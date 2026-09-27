@@ -1,4 +1,5 @@
 import {
+  addCustomRefinementIssue,
   getOutcomeResultsForMethod,
   hasMeaningfulOutcomeContent,
   supportsPartialApplicationForEffectKind,
@@ -27,11 +28,11 @@ export function validateResolutionFormOutcomes(
   })
 
   if (!values.outcomes.some(hasMeaningfulOutcomeContent)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: resolutionFormValidationMessages.resolutionRequiresMeaningfulOutcome(),
-      path: ['outcomes'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      resolutionFormValidationMessages.resolutionRequiresMeaningfulOutcome(),
+      ['outcomes'],
+    )
   }
 }
 
@@ -43,22 +44,22 @@ function validateResolutionFormOutcomeResult(
   ctx: z.RefinementCtx,
 ): void {
   if (seenResults.has(outcome.result)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: resolutionFormValidationMessages.duplicateOutcomeResult(),
-      path: ['outcomes', outcomeIndex, 'result'],
-    })
+    addCustomRefinementIssue(ctx, resolutionFormValidationMessages.duplicateOutcomeResult(), [
+      'outcomes',
+      outcomeIndex,
+      'result',
+    ])
   }
   seenResults.add(outcome.result)
 
   if (!allowedResults.has(outcome.result)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: resolutionFormValidationMessages.outcomeResultNotAllowedForMethod({
+    addCustomRefinementIssue(
+      ctx,
+      resolutionFormValidationMessages.outcomeResultNotAllowedForMethod({
         result: outcome.result,
       }),
-      path: ['outcomes', outcomeIndex, 'result'],
-    })
+      ['outcomes', outcomeIndex, 'result'],
+    )
   }
 }
 
@@ -71,34 +72,34 @@ function validateResolutionFormOutcomeApplications(
   const applicationEffectIds = outcome.applications.map((application) => application.effectId)
   const uniqueApplicationEffectIds = new Set(applicationEffectIds)
   if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: resolutionFormValidationMessages.duplicateOutcomeApplicationEffectId(),
-      path: ['outcomes', outcomeIndex, 'applications'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      resolutionFormValidationMessages.duplicateOutcomeApplicationEffectId(),
+      ['outcomes', outcomeIndex, 'applications'],
+    )
   }
 
   outcome.applications.forEach((application, applicationIndex) => {
     const effect = findResolutionEffectById(values.effects, application.effectId)
     if (!effect) {
-      ctx.addIssue({
-        code: 'custom',
-        message: resolutionFormValidationMessages.unknownEffectReference({
+      addCustomRefinementIssue(
+        ctx,
+        resolutionFormValidationMessages.unknownEffectReference({
           effectId: application.effectId,
         }),
-        path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
-      })
+        ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
+      )
       return
     }
 
     if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: resolutionFormValidationMessages.halfNotSupportedForEffectKind({
+      addCustomRefinementIssue(
+        ctx,
+        resolutionFormValidationMessages.halfNotSupportedForEffectKind({
           kind: effect.kind,
         }),
-        path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
-      })
+        ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
+      )
     }
   })
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { MAX_CHARACTER_LEVEL } from '../../primitives/level'
 import {
@@ -91,22 +92,22 @@ function validateUniqueOrganizationMembershipTitleDefinitions(
   titles.forEach((title, index) => {
     const path = [...pathPrefix, index]
     if (seenIds.has(title.id)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Organization membership title ids must be unique within an organization.',
-        path: [...path, 'id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        'Organization membership title ids must be unique within an organization.',
+        [...path, 'id'],
+      )
     } else {
       seenIds.add(title.id)
     }
 
     const normalizedLabel = normalizeOrganizationMembershipTitleLabel(title.label)
     if (seenLabels.has(normalizedLabel)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Organization membership title labels must be unique within an organization.',
-        path: [...path, 'label'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        'Organization membership title labels must be unique within an organization.',
+        [...path, 'label'],
+      )
     } else {
       seenLabels.add(normalizedLabel)
     }
@@ -199,10 +200,10 @@ export function organizationCreateMembershipTitlesInputRefinement(
   const hasPreset = value.sourcePresetId !== undefined
   const hasTitles = value.members?.titles !== undefined && value.members.titles.length > 0
   if (hasPreset && hasTitles) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: 'Organization create input must not combine sourcePresetId with members.titles.',
-      path: ['members', 'titles'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      'Organization create input must not combine sourcePresetId with members.titles.',
+      ['members', 'titles'],
+    )
   }
 }

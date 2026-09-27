@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import {
+  addCustomRefinementIssue,
   contentTraitKindSchema,
   defineMessage,
   fieldValidationMessages,
@@ -73,19 +74,11 @@ export function refinePublishedTraitRow(
   ctx: z.RefinementCtx,
 ): void {
   if (row.kind === 'custom' && !row.name?.trim()) {
-    ctx.addIssue({
-      code: 'custom',
-      message: fieldValidationMessages.requiredText({ label: 'Name' }),
-      path: ['name'],
-    })
+    addCustomRefinementIssue(ctx, fieldValidationMessages.requiredText({ label: 'Name' }), ['name'])
   }
   if (row.kind === 'grant') {
     if (row.grants.length === 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: speciesTraitValidationMessages.grantRowRequired(),
-        path: ['grants'],
-      })
+      addCustomRefinementIssue(ctx, speciesTraitValidationMessages.grantRowRequired(), ['grants'])
       return
     }
 
@@ -94,11 +87,7 @@ export function refinePublishedTraitRow(
       const hasCompleteGrantRow = row.grants.some((grantRow) => formRowToContentGrant(grantRow))
       if (!hasCompleteGrantRow) return
 
-      ctx.addIssue({
-        code: 'custom',
-        message: speciesTraitValidationMessages.grantRowRequired(),
-        path: ['grants'],
-      })
+      addCustomRefinementIssue(ctx, speciesTraitValidationMessages.grantRowRequired(), ['grants'])
     }
   }
 }

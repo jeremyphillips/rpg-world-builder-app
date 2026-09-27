@@ -1,11 +1,12 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
+  SPELLCASTING_FOCUS_GEAR_KINDS,
+  SPELLCASTING_GEAR_KIND_ENTRIES,
+  addCustomRefinementIssue,
   choiceOptionTitle,
   defineMessage,
   formatStartingEquipmentOptionCompactSummary,
-  SPELLCASTING_FOCUS_GEAR_KINDS,
-  SPELLCASTING_GEAR_KIND_ENTRIES,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -80,11 +81,11 @@ export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSc
   })
   .superRefine((row, ctx) => {
     if (row.grantTargetSource === 'proficiency_choice' && (row.modifiers?.length ?? 0) > 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Proficiency-linked starting equipment grants cannot carry modifiers.',
-        path: ['modifiers'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        'Proficiency-linked starting equipment grants cannot carry modifiers.',
+        ['modifiers'],
+      )
     }
   })
 
@@ -104,20 +105,16 @@ export function refineStartingEquipmentProficiencyLinkRow(
   const choiceId = row.proficiencyChoiceId.trim()
 
   if (!validation.definedToolChoiceIds.has(choiceId)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: equipmentGrantValidationMessages.missingProficiencyChoice({ choiceId }),
-      path: ['proficiencyChoiceId'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      equipmentGrantValidationMessages.missingProficiencyChoice({ choiceId }),
+      ['proficiencyChoiceId'],
+    )
     return
   }
 
   if (!validation.eligibleProficiencyChoiceIds.has(choiceId)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: INELIGIBLE_PROFICIENCY_CHOICE_ERROR,
-      path: ['proficiencyChoiceId'],
-    })
+    addCustomRefinementIssue(ctx, INELIGIBLE_PROFICIENCY_CHOICE_ERROR, ['proficiencyChoiceId'])
   }
 }
 
@@ -141,11 +138,10 @@ export const startingEquipmentOptionFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (!row.items.length && !wealthGrantMoneyFromForm(row.wealth)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: startingEquipmentValidationMessages.wealthGrantRequired(),
-        path: ['wealth', 'amount'],
-      })
+      addCustomRefinementIssue(ctx, startingEquipmentValidationMessages.wealthGrantRequired(), [
+        'wealth',
+        'amount',
+      ])
     }
   })
 

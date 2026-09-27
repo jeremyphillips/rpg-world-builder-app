@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { toolCategorySchema } from '../../../vocab/equipment/tool-category'
 import { skillSchema } from '../../skill-proficiency'
@@ -63,11 +64,7 @@ function refineMeaningfulChoiceGroup(
   ctx: z.RefinementCtx,
 ): void {
   if (!choices.some(isMeaningfulProficiencyChoice)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: MEANINGFUL_CHOICE_GROUP_MESSAGE,
-      path: ['choices'],
-    })
+    addCustomRefinementIssue(ctx, MEANINGFUL_CHOICE_GROUP_MESSAGE, ['choices'])
   }
 }
 
@@ -148,11 +145,7 @@ function refineMeaningfulToolChoiceGroup(
   ctx: z.RefinementCtx,
 ): void {
   if (!choices.some(isMeaningfulToolProficiencyChoice)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: MEANINGFUL_TOOL_CHOICE_GROUP_MESSAGE,
-      path: ['choices'],
-    })
+    addCustomRefinementIssue(ctx, MEANINGFUL_TOOL_CHOICE_GROUP_MESSAGE, ['choices'])
   }
 }
 

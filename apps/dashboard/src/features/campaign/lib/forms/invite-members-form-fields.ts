@@ -1,5 +1,9 @@
 import { z } from 'zod'
-import { campaignInviteRecipientInputSchema, fieldValidationMessages } from '@rpg/contracts'
+import {
+  addCustomRefinementIssue,
+  campaignInviteRecipientInputSchema,
+  fieldValidationMessages,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 const inviteEmailEntrySchema = z.object({
@@ -17,21 +21,17 @@ export const inviteMembersSchema = z
 
     const normalized = filledEntries.map((entry) => entry.email.toLowerCase())
     if (new Set(normalized).size !== normalized.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate email addresses are not allowed.',
-        path: ['inviteEmails'],
-      })
+      addCustomRefinementIssue(ctx, 'Duplicate email addresses are not allowed.', ['inviteEmails'])
     }
 
     for (const entry of filledEntries) {
       const parsed = campaignInviteRecipientInputSchema.safeParse({ email: entry.email })
       if (!parsed.success) {
-        ctx.addIssue({
-          code: 'custom',
-          message: fieldValidationMessages.invalidEmail(),
-          path: ['inviteEmails', entry.index, 'email'],
-        })
+        addCustomRefinementIssue(ctx, fieldValidationMessages.invalidEmail(), [
+          'inviteEmails',
+          entry.index,
+          'email',
+        ])
       }
     }
   })

@@ -1,5 +1,10 @@
 import type { z } from 'zod'
-import { changePasswordInputSchema, defineMessage, passwordSchema } from '@rpg/contracts'
+import {
+  addCustomRefinementIssue,
+  changePasswordInputSchema,
+  defineMessage,
+  passwordSchema,
+} from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
 /** Change-password form validation messages (tier 3 form overrides). */
@@ -19,11 +24,9 @@ export const changePasswordFormSchema = changePasswordInputSchema
   .extend({ confirmNewPassword: passwordSchema })
   .superRefine((data, ctx) => {
     if (data.newPassword !== data.confirmNewPassword) {
-      ctx.addIssue({
-        code: 'custom',
-        message: changePasswordValidationMessages.passwordsDoNotMatch(),
-        path: ['confirmNewPassword'],
-      })
+      addCustomRefinementIssue(ctx, changePasswordValidationMessages.passwordsDoNotMatch(), [
+        'confirmNewPassword',
+      ])
     }
   })
 

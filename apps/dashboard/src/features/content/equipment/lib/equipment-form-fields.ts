@@ -1,34 +1,35 @@
 import { z } from 'zod'
 import {
-  EQUIPMENT_KINDS,
-  EQUIPMENT_KIND_LABELS,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
+  EQUIPMENT_KINDS,
+  EQUIPMENT_KIND_LABELS,
   abilitySchema,
+  addCustomRefinementIssue,
   armorCategorySchema,
   armorMaterialSchema,
   currencySchema,
+  diceSchema,
   gearKindSchema,
   holySymbolUsageSchema,
-  spellcastingGearKindSchema,
   magicItemCategorySchema,
   magicItemRaritySchema,
   massUnitSchema,
   serviceCategorySchema,
   serviceDurationUnitSchema,
-  speedRateUnitSchema,
-  diceSchema,
   slugSchema,
+  speedRateUnitSchema,
+  spellcastingGearKindSchema,
   toolCategorySchema,
   toolUtilizeActionSchema,
+  type ContentValidationIntent,
+  type EquipmentKind,
   vehicleCategorySchema,
   weaponCategorySchema,
   weaponDamageTypeSchema,
   weaponMasterySchema,
   weaponModeSchema,
   weaponPropertySchema,
-  type ContentValidationIntent,
-  type EquipmentKind,
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
@@ -59,11 +60,7 @@ function refineEquipmentEconomyForm(
   if (!data.hasMarketPrice) return
   const amount = data.cost?.amount
   if (amount === undefined || Number.isNaN(amount)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Enter a market price greater than zero.',
-      path: ['cost', 'amount'],
-    })
+    addCustomRefinementIssue(ctx, 'Enter a market price greater than zero.', ['cost', 'amount'])
   }
 }
 

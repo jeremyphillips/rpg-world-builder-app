@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { contentMediaSchema } from '../../shared/media/content-media'
 import { vocabularyValidationMessages } from './vocabulary-messages'
@@ -222,11 +223,11 @@ export const updateVocabularyEntryInputSchema = z
     const hasMedia = value.media !== undefined
     const hasRevision = value.expectedMediaRevision !== undefined
     if (hasMedia !== hasRevision) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'media and expectedMediaRevision must be provided together.',
-        path: hasMedia ? ['expectedMediaRevision'] : ['media'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        'media and expectedMediaRevision must be provided together.',
+        hasMedia ? ['expectedMediaRevision'] : ['media'],
+      )
     }
   })
 

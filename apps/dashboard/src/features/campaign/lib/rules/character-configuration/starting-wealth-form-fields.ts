@@ -3,6 +3,7 @@ import {
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
   absoluteLevelSchema,
+  addCustomRefinementIssue,
   currencySchema,
   defineMessage,
   getCurrencyAbbrev,
@@ -85,20 +86,17 @@ export const startingWealthTierFormSchema = z
     if (!tier.bonusGoldEnabled) return
 
     if (!tier.bonusGold) {
-      ctx.addIssue({
-        code: 'custom',
-        message: startingWealthValidationMessages.bonusGoldRequired(),
-        path: ['bonusGold'],
-      })
+      addCustomRefinementIssue(ctx, startingWealthValidationMessages.bonusGoldRequired(), [
+        'bonusGold',
+      ])
       return
     }
 
     if (tier.bonusGold.formula.modifier?.operator !== '×') {
-      ctx.addIssue({
-        code: 'custom',
-        message: startingWealthValidationMessages.bonusGoldMultiplier(),
-        path: ['bonusGold', 'formula'],
-      })
+      addCustomRefinementIssue(ctx, startingWealthValidationMessages.bonusGoldMultiplier(), [
+        'bonusGold',
+        'formula',
+      ])
     }
   })
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { absoluteLevelSchema } from '../primitives/level'
 import { classSlugSchema } from './classes/class'
@@ -52,11 +53,11 @@ export const speciesClassPolicySchema = z
       SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS.includes(value.mode) &&
       value.classIds.length === 0
     ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: speciesCharacterCreationValidationMessages.classPolicyRequiresClasses(),
-        path: ['classIds'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        speciesCharacterCreationValidationMessages.classPolicyRequiresClasses(),
+        ['classIds'],
+      )
     }
   })
 
@@ -91,11 +92,11 @@ export const speciesLevelLimitsSchema = z
     const seen = new Set<string>()
     value.classLevelCaps.forEach((cap, index) => {
       if (seen.has(cap.classId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: speciesCharacterCreationValidationMessages.duplicateClassLevelCap(),
-          path: ['classLevelCaps', index, 'classId'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          speciesCharacterCreationValidationMessages.duplicateClassLevelCap(),
+          ['classLevelCaps', index, 'classId'],
+        )
       }
       seen.add(cap.classId)
     })

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../../../validation/define-message'
 import { absoluteLevelSchema } from '../../../primitives/level'
@@ -22,11 +23,11 @@ export const progressionCurveSchema = z
     const seen = new Set<number>()
     curve.rows.forEach((row, index) => {
       if (seen.has(row.level)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: progressionCurveValidationMessages.duplicateLevel({ level: row.level }),
-          path: ['rows', index, 'level'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          progressionCurveValidationMessages.duplicateLevel({ level: row.level }),
+          ['rows', index, 'level'],
+        )
       }
       seen.add(row.level)
     })

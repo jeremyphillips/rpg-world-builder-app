@@ -1,6 +1,7 @@
 import {
   MOVEMENT_MODES,
   MOVEMENT_SPEED_FEET,
+  addCustomRefinementIssue,
   defineMessage,
   fieldValidationMessages,
   getMovementModeLabel,
@@ -48,19 +49,19 @@ function refineMovementRowRequired(
   pathPrefix: (string | number)[] = [],
 ): void {
   if (!row.mode) {
-    ctx.addIssue({
-      code: 'custom',
-      message: fieldValidationMessages.requiredSelect({ label: MOVEMENT_MODE_FIELD_LABEL }),
-      path: [...pathPrefix, 'mode'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.requiredSelect({ label: MOVEMENT_MODE_FIELD_LABEL }),
+      [...pathPrefix, 'mode'],
+    )
   }
 
   if (row.feet === undefined || row.feet === '') {
-    ctx.addIssue({
-      code: 'custom',
-      message: fieldValidationMessages.requiredSelect({ label: MOVEMENT_SPEED_FIELD_LABEL }),
-      path: [...pathPrefix, 'feet'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.requiredSelect({ label: MOVEMENT_SPEED_FIELD_LABEL }),
+      [...pathPrefix, 'feet'],
+    )
   }
 }
 
@@ -201,11 +202,11 @@ export function refineSpeciesMovementRows(
 
     const mode = row.mode as MovementMode
     if (seen.has(mode)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: speciesMovementValidationMessages.duplicateMode(),
-        path: [...pathPrefix, index, 'mode'],
-      })
+      addCustomRefinementIssue(ctx, speciesMovementValidationMessages.duplicateMode(), [
+        ...pathPrefix,
+        index,
+        'mode',
+      ])
     }
     seen.add(mode)
   }

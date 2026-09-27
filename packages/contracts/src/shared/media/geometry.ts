@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { contentMediaValidationMessages } from './content-media-validation-messages'
 import type { CropPresentation } from './image-presentation'
@@ -27,18 +28,10 @@ export const normalizedCropSchema = z
   })
   .superRefine((crop, ctx) => {
     if (crop.x + crop.width > 1 + Number.EPSILON) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Crop width extends beyond the source image.',
-        path: ['width'],
-      })
+      addCustomRefinementIssue(ctx, 'Crop width extends beyond the source image.', ['width'])
     }
     if (crop.y + crop.height > 1 + Number.EPSILON) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Crop height extends beyond the source image.',
-        path: ['height'],
-      })
+      addCustomRefinementIssue(ctx, 'Crop height extends beyond the source image.', ['height'])
     }
   })
 

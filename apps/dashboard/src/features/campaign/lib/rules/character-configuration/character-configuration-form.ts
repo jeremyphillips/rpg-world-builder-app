@@ -1,3 +1,4 @@
+import { addCustomRefinementIssue } from '@rpg/contracts'
 import type { FieldOption, FormItem } from '@rpg/ui/form'
 
 import {
@@ -43,11 +44,11 @@ export function resolveRulesSchema(activeCreatureTypeIds?: ReadonlySet<string>) 
   return rulesSchema.superRefine((values, ctx) => {
     for (const id of values.allowedCharacterCreatureTypes) {
       if (!activeCreatureTypeIds.has(id)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: characterConfigurationValidationMessages.creatureTypeUnavailable(),
-          path: ['allowedCharacterCreatureTypes'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          characterConfigurationValidationMessages.creatureTypeUnavailable(),
+          ['allowedCharacterCreatureTypes'],
+        )
       }
     }
   })
@@ -64,11 +65,11 @@ export function resolveRulesSchemaWithVocabulary(options: {
     if (activeCreatureTypeIds) {
       for (const id of values.allowedCharacterCreatureTypes) {
         if (!activeCreatureTypeIds.has(id)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: characterConfigurationValidationMessages.creatureTypeUnavailable(),
-            path: ['allowedCharacterCreatureTypes'],
-          })
+          addCustomRefinementIssue(
+            ctx,
+            characterConfigurationValidationMessages.creatureTypeUnavailable(),
+            ['allowedCharacterCreatureTypes'],
+          )
         }
       }
     }
@@ -76,21 +77,21 @@ export function resolveRulesSchemaWithVocabulary(options: {
     if (activeLanguageIds) {
       for (const id of values.languageProficiencyGrants.items) {
         if (!activeLanguageIds.has(id)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: characterConfigurationValidationMessages.languageUnavailable(),
-            path: ['languageProficiencyGrants', 'items'],
-          })
+          addCustomRefinementIssue(
+            ctx,
+            characterConfigurationValidationMessages.languageUnavailable(),
+            ['languageProficiencyGrants', 'items'],
+          )
         }
       }
 
       for (const id of values.levelZeroLanguageProficiencies.items) {
         if (!activeLanguageIds.has(id)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: characterConfigurationValidationMessages.languageUnavailable(),
-            path: ['levelZeroLanguageProficiencies', 'items'],
-          })
+          addCustomRefinementIssue(
+            ctx,
+            characterConfigurationValidationMessages.languageUnavailable(),
+            ['levelZeroLanguageProficiencies', 'items'],
+          )
         }
       }
     }

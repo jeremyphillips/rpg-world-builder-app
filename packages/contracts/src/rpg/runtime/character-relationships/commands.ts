@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { fieldValidationMessages } from '../../../validation/messages'
 import {
@@ -135,11 +136,11 @@ export const createCharacterRelationshipInputSchema = createCharacterRelationshi
   .transform(normalizeCharacterRelationshipAudience)
   .superRefine((data, ctx) => {
     if (data.visibility === 'specific_players' && data.participantIds.length < 1) {
-      ctx.addIssue({
-        code: 'custom',
-        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
-        path: ['participantIds'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'player' }),
+        ['participantIds'],
+      )
     }
   })
 
@@ -169,11 +170,11 @@ export const updateCharacterRelationshipInputSchema = z
       data.visibility === 'specific_players' &&
       (data.participantIds === undefined || data.participantIds.length < 1)
     ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
-        path: ['participantIds'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'player' }),
+        ['participantIds'],
+      )
     }
   })
   .transform((data) => {

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { personalNameComponentSchema } from '../vocab/personal-name-component'
 import type { PersonalNameComponent } from '../vocab/personal-name-component'
@@ -40,11 +41,11 @@ export const speciesCultureConfigSchema = z
     const hasId = value.id !== undefined
     const hasName = value.name !== undefined
     if (hasId !== hasName) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Culture id and name must be provided together.',
-        path: hasId ? ['name'] : ['id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        'Culture id and name must be provided together.',
+        hasId ? ['name'] : ['id'],
+      )
     }
   })
 

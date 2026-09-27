@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
 
 import { nameCollectionIdSchema } from './collection'
 import { nameCollectionProvenanceSchema } from './provenance'
@@ -44,19 +45,19 @@ export const namingConventionSchema = z
 
     for (const [index, binding] of convention.partBindings.entries()) {
       if (!structurePartKeys.has(binding.partKey)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Part binding "${binding.partKey}" does not match any structure part key`,
-          path: ['partBindings', index, 'partKey'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          `Part binding "${binding.partKey}" does not match any structure part key`,
+          ['partBindings', index, 'partKey'],
+        )
       }
 
       if (!collectionIdSet.has(binding.collectionId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Part binding collection "${binding.collectionId}" is not listed in collectionIds`,
-          path: ['partBindings', index, 'collectionId'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          `Part binding collection "${binding.collectionId}" is not listed in collectionIds`,
+          ['partBindings', index, 'collectionId'],
+        )
       }
     }
 
@@ -65,11 +66,11 @@ export const namingConventionSchema = z
         (binding) => binding.collectionId === collectionId,
       )
       if (!referenced) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Collection "${collectionId}" is not referenced by any part binding`,
-          path: ['collectionIds', index],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          `Collection "${collectionId}" is not referenced by any part binding`,
+          ['collectionIds', index],
+        )
       }
     }
   })

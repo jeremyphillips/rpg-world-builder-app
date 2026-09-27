@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { slugSchema } from '../lib/envelope'
 
@@ -42,11 +43,11 @@ function refineUniqueColumnIds(
 
   for (const [index, column] of columns.entries()) {
     if (seenIds.has(column.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: generalTableValidationMessages.duplicateColumnId({ columnId: column.id }),
-        path: [...pathPrefix, index, 'id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        generalTableValidationMessages.duplicateColumnId({ columnId: column.id }),
+        [...pathPrefix, index, 'id'],
+      )
     }
     seenIds.add(column.id)
   }
@@ -61,11 +62,11 @@ function refineUniqueRowIds(
 
   for (const [index, row] of rows.entries()) {
     if (seenIds.has(row.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: generalTableValidationMessages.duplicateRowId({ rowId: row.id }),
-        path: [...pathPrefix, index, 'id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        generalTableValidationMessages.duplicateRowId({ rowId: row.id }),
+        [...pathPrefix, index, 'id'],
+      )
     }
     seenIds.add(row.id)
   }
@@ -80,21 +81,21 @@ function refineRowCells(
   for (const [columnId, rawValue] of Object.entries(row.cells)) {
     const column = columnsById.get(columnId)
     if (column === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: generalTableValidationMessages.unknownCellColumnId({ columnId }),
-        path: [...pathPrefix, 'cells', columnId],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        generalTableValidationMessages.unknownCellColumnId({ columnId }),
+        [...pathPrefix, 'cells', columnId],
+      )
       continue
     }
 
     const parsed = parseTableCellValue(column, rawValue)
     if (parsed === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: generalTableValidationMessages.invalidCellValue({ columnId }),
-        path: [...pathPrefix, 'cells', columnId],
-      })
+      addCustomRefinementIssue(ctx, generalTableValidationMessages.invalidCellValue({ columnId }), [
+        ...pathPrefix,
+        'cells',
+        columnId,
+      ])
     }
   }
 }

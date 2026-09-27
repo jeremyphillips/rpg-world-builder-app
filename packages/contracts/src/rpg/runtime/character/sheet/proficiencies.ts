@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { characterValidationMessages } from '../character-messages'
 import { armorCategorySchema } from '../../../vocab/armor/category'
@@ -52,11 +53,9 @@ export const characterToolProficiencyEntrySchema = z
   })
   .superRefine((val, ctx) => {
     if ((val.toolId === undefined) === (val.toolCategory === undefined)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: characterValidationMessages.toolProficiencyExclusiveTarget(),
-        path: ['toolId'],
-      })
+      addCustomRefinementIssue(ctx, characterValidationMessages.toolProficiencyExclusiveTarget(), [
+        'toolId',
+      ])
     }
   })
 
@@ -71,11 +70,11 @@ export const characterWeaponProficiencyEntrySchema = z
   })
   .superRefine((val, ctx) => {
     if ((val.weaponId === undefined) === (val.weaponCategory === undefined)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: characterValidationMessages.weaponProficiencyExclusiveTarget(),
-        path: ['weaponId'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        characterValidationMessages.weaponProficiencyExclusiveTarget(),
+        ['weaponId'],
+      )
     }
   })
 

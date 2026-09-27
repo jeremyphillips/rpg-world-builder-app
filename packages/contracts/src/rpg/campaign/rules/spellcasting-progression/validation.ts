@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { spellcastingProgressionValidationMessages } from './messages'
 import type { LeveledSlotRow, PactSlotRow } from './slot-progression'
@@ -25,11 +26,11 @@ export function refineLeveledSlotRows(
     const rowPath = [...pathPrefix, index]
 
     if (seen.has(row.level)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingProgressionValidationMessages.duplicateSlotLevel({ level: row.level }),
-        path: [...rowPath, 'level'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        spellcastingProgressionValidationMessages.duplicateSlotLevel({ level: row.level }),
+        [...rowPath, 'level'],
+      )
     }
     seen.add(row.level)
 
@@ -41,43 +42,43 @@ export function refineLeveledSlotRows(
       const previousHighest = highestUnlockedSlotLevel(previousSlots)
 
       if (currentHighest < previousHighest) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingProgressionValidationMessages.slotLevelDecreased({
+        addCustomRefinementIssue(
+          ctx,
+          spellcastingProgressionValidationMessages.slotLevelDecreased({
             level: row.level,
             previous: previousHighest,
             next: currentHighest,
           }),
-          path: [...rowPath, 'slots'],
-        })
+          [...rowPath, 'slots'],
+        )
       }
 
       for (let slotLevel = 1; slotLevel <= MAX_SPELL_SLOT_LEVEL; slotLevel += 1) {
         const previousCount = previousSlots[slotLevel - 1] ?? 0
         const currentCount = slots[slotLevel - 1] ?? 0
         if (currentCount < previousCount) {
-          ctx.addIssue({
-            code: 'custom',
-            message: spellcastingProgressionValidationMessages.slotCountDecreased({
+          addCustomRefinementIssue(
+            ctx,
+            spellcastingProgressionValidationMessages.slotCountDecreased({
               level: row.level,
               slotLevel,
               previous: previousCount,
               next: currentCount,
             }),
-            path: [...rowPath, 'slots'],
-          })
+            [...rowPath, 'slots'],
+          )
         }
       }
 
       if (currentHighest > previousHighest + 1) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingProgressionValidationMessages.slotLevelSkipped({
+        addCustomRefinementIssue(
+          ctx,
+          spellcastingProgressionValidationMessages.slotLevelSkipped({
             level: row.level,
             slotLevel: previousHighest + 1,
           }),
-          path: [...rowPath, 'slots'],
-        })
+          [...rowPath, 'slots'],
+        )
       }
     }
 
@@ -97,48 +98,48 @@ export function refinePactSlotRows(
     const rowPath = [...pathPrefix, index]
 
     if (seen.has(row.level)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingProgressionValidationMessages.duplicateSlotLevel({ level: row.level }),
-        path: [...rowPath, 'level'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        spellcastingProgressionValidationMessages.duplicateSlotLevel({ level: row.level }),
+        [...rowPath, 'level'],
+      )
     }
     seen.add(row.level)
 
     if (previousRow) {
       if (row.slotLevel < previousRow.slotLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingProgressionValidationMessages.slotLevelDecreased({
+        addCustomRefinementIssue(
+          ctx,
+          spellcastingProgressionValidationMessages.slotLevelDecreased({
             level: row.level,
             previous: previousRow.slotLevel,
             next: row.slotLevel,
           }),
-          path: [...rowPath, 'slotLevel'],
-        })
+          [...rowPath, 'slotLevel'],
+        )
       }
 
       if (row.slotLevel > previousRow.slotLevel + 1) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingProgressionValidationMessages.slotLevelSkipped({
+        addCustomRefinementIssue(
+          ctx,
+          spellcastingProgressionValidationMessages.slotLevelSkipped({
             level: row.level,
             slotLevel: previousRow.slotLevel + 1,
           }),
-          path: [...rowPath, 'slotLevel'],
-        })
+          [...rowPath, 'slotLevel'],
+        )
       }
 
       if (row.slotCount < previousRow.slotCount && row.slotLevel === previousRow.slotLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingProgressionValidationMessages.pactSlotCountDecreased({
+        addCustomRefinementIssue(
+          ctx,
+          spellcastingProgressionValidationMessages.pactSlotCountDecreased({
             level: row.level,
             previous: previousRow.slotCount,
             next: row.slotCount,
           }),
-          path: [...rowPath, 'slotCount'],
-        })
+          [...rowPath, 'slotCount'],
+        )
       }
     }
 

@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 import {
+  addCustomRefinementIssue,
   eligibleProficiencyChoiceTargetIds,
   indexCharacterBuildCatalog,
   type CharacterClass,
@@ -65,11 +66,11 @@ function refineCharacterCreationSkillChoice(
 ): void {
   if (!skills || skills.choose <= 0 || skills.from.length >= skills.choose) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: `Add at least ${skills.choose} skills to the pool`,
-    path: ['proficiencies', 'skills', 'from'],
-  })
+  addCustomRefinementIssue(ctx, `Add at least ${skills.choose} skills to the pool`, [
+    'proficiencies',
+    'skills',
+    'from',
+  ])
 }
 
 function refineCharacterCreationStartingEquipmentLinks(
@@ -123,11 +124,11 @@ export function refineCharacterCreationSaveValidation(
   const tools = characterCreation?.proficiencies?.tools
 
   if (isMeaningfulCharacterCreationToolChoice(tools) && !tools.label?.trim()) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Enter a label for the tool proficiency choice.',
-      path: ['proficiencies', 'tools', 'label'],
-    })
+    addCustomRefinementIssue(ctx, 'Enter a label for the tool proficiency choice.', [
+      'proficiencies',
+      'tools',
+      'label',
+    ])
   }
 
   if (characterCreation) {

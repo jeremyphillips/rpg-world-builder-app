@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { joinNaturalList } from '../../../primitives/prose'
 import {
@@ -63,11 +64,9 @@ function refineFixedSlugsOrCategories(
   const hasSlugs = (val.slugs?.length ?? 0) > 0
   const hasCategories = (val.categories?.length ?? 0) > 0
   if (!hasSlugs && !hasCategories) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.fixedProficiencyRequiresTarget(),
-      path: [slugPath],
-    })
+    addCustomRefinementIssue(ctx, grantValidationMessages.fixedProficiencyRequiresTarget(), [
+      slugPath,
+    ])
   }
 }
 
@@ -143,11 +142,9 @@ const filteredToolProficiencyPoolSchema = z
     const hasCategories = (val.toolCategories?.length ?? 0) > 0
     const hasSlugs = (val.toolSlugs?.length ?? 0) > 0
     if (!hasCategories && !hasSlugs) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.filteredToolPoolRequiresTarget(),
-        path: ['toolCategories'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.filteredToolPoolRequiresTarget(), [
+        'toolCategories',
+      ])
     }
   })
 

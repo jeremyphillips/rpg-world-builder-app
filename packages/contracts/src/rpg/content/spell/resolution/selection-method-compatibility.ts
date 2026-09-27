@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { spellResolutionValidationMessages } from './validation-messages'
 import type { SpellResolutionMethod } from './schema'
@@ -200,14 +201,14 @@ export function validateSpellResolutionMethodCompatibility(
   const reasonCode = getSelectionMethodCompatibilityReasonCode(context, resolution.method.kind)
   if (!reasonCode) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: spellResolutionValidationMessages.methodIncompatibleWithSelectionMode({
+  addCustomRefinementIssue(
+    ctx,
+    spellResolutionValidationMessages.methodIncompatibleWithSelectionMode({
       compatibility,
       reasonCode,
       methodKind: resolution.method.kind,
       selectionContext: context,
     }),
-    path: ['method', 'kind'],
-  })
+    ['method', 'kind'],
+  )
 }

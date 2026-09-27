@@ -1,5 +1,6 @@
 import {
   STANDARD_STARTING_WEALTH_SLUG,
+  addCustomRefinementIssue,
   standardStartingWealthTableId,
   type StartingWealth,
   type StartingWealthRules,
@@ -14,11 +15,10 @@ const SYSTEM_SEED_TIMESTAMP = '2024-05-21T00:00:00.000Z'
 
 const startingWealthSeedSchema = startingWealthSeedFileSchema.superRefine((tables, ctx) => {
   if (tables[0]?.scope.kind !== 'standard') {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'The SRD starting wealth table must use the standard scope',
-      path: [0, 'scope'],
-    })
+    addCustomRefinementIssue(ctx, 'The SRD starting wealth table must use the standard scope', [
+      0,
+      'scope',
+    ])
   }
 })
 

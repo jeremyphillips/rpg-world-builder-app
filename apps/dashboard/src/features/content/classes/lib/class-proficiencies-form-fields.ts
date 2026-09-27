@@ -1,17 +1,18 @@
 import { z, type RefinementCtx } from 'zod'
 import {
   ABILITY_ENTRIES,
-  fieldValidationMessages,
   ABILITY_IDS,
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  getProficiencyDomainSentenceForm,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   abilitySchema,
+  addCustomRefinementIssue,
   armorCategorySchema,
+  fieldValidationMessages,
+  getProficiencyDomainSentenceForm,
   skillSchema,
   toolCategorySchema,
   weaponCategorySchema,
@@ -97,21 +98,21 @@ export function refineClassWeaponProficiencies(
 
   if (weaponProficiencyMode === 'categories') {
     if (proficiencies.weapons.categories.length === 0) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['proficiencies', 'weapons', 'categories'],
-        message: fieldValidationMessages.minSelections({ itemLabel: 'weapon proficiency' }),
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'weapon proficiency' }),
+        ['proficiencies', 'weapons', 'categories'],
+      )
     }
     return
   }
 
   if ((proficiencies.weapons.items ?? []).length === 0) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['proficiencies', 'weapons', 'items'],
-      message: fieldValidationMessages.minSelections({ itemLabel: 'weapon choice' }),
-    })
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.minSelections({ itemLabel: 'weapon choice' }),
+      ['proficiencies', 'weapons', 'items'],
+    )
   }
 }
 

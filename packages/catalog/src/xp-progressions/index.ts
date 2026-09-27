@@ -1,9 +1,10 @@
 import {
+  addCustomRefinementIssue,
   resolveEffectiveXpProgression,
-  type XpProgressionEntry,
-  type XpThresholdsPatch,
   type SystemRulesetId,
   type XpProgression,
+  type XpProgressionEntry,
+  type XpThresholdsPatch,
 } from '@rpg/contracts'
 
 import { getBySlug } from '../lib/get-by-slug'
@@ -12,11 +13,10 @@ import { xpProgressionSeedFileSchema } from '../seed-schemas'
 
 const xpProgressionSeedSchema = xpProgressionSeedFileSchema.superRefine((progressions, ctx) => {
   if (progressions[0]?.scope.kind !== 'standard') {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'The SRD XP progression must use the standard scope',
-      path: [0, 'scope'],
-    })
+    addCustomRefinementIssue(ctx, 'The SRD XP progression must use the standard scope', [
+      0,
+      'scope',
+    ])
   }
 })
 

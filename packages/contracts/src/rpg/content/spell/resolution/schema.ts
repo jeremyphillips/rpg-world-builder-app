@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 /**
  * @todo Enum/vocab follow-up — migrate spell resolution closed sets (attack types,
@@ -259,11 +260,9 @@ export function validateSpellResolutionReferences(
   const effectIds = resolution.effects.map((effect) => effect.id)
   const uniqueEffectIds = new Set(effectIds)
   if (uniqueEffectIds.size !== effectIds.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionValidationMessages.duplicateEffectId(),
-      path: ['effects'],
-    })
+    addCustomRefinementIssue(ctx, spellResolutionValidationMessages.duplicateEffectId(), [
+      'effects',
+    ])
   }
 
   const targetCompatibilityContext = {
@@ -276,78 +275,76 @@ export function validateSpellResolutionReferences(
     if (!isResolutionEffectKind(effect.kind)) return
     if (isEffectKindAllowedForTarget(effect.kind, targetCompatibilityContext)) return
 
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionValidationMessages.effectKindIncompatibleWithTarget({
         kind: effect.kind,
         targetKind: resolution.target?.kind ?? 'creature',
       }),
-      path: ['effects', effectIndex, 'kind'],
-    })
+      ['effects', effectIndex, 'kind'],
+    )
   })
 
   if (!resolution.outcomes.some(hasMeaningfulOutcomeContent)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionValidationMessages.resolutionRequiresMeaningfulOutcome(),
-      path: ['outcomes'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionValidationMessages.resolutionRequiresMeaningfulOutcome(),
+      ['outcomes'],
+    )
   }
 
   const outcomeResults = resolution.outcomes.map((outcome) => outcome.result)
   const uniqueOutcomeResults = new Set(outcomeResults)
   if (uniqueOutcomeResults.size !== outcomeResults.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionValidationMessages.duplicateOutcomeResult(),
-      path: ['outcomes'],
-    })
+    addCustomRefinementIssue(ctx, spellResolutionValidationMessages.duplicateOutcomeResult(), [
+      'outcomes',
+    ])
   }
 
   const allowedResults = allowedOutcomeResultsForMethod(resolution.method)
 
   resolution.outcomes.forEach((outcome, outcomeIndex) => {
     if (!allowedResults.includes(outcome.result)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellResolutionValidationMessages.outcomeResultNotAllowedForMethod({
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.outcomeResultNotAllowedForMethod({
           result: outcome.result,
         }),
-        path: ['outcomes', outcomeIndex, 'result'],
-      })
+        ['outcomes', outcomeIndex, 'result'],
+      )
     }
 
     const applicationEffectIds = outcome.applications.map((application) => application.effectId)
     const uniqueApplicationEffectIds = new Set(applicationEffectIds)
     if (uniqueApplicationEffectIds.size !== applicationEffectIds.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
-        path: ['outcomes', outcomeIndex, 'applications'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        spellResolutionValidationMessages.duplicateOutcomeApplicationEffectId(),
+        ['outcomes', outcomeIndex, 'applications'],
+      )
     }
 
     outcome.applications.forEach((application, applicationIndex) => {
       const effect = effectById.get(application.effectId)
       if (!effect) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellResolutionValidationMessages.unknownEffectReference({
+        addCustomRefinementIssue(
+          ctx,
+          spellResolutionValidationMessages.unknownEffectReference({
             effectId: application.effectId,
           }),
-          path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
-        })
+          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'effectId'],
+        )
         return
       }
 
       if (application.amount === 'half' && !supportsPartialApplicationForEffectKind(effect.kind)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellResolutionValidationMessages.halfNotSupportedForEffectKind({
+        addCustomRefinementIssue(
+          ctx,
+          spellResolutionValidationMessages.halfNotSupportedForEffectKind({
             kind: effect.kind,
           }),
-          path: ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
-        })
+          ['outcomes', outcomeIndex, 'applications', applicationIndex, 'amount'],
+        )
       }
     })
   })

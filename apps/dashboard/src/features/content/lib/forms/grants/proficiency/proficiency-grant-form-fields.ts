@@ -2,15 +2,16 @@ import { z } from 'zod'
 import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  defineMessage,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
+  addCustomRefinementIssue,
   armorCategorySchema,
+  defineMessage,
+  skillSchema,
   toolCategorySchema,
   weaponCategorySchema,
-  skillSchema,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -190,11 +191,11 @@ export const weaponProficiencyPoolFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit' && !row.weaponProficiencyPoolSlugs?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
-        path: ['weaponProficiencyPoolSlugs'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
+        ['weaponProficiencyPoolSlugs'],
+      )
     }
   })
 
@@ -381,11 +382,11 @@ export const skillProficiencyPoolFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit' && !row.skillProficiencyPoolIds?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: proficiencyGrantValidationMessages.explicitSkillPoolRequired(),
-        path: ['skillProficiencyPoolIds'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        proficiencyGrantValidationMessages.explicitSkillPoolRequired(),
+        ['skillProficiencyPoolIds'],
+      )
     }
   })
 
@@ -482,11 +483,11 @@ export const armorTrainingPoolFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit' && !row.armorTrainingPoolSlugs?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
-        path: ['armorTrainingPoolSlugs'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
+        ['armorTrainingPoolSlugs'],
+      )
     }
   })
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { contentPoolChoiceSchema } from './choice'
 import { abilitySchema } from '../../../vocab/ability'
@@ -61,11 +62,7 @@ export const languageChoiceGrantSchema = contentPoolChoiceSchema
   })
   .superRefine((val, ctx) => {
     if (val.from === undefined && val.categories === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.languageChoicePoolRequired(),
-        path: ['from'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.languageChoicePoolRequired(), ['from'])
     }
   })
 
@@ -118,11 +115,9 @@ export const featChoiceGrantSchema = z
   })
   .superRefine((val, ctx) => {
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.allowAnyQualifyingCategoryOnly(),
-        path: ['allowAnyQualifying'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.allowAnyQualifyingCategoryOnly(), [
+        'allowAnyQualifying',
+      ])
     }
   })
 
@@ -233,11 +228,7 @@ const languageChoiceContentGrantSchema = z
   })
   .superRefine((val, ctx) => {
     if (val.from === undefined && val.categories === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.languageChoicePoolRequired(),
-        path: ['from'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.languageChoicePoolRequired(), ['from'])
     }
   })
 
@@ -253,11 +244,9 @@ const featChoiceContentGrantSchema = z
   })
   .superRefine((val, ctx) => {
     if (val.allowAnyQualifying && val.category !== 'epic-boon' && val.category !== 'general') {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.allowAnyQualifyingCategoryOnly(),
-        path: ['allowAnyQualifying'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.allowAnyQualifyingCategoryOnly(), [
+        'allowAnyQualifying',
+      ])
     }
   })
 
@@ -289,19 +278,19 @@ const spellsContentGrantSchema = z
   .strict()
   .superRefine((val, ctx) => {
     if (val.availability === undefined && val.casting === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.spellsGrantRequiresAvailabilityOrCasting(),
-        path: ['availability'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        grantValidationMessages.spellsGrantRequiresAvailabilityOrCasting(),
+        ['availability'],
+      )
     }
 
     if (val.casting?.allowsSlotCasting === true && val.availability === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.spellsGrantSlotCastingRequiresAvailability(),
-        path: ['casting', 'allowsSlotCasting'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        grantValidationMessages.spellsGrantSlotCastingRequiresAvailability(),
+        ['casting', 'allowsSlotCasting'],
+      )
     }
   })
 
@@ -411,18 +400,12 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
   }, [])
 
   if (defaultIndexes.length > 1) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.atMostOneDefaultGrantGroup(),
-    })
+    addCustomRefinementIssue(ctx, grantValidationMessages.atMostOneDefaultGrantGroup())
     return
   }
 
   if (defaultIndexes.length === 1 && defaultIndexes[0] !== 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.defaultGrantGroupMustBeFirst(),
-    })
+    addCustomRefinementIssue(ctx, grantValidationMessages.defaultGrantGroupMustBeFirst())
     return
   }
 
@@ -430,19 +413,13 @@ export const grantGroupsSchema = z.array(grantGroupSchema).superRefine((groups, 
   const levels = levelGroups.map((g) => g.unlock!.level)
 
   if (new Set(levels).size !== levels.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.grantGroupUnlockLevelsUnique(),
-    })
+    addCustomRefinementIssue(ctx, grantValidationMessages.grantGroupUnlockLevelsUnique())
     return
   }
 
   for (let i = 1; i < levelGroups.length; i++) {
     if (levelGroups[i]!.unlock!.level <= levelGroups[i - 1]!.unlock!.level) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.grantGroupsSortedByUnlock(),
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.grantGroupsSortedByUnlock())
       return
     }
   }
@@ -622,11 +599,9 @@ export const grantContentTraitSchema = z
   })
   .superRefine((val, ctx) => {
     if (!isGrantGroupsEligible(val.grantGroups)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.grantTraitSingleAtomicGrant(),
-        path: ['grantGroups'],
-      })
+      addCustomRefinementIssue(ctx, grantValidationMessages.grantTraitSingleAtomicGrant(), [
+        'grantGroups',
+      ])
     }
   })
 

@@ -16,16 +16,17 @@ import {
   DEFAULT_SPECIES_LEVEL_LIMITS_ENABLED,
   DEFAULT_SPECIES_MULTICLASS_POLICY_ENABLED,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
+  EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  MAX_CHARACTER_LEVEL,
+  addCustomRefinementIssue,
+  creatureTypeSchema,
   defineMessage,
   getContentTypeSentenceForm,
   getContentTypeTerm,
   getTermSentenceForm,
-  EXTENDED_PROGRESSION_TIER_NAME_MAX,
+  hitDieSchema,
   isMeaningfulLanguageProficiencyChoice,
   levelValidationMessages,
-  MAX_CHARACTER_LEVEL,
-  creatureTypeSchema,
-  hitDieSchema,
   levelZeroProficiencyBonusSchema,
   refineEffectiveXpProgression,
   refineLevelRangeTable,
@@ -180,11 +181,9 @@ const createRulesSchema = z
   })
   .superRefine((values, ctx) => {
     if (values.startingLevel > MAX_CHARACTER_LEVEL) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.startingLevelExceedsMax(),
-        path: ['startingLevel'],
-      })
+      addCustomRefinementIssue(ctx, levelValidationMessages.startingLevelExceedsMax(), [
+        'startingLevel',
+      ])
     }
   })
 
@@ -234,11 +233,9 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
   const effectiveMax = resolveEffectiveMax(values)
 
   if (values.startingLevel > effectiveMax) {
-    ctx.addIssue({
-      code: 'custom',
-      message: levelValidationMessages.startingLevelExceedsMax(),
-      path: ['startingLevel'],
-    })
+    addCustomRefinementIssue(ctx, levelValidationMessages.startingLevelExceedsMax(), [
+      'startingLevel',
+    ])
   }
 
   refineLevelRangeTable(values.startingWealth.tiers, ctx, {
@@ -263,29 +260,21 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
 
   const tierName = values.extendedTierName?.trim() ?? ''
   if (tierName.length === 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: levelValidationMessages.extendedTierNameRequired(),
-      path: ['extendedTierName'],
-    })
+    addCustomRefinementIssue(ctx, levelValidationMessages.extendedTierNameRequired(), [
+      'extendedTierName',
+    ])
   }
 
   if (values.extendedMaxLevel === undefined) {
-    ctx.addIssue({
-      code: 'custom',
-      message: levelValidationMessages.extendedMaxLevelRequired(),
-      path: ['extendedMaxLevel'],
-    })
+    addCustomRefinementIssue(ctx, levelValidationMessages.extendedMaxLevelRequired(), [
+      'extendedMaxLevel',
+    ])
     return
   }
 
   const result = validateExtendedMaxLevel(values.maxCharacterLevel, values.extendedMaxLevel)
   if (!result.valid) {
-    ctx.addIssue({
-      code: 'custom',
-      message: result.message,
-      path: ['extendedMaxLevel'],
-    })
+    addCustomRefinementIssue(ctx, result.message, ['extendedMaxLevel'])
   }
 
   const languageChoice = {
@@ -295,11 +284,11 @@ function configRulesSuperRefine(values: ConfigRulesValues, ctx: z.RefinementCtx)
     categories: values.languageProficiencyChoice.categories,
   }
   if (languageChoice.choose > 0 && !isMeaningfulLanguageProficiencyChoice(languageChoice)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Choose at least one language category when choose count is greater than zero.',
-      path: ['languageProficiencyChoice', 'categories'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      'Choose at least one language category when choose count is greater than zero.',
+      ['languageProficiencyChoice', 'categories'],
+    )
   }
 }
 

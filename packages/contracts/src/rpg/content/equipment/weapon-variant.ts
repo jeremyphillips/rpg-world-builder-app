@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { diceSchema } from '../../primitives/dice'
 import {
@@ -111,27 +112,23 @@ export function refineWeaponEquipment(
   const hasDamage = val.damage !== undefined
   const hasDamageType = val.damageType !== undefined
   if (hasDamage !== hasDamageType) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: hasDamage ? ['damageType'] : ['damage'],
-      message: equipmentVariantValidationMessages.damageDamageTypeTogether(),
-    })
+    addCustomRefinementIssue(
+      ctx,
+      equipmentVariantValidationMessages.damageDamageTypeTogether(),
+      hasDamage ? ['damageType'] : ['damage'],
+    )
   }
 
   const hasVersatile = val.properties.includes('versatile')
   const hasVersatileDamage = val.versatileDamage !== undefined
   if (hasVersatile && !hasVersatileDamage) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['versatileDamage'],
-      message: equipmentVariantValidationMessages.versatileDamageRequired(),
-    })
+    addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.versatileDamageRequired(), [
+      'versatileDamage',
+    ])
   }
   if (!hasVersatile && hasVersatileDamage) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['versatileDamage'],
-      message: equipmentVariantValidationMessages.versatileDamageForbidden(),
-    })
+    addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.versatileDamageForbidden(), [
+      'versatileDamage',
+    ])
   }
 }

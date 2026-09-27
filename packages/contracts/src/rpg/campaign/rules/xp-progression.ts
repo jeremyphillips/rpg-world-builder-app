@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../../validation/define-message'
 import { absoluteLevelSchema } from '../../primitives/level'
@@ -25,11 +26,11 @@ export const xpThresholdOverrideEntriesSchema = z
     const seen = new Set<number>()
     entries.forEach((entry, index) => {
       if (seen.has(entry.level)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: xpThresholdsValidationMessages.duplicateLevel({ level: entry.level }),
-          path: [index, 'level'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          xpThresholdsValidationMessages.duplicateLevel({ level: entry.level }),
+          [index, 'level'],
+        )
       }
       seen.add(entry.level)
     })
@@ -696,20 +697,20 @@ export function refineEffectiveXpProgression(
 
   effective.forEach((entry, index) => {
     if (index === 0 && entry.level === 1 && entry.xpRequired !== 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: xpThresholdsValidationMessages.levelOneZeroXp(),
-        path: [...pathPrefix, index, 'xpRequired'],
-      })
+      addCustomRefinementIssue(ctx, xpThresholdsValidationMessages.levelOneZeroXp(), [
+        ...pathPrefix,
+        index,
+        'xpRequired',
+      ])
     }
 
     const previous = validChain[validChain.length - 1]
     if (previous !== undefined && entry.xpRequired <= previous.xpRequired) {
-      ctx.addIssue({
-        code: 'custom',
-        message: xpThresholdsValidationMessages.increasingXp(),
-        path: [...pathPrefix, index, 'xpRequired'],
-      })
+      addCustomRefinementIssue(ctx, xpThresholdsValidationMessages.increasingXp(), [
+        ...pathPrefix,
+        index,
+        'xpRequired',
+      ])
     }
 
     validChain.push(entry)

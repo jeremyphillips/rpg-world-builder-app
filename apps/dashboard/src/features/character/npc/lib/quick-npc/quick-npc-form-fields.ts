@@ -6,6 +6,7 @@ import { z } from 'zod'
 import {
   ALIGNMENTS,
   CHARACTER_GENDERS,
+  addCustomRefinementIssue,
   alignmentSchema,
   characterBuilderValidationMessages,
   formatFieldMessage,
@@ -120,11 +121,11 @@ function quickNpcSetupCoreFields(maxLevel: number, minLevel: number) {
     })
     .superRefine((values, ctx) => {
       if (isClassProgressionApplicable(values.level) && values.classId.trim().length === 0) {
-        ctx.addIssue({
-          code: 'custom',
-          message: formatFieldMessage(characterBuilderValidationMessages.classRequired()),
-          path: ['classId'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          formatFieldMessage(characterBuilderValidationMessages.classRequired()),
+          ['classId'],
+        )
       }
     })
 }

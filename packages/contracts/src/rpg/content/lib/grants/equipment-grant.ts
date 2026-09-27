@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import {
   armorCategorySchema,
@@ -130,14 +131,14 @@ function refineFilteredEquipmentPool(
     if (
       (EQUIPMENT_KINDS_WITHOUT_CATEGORY_FILTER as readonly string[]).includes(val.equipmentKind)
     ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.categoryFilterNotAllowedForKind({
+      addCustomRefinementIssue(
+        ctx,
+        grantValidationMessages.categoryFilterNotAllowedForKind({
           filterLabel: FILTERED_POOL_CATEGORY_LABELS[field],
           equipmentKindLabel: getEquipmentKindLabel(val.equipmentKind),
         }),
-        path: [field],
-      })
+        [field],
+      )
       continue
     }
 
@@ -145,14 +146,14 @@ function refineFilteredEquipmentPool(
       const expectedKind = Object.entries(EQUIPMENT_KIND_CATEGORY_FIELDS).find(([, fields]) =>
         (fields as readonly string[]).includes(field),
       )?.[0]
-      ctx.addIssue({
-        code: 'custom',
-        message: grantValidationMessages.categoryFilterWrongKind({
+      addCustomRefinementIssue(
+        ctx,
+        grantValidationMessages.categoryFilterWrongKind({
           filterLabel: FILTERED_POOL_CATEGORY_LABELS[field],
           equipmentKindLabel: getEquipmentKindLabel(expectedKind ?? val.equipmentKind),
         }),
-        path: [field],
-      })
+        [field],
+      )
     }
   }
 
@@ -161,14 +162,14 @@ function refineFilteredEquipmentPool(
     val.gearKind !== undefined &&
     val.gearKind !== 'spellcasting'
   ) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantValidationMessages.categoryFilterWrongKind({
+    addCustomRefinementIssue(
+      ctx,
+      grantValidationMessages.categoryFilterWrongKind({
         filterLabel: FILTERED_POOL_CATEGORY_LABELS.spellcastingGearKind,
         equipmentKindLabel: getGearKindLabel('spellcasting'),
       }),
-      path: ['spellcastingGearKind'],
-    })
+      ['spellcastingGearKind'],
+    )
   }
 }
 

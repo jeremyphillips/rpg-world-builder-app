@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import {
   epicStatusSchema,
@@ -28,11 +29,7 @@ export const listTicketsQuerySchema = z
   })
   .superRefine((query, ctx) => {
     if (query.bucket !== undefined && query.status !== undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Provide either bucket or status, not both.',
-        path: ['bucket'],
-      })
+      addCustomRefinementIssue(ctx, 'Provide either bucket or status, not both.', ['bucket'])
     }
   })
 

@@ -5,6 +5,7 @@ import {
   FEAT_CATEGORY_IDS,
   FEAT_PART_ENTRIES,
   MAX_CHARACTER_LEVEL,
+  addCustomRefinementIssue,
   featValidationMessages,
   slugSchema,
 } from '@rpg/contracts'
@@ -37,11 +38,9 @@ export function createFeatFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL) {
     })
     .superRefine((values, ctx) => {
       if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
-        ctx.addIssue({
-          code: 'custom',
-          message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
-          path: ['repeatableNotes'],
-        })
+        addCustomRefinementIssue(ctx, featValidationMessages.repeatableNotesOnlyWhenAllowed(), [
+          'repeatableNotes',
+        ])
       }
     })
 }
@@ -59,11 +58,9 @@ export function createFeatDraftFormSchema(maxLevel: number = MAX_CHARACTER_LEVEL
     })
     .superRefine((values, ctx) => {
       if (!values.repeatableAllowed && values.repeatableNotes?.trim()) {
-        ctx.addIssue({
-          code: 'custom',
-          message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
-          path: ['repeatableNotes'],
-        })
+        addCustomRefinementIssue(ctx, featValidationMessages.repeatableNotesOnlyWhenAllowed(), [
+          'repeatableNotes',
+        ])
       }
     })
 }

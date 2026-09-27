@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { interiorTypeSchema } from '../../vocab/location/building/interior-type'
 import { locationBaseSchema } from './base'
@@ -22,22 +23,20 @@ function refineInteriorClassification(
   ctx: z.RefinementCtx,
 ) {
   if (data.classification && !data.interiorType) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Interior classification requires interiorType.',
-      path: ['classification'],
-    })
+    addCustomRefinementIssue(ctx, 'Interior classification requires interiorType.', [
+      'classification',
+    ])
   }
 
   if (data.classification && data.interiorType) {
     const interiorType = data.interiorType as InteriorClassificationType
     const classification = data.classification as InteriorClassification
     if (!isInteriorClassificationTypeValid(interiorType, classification.type)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: `Invalid interior classification type "${classification.type}" for interiorType "${interiorType}".`,
-        path: ['classification', 'type'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        `Invalid interior classification type "${classification.type}" for interiorType "${interiorType}".`,
+        ['classification', 'type'],
+      )
     }
   }
 }

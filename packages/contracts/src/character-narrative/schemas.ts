@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
 import { alignmentSchema } from '../rpg/vocab/alignment'
 import { characterTypeSchema } from '../rpg/runtime/character/sheet/core'
 import { characterNarrativeSchema } from '../rpg/runtime/character/sheet/narrative'
@@ -66,20 +67,17 @@ export const narrativeFragmentSchema = z
         !narrativeTokenSchema.safeParse(token).success ||
         !fragment.requires.includes(token as z.infer<typeof narrativeTokenSchema>)
       ) {
-        ctx.addIssue({ code: 'custom', message: `Undeclared or unknown token: ${token}` })
+        addCustomRefinementIssue(ctx, `Undeclared or unknown token: ${token}`)
       }
     }
     if (fragment.text.replace(new RegExp(NARRATIVE_TOKEN_PATTERN), '').match(/[{}]/)) {
-      ctx.addIssue({ code: 'custom', message: 'Malformed template token' })
+      addCustomRefinementIssue(ctx, 'Malformed template token')
     }
     if (
       fragment.fallback &&
       (fragment.requires.length || fragment.alignmentIds || fragment.conflictTags.length)
     ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Fallback fragments must be unrestricted and reference-free',
-      })
+      addCustomRefinementIssue(ctx, 'Fallback fragments must be unrestricted and reference-free')
     }
   })
 export const narrativeCollectionSchema = z
@@ -89,8 +87,7 @@ export const narrativeCollectionSchema = z
   })
   .superRefine((collection, ctx) => {
     const ids = collection.fragments.map(({ id }) => id)
-    if (new Set(ids).size !== ids.length)
-      ctx.addIssue({ code: 'custom', message: 'Duplicate fragment IDs' })
+    if (new Set(ids).size !== ids.length) addCustomRefinementIssue(ctx, 'Duplicate fragment IDs')
   })
 export const narrativeRoleBindingSchema = z.object({
   targetId: z.string().min(1),

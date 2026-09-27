@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import {
+  MAX_CHARACTER_LEVEL,
+  PROFICIENCY_POOL_SOURCES,
   abilitySchema,
+  addCustomRefinementIssue,
   armorCategorySchema,
   campaignLevelSchema,
   damageTypeIdSchema,
@@ -10,15 +13,13 @@ import {
   gearKindSchema,
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
-  spellcastingGearKindSchema,
   languageIdSchema,
-  MAX_CHARACTER_LEVEL,
-  PROFICIENCY_POOL_SOURCES,
-  senseIdSchema,
-  skillSchema,
-  toolCategorySchema,
   movementModeSchema,
   movementOperationSchema,
+  senseIdSchema,
+  skillSchema,
+  spellcastingGearKindSchema,
+  toolCategorySchema,
   usageFrequencySchema,
   weaponCategorySchema,
 } from '@rpg/contracts'
@@ -163,11 +164,7 @@ function applyFormSchemaIssues(
   if (result.success || !result.error) return
 
   for (const issue of result.error.issues) {
-    ctx.addIssue({
-      code: 'custom',
-      message: issue.message,
-      path: issue.path,
-    })
+    addCustomRefinementIssue(ctx, issue.message, issue.path)
   }
 }
 
@@ -192,35 +189,25 @@ function validateSpellsGrantRow(
   const hasCasting = row.spellCastingEnabled === true
 
   if (!hasAvailability && !hasCasting) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Enable availability, casting, or both for this spell grant.',
-      path: ['spellAvailability'],
-    })
+    addCustomRefinementIssue(ctx, 'Enable availability, casting, or both for this spell grant.', [
+      'spellAvailability',
+    ])
   }
 
   if (hasCasting && !row.spellCastingFrequency) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Choose a cast frequency when casting is enabled.',
-      path: ['spellCastingFrequency'],
-    })
+    addCustomRefinementIssue(ctx, 'Choose a cast frequency when casting is enabled.', [
+      'spellCastingFrequency',
+    ])
   }
 
   if (row.spellAllowsSlotCasting === true && !hasAvailability) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Slot casting requires always-prepared availability.',
-      path: ['spellAllowsSlotCasting'],
-    })
+    addCustomRefinementIssue(ctx, 'Slot casting requires always-prepared availability.', [
+      'spellAllowsSlotCasting',
+    ])
   }
 
   if (!row.spellIds?.length) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantFieldMinSelectionsMessage('spellIds'),
-      path: ['spellIds'],
-    })
+    addCustomRefinementIssue(ctx, grantFieldMinSelectionsMessage('spellIds'), ['spellIds'])
   }
 }
 
@@ -259,11 +246,7 @@ function validateProficiencySpecificGrantRow(
 
   for (const selection of SPECIFIC_PROFICIENCY_REQUIRED_SELECTIONS) {
     if (row.grantType !== selection.grantType || selection.hasSelection(row)) continue
-    ctx.addIssue({
-      code: 'custom',
-      message: grantFieldMinSelectionsMessage(selection.path),
-      path: [selection.path],
-    })
+    addCustomRefinementIssue(ctx, grantFieldMinSelectionsMessage(selection.path), [selection.path])
   }
 }
 
@@ -272,47 +255,37 @@ function validateMovementGrantRow(
   ctx: z.RefinementCtx,
 ): void {
   if (!row.movementMode) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantFieldRequiredSelectMessage('movementMode'),
-      path: ['movementMode'],
-    })
+    addCustomRefinementIssue(ctx, grantFieldRequiredSelectMessage('movementMode'), ['movementMode'])
   }
 
   if (!row.movementOperation) {
-    ctx.addIssue({
-      code: 'custom',
-      message: grantFieldRequiredSelectMessage('movementOperation'),
-      path: ['movementOperation'],
-    })
+    addCustomRefinementIssue(ctx, grantFieldRequiredSelectMessage('movementOperation'), [
+      'movementOperation',
+    ])
   }
 
   if (row.movementOperation === 'match') {
     if (!row.movementMatchMode || row.movementMatchMode === row.movementMode) {
-      ctx.addIssue({
-        code: 'custom',
-        message: fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_MATCH_MODE_LABEL }),
-        path: ['movementMatchMode'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_MATCH_MODE_LABEL }),
+        ['movementMatchMode'],
+      )
     }
     return
   }
 
   if (row.movementFeet === undefined || String(row.movementFeet) === '') {
-    ctx.addIssue({
-      code: 'custom',
-      message: fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_SPEED_LABEL }),
-      path: ['movementFeet'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.requiredSelect({ label: GRANT_MOVEMENT_SPEED_LABEL }),
+      ['movementFeet'],
+    )
   }
 }
 
 function addValidationIssue(ctx: z.RefinementCtx, message: string, path: string): void {
-  ctx.addIssue({
-    code: 'custom',
-    message,
-    path: [path],
-  })
+  addCustomRefinementIssue(ctx, message, [path])
 }
 
 type GrantRowValues = z.infer<ReturnType<typeof createGrantRowFormSchemaBase>>

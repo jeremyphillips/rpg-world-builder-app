@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 import { spellResolutionValidationMessages } from './validation-messages'
 import type { SpellResolutionSelectionMode } from './vocab'
 
@@ -90,10 +91,6 @@ function hasModeField(
   return Boolean(resolution[field])
 }
 
-function addModeFieldIssue(ctx: z.RefinementCtx, path: ResolutionModeField, message: string): void {
-  ctx.addIssue({ code: 'custom', message, path: [path] })
-}
-
 export function validateSpellResolutionModeFields(
   resolution: SpellResolutionModeValidationInput,
   ctx: z.RefinementCtx,
@@ -102,11 +99,11 @@ export function validateSpellResolutionModeFields(
 
   for (const rule of rules.required ?? []) {
     if (hasModeField(resolution, rule.field)) continue
-    addModeFieldIssue(ctx, rule.field, rule.message(resolution.selectionMode))
+    addCustomRefinementIssue(ctx, rule.message(resolution.selectionMode), [rule.field])
   }
 
   for (const rule of rules.forbidden ?? []) {
     if (!hasModeField(resolution, rule.field)) continue
-    addModeFieldIssue(ctx, rule.field, rule.message(resolution.selectionMode))
+    addCustomRefinementIssue(ctx, rule.message(resolution.selectionMode), [rule.field])
   }
 }

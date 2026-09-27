@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import {
   ABILITY_IDS,
@@ -35,10 +36,7 @@ export const abilityScoreOrderSchema = z
 
     for (const ability of order) {
       if (seen.has(ability)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: standardArrayValidationMessages.incompleteClassOrder(),
-        })
+        addCustomRefinementIssue(ctx, standardArrayValidationMessages.incompleteClassOrder())
         return
       }
       seen.add(ability)
@@ -46,10 +44,7 @@ export const abilityScoreOrderSchema = z
 
     for (const ability of ABILITY_IDS) {
       if (!seen.has(ability)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: standardArrayValidationMessages.incompleteClassOrder(),
-        })
+        addCustomRefinementIssue(ctx, standardArrayValidationMessages.incompleteClassOrder())
         return
       }
     }

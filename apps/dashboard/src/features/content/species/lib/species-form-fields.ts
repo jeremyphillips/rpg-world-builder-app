@@ -5,6 +5,7 @@ import {
   CREATURE_SIZE_ENTRIES,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
+  addCustomRefinementIssue,
   creatureSizeSchema,
   creatureTypeSchema,
   defineMessage,
@@ -102,27 +103,19 @@ export function createSpeciesFormSchema(
     })
     .superRefine((values, ctx) => {
       if (!allowedSet.has(values.creatureType)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: speciesValidationMessages.creatureTypeNotAllowed(),
-          path: ['creatureType'],
-        })
+        addCustomRefinementIssue(ctx, speciesValidationMessages.creatureTypeNotAllowed(), [
+          'creatureType',
+        ])
       }
       if (activeCreatureTypes && !activeCreatureTypes.has(values.creatureType)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: speciesValidationMessages.creatureTypeUnavailable(),
-          path: ['creatureType'],
-        })
+        addCustomRefinementIssue(ctx, speciesValidationMessages.creatureTypeUnavailable(), [
+          'creatureType',
+        ])
       }
       refineSpeciesMovementRows(values.movement, ctx)
       refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
       cultureFormSchemaRefinement(values, formCtx, (issue) => {
-        ctx.addIssue({
-          code: 'custom',
-          message: issue.message,
-          path: issue.path,
-        })
+        addCustomRefinementIssue(ctx, issue.message, issue.path)
       })
     })
 }

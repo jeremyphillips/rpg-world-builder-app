@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { absoluteLevelSchema, campaignLevelSchema, formatLevelRangeLabel } from './level'
 import { levelValidationMessages } from './level-messages'
@@ -30,19 +31,19 @@ function issueCampaignLevelBounds(
 
   rows.forEach((row, index) => {
     if (!levelSchema.safeParse(row.minLevel).success) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.outOfBounds({ maxLevel: cap }),
-        path: [...pathPrefix, index, 'minLevel'],
-      })
+      addCustomRefinementIssue(ctx, levelValidationMessages.outOfBounds({ maxLevel: cap }), [
+        ...pathPrefix,
+        index,
+        'minLevel',
+      ])
     }
 
     if (!levelSchema.safeParse(row.maxLevel).success) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.outOfBounds({ maxLevel: cap }),
-        path: [...pathPrefix, index, 'maxLevel'],
-      })
+      addCustomRefinementIssue(ctx, levelValidationMessages.outOfBounds({ maxLevel: cap }), [
+        ...pathPrefix,
+        index,
+        'maxLevel',
+      ])
     }
   })
 }
@@ -61,11 +62,11 @@ export function refineLevelRangeTable(
 
   rows.forEach((row, index) => {
     if (row.minLevel > row.maxLevel) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.invertedRange(),
-        path: [...pathPrefix, index, 'minLevel'],
-      })
+      addCustomRefinementIssue(ctx, levelValidationMessages.invertedRange(), [
+        ...pathPrefix,
+        index,
+        'minLevel',
+      ])
     }
 
     if (
@@ -73,31 +74,31 @@ export function refineLevelRangeTable(
       options.requireStartAt !== undefined &&
       row.minLevel !== options.requireStartAt
     ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.rangeStartAt({ expected: options.requireStartAt }),
-        path: [...pathPrefix, 0, 'minLevel'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        levelValidationMessages.rangeStartAt({ expected: options.requireStartAt }),
+        [...pathPrefix, 0, 'minLevel'],
+      )
     }
 
     const previousRow = rows[index - 1]
     if (previousRow !== undefined) {
       if (row.minLevel <= previousRow.maxLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: levelValidationMessages.rangeOverlap({
+        addCustomRefinementIssue(
+          ctx,
+          levelValidationMessages.rangeOverlap({
             otherLabel: formatLevelRangeLabel(previousRow),
           }),
-          path: [...pathPrefix, index, 'minLevel'],
-        })
+          [...pathPrefix, index, 'minLevel'],
+        )
       }
 
       if (row.minLevel > previousRow.maxLevel + 1) {
-        ctx.addIssue({
-          code: 'custom',
-          message: levelValidationMessages.rangeGap({ level: previousRow.maxLevel + 1 }),
-          path: [...pathPrefix, index, 'minLevel'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          levelValidationMessages.rangeGap({ level: previousRow.maxLevel + 1 }),
+          [...pathPrefix, index, 'minLevel'],
+        )
       }
     }
   })
@@ -107,11 +108,11 @@ export function refineLevelRangeTable(
     const lastRow = rows[lastIndex]!
 
     if (lastRow.maxLevel !== options.requireEndAt) {
-      ctx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.rangeEndAt({ expected: options.requireEndAt }),
-        path: [...pathPrefix, lastIndex, 'maxLevel'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        levelValidationMessages.rangeEndAt({ expected: options.requireEndAt }),
+        [...pathPrefix, lastIndex, 'maxLevel'],
+      )
     }
   }
 }

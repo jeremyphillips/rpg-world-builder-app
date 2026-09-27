@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { closedSetEnum, keysFromEntries, vocabEnumFromEntries } from './enum-schema'
 import { getTermSentenceForm } from './types'
@@ -127,19 +128,12 @@ export const movementSpeedsSchema: z.ZodType<MovementSpeeds> = z
   .superRefine((movement, ctx) => {
     const keys = Object.keys(movement)
     if (keys.length < 1) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'At least one movement mode is required.',
-      })
+      addCustomRefinementIssue(ctx, 'At least one movement mode is required.')
       return
     }
     for (const key of keys) {
       if (!movementModeSchema.safeParse(key).success) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Invalid movement mode: ${key}`,
-          path: [key],
-        })
+        addCustomRefinementIssue(ctx, `Invalid movement mode: ${key}`, [key])
       }
     }
   })
@@ -150,11 +144,7 @@ export const movementSpeedsDraftSchema: z.ZodType<MovementSpeeds> = z
   .superRefine((movement, ctx) => {
     for (const key of Object.keys(movement)) {
       if (!movementModeSchema.safeParse(key).success) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Invalid movement mode: ${key}`,
-          path: [key],
-        })
+        addCustomRefinementIssue(ctx, `Invalid movement mode: ${key}`, [key])
       }
     }
   })
@@ -283,11 +273,7 @@ export const movementGrantPayloadSchema = z
   ])
   .superRefine((grant, ctx) => {
     if (grant.operation === 'match' && grant.mode === grant.matchMode) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'matchMode must differ from mode.',
-        path: ['matchMode'],
-      })
+      addCustomRefinementIssue(ctx, 'matchMode must differ from mode.', ['matchMode'])
     }
   })
 

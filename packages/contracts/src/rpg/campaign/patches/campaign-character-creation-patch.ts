@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { ABSOLUTE_MAX_CHARACTER_LEVEL, MAX_CHARACTER_LEVEL } from '../../primitives/level'
 import { levelValidationMessages, refineLevelRangeTable } from '../../primitives/level'
@@ -169,11 +170,10 @@ function validateStartingLevelWithinEffectiveMax(
   const startingLevel = patch.startingLevel
   if (startingLevel === undefined || startingLevel <= effectiveMax) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: levelValidationMessages.startingLevelExceedsMax(),
-    path: [...pathPrefix, 'startingLevel'],
-  })
+  addCustomRefinementIssue(ctx, levelValidationMessages.startingLevelExceedsMax(), [
+    ...pathPrefix,
+    'startingLevel',
+  ])
 }
 
 function validateExtendedProgressionMaxLevel(
@@ -186,11 +186,12 @@ function validateExtendedProgressionMaxLevel(
   const result = validateExtendedMaxLevel(standardMaxCharacterLevel, extended.maxLevel)
   if (result.valid) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: result.message,
-    path: [...pathPrefix, 'progression', 'extendedProgression', 'maxLevel'],
-  })
+  addCustomRefinementIssue(ctx, result.message, [
+    ...pathPrefix,
+    'progression',
+    'extendedProgression',
+    'maxLevel',
+  ])
 }
 
 function validateSubclassChoicesPatchInput({
@@ -203,11 +204,11 @@ function validateSubclassChoicesPatchInput({
   const result = validateSubclassChoicesEnabledChange()
   if (result.valid) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: result.message ?? campaignPatchValidationMessages.subclassChoicesChangeNotAllowed(),
-    path: [...pathPrefix, 'subclasses', 'enabled'],
-  })
+  addCustomRefinementIssue(
+    ctx,
+    result.message ?? campaignPatchValidationMessages.subclassChoicesChangeNotAllowed(),
+    [...pathPrefix, 'subclasses', 'enabled'],
+  )
 }
 
 function validateStartingWealthTiersInPatchInput({

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { gearKindSchema } from '../../vocab/equipment/gear-kind'
 import { holySymbolUsageSchema } from '../../vocab/equipment/holy-symbol-usage'
@@ -53,21 +54,21 @@ function refineSpellcastingGearKindFields(
 ): void {
   if (val.gearKind === 'spellcasting') {
     if (val.spellcastingGearKind === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['spellcastingGearKind'],
-        message: equipmentVariantValidationMessages.spellcastingGearKindRequired(),
-      })
+      addCustomRefinementIssue(
+        ctx,
+        equipmentVariantValidationMessages.spellcastingGearKindRequired(),
+        ['spellcastingGearKind'],
+      )
     }
     return
   }
 
   if (val.spellcastingGearKind !== undefined) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['spellcastingGearKind'],
-      message: equipmentVariantValidationMessages.spellcastingGearKindForbidden(),
-    })
+    addCustomRefinementIssue(
+      ctx,
+      equipmentVariantValidationMessages.spellcastingGearKindForbidden(),
+      ['spellcastingGearKind'],
+    )
   }
 }
 
@@ -77,21 +78,17 @@ function refineHolySymbolUsageFields(
 ): void {
   if (val.spellcastingGearKind === 'holy_symbol') {
     if (val.holySymbolUsage === undefined || val.holySymbolUsage.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['holySymbolUsage'],
-        message: equipmentVariantValidationMessages.holySymbolUsageRequired(),
-      })
+      addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.holySymbolUsageRequired(), [
+        'holySymbolUsage',
+      ])
     }
     return
   }
 
   if (val.holySymbolUsage !== undefined) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['holySymbolUsage'],
-      message: equipmentVariantValidationMessages.holySymbolUsageForbidden(),
-    })
+    addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.holySymbolUsageForbidden(), [
+      'holySymbolUsage',
+    ])
   }
 }
 
@@ -109,11 +106,9 @@ function refineAlsoWeaponSlugField(
 ): void {
   if (val.alsoWeaponSlug === undefined || allowsAlsoWeaponSlug(val.spellcastingGearKind)) return
 
-  ctx.addIssue({
-    code: z.ZodIssueCode.custom,
-    path: ['alsoWeaponSlug'],
-    message: equipmentVariantValidationMessages.alsoWeaponSlugForbidden(),
-  })
+  addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.alsoWeaponSlugForbidden(), [
+    'alsoWeaponSlug',
+  ])
 }
 
 /** Cross-field invariants for adventuring gear equipment records. */

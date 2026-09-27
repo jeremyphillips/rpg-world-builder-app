@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
 
 export const codeRefSchema = z
   .object({
@@ -11,11 +12,9 @@ export const codeRefSchema = z
   })
   .superRefine((ref, ctx) => {
     if (ref.lineStart !== undefined && ref.lineEnd !== undefined && ref.lineEnd < ref.lineStart) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'lineEnd must be greater than or equal to lineStart',
-        path: ['lineEnd'],
-      })
+      addCustomRefinementIssue(ctx, 'lineEnd must be greater than or equal to lineStart', [
+        'lineEnd',
+      ])
     }
   })
 
