@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { contentMediaSchema } from '../../shared/media/content-media'
 import { vocabularyValidationMessages } from './vocabulary-messages'
 import { vocabularyUsageReferenceSchema } from './vocabulary-usage'
 
@@ -62,6 +63,7 @@ export const vocabularyOptionSchema = z.object({
   description: z.string().optional(),
   source: vocabularyOptionSourceSchema,
   status: vocabularyOptionStatusSchema,
+  media: contentMediaSchema.optional(),
 })
 
 export type VocabularyOption = z.infer<typeof vocabularyOptionSchema>
@@ -135,6 +137,7 @@ export const vocabularySystemEntryPatchSchema = z
     label: z.string().min(1).optional(),
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.optional(),
+    media: contentMediaSchema.optional(),
   })
   .strict()
 
@@ -152,6 +155,7 @@ export const vocabularyCampaignEntrySchema = z
     label: z.string().min(1),
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.default('active'),
+    media: contentMediaSchema.optional(),
   })
   .strict()
 
@@ -210,8 +214,21 @@ export const updateVocabularyEntryInputSchema = z
     label: z.string().min(1).optional(),
     description: z.string().optional(),
     status: vocabularyOptionStatusSchema.optional(),
+    media: contentMediaSchema.optional(),
+    expectedMediaRevision: z.number().int().min(0).optional(),
   })
   .strict()
+  .superRefine((value, ctx) => {
+    const hasMedia = value.media !== undefined
+    const hasRevision = value.expectedMediaRevision !== undefined
+    if (hasMedia !== hasRevision) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'media and expectedMediaRevision must be provided together.',
+        path: hasMedia ? ['expectedMediaRevision'] : ['media'],
+      })
+    }
+  })
 
 export type UpdateVocabularyEntryInput = z.infer<typeof updateVocabularyEntryInputSchema>
 
@@ -243,4 +260,11 @@ export function activeVocabularyOptionIds(set: VocabularyOptionSet): ReadonlySet
 /** Lookup label for a vocabulary option; falls back to the raw id. */
 export function getVocabularyOptionLabel(set: VocabularyOptionSet, id: string): string {
   return set.options.find((option) => option.id === id)?.label ?? id
+}
+
+/** Maps vocabulary row source to catalog content source for system-art derivation. */
+export function vocabularyOptionContentSource(
+  source: VocabularyOptionSource,
+): 'system' | 'homebrew' {
+  return source === 'system' ? 'system' : 'homebrew'
 }

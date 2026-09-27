@@ -12,11 +12,21 @@ export type ContentMediaCollectionConstraint = z.infer<
   typeof contentMediaCollectionConstraintSchema
 >
 
-export function resolveContentMediaMaxItems(constraint?: ContentMediaCollectionConstraint): number {
+export function resolveContentMediaMaxItems(
+  constraintOrPolicy?: ContentMediaCollectionConstraint | ContentMediaPolicy,
+): number {
+  const constraint =
+    constraintOrPolicy && 'domain' in constraintOrPolicy
+      ? constraintOrPolicy.collection
+      : constraintOrPolicy
   return (
     contentMediaCollectionConstraintSchema.parse(constraint ?? {}).maxItems ??
     CONTENT_MEDIA_MAX_ATTACHMENTS_CEILING
   )
+}
+
+export function resolveDetailRoles(policy: ContentMediaPolicy): readonly MediaRole[] {
+  return policy.detailRoles ?? PRIMARY_ONLY
 }
 
 /** Domains opted into reusable content media management. */
@@ -28,6 +38,7 @@ export const CONTENT_MEDIA_DOMAINS = [
   'equipment',
   'location',
   'organization',
+  'game-term',
 ] as const
 
 export type ContentMediaDomain = (typeof CONTENT_MEDIA_DOMAINS)[number]
@@ -38,6 +49,9 @@ export type ContentMediaPolicy = {
   domain: ContentMediaDomain
   allowedRoles: readonly MediaRole[]
   representativeRoles: readonly MediaRole[]
+  /** Detail surface role order; defaults to primary-only when omitted. */
+  detailRoles?: readonly MediaRole[]
+  collection?: ContentMediaCollectionConstraint
 }
 
 export const contentMediaPolicySchema = z.object({
@@ -85,6 +99,13 @@ export const CONTENT_MEDIA_POLICIES = {
     domain: 'organization',
     allowedRoles: ['primary', 'emblem'] as const,
     representativeRoles: PRIMARY_REPRESENTATIVE,
+  },
+  'game-term': {
+    domain: 'game-term',
+    allowedRoles: ['emblem'] as const,
+    representativeRoles: ['emblem'] as const,
+    detailRoles: ['emblem'] as const,
+    collection: { maxItems: 1 },
   },
 } as const satisfies Record<ContentMediaDomain, ContentMediaPolicy>
 

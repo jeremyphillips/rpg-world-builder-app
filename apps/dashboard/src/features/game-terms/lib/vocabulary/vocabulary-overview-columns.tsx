@@ -12,6 +12,8 @@ import type {
 } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
 
+import type { DashboardContentDisplayResult } from '@/features/content/lib/detail/page/content-display-image'
+import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
 import { buildSourceColumn } from '@/lib/data-table/column-builders'
 import { buildUsedByOverviewColumn } from '@/lib/usage-references/build-used-by-overview-column'
 
@@ -30,6 +32,8 @@ type VocabularyColumnsOptions = {
   nameHref?: (entry: VocabularyOptionWithUsage) => string
   onEdit?: (entry: VocabularyOptionWithUsage) => void
   canEdit?: boolean
+  showMediaColumn?: boolean
+  resolveDisplay?: (entry: VocabularyOptionWithUsage) => DashboardContentDisplayResult
   usageSummaryLabels?: VocabularyUsageSummaryLabels
   overviewUsageScope?: VocabularyOverviewUsageScope
 }
@@ -53,9 +57,40 @@ function buildVocabularyUsedByColumn(
 export function vocabularyColumns(
   options: VocabularyColumnsOptions = {},
 ): ColumnDef<VocabularyOptionWithUsage>[] {
-  const { nameHref, onEdit, canEdit = false, usageSummaryLabels, overviewUsageScope } = options
+  const {
+    nameHref,
+    onEdit,
+    canEdit = false,
+    showMediaColumn = false,
+    resolveDisplay,
+    usageSummaryLabels,
+    overviewUsageScope,
+  } = options
 
-  const columns: ColumnDef<VocabularyOptionWithUsage>[] = [
+  const columns: ColumnDef<VocabularyOptionWithUsage>[] = []
+
+  if (showMediaColumn && resolveDisplay) {
+    columns.push({
+      id: 'overview-display-image',
+      header: () => <span className="sr-only">Image</span>,
+      cell: ({ row }) => (
+        <ContentDisplayOverviewCell
+          resolved={resolveDisplay(row.original)}
+          alt={row.original.label}
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      meta: {
+        ...dataTableColumnMeta.identity,
+        ...dataTableWidthMeta('image'),
+        label: 'Image',
+        locked: true,
+      },
+    })
+  }
+
+  columns.push(
     {
       accessorKey: 'label',
       header: ({ column }) => <SortableHeader column={column}>Name</SortableHeader>,
@@ -106,7 +141,7 @@ export function vocabularyColumns(
       badgeMap: VOCABULARY_SOURCE_BADGE,
       width: 'badge',
     }),
-  ]
+  )
 
   if (usageSummaryLabels) {
     columns.push(buildVocabularyUsedByColumn(usageSummaryLabels, overviewUsageScope))

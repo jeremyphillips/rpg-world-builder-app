@@ -20,6 +20,11 @@ export type VocabularySetCapability = {
   disableGuard: boolean
   /** Block DELETE when referenced. */
   deleteGuard: boolean
+  /**
+   * Campaign managers may PATCH entry media for this set (independent of `edit`).
+   * Display of registry-only system emblems does not require this flag.
+   */
+  media: boolean
 }
 
 const disabledCapabilities = (): VocabularySetCapability => ({
@@ -33,6 +38,7 @@ const disabledCapabilities = (): VocabularySetCapability => ({
   batchUsageCounting: false,
   disableGuard: false,
   deleteGuard: false,
+  media: false,
 })
 
 const browseOnlyWithUsageResolutionCapabilities = (): VocabularySetCapability => ({
@@ -46,6 +52,21 @@ const browseOnlyWithUsageResolutionCapabilities = (): VocabularySetCapability =>
   batchUsageCounting: true,
   disableGuard: false,
   deleteGuard: false,
+  media: false,
+})
+
+const browseOnlyWithMediaCapabilities = (): VocabularySetCapability => ({
+  browse: true,
+  create: false,
+  edit: false,
+  delete: false,
+  availability: false,
+  bulkAvailability: false,
+  usageResolution: true,
+  batchUsageCounting: true,
+  disableGuard: false,
+  deleteGuard: false,
+  media: true,
 })
 
 const enabledManagementCapabilities = (): VocabularySetCapability => ({
@@ -59,6 +80,7 @@ const enabledManagementCapabilities = (): VocabularySetCapability => ({
   batchUsageCounting: true,
   disableGuard: true,
   deleteGuard: true,
+  media: false,
 })
 
 /**
@@ -72,7 +94,7 @@ export const VOCABULARY_SET_CAPABILITIES = {
   languages: browseOnlyWithUsageResolutionCapabilities(),
   senses: browseOnlyWithUsageResolutionCapabilities(),
   sizes: browseOnlyWithUsageResolutionCapabilities(),
-  'spell-schools': browseOnlyWithUsageResolutionCapabilities(),
+  'spell-schools': browseOnlyWithMediaCapabilities(),
   'weapon-properties': browseOnlyWithUsageResolutionCapabilities(),
   'equipment-categories': browseOnlyWithUsageResolutionCapabilities(),
   'edition-presets': disabledCapabilities(),
@@ -100,6 +122,7 @@ export function validateVocabularySetCapabilityImplications(
     'batchUsageCounting',
     'disableGuard',
     'deleteGuard',
+    'media',
   ] as const satisfies readonly (keyof VocabularySetCapability)[]
 
   for (const field of managementFields) {
@@ -138,6 +161,16 @@ export function getVocabularySetCapability(setId: VocabularyOptionSetId): Vocabu
 }
 
 /** Set ids listed on the Game Terms hub and reachable at overview/detail routes. */
+/** Set ids where campaign managers may PATCH entry media. Implies browse. */
+export function vocabularySetIdsWithMedia(
+  capabilities: Record<
+    VocabularyOptionSetId,
+    VocabularySetCapability
+  > = VOCABULARY_SET_CAPABILITIES,
+): VocabularyOptionSetId[] {
+  return VOCABULARY_OPTION_SET_IDS.filter((setId) => capabilities[setId].media)
+}
+
 export function vocabularySetIdsWithBrowse(
   capabilities: Record<
     VocabularyOptionSetId,

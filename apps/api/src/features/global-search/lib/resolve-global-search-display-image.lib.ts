@@ -6,6 +6,7 @@ import {
   type ContentMedia,
   type ContentSource,
   type ContentTypeKey,
+  contentTypeSubject,
 } from '@rpg/contracts'
 
 import { resolveMediaArtworkUrl } from '../../media/lib/media-artwork-url.lib'
@@ -27,7 +28,7 @@ export function resolveGlobalSearchContentDisplayImage(input: {
     media: input.media,
     surface: 'compact',
     domain,
-    contentType: input.contentType as ContentTypeKey,
+    subject: contentTypeSubject(input.contentType as ContentTypeKey),
     slug: input.slug,
     contentSource: input.contentSource,
     rulesetId: input.rulesetId,

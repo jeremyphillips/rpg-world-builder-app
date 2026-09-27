@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 /** Domains that may attach media reference rows during reconcile. */
-export const mediaSubjectKindSchema = z.enum(['content', 'character', 'campaign'])
+export const mediaSubjectKindSchema = z.enum(['content', 'character', 'campaign', 'game-term'])
 
 export type MediaSubjectKind = z.infer<typeof mediaSubjectKindSchema>
 

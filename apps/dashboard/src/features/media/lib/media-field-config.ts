@@ -1,4 +1,5 @@
 import {
+  getContentMediaPolicy,
   resolveContentMediaDomainForDashboardRoute,
   resolveContentMediaMaxItems,
   type ContentMediaCollectionConstraint,
@@ -30,5 +31,6 @@ export function resolveContentMediaFieldConfig(routeKey: string): MediaFieldConf
 }
 
 export function resolveMediaFieldCapacity(config: MediaFieldConfig): number {
-  return resolveContentMediaMaxItems(config.collection)
+  const policy = getContentMediaPolicy(config.domain)
+  return resolveContentMediaMaxItems(config.collection ?? policy)
 }

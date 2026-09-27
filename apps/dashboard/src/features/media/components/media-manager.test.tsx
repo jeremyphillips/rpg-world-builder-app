@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   CONTENT_MEDIA_DOMAINS,
+  contentTypeSubject,
   createUploadRoleAssignment,
   focalPointFromCropCenter,
   resetPrimaryCrop,
@@ -66,6 +67,11 @@ describe('MediaManager', () => {
       domain,
       value: { ...mediaFixture, roles: { primary: createUploadRoleAssignment('image-0') } },
     })
+    if (domain === 'game-term') {
+      expect(screen.getByRole('checkbox', { name: 'Emblem' })).toBeInTheDocument()
+      expect(screen.queryByRole('checkbox', { name: 'Primary image' })).not.toBeInTheDocument()
+      return
+    }
     expect(screen.getByRole('checkbox', { name: 'Primary image' })).toBeInTheDocument()
     expect(Boolean(screen.queryByRole('checkbox', { name: 'Portrait' }))).toBe(
       domain === 'character',
@@ -279,7 +285,8 @@ describe('MediaManager', () => {
       domain: 'class',
       value: { revision: 0, images: [], roles: {} },
       contentContext: {
-        contentType: 'classes',
+        domain: 'class',
+        subject: contentTypeSubject('classes'),
         slug: 'fighter',
         contentSource: 'system',
         rulesetId: 'srd-cc-5.2.1',
@@ -337,7 +344,8 @@ describe('MediaManager', () => {
 
   it('tracks effective primary ownership across save and reopen for system classes', async () => {
     const contentContext = {
-      contentType: 'classes' as const,
+      domain: 'class' as const,
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system' as const,
       rulesetId: 'srd-cc-5.2.1',

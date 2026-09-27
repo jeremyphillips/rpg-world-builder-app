@@ -49,7 +49,7 @@ export function shouldConfirmMediaRoleChange(input: {
     : previous.source.kind === 'system'
       ? resolveSystemContentImageSourceDimensions({
           imageSetId: previous.source.imageSetId,
-          contentType: previous.source.contentType,
+          subject: previous.source.subject,
           assetRole: previous.source.assetRole,
           slug: previous.source.slug,
         })

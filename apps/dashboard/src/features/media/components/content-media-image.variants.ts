@@ -9,6 +9,7 @@ export type ContentMediaImageFrame =
   | 'builderCard'
   | 'square'
   | 'insetSm'
+  | 'emblem'
 
 /** Matches inherited radio-card / shell `--surface-current` for blend knockouts. */
 export const contentMediaImageSurfaceBackdropClasses =
@@ -23,6 +24,7 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
       builderCard: cn('aspect-[4/2] w-full min-h-0', contentMediaImageSurfaceBackdropClasses),
       square: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate'),
       insetSm: cn(identityFrameVariants({ shape: 'box', size: 'sm' }), 'isolate'),
+      emblem: cn(identityFrameVariants({ shape: 'box', size: 'xs' }), 'isolate aspect-square'),
     },
   },
   defaultVariants: {
@@ -31,6 +33,10 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
 })
 
 export const contentMediaImageClasses = 'block size-full max-w-none select-none object-cover'
+
+export const contentMediaImageEmblemClasses = 'object-contain'
+
+export const contentMediaImageMonoGlyphInvertClasses = 'dark:invert'
 
 /** White-paper line art on a light surface; dark mode renders the original artwork. */
 export const contentMediaImageWhitePaperKnockoutClasses = 'mix-blend-multiply dark:mix-blend-normal'
@@ -47,4 +53,5 @@ export const contentMediaImageFallbackIconClasses: Record<ContentMediaImageFrame
   primary: 'size-icon-glyph-xl',
   builderSheetHero: 'size-icon-glyph-xl',
   intrinsic: 'size-icon-glyph-xl',
+  emblem: 'size-icon-glyph-xl',
 }

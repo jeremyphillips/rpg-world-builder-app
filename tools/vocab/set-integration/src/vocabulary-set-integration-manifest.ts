@@ -62,7 +62,7 @@ export const VOCABULARY_SET_INTEGRATION_MANIFEST: VocabularySetIntegrationManife
   },
   'spell-schools': {
     owner: 'catalog',
-    notes: 'Spell school field references.',
+    notes: 'Spell school field references; entry media (emblem) enabled via capabilities.media.',
     ...usageResolverExtension,
   },
   'weapon-properties': {

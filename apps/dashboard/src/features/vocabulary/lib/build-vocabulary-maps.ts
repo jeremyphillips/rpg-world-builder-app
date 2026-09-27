@@ -2,6 +2,7 @@ import { loadSeedVocabularyOptionSet } from '@rpg/catalog/vocabulary'
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   type ResolvedVocabularyOptionSet,
+  type VocabularyOption,
   type VocabularyOptionSetId,
 } from '@rpg/contracts'
 
@@ -12,6 +13,7 @@ export type LabelActiveVocabulary = {
 
 export type LabelDescriptionActiveVocabulary = LabelActiveVocabulary & {
   descriptionById: Record<string, string>
+  optionById: Record<string, VocabularyOption>
 }
 
 /** Builds label and active-id maps from a resolved vocabulary set. */
@@ -32,7 +34,8 @@ export function buildLabelDescriptionActiveVocabulary(
   const descriptionById = Object.fromEntries(
     set.options.map((option) => [option.id, option.description ?? '']),
   )
-  return { ...buildLabelActiveVocabulary(set), descriptionById }
+  const optionById = Object.fromEntries(set.options.map((option) => [option.id, option]))
+  return { ...buildLabelActiveVocabulary(set), descriptionById, optionById }
 }
 
 /** Loads catalog seed options as an active resolved set for default-ruleset flows. */

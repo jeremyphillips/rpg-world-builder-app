@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createUploadRoleAssignment, createSystemRoleAssignment } from './content-media-source'
+import { contentTypeSubject } from './system-image-subject'
 import type { AvailableContentImage } from './get-available-content-images'
 import {
   resolveEffectiveImageRoles,
@@ -9,11 +10,11 @@ import {
 
 const systemImage: AvailableContentImage = {
   kind: 'system',
-  id: 'system:srd:classes:primary:fighter',
+  id: 'system:srd:content-type:classes:primary:fighter',
   source: {
     kind: 'system',
     imageSetId: 'srd',
-    contentType: 'classes',
+    subject: contentTypeSubject('classes'),
     assetRole: 'primary',
     slug: 'fighter',
   },
@@ -76,7 +77,7 @@ describe('resolveEffectiveImageRoles', () => {
           roles: {
             primary: createSystemRoleAssignment({
               imageSetId: 'srd',
-              contentType: 'classes',
+              subject: contentTypeSubject('classes'),
               assetRole: 'primary',
               slug: 'fighter',
             }),

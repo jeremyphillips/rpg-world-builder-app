@@ -5,7 +5,7 @@ import type {
   ContentTypeKey,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { type ContentMediaDomain } from '@rpg/contracts'
+import { contentTypeSubject, type ContentMediaDomain } from '@rpg/contracts'
 import { useWatch } from 'react-hook-form'
 import { cn, fieldStackRhythmVariants } from '@rpg/ui'
 import { FormItems, resolveFormDensity, useFormSectionContext, type FormItem } from '@rpg/ui/form'
@@ -69,7 +69,8 @@ function ContentMediaIdentitySlot({
       contentContext={
         slug && contentSource
           ? {
-              contentType,
+              domain,
+              subject: contentTypeSubject(contentType),
               slug,
               contentSource,
               rulesetId,

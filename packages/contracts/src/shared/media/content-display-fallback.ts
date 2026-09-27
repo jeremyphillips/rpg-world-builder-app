@@ -50,6 +50,7 @@ const MEDIA_DOMAIN_COMPACT_FALLBACK: Record<ContentMediaDomain, ContentDisplayFa
   equipment: 'equipment',
   class: 'class',
   species: 'species',
+  'game-term': 'game-term',
 }
 
 function resolveMediaDomainFallback(

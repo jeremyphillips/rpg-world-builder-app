@@ -257,15 +257,26 @@ const CONTENT_PROJECTORS: {
 export function projectContentEntity(
   contentType: ApiContentTypeKey,
   entity: NamedContentEntity,
+  options?: {
+    resolveSpellSchoolDisplay?: (schoolId: string) => GlobalSearchDocument['displayImage']
+  },
 ): GlobalSearchDocument {
   const projector = CONTENT_PROJECTORS[contentType]
-  const displayImage = resolveGlobalSearchContentDisplayImage({
+  let displayImage = resolveGlobalSearchContentDisplayImage({
     contentType,
     media: entity.media,
     slug: entity.slug,
     contentSource: entity.source,
     rulesetId: entity.rulesetId,
   })
+
+  if (contentType === 'spells') {
+    const school = (entity as Spell).school
+    const schoolDisplay = school ? options?.resolveSpellSchoolDisplay?.(school) : undefined
+    if (schoolDisplay) {
+      displayImage = schoolDisplay
+    }
+  }
 
   return {
     id: buildContentDocumentId(contentType, entity.id),

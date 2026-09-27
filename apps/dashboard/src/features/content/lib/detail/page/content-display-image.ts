@@ -9,6 +9,7 @@ import {
   type ContentSource,
   type ContentTypeKey,
   type ResolveContentDisplayImageResult,
+  contentTypeSubject,
 } from '@rpg/contracts'
 
 import {
@@ -55,7 +56,7 @@ export function resolveDashboardContentDisplay(
     media: input.media,
     surface: input.surface ?? 'detail',
     domain,
-    contentType: input.contentType,
+    subject: contentTypeSubject(input.contentType),
     slug: input.slug,
     contentSource: input.contentSource,
     rulesetId: input.rulesetId,

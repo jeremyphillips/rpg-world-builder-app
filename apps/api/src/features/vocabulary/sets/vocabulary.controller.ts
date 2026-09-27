@@ -110,6 +110,9 @@ export async function patchVocabularyEntry(req: Request, res: Response): Promise
   if (hasStatus) {
     assertVocabularySetCapability(setId, 'availability')
   }
+  if (parsed.data.media !== undefined) {
+    assertVocabularySetCapability(setId, 'media')
+  }
 
   const ctx = vocabularyUsageContextFromRequest(req, campaignId)
   const set = await updateVocabularyEntry(ctx, setId, entryId, parsed.data)

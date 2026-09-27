@@ -39,8 +39,8 @@ export const MEDIA_RENDITION_PRESET_ENTRIES = {
   },
   emblem: {
     label: 'Emblem',
-    width: 256,
-    height: 256,
+    width: 512,
+    height: 512,
     fit: 'contain' as const,
     outputFormat: 'png' as const,
   },
@@ -70,7 +70,7 @@ export const MEDIA_RENDITION_PRESETS = Object.keys(MEDIA_RENDITION_PRESET_ENTRIE
 export const mediaRenditionPresetSchema = z.enum(MEDIA_RENDITION_PRESETS)
 
 /** Bump when derivative generation logic changes to invalidate on-disk caches. */
-export const MEDIA_RENDITION_RENDERER_VERSION = 4
+export const MEDIA_RENDITION_RENDERER_VERSION = 5
 
 export type MediaRenditionPresetConfig =
   (typeof MEDIA_RENDITION_PRESET_ENTRIES)[MediaRenditionPreset]

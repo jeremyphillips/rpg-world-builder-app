@@ -20,6 +20,7 @@ const vocabularySystemEntryPatchEntrySchema = new Schema(
     label: { type: String, trim: true },
     description: { type: String },
     status: { type: String, enum: VOCABULARY_OPTION_STATUSES },
+    media: { type: Schema.Types.Mixed },
   },
   { _id: false },
 )
@@ -30,6 +31,7 @@ const vocabularyCampaignEntrySchema = new Schema(
     label: { type: String, required: true, trim: true },
     description: { type: String },
     status: { type: String, enum: VOCABULARY_OPTION_STATUSES, default: 'active' },
+    media: { type: Schema.Types.Mixed },
   },
   { _id: false },
 )

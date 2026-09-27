@@ -1,7 +1,10 @@
 import type { ContentSource } from '../../rpg/content/lib/envelope'
-import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentMedia } from './content-media'
-import { isSystemRoleAssignment, type ContentMediaSystemSource } from './content-media-source'
+import {
+  isSystemRoleAssignment,
+  systemImageSourcesEqual,
+  type ContentMediaSystemSource,
+} from './content-media-source'
 import type { ContentDisplaySurface } from './content-display-surface'
 import {
   resolveContentDisplayFallback,
@@ -10,18 +13,19 @@ import {
 import { asCropPresentation } from './role-presentation'
 import type { NormalizedCrop } from './geometry'
 import type { MediaRole } from './roles'
-import { getContentMediaPolicy, type ContentMediaDomain } from './media-policy'
+import { getContentMediaPolicy, resolveDetailRoles, type ContentMediaDomain } from './media-policy'
 import {
   resolveContentImageSet,
   resolveSystemContentImage,
   resolveSystemContentImageSourceDimensionsFromPath,
 } from './system-content-image-registry'
+import type { SystemImageSubject } from './system-image-subject'
 
 export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload'] as const
 
 export type ContentDisplayImageSourceKind = (typeof CONTENT_DISPLAY_IMAGE_SOURCE_KINDS)[number]
 
-export type ContentDisplayImagePresentationTreatment = 'white-paper-knockout'
+export type ContentDisplayImagePresentationTreatment = 'white-paper-knockout' | 'mono-glyph-invert'
 
 export type ContentDisplayImage = {
   src: string
@@ -35,7 +39,7 @@ export type ResolveContentDisplayImageInput = {
   media?: ContentMedia | null
   surface: ContentDisplaySurface
   domain: ContentMediaDomain
-  contentType: ContentTypeKey
+  subject: SystemImageSubject
   slug: string
   contentSource: ContentSource
   rulesetId?: string
@@ -60,7 +64,7 @@ function resolveUploadAssignmentSrc(
 function resolveSystemAssignment(source: ContentMediaSystemSource, contentSource: ContentSource) {
   return resolveSystemContentImage({
     imageSetId: source.imageSetId,
-    contentType: source.contentType,
+    subject: source.subject,
     assetRole: source.assetRole,
     slug: source.slug,
     contentSource,
@@ -70,7 +74,13 @@ function resolveSystemAssignment(source: ContentMediaSystemSource, contentSource
 function presentationTreatmentFromSystemImage(
   presentation: { treatment: string } | undefined,
 ): ContentDisplayImagePresentationTreatment | undefined {
-  return presentation?.treatment === 'white-paper-knockout' ? 'white-paper-knockout' : undefined
+  if (presentation?.treatment === 'white-paper-knockout') {
+    return 'white-paper-knockout'
+  }
+  if (presentation?.treatment === 'mono-glyph-invert') {
+    return 'mono-glyph-invert'
+  }
+  return undefined
 }
 
 function resolveRolesForSurface(
@@ -82,7 +92,7 @@ function resolveRolesForSurface(
     return policy.representativeRoles
   }
   if (surface === 'detail') {
-    return ['primary']
+    return resolveDetailRoles(policy)
   }
   const representative = policy.representativeRoles[0]
   return representative ? [representative] : ['primary']
@@ -122,7 +132,7 @@ function resolveDisplayImageForRole(
 
   const derivedResolved = resolveSystemContentImage({
     imageSetId,
-    contentType: input.contentType,
+    subject: input.subject,
     assetRole: role,
     slug: input.slug,
     contentSource: input.contentSource,
@@ -176,4 +186,11 @@ export function resolveContentDisplayImageSourceDimensions(
     return resolveSystemContentImageSourceDimensionsFromPath(display.src)
   }
   return undefined
+}
+
+export function systemDerivedImageMatchesAssignment(
+  derived: Pick<ContentMediaSystemSource, 'imageSetId' | 'subject' | 'assetRole' | 'slug'>,
+  assignment: ContentMediaSystemSource,
+): boolean {
+  return systemImageSourcesEqual(assignment, derived)
 }

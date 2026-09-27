@@ -264,7 +264,7 @@ function assignRole(
     media.roles[action.role] = {
       ...createSystemRoleAssignment({
         imageSetId: systemSource.imageSetId,
-        contentType: systemSource.contentType as 'classes',
+        subject: systemSource.subject,
         assetRole: systemSource.assetRole,
         slug: systemSource.slug,
       }),
@@ -331,7 +331,7 @@ function ensureAssignmentForSelection(
   if (systemSource) {
     next.media.roles[next.presentation] = createSystemRoleAssignment({
       imageSetId: systemSource.imageSetId,
-      contentType: systemSource.contentType,
+      subject: systemSource.subject,
       assetRole: systemSource.assetRole,
       slug: systemSource.slug,
     })

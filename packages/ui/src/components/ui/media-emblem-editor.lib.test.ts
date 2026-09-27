@@ -11,7 +11,7 @@ describe('resolveOffsetFromDragDelta', () => {
         deltaY: -16,
         maxTranslationX: 64,
         maxTranslationY: 64,
-        viewportSize: 256,
+        viewportSize: 512,
       }),
     ).toEqual({ x: 0.5, y: -0.25 })
   })
@@ -24,7 +24,7 @@ describe('resolveOffsetFromDragDelta', () => {
         deltaY: 40,
         maxTranslationX: 0,
         maxTranslationY: 64,
-        viewportSize: 256,
+        viewportSize: 512,
       }),
     ).toEqual({ x: 0, y: 0.625 })
   })
