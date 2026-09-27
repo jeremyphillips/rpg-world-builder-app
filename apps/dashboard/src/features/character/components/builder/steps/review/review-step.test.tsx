@@ -5,7 +5,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  characterBuilderValidationMessages,
   createEmptyCharacterBuilderDraft,
+  formatFieldMessage,
 } from '@rpg/contracts'
 
 import { createPopulatedStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
@@ -65,17 +67,23 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={onNavigateToStep}
       />,
     )
 
-    expect(screen.getByText(chrome.reviewValidationHeading)).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        formatFieldMessage(characterBuilderValidationMessages.completeRequiredFields()),
+      ),
+    ).toBeInTheDocument()
     const validationAlert = screen
       .getAllByRole('alert')
-      .find((node) => within(node).queryByText('identity.name'))
+      .find((node) => within(node).queryByText('Enter a character name.'))
     expect(validationAlert).toBeDefined()
-    expect(within(validationAlert!).getByText(/name_required/)).toBeInTheDocument()
+    expect(within(validationAlert!).queryByText('identity.name')).not.toBeInTheDocument()
 
     const requiredSection = screen.getByText('Required items').parentElement
     expect(requiredSection).toBeTruthy()
@@ -108,7 +116,9 @@ describe('ReviewStep', () => {
         draft={draft}
         preview={null}
         resolvedChoiceSets={[]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )
@@ -139,7 +149,9 @@ describe('ReviewStep', () => {
         draft={draft}
         preview={null}
         resolvedChoiceSets={[]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )
@@ -162,7 +174,9 @@ describe('ReviewStep', () => {
             stepId: 'identity',
           },
         ]}
-        validationHeading={chrome.reviewValidationHeading}
+        validationHeading={formatFieldMessage(
+          characterBuilderValidationMessages.completeRequiredFields(),
+        )}
         onNavigateToStep={vi.fn()}
       />,
     )

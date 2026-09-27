@@ -98,18 +98,20 @@ describe('resolveBuilderCreateFailure', () => {
       ),
     ).toEqual({
       kind: 'validation',
-      headline: 'Validation failed',
+      validationAlertHeading: "We couldn't create this character.",
       issues: [
         {
           code: 'invalid_type',
           message: 'Invalid input',
           path: 'spells.0.access',
+          source: 'api',
           stepId: 'spells',
         },
         {
           code: 'invalid_enum_value',
           message: 'Invalid enum value',
           path: 'vital.status',
+          source: 'api',
         },
       ],
     })
@@ -142,6 +144,47 @@ describe('resolveBuilderCreateFailure', () => {
 
     expect(setCreateError).toHaveBeenCalledWith(
       'This invitation has expired. Ask the campaign owner to send a new invite.',
+    )
+  })
+
+  it('does not set createError for structured validation outcomes', () => {
+    const setCreateError = vi.fn()
+    const applyValidationIssues = vi.fn()
+
+    applyBuilderCreateFailure(
+      {
+        kind: 'validation',
+        validationAlertHeading: "We couldn't create this NPC.",
+        issues: [
+          {
+            code: 'invalid_type',
+            message: 'Spell access is required.',
+            path: 'spells.0.access',
+            source: 'api',
+            stepId: 'spells',
+          },
+        ],
+      },
+      {
+        applyValidationIssues,
+        patchDraft: vi.fn(),
+        setCampaignEligibilityError: vi.fn(),
+        setCreateError,
+      },
+    )
+
+    expect(setCreateError).not.toHaveBeenCalled()
+    expect(applyValidationIssues).toHaveBeenCalledWith(
+      [
+        {
+          code: 'invalid_type',
+          message: 'Spell access is required.',
+          path: 'spells.0.access',
+          source: 'api',
+          stepId: 'spells',
+        },
+      ],
+      { heading: "We couldn't create this NPC." },
     )
   })
 })

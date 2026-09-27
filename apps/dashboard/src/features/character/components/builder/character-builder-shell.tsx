@@ -2,9 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
+  characterBuilderValidationMessages,
   formatCharacterBuilderDraftRestoreRejectionMessage,
+  formatFieldMessage,
   isCampaignBuildContext,
   resolveBuilderLevelConstraints,
+  resolveEffectiveBuilderSteps,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -12,7 +15,6 @@ import {
   type CharacterCampaignWarning,
   type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
-  resolveEffectiveBuilderSteps,
 } from '@rpg/contracts'
 import type {
   CharacterBuildAcquisition,
@@ -148,6 +150,12 @@ export function CharacterBuilderShell({
     CharacterBuilderStepId[]
   >([])
   const [createError, setCreateError] = useState<string | null>(null)
+  const defaultValidationAlertHeading = formatFieldMessage(
+    characterBuilderValidationMessages.completeRequiredFields(),
+  )
+  const [validationAlertHeading, setValidationAlertHeading] = useState(
+    defaultValidationAlertHeading,
+  )
   const [campaignEligibilityError, setCampaignEligibilityError] = useState<{
     blockingIssues: CharacterCampaignBlockingIssue[]
     warnings: CharacterCampaignWarning[]
@@ -285,12 +293,18 @@ export function CharacterBuilderShell({
     setPendingEquipmentPickerFocus(undefined)
   }, [])
 
-  const applyValidationIssues = useCallback((issues: CharacterBuildValidationIssue[]) => {
-    const issueStepIds = validationIssueStepIds(issues)
-    setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
-    setValidationVisibleStepIds((previous) => mergeValidationVisibleStepIds(previous, issueStepIds))
-    setValidationIssues(issues)
-  }, [])
+  const applyValidationIssues = useCallback(
+    (issues: CharacterBuildValidationIssue[], options?: { heading?: string }) => {
+      const issueStepIds = validationIssueStepIds(issues)
+      setAttemptedStepIds((previous) => mergeAttemptedStepIds(previous, issueStepIds))
+      setValidationVisibleStepIds((previous) =>
+        mergeValidationVisibleStepIds(previous, issueStepIds),
+      )
+      setValidationAlertHeading(options?.heading ?? defaultValidationAlertHeading)
+      setValidationIssues(issues)
+    },
+    [defaultValidationAlertHeading],
+  )
 
   if (!hasHydrated) {
     return (
@@ -357,6 +371,7 @@ export function CharacterBuilderShell({
       setValidationVisibleStepIds((previous) =>
         mergeValidationVisibleStepIds(previous, [currentStepId]),
       )
+      setValidationAlertHeading(defaultValidationAlertHeading)
       setValidationIssues(result.issues)
       return
     }
@@ -365,6 +380,7 @@ export function CharacterBuilderShell({
       removeValidationVisibleStepId(previous, currentStepId),
     )
     setValidationIssues([])
+    setValidationAlertHeading(defaultValidationAlertHeading)
     setCreateError(null)
     setCampaignEligibilityError(null)
     shiftStep('forward')
@@ -382,6 +398,9 @@ export function CharacterBuilderShell({
       mergeValidationVisibleStepIds(previous, [currentStepId]),
     )
     const result = validateBuilderStepSubmit(nextDraft, context, currentStepId, resolvedChoiceSets)
+    if (!result.ok) {
+      setValidationAlertHeading(defaultValidationAlertHeading)
+    }
     setValidationIssues(result.ok ? [] : result.issues)
   }
 
@@ -397,6 +416,7 @@ export function CharacterBuilderShell({
 
   const handleCreateCharacter = async () => {
     setValidationIssues([])
+    setValidationAlertHeading(defaultValidationAlertHeading)
     setCreateError(null)
     setCampaignEligibilityError(null)
 
@@ -540,7 +560,7 @@ export function CharacterBuilderShell({
                   preview={preview}
                   resolvedChoiceSets={resolvedChoiceSets}
                   validationIssues={stepValidationIssues}
-                  reviewValidationHeading={chrome.reviewValidationHeading}
+                  validationAlertHeading={validationAlertHeading}
                   onDraftChange={applyDraftPatch}
                   onStepComplete={attemptStepAdvance}
                   onFormContinueValidationFailed={handleFormContinueValidationFailed}

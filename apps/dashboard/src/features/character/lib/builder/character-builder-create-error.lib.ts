@@ -1,11 +1,13 @@
 import {
   formatCampaignInviteUnavailableMessage,
   getApiValidationIssues,
+  getCharacterBuilderChromeMessages,
   getErrorMessage,
-  isApiError,
   isCampaignPcOnboardingBuildContext,
   isCharacterBuildFinalizationError,
   resolveCampaignCharacterAssignmentError,
+  resolveCharacterBuilderChromeVariant,
+  resolveCharacterBuildStepForIssuePath,
   type ApiValidationIssue,
   type CampaignInviteUnavailableReason,
   type CharacterBuildContext,
@@ -13,14 +15,17 @@ import {
   type CharacterCampaignBlockingIssue,
   type CharacterCampaignWarning,
 } from '@rpg/contracts'
-import {
-  resolveCharacterBuildStepForIssuePath,
-  type CharacterBuilderStepId,
-  type CharacterBuildValidationIssue,
+import type {
+  CharacterBuilderStepId,
+  CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
 
 export type BuilderCreateFailureOutcome =
-  | { kind: 'validation'; issues: CharacterBuildValidationIssue[]; headline?: string }
+  | {
+      kind: 'validation'
+      issues: CharacterBuildValidationIssue[]
+      validationAlertHeading?: string
+    }
   | {
       kind: 'campaign_eligibility'
       blockingIssues: CharacterCampaignBlockingIssue[]
@@ -35,8 +40,15 @@ export function validationIssueStepIds(
   return issues.flatMap((issue) => (issue.stepId ? [issue.stepId] : []))
 }
 
+export type ApplyValidationIssuesOptions = {
+  heading?: string
+}
+
 export type BuilderCreateFailureHandlers = {
-  applyValidationIssues: (issues: CharacterBuildValidationIssue[]) => void
+  applyValidationIssues: (
+    issues: CharacterBuildValidationIssue[],
+    options?: ApplyValidationIssuesOptions,
+  ) => void
   patchDraft: (patch: Partial<CharacterBuilderDraft>) => void
   setCampaignEligibilityError: (error: {
     blockingIssues: CharacterCampaignBlockingIssue[]
@@ -44,6 +56,11 @@ export type BuilderCreateFailureHandlers = {
   }) => void
   setCreateError: (message: string) => void
   onInviteUnavailable?: (reason: CampaignInviteUnavailableReason) => void
+}
+
+function resolveCreateValidationAlertHeading(context: CharacterBuildContext): string {
+  const variant = resolveCharacterBuilderChromeVariant(context)
+  return getCharacterBuilderChromeMessages(variant).createValidationFailureHeading
 }
 
 function mapApiValidationIssuesToBuilderIssues(
@@ -55,6 +72,7 @@ function mapApiValidationIssuesToBuilderIssues(
       code: issue.code,
       message: issue.message,
       path: issue.path.length > 0 ? issue.path : undefined,
+      source: 'api',
       ...(stepId ? { stepId } : {}),
     }
   })
@@ -66,10 +84,9 @@ export function applyBuilderCreateFailure(
 ): void {
   switch (outcome.kind) {
     case 'validation':
-      handlers.applyValidationIssues(outcome.issues)
-      if (outcome.headline) {
-        handlers.setCreateError(outcome.headline)
-      }
+      handlers.applyValidationIssues(outcome.issues, {
+        heading: outcome.validationAlertHeading,
+      })
       return
     case 'campaign_eligibility':
       handlers.setCampaignEligibilityError({
@@ -106,7 +123,7 @@ export function resolveBuilderCreateFailure(
     return {
       kind: 'validation',
       issues: mapApiValidationIssuesToBuilderIssues(apiValidationIssues),
-      headline: isApiError(error) ? error.message : undefined,
+      validationAlertHeading: resolveCreateValidationAlertHeading(context),
     }
   }
 

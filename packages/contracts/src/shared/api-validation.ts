@@ -1,5 +1,8 @@
 import { isApiError } from './errors'
 
+/** Stable issue code for invalid pagination cursors in hand-built API validation payloads. */
+export const INVALID_CURSOR_ISSUE_CODE = 'invalid_cursor'
+
 export type ApiValidationIssue = {
   path: string
   message: string

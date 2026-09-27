@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { CSRF_HEADER } from '../../../lib/cookies'
 import { CampaignMembershipModel } from '..'
 import { createTestCampaign, registerAndLoginTestUser } from '../../../test/auth-agent'
-import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
+import {
+  minimalNpcRequestInput,
+  wizardSpellcasterNpcRequestInput,
+} from '../../../test/fixtures/npcs'
 import { useIntegrationApp } from '../../../test/setup/integration-app'
 
 const getApp = useIntegrationApp()
@@ -19,6 +22,34 @@ async function authedOwnerCampaign(email: string) {
 }
 
 describe('campaign NPC routes', () => {
+  it('persists wizard spell access through create and read', async () => {
+    const { agent, csrfToken, campaignId } = await authedOwnerCampaign(
+      'npc-wizard-spells@example.com',
+    )
+
+    const createRes = await agent
+      .post(`/api/campaigns/${campaignId}/npcs`)
+      .set(CSRF_HEADER, csrfToken)
+      .send(wizardSpellcasterNpcRequestInput)
+      .expect(201)
+
+    const npcId = createRes.body.npc.character.id as string
+    expect(createRes.body.npc.character.spells[0]).toMatchObject({
+      spellId: 'srd-cc-5.2.1:fire-bolt',
+      access: {},
+    })
+
+    const readRes = await agent
+      .get(`/api/campaigns/${campaignId}/npcs/${npcId}`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    expect(readRes.body.npc.character.spells[0]).toMatchObject({
+      spellId: 'srd-cc-5.2.1:fire-bolt',
+      access: {},
+    })
+  })
+
   it('creates, lists, reads, and deletes a campaign NPC for owner/co-owner', async () => {
     const { agent, csrfToken, campaignId } = await authedOwnerCampaign('npc-owner@example.com')
 

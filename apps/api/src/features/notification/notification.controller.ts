@@ -3,6 +3,7 @@ import { isValidObjectId } from 'mongoose'
 
 import type { MarkNotificationsSeenInput } from '@rpg/contracts'
 import {
+  INVALID_CURSOR_ISSUE_CODE,
   markNotificationReadParamsSchema,
   notificationListQuerySchema,
   notificationUnreadCountResponseSchema,
@@ -34,7 +35,7 @@ export async function list(req: Request, res: Response): Promise<void> {
     const decodedCursor = decodeNotificationCursor(parsed.data.cursor)
     if (!decodedCursor || !isValidObjectId(decodedCursor.id)) {
       throw HttpError.badRequest('Validation failed', {
-        issues: [{ path: 'cursor', message: 'Invalid cursor.' }],
+        issues: [{ path: 'cursor', message: 'Invalid cursor.', code: INVALID_CURSOR_ISSUE_CODE }],
       })
     }
   }

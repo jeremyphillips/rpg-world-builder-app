@@ -53,10 +53,16 @@ Readiness does not replace `validateCharacterBuild` on Continue / Create.
 ### Create failures from the API
 
 When create returns structured validation issues (`bad_request` or
-`validation_error` with `details.issues`), the review step shows the API message
-as the headline and lists each issue’s path, message, and Zod code in
-`CharacterBuilderValidationAlert`. Known issue paths also mark the matching
-builder step in the rail; unknown paths stay on the review alert only.
+`validation_error` with `details.issues`), the review step shows a single
+`CharacterBuilderValidationAlert` (no duplicate create-error line). The alert
+heading is semantic copy from builder chrome messages (for example, “We couldn't
+create this NPC”), not the API transport message. Each issue lists the
+user-facing message first; step labels from `BUILDER_STEPS` provide context when
+the path maps to a builder step. Raw path and Zod code appear under an optional
+“Technical details” disclosure (inline in development). Known issue paths also
+mark the matching builder step in the rail; unknown paths stay on the review
+alert only. Local builder validation uses the “Complete the required fields”
+heading.
 
 ### Builder level (phase 1)
 

@@ -2,10 +2,12 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { runInTransaction } from '../../lib/mongo-transaction'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
+import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { useIntegrationDb } from '../../test/setup/integration-db'
 import { CharacterModel } from './character.model'
-import { createPcRecord } from './character.repository'
+import { createNpcRecord, createPcRecord } from './character.repository'
 import * as toCharacterModule from './to-character'
+import * as toNpcCharacterModule from './to-npc-character'
 
 useIntegrationDb()
 
@@ -41,6 +43,21 @@ describe('character.repository create records', () => {
     ).rejects.toThrow('map failed in transaction')
 
     const remaining = await CharacterModel.find({ name: 'Transactional Orphan PC' }).lean()
+    expect(remaining).toHaveLength(0)
+
+    spy.mockRestore()
+  })
+
+  it('deletes the saved NPC when response mapping throws without a session', async () => {
+    const spy = vi.spyOn(toNpcCharacterModule, 'toNpcCharacter').mockImplementation(() => {
+      throw new Error('npc map failed')
+    })
+
+    await expect(
+      createNpcRecord({ ...minimalNpcRequestInput, characterType: 'npc', name: 'Orphan NPC' }),
+    ).rejects.toThrow('npc map failed')
+
+    const remaining = await CharacterModel.find({ name: 'Orphan NPC' }).lean()
     expect(remaining).toHaveLength(0)
 
     spy.mockRestore()
