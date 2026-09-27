@@ -50,4 +50,20 @@ describe('EntityAnatomyHost', () => {
     expect(screen.getByTestId('leading')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
   })
+
+  it('centers the trailing rail when trailingAlign is center', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <EntityAnatomyHost
+          entity={GREY_COAST_ENTITY}
+          trailing={{ kind: 'indicator', variant: 'chevron' }}
+          trailingAlign="center"
+          density="compact"
+        />
+      </MemoryRouter>,
+    )
+
+    const trailingSlot = container.querySelector('[data-entity-item-slot="trailing"]')
+    expect(trailingSlot).toHaveClass('self-center')
+  })
 })

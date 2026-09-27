@@ -37,6 +37,8 @@ export type EntityAnatomyHostProps = {
   /** Exactly one leading utility when set — never a multi-control group or fragment. */
   leading?: ReactNode
   trailing?: EntityAnatomyTrailing
+  /** Vertical alignment of the trailing rail within the anatomy grid row. */
+  trailingAlign?: 'start' | 'center'
   density?: ContentCardDensity
 }
 
@@ -104,6 +106,7 @@ export function EntityAnatomyHost({
   headingHref,
   leading,
   trailing,
+  trailingAlign,
   density = 'comfortable',
 }: EntityAnatomyHostProps) {
   return (
@@ -113,6 +116,7 @@ export function EntityAnatomyHost({
         headingHref={headingHref}
         leadingUtilities={leading != null ? [leading] : undefined}
         trailing={trailing}
+        trailingAlign={trailingAlign}
         density={density}
       />
     </div>

@@ -7,9 +7,10 @@ import {
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
-import { Badge, buttonVariants, Text } from '@rpg/ui'
+import { Badge, buttonVariants, Eyebrow, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
+import { contentDetailHeroEyebrowClasses } from '@/features/content'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
@@ -41,6 +42,7 @@ import { vocabularyTermDetailBodyClasses } from './vocabulary-term-detail-conten
 type VocabularyTermDetailBodyProps = {
   campaignId: string
   setId: VocabularyOptionSetId
+  setLabel: string
   entry: VocabularyOptionWithUsage
   singularLabel: string
   canManageMedia: boolean
@@ -54,6 +56,7 @@ type VocabularyTermDetailBodyProps = {
 function VocabularyTermDetailBody({
   campaignId,
   setId,
+  setLabel,
   entry,
   singularLabel,
   canManageMedia,
@@ -92,16 +95,21 @@ function VocabularyTermDetailBody({
     <>
       <div className={vocabularyTermDetailBodyClasses}>
         <div className="min-w-0 flex-1 space-y-3">
-          <PageHeader
-            heading={entry.label}
-            badge={
-              <>
-                {sourceBadge}
-                {disabledBadge}
-              </>
-            }
-            actions={editAction}
-          />
+          <div>
+            <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
+              {setLabel}
+            </Eyebrow>
+            <PageHeader
+              heading={entry.label}
+              badge={
+                <>
+                  {sourceBadge}
+                  {disabledBadge}
+                </>
+              }
+              actions={editAction}
+            />
+          </div>
           <Text variant="muted">{entry.description ?? 'No description.'}</Text>
         </div>
         {showMediaField ? (
@@ -140,11 +148,13 @@ type VocabularyTermDetailPageProps = {
 function VocabularyTermDetailLoaded({
   campaignId,
   setId,
+  setLabel,
   singularLabel,
   entry,
 }: {
   campaignId: string
   setId: VocabularyOptionSetId
+  setLabel: string
   singularLabel: string
   entry: VocabularyOptionWithUsage
 }) {
@@ -185,6 +195,7 @@ function VocabularyTermDetailLoaded({
       <VocabularyTermDetailBody
         campaignId={campaignId}
         setId={setId}
+        setLabel={setLabel}
         entry={entry}
         singularLabel={singularLabel}
         canManageMedia={Boolean(canManage && capabilities.media)}
@@ -242,6 +253,7 @@ function VocabularyTermDetailPage({
           <VocabularyTermDetailLoaded
             campaignId={campaignId}
             setId={setId}
+            setLabel={setLabel}
             singularLabel={singularLabel}
             entry={entry}
           />

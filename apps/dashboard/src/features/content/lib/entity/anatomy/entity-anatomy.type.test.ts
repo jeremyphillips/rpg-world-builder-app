@@ -62,6 +62,7 @@ describe('entity surface closed API', () => {
       headingHref?: string
       leading?: React.ReactNode
       trailing?: EntityAnatomyHostProps['trailing']
+      trailingAlign?: EntityAnatomyHostProps['trailingAlign']
       density?: EntityAnatomyHostProps['density']
     }>()
   })

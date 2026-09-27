@@ -70,6 +70,7 @@ export type {
 } from './lib/relationship/list/relationship-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
+export { contentDetailHeroEyebrowClasses } from './lib/detail/page/content-detail-layout.variants'
 export {
   ContentDetailSection,
   ContentDetailSectionItem,

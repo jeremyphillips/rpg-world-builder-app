@@ -609,11 +609,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                        |
-| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-3` comfortable); heading-band min-height matches frame size; outer row `items-start` |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                          |
-| Stacked bleed | Species/class radio cards, character list cards            | Full-bleed `ContentMediaImage` `builderCard` frame; text padding under the image                                                |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                         |
+| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); heading-band min-height matches frame size; outer row `items-start` |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                           |
+| Stacked bleed | Species/class radio cards, character list cards            | Full-bleed `ContentMediaImage` `builderCard` frame; text padding under the image                                                                                                                 |
 
 Portrait role copy targets compact circle/square tokens; stacked character cards use
 **primary** crop in the builder-card window.
