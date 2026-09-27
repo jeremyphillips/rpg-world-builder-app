@@ -52,6 +52,16 @@ function usesNormalizedCropLayout(frame: ContentMediaImageFrame, hasCrop: boolea
   return false
 }
 
+function resolveObjectPresentation(frame: ContentMediaImageFrame): {
+  objectFit: 'cover' | 'contain'
+  objectPosition: string
+} {
+  if (frame === 'emblem' || frame === 'emblemHero') {
+    return { objectFit: 'contain', objectPosition: '50% 50%' }
+  }
+  return resolveContentImagePresentationDefault(resolvePresentationSurface(frame))
+}
+
 /** Renders a resolved display image with optional normalized-crop math. */
 export function ContentMediaImage({
   display,
@@ -63,7 +73,7 @@ export function ContentMediaImage({
   const applyCropLayout = usesNormalizedCropLayout(frame, hasCrop)
   const cropLayout =
     applyCropLayout && display.crop ? resolveNormalizedCropImageLayout(display.crop) : undefined
-  const presentation = resolveContentImagePresentationDefault(resolvePresentationSurface(frame))
+  const presentation = resolveObjectPresentation(frame)
   const usesWhitePaperKnockout = display.presentationTreatment === 'white-paper-knockout'
   const usesMonoGlyphInvert = display.presentationTreatment === 'mono-glyph-invert'
 

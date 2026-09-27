@@ -9,6 +9,7 @@ import {
   vocabularySetIdsRequiringBatchCountResolver,
   vocabularySetIdsRequiringUsageResolver,
   vocabularySetIdsWithBrowse,
+  vocabularySetIdsWithMedia,
 } from './vocabulary-set-capabilities'
 import { VOCABULARY_INTERNAL_ONLY_SET_IDS } from './vocabulary-category-registry'
 
@@ -127,6 +128,13 @@ describe('validateVocabularySetCapabilityImplications', () => {
     expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
       'batchUsageCounting requires usageResolution',
     )
+  })
+})
+
+describe('vocabularySetIdsWithMedia', () => {
+  it('lists spell-schools when media capability is enabled', () => {
+    expect(vocabularySetIdsWithMedia()).toContain('spell-schools')
+    expect(vocabularySetIdsWithMedia()).not.toContain('creature-types')
   })
 })
 
