@@ -1,7 +1,7 @@
 # Content media management
 
 Implementation tracker for reusable content media (Character, Class, Species,
-Equipment, Location, Organization). Full product and UX specification:
+Equipment, Location, Organization, Game term). Full product and UX specification:
 [roadmap/content-media-management-plan.md](./roadmap/content-media-management-plan.md).
 
 ## Display-image SSOT (locked)
@@ -25,18 +25,21 @@ Equipment, Location, Organization). Full product and UX specification:
    `CharacterListCard` still omits the stacked band when `displayImage` is absent.
 5. **Closed surface walker** — `resolveContentDisplayImage({ surface, domain, … })` with
    `surface: 'compact' | 'detail' | 'field'`. Compact walks `representativeRoles`
-   (character: portrait → primary). Detail walks primary only. Field walks the
-   domain representative role. Campaign overview hero stays on its banner path.
+   (character: portrait → primary). Detail walks `detailRoles` when declared on the
+   domain policy (otherwise primary only). Field walks the domain representative role.
+   Campaign overview hero stays on its banner path.
 6. **`imageKey` removed from authored catalog content.** Media domains display through
-   `ContentMedia` only. Spells, feats, and skill-proficiencies have no image field and
-   no image UI on detail or overview until they opt into `ContentMedia`. `avatarKey`
-   stays.
+   `ContentMedia` only. Spell **entities** do not attach `ContentMedia`; spell detail
+   hero art resolves from the spell-school vocabulary entry (registry emblem or campaign
+   override). Feats and skill-proficiencies still have no image UI until they opt into
+   `ContentMedia`. `avatarKey` stays.
 7. **Location and organization** allow `primary` and `emblem` uploads. Compact cards,
    pickers, and overview thumbnails resolve **primary** only (emblem is manager-only in
    this pass).
 
 System art comes only from `SYSTEM_CONTENT_IMAGE_ENTRIES` while walking each role
-(upload assignment, then registry entry for that content type, slug, and role).
+(upload assignment, then registry entry for that subject, slug, and role). Registry
+subjects use `SystemImageSubject` (`content-type` or `vocabulary-set` keys).
 
 ## v1 policy defaults (locked)
 
@@ -53,7 +56,8 @@ System art comes only from `SYSTEM_CONTENT_IMAGE_ENTRIES` while walking each rol
 | Unreferenced lease     | 24 hours                           |
 
 Character allows Portrait + Primary; location and organization allow Primary + Emblem;
-all other opted-in catalog domains are Primary only. Animated GIF/WebP originals are
+game-term vocabulary entries allow Emblem only (max one attachment). All other opted-in
+catalog domains are Primary only. Animated GIF/WebP originals are
 preserved; inspection and derivatives use the first frame. SVG is rejected. Private
 assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
 `GET /api/uploads/:key`.
@@ -74,8 +78,9 @@ assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
 
 - **`SYSTEM_ASSET_MANIFEST`** — upload/rendition fixture dimensions for tests.
 - **`system-content-image-registry.ts`** — shipped SRD catalog artwork (class and
-  species primary for `srd-cc-5.2.1`, `white-paper-knockout` treatment). The media
-  manager lists virtual system sources alongside uploads.
+  species primary for `srd-cc-5.2.1` with `white-paper-knockout`; spell-school emblems
+  with `mono-glyph-invert`). The media manager lists virtual system sources alongside
+  uploads.
 
 ## Phase status
 

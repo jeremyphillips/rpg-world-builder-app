@@ -129,6 +129,24 @@ describe('ContentMediaImage', () => {
     expect(container.querySelector('svg')).toHaveClass('size-icon-glyph-xl')
   })
 
+  it('uses contain presentation for emblem hero frames without a crop', () => {
+    const { container } = render(
+      <ContentMediaImage
+        display={{
+          src: '/assets/system/srd-cc-5.2.1/spell-schools/emblem/evocation.png',
+          sourceKind: 'system',
+          presentationTreatment: 'mono-glyph-invert',
+        }}
+        alt="Evocation"
+        frame="emblemHero"
+      />,
+    )
+
+    const img = container.querySelector('img')
+    expect(img).toHaveStyle({ objectFit: 'contain', objectPosition: '50% 50%' })
+    expect(img).toHaveClass('object-contain')
+  })
+
   it('does not apply knockout blend classes without presentation treatment metadata', () => {
     const { container } = render(
       <ContentMediaImage

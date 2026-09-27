@@ -8,10 +8,12 @@ export type EffectiveImageRoles = {
   derivedRoles: MediaRole[]
 }
 
-function derivedSystemImage(
+function systemAvailableImageForId(
   availableImages: AvailableContentImage[],
-): AvailableContentImage | undefined {
-  return availableImages.find((image) => image.kind === 'system')
+  imageId: string,
+): Extract<AvailableContentImage, { kind: 'system' }> | undefined {
+  const image = availableImages.find((entry) => entry.id === imageId)
+  return image?.kind === 'system' ? image : undefined
 }
 
 /** Resolve role ownership for one gallery image, including derived system primary. */
@@ -30,9 +32,12 @@ export function resolveEffectiveImageRoles(
     return { roles, derivedRoles: [] }
   }
 
-  const systemImage = derivedSystemImage(availableImages)
-  if (systemImage?.id === imageId && allowedRoles.includes('primary') && !media.roles.primary) {
-    return { roles: ['primary'], derivedRoles: ['primary'] }
+  const systemImage = systemAvailableImageForId(availableImages, imageId)
+  if (systemImage) {
+    const assetRole = systemImage.source.assetRole as MediaRole
+    if (allowedRoles.includes(assetRole) && !media.roles[assetRole]) {
+      return { roles: [assetRole], derivedRoles: [assetRole] }
+    }
   }
 
   return { roles: [], derivedRoles: [] }

@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { randomUUID } from 'node:crypto'
 
-import { CREATURE_TYPE_SET_ID } from '@rpg/contracts'
+import { beforeEach, describe, expect, it } from 'vitest'
+
+import { CREATURE_TYPE_SET_ID, createUploadRoleAssignment } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
+import { setMongoTransactionsEnabled } from '../../../lib/mongo-transaction'
+import { createMediaAssetRecord } from '../../media/media.repository'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'
@@ -209,6 +213,74 @@ describe('vocabulary write rules', () => {
         'robot',
       ),
     ).resolves.toBeDefined()
+  })
+})
+
+async function seedCampaignMediaAsset(campaignId: string) {
+  const assetId = randomUUID()
+  await createMediaAssetRecord({
+    _id: assetId,
+    sessionId: randomUUID(),
+    scopeKind: 'campaign-content',
+    scopeKey: `campaign-content:${campaignId}`,
+    campaignId,
+    createdByUserId: 'user-1',
+    storageKey: `media/${assetId}/original.png`,
+    originalFilename: 'emblem.png',
+    mimeType: 'image/png',
+    byteSize: 128,
+    orientedWidth: 1254,
+    orientedHeight: 1254,
+    contentHash: randomUUID(),
+    animated: false,
+    lifecycle: 'ready',
+    referenceCount: 0,
+    leaseExpiresAt: new Date(Date.now() + 60_000),
+  })
+  return assetId
+}
+
+describe('vocabulary entry media', () => {
+  beforeEach(() => {
+    setMongoTransactionsEnabled(true)
+  })
+
+  it('persists emblem media on a system spell school alongside other entry fields', async () => {
+    const campaign = await makeTestCampaign()
+    const ctx = vocabularyUsageContextForCampaign(campaign.id)
+    const assetId = await seedCampaignMediaAsset(campaign.id)
+
+    const updated = await updateVocabularyEntry(ctx, 'spell-schools', 'abjuration', {
+      media: {
+        revision: 0,
+        images: [{ id: 'img-1', assetId, alt: 'Custom abjuration emblem' }],
+        roles: { emblem: createUploadRoleAssignment('img-1') },
+      },
+      expectedMediaRevision: 0,
+      label: 'Abjuration magic',
+    })
+
+    const abjuration = updated.options.find((option) => option.id === 'abjuration')
+    expect(abjuration?.label).toBe('Abjuration magic')
+    expect(abjuration?.media?.revision).toBe(1)
+    expect(abjuration?.media?.roles.emblem?.source.kind).toBe('upload')
+  })
+
+  it('rejects stale vocabulary media revisions', async () => {
+    const campaign = await makeTestCampaign()
+    const ctx = vocabularyUsageContextForCampaign(campaign.id)
+    const assetId = await seedCampaignMediaAsset(campaign.id)
+
+    await expect(
+      updateVocabularyEntry(ctx, 'spell-schools', 'evocation', {
+        media: {
+          revision: 0,
+          images: [{ id: 'img-1', assetId }],
+          roles: { emblem: createUploadRoleAssignment('img-1') },
+        },
+        expectedMediaRevision: 2,
+      }),
+    ).rejects.toMatchObject({ status: 409, code: 'stale_revision' })
   })
 })
 
