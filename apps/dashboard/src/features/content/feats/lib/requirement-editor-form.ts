@@ -1,6 +1,7 @@
 import {
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
+  addCustomRefinementIssue,
   betweenCopy,
   campaignLevelSchema,
   defineMessage,
@@ -45,7 +46,7 @@ export const requirementEditorValidationMessages = {
 }
 
 function addCustomIssue(ctx: RefinementCtx, path: (string | number)[], message: string): void {
-  ctx.addIssue({ code: 'custom', message, path })
+  addCustomRefinementIssue(ctx, message, path)
 }
 
 function validateLeaf(

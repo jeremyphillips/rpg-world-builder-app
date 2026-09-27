@@ -2,6 +2,7 @@ import { action } from 'storybook/actions'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { expect, userEvent, within } from 'storybook/test'
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
@@ -637,11 +638,7 @@ const issueTraitSchema = z.object({
 })
 
 const rowIssueTraitSchema = issueTraitSchema.superRefine((_values, ctx) => {
-  ctx.addIssue({
-    code: 'custom',
-    path: ['traits', 0],
-    message: 'Review this trait before saving',
-  })
+  addCustomRefinementIssue(ctx, 'Review this trait before saving', ['traits', 0])
 })
 
 const nestedIssueSchema = z.object({

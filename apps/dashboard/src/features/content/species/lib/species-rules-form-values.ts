@@ -1,5 +1,6 @@
 import type { RefinementCtx } from 'zod'
 import {
+  addCustomRefinementIssue,
   defaultSpeciesMulticlassing,
   defineMessage,
   levelValidationMessages,
@@ -135,17 +136,17 @@ export function refineSpeciesCharacterCreationForm(
     const maxLevel = limits.maxCharacterLevel
 
     if (maxLevel === undefined) {
-      refinementCtx.addIssue({
-        code: 'custom',
-        message: speciesCharacterCreationFormValidationMessages.maxCharacterLevelRequired(),
-        path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
-      })
+      addCustomRefinementIssue(
+        refinementCtx,
+        speciesCharacterCreationFormValidationMessages.maxCharacterLevelRequired(),
+        ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
+      )
     } else if (maxLevel > campaignMax) {
-      refinementCtx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
-        path: ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
-      })
+      addCustomRefinementIssue(
+        refinementCtx,
+        levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
+        ['characterCreation', 'levelLimits', 'maxCharacterLevel'],
+      )
     }
   }
 
@@ -153,11 +154,11 @@ export function refineSpeciesCharacterCreationForm(
 
   limits.classLevelCaps.forEach((cap, index) => {
     if (cap.maxLevel > campaignMax) {
-      refinementCtx.addIssue({
-        code: 'custom',
-        message: levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
-        path: ['characterCreation', 'levelLimits', 'classLevelCaps', index, 'maxLevel'],
-      })
+      addCustomRefinementIssue(
+        refinementCtx,
+        levelValidationMessages.overCampaignMax({ maxLevel: campaignMax }),
+        ['characterCreation', 'levelLimits', 'classLevelCaps', index, 'maxLevel'],
+      )
     }
   })
 }

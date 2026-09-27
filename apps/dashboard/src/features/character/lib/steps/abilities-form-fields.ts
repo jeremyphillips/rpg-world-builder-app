@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
+  addCustomRefinementIssue,
   fieldValidationMessages,
   type AbilityGenerationMethod,
 } from '@rpg/contracts'
@@ -22,13 +23,13 @@ export const abilitiesFormSchema = z
   .superRefine((values, ctx) => {
     for (const ability of ABILITY_IDS) {
       if (typeof values[ability] !== 'number') {
-        ctx.addIssue({
-          code: 'custom',
-          message: fieldValidationMessages.requiredText({
+        addCustomRefinementIssue(
+          ctx,
+          fieldValidationMessages.requiredText({
             label: ABILITY_ENTRIES[ability].label,
           }),
-          path: [ability],
-        })
+          [ability],
+        )
       }
     }
   })

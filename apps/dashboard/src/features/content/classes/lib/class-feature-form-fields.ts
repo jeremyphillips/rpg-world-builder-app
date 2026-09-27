@@ -2,9 +2,10 @@ import { createElement } from 'react'
 import { z } from 'zod'
 import {
   CLASS_FEATURE_KINDS,
+  MAX_CHARACTER_LEVEL,
+  addCustomRefinementIssue,
   campaignLevelSchema,
   classValidationMessages,
-  MAX_CHARACTER_LEVEL,
   contentTableSchema,
   resolveGrantGroupsFromContent,
   type ClassBodyFeature,
@@ -49,14 +50,14 @@ function refineFeatureRowGrantUnlockLevels(
     if (!Number.isFinite(numericUnlock)) continue
 
     if (numericUnlock <= row.level) {
-      ctx.addIssue({
-        code: 'custom',
-        message: classValidationMessages.grantGroupUnlockAfterFeatureLevel({
+      addCustomRefinementIssue(
+        ctx,
+        classValidationMessages.grantGroupUnlockAfterFeatureLevel({
           unlockLevel: numericUnlock,
           featureLevel: row.level,
         }),
-        path: ['grants', index, 'unlockLevel'],
-      })
+        ['grants', index, 'unlockLevel'],
+      )
     }
   }
 }

@@ -2,6 +2,7 @@ import {
   CONTENT_TABLE_KINDS,
   TABLE_COLUMN_VALUE_TYPES,
   TABLE_NUMBER_FORMATS,
+  addCustomRefinementIssue,
   defineMessage,
 } from '@rpg/contracts'
 import { z } from 'zod'
@@ -67,11 +68,7 @@ function refineCell(
 
   if (column.valueType === 'number') {
     if (typeof cell !== 'string' || parseNumberCellDraft(cell) === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.invalidNumber(),
-        path,
-      })
+      addCustomRefinementIssue(ctx, tableBuilderValidationMessages.invalidNumber(), path)
       return false
     }
     return true
@@ -79,11 +76,7 @@ function refineCell(
 
   if (column.valueType === 'dice') {
     if (typeof cell === 'string' || parseDiceCellDraft(cell) === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.invalidDice(),
-        path,
-      })
+      addCustomRefinementIssue(ctx, tableBuilderValidationMessages.invalidDice(), path)
       return false
     }
     return true
@@ -94,38 +87,26 @@ function refineCell(
 
 function refineStructure(values: TableBuilderFormValues, ctx: z.RefinementCtx): void {
   if (values.name.trim() === '') {
-    ctx.addIssue({
-      code: 'custom',
-      message: tableBuilderValidationMessages.tableName(),
-      path: ['name'],
-    })
+    addCustomRefinementIssue(ctx, tableBuilderValidationMessages.tableName(), ['name'])
   }
 
   if (values.columns.length === 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: tableBuilderValidationMessages.minColumns(),
-      path: ['columns'],
-    })
+    addCustomRefinementIssue(ctx, tableBuilderValidationMessages.minColumns(), ['columns'])
   }
 
   if (values.rows.length === 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: tableBuilderValidationMessages.minRows(),
-      path: ['rows'],
-    })
+    addCustomRefinementIssue(ctx, tableBuilderValidationMessages.minRows(), ['rows'])
   }
 }
 
 function refineColumnLabels(values: TableBuilderFormValues, ctx: z.RefinementCtx): void {
   for (const [index, column] of values.columns.entries()) {
     if (column.label.trim() === '') {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.columnName(),
-        path: ['columns', index, 'label'],
-      })
+      addCustomRefinementIssue(ctx, tableBuilderValidationMessages.columnName(), [
+        'columns',
+        index,
+        'label',
+      ])
     }
   }
 }
@@ -137,20 +118,20 @@ function refineRowLevels(values: TableBuilderFormValues, ctx: z.RefinementCtx): 
     const level = parseLevelDraft(row.level ?? '')
 
     if (level === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.chooseLevel(),
-        path: ['rows', rowIndex, 'level'],
-      })
+      addCustomRefinementIssue(ctx, tableBuilderValidationMessages.chooseLevel(), [
+        'rows',
+        rowIndex,
+        'level',
+      ])
       continue
     }
 
     if (seenLevels.has(level)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.duplicateLevel({ level }),
-        path: ['rows', rowIndex, 'level'],
-      })
+      addCustomRefinementIssue(ctx, tableBuilderValidationMessages.duplicateLevel({ level }), [
+        'rows',
+        rowIndex,
+        'level',
+      ])
     }
     seenLevels.add(level)
   }
@@ -171,11 +152,11 @@ function refineColumnCells(values: TableBuilderFormValues, ctx: z.RefinementCtx)
     }
 
     if (!hasValue && column.label.trim() !== '') {
-      ctx.addIssue({
-        code: 'custom',
-        message: tableBuilderValidationMessages.columnNeedsValue({ label: column.label.trim() }),
-        path: ['columns', columnIndex, 'label'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        tableBuilderValidationMessages.columnNeedsValue({ label: column.label.trim() }),
+        ['columns', columnIndex, 'label'],
+      )
     }
   }
 }

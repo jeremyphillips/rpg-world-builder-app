@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { createElement } from 'react'
 import {
+  addCustomRefinementIssue,
   buildingFacilityTypeSchema,
   buildingFormSchema,
   interiorTypeSchema,
@@ -8,8 +9,8 @@ import {
   settlementTypeSchema,
   siteTypeSchema,
   slugSchema,
-  validateLocationParentRequirement,
   type BuildingFacilityAuthoringGroup,
+  validateLocationParentRequirement,
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
@@ -63,7 +64,7 @@ export const locationFormSchema = z
     const { kind } = canonicalFieldsForAuthoringType(values.authoringType)
     const error = validateLocationParentRequirement(kind, values.parentLocationId)
     if (error) {
-      ctx.addIssue({ code: 'custom', message: error, path: ['parentLocationId'] })
+      addCustomRefinementIssue(ctx, error, ['parentLocationId'])
     }
   })
 

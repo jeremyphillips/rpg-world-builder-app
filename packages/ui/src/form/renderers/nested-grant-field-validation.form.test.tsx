@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { Form } from '../shells/form.client'
 import type { FormItem } from '../field-config'
@@ -18,25 +19,13 @@ const grantRowSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.grantType === 'languages' && !row.language) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Language is required.',
-        path: ['language'],
-      })
+      addCustomRefinementIssue(ctx, 'Language is required.', ['language'])
     }
     if (row.grantType === 'resistances' && !row.resistances?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Damage types are required.',
-        path: ['resistances'],
-      })
+      addCustomRefinementIssue(ctx, 'Damage types are required.', ['resistances'])
     }
     if (row.grantType === 'weaponProficiency' && !row.weaponProficiencySlugs?.length) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Weapons are required.',
-        path: ['weaponProficiencySlugs'],
-      })
+      addCustomRefinementIssue(ctx, 'Weapons are required.', ['weaponProficiencySlugs'])
     }
   })
 

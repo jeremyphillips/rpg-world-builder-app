@@ -1,3 +1,4 @@
+export * from './lib/add-custom-refinement-issue'
 export * from './lib/bulk-field-operation'
 export * from './lib/strip-html-tags'
 export * from './lib/action-validation'

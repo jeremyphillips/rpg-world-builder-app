@@ -4,6 +4,7 @@ import {
   MAX_CHARACTER_LEVEL,
   abilitySchema,
   abilityScoreOrderSchema,
+  addCustomRefinementIssue,
   classGainProgressionSchema,
   hitDieSchema,
   slugSchema,
@@ -109,11 +110,7 @@ export function createClassFormSchema(
       const parsed = spellcastingSchema.safeParse(spellcasting)
       if (!parsed.success) {
         for (const issue of parsed.error.issues) {
-          ctx.addIssue({
-            code: 'custom',
-            message: issue.message,
-            path: ['spellcasting', ...issue.path],
-          })
+          addCustomRefinementIssue(ctx, issue.message, ['spellcasting', ...issue.path])
         }
       }
 
@@ -122,25 +119,19 @@ export function createClassFormSchema(
         !values.spellbookAcquisitionIrregular
       ) {
         if (values.spellbookAcquisitionStarting === undefined) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Starting spells is required.',
-            path: ['spellbookAcquisitionStarting'],
-          })
+          addCustomRefinementIssue(ctx, 'Starting spells is required.', [
+            'spellbookAcquisitionStarting',
+          ])
         }
         if (values.spellbookAcquisitionPerLevel === undefined) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Spells gained each later level is required.',
-            path: ['spellbookAcquisitionPerLevel'],
-          })
+          addCustomRefinementIssue(ctx, 'Spells gained each later level is required.', [
+            'spellbookAcquisitionPerLevel',
+          ])
         }
         if (values.spellbookAcquisitionThroughLevel === undefined) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Through level is required.',
-            path: ['spellbookAcquisitionThroughLevel'],
-          })
+          addCustomRefinementIssue(ctx, 'Through level is required.', [
+            'spellbookAcquisitionThroughLevel',
+          ])
         }
       }
     })

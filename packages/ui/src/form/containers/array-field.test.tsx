@@ -6,6 +6,7 @@ import type { UseFormReturn } from 'react-hook-form'
 import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { CANVAS_SURFACE } from '../../components/ui/surface.variants'
 import { Form } from '../shells/form.client'
@@ -32,11 +33,7 @@ const schema = z.object({
 })
 
 const rowIssueSchema = z.object({ traits: z.array(traitSchema) }).superRefine((_values, ctx) => {
-  ctx.addIssue({
-    code: 'custom',
-    path: ['traits', 0],
-    message: 'Review this trait before saving',
-  })
+  addCustomRefinementIssue(ctx, 'Review this trait before saving', ['traits', 0])
 })
 
 type Values = z.infer<typeof schema>

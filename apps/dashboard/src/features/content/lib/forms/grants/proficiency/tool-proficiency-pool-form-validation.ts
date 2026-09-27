@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { proficiencyGrantValidationMessages } from './proficiency-grant-form-fields'
 import type { TOOL_PROFICIENCY_POOL_SOURCES } from './tool-proficiency-pool-form-fields'
@@ -28,11 +29,9 @@ function refineExplicitToolPoolSlugs(
 ): void {
   if (row.poolSource !== 'explicit' || row[slugPath]?.length) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: proficiencyGrantValidationMessages.explicitPoolSlugsRequired(),
-    path: [slugPath],
-  })
+  addCustomRefinementIssue(ctx, proficiencyGrantValidationMessages.explicitPoolSlugsRequired(), [
+    slugPath,
+  ])
 }
 
 function refineFilteredToolPoolTargets(
@@ -47,11 +46,11 @@ function refineFilteredToolPoolTargets(
   const hasSlugs = (row[filteredSlugsPath]?.length ?? 0) > 0
   if (hasCategories || hasSlugs) return
 
-  ctx.addIssue({
-    code: 'custom',
-    message: proficiencyGrantValidationMessages.filteredPoolCategoriesRequired(),
-    path: [categoriesPath],
-  })
+  addCustomRefinementIssue(
+    ctx,
+    proficiencyGrantValidationMessages.filteredPoolCategoriesRequired(),
+    [categoriesPath],
+  )
 }
 
 /** Shared Zod superRefine for tool proficiency pool form rows (grants + character creation). */

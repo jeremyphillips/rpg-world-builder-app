@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { z } from 'zod'
-import { generalTableSchema } from '@rpg/contracts'
+import { addCustomRefinementIssue, generalTableSchema } from '@rpg/contracts'
 import {
   type AREA_GEOMETRY_SHAPES,
   DAMAGE_TYPE_TERM,
@@ -248,22 +248,18 @@ function refineSpellComponents(
     values.components.verbal === true || values.components.somatic === true || hasMaterial
 
   if (!hasComponent) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellValidationMessages.componentRequired(),
-      path: ['components'],
-    })
+    addCustomRefinementIssue(ctx, spellValidationMessages.componentRequired(), ['components'])
   }
 
   if (
     values.components.material?.enabled === true &&
     !values.components.material?.description?.trim()
   ) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellValidationMessages.materialDescriptionRequired(),
-      path: ['components', 'material', 'description'],
-    })
+    addCustomRefinementIssue(ctx, spellValidationMessages.materialDescriptionRequired(), [
+      'components',
+      'material',
+      'description',
+    ])
   }
 }
 

@@ -3,24 +3,25 @@ import { z } from 'zod'
 import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
-  defineMessage,
-  fieldValidationMessages,
-  EQUIPMENT_KIND_LABELS,
   EQUIPMENT_KINDS,
-  GEAR_KIND_ENTRIES,
+  EQUIPMENT_KIND_LABELS,
   GEAR_KINDS,
+  GEAR_KIND_ENTRIES,
   SPELLCASTING_GEAR_KINDS,
   SPELLCASTING_GEAR_KIND_ENTRIES,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_ENTRIES,
-  toolCategorySchema,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
-  weaponCategorySchema,
+  addCustomRefinementIssue,
   armorCategorySchema,
+  defineMessage,
   equipmentKindSchema,
+  fieldValidationMessages,
   gearKindSchema,
   spellcastingGearKindSchema,
+  toolCategorySchema,
+  weaponCategorySchema,
 } from '@rpg/contracts'
 import {
   combineFieldVisibilityAll,
@@ -151,19 +152,17 @@ export const grantedEquipmentItemFormSchema = z
   })
   .superRefine((row, ctx) => {
     if (row.grantTargetSource === 'equipment' && !row.equipmentSlug?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        message: fieldValidationMessages.requiredSelect({ label: 'Equipment' }),
-        path: ['equipmentSlug'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.requiredSelect({ label: 'Equipment' }),
+        ['equipmentSlug'],
+      )
     }
 
     if (row.grantTargetSource === 'proficiency_choice' && !row.proficiencyChoiceId?.trim()) {
-      ctx.addIssue({
-        code: 'custom',
-        message: equipmentGrantValidationMessages.proficiencyChoiceRequired(),
-        path: ['proficiencyChoiceId'],
-      })
+      addCustomRefinementIssue(ctx, equipmentGrantValidationMessages.proficiencyChoiceRequired(), [
+        'proficiencyChoiceId',
+      ])
     }
   })
 
@@ -191,21 +190,19 @@ export const equipmentGrantChoiceItemFormSchema = z
   .superRefine((row, ctx) => {
     if (row.poolSource === 'explicit') {
       if (!row.poolEquipmentSlugs?.length) {
-        ctx.addIssue({
-          code: 'custom',
-          message: equipmentGrantValidationMessages.explicitPoolSlugsRequired(),
-          path: ['poolEquipmentSlugs'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          equipmentGrantValidationMessages.explicitPoolSlugsRequired(),
+          ['poolEquipmentSlugs'],
+        )
       }
       return
     }
 
     if (!row.poolEquipmentKind) {
-      ctx.addIssue({
-        code: 'custom',
-        message: equipmentGrantValidationMessages.filteredPoolKindRequired(),
-        path: ['poolEquipmentKind'],
-      })
+      addCustomRefinementIssue(ctx, equipmentGrantValidationMessages.filteredPoolKindRequired(), [
+        'poolEquipmentKind',
+      ])
     }
   })
 

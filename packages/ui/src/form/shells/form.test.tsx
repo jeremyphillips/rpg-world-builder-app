@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { Form } from './form.client'
 import { FormShellFooterScope, FormShellFooterSlot } from '../chrome/form-shell-footer.context'
@@ -292,11 +293,7 @@ describe('Form', () => {
       })
       .superRefine((values, ctx) => {
         if (values.hasExtra && !values.extra?.trim()) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Extra is required when enabled',
-            path: ['extra'],
-          })
+          addCustomRefinementIssue(ctx, 'Extra is required when enabled', ['extra'])
         }
       })
 

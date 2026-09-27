@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '@rpg/contracts'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
 import { Form } from '../../shells/form.client'
@@ -467,11 +468,7 @@ describe('InlineSentenceField form integration', () => {
       })
       .superRefine((row, ctx) => {
         if (row.movementFeet === undefined || row.movementFeet === '') {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Movement speed is required.',
-            path: ['movementFeet'],
-          })
+          addCustomRefinementIssue(ctx, 'Movement speed is required.', ['movementFeet'])
         }
       })
 
