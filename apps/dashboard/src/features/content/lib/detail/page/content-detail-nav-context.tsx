@@ -43,6 +43,8 @@ export function ContentDetailNavProvider({ children }: { children: ReactNode }) 
   const storeRef = useRef(new Map<string, SectionRecord>())
   const orderRef = useRef(0)
   const leafOrderRef = useRef(0)
+  /** Stable leaf order across effect cleanup/re-register (e.g. label edits). */
+  const leafOrderByIdRef = useRef(new Map<string, number>())
   const [sections, setSections] = useState<readonly InPageNavSection[]>([])
 
   const syncSections = useCallback(() => {
@@ -77,8 +79,12 @@ export function ContentDetailNavProvider({ children }: { children: ReactNode }) 
         const section = storeRef.current.get(sectionId)
         if (!section) return false
 
-        const order = leafOrderRef.current
-        leafOrderRef.current += 1
+        let order = leafOrderByIdRef.current.get(id)
+        if (order === undefined) {
+          order = leafOrderRef.current
+          leafOrderRef.current += 1
+          leafOrderByIdRef.current.set(id, order)
+        }
         section.leaves.set(id, { label, order })
         syncSections()
         return true

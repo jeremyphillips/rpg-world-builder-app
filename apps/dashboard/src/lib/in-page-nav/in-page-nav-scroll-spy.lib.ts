@@ -1,6 +1,11 @@
 import { appStickyChromeBlockSizeFallbackPx } from '@/components/layout/shell/app-shell.variants'
 
 import type { InPageNavSection } from './in-page-nav.types'
+import {
+  resolveInPageNavScrollContainer,
+  resolveInPageNavScrollOffsetPxForContainer,
+  type InPageNavScrollContainer,
+} from './in-page-nav-scroll-container.lib'
 
 export type NavScrollSpyAnchor = {
   id: string
@@ -84,10 +89,24 @@ export function buildInPageNavObserverRootMargin(
   return `-${scrollOffsetPx}px 0px -55% 0px`
 }
 
-/** Distance from the viewport top after applying the nav offset (document scroll). */
+/** Distance from the scrollport top after applying the nav offset. */
 export function measureAnchorTopRelativeToViewport(
   element: Element,
   scrollOffsetPx = resolveInPageNavScrollOffsetPx(),
+  scrollContainer?: InPageNavScrollContainer,
 ): number {
-  return element.getBoundingClientRect().top - scrollOffsetPx
+  const container = scrollContainer ?? resolveInPageNavScrollContainer(element)
+  const offset = resolveInPageNavScrollOffsetPxForContainer(container, scrollOffsetPx)
+
+  if (container === 'document') {
+    return element.getBoundingClientRect().top - offset
+  }
+
+  return element.getBoundingClientRect().top - container.getBoundingClientRect().top - offset
+}
+
+export function resolveInPageNavScrollTarget(
+  container: InPageNavScrollContainer,
+): HTMLElement | Window {
+  return container === 'document' ? window : container
 }

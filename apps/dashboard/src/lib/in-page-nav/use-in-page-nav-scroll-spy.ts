@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 
 import type { InPageNavSection } from './in-page-nav.types'
+import { resolveInPageNavScrollContainer } from './in-page-nav-scroll-container.lib'
 import {
   collectNavScrollSpyAnchors,
   measureAnchorTopRelativeToViewport,
   resolveActiveNavFromEntries,
   resolveInPageNavScrollOffsetPx,
+  resolveInPageNavScrollTarget,
   type NavScrollSpyEntry,
 } from './in-page-nav-scroll-spy.lib'
 
@@ -17,13 +19,27 @@ export function useInPageNavScrollSpy(sections: readonly InPageNavSection[]) {
   useEffect(() => {
     if (anchors.length === 0) return
 
+    let scrollContainer: ReturnType<typeof resolveInPageNavScrollContainer> = 'document'
+    let scrollTarget: HTMLElement | Window = window
+
+    const onScroll = () => updateActive()
+
+    const syncScrollListener = () => {
+      const nextTarget = resolveInPageNavScrollTarget(scrollContainer)
+      if (nextTarget === scrollTarget) return
+      scrollTarget.removeEventListener('scroll', onScroll)
+      scrollTarget = nextTarget
+      scrollTarget.addEventListener('scroll', onScroll, { passive: true })
+    }
+
     const updateActive = () => {
       const scrollOffsetPx = resolveInPageNavScrollOffsetPx()
       const entries: NavScrollSpyEntry[] = anchors.flatMap((anchor) => {
         const element = document.getElementById(anchor.id)
         if (!element) return []
 
-        const top = measureAnchorTopRelativeToViewport(element, scrollOffsetPx)
+        scrollContainer = resolveInPageNavScrollContainer(element)
+        const top = measureAnchorTopRelativeToViewport(element, scrollOffsetPx, scrollContainer)
         return [
           {
             ...anchor,
@@ -33,16 +49,20 @@ export function useInPageNavScrollSpy(sections: readonly InPageNavSection[]) {
         ]
       })
 
+      if (entries.length > 0) {
+        syncScrollListener()
+      }
+
       const next = resolveActiveNavFromEntries(entries)
       setActiveSectionId(next.activeSectionId)
       setActiveLeafId(next.activeLeafId)
     }
 
-    updateActive()
-    const onScroll = () => updateActive()
+    scrollTarget.addEventListener('scroll', onScroll, { passive: true })
     const onResize = () => updateActive()
-    window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize)
+
+    updateActive()
 
     const retryTimer = window.setInterval(() => {
       const found = anchors.filter((anchor) => document.getElementById(anchor.id)).length
@@ -54,7 +74,7 @@ export function useInPageNavScrollSpy(sections: readonly InPageNavSection[]) {
 
     return () => {
       window.clearInterval(retryTimer)
-      window.removeEventListener('scroll', onScroll)
+      scrollTarget.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
     }
   }, [anchors])

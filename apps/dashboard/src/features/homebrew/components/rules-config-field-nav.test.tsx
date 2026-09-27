@@ -15,6 +15,9 @@ beforeAll(() => {
   if (!HTMLElement.prototype.scrollIntoView) {
     HTMLElement.prototype.scrollIntoView = vi.fn()
   }
+  if (!window.scrollTo) {
+    window.scrollTo = vi.fn()
+  }
 })
 
 const sections = buildCharacterConfigurationNavigation()
@@ -88,8 +91,7 @@ describe('RulesConfigFieldNav', () => {
   })
 
   it('scrolls to a section from the mobile select', async () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
 
     const target = document.createElement('div')
     target.id = 'multiclassing'
@@ -101,7 +103,8 @@ describe('RulesConfigFieldNav', () => {
     await user.click(screen.getByRole('combobox', { name: 'Character configuration section' }))
     await user.click(await screen.findByRole('option', { name: 'Multiclassing' }))
 
-    expect(scrollIntoView).toHaveBeenCalled()
+    expect(scrollTo).toHaveBeenCalled()
+    scrollTo.mockRestore()
     target.remove()
   })
 
@@ -117,8 +120,7 @@ describe('RulesConfigFieldNav', () => {
   })
 
   it('scrolls to a leaf target when selected on mobile', async () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
 
     const target = document.createElement('div')
     target.id = 'creation-standard-array'
@@ -130,7 +132,8 @@ describe('RulesConfigFieldNav', () => {
     await user.click(screen.getByRole('combobox', { name: 'Character configuration section' }))
     await user.click(await screen.findByRole('option', { name: 'Creation · Standard array' }))
 
-    expect(scrollIntoView).toHaveBeenCalled()
+    expect(scrollTo).toHaveBeenCalled()
+    scrollTo.mockRestore()
     target.remove()
   })
 })

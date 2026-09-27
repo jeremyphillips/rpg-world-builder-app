@@ -20,6 +20,12 @@ export const inPageSectionNavRailSlotClasses = cn(
   'lg:w-60',
 )
 
+export const inPageSectionNavEyebrowClasses = 'mb-2'
+
+export const inPageSectionNavSectionListClasses = 'space-y-1'
+
+export const inPageSectionNavMobileSelectSlotClasses = 'lg:hidden'
+
 /** Desktop nav panel — sticky within the stretch column. */
 export const inPageSectionNavStickyClasses =
   'lg:sticky lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))] lg:self-start'

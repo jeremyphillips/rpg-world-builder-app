@@ -1,5 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
+
+beforeAll(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined)
+})
 
 import { ContentDetailBody } from '../content-detail-body'
 import { ContentDetailSection, ContentDetailSectionItem } from '../content-detail-section'

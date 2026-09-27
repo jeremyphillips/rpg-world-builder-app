@@ -12,7 +12,7 @@ import {
   ContentDetailSection,
   ContentDetailSectionItem,
 } from '../../../lib/detail/page/content-detail-section'
-import { contentDetailSectionProseBodyClasses } from '../../../lib/detail/page/content-detail-section.variants'
+import { contentDetailSectionProseBodyFlushFollowClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import type { SpeciesDetailItem, SpeciesDetailViewModel } from '../../lib/species-display'
 
 const TRAITS_HEADING_ID = 'traits-heading'
@@ -54,7 +54,7 @@ function HeritageSection({
   return (
     <ContentDetailSection heading={section.title} headingId={headingId} bodyLayout="flush">
       {section.descriptionHtml ? (
-        <div className={`${contentDetailSectionProseBodyClasses} pb-0`}>
+        <div className={contentDetailSectionProseBodyFlushFollowClasses}>
           <RichTextContent html={section.descriptionHtml} size="md" tone="muted" />
         </div>
       ) : null}

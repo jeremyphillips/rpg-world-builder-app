@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 import {
@@ -8,12 +8,16 @@ import {
   scrollToInPageNavAnchor,
 } from './in-page-section-nav.lib'
 import type { InPageNavSection } from './in-page-nav.types'
+import { IN_PAGE_SECTION_NAV_PANEL_ATTR } from './in-page-nav-scroll-container.lib'
 import {
+  inPageSectionNavEyebrowClasses,
   inPageSectionNavLeafLinkClasses,
   inPageSectionNavLeafListClasses,
+  inPageSectionNavMobileSelectSlotClasses,
   inPageSectionNavPanelClasses,
   inPageSectionNavRailSlotClasses,
   inPageSectionNavSectionLinkClasses,
+  inPageSectionNavSectionListClasses,
   inPageSectionNavShellClasses,
 } from './in-page-section-nav.variants'
 
@@ -43,22 +47,17 @@ export function InPageSectionNav({
   /** Expands leaf lists on section click before scroll-spy catches up. */
   const [expandedSectionId, setExpandedSectionId] = useState<string | undefined>()
 
-  useEffect(() => {
-    if (activeSectionId || activeLeafId) {
-      setExpandedSectionId(undefined)
-    }
-  }, [activeLeafId, activeSectionId])
-
   return (
     <div className={inPageSectionNavRailSlotClasses}>
       <nav
         className={cn(inPageSectionNavPanelClasses, inPageSectionNavShellClasses)}
         aria-label={navLabel}
+        {...{ [IN_PAGE_SECTION_NAV_PANEL_ATTR]: '' }}
       >
-        <Eyebrow size="sm" className="mb-2">
+        <Eyebrow size="sm" className={inPageSectionNavEyebrowClasses}>
           {eyebrowLabel}
         </Eyebrow>
-        <ul className="space-y-1">
+        <ul className={inPageSectionNavSectionListClasses}>
           {sections.map((section) => {
             const sectionLinkState = resolveInPageSectionLinkState(
               section.id,
@@ -115,7 +114,7 @@ export function InPageSectionNav({
         </ul>
       </nav>
 
-      <div className="lg:hidden">
+      <div className={inPageSectionNavMobileSelectSlotClasses}>
         <Select
           value={selectedValue}
           onValueChange={(value) => {
