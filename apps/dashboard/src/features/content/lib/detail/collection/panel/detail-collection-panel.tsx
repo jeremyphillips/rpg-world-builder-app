@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react'
 
-import { cn, establishSurfaceCurrent, Heading, Text } from '@rpg/ui'
+import { cn, establishSurfaceCurrent, Heading } from '@rpg/ui'
 
 import {
   detailCollectionPanelBodyVariants,
+  detailCollectionPanelHeaderHelperClasses,
   detailCollectionPanelHeaderRowVariants,
   detailCollectionPanelHeaderVariants,
   detailCollectionPanelVariants,
@@ -48,10 +49,10 @@ export function DetailCollectionPanel({
           <div className="flex min-w-0 items-center gap-3">
             {icon ? <div className="shrink-0">{icon}</div> : null}
             <div className="min-w-0 space-y-1">
-              <Heading variant="label" as={headingAs} id={headingId}>
+              <Heading variant="subsection" as={headingAs} id={headingId}>
                 {heading}
               </Heading>
-              {helper ? <Text variant="muted">{helper}</Text> : null}
+              {helper ? <p className={detailCollectionPanelHeaderHelperClasses}>{helper}</p> : null}
             </div>
           </div>
           {action ? <div className="shrink-0">{action}</div> : null}

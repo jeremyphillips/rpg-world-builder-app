@@ -125,6 +125,22 @@ describe('ContentDetailLayout', () => {
     expect(screen.getByText('Draft badge')).toBeInTheDocument()
   })
 
+  it('renders classificationLabel when provided instead of the content type label', () => {
+    useCanManageCampaignMock.mockReturnValue(false)
+
+    renderLayout(
+      <ContentDetailLayout
+        {...defaultProps}
+        contentTypeKey="equipment"
+        classificationLabel="Weapon"
+        editHref={undefined}
+      />,
+    )
+
+    expect(screen.getByText('Weapon')).toBeInTheDocument()
+    expect(screen.queryByText('Equipment')).not.toBeInTheDocument()
+  })
+
   it('omits hero description when heroDescription is false', () => {
     useCanManageCampaignMock.mockReturnValue(false)
 

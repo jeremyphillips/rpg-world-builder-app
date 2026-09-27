@@ -26,7 +26,8 @@ const defaultNavProps = {
 }
 
 describe('RulesConfigFieldNav', () => {
-  it('lists section and leaf links in the desktop rail', () => {
+  it('lists section and leaf links in the desktop rail', async () => {
+    const user = userEvent.setup()
     render(<RulesConfigFieldNav {...defaultNavProps} />)
 
     const rail = screen.getByRole('navigation', { name: 'Character configuration sections' })
@@ -39,9 +40,14 @@ describe('RulesConfigFieldNav', () => {
     )
     expect(rail).toHaveClass('bg-surface-faint', 'rounded-lg')
     expect(rail).toHaveTextContent('Creation')
-    expect(rail).toHaveTextContent('Starting level')
     expect(rail).toHaveTextContent('Progression')
-    expect(rail).toHaveTextContent('Extended progression')
+    expect(rail).not.toHaveTextContent('Starting level')
+
+    await user.click(screen.getByRole('link', { name: 'Creation' }))
+    expect(await screen.findByRole('link', { name: 'Starting level' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: 'Progression' }))
+    expect(await screen.findByRole('link', { name: 'Extended progression' })).toBeInTheDocument()
   })
 
   it('marks the active section without a leaf using bold foreground text', () => {

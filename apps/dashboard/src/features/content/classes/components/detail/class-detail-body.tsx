@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
-import type { ContentTable } from '@rpg/contracts'
 import {
   type ContentDisplayFallback,
   type ContentDisplayImage,
@@ -8,19 +7,15 @@ import {
   type Subclass,
 } from '@rpg/contracts'
 
-import { ContentTableView } from '../../../components/tables/content-table-view'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
 import {
   ContentDetailSection,
   ContentDetailSectionItem,
 } from '../../../lib/detail/page/content-detail-section'
+import { ClassFeatureLevelTable } from './class-feature-level-table'
 import { ClassProficienciesSection } from './class-proficiencies-section'
-import {
-  type ClassDetailViewModel,
-  type ClassDisplayVocabulary,
-  type ClassFeatureDetailItem,
-} from '../../lib/class-display'
+import { type ClassDetailViewModel, type ClassDisplayVocabulary } from '../../lib/class-display'
 
 const FEATURES_HEADING_ID = 'features-heading'
 const SUBCLASSES_HEADING_ID = 'subclasses-heading'
@@ -73,41 +68,18 @@ function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   )
 }
 
-function ClassFeatureDetailRow({ item }: { item: ClassFeatureDetailItem }) {
-  const inlineTables = (item.tables ?? []).filter((table) => table.kind === 'general')
-
-  return (
-    <ContentDetailSectionItem
-      id={contentDetailNavItemId('feature', item.id)}
-      label={item.title}
-      navLabel={`Level ${item.level}: ${item.title}`}
-    >
-      {item.bodyHtml ? <RichTextContent html={item.bodyHtml} size="md" tone="muted" /> : null}
-      {inlineTables.length > 0 ? (
-        <div className="space-y-4">
-          {inlineTables.map((table: ContentTable) => (
-            <ContentTableView key={table.id} table={table} />
-          ))}
-        </div>
-      ) : null}
-    </ContentDetailSectionItem>
-  )
-}
-
 function ClassFeaturesSection({
   section,
 }: {
   section: Extract<ClassDetailViewModel['sections'][number], { id: 'features' }>
 }) {
   return (
-    <ContentDetailSection heading={section.title} headingId={FEATURES_HEADING_ID}>
-      <ul className="space-y-4" role="list">
-        {section.items.map((item) => (
-          <li key={item.id}>
-            <ClassFeatureDetailRow item={item} />
-          </li>
-        ))}
-      </ul>
+    <ContentDetailSection
+      heading={section.title}
+      headingId={FEATURES_HEADING_ID}
+      bodyLayout="flush"
+    >
+      <ClassFeatureLevelTable items={section.items} />
     </ContentDetailSection>
   )
 }

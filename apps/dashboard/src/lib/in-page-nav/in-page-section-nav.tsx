@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Eyebrow, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, cn } from '@rpg/ui'
 
 import {
@@ -39,6 +40,14 @@ export function InPageSectionNav({
 }: InPageSectionNavProps) {
   const selectedValue = resolveInPageMobileSelectValue(sections, activeSectionId, activeLeafId)
   const mobileItems = buildInPageMobileNavItems(sections)
+  /** Expands leaf lists on section click before scroll-spy catches up. */
+  const [expandedSectionId, setExpandedSectionId] = useState<string | undefined>()
+
+  useEffect(() => {
+    if (activeSectionId || activeLeafId) {
+      setExpandedSectionId(undefined)
+    }
+  }, [activeLeafId, activeSectionId])
 
   return (
     <div className={inPageSectionNavRailSlotClasses}>
@@ -56,6 +65,10 @@ export function InPageSectionNav({
               activeSectionId,
               activeLeafId,
             )
+            const leaves = section.leaves ?? []
+            const showLeaves =
+              leaves.length > 0 &&
+              (sectionLinkState !== 'inactive' || expandedSectionId === section.id)
 
             return (
               <li key={section.id}>
@@ -63,6 +76,7 @@ export function InPageSectionNav({
                   href={`#${section.id}`}
                   onClick={(event) => {
                     event.preventDefault()
+                    setExpandedSectionId(section.id)
                     scrollToInPageNavAnchor(section.id)
                   }}
                   aria-current={sectionLinkState === 'active' ? 'location' : undefined}
@@ -70,13 +84,13 @@ export function InPageSectionNav({
                 >
                   {section.label}
                 </a>
-                {section.leaves && section.leaves.length > 0 ? (
+                {showLeaves ? (
                   <ul
                     className={inPageSectionNavLeafListClasses({
                       active: sectionLinkState !== 'inactive',
                     })}
                   >
-                    {section.leaves.map((leaf) => (
+                    {leaves.map((leaf) => (
                       <li key={leaf.id}>
                         <a
                           href={`#${leaf.id}`}

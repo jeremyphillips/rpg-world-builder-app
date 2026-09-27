@@ -2,12 +2,17 @@ import type { ReactNode } from 'react'
 import { RichTextContent } from '@rpg/ui'
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
+import {
+  DetailCollectionFlushItemStack,
+  DetailCollectionFlushItemStackItem,
+} from '../../../lib/detail/collection/item-stack/detail-collection-flush-item-stack'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
 import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
 import {
   ContentDetailSection,
   ContentDetailSectionItem,
 } from '../../../lib/detail/page/content-detail-section'
+import { contentDetailSectionProseBodyClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import type { SpeciesDetailItem, SpeciesDetailViewModel } from '../../lib/species-display'
 
 const TRAITS_HEADING_ID = 'traits-heading'
@@ -22,19 +27,19 @@ function TraitsSection({
   section: Extract<SpeciesDetailViewModel['sections'][number], { id: 'traits' }>
 }) {
   return (
-    <ContentDetailSection heading={section.title} headingId={TRAITS_HEADING_ID}>
-      <ul className="space-y-4" role="list">
+    <ContentDetailSection heading={section.title} headingId={TRAITS_HEADING_ID} bodyLayout="flush">
+      <DetailCollectionFlushItemStack>
         {section.items.map((item) => (
-          <li key={item.id}>
+          <DetailCollectionFlushItemStackItem key={item.id}>
             <ContentDetailSectionItem
               id={contentDetailNavItemId('trait', item.id)}
               label={item.title}
             >
               <TraitItemBody item={item} />
             </ContentDetailSectionItem>
-          </li>
+          </DetailCollectionFlushItemStackItem>
         ))}
-      </ul>
+      </DetailCollectionFlushItemStack>
     </ContentDetailSection>
   )
 }
@@ -47,22 +52,24 @@ function HeritageSection({
   const headingId = `heritage-${section.heritageId}-heading`
 
   return (
-    <ContentDetailSection heading={section.title} headingId={headingId}>
+    <ContentDetailSection heading={section.title} headingId={headingId} bodyLayout="flush">
       {section.descriptionHtml ? (
-        <RichTextContent html={section.descriptionHtml} size="md" tone="muted" className="mb-4" />
+        <div className={`${contentDetailSectionProseBodyClasses} pb-0`}>
+          <RichTextContent html={section.descriptionHtml} size="md" tone="muted" />
+        </div>
       ) : null}
-      <ul className="space-y-4" role="list">
+      <DetailCollectionFlushItemStack>
         {section.items.map((item) => (
-          <li key={item.id}>
+          <DetailCollectionFlushItemStackItem key={item.id}>
             <ContentDetailSectionItem
               id={contentDetailNavItemId('heritage-trait', item.id)}
               label={item.title}
             >
               <TraitItemBody item={item} />
             </ContentDetailSectionItem>
-          </li>
+          </DetailCollectionFlushItemStackItem>
         ))}
-      </ul>
+      </DetailCollectionFlushItemStack>
     </ContentDetailSection>
   )
 }

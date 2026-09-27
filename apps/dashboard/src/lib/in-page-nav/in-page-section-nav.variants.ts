@@ -28,6 +28,7 @@ export const inPageSectionNavPanelClasses = cn(
   'hidden lg:block',
   inPageSectionNavRailWidthClasses,
   inPageSectionNavStickyClasses,
+  'max-h-[calc(100vh-var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))-2rem)] overflow-y-auto',
 )
 
 export const inPageSectionNavLeafListClasses = cva('ml-3.5 mt-1 space-y-0.5 border-l-2 pl-2', {

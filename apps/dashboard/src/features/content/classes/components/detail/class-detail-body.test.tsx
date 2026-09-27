@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { skillSlugsFromClassChoices } from '@rpg/contracts'
 
@@ -47,5 +47,38 @@ describe('ClassDetailBody', () => {
       screen.getByRole('heading', { name: CLASS_SECTION_LABELS.proficiencies }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /edit/i })).not.toBeInTheDocument()
+  })
+
+  it('registers subclasses in the in-page nav when subclassing is enabled', async () => {
+    const skillProficiencies = skillSlugsFromClassChoices(FIGHTER).map((slug) =>
+      pickSkillProficiency(slug),
+    )
+
+    render(
+      <MemoryRouter>
+        <ClassDetailBody
+          name={FIGHTER.name}
+          displayFallback="generic"
+          imageName={FIGHTER.name}
+          viewModel={buildClassDetailViewModel(FIGHTER, vocabulary, { surface: 'content-detail' })}
+          subclasses={SUBCLASSES_FOR_FIGHTER}
+          subclassingEnabled
+          campaignId="camp_1"
+          skillProficiencies={skillProficiencies}
+          skillsPending={false}
+          vocabulary={vocabulary}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('navigation', { name: 'On this page sections' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Subclasses' })).toBeInTheDocument()
+
+    const subclassesNav = screen.getByRole('link', { name: 'Subclasses' })
+    subclassesNav.click()
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Champion' })).toBeInTheDocument()
+    })
   })
 })

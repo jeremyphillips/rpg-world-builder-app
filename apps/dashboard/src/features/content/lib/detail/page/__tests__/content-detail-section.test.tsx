@@ -21,6 +21,7 @@ describe('ContentDetailSection', () => {
 
     expect(screen.getByRole('navigation', { name: 'On this page sections' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Traits' })).toBeInTheDocument()
+    screen.getByRole('link', { name: 'Traits' }).click()
     await waitFor(() => {
       expect(screen.getByRole('link', { name: 'Darkvision' })).toBeInTheDocument()
     })

@@ -40,6 +40,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   return (
     <ContentDetailLayout
       contentTypeKey="equipment"
+      classificationLabel={viewModel.classificationLabel}
       name={item.name}
       nameBadge={<ContentStatusNameBadge status={item.status} />}
       displayImage={getContentDisplayImage(buildEquipmentContentDisplayImageInput(item, 'detail'))}
@@ -47,7 +48,7 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
       imageName={item.name}
       campaignId={campaignId}
       editHref={contentEditHref('equipment', campaignId, item.id, family)}
-      statRows={viewModel.statRows}
+      statRows={viewModel.heroStatRows}
       heroDescription={false}
       descriptionContent={
         viewModel.description ? (

@@ -34,8 +34,10 @@ import {
 import type { ContentStatRowData } from '../metadata/content-stat-rows'
 
 export type ContentDetailLayoutProps = {
-  /** Catalog content type — rendered as the hero classification eyebrow. */
+  /** Catalog content type — default hero classification label when `classificationLabel` is omitted. */
   contentTypeKey: ContentTypeKey
+  /** Overrides the hero classification label (e.g. equipment kind: Weapon, Armor). */
+  classificationLabel?: string
   /** Content item display name — rendered as the hero heading. */
   name: string
   /** Optional badge rendered beside the hero heading (e.g. draft status). */
@@ -81,6 +83,7 @@ export type ContentDetailLayoutProps = {
 // fallow-ignore-next-line complexity
 export function ContentDetailLayout({
   contentTypeKey,
+  classificationLabel,
   name,
   nameBadge,
   displayImage,
@@ -113,6 +116,8 @@ export function ContentDetailLayout({
 
   useSetPageChromeActions(pageActions)
 
+  const resolvedClassificationLabel = classificationLabel ?? getContentTypeItemLabel(contentTypeKey)
+
   const heroMetadata =
     metadata ??
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
@@ -128,7 +133,7 @@ export function ContentDetailLayout({
           <div className={contentDetailHeroGridClasses}>
             <div className={contentDetailHeroMainClasses}>
               <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
-                {getContentTypeItemLabel(contentTypeKey)}
+                {resolvedClassificationLabel}
               </Eyebrow>
               <div className={contentDetailHeroTitleRowClasses}>
                 <Heading variant="page" as="h1">

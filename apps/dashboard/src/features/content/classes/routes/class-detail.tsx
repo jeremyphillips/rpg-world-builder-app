@@ -94,7 +94,11 @@ export function ClassDetailContent({
       editHref={contentEditHref('classes', campaignId, classId)}
       progressionTable={
         showProgressionTable ? (
-          <ContentDetailSection heading="Class Progression" headingId="progression-heading">
+          <ContentDetailSection
+            heading="Class Progression"
+            headingId="progression-heading"
+            bodyLayout="flush"
+          >
             <ClassProgressionTable
               characterClass={characterClass}
               spellcastingProgression={spellcastingProgression}

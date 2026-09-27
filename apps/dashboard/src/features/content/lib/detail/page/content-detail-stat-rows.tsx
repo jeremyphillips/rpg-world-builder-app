@@ -13,7 +13,7 @@ function ContentDetailStatRowsColumn({ statRows }: { statRows: ContentStatRowDat
   return (
     <div className={cn(contentDetailStatRowsColumnClasses, contentDetailStatRowsGridClasses)}>
       {statRows.map((row) => (
-        <ContentStatRowHeroPair key={row.label} {...row} />
+        <ContentStatRowHeroPair key={row.id ?? row.label} {...row} />
       ))}
     </div>
   )

@@ -7,7 +7,10 @@ import {
   ContentLinkBadge,
   ContentStaticBadge,
 } from '../../../lib/detail/metadata/content-link-badge'
-import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
+import {
+  ContentDetailSection,
+  contentDetailSectionPanelContentHeadingClasses,
+} from '../../../lib/detail/page/content-detail-section'
 import {
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
@@ -34,7 +37,11 @@ function GrantedProficienciesGroup({
 
   return (
     <div className="space-y-3">
-      <Heading variant="subsection" as="h3">
+      <Heading
+        variant="subsection"
+        as="h3"
+        className={contentDetailSectionPanelContentHeadingClasses}
+      >
         {CLASS_PROFICIENCY_GROUP_LABELS.granted}
       </Heading>
       <dl className="space-y-3">
@@ -180,7 +187,11 @@ function ProficiencyChoicesGroup({
 
   return (
     <div className="space-y-3">
-      <Heading variant="subsection" as="h3">
+      <Heading
+        variant="subsection"
+        as="h3"
+        className={contentDetailSectionPanelContentHeadingClasses}
+      >
         {CLASS_PROFICIENCY_GROUP_LABELS.choices}
       </Heading>
       <dl className="space-y-3">

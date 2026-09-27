@@ -144,7 +144,7 @@ describe('ClassDetailContent proficiencies', () => {
   it('hides the progression table when showProgressionTable is false', () => {
     renderClassDetail({ showProgressionTable: false })
 
-    expect(screen.queryByRole('table')).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Class Progression' })).not.toBeInTheDocument()
   })
 })
 
@@ -157,7 +157,7 @@ describe('ClassDetailContent features', () => {
     renderClassDetail()
 
     expect(screen.getByRole('heading', { name: 'Fighter Class Features' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Second Wind', level: 3 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Second Wind', level: 4 })).toBeInTheDocument()
   })
 })
 
@@ -186,7 +186,7 @@ describe('ClassDetailContent subclassing gate', () => {
     expect(screen.queryByText('Champion')).not.toBeInTheDocument()
     expect(screen.queryByText('Pursue Physical Excellence in Combat')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Fighter Class Features' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Second Wind', level: 3 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Second Wind', level: 4 })).toBeInTheDocument()
   })
 
   it('shows subclass sections when subclassing is enabled', () => {
