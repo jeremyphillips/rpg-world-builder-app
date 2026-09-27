@@ -1,4 +1,8 @@
-import { assembleCharacterBuildSheet } from './finalize'
+import {
+  assembleCharacterBuildSheet,
+  CharacterBuildFinalizationError,
+  mapZodIssuesToFinalizationIssues,
+} from './finalize'
 import type { CharacterBuildContext } from '../context'
 import {
   createNpcRequestInputSchema,
@@ -17,8 +21,14 @@ export function finalizeNpcCharacterBuild(
   options: CharacterBuildEngineOptions = {},
 ): CreateNpcRequestInput {
   const sheet = assembleCharacterBuildSheet(draft, context, options)
-  return createNpcRequestInputSchema.parse({
+  const parsed = createNpcRequestInputSchema.safeParse({
     ...sheet,
     relationshipEdges: draft.relationshipEdges,
   })
+
+  if (!parsed.success) {
+    throw new CharacterBuildFinalizationError(mapZodIssuesToFinalizationIssues(parsed.error))
+  }
+
+  return parsed.data
 }

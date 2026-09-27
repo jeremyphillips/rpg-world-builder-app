@@ -12,6 +12,26 @@ describe('CharacterBuilderValidationAlert', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('lists path, message, and code for validation issues', () => {
+    render(
+      <CharacterBuilderValidationAlert
+        issues={[
+          {
+            code: 'invalid_type',
+            message: 'Invalid input',
+            path: 'spells.0.access',
+            stepId: 'spells',
+          },
+        ]}
+      />,
+    )
+
+    const alert = screen.getByRole('alert')
+    expect(alert).toHaveTextContent('spells.0.access')
+    expect(alert).toHaveTextContent('Invalid input')
+    expect(alert).toHaveTextContent('invalid_type')
+  })
+
   it('lists validation issues in an alert', () => {
     render(
       <CharacterBuilderValidationAlert

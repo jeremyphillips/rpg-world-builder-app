@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -71,7 +71,15 @@ describe('ReviewStep', () => {
     )
 
     expect(screen.getByText(chrome.reviewValidationHeading)).toBeInTheDocument()
-    expect(screen.getAllByText('Enter a character name.')).toHaveLength(2)
+    const validationAlert = screen
+      .getAllByRole('alert')
+      .find((node) => within(node).queryByText('identity.name'))
+    expect(validationAlert).toBeDefined()
+    expect(within(validationAlert!).getByText(/name_required/)).toBeInTheDocument()
+
+    const requiredSection = screen.getByText('Required items').parentElement
+    expect(requiredSection).toBeTruthy()
+    expect(within(requiredSection!).getByText('Enter a character name.')).toBeInTheDocument()
     expect(screen.getByText('Required items')).toBeInTheDocument()
     expect(screen.getByText('Choose Skills')).toBeInTheDocument()
     expect(screen.getByText('Advisory notes')).toBeInTheDocument()

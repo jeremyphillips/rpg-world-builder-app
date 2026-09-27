@@ -2223,6 +2223,7 @@
     "mapVocabularyDisableAvailabilityBatchResponse",
     "mapVocabularyDisableAvailabilityBatchToValidationResult",
     "mapVocabularyDisableAvailabilityToActionTarget",
+    "mapZodIssuesToFinalizationIssues",
     "markAllNotificationsReadResponseSchema",
     "markConversationReadInputSchema",
     "markConversationReadResponseSchema",

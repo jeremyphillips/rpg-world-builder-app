@@ -50,6 +50,14 @@ hidden until a class is chosen.
 
 Readiness does not replace `validateCharacterBuild` on Continue / Create.
 
+### Create failures from the API
+
+When create returns structured validation issues (`bad_request` or
+`validation_error` with `details.issues`), the review step shows the API message
+as the headline and lists each issue’s path, message, and Zod code in
+`CharacterBuilderValidationAlert`. Known issue paths also mark the matching
+builder step in the rail; unknown paths stay on the review alert only.
+
 ### Builder level (phase 1)
 
 - `draft.class.level` is the selected class level (schema: `absoluteLevelSchema`, default `1`).

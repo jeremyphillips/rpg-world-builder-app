@@ -1,22 +1,26 @@
 import {
   formatCampaignInviteUnavailableMessage,
+  getApiValidationIssues,
   getErrorMessage,
+  isApiError,
   isCampaignPcOnboardingBuildContext,
   isCharacterBuildFinalizationError,
   resolveCampaignCharacterAssignmentError,
+  type ApiValidationIssue,
   type CampaignInviteUnavailableReason,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterCampaignBlockingIssue,
   type CharacterCampaignWarning,
 } from '@rpg/contracts'
-import type {
-  CharacterBuilderStepId,
-  CharacterBuildValidationIssue,
+import {
+  resolveCharacterBuildStepForIssuePath,
+  type CharacterBuilderStepId,
+  type CharacterBuildValidationIssue,
 } from '@rpg/contracts/rpg/character-builder'
 
 export type BuilderCreateFailureOutcome =
-  | { kind: 'validation'; issues: CharacterBuildValidationIssue[] }
+  | { kind: 'validation'; issues: CharacterBuildValidationIssue[]; headline?: string }
   | {
       kind: 'campaign_eligibility'
       blockingIssues: CharacterCampaignBlockingIssue[]
@@ -42,6 +46,20 @@ export type BuilderCreateFailureHandlers = {
   onInviteUnavailable?: (reason: CampaignInviteUnavailableReason) => void
 }
 
+function mapApiValidationIssuesToBuilderIssues(
+  issues: ApiValidationIssue[],
+): CharacterBuildValidationIssue[] {
+  return issues.map((issue) => {
+    const stepId = resolveCharacterBuildStepForIssuePath(issue.path)
+    return {
+      code: issue.code,
+      message: issue.message,
+      path: issue.path.length > 0 ? issue.path : undefined,
+      ...(stepId ? { stepId } : {}),
+    }
+  })
+}
+
 export function applyBuilderCreateFailure(
   outcome: BuilderCreateFailureOutcome,
   handlers: BuilderCreateFailureHandlers,
@@ -49,6 +67,9 @@ export function applyBuilderCreateFailure(
   switch (outcome.kind) {
     case 'validation':
       handlers.applyValidationIssues(outcome.issues)
+      if (outcome.headline) {
+        handlers.setCreateError(outcome.headline)
+      }
       return
     case 'campaign_eligibility':
       handlers.setCampaignEligibilityError({
@@ -80,6 +101,15 @@ export function resolveBuilderCreateFailure(
     defaultMessage: string
   },
 ): BuilderCreateFailureOutcome {
+  const apiValidationIssues = getApiValidationIssues(error)
+  if (apiValidationIssues && apiValidationIssues.length > 0) {
+    return {
+      kind: 'validation',
+      issues: mapApiValidationIssuesToBuilderIssues(apiValidationIssues),
+      headline: isApiError(error) ? error.message : undefined,
+    }
+  }
+
   if (isCharacterBuildFinalizationError(error)) {
     return { kind: 'validation', issues: error.validationIssues }
   }

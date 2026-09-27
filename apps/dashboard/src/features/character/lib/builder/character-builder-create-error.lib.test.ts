@@ -74,6 +74,47 @@ describe('resolveBuilderCreateFailure', () => {
     })
   })
 
+  it('maps bad_request validation issues to builder validation with step ids', () => {
+    expect(
+      resolveBuilderCreateFailure(
+        new ApiError(400, 'bad_request', 'Validation failed', {
+          issues: [
+            {
+              path: 'spells.0.access',
+              message: 'Invalid input',
+              code: 'invalid_type',
+            },
+            {
+              path: 'vital.status',
+              message: 'Invalid enum value',
+              code: 'invalid_enum_value',
+            },
+          ],
+        }),
+        {
+          context: createStandaloneBuilderContextFixture(),
+          defaultMessage: 'Could not create character.',
+        },
+      ),
+    ).toEqual({
+      kind: 'validation',
+      headline: 'Validation failed',
+      issues: [
+        {
+          code: 'invalid_type',
+          message: 'Invalid input',
+          path: 'spells.0.access',
+          stepId: 'spells',
+        },
+        {
+          code: 'invalid_enum_value',
+          message: 'Invalid enum value',
+          path: 'vital.status',
+        },
+      ],
+    })
+  })
+
   it('falls back to create_error for standalone builds', () => {
     expect(
       resolveBuilderCreateFailure(new Error('Save failed'), {

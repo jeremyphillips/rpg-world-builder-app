@@ -63,7 +63,9 @@ export function isCharacterBuildFinalizationError(
   )
 }
 
-function zodIssuesToFinalizationIssues(error: ZodError): CharacterBuildValidationResult['issues'] {
+export function mapZodIssuesToFinalizationIssues(
+  error: ZodError,
+): CharacterBuildValidationResult['issues'] {
   return error.issues.map((issue) => {
     const path = issue.path.length > 0 ? issue.path.join('.') : undefined
     const mappedMessage = mapCreateInputZodIssueMessage(path, issue.code)
@@ -184,7 +186,7 @@ function resolveFinalizeCatalogIssues(
 function parseCreateCharacterInput(input: unknown): CreateCharacterInput {
   const parsed = createCharacterInputSchema.safeParse(input)
   if (!parsed.success) {
-    throw new CharacterBuildFinalizationError(zodIssuesToFinalizationIssues(parsed.error))
+    throw new CharacterBuildFinalizationError(mapZodIssuesToFinalizationIssues(parsed.error))
   }
 
   return parsed.data

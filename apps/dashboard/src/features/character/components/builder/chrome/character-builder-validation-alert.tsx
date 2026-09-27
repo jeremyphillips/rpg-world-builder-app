@@ -28,7 +28,14 @@ export function CharacterBuilderValidationAlert({
       <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-destructive">
         {issues.map((issue) => (
           <li key={`${issue.code}-${issue.path ?? issue.choiceSetId ?? issue.message}`}>
+            {issue.path ? (
+              <>
+                <span className="font-medium">{issue.path}</span>
+                {': '}
+              </>
+            ) : null}
             {formatFieldMessage(issue.message)}
+            {issue.code ? <> ({issue.code})</> : null}
           </li>
         ))}
       </ul>
