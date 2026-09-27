@@ -1,6 +1,11 @@
 import type { CampaignFlavor, CampaignStatus, Mood, PlayStyle } from '@rpg/contracts'
 
 import {
+  formatCampaignCountsClause,
+  resolveCampaignMetaStatusTone,
+  type CampaignMetaStatusTone,
+} from '../campaign-meta.lib'
+import {
   DIFFICULTY_LABELS,
   MAGIC_LEVEL_LABELS,
   MOOD_LABELS,
@@ -9,7 +14,7 @@ import {
 
 export const CAMPAIGN_OVERVIEW_HERO_BADGE_LIMIT = 4 as const
 
-export type CampaignOverviewHeroStatusTone = 'success' | 'sunken'
+export type CampaignOverviewHeroStatusTone = CampaignMetaStatusTone
 
 export type CampaignOverviewHeroStatusLine = {
   statusLabel: string
@@ -36,7 +41,7 @@ const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
 export function resolveCampaignOverviewHeroStatusTone(
   status: CampaignStatus,
 ): CampaignOverviewHeroStatusTone {
-  return status === 'active' ? 'success' : 'sunken'
+  return resolveCampaignMetaStatusTone(status)
 }
 
 export function composeCampaignOverviewHeroStatusLine(input: {
@@ -54,21 +59,11 @@ export function composeCampaignOverviewHeroStatusLine(input: {
 
   const playerCount = input.playerCount ?? 0
   const characterCount = input.characterCount ?? 0
-  const playerClause = `${playerCount} ${playerCount === 1 ? 'player' : 'players'}`
 
-  if (playerCount === characterCount) {
-    return {
-      statusLabel,
-      statusTone,
-      countsSuffix: playerClause,
-    }
-  }
-
-  const characterClause = `${characterCount} ${characterCount === 1 ? 'character' : 'characters'}`
   return {
     statusLabel,
     statusTone,
-    countsSuffix: `${playerClause} · ${characterClause}`,
+    countsSuffix: formatCampaignCountsClause(playerCount, characterCount),
   }
 }
 

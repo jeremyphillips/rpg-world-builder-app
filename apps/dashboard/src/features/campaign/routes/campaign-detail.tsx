@@ -29,9 +29,9 @@ export function CampaignDetail() {
           campaign={campaign}
           campaignId={campaignId}
           canManage={canManage}
-          playerCount={overview.isPending ? undefined : overview.members.length}
-          characterCount={overview.isPending ? undefined : overview.party.length}
-          countsPending={overview.isPending}
+          playerCount={campaign.otherMemberCount}
+          characterCount={campaign.openCharacterCount}
+          countsPending={false}
         />
       ) : null}
 

@@ -105,6 +105,11 @@ to are excluded server-side and again client-side before render.
 | Dashboard home  | `CampaignRecoveryPromotionCard`, `CampaignInvitationCard`            | Highest-priority recovery promotion + pending invites                                                                      |
 | Campaigns index | `CampaignDestinationRow`                                             | Every campaign status row                                                                                                  |
 
+**Destination row description priority:** recovery/onboarding `supportingCopy`
+(from `resolveCampaignEntryDestination`) overrides the normal meta line
+(`buildCampaignDestinationDescription` → status · counts · optional last opened).
+Flavor and recovery badges stay separate from the meta line.
+
 Recovery derives from `campaign.viewerState` via contracts capability helpers
 (`isCampaignViewerSelfRecoverable`, `isCampaignViewerReconnectRequired`, …).
 Preferences rank promotions via `resolveCampaignRecoveryPromotions` but never suppress self-recoverable campaigns.

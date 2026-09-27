@@ -3,6 +3,7 @@ import { Outlet, useLocation, useMatch, useParams } from 'react-router-dom'
 import { CampaignLayoutRecoveryChrome } from '../components/recovery/campaign-layout-recovery-chrome'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { usePersistViewedCampaign } from '../hooks/use-persist-viewed-campaign'
+import { useRecordCampaignOpened } from '../hooks/use-record-campaign-opened'
 
 export function CampaignLayout() {
   const { campaignId } = useParams<{ campaignId: string }>()
@@ -14,6 +15,7 @@ export function CampaignLayout() {
     Boolean(campaignId) && activeCampaignMatch?.params.campaignId === campaignId
 
   usePersistViewedCampaign(campaignId, shouldPersistViewedCampaign)
+  useRecordCampaignOpened(campaignId)
 
   const campaign = campaigns?.find((item) => item.id === campaignId)
 

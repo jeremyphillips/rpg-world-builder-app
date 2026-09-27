@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { makeTestUser } from '../../test/fixtures/users'
 import { useIntegrationDb } from '../../test/setup/integration-db'
@@ -15,6 +15,7 @@ import {
   isCampaignMember,
   listCampaignTemplates,
   listCampaignsForUser,
+  touchCampaignOpened,
   updateCampaign,
 } from './campaign.service'
 import { getRulesetPatchRead } from '../vocabulary'
@@ -403,6 +404,68 @@ describe('listCampaignsForUser', () => {
     const freshCampaigns = await listCampaignsForUser(freshPlayer.id)
     expect(freshCampaigns[0]?.viewerState).toEqual({ kind: 'onboarding_incomplete' })
     expect(freshCampaigns[0]?.recoveryReason).toBe('no_controlled_character')
+  })
+
+  it('returns viewer-relative member and open character counts on each list item', async () => {
+    const owner = await makeTestUser({ email: 'aggregate-owner@example.com' })
+    const player = await makeTestUser({ email: 'aggregate-player@example.com' })
+    const { campaign } = await createCampaign({ name: 'Aggregate Campaign', createdBy: owner.id })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: player.id,
+      campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    const character = await createPcRecord(minimalStandalonePcInput, player.id)
+    await setMembershipControlledPcs({
+      campaignId: campaign.id,
+      userId: player.id,
+      controlledCharacterIds: [character.id],
+    })
+
+    const ownerCampaigns = await listCampaignsForUser(owner.id)
+    expect(ownerCampaigns[0]).toMatchObject({
+      otherMemberCount: 1,
+      openCharacterCount: 1,
+      lastOpenedByViewerAt: null,
+    })
+
+    const playerCampaigns = await listCampaignsForUser(player.id)
+    expect(playerCampaigns[0]).toMatchObject({
+      otherMemberCount: 1,
+      openCharacterCount: 1,
+      lastOpenedByViewerAt: null,
+    })
+  })
+})
+
+describe('touchCampaignOpened', () => {
+  it('updates membership lastOpenedAt and list reflects the timestamp', async () => {
+    const owner = await makeTestUser({ email: 'opened-owner@example.com' })
+    const { campaign } = await createCampaign({ name: 'Opened Campaign', createdBy: owner.id })
+
+    const openedAt = new Date('2026-01-15T10:00:00.000Z')
+    vi.useFakeTimers()
+    vi.setSystemTime(openedAt)
+
+    await expect(touchCampaignOpened(owner.id, campaign.id)).resolves.toBe(true)
+
+    const campaigns = await listCampaignsForUser(owner.id)
+    expect(campaigns[0]?.lastOpenedByViewerAt).toBe(openedAt.toISOString())
+
+    vi.useRealTimers()
+  })
+
+  it('returns false when the user is not a member', async () => {
+    const owner = await makeTestUser({ email: 'opened-stranger-owner@example.com' })
+    const stranger = await makeTestUser({ email: 'opened-stranger@example.com' })
+    const { campaign } = await createCampaign({ name: 'Private Opened', createdBy: owner.id })
+
+    await expect(touchCampaignOpened(stranger.id, campaign.id)).resolves.toBe(false)
   })
 })
 

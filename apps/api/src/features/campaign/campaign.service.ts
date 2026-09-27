@@ -25,6 +25,7 @@ import { findCampaignById, toCampaign } from './find-campaign-by-id'
 import { validateCampaignPrimaryWorldId } from './validate-campaign-primary-world'
 import { listCharactersForUser } from '../character'
 import {
+  countOpenPartyPcsByCampaignIds,
   listOpenPcParticipationCharacterIdsForCampaign,
   resolveOpenControlledPcCharacterIds,
 } from './participation/campaign-character-participation.repository'
@@ -37,6 +38,52 @@ type CampaignRecord = CampaignSchemaType & {
 
 function dedupeCharacterIds(ids: readonly string[]): string[] {
   return [...new Set(ids)]
+}
+
+type MembershipListRecord = {
+  campaignId: string
+  campaignRole: string
+  controlledCharacterIds?: string[]
+  lastOpenedAt?: Date | null
+}
+
+async function loadOtherMemberCountsByCampaignId(
+  campaignIds: readonly string[],
+  viewerId: string,
+): Promise<Map<string, number>> {
+  if (campaignIds.length === 0) return new Map()
+
+  const rows = await CampaignMembershipModel.aggregate<{ _id: string; count: number }>([
+    { $match: { campaignId: { $in: [...campaignIds] } } },
+    {
+      $group: {
+        _id: '$campaignId',
+        count: {
+          $sum: { $cond: [{ $ne: ['$userId', viewerId] }, 1, 0] },
+        },
+      },
+    },
+  ])
+
+  return new Map(rows.map((row) => [row._id, row.count]))
+}
+
+function membershipLastOpenedIso(membership: MembershipListRecord | undefined): string | null {
+  const value = membership?.lastOpenedAt
+  if (!value) return null
+  return value.toISOString()
+}
+
+/** Record that the viewer opened the campaign shell (membership-scoped recency). */
+export async function touchCampaignOpened(userId: string, campaignId: string): Promise<boolean> {
+  if (!isValidObjectId(campaignId)) return false
+
+  const result = await CampaignMembershipModel.updateOne(
+    { campaignId, userId },
+    { $set: { lastOpenedAt: new Date() } },
+  )
+
+  return result.matchedCount === 1
 }
 
 export async function createCampaign(
@@ -70,8 +117,8 @@ export function listCampaignTemplates(): CampaignTemplate[] {
  */
 export async function listCampaignsForUser(userId: string): Promise<CampaignListItem[]> {
   const memberships = await CampaignMembershipModel.find({ userId })
-    .select('campaignId campaignRole controlledCharacterIds')
-    .lean<{ campaignId: string; campaignRole: string; controlledCharacterIds?: string[] }[]>()
+    .select('campaignId campaignRole controlledCharacterIds lastOpenedAt')
+    .lean<MembershipListRecord[]>()
 
   const membershipByCampaignId = new Map(
     memberships.map((membership) => [membership.campaignId, membership]),
@@ -80,7 +127,11 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
   if (campaignIds.length === 0) return []
 
-  const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
+  const [docs, otherMemberCountByCampaignId, openCharacterCountByCampaignId] = await Promise.all([
+    CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>(),
+    loadOtherMemberCountsByCampaignId(campaignIds, userId),
+    countOpenPartyPcsByCampaignIds(campaignIds),
+  ])
   const userCharacters = await listCharactersForUser(userId)
   const userCharacterIds = userCharacters.map((character) => character.id)
 
@@ -112,6 +163,9 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
         openControlledCharacterIds,
         viewerState,
         recoveryReason,
+        otherMemberCount: otherMemberCountByCampaignId.get(campaign.id) ?? 0,
+        openCharacterCount: openCharacterCountByCampaignId.get(campaign.id) ?? 0,
+        lastOpenedByViewerAt: membershipLastOpenedIso(membership),
       }
     }),
   )

@@ -6,6 +6,7 @@ import { EntityAnatomyHost } from '@/features/content'
 
 import { campaignDestinationRowVariants } from './campaign-destination.variants'
 import { buildCampaignDisplay } from '../../lib/campaign-display'
+import { buildCampaignDestinationDescription } from '../../lib/campaign-meta.lib'
 import {
   resolveCampaignEntryDestination,
   resolveEntryBadgeLabel,
@@ -24,6 +25,7 @@ export function CampaignDestinationRow({
 }: CampaignDestinationRowProps) {
   const destination = resolveCampaignEntryDestination(campaign)
   const display = buildCampaignDisplay(campaign)
+  const description = buildCampaignDestinationDescription(campaign, destination)
   const badgeLabel = resolveEntryBadgeLabel(campaign)
   const badgeTone = resolveEntryBadgeTone(campaign)
 
@@ -44,7 +46,7 @@ export function CampaignDestinationRow({
         density="comfortable"
         entity={{
           heading: display.name,
-          description: destination.supportingCopy,
+          description,
           media: display.imageUrl ? (
             <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
           ) : undefined,

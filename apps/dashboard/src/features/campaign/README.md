@@ -15,7 +15,8 @@ ruleset patches, track sessions, and (for DMs) author campaign-owned NPCs.
 | Recovery / invites index | `components/recovery/`, `lib/recovery/`                                                                             |
 | Roster shell             | `routes/campaign-characters-overview.tsx`, `lib/characters/`                                                        |
 | Settings / rules forms   | `lib/settings/`, `lib/rules/`                                                                                       |
-| Campaign identity VM     | `lib/campaign-display.ts`                                                                                           |
+| Campaign identity VM     | `lib/campaign-display.ts` (name/emblem only)                                                                        |
+| Campaign meta line       | `lib/campaign-meta.lib.ts` (status, counts, optional recency)                                                       |
 | Selection / topbar state | `lib/navigation/`                                                                                                   |
 | Invite form schemas      | `lib/forms/invite-*-form-fields.ts`                                                                                 |
 
@@ -109,6 +110,19 @@ acquisition model (axes, ownership, build/import finalization).
 - **Ownership:** NPCs are campaign-owned (`characterType: 'npc'`, required
   `campaignId`, no `userId`). Distinct from user-owned PCs — see
   [ROLES.md](../../../../packages/contracts/ROLES.md#character-ownership).
+
+## List meta vs display
+
+- **`buildCampaignDisplay`** — identity chrome only (name, emblem URL).
+- **`buildCampaignMeta` / `formatCampaignMetaForSurface`** — shared status and
+  member/character counts from `CampaignListItem.otherMemberCount` and
+  `openCharacterCount` (viewer-relative / overview party semantics).
+- **Recency** — `lastOpenedByViewerAt` on the list DTO; formatted only when
+  `includeRecency: true` (campaign index + continue card). Overview hero omits
+  recency.
+- **Opened vs selected** — `PUT /api/campaigns/selection` remembers preference
+  only. `POST /api/campaigns/:campaignId/opened` (via `useRecordCampaignOpened`
+  on campaign shell mount) is the sole recency write.
 
 ## Related docs
 
