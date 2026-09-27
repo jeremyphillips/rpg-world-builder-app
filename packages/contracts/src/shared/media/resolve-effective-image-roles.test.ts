@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createUploadRoleAssignment, createSystemRoleAssignment } from './content-media-source'
-import { contentTypeSubject } from './system-image-subject'
+import { contentTypeSubject, vocabularySetSubject } from './system-image-subject'
 import type { AvailableContentImage } from './get-available-content-images'
 import {
   resolveEffectiveImageRoles,
@@ -53,6 +53,31 @@ describe('resolveEffectiveImageRoles', () => {
         [uploadImage, systemImage],
       ),
     ).toEqual({ roles: [], derivedRoles: [] })
+  })
+
+  it('derives emblem on the system tile when emblem is unassigned', () => {
+    const emblemSystemImage: AvailableContentImage = {
+      kind: 'system',
+      id: 'system:srd:spell-schools:emblem:evocation',
+      source: {
+        kind: 'system',
+        imageSetId: 'srd-cc-5.2.1',
+        subject: vocabularySetSubject('spell-schools'),
+        assetRole: 'emblem',
+        slug: 'evocation',
+      },
+      srcPath: '/assets/system/srd-cc-5.2.1/spell-schools/emblem/evocation.png',
+      sourceDimensions: { width: 1254, height: 1254 },
+    }
+
+    expect(
+      resolveEffectiveImageRoles(
+        { revision: 0, images: [], roles: {} },
+        emblemSystemImage.id,
+        ['emblem'],
+        [emblemSystemImage],
+      ),
+    ).toEqual({ roles: ['emblem'], derivedRoles: ['emblem'] })
   })
 
   it('returns explicit upload and system role ownership without derivation', () => {
