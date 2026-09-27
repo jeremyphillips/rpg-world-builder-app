@@ -22,7 +22,7 @@ etc.) stay in their feature folders — see [`page/` boundary](#page-boundary) b
 | --------------------------------------------- | ------------------------------------------ | -------------------------------------------------------------- |
 | Same subfolder, co-located file               | Relative `./`                              | `./page-header` inside `page/`                                 |
 | Cross subfolder within `layout/`              | `@/components/layout/<subfolder>/<module>` | `@/components/layout/topbar/topbar` from `shell/app-shell.tsx` |
-| External consumers (features, routes, router) | `@/components/layout/<subfolder>/<module>` | `@/components/layout/page/wide-page`                           |
+| External consumers (features, routes, router) | `@/components/layout/<subfolder>/<module>` | `@/components/layout/page/page-shell`                          |
 
 Do **not** add subfolder barrels (e.g. `@/components/layout/page`). Explicit deep
 imports identify which layout primitive is consumed.
@@ -34,7 +34,7 @@ eager router wiring does not pin the whole layout tree. See
 ## `page/` boundary
 
 **`page/` owns:** generic page-level geometry and chrome shared across dashboard
-features — width shells (`NarrowPage`, `WidePage`), spacing tokens, title row,
+features — width shell (`PageShell`: `full` | `wide` | `narrow`), spacing tokens, title row,
 async load boundary, and thin composers built only from those pieces
 (`OverviewPageShell`, `IndexPageIntro`).
 
@@ -60,7 +60,7 @@ layout/
   shell/           AppShell, ConcentrationShell, app-shell.variants
   topbar/          Topbar, title slots, user menu
   breadcrumb/      AppBreadcrumb, label context, resolution hooks
-  page/            NarrowPage, WidePage, PageHeader, PageLoadState, variants, overview/index intro
+  page/            PageShell, PageHeader, PageLoadState, variants, overview/index intro
   sidebar/         Primary navigation — see sidebar-navigation.md
   resolve-dashboard-navigation-scope.ts
   promotion-card.*

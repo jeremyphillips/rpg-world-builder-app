@@ -14,7 +14,7 @@ import type {
   OrganizationLocationConnectionMutationContext,
 } from '../../lib/location-connections/organization-location-connection-mutation-context'
 import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row'
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
 import {
   relationshipGroupUsesRootFamilyAdd,
@@ -117,8 +117,9 @@ export function OrganizationLocationConnectionsSection({
                 : undefined
 
             return (
-              <DetailCollectionPanel
+              <ContentDetailSection
                 key={family}
+                bodyLayout="list"
                 heading={familyPresentation.heading}
                 headingId={`organization-location-connections-${family}-heading`}
                 headingAs="h3"
@@ -160,7 +161,7 @@ export function OrganizationLocationConnectionsSection({
                     </RelationshipList.Group>
                   ))}
                 </RelationshipList.Root>
-              </DetailCollectionPanel>
+              </ContentDetailSection>
             )
           })}
         </div>

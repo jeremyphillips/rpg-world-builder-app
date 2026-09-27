@@ -1,12 +1,12 @@
 import { Alert, Heading, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { NameGeneratorPage } from '../components/name-generator-page'
 
 export function NameGeneratorRoute() {
   return (
-    <NarrowPage rhythm="relaxed">
+    <PageShell width="narrow" rhythm="relaxed">
       <Heading variant="page" as="h1">
         Name Generator
       </Heading>
@@ -17,6 +17,6 @@ export function NameGeneratorRoute() {
         description="Naming collections and matching behavior are still being developed. Generated names may change as datasets are refined."
       />
       <NameGeneratorPage />
-    </NarrowPage>
+    </PageShell>
   )
 }

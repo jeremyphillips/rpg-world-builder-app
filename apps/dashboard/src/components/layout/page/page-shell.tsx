@@ -2,34 +2,39 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
+import { pageShellWidthClasses, type PageWidth } from './page-shell.variants'
 import {
   pageShellInsetClasses,
   pageSpacingClasses,
   type PageRhythm,
   type PageShellInset,
 } from './page-spacing.variants'
-import { widePageBaseClasses } from './wide-page.variants'
 
-export interface WidePageProps {
+export type { PageWidth }
+
+export interface PageShellProps {
+  /** Route-level content width — the only page max-width owner for this subtree. */
+  width: PageWidth
   children: ReactNode
-  /** Vertical shell inset below the breadcrumb rail. Default: page (`py-8`); `page-top` is document-scroll only (top inset). Viewport forms use `spacing="none"` inside ViewportWorkspace. */
+  /** Vertical shell inset below the breadcrumb rail. Default: page (`pt-6 pb-8`). */
   spacing?: PageShellInset
   /** Vertical rhythm between direct children. Default: compact (`space-y-2`). */
   rhythm?: PageRhythm
   className?: string
 }
 
-/** Full-width page column for lists, hubs, and detail routes. */
-export function WidePage({
+/** Dashboard route width shell — full, wide (~1280px), or narrow (~900px). */
+export function PageShell({
+  width,
   children,
   spacing = 'page',
   rhythm = 'compact',
   className,
-}: WidePageProps) {
+}: PageShellProps) {
   return (
     <div
       className={cn(
-        widePageBaseClasses,
+        pageShellWidthClasses[width],
         pageShellInsetClasses[spacing],
         pageSpacingClasses[rhythm],
         className,

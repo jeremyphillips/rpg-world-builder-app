@@ -1,6 +1,6 @@
 import { PageHeader } from './page-header'
 import { PageLoadState } from './page-load-state'
-import { WidePage } from './wide-page'
+import { PageShell } from './page-shell'
 
 type OverviewPageShellProps = {
   heading: string
@@ -23,7 +23,7 @@ export function OverviewPageShell({
   children,
 }: OverviewPageShellProps) {
   return (
-    <WidePage rhythm="list">
+    <PageShell width="full" rhythm="list">
       <PageHeader heading={heading} actions={actions} />
       <PageLoadState
         isPending={isPending}
@@ -33,6 +33,6 @@ export function OverviewPageShell({
       >
         {children}
       </PageLoadState>
-    </WidePage>
+    </PageShell>
   )
 }

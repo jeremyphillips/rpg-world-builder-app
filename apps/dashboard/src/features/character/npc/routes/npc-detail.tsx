@@ -1,5 +1,5 @@
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { CampaignCharacterStatusSummary } from '../../components/detail/status/campaign-character-status-summary'
 import { CharacterDetailContent } from '../../components/detail/character-detail-content'
@@ -22,7 +22,7 @@ export function NpcDetail() {
   } = useNpcDetailPage()
 
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       <PageLoadState
         isPending={isPending}
         isError={isError}
@@ -73,6 +73,6 @@ export function NpcDetail() {
       </PageLoadState>
 
       {viewModel ? deleteFlow.blockedDialog : null}
-    </WidePage>
+    </PageShell>
   )
 }

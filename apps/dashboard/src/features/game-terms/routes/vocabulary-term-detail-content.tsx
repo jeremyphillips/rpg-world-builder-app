@@ -10,7 +10,7 @@ import { Badge, buttonVariants, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { useCanManageCampaign } from '@/features/campaign'
 import { UsageReferencesSection } from '@/lib/usage-references/usage-references-section'
@@ -144,7 +144,7 @@ function VocabularyTermDetailPage({
 
   return (
     <>
-      <WidePage rhythm="relaxed">
+      <PageShell width="full" rhythm="relaxed">
         <PageLoadState
           isPending={isPending}
           isError={isError}
@@ -161,7 +161,7 @@ function VocabularyTermDetailPage({
             />
           ) : null}
         </PageLoadState>
-      </WidePage>
+      </PageShell>
 
       {entry ? (
         <VocabularyEntrySheet

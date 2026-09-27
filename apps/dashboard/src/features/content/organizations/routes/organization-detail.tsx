@@ -1,10 +1,8 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Organization } from '@rpg/contracts'
 import { RichTextContent } from '@rpg/ui'
-
+import type { Organization } from '@rpg/contracts'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/page/wide-page'
 import {
   formatContentListLoadErrorMessage,
   formatContentNotFoundMessage,
@@ -56,33 +54,33 @@ export function OrganizationDetailContent({
   )
 
   return (
-    <WidePage>
-      <ContentDetailLayout
-        name={organization.name}
-        nameBadge={<ContentStatusNameBadge status={organization.status} />}
-        displayImage={getContentDisplayImage(
-          buildOrganizationContentDisplayImageInput(organization, 'detail'),
-        )}
-        displayFallback={resolveDashboardDetailDisplayFallback('organization')}
-        imageName={organization.name}
-        campaignId={campaignId}
-        editHref={contentEditHref('organizations', campaignId, organization.id)}
-        statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
-      >
-        <div className="space-y-8">
-          <OrganizationMembersDetailSection campaignId={campaignId} organization={organization} />
-          <OrganizationLocationConnectionsDetailSection
-            campaignId={campaignId}
-            organization={organization}
-          />
-        </div>
-      </ContentDetailLayout>
-    </WidePage>
+    <ContentDetailLayout
+      contentTypeKey="organizations"
+      name={organization.name}
+      nameBadge={<ContentStatusNameBadge status={organization.status} />}
+      displayImage={getContentDisplayImage(
+        buildOrganizationContentDisplayImageInput(organization, 'detail'),
+      )}
+      displayFallback={resolveDashboardDetailDisplayFallback('organization')}
+      imageName={organization.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('organizations', campaignId, organization.id)}
+      statRows={viewModel.statRows}
+      heroDescription={false}
+      descriptionContent={
+        viewModel.description ? (
+          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+        ) : undefined
+      }
+    >
+      <div className="space-y-8">
+        <OrganizationMembersDetailSection campaignId={campaignId} organization={organization} />
+        <OrganizationLocationConnectionsDetailSection
+          campaignId={campaignId}
+          organization={organization}
+        />
+      </div>
+    </ContentDetailLayout>
   )
 }
 

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { CampaignOnboardingIncompleteContext } from '@rpg/contracts'
 import { Heading, RadioCard, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import {
   CAMPAIGN_ONBOARDING_RECONNECT_BODY,
@@ -74,7 +74,7 @@ export function CampaignOnboardingClient({
 
   if (branch === 'existing') {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         {isReconnect ? (
           <div className="mb-6 flex flex-col gap-2">
             <Heading variant="page" as="h1">
@@ -88,25 +88,25 @@ export function CampaignOnboardingClient({
           initialCharacterId={preselectedCharacterId}
           onBack={() => setBranch(isReconnect ? 'existing' : 'choice')}
         />
-      </NarrowPage>
+      </PageShell>
     )
   }
 
   if (branch === 'new') {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <CampaignOnboardingNewCharacterPanel
           context={context}
           campaignId={campaignId}
           onBack={() => setBranch('choice')}
         />
-      </NarrowPage>
+      </PageShell>
     )
   }
 
   return (
-    <NarrowPage>
+    <PageShell width="narrow">
       <OnboardingChoicePanel context={context} onSelect={setBranch} />
-    </NarrowPage>
+    </PageShell>
   )
 }

@@ -37,7 +37,7 @@ function expectViewportWorkspaceChain(container: HTMLElement) {
 }
 
 describe('ContentFormPageShell', () => {
-  it('uses NarrowPage with page inset when scrollMode is document', () => {
+  it('uses PageShell narrow width with page inset when scrollMode is document', () => {
     const { container } = renderShell(
       <ContentFormPageShell scrollMode="document" pageWidth="narrow">
         <p>Form body</p>
@@ -45,13 +45,13 @@ describe('ContentFormPageShell', () => {
     )
 
     const root = container.firstElementChild
-    expect(root).toHaveClass('mx-auto', 'max-w-4xl')
+    expect(root).toHaveClass('mx-auto', 'max-w-page-narrow')
     expect(root).toHaveClass(...pageShellInsetTopClasses.split(/\s+/))
     expect(root).not.toHaveClass(...viewportWorkspaceClasses.split(/\s+/))
     expect(root?.textContent).toBe('Form body')
   })
 
-  it('uses ViewportWorkspace, body wrapper, and WidePage when scrollMode is viewport', () => {
+  it('uses ViewportWorkspace, body wrapper, and PageShell when scrollMode is viewport', () => {
     const { container } = renderShell(
       <ContentFormPageShell scrollMode="viewport" pageWidth="wide">
         <p>Form body</p>
@@ -60,7 +60,7 @@ describe('ContentFormPageShell', () => {
 
     const { widthShell } = expectViewportWorkspaceChain(container)
     expect(widthShell).toHaveClass('w-full')
-    expect(widthShell).not.toHaveClass('max-w-4xl')
+    expect(widthShell).not.toHaveClass('max-w-page-narrow', 'max-w-page-wide')
 
     const body = widthShell?.firstElementChild
     expect(body).toHaveClass(...contentFormPageShellBodyClasses.split(/\s+/))

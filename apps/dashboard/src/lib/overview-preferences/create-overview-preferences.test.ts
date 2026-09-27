@@ -3,12 +3,58 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { createOverviewPreferences } from './create-overview-preferences'
+import {
+  createOverviewPreferences,
+  reconcileOverviewColumnOrder,
+  sanitizeOverviewColumnOrder,
+} from './create-overview-preferences'
 
 const columnSchema = {
   ids: ['name', 'role'],
   lockedIds: ['name'],
 } as const
+
+describe('reconcileOverviewColumnOrder', () => {
+  const schema = [
+    'overview-display-image',
+    'name',
+    'hitDie',
+    'status',
+    'source',
+    'actions',
+  ] as const
+
+  it('keeps schema order when persisted order is empty', () => {
+    expect(reconcileOverviewColumnOrder(schema, [])).toEqual([...schema])
+  })
+
+  it('keeps omitted columns at their schema index while honoring persisted relative order', () => {
+    expect(reconcileOverviewColumnOrder(schema, ['hitDie', 'name'])).toEqual([
+      'overview-display-image',
+      'hitDie',
+      'name',
+      'status',
+      'source',
+      'actions',
+    ])
+  })
+})
+
+describe('sanitizeOverviewColumnOrder', () => {
+  const columnSchema = {
+    ids: ['overview-display-image', 'name', 'traits', 'status', 'source', 'actions'],
+    lockedIds: ['overview-display-image', 'name', 'actions'],
+  } as const
+
+  it('pins the locked leading image column when it was persisted last', () => {
+    expect(
+      sanitizeOverviewColumnOrder(
+        ['name', 'traits', 'status', 'source', 'overview-display-image'],
+        columnSchema,
+      ),
+    ).toEqual(['overview-display-image', 'name', 'traits', 'status', 'source', 'actions'])
+  })
+})
 
 describe('createOverviewPreferences', () => {
   beforeEach(() => {

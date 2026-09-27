@@ -4,7 +4,7 @@ import type { CampaignOnboardingContext } from '@rpg/contracts'
 import { buttonVariants, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/onboarding/campaign-onboarding-copy'
 import { CampaignOnboardingClient } from '../components/onboarding/campaign-onboarding'
@@ -20,7 +20,7 @@ export function CampaignOnboardingBody({
 }) {
   if (context.status === 'complete') {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <div className="flex flex-col gap-4">
           <Text variant="muted" role="status">
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.complete.message}
@@ -29,17 +29,17 @@ export function CampaignOnboardingBody({
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.complete.action}
           </Link>
         </div>
-      </NarrowPage>
+      </PageShell>
     )
   }
 
   if (context.campaign.id !== campaignId) {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <Text variant="destructive" role="alert">
           This onboarding session does not match the campaign in the URL.
         </Text>
-      </NarrowPage>
+      </PageShell>
     )
   }
 

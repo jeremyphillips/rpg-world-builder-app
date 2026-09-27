@@ -16,13 +16,7 @@ export const formTabbedAsideWidthAt2xl = '21rem'
 export const formTabbedAsideGridColsBelow2xlClasses = `xl:grid-cols-[minmax(0,1fr)_${formTabbedAsideWidthBelow2xl}]`
 
 /** TabbedForm grid tracks when the persistent preview rail is visible at `2xl` and above. */
-export const formTabbedAsideGridColsAt2xlClasses = `2xl:grid-cols-[minmax(0,56rem)_${formTabbedAsideWidthAt2xl}]`
-
-/** Centered TabbedForm max width below `2xl` (form cap + gap + preview rail). */
-export const formTabbedAsideGridMaxWidthBelow2xlClasses = `xl:max-w-[calc(56rem+1.5rem+${formTabbedAsideWidthBelow2xl})]`
-
-/** Centered TabbedForm max width at `2xl` and above. */
-export const formTabbedAsideGridMaxWidthAt2xlClasses = `2xl:max-w-[calc(56rem+1.5rem+${formTabbedAsideWidthAt2xl})]`
+export const formTabbedAsideGridColsAt2xlClasses = `2xl:grid-cols-[minmax(0,1fr)_${formTabbedAsideWidthAt2xl}]`
 
 /** PreviewRail card max width below `2xl` — matches the aside column. */
 export const formTabbedAsideCardMaxWidthBelow2xlClasses = `max-w-[${formTabbedAsideWidthBelow2xl}]`
@@ -48,16 +42,13 @@ export const formTabbedNavWithTrailingClasses = 'flex items-center gap-2'
 export const formTabbedNavControlWrapClasses = 'min-w-0 flex-1 overflow-x-auto'
 
 /**
- * TabbedForm body + aside grid. Below `xl` the form column stays `max-w-4xl` and
- * centered; from `xl` the rail sits in a second column ({@link formTabbedAsideWidthBelow2xl}
- * until `2xl`, then {@link formTabbedAsideWidthAt2xl}) with a large gap.
+ * TabbedForm body + aside grid. Page width is owned by the dashboard {@code PageShell};
+ * this grid fills that column. From `xl`, the preview rail sits in a second column.
  */
 export const formTabbedAsideGridClasses = cn(
-  'mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col overflow-hidden xl:grid xl:grid-rows-[minmax(0,1fr)] xl:items-stretch xl:gap-6',
+  'flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden xl:grid xl:grid-rows-[minmax(0,1fr)] xl:items-stretch xl:gap-6',
   formTabbedAsideGridColsBelow2xlClasses,
   formTabbedAsideGridColsAt2xlClasses,
-  formTabbedAsideGridMaxWidthBelow2xlClasses,
-  formTabbedAsideGridMaxWidthAt2xlClasses,
 )
 
 export const formTabbedAsideBodyClasses =

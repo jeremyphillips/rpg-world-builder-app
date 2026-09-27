@@ -7,7 +7,6 @@ import {
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/page/wide-page'
 import { useEquipment } from '../hooks/use-equipment'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
@@ -39,31 +38,30 @@ export function EquipmentDetailContent({ item, campaignId, family }: EquipmentDe
   const viewModel = buildEquipmentDetailViewModel(item)
 
   return (
-    <WidePage>
-      <ContentDetailLayout
-        name={item.name}
-        nameBadge={<ContentStatusNameBadge status={item.status} />}
-        displayImage={getContentDisplayImage(
-          buildEquipmentContentDisplayImageInput(item, 'detail'),
-        )}
-        displayFallback={resolveDashboardDetailDisplayFallback('equipment')}
-        imageName={item.name}
+    <ContentDetailLayout
+      contentTypeKey="equipment"
+      classificationLabel={viewModel.classificationLabel}
+      name={item.name}
+      nameBadge={<ContentStatusNameBadge status={item.status} />}
+      displayImage={getContentDisplayImage(buildEquipmentContentDisplayImageInput(item, 'detail'))}
+      displayFallback={resolveDashboardDetailDisplayFallback('equipment')}
+      imageName={item.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('equipment', campaignId, item.id, family)}
+      statRows={viewModel.heroStatRows}
+      heroDescription={false}
+      descriptionContent={
+        viewModel.description ? (
+          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+        ) : undefined
+      }
+    >
+      <ContentUsageReferencesSection
         campaignId={campaignId}
-        editHref={contentEditHref('equipment', campaignId, item.id, family)}
-        statRows={viewModel.statRows}
-        descriptionContent={
-          viewModel.description ? (
-            <RichTextContent html={viewModel.description} size="md" tone="muted" />
-          ) : undefined
-        }
-      >
-        <ContentUsageReferencesSection
-          campaignId={campaignId}
-          routeKey="equipment"
-          entityId={item.id}
-        />
-      </ContentDetailLayout>
-    </WidePage>
+        routeKey="equipment"
+        entityId={item.id}
+      />
+    </ContentDetailLayout>
   )
 }
 

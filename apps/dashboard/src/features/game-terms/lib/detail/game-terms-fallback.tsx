@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 
 const GAME_TERMS_HUB_LABEL = 'Game Terms'
@@ -20,7 +20,7 @@ export function GameTermsFallback({
   campaignId,
 }: GameTermsFallbackProps) {
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       <PageHeader heading={heading} />
       <Heading variant="section" as="h2">
         Not found
@@ -32,7 +32,7 @@ export function GameTermsFallback({
       >
         Back to Game Terms
       </Link>
-    </WidePage>
+    </PageShell>
   )
 }
 

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { Navigate, useLocation, useParams } from 'react-router-dom'
 
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useCampaigns } from '@/features/campaign'
 
 import { useCharacter } from '../hooks/use-character'
@@ -52,11 +52,11 @@ export function StandaloneCharacterRedirectGuard({
 
   if (isCharacterPending || (isCharacterSuccess && isRoutingPending)) {
     return (
-      <WidePage rhythm="relaxed">
+      <PageShell width="full" rhythm="relaxed">
         <PageLoadState isPending isError={false} defaultErrorLabel="Could not load character.">
           {null}
         </PageLoadState>
-      </WidePage>
+      </PageShell>
     )
   }
 

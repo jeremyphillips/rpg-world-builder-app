@@ -258,7 +258,7 @@ describe('RulesConfigDetailContent', { timeout: 15_000 }, () => {
 
     expect(container.querySelector('[data-scroll-container]')).toBeNull()
 
-    const mainColumn = container.querySelector('.max-w-xl')
+    const mainColumn = container.querySelector('.min-w-0.flex-1')
     expect(mainColumn?.querySelector('.overflow-y-auto')).toBeNull()
     expect(mainColumn?.querySelector('.form-scroll-body-container')).toBeNull()
 

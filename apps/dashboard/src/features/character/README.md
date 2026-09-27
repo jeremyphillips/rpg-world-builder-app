@@ -153,7 +153,7 @@ stay in `lib/builder/`, `lib/steps/`, and per-concern `lib/<step>/`.
 
 ### Builder anatomy (three columns)
 
-`CharacterBuilderPageShell` owns `ViewportWorkspace` + `WidePage` exactly once.
+`CharacterBuilderPageShell` owns `ViewportWorkspace` + `PageShell` exactly once.
 Route hosts (`character-create`, `npc-create`, onboarding panel) must not wrap another
 width/workspace shell.
 

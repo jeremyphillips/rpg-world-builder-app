@@ -70,7 +70,8 @@ describe('HomebrewDetailShell', () => {
     expect(container.querySelector('.overflow-y-auto')).toBeNull()
 
     const mainColumn = screen.getByText('Ready content').parentElement
-    expect(mainColumn).toHaveClass('max-w-xl', 'flex-1')
+    expect(mainColumn).toHaveClass('flex-1', 'min-w-0')
+    expect(mainColumn).not.toHaveClass('max-w-xl')
     expect(mainColumn).not.toHaveClass('min-h-full', 'min-h-0')
   })
 

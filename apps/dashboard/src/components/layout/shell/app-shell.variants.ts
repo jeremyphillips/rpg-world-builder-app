@@ -39,4 +39,4 @@ export const APP_SHELL_CONTENT_COLUMN_ATTR = 'data-app-shell-content-column'
 export const APP_SHELL_MAIN_ATTR = 'data-app-shell-main'
 
 /** Breadcrumb rail — shares horizontal gutter with main content. */
-export const appShellBreadcrumbRailClasses = `border-b border-border py-1.5 ${appShellHorizontalPaddingClasses}`
+export const appShellBreadcrumbRailClasses = `border-b border-border ${appShellHorizontalPaddingClasses}`

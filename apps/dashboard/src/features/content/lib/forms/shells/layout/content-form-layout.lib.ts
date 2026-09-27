@@ -1,7 +1,9 @@
 import { hasContentFormPreview } from '../../preview/content-form-preview.types'
 
 export type ContentFormScrollMode = 'document' | 'viewport'
-export type ContentFormPageWidth = 'narrow' | 'wide'
+import type { PageWidth } from '@/components/layout/page/page-shell.variants'
+
+export type ContentFormPageWidth = Extract<PageWidth, 'narrow' | 'wide'>
 
 export type ContentFormLayout = {
   /** Preview rail + publish validation chrome are active. */

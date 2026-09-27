@@ -1,24 +1,36 @@
-/** Vertical stack for toolbar, hero card, and narrow body column. */
-export const contentDetailRootClasses = 'space-y-6'
+/** Vertical stack for hero card and body shell — width from {@link PageShell}. */
+export const contentDetailRootClasses = 'w-full min-w-0 space-y-6'
 
-export const contentDetailToolbarClasses = 'flex justify-end gap-2'
+/** Nav rail + narrow content column below the hero. */
+export const contentDetailBodyShellClasses = 'flex w-full flex-col gap-6 lg:flex-row lg:items-start'
 
-/** Hero card content shell — no padding; text column carries `p-6`. */
-export const contentDetailHeroCardContentClasses = 'p-0'
+/** Section stack inside the body column. */
+export const contentDetailBodyColumnClasses = 'min-w-0 w-full flex-1 space-y-6'
 
-export const contentDetailHeroGridClasses = 'grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-0'
+/** Hero card — subtle fill inside standard card chrome. */
+export const contentDetailHeroCardClasses = 'overflow-hidden bg-muted'
 
-/** Padded inner wrapper for hero title and metadata. */
-export const contentDetailHeroMainClasses = 'space-y-8 p-6 md:col-span-2'
+/** 16px top/right/bottom, 24px left. */
+export const contentDetailHeroCardContentClasses = 'py-4 pr-4 pb-4 pl-6'
 
-/** Hero image column — stretches with the text column on desktop. */
-export const contentDetailHeroImageShellClasses = 'flex w-full min-h-0 md:h-full md:flex-col'
+export const contentDetailHeroGridClasses =
+  'flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10'
 
-/**
- * Hero artwork clip shell — outer corners use `rounded-card`; inner edge stays
- * square where the image meets text. Keeps a stable 4:3 clip so saved crops match the editor.
- */
+/** Padded inner wrapper for hero eyebrow, title, description, and metadata. */
+export const contentDetailHeroMainClasses = 'flex min-w-0 flex-1 flex-col'
+
+export const contentDetailHeroEyebrowClasses = 'mb-1'
+
+export const contentDetailHeroTitleRowClasses = 'flex flex-wrap items-center gap-3'
+
+export const contentDetailHeroDescriptionClasses =
+  'mt-2 line-clamp-3 text-base text-muted-foreground'
+
+export const contentDetailHeroMetadataClasses = 'mt-3 border-t border-border-subtle pt-3'
+
+/** Hero image — fixed 4:3, not stretched to text column height. */
+export const contentDetailHeroImageShellClasses =
+  'mx-auto w-full max-w-sm shrink-0 md:mx-0 md:max-w-xs lg:max-w-sm'
+
 export const contentDetailHeroImageFrameClasses =
-  'size-full w-full min-h-0 rounded-none rounded-b-card shadow-sm md:rounded-none md:rounded-tr-card md:rounded-br-card'
-
-export const contentDetailHeroCardClasses = 'overflow-hidden'
+  'overflow-hidden rounded-card border-2 border-background shadow-sm'

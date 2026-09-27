@@ -22,6 +22,7 @@ import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-me
 import {
   applyOverviewAdvancedOpenPreferences,
   applyOverviewColumnChangePreferences,
+  sanitizeOverviewColumnOrder,
 } from '@/lib/overview-preferences'
 
 import {
@@ -221,13 +222,16 @@ export function useContentOverviewTable<
   const handleColumnChange = useCallback(
     (state: ColumnChangeState) => {
       setPreferences((current) => {
-        const { next, changed } = applyOverviewColumnChangePreferences(current, state)
+        const sanitizedOrder = sanitizeOverviewColumnOrder(state.order, columnSchema) ?? state.order
+        const normalizedState =
+          sanitizedOrder === state.order ? state : { ...state, order: sanitizedOrder }
+        const { next, changed } = applyOverviewColumnChangePreferences(current, normalizedState)
         if (!changed) return current
         persistContentOverviewPreferences(contentTypeKey, next)
         return next
       })
     },
-    [contentTypeKey],
+    [columnSchema, contentTypeKey],
   )
 
   const handleFilterValueChange = useCallback(

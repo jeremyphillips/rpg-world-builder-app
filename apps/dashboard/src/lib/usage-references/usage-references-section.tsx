@@ -16,6 +16,8 @@ export type UsageReferencesSectionProps = {
   disclosureLimit?: number
   /** When true, section content is visible on load (nested groups remain collapsed). */
   defaultOpen?: boolean
+  /** When true, parent chrome owns the section heading. */
+  embedded?: boolean
 }
 
 /** Informational "Used by" section for vocabulary entry surfaces. */
@@ -24,21 +26,21 @@ export function UsageReferencesSection({
   references,
   disclosureLimit = USAGE_REFERENCE_DISCLOSURE_LIMIT,
   defaultOpen: _defaultOpen = false,
+  embedded = false,
 }: UsageReferencesSectionProps) {
   const usedBy = references.length
   const groupCount = countUsageReferenceGroups(references)
   const summary = formatUsageReferencesSummary(usedBy, groupCount)
   const groups = groupUsageReferences(references)
 
-  return (
-    <section
-      aria-labelledby="usage-references-heading"
-      className="space-y-3 border-t border-border-subtle pt-6"
-    >
+  const body = (
+    <>
       <div className="space-y-1">
-        <Heading variant="group" as="h3" id="usage-references-heading">
-          Used by
-        </Heading>
+        {!embedded ? (
+          <Heading variant="group" as="h3" id="usage-references-heading">
+            Used by
+          </Heading>
+        ) : null}
         <Text variant="muted" className="text-sm">
           {summary}
         </Text>
@@ -52,6 +54,19 @@ export function UsageReferencesSection({
           defaultExpanded={false}
         />
       ) : null}
+    </>
+  )
+
+  if (embedded) {
+    return <div className="space-y-3 px-4 py-2">{body}</div>
+  }
+
+  return (
+    <section
+      aria-labelledby="usage-references-heading"
+      className="space-y-3 border-t border-border-subtle pt-6"
+    >
+      {body}
     </section>
   )
 }

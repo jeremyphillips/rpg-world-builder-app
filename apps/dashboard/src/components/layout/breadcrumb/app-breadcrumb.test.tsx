@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { AppBreadcrumb } from './app-breadcrumb'
@@ -124,6 +124,35 @@ describe('AppBreadcrumb', () => {
     )
 
     expect(screen.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument()
+  })
+
+  it('prepends a campaign overview home link when campaignId is in the route', () => {
+    render(
+      <MemoryRouter initialEntries={['/campaigns/c1/classes']}>
+        <Routes>
+          <Route
+            path="/campaigns/:campaignId/classes"
+            element={
+              <AppBreadcrumb
+                crumbs={[
+                  {
+                    label: 'Classes',
+                    href: '/campaigns/c1/classes',
+                  },
+                  { label: 'Wizard' },
+                ]}
+              />
+            }
+          />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Campaign overview' })).toHaveAttribute(
+      'href',
+      '/campaigns/c1',
+    )
+    expect(screen.getByRole('link', { name: 'Classes' })).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -6,7 +6,6 @@ import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
 } from '@/features/content/lib/content-type-labels'
-import { WidePage } from '@/components/layout/page/wide-page'
 import { useCampaignRules } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'
 import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
@@ -25,6 +24,7 @@ import { buildClassContentDisplayImageInput } from '../../lib/detail/page/conten
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { ClassProgressionTable } from '../components/detail/class-progression-table'
 import { ClassDetailBody } from '../components/detail/class-detail-body'
+import { ContentDetailSection } from '../../lib/detail/page/content-detail-section'
 import { buildClassDetailViewModel, projectVisibleClassFeatures } from '../lib/class-display'
 
 type ClassDetailContentProps = {
@@ -76,38 +76,44 @@ export function ClassDetailContent({
   })
 
   return (
-    <WidePage rhythm="relaxed">
-      <ClassDetailBody
-        name={characterClass.name}
-        nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
-        displayImage={getContentDisplayImage(
-          buildClassContentDisplayImageInput(characterClass, 'detail'),
-        )}
-        displayFallback={resolveDashboardDetailDisplayFallback('class')}
-        imageName={characterClass.name}
-        viewModel={viewModel}
-        subclasses={subclasses}
-        subclassingEnabled={subclassingEnabled}
+    <ClassDetailBody
+      name={characterClass.name}
+      nameBadge={<ContentStatusNameBadge status={characterClass.status} />}
+      displayImage={getContentDisplayImage(
+        buildClassContentDisplayImageInput(characterClass, 'detail'),
+      )}
+      displayFallback={resolveDashboardDetailDisplayFallback('class')}
+      imageName={characterClass.name}
+      viewModel={viewModel}
+      subclasses={subclasses}
+      subclassingEnabled={subclassingEnabled}
+      campaignId={campaignId}
+      skillProficiencies={skillProficiencies}
+      skillsPending={skillsPending}
+      vocabulary={vocabulary}
+      editHref={contentEditHref('classes', campaignId, classId)}
+      progressionTable={
+        showProgressionTable ? (
+          <ContentDetailSection
+            heading="Class Progression"
+            headingId="progression-heading"
+            bodyLayout="flush"
+          >
+            <ClassProgressionTable
+              characterClass={characterClass}
+              spellcastingProgression={spellcastingProgression}
+              campaignRules={campaignRules}
+            />
+          </ContentDetailSection>
+        ) : null
+      }
+    >
+      <ContentUsageReferencesSection
         campaignId={campaignId}
-        skillProficiencies={skillProficiencies}
-        skillsPending={skillsPending}
-        vocabulary={vocabulary}
-        editHref={contentEditHref('classes', campaignId, classId)}
-      >
-        <ContentUsageReferencesSection
-          campaignId={campaignId}
-          routeKey="classes"
-          entityId={classId}
-        />
-      </ClassDetailBody>
-      {showProgressionTable ? (
-        <ClassProgressionTable
-          characterClass={characterClass}
-          spellcastingProgression={spellcastingProgression}
-          campaignRules={campaignRules}
-        />
-      ) : null}
-    </WidePage>
+        routeKey="classes"
+        entityId={classId}
+      />
+    </ClassDetailBody>
   )
 }
 

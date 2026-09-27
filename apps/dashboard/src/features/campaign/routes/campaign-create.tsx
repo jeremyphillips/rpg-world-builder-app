@@ -4,7 +4,7 @@ import { formatFieldMessage, getErrorMessage, resolveMediaRoleEligibility } from
 import { Heading, Wizard, type WizardStepDef } from '@rpg/ui'
 import { WizardStepForm } from '@rpg/ui/form'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { updateCampaign } from '../api/campaign-client'
 import {
   createRulesFields,
@@ -105,7 +105,7 @@ export function CampaignCreate() {
   }
 
   return (
-    <NarrowPage>
+    <PageShell width="narrow">
       <Heading variant="page" as="h1">
         New campaign
       </Heading>
@@ -138,6 +138,6 @@ export function CampaignCreate() {
         />
         <InviteMembersStep onFinish={onComplete} />
       </Wizard>
-    </NarrowPage>
+    </PageShell>
   )
 }

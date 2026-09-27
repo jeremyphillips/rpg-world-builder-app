@@ -1,6 +1,6 @@
 import { SemanticText, Text } from '@rpg/ui'
 
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
@@ -157,7 +157,8 @@ export function OrganizationMembersSection({
   onRemoveMember,
 }: OrganizationMembersSectionProps) {
   return (
-    <DetailCollectionPanel
+    <ContentDetailSection
+      bodyLayout="list"
       heading={ORGANIZATION_SECTION_LABELS.members}
       headingId={ORGANIZATION_MEMBERS_HEADING_ID}
     >
@@ -179,6 +180,6 @@ export function OrganizationMembersSection({
           onRemoveMember={onRemoveMember}
         />
       )}
-    </DetailCollectionPanel>
+    </ContentDetailSection>
   )
 }

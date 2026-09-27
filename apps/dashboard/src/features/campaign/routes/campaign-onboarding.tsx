@@ -4,7 +4,7 @@ import { buttonVariants, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY } from '../lib/onboarding/campaign-onboarding-copy'
 import { useCampaignOnboardingContext } from '../hooks/use-campaign-onboarding-context'
@@ -18,11 +18,11 @@ export function CampaignOnboarding() {
 
   if (!campaignId) {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <Text variant="destructive" role="alert">
           This onboarding link is missing the campaign id.
         </Text>
-      </NarrowPage>
+      </PageShell>
     )
   }
 
@@ -37,7 +37,7 @@ export function CampaignOnboarding() {
     }
 
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <div className="flex flex-col gap-4">
           <Text variant="muted" role="status">
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.message}
@@ -46,7 +46,7 @@ export function CampaignOnboarding() {
             {CAMPAIGN_ONBOARDING_UNEXPECTED_STATUS_COPY.activeWithoutCharacter.action}
           </Link>
         </div>
-      </NarrowPage>
+      </PageShell>
     )
   }
 

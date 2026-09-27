@@ -9,6 +9,7 @@ import {
   buildEquipmentPickerRowViewModel,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
+  EQUIPMENT_STAT_ROW_IDS,
 } from './equipment-display'
 
 const KIND_FIXTURES = [
@@ -32,11 +33,19 @@ function expectedPickerPriceLabel(slug: string) {
   return formatEquipmentCostLabel(equipment.cost) ?? ''
 }
 
-function expectedDetailStatRows(slug: string) {
+function expectedMetadataStatRows(slug: string) {
   const equipment = pickEquipment(slug)
   return [
-    { label: EQUIPMENT_STAT_LABELS.kind, value: getEquipmentKindLabel(equipment.kind) },
-    { label: EQUIPMENT_STAT_LABELS.cost, value: expectedCostLabel(slug) },
+    {
+      id: EQUIPMENT_STAT_ROW_IDS.kind,
+      label: EQUIPMENT_STAT_LABELS.kind,
+      value: getEquipmentKindLabel(equipment.kind),
+    },
+    {
+      id: EQUIPMENT_STAT_ROW_IDS.cost,
+      label: EQUIPMENT_STAT_LABELS.cost,
+      value: expectedCostLabel(slug),
+    },
     ...getEquipmentKindStatRows(equipment),
   ].filter((row) => row.label !== EQUIPMENT_STAT_LABELS.gearKind)
 }
@@ -96,7 +105,14 @@ describe('equipment-display', () => {
       const viewModel = buildEquipmentDetailViewModel(equipment)
 
       expect(viewModel.detailsSectionTitle).toBe(EQUIPMENT_DETAILS_SECTION_TITLES[kind])
-      expect(viewModel.statRows).toEqual(expectedDetailStatRows(slug))
+      expect(viewModel.classificationLabel).toBe(getEquipmentKindLabel(kind))
+      expect(viewModel.statRows).toEqual(expectedMetadataStatRows(slug))
+      expect(viewModel.heroStatRows.some((row) => row.id === EQUIPMENT_STAT_ROW_IDS.kind)).toBe(
+        false,
+      )
+      expect(viewModel.heroStatRows).toEqual(
+        expectedMetadataStatRows(slug).filter((row) => row.id !== EQUIPMENT_STAT_ROW_IDS.kind),
+      )
     })
 
     it('includes description when present', () => {

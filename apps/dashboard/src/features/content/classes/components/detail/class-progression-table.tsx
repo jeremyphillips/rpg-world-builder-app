@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Heading } from '@rpg/ui'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@rpg/ui'
 import {
   formatSpellLevel,
   proficiencyBonus,
@@ -303,30 +303,25 @@ export function ClassProgressionTable({
   const extended = rules.extendedProgression
 
   return (
-    <section aria-labelledby="progression-heading">
-      <Heading variant="section" as="h2" id="progression-heading" className="mb-4">
-        Class Progression
-      </Heading>
-      <Table>
-        <ProgressionTableHeader {...flags} />
-        <TableBody>
-          {rows.flatMap((row) => {
-            const bodyRow = <ProgressionBodyRow key={`level-${row.level}`} row={row} {...flags} />
-            if (extended && row.level === rules.standardMaxCharacterLevel) {
-              return [
-                bodyRow,
-                <ProgressionTierSeparatorTableRow
-                  key={`tier-separator-${extended.tierName}`}
-                  label={`${extended.tierName} Tier`}
-                  colSpan={colSpan}
-                  variant="preview"
-                />,
-              ]
-            }
-            return [bodyRow]
-          })}
-        </TableBody>
-      </Table>
-    </section>
+    <Table>
+      <ProgressionTableHeader {...flags} />
+      <TableBody>
+        {rows.flatMap((row) => {
+          const bodyRow = <ProgressionBodyRow key={`level-${row.level}`} row={row} {...flags} />
+          if (extended && row.level === rules.standardMaxCharacterLevel) {
+            return [
+              bodyRow,
+              <ProgressionTierSeparatorTableRow
+                key={`tier-separator-${extended.tierName}`}
+                label={`${extended.tierName} Tier`}
+                colSpan={colSpan}
+                variant="preview"
+              />,
+            ]
+          }
+          return [bodyRow]
+        })}
+      </TableBody>
+    </Table>
   )
 }

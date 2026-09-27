@@ -10,7 +10,7 @@ import { buttonVariants } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useCanManageCampaign } from '@/features/campaign'
 import { notifyVocabularyEntryCreated, notifyVocabularyEntrySaved } from '@/lib/notify'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
@@ -113,7 +113,7 @@ function VocabularyOverviewPage({
 
   return (
     <>
-      <WidePage rhythm="relaxed">
+      <PageShell width="full" rhythm="relaxed">
         <PageHeader heading={setLabel} actions={newAction} />
         <PageLoadState
           isPending={isPending}
@@ -143,7 +143,7 @@ function VocabularyOverviewPage({
             }
           />
         </PageLoadState>
-      </WidePage>
+      </PageShell>
 
       <VocabularyEntrySheet
         open={isSheetOpen}

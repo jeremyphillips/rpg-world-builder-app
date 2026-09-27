@@ -126,10 +126,10 @@ test runner. ESLint enforces this on `**/*.stories.tsx`.
 
 For layout-only decorators, use page shells or a `<div>` — not a router.
 
-| Story title prefix | Use for                                                          |
-| ------------------ | ---------------------------------------------------------------- |
-| `Content/*`        | Catalog feature stories (detail routes, tables)                  |
-| `Layout/*`         | Shell/layout stories (`NarrowPage`, `WidePage`, `PageHeader`, …) |
+| Story title prefix | Use for                                             |
+| ------------------ | --------------------------------------------------- |
+| `Content/*`        | Catalog feature stories (detail routes, tables)     |
+| `Layout/*`         | Shell/layout stories (`PageShell`, `PageHeader`, …) |
 
 ## Page layout
 
@@ -160,23 +160,23 @@ scrollport. When a descendant mounts `data-viewport-fill="workspace"`, AppShell
 
 Inset vs child rhythm are **independent** on width shells:
 
-| Prop      | SSOT                                                                                 | Default   | Role                                    |
-| --------- | ------------------------------------------------------------------------------------ | --------- | --------------------------------------- |
-| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`py-8` or `none`) |
-| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only           |
+| Prop      | SSOT                                                                                 | Default   | Role                                         |
+| --------- | ------------------------------------------------------------------------------------ | --------- | -------------------------------------------- |
+| `spacing` | [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts) | `page`    | Shell vertical inset (`pt-6 pb-8` or `none`) |
+| `rhythm`  | same file (`pageSpacingClasses`)                                                     | `compact` | Direct-child `space-y-*` only                |
 
 Every route picks **one width shell** from `components/layout/page/`:
 
-| Shell                                                                                                 | Width                | Typical routes                                                                      |
-| ----------------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------- |
-| [`NarrowPage`](../src/components/layout/page/narrow-page.tsx)                                         | Centered `max-w-4xl` | Settings, wizards, account settings, simple forms                                   |
-| [`WidePage`](../src/components/layout/page/wide-page.tsx)                                             | Full main column     | Lists, hubs, detail pages, tables, Rules Config                                     |
-| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | Narrow or wide       | Catalog create/edit — `resolveContentFormLayout` picks `scrollMode` and `pageWidth` |
+| Shell                                                                                                 | `width` prop      | Typical routes                                                                      |
+| ----------------------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| [`PageShell`](../src/components/layout/page/page-shell.tsx)                                           | `full`            | Lists, hubs, tables, builders — uncapped main column                                |
+| same                                                                                                  | `wide`            | Catalog detail, homebrew detail, preview-capable create/edit (~1280px)              |
+| same                                                                                                  | `narrow`          | Settings, wizards, account settings, simple forms (~900px)                          |
+| [`ContentFormPageShell`](../src/features/content/lib/forms/shells/layout/content-form-page-shell.tsx) | `narrow` / `wide` | Catalog create/edit — `resolveContentFormLayout` picks `scrollMode` and `pageWidth` |
 
-Nested readable columns inside `WidePage` use
-[`narrowPageContentClasses`](../src/components/layout/page/page-content.variants.ts)
-(left-aligned `max-w-narrow-content`, ~660px) — narrower than `NarrowPage`, for prose
-body sections on catalog detail routes.
+Tokens: `--max-width-page-wide` / `--max-width-page-narrow` in `@rpg/ui` globals
+(`max-w-page-wide`, `max-w-page-narrow`). **Do not** add nested page-level `max-w-*`
+inside a width shell — domain layouts use flex/grid only.
 
 Child rhythm tokens (`compact`, `list`, `relaxed`, `loose`) live in
 [`page-spacing.variants.ts`](../src/components/layout/page/page-spacing.variants.ts).
@@ -190,65 +190,64 @@ Pass them via the `rhythm` prop — not `spacing`.
 | [`PageLoadState`](../src/components/layout/page/page-load-state.tsx) | Spinner / error / ready body beneath a header |
 
 ```tsx
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageHeader } from '@/components/layout/page/page-header'
-import { WidePage } from '@/components/layout/page/wide-page'
 
 // Narrow settings page
-<NarrowPage rhythm="relaxed">
+<PageShell width="narrow" rhythm="relaxed">
   <PageHeader heading="Account" />
   {/* sections */}
-</NarrowPage>
+</PageShell>
 
 // Full-width hub (no domain shell needed)
-<WidePage rhythm="relaxed">
+<PageShell width="full" rhythm="relaxed">
   <PageHeader heading="Equipment" />
   {/* card grid */}
-</WidePage>
+</PageShell>
 
 // Content catalog create/edit — layout resolver picks scroll ownership once
 const layout = resolveContentFormLayout(def)
 <ContentFormPageShell scrollMode={layout.scrollMode} pageWidth={layout.pageWidth}>
-  {/* form — viewport routes use bounded inner scroll; document routes use NarrowPage + documentScroll */}
+  {/* form — viewport routes use bounded inner scroll; document routes use PageShell + documentScroll */}
 </ContentFormPageShell>
 ```
 
 ### Domain layouts (feature-specific, nest inside a width shell)
 
 - [`ContentOverviewShell`](../src/features/content/lib/overview/content-overview-shell.tsx)
-  — managed catalog **list** recipe: `WidePage` + `PageHeader` + `PageLoadState`
+  — managed catalog **list** recipe: `PageShell width="full"` + `PageHeader` + `PageLoadState`
   - campaign-manager "New" gating. Use for catalog list routes only.
 - [`ContentDetailLayout`](../src/features/content/lib/detail/page/content-detail-layout.tsx)
-  — catalog **detail** recipe inside `WidePage`: edit toolbar, full-width hero
-  card (name + metadata + artwork), then a `narrowPageContentClasses` body column
-  for description and sections. Pass static rows via `statRows` or hook-driven
-  rows via `metadata` (e.g. species creature type). Not a page width shell.
+  — catalog **detail** recipe (includes `PageShell width="wide"` by default): sticky edit actions, hero
+  card (name + metadata + artwork), then an optional **On this page** scroll-spy
+  rail beside the body column. Use [`ContentDetailSection`](../src/features/content/lib/detail/page/content-detail-section.tsx)
+  for bordered section panels (subtle header, faint body); [`ContentDetailSectionItem`](../src/features/content/lib/detail/page/content-detail-section.tsx)
+  for array entries that need nav leaves. Pass static rows via `statRows` or hook-driven
+  rows via `metadata`. Description prose belongs in `descriptionContent` (panel + nav),
+  not duplicated in the hero excerpt (`heroDescription={false}` when using the panel).
 
-  Full-width blocks (e.g. [`ClassProgressionTable`](../src/features/content/classes/components/detail/class-progression-table.tsx))
-  render as **siblings** below `ContentDetailLayout` in the same `WidePage` — do
-  not nest wide tables inside the layout.
+  Wide blocks (e.g. [`ClassProgressionTable`](../src/features/content/classes/components/detail/class-progression-table.tsx))
+  belong **inside** the layout body as `ContentDetailSection` panels — not as
+  siblings outside the layout.
 
 ```tsx
-import { WidePage } from '@/components/layout/page/wide-page'
 import { ContentDetailLayout } from '@/features/content/lib/detail/page/content-detail-layout'
-;<WidePage rhythm="relaxed">
-  <ContentDetailLayout
-    name={item.name}
-    statRows={rows}
-    imageUrl={getContentImageUrl(item.imageKey)}
-    imageName={item.name}
-    campaignId={campaignId}
-    editHref={contentEditHref('feats', campaignId, item.id)}
-    descriptionContent={<RichTextContent html={item.description} size="md" tone="muted" />}
-  >
-    {/* narrow sections */}
-  </ContentDetailLayout>
-  <ClassProgressionTable characterClass={characterClass} campaignRules={campaignRules} />
-</WidePage>
+;<ContentDetailLayout
+  contentTypeKey="feats"
+  name={item.name}
+  statRows={rows}
+  displayImage={displayImage}
+  imageName={item.name}
+  campaignId={campaignId}
+  editHref={contentEditHref('feats', campaignId, item.id)}
+  descriptionContent={<RichTextContent html={item.description} size="md" tone="muted" />}
+>
+  {/* sections and wide panels */}
+</ContentDetailLayout>
 ```
 
 Do not use `ContentOverviewShell` for non-catalog full-width pages (hubs,
-dashboard widgets, etc.) — compose `WidePage` + `PageHeader` directly instead.
+dashboard widgets, etc.) — compose `PageShell width="full"` + `PageHeader` directly instead.
 
 Use CSF3 with `satisfies Meta<typeof Component>` and `StoryObj` (not
 `StoryObj<typeof meta>`) for custom `render` stories.

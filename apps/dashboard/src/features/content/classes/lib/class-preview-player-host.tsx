@@ -70,6 +70,7 @@ export function ClassPreviewPlayerHost({
             skillProficiencies={skillProficiencies}
             skillsPending={skillsPending}
             vocabulary={vocabulary}
+            pageShell={false}
           />
         </Modal.Body>
       </Modal.Content>

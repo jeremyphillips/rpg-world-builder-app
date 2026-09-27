@@ -1,43 +1,43 @@
-import type { ReactNode } from 'react'
-import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
-import { Card, CardContent, Heading } from '@rpg/ui'
+import { useMemo, type ReactNode } from 'react'
+import {
+  stripHtmlTags,
+  type ContentDisplayFallback,
+  type ContentDisplayImage,
+  type ContentTypeKey,
+} from '@rpg/contracts'
+import { Card, CardContent, Eyebrow, Heading, Text } from '@rpg/ui'
 
-import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
+import { PageShell } from '@/components/layout/page/page-shell'
+import type { PageRhythm, PageShellInset } from '@/components/layout/page/page-spacing.variants'
+
+import { ContentDetailBody } from './content-detail-body'
+import { useSetPageChromeActions } from '@/components/layout/page-chrome/use-set-page-chrome-actions'
 import { useCanManageCampaign } from '@/features/campaign'
+import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
 
 import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
+import { ContentDetailStatRows } from './content-detail-stat-rows'
 import {
   contentDetailHeroCardClasses,
   contentDetailHeroCardContentClasses,
+  contentDetailHeroDescriptionClasses,
   contentDetailHeroGridClasses,
+  contentDetailHeroEyebrowClasses,
   contentDetailHeroImageFrameClasses,
   contentDetailHeroImageShellClasses,
   contentDetailHeroMainClasses,
+  contentDetailHeroMetadataClasses,
+  contentDetailHeroTitleRowClasses,
   contentDetailRootClasses,
-  contentDetailToolbarClasses,
 } from './content-detail-layout.variants'
-import { ContentStatRow } from '../metadata/content-stat-row'
 import type { ContentStatRowData } from '../metadata/content-stat-rows'
 
-function ContentDetailStatRows({ statRows }: { statRows: ContentStatRowData[] }) {
-  return (
-    <div className="space-y-3">
-      {statRows.map(({ label, value, info, infoPlacement, infoAriaLabel }) => (
-        <ContentStatRow
-          key={label}
-          label={label}
-          value={value}
-          info={info}
-          infoPlacement={infoPlacement}
-          infoAriaLabel={infoAriaLabel}
-        />
-      ))}
-    </div>
-  )
-}
-
 export type ContentDetailLayoutProps = {
+  /** Catalog content type — default hero classification label when `classificationLabel` is omitted. */
+  contentTypeKey: ContentTypeKey
+  /** Overrides the hero classification label (e.g. equipment kind: Weapon, Armor). */
+  classificationLabel?: string
   /** Content item display name — rendered as the hero heading. */
   name: string
   /** Optional badge rendered beside the hero heading (e.g. draft status). */
@@ -52,27 +52,38 @@ export type ContentDetailLayoutProps = {
   campaignId?: string
   /** When set and the user can manage the campaign, renders a standard Edit action. */
   editHref?: string
-  /** Optional extra action elements rendered alongside Edit in the top-right toolbar. */
+  /** Optional extra action elements rendered alongside Edit in the sticky page header. */
   actions?: ReactNode
   /** Static metadata rows in the hero card. Ignored when `metadata` is set. */
   statRows?: ContentStatRowData[]
   /** Hook-driven or custom metadata in the hero card; takes precedence over `statRows`. */
   metadata?: ReactNode
+  /** HTML description source for the hero excerpt (plain text, clamped). Ignored when `heroDescription` is false. */
+  descriptionHtml?: string
+  /** When false, omits the hero description (e.g. spells keep full prose in the body). Default true. */
+  heroDescription?: boolean
   /** First block in the narrow body column (rich text or plain). */
   descriptionContent?: ReactNode
   /** Additional sections in the narrow body column below `descriptionContent`. */
   children?: ReactNode
+  /** When false, omits the page shell (modal preview embeds). Default true. */
+  pageShell?: boolean
+  /** PageShell rhythm when `pageShell` is true. Default `relaxed`. */
+  rhythm?: PageRhythm
+  /** PageShell vertical inset when `pageShell` is true. Default `page`. */
+  spacing?: PageShellInset
 }
 
 /**
- * Catalog content detail layout: toolbar, full-width hero card (name + metadata + image),
- * and a `max-w-narrow-content` body column for prose sections.
+ * Catalog content detail layout: sticky header actions, hero card (eyebrow, name, metadata, image),
+ * optional scroll-spy nav rail, and bordered section panels in the body column.
  *
- * Wrap in `WidePage`. Render full-width sections (e.g. progression tables) as `WidePage`
- * siblings outside this layout.
+ * Renders inside `PageShell width="wide"` by default. Wide tables and sections belong in the body as panels.
  */
 // fallow-ignore-next-line complexity
 export function ContentDetailLayout({
+  contentTypeKey,
+  classificationLabel,
   name,
   nameBadge,
   displayImage,
@@ -83,38 +94,61 @@ export function ContentDetailLayout({
   actions,
   statRows,
   metadata,
+  descriptionHtml,
+  heroDescription = true,
   descriptionContent,
   children,
+  pageShell = true,
+  rhythm = 'relaxed',
+  spacing = 'page',
 }: ContentDetailLayoutProps) {
   const canManage = useCanManageCampaign(campaignId)
   const showEdit = Boolean(canManage && editHref)
-  const toolbar = showEdit || actions
+  const pageActions = useMemo(() => {
+    if (!showEdit && !actions) return null
+    return (
+      <>
+        {showEdit && editHref ? <ContentDetailEditAction to={editHref} /> : null}
+        {actions}
+      </>
+    )
+  }, [actions, editHref, showEdit])
+
+  useSetPageChromeActions(pageActions)
+
+  const resolvedClassificationLabel = classificationLabel ?? getContentTypeItemLabel(contentTypeKey)
+
   const heroMetadata =
     metadata ??
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
   const showHeroImage = displayImage != null || displayFallback != null
+  const heroDescriptionText =
+    heroDescription && descriptionHtml ? stripHtmlTags(descriptionHtml).trim() : undefined
   const hasBody = Boolean(descriptionContent || children)
 
-  return (
+  const content = (
     <div className={contentDetailRootClasses}>
-      {toolbar ? (
-        <div className={contentDetailToolbarClasses} role="toolbar" aria-label="Page actions">
-          {showEdit && editHref ? <ContentDetailEditAction to={editHref} /> : null}
-          {actions}
-        </div>
-      ) : null}
-
       <Card className={contentDetailHeroCardClasses}>
         <CardContent className={contentDetailHeroCardContentClasses}>
           <div className={contentDetailHeroGridClasses}>
             <div className={contentDetailHeroMainClasses}>
-              <div className="flex flex-wrap items-center gap-3">
-                <Heading variant="display" as="h1">
+              <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
+                {resolvedClassificationLabel}
+              </Eyebrow>
+              <div className={contentDetailHeroTitleRowClasses}>
+                <Heading variant="page" as="h1">
                   {name}
                 </Heading>
                 {nameBadge}
               </div>
-              {heroMetadata}
+              {heroDescriptionText ? (
+                <Text as="p" className={contentDetailHeroDescriptionClasses}>
+                  {heroDescriptionText}
+                </Text>
+              ) : null}
+              {heroMetadata ? (
+                <div className={contentDetailHeroMetadataClasses}>{heroMetadata}</div>
+              ) : null}
             </div>
             {showHeroImage ? (
               <div className={contentDetailHeroImageShellClasses}>
@@ -139,11 +173,18 @@ export function ContentDetailLayout({
       </Card>
 
       {hasBody ? (
-        <div className={narrowPageContentClasses}>
-          {descriptionContent}
-          {children}
-        </div>
+        <ContentDetailBody descriptionContent={descriptionContent}>{children}</ContentDetailBody>
       ) : null}
     </div>
+  )
+
+  if (!pageShell) {
+    return content
+  }
+
+  return (
+    <PageShell width="wide" rhythm={rhythm} spacing={spacing}>
+      {content}
+    </PageShell>
   )
 }

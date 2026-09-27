@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
 
-import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/detail-collection-panel'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
 import {
   isRelationshipMutationActionVisible,
@@ -249,7 +249,8 @@ export function LocationTerritorialAuthoritySectionBody({
   const rootItemCount = Math.max(totalRows, visibleGroupCount > 0 ? 1 : 0)
 
   return (
-    <DetailCollectionPanel
+    <ContentDetailSection
+      bodyLayout="list"
       heading={TERRITORIAL_AUTHORITY_SECTION_HEADING}
       headingId={TERRITORIAL_AUTHORITY_HEADING_ID}
       helper={showHelper ? TERRITORIAL_AUTHORITY_SECTION_HELPER : undefined}
@@ -322,7 +323,7 @@ export function LocationTerritorialAuthoritySectionBody({
           </RelationshipList.Group>
         ) : null}
       </RelationshipList.Root>
-    </DetailCollectionPanel>
+    </ContentDetailSection>
   )
 }
 

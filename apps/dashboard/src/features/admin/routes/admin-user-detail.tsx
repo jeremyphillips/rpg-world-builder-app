@@ -4,7 +4,7 @@ import { ActionIcon, Badge, buttonVariants, Heading, RowActionsMenu, Text } from
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useIsSuperadmin } from '@/features/auth'
 
 import { DeleteUserDialog } from '../components/delete-user-dialog'
@@ -42,7 +42,7 @@ export function AdminUserDetail() {
   const showInvites = user.pendingInviteCount > 0 || user.acceptedIncompleteInviteCount > 0
 
   return (
-    <NarrowPage rhythm="loose">
+    <PageShell width="narrow" rhythm="loose">
       <div className="space-y-2">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
@@ -180,6 +180,6 @@ export function AdminUserDetail() {
         onOpenChange={setDeleteOpen}
         onDeleted={() => navigate(ROUTES.admin.users)}
       />
-    </NarrowPage>
+    </PageShell>
   )
 }

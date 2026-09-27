@@ -1,6 +1,6 @@
 import { Heading, Spinner, Text } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { DashboardHomeSections } from './dashboard-home-sections'
 import { DashboardHomeStarterCards } from './dashboard-home-starter-cards'
@@ -18,16 +18,16 @@ export function DashboardHome() {
 
   if (isPending) {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <div className="flex justify-center">
           <Spinner />
         </div>
-      </NarrowPage>
+      </PageShell>
     )
   }
 
   return (
-    <NarrowPage rhythm="relaxed">
+    <PageShell width="narrow" rhythm="relaxed">
       <div className="space-y-1">
         <Heading variant="page" as="h1">
           {welcome.title}
@@ -44,6 +44,6 @@ export function DashboardHome() {
       {sections.some((section) => section.kind === 'starterCards') ? (
         <DashboardHomeStarterCards hasCampaignRows={campaignRowsPresent} />
       ) : null}
-    </NarrowPage>
+    </PageShell>
   )
 }

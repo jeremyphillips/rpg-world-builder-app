@@ -18,12 +18,30 @@ describe('costColumn', () => {
   })
 })
 
+function columnIds<T>(columns: ColumnDef<T>[]): string[] {
+  return columns.map(
+    (column) =>
+      column.id ??
+      (typeof (column as { accessorKey?: unknown }).accessorKey === 'string'
+        ? (column as { accessorKey: string }).accessorKey
+        : ''),
+  )
+}
+
 describe('buildContentColumns', () => {
   it('includes source chrome according to the content-type presentation policy', () => {
     const columns = buildContentColumns([], { contentType: 'classes' })
 
-    expect(
-      columns.map((column) => column.id ?? ('accessorKey' in column && column.accessorKey)),
-    ).toContain('source')
+    expect(columnIds(columns)).toContain('source')
+  })
+
+  it('places the display image column before name for classes and species', () => {
+    const classIds = columnIds(buildContentColumns([], { contentType: 'classes' }))
+    const speciesIds = columnIds(buildContentColumns([], { contentType: 'species' }))
+
+    expect(classIds[0]).toBe('overview-display-image')
+    expect(classIds[1]).toBe('name')
+    expect(speciesIds[0]).toBe('overview-display-image')
+    expect(speciesIds[1]).toBe('name')
   })
 })

@@ -3,7 +3,7 @@ import { Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 
@@ -33,7 +33,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
   )
 
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       <PageHeader heading="Homebrew" />
       <Text variant="muted">{HOMEBREW_DESCRIPTION}</Text>
 
@@ -81,7 +81,7 @@ export function HomebrewHubContent({ campaignId }: HomebrewHubContentProps) {
           </ul>
         </section>
       </PageLoadState>
-    </WidePage>
+    </PageShell>
   )
 }
 

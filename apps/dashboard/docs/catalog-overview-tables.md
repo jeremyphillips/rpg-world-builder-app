@@ -159,7 +159,7 @@ character surfaces require shared character-specific policy.
 ## Page shell
 
 `OverviewPageShell` (`src/components/layout/page/overview-page-shell.tsx`) composes
-`WidePage` + `PageHeader` + `PageLoadState` for overview routes. Content lists
+`PageShell width="full"` + `PageHeader` + `PageLoadState` for overview routes. Content lists
 use `ContentOverviewShell` (campaign-manager "New" gating). NPC overview uses
 `OverviewPageShell` directly with custom route actions.
 

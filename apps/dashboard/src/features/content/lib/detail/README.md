@@ -129,12 +129,18 @@ evaluating the pilot — global feature-structure docs are unchanged.
 Use `DetailCollectionPanel` when the primary body is a collection/list of related
 records or entities (optionally divided into semantic groups).
 
-**Do not use for:** prose blocks, stat/metadata rows, forms, metric grids,
-single-value fields, arbitrary card layouts, spell-resolution slot editors.
+Use [`ContentDetailSection`](page/content-detail-section.tsx) on **catalog detail**
+routes for headed body regions (prose, lists, tables, relationship rosters). It
+defaults to subtle header + faint body and registers with the layout scroll-spy nav.
+Array items use `ContentDetailSectionItem` for nested nav leaves.
+
+**Do not use `DetailCollectionPanel` directly for:** prose blocks, stat/metadata rows,
+forms, metric grids, single-value fields, arbitrary card layouts — prefer
+`ContentDetailSection` on detail routes.
 
 ## Do not build another…
 
-- No generic `DetailSection` or universal `ContentDetailSection`
+- No feature-local copy of `ContentDetailSection` props without domain reason
 - No wrapper over `DetailCollectionPanel` that only re-exposes its props
 - No feature-local copy of Group/RowList layout anatomy
 - No moving `EntityAnatomy` ownership into `collection/`

@@ -3,7 +3,7 @@ import { DEFAULT_SYSTEM_RULESET_ID } from '@rpg/contracts'
 import { buttonVariants, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { useBuildContext } from '@/features/character'
 
@@ -34,7 +34,7 @@ export function CharacterImportRoute() {
       : null
 
   return (
-    <NarrowPage>
+    <PageShell width="narrow">
       <div className="mb-6 flex items-start justify-between gap-4">
         <Heading variant="page" as="h1">
           Import D&amp;D Beyond character
@@ -55,6 +55,6 @@ export function CharacterImportRoute() {
           onSaveSuccess={(characterId) => navigate(ROUTES.characters.detail(characterId))}
         />
       </PageLoadState>
-    </NarrowPage>
+    </PageShell>
   )
 }

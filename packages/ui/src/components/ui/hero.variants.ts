@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 
-export const heroRootClasses = '@container max-w-4xl space-y-3'
+export const heroRootClasses = '@container w-full min-w-0 space-y-3'
 
 export const heroMediaFrameClasses =
   'relative w-full overflow-hidden rounded-xl h-[min(calc(100cqw/3),15rem)]'

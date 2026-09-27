@@ -13,8 +13,6 @@ import {
   formTabbedAsideGridClasses,
   formTabbedAsideGridColsAt2xlClasses,
   formTabbedAsideGridColsBelow2xlClasses,
-  formTabbedAsideGridMaxWidthAt2xlClasses,
-  formTabbedAsideGridMaxWidthBelow2xlClasses,
   formTabbedAsideSlotClasses,
   formTabbedAsideSlotBottomInsetClasses,
   formTabbedAsideSlotTopInsetClasses,
@@ -38,11 +36,11 @@ describe('formTabbedAside layout tokens', () => {
     expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridColsAt2xlClasses)
   })
 
-  it('keeps the preview-rail grid centered with a capped max width', () => {
-    expect(formTabbedAsideGridClasses).toContain('mx-auto')
-    expect(formTabbedAsideGridClasses).not.toContain('xl:mx-0')
-    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridMaxWidthBelow2xlClasses)
-    expect(formTabbedAsideGridClasses).toContain(formTabbedAsideGridMaxWidthAt2xlClasses)
+  it('fills the page shell without an inner page max-width cap', () => {
+    expect(formTabbedAsideGridClasses).toContain('w-full')
+    expect(formTabbedAsideGridClasses).toContain('min-w-0')
+    expect(formTabbedAsideGridClasses).not.toContain('max-w-4xl')
+    expect(formTabbedAsideGridClasses).not.toContain('mx-auto')
   })
 
   it('fills grid cells for scroll + docked footer columns', () => {

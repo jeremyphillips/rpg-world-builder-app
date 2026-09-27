@@ -6,7 +6,7 @@ import { useFilterState } from '@rpg/ui/filters'
 import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
 import { PageHeader } from '@/components/layout/page/page-header'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region'
 
 import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
@@ -64,13 +64,13 @@ export function AdminUserCharactersPage() {
   const { user } = useAdminUserRouteContext()
 
   return (
-    <NarrowPage rhythm="list">
+    <PageShell width="narrow" rhythm="list">
       <PageHeader heading="Characters" />
       <Text variant="muted">Player characters owned by this user.</Text>
       <Text variant="muted" className="text-sm">
         {user.email} · {user.characterCount} character{user.characterCount === 1 ? '' : 's'}
       </Text>
       <AdminUserCharactersList />
-    </NarrowPage>
+    </PageShell>
   )
 }
