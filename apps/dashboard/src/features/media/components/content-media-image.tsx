@@ -74,7 +74,7 @@ export function ContentMediaImage({
         alt={alt}
         className={cn(
           contentMediaImageClasses,
-          frame === 'emblem' && contentMediaImageEmblemClasses,
+          (frame === 'emblem' || frame === 'emblemHero') && contentMediaImageEmblemClasses,
           usesWhitePaperKnockout && contentMediaImageWhitePaperKnockoutClasses,
           usesMonoGlyphInvert && contentMediaImageMonoGlyphInvertClasses,
         )}

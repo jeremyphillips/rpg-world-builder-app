@@ -44,7 +44,7 @@ export function contentDetailHeroImageShellClasses(
   presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
 ): string {
   if (presentation.size === 'emblem-lg') {
-    return 'mx-auto w-full max-w-hero-emblem shrink-0 md:mx-0'
+    return 'mx-auto size-hero-emblem max-h-hero-emblem max-w-hero-emblem shrink-0 md:mx-0'
   }
   return 'mx-auto w-full max-w-sm shrink-0 md:mx-0 md:max-w-xs lg:max-w-sm'
 }
