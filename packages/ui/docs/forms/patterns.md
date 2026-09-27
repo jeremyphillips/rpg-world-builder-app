@@ -31,7 +31,7 @@ for flat layout. Dashboard preview catalog routes (`scrollMode: 'viewport'`) mou
 `ContentFormPageShell` with `ViewportWorkspace` + width shell (`spacing="none"`) so the page fills
 the app main column without document scroll; TabbedForm owns the bounded scroll body and docked
 footer (flush to the viewport bottom). Non-preview catalog routes and settings-style pages use
-`scrollMode: 'document'` (`NarrowPage` + `documentScroll`). `scrollBodyClassName` is inset-only —
+`scrollMode: 'document'` (`PageShell` + `documentScroll`). `scrollBodyClassName` is inset-only —
 it never selects scroll ownership; pass explicit `boundedScroll` or use the docked-footer shell path.
 Top inset scrolls away via `scrollBodyClassName` (typically `formViewportScrollBodyTopInsetClasses`)
 as the first child inside the scroll region — not as padding on the scroll container — so sticky
@@ -50,8 +50,8 @@ for submit actions rendered outside the `<form>` element.
 Presets: `formStickyTabsTransparentClasses`, `formStickyActionsBarTransparentClasses`.
 
 Optional `aside` (inside `FormProvider`) + `tabRowTrailing` for a compact tab-row action. At `xl`
-the body is a centered two-column grid (form `minmax(0, 1fr)` + aside `280px`; at `2xl` form
-`minmax(0, 56rem)` + aside `21rem`); the footer stays in the form column below the scroll body
+the body is a full-width two-column grid (form `minmax(0, 1fr)` + aside `280px`; at `2xl` the same
+form track + aside `21rem`); the footer stays in the form column below the scroll body
 (not a separate grid row). `activeTabId` is on
 `TabbedFormChromeContext`.
 

@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
@@ -28,7 +28,7 @@ export function GlobalSearchPage() {
   } = useGlobalSearchPage(campaignId)
 
   return (
-    <NarrowPage rhythm="list">
+    <PageShell width="narrow" rhythm="list">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader heading={GLOBAL_SEARCH_COPY.pageTitle} />
         <form
@@ -65,6 +65,6 @@ export function GlobalSearchPage() {
           ROUTES.campaign.search(campaignId, { q: query, group: filterGroup })
         }
       />
-    </NarrowPage>
+    </PageShell>
   )
 }

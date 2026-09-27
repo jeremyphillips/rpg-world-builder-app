@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { cn } from '@rpg/ui'
 
-import { narrowPageBaseClasses } from './narrow-page.variants'
+import { pageShellWidthClasses, type PageWidth } from './page-shell.variants'
 import {
   pageShellInsetClasses,
   pageSpacingClasses,
@@ -10,7 +10,11 @@ import {
   type PageShellInset,
 } from './page-spacing.variants'
 
-export interface NarrowPageProps {
+export type { PageWidth }
+
+export interface PageShellProps {
+  /** Route-level content width — the only page max-width owner for this subtree. */
+  width: PageWidth
   children: ReactNode
   /** Vertical shell inset below the breadcrumb rail. Default: page (`pt-6 pb-8`). */
   spacing?: PageShellInset
@@ -19,17 +23,18 @@ export interface NarrowPageProps {
   className?: string
 }
 
-/** Centered max-w-4xl page column for settings, forms, and simple routes. */
-export function NarrowPage({
+/** Dashboard route width shell — full, wide (~1280px), or narrow (~900px). */
+export function PageShell({
+  width,
   children,
   spacing = 'page',
   rhythm = 'compact',
   className,
-}: NarrowPageProps) {
+}: PageShellProps) {
   return (
     <div
       className={cn(
-        narrowPageBaseClasses,
+        pageShellWidthClasses[width],
         pageShellInsetClasses[spacing],
         pageSpacingClasses[rhythm],
         className,

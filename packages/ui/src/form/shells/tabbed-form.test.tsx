@@ -281,13 +281,12 @@ describe('TabbedForm', () => {
     )
     expect(formColumn).toHaveClass('xl:h-full', 'flex-col')
     expect(grid).toHaveClass(
-      'mx-auto',
+      'w-full',
+      'min-w-0',
       'xl:grid-cols-[minmax(0,1fr)_280px]',
-      'xl:max-w-[calc(56rem+1.5rem+280px)]',
-      '2xl:grid-cols-[minmax(0,56rem)_21rem]',
-      '2xl:max-w-[calc(56rem+1.5rem+21rem)]',
+      '2xl:grid-cols-[minmax(0,1fr)_21rem]',
     )
-    expect(grid).not.toHaveClass('xl:mx-0')
+    expect(grid).not.toHaveClass('max-w-4xl', 'mx-auto')
     expect(formColumn).toHaveClass('xl:col-start-1')
     expect(grid).toContainElement(formColumn)
     expect(grid?.childElementCount).toBe(2)

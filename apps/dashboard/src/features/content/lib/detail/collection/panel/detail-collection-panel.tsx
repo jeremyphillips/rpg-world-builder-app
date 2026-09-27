@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { cn, Heading, Text } from '@rpg/ui'
+import { cn, establishSurfaceCurrent, Heading, Text } from '@rpg/ui'
 
 import {
   detailCollectionPanelBodyVariants,
@@ -19,9 +19,9 @@ export type DetailCollectionPanelProps = {
   /** Vertical alignment of the header row contents. */
   headerAlign?: 'start' | 'center'
   /** Header surface treatment — subtle for connection section chrome. */
-  headerSurface?: 'card' | 'subtle'
-  /** Body surface treatment — transparent for bordered list rows without card fill. */
-  bodySurface?: 'subtle' | 'transparent'
+  headerSurface?: 'card' | 'subtle' | 'muted'
+  /** Body surface treatment — faint for catalog detail sections; transparent for list-only chrome. */
+  bodySurface?: 'subtle' | 'faint' | 'transparent'
   /** Single optional panel-header action control (button, menu, link-button). */
   action?: ReactNode
   children: ReactNode
@@ -57,7 +57,14 @@ export function DetailCollectionPanel({
           {action ? <div className="shrink-0">{action}</div> : null}
         </div>
       </div>
-      <div className={detailCollectionPanelBodyVariants({ surface: bodySurface })}>{children}</div>
+      <div
+        className={cn(
+          detailCollectionPanelBodyVariants({ surface: bodySurface }),
+          bodySurface === 'faint' && establishSurfaceCurrent('surface-faint'),
+        )}
+      >
+        {children}
+      </div>
     </section>
   )
 }

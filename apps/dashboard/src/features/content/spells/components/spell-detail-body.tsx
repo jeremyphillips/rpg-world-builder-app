@@ -1,13 +1,29 @@
 import type { ReactNode } from 'react'
-import { Heading, RichTextContent, Text } from '@rpg/ui'
+import { RichTextContent, Text } from '@rpg/ui'
 
 import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
 
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import { contentDetailNavItemId } from '../../lib/detail/page/content-detail-nav-anchor-id'
+import {
+  ContentDetailSection,
+  ContentDetailSectionItem,
+} from '../../lib/detail/page/content-detail-section'
 import { ContentLinkBadge, ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
 import { SPELL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
+
+const SPELL_CLASSES_HEADING_ID = 'spell-classes-heading'
+const SPELL_TAGS_HEADING_ID = 'spell-tags-heading'
+const SPELL_RESOLUTION_HEADING_ID = 'spell-resolution-heading'
+
+function slugifyHeading(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
 
 function SpellClassesList({
   campaignId,
@@ -20,10 +36,7 @@ function SpellClassesList({
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
 
   return (
-    <section aria-labelledby="spell-classes-heading">
-      <Heading variant="section" as="h2" id="spell-classes-heading" className="mb-3">
-        {section.title}
-      </Heading>
+    <ContentDetailSection heading={section.title} headingId={SPELL_CLASSES_HEADING_ID}>
       {isPending ? (
         <Text variant="muted">Loading…</Text>
       ) : (
@@ -44,7 +57,7 @@ function SpellClassesList({
           })}
         </ul>
       )}
-    </section>
+    </ContentDetailSection>
   )
 }
 
@@ -54,10 +67,7 @@ function SpellTagsSection({
   section: NonNullable<SpellDetailViewModel['tagsSection']>
 }) {
   return (
-    <section aria-labelledby="spell-tags-heading">
-      <Heading variant="section" as="h2" id="spell-tags-heading" className="mb-3">
-        {section.title}
-      </Heading>
+    <ContentDetailSection heading={section.title} headingId={SPELL_TAGS_HEADING_ID}>
       <ul className="flex flex-wrap gap-2" role="list">
         {section.labels.map((label) => (
           <li key={label}>
@@ -65,7 +75,7 @@ function SpellTagsSection({
           </li>
         ))}
       </ul>
-    </section>
+    </ContentDetailSection>
   )
 }
 
@@ -75,16 +85,14 @@ function SpellResolutionSection({
   section: NonNullable<SpellDetailViewModel['resolutionSection']>
 }) {
   return (
-    <section aria-labelledby="spell-resolution-heading">
-      <Heading variant="section" as="h2" id="spell-resolution-heading" className="mb-3">
-        {section.title}
-      </Heading>
+    <ContentDetailSection heading={section.title} headingId={SPELL_RESOLUTION_HEADING_ID}>
       <div className="space-y-4">
         {section.subsections.map((subsection) => (
-          <div key={subsection.heading}>
-            <Heading variant="subsection" as="h3" className="mb-2">
-              {subsection.heading}
-            </Heading>
+          <ContentDetailSectionItem
+            key={subsection.heading}
+            id={contentDetailNavItemId('resolution', slugifyHeading(subsection.heading))}
+            label={subsection.heading}
+          >
             <ul className="list-inside list-disc space-y-1" role="list">
               {subsection.lines.map((line) => (
                 <li key={`${subsection.heading}-${line}`}>
@@ -92,10 +100,10 @@ function SpellResolutionSection({
                 </li>
               ))}
             </ul>
-          </div>
+          </ContentDetailSectionItem>
         ))}
       </div>
-    </section>
+    </ContentDetailSection>
   )
 }
 
@@ -108,13 +116,12 @@ function SpellProseSection({
   title: string
   bodyHtml: string
 }) {
+  const headingId = `spell-${id}-heading`
+
   return (
-    <section aria-labelledby={`spell-${id}-heading`}>
-      <Heading variant="section" as="h2" id={`spell-${id}-heading`} className="mb-3">
-        {title}
-      </Heading>
+    <ContentDetailSection heading={title} headingId={headingId}>
       <RichTextContent html={bodyHtml} size="md" tone="muted" />
-    </section>
+    </ContentDetailSection>
   )
 }
 

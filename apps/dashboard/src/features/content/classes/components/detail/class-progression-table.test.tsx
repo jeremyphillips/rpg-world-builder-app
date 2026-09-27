@@ -34,10 +34,9 @@ describe('ClassProgressionTable', () => {
     expect(rowText(9)).toMatch(/4.*\+3/)
   })
 
-  it('renders the progression heading and level rows for a spellcaster', () => {
+  it('renders level rows for a spellcaster', () => {
     renderProgressionTable({ characterClass: pickClass('bard') })
 
-    expect(screen.getByRole('heading', { name: 'Class Progression' })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: 'Level' })).toBeInTheDocument()
 
     const rows = screen.getAllByRole('row')

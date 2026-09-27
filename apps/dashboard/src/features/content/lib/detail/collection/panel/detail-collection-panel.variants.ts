@@ -9,6 +9,7 @@ export const detailCollectionPanelHeaderVariants = cva('border-b border-border-s
     surface: {
       card: 'bg-card',
       subtle: 'bg-surface-subtle',
+      muted: 'bg-muted',
     },
   },
   defaultVariants: {
@@ -32,6 +33,7 @@ export const detailCollectionPanelBodyVariants = cva('', {
   variants: {
     surface: {
       subtle: 'bg-surface-subtle',
+      faint: 'bg-surface-faint',
       transparent: 'bg-transparent',
     },
   },

@@ -4,7 +4,7 @@ import { Text } from '@rpg/ui'
 import { useFilterState } from '@rpg/ui/filters'
 
 import { PageHeader } from '@/components/layout/page/page-header'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region'
 
@@ -62,11 +62,11 @@ export function AdminUserCampaignsTable() {
 
 export function AdminUserCampaignsPage() {
   return (
-    <WidePage rhythm="list">
+    <PageShell width="full" rhythm="list">
       <PageHeader heading="Campaigns" />
       <Text variant="muted">Campaigns this user owns, co-owns, or has joined.</Text>
       <AdminUserContextLine />
       <AdminUserCampaignsTable />
-    </WidePage>
+    </PageShell>
   )
 }

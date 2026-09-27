@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 
 import { CampaignOverviewInvitationsSection } from '../components/overview/campaign-overview-invitations-section'
@@ -22,7 +22,7 @@ export function CampaignDetail() {
   const campaign = campaigns?.find((item) => item.id === campaignId)
 
   return (
-    <NarrowPage rhythm="list">
+    <PageShell width="wide" rhythm="list">
       <CampaignBannerUploadAlert />
       {campaign && campaignId ? (
         <CampaignOverviewHero
@@ -62,6 +62,6 @@ export function CampaignDetail() {
           ) : null}
         </div>
       </PageLoadState>
-    </NarrowPage>
+    </PageShell>
   )
 }

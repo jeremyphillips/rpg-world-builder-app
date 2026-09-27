@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+import { RichTextContent } from '@rpg/ui'
 import type { Location } from '@rpg/contracts'
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/page/wide-page'
 import { useCanManageCampaign } from '@/features/campaign'
 import {
   formatContentListLoadErrorMessage,
@@ -45,41 +45,44 @@ export function LocationDetailContent({
   )
 
   return (
-    <WidePage>
-      <ContentDetailLayout
-        contentTypeKey="locations"
-        name={location.name}
-        nameBadge={<ContentStatusNameBadge status={location.status} />}
-        displayImage={getContentDisplayImage(
-          buildLocationContentDisplayImageInput(location, 'detail'),
-        )}
-        displayFallback={resolveDashboardDetailDisplayFallback('location')}
-        imageName={location.name}
-        campaignId={campaignId}
-        editHref={contentEditHref('locations', campaignId, location.id)}
-        metadata={
-          <LocationDetailMetadata
-            location={location}
-            campaignId={campaignId}
-            locations={locations}
-            identity={viewModel.identity}
-          />
-        }
-        descriptionHtml={viewModel.description}
-      >
-        <div className="space-y-8">
-          <LocationChildrenSection
-            childrenViewModel={viewModel.children}
-            canManage={canManage}
-            parentLocationId={location.id}
-            parentKind={location.kind}
-            campaignId={campaignId}
-            campaignLocations={locations}
-          />
-          <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
-        </div>
-      </ContentDetailLayout>
-    </WidePage>
+    <ContentDetailLayout
+      contentTypeKey="locations"
+      name={location.name}
+      nameBadge={<ContentStatusNameBadge status={location.status} />}
+      displayImage={getContentDisplayImage(
+        buildLocationContentDisplayImageInput(location, 'detail'),
+      )}
+      displayFallback={resolveDashboardDetailDisplayFallback('location')}
+      imageName={location.name}
+      campaignId={campaignId}
+      editHref={contentEditHref('locations', campaignId, location.id)}
+      metadata={
+        <LocationDetailMetadata
+          location={location}
+          campaignId={campaignId}
+          locations={locations}
+          identity={viewModel.identity}
+        />
+      }
+      heroDescription={false}
+      descriptionContent={
+        viewModel.description ? (
+          <RichTextContent html={viewModel.description} size="md" tone="muted" />
+        ) : undefined
+      }
+    >
+      <div className="space-y-8">
+        <LocationChildrenSection
+          childrenViewModel={viewModel.children}
+          canManage={canManage}
+          parentLocationId={location.id}
+          parentKind={location.kind}
+          campaignId={campaignId}
+          campaignLocations={locations}
+        />
+        <LocationConnectedPartiesDetailSections campaignId={campaignId} location={location} />
+      </div>
+    </ContentDetailLayout>
   )
 }
 

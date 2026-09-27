@@ -6,6 +6,8 @@ import { UsageReferencesSection } from './usage-references-section'
 export type UsageReferencesQuerySectionProps = {
   campaignId: string
   heading?: string
+  /** When true, parent chrome owns the section heading (e.g. ContentDetailSection). */
+  embedded?: boolean
   isPending: boolean
   isError: boolean
   errorMessage?: string
@@ -13,10 +15,10 @@ export type UsageReferencesQuerySectionProps = {
   references?: VocabularyUsageReference[]
 }
 
-/** Explicit pending | empty | error | ready states for usage reference sections. */
-export function UsageReferencesQuerySection({
+function UsageReferencesQueryBody({
   campaignId,
-  heading = 'Used by',
+  heading,
+  embedded,
   isPending,
   isError,
   errorMessage = 'Could not load usage references.',
@@ -25,23 +27,27 @@ export function UsageReferencesQuerySection({
 }: UsageReferencesQuerySectionProps) {
   if (isPending) {
     return (
-      <section aria-busy="true" aria-label={heading}>
-        <Heading variant="group" as="h3" className="mb-2">
-          {heading}
-        </Heading>
+      <div aria-busy="true" aria-label={heading}>
+        {!embedded ? (
+          <Heading variant="group" as="h3" className="mb-2">
+            {heading}
+          </Heading>
+        ) : null}
         <Text variant="muted" className="text-sm">
           Loading usage references…
         </Text>
-      </section>
+      </div>
     )
   }
 
   if (isError) {
     return (
-      <section aria-label={heading}>
-        <Heading variant="group" as="h3" className="mb-2">
-          {heading}
-        </Heading>
+      <div aria-label={heading}>
+        {!embedded ? (
+          <Heading variant="group" as="h3" className="mb-2">
+            {heading}
+          </Heading>
+        ) : null}
         <Alert
           variant="destructive"
           title={errorMessage}
@@ -53,22 +59,41 @@ export function UsageReferencesQuerySection({
             ) : undefined
           }
         />
-      </section>
+      </div>
     )
   }
 
   if (!references || references.length === 0) {
     return (
-      <section aria-label={heading}>
-        <Heading variant="group" as="h3" className="mb-2">
-          {heading}
-        </Heading>
+      <div aria-label={heading}>
+        {!embedded ? (
+          <Heading variant="group" as="h3" className="mb-2">
+            {heading}
+          </Heading>
+        ) : null}
         <Text variant="muted" className="text-sm">
           Nothing references this yet.
         </Text>
-      </section>
+      </div>
     )
   }
 
-  return <UsageReferencesSection campaignId={campaignId} references={references} />
+  return (
+    <UsageReferencesSection campaignId={campaignId} references={references} embedded={embedded} />
+  )
+}
+
+/** Explicit pending | empty | error | ready states for usage reference sections. */
+export function UsageReferencesQuerySection(props: UsageReferencesQuerySectionProps) {
+  const heading = props.heading ?? 'Used by'
+
+  if (props.embedded) {
+    return <UsageReferencesQueryBody {...props} heading={heading} />
+  }
+
+  return (
+    <section aria-label={heading}>
+      <UsageReferencesQueryBody {...props} heading={heading} />
+    </section>
+  )
 }

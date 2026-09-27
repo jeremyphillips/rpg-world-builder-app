@@ -237,9 +237,9 @@ Rules:
   `itemCount`, `emptyLabel`, and typed `action` / `headerAction` only.
 - One Add chrome everywhere: `Button variant="text" size="sm" density="compact"` + Lucide `Plus`
   - feature-owned label (neutral tone — omit `tone`). No literal `+ ` text prefixes.
-- Horizontal inset/measure is owned by the detail primitives (`DetailCollectionGroup` `px-4`, page
-  `max-w-narrow-content`). Features must not position actions with local `max-w-*`, margins, or
-  padding wrappers.
+- Horizontal inset/measure is owned by the route `PageShell` width and detail collection primitives
+  (`DetailCollectionGroup` `px-4`). Features must not position actions with local page-level
+  `max-w-*`, margins, or padding wrappers.
 
 ### Subgroup header actions
 

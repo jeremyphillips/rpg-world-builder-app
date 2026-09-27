@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import type { Species } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/page/wide-page'
 import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
@@ -45,26 +44,22 @@ export function SpeciesDetailContent({ species, campaignId }: SpeciesDetailConte
   })
 
   return (
-    <WidePage>
-      <SpeciesDetailBody
-        name={species.name}
-        nameBadge={<ContentStatusNameBadge status={species.status} />}
-        displayImage={getContentDisplayImage(
-          buildSpeciesContentDisplayImageInput(species, 'detail'),
-        )}
-        displayFallback={resolveDashboardDetailDisplayFallback('species')}
-        imageName={species.name}
-        viewModel={viewModel}
+    <SpeciesDetailBody
+      name={species.name}
+      nameBadge={<ContentStatusNameBadge status={species.status} />}
+      displayImage={getContentDisplayImage(buildSpeciesContentDisplayImageInput(species, 'detail'))}
+      displayFallback={resolveDashboardDetailDisplayFallback('species')}
+      imageName={species.name}
+      viewModel={viewModel}
+      campaignId={campaignId}
+      editHref={contentEditHref('species', campaignId, species.id)}
+    >
+      <ContentUsageReferencesSection
         campaignId={campaignId}
-        editHref={contentEditHref('species', campaignId, species.id)}
-      >
-        <ContentUsageReferencesSection
-          campaignId={campaignId}
-          routeKey="species"
-          entityId={species.id}
-        />
-      </SpeciesDetailBody>
-    </WidePage>
+        routeKey="species"
+        entityId={species.id}
+      />
+    </SpeciesDetailBody>
   )
 }
 

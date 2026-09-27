@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { skillSlugsFromClassChoices } from '@rpg/contracts'
 
@@ -17,6 +17,9 @@ vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
 }))
 vi.mock('../../lib/usage/content-usage-references-section', () => ({
   ContentUsageReferencesSection: () => null,
+}))
+vi.mock('../../lib/detail/page/content-detail-section-nav', () => ({
+  ContentDetailSectionNav: () => null,
 }))
 vi.mock('@/features/homebrew', () => ({
   useRulesetPatch: vi.fn(() => ({
@@ -154,7 +157,7 @@ describe('ClassDetailContent features', () => {
     renderClassDetail()
 
     expect(screen.getByRole('heading', { name: 'Fighter Class Features' })).toBeInTheDocument()
-    expect(screen.getByText('Second Wind')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Second Wind', level: 3 })).toBeInTheDocument()
   })
 })
 
@@ -181,9 +184,9 @@ describe('ClassDetailContent subclassing gate', () => {
 
     expect(screen.queryByRole('heading', { name: 'Subclasses' })).not.toBeInTheDocument()
     expect(screen.queryByText('Champion')).not.toBeInTheDocument()
-    expect(screen.queryByText('Fighter Subclass')).not.toBeInTheDocument()
+    expect(screen.queryByText('Pursue Physical Excellence in Combat')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Fighter Class Features' })).toBeInTheDocument()
-    expect(screen.getByText('Second Wind')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Second Wind', level: 3 })).toBeInTheDocument()
   })
 
   it('shows subclass sections when subclassing is enabled', () => {
@@ -202,8 +205,12 @@ describe('ClassDetailContent subclassing gate', () => {
 
     renderClassDetail({ subclasses: SUBCLASSES_FOR_FIGHTER })
 
-    expect(screen.getByRole('heading', { name: 'Subclasses' })).toBeInTheDocument()
-    expect(screen.getByText('Champion')).toBeInTheDocument()
-    expect(screen.getByText('Fighter Subclass')).toBeInTheDocument()
+    const subclassesSection = screen.getByRole('region', { name: 'Subclasses' })
+    expect(
+      within(subclassesSection).getByRole('heading', { name: 'Champion', level: 3 }),
+    ).toBeInTheDocument()
+    expect(
+      within(subclassesSection).getByText('Pursue Physical Excellence in Combat'),
+    ).toBeInTheDocument()
   })
 })

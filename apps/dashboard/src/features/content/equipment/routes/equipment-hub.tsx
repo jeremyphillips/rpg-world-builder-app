@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Card, CardHeader, CardTitle } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 
@@ -18,7 +18,7 @@ type EquipmentHubContentProps = {
 
 export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       <PageHeader heading={getContentTypeCollectionLabel('equipment')} />
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {EQUIPMENT_FAMILY_PATHS.map((family) => (
@@ -36,7 +36,7 @@ export function EquipmentHubContent({ campaignId }: EquipmentHubContentProps) {
           </li>
         ))}
       </ul>
-    </WidePage>
+    </PageShell>
   )
 }
 

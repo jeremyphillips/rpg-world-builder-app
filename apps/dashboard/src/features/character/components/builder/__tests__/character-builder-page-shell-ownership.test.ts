@@ -12,11 +12,11 @@ const BUILDER_HOSTS = [
 ] as const
 
 describe('CharacterBuilderPageShell ownership', () => {
-  it.each(BUILDER_HOSTS)('%s does not import ViewportWorkspace or WidePage', (relativePath) => {
+  it.each(BUILDER_HOSTS)('%s does not import layout page shell primitives', (relativePath) => {
     const source = readFileSync(join(REPO_ROOT, relativePath), 'utf8')
 
     expect(source).not.toMatch(/ViewportWorkspace/)
-    expect(source).not.toMatch(/WidePage/)
+    expect(source).not.toMatch(/@\/components\/layout\/page\/page-shell/)
     expect(source).toMatch(/CharacterBuilderPageShell/)
   })
 })

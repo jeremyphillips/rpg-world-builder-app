@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Heading } from '@rpg/ui'
 
 import { PageLoadState, type PageLoadStateProps } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { CHARACTER_SHEET_ERROR_LABELS } from '../../lib/detail/character-sheet-error-labels'
 
@@ -28,7 +28,7 @@ export function CharacterSheetDetailShell({
   children,
 }: CharacterSheetDetailShellProps) {
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       {scope === 'campaign' ? (
         <Heading variant="page" as="h1" className="mb-6">
           Campaign character
@@ -44,6 +44,6 @@ export function CharacterSheetDetailShell({
       >
         {children}
       </PageLoadState>
-    </WidePage>
+    </PageShell>
   )
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 export type HomebrewDetailShellProps = {
   nav: ReactNode
@@ -23,11 +23,11 @@ export type HomebrewDetailShellProps = {
  */
 export function HomebrewDetailShell({ nav, children }: HomebrewDetailShellProps) {
   return (
-    <WidePage rhythm="list">
+    <PageShell width="wide" rhythm="list">
       <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch">
         {nav}
-        <div className="mx-auto min-w-0 w-full max-w-xl flex-1 overflow-visible">{children}</div>
+        <div className="min-w-0 w-full flex-1 overflow-visible">{children}</div>
       </div>
-    </WidePage>
+    </PageShell>
   )
 }

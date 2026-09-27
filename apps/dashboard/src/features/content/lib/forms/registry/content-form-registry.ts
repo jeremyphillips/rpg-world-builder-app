@@ -177,7 +177,7 @@ export interface ContentFormDef<
    */
   coverage?: 'structural' | 'roundtrip-only'
   /**
-   * When set, create/edit shells use WidePage and reserve the preview rail slot.
+   * When set, create/edit shells use PageShell width="wide" and reserve the preview rail slot.
    * Projection builders are required when `preview` is present.
    */
   preview?: ContentFormPreviewConfig<TFormValues, TPreviewResources>

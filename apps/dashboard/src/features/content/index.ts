@@ -70,6 +70,15 @@ export type {
 } from './lib/relationship/list/relationship-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
+export {
+  ContentDetailSection,
+  ContentDetailSectionItem,
+} from './lib/detail/page/content-detail-section'
+export type {
+  ContentDetailSectionItemProps,
+  ContentDetailSectionProps,
+} from './lib/detail/page/content-detail-section'
+export { contentDetailNavItemId } from './lib/detail/page/content-detail-nav-anchor-id'
 export { detailCollectionRecordSeparatorVariants } from './lib/detail/collection/detail-collection-chrome.variants'
 export type { DetailOverflowAction } from './lib/detail/detail-overflow-menu'
 export { buildLocationConnectedPartyCharactersById } from './locations/lib/connected-parties/location-connected-party-character-options.lib'

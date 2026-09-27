@@ -8,7 +8,7 @@ export interface PageHeaderProps {
   actions?: ReactNode
 }
 
-/** Page title row with optional actions — composes inside NarrowPage or WidePage. */
+/** Page title row with optional actions — composes inside PageShell. */
 export function PageHeader({ heading, actions }: PageHeaderProps) {
   return (
     <div className={actions ? 'flex items-center justify-between gap-4' : undefined}>

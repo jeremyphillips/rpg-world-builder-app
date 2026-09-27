@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 
 import { PageHeader } from '@/components/layout/page/page-header'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 import { useCanManageCampaign } from '@/features/campaign'
 import {
@@ -50,7 +50,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
   )
 
   return (
-    <WidePage rhythm="relaxed">
+    <PageShell width="full" rhythm="relaxed">
       <PageHeader heading={GAME_TERMS_HUB_LABEL} />
       <Text variant="muted">{GAME_TERMS_HUB_DESCRIPTION}</Text>
 
@@ -89,7 +89,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
             })}
         </ul>
       </PageLoadState>
-    </WidePage>
+    </PageShell>
   )
 }
 

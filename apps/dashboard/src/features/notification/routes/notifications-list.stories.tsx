@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
@@ -36,7 +36,7 @@ const previewItems = [
 
 function NotificationsListPagePreview() {
   return (
-    <NarrowPage rhythm="compact">
+    <PageShell width="narrow" rhythm="compact">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader
           heading={NOTIFICATION_COPY.title}
@@ -65,7 +65,7 @@ function NotificationsListPagePreview() {
         isFetchNextPageError={false}
         onLoadMore={() => undefined}
       />
-    </NarrowPage>
+    </PageShell>
   )
 }
 

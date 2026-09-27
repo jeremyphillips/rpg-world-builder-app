@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Heading, RichTextContent, Text } from '@rpg/ui'
+import type { ContentTable } from '@rpg/contracts'
 import {
   type ContentDisplayFallback,
   type ContentDisplayImage,
@@ -7,14 +8,22 @@ import {
   type Subclass,
 } from '@rpg/contracts'
 
+import { ContentTableView } from '../../../components/tables/content-table-view'
 import { ContentDetailLayout } from '../../../lib/detail/page/content-detail-layout'
+import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
+import {
+  ContentDetailSection,
+  ContentDetailSectionItem,
+} from '../../../lib/detail/page/content-detail-section'
 import { ClassProficienciesSection } from './class-proficiencies-section'
-import { ClassFeatureItem as ClassFeatureRow } from './class-feature-item'
 import {
   type ClassDetailViewModel,
   type ClassDisplayVocabulary,
   type ClassFeatureDetailItem,
 } from '../../lib/class-display'
+
+const FEATURES_HEADING_ID = 'features-heading'
+const SUBCLASSES_HEADING_ID = 'subclasses-heading'
 
 function SubclassFeaturesList({ features }: { features: Subclass['features'] }) {
   if (features.length === 0) return null
@@ -22,7 +31,14 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
   return (
     <ul className="mt-4 space-y-4" role="list">
       {sorted.map((feature) => (
-        <ClassFeatureRow key={feature.id} feature={feature} />
+        <li key={feature.id} className="space-y-2">
+          <Heading variant="label" as="p">
+            {`Level ${feature.level}: ${feature.name}`}
+          </Heading>
+          {feature.description ? (
+            <RichTextContent html={feature.description} size="md" tone="muted" />
+          ) : null}
+        </li>
       ))}
     </ul>
   )
@@ -30,28 +46,51 @@ function SubclassFeaturesList({ features }: { features: Subclass['features'] }) 
 
 function SubclassesList({ subclasses }: { subclasses: Subclass[] }) {
   if (subclasses.length === 0) return null
+
   return (
-    <section aria-labelledby="subclasses-heading">
-      <Heading variant="section" as="h2" id="subclasses-heading" className="mb-4">
-        Subclasses
-      </Heading>
+    <ContentDetailSection heading="Subclasses" headingId={SUBCLASSES_HEADING_ID}>
       <ul className="space-y-6" role="list">
         {subclasses.map((sub) => (
-          <li key={sub.id} className="space-y-2">
-            <Heading variant="label" as="p">
-              {sub.name}
-            </Heading>
-            {sub.tagline && (
-              <Text variant="small" className="italic">
-                {sub.tagline}
-              </Text>
-            )}
-            {sub.description && <RichTextContent html={sub.description} size="md" tone="muted" />}
-            <SubclassFeaturesList features={sub.features} />
+          <li key={sub.id}>
+            <ContentDetailSectionItem
+              id={contentDetailNavItemId('subclass', sub.id)}
+              label={sub.name}
+            >
+              {sub.tagline ? (
+                <Text variant="small" className="italic">
+                  {sub.tagline}
+                </Text>
+              ) : null}
+              {sub.description ? (
+                <RichTextContent html={sub.description} size="md" tone="muted" />
+              ) : null}
+              <SubclassFeaturesList features={sub.features} />
+            </ContentDetailSectionItem>
           </li>
         ))}
       </ul>
-    </section>
+    </ContentDetailSection>
+  )
+}
+
+function ClassFeatureDetailRow({ item }: { item: ClassFeatureDetailItem }) {
+  const inlineTables = (item.tables ?? []).filter((table) => table.kind === 'general')
+
+  return (
+    <ContentDetailSectionItem
+      id={contentDetailNavItemId('feature', item.id)}
+      label={item.title}
+      navLabel={`Level ${item.level}: ${item.title}`}
+    >
+      {item.bodyHtml ? <RichTextContent html={item.bodyHtml} size="md" tone="muted" /> : null}
+      {inlineTables.length > 0 ? (
+        <div className="space-y-4">
+          {inlineTables.map((table: ContentTable) => (
+            <ContentTableView key={table.id} table={table} />
+          ))}
+        </div>
+      ) : null}
+    </ContentDetailSectionItem>
   )
 }
 
@@ -61,29 +100,15 @@ function ClassFeaturesSection({
   section: Extract<ClassDetailViewModel['sections'][number], { id: 'features' }>
 }) {
   return (
-    <section aria-labelledby="features-heading">
-      <Heading variant="section" as="h2" id="features-heading" className="mb-4">
-        {section.title}
-      </Heading>
+    <ContentDetailSection heading={section.title} headingId={FEATURES_HEADING_ID}>
       <ul className="space-y-4" role="list">
         {section.items.map((item) => (
-          <ClassFeatureDetailRow key={item.id} item={item} />
+          <li key={item.id}>
+            <ClassFeatureDetailRow item={item} />
+          </li>
         ))}
       </ul>
-    </section>
-  )
-}
-
-function ClassFeatureDetailRow({ item }: { item: ClassFeatureDetailItem }) {
-  return (
-    <ClassFeatureRow
-      feature={{
-        level: item.level,
-        name: item.title,
-        description: item.bodyHtml,
-        tables: item.tables,
-      }}
-    />
+    </ContentDetailSection>
   )
 }
 
@@ -134,10 +159,12 @@ export type ClassDetailBodyProps = {
   skillsPending: boolean
   vocabulary: ClassDisplayVocabulary
   editHref?: string
+  progressionTable?: ReactNode
   children?: ReactNode
+  pageShell?: boolean
 }
 
-/** View-model-driven class detail composition — no route chrome, usage, or progression table. */
+/** View-model-driven class detail composition — no route chrome or usage section. */
 export function ClassDetailBody({
   name,
   nameBadge,
@@ -152,10 +179,13 @@ export function ClassDetailBody({
   skillsPending,
   vocabulary,
   editHref,
+  progressionTable,
   children,
+  pageShell,
 }: ClassDetailBodyProps) {
   return (
     <ContentDetailLayout
+      pageShell={pageShell}
       contentTypeKey="classes"
       name={name}
       nameBadge={nameBadge}
@@ -165,7 +195,12 @@ export function ClassDetailBody({
       campaignId={campaignId}
       editHref={editHref}
       statRows={viewModel.statRows}
-      descriptionHtml={viewModel.descriptionHtml}
+      heroDescription={false}
+      descriptionContent={
+        viewModel.descriptionHtml ? (
+          <RichTextContent html={viewModel.descriptionHtml} size="md" tone="muted" />
+        ) : undefined
+      }
     >
       <ClassDetailSections
         sections={viewModel.sections}
@@ -175,6 +210,7 @@ export function ClassDetailBody({
         vocabulary={vocabulary}
       />
       {subclassingEnabled ? <SubclassesList subclasses={subclasses} /> : null}
+      {progressionTable}
       {children}
     </ContentDetailLayout>
   )

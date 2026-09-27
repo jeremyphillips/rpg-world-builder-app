@@ -8,7 +8,7 @@ import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
 import {
   resolveContentFormLayout,
@@ -313,12 +313,12 @@ export function ContentCreateShell({
 
   if (!layout) {
     return (
-      <NarrowPage>
+      <PageShell width="narrow">
         <Heading variant="page" as="h1">
           {heading}
         </Heading>
         {formContent}
-      </NarrowPage>
+      </PageShell>
     )
   }
 

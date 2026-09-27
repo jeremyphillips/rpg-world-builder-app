@@ -8,7 +8,7 @@ import type {
 } from '@rpg/contracts'
 import { Heading, InsetPanel } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { weaponAdvisorySubmitOptions } from '../../../../equipment/weapons'
 import { resolveContentFormValueSyncs } from '../host/content-form-host-projection'
 import { useContentFormOptions } from '../../../form-options/content-form-options'
@@ -38,12 +38,12 @@ export function ContentFormComingSoon() {
 
 export function ContentFormNotRegistered({ heading = 'Edit' }: { heading?: string }) {
   return (
-    <NarrowPage rhythm="relaxed" className="pb-10">
+    <PageShell width="narrow" rhythm="relaxed" className="pb-10">
       <Heading variant="page" as="h1">
         {heading}
       </Heading>
       <ContentFormComingSoon />
-    </NarrowPage>
+    </PageShell>
   )
 }
 

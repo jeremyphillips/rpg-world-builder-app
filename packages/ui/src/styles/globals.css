@@ -185,8 +185,9 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-card: var(--radius-card);
 
-  /* Layout — readable body column nested inside full-width page shells. */
-  --max-width-narrow-content: 41.25rem; /* ~660px */
+  /* Layout — dashboard page shells (one cap per route via PageShell). */
+  --max-width-page-wide: 80rem; /* ~1280px — Tailwind max-w-7xl */
+  --max-width-page-narrow: 56rem; /* ~896px — aligns with legacy max-w-4xl */
 
   /*
    * Type scale — SSOT for Tailwind `text-*` utilities (@ 16px root).

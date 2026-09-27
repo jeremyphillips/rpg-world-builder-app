@@ -3,7 +3,7 @@ import { InviteInvalidSegmentState } from '@rpg/campaign-invite'
 import { useParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { CampaignInviteReviewPage } from '../components/campaign-invite-review-page'
 
@@ -12,12 +12,12 @@ export function CampaignInviteReviewRoute() {
   const parsedInviteId = inviteId && isCampaignInviteId(inviteId) ? inviteId : null
 
   return (
-    <NarrowPage rhythm="compact">
+    <PageShell width="narrow" rhythm="compact">
       {parsedInviteId ? (
         <CampaignInviteReviewPage inviteId={parsedInviteId} />
       ) : (
         <InviteInvalidSegmentState navigation={{ homeHref: ROUTES.home }} />
       )}
-    </NarrowPage>
+    </PageShell>
   )
 }

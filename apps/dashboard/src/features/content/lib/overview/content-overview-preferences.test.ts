@@ -14,8 +14,8 @@ import {
 } from './content-overview-preferences'
 
 const columnSchema = {
-  ids: ['image', 'name', 'status', 'source', 'actions'],
-  lockedIds: ['image', 'name', 'actions'],
+  ids: ['overview-display-image', 'name', 'status', 'source', 'actions'],
+  lockedIds: ['overview-display-image', 'name', 'actions'],
 } as const
 
 describe('content-overview-preferences', () => {
@@ -34,7 +34,7 @@ describe('content-overview-preferences', () => {
       {
         version: 2,
         columnVisibility: {
-          image: false,
+          'overview-display-image': false,
           name: false,
           status: false,
           removed: true,
@@ -48,17 +48,19 @@ describe('content-overview-preferences', () => {
       version: 2,
       columnVisibility: {
         actions: true,
-        image: true,
+        'overview-display-image': true,
         name: true,
         status: false,
       },
-      columnOrder: ['status', 'name', 'image', 'source', 'actions'],
+      columnOrder: ['overview-display-image', 'status', 'name', 'source', 'actions'],
     })
   })
 
   it('rejects invalid payloads', () => {
     expect(validateContentOverviewPreferences({ version: 1 }, columnSchema)).toBeNull()
-    expect(validateContentOverviewPreferences({ version: 2, pageSize: 15 }, columnSchema)).toBeNull()
+    expect(
+      validateContentOverviewPreferences({ version: 2, pageSize: 15 }, columnSchema),
+    ).toBeNull()
     expect(
       validateContentOverviewPreferences({ version: 2, columnVisibility: 'bad' }, columnSchema),
     ).toBeNull()
@@ -77,6 +79,22 @@ describe('content-overview-preferences', () => {
     expect(hydrateContentOverviewPreferences('classes', columnSchema)).toEqual(
       createDefaultContentOverviewPreferences(),
     )
+  })
+
+  it('remaps legacy image column ids and pins the display image column first', () => {
+    const validated = validateContentOverviewPreferences(
+      {
+        version: 2,
+        columnOrder: ['name', 'traits', 'image'],
+      },
+      {
+        ids: ['overview-display-image', 'name', 'traits', 'status', 'source', 'actions'],
+        lockedIds: ['overview-display-image', 'name', 'actions'],
+      },
+    )
+
+    expect(validated?.columnOrder?.[0]).toBe('overview-display-image')
+    expect(validated?.columnOrder).toContain('traits')
   })
 
   it('persists validated preferences', () => {

@@ -7,7 +7,10 @@ import {
 } from '@rpg/contracts'
 import { Card, CardContent, Eyebrow, Heading, Text } from '@rpg/ui'
 
-import { narrowPageContentClasses } from '@/components/layout/page/page-content.variants'
+import { PageShell } from '@/components/layout/page/page-shell'
+import type { PageRhythm, PageShellInset } from '@/components/layout/page/page-spacing.variants'
+
+import { ContentDetailBody } from './content-detail-body'
 import { useSetPageChromeActions } from '@/components/layout/page-chrome/use-set-page-chrome-actions'
 import { useCanManageCampaign } from '@/features/campaign'
 import { getContentTypeItemLabel } from '@/features/content/lib/content-type-labels'
@@ -61,14 +64,19 @@ export type ContentDetailLayoutProps = {
   descriptionContent?: ReactNode
   /** Additional sections in the narrow body column below `descriptionContent`. */
   children?: ReactNode
+  /** When false, omits the page shell (modal preview embeds). Default true. */
+  pageShell?: boolean
+  /** PageShell rhythm when `pageShell` is true. Default `relaxed`. */
+  rhythm?: PageRhythm
+  /** PageShell vertical inset when `pageShell` is true. Default `page`. */
+  spacing?: PageShellInset
 }
 
 /**
  * Catalog content detail layout: sticky header actions, hero card (eyebrow, name, metadata, image),
- * and a `max-w-narrow-content` body column for prose sections.
+ * optional scroll-spy nav rail, and bordered section panels in the body column.
  *
- * Wrap in `WidePage`. Render full-width sections (e.g. progression tables) as `WidePage`
- * siblings outside this layout.
+ * Renders inside `PageShell width="wide"` by default. Wide tables and sections belong in the body as panels.
  */
 // fallow-ignore-next-line complexity
 export function ContentDetailLayout({
@@ -87,6 +95,9 @@ export function ContentDetailLayout({
   heroDescription = true,
   descriptionContent,
   children,
+  pageShell = true,
+  rhythm = 'relaxed',
+  spacing = 'page',
 }: ContentDetailLayoutProps) {
   const canManage = useCanManageCampaign(campaignId)
   const showEdit = Boolean(canManage && editHref)
@@ -110,7 +121,7 @@ export function ContentDetailLayout({
     heroDescription && descriptionHtml ? stripHtmlTags(descriptionHtml).trim() : undefined
   const hasBody = Boolean(descriptionContent || children)
 
-  return (
+  const content = (
     <div className={contentDetailRootClasses}>
       <Card className={contentDetailHeroCardClasses}>
         <CardContent className={contentDetailHeroCardContentClasses}>
@@ -157,11 +168,18 @@ export function ContentDetailLayout({
       </Card>
 
       {hasBody ? (
-        <div className={narrowPageContentClasses}>
-          {descriptionContent}
-          {children}
-        </div>
+        <ContentDetailBody descriptionContent={descriptionContent}>{children}</ContentDetailBody>
       ) : null}
     </div>
+  )
+
+  if (!pageShell) {
+    return content
+  }
+
+  return (
+    <PageShell width="wide" rhythm={rhythm} spacing={spacing}>
+      {content}
+    </PageShell>
   )
 }

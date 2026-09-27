@@ -8,10 +8,9 @@ import {
 } from '@/features/message/components/workspace/messages-workspace.variants'
 
 import { pageShellInsetTopClasses } from '../page/page-spacing.variants'
-import { NarrowPage } from '../page/narrow-page'
+import { PageShell } from '../page/page-shell'
 import { viewportWorkspaceClasses } from '../page/viewport-workspace.variants'
 import { ViewportWorkspace } from '../page/viewport-workspace'
-import { WidePage } from '../page/wide-page'
 import {
   appShellContentColumnClasses,
   appShellMainClasses,
@@ -55,21 +54,21 @@ describe('AppShell route scroll ownership', () => {
     )
   })
 
-  it('WidePage has no overflow classes', () => {
+  it('PageShell full width has no overflow classes', () => {
     const { container } = render(
-      <WidePage>
+      <PageShell width="full">
         <p>Body</p>
-      </WidePage>,
+      </PageShell>,
     )
     const root = container.firstElementChild
     expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')
   })
 
-  it('NarrowPage has no overflow classes', () => {
+  it('PageShell narrow width has no overflow classes', () => {
     const { container } = render(
-      <NarrowPage>
+      <PageShell width="narrow">
         <p>Body</p>
-      </NarrowPage>,
+      </PageShell>,
     )
     const root = container.firstElementChild
     expect(root).not.toHaveClass('overflow-y-auto', 'overflow-hidden')

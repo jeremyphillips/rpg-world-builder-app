@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { buttonVariants, Heading, Text } from '@rpg/ui'
 
 import { PageHeader } from '@/components/layout/page/page-header'
-import { WidePage } from '@/components/layout/page/wide-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { ROUTES } from '@/app/routes'
 
 import { HomebrewDetailMain } from './homebrew-detail-main'
@@ -51,7 +51,11 @@ export function HomebrewDetailFallback({
   )
 
   if (status === 'unknown') {
-    return <WidePage rhythm="relaxed">{body}</WidePage>
+    return (
+      <PageShell width="full" rhythm="relaxed">
+        {body}
+      </PageShell>
+    )
   }
 
   return <HomebrewDetailMain>{body}</HomebrewDetailMain>

@@ -44,6 +44,51 @@ export function sanitizeOverviewColumnVisibility(
   return Object.keys(sanitized).length > 0 ? sanitized : undefined
 }
 
+/**
+ * Merges persisted column order with schema definition order. Columns present in
+ * `userOrder` keep their relative order; columns omitted from storage stay at
+ * their schema index (e.g. a new leading image column remains first).
+ */
+export function reconcileOverviewColumnOrder(
+  schemaIds: readonly string[],
+  userOrder: readonly string[],
+): string[] {
+  const persisted = userOrder.filter((id) => schemaIds.includes(id))
+  if (persisted.length === 0) return [...schemaIds]
+
+  const schemaIndex = new Map(schemaIds.map((id, index) => [id, index]))
+  const persistedIndex = new Map(persisted.map((id, index) => [id, index]))
+
+  return [...schemaIds].sort((left, right) => {
+    const leftPersisted = persistedIndex.get(left)
+    const rightPersisted = persistedIndex.get(right)
+    if (leftPersisted !== undefined && rightPersisted !== undefined) {
+      return leftPersisted - rightPersisted
+    }
+    return schemaIndex.get(left)! - schemaIndex.get(right)!
+  })
+}
+
+export const OVERVIEW_DISPLAY_IMAGE_COLUMN_ID = 'overview-display-image'
+
+/** Content overview thumbnails stay first even when older prefs persisted them last. */
+export function pinLockedLeadingOverviewColumn(
+  order: readonly string[],
+  columnSchema: OverviewPreferencesColumnSchema,
+): string[] {
+  const leadId = columnSchema.ids[0]
+  const lockedIds = columnSchema.lockedIds ?? []
+  if (
+    leadId !== OVERVIEW_DISPLAY_IMAGE_COLUMN_ID ||
+    !lockedIds.includes(leadId) ||
+    !order.includes(leadId)
+  ) {
+    return [...order]
+  }
+
+  return [leadId, ...order.filter((id) => id !== leadId)]
+}
+
 export function sanitizeOverviewColumnOrder(
   order: unknown,
   columnSchema: OverviewPreferencesColumnSchema,
@@ -52,8 +97,12 @@ export function sanitizeOverviewColumnOrder(
 
   const allowedIds = new Set(columnSchema.ids)
   const known = order.filter((id): id is string => typeof id === 'string' && allowedIds.has(id))
-  const missing = columnSchema.ids.filter((id) => !known.includes(id))
-  const sanitized = [...known, ...missing]
+  if (known.length === 0) return undefined
+
+  const sanitized = pinLockedLeadingOverviewColumn(
+    reconcileOverviewColumnOrder(columnSchema.ids, known),
+    columnSchema,
+  )
 
   return sanitized.length > 0 ? sanitized : undefined
 }

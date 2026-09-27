@@ -1,5 +1,11 @@
-/** Vertical stack for hero card and narrow body column. */
-export const contentDetailRootClasses = 'space-y-6'
+/** Vertical stack for hero card and body shell — width from {@link PageShell}. */
+export const contentDetailRootClasses = 'w-full min-w-0 space-y-6'
+
+/** Nav rail + narrow content column below the hero. */
+export const contentDetailBodyShellClasses = 'flex w-full flex-col gap-6 lg:flex-row lg:items-start'
+
+/** Section stack inside the body column. */
+export const contentDetailBodyColumnClasses = 'min-w-0 w-full flex-1 space-y-6'
 
 /** Hero card — subtle fill inside standard card chrome. */
 export const contentDetailHeroCardClasses = 'overflow-hidden bg-muted'

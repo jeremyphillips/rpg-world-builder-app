@@ -1,6 +1,6 @@
 import { Button } from '@rpg/ui'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageHeader } from '@/components/layout/page/page-header'
 import { pageHeaderSectionGapClasses } from '@/components/layout/page/page-spacing.variants'
 
@@ -33,7 +33,7 @@ export function NotificationsList() {
   } = useNotificationInboxPage()
 
   return (
-    <NarrowPage rhythm="compact">
+    <PageShell width="narrow" rhythm="compact">
       <div className={pageHeaderSectionGapClasses}>
         <PageHeader
           heading={NOTIFICATION_COPY.title}
@@ -74,6 +74,6 @@ export function NotificationsList() {
         }}
         onLoadMore={handleLoadMore}
       />
-    </NarrowPage>
+    </PageShell>
   )
 }

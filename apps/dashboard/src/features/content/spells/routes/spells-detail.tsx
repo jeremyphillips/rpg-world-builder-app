@@ -3,7 +3,6 @@ import { formatSlugAsLabel } from '@rpg/contracts'
 import type { Spell } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
-import { WidePage } from '@/components/layout/page/wide-page'
 import {
   formatContentNotFoundMessage,
   formatContentListLoadErrorMessage,
@@ -47,22 +46,20 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   })
 
   return (
-    <WidePage>
-      <SpellDetailBody
-        name={spell.name}
-        nameBadge={<ContentStatusNameBadge status={spell.status} />}
-        imageName={spell.name}
-        viewModel={viewModel}
+    <SpellDetailBody
+      name={spell.name}
+      nameBadge={<ContentStatusNameBadge status={spell.status} />}
+      imageName={spell.name}
+      viewModel={viewModel}
+      campaignId={campaignId}
+      editHref={contentEditHref('spells', campaignId, spell.id)}
+    >
+      <ContentUsageReferencesSection
         campaignId={campaignId}
-        editHref={contentEditHref('spells', campaignId, spell.id)}
-      >
-        <ContentUsageReferencesSection
-          campaignId={campaignId}
-          routeKey="spells"
-          entityId={spell.id}
-        />
-      </SpellDetailBody>
-    </WidePage>
+        routeKey="spells"
+        entityId={spell.id}
+      />
+    </SpellDetailBody>
   )
 }
 

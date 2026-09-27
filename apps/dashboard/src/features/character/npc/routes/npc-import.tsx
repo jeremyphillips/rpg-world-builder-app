@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { buttonVariants, Heading } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
 import { useCampaignBuildContext } from '@/features/character'
 import { NpcAuthoringGate } from '@/features/character'
@@ -36,7 +36,7 @@ export function NpcImportRoute() {
 
   return (
     <NpcAuthoringGate campaignId={campaignId}>
-      <NarrowPage>
+      <PageShell width="narrow">
         <div className="mb-6 flex items-start justify-between gap-4">
           <Heading variant="page" as="h1">
             Import D&amp;D Beyond NPC
@@ -60,7 +60,7 @@ export function NpcImportRoute() {
             onSaveSuccess={(npcId) => navigate(ROUTES.campaign.npcs.detail(campaignId, npcId))}
           />
         </PageLoadState>
-      </NarrowPage>
+      </PageShell>
     </NpcAuthoringGate>
   )
 }

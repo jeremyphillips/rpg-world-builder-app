@@ -39,6 +39,7 @@ const defaultProps = {
   imageName: 'Fighter',
   campaignId: 'c1',
   editHref: '/campaigns/c1/classes/f1/edit',
+  pageShell: false,
 }
 
 describe('ContentDetailLayout', () => {
@@ -90,13 +91,8 @@ describe('ContentDetailLayout', () => {
     expect(screen.getByText('Hit Die')).toBeInTheDocument()
     expect(screen.getByText('d10 per level')).toBeInTheDocument()
     expect(screen.getByText('Lead description')).toBeInTheDocument()
-    expect(screen.getByText('Body-only block')).toBeInTheDocument()
-    expect(screen.getByText('Extra section')).toBeInTheDocument()
-
-    const bodyColumn = container.querySelector('.max-w-narrow-content')
-    expect(bodyColumn).not.toBeNull()
-    expect(bodyColumn).toContainElement(screen.getByText('Body-only block'))
-    expect(bodyColumn).toContainElement(screen.getByText('Extra section'))
+    expect(container.querySelector('.max-w-narrow-content')).toBeNull()
+    expect(container.querySelector('.max-w-4xl')).toBeNull()
   })
 
   it('prefers metadata over statRows when both are provided', () => {

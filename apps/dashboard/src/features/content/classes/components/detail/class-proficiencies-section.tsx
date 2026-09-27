@@ -7,12 +7,15 @@ import {
   ContentLinkBadge,
   ContentStaticBadge,
 } from '../../../lib/detail/metadata/content-link-badge'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import {
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,
   type ClassDisplayVocabulary,
   type ClassProficienciesViewModel,
 } from '../../lib/class-display'
+
+const PROFICIENCIES_HEADING_ID = 'proficiencies-heading'
 
 type ClassProficienciesSectionProps = {
   section: ClassProficienciesViewModel
@@ -204,10 +207,7 @@ export function ClassProficienciesSection({
   vocabulary,
 }: ClassProficienciesSectionProps) {
   return (
-    <section aria-labelledby="proficiencies-heading">
-      <Heading variant="section" as="h2" id="proficiencies-heading" className="mb-4">
-        {section.title}
-      </Heading>
+    <ContentDetailSection heading={section.title} headingId={PROFICIENCIES_HEADING_ID}>
       <div className="space-y-6">
         <GrantedProficienciesGroup granted={section.granted} />
         <ProficiencyChoicesGroup
@@ -218,6 +218,6 @@ export function ClassProficienciesSection({
           vocabulary={vocabulary}
         />
       </div>
-    </section>
+    </ContentDetailSection>
   )
 }

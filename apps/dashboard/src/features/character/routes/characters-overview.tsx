@@ -7,7 +7,7 @@ import { ROUTES } from '@/app/routes'
 import { CharacterListCard } from '@/features/character'
 import { IndexPageEmptyState, IndexPageIntro } from '@/components/layout/page/index-page-intro'
 import { PageLoadState } from '@/components/layout/page/page-load-state'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacters } from '../hooks/use-characters'
@@ -119,7 +119,7 @@ export function CharactersOverview() {
   )
 
   return (
-    <NarrowPage rhythm="list">
+    <PageShell width="narrow" rhythm="list">
       <IndexPageIntro
         title="Characters"
         description={CHARACTERS_OVERVIEW_COPY.description}
@@ -152,6 +152,6 @@ export function CharactersOverview() {
           </div>
         )}
       </PageLoadState>
-    </NarrowPage>
+    </PageShell>
   )
 }

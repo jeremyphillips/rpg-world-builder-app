@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 import { Heading, Spinner, Text } from '@rpg/ui'
 import { TabbedForm, FormSaveFooter, type TabbedFormTab } from '@rpg/ui/form'
 
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { notifySaveSuccess } from '@/lib/notify'
 import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
@@ -115,9 +115,9 @@ export function CampaignSettings() {
   }
 
   return (
-    <NarrowPage>
+    <PageShell width="narrow">
       <CampaignSettingsHeading />
       {body}
-    </NarrowPage>
+    </PageShell>
   )
 }

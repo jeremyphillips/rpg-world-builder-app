@@ -34,6 +34,44 @@ export const CONTENT_OVERVIEW_PREFERENCES_DEFAULTS: ContentOverviewPreferencesDe
   advancedOpen: false,
 }
 
+/** Persisted column id for overview thumbnails (`buildContentColumns`). */
+export const CONTENT_OVERVIEW_DISPLAY_IMAGE_COLUMN_ID = 'overview-display-image'
+
+const LEGACY_CONTENT_OVERVIEW_IMAGE_COLUMN_ID = 'image'
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function normalizeStoredContentOverviewPreferencesRaw(raw: unknown): unknown {
+  if (!isRecord(raw)) return raw
+
+  const next: Record<string, unknown> = { ...raw }
+
+  if (Array.isArray(raw.columnOrder)) {
+    next.columnOrder = raw.columnOrder.map((id) =>
+      id === LEGACY_CONTENT_OVERVIEW_IMAGE_COLUMN_ID
+        ? CONTENT_OVERVIEW_DISPLAY_IMAGE_COLUMN_ID
+        : id,
+    )
+  }
+
+  if (isRecord(raw.columnVisibility)) {
+    const visibility = { ...raw.columnVisibility }
+    if (
+      LEGACY_CONTENT_OVERVIEW_IMAGE_COLUMN_ID in visibility &&
+      !(CONTENT_OVERVIEW_DISPLAY_IMAGE_COLUMN_ID in visibility)
+    ) {
+      visibility[CONTENT_OVERVIEW_DISPLAY_IMAGE_COLUMN_ID] =
+        visibility[LEGACY_CONTENT_OVERVIEW_IMAGE_COLUMN_ID]
+    }
+    delete visibility[LEGACY_CONTENT_OVERVIEW_IMAGE_COLUMN_ID]
+    next.columnVisibility = visibility
+  }
+
+  return next
+}
+
 const contentOverviewPreferencesStore = createOverviewPreferences({
   keyPrefix: CONTENT_OVERVIEW_PREFERENCES_KEY_PREFIX,
   version: CONTENT_OVERVIEW_PREFERENCES_VERSION,
@@ -76,7 +114,10 @@ export function validateContentOverviewPreferences(
   raw: unknown,
   columnSchema: ContentOverviewColumnSchema,
 ): ContentOverviewPreferences | null {
-  return contentOverviewPreferencesStore.validate(raw, columnSchema)
+  return contentOverviewPreferencesStore.validate(
+    normalizeStoredContentOverviewPreferencesRaw(raw),
+    columnSchema,
+  )
 }
 
 export function createDefaultContentOverviewPreferences(
@@ -91,7 +132,21 @@ export function hydrateContentOverviewPreferences(
   columnSchema: ContentOverviewColumnSchema,
   defaults: ContentOverviewPreferencesDefaults = CONTENT_OVERVIEW_PREFERENCES_DEFAULTS,
 ): ContentOverviewPreferences {
-  return contentOverviewPreferencesStore.hydrate(contentTypeKey, columnSchema, defaults)
+  const stored = readStoredContentOverviewPreferences(contentTypeKey)
+  if (stored === null) {
+    return createDefaultContentOverviewPreferences(defaults)
+  }
+
+  const validated = validateContentOverviewPreferences(stored, columnSchema)
+  if (!validated) {
+    return createDefaultContentOverviewPreferences(defaults)
+  }
+
+  return {
+    ...createDefaultContentOverviewPreferences(defaults),
+    ...validated,
+    version: CONTENT_OVERVIEW_PREFERENCES_VERSION,
+  }
 }
 
 export function persistContentOverviewPreferences(

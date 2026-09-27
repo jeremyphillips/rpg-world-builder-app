@@ -1,5 +1,5 @@
 import { IndexPageIntro } from '@/components/layout/page/index-page-intro'
-import { NarrowPage } from '@/components/layout/page/narrow-page'
+import { PageShell } from '@/components/layout/page/page-shell'
 import { useCampaigns } from '@/features/campaign'
 import { usePendingCampaignInvites } from '@/features/campaign-invite'
 
@@ -34,7 +34,7 @@ export function CampaignsOverview() {
   )
 
   return (
-    <NarrowPage rhythm="relaxed">
+    <PageShell width="narrow" rhythm="relaxed">
       <IndexPageIntro
         title="Campaigns"
         description={description}
@@ -48,6 +48,6 @@ export function CampaignsOverview() {
         pendingInvites={pendingInvitesError ? undefined : pendingInvites}
         newCampaignAction={newCampaignAction}
       />
-    </NarrowPage>
+    </PageShell>
   )
 }
