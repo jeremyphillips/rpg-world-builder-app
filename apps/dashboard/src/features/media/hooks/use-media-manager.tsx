@@ -71,7 +71,8 @@ function resolveAvailableImages(
   }
   return getAvailableContentImages({
     media: value,
-    contentType: contentContext.contentType,
+    domain: contentContext.domain,
+    subject: contentContext.subject,
     slug: contentContext.slug,
     contentSource: contentContext.contentSource,
     rulesetId: contentContext.rulesetId,
@@ -389,7 +390,7 @@ export function useMediaManager({
       const normalizedMedia = contentContext
         ? normalizePersistedContentMedia({
             media: structuredClone(state.media),
-            contentType: contentContext.contentType,
+            subject: contentContext.subject,
             slug: contentContext.slug,
             contentSource: contentContext.contentSource,
             rulesetId: contentContext.rulesetId,

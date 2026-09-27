@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 import { RichTextContent, Text } from '@rpg/ui'
 
 import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
@@ -6,6 +7,7 @@ import { RichTextWithTables } from '../../components/rich-text/rich-text-with-ta
 import { ROUTES } from '@/app/routes'
 import { useClasses } from '../../classes/hooks/use-classes'
 import { ContentDetailLayout } from '../../lib/detail/page/content-detail-layout'
+import type { ContentDetailHeroMediaPresentation } from '../../lib/detail/page/content-detail-layout.types'
 import { contentDetailNavItemId } from '../../lib/detail/page/content-detail-nav-anchor-id'
 import {
   ContentDetailSection,
@@ -173,6 +175,9 @@ export type SpellDetailBodyProps = {
   name: string
   nameBadge?: ReactNode
   imageName: string
+  displayImage?: ContentDisplayImage
+  displayFallback?: ContentDisplayFallback
+  mediaPresentation?: ContentDetailHeroMediaPresentation
   viewModel: SpellDetailViewModel
   campaignId: string
   editHref?: string
@@ -184,6 +189,9 @@ export function SpellDetailBody({
   name,
   nameBadge,
   imageName,
+  displayImage,
+  displayFallback,
+  mediaPresentation,
   viewModel,
   campaignId,
   editHref,
@@ -195,6 +203,9 @@ export function SpellDetailBody({
       name={name}
       nameBadge={nameBadge}
       imageName={imageName}
+      displayImage={displayImage}
+      displayFallback={displayFallback}
+      mediaPresentation={mediaPresentation}
       campaignId={campaignId}
       editHref={editHref}
       heroDescription={false}

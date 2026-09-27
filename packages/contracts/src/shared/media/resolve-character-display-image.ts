@@ -1,4 +1,5 @@
 import type { ContentMedia } from './content-media'
+import { contentTypeSubject } from './system-image-subject'
 import type { ContentDisplaySurface } from './content-display-surface'
 import {
   resolveContentDisplayImage,
@@ -15,10 +16,10 @@ export type ResolveCharacterDisplayImageInput = {
 }
 
 const CHARACTER_REGISTRY_LOOKUP_STUB = {
-  contentType: 'classes',
+  subject: contentTypeSubject('classes'),
   slug: '',
   contentSource: 'homebrew',
-} as const satisfies Pick<ResolveContentDisplayImageInput, 'contentType' | 'slug' | 'contentSource'>
+} as const satisfies Pick<ResolveContentDisplayImageInput, 'subject' | 'slug' | 'contentSource'>
 
 /** Character display resolution — portrait→primary on compact; no catalog system art. */
 export function resolveCharacterDisplayImage(

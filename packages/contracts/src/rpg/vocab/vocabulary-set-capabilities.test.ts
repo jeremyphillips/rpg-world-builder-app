@@ -84,6 +84,7 @@ describe('validateVocabularySetCapabilityImplications', () => {
       batchUsageCounting: false,
       disableGuard: false,
       deleteGuard: false,
+      media: false,
     }
     expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
       'bulkAvailability requires availability',
@@ -102,6 +103,7 @@ describe('validateVocabularySetCapabilityImplications', () => {
       batchUsageCounting: false,
       disableGuard: false,
       deleteGuard: false,
+      media: false,
     }
     expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
       'create requires browse',
@@ -120,6 +122,7 @@ describe('validateVocabularySetCapabilityImplications', () => {
       batchUsageCounting: true,
       disableGuard: false,
       deleteGuard: false,
+      media: false,
     }
     expect(validateVocabularySetCapabilityImplications(cap).map((v) => v.message)).toContain(
       'batchUsageCounting requires usageResolution',
@@ -142,6 +145,7 @@ describe('capability derivation fixture', () => {
         batchUsageCounting: false,
         disableGuard: false,
         deleteGuard: false,
+        media: false,
       },
     } satisfies Record<(typeof VOCABULARY_OPTION_SET_IDS)[number], VocabularySetCapability>
 

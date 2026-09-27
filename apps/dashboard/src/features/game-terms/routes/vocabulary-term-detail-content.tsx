@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   getVocabularyOptionSetTerm,
   getVocabularySetCapability,
   vocabularyOptionSetIdSchema,
@@ -32,25 +33,38 @@ import {
 
 import { GameTermsFallback } from '../lib/detail/game-terms-fallback'
 import { findGameTermsCategory } from '../lib/hub/vocabulary-set-registry'
+import { GameTermDetailMediaField } from '../components/game-term-detail-media-field'
+import { shouldShowGameTermMediaField } from '../lib/vocabulary/vocabulary-term-detail-page.lib'
+import type { MediaManagerSave } from '@/features/media'
+import { vocabularyTermDetailBodyClasses } from './vocabulary-term-detail-content.variants'
 
 type VocabularyTermDetailBodyProps = {
   campaignId: string
   setId: VocabularyOptionSetId
   entry: VocabularyOptionWithUsage
+  singularLabel: string
+  canManageMedia: boolean
   canEdit: boolean
+  showMediaField: boolean
   showUsage: boolean
   onEdit: () => void
+  onSaveMedia: (change: MediaManagerSave) => void | Promise<void>
 }
 
 function VocabularyTermDetailBody({
   campaignId,
   setId,
   entry,
+  singularLabel,
+  canManageMedia,
   canEdit,
+  showMediaField,
   showUsage,
   onEdit,
+  onSaveMedia,
 }: VocabularyTermDetailBodyProps) {
   const { data: usage } = useVocabularyEntryUsage(campaignId, setId, entry.id, showUsage)
+  const rulesetId = DEFAULT_SYSTEM_RULESET_ID
 
   const editAction = canEdit ? (
     <button
@@ -62,20 +76,48 @@ function VocabularyTermDetailBody({
     </button>
   ) : undefined
 
+  const sourceBadge = (
+    <Badge appearance="outline" tone="neutral" size="sm">
+      {getVocabularySourceLabel(entry.source)}
+    </Badge>
+  )
+  const disabledBadge =
+    entry.status === 'disabled' ? (
+      <Badge appearance="outline" tone="warning" size="sm">
+        {VOCABULARY_STATUS_LABELS.disabled}
+      </Badge>
+    ) : null
+
   return (
     <>
-      <PageHeader heading={entry.label} actions={editAction} />
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge appearance="outline" tone="neutral" size="sm">
-          {getVocabularySourceLabel(entry.source)}
-        </Badge>
-        {entry.status === 'disabled' ? (
-          <Badge appearance="outline" tone="warning" size="sm">
-            {VOCABULARY_STATUS_LABELS.disabled}
-          </Badge>
+      <div className={vocabularyTermDetailBodyClasses}>
+        <div className="min-w-0 flex-1 space-y-3">
+          <PageHeader
+            heading={entry.label}
+            badge={
+              <>
+                {sourceBadge}
+                {disabledBadge}
+              </>
+            }
+            actions={editAction}
+          />
+          <Text variant="muted">{entry.description ?? 'No description.'}</Text>
+        </div>
+        {showMediaField ? (
+          <div className="shrink-0 self-start">
+            <GameTermDetailMediaField
+              campaignId={campaignId}
+              setId={setId}
+              entry={entry}
+              singularLabel={singularLabel}
+              rulesetId={rulesetId}
+              readOnly={!canManageMedia}
+              onSave={onSaveMedia}
+            />
+          </div>
         ) : null}
       </div>
-      <Text variant="muted">{entry.description ?? 'No description.'}</Text>
       {showUsage ? (
         <UsageReferencesSection
           campaignId={campaignId}
@@ -95,29 +137,37 @@ type VocabularyTermDetailPageProps = {
   singularLabel: string
 }
 
-function VocabularyTermDetailPage({
+function VocabularyTermDetailLoaded({
   campaignId,
   setId,
-  termId,
-  setLabel,
   singularLabel,
-}: VocabularyTermDetailPageProps) {
+  entry,
+}: {
+  campaignId: string
+  setId: VocabularyOptionSetId
+  singularLabel: string
+  entry: VocabularyOptionWithUsage
+}) {
   const canManage = useCanManageCampaign(campaignId)
   const capabilities = getVocabularySetCapability(setId)
-  const { data: vocabularySet, isPending, isError } = useVocabularySet(campaignId, setId)
-  const entry = vocabularySet?.options.find((option) => option.id === termId)
   const mutations = useVocabularyMutations(campaignId, setId)
   const [sheetOpen, setSheetOpen] = useState(false)
 
-  useSetBreadcrumbLabel(entry?.label ?? '…')
+  const handleEdit = useCallback(() => setSheetOpen(true), [])
+  const handleSaveMedia = useCallback(
+    async (change: MediaManagerSave) => {
+      await mutations.patchEntry.mutateAsync({
+        entryId: entry.id,
+        input: {
+          media: change.media,
+          expectedMediaRevision: change.expectedMediaRevision,
+        },
+      })
+    },
+    [entry.id, mutations.patchEntry],
+  )
 
-  const handleEdit = useCallback(() => {
-    setSheetOpen(true)
-  }, [])
-
-  async function handleSheetSubmit(values: VocabularyEntryFormValues) {
-    if (!entry) return
-
+  const handleSheetSubmit = async (values: VocabularyEntryFormValues) => {
     await mutations.patchEntry.mutateAsync({
       entryId: entry.id,
       input: {
@@ -130,6 +180,47 @@ function VocabularyTermDetailPage({
     setSheetOpen(false)
   }
 
+  return (
+    <>
+      <VocabularyTermDetailBody
+        campaignId={campaignId}
+        setId={setId}
+        entry={entry}
+        singularLabel={singularLabel}
+        canManageMedia={Boolean(canManage && capabilities.media)}
+        canEdit={Boolean(canManage && capabilities.edit)}
+        showMediaField={shouldShowGameTermMediaField(setId, entry, capabilities)}
+        showUsage={capabilities.usageResolution}
+        onEdit={handleEdit}
+        onSaveMedia={handleSaveMedia}
+      />
+      <VocabularyEntrySheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        mode="edit"
+        campaignId={campaignId}
+        setId={setId}
+        createHeadline={`New ${singularLabel.toLowerCase()}`}
+        entry={entry}
+        isPending={mutations.patchEntry.isPending}
+        onSubmit={handleSheetSubmit}
+      />
+    </>
+  )
+}
+
+function VocabularyTermDetailPage({
+  campaignId,
+  setId,
+  termId,
+  setLabel,
+  singularLabel,
+}: VocabularyTermDetailPageProps) {
+  const { data: vocabularySet, isPending, isError } = useVocabularySet(campaignId, setId)
+  const entry = vocabularySet?.options.find((option) => option.id === termId)
+
+  useSetBreadcrumbLabel(entry?.label ?? '…')
+
   if (!isPending && !isError && vocabularySet && !entry) {
     return (
       <GameTermsFallback
@@ -140,43 +231,23 @@ function VocabularyTermDetailPage({
     )
   }
 
-  const canEdit = Boolean(canManage && capabilities.edit && entry)
-
   return (
-    <>
-      <PageShell width="full" rhythm="relaxed">
-        <PageLoadState
-          isPending={isPending}
-          isError={isError}
-          defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
-        >
-          {entry ? (
-            <VocabularyTermDetailBody
-              campaignId={campaignId}
-              setId={setId}
-              entry={entry}
-              canEdit={canEdit}
-              showUsage={capabilities.usageResolution}
-              onEdit={handleEdit}
-            />
-          ) : null}
-        </PageLoadState>
-      </PageShell>
-
-      {entry ? (
-        <VocabularyEntrySheet
-          open={sheetOpen}
-          onOpenChange={setSheetOpen}
-          mode="edit"
-          campaignId={campaignId}
-          setId={setId}
-          createHeadline={`New ${singularLabel.toLowerCase()}`}
-          entry={entry}
-          isPending={mutations.patchEntry.isPending}
-          onSubmit={(values) => handleSheetSubmit(values)}
-        />
-      ) : null}
-    </>
+    <PageShell width="full" rhythm="relaxed">
+      <PageLoadState
+        isPending={isPending}
+        isError={isError}
+        defaultErrorLabel={`Could not load ${setLabel.toLowerCase()}.`}
+      >
+        {entry ? (
+          <VocabularyTermDetailLoaded
+            campaignId={campaignId}
+            setId={setId}
+            singularLabel={singularLabel}
+            entry={entry}
+          />
+        ) : null}
+      </PageLoadState>
+    </PageShell>
   )
 }
 

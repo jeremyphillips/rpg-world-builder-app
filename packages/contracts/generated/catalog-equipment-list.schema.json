@@ -340,9 +340,47 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "contentType": {
-                  "type": "string",
-                  "minLength": 1
+                "subject": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "content-type",
+                          "description": "content-type"
+                        },
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "key"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "const": "vocabulary-set",
+                          "description": "vocabulary-set"
+                        },
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "key"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
                 },
                 "assetRole": {
                   "type": "string",
@@ -356,7 +394,7 @@
               "required": [
                 "kind",
                 "imageSetId",
-                "contentType",
+                "subject",
                 "assetRole",
                 "slug"
               ],

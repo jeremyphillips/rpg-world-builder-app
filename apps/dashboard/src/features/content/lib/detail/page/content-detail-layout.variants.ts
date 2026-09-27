@@ -13,8 +13,19 @@ export const contentDetailHeroCardClasses = 'overflow-hidden bg-muted'
 /** 16px top/right/bottom, 24px left. */
 export const contentDetailHeroCardContentClasses = 'py-4 pr-4 pb-4 pl-6'
 
-export const contentDetailHeroGridClasses =
-  'flex flex-col gap-8 md:flex-row md:items-start md:justify-between md:gap-10'
+import type { ContentDetailHeroMediaPresentation } from './content-detail-layout.types'
+import { DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION } from './content-detail-layout.types'
+
+export function contentDetailHeroGridClasses(
+  presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
+): string {
+  const placement = presentation.placement ?? 'end'
+  const base = 'flex flex-col gap-8 md:flex-row md:items-start md:gap-10'
+  if (placement === 'start') {
+    return `${base} md:flex-row-reverse md:justify-between`
+  }
+  return `${base} md:justify-between`
+}
 
 /** Padded inner wrapper for hero eyebrow, title, description, and metadata. */
 export const contentDetailHeroMainClasses = 'flex min-w-0 flex-1 flex-col'
@@ -29,8 +40,14 @@ export const contentDetailHeroDescriptionClasses =
 export const contentDetailHeroMetadataClasses = 'mt-3 border-t border-border-subtle pt-3'
 
 /** Hero image — fixed 4:3, not stretched to text column height. */
-export const contentDetailHeroImageShellClasses =
-  'mx-auto w-full max-w-sm shrink-0 md:mx-0 md:max-w-xs lg:max-w-sm'
+export function contentDetailHeroImageShellClasses(
+  presentation: ContentDetailHeroMediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
+): string {
+  if (presentation.size === 'emblem-lg') {
+    return 'mx-auto w-full max-w-hero-emblem shrink-0 md:mx-0'
+  }
+  return 'mx-auto w-full max-w-sm shrink-0 md:mx-0 md:max-w-xs lg:max-w-sm'
+}
 
 export const contentDetailHeroImageFrameClasses =
   'overflow-hidden rounded-card border-2 border-background shadow-sm'

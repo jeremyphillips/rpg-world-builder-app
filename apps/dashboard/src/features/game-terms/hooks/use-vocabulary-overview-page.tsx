@@ -1,5 +1,6 @@
 import { useCallback, useId, useMemo, useRef, useState } from 'react'
 import {
+  DEFAULT_SYSTEM_RULESET_ID,
   getVocabularySetCapability,
   type VocabularyOptionSetId,
   type VocabularyOptionWithUsage,
@@ -17,6 +18,7 @@ import {
 import { useVocabularyMutations, useVocabularySet } from '@/features/vocabulary'
 
 import { vocabularyColumns } from '../lib/vocabulary/vocabulary-overview-columns'
+import { resolveGameTermDisplay } from '../lib/game-term-display'
 import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-overview-filter-schema'
 import {
   buildVocabularyBulkSelectionConfig,
@@ -76,6 +78,14 @@ export function useVocabularyOverviewPage({
         nameHref: (entry) => ROUTES.gameTerms.detail(campaignId, setId, entry.id),
         onEdit: showEdit ? onEdit : undefined,
         canEdit: showEdit,
+        showMediaColumn: capabilities.media,
+        resolveDisplay: (entry) =>
+          resolveGameTermDisplay({
+            setId,
+            option: entry,
+            rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+            surface: 'compact',
+          }),
         usageSummaryLabels: capabilities.batchUsageCounting
           ? vocabularySet?.usageSummaryLabels
           : undefined,
@@ -87,6 +97,7 @@ export function useVocabularyOverviewPage({
       campaignId,
       capabilities.batchUsageCounting,
       onEdit,
+      capabilities.media,
       setId,
       showEdit,
       vocabularySet?.overviewUsageScope,

@@ -7,7 +7,7 @@ export const contentDisplayImageSchema = z.object({
   src: z.string().min(1),
   crop: normalizedCropSchema.optional(),
   sourceKind: z.enum(CONTENT_DISPLAY_IMAGE_SOURCE_KINDS),
-  presentationTreatment: z.literal('white-paper-knockout').optional(),
+  presentationTreatment: z.enum(['white-paper-knockout', 'mono-glyph-invert']).optional(),
 })
 
 export type ContentDisplayImageDto = z.infer<typeof contentDisplayImageSchema>

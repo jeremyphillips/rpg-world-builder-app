@@ -9,7 +9,7 @@ const mediaReferenceSchema = new Schema(
     subjectKind: {
       type: String,
       required: true,
-      enum: ['content', 'character', 'campaign'],
+      enum: ['content', 'character', 'campaign', 'game-term'],
       index: true,
     },
     subjectId: { type: String, required: true, index: true },

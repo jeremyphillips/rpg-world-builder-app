@@ -26,6 +26,7 @@ export function resolveVocabularySet(
       description: patch?.description ?? seedOption.description,
       source: 'system' as const,
       status: patch?.status ?? seedOption.status,
+      media: patch?.media,
     }
   })
 
@@ -40,6 +41,7 @@ export function resolveVocabularySet(
       description: entry.description,
       source: 'campaign',
       status: entry.status ?? 'active',
+      media: entry.media,
     })
   }
 

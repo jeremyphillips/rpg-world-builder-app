@@ -40,6 +40,7 @@ import {
   buildVocabularyUsageResolverContext,
   withAuthoritativeGuardPurpose,
 } from '../lib/vocabulary-usage-context'
+import { applyVocabularyEntryMediaPatch } from '../lib/apply-vocabulary-entry-media-patch.lib'
 
 function assertSeedSetAvailable(rulesetId: SystemRulesetId, setId: VocabularyOptionSetId): void {
   if (!listSeedVocabularySetIds(rulesetId).includes(setId)) {
@@ -291,6 +292,7 @@ function applyVocabularyEntryInput<T extends { id: string }>(
     ...(input.label !== undefined && { label: input.label }),
     ...(input.description !== undefined && { description: input.description }),
     ...(input.status !== undefined && { status: input.status }),
+    ...(input.media !== undefined && { media: input.media }),
   }
 }
 
@@ -344,8 +346,9 @@ async function assertVocabularyEntryPatchAllowed(
 ): Promise<void> {
   const hasLabelOrDescription = input.label !== undefined || input.description !== undefined
   const hasStatus = input.status !== undefined
+  const hasMedia = input.media !== undefined
 
-  if (!hasLabelOrDescription && !hasStatus) {
+  if (!hasLabelOrDescription && !hasStatus && !hasMedia) {
     throw new HttpError(400, 'bad_request', 'No supported vocabulary patch fields were provided.')
   }
 }
@@ -500,6 +503,29 @@ export async function updateVocabularyEntry(
   const current = await resolveVocabularySetForCampaign(ctx, setId)
   const existing = findResolvedOption(current, entryId)
 
+  const { media, expectedMediaRevision, ...entryPatch } = input
+
+  if (media !== undefined) {
+    await applyVocabularyEntryMediaPatch({
+      campaignId,
+      rulesetId,
+      setId,
+      entryId,
+      source: existing.source,
+      currentMedia: existing.media ?? null,
+      media,
+      expectedMediaRevision: expectedMediaRevision ?? 0,
+    })
+
+    if (
+      entryPatch.label === undefined &&
+      entryPatch.description === undefined &&
+      entryPatch.status === undefined
+    ) {
+      return resolveVocabularySetForCampaign(ctx, setId)
+    }
+  }
+
   if (input.status === 'disabled' && existing.status === 'active') {
     const disableCheck = await resolveVocabularyDisableBlockers(ctx, setId, entryId)
     if (disableCheck.status === 'blocked') {
@@ -518,7 +544,7 @@ export async function updateVocabularyEntry(
   await saveSetPatch(
     campaignId,
     rulesetId,
-    patchVocabularyEntry(setPatch, existing, entryId, input),
+    patchVocabularyEntry(setPatch, existing, entryId, entryPatch),
   )
 
   return resolveVocabularySetForCampaign(ctx, setId)

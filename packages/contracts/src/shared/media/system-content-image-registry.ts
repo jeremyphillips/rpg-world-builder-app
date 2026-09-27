@@ -1,6 +1,12 @@
 import type { ContentSource } from '../../rpg/content/lib/envelope'
 import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { SourceDimensions } from './geometry'
+import {
+  contentTypeSubject,
+  systemImageEntryLookupKey,
+  type SystemImageSubject,
+  vocabularySetSubject,
+} from './system-image-subject'
 
 export const SYSTEM_IMAGE_SET_IDS = ['srd-cc-5.2.1'] as const
 
@@ -8,9 +14,13 @@ export type SystemImageSetId = (typeof SYSTEM_IMAGE_SET_IDS)[number]
 
 export const DEFAULT_SYSTEM_IMAGE_SET_ID: SystemImageSetId = 'srd-cc-5.2.1'
 
-export const SYSTEM_CONTENT_IMAGE_ASSET_ROLE_PRIMARY = 'primary' as const
+export const SYSTEM_CONTENT_IMAGE_ASSET_ROLES = ['primary', 'emblem'] as const
 
-export type SystemContentImageAssetRole = typeof SYSTEM_CONTENT_IMAGE_ASSET_ROLE_PRIMARY
+export type SystemContentImageAssetRole = (typeof SYSTEM_CONTENT_IMAGE_ASSET_ROLES)[number]
+
+export const SYSTEM_CONTENT_IMAGE_EXTENSIONS = ['jpeg', 'png'] as const
+
+export type SystemContentImageExtension = (typeof SYSTEM_CONTENT_IMAGE_EXTENSIONS)[number]
 
 /** Shipped catalog artwork dimensions — 1200×896 JPEGs (four px short of 900). */
 const STANDARD_SOURCE_DIMENSIONS: SourceDimensions = {
@@ -18,9 +28,16 @@ const STANDARD_SOURCE_DIMENSIONS: SourceDimensions = {
   height: 896,
 }
 
+/** Spell school emblem PNGs — square mono glyphs on alpha. */
+const EMBLEM_SOURCE_DIMENSIONS: SourceDimensions = {
+  width: 1254,
+  height: 1254,
+}
+
 export const SYSTEM_CONTENT_IMAGE_PRESENTATION_TREATMENTS = [
   'default',
   'white-paper-knockout',
+  'mono-glyph-invert',
 ] as const
 
 export type SystemContentImagePresentationTreatment =
@@ -32,9 +49,10 @@ export type SystemContentImagePresentation = {
 
 export type SystemContentImageEntry = {
   imageSetId: SystemImageSetId
-  contentType: ContentTypeKey
+  subject: SystemImageSubject
   assetRole: SystemContentImageAssetRole
   slug: string
+  extension: SystemContentImageExtension
   path: string
   sourceDimensions: SourceDimensions
   presentation: SystemContentImagePresentation
@@ -73,34 +91,85 @@ const SPECIES_PRIMARY_SLUGS = [
   'tiefling',
 ] as const
 
+const SPELL_SCHOOL_EMBLEM_SLUGS = [
+  'abjuration',
+  'conjuration',
+  'divination',
+  'enchantment',
+  'evocation',
+  'illusion',
+  'necromancy',
+  'transmutation',
+] as const
+
 const SYSTEM_IMAGE_SET_ID_SET = new Set<string>(SYSTEM_IMAGE_SET_IDS)
 
 const WHITE_PAPER_KNOCKOUT_PRESENTATION: SystemContentImagePresentation = {
   treatment: 'white-paper-knockout',
 }
 
-function buildEntry(contentType: ContentTypeKey, slug: string): SystemContentImageEntry {
+const MONO_GLYPH_INVERT_PRESENTATION: SystemContentImagePresentation = {
+  treatment: 'mono-glyph-invert',
+}
+
+export function buildSystemContentImagePath(input: {
+  imageSetId: string
+  subject: SystemImageSubject
+  assetRole: string
+  slug: string
+  extension: SystemContentImageExtension
+}): string {
+  return `assets/system/${input.imageSetId}/${input.subject.key}/${input.assetRole}/${input.slug}.${input.extension}`
+}
+
+function buildPrimaryEntry(contentType: ContentTypeKey, slug: string): SystemContentImageEntry {
   const imageSetId = DEFAULT_SYSTEM_IMAGE_SET_ID
-  const assetRole = SYSTEM_CONTENT_IMAGE_ASSET_ROLE_PRIMARY
+  const subject = contentTypeSubject(contentType)
+  const assetRole = 'primary' as const
+  const extension = 'jpeg' as const
   return {
     imageSetId,
-    contentType,
+    subject,
     assetRole,
     slug,
-    path: buildSystemContentImagePath({ imageSetId, contentType, assetRole, slug }),
+    extension,
+    path: buildSystemContentImagePath({ imageSetId, subject, assetRole, slug, extension }),
     sourceDimensions: STANDARD_SOURCE_DIMENSIONS,
     presentation: WHITE_PAPER_KNOCKOUT_PRESENTATION,
   }
 }
 
+function buildSpellSchoolEmblemEntry(slug: string): SystemContentImageEntry {
+  const imageSetId = DEFAULT_SYSTEM_IMAGE_SET_ID
+  const subject = vocabularySetSubject('spell-schools')
+  const assetRole = 'emblem' as const
+  const extension = 'png' as const
+  return {
+    imageSetId,
+    subject,
+    assetRole,
+    slug,
+    extension,
+    path: buildSystemContentImagePath({ imageSetId, subject, assetRole, slug, extension }),
+    sourceDimensions: EMBLEM_SOURCE_DIMENSIONS,
+    presentation: MONO_GLYPH_INVERT_PRESENTATION,
+  }
+}
+
 const SYSTEM_CONTENT_IMAGE_ENTRIES: SystemContentImageEntry[] = [
-  ...CLASS_PRIMARY_SLUGS.map((slug) => buildEntry('classes', slug)),
-  ...SPECIES_PRIMARY_SLUGS.map((slug) => buildEntry('species', slug)),
+  ...CLASS_PRIMARY_SLUGS.map((slug) => buildPrimaryEntry('classes', slug)),
+  ...SPECIES_PRIMARY_SLUGS.map((slug) => buildPrimaryEntry('species', slug)),
+  ...SPELL_SCHOOL_EMBLEM_SLUGS.map((slug) => buildSpellSchoolEmblemEntry(slug)),
 ]
 
 const SYSTEM_CONTENT_IMAGE_ENTRY_LOOKUP = new Map<string, SystemContentImageEntry>(
   SYSTEM_CONTENT_IMAGE_ENTRIES.map((entry) => [
-    `${entry.imageSetId}:${entry.contentType}:${entry.assetRole}:${entry.slug}`,
+    systemImageEntryLookupKey({
+      imageSetId: entry.imageSetId,
+      subject: entry.subject,
+      assetRole: entry.assetRole,
+      slug: entry.slug,
+    }),
     entry,
   ]),
 )
@@ -109,24 +178,24 @@ export function isRegisteredSystemImageSetId(imageSetId: string): imageSetId is 
   return SYSTEM_IMAGE_SET_ID_SET.has(imageSetId)
 }
 
-export function buildSystemContentImagePath(input: {
+export type SystemContentImageLookupInput = {
   imageSetId: string
-  contentType: string
+  subject: SystemImageSubject
   assetRole: string
   slug: string
-}): string {
-  return `assets/system/${input.imageSetId}/${input.contentType}/${input.assetRole}/${input.slug}.jpeg`
 }
 
-function lookupSystemContentImageEntry(input: {
-  imageSetId: string
-  contentType: string
-  assetRole: string
-  slug: string
-}): SystemContentImageEntry | undefined {
+function lookupSystemContentImageEntry(
+  input: SystemContentImageLookupInput,
+): SystemContentImageEntry | undefined {
   if (!isRegisteredSystemImageSetId(input.imageSetId)) return undefined
   return SYSTEM_CONTENT_IMAGE_ENTRY_LOOKUP.get(
-    `${input.imageSetId}:${input.contentType}:${input.assetRole}:${input.slug}`,
+    systemImageEntryLookupKey({
+      imageSetId: input.imageSetId,
+      subject: input.subject,
+      assetRole: input.assetRole,
+      slug: input.slug,
+    }),
   )
 }
 
@@ -145,7 +214,7 @@ export function resolveContentImageSet(input: {
 
 export function resolveSystemContentImage(input: {
   imageSetId: string
-  contentType: string
+  subject: SystemImageSubject
   assetRole: string
   slug: string
   contentSource: ContentSource
@@ -160,28 +229,22 @@ export function resolveSystemContentImage(input: {
   }
 }
 
-export function deriveSystemContentImage(input: {
-  imageSetId: string
-  contentType: string
-  assetRole: string
-  slug: string
-}): Pick<SystemContentImageEntry, 'imageSetId' | 'contentType' | 'assetRole' | 'slug'> | undefined {
+export function deriveSystemContentImage(
+  input: SystemContentImageLookupInput,
+): Pick<SystemContentImageEntry, 'imageSetId' | 'subject' | 'assetRole' | 'slug'> | undefined {
   const entry = lookupSystemContentImageEntry(input)
   if (!entry) return undefined
   return {
     imageSetId: entry.imageSetId,
-    contentType: entry.contentType,
+    subject: entry.subject,
     assetRole: entry.assetRole,
     slug: entry.slug,
   }
 }
 
-export function resolveSystemContentImageSourceDimensions(input: {
-  imageSetId: string
-  contentType: string
-  assetRole: string
-  slug: string
-}): SourceDimensions | undefined {
+export function resolveSystemContentImageSourceDimensions(
+  input: SystemContentImageLookupInput,
+): SourceDimensions | undefined {
   return lookupSystemContentImageEntry(input)?.sourceDimensions
 }
 
@@ -189,4 +252,20 @@ export function resolveSystemContentImageSourceDimensionsFromPath(
   path: string,
 ): SourceDimensions | undefined {
   return SYSTEM_CONTENT_IMAGE_ENTRIES.find((entry) => entry.path === path)?.sourceDimensions
+}
+
+/** @deprecated Use {@link buildSystemContentImagePath} with a {@link SystemImageSubject}. */
+export function buildLegacySystemContentImagePath(input: {
+  imageSetId: string
+  contentType: string
+  assetRole: string
+  slug: string
+}): string {
+  return buildSystemContentImagePath({
+    imageSetId: input.imageSetId,
+    subject: contentTypeSubject(input.contentType as ContentTypeKey),
+    assetRole: input.assetRole,
+    slug: input.slug,
+    extension: 'jpeg',
+  })
 }

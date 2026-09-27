@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { contentTypeSubject, vocabularySetSubject } from './system-image-subject'
 import {
   buildSystemContentImagePath,
   deriveSystemContentImage,
@@ -12,7 +13,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'fighter',
         contentSource: 'system',
@@ -24,11 +25,27 @@ describe('system content image registry', () => {
     })
   })
 
+  it('resolves spell school emblems with mono-glyph-invert presentation', () => {
+    expect(
+      resolveSystemContentImage({
+        imageSetId: 'srd-cc-5.2.1',
+        subject: vocabularySetSubject('spell-schools'),
+        assetRole: 'emblem',
+        slug: 'evocation',
+        contentSource: 'system',
+      }),
+    ).toEqual({
+      path: 'assets/system/srd-cc-5.2.1/spell-schools/emblem/evocation.png',
+      sourceDimensions: { width: 1254, height: 1254 },
+      presentation: { treatment: 'mono-glyph-invert' },
+    })
+  })
+
   it('resolves elf and human system species primary to the public path', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'species',
+        subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'elf',
         contentSource: 'system',
@@ -38,7 +55,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'species',
+        subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'human',
         contentSource: 'system',
@@ -50,7 +67,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'unknown',
         contentSource: 'system',
@@ -59,7 +76,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         assetRole: 'portrait',
         slug: 'fighter',
         contentSource: 'system',
@@ -68,7 +85,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'species',
+        subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'fighter',
         contentSource: 'system',
@@ -80,7 +97,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'fighter',
         contentSource: 'homebrew',
@@ -90,7 +107,7 @@ describe('system content image registry', () => {
     expect(
       resolveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'species',
+        subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'elf',
         contentSource: 'homebrew',
@@ -98,17 +115,17 @@ describe('system content image registry', () => {
     ).toBeUndefined()
   })
 
-  it('derives catalog entries by content type and slug', () => {
+  it('derives catalog entries by subject and slug', () => {
     expect(
       deriveSystemContentImage({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'species',
+        subject: contentTypeSubject('species'),
         assetRole: 'primary',
         slug: 'elf',
       }),
     ).toEqual({
       imageSetId: 'srd-cc-5.2.1',
-      contentType: 'species',
+      subject: contentTypeSubject('species'),
       assetRole: 'primary',
       slug: 'elf',
     })
@@ -124,9 +141,10 @@ describe('system content image registry', () => {
     expect(
       buildSystemContentImagePath({
         imageSetId: 'srd-cc-5.2.1',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         assetRole: 'primary',
         slug: 'wizard',
+        extension: 'jpeg',
       }),
     ).toBe('assets/system/srd-cc-5.2.1/classes/primary/wizard.jpeg')
   })

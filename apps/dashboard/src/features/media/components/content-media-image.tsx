@@ -14,6 +14,8 @@ import {
   contentMediaImageFallbackIconClasses,
   contentMediaImageFallbackWellClasses,
   contentMediaImageFrameVariants,
+  contentMediaImageEmblemClasses,
+  contentMediaImageMonoGlyphInvertClasses,
   contentMediaImageWhitePaperKnockoutClasses,
   type ContentMediaImageFrame,
 } from './content-media-image.variants'
@@ -63,6 +65,7 @@ export function ContentMediaImage({
     applyCropLayout && display.crop ? resolveNormalizedCropImageLayout(display.crop) : undefined
   const presentation = resolveContentImagePresentationDefault(resolvePresentationSurface(frame))
   const usesWhitePaperKnockout = display.presentationTreatment === 'white-paper-knockout'
+  const usesMonoGlyphInvert = display.presentationTreatment === 'mono-glyph-invert'
 
   return (
     <div className={cn(contentMediaImageFrameVariants({ frame }), className)}>
@@ -71,7 +74,9 @@ export function ContentMediaImage({
         alt={alt}
         className={cn(
           contentMediaImageClasses,
+          frame === 'emblem' && contentMediaImageEmblemClasses,
           usesWhitePaperKnockout && contentMediaImageWhitePaperKnockoutClasses,
+          usesMonoGlyphInvert && contentMediaImageMonoGlyphInvertClasses,
         )}
         style={
           cropLayout

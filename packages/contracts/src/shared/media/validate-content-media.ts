@@ -4,11 +4,13 @@ import { contentMediaValidationMessages } from './content-media-validation-messa
 import type { ContentMedia } from './content-media'
 import { isSystemRoleAssignment, roleAssignmentUploadImageId } from './content-media-source'
 import { CONTENT_MEDIA_MAX_ATTACHMENTS } from './limits'
+import { systemImageSourcesEqual } from './content-media-source'
 import {
   deriveSystemContentImage,
   resolveContentImageSet,
   resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
+import { resolveContentMediaMaxItems } from './media-policy'
 import { formatAspectRatioLabel, getFixedAspectCropSpec } from './role-crop-spec'
 import {
   isFocalPointInCrop,
@@ -207,17 +209,11 @@ function collectSystemRoleIssues(
   const imageSetId = resolveContentImageSet({})
   const derived = deriveSystemContentImage({
     imageSetId,
-    contentType: assignment.source.contentType,
+    subject: assignment.source.subject,
     assetRole: assignment.source.assetRole,
     slug: assignment.source.slug,
   })
-  if (
-    !derived ||
-    assignment.source.imageSetId !== derived.imageSetId ||
-    assignment.source.contentType !== derived.contentType ||
-    assignment.source.assetRole !== derived.assetRole ||
-    assignment.source.slug !== derived.slug
-  ) {
+  if (!derived || !systemImageSourcesEqual(assignment.source, derived)) {
     return [
       customIssue(`Role ${role} references an unknown system image source.`, [
         'roles',
@@ -229,7 +225,7 @@ function collectSystemRoleIssues(
 
   const sourceDimensions = resolveSystemContentImageSourceDimensions({
     imageSetId: assignment.source.imageSetId,
-    contentType: assignment.source.contentType,
+    subject: assignment.source.subject,
     assetRole: assignment.source.assetRole,
     slug: assignment.source.slug,
   }) ?? { width: 0, height: 0 }
@@ -284,7 +280,12 @@ export function validateContentMedia(
   context: ContentMediaValidationContext,
 ): ContentMediaValidationResult {
   const issues = [
-    ...collectAttachmentIssues(media.images, context.maxItems ?? CONTENT_MEDIA_MAX_ATTACHMENTS),
+    ...collectAttachmentIssues(
+      media.images,
+      context.maxItems ??
+        resolveContentMediaMaxItems(context.policy) ??
+        CONTENT_MEDIA_MAX_ATTACHMENTS,
+    ),
     ...collectRoleIssues(media, context.policy, context.assetDimensionsById),
   ]
 

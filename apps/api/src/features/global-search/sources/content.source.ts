@@ -8,6 +8,12 @@ import { resolveContentUsageLookupKey } from '../../content'
 import { resolveViewerCharacterRelationships } from '../../content'
 import type { ContentUsageSurfaceKey } from '../../content'
 import { projectContentEntity, API_CONTENT_TYPE_KEYS } from '../lib/project-content-document'
+import {
+  resolveVocabularySetForCampaign,
+  vocabularyUsageContextForCampaign,
+} from '../../vocabulary'
+import { resolveGameTermDisplayImage } from '../lib/resolve-game-term-display-image.lib'
+import { requireCampaignRuleset } from '../../vocabulary/lib/patch-document'
 import type { NamedContentEntity } from '../lib/project-content-document'
 import type { SearchSource } from '../lib/search-source.types'
 
@@ -31,6 +37,20 @@ export const contentSearchSource: SearchSource = {
     })
 
     const documents: GlobalSearchDocument[] = []
+    const vocabularyContext = vocabularyUsageContextForCampaign(ctx.campaignId)
+    const { rulesetId } = await requireCampaignRuleset(ctx.campaignId)
+    const spellSchools = await resolveVocabularySetForCampaign(vocabularyContext, 'spell-schools')
+    const resolveSpellSchoolDisplay = (schoolId: string) => {
+      const option = spellSchools.options.find((entry) => entry.id === schoolId)
+      if (!option) return undefined
+      return resolveGameTermDisplayImage({
+        setId: 'spell-schools',
+        optionId: option.id,
+        source: option.source,
+        media: option.media,
+        rulesetId,
+      })
+    }
 
     for (const contentType of API_CONTENT_TYPE_KEYS) {
       const items = await resolveContentForCampaign(contentType, ctx.campaignId)
@@ -56,7 +76,13 @@ export const contentSearchSource: SearchSource = {
           entity,
         )
         const viewerCharacterRelationships = relationshipMap.get(lookupKey)
-        const document = projectContentEntity(contentType, entity as unknown as NamedContentEntity)
+        const document = projectContentEntity(
+          contentType,
+          entity as unknown as NamedContentEntity,
+          {
+            resolveSpellSchoolDisplay,
+          },
+        )
         documents.push(
           viewerCharacterRelationships ? { ...document, viewerCharacterRelationships } : document,
         )

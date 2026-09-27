@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { emptyContentMediaSchema } from './content-media'
 import { createSystemRoleAssignment, createUploadRoleAssignment } from './content-media-source'
+import { contentTypeSubject } from './system-image-subject'
 import { getAvailableContentImages } from './get-available-content-images'
 import { normalizePersistedContentMedia } from './normalize-persisted-content-media'
 import {
@@ -17,7 +18,7 @@ describe('resolveContentDisplayImage', () => {
       surface: 'compact',
       domain: 'class',
       media: emptyContentMediaSchema,
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -44,7 +45,7 @@ describe('resolveContentDisplayImage', () => {
           primary: createUploadRoleAssignment('img-1'),
         },
       },
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -69,7 +70,7 @@ describe('resolveContentDisplayImage', () => {
           primary: {
             ...createSystemRoleAssignment({
               imageSetId: 'srd-cc-5.2.1',
-              contentType: 'classes',
+              subject: contentTypeSubject('classes'),
               assetRole: 'primary',
               slug: 'fighter',
             }),
@@ -77,7 +78,7 @@ describe('resolveContentDisplayImage', () => {
           },
         },
       },
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -95,7 +96,7 @@ describe('resolveContentDisplayImage', () => {
       surface: 'compact',
       domain: 'species',
       media: emptyContentMediaSchema,
-      contentType: 'species',
+      subject: contentTypeSubject('species'),
       slug: 'elf',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -126,7 +127,7 @@ describe('resolveContentDisplayImage', () => {
           primary: createUploadRoleAssignment('primary-img'),
         },
       },
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: '',
       contentSource: 'homebrew',
       resolveUploadSrc: (assetId) =>
@@ -154,7 +155,7 @@ describe('resolveContentDisplayImage', () => {
           primary: createUploadRoleAssignment('primary-img'),
         },
       },
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: '',
       contentSource: 'homebrew',
       resolveUploadSrc: (assetId) =>
@@ -178,7 +179,7 @@ describe('resolveContentDisplayImage', () => {
           emblem: createUploadRoleAssignment('emblem-img'),
         },
       },
-      contentType: 'organizations',
+      subject: contentTypeSubject('organizations'),
       slug: 'silver-compass',
       contentSource: 'homebrew',
       resolveUploadSrc: () => '/emblem.jpg',
@@ -192,7 +193,7 @@ describe('resolveContentDisplayImage', () => {
       resolveContentDisplayImage({
         surface: 'compact',
         domain: 'class',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         slug: 'custom-archetype',
         contentSource: 'homebrew',
       }),
@@ -202,7 +203,7 @@ describe('resolveContentDisplayImage', () => {
       resolveContentDisplayImageAsOptional({
         surface: 'compact',
         domain: 'class',
-        contentType: 'classes',
+        subject: contentTypeSubject('classes'),
         slug: 'custom-archetype',
         contentSource: 'homebrew',
       }),
@@ -218,7 +219,8 @@ describe('getAvailableContentImages', () => {
         images: [{ id: 'img-1', assetId: 'asset-1' }],
         roles: {},
       },
-      contentType: 'classes',
+      domain: 'class',
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -235,7 +237,8 @@ describe('getAvailableContentImages', () => {
   it('includes a virtual species source only for system content', () => {
     const available = getAvailableContentImages({
       media: emptyContentMediaSchema,
-      contentType: 'species',
+      domain: 'species',
+      subject: contentTypeSubject('species'),
       slug: 'human',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',
@@ -252,7 +255,8 @@ describe('getAvailableContentImages', () => {
     expect(
       getAvailableContentImages({
         media: emptyContentMediaSchema,
-        contentType: 'classes',
+        domain: 'class',
+        subject: contentTypeSubject('classes'),
         slug: 'fighter-variant',
         contentSource: 'system',
         rulesetId: 'srd-cc-5.2.1',
@@ -262,7 +266,8 @@ describe('getAvailableContentImages', () => {
     expect(
       getAvailableContentImages({
         media: emptyContentMediaSchema,
-        contentType: 'classes',
+        domain: 'class',
+        subject: contentTypeSubject('classes'),
         slug: 'fighter',
         contentSource: 'homebrew',
         rulesetId: 'srd-cc-5.2.1',
@@ -272,7 +277,8 @@ describe('getAvailableContentImages', () => {
     expect(
       getAvailableContentImages({
         media: emptyContentMediaSchema,
-        contentType: 'species',
+        domain: 'species',
+        subject: contentTypeSubject('species'),
         slug: 'elf',
         contentSource: 'homebrew',
         rulesetId: 'srd-cc-5.2.1',
@@ -290,13 +296,13 @@ describe('normalizePersistedContentMedia', () => {
         roles: {
           primary: createSystemRoleAssignment({
             imageSetId: 'srd-cc-5.2.1',
-            contentType: 'classes',
+            subject: contentTypeSubject('classes'),
             assetRole: 'primary',
             slug: 'fighter',
           }),
         },
       },
-      contentType: 'classes',
+      subject: contentTypeSubject('classes'),
       slug: 'fighter',
       contentSource: 'system',
       rulesetId: 'srd-cc-5.2.1',

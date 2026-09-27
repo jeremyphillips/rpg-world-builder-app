@@ -2,9 +2,9 @@ import type {
   ContentMedia,
   ContentMediaDomain,
   ContentSource,
-  ContentTypeKey,
   MediaAsset,
   MediaScope,
+  SystemImageSubject,
 } from '@rpg/contracts'
 
 export type MediaManagerSave = {
@@ -14,7 +14,8 @@ export type MediaManagerSave = {
 }
 import type { mediaImageUrl } from './media-display'
 export type MediaManagerContentContext = {
-  contentType: ContentTypeKey
+  domain: ContentMediaDomain
+  subject: SystemImageSubject
   slug: string
   contentSource: ContentSource
   rulesetId?: string

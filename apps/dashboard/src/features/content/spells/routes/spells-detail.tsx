@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { formatSlugAsLabel } from '@rpg/contracts'
+import { DEFAULT_SYSTEM_RULESET_ID, formatSlugAsLabel } from '@rpg/contracts'
 import type { Spell } from '@rpg/contracts'
 
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
@@ -22,6 +22,7 @@ import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
 import { buildSpellDetailViewModel } from '../lib/spell-display'
 import { SpellDetailBody } from '../components/spell-detail-body'
+import { resolveSpellSchoolEntityMedia } from '../lib/spell-school-media'
 
 type SpellDetailContentProps = {
   spell: Spell
@@ -34,6 +35,13 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
   const { vocabulary: damageTypeVocabulary } = useDamageTypeVocabulary(campaignId)
   const { vocabulary: spellSchoolVocabulary } = useSpellSchoolVocabulary(campaignId)
   const classesBySlug = new Map(classes.map((cls) => [cls.slug, cls]))
+
+  const schoolMedia = resolveSpellSchoolEntityMedia({
+    schoolId: spell.school,
+    vocabulary: spellSchoolVocabulary ?? { optionById: {} },
+    rulesetId: DEFAULT_SYSTEM_RULESET_ID,
+    surface: 'detail',
+  })
 
   const viewModel = buildSpellDetailViewModel(spell, {
     resolveSpellSchoolLabel: (schoolId) =>
@@ -50,6 +58,9 @@ export function SpellDetailContent({ spell, campaignId }: SpellDetailContentProp
       name={spell.name}
       nameBadge={<ContentStatusNameBadge status={spell.status} />}
       imageName={spell.name}
+      displayImage={schoolMedia.displayImage}
+      displayFallback={schoolMedia.fallback}
+      mediaPresentation={{ frame: 'emblem', placement: 'start', size: 'emblem-lg' }}
       viewModel={viewModel}
       campaignId={campaignId}
       editHref={contentEditHref('spells', campaignId, spell.id)}

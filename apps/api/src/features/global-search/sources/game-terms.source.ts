@@ -7,6 +7,8 @@ import {
 } from '../../vocabulary'
 import { resolveVocabularyOptionsForViewer } from '../../vocabulary'
 import type { SearchSource } from '../lib/search-source.types'
+import { resolveGameTermDisplayImage } from '../lib/resolve-game-term-display-image.lib'
+import { requireCampaignRuleset } from '../../vocabulary/lib/patch-document'
 
 function labelField(text: string): GlobalSearchField {
   return { text, weight: 1, role: 'label' }
@@ -28,6 +30,7 @@ export const gameTermsSearchSource: SearchSource = {
   id: 'game-terms',
   async collect(ctx) {
     const vocabularyContext = vocabularyUsageContextForCampaign(ctx.campaignId)
+    const { rulesetId } = await requireCampaignRuleset(ctx.campaignId)
     const sets = await listResolvedVocabularySetsForCampaign(vocabularyContext)
     const documents: GlobalSearchDocument[] = []
 
@@ -42,6 +45,14 @@ export const gameTermsSearchSource: SearchSource = {
           groupField(setLabel),
         ].filter((field): field is GlobalSearchField => field !== undefined)
 
+        const displayImage = resolveGameTermDisplayImage({
+          setId: set.id,
+          optionId: option.id,
+          source: option.source,
+          media: option.media,
+          rulesetId,
+        })
+
         documents.push({
           id: `game-term:${set.id}:${option.id}`,
           filterGroup: 'game-terms',
@@ -54,6 +65,7 @@ export const gameTermsSearchSource: SearchSource = {
             termId: option.id,
           },
           fields,
+          ...(displayImage ? { displayImage } : {}),
           ...(option.status === 'disabled' ? { campaignAvailable: false as const } : {}),
         })
       }

@@ -1,6 +1,6 @@
 import type { ContentSource } from '../../rpg/content/lib/envelope'
-import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentMedia } from './content-media'
+import { systemImageSourcesEqual } from './content-media-source'
 import { isRolePresentationCustomized } from './is-role-presentation-customized'
 import type { MediaRole } from './roles'
 import {
@@ -8,12 +8,13 @@ import {
   resolveContentImageSet,
   resolveSystemContentImageSourceDimensions,
 } from './system-content-image-registry'
+import type { SystemImageSubject } from './system-image-subject'
 
 /** Strip derived-default role assignments before persisting media from the manager. */
 // fallow-ignore-next-line complexity
 export function normalizePersistedContentMedia(input: {
   media: ContentMedia
-  contentType: ContentTypeKey
+  subject: SystemImageSubject
   slug: string
   contentSource: ContentSource
   rulesetId?: string
@@ -24,29 +25,26 @@ export function normalizePersistedContentMedia(input: {
     campaignImageSetId: input.campaignImageSetId,
     rulesetId: input.rulesetId,
   })
-  const derived = deriveSystemContentImage({
-    imageSetId,
-    contentType: input.contentType,
-    assetRole: 'primary',
-    slug: input.slug,
-  })
   const roles = { ...input.media.roles }
 
   for (const role of input.allowedRoles) {
     const assignment = roles[role]
     if (!assignment) continue
 
+    const derived = deriveSystemContentImage({
+      imageSetId,
+      subject: input.subject,
+      assetRole: role,
+      slug: input.slug,
+    })
+
     if (assignment.source.kind === 'system') {
       const matchesDerived =
-        derived !== undefined &&
-        assignment.source.imageSetId === derived.imageSetId &&
-        assignment.source.contentType === derived.contentType &&
-        assignment.source.assetRole === derived.assetRole &&
-        assignment.source.slug === derived.slug
+        derived !== undefined && systemImageSourcesEqual(assignment.source, derived)
 
       const sourceDimensions = resolveSystemContentImageSourceDimensions({
         imageSetId: assignment.source.imageSetId,
-        contentType: assignment.source.contentType,
+        subject: assignment.source.subject,
         assetRole: assignment.source.assetRole,
         slug: assignment.source.slug,
       }) ?? { width: 0, height: 0 }

@@ -32,6 +32,11 @@ import {
   contentDetailRootClasses,
 } from './content-detail-layout.variants'
 import type { ContentStatRowData } from '../metadata/content-stat-rows'
+import {
+  DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
+  type ContentDetailHeroMediaPresentation,
+} from './content-detail-layout.types'
+import type { ContentMediaImageFrame } from '@/features/media/components/content-media-image'
 
 export type ContentDetailLayoutProps = {
   /** Catalog content type — default hero classification label when `classificationLabel` is omitted. */
@@ -42,6 +47,8 @@ export type ContentDetailLayoutProps = {
   name: string
   /** Optional badge rendered beside the hero heading (e.g. draft status). */
   nameBadge?: ReactNode
+  /** Hero image framing, placement, and size tokens. */
+  mediaPresentation?: ContentDetailHeroMediaPresentation
   /** Crop-aware display image when artwork resolves. */
   displayImage?: ContentDisplayImage
   /** Semantic fallback when no artwork resolves (media domains). */
@@ -86,6 +93,7 @@ export function ContentDetailLayout({
   classificationLabel,
   name,
   nameBadge,
+  mediaPresentation = DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
   displayImage,
   displayFallback,
   imageName,
@@ -122,6 +130,8 @@ export function ContentDetailLayout({
     metadata ??
     (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
   const showHeroImage = displayImage != null || displayFallback != null
+  const heroFrame: ContentMediaImageFrame =
+    mediaPresentation.frame === 'emblem' ? 'emblem' : 'primary'
   const heroDescriptionText =
     heroDescription && descriptionHtml ? stripHtmlTags(descriptionHtml).trim() : undefined
   const hasBody = Boolean(descriptionContent || children)
@@ -130,7 +140,7 @@ export function ContentDetailLayout({
     <div className={contentDetailRootClasses}>
       <Card className={contentDetailHeroCardClasses}>
         <CardContent className={contentDetailHeroCardContentClasses}>
-          <div className={contentDetailHeroGridClasses}>
+          <div className={contentDetailHeroGridClasses(mediaPresentation)}>
             <div className={contentDetailHeroMainClasses}>
               <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
                 {resolvedClassificationLabel}
@@ -151,18 +161,18 @@ export function ContentDetailLayout({
               ) : null}
             </div>
             {showHeroImage ? (
-              <div className={contentDetailHeroImageShellClasses}>
+              <div className={contentDetailHeroImageShellClasses(mediaPresentation)}>
                 {displayImage ? (
                   <ContentMediaImage
                     display={displayImage}
                     alt={imageName}
-                    frame="primary"
+                    frame={heroFrame}
                     className={contentDetailHeroImageFrameClasses}
                   />
                 ) : displayFallback ? (
                   <ContentMediaFallback
                     fallback={displayFallback}
-                    frame="primary"
+                    frame={heroFrame}
                     className={contentDetailHeroImageFrameClasses}
                   />
                 ) : null}

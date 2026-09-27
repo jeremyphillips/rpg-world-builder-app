@@ -1,5 +1,4 @@
 import type { ContentSource } from '../../rpg/content/lib/envelope'
-import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
 import type { ContentMedia } from './content-media'
 import {
   buildSystemContentImageVirtualId,
@@ -7,11 +6,14 @@ import {
   type ContentMediaSystemSource,
 } from './content-media-source'
 import type { SourceDimensions } from './geometry'
+import { getContentMediaPolicy, type ContentMediaDomain } from './media-policy'
+import type { MediaRole } from './roles'
 import {
   deriveSystemContentImage,
   resolveContentImageSet,
   resolveSystemContentImage,
 } from './system-content-image-registry'
+import type { SystemImageSubject } from './system-image-subject'
 
 export type AvailableContentUploadImage = {
   kind: 'upload'
@@ -31,7 +33,8 @@ export type AvailableContentImage = AvailableContentUploadImage | AvailableConte
 
 export function getAvailableContentImages(input: {
   media: ContentMedia
-  contentType: ContentTypeKey
+  domain: ContentMediaDomain
+  subject: SystemImageSubject
   slug: string
   contentSource: ContentSource
   imageSetId?: string
@@ -51,42 +54,42 @@ export function getAvailableContentImages(input: {
     return uploads
   }
 
-  const derived = deriveSystemContentImage({
-    imageSetId: resolvedImageSetId,
-    contentType: input.contentType,
-    assetRole: 'primary',
-    slug: input.slug,
-  })
-  if (!derived) {
-    return uploads
+  const policy = getContentMediaPolicy(input.domain)
+  const systemImages: AvailableContentSystemImage[] = []
+
+  for (const assetRole of policy.allowedRoles as readonly MediaRole[]) {
+    const derived = deriveSystemContentImage({
+      imageSetId: resolvedImageSetId,
+      subject: input.subject,
+      assetRole,
+      slug: input.slug,
+    })
+    if (!derived) continue
+
+    const resolved = resolveSystemContentImage({
+      imageSetId: derived.imageSetId,
+      subject: derived.subject,
+      assetRole: derived.assetRole,
+      slug: derived.slug,
+      contentSource: input.contentSource,
+    })
+    if (!resolved) continue
+
+    const source = createSystemRoleAssignment({
+      imageSetId: derived.imageSetId,
+      subject: derived.subject,
+      assetRole: derived.assetRole,
+      slug: derived.slug,
+    }).source
+
+    systemImages.push({
+      kind: 'system',
+      id: buildSystemContentImageVirtualId(source),
+      source,
+      srcPath: resolved.path,
+      sourceDimensions: resolved.sourceDimensions,
+    })
   }
 
-  const resolved = resolveSystemContentImage({
-    imageSetId: derived.imageSetId,
-    contentType: derived.contentType,
-    assetRole: derived.assetRole,
-    slug: derived.slug,
-    contentSource: input.contentSource,
-  })
-  if (!resolved) return uploads
-
-  const srcPath = resolved.path
-  const sourceDimensions = resolved.sourceDimensions
-
-  const source = createSystemRoleAssignment({
-    imageSetId: derived.imageSetId,
-    contentType: derived.contentType,
-    assetRole: derived.assetRole,
-    slug: derived.slug,
-  }).source
-
-  const systemImage: AvailableContentSystemImage = {
-    kind: 'system',
-    id: buildSystemContentImageVirtualId(source),
-    source,
-    srcPath,
-    sourceDimensions,
-  }
-
-  return [...uploads, systemImage]
+  return [...uploads, ...systemImages]
 }

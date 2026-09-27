@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import type { ContentSource } from '../../rpg/content/lib/envelope'
-import type { ContentTypeKey } from '../../rpg/primitives/content/content-type-keys'
+import { systemImageSubjectSchema, type SystemImageSubject } from './system-image-subject'
 
 export const CONTENT_MEDIA_UPLOAD_SOURCE_KIND = 'upload' as const
 export const CONTENT_MEDIA_SYSTEM_SOURCE_KIND = 'system' as const
@@ -19,7 +19,7 @@ export const contentMediaSystemSourceSchema = z
   .object({
     kind: z.literal(CONTENT_MEDIA_SYSTEM_SOURCE_KIND),
     imageSetId: z.string().min(1),
-    contentType: z.string().min(1),
+    subject: systemImageSubjectSchema,
     assetRole: z.string().min(1),
     slug: z.string().min(1),
   })
@@ -40,7 +40,8 @@ export function buildSystemContentImageVirtualId(source: ContentMediaSystemSourc
   return [
     SYSTEM_CONTENT_IMAGE_VIRTUAL_ID_PREFIX,
     source.imageSetId,
-    source.contentType,
+    source.subject.kind,
+    source.subject.key,
     source.assetRole,
     source.slug,
   ].join(':')
@@ -48,16 +49,31 @@ export function buildSystemContentImageVirtualId(source: ContentMediaSystemSourc
 
 export function parseSystemContentImageVirtualId(id: string): ContentMediaSystemSource | undefined {
   const parts = id.split(':')
-  if (parts.length !== 5 || parts[0] !== SYSTEM_CONTENT_IMAGE_VIRTUAL_ID_PREFIX) return undefined
-  const [, imageSetId, contentType, assetRole, slug] = parts
-  if (!imageSetId || !contentType || !assetRole || !slug) return undefined
+  if (parts.length !== 6 || parts[0] !== SYSTEM_CONTENT_IMAGE_VIRTUAL_ID_PREFIX) return undefined
+  const [, imageSetId, kind, key, assetRole, slug] = parts
+  if (!imageSetId || !kind || !key || !assetRole || !slug) return undefined
+  const parsedSubject = systemImageSubjectSchema.safeParse({ kind, key })
+  if (!parsedSubject.success) return undefined
   return {
     kind: CONTENT_MEDIA_SYSTEM_SOURCE_KIND,
     imageSetId,
-    contentType,
+    subject: parsedSubject.data,
     assetRole,
     slug,
   }
+}
+
+export function systemImageSourcesEqual(
+  a: ContentMediaSystemSource,
+  b: Pick<ContentMediaSystemSource, 'imageSetId' | 'subject' | 'assetRole' | 'slug'>,
+): boolean {
+  return (
+    a.imageSetId === b.imageSetId &&
+    a.subject.kind === b.subject.kind &&
+    a.subject.key === b.subject.key &&
+    a.assetRole === b.assetRole &&
+    a.slug === b.slug
+  )
 }
 
 export function roleAssignmentUploadImageId(
@@ -109,7 +125,7 @@ export function createUploadRoleAssignment(imageId: string): {
 
 export function createSystemRoleAssignment(input: {
   imageSetId: string
-  contentType: ContentTypeKey | string
+  subject: SystemImageSubject
   assetRole: string
   slug: string
 }): { source: ContentMediaSystemSource } {
@@ -117,7 +133,7 @@ export function createSystemRoleAssignment(input: {
     source: {
       kind: CONTENT_MEDIA_SYSTEM_SOURCE_KIND,
       imageSetId: input.imageSetId,
-      contentType: input.contentType,
+      subject: input.subject,
       assetRole: input.assetRole,
       slug: input.slug,
     },

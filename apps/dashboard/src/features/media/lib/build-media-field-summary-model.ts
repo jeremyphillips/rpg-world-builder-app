@@ -29,7 +29,8 @@ export function buildMediaFieldSummaryModel(input: {
   const availableImages = contentContext
     ? getAvailableContentImages({
         media,
-        contentType: contentContext.contentType,
+        domain: contentContext.domain,
+        subject: contentContext.subject,
         slug: contentContext.slug,
         contentSource: contentContext.contentSource,
         rulesetId: contentContext.rulesetId,

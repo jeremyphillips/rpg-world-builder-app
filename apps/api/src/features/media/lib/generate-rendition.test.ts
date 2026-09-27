@@ -148,18 +148,18 @@ describe('generateMediaRendition emblem layout', () => {
     const emblemLayout = { mode: 'contain' as const, scale: 0.75 }
     const metrics = resolveEmblemLayoutMetrics({
       source: { width: sourceWidth, height: sourceHeight },
-      canvasSize: 256,
+      canvasSize: 512,
       layout: emblemLayout,
     })
 
     const rendition = await generateMediaRendition({ asset, preset: 'emblem', emblemLayout })
     const metadata = await sharp(rendition.buffer).metadata()
 
-    expect(metadata.width).toBe(256)
-    expect(metadata.height).toBe(256)
-    expect(metrics.renderedWidth).toBe(192)
-    expect(metrics.renderedHeight).toBe(96)
-    expect(metrics.left).toBe(32)
-    expect(metrics.top).toBe(80)
+    expect(metadata.width).toBe(512)
+    expect(metadata.height).toBe(512)
+    expect(metrics.renderedWidth).toBe(384)
+    expect(metrics.renderedHeight).toBe(192)
+    expect(metrics.left).toBe(64)
+    expect(metrics.top).toBe(160)
   })
 })

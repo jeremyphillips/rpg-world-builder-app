@@ -28,7 +28,6 @@ const LEGACY_DISPLAY_IMAGE_HELPERS = [
 
 const NON_MEDIA_DETAIL_ROUTES = [
   'content/feats/routes/feat-detail.tsx',
-  'content/spells/routes/spells-detail.tsx',
   'content/skill-proficiencies/routes/skill-proficiency-detail.tsx',
 ] as const
 
@@ -115,5 +114,13 @@ describe('entity surface config guard', () => {
         /displayImage|ContentMediaImage|getContentDisplayImage/,
       )
     }
+  })
+
+  it('never passes spell entity media on spell detail routes', () => {
+    const source = readFileSync(
+      join(FEATURE_ROOT, 'content/spells/routes/spells-detail.tsx'),
+      'utf8',
+    )
+    expect(source).not.toMatch(/\bspell\.media\b/)
   })
 })
