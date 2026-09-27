@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { characterBuilderStepIdSchema } from './step-ids'
 
@@ -25,10 +26,7 @@ export const characterBuildValidationIssueSchema = z
     ).length
 
     if (referenceCount > 1) {
-      ctx.addIssue({
-        code: 'custom',
-        message: CHARACTER_BUILD_VALIDATION_ISSUE_SINGLE_TARGET_MESSAGE,
-      })
+      addCustomRefinementIssue(ctx, CHARACTER_BUILD_VALIDATION_ISSUE_SINGLE_TARGET_MESSAGE)
     }
   })
 

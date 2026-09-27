@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { contentChoiceOptionSchema, contentChoiceSchema } from './lib/grants/choice'
 import {
@@ -41,11 +42,7 @@ const startingEquipmentGrantedItemObjectSchema = z
   .strict()
   .superRefine((grant, ctx) => {
     if (grant.target.source === 'proficiency_choice' && (grant.modifiers?.length ?? 0) > 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: PROFICIENCY_LINKED_GRANT_MODIFIERS_MESSAGE,
-        path: ['modifiers'],
-      })
+      addCustomRefinementIssue(ctx, PROFICIENCY_LINKED_GRANT_MODIFIERS_MESSAGE, ['modifiers'])
     }
   })
 

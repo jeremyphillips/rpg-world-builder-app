@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { systemRulesetIdSchema, type SystemRulesetId } from '../../primitives/ruleset'
 import { tierBonusGoldSchema } from '../../primitives/currency-formula'
@@ -15,11 +16,11 @@ function refineUniqueMagicItemGrantRarities(
 
   grants.forEach((grant, index) => {
     if (seen.has(grant.rarity)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Duplicate magic item rarity grant per tier',
-        path: [...pathPrefix, index, 'rarity'],
-      })
+      addCustomRefinementIssue(ctx, 'Duplicate magic item rarity grant per tier', [
+        ...pathPrefix,
+        index,
+        'rarity',
+      ])
     }
     seen.add(grant.rarity)
   })

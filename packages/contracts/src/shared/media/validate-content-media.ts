@@ -1,4 +1,5 @@
 import type { ZodIssue } from 'zod'
+import { customZodIssue } from '../../lib/add-custom-refinement-issue'
 
 import { contentMediaValidationMessages } from './content-media-validation-messages'
 import type { ContentMedia } from './content-media'
@@ -38,30 +39,26 @@ export type ContentMediaValidationResult =
   | { ok: true; media: ContentMedia }
   | { ok: false; issues: ZodIssue[] }
 
-function customIssue(message: string, path: Array<string | number>): ZodIssue {
-  return { code: 'custom', message, path }
-}
-
 function collectAttachmentIssues(images: ContentMedia['images'], maxItems: number): ZodIssue[] {
   const issues: ZodIssue[] = []
   const imageIds = new Set<string>()
   const assetIds = new Set<string>()
 
   if (images.length > maxItems) {
-    issues.push(customIssue(`A record may have at most ${maxItems} attachments.`, ['images']))
+    issues.push(customZodIssue(`A record may have at most ${maxItems} attachments.`, ['images']))
   }
 
   for (const [index, image] of images.entries()) {
     if (imageIds.has(image.id)) {
       issues.push(
-        customIssue('Attachment ids must be unique within a record.', ['images', index, 'id']),
+        customZodIssue('Attachment ids must be unique within a record.', ['images', index, 'id']),
       )
     }
     imageIds.add(image.id)
 
     if (assetIds.has(image.assetId)) {
       issues.push(
-        customIssue('Asset ids must be unique within a record gallery.', [
+        customZodIssue('Asset ids must be unique within a record gallery.', [
           'images',
           index,
           'assetId',
@@ -94,12 +91,12 @@ function collectEmblemPresentationIssues(
   const issues: ZodIssue[] = []
   if (assignment.presentation && assignment.presentation.mode !== 'contain') {
     issues.push(
-      customIssue('Emblem presentation must use contain mode.', ['roles', role, 'presentation']),
+      customZodIssue('Emblem presentation must use contain mode.', ['roles', role, 'presentation']),
     )
   }
   const eligibility = resolveMediaRoleEligibility(role, source)
   if (!eligibility.eligible) {
-    issues.push(customIssue(eligibility.message, ['roles', role]))
+    issues.push(customZodIssue(eligibility.message, ['roles', role]))
   }
   return issues
 }
@@ -115,7 +112,7 @@ function collectCropShapeIssues(
   if (!isFixedAspectCrop(crop, source, spec) || !meetsFixedAspectMinimum(crop, source, spec)) {
     const aspectLabel = formatAspectRatioLabel(spec)
     return [
-      customIssue(
+      customZodIssue(
         contentMediaValidationMessages.fixedAspectCropInvalid({
           roleLabel: MEDIA_ROLE_ENTRIES[role].label,
           aspectLabel,
@@ -137,7 +134,7 @@ function collectCropPresentationIssues(
 ): ZodIssue[] {
   if (assignment.presentation?.mode === 'contain') {
     return [
-      customIssue(`${MEDIA_ROLE_ENTRIES[role].label} presentation must use crop mode.`, [
+      customZodIssue(`${MEDIA_ROLE_ENTRIES[role].label} presentation must use crop mode.`, [
         'roles',
         role,
         'presentation',
@@ -155,7 +152,7 @@ function collectCropPresentationIssues(
 
   if (cropPresentation?.focalPoint && !isFocalPointInCrop(cropPresentation.focalPoint, crop)) {
     issues.push(
-      customIssue('Focal point must sit inside the crop.', [
+      customZodIssue('Focal point must sit inside the crop.', [
         'roles',
         role,
         'presentation',
@@ -166,7 +163,7 @@ function collectCropPresentationIssues(
 
   const eligibility = resolveMediaRoleEligibility(role, source, cropPresentation)
   if (!eligibility.eligible) {
-    issues.push(customIssue(eligibility.message, ['roles', role, 'presentation']))
+    issues.push(customZodIssue(eligibility.message, ['roles', role, 'presentation']))
     return issues
   }
 
@@ -181,7 +178,7 @@ function collectRolePresentationIssues(
 ): ZodIssue[] {
   if (!dimensions) {
     return [
-      customIssue(
+      customZodIssue(
         `${MEDIA_ROLE_ENTRIES[role].label} validation requires trusted asset dimensions.`,
         ['roles', role],
       ),
@@ -215,7 +212,7 @@ function collectSystemRoleIssues(
   })
   if (!derived || !systemImageSourcesEqual(assignment.source, derived)) {
     return [
-      customIssue(`Role ${role} references an unknown system image source.`, [
+      customZodIssue(`Role ${role} references an unknown system image source.`, [
         'roles',
         role,
         'source',
@@ -249,7 +246,7 @@ function collectRoleIssues(
     if (!assignment) continue
 
     if (!policy.allowedRoles.includes(role)) {
-      issues.push(customIssue(`${role} is not allowed for ${policy.domain}.`, ['roles', role]))
+      issues.push(customZodIssue(`${role} is not allowed for ${policy.domain}.`, ['roles', role]))
       continue
     }
 
@@ -261,7 +258,7 @@ function collectRoleIssues(
     const imageId = roleAssignmentUploadImageId(assignment)
     if (!imageId || !imageIds.has(imageId)) {
       issues.push(
-        customIssue(`Role ${role} references a missing attachment.`, ['roles', role, 'source']),
+        customZodIssue(`Role ${role} references a missing attachment.`, ['roles', role, 'source']),
       )
       continue
     }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { diceSchema } from '../../primitives/dice'
 import { absoluteLevelSchema } from '../../primitives/level'
@@ -124,22 +125,22 @@ function refineAscendingEntryLevels(
 
   for (const [index, entry] of entries.entries()) {
     if (seenLevels.has(entry.level)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: progressionTableValidationMessages.duplicateEntryLevel({ level: entry.level }),
-        path: [...pathPrefix, index, 'level'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        progressionTableValidationMessages.duplicateEntryLevel({ level: entry.level }),
+        [...pathPrefix, index, 'level'],
+      )
     }
     seenLevels.add(entry.level)
 
     if (index > 0) {
       const previous = entries[index - 1]
       if (previous && entry.level <= previous.level) {
-        ctx.addIssue({
-          code: 'custom',
-          message: progressionTableValidationMessages.entriesNotAscending(),
-          path: [...pathPrefix, index, 'level'],
-        })
+        addCustomRefinementIssue(ctx, progressionTableValidationMessages.entriesNotAscending(), [
+          ...pathPrefix,
+          index,
+          'level',
+        ])
       }
     }
   }

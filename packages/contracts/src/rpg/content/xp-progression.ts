@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../validation/define-message'
 import {
@@ -73,28 +74,26 @@ export const xpProgressionEntriesSchema = z
       const expectedLevel = index + 1
 
       if (entry.level !== expectedLevel) {
-        ctx.addIssue({
-          code: 'custom',
-          message: xpProgressionValidationMessages.contiguousLevels({ expected: expectedLevel }),
-          path: [index, 'level'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          xpProgressionValidationMessages.contiguousLevels({ expected: expectedLevel }),
+          [index, 'level'],
+        )
       }
 
       if (index === 0 && entry.xpRequired !== 0) {
-        ctx.addIssue({
-          code: 'custom',
-          message: xpProgressionValidationMessages.levelOneZeroXp(),
-          path: [index, 'xpRequired'],
-        })
+        addCustomRefinementIssue(ctx, xpProgressionValidationMessages.levelOneZeroXp(), [
+          index,
+          'xpRequired',
+        ])
       }
 
       const previousEntry = entries[index - 1]
       if (previousEntry !== undefined && entry.xpRequired <= previousEntry.xpRequired) {
-        ctx.addIssue({
-          code: 'custom',
-          message: xpProgressionValidationMessages.increasingXp(),
-          path: [index, 'xpRequired'],
-        })
+        addCustomRefinementIssue(ctx, xpProgressionValidationMessages.increasingXp(), [
+          index,
+          'xpRequired',
+        ])
       }
     })
   })

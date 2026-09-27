@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import {
   getOrganizationLocationConnectionFamily,
@@ -30,21 +31,21 @@ export const organizationLocationConnectionsSchema = z
 
     connections.forEach((connection, index) => {
       if (seenIds.has(connection.id)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Location connection ids must be unique within the organization.',
-          path: [index, 'id'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          'Location connection ids must be unique within the organization.',
+          [index, 'id'],
+        )
       }
       seenIds.add(connection.id)
 
       const locationKindKey = `${connection.locationId}:${connection.kind}`
       if (seenLocationKinds.has(locationKindKey)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Each location may appear at most once per connection kind.',
-          path: [index, 'kind'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          'Each location may appear at most once per connection kind.',
+          [index, 'kind'],
+        )
       }
       seenLocationKinds.add(locationKindKey)
 
@@ -53,11 +54,11 @@ export const organizationLocationConnectionsSchema = z
       if (familyExclusivity === 'one_per_family') {
         const locationFamilyKey = `${connection.locationId}:${family}`
         if (seenLocationFamilies.has(locationFamilyKey)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: organizationLocationConnectionFamilyViolationMessage(family),
-            path: [index, 'kind'],
-          })
+          addCustomRefinementIssue(
+            ctx,
+            organizationLocationConnectionFamilyViolationMessage(family),
+            [index, 'kind'],
+          )
         }
         seenLocationFamilies.add(locationFamilyKey)
       }
@@ -73,11 +74,11 @@ export const organizationLocationConnectionsSchema = z
           .map((connection, index) => (connection.kind === kind ? index : -1))
           .filter((index) => index >= 0)
         for (const index of indexes) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `Each organization may have at most ${maxSubjectsPerOrganization} ${kind} connection(s).`,
-            path: [index, 'kind'],
-          })
+          addCustomRefinementIssue(
+            ctx,
+            `Each organization may have at most ${maxSubjectsPerOrganization} ${kind} connection(s).`,
+            [index, 'kind'],
+          )
         }
       }
     }

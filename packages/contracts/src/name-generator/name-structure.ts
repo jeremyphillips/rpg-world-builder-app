@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../lib/add-custom-refinement-issue'
 
 // ---------------------------------------------------------------------------
 // Name structures — output shape and assembly format (separate from generation).
@@ -59,21 +60,17 @@ export const nameStructureDefinitionSchema = z
 
     for (const token of formatTokens) {
       if (!partKeys.has(token)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Format token {${token}} does not match any part key`,
-          path: ['format'],
-        })
+        addCustomRefinementIssue(ctx, `Format token {${token}} does not match any part key`, [
+          'format',
+        ])
       }
     }
 
     for (const part of structure.parts) {
       if (part.required !== false && !formatTokens.includes(part.key)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Required part "${part.key}" is not referenced in format`,
-          path: ['parts'],
-        })
+        addCustomRefinementIssue(ctx, `Required part "${part.key}" is not referenced in format`, [
+          'parts',
+        ])
       }
     }
   })

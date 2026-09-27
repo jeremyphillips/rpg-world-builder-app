@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { averageDiceRoll, diceSchema, formatDice, type Dice } from '../dice'
 import { rollValidationMessages } from './roll-messages'
@@ -15,10 +16,7 @@ export const rollSchema = z
   })
   .superRefine((val, ctx) => {
     if (val.dice === undefined && val.flat === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: rollValidationMessages.atLeastOneRequired(),
-      })
+      addCustomRefinementIssue(ctx, rollValidationMessages.atLeastOneRequired())
     }
   })
 

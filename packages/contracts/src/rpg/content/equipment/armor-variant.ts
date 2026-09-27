@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { armorMaterialSchema } from '../../vocab/armor/material'
@@ -53,18 +54,14 @@ export function refineArmorEquipment(
 ): void {
   if (val.category === 'shields') {
     if (val.acBonus === undefined) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['acBonus'],
-        message: equipmentVariantValidationMessages.shieldAcBonusRequired(),
-      })
+      addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.shieldAcBonusRequired(), [
+        'acBonus',
+      ])
     }
   } else if (val.baseAc === undefined) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['baseAc'],
-      message: equipmentVariantValidationMessages.bodyArmorBaseAcRequired(),
-    })
+    addCustomRefinementIssue(ctx, equipmentVariantValidationMessages.bodyArmorBaseAcRequired(), [
+      'baseAc',
+    ])
   }
 }
 

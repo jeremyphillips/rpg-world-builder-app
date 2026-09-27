@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { characterValidationMessages } from '../character-messages'
 
@@ -52,11 +53,9 @@ export const characterSelectionSourceSchema = z
   })
   .superRefine((val, ctx) => {
     if (val.kind !== 'manual' && val.kind !== 'grant' && val.sourceId === undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: characterValidationMessages.selectionSourceIdRequired(),
-        path: ['sourceId'],
-      })
+      addCustomRefinementIssue(ctx, characterValidationMessages.selectionSourceIdRequired(), [
+        'sourceId',
+      ])
     }
   })
 

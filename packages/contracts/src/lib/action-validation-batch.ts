@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from './add-custom-refinement-issue'
 
 import type { ActionBatchValidationResult, ActionTargetFailure } from './action-validation'
 
@@ -35,11 +36,11 @@ export function uniqueTargetIdsRefinement(idKey: string) {
       }
 
       if (seen.has(id)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: `Duplicate ${idKey} "${id}" in batch targets.`,
-          path: ['targets', index, idKey],
-        })
+        addCustomRefinementIssue(ctx, `Duplicate ${idKey} "${id}" in batch targets.`, [
+          'targets',
+          index,
+          idKey,
+        ])
       }
 
       seen.add(id)

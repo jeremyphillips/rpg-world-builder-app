@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateMetadataSchema } from '../primitives/versioned-template'
@@ -56,11 +57,12 @@ export const campaignPresetCatalogSchema = z
         for (const [index, entry] of collection.entries()) {
           const value = entry.metadata[field]
           if (seen.has(value)) {
-            ctx.addIssue({
-              code: 'custom',
-              message: `Duplicate ${field} "${value}"`,
-              path: [collectionName, index, 'metadata', field],
-            })
+            addCustomRefinementIssue(ctx, `Duplicate ${field} "${value}"`, [
+              collectionName,
+              index,
+              'metadata',
+              field,
+            ])
           }
           seen.add(value)
         }
@@ -73,17 +75,19 @@ export const campaignPresetCatalogSchema = z
       for (const [packIndex, packId] of template.worldSeedPackIds.entries()) {
         const pack = packsById.get(packId)
         if (!pack) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `Unknown world seed pack id "${packId}"`,
-            path: ['campaignTemplates', templateIndex, 'worldSeedPackIds', packIndex],
-          })
+          addCustomRefinementIssue(ctx, `Unknown world seed pack id "${packId}"`, [
+            'campaignTemplates',
+            templateIndex,
+            'worldSeedPackIds',
+            packIndex,
+          ])
         } else if (pack.rulesetId !== template.rulesetId) {
-          ctx.addIssue({
-            code: 'custom',
-            message: `World seed pack "${packId}" targets a different ruleset`,
-            path: ['campaignTemplates', templateIndex, 'worldSeedPackIds', packIndex],
-          })
+          addCustomRefinementIssue(ctx, `World seed pack "${packId}" targets a different ruleset`, [
+            'campaignTemplates',
+            templateIndex,
+            'worldSeedPackIds',
+            packIndex,
+          ])
         }
       }
     }

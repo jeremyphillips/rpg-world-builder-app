@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../../../validation/define-message'
 import { absoluteLevelSchema } from '../../../primitives/level'
@@ -17,11 +18,11 @@ const classCapacityCurveSchema = z
     const seen = new Set<number>()
     curve.rows.forEach((row, index) => {
       if (seen.has(row.level)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: `Level ${row.level} appears more than once in the progression curve.`,
-          path: ['rows', index, 'level'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          `Level ${row.level} appears more than once in the progression curve.`,
+          ['rows', index, 'level'],
+        )
       }
       seen.add(row.level)
     })
@@ -59,15 +60,15 @@ function refineStrictlyIncreasingCapacityRows(
 
   sorted.forEach((row, index) => {
     if (previousCount !== undefined && row.count <= previousCount) {
-      ctx.addIssue({
-        code: 'custom',
-        message: classCapacityProgressionValidationMessages.countMustIncrease({
+      addCustomRefinementIssue(
+        ctx,
+        classCapacityProgressionValidationMessages.countMustIncrease({
           level: row.level,
           previous: previousCount,
           next: row.count,
         }),
-        path: [...pathPrefix, index, 'count'],
-      })
+        [...pathPrefix, index, 'count'],
+      )
     }
     previousCount = row.count
   })
@@ -81,11 +82,10 @@ export const classCapacityProgressionSchema = z
   .superRefine((progression, ctx) => {
     const rows = progression.curve.rows
     if (rows.length === 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: classCapacityProgressionValidationMessages.emptyCurve(),
-        path: ['curve', 'rows'],
-      })
+      addCustomRefinementIssue(ctx, classCapacityProgressionValidationMessages.emptyCurve(), [
+        'curve',
+        'rows',
+      ])
       return
     }
 

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { fieldValidationMessages } from '../../../../validation/messages'
 import { contentVisibilityModeSchema } from '../../../vocab/content-visibility'
@@ -16,11 +17,11 @@ export type ContentCampaignAccess = z.infer<typeof contentCampaignAccessSchema>
 export const contentCampaignAccessPatchSchema = contentCampaignAccessSchema
   .superRefine((data, ctx) => {
     if (data.visibilityMode === 'specific_players' && data.participantIds.length < 1) {
-      ctx.addIssue({
-        code: 'custom',
-        message: fieldValidationMessages.minSelections({ itemLabel: 'player' }),
-        path: ['participantIds'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'player' }),
+        ['participantIds'],
+      )
     }
   })
   .transform((data) => ({

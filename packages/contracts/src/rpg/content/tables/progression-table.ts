@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { slugSchema } from '../lib/envelope'
 
@@ -34,11 +35,11 @@ function refineUniqueColumnIds(
 
   for (const [index, column] of columns.entries()) {
     if (seenIds.has(column.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: progressionTableValidationMessages.duplicateColumnId({ columnId: column.id }),
-        path: [...pathPrefix, index, 'id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        progressionTableValidationMessages.duplicateColumnId({ columnId: column.id }),
+        [...pathPrefix, index, 'id'],
+      )
     }
     seenIds.add(column.id)
   }

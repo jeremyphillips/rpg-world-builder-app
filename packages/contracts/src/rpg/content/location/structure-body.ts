@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { structureTypeSchema } from '../../vocab/location/building/structure-type'
 import { locationBaseSchema } from './base'
@@ -17,11 +18,11 @@ function refineStructureClassification(
   ctx: z.RefinementCtx,
 ) {
   if (data.classification && data.structureType !== 'building') {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'Building classification is only valid when structureType is building.',
-      path: ['classification'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      'Building classification is only valid when structureType is building.',
+      ['classification'],
+    )
   }
 }
 

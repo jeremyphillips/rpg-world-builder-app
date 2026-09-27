@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { abilitySchema, abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
@@ -60,11 +61,7 @@ export const creatureRuntimeHitPointsSchema = z
   })
   .superRefine((hitPoints, ctx) => {
     if (hitPoints.current > hitPoints.base) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'Current hit points cannot exceed the maximum.',
-        path: ['current'],
-      })
+      addCustomRefinementIssue(ctx, 'Current hit points cannot exceed the maximum.', ['current'])
     }
   })
 

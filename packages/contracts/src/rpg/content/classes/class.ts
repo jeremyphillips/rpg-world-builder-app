@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { abilitySchema } from '../../vocab/ability'
 import { hitDieSchema } from '../../primitives/dice'
@@ -53,14 +54,14 @@ function refineClassFeatureGrantUnlockLevels(
 ): void {
   for (const group of (feature.grantGroups ?? []) as GrantGroup[]) {
     if (group.unlock !== undefined && group.unlock.level <= feature.level) {
-      ctx.addIssue({
-        code: 'custom',
-        message: classValidationMessages.grantGroupUnlockAfterFeatureLevel({
+      addCustomRefinementIssue(
+        ctx,
+        classValidationMessages.grantGroupUnlockAfterFeatureLevel({
           unlockLevel: group.unlock.level,
           featureLevel: feature.level,
         }),
-        path: ['grantGroups'],
-      })
+        ['grantGroups'],
+      )
     }
   }
 }
@@ -229,29 +230,23 @@ function refineClassSpellcastingOwnership(
   if (hasConfig && grantingFeatures.length === 1) return
 
   if (hasConfig && !hasGrant) {
-    ctx.addIssue({
-      code: 'custom',
-      message: classValidationMessages.spellcastingConfigRequiresGrant(),
-      path: ['spellcasting'],
-    })
+    addCustomRefinementIssue(ctx, classValidationMessages.spellcastingConfigRequiresGrant(), [
+      'spellcasting',
+    ])
     return
   }
 
   if (!hasConfig && hasGrant) {
-    ctx.addIssue({
-      code: 'custom',
-      message: classValidationMessages.spellcastingGrantRequiresConfig(),
-      path: ['features'],
-    })
+    addCustomRefinementIssue(ctx, classValidationMessages.spellcastingGrantRequiresConfig(), [
+      'features',
+    ])
     return
   }
 
   if (grantingFeatures.length > 1) {
-    ctx.addIssue({
-      code: 'custom',
-      message: classValidationMessages.spellcastingGrantingFeatureDuplicate(),
-      path: ['features'],
-    })
+    addCustomRefinementIssue(ctx, classValidationMessages.spellcastingGrantingFeatureDuplicate(), [
+      'features',
+    ])
   }
 }
 
@@ -260,11 +255,10 @@ const createClassInputBaseSchema = classStoredBodySchema.extend({ slug: slugSche
 
 export const createClassInputSchema = createClassInputBaseSchema.superRefine((value, ctx) => {
   if (value.characterCreation && value.characterCreation.abilityScoreOrder === undefined) {
-    ctx.addIssue({
-      code: 'custom',
-      message: 'characterCreation requires abilityScoreOrder on publish',
-      path: ['characterCreation', 'abilityScoreOrder'],
-    })
+    addCustomRefinementIssue(ctx, 'characterCreation requires abilityScoreOrder on publish', [
+      'characterCreation',
+      'abilityScoreOrder',
+    ])
   }
 
   refineClassSpellcastingOwnership(value, ctx)

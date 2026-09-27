@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { organizationLocationConnectionKindSchema } from '../vocab/location/connection/organization-location-connection'
 import { contentStatusSchema } from './lib/envelope'
@@ -42,11 +43,11 @@ export const buildingCreateCompositionRequestSchema = z
     const organizationDraftIds = new Set<string>()
     value.organizations.forEach((organization, index) => {
       if (organizationDraftIds.has(organization.organizationDraftId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Organization draft ids must be unique.',
-          path: ['organizations', index, 'organizationDraftId'],
-        })
+        addCustomRefinementIssue(ctx, 'Organization draft ids must be unique.', [
+          'organizations',
+          index,
+          'organizationDraftId',
+        ])
       }
       organizationDraftIds.add(organization.organizationDraftId)
     })
@@ -54,11 +55,11 @@ export const buildingCreateCompositionRequestSchema = z
     const relationshipDraftIds = new Set<string>()
     value.relationships.forEach((relationship, index) => {
       if (relationshipDraftIds.has(relationship.relationshipDraftId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Relationship draft ids must be unique.',
-          path: ['relationships', index, 'relationshipDraftId'],
-        })
+        addCustomRefinementIssue(ctx, 'Relationship draft ids must be unique.', [
+          'relationships',
+          index,
+          'relationshipDraftId',
+        ])
       }
       relationshipDraftIds.add(relationship.relationshipDraftId)
 
@@ -66,11 +67,12 @@ export const buildingCreateCompositionRequestSchema = z
         relationship.organization.kind === 'new' &&
         !organizationDraftIds.has(relationship.organization.organizationDraftId)
       ) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Relationship references an unknown organization draft.',
-          path: ['relationships', index, 'organization', 'organizationDraftId'],
-        })
+        addCustomRefinementIssue(ctx, 'Relationship references an unknown organization draft.', [
+          'relationships',
+          index,
+          'organization',
+          'organizationDraftId',
+        ])
       }
     })
   })

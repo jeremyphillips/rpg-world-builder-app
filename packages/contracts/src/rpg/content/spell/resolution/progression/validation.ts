@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../../lib/add-custom-refinement-issue'
 
 import {
   DEFAULT_CANTrip_SCALING_THRESHOLDS,
@@ -80,29 +81,28 @@ function validateProgressionBasis(
 ): void {
   const { progression, ctx, pathPrefix } = validation
   if (progression.tracks.length === 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.tracksRequired(),
-      path: [...pathPrefix, 'tracks'],
-    })
+    addCustomRefinementIssue(ctx, spellResolutionProgressionValidationMessages.tracksRequired(), [
+      ...pathPrefix,
+      'tracks',
+    ])
   }
 
   if (options.spellLevel === undefined) return
 
   if (progression.basis === 'character-level' && options.spellLevel !== 0) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.basisRequiresCantripLevel(),
-      path: [...pathPrefix, 'basis'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.basisRequiresCantripLevel(),
+      [...pathPrefix, 'basis'],
+    )
   }
 
   if (progression.basis === 'spell-slot-level' && options.spellLevel < 1) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.basisRequiresLeveledSpell(),
-      path: [...pathPrefix, 'basis'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.basisRequiresLeveledSpell(),
+      [...pathPrefix, 'basis'],
+    )
   }
 }
 
@@ -114,24 +114,24 @@ function validateEffectReference(
 ): void {
   const effect = findResolutionEffectById(resolution, reference.effectId)
   if (!effect) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.unknownEffectReference({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.unknownEffectReference({
         effectId: reference.effectId,
       }),
-      path: [...trackPath, 'reference', 'subject', 'effectId'],
-    })
+      [...trackPath, 'reference', 'subject', 'effectId'],
+    )
     return
   }
 
   if (!isRollBearingResolutionEffect(effect)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.effectMustBeRollBearing({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.effectMustBeRollBearing({
         effectId: reference.effectId,
       }),
-      path: [...trackPath, 'reference', 'subject', 'effectId'],
-    })
+      [...trackPath, 'reference', 'subject', 'effectId'],
+    )
   }
 }
 
@@ -150,30 +150,30 @@ function validateReferenceContext(
     reference.property === 'projectile-count' &&
     resolution.applicationPattern?.kind !== 'projectiles'
   ) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.applicationPatternProjectilesRequired(),
-      path: [...trackPath, 'reference'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.applicationPatternProjectilesRequired(),
+      [...trackPath, 'reference'],
+    )
   }
 
   if (reference.property === 'selected-target-count' && !resolution.target) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.targetRequiredForTargetCount(),
-      path: [...trackPath, 'reference'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.targetRequiredForTargetCount(),
+      [...trackPath, 'reference'],
+    )
   }
 
   if (readProgressionBaseValue(resolution, track.reference) === undefined) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.invalidSubjectPropertyPair({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.invalidSubjectPropertyPair({
         subject: reference.subject.kind,
         property: reference.property,
       }),
-      path: [...trackPath, 'reference'],
-    })
+      [...trackPath, 'reference'],
+    )
   }
 }
 
@@ -186,11 +186,11 @@ function validateThresholdTrack(
 ): void {
   const thresholds = track.entries.map((entry) => entry.threshold)
   if (!isStrictlyAscending(thresholds)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.thresholdsMustAscend(),
-      path: [...trackPath, 'entries'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.thresholdsMustAscend(),
+      [...trackPath, 'entries'],
+    )
   }
 
   if (basis !== 'character-level') return
@@ -201,13 +201,13 @@ function validateThresholdTrack(
     actual.length === expected.length && actual.every((value, index) => value === expected[index])
 
   if (!matches) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.cantripThresholdsMustMatchRuleset({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.cantripThresholdsMustMatchRuleset({
         expected: expected.join(', '),
       }),
-      path: [...trackPath, 'entries'],
-    })
+      [...trackPath, 'entries'],
+    )
   }
 }
 
@@ -218,11 +218,11 @@ function validateLinearTrack(
   ctx: z.RefinementCtx,
 ): void {
   if (!isPositiveIncrementValue(track)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.incrementMustBePositive(),
-      path: [...trackPath, 'increment'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.incrementMustBePositive(),
+      [...trackPath, 'increment'],
+    )
   }
 
   if (
@@ -230,19 +230,19 @@ function validateLinearTrack(
     track.increment.roll.dice === undefined &&
     track.increment.roll.flat !== undefined
   ) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.flatOnlyIncrementNotSupported(),
-      path: [...trackPath, 'increment'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.flatOnlyIncrementNotSupported(),
+      [...trackPath, 'increment'],
+    )
   }
 
   if (!validateIncrementDiceFacesMatchBase(resolution, track)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.incrementDiceFacesMustMatchBase(),
-      path: [...trackPath, 'increment'],
-    })
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.incrementDiceFacesMustMatchBase(),
+      [...trackPath, 'increment'],
+    )
   }
 }
 
@@ -256,27 +256,27 @@ function validateProgressionTrack(
   const { reference } = track
 
   if (!isValidSpellResolutionProgressionReferencePair(reference.subject, reference.property)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.invalidSubjectPropertyPair({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.invalidSubjectPropertyPair({
         subject: reference.subject.kind,
         property: reference.property,
       }),
-      path: [...trackPath, 'reference'],
-    })
+      [...trackPath, 'reference'],
+    )
     return
   }
 
   const expectedValueKind = progressionValueKindForProperty(reference.property)
   if (!validateValueKindForReference(track, expectedValueKind)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellResolutionProgressionValidationMessages.valueKindMismatch({
+    addCustomRefinementIssue(
+      ctx,
+      spellResolutionProgressionValidationMessages.valueKindMismatch({
         expected: expectedValueKind,
         actual: track.kind === 'linear' ? track.increment.kind : 'mixed',
       }),
-      path: [...trackPath],
-    })
+      [...trackPath],
+    )
   }
 
   validateReferenceContext(resolution, reference, track, trackPath, ctx)

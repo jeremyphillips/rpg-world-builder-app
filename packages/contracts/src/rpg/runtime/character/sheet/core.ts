@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { absoluteLevelSchema } from '../../../primitives/level'
 import { characterValidationMessages } from '../character-messages'
@@ -33,11 +34,10 @@ export const characterClassesSchema = z
 
     entries.forEach((entry, index) => {
       if (seen.has(entry.classId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: characterValidationMessages.duplicateClass(),
-          path: [index, 'classId'],
-        })
+        addCustomRefinementIssue(ctx, characterValidationMessages.duplicateClass(), [
+          index,
+          'classId',
+        ])
       }
 
       seen.add(entry.classId)
@@ -52,11 +52,10 @@ export const npcCharacterClassesSchema = z
 
     entries.forEach((entry, index) => {
       if (seen.has(entry.classId)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: characterValidationMessages.duplicateClass(),
-          path: [index, 'classId'],
-        })
+        addCustomRefinementIssue(ctx, characterValidationMessages.duplicateClass(), [
+          index,
+          'classId',
+        ])
       }
 
       seen.add(entry.classId)

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import { modelingBlockerSchema, modelingGapEntrySchema } from './gap-entry'
 import { EXPLICIT_MODELING_STATUSES } from './status'
@@ -22,19 +23,11 @@ export const contentModelingSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.gaps !== undefined && data.gaps.length === 0) {
-      ctx.addIssue({
-        code: 'custom',
-        message: modelingValidationMessages.emptyGapsArray,
-        path: ['gaps'],
-      })
+      addCustomRefinementIssue(ctx, modelingValidationMessages.emptyGapsArray, ['gaps'])
     }
 
     if (data.blocker && data.gaps?.some((gap) => gap.code === data.blocker?.code)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: modelingValidationMessages.duplicateBlockerInGaps,
-        path: ['gaps'],
-      })
+      addCustomRefinementIssue(ctx, modelingValidationMessages.duplicateBlockerInGaps, ['gaps'])
     }
   })
 

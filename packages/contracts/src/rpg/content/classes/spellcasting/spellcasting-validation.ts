@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { defineMessage } from '../../../../validation/define-message'
 
@@ -72,11 +73,11 @@ function refineSelectionAgainstProgression(
 ): void {
   if (!selection) {
     if (hasCapacityRows(progression?.repertoire) || hasCapacityRows(progression?.preparedSpells)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingValidationMessages.selectionProgressionForbidden(),
-        path: [...pathPrefix, 'progression'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        spellcastingValidationMessages.selectionProgressionForbidden(),
+        [...pathPrefix, 'progression'],
+      )
     }
     return
   }
@@ -84,57 +85,57 @@ function refineSelectionAgainstProgression(
   switch (selection.model) {
     case 'limitedRepertoire':
       if (!hasCapacityRows(progression?.repertoire)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.repertoireRequired(),
-          path: [...pathPrefix, 'progression', 'repertoire'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.repertoireRequired(), [
+          ...pathPrefix,
+          'progression',
+          'repertoire',
+        ])
       }
       if (hasCapacityRows(progression?.preparedSpells)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.preparedSpellsForbidden(),
-          path: [...pathPrefix, 'progression', 'preparedSpells'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.preparedSpellsForbidden(), [
+          ...pathPrefix,
+          'progression',
+          'preparedSpells',
+        ])
       }
       break
     case 'prepareFromClassList':
       if (!hasCapacityRows(progression?.preparedSpells)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.preparedSpellsRequired(),
-          path: [...pathPrefix, 'progression', 'preparedSpells'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.preparedSpellsRequired(), [
+          ...pathPrefix,
+          'progression',
+          'preparedSpells',
+        ])
       }
       if (hasCapacityRows(progression?.repertoire)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.repertoireForbidden(),
-          path: [...pathPrefix, 'progression', 'repertoire'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.repertoireForbidden(), [
+          ...pathPrefix,
+          'progression',
+          'repertoire',
+        ])
       }
       break
     case 'prepareFromLearnedCollection':
       if (!hasCapacityRows(progression?.preparedSpells)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.preparedSpellsRequired(),
-          path: [...pathPrefix, 'progression', 'preparedSpells'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.preparedSpellsRequired(), [
+          ...pathPrefix,
+          'progression',
+          'preparedSpells',
+        ])
       }
       if (selection.acquisition.curve.rows.length === 0) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.acquisitionRequired(),
-          path: [...pathPrefix, 'spellSelection', 'acquisition'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.acquisitionRequired(), [
+          ...pathPrefix,
+          'spellSelection',
+          'acquisition',
+        ])
       }
       if (hasCapacityRows(progression?.repertoire)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: spellcastingValidationMessages.repertoireForbidden(),
-          path: [...pathPrefix, 'progression', 'repertoire'],
-        })
+        addCustomRefinementIssue(ctx, spellcastingValidationMessages.repertoireForbidden(), [
+          ...pathPrefix,
+          'progression',
+          'repertoire',
+        ])
       }
       break
   }
@@ -148,20 +149,20 @@ function refineCantripsAgainstGrant(
 ): void {
   if (grantsCantrips) {
     if (!hasCapacityRows(progression?.cantrips)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: spellcastingValidationMessages.cantripsRequired(),
-        path: [...pathPrefix, 'progression', 'cantrips'],
-      })
+      addCustomRefinementIssue(ctx, spellcastingValidationMessages.cantripsRequired(), [
+        ...pathPrefix,
+        'progression',
+        'cantrips',
+      ])
     }
     return
   }
 
   if (hasCapacityRows(progression?.cantrips)) {
-    ctx.addIssue({
-      code: 'custom',
-      message: spellcastingValidationMessages.cantripsForbidden(),
-      path: [...pathPrefix, 'progression', 'cantrips'],
-    })
+    addCustomRefinementIssue(ctx, spellcastingValidationMessages.cantripsForbidden(), [
+      ...pathPrefix,
+      'progression',
+      'cantrips',
+    ])
   }
 }

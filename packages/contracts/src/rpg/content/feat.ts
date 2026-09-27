@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { featCategorySchema } from '../vocab/feat'
 import { FEAT_CONTENT_TYPE_TERM } from './lib/content-type-terms'
@@ -22,11 +23,9 @@ export const featRepeatableSchema = z
   })
   .superRefine((val, ctx) => {
     if (!val.allowed && val.notes !== undefined) {
-      ctx.addIssue({
-        code: 'custom',
-        message: featValidationMessages.repeatableNotesOnlyWhenAllowed(),
-        path: ['notes'],
-      })
+      addCustomRefinementIssue(ctx, featValidationMessages.repeatableNotesOnlyWhenAllowed(), [
+        'notes',
+      ])
     }
   })
 

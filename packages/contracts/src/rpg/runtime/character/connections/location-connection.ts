@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import {
   characterLocationConnectionKindSchema,
@@ -22,21 +23,21 @@ export const characterLocationConnectionsSchema = z
 
     connections.forEach((connection, index) => {
       if (seenIds.has(connection.id)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Location connection ids must be unique within the character.',
-          path: [index, 'id'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          'Location connection ids must be unique within the character.',
+          [index, 'id'],
+        )
       }
       seenIds.add(connection.id)
 
       const locationKindKey = `${connection.locationId}:${connection.kind}`
       if (seenLocationKinds.has(locationKindKey)) {
-        ctx.addIssue({
-          code: 'custom',
-          message: 'Each location may appear at most once per connection kind.',
-          path: [index, 'kind'],
-        })
+        addCustomRefinementIssue(
+          ctx,
+          'Each location may appear at most once per connection kind.',
+          [index, 'kind'],
+        )
       }
       seenLocationKinds.add(locationKindKey)
     })

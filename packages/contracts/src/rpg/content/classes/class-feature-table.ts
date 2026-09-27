@@ -1,4 +1,5 @@
 import type { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
 import type { ContentTable, ProgressionTableColumn } from '../tables'
 import { classFeatureTableValidationMessages } from './class-feature-table-messages'
@@ -30,11 +31,11 @@ export function refineFeatureTablesOnFeature(
 
   for (const [tableIndex, table] of tables.entries()) {
     if (seenTableIds.has(table.id)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: classFeatureTableValidationMessages.duplicateTableId({ tableId: table.id }),
-        path: ['tables', tableIndex, 'id'],
-      })
+      addCustomRefinementIssue(
+        ctx,
+        classFeatureTableValidationMessages.duplicateTableId({ tableId: table.id }),
+        ['tables', tableIndex, 'id'],
+      )
     }
     seenTableIds.add(table.id)
 
@@ -43,14 +44,14 @@ export function refineFeatureTablesOnFeature(
     for (const [columnIndex, column] of table.columns.entries()) {
       for (const [entryIndex, entry] of column.entries.entries()) {
         if (entry.level < feature.level) {
-          ctx.addIssue({
-            code: 'custom',
-            message: classFeatureTableValidationMessages.entryBeforeFeatureLevel({
+          addCustomRefinementIssue(
+            ctx,
+            classFeatureTableValidationMessages.entryBeforeFeatureLevel({
               entryLevel: entry.level,
               featureLevel: feature.level,
             }),
-            path: ['tables', tableIndex, 'columns', columnIndex, 'entries', entryIndex, 'level'],
-          })
+            ['tables', tableIndex, 'columns', columnIndex, 'entries', entryIndex, 'level'],
+          )
         }
       }
     }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import { characterLocationConnectionsSchema } from './location-connection'
 
@@ -25,11 +26,10 @@ export const characterConnectionsSchema = z.object({
       const seen = new Set<string>()
       connections.forEach((connection, index) => {
         if (seen.has(connection.organizationId)) {
-          ctx.addIssue({
-            code: 'custom',
-            message: 'Organization memberships must be unique.',
-            path: [index, 'organizationId'],
-          })
+          addCustomRefinementIssue(ctx, 'Organization memberships must be unique.', [
+            index,
+            'organizationId',
+          ])
         }
         seen.add(connection.organizationId)
       })
