@@ -10,6 +10,20 @@ import {
   organizationPresetOwnedEditableMatchesPreset,
 } from '@rpg/contracts'
 
+const ORGANIZATION_AUTHORING_PRESET_COMBOBOX_DESCRIPTION_PREFIX = 'Closest starting point for '
+
+/** Combobox secondary line — drops catalog boilerplate from preset descriptions. */
+export function organizationAuthoringPresetComboboxDescription(description: string): string {
+  if (!description.startsWith(ORGANIZATION_AUTHORING_PRESET_COMBOBOX_DESCRIPTION_PREFIX)) {
+    return description
+  }
+  const rest = description.slice(ORGANIZATION_AUTHORING_PRESET_COMBOBOX_DESCRIPTION_PREFIX.length)
+  if (rest.length === 0) {
+    return rest
+  }
+  return rest.charAt(0).toUpperCase() + rest.slice(1)
+}
+
 export function organizationStartingPointFieldPath(prefix?: string): string {
   return prefix ? `${prefix}.startingPointId` : 'startingPointId'
 }

@@ -19,6 +19,7 @@ import {
 } from '../../lib/presets/organization-form-copy.lib'
 import {
   isOrganizationAuthoringPresetId,
+  organizationAuthoringPresetComboboxDescription,
   organizationStartingPointFieldPath,
   organizationStartingPointIsCustomized,
 } from '../../lib/presets/organization-starting-point.lib'
@@ -28,7 +29,7 @@ const presetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
   return {
     value: id,
     label: preset.label,
-    metadata: preset.description,
+    metadata: organizationAuthoringPresetComboboxDescription(preset.description),
     ...('discoveryTerms' in preset && preset.discoveryTerms
       ? { searchTerms: preset.discoveryTerms }
       : {}),
@@ -103,6 +104,7 @@ export function OrganizationStartingPointField({
         <ComboboxField
           id={comboboxId}
           label={ORGANIZATION_STARTING_POINT_LEGEND}
+          labelVisibility="srOnly"
           hint={ORGANIZATION_STARTING_POINT_HINT}
           hintPosition="below-control"
           options={presetOptions}

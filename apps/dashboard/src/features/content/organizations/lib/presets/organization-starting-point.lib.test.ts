@@ -3,11 +3,23 @@ import { describe, expect, it } from 'vitest'
 import {
   buildOrganizationEditFamiliarTypeFormPatch,
   buildOrganizationStartingPointValueSyncPatch,
+  organizationAuthoringPresetComboboxDescription,
   organizationStartingPointIsCustomized,
   ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION,
 } from './organization-starting-point.lib'
 
 describe('organization starting point helpers', () => {
+  it('strips combobox description boilerplate from preset catalog copy', () => {
+    expect(
+      organizationAuthoringPresetComboboxDescription(
+        'Closest starting point for bardic college, seminary, and teaching bodies.',
+      ),
+    ).toBe('Bardic college, seminary, and teaching bodies.')
+    expect(organizationAuthoringPresetComboboxDescription('Custom summary.')).toBe(
+      'Custom summary.',
+    )
+  })
+
   it('materializes startingPointId, taxonomy, classes, and membership titles', () => {
     const patch = buildOrganizationStartingPointValueSyncPatch('bank', {
       discoverableClasses: [],
