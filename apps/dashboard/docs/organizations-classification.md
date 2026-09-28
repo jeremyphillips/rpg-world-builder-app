@@ -56,7 +56,9 @@ Do not start from the frozen discovery corpus to learn the current shipped model
   (authoring guidance only) while a starting point remains selected.
 - Removing the starting point clears the association and recommendations but retains materialized
   profile values, class affinities, and titles.
-- Edit routes expose **Apply familiar type…** (profile + class affinities only; titles unchanged).
+- Edit routes expose **Use familiar type…** on the Organization profile legend. The temporary
+  field replaces profile values plus class affinities after confirmation, leaves titles unchanged,
+  then closes.
 
 ### Membership title catalog
 
@@ -87,10 +89,11 @@ resolver is authoritative — client omission of `members.titles` still yields t
 snapshot at persist.
 
 **Edit path:** classification forms expose `members.classAffinityIds` and
-`members.speciesAffinityIds` only — never `members.titles`, `connections`, or
-`sourcePresetId`. Title catalog and location connections are owned by create and dedicated
-mutations respectively. Classification PATCH never modifies an existing `members.titles`
-snapshot.
+`members.speciesAffinityIds` for mutation. `members.titles` is **read-only** on edit
+(surfaced from saved form state; not replaced by **Use familiar type…**). `connections` and
+`sourcePresetId` stay off the classification form. Title catalog edits and location
+connections use dedicated mutations respectively. Classification PATCH never modifies an
+existing `members.titles` snapshot.
 
 **Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
 Mongo mapping, API serialization, duplication, and parse round-trips must preserve array
@@ -110,7 +113,12 @@ Detail: [`organization/membership-titles.ts`](../../../packages/contracts/src/rp
 ### Detail surfaces
 
 Organization detail stat rows show Domain, optional Form, Functions, Practices, and member
-class/species affinities (when present). Membership rosters intersect affinities with the NPC
+class/species affinities (when present). A read-only **Membership titles** section lists
+`members.titles` in canonical hierarchy order (same sort as member-title pickers). Presets may
+seed the catalog at create; once materialized, titles are organization-owned and are not
+replaced when applying a familiar type on edit.
+
+Membership rosters intersect affinities with the NPC
 playable catalog from `resolvePlayableBuilderContent` to badge recommended picker rows. The
 picker candidate list loads independently — recommendations decorate rows once that universe
 is ready; a failed build context degrades badges only.

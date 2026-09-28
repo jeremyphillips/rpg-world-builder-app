@@ -62,7 +62,11 @@ Organization familiar starting points (`organization-form-projection.ts`):
 - Create uses draft-only `startingPointId` plus `OrganizationStartingPointField` (slot) for
   summary/change/remove UX. `buildOrganizationFormValueSyncs` materializes domain / form /
   functions / practices / class affinities / `members.titles`; the id is **not** persisted.
-- Edit uses `OrganizationApplyFamiliarTypeField` — profile + class affinities only.
+- Edit exposes `OrganizationEditFamiliarTypeField` from the **Organization profile**
+  legend action. The temporary picker replaces profile values plus class affinities,
+  never membership titles, and closes after cancel or successful apply.
+- Edit also surfaces a read-only **Membership titles** group (`OrganizationEditMembershipTitlesField`)
+  between member affinities and description — catalog from form `members.titles`, canonical sort.
 - Optional **Form** uses shared `select` `clearable` (accessible name `Clear Form`).
 - **Functions** — multi **`chips`** with outline chrome and hint
   _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.

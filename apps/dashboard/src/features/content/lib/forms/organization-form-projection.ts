@@ -38,7 +38,9 @@ import { draftOptionalSelect } from './validation/draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
 import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
-import { OrganizationApplyFamiliarTypeField } from '../../organizations/components/create/organization-apply-familiar-type-field'
+import { OrganizationEditFamiliarTypeField } from '../../organizations/components/edit/organization-edit-familiar-type-field'
+import { OrganizationEditMembershipTitlesField } from '../../organizations/components/edit/organization-edit-membership-titles-field'
+import { OrganizationUseFamiliarTypeAction } from '../../organizations/components/edit/organization-use-familiar-type-action'
 import { OrganizationQuickCreateProfileSections } from '../../organizations/components/create/organization-quick-create-profile-sections'
 import { OrganizationStartingPointLegendAccessory } from '../../organizations/components/create/organization-starting-point-legend-accessory'
 import { OrganizationStartingPointSetupManuallyAction } from '../../organizations/components/create/organization-starting-point-setup-manually-action'
@@ -73,6 +75,10 @@ import {
   buildMemberSpeciesAffinityChipOptions,
   ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
 } from '../../organizations/lib/members/organization-member-species-chip-options.lib'
+import {
+  ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
+  ORGANIZATION_SECTION_LABELS,
+} from '../../organizations/lib/organization-display'
 
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,
@@ -270,17 +276,55 @@ function buildOrganizationMemberAffinityFields(
 }
 
 function buildOrganizationProfileGroup(options: {
+  ctx: ContentFormCtx
   prefix?: string
+  discoverableClasses: readonly CharacterClass[]
   recommendedPracticeIds: readonly OrganizationPractice[]
 }): FormItem {
-  const { prefix, recommendedPracticeIds } = options
+  const { ctx, prefix, discoverableClasses, recommendedPracticeIds } = options
+  const profileFields = buildOrganizationProfileFields({ prefix, recommendedPracticeIds })
+  const editFamiliarTypeField: FormItem = {
+    kind: 'slot',
+    name: fieldPath(prefix, '_organizationEditFamiliarType'),
+    render: () =>
+      createElement(OrganizationEditFamiliarTypeField, {
+        prefix,
+        discoverableClasses,
+      }),
+  }
+
   return {
     kind: 'group',
     id: 'organization-quick-create-profile',
-    legend: ORGANIZATION_PROFILE_GROUP_LEGEND,
-    description: ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
-    density: 'compact',
-    fields: buildOrganizationProfileFields({ prefix, recommendedPracticeIds }),
+    ...(ctx.mode === 'edit'
+      ? {
+          heading: {
+            label: ORGANIZATION_PROFILE_GROUP_LEGEND,
+            hint: ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
+            action: createElement(OrganizationUseFamiliarTypeAction),
+          },
+        }
+      : {
+          legend: ORGANIZATION_PROFILE_GROUP_LEGEND,
+          description: ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
+        }),
+    fields: ctx.mode === 'edit' ? [editFamiliarTypeField, ...profileFields] : profileFields,
+  }
+}
+
+function buildOrganizationMembershipTitlesReadOnlyGroup(prefix?: string): FormItem {
+  return {
+    kind: 'group',
+    id: 'organization-membership-titles',
+    legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
+    description: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
+    fields: [
+      {
+        kind: 'slot',
+        name: fieldPath(prefix, '_organizationMembershipTitles'),
+        render: () => createElement(OrganizationEditMembershipTitlesField, { prefix }),
+      },
+    ],
   }
 }
 
@@ -301,18 +345,16 @@ function buildOrganizationOptionalDetailsGroup(
       label: ORGANIZATION_OPTIONAL_DETAILS_GROUP_LEGEND,
       hint: ORGANIZATION_OPTIONAL_DETAILS_GROUP_DESCRIPTION,
     },
-    density: 'compact',
     disclosure: {
       variant: 'legend',
       defaultOpen: false,
-      collapseKey: 'organization-quick-create-optional-details',
+      persistOpen: false,
     },
     fields: [
       {
         kind: 'group',
         legend: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
         description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
-        density: 'compact',
         fields: memberAffinityFields,
       },
       descriptionFieldItem,
@@ -340,6 +382,7 @@ export function buildOrganizationQuickCreateFollowOnFields(
   } = options
   const practiceRecommendationIds =
     recommendedPracticeIds ?? ctx.organizationPracticeRecommendationIds ?? []
+  const discoverableClasses = resolveDiscoverableOrganizationMemberClasses(ctx)
   const descriptionFieldItem: FormItem = {
     ...descriptionField(ctx),
     name: fieldPath(prefix, 'description'),
@@ -351,21 +394,37 @@ export function buildOrganizationQuickCreateFollowOnFields(
       selectedMemberClassAffinityIds,
       selectedMemberSpeciesAffinityIds,
     })
-    return [
-      buildOrganizationProfileGroup({ prefix, recommendedPracticeIds: practiceRecommendationIds }),
+    const fullPresentationFields: FormItem[] = [
+      buildOrganizationProfileGroup({
+        ctx,
+        prefix,
+        discoverableClasses,
+        recommendedPracticeIds: practiceRecommendationIds,
+      }),
       {
         kind: 'group',
         legend: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
         description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
-        density: 'compact',
         fields: memberAffinityFields,
       },
-      descriptionFieldItem,
     ]
+
+    if (ctx.mode === 'edit') {
+      fullPresentationFields.push(buildOrganizationMembershipTitlesReadOnlyGroup(prefix))
+    }
+
+    fullPresentationFields.push(descriptionFieldItem)
+
+    return fullPresentationFields
   }
 
   return [
-    buildOrganizationProfileGroup({ prefix, recommendedPracticeIds: practiceRecommendationIds }),
+    buildOrganizationProfileGroup({
+      ctx,
+      prefix,
+      discoverableClasses,
+      recommendedPracticeIds: practiceRecommendationIds,
+    }),
     buildOrganizationOptionalDetailsGroup(
       ctx,
       { prefix, selectedMemberClassAffinityIds, selectedMemberSpeciesAffinityIds },
@@ -402,17 +461,7 @@ export function buildOrganizationFields(
     fields.push({ ...nameField(), name: fieldPath(prefix, 'name') })
   }
 
-  if (ctx.mode === 'edit') {
-    fields.push({
-      kind: 'slot',
-      name: fieldPath(prefix, '_organizationApplyFamiliarType'),
-      render: () =>
-        createElement(OrganizationApplyFamiliarTypeField, {
-          prefix,
-          discoverableClasses,
-        }),
-    })
-  } else {
+  if (ctx.mode !== 'edit') {
     fields.push({
       kind: 'group',
       heading: {
@@ -423,7 +472,6 @@ export function buildOrganizationFields(
         }),
         action: createElement(OrganizationStartingPointSetupManuallyAction),
       },
-      density: 'compact',
       fields: [
         {
           kind: 'slot',

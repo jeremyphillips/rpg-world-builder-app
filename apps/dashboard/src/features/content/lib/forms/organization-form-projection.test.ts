@@ -41,10 +41,39 @@ describe('organization form projection', () => {
     ).toMatchObject({ startingPointId: undefined })
   })
 
-  it('omits the starting point slot on edit and exposes apply familiar type', () => {
-    const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode: 'edit' })))
+  it('surfaces read-only membership titles on edit after member affinities', () => {
+    const items = buildOrganizationFields(makeContentFormCtx({ mode: 'edit' }))
+    const fields = collectFields(items)
+    const groupLegends = items
+      .flatMap((item) => ('kind' in item && item.kind === 'group' ? [item] : []))
+      .map((group) => group.legend ?? group.heading?.label)
+
+    expect(groupLegends).toEqual(['Organization profile', 'Member affinities', 'Membership titles'])
+    expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
+    const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
+    const titlesSlotIndex = fields.findIndex(({ name }) => name === '_organizationMembershipTitles')
+    expect(titlesSlotIndex).toBeGreaterThan(-1)
+    expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
+    expect(
+      collectFields(buildOrganizationFields(makeContentFormCtx())).map(({ name }) => name),
+    ).not.toContain('_organizationMembershipTitles')
+  })
+
+  it('places the edit familiar type utility inside the organization profile group', () => {
+    const items = buildOrganizationFields(makeContentFormCtx({ mode: 'edit' }))
+    const fields = collectFields(items)
+    const profileGroup = items.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group' && item.heading?.label === 'Organization profile',
+    )
+
     expect(fields.map(({ name }) => name)).not.toContain('startingPointId')
-    expect(fields.map(({ name }) => name)).toContain('_organizationApplyFamiliarType')
+    expect(fields.map(({ name }) => name)).toContain('_organizationEditFamiliarType')
+    expect(profileGroup?.heading?.action).toBeDefined()
+    expect(profileGroup?.fields[0]).toMatchObject({
+      kind: 'slot',
+      name: '_organizationEditFamiliarType',
+    })
   })
 
   it('reuses the canonical standalone fields under an embedded namespace', () => {
@@ -189,13 +218,33 @@ describe('organization form projection', () => {
       disclosure: {
         variant: 'legend',
         defaultOpen: false,
-        collapseKey: 'organization-quick-create-optional-details',
+        persistOpen: false,
       },
       heading: {
         label: 'Optional details',
         hint: 'Member affinities and description',
       },
     })
+    expect(optionalDetails).not.toHaveProperty('density')
+  })
+
+  it('does not hardcode group density on organization fields', () => {
+    const collectGroups = (items: FormItem[]): Extract<FormItem, { kind: 'group' }>[] =>
+      items.flatMap((item) => {
+        if (!('kind' in item) || item.kind !== 'group') return []
+        return [item, ...collectGroups(item.fields)]
+      })
+
+    for (const presentation of ['quick', 'full'] as const) {
+      const groups = collectGroups(
+        buildOrganizationFields(makeContentFormCtx(), { presentation }),
+      ).concat(
+        collectGroups(
+          buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), { presentation }),
+        ),
+      )
+      expect(groups.every((group) => group.density === undefined)).toBe(true)
+    }
   })
 
   it('uses one input builder for standalone and embedded function/practice values', () => {
