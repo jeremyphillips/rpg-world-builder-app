@@ -7,6 +7,7 @@ import type {
 import { emptyContentMediaSchema } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 import { useRef, useState, type ReactNode } from 'react'
+import type { FieldValues, UseFormReturn } from 'react-hook-form'
 
 import { PageShell } from '@/components/layout/page/page-shell'
 import { ContentFormPageShell } from '../layout/content-form-page-shell'
@@ -32,6 +33,7 @@ import {
 } from '../../registry/content-form-registry'
 import { resolveContentPostCreateEditHref } from '../layout/content-form-navigation'
 
+import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
 import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
@@ -102,21 +104,23 @@ function ContentCreateFormBody({
     values: Record<string, unknown>,
     status: 'draft' | 'published',
     validationIntent: ContentValidationIntent,
+    form?: UseFormReturn<FieldValues>,
   ) => {
     const preparedValues = prepareSubmitValues?.(values) ?? values
+    const inputCtx = {
+      weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+      campaignRules: ctx.campaignRules,
+      equipmentKind: ctx.equipmentKind,
+    }
     const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
       campaignId,
       routeKey: def.routeKey,
       createInput: {
-        ...def.toInput(
-          preparedValues,
-          {
-            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            campaignRules: ctx.campaignRules,
-            equipmentKind: ctx.equipmentKind,
-          },
-          validationIntent,
-        ),
+        ...(serializeContentFormInput(def, preparedValues, inputCtx, validationIntent, {
+          operation: 'create',
+          dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
+          rulesetId: ctx.rulesetId,
+        }) as Record<string, unknown>),
         status,
       },
       mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
@@ -149,16 +153,16 @@ function ContentCreateFormBody({
     fallbackMessage: `Could not create ${def.routeKey}.`,
     prepareCommitValues,
     invalidPresentation,
-    persist: async (values) => {
-      await createEntity(values, intentToStatus('publish'), 'publish')
+    persist: async (values, form) => {
+      await createEntity(values, intentToStatus('publish'), 'publish', form)
     },
   })
 
   const { onSubmit: onSaveDraft, formError: saveDraftFormError } = useSubmitHandler(
-    async (values) => {
+    async (values, form) => {
       setSaveDraftPending(true)
       try {
-        await createEntity(values, intentToStatus('save_draft'), 'draft')
+        await createEntity(values, intentToStatus('save_draft'), 'draft', form)
       } finally {
         setSaveDraftPending(false)
       }

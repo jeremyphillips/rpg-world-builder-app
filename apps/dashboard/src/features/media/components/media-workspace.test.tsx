@@ -1,13 +1,16 @@
 import { createUploadRoleAssignment } from '@rpg/contracts'
+import { resolveCropRelativeGuideLayout } from '@rpg/ui'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createUploadSession } from '../api/media-api'
+import type * as MediaApiModule from '../api/media-api'
 import { MediaManager } from './media-manager'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+import { resolveFramePresentation } from '../lib/content-media-image-frame.lib'
 
 vi.mock('../api/media-api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../api/media-api')>()
+  const actual = await importOriginal<typeof MediaApiModule>()
   return {
     ...actual,
     createUploadSession: vi.fn(),
@@ -117,4 +120,38 @@ it('returns to the neutral preview when the active role is unchecked', () => {
   expect(screen.getByRole('heading', { name: 'Portrait crop' })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('checkbox', { name: 'Portrait' }))
   expect(screen.getByRole('heading', { name: 'Image preview' })).toBeInTheDocument()
+})
+
+it('projects the renderer frame presentation as the primary card guide', () => {
+  const authoredCrop = { x: 0.2, y: 0.15, width: 0.6, height: 0.45 }
+  const focalPoint = { x: 0.5, y: 0.3 }
+  mount({
+    initialSelectedImageId: 'image-1',
+    value: {
+      ...mediaFixture,
+      roles: {
+        primary: {
+          ...createUploadRoleAssignment('image-1'),
+          presentation: { mode: 'crop', crop: authoredCrop, focalPoint },
+        },
+      },
+    },
+  })
+
+  const presentation = resolveFramePresentation({
+    role: 'primary',
+    authoredCrop,
+    focalPoint,
+    frame: 'builderCard',
+  })
+  const layout = resolveCropRelativeGuideLayout(authoredCrop, presentation.effectiveCrop!)
+  const guide = document.querySelector<HTMLElement>('[data-effective-crop-guide]')
+
+  expect(guide).toHaveStyle({
+    left: `${layout.leftPercent}%`,
+    top: `${layout.topPercent}%`,
+    width: `${layout.widthPercent}%`,
+    height: `${layout.heightPercent}%`,
+  })
+  expect(screen.getAllByText(/outlined card window shows the resulting crop/i)).toHaveLength(1)
 })

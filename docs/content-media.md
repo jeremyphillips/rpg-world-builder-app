@@ -37,6 +37,42 @@ Equipment, Location, Organization, Game term). Full product and UX specification
    pickers, and overview thumbnails resolve **primary** only (emblem is manager-only in
    this pass).
 
+## Four layers (source → surface)
+
+1. **Source availability** — `resolveAvailableContentMediaSources` in `@rpg/contracts`
+   is the SSOT for which upload attachments and registry system assets exist. Each source
+   carries `sourceKind`, `sourcePersistence` (`persisted` uploads vs `virtual` registry
+   art), and per-role `assignments` (`derived` defaults vs `persisted` role bindings).
+   The result includes `contextStatus: 'complete' | 'incomplete'` and `missing` lookup
+   fields. System lookup requires `contentSource: 'system'`, subject, slug, and an image
+   set; homebrew domains (including characters) need only persisted media plus
+   `contentSource`. Create vs edit is **not** in contracts — the dashboard treats
+   `incomplete` as uploads-only on create and as a blocking edit state.
+2. **Role assignment / authored presentation** — `ContentMedia.roles`, crops, focal
+   points, and emblem layout. `normalizePersistedContentMedia` strips untouched derived
+   system defaults before persist; customized system treatment stays authored.
+3. **Surface display resolution** — `resolveContentDisplayImage` and
+   `selectDisplaySourceForRole` choose which source and role a card, detail, or field
+   renders. Gallery-only uploads never become implicit primary. Broken persisted
+   assignments set `assignedSourceMissing` and fall back to virtual system art in
+   production.
+4. **Workspace presentation** — `getAvailableContentImages` projects the same
+   availability into gallery tiles; the media manager assigns roles and edits presentation.
+   Gallery-only uploads are labeled in the UI and stay out of the field preview thumb.
+
+Direct `deriveSystemContentImage` / `resolveSystemContentImage` calls belong in the
+source resolver, registry, normalize/validate/catalog-write, and registry tests only
+(drift guard in contracts).
+
+## Crop ownership and frame presentation
+
+The authored role crop defines the permitted source region and is the only crop persisted
+with `ContentMedia`. Focal points are persisted in source-normalized coordinates. Each
+destination frame derives an ephemeral effective crop from the authored crop, focal point,
+role, and canonical frame descriptor. The editor guide and renderer consume the same frame
+presentation result. An effective frame crop may narrow the authored region but must never
+reveal pixels outside it or be saved back over the authored role crop.
+
 System art comes only from `SYSTEM_CONTENT_IMAGE_ENTRIES` while walking each role
 (upload assignment, then registry entry for that subject, slug, and role). Registry
 subjects use `SystemImageSubject` (`content-type` or `vocabulary-set` keys).
@@ -70,7 +106,20 @@ assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
 - `resolveCharacterDisplayImage` for portrait → primary character resolution
 - Normalized crop geometry and `validateContentMedia`
 - `mediaBearingAuthoredContentBodySchema` (authored bodies without `imageKey`)
-- Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
+- Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`). Any write that
+  includes `media` must send a **complete canonical** `ContentMedia` snapshot
+  (full `images[]` and `roles` after normalize rules)—never a partial nested patch.
+  Unrelated saves omit `media` and `expectedMediaRevision`.
+- Catalog writes validate media on the API (coherence + policy), reconcile upload
+  references in the same Mongo transaction as persistence, and accept
+  `expectedMediaRevision` alongside `media` when media is included. Media mutation
+  helpers accept an optional Mongo session and never start or commit transactions;
+  only top-level create/update/delete owners do.
+- Form-bound managed media registers its RHF path with `useController`; the schema
+  `<Form>` uses `shouldUnregister: true`, so watch-only paths lose seeded defaults.
+- A media write rejected with `409 stale_revision` includes the current snapshot at
+  `details.media`. Edit forms reset the media field to that snapshot and ask the user
+  to review the reloaded images before saving again.
 - `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
 - System content image registry (`SYSTEM_CONTENT_IMAGE_ENTRIES`)
 

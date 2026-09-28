@@ -35,9 +35,22 @@ export const contentMediaImageFrameVariants = cva('relative overflow-hidden', {
   },
 })
 
-export const contentMediaImageClasses = 'block size-full max-w-none select-none object-cover'
+export const contentMediaImageBaseClasses = 'block max-w-none select-none'
 
-export const contentMediaImageEmblemClasses = 'object-contain'
+export const contentMediaImageCoverClasses = cn(
+  contentMediaImageBaseClasses,
+  'size-full object-cover',
+)
+
+export const contentMediaImageCropClasses = cn(
+  contentMediaImageBaseClasses,
+  'absolute object-fill object-left-top',
+)
+
+export const contentMediaImageEmblemClasses = cn(
+  contentMediaImageBaseClasses,
+  'size-full object-contain',
+)
 
 export const contentMediaImageMonoGlyphInvertClasses = 'dark:invert'
 

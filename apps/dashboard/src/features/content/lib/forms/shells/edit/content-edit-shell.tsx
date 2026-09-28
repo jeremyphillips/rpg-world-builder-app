@@ -16,6 +16,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadc
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
+import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import {
   contentFormRegistry,
@@ -34,6 +35,10 @@ import { ContentEditLifecycleActions } from './content-edit-lifecycle-actions'
 import { ContentEditPublishProvider } from './content-edit-publish-context'
 import { ContentEditHeadingBadges } from '../../../campaign-access/content-edit-heading-badges'
 import { ContentEditEntityFormDialogs } from './content-edit-entity-form-dialogs'
+import {
+  CONTENT_MEDIA_STALE_FORM_MESSAGE,
+  extractStaleMediaFromError,
+} from './content-edit-stale-media.lib'
 
 function ContentEditFormHeading({
   heading,
@@ -350,18 +355,33 @@ function ContentEditFormBody({
   })
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
-      const saved = await mutation.mutateAsync(
-        def.toInput(
-          values,
-          {
-            entity,
-            weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
-            campaignRules: layoutCtx.campaignRules,
-            equipmentKind: layoutCtx.equipmentKind,
-          },
-          validationIntent,
-        ),
-      )
+      let saved: unknown
+      try {
+        saved = await mutation.mutateAsync(
+          serializeContentFormInput(
+            def,
+            values,
+            {
+              entity,
+              weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
+              campaignRules: layoutCtx.campaignRules,
+              equipmentKind: layoutCtx.equipmentKind,
+            },
+            validationIntent,
+            {
+              operation: 'update',
+              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+              rulesetId: layoutCtx.rulesetId,
+            },
+          ),
+        )
+      } catch (error) {
+        const serverMedia = extractStaleMediaFromError(error)
+        if (serverMedia === undefined) throw error
+
+        form.resetField('media', { defaultValue: serverMedia })
+        throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE)
+      }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
       const baseline = stripEditEnvelopeFromFormDefaults(
         { ...def.toFormValues(saved), media: savedRecord.media ?? emptyContentMediaSchema },

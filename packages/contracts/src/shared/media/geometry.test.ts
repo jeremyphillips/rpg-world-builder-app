@@ -6,9 +6,12 @@ import { createUploadRoleAssignment } from './content-media-source'
 import {
   cropFromFocalPoint,
   cropFromPanZoom,
+  deriveFrameCropWithinRoleCrop,
   fixedAspectRoleEligibility,
   focalPointFromCropCenter,
   isFixedAspectCrop,
+  isFocalPointInCrop,
+  isNormalizedCropContainedIn,
   isSquareCrop,
   meetsFixedAspectMinimum,
   meetsPortraitMinimumCrop,
@@ -22,6 +25,70 @@ import {
 import { getFixedAspectCropSpec } from './role-crop-spec'
 import { validateContentMedia } from './validate-content-media'
 import { getContentMediaPolicy } from './media-policy'
+
+const primaryRoleCrop = { x: 0.2, y: 0.15, width: 0.6, height: 0.45 } as const
+const primaryAspect = 4 / 3
+
+describe('deriveFrameCropWithinRoleCrop', () => {
+  it('returns the role crop when frame aspect matches the role aspect', () => {
+    expect(deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, primaryAspect)).toEqual(
+      primaryRoleCrop,
+    )
+  })
+
+  it('derives a 2:1 window inside a 4:3 primary crop', () => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2)
+    expect(derived.width).toBeCloseTo(0.6)
+    expect(derived.height).toBeCloseTo(0.3)
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+  })
+
+  it('derives a 1:1 window inside a 4:3 primary crop', () => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 1)
+    expect(derived.width).toBeCloseTo(0.45)
+    expect(derived.height).toBeCloseTo(0.45)
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+  })
+
+  it.each([
+    { name: 'top-left', focalPoint: { x: 0.2, y: 0.15 } },
+    { name: 'top-right', focalPoint: { x: 0.8, y: 0.15 } },
+    { name: 'bottom-left', focalPoint: { x: 0.2, y: 0.6 } },
+    { name: 'bottom-right', focalPoint: { x: 0.8, y: 0.6 } },
+  ])('keeps the $name focal point in a contained 2:1 crop', ({ focalPoint }) => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2, focalPoint)
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+    expect(isFocalPointInCrop(focalPoint, derived)).toBe(true)
+  })
+
+  it.each([1, 3 / 2, 2, 3])(
+    'produces requested pixel aspect %s without leaving the authored crop',
+    (frameAspect) => {
+      const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, frameAspect, {
+        x: 0.35,
+        y: 0.25,
+      })
+      const impliedSourceAspect = (primaryAspect * primaryRoleCrop.height) / primaryRoleCrop.width
+      const derivedPixelAspect = (derived.width * impliedSourceAspect) / derived.height
+
+      expect(derivedPixelAspect).toBeCloseTo(frameAspect)
+      expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+    },
+  )
+
+  it('never moves the effective source window up when focal moves down', () => {
+    const upper = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2, {
+      x: 0.5,
+      y: 0.25,
+    })
+    const lower = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2, {
+      x: 0.5,
+      y: 0.5,
+    })
+
+    expect(lower.y).toBeGreaterThanOrEqual(upper.y)
+  })
+})
 
 describe('resetPortraitCrop', () => {
   it('centers the largest square on landscape sources', () => {

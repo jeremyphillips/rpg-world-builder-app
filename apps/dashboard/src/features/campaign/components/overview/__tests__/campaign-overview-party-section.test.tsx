@@ -3,8 +3,6 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { CHARACTER_CONTROLLER_DISPLAY } from '@/features/character'
-
 import { CampaignOverviewPartySection } from '../campaign-overview-party-section'
 
 describe('CampaignOverviewPartySection', () => {
@@ -35,9 +33,8 @@ describe('CampaignOverviewPartySection', () => {
     )
 
     expect(screen.getByText('Verna')).toBeInTheDocument()
-    expect(
-      screen.getByText(CHARACTER_CONTROLLER_DISPLAY.playedBy('Player One')),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Player One/)).toBeInTheDocument()
+    expect(screen.getByText(/Dwarf · Level 1 Fighter/)).toBeInTheDocument()
     expect(screen.queryByText('The Argent Road')).not.toBeInTheDocument()
   })
 
@@ -67,7 +64,7 @@ describe('CampaignOverviewPartySection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(CHARACTER_CONTROLLER_DISPLAY.playedByYou)).toBeInTheDocument()
+    expect(screen.getByText(/Played by you/i)).toBeInTheDocument()
   })
 
   it('renders no-player copy for unassigned characters', () => {
@@ -93,7 +90,7 @@ describe('CampaignOverviewPartySection', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByText(CHARACTER_CONTROLLER_DISPLAY.noPlayerAssigned)).toBeInTheDocument()
+    expect(screen.getByText(/No player assigned/i)).toBeInTheDocument()
     expect(screen.getByText('Inactive')).toBeInTheDocument()
   })
 

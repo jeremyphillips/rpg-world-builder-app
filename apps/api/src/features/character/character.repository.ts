@@ -180,6 +180,23 @@ export async function findPcOwnerIdsByCharacterIds(
   return new Map(docs.map((doc) => [String(doc._id), doc.userId]))
 }
 
+/** Subset of the given ids whose stored documents are player characters. */
+export async function findPcCharacterIdsAmong(
+  characterIds: readonly string[],
+): Promise<Set<string>> {
+  const validIds = characterIds.filter((id) => isValidObjectId(id))
+  if (validIds.length === 0) return new Set()
+
+  const docs = await CharacterModel.find({
+    _id: { $in: validIds },
+    characterType: 'pc',
+  })
+    .select('_id')
+    .lean<Array<{ _id: unknown }>>()
+
+  return new Set(docs.map((doc) => String(doc._id)))
+}
+
 export async function deletePcForUser(
   characterId: string,
   userId: string,

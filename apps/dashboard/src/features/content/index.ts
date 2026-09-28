@@ -70,6 +70,7 @@ export type {
 } from './lib/relationship/list/relationship-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
+export { contentDetailHeroEyebrowClasses } from './lib/detail/page/content-detail-layout.variants'
 export {
   ContentDetailSection,
   ContentDetailSectionItem,
@@ -94,9 +95,14 @@ export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/en
 export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export {
   buildCatalogToggleSelectInlineAction,
+  buildEntitySurfaceLeadingMediaNode,
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'
+export { DetailRowLeadingMedia } from './lib/detail/row/detail-row-leading-media'
+export type { DetailRowLeadingMediaProps } from './lib/detail/row/detail-row-leading-media'
+export { DetailRowLeadingAvatar } from './lib/detail/row/detail-row-leading-avatar'
+export type { DetailRowLeadingAvatarProps } from './lib/detail/row/detail-row-leading-avatar'
 export type { EntitySurfaceConfig } from './lib/entity/surfaces/entity-surface.types'
 export type {
   EntitySurfaceIdentity,
@@ -264,4 +270,5 @@ export type { ContentMediaImageFrame } from './lib/detail/page/content-media-ima
 export {
   CONTENT_IMAGE_PRESENTATION_DEFAULTS,
   resolveContentImagePresentationDefault,
+  type ContentImagePresentationSurface,
 } from './lib/detail/page/content-image-presentation-defaults'

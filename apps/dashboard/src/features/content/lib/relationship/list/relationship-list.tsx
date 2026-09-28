@@ -52,6 +52,8 @@ export type RelationshipListRowProps = {
     items: readonly RelationshipRowMenuItem[]
   }
   overflowTriggerIcon?: 'horizontal' | 'vertical'
+  /** Leading media node — project domain art upstream; not typed to content DTOs. */
+  leadingMedia?: ReactNode
 }
 
 function RelationshipListHeaderAction({ action }: { action: RelationshipListAction }) {
@@ -219,6 +221,7 @@ function RelationshipListRow({
   metadata,
   menu,
   overflowTriggerIcon = 'horizontal',
+  leadingMedia,
 }: RelationshipListRowProps) {
   const resolvedClassification = classification ?? headingSuffix
   const resolvedStatus = status ?? badge ?? metadata
@@ -235,6 +238,7 @@ function RelationshipListRow({
         actions={actions}
         overflowTriggerLabel={menu?.label ?? 'Relationship actions'}
         overflowTriggerIcon={overflowTriggerIcon}
+        leadingMedia={leadingMedia}
       />
     </li>
   )

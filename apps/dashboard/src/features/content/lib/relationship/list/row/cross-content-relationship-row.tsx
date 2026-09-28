@@ -34,6 +34,7 @@ export type CrossContentRelationshipRowProps = {
    * - `EntityAnatomyTrailing` — semantic trailing rail content
    */
   trailing?: EntityAnatomyTrailing | null
+  leadingMedia?: ReactNode
   className?: string
 }
 
@@ -59,6 +60,7 @@ export function CrossContentRelationshipRow({
   overflowTriggerLabel = 'Relationship actions',
   overflowTriggerIcon = 'horizontal',
   trailing,
+  leadingMedia,
   className,
 }: CrossContentRelationshipRowProps) {
   const resolvedDescription = description ?? secondaryText ?? subheading
@@ -93,6 +95,7 @@ export function CrossContentRelationshipRow({
         headingSuffix={headingSuffix}
         subheading={resolvedDescription}
         metadata={resolvedStatus}
+        leadingMedia={leadingMedia}
         trailing={resolvedTrailing}
         trailingAlign={trailingAlign}
       />

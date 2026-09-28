@@ -1,5 +1,7 @@
 import { cva } from 'class-variance-authority'
 
+import { resolveContentCardIdentityColumnGapClasses } from '@rpg/ui'
+
 /** Embedded EntityAnatomyHost host — anatomy only; collection inset owned by the host. */
 export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
 
@@ -28,8 +30,8 @@ export const entityAnatomyContentVariants = cva(
   {
     variants: {
       density: {
-        compact: 'gap-2',
-        comfortable: 'gap-3',
+        compact: resolveContentCardIdentityColumnGapClasses('compact'),
+        comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
       },
     },
     defaultVariants: {

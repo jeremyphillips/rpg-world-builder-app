@@ -5,6 +5,8 @@ import {
 } from './role-crop-spec'
 import type { MediaRole } from './roles'
 
+export const MEDIA_GALLERY_ONLY_LABEL = 'Gallery only'
+
 type MediaRoleSurfaceCopy = {
   positionLabel: string
   instructions: string
@@ -34,7 +36,8 @@ export const mediaRoleSurfaceCopy = {
   },
   primary: {
     positionLabel: 'Primary crop position',
-    instructions: 'Drag to reposition. Move the focal point to adjust focus.',
+    instructions:
+      'Drag the image to reposition the 4:3 crop. Place the focal point on the subject. The outlined card window shows the resulting crop.',
     workspaceHeading: 'Primary crop',
     workspaceDescription: `Crop a ${formatAspectRatioLabel(primarySpec)} image for stacked cards, detail views, and preview rails.`,
     switchLabel: 'Primary',

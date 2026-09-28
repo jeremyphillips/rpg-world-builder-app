@@ -14,6 +14,10 @@ import {
 } from '@rpg/contracts'
 import type { FormItem, RowFieldItem } from '@rpg/ui/form'
 
+import {
+  managedContentMediaFormFields,
+  withManagedContentMediaFormSchema,
+} from '../../../lib/forms/fields/content-managed-media-form-schema.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { LocationFormCtx } from './location-form-ctx'
 import { descriptionField, nameField } from '../../../lib/forms/fields/content-identity-form-fields'
@@ -49,6 +53,7 @@ const classificationFormSchema = z
 
 export const locationFormSchema = z
   .object({
+    ...managedContentMediaFormFields,
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
@@ -68,18 +73,21 @@ export const locationFormSchema = z
     }
   })
 
-export const locationDraftFormSchema = z.object({
-  name: z.string(),
-  slug: slugSchema.optional(),
-  description: z.string().optional(),
-  authoringType: draftOptionalSelect(locationAuthoringTypeSchema),
-  parentLocationId: draftOptionalSelect(z.string().min(1)),
-  planeType: draftOptionalSelect(planeTypeSchema),
-  settlementType: draftOptionalSelect(settlementTypeSchema),
-  siteType: draftOptionalSelect(siteTypeSchema),
-  interiorType: draftOptionalSelect(interiorTypeSchema),
-  classification: classificationFormSchema,
-})
+export const locationDraftFormSchema = withManagedContentMediaFormSchema(
+  z.object({
+    ...managedContentMediaFormFields,
+    name: z.string(),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    authoringType: draftOptionalSelect(locationAuthoringTypeSchema),
+    parentLocationId: draftOptionalSelect(z.string().min(1)),
+    planeType: draftOptionalSelect(planeTypeSchema),
+    settlementType: draftOptionalSelect(settlementTypeSchema),
+    siteType: draftOptionalSelect(siteTypeSchema),
+    interiorType: draftOptionalSelect(interiorTypeSchema),
+    classification: classificationFormSchema,
+  }),
+)
 
 export type LocationFormValues = z.infer<typeof locationFormSchema>
 

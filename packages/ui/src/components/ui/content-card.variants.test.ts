@@ -4,10 +4,13 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
+  contentCardHeadingVariants,
+  contentCardIdentityColumnGapVariants,
   contentCardMixedHeadingNameVariants,
   contentCardMixedHeadingRowVariants,
   contentCardMixedHeadingSeparatorVariants,
   contentCardMixedHeadingSuffixVariants,
+  resolveContentCardIdentityColumnGapClasses,
 } from './content-card.variants'
 
 const VARIANTS_PATH = join(__dirname, 'content-card.variants.ts')
@@ -24,6 +27,23 @@ function assertNoMixedHeadingAntiPatterns(source: string, label: string) {
     expect(source, `${label} must not match ${pattern}`).not.toMatch(pattern)
   }
 }
+
+describe('contentCardIdentityColumnGapVariants', () => {
+  it('maps compact to gap-2 and comfortable to gap-4', () => {
+    expect(contentCardIdentityColumnGapVariants({ density: 'compact' })).toContain('gap-2')
+    expect(contentCardIdentityColumnGapVariants({ density: 'comfortable' })).toContain('gap-4')
+    expect(resolveContentCardIdentityColumnGapClasses('comfortable')).toContain('gap-4')
+  })
+})
+
+describe('contentCardHeadingVariants', () => {
+  it('maps comfortable titles to entity-card-heading-comfortable', () => {
+    expect(contentCardHeadingVariants({ density: 'comfortable' })).toContain(
+      'entity-card-heading-comfortable',
+    )
+    expect(contentCardHeadingVariants({ density: 'compact' })).toContain('text-sm')
+  })
+})
 
 describe('contentCardMixedHeading variants', () => {
   it('keeps title shrinkable without flex growth', () => {

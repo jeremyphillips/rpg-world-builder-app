@@ -15,6 +15,10 @@ vi.mock('../hooks/use-campaigns', () => ({
   useCampaigns,
 }))
 
+vi.mock('../hooks/use-record-campaign-opened', () => ({
+  useRecordCampaignOpened: vi.fn(),
+}))
+
 import { CampaignLayout } from './campaign-layout'
 
 const incompleteCampaign = makeCampaignListItem({

@@ -1,6 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets, mediaFixtureImageUrl } from '../fixtures'
+
+const fixtureSources = resolveAvailableContentMediaSources({
+  media: mediaFixture,
+  domain: 'character',
+  contentSource: 'homebrew',
+}).sources
 
 const fixtureAvailable = mediaFixture.images.map((attachment) => ({
   kind: 'upload' as const,
@@ -15,6 +22,7 @@ const meta = {
     imageUrl: mediaFixtureImageUrl,
     media: mediaFixture,
     availableImages: fixtureAvailable,
+    availableSources: fixtureSources,
     assets: Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset])),
     allowedRoles: ['portrait', 'primary'],
     selectedId: 'image-0',

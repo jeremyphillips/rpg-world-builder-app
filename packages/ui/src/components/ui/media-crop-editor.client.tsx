@@ -29,6 +29,10 @@ export type MediaCropEditorProps = {
   constraint: MediaCropEditorConstraint
   focalPoint?: NormalizedFocalPoint
   onFocalPointChange?: (focalPoint: NormalizedFocalPoint) => void
+  effectiveCropGuide?: {
+    crop: NormalizedCrop
+    label: string
+  }
 }
 
 type FrameLayout = {
@@ -53,6 +57,45 @@ type CropPreviewLayout = {
   heightPercent: number
   leftPercent: number
   topPercent: number
+}
+
+type ApertureRect = Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>
+
+export function mapAperturePointerToFocalPoint(input: {
+  clientX: number
+  clientY: number
+  apertureRect: ApertureRect
+  crop: NormalizedCrop
+}): NormalizedFocalPoint | undefined {
+  if (input.apertureRect.width <= 0 || input.apertureRect.height <= 0) return undefined
+
+  const relativeX = clamp(
+    (input.clientX - input.apertureRect.left) / input.apertureRect.width,
+    0,
+    1,
+  )
+  const relativeY = clamp(
+    (input.clientY - input.apertureRect.top) / input.apertureRect.height,
+    0,
+    1,
+  )
+
+  return {
+    x: input.crop.x + relativeX * input.crop.width,
+    y: input.crop.y + relativeY * input.crop.height,
+  }
+}
+
+export function resolveCropRelativeGuideLayout(
+  authoredCrop: NormalizedCrop,
+  effectiveCrop: NormalizedCrop,
+): CropPreviewLayout {
+  return {
+    widthPercent: (effectiveCrop.width / authoredCrop.width) * 100,
+    heightPercent: (effectiveCrop.height / authoredCrop.height) * 100,
+    leftPercent: ((effectiveCrop.x - authoredCrop.x) / authoredCrop.width) * 100,
+    topPercent: ((effectiveCrop.y - authoredCrop.y) / authoredCrop.height) * 100,
+  }
 }
 
 /** Map a normalized crop to viewport percentages with uniform scale that fills the aperture. */
@@ -91,12 +134,14 @@ export function MediaCropEditor({
   constraint,
   focalPoint,
   onFocalPointChange,
+  effectiveCropGuide,
 }: MediaCropEditorProps) {
   const id = useId()
   const [failed, setFailed] = useState(false)
   const [attempt, setAttempt] = useState(0)
   const drag = useRef<{ x: number; y: number; crop: NormalizedCrop } | null>(null)
   const focalDrag = useRef<{ crop: NormalizedCrop } | null>(null)
+  const apertureRef = useRef<HTMLDivElement>(null)
   const base = resetFixedAspectCrop(source, constraint.spec)
   const layout = APERTURE_LAYOUT
   const zoom = base.width / crop.width
@@ -134,6 +179,9 @@ export function MediaCropEditor({
       top: `${previewLayout.topPercent}%`,
     }
   }
+  const effectiveCropGuideLayout = effectiveCropGuide
+    ? resolveCropRelativeGuideLayout(crop, effectiveCropGuide.crop)
+    : undefined
 
   return (
     <div className={styles.root()}>
@@ -173,21 +221,15 @@ export function MediaCropEditor({
         onPointerMove={(event) => {
           const focalStart = focalDrag.current
           if (focalStart && onFocalPointChange) {
-            const rect = event.currentTarget.getBoundingClientRect()
-            const relativeX = clamp((event.clientX - rect.left) / rect.width, 0, 1)
-            const relativeY = clamp((event.clientY - rect.top) / rect.height, 0, 1)
-            onFocalPointChange({
-              x: clamp(
-                focalStart.crop.x + relativeX * focalStart.crop.width,
-                focalStart.crop.x,
-                focalStart.crop.x + focalStart.crop.width,
-              ),
-              y: clamp(
-                focalStart.crop.y + relativeY * focalStart.crop.height,
-                focalStart.crop.y,
-                focalStart.crop.y + focalStart.crop.height,
-              ),
+            const apertureRect = apertureRef.current?.getBoundingClientRect()
+            if (!apertureRect) return
+            const nextFocalPoint = mapAperturePointerToFocalPoint({
+              clientX: event.clientX,
+              clientY: event.clientY,
+              apertureRect,
+              crop: focalStart.crop,
             })
+            if (nextFocalPoint) onFocalPointChange(nextFocalPoint)
             return
           }
 
@@ -221,8 +263,24 @@ export function MediaCropEditor({
           className={styles.image()}
           style={imageStyle(layout)}
         />
-        <div className={styles.aperture()}>
-          <div className={styles.guides()} />
+        <div ref={apertureRef} className={styles.aperture()} data-media-crop-aperture>
+          {effectiveCropGuide && effectiveCropGuideLayout ? (
+            <div
+              className={styles.effectiveCropGuide()}
+              style={{
+                left: `${effectiveCropGuideLayout.leftPercent}%`,
+                top: `${effectiveCropGuideLayout.topPercent}%`,
+                width: `${effectiveCropGuideLayout.widthPercent}%`,
+                height: `${effectiveCropGuideLayout.heightPercent}%`,
+              }}
+              aria-hidden
+              data-effective-crop-guide
+            >
+              <span className={styles.effectiveCropGuideLabel()}>{effectiveCropGuide.label}</span>
+            </div>
+          ) : (
+            <div className={styles.guides()} />
+          )}
           {focalPoint && onFocalPointChange && (
             <button
               type="button"

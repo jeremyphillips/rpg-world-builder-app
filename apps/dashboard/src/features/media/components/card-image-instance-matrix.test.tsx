@@ -24,7 +24,14 @@ describe('card image instance matrix', () => {
             id: 'char-1',
             name: 'Astra',
             summary: 'Level 3 Fighter',
-            displayImage: { src: '/hero.png', sourceKind: 'upload', crop: PRIMARY_CROP },
+            displayImagesByRole: {
+              primary: {
+                src: '/hero.png',
+                role: 'primary',
+                sourceKind: 'upload',
+                crop: PRIMARY_CROP,
+              },
+            },
           }}
           detailHref="/characters/char-1"
         />
@@ -38,7 +45,7 @@ describe('card image instance matrix', () => {
       name: 'species radio card stacked bleed',
       render: () => (
         <ContentMediaImage
-          display={{ src: '/species.png', sourceKind: 'system' }}
+          display={{ src: '/species.png', role: 'primary', sourceKind: 'system' }}
           alt=""
           frame="builderCard"
         />
@@ -54,7 +61,12 @@ describe('card image instance matrix', () => {
       name: 'catalog table inset box xs',
       render: () => (
         <ContentMediaImage
-          display={{ src: '/species.png', sourceKind: 'system', crop: PRIMARY_CROP }}
+          display={{
+            src: '/species.png',
+            role: 'portrait',
+            sourceKind: 'system',
+            crop: PRIMARY_CROP,
+          }}
           alt=""
           frame="square"
         />
@@ -98,7 +110,12 @@ describe('card image instance matrix', () => {
       name: 'content form preview rail inset sm',
       render: () => (
         <ContentPreviewRailMedia
-          displayImage={{ src: '/spell.png', sourceKind: 'upload', crop: PRIMARY_CROP }}
+          displayImage={{
+            src: '/spell.png',
+            role: 'portrait',
+            sourceKind: 'upload',
+            crop: PRIMARY_CROP,
+          }}
           fallback="character"
         />
       ),

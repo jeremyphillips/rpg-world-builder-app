@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { buildingCreateCompositionResponseSchema } from '@rpg/contracts'
@@ -10,6 +12,8 @@ import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { createHomebrewContent } from '../lib/content-write.service'
 import { HomebrewOrganizationModel } from '../organizations/homebrew-organization.model'
 import { organizationWriteConfig } from '../organizations/organizations.config'
+import { MediaReferenceModel } from '../../media/media-reference.model'
+import { createMediaAssetRecord, findMediaAssetsByIds } from '../../media/media.repository'
 import { HomebrewLocationModel } from './homebrew-location.model'
 import { locationWriteConfig } from './locations.config'
 
@@ -48,14 +52,47 @@ async function seedBuildingParent(campaignId: string) {
   })
 }
 
-function buildingInput(parentLocationId: string) {
+function buildingInput(parentLocationId: string, media?: { assetId: string }) {
   return {
     slug: 'guildhall',
     name: 'Guildhall',
     kind: 'structure' as const,
     structureType: 'building' as const,
     parentLocationId,
+    ...(media
+      ? {
+          media: {
+            revision: 0,
+            images: [{ id: 'building-hero', assetId: media.assetId }],
+            roles: {},
+          },
+        }
+      : {}),
   }
+}
+
+async function seedCampaignAsset(campaignId: string) {
+  const assetId = randomUUID()
+  await createMediaAssetRecord({
+    _id: assetId,
+    sessionId: randomUUID(),
+    scopeKind: 'campaign-content',
+    scopeKey: `campaign-content:${campaignId}`,
+    campaignId,
+    createdByUserId: 'user-1',
+    storageKey: `media/${assetId}/original.png`,
+    originalFilename: 'sample.png',
+    mimeType: 'image/png',
+    byteSize: 128,
+    orientedWidth: 1200,
+    orientedHeight: 900,
+    contentHash: randomUUID(),
+    animated: false,
+    lifecycle: 'ready',
+    referenceCount: 0,
+    leaseExpiresAt: new Date(Date.now() + 60_000),
+  })
+  return assetId
 }
 
 function newOrganization(organizationDraftId: string, slug: string, name: string) {
@@ -232,6 +269,47 @@ describe('Building create composition route', () => {
     })
     expect(await HomebrewLocationModel.countDocuments({ campaignId })).toBe(locationCount)
     expect(await HomebrewOrganizationModel.countDocuments({ campaignId })).toBe(0)
+  })
+
+  it('aborts media-bearing Building, Organization, and media refs when relationship persistence fails', async () => {
+    const { agent, csrfToken } = await registerAndLoginTestUser(getApp())
+    const campaignId = await createTestCampaign(agent, csrfToken)
+    const district = await seedBuildingParent(campaignId)
+    const assetId = await seedCampaignAsset(campaignId)
+    const locationCount = await HomebrewLocationModel.countDocuments({ campaignId })
+    vi.spyOn(HomebrewOrganizationModel, 'updateOne').mockRejectedValueOnce(
+      new Error('injected relationship persistence failure'),
+    )
+
+    const response = await agent
+      .post(path(campaignId))
+      .set(CSRF_HEADER, csrfToken)
+      .send({
+        building: {
+          status: 'published',
+          input: buildingInput(district.id, { assetId }),
+        },
+        organizations: [newOrganization('org-draft', 'keepers', 'Keepers')],
+        relationships: [
+          {
+            relationshipDraftId: 'relationship-new',
+            kind: 'operator',
+            organization: { kind: 'new', organizationDraftId: 'org-draft' },
+          },
+        ],
+      })
+
+    expect(response.status).toBe(500)
+
+    expect(await HomebrewLocationModel.countDocuments({ campaignId })).toBe(locationCount)
+    expect(await HomebrewOrganizationModel.countDocuments({ campaignId })).toBe(0)
+
+    const [asset] = await findMediaAssetsByIds([assetId])
+    expect(asset?.referenceCount).toBe(0)
+
+    expect(
+      await MediaReferenceModel.countDocuments({ scopeKey: `campaign-content:${campaignId}` }),
+    ).toBe(0)
   })
 
   it('aborts Building and Organization writes when relationship persistence fails', async () => {

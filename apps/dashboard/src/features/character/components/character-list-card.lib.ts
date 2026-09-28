@@ -1,10 +1,10 @@
-import type { ContentDisplayImage } from '@rpg/contracts'
+import type { ContentDisplayImagesByRole } from '@rpg/contracts'
 
 export type CharacterListCardData = {
   id: string
   name: string
   summary: string
-  displayImage?: ContentDisplayImage
+  displayImagesByRole?: ContentDisplayImagesByRole
   campaign?: {
     id: string
     name: string

@@ -2,7 +2,7 @@ import type { z } from 'zod'
 import { useEffect, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFormContext, useFormState } from 'react-hook-form'
-import { type ContentCampaignAccessPatch } from '@rpg/contracts'
+import { type ContentCampaignAccessPatch, type CreateLocationInput } from '@rpg/contracts'
 import { Button, cn, toast } from '@rpg/ui'
 import { FormShellSubmitButton, type FormValueSync } from '@rpg/ui/form'
 
@@ -27,6 +27,7 @@ import {
   contentFormFields,
   type ContentFormCtx,
 } from '../../../lib/forms/registry/content-form-registry'
+import { serializeContentFormInput } from '../../../lib/forms/registry/content-form-serialize-input.lib'
 import {
   ContentFormHost,
   type ContentFormHostChrome,
@@ -421,7 +422,10 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
         values as LocationFormValues,
         fixedCreate,
       )
-      const buildingCreateInput = locationFormDef.toInput(
+      const buildingCreateInput = serializeContentFormInput<
+        ReturnType<typeof locationFormDef.toInput>
+      >(
+        locationFormDef,
         overlaidValues,
         {
           weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
@@ -429,6 +433,10 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
           equipmentKind: locationCtx.equipmentKind,
         },
         'publish',
+        {
+          operation: 'create',
+          dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+        },
       )
 
       const organizationsController = organizationsControllerRef?.current
@@ -531,7 +539,7 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
       resolverFields: resolveContentFormNavigationFields(locationFormDef, locationCtx, fields),
       formId: props.formKey,
     },
-    persist: async (values) => {
+    persist: async (values, form) => {
       if (fixedCreate.authoringType === 'building') {
         throw new Error('Building create must use the composition coordinator.')
       }
@@ -545,7 +553,8 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
         campaignId,
         routeKey: locationFormDef.routeKey,
         createInput: {
-          ...locationFormDef.toInput(
+          ...(serializeContentFormInput(
+            locationFormDef,
             overlaidValues,
             {
               weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
@@ -553,7 +562,11 @@ function LocationGenericCreateForm(props: LocationCreateFormBodyProps) {
               equipmentKind: locationCtx.equipmentKind,
             },
             'publish',
-          ),
+            {
+              operation: 'create',
+              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+            },
+          ) as Record<string, unknown>),
           status: 'published' as const,
         },
         mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
@@ -615,7 +628,7 @@ function LocationSettlementCreateForm(
       resolverFields: resolveContentFormNavigationFields(locationFormDef, locationCtx, fields),
       formId: props.formKey,
     },
-    persist: async (values) => {
+    persist: async (values, form) => {
       const overlaidValues = applyLocationFixedCreateContext(
         values as LocationFormValues,
         fixedCreate,
@@ -631,7 +644,8 @@ function LocationSettlementCreateForm(
       setCompositionPending(true)
       try {
         const settlementCreateInput = {
-          ...locationFormDef.toInput(
+          ...(serializeContentFormInput(
+            locationFormDef,
             overlaidValues,
             {
               weaponCategoryBySlug: locationCtx.options?.weaponCategoryBySlug,
@@ -639,9 +653,13 @@ function LocationSettlementCreateForm(
               equipmentKind: locationCtx.equipmentKind,
             },
             'publish',
-          ),
+            {
+              operation: 'create',
+              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+            },
+          ) as Record<string, unknown>),
           status: 'published' as const,
-        }
+        } as unknown as CreateLocationInput
 
         const result = await createSettlementWithStartingDistricts({
           campaignId,

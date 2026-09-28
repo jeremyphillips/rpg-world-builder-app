@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -11,6 +12,7 @@ import { renderWithProviders } from '@/test/render'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 import { CampaignOverviewHero } from '../campaign-overview-hero'
+import { InviteMemberDialog } from '../invite-member-dialog'
 
 const mutateAsync = vi.fn()
 
@@ -24,6 +26,8 @@ vi.mock('../../../hooks/use-send-campaign-invite', () => ({
 
 const campaign = makeCampaignListItem({
   identity: { name: 'Sunless Citadel' },
+  playerMemberCount: 4,
+  openPcCount: 6,
   configuration: {
     flavor: {
       playStyle: ['dungeon_crawl'],
@@ -39,9 +43,6 @@ function renderHero(overrides: Partial<ComponentProps<typeof CampaignOverviewHer
       campaign={campaign}
       campaignId="camp_1"
       canManage={false}
-      playerCount={4}
-      characterCount={6}
-      countsPending={false}
       {...overrides}
     />,
   )
@@ -52,19 +53,34 @@ describe('CampaignOverviewHero', () => {
     mutateAsync.mockReset()
   })
 
-  it('renders the campaign title and status line with counts', () => {
+  it('renders the campaign title and viewer meta line with counts', () => {
     renderHero()
 
     const heading = screen.getByRole('heading', { level: 1, name: 'Sunless Citadel' })
     expect(heading).toBeInTheDocument()
     expect(heading).toHaveClass(...headingVariants({ variant: 'heroTitle' }).split(/\s+/))
-    expect(screen.getByText('Active · 4 players · 6 characters')).toBeInTheDocument()
+    expect(screen.getByText(/GM/)).toBeInTheDocument()
+    expect(screen.getByText(/Active/)).toBeInTheDocument()
+    expect(screen.getByText(/4 players/)).toBeInTheDocument()
+    expect(screen.getByText(/6 PCs/)).toBeInTheDocument()
+    expect(screen.queryByText(/Last opened/)).not.toBeInTheDocument()
   })
 
-  it('shows only the status word while counts are pending', () => {
-    renderHero({ countsPending: true, playerCount: undefined, characterCount: undefined })
+  it('omits meta when the campaign is not a list item with role', () => {
+    renderHero({
+      campaign: {
+        id: 'camp_1',
+        status: 'active',
+        identity: { name: 'Sunless Citadel' },
+        configuration: {},
+        visibility: 'private',
+        rulesetId: campaign.rulesetId,
+        createdBy: 'u1',
+        createdAt: campaign.createdAt,
+        updatedAt: campaign.updatedAt,
+      },
+    })
 
-    expect(screen.getByText('Active')).toBeInTheDocument()
     expect(screen.queryByText(/players/)).not.toBeInTheDocument()
   })
 
@@ -78,7 +94,28 @@ describe('CampaignOverviewHero', () => {
 
   it('lists invite first for managers and opens the invite dialog from the menu', async () => {
     const user = userEvent.setup()
-    renderHero({ canManage: true })
+
+    function InviteHarness() {
+      const [inviteOpen, setInviteOpen] = useState(false)
+      return (
+        <>
+          <CampaignOverviewHero
+            campaign={campaign}
+            campaignId="camp_1"
+            canManage
+            onInviteMember={() => setInviteOpen(true)}
+          />
+          <InviteMemberDialog
+            campaignId="camp_1"
+            open={inviteOpen}
+            onOpenChange={setInviteOpen}
+            showTrigger={false}
+          />
+        </>
+      )
+    }
+
+    renderWithProviders(<InviteHarness />)
 
     await user.click(screen.getByRole('button', { name: 'Open actions for Sunless Citadel' }))
 

@@ -25,8 +25,8 @@ import { findCampaignById, toCampaign } from './find-campaign-by-id'
 import { validateCampaignPrimaryWorldId } from './validate-campaign-primary-world'
 import { listCharactersForUser } from '../character'
 import {
-  listOpenPcParticipationCharacterIdsForCampaign,
-  resolveOpenControlledPcCharacterIds,
+  intersectControlledCharacterIdsWithOpenParticipation,
+  projectOpenParticipationSummaryByCampaignIds,
 } from './participation/campaign-character-participation.repository'
 
 type CampaignRecord = CampaignSchemaType & {
@@ -37,6 +37,44 @@ type CampaignRecord = CampaignSchemaType & {
 
 function dedupeCharacterIds(ids: readonly string[]): string[] {
   return [...new Set(ids)]
+}
+
+type MembershipListRecord = {
+  campaignId: string
+  campaignRole: string
+  controlledCharacterIds?: string[]
+  lastOpenedAt?: Date | null
+}
+
+async function countPlayerMembersByCampaignIds(
+  campaignIds: readonly string[],
+): Promise<Map<string, number>> {
+  if (campaignIds.length === 0) return new Map()
+
+  const rows = await CampaignMembershipModel.aggregate<{ _id: string; count: number }>([
+    { $match: { campaignId: { $in: [...campaignIds] }, campaignRole: 'pc' } },
+    { $group: { _id: '$campaignId', count: { $sum: 1 } } },
+  ])
+
+  return new Map(rows.map((row) => [row._id, row.count]))
+}
+
+function membershipLastOpenedIso(membership: MembershipListRecord | undefined): string | null {
+  const value = membership?.lastOpenedAt
+  if (!value) return null
+  return value.toISOString()
+}
+
+/** Record that the viewer opened the campaign shell (membership-scoped recency). */
+export async function touchCampaignOpened(userId: string, campaignId: string): Promise<boolean> {
+  if (!isValidObjectId(campaignId)) return false
+
+  const result = await CampaignMembershipModel.updateOne(
+    { campaignId, userId },
+    { $set: { lastOpenedAt: new Date() } },
+  )
+
+  return result.matchedCount === 1
 }
 
 export async function createCampaign(
@@ -70,8 +108,8 @@ export function listCampaignTemplates(): CampaignTemplate[] {
  */
 export async function listCampaignsForUser(userId: string): Promise<CampaignListItem[]> {
   const memberships = await CampaignMembershipModel.find({ userId })
-    .select('campaignId campaignRole controlledCharacterIds')
-    .lean<{ campaignId: string; campaignRole: string; controlledCharacterIds?: string[] }[]>()
+    .select('campaignId campaignRole controlledCharacterIds lastOpenedAt')
+    .lean<MembershipListRecord[]>()
 
   const membershipByCampaignId = new Map(
     memberships.map((membership) => [membership.campaignId, membership]),
@@ -80,41 +118,52 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
   if (campaignIds.length === 0) return []
 
-  const docs = await CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>()
+  const [docs, playerMemberCountByCampaignId, participationSummaryByCampaignId] = await Promise.all(
+    [
+      CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>(),
+      countPlayerMembersByCampaignIds(campaignIds),
+      projectOpenParticipationSummaryByCampaignIds(campaignIds),
+    ],
+  )
   const userCharacters = await listCharactersForUser(userId)
   const userCharacterIds = userCharacters.map((character) => character.id)
 
-  const campaigns = await Promise.all(
-    docs.map(async (doc) => {
-      const campaign = toCampaign(doc)
-      const membership = membershipByCampaignId.get(campaign.id)
-      const controlledCharacterIds = membership?.controlledCharacterIds ?? []
-      const campaignWideOpenParticipatingCharacterIds =
-        await listOpenPcParticipationCharacterIdsForCampaign(campaign.id)
-      const openParticipatingCharacterIds = filterViewerOpenParticipatingCharacterIds({
+  const campaigns = docs.map((doc) => {
+    const campaign = toCampaign(doc)
+    const membership = membershipByCampaignId.get(campaign.id)
+    const controlledCharacterIds = membership?.controlledCharacterIds ?? []
+    const participationSummary = participationSummaryByCampaignId.get(campaign.id)
+    const campaignWideOpenParticipatingCharacterIds =
+      participationSummary?.openParticipationCharacterIds ?? []
+    const openParticipatingCharacterIds = filterViewerOpenParticipatingCharacterIds({
+      controlledCharacterIds,
+      openParticipatingCharacterIds: campaignWideOpenParticipatingCharacterIds,
+      userCharacterIds,
+    })
+    const openControlledCharacterIds = dedupeCharacterIds(
+      intersectControlledCharacterIdsWithOpenParticipation(
         controlledCharacterIds,
-        openParticipatingCharacterIds: campaignWideOpenParticipatingCharacterIds,
-        userCharacterIds,
-      })
-      const openControlledCharacterIds = dedupeCharacterIds(
-        await resolveOpenControlledPcCharacterIds(campaign.id, controlledCharacterIds),
-      )
-      const campaignRole = membership?.campaignRole as CampaignRole
-      const { viewerState, recoveryReason } = resolveCampaignViewerState({
-        role: campaignRole,
-        controlledCharacterIds,
-        openParticipatingCharacterIds,
-      })
-      return {
-        ...campaign,
-        campaignRole,
-        controlledCharacterIds,
-        openControlledCharacterIds,
-        viewerState,
-        recoveryReason,
-      }
-    }),
-  )
+        campaignWideOpenParticipatingCharacterIds,
+      ),
+    )
+    const campaignRole = membership?.campaignRole as CampaignRole
+    const { viewerState, recoveryReason } = resolveCampaignViewerState({
+      role: campaignRole,
+      controlledCharacterIds,
+      openParticipatingCharacterIds,
+    })
+    return {
+      ...campaign,
+      campaignRole,
+      controlledCharacterIds,
+      openControlledCharacterIds,
+      viewerState,
+      recoveryReason,
+      playerMemberCount: playerMemberCountByCampaignId.get(campaign.id) ?? 0,
+      openPcCount: participationSummary?.nonRetiredOpenPcIds.length ?? 0,
+      lastOpenedByViewerAt: membershipLastOpenedIso(membership),
+    }
+  })
   return campaigns.sort((a, b) => a.identity.name.localeCompare(b.identity.name))
 }
 

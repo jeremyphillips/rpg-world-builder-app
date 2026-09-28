@@ -37,6 +37,8 @@ export type EntityAnatomyHostProps = {
   /** Exactly one leading utility when set — never a multi-control group or fragment. */
   leading?: ReactNode
   trailing?: EntityAnatomyTrailing
+  /** Vertical alignment of the trailing rail within the anatomy grid row. */
+  trailingAlign?: 'start' | 'center'
   density?: ContentCardDensity
 }
 
@@ -79,7 +81,10 @@ export function EntityAnatomy({
         </div>
       ) : null}
       <div className={entityAnatomyContentVariants({ density })} data-entity-item-slot="content">
-        {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
+        {resolvedEntity.media ? (
+          // Alignment-only wrapper — leading media must be self-bounded (e.g. DetailRowLeadingMedia).
+          <div className="shrink-0">{resolvedEntity.media}</div>
+        ) : null}
         <EntitySummary
           entity={resolvedEntity}
           density={density}
@@ -104,6 +109,7 @@ export function EntityAnatomyHost({
   headingHref,
   leading,
   trailing,
+  trailingAlign,
   density = 'comfortable',
 }: EntityAnatomyHostProps) {
   return (
@@ -113,6 +119,7 @@ export function EntityAnatomyHost({
         headingHref={headingHref}
         leadingUtilities={leading != null ? [leading] : undefined}
         trailing={trailing}
+        trailingAlign={trailingAlign}
         density={density}
       />
     </div>

@@ -35,6 +35,12 @@ campaignRouter.put(
   validate(selectCampaignInputSchema),
   controller.selectCampaign,
 )
+campaignRouter.post(
+  '/:campaignId/opened',
+  requireAuth,
+  requireCampaignRole(...CAMPAIGN_ROLES),
+  controller.recordCampaignOpened,
+)
 campaignRouter.patch(
   '/:campaignId',
   requireAuth,

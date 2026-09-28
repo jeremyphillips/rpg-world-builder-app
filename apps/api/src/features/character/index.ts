@@ -9,6 +9,7 @@ export {
   findNpcsByIds,
   findPcById,
   findPcForUser,
+  findPcCharacterIdsAmong,
   findPcOwnerIdsByCharacterIds,
   findPcsByIds,
 } from './character.repository'

@@ -39,14 +39,20 @@ function createUploadFile(name: string, type: string) {
 }
 
 function mount(overrides: Partial<MediaManagerProps> = {}) {
+  const domain = overrides.domain ?? 'character'
+  const contentContext =
+    'contentContext' in overrides
+      ? overrides.contentContext
+      : { domain, contentSource: 'homebrew' as const }
   const props: MediaManagerProps = {
     open: true,
     onOpenChange: vi.fn(),
-    domain: 'character',
+    domain,
     value: structuredClone(mediaFixture),
     scope: { kind: 'user-pc', userId: 'user' },
     initialAssets: mediaFixtureAssets,
     mode: 'form',
+    contentContext,
     onSave: vi.fn(),
     ...overrides,
   }

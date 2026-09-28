@@ -1,4 +1,5 @@
 import type { CharacterClass, ClassStored } from '@rpg/contracts'
+import { CONTENT_MEDIA_REPLACE_KEY } from '@rpg/contracts'
 import {
   classDraftStoredSchema,
   classStoredBodySchema,
@@ -61,6 +62,7 @@ function prepareHomebrewUpdate(
 
 export const classContentConfig: ContentTypeConfig<CharacterClass> = {
   type: 'classes',
+  patchReplaceKeys: [CONTENT_MEDIA_REPLACE_KEY],
   system: {
     load: (rulesetId) => loadSeedClassesStored(rulesetId) as CharacterClass[],
     slugs: seedClassSlugs,

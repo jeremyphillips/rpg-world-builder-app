@@ -1,19 +1,16 @@
 import {
-  resolveCharacterDisplayImageAsOptional,
+  resolveCharacterDisplayImagesByRole,
   type Character,
-  type ContentDisplayImage,
-  type ContentDisplaySurface,
+  type ContentDisplayImagesByRole,
 } from '@rpg/contracts'
 
 import { resolveMediaArtworkUrl } from '../../media/lib/media-artwork-url.lib'
 
-export function resolveCharacterDisplayImageForSurface(
+export function resolveCharacterDisplayImagesByRoleForRecord(
   character: Pick<Character, 'media'>,
-  surface: ContentDisplaySurface = 'compact',
-): ContentDisplayImage | undefined {
-  return resolveCharacterDisplayImageAsOptional({
+): ContentDisplayImagesByRole {
+  return resolveCharacterDisplayImagesByRole({
     media: character.media,
-    surface,
     resolveUploadSrc: resolveMediaArtworkUrl,
   })
 }

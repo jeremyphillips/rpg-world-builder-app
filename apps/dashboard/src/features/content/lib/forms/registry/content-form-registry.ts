@@ -3,6 +3,7 @@ import type { ZodType } from 'zod'
 import type { FormItem, FormValueSync, TabbedFormTab } from '@rpg/ui/form'
 
 import type {
+  ContentMediaDomain,
   ContentSource,
   EquipmentKind,
   OrganizationPractice,
@@ -109,6 +110,10 @@ export interface ContentFormDef<
 > {
   /** Kebab-case route key used in URLs and API paths (e.g. `'species'`). */
   routeKey: string
+  /** When true, {@link serializeContentFormInput} may attach validated form `media`. */
+  supportsManagedMedia?: boolean
+  /** Content media policy domain; set when `supportsManagedMedia` is true. */
+  mediaDomain?: ContentMediaDomain
   /** Zod schema validated on submit. Must match `TFormValues`. */
   schema: ZodType<TFormValues>
   /** Relaxed schema for draft saves — falls back to `schema` when omitted. */

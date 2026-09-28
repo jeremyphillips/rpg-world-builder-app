@@ -4,8 +4,13 @@ import { IdentityFrame } from '@rpg/ui'
 
 import { EntityAnatomyHost } from '@/features/content'
 
+import { CampaignMetaLine } from '../campaign-meta-line'
 import { campaignDestinationRowVariants } from './campaign-destination.variants'
-import { buildCampaignDisplay } from '../../lib/campaign-display'
+import {
+  buildCampaignDisplay,
+  resolveCampaignGameMasterDisplayStyle,
+} from '../../lib/campaign-display'
+import { buildCampaignDestinationMeta } from '../../lib/campaign-meta.lib'
 import {
   resolveCampaignEntryDestination,
   resolveEntryBadgeLabel,
@@ -24,8 +29,13 @@ export function CampaignDestinationRow({
 }: CampaignDestinationRowProps) {
   const destination = resolveCampaignEntryDestination(campaign)
   const display = buildCampaignDisplay(campaign)
+  const gameMasterStyle = resolveCampaignGameMasterDisplayStyle()
+  const meta = buildCampaignDestinationMeta(campaign, destination, gameMasterStyle)
   const badgeLabel = resolveEntryBadgeLabel(campaign)
   const badgeTone = resolveEntryBadgeTone(campaign)
+
+  const description =
+    destination.supportingCopy ?? (meta ? <CampaignMetaLine meta={meta} includeRecency /> : null)
 
   return (
     <Link
@@ -44,7 +54,7 @@ export function CampaignDestinationRow({
         density="comfortable"
         entity={{
           heading: display.name,
-          description: destination.supportingCopy,
+          description,
           media: display.imageUrl ? (
             <IdentityFrame src={display.imageUrl} alt="" shape="box" size="sm" fit="contain" />
           ) : undefined,
@@ -54,6 +64,7 @@ export function CampaignDestinationRow({
               : undefined,
         }}
         trailing={{ kind: 'indicator', variant: 'chevron' }}
+        trailingAlign="center"
       />
     </Link>
   )

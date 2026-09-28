@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { getContentMediaPolicy } from '@rpg/contracts'
+import { getContentMediaPolicy, resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
@@ -8,13 +8,18 @@ const uploadAvailable = {
   id: mediaFixture.images[0]!.id,
   attachment: mediaFixture.images[0]!,
 }
+const fixtureSources = resolveAvailableContentMediaSources({
+  media: mediaFixture,
+  domain: 'character',
+  contentSource: 'homebrew',
+}).sources
 
 const meta = {
   title: 'Features/Media/ImageDetails',
   component: MediaImageDetails,
   args: {
     selectedAvailable: uploadAvailable,
-    availableImages: [uploadAvailable],
+    availableSources: fixtureSources,
     asset: mediaFixtureAssets[0]!,
     media: mediaFixture,
     policy: getContentMediaPolicy('character'),

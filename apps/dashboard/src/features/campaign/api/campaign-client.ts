@@ -60,3 +60,12 @@ export async function rememberSelectedCampaign(campaignId: string): Promise<Sess
   )
   return user
 }
+
+/** Record that the viewer opened the campaign shell (membership recency). */
+export async function touchCampaignOpened(campaignId: string): Promise<void> {
+  await postJson<void>(
+    `/api/campaigns/${campaignId}/opened`,
+    {},
+    'Could not record campaign opened.',
+  )
+}

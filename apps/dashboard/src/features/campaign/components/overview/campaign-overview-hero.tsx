@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { Campaign, CampaignListItem } from '@rpg/contracts'
 import {
@@ -6,36 +6,30 @@ import {
   Heading,
   Hero,
   RowActionsMenu,
-  StatusDot,
-  Text,
+  ActionIcon,
   heroMarkFrameClasses,
   heroMarkImageClasses,
   heroMediaImageClasses,
-  heroMetaClasses,
-  ActionIcon,
   type RowActionsMenuLinkProps,
 } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 
-import { InviteMemberDialog } from './invite-member-dialog'
-import {
-  buildCampaignOverviewHeroBadges,
-  composeCampaignOverviewHeroStatusLine,
-} from '../../lib/overview/campaign-overview-hero-meta.lib'
+import { CampaignMetaLine } from '../campaign-meta-line'
+import { buildCampaignOverviewHeroBadges } from '../../lib/overview/campaign-overview-hero-meta.lib'
 import {
   resolveCampaignBannerImageUrl,
   resolveCampaignEmblemImageUrl,
 } from '../../lib/overview/campaign-overview-hero-media.lib'
+import { resolveCampaignGameMasterDisplayStyle } from '../../lib/campaign-display'
+import { buildCampaignMeta, isCampaignListItem } from '../../lib/campaign-meta.lib'
 
 type CampaignOverviewHeroProps = {
   campaign: Campaign | CampaignListItem
   campaignId: string
   canManage: boolean
-  playerCount?: number
-  characterCount?: number
-  countsPending?: boolean
+  onInviteMember?: () => void
 }
 
 function CampaignOverviewHeroRouterLink({ href, className, children }: RowActionsMenuLinkProps) {
@@ -50,23 +44,15 @@ export function CampaignOverviewHero({
   campaign,
   campaignId,
   canManage,
-  playerCount,
-  characterCount,
-  countsPending,
+  onInviteMember,
 }: CampaignOverviewHeroProps) {
-  const [inviteOpen, setInviteOpen] = useState(false)
   const bannerUrl = resolveCampaignBannerImageUrl(campaign.identity.media)
   const emblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
+  const gameMasterStyle = resolveCampaignGameMasterDisplayStyle()
 
-  const statusLine = useMemo(
-    () =>
-      composeCampaignOverviewHeroStatusLine({
-        status: campaign.status,
-        playerCount,
-        characterCount,
-        countsPending,
-      }),
-    [campaign.status, characterCount, countsPending, playerCount],
+  const meta = useMemo(
+    () => (isCampaignListItem(campaign) ? buildCampaignMeta(campaign, gameMasterStyle) : null),
+    [campaign, gameMasterStyle],
   )
 
   const flavorBadges = useMemo(
@@ -75,14 +61,14 @@ export function CampaignOverviewHero({
   )
 
   const menuItems = [
-    ...(canManage
+    ...(canManage && onInviteMember
       ? [
           {
             kind: 'action' as const,
             id: 'invite-member',
             label: 'Invite member',
             icon: <ActionIcon action="invite" step="md" />,
-            onSelect: () => setInviteOpen(true),
+            onSelect: onInviteMember,
           },
         ]
       : []),
@@ -127,14 +113,7 @@ export function CampaignOverviewHero({
             items={menuItems}
           />
         }
-        meta={
-          <Text variant="muted" className={heroMetaClasses}>
-            <StatusDot tone={statusLine.statusTone} />
-            {statusLine.countsSuffix
-              ? `${statusLine.statusLabel} · ${statusLine.countsSuffix}`
-              : statusLine.statusLabel}
-          </Text>
-        }
+        meta={meta ? <CampaignMetaLine meta={meta} includeRecency={false} /> : undefined}
         secondary={
           flavorBadges ? (
             <div className="flex flex-wrap gap-1.5">
@@ -152,14 +131,6 @@ export function CampaignOverviewHero({
           ) : undefined
         }
       />
-      {canManage ? (
-        <InviteMemberDialog
-          campaignId={campaignId}
-          open={inviteOpen}
-          onOpenChange={setInviteOpen}
-          showTrigger={false}
-        />
-      ) : null}
     </>
   )
 }

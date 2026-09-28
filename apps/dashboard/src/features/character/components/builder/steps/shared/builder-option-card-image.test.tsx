@@ -8,12 +8,14 @@ import { BuilderOptionCardImage } from './builder-option-card-image'
 describe('BuilderOptionCardImage', () => {
   it('renders builder card presentation defaults', () => {
     const { container } = render(
-      <BuilderOptionCardImage display={{ src: '/elf.jpeg', sourceKind: 'system' }} />,
+      <BuilderOptionCardImage
+        display={{ src: '/elf.jpeg', role: 'primary', sourceKind: 'system' }}
+      />,
     )
 
     const img = container.querySelector('img')
+    expect(img).toHaveClass('object-cover')
     expect(img).toHaveStyle({
-      objectFit: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectFit,
       objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectPosition,
     })
   })
@@ -23,6 +25,7 @@ describe('BuilderOptionCardImage', () => {
       <BuilderOptionCardImage
         display={{
           src: '/elf.jpeg',
+          role: 'primary',
           sourceKind: 'system',
           presentationTreatment: 'white-paper-knockout',
         }}

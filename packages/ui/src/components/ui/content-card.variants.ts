@@ -34,11 +34,30 @@ export const contentCardRootVariants = cva('w-full min-w-0 rounded-md', {
   },
 })
 
-export const contentCardBodyVariants = cva('flex min-w-0 w-full', {
+/** Horizontal gap between identity media and summary column — shared by card body and embedded anatomy. */
+export const contentCardIdentityColumnGapVariants = cva('', {
   variants: {
     density: {
       compact: 'gap-2',
-      comfortable: 'gap-3',
+      comfortable: 'gap-4',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
+export function resolveContentCardIdentityColumnGapClasses(
+  density: ContentCardDensity = 'comfortable',
+): string {
+  return contentCardIdentityColumnGapVariants({ density })
+}
+
+export const contentCardBodyVariants = cva('flex min-w-0 w-full', {
+  variants: {
+    density: {
+      compact: resolveContentCardIdentityColumnGapClasses('compact'),
+      comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
     },
     rowAlign: {
       start: 'items-start',
@@ -70,7 +89,7 @@ export const contentCardHeadingVariants = cva(
     variants: {
       density: {
         compact: 'text-sm',
-        comfortable: 'text-base',
+        comfortable: 'entity-card-heading-comfortable',
       },
     },
     defaultVariants: {
@@ -83,7 +102,7 @@ export const contentCardMixedHeadingRowVariants = cva('flex min-w-0 items-baseli
   variants: {
     density: {
       compact: 'text-sm',
-      comfortable: 'text-base',
+      comfortable: 'entity-card-heading-comfortable',
     },
   },
   defaultVariants: {

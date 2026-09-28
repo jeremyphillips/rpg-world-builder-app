@@ -2,7 +2,7 @@ import type {
   Ability,
   CharacterNarrative,
   CharacterVitalState,
-  ContentDisplayImage,
+  ContentDisplayImagesByRole,
 } from '@rpg/contracts'
 
 import type {
@@ -14,7 +14,7 @@ export type CharacterCardViewModel = {
   id: string
   name: string
   summary: string
-  displayImage?: ContentDisplayImage
+  displayImagesByRole?: ContentDisplayImagesByRole
   campaign?: {
     id: string
     name: string

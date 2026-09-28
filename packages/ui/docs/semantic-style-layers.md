@@ -80,10 +80,12 @@ Bench/score-token whole-surface drag stays outside `dragSurfaceVariants`.
 
 ## Layer 2 presentation
 
-| Primitive                         | Owner        | Consumers                          |
-| --------------------------------- | ------------ | ---------------------------------- |
-| `supportingTextDensityVariants`   | content-card | EntitySummary, ContentCard body    |
-| `contentCardDensityInsetVariants` | content-card | EntityCardFrame, ContentCard shell |
+| Primitive                                    | Owner        | Consumers                               |
+| -------------------------------------------- | ------------ | --------------------------------------- |
+| `supportingTextDensityVariants`              | content-card | EntitySummary, ContentCard body         |
+| `contentCardDensityInsetVariants`            | content-card | EntityCardFrame, ContentCard shell      |
+| `contentCardIdentityColumnGapVariants`       | content-card | ContentCard body, EntityAnatomy content |
+| `entity-card-heading-comfortable` (@utility) | globals      | Comfortable entity card titles          |
 
 ## Feature guardrails (dashboard ESLint)
 

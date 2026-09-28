@@ -34,6 +34,10 @@ import {
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
+import {
+  managedContentMediaFormFields,
+  withManagedContentMediaFormSchema,
+} from '../../lib/forms/fields/content-managed-media-form-schema.lib'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
@@ -67,6 +71,7 @@ function refineEquipmentEconomyForm(
 /** Identity + economy fields only — no weight, no kind discriminant. */
 const equipmentIdentityEconomyFormSchema = z
   .object({
+    ...managedContentMediaFormFields,
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
@@ -202,6 +207,7 @@ export const magicItemEquipmentFormSchema = physicalEquipmentBaseFormSchema.exte
 
 /** Identity + economy fields only — no weight, no kind discriminant. */
 const equipmentIdentityEconomyDraftFormSchema = z.object({
+  ...managedContentMediaFormFields,
   name: z.string(),
   slug: slugSchema.optional(),
   description: z.string().optional(),
@@ -318,27 +324,31 @@ export const magicItemEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormS
   baseEquipmentId: z.string().optional(),
 })
 
-export const equipmentKindScopedDraftFormSchema = z.discriminatedUnion('kind', [
-  weaponEquipmentDraftFormSchema,
-  armorEquipmentDraftFormSchema,
-  adventuringGearEquipmentDraftFormSchema,
-  toolEquipmentDraftFormSchema,
-  mountEquipmentDraftFormSchema,
-  vehicleEquipmentDraftFormSchema,
-  serviceEquipmentDraftFormSchema,
-  magicItemEquipmentDraftFormSchema,
-])
+export const equipmentKindScopedDraftFormSchema = withManagedContentMediaFormSchema(
+  z.discriminatedUnion('kind', [
+    weaponEquipmentDraftFormSchema,
+    armorEquipmentDraftFormSchema,
+    adventuringGearEquipmentDraftFormSchema,
+    toolEquipmentDraftFormSchema,
+    mountEquipmentDraftFormSchema,
+    vehicleEquipmentDraftFormSchema,
+    serviceEquipmentDraftFormSchema,
+    magicItemEquipmentDraftFormSchema,
+  ]),
+)
 
-export const equipmentKindScopedFormSchema = z.discriminatedUnion('kind', [
-  weaponEquipmentFormSchema,
-  armorEquipmentFormSchema,
-  adventuringGearEquipmentFormSchema,
-  toolEquipmentFormSchema,
-  mountEquipmentFormSchema,
-  vehicleEquipmentFormSchema,
-  serviceEquipmentFormSchema,
-  magicItemEquipmentFormSchema,
-])
+export const equipmentKindScopedFormSchema = withManagedContentMediaFormSchema(
+  z.discriminatedUnion('kind', [
+    weaponEquipmentFormSchema,
+    armorEquipmentFormSchema,
+    adventuringGearEquipmentFormSchema,
+    toolEquipmentFormSchema,
+    mountEquipmentFormSchema,
+    vehicleEquipmentFormSchema,
+    serviceEquipmentFormSchema,
+    magicItemEquipmentFormSchema,
+  ]),
+)
 
 export type EquipmentFormValues = z.infer<typeof equipmentKindScopedFormSchema>
 
@@ -392,10 +402,12 @@ export function resolveEquipmentFormSchema(
   const schemas = validationIntent === 'draft' ? kindDraftSchemas : kindSchemas
   const kindSchema = schemas[ctx.equipmentKind]
   const equipmentKind = ctx.equipmentKind
-  return z.preprocess((value) => {
-    if (typeof value !== 'object' || value === null) return value
-    return { ...value, kind: equipmentKind }
-  }, kindSchema) as z.ZodType<EquipmentFormValues>
+  return withManagedContentMediaFormSchema(
+    z.preprocess((value) => {
+      if (typeof value !== 'object' || value === null) return value
+      return { ...value, kind: equipmentKind }
+    }, kindSchema),
+  ) as z.ZodType<EquipmentFormValues>
 }
 
 /**
@@ -405,6 +417,7 @@ export function resolveEquipmentFormSchema(
  */
 export const equipmentFormSchema = z
   .object({
+    ...managedContentMediaFormFields,
     name: z.string().min(1),
     slug: slugSchema.optional(),
     description: z.string().optional(),
@@ -498,6 +511,7 @@ export const equipmentFormSchema = z
  * Unscoped hub draft schema — relaxed identity/economy for Save Draft on the equipment hub.
  */
 export const equipmentFormDraftSchema = z.object({
+  ...managedContentMediaFormFields,
   name: z.string(),
   slug: slugSchema.optional(),
   description: z.string().optional(),

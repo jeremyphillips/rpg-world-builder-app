@@ -15,7 +15,8 @@ ruleset patches, track sessions, and (for DMs) author campaign-owned NPCs.
 | Recovery / invites index | `components/recovery/`, `lib/recovery/`                                                                             |
 | Roster shell             | `routes/campaign-characters-overview.tsx`, `lib/characters/`                                                        |
 | Settings / rules forms   | `lib/settings/`, `lib/rules/`                                                                                       |
-| Campaign identity VM     | `lib/campaign-display.ts`                                                                                           |
+| Campaign identity VM     | `lib/campaign-display.ts` (name/emblem only)                                                                        |
+| Campaign meta line       | `lib/campaign-meta.lib.ts` (status, counts, optional recency)                                                       |
 | Selection / topbar state | `lib/navigation/`                                                                                                   |
 | Invite form schemas      | `lib/forms/invite-*-form-fields.ts`                                                                                 |
 
@@ -42,13 +43,13 @@ acquisition model (axes, ownership, build/import finalization).
 
 ## Invite ownership
 
-| Concern                                | Location                                                                                           |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Manager send-invite dialog             | `components/overview/invite-member-dialog.tsx`                                                     |
-| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-invite-row-actions.tsx` |
-| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                             |
-| Invite review card                     | `features/campaign-invite/`                                                                        |
-| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                          |
+| Concern                                | Location                                                                                            |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Manager send-invite dialog             | `components/overview/invite-member-dialog.tsx`                                                      |
+| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-overview-invite-row.tsx` |
+| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                              |
+| Invite review card                     | `features/campaign-invite/`                                                                         |
+| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                           |
 
 ## Player onboarding
 
@@ -109,6 +110,20 @@ acquisition model (axes, ownership, build/import finalization).
 - **Ownership:** NPCs are campaign-owned (`characterType: 'npc'`, required
   `campaignId`, no `userId`). Distinct from user-owned PCs — see
   [ROLES.md](../../../../packages/contracts/ROLES.md#character-ownership).
+
+## List meta vs display
+
+- **`buildCampaignDisplay`** — identity chrome only (name, emblem URL).
+- **`buildCampaignMeta(campaign, gameMasterStyle)`** — complete VM including
+  `campaignRole`, `viewerFacetLabel` (`resolveCampaignViewerFacetLabel`), counts,
+  and status. Style comes from `resolveCampaignGameMasterDisplayStyle()` (defaults
+  today; wire settings there later).
+- **`buildCampaignMetaSegments` + `CampaignMetaLine`** — segment ordering and
+  presentation (StatusDot on status); hero and destination rows share the line.
+- **Recency** — opt-in via `includeRecency` on list/continue rows only.
+- **Opened vs selected** — `PUT /api/campaigns/selection` remembers preference
+  only. `POST /api/campaigns/:campaignId/opened` (via `useRecordCampaignOpened`
+  on campaign shell mount) is the sole recency write.
 
 ## Related docs
 

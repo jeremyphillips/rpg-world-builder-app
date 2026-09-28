@@ -638,6 +638,14 @@
   letter-spacing: var(--tracking-heading);
 }
 
+/** Entity card comfortable title — 19px heading-card size with body emphasis weight. */
+@utility entity-card-heading-comfortable {
+  font-size: var(--text-heading-card);
+  line-height: var(--text-heading-card--line-height);
+  font-weight: var(--font-weight-body-emphasis);
+  letter-spacing: var(--tracking-heading);
+}
+
 @utility heading-style-dialog-title {
   font-size: var(--text-heading-dialog-title);
   line-height: var(--text-heading-dialog-title--line-height);

@@ -8,6 +8,7 @@ import {
   isCampaignMember,
   listCampaignTemplates,
   listCampaignsForUser,
+  touchCampaignOpened,
   updateCampaign,
 } from './campaign.service'
 import {
@@ -44,6 +45,18 @@ export async function patch(req: Request, res: Response): Promise<void> {
     throw new HttpError(404, 'not_found', 'Campaign not found.')
   }
   res.status(200).json({ campaign })
+}
+
+export async function recordCampaignOpened(req: Request, res: Response): Promise<void> {
+  const { campaignId } = req.params as { campaignId: string }
+  const userId = req.user!.id
+
+  const updated = await touchCampaignOpened(userId, campaignId)
+  if (!updated) {
+    throw HttpError.forbidden('Not a member of this campaign')
+  }
+
+  res.status(204).send()
 }
 
 export async function selectCampaign(req: Request, res: Response): Promise<void> {

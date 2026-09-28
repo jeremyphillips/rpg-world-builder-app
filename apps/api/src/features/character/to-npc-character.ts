@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import { normalizeStoredCharacterRecordForRead } from './lib/normalize-stored-character-for-read.lib'
-import { resolveCharacterDisplayImageForSurface } from './lib/resolve-character-display-image.lib'
+import { resolveCharacterDisplayImagesByRoleForRecord } from './lib/resolve-character-display-image.lib'
 import type { CharacterSchemaType } from './character.model'
 
 type CharacterRecord = CharacterSchemaType & {
@@ -47,7 +47,8 @@ export function toNpcCharacter(doc: CharacterRecord): NpcCharacter {
 }
 
 export function toNpcListCharacterSummary(npc: NpcCharacter) {
-  const displayImage = resolveCharacterDisplayImageForSurface(npc, 'compact')
+  const displayImagesByRole = resolveCharacterDisplayImagesByRoleForRecord(npc)
+  const portraitImage = displayImagesByRole.portrait
 
   return {
     id: npc.id,
@@ -55,6 +56,6 @@ export function toNpcListCharacterSummary(npc: NpcCharacter) {
     vital: npc.vital,
     classes: npc.classes,
     species: npc.species,
-    ...(displayImage ? { displayImage } : {}),
+    ...(portraitImage ? { displayImage: portraitImage } : {}),
   }
 }

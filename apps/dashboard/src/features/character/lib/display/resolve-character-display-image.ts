@@ -1,11 +1,15 @@
 import {
   resolveCharacterDisplayImageAsOptional,
+  resolveCharacterDisplayImagesByRole,
   type Character,
   type ContentDisplayImage,
+  type ContentDisplayImagesByRole,
   type ContentDisplaySurface,
 } from '@rpg/contracts'
 
 import { mediaImageUrl, MEDIA_SOURCE_CROP } from '@/features/media/lib/media-display'
+
+const resolveUploadSrc = (assetId: string) => mediaImageUrl(assetId, 'artwork', MEDIA_SOURCE_CROP)
 
 export function resolveCharacterDisplayImageForSurface(
   character: Pick<Character, 'media'>,
@@ -14,9 +18,18 @@ export function resolveCharacterDisplayImageForSurface(
   return resolveCharacterDisplayImageAsOptional({
     media: character.media,
     surface,
-    resolveUploadSrc: (assetId) => mediaImageUrl(assetId, 'artwork', MEDIA_SOURCE_CROP),
+    resolveUploadSrc,
   })
 }
 
-/** @deprecated Use {@link resolveCharacterDisplayImageForSurface}. */
+export function resolveCharacterDisplayImagesByRoleForRecord(
+  character: Pick<Character, 'media'>,
+): ContentDisplayImagesByRole {
+  return resolveCharacterDisplayImagesByRole({
+    media: character.media,
+    resolveUploadSrc,
+  })
+}
+
+/** @deprecated Use {@link resolveCharacterDisplayImageForSurface} or {@link resolveCharacterDisplayImagesByRoleForRecord}. */
 export const resolveCharacterPrimaryDisplayImage = resolveCharacterDisplayImageForSurface

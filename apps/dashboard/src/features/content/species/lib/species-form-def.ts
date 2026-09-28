@@ -6,6 +6,7 @@ import {
   contentFormFields,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
+import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { finalizeContentInput } from '../../lib/forms/registry/content-form-key-helpers'
 import { useSpecies, speciesQueryKey } from '../hooks/use-species'
@@ -30,6 +31,7 @@ import { SpeciesPreviewPlayerHost } from './species-preview-player-host'
 
 const speciesFormDef: ContentFormDef<Species, SpeciesFormValues, CreateSpeciesInput> = {
   routeKey: 'species',
+  ...managedMediaFormDefFields('species'),
 
   schema: speciesFormSchema,
   draftSchema: speciesDraftFormSchema,

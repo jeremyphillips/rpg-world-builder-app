@@ -26,9 +26,6 @@ const meta = {
   args: {
     campaignId: 'camp_1',
     canManage: true,
-    playerCount: 4,
-    characterCount: 6,
-    countsPending: false,
   },
 } satisfies Meta<typeof CampaignOverviewHero>
 
@@ -55,6 +52,8 @@ export const WithBannerAndEmblem: Story = {
           },
         },
       },
+      playerMemberCount: 4,
+      openPcCount: 6,
       configuration: {
         flavor: {
           playStyle: ['dungeon_crawl'],
@@ -72,6 +71,8 @@ export const WithoutMedia: Story = {
     campaign: makeCampaignListItem({
       status: 'draft',
       identity: { name: 'New Campaign' },
+      playerMemberCount: 1,
+      openPcCount: 1,
       configuration: {
         flavor: {
           playStyle: ['sandbox'],
@@ -79,19 +80,18 @@ export const WithoutMedia: Story = {
       },
     }),
     canManage: false,
-    playerCount: 1,
-    characterCount: 1,
   },
 }
 
-export const CountsPending: Story = {
+export const PlayerViewer: Story = {
   args: {
     campaign: makeCampaignListItem({
-      identity: { name: 'Loading Counts' },
+      identity: { name: 'Joined Campaign' },
+      campaignRole: 'pc',
+      playerMemberCount: 3,
+      openPcCount: 5,
     }),
-    countsPending: true,
-    playerCount: undefined,
-    characterCount: undefined,
+    canManage: false,
   },
 }
 
@@ -99,6 +99,8 @@ export const OverflowFlavorBadges: Story = {
   args: {
     campaign: makeCampaignListItem({
       identity: { name: 'Fully Tagged Campaign' },
+      playerMemberCount: 2,
+      openPcCount: 2,
       configuration: {
         flavor: {
           playStyle: ['dungeon_crawl', 'exploration', 'sandbox'],

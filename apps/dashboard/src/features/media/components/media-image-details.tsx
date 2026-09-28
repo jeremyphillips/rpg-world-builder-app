@@ -20,6 +20,7 @@ import {
   resolveMediaRoleEligibility,
   roleAssignmentMatchesSelection,
   type AvailableContentImage,
+  type AvailableContentMediaSource,
   type ContentMedia,
   type ContentMediaPolicy,
   type MediaAsset,
@@ -40,7 +41,8 @@ const altFields: FormItem[] = [
 
 export type MediaImageDetailsProps = {
   selectedAvailable: AvailableContentImage
-  availableImages: AvailableContentImage[]
+  availableSources: readonly AvailableContentMediaSource[]
+  assignedSourceMissing?: boolean
   media: ContentMedia
   policy: ContentMediaPolicy
   assignedRoles: MediaRole[]
@@ -55,7 +57,8 @@ export type MediaImageDetailsProps = {
 // fallow-ignore-next-line complexity
 export function MediaImageDetails({
   selectedAvailable,
-  availableImages,
+  availableSources,
+  assignedSourceMissing = false,
   media,
   policy,
   assignedRoles,
@@ -91,8 +94,12 @@ export function MediaImageDetails({
     media,
     selectedAvailable.id,
     policy.allowedRoles,
-    availableImages,
+    availableSources,
   )
+  const galleryOnlyUpload =
+    selectedAvailable.kind === 'upload' &&
+    effectiveRoles.roles.length === 0 &&
+    effectiveRoles.derivedRoles.length === 0
 
   return (
     <aside className={styles.detailsColumn()} aria-label="Image details">
@@ -106,6 +113,17 @@ export function MediaImageDetails({
       >
         <div className={styles.details()}>
           <h3 className={styles.subheading()}>Image details</h3>
+          {assignedSourceMissing ? (
+            <p className={styles.error()} role="alert">
+              A saved role points at a missing image. The preview uses the fallback source until you
+              reassign the role.
+            </p>
+          ) : null}
+          {galleryOnlyUpload ? (
+            <p className={styles.muted()}>
+              Gallery only — assign a role to show this image on cards and detail pages.
+            </p>
+          ) : null}
           <div className={styles.detailsPanel()}>
             <section className={styles.detailsSection()} aria-labelledby={`${id}-roles-heading`}>
               <h4 id={`${id}-roles-heading`} className={styles.subheading()}>

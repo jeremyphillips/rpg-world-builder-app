@@ -1,6 +1,10 @@
 import type { CreateOrganizationInput, Organization } from '@rpg/contracts'
 
-import { contentFormRegistry, type ContentFormDef } from '../../lib/forms/registry/content-form-registry'
+import {
+  contentFormRegistry,
+  type ContentFormDef,
+} from '../../lib/forms/registry/content-form-registry'
+import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
 import {
   buildOrganizationCreateInput,
   buildOrganizationFields,
@@ -21,6 +25,7 @@ const organizationFormDef: ContentFormDef<
   CreateOrganizationInput
 > = {
   routeKey: 'organizations',
+  ...managedMediaFormDefFields('organizations'),
   schema: organizationFormSchema,
   draftSchema: organizationDraftFormSchema,
   coverage: 'structural',

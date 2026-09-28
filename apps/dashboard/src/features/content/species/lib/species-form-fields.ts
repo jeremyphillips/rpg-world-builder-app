@@ -19,6 +19,10 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
+import {
+  managedContentMediaFormFields,
+  withManagedContentMediaFormSchema,
+} from '../../lib/forms/fields/content-managed-media-form-schema.lib'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -89,6 +93,7 @@ export function createSpeciesFormSchema(
 
   return z
     .object({
+      ...managedContentMediaFormFields,
       name: z.string().min(1),
       slug: slugSchema.optional(),
       description: z.string().optional(),
@@ -121,19 +126,21 @@ export function createSpeciesFormSchema(
 }
 
 export function createSpeciesDraftFormSchema() {
-  return z.object({
-    name: z.string(),
-    slug: slugSchema.optional(),
-    description: z.string().optional(),
-    creatureType: creatureTypeSchema,
-    sizes: z.array(creatureSizeSchema).default([]),
-    movement: z.array(movementRowDraftFormSchema).default([]),
-    languageAffinities: z.array(z.string()).optional(),
-    traits: z.array(traitRowDraftFormSchema).default([]),
-    heritage: heritageDraftFormSchema.optional(),
-    characterCreation: speciesCharacterCreationFormSchema.optional(),
-    culture: speciesCultureFormSchema.optional(),
-  })
+  return withManagedContentMediaFormSchema(
+    z.object({
+      name: z.string(),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      creatureType: creatureTypeSchema,
+      sizes: z.array(creatureSizeSchema).default([]),
+      movement: z.array(movementRowDraftFormSchema).default([]),
+      languageAffinities: z.array(z.string()).optional(),
+      traits: z.array(traitRowDraftFormSchema).default([]),
+      heritage: heritageDraftFormSchema.optional(),
+      characterCreation: speciesCharacterCreationFormSchema.optional(),
+      culture: speciesCultureFormSchema.optional(),
+    }),
+  )
 }
 
 export const speciesFormSchema = createSpeciesFormSchema(['humanoid'])

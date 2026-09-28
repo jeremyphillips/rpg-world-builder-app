@@ -1,4 +1,4 @@
-import type { CampaignFlavor, CampaignStatus, Mood, PlayStyle } from '@rpg/contracts'
+import type { CampaignFlavor, Mood, PlayStyle } from '@rpg/contracts'
 
 import {
   DIFFICULTY_LABELS,
@@ -9,14 +9,6 @@ import {
 
 export const CAMPAIGN_OVERVIEW_HERO_BADGE_LIMIT = 4 as const
 
-export type CampaignOverviewHeroStatusTone = 'success' | 'sunken'
-
-export type CampaignOverviewHeroStatusLine = {
-  statusLabel: string
-  statusTone: CampaignOverviewHeroStatusTone
-  countsSuffix?: string
-}
-
 export type CampaignOverviewHeroBadge = {
   id: string
   label: string
@@ -25,51 +17,6 @@ export type CampaignOverviewHeroBadge = {
 export type CampaignOverviewHeroBadges = {
   visible: CampaignOverviewHeroBadge[]
   overflowCount: number
-}
-
-const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
-  active: 'Active',
-  draft: 'Draft',
-  archived: 'Archived',
-}
-
-export function resolveCampaignOverviewHeroStatusTone(
-  status: CampaignStatus,
-): CampaignOverviewHeroStatusTone {
-  return status === 'active' ? 'success' : 'sunken'
-}
-
-export function composeCampaignOverviewHeroStatusLine(input: {
-  status: CampaignStatus
-  playerCount?: number
-  characterCount?: number
-  countsPending?: boolean
-}): CampaignOverviewHeroStatusLine {
-  const statusLabel = CAMPAIGN_STATUS_LABELS[input.status]
-  const statusTone = resolveCampaignOverviewHeroStatusTone(input.status)
-
-  if (input.countsPending) {
-    return { statusLabel, statusTone }
-  }
-
-  const playerCount = input.playerCount ?? 0
-  const characterCount = input.characterCount ?? 0
-  const playerClause = `${playerCount} ${playerCount === 1 ? 'player' : 'players'}`
-
-  if (playerCount === characterCount) {
-    return {
-      statusLabel,
-      statusTone,
-      countsSuffix: playerClause,
-    }
-  }
-
-  const characterClause = `${characterCount} ${characterCount === 1 ? 'character' : 'characters'}`
-  return {
-    statusLabel,
-    statusTone,
-    countsSuffix: `${playerClause} · ${characterClause}`,
-  }
 }
 
 function buildFlavorBadge(id: string, label: string): CampaignOverviewHeroBadge {

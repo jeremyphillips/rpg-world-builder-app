@@ -55,7 +55,35 @@ describe('CampaignPicker', () => {
       ROUTES.campaign.detail('camp_1'),
     )
     expect(screen.getByText('Active Campaign')).toHaveClass('font-body-emphasis')
+    expect(screen.getByText(/GM/)).toBeInTheDocument()
+    expect(screen.getByText(/0 players/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
+  })
+
+  it('renders healthy row meta with recency when lastOpenedByViewerAt is set', () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-09-28T12:00:00.000Z'))
+
+    renderWithProviders(
+      <CampaignPicker
+        campaigns={[
+          makeCampaignListItem({
+            id: 'camp_1',
+            identity: { name: 'Recent Campaign' },
+            status: 'draft',
+            playerMemberCount: 1,
+            openPcCount: 1,
+            lastOpenedByViewerAt: '2026-09-27T12:00:00.000Z',
+          }),
+        ]}
+      />,
+    )
+
+    expect(screen.getByText(/Draft/)).toBeInTheDocument()
+    expect(screen.getByText(/1 player/)).toBeInTheDocument()
+    expect(screen.getByText(/Last opened yesterday/)).toBeInTheDocument()
+
+    vi.useRealTimers()
   })
 
   it('renders a campaign emblem in destination rows', () => {

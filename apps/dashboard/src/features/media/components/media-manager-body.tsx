@@ -1,4 +1,5 @@
 import type { ContentMedia, MediaAsset } from '@rpg/contracts'
+import { MEDIA_CONTEXT_INCOMPLETE_MESSAGE } from '../lib/resolve-media-content-availability.lib'
 import type { UseMediaManagerBodyDropResult } from '../hooks/use-media-manager-body-drop'
 import type { MediaManagerController } from '../hooks/use-media-manager'
 import type { UploadEntry } from '../hooks/use-media-uploads'
@@ -60,7 +61,10 @@ export function MediaManagerBody({
           systemImageUrl={controller.resolveSystemImageUrl}
           media={media}
           availableImages={controller.sessionAvailableImages}
+          availableSources={controller.sessionSources}
           assets={assets}
+          contextBlocked={controller.contextBlocked}
+          contextBlockedMessage={MEDIA_CONTEXT_INCOMPLETE_MESSAGE}
           allowedRoles={controller.policy.allowedRoles}
           selectedId={selectedId}
           entries={entries}
@@ -79,7 +83,8 @@ export function MediaManagerBody({
         {showDetailsColumn && selectedAvailable ? (
           <MediaImageDetails
             selectedAvailable={selectedAvailable}
-            availableImages={controller.sessionAvailableImages}
+            availableSources={controller.sessionSources}
+            assignedSourceMissing={controller.assignedSourceMissing}
             asset={asset}
             media={media}
             policy={policy}
