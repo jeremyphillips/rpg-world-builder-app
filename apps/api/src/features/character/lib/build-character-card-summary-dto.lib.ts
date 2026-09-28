@@ -7,7 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { formatCharacterSummary, resolveCharacterSummaryParts } from '@rpg/contracts'
 
-import { resolveCharacterDisplayImageForSurface } from './resolve-character-display-image.lib'
+import { resolveCharacterDisplayImagesByRoleForRecord } from './resolve-character-display-image.lib'
 
 function isContentIndex(
   contentIndex:
@@ -47,7 +47,7 @@ export function buildCharacterCardSummaryDto(input: {
   const lookup = createCharacterSummaryLabelLookup(input.contentIndex)
   const parts = resolveCharacterSummaryParts(input.character, lookup)
 
-  const displayImage = resolveCharacterDisplayImageForSurface(input.character, 'compact')
+  const displayImagesByRole = resolveCharacterDisplayImagesByRoleForRecord(input.character)
 
   return {
     id: input.character.id,
@@ -55,6 +55,6 @@ export function buildCharacterCardSummaryDto(input: {
     summary: formatCharacterSummary(parts),
     classIds: input.character.classes.map((entry) => entry.classId),
     speciesId: input.character.species.id,
-    ...(displayImage ? { displayImage } : {}),
+    ...(Object.keys(displayImagesByRole).length > 0 ? { displayImagesByRole } : {}),
   }
 }

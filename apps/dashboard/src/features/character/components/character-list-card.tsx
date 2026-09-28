@@ -40,10 +40,10 @@ export function CharacterListCard({
 
   return (
     <Card className="flex h-full flex-col overflow-hidden p-0">
-      {card.displayImage ? (
-        <ContentMediaImage display={card.displayImage} alt="" frame="builderCard" />
+      {card.displayImagesByRole?.primary ? (
+        <ContentMediaImage display={card.displayImagesByRole.primary} alt="" frame="primary" />
       ) : null}
-      <CardHeader className={card.displayImage ? 'px-5 pb-3 pt-3' : undefined}>
+      <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
         <div className="flex items-start justify-between gap-2">
           <CardTitle>{card.name}</CardTitle>
           {rosterPresentation ? (
@@ -69,7 +69,9 @@ export function CharacterListCard({
           />
         ) : null}
       </CardHeader>
-      <CardFooter className={cn('mt-auto', card.displayImage != null && 'px-5 pb-5')}>
+      <CardFooter
+        className={cn('mt-auto', card.displayImagesByRole?.primary != null && 'px-5 pb-5')}
+      >
         <Link to={detailHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           View
         </Link>

@@ -31,6 +31,6 @@ describe('DetailRowLeadingMedia', () => {
     expect(frame).toHaveClass('size-8')
     const img = screen.getByRole('img', { name: 'Huge portrait' })
     expect(frame?.contains(img)).toBe(true)
-    expect(frame?.querySelector('[class*="object-cover"]') ?? img.parentElement).toBeTruthy()
+    expect(img.parentElement).toHaveClass('size-full')
   })
 })

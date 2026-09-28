@@ -15,6 +15,7 @@ export const SystemArt: Story = {
   args: {
     display: {
       src: '/app/assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',
+      role: 'primary',
       sourceKind: 'system',
     },
     alt: 'Elf',

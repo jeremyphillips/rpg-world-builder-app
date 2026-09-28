@@ -10,7 +10,12 @@ import {
   type ContentImagePresentationSurface,
 } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
 import {
-  contentMediaImageClasses,
+  resolveFrameCropCompatibility,
+  resolveFocalObjectPosition,
+} from '../lib/content-media-image-frame.lib'
+import {
+  contentMediaImageCoverClasses,
+  contentMediaImageCropClasses,
   contentMediaImageFallbackIconClasses,
   contentMediaImageFallbackWellClasses,
   contentMediaImageFrameVariants,
@@ -44,50 +49,47 @@ function resolvePresentationSurface(
   return 'primary'
 }
 
-function usesNormalizedCropLayout(frame: ContentMediaImageFrame, hasCrop: boolean): boolean {
-  if (frame === 'primary' || frame === 'builderSheetHero') return true
-  if (hasCrop && (frame === 'builderCard' || frame === 'square' || frame === 'insetSm')) {
-    return true
-  }
-  return false
+function resolveCoverObjectPosition(
+  display: ContentDisplayImage,
+  frame: ContentMediaImageFrame,
+): string {
+  return (
+    resolveFocalObjectPosition(display.focalPoint) ??
+    resolveContentImagePresentationDefault(resolvePresentationSurface(frame)).objectPosition
+  )
 }
 
-function resolveObjectPresentation(frame: ContentMediaImageFrame): {
-  objectFit: 'cover' | 'contain'
-  objectPosition: string
-} {
-  if (frame === 'emblem' || frame === 'emblemHero') {
-    return { objectFit: 'contain', objectPosition: '50% 50%' }
-  }
-  return resolveContentImagePresentationDefault(resolvePresentationSurface(frame))
-}
-
-/** Renders a resolved display image with optional normalized-crop math. */
+/** Renders a resolved display image with frame-aware crop or cover presentation. */
 export function ContentMediaImage({
   display,
   alt,
   frame = 'intrinsic',
   className,
 }: ContentMediaImageProps) {
-  const hasCrop = display.crop != null
-  const applyCropLayout = usesNormalizedCropLayout(frame, hasCrop)
+  const { display: compatibleDisplay, renderMode } = resolveFrameCropCompatibility(display, frame)
   const cropLayout =
-    applyCropLayout && display.crop ? resolveNormalizedCropImageLayout(display.crop) : undefined
-  const presentation = resolveObjectPresentation(frame)
-  const usesWhitePaperKnockout = display.presentationTreatment === 'white-paper-knockout'
-  const usesMonoGlyphInvert = display.presentationTreatment === 'mono-glyph-invert'
+    renderMode === 'crop' && compatibleDisplay.crop
+      ? resolveNormalizedCropImageLayout(compatibleDisplay.crop)
+      : undefined
+  const usesWhitePaperKnockout = compatibleDisplay.presentationTreatment === 'white-paper-knockout'
+  const usesMonoGlyphInvert = compatibleDisplay.presentationTreatment === 'mono-glyph-invert'
+
+  const imageClassName = cn(
+    renderMode === 'crop'
+      ? contentMediaImageCropClasses
+      : renderMode === 'contain'
+        ? contentMediaImageEmblemClasses
+        : contentMediaImageCoverClasses,
+    usesWhitePaperKnockout && contentMediaImageWhitePaperKnockoutClasses,
+    usesMonoGlyphInvert && contentMediaImageMonoGlyphInvertClasses,
+  )
 
   return (
     <div className={cn(contentMediaImageFrameVariants({ frame }), className)}>
       <img
-        src={display.src}
+        src={compatibleDisplay.src}
         alt={alt}
-        className={cn(
-          contentMediaImageClasses,
-          (frame === 'emblem' || frame === 'emblemHero') && contentMediaImageEmblemClasses,
-          usesWhitePaperKnockout && contentMediaImageWhitePaperKnockoutClasses,
-          usesMonoGlyphInvert && contentMediaImageMonoGlyphInvertClasses,
-        )}
+        className={imageClassName}
         style={
           cropLayout
             ? {
@@ -96,10 +98,9 @@ export function ContentMediaImage({
                 marginLeft: `${cropLayout.offsetXPercent}%`,
                 marginTop: `${cropLayout.offsetYPercent}%`,
               }
-            : {
-                objectFit: presentation.objectFit,
-                objectPosition: presentation.objectPosition,
-              }
+            : renderMode === 'cover'
+              ? { objectPosition: resolveCoverObjectPosition(compatibleDisplay, frame) }
+              : undefined
         }
       />
     </div>

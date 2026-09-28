@@ -4,7 +4,9 @@ import type { ContentDisplaySurface } from './content-display-surface'
 import {
   resolveContentDisplayImage,
   resolveContentDisplayImageAsOptional,
+  resolveContentDisplayImagesByRole,
   type ContentDisplayImage,
+  type ContentDisplayImagesByRole,
   type ResolveContentDisplayImageInput,
   type ResolveContentDisplayImageResult,
 } from './resolve-content-display-image'
@@ -39,5 +41,17 @@ export function resolveCharacterDisplayImageAsOptional(
     ...input,
     ...CHARACTER_REGISTRY_LOOKUP_STUB,
     domain: 'character',
+  })
+}
+
+/** Portrait and primary images for multi-frame character surfaces (list card + row thumb). */
+export function resolveCharacterDisplayImagesByRole(
+  input: Omit<ResolveCharacterDisplayImageInput, 'surface'>,
+): ContentDisplayImagesByRole {
+  return resolveContentDisplayImagesByRole({
+    ...input,
+    ...CHARACTER_REGISTRY_LOOKUP_STUB,
+    domain: 'character',
+    roles: ['portrait', 'primary'],
   })
 }

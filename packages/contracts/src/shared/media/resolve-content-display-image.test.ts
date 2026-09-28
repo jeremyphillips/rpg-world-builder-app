@@ -8,6 +8,7 @@ import { normalizePersistedContentMedia } from './normalize-persisted-content-me
 import {
   resolveContentDisplayImage,
   resolveContentDisplayImageAsOptional,
+  resolveContentDisplayImagesByRole,
 } from './resolve-content-display-image'
 
 const resolveUploadSrc = () => '/api/media/upload.jpg'
@@ -28,6 +29,7 @@ describe('resolveContentDisplayImage', () => {
       outcome: 'image',
       display: {
         src: 'assets/system/srd-cc-5.2.1/classes/primary/fighter.jpeg',
+        role: 'primary',
         sourceKind: 'system',
         presentationTreatment: 'white-paper-knockout',
       },
@@ -106,6 +108,7 @@ describe('resolveContentDisplayImage', () => {
       outcome: 'image',
       display: {
         src: 'assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',
+        role: 'primary',
         sourceKind: 'system',
         presentationTreatment: 'white-paper-knockout',
       },
@@ -136,7 +139,7 @@ describe('resolveContentDisplayImage', () => {
 
     expect(result).toEqual({
       outcome: 'image',
-      display: { src: '/portrait.jpg', sourceKind: 'upload' },
+      display: { src: '/portrait.jpg', role: 'portrait', sourceKind: 'upload' },
     })
   })
 
@@ -164,7 +167,7 @@ describe('resolveContentDisplayImage', () => {
 
     expect(result).toEqual({
       outcome: 'image',
-      display: { src: '/primary.jpg', sourceKind: 'upload' },
+      display: { src: '/primary.jpg', role: 'primary', sourceKind: 'upload' },
     })
   })
 
@@ -186,6 +189,45 @@ describe('resolveContentDisplayImage', () => {
     })
 
     expect(result).toEqual({ outcome: 'fallback', fallback: 'organization' })
+  })
+
+  it('resolves portrait and primary independently for character media', () => {
+    const portraitCrop = { x: 0.2, y: 0.1, width: 0.25, height: 0.25 }
+    const primaryCrop = { x: 0, y: 0.05, width: 0.9, height: 0.675 }
+    const byRole = resolveContentDisplayImagesByRole({
+      domain: 'character',
+      media: {
+        revision: 0,
+        images: [{ id: 'shared-img', assetId: 'shared-asset' }],
+        roles: {
+          portrait: {
+            ...createUploadRoleAssignment('shared-img'),
+            presentation: { mode: 'crop', crop: portraitCrop },
+          },
+          primary: {
+            ...createUploadRoleAssignment('shared-img'),
+            presentation: { mode: 'crop', crop: primaryCrop },
+          },
+        },
+      },
+      subject: contentTypeSubject('classes'),
+      slug: '',
+      contentSource: 'homebrew',
+      resolveUploadSrc: () => '/shared.jpg',
+    })
+
+    expect(byRole.portrait).toEqual({
+      src: '/shared.jpg',
+      role: 'portrait',
+      sourceKind: 'upload',
+      crop: portraitCrop,
+    })
+    expect(byRole.primary).toEqual({
+      src: '/shared.jpg',
+      role: 'primary',
+      sourceKind: 'upload',
+      crop: primaryCrop,
+    })
   })
 
   it('returns a semantic fallback key when nothing resolves', () => {

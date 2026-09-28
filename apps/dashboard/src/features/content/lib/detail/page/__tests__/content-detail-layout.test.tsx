@@ -35,7 +35,7 @@ function renderLayout(ui: ReactElement) {
 const defaultProps = {
   contentTypeKey: 'classes' as const,
   name: 'Fighter',
-  displayImage: { src: '/img.png', sourceKind: 'upload' as const },
+  displayImage: { src: '/img.png', role: 'primary' as const, sourceKind: 'upload' as const },
   imageName: 'Fighter',
   campaignId: 'c1',
   editHref: '/campaigns/c1/classes/f1/edit',

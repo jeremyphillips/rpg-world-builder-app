@@ -90,7 +90,7 @@ export const charactersSearchSource: SearchSource = {
           summary,
           entry.character.id,
           [labelField(entry.character.name), keywordField(summary)],
-          entry.character.displayImage,
+          entry.character.displayImagesByRole?.portrait,
         ),
       )
     }

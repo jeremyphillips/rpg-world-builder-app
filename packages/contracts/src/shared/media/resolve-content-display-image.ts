@@ -11,7 +11,8 @@ import {
   type ContentDisplayFallback,
 } from './content-display-fallback'
 import { asCropPresentation } from './role-presentation'
-import type { NormalizedCrop } from './geometry'
+import type { NormalizedCrop, NormalizedFocalPoint } from './geometry'
+import type { ContentDisplayImagesByRole } from './content-display-image-dto'
 import type { MediaRole } from './roles'
 import { getContentMediaPolicy, resolveDetailRoles, type ContentMediaDomain } from './media-policy'
 import {
@@ -29,11 +30,15 @@ export type ContentDisplayImagePresentationTreatment = 'white-paper-knockout' | 
 
 export type ContentDisplayImage = {
   src: string
+  role: MediaRole
   crop?: NormalizedCrop
+  focalPoint?: NormalizedFocalPoint
   sourceKind: ContentDisplayImageSourceKind
   /** Set only when resolved from a registry entry that declares a non-default treatment. */
   presentationTreatment?: ContentDisplayImagePresentationTreatment
 }
+
+export type { ContentDisplayImagesByRole } from './content-display-image-dto'
 
 export type ResolveContentDisplayImageInput = {
   media?: ContentMedia | null
@@ -106,14 +111,16 @@ function resolveDisplayImageForRole(
   const assignment = input.media?.roles[role]
 
   if (assignment) {
-    const crop = asCropPresentation(assignment.presentation)?.crop
+    const cropPresentation = asCropPresentation(assignment.presentation)
+    const crop = cropPresentation?.crop
+    const focalPoint = cropPresentation?.focalPoint
 
     if (assignment.source.kind === 'upload') {
       const src = input.media
         ? resolveUploadAssignmentSrc(input.media, assignment.source.imageId, input.resolveUploadSrc)
         : undefined
       if (src) {
-        return { src, crop, sourceKind: 'upload' }
+        return { src, role, crop, focalPoint, sourceKind: 'upload' }
       }
     }
 
@@ -122,7 +129,9 @@ function resolveDisplayImageForRole(
       if (resolved) {
         return {
           src: resolved.path,
+          role,
           crop,
+          focalPoint,
           sourceKind: 'system',
           presentationTreatment: presentationTreatmentFromSystemImage(resolved.presentation),
         }
@@ -140,12 +149,37 @@ function resolveDisplayImageForRole(
   if (derivedResolved) {
     return {
       src: derivedResolved.path,
+      role,
       sourceKind: 'system',
       presentationTreatment: presentationTreatmentFromSystemImage(derivedResolved.presentation),
     }
   }
 
   return undefined
+}
+
+/** Resolve one display image per requested role (independent crops; no compact walk). */
+export function resolveContentDisplayImagesByRole(
+  input: Omit<ResolveContentDisplayImageInput, 'surface'> & {
+    roles?: readonly MediaRole[]
+  },
+): ContentDisplayImagesByRole {
+  const imageSetId = resolveContentImageSet({
+    campaignImageSetId: input.campaignImageSetId,
+    rulesetId: input.rulesetId,
+  })
+  const policy = getContentMediaPolicy(input.domain)
+  const roles = input.roles ?? policy.representativeRoles
+  const byRole: ContentDisplayImagesByRole = {}
+
+  for (const role of roles) {
+    const display = resolveDisplayImageForRole({ ...input, surface: 'compact' }, role, imageSetId)
+    if (display) {
+      byRole[role] = display
+    }
+  }
+
+  return byRole
 }
 
 /** Resolve display image or semantic fallback for a content record and surface. */

@@ -32,7 +32,7 @@ export function buildCharacterListRowPresentation(
   })
 
   const identity = buildCharacterEntityCardModel(vm, {
-    displayImage: input.card.displayImage,
+    displayImage: input.card.displayImagesByRole?.portrait,
     status: input.rosterStatus
       ? (() => {
           const roster = resolveCharacterRosterStatusPresentation(input.rosterStatus)

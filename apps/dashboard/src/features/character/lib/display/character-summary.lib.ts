@@ -1,4 +1,8 @@
-import type { Character, CharacterBuildCatalogIndex, ContentDisplayImage } from '@rpg/contracts'
+import type {
+  Character,
+  CharacterBuildCatalogIndex,
+  ContentDisplayImagesByRole,
+} from '@rpg/contracts'
 import {
   formatCharacterSummary,
   resolveCharacterSummaryParts,
@@ -7,7 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { formatContentReferenceLabel } from './format-content-reference-label'
-import { resolveCharacterPrimaryDisplayImage } from './resolve-character-display-image'
+import { resolveCharacterDisplayImagesByRoleForRecord } from './resolve-character-display-image'
 import type { CharacterCardViewModel } from './character-display-types'
 
 function createDashboardSummaryLabelLookup(
@@ -46,18 +50,19 @@ export function formatCharacterSummaryFromCatalog(
 /** Card view model for roster and campaign list surfaces — PCs and NPC list rows share this base. */
 export function buildCharacterCardViewModel(
   character: Pick<Character, 'id' | 'name' | 'classes' | 'species' | 'media'> & {
-    displayImage?: ContentDisplayImage
+    displayImagesByRole?: ContentDisplayImagesByRole
     campaign?: { id: string; name: string; emblemUrl?: string }
   },
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterCardViewModel {
-  const displayImage = character.displayImage ?? resolveCharacterPrimaryDisplayImage(character)
+  const displayImagesByRole =
+    character.displayImagesByRole ?? resolveCharacterDisplayImagesByRoleForRecord(character)
 
   return {
     id: character.id,
     name: character.name,
     summary: formatCharacterSummaryFromCatalog(character, catalogIndex),
-    ...(displayImage ? { displayImage } : {}),
+    ...(Object.keys(displayImagesByRole).length > 0 ? { displayImagesByRole } : {}),
     ...(character.campaign ? { campaign: character.campaign } : {}),
   }
 }

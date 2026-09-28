@@ -24,6 +24,7 @@ type Story = StoryObj<typeof meta>
 
 const PLACEHOLDER_DISPLAY_IMAGE = {
   src: 'https://placehold.co/400x500/1e293b/94a3b8?text=Class+Art',
+  role: 'primary' as const,
   sourceKind: 'upload' as const,
 }
 
