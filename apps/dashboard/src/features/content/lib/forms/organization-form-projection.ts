@@ -1,4 +1,6 @@
 import { z } from 'zod'
+
+import { withManagedContentMediaFormSchema } from './fields/content-managed-media-form-schema.lib'
 import {
   ORGANIZATION_AUTHORING_PRESETS,
   ORGANIZATION_AUTHORING_PRESET_IDS,
@@ -107,39 +109,43 @@ const organizationMembersFormFieldsSchema = z.object({
   speciesAffinityIds: z.array(z.string().min(1)).default([]),
 })
 
-export const organizationFormSchema = z.object({
-  name: z.string().min(1),
-  slug: slugSchema.optional(),
-  description: z.string().optional(),
-  organizationDomain: organizationDomainSchema,
-  organizationForm: canonicalOrganizationFormSchema.optional(),
-  functions: z.array(organizationFunctionSchema).default([]),
-  practices: z.array(organizationPracticeSchema).default([]),
-  members: organizationMembersFormFieldsSchema.default({
-    classAffinityIds: [],
-    speciesAffinityIds: [],
+export const organizationFormSchema = withManagedContentMediaFormSchema(
+  z.object({
+    name: z.string().min(1),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    organizationDomain: organizationDomainSchema,
+    organizationForm: canonicalOrganizationFormSchema.optional(),
+    functions: z.array(organizationFunctionSchema).default([]),
+    practices: z.array(organizationPracticeSchema).default([]),
+    members: organizationMembersFormFieldsSchema.default({
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+    }),
+    /** Ephemeral picker value — cleared after apply; not sent on create. */
+    authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
+    /** Create provenance when a familiar starting point was applied — sent as sourcePresetId. */
+    sourcePresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
   }),
-  /** Ephemeral picker value — cleared after apply; not sent on create. */
-  authoringPresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
-  /** Create provenance when a familiar starting point was applied — sent as sourcePresetId. */
-  sourcePresetId: z.enum(ORGANIZATION_AUTHORING_PRESET_IDS).optional(),
-})
+)
 
-export const organizationDraftFormSchema = z.object({
-  name: z.string(),
-  slug: slugSchema.optional(),
-  description: z.string().optional(),
-  organizationDomain: draftOptionalSelect(organizationDomainSchema),
-  organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
-  functions: z.array(organizationFunctionSchema).default([]),
-  practices: z.array(organizationPracticeSchema).default([]),
-  members: organizationMembersFormFieldsSchema.default({
-    classAffinityIds: [],
-    speciesAffinityIds: [],
+export const organizationDraftFormSchema = withManagedContentMediaFormSchema(
+  z.object({
+    name: z.string(),
+    slug: slugSchema.optional(),
+    description: z.string().optional(),
+    organizationDomain: draftOptionalSelect(organizationDomainSchema),
+    organizationForm: draftOptionalSelect(canonicalOrganizationFormSchema),
+    functions: z.array(organizationFunctionSchema).default([]),
+    practices: z.array(organizationPracticeSchema).default([]),
+    members: organizationMembersFormFieldsSchema.default({
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+    }),
+    authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
+    sourcePresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
   }),
-  authoringPresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
-  sourcePresetId: draftOptionalSelect(z.enum(ORGANIZATION_AUTHORING_PRESET_IDS)),
-})
+)
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
 

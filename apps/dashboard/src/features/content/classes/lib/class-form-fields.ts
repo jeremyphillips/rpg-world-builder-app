@@ -12,6 +12,10 @@ import {
 } from '@rpg/contracts'
 import { type TabbedFormTab } from '@rpg/ui/form'
 
+import {
+  managedContentMediaFormFields,
+  withManagedContentMediaFormSchema,
+} from '../../lib/forms/fields/content-managed-media-form-schema.lib'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -67,6 +71,7 @@ export function createClassFormSchema(
 ) {
   return z
     .object({
+      ...managedContentMediaFormFields,
       name: z.string().min(1),
       slug: slugSchema.optional(),
       description: z.string().optional(),
@@ -141,37 +146,39 @@ export function createClassDraftFormSchema(
   maxLevel: number = MAX_CHARACTER_LEVEL,
   _formCtx?: Pick<ContentFormCtx, 'options' | 'entityId'>,
 ) {
-  return z.object({
-    name: z.string(),
-    slug: slugSchema.optional(),
-    description: z.string().optional(),
-    primaryAbilities: z.array(abilitySchema).max(2).default([]),
-    hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
-    hasSpellcasting: z.boolean(),
-    grantsCantrips: z.boolean(),
-    spellSelectionModel: z
-      .enum(['limitedRepertoire', 'prepareFromClassList', 'prepareFromLearnedCollection'])
-      .optional(),
-    spellSelectionChangePackage: z
-      .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
-      .optional(),
-    spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
-    spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
-    spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
-    spellbookAcquisitionIrregular: z.boolean().optional(),
-    spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
-    weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
-    spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
-    proficiencies: proficienciesDraftFormSchema,
-    features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
-    characterCreation: z
-      .object({
-        startingEquipment: startingEquipmentDraftFormSchema.optional(),
-        proficiencies: characterCreationProficienciesFormSchema.optional(),
-        abilityScoreOrder: abilityScoreOrderSchema.optional(),
-      })
-      .optional(),
-  })
+  return withManagedContentMediaFormSchema(
+    z.object({
+      name: z.string(),
+      slug: slugSchema.optional(),
+      description: z.string().optional(),
+      primaryAbilities: z.array(abilitySchema).max(2).default([]),
+      hitDie: draftOptionalSelect(z.coerce.number().pipe(hitDieSchema)),
+      hasSpellcasting: z.boolean(),
+      grantsCantrips: z.boolean(),
+      spellSelectionModel: z
+        .enum(['limitedRepertoire', 'prepareFromClassList', 'prepareFromLearnedCollection'])
+        .optional(),
+      spellSelectionChangePackage: z
+        .enum(['levelUp:1', 'longRest:1', 'longRest:all', 'none'])
+        .optional(),
+      spellbookAcquisitionStarting: z.coerce.number().int().min(0).optional(),
+      spellbookAcquisitionPerLevel: z.coerce.number().int().min(0).optional(),
+      spellbookAcquisitionThroughLevel: z.coerce.number().int().min(2).optional(),
+      spellbookAcquisitionIrregular: z.boolean().optional(),
+      spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
+      weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
+      spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
+      proficiencies: proficienciesDraftFormSchema,
+      features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
+      characterCreation: z
+        .object({
+          startingEquipment: startingEquipmentDraftFormSchema.optional(),
+          proficiencies: characterCreationProficienciesFormSchema.optional(),
+          abilityScoreOrder: abilityScoreOrderSchema.optional(),
+        })
+        .optional(),
+    }),
+  )
 }
 
 export const classFormSchema = createClassFormSchema()

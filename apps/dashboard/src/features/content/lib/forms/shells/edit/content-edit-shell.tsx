@@ -16,6 +16,7 @@ import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadc
 import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { SubclassUnsavedEditsProvider } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
 import { stripEditEnvelopeFromFormDefaults } from '../../registry/content-form-key-helpers'
+import { serializeContentFormInput } from '../../registry/content-form-serialize-input.lib'
 import { useContentWriteMutation } from '../../../list/use-content-mutations'
 import {
   contentFormRegistry,
@@ -351,7 +352,8 @@ function ContentEditFormBody({
   const { onSubmit, formError } = useSubmitHandler({
     submit: async (values, form) => {
       const saved = await mutation.mutateAsync(
-        def.toInput(
+        serializeContentFormInput(
+          def,
           values,
           {
             entity,
@@ -360,6 +362,10 @@ function ContentEditFormBody({
             equipmentKind: layoutCtx.equipmentKind,
           },
           validationIntent,
+          {
+            operation: 'update',
+            dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+          },
         ),
       )
       const savedRecord = saved as typeof entity & { media?: ContentMedia }

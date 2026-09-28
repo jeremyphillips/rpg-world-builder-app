@@ -71,7 +71,7 @@ describe.each(registryEntries)('ContentFormDef[%s] tab ownership drift', (routeK
     const exempt = new Set(TAB_OWNERSHIP_EXEMPT[routeKey] ?? ['slug'])
 
     for (const key of publishSchemaTopLevelKeys(def, ctx)) {
-      if (exempt.has(key) || key.startsWith('_')) continue
+      if (exempt.has(key) || key.startsWith('_') || key === 'media') continue
 
       const isOwned = ownedKeys.some((ownedKey) => pathOwnsIssue(ownedKey, key))
       expect(

@@ -18,6 +18,7 @@ import {
   formatContentCreateHeading,
 } from '../../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { serializeContentFormInput } from '../../../lib/forms/registry/content-form-serialize-input.lib'
 import {
   ContentFormHost,
   type ContentFormHostLeaveBridge,
@@ -90,12 +91,13 @@ function OrganizationCreateModalForm({
       resolverFields: resolveContentFormNavigationFields(organizationFormDef, ctx),
       formId: formKey,
     },
-    persist: async (values) => {
+    persist: async (values, form) => {
       const { entity: created, deferredAccessFailed } = await createWithDeferredCampaignAccess({
         campaignId,
         routeKey: organizationFormDef.routeKey,
         createInput: {
-          ...organizationFormDef.toInput(
+          ...(serializeContentFormInput(
+            organizationFormDef,
             values,
             {
               weaponCategoryBySlug: ctx.options?.weaponCategoryBySlug,
@@ -103,7 +105,11 @@ function OrganizationCreateModalForm({
               equipmentKind: ctx.equipmentKind,
             },
             'publish',
-          ),
+            {
+              operation: 'create',
+              dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+            },
+          ) as Record<string, unknown>),
           status: 'published' as const,
         },
         mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,

@@ -74,6 +74,9 @@ const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 /** Set by preset value sync — not a visible form control. */
 const ORGANIZATION_SCHEMA_EXEMPT = ['sourcePresetId'] as const
 
+/** Managed in the identity header via ManagedMediaField — not FormItem paths. */
+const MANAGED_MEDIA_SCHEMA_EXEMPT = [/^media\b/] as const
+
 /** Cantrip capacity is authored in TableBuilder — not inline scalar form fields. */
 const CLASS_SCHEMA_EXEMPT = [
   /^spellcasting\.progression\b/,
@@ -89,6 +92,7 @@ const COMMON_SCHEMA_EXEMPT = [
   ...HERITAGE_FORM_EXEMPT,
   ...STARTING_EQUIPMENT_FORM_EXEMPT,
   ...GRANT_NESTED_EXEMPT,
+  ...MANAGED_MEDIA_SCHEMA_EXEMPT,
 ] as const
 
 const EQUIPMENT_SCHEMA_EXEMPT = [...COMMON_SCHEMA_EXEMPT, ...EQUIPMENT_KIND_EXEMPT] as const
