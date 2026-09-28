@@ -1,5 +1,7 @@
 import {
+  contentMediaSchema,
   contentStatusToValidationIntent,
+  type ContentMedia,
   type ContentSource,
   type ContentStatus,
   type ContentValidationIntent,
@@ -36,6 +38,10 @@ import {
 } from './apply-content-catalog-media.lib'
 
 const MAX_SLUG_ATTEMPTS = 5
+
+function withCanonicalContentMediaRoles(media: ContentMedia): ContentMedia {
+  return contentMediaSchema.parse({ ...media, roles: media.roles ?? {} })
+}
 
 export interface CreateHomebrewContentOptions {
   status?: ContentStatus
@@ -237,6 +243,31 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   return resolveStoredSchema(config, validationIntent).parse(entity)
 }
 
+function parseSystemPatchedStoredEntity<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  existing: T,
+  mergedBody: Record<string, unknown>,
+): T {
+  const mergedBodyForParse = config.readConfig.patchReplaceKeys?.length
+    ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
+    : mergedBody
+  config.bodySchema.parse(mergedBodyForParse)
+
+  const existingRecord = existing as Record<string, unknown>
+  const entityForParse = {
+    ...existingRecord,
+    ...mergedBodyForParse,
+    id: existing.id,
+    slug: existing.slug,
+    source: existing.source,
+    status: existing.status,
+    campaignId: existing.campaignId,
+    rulesetId: existingRecord.rulesetId,
+  }
+
+  return config.storedSchema.parse(entityForParse as unknown as T)
+}
+
 async function updateSystemPatch<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   campaignId: string,
@@ -261,10 +292,6 @@ async function updateSystemPatch<T extends StoredEntity>(
     existingPatchDoc?.patch,
     update,
   )
-  const mergedBodyForParse = config.readConfig.patchReplaceKeys?.length
-    ? stripNullDeepFields(mergedBody, config.readConfig.patchReplaceKeys)
-    : mergedBody
-  config.bodySchema.parse(mergedBodyForParse)
 
   const sanitizedPatch = stripNullDeep(cumulativePatch) as Record<string, unknown>
 
@@ -274,19 +301,7 @@ async function updateSystemPatch<T extends StoredEntity>(
     { upsert: true, returnDocument: 'after', session },
   )
 
-  const resolved = await resolveCatalogForCampaign(config.readConfig, campaignId)
-  const entity = resolved.find((record) => record.id === entityId)
-  if (!entity) {
-    throw new HttpError(404, 'not_found', 'Patched record not found after update.')
-  }
-
-  const sanitizeKeys = config.readConfig.patchReplaceKeys
-  const entityForParse =
-    sanitizeKeys?.length && entity
-      ? stripNullDeepFields(entity as Record<string, unknown>, sanitizeKeys)
-      : entity
-
-  return config.storedSchema.parse(entityForParse as T)
+  return parseSystemPatchedStoredEntity(config, existing, mergedBody)
 }
 
 async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
@@ -314,19 +329,28 @@ async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
   const entityId = String(created._id)
 
   if (input.mediaEnvelope) {
-    const reconciledMedia = await reconcileCatalogContentMediaWithSession(
-      {
-        config,
-        campaignId: input.campaignId,
-        entityId,
-        contentSource: 'homebrew',
-        slug: input.slug,
-        rulesetId: input.rulesetId,
-        envelope: input.mediaEnvelope,
-        mode: 'create',
-        currentMedia: null,
-      },
-      input.session!,
+    if (!input.session) {
+      throw new HttpError(
+        500,
+        'internal_error',
+        'Catalog media create requires an active MongoDB session.',
+      )
+    }
+    const reconciledMedia = withCanonicalContentMediaRoles(
+      await reconcileCatalogContentMediaWithSession(
+        {
+          config,
+          campaignId: input.campaignId,
+          entityId,
+          contentSource: 'homebrew',
+          slug: input.slug,
+          rulesetId: input.rulesetId,
+          envelope: input.mediaEnvelope,
+          mode: 'create',
+          currentMedia: null,
+        },
+        input.session,
+      ),
     )
     await config.homebrewModel.updateOne(
       { _id: entityId, campaignId: input.campaignId },
@@ -336,7 +360,16 @@ async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
     created.set('media', reconciledMedia)
   }
 
-  const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
+  let entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc) as T
+  if (input.mediaEnvelope) {
+    const media = (entity as T & { media?: ContentMedia }).media
+    if (media !== undefined) {
+      entity = {
+        ...entity,
+        media: withCanonicalContentMediaRoles(media),
+      } as T
+    }
+  }
   return resolveStoredSchema(config, input.validationIntent).parse(entity)
 }
 
@@ -357,9 +390,14 @@ async function persistResolvedHomebrewCreate<T extends StoredEntity>(
   optionsSession?: ClientSession,
 ): Promise<T> {
   const parsed = saveInput.mediaEnvelope
-    ? await runInTransaction((session) =>
-        saveNewHomebrewRecordWithOptionalMedia(config, { ...saveInput, session }),
-      )
+    ? optionsSession
+      ? await saveNewHomebrewRecordWithOptionalMedia(config, {
+          ...saveInput,
+          session: optionsSession,
+        })
+      : await runInTransaction((session) =>
+          saveNewHomebrewRecordWithOptionalMedia(config, { ...saveInput, session }),
+        )
     : await saveNewHomebrewRecordWithOptionalMedia(config, {
         ...saveInput,
         session: optionsSession,
@@ -691,18 +729,20 @@ export async function updateContentEntity<T extends StoredEntity>(
   if (mediaEnvelope) {
     const slug = existing.slug
     const updated = await runInTransaction(async (session) => {
-      const reconciledMedia = await reconcileCatalogContentMediaWithSession(
-        {
-          config,
-          campaignId,
-          entityId,
-          contentSource: existing.source,
-          slug,
-          rulesetId: campaign.rulesetId,
-          envelope: mediaEnvelope,
-          mode: 'update',
-        },
-        session,
+      const reconciledMedia = withCanonicalContentMediaRoles(
+        await reconcileCatalogContentMediaWithSession(
+          {
+            config,
+            campaignId,
+            entityId,
+            contentSource: existing.source,
+            slug,
+            rulesetId: campaign.rulesetId,
+            envelope: mediaEnvelope,
+            mode: 'update',
+          },
+          session,
+        ),
       )
       return persistUpdate({ ...update, media: reconciledMedia }, session)
     })

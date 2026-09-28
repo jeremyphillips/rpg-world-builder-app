@@ -1,6 +1,14 @@
-import { describe, expect, it } from 'vitest'
+import { randomUUID } from 'node:crypto'
+
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { catalogContentMediaExpectedRevisionField } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { setMongoTransactionsEnabled } from '../../../lib/mongo-transaction'
+import { createMediaAssetRecord, findMediaAssetsByIds } from '../../media/media.repository'
+import { findMediaReferencesForSubject } from '../../media/media.repository'
+import { HomebrewSpeciesModel } from '../species/homebrew-species.model'
 import { makeTestUser } from '../../../test/fixtures/users'
 import { minimalStandalonePcInput } from '../../../test/fixtures/characters'
 import { minimalNpcRequestInput } from '../../../test/fixtures/npcs'
@@ -21,6 +29,35 @@ import { deleteContentEntity, getContentDeletionAvailability } from './content-d
 import { HttpError } from '../../../lib/http-error'
 
 useIntegrationDb()
+
+beforeEach(() => {
+  setMongoTransactionsEnabled(true)
+  vi.restoreAllMocks()
+})
+
+async function seedCampaignAsset(campaignId: string) {
+  const assetId = randomUUID()
+  await createMediaAssetRecord({
+    _id: assetId,
+    sessionId: randomUUID(),
+    scopeKind: 'campaign-content',
+    scopeKey: `campaign-content:${campaignId}`,
+    campaignId,
+    createdByUserId: 'user-1',
+    storageKey: `media/${assetId}/original.png`,
+    originalFilename: 'sample.png',
+    mimeType: 'image/png',
+    byteSize: 128,
+    orientedWidth: 1200,
+    orientedHeight: 900,
+    contentHash: randomUUID(),
+    animated: false,
+    lifecycle: 'ready',
+    referenceCount: 0,
+    leaseExpiresAt: new Date(Date.now() + 60_000),
+  })
+  return assetId
+}
 
 const minimalClassInput = {
   slug: 'deletable-class',
@@ -237,6 +274,47 @@ describe('content deletion service', () => {
       created.id,
     )
     expect(availability).toEqual({ status: 'allowed' })
+  })
+
+  it('rolls back media reference release when delete fails inside the transaction', async () => {
+    const campaign = await makeTestCampaign()
+    const assetId = await seedCampaignAsset(campaign.id)
+    const created = await createHomebrewContent(speciesWriteConfig, campaign.id, {
+      ...minimalSpeciesInput,
+      slug: 'media-delete-rollback',
+      media: {
+        revision: 0,
+        images: [{ id: 'img-delete', assetId }],
+        roles: {},
+      },
+      [catalogContentMediaExpectedRevisionField]: 0,
+    })
+
+    const deleteSpy = vi.spyOn(HomebrewSpeciesModel, 'deleteOne').mockImplementationOnce(
+      () =>
+        ({
+          session: () => Promise.reject(new Error('injected delete failure')),
+        }) as unknown as ReturnType<typeof HomebrewSpeciesModel.deleteOne>,
+    )
+
+    await expect(deleteContentEntity(speciesWriteConfig, campaign.id, created.id)).rejects.toThrow(
+      'injected delete failure',
+    )
+
+    const remaining = await HomebrewSpeciesModel.findById(created.id).lean()
+    expect(remaining).not.toBeNull()
+
+    const [asset] = await findMediaAssetsByIds([assetId])
+    expect(asset?.referenceCount).toBe(1)
+
+    const refs = await findMediaReferencesForSubject({
+      kind: 'content',
+      id: created.id,
+      scopeKey: `campaign-content:${campaign.id}`,
+    })
+    expect(refs).toHaveLength(1)
+
+    deleteSpy.mockRestore()
   })
 
   it('returns 403 for system content availability GET', async () => {

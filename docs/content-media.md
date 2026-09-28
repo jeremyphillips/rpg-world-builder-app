@@ -112,7 +112,9 @@ assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
   Unrelated saves omit `media` and `expectedMediaRevision`.
 - Catalog writes validate media on the API (coherence + policy), reconcile upload
   references in the same Mongo transaction as persistence, and accept
-  `expectedMediaRevision` alongside `media` when media is included.
+  `expectedMediaRevision` alongside `media` when media is included. Media mutation
+  helpers accept an optional Mongo session and never start or commit transactions;
+  only top-level create/update/delete owners do.
 - Form-bound managed media registers its RHF path with `useController`; the schema
   `<Form>` uses `shouldUnregister: true`, so watch-only paths lose seeded defaults.
 - A media write rejected with `409 stale_revision` includes the current snapshot at

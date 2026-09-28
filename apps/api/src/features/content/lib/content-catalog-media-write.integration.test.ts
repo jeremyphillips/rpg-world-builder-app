@@ -61,10 +61,12 @@ describe('catalog content media write integration', () => {
       roles: {},
     }
 
-    await updateContentEntity(classWriteConfig, campaign.id, fighter.id, {
+    const updated = await updateContentEntity(classWriteConfig, campaign.id, fighter.id, {
       media: galleryMedia,
       [catalogContentMediaExpectedRevisionField]: 0,
     })
+    expect(updated.media?.images).toEqual(galleryMedia.images)
+    expect(updated.media?.revision).toBeGreaterThan(0)
 
     const patchDoc = await ClassPatchModel.findOne({
       campaignId: campaign.id,

@@ -68,11 +68,13 @@ async function loadPersistedMediaOverride<T extends WriteEntityBase>(
   campaignId: string,
   entityId: string,
   source: ContentSource,
+  session?: ClientSession,
 ): Promise<ContentMedia | null> {
   if (source === 'homebrew') {
     const doc = await config.homebrewModel
       .findOne({ _id: entityId, campaignId })
       .select({ media: 1 })
+      .session(session ?? null)
       .lean<{ media?: ContentMedia }>()
     return resolvePersistedContentMediaOverride({
       source,
@@ -83,6 +85,7 @@ async function loadPersistedMediaOverride<T extends WriteEntityBase>(
   if (!config.patchModel) return null
   const patchDoc = await config.patchModel
     .findOne({ campaignId, targetId: entityId })
+    .session(session ?? null)
     .lean<{ patch?: Record<string, unknown> }>()
   const patchMedia = patchDoc?.patch?.media
   return resolvePersistedContentMediaOverride({
@@ -198,6 +201,7 @@ async function reconcileCatalogContentMediaWithSession<T extends WriteEntityBase
             input.campaignId,
             input.entityId,
             input.contentSource,
+            session,
           )
         : null
 
@@ -253,7 +257,40 @@ export async function reconcileCatalogContentMediaForWrite<T extends WriteEntity
 
 export { reconcileCatalogContentMediaWithSession }
 
-/** Detach upload references when homebrew catalog content is deleted. */
+/** Detach upload references within a caller-owned transaction (no nested transaction). */
+export async function releaseCatalogContentMediaReferencesWithSession<T extends WriteEntityBase>(
+  config: ContentWriteConfig<T>,
+  input: {
+    campaignId: string
+    entityId: string
+    slug: string
+    rulesetId: SystemRulesetId
+    currentMedia: ContentMedia
+  },
+  session: ClientSession,
+): Promise<void> {
+  if (!isCatalogMediaContentType(config.typeName)) return
+
+  await reconcileCatalogContentMediaWithSession(
+    {
+      config,
+      campaignId: input.campaignId,
+      entityId: input.entityId,
+      contentSource: 'homebrew',
+      slug: input.slug,
+      rulesetId: input.rulesetId,
+      envelope: {
+        media: emptyContentMediaSchema,
+        expectedMediaRevision: input.currentMedia.revision,
+      },
+      mode: 'update',
+      currentMedia: input.currentMedia,
+    },
+    session,
+  )
+}
+
+/** Detach upload references when homebrew catalog content is deleted (standalone transaction owner). */
 export async function releaseCatalogContentMediaReferences<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
   campaignId: string,

@@ -130,6 +130,96 @@ export async function listOpenPcParticipationCharacterIdsForCampaign(
 type OpenParticipationRow = {
   campaignId: string
   characterId: string
+  roster: { status?: string }
+}
+
+export type CampaignOpenParticipationSummary = {
+  /** Open participation character ids (any character type), deduped per campaign. */
+  openParticipationCharacterIds: string[]
+  /** Open PC participations excluding retired roster status, deduped per campaign. */
+  nonRetiredOpenPcIds: string[]
+}
+
+function emptyParticipationSummary(): CampaignOpenParticipationSummary {
+  return { openParticipationCharacterIds: [], nonRetiredOpenPcIds: [] }
+}
+
+function seedParticipationSummaries(
+  campaignIds: readonly string[],
+): Map<string, CampaignOpenParticipationSummary> {
+  const summaryByCampaignId = new Map<string, CampaignOpenParticipationSummary>()
+  for (const campaignId of campaignIds) {
+    summaryByCampaignId.set(campaignId, emptyParticipationSummary())
+  }
+  return summaryByCampaignId
+}
+
+function appendUniqueCharacterId(
+  seenByCampaign: Map<string, Set<string>>,
+  campaignId: string,
+  characterId: string,
+  target: string[],
+): void {
+  let seen = seenByCampaign.get(campaignId)
+  if (!seen) {
+    seen = new Set()
+    seenByCampaign.set(campaignId, seen)
+  }
+  if (seen.has(characterId)) return
+  seen.add(characterId)
+  target.push(characterId)
+}
+
+function foldOpenParticipationRows(
+  summaryByCampaignId: Map<string, CampaignOpenParticipationSummary>,
+  rows: OpenParticipationRow[],
+  pcCharacterIds: Set<string>,
+): void {
+  const seenOpenParticipation = new Map<string, Set<string>>()
+  const seenNonRetiredPc = new Map<string, Set<string>>()
+
+  for (const row of rows) {
+    const summary = summaryByCampaignId.get(row.campaignId)
+    if (!summary) continue
+
+    appendUniqueCharacterId(
+      seenOpenParticipation,
+      row.campaignId,
+      row.characterId,
+      summary.openParticipationCharacterIds,
+    )
+
+    if (!pcCharacterIds.has(row.characterId) || row.roster?.status === 'retired') {
+      continue
+    }
+
+    appendUniqueCharacterId(
+      seenNonRetiredPc,
+      row.campaignId,
+      row.characterId,
+      summary.nonRetiredOpenPcIds,
+    )
+  }
+}
+
+/** Batched open-participation facts for campaign list summaries. */
+export async function projectOpenParticipationSummaryByCampaignIds(
+  campaignIds: readonly string[],
+): Promise<Map<string, CampaignOpenParticipationSummary>> {
+  const summaryByCampaignId = seedParticipationSummaries(campaignIds)
+  if (campaignIds.length === 0) return summaryByCampaignId
+
+  const rows = await CampaignCharacterParticipationModel.find({
+    campaignId: { $in: [...campaignIds] },
+    ...OPEN_PARTICIPATION_FILTER,
+  })
+    .select('campaignId characterId roster')
+    .lean<OpenParticipationRow[]>()
+
+  const pcCharacterIds = await findPcCharacterIdsAmong(rows.map((row) => row.characterId))
+  foldOpenParticipationRows(summaryByCampaignId, rows, pcCharacterIds)
+
+  return summaryByCampaignId
 }
 
 /**
@@ -139,38 +229,26 @@ type OpenParticipationRow = {
 export async function countOpenPartyPcsByCampaignIds(
   campaignIds: readonly string[],
 ): Promise<Map<string, number>> {
-  if (campaignIds.length === 0) return new Map()
-
-  const rows = await CampaignCharacterParticipationModel.find({
-    campaignId: { $in: [...campaignIds] },
-    ...OPEN_PARTICIPATION_FILTER,
-    'roster.status': { $ne: 'retired' },
-  })
-    .select('campaignId characterId')
-    .lean<OpenParticipationRow[]>()
-
-  const pcCharacterIds = await findPcCharacterIdsAmong(rows.map((row) => row.characterId))
-
-  const counts = new Map<string, number>()
-  for (const row of rows) {
-    if (!pcCharacterIds.has(row.characterId)) continue
-    counts.set(row.campaignId, (counts.get(row.campaignId) ?? 0) + 1)
-  }
-
-  return counts
+  const summaries = await projectOpenParticipationSummaryByCampaignIds(campaignIds)
+  return new Map(
+    [...summaries.entries()].map(([campaignId, summary]) => [
+      campaignId,
+      summary.nonRetiredOpenPcIds.length,
+    ]),
+  )
 }
 
 /**
  * Returns controlled PC ids that still have open participation in the campaign.
  * Dedupes input. Do not use raw `controlledCharacterIds` for authorization.
  */
-export async function resolveOpenControlledPcCharacterIds(
-  campaignId: string,
+export function intersectControlledCharacterIdsWithOpenParticipation(
   controlledCharacterIds: readonly string[],
-): Promise<string[]> {
+  openParticipationCharacterIds: readonly string[],
+): string[] {
   if (controlledCharacterIds.length === 0) return []
 
-  const openCharacterIds = new Set(await listOpenPcParticipationCharacterIdsForCampaign(campaignId))
+  const openCharacterIds = new Set(openParticipationCharacterIds)
   const seen = new Set<string>()
 
   return controlledCharacterIds.filter((characterId) => {
@@ -178,6 +256,22 @@ export async function resolveOpenControlledPcCharacterIds(
     seen.add(characterId)
     return true
   })
+}
+
+export async function resolveOpenControlledPcCharacterIds(
+  campaignId: string,
+  controlledCharacterIds: readonly string[],
+): Promise<string[]> {
+  if (controlledCharacterIds.length === 0) return []
+
+  const summaries = await projectOpenParticipationSummaryByCampaignIds([campaignId])
+  const openParticipationCharacterIds =
+    summaries.get(campaignId)?.openParticipationCharacterIds ?? []
+
+  return intersectControlledCharacterIdsWithOpenParticipation(
+    controlledCharacterIds,
+    openParticipationCharacterIds,
+  )
 }
 
 export async function updateParticipationRoster({

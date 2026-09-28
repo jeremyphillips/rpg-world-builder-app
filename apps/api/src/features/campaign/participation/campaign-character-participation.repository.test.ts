@@ -1,3 +1,4 @@
+import { createDefaultCampaignRosterState } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { makeTestUser } from '../../../test/fixtures/users'
@@ -9,10 +10,46 @@ import { CampaignMembershipModel } from '../campaign-membership.model'
 import { CampaignCharacterParticipationModel } from './campaign-character-participation.model'
 import {
   attachCharacterToCampaign,
+  projectOpenParticipationSummaryByCampaignIds,
   resolveOpenControlledPcCharacterIds,
 } from './campaign-character-participation.repository'
 
 useIntegrationDb()
+
+describe('projectOpenParticipationSummaryByCampaignIds', () => {
+  it('excludes retired PCs from nonRetiredOpenPcIds while keeping open participation ids', async () => {
+    const owner = await makeTestUser({ email: 'batch-summary-owner@example.com' })
+    const { campaign } = await createCampaign({
+      name: 'Batch Summary Campaign',
+      createdBy: owner.id,
+    })
+    const character = await createPcRecord(minimalStandalonePcInput, owner.id)
+
+    await attachCharacterToCampaign({
+      campaignId: campaign.id,
+      characterId: character.id,
+      joinedAt: new Date().toISOString(),
+    })
+
+    const summaries = await projectOpenParticipationSummaryByCampaignIds([campaign.id])
+    const summary = summaries.get(campaign.id)
+    expect(summary?.openParticipationCharacterIds).toEqual([character.id])
+    expect(summary?.nonRetiredOpenPcIds).toEqual([character.id])
+
+    await CampaignCharacterParticipationModel.updateOne(
+      { campaignId: campaign.id, characterId: character.id, leftAt: { $exists: false } },
+      {
+        $set: {
+          roster: { ...createDefaultCampaignRosterState(), status: 'retired' },
+        },
+      },
+    )
+
+    const afterRetire = await projectOpenParticipationSummaryByCampaignIds([campaign.id])
+    expect(afterRetire.get(campaign.id)?.openParticipationCharacterIds).toEqual([character.id])
+    expect(afterRetire.get(campaign.id)?.nonRetiredOpenPcIds).toEqual([])
+  })
+})
 
 describe('resolveOpenControlledPcCharacterIds', () => {
   it.each([

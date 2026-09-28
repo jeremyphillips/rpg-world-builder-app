@@ -194,6 +194,21 @@ describe('listCampaignTemplates', () => {
 })
 
 describe('listCampaignsForUser', () => {
+  it('requests open participation summaries once for all memberships', async () => {
+    const participation =
+      await import('./participation/campaign-character-participation.repository')
+    const spy = vi.spyOn(participation, 'projectOpenParticipationSummaryByCampaignIds')
+    const owner = await makeTestUser({ email: 'batch-list-owner@example.com' })
+    const { campaign: first } = await createCampaign({ name: 'Batch A', createdBy: owner.id })
+    const { campaign: second } = await createCampaign({ name: 'Batch B', createdBy: owner.id })
+
+    await listCampaignsForUser(owner.id)
+
+    expect(spy).toHaveBeenCalledOnce()
+    expect(spy.mock.calls[0]?.[0]).toEqual(expect.arrayContaining([first.id, second.id]))
+    spy.mockRestore()
+  })
+
   it('returns every campaign the user owns or belongs to, sorted by name', async () => {
     const owner = await makeTestUser({ email: 'owner@example.com' })
 
