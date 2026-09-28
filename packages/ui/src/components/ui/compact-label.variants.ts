@@ -9,9 +9,10 @@ import {
 } from './compact-label.lib'
 import {
   controlActionCompactIconClasses,
+  controlActionCompactSizeClasses,
   controlActionDefaultIconClasses,
 } from './control-action.variants'
-import { compactLabelIconGlyphClasses } from './icon-glyph.variants'
+import { compactLabelIconGlyphClasses, iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export type CompactLabelVariantProps = {
   size?: CompactLabelSize
@@ -29,7 +30,8 @@ export const COMPACT_LABEL_SM_HEIGHT_CLASS = 'h-[22px]'
 /** Reserved row height for Badge/Chip sm — matches {@link COMPACT_LABEL_SM_HEIGHT_CLASS}. */
 export const COMPACT_LABEL_SM_MIN_HEIGHT_CLASS = 'min-h-[22px]'
 
-const compactLabelRemovablePaddingClasses: Record<'md' | 'lg', string> = {
+const compactLabelRemovablePaddingClasses: Record<CompactLabelSize, string> = {
+  sm: 'pr-0.5',
   md: 'pr-0.5',
   lg: 'pr-1',
 }
@@ -77,6 +79,11 @@ export const compactLabelVariants = cva(
         selected: false,
         interactive: true,
         className: 'border-border bg-background text-foreground',
+      },
+      {
+        removable: true,
+        size: 'sm',
+        className: compactLabelRemovablePaddingClasses.sm,
       },
       {
         removable: true,
@@ -141,6 +148,7 @@ export const chipRemoveButtonVariants = cva(
   {
     variants: {
       size: {
+        sm: cn(controlActionCompactSizeClasses, iconGlyphDescendantClasses.sm),
         md: controlActionCompactIconClasses,
         lg: controlActionDefaultIconClasses,
       },

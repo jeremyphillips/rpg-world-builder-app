@@ -6,10 +6,9 @@ import {
   type CharacterClass,
   type OrganizationAuthoringPresetId,
 } from '@rpg/contracts'
-import { Badge, ComboboxField, ConfirmDialog } from '@rpg/ui'
+import { ComboboxField, ConfirmDialog } from '@rpg/ui'
 
 import {
-  ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL,
   ORGANIZATION_STARTING_POINT_HINT,
   ORGANIZATION_STARTING_POINT_LEGEND,
   ORGANIZATION_STARTING_POINT_PLACEHOLDER,
@@ -99,34 +98,27 @@ export function OrganizationStartingPointField({
   }, [])
 
   return (
-    <div className="flex flex-wrap items-end gap-2">
-      <div className="min-w-0 flex-1">
-        <ComboboxField
-          id={comboboxId}
-          label={ORGANIZATION_STARTING_POINT_LEGEND}
-          labelVisibility="srOnly"
-          hint={ORGANIZATION_STARTING_POINT_HINT}
-          hintPosition="below-control"
-          options={presetOptions}
-          multiple={false}
-          placeholder={ORGANIZATION_STARTING_POINT_PLACEHOLDER}
-          value={applied ? startingPointId : ''}
-          clearable={applied}
-          clearAccessibleName={`Clear ${ORGANIZATION_STARTING_POINT_LEGEND}`}
-          onClear={handleClear}
-          triggerRef={comboboxTriggerRef}
-          onChange={(next) => {
-            if (typeof next === 'string') {
-              handlePick(next)
-            }
-          }}
-        />
-      </div>
-      {customized ? (
-        <Badge tone="neutral" size="sm" appearance="soft" className="mb-1 shrink-0">
-          {ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL}
-        </Badge>
-      ) : null}
+    <>
+      <ComboboxField
+        id={comboboxId}
+        label={ORGANIZATION_STARTING_POINT_LEGEND}
+        labelVisibility="srOnly"
+        hint={ORGANIZATION_STARTING_POINT_HINT}
+        hintPosition="below-control"
+        options={presetOptions}
+        multiple={false}
+        placeholder={ORGANIZATION_STARTING_POINT_PLACEHOLDER}
+        value={applied ? startingPointId : ''}
+        clearable={applied}
+        clearAccessibleName={`Clear ${ORGANIZATION_STARTING_POINT_LEGEND}`}
+        onClear={handleClear}
+        triggerRef={comboboxTriggerRef}
+        onChange={(next) => {
+          if (typeof next === 'string') {
+            handlePick(next)
+          }
+        }}
+      />
 
       {pendingPresetId ? (
         <ConfirmDialog
@@ -152,6 +144,6 @@ export function OrganizationStartingPointField({
           }}
         />
       ) : null}
-    </div>
+    </>
   )
 }

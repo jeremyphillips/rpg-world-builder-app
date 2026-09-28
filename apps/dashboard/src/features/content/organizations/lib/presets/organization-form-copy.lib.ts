@@ -20,7 +20,8 @@ export const ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND = 'Member affinities'
 export const ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION =
   'Used to suggest suitable options when adding or creating members.'
 
-export const ORGANIZATION_MORE_DETAILS_GROUP_LEGEND = 'More details'
+export const ORGANIZATION_OPTIONAL_DETAILS_GROUP_LEGEND = 'Optional details'
+export const ORGANIZATION_OPTIONAL_DETAILS_GROUP_DESCRIPTION = 'Member affinities and description'
 
 export const ORGANIZATION_APPLY_FAMILIAR_TYPE_LABEL = 'Apply familiar type…'
 export const ORGANIZATION_APPLY_FAMILIAR_TYPE_HINT =

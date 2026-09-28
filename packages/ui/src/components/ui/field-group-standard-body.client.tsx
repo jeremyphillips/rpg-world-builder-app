@@ -51,6 +51,7 @@ export type StandardFieldGroupBodyProps = {
   id?: string
   legend?: string
   description?: string
+  legendAccessory?: React.ReactNode
   legendSize: FieldGroupLegendSize
   legendTypography: string
   rhythm: FieldRhythm
@@ -67,6 +68,7 @@ export function StandardFieldGroupBody({
   id,
   legend,
   description,
+  legendAccessory,
   legendSize,
   legendTypography,
   rhythm,
@@ -104,6 +106,7 @@ export function StandardFieldGroupBody({
         <FieldGroupLegend
           legend={legend}
           description={description}
+          legendAccessory={legendAccessory}
           legendSize={legendSize}
           legendTypography={legendTypography}
           rhythm={rhythm}

@@ -180,7 +180,11 @@ describe('ComboboxField', () => {
       />,
     )
 
-    expect(screen.getByText('Dagger').closest('.text-sm-meta')).toBeInTheDocument()
+    const chip = screen.getByText('Dagger').closest('span.inline-flex')
+    expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
+    expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass(
+      'size-control-action-compact',
+    )
   })
 
   it('opens with a chromeless search row that replaces the trigger', async () => {

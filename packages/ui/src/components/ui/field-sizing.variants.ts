@@ -7,6 +7,7 @@
  */
 import { cn } from '../../lib/utils'
 import type { ButtonVariantProps } from './button.variants'
+import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
@@ -176,12 +177,12 @@ export const fieldSizeToBadgeSize = {
   lg: 'lg',
 } as const satisfies Record<FieldSizeToken, 'sm' | 'md' | 'lg'>
 
-/** Maps field control size to removable chip size (`sm` fields use `md` — removable chips have no `sm`). */
+/** Maps field control size to removable chip size (1:1 with control scale). */
 export const fieldSizeToChipSize = {
-  sm: 'md',
+  sm: 'sm',
   md: 'md',
   lg: 'lg',
-} as const satisfies Record<FieldSizeToken, 'md' | 'lg'>
+} as const satisfies Record<FieldSizeToken, CompactLabelSize>
 
 export const fieldSizeToAttachedButtonSize = {
   sm: 'sm',

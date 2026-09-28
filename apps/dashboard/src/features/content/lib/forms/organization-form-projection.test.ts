@@ -156,16 +156,30 @@ describe('organization form projection', () => {
     expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(50)
   })
 
-  it('tucks member affinities and description under More details for quick create', () => {
+  it('nests member affinities under collapsed Optional details for quick create', () => {
     const quick = buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' })
-    const legends = quick
-      .filter(
-        (item): item is Extract<FormItem, { kind: 'group' }> =>
-          'kind' in item && item.kind === 'group',
-      )
-      .map((group) => group.legend)
-    expect(legends).toContain('More details')
-    expect(legends).not.toContain('Member affinities')
+    const groups = quick.filter(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group',
+    )
+    const optionalDetails = groups.find(
+      (group) => group.heading?.label === 'Optional details' || group.legend === 'Optional details',
+    )
+    expect(optionalDetails).toMatchObject({
+      disclosure: { variant: 'legend', defaultOpen: false },
+      heading: {
+        label: 'Optional details',
+        hint: 'Member affinities and description',
+      },
+    })
+    const nested = optionalDetails?.fields.find(
+      (field): field is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in field && field.kind === 'group',
+    )
+    expect(nested).toMatchObject({
+      legend: 'Member affinities',
+      description: 'Used to suggest suitable options when adding or creating members.',
+    })
   })
 
   it('uses one input builder for standalone and embedded function/practice values', () => {

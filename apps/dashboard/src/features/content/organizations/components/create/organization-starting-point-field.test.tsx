@@ -1,3 +1,4 @@
+import { createElement } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -5,7 +6,9 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
+import { OrganizationStartingPointCustomizedBadge } from './organization-starting-point-customized-badge'
 import { OrganizationStartingPointField } from './organization-starting-point-field'
+import { ORGANIZATION_STARTING_POINT_LEGEND } from '../../lib/presets/organization-form-copy.lib'
 import { buildOrganizationFormValueSyncs } from '../../../lib/forms/organization-form-projection'
 import { ORGANIZATION_STARTING_POINT_HINT } from '../../lib/presets/organization-form-copy.lib'
 import { organizationStartingPointIsCustomized } from '../../lib/presets/organization-starting-point.lib'
@@ -57,7 +60,6 @@ function Harness() {
   return (
     <>
       <CustomizedProbe />
-      <OrganizationStartingPointField discoverableClasses={[]} />
       <button
         type="button"
         onClick={() => form.setValue('organizationDomain', 'government', { shouldDirty: true })}
@@ -78,7 +80,25 @@ function renderStartingPointForm() {
   render(
     <Form
       schema={schema}
-      fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+      fields={[
+        { type: 'text', name: 'name', label: 'Name' },
+        {
+          kind: 'group',
+          heading: {
+            label: ORGANIZATION_STARTING_POINT_LEGEND,
+            accessory: createElement(OrganizationStartingPointCustomizedBadge, {
+              discoverableClasses: [],
+            }),
+          },
+          fields: [
+            {
+              kind: 'slot',
+              name: 'startingPointId',
+              render: () => <OrganizationStartingPointField discoverableClasses={[]} />,
+            },
+          ],
+        },
+      ]}
       defaultValues={{
         name: 'Test',
         functions: [],

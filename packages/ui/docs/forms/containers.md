@@ -37,8 +37,13 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 
 ## Groups
 
-Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint? }` for new config;
-`legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint?, accessory? }` for new
+config; `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+
+`heading.accessory` is **group-only**: non-interactive status beside the legend label (badges,
+static text). Do not pass buttons, links, or other focusable controls — collapsible groups
+use the legend row for disclosure, and nested interactives corrupt fieldset naming.
+Row, array, and slot headings ignore `accessory`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
 override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit

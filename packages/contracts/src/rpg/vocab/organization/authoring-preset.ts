@@ -17,7 +17,7 @@ import {
  */
 export type OrganizationAuthoringPresetEntry = {
   label: string
-  /** Closest-starting-point rationale shown on the picker option. */
+  /** Secondary line shown on the picker option. */
   description: string
   /** Adjacent familiar names and search helpers for picker discovery. */
   discoveryTerms?: readonly string[]
@@ -38,7 +38,7 @@ type OrganizationAuthoringPresetBaseEntry = Omit<OrganizationAuthoringPresetEntr
 const ORGANIZATION_AUTHORING_PRESET_BASE = {
   academy: {
     label: 'Academy',
-    description: 'Closest starting point for bardic college, seminary, and teaching bodies.',
+    description: 'Bardic colleges, seminaries, and teaching bodies.',
     discoveryTerms: ['bardic college', 'seminary', 'wizard circle'],
     domain: 'academic',
     form: 'association',
@@ -48,8 +48,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   adventurers_guild: {
     label: "Adventurers' guild",
-    description:
-      'Closest starting point for an adventurer hall, company, or monster hunters guild.',
+    description: 'Adventurer halls, companies, and monster hunters guilds.',
     discoveryTerms: ["monster hunters' guild", 'adventuring company', 'treasure hunters'],
     domain: 'occupational',
     form: 'guild',
@@ -59,8 +58,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   army: {
     label: 'Army',
-    description:
-      'Closest starting point for marines, garrison, legion, and other land armed hosts.',
+    description: 'Marines, garrison, legion, and other land armed hosts.',
     discoveryTerms: [
       'marines',
       'sky fleet',
@@ -78,7 +76,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   bank: {
     label: 'Bank',
-    description: 'Closest starting point for moneylenders, pawnbrokers, and tax farmers.',
+    description: 'Moneylenders, pawnbrokers, and tax farmers.',
     discoveryTerms: ['moneylenders', 'pawnbrokers', 'tax farmers', 'insurance company'],
     domain: 'commercial',
     form: 'company',
@@ -88,7 +86,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   church: {
     label: 'Church',
-    description: 'Closest starting point for temple and gathered faith communities.',
+    description: 'Temple and gathered faith communities.',
     discoveryTerms: ['temple', 'temple organization', 'heretical sect', 'pilgrimage society'],
     domain: 'religious',
     form: 'congregation',
@@ -98,7 +96,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   city_council: {
     label: 'City council',
-    description: 'Closest starting point for parliament, senate, and privy council.',
+    description: 'Parliament, senate, and privy council.',
     discoveryTerms: ['parliament', 'senate', 'privy council'],
     domain: 'government',
     form: 'association',
@@ -108,7 +106,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   city_watch: {
     label: 'City watch',
-    description: 'Closest starting point for civic policing and crown law enforcement.',
+    description: 'Civic policing and crown law enforcement.',
     discoveryTerms: ['marshals'],
     domain: 'government',
     functions: ['policing'],
@@ -117,7 +115,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   craft_guild: {
     label: 'Craft guild',
-    description: 'Closest starting point for scribes, alchemists, and professional trade guilds.',
+    description: 'Scribes, alchemists, and professional trade guilds.',
     discoveryTerms: [
       'merchant guild',
       'professional college',
@@ -145,7 +143,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   gang: {
     label: 'Gang',
-    description: 'Closest starting point for street gangs, wreckers, and prison crews.',
+    description: 'Street gangs, wreckers, and prison crews.',
     discoveryTerms: ['wreckers', 'prison gang'],
     domain: 'criminal',
     functions: [],
@@ -154,8 +152,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   government_ministry: {
     label: 'Government ministry',
-    description:
-      'Closest starting point for customs service, provincial administration, and executive departments.',
+    description: 'Customs service, provincial administration, and executive departments.',
     discoveryTerms: [
       'royal court',
       'magistracy',
@@ -184,7 +181,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   mercenary_company: {
     label: 'Mercenary company',
-    description: 'Closest starting point for ranger company and other hired fighting enterprises.',
+    description: 'Ranger companies and other hired fighting enterprises.',
     discoveryTerms: ['ranger company', 'fighter company'],
     domain: 'military',
     form: 'company',
@@ -194,8 +191,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   mutual_aid_society: {
     label: 'Mutual aid society',
-    description:
-      'Closest starting point for burial societies, civic leagues, and reciprocal support bodies.',
+    description: 'Burial societies, civic leagues, and reciprocal support bodies.',
     discoveryTerms: [
       'orphanage society',
       'famine relief society',
@@ -213,7 +209,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   political_party: {
     label: 'Political party',
-    description: 'Closest starting point for reform league and advocacy society.',
+    description: 'Reform leagues and advocacy societies.',
     discoveryTerms: ['reform league', 'advocacy society'],
     domain: 'political',
     form: 'association',
@@ -223,7 +219,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   religious_order: {
     label: 'Religious order',
-    description: 'Closest starting point for monastery and rule-bound faith communities.',
+    description: 'Monasteries and rule-bound faith communities.',
     discoveryTerms: ['monastery'],
     domain: 'religious',
     form: 'order',
@@ -233,8 +229,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   scholarly_society: {
     label: 'Scholarly society',
-    description:
-      'Closest starting point for guild of scholars, museum society, and research institute.',
+    description: 'Guilds of scholars, museum societies, and research institutes.',
     discoveryTerms: ['guild of scholars', 'museum society', 'research institute'],
     domain: 'academic',
     form: 'association',
@@ -244,7 +239,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   shipping_company: {
     label: 'Shipping company',
-    description: 'Closest starting point for coach lines and courier services.',
+    description: 'Coach lines and courier services.',
     discoveryTerms: ['coach line', 'courier service'],
     domain: 'commercial',
     form: 'company',
@@ -254,7 +249,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   smuggling_ring: {
     label: 'Smuggling ring',
-    description: 'Closest starting point for criminal syndicates and covert transport networks.',
+    description: 'Criminal syndicates and covert transport networks.',
     discoveryTerms: ['criminal syndicate'],
     domain: 'criminal',
     form: 'network',
@@ -264,7 +259,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   thieves_guild: {
     label: "Thieves' guild",
-    description: "Closest starting point for beggars' guild and urban criminal guilds.",
+    description: "Beggars' guilds and urban criminal guilds.",
     discoveryTerms: ["beggars' guild"],
     domain: 'criminal',
     form: 'guild',
@@ -274,7 +269,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   },
   trading_company: {
     label: 'Trading company',
-    description: 'Closest starting point for chartered company and general commerce.',
+    description: 'Chartered companies and general commerce.',
     discoveryTerms: [
       'chartered company',
       'auction house',

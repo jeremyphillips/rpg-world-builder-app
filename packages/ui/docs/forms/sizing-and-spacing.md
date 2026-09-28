@@ -68,16 +68,17 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 
 Control height, padding, and type scale come from `field-sizing.variants.ts` (`sm | md | lg`).
 
-| Map                                | Use                                                                                         |
-| ---------------------------------- | ------------------------------------------------------------------------------------------- |
-| `fieldSizeTypographyClasses`       | Label + control type scale                                                                  |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                                 |
-| `fieldGroupedControlSizeClasses`   | One segment in grouped shells (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …) |
-| `fieldTextareaSizeClasses`         | Multi-line controls                                                                         |
-| `fieldDigitSizeClasses`            | Digit-width control padding                                                                 |
-| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                     |
-| `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                       |
-| `fieldDigitTrailingIconClasses`    | Trailing icon sizing — uses `icon-glyph` SSOT (`xs`/`md`; sm≡xs for digit chrome)           |
+| Map                                | Use                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `fieldSizeTypographyClasses`       | Label + control type scale                                                                       |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                                      |
+| `fieldGroupedControlSizeClasses`   | One segment in grouped shells (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …)      |
+| `fieldTextareaSizeClasses`         | Multi-line controls                                                                              |
+| `fieldDigitSizeClasses`            | Digit-width control padding                                                                      |
+| `fieldDigitTrailingPaddingClasses` | Right reserve for stepper/caret columns                                                          |
+| `fieldDigitTrailingColumnClasses`  | Trailing column width                                                                            |
+| `fieldDigitTrailingIconClasses`    | Trailing icon sizing — uses `icon-glyph` SSOT (`xs`/`md`; sm≡xs for digit chrome)                |
+| `fieldSizeToChipSize`              | Combobox multi-select removable chips — 1:1 with field `size`; sm remove uses compact hit target |
 
 ### `size` — control height + type scale
 

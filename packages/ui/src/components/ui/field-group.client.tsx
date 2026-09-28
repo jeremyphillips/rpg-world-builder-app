@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import type { Control, FieldValues } from 'react-hook-form'
 
 import type { FieldSize } from './field.client'
@@ -25,6 +26,8 @@ export type { FieldGroupLegendSize }
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
   legend?: string
+  /** Non-interactive status beside the legend label (badges, static text). */
+  legendAccessory?: ReactNode
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -66,6 +69,7 @@ export interface FieldGroupProps {
  */
 export function FieldGroup({
   legend,
+  legendAccessory,
   legendSize = 'section',
   size,
   rhythm = resolveFormDensity().rhythm,
@@ -138,6 +142,7 @@ export function FieldGroup({
       id={id}
       legend={legend}
       description={description}
+      legendAccessory={legendAccessory}
       legendSize={legendSize}
       legendTypography={legendTypography}
       rhythm={rhythm}

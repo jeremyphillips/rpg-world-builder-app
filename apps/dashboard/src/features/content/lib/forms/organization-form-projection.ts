@@ -39,6 +39,7 @@ import { descriptionField, nameField } from './fields/content-identity-form-fiel
 import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
 import { OrganizationApplyFamiliarTypeField } from '../../organizations/components/create/organization-apply-familiar-type-field'
+import { OrganizationStartingPointCustomizedBadge } from '../../organizations/components/create/organization-starting-point-customized-badge'
 import { OrganizationStartingPointField } from '../../organizations/components/create/organization-starting-point-field'
 import {
   ORGANIZATION_DOMAIN_FIELD_HINT,
@@ -47,7 +48,8 @@ import {
   ORGANIZATION_FUNCTION_FIELD_HINT,
   ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
   ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
-  ORGANIZATION_MORE_DETAILS_GROUP_LEGEND,
+  ORGANIZATION_OPTIONAL_DETAILS_GROUP_DESCRIPTION,
+  ORGANIZATION_OPTIONAL_DETAILS_GROUP_LEGEND,
   ORGANIZATION_PRACTICE_FIELD_HINT,
   ORGANIZATION_PROFILE_GROUP_DESCRIPTION,
   ORGANIZATION_PROFILE_GROUP_LEGEND,
@@ -302,7 +304,13 @@ export function buildOrganizationFields(
   } else {
     fields.push({
       kind: 'group',
-      legend: ORGANIZATION_STARTING_POINT_LEGEND,
+      heading: {
+        label: ORGANIZATION_STARTING_POINT_LEGEND,
+        accessory: createElement(OrganizationStartingPointCustomizedBadge, {
+          prefix,
+          discoverableClasses,
+        }),
+      },
       density: 'compact',
       fields: [
         {
@@ -342,10 +350,22 @@ export function buildOrganizationFields(
   if (presentation === 'quick') {
     fields.push({
       kind: 'group',
-      legend: ORGANIZATION_MORE_DETAILS_GROUP_LEGEND,
+      heading: {
+        label: ORGANIZATION_OPTIONAL_DETAILS_GROUP_LEGEND,
+        hint: ORGANIZATION_OPTIONAL_DETAILS_GROUP_DESCRIPTION,
+      },
       density: 'compact',
       disclosure: { variant: 'legend', defaultOpen: false },
-      fields: [...memberAffinityFields, descriptionFieldItem],
+      fields: [
+        {
+          kind: 'group',
+          legend: ORGANIZATION_MEMBER_AFFINITIES_GROUP_LEGEND,
+          description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
+          density: 'compact',
+          fields: memberAffinityFields,
+        },
+        descriptionFieldItem,
+      ],
     })
   } else {
     fields.push({

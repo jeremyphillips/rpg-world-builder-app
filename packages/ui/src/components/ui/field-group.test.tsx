@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { Badge } from './badge'
+
 import { FieldGroup } from './field-group'
 import { TextField } from './text-field'
 
@@ -142,6 +144,52 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByRole('group', { name: /Weapons/ })).toHaveClass('border-t', 'pt-7')
+  })
+
+  it('renders a non-interactive legend accessory without changing the group name', () => {
+    render(
+      <FieldGroup
+        legend="Starting point"
+        legendAccessory={
+          <Badge tone="neutral" size="sm" appearance="soft" aria-hidden>
+            Customized
+          </Badge>
+        }
+      >
+        <TextField id="preset" label="Preset" labelVisibility="srOnly" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByRole('group', { name: 'Starting point' })).toBeInTheDocument()
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+    expect(screen.getByText('Customized').closest('legend')).toBeInTheDocument()
+  })
+
+  it('keeps collapsible legend accessory outside the disclosure trigger', async () => {
+    const user = userEvent.setup()
+    render(
+      <FieldGroup
+        legend="Optional details"
+        description="Member affinities and description"
+        legendAccessory={
+          <Badge tone="neutral" size="sm" appearance="soft" aria-hidden>
+            Status
+          </Badge>
+        }
+        disclosure={{ variant: 'legend', defaultOpen: false }}
+      >
+        <TextField id="detail" label="Detail" />
+      </FieldGroup>,
+    )
+
+    const legend = screen.getByText('Optional details').closest('legend')
+    const toggle = screen.getByRole('button', { name: /Optional details/i })
+    expect(legend).toContainElement(toggle)
+    expect(toggle).not.toContainElement(screen.getByText('Status'))
+    expect(legend).toContainElement(screen.getByText('Status'))
+
+    await user.click(toggle)
+    expect(screen.getByRole('textbox', { name: 'Detail' })).toBeInTheDocument()
   })
 
   it('toggles collapsible groups', async () => {
