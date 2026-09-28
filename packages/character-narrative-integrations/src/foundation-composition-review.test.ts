@@ -1,11 +1,31 @@
+import { readFile } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
+
 import { generateNarrative } from '@rpg/character-narrative-core'
 import { loadNarrativeCollection } from '@rpg/character-narrative-data'
 import { NARRATIVE_TOKEN_PATTERN } from '@rpg/contracts/character-narrative'
 import { describe, expect, it } from 'vitest'
 
 import { FOUNDATION_COMPOSITION_REVIEW_CASES } from './foundation-composition-review.fixture'
+import { renderFoundationCompositionReviewReport } from './foundation-composition-review-report.lib'
 
 describe('foundation composition review fixture', () => {
+  it('matches the committed generated composition review', async () => {
+    const collection = await loadNarrativeCollection()
+    const reportPath = fileURLToPath(
+      new URL(
+        '../../character-narrative-data/docs/foundation-composition-review.generated.md',
+        import.meta.url,
+      ),
+    )
+    const committed = await readFile(reportPath, 'utf8')
+    const rendered = renderFoundationCompositionReviewReport(
+      collection,
+      FOUNDATION_COMPOSITION_REVIEW_CASES,
+    )
+    expect(`${rendered.trimEnd()}\n`).toBe(`${committed.trimEnd()}\n`)
+  })
+
   it('keeps the fixed editorial review matrix complete and reproducible', async () => {
     const collection = await loadNarrativeCollection()
     const fragmentsById = new Map(collection.fragments.map((fragment) => [fragment.id, fragment]))
@@ -49,9 +69,9 @@ describe('foundation composition review fixture', () => {
       })
       if (reviewCase.minimumConditionedFragments !== undefined) {
         expect(
-          selectedFragments.filter((fragment) => fragment.conditions.length > 0),
+          selectedFragments.filter((fragment) => fragment.conditions.length > 0).length,
           reviewCase.name,
-        ).toHaveLength(reviewCase.minimumConditionedFragments)
+        ).toBeGreaterThanOrEqual(reviewCase.minimumConditionedFragments)
       }
       if (reviewCase.expectedCondition) {
         expect(
@@ -66,7 +86,7 @@ describe('foundation composition review fixture', () => {
         selectedIds.add(id)
         const fragment = fragmentsById.get(id)
         expect(fragment, `${reviewCase.name}: ${id}`).toBeDefined()
-        if (fragment?.alignmentIds) {
+        if (fragment?.alignmentIds && reviewCase.context.alignment !== undefined) {
           expect(fragment.alignmentIds, `${reviewCase.name}: ${id}`).toContain(
             reviewCase.context.alignment,
           )

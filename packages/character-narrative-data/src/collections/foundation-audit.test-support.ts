@@ -6,20 +6,18 @@ import type {
   NarrativeTheme,
 } from '@rpg/contracts/character-narrative'
 import { NARRATIVE_SLOTS, NARRATIVE_THEMES } from '@rpg/contracts/character-narrative'
+import { ALIGNMENTS } from '@rpg/contracts'
 
-type NarrativeAlignment = NonNullable<NarrativeFragment['alignmentIds']>[number]
+type NarrativeAlignment = (typeof ALIGNMENTS)[number]
 
-export const NARRATIVE_ALIGNMENTS: NarrativeAlignment[] = [
-  'lg',
-  'ng',
-  'cg',
-  'ln',
-  'n',
-  'cn',
-  'le',
-  'ne',
-  'ce',
-]
+export const ALIGNMENT_SENSITIVE_SLOTS = [
+  'ideals',
+  'flaws',
+  'choice',
+  'motivation',
+] as const satisfies readonly NarrativeSlot[]
+
+export type AlignmentSensitiveSlot = (typeof ALIGNMENT_SENSITIVE_SLOTS)[number]
 
 export const LINTABLE_GENERIC_PHRASES = [
   'person i am becoming',
@@ -51,20 +49,58 @@ function countBy<T extends string>(values: readonly T[]): Record<T, number> {
   return Object.fromEntries(values.map((value) => [value, 0])) as Record<T, number>
 }
 
+export function isFragmentEligibleForAlignment(
+  fragment: NarrativeFragment,
+  alignment: NarrativeAlignment,
+): boolean {
+  return !fragment.alignmentIds || fragment.alignmentIds.includes(alignment)
+}
+
+/** Generic plus fragments explicitly tagged for the alignment. */
+export function buildEligibleByAlignment(collection: NarrativeCollection) {
+  return Object.fromEntries(
+    NARRATIVE_SLOTS.map((slot) => [
+      slot,
+      Object.fromEntries(
+        ALIGNMENTS.map((alignment) => [
+          alignment,
+          collection.fragments.filter(
+            (fragment) =>
+              fragment.slot === slot && isFragmentEligibleForAlignment(fragment, alignment),
+          ).length,
+        ]),
+      ),
+    ]),
+  ) as Record<NarrativeSlot, Record<NarrativeAlignment, number>>
+}
+
+/** Only fragments whose alignmentIds include the alignment. */
+export function buildExplicitAlignmentCoverage(collection: NarrativeCollection) {
+  return Object.fromEntries(
+    NARRATIVE_SLOTS.map((slot) => [
+      slot,
+      Object.fromEntries(
+        ALIGNMENTS.map((alignment) => [
+          alignment,
+          collection.fragments.filter(
+            (fragment) =>
+              fragment.slot === slot && fragment.alignmentIds?.includes(alignment) === true,
+          ).length,
+        ]),
+      ),
+    ]),
+  ) as Record<NarrativeSlot, Record<NarrativeAlignment, number>>
+}
+
 export function buildFoundationInventory(collection: NarrativeCollection) {
   const slotTheme = Object.fromEntries(
     NARRATIVE_SLOTS.map((slot) => [slot, countBy(NARRATIVE_THEMES)]),
   ) as Record<NarrativeSlot, Record<NarrativeTheme, number>>
-  const slotAlignment = Object.fromEntries(
-    NARRATIVE_SLOTS.map((slot) => [slot, countBy(NARRATIVE_ALIGNMENTS)]),
-  ) as Record<NarrativeSlot, Record<NarrativeAlignment, number>>
   const conditions: Partial<Record<NarrativeFragmentCondition, number>> = {}
   const hookShapes = { direct: 0, pressure: 0, tension: 0 } satisfies Record<HookShape, number>
 
   for (const fragment of collection.fragments) {
     for (const theme of fragment.themeIds) slotTheme[fragment.slot][theme]++
-    for (const alignment of fragment.alignmentIds ?? NARRATIVE_ALIGNMENTS)
-      slotAlignment[fragment.slot][alignment]++
     for (const condition of fragment.conditions)
       conditions[condition] = (conditions[condition] ?? 0) + 1
     hookShapes[inferHookShape(fragment)]++
@@ -79,7 +115,8 @@ export function buildFoundationInventory(collection: NarrativeCollection) {
       ]),
     ) as Record<NarrativeSlot, number>,
     slotTheme,
-    slotAlignment,
+    eligibleByAlignment: buildEligibleByAlignment(collection),
+    explicitAlignmentCoverage: buildExplicitAlignmentCoverage(collection),
     conditions,
     hookShapes,
   }
@@ -136,7 +173,7 @@ export function findHighTextOverlap(
 
 export function findRepeatedOpenings(
   fragments: NarrativeFragment[],
-  wordCount = 5,
+  wordCount = 4,
 ): Array<{ opening: string; fragmentIds: string[] }> {
   const groups = new Map<string, string[]>()
   for (const fragment of fragments) {

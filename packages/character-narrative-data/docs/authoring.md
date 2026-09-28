@@ -90,19 +90,24 @@ contradiction.
 Use first person and neutral fantasy-adventure language. Prefer concrete verbs,
 objects, routines, and consequences over summaries of self-discovery.
 
-The collection quality tests may reject narrow, repeated constructions. The
-following are broader editorial smells and require review in context:
+The collection quality tests reject the following generic constructions anywhere
+in the collection:
 
-- “what matters to me”
+- “what matters to me” / “what mattered to me”
 - “the person I am becoming”
-- “reconsider what I want”
-- “there was more to learn”
+- “reconsider what I want” / “reconsider what I wanted”
+- “there was more to learn” / “how much I still had to learn” / “how much I had yet to learn”
 - “gave me a new perspective”
-- repeated openings such as “I learned to,” “I began to notice,” or “I came to
-  understand”
 
-An occasional phrase can be justified by a specific event. Repetition across the
-collection is evidence that the event has been replaced by abstraction.
+Repeated openings such as “I learned to,” “I began to notice,” or “I came to
+understand” are editorial smells for human review in the inventory report, not
+automatic test failures.
+
+For each alignment, alignment-sensitive slots (`ideals`, `flaws`, `choice`,
+`motivation`) need at least two explicitly tagged candidates. The alternates must
+express different methods or pressures, not paraphrases of the same temperament.
+One fragment may list several compatible alignments when the pressure genuinely
+fits each.
 
 ## Alignment
 
@@ -115,7 +120,10 @@ single temperament. Avoid moral caricatures and repeated stereotypes.
   them.
 
 Review each alignment pool for varied values, methods, pressures, relationships,
-and consequences. Affinities and tags cannot substitute for editorial judgment.
+and consequences. Automated **alignment-specific coverage** counts only
+fragments whose `alignmentIds` include that alignment; **alignment eligibility**
+also includes untagged generic fragments. Affinities and tags cannot substitute
+for editorial judgment.
 
 ## Campaign truth and templates
 

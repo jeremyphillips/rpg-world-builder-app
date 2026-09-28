@@ -1,6 +1,6 @@
 # Foundation collection inventory
 
-Generated from collection revision `foundation-3`. Do not edit
+Generated from collection revision `foundation-4`. Do not edit
 this file directly. Regenerate it with:
 
 ```bash
@@ -14,15 +14,15 @@ from slot and prose markers, so reviewers must confirm the classification.
 
 ```json
 {
-  "total": 134,
+  "total": 170,
   "bySlot": {
     "personalityTraits": 18,
-    "ideals": 15,
+    "ideals": 24,
     "bonds": 27,
-    "flaws": 20,
+    "flaws": 29,
     "experience": 26,
-    "choice": 14,
-    "motivation": 14
+    "choice": 23,
+    "motivation": 23
   }
 }
 ```
@@ -37,9 +37,9 @@ from slot and prose markers, so reviewers must confirm the classification.
     "ambition": 13
   },
   "ideals": {
-    "duty": 13,
-    "belonging": 11,
-    "ambition": 11
+    "duty": 22,
+    "belonging": 20,
+    "ambition": 20
   },
   "bonds": {
     "duty": 23,
@@ -47,9 +47,9 @@ from slot and prose markers, so reviewers must confirm the classification.
     "ambition": 14
   },
   "flaws": {
-    "duty": 16,
-    "belonging": 16,
-    "ambition": 16
+    "duty": 25,
+    "belonging": 25,
+    "ambition": 25
   },
   "experience": {
     "duty": 20,
@@ -57,21 +57,21 @@ from slot and prose markers, so reviewers must confirm the classification.
     "ambition": 18
   },
   "choice": {
-    "duty": 12,
-    "belonging": 11,
-    "ambition": 11
+    "duty": 21,
+    "belonging": 20,
+    "ambition": 20
   },
   "motivation": {
-    "duty": 12,
-    "belonging": 11,
-    "ambition": 12
+    "duty": 21,
+    "belonging": 20,
+    "ambition": 21
   }
 }
 ```
 
-## Slot × alignment eligibility
+## Alignment eligibility
 
-Unrestricted fragments count as eligible for every alignment.
+Generic fragments plus fragments explicitly tagged for the alignment.
 
 ```json
 {
@@ -87,15 +87,15 @@ Unrestricted fragments count as eligible for every alignment.
     "ce": 18
   },
   "ideals": {
-    "lg": 7,
-    "ng": 7,
-    "cg": 7,
-    "ln": 7,
-    "n": 7,
-    "cn": 7,
-    "le": 7,
-    "ne": 7,
-    "ce": 7
+    "lg": 9,
+    "ng": 8,
+    "cg": 8,
+    "ln": 8,
+    "n": 8,
+    "cn": 8,
+    "le": 8,
+    "ne": 8,
+    "ce": 8
   },
   "bonds": {
     "lg": 27,
@@ -109,15 +109,15 @@ Unrestricted fragments count as eligible for every alignment.
     "ce": 27
   },
   "flaws": {
-    "lg": 12,
-    "ng": 12,
-    "cg": 12,
-    "ln": 12,
-    "n": 12,
-    "cn": 12,
-    "le": 12,
-    "ne": 12,
-    "ce": 12
+    "lg": 13,
+    "ng": 13,
+    "cg": 13,
+    "ln": 13,
+    "n": 13,
+    "cn": 14,
+    "le": 13,
+    "ne": 13,
+    "ce": 13
   },
   "experience": {
     "lg": 26,
@@ -131,26 +131,112 @@ Unrestricted fragments count as eligible for every alignment.
     "ce": 26
   },
   "choice": {
-    "lg": 6,
-    "ng": 6,
-    "cg": 6,
-    "ln": 6,
-    "n": 6,
-    "cn": 6,
-    "le": 6,
-    "ne": 6,
-    "ce": 6
+    "lg": 7,
+    "ng": 7,
+    "cg": 7,
+    "ln": 7,
+    "n": 7,
+    "cn": 7,
+    "le": 7,
+    "ne": 7,
+    "ce": 7
   },
   "motivation": {
-    "lg": 6,
-    "ng": 6,
-    "cg": 6,
-    "ln": 6,
-    "n": 6,
-    "cn": 6,
-    "le": 6,
-    "ne": 6,
-    "ce": 6
+    "lg": 7,
+    "ng": 7,
+    "cg": 7,
+    "ln": 7,
+    "n": 7,
+    "cn": 7,
+    "le": 7,
+    "ne": 7,
+    "ce": 7
+  }
+}
+```
+
+## Alignment-specific coverage
+
+Only fragments whose `alignmentIds` include the alignment.
+
+```json
+{
+  "personalityTraits": {
+    "lg": 0,
+    "ng": 0,
+    "cg": 0,
+    "ln": 0,
+    "n": 0,
+    "cn": 0,
+    "le": 0,
+    "ne": 0,
+    "ce": 0
+  },
+  "ideals": {
+    "lg": 3,
+    "ng": 2,
+    "cg": 2,
+    "ln": 2,
+    "n": 2,
+    "cn": 2,
+    "le": 2,
+    "ne": 2,
+    "ce": 2
+  },
+  "bonds": {
+    "lg": 0,
+    "ng": 0,
+    "cg": 0,
+    "ln": 0,
+    "n": 0,
+    "cn": 0,
+    "le": 0,
+    "ne": 0,
+    "ce": 0
+  },
+  "flaws": {
+    "lg": 2,
+    "ng": 2,
+    "cg": 2,
+    "ln": 2,
+    "n": 2,
+    "cn": 3,
+    "le": 2,
+    "ne": 2,
+    "ce": 2
+  },
+  "experience": {
+    "lg": 0,
+    "ng": 0,
+    "cg": 0,
+    "ln": 0,
+    "n": 0,
+    "cn": 0,
+    "le": 0,
+    "ne": 0,
+    "ce": 0
+  },
+  "choice": {
+    "lg": 2,
+    "ng": 2,
+    "cg": 2,
+    "ln": 2,
+    "n": 2,
+    "cn": 2,
+    "le": 2,
+    "ne": 2,
+    "ce": 2
+  },
+  "motivation": {
+    "lg": 2,
+    "ng": 2,
+    "cg": 2,
+    "ln": 2,
+    "n": 2,
+    "cn": 2,
+    "le": 2,
+    "ne": 2,
+    "ce": 2
   }
 }
 ```
@@ -177,9 +263,9 @@ Unrestricted fragments count as eligible for every alignment.
 
 ```json
 {
-  "direct": 41,
-  "pressure": 54,
-  "tension": 39
+  "direct": 58,
+  "pressure": 67,
+  "tension": 45
 }
 ```
 

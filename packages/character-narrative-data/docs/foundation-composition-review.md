@@ -2,7 +2,7 @@
 
 Review date: 2026-09-28
 
-Collection revision: `foundation-3`
+Collection revision: `foundation-4`
 
 Fixture: 24 fixed seed/context cases in
 [`foundation-composition-review.generated.md`](foundation-composition-review.generated.md)
@@ -18,16 +18,25 @@ The reviewed fixture passes the authoring standard:
 - Flaws create predictable trouble through a behavior under pressure.
 - Every experience includes a concrete circumstance and action or consequence;
   most include all three.
-- Alignment-specific selections vary in method and pressure without reducing each
-  alignment to one temperament.
+- Alignment-sensitive slots now have two explicitly tagged candidates per
+  alignment. Pairs were checked for different methods or pressures (for example
+  lawful good promise-keeping versus speaking up about wrongdoing; chaotic evil
+  entitlement versus punitive humiliation), not paraphrases of one temperament.
 - Rich contexts demonstrate organization, residence, hometown, mentor, class,
-  species, and culture-aware prose without asserting unsupported campaign facts.
+  and species-aware prose where those references bind. Culture tokens are present
+  in rich contexts but did not surface in this seed set; culture-bound fragments
+  remain in the inventory for later fixture seeds.
 - Sparse and missing-alignment contexts still produce complete, concrete
   compositions.
 
-The inventory reports 134 fragments, all declared relationship conditions, all
-three inferred hook shapes, no repeated four-word openings, and no text-overlap
-clusters at the editorial review threshold.
+The inventory reports 170 fragments, explicit alignment coverage of at least two
+per alignment for ideals, flaws, choice, and motivation, all declared relationship
+conditions, all three inferred hook shapes, no repeated four-word openings, and no
+text-overlap clusters at the editorial review threshold.
+
+Selection smoke tests across 24 deterministic seeds confirm multiple explicit
+alignment-tagged IDs are chosen for each alignment-sensitive slot without changing
+generator weighting.
 
 ## Composition decision
 
