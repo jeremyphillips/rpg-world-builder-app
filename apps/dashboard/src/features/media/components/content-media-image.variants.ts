@@ -44,7 +44,7 @@ export const contentMediaImageCoverClasses = cn(
 
 export const contentMediaImageCropClasses = cn(
   contentMediaImageBaseClasses,
-  'object-fill object-left-top',
+  'absolute object-fill object-left-top',
 )
 
 export const contentMediaImageEmblemClasses = cn(

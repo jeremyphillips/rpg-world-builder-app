@@ -1,13 +1,16 @@
 import type {
   AvailableContentImage,
+  AvailableContentMediaSource,
   ContentMedia,
   ContainPresentation,
   MediaAsset,
   MediaRole,
   NormalizedCrop,
   NormalizedFocalPoint,
+  ResolveAvailableContentMediaSourcesResult,
   SourceDimensions,
 } from '@rpg/contracts'
+import { projectAvailableContentImages } from '@rpg/contracts'
 import {
   buildSystemContentImageVirtualId,
   canonicalizeEmblemPresentation,
@@ -57,7 +60,13 @@ export type MediaAction =
   | { type: 'crop'; crop: NormalizedCrop; focalPoint?: NormalizedFocalPoint }
   | { type: 'contain'; layout: ContainPresentation; source: SourceDimensions }
 
-export type DeriveAvailableImages = (media: ContentMedia) => AvailableContentImage[]
+export type DeriveMediaAvailability = (
+  media: ContentMedia,
+) => ResolveAvailableContentMediaSourcesResult
+
+function galleryImagesFromAvailability(availability: ResolveAvailableContentMediaSourcesResult) {
+  return projectAvailableContentImages(availability.sources)
+}
 
 function isVirtualSystemId(id: string): boolean {
   return parseSystemContentImageVirtualId(id) !== undefined
@@ -67,10 +76,10 @@ function resolvePresentationForImage(
   media: ContentMedia,
   imageId: string | undefined,
   allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[],
+  sources: readonly AvailableContentMediaSource[],
 ): MediaRole {
   if (!imageId) return allowedRoles[0] ?? 'primary'
-  const { roles } = resolveEffectiveImageRoles(media, imageId, allowedRoles, availableImages)
+  const { roles } = resolveEffectiveImageRoles(media, imageId, allowedRoles, sources)
   return roles[0] ?? allowedRoles[0] ?? 'primary'
 }
 
@@ -78,11 +87,12 @@ function resolveInitialSelectedId(
   media: ContentMedia,
   initialSelectedImageId: string | undefined,
   allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[],
+  sources: readonly AvailableContentMediaSource[],
 ): string | undefined {
+  const galleryImages = projectAvailableContentImages(sources)
   const selectableIds = new Set([
     ...media.images.map((image) => image.id),
-    ...availableImages.filter((image) => image.kind === 'system').map((image) => image.id),
+    ...galleryImages.filter((image) => image.kind === 'system').map((image) => image.id),
   ])
   const requested =
     initialSelectedImageId && selectableIds.has(initialSelectedImageId)
@@ -100,27 +110,32 @@ function resolveInitialSelectedId(
     if (imageId) return imageId
   }
 
-  return availableImages.find((image) => image.kind === 'system')?.id ?? media.images[0]?.id
+  return galleryImages.find((image) => image.kind === 'system')?.id ?? media.images[0]?.id
 }
 
 export function createMediaSession(
   media: ContentMedia,
   initialSelectedImageId: string | undefined,
   allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[] = [],
+  initialAvailability: ResolveAvailableContentMediaSourcesResult,
 ): MediaSession {
   const selectedId = resolveInitialSelectedId(
     media,
     initialSelectedImageId,
     allowedRoles,
-    availableImages,
+    initialAvailability.sources,
   )
 
   return {
     initial: structuredClone(media),
     media: structuredClone(media),
     selectedId,
-    presentation: resolvePresentationForImage(media, selectedId, allowedRoles, availableImages),
+    presentation: resolvePresentationForImage(
+      media,
+      selectedId,
+      allowedRoles,
+      initialAvailability.sources,
+    ),
   }
 }
 
@@ -136,10 +151,10 @@ export function hasNewMediaUploads(state: MediaSession): boolean {
 export function mediaSessionReducer(
   state: MediaSession,
   action: MediaAction,
-  deriveAvailableImages: DeriveAvailableImages,
+  deriveAvailability: DeriveMediaAvailability,
 ): MediaSession {
   if (action.type === 'select') {
-    return selectImage(state, action.id, action.allowedRoles, deriveAvailableImages)
+    return selectImage(state, action.id, action.allowedRoles, deriveAvailability)
   }
   if (action.type === 'presentation') return { ...state, presentation: action.role }
 
@@ -151,10 +166,10 @@ export function mediaSessionReducer(
       addImage(next, action)
       break
     case 'remove':
-      removeImage(next, action.id, action.allowedRoles, deriveAvailableImages)
+      removeImage(next, action.id, action.allowedRoles, deriveAvailability)
       break
     case 'restoreRemoved':
-      restoreRemovedImage(next, action, deriveAvailableImages)
+      restoreRemovedImage(next, action, deriveAvailability)
       break
     case 'alt': {
       const image = media.images.find((image) => image.id === action.id)
@@ -162,7 +177,7 @@ export function mediaSessionReducer(
       break
     }
     case 'role':
-      assignRole(next, action, deriveAvailableImages)
+      assignRole(next, action, deriveAvailability)
       break
     case 'crop':
       updateCrop(next, action.crop, action.focalPoint)
@@ -179,14 +194,14 @@ function removeImage(
   next: MediaSession,
   id: string,
   allowedRoles: readonly MediaRole[],
-  deriveAvailableImages: DeriveAvailableImages,
+  deriveAvailability: DeriveMediaAvailability,
 ) {
   if (isVirtualSystemId(id)) return
 
   const { media } = next
   const index = media.images.findIndex((image) => image.id === id)
   media.images = media.images.filter((image) => image.id !== id)
-  const availableImages = deriveAvailableImages(media)
+  const galleryImages = galleryImagesFromAvailability(deriveAvailability(media))
   for (const role of allowedRoles) {
     const assignment = media.roles[role]
     if (assignment && roleAssignmentMatchesImageId(assignment, id)) {
@@ -195,21 +210,21 @@ function removeImage(
   }
   if (next.selectedId === id) {
     next.selectedId =
-      availableImages.find((image) => image.kind === 'system')?.id ??
+      galleryImages.find((image) => image.kind === 'system')?.id ??
       media.images[Math.min(index, media.images.length - 1)]?.id
   }
   next.presentation = resolvePresentationForImage(
     media,
     next.selectedId,
     allowedRoles,
-    availableImages,
+    deriveAvailability(media).sources,
   )
 }
 
 function restoreRemovedImage(
   next: MediaSession,
   action: Extract<MediaAction, { type: 'restoreRemoved' }>,
-  deriveAvailableImages: DeriveAvailableImages,
+  deriveAvailability: DeriveMediaAvailability,
 ) {
   const { media } = next
   const clampedIndex = Math.max(0, Math.min(action.index, media.images.length))
@@ -219,14 +234,14 @@ function restoreRemovedImage(
   >) {
     media.roles[role] = structuredClone(assignment)
   }
-  const availableImages = deriveAvailableImages(media)
+  const availability = deriveAvailability(media)
   if (action.restoreSelection) {
     next.selectedId = action.image.id
     next.presentation = resolvePresentationForImage(
       media,
       action.image.id,
       action.allowedRoles,
-      availableImages,
+      availability.sources,
     )
   }
 }
@@ -235,7 +250,7 @@ function restoreRemovedImage(
 function assignRole(
   next: MediaSession,
   action: Extract<MediaAction, { type: 'role' }>,
-  deriveAvailableImages: DeriveAvailableImages,
+  deriveAvailability: DeriveMediaAvailability,
 ) {
   const { media } = next
 
@@ -248,7 +263,7 @@ function assignRole(
       media,
       next.selectedId,
       action.allowedRoles,
-      deriveAvailableImages(media),
+      deriveAvailability(media).sources,
     )
     return
   }
@@ -298,13 +313,13 @@ function selectImage(
   state: MediaSession,
   id: string,
   allowedRoles: readonly MediaRole[],
-  deriveAvailableImages: DeriveAvailableImages,
+  deriveAvailability: DeriveMediaAvailability,
 ): MediaSession {
-  const availableImages = deriveAvailableImages(state.media)
+  const availability = deriveAvailability(state.media)
   return {
     ...state,
     selectedId: id,
-    presentation: resolvePresentationForImage(state.media, id, allowedRoles, availableImages),
+    presentation: resolvePresentationForImage(state.media, id, allowedRoles, availability.sources),
   }
 }
 

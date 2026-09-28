@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { getContentMediaPolicy } from '@rpg/contracts'
+import { getContentMediaPolicy, resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaImageDetails } from './media-image-details'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
@@ -10,11 +10,17 @@ const uploadAvailable = {
   attachment: mediaFixture.images[0]!,
 }
 
+const fixtureSources = resolveAvailableContentMediaSources({
+  media: mediaFixture,
+  domain: 'character',
+  contentSource: 'homebrew',
+}).sources
+
 it('explains why a small image cannot have Portrait or Primary', () => {
   render(
     <MediaImageDetails
       selectedAvailable={uploadAvailable}
-      availableImages={[uploadAvailable]}
+      availableSources={fixtureSources}
       asset={{ ...mediaFixtureAssets[0]!, orientedWidth: 64, orientedHeight: 64 }}
       media={{ ...mediaFixture, roles: {} }}
       policy={getContentMediaPolicy('character')}
@@ -35,7 +41,7 @@ it('keeps accessibility fields inside a collapsed disclosure by default', () => 
   render(
     <MediaImageDetails
       selectedAvailable={uploadAvailable}
-      availableImages={[uploadAvailable]}
+      availableSources={fixtureSources}
       asset={mediaFixtureAssets[0]!}
       media={mediaFixture}
       policy={getContentMediaPolicy('character')}

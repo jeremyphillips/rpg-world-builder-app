@@ -1,10 +1,6 @@
 import type { ContentSource } from '../../rpg/content/lib/envelope'
 import type { ContentMedia } from './content-media'
-import {
-  isSystemRoleAssignment,
-  systemImageSourcesEqual,
-  type ContentMediaSystemSource,
-} from './content-media-source'
+import { roleAssignmentMatchesSelection } from './content-media-source'
 import type { ContentDisplaySurface } from './content-display-surface'
 import {
   resolveContentDisplayFallback,
@@ -15,12 +11,11 @@ import type { NormalizedCrop, NormalizedFocalPoint } from './geometry'
 import type { ContentDisplayImagesByRole } from './content-display-image-dto'
 import type { MediaRole } from './roles'
 import { getContentMediaPolicy, resolveDetailRoles, type ContentMediaDomain } from './media-policy'
-import {
-  resolveContentImageSet,
-  resolveSystemContentImage,
-  resolveSystemContentImageSourceDimensionsFromPath,
-} from './system-content-image-registry'
+import { resolveSystemContentImageSourceDimensionsFromPath } from './system-content-image-registry'
 import type { SystemImageSubject } from './system-image-subject'
+import { resolveAvailableContentMediaSources } from './resolve-available-content-media-sources'
+import { selectDisplaySourceForRole } from './select-display-source-for-role'
+import type { AvailableContentMediaSource } from './resolve-available-content-media-sources'
 
 export const CONTENT_DISPLAY_IMAGE_SOURCE_KINDS = ['system', 'upload'] as const
 
@@ -36,6 +31,8 @@ export type ContentDisplayImage = {
   sourceKind: ContentDisplayImageSourceKind
   /** Set only when resolved from a registry entry that declares a non-default treatment. */
   presentationTreatment?: ContentDisplayImagePresentationTreatment
+  /** True when a persisted role assignment could not be resolved and display fell back. */
+  assignedSourceMissing?: boolean
 }
 
 export type { ContentDisplayImagesByRole } from './content-display-image-dto'
@@ -66,28 +63,6 @@ function resolveUploadAssignmentSrc(
   return resolveUploadSrc(attachment.assetId)
 }
 
-function resolveSystemAssignment(source: ContentMediaSystemSource, contentSource: ContentSource) {
-  return resolveSystemContentImage({
-    imageSetId: source.imageSetId,
-    subject: source.subject,
-    assetRole: source.assetRole,
-    slug: source.slug,
-    contentSource,
-  })
-}
-
-function presentationTreatmentFromSystemImage(
-  presentation: { treatment: string } | undefined,
-): ContentDisplayImagePresentationTreatment | undefined {
-  if (presentation?.treatment === 'white-paper-knockout') {
-    return 'white-paper-knockout'
-  }
-  if (presentation?.treatment === 'mono-glyph-invert') {
-    return 'mono-glyph-invert'
-  }
-  return undefined
-}
-
 function resolveRolesForSurface(
   surface: ContentDisplaySurface,
   domain: ContentMediaDomain,
@@ -103,59 +78,77 @@ function resolveRolesForSurface(
   return representative ? [representative] : ['primary']
 }
 
+function presentationFromSource(
+  source: AvailableContentMediaSource,
+): ContentDisplayImagePresentationTreatment | undefined {
+  if (source.sourceKind !== 'system') return undefined
+  return source.presentationTreatment
+}
+
+function buildDisplayImageForRole(
+  input: ResolveContentDisplayImageInput,
+  role: MediaRole,
+  source: AvailableContentMediaSource,
+  assignedSourceMissing?: boolean,
+): ContentDisplayImage | undefined {
+  const assignment = input.media?.roles[role]
+  const cropPresentation =
+    assignment && roleAssignmentMatchesSelection(assignment, source.id)
+      ? asCropPresentation(assignment.presentation)
+      : undefined
+  const crop = cropPresentation?.crop
+  const focalPoint = cropPresentation?.focalPoint
+
+  if (source.sourceKind === 'upload') {
+    const src = input.media
+      ? resolveUploadAssignmentSrc(input.media, source.id, input.resolveUploadSrc)
+      : undefined
+    if (!src) return undefined
+    return {
+      src,
+      role,
+      crop,
+      focalPoint,
+      sourceKind: 'upload',
+      assignedSourceMissing,
+    }
+  }
+
+  return {
+    src: source.path,
+    role,
+    crop,
+    focalPoint,
+    sourceKind: 'system',
+    presentationTreatment: presentationFromSource(source),
+    assignedSourceMissing,
+  }
+}
+
 function resolveDisplayImageForRole(
   input: ResolveContentDisplayImageInput,
   role: MediaRole,
-  imageSetId: string,
+  sources: readonly AvailableContentMediaSource[],
 ): ContentDisplayImage | undefined {
-  const assignment = input.media?.roles[role]
-
-  if (assignment) {
-    const cropPresentation = asCropPresentation(assignment.presentation)
-    const crop = cropPresentation?.crop
-    const focalPoint = cropPresentation?.focalPoint
-
-    if (assignment.source.kind === 'upload') {
-      const src = input.media
-        ? resolveUploadAssignmentSrc(input.media, assignment.source.imageId, input.resolveUploadSrc)
-        : undefined
-      if (src) {
-        return { src, role, crop, focalPoint, sourceKind: 'upload' }
-      }
-    }
-
-    if (isSystemRoleAssignment(assignment)) {
-      const resolved = resolveSystemAssignment(assignment.source, input.contentSource)
-      if (resolved) {
-        return {
-          src: resolved.path,
-          role,
-          crop,
-          focalPoint,
-          sourceKind: 'system',
-          presentationTreatment: presentationTreatmentFromSystemImage(resolved.presentation),
-        }
-      }
-    }
-  }
-
-  const derivedResolved = resolveSystemContentImage({
-    imageSetId,
-    subject: input.subject,
-    assetRole: role,
-    slug: input.slug,
-    contentSource: input.contentSource,
+  const selection = selectDisplaySourceForRole({
+    sources,
+    media: input.media,
+    role,
   })
-  if (derivedResolved) {
-    return {
-      src: derivedResolved.path,
-      role,
-      sourceKind: 'system',
-      presentationTreatment: presentationTreatmentFromSystemImage(derivedResolved.presentation),
-    }
-  }
+  if (!selection.source) return undefined
+  return buildDisplayImageForRole(input, role, selection.source, selection.assignedSourceMissing)
+}
 
-  return undefined
+function resolveAvailabilityForDisplay(input: ResolveContentDisplayImageInput) {
+  return resolveAvailableContentMediaSources({
+    media: input.media ?? { revision: 0, images: [], roles: {} },
+    domain: input.domain,
+    contentSource: input.contentSource,
+    subject: input.subject,
+    slug: input.slug,
+    rulesetId: input.rulesetId,
+    campaignImageSetId: input.campaignImageSetId,
+  })
 }
 
 /** Resolve one display image per requested role (independent crops; no compact walk). */
@@ -164,16 +157,13 @@ export function resolveContentDisplayImagesByRole(
     roles?: readonly MediaRole[]
   },
 ): ContentDisplayImagesByRole {
-  const imageSetId = resolveContentImageSet({
-    campaignImageSetId: input.campaignImageSetId,
-    rulesetId: input.rulesetId,
-  })
   const policy = getContentMediaPolicy(input.domain)
   const roles = input.roles ?? policy.representativeRoles
+  const { sources } = resolveAvailabilityForDisplay({ ...input, surface: 'compact' })
   const byRole: ContentDisplayImagesByRole = {}
 
   for (const role of roles) {
-    const display = resolveDisplayImageForRole({ ...input, surface: 'compact' }, role, imageSetId)
+    const display = resolveDisplayImageForRole({ ...input, surface: 'compact' }, role, sources)
     if (display) {
       byRole[role] = display
     }
@@ -186,14 +176,11 @@ export function resolveContentDisplayImagesByRole(
 export function resolveContentDisplayImage(
   input: ResolveContentDisplayImageInput,
 ): ResolveContentDisplayImageResult {
-  const imageSetId = resolveContentImageSet({
-    campaignImageSetId: input.campaignImageSetId,
-    rulesetId: input.rulesetId,
-  })
+  const { sources } = resolveAvailabilityForDisplay(input)
   const roles = resolveRolesForSurface(input.surface, input.domain)
 
   for (const role of roles) {
-    const display = resolveDisplayImageForRole(input, role, imageSetId)
+    const display = resolveDisplayImageForRole(input, role, sources)
     if (display) {
       return { outcome: 'image', display }
     }
@@ -222,9 +209,4 @@ export function resolveContentDisplayImageSourceDimensions(
   return undefined
 }
 
-export function systemDerivedImageMatchesAssignment(
-  derived: Pick<ContentMediaSystemSource, 'imageSetId' | 'subject' | 'assetRole' | 'slug'>,
-  assignment: ContentMediaSystemSource,
-): boolean {
-  return systemImageSourcesEqual(assignment, derived)
-}
+export { systemDerivedImageMatchesAssignment } from './content-display-image-system-match'

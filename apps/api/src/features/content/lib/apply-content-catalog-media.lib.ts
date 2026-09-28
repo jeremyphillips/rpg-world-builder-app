@@ -55,6 +55,8 @@ export function extractCatalogMediaWriteEnvelope(
   delete normalized[catalogContentMediaExpectedRevisionField]
 
   const prepared = prepareContentMediaForCatalogWrite(normalized.media)
+  delete normalized.media
+
   return {
     ...(typeof expectedMediaRevision === 'number' ? { expectedMediaRevision } : {}),
     media: prepared,

@@ -41,6 +41,7 @@ export interface ContentFormCampaignAccessProps {
   form?: UseFormReturn<FieldValues>
   mediaDomain?: ContentMediaDomain
   entitySource?: ContentSource
+  formMode?: 'create' | 'edit'
 }
 
 function ContentMediaIdentitySlot({
@@ -51,6 +52,7 @@ function ContentMediaIdentitySlot({
   contentSource,
   entitySlug,
   rulesetId,
+  formMode,
 }: {
   domain: ContentMediaDomain
   form: UseFormReturn<FieldValues>
@@ -59,6 +61,7 @@ function ContentMediaIdentitySlot({
   contentSource?: ContentSource
   entitySlug?: string
   rulesetId?: string
+  formMode?: 'create' | 'edit'
 }) {
   const watchedSlug = useWatch({ control: form.control, name: 'slug' }) as string | undefined
   const slug = entitySlug ?? watchedSlug
@@ -66,13 +69,14 @@ function ContentMediaIdentitySlot({
     <ManagedMediaField
       config={{ domain, presentation: { layout: 'compact' } }}
       scope={{ kind: 'campaign-content', campaignId: campaignId ?? 'draft' }}
+      formMode={formMode}
       contentContext={
-        slug && contentSource
+        contentSource !== undefined
           ? {
               domain,
-              subject: contentTypeSubject(contentType),
-              slug,
               contentSource,
+              subject: contentTypeSubject(contentType),
+              slug: slug?.trim() ? slug : undefined,
               rulesetId,
             }
           : undefined
@@ -95,6 +99,7 @@ export function ContentFormHeader({
   form,
   mediaDomain,
   entitySource,
+  formMode,
 }: ContentFormCampaignAccessProps) {
   const { density } = useFormSectionContext()
   const { rhythm } = resolveFormDensity(density)
@@ -136,6 +141,7 @@ export function ContentFormHeader({
             contentSource={entitySource}
             entitySlug={ctx.entitySlug}
             rulesetId={ctx.rulesetId}
+            formMode={formMode}
           />
         ) : null}
         <div className="min-w-0 flex-1">

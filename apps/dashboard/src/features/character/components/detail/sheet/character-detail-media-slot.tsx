@@ -28,6 +28,7 @@ export function CharacterDetailMediaSlot({
       value={media ?? emptyContentMediaSchema}
       label={CHARACTER_IMAGES_LABEL}
       readOnly={readOnly}
+      contentContext={{ domain: 'character', contentSource: 'homebrew' }}
       onSave={onSave}
     />
   )

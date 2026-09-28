@@ -5,6 +5,8 @@ import {
 } from './role-crop-spec'
 import type { MediaRole } from './roles'
 
+export const MEDIA_GALLERY_ONLY_LABEL = 'Gallery only'
+
 type MediaRoleSurfaceCopy = {
   positionLabel: string
   instructions: string

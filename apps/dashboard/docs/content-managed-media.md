@@ -2,6 +2,12 @@
 
 Content types in `CONTENT_TYPE_MEDIA_DOMAIN` expose a header `ManagedMediaField` bound to RHF `media`. Writes must go through `serializeContentFormInput` at mutation boundaries — not raw `def.toInput`.
 
+Source availability, display resolution, and workspace behavior are layered in
+[content-media.md](../../../docs/content-media.md#four-layers-source--surface). The dashboard
+passes `contentContext` into `resolveAvailableContentMediaSources` (via
+`resolveMediaContentAvailability`); edit flows block the manager when lookup context is
+`incomplete`, while create flows may list uploads only until identity exists.
+
 ## Write semantics
 
 | Payload                          | Meaning                                            |

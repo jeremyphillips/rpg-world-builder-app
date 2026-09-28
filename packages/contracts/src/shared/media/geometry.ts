@@ -44,7 +44,7 @@ export type NormalizedCropImageLayout = {
   offsetYPercent: number
 }
 
-/** Map a normalized crop to percentage width/height/margins for object-fill framing. */
+/** Map a normalized crop to percentage size and frame-relative offsets for object-fill framing. */
 export function resolveNormalizedCropImageLayout(crop: NormalizedCrop): NormalizedCropImageLayout {
   return {
     widthPercent: 100 / crop.width,

@@ -1,8 +1,15 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { resolveAvailableContentMediaSources } from '@rpg/contracts'
 import { MediaGallery } from './media-gallery'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
+
+const fixtureSources = resolveAvailableContentMediaSources({
+  media: mediaFixture,
+  domain: 'character',
+  contentSource: 'homebrew',
+}).sources
 
 beforeEach(() => {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -26,6 +33,7 @@ it('shows the quiet empty state copy', () => {
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
       availableImages={emptyAvailable}
+      availableSources={[]}
       assets={{}}
       allowedRoles={['portrait', 'primary']}
       entries={[]}
@@ -47,6 +55,7 @@ it('calls onAdd from the gallery picker', async () => {
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
       availableImages={emptyAvailable}
+      availableSources={[]}
       assets={{}}
       allowedRoles={['portrait', 'primary']}
       entries={[]}
@@ -86,6 +95,7 @@ it('moves keyboard selection vertically by the visible column stride', () => {
           attachment: { ...mediaFixture.images[1]!, id: 'image-3', alt: 'Second artwork' },
         },
       ]}
+      availableSources={fixtureSources}
       assets={Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset]))}
       allowedRoles={['portrait', 'primary']}
       selectedId="image-0"
@@ -108,6 +118,7 @@ it('moves keyboard selection between images and shows role badges without a foot
     <MediaGallery
       media={mediaFixture}
       availableImages={fixtureAvailable}
+      availableSources={fixtureSources}
       assets={Object.fromEntries(mediaFixtureAssets.map((asset) => [asset.id, asset]))}
       allowedRoles={['portrait', 'primary']}
       selectedId="image-0"
@@ -133,6 +144,7 @@ it('labels upload queue rows with Waiting, Uploading, or Failed', () => {
     <MediaGallery
       media={{ revision: 0, images: [], roles: {} }}
       availableImages={emptyAvailable}
+      availableSources={[]}
       assets={{}}
       allowedRoles={['primary']}
       entries={[

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { useFormContext, useWatch, type FieldValues } from 'react-hook-form'
+import { useController, useFormContext, type FieldValues } from 'react-hook-form'
 import {
   emptyContentMediaSchema,
   resolveContentDisplayFallback,
@@ -23,6 +23,7 @@ export type ManagedMediaFieldProps = {
   name?: string
   label?: string
   contentContext?: MediaManagerContentContext
+  formMode?: 'create' | 'edit'
   /** Opens the manager once on mount — used for deep links from failed banner upload alerts. */
   initialOpen?: boolean
 }
@@ -34,14 +35,20 @@ export function ManagedMediaField({
   name = 'media',
   label = 'Images',
   contentContext,
+  formMode,
   initialOpen = false,
 }: ManagedMediaFieldProps) {
   const headingId = useId()
   const { density } = useFormSectionContext()
   const { size } = resolveFormDensity(density)
   const form = useFormContext<FieldValues>()
-  const watched = useWatch({ control: form.control, name })
-  const media = watched ?? emptyContentMediaSchema
+  // useController (not useWatch) so the path registers with react-hook-form:
+  // the schema Form shell mounts with `shouldUnregister: true`, and unregistered
+  // paths are dropped from live form values — seeded media would never render.
+  const {
+    field: { value: mediaValue },
+  } = useController({ control: form.control, name })
+  const media = mediaValue ?? emptyContentMediaSchema
   const [open, setOpen] = useState(initialOpen)
   const handledInitialOpenRef = useRef(false)
 
@@ -121,23 +128,29 @@ export function ManagedMediaField({
         />
       )}
       <MediaManager
+        key={`${media.revision}-${open ? 'open' : 'closed'}`}
         open={open}
         onOpenChange={setOpen}
         domain={config.domain}
         value={media}
         scope={scope}
         mode="form"
+        formMode={formMode}
         initialAssets={assets}
         initialSelectedImageId={selectedId}
         maxItems={maxItems}
         contentContext={contentContext}
         onSave={(change) => {
           setAssets(change.assets)
-          form.setValue(name, change.media, {
-            shouldDirty: true,
-            shouldTouch: true,
-            shouldValidate: true,
-          })
+          form.setValue(
+            name,
+            { ...change.media, revision: change.media.revision },
+            {
+              shouldDirty: true,
+              shouldTouch: true,
+              shouldValidate: true,
+            },
+          )
         }}
       />
     </>

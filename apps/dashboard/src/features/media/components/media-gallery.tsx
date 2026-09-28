@@ -8,9 +8,11 @@ import {
 } from '@rpg/ui'
 import { Images } from 'lucide-react'
 import {
+  MEDIA_GALLERY_ONLY_LABEL,
   mediaRoleSurfaceCopy,
   resolveEffectiveImageRoles,
   type AvailableContentImage,
+  type AvailableContentMediaSource,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
@@ -31,7 +33,10 @@ export type MediaGalleryProps = {
   systemImageUrl?: (srcPath: string) => string
   media: ContentMedia
   availableImages: AvailableContentImage[]
+  availableSources: readonly AvailableContentMediaSource[]
   assets: Record<string, MediaAsset>
+  contextBlocked?: boolean
+  contextBlockedMessage?: string
   allowedRoles: readonly MediaRole[]
   selectedId?: string
   entries: UploadEntry[]
@@ -70,8 +75,11 @@ export function MediaGallery({
   systemImageUrl: resolveSystemImageUrl = systemContentImageUrl,
   media,
   availableImages,
+  availableSources,
   assets,
   allowedRoles,
+  contextBlocked = false,
+  contextBlockedMessage,
   selectedId,
   entries,
   onSelect,
@@ -133,7 +141,13 @@ export function MediaGallery({
             }}
           />
         </div>
-        {!availableImages.length ? (
+        {contextBlocked ? (
+          <div className={styles.galleryEmpty()} role="alert">
+            <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />
+            <p className={styles.galleryEmptyTitle()}>Images unavailable</p>
+            <p className={styles.muted()}>{contextBlockedMessage}</p>
+          </div>
+        ) : !availableImages.length ? (
           <div className={styles.galleryEmpty()}>
             <Images className={styles.galleryEmptyIcon()} aria-hidden="true" />
             <p className={styles.galleryEmptyTitle()}>No images yet</p>
@@ -142,12 +156,14 @@ export function MediaGallery({
         ) : (
           <div className={styles.grid()}>
             {availableImages.map((image, index) => {
-              const roles = resolveEffectiveImageRoles(
+              const effective = resolveEffectiveImageRoles(
                 media,
                 image.id,
                 allowedRoles,
-                availableImages,
-              ).roles
+                availableSources,
+              )
+              const roles = effective.roles
+              const galleryOnly = roles.length === 0 && image.kind === 'upload'
               const roleLabels = roles.map((role) => mediaRoleSurfaceCopy[role].switchLabel)
               return (
                 <button
@@ -181,7 +197,7 @@ export function MediaGallery({
                       src={resolveGalleryImageSrc(image, imageUrl, resolveSystemImageUrl)}
                       alt=""
                     />
-                    {roles.length > 0 ? (
+                    {roles.length > 0 || galleryOnly ? (
                       <div className={styles.tileBadges()}>
                         {roles.map((role) => (
                           <Badge
@@ -194,6 +210,16 @@ export function MediaGallery({
                             {mediaRoleSurfaceCopy[role].switchLabel}
                           </Badge>
                         ))}
+                        {galleryOnly ? (
+                          <Badge
+                            size="sm"
+                            appearance="soft"
+                            tone="neutral"
+                            className="max-w-full truncate"
+                          >
+                            {MEDIA_GALLERY_ONLY_LABEL}
+                          </Badge>
+                        ) : null}
                       </div>
                     ) : null}
                   </div>

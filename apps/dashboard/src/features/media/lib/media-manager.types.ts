@@ -15,10 +15,11 @@ export type MediaManagerSave = {
 import type { mediaImageUrl } from './media-display'
 export type MediaManagerContentContext = {
   domain: ContentMediaDomain
-  subject: SystemImageSubject
-  slug: string
   contentSource: ContentSource
+  subject?: SystemImageSubject
+  slug?: string
   rulesetId?: string
+  campaignImageSetId?: string
 }
 
 export type MediaManagerProps = {
@@ -35,6 +36,7 @@ export type MediaManagerProps = {
   initialSelectedImageId?: ContentMedia['images'][number]['id']
   maxItems?: number
   mode: 'form' | 'detail'
+  formMode?: 'create' | 'edit'
   contentContext?: MediaManagerContentContext
   onSave: (change: MediaManagerSave) => void | Promise<void>
   /** Storybook-only: force the body drop overlay without a live file drag. */

@@ -1,6 +1,6 @@
 import {
-  getAvailableContentImages,
   getContentMediaPolicy,
+  projectAvailableContentImages,
   resolveEffectiveRepresentativeImageId,
   type ContentMedia,
   type ContentMediaDomain,
@@ -10,6 +10,7 @@ import type { MediaFieldSummaryItem } from '@rpg/ui'
 import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from './media-display'
 import { resolveMediaFieldCapacity, type MediaFieldConfig } from './media-field-config'
 import type { MediaManagerContentContext } from './media-manager.types'
+import { resolveMediaContentAvailability } from './resolve-media-content-availability.lib'
 
 export type MediaFieldSummaryModel = {
   items: MediaFieldSummaryItem[]
@@ -17,6 +18,7 @@ export type MediaFieldSummaryModel = {
   galleryCount: number
   representativeId: string | undefined
   maxItems: number
+  contextStatus: 'complete' | 'incomplete'
 }
 
 export function buildMediaFieldSummaryModel(input: {
@@ -26,21 +28,17 @@ export function buildMediaFieldSummaryModel(input: {
 }): MediaFieldSummaryModel {
   const { config, media, contentContext } = input
   const policy = getContentMediaPolicy(config.domain as ContentMediaDomain)
-  const availableImages = contentContext
-    ? getAvailableContentImages({
-        media,
-        domain: contentContext.domain,
-        subject: contentContext.subject,
-        slug: contentContext.slug,
-        contentSource: contentContext.contentSource,
-        rulesetId: contentContext.rulesetId,
-      })
-    : []
+  const availability = resolveMediaContentAvailability({
+    media,
+    domain: config.domain as ContentMediaDomain,
+    contentContext,
+  })
+  const availableImages = projectAvailableContentImages(availability.sources)
   const systemImage = availableImages.find((image) => image.kind === 'system')
   const representativeId = resolveEffectiveRepresentativeImageId(
     media,
     policy.representativeRoles,
-    availableImages,
+    availability.sources,
   )
   const maxItems = resolveMediaFieldCapacity(config)
   const items: MediaFieldSummaryItem[] = [
@@ -66,5 +64,6 @@ export function buildMediaFieldSummaryModel(input: {
     galleryCount: items.length,
     representativeId,
     maxItems,
+    contextStatus: availability.contextStatus,
   }
 }

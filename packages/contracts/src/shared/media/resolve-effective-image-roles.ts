@@ -1,6 +1,6 @@
 import type { ContentMedia } from './content-media'
-import { roleAssignmentMatchesSelection } from './content-media-source'
-import type { AvailableContentImage } from './get-available-content-images'
+import type { AvailableContentMediaSource } from './resolve-available-content-media-sources'
+import { selectDisplaySourceForRole } from './select-display-source-for-role'
 import type { MediaRole } from './roles'
 
 export type EffectiveImageRoles = {
@@ -8,53 +8,42 @@ export type EffectiveImageRoles = {
   derivedRoles: MediaRole[]
 }
 
-function systemAvailableImageForId(
-  availableImages: AvailableContentImage[],
-  imageId: string,
-): Extract<AvailableContentImage, { kind: 'system' }> | undefined {
-  const image = availableImages.find((entry) => entry.id === imageId)
-  return image?.kind === 'system' ? image : undefined
-}
-
-/** Resolve role ownership for one gallery image, including derived system primary. */
+/** Resolve role ownership for one gallery image from canonical sources. */
 export function resolveEffectiveImageRoles(
-  media: ContentMedia,
+  _media: ContentMedia,
   imageId: string,
   allowedRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[],
+  sources: readonly AvailableContentMediaSource[],
 ): EffectiveImageRoles {
-  const roles = allowedRoles.filter((role) => {
-    const assignment = media.roles[role]
-    return assignment ? roleAssignmentMatchesSelection(assignment, imageId) : false
-  })
-
-  if (roles.length > 0) {
-    return { roles, derivedRoles: [] }
+  const source = sources.find((entry) => entry.id === imageId)
+  if (!source) {
+    return { roles: [], derivedRoles: [] }
   }
 
-  const systemImage = systemAvailableImageForId(availableImages, imageId)
-  if (systemImage) {
-    const assetRole = systemImage.source.assetRole as MediaRole
-    if (allowedRoles.includes(assetRole) && !media.roles[assetRole]) {
-      return { roles: [assetRole], derivedRoles: [assetRole] }
-    }
+  const persisted = allowedRoles.filter((role) =>
+    source.assignments.some((entry) => entry.role === role && entry.state === 'persisted'),
+  )
+  if (persisted.length > 0) {
+    return { roles: persisted, derivedRoles: [] }
   }
 
-  return { roles: [], derivedRoles: [] }
+  const derived = allowedRoles.filter((role) =>
+    source.assignments.some((entry) => entry.role === role && entry.state === 'derived'),
+  )
+  return { roles: derived, derivedRoles: derived }
 }
 
-/** Walk representative roles and return the gallery image that effectively owns the first match. */
+/** Representative field preview id from the same role selection as display resolution. */
 export function resolveEffectiveRepresentativeImageId(
   media: ContentMedia,
   representativeRoles: readonly MediaRole[],
-  availableImages: AvailableContentImage[],
+  sources: readonly AvailableContentMediaSource[],
 ): string | undefined {
   for (const role of representativeRoles) {
-    for (const image of availableImages) {
-      const { roles } = resolveEffectiveImageRoles(media, image.id, [role], availableImages)
-      if (roles.includes(role)) return image.id
+    const { source } = selectDisplaySourceForRole({ sources, media, role })
+    if (source) {
+      return source.id
     }
   }
-
-  return availableImages[0]?.id ?? media.images[0]?.id
+  return undefined
 }

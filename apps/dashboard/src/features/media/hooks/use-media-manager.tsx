@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useQueries } from '@tanstack/react-query'
 import {
-  getAvailableContentImages,
+  contentTypeSubject,
   getContentMediaPolicy,
   normalizePersistedContentMedia,
+  projectAvailableContentImages,
   resolveEffectiveImageRoles,
   roleAssignmentMatchesImageId,
+  roleAssignmentMatchesSelection,
   validateContentMedia,
-  type AvailableContentImage,
   type ContentMedia,
   type MediaAsset,
   type MediaRole,
@@ -22,9 +23,13 @@ import {
   isRemovableMediaSelection,
   mediaSessionReducer,
   resolvePostRemovalSelection,
-  type DeriveAvailableImages,
+  type DeriveMediaAvailability,
   type MediaAction,
 } from '../lib/media-session'
+import {
+  isBlockingMediaContextForEdit,
+  resolveMediaContentAvailability,
+} from '../lib/resolve-media-content-availability.lib'
 import { mediaErrorMessage, mediaImageUrl, systemContentImageUrl } from '../lib/media-display'
 import { mediaManagerStyles } from '../components/media-manager.variants'
 import {
@@ -58,24 +63,25 @@ type RemovedImageSnapshot = {
   fallbackSelectedId?: string
 }
 
-function resolveAvailableImages(
-  value: ContentMedia,
-  contentContext: MediaManagerProps['contentContext'],
-): AvailableContentImage[] {
-  if (!contentContext) {
-    return value.images.map((attachment) => ({
-      kind: 'upload' as const,
-      id: attachment.id,
-      attachment,
-    }))
+function normalizeManagerPersistedMedia(
+  media: ContentMedia,
+  contentContext: NonNullable<MediaManagerProps['contentContext']>,
+  allowedRoles: readonly MediaRole[],
+): ContentMedia {
+  if (
+    contentContext.contentSource === 'system' &&
+    !(contentContext.subject && contentContext.slug?.trim())
+  ) {
+    return structuredClone(media)
   }
-  return getAvailableContentImages({
-    media: value,
-    domain: contentContext.domain,
-    subject: contentContext.subject,
-    slug: contentContext.slug,
+
+  return normalizePersistedContentMedia({
+    media: structuredClone(media),
+    subject: contentContext.subject ?? contentTypeSubject('classes'),
+    slug: contentContext.slug ?? '',
     contentSource: contentContext.contentSource,
     rulesetId: contentContext.rulesetId,
+    allowedRoles,
   })
 }
 
@@ -96,37 +102,38 @@ export function useMediaManager({
   initialSelectedImageId,
   maxItems,
   contentContext,
+  formMode,
   systemImageUrl: resolveSystemImageUrl = systemContentImageUrl,
   onSave,
+  mode,
 }: MediaManagerProps) {
   const toast = useToastScope()
   const policy = getContentMediaPolicy(domain)
   const allowedRoles = policy.allowedRoles
-  const deriveAvailableImages = useCallback<DeriveAvailableImages>(
-    (media) => resolveAvailableImages(media, contentContext),
-    [contentContext],
+  const deriveAvailability = useCallback<DeriveMediaAvailability>(
+    (media) => resolveMediaContentAvailability({ media, domain, contentContext }),
+    [contentContext, domain],
   )
-  const initialAvailableImages = useMemo(
-    () => resolveAvailableImages(value, contentContext),
-    [contentContext, value],
-  )
+  const contextAvailability = useMemo(() => deriveAvailability(value), [deriveAvailability, value])
+  const contextBlocked = isBlockingMediaContextForEdit({
+    mode,
+    formMode,
+    availability: contextAvailability,
+  })
   const [state, dispatchReducer] = useReducer(
     (current: ReturnType<typeof createMediaSession>, action: MediaAction) =>
-      mediaSessionReducer(current, action, deriveAvailableImages),
+      mediaSessionReducer(current, action, deriveAvailability),
     undefined,
     () =>
-      createMediaSession(
-        value,
-        initialSelectedImageId,
-        allowedRoles,
-        initialAvailableImages.length > 0
-          ? initialAvailableImages
-          : resolveAvailableImages(value, contentContext),
-      ),
+      createMediaSession(value, initialSelectedImageId, allowedRoles, deriveAvailability(value)),
   )
   const sessionAvailableImages = useMemo(
-    () => deriveAvailableImages(state.media),
-    [deriveAvailableImages, state.media],
+    () => projectAvailableContentImages(deriveAvailability(state.media).sources),
+    [deriveAvailability, state.media],
+  )
+  const sessionSources = useMemo(
+    () => deriveAvailability(state.media).sources,
+    [deriveAvailability, state.media],
   )
   const [uploaded, setUploaded] = useState<Record<string, MediaAsset>>({})
   const [saving, setSaving] = useState(false)
@@ -371,16 +378,27 @@ export function useMediaManager({
     })
   }
 
-  const blocked = saving || !validation.ok || !metadataReady || uploads.entries.length > 0 || !dirty
+  const blocked =
+    contextBlocked ||
+    saving ||
+    !validation.ok ||
+    !metadataReady ||
+    uploads.entries.length > 0 ||
+    !dirty
   const canRemove = isRemovableMediaSelection(state.selectedId, sessionAvailableImages)
   const assignedRolesForSelection = state.selectedId
-    ? resolveEffectiveImageRoles(
-        state.media,
-        state.selectedId,
-        allowedRoles,
-        sessionAvailableImages,
-      ).roles
+    ? resolveEffectiveImageRoles(state.media, state.selectedId, allowedRoles, sessionSources).roles
     : []
+  const assignedSourceMissing = useMemo(() => {
+    for (const role of allowedRoles) {
+      const assignment = state.media.roles[role]
+      if (!assignment) continue
+      if (!sessionSources.some((source) => roleAssignmentMatchesSelection(assignment, source.id))) {
+        return true
+      }
+    }
+    return false
+  }, [allowedRoles, sessionSources, state.media])
 
   async function save() {
     if (blocked) return
@@ -388,19 +406,13 @@ export function useMediaManager({
     setError('')
     try {
       const normalizedMedia = contentContext
-        ? normalizePersistedContentMedia({
-            media: structuredClone(state.media),
-            subject: contentContext.subject,
-            slug: contentContext.slug,
-            contentSource: contentContext.contentSource,
-            rulesetId: contentContext.rulesetId,
-            allowedRoles,
-          })
+        ? normalizeManagerPersistedMedia(state.media, contentContext, allowedRoles)
         : structuredClone(state.media)
+      const revision = value.revision
 
       await onSave({
-        media: normalizedMedia,
-        expectedMediaRevision: state.initial.revision,
+        media: { ...normalizedMedia, revision },
+        expectedMediaRevision: revision,
         assets: Object.values(assets),
       })
       for (const toastId of removedSnapshots.current.keys()) {
@@ -444,7 +456,11 @@ export function useMediaManager({
     notifyRejectedDrop,
     resolveSystemImageUrl,
     sessionAvailableImages,
+    sessionSources,
     assignedRolesForSelection,
+    contextBlocked,
+    contextAvailability,
+    assignedSourceMissing,
   }
 }
 

@@ -57,9 +57,16 @@ describe('ContentMediaImage', () => {
     )
 
     const img = container.querySelector('img')
-    expect(img).toHaveClass('object-fill', 'object-left-top')
+    expect(img).toHaveClass('absolute', 'object-fill', 'object-left-top')
     expect(img).not.toHaveClass('object-cover')
-    expect(img).toHaveStyle({ width: '200%', height: '200%' })
+    expect(img).toHaveStyle({
+      width: '200%',
+      height: '200%',
+      left: '-20%',
+      top: '-40%',
+    })
+    expect(img?.style.marginLeft).toBe('')
+    expect(img?.style.marginTop).toBe('')
     expect(img?.style.objectPosition).toBe('')
   })
 
@@ -97,7 +104,12 @@ describe('ContentMediaImage', () => {
 
     const img = container.querySelector('img')
     expect(img).toHaveClass('object-fill')
-    expect(img).toHaveStyle({ width: '200%', height: '200%' })
+    expect(img).toHaveStyle({
+      width: '200%',
+      height: '200%',
+      left: '-20%',
+      top: '-40%',
+    })
     expect(img?.style.objectPosition).toBe('')
   })
 
@@ -239,8 +251,10 @@ describe('ContentMediaImage', () => {
       expect(img).toHaveStyle({
         width: `${builderCardDerivedLayout.widthPercent}%`,
         height: `${builderCardDerivedLayout.heightPercent}%`,
-        marginTop: `${builderCardDerivedLayout.offsetYPercent}%`,
+        left: `${builderCardDerivedLayout.offsetXPercent}%`,
+        top: `${builderCardDerivedLayout.offsetYPercent}%`,
       })
+      expect(img?.style.marginTop).toBe('')
     }
   })
 })

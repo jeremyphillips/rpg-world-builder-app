@@ -186,17 +186,13 @@ export function MediaWorkspaceSelection({
   assignedRoles: MediaRole[]
   interaction?: string
 }) {
-  const {
-    state,
-    resolveSystemImageUrl = systemContentImageUrl,
-    sessionAvailableImages,
-  } = controller
+  const { state, resolveSystemImageUrl = systemContentImageUrl, sessionSources } = controller
   const activeRole = state.presentation
   const isActiveForSelection = resolveEffectiveImageRoles(
     state.media,
     selectedAvailable.id,
     [activeRole],
-    sessionAvailableImages,
+    sessionSources,
   ).roles.includes(activeRole)
   const context = resolveSelectionContext({
     selectedAvailable,

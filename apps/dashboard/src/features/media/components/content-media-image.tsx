@@ -102,8 +102,8 @@ export function ContentMediaImage({
             ? {
                 width: `${cropLayout.widthPercent}%`,
                 height: `${cropLayout.heightPercent}%`,
-                marginLeft: `${cropLayout.offsetXPercent}%`,
-                marginTop: `${cropLayout.offsetYPercent}%`,
+                left: `${cropLayout.offsetXPercent}%`,
+                top: `${cropLayout.offsetYPercent}%`,
               }
             : renderMode === 'cover'
               ? { objectPosition: resolveCoverObjectPosition(compatibleDisplay, frame) }
