@@ -24,6 +24,17 @@ Data entries are complete sentences or short passages. Supported tokens include
 requires and must not make campaign claims that are not represented by the
 supplied reference.
 
+All additions and revisions must pass the
+[character narrative authoring standard](docs/authoring.md). Schema validity does
+not replace the guide's playable-specificity, experience, distinctiveness, and
+editorial composition checks.
+
+The current collection's
+[coverage inventory](docs/foundation-inventory.generated.md),
+[fixed composition fixture](docs/foundation-composition-review.generated.md), and
+[editorial acceptance record](docs/foundation-composition-review.md) are committed
+so later revisions can be compared against the same baseline.
+
 ## Public API
 
 ```ts
@@ -42,4 +53,6 @@ later use the same validated collection shape.
 pnpm --filter @rpg/character-narrative-data typecheck
 pnpm --filter @rpg/character-narrative-data lint
 pnpm --filter @rpg/character-narrative-data test
+pnpm --filter @rpg/character-narrative-data review:inventory
+pnpm --filter @rpg/character-narrative-integrations review:foundation
 ```
