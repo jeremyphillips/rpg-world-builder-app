@@ -177,6 +177,69 @@ export function focalPointFromCropCenter(crop: NormalizedCrop): NormalizedFocalP
   }
 }
 
+const FRAME_CROP_ASPECT_MATCH_EPSILON = 1e-9
+
+function roleAndFrameAspectsMatch(roleAspectRatio: number, frameAspectRatio: number): boolean {
+  return Math.abs(roleAspectRatio - frameAspectRatio) <= FRAME_CROP_ASPECT_MATCH_EPSILON
+}
+
+/** Whether `inner` lies entirely within `outer` in normalized source space. */
+export function isNormalizedCropContainedIn(inner: NormalizedCrop, outer: NormalizedCrop): boolean {
+  return (
+    inner.x >= outer.x - Number.EPSILON &&
+    inner.y >= outer.y - Number.EPSILON &&
+    inner.x + inner.width <= outer.x + outer.width + Number.EPSILON &&
+    inner.y + inner.height <= outer.y + outer.height + Number.EPSILON
+  )
+}
+
+/**
+ * Derive a frame-aspect window inside an authored role crop. The result never extends
+ * outside `roleCrop`. Focal point (else crop center) guides placement when clamping.
+ */
+export function deriveFrameCropWithinRoleCrop(
+  roleCrop: NormalizedCrop,
+  roleAspectRatio: number,
+  frameAspectRatio: number,
+  focalPoint?: NormalizedFocalPoint,
+): NormalizedCrop {
+  if (roleAndFrameAspectsMatch(roleAspectRatio, frameAspectRatio)) {
+    return roleCrop
+  }
+
+  let innerWidth: number
+  let innerHeight: number
+
+  if (frameAspectRatio >= roleAspectRatio) {
+    innerWidth = roleCrop.width
+    innerHeight = (roleCrop.height * roleAspectRatio) / frameAspectRatio
+  } else {
+    innerHeight = roleCrop.height
+    innerWidth = (roleCrop.width * frameAspectRatio) / roleAspectRatio
+  }
+
+  const centerX = focalPoint?.x ?? roleCrop.x + roleCrop.width / 2
+  const centerY = focalPoint?.y ?? roleCrop.y + roleCrop.height / 2
+
+  const clampedCenterX = clamp(
+    centerX,
+    roleCrop.x + innerWidth / 2,
+    roleCrop.x + roleCrop.width - innerWidth / 2,
+  )
+  const clampedCenterY = clamp(
+    centerY,
+    roleCrop.y + innerHeight / 2,
+    roleCrop.y + roleCrop.height - innerHeight / 2,
+  )
+
+  return {
+    x: clampedCenterX - innerWidth / 2,
+    y: clampedCenterY - innerHeight / 2,
+    width: innerWidth,
+    height: innerHeight,
+  }
+}
+
 /** Convert transient pan/zoom editor state into a normalized crop rectangle. */
 export function cropFromPanZoom(state: PanZoomState): NormalizedCrop {
   const { sourceWidth, sourceHeight, viewportSize, zoom, panX, panY } = state

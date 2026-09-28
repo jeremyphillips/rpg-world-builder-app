@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
+import { deriveFrameCropWithinRoleCrop, resolveNormalizedCropImageLayout } from '@rpg/contracts'
+
 import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
 
 import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
@@ -179,5 +181,54 @@ describe('ContentMediaImage', () => {
     )
 
     expect(container.querySelector('img')).not.toHaveClass('mix-blend-multiply')
+  })
+
+  const sharedPrimaryCrop = { x: 0, y: 0.1, width: 0.9, height: 0.675 } as const
+  const builderCardDerivedCrop = deriveFrameCropWithinRoleCrop(sharedPrimaryCrop, 4 / 3, 2)
+  const builderCardDerivedLayout = resolveNormalizedCropImageLayout(builderCardDerivedCrop)
+
+  it('uses cover defaults for untouched primary on builderCard', () => {
+    const { container } = render(
+      <ContentMediaImage
+        display={{ src: '/fighter.jpeg', role: 'primary', sourceKind: 'system' }}
+        alt="Fighter"
+        frame="builderCard"
+      />,
+    )
+
+    const img = container.querySelector('img')
+    expect(img).toHaveClass('object-cover')
+    expect(img).toHaveStyle({
+      objectPosition: CONTENT_IMAGE_PRESENTATION_DEFAULTS.builderCard.objectPosition,
+    })
+  })
+
+  it('derives the same 2:1 window for system and upload primary crops on builderCard', () => {
+    const displays = [
+      {
+        src: '/fighter.jpeg',
+        role: 'primary' as const,
+        sourceKind: 'system' as const,
+        crop: sharedPrimaryCrop,
+      },
+      {
+        src: '/upload.jpg',
+        role: 'primary' as const,
+        sourceKind: 'upload' as const,
+        crop: sharedPrimaryCrop,
+      },
+    ]
+
+    for (const display of displays) {
+      const { container } = render(
+        <ContentMediaImage display={display} alt="Art" frame="builderCard" />,
+      )
+      const img = container.querySelector('img')
+      expect(img).toHaveClass('object-fill')
+      expect(img).toHaveStyle({
+        width: `${builderCardDerivedLayout.widthPercent}%`,
+        height: `${builderCardDerivedLayout.heightPercent}%`,
+      })
+    }
   })
 })

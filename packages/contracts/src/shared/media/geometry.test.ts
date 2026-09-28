@@ -6,9 +6,11 @@ import { createUploadRoleAssignment } from './content-media-source'
 import {
   cropFromFocalPoint,
   cropFromPanZoom,
+  deriveFrameCropWithinRoleCrop,
   fixedAspectRoleEligibility,
   focalPointFromCropCenter,
   isFixedAspectCrop,
+  isNormalizedCropContainedIn,
   isSquareCrop,
   meetsFixedAspectMinimum,
   meetsPortraitMinimumCrop,
@@ -22,6 +24,40 @@ import {
 import { getFixedAspectCropSpec } from './role-crop-spec'
 import { validateContentMedia } from './validate-content-media'
 import { getContentMediaPolicy } from './media-policy'
+
+const primaryRoleCrop = { x: 0, y: 0.1, width: 0.9, height: 0.675 } as const
+const primaryAspect = 4 / 3
+
+describe('deriveFrameCropWithinRoleCrop', () => {
+  it('returns the role crop when frame aspect matches the role aspect', () => {
+    expect(deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, primaryAspect)).toEqual(
+      primaryRoleCrop,
+    )
+  })
+
+  it('derives a 2:1 window inside a 4:3 primary crop', () => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2)
+    expect(derived.width).toBeCloseTo(0.9)
+    expect(derived.height).toBeCloseTo(0.45)
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+  })
+
+  it('derives a 1:1 window inside a 4:3 primary crop', () => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 1)
+    expect(derived.width).toBeCloseTo(0.675)
+    expect(derived.height).toBeCloseTo(0.675)
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+  })
+
+  it('clamps a focal-guided window inside the role crop', () => {
+    const derived = deriveFrameCropWithinRoleCrop(primaryRoleCrop, primaryAspect, 2, {
+      x: 0.05,
+      y: 0.15,
+    })
+    expect(isNormalizedCropContainedIn(derived, primaryRoleCrop)).toBe(true)
+    expect(derived.x).toBeGreaterThanOrEqual(primaryRoleCrop.x)
+  })
+})
 
 describe('resetPortraitCrop', () => {
   it('centers the largest square on landscape sources', () => {
