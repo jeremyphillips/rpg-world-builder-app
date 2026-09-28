@@ -1,60 +1,57 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { PageShell } from '@/components/layout/page/page-shell'
-import { PageLoadState } from '@/components/layout/page/page-load-state'
 
-import { CampaignOverviewInvitationsSection } from '../components/overview/campaign-overview-invitations-section'
+import { CampaignBannerUploadAlert } from '../components/campaign-banner-upload-alert'
 import { CampaignOverviewHero } from '../components/overview/campaign-overview-hero'
-import { CampaignOverviewMembersSection } from '../components/overview/campaign-overview-members-section'
-import { CampaignOverviewPartySection } from '../components/overview/campaign-overview-party-section'
+import { InviteMemberDialog } from '../components/overview/invite-member-dialog'
 import { useCampaignOverviewData } from '../hooks/use-campaign-overview-data'
 import { useCampaigns } from '../hooks/use-campaigns'
 import { useCanManageCampaign } from '../hooks/use-can-manage-campaign'
-import { CampaignBannerUploadAlert } from '../components/campaign-banner-upload-alert'
+import { CampaignOverviewPageBody } from './campaign-overview-page-body'
 
-/** Campaign overview — members, invitations, and party sections. */
+/** Campaign overview — party, members, and invitations. */
 export function CampaignDetail() {
   const { campaignId } = useParams<{ campaignId: string }>()
   const { data: campaigns } = useCampaigns()
   const canManage = useCanManageCampaign(campaignId)
   const overview = useCampaignOverviewData(campaignId, canManage)
+  const [inviteOpen, setInviteOpen] = useState(false)
 
   const campaign = campaigns?.find((item) => item.id === campaignId)
+  const onInviteMember = canManage ? () => setInviteOpen(true) : undefined
+  const showHero = Boolean(campaign && campaignId)
+  const showInviteDialog = canManage && Boolean(campaignId)
 
   return (
     <PageShell width="wide" rhythm="list">
       <CampaignBannerUploadAlert />
-      {campaign && campaignId ? (
-        <CampaignOverviewHero campaign={campaign} campaignId={campaignId} canManage={canManage} />
+      {showHero ? (
+        <CampaignOverviewHero
+          campaign={campaign!}
+          campaignId={campaignId!}
+          canManage={canManage}
+          onInviteMember={onInviteMember}
+        />
       ) : null}
 
-      <PageLoadState
-        isPending={overview.isPending}
-        isError={overview.isError}
-        errorLabel={overview.errorLabel}
-        defaultErrorLabel="Could not load campaign overview."
-      >
-        <div className="space-y-8">
-          <CampaignOverviewMembersSection
-            members={overview.members}
-            campaignId={campaignId}
-            canManage={canManage}
-          />
-          {canManage && campaignId ? (
-            <CampaignOverviewInvitationsSection
-              campaignId={campaignId}
-              invites={overview.invites}
-            />
-          ) : null}
-          {campaignId ? (
-            <CampaignOverviewPartySection
-              campaignId={campaignId}
-              party={overview.party}
-              openControlledCharacterIds={campaign?.openControlledCharacterIds ?? []}
-            />
-          ) : null}
-        </div>
-      </PageLoadState>
+      {showInviteDialog ? (
+        <InviteMemberDialog
+          campaignId={campaignId!}
+          open={inviteOpen}
+          onOpenChange={setInviteOpen}
+          showTrigger={false}
+        />
+      ) : null}
+
+      <CampaignOverviewPageBody
+        campaignId={campaignId}
+        campaign={campaign}
+        overview={overview}
+        canManage={canManage}
+        onInviteMember={onInviteMember}
+      />
     </PageShell>
   )
 }

@@ -16,6 +16,12 @@ export {
 export { CharacterBuilderDraftRestore } from './components/builder/chrome/character-builder-draft-restore'
 export { CharacterListCard } from './components/character-list-card'
 export type { CharacterListCardData } from './components/character-list-card.lib'
+export { CharacterListRow } from './components/character-list-row'
+export type { CharacterListRowProps } from './components/character-list-row'
+export {
+  buildCharacterListRowPresentation,
+  type BuildCharacterListRowPresentationInput,
+} from './lib/display/character-list-row.lib'
 export { useBuildContext, type BuildContextResult } from './hooks/use-build-context'
 export {
   useCampaignBuildContext,

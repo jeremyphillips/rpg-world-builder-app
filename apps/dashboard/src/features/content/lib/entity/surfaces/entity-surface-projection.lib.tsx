@@ -15,6 +15,13 @@ function resolveEntitySurfaceMediaFrame(density: ContentCardDensity): ContentMed
   return density === 'compact' ? 'square' : 'insetSm'
 }
 
+export function buildEntitySurfaceLeadingMediaNode(
+  identity: EntitySurfaceIdentity,
+  density: ContentCardDensity = 'compact',
+) {
+  return buildEntitySurfaceMedia(identity, density)
+}
+
 function buildEntitySurfaceMedia(identity: EntitySurfaceIdentity, density: ContentCardDensity) {
   const className = contentCardMediaVariants({ density })
 

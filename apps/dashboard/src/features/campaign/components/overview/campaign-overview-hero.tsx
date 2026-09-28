@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import type { Campaign, CampaignListItem } from '@rpg/contracts'
 import {
@@ -17,7 +17,6 @@ import { ROUTES } from '@/app/routes'
 import { MESSAGES_ACTION_COPY } from '@/features/message'
 
 import { CampaignMetaLine } from '../campaign-meta-line'
-import { InviteMemberDialog } from './invite-member-dialog'
 import { buildCampaignOverviewHeroBadges } from '../../lib/overview/campaign-overview-hero-meta.lib'
 import {
   resolveCampaignBannerImageUrl,
@@ -30,6 +29,7 @@ type CampaignOverviewHeroProps = {
   campaign: Campaign | CampaignListItem
   campaignId: string
   canManage: boolean
+  onInviteMember?: () => void
 }
 
 function CampaignOverviewHeroRouterLink({ href, className, children }: RowActionsMenuLinkProps) {
@@ -44,8 +44,8 @@ export function CampaignOverviewHero({
   campaign,
   campaignId,
   canManage,
+  onInviteMember,
 }: CampaignOverviewHeroProps) {
-  const [inviteOpen, setInviteOpen] = useState(false)
   const bannerUrl = resolveCampaignBannerImageUrl(campaign.identity.media)
   const emblemUrl = resolveCampaignEmblemImageUrl(campaign.identity.media)
   const gameMasterStyle = resolveCampaignGameMasterDisplayStyle()
@@ -61,14 +61,14 @@ export function CampaignOverviewHero({
   )
 
   const menuItems = [
-    ...(canManage
+    ...(canManage && onInviteMember
       ? [
           {
             kind: 'action' as const,
             id: 'invite-member',
             label: 'Invite member',
             icon: <ActionIcon action="invite" step="md" />,
-            onSelect: () => setInviteOpen(true),
+            onSelect: onInviteMember,
           },
         ]
       : []),
@@ -131,14 +131,6 @@ export function CampaignOverviewHero({
           ) : undefined
         }
       />
-      {canManage ? (
-        <InviteMemberDialog
-          campaignId={campaignId}
-          open={inviteOpen}
-          onOpenChange={setInviteOpen}
-          showTrigger={false}
-        />
-      ) : null}
     </>
   )
 }

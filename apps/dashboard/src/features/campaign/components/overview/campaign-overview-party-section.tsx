@@ -1,9 +1,9 @@
 import type { CampaignPartyPcListItem } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
-import { CharacterListCard } from '@/features/character'
+import { CharacterListRow } from '@/features/character'
 import { normalizePartyController, resolveCharacterControllerDisplay } from '@/features/character'
+import { DetailCollectionPanel, RelationshipList } from '@/features/content'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -16,38 +16,40 @@ export type CampaignOverviewPartySectionProps = {
   openControlledCharacterIds: readonly string[]
 }
 
-/** Campaign party PCs composed server-side with controlling member metadata. */
+/** Campaign party PCs in a DetailCollectionPanel with compact character list rows. */
 export function CampaignOverviewPartySection({
   campaignId,
   party,
   openControlledCharacterIds,
 }: CampaignOverviewPartySectionProps) {
   return (
-    <section aria-labelledby="campaign-overview-party-heading" className="space-y-4">
-      <Heading variant="group" as="h2" id="campaign-overview-party-heading">
-        {CAMPAIGN_OVERVIEW_SECTION_LABELS.party}
-      </Heading>
-
-      {party.length === 0 ? (
-        <Text variant="muted">{CAMPAIGN_OVERVIEW_EMPTY_TEXT.party}</Text>
-      ) : (
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {party.map((entry) => (
-            <li key={entry.character.id}>
-              <CharacterListCard
+    <DetailCollectionPanel
+      heading={CAMPAIGN_OVERVIEW_SECTION_LABELS.party}
+      headingId="campaign-overview-party-heading"
+      headerAlign="center"
+      bodySurface="transparent"
+    >
+      <RelationshipList.Root
+        itemCount={party.length}
+        emptyLabel={CAMPAIGN_OVERVIEW_EMPTY_TEXT.party}
+      >
+        {party.length > 0 ? (
+          <RelationshipList.Group itemCount={party.length}>
+            {party.map((entry) => (
+              <CharacterListRow
+                key={entry.character.id}
                 card={entry.character}
                 detailHref={ROUTES.campaign.characters.detail(campaignId, entry.character.id)}
-                showCampaign={false}
                 controllerLine={resolveCharacterControllerDisplay({
                   controller: normalizePartyController(entry.member),
                   viewerControlsCharacter: openControlledCharacterIds.includes(entry.character.id),
                 })}
                 rosterStatus={entry.roster.status}
               />
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+            ))}
+          </RelationshipList.Group>
+        ) : null}
+      </RelationshipList.Root>
+    </DetailCollectionPanel>
   )
 }

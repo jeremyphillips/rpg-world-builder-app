@@ -73,9 +73,20 @@ not accidental DRY through private component variants.
 ```text
 DetailEntityRow
 └── EntityAnatomy
+    ├── optional leadingMedia (ReactNode — project domain art upstream)
     ├── optional disclosure
     └── trailing (EntityAnatomyTrailing)
 ```
+
+`RelationshipList.Row` forwards the same **`leadingMedia`** contract. Do not pass
+`ContentDisplayImage` into list rows — use `buildEntitySurfaceLeadingMediaNode` or
+`DetailRowLeadingMedia` in feature projection code first.
+
+**Geometry rule:** any `leadingMedia` node must be **self-bounded** via
+[`DetailRowLeadingMedia`](row/detail-row-leading-media.tsx) (`shape` + `size`, default
+`box` + `xs`). The shell composes `IdentityFrame` tokens — not `contentCardMediaVariants`.
+Children fill the frame (`size-full`); intrinsic image dimensions must never size the row.
+User avatars: [`DetailRowLeadingAvatar`](row/detail-row-leading-avatar.tsx).
 
 Companion primitives (composed by features, not imported by `DetailEntityRow` itself):
 

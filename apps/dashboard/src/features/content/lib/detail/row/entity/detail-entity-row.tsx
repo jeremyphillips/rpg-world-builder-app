@@ -30,6 +30,8 @@ export type DetailEntityRowProps = {
   headingSuffix?: ReactNode
   subheading?: ReactNode
   metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
+  /** Leading entity media lane — domain types project to a node upstream. */
+  leadingMedia?: ReactNode
   trailing?: EntityAnatomyTrailing
   trailingAlign?: 'start' | 'center'
   inset?: 'self' | 'parent'
@@ -88,6 +90,7 @@ function DetailEntityRowIdentity(
     | 'metadata'
     | 'trailing'
     | 'trailingAlign'
+    | 'leadingMedia'
   > & {
     leadingUtilities?: readonly ReactNode[]
   },
@@ -98,19 +101,25 @@ function DetailEntityRowIdentity(
     headingSuffix,
     subheading,
     metadata,
+    leadingMedia,
     trailing,
     trailingAlign,
     leadingUtilities,
   } = props
 
+  const summaryModel = projectEntitySummaryModel({
+    heading,
+    classification: headingSuffix,
+    description: subheading,
+    status: metadata,
+  })
+
   return (
     <EntityAnatomy
-      entity={projectEntitySummaryModel({
-        heading,
-        classification: headingSuffix,
-        description: subheading,
-        status: metadata,
-      })}
+      entity={{
+        ...summaryModel,
+        ...(leadingMedia != null ? { media: leadingMedia } : {}),
+      }}
       headingHref={headingHref}
       leadingUtilities={leadingUtilities}
       trailing={trailing}
@@ -126,6 +135,7 @@ export function DetailEntityRow({
   headingSuffix,
   subheading,
   metadata,
+  leadingMedia,
   trailing,
   trailingAlign,
   inset = 'self',
@@ -144,6 +154,7 @@ export function DetailEntityRow({
           headingSuffix={headingSuffix}
           subheading={subheading}
           metadata={metadata}
+          leadingMedia={leadingMedia}
           trailing={trailing}
           trailingAlign={trailingAlign}
         />
@@ -168,6 +179,7 @@ export function DetailEntityRow({
           headingSuffix={headingSuffix}
           subheading={subheading}
           metadata={metadata}
+          leadingMedia={leadingMedia}
           trailing={trailing}
           trailingAlign={trailingAlign}
           leadingUtilities={[

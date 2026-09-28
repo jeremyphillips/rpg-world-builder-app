@@ -81,7 +81,10 @@ export function EntityAnatomy({
         </div>
       ) : null}
       <div className={entityAnatomyContentVariants({ density })} data-entity-item-slot="content">
-        {resolvedEntity.media ? <div className="shrink-0">{resolvedEntity.media}</div> : null}
+        {resolvedEntity.media ? (
+          // Alignment-only wrapper — leading media must be self-bounded (e.g. DetailRowLeadingMedia).
+          <div className="shrink-0">{resolvedEntity.media}</div>
+        ) : null}
         <EntitySummary
           entity={resolvedEntity}
           density={density}

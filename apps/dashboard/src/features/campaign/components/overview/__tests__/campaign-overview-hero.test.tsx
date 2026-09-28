@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -11,6 +12,7 @@ import { renderWithProviders } from '@/test/render'
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 import { CampaignOverviewHero } from '../campaign-overview-hero'
+import { InviteMemberDialog } from '../invite-member-dialog'
 
 const mutateAsync = vi.fn()
 
@@ -92,7 +94,28 @@ describe('CampaignOverviewHero', () => {
 
   it('lists invite first for managers and opens the invite dialog from the menu', async () => {
     const user = userEvent.setup()
-    renderHero({ canManage: true })
+
+    function InviteHarness() {
+      const [inviteOpen, setInviteOpen] = useState(false)
+      return (
+        <>
+          <CampaignOverviewHero
+            campaign={campaign}
+            campaignId="camp_1"
+            canManage
+            onInviteMember={() => setInviteOpen(true)}
+          />
+          <InviteMemberDialog
+            campaignId="camp_1"
+            open={inviteOpen}
+            onOpenChange={setInviteOpen}
+            showTrigger={false}
+          />
+        </>
+      )
+    }
+
+    renderWithProviders(<InviteHarness />)
 
     await user.click(screen.getByRole('button', { name: 'Open actions for Sunless Citadel' }))
 

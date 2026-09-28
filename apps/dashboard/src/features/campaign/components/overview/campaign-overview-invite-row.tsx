@@ -1,20 +1,25 @@
 import { useState } from 'react'
 import type { CampaignInviteAdminListItem } from '@rpg/contracts'
-import { ActionIcon, ConfirmDialog, RowActionsMenu } from '@rpg/ui'
+import { ActionIcon, ConfirmDialog } from '@rpg/ui'
 import { Link2 } from 'lucide-react'
 
-import { CAMPAIGN_INVITE_ROW_ACTION_COPY } from '../../lib/overview/campaign-overview-labels'
+import { RelationshipList } from '@/features/content'
+
 import {
   useRevokeCampaignInvite,
   useShareCampaignInviteLink,
 } from '../../hooks/use-campaign-invite-mutations'
+import {
+  CAMPAIGN_INVITE_ROW_ACTION_COPY,
+  formatInvitationStatusLine,
+} from '../../lib/overview/campaign-overview-labels'
 
-export type CampaignInviteRowActionsProps = {
+export type CampaignOverviewInviteRowProps = {
   campaignId: string
   invite: CampaignInviteAdminListItem
 }
 
-export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteRowActionsProps) {
+export function CampaignOverviewInviteRow({ campaignId, invite }: CampaignOverviewInviteRowProps) {
   const [shareOpen, setShareOpen] = useState(false)
   const [revokeOpen, setRevokeOpen] = useState(false)
   const shareMutation = useShareCampaignInviteLink(campaignId)
@@ -42,27 +47,31 @@ export function CampaignInviteRowActions({ campaignId, invite }: CampaignInviteR
 
   return (
     <>
-      <RowActionsMenu
-        triggerLabel={`Open actions for ${invite.email}`}
-        disabled={isPending}
-        items={[
-          {
-            kind: 'action',
-            id: 'share-link',
-            label: CAMPAIGN_INVITE_ROW_ACTION_COPY.shareLink,
-            icon: <Link2 />,
-            onSelect: () => setShareOpen(true),
-          },
-          {
-            kind: 'action',
-            id: 'revoke',
-            label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
-            icon: <ActionIcon action="remove" />,
-            destructive: true,
-            separatorBefore: true,
-            onSelect: () => setRevokeOpen(true),
-          },
-        ]}
+      <RelationshipList.Row
+        title={invite.email}
+        description={formatInvitationStatusLine(invite)}
+        overflowTriggerIcon="vertical"
+        menu={{
+          label: `Open actions for ${invite.email}`,
+          items: [
+            {
+              id: 'share-link',
+              label: CAMPAIGN_INVITE_ROW_ACTION_COPY.shareLink,
+              icon: <Link2 />,
+              disabled: isPending,
+              onSelect: () => setShareOpen(true),
+            },
+            {
+              id: 'revoke',
+              label: CAMPAIGN_INVITE_ROW_ACTION_COPY.revokePending,
+              icon: <ActionIcon action="remove" />,
+              destructive: true,
+              separatorBefore: true,
+              disabled: isPending,
+              onSelect: () => setRevokeOpen(true),
+            },
+          ],
+        }}
       />
 
       <ConfirmDialog

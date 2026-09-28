@@ -60,6 +60,22 @@ describe('RelationshipList layout mechanics', () => {
     expect(screen.getByText('No governing organization.')).toBeInTheDocument()
   })
 
+  it('forwards leadingMedia to the row anatomy', () => {
+    render(
+      <RelationshipList.Root itemCount={1}>
+        <RelationshipList.Group itemCount={1}>
+          <RelationshipList.Row
+            title="Member"
+            leadingMedia={<span data-testid="leading-media">Art</span>}
+          />
+        </RelationshipList.Group>
+      </RelationshipList.Root>,
+    )
+
+    expect(screen.getByTestId('leading-media')).toBeInTheDocument()
+    expect(screen.getByText('Member')).toBeInTheDocument()
+  })
+
   it('renders record-separated rows when group itemCount is greater than 0', () => {
     const { container } = render(
       <RelationshipList.Root itemCount={2}>

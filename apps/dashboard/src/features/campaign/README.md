@@ -43,13 +43,13 @@ acquisition model (axes, ownership, build/import finalization).
 
 ## Invite ownership
 
-| Concern                                | Location                                                                                           |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Manager send-invite dialog             | `components/overview/invite-member-dialog.tsx`                                                     |
-| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-invite-row-actions.tsx` |
-| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                             |
-| Invite review card                     | `features/campaign-invite/`                                                                        |
-| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                          |
+| Concern                                | Location                                                                                            |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Manager send-invite dialog             | `components/overview/invite-member-dialog.tsx`                                                      |
+| Overview invite list / row actions     | `components/overview/campaign-overview-invitations-section.tsx`, `campaign-overview-invite-row.tsx` |
+| Pending invite promotions (home/index) | `components/recovery/pending-campaign-invitation*.tsx`                                              |
+| Invite review card                     | `features/campaign-invite/`                                                                         |
+| Form schemas (dialog + create wizard)  | `lib/forms/invite-member-form-fields.ts`, `invite-members-form-fields.ts`                           |
 
 ## Player onboarding
 
