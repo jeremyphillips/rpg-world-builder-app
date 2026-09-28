@@ -15,7 +15,7 @@ import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
 import {
   fieldGroupLegendVariants,
-  resolveArrayLegendClassName,
+  fieldLabelTypographyVariants,
   type FieldGroupLegendSize,
   type FieldRhythm,
 } from './field.variants'
@@ -28,6 +28,8 @@ export interface FieldGroupProps {
   legend?: string
   /** Non-interactive status beside the legend label (badges, static text). */
   legendAccessory?: ReactNode
+  /** Trailing header action aligned to the legend row end (compact inline controls). */
+  legendAction?: ReactNode
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -70,6 +72,7 @@ export interface FieldGroupProps {
 export function FieldGroup({
   legend,
   legendAccessory,
+  legendAction,
   legendSize = 'section',
   size,
   rhythm = resolveFormDensity().rhythm,
@@ -88,7 +91,7 @@ export function FieldGroup({
   const resolvedFieldSize = size ?? resolveFormDensity('compact').size
   const legendTypography =
     legendSize === 'array'
-      ? resolveArrayLegendClassName(resolvedFieldSize)
+      ? fieldLabelTypographyVariants({ size: resolvedFieldSize })
       : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({
@@ -143,8 +146,10 @@ export function FieldGroup({
       legend={legend}
       description={description}
       legendAccessory={legendAccessory}
+      legendAction={legendAction}
       legendSize={legendSize}
       legendTypography={legendTypography}
+      fieldSize={resolvedFieldSize}
       rhythm={rhythm}
       className={className}
       uiStateKey={uiStateKey}

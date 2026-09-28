@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildOrganizationPresetOwnedEditableSnapshot,
+  listOrganizationPresetOwnedEditableDivergentFieldKeys,
   organizationPresetOwnedEditableMatchesRecipe,
 } from './organization-preset-recipe.lib'
 
@@ -15,6 +16,19 @@ describe('organization preset owned editable recipe', () => {
       classAffinityIds: ['class-b', 'class-a'],
     }
     expect(organizationPresetOwnedEditableMatchesRecipe(current, expected)).toBe(true)
+  })
+
+  it('lists divergent preset-owned field keys in stable order', () => {
+    const expected = buildOrganizationPresetOwnedEditableSnapshot('bank', ['class-a'])
+    const current = {
+      ...expected,
+      organizationDomain: 'government' as typeof expected.organizationDomain,
+      practices: ['brewing' as const],
+    }
+    expect(listOrganizationPresetOwnedEditableDivergentFieldKeys(current, expected)).toEqual([
+      'organizationDomain',
+      'practices',
+    ])
   })
 
   it('detects divergence in class affinity ids', () => {

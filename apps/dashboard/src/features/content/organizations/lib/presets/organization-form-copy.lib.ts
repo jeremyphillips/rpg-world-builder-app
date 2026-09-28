@@ -4,6 +4,7 @@ export const ORGANIZATION_STARTING_POINT_HINT =
   'Prefills the organization profile, common member classes, and membership titles. You can customize these afterward.'
 
 export const ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL = 'Customized'
+export const ORGANIZATION_SET_UP_MANUALLY_LABEL = 'Set up manually'
 
 export const ORGANIZATION_PROFILE_GROUP_LEGEND = 'Organization profile'
 export const ORGANIZATION_PROFILE_GROUP_DESCRIPTION =
@@ -33,8 +34,29 @@ export function organizationChangeStartingPointDialogTitle(): string {
   return 'Change starting point?'
 }
 
-export function organizationChangeStartingPointDialogBody(presetLabel: string): string {
-  return `Applying ${presetLabel} will replace your current Domain, Form, Functions, Practices, and Classes with the values from that starting point. Membership titles will also be replaced with ${presetLabel} defaults. Other organization details will not change.`
+function formatStartingPointOverwriteFieldList(fieldLabels: readonly string[]): string {
+  if (fieldLabels.length === 0) {
+    return ''
+  }
+  if (fieldLabels.length === 1) {
+    return fieldLabels[0] ?? ''
+  }
+  if (fieldLabels.length === 2) {
+    return `${fieldLabels[0]} and ${fieldLabels[1]}`
+  }
+  return `${fieldLabels.slice(0, -1).join(', ')}, and ${fieldLabels[fieldLabels.length - 1]}`
+}
+
+export function organizationChangeStartingPointDialogBody(
+  presetLabel: string,
+  overwrittenFieldLabels: readonly string[],
+): string {
+  const fieldList = formatStartingPointOverwriteFieldList(overwrittenFieldLabels)
+  const overwriteSentence =
+    overwrittenFieldLabels.length === 1
+      ? `Applying ${presetLabel} will replace your change to ${fieldList}.`
+      : `Applying ${presetLabel} will replace your changes to ${fieldList}.`
+  return `${overwriteSentence} Membership titles will also use ${presetLabel} defaults.`
 }
 
 export function organizationApplyStartingPointConfirmLabel(presetLabel: string): string {

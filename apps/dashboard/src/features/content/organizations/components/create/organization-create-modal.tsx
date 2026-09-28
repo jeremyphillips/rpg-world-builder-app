@@ -269,7 +269,7 @@ function OrganizationCreateModalSession({
 export function OrganizationCreateModal(props: OrganizationCreateModalProps) {
   if (!props.open) return null
   return (
-    <OrganizationAuthoringFormShell>
+    <OrganizationAuthoringFormShell presentation="quick">
       <OrganizationCreateModalSession key={props.campaignId} {...props} />
     </OrganizationAuthoringFormShell>
   )

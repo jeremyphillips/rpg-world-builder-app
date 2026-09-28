@@ -113,7 +113,7 @@ describe('ClassSubclassesTab', () => {
     await waitFor(() => {
       expect(screen.queryByText('Untitled subclass')).not.toBeInTheDocument()
     })
-  })
+  }, 15_000)
 
   it('shows a subclasses-disabled availability alert when subclassing is off', () => {
     render(

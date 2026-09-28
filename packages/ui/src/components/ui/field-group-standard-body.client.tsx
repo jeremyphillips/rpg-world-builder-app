@@ -7,7 +7,7 @@ import {
   readGroupCollapseOpen,
   writeGroupCollapseOpen,
 } from '../../form/config/group-collapse-storage.lib'
-import { accordionContentVariants } from './accordion.variants'
+import type { FieldSizeToken } from './field-sizing.variants'
 import { Collapsible, CollapsibleContent } from './collapsible.client'
 import type { FieldGroupChromeClassNames } from './field-group-chrome.variants'
 import type { FieldGroupDisclosure } from './field-group-disclosure.types'
@@ -15,8 +15,10 @@ import { isLegendDisclosure, resolveDisclosureDefaultOpen } from './field-group-
 import { FieldGroupLegend } from './field-group-legend.client'
 import {
   fieldGroupBottomMarginClasses,
+  fieldGroupLegendDisclosureContentVariants,
   fieldSetResetClasses,
   fieldStackRhythmVariants,
+  resolveFieldGroupBodyGap,
   type FieldGroupLegendSize,
   type FieldRhythm,
 } from './field.variants'
@@ -47,13 +49,25 @@ function useGroupCollapseState(options: {
   return [open, onOpenChange]
 }
 
+function wrapFieldGroupBody(
+  body: React.ReactNode,
+  bodyGapClass: string | undefined,
+): React.ReactNode {
+  if (!bodyGapClass) {
+    return body
+  }
+  return <div className={bodyGapClass}>{body}</div>
+}
+
 export type StandardFieldGroupBodyProps = {
   id?: string
   legend?: string
   description?: string
   legendAccessory?: React.ReactNode
+  legendAction?: React.ReactNode
   legendSize: FieldGroupLegendSize
   legendTypography: string
+  fieldSize: FieldSizeToken
   rhythm: FieldRhythm
   className?: string
   uiStateKey?: string
@@ -69,8 +83,10 @@ export function StandardFieldGroupBody({
   legend,
   description,
   legendAccessory,
+  legendAction,
   legendSize,
   legendTypography,
+  fieldSize,
   rhythm,
   className,
   uiStateKey,
@@ -86,6 +102,13 @@ export function StandardFieldGroupBody({
     uiStateKey,
   })
 
+  const hasBody = React.Children.count(children) > 0
+  const bodyVisible = hasBody && (!collapsible || open)
+  const bodyGapClass =
+    legend && bodyVisible
+      ? resolveFieldGroupBodyGap({ size: legendSize, rhythm, fieldSize })
+      : undefined
+
   const fieldsetClassName = cn(
     fieldSetResetClasses,
     fieldGroupBottomMarginClasses,
@@ -98,6 +121,8 @@ export function StandardFieldGroupBody({
     <div className={cn(fieldStackRhythmVariants({ rhythm }), chromeClasses.body)}>{children}</div>
   )
 
+  const bodyWithGap = wrapFieldGroupBody(body, bodyGapClass)
+
   const Wrapper = legend ? 'fieldset' : 'div'
 
   return (
@@ -107,6 +132,7 @@ export function StandardFieldGroupBody({
           legend={legend}
           description={description}
           legendAccessory={legendAccessory}
+          legendAction={legendAction}
           legendSize={legendSize}
           legendTypography={legendTypography}
           rhythm={rhythm}
@@ -118,13 +144,13 @@ export function StandardFieldGroupBody({
       ) : null}
       {collapsible ? (
         <Collapsible open={open} onOpenChange={onOpenChange} className="min-w-0">
-          <CollapsibleContent forceMount className={accordionContentVariants()}>
-            {body}
+          <CollapsibleContent forceMount className={fieldGroupLegendDisclosureContentVariants()}>
+            {bodyWithGap}
           </CollapsibleContent>
         </Collapsible>
-      ) : (
-        body
-      )}
+      ) : hasBody ? (
+        bodyWithGap
+      ) : null}
     </Wrapper>
   )
 }

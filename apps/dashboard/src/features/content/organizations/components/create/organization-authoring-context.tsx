@@ -1,7 +1,12 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { OrganizationPractice } from '@rpg/contracts'
 
+import type { OrganizationFormPresentation } from '../../lib/organization-form-presentation.lib'
+
 type OrganizationAuthoringContextValue = {
+  presentation: OrganizationFormPresentation
+  hasEnteredProfileSetup: boolean
+  enterProfileSetup: () => void
   practiceRecommendations: OrganizationPractice[]
   setPracticeRecommendations: (ids: OrganizationPractice[]) => void
   clearPracticeRecommendations: () => void
@@ -9,18 +14,34 @@ type OrganizationAuthoringContextValue = {
 
 const OrganizationAuthoringContext = createContext<OrganizationAuthoringContextValue | null>(null)
 
-export function OrganizationAuthoringProvider({ children }: { children: ReactNode }) {
+export function OrganizationAuthoringProvider({
+  children,
+  presentation = 'full',
+}: {
+  children: ReactNode
+  presentation?: OrganizationFormPresentation
+}) {
   const [practiceRecommendations, setPracticeRecommendationsState] = useState<
     OrganizationPractice[]
   >([])
+  const [hasEnteredProfileSetup, setHasEnteredProfileSetup] = useState(
+    () => presentation !== 'quick',
+  )
+
+  const enterProfileSetup = useCallback(() => {
+    setHasEnteredProfileSetup(true)
+  }, [])
 
   const value = useMemo(
     () => ({
+      presentation,
+      hasEnteredProfileSetup,
+      enterProfileSetup,
       practiceRecommendations,
       setPracticeRecommendations: setPracticeRecommendationsState,
       clearPracticeRecommendations: () => setPracticeRecommendationsState([]),
     }),
-    [practiceRecommendations],
+    [enterProfileSetup, hasEnteredProfileSetup, practiceRecommendations, presentation],
   )
 
   return (

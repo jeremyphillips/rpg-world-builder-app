@@ -16,11 +16,12 @@ import {
   organizationChangeStartingPointDialogBody,
   organizationChangeStartingPointDialogTitle,
 } from '../../lib/presets/organization-form-copy.lib'
+import { useOrganizationAuthoringContext } from './organization-authoring-context'
 import {
   isOrganizationAuthoringPresetId,
+  listOrganizationStartingPointConfirmOverwriteFieldLabels,
   organizationAuthoringPresetComboboxDescription,
   organizationStartingPointFieldPath,
-  organizationStartingPointIsCustomized,
 } from '../../lib/presets/organization-starting-point.lib'
 
 const presetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
@@ -48,22 +49,21 @@ export function OrganizationStartingPointField({
   const comboboxId = useId()
   const comboboxTriggerRef = useRef<HTMLButtonElement>(null)
   const form = useFormContext()
+  const { enterProfileSetup } = useOrganizationAuthoringContext()
   const startingPointId = useWatch({ name: fieldPath })
   const values = useWatch() as Record<string, unknown>
 
   const [pendingPresetId, setPendingPresetId] = useState<OrganizationAuthoringPresetId | null>(null)
 
   const applied = isOrganizationAuthoringPresetId(startingPointId)
-  const customized = applied
-    ? organizationStartingPointIsCustomized(values, { prefix, discoverableClasses })
-    : false
 
   const applyPreset = useCallback(
     (presetId: OrganizationAuthoringPresetId) => {
+      enterProfileSetup()
       form.setValue(fieldPath, presetId, { shouldDirty: true, shouldValidate: true })
       setPendingPresetId(null)
     },
-    [fieldPath, form],
+    [enterProfileSetup, fieldPath, form],
   )
 
   const handlePick = useCallback(
@@ -78,13 +78,22 @@ export function OrganizationStartingPointField({
       if (nextValue === startingPointId) {
         return
       }
-      if (customized) {
+      const overwriteFieldLabels = listOrganizationStartingPointConfirmOverwriteFieldLabels(
+        values,
+        {
+          prefix,
+          currentPresetId: startingPointId,
+          nextPresetId: nextValue,
+          discoverableClasses,
+        },
+      )
+      if (overwriteFieldLabels.length > 0) {
         setPendingPresetId(nextValue)
         return
       }
       applyPreset(nextValue)
     },
-    [applied, applyPreset, customized, startingPointId],
+    [applied, applyPreset, discoverableClasses, prefix, startingPointId, values],
   )
 
   const handleClear = useCallback(() => {
@@ -132,6 +141,12 @@ export function OrganizationStartingPointField({
           headline={organizationChangeStartingPointDialogTitle()}
           description={organizationChangeStartingPointDialogBody(
             ORGANIZATION_AUTHORING_PRESETS[pendingPresetId].label,
+            listOrganizationStartingPointConfirmOverwriteFieldLabels(values, {
+              prefix,
+              currentPresetId: startingPointId as OrganizationAuthoringPresetId,
+              nextPresetId: pendingPresetId,
+              discoverableClasses,
+            }),
           )}
           confirmLabel={organizationApplyStartingPointConfirmLabel(
             ORGANIZATION_AUTHORING_PRESETS[pendingPresetId].label,

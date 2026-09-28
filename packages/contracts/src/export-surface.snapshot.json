@@ -2207,6 +2207,7 @@
     "listCharacterRelationshipEdgeKindsBySection",
     "listCompatibleProgressionReferences",
     "listEquipmentMatchingPool",
+    "listOrganizationPresetOwnedEditableDivergentFieldKeys",
     "listReachableSpellOptions",
     "listReachableStartingWeapons",
     "listSkillsMatchingPool",

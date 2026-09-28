@@ -37,13 +37,17 @@ wrapper resolves section context and RHF name prefixes, then renders the entry r
 
 ## Groups
 
-Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint?, accessory? }` for new
-config; `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
+Semantic `<fieldset>` + `<legend>`. Prefer `heading: { label, hint?, accessory?, action? }` for
+new config; `legend` + `description` remain supported and resolve through `resolveGroupHeading`.
 
 `heading.accessory` is **group-only**: non-interactive status beside the legend label (badges,
 static text). Do not pass buttons, links, or other focusable controls — collapsible groups
 use the legend row for disclosure, and nested interactives corrupt fieldset naming.
-Row, array, and slot headings ignore `accessory`.
+
+`heading.action` is **group-only**: trailing compact inline controls on the legend row end
+(same alignment as array `addAction.layout: 'inline'`). Prefer `sm` text/outline buttons.
+
+Row, array, and slot headings ignore `accessory` and `action`.
 Nested named groups derive subsection typography from nesting depth — no `legendSize`
 override. Nested groups omit `mb-8` — parent group rhythm (`gap-6` / `gap-3`) owns sibling
 spacing, matching nested array sections. Top-level groups and arrays inside `<Form>` omit
@@ -151,8 +155,11 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 }
 ```
 
-Legend header margin (`mb-5` / `mb-4`) lives on the legend header block; `<legend>` is `w-full`
-and sits **outside** panel, outline, inset, and callout **group chrome** boxes. The default
+Legend→body spacing for `FieldGroup` is owned by `StandardFieldGroupBody` (`resolveFieldGroupBodyGap`
+on a body-side wrapper when a body is visible). `FieldGroupLegend` keeps title, description, and
+accessory anatomy only. Legacy legend header margin (`fieldGroupLegendHeaderMarginVariants`) remains
+for non-FieldGroup headings. `<legend>` is `w-full` and sits **outside** panel, outline, inset, and
+callout **group chrome** boxes. The default
 field container wraps the whole fieldset, including the legend and description — see
 [Field container chrome](#field-container-chrome-default). Divider and accent-top chrome
 apply to the `<fieldset>`. Token source: `field-group-chrome.variants.ts`.

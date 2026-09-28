@@ -91,3 +91,79 @@ export function organizationPresetOwnedEditableMatchesPreset(
   const expected = buildOrganizationPresetOwnedEditableSnapshot(presetId, resolvedClassAffinityIds)
   return organizationPresetOwnedEditableMatchesRecipe(current, expected)
 }
+
+/** Stable compare order for preset-owned editable fields. */
+export type OrganizationPresetOwnedEditableFieldKey =
+  | 'organizationDomain'
+  | 'organizationForm'
+  | 'functions'
+  | 'practices'
+  | 'classAffinityIds'
+
+const ORGANIZATION_PRESET_OWNED_EDITABLE_FIELD_KEY_ORDER = [
+  'organizationDomain',
+  'organizationForm',
+  'functions',
+  'practices',
+  'classAffinityIds',
+] as const satisfies readonly OrganizationPresetOwnedEditableFieldKey[]
+
+function practicesDiffer(
+  current: readonly OrganizationPractice[],
+  expected: readonly OrganizationPractice[],
+): boolean {
+  const currentPractices = sortedEnumValues(current)
+  const expectedPractices = sortedEnumValues(expected)
+  return (
+    currentPractices.length !== expectedPractices.length ||
+    currentPractices.some((value, index) => value !== expectedPractices[index])
+  )
+}
+
+function functionsDiffer(
+  current: readonly OrganizationFunction[],
+  expected: readonly OrganizationFunction[],
+): boolean {
+  const currentFunctions = sortedEnumValues(current)
+  const expectedFunctions = sortedEnumValues(expected)
+  return (
+    currentFunctions.length !== expectedFunctions.length ||
+    currentFunctions.some((value, index) => value !== expectedFunctions[index])
+  )
+}
+
+function classAffinityIdsDiffer(current: readonly string[], expected: readonly string[]): boolean {
+  const currentClasses = sortedUniqueStrings(current)
+  const expectedClasses = sortedUniqueStrings(expected)
+  return (
+    currentClasses.length !== expectedClasses.length ||
+    currentClasses.some((value, index) => value !== expectedClasses[index])
+  )
+}
+
+/** Lists preset-owned editable fields whose values differ from `expected` (semantic equality). */
+export function listOrganizationPresetOwnedEditableDivergentFieldKeys(
+  current: OrganizationPresetOwnedEditableSnapshot,
+  expected: OrganizationPresetOwnedEditableSnapshot,
+): OrganizationPresetOwnedEditableFieldKey[] {
+  const divergent = new Set<OrganizationPresetOwnedEditableFieldKey>()
+  if (current.organizationDomain !== expected.organizationDomain) {
+    divergent.add('organizationDomain')
+  }
+  if (
+    normalizeOptionalForm(current.organizationForm) !==
+    normalizeOptionalForm(expected.organizationForm)
+  ) {
+    divergent.add('organizationForm')
+  }
+  if (functionsDiffer(current.functions, expected.functions)) {
+    divergent.add('functions')
+  }
+  if (practicesDiffer(current.practices, expected.practices)) {
+    divergent.add('practices')
+  }
+  if (classAffinityIdsDiffer(current.classAffinityIds, expected.classAffinityIds)) {
+    divergent.add('classAffinityIds')
+  }
+  return ORGANIZATION_PRESET_OWNED_EDITABLE_FIELD_KEY_ORDER.filter((key) => divergent.has(key))
+}

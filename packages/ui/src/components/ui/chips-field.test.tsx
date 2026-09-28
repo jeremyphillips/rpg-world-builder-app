@@ -298,7 +298,7 @@ describe('ChipsField', () => {
     )
 
     const hint = screen.getByText('Pick as many as apply.')
-    expect(hint.closest('[data-field-message-region]')).toHaveClass('has-[*]:pt-1')
+    expect(hint.closest('[data-field-message-region]')).toHaveClass('has-[*]:pt-1.5')
   })
 
   it('applies md pill classes by default', () => {

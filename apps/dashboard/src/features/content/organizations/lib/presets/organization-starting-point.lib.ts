@@ -1,11 +1,14 @@
 import {
   applyOrganizationAuthoringPreset,
+  buildOrganizationPresetOwnedEditableSnapshot,
+  listOrganizationPresetOwnedEditableDivergentFieldKeys,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   resolveOrganizationPresetMemberClassAffinityIds,
   snapshotOrganizationMembershipTitlesFromPreset,
   type CharacterClass,
   type OrganizationAuthoringPresetId,
   type OrganizationMembershipTitleDefinition,
+  type OrganizationPresetOwnedEditableFieldKey,
   type OrganizationPresetOwnedEditableSnapshot,
   organizationPresetOwnedEditableMatchesPreset,
 } from '@rpg/contracts'
@@ -149,6 +152,66 @@ export function readOrganizationPresetOwnedEditableSnapshot(
       organizationFieldPath(prefix, 'members.classAffinityIds'),
     ),
   }
+}
+
+const ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS: Record<
+  OrganizationPresetOwnedEditableFieldKey,
+  string
+> = {
+  organizationDomain: 'Domain',
+  organizationForm: 'Form',
+  functions: 'Functions',
+  practices: 'Practices',
+  classAffinityIds: 'Classes',
+}
+
+function resolvePresetOwnedEditableSnapshot(
+  presetId: OrganizationAuthoringPresetId,
+  discoverableClasses: readonly CharacterClass[],
+): OrganizationPresetOwnedEditableSnapshot {
+  return buildOrganizationPresetOwnedEditableSnapshot(
+    presetId,
+    resolveOrganizationPresetMemberClassAffinityIds(presetId, discoverableClasses),
+  )
+}
+
+/**
+ * Field labels for the change-starting-point confirm dialog — customized values that
+ * differ from the incoming preset (stable Domain → Form → Functions → Practices → Classes).
+ */
+export function listOrganizationStartingPointConfirmOverwriteFieldLabels(
+  values: Record<string, unknown>,
+  options: {
+    prefix?: string
+    currentPresetId: OrganizationAuthoringPresetId
+    nextPresetId: OrganizationAuthoringPresetId
+    discoverableClasses: readonly CharacterClass[]
+  },
+): string[] {
+  const current = readOrganizationPresetOwnedEditableSnapshot(values, options.prefix)
+  if (!current) {
+    return []
+  }
+  const fromCurrentPreset = resolvePresetOwnedEditableSnapshot(
+    options.currentPresetId,
+    options.discoverableClasses,
+  )
+  const fromIncomingPreset = resolvePresetOwnedEditableSnapshot(
+    options.nextPresetId,
+    options.discoverableClasses,
+  )
+  const customizedKeys = listOrganizationPresetOwnedEditableDivergentFieldKeys(
+    current,
+    fromCurrentPreset,
+  )
+  const customizedKeySet = new Set(customizedKeys)
+  const overwriteKeys = listOrganizationPresetOwnedEditableDivergentFieldKeys(
+    current,
+    fromIncomingPreset,
+  )
+  return overwriteKeys
+    .filter((key) => customizedKeySet.has(key))
+    .map((key) => ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS[key])
 }
 
 export function organizationStartingPointIsCustomized(

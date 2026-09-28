@@ -9,7 +9,9 @@ import {
   fieldLabelVariants,
   fieldMessageRegionVariants,
   fieldArrayItemListClasses,
+  fieldGroupBodyGapVariants,
   fieldGroupLegendHeaderMarginVariants,
+  resolveFieldGroupBodyGap,
   fieldStackRhythmVariants,
   resolveArrayLegendClassName,
   resolveArrayLegendScale,
@@ -40,7 +42,7 @@ describe('fieldAnatomyStackVariants', () => {
   it('keeps three-region padding on the same size map via has-*', () => {
     expect(fieldLabelRegionVariants({ size: 'sm' })).toContain('has-[*]:pb-1')
     expect(fieldLabelRegionVariants({ size: 'md' })).toContain('has-[*]:pb-1.5')
-    expect(fieldMessageRegionVariants({ size: 'sm' })).toContain('has-[*]:pt-1')
+    expect(fieldMessageRegionVariants({ size: 'sm' })).toContain('has-[*]:pt-1.5')
     expect(fieldMessageRegionVariants({ size: 'md' })).toContain('has-[*]:pt-1.5')
   })
 
@@ -130,6 +132,18 @@ describe('field group legend helpers', () => {
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection', rhythm: 'compact' })).toBe(
       'mb-3',
     )
+  })
+
+  it('applies FieldGroup body gap scale by size and rhythm', () => {
+    expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'comfortable' })).toBe('mt-5')
+    expect(resolveFieldGroupBodyGap({ size: 'subsection', rhythm: 'comfortable' })).toBe('mt-4')
+    expect(resolveFieldGroupBodyGap({ size: 'section', rhythm: 'compact' })).toBe('mt-3')
+    expect(
+      resolveFieldGroupBodyGap({ size: 'array', rhythm: 'comfortable', fieldSize: 'sm' }),
+    ).toBe('mt-1')
+    expect(
+      fieldGroupBodyGapVariants({ size: 'array', rhythm: 'comfortable', fieldSize: 'md' }),
+    ).toBe('mt-1.5')
   })
 
   it('composes legend class names with header margin', () => {

@@ -15,6 +15,7 @@ import {
   buildOrganizationCreateInput,
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
+  buildOrganizationQuickCreateFollowOnFields,
   organizationDraftFormSchema,
 } from './organization-form-projection'
 import { buildOrganizationStartingPointValueSyncPatch } from '../../organizations/lib/presets/organization-starting-point.lib'
@@ -156,29 +157,44 @@ describe('organization form projection', () => {
     expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(50)
   })
 
-  it('nests member affinities under collapsed Optional details for quick create', () => {
+  it('gates quick-create profile sections behind a follow-on slot', () => {
     const quick = buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' })
-    const groups = quick.filter(
+    expect(quick.find((item) => 'kind' in item && item.kind === 'slot')).toMatchObject({
+      kind: 'slot',
+      name: '_organizationQuickCreateProfileSections',
+    })
+    expect(
+      quick.some(
+        (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
+      ),
+    ).toBe(false)
+
+    const followOn = buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), {
+      presentation: 'quick',
+    })
+    const profileGroup = followOn.find(
       (item): item is Extract<FormItem, { kind: 'group' }> =>
-        'kind' in item && item.kind === 'group',
+        'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
     )
-    const optionalDetails = groups.find(
-      (group) => group.heading?.label === 'Optional details' || group.legend === 'Optional details',
+    expect(
+      profileGroup?.fields.map((field) => ('separator' in field ? field.separator : undefined)),
+    ).toEqual(['subtle', 'subtle', 'subtle', undefined])
+
+    const optionalDetails = followOn.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group' && item.heading?.label === 'Optional details',
     )
     expect(optionalDetails).toMatchObject({
-      disclosure: { variant: 'legend', defaultOpen: false },
+      id: 'organization-quick-create-optional-details',
+      disclosure: {
+        variant: 'legend',
+        defaultOpen: false,
+        collapseKey: 'organization-quick-create-optional-details',
+      },
       heading: {
         label: 'Optional details',
         hint: 'Member affinities and description',
       },
-    })
-    const nested = optionalDetails?.fields.find(
-      (field): field is Extract<FormItem, { kind: 'group' }> =>
-        'kind' in field && field.kind === 'group',
-    )
-    expect(nested).toMatchObject({
-      legend: 'Member affinities',
-      description: 'Used to suggest suitable options when adding or creating members.',
     })
   })
 

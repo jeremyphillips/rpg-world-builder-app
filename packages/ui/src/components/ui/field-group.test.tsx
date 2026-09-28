@@ -9,8 +9,23 @@ import { FieldGroup } from './field-group'
 import { TextField } from './text-field'
 
 function fieldStack(fieldset: HTMLElement): HTMLElement | null {
+  return fieldset.querySelector('div.flex.flex-col.gap-6, div.flex.flex-col.gap-4')
+}
+
+function bodyRelationshipWrapper(fieldset: HTMLElement): HTMLElement | null {
   return fieldset.querySelector(
-    ':scope > div.flex.flex-col.gap-6, :scope > div > div.flex.flex-col.gap-6, :scope > div.flex.flex-col.gap-4',
+    [
+      ':scope > .mt-5',
+      ':scope > .mt-4',
+      ':scope > .mt-3',
+      ':scope > .mt-1\\.5',
+      ':scope > .mt-1',
+      ':scope [data-state] > .mt-5',
+      ':scope [data-state] > .mt-4',
+      ':scope [data-state] > .mt-3',
+      ':scope [data-state] > .mt-1\\.5',
+      ':scope [data-state] > .mt-1',
+    ].join(', '),
   )
 }
 
@@ -34,30 +49,41 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
+    const fieldset = screen.getByRole('group', { name: /Character basics/ })
     const legend = screen.getByText('Character basics').closest('legend')
     expect(legend).toHaveClass('text-field-group-legend', 'w-full')
-    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2', 'mb-5')
+    expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2')
+    expect(legend?.firstElementChild).not.toHaveClass('mb-5')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
     expect(screen.getByText('Shown on your sheet.')).not.toHaveClass('mb-3')
   })
 
-  it('applies section header margin to a legend without a description', () => {
+  it('applies section body gap outside the legend when there is no description', () => {
     render(
       <FieldGroup legend="Character basics">
         <TextField id="name" label="Name" />
       </FieldGroup>,
     )
 
-    expect(screen.getByText('Character basics').closest('legend')).toHaveClass('mb-5')
+    const fieldset = screen.getByRole('group', { name: /Character basics/ })
+    expect(screen.getByText('Character basics').closest('legend')).not.toHaveClass('mb-5')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
   })
 
-  it('uses subgroup header margin for subsection legends with a description', () => {
+  it('uses subgroup body gap for subsection legends with a description', () => {
     render(
       <FieldGroup legend="Damage" legendSize="subsection" description="Primary damage dice.">
         <TextField id="damage-dice" label="Dice" />
       </FieldGroup>,
     )
 
-    expect(screen.getByText('Damage').closest('legend')?.firstElementChild).toHaveClass('mb-4')
+    const fieldset = screen.getByRole('group', { name: /Damage/ })
+    expect(screen.getByText('Damage').closest('legend')?.firstElementChild).toHaveClass(
+      'flex',
+      'flex-col',
+      'gap-2',
+    )
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-4')
   })
 
   it('stacks sibling fields with a gap-based column rhythm', () => {
@@ -71,19 +97,22 @@ describe('FieldGroup', () => {
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
   })
 
-  it('applies compact legend typography, header spacing, and stack rhythm', () => {
+  it('applies compact legend typography, body spacing, and stack rhythm', () => {
     render(
       <FieldGroup legend="Basics" rhythm="compact" description="Help copy.">
         <TextField id="name" label="Name" size="sm" />
       </FieldGroup>,
     )
 
+    const fieldset = screen.getByRole('group', { name: /Basics/ })
     const legend = screen.getByText('Basics').closest('legend')
     expect(legend).toHaveClass('text-md', 'font-heading')
-    expect(legend?.firstElementChild).toHaveClass('gap-1', 'mb-3')
+    expect(legend?.firstElementChild).toHaveClass('gap-1')
+    expect(legend?.firstElementChild).not.toHaveClass('mb-3')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
     expect(screen.getByText('Help copy.')).toHaveClass('text-xs')
 
-    const stack = fieldStack(screen.getByRole('group', { name: /Basics/ }))
+    const stack = fieldStack(fieldset)
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-4')
   })
 
@@ -96,13 +125,16 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
   })
 
-  it('renders an array legend with field label typography when size is md', () => {
+  it('applies array body gap outside array legend typography', () => {
     render(
       <FieldGroup legend="Grants" legendSize="array" size="md">
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
+    const fieldset = screen.getByRole('group', { name: /Grants/ })
     expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-md', 'font-field-label')
+    expect(screen.getByText('Grants').closest('legend')).not.toHaveClass('mb-1.5')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-1.5')
   })
 
   it('defaults array legend to sm field label typography when size is omitted', () => {
@@ -112,6 +144,23 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-xs', 'font-field-label')
+  })
+
+  it('does not apply body gap when the group has no legend', () => {
+    render(
+      <FieldGroup>
+        <TextField id="name" label="Name" />
+      </FieldGroup>,
+    )
+    const wrapper = screen.getByRole('textbox', { name: 'Name' }).closest('div')
+    expect(wrapper?.parentElement).not.toHaveClass('mt-5', 'mt-4', 'mt-3')
+  })
+
+  it('does not render body spacing when the group has a legend but no body', () => {
+    render(<FieldGroup legend="Empty">{null}</FieldGroup>)
+    const fieldset = screen.getByRole('group', { name: /Empty/ })
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
+    expect(fieldStack(fieldset)).toBeNull()
   })
 
   it('applies panel chrome on the field body', () => {
@@ -165,6 +214,71 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Customized').closest('legend')).toBeInTheDocument()
   })
 
+  it('uses compact legend typography and trigger rhythm for legend disclosure groups', () => {
+    render(
+      <FieldGroup
+        legend="Optional details"
+        description="Member affinities and description"
+        rhythm="compact"
+        disclosure={{ variant: 'legend', defaultOpen: false }}
+      >
+        <TextField id="detail" label="Detail" size="sm" />
+      </FieldGroup>,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Optional details/ })
+    const legend = screen.getByText('Optional details').closest('legend')
+    expect(legend).toHaveClass('text-md', 'font-heading')
+    expect(legend?.firstElementChild?.querySelector('.flex.flex-col.gap-1')).toBeTruthy()
+    const trigger = screen.getByRole('button', { name: /Optional details/i })
+    expect(trigger).toHaveClass('py-0')
+    expect(trigger).not.toHaveClass('text-field-group-legend')
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
+    const content = fieldset.querySelector('[data-state]')
+    expect(content?.className).not.toMatch(/\bpt-|\bpb-/)
+    expect(content?.className).not.toContain('text-sm')
+  })
+
+  it('applies the same compact body gap for open disclosure as static groups', async () => {
+    const user = userEvent.setup()
+    render(
+      <FieldGroup
+        legend="Optional details"
+        description="Support copy"
+        rhythm="compact"
+        disclosure={{ variant: 'legend', defaultOpen: false }}
+      >
+        <TextField id="detail" label="Detail" size="sm" />
+      </FieldGroup>,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Optional details/ })
+    await user.click(screen.getByRole('button', { name: /Optional details/i }))
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
+  })
+
+  it('aligns a trailing legend action in the header end slot without changing body gap', () => {
+    render(
+      <FieldGroup
+        legend="Starting point"
+        rhythm="compact"
+        legendAction={
+          <button type="button" className="test-legend-action">
+            Set up manually
+          </button>
+        }
+      >
+        <TextField id="detail" label="Detail" size="sm" />
+      </FieldGroup>,
+    )
+
+    const fieldset = screen.getByRole('group', { name: /Starting point/ })
+    const action = screen.getByRole('button', { name: 'Set up manually' })
+    expect(action).toHaveClass('test-legend-action')
+    expect(action.parentElement).toHaveClass('shrink-0', 'justify-self-end')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
+  })
+
   it('keeps collapsible legend accessory outside the disclosure trigger', async () => {
     const user = userEvent.setup()
     render(
@@ -192,18 +306,25 @@ describe('FieldGroup', () => {
     expect(screen.getByRole('textbox', { name: 'Detail' })).toBeInTheDocument()
   })
 
-  it('toggles collapsible groups', async () => {
+  it('toggles collapsible groups and drops body gap when closed', async () => {
     const user = userEvent.setup()
     render(
-      <FieldGroup legend="Advanced" disclosure={{ variant: 'legend', defaultOpen: true }}>
-        <TextField id="advanced-field" label="Detail" />
+      <FieldGroup
+        legend="Advanced"
+        rhythm="compact"
+        disclosure={{ variant: 'legend', defaultOpen: true }}
+      >
+        <TextField id="advanced-field" label="Detail" size="sm" />
       </FieldGroup>,
     )
 
-    const content = screen.getByRole('group', { name: /Advanced/ }).querySelector('[data-state]')
+    const fieldset = screen.getByRole('group', { name: /Advanced/ })
+    const content = fieldset.querySelector('[data-state]')
     expect(content).toHaveAttribute('data-state', 'open')
+    expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
     await user.click(screen.getByRole('button', { name: /Advanced/ }))
     expect(content).toHaveAttribute('data-state', 'closed')
+    expect(bodyRelationshipWrapper(fieldset)).toBeNull()
   })
 
   itAxe('has no axe accessibility violations', async () => {

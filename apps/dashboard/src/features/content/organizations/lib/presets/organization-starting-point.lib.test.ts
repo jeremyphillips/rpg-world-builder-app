@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildOrganizationEditFamiliarTypeFormPatch,
   buildOrganizationStartingPointValueSyncPatch,
+  listOrganizationStartingPointConfirmOverwriteFieldLabels,
   organizationAuthoringPresetComboboxDescription,
   organizationStartingPointIsCustomized,
   ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION,
@@ -61,6 +62,27 @@ describe('organization starting point helpers', () => {
         { discoverableClasses: [] },
       ),
     ).toBe(true)
+  })
+
+  it('lists only customized fields that differ from the incoming preset for confirm copy', () => {
+    const patch = buildOrganizationStartingPointValueSyncPatch('thieves_guild', {
+      discoverableClasses: [],
+    })
+    const values = {
+      startingPointId: 'thieves_guild',
+      organizationDomain: 'government',
+      organizationForm: patch.organizationForm,
+      functions: patch.functions,
+      practices: patch.practices,
+      'members.classAffinityIds': patch['members.classAffinityIds'],
+    }
+    expect(
+      listOrganizationStartingPointConfirmOverwriteFieldLabels(values, {
+        currentPresetId: 'thieves_guild',
+        nextPresetId: 'army',
+        discoverableClasses: [],
+      }),
+    ).toEqual(['Domain'])
   })
 
   it('excludes membership titles from customized detection by contract', () => {

@@ -52,15 +52,6 @@ vi.mock('../../../lib/campaign-access/campaign-availability-field', () => ({
   ),
 }))
 
-vi.mock('./organization-authoring-context', () => ({
-  OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
-  useOrganizationAuthoringContext: () => ({
-    practiceRecommendations: [],
-    setPracticeRecommendations: vi.fn(),
-    clearPracticeRecommendations: vi.fn(),
-  }),
-}))
-
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
     HTMLElement.prototype.hasPointerCapture = () => false
@@ -104,6 +95,7 @@ describe('OrganizationCreateModal', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'City Council')
+    await user.click(screen.getByRole('button', { name: 'Set up manually' }))
     await user.click(screen.getByRole('radio', { name: /Government/i }))
     await user.click(screen.getByRole('button', { name: 'Create organization' }))
 

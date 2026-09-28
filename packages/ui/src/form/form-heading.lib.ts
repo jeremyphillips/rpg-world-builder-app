@@ -12,11 +12,15 @@ export type FormHeadingTier = 'section' | 'subsection' | 'leaf'
  * `accessory` is a **group-heading** slot only (wired through `GroupFieldSection` →
  * `FieldGroup`). Status/decorative content (badges, static text) — not buttons, links,
  * or other focusable controls inside `<legend>`.
+ *
+ * `action` is a **group-heading** trailing slot (same end alignment as array legend add
+ * controls). Use compact `sm` text/outline buttons — not nested inside `<legend>` text.
  */
 export type FormHeading = {
   label: string
   hint?: string | FieldHintConfig
   accessory?: ReactNode
+  action?: ReactNode
 }
 
 /** Label + hint slice shared by arrays and other section headings. */

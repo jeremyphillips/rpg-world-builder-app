@@ -3,12 +3,15 @@
 import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { formSectionHeaderLabelRowClasses } from '../../form/presentation/form-section-header.variants'
-import { accordionTriggerVariants } from './accordion.variants'
+import {
+  formSectionHeaderActionLayoutClasses,
+  formSectionHeaderActionSlotClasses,
+  formSectionHeaderLabelRowClasses,
+} from '../../form/presentation/form-section-header.variants'
 import {
   fieldGroupDescriptionCompactTypographyClasses,
   fieldGroupDescriptionTypographyClasses,
-  fieldGroupLegendHeaderMarginVariants,
+  fieldGroupLegendDisclosureTriggerVariants,
   fieldGroupLegendHeaderStackVariants,
   type FieldGroupLegendSize,
   type FieldRhythm,
@@ -20,6 +23,8 @@ export type FieldGroupLegendProps = {
   description?: string
   /** Non-interactive status/decoration beside the legend label (group headings only). */
   legendAccessory?: React.ReactNode
+  /** Trailing compact inline action on the legend row end. */
+  legendAction?: React.ReactNode
   legendSize: FieldGroupLegendSize
   legendTypography: string
   legendChromeClassName: string
@@ -34,10 +39,33 @@ function LegendLabelRow({ legend, accessory }: { legend: string; accessory?: Rea
     return <>{legend}</>
   }
   return (
-    <span className={formSectionHeaderLabelRowClasses}>
-      <span className="min-w-0 truncate">{legend}</span>
+    <span className={cn(formSectionHeaderLabelRowClasses, 'items-baseline')}>
+      <span className="min-w-0">{legend}</span>
       <span className="shrink-0">{accessory}</span>
     </span>
+  )
+}
+
+function LegendActionEndSlot({ action }: { action: React.ReactNode }) {
+  return <div className={formSectionHeaderActionSlotClasses}>{action}</div>
+}
+
+function LegendHeaderActionLayout({
+  action,
+  children,
+}: {
+  action?: React.ReactNode
+  children: React.ReactNode
+}) {
+  if (!action) {
+    return <>{children}</>
+  }
+
+  return (
+    <div className={formSectionHeaderActionLayoutClasses}>
+      <div className="min-w-0">{children}</div>
+      <LegendActionEndSlot action={action} />
+    </div>
   )
 }
 
@@ -47,7 +75,6 @@ type LegendContentOptions = {
   legendAccessory?: React.ReactNode
   collapsible: boolean
   rhythm: FieldRhythm
-  headerMargin: string
   descriptionTypography: string
 }
 
@@ -60,12 +87,12 @@ function resolveLegendPrimaryLabel(options: LegendContentOptions): React.ReactNo
 }
 
 function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
-  const { description, rhythm, headerMargin, descriptionTypography } = options
+  const { description, rhythm, descriptionTypography } = options
   if (!description) {
     return options.collapsible ? options.legend : resolveLegendPrimaryLabel(options)
   }
   return (
-    <span className={cn(fieldGroupLegendHeaderStackVariants({ rhythm }), headerMargin)}>
+    <span className={fieldGroupLegendHeaderStackVariants({ rhythm })}>
       {resolveLegendPrimaryLabel(options)}
       <Text
         as="span"
@@ -81,26 +108,17 @@ function resolveLegendContent(options: LegendContentOptions): React.ReactNode {
 function StaticFieldGroupLegend({
   legendTypography,
   legendChromeClassName,
-  headerMargin,
-  description,
   legendContent,
+  legendAction,
 }: {
   legendTypography: string
   legendChromeClassName: string
-  headerMargin: string
-  description?: string
   legendContent: React.ReactNode
+  legendAction?: React.ReactNode
 }) {
   return (
-    <legend
-      className={cn(
-        legendTypography,
-        'w-full min-w-0',
-        legendChromeClassName,
-        !description && headerMargin,
-      )}
-    >
-      {legendContent}
+    <legend className={cn(legendTypography, 'w-full min-w-0', legendChromeClassName)}>
+      <LegendHeaderActionLayout action={legendAction}>{legendContent}</LegendHeaderActionLayout>
     </legend>
   )
 }
@@ -108,39 +126,43 @@ function StaticFieldGroupLegend({
 function CollapsibleFieldGroupLegend({
   legendTypography,
   legendChromeClassName,
-  headerMargin,
-  description,
   legendContent,
   legendAccessory,
+  legendAction,
+  rhythm,
   open,
   onToggle,
 }: {
   legendTypography: string
   legendChromeClassName: string
-  headerMargin: string
-  description?: string
   legendContent: React.ReactNode
   legendAccessory?: React.ReactNode
+  legendAction?: React.ReactNode
+  rhythm: FieldRhythm
   open?: boolean
   onToggle?: () => void
 }) {
+  const toggleRow = (
+    <div className="flex w-full min-w-0 items-start gap-2">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className={fieldGroupLegendDisclosureTriggerVariants({ rhythm })}
+      >
+        {legendContent}
+        <ChevronDown
+          className={cn('size-4 shrink-0 text-muted-foreground', open && 'rotate-180')}
+          aria-hidden
+        />
+      </button>
+      {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}
+    </div>
+  )
+
   return (
     <legend className={cn(legendTypography, 'w-full min-w-0', legendChromeClassName)}>
-      <div className={cn('flex w-full min-w-0 items-start gap-2', !description && headerMargin)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={onToggle}
-          className={cn(accordionTriggerVariants({ variant: 'section' }), 'min-w-0 flex-1')}
-        >
-          {legendContent}
-          <ChevronDown
-            className={cn('size-4 shrink-0 text-muted-foreground', open && 'rotate-180')}
-            aria-hidden
-          />
-        </button>
-        {legendAccessory ? <span className="shrink-0 pt-0.5">{legendAccessory}</span> : null}
-      </div>
+      <LegendHeaderActionLayout action={legendAction}>{toggleRow}</LegendHeaderActionLayout>
     </legend>
   )
 }
@@ -149,7 +171,7 @@ export function FieldGroupLegend({
   legend,
   description,
   legendAccessory,
-  legendSize,
+  legendAction,
   legendTypography,
   legendChromeClassName,
   collapsible,
@@ -157,8 +179,6 @@ export function FieldGroupLegend({
   open,
   onToggle,
 }: FieldGroupLegendProps) {
-  const headerMargin =
-    legendSize === 'array' ? '' : fieldGroupLegendHeaderMarginVariants({ size: legendSize, rhythm })
   const descriptionTypography =
     rhythm === 'compact'
       ? fieldGroupDescriptionCompactTypographyClasses
@@ -170,7 +190,6 @@ export function FieldGroupLegend({
     legendAccessory,
     collapsible,
     rhythm,
-    headerMargin,
     descriptionTypography,
   }
   const legendContent = resolveLegendContent(contentOptions)
@@ -180,9 +199,8 @@ export function FieldGroupLegend({
       <StaticFieldGroupLegend
         legendTypography={legendTypography}
         legendChromeClassName={legendChromeClassName}
-        headerMargin={headerMargin}
-        description={description}
         legendContent={legendContent}
+        legendAction={legendAction}
       />
     )
   }
@@ -191,10 +209,10 @@ export function FieldGroupLegend({
     <CollapsibleFieldGroupLegend
       legendTypography={legendTypography}
       legendChromeClassName={legendChromeClassName}
-      headerMargin={headerMargin}
-      description={description}
       legendContent={legendContent}
       legendAccessory={legendAccessory}
+      legendAction={legendAction}
+      rhythm={rhythm}
       open={open}
       onToggle={onToggle}
     />

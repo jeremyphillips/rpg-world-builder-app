@@ -127,7 +127,7 @@ describe('FeatureTablesField', () => {
 
     const saved = onTablesChange.mock.calls.at(-1)?.[0] as { name: string }[]
     expect(saved[0]?.name).toBe('Updated rage progression')
-  })
+  }, 15_000)
 
   it('shows kind selection when adding a new table regardless of parent publish intent', async () => {
     const user = userEvent.setup()

@@ -6,7 +6,9 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
-import { OrganizationStartingPointCustomizedBadge } from './organization-starting-point-customized-badge'
+import { OrganizationAuthoringProvider } from './organization-authoring-context'
+import { OrganizationStartingPointLegendAccessory } from './organization-starting-point-legend-accessory'
+import { OrganizationStartingPointSetupManuallyAction } from './organization-starting-point-setup-manually-action'
 import { OrganizationStartingPointField } from './organization-starting-point-field'
 import { ORGANIZATION_STARTING_POINT_LEGEND } from '../../lib/presets/organization-form-copy.lib'
 import { buildOrganizationFormValueSyncs } from '../../../lib/forms/organization-form-projection'
@@ -78,37 +80,40 @@ function Harness() {
 
 function renderStartingPointForm() {
   render(
-    <Form
-      schema={schema}
-      fields={[
-        { type: 'text', name: 'name', label: 'Name' },
-        {
-          kind: 'group',
-          heading: {
-            label: ORGANIZATION_STARTING_POINT_LEGEND,
-            accessory: createElement(OrganizationStartingPointCustomizedBadge, {
-              discoverableClasses: [],
-            }),
-          },
-          fields: [
-            {
-              kind: 'slot',
-              name: 'startingPointId',
-              render: () => <OrganizationStartingPointField discoverableClasses={[]} />,
+    <OrganizationAuthoringProvider presentation="quick">
+      <Form
+        schema={schema}
+        fields={[
+          { type: 'text', name: 'name', label: 'Name' },
+          {
+            kind: 'group',
+            heading: {
+              label: ORGANIZATION_STARTING_POINT_LEGEND,
+              accessory: createElement(OrganizationStartingPointLegendAccessory, {
+                discoverableClasses: [],
+              }),
+              action: createElement(OrganizationStartingPointSetupManuallyAction),
             },
-          ],
-        },
-      ]}
-      defaultValues={{
-        name: 'Test',
-        functions: [],
-        practices: [],
-        members: { classAffinityIds: [], titles: [] },
-      }}
-      valueSyncs={buildOrganizationFormValueSyncs()}
-      onSubmit={() => undefined}
-      header={() => <Harness />}
-    />,
+            fields: [
+              {
+                kind: 'slot',
+                name: 'startingPointId',
+                render: () => <OrganizationStartingPointField discoverableClasses={[]} />,
+              },
+            ],
+          },
+        ]}
+        defaultValues={{
+          name: 'Test',
+          functions: [],
+          practices: [],
+          members: { classAffinityIds: [], titles: [] },
+        }}
+        valueSyncs={buildOrganizationFormValueSyncs()}
+        onSubmit={() => undefined}
+        header={() => <Harness />}
+      />
+    </OrganizationAuthoringProvider>,
   )
 }
 
@@ -168,7 +173,11 @@ describe('OrganizationStartingPointField', () => {
     await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
     await user.click(screen.getByRole('option', { name: /Army/i }))
 
-    expect(screen.getByRole('alertdialog')).toHaveTextContent(/Change starting point/i)
+    const dialog = screen.getByRole('alertdialog')
+    expect(dialog).toHaveTextContent(/Change starting point/i)
+    expect(dialog).toHaveTextContent(/replace your change to Domain/i)
+    expect(dialog).toHaveTextContent(/Membership titles will also use Army defaults/i)
+    expect(dialog).not.toHaveTextContent(/Other organization details/i)
     await user.click(screen.getByRole('button', { name: /Apply Army/i }))
 
     await waitFor(() => {

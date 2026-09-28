@@ -167,7 +167,7 @@ describe('FieldsetChromeFrame', () => {
     const hint = screen.getByText('Pick one.')
     const messageRegion = hint.closest('[data-field-message-region]')
     expect(messageRegion).toBeTruthy()
-    expect(messageRegion).toHaveClass('has-[*]:pt-1')
+    expect(messageRegion).toHaveClass('has-[*]:pt-1.5')
     expect(screen.getByTestId('chip-wrap').closest('fieldset')?.contains(hint)).toBe(false)
   })
 

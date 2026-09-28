@@ -302,7 +302,7 @@ export function BuildingOrganizationRelationshipReview({
             </Button>
           }
         >
-          <OrganizationAuthoringFormShell>
+          <OrganizationAuthoringFormShell presentation="quick">
             <BuildingOrganizationNewOrganizationForm
               context={controller.context}
               newOrganizationDraftId={controller.newOrganizationDraftId}
