@@ -1,53 +1,84 @@
 import { describe, expect, it } from 'vitest'
 
+import { DEFAULT_GAME_MASTER_DISPLAY_STYLE } from '@rpg/contracts'
+
 import { makeCampaignListItem } from '@/test/fixtures/campaigns'
 
 import {
   buildCampaignMeta,
+  buildCampaignMetaSegments,
   formatCampaignLastOpenedClause,
-  formatCampaignMetaForSurface,
+  formatCampaignMetaPlainText,
 } from './campaign-meta.lib'
 
+const gameMasterStyle = DEFAULT_GAME_MASTER_DISPLAY_STYLE
+
 describe('campaign-meta.lib', () => {
-  it('omits recency for hero-style surfaces', () => {
+  it('builds viewer facet and omits pc count when equal to player count', () => {
     const meta = buildCampaignMeta(
       makeCampaignListItem({
         status: 'draft',
-        otherMemberCount: 1,
-        openCharacterCount: 1,
+        campaignRole: 'owner',
+        playerMemberCount: 1,
+        openPcCount: 1,
         lastOpenedByViewerAt: '2020-01-01T12:00:00.000Z',
       }),
+      gameMasterStyle,
     )
 
-    expect(formatCampaignMetaForSurface(meta, { includeRecency: false })).toBe('Draft · 1 player')
+    expect(meta.viewerFacetLabel).toBe('GM')
+    expect(
+      formatCampaignMetaPlainText(buildCampaignMetaSegments(meta, { includeRecency: false })),
+    ).toBe('GM · Draft · 1 player')
   })
 
-  it('includes recency when the viewer timestamp is set', () => {
+  it('includes pc count when it differs from player member count', () => {
+    const meta = buildCampaignMeta(
+      makeCampaignListItem({
+        status: 'active',
+        campaignRole: 'owner',
+        playerMemberCount: 4,
+        openPcCount: 6,
+      }),
+      gameMasterStyle,
+    )
+
+    expect(
+      formatCampaignMetaPlainText(buildCampaignMetaSegments(meta, { includeRecency: false })),
+    ).toBe('GM · Active · 4 players · 6 PCs')
+  })
+
+  it('includes recency when requested and timestamp is set', () => {
     const now = new Date('2026-09-28T12:00:00.000Z')
     const meta = buildCampaignMeta(
       makeCampaignListItem({
         status: 'draft',
-        otherMemberCount: 1,
-        openCharacterCount: 1,
+        campaignRole: 'pc',
+        playerMemberCount: 1,
+        openPcCount: 1,
         lastOpenedByViewerAt: '2026-09-27T12:00:00.000Z',
       }),
+      gameMasterStyle,
     )
 
-    expect(formatCampaignMetaForSurface(meta, { includeRecency: true, now })).toBe(
-      'Draft · 1 player · Last opened yesterday',
-    )
+    expect(
+      formatCampaignMetaPlainText(buildCampaignMetaSegments(meta, { includeRecency: true, now })),
+    ).toBe('Player · Draft · 1 player · Last opened yesterday')
   })
 
-  it('omits the recency clause when lastOpenedByViewerAt is null', () => {
+  it('omits the recency segment when lastOpenedByViewerAt is null', () => {
     const meta = buildCampaignMeta(
       makeCampaignListItem({
-        otherMemberCount: 0,
-        openCharacterCount: 0,
+        playerMemberCount: 0,
+        openPcCount: 0,
         lastOpenedByViewerAt: null,
       }),
+      gameMasterStyle,
     )
 
-    expect(formatCampaignMetaForSurface(meta, { includeRecency: true })).toBe('Active · 0 players')
+    expect(
+      formatCampaignMetaPlainText(buildCampaignMetaSegments(meta, { includeRecency: true })),
+    ).toBe('GM · Active · 0 players')
   })
 
   it('formats last opened copy from relative recency', () => {

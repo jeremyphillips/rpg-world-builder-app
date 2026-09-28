@@ -25,14 +25,7 @@ export function CampaignDetail() {
     <PageShell width="wide" rhythm="list">
       <CampaignBannerUploadAlert />
       {campaign && campaignId ? (
-        <CampaignOverviewHero
-          campaign={campaign}
-          campaignId={campaignId}
-          canManage={canManage}
-          playerCount={campaign.otherMemberCount}
-          characterCount={campaign.openCharacterCount}
-          countsPending={false}
-        />
+        <CampaignOverviewHero campaign={campaign} campaignId={campaignId} canManage={canManage} />
       ) : null}
 
       <PageLoadState

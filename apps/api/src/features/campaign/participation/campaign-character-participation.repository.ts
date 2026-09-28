@@ -13,6 +13,7 @@ import {
 } from '@rpg/contracts'
 
 import type { WithMongoSession } from '../../../lib/mongo-session'
+import { findPcCharacterIdsAmong } from '../../character'
 import { CampaignCharacterParticipationModel } from './campaign-character-participation.model'
 
 type ParticipationRecord = {
@@ -126,29 +127,37 @@ export async function listOpenPcParticipationCharacterIdsForCampaign(
   return participations.map((participation) => participation.characterId)
 }
 
-type CampaignOpenPartyCount = {
-  _id: string
-  count: number
+type OpenParticipationRow = {
+  campaignId: string
+  characterId: string
 }
 
-/** Open, non-retired party PC counts keyed by campaign id (overview party length semantics). */
+/**
+ * Open, non-retired party PC counts keyed by campaign id — same semantics as overview
+ * party PC rows (PC character type only; NPC participations are excluded).
+ */
 export async function countOpenPartyPcsByCampaignIds(
   campaignIds: readonly string[],
 ): Promise<Map<string, number>> {
   if (campaignIds.length === 0) return new Map()
 
-  const rows = await CampaignCharacterParticipationModel.aggregate<CampaignOpenPartyCount>([
-    {
-      $match: {
-        campaignId: { $in: [...campaignIds] },
-        ...OPEN_PARTICIPATION_FILTER,
-        'roster.status': { $ne: 'retired' },
-      },
-    },
-    { $group: { _id: '$campaignId', count: { $sum: 1 } } },
-  ])
+  const rows = await CampaignCharacterParticipationModel.find({
+    campaignId: { $in: [...campaignIds] },
+    ...OPEN_PARTICIPATION_FILTER,
+    'roster.status': { $ne: 'retired' },
+  })
+    .select('campaignId characterId')
+    .lean<OpenParticipationRow[]>()
 
-  return new Map(rows.map((row) => [row._id, row.count]))
+  const pcCharacterIds = await findPcCharacterIdsAmong(rows.map((row) => row.characterId))
+
+  const counts = new Map<string, number>()
+  for (const row of rows) {
+    if (!pcCharacterIds.has(row.characterId)) continue
+    counts.set(row.campaignId, (counts.get(row.campaignId) ?? 0) + 1)
+  }
+
+  return counts
 }
 
 /**

@@ -22,6 +22,8 @@ import { getRulesetPatchRead } from '../vocabulary'
 import { minimalStandalonePcInput } from '../../test/fixtures/characters'
 import { setMembershipControlledPcs } from '../../test/helpers/campaign-participation'
 import { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
+import { createCampaignNpc } from './npc/npc.service'
+import { minimalNpcRequestInput } from '../../test/fixtures/npcs'
 import { createHomebrewContent } from '../content'
 import { locationWriteConfig } from '../content'
 import { HttpError } from '../../lib/http-error'
@@ -406,15 +408,25 @@ describe('listCampaignsForUser', () => {
     expect(freshCampaigns[0]?.recoveryReason).toBe('no_controlled_character')
   })
 
-  it('returns viewer-relative member and open character counts on each list item', async () => {
+  it('returns pc-role playerMemberCount and PC-only openPcCount on each list item', async () => {
     const owner = await makeTestUser({ email: 'aggregate-owner@example.com' })
     const player = await makeTestUser({ email: 'aggregate-player@example.com' })
+    const observer = await makeTestUser({ email: 'aggregate-observer@example.com' })
     const { campaign } = await createCampaign({ name: 'Aggregate Campaign', createdBy: owner.id })
 
     await CampaignMembershipModel.create({
       campaignId: campaign.id,
       userId: player.id,
       campaignRole: 'pc',
+      controlledCharacterIds: [],
+      invitedAt: new Date(),
+      joinedAt: new Date(),
+    })
+
+    await CampaignMembershipModel.create({
+      campaignId: campaign.id,
+      userId: observer.id,
+      campaignRole: 'observer',
       controlledCharacterIds: [],
       invitedAt: new Date(),
       joinedAt: new Date(),
@@ -427,17 +439,19 @@ describe('listCampaignsForUser', () => {
       controlledCharacterIds: [character.id],
     })
 
+    await createCampaignNpc(campaign.id, owner.id, minimalNpcRequestInput)
+
     const ownerCampaigns = await listCampaignsForUser(owner.id)
     expect(ownerCampaigns[0]).toMatchObject({
-      otherMemberCount: 1,
-      openCharacterCount: 1,
+      playerMemberCount: 1,
+      openPcCount: 1,
       lastOpenedByViewerAt: null,
     })
 
     const playerCampaigns = await listCampaignsForUser(player.id)
     expect(playerCampaigns[0]).toMatchObject({
-      otherMemberCount: 1,
-      openCharacterCount: 1,
+      playerMemberCount: 1,
+      openPcCount: 1,
       lastOpenedByViewerAt: null,
     })
   })

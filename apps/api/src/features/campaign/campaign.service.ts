@@ -47,22 +47,14 @@ type MembershipListRecord = {
   lastOpenedAt?: Date | null
 }
 
-async function loadOtherMemberCountsByCampaignId(
+async function countPlayerMembersByCampaignIds(
   campaignIds: readonly string[],
-  viewerId: string,
 ): Promise<Map<string, number>> {
   if (campaignIds.length === 0) return new Map()
 
   const rows = await CampaignMembershipModel.aggregate<{ _id: string; count: number }>([
-    { $match: { campaignId: { $in: [...campaignIds] } } },
-    {
-      $group: {
-        _id: '$campaignId',
-        count: {
-          $sum: { $cond: [{ $ne: ['$userId', viewerId] }, 1, 0] },
-        },
-      },
-    },
+    { $match: { campaignId: { $in: [...campaignIds] }, campaignRole: 'pc' } },
+    { $group: { _id: '$campaignId', count: { $sum: 1 } } },
   ])
 
   return new Map(rows.map((row) => [row._id, row.count]))
@@ -127,9 +119,9 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
   const campaignIds = memberships.map((m) => m.campaignId).filter((id) => isValidObjectId(id))
   if (campaignIds.length === 0) return []
 
-  const [docs, otherMemberCountByCampaignId, openCharacterCountByCampaignId] = await Promise.all([
+  const [docs, playerMemberCountByCampaignId, openPcCountByCampaignId] = await Promise.all([
     CampaignModel.find({ _id: { $in: campaignIds } }).lean<CampaignRecord[]>(),
-    loadOtherMemberCountsByCampaignId(campaignIds, userId),
+    countPlayerMembersByCampaignIds(campaignIds),
     countOpenPartyPcsByCampaignIds(campaignIds),
   ])
   const userCharacters = await listCharactersForUser(userId)
@@ -163,8 +155,8 @@ export async function listCampaignsForUser(userId: string): Promise<CampaignList
         openControlledCharacterIds,
         viewerState,
         recoveryReason,
-        otherMemberCount: otherMemberCountByCampaignId.get(campaign.id) ?? 0,
-        openCharacterCount: openCharacterCountByCampaignId.get(campaign.id) ?? 0,
+        playerMemberCount: playerMemberCountByCampaignId.get(campaign.id) ?? 0,
+        openPcCount: openPcCountByCampaignId.get(campaign.id) ?? 0,
         lastOpenedByViewerAt: membershipLastOpenedIso(membership),
       }
     }),

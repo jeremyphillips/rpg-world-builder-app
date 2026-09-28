@@ -1,4 +1,15 @@
-import type { CampaignListItem, CampaignStatus } from '@rpg/contracts'
+import type {
+  CampaignListItem,
+  CampaignRole,
+  CampaignStatus,
+  GameMasterDisplayStyle,
+} from '@rpg/contracts'
+import {
+  formatCampaignOpenPcCount,
+  formatCampaignPlayerMemberCount,
+  resolveCampaignStatusLabel,
+  resolveCampaignViewerFacetLabel,
+} from '@rpg/contracts'
 
 import { INVALID_DATETIME_FALLBACK, formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
@@ -7,47 +18,45 @@ import type { CampaignDestination } from './recovery/campaign-destination.lib'
 export type CampaignMetaStatusTone = 'success' | 'sunken'
 
 export type CampaignMeta = {
+  campaignRole: CampaignRole
   status: CampaignStatus
   statusLabel: string
   statusTone: CampaignMetaStatusTone
-  otherMemberCount: number
-  openCharacterCount: number
+  viewerFacetLabel: string
+  playerMemberCount: number
+  openPcCount: number
   lastOpenedByViewerAt: string | null
 }
 
-const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
-  active: 'Active',
-  draft: 'Draft',
-  archived: 'Archived',
-}
+export type CampaignMetaSegment =
+  | { kind: 'facet'; text: string }
+  | { kind: 'status'; text: string }
+  | { kind: 'playerCount'; text: string }
+  | { kind: 'pcCount'; text: string }
+  | { kind: 'recency'; text: string }
 
 export function resolveCampaignMetaStatusTone(status: CampaignStatus): CampaignMetaStatusTone {
   return status === 'active' ? 'success' : 'sunken'
 }
 
-export function formatCampaignCountsClause(
-  otherMemberCount: number,
-  openCharacterCount: number,
-): string {
-  const playerClause = `${otherMemberCount} ${otherMemberCount === 1 ? 'player' : 'players'}`
-
-  if (otherMemberCount === openCharacterCount) {
-    return playerClause
-  }
-
-  const characterClause = `${openCharacterCount} ${
-    openCharacterCount === 1 ? 'character' : 'characters'
-  }`
-  return `${playerClause} · ${characterClause}`
+export function isCampaignListItem(
+  campaign: CampaignListItem | { status: CampaignStatus; identity: { name: string } },
+): campaign is CampaignListItem {
+  return 'campaignRole' in campaign
 }
 
-export function buildCampaignMeta(campaign: CampaignListItem): CampaignMeta {
+export function buildCampaignMeta(
+  campaign: CampaignListItem,
+  gameMasterStyle: GameMasterDisplayStyle,
+): CampaignMeta {
   return {
+    campaignRole: campaign.campaignRole,
     status: campaign.status,
-    statusLabel: CAMPAIGN_STATUS_LABELS[campaign.status],
+    statusLabel: resolveCampaignStatusLabel(campaign.status),
     statusTone: resolveCampaignMetaStatusTone(campaign.status),
-    otherMemberCount: campaign.otherMemberCount,
-    openCharacterCount: campaign.openCharacterCount,
+    viewerFacetLabel: resolveCampaignViewerFacetLabel(campaign.campaignRole, gameMasterStyle),
+    playerMemberCount: campaign.playerMemberCount,
+    openPcCount: campaign.openPcCount,
     lastOpenedByViewerAt: campaign.lastOpenedByViewerAt,
   }
 }
@@ -62,39 +71,55 @@ export function formatCampaignLastOpenedClause(iso: string, now?: Date): string 
   return `Last opened ${phrase}`
 }
 
-export type FormatCampaignMetaForSurfaceOptions = {
+export type BuildCampaignMetaSegmentsOptions = {
   includeRecency: boolean
   countsPending?: boolean
   now?: Date
 }
 
-export function formatCampaignMetaForSurface(
+export function buildCampaignMetaSegments(
   meta: CampaignMeta,
-  options: FormatCampaignMetaForSurfaceOptions,
-): string {
+  options: BuildCampaignMetaSegmentsOptions,
+): CampaignMetaSegment[] {
   if (options.countsPending) {
-    return meta.statusLabel
+    return [
+      { kind: 'facet', text: meta.viewerFacetLabel },
+      { kind: 'status', text: meta.statusLabel },
+    ]
   }
 
-  const clauses = [
-    meta.statusLabel,
-    formatCampaignCountsClause(meta.otherMemberCount, meta.openCharacterCount),
+  const segments: CampaignMetaSegment[] = [
+    { kind: 'facet', text: meta.viewerFacetLabel },
+    { kind: 'status', text: meta.statusLabel },
+    { kind: 'playerCount', text: formatCampaignPlayerMemberCount(meta.playerMemberCount) },
   ]
 
-  if (options.includeRecency && meta.lastOpenedByViewerAt) {
-    clauses.push(formatCampaignLastOpenedClause(meta.lastOpenedByViewerAt, options.now))
+  if (meta.openPcCount !== meta.playerMemberCount) {
+    segments.push({ kind: 'pcCount', text: formatCampaignOpenPcCount(meta.openPcCount) })
   }
 
-  return clauses.join(' · ')
+  if (options.includeRecency && meta.lastOpenedByViewerAt) {
+    segments.push({
+      kind: 'recency',
+      text: formatCampaignLastOpenedClause(meta.lastOpenedByViewerAt, options.now),
+    })
+  }
+
+  return segments
 }
 
-export function buildCampaignDestinationDescription(
+export function formatCampaignMetaPlainText(segments: readonly CampaignMetaSegment[]): string {
+  return segments.map((segment) => segment.text).join(' · ')
+}
+
+export function buildCampaignDestinationMeta(
   campaign: CampaignListItem,
   destination: Pick<CampaignDestination, 'supportingCopy'>,
-): string {
+  gameMasterStyle: GameMasterDisplayStyle,
+): CampaignMeta | null {
   if (destination.supportingCopy) {
-    return destination.supportingCopy
+    return null
   }
 
-  return formatCampaignMetaForSurface(buildCampaignMeta(campaign), { includeRecency: true })
+  return buildCampaignMeta(campaign, gameMasterStyle)
 }

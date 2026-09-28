@@ -173,13 +173,10 @@ export const campaignListItemSchema = campaignSchema.extend({
   viewerState: campaignViewerStateSchema,
   /** Diagnostic reason when viewerState is recoverable or invalid. */
   recoveryReason: campaignRecoveryReasonSchema.optional(),
-  /**
-   * Campaign memberships excluding the viewing user — same semantics as overview
-   * members API with `excludeUserId`.
-   */
-  otherMemberCount: z.number().int().nonnegative(),
-  /** Open party PC count for this campaign (overview party list length semantics). */
-  openCharacterCount: z.number().int().nonnegative(),
+  /** Human player memberships (`campaignRole: pc`) in this campaign. */
+  playerMemberCount: z.number().int().nonnegative(),
+  /** Open, non-retired party participations for PC characters only (excludes NPCs). */
+  openPcCount: z.number().int().nonnegative(),
   /**
    * When this user last entered the campaign shell (`POST …/opened`), or null if
    * never recorded.

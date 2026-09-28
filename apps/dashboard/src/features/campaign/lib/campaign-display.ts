@@ -1,13 +1,25 @@
+import {
+  DEFAULT_GAME_MASTER_DISPLAY_STYLE,
+  type ContentMedia,
+  type GameMasterDisplayStyle,
+} from '@rpg/contracts'
+
+import { resolveCampaignEmblemImageUrl } from './overview/campaign-overview-hero-media.lib'
+
 export const CAMPAIGN_UNKNOWN_NAME = 'Unknown campaign' as const
 
 /** @deprecated Use CAMPAIGN_UNKNOWN_NAME */
 export const CAMPAIGN_DISPLAY_FALLBACK_NAME = CAMPAIGN_UNKNOWN_NAME
 
-import type { ContentMedia } from '@rpg/contracts'
-
-import { resolveCampaignEmblemImageUrl } from './overview/campaign-overview-hero-media.lib'
-
 export const CAMPAIGNS_QUERY_ERROR_MESSAGE = "Couldn't load campaigns" as const
+
+/**
+ * Resolves GM vs DM short-label style for campaign viewer copy. Wire campaign or
+ * user settings here when the toggle ships; surfaces should not read defaults directly.
+ */
+export function resolveCampaignGameMasterDisplayStyle(): GameMasterDisplayStyle {
+  return DEFAULT_GAME_MASTER_DISPLAY_STYLE
+}
 
 export type CampaignDisplayVM = {
   id: string

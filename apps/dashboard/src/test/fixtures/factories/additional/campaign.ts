@@ -44,8 +44,8 @@ export function makeCampaignListItem(overrides: Partial<CampaignListItem> = {}):
     controlledCharacterIds: overrides.controlledCharacterIds ?? [],
     openControlledCharacterIds: overrides.openControlledCharacterIds ?? [],
     viewerState: overrides.viewerState ?? VIEWER_STATE.ready,
-    otherMemberCount: overrides.otherMemberCount ?? 0,
-    openCharacterCount: overrides.openCharacterCount ?? 0,
+    playerMemberCount: overrides.playerMemberCount ?? 0,
+    openPcCount: overrides.openPcCount ?? 0,
     lastOpenedByViewerAt:
       overrides.lastOpenedByViewerAt === undefined ? null : overrides.lastOpenedByViewerAt,
     ...overrides,

@@ -1,10 +1,5 @@
-import type { CampaignFlavor, CampaignStatus, Mood, PlayStyle } from '@rpg/contracts'
+import type { CampaignFlavor, Mood, PlayStyle } from '@rpg/contracts'
 
-import {
-  formatCampaignCountsClause,
-  resolveCampaignMetaStatusTone,
-  type CampaignMetaStatusTone,
-} from '../campaign-meta.lib'
 import {
   DIFFICULTY_LABELS,
   MAGIC_LEVEL_LABELS,
@@ -14,14 +9,6 @@ import {
 
 export const CAMPAIGN_OVERVIEW_HERO_BADGE_LIMIT = 4 as const
 
-export type CampaignOverviewHeroStatusTone = CampaignMetaStatusTone
-
-export type CampaignOverviewHeroStatusLine = {
-  statusLabel: string
-  statusTone: CampaignOverviewHeroStatusTone
-  countsSuffix?: string
-}
-
 export type CampaignOverviewHeroBadge = {
   id: string
   label: string
@@ -30,41 +17,6 @@ export type CampaignOverviewHeroBadge = {
 export type CampaignOverviewHeroBadges = {
   visible: CampaignOverviewHeroBadge[]
   overflowCount: number
-}
-
-const CAMPAIGN_STATUS_LABELS: Record<CampaignStatus, string> = {
-  active: 'Active',
-  draft: 'Draft',
-  archived: 'Archived',
-}
-
-export function resolveCampaignOverviewHeroStatusTone(
-  status: CampaignStatus,
-): CampaignOverviewHeroStatusTone {
-  return resolveCampaignMetaStatusTone(status)
-}
-
-export function composeCampaignOverviewHeroStatusLine(input: {
-  status: CampaignStatus
-  playerCount?: number
-  characterCount?: number
-  countsPending?: boolean
-}): CampaignOverviewHeroStatusLine {
-  const statusLabel = CAMPAIGN_STATUS_LABELS[input.status]
-  const statusTone = resolveCampaignOverviewHeroStatusTone(input.status)
-
-  if (input.countsPending) {
-    return { statusLabel, statusTone }
-  }
-
-  const playerCount = input.playerCount ?? 0
-  const characterCount = input.characterCount ?? 0
-
-  return {
-    statusLabel,
-    statusTone,
-    countsSuffix: formatCampaignCountsClause(playerCount, characterCount),
-  }
 }
 
 function buildFlavorBadge(id: string, label: string): CampaignOverviewHeroBadge {

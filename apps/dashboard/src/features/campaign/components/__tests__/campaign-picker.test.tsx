@@ -55,7 +55,8 @@ describe('CampaignPicker', () => {
       ROUTES.campaign.detail('camp_1'),
     )
     expect(screen.getByText('Active Campaign')).toHaveClass('font-body-emphasis')
-    expect(screen.getByText('Active · 0 players')).toBeInTheDocument()
+    expect(screen.getByText(/GM/)).toBeInTheDocument()
+    expect(screen.getByText(/0 players/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Open campaign' })).not.toBeInTheDocument()
   })
 
@@ -70,15 +71,17 @@ describe('CampaignPicker', () => {
             id: 'camp_1',
             identity: { name: 'Recent Campaign' },
             status: 'draft',
-            otherMemberCount: 1,
-            openCharacterCount: 1,
+            playerMemberCount: 1,
+            openPcCount: 1,
             lastOpenedByViewerAt: '2026-09-27T12:00:00.000Z',
           }),
         ]}
       />,
     )
 
-    expect(screen.getByText('Draft · 1 player · Last opened yesterday')).toBeInTheDocument()
+    expect(screen.getByText(/Draft/)).toBeInTheDocument()
+    expect(screen.getByText(/1 player/)).toBeInTheDocument()
+    expect(screen.getByText(/Last opened yesterday/)).toBeInTheDocument()
 
     vi.useRealTimers()
   })
