@@ -1,6 +1,6 @@
 import { asCropPresentation, type ContentMedia } from '@rpg/contracts'
 
-import { mediaImageUrl } from '@/features/media/lib/media-display'
+import { mediaImageUrl } from '@/features/media'
 
 /** Banner rendition URL for the overview hero. Crop comes from the saved role; emblem scale/offset is not applied by the rendition API yet. */
 export function resolveCampaignBannerImageUrl(media: ContentMedia | undefined): string | undefined {

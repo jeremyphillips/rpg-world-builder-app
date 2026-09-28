@@ -53,17 +53,18 @@ export function AnatomyFieldRow({
     fieldDivider: useFieldDivider,
     rhythm,
   })
-  const collapse = useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
+  const { ref: fieldRowCollapseRef, 'data-field-row-collapsed': fieldRowCollapsed } =
+    useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
 
   return (
     <FieldRowAnatomyProvider>
       <FieldRow
-        ref={collapse.ref}
+        ref={fieldRowCollapseRef}
         layout="anatomy-grid"
         gap={gap}
         className={cn(presentation.className, className)}
         style={presentation.style}
-        data-field-row-collapsed={collapse['data-field-row-collapsed']}
+        data-field-row-collapsed={fieldRowCollapsed}
       >
         {fields.map((field, index) => {
           const fieldKey = isRowSlotItem(field)

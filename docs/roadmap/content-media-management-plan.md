@@ -306,15 +306,15 @@ Parent-form persistence hint                    Cancel    Save changes
 
 ## Ownership and dependencies
 
-| Layer                                  | Responsibility                                                                                                                               |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/contracts/src/shared/media/` | Asset DTOs, ContentImage, ImagePresentation, ContentMedia, normalized geometry, role vocabulary and validation                               |
-| Contracts domain policy                | Typed media policy per supported content type and PC/NPC; allowed roles, representative role, role dimensions/capabilities                   |
-| `apps/api/src/features/media/`         | Asset records, original storage adapter, attachment authorization, inspection, derivatives, lifecycle/cleanup                                |
-| Existing content/character services    | Own media on their records; delegate shared asset/role validation and attachment reconciliation                                              |
-| `packages/ui`                          | Reusable source preview, gallery selection, accessible crop controls, role controls, dialog layout; no campaign queries or asset persistence |
-| `apps/dashboard/src/features/media/`   | Public MediaManager orchestration, upload queue, local edit session, API hooks, policies supplied by consumers                               |
-| Content/character adapters             | Parent form integration and representative image rendering through common resolver                                                           |
+| Layer                                                                       | Responsibility                                                                                                                               |
+| --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/contracts/src/rpg/primitives/media/` (+ `rpg/content/lib/media/`) | Asset DTOs, ContentImage, ImagePresentation, ContentMedia, normalized geometry, role vocabulary and validation                               |
+| Contracts domain policy                                                     | Typed media policy per supported content type and PC/NPC; allowed roles, representative role, role dimensions/capabilities                   |
+| `apps/api/src/features/media/`                                              | Asset records, original storage adapter, attachment authorization, inspection, derivatives, lifecycle/cleanup                                |
+| Existing content/character services                                         | Own media on their records; delegate shared asset/role validation and attachment reconciliation                                              |
+| `packages/ui`                                                               | Reusable source preview, gallery selection, accessible crop controls, role controls, dialog layout; no campaign queries or asset persistence |
+| `apps/dashboard/src/features/media/`                                        | Public MediaManager orchestration, upload queue, local edit session, API hooks, policies supplied by consumers                               |
+| Content/character adapters                                                  | Parent form integration and representative image rendering through common resolver                                                           |
 
 Follow existing feature public barrels and schema-driven Form integration. Add
 co-located CSF3 stories and interactive tests. UI primitives use `.client.tsx` and

@@ -26,6 +26,49 @@ export type CharacterListCardProps = {
   rosterStatus?: CharacterRosterStatus
 }
 
+type CharacterListCardHeaderProps = {
+  card: CharacterListCardData
+  showCampaign: boolean
+  controllerLine?: string
+  rosterPresentation: ReturnType<typeof resolveCharacterRosterStatusPresentation> | null
+}
+
+function CharacterListCardHeader({
+  card,
+  showCampaign,
+  controllerLine,
+  rosterPresentation,
+}: CharacterListCardHeaderProps) {
+  return (
+    <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
+      <div className="flex items-start justify-between gap-2">
+        <CardTitle>{card.name}</CardTitle>
+        {rosterPresentation ? (
+          <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
+            {rosterPresentation.label}
+          </Badge>
+        ) : null}
+      </div>
+      <CardDescription>{card.summary}</CardDescription>
+      {controllerLine ? (
+        <Text variant="small" className="text-muted-foreground">
+          {controllerLine}
+        </Text>
+      ) : null}
+      {showCampaign && card.campaign ? (
+        <CampaignDisplayName
+          display={buildCampaignDisplay({
+            id: card.campaign.id,
+            name: card.campaign.name,
+            emblemUrl: card.campaign.emblemUrl,
+          })}
+          surface="inlineMuted"
+        />
+      ) : null}
+    </CardHeader>
+  )
+}
+
 /** Roster card for a character summary row — optional stacked art, name, summary, and detail link. */
 export function CharacterListCard({
   card,
@@ -43,32 +86,12 @@ export function CharacterListCard({
       {card.displayImagesByRole?.primary ? (
         <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
       ) : null}
-      <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle>{card.name}</CardTitle>
-          {rosterPresentation ? (
-            <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
-              {rosterPresentation.label}
-            </Badge>
-          ) : null}
-        </div>
-        <CardDescription>{card.summary}</CardDescription>
-        {controllerLine ? (
-          <Text variant="small" className="text-muted-foreground">
-            {controllerLine}
-          </Text>
-        ) : null}
-        {showCampaign && card.campaign ? (
-          <CampaignDisplayName
-            display={buildCampaignDisplay({
-              id: card.campaign.id,
-              name: card.campaign.name,
-              emblemUrl: card.campaign.emblemUrl,
-            })}
-            surface="inlineMuted"
-          />
-        ) : null}
-      </CardHeader>
+      <CharacterListCardHeader
+        card={card}
+        showCampaign={showCampaign}
+        controllerLine={controllerLine}
+        rosterPresentation={rosterPresentation}
+      />
       <CardFooter
         className={cn('mt-auto', card.displayImagesByRole?.primary != null && 'px-5 pb-5')}
       >

@@ -3,6 +3,7 @@ export {
   formatAddContentTypeLabel,
   formatContentCollectionAvailabilityCaption,
   formatContentCreateHeading,
+  formatContentListLoadErrorMessage,
   getContentTypeCollectionLabel,
   getContentTypeItemLabel,
   getContentTypeMidSentenceLabel,
@@ -197,6 +198,28 @@ export {
   useOrganizationMembers,
 } from './organizations'
 export { useLocations, locationsQueryKey } from './locations'
+export {
+  buildLocationEntityCardModel,
+  buildLocationEntityCardModelFromClassification,
+} from './locations/lib/location-display'
+export {
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from './organizations/lib/organization-display'
+export {
+  ContentPreviewRailMedia,
+  type ContentPreviewRailMediaProps,
+} from './lib/forms/preview/content-preview-rail-media'
+export { useCampaignAccessParticipantRoster } from './lib/campaign-access/use-campaign-access-participant-roster'
+export { buildCampaignAccessVisibilityOptions } from './lib/campaign-access/campaign-access-options.lib'
+export {
+  CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
+  CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
+  CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
+  CAMPAIGN_ACCESS_PLAYER_ACCESS_HINT,
+  CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
+  CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
+} from './lib/campaign-access/campaign-access-labels'
 export { SpellsOverview, SpellDetail, useSpells, spellsQueryKey } from './spells'
 export { SpellCreate } from './spells/routes/spell-create'
 export { SpellEdit } from './spells/routes/spell-edit'
@@ -259,10 +282,14 @@ export {
 } from './lib/list/use-content-mutations'
 export { ContentDeletionBlockedDialog } from './lib/delete/content-deletion-blocked-dialog'
 export { ContentCampaignAvailabilityAction } from './lib/campaign-access/overview/content-campaign-availability-action'
-export { getContentDisplayImage } from './lib/detail/page/content-display-image'
+export {
+  getContentDisplayImage,
+  type DashboardContentDisplayResult,
+} from './lib/detail/page/content-display-image'
 export {
   buildClassContentDisplayImageInput,
   buildContentDisplayImageInput,
+  buildLocationContentDisplayImageInput,
   buildSpeciesContentDisplayImageInput,
 } from './lib/detail/page/content-display-image-input'
 export { ContentMediaImage } from './lib/detail/page/content-media-image'

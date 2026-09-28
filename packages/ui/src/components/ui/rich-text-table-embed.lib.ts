@@ -31,7 +31,7 @@ function extractTableEmbedIdsFromDocument(html: string): string[] {
 export function extractTableEmbedIds(html: string): string[] {
   if (html.trim() === '') return []
 
-  let sanitized = html
+  let sanitized: string
   try {
     sanitized = sanitizeHtml(html)
   } catch {

@@ -13,8 +13,10 @@ import { createUploadSession } from '../api/media-api'
 import { MediaManager, type MediaManagerProps } from './media-manager'
 import { mediaFixture, mediaFixtureAssets } from '../fixtures'
 
+import type * as MediaApi from '../api/media-api'
+
 vi.mock('../api/media-api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../api/media-api')>()
+  const actual = await importOriginal<typeof MediaApi>()
   return {
     ...actual,
     createUploadSession: vi.fn(),

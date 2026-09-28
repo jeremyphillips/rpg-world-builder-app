@@ -285,7 +285,18 @@ export function FileDropzone(props: FileDropzoneProps) {
     'aria-invalid': ariaInvalid,
   } = props
 
-  const dropzone = useFileDropzone({
+  const {
+    inputRef,
+    isDragOver,
+    errorMsg,
+    getPreviewUrl,
+    openPicker,
+    removeFile,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    handleInputChange,
+  } = useFileDropzone({
     value,
     onChange,
     accept,
@@ -304,7 +315,7 @@ export function FileDropzone(props: FileDropzoneProps) {
   })
   const promptState = resolveFileDropzonePromptState({
     disabled,
-    isDragOver: dropzone.isDragOver,
+    isDragOver,
     dropTarget,
   })
 
@@ -319,19 +330,19 @@ export function FileDropzone(props: FileDropzoneProps) {
           density={density}
           state={promptState}
           showBrowse
-          onBrowse={dropzone.openPicker}
+          onBrowse={openPicker}
           disabled={disabled}
           className={className}
           aria-describedby={ariaDescribedby}
           aria-invalid={ariaInvalid}
-          onDragOver={dropzone.handleDragOver}
-          onDragLeave={dropzone.handleDragLeave}
-          onDrop={dropzone.handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         />
       ) : null}
 
       <input
-        ref={dropzone.inputRef}
+        ref={inputRef}
         type="file"
         accept={accept.join(',')}
         multiple={multiple}
@@ -339,12 +350,12 @@ export function FileDropzone(props: FileDropzoneProps) {
         tabIndex={-1}
         aria-hidden="true"
         className="sr-only"
-        onChange={dropzone.handleInputChange}
+        onChange={handleInputChange}
       />
 
-      {dropzone.errorMsg ? (
+      {errorMsg ? (
         <Text variant="destructive" role="alert">
-          {dropzone.errorMsg}
+          {errorMsg}
         </Text>
       ) : null}
 
@@ -361,8 +372,8 @@ export function FileDropzone(props: FileDropzoneProps) {
             <FileList
               files={value}
               disabled={disabled}
-              getPreviewUrl={dropzone.getPreviewUrl}
-              onRemove={dropzone.removeFile}
+              getPreviewUrl={getPreviewUrl}
+              onRemove={removeFile}
             />
           )}
         </ul>

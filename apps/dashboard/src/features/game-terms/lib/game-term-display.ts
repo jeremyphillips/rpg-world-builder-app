@@ -9,11 +9,7 @@ import {
   type VocabularyOptionSetId,
 } from '@rpg/contracts'
 
-import {
-  mediaImageUrl,
-  MEDIA_SOURCE_CROP,
-  systemContentImageUrl,
-} from '@/features/media/lib/media-display'
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '@/features/media'
 
 export type ResolveGameTermDisplayInput = {
   setId: VocabularyOptionSetId

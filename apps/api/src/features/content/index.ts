@@ -21,6 +21,7 @@ export type { WriteEntityBase } from './lib/content-write-config'
 export { filterCatalogForMembership } from './lib/filter-catalog-for-viewer'
 export {
   buildContentUsageResolverContext,
+  resolveContentUsagePurpose,
   type ContentUsageResolverContext,
 } from './lib/content-usage/content-usage-context'
 export { indexRecordsByContentId } from './lib/content-usage/reference-sources/index-by-content-id'

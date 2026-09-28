@@ -16,6 +16,7 @@ export {
   prepareContentMediaReconciliation,
   reconcileContentMedia,
   reconcileReferencesWithSession,
+  type ReconcileContentMediaResult,
 } from './lib/reconcile-content-media'
 export { reclaimExpiredAssets } from './lib/reclaim-expired-assets'
 export { resolveMediaArtworkUrl } from './lib/media-artwork-url.lib'

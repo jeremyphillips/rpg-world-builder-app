@@ -3,10 +3,13 @@ import * as React from 'react'
 import { resolveLocationClassificationDisplay, type Location } from '@rpg/contracts'
 import { Button, Eyebrow, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
-import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
-import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
-import { buildLocationEntityCardModelFromClassification } from '@/features/content/locations/lib/location-display'
+import {
+  CatalogEntityPickerSheet,
+  CatalogEntitySurfaceRow,
+  buildLocationContentDisplayImageInput,
+  buildLocationEntityCardModelFromClassification,
+  getContentDisplayImage,
+} from '@/features/content'
 import { DrawerShell } from '@/components/drawer'
 
 import type {

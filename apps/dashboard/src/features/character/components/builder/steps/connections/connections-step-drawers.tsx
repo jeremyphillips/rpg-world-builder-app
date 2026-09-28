@@ -74,10 +74,6 @@ function ConnectionDraftDetailsDrawer(input: {
     connectionDetailsFromDraftEdge(input.edge),
   )
 
-  React.useEffect(() => {
-    setState(connectionDetailsFromDraftEdge(input.edge))
-  }, [input.edge])
-
   return (
     <Modal.Root open={input.open} onOpenChange={input.onOpenChange}>
       <Modal.Content size="md" aria-describedby="connection-draft-details-description">
@@ -236,6 +232,7 @@ export function ConnectionsStepDrawers({
       editingEdge.kind !== 'organizationMembership' &&
       draftEdgeHasEditableDetails(editingEdge.kind) ? (
         <ConnectionDraftDetailsDrawer
+          key={editingEdge.id}
           edge={editingEdge}
           stepData={stepData}
           open={Boolean(editingEdgeId)}

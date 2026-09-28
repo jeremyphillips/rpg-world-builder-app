@@ -12,8 +12,8 @@ import type {
 } from '@rpg/contracts'
 import { Link } from 'react-router-dom'
 
-import type { DashboardContentDisplayResult } from '@/features/content/lib/detail/page/content-display-image'
-import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
+import type { DashboardContentDisplayResult } from '@/features/content'
+import { ContentDisplayOverviewCell } from '@/features/media'
 import { buildSourceColumn } from '@/lib/data-table/column-builders'
 import { buildUsedByOverviewColumn } from '@/lib/usage-references/build-used-by-overview-column'
 

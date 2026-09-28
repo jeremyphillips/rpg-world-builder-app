@@ -163,7 +163,7 @@ function VocabularyTermDetailLoaded({
   const mutations = useVocabularyMutations(campaignId, setId)
   const [sheetOpen, setSheetOpen] = useState(false)
 
-  const handleEdit = useCallback(() => setSheetOpen(true), [])
+  const handleEdit = useCallback(() => setSheetOpen(true), [setSheetOpen])
   const handleSaveMedia = useCallback(
     async (change: MediaManagerSave) => {
       await mutations.patchEntry.mutateAsync({

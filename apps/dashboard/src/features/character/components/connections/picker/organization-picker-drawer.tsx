@@ -3,11 +3,12 @@ import * as React from 'react'
 import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
 import { Button, SelectField, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
 import {
+  CatalogEntityPickerSheet,
+  CatalogEntitySurfaceRow,
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
-} from '@/features/content/organizations/lib/organization-display'
+} from '@/features/content'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import {

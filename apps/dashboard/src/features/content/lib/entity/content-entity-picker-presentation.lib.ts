@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { Organization } from '@rpg/contracts'
 import type { ContentCardDensity } from '@rpg/ui'
 
-import { buildCharacterEntityCardModel } from '@/features/character/lib/display/character-entity-summary.lib'
+import { buildCharacterEntityCardModel } from '@/features/character'
 
 import {
   buildLocationEntityCardModel,

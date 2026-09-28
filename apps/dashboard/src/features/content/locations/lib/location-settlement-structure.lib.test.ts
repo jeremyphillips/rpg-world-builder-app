@@ -9,6 +9,7 @@ import {
   resolveLocationStructureProfile,
   resolveStructureChildAuthoringOptions,
 } from './location-structure.lib'
+import { buildLocationDetailViewModel } from './location-display'
 
 describe('partitionLocationsByStructureGroup (settlement)', () => {
   it('groups districts separately from direct places', () => {
@@ -52,8 +53,7 @@ describe('settlement child eligibility helpers', () => {
 })
 
 describe('settlement structure on Harborford', () => {
-  it('uses settlement type in structure heading via display vm', async () => {
-    const { buildLocationDetailViewModel } = await import('./location-display')
+  it('uses settlement type in structure heading via display vm', () => {
     const viewModel = buildLocationDetailViewModel(HARBORFORD, {
       locations: [HARBORFORD, DOCK_WARD, YAWNING_PORTAL],
       campaignId: 'camp_1',

@@ -7,7 +7,7 @@ import {
   type ContentDisplaySurface,
 } from '@rpg/contracts'
 
-import { mediaImageUrl, MEDIA_SOURCE_CROP } from '@/features/media/lib/media-display'
+import { mediaImageUrl, MEDIA_SOURCE_CROP } from '@/features/media'
 
 const resolveUploadSrc = (assetId: string) => mediaImageUrl(assetId, 'artwork', MEDIA_SOURCE_CROP)
 

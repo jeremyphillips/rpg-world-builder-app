@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs -- React Hook Form forwards the controller ref to TextField. */
 import { useController, useFormContext } from 'react-hook-form'
 
 import type { CharacterBuildContext, CharacterBuilderDraft } from '@rpg/contracts'

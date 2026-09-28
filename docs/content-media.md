@@ -98,7 +98,7 @@ preserved; inspection and derivatives use the first frame. SVG is rejected. Priv
 assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
 `GET /api/uploads/:key`.
 
-## Contracts (`@rpg/contracts/shared/media`)
+## Contracts (`@rpg/contracts` — `rpg/primitives/media` + `rpg/content/lib/media`)
 
 - Asset DTO, upload session, `ContentImage`, `ImagePresentation`, `ContentMedia`
 - Typed `CONTENT_MEDIA_POLICIES` registry

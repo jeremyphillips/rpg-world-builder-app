@@ -1,4 +1,4 @@
-import type { DashboardContentDisplayResult } from '@/features/content/lib/detail/page/content-display-image'
+import type { DashboardContentDisplayResult } from '@/features/content'
 import { ContentDisplayFallbackIcon, IdentityFrame } from '@rpg/ui'
 
 import { ContentMediaImage } from './content-media-image'

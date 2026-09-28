@@ -6,7 +6,7 @@ import type {
 } from '@rpg/contracts'
 import { indexCharacterBuildCatalog, resolvePlayableBuilderContent } from '@rpg/contracts'
 
-import { buildLocationConnectedPartyCharactersById } from '@/features/content/locations/lib/connected-parties/location-connected-party-character-options.lib'
+import { buildLocationConnectedPartyCharactersById } from '@/features/content'
 
 import { filterResidenceEligibleLocations } from '../connections/residence-location-connection.lib'
 import { filterPropertyEligibleLocations } from '../connections/property-location-connection.lib'

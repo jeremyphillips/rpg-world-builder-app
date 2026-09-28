@@ -35,14 +35,12 @@ export function PersonRelationshipAddDrawer({
   presetRole,
   onAdd,
 }: PersonRelationshipAddDrawerProps) {
-  const [pickerOpen, setPickerOpen] = React.useState(false)
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(null)
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const resetSession = React.useCallback(() => {
-    setPickerOpen(false)
     setSelectedCharacterId(null)
     setSelectedRoleId(presetRole?.id ?? null)
     setPending(false)
@@ -57,10 +55,6 @@ export function PersonRelationshipAddDrawer({
     },
     [onOpenChange, pending, resetSession],
   )
-
-  React.useEffect(() => {
-    if (open) setPickerOpen(true)
-  }, [open])
 
   const selectedCharacter = characters.find((character) => character.id === selectedCharacterId)
   const selectedRole = PERSON_CONNECTION_ROLE_OPTIONS.find((role) => role.id === selectedRoleId)
@@ -93,21 +87,15 @@ export function PersonRelationshipAddDrawer({
   return (
     <>
       <CharacterPickerDrawer
-        open={open && pickerOpen && !showRoleStep && !showConfirmStep}
+        open={open && !showRoleStep && !showConfirmStep}
         closeOnSelect={false}
         onOpenChange={(nextOpen) => {
-          if (!nextOpen) {
-            setPickerOpen(false)
-            if (!selectedCharacterId) handleOpenChange(false)
-            return
-          }
-          setPickerOpen(true)
+          if (!nextOpen && !selectedCharacterId) handleOpenChange(false)
         }}
         title={drawerTitle}
         items={pickerItems}
         onSelect={(characterId) => {
           setSelectedCharacterId(characterId)
-          setPickerOpen(false)
         }}
       />
       <DrawerShell

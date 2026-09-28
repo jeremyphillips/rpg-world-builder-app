@@ -12,7 +12,7 @@ import {
   indexCharacterRelationshipCharacterBlockersByContentId,
   indexCharacterRelationshipLocationBlockersByContentId,
   indexCharacterRelationshipOrganizationBlockersByContentId,
-} from '../../../character-relationships'
+} from '../../../character-relationships/lib/content-usage/character-relationship-usage'
 import {
   indexCharacterBlockersByContentId,
   indexCharacterEquipmentBlockersByContentId,

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
-import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
+import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content'
 
 import { BuilderOptionSheetHeroImage } from './builder-option-sheet-hero-image'
 

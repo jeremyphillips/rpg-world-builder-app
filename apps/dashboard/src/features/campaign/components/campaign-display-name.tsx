@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { cn, IdentityFrame, Text, contentIdentityIcon } from '@rpg/ui'
 
+const CampaignIdentityIcon = contentIdentityIcon('campaign')
+
 import type { CampaignDisplayVM } from '../lib/campaign-display'
 import {
   campaignDisplayNameTextVariants,
@@ -24,8 +26,6 @@ export function CampaignDisplayName({
   asLink = false,
   className,
 }: CampaignDisplayNameProps) {
-  const CampaignIdentityIcon = contentIdentityIcon('campaign')
-
   const mark = (
     <IdentityFrame
       src={display.imageUrl ?? undefined}

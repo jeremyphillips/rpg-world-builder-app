@@ -29,7 +29,7 @@ function resolveRelationshipArrayPresentation(
 export function createCharacterRelationshipArrayItemShell(
   vocabulary: CharacterRelationshipVocabulary,
 ) {
-  return function renderCharacterRelationshipArrayItemShell(props: ArrayItemShellRenderProps) {
+  return function CharacterRelationshipArrayItemShell(props: ArrayItemShellRenderProps) {
     const { context } = useRelationshipFieldContext()
     const relationshipContext = context as CharacterRelationshipFieldContext
     const presentation = resolveRelationshipArrayPresentation(

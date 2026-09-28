@@ -9,9 +9,9 @@ import {
   type ContentMedia,
 } from '@rpg/contracts'
 
-import { CharacterListCard } from '@/features/character/components/character-list-card'
+import { CharacterListCard } from '@/features/character'
+import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content'
 import { ContentMediaImage } from './content-media-image'
-import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
 
 const portraitCrop = { x: 0.2, y: 0.1, width: 0.25, height: 0.25 } as const
 const primaryCrop = { x: 0, y: 0.05, width: 0.9, height: 0.675 } as const

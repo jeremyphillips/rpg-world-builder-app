@@ -26,16 +26,17 @@ function AnatomyRow({
   className?: string
 }) {
   const presentation = resolveFieldRowAnatomyPresentation(widths)
-  const collapse = useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
+  const { ref: fieldRowCollapseRef, 'data-field-row-collapsed': fieldRowCollapsed } =
+    useFieldRowAnatomyCollapse(presentation.collapseMinWidth)
   return (
     <FieldRowAnatomyProvider>
       <div
-        ref={collapse.ref}
+        ref={fieldRowCollapseRef}
         data-field-row=""
         data-field-row-anatomy=""
         className={cn(presentation.className, className)}
         style={presentation.style}
-        data-field-row-collapsed={collapse['data-field-row-collapsed']}
+        data-field-row-collapsed={fieldRowCollapsed}
       >
         {children}
       </div>

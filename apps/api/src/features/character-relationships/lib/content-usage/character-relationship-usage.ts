@@ -3,8 +3,11 @@ import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
 import { listOpenParticipationsForCampaign } from '../../../campaign'
 import { findNpcById, findPcById } from '../../../character'
-import { resolveContentUsagePurpose, type ContentUsageResolverContext } from '../../../content'
-import { indexRecordsByContentId } from '../../../content'
+import {
+  resolveContentUsagePurpose,
+  type ContentUsageResolverContext,
+} from '../../../content/lib/content-usage/content-usage-context'
+import { indexRecordsByContentId } from '../../../content/lib/content-usage/reference-sources/index-by-content-id'
 import { CharacterRelationshipModel } from '../../character-relationship.model'
 
 type RelationshipUsageRecord = {

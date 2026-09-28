@@ -12,11 +12,7 @@ import {
   contentTypeSubject,
 } from '@rpg/contracts'
 
-import {
-  mediaImageUrl,
-  MEDIA_SOURCE_CROP,
-  systemContentImageUrl,
-} from '@/features/media/lib/media-display'
+import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '@/features/media'
 
 import { resolveContentMediaDomainForCatalog } from './resolve-content-display-for-catalog'
 

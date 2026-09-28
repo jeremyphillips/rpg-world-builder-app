@@ -36,7 +36,7 @@ import {
   DEFAULT_CONTENT_DETAIL_HERO_MEDIA_PRESENTATION,
   type ContentDetailHeroMediaPresentation,
 } from './content-detail-layout.types'
-import type { ContentMediaImageFrame } from '@/features/media/components/content-media-image'
+import type { ContentMediaImageFrame } from '@/features/media'
 
 export type ContentDetailLayoutProps = {
   /** Catalog content type — default hero classification label when `classificationLabel` is omitted. */
