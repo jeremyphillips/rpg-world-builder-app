@@ -79,6 +79,7 @@ function OrganizationCreateModalForm({
     mode: 'create' as const,
     entitySource: 'homebrew' as const,
     organizationPracticeRecommendationIds: practiceRecommendations,
+    organizationFormPresentation: 'quick' as const,
   }
 
   const formKey = `organization-create-modal-${campaignId}`

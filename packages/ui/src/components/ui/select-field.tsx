@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
+import { X } from 'lucide-react'
 
+import { Button } from './button.client'
 import { Field, type FieldSize } from './field.client'
 import { FieldLayout } from './field-layout'
 import { FieldLabelContent } from './field-label-content'
@@ -80,6 +82,9 @@ export interface SelectFieldProps extends FieldValidationProps, FieldChromeProps
   onValueChange?: (value: string) => void
   /** Forwarded to the trigger so RHF's `field.onBlur` (touched state) can fire. */
   onBlur?: () => void
+  clearable?: boolean
+  clearAccessibleName?: string
+  onClear?: () => void
 }
 
 function renderSelectOption(option: FieldOption) {
@@ -101,6 +106,75 @@ function renderSelectContent(options: SelectFieldOptionListItem[]) {
         return renderSelectOption(item)
       })}
     </SelectContent>
+  )
+}
+
+type SelectRootWithClearProps = {
+  label: string
+  size: FieldSize
+  resolvedValue: string | undefined
+  defaultValue?: string
+  name?: string
+  disabled?: boolean
+  clearable: boolean
+  clearAccessibleName?: string
+  onClear?: () => void
+  onValueChange?: (value: string) => void
+  selectTrigger: React.ReactNode
+  options: SelectFieldOptionListItem[]
+}
+
+function SelectRootWithClear({
+  label,
+  size,
+  resolvedValue,
+  defaultValue,
+  name,
+  disabled,
+  clearable,
+  clearAccessibleName,
+  onClear,
+  onValueChange,
+  selectTrigger,
+  options,
+}: SelectRootWithClearProps) {
+  const showClear = clearable && resolvedValue !== undefined && !disabled
+  const select = (
+    <Select
+      value={resolvedValue}
+      defaultValue={defaultValue}
+      onValueChange={onValueChange}
+      name={name}
+      disabled={disabled}
+    >
+      {selectTrigger}
+      {renderSelectContent(options)}
+    </Select>
+  )
+
+  if (!showClear) {
+    return select
+  }
+
+  return (
+    <div className="flex w-full items-stretch gap-0">
+      {select}
+      <Button
+        type="button"
+        variant="attached"
+        size={size === 'sm' || size === 'lg' ? size : 'default'}
+        aria-label={clearAccessibleName ?? `Clear ${label}`}
+        onClick={() => {
+          if (onClear) {
+            onClear()
+            return
+          }
+          onValueChange?.('')
+        }}
+      >
+        <X aria-hidden />
+      </Button>
+    </div>
   )
 }
 
@@ -131,6 +205,9 @@ export function SelectField({
   defaultValue,
   onValueChange,
   onBlur,
+  clearable = false,
+  clearAccessibleName,
+  onClear,
   chrome,
 }: SelectFieldProps) {
   const resolvedPlaceholder = resolveFieldPlaceholder(
@@ -166,17 +243,23 @@ export function SelectField({
       </Field.Control>
     )
 
+  const resolvedValue = typeof value === 'string' && value.length > 0 ? value : undefined
+
   const select = (
-    <Select
-      value={value}
+    <SelectRootWithClear
+      label={label}
+      size={size}
+      resolvedValue={resolvedValue}
       defaultValue={defaultValue}
-      onValueChange={onValueChange}
       name={name}
       disabled={disabled}
-    >
-      {selectTrigger}
-      {renderSelectContent(options)}
-    </Select>
+      clearable={clearable}
+      clearAccessibleName={clearAccessibleName}
+      onClear={onClear}
+      onValueChange={onValueChange}
+      selectTrigger={selectTrigger}
+      options={options}
+    />
   )
 
   if (labelPosition === 'settings') {

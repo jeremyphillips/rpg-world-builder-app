@@ -142,17 +142,10 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
   })
 }
 
+/** Resolves membership titles for organization create — client-supplied catalog only. */
 export function resolveOrganizationCreateMembershipTitles(input: {
-  sourcePresetId?: OrganizationAuthoringPresetId
   titles?: readonly OrganizationMembershipTitleDefinition[]
-  createId?: () => string
 }): OrganizationMembershipTitleDefinition[] {
-  if (input.sourcePresetId !== undefined) {
-    return snapshotOrganizationMembershipTitlesFromPreset(
-      input.sourcePresetId,
-      input.createId ?? createDefaultOrganizationMembershipTitleUuid,
-    )
-  }
   return [...(input.titles ?? [])]
 }
 
@@ -183,27 +176,14 @@ export function resolveOrganizationMembershipTitleDefinitionByLabel(
   )
 }
 
-export const organizationSourcePresetIdSchema = organizationAuthoringPresetIdSchema.optional()
-
 export { organizationAuthoringPresetIdSchema }
 
-/** Create input: preset provenance XOR explicit membership title catalog. */
+/** Reserved for create-input membership title refinements (currently none). */
 export function organizationCreateMembershipTitlesInputRefinement(
-  value: {
-    sourcePresetId?: OrganizationAuthoringPresetId
+  _value: {
     members?: {
       titles?: readonly OrganizationMembershipTitleDefinition[]
     }
   },
-  ctx: z.RefinementCtx,
-): void {
-  const hasPreset = value.sourcePresetId !== undefined
-  const hasTitles = value.members?.titles !== undefined && value.members.titles.length > 0
-  if (hasPreset && hasTitles) {
-    addCustomRefinementIssue(
-      ctx,
-      'Organization create input must not combine sourcePresetId with members.titles.',
-      ['members', 'titles'],
-    )
-  }
-}
+  _ctx: z.RefinementCtx,
+): void {}

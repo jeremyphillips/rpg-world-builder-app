@@ -211,7 +211,7 @@ describe('organization authoring inputs', () => {
     })
   })
 
-  it('strips connections, titles, and sourcePresetId from classification PATCH parse output', () => {
+  it('strips connections and titles from classification PATCH parse output', () => {
     expect(
       updateOrganizationInputSchema.parse({
         organizationDomain: 'academic',
@@ -220,7 +220,6 @@ describe('organization authoring inputs', () => {
           classAffinityIds: ['class-fighter'],
           titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
         },
-        sourcePresetId: 'bank',
       }),
     ).toEqual({
       organizationDomain: 'academic',
@@ -230,7 +229,6 @@ describe('organization authoring inputs', () => {
     expect(
       updateOrganizationDraftInputSchema.parse({
         description: '<p>Notes</p>',
-        sourcePresetId: 'bank',
         connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
       }),
     ).toEqual({ description: '<p>Notes</p>' })
@@ -254,18 +252,17 @@ describe('organization authoring inputs', () => {
     ).toEqual({ classAffinityIds: [], speciesAffinityIds: [], titles: [] })
   })
 
-  it('rejects create input that combines sourcePresetId with explicit members.titles', () => {
+  it('accepts create input with explicit members.titles', () => {
     expect(
       createOrganizationInputSchema.safeParse({
         slug: 'lantern-guild',
         name: 'The Lantern Guild',
         organizationDomain: 'occupational',
-        sourcePresetId: 'craft_guild',
         members: {
           titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
         },
       }).success,
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('accepts partial members affinity updates without titles', () => {

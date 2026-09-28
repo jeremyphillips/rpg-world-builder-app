@@ -8,7 +8,6 @@ import { organizationConnectionsSchema } from './connections'
 import {
   organizationCreateMembershipTitlesInputRefinement,
   organizationMembershipTitlesSchema,
-  organizationSourcePresetIdSchema,
   type OrganizationMembershipTitleDefinition,
 } from './membership-titles'
 import { createDraftInputSchema } from '../lib/content-input-schemas'
@@ -108,7 +107,6 @@ const organizationBodyFieldsSchema = organizationClassificationBodyFieldsSchema
   .omit({ members: true })
   .extend({
     members: organizationMembersSchema.default(defaultOrganizationMembers),
-    sourcePresetId: organizationSourcePresetIdSchema,
   })
 
 /** Publish-complete organization body. */
@@ -124,7 +122,6 @@ const organizationBodyDraftFieldsSchema = mediaBearingDraftAuthoredContentBodySc
   .omit({ members: true })
   .extend({
     members: organizationMembersSchema.default(defaultOrganizationMembers),
-    sourcePresetId: organizationSourcePresetIdSchema,
   })
 
 /** Draft organization body — domain may remain unset until publish. */
@@ -160,7 +157,6 @@ export const createOrganizationInputSchema = organizationClassificationBodyField
   .omit({ members: true })
   .extend({
     slug: slugSchema,
-    sourcePresetId: organizationSourcePresetIdSchema,
     members: organizationMembersWithOptionalTitlesSchema.default(
       defaultOrganizationMembersAffinity,
     ),
@@ -192,7 +188,7 @@ export const updateOrganizationInputSchema = organizationClassificationBodyField
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationInputSchema>
 
 export const updateOrganizationDraftInputSchema = organizationBodyDraftFieldsSchema
-  .omit({ connections: true, sourcePresetId: true })
+  .omit({ connections: true })
   .extend({
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),

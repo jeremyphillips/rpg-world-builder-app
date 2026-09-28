@@ -72,25 +72,23 @@ describe('organization authoring vocab smoke', () => {
   })
 
   it('projects the Bank preset to finance and banking in standalone and embedded syncs', () => {
-    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'bank' }, [
-      'authoringPresetId',
+    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ startingPointId: 'bank' }, [
+      'startingPointId',
     ])
     const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
-      { 'operatorOrganization.authoringPresetId': 'bank' },
-      ['operatorOrganization.authoringPresetId'],
+      { 'operatorOrganization.startingPointId': 'bank' },
+      ['operatorOrganization.startingPointId'],
     )
 
     expect(standalone).toMatchObject({
-      authoringPresetId: undefined,
-      sourcePresetId: 'bank',
+      startingPointId: 'bank',
       organizationDomain: 'commercial',
       organizationForm: 'company',
       functions: ['finance'],
       practices: ['banking'],
     })
     expect(embedded).toMatchObject({
-      'operatorOrganization.authoringPresetId': undefined,
-      'operatorOrganization.sourcePresetId': 'bank',
+      'operatorOrganization.startingPointId': 'bank',
       'operatorOrganization.organizationDomain': 'commercial',
       'operatorOrganization.organizationForm': 'company',
       'operatorOrganization.functions': ['finance'],
@@ -99,25 +97,23 @@ describe('organization authoring vocab smoke', () => {
   })
 
   it('projects the Army preset to force in standalone and embedded syncs', () => {
-    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'army' }, [
-      'authoringPresetId',
+    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ startingPointId: 'army' }, [
+      'startingPointId',
     ])
     const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
-      { 'operatorOrganization.authoringPresetId': 'army' },
-      ['operatorOrganization.authoringPresetId'],
+      { 'operatorOrganization.startingPointId': 'army' },
+      ['operatorOrganization.startingPointId'],
     )
 
     expect(standalone).toMatchObject({
-      authoringPresetId: undefined,
-      sourcePresetId: 'army',
+      startingPointId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
     })
     expect(embedded).toMatchObject({
-      'operatorOrganization.authoringPresetId': undefined,
-      'operatorOrganization.sourcePresetId': 'army',
+      'operatorOrganization.startingPointId': 'army',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -126,25 +122,23 @@ describe('organization authoring vocab smoke', () => {
   })
 
   it('projects breadth presets through standalone and embedded syncs', () => {
-    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ authoringPresetId: 'navy' }, [
-      'authoringPresetId',
+    const standalone = buildOrganizationFormValueSyncs()[0]!.apply({ startingPointId: 'navy' }, [
+      'startingPointId',
     ])
     const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
-      { 'operatorOrganization.authoringPresetId': 'navy' },
-      ['operatorOrganization.authoringPresetId'],
+      { 'operatorOrganization.startingPointId': 'navy' },
+      ['operatorOrganization.startingPointId'],
     )
 
     expect(standalone).toMatchObject({
-      authoringPresetId: undefined,
-      sourcePresetId: 'navy',
+      startingPointId: 'navy',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: ['navigation'],
     })
     expect(embedded).toMatchObject({
-      'operatorOrganization.authoringPresetId': undefined,
-      'operatorOrganization.sourcePresetId': 'navy',
+      'operatorOrganization.startingPointId': 'navy',
       'operatorOrganization.organizationDomain': 'military',
       'operatorOrganization.organizationForm': 'force',
       'operatorOrganization.functions': ['warfare', 'defense'],
@@ -153,12 +147,11 @@ describe('organization authoring vocab smoke', () => {
   })
 
   it('projects City watch to policing with investigation practice', () => {
-    const applied = buildOrganizationFormValueSyncs()[0]!.apply(
-      { authoringPresetId: 'city_watch' },
-      ['authoringPresetId'],
-    )
+    const applied = buildOrganizationFormValueSyncs()[0]!.apply({ startingPointId: 'city_watch' }, [
+      'startingPointId',
+    ])
     expect(applied).toMatchObject({
-      sourcePresetId: 'city_watch',
+      startingPointId: 'city_watch',
       organizationDomain: 'government',
       functions: ['policing'],
       practices: ['investigation'],
@@ -167,11 +160,11 @@ describe('organization authoring vocab smoke', () => {
 
   it('projects Political party to advocacy', () => {
     const applied = buildOrganizationFormValueSyncs()[0]!.apply(
-      { authoringPresetId: 'political_party' },
-      ['authoringPresetId'],
+      { startingPointId: 'political_party' },
+      ['startingPointId'],
     )
     expect(applied).toMatchObject({
-      sourcePresetId: 'political_party',
+      startingPointId: 'political_party',
       organizationDomain: 'political',
       organizationForm: 'association',
       functions: ['advocacy'],
@@ -186,7 +179,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['transport'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     },
     {
       name: 'Royal Exchequer',
@@ -194,7 +187,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     },
     {
       name: 'Ironworking Consortium',
@@ -202,7 +195,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['production', 'trade'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     },
     {
       name: 'Royal Host',
@@ -210,11 +203,11 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     },
   ] satisfies Array<OrganizationFormValues>)('persists $name without preset identity', (values) => {
     const input = buildOrganizationCreateInput(values)
-    expect(input).not.toHaveProperty('authoringPresetId')
+    expect(input).not.toHaveProperty('startingPointId')
     expect(input).toMatchObject({
       name: values.name,
       organizationDomain: values.organizationDomain,
@@ -230,10 +223,10 @@ describe('organization authoring vocab smoke', () => {
       organizationDomain: 'criminal',
       practices: ['extortion'],
       functions: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     })
     expect(input.practices).toEqual(['extortion'])
-    expect(input).not.toHaveProperty('authoringPresetId')
+    expect(input).not.toHaveProperty('startingPointId')
   })
 
   it('reopens saved canonical fields without reconstructing preset identity', () => {
@@ -243,7 +236,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration', 'defense'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     })
     const reopened = organizationToFormValues({
       ...saved,
@@ -265,7 +258,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration', 'defense'],
     })
-    expect(reopened).not.toHaveProperty('authoringPresetId')
+    expect(reopened).not.toHaveProperty('startingPointId')
   })
 
   it('keeps overview domain facet on organizationDomain', () => {

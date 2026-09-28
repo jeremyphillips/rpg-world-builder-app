@@ -13,7 +13,7 @@ import {
 import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from './organization-member-class-chip-options.lib'
 
 export const ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT =
-  'Species commonly associated with members of this organization. Used to recommend species when adding or creating members.'
+  'Species commonly associated with members.'
 
 const UNAVAILABLE_CHIP_LABEL_SUFFIX = `· ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`
 

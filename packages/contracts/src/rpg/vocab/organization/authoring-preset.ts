@@ -11,7 +11,7 @@ import {
  * Ephemeral familiar starting points for organization authoring.
  *
  * Presets project editable domain / form / functions / practices only. Preset identity is
- * never persisted on the organization body except optional `sourcePresetId` at create.
+ * never persisted on the organization body; create forms materialize titles and taxonomy locally.
  * `discoveryTerms` are authoring discovery strings that help users find a closest starting
  * point — not lexical aliases and not the same field as `OrganizationClassificationEntry.searchTerms`.
  */
@@ -185,7 +185,7 @@ const ORGANIZATION_AUTHORING_PRESET_BASE = {
   mercenary_company: {
     label: 'Mercenary company',
     description: 'Closest starting point for ranger company and other hired fighting enterprises.',
-    discoveryTerms: ['ranger company'],
+    discoveryTerms: ['ranger company', 'fighter company'],
     domain: 'military',
     form: 'company',
     functions: ['warfare'],

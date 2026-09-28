@@ -42,13 +42,12 @@ describe('omitDuplicateDeniedFields', () => {
     expect(result).toEqual({ name: 'Fighter', hitDie: 10 })
   })
 
-  it('strips sourcePresetId but preserves members.titles on organization duplicate input', () => {
+  it('preserves members.titles on organization duplicate input', () => {
     const result = omitDuplicateDeniedFields({
       id: 'org-1',
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
       members: {
         classAffinityIds: [],
         speciesAffinityIds: [],
@@ -63,7 +62,6 @@ describe('omitDuplicateDeniedFields', () => {
       },
     })
 
-    expect(result).not.toHaveProperty('sourcePresetId')
     expect(result.members).toEqual({
       classAffinityIds: [],
       speciesAffinityIds: [],
@@ -214,7 +212,7 @@ describe('transformDuplicateSource', () => {
     expect(parsed).not.toHaveProperty('modeling')
   })
 
-  it('parses organization duplicate input without sourcePresetId', () => {
+  it('parses organization duplicate input with membership titles', () => {
     const parsed = transformDuplicateSource({
       source: {
         id: 'org-1',
@@ -227,7 +225,6 @@ describe('transformDuplicateSource', () => {
         updatedAt: '2026-01-01T00:00:00.000Z',
         name: 'River Bank',
         organizationDomain: 'commercial',
-        sourcePresetId: 'bank',
         functions: ['finance'],
         practices: ['banking'],
         members: {
@@ -250,7 +247,6 @@ describe('transformDuplicateSource', () => {
       writeConfig: organizationWriteConfig,
     })
 
-    expect(parsed).not.toHaveProperty('sourcePresetId')
     expect((parsed.members as { titles: unknown[] }).titles).toHaveLength(1)
     expect((parsed.members as { titles: Array<{ label: string }> }).titles[0]?.label).toBe(
       'Treasurer',

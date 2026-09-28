@@ -12,8 +12,9 @@ type OrganizationMembers = {
 }
 ```
 
-**Familiar starting points** are create-only ephemeral projections — they seed domain / form /
-functions / practices / affinities and record `sourcePresetId` for title snapshotting at create.
+**Familiar starting points** are create-only draft UI (`startingPointId`) — they materialize domain /
+form / functions / practices / class affinities and membership titles into organization-owned form
+state. The association is not persisted on the organization record.
 
 | Concern                        | Where to read                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,11 +50,13 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 
 - Registry: [`organization-authoring-preset.ts`](../../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)
 - Create routes mount `OrganizationAuthoringFormShell` + `OrganizationAuthoringPresetBridge`.
-- Preset selection writes domain / form / functions / practices / affinities via
-  `buildOrganizationFormValueSyncs`, clears `authoringPresetId`, records `sourcePresetId` for
-  create, and sets **recommended practices** through
-  `ContentFormCtx.organizationPracticeRecommendationIds` (authoring guidance only).
-- Edit routes omit the preset combobox (`mode: 'edit'`).
+- Starting point selection writes domain / form / functions / practices / affinities / titles via
+  `buildOrganizationFormValueSyncs` while keeping visible `startingPointId` for summary UX.
+  **Recommended practices** flow through `ContentFormCtx.organizationPracticeRecommendationIds`
+  (authoring guidance only) while a starting point remains selected.
+- Removing the starting point clears the association and recommendations but retains materialized
+  profile values, class affinities, and titles.
+- Edit routes expose **Apply familiar type…** (profile + class affinities only; titles unchanged).
 
 ### Membership title catalog
 
@@ -69,14 +72,12 @@ Organizations carry a snapshot catalog at `members.titles[]`. Three ID layers ap
 may hold custom titles with no vocabulary entry. Preset `titleId` refs stay compile-time typed;
 org title space stays open.
 
-**Create path:** dashboard sends `sourcePresetId` only when a familiar starting point was
-applied — the API snapshots vocabulary labels/descriptions + preset priorities into
-`members.titles[]` at `bodyFromCreateInput`. Manual create may supply explicit
-`members.titles` when no preset is used. Create input rejects combining both.
+**Create path:** dashboard sends explicit `members.titles[]` when a starting point materialized
+the catalog (or when authored manually). The API persists title rows as given.
 
 | Path          | Client sends               | API persists                                                                     |
 | ------------- | -------------------------- | -------------------------------------------------------------------------------- |
-| Preset create | `sourcePresetId`           | Vocabulary resolve → opaque `omt_*` ids + `members.titles` snapshot + provenance |
+| Materialized  | `members.titles` snapshot  | As given (validate ids; preserve order)                                          |
 | Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
 | Duplicate     | (N/A — server copies body) | Source title rows copied in order with new `omt_*` ids; `sourcePresetId` omitted |
 

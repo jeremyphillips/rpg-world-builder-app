@@ -16,13 +16,9 @@ import {
   outlineControlShellClasses,
 } from './outline-control.variants'
 
-const chromeButtonVariants: Array<'default' | 'destructive' | 'outline' | 'secondary' | 'ghost'> = [
-  'default',
-  'destructive',
-  'outline',
-  'secondary',
-  'ghost',
-]
+const chromeButtonVariants: Array<
+  'default' | 'destructive' | 'warning' | 'outline' | 'secondary' | 'ghost'
+> = ['default', 'destructive', 'warning', 'outline', 'secondary', 'ghost']
 
 const textButtonTransparentClasses = 'bg-transparent hover:bg-transparent active:bg-transparent'
 
@@ -45,6 +41,8 @@ export const buttonVariants = cva(
           'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/80',
+        warning:
+          'bg-semantic-warning-strong text-semantic-warning-strong-foreground shadow-sm hover:bg-semantic-warning-strong/90 active:bg-semantic-warning-strong/80',
         attached:
           'border-0 bg-transparent shadow-none rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         outline: `${outlineControlShellClasses} ${outlineControlExpandedClasses}`,

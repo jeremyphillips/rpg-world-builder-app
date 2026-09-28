@@ -67,6 +67,8 @@ export type ContentFormCtx = {
   locationParentLocationIdSeed?: string
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
+  /** Standalone vs quick-create organization field visibility (`full` default). */
+  organizationFormPresentation?: 'full' | 'quick'
   /**
    * Parent content validation intent — `draft` when parent is unpublished/draft,
    * `publish` when editing published content. Drives read-only vs mutable table kind UI.

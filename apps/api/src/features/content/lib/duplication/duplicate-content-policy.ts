@@ -21,7 +21,6 @@ export const DUPLICATE_DENIED_FIELDS = [
   '_id',
   '__v',
   'modeling',
-  'sourcePresetId',
 ] as const
 
 export function assertDuplicateContentType(

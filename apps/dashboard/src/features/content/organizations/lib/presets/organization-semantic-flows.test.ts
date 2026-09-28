@@ -35,12 +35,18 @@ function practiceOptions(fields: ReturnType<typeof collectFields>): FieldOption[
   return flattenSelectFieldOptions(practicesField.options)
 }
 
-function presetOptions(fields: ReturnType<typeof collectFields>): FieldOption[] {
-  const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
-  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
-    return []
-  }
-  return flattenSelectFieldOptions(presetField.options)
+function authoringPresetComboboxOptions(): FieldOption[] {
+  return ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
+    const preset = ORGANIZATION_AUTHORING_PRESETS[id]
+    return {
+      value: id,
+      label: preset.label,
+      metadata: preset.description,
+      ...('discoveryTerms' in preset && preset.discoveryTerms
+        ? { searchTerms: preset.discoveryTerms }
+        : {}),
+    }
+  })
 }
 
 describe('initial Organization semantic flows', () => {
@@ -49,23 +55,36 @@ describe('initial Organization semantic flows', () => {
     (presetId) => {
       const recipe = ORGANIZATION_AUTHORING_PRESETS[presetId]
       const standalone = buildOrganizationFormValueSyncs()[0]!.apply(
-        { authoringPresetId: presetId },
-        ['authoringPresetId'],
+        { startingPointId: presetId },
+        ['startingPointId'],
       )!
       const embedded = buildOrganizationFormValueSyncs('operatorOrganization')[0]!.apply(
-        { 'operatorOrganization.authoringPresetId': presetId },
-        ['operatorOrganization.authoringPresetId'],
+        { 'operatorOrganization.startingPointId': presetId },
+        ['operatorOrganization.startingPointId'],
       )!
 
-      expect(embedded).toEqual(
+      const standaloneTitles = standalone['members.titles']
+      const embeddedTitles = embedded['operatorOrganization.members.titles']
+      const standaloneWithoutTitles = { ...standalone }
+      const embeddedWithoutTitles = { ...embedded }
+      delete standaloneWithoutTitles['members.titles']
+      delete embeddedWithoutTitles['operatorOrganization.members.titles']
+
+      expect(embeddedWithoutTitles).toEqual(
         Object.fromEntries(
-          Object.entries(standalone).map(([key, value]) => [`operatorOrganization.${key}`, value]),
+          Object.entries(standaloneWithoutTitles).map(([key, value]) => [
+            `operatorOrganization.${key}`,
+            value,
+          ]),
         ),
       )
+      expect(Array.isArray(standaloneTitles)).toBe(true)
+      expect(Array.isArray(embeddedTitles)).toBe(true)
+      expect((embeddedTitles as unknown[]).length).toBe((standaloneTitles as unknown[]).length)
 
       const input = buildOrganizationCreateInput({
         name: recipe.label,
-        sourcePresetId: presetId,
+        startingPointId: presetId,
         organizationDomain:
           standalone.organizationDomain as OrganizationFormValues['organizationDomain'],
         organizationForm: standalone.organizationForm as OrganizationFormValues['organizationForm'],
@@ -74,28 +93,30 @@ describe('initial Organization semantic flows', () => {
         members: {
           classAffinityIds: (standalone['members.classAffinityIds'] ?? []) as string[],
           speciesAffinityIds: [],
+          titles: (standalone['members.titles'] ??
+            []) as OrganizationFormValues['members']['titles'],
         },
       })
-      expect(input).not.toHaveProperty('authoringPresetId')
-      expect(input.sourcePresetId).toBe(presetId)
-      expect(input.members?.titles ?? []).toEqual([])
+      expect(input).not.toHaveProperty('startingPointId')
+      expect(input).not.toHaveProperty('sourcePresetId')
+      expect((input.members.titles ?? []).length).toBeGreaterThan(0)
     },
   )
 
   it('does not seed name when applying a familiar starting point', () => {
     const [sync] = buildOrganizationFormValueSyncs()
-    const applied = sync?.apply({ name: 'Royal Navy', authoringPresetId: 'army' }, [
-      'authoringPresetId',
+    const applied = sync?.apply({ name: 'Royal Navy', startingPointId: 'army' }, [
+      'startingPointId',
     ])
 
-    expect(applied).toEqual({
-      authoringPresetId: undefined,
-      sourcePresetId: 'army',
+    expect(applied).toMatchObject({
+      startingPointId: 'army',
       organizationDomain: 'military',
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
       'members.classAffinityIds': [],
+      'members.titles': expect.any(Array),
     })
     expect(applied).not.toHaveProperty('name')
   })
@@ -107,7 +128,7 @@ describe('initial Organization semantic flows', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
     })
     expect(input).toMatchObject({
       organizationDomain: 'criminal',
@@ -115,7 +136,7 @@ describe('initial Organization semantic flows', () => {
       practices: ['smuggling'],
     })
     expect(input).not.toHaveProperty('type')
-    expect(input).not.toHaveProperty('authoringPresetId')
+    expect(input).not.toHaveProperty('startingPointId')
   })
 
   it('projects breadth presets for protection racket, assassins, and shipyard flows', () => {
@@ -180,8 +201,8 @@ describe('initial Organization semantic flows', () => {
   })
 
   it('routes breadth familiar-type searches away from generic parents', () => {
-    const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
-    const options = presetOptions(fields)
+    collectFields(buildOrganizationFields(makeContentFormCtx()))
+    const options = authoringPresetComboboxOptions()
 
     const army = options.find((option) => option.value === 'army')
     const navy = options.find((option) => option.value === 'navy')

@@ -54,6 +54,9 @@ export function SelectFieldRenderer({
       value={normalizedSelectFieldValue(state.field.value)}
       onValueChange={state.field.onChange}
       onBlur={state.field.onBlur}
+      clearable={state.renderConfig.clearable}
+      clearAccessibleName={state.renderConfig.clearAccessibleName}
+      onClear={() => state.field.onChange('', { shouldDirty: true })}
       {...chrome}
       {...state.validation}
     />

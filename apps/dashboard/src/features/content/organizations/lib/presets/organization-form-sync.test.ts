@@ -6,6 +6,6 @@ describe('organizationFormValueSyncs', () => {
   it('only watches the ephemeral authoring preset', () => {
     const syncs = buildOrganizationFormValueSyncs()
     expect(syncs).toHaveLength(1)
-    expect(syncs[0]?.dependsOn).toEqual(['authoringPresetId'])
+    expect(syncs[0]?.dependsOn).toEqual(['startingPointId'])
   })
 })

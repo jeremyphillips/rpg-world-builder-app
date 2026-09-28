@@ -6,7 +6,6 @@ import {
   ORGANIZATION_FUNCTION_IDS,
   ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES,
   ORGANIZATION_PRACTICE_IDS,
-  ORGANIZATION_AUTHORING_PRESET_IDS,
   NPC_AUTHORING_TEMPLATE_IDS,
   MAX_CHARACTER_LEVEL,
 } from '@rpg/contracts'
@@ -65,7 +64,6 @@ const homebrewOrganizationSchema = new Schema(
         default: [],
       },
     },
-    sourcePresetId: { type: String, enum: [...ORGANIZATION_AUTHORING_PRESET_IDS] },
     connections: {
       locations: [
         {

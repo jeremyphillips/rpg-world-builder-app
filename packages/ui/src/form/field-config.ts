@@ -489,6 +489,10 @@ export interface SelectFieldConfig extends BaseFieldConfig {
   optionsResolve?: FieldDynamicSelectOptions
   placeholder?: string
   defaultValue?: string
+  /** Inline clear control when a value is selected — clears to `undefined` in form state. */
+  clearable?: boolean
+  /** Accessible name for the clear control — defaults to `Clear ${label}`. */
+  clearAccessibleName?: string
   optionalDisclosure?: OptionalDisclosureConfig
   /** Disables individual options when `enabledWhen` is false for the current values. */
   optionAvailability?: FieldOptionAvailability

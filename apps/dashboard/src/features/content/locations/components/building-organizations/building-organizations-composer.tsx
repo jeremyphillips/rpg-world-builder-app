@@ -237,6 +237,7 @@ function BuildingOrganizationNewOrganizationForm({
       schema={organizationFormSchema}
       fields={buildOrganizationFields(context, {
         includeName: true,
+        presentation: 'quick',
         recommendedPracticeIds: practiceRecommendations,
       })}
       defaultValues={organizationCreateDefaultValues}

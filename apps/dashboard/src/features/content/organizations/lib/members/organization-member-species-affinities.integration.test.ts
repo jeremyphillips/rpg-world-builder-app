@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { buildContentPurposeSelectors, DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
-import { flattenSelectFieldOptions } from '@rpg/ui/form'
+import {
+  buildContentPurposeSelectors,
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  ORGANIZATION_AUTHORING_PRESET_IDS,
+} from '@rpg/contracts'
 
 import { buildQuickNpcSpeciesRadioCardPresentation } from '@/features/character'
 import { makeSpecies } from '@/test/fixtures/factories/species'
@@ -8,20 +11,13 @@ import type { OrganizationMemberPickerCandidate } from '../../lib/members/organi
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildOrganizationCreateInput,
-  buildOrganizationFields,
   organizationToFormValues,
 } from '../../../lib/forms/organization-form-projection'
 import { buildMemberSpeciesAffinityChipOptions } from './organization-member-species-chip-options.lib'
 import { isOrganizationMemberPickerRecommended } from './organization-member-picker-drawer.lib'
 
-function collectPresetOptionValues(ctx = makeContentFormCtx()): string[] {
-  const presetField = buildOrganizationFields(ctx).find(
-    (item) => 'name' in item && item.name === 'authoringPresetId',
-  )
-  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
-    return []
-  }
-  return flattenSelectFieldOptions(presetField.options).map((option) => option.value)
+function collectPresetOptionValues(): string[] {
+  return [...ORGANIZATION_AUTHORING_PRESET_IDS]
 }
 
 describe('organization member species affinities integration', () => {
@@ -43,7 +39,7 @@ describe('organization member species affinities integration', () => {
       },
     })
 
-    expect(saved).not.toHaveProperty('authoringPresetId')
+    expect(saved).not.toHaveProperty('startingPointId')
     expect(saved.members.speciesAffinityIds).toEqual([elf.id, dwarf.id])
 
     const reopened = organizationToFormValues({
@@ -67,7 +63,7 @@ describe('organization member species affinities integration', () => {
     expect(reopened).toMatchObject({
       members: { classAffinityIds: [], speciesAffinityIds: [elf.id, dwarf.id] },
     })
-    expect(reopened).not.toHaveProperty('authoringPresetId')
+    expect(reopened).not.toHaveProperty('startingPointId')
   })
 
   it('round-trips custom species affinity ids through edit form values', () => {
@@ -152,19 +148,7 @@ describe('organization member species affinities integration', () => {
   })
 
   it('does not block org authoring when a stored affinity species is unavailable', () => {
-    const ctx = makeContentFormCtx({
-      options: {
-        species: buildContentPurposeSelectors([
-          human,
-          {
-            ...elf,
-            campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
-          },
-        ]),
-      },
-    })
-
-    expect(collectPresetOptionValues(ctx)).toContain('thieves_guild')
+    expect(collectPresetOptionValues()).toContain('thieves_guild')
 
     const saved = buildOrganizationCreateInput({
       name: 'Lantern Guild',

@@ -1,4 +1,4 @@
-import type { Organization, OrganizationAuthoringPresetId } from '@rpg/contracts'
+import type { Organization } from '@rpg/contracts'
 import {
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
@@ -41,9 +41,6 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
       speciesAffinityIds: record.members?.speciesAffinityIds ?? [],
       titles: organizationMembershipTitlesSchema.parse(record.members?.titles ?? []),
     },
-    ...(record.sourcePresetId !== undefined && record.sourcePresetId !== null
-      ? { sourcePresetId: record.sourcePresetId as OrganizationAuthoringPresetId }
-      : {}),
     connections: {
       locations: record.connections?.locations ?? [],
     },
@@ -52,10 +49,8 @@ export function toHomebrewOrganization(doc: HomebrewDoc): Organization {
 
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
   const { slug: _slug, ...rest } = input
-  const sourcePresetId = rest.sourcePresetId as OrganizationAuthoringPresetId | undefined
   const membersInput = (rest.members ?? {}) as Record<string, unknown>
   const titles = resolveOrganizationCreateMembershipTitles({
-    ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
     ...(membersInput.titles !== undefined
       ? {
           titles: organizationMembershipTitlesSchema.parse(membersInput.titles),
@@ -72,7 +67,6 @@ function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unk
       speciesAffinityIds: membersInput.speciesAffinityIds ?? [],
       titles,
     },
-    ...(sourcePresetId !== undefined ? { sourcePresetId } : {}),
   }
 }
 
