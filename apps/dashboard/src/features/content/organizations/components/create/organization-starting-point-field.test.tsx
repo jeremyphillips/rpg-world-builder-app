@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
 import { OrganizationStartingPointField } from './organization-starting-point-field'
 import { buildOrganizationFormValueSyncs } from '../../../lib/forms/organization-form-projection'
+import { ORGANIZATION_STARTING_POINT_HINT } from '../../lib/presets/organization-form-copy.lib'
+import { organizationStartingPointIsCustomized } from '../../lib/presets/organization-starting-point.lib'
 
 const schema = z.object({
   name: z.string().optional(),
@@ -25,13 +27,36 @@ const schema = z.object({
 
 type HarnessValues = z.infer<typeof schema>
 
-function Harness() {
-  const form = useForm<HarnessValues>({
-    defaultValues: { functions: [], practices: [], members: { classAffinityIds: [], titles: [] } },
+let readHarnessValues: (() => Record<string, unknown>) | undefined
+
+function CustomizedProbe() {
+  const values = useWatch() as Record<string, unknown>
+  return (
+    <div data-testid="customized-probe">
+      {String(organizationStartingPointIsCustomized(values, { discoverableClasses: [] }))}
+    </div>
+  )
+}
+
+async function waitForThievesGuildMaterialized(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
+  await user.click(screen.getByRole('option', { name: /Thieves' guild/i }))
+  await waitFor(() => {
+    expect(readHarnessValues?.()).toMatchObject({
+      startingPointId: 'thieves_guild',
+      organizationDomain: 'criminal',
+      practices: ['theft'],
+    })
   })
+}
+
+function Harness() {
+  const form = useFormContext<HarnessValues>()
+  readHarnessValues = () => form.getValues()
 
   return (
-    <FormProvider {...form}>
+    <>
+      <CustomizedProbe />
       <OrganizationStartingPointField discoverableClasses={[]} />
       <button
         type="button"
@@ -39,55 +64,87 @@ function Harness() {
       >
         Customize domain
       </button>
-    </FormProvider>
+      <button
+        type="button"
+        onClick={() => form.setValue('organizationDomain', 'criminal', { shouldDirty: true })}
+      >
+        Restore thieves guild domain
+      </button>
+    </>
+  )
+}
+
+function renderStartingPointForm() {
+  render(
+    <Form
+      schema={schema}
+      fields={[{ type: 'text', name: 'name', label: 'Name' }]}
+      defaultValues={{
+        name: 'Test',
+        functions: [],
+        practices: [],
+        members: { classAffinityIds: [], titles: [] },
+      }}
+      valueSyncs={buildOrganizationFormValueSyncs()}
+      onSubmit={() => undefined}
+      header={() => <Harness />}
+    />,
   )
 }
 
 describe('OrganizationStartingPointField', () => {
-  it('shows a compact summary after applying a starting point', async () => {
-    const user = userEvent.setup()
-    render(
-      <Form
-        schema={schema}
-        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
-        defaultValues={{ name: 'Test' }}
-        valueSyncs={buildOrganizationFormValueSyncs()}
-        onSubmit={() => undefined}
-        header={() => <Harness />}
-      />,
+  it('shows an empty starting point select with hint copy', () => {
+    renderStartingPointForm()
+
+    expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(
+      /Choose a familiar organization type/i,
     )
-
-    await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
-    await user.click(screen.getByRole('option', { name: /Thieves' guild/i }))
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument()
-    })
-    expect(screen.getByText(/Thieves' guild/i)).toBeInTheDocument()
+    expect(screen.getByText(ORGANIZATION_STARTING_POINT_HINT)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Clear Starting point' })).not.toBeInTheDocument()
   })
 
-  it('confirms before replacing a customized starting point', async () => {
+  it('keeps the selected preset in the same select with a clear affordance', async () => {
     const user = userEvent.setup()
-    render(
-      <Form
-        schema={schema}
-        fields={[{ type: 'text', name: 'name', label: 'Name' }]}
-        defaultValues={{ name: 'Test' }}
-        valueSyncs={buildOrganizationFormValueSyncs()}
-        onSubmit={() => undefined}
-        header={() => <Harness />}
-      />,
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
+
+    expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(
+      /Thieves' guild/i,
+    )
+    expect(screen.getByRole('button', { name: 'Clear Starting point' })).toBeInTheDocument()
+    expect(screen.queryByText('Customized')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change' })).not.toBeInTheDocument()
+  })
+
+  it('switches presets immediately when seeded values still match the recipe', async () => {
+    const user = userEvent.setup()
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
+
+    expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(
+      /Thieves' guild/i,
     )
 
     await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
-    await user.click(screen.getByRole('option', { name: /Thieves' guild/i }))
+    await user.click(screen.getByRole('option', { name: /Army/i }))
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Customize domain' })).toBeInTheDocument()
+      expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(/Army/i)
     })
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('shows a customized badge and confirms before replacing divergent seeded values', async () => {
+    const user = userEvent.setup()
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
 
     await user.click(screen.getByRole('button', { name: 'Customize domain' }))
-    await user.click(screen.getByRole('button', { name: 'Change' }))
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+
     await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
     await user.click(screen.getByRole('option', { name: /Army/i }))
 
@@ -96,6 +153,59 @@ describe('OrganizationStartingPointField', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(/Army/i)
+    })
+  })
+
+  it('drops the customized badge when preset-owned values match the recipe again', async () => {
+    const user = userEvent.setup()
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
+    await user.click(screen.getByRole('button', { name: 'Customize domain' }))
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Restore thieves guild domain' }))
+    await waitFor(() => {
+      expect(screen.getByTestId('customized-probe')).toHaveTextContent('false')
+      expect(screen.queryByText('Customized')).not.toBeInTheDocument()
+    })
+  })
+
+  it('clears the starting point association without confirmation and keeps the combobox editable', async () => {
+    const user = userEvent.setup()
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
+
+    expect(screen.getByRole('button', { name: 'Clear Starting point' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Clear Starting point' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveFocus()
+      expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveTextContent(
+        /Choose a familiar organization type/i,
+      )
+    })
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+  })
+
+  it('returns focus to the starting point control when a change dialog is cancelled', async () => {
+    const user = userEvent.setup()
+    renderStartingPointForm()
+
+    await waitForThievesGuildMaterialized(user)
+    await user.click(screen.getByRole('button', { name: 'Customize domain' }))
+
+    await user.click(screen.getByRole('combobox', { name: /Starting point/i }))
+    await user.click(screen.getByRole('option', { name: /Army/i }))
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(screen.getByRole('combobox', { name: /Starting point/i })).toHaveFocus()
     })
   })
 })

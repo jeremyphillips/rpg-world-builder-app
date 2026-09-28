@@ -43,60 +43,72 @@ interface ComboboxTriggerProps {
   muted: boolean
   /** When false, the trigger stays visible while the panel is open. */
   hideWhenOpen?: boolean
+  grouped?: boolean
   onBlur?: () => void
 }
 
-export function ComboboxTrigger({
-  listboxId,
-  open,
-  size,
-  triggerText,
-  loading,
-  disabled,
-  muted,
-  hideWhenOpen = true,
-  onBlur,
-}: ComboboxTriggerProps) {
-  return (
-    <Field.Control>
-      <PopoverPrimitive.Trigger asChild>
-        <button
-          type="button"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={listboxId}
-          aria-haspopup="listbox"
-          aria-busy={loading || undefined}
-          disabled={disabled}
-          onBlur={onBlur}
-          className={cn(
-            selectTriggerShellClasses(size, { grouped: false, groupedPosition: 'end' }),
-            'w-full shrink-0 items-stretch gap-0 text-left',
-            open && hideWhenOpen && comboboxTriggerOpenVariants(),
-          )}
-        >
-          <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
-            <span
-              className={cn(
-                comboboxTriggerValueTextClasses(size),
-                muted && 'text-muted-foreground',
-              )}
-            >
-              {triggerText}
-            </span>
-          </SelectLikeValueSlot>
-          <SelectLikeCaretSlot size={size}>
-            {loading ? (
-              <Spinner size="sm" variant="muted" />
-            ) : (
-              <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
+  function ComboboxTrigger(
+    {
+      listboxId,
+      open,
+      size,
+      triggerText,
+      loading,
+      disabled,
+      muted,
+      hideWhenOpen = true,
+      grouped = false,
+      onBlur,
+    },
+    ref,
+  ) {
+    return (
+      <Field.Control>
+        <PopoverPrimitive.Trigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listboxId}
+            aria-haspopup="listbox"
+            aria-busy={loading || undefined}
+            disabled={disabled}
+            onBlur={onBlur}
+            className={cn(
+              selectTriggerShellClasses(size, {
+                grouped,
+                groupedPosition: grouped ? 'start' : 'end',
+              }),
+              grouped ? 'min-w-0 w-full' : 'w-full',
+              'shrink-0 items-stretch gap-0 text-left',
+              open && hideWhenOpen && comboboxTriggerOpenVariants(),
             )}
-          </SelectLikeCaretSlot>
-        </button>
-      </PopoverPrimitive.Trigger>
-    </Field.Control>
-  )
-}
+          >
+            <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
+              <span
+                className={cn(
+                  comboboxTriggerValueTextClasses(size),
+                  muted && 'text-muted-foreground',
+                )}
+              >
+                {triggerText}
+              </span>
+            </SelectLikeValueSlot>
+            <SelectLikeCaretSlot size={size}>
+              {loading ? (
+                <Spinner size="sm" variant="muted" />
+              ) : (
+                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+              )}
+            </SelectLikeCaretSlot>
+          </button>
+        </PopoverPrimitive.Trigger>
+      </Field.Control>
+    )
+  },
+)
 
 interface ComboboxOptionItemProps {
   option: ComboboxFieldOption

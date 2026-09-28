@@ -51,7 +51,7 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 - Registry: [`organization-authoring-preset.ts`](../../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)
 - Create routes mount `OrganizationAuthoringFormShell` + `OrganizationAuthoringPresetBridge`.
 - Starting point selection writes domain / form / functions / practices / affinities / titles via
-  `buildOrganizationFormValueSyncs` while keeping visible `startingPointId` for summary UX.
+  `buildOrganizationFormValueSyncs` while keeping an editable clearable `startingPointId` select.
   **Recommended practices** flow through `ContentFormCtx.organizationPracticeRecommendationIds`
   (authoring guidance only) while a starting point remains selected.
 - Removing the starting point clears the association and recommendations but retains materialized

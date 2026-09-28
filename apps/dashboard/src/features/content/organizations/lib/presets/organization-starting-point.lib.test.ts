@@ -27,6 +27,30 @@ describe('organization starting point helpers', () => {
     expect(patch).not.toHaveProperty('authoringPresetId')
   })
 
+  it('reads nested members.classAffinityIds when detecting customized state', () => {
+    const patch = buildOrganizationStartingPointValueSyncPatch('thieves_guild', {
+      discoverableClasses: [],
+    })
+    const unchanged = {
+      startingPointId: 'thieves_guild',
+      organizationDomain: patch.organizationDomain,
+      organizationForm: patch.organizationForm,
+      functions: patch.functions,
+      practices: patch.practices,
+      members: { classAffinityIds: patch['members.classAffinityIds'], titles: [] },
+    }
+    expect(organizationStartingPointIsCustomized(unchanged, { discoverableClasses: [] })).toBe(
+      false,
+    )
+
+    expect(
+      organizationStartingPointIsCustomized(
+        { ...unchanged, organizationDomain: 'government' },
+        { discoverableClasses: [] },
+      ),
+    ).toBe(true)
+  })
+
   it('excludes membership titles from customized detection by contract', () => {
     expect(ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION).toBe(
       true,

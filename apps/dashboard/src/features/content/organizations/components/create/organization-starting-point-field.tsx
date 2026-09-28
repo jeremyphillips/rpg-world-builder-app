@@ -6,16 +6,13 @@ import {
   type CharacterClass,
   type OrganizationAuthoringPresetId,
 } from '@rpg/contracts'
-import { Button, ComboboxField, ConfirmDialog, Text } from '@rpg/ui'
+import { Badge, ComboboxField, ConfirmDialog } from '@rpg/ui'
 
 import {
-  ORGANIZATION_STARTING_POINT_CHANGE_LABEL,
   ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL,
   ORGANIZATION_STARTING_POINT_HINT,
   ORGANIZATION_STARTING_POINT_LEGEND,
   ORGANIZATION_STARTING_POINT_PLACEHOLDER,
-  ORGANIZATION_STARTING_POINT_REMOVE_HELP,
-  ORGANIZATION_STARTING_POINT_REMOVE_LABEL,
   organizationApplyStartingPointConfirmLabel,
   organizationChangeStartingPointDialogBody,
   organizationChangeStartingPointDialogTitle,
@@ -49,24 +46,21 @@ export function OrganizationStartingPointField({
 }: OrganizationStartingPointFieldProps) {
   const fieldPath = organizationStartingPointFieldPath(prefix)
   const comboboxId = useId()
-  const changeButtonRef = useRef<HTMLButtonElement>(null)
+  const comboboxTriggerRef = useRef<HTMLButtonElement>(null)
   const form = useFormContext()
   const startingPointId = useWatch({ name: fieldPath })
   const values = useWatch() as Record<string, unknown>
 
-  const [pickerOpen, setPickerOpen] = useState(false)
   const [pendingPresetId, setPendingPresetId] = useState<OrganizationAuthoringPresetId | null>(null)
 
   const applied = isOrganizationAuthoringPresetId(startingPointId)
   const customized = applied
     ? organizationStartingPointIsCustomized(values, { prefix, discoverableClasses })
     : false
-  const appliedLabel = applied ? ORGANIZATION_AUTHORING_PRESETS[startingPointId].label : ''
 
   const applyPreset = useCallback(
     (presetId: OrganizationAuthoringPresetId) => {
       form.setValue(fieldPath, presetId, { shouldDirty: true, shouldValidate: true })
-      setPickerOpen(false)
       setPendingPresetId(null)
     },
     [fieldPath, form],
@@ -81,11 +75,10 @@ export function OrganizationStartingPointField({
         applyPreset(nextValue)
         return
       }
-      if (nextValue === startingPointId && !customized) {
-        setPickerOpen(false)
+      if (nextValue === startingPointId) {
         return
       }
-      if (customized || nextValue !== startingPointId) {
+      if (customized) {
         setPendingPresetId(nextValue)
         return
       }
@@ -94,66 +87,43 @@ export function OrganizationStartingPointField({
     [applied, applyPreset, customized, startingPointId],
   )
 
-  const handleRemove = useCallback(() => {
+  const handleClear = useCallback(() => {
     form.setValue(fieldPath, undefined, { shouldDirty: true })
-    setPickerOpen(true)
   }, [fieldPath, form])
 
-  const showPicker = !applied || pickerOpen
+  const focusStartingPointControl = useCallback(() => {
+    requestAnimationFrame(() => {
+      comboboxTriggerRef.current?.focus()
+    })
+  }, [])
 
   return (
-    <div className="flex flex-col gap-2">
-      {applied && !pickerOpen ? (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <Text variant="small" as="span">
-            <span className="font-body-emphasis">{appliedLabel}</span>
-            {customized ? (
-              <Text variant="muted" as="span">
-                {' '}
-                · {ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL}
-              </Text>
-            ) : null}
-          </Text>
-          <Button
-            ref={changeButtonRef}
-            type="button"
-            variant="text"
-            size="sm"
-            density="compact"
-            onClick={() => setPickerOpen(true)}
-          >
-            {ORGANIZATION_STARTING_POINT_CHANGE_LABEL}
-          </Button>
-          <Button
-            type="button"
-            variant="text"
-            size="sm"
-            density="compact"
-            title={ORGANIZATION_STARTING_POINT_REMOVE_HELP}
-            onClick={handleRemove}
-          >
-            {ORGANIZATION_STARTING_POINT_REMOVE_LABEL}
-          </Button>
-        </div>
-      ) : null}
-
-      {showPicker ? (
+    <div className="flex flex-wrap items-end gap-2">
+      <div className="min-w-0 flex-1">
         <ComboboxField
           id={comboboxId}
           label={ORGANIZATION_STARTING_POINT_LEGEND}
-          labelVisibility="srOnly"
           hint={ORGANIZATION_STARTING_POINT_HINT}
           hintPosition="below-control"
           options={presetOptions}
           multiple={false}
           placeholder={ORGANIZATION_STARTING_POINT_PLACEHOLDER}
           value={applied ? startingPointId : ''}
+          clearable={applied}
+          clearAccessibleName={`Clear ${ORGANIZATION_STARTING_POINT_LEGEND}`}
+          onClear={handleClear}
+          triggerRef={comboboxTriggerRef}
           onChange={(next) => {
             if (typeof next === 'string') {
               handlePick(next)
             }
           }}
         />
+      </div>
+      {customized ? (
+        <Badge tone="neutral" size="sm" appearance="soft" className="mb-1 shrink-0">
+          {ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL}
+        </Badge>
       ) : null}
 
       {pendingPresetId ? (
@@ -162,7 +132,7 @@ export function OrganizationStartingPointField({
           onOpenChange={(open) => {
             if (!open) {
               setPendingPresetId(null)
-              changeButtonRef.current?.focus()
+              focusStartingPointControl()
             }
           }}
           headline={organizationChangeStartingPointDialogTitle()}
@@ -176,7 +146,7 @@ export function OrganizationStartingPointField({
           onConfirm={() => applyPreset(pendingPresetId)}
           onCancel={() => {
             setPendingPresetId(null)
-            changeButtonRef.current?.focus()
+            focusStartingPointControl()
           }}
         />
       ) : null}

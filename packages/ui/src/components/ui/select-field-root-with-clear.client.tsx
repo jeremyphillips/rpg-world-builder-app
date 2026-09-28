@@ -1,9 +1,9 @@
 'use client'
 
-import { X } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from '../../lib/utils'
 import { Field, type FieldSize } from './field.client'
+import { FieldClearAffordanceButton } from './field-clear-affordance.client'
 import { JoinedPair } from './joined-pair-field.client'
 import {
   Select,
@@ -20,10 +20,6 @@ import {
   type SelectFieldOptionListItem,
 } from '../../form/field-config'
 import { SelectOptionItem } from './select-option-item.client'
-import {
-  groupedEndLabelSegmentShellClasses,
-  selectCaretSlotWidthClasses,
-} from './select-compact-trigger.variants'
 
 function renderSelectOption(option: FieldOption) {
   return <SelectOptionItem key={option.value} option={option} />
@@ -74,18 +70,22 @@ export type SelectRootWithClearProps = {
   options: SelectFieldOptionListItem[]
 }
 
-function renderSelectTrigger({
-  id,
-  size,
-  digits,
-  sizingLabel,
-  sizingLabels,
-  onBlur,
-  placeholder,
-  grouped,
-}: SelectTriggerConfig) {
+function renderSelectTrigger(
+  {
+    id,
+    size,
+    digits,
+    sizingLabel,
+    sizingLabels,
+    onBlur,
+    placeholder,
+    grouped,
+  }: SelectTriggerConfig,
+  triggerRef: React.Ref<HTMLButtonElement>,
+) {
   return (
     <SelectTrigger
+      ref={triggerRef}
       id={id}
       size={size}
       digits={digits}
@@ -115,8 +115,9 @@ export function SelectRootWithClear({
   triggerConfig,
   options,
 }: SelectRootWithClearProps) {
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
   const showClear = clearable && resolvedValue !== undefined && !disabled
-  const trigger = renderSelectTrigger({ ...triggerConfig, grouped: showClear })
+  const trigger = renderSelectTrigger({ ...triggerConfig, grouped: showClear }, triggerRef)
   const select = (
     <Select
       value={resolvedValue}
@@ -140,24 +141,20 @@ export function SelectRootWithClear({
     <JoinedPair.Root layout="stretch" className="w-full">
       <div className="min-w-0">{select}</div>
       <JoinedPair.Divider />
-      <button
-        type="button"
-        className={cn(
-          groupedEndLabelSegmentShellClasses(size),
-          selectCaretSlotWidthClasses[size],
-          'inline-flex shrink-0 items-center justify-center text-muted-foreground hover:text-foreground',
-        )}
-        aria-label={clearLabel}
-        onClick={() => {
+      <FieldClearAffordanceButton
+        size={size}
+        accessibleName={clearLabel}
+        onClear={() => {
           if (onClear) {
             onClear()
-            return
+          } else {
+            onValueChange?.('')
           }
-          onValueChange?.('')
+          requestAnimationFrame(() => {
+            triggerRef.current?.focus()
+          })
         }}
-      >
-        <X className="size-icon-glyph-md" aria-hidden />
-      </button>
+      />
     </JoinedPair.Root>
   )
 }

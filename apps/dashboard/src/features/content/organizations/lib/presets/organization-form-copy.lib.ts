@@ -1,13 +1,8 @@
 export const ORGANIZATION_STARTING_POINT_LEGEND = 'Starting point'
 export const ORGANIZATION_STARTING_POINT_PLACEHOLDER = 'Choose a familiar organization type…'
 export const ORGANIZATION_STARTING_POINT_HINT =
-  'Choose a familiar type to prefill the organization profile, common member classes, and membership titles. You can customize the values afterward.'
+  'Prefills the organization profile, common member classes, and membership titles. You can customize these afterward.'
 
-export const ORGANIZATION_STARTING_POINT_REMOVE_LABEL = 'Remove starting point'
-export const ORGANIZATION_STARTING_POINT_REMOVE_HELP =
-  'Seeded profile values, common member classes, and membership titles will remain.'
-
-export const ORGANIZATION_STARTING_POINT_CHANGE_LABEL = 'Change'
 export const ORGANIZATION_STARTING_POINT_CUSTOMIZED_LABEL = 'Customized'
 
 export const ORGANIZATION_PROFILE_GROUP_LEGEND = 'Organization profile'

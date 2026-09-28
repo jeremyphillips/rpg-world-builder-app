@@ -18,6 +18,28 @@ function organizationFieldPath(prefix: string | undefined, name: string): string
   return prefix ? `${prefix}.${name}` : name
 }
 
+function readStringArrayField(values: Record<string, unknown>, path: string): string[] {
+  const direct = values[path]
+  if (Array.isArray(direct)) {
+    return direct.filter((id): id is string => typeof id === 'string' && id.length > 0)
+  }
+  const segments = path.split('.')
+  if (segments.length < 2) {
+    return []
+  }
+  let current: unknown = values
+  for (const segment of segments) {
+    if (!current || typeof current !== 'object') {
+      return []
+    }
+    current = (current as Record<string, unknown>)[segment]
+  }
+  if (!Array.isArray(current)) {
+    return []
+  }
+  return current.filter((id): id is string => typeof id === 'string' && id.length > 0)
+}
+
 export function isOrganizationAuthoringPresetId(
   value: unknown,
 ): value is OrganizationAuthoringPresetId {
@@ -94,7 +116,6 @@ export function readOrganizationPresetOwnedEditableSnapshot(
   const formValue = values[organizationFieldPath(prefix, 'organizationForm')]
   const functions = values[organizationFieldPath(prefix, 'functions')]
   const practices = values[organizationFieldPath(prefix, 'practices')]
-  const classAffinityIds = values[organizationFieldPath(prefix, 'members.classAffinityIds')]
   return {
     organizationDomain: domain as OrganizationPresetOwnedEditableSnapshot['organizationDomain'],
     ...(typeof formValue === 'string' && formValue.length > 0
@@ -109,9 +130,10 @@ export function readOrganizationPresetOwnedEditableSnapshot(
     practices: Array.isArray(practices)
       ? (practices as OrganizationPresetOwnedEditableSnapshot['practices'])
       : [],
-    classAffinityIds: Array.isArray(classAffinityIds)
-      ? classAffinityIds.filter((id): id is string => typeof id === 'string' && id.length > 0)
-      : [],
+    classAffinityIds: readStringArrayField(
+      values,
+      organizationFieldPath(prefix, 'members.classAffinityIds'),
+    ),
   }
 }
 

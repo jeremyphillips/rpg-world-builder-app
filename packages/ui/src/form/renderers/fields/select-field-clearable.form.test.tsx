@@ -46,6 +46,7 @@ describe('FormItems select clearable', () => {
     await user.click(screen.getByRole('button', { name: 'Clear Form' }))
     await waitFor(() => {
       expect(screen.getByRole('combobox', { name: 'Form' })).not.toHaveTextContent(/Guild/i)
+      expect(screen.getByRole('combobox', { name: 'Form' })).toHaveFocus()
     })
   })
 })
