@@ -22,6 +22,16 @@ export type AuthAgentSession = {
   userId: string
 }
 
+function formatAuthBodyError(action: string, status: number, body: unknown): string {
+  let serialized: string
+  try {
+    serialized = JSON.stringify(body)
+  } catch {
+    serialized = String(body)
+  }
+  return `${action} response missing user.id (status ${status}, body ${serialized})`
+}
+
 export async function registerTestUser(
   app: Express,
   credentials = defaultTestCredentials,
@@ -34,7 +44,7 @@ export async function registerTestUser(
     .expect(201)
   const userId = registerRes.body.user?.id as string | undefined
   if (!userId) {
-    throw new Error('Register response missing user.id')
+    throw new Error(formatAuthBodyError('Register', registerRes.status, registerRes.body))
   }
   return { agent, csrfToken, userId }
 }
@@ -44,17 +54,23 @@ export async function registerAndLoginTestUser(
   credentials = defaultTestCredentials,
 ): Promise<AuthAgentSession> {
   const { agent } = await newAuthAgent(app)
-  const csrf1 = (await agent.get('/api/auth/csrf')).body.csrfToken as string
-  await agent.post('/api/auth/register').set(CSRF_HEADER, csrf1).send(credentials).expect(201)
+  const csrfForRegister = (await agent.get('/api/auth/csrf')).body.csrfToken as string
+  await agent
+    .post('/api/auth/register')
+    .set(CSRF_HEADER, csrfForRegister)
+    .send(credentials)
+    .expect(201)
+
+  const csrfForLogin = (await agent.get('/api/auth/csrf')).body.csrfToken as string
   const loginRes = await agent
     .post('/api/auth/login')
-    .set(CSRF_HEADER, csrf1)
+    .set(CSRF_HEADER, csrfForLogin)
     .send({ email: credentials.email, password: credentials.password })
     .expect(200)
 
   const userId = loginRes.body.user?.id as string | undefined
   if (!userId) {
-    throw new Error('Login response missing user.id')
+    throw new Error(formatAuthBodyError('Login', loginRes.status, loginRes.body))
   }
 
   const csrfToken =

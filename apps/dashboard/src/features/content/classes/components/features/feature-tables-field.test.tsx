@@ -17,7 +17,10 @@ beforeAll(() => {
     HTMLElement.prototype.releasePointerCapture = () => undefined
   }
   if (!Element.prototype.scrollIntoView) {
-    Element.prototype.scrollIntoView = () => undefined
+    Element.prototype.scrollIntoView = vi.fn()
+  }
+  if (!HTMLElement.prototype.setPointerCapture) {
+    HTMLElement.prototype.setPointerCapture = () => undefined
   }
 })
 
