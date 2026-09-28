@@ -1,6 +1,6 @@
+import { ALIGNMENTS } from '@rpg/contracts'
 import type {
   NarrativeFragmentCondition,
-  NarrativeFragment,
   NarrativeGenerationContext,
 } from '@rpg/contracts/character-narrative'
 
@@ -12,9 +12,7 @@ export interface FoundationCompositionReviewCase {
   minimumConditionedFragments?: number
 }
 
-type NarrativeAlignment = NonNullable<NarrativeFragment['alignmentIds']>[number]
-
-const alignments: NarrativeAlignment[] = ['lg', 'ng', 'cg', 'ln', 'n', 'cn', 'le', 'ne', 'ce']
+const alignments = ALIGNMENTS
 const sparseSeeds = [1, 2, 3, 6, 7, 8, 11, 22, 4]
 const richSeeds = [1, 4, 6, 7, 9, 10, 12, 16, 19]
 

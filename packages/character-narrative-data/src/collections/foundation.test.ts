@@ -4,14 +4,15 @@ import {
   NARRATIVE_THEMES,
   type NarrativeSlot,
 } from '@rpg/contracts/character-narrative'
+import { ALIGNMENTS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
+  ALIGNMENT_SENSITIVE_SLOTS,
   buildFoundationInventory,
   findHighTextOverlap,
   findRepeatedOpenings,
   LINTABLE_GENERIC_PHRASES,
-  NARRATIVE_ALIGNMENTS,
 } from './foundation-audit.test-support'
 import { foundationCollection } from './foundation'
 
@@ -25,9 +26,11 @@ const MINIMUM_THEME_COVERAGE: Record<NarrativeSlot, number> = {
   motivation: 6,
 }
 
+const MIN_EXPLICIT_ALIGNMENT_COVERAGE = 2
+
 describe('foundation narrative collection', () => {
   it('loads validated authored fragments', () => {
-    expect(foundationCollection.revision).toBe('foundation-3')
+    expect(foundationCollection.revision).toBe('foundation-4')
     expect(foundationCollection.fragments).not.toHaveLength(0)
   })
 
@@ -72,14 +75,6 @@ describe('foundation narrative collection', () => {
       }
     }
 
-    for (const alignment of NARRATIVE_ALIGNMENTS) {
-      const eligibleCount = NARRATIVE_SLOTS.reduce(
-        (total, slot) => total + inventory.slotAlignment[slot][alignment],
-        0,
-      )
-      expect(eligibleCount, alignment).toBeGreaterThanOrEqual(4)
-    }
-
     for (const condition of Object.keys(NARRATIVE_FRAGMENT_CONDITION_ENTRIES)) {
       expect(
         inventory.conditions[condition as keyof typeof inventory.conditions],
@@ -90,6 +85,19 @@ describe('foundation narrative collection', () => {
     expect(inventory.hookShapes.direct).toBeGreaterThanOrEqual(20)
     expect(inventory.hookShapes.pressure).toBeGreaterThanOrEqual(20)
     expect(inventory.hookShapes.tension).toBeGreaterThanOrEqual(15)
+  })
+
+  it('meets alignment-specific coverage for alignment-sensitive slots', () => {
+    const inventory = buildFoundationInventory(foundationCollection)
+
+    for (const slot of ALIGNMENT_SENSITIVE_SLOTS) {
+      for (const alignment of ALIGNMENTS) {
+        expect(
+          inventory.explicitAlignmentCoverage[slot][alignment],
+          `${slot} × ${alignment}`,
+        ).toBeGreaterThanOrEqual(MIN_EXPLICIT_ALIGNMENT_COVERAGE)
+      }
+    }
   })
 
   it('rejects generic abstractions and obvious prose duplication', () => {
