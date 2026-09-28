@@ -1,4 +1,8 @@
-import { contentMediaSchema, emptyContentMediaSchema } from '@rpg/contracts'
+import {
+  contentMediaSchema,
+  createUploadRoleAssignment,
+  emptyContentMediaSchema,
+} from '@rpg/contracts'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
@@ -8,6 +12,7 @@ import {
 } from './content-form-serialize-input.lib'
 
 const mediaEnabledDef = {
+  routeKey: 'classes',
   supportsManagedMedia: true as const,
   mediaDomain: 'class' as const,
   toInput: vi.fn(() => ({ name: 'Test Class' })),
@@ -69,6 +74,7 @@ describe('serializeContentFormInput', () => {
     ) as Record<string, unknown>
 
     expect(result.media).toEqual(authoredMedia)
+    expect(result.expectedMediaRevision).toBe(1)
   })
 
   it('update: persists canonical empty media when clearing override', () => {
@@ -101,10 +107,31 @@ describe('serializeContentFormInput', () => {
     ) as Record<string, unknown>
 
     expect(result.media).toEqual(authoredMedia)
+    expect(result.expectedMediaRevision).toBe(1)
+  })
+
+  it('throws when upload roles reference missing gallery attachments', () => {
+    expect(() =>
+      serializeContentFormInput(
+        mediaEnabledDef,
+        {
+          ...baseValues,
+          media: contentMediaSchema.parse({
+            revision: 0,
+            images: [],
+            roles: { primary: createUploadRoleAssignment('missing') },
+          }),
+        },
+        undefined,
+        'publish',
+        { operation: 'update', dirtyFields: { media: true } },
+      ),
+    ).toThrow(/missing attachment/)
   })
 
   it('skips media merge when def does not support managed media', () => {
     const def = {
+      routeKey: 'spells',
       supportsManagedMedia: false,
       toInput: vi.fn(() => ({ name: 'Spell' })),
     }

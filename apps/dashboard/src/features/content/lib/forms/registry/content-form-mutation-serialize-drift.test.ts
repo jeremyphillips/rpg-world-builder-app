@@ -37,6 +37,14 @@ describe('content form mutation serialize drift guard', () => {
     expect(source).not.toMatch(RAW_TO_INPUT_AT_MUTATION_BOUNDARY)
   })
 
+  it('serialize helper attaches expectedMediaRevision when media is included', () => {
+    const serializePath = fileURLToPath(
+      new URL('./content-form-serialize-input.lib.ts', import.meta.url),
+    )
+    const source = readFileSync(serializePath, 'utf8')
+    expect(source).toContain('catalogContentMediaExpectedRevisionField')
+  })
+
   it('allows raw toInput on subclass tab save (no managed media)', () => {
     const source = readFileSync(subclassTabSavePath, 'utf8')
     expect(source).toContain('subclassFormDef.toInput')

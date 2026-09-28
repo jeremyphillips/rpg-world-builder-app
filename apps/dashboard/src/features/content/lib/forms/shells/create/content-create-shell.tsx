@@ -119,6 +119,7 @@ function ContentCreateFormBody({
         ...(serializeContentFormInput(def, preparedValues, inputCtx, validationIntent, {
           operation: 'create',
           dirtyFields: form?.formState.dirtyFields as Record<string, unknown> | undefined,
+          rulesetId: ctx.rulesetId,
         }) as Record<string, unknown>),
         status,
       },

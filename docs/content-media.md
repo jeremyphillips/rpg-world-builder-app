@@ -79,7 +79,13 @@ assets live under `{UPLOAD_DIR}/media/{assetId}/` and are not served by
 - `resolveCharacterDisplayImage` for portrait → primary character resolution
 - Normalized crop geometry and `validateContentMedia`
 - `mediaBearingAuthoredContentBodySchema` (authored bodies without `imageKey`)
-- Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`)
+- Overlay replacement key: `CONTENT_MEDIA_REPLACE_KEY` (`media`). Any write that
+  includes `media` must send a **complete canonical** `ContentMedia` snapshot
+  (full `images[]` and `roles` after normalize rules)—never a partial nested patch.
+  Unrelated saves omit `media` and `expectedMediaRevision`.
+- Catalog writes validate media on the API (coherence + policy), reconcile upload
+  references in the same Mongo transaction as persistence, and accept
+  `expectedMediaRevision` alongside `media` when media is included.
 - `reconcileContentMedia`, `reclaimExpiredAssets`, `remapContentMediaForDuplicate`
 - System content image registry (`SYSTEM_CONTENT_IMAGE_ENTRIES`)
 

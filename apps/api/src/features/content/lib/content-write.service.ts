@@ -28,6 +28,12 @@ import {
   isSlugDuplicateKeyError,
   resolveNextSlugCandidate,
 } from './slug/resolve-unique-content-slug'
+import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
+import {
+  extractCatalogMediaWriteEnvelope,
+  isCatalogMediaContentType,
+  reconcileCatalogContentMediaWithSession,
+} from './apply-content-catalog-media.lib'
 
 const MAX_SLUG_ATTEMPTS = 5
 
@@ -193,8 +199,12 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   entityId: string,
   _existing: T,
   update: Record<string, unknown>,
+  session?: ClientSession,
 ): Promise<T> {
-  const doc = await config.homebrewModel.findOne({ _id: entityId, campaignId }).lean<HomebrewDoc>()
+  const doc = await config.homebrewModel
+    .findOne({ _id: entityId, campaignId })
+    .session(session ?? null)
+    .lean<HomebrewDoc>()
   if (!doc) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
   }
@@ -211,7 +221,10 @@ async function updateHomebrewRecord<T extends StoredEntity>(
   if (Object.keys(unset).length > 0) mongoUpdate.$unset = unset
 
   const updated = await config.homebrewModel
-    .findOneAndUpdate({ _id: entityId, campaignId }, mongoUpdate, { returnDocument: 'after' })
+    .findOneAndUpdate({ _id: entityId, campaignId }, mongoUpdate, {
+      returnDocument: 'after',
+      session,
+    })
     .lean<HomebrewDoc>()
   if (!updated) {
     throw new HttpError(404, 'not_found', 'Homebrew record not found.')
@@ -231,6 +244,7 @@ async function updateSystemPatch<T extends StoredEntity>(
   entityId: string,
   existing: T,
   update: Record<string, unknown>,
+  session?: ClientSession,
 ): Promise<T> {
   if (!config.patchModel) {
     throw new HttpError(400, 'not_patchable', 'This content type does not support system patches.')
@@ -238,6 +252,7 @@ async function updateSystemPatch<T extends StoredEntity>(
 
   const existingPatchDoc = await config.patchModel
     .findOne({ campaignId, targetId: entityId })
+    .session(session ?? null)
     .lean<{ patch: Record<string, unknown> }>()
 
   const { mergedBody, cumulativePatch } = prepareSystemPatchMerge(
@@ -256,7 +271,7 @@ async function updateSystemPatch<T extends StoredEntity>(
   await config.patchModel.findOneAndUpdate(
     { campaignId, targetId: entityId },
     { $set: { patch: sanitizedPatch } },
-    { upsert: true, returnDocument: 'after' },
+    { upsert: true, returnDocument: 'after', session },
   )
 
   const resolved = await resolveCatalogForCampaign(config.readConfig, campaignId)
@@ -274,37 +289,113 @@ async function updateSystemPatch<T extends StoredEntity>(
   return config.storedSchema.parse(entityForParse as T)
 }
 
-/** Create a campaign-owned homebrew record for a content type. */
-export async function createHomebrewContent<T extends StoredEntity>(
+async function saveNewHomebrewRecordWithOptionalMedia<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
-  campaignId: string,
-  rawInput: unknown,
-  options: CreateHomebrewContentOptions = {},
+  input: {
+    campaignId: string
+    rulesetId: SystemRulesetId
+    slug: string
+    status: ContentStatus
+    body: Record<string, unknown>
+    mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
+    validationIntent: ContentValidationIntent
+    session?: ClientSession
+  },
 ): Promise<T> {
-  const status = options.status ?? 'published'
-  const slugCollisionPolicy = options.slugCollisionPolicy ?? 'reject'
-  const validationIntent = contentStatusToValidationIntent(status)
-  const writeMode = options.preserveNestedIds ? 'duplicate' : 'create'
-  const normalized = normalizeWriteInput(rawInput, undefined, writeMode)
-  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
-  const campaign = await findCampaignById(campaignId)
-  if (!campaign) {
-    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  const { media: _pendingMedia, ...bodyWithoutMedia } = input.body
+  const created = new config.homebrewModel({
+    campaignId: input.campaignId,
+    rulesetId: input.rulesetId,
+    slug: input.slug,
+    status: input.status,
+    ...(input.mediaEnvelope ? bodyWithoutMedia : input.body),
+  })
+  await created.save(input.session ? { session: input.session } : undefined)
+  const entityId = String(created._id)
+
+  if (input.mediaEnvelope) {
+    const reconciledMedia = await reconcileCatalogContentMediaWithSession(
+      {
+        config,
+        campaignId: input.campaignId,
+        entityId,
+        contentSource: 'homebrew',
+        slug: input.slug,
+        rulesetId: input.rulesetId,
+        envelope: input.mediaEnvelope,
+        mode: 'create',
+        currentMedia: null,
+      },
+      input.session!,
+    )
+    await config.homebrewModel.updateOne(
+      { _id: entityId, campaignId: input.campaignId },
+      { $set: { media: reconciledMedia } },
+      { session: input.session },
+    )
+    created.set('media', reconciledMedia)
   }
 
-  const { rulesetId } = campaign
-  const writeCtx = buildWriteContext(
+  const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
+  return resolveStoredSchema(config, input.validationIntent).parse(entity)
+}
+
+type HomebrewCreatePersistInput = {
+  campaignId: string
+  rulesetId: SystemRulesetId
+  slug: string
+  status: ContentStatus
+  body: Record<string, unknown>
+  mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
+  validationIntent: ContentValidationIntent
+}
+
+async function persistResolvedHomebrewCreate<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  writeCtxWithSlug: ContentWriteContext,
+  saveInput: HomebrewCreatePersistInput,
+  optionsSession?: ClientSession,
+): Promise<T> {
+  const parsed = saveInput.mediaEnvelope
+    ? await runInTransaction((session) =>
+        saveNewHomebrewRecordWithOptionalMedia(config, { ...saveInput, session }),
+      )
+    : await saveNewHomebrewRecordWithOptionalMedia(config, {
+        ...saveInput,
+        session: optionsSession,
+      })
+  return finalizeWriteResult(config, writeCtxWithSlug, parsed)
+}
+
+async function createHomebrewWithSlugRetries<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  params: {
+    campaignId: string
+    rulesetId: SystemRulesetId
+    validationIntent: ContentValidationIntent
+    input: Record<string, unknown>
+    normalized: Record<string, unknown>
+    body: Record<string, unknown>
+    requestedName: string
+    status: ContentStatus
+    mediaEnvelope?: ReturnType<typeof extractCatalogMediaWriteEnvelope>
+    slugCollisionPolicy: ContentSlugCollisionPolicy
+    options: CreateHomebrewContentOptions
+  },
+): Promise<T> {
+  const {
     campaignId,
     rulesetId,
-    'create',
     validationIntent,
     input,
     normalized,
-  )
-  await runValidateBeforeWrite(config, writeCtx)
-
-  const requestedName = typeof input.name === 'string' ? input.name : ''
-  const body = config.bodyFromCreateInput(input)
+    body,
+    requestedName,
+    status,
+    mediaEnvelope,
+    slugCollisionPolicy,
+    options,
+  } = params
 
   for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt++) {
     const slug = await resolveSlugForCreateAttempt({
@@ -330,18 +421,20 @@ export async function createHomebrewContent<T extends StoredEntity>(
     )
 
     try {
-      const created = new config.homebrewModel({
-        campaignId,
-        rulesetId,
-        slug,
-        status,
-        ...body,
-      })
-      await created.save(options.session ? { session: options.session } : undefined)
-
-      const entity = config.toHomebrewEntity(created.toObject() as unknown as HomebrewDoc)
-      const parsed = resolveStoredSchema(config, validationIntent).parse(entity)
-      return finalizeWriteResult(config, writeCtxWithSlug, parsed)
+      return await persistResolvedHomebrewCreate(
+        config,
+        writeCtxWithSlug,
+        {
+          campaignId,
+          rulesetId,
+          slug,
+          status,
+          body,
+          mediaEnvelope,
+          validationIntent,
+        },
+        options.session,
+      )
     } catch (error) {
       if (!isSlugDuplicateKeyError(error) || slugCollisionPolicy !== 'suffix') {
         throw error
@@ -350,6 +443,65 @@ export async function createHomebrewContent<T extends StoredEntity>(
   }
 
   throw new HttpError(409, 'slug_conflict', 'Could not allocate a unique slug for this content.')
+}
+
+/** Create a campaign-owned homebrew record for a content type. */
+export async function createHomebrewContent<T extends StoredEntity>(
+  config: ContentWriteConfig<T>,
+  campaignId: string,
+  rawInput: unknown,
+  options: CreateHomebrewContentOptions = {},
+): Promise<T> {
+  const status = options.status ?? 'published'
+  const slugCollisionPolicy = options.slugCollisionPolicy ?? 'reject'
+  const validationIntent = contentStatusToValidationIntent(status)
+  const writeMode = options.preserveNestedIds ? 'duplicate' : 'create'
+  const normalized = normalizeWriteInput(rawInput, undefined, writeMode)
+  const mediaEnvelope = isCatalogMediaContentType(config.typeName)
+    ? extractCatalogMediaWriteEnvelope(normalized)
+    : undefined
+
+  if (mediaEnvelope && !areMongoTransactionsEnabled()) {
+    throw new HttpError(
+      503,
+      'transactions_unavailable',
+      'Content media writes require MongoDB transactions.',
+    )
+  }
+
+  const input = parsePersistedWriteInput(config, normalized, 'create', validationIntent)
+  const campaign = await findCampaignById(campaignId)
+  if (!campaign) {
+    throw new HttpError(404, 'not_found', 'Campaign not found.')
+  }
+
+  const { rulesetId } = campaign
+  const writeCtx = buildWriteContext(
+    campaignId,
+    rulesetId,
+    'create',
+    validationIntent,
+    input,
+    normalized,
+  )
+  await runValidateBeforeWrite(config, writeCtx)
+
+  const requestedName = typeof input.name === 'string' ? input.name : ''
+  const body = config.bodyFromCreateInput(input)
+
+  return createHomebrewWithSlugRetries(config, {
+    campaignId,
+    rulesetId,
+    validationIntent,
+    input,
+    normalized,
+    body,
+    requestedName,
+    status,
+    mediaEnvelope,
+    slugCollisionPolicy,
+    options,
+  })
 }
 
 async function resolveSlugForCreateAttempt<T extends StoredEntity>({
@@ -488,6 +640,18 @@ export async function updateContentEntity<T extends StoredEntity>(
 
   const existingBody = entityBody(existing as unknown as Record<string, unknown>)
   const normalized = normalizeWriteInput(rawInput, existingBody, 'update')
+  const mediaEnvelope = isCatalogMediaContentType(config.typeName)
+    ? extractCatalogMediaWriteEnvelope(normalized)
+    : undefined
+
+  if (mediaEnvelope && !areMongoTransactionsEnabled()) {
+    throw new HttpError(
+      503,
+      'transactions_unavailable',
+      'Content media writes require MongoDB transactions.',
+    )
+  }
+
   const validationIntent = contentStatusToValidationIntent(existing.status)
   const update = parsePersistedWriteInput(config, normalized, 'update', validationIntent)
   const writeCtx = buildWriteContext(
@@ -501,25 +665,50 @@ export async function updateContentEntity<T extends StoredEntity>(
   )
   await runValidateBeforeWrite(config, writeCtx)
 
-  if (existing.source === 'homebrew') {
-    const updated = await updateHomebrewRecord(
+  const persistUpdate = async (payload: Record<string, unknown>, session?: ClientSession) => {
+    if (existing.source === 'homebrew') {
+      return updateHomebrewRecord(
+        config,
+        campaignId,
+        campaign.rulesetId,
+        entityId,
+        existing,
+        payload,
+        session,
+      )
+    }
+    return updateSystemPatch(
       config,
       campaignId,
       campaign.rulesetId,
       entityId,
       existing,
-      update,
+      payload,
+      session,
     )
+  }
+
+  if (mediaEnvelope) {
+    const slug = existing.slug
+    const updated = await runInTransaction(async (session) => {
+      const reconciledMedia = await reconcileCatalogContentMediaWithSession(
+        {
+          config,
+          campaignId,
+          entityId,
+          contentSource: existing.source,
+          slug,
+          rulesetId: campaign.rulesetId,
+          envelope: mediaEnvelope,
+          mode: 'update',
+        },
+        session,
+      )
+      return persistUpdate({ ...update, media: reconciledMedia }, session)
+    })
     return finalizeWriteResult(config, writeCtx, updated)
   }
 
-  const patched = await updateSystemPatch(
-    config,
-    campaignId,
-    campaign.rulesetId,
-    entityId,
-    existing,
-    update,
-  )
-  return finalizeWriteResult(config, writeCtx, patched)
+  const updated = await persistUpdate(update)
+  return finalizeWriteResult(config, writeCtx, updated)
 }

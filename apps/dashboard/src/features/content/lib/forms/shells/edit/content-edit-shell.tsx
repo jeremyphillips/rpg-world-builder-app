@@ -365,6 +365,7 @@ function ContentEditFormBody({
           {
             operation: 'update',
             dirtyFields: form.formState.dirtyFields as Record<string, unknown>,
+            rulesetId: layoutCtx.rulesetId,
           },
         ),
       )

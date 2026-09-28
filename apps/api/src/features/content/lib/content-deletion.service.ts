@@ -11,6 +11,7 @@ import {
   resolveAuthoritativeContentUsageBlockers,
 } from './content-usage/content-usage-resolvers'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
+import { releaseCatalogContentMediaReferences } from './apply-content-catalog-media.lib'
 import { resolveContentEntityForWrite } from './content-write.service'
 
 async function evaluateContentDeletionBlockers<T extends WriteEntityBase>(
@@ -60,6 +61,8 @@ export async function deleteContentEntity<T extends WriteEntityBase>(
   if (blockers.length > 0) {
     return { status: 'blocked', blockers }
   }
+
+  await releaseCatalogContentMediaReferences(config, campaignId, entityId)
 
   const result = await config.homebrewModel.deleteOne({ _id: entityId, campaignId })
   if (result.deletedCount !== 1) {

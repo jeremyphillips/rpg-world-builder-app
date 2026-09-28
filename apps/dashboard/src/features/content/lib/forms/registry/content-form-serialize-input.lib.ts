@@ -1,7 +1,13 @@
 import {
-  contentMediaSchema,
+  catalogContentMediaExpectedRevisionField,
+  collectContentMediaCoherenceIssues,
+  contentTypeSubject,
   emptyContentMediaSchema,
+  hasAuthoredContentMediaForCatalogWrite,
+  prepareContentMediaForCatalogWrite,
+  type CatalogContentMediaWriteContext,
   type ContentMedia,
+  type ContentTypeKey,
   type ContentValidationIntent,
 } from '@rpg/contracts'
 import type { FieldValues } from 'react-hook-form'
@@ -15,6 +21,7 @@ export type ContentFormSerializeOperation = 'create' | 'update'
 export type SerializeContentFormInputOptions = {
   operation: ContentFormSerializeOperation
   dirtyFields?: Record<string, unknown>
+  rulesetId?: string
 }
 
 export function isManagedContentMediaDirty(
@@ -29,26 +36,57 @@ export function isManagedContentMediaDirty(
   return false
 }
 
-/** True when form media is more than the blank create default (gallery or role assignments). */
-export function hasAuthoredContentMedia(media: ContentMedia | undefined | null): boolean {
-  if (!media) return false
-  if (media.images.length > 0) return true
-  return Object.keys(media.roles).length > 0
+/** @deprecated Use hasAuthoredContentMediaForCatalogWrite from @rpg/contracts at call sites with context. */
+export function hasAuthoredContentMedia(
+  media: ContentMedia | undefined | null,
+  ctx?: CatalogContentMediaWriteContext,
+): boolean {
+  return hasAuthoredContentMediaForCatalogWrite(media, ctx)
+}
+
+function resolveCatalogMediaWriteContext(
+  def: Pick<AnyContentFormDef, 'routeKey' | 'mediaDomain'>,
+  values: FieldValues,
+  ctx: ContentFormInputCtx<unknown> | undefined,
+  rulesetId?: string,
+): CatalogContentMediaWriteContext | undefined {
+  if (!def.mediaDomain) return undefined
+
+  const slug =
+    (ctx?.entity as { slug?: string } | undefined)?.slug ??
+    (typeof values.slug === 'string' ? values.slug : undefined)
+  const contentSource =
+    (ctx?.entity as { source?: 'homebrew' | 'system' } | undefined)?.source ?? 'homebrew'
+
+  if (!slug) return undefined
+
+  return {
+    domain: def.mediaDomain,
+    subject: contentTypeSubject(def.routeKey as ContentTypeKey),
+    slug,
+    contentSource,
+    rulesetId,
+  }
 }
 
 function shouldIncludeMediaInWritePayload(
   operation: ContentFormSerializeOperation,
   values: FieldValues,
   dirtyFields: Record<string, unknown> | undefined,
+  mediaCtx: CatalogContentMediaWriteContext | undefined,
 ): boolean {
+  const media = values.media as ContentMedia | undefined
   if (operation === 'update') {
     return isManagedContentMediaDirty(dirtyFields)
   }
-  return hasAuthoredContentMedia(values.media as ContentMedia | undefined)
+  return hasAuthoredContentMediaForCatalogWrite(media, mediaCtx)
 }
 
-function parseFormMedia(values: FieldValues): ContentMedia {
-  return contentMediaSchema.parse(values.media ?? emptyContentMediaSchema)
+function assertCoherentFormMedia(prepared: ContentMedia): void {
+  const issues = collectContentMediaCoherenceIssues(prepared)
+  if (issues.length === 0) return
+  const first = issues[0]!
+  throw new Error(first.message)
 }
 
 /**
@@ -58,7 +96,7 @@ function parseFormMedia(values: FieldValues): ContentMedia {
 export function serializeContentFormInput<
   TInput extends Record<string, unknown> = Record<string, unknown>,
 >(
-  def: Pick<AnyContentFormDef, 'supportsManagedMedia' | 'toInput'>,
+  def: Pick<AnyContentFormDef, 'supportsManagedMedia' | 'mediaDomain' | 'routeKey' | 'toInput'>,
   values: FieldValues,
   ctx: ContentFormInputCtx<unknown> | undefined,
   validationIntent: ContentValidationIntent,
@@ -70,12 +108,18 @@ export function serializeContentFormInput<
     return baseInput
   }
 
-  if (!shouldIncludeMediaInWritePayload(options.operation, values, options.dirtyFields)) {
+  const mediaCtx = resolveCatalogMediaWriteContext(def, values, ctx, options.rulesetId)
+
+  if (!shouldIncludeMediaInWritePayload(options.operation, values, options.dirtyFields, mediaCtx)) {
     return baseInput
   }
 
+  const prepared = prepareContentMediaForCatalogWrite(values.media ?? emptyContentMediaSchema)
+  assertCoherentFormMedia(prepared)
+
   return {
     ...baseInput,
-    media: parseFormMedia(values),
+    media: prepared,
+    [catalogContentMediaExpectedRevisionField]: prepared.revision,
   } as TInput
 }
