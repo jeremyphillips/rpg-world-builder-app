@@ -1,11 +1,34 @@
-import { NARRATIVE_SLOTS, NARRATIVE_THEMES } from '@rpg/contracts/character-narrative'
+import {
+  NARRATIVE_FRAGMENT_CONDITION_ENTRIES,
+  NARRATIVE_SLOTS,
+  NARRATIVE_THEMES,
+  type NarrativeSlot,
+} from '@rpg/contracts/character-narrative'
 import { describe, expect, it } from 'vitest'
 
+import {
+  buildFoundationInventory,
+  findHighTextOverlap,
+  findRepeatedOpenings,
+  LINTABLE_GENERIC_PHRASES,
+  NARRATIVE_ALIGNMENTS,
+} from './foundation-audit.test-support'
 import { foundationCollection } from './foundation'
+
+const MINIMUM_THEME_COVERAGE: Record<NarrativeSlot, number> = {
+  personalityTraits: 8,
+  ideals: 8,
+  bonds: 6,
+  flaws: 8,
+  experience: 6,
+  choice: 6,
+  motivation: 6,
+}
 
 describe('foundation narrative collection', () => {
   it('loads validated authored fragments', () => {
-    expect(foundationCollection.fragments.length).toBeGreaterThan(80)
+    expect(foundationCollection.revision).toBe('foundation-3')
+    expect(foundationCollection.fragments).not.toHaveLength(0)
   })
 
   it('includes relationship-conditioned fragments for Phase 7 enrichment', () => {
@@ -36,5 +59,49 @@ describe('foundation narrative collection', () => {
         expect(fallbackCount).toBeGreaterThanOrEqual(required)
       }
     }
+  })
+
+  it('meets the editorial coverage matrix floors', () => {
+    const inventory = buildFoundationInventory(foundationCollection)
+
+    for (const slot of NARRATIVE_SLOTS) {
+      for (const theme of NARRATIVE_THEMES) {
+        expect(inventory.slotTheme[slot][theme], `${slot} × ${theme}`).toBeGreaterThanOrEqual(
+          MINIMUM_THEME_COVERAGE[slot],
+        )
+      }
+    }
+
+    for (const alignment of NARRATIVE_ALIGNMENTS) {
+      const eligibleCount = NARRATIVE_SLOTS.reduce(
+        (total, slot) => total + inventory.slotAlignment[slot][alignment],
+        0,
+      )
+      expect(eligibleCount, alignment).toBeGreaterThanOrEqual(4)
+    }
+
+    for (const condition of Object.keys(NARRATIVE_FRAGMENT_CONDITION_ENTRIES)) {
+      expect(
+        inventory.conditions[condition as keyof typeof inventory.conditions],
+        condition,
+      ).toBeGreaterThanOrEqual(1)
+    }
+
+    expect(inventory.hookShapes.direct).toBeGreaterThanOrEqual(20)
+    expect(inventory.hookShapes.pressure).toBeGreaterThanOrEqual(20)
+    expect(inventory.hookShapes.tension).toBeGreaterThanOrEqual(15)
+  })
+
+  it('rejects generic abstractions and obvious prose duplication', () => {
+    const normalizedText = foundationCollection.fragments
+      .map((fragment) => fragment.text.toLowerCase())
+      .join('\n')
+
+    for (const phrase of LINTABLE_GENERIC_PHRASES) {
+      expect(normalizedText, phrase).not.toContain(phrase)
+    }
+
+    expect(findHighTextOverlap(foundationCollection.fragments)).toEqual([])
+    expect(findRepeatedOpenings(foundationCollection.fragments)).toEqual([])
   })
 })
