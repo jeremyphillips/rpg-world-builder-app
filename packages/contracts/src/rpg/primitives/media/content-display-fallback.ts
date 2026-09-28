@@ -1,0 +1,128 @@
+import type { ContentTypeKey } from '../content/content-type-keys'
+import type { ContentDisplaySurface } from '../media/content-display-surface'
+import type { ContentMediaDomain } from '../media/media-policy'
+import { resolveContentMediaDomainForContentType } from '../media/resolve-content-media-domain'
+
+export const CONTENT_DISPLAY_FALLBACKS = [
+  'character',
+  'npc',
+  'location',
+  'organization',
+  'campaign',
+  'equipment',
+  'class',
+  'species',
+  'spell',
+  'feat',
+  'skill-proficiency',
+  'game-term',
+  'generic',
+] as const
+
+export type ContentDisplayFallback = (typeof CONTENT_DISPLAY_FALLBACKS)[number]
+
+/** Fallback subjects — opted-in media domains plus non-media catalog kinds. */
+export type ContentDisplayFallbackSubject =
+  | ContentMediaDomain
+  | 'spell'
+  | 'feat'
+  | 'skill-proficiency'
+  | 'game-term'
+
+export type ContentDisplayFallbackSurface = ContentDisplaySurface | 'search'
+
+export type ResolveContentDisplayFallbackInput = {
+  domain: ContentDisplayFallbackSubject
+  surface: ContentDisplayFallbackSurface
+  characterType?: 'pc' | 'npc'
+}
+
+function isCompactIdentitySurface(surface: ContentDisplayFallbackSurface): boolean {
+  return surface === 'compact' || surface === 'search'
+}
+
+const MEDIA_DOMAIN_COMPACT_FALLBACK: Record<ContentMediaDomain, ContentDisplayFallback> = {
+  character: 'character',
+  location: 'location',
+  organization: 'organization',
+  campaign: 'campaign',
+  equipment: 'equipment',
+  class: 'class',
+  species: 'species',
+  'game-term': 'game-term',
+}
+
+function resolveMediaDomainFallback(
+  domain: ContentMediaDomain,
+  surface: ContentDisplayFallbackSurface,
+): ContentDisplayFallback {
+  if (isCompactIdentitySurface(surface)) {
+    return MEDIA_DOMAIN_COMPACT_FALLBACK[domain]
+  }
+
+  if (domain === 'class' || domain === 'species') {
+    return 'generic'
+  }
+
+  return MEDIA_DOMAIN_COMPACT_FALLBACK[domain]
+}
+
+/** Non-media catalog types — identity fallback subjects (preview rail, form chrome). */
+const CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT = {
+  spells: 'spell',
+  feats: 'feat',
+  'skill-proficiencies': 'skill-proficiency',
+} as const satisfies Partial<Record<ContentTypeKey, ContentDisplayFallbackSubject>>
+
+function resolveContentDisplayFallbackSubjectForContentType(
+  contentType: ContentTypeKey,
+): ContentDisplayFallbackSubject {
+  const mediaDomain = resolveContentMediaDomainForContentType(contentType)
+  if (mediaDomain) {
+    return mediaDomain
+  }
+
+  const nonMediaSubject =
+    CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT[
+      contentType as keyof typeof CONTENT_TYPE_NON_MEDIA_FALLBACK_SUBJECT
+    ]
+  if (nonMediaSubject) {
+    return nonMediaSubject
+  }
+
+  throw new Error(`Missing content display fallback subject for content type: ${contentType}`)
+}
+
+/** Preview rail, catalog chrome — `surface: 'field'` matches detail/field fallback policy. */
+export function resolveContentDisplayFallbackForContentType(
+  contentType: ContentTypeKey,
+  surface: ContentDisplayFallbackSurface = 'field',
+): ContentDisplayFallback {
+  const domain = resolveContentDisplayFallbackSubjectForContentType(contentType)
+  return resolveContentDisplayFallback({ domain, surface })
+}
+
+/** Surface-aware semantic empty-state key (UI maps to icons). */
+export function resolveContentDisplayFallback(
+  input: ResolveContentDisplayFallbackInput,
+): ContentDisplayFallback {
+  const { domain, surface, characterType } = input
+
+  if (domain === 'character') {
+    if (isCompactIdentitySurface(surface) && characterType === 'npc') {
+      return 'npc'
+    }
+    return 'character'
+  }
+
+  if (
+    domain === 'spell' ||
+    domain === 'feat' ||
+    domain === 'skill-proficiency' ||
+    domain === 'game-term'
+  ) {
+    return domain
+  }
+
+  return resolveMediaDomainFallback(domain, surface)
+}

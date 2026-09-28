@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
-import { contentMediaSchema } from '../../shared/media/content-media'
+import { contentMediaSchema } from '../primitives/media/content-media'
 import { vocabularyValidationMessages } from './vocabulary-messages'
 import { vocabularyUsageReferenceSchema } from './vocabulary-usage'
 

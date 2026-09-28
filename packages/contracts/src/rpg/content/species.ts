@@ -4,7 +4,7 @@ import { contentMetaSchema, contentPatchBaseSchema, slugSchema } from './lib/env
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
-} from '../../shared/media/media-bearing-content'
+} from './lib/media/media-bearing-content'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { movementSpeedsDraftSchema, movementSpeedsSchema } from '../vocab/movement-mode'

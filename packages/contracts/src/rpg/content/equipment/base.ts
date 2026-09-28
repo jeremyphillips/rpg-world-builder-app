@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { equipmentCostSchema } from '../../primitives/money'
 import { weightSchema } from '../../primitives/units'
-import { mediaBearingAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
+import { mediaBearingAuthoredContentBodySchema } from '../lib/media/media-bearing-content'
 
 /** Shared body fields present on every equipment union variant. */
 export const equipmentBaseSchema = mediaBearingAuthoredContentBodySchema.extend({

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { contentMediaSchema } from '../../shared/media/content-media'
+import { contentMediaSchema } from '../primitives/media/content-media'
 import { campaignRoleSchema } from '../../shared/roles'
 import { systemRulesetIdSchema } from '../primitives/ruleset'
 import { versionedTemplateReferenceSchema } from '../primitives/versioned-template'

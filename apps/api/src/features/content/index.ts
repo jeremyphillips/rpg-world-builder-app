@@ -13,6 +13,7 @@ export {
 export { resolveCatalogForCampaign } from './content.service'
 export type { ContentTypeConfig } from './lib/content-type-config'
 export { attachCampaignAccessForTargetType } from './lib/content-campaign-access.service'
+export { loadCampaignAccessByTargetIds } from './lib/content-campaign-access.service'
 export { getHomebrewContentSummary } from './lib/homebrew-summary.service'
 export { resolveSubclassesForCampaign } from './subclasses/list-subclasses'
 export { createHomebrewContent } from './lib/content-write.service'

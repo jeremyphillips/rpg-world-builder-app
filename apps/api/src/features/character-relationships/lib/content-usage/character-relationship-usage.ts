@@ -1,13 +1,10 @@
 import type { CharacterRelationship, ContentUsageBlocker } from '@rpg/contracts'
 import { isCampaignManager, USAGE_BLOCKER_SOURCE_KEYS } from '@rpg/contracts'
 
-import { listOpenParticipationsForCampaign } from '../../../campaign/participation/campaign-character-participation.repository'
+import { listOpenParticipationsForCampaign } from '../../../campaign'
 import { findNpcById, findPcById } from '../../../character'
-import {
-  resolveContentUsagePurpose,
-  type ContentUsageResolverContext,
-} from '../../../content/lib/content-usage/content-usage-context'
-import { indexRecordsByContentId } from '../../../content/lib/content-usage/reference-sources/index-by-content-id'
+import { resolveContentUsagePurpose, type ContentUsageResolverContext } from '../../../content'
+import { indexRecordsByContentId } from '../../../content'
 import { CharacterRelationshipModel } from '../../character-relationship.model'
 
 type RelationshipUsageRecord = {

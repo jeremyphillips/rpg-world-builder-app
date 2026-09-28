@@ -3,7 +3,7 @@ import { z } from 'zod'
 import {
   contentDisplayImagesByRoleSchema,
   type ContentDisplayImagesByRole,
-} from '../../../../shared/media/content-display-image-dto'
+} from '../../../primitives/media/content-display-image-dto'
 import { characterRouteContextSchema } from '../../campaign/character-route-context'
 
 // ---------------------------------------------------------------------------

@@ -9,7 +9,7 @@ import {
   contentTypeSubject,
 } from '@rpg/contracts'
 
-import { resolveMediaArtworkUrl } from '../../media/lib/media-artwork-url.lib'
+import { resolveMediaArtworkUrl } from '../../media'
 
 export function resolveGlobalSearchContentDisplayImage(input: {
   contentType: ApiContentTypeKey

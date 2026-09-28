@@ -30,7 +30,7 @@ import { interiorClassificationSchema } from './interior-classification'
 import { settlementTypeSchema } from '../../vocab/location/region/settlement-type'
 import { siteTypeSchema } from '../../vocab/location/region/site-type'
 import { structureTypeSchema } from '../../vocab/location/building/structure-type'
-import { mediaBearingDraftAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
+import { mediaBearingDraftAuthoredContentBodySchema } from '../lib/media/media-bearing-content'
 
 // ---------------------------------------------------------------------------
 // Location — campaign-authored content type discriminated by `kind`. Each

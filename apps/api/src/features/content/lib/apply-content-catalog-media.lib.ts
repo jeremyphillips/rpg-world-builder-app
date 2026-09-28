@@ -18,11 +18,8 @@ import type { ClientSession } from 'mongoose'
 
 import { HttpError } from '../../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
-import { findMediaAssetsByIds } from '../../media/media.repository'
-import {
-  prepareContentMediaReconciliation,
-  reconcileReferencesWithSession,
-} from '../../media/lib/reconcile-content-media'
+import { findMediaAssetsByIds } from '../../media'
+import { prepareContentMediaReconciliation, reconcileReferencesWithSession } from '../../media'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
 
 const CATALOG_MEDIA_TYPES = new Set<ApiContentTypeKey>([

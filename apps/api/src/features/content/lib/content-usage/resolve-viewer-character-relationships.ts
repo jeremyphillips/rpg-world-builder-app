@@ -16,7 +16,7 @@ import {
   indexSpellRelationshipsByContentId,
   relationshipsForContentEntry,
 } from './reference-sources/characters-extract'
-import { indexOrganizationMembershipViewerRelationshipsByContentId } from '../../../character-relationships/lib/content-usage/character-relationship-usage'
+import { indexOrganizationMembershipViewerRelationshipsByContentId } from '../../../character-relationships'
 import { loadControlledCharacterHits } from './reference-sources/characters'
 
 function sortRelationships(

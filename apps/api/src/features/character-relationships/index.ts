@@ -20,4 +20,18 @@ export {
   indexCharacterRelationshipCharacterBlockersByContentId,
   indexCharacterRelationshipLocationBlockersByContentId,
   indexCharacterRelationshipOrganizationBlockersByContentId,
+  indexOrganizationMembershipViewerRelationshipsByContentId,
 } from './lib/content-usage/character-relationship-usage'
+export {
+  createCharacterRelationshipItem,
+  deleteCharacterRelationshipItem,
+  listCharacterRelationships,
+  updateCharacterRelationshipItem,
+} from './character-relationship.handlers'
+export { createCharacterRelationshipsFromDraftEdges } from './lib/create-character-relationships-from-draft'
+export {
+  resolveCampaignCharacterRelationshipBlockers,
+  resolveCrossCampaignCharacterRelationshipBlockers,
+} from './lib/character-relationship-deletion-guards'
+export { canViewerSeeCharacterRelationship } from './lib/character-relationship-visibility.lib'
+export { projectCharacterRelationships } from './lib/project-character-relationships'

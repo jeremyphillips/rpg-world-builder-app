@@ -25,3 +25,5 @@ export {
   buildCharacterCardSummaryDto,
   createCharacterSummaryLabelLookup,
 } from './lib/build-character-card-summary-dto.lib'
+export { updateCharacterMediaRecord } from './lib/update-character-media.lib'
+export { resolveCharacterDisplayImagesByRoleForRecord } from './lib/resolve-character-display-image.lib'

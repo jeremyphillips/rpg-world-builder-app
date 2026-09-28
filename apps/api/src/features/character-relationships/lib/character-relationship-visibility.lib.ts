@@ -8,7 +8,7 @@ import {
   type ContentViewer,
 } from '@rpg/contracts'
 
-import { loadCampaignAccessByTargetIds } from '../../content/lib/content-campaign-access.service'
+import { loadCampaignAccessByTargetIds } from '../../content'
 
 type RelationshipViewerContext = {
   viewerRole: 'owner' | 'co-owner' | 'pc' | 'observer'

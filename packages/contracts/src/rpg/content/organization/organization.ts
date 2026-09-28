@@ -17,7 +17,7 @@ import { ORGANIZATION_CONTENT_TYPE_TERM } from '../lib/content-type-terms'
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
-} from '../../../shared/media/media-bearing-content'
+} from '../lib/media/media-bearing-content'
 
 function uniqueOrganizationClassificationArray<T extends z.ZodTypeAny>(
   itemSchema: T,

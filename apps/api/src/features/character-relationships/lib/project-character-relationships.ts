@@ -19,10 +19,10 @@ import {
 } from './character-relationship-visibility.lib'
 
 import { findNpcById, findPcById } from '../../character'
-import type { HomebrewDoc } from '../../content/lib/content-write-config'
-import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
-import { toHomebrewLocation } from '../../content/locations/locations.config'
-import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
+import type { HomebrewDoc } from '../../content'
+import { HomebrewLocationModel } from '../../content'
+import { toHomebrewLocation } from '../../content'
+import { HomebrewOrganizationModel } from '../../content'
 
 type ViewerContext = {
   viewerRole: 'owner' | 'co-owner' | 'pc' | 'observer'

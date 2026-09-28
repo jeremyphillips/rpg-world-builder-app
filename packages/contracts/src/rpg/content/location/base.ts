@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { mediaBearingAuthoredContentBodySchema } from '../../../shared/media/media-bearing-content'
+import { mediaBearingAuthoredContentBodySchema } from '../lib/media/media-bearing-content'
 
 /**
  * Shared body fields present on every location union variant.

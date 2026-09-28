@@ -19,7 +19,7 @@ import {
 } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
-import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
+import { CharacterRelationshipModel } from '../../character-relationships'
 import { resolveCatalogForCampaign } from '../content.service'
 import { locationWriteConfig } from '../locations/locations.config'
 import { HomebrewOrganizationModel } from '../organizations/homebrew-organization.model'
