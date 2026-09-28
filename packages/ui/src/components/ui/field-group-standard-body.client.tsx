@@ -106,6 +106,7 @@ export function StandardFieldGroupBody({
           description={description}
           legendSize={legendSize}
           legendTypography={legendTypography}
+          rhythm={rhythm}
           legendChromeClassName={chromeClasses.legend}
           collapsible={collapsible}
           open={open}

@@ -25,6 +25,8 @@ import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
 import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
+import { useFormSectionContext } from '../../form/context/form-section.context'
+import { resolveFormDensity } from '../../form/form-density'
 import { useComboboxControl } from './use-combobox-control.client'
 import type { FieldLabelPresentationProps } from './field-label-props'
 
@@ -154,7 +156,7 @@ export function ComboboxField({
   disabled,
   loading,
   width,
-  size = 'md',
+  size: sizeProp,
   placeholder,
   emptyMessage = 'No options found.',
   enableSearch = true,
@@ -165,6 +167,8 @@ export function ComboboxField({
   hintPosition,
   chrome,
 }: ComboboxFieldProps) {
+  const { density } = useFormSectionContext()
+  const size = sizeProp ?? resolveFormDensity(density).size
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
   const resolvedPlaceholder = resolveFieldPlaceholder(
     { label, category: multiple ? 'multi' : 'choice' },

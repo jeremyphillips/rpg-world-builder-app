@@ -159,10 +159,28 @@ export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2'
 export const fieldGroupDescriptionTypographyClasses =
   'font-normal leading-normal text-muted-foreground'
+/** Compact group legend description — 12px caption scale. */
+export const fieldGroupDescriptionCompactTypographyClasses =
+  'text-xs font-normal leading-normal text-muted-foreground'
 /** Group/subgroup hint copy — spacing is applied on the legend header wrapper. */
 export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
-export const fieldGroupLegendHeaderStackClasses = 'flex flex-col gap-2'
+export const fieldGroupLegendHeaderStackVariants = cva('flex flex-col', {
+  variants: {
+    rhythm: {
+      comfortable: 'gap-2',
+      compact: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
+
+/** Comfortable default — prefer {@link fieldGroupLegendHeaderStackVariants} when rhythm is known. */
+export const fieldGroupLegendHeaderStackClasses = fieldGroupLegendHeaderStackVariants({
+  rhythm: 'comfortable',
+})
 /** Section-level legend header bottom margin (20px). */
 export const fieldGroupLegendSpacingClasses = 'mb-5'
 /** Subgroup legend header bottom margin (16px). */
@@ -173,6 +191,9 @@ export const fieldGroupLegendTypographyClasses =
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
 export const fieldSubgroupLegendTypographyClasses =
   'text-field-subgroup-legend font-heading leading-none text-foreground'
+/** Compact section/subgroup legend typography — 15px heading scale. */
+export const fieldGroupLegendCompactTypographyClasses =
+  'text-md font-heading leading-none text-foreground'
 /** Repeatable array section legend — matches leaf field label typography. */
 export const fieldLabelTypographyVariants = cva('font-field-label leading-none text-foreground', {
   variants: {
@@ -279,7 +300,7 @@ export type FieldRhythm = 'compact' | 'comfortable'
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
     rhythm: {
-      compact: 'gap-3',
+      compact: 'gap-4',
       comfortable: 'gap-6',
     },
   },
@@ -504,18 +525,29 @@ export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendS
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
-      section: fieldGroupLegendTypographyClasses,
-      subsection: fieldSubgroupLegendTypographyClasses,
+      section: '',
+      subsection: '',
       array: '',
     },
     scale: {
       default: '',
       sm: '',
     },
+    rhythm: {
+      comfortable: '',
+      compact: '',
+    },
   },
+  compoundVariants: [
+    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendTypographyClasses },
+    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendTypographyClasses },
+    { size: 'section', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
+    { size: 'subsection', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
+  ],
   defaultVariants: {
     size: 'section',
     scale: 'default',
+    rhythm: 'comfortable',
   },
 })
 
@@ -523,13 +555,24 @@ export const fieldGroupLegendVariants = cva('', {
 export const fieldGroupLegendHeaderMarginVariants = cva('', {
   variants: {
     size: {
-      section: fieldGroupLegendSpacingClasses,
-      subsection: fieldSubgroupLegendSpacingClasses,
+      section: '',
+      subsection: '',
       array: fieldArrayLegendSpacingClasses,
     },
+    rhythm: {
+      comfortable: '',
+      compact: '',
+    },
   },
+  compoundVariants: [
+    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendSpacingClasses },
+    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendSpacingClasses },
+    { size: 'section', rhythm: 'compact', class: 'mb-3' },
+    { size: 'subsection', rhythm: 'compact', class: 'mb-3' },
+  ],
   defaultVariants: {
     size: 'section',
+    rhythm: 'comfortable',
   },
 })
 
@@ -537,18 +580,29 @@ export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendV
 
 /** Typography + header margin for `<legend>` on groups and subgroups. */
 export function resolveFieldGroupLegendClassName(
-  options: FieldGroupLegendVariantProps & { fieldSize?: FieldSizeToken } = {},
+  options: FieldGroupLegendVariantProps & {
+    fieldSize?: FieldSizeToken
+    rhythm?: FieldRhythm
+  } = {},
 ): string {
   const size = options.size ?? 'section'
+  const rhythm = options.rhythm ?? 'comfortable'
   if (size === 'array') {
     return resolveArrayLegendClassName(options.fieldSize ?? 'sm')
   }
-  return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
+  return cn(
+    fieldGroupLegendVariants({ size, scale: options.scale, rhythm }),
+    fieldGroupLegendHeaderMarginVariants({ size, rhythm }),
+  )
 }
 
 /** Stack + bottom margin for a legend/hint header block nested inside `<legend>`. */
 export function resolveFieldGroupLegendHeaderStackClassName(
   size: NonNullable<FieldGroupLegendVariantProps['size']> = 'section',
+  rhythm: FieldRhythm = 'comfortable',
 ): string {
-  return cn(fieldGroupLegendHeaderStackClasses, fieldGroupLegendHeaderMarginVariants({ size }))
+  return cn(
+    fieldGroupLegendHeaderStackVariants({ rhythm }),
+    fieldGroupLegendHeaderMarginVariants({ size, rhythm }),
+  )
 }

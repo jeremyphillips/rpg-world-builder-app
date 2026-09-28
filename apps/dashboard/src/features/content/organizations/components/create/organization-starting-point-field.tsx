@@ -141,6 +141,7 @@ export function OrganizationStartingPointField({
         <ComboboxField
           id={comboboxId}
           label={ORGANIZATION_STARTING_POINT_LEGEND}
+          labelVisibility="srOnly"
           hint={ORGANIZATION_STARTING_POINT_HINT}
           hintPosition="below-control"
           options={presetOptions}

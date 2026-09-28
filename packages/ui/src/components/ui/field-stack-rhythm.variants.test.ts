@@ -61,8 +61,8 @@ describe('fieldStackRhythmVariants', () => {
     expect(fieldStackRhythmVariants({ rhythm: 'comfortable' })).toContain('gap-6')
   })
 
-  it('maps compact to gap-3', () => {
-    expect(fieldStackRhythmVariants({ rhythm: 'compact' })).toContain('gap-3')
+  it('maps compact to gap-4', () => {
+    expect(fieldStackRhythmVariants({ rhythm: 'compact' })).toContain('gap-4')
   })
 })
 
@@ -124,6 +124,12 @@ describe('field group legend helpers', () => {
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'section' })).toBe('mb-5')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection' })).toBe('mb-4')
     expect(fieldGroupLegendHeaderMarginVariants({ size: 'array' })).toBe('mb-1.5')
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'section', rhythm: 'compact' })).toBe(
+      'mb-3',
+    )
+    expect(fieldGroupLegendHeaderMarginVariants({ size: 'subsection', rhythm: 'compact' })).toBe(
+      'mb-3',
+    )
   })
 
   it('composes legend class names with header margin', () => {

@@ -8,7 +8,7 @@ import { TextField } from './text-field'
 
 function fieldStack(fieldset: HTMLElement): HTMLElement | null {
   return fieldset.querySelector(
-    ':scope > div.flex.flex-col.gap-6, :scope > div > div.flex.flex-col.gap-6',
+    ':scope > div.flex.flex-col.gap-6, :scope > div > div.flex.flex-col.gap-6, :scope > div.flex.flex-col.gap-4',
   )
 }
 
@@ -67,6 +67,22 @@ describe('FieldGroup', () => {
     )
     const stack = fieldStack(screen.getByRole('group', { name: /Character basics/ }))
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-6')
+  })
+
+  it('applies compact legend typography, header spacing, and stack rhythm', () => {
+    render(
+      <FieldGroup legend="Basics" rhythm="compact" description="Help copy.">
+        <TextField id="name" label="Name" size="sm" />
+      </FieldGroup>,
+    )
+
+    const legend = screen.getByText('Basics').closest('legend')
+    expect(legend).toHaveClass('text-md', 'font-heading')
+    expect(legend?.firstElementChild).toHaveClass('gap-1', 'mb-3')
+    expect(screen.getByText('Help copy.')).toHaveClass('text-xs')
+
+    const stack = fieldStack(screen.getByRole('group', { name: /Basics/ }))
+    expect(stack).toHaveClass('flex', 'flex-col', 'gap-4')
   })
 
   it('renders a subsection legend at the smaller type scale', () => {

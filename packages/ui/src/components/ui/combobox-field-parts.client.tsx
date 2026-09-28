@@ -7,8 +7,8 @@ import { ChevronDown, Check, Search } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
-import { fieldControlVariants } from './field-control.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
+import { selectTriggerShellClasses } from './select-compact-trigger.variants'
 import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -19,6 +19,7 @@ import type {
 } from './combobox-field.types'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
+  comboboxTriggerValueTextClasses,
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
@@ -69,14 +70,20 @@ export function ComboboxTrigger({
           disabled={disabled}
           onBlur={onBlur}
           className={cn(
-            fieldControlVariants({ size }),
-            'inline-flex shrink-0 items-stretch gap-0 px-0 py-0 text-left',
-            muted && 'text-muted-foreground',
+            selectTriggerShellClasses(size, { grouped: false, groupedPosition: 'end' }),
+            'w-full shrink-0 items-stretch gap-0 text-left',
             open && hideWhenOpen && comboboxTriggerOpenVariants(),
           )}
         >
           <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
-            <span className="truncate">{triggerText}</span>
+            <span
+              className={cn(
+                comboboxTriggerValueTextClasses(size),
+                muted && 'text-muted-foreground',
+              )}
+            >
+              {triggerText}
+            </span>
           </SelectLikeValueSlot>
           <SelectLikeCaretSlot size={size}>
             {loading ? (

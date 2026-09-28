@@ -152,7 +152,7 @@ describe('SlotFieldRenderer', () => {
       />,
     )
 
-    expect(container.querySelectorAll('.flex.flex-col.gap-3')).toHaveLength(1)
+    expect(container.querySelectorAll('.flex.flex-col.gap-4')).toHaveLength(1)
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
@@ -177,7 +177,7 @@ describe('SlotFieldRenderer', () => {
       />,
     )
 
-    expect(container.querySelectorAll('.flex.flex-col.gap-3')).toHaveLength(1)
+    expect(container.querySelectorAll('.flex.flex-col.gap-4')).toHaveLength(1)
     expect(container.querySelectorAll('.bg-field-container')).toHaveLength(1)
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })

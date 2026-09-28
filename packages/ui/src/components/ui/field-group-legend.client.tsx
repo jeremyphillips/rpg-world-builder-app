@@ -5,10 +5,12 @@ import { ChevronDown } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { accordionTriggerVariants } from './accordion.variants'
 import {
+  fieldGroupDescriptionCompactTypographyClasses,
   fieldGroupDescriptionTypographyClasses,
   fieldGroupLegendHeaderMarginVariants,
-  fieldGroupLegendHeaderStackClasses,
+  fieldGroupLegendHeaderStackVariants,
   type FieldGroupLegendSize,
+  type FieldRhythm,
 } from './field.variants'
 import { Text } from './text'
 
@@ -19,6 +21,7 @@ export type FieldGroupLegendProps = {
   legendTypography: string
   legendChromeClassName: string
   collapsible: boolean
+  rhythm?: FieldRhythm
   open?: boolean
   onToggle?: () => void
 }
@@ -30,15 +33,24 @@ export function FieldGroupLegend({
   legendTypography,
   legendChromeClassName,
   collapsible,
+  rhythm = 'comfortable',
   open,
   onToggle,
 }: FieldGroupLegendProps) {
   const headerMargin =
-    legendSize === 'array' ? '' : fieldGroupLegendHeaderMarginVariants({ size: legendSize })
+    legendSize === 'array' ? '' : fieldGroupLegendHeaderMarginVariants({ size: legendSize, rhythm })
+  const descriptionTypography =
+    rhythm === 'compact'
+      ? fieldGroupDescriptionCompactTypographyClasses
+      : fieldGroupDescriptionTypographyClasses
   const legendContent = description ? (
-    <span className={cn(fieldGroupLegendHeaderStackClasses, headerMargin)}>
+    <span className={cn(fieldGroupLegendHeaderStackVariants({ rhythm }), headerMargin)}>
       <span>{legend}</span>
-      <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>
+      <Text
+        as="span"
+        variant={rhythm === 'compact' ? 'caption' : 'small'}
+        className={descriptionTypography}
+      >
         {description}
       </Text>
     </span>

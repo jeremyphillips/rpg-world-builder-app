@@ -85,7 +85,7 @@ export function FieldGroup({
   const legendTypography =
     legendSize === 'array'
       ? resolveArrayLegendClassName(resolvedFieldSize)
-      : fieldGroupLegendVariants({ size: legendSize })
+      : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({
     disclosure,

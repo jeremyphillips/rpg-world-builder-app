@@ -32,6 +32,19 @@ describe('ComboboxTrigger', () => {
     expect(trigger.querySelector('[data-select-caret-slot]')).toBeInTheDocument()
   })
 
+  it('maps sm trigger value text to the compact control type scale', () => {
+    renderComboboxTrigger({
+      listboxId: 'weapon-listbox',
+      open: false,
+      size: 'sm',
+      triggerText: 'Choose weapon…',
+      muted: true,
+    })
+
+    const value = screen.getByRole('combobox').querySelector('[data-select-value-slot] span')
+    expect(value).toHaveClass('text-xs')
+  })
+
   it('shows a spinner inside the caret slot while loading', () => {
     renderComboboxTrigger({
       listboxId: 'weapon-listbox',

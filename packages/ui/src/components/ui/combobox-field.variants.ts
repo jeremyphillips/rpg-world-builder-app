@@ -2,7 +2,13 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { establishSurfaceCurrent } from './surface-current.lib'
-import type { FieldSizeToken } from './field-sizing.variants'
+import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
+import type { FieldSize } from './field.client'
+
+/** Trigger placeholder / selected value type scale — matches single-line field controls. */
+export function comboboxTriggerValueTextClasses(size: FieldSize = 'md'): string {
+  return cn('min-w-0 truncate', fieldSizeTypographyClasses[size])
+}
 
 /** Negative `sideOffset` magnitude — matches field-control height so the panel overlaps the trigger. */
 export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
