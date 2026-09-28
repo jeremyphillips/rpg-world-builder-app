@@ -13,6 +13,7 @@ import {
 } from '@rpg/contracts'
 
 import type { MediaManagerController } from '../hooks/use-media-manager'
+import { resolveFramePresentation } from '../lib/content-media-image-frame.lib'
 import { mediaImageUrl, MEDIA_SOURCE_CROP, systemContentImageUrl } from '../lib/media-display'
 import {
   isStalePrimaryCrop,
@@ -54,6 +55,16 @@ function MediaWorkspaceCropEditor({
     stalePrimaryCrop,
   })
   const supportsFocalPoint = constraint.spec.supportsFocalPoint
+  const cardPresentation =
+    activeRole === 'primary'
+      ? resolveFramePresentation({
+          role: activeRole,
+          authoredCrop: crop,
+          focalPoint: cropPresentation?.focalPoint,
+          frame: 'builderCard',
+        })
+      : undefined
+  const effectiveCardCrop = cardPresentation?.effectiveCrop
 
   return (
     <MediaCropEditor
@@ -69,6 +80,9 @@ function MediaWorkspaceCropEditor({
       }
       onChange={(nextCrop) =>
         dispatch({ type: 'crop', crop: nextCrop, focalPoint: cropPresentation?.focalPoint })
+      }
+      effectiveCropGuide={
+        effectiveCardCrop ? { crop: effectiveCardCrop, label: 'Card crop' } : undefined
       }
     />
   )
@@ -132,7 +146,6 @@ function MediaWorkspaceEditor({
         activeRole={activeRole}
         cropPresentation={cropPresentation}
       />
-      {interaction ? <p className={styles.muted()}>{interaction}</p> : null}
     </div>
   )
 }

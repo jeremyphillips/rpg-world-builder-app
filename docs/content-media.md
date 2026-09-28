@@ -37,6 +37,15 @@ Equipment, Location, Organization, Game term). Full product and UX specification
    pickers, and overview thumbnails resolve **primary** only (emblem is manager-only in
    this pass).
 
+## Crop ownership and frame presentation
+
+The authored role crop defines the permitted source region and is the only crop persisted
+with `ContentMedia`. Focal points are persisted in source-normalized coordinates. Each
+destination frame derives an ephemeral effective crop from the authored crop, focal point,
+role, and canonical frame descriptor. The editor guide and renderer consume the same frame
+presentation result. An effective frame crop may narrow the authored region but must never
+reveal pixels outside it or be saved back over the authored role crop.
+
 System art comes only from `SYSTEM_CONTENT_IMAGE_ENTRIES` while walking each role
 (upload assignment, then registry entry for that subject, slug, and role). Registry
 subjects use `SystemImageSubject` (`content-type` or `vocabulary-set` keys).

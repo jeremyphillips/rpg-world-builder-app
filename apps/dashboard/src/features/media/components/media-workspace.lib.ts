@@ -28,7 +28,7 @@ export function resolveMediaWorkspaceCopy(input: {
   return {
     heading: copy.workspaceHeading,
     description: copy.workspaceDescription,
-    interaction: copy.instructions,
+    ...(input.presentation === 'emblem' ? { interaction: copy.instructions } : {}),
   }
 }
 

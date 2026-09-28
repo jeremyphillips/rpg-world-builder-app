@@ -10,8 +10,12 @@ export const mediaCropStyles = {
     'pointer-events-none absolute inset-[12.5%] border-2 border-foreground ring-[100vmax] ring-overlay',
   ),
   guides: cva('absolute inset-1/3 border-x border-y border-border'),
+  effectiveCropGuide: cva('absolute border-2 border-primary'),
+  effectiveCropGuideLabel: cva(
+    'absolute left-1 top-1 rounded-sm bg-background px-1 py-0.5 text-xs text-foreground shadow-sm',
+  ),
   focalPoint: cva(
-    'absolute size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-foreground bg-background shadow-sm touch-none',
+    'pointer-events-auto absolute z-10 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-foreground bg-background shadow-sm touch-none',
   ),
   row: cva('flex min-w-0 max-w-full flex-wrap items-center gap-2'),
   slider: cva('min-w-0 flex-1 accent-primary'),

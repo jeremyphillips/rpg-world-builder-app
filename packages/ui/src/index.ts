@@ -1270,7 +1270,10 @@ export {
 } from './components/ui/data-table.variants'
 
 export {
+  mapAperturePointerToFocalPoint,
   MediaCropEditor,
+  resolveCropRelativeGuideLayout,
+  resolveCropPreviewLayout,
   type MediaCropEditorConstraint,
   type MediaCropEditorProps,
 } from './components/ui/media-crop-editor.client'

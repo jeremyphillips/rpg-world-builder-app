@@ -12,7 +12,57 @@ import {
   resetPrimaryCrop,
   resolveMediaCropEditorConstraint,
 } from '@rpg/contracts'
-import { MediaCropEditor, resolveCropPreviewLayout } from './media-crop-editor.client'
+import {
+  mapAperturePointerToFocalPoint,
+  MediaCropEditor,
+  resolveCropRelativeGuideLayout,
+  resolveCropPreviewLayout,
+} from './media-crop-editor.client'
+
+describe('mapAperturePointerToFocalPoint', () => {
+  const crop = { x: 0.2, y: 0.15, width: 0.6, height: 0.45 }
+
+  it.each([
+    { name: 'top-left', relativeX: 0, relativeY: 0, expected: { x: 0.2, y: 0.15 } },
+    { name: 'center', relativeX: 0.5, relativeY: 0.5, expected: { x: 0.5, y: 0.375 } },
+    { name: 'bottom-right', relativeX: 1, relativeY: 1, expected: { x: 0.8, y: 0.6 } },
+  ])('maps the aperture $name to source-normalized crop coordinates', (testCase) => {
+    const apertureRect = { left: 40, top: 20, width: 300, height: 225 }
+    expect(
+      mapAperturePointerToFocalPoint({
+        clientX: apertureRect.left + apertureRect.width * testCase.relativeX,
+        clientY: apertureRect.top + apertureRect.height * testCase.relativeY,
+        apertureRect,
+        crop,
+      }),
+    ).toEqual(testCase.expected)
+  })
+
+  it('is independent of aperture pixel size', () => {
+    const mapRelativePoint = (width: number, height: number) =>
+      mapAperturePointerToFocalPoint({
+        clientX: 25 + width * 0.75,
+        clientY: 50 + height * 0.25,
+        apertureRect: { left: 25, top: 50, width, height },
+        crop,
+      })
+
+    expect(mapRelativePoint(300, 225)).toEqual(mapRelativePoint(900, 675))
+  })
+})
+
+describe('resolveCropRelativeGuideLayout', () => {
+  it('projects an effective frame crop relative to its authored role crop', () => {
+    const layout = resolveCropRelativeGuideLayout(
+      { x: 0.2, y: 0.15, width: 0.6, height: 0.45 },
+      { x: 0.2, y: 0.225, width: 0.6, height: 0.3 },
+    )
+    expect(layout.leftPercent).toBeCloseTo(0)
+    expect(layout.topPercent).toBeCloseTo(100 / 6)
+    expect(layout.widthPercent).toBeCloseTo(100)
+    expect(layout.heightPercent).toBeCloseTo(200 / 3)
+  })
+})
 
 describe('MediaCropEditor', () => {
   const source = { width: 2400, height: 1600 }
@@ -125,5 +175,77 @@ describe('MediaCropEditor', () => {
     expect(onChange.mock.calls[0]![0].x).toBeLessThan(crop.x)
     fireEvent.click(screen.getByRole('button', { name: 'Reset crop' }))
     expect(onChange).toHaveBeenLastCalledWith(resetPortraitCrop(source))
+  })
+
+  it('maps focal dragging against the live aperture bounds', () => {
+    const crop = { x: 0.2, y: 0.15, width: 0.6, height: 0.45 }
+    const onFocalPointChange = vi.fn()
+    const { container } = render(
+      <MediaCropEditor
+        src="/image.png"
+        source={source}
+        constraint={primaryConstraint}
+        crop={crop}
+        focalPoint={{ x: 0.5, y: 0.375 }}
+        onChange={vi.fn()}
+        onFocalPointChange={onFocalPointChange}
+      />,
+    )
+    const aperture = container.querySelector<HTMLElement>('[data-media-crop-aperture]')!
+    vi.spyOn(aperture, 'getBoundingClientRect').mockReturnValue({
+      left: 100,
+      top: 200,
+      width: 300,
+      height: 225,
+      right: 400,
+      bottom: 425,
+      x: 100,
+      y: 200,
+      toJSON: () => ({}),
+    })
+
+    const focalHandle = screen.getByRole('button', { name: 'Focal point' })
+    Object.defineProperty(focalHandle, 'setPointerCapture', { value: vi.fn() })
+    const pointerDown = new Event('pointerdown', { bubbles: true })
+    Object.defineProperties(pointerDown, {
+      pointerId: { value: 1 },
+      clientX: { value: 250 },
+      clientY: { value: 312.5 },
+    })
+    fireEvent(focalHandle, pointerDown)
+    const pointerMove = new Event('pointermove', { bubbles: true })
+    Object.defineProperties(pointerMove, {
+      pointerId: { value: 1 },
+      clientX: { value: 250 },
+      clientY: { value: 368.75 },
+    })
+    fireEvent(screen.getByRole('group', { name: 'Primary crop position' }), pointerMove)
+
+    expect(onFocalPointChange).toHaveBeenCalledWith({ x: 0.5, y: 0.48750000000000004 })
+  })
+
+  it('renders the exact effective crop guide instead of the generic center guide', () => {
+    const crop = { x: 0.2, y: 0.15, width: 0.6, height: 0.45 }
+    const effectiveCrop = { x: 0.2, y: 0.225, width: 0.6, height: 0.3 }
+    const { container } = render(
+      <MediaCropEditor
+        src="/image.png"
+        source={source}
+        constraint={primaryConstraint}
+        crop={crop}
+        onChange={vi.fn()}
+        effectiveCropGuide={{ crop: effectiveCrop, label: 'Card crop' }}
+      />,
+    )
+
+    const guide = container.querySelector<HTMLElement>('[data-effective-crop-guide]')
+    const layout = resolveCropRelativeGuideLayout(crop, effectiveCrop)
+    expect(guide).toHaveStyle({
+      left: `${layout.leftPercent}%`,
+      top: `${layout.topPercent}%`,
+      width: `${layout.widthPercent}%`,
+      height: `${layout.heightPercent}%`,
+    })
+    expect(container.querySelector('.inset-1\\/3')).toBeNull()
   })
 })

@@ -12,7 +12,7 @@ import {
   Text,
 } from '@rpg/ui'
 
-import { ContentMediaImage } from '@/features/media/components/content-media-image'
+import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 
 import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
@@ -41,7 +41,7 @@ export function CharacterListCard({
   return (
     <Card className="flex h-full flex-col overflow-hidden p-0">
       {card.displayImagesByRole?.primary ? (
-        <ContentMediaImage display={card.displayImagesByRole.primary} alt="" frame="primary" />
+        <BuilderOptionCardImage display={card.displayImagesByRole.primary} alt="" />
       ) : null}
       <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
         <div className="flex items-start justify-between gap-2">

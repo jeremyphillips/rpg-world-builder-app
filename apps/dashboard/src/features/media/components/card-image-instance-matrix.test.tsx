@@ -37,7 +37,7 @@ describe('card image instance matrix', () => {
         />
       ),
       assert: (container: HTMLElement) => {
-        expect(container.querySelector('.aspect-\\[4\\/3\\]')).toBeTruthy()
+        expect(container.querySelector('.aspect-\\[4\\/2\\]')).toBeTruthy()
         expect(container.querySelector('img')?.style.width).toBe('200%')
       },
     },

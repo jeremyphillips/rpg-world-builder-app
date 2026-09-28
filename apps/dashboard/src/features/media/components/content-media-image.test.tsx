@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 
-import { deriveFrameCropWithinRoleCrop, resolveNormalizedCropImageLayout } from '@rpg/contracts'
+import { resolveNormalizedCropImageLayout } from '@rpg/contracts'
 
-import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content/lib/detail/page/content-image-presentation-defaults'
+import { CONTENT_IMAGE_PRESENTATION_DEFAULTS } from '@/features/content'
 
+import { resolveFramePresentation } from '../lib/content-media-image-frame.lib'
 import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 
 const systemPrimary = {
@@ -184,8 +185,16 @@ describe('ContentMediaImage', () => {
   })
 
   const sharedPrimaryCrop = { x: 0, y: 0.1, width: 0.9, height: 0.675 } as const
-  const builderCardDerivedCrop = deriveFrameCropWithinRoleCrop(sharedPrimaryCrop, 4 / 3, 2)
-  const builderCardDerivedLayout = resolveNormalizedCropImageLayout(builderCardDerivedCrop)
+  const sharedFocalPoint = { x: 0.5, y: 0.5 } as const
+  const builderCardPresentation = resolveFramePresentation({
+    role: 'primary',
+    authoredCrop: sharedPrimaryCrop,
+    focalPoint: sharedFocalPoint,
+    frame: 'builderCard',
+  })
+  const builderCardDerivedLayout = resolveNormalizedCropImageLayout(
+    builderCardPresentation.effectiveCrop!,
+  )
 
   it('uses cover defaults for untouched primary on builderCard', () => {
     const { container } = render(
@@ -210,12 +219,14 @@ describe('ContentMediaImage', () => {
         role: 'primary' as const,
         sourceKind: 'system' as const,
         crop: sharedPrimaryCrop,
+        focalPoint: sharedFocalPoint,
       },
       {
         src: '/upload.jpg',
         role: 'primary' as const,
         sourceKind: 'upload' as const,
         crop: sharedPrimaryCrop,
+        focalPoint: sharedFocalPoint,
       },
     ]
 
@@ -228,6 +239,7 @@ describe('ContentMediaImage', () => {
       expect(img).toHaveStyle({
         width: `${builderCardDerivedLayout.widthPercent}%`,
         height: `${builderCardDerivedLayout.heightPercent}%`,
+        marginTop: `${builderCardDerivedLayout.offsetYPercent}%`,
       })
     }
   })

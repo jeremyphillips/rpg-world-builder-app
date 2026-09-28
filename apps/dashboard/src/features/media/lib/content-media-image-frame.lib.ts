@@ -1,8 +1,9 @@
 import {
   deriveFrameCropWithinRoleCrop,
   getFixedAspectCropSpec,
-  type ContentDisplayImage,
   type MediaRole,
+  type NormalizedCrop,
+  type NormalizedFocalPoint,
 } from '@rpg/contracts'
 
 import type { ContentMediaImageFrame } from '../components/content-media-image.variants'
@@ -38,9 +39,16 @@ export function shouldEnforceFrameCropCompatibility(): boolean {
   return import.meta.env.DEV
 }
 
-export type FrameCropCompatibilityResult = {
-  display: ContentDisplayImage
-  renderMode: ContentMediaImageRenderMode
+export type FramePresentationInput = {
+  role: MediaRole
+  authoredCrop?: NormalizedCrop
+  focalPoint?: NormalizedFocalPoint
+  frame: ContentMediaImageFrame
+}
+
+export type FramePresentation = {
+  mode: ContentMediaImageRenderMode
+  effectiveCrop?: NormalizedCrop
 }
 
 function resolveRoleAspectRatio(role: MediaRole): number | undefined {
@@ -50,68 +58,55 @@ function resolveRoleAspectRatio(role: MediaRole): number | undefined {
 }
 
 function rejectIncompatibleRoleCrop(
-  display: ContentDisplayImage,
+  role: MediaRole,
   frame: ContentMediaImageFrame,
-): FrameCropCompatibilityResult {
-  const message = `Frame "${frame}" does not accept role crop "${display.role}".`
+): FramePresentation {
+  const message = `Frame "${frame}" does not accept role crop "${role}".`
   if (shouldEnforceFrameCropCompatibility()) {
     throw new Error(message)
   }
-  return {
-    display: { ...display, crop: undefined },
-    renderMode: 'cover',
-  }
+  return { mode: 'cover' }
 }
 
-function resolveCropPresentationForFrame(
-  display: ContentDisplayImage,
-  frame: ContentMediaImageFrame,
-): FrameCropCompatibilityResult {
-  const roleCrop = display.crop!
-  const roleAspectRatio = resolveRoleAspectRatio(display.role)
-  const frameAspectRatio = resolveFrameAspectRatio(frame)
-
-  if (roleAspectRatio == null || frameAspectRatio == null) {
-    return { display, renderMode: 'cover' }
+/**
+ * Resolve an ephemeral destination-frame presentation from authored role presentation.
+ * `effectiveCrop` is render-only and must never replace the persisted authored crop.
+ */
+export function resolveFramePresentation(input: FramePresentationInput): FramePresentation {
+  if (input.frame === 'emblem' || input.frame === 'emblemHero') {
+    return { mode: 'contain' }
   }
 
-  const frameCrop = deriveFrameCropWithinRoleCrop(
-    roleCrop,
-    roleAspectRatio,
-    frameAspectRatio,
-    display.focalPoint,
-  )
-
-  return {
-    display: { ...display, crop: frameCrop },
-    renderMode: 'crop',
-  }
-}
-
-/** Map saved role presentation to frame-compatible crop or cover presentation. */
-export function resolveFrameCropCompatibility(
-  display: ContentDisplayImage,
-  frame: ContentMediaImageFrame,
-): FrameCropCompatibilityResult {
-  if (frame === 'emblem' || frame === 'emblemHero') {
-    return { display, renderMode: 'contain' }
+  if (!input.authoredCrop) {
+    return { mode: 'cover' }
   }
 
-  if (display.crop != null) {
-    if (!frameAcceptsRoleCrop(frame, display.role)) {
-      if (resolveFrameAcceptedCropRoles(frame).length === 0) {
-        return { display: { ...display, crop: undefined }, renderMode: 'cover' }
-      }
-      return rejectIncompatibleRoleCrop(display, frame)
+  if (!frameAcceptsRoleCrop(input.frame, input.role)) {
+    if (resolveFrameAcceptedCropRoles(input.frame).length === 0) {
+      return { mode: 'cover' }
     }
-    return resolveCropPresentationForFrame(display, frame)
+    return rejectIncompatibleRoleCrop(input.role, input.frame)
   }
 
-  return { display, renderMode: 'cover' }
+  const roleAspectRatio = resolveRoleAspectRatio(input.role)
+  const frameAspectRatio = resolveFrameAspectRatio(input.frame)
+  if (roleAspectRatio == null || frameAspectRatio == null) {
+    return { mode: 'cover' }
+  }
+
+  return {
+    mode: 'crop',
+    effectiveCrop: deriveFrameCropWithinRoleCrop(
+      input.authoredCrop,
+      roleAspectRatio,
+      frameAspectRatio,
+      input.focalPoint,
+    ),
+  }
 }
 
 export function resolveFocalObjectPosition(
-  focalPoint: ContentDisplayImage['focalPoint'],
+  focalPoint: NormalizedFocalPoint | undefined,
 ): string | undefined {
   if (!focalPoint) return undefined
   return `${focalPoint.x * 100}% ${focalPoint.y * 100}%`

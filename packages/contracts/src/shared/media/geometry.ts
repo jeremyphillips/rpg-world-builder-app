@@ -371,10 +371,10 @@ export function isFocalPointInCrop(
   crop: NormalizedCrop,
 ): boolean {
   return (
-    focalPoint.x >= crop.x &&
-    focalPoint.x <= crop.x + crop.width &&
-    focalPoint.y >= crop.y &&
-    focalPoint.y <= crop.y + crop.height
+    focalPoint.x >= crop.x - Number.EPSILON &&
+    focalPoint.x <= crop.x + crop.width + Number.EPSILON &&
+    focalPoint.y >= crop.y - Number.EPSILON &&
+    focalPoint.y <= crop.y + crop.height + Number.EPSILON
   )
 }
 

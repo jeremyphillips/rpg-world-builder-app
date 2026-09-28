@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { resolveCharacterDisplayImagesByRole, type ContentMedia } from '@rpg/contracts'
+import {
+  deriveFrameCropWithinRoleCrop,
+  resolveCharacterDisplayImagesByRole,
+  resolveNormalizedCropImageLayout,
+  type ContentMedia,
+} from '@rpg/contracts'
 
 import { CharacterListCard } from '@/features/character/components/character-list-card'
 import { ContentMediaImage } from './content-media-image'
@@ -72,7 +77,10 @@ describe('content media image projection matrix', () => {
     })
   })
 
-  it('routes character list cards through the primary role image', () => {
+  it('routes character list cards through builderCard 2:1 derived from primary crop', () => {
+    const derivedCrop = deriveFrameCropWithinRoleCrop(primaryCrop, 4 / 3, 2)
+    const derivedLayout = resolveNormalizedCropImageLayout(derivedCrop)
+
     const { container } = render(
       <MemoryRouter>
         <CharacterListCard
@@ -87,9 +95,9 @@ describe('content media image projection matrix', () => {
       </MemoryRouter>,
     )
 
-    expect(container.querySelector('.aspect-\\[4\\/3\\]')).toBeTruthy()
+    expect(container.querySelector('.aspect-\\[4\\/2\\]')).toBeTruthy()
     const img = container.querySelector('img')
     expect(img).toHaveClass('object-fill')
-    expect(img?.style.width).toBe(`${100 / primaryCrop.width}%`)
+    expect(img?.style.width).toBe(`${derivedLayout.widthPercent}%`)
   })
 })

@@ -270,4 +270,5 @@ export type { ContentMediaImageFrame } from './lib/detail/page/content-media-ima
 export {
   CONTENT_IMAGE_PRESENTATION_DEFAULTS,
   resolveContentImagePresentationDefault,
+  type ContentImagePresentationSurface,
 } from './lib/detail/page/content-image-presentation-defaults'

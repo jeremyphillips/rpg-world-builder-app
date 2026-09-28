@@ -8,9 +8,9 @@ import {
 import {
   resolveContentImagePresentationDefault,
   type ContentImagePresentationSurface,
-} from '@/features/content/lib/detail/page/content-image-presentation-defaults'
+} from '@/features/content'
 import {
-  resolveFrameCropCompatibility,
+  resolveFramePresentation,
   resolveFocalObjectPosition,
 } from '../lib/content-media-image-frame.lib'
 import {
@@ -66,7 +66,14 @@ export function ContentMediaImage({
   frame = 'intrinsic',
   className,
 }: ContentMediaImageProps) {
-  const { display: compatibleDisplay, renderMode } = resolveFrameCropCompatibility(display, frame)
+  const presentation = resolveFramePresentation({
+    role: display.role,
+    authoredCrop: display.crop,
+    focalPoint: display.focalPoint,
+    frame,
+  })
+  const compatibleDisplay = { ...display, crop: presentation.effectiveCrop }
+  const renderMode = presentation.mode
   const cropLayout =
     renderMode === 'crop' && compatibleDisplay.crop
       ? resolveNormalizedCropImageLayout(compatibleDisplay.crop)
