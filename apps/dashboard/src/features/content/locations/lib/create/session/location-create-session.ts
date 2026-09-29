@@ -7,14 +7,12 @@ import type {
   SiteType,
 } from '@rpg/contracts'
 
-import {
-  requiresLocationCreateSetup,
-  type LocationAuthoringType,
-} from '../../location-authoring-type'
+import type { LocationAuthoringType } from '../../location-authoring-type'
+import { requiresLocationCreateSetup } from '../setup/location-create-modal-setup.lib'
 import type { LocationFixedCreateContext } from '../../forms/location-form-ctx'
 
 export type LocationCreateIntent = {
-  authoringType: LocationAuthoringType
+  authoringType?: LocationAuthoringType
   /** Contained create supplies a fixed parent; overview typed create omits this. */
   parentLocationId?: string
   /** Parent kind for contextual copy (Subregion vs Region) when known at launch. */
@@ -37,7 +35,7 @@ export type LocationCreateSession =
 
 /** Maps create intent to a fixed session or setup gate — pure, no shell knowledge. */
 export function resolveLocationCreateSession(intent: LocationCreateIntent): LocationCreateSession {
-  if (requiresLocationCreateSetup(intent.authoringType)) {
+  if (!intent.authoringType || requiresLocationCreateSetup(intent.authoringType)) {
     return { status: 'needsSetup' }
   }
 
@@ -46,6 +44,10 @@ export function resolveLocationCreateSession(intent: LocationCreateIntent): Loca
 
 /** Builds fixed create context from intent without setup fields. */
 export function fixedCreateFromIntent(intent: LocationCreateIntent): LocationFixedCreateContext {
+  if (!intent.authoringType) {
+    throw new Error('fixedCreateFromIntent requires authoringType')
+  }
+
   const fixedCreate: LocationFixedCreateContext = {
     authoringType: intent.authoringType,
   }
@@ -66,7 +68,10 @@ export function completeLocationCreateSetup(
   intent: LocationCreateIntent,
   setupResult: LocationCreateSetupResult,
 ): LocationFixedCreateContext {
-  const base = fixedCreateFromIntent(intent)
+  const base = fixedCreateFromIntent({
+    ...intent,
+    authoringType: intent.authoringType ?? setupResult.kind,
+  })
 
   switch (setupResult.kind) {
     case 'building':

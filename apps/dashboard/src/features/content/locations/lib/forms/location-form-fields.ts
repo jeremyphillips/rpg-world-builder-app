@@ -146,6 +146,11 @@ export function buildLocationFields(
   },
 ): FormItem[] {
   const locationCtx = ctx as LocationFormCtx
+  const resolvedOptions = {
+    ...options,
+    buildingFacilityAuthoringGroup:
+      options?.buildingFacilityAuthoringGroup ?? locationCtx.buildingFacilityAuthoringGroup,
+  }
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
   const items: FormItem[] = []
@@ -168,7 +173,7 @@ export function buildLocationFields(
     items.push(
       ...omitFixedCreateNamedFields(
         filterLocationFieldsForAuthoringType(
-          buildLocationClassificationFields(options),
+          buildLocationClassificationFields(resolvedOptions),
           fixedCreate.authoringType,
         ),
         fixedCreate,
@@ -189,12 +194,12 @@ export function buildLocationFields(
       },
       dependents: {
         visibility: {
-          dependsOn: locationTypeDependentsVisibilityDependsOn(options),
-          visibleWhen: (values) => hasVisibleLocationTypeDependentFields(values, options),
+          dependsOn: locationTypeDependentsVisibilityDependsOn(resolvedOptions),
+          visibleWhen: (values) => hasVisibleLocationTypeDependentFields(values, resolvedOptions),
         },
         fields: [
           ...buildLocationPrimaryClassificationFields(),
-          ...buildLocationClassificationFields(options),
+          ...buildLocationClassificationFields(resolvedOptions),
         ],
       },
     })

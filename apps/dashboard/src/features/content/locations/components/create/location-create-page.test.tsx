@@ -1,16 +1,11 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen } from '@testing-library/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { makeTestQueryClient } from '@/test/render'
 
-import {
-  LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM,
-  LOCATION_CREATE_TYPE_SEARCH_PARAM,
-} from '../../lib/create/location-create-shortcuts'
-import { SITE_CREATE_SETUP_PROMPT } from '../../lib/create/setup/location-site-create-setup.lib'
+import { LOCATION_CREATE_TYPE_SEARCH_PARAM } from '../../lib/create/location-create-shortcuts'
 import { LocationCreatePage } from './location-create-page'
 
 vi.mock('@/features/campaign', () => ({
@@ -18,13 +13,20 @@ vi.mock('@/features/campaign', () => ({
 }))
 
 vi.mock('../../../lib/forms/shells/create/content-create-shell', () => ({
-  ContentCreateShell: ({ heading }: { heading: string }) => (
-    <div data-testid="content-create-shell">{heading}</div>
+  ContentCreateShell: ({
+    heading,
+    initialValues,
+  }: {
+    heading: string
+    initialValues?: Record<string, unknown>
+  }) => (
+    <div
+      data-testid="content-create-shell"
+      data-initial-values={JSON.stringify(initialValues ?? null)}
+    >
+      {heading}
+    </div>
   ),
-}))
-
-vi.mock('./location-create-modal', () => ({
-  LocationCreateModal: () => <div data-testid="location-create-modal" />,
 }))
 
 function renderLocationCreatePage(search: string) {
@@ -47,33 +49,22 @@ function renderLocationCreatePage(search: string) {
   return router
 }
 
-describe('LocationCreatePage setup shell path', () => {
+describe('LocationCreatePage prefill', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
-  it('routes site setup through CreateSetupShell and navigates to fixed create on Continue', async () => {
-    const user = userEvent.setup()
-    const router = renderLocationCreatePage(`?${LOCATION_CREATE_TYPE_SEARCH_PARAM}=site`)
+  it('renders the create shell with type prefilled and no setup gate', () => {
+    renderLocationCreatePage(`?${LOCATION_CREATE_TYPE_SEARCH_PARAM}=settlement`)
 
-    expect(screen.getByRole('radiogroup', { name: SITE_CREATE_SETUP_PROMPT })).toBeInTheDocument()
-    expect(screen.queryByTestId('content-create-shell')).not.toBeInTheDocument()
-
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Ruin') }))
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
-
-    await waitFor(() => {
-      const params = new URLSearchParams(router.state.location.search)
-      expect(params.get(LOCATION_CREATE_TYPE_SEARCH_PARAM)).toBe('site')
-      expect(params.get(LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM)).toBe('ruin')
-      expect(screen.getByTestId('content-create-shell')).toBeInTheDocument()
-    })
+    const shell = screen.getByTestId('content-create-shell')
+    expect(shell).toBeInTheDocument()
+    expect(shell.getAttribute('data-initial-values')).toContain('"authoringType":"settlement"')
   })
 
-  it('renders the inline create form for fixed building sessions', () => {
+  it('renders the inline create form for building type prefill', () => {
     renderLocationCreatePage(`?${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
 
     expect(screen.getByTestId('content-create-shell')).toBeInTheDocument()
-    expect(screen.queryByTestId('location-create-modal')).not.toBeInTheDocument()
   })
 })

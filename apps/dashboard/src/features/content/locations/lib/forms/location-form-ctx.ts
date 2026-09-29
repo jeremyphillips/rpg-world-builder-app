@@ -1,4 +1,10 @@
-import type { LocationKind, RegionClassification, SettlementType, SiteType } from '@rpg/contracts'
+import type {
+  BuildingFacilityAuthoringGroup,
+  LocationKind,
+  RegionClassification,
+  SettlementType,
+  SiteType,
+} from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
@@ -16,4 +22,6 @@ export type LocationFixedCreateContext = {
 
 export type LocationFormCtx = ContentFormCtx & {
   fixedCreate?: LocationFixedCreateContext
+  /** Narrows building facility options on unrestricted create when prefilled from setup. */
+  buildingFacilityAuthoringGroup?: BuildingFacilityAuthoringGroup
 }

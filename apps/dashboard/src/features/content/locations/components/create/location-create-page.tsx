@@ -1,22 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 import { ROUTES } from '@/app/routes'
-import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
 import { useCampaigns } from '@/features/campaign'
+import { formatContentCreateHeading } from '@/features/content/lib/content-type-labels'
+
 import { ContentCreateShell } from '../../../lib/forms/shells/create/content-create-shell'
-import { LocationCreateSetupHost } from './setup/location-create-setup-host'
 import {
-  buildLocationFixedCreateHref,
-  parseLocationCreateSessionFromSearchParams,
+  parseLocationCreatePrefillFromSearchParams,
   parseLocationCreateSoftParent,
 } from '../../lib/create/location-create-shortcuts'
-import { completeLocationCreateSetup } from '../../lib/create/session/location-create-session'
 import { resolveLocationCreatePageModel } from '../../lib/create/session/location-create-page.lib'
-import type { LocationFormCtx } from '../../lib/forms/location-form-ctx'
-import type { LocationFormValues } from '../../lib/forms/location-form-fields'
-import { applyLocationFixedCreateContext } from '../../lib/forms/location-form-values'
-import { LocationFixedCreateHiddenFields } from './location-fixed-create-hidden-fields'
 import '../../lib/forms/location-form-def'
 
 export type LocationCreatePageProps = {
@@ -25,60 +19,21 @@ export type LocationCreatePageProps = {
 
 export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
   const { data: campaigns } = useCampaigns()
   const campaign = campaigns?.find((entry) => entry.id === campaignId)
   const primaryWorldId = campaign?.configuration.settings?.primaryWorldId
 
-  const session = useMemo(
-    () => parseLocationCreateSessionFromSearchParams(searchParams),
+  const prefill = useMemo(
+    () => parseLocationCreatePrefillFromSearchParams(searchParams),
     [searchParams],
   )
   const softParentLocationId = parseLocationCreateSoftParent(searchParams)
-  const setupCompletedRef = useRef(false)
 
-  useEffect(() => {
-    if (session.kind === 'needsSetup') {
-      setupCompletedRef.current = false
-    }
-  }, [session])
-
-  const navigateToFixedCreate = useCallback(
-    (fixedCreate: NonNullable<LocationFormCtx['fixedCreate']>) => {
-      navigate(
-        buildLocationFixedCreateHref(
-          campaignId,
-          fixedCreate,
-          softParentLocationId ?? primaryWorldId,
-        ),
-      )
-    },
-    [campaignId, navigate, primaryWorldId, softParentLocationId],
-  )
-
-  if (session.kind === 'needsSetup') {
-    return (
-      <LocationCreateSetupHost
-        intent={session.intent}
-        onOpenChange={(open) => {
-          if (!open && !setupCompletedRef.current) {
-            navigate(ROUTES.content.locations.create(campaignId))
-          }
-        }}
-        onComplete={(result) => {
-          setupCompletedRef.current = true
-          navigateToFixedCreate(completeLocationCreateSetup(session.intent, result))
-        }}
-      />
-    )
-  }
-
-  const { fixedCreate, initialValues } = resolveLocationCreatePageModel(
-    session,
+  const { formCtx, initialValues } = resolveLocationCreatePageModel(
+    prefill,
     softParentLocationId,
     primaryWorldId,
   )
-  const formCtx: LocationFormCtx | undefined = fixedCreate ? { fixedCreate } : undefined
 
   return (
     <ContentCreateShell
@@ -88,14 +43,6 @@ export function LocationCreatePage({ campaignId }: LocationCreatePageProps) {
       backHref={ROUTES.content.locations.overview(campaignId)}
       initialValues={initialValues}
       formCtx={formCtx}
-      prepareSubmitValues={(values) =>
-        fixedCreate
-          ? applyLocationFixedCreateContext(values as LocationFormValues, fixedCreate)
-          : values
-      }
-      formHeaderPrefix={
-        fixedCreate ? <LocationFixedCreateHiddenFields fixedCreate={fixedCreate} /> : undefined
-      }
     />
   )
 }

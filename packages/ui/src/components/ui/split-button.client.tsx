@@ -16,6 +16,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
+import { DropdownMenuChoiceItemContent } from './dropdown-menu-choice-item-content'
+import {
+  dropdownMenuChoiceContentClasses,
+  dropdownMenuChoiceItemClasses,
+} from './dropdown-menu-choice.variants'
 import {
   splitButtonChevronIconClasses,
   splitButtonChevronVariants,
@@ -26,6 +31,7 @@ import {
 export type SplitButtonMenuItem = {
   id: string
   label: string
+  description?: string
   disabled?: boolean
   onSelect: () => void
 }
@@ -58,6 +64,8 @@ export function SplitButton({
   ...props
 }: SplitButtonProps) {
   const hasMenu = menuGroups.some((group) => group.items.length > 0)
+  const menuItems = menuGroups.flatMap((group) => group.items)
+  const useChoiceMenuLayout = menuItems.some((item) => item.description != null)
   const resolvedMenuAriaLabel = menuAriaLabel ?? `${label} shortcuts`
 
   return (
@@ -90,7 +98,10 @@ export function SplitButton({
               <ChevronDown className={splitButtonChevronIconClasses} aria-hidden />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            className={useChoiceMenuLayout ? cn(dropdownMenuChoiceContentClasses) : undefined}
+          >
             {menuGroups.map((group, groupIndex) => (
               <React.Fragment key={group.id}>
                 {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
@@ -99,10 +110,20 @@ export function SplitButton({
                   {group.items.map((item) => (
                     <DropdownMenuItem
                       key={item.id}
+                      className={
+                        useChoiceMenuLayout ? cn(dropdownMenuChoiceItemClasses) : undefined
+                      }
                       disabled={item.disabled}
                       onSelect={() => item.onSelect()}
                     >
-                      {item.label}
+                      {item.description ? (
+                        <DropdownMenuChoiceItemContent
+                          label={item.label}
+                          description={item.description}
+                        />
+                      ) : (
+                        item.label
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuGroup>

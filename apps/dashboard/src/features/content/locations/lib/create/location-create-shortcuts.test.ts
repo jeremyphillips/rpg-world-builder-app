@@ -2,133 +2,77 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildLocationCreateInitialValues,
+  buildLocationCreatePrefillHref,
   buildLocationFixedCreateHref,
   childAuthoringTypesForParentKind,
   formatLocationAuthoringTypeAddHeading,
   formatLocationFixedCreateHeading,
   LOCATION_CREATE_PARENT_SEARCH_PARAM,
-  LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
   LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM,
   LOCATION_CREATE_TYPE_SEARCH_PARAM,
-  parseLocationCreateSessionFromSearchParams,
+  parseLocationCreatePrefillFromSearchParams,
   parseLocationCreateSoftParent,
 } from './location-create-shortcuts'
-import { completeLocationCreateSetup } from './session/location-create-session'
 
-describe('parseLocationCreateSessionFromSearchParams', () => {
-  it('returns unrestricted when type param is absent', () => {
-    expect(parseLocationCreateSessionFromSearchParams(new URLSearchParams())).toEqual({
-      kind: 'unrestricted',
-    })
+describe('parseLocationCreatePrefillFromSearchParams', () => {
+  it('returns empty prefill when type param is absent', () => {
+    expect(parseLocationCreatePrefillFromSearchParams(new URLSearchParams())).toEqual({})
   })
 
-  it('routes a typed building param into a fixed create session', () => {
-    const params = new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
-
-    expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
-      kind: 'ready',
-      fixedCreate: { authoringType: 'building' },
-    })
-  })
-
-  it('returns needsSetup for settlement without settlementType', () => {
+  it('prefills authoring type without a setup gate', () => {
     expect(
-      parseLocationCreateSessionFromSearchParams(
+      parseLocationCreatePrefillFromSearchParams(
         new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=settlement`),
       ),
-    ).toEqual({
-      kind: 'needsSetup',
-      intent: { authoringType: 'settlement' },
-    })
+    ).toEqual({ authoringType: 'settlement' })
   })
 
-  it('returns ready fixed settlement session when settlementType is present', () => {
+  it('includes setup fields when present on the URL', () => {
     const params = new URLSearchParams(
       `${LOCATION_CREATE_TYPE_SEARCH_PARAM}=settlement&${LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM}=city`,
     )
-    const intent = { authoringType: 'settlement' as const }
 
-    expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
-      kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(intent, {
-        kind: 'settlement',
-        settlementType: 'city',
-      }),
-    })
-  })
-
-  it('returns needsSetup for region and site without setup params', () => {
-    expect(
-      parseLocationCreateSessionFromSearchParams(
-        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=region`),
-      ),
-    ).toEqual({
-      kind: 'needsSetup',
-      intent: { authoringType: 'region' },
-    })
-    expect(
-      parseLocationCreateSessionFromSearchParams(
-        new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=site`),
-      ),
-    ).toEqual({
-      kind: 'needsSetup',
-      intent: { authoringType: 'site' },
+    expect(parseLocationCreatePrefillFromSearchParams(params)).toEqual({
+      authoringType: 'settlement',
+      settlementType: 'city',
     })
   })
 
   it('ignores unknown type params safely', () => {
     expect(
-      parseLocationCreateSessionFromSearchParams(
+      parseLocationCreatePrefillFromSearchParams(
         new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=inn`),
       ),
-    ).toEqual({ kind: 'unrestricted' })
+    ).toEqual({})
   })
 
-  it('round-trips fixed sessions through buildLocationFixedCreateHref', () => {
-    const href = buildLocationFixedCreateHref('campaign-1', {
-      authoringType: 'settlement',
-      settlementType: 'town',
+  it('round-trips prefill through buildLocationCreatePrefillHref', () => {
+    const href = buildLocationCreatePrefillHref('campaign-1', {
+      authoringType: 'building',
+      buildingForm: 'tower',
+      facilityGroup: 'production',
     })
-    const parsed = parseLocationCreateSessionFromSearchParams(
+    const parsed = parseLocationCreatePrefillFromSearchParams(
       new URLSearchParams(href.split('?')[1]),
     )
 
     expect(parsed).toEqual({
-      kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(
-        { authoringType: 'settlement' },
-        { kind: 'settlement', settlementType: 'town' },
-      ),
+      authoringType: 'building',
+      buildingForm: 'tower',
+      facilityGroup: 'production',
     })
   })
 
-  it('round-trips site and region setup params', () => {
-    const siteHref = buildLocationFixedCreateHref('campaign-1', {
+  it('round-trips fixed create href helpers', () => {
+    const href = buildLocationFixedCreateHref('campaign-1', {
       authoringType: 'site',
       siteType: 'ruin',
     })
     expect(
-      parseLocationCreateSessionFromSearchParams(new URLSearchParams(siteHref.split('?')[1])),
+      parseLocationCreatePrefillFromSearchParams(new URLSearchParams(href.split('?')[1])),
     ).toEqual({
-      kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(
-        { authoringType: 'site' },
-        { kind: 'site', siteType: 'ruin' },
-      ),
-    })
-
-    const regionHref = buildLocationFixedCreateHref('campaign-1', {
-      authoringType: 'region',
-      classification: { kind: 'geographic', type: 'coast' },
-    })
-    expect(
-      parseLocationCreateSessionFromSearchParams(new URLSearchParams(regionHref.split('?')[1])),
-    ).toEqual({
-      kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(
-        { authoringType: 'region' },
-        { kind: 'region', classification: { kind: 'geographic', type: 'coast' } },
-      ),
+      authoringType: 'site',
+      siteType: 'ruin',
     })
   })
 })
@@ -286,14 +230,5 @@ describe('childAuthoringTypesForParentKind', () => {
       expect.arrayContaining(['building', 'fortification', 'structure']),
     )
     expect(childAuthoringTypesForParentKind('site')).not.toContain('interior')
-  })
-
-  it('lists promoted overview shortcuts from the registry ids', () => {
-    expect(LOCATION_CREATE_PROMOTED_AUTHORING_TYPES).toEqual([
-      'building',
-      'settlement',
-      'site',
-      'region',
-    ])
   })
 })

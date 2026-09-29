@@ -100,21 +100,26 @@ canonical.
 | Generic defensive wall  | Fortification          | —                                        | `kind: structure`, `structureType: fortification`                                                |
 | Rare unclassified shell | Unclassified structure | —                                        | `kind: structure` (no `structureType`)                                                           |
 
-Creation shortcuts use an authoritative fixed session on the create route:
+The create page accepts **prefill** query params (editable on the form — type is not locked):
 
-| URL                                                  | Meaning                                          |
-| ---------------------------------------------------- | ------------------------------------------------ |
-| `/locations/new`                                     | Unrestricted create                              |
-| `/locations/new?type=building`                       | Fixed Building session (type locked)             |
-| `/locations/new?type=settlement&settlementType=city` | Fixed Settlement + settlement type (after setup) |
+| URL                                                               | Meaning                                     |
+| ----------------------------------------------------------------- | ------------------------------------------- |
+| `/locations/new`                                                  | Blank create                                |
+| `/locations/new?type=building`                                    | Prefill Building type                       |
+| `/locations/new?type=building&buildingForm=house&facilityGroup=…` | Prefill Building setup (handoff from modal) |
+| `/locations/new?type=settlement&settlementType=city`              | Prefill Settlement + settlement type        |
 
-Overview promoted shortcuts run through `resolveLocationCreateSession` — Settlement opens a setup
-step first; other promoted types navigate directly to the fixed URL. The optional `?parent=` query
-param remains a soft initial value for the parent picker on the page.
+Overview **New location** uses `ContentCreateSplitAction` — scratch navigates to `/locations/new`;
+**Start with setup…** runs `LocationCreateModal` in handoff mode and navigates with prefill href;
+**Quick create…** completes setup + details inside the modal. See [create-flow.md](./create-flow.md#split-create-actions).
 
-Detail-page **Add location** opens `LocationCreateModal` (`size="md"`) for both setup-gated and
-ready authoring types — one continuous setup ↔ details transaction. City structure partitions
-District vs direct choices — see [location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
+**Building setup** (Form → Facility discovery, optional Form skip) runs in `LocationCreateModal` for
+overview quick/handoff, detail **Add building**, and nested relationship create — not only on the
+full create page. Eligibility is dynamic (`resolveLocationCreateSetupAuthoringTypes`).
+
+Detail-page **Add location** opens `LocationCreateModal` for setup-gated and ready authoring types —
+one continuous setup ↔ details transaction (or handoff when the caller supplies it). City structure
+partitions District vs direct choices — see [location-hierarchy.md](./location-hierarchy.md#city-structure-authoring).
 
 Building create with Organization relationship drafts uses atomic composite submit — see
 [create-flow.md](./create-flow.md).
@@ -125,13 +130,13 @@ When the create modal reaches details for a fixed settlement session, authors ca
 **starting districts** in the Structure group below description. Submit creates the settlement
 first, then sequentially POSTs each district as a child `kind: 'district'` Location.
 
-| Module                                   | Role                                                          |
-| ---------------------------------------- | ------------------------------------------------------------- |
-| `location-create-session.ts`             | `resolveLocationCreateSession`, `completeLocationCreateSetup` |
-| `location-create-shortcuts.ts`           | Fixed-session URL parse/serialize                             |
-| `location-create-modal.tsx`              | Contained create: setup ↔ details in one modal                |
-| `location-classification-form-fields.ts` | Form select + Facility searchable combobox                    |
-| `location-building-create-setup.lib.ts`  | Building Setup — Form cards + Facility discovery groups       |
+| Module                                   | Role                                                           |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| `location-create-session.ts`             | `resolveLocationCreateSession`, `completeLocationCreateSetup`  |
+| `location-create-shortcuts.ts`           | Prefill URL parse/serialize (`buildLocationCreatePrefillHref`) |
+| `location-create-modal.tsx`              | Contained create: setup ↔ details in one modal                 |
+| `location-classification-form-fields.ts` | Form select + Facility searchable combobox                     |
+| `location-building-create-setup.lib.ts`  | Building Setup — Form cards + Facility discovery groups        |
 
 Form lib conventions: [form-lib-conventions.md](./form-lib-conventions.md).
 
@@ -143,7 +148,7 @@ Storybook: tag `phase-7-building-flows` and `phase-20-building-flows` on
 | Module                                   | Role                                           |
 | ---------------------------------------- | ---------------------------------------------- |
 | `location-authoring-type.ts`             | Form projection ids, hydrate/serialize mapping |
-| `location-create-shortcuts.ts`           | Fixed-session URL parse/serialize              |
+| `location-create-shortcuts.ts`           | Prefill URL parse/serialize                    |
 | `location-classification-form-fields.ts` | Form select + Facility searchable combobox     |
 | `location-overview-search.lib.ts`        | Overview name-search discovery strings         |
 | `locations-overview-filter-schema.ts`    | Facility type and function overview filters    |

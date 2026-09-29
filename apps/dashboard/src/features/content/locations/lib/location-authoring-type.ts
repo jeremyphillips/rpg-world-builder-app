@@ -14,6 +14,7 @@ import {
   type LocationKind,
   type StructureType,
 } from '@rpg/contracts'
+import type { RadioCardOption } from '@rpg/ui'
 import type { FieldOption, SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import { LOCATION_KIND_BROWSE_FAMILIES } from './location-kind-browse-families'
@@ -45,23 +46,6 @@ export const LOCATION_AUTHORING_TYPES_DEFERRED = [
 
 export function isDeferredLocationAuthoringType(type: LocationAuthoringType): boolean {
   return (LOCATION_AUTHORING_TYPES_DEFERRED as readonly string[]).includes(type)
-}
-
-/** Authoring types that require a setup step before opening create (inline form picks building). */
-export const LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP = [
-  'settlement',
-  'region',
-  'site',
-] as const satisfies readonly LocationAuthoringType[]
-
-export type LocationAuthoringTypeWithCreateSetup =
-  (typeof LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP)[number]
-
-/** Whether typed create for this authoring type requires setup before a fixed session. */
-export function requiresLocationCreateSetup(
-  type: LocationAuthoringType,
-): type is LocationAuthoringTypeWithCreateSetup {
-  return (LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP as readonly string[]).includes(type)
 }
 
 function isStructureAuthoringType(
@@ -275,6 +259,26 @@ function structureAuthoringTypeOption(
     label: STRUCTURE_TYPE_ENTRIES[id].label,
     description: STRUCTURE_TYPE_ENTRIES[id].description,
   }
+}
+
+/** Radio-card option for a single location authoring type (setup type step). */
+export function buildLocationAuthoringTypeOption(id: LocationAuthoringType): RadioCardOption {
+  if (isDeferredLocationAuthoringType(id)) {
+    throw new Error(`Deferred authoring type cannot appear in setup: ${id}`)
+  }
+
+  if (
+    id === UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE ||
+    (STRUCTURE_TYPE_IDS as readonly string[]).includes(id)
+  ) {
+    const option = structureAuthoringTypeOption(
+      id as StructureType | typeof UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
+    )
+    return { value: option.value, label: option.label, description: option.description }
+  }
+
+  const option = nonStructureKindOption(id as NonStructureLocationKind)
+  return { value: option.value, label: option.label, description: option.description }
 }
 
 /** Flat searchable location type options with vocabulary descriptions for combobox fields. */

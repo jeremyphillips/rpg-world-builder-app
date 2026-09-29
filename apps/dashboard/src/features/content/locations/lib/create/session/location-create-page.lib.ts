@@ -1,29 +1,28 @@
 import {
-  fixedCreateToInitialValues,
-  type LocationCreateSessionParseResult,
+  buildLocationCreateInitialValues,
+  type LocationCreatePrefill,
 } from '../location-create-shortcuts'
-import type { LocationFixedCreateContext } from '../../forms/location-form-ctx'
+import type { LocationFormCtx } from '../../forms/location-form-ctx'
 
 export function resolveLocationCreatePageModel(
-  session: LocationCreateSessionParseResult,
+  prefill: LocationCreatePrefill,
   softParentLocationId: string | undefined,
   primaryWorldId: string | undefined,
 ): {
-  fixedCreate?: LocationFixedCreateContext
+  formCtx?: LocationFormCtx
   initialValues?: Record<string, unknown>
 } {
-  const defaultParentLocationId = softParentLocationId ?? primaryWorldId
+  const defaultParentLocationId = prefill.parentLocationId ?? softParentLocationId ?? primaryWorldId
 
-  if (session.kind === 'ready') {
-    return {
-      fixedCreate: session.fixedCreate,
-      initialValues: fixedCreateToInitialValues(session.fixedCreate, defaultParentLocationId),
-    }
-  }
+  const formCtx: LocationFormCtx | undefined = prefill.facilityGroup
+    ? { buildingFacilityAuthoringGroup: prefill.facilityGroup }
+    : undefined
 
   return {
-    initialValues: defaultParentLocationId
-      ? { parentLocationId: defaultParentLocationId }
-      : undefined,
+    formCtx,
+    initialValues: buildLocationCreateInitialValues(
+      { ...prefill, parentLocationId: defaultParentLocationId },
+      { parentLocationId: defaultParentLocationId },
+    ),
   }
 }

@@ -39,6 +39,35 @@ describe('SplitButton', () => {
     expect(onShortcut).toHaveBeenCalledTimes(1)
   })
 
+  it('renders described menu items with choice layout', async () => {
+    const user = userEvent.setup()
+    const onSetup = vi.fn()
+
+    render(
+      <SplitButton
+        label="Create location"
+        onPrimaryClick={vi.fn()}
+        menuGroups={[
+          {
+            id: 'modes',
+            items: [
+              {
+                id: 'setup',
+                label: 'Start with setup…',
+                description: 'Pre-fill the full location form',
+                onSelect: onSetup,
+              },
+            ],
+          },
+        ]}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Create location shortcuts' }))
+    await user.click(screen.getByRole('menuitem', { name: /Start with setup/i }))
+    expect(onSetup).toHaveBeenCalledTimes(1)
+  })
+
   it('omits the chevron when no menu groups are provided', () => {
     render(<SplitButton label="Add organization" onPrimaryClick={vi.fn()} menuGroups={[]} />)
 

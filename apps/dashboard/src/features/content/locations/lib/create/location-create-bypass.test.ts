@@ -27,12 +27,12 @@ const formSource = readFileSync(
 )
 
 describe('location create bypass guard', () => {
-  it('routes overview promoted shortcuts through the canonical session surfaces', () => {
-    expect(actionsSource).toContain('useLocationCreateSessionLaunch')
-    expect(actionsSource).toContain('launch({ authoringType })')
-    expect(actionsSource).toContain("authoringType === 'building'")
+  it('routes overview create through the split action and modal handoff', () => {
+    expect(actionsSource).toContain('ContentCreateSplitAction')
+    expect(actionsSource).toContain('setupCompletion')
+    expect(actionsSource).toContain('buildLocationCreateHandoffHref')
     expect(actionsSource).toContain('LocationCreateModal')
-    expect(actionsSource).not.toMatch(/Link to=\{buildLocationCreateHref\([^)]*authoringType/)
+    expect(actionsSource).not.toContain('useLocationCreateSessionLaunch')
   })
 
   it('routes contained add selections through LocationCreateModal', () => {
@@ -55,6 +55,7 @@ describe('location create bypass guard', () => {
   it('does not redirect unrestricted create when Location type changes', () => {
     expect(pageSource).not.toContain('LocationCreateAuthoringTypeWatcher')
     expect(pageSource).not.toContain('Building create must use the composition coordinator.')
+    expect(pageSource).not.toContain('LocationCreateSetupHost')
   })
 
   it('keeps modal building composition on LocationCreateForm', () => {

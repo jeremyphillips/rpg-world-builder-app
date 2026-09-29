@@ -8,11 +8,14 @@ import {
 } from './location-create-session'
 
 describe('resolveLocationCreateSession', () => {
-  it('opens a fixed building session without setup gating', () => {
+  it('returns needsSetup for building', () => {
     expect(resolveLocationCreateSession({ authoringType: 'building' })).toEqual({
-      status: 'ready',
-      fixedCreate: { authoringType: 'building' },
+      status: 'needsSetup',
     })
+  })
+
+  it('returns needsSetup when authoring type is omitted (modal type step)', () => {
+    expect(resolveLocationCreateSession({})).toEqual({ status: 'needsSetup' })
   })
 
   it('returns needsSetup for settlement', () => {
@@ -21,18 +24,15 @@ describe('resolveLocationCreateSession', () => {
     })
   })
 
-  it('includes fixed parent for contained create intents', () => {
+  it('includes fixed parent for contained create intents after setup', () => {
     expect(
-      resolveLocationCreateSession({
-        authoringType: 'building',
-        parentLocationId: HARBORFORD.id,
-      }),
+      completeLocationCreateSetup(
+        { authoringType: 'building', parentLocationId: HARBORFORD.id },
+        { kind: 'building' },
+      ),
     ).toEqual({
-      status: 'ready',
-      fixedCreate: {
-        authoringType: 'building',
-        parent: { kind: 'fixed', locationId: HARBORFORD.id },
-      },
+      authoringType: 'building',
+      parent: { kind: 'fixed', locationId: HARBORFORD.id },
     })
   })
 })
@@ -64,6 +64,13 @@ describe('completeLocationCreateSetup', () => {
       authoringType: 'settlement',
       parent: { kind: 'fixed', locationId: DOCK_WARD.id },
       settlementType: 'city',
+    })
+  })
+
+  it('derives authoring type from setup result when intent omits it', () => {
+    expect(completeLocationCreateSetup({}, { kind: 'site', siteType: 'landmark' })).toEqual({
+      authoringType: 'site',
+      siteType: 'landmark',
     })
   })
 

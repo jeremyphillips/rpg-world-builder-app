@@ -31,6 +31,21 @@ modules belong in the same subfolder as modal shell without evidence.
 Building create-flow Phases 7–8 are **closed**. Remaining Building taxonomy work is planned in
 [`docs/roadmap/building-taxonomy.md`](../../../docs/roadmap/building-taxonomy.md).
 
+## Split create actions
+
+Overview create buttons for locations and NPCs use `ContentCreateSplitAction` (`SplitButton` with
+described menu rows from `@rpg/ui`):
+
+- **Create from scratch** — primary segment and first menu item; blank full form or builder.
+- **Start with setup…** — opens the domain create modal in **handoff** mode; setup values prefill the
+  full form (location create page URL or NPC builder seed via router state).
+- **Quick create…** — opens the same modal in **details** mode; minimal setup then submit in the
+  modal.
+
+Copy lives in `content-create-split-action.copy.ts`. New overview create entry points should compose
+this component (or `EntityActionChoiceMenu` for non-split menus) rather than hand-rolling
+`DropdownMenu`.
+
 ## CreateModalShell
 
 `CreateModalShell` places header, optional Setup summary, optional tabs, one

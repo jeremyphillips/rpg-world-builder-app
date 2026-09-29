@@ -12,6 +12,12 @@ import {
   type CreateSetupValueChangeEvent,
 } from '@/lib/create-setup'
 
+import {
+  buildLocationAuthoringTypeOption,
+  isDeferredLocationAuthoringType,
+  LOCATION_AUTHORING_TYPE_IDS,
+  type LocationAuthoringType,
+} from '../../location-authoring-type'
 import type {
   LocationCreateIntent,
   LocationCreateSetupResult,
@@ -61,7 +67,13 @@ import {
   SITE_CREATE_SETUP_PROMPT,
 } from './location-site-create-setup.lib'
 
+export const LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID = 'authoringType' as const
+export const LOCATION_CREATE_MODAL_HEADLINE = 'Create location' as const
+const LOCATION_CREATE_MODAL_TYPE_FIELD_LABEL = 'Location type' as const
+const LOCATION_CREATE_MODAL_TYPE_PROMPT = 'What kind of location are you creating?' as const
+
 export type LocationCreateModalSetupValues = {
+  authoringType: LocationAuthoringType | ''
   buildingForm: BuildingForm | ''
   buildingFormSkipped: boolean
   buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
@@ -74,6 +86,7 @@ export type LocationCreateModalSetupValues = {
 }
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
+  authoringType: '',
   buildingForm: '',
   buildingFormSkipped: false,
   buildingFacilityAuthoringGroup: '',
@@ -168,18 +181,51 @@ function resolveBuildingSetupModel(
   }
 }
 
-export function resolveLocationCreateModalSetupModel({
-  intent,
-  values,
-}: {
-  intent: LocationCreateIntent
-  values: LocationCreateModalSetupValues
-}): LocationCreateModalSetupModel | null {
-  if (intent.authoringType === 'building') {
+function isLocationAuthoringType(value: string): value is LocationAuthoringType {
+  return (
+    value !== '' &&
+    (LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(value) &&
+    !isDeferredLocationAuthoringType(value as LocationAuthoringType)
+  )
+}
+
+/** Authoring types whose setup model exposes at least one choice set (empty values). */
+export function resolveLocationCreateSetupAuthoringTypes(): LocationAuthoringType[] {
+  return LOCATION_AUTHORING_TYPE_IDS.filter((authoringType) => {
+    if (isDeferredLocationAuthoringType(authoringType)) return false
+    const model = resolveLocationCreateModalSetupModelForAuthoringType(
+      authoringType,
+      EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+    )
+    return model != null && model.choiceSets.length > 0
+  })
+}
+
+export function requiresLocationCreateSetup(type: LocationAuthoringType): boolean {
+  return (resolveLocationCreateSetupAuthoringTypes() as readonly string[]).includes(type)
+}
+
+function resolveEffectiveSetupAuthoringType(
+  intent: LocationCreateIntent,
+  values: LocationCreateModalSetupValues,
+): LocationAuthoringType | undefined {
+  if (intent.authoringType) return intent.authoringType
+  if (values.authoringType && isLocationAuthoringType(values.authoringType)) {
+    return values.authoringType
+  }
+  return undefined
+}
+
+export function resolveLocationCreateModalSetupModelForAuthoringType(
+  authoringType: LocationAuthoringType,
+  values: LocationCreateModalSetupValues,
+  intent?: LocationCreateIntent,
+): LocationCreateModalSetupModel | null {
+  if (authoringType === 'building') {
     return resolveBuildingSetupModel(values)
   }
 
-  if (intent.authoringType === 'site') {
+  if (authoringType === 'site') {
     const options = buildSiteTypeRadioOptions()
     return {
       headline: SITE_CREATE_SETUP_HEADLINE,
@@ -209,7 +255,7 @@ export function resolveLocationCreateModalSetupModel({
     }
   }
 
-  if (intent.authoringType === 'settlement') {
+  if (authoringType === 'settlement') {
     const options = buildSettlementTypeRadioOptions()
     return {
       headline: SETTLEMENT_CREATE_SETUP_HEADLINE,
@@ -239,7 +285,8 @@ export function resolveLocationCreateModalSetupModel({
     }
   }
 
-  if (intent.authoringType === 'region') {
+  if (authoringType === 'region') {
+    const regionIntent = intent ?? { authoringType }
     const kindOptions = buildRegionClassificationKindRadioOptions()
     const typeOptions = values.classification.kind
       ? buildRegionTypeRadioOptions(values.classification.kind)
@@ -251,12 +298,12 @@ export function resolveLocationCreateModalSetupModel({
       values.classification.type,
     )
     return {
-      headline: resolveRegionCreateSetupHeadline(intent),
+      headline: resolveRegionCreateSetupHeadline(regionIntent),
       choiceSets: [
         {
           id: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
           fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
-          prompt: resolveRegionCreateSetupPrompt(intent),
+          prompt: resolveRegionCreateSetupPrompt(regionIntent),
           options: kindOptions,
           value: values.classification.kind,
           summaryGroup: REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
@@ -297,6 +344,101 @@ export function resolveLocationCreateModalSetupModel({
   return null
 }
 
+function buildAuthoringTypeSetupChoiceSet(
+  values: LocationCreateModalSetupValues,
+): LocationCreateModalSetupChoiceSetConfig {
+  const options = resolveLocationCreateSetupAuthoringTypes().map((type) =>
+    buildLocationAuthoringTypeOption(type),
+  )
+
+  return {
+    id: LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
+    fieldLabel: LOCATION_CREATE_MODAL_TYPE_FIELD_LABEL,
+    prompt: LOCATION_CREATE_MODAL_TYPE_PROMPT,
+    options,
+    value: values.authoringType,
+    isComplete: Boolean(values.authoringType),
+  }
+}
+
+export function resolveLocationCreateModalSetupModel({
+  intent,
+  values,
+}: {
+  intent: LocationCreateIntent
+  values: LocationCreateModalSetupValues
+}): LocationCreateModalSetupModel | null {
+  const effectiveType = resolveEffectiveSetupAuthoringType(intent, values)
+
+  if (intent.authoringType) {
+    return resolveLocationCreateModalSetupModelForAuthoringType(
+      intent.authoringType,
+      values,
+      intent,
+    )
+  }
+
+  const typeChoiceSet = buildAuthoringTypeSetupChoiceSet(values)
+  if (!effectiveType) {
+    return {
+      headline: LOCATION_CREATE_MODAL_HEADLINE,
+      choiceSets: [typeChoiceSet],
+      complete: () => null,
+      summaryEntries: [],
+    }
+  }
+
+  const typeModel = resolveLocationCreateModalSetupModelForAuthoringType(
+    effectiveType,
+    values,
+    intent,
+  )
+  if (!typeModel) {
+    return {
+      headline: LOCATION_CREATE_MODAL_HEADLINE,
+      choiceSets: [typeChoiceSet],
+      complete: () => null,
+      summaryEntries: [],
+    }
+  }
+
+  const typeSummaryEntry = {
+    setId: LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
+    fieldLabel: LOCATION_CREATE_MODAL_TYPE_FIELD_LABEL,
+    valueLabel: optionLabel(typeChoiceSet.options, values.authoringType),
+  }
+
+  const dependentSets = typeModel.choiceSets.map((set) => ({
+    ...set,
+    dependsOn: [
+      ...(set.dependsOn ?? []),
+      LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
+    ] as readonly string[],
+  }))
+
+  return {
+    headline: typeModel.headline,
+    subhead: typeModel.subhead,
+    choiceSets: [typeChoiceSet, ...dependentSets],
+    complete: () => typeModel.complete(),
+    summaryEntries: [typeSummaryEntry, ...typeModel.summaryEntries],
+  }
+}
+
+function clearTypeSpecificSetupValues(
+  values: LocationCreateModalSetupValues,
+): LocationCreateModalSetupValues {
+  return {
+    ...values,
+    buildingForm: '',
+    buildingFormSkipped: false,
+    buildingFacilityAuthoringGroup: '',
+    siteType: '',
+    settlementType: '',
+    classification: { kind: '', type: '' },
+  }
+}
+
 function clearInvalidatedLocationSetupValues(
   values: LocationCreateModalSetupValues,
   invalidatedSetIds: readonly string[],
@@ -318,15 +460,10 @@ function clearInvalidatedLocationSetupValues(
   return next
 }
 
-export function applyLocationCreateModalSetupValueChange({
-  values,
-  event,
-}: {
-  values: LocationCreateModalSetupValues
-  event: CreateSetupValueChangeEvent
-}): LocationCreateModalSetupValues {
-  const nextValues = clearInvalidatedLocationSetupValues(values, event.invalidatedSetIds)
-
+function applyBuildingLocationSetupValueChange(
+  nextValues: LocationCreateModalSetupValues,
+  event: CreateSetupValueChangeEvent,
+): LocationCreateModalSetupValues | null {
   const buildingSelection = applyBuildingCreateSetupSelectionChange({
     selection: {
       form: nextValues.buildingForm,
@@ -335,24 +472,29 @@ export function applyLocationCreateModalSetupValueChange({
     choiceSetId: event.setId,
     nextValue: String(event.nextValue),
   })
-  if (buildingSelection) {
-    if (event.setId === 'buildingForm' && event.skipped) {
-      return {
-        ...nextValues,
-        buildingForm: '',
-        buildingFormSkipped: true,
-        buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
-      }
-    }
+  if (!buildingSelection) return null
 
+  if (event.setId === 'buildingForm' && event.skipped) {
     return {
       ...nextValues,
-      buildingForm: buildingSelection.form,
-      buildingFormSkipped: event.setId === 'buildingForm' ? false : nextValues.buildingFormSkipped,
+      buildingForm: '',
+      buildingFormSkipped: true,
       buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
     }
   }
 
+  return {
+    ...nextValues,
+    buildingForm: buildingSelection.form,
+    buildingFormSkipped: event.setId === 'buildingForm' ? false : nextValues.buildingFormSkipped,
+    buildingFacilityAuthoringGroup: buildingSelection.facilityAuthoringGroup,
+  }
+}
+
+function applyTypedLocationSetupValueChange(
+  nextValues: LocationCreateModalSetupValues,
+  event: CreateSetupValueChangeEvent,
+): LocationCreateModalSetupValues | null {
   if (event.setId === 'siteType') {
     return {
       ...nextValues,
@@ -385,5 +527,33 @@ export function applyLocationCreateModalSetupValueChange({
       },
     }
   }
-  return nextValues
+  if (event.setId === LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID) {
+    const nextType = isLocationAuthoringType(String(event.nextValue))
+      ? (event.nextValue as LocationAuthoringType)
+      : ''
+    if (nextType === nextValues.authoringType) {
+      return nextValues
+    }
+    return clearTypeSpecificSetupValues({
+      ...nextValues,
+      authoringType: nextType,
+    })
+  }
+  return null
+}
+
+export function applyLocationCreateModalSetupValueChange({
+  values,
+  event,
+}: {
+  values: LocationCreateModalSetupValues
+  event: CreateSetupValueChangeEvent
+}): LocationCreateModalSetupValues {
+  const nextValues = clearInvalidatedLocationSetupValues(values, event.invalidatedSetIds)
+
+  return (
+    applyBuildingLocationSetupValueChange(nextValues, event) ??
+    applyTypedLocationSetupValueChange(nextValues, event) ??
+    nextValues
+  )
 }

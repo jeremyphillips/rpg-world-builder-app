@@ -21,6 +21,8 @@ export type CharacterBuilderStoreState = {
   rejectedDraftRestoreReason: CharacterBuilderDraftStorageRejectionReason | null
   _hasHydrated: boolean
   setDraft: (draft: CharacterBuilderDraft) => void
+  /** Replaces the in-memory draft and clears any pending session restore. */
+  replaceDraft: (draft: CharacterBuilderDraft) => void
   patchDraft: (patch: Partial<CharacterBuilderDraft>) => void
   continuePreviousDraft: () => void
   startOver: () => void
@@ -193,6 +195,13 @@ function createCharacterBuilderStoreImpl(storageKey: string, scope: CharacterBui
         rejectedDraftRestoreReason: null,
         _hasHydrated: false,
         setDraft: (draft) => set({ draft }),
+        replaceDraft: (draft) =>
+          set({
+            draft: normalizeCharacterBuilderDraft(draft),
+            hasPendingRestore: false,
+            pendingRestoredDraft: null,
+            rejectedDraftRestoreReason: null,
+          }),
         patchDraft: (patch) =>
           set((state) => ({ draft: mergeCharacterBuilderDraft(state.draft, patch) })),
         continuePreviousDraft: () => {

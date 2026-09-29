@@ -805,6 +805,14 @@ export {
   type DropdownMenuItemContentProps,
 } from './components/ui/dropdown-menu-item-content'
 export {
+  DropdownMenuChoiceItemContent,
+  type DropdownMenuChoiceItemContentProps,
+} from './components/ui/dropdown-menu-choice-item-content'
+export {
+  dropdownMenuChoiceContentClasses,
+  dropdownMenuChoiceItemClasses,
+} from './components/ui/dropdown-menu-choice.variants'
+export {
   UserMenuTrigger,
   type UserMenuTriggerProps,
 } from './components/ui/user-menu-trigger.client'
