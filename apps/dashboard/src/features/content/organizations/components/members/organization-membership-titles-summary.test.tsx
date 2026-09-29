@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 
-import { buildOrganizationMembershipTitleRadioOptions } from '@/features/character/lib/organization-membership/organization-membership-title.lib'
+import { buildOrganizationMembershipTitleRadioOptions } from '@/features/character'
 
 import { OrganizationMembershipTitlesSummary } from './organization-membership-titles-summary'
 

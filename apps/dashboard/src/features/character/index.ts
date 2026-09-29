@@ -78,6 +78,7 @@ export {
 } from './components/connections/edit-organization-membership-drawer.types'
 export { OrganizationMembershipTitleField } from './components/connections/organization-membership-title-field'
 export {
+  buildOrganizationMembershipTitleRadioOptions,
   membershipRadioValueFromTitle,
   titleFromMembershipRadioValue,
 } from './lib/organization-membership/organization-membership-title.lib'
