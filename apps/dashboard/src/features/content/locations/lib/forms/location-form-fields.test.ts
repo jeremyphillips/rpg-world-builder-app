@@ -16,6 +16,13 @@ function collectFieldNames(items: FormItem[]): string[] {
     if ('fields' in item && Array.isArray(item.fields)) {
       names.push(...collectFieldNames(item.fields as FormItem[]))
     }
+    if ('kind' in item && item.kind === 'dependent' && 'dependents' in item) {
+      const dependent = item as Extract<FormItem, { kind: 'dependent' }>
+      if ('name' in dependent.controller && typeof dependent.controller.name === 'string') {
+        names.push(dependent.controller.name)
+      }
+      names.push(...collectFieldNames(dependent.dependents.fields as FormItem[]))
+    }
   }
 
   return names
@@ -89,7 +96,7 @@ describe('buildLocationFields', () => {
     expect(names).not.toContain('siteType')
   })
 
-  it('includes interior classification fields for fixed interior create', () => {
+  it('omits under-modeled interior classification UI for fixed interior create', () => {
     const ctx: LocationFormCtx = {
       ...makeContentFormCtx(),
       mode: 'create',
@@ -101,8 +108,7 @@ describe('buildLocationFields', () => {
 
     const names = collectFieldNames(buildLocationFields(ctx))
 
-    expect(names).toContain('interiorType')
-    expect(names).toContain('classification.type')
+    expect(names).not.toContain('interiorType')
   })
 
   it('omits authoringType-only fields for other types on fixed district create', () => {

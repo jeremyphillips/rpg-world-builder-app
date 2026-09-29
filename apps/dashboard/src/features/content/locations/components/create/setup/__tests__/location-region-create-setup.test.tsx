@@ -27,7 +27,7 @@ describe('LocationRegionCreateSetup', () => {
     await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Geographic type' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     expect(
       screen.queryByRole('radio', { name: (name) => name.startsWith('Kingdom'), checked: true }),
@@ -72,7 +72,7 @@ describe('LocationRegionCreateSetup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
     expect(screen.getByText('Kingdom')).toBeInTheDocument()
   })
 

@@ -22,6 +22,7 @@ import {
 import { ROUTES } from '@/app/routes'
 
 import {
+  isDeferredLocationAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
   UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
   UNCLASSIFIED_STRUCTURE_LABEL,
@@ -155,7 +156,7 @@ export function childAuthoringTypesForParentKind(
     }
   }
 
-  return sortAuthoringTypes([...types])
+  return sortAuthoringTypes([...types]).filter((type) => !isDeferredLocationAuthoringType(type))
 }
 
 function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthoringType | undefined {
@@ -163,7 +164,11 @@ function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthori
   if (!typeParam || !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(typeParam)) {
     return undefined
   }
-  return typeParam as LocationAuthoringType
+  const authoringType = typeParam as LocationAuthoringType
+  if (isDeferredLocationAuthoringType(authoringType)) {
+    return undefined
+  }
+  return authoringType
 }
 
 function parseSettlementTypeParam(searchParams: URLSearchParams): SettlementType | undefined {

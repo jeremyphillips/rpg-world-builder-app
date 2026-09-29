@@ -13,6 +13,7 @@ import { makeTestQueryClient } from '@/test/render'
 import { makeLocation } from '@/test/fixtures/factories/location'
 import { STORY_CAMPAIGN_ID } from '../../../../lib/fixtures/constants'
 import { DOCK_WARD, HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../../fixtures'
+import { resolveLocationAuthoringType } from '../../../lib/location-authoring-type'
 import { buildLocationDetailViewModel } from '../../../lib/location-display'
 import { LOCATION_PARENT_REPLACEMENT_DRAWER } from '../../../lib/hierarchy/location-parent-replacement-surface-copy'
 import { LocationChildrenSection } from '../location-children-section'
@@ -76,6 +77,7 @@ function renderSection(input?: {
           canManage={input?.canManage ?? false}
           parentLocationId={input?.parentLocationId ?? parent.id}
           parentKind={parent.kind}
+          parentAuthoringType={resolveLocationAuthoringType(parent)}
           campaignId={STORY_CAMPAIGN_ID}
           campaignLocations={input?.campaignLocations ?? LOCATIONS_LIST}
         />
@@ -159,6 +161,7 @@ describe('LocationChildrenSection', () => {
             canManage={false}
             parentLocationId={HARBORFORD.id}
             parentKind={HARBORFORD.kind}
+            parentAuthoringType={resolveLocationAuthoringType(HARBORFORD)}
             campaignId={STORY_CAMPAIGN_ID}
             campaignLocations={[...LOCATIONS_LIST, marketWard]}
           />
@@ -202,6 +205,7 @@ describe('LocationChildrenSection', () => {
             canManage
             parentLocationId={HARBORFORD.id}
             parentKind={HARBORFORD.kind}
+            parentAuthoringType={resolveLocationAuthoringType(HARBORFORD)}
             campaignId={STORY_CAMPAIGN_ID}
             campaignLocations={[HARBORFORD]}
           />
@@ -225,7 +229,7 @@ describe('LocationChildrenSection', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add location to Dock Ward' }))
     expect(screen.getByText('Add to Dock Ward')).toBeInTheDocument()
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
 
     expect(screen.getByText(`Create modal: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Hide locations in Dock Ward' })).toBeInTheDocument()
@@ -261,11 +265,11 @@ describe('LocationChildrenSection', () => {
     expect(addLocation).toBeInTheDocument()
 
     await user.click(addLocation)
-    expect(screen.queryByRole('menuitem', { name: 'District' })).not.toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'Building' })).toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'Site' })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^District\b/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Building/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /^Site\b/i })).toBeInTheDocument()
 
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
     expect(screen.getByText(`Create modal: building parent=${HARBORFORD.id}`)).toBeInTheDocument()
   })
 
@@ -285,7 +289,7 @@ describe('LocationChildrenSection', () => {
     renderSection({ canManage: true, parent: DOCK_WARD })
 
     await user.click(screen.getByRole('button', { name: /^add location$/i }))
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
 
     expect(screen.getByText(`Create modal: building parent=${DOCK_WARD.id}`)).toBeInTheDocument()
   })

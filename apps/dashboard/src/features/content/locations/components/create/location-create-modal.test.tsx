@@ -39,7 +39,6 @@ import {
   BUILDING_ORGANIZATIONS_SELECT_LABEL,
   BUILDING_ORGANIZATIONS_UPDATE_RELATIONSHIP_LABEL,
 } from '../../lib/building-organizations/building-organizations-create-tab.lib'
-import { BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL } from '../../lib/create/setup/location-building-create-setup.lib'
 import type { LocationCreateIntent } from '../../lib/create/session/location-create-session'
 import { createSettlementWithStartingDistricts } from '../../lib/create/composition/location-settlement-create-composition.lib'
 import {
@@ -272,18 +271,8 @@ async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>)
 
 async function chooseBuildingForm(user: ReturnType<typeof userEvent.setup>, form: BuildingForm) {
   const label = BUILDING_FORM_ENTRIES[form].label
-  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
-}
-
-async function skipBuildingForm(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole('button', { name: /skip \/ not specified/i }))
-}
-
-async function chooseBuildingFacilityGroup(
-  user: ReturnType<typeof userEvent.setup>,
-  label: 'Browse all' | 'Commercial' | 'Production' | 'Religious' | 'Residence' | 'Civic',
-) {
-  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
+  await user.click(screen.getByRole('combobox', { name: 'Form' }))
+  await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
 }
 
 async function chooseBuildingFacilityType(
@@ -306,15 +295,7 @@ async function chooseBuildingFacilityType(
   await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
 }
 
-async function continueBuildingSetup(
-  user: ReturnType<typeof userEvent.setup>,
-  facilityGroup: Parameters<typeof chooseBuildingFacilityGroup>[1] = 'Browse all',
-) {
-  const skipButton = screen.queryByRole('button', { name: /skip \/ not specified/i })
-  if (skipButton) {
-    await user.click(skipButton)
-  }
-  await chooseBuildingFacilityGroup(user, facilityGroup)
+async function continueBuildingDetails() {
   expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
   expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
 }
@@ -376,21 +357,16 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('requires Facility discovery intent while Form remains optional', async () => {
-    const user = userEvent.setup()
+  it('shows inline Form and Facility type comboboxes for building create', async () => {
     renderModal(buildingIntent)
 
     expect(screen.getByRole('heading', { name: 'Create building' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toBeInTheDocument()
     expect(
-      screen.getByRole('radiogroup', { name: 'What physical form does this building have?' }),
-    ).toBeVisible()
-    expect(
-      screen.queryByRole('radiogroup', { name: 'What kind of facility are you creating?' }),
+      screen.queryByRole('radiogroup', { name: 'What physical form does this building have?' }),
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
-
-    await skipBuildingForm(user)
-    await continueBuildingSetup(user)
   })
 
   it('renders settlement-type create headings after setup continue', async () => {
@@ -424,19 +400,16 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
   })
 
-  it('shows intrinsic setup summary and Organizations tab for Building details', async () => {
-    const user = userEvent.setup()
+  it('shows Organizations tab on building create details', async () => {
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
-    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
-    expect(screen.getByText('Browse all')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Organizations' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Change facility' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toBeInTheDocument()
   })
 
   it('suppresses Organizations composition for relationship-target Building create', async () => {
-    const user = userEvent.setup()
     renderModal(buildingIntent, vi.fn(), true, {
       createContext: {
         kind: 'relationship-target',
@@ -444,7 +417,7 @@ describe('LocationCreateModal', () => {
         relationshipVocabulary: 'organization_location_connection',
       },
     })
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     expect(screen.queryByRole('tab', { name: /Organizations/i })).not.toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
@@ -459,7 +432,7 @@ describe('LocationCreateModal', () => {
         relationshipVocabulary: 'organization_location_connection',
       },
     })
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Guild Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -474,29 +447,23 @@ describe('LocationCreateModal', () => {
   })
 
   it('keeps Organizations composition available for contained Building create', async () => {
-    const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     expect(screen.getByRole('tab', { name: 'Organizations' })).toBeInTheDocument()
   })
 
-  it('preserves Organization editor state through Change-to-Setup and includes it in dismissal guards', async () => {
+  it('preserves Organization editor state through tab switches and includes it in dismissal guards', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_ADD_FIRST_LABEL }))
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
     await user.click(screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CREATE_NEW_LABEL }))
-    await user.click(
-      screen.getByRole('button', {
-        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
-      }),
-    )
-    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    await user.click(screen.getByRole('tab', { name: 'Details' }))
 
     expect(
       screen.getByRole('button', { name: BUILDING_ORGANIZATIONS_CHOOSE_EXISTING_LABEL }),
@@ -509,7 +476,7 @@ describe('LocationCreateModal', () => {
   it('shows child footer while the Organizations composer is in progress', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
@@ -526,7 +493,7 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await openOrganizationsComposing(user)
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
@@ -542,7 +509,7 @@ describe('LocationCreateModal', () => {
   it('commits an organization relationship from the child footer and restores the parent footer', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await openOrganizationsComposing(user)
     await chooseOwnerAndSelectFirstOrganization(user)
@@ -562,7 +529,7 @@ describe('LocationCreateModal', () => {
   it('shows Update relationship in the child footer while editing a pending relationship', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await openOrganizationsComposing(user)
     await chooseOwnerAndSelectFirstOrganization(user)
@@ -583,7 +550,7 @@ describe('LocationCreateModal', () => {
   it('shows Add relationship on the child footer for nested new organization authoring', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 })
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await openOrganizationsComposing(user)
     await user.click(screen.getByRole('radio', { name: /Owner/i }))
@@ -600,7 +567,7 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.click(screen.getByRole('tab', { name: 'Organizations' }))
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -614,9 +581,8 @@ describe('LocationCreateModal', () => {
   })
 
   it('preserves the bounded modal scroll chain when Building details expand', async () => {
-    const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     const form = screen.getAllByRole('textbox', { name: 'Name' })[0]?.closest('form')
     const visibilityWrapper = form?.parentElement
@@ -638,13 +604,10 @@ describe('LocationCreateModal', () => {
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
 
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
-    await continueBuildingSetup(user)
+    await chooseBuildingForm(user, 'house')
+    await continueBuildingDetails()
 
-    expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('House')).toBeInTheDocument()
-    expect(screen.getByText('Browse all')).toBeInTheDocument()
-    expect(screen.queryByRole('combobox', { name: 'Form' })).not.toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -665,16 +628,14 @@ describe('LocationCreateModal', () => {
     ).not.toHaveProperty('facilityAuthoringGroup')
   })
 
-  it('creates the Tower form-only flow with Browse all', async () => {
+  it('creates the Tower form-only flow', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'tower')
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
-    expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('Tower')).toBeInTheDocument()
-    expect(screen.getByText('Browse all')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Tower')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'North Spire')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -689,16 +650,14 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('creates the Hall form-only flow with Browse all', async () => {
+  it('creates the Hall form-only flow', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'hall')
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
-    expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('Hall')).toBeInTheDocument()
-    expect(screen.getByText('Browse all')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Hall')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Great Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -713,16 +672,14 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('creates the Keep form-only flow with Browse all', async () => {
+  it('creates the Keep form-only flow', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'keep')
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
-    expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('Keep')).toBeInTheDocument()
-    expect(screen.getByText('Browse all')).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Keep')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Stone Keep')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -742,7 +699,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'keep')
-    await continueBuildingSetup(user, 'Residence')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Residence')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Lord Keep')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -762,7 +719,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'keep')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Barracks')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Garrison Keep')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -782,7 +739,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'house')
-    await continueBuildingSetup(user, 'Commercial')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Shop')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Corner Shop')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -802,7 +759,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'tower')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Watch post')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Border Watch')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -822,7 +779,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'hall')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Guildhall')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Smiths Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -842,7 +799,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'keep')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Armory')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Castle Armory')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -862,7 +819,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'house')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Archive')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Record House')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -882,7 +839,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'tower')
-    await continueBuildingSetup(user, 'Religious')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Temple')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Temple Spire')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -902,7 +859,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'hall')
-    await continueBuildingSetup(user, 'Civic')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Town hall')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Civic Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -922,7 +879,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'house')
-    await continueBuildingSetup(user, 'Religious')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Temple')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Shrine House')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -942,7 +899,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
 
     await chooseBuildingForm(user, 'tower')
-    await continueBuildingSetup(user, 'Residence')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Residence')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Tower Residence')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -961,10 +918,9 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
-    await continueBuildingSetup(user, 'Production')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Brewery')
 
-    expect(screen.getByText('Production')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Red Dragon Brewery')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
@@ -981,33 +937,26 @@ describe('LocationCreateModal', () => {
     expect(getEffectiveBuildingFunctions(classification)).toEqual(['production'])
   })
 
-  it('reapplies Building setup through canonical form values without losing the draft', async () => {
+  it('updates facility type through comboboxes without losing other draft fields', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
 
-    await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('House') }))
-    await continueBuildingSetup(user, 'Production')
+    await chooseBuildingForm(user, 'house')
+    await continueBuildingDetails()
     await chooseBuildingFacilityType(user, 'Brewery')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Copper Kettle')
     const description = screen.getByRole('textbox', { name: 'Description' })
     description.innerHTML = '<p>A landmark by the quay.</p>'
     fireEvent.input(description)
 
-    await user.click(
-      screen.getByRole('button', {
-        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
-      }),
-    )
-    await chooseBuildingFacilityGroup(user, 'Religious')
+    await chooseBuildingFacilityType(user, 'Temple')
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Copper Kettle')
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
       'A landmark by the quay.',
     )
-    expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('House')).toBeInTheDocument()
-    expect(screen.getByText('Religious')).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Facility type' })).not.toHaveTextContent('Brewery')
+    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
+    expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Temple')
 
     await user.click(screen.getByRole('button', { name: 'Create building' }))
     await waitFor(() => expect(mockedCompleteBuildingCreateComposition).toHaveBeenCalledOnce())
@@ -1016,32 +965,15 @@ describe('LocationCreateModal', () => {
       mockedCompleteBuildingCreateComposition.mock.calls[0]?.[0].request.building.input,
     ).toMatchObject({
       name: 'Copper Kettle',
-      classification: { form: 'house' },
+      classification: { form: 'house', facilityType: 'temple' },
     })
-  })
-
-  it('preserves a Facility when Change selects another compatible authoring group', async () => {
-    const user = userEvent.setup()
-    renderModal(buildingIntent)
-    await continueBuildingSetup(user, 'Production')
-    await chooseBuildingFacilityType(user, 'Brewery')
-
-    await user.click(
-      screen.getByRole('button', {
-        name: `Change ${BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL.toLowerCase()}`,
-      }),
-    )
-    await chooseBuildingFacilityGroup(user, 'Commercial')
-
-    expect(screen.getByText('Commercial')).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Brewery')
   })
 
   it('creates with default campaign access draft without PATCH and closes the modal', async () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.click(screen.getByRole('button', { name: 'Use default campaign access' }))
     await submitBuildingCreateForm(user)
@@ -1065,7 +997,7 @@ describe('LocationCreateModal', () => {
     const user = userEvent.setup()
     const onOpenChange = vi.fn()
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
     await submitBuildingCreateForm(user)
@@ -1091,7 +1023,7 @@ describe('LocationCreateModal', () => {
   it('submits fixed building context without leaking incompatible form values', async () => {
     const user = userEvent.setup()
     renderModal(buildingIntent)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await submitBuildingCreateForm(user)
 
@@ -1124,7 +1056,7 @@ describe('LocationCreateModal', () => {
       },
     })
     renderModal(buildingIntent, onOpenChange)
-    await continueBuildingSetup(user)
+    await continueBuildingDetails()
 
     await user.click(screen.getByRole('button', { name: 'Use restricted campaign access' }))
     await submitBuildingCreateForm(user)
@@ -1261,7 +1193,7 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Political type' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
   })
 
@@ -1270,7 +1202,7 @@ describe('LocationCreateModal', () => {
     renderModal(regionIntent)
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
-    const regionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
+    const regionTypeGroup = screen.getByRole('radiogroup', { name: 'Political type' })
     const firstRegionType = within(regionTypeGroup).getAllByRole('radio')[0]
     expect(firstRegionType).toBeTruthy()
     await user.click(firstRegionType!)
@@ -1278,7 +1210,7 @@ describe('LocationCreateModal', () => {
     await user.click(screen.getByRole('button', { name: 'Change classification' }))
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
-    const clearedRegionTypeGroup = screen.getByRole('radiogroup', { name: 'Region type' })
+    const clearedRegionTypeGroup = screen.getByRole('radiogroup', { name: 'Geographic type' })
     expect(
       within(clearedRegionTypeGroup).queryByRole('radio', { checked: true }),
     ).not.toBeInTheDocument()
@@ -1296,7 +1228,7 @@ describe('LocationCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
     const firstRegionType = within(
-      screen.getByRole('radiogroup', { name: 'Region type' }),
+      screen.getByRole('radiogroup', { name: 'Political type' }),
     ).getAllByRole('radio')[0]
     expect(firstRegionType).toBeTruthy()
     const firstRegionTypeName = within(firstRegionType!).getByText(
@@ -1308,18 +1240,18 @@ describe('LocationCreateModal', () => {
     expect(screen.getByText('Setup')).toBeInTheDocument()
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Westmark')
-    await user.click(screen.getByRole('button', { name: 'Change region type' }))
+    await user.click(screen.getByRole('button', { name: 'Change political type' }))
 
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Political type' })).toBeInTheDocument()
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { checked: true }))
 
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Westmark')
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByText(firstRegionTypeName!)).toBeInTheDocument()
@@ -1374,9 +1306,8 @@ describe('LocationCreateModal', () => {
 
   describe('transaction-aware submit labels', () => {
     it('shows Create building when there are no new organization drafts', async () => {
-      const user = userEvent.setup()
       renderModal(buildingIntent)
-      await continueBuildingSetup(user)
+      await continueBuildingDetails()
 
       expect(screen.getByRole('button', { name: 'Create building' })).toBeInTheDocument()
     })

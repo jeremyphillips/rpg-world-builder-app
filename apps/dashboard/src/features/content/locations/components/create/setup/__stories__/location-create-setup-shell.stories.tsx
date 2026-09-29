@@ -125,26 +125,33 @@ export const WithDefaultSubhead: Story = {
 
 export const TwoChoiceSets: Story = {
   render: (args) => {
-    const [classification, setClassification] = useState('')
-    const [regionType, setRegionType] = useState('')
+    const [classificationKind, setClassificationKind] = useState('')
+    const [classificationType, setClassificationType] = useState('')
+
+    const typeFieldLabel =
+      classificationKind === 'political'
+        ? 'Political type'
+        : classificationKind === 'geographic'
+          ? 'Geographic type'
+          : 'Region type'
 
     const choiceSets: LocationCreateSetupChoiceSet[] = [
       {
-        id: 'classification',
+        id: 'classification.kind',
         fieldLabel: 'Classification',
         prompt: 'What kind of region are you creating?',
         options: CLASSIFICATION_OPTIONS,
-        value: classification,
-        isComplete: Boolean(classification),
+        value: classificationKind,
+        isComplete: Boolean(classificationKind),
       },
       {
-        id: 'regionType',
-        fieldLabel: 'Region type',
-        prompt: 'Region type',
+        id: 'classification.type',
+        fieldLabel: typeFieldLabel,
+        prompt: typeFieldLabel,
         options: REGION_TYPE_OPTIONS,
-        value: regionType,
-        isComplete: Boolean(regionType),
-        dependsOn: ['classification'],
+        value: classificationType,
+        isComplete: Boolean(classificationType),
+        dependsOn: ['classification.kind'],
       },
     ]
 
@@ -154,8 +161,8 @@ export const TwoChoiceSets: Story = {
         headline="Create region"
         sets={buildLocationCreateSetupSets(choiceSets)}
         onSetupValueChange={(event) => {
-          if (event.setId === 'classification') setClassification(String(event.nextValue))
-          if (event.setId === 'regionType') setRegionType(String(event.nextValue))
+          if (event.setId === 'classification.kind') setClassificationKind(String(event.nextValue))
+          if (event.setId === 'classification.type') setClassificationType(String(event.nextValue))
         }}
       />
     )

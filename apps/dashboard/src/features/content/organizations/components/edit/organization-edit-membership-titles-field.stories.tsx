@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
-import {
-  ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
-  ORGANIZATION_SECTION_LABELS,
-} from '../../lib/organization-display'
-import { OrganizationEditMembershipTitlesField } from './organization-edit-membership-titles-field'
+import { buildOrganizationMembershipTitlesArrayField } from '../../lib/membership-titles/organization-membership-titles-form.lib'
 
 const schema = z.object({
   members: z.object({
@@ -14,7 +10,7 @@ const schema = z.object({
       z.object({
         id: z.string(),
         label: z.string(),
-        priority: z.number(),
+        priority: z.union([z.number(), z.string()]),
       }),
     ),
   }),
@@ -22,26 +18,12 @@ const schema = z.object({
 
 const meta = {
   title: 'Content/Organizations/OrganizationEditMembershipTitlesField',
-  component: OrganizationEditMembershipTitlesField,
   parameters: { layout: 'padded' },
   decorators: [
-    (Story) => (
+    () => (
       <Form
         schema={schema}
-        fields={[
-          {
-            kind: 'group',
-            legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-            description: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
-            fields: [
-              {
-                kind: 'slot',
-                name: '_organizationMembershipTitles',
-                render: () => <Story />,
-              },
-            ],
-          },
-        ]}
+        fields={[buildOrganizationMembershipTitlesArrayField()]}
         defaultValues={{
           members: {
             titles: [
@@ -54,7 +36,7 @@ const meta = {
       />
     ),
   ],
-} satisfies Meta<typeof OrganizationEditMembershipTitlesField>
+} satisfies Meta
 
 export default meta
 type Story = StoryObj<typeof meta>

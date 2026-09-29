@@ -1,8 +1,14 @@
-import { SemanticText, Text } from '@rpg/ui'
+import { ActionIcon, SemanticText, Text } from '@rpg/ui'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
-import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import {
+  detailOverflowDeleteAction,
+  type DetailOverflowAction,
+} from '../../../lib/detail/detail-overflow-menu'
+import {
+  detailOverflowActionsToRowMenuItems,
+  EntityRowList,
+} from '../../../lib/entity/row-list/entity-row-list'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
 import { buildOrganizationMemberLeadingMedia } from '../../lib/members/organization-member-leading-media.lib'
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
@@ -56,6 +62,7 @@ function buildMemberOverflowActions(input: {
     actions.push({
       id: 'edit-membership',
       label: ORGANIZATION_MEMBER_EDIT_LABEL,
+      icon: <ActionIcon action="edit" step="md" />,
       disabled: input.isPending,
       onSelect: () => input.onEditMembership?.(input.row),
     })
@@ -63,11 +70,11 @@ function buildMemberOverflowActions(input: {
 
   if (input.onRemoveMember) {
     actions.push({
+      ...detailOverflowDeleteAction(ORGANIZATION_MEMBER_REMOVE_LABEL, () =>
+        input.onRemoveMember?.(input.row),
+      ),
       id: 'remove-member',
-      label: ORGANIZATION_MEMBER_REMOVE_LABEL,
-      destructive: true,
       disabled: input.isPending,
-      onSelect: () => input.onRemoveMember?.(input.row),
     })
   }
 
@@ -79,13 +86,7 @@ function toRowMenu(row: OrganizationMemberRowVm, actions: DetailOverflowAction[]
 
   return {
     label: `Actions for ${row.name}`,
-    items: actions.map((action) => ({
-      id: action.id,
-      label: action.label,
-      destructive: action.destructive,
-      disabled: action.disabled,
-      onSelect: action.onSelect,
-    })),
+    items: detailOverflowActionsToRowMenuItems(actions),
   }
 }
 

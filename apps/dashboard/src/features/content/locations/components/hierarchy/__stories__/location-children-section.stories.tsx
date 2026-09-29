@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { STORY_CAMPAIGN_ID } from '../../../../lib/fixtures/constants'
 import { buildLocationDetailViewModel } from '../../../lib/location-display'
 import { HARBORFORD, LOCATIONS_LIST, YAWNING_PORTAL } from '../../../fixtures'
+import { resolveLocationAuthoringType } from '../../../lib/location-authoring-type'
 import { LocationChildrenSection } from '../location-children-section'
 
 function createQueryClient() {
@@ -43,6 +44,7 @@ export const ContainedRows: Story = {
     childrenViewModel: harborfordChildren,
     parentLocationId: HARBORFORD.id,
     parentKind: HARBORFORD.kind,
+    parentAuthoringType: resolveLocationAuthoringType(HARBORFORD),
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: false,
@@ -54,6 +56,7 @@ export const ManagedWithMove: Story = {
     childrenViewModel: harborfordChildren,
     parentLocationId: HARBORFORD.id,
     parentKind: HARBORFORD.kind,
+    parentAuthoringType: resolveLocationAuthoringType(HARBORFORD),
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: true,
@@ -65,6 +68,7 @@ export const Empty: Story = {
     childrenViewModel: emptyChildren,
     parentLocationId: YAWNING_PORTAL.id,
     parentKind: YAWNING_PORTAL.kind,
+    parentAuthoringType: resolveLocationAuthoringType(YAWNING_PORTAL),
     campaignId: STORY_CAMPAIGN_ID,
     campaignLocations: LOCATIONS_LIST,
     canManage: true,

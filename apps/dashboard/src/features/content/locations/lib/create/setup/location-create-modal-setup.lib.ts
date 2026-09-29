@@ -37,10 +37,12 @@ import {
   buildRegionTypeRadioOptions,
   parseRegionClassification,
   REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
+  REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+  REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
   REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
   REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
-  REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
-  REGION_CREATE_SETUP_TYPE_PROMPT,
+  resolveRegionClassificationTypeFieldLabel,
+  resolveRegionClassificationTypeFieldPrompt,
   resolveRegionCreateSetupHeadline,
   resolveRegionCreateSetupPrompt,
 } from './location-region-create-setup.lib'
@@ -65,8 +67,10 @@ export type LocationCreateModalSetupValues = {
   buildingFacilityAuthoringGroup: BuildingFacilityAuthoringGroup | 'browse_all' | ''
   siteType: SiteType | ''
   settlementType: SettlementType | ''
-  classificationKind: RegionClassificationKind | ''
-  regionType: string
+  classification: {
+    kind: RegionClassificationKind | ''
+    type: string
+  }
 }
 
 export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
@@ -75,8 +79,7 @@ export const EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES = {
   buildingFacilityAuthoringGroup: '',
   siteType: '',
   settlementType: '',
-  classificationKind: '',
-  regionType: '',
+  classification: { kind: '', type: '' },
 } as const satisfies LocationCreateModalSetupValues
 
 export type LocationCreateModalSetupChoiceSetConfig = {
@@ -238,48 +241,53 @@ export function resolveLocationCreateModalSetupModel({
 
   if (intent.authoringType === 'region') {
     const kindOptions = buildRegionClassificationKindRadioOptions()
-    const typeOptions = values.classificationKind
-      ? buildRegionTypeRadioOptions(values.classificationKind)
+    const typeOptions = values.classification.kind
+      ? buildRegionTypeRadioOptions(values.classification.kind)
       : []
-    const classification = parseRegionClassification(values.classificationKind, values.regionType)
+    const typeFieldLabel = resolveRegionClassificationTypeFieldLabel(values.classification.kind)
+    const typeFieldPrompt = resolveRegionClassificationTypeFieldPrompt(values.classification.kind)
+    const classification = parseRegionClassification(
+      values.classification.kind,
+      values.classification.type,
+    )
     return {
       headline: resolveRegionCreateSetupHeadline(intent),
       choiceSets: [
         {
-          id: 'classification',
+          id: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
           fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
           prompt: resolveRegionCreateSetupPrompt(intent),
           options: kindOptions,
-          value: values.classificationKind,
+          value: values.classification.kind,
           summaryGroup: REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
           summaryGroupEyebrow: REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
-          isComplete: Boolean(values.classificationKind),
+          isComplete: Boolean(values.classification.kind),
         },
         {
-          id: 'regionType',
-          fieldLabel: REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
-          prompt: REGION_CREATE_SETUP_TYPE_PROMPT,
+          id: REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+          fieldLabel: typeFieldLabel,
+          prompt: typeFieldPrompt,
           options: typeOptions,
-          value: values.regionType,
-          dependsOn: ['classification'],
+          value: values.classification.type,
+          dependsOn: [REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID],
           summaryGroup: REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP,
           summaryGroupEyebrow: REGION_CREATE_SETUP_SELECTIONS_EYEBROW,
-          isComplete: Boolean(values.regionType),
+          isComplete: Boolean(values.classification.type),
         },
       ],
       complete: () => (classification ? { kind: 'region', classification } : null),
       summaryEntries:
-        values.classificationKind && values.regionType
+        values.classification.kind && values.classification.type
           ? [
               {
-                setId: 'classification',
+                setId: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
                 fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
-                valueLabel: optionLabel(kindOptions, values.classificationKind),
+                valueLabel: optionLabel(kindOptions, values.classification.kind),
               },
               {
-                setId: 'regionType',
-                fieldLabel: REGION_CREATE_SETUP_TYPE_FIELD_LABEL,
-                valueLabel: optionLabel(typeOptions, values.regionType),
+                setId: REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+                fieldLabel: typeFieldLabel,
+                valueLabel: optionLabel(typeOptions, values.classification.type),
               },
             ]
           : [],
@@ -296,8 +304,11 @@ function clearInvalidatedLocationSetupValues(
   let next = values
 
   for (const setId of invalidatedSetIds) {
-    if (setId === 'regionType') {
-      next = { ...next, regionType: '' }
+    if (setId === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID) {
+      next = {
+        ...next,
+        classification: { ...next.classification, type: '' },
+      }
     }
     if (setId === 'buildingFacilityAuthoringGroup') {
       next = { ...next, buildingFacilityAuthoringGroup: '' }
@@ -356,15 +367,23 @@ export function applyLocationCreateModalSetupValueChange({
         : '',
     }
   }
-  if (event.setId === 'classification') {
+  if (event.setId === REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID) {
     return {
       ...nextValues,
-      classificationKind: event.nextValue as RegionClassificationKind | '',
-      regionType: '',
+      classification: {
+        kind: event.nextValue as RegionClassificationKind | '',
+        type: '',
+      },
     }
   }
-  if (event.setId === 'regionType') {
-    return { ...nextValues, regionType: String(event.nextValue) }
+  if (event.setId === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID) {
+    return {
+      ...nextValues,
+      classification: {
+        ...nextValues.classification,
+        type: String(event.nextValue),
+      },
+    }
   }
   return nextValues
 }

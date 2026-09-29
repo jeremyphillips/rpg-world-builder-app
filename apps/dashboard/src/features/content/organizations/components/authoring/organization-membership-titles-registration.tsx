@@ -1,18 +1,40 @@
 import { useEffect } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useController, useFormContext, useWatch } from 'react-hook-form'
 
-function membersTitlesFieldPath(prefix?: string): string {
-  return prefix ? `${prefix}.members.titles` : 'members.titles'
+import { membersTitlesFieldPath } from '../../lib/membership-titles/organization-membership-titles-form.lib'
+
+function OrganizationMembershipTitleDomainIdRegistration({
+  prefix,
+  index,
+}: {
+  prefix?: string
+  index: number
+}) {
+  const idPath = `${membersTitlesFieldPath(prefix)}.${index}.id`
+  useController({ name: idPath })
+  return null
 }
 
-/** Keeps `members.titles` registered under React Hook Form `shouldUnregister`. */
+/** Keeps `members.titles` and each row `id` registered under React Hook Form `shouldUnregister`. */
 export function OrganizationMembershipTitlesRegistration({ prefix }: { prefix?: string }) {
   const form = useFormContext()
   const path = membersTitlesFieldPath(prefix)
+  const titles = useWatch({ name: path }) as unknown[] | undefined
+  const rowCount = Array.isArray(titles) ? titles.length : 0
 
   useEffect(() => {
     form.register(path, { shouldUnregister: false })
   }, [form, path])
 
-  return null
+  return (
+    <>
+      {Array.from({ length: rowCount }, (_, index) => (
+        <OrganizationMembershipTitleDomainIdRegistration
+          key={index}
+          prefix={prefix}
+          index={index}
+        />
+      ))}
+    </>
+  )
 }

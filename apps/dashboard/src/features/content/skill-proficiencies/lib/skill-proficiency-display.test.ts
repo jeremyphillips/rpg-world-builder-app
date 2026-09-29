@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import { ATHLETICS } from '../fixtures'
-import { buildSkillProficiencyDetailViewModel } from './skill-proficiency-display'
+import {
+  buildSkillProficiencyDetailViewModel,
+  buildSkillProficiencyHeroStatRows,
+} from './skill-proficiency-display'
 
 describe('buildSkillProficiencyDetailViewModel', () => {
   it('builds the athletics detail view model', () => {
@@ -12,5 +15,13 @@ describe('buildSkillProficiencyDetailViewModel', () => {
       examples: ['Jump farther than normal', 'Stay afloat in rough water', 'Break something'],
       examplesSectionTitle: 'Examples',
     })
+  })
+})
+
+describe('buildSkillProficiencyHeroStatRows', () => {
+  it('returns governing ability for the shared hero grid', () => {
+    expect(buildSkillProficiencyHeroStatRows('Strength')).toEqual([
+      { label: 'Governing Ability', value: 'Strength' },
+    ])
   })
 })

@@ -11,6 +11,7 @@ import {
   SquarePen,
   Trash2,
   UserPlus,
+  Waypoints,
   X,
   type LucideIcon,
 } from 'lucide-react'
@@ -33,6 +34,7 @@ export const ACTION_ICON_VERBS = [
   'overflow',
   'overflowVertical',
   'overflowMenu',
+  'waypoints',
 ] as const
 
 export type ActionIconVerb = (typeof ACTION_ICON_VERBS)[number]
@@ -54,4 +56,5 @@ export const ACTION_ICONS = {
   overflow: MoreHorizontal,
   overflowVertical: MoreVertical,
   overflowMenu: Ellipsis,
+  waypoints: Waypoints,
 } as const satisfies Record<ActionIconVerb, LucideIcon & AppIcon>

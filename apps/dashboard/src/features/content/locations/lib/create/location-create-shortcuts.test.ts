@@ -22,13 +22,12 @@ describe('parseLocationCreateSessionFromSearchParams', () => {
     })
   })
 
-  it('routes a typed building param into setup without serializing classification', () => {
+  it('routes a typed building param into a fixed create session', () => {
     const params = new URLSearchParams(`${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
-    const intent = { authoringType: 'building' as const }
 
     expect(parseLocationCreateSessionFromSearchParams(params)).toEqual({
-      kind: 'needsSetup',
-      intent,
+      kind: 'ready',
+      fixedCreate: { authoringType: 'building' },
     })
   })
 
@@ -277,6 +276,16 @@ describe('childAuthoringTypesForParentKind', () => {
     expect(childAuthoringTypesForParentKind('district')).toEqual(
       expect.arrayContaining(['building', 'site', 'structure']),
     )
+  })
+
+  it('offers structure authoring types under site and structure parents', () => {
+    expect(childAuthoringTypesForParentKind('site')).toEqual(
+      expect.arrayContaining(['building', 'fortification', 'structure']),
+    )
+    expect(childAuthoringTypesForParentKind('structure')).toEqual(
+      expect.arrayContaining(['building', 'fortification', 'structure']),
+    )
+    expect(childAuthoringTypesForParentKind('site')).not.toContain('interior')
   })
 
   it('lists promoted overview shortcuts from the registry ids', () => {

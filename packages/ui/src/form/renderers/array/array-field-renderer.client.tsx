@@ -43,7 +43,10 @@ export function ArrayFieldRenderer({
   sectionLayout,
 }: ArrayFieldRendererProps) {
   const form = useFormContext()
-  const { fields, append, remove, move, replace } = useFieldArray({ name: fullName })
+  const { fields, append, remove, move, replace } = useFieldArray({
+    name: fullName,
+    ...(config.keyName ? { keyName: config.keyName } : {}),
+  })
   const { getValues } = form
   const watchedItems = useWatch({ name: fullName }) as unknown[] | undefined
 

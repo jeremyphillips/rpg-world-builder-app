@@ -26,15 +26,20 @@ import {
   buildLocationClassificationFields,
   buildLocationPrimaryClassificationFields,
   filterLocationFieldsForAuthoringType,
+  hasVisibleLocationTypeDependentFields,
+  locationTypeDependentsVisibilityDependsOn,
 } from './location-classification-form-fields'
 import {
-  buildLocationAuthoringTypeOptions,
+  buildLocationAuthoringTypeComboboxOptions,
   canonicalFieldsForAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
 } from '../location-authoring-type'
-import { buildParentLocationFieldOptions } from '../hierarchy/location-parent-field-options.lib'
 import {
-  buildParentLocationOptionAvailability,
+  buildParentLocationComboboxOptionsResolve,
+  buildParentLocationFilterSelectResolve,
+} from '../hierarchy/location-parent-combobox.lib'
+import {
+  LOCATION_PARENT_FIELD_HINT,
   parentLocationFieldVisibility,
 } from '../hierarchy/location-parent-picker'
 import { LocationSettlementStartingDistrictsSlot } from '../../components/create/composition/location-settlement-starting-districts-slot'
@@ -143,7 +148,6 @@ export function buildLocationFields(
   const locationCtx = ctx as LocationFormCtx
   const fixedCreate = locationCtx.fixedCreate
   const parentIsFixed = fixedCreate?.parent?.kind === 'fixed'
-  const referenceableLocations = ctx.options?.locations?.forReference()
   const items: FormItem[] = []
 
   if (fixedCreate) {
@@ -158,7 +162,7 @@ export function buildLocationFields(
       options?.omitBuildingForm ? new Set(['classification.form']) : new Set(),
     )
     if (primaryFields.length > 0) {
-      items.push({ kind: 'row', fields: primaryFields })
+      items.push(...primaryFields)
     }
 
     items.push(
@@ -172,36 +176,45 @@ export function buildLocationFields(
     )
   } else {
     items.push({
-      kind: 'row',
-      fields: [
-        {
-          type: 'select',
-          name: 'authoringType',
-          label: 'Location type',
-          options: buildLocationAuthoringTypeOptions(),
-          required: true,
-          width: '1/3',
+      kind: 'dependent',
+      controller: {
+        type: 'combobox',
+        name: 'authoringType',
+        label: 'Location type',
+        multiple: false,
+        options: buildLocationAuthoringTypeComboboxOptions(),
+        placeholder: 'Search location types…',
+        required: true,
+        width: 'full',
+      },
+      dependents: {
+        visibility: {
+          dependsOn: locationTypeDependentsVisibilityDependsOn(options),
+          visibleWhen: (values) => hasVisibleLocationTypeDependentFields(values, options),
         },
-        ...buildLocationPrimaryClassificationFields(),
-      ],
+        fields: [
+          ...buildLocationPrimaryClassificationFields(),
+          ...buildLocationClassificationFields(options),
+        ],
+      },
     })
-  }
-
-  if (!fixedCreate) {
-    items.push(...buildLocationClassificationFields())
   }
 
   if (!parentIsFixed) {
     items.push({
-      type: 'select',
+      type: 'combobox',
       name: 'parentLocationId',
       label: 'Parent location',
-      options: buildParentLocationFieldOptions(ctx, ctx.locationParentLocationIdSeed),
-      visibility: parentLocationFieldVisibility(),
-      optionAvailability: buildParentLocationOptionAvailability(
-        referenceableLocations,
-        ctx.entityId,
+      multiple: false,
+      options: [],
+      optionsResolve: buildParentLocationComboboxOptionsResolve(
+        ctx,
+        ctx.locationParentLocationIdSeed,
       ),
+      filterSelectResolve: buildParentLocationFilterSelectResolve(),
+      hint: LOCATION_PARENT_FIELD_HINT,
+      visibility: parentLocationFieldVisibility(),
+      width: 'full',
     })
   }
 

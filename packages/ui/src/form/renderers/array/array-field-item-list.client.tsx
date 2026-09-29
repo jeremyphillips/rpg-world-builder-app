@@ -24,6 +24,7 @@ import {
   type ArrayFieldItemContentProps,
 } from './array-field-item-content.client'
 import { resolveSortableArrayMove } from './sortable-array-list.lib'
+import { resolveFieldArrayRowKey } from './resolve-field-array-row-key.lib'
 
 interface ArrayFieldItemProps extends Omit<
   ArrayFieldItemContentProps,
@@ -73,14 +74,16 @@ function ArrayFieldItem({ collapsedIds, onToggleCollapse, itemId, ...props }: Ar
 }
 
 export interface ArrayFieldItemListProps {
-  fields: ReadonlyArray<{ id: string }>
+  fields: ReadonlyArray<Record<string, unknown>>
+  keyName?: string
   sortableEnabled: boolean
-  itemProps: (rhfField: { id: string }, index: number) => ArrayFieldItemProps
+  itemProps: (rhfField: Record<string, unknown>, index: number) => ArrayFieldItemProps
   onMove: (from: number, to: number) => void
 }
 
 export function ArrayFieldItemList({
   fields,
+  keyName,
   sortableEnabled,
   itemProps,
   onMove,
@@ -91,19 +94,23 @@ export function ArrayFieldItemList({
   )
 
   function handleDragEnd(event: DragEndEvent) {
-    const resolved = resolveSortableArrayMove(fields, event)
+    const resolved = resolveSortableArrayMove(
+      fields.map((field) => ({ id: resolveFieldArrayRowKey(field, keyName) })),
+      event,
+    )
     if (resolved) onMove(resolved.from, resolved.to)
   }
 
   const list = (
     <>
-      {fields.map((rhfField, index) =>
-        sortableEnabled ? (
-          <SortableArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
+      {fields.map((rhfField, index) => {
+        const rowKey = resolveFieldArrayRowKey(rhfField, keyName)
+        return sortableEnabled ? (
+          <SortableArrayFieldItem key={rowKey} {...itemProps(rhfField, index)} />
         ) : (
-          <ArrayFieldItem key={rhfField.id} {...itemProps(rhfField, index)} />
-        ),
-      )}
+          <ArrayFieldItem key={rowKey} {...itemProps(rhfField, index)} />
+        )
+      })}
     </>
   )
 
@@ -117,7 +124,7 @@ export function ArrayFieldItemList({
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={fields.map((field) => field.id)}
+        items={fields.map((field) => resolveFieldArrayRowKey(field, keyName))}
         strategy={verticalListSortingStrategy}
       >
         {list}

@@ -15,7 +15,7 @@ export const LOCATION_KIND_DEFINITIONS = {
   settlement: { allowedParents: ['world', 'region'], parentRequirement: 'required' },
   district: { allowedParents: ['settlement'], parentRequirement: 'required' },
   site: {
-    allowedParents: ['world', 'region', 'settlement', 'district', 'site'],
+    allowedParents: ['world', 'region', 'settlement', 'district'],
     parentRequirement: 'required',
   },
   structure: {
@@ -23,7 +23,7 @@ export const LOCATION_KIND_DEFINITIONS = {
     parentRequirement: 'required',
   },
   interior: {
-    allowedParents: ['structure', 'interior', 'site'],
+    allowedParents: ['interior'],
     parentRequirement: 'required',
   },
 } as const satisfies Record<LocationKind, LocationKindDefinition>

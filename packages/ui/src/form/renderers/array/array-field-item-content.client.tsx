@@ -173,6 +173,7 @@ function FlatLabeledArrayFieldItem({
       surface={resolveArrayItemShellSurface({
         explicit: arrayItemSurface,
         collapsible: false,
+        hasItemHeader: true,
       })}
       tone={arrayItemTone}
       actionsAlign="center"

@@ -22,6 +22,7 @@ import { LocationConnectedPartiesDetailSections } from '../components/connected-
 import { LocationDetailMetadata } from '../components/detail/location-detail-metadata'
 import { useLocations } from '../hooks/use-locations'
 import { buildLocationDetailViewModel } from '../lib/location-display'
+import { resolveLocationAuthoringType } from '../lib/location-authoring-type'
 
 export function LocationDetailContent({
   location,
@@ -77,6 +78,7 @@ export function LocationDetailContent({
           canManage={canManage}
           parentLocationId={location.id}
           parentKind={location.kind}
+          parentAuthoringType={resolveLocationAuthoringType(location)}
           campaignId={campaignId}
           campaignLocations={locations}
         />

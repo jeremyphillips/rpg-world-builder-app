@@ -38,9 +38,17 @@ export const LOCATION_AUTHORING_TYPE_IDS = [
 
 export type LocationAuthoringType = (typeof LOCATION_AUTHORING_TYPE_IDS)[number]
 
-/** Authoring types that require a setup step before opening create. */
+/** Kinds offered in create menus until hierarchy / classification is ready. */
+export const LOCATION_AUTHORING_TYPES_DEFERRED = [
+  'interior',
+] as const satisfies readonly LocationAuthoringType[]
+
+export function isDeferredLocationAuthoringType(type: LocationAuthoringType): boolean {
+  return (LOCATION_AUTHORING_TYPES_DEFERRED as readonly string[]).includes(type)
+}
+
+/** Authoring types that require a setup step before opening create (inline form picks building). */
 export const LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP = [
-  'building',
   'settlement',
   'region',
   'site',
@@ -248,7 +256,11 @@ export function clearInvalidFieldsForAuthoringType(
 }
 
 function nonStructureKindOption(id: NonStructureLocationKind): FieldOption {
-  return { value: id, label: LOCATION_KIND_ENTRIES[id].label }
+  return {
+    value: id,
+    label: LOCATION_KIND_ENTRIES[id].label,
+    description: LOCATION_KIND_ENTRIES[id].description,
+  }
 }
 
 function structureAuthoringTypeOption(
@@ -258,26 +270,68 @@ function structureAuthoringTypeOption(
     return { value: id, label: UNCLASSIFIED_STRUCTURE_LABEL }
   }
 
-  return { value: id, label: STRUCTURE_TYPE_ENTRIES[id].label }
+  return {
+    value: id,
+    label: STRUCTURE_TYPE_ENTRIES[id].label,
+    description: STRUCTURE_TYPE_ENTRIES[id].description,
+  }
+}
+
+/** Flat searchable location type options with vocabulary descriptions for combobox fields. */
+export function buildLocationAuthoringTypeComboboxOptions(): FieldOption[] {
+  const options: FieldOption[] = []
+
+  for (const family of LOCATION_KIND_BROWSE_FAMILIES) {
+    if (family.id === 'structures') {
+      for (const id of [...STRUCTURE_TYPE_IDS, UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE]) {
+        options.push({
+          ...structureAuthoringTypeOption(id),
+          filterCategory: family.id,
+        })
+      }
+      continue
+    }
+
+    for (const kind of family.kinds) {
+      const authoringType = kind as LocationAuthoringType
+      if (isDeferredLocationAuthoringType(authoringType)) continue
+      options.push({
+        ...nonStructureKindOption(kind),
+        filterCategory: family.id,
+      })
+    }
+  }
+
+  return options
 }
 
 /** Grouped location type options for the authoring select. */
 export function buildLocationAuthoringTypeOptions(): SelectFieldOptionListItem[] {
-  return LOCATION_KIND_BROWSE_FAMILIES.map((family) => {
+  const groups: SelectFieldOptionListItem[] = []
+
+  for (const family of LOCATION_KIND_BROWSE_FAMILIES) {
     if (family.id === 'structures') {
-      return {
-        kind: 'group' as const,
+      groups.push({
+        kind: 'group',
         label: family.label,
         options: [...STRUCTURE_TYPE_IDS, UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE].map(
           structureAuthoringTypeOption,
         ),
-      }
+      })
+      continue
     }
 
-    return {
-      kind: 'group' as const,
+    const options = family.kinds
+      .filter((kind) => !isDeferredLocationAuthoringType(kind as LocationAuthoringType))
+      .map((kind) => nonStructureKindOption(kind))
+    if (options.length === 0) continue
+
+    groups.push({
+      kind: 'group',
       label: family.label,
-      options: family.kinds.map((kind) => nonStructureKindOption(kind)),
-    }
-  })
+      options,
+    })
+  }
+
+  return groups
 }

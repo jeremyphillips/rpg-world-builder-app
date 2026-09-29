@@ -93,3 +93,94 @@ export const SemanticFallback: Story = {
     statRows: [{ label: 'Type', value: 'Adventuring gear' }],
   },
 }
+
+const MANY_STAT_ROWS = [
+  { label: 'Hit Die', value: 'd10 per level' },
+  { label: 'Primary Abilities', value: 'Strength, Dexterity' },
+  { label: 'Saving Throws', value: 'Strength, Constitution' },
+  { label: 'Armor', value: 'All armor, shields' },
+  { label: 'Weapons', value: 'Simple and martial' },
+  { label: 'Tools', value: 'None' },
+]
+
+export const HeroMetadataWide: Story = {
+  name: 'Hero metadata / wide',
+  parameters: { layout: 'fullscreen' },
+  decorators: [
+    (Story) => (
+      <div className="mx-auto w-full max-w-6xl p-8">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    contentTypeKey: 'classes',
+    name: 'Fighter',
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
+    imageName: 'Fighter',
+    statRows: MANY_STAT_ROWS,
+    descriptionHtml: '<p>Wide hero with several metadata groups beside artwork.</p>',
+  },
+}
+
+export const HeroMetadataConstrained: Story = {
+  name: 'Hero metadata / constrained width',
+  decorators: [
+    (Story) => (
+      <div className="w-[22rem] max-w-full border border-dashed border-border-subtle p-4">
+        <Story />
+      </div>
+    ),
+  ],
+  args: {
+    contentTypeKey: 'classes',
+    name: 'Fighter',
+    pageShell: false,
+    imageName: 'Fighter',
+    statRows: MANY_STAT_ROWS,
+    descriptionHtml: '<p>Narrow column forces metadata groups to wrap.</p>',
+  },
+}
+
+export const HeroMetadataLongLabels: Story = {
+  name: 'Hero metadata / long labels and values',
+  args: {
+    contentTypeKey: 'species',
+    name: 'Custom ancestry',
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
+    imageName: 'Custom ancestry',
+    statRows: [
+      {
+        label: 'Creature type',
+        value: 'Humanoid (elf lineage with extraplanar influence)',
+      },
+      {
+        label: 'Typical height and build',
+        value: '5–6½ ft., lightly built, adapted for forest travel',
+      },
+      {
+        label: 'Languages commonly spoken',
+        value: 'Common, Elvish, Sylvan, plus one regional dialect',
+      },
+      {
+        label: 'Resistances and immunities',
+        value: 'Resistance to cold; advantage on saves against charm',
+      },
+    ],
+    descriptionHtml:
+      '<p>Long copy should stay aligned within each group without forcing equal columns.</p>',
+  },
+}
+
+export const HeroImageAndMetadata: Story = {
+  name: 'Hero metadata / image composition',
+  args: {
+    contentTypeKey: 'classes',
+    name: 'Paladin',
+    displayImage: PLACEHOLDER_DISPLAY_IMAGE,
+    imageName: 'Paladin',
+    mediaPresentation: { placement: 'end', frame: 'primary', size: 'default' },
+    statRows: FIGHTER_STAT_ROWS,
+    descriptionHtml: '<p>Metadata sits in the text column; image stays in the hero grid.</p>',
+  },
+}

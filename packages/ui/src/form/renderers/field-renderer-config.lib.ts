@@ -11,6 +11,7 @@ import {
   applyOptionAvailabilityToFieldOptions,
   applyOptionAvailabilityToSelectOptions,
   resolveFieldHintPresentation,
+  resolveComboboxFieldConfig,
   resolveSelectFieldConfigOptions,
 } from '../field-config'
 import type { FormDensity } from '../form-density'
@@ -113,6 +114,13 @@ export function resolveFieldRenderConfig(
         ...config,
         options: resolvedOptions,
       } as FieldConfig,
+      ...basePresentation,
+    }
+  }
+
+  if (config.type === 'combobox') {
+    return {
+      config: resolveComboboxFieldConfig(config, dynamicValues) as FieldConfig,
       ...basePresentation,
     }
   }

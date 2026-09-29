@@ -8,9 +8,10 @@ import {
 } from './location-create-session'
 
 describe('resolveLocationCreateSession', () => {
-  it('requires setup for typed Building create', () => {
+  it('opens a fixed building session without setup gating', () => {
     expect(resolveLocationCreateSession({ authoringType: 'building' })).toEqual({
-      status: 'needsSetup',
+      status: 'ready',
+      fixedCreate: { authoringType: 'building' },
     })
   })
 
@@ -27,7 +28,11 @@ describe('resolveLocationCreateSession', () => {
         parentLocationId: HARBORFORD.id,
       }),
     ).toEqual({
-      status: 'needsSetup',
+      status: 'ready',
+      fixedCreate: {
+        authoringType: 'building',
+        parent: { kind: 'fixed', locationId: HARBORFORD.id },
+      },
     })
   })
 })

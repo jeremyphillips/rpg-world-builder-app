@@ -82,11 +82,11 @@ export function FormShellFieldStack({
           {formError}
         </Text>
       ) : null}
+      {header}
+      <FormItems items={fields} idPrefix={formId} />
       {valueSyncs && valueSyncs.length > 0 ? (
         <FormValueSyncEffects valueSyncs={valueSyncs} />
       ) : null}
-      {header}
-      <FormItems items={fields} idPrefix={formId} />
     </FormRhythmStack>
   )
 

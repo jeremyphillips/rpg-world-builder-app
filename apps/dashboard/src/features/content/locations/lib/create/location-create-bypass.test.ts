@@ -52,15 +52,12 @@ describe('location create bypass guard', () => {
     expect(modalSource).not.toContain('ContentFormDrawer')
   })
 
-  it('routes unrestricted Building selection into the typed building session', () => {
-    expect(pageSource).toContain('LocationCreateAuthoringTypeWatcher')
-    expect(pageSource).toContain("authoringType === 'building'")
-    expect(pageSource).toContain('buildLocationFixedCreateHref')
-    expect(pageSource).toContain('ROUTES.content.locations.create(campaignId)')
+  it('does not redirect unrestricted create when Location type changes', () => {
+    expect(pageSource).not.toContain('LocationCreateAuthoringTypeWatcher')
+    expect(pageSource).not.toContain('Building create must use the composition coordinator.')
   })
 
-  it('blocks generic create from persisting buildings', () => {
-    expect(pageSource).toContain('Building create must use the composition coordinator.')
+  it('keeps modal building composition on LocationCreateForm', () => {
     expect(formSource).toContain("fixedCreate.authoringType === 'building'")
     expect(formSource).toContain('completeBuildingCreateComposition')
     expect(formSource).not.toMatch(

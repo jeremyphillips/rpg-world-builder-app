@@ -23,3 +23,19 @@ function normalizeEmptySelectValue(value: unknown): unknown {
 export function draftOptionalSelect<T extends ZodType>(schema: T) {
   return z.preprocess(normalizeEmptySelectValue, schema.optional())
 }
+
+/**
+ * Numeric contract field bound to `select` or single `chips` controls.
+ *
+ * RHF stores option values as strings. Preprocess non-empty numeric strings
+ * before the contract number schema runs. Unlike `z.coerce.number()`, `''` is
+ * left unchanged so optional draft fields do not become `0`.
+ */
+export function formSelectNumberSchema<T extends ZodType<number>>(schema: T) {
+  return z.preprocess((value) => {
+    if (typeof value === 'string' && value.trim() !== '') {
+      return Number(value)
+    }
+    return value
+  }, schema)
+}

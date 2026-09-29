@@ -56,6 +56,11 @@ export type {
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'
 export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy'
+export { EntityActionChoiceMenu } from './lib/entity/action/entity-action-choice-menu'
+export type {
+  EntityActionChoiceMenuItem,
+  EntityActionChoiceMenuProps,
+} from './lib/entity/action/entity-action-choice-menu'
 export { EntityRowList } from './lib/entity/row-list/entity-row-list'
 export type {
   EntityRowListAction,

@@ -23,7 +23,7 @@ import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surf
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 
-import type { LocationAuthoringType } from './location-authoring-type'
+import { resolveLocationAuthoringType, type LocationAuthoringType } from './location-authoring-type'
 import { resolveRegionRelationshipLabelPlural } from './location-contextual-terminology.lib'
 import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import {
@@ -129,6 +129,8 @@ export type LocationChildItem = {
 export type LocationStructureRowVm = {
   item: LocationChildItem
   kind: LocationKind
+  /** Form-layer authoring type for contextual add-child copy on this row. */
+  authoringType: LocationAuthoringType
   /** Preformatted immediate-child count phrase (split or single), when any. */
   countPhrase?: string
   /** When true, render a disclosure chevron; when false at depth cap, counts only. */
@@ -490,6 +492,7 @@ function buildStructureRowVm(
         return {
           item: toLocationChildItem(child, campaignId),
           kind: child.kind,
+          authoringType: resolveLocationAuthoringType(child),
           disclosure: false,
           children: [],
           childParentKind: location.kind,
@@ -505,6 +508,7 @@ function buildStructureRowVm(
   return {
     item: toLocationChildItem(location, campaignId),
     kind: location.kind,
+    authoringType: resolveLocationAuthoringType(location),
     countPhrase,
     disclosure: withinDepth && immediateChildren.length > 0,
     children: childRows,

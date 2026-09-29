@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { makeResolver } from '@rpg/ui/form'
 import { optionMatchesQuery } from '@rpg/ui'
 import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
@@ -17,19 +18,59 @@ import {
   buildOrganizationFormValueSyncs,
   buildOrganizationQuickCreateFollowOnFields,
   organizationDraftFormSchema,
+  organizationFormSchema,
 } from './organization-form-projection'
+import { contentFormAllFields } from './registry/content-form-registry'
+import { organizationFormDef } from '../../organizations/lib/organization-form-def'
 import { buildOrganizationStartingPointValueSyncPatch } from '../../organizations/lib/presets/organization-starting-point.lib'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
   const fields: Array<{ name: string; item: FormItem }> = []
   for (const item of items) {
     if ('name' in item && typeof item.name === 'string') fields.push({ name: item.name, item })
+    if ('kind' in item && item.kind === 'array') continue
     if ('fields' in item && Array.isArray(item.fields)) fields.push(...collectFields(item.fields))
   }
   return fields
 }
 
 describe('organization form projection', () => {
+  it('coerces membership title Rank from select string at the form schema boundary', () => {
+    const row = { id: 'omt_captain', label: 'Captain', priority: '40' as const }
+    for (const schema of [organizationFormSchema, organizationDraftFormSchema]) {
+      const parsed = schema.safeParse({
+        name: 'Iron Company',
+        organizationDomain: 'commercial',
+        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [row] },
+      })
+      expect(parsed.success).toBe(true)
+      if (!parsed.success) return
+      expect(parsed.data.members?.titles?.[0]?.priority).toBe(40)
+    }
+  })
+
+  it('makeResolver accepts string Rank values from the membership titles select', async () => {
+    const ctx = makeContentFormCtx({ mode: 'create' })
+    const fields = contentFormAllFields(organizationFormDef, ctx)
+    const resolver = makeResolver(organizationFormSchema, fields)
+    const result = await resolver(
+      {
+        name: 'Iron Company',
+        organizationDomain: 'commercial',
+        functions: [],
+        practices: [],
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: 'omt_captain', label: 'Captain', priority: '40' }],
+        },
+      },
+      undefined,
+      { fields: {}, shouldUseNativeValidation: false },
+    )
+    expect(result.errors).toEqual({})
+  })
+
   it('accepts the blank sentinel from an untouched authoring preset picker', () => {
     expect(
       organizationDraftFormSchema.parse({
@@ -41,18 +82,16 @@ describe('organization form projection', () => {
     ).toMatchObject({ startingPointId: undefined })
   })
 
-  it('surfaces read-only membership titles on create and edit after member affinities', () => {
+  it('surfaces editable membership titles on create and edit after member affinities', () => {
     for (const mode of ['create', 'edit'] as const) {
       const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode })))
-      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
+      expect(fields.map(({ name }) => name)).toContain('members.titles')
       expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
       const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
       const affinitiesIndex = fields.findIndex(({ name }) => name === 'members.classAffinityIds')
-      const titlesSlotIndex = fields.findIndex(
-        ({ name }) => name === '_organizationMembershipTitles',
-      )
-      expect(titlesSlotIndex).toBeGreaterThan(affinitiesIndex)
-      expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
+      const titlesIndex = fields.findIndex(({ name }) => name === 'members.titles')
+      expect(titlesIndex).toBeGreaterThan(affinitiesIndex)
+      expect(descriptionIndex).toBeGreaterThan(titlesIndex)
     }
   })
 
@@ -72,7 +111,7 @@ describe('organization form projection', () => {
         item.id === 'organization-quick-create-optional-details',
     )
     expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).toContain(
-      '_organizationMembershipTitles',
+      'members.titles',
     )
     expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).not.toContain(
       '_organizationMembershipTitlesRegistration',
@@ -114,7 +153,7 @@ describe('organization form projection', () => {
       'practices',
       'members.classAffinityIds',
       'members.speciesAffinityIds',
-      '_organizationMembershipTitles',
+      'members.titles',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -127,7 +166,7 @@ describe('organization form projection', () => {
       'operatorOrganization.practices',
       'operatorOrganization.members.classAffinityIds',
       'operatorOrganization.members.speciesAffinityIds',
-      'operatorOrganization._organizationMembershipTitles',
+      'operatorOrganization.members.titles',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
