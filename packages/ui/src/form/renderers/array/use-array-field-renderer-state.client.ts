@@ -23,6 +23,7 @@ import {
   resolveArrayAppendAvailability,
   resolveArrayValidationCounts,
 } from './use-array-field-renderer-state.lib'
+import { resolveFieldArrayRowKey } from './resolve-field-array-row-key.lib'
 
 type UseArrayFieldRendererStateOptions = {
   config: ArrayConfig
@@ -145,12 +146,12 @@ export function useArrayFieldRendererState({
   })
 
   const itemProps = React.useCallback(
-    (rhfField: (typeof fields)[number], index: number) => ({
+    (rhfField: Record<string, unknown>, index: number) => ({
       config,
       idPrefix,
       fullName,
       index,
-      itemId: rhfField.id,
+      itemId: resolveFieldArrayRowKey(rhfField, config.keyName),
       legend,
       itemBodyStackClasses,
       canRemove,

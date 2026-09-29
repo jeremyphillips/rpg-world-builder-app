@@ -3,6 +3,7 @@ import { describe, expect, it, vi, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { UseFormReturn } from 'react-hook-form'
+import { useController } from 'react-hook-form'
 import axe from 'axe-core'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { z } from 'zod'
@@ -31,6 +32,11 @@ const schema = z.object({
   name: z.string().min(1, 'Name is required'),
   traits: z.array(traitSchema).min(0),
 })
+
+function RegisterRowsDomainIdSlot({ name }: { name: string }) {
+  useController({ name: name as 'rows.0.id' })
+  return null
+}
 
 const rowIssueSchema = z.object({ traits: z.array(traitSchema) }).superRefine((_values, ctx) => {
   addCustomRefinementIssue(ctx, 'Review this trait before saving', ['traits', 0])
@@ -762,6 +768,51 @@ describe('ArrayFieldRenderer', () => {
     expect(screen.getByText('No trait added.')).toBeInTheDocument()
     expect(screen.getByText('Add at least one trait.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Review 1 issue in Traits/i })).toBeInTheDocument()
+  })
+
+  it('preserves domain row id on submit when array keyName is not id', async () => {
+    const user = userEvent.setup()
+    const onSubmit = vi.fn()
+    const rowSchema = z.object({
+      id: z.string(),
+      label: z.string().min(1),
+    })
+    const domainIdSchema = z.object({ rows: z.array(rowSchema).min(1) })
+    function RegisterDomainRowId() {
+      return <RegisterRowsDomainIdSlot name="rows.0.id" />
+    }
+    const fields: FormItem[] = [
+      {
+        kind: 'slot',
+        name: '_registerRowId',
+        render: () => <RegisterDomainRowId />,
+      },
+      {
+        kind: 'array',
+        name: 'rows',
+        legend: 'Rows',
+        keyName: '_fieldArrayKey',
+        fields: [{ type: 'text', name: 'label', label: 'Label', required: true }],
+        addAction: { label: 'Add row' },
+        appendDefaults: () => ({ id: 'omt_new', label: 'Beta' }),
+      },
+    ]
+    render(
+      <Form
+        schema={domainIdSchema}
+        fields={fields}
+        defaultValues={{ rows: [{ id: 'omt_existing', label: 'Alpha' }] }}
+        onSubmit={onSubmit}
+        footer={<button type="submit">Save</button>}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+    expect(onSubmit.mock.calls[0]?.[0]).toEqual({
+      rows: [{ id: 'omt_existing', label: 'Alpha' }],
+    })
   })
 
   it('shows required marker on array legend when min is at least one', async () => {

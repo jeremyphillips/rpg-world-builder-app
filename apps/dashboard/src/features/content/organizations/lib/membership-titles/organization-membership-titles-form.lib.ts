@@ -1,6 +1,5 @@
 import {
   createDefaultOrganizationMembershipTitleDefinition,
-  createOrganizationMembershipTitleId,
   ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES,
   type OrganizationMembershipTitleDefinition,
   type OrganizationMembershipTitlePriority,
@@ -11,6 +10,9 @@ import {
   ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
   ORGANIZATION_SECTION_LABELS,
 } from '../organization-display'
+
+/** RHF `useFieldArray` keyName — must not match persisted catalog row `id` (`omt_*`). */
+export const ORGANIZATION_MEMBERSHIP_TITLE_FIELD_ARRAY_KEY = '_fieldArrayKey' as const
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_PRIORITY_LABELS: Record<
   OrganizationMembershipTitlePriority,
@@ -29,10 +31,14 @@ export const organizationMembershipTitlePriorityOptions =
     label: ORGANIZATION_MEMBERSHIP_TITLE_PRIORITY_LABELS[priority],
   }))
 
-export function createOrganizationMembershipTitleFormRow(
-  createId: () => string = createOrganizationMembershipTitleId,
-): OrganizationMembershipTitleDefinition {
-  return createDefaultOrganizationMembershipTitleDefinition(createId)
+/** Defaults for user-initiated "Add title" — empty label, fresh single-prefix `omt_*`. */
+export function createOrganizationMembershipTitleAppendRow(): OrganizationMembershipTitleDefinition {
+  const { id } = createDefaultOrganizationMembershipTitleDefinition()
+  return {
+    id,
+    label: '',
+    priority: ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[4],
+  }
 }
 
 export function parseOrganizationMembershipTitlePriorityValue(
@@ -70,13 +76,14 @@ export function buildOrganizationMembershipTitlesArrayField(prefix?: string): Fo
     kind: 'array',
     id: 'organization-membership-titles',
     name: membershipTitlesFieldName(prefix),
+    keyName: ORGANIZATION_MEMBERSHIP_TITLE_FIELD_ARRAY_KEY,
     heading: {
       label: ORGANIZATION_SECTION_LABELS.membershipTitles,
       hint: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
     },
     min: 1,
     addAction: { label: 'Add title', layout: 'inline' },
-    appendDefaults: () => createOrganizationMembershipTitleFormRow(),
+    appendDefaults: () => createOrganizationMembershipTitleAppendRow(),
     item: {
       variant: 'compact',
       headerVisibility: 'hidden',
@@ -103,13 +110,6 @@ export function buildOrganizationMembershipTitlesArrayField(prefix?: string): Fo
             required: true,
             width: 'md',
             options: organizationMembershipTitlePriorityOptions,
-          },
-          {
-            type: 'text',
-            name: 'id',
-            label: 'Title ID',
-            labelVisibility: 'srOnly',
-            required: true,
           },
         ],
       },

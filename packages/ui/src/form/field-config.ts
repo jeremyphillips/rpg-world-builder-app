@@ -1473,6 +1473,11 @@ export interface ArrayConfig {
   visibility?: FieldVisibility
   arrayPattern?: ArrayPatternConfig
   appendDefaults?: (items: unknown[]) => Record<string, unknown>
+  /**
+   * RHF `useFieldArray` `keyName` when row values include a domain `id` (or other
+   * key) that must not double as the synthetic row key. Defaults to RHF's `id`.
+   */
+  keyName?: string
   filterSelect?: ArrayFilterSelectConfig
   /** When append should stay visible but disabled (e.g. finite enum saturation). */
   resolveCanAppend?: (items: unknown[]) => ArrayCanAppendResult

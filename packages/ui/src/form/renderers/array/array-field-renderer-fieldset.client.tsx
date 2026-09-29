@@ -43,7 +43,7 @@ interface ArrayFieldRendererFieldsetProps {
   config: ArrayConfig
   sectionLayout?: ArrayFieldSectionLayout
   state: ArrayFieldRendererState
-  fields: Array<{ id: string }>
+  fields: ReadonlyArray<Record<string, unknown>>
   onMove: (from: number, to: number) => void
 }
 
@@ -112,7 +112,8 @@ export function ArrayFieldRendererFieldset({
         ) : (
           <>
             <ArrayFieldItemList
-              fields={fields}
+              fields={fields as unknown as ReadonlyArray<Record<string, unknown>>}
+              keyName={config.keyName}
               sortableEnabled={state.sortableEnabled}
               itemProps={state.itemProps}
               onMove={onMove}
