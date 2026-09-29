@@ -28,6 +28,7 @@ uploads/
 # Test / coverage
 coverage/
 .vitest/
+.tmp/
 
 # Env
 .env

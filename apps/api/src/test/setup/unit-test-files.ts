@@ -49,4 +49,5 @@ export const unitTestFiles = [
   'src/services/email/providers/ethereal.provider.test.ts',
   'src/services/email/templates/campaign-invite.template.test.ts',
   'src/test/setup/integration-mongo-uri.test.ts',
+  'src/test/setup/vitest-worker-cap.test.ts',
 ] as const
