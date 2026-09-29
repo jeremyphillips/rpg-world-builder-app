@@ -6,25 +6,28 @@ import {
   isLocationCreateModalSetupComplete,
   resolveLocationCreateModalSetupModel,
 } from './location-create-modal-setup.lib'
+import {
+  REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+  REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+} from './location-region-create-setup.lib'
 
 describe('applyLocationCreateModalSetupValueChange', () => {
-  it('clears regionType atomically when classification changes', () => {
+  it('clears classification.type atomically when classification.kind changes', () => {
     const next = applyLocationCreateModalSetupValueChange({
       values: {
         ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
-        classificationKind: 'political',
-        regionType: 'kingdom',
+        classification: { kind: 'political', type: 'kingdom' },
       },
       event: {
-        setId: 'classification',
+        setId: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
         previousValue: 'political',
         nextValue: 'geographic',
-        invalidatedSetIds: ['regionType'],
+        invalidatedSetIds: [REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID],
       },
     })
 
-    expect(next.classificationKind).toBe('geographic')
-    expect(next.regionType).toBe('')
+    expect(next.classification.kind).toBe('geographic')
+    expect(next.classification.type).toBe('')
   })
 
   it('marks building form as skipped without a value', () => {
@@ -129,29 +132,44 @@ describe('resolveLocationCreateModalSetupModel', () => {
     expect(model?.complete()).not.toHaveProperty('facilityType')
   })
 
-  it('builds shared region choice sets with dependsOn', () => {
+  it('builds shared region choice sets aligned with form field paths', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'region' },
       values: {
         ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
-        classificationKind: 'political',
-        regionType: 'kingdom',
+        classification: { kind: 'political', type: 'kingdom' },
       },
     })
 
     expect(model?.choiceSets.map((choiceSet) => choiceSet.id)).toEqual([
-      'classification',
-      'regionType',
+      REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+      REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
     ])
-    expect(model?.choiceSets.find((choiceSet) => choiceSet.id === 'regionType')?.dependsOn).toEqual(
-      ['classification'],
-    )
     expect(
-      model?.choiceSets.find((choiceSet) => choiceSet.id === 'classification')?.summaryGroup,
+      model?.choiceSets.find(
+        (choiceSet) => choiceSet.id === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+      )?.dependsOn,
+    ).toEqual([REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID])
+    expect(
+      model?.choiceSets.find(
+        (choiceSet) => choiceSet.id === REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+      )?.fieldLabel,
+    ).toBe('Classification')
+    expect(
+      model?.choiceSets.find(
+        (choiceSet) => choiceSet.id === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+      )?.fieldLabel,
+    ).toBe('Political type')
+    expect(
+      model?.choiceSets.find(
+        (choiceSet) => choiceSet.id === REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+      )?.summaryGroup,
     ).toBe('selections')
-    expect(model?.choiceSets.find((choiceSet) => choiceSet.id === 'regionType')?.summaryGroup).toBe(
-      'selections',
-    )
+    expect(
+      model?.choiceSets.find(
+        (choiceSet) => choiceSet.id === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+      )?.summaryGroup,
+    ).toBe('selections')
     expect(isLocationCreateModalSetupComplete(model!)).toBe(true)
     expect(model?.complete()).toEqual({
       kind: 'region',

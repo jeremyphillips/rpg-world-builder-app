@@ -70,10 +70,10 @@ describe('LocationCreatePage setup shell path', () => {
     })
   })
 
-  it('keeps building create on the modal path instead of CreateSetupShell', () => {
+  it('renders the inline create form for fixed building sessions', () => {
     renderLocationCreatePage(`?${LOCATION_CREATE_TYPE_SEARCH_PARAM}=building`)
 
-    expect(screen.getByTestId('location-create-modal')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+    expect(screen.getByTestId('content-create-shell')).toBeInTheDocument()
+    expect(screen.queryByTestId('location-create-modal')).not.toBeInTheDocument()
   })
 })

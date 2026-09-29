@@ -62,6 +62,16 @@ describe('LOCATION_KIND_DEFINITIONS integrity', () => {
     expect(isValidParentKind('site', 'district')).toBe(true)
   })
 
+  it('forbids site from parenting another site', () => {
+    expect(isValidParentKind('site', 'site')).toBe(false)
+  })
+
+  it('forbids structure and site from parenting interior until hierarchy widens', () => {
+    expect(isValidParentKind('interior', 'structure')).toBe(false)
+    expect(isValidParentKind('interior', 'site')).toBe(false)
+    expect(isValidParentKind('interior', 'interior')).toBe(true)
+  })
+
   it('validates parent requirement presence per kind', () => {
     expect(validateLocationParentRequirement('plane', undefined)).toBeUndefined()
     expect(validateLocationParentRequirement('plane', 'parent-1')).toBeDefined()

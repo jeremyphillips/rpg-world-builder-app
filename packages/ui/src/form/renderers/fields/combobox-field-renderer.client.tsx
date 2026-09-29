@@ -41,12 +41,20 @@ export function ComboboxFieldRenderer({
   ...validation
 }: ComboboxFieldRendererProps) {
   const comboboxOptions = React.useMemo(
-    () => toComboboxFieldOptions(config.options),
+    () => toComboboxFieldOptions(config.options ?? []),
     [config.options],
   )
   const [categoryFilter, setCategoryFilter] = React.useState(() =>
     config.filterSelect ? resolveComboboxFilterDefaultValue(config.filterSelect) : undefined,
   )
+
+  React.useEffect(() => {
+    if (!config.filterSelect) return
+    const isValid = config.filterSelect.options.some((option) => option.value === categoryFilter)
+    if (!isValid) {
+      setCategoryFilter(resolveComboboxFilterDefaultValue(config.filterSelect))
+    }
+  }, [categoryFilter, config.filterSelect])
 
   const resolveFilteredOptions = React.useMemo((): ResolveComboboxFilteredOptions | undefined => {
     const formResolver = config.filterSelect

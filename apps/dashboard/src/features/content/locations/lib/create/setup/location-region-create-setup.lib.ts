@@ -19,9 +19,16 @@ export const REGION_CREATE_SETUP_SELECTIONS_SUMMARY_GROUP = 'selections' as cons
 
 export const REGION_CREATE_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
 
-export const REGION_CREATE_SETUP_TYPE_FIELD_LABEL = 'Region type' as const
+/** Matches form field path `classification.kind`. */
+export const REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID = 'classification.kind' as const
 
-export const REGION_CREATE_SETUP_TYPE_PROMPT = 'Region type' as const
+/** Matches form field path `classification.type`. */
+export const REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID = 'classification.type' as const
+
+export {
+  resolveRegionClassificationTypeFieldLabel,
+  resolveRegionClassificationTypeFieldPrompt,
+} from '../../forms/location-region-classification-field-copy.lib'
 
 export function resolveRegionCreateSetupHeadline(intent: LocationCreateIntent): string {
   const noun = resolveRegionRelationshipLabel(intent.parentKind).toLowerCase()

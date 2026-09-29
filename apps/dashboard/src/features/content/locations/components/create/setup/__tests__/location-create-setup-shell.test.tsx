@@ -9,6 +9,12 @@ import { CreateSetupShell, type CreateSetupValueChangeEvent } from '@/lib/create
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../../../../lib/create/setup/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../../../../lib/create/setup/location-create-setup.lib'
 import type { LocationCreateSetupChoiceSet } from '../../../../lib/create/setup/location-create-setup.lib'
+import {
+  REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
+  REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+  resolveRegionClassificationTypeFieldLabel,
+} from '../../../../lib/create/setup/location-region-create-setup.lib'
+import type { RegionClassificationKind } from '@rpg/contracts'
 
 const SITE_OPTIONS: RadioCardOption[] = [
   {
@@ -79,39 +85,41 @@ function SingleChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () =>
 }
 
 function TwoChoiceSetupHarness({ onContinue = vi.fn() }: { onContinue?: () => void }) {
-  const [classification, setClassification] = useState('')
-  const [regionType, setRegionType] = useState('')
+  const [classificationKind, setClassificationKind] = useState<RegionClassificationKind | ''>('')
+  const [classificationType, setClassificationType] = useState('')
 
   const handleSetupValueChange = (event: CreateSetupValueChangeEvent) => {
-    if (event.setId === 'classification') {
-      setClassification(String(event.nextValue))
-      if (event.invalidatedSetIds.includes('regionType')) {
-        setRegionType('')
+    if (event.setId === REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID) {
+      setClassificationKind(event.nextValue as RegionClassificationKind | '')
+      if (event.invalidatedSetIds.includes(REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID)) {
+        setClassificationType('')
       }
       return
     }
-    if (event.setId === 'regionType') {
-      setRegionType(String(event.nextValue))
+    if (event.setId === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID) {
+      setClassificationType(String(event.nextValue))
     }
   }
 
+  const typeFieldLabel = resolveRegionClassificationTypeFieldLabel(classificationKind)
+
   const choiceSets: LocationCreateSetupChoiceSet[] = [
     {
-      id: 'classification',
+      id: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
       fieldLabel: 'Classification',
       prompt: 'What kind of region are you creating?',
       options: CLASSIFICATION_OPTIONS,
-      value: classification,
-      isComplete: Boolean(classification),
+      value: classificationKind,
+      isComplete: Boolean(classificationKind),
     },
     {
-      id: 'regionType',
-      fieldLabel: 'Region type',
-      prompt: 'Region type',
+      id: REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
+      fieldLabel: typeFieldLabel,
+      prompt: typeFieldLabel,
       options: REGION_TYPE_OPTIONS,
-      value: regionType,
-      dependsOn: ['classification'],
-      isComplete: Boolean(regionType),
+      value: classificationType,
+      dependsOn: [REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID],
+      isComplete: Boolean(classificationType),
     },
   ]
 
@@ -209,7 +217,7 @@ describe('location create setup', () => {
     expect(
       screen.getByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
@@ -219,12 +227,12 @@ describe('location create setup', () => {
     expect(
       screen.queryByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Political type' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Kingdom') }))
 
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
     expect(screen.getByText('Kingdom')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
@@ -242,7 +250,7 @@ describe('location create setup', () => {
     expect(
       screen.getByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('radiogroup', { name: 'Region type' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
     expect(screen.queryByText('Kingdom')).not.toBeInTheDocument()
   })
 
@@ -257,9 +265,9 @@ describe('location create setup', () => {
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Geographic') }))
 
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
-    expect(screen.getByRole('radiogroup', { name: 'Region type' })).toBeInTheDocument()
+    expect(screen.getByRole('radiogroup', { name: 'Geographic type' })).toBeInTheDocument()
     expect(
-      within(screen.getByRole('radiogroup', { name: 'Region type' })).queryByRole('radio', {
+      within(screen.getByRole('radiogroup', { name: 'Geographic type' })).queryByRole('radio', {
         checked: true,
       }),
     ).not.toBeInTheDocument()

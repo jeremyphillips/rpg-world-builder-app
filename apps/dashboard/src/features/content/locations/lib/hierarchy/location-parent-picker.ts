@@ -62,6 +62,9 @@ export function buildParentLocationOptionAvailability(
   }
 }
 
+export const LOCATION_PARENT_FIELD_HINT =
+  'The broader location this place is part of. Leave blank for a top-level location.' as const
+
 export function parentLocationPlaceholder(kind: LocationKind | undefined): string {
   if (!kind) return 'Choose a parent location…'
   const requirement = getParentRequirement(kind)

@@ -260,6 +260,12 @@ export interface FieldDynamicSelectOptions {
   optionsWhen: (values: Record<string, unknown>) => readonly FieldOption[]
 }
 
+/** Resolves combobox panel category filter config from watched form values. */
+export interface FieldDynamicComboboxFilterSelect {
+  dependsOn: readonly string[]
+  filterSelectWhen: (values: Record<string, unknown>) => ComboboxFilterSelectConfig
+}
+
 /** Static and dynamic hint configuration on leaf fields. */
 export interface FieldHintConfig {
   text?: string
@@ -801,7 +807,10 @@ export interface ComboboxFilterSelectConfig {
 
 export interface ComboboxFieldConfig extends BaseFieldConfig {
   type: 'combobox'
-  options: FieldOption[]
+  /** Static options — omit when `optionsResolve` supplies the list at render time. */
+  options?: FieldOption[]
+  /** Dynamic options resolved from watched values; replaces `options` when set. */
+  optionsResolve?: FieldDynamicSelectOptions
   /**
    * Single vs multi selection. Defaults to `true` (`string[]` value).
    * Set `false` for a single `string` value (optional enums use `undefined`, not `''`).
@@ -829,6 +838,8 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   ) => FieldOption[]
   /** Optional category filter row in the combobox panel toolbar. */
   filterSelect?: ComboboxFilterSelectConfig
+  /** Dynamic category filter resolved from watched values; replaces `filterSelect` when set. */
+  filterSelectResolve?: FieldDynamicComboboxFilterSelect
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'
@@ -1881,14 +1892,46 @@ export function collectFieldDynamicDependsOn(field: {
   derivedMeta?: BaseFieldConfig['derivedMeta']
   type?: FieldConfig['type']
   optionsResolve?: FieldDynamicSelectOptions
+  filterSelectResolve?: FieldDynamicComboboxFilterSelect
 }): readonly string[] {
   const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
   const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
   const optionsResolveDependsOn =
-    (field.type === 'select' || field.type === 'inlineSentence') && field.optionsResolve
+    (field.type === 'select' || field.type === 'inlineSentence' || field.type === 'combobox') &&
+    field.optionsResolve
       ? field.optionsResolve.dependsOn
       : []
-  return [...new Set([...hintDependsOn, ...derivedMetaDependsOn, ...optionsResolveDependsOn])]
+  const filterSelectResolveDependsOn =
+    field.type === 'combobox' && field.filterSelectResolve
+      ? field.filterSelectResolve.dependsOn
+      : []
+  return [
+    ...new Set([
+      ...hintDependsOn,
+      ...derivedMetaDependsOn,
+      ...optionsResolveDependsOn,
+      ...filterSelectResolveDependsOn,
+    ]),
+  ]
+}
+
+/** Resolves a combobox field's option list and category filter, applying dynamic resolution when configured. */
+export function resolveComboboxFieldConfig(
+  config: ComboboxFieldConfig,
+  values: Record<string, unknown>,
+): ComboboxFieldConfig {
+  const options = config.optionsResolve
+    ? [...config.optionsResolve.optionsWhen(values)]
+    : (config.options ?? [])
+  const filterSelect = config.filterSelectResolve
+    ? config.filterSelectResolve.filterSelectWhen(values)
+    : config.filterSelect
+
+  return {
+    ...config,
+    options,
+    filterSelect,
+  }
 }
 
 /** Resolves inline-sentence select options, applying dynamic resolution when configured. */

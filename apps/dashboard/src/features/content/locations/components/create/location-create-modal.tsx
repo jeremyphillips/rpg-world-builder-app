@@ -557,9 +557,7 @@ function LocationCreateModalSession({
 
   const showDetails = state.phase === 'details' && state.fixedCreate != null
   const buildingDetailsReady =
-    state.detailsMounted &&
-    state.fixedCreate?.authoringType === 'building' &&
-    state.buildingSetupApplication != null
+    state.detailsMounted && state.fixedCreate?.authoringType === 'building'
   const capabilities =
     state.fixedCreate != null
       ? resolveLocationCreateAuthoringCapabilities({

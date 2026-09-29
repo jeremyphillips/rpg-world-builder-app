@@ -403,7 +403,7 @@ function LocationBuildingCreateForm(props: LocationCreateFormBodyProps) {
 
   const fields = composeLocationCreateBodyFields(locationCtx, {
     buildingFacilityAuthoringGroup: buildingSetupApplication?.projection.facilityAuthoringGroup,
-    omitBuildingForm: true,
+    omitBuildingForm: Boolean(buildingSetupApplication),
   })
 
   const { onSubmit, formError, UiBridge } = useContentFormSubmit<LocationDraftFormValues>({

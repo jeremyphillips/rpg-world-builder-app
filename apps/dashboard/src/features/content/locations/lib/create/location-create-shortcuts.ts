@@ -142,6 +142,12 @@ function sortAuthoringTypes(types: readonly LocationAuthoringType[]): LocationAu
   )
 }
 
+/** Parents that may add only the Building authoring type until broader structure kinds return. */
+const BUILDING_ONLY_CHILD_PARENT_KINDS = [
+  'site',
+  'structure',
+] as const satisfies readonly LocationKind[]
+
 /** Derives child authoring types valid under a parent location kind via contracts hierarchy. */
 export function childAuthoringTypesForParentKind(
   parentKind: LocationKind,
@@ -155,7 +161,12 @@ export function childAuthoringTypesForParentKind(
     }
   }
 
-  return sortAuthoringTypes([...types])
+  const sorted = sortAuthoringTypes([...types])
+  if ((BUILDING_ONLY_CHILD_PARENT_KINDS as readonly string[]).includes(parentKind)) {
+    return sorted.filter((type) => type === 'building')
+  }
+
+  return sorted
 }
 
 function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthoringType | undefined {

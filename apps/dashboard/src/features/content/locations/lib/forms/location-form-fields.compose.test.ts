@@ -21,6 +21,13 @@ function collectFieldNames(items: FormItem[]): string[] {
     if ('fields' in item && Array.isArray(item.fields)) {
       names.push(...collectFieldNames(item.fields as FormItem[]))
     }
+    if ('kind' in item && item.kind === 'dependent' && 'dependents' in item) {
+      const dependent = item as Extract<FormItem, { kind: 'dependent' }>
+      if ('name' in dependent.controller && typeof dependent.controller.name === 'string') {
+        names.push(dependent.controller.name)
+      }
+      names.push(...collectFieldNames(dependent.dependents.fields as FormItem[]))
+    }
   }
 
   return names

@@ -264,6 +264,10 @@ function isStructurePreviewLeaf(row: LocationStructureRowVm): boolean {
   return !row.disclosure && row.children.length === 0 && !row.canAddChildren
 }
 
+function structureListHasExpandableCaret(rows: readonly LocationStructureRowVm[]): boolean {
+  return rows.some((row) => row.disclosure && row.children.length > 0)
+}
+
 function LocationStructureRow({
   row,
   index,
@@ -274,6 +278,7 @@ function LocationStructureRow({
   onView,
   onSelectAuthoringType,
   inset,
+  reserveDisclosureGutter,
 }: {
   row: LocationStructureRowVm
   index: number
@@ -284,6 +289,7 @@ function LocationStructureRow({
   onView: (href: string) => void
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
   inset: 'self' | 'parent'
+  reserveDisclosureGutter: boolean
 }) {
   const actions = buildChildRowActions(row.item, canManage, onMove, onView)
   const previewClassName = detailEntityRowDisclosurePreviewRowVariants({
@@ -297,6 +303,7 @@ function LocationStructureRow({
         headingHref={row.item.href}
         headingSuffix={resolveStructureRowHeadingSuffix(row)}
         inset={inset}
+        disclosure={reserveDisclosureGutter ? { mode: 'reserved' } : undefined}
         className={previewClassName}
       />
     )
@@ -350,6 +357,8 @@ function LocationStructureRows({
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
   inset?: 'self' | 'parent'
 }) {
+  const reserveDisclosureGutter = structureListHasExpandableCaret(rows)
+
   return (
     <DetailCollectionRowList separator="structural">
       {rows.map((row, index) => (
@@ -364,6 +373,7 @@ function LocationStructureRows({
           onView={onView}
           onSelectAuthoringType={onSelectAuthoringType}
           inset={inset}
+          reserveDisclosureGutter={reserveDisclosureGutter}
         />
       ))}
     </DetailCollectionRowList>

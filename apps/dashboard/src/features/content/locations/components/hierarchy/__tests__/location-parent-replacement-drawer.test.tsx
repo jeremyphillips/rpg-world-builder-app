@@ -25,17 +25,9 @@ function createMultiFamilyCampaignLocations() {
     parentLocationId: HARBORFORD.id,
   })
 
-  const interior = makeLocation({
-    kind: 'interior',
-    id: 'location-interior',
-    slug: 'taproom',
-    name: 'Taproom',
-    parentLocationId: YAWNING_PORTAL.id,
-  })
-
   return {
     campaignLocations: [...LOCATIONS_LIST, site, structureSibling],
-    subject: interior,
+    subject: YAWNING_PORTAL,
   }
 }
 
@@ -130,9 +122,9 @@ describe('LocationParentReplacementDrawer', () => {
     )
 
     expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sites' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Structures' })).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Settlements' })).not.toBeInTheDocument()
   })
 
   it('filters candidates by active browse scope', async () => {
