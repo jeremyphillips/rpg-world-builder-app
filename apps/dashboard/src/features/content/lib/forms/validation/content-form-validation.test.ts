@@ -43,6 +43,7 @@ import {
 } from '../../../species/lib/species-rules-form-fields'
 import { createSpeciesFormSchema } from '../../../species/lib/species-form-fields'
 import { createFeatFormSchema } from '../../../feats/lib/feat-form-fields'
+import { assertNumericSelectStringValuesParse } from './numeric-select-form-schema.lib'
 import { equipmentFormDef } from '../../../equipment/lib/equipment-form-def'
 import { resolveEquipmentFormSchema } from '../../../equipment/lib/equipment-form-fields'
 import { equipmentEconomyFormDefaults } from '../../../equipment/lib/equipment-economy-form-values'
@@ -72,10 +73,25 @@ const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 
 /** Set by preset value sync — not a visible form control. */
-const ORGANIZATION_SCHEMA_EXEMPT = [
+const ORGANIZATION_STARTING_POINT_EXEMPT = [
   'startingPointId',
-  /^members\.titles\b/,
   /_organizationEditFamiliarType$/,
+] as const
+
+/**
+ * Membership title rows: Label and Rank are visible author fields (registry required).
+ * Persistence-only row metadata is exempt — see organization-membership-titles form lib.
+ */
+const ORGANIZATION_MEMBERSHIP_TITLES_ROW_EXEMPT = [
+  'members.titles.*.id',
+  'members.titles.*.sourceTitleId',
+  'members.titles.*.description',
+  'members.titles.*.npcRecommendation',
+] as const
+
+const ORGANIZATION_SCHEMA_EXEMPT = [
+  ...ORGANIZATION_STARTING_POINT_EXEMPT,
+  ...ORGANIZATION_MEMBERSHIP_TITLES_ROW_EXEMPT,
 ] as const
 
 /** Managed in the identity header via ManagedMediaField — not FormItem paths. */
@@ -141,6 +157,12 @@ describe.each(registryEntries)('ContentFormDef[%s] validation', (routeKey, def) 
     assertRegistryCoverage(schema, fields, { exemptPaths: exempt })
   })
 
+  it('accepts UI numeric select strings without new field-path schema issues', () => {
+    const fields = contentFormAllFields(def, ctx)
+    const schema = def.resolveSchema?.(ctx) ?? def.schema
+    assertNumericSelectStringValuesParse(schema, fields)
+  })
+
   it('rejects invalid submit without Zod default messages', () => {
     const fields = contentFormAllFields(def, ctx)
     const schema = def.resolveSchema?.(ctx) ?? def.schema
@@ -163,6 +185,10 @@ describe.each(EQUIPMENT_KINDS)('equipment form validation — %s', (kind) => {
 
   it('registers schema leaf paths in the field error map', () => {
     assertRegistryCoverage(schema, fields, { exemptPaths: EQUIPMENT_SCHEMA_EXEMPT })
+  })
+
+  it('accepts UI numeric select strings without new field-path schema issues', () => {
+    assertNumericSelectStringValuesParse(schema, fields)
   })
 
   it('smoke: rejects empty name without Zod default messages', () => {

@@ -282,6 +282,12 @@ Config union source of truth: [field-config.ts](../src/form/field-config.ts).
 Zod schemas live in `@rpg/contracts` — single source of truth for client and server.
 **Never redefine domain shapes in apps.**
 
+`select` and single `chips` controls always emit **string** option values in RHF.
+Dashboard content forms coerce numeric contract fields at the form-schema layer
+(`formSelectNumberSchema` in
+[`form-lib-conventions.md`](../../../apps/dashboard/docs/form-lib-conventions.md#numeric-selects-and-contract-number-fields))
+— not via a UI `valueKind`.
+
 ```tsx
 import { CreateCampaignInput } from '@rpg/contracts'
 ;<Form schema={CreateCampaignInput} fields={fields} onSubmit={onSubmit} />

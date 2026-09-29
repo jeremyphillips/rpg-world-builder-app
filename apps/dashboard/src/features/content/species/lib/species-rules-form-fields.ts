@@ -17,6 +17,7 @@ import {
   formatChooseContentTypePlaceholder,
 } from '../../lib/content-type-labels'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { formSelectNumberSchema } from '../../lib/forms/validation/draft-form-schema-helpers'
 import { campaignSettingHref } from '@/lib/availability'
 import {
   SPECIES_CLASS_POLICY_ALLOWED_CLASSES_HINT,
@@ -35,12 +36,15 @@ export const ENABLE_CLASS_LEVEL_CAPS_FIELD = 'enableClassLevelCaps'
 export const speciesLevelLimitsFormSchema = z
   .object({
     limitMaxCharacterLevel: z.boolean().default(false),
-    maxCharacterLevel: z.number().int().min(1).optional(),
+    maxCharacterLevel: z.preprocess(
+      (value) => (value === '' || value === undefined || value === null ? undefined : value),
+      formSelectNumberSchema(z.number().int().min(1)).optional(),
+    ),
     enableClassLevelCaps: z.boolean().default(false),
     classLevelCaps: z.array(
       z.object({
         classId: z.string().min(1),
-        maxLevel: z.number().int().min(1),
+        maxLevel: formSelectNumberSchema(z.number().int().min(1)),
       }),
     ),
   })

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { makeResolver } from '@rpg/ui/form'
 import { optionMatchesQuery } from '@rpg/ui'
 import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
@@ -17,7 +18,10 @@ import {
   buildOrganizationFormValueSyncs,
   buildOrganizationQuickCreateFollowOnFields,
   organizationDraftFormSchema,
+  organizationFormSchema,
 } from './organization-form-projection'
+import { contentFormAllFields } from './registry/content-form-registry'
+import { organizationFormDef } from '../../organizations/lib/organization-form-def'
 import { buildOrganizationStartingPointValueSyncPatch } from '../../organizations/lib/presets/organization-starting-point.lib'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
@@ -31,6 +35,42 @@ function collectFields(items: readonly FormItem[]): Array<{ name: string; item: 
 }
 
 describe('organization form projection', () => {
+  it('coerces membership title Rank from select string at the form schema boundary', () => {
+    const row = { id: 'omt_captain', label: 'Captain', priority: '40' as const }
+    for (const schema of [organizationFormSchema, organizationDraftFormSchema]) {
+      const parsed = schema.safeParse({
+        name: 'Iron Company',
+        organizationDomain: 'commercial',
+        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [row] },
+      })
+      expect(parsed.success).toBe(true)
+      if (!parsed.success) return
+      expect(parsed.data.members?.titles?.[0]?.priority).toBe(40)
+    }
+  })
+
+  it('makeResolver accepts string Rank values from the membership titles select', async () => {
+    const ctx = makeContentFormCtx({ mode: 'create' })
+    const fields = contentFormAllFields(organizationFormDef, ctx)
+    const resolver = makeResolver(organizationFormSchema, fields)
+    const result = await resolver(
+      {
+        name: 'Iron Company',
+        organizationDomain: 'commercial',
+        functions: [],
+        practices: [],
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: 'omt_captain', label: 'Captain', priority: '40' }],
+        },
+      },
+      undefined,
+      { fields: {}, shouldUseNativeValidation: false },
+    )
+    expect(result.errors).toEqual({})
+  })
+
   it('accepts the blank sentinel from an untouched authoring preset picker', () => {
     expect(
       organizationDraftFormSchema.parse({

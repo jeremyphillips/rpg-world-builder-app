@@ -24,6 +24,8 @@ import {
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
   createDefaultOrganizationMembershipTitleDefinition,
+  organizationMembershipTitleDefinitionSchema,
+  organizationMembershipTitlePrioritySchema,
   organizationMembershipTitlesSchema,
   resolveOrganizationCreateMembershipTitles,
   vocabularyTermFieldCopy,
@@ -36,7 +38,7 @@ import {
 import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import type { ContentFormCtx, ContentFormInputCtx } from './registry/content-form-registry'
-import { draftOptionalSelect } from './validation/draft-form-schema-helpers'
+import { draftOptionalSelect, formSelectNumberSchema } from './validation/draft-form-schema-helpers'
 import { descriptionField, nameField } from './fields/content-identity-form-fields'
 import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
@@ -124,10 +126,20 @@ function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
 }
 
+const organizationMembershipTitleFormRowSchema = organizationMembershipTitleDefinitionSchema.extend(
+  {
+    priority: formSelectNumberSchema(organizationMembershipTitlePrioritySchema),
+  },
+)
+
+const organizationMembershipTitlesFormSchema = z
+  .array(organizationMembershipTitleFormRowSchema)
+  .pipe(organizationMembershipTitlesSchema)
+
 const organizationMembersFormFieldsSchema = z.object({
   classAffinityIds: z.array(z.string().min(1)).default([]),
   speciesAffinityIds: z.array(z.string().min(1)).default([]),
-  titles: organizationMembershipTitlesSchema.optional(),
+  titles: organizationMembershipTitlesFormSchema.optional(),
 })
 
 export const organizationFormSchema = withManagedContentMediaFormSchema(

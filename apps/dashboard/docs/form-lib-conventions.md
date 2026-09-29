@@ -183,6 +183,30 @@ in `*-form-values.ts` `toInput` when building API payloads.
 
 See also [validation-messages.md § Draft vs publish](../../../packages/contracts/docs/validation-messages.md#draft-vs-publish-contract-families).
 
+### Numeric selects and contract number fields
+
+All `select` and single `chips` option values are **strings** in React Hook Form
+(see `fieldDefaultValue` in `@rpg/ui/form`). Numeric or numeric-enum contract
+fields bound to those controls must coerce at the **dashboard form schema** layer
+with `formSelectNumberSchema(contractNumberSchema)` from
+[`draft-form-schema-helpers.ts`](../src/features/content/lib/forms/validation/draft-form-schema-helpers.ts)
+— not only in `*-form-values.ts` / `toInput`. Prefer piping into the canonical
+contracts array/object schema (for example
+`z.array(formRowSchema).pipe(organizationMembershipTitlesSchema)`) instead of
+`.transform(() => canonical.parse())`.
+
+Use `formSelectNumberSchema` rather than `z.coerce.number()` when the control can
+be empty: `z.coerce.number()` turns `''` into `0`. Optional numeric selects on
+draft paths can compose `draftOptionalSelect` with the same preprocess when needed.
+
+Submit-path row normalizers may still convert valid numeric strings to numbers for
+API parse, but must not default invalid input to a fallback rank or enum value.
+
+Regression coverage: `draft-form-schema-helpers.test.ts` (`formSelectNumberSchema`)
+and `numeric-select-form-schema.lib.ts` (differential sweep in
+`content-form-validation.test.ts`). UI stays string-emitting — see
+[`packages/ui/docs/forms.md`](../../../packages/ui/docs/forms.md).
+
 **Draft vs publish presentation (content forms with preview):** Save draft uses the
 generic FormUi `hasAttemptedSubmit` for persist-unsafe field errors only. Publish
 uses content-form `hasAttemptedPublish` plus live publish-schema issues for tab

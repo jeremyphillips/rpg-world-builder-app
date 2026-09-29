@@ -1,10 +1,13 @@
 import {
   createDefaultOrganizationMembershipTitleDefinition,
   ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES,
+  organizationMembershipTitlePrioritySchema,
   type OrganizationMembershipTitleDefinition,
   type OrganizationMembershipTitlePriority,
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
+
+import { formSelectNumberSchema } from '../../../lib/forms/validation/draft-form-schema-helpers'
 
 import {
   ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
@@ -41,34 +44,36 @@ export function createOrganizationMembershipTitleAppendRow(): OrganizationMember
   }
 }
 
-export function parseOrganizationMembershipTitlePriorityValue(
-  value: string,
-): OrganizationMembershipTitlePriority {
-  const parsed = Number.parseInt(value, 10)
-  if (
-    ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES.includes(parsed as OrganizationMembershipTitlePriority)
-  ) {
-    return parsed as OrganizationMembershipTitlePriority
-  }
-  return 10
-}
+const membershipTitlePriorityFromFormValue = formSelectNumberSchema(
+  organizationMembershipTitlePrioritySchema,
+)
 
 function membershipTitlesFieldName(prefix?: string): string {
   return prefix ? `${prefix}.members.titles` : 'members.titles'
 }
 
-/** Coerces select string priorities before contract parse on submit. */
+export type OrganizationMembershipTitleFormRow = Omit<
+  OrganizationMembershipTitleDefinition,
+  'priority'
+> & {
+  priority?: OrganizationMembershipTitleDefinition['priority'] | string
+}
+
+/** Strict select string → number conversion before contract parse on submit (no default rank). */
 export function normalizeOrganizationMembershipTitleFormRows(
-  titles: readonly OrganizationMembershipTitleDefinition[] | undefined,
+  titles: readonly OrganizationMembershipTitleFormRow[] | undefined,
 ): OrganizationMembershipTitleDefinition[] | undefined {
   if (!titles) return undefined
-  return titles.map((row) => ({
-    ...row,
-    priority:
-      typeof row.priority === 'string'
-        ? parseOrganizationMembershipTitlePriorityValue(row.priority)
-        : row.priority,
-  }))
+  return titles.map((row) => {
+    if (typeof row.priority !== 'string') {
+      return row as OrganizationMembershipTitleDefinition
+    }
+    const parsed = membershipTitlePriorityFromFormValue.safeParse(row.priority)
+    return {
+      ...row,
+      priority: parsed.success ? parsed.data : row.priority,
+    } as OrganizationMembershipTitleDefinition
+  })
 }
 
 export function buildOrganizationMembershipTitlesArrayField(prefix?: string): FormItem {
