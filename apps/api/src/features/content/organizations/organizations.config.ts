@@ -20,7 +20,7 @@ import type {
   ContentWriteContext,
   HomebrewDoc,
 } from '../lib/content-write-config'
-import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
+import { CharacterRelationshipModel } from '../../character-relationships'
 import {
   HomebrewOrganizationModel,
   type HomebrewOrganizationSchemaType,

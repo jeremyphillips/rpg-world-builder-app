@@ -36,4 +36,7 @@ export { classContentConfig } from './classes/classes.config'
 export { equipmentWriteConfig } from './equipment/equipment.config'
 export { speciesWriteConfig } from './species/species.config'
 export { spellWriteConfig } from './spells/spells.config'
-export { organizationWriteConfig } from './organizations/organizations.config'
+export {
+  organizationWriteConfig,
+  toHomebrewOrganization,
+} from './organizations/organizations.config'

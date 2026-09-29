@@ -2,10 +2,8 @@ import type { MembershipRelationshipDetails, Organization } from '@rpg/contracts
 import { assertOrganizationMembershipTitleIdBelongsToCatalog } from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
-import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
-import type { HomebrewDoc } from '../../content/lib/content-write-config'
-import { toHomebrewOrganization } from '../../content/organizations/organizations.config'
 import { CharacterRelationshipModel } from '../character-relationship.model'
+import { HomebrewOrganizationModel, type HomebrewDoc, toHomebrewOrganization } from '../../content'
 
 export async function loadOrganizationMembershipTitleCatalog(
   organizationId: string,
