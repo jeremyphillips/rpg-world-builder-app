@@ -72,7 +72,11 @@ const GRANT_NESTED_EXEMPT = [/\.grants\.\*\./] as const
 const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 
 /** Set by preset value sync — not a visible form control. */
-const ORGANIZATION_SCHEMA_EXEMPT = ['sourcePresetId'] as const
+const ORGANIZATION_SCHEMA_EXEMPT = [
+  'startingPointId',
+  /^members\.titles\b/,
+  /_organizationEditFamiliarType$/,
+] as const
 
 /** Managed in the identity header via ManagedMediaField — not FormItem paths. */
 const MANAGED_MEDIA_SCHEMA_EXEMPT = [/^media\b/] as const

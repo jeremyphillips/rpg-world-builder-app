@@ -6,7 +6,10 @@ import type { ContentValidationIntent } from '@rpg/contracts'
 import { weaponFormValueSyncs } from '../../../../equipment/weapons'
 import { resolutionFormValueSyncs } from '../../../../spells/resolution/lib/form/resolution-form-sync'
 import type { AnyContentFormDef, ContentFormCtx } from '../../registry/content-form-registry'
-import { contentFormFields } from '../../registry/content-form-registry'
+import {
+  contentFormFields,
+  resolveContentFormCreateDefaultValues,
+} from '../../registry/content-form-registry'
 import { resolveContentFormSchema } from '../edit/content-edit-load'
 import type { ContentFormHostFormProps } from './content-form-host'
 
@@ -54,7 +57,7 @@ export function resolveContentFormHostConfig<TFormValues extends FieldValues>(
     fields: options.fields ?? contentFormFields(def, ctx),
     valueSyncs: resolveContentFormValueSyncs(def, ctx),
     defaultValues: {
-      ...def.createDefaultValues,
+      ...resolveContentFormCreateDefaultValues(def),
       ...options.defaultValues,
     } as DefaultValues<TFormValues>,
     ...(options.formKey !== undefined ? { formKey: options.formKey } : {}),

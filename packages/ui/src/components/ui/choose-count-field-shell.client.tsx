@@ -69,6 +69,9 @@ export function ChooseCountFieldShell({
       <FieldsetChromeFrame
         chrome={chrome}
         size={size}
+        hint={hint}
+        hintPosition={hintPosition}
+        hintId={hintId}
         error={error}
         errorId={errorId}
         fieldsetProps={{
@@ -82,7 +85,6 @@ export function ChooseCountFieldShell({
           size={size}
           hintPosition={hintPosition}
           hint={hint}
-          error={error}
           hintId={hintId}
           legend={
             <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>

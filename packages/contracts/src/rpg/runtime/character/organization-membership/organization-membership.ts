@@ -1,9 +1,15 @@
 import { z } from 'zod'
 
 import type { OrganizationMembershipTitleDefinition } from '../../../content/organization/membership-titles'
-import { resolveOrganizationMembershipTitleDefinitionByLabel } from '../../../content/organization/membership-titles'
-import { comparePriorityDescending } from '../../../vocab/types'
 import { characterOrganizationConnectionSchema } from '../connections/connections'
+import { comparePriorityDescending } from '../../../vocab/types'
+
+import {
+  assertOrganizationMembershipTitleIdBelongsToCatalog,
+  resolveOrganizationMembershipPriorityFromProjection,
+  resolveOptionalOrganizationMembershipTitleProjection,
+  type OrganizationMembershipTitleProjection,
+} from './membership-title-projection'
 
 /** Body for nested POST …/organization-memberships. */
 export const createCharacterOrganizationMembershipInputSchema =
@@ -13,16 +19,9 @@ export type CreateCharacterOrganizationMembershipInput = z.infer<
   typeof createCharacterOrganizationMembershipInputSchema
 >
 
-/**
- * Body for nested PATCH …/organization-memberships/:organizationId.
- *
- * `title` and `priority` are both required: a value sets the field; `null` clears it.
- * Omission fails validation so accidental clears cannot happen via missing fields.
- * Both update atomically in one request.
- */
+/** Body for nested PATCH …/organization-memberships/:organizationId. */
 export const updateCharacterOrganizationMembershipInputSchema = z.object({
-  title: z.union([z.string().trim().min(1).max(80), z.null()]),
-  priority: z.union([z.number().int(), z.null()]),
+  membershipTitleId: z.string().trim().min(1),
 })
 
 export type UpdateCharacterOrganizationMembershipInput = z.infer<
@@ -30,26 +29,21 @@ export type UpdateCharacterOrganizationMembershipInput = z.infer<
 >
 
 type MembershipPrioritySource = {
-  readonly title?: string
-  readonly priority?: number
+  readonly membershipTitleId?: string
 }
 
 /**
- * Effective roster priority for a membership.
- *
- * Explicit persisted `membership.priority` is authoritative. Organization catalog
- * fallback only applies when priority is absent (legacy / unranked records).
+ * Effective roster priority for a membership from the organization catalog projection.
  */
 export function resolveOrganizationMembershipPriority(input: {
   membership: MembershipPrioritySource
   titles: readonly OrganizationMembershipTitleDefinition[]
 }): number | undefined {
-  if (input.membership.priority !== undefined) {
-    return input.membership.priority
-  }
-  const title = input.membership.title
-  if (title === undefined) return undefined
-  return resolveOrganizationMembershipTitleDefinitionByLabel(input.titles, title)?.priority
+  const projection = resolveOptionalOrganizationMembershipTitleProjection({
+    catalog: input.titles,
+    membershipTitleId: input.membership.membershipTitleId,
+  })
+  return resolveOrganizationMembershipPriorityFromProjection(projection)
 }
 
 type SortableOrganizationMember = {
@@ -85,38 +79,35 @@ export function sortOrganizationMembers<T extends SortableOrganizationMember>(
 }
 
 export type ResolvedOrganizationMembershipMetadata = {
-  readonly title: string | undefined
-  readonly priority: number | undefined
+  readonly membershipTitleId: string
 }
 
-/**
- * Single owner of title → membership stamping for create/update editors.
- *
- * - Organization catalog title → that definition's label + priority
- * - No title → clear both title and priority
- * - Preserved historical/custom title → keep the current membership's explicit priority
- */
+/** Maps picker selection to persisted membership title id. */
 export function resolveOrganizationMembershipMetadata(input: {
   titles: readonly OrganizationMembershipTitleDefinition[]
-  /** Selected title after radio mapping; `undefined` means No title. */
-  selectedTitle: string | undefined
-  currentMembership?: MembershipPrioritySource
+  selectedMembershipTitleId: string
 }): ResolvedOrganizationMembershipMetadata {
-  const selectedTitle = input.selectedTitle?.trim() || undefined
-  if (selectedTitle === undefined) {
-    return { title: undefined, priority: undefined }
+  const membershipTitleId = input.selectedMembershipTitleId.trim()
+  if (membershipTitleId === '') {
+    throw new Error('Organization membership title id is required.')
   }
 
-  const catalogTitle = resolveOrganizationMembershipTitleDefinitionByLabel(
-    input.titles,
-    selectedTitle,
-  )
-  if (catalogTitle) {
-    return { title: catalogTitle.label, priority: catalogTitle.priority }
-  }
+  assertOrganizationMembershipTitleIdBelongsToCatalog({
+    catalog: input.titles,
+    membershipTitleId,
+  })
 
-  return {
-    title: selectedTitle,
-    priority: input.currentMembership?.priority,
-  }
+  return { membershipTitleId }
 }
+
+export type { OrganizationMembershipTitleProjection }
+export {
+  assertOrganizationMembershipTitleIdBelongsToCatalog,
+  assertOrganizationMembershipTitleIdUnused,
+  assertOrganizationMembershipTitlesCatalogUpdateAllowed,
+  countOrganizationMembershipTitleIdUsage,
+  materializeOrganizationMembershipCatalogForRequiredTitleIds,
+  migrateOrganizationMembershipEdgesToTitleIds,
+  resolveOrganizationMembershipTitleProjection,
+  resolveOptionalOrganizationMembershipTitleProjection,
+} from './membership-title-projection'

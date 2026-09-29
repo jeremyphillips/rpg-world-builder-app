@@ -60,7 +60,7 @@ describe('shell density parity', () => {
     }
 
     render(<Harness />)
-    expect(screen.getByLabelText('Name').closest('.gap-3')).toBeInTheDocument()
+    expect(screen.getByLabelText('Name').closest('.gap-4')).toBeInTheDocument()
     // Compact anatomy uses region-owned 4px padding (has-[*]:pb-1), not Root gap-y.
     const fieldRoot = screen.getByLabelText('Name').closest('[data-field-anatomy]')
     expect(fieldRoot?.querySelector('[data-field-label-region]')?.className).toContain(

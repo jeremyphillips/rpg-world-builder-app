@@ -20,8 +20,7 @@ import {
 
 export type QuickNpcMembership = {
   organizationId: string
-  title?: string
-  priority?: number
+  membershipTitleId?: string
 }
 
 function withMembershipConnection(
@@ -41,12 +40,11 @@ function withMembershipConnection(
         kind: 'organizationMembership',
         characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
         organizationId: membership.organizationId,
-        ...(membership.title !== undefined || membership.priority !== undefined
+        ...(membership.membershipTitleId !== undefined
           ? {
               details: {
                 lifecycle: 'current' as const,
-                ...(membership.title !== undefined ? { title: membership.title } : {}),
-                ...(membership.priority !== undefined ? { priority: membership.priority } : {}),
+                membershipTitleId: membership.membershipTitleId,
               },
             }
           : {}),

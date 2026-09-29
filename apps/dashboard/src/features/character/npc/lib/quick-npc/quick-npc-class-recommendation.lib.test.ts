@@ -68,7 +68,7 @@ describe('resolveQuickNpcClassRecommendationIds', () => {
       resolveQuickNpcClassRecommendationIds({
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: '',
           level: 9,
         }),
@@ -131,7 +131,7 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
           level: 1,
         }),
         context,
-        titles: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
         organizationClassAffinityIds: [rogueClass.id],
       }),
     ).toMatchObject({ classId: rogueClass.id })
@@ -142,7 +142,7 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
       applyQuickNpcRecommendedClassSeeding({
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: rogueClass.id,
           level: 0,
         }),
@@ -158,7 +158,7 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
       applyQuickNpcRecommendedClassSeeding({
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: '',
           level: 9,
         }),

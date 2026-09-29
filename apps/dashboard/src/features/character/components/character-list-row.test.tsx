@@ -3,16 +3,16 @@ import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-import { RelationshipList } from '@/features/content'
+import { EntityRowList } from '@/features/content'
 
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import { CharacterListRow } from './character-list-row'
 
-function RelationshipListWrapper({ children }: { children: ReactNode }) {
+function EntityRowListWrapper({ children }: { children: ReactNode }) {
   return (
-    <RelationshipList.Root itemCount={1}>
-      <RelationshipList.Group itemCount={1}>{children}</RelationshipList.Group>
-    </RelationshipList.Root>
+    <EntityRowList.Root itemCount={1}>
+      <EntityRowList.Group itemCount={1}>{children}</EntityRowList.Group>
+    </EntityRowList.Root>
   )
 }
 
@@ -20,7 +20,7 @@ describe('CharacterListRow', () => {
   it('renders a linked character name and controller copy in the description', () => {
     render(
       <MemoryRouter>
-        <RelationshipListWrapper>
+        <EntityRowListWrapper>
           <CharacterListRow
             card={{
               id: 'char_1',
@@ -31,7 +31,7 @@ describe('CharacterListRow', () => {
             controllerLine={CHARACTER_CONTROLLER_DISPLAY.playedBy('Player One')}
             rosterStatus="active"
           />
-        </RelationshipListWrapper>
+        </EntityRowListWrapper>
       </MemoryRouter>,
     )
 

@@ -63,7 +63,7 @@ import {
 } from './building-organizations-create-tab.variants'
 import { OrganizationAuthoringFormShell } from '../../../organizations/components/create/organization-authoring-form-shell'
 import { OrganizationAuthoringPresetBridge } from '../../../organizations/components/create/organization-authoring-preset-bridge'
-import { useOrganizationAuthoringContext } from '../../../organizations/components/create/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../../../organizations/components/authoring/organization-authoring-context'
 
 function toRelationshipRadioOptions(
   options: readonly BuildingOrganizationRelationshipKindOption[],
@@ -237,6 +237,7 @@ function BuildingOrganizationNewOrganizationForm({
       schema={organizationFormSchema}
       fields={buildOrganizationFields(context, {
         includeName: true,
+        presentation: 'quick',
         recommendedPracticeIds: practiceRecommendations,
       })}
       defaultValues={organizationCreateDefaultValues}
@@ -301,7 +302,7 @@ export function BuildingOrganizationRelationshipReview({
             </Button>
           }
         >
-          <OrganizationAuthoringFormShell>
+          <OrganizationAuthoringFormShell presentation="quick">
             <BuildingOrganizationNewOrganizationForm
               context={controller.context}
               newOrganizationDraftId={controller.newOrganizationDraftId}

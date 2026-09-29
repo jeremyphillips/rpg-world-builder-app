@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createOrganizationInputSchema } from './organization'
 import {
+  organizationMembershipTitleCatalogMatchesPresetSnapshot,
   organizationMembershipTitlesSchema,
   organizationPresetNpcRecommendationSchema,
   resolveOrganizationCreateMembershipTitles,
@@ -41,14 +42,13 @@ describe('organization membership title snapshot', () => {
     expect(priority50).toEqual(['Treasurer', 'Proprietor'])
   })
 
-  it('resolves create input from sourcePresetId at the boundary', () => {
-    const resolved = resolveOrganizationCreateMembershipTitles({
-      sourcePresetId: 'bank',
-      createId: () => 'fixed',
-    })
+  it('resolves create input from explicit members.titles at the boundary', () => {
+    let count = 0
+    const titles = snapshotOrganizationMembershipTitlesFromPreset('bank', () => `fixed-${++count}`)
+    const resolved = resolveOrganizationCreateMembershipTitles({ titles })
     expect(resolved).toHaveLength(7)
     expect(resolved[0]?.sourceTitleId).toBe('treasurer')
-    expect(resolved[0]?.id).toBe('omt_fixed')
+    expect(resolved[0]?.id).toBe('omt_fixed-1')
   })
 
   it('accepts explicit members.titles when no preset is provided', () => {
@@ -62,13 +62,12 @@ describe('organization membership title snapshot', () => {
     expect(resolveOrganizationCreateMembershipTitles({ titles: custom })).toEqual(custom)
   })
 
-  it('rejects combining sourcePresetId with explicit members.titles on create input', () => {
+  it('accepts explicit members.titles on create input', () => {
     expect(
       createOrganizationInputSchema.safeParse({
         slug: 'test-org',
         name: 'Test Org',
         organizationDomain: 'government',
-        sourcePresetId: 'bank',
         members: {
           titles: [
             {
@@ -79,6 +78,33 @@ describe('organization membership title snapshot', () => {
           ],
         },
       }).success,
+    ).toBe(true)
+  })
+
+  it('rejects organization title ids without the omt_ prefix', () => {
+    expect(
+      organizationMembershipTitlesSchema.safeParse([
+        {
+          id: 'not_omt',
+          label: 'Invalid',
+          priority: 10,
+        },
+      ]).success,
+    ).toBe(false)
+  })
+
+  it('matches preset snapshots by semantic shape ignoring omt ids', () => {
+    const presetSnapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'a')
+    const renamedIds = presetSnapshot.map((title, index) => ({
+      ...title,
+      id: `omt_renamed-${index}`,
+    }))
+    expect(organizationMembershipTitleCatalogMatchesPresetSnapshot(renamedIds, 'bank')).toBe(true)
+    expect(
+      organizationMembershipTitleCatalogMatchesPresetSnapshot(
+        [{ id: 'omt_x', label: 'Only title', priority: 10 }],
+        'bank',
+      ),
     ).toBe(false)
   })
 

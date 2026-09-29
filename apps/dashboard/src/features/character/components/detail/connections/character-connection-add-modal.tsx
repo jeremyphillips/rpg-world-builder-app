@@ -55,7 +55,7 @@ export type CharacterConnectionAddModalProps = {
   existingProjectionKinds: ReadonlySet<string>
   onOpenChange: (open: boolean) => void
   onAddPerson: (relatedCharacterId: string, role: PersonConnectionRoleOption) => Promise<void>
-  onAddOrganization: (organizationId: string, title?: string, priority?: number) => Promise<void>
+  onAddOrganization: (organizationId: string, membershipTitleId?: string) => Promise<void>
   onAddPlace: (
     locationId: string,
     role: PlaceConnectionRoleOption,
@@ -152,11 +152,17 @@ export function CharacterConnectionAddModal({
         await onAddPerson(selectedEntityId, selectedPersonRole)
       } else if (sectionId === 'organizations') {
         const organization = sheetData.organizationsById.get(selectedEntityId)
+        if (
+          detailsState.membershipTitle === undefined ||
+          detailsState.membershipTitle.trim() === ''
+        ) {
+          throw new Error('Choose a membership title before adding this organization.')
+        }
         const metadata = resolveOrganizationMembershipMetadata({
           titles: organization?.members?.titles ?? [],
-          selectedTitle: titleFromMembershipRadioValue(detailsState.membershipTitle),
+          selectedMembershipTitleId: titleFromMembershipRadioValue(detailsState.membershipTitle),
         })
-        await onAddOrganization(selectedEntityId, metadata.title, metadata.priority)
+        await onAddOrganization(selectedEntityId, metadata.membershipTitleId)
       } else if (sectionId === 'places' && selectedPlaceRole) {
         if (selectedPlaceRole.kind === 'resides_at') {
           const eligibleResidenceIds = new Set(

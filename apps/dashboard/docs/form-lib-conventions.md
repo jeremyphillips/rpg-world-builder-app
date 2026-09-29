@@ -59,12 +59,18 @@ Caller overrides replace top-level keys entirely — no deep merge.
 Organization familiar starting points (`organization-form-projection.ts`):
 
 - Runtime model: [`organizations-classification.md`](./organizations-classification.md)
-- Recipes live in `@rpg/contracts` `ORGANIZATION_AUTHORING_PRESETS` — ephemeral
-  projection onto domain / form / functions / practices only; preset id is **not** persisted.
-- Picker is a single-select **`combobox`** (`multiple: false`). Map preset
-  `discoveryTerms` → option `searchTerms` and `description` → option `description`
-  at the form boundary only. These are closest-starting-point discovery strings,
-  not lexical aliases and not classification-entry `searchTerms`.
+- Create uses draft-only `startingPointId` plus `OrganizationStartingPointField` (slot) for
+  summary/change/remove UX. `buildOrganizationFormValueSyncs` materializes domain / form /
+  functions / practices / class affinities / `members.titles`; the id is **not** persisted.
+- Edit exposes `OrganizationEditFamiliarTypeField` from the **Organization profile**
+  legend action. The temporary picker replaces profile values plus class affinities,
+  never membership titles, and closes after cancel or successful apply.
+- Full create, Quick Create Optional details, and edit surface the same editable **Membership titles**
+  group (`OrganizationEditMembershipTitlesField` → `OrganizationMembershipTitlesEditor`) between member
+  affinities and description — catalog from form `members.titles` (min one row), canonical sort in
+  read-only summaries. `OrganizationMembershipTitlesRegistration` keeps `members.titles` registered
+  with `shouldUnregister: false` so Quick Create optional disclosure does not drop the catalog.
+- Optional **Form** uses shared `select` `clearable` (accessible name `Clear Form`).
 - **Functions** — multi **`chips`** with outline chrome and hint
   _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.
 - **Practices** — multi **`combobox`** with classification-entry `aliases` and

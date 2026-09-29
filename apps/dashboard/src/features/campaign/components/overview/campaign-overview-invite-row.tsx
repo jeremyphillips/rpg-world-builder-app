@@ -3,7 +3,7 @@ import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 import { ActionIcon, ConfirmDialog } from '@rpg/ui'
 import { Link2 } from 'lucide-react'
 
-import { RelationshipList } from '@/features/content'
+import { EntityRowList } from '@/features/content'
 
 import {
   useRevokeCampaignInvite,
@@ -47,8 +47,8 @@ export function CampaignOverviewInviteRow({ campaignId, invite }: CampaignOvervi
 
   return (
     <>
-      <RelationshipList.Row
-        title={invite.email}
+      <EntityRowList.Row
+        heading={invite.email}
         description={formatInvitationStatusLine(invite)}
         overflowTriggerIcon="vertical"
         menu={{

@@ -154,7 +154,7 @@ export const MultipleClassRecommendations: Story = {
       members: {
         classAffinityIds: [rogueClass.id, quickFighter.id],
         speciesAffinityIds: [],
-        titles: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
       },
     }),
   },
@@ -178,10 +178,16 @@ export const MultipleClassRecommendations: Story = {
 
 export const Authoring: Story = {
   args: {
-    buildContext: buildOrganizationCatalog({ titles: [] }),
+    buildContext: buildOrganizationCatalog({
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+    }),
     context: quickNpcOrganizationMemberCreateContext({
       ...organization,
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+      },
     }),
   },
   play: async ({ canvasElement }) => {

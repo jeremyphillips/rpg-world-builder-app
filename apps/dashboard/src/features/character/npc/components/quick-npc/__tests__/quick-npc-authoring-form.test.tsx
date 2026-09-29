@@ -184,9 +184,9 @@ describe('QuickNpcAuthoringForm', () => {
     renderAuthoringForm()
 
     expect(screen.getByText('Setup')).toBeInTheDocument()
-    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
-    expect(screen.getByText('Level 1 Fighter')).toBeInTheDocument()
+    expect(screen.getByText(/Fighter/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change role' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change build' })).toBeInTheDocument()

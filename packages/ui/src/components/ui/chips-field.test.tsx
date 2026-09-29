@@ -18,6 +18,10 @@ const difficultyOptions = [
   { value: 'dangerous', label: 'Dangerous' },
 ]
 
+function fieldsetChromeShell(fieldset: HTMLElement | null | undefined): HTMLElement | null {
+  return fieldset?.parentElement?.parentElement ?? null
+}
+
 describe('ChipsField', () => {
   it('renders label and all options', () => {
     render(
@@ -242,9 +246,11 @@ describe('ChipsField', () => {
       />,
     )
     const error = screen.getByRole('alert')
-    const fieldset = error.previousElementSibling
+    const fieldset = document.querySelector('fieldset')
     expect(error).toHaveTextContent('Choose at least one.')
     expect(fieldset?.tagName).toBe('FIELDSET')
+    expect(fieldsetChromeShell(fieldset)).toContainElement(error)
+    expect(fieldset?.contains(error)).toBe(false)
     expect(error.parentElement).toHaveClass('gap-y-1.5')
   })
 
@@ -275,6 +281,24 @@ describe('ChipsField', () => {
       />,
     )
     expect(screen.getByText('Pick as many as apply.')).toBeInTheDocument()
+  })
+
+  it('places below-control hints in the message region with sm top padding', () => {
+    render(
+      <ChipsField
+        id="play-style"
+        label="Play Style"
+        options={playStyleOptions}
+        multiple
+        value={[]}
+        size="sm"
+        hint="Pick as many as apply."
+        hintPosition="below-control"
+      />,
+    )
+
+    const hint = screen.getByText('Pick as many as apply.')
+    expect(hint.closest('[data-field-message-region]')).toHaveClass('has-[*]:pt-1.5')
   })
 
   it('applies md pill classes by default', () => {
@@ -447,7 +471,7 @@ describe('ChipsField', () => {
 
     const fieldset = container.querySelector('fieldset')!
     const legend = fieldset.querySelector('legend')
-    const shell = fieldset.parentElement
+    const shell = fieldsetChromeShell(fieldset)
 
     expect(legend).toHaveTextContent('Alignment')
     expect(fieldset).toHaveClass('border-0')
@@ -470,7 +494,7 @@ describe('ChipsField', () => {
     )
 
     const fieldset = container.querySelector('fieldset')!
-    const shell = fieldset.parentElement
+    const shell = fieldsetChromeShell(fieldset)
 
     expect(fieldset).toHaveClass('border-0')
     expect(shell).toHaveClass('rounded-md', 'border', 'bg-field-container', 'p-4')
@@ -492,7 +516,7 @@ describe('ChipsField', () => {
 
     const fieldset = container.querySelector('fieldset')
     const error = container.querySelector('[role="alert"]')
-    const shell = fieldset?.parentElement
+    const shell = fieldsetChromeShell(fieldset)
 
     expect(shell).toHaveClass('rounded-md', 'border', 'bg-surface-subtle')
     expect(error).toHaveTextContent('Select an alignment.')

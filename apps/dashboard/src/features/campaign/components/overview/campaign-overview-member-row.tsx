@@ -3,7 +3,7 @@ import { getAssetUrl, type CampaignOverviewMemberListItem } from '@rpg/contracts
 import { ActionIcon, ConfirmDialog, type BadgeTone } from '@rpg/ui'
 
 import type { DetailOverflowAction } from '@/features/content'
-import { DetailRowLeadingAvatar, RelationshipList } from '@/features/content'
+import { DetailRowLeadingAvatar, EntityRowList } from '@/features/content'
 
 import { useRemoveIncompleteCampaignMember } from '../../hooks/use-remove-incomplete-campaign-member'
 import {
@@ -87,8 +87,8 @@ export function CampaignOverviewMemberRow({ campaignId, member }: CampaignOvervi
 
   return (
     <>
-      <RelationshipList.Row
-        title={member.displayName}
+      <EntityRowList.Row
+        heading={member.displayName}
         description={buildMemberRoleDescription(member)}
         status={memberOnboardingStatus(member.onboardingState)}
         leadingMedia={

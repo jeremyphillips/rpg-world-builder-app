@@ -57,7 +57,7 @@ export type QuickNpcStandaloneSetupValues = QuickNpcSetupCoreValues & {
 
 export type QuickNpcOrganizationMemberSetupValues = QuickNpcSetupCoreValues & {
   contextKind: 'organization-member'
-  /** Setup-only unset (`undefined`) until the user chooses a title or No title. */
+  /** Setup-only unset (`undefined`) until the user chooses a catalog title. */
   membershipTitle: string | undefined
 }
 
@@ -140,7 +140,7 @@ export function quickNpcOrganizationMemberSetupSchema(maxLevel: number, minLevel
   return quickNpcSetupCoreFields(maxLevel, minLevel).extend({
     contextKind: z.literal('organization-member'),
     membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
-      message: 'Choose a membership title or No title.',
+      message: 'Choose a membership title.',
     }),
   })
 }

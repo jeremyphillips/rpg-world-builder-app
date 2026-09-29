@@ -55,7 +55,7 @@ export const ORGANIZATION_MEMBER_PICKER_CANDIDATES: OrganizationMemberPickerCand
     characterType: 'npc',
     classIds: [WIZARD_CLASS_ID],
     isMember: true,
-    membershipTitle: 'Guildmaster',
+    membershipTitle: 'omt_guildmaster',
   },
   {
     id: 'char-1',

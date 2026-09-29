@@ -82,7 +82,9 @@ export function relationshipOrganizationDomainLabel(input: {
   const draft = input.plan.organizations.find(
     (item) => item.draftOrganizationId === target.draftOrganizationId,
   )
-  return draft ? getOrganizationDomainLabel(draft.values.organizationDomain) : ''
+  return draft?.values.organizationDomain
+    ? getOrganizationDomainLabel(draft.values.organizationDomain)
+    : ''
 }
 
 export function buildBuildingOrganizationPendingEntity(input: {
@@ -142,5 +144,7 @@ export function resolveBuildingOrganizationTargetDomainLabel(input: {
   const draft = input.plan.organizations.find(
     (item) => item.draftOrganizationId === target.draftOrganizationId,
   )
-  return draft ? getOrganizationDomainLabel(draft.values.organizationDomain) : ''
+  return draft?.values.organizationDomain
+    ? getOrganizationDomainLabel(draft.values.organizationDomain)
+    : ''
 }

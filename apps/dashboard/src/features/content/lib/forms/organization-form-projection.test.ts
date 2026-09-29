@@ -1,16 +1,24 @@
 import { describe, expect, it } from 'vitest'
 import { optionMatchesQuery } from '@rpg/ui'
-import { ORGANIZATION_PRACTICE_TERM, vocabularyTermFieldCopy } from '@rpg/contracts'
-import type { FieldOption, FormItem } from '@rpg/ui/form'
+import {
+  ORGANIZATION_AUTHORING_PRESET_IDS,
+  ORGANIZATION_PRACTICE_TERM,
+  vocabularyTermFieldCopy,
+} from '@rpg/contracts'
+import type { FormItem } from '@rpg/ui/form'
 import { flattenSelectFieldOptions } from '@rpg/ui/form'
 
 import { makeContentFormCtx } from '../fixtures/content-form-ctx'
+import { snapshotOrganizationMembershipTitlesFromPreset } from '@rpg/contracts'
+
 import {
   buildOrganizationCreateInput,
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
+  buildOrganizationQuickCreateFollowOnFields,
   organizationDraftFormSchema,
 } from './organization-form-projection'
+import { buildOrganizationStartingPointValueSyncPatch } from '../../organizations/lib/presets/organization-starting-point.lib'
 
 function collectFields(items: readonly FormItem[]): Array<{ name: string; item: FormItem }> {
   const fields: Array<{ name: string; item: FormItem }> = []
@@ -21,30 +29,71 @@ function collectFields(items: readonly FormItem[]): Array<{ name: string; item: 
   return fields
 }
 
-function presetPickerOptions(fields: ReturnType<typeof collectFields>): FieldOption[] {
-  const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
-  expect(presetField && 'options' in presetField).toBe(true)
-  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
-    return []
-  }
-  return flattenSelectFieldOptions(presetField.options)
-}
-
 describe('organization form projection', () => {
   it('accepts the blank sentinel from an untouched authoring preset picker', () => {
     expect(
       organizationDraftFormSchema.parse({
         name: 'Ironroot Smiths',
-        authoringPresetId: '',
+        startingPointId: '',
         organizationDomain: 'commercial',
         practices: ['blacksmithing'],
       }),
-    ).toMatchObject({ authoringPresetId: undefined })
+    ).toMatchObject({ startingPointId: undefined })
   })
 
-  it('omits the authoring preset field on edit', () => {
-    const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode: 'edit' })))
-    expect(fields.map(({ name }) => name)).not.toContain('authoringPresetId')
+  it('surfaces read-only membership titles on create and edit after member affinities', () => {
+    for (const mode of ['create', 'edit'] as const) {
+      const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode })))
+      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
+      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
+      const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
+      const affinitiesIndex = fields.findIndex(({ name }) => name === 'members.classAffinityIds')
+      const titlesSlotIndex = fields.findIndex(
+        ({ name }) => name === '_organizationMembershipTitles',
+      )
+      expect(titlesSlotIndex).toBeGreaterThan(affinitiesIndex)
+      expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
+    }
+  })
+
+  it('mounts membership title registration outside quick-create optional details', () => {
+    const topLevel = collectFields(
+      buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' }),
+    )
+    expect(topLevel.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
+
+    const followOn = buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), {
+      presentation: 'quick',
+    })
+    const optionalDetails = followOn.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item &&
+        item.kind === 'group' &&
+        item.id === 'organization-quick-create-optional-details',
+    )
+    expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).toContain(
+      '_organizationMembershipTitles',
+    )
+    expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).not.toContain(
+      '_organizationMembershipTitlesRegistration',
+    )
+  })
+
+  it('places the edit familiar type utility inside the organization profile group', () => {
+    const items = buildOrganizationFields(makeContentFormCtx({ mode: 'edit' }))
+    const fields = collectFields(items)
+    const profileGroup = items.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group' && item.heading?.label === 'Organization profile',
+    )
+
+    expect(fields.map(({ name }) => name)).not.toContain('startingPointId')
+    expect(fields.map(({ name }) => name)).toContain('_organizationEditFamiliarType')
+    expect(profileGroup?.heading?.action).toBeDefined()
+    expect(profileGroup?.fields[0]).toMatchObject({
+      kind: 'slot',
+      name: '_organizationEditFamiliarType',
+    })
   })
 
   it('reuses the canonical standalone fields under an embedded namespace', () => {
@@ -57,24 +106,28 @@ describe('organization form projection', () => {
     )
 
     expect(standalone.map(({ name }) => name)).toEqual([
-      'authoringPresetId',
+      'startingPointId',
+      '_organizationMembershipTitlesRegistration',
       'organizationDomain',
       'organizationForm',
       'functions',
       'practices',
       'members.classAffinityIds',
       'members.speciesAffinityIds',
+      '_organizationMembershipTitles',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
       'operatorOrganization.name',
-      'operatorOrganization.authoringPresetId',
+      'operatorOrganization.startingPointId',
+      'operatorOrganization._organizationMembershipTitlesRegistration',
       'operatorOrganization.organizationDomain',
       'operatorOrganization.organizationForm',
       'operatorOrganization.functions',
       'operatorOrganization.practices',
       'operatorOrganization.members.classAffinityIds',
       'operatorOrganization.members.speciesAffinityIds',
+      'operatorOrganization._organizationMembershipTitles',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
@@ -82,7 +135,7 @@ describe('organization form projection', () => {
     expect(embeddedFunctions).toMatchObject({
       type: 'chips',
       label: 'Functions',
-      hint: { text: 'What this organization broadly does.', position: 'below-control' },
+      hint: { text: 'What the organization primarily does.', position: 'below-control' },
       options:
         standaloneFunctions && 'options' in standaloneFunctions ? standaloneFunctions.options : [],
       multiple: true,
@@ -93,7 +146,7 @@ describe('organization form projection', () => {
       type: 'combobox',
       label: 'Practices',
       hint: {
-        text: 'Distinctive trades, methods, or operational specialties.',
+        text: 'Distinctive methods, trades, or operational specialties.',
         position: 'below-control',
       },
       options:
@@ -111,7 +164,7 @@ describe('organization form projection', () => {
     expect(fields.find(({ name }) => name === 'functions')?.item).toMatchObject({
       type: 'chips',
       label: 'Functions',
-      hint: { text: 'What this organization broadly does.', position: 'below-control' },
+      hint: { text: 'What the organization primarily does.', position: 'below-control' },
       multiple: true,
     })
     const practicesField = fields.find(({ name }) => name === 'practices')?.item
@@ -119,7 +172,7 @@ describe('organization form projection', () => {
       type: 'combobox',
       label: 'Practices',
       hint: {
-        text: 'Distinctive trades, methods, or operational specialties.',
+        text: 'Distinctive methods, trades, or operational specialties.',
         position: 'below-control',
       },
       placeholder: practicePlaceholder,
@@ -144,57 +197,85 @@ describe('organization form projection', () => {
     expect(optionMatchesQuery(fencing!, 'stolen goods')).toBe(true)
   })
 
-  it('uses a searchable single-select combobox for familiar starting points', () => {
+  it('registers a starting point slot and clearable optional form select', () => {
     const fields = collectFields(buildOrganizationFields(makeContentFormCtx()))
-    const presetField = fields.find(({ name }) => name === 'authoringPresetId')?.item
-    expect(presetField).toMatchObject({
-      type: 'combobox',
-      label: 'Start from familiar type',
-      multiple: false,
-      placeholder: 'Search familiar types…',
+    expect(fields.find(({ name }) => name === 'startingPointId')?.item).toMatchObject({
+      kind: 'slot',
     })
-
-    const options = presetPickerOptions(fields)
-    expect(options).toHaveLength(50)
-
-    const army = options.find((option) => option.value === 'army')
-    expect(army).toMatchObject({
-      label: 'Army',
-      description: expect.stringContaining('marines'),
-      searchTerms: expect.arrayContaining(['marines', 'garrison', 'legion']),
+    expect(fields.find(({ name }) => name === 'organizationForm')?.item).toMatchObject({
+      type: 'select',
+      clearable: true,
+      clearAccessibleName: 'Clear Form',
     })
-    expect(optionMatchesQuery(army!, 'navy')).toBe(false)
-    expect(optionMatchesQuery(army!, 'militia')).toBe(false)
+    expect(ORGANIZATION_AUTHORING_PRESET_IDS).toHaveLength(50)
+  })
 
-    const navy = options.find((option) => option.value === 'navy')
-    expect(optionMatchesQuery(navy!, 'navy')).toBe(true)
-
-    const church = options.find((option) => option.value === 'church')
-    expect(optionMatchesQuery(church!, 'temple')).toBe(true)
-
-    const academy = options.find((option) => option.value === 'academy')
-    expect(optionMatchesQuery(academy!, 'university')).toBe(false)
-
-    const university = options.find((option) => option.value === 'university')
-    expect(optionMatchesQuery(university!, 'university')).toBe(true)
-
-    const tradingCompany = options.find((option) => option.value === 'trading_company')
-    expect(optionMatchesQuery(tradingCompany!, 'merchant house')).toBe(false)
-
-    const merchantHouse = options.find((option) => option.value === 'merchant_house')
-    expect(optionMatchesQuery(merchantHouse!, 'merchant house')).toBe(true)
-    expect(optionMatchesQuery(tradingCompany!, 'shipping')).toBe(false)
-
-    const shippingCompany = options.find((option) => option.value === 'shipping_company')
-    expect(shippingCompany).toMatchObject({
-      label: 'Shipping company',
-      searchTerms: expect.arrayContaining(['coach line', 'courier service']),
+  it('gates quick-create profile sections behind a follow-on slot', () => {
+    const quick = buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' })
+    expect(
+      quick.find(
+        (item) =>
+          'kind' in item &&
+          item.kind === 'slot' &&
+          item.name === '_organizationQuickCreateProfileSections',
+      ),
+    ).toMatchObject({
+      kind: 'slot',
+      name: '_organizationQuickCreateProfileSections',
     })
-    expect(optionMatchesQuery(shippingCompany!, 'caravan company')).toBe(false)
+    expect(
+      quick.some(
+        (item) => 'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
+      ),
+    ).toBe(false)
 
-    const caravanCompany = options.find((option) => option.value === 'caravan_company')
-    expect(optionMatchesQuery(caravanCompany!, 'caravan company')).toBe(true)
-    expect(optionMatchesQuery(shippingCompany!, 'shipping')).toBe(true)
+    const followOn = buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), {
+      presentation: 'quick',
+    })
+    const profileGroup = followOn.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group' && item.legend === 'Organization profile',
+    )
+    expect(
+      profileGroup?.fields.map((field) => ('separator' in field ? field.separator : undefined)),
+    ).toEqual(['subtle', 'subtle', 'subtle', undefined])
+
+    const optionalDetails = followOn.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item && item.kind === 'group' && item.heading?.label === 'Optional details',
+    )
+    expect(optionalDetails).toMatchObject({
+      id: 'organization-quick-create-optional-details',
+      disclosure: {
+        variant: 'legend',
+        defaultOpen: false,
+        persistOpen: false,
+      },
+      heading: {
+        label: 'Optional details',
+        hint: 'Member affinities and description',
+      },
+    })
+    expect(optionalDetails).not.toHaveProperty('density')
+  })
+
+  it('does not hardcode group density on organization fields', () => {
+    const collectGroups = (items: FormItem[]): Extract<FormItem, { kind: 'group' }>[] =>
+      items.flatMap((item) => {
+        if (!('kind' in item) || item.kind !== 'group') return []
+        return [item, ...collectGroups(item.fields)]
+      })
+
+    for (const presentation of ['quick', 'full'] as const) {
+      const groups = collectGroups(
+        buildOrganizationFields(makeContentFormCtx(), { presentation }),
+      ).concat(
+        collectGroups(
+          buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), { presentation }),
+        ),
+      )
+      expect(groups.every((group) => group.density === undefined)).toBe(true)
+    }
   })
 
   it('uses one input builder for standalone and embedded function/practice values', () => {
@@ -205,7 +286,11 @@ describe('organization form projection', () => {
         organizationForm: 'company',
         practices: ['brewing'],
         functions: [],
-        members: { classAffinityIds: [], speciesAffinityIds: [] },
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: 'omt_fixture', label: 'Member', priority: 10 }],
+        },
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
@@ -215,31 +300,35 @@ describe('organization form projection', () => {
     })
   })
 
-  it('serializes sourcePresetId when a familiar starting point was applied', () => {
+  it('serializes materialized membership titles and omits draft startingPointId', () => {
+    let titleId = 0
+    const titles = snapshotOrganizationMembershipTitlesFromPreset(
+      'smuggling_ring',
+      () => `fixed-${++titleId}`,
+    )
     const input = buildOrganizationCreateInput({
       name: 'Night Market Ring',
-      sourcePresetId: 'smuggling_ring',
-      organizationDomain: 'political',
+      startingPointId: 'smuggling_ring',
+      organizationDomain: 'criminal',
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles },
     })
-    expect(input).not.toHaveProperty('authoringPresetId')
-    expect(input.sourcePresetId).toBe('smuggling_ring')
-    expect(input.members?.titles ?? []).toEqual([])
-    expect(input.organizationDomain).toBe('political')
+    expect(input).not.toHaveProperty('startingPointId')
+    expect(input).not.toHaveProperty('sourcePresetId')
+    expect(input.members.titles).toHaveLength(titles.length)
+    expect(input.organizationDomain).toBe('criminal')
   })
 
-  it('applies an ephemeral preset equally under an embedded namespace', () => {
-    const [sync] = buildOrganizationFormValueSyncs('operatorOrganization')
+  it('materializes preset values under an embedded namespace while keeping startingPointId', () => {
     expect(
-      sync?.apply({ 'operatorOrganization.authoringPresetId': 'smuggling_ring' }, [
-        'operatorOrganization.authoringPresetId',
-      ]),
-    ).toEqual({
-      'operatorOrganization.authoringPresetId': undefined,
-      'operatorOrganization.sourcePresetId': 'smuggling_ring',
+      buildOrganizationStartingPointValueSyncPatch('smuggling_ring', {
+        prefix: 'operatorOrganization',
+        discoverableClasses: [],
+      }),
+    ).toMatchObject({
+      'operatorOrganization.startingPointId': 'smuggling_ring',
       'operatorOrganization.organizationDomain': 'criminal',
       'operatorOrganization.organizationForm': 'network',
       'operatorOrganization.functions': [],
@@ -261,14 +350,14 @@ describe('organization form projection', () => {
     }
     const discoverable = [fighter, paladin]
     const [sync] = buildOrganizationFormValueSyncs(undefined, discoverable as never)
-    expect(sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId'])).toEqual({
-      authoringPresetId: undefined,
-      sourcePresetId: 'knightly_order',
+    expect(sync?.apply({ startingPointId: 'knightly_order' }, ['startingPointId'])).toMatchObject({
+      startingPointId: 'knightly_order',
       organizationDomain: 'military',
       organizationForm: 'order',
       functions: ['warfare', 'defense'],
       practices: [],
       'members.classAffinityIds': ['class-fighter', 'class-paladin'],
+      'members.titles': expect.any(Array),
     })
   })
 
@@ -279,9 +368,7 @@ describe('organization form projection', () => {
       name: 'Fighter',
     }
     const [sync] = buildOrganizationFormValueSyncs(undefined, [fighter] as never)
-    expect(
-      sync?.apply({ authoringPresetId: 'knightly_order' }, ['authoringPresetId']),
-    ).toMatchObject({
+    expect(sync?.apply({ startingPointId: 'knightly_order' }, ['startingPointId'])).toMatchObject({
       'members.classAffinityIds': ['class-fighter'],
     })
   })
@@ -294,10 +381,10 @@ describe('organization form projection', () => {
       { id: 'class-rogue', slug: 'rogue', name: 'Rogue' },
     ]
     const [sync] = buildOrganizationFormValueSyncs(undefined, classes as never)
-    const thievesGuild = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
+    const thievesGuild = sync?.apply({ startingPointId: 'thieves_guild' }, ['startingPointId'])
     expect(thievesGuild?.['members.classAffinityIds']).toEqual(['class-rogue'])
 
-    const mercenary = sync?.apply({ authoringPresetId: 'mercenary_company' }, ['authoringPresetId'])
+    const mercenary = sync?.apply({ startingPointId: 'mercenary_company' }, ['startingPointId'])
     expect(mercenary?.['members.classAffinityIds']).toEqual([
       'class-fighter',
       'class-barbarian',
@@ -305,13 +392,13 @@ describe('organization form projection', () => {
     ])
   })
 
-  it('updates sourcePresetId when switching familiar starting points', () => {
+  it('updates startingPointId when switching familiar starting points', () => {
     const [sync] = buildOrganizationFormValueSyncs()
-    const thievesGuild = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
-    expect(thievesGuild?.sourcePresetId).toBe('thieves_guild')
+    const thievesGuild = sync?.apply({ startingPointId: 'thieves_guild' }, ['startingPointId'])
+    expect(thievesGuild?.startingPointId).toBe('thieves_guild')
 
-    const mercenary = sync?.apply({ authoringPresetId: 'mercenary_company' }, ['authoringPresetId'])
-    expect(mercenary?.sourcePresetId).toBe('mercenary_company')
+    const mercenary = sync?.apply({ startingPointId: 'mercenary_company' }, ['startingPointId'])
+    expect(mercenary?.startingPointId).toBe('mercenary_company')
   })
 
   it('round-trips custom member class affinity ids through create input', () => {
@@ -323,6 +410,7 @@ describe('organization form projection', () => {
       members: {
         classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
         speciesAffinityIds: [],
+        titles: [{ id: 'omt_fixture', label: 'Member', priority: 10 }],
       },
     })
     expect(input.members.classAffinityIds).toEqual([

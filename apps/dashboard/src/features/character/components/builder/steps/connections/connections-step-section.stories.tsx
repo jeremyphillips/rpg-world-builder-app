@@ -33,7 +33,7 @@ const relationshipEdges = [
     kind: 'organizationMembership' as const,
     characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
     organizationId: lanternGuild.id,
-    details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+    details: { lifecycle: 'current' as const, membershipTitleId: 'omt_guildmaster' },
   },
   {
     id: 'edge-place-1',

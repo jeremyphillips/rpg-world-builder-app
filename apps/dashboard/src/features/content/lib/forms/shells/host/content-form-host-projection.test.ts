@@ -41,14 +41,14 @@ describe('resolveContentFormValueSyncs', () => {
     expect(syncs).toBeDefined()
     expect(syncs?.length).toBeGreaterThan(0)
 
-    const applied = syncs?.[0]?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
+    const applied = syncs?.[0]?.apply({ startingPointId: 'thieves_guild' }, ['startingPointId'])
     expect(applied).toMatchObject({
-      authoringPresetId: undefined,
-      sourcePresetId: 'thieves_guild',
+      startingPointId: 'thieves_guild',
       organizationDomain: 'criminal',
       organizationForm: 'guild',
       functions: [],
       practices: ['theft'],
+      'members.titles': expect.any(Array),
     })
   })
 })

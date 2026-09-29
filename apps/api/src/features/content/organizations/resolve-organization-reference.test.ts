@@ -76,12 +76,18 @@ describe('resolveOrganizationReference', () => {
 
   it('bulk-resolves saved references and preserves missing entries', async () => {
     const campaign = await makeTestCampaign()
+    const guildmasterTitleId = 'omt_guildmaster'
     const organization = await createHomebrewContent(
       organizationWriteConfig,
       campaign.id,
       {
         slug: 'hidden-society',
         name: 'Hidden Society',
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: guildmasterTitleId, label: 'Guildmaster', priority: 50 as const }],
+        },
       },
       { status: 'draft' },
     )
@@ -95,7 +101,7 @@ describe('resolveOrganizationReference', () => {
         campaignId: campaign.id,
         characterId: character.id,
         organizationId: organization.id,
-        details: { title: 'Guildmaster' },
+        details: { membershipTitleId: guildmasterTitleId },
       }),
       seedOrganizationMembershipEdge({
         campaignId: campaign.id,
@@ -113,11 +119,15 @@ describe('resolveOrganizationReference', () => {
     ).resolves.toEqual([
       {
         organizationId: organization.id,
+        membershipTitleId: guildmasterTitleId,
+        titleReferenceStatus: 'resolved',
         title: 'Guildmaster',
+        priority: 50,
         organization: expect.objectContaining({ id: organization.id, status: 'draft' }),
       },
       {
         organizationId: '000000000000000000000000',
+        titleReferenceStatus: 'none',
         organization: null,
       },
     ])

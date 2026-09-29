@@ -23,7 +23,12 @@ describe('resolveProjectionRowPresentation', () => {
       ...baseRow,
       kind: 'organizationMembership',
       roleLabel: 'Member',
-      details: { lifecycle: 'current', title: 'Captain' },
+      details: {
+        lifecycle: 'current',
+        membershipTitleId: 'omt_captain',
+        titleReferenceStatus: 'resolved',
+        title: 'Captain',
+      },
       target: { type: 'organization', id: 'org-1', name: 'Lantern Guild', slug: 'lantern-guild' },
     }
 

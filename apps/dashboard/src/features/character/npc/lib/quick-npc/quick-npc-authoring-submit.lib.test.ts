@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -40,7 +39,11 @@ const lanternGuild = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+  },
   connections: { locations: [] },
 }
 
@@ -84,7 +87,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       createContext: quickNpcOrganizationMemberCreateContext(organization),
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: quickFighter.id,
         level: 1,
       }),
@@ -96,7 +99,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       expect.objectContaining({
         kind: 'organizationMembership',
         organizationId: organization.id,
-        details: { lifecycle: 'current', title: 'Guildmaster', priority: 50 },
+        details: { lifecycle: 'current', membershipTitleId: 'omt_guildmaster' },
       }),
     ])
   })
@@ -116,19 +119,21 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
     expect(input.relationshipEdges).toEqual([])
   })
 
-  it('omits title and priority for untitled member setup', () => {
+  it('stores membershipTitleId for member setup', () => {
     const organization = {
       id: 'organization-1',
       name: 'Lantern Guild',
       organizationDomain: 'occupational' as const,
-      members: { titles: [] },
+      members: {
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+      },
     }
 
     const input = buildQuickNpcAuthoringCreateInput({
       createContext: quickNpcOrganizationMemberCreateContext(organization),
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        membershipTitle: 'omt_member',
         classId: quickFighter.id,
         level: 1,
       }),
@@ -140,6 +145,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       expect.objectContaining({
         kind: 'organizationMembership',
         organizationId: organization.id,
+        details: { lifecycle: 'current', membershipTitleId: 'omt_member' },
       }),
     ])
   })

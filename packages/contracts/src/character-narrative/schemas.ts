@@ -25,7 +25,7 @@ import {
 
 export const narrativeOrganizationSchema = organizationSchema
   .pick({ id: true, name: true })
-  .merge(characterOrganizationConnectionSchema.pick({ title: true }))
+  .merge(characterOrganizationConnectionSchema.pick({ membershipTitleId: true }))
   .extend({ affinities: z.array(z.string()).default([]) })
 export const narrativeResidenceSchema = narrativeResidenceFactSchema
 

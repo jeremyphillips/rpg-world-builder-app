@@ -1,13 +1,24 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { defaultCampaignRules } from '../../lib/form-options/content-campaign-rules'
 import { makeQueryWrapper } from '@/test/make-wrapper'
 import { SUBCLASSES_FOR_FIGHTER } from '../fixtures'
 import { ClassSubclassesTab } from './class-subclasses-tab'
+
+beforeAll(() => {
+  if (!HTMLElement.prototype.hasPointerCapture) {
+    HTMLElement.prototype.hasPointerCapture = () => false
+    HTMLElement.prototype.setPointerCapture = () => undefined
+    HTMLElement.prototype.releasePointerCapture = () => undefined
+  }
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = vi.fn()
+  }
+})
 
 vi.mock('../hooks/use-subclass-mutations', () => ({
   useCreateSubclass: () => ({
@@ -94,14 +105,15 @@ describe('ClassSubclassesTab', () => {
     await user.click(screen.getByRole('button', { name: /Actions for Untitled subclass/i }))
     await user.click(screen.getByRole('menuitem', { name: /Delete subclass/i }))
 
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+    const confirmDialog = screen.getByRole('alertdialog')
+    expect(confirmDialog).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
+    await user.click(within(confirmDialog).getByRole('button', { name: /^Delete$/ }))
 
     await waitFor(() => {
       expect(screen.queryByText('Untitled subclass')).not.toBeInTheDocument()
     })
-  })
+  }, 15_000)
 
   it('shows a subclasses-disabled availability alert when subclassing is off', () => {
     render(

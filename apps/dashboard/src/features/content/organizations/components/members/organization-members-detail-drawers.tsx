@@ -93,7 +93,7 @@ export function OrganizationMembersDetailDrawers({
           }}
           organization={editableOrganization}
           characterName={detail.editingRow.name}
-          currentTitle={detail.editingRow.title}
+          currentMembershipTitleId={detail.editingRow.membershipTitleId}
           copy={ORGANIZATION_ROSTER_EDIT_MEMBERSHIP_COPY}
           onSave={detail.handleSaveMembership}
           onRemove={detail.handleRemoveFromEditDrawer}

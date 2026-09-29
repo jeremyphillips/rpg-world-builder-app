@@ -34,6 +34,30 @@ export const Default: StoryObj = {
   },
 }
 
+/** Overwrite confirmations use the `warning` confirm variant (not entity deletion). */
+export const Warning: StoryObj = {
+  render: () => {
+    const [open, setOpen] = useState(false)
+    return (
+      <>
+        <Button variant="outline" onClick={() => setOpen(true)}>
+          Replace fields
+        </Button>
+        <ConfirmDialog
+          open={open}
+          onOpenChange={setOpen}
+          headline="Apply preset values?"
+          description="This replaces unsaved field values."
+          confirmLabel="Apply preset"
+          confirmVariant="warning"
+          onConfirm={action('confirm')}
+          onCancel={action('cancel')}
+        />
+      </>
+    )
+  },
+}
+
 /** A destructive confirmation uses the `destructive` confirm variant. */
 export const Destructive: StoryObj = {
   render: () => {

@@ -152,8 +152,7 @@ export function useOrganizationMembersDetail(
             organizationId,
             details: {
               lifecycle: 'current',
-              ...(commit.title !== undefined ? { title: commit.title } : {}),
-              ...(commit.priority !== undefined ? { priority: commit.priority } : {}),
+              membershipTitleId: commit.membershipTitleId,
             },
           },
         })
@@ -181,15 +180,15 @@ export function useOrganizationMembersDetail(
   const editingRow = drawerState?.mode === 'edit' ? drawerState.row : null
 
   const handleSaveMembership = React.useCallback(
-    async (title?: string) => {
+    async (membershipTitleRadioValue?: string) => {
       if (!editingRow) return
+      if (membershipTitleRadioValue === undefined || membershipTitleRadioValue.trim() === '') {
+        setMutationError('Choose a membership title before saving.')
+        return
+      }
       const metadata = resolveOrganizationMembershipMetadata({
         titles: organization.members.titles ?? [],
-        selectedTitle: title,
-        currentMembership: {
-          ...(editingRow.title !== undefined ? { title: editingRow.title } : {}),
-          ...(editingRow.priority !== undefined ? { priority: editingRow.priority } : {}),
-        },
+        selectedMembershipTitleId: membershipTitleRadioValue,
       })
 
       setMutationError(null)
@@ -205,7 +204,7 @@ export function useOrganizationMembersDetail(
 
         await updateCharacterRelationship(campaignId, edge.relationshipId, {
           expectedRevision: edge.revision,
-          details: { title: metadata.title ?? null, priority: metadata.priority ?? null },
+          details: { membershipTitleId: metadata.membershipTitleId ?? null },
         })
         await invalidate({
           characterId: editingRow.characterId,
@@ -220,6 +219,7 @@ export function useOrganizationMembersDetail(
       editingRow,
       invalidate,
       organization.functions,
+      organization.members.titles,
       organization.practices,
       organization.organizationDomain,
       organization.organizationForm,

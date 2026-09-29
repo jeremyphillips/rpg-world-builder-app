@@ -6,12 +6,12 @@ import {
 } from '@rpg/contracts'
 
 import {
-  membershipRadioValueFromTitle,
-  titleFromMembershipRadioValue,
+  membershipRadioValueFromMembershipTitleId,
+  membershipTitleIdFromRadioValue,
 } from '../organization-membership/organization-membership-title.lib'
 
 export type ConnectionDetailsFormState = {
-  membershipTitle: string
+  membershipTitle: string | undefined
   lifecycle: 'current' | 'former'
   isPrimary: boolean
   visibility: CharacterRelationshipVisibility
@@ -19,7 +19,7 @@ export type ConnectionDetailsFormState = {
 }
 
 export const EMPTY_CONNECTION_DETAILS_FORM_STATE: ConnectionDetailsFormState = {
-  membershipTitle: '',
+  membershipTitle: undefined,
   lifecycle: 'current',
   isPrimary: false,
   visibility: 'dm_only',
@@ -30,8 +30,8 @@ export function connectionDetailsFromDraftEdge(
   edge: CharacterRelationshipDraftEdge,
 ): ConnectionDetailsFormState {
   return {
-    membershipTitle: membershipRadioValueFromTitle(
-      (edge.details as { title?: string } | undefined)?.title,
+    membershipTitle: membershipRadioValueFromMembershipTitleId(
+      (edge.details as { membershipTitleId?: string } | undefined)?.membershipTitleId,
     ),
     lifecycle:
       (edge.details as { lifecycle?: 'current' | 'former' } | undefined)?.lifecycle ?? 'current',
@@ -47,7 +47,9 @@ export function connectionDetailsFromProjection(
   if (!row) return EMPTY_CONNECTION_DETAILS_FORM_STATE
 
   return {
-    membershipTitle: membershipRadioValueFromTitle((row.details as { title?: string }).title),
+    membershipTitle: membershipRadioValueFromMembershipTitleId(
+      (row.details as { membershipTitleId?: string }).membershipTitleId,
+    ),
     lifecycle: (row.details as { lifecycle?: 'current' | 'former' }).lifecycle ?? 'current',
     isPrimary: Boolean((row.details as { isPrimary?: boolean }).isPrimary),
     visibility: row.visibility,
@@ -60,9 +62,11 @@ export function buildConnectionDetailsPatch(
   state: ConnectionDetailsFormState,
 ): Record<string, unknown> {
   if (rowKind === 'organizationMembership') {
-    const title = titleFromMembershipRadioValue(state.membershipTitle)
+    if (state.membershipTitle === undefined || state.membershipTitle.trim() === '') {
+      throw new Error('Organization membership title id is required.')
+    }
     return {
-      title: title ?? null,
+      membershipTitleId: membershipTitleIdFromRadioValue(state.membershipTitle),
     }
   }
 

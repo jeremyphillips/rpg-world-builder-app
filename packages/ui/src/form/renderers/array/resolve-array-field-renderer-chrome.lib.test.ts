@@ -60,7 +60,7 @@ describe('resolveArrayFieldRendererChrome', () => {
     })
 
     expect(chrome.legendFieldSize).toBe('md')
-    expect(chrome.itemBodyStackClasses).toContain('gap-3')
+    expect(chrome.itemBodyStackClasses).toContain('gap-4')
   })
 
   it('does not enable collapse for compact nested arrays without renderShell', () => {

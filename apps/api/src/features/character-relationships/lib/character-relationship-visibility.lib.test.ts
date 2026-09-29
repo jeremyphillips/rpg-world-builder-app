@@ -16,7 +16,7 @@ const baseRelationship = {
   kind: 'organizationMembership' as const,
   characterId: 'char-1',
   organizationId: 'org-1',
-  details: { lifecycle: 'current' },
+  details: { lifecycle: 'current', membershipTitleId: 'omt_member' },
 } satisfies CharacterRelationshipEdge
 
 describe('canViewerSeeCharacterRelationship', () => {

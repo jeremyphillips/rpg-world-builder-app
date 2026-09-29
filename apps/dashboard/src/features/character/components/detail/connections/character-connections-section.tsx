@@ -1,12 +1,7 @@
 import * as React from 'react'
 import { Alert, ActionButton } from '@rpg/ui'
 
-import {
-  CrossContentRelationshipRow,
-  DetailCollectionPanel,
-  RelationshipList,
-  detailCollectionRecordSeparatorVariants,
-} from '@/features/content'
+import { DetailCollectionPanel, EntityRowList } from '@/features/content'
 
 import { useCharacterConnectionsSheet } from '../../../hooks/use-character-connections-sheet'
 import type { CharacterRelationshipSubjectKind } from '../../../lib/invalidate-character-relationship-queries'
@@ -83,7 +78,7 @@ export function CharacterConnectionsSection({
             </Alert>
           </div>
         ) : (
-          <RelationshipList.Root
+          <EntityRowList.Root
             itemCount={sheet.projections.length}
             emptyLabel={CONNECTIONS_EMPTY_LABEL}
           >
@@ -97,49 +92,46 @@ export function CharacterConnectionsSection({
                   const editCopy = resolveConnectionSheetEditCopy(sectionId)
 
                   return (
-                    <RelationshipList.Group
+                    <EntityRowList.Group
                       key={sectionId}
                       label={section.heading}
                       itemCount={sectionRows.length}
                     >
-                      <ul className={detailCollectionRecordSeparatorVariants()}>
-                        {sectionRows.map((row) => {
-                          const presentation = resolveProjectionRowPresentation(row, campaignId)
+                      {sectionRows.map((row) => {
+                        const presentation = resolveProjectionRowPresentation(row, campaignId)
 
-                          return (
-                            <li key={row.relationshipId}>
-                              <CrossContentRelationshipRow
-                                heading={presentation.heading}
-                                href={presentation.headingHref}
-                                description={presentation.description}
-                                trailing={
-                                  canEdit && row.capabilities.canUpdateDetails
-                                    ? {
-                                        kind: 'action',
-                                        content: (
-                                          <ActionButton
-                                            action="edit"
-                                            variant="ghost"
-                                            size="icon"
-                                            iconStep="md"
-                                            aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
-                                            onClick={() => sheet.setEditingRow(row)}
-                                          />
-                                        ),
-                                      }
-                                    : null
-                                }
-                              />
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </RelationshipList.Group>
+                        return (
+                          <EntityRowList.Row
+                            key={row.relationshipId}
+                            heading={presentation.heading}
+                            headingHref={presentation.headingHref}
+                            description={presentation.description}
+                            trailing={
+                              canEdit && row.capabilities.canUpdateDetails
+                                ? {
+                                    kind: 'action',
+                                    content: (
+                                      <ActionButton
+                                        action="edit"
+                                        variant="ghost"
+                                        size="icon"
+                                        iconStep="md"
+                                        aria-label={`${editCopy.editLabel} for ${presentation.heading}`}
+                                        onClick={() => sheet.setEditingRow(row)}
+                                      />
+                                    ),
+                                  }
+                                : null
+                            }
+                          />
+                        )
+                      })}
+                    </EntityRowList.Group>
                   )
                 })}
               </div>
             ) : null}
-          </RelationshipList.Root>
+          </EntityRowList.Root>
         )}
       </DetailCollectionPanel>
 

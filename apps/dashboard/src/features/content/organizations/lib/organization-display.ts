@@ -29,13 +29,23 @@ import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './members/
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
+  membershipTitles: 'Membership titles',
   locationConnections: 'Location connections',
 } as const
 
 export const ORGANIZATION_EMPTY_SECTION_TEXT = {
   members: 'No members linked.',
+  membershipTitles: 'No membership titles',
   locationConnections: 'No location connections yet.',
 } as const
+
+export const ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION =
+  'Titles available to organization members, ordered from highest to lowest.'
+
+export const ORGANIZATION_MEMBERSHIP_TITLES_EMPTY_SUPPORT =
+  'Members can still be added without a title.'
+
+export const ORGANIZATION_MEMBERSHIP_TITLES_HEADING_ID = 'organization-membership-titles-heading'
 
 export const ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX = ' · Organization' as const
 

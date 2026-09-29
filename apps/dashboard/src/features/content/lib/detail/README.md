@@ -39,13 +39,13 @@ Canonical production: [`LocationChildrenSection`](../../locations/components/hie
 
 ## Relationship collection body
 
-Typed-edge sections use `RelationshipList` inside the same panel shell:
+Typed-edge sections use `EntityRowList` inside the same panel shell:
 
 ```text
-RelationshipList.Root
-└── RelationshipList.Group
-    └── RelationshipList.Row
-        └── CrossContentRelationshipRow
+EntityRowList.Root
+└── EntityRowList.Group
+    └── EntityRowList.Row
+        └── EntityRowList.Row
             └── DetailEntityRow
 ```
 
@@ -62,10 +62,10 @@ Organizations stay **Relationship-first** — do not re-scaffold them onto
 
 [`collection/detail-collection-chrome.variants.ts`](collection/detail-collection-chrome.variants.ts)
 exports group header layout and record list separators. Both grouped collection body
-and `RelationshipList.Group` import this file — an explicit cross-grammar contract,
+and `EntityRowList.Group` import this file — an explicit cross-grammar contract,
 not accidental DRY through private component variants.
 
-`RelationshipList` must **not** import `detail-collection-group.variants.ts` or
+`EntityRowList` must **not** import `detail-collection-group.variants.ts` or
 `detail-collection-row-list.variants.ts` directly.
 
 ## Entity row grammar (separate)
@@ -78,7 +78,7 @@ DetailEntityRow
     └── trailing (EntityAnatomyTrailing)
 ```
 
-`RelationshipList.Row` forwards the same **`leadingMedia`** contract. Do not pass
+`EntityRowList.Row` forwards the same **`leadingMedia`** contract. Do not pass
 `ContentDisplayImage` into list rows — use `buildEntitySurfaceLeadingMediaNode` or
 `DetailRowLeadingMedia` in feature projection code first.
 
@@ -155,10 +155,10 @@ forms, metric grids, single-value fields, arbitrary card layouts — prefer
 - No wrapper over `DetailCollectionPanel` that only re-exposes its props
 - No feature-local copy of Group/RowList layout anatomy
 - No moving `EntityAnatomy` ownership into `collection/`
-- No forcing RelationshipList surfaces through `DetailCollectionGroup` / `DetailCollectionRowList`
+- No forcing EntityRowList surfaces through `DetailCollectionGroup` / `DetailCollectionRowList`
 
 ## Guards
 
 [`detail-collection-grammar.guard.test.ts`](detail-collection-grammar.guard.test.ts) —
-typed-edge relationship sections use `RelationshipList` for subgroup/list anatomy, not
+typed-edge relationship sections use `EntityRowList` for subgroup/list anatomy, not
 grouped collection body components.

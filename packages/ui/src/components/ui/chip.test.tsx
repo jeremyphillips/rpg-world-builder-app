@@ -44,6 +44,19 @@ describe('Chip', () => {
     expect(onSelectedChange).toHaveBeenCalledWith(true)
   })
 
+  it('removable sm uses compact chip scale with expanded remove hit target', () => {
+    render(
+      <Chip mode="removable" size="sm" removeLabel="Remove Tag" onRemove={vi.fn()}>
+        Tag
+      </Chip>,
+    )
+    const chip = screen.getByText('Tag').closest('span.inline-flex')
+    expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
+    expect(screen.getByRole('button', { name: 'Remove Tag' })).toHaveClass(
+      'size-control-action-compact',
+    )
+  })
+
   it('removable calls onRemove from dismiss button', async () => {
     const onRemove = vi.fn()
     const user = userEvent.setup()

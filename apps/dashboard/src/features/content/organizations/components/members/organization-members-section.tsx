@@ -2,8 +2,9 @@ import { SemanticText, Text } from '@rpg/ui'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
 import type { DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
+import { buildOrganizationMemberLeadingMedia } from '../../lib/members/organization-member-leading-media.lib'
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
 import {
   formatOrganizationMembersOverflow,
@@ -108,8 +109,8 @@ function OrganizationMembersRosterBody({
       : undefined
 
   return (
-    <RelationshipList.Root itemCount={rows.length} emptyLabel={emptyText} action={addAction}>
-      <RelationshipList.Group itemCount={rows.length}>
+    <EntityRowList.Root itemCount={rows.length} emptyLabel={emptyText} action={addAction}>
+      <EntityRowList.Group itemCount={rows.length}>
         {rows.map((row) => {
           const actions = buildMemberOverflowActions({
             row,
@@ -120,24 +121,25 @@ function OrganizationMembersRosterBody({
           })
 
           return (
-            <RelationshipList.Row
+            <EntityRowList.Row
               key={row.characterId}
-              title={row.name}
-              href={row.detailHref}
-              headingSuffix={row.title ? ` · ${row.title}` : undefined}
+              heading={row.name}
+              headingHref={row.detailHref}
+              headingAccessory={row.title ? ` · ${row.title}` : undefined}
               description={row.identityLine || undefined}
+              leadingMedia={buildOrganizationMemberLeadingMedia(row)}
               menu={toRowMenu(row, actions)}
             />
           )
         })}
-      </RelationshipList.Group>
+      </EntityRowList.Group>
 
       {total !== undefined && total > rows.length ? (
-        <RelationshipList.Supplementary>
+        <EntityRowList.Supplementary>
           <Text variant="muted">{formatOrganizationMembersOverflow(rows.length, total)}</Text>
-        </RelationshipList.Supplementary>
+        </EntityRowList.Supplementary>
       ) : null}
-    </RelationshipList.Root>
+    </EntityRowList.Root>
   )
 }
 

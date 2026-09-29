@@ -7,8 +7,8 @@ import { ChevronDown, Check, Search } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
-import { fieldControlVariants } from './field-control.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
+import { selectTriggerShellClasses } from './select-compact-trigger.variants'
 import { fieldSizeToChipSize } from './field-sizing.variants'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
@@ -19,6 +19,7 @@ import type {
 } from './combobox-field.types'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
+  comboboxTriggerValueTextClasses,
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
@@ -42,54 +43,72 @@ interface ComboboxTriggerProps {
   muted: boolean
   /** When false, the trigger stays visible while the panel is open. */
   hideWhenOpen?: boolean
+  grouped?: boolean
   onBlur?: () => void
 }
 
-export function ComboboxTrigger({
-  listboxId,
-  open,
-  size,
-  triggerText,
-  loading,
-  disabled,
-  muted,
-  hideWhenOpen = true,
-  onBlur,
-}: ComboboxTriggerProps) {
-  return (
-    <Field.Control>
-      <PopoverPrimitive.Trigger asChild>
-        <button
-          type="button"
-          role="combobox"
-          aria-expanded={open}
-          aria-controls={listboxId}
-          aria-haspopup="listbox"
-          aria-busy={loading || undefined}
-          disabled={disabled}
-          onBlur={onBlur}
-          className={cn(
-            fieldControlVariants({ size }),
-            'inline-flex shrink-0 items-stretch gap-0 px-0 py-0 text-left',
-            muted && 'text-muted-foreground',
-            open && hideWhenOpen && comboboxTriggerOpenVariants(),
-          )}
-        >
-          <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
-            <span className="truncate">{triggerText}</span>
-          </SelectLikeValueSlot>
-          <SelectLikeCaretSlot size={size}>
-            {loading ? (
-              <Spinner size="sm" variant="muted" />
-            ) : (
-              <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTriggerProps>(
+  function ComboboxTrigger(
+    {
+      listboxId,
+      open,
+      size,
+      triggerText,
+      loading,
+      disabled,
+      muted,
+      hideWhenOpen = true,
+      grouped = false,
+      onBlur,
+    },
+    ref,
+  ) {
+    return (
+      <Field.Control>
+        <PopoverPrimitive.Trigger asChild>
+          <button
+            ref={ref}
+            type="button"
+            role="combobox"
+            aria-expanded={open}
+            aria-controls={listboxId}
+            aria-haspopup="listbox"
+            aria-busy={loading || undefined}
+            disabled={disabled}
+            onBlur={onBlur}
+            className={cn(
+              selectTriggerShellClasses(size, {
+                grouped,
+                groupedPosition: grouped ? 'start' : 'end',
+              }),
+              grouped ? 'min-w-0 w-full' : 'w-full',
+              'shrink-0 items-stretch gap-0 text-left',
+              open && hideWhenOpen && comboboxTriggerOpenVariants(),
             )}
-          </SelectLikeCaretSlot>
-        </button>
-      </PopoverPrimitive.Trigger>
-    </Field.Control>
-  )
-}
+          >
+            <SelectLikeValueSlot size={size} position="standalone" trailingSlot prose>
+              <span
+                className={cn(
+                  comboboxTriggerValueTextClasses(size),
+                  muted && 'text-muted-foreground',
+                )}
+              >
+                {triggerText}
+              </span>
+            </SelectLikeValueSlot>
+            <SelectLikeCaretSlot size={size}>
+              {loading ? (
+                <Spinner size="sm" variant="muted" />
+              ) : (
+                <ChevronDown className="size-4 shrink-0 opacity-50" aria-hidden />
+              )}
+            </SelectLikeCaretSlot>
+          </button>
+        </PopoverPrimitive.Trigger>
+      </Field.Control>
+    )
+  },
+)
 
 interface ComboboxOptionItemProps {
   option: ComboboxFieldOption

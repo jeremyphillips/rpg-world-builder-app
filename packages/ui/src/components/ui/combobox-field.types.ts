@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, Ref } from 'react'
 
 import type { FieldSize } from './field.client'
 
@@ -69,4 +69,8 @@ export interface ComboboxFieldControlProps {
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
   /** Optional filter row below search — hosts own filter UI and state. */
   filter?: React.ReactNode
+  clearable?: boolean
+  clearAccessibleName?: string
+  onClear?: () => void
+  triggerRef?: Ref<HTMLButtonElement>
 }

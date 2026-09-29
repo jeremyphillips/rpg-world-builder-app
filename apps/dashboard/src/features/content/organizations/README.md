@@ -14,11 +14,13 @@ Cross-type relationship chrome lives in [`content/lib/relationship/`](../lib/rel
 
 ## `components/` ownership
 
-| Folder                             | Owns                                                                                                                                                                                        |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `components/create/`               | Organization **create-lifecycle** UI and state (provider, preset bridge, nested create modal). Used by org create route, nested-create, and embedded building create. **Not** used on edit. |
-| `components/members/`              | Detail members surface (section, drawer orchestrator, member picker).                                                                                                                       |
-| `components/location-connections/` | Detail org→location connections (section, list row, link drawer).                                                                                                                           |
+| Folder                             | Owns                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `components/authoring/`            | Organization authoring interaction state shared by create and edit.                                                                                           |
+| `components/create/`               | Organization **create-lifecycle** UI (form shell, preset bridge, nested create modal). Used by org create route, nested-create, and embedded building create. |
+| `components/edit/`                 | Organization **edit-lifecycle** UI, including the temporary familiar-type bulk-edit utility and read-only membership-title surfacing.                         |
+| `components/members/`              | Detail members surface (section, drawer orchestrator, member picker, membership-title summary).                                                               |
+| `components/location-connections/` | Detail org→location connections (section, list row, link drawer).                                                                                             |
 
 Flat layout in `members/` and `location-connections/` is a **local** decision for
 today's file count and filename-role vocabulary — not a standing rule that
@@ -29,20 +31,27 @@ controllers, or unrelated surfaces accumulate in one folder.
 
 ```text
 components/create/
-  consumer → OrganizationAuthoringFormShell → OrganizationAuthoringProvider
+  consumer → OrganizationAuthoringFormShell
+    └── components/authoring/OrganizationAuthoringProvider
     └── form + OrganizationAuthoringPresetBridge
+
+components/edit/
+  Organization profile legend action → OrganizationEditFamiliarTypeField
+  OrganizationEditMembershipTitlesField (read-only `members.titles`)
 
 components/members/
   OrganizationMembersDetailSection
   ├── OrganizationMembersSection
-  │     └── DetailCollectionPanel → RelationshipList (relationship body)
+  │     └── DetailCollectionPanel → EntityRowList (relationship body)
+  ├── OrganizationMembershipTitlesDetailSection
+  │     └── OrganizationMembershipTitlesSummary
   └── OrganizationMembersDetailDrawers
         └── OrganizationMemberPickerDrawer
 
 components/location-connections/
   OrganizationLocationConnectionsDetailSection
   ├── OrganizationLocationConnectionsSection
-  │     └── DetailCollectionPanel × family → RelationshipList
+  │     └── DetailCollectionPanel × family → EntityRowList
   │           └── OrganizationLocationConnectionListRow
   └── OrganizationLocationConnectionLinkDrawer
 ```
@@ -54,7 +63,7 @@ Detail collection grammar: [`content/lib/detail/README.md`](../lib/detail/README
 | Consumer                     | May import                                                             |
 | ---------------------------- | ---------------------------------------------------------------------- |
 | `relationship/nested-create` | `components/create/organization-create-modal.tsx` only                 |
-| Locations building composer  | `components/create/` (FormShell, context, PresetBridge)                |
+| Locations building composer  | `components/create/` (FormShell, PresetBridge) and authoring context   |
 | Org detail route             | `*-detail-section` composition roots in members / location-connections |
 
 Do not import private children (section, list row, picker, link drawer) from

@@ -18,7 +18,7 @@ describe('EditOrganizationMembershipDrawer', () => {
         onOpenChange={onOpenChange}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Guildmaster"
+        currentMembershipTitleId="omt_guildmaster"
         onSave={onSave}
         onRemove={vi.fn()}
       />,
@@ -30,11 +30,11 @@ describe('EditOrganizationMembershipDrawer', () => {
     expect(screen.getByText(/Lantern Guild/)).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeChecked()
 
-    await user.click(screen.getByRole('radio', { name: 'No title' }))
+    await user.click(screen.getByRole('radio', { name: 'Member' }))
     await user.click(screen.getByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => {
-      expect(onSave).toHaveBeenCalledWith(undefined)
+      expect(onSave).toHaveBeenCalledWith('omt_member')
       expect(onOpenChange).toHaveBeenCalledWith(false)
     })
   })
@@ -50,7 +50,7 @@ describe('EditOrganizationMembershipDrawer', () => {
         onOpenChange={onOpenChange}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Guildmaster"
+        currentMembershipTitleId="omt_guildmaster"
         onSave={onSave}
         onRemove={vi.fn()}
       />,
@@ -92,20 +92,21 @@ describe('EditOrganizationMembershipDrawer', () => {
     })
   })
 
-  it('keeps an unrecognized historical title selectable', () => {
+  it('clears selection when the stored id is absent from the catalog', () => {
     render(
       <EditOrganizationMembershipDrawer
         open
         onOpenChange={vi.fn()}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Custom Chronicler"
+        currentMembershipTitleId="omt_missing"
         onSave={vi.fn()}
         onRemove={vi.fn()}
       />,
     )
 
-    expect(screen.getByRole('radio', { name: 'Custom Chronicler' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Guildmaster' })).not.toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Member' })).not.toBeChecked()
   })
 
   it('resets title selection when reopened for the same membership', async () => {
@@ -118,29 +119,14 @@ describe('EditOrganizationMembershipDrawer', () => {
         onOpenChange={onOpenChange}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Guildmaster"
+        currentMembershipTitleId="omt_guildmaster"
         onSave={vi.fn()}
         onRemove={vi.fn()}
       />,
     )
 
-    await user.click(screen.getByRole('radio', { name: 'No title' }))
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
-
+    await user.click(screen.getByRole('radio', { name: 'Member' }))
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(onOpenChange).toHaveBeenCalledWith(false)
-
-    rerender(
-      <EditOrganizationMembershipDrawer
-        open={false}
-        onOpenChange={onOpenChange}
-        organization={lanternGuild}
-        characterName="Frug Daergel"
-        currentTitle="Guildmaster"
-        onSave={vi.fn()}
-        onRemove={vi.fn()}
-      />,
-    )
 
     rerender(
       <EditOrganizationMembershipDrawer
@@ -148,7 +134,7 @@ describe('EditOrganizationMembershipDrawer', () => {
         onOpenChange={onOpenChange}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Guildmaster"
+        currentMembershipTitleId="omt_guildmaster"
         onSave={vi.fn()}
         onRemove={vi.fn()}
       />,
@@ -157,14 +143,14 @@ describe('EditOrganizationMembershipDrawer', () => {
     expect(screen.getByRole('radio', { name: 'Guildmaster' })).toBeChecked()
   })
 
-  itAxe('has no axe accessibility violations', async () => {
+  itAxe('has no axe violations', async () => {
     const { container } = render(
       <EditOrganizationMembershipDrawer
         open
         onOpenChange={vi.fn()}
         organization={lanternGuild}
         characterName="Frug Daergel"
-        currentTitle="Guildmaster"
+        currentMembershipTitleId="omt_guildmaster"
         onSave={vi.fn()}
         onRemove={vi.fn()}
       />,

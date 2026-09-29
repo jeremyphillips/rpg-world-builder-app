@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { afterEach } from 'vitest'
+import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
 // jsdom lacks ResizeObserver, which Radix primitives (via useSize) rely on.
@@ -12,6 +12,11 @@ if (!('ResizeObserver' in globalThis)) {
 }
 
 // jsdom lacks IntersectionObserver, used by Sheet.MediaScroll sticky headers.
+// jsdom lacks window.scrollTo; focus management and in-page nav call it during tests.
+if (typeof window !== 'undefined' && typeof window.scrollTo !== 'function') {
+  window.scrollTo = vi.fn() as typeof window.scrollTo
+}
+
 if (!('IntersectionObserver' in globalThis)) {
   globalThis.IntersectionObserver = class implements IntersectionObserver {
     readonly root: Element | Document | null = null

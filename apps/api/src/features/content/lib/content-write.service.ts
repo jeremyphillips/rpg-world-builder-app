@@ -168,7 +168,6 @@ async function runValidateBeforeWrite<T extends StoredEntity>(
   config: ContentWriteConfig<T>,
   ctx: ContentWriteContext,
 ): Promise<void> {
-  if (ctx.validationIntent === 'draft') return
   await config.validateBeforeWrite?.(ctx)
 }
 

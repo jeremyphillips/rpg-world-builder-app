@@ -1,13 +1,26 @@
+import type { ReactNode } from 'react'
+
 import type { FieldGroupLegendSize } from '../components/ui/field.variants'
 import type { FieldHintConfig } from './field-config'
 
 /** Resolved typography tier — label and hint always share this tier. */
 export type FormHeadingTier = 'section' | 'subsection' | 'leaf'
 
-/** Feature-level heading — tier is never authored on dashboard form JSON. */
+/**
+ * Feature-level heading — tier is never authored on dashboard form JSON.
+ *
+ * `accessory` is a **group-heading** slot only (wired through `GroupFieldSection` →
+ * `FieldGroup`). Status/decorative content (badges, static text) — not buttons, links,
+ * or other focusable controls inside `<legend>`.
+ *
+ * `action` is a **group-heading** trailing slot (same end alignment as array legend add
+ * controls). Use compact `sm` text/outline buttons — not nested inside `<legend>` text.
+ */
 export type FormHeading = {
   label: string
   hint?: string | FieldHintConfig
+  accessory?: ReactNode
+  action?: ReactNode
 }
 
 /** Label + hint slice shared by arrays and other section headings. */

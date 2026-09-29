@@ -14,7 +14,7 @@ export type DetailRowLeadingMediaProps = {
 }
 
 /**
- * Single geometry owner for DetailEntityRow / RelationshipList leading media.
+ * Single geometry owner for DetailEntityRow / EntityRowList leading media.
  * Children render content only; intrinsic media dimensions must not size the row.
  */
 export function DetailRowLeadingMedia({

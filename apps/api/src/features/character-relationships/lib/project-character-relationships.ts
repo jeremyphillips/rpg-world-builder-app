@@ -5,12 +5,14 @@ import type {
   PcCharacter,
 } from '@rpg/contracts'
 import {
+  enrichMembershipRelationshipDetailsForRead,
   getCharacterRelationshipEdgeKindDisplayLabel,
   getCharacterRelationshipEdgeKindEntry,
   getCharacterRelationshipEdgeKindSection,
   isCampaignManager,
   isViewerRelationshipSource,
   resolveRelationshipProjectionRoleLabel,
+  type MembershipRelationshipDetails,
 } from '@rpg/contracts'
 
 import {
@@ -23,6 +25,7 @@ import type { HomebrewDoc } from '../../content/lib/content-write-config'
 import { HomebrewLocationModel } from '../../content/locations/homebrew-location.model'
 import { toHomebrewLocation } from '../../content/locations/locations.config'
 import { HomebrewOrganizationModel } from '../../content/organizations/homebrew-organization.model'
+import { toHomebrewOrganization } from '../../content/organizations/organizations.config'
 
 type ViewerContext = {
   viewerRole: 'owner' | 'co-owner' | 'pc' | 'observer'
@@ -48,7 +51,13 @@ async function resolveCharacterTarget(
 async function resolveOrganizationTarget(organizationId: string) {
   const doc = await HomebrewOrganizationModel.findById(organizationId).lean<HomebrewDoc | null>()
   if (!doc) return null
-  return { id: String(doc._id), name: String(doc.name), slug: String(doc.slug) }
+  const organization = toHomebrewOrganization(doc)
+  return {
+    id: organization.id,
+    name: organization.name,
+    slug: organization.slug,
+    membershipTitleCatalog: organization.members.titles,
+  }
 }
 
 async function resolveLocationTarget(locationId: string) {
@@ -89,18 +98,30 @@ async function projectOrganizationRelationshipRow(
   },
 ): Promise<CharacterRelationshipProjectionRow> {
   const organization = await resolveOrganizationTarget(context.relationship.organizationId)
-  return buildProjectionRowBase({
-    ...context,
-    referenceStatus: organization ? 'resolved' : 'deleted',
-    target: organization
-      ? {
-          type: 'organization',
-          id: organization.id,
-          name: organization.name,
-          slug: organization.slug,
-        }
-      : undefined,
-  })
+  const storedDetails = (context.relationship.details ?? {}) as MembershipRelationshipDetails
+  const details =
+    organization !== null
+      ? enrichMembershipRelationshipDetailsForRead({
+          catalog: organization.membershipTitleCatalog,
+          details: storedDetails,
+        })
+      : (context.relationship.details ?? {})
+
+  return {
+    ...buildProjectionRowBase({
+      ...context,
+      referenceStatus: organization ? 'resolved' : 'deleted',
+      target: organization
+        ? {
+            type: 'organization',
+            id: organization.id,
+            name: organization.name,
+            slug: organization.slug,
+          }
+        : undefined,
+    }),
+    details,
+  }
 }
 
 async function projectLocationRelationshipRow(

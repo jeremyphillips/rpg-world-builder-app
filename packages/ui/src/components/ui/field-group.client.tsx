@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import type { Control, FieldValues } from 'react-hook-form'
 
 import type { FieldSize } from './field.client'
@@ -14,7 +15,7 @@ import { FieldGroupSummaryRoute } from './field-group-summary-route.client'
 import { StandardFieldGroupBody } from './field-group-standard-body.client'
 import {
   fieldGroupLegendVariants,
-  resolveArrayLegendClassName,
+  fieldLabelTypographyVariants,
   type FieldGroupLegendSize,
   type FieldRhythm,
 } from './field.variants'
@@ -25,6 +26,10 @@ export type { FieldGroupLegendSize }
 export interface FieldGroupProps {
   /** Group heading rendered as the fieldset legend. Omit for layout-only wrappers. */
   legend?: string
+  /** Non-interactive status beside the legend label (badges, static text). */
+  legendAccessory?: ReactNode
+  /** Trailing header action aligned to the legend row end (compact inline controls). */
+  legendAction?: ReactNode
   /** Legend type scale — use `subsection` for nested groups, `array` for repeatable lists. */
   legendSize?: FieldGroupLegendSize
   /**
@@ -66,6 +71,8 @@ export interface FieldGroupProps {
  */
 export function FieldGroup({
   legend,
+  legendAccessory,
+  legendAction,
   legendSize = 'section',
   size,
   rhythm = resolveFormDensity().rhythm,
@@ -84,8 +91,8 @@ export function FieldGroup({
   const resolvedFieldSize = size ?? resolveFormDensity('compact').size
   const legendTypography =
     legendSize === 'array'
-      ? resolveArrayLegendClassName(resolvedFieldSize)
-      : fieldGroupLegendVariants({ size: legendSize })
+      ? fieldLabelTypographyVariants({ size: resolvedFieldSize })
+      : fieldGroupLegendVariants({ size: legendSize, rhythm })
   const chromeClasses = resolveFieldGroupChromeClassNames(chrome, { rhythm })
   const resolvedCollapseKey = resolveFieldGroupCollapseKey({
     disclosure,
@@ -138,8 +145,11 @@ export function FieldGroup({
       id={id}
       legend={legend}
       description={description}
+      legendAccessory={legendAccessory}
+      legendAction={legendAction}
       legendSize={legendSize}
       legendTypography={legendTypography}
+      fieldSize={resolvedFieldSize}
       rhythm={rhythm}
       className={className}
       uiStateKey={uiStateKey}

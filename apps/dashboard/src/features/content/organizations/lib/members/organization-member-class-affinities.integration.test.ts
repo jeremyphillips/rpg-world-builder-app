@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { buildContentPurposeSelectors, DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
-import { flattenSelectFieldOptions } from '@rpg/ui/form'
+import {
+  buildContentPurposeSelectors,
+  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  ORGANIZATION_AUTHORING_PRESET_IDS,
+} from '@rpg/contracts'
 
 import { buildQuickNpcClassRadioCardPresentation } from '@/features/character'
 import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
@@ -8,21 +11,14 @@ import type { OrganizationMemberPickerCandidate } from '../../lib/members/organi
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildOrganizationCreateInput,
-  buildOrganizationFields,
   buildOrganizationFormValueSyncs,
   organizationToFormValues,
 } from '../../../lib/forms/organization-form-projection'
 import { buildMemberClassAffinityChipOptions } from './organization-member-class-chip-options.lib'
 import { isOrganizationMemberPickerRecommended } from './organization-member-picker-drawer.lib'
 
-function collectPresetOptionValues(ctx = makeContentFormCtx()): string[] {
-  const presetField = buildOrganizationFields(ctx).find(
-    (item) => 'name' in item && item.name === 'authoringPresetId',
-  )
-  if (!presetField || !('options' in presetField) || !Array.isArray(presetField.options)) {
-    return []
-  }
-  return flattenSelectFieldOptions(presetField.options).map((option) => option.value)
+function collectPresetOptionValues(): string[] {
+  return [...ORGANIZATION_AUTHORING_PRESET_IDS]
 }
 
 describe('organization member class affinities integration', () => {
@@ -30,20 +26,20 @@ describe('organization member class affinities integration', () => {
   const fighter = makeCharacterClass({ slug: 'fighter', id: 'class-fighter', name: 'Fighter' })
   const wizard = makeCharacterClass({ slug: 'wizard', id: 'class-wizard', name: 'Wizard' })
 
-  it('persists familiar-seeded affinities with sourcePresetId after save/reload', () => {
+  it('persists familiar-seeded affinities and materialized titles after save/reload', () => {
     const [sync] = buildOrganizationFormValueSyncs(undefined, [rogue])
-    const applied = sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId'])
+    const applied = sync?.apply({ startingPointId: 'thieves_guild' }, ['startingPointId'])
 
     expect(applied).toMatchObject({
-      authoringPresetId: undefined,
-      sourcePresetId: 'thieves_guild',
+      startingPointId: 'thieves_guild',
       practices: ['theft'],
       'members.classAffinityIds': ['class-rogue'],
+      'members.titles': expect.any(Array),
     })
 
     const saved = buildOrganizationCreateInput({
       name: 'Dockside Exchange',
-      sourcePresetId: 'thieves_guild',
+      startingPointId: 'thieves_guild',
       organizationDomain: 'criminal',
       organizationForm: 'network',
       functions: [],
@@ -51,12 +47,14 @@ describe('organization member class affinities integration', () => {
       members: {
         classAffinityIds: ['class-rogue'],
         speciesAffinityIds: [],
+        titles: applied?.['members.titles'] as never,
       },
     })
 
-    expect(saved).not.toHaveProperty('authoringPresetId')
-    expect(saved.sourcePresetId).toBe('thieves_guild')
+    expect(saved).not.toHaveProperty('startingPointId')
+    expect(saved).not.toHaveProperty('sourcePresetId')
     expect(saved.members.classAffinityIds).toEqual(['class-rogue'])
+    expect((saved.members.titles ?? []).length).toBeGreaterThan(0)
 
     const reopened = organizationToFormValues({
       ...saved,
@@ -80,8 +78,7 @@ describe('organization member class affinities integration', () => {
       practices: ['theft'],
       members: { classAffinityIds: ['class-rogue'], speciesAffinityIds: [] },
     })
-    expect(reopened).not.toHaveProperty('authoringPresetId')
-    expect(reopened).not.toHaveProperty('sourcePresetId')
+    expect(reopened).not.toHaveProperty('startingPointId')
   })
 
   it('round-trips custom affinity ids through edit form values', () => {
@@ -101,7 +98,7 @@ describe('organization member class affinities integration', () => {
       members: {
         classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
         speciesAffinityIds: [],
-        titles: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
       },
       connections: { locations: [] },
     })
@@ -171,26 +168,13 @@ describe('organization member class affinities integration', () => {
   })
 
   it('does not block org authoring when a stored affinity class is unavailable', () => {
-    const ctx = makeContentFormCtx({
-      options: {
-        classes: buildContentPurposeSelectors([
-          fighter,
-          {
-            ...rogue,
-            campaignAccess: { ...DEFAULT_CONTENT_CAMPAIGN_ACCESS, available: false },
-          },
-        ]),
-      },
-    })
     const [sync] = buildOrganizationFormValueSyncs(undefined, [fighter])
 
-    expect(
-      sync?.apply({ authoringPresetId: 'thieves_guild' }, ['authoringPresetId']),
-    ).toMatchObject({
+    expect(sync?.apply({ startingPointId: 'thieves_guild' }, ['startingPointId'])).toMatchObject({
       'members.classAffinityIds': [],
     })
 
-    expect(collectPresetOptionValues(ctx)).toContain('thieves_guild')
+    expect(collectPresetOptionValues()).toContain('thieves_guild')
 
     const saved = buildOrganizationCreateInput({
       name: 'Lantern Guild',

@@ -32,7 +32,7 @@ describe('relationship-group-presentation', () => {
     expect(resolveOrganizationLocationConnectionFamilyPresentation('site')).toBe('sparse_groups')
   })
 
-  it('maps presentation modes to RelationshipList action placement', () => {
+  it('maps presentation modes to EntityRowList action placement', () => {
     expect(relationshipGroupUsesLabeledSlotActions('meaningful_slots')).toBe(true)
     expect(relationshipGroupUsesLabeledSlotActions('sparse_groups')).toBe(false)
     expect(relationshipGroupUsesRootFamilyAdd('sparse_groups')).toBe(true)

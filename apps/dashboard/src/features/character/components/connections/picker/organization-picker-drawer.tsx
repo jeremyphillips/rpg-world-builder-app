@@ -1,6 +1,9 @@
 import * as React from 'react'
 
-import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import {
+  resolveOrganizationMembershipMetadata,
+  resolveSoleOrganizationMembershipTitleId,
+} from '@rpg/contracts'
 import { Button, SelectField, Text } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
@@ -10,10 +13,7 @@ import {
 } from '@/features/content/organizations/lib/organization-display'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
-import {
-  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-  titleFromMembershipRadioValue,
-} from '../../../lib/organization-membership/organization-membership-title.lib'
+import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   buildOrganizationPickerDomainOptions,
   filterAndSortOrganizationPickerItems,
@@ -48,14 +48,14 @@ export function OrganizationPickerDrawer({
     ORGANIZATION_PICKER_VIEW_DEFAULTS.domain,
   )
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
-  const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+  const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(undefined)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const resetMembershipConfig = React.useCallback(() => {
     setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
     setExpandedItemId(null)
-    setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    setSelectedTitle(undefined)
     setSubmitError(null)
     setPending(false)
   }, [])
@@ -69,11 +69,21 @@ export function OrganizationPickerDrawer({
     [onOpenChange, pending, resetMembershipConfig],
   )
 
-  const handleExpandedItemChange = React.useCallback((itemId: string | null) => {
-    setExpandedItemId(itemId)
-    setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
-    setSubmitError(null)
-  }, [])
+  const handleExpandedItemChange = React.useCallback(
+    (itemId: string | null) => {
+      setExpandedItemId(itemId)
+      const organization = items.find(
+        ({ organization }) => organization.id === itemId,
+      )?.organization
+      setSelectedTitle(
+        organization
+          ? resolveSoleOrganizationMembershipTitleId(organization.members.titles ?? [])
+          : undefined,
+      )
+      setSubmitError(null)
+    },
+    [items],
+  )
 
   const domainOptions = React.useMemo(
     () => buildOrganizationPickerDomainOptions(items.map(({ organization }) => organization)),
@@ -92,14 +102,18 @@ export function OrganizationPickerDrawer({
     async (organization: OrganizationPickerItem['organization']) => {
       if (pending) return
 
-      const { title, priority } = resolveOrganizationMembershipMetadata({
+      if (selectedTitle === undefined || selectedTitle.trim() === '') {
+        setSubmitError('Choose a membership title before adding this organization.')
+        return
+      }
+
+      const { membershipTitleId } = resolveOrganizationMembershipMetadata({
         titles: organization.members.titles ?? [],
-        selectedTitle: titleFromMembershipRadioValue(selectedTitle),
+        selectedMembershipTitleId: titleFromMembershipRadioValue(selectedTitle),
       })
       const membership: OrganizationMembershipSelection = {
         organizationId: organization.id,
-        ...(title !== undefined ? { title } : {}),
-        ...(priority !== undefined ? { priority } : {}),
+        membershipTitleId,
       }
 
       setPending(true)
@@ -204,11 +218,7 @@ export function OrganizationPickerDrawer({
           <div className="flex flex-col gap-4">
             <OrganizationMembershipTitleField
               titles={organization.members.titles ?? []}
-              value={
-                expandedItemId === organization.id
-                  ? selectedTitle
-                  : ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
-              }
+              value={expandedItemId === organization.id ? selectedTitle : undefined}
               onValueChange={setSelectedTitle}
               idPrefix={`organization-membership-${organization.id}`}
             />

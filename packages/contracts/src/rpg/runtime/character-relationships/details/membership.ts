@@ -4,8 +4,7 @@ import { characterRelationshipLifecycleSchema } from '../../../vocab/character-r
 
 export const membershipRelationshipDetailsSchema = z.object({
   lifecycle: characterRelationshipLifecycleSchema.default('current'),
-  title: z.string().trim().min(1).max(80).optional(),
-  priority: z.number().int().optional(),
+  membershipTitleId: z.string().trim().min(1),
 })
 
 export type MembershipRelationshipDetails = z.infer<typeof membershipRelationshipDetailsSchema>

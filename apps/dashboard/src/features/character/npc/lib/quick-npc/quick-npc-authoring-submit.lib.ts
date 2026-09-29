@@ -18,15 +18,16 @@ function resolveQuickNpcMembershipPayload(
 ) {
   const membershipMetadata = resolveOrganizationMembershipMetadata({
     titles: createContext.organization.members?.titles ?? [],
-    selectedTitle: titleFromMembershipRadioValue(
+    selectedMembershipTitleId: titleFromMembershipRadioValue(
       isQuickNpcOrganizationMemberSetup(setup) ? (setup.membershipTitle ?? '') : '',
     ),
   })
 
   return {
     organizationId: createContext.organization.id,
-    ...(membershipMetadata.title !== undefined ? { title: membershipMetadata.title } : {}),
-    ...(membershipMetadata.priority !== undefined ? { priority: membershipMetadata.priority } : {}),
+    ...(membershipMetadata.membershipTitleId !== undefined
+      ? { membershipTitleId: membershipMetadata.membershipTitleId }
+      : {}),
   }
 }
 

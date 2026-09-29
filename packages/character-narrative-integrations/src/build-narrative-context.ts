@@ -1,6 +1,7 @@
 import type { Location } from '@rpg/contracts/rpg/content'
 import {
   indexCharacterBuildCatalog,
+  resolveOrganizationMembershipTitleProjection,
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -70,7 +71,17 @@ function resolveOrganizations(
     .flatMap((edge) => {
       const organization = available.get(edge.organizationId)
       if (!organization) return []
-      const title = edge.details?.title
+      const membershipTitleId = edge.details?.membershipTitleId
+      const title =
+        membershipTitleId === undefined
+          ? undefined
+          : (() => {
+              const projection = resolveOrganizationMembershipTitleProjection({
+                catalog: organization.members.titles,
+                membershipTitleId,
+              })
+              return projection.status === 'resolved' ? projection.label : undefined
+            })()
       const lifecycle = edge.details?.lifecycle ?? 'current'
       return [
         {

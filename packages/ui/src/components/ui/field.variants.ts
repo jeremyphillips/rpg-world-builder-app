@@ -33,7 +33,8 @@ import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.
  * - `fieldChipWrapGapClasses` — chip pill row gap only (no vertical pad) inside `ChipsField`
  * - `fieldGroupDescriptionClasses` — group/section hint typography (spacing lives on the legend header)
  * - `fieldGroupLegendHeaderStackClasses` — vertical gap between a group legend and its hint
- * - `fieldGroupLegendHeaderMarginVariants` — space below a legend header (legend alone or legend + hint)
+ * - `fieldGroupLegendHeaderMarginVariants` — legacy legend bottom margin (HeadingPresentation, editable-grid — not FieldGroup body spacing)
+ * - `fieldGroupBodyGapVariants` / `resolveFieldGroupBodyGap` — legend→body spacing scale for FieldGroup (applied on the body relationship)
  * - `fieldGroupLegendSpacingClasses` — section legend header bottom margin (`mb-5` / 20px)
  * - `fieldArrayItemVariants` — chrome around one repeatable array item
  * - `fieldInlineSentenceClasses` — prose + compact control sentence rows
@@ -128,7 +129,7 @@ export const fieldMessageRegionVariants = cva(
   {
     variants: {
       size: {
-        sm: 'has-[*]:pt-1',
+        sm: 'has-[*]:pt-1.5',
         md: 'has-[*]:pt-1.5',
         lg: 'has-[*]:pt-1.5',
       },
@@ -159,10 +160,28 @@ export const fieldRowGapClasses = 'gap-6'
 export const fieldChipWrapGapClasses = 'gap-2'
 export const fieldGroupDescriptionTypographyClasses =
   'font-normal leading-normal text-muted-foreground'
-/** Group/subgroup hint copy — spacing is applied on the legend header wrapper. */
+/** Compact group legend description — 12px caption scale. */
+export const fieldGroupDescriptionCompactTypographyClasses =
+  'text-xs font-normal leading-normal text-muted-foreground'
+/** Group/subgroup hint copy — legend→body spacing lives on FieldGroup body wrapper. */
 export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
-export const fieldGroupLegendHeaderStackClasses = 'flex flex-col gap-2'
+export const fieldGroupLegendHeaderStackVariants = cva('flex flex-col', {
+  variants: {
+    rhythm: {
+      comfortable: 'gap-2',
+      compact: 'gap-1',
+    },
+  },
+  defaultVariants: {
+    rhythm: 'comfortable',
+  },
+})
+
+/** Comfortable default — prefer {@link fieldGroupLegendHeaderStackVariants} when rhythm is known. */
+export const fieldGroupLegendHeaderStackClasses = fieldGroupLegendHeaderStackVariants({
+  rhythm: 'comfortable',
+})
 /** Section-level legend header bottom margin (20px). */
 export const fieldGroupLegendSpacingClasses = 'mb-5'
 /** Subgroup legend header bottom margin (16px). */
@@ -173,6 +192,9 @@ export const fieldGroupLegendTypographyClasses =
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
 export const fieldSubgroupLegendTypographyClasses =
   'text-field-subgroup-legend font-heading leading-none text-foreground'
+/** Compact section/subgroup legend typography — 15px heading scale. */
+export const fieldGroupLegendCompactTypographyClasses =
+  'text-md font-heading leading-none text-foreground'
 /** Repeatable array section legend — matches leaf field label typography. */
 export const fieldLabelTypographyVariants = cva('font-field-label leading-none text-foreground', {
   variants: {
@@ -279,7 +301,7 @@ export type FieldRhythm = 'compact' | 'comfortable'
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
     rhythm: {
-      compact: 'gap-3',
+      compact: 'gap-4',
       comfortable: 'gap-6',
     },
   },
@@ -501,54 +523,172 @@ export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendS
   return size === 'sm' ? 'sm' : 'default'
 }
 
+/**
+ * Legend-row disclosure trigger inside `<FieldGroupLegend>`.
+ * Typography inherits from the parent `<legend>` (`fieldGroupLegendVariants` + density rhythm).
+ */
+export const fieldGroupLegendDisclosureTriggerVariants = cva(
+  cn(
+    'flex min-w-0 flex-1 items-center justify-between gap-2 text-left transition-all',
+    'hover:text-foreground/80',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+  ),
+  {
+    variants: {
+      rhythm: {
+        comfortable: 'py-2',
+        compact: 'py-0',
+      },
+    },
+    defaultVariants: {
+      rhythm: 'comfortable',
+    },
+  },
+)
+
+/** Collapsible panel for legend disclosure — animation only; spacing comes from the field stack. */
+export const fieldGroupLegendDisclosureContentVariants = cva([
+  'overflow-hidden',
+  'data-[state=open]:overflow-visible',
+  'data-[state=closed]:h-0 data-[state=closed]:animate-accordion-up',
+  'data-[state=open]:animate-accordion-down',
+  'data-[state=closed]:pointer-events-none data-[state=closed]:inert',
+])
+
 export const fieldGroupLegendVariants = cva('', {
   variants: {
     size: {
-      section: fieldGroupLegendTypographyClasses,
-      subsection: fieldSubgroupLegendTypographyClasses,
+      section: '',
+      subsection: '',
       array: '',
     },
     scale: {
       default: '',
       sm: '',
     },
+    rhythm: {
+      comfortable: '',
+      compact: '',
+    },
   },
+  compoundVariants: [
+    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendTypographyClasses },
+    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendTypographyClasses },
+    { size: 'section', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
+    { size: 'subsection', rhythm: 'compact', class: fieldGroupLegendCompactTypographyClasses },
+  ],
   defaultVariants: {
     size: 'section',
     scale: 'default',
+    rhythm: 'comfortable',
   },
 })
 
-/** Bottom margin for a field-group legend header — legend alone or legend + hint block. */
+/**
+ * Legacy bottom margin on a legend header block — not the FieldGroup legend→body API.
+ * {@link StandardFieldGroupBody} applies {@link resolveFieldGroupBodyGap} on the body side.
+ */
 export const fieldGroupLegendHeaderMarginVariants = cva('', {
   variants: {
     size: {
-      section: fieldGroupLegendSpacingClasses,
-      subsection: fieldSubgroupLegendSpacingClasses,
+      section: '',
+      subsection: '',
       array: fieldArrayLegendSpacingClasses,
     },
+    rhythm: {
+      comfortable: '',
+      compact: '',
+    },
   },
+  compoundVariants: [
+    { size: 'section', rhythm: 'comfortable', class: fieldGroupLegendSpacingClasses },
+    { size: 'subsection', rhythm: 'comfortable', class: fieldSubgroupLegendSpacingClasses },
+    { size: 'section', rhythm: 'compact', class: 'mb-3' },
+    { size: 'subsection', rhythm: 'compact', class: 'mb-3' },
+  ],
   defaultVariants: {
     size: 'section',
+    rhythm: 'comfortable',
   },
 })
+
+/** Top margin between a FieldGroup legend and its body — composer applies when a body is visible. */
+export const fieldGroupBodyGapVariants = cva('', {
+  variants: {
+    size: {
+      section: '',
+      subsection: '',
+      array: '',
+    },
+    rhythm: {
+      comfortable: '',
+      compact: '',
+    },
+    fieldSize: {
+      sm: '',
+      md: '',
+      lg: '',
+    },
+  },
+  compoundVariants: [
+    { size: 'section', rhythm: 'comfortable', class: 'mt-5' },
+    { size: 'subsection', rhythm: 'comfortable', class: 'mt-4' },
+    { size: 'section', rhythm: 'compact', class: 'mt-3' },
+    { size: 'subsection', rhythm: 'compact', class: 'mt-3' },
+    { size: 'array', fieldSize: 'sm', class: 'mt-1' },
+    { size: 'array', fieldSize: 'md', class: 'mt-1.5' },
+    { size: 'array', fieldSize: 'lg', class: 'mt-1.5' },
+  ],
+  defaultVariants: {
+    size: 'section',
+    rhythm: 'comfortable',
+    fieldSize: 'md',
+  },
+})
+
+export function resolveFieldGroupBodyGap(options: {
+  size: FieldGroupLegendSize
+  rhythm: FieldRhythm
+  fieldSize?: FieldSizeToken
+}): string {
+  const fieldSize = options.fieldSize ?? 'md'
+  if (options.size === 'array') {
+    return fieldGroupBodyGapVariants({ size: 'array', rhythm: options.rhythm, fieldSize })
+  }
+  return fieldGroupBodyGapVariants({
+    size: options.size,
+    rhythm: options.rhythm,
+    fieldSize,
+  })
+}
 
 export type FieldGroupLegendVariantProps = VariantProps<typeof fieldGroupLegendVariants>
 
 /** Typography + header margin for `<legend>` on groups and subgroups. */
 export function resolveFieldGroupLegendClassName(
-  options: FieldGroupLegendVariantProps & { fieldSize?: FieldSizeToken } = {},
+  options: FieldGroupLegendVariantProps & {
+    fieldSize?: FieldSizeToken
+    rhythm?: FieldRhythm
+  } = {},
 ): string {
   const size = options.size ?? 'section'
+  const rhythm = options.rhythm ?? 'comfortable'
   if (size === 'array') {
     return resolveArrayLegendClassName(options.fieldSize ?? 'sm')
   }
-  return cn(fieldGroupLegendVariants(options), fieldGroupLegendHeaderMarginVariants({ size }))
+  return cn(
+    fieldGroupLegendVariants({ size, scale: options.scale, rhythm }),
+    fieldGroupLegendHeaderMarginVariants({ size, rhythm }),
+  )
 }
 
 /** Stack + bottom margin for a legend/hint header block nested inside `<legend>`. */
 export function resolveFieldGroupLegendHeaderStackClassName(
   size: NonNullable<FieldGroupLegendVariantProps['size']> = 'section',
+  rhythm: FieldRhythm = 'comfortable',
 ): string {
-  return cn(fieldGroupLegendHeaderStackClasses, fieldGroupLegendHeaderMarginVariants({ size }))
+  return cn(
+    fieldGroupLegendHeaderStackVariants({ rhythm }),
+    fieldGroupLegendHeaderMarginVariants({ size, rhythm }),
+  )
 }

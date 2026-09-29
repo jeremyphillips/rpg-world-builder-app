@@ -35,7 +35,7 @@ const TAB_OWNERSHIP_EXEMPT: Readonly<Record<string, readonly string[]>> = {
   classes: ['slug', 'subclasses'],
   species: ['slug', 'culture'],
   equipment: ['slug', 'kind'],
-  organizations: ['slug', 'sourcePresetId'],
+  organizations: ['slug', 'startingPointId'],
   feats: ['slug'],
   locations: ['slug'],
   'skill-proficiencies': ['slug', 'examples'],

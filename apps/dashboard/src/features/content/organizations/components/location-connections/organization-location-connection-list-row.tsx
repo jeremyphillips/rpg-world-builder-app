@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
 
 import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -148,10 +148,10 @@ export function OrganizationLocationConnectionListRow({
   })
 
   return (
-    <RelationshipList.Row
-      title={presentation.heading}
-      href={item.target?.href}
-      headingSuffix={presentation.headingSuffix}
+    <EntityRowList.Row
+      heading={presentation.heading}
+      headingHref={item.target?.href}
+      classification={presentation.headingSuffix}
       description={presentation.supportingText}
       status={
         item.target == null ? [{ kind: 'badge', label: 'Unavailable', tone: 'warning' }] : undefined

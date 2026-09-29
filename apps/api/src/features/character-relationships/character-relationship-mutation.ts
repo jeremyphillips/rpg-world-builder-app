@@ -4,6 +4,7 @@ import type {
   CharacterRelationshipEdge,
   CreateCharacterRelationshipCommand,
   DeleteCharacterRelationshipInput,
+  MembershipRelationshipDetails,
   ReplaceCharacterRelationshipCommand,
   UpdateCharacterRelationshipInput,
 } from '@rpg/contracts'
@@ -12,6 +13,7 @@ import { HttpError } from '../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../lib/mongo-transaction'
 import type { WithMongoSession } from '../../lib/mongo-session'
 import { assertCreateCharacterRelationshipEndpoints } from './lib/assert-relationship-endpoints'
+import { assertOrganizationMembershipTitleIdForRelationshipWrite } from './lib/validate-organization-membership-title.lib'
 import {
   createCharacterRelationshipRecord,
   deleteCharacterRelationshipRecord,
@@ -90,6 +92,13 @@ export async function createCharacterRelationshipRecordCommand(input: {
   }
 
   await assertCreateCharacterRelationshipEndpoints(input.campaignId, input.command.relationship)
+
+  if (input.command.relationship.kind === 'organizationMembership') {
+    await assertOrganizationMembershipTitleIdForRelationshipWrite({
+      organizationId: input.command.relationship.organizationId,
+      details: input.command.relationship.details,
+    })
+  }
 
   const relationshipId = randomUUID()
 
@@ -175,6 +184,13 @@ export async function updateCharacterRelationshipRecordCommand(input: {
   const existing = await findCharacterRelationshipById(input.campaignId, input.relationshipId)
   if (!existing) {
     throw new HttpError(404, 'not_found', 'Character relationship not found.')
+  }
+
+  if (existing.kind === 'organizationMembership' && input.body.details !== undefined) {
+    await assertOrganizationMembershipTitleIdForRelationshipWrite({
+      organizationId: existing.organizationId,
+      details: input.body.details as MembershipRelationshipDetails,
+    })
   }
 
   const nextIsPrimary =
@@ -291,6 +307,13 @@ export async function replaceCharacterRelationshipRecordCommand(input: {
   }
 
   await assertCreateCharacterRelationshipEndpoints(input.campaignId, input.command.relationship)
+
+  if (input.command.relationship.kind === 'organizationMembership') {
+    await assertOrganizationMembershipTitleIdForRelationshipWrite({
+      organizationId: input.command.relationship.organizationId,
+      details: input.command.relationship.details,
+    })
+  }
 
   const relationshipId = randomUUID()
 

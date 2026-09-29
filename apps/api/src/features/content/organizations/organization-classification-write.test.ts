@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Organization } from '@rpg/contracts'
+import { snapshotOrganizationMembershipTitlesFromPreset, type Organization } from '@rpg/contracts'
 
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -12,6 +12,11 @@ import {
 import { organizationWriteConfig, toHomebrewOrganization } from './organizations.config'
 
 useIntegrationDb()
+
+function bankMembershipTitles() {
+  let count = 0
+  return snapshotOrganizationMembershipTitlesFromPreset('bank', () => `seed-${++count}`)
+}
 
 describe('organization classification writes', () => {
   it('creates and updates organizations with an optional reusable form', async () => {
@@ -155,8 +160,9 @@ describe('organization classification writes', () => {
     })
   })
 
-  it('snapshots membership titles from sourcePresetId at the create boundary', async () => {
+  it('persists explicit membership titles supplied at create', async () => {
     const campaign = await makeTestCampaign()
+    const titles = bankMembershipTitles()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'river-bank',
       name: 'River Bank',
@@ -164,10 +170,10 @@ describe('organization classification writes', () => {
       organizationForm: 'company',
       functions: ['finance'],
       practices: ['banking'],
-      sourcePresetId: 'bank',
+      members: { classAffinityIds: [], speciesAffinityIds: [], titles },
     })
 
-    expect(created.sourcePresetId).toBe('bank')
+    expect(created).not.toHaveProperty('sourcePresetId')
     expect(created.members.titles).toHaveLength(7)
     expect(created.members.titles[0]).toMatchObject({
       sourceTitleId: 'treasurer',
@@ -184,7 +190,11 @@ describe('organization classification writes', () => {
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: bankMembershipTitles(),
+      },
     })
 
     const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
@@ -193,7 +203,6 @@ describe('organization classification writes', () => {
     })
 
     expect(updated.members.titles).toEqual(created.members.titles)
-    expect(updated.sourcePresetId).toBe('bank')
   })
 
   it('preserves titles, sibling affinity, and connections when only classAffinityIds is PATCHed', async () => {
@@ -202,10 +211,10 @@ describe('organization classification writes', () => {
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
       members: {
         classAffinityIds: ['class-fighter'],
         speciesAffinityIds: ['species-human'],
+        titles: bankMembershipTitles(),
       },
     })
 
@@ -235,10 +244,10 @@ describe('organization classification writes', () => {
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
       members: {
         classAffinityIds: ['class-fighter'],
         speciesAffinityIds: ['species-human'],
+        titles: bankMembershipTitles(),
       },
     })
 
@@ -266,24 +275,7 @@ describe('organization classification writes', () => {
     ])
   })
 
-  it('does not change sourcePresetId when provenance is sent on classification PATCH', async () => {
-    const campaign = await makeTestCampaign()
-    const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
-      slug: 'river-bank',
-      name: 'River Bank',
-      organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
-    })
-
-    const updated = await updateContentEntity(organizationWriteConfig, campaign.id, created.id, {
-      sourcePresetId: 'army',
-      organizationDomain: 'government',
-    })
-
-    expect(updated.sourcePresetId).toBe('bank')
-  })
-
-  it('persists explicit members.titles on manual create without sourcePresetId', async () => {
+  it('persists explicit members.titles on manual create', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'sealed-order',
@@ -302,7 +294,6 @@ describe('organization classification writes', () => {
       },
     })
 
-    expect(created).not.toHaveProperty('sourcePresetId')
     expect(created.members.titles).toEqual([
       {
         id: 'omt_custom',
@@ -318,7 +309,11 @@ describe('organization classification writes', () => {
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: bankMembershipTitles(),
+      },
     })
 
     const doc = await HomebrewOrganizationModel.findById(created.id).lean<
@@ -335,13 +330,17 @@ describe('organization classification writes', () => {
     )
   })
 
-  it('duplicates members.titles with new omt_* ids and omits sourcePresetId', async () => {
+  it('duplicates members.titles with new omt_* ids', async () => {
     const campaign = await makeTestCampaign()
     const created = await createHomebrewContent(organizationWriteConfig, campaign.id, {
       slug: 'river-bank',
       name: 'River Bank',
       organizationDomain: 'commercial',
-      sourcePresetId: 'bank',
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: bankMembershipTitles(),
+      },
     })
 
     const { entity } = await duplicateContentEntity({
@@ -352,7 +351,7 @@ describe('organization classification writes', () => {
     })
     const duplicate = entity as Organization
 
-    expect(duplicate.sourcePresetId).toBeUndefined()
+    expect(duplicate).not.toHaveProperty('sourcePresetId')
     expect(duplicate.members.titles).toHaveLength(created.members.titles.length)
     for (let index = 0; index < created.members.titles.length; index += 1) {
       const source = created.members.titles[index]!

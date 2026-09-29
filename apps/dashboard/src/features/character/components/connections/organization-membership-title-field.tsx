@@ -5,7 +5,7 @@ import { buildOrganizationMembershipTitleRadioOptions } from '../../lib/organiza
 
 export type OrganizationMembershipTitleFieldProps = {
   titles: readonly OrganizationMembershipTitleDefinition[]
-  value: string
+  value: string | undefined
   onValueChange: (value: string) => void
   idPrefix: string
 }
@@ -19,7 +19,7 @@ export function OrganizationMembershipTitleField({
 }: OrganizationMembershipTitleFieldProps) {
   const options = buildOrganizationMembershipTitleRadioOptions({
     titles,
-    currentValue: value,
+    currentMembershipTitleId: value,
   })
 
   return (
@@ -27,7 +27,7 @@ export function OrganizationMembershipTitleField({
       id={`${idPrefix}-title`}
       label="Title"
       options={options}
-      value={value}
+      value={value ?? ''}
       onValueChange={onValueChange}
     />
   )

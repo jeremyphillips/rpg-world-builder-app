@@ -40,6 +40,7 @@ import { createWithDeferredCampaignAccess } from '../../../campaign-access/creat
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../campaign-access/campaign-access-labels'
 import { useContentFormSubmit } from '../submit/content-form-submit'
 import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
+import { resolveContentFormCreateDefaultValues } from '../../registry/content-form-registry'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -182,7 +183,7 @@ function ContentCreateFormBody({
         ctx={ctx}
         schema={resolveContentFormSchema(def, ctx, 'draft')}
         defaultValues={{
-          ...def.createDefaultValues,
+          ...resolveContentFormCreateDefaultValues(def),
           ...initialValues,
           media: emptyContentMediaSchema,
         }}

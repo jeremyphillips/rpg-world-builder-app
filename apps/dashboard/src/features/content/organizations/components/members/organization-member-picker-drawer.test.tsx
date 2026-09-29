@@ -124,28 +124,28 @@ describe('OrganizationMemberPickerDrawer', () => {
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     expect(props.onAdd).not.toHaveBeenCalled()
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
-
     await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
     await user.click(screen.getByRole('button', { name: 'Add member' }))
 
     expect(props.onAdd).toHaveBeenCalledWith({
       characterId: 'char-1',
       characterType: 'pc',
-      title: 'Guildmaster',
-      priority: 50,
+      membershipTitleId: 'omt_guildmaster',
     })
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('omits title and priority when No title stays selected', async () => {
+  it('requires an explicit title when the catalog has multiple titles', async () => {
     const user = userEvent.setup()
     const { props } = renderPicker()
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     await user.click(screen.getByRole('button', { name: 'Add member' }))
 
-    expect(props.onAdd).toHaveBeenCalledWith({ characterId: 'char-1', characterType: 'pc' })
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Choose a membership title before adding this member.',
+    )
+    expect(props.onAdd).not.toHaveBeenCalled()
   })
 
   it('filters candidates by search', async () => {
@@ -165,6 +165,7 @@ describe('OrganizationMemberPickerDrawer', () => {
     })
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
     await user.click(screen.getByRole('button', { name: 'Add member' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')
