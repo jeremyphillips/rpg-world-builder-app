@@ -36,7 +36,7 @@ export const Default: Story = {
     <OpenEditDrawer
       organization={lanternGuild}
       characterName="Frug Daergel"
-      currentTitle="Guildmaster"
+      currentMembershipTitleId="omt_guildmaster"
     />
   ),
 }
@@ -46,7 +46,7 @@ export const HistoricalTitle: Story = {
     <OpenEditDrawer
       organization={lanternGuild}
       characterName="Frug Daergel"
-      currentTitle="Custom Chronicler"
+      currentMembershipTitleId="omt_guildmaster"
     />
   ),
 }

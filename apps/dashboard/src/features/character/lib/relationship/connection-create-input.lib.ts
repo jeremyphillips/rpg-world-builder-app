@@ -50,18 +50,17 @@ export function buildPersonRelationshipCreateInput(
 export function buildOrganizationMembershipCreateInput(
   focalCharacterId: string,
   organizationId: string,
-  details?: { title?: string; priority?: number },
+  details?: { membershipTitleId?: string },
 ): CreateCharacterRelationshipInput {
   return {
     kind: 'organizationMembership',
     characterId: focalCharacterId,
     organizationId,
-    ...(details?.title !== undefined || details?.priority !== undefined
+    ...(details?.membershipTitleId !== undefined
       ? {
           details: {
             lifecycle: 'current' as const,
-            ...(details.title !== undefined ? { title: details.title } : {}),
-            ...(details.priority !== undefined ? { priority: details.priority } : {}),
+            membershipTitleId: details.membershipTitleId,
           },
         }
       : {}),

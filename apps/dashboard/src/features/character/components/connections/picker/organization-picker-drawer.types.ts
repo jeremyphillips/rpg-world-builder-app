@@ -20,10 +20,10 @@ export type OrganizationPickerItem = {
   selected: boolean
 }
 
-/** Add-flow payload — `title`/`priority` are stamped together by the contracts metadata helper. */
+/** Add-flow payload — optional catalog title id validated on the API write path. */
 export type OrganizationMembershipSelection = Pick<
   CharacterOrganizationConnection,
-  'organizationId' | 'title' | 'priority'
+  'organizationId' | 'membershipTitleId'
 >
 
 export type OrganizationPickerDrawerProps = {

@@ -17,6 +17,8 @@ export const organizationMembershipFormRowSchema = z.object({
   relationshipId: z.string().min(1),
   revision: z.number().int().positive().optional(),
   organizationId: z.string().min(1),
+  membershipTitleId: z.string().optional(),
+  titleReferenceStatus: z.enum(['none', 'resolved', 'broken']).optional(),
   title: z.string().optional(),
   priority: z.number().int().optional(),
 })
@@ -76,14 +78,13 @@ export function createApiResidenceRow(locationId: string): ResidenceFormRow & { 
 function membershipDetailsFromRow(
   row: OrganizationMembershipFormRow,
 ): MembershipRelationshipDetails | undefined {
-  if (row.title === undefined && row.priority === undefined) {
+  if (row.membershipTitleId === undefined) {
     return undefined
   }
 
   return {
     lifecycle: 'current',
-    ...(row.title !== undefined ? { title: row.title } : {}),
-    ...(row.priority !== undefined ? { priority: row.priority } : {}),
+    membershipTitleId: row.membershipTitleId,
   }
 }
 
@@ -118,8 +119,9 @@ export function draftEdgeToOrganizationMembershipRow(
   return {
     relationshipId: edge.id,
     organizationId: edge.organizationId,
-    ...(edge.details?.title !== undefined ? { title: edge.details.title } : {}),
-    ...(edge.details?.priority !== undefined ? { priority: edge.details.priority } : {}),
+    ...(edge.details?.membershipTitleId !== undefined
+      ? { membershipTitleId: edge.details.membershipTitleId }
+      : {}),
   }
 }
 
@@ -189,12 +191,25 @@ export function organizationMembershipProjectionToFormRow(
 ): OrganizationMembershipFormRow {
   const details = membershipDetailsFromProjection(row)
 
+  const projected = details as {
+    membershipTitleId?: string
+    titleReferenceStatus?: 'none' | 'resolved' | 'broken'
+    title?: string
+    priority?: number
+  }
+
   return {
     relationshipId: row.relationshipId,
     revision: row.revision,
     organizationId: row.target?.type === 'organization' ? row.target.id : '',
-    ...(details.title !== undefined ? { title: details.title } : {}),
-    ...(details.priority !== undefined ? { priority: details.priority } : {}),
+    ...(projected.membershipTitleId !== undefined
+      ? { membershipTitleId: projected.membershipTitleId }
+      : {}),
+    ...(projected.titleReferenceStatus !== undefined
+      ? { titleReferenceStatus: projected.titleReferenceStatus }
+      : {}),
+    ...(projected.title !== undefined ? { title: projected.title } : {}),
+    ...(projected.priority !== undefined ? { priority: projected.priority } : {}),
   }
 }
 
@@ -215,12 +230,25 @@ export function organizationMembershipProjectionToSheetRow(
   const details = membershipDetailsFromProjection(row)
   const organizationId = row.target?.type === 'organization' ? row.target.id : ''
 
+  const projected = details as {
+    membershipTitleId?: string
+    titleReferenceStatus?: 'none' | 'resolved' | 'broken'
+    title?: string
+    priority?: number
+  }
+
   return {
     relationshipId: row.relationshipId,
     revision: row.revision,
     organizationId,
-    ...(details.title !== undefined ? { title: details.title } : {}),
-    ...(details.priority !== undefined ? { priority: details.priority } : {}),
+    ...(projected.membershipTitleId !== undefined
+      ? { membershipTitleId: projected.membershipTitleId }
+      : {}),
+    ...(projected.titleReferenceStatus !== undefined
+      ? { titleReferenceStatus: projected.titleReferenceStatus }
+      : {}),
+    ...(projected.title !== undefined ? { title: projected.title } : {}),
+    ...(projected.priority !== undefined ? { priority: projected.priority } : {}),
     organization: null,
   }
 }
@@ -291,8 +319,7 @@ export function organizationMembershipFormRowContentEqual(
 ): boolean {
   return (
     left.organizationId === right.organizationId &&
-    left.title === right.title &&
-    left.priority === right.priority
+    left.membershipTitleId === right.membershipTitleId
   )
 }
 

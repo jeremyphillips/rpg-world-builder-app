@@ -19,7 +19,7 @@ describe('characterRelationshipEdgeSchema', () => {
       kind: 'organizationMembership',
       characterId: 'pc-1',
       organizationId: 'org-1',
-      details: { lifecycle: 'current', title: 'Captain' },
+      details: { lifecycle: 'current', membershipTitleId: 'omt_captain' },
     })
 
     expect(parsed.kind).toBe('organizationMembership')

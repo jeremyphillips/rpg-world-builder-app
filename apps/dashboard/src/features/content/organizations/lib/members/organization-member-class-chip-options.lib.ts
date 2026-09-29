@@ -11,7 +11,7 @@ import {
 } from './organization-member-class-discoverable.lib'
 
 export const ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT =
-  'Classes commonly associated with members of this organization. Used to recommend classes when adding or creating members.'
+  'Classes commonly associated with members.'
 
 export const CONTENT_REFERENCE_UNRESOLVED_SUFFIX = '· Unresolved reference'
 

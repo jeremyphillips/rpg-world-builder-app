@@ -105,9 +105,11 @@ describe('FieldsetChromeFrame', () => {
 
     const fieldset = container.querySelector('fieldset')
     const error = screen.getByRole('alert')
+    const shell = fieldset?.parentElement?.parentElement
 
-    expect(fieldset?.parentElement).toContainElement(error)
-    expect(fieldset?.parentElement).toHaveClass('gap-y-1.5')
+    expect(shell).toContainElement(fieldset)
+    expect(shell).toContainElement(error)
+    expect(fieldset?.parentElement).toHaveClass('flex', 'flex-col')
     expect(fieldset).toHaveClass('gap-y-1.5')
   })
 
@@ -134,6 +136,39 @@ describe('FieldsetChromeFrame', () => {
     expect(legend).not.toHaveClass('contents')
     expect(fieldset?.querySelector(':scope > div.font-field-label')).toBeNull()
     expect(screen.getByTestId('movement-row')).toBeVisible()
+  })
+
+  it('renders below-control hints in the message region with compact top padding', () => {
+    render(
+      <FieldsetChromeFrame
+        size="sm"
+        hint="Pick one."
+        hintPosition="below-control"
+        hintId="scores-hint"
+        errorId="scores-error"
+        fieldsetProps={{ id: 'scores-fieldset' }}
+      >
+        <FieldsetChromeAnatomy
+          size="sm"
+          hintPosition="below-control"
+          hint="Pick one."
+          hintId="scores-hint"
+          legend={
+            <legend id="scores-legend">
+              <FieldLabelContent label="Ability scores" />
+            </legend>
+          }
+        >
+          <div data-testid="chip-wrap">chips</div>
+        </FieldsetChromeAnatomy>
+      </FieldsetChromeFrame>,
+    )
+
+    const hint = screen.getByText('Pick one.')
+    const messageRegion = hint.closest('[data-field-message-region]')
+    expect(messageRegion).toBeTruthy()
+    expect(messageRegion).toHaveClass('has-[*]:pt-1.5')
+    expect(screen.getByTestId('chip-wrap').closest('fieldset')?.contains(hint)).toBe(false)
   })
 
   it('uses contents on the legend so fieldset gap applies to the label cluster', () => {

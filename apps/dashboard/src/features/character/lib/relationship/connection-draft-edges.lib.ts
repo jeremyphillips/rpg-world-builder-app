@@ -83,22 +83,17 @@ export function createPropertyDraftEdge(
 
 export function createOrganizationMembershipDraftEdge(
   organizationId: string,
-  details?: { title?: string; priority?: number },
+  details: { membershipTitleId: string },
 ): CharacterRelationshipDraftEdge {
   return {
     id: crypto.randomUUID(),
     kind: 'organizationMembership',
     characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
     organizationId,
-    ...(details?.title !== undefined || details?.priority !== undefined
-      ? {
-          details: {
-            lifecycle: 'current' as const,
-            ...(details.title !== undefined ? { title: details.title } : {}),
-            ...(details.priority !== undefined ? { priority: details.priority } : {}),
-          },
-        }
-      : {}),
+    details: {
+      lifecycle: 'current' as const,
+      membershipTitleId: details.membershipTitleId,
+    },
   }
 }
 
@@ -107,7 +102,7 @@ export function updateDraftEdgeDetails(
   patch: Record<string, unknown>,
 ): CharacterRelationshipDraftEdge {
   if (edge.kind === 'organizationMembership') {
-    const currentDetails = edge.details ?? { lifecycle: 'current' as const }
+    const currentDetails = edge.details ?? { lifecycle: 'current' as const, membershipTitleId: '' }
     return {
       ...edge,
       details: {

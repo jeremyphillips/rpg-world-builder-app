@@ -1,4 +1,3 @@
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import type {
   QuickNpcCreateContext,
   QuickNpcCreateFormOrganization,
@@ -13,6 +12,19 @@ export const quickNpcTestOrganization = {
   id: 'organization-lantern-guild',
   name: 'Lantern Guild',
   organizationDomain: 'occupational' as const,
+  members: {
+    classAffinityIds: [] as string[],
+    speciesAffinityIds: [] as string[],
+    titles: [
+      {
+        id: 'omt_guildmaster',
+        label: 'Guildmaster',
+        description: 'Head of the guild.',
+        priority: 50 as const,
+        npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+      },
+    ],
+  },
 }
 
 export function quickNpcOrganizationMemberCreateContext(
@@ -53,11 +65,14 @@ export function quickNpcStandaloneSetupValues(
   }
 }
 
-export function quickNpcMemberSetupWithNoTitle(
+export function quickNpcMemberSetupWithChosenTitle(
   overrides: Partial<Omit<QuickNpcOrganizationMemberSetupValues, 'membershipTitle'>> = {},
 ): QuickNpcSetupValues {
   return quickNpcMemberSetupValues({
-    membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+    membershipTitle: 'omt_guildmaster',
     ...overrides,
   })
 }
+
+/** @deprecated Use {@link quickNpcMemberSetupWithChosenTitle}. */
+export const quickNpcMemberSetupWithNoTitle = quickNpcMemberSetupWithChosenTitle

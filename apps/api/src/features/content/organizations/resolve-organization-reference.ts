@@ -1,5 +1,6 @@
 import {
   canResolveSavedContentReference,
+  projectOrganizationMemberMembership,
   type ContentViewer,
   type Organization,
   type OrganizationReferenceResolution,
@@ -77,19 +78,16 @@ export async function resolveCharacterOrganizationReferences({
     kind: 'organizationMembership',
   })
     .select({ organizationId: 1, details: 1 })
-    .lean<Array<{ organizationId?: string; details?: { title?: string; priority?: number } }>>()
+    .lean<Array<{ organizationId?: string; details?: { membershipTitleId?: string } }>>()
 
   if (edges.length === 0) return []
 
   const references = edges.flatMap((edge) => {
     if (!edge.organizationId) return []
-    const title = edge.details?.title
-    const priority = edge.details?.priority
     return [
       {
         organizationId: edge.organizationId,
-        ...(title !== undefined ? { title } : {}),
-        ...(priority !== undefined ? { priority } : {}),
+        membershipTitleId: edge.details?.membershipTitleId,
       },
     ]
   })
@@ -107,12 +105,19 @@ export async function resolveCharacterOrganizationReferences({
   )
 
   return references
-    .map(({ organizationId, title, priority }) => ({
-      organizationId,
-      ...(title !== undefined ? { title } : {}),
-      ...(priority !== undefined ? { priority } : {}),
-      organization: organizationsById.get(organizationId) ?? null,
-    }))
+    .map(({ organizationId, membershipTitleId }) => {
+      const organization = organizationsById.get(organizationId) ?? null
+      const membership = projectOrganizationMemberMembership({
+        catalog: organization?.members.titles ?? [],
+        membershipTitleId,
+      })
+
+      return {
+        organizationId,
+        ...membership,
+        organization,
+      }
+    })
     .sort((left, right) => {
       const leftResolved = left.organization ? 0 : 1
       const rightResolved = right.organization ? 0 : 1

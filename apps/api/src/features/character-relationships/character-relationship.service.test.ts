@@ -21,10 +21,21 @@ beforeAll(async () => {
   await CharacterRelationshipModel.syncIndexes()
 })
 
+const captainTitleId = 'omt_captain'
+const commanderTitleId = 'omt_commander'
+
 const minimalOrganizationInput = {
   slug: 'silver-guard',
   name: 'Silver Guard',
   organizationDomain: 'military',
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [
+      { id: captainTitleId, label: 'Captain', priority: 50 as const },
+      { id: commanderTitleId, label: 'Commander', priority: 40 as const },
+    ],
+  },
 } as const
 
 describe('character relationship services', () => {
@@ -50,7 +61,7 @@ describe('character relationship services', () => {
           kind: 'organizationMembership',
           characterId: npc.id,
           organizationId: organization.id,
-          details: { lifecycle: 'current', title: 'Captain' },
+          details: { lifecycle: 'current', membershipTitleId: captainTitleId },
         },
       },
     })
@@ -60,7 +71,7 @@ describe('character relationship services', () => {
       characterId: npc.id,
       organizationId: organization.id,
       revision: 1,
-      details: { lifecycle: 'current', title: 'Captain' },
+      details: { lifecycle: 'current', membershipTitleId: captainTitleId },
     })
 
     const replayed = await createCharacterRelationshipRecordCommand({
@@ -72,7 +83,7 @@ describe('character relationship services', () => {
           kind: 'organizationMembership',
           characterId: npc.id,
           organizationId: organization.id,
-          details: { lifecycle: 'current', title: 'Captain' },
+          details: { lifecycle: 'current', membershipTitleId: captainTitleId },
         },
       },
     })
@@ -83,11 +94,11 @@ describe('character relationship services', () => {
       relationshipId: created.id,
       body: {
         expectedRevision: 1,
-        details: { title: 'Commander' },
+        details: { membershipTitleId: commanderTitleId },
       },
     })
     expect(updated.revision).toBe(2)
-    expect(updated.details).toMatchObject({ title: 'Commander' })
+    expect(updated.details).toMatchObject({ membershipTitleId: commanderTitleId })
 
     await deleteCharacterRelationshipRecordCommand({
       campaignId,
@@ -120,6 +131,7 @@ describe('character relationship services', () => {
           kind: 'organizationMembership',
           characterId: npc.id,
           organizationId: organization.id,
+          details: { lifecycle: 'current', membershipTitleId: captainTitleId },
         },
       },
     })
@@ -134,6 +146,7 @@ describe('character relationship services', () => {
             kind: 'organizationMembership',
             characterId: npc.id,
             organizationId: organization.id,
+            details: { lifecycle: 'current', membershipTitleId: commanderTitleId },
           },
         },
       }),
@@ -162,7 +175,7 @@ describe('character relationship services', () => {
           kind: 'organizationMembership',
           characterId: npc.id,
           organizationId: organization.id,
-          details: { lifecycle: 'current', title: 'Captain' },
+          details: { lifecycle: 'current', membershipTitleId: captainTitleId },
         },
       },
     })
@@ -177,7 +190,7 @@ describe('character relationship services', () => {
             kind: 'organizationMembership',
             characterId: npc.id,
             organizationId: organization.id,
-            details: { lifecycle: 'current', title: 'Commander' },
+            details: { lifecycle: 'current', membershipTitleId: commanderTitleId },
           },
         },
       }),
@@ -206,6 +219,7 @@ describe('character relationship services', () => {
           kind: 'organizationMembership',
           characterId: npc.id,
           organizationId: organization.id,
+          details: { lifecycle: 'current', membershipTitleId: captainTitleId },
         },
       },
     })
@@ -214,7 +228,7 @@ describe('character relationship services', () => {
       updateCharacterRelationshipRecordCommand({
         campaignId,
         relationshipId: created.id,
-        body: { expectedRevision: 0, details: { title: 'Outdated' } },
+        body: { expectedRevision: 0, details: { membershipTitleId: commanderTitleId } },
       }),
     ).rejects.toMatchObject({ status: 409 })
   })

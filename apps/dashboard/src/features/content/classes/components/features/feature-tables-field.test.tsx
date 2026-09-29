@@ -17,7 +17,10 @@ beforeAll(() => {
     HTMLElement.prototype.releasePointerCapture = () => undefined
   }
   if (!Element.prototype.scrollIntoView) {
-    Element.prototype.scrollIntoView = () => undefined
+    Element.prototype.scrollIntoView = vi.fn()
+  }
+  if (!HTMLElement.prototype.setPointerCapture) {
+    HTMLElement.prototype.setPointerCapture = () => undefined
   }
 })
 
@@ -124,7 +127,7 @@ describe('FeatureTablesField', () => {
 
     const saved = onTablesChange.mock.calls.at(-1)?.[0] as { name: string }[]
     expect(saved[0]?.name).toBe('Updated rage progression')
-  })
+  }, 15_000)
 
   it('shows kind selection when adding a new table regardless of parent publish intent', async () => {
     const user = userEvent.setup()

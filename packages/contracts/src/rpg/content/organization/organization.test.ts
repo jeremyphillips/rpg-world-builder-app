@@ -29,7 +29,11 @@ describe('organization body contracts', () => {
       organizationDomain: 'occupational',
       functions: [],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+      },
       connections: { locations: [] },
     })
 
@@ -63,7 +67,11 @@ describe('organization body contracts', () => {
       name: 'Untitled Organization',
       functions: [],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+      },
       connections: { locations: [] },
     })
   })
@@ -211,7 +219,7 @@ describe('organization authoring inputs', () => {
     })
   })
 
-  it('strips connections, titles, and sourcePresetId from classification PATCH parse output', () => {
+  it('strips connections and titles from classification PATCH parse output', () => {
     expect(
       updateOrganizationInputSchema.parse({
         organizationDomain: 'academic',
@@ -220,17 +228,18 @@ describe('organization authoring inputs', () => {
           classAffinityIds: ['class-fighter'],
           titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
         },
-        sourcePresetId: 'bank',
       }),
     ).toEqual({
       organizationDomain: 'academic',
-      members: { classAffinityIds: ['class-fighter'] },
+      members: {
+        classAffinityIds: ['class-fighter'],
+        titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+      },
     })
 
     expect(
       updateOrganizationDraftInputSchema.parse({
         description: '<p>Notes</p>',
-        sourcePresetId: 'bank',
         connections: { locations: [{ id: 'conn-1', locationId: 'loc-1', kind: 'headquarters' }] },
       }),
     ).toEqual({ description: '<p>Notes</p>' })
@@ -251,21 +260,24 @@ describe('organization authoring inputs', () => {
         name: 'Lantern Guild',
         organizationDomain: 'occupational',
       }).members,
-    ).toEqual({ classAffinityIds: [], speciesAffinityIds: [], titles: [] })
+    ).toEqual({
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+    })
   })
 
-  it('rejects create input that combines sourcePresetId with explicit members.titles', () => {
+  it('accepts create input with explicit members.titles', () => {
     expect(
       createOrganizationInputSchema.safeParse({
         slug: 'lantern-guild',
         name: 'The Lantern Guild',
         organizationDomain: 'occupational',
-        sourcePresetId: 'craft_guild',
         members: {
           titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
         },
       }).success,
-    ).toBe(false)
+    ).toBe(true)
   })
 
   it('accepts partial members affinity updates without titles', () => {
@@ -287,6 +299,8 @@ describe('organization authoring inputs', () => {
       membershipTitles: [{ id: 'omt_legacy', label: 'Boss', priority: 50 }],
     })
     expect(parsed).not.toHaveProperty('membershipTitles')
-    expect(parsed.members.titles).toEqual([])
+    expect(parsed.members.titles).toEqual([
+      { id: 'omt_schema-default', label: 'Member', priority: 10 },
+    ])
   })
 })

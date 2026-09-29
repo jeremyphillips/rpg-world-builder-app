@@ -14,8 +14,8 @@ import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.varian
 
 import { OrganizationMembershipTitleField } from './organization-membership-title-field'
 import {
-  membershipRadioValueFromTitle,
-  titleFromMembershipRadioValue,
+  membershipRadioValueFromMembershipTitleId,
+  membershipTitleIdFromRadioValue,
 } from '../../lib/organization-membership/organization-membership-title.lib'
 import {
   CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
@@ -33,24 +33,32 @@ export function EditOrganizationMembershipDrawer({
   onOpenChange,
   organization,
   characterName,
-  currentTitle,
+  currentMembershipTitleId,
   copy = CHARACTER_SHEET_EDIT_MEMBERSHIP_COPY,
   onSave,
   onRemove,
 }: EditOrganizationMembershipDrawerProps) {
   const [selectedTitle, setSelectedTitle] = React.useState(() =>
-    membershipRadioValueFromTitle(currentTitle),
+    membershipRadioValueFromMembershipTitleId(
+      currentMembershipTitleId,
+      organization.members?.titles ?? [],
+    ),
   )
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
   const [confirmRemoveOpen, setConfirmRemoveOpen] = React.useState(false)
 
   const resetSessionState = React.useCallback(() => {
-    setSelectedTitle(membershipRadioValueFromTitle(currentTitle))
+    setSelectedTitle(
+      membershipRadioValueFromMembershipTitleId(
+        currentMembershipTitleId,
+        organization.members?.titles ?? [],
+      ),
+    )
     setPending(false)
     setSubmitError(null)
     setConfirmRemoveOpen(false)
-  }, [currentTitle])
+  }, [currentMembershipTitleId, organization.members?.titles])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -66,7 +74,12 @@ export function EditOrganizationMembershipDrawer({
     setPending(true)
     setSubmitError(null)
     try {
-      await onSave(titleFromMembershipRadioValue(selectedTitle))
+      if (selectedTitle === undefined || selectedTitle.trim() === '') {
+        setSubmitError('Choose a membership title before saving.')
+        setPending(false)
+        return
+      }
+      await onSave(membershipTitleIdFromRadioValue(selectedTitle))
       onOpenChange(false)
     } catch (error) {
       const message =

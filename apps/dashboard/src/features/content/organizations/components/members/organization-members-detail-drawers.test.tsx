@@ -61,7 +61,11 @@ const organization = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+  },
   connections: { locations: [] },
 }
 
@@ -128,7 +132,7 @@ describe('OrganizationMembersDetailDrawers', () => {
           members: {
             classAffinityIds: ['class-rogue', 'class-fighter'],
             speciesAffinityIds: ['species-elf'],
-            titles: [],
+            titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
           },
         }}
         detail={createDetail({ drawerState: { mode: 'createNpc' } })}

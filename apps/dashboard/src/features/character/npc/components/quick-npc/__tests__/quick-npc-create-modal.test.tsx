@@ -84,7 +84,11 @@ const buildContext = createCampaignNpcBuilderContextFixture({
         organizationDomain: organization.organizationDomain,
         functions: [],
         practices: [],
-        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [...organization.members.titles],
+        },
         connections: { locations: [] },
       },
     ],
@@ -137,9 +141,9 @@ async function selectBuildCardClass(user: ReturnType<typeof userEvent.setup>, cl
 }
 
 async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
-  const noTitleRadio = screen.queryByRole('radio', { name: /no title/i })
-  if (noTitleRadio) {
-    await user.click(noTitleRadio)
+  const titleRadio = screen.queryByRole('radio', { name: /guildmaster/i })
+  if (titleRadio) {
+    await user.click(titleRadio)
   }
 
   const dwarfRadio = screen.queryByRole('radio', { name: /dwarf/i })
@@ -178,11 +182,11 @@ describe('QuickNpcCreateModal', () => {
     const user = userEvent.setup()
     renderModal()
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
     expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
@@ -197,7 +201,7 @@ describe('QuickNpcCreateModal', () => {
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
     ).not.toBeInTheDocument()
@@ -215,7 +219,7 @@ describe('QuickNpcCreateModal', () => {
     const user = userEvent.setup()
     renderModal()
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
@@ -231,14 +235,14 @@ describe('QuickNpcCreateModal', () => {
     const user = userEvent.setup()
     renderModal()
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     await screen.findByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL })
     await setBuildCardLevel(user, '3')
     await selectBuildCardClass(user, /fighter/i)
 
     await user.click(screen.getByRole('button', { name: 'Change title' }))
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(
@@ -253,11 +257,11 @@ describe('QuickNpcCreateModal', () => {
     const user = userEvent.setup()
     renderModal()
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(screen.getByText('No title')).toBeInTheDocument()
+    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
     expect(
@@ -273,7 +277,7 @@ describe('QuickNpcCreateModal', () => {
 
     await completeSetup(user)
     await user.click(screen.getByRole('button', { name: 'Change role' }))
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
 
     expect(screen.getByRole('button', { name: 'Details' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
@@ -423,7 +427,11 @@ describe('QuickNpcCreateModal', () => {
               organizationDomain: organization.organizationDomain,
               functions: [],
               practices: [],
-              members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
+              members: {
+                classAffinityIds: [rogueClass.id],
+                speciesAffinityIds: [],
+                titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+              },
               connections: { locations: [] },
             },
           ],
@@ -433,12 +441,16 @@ describe('QuickNpcCreateModal', () => {
         kind: 'organization-member',
         organization: {
           ...organization,
-          members: { classAffinityIds: [rogueClass.id], speciesAffinityIds: [], titles: [] },
+          members: {
+            classAffinityIds: [rogueClass.id],
+            speciesAffinityIds: [],
+            titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+          },
         },
       },
     })
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     await setBuildCardLevel(user, '1')
 
@@ -477,7 +489,7 @@ describe('QuickNpcCreateModal', () => {
               members: {
                 classAffinityIds: [rogueClass.id, quickFighter.id],
                 speciesAffinityIds: [],
-                titles: [],
+                titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
               },
               connections: { locations: [] },
             },
@@ -491,13 +503,13 @@ describe('QuickNpcCreateModal', () => {
           members: {
             classAffinityIds: [rogueClass.id, quickFighter.id],
             speciesAffinityIds: [],
-            titles: [],
+            titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
           },
         },
       },
     })
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     await setBuildCardLevel(user, '1')
 
@@ -540,7 +552,7 @@ describe('QuickNpcCreateModal', () => {
               members: {
                 classAffinityIds: [rogueClass.id, quickFighter.id],
                 speciesAffinityIds: [],
-                titles: [],
+                titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
               },
               connections: { locations: [] },
             },
@@ -554,13 +566,13 @@ describe('QuickNpcCreateModal', () => {
           members: {
             classAffinityIds: [rogueClass.id, quickFighter.id],
             speciesAffinityIds: [],
-            titles: [],
+            titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
           },
         },
       },
     })
 
-    await user.click(screen.getByRole('radio', { name: /no title/i }))
+    await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     await setBuildCardLevel(user, '1')
     await selectBuildCardClass(user, /rogue/i)
@@ -629,7 +641,7 @@ describe('QuickNpcCreateModal standalone context', () => {
 
     expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_HEADLINE)).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_DESCRIPTION)).toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: /no title/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /guildmaster/i })).not.toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
   })
 

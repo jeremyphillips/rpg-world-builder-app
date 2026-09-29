@@ -1,7 +1,7 @@
 import type { CampaignOverviewMemberListItem } from '@rpg/contracts'
 import { ActionButton, Text } from '@rpg/ui'
 
-import { DetailCollectionPanel, RelationshipList } from '@/features/content'
+import { DetailCollectionPanel, EntityRowList } from '@/features/content'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -45,12 +45,12 @@ export function CampaignOverviewMembersSection({
         ) : undefined
       }
     >
-      <RelationshipList.Root
+      <EntityRowList.Root
         itemCount={members.length}
         emptyLabel={CAMPAIGN_OVERVIEW_EMPTY_TEXT.members}
       >
         {members.length > 0 ? (
-          <RelationshipList.Group itemCount={members.length}>
+          <EntityRowList.Group itemCount={members.length}>
             {members.map((member) =>
               campaignId ? (
                 <CampaignOverviewMemberRow
@@ -60,14 +60,14 @@ export function CampaignOverviewMembersSection({
                 />
               ) : null,
             )}
-          </RelationshipList.Group>
+          </EntityRowList.Group>
         ) : null}
         {members.length > 0 && !hasPlayers ? (
-          <RelationshipList.Supplementary>
+          <EntityRowList.Supplementary>
             <Text variant="muted">{CAMPAIGN_OVERVIEW_EMPTY_TEXT.members}</Text>
-          </RelationshipList.Supplementary>
+          </EntityRowList.Supplementary>
         ) : null}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </DetailCollectionPanel>
   )
 }

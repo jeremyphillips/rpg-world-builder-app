@@ -26,6 +26,8 @@ const organizationAuthoringPresetIdSchema = z.enum(
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX = 'omt_' as const
 
+export const ORGANIZATION_DEFAULT_MEMBERSHIP_TITLE_LABEL = 'Member' as const
+
 type GlobalWithWebCrypto = typeof globalThis & {
   crypto?: {
     randomUUID?: () => string
@@ -47,6 +49,16 @@ export function createOrganizationMembershipTitleId(
   return `${ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX}${createId()}`
 }
 
+export function createDefaultOrganizationMembershipTitleDefinition(
+  createId: () => string = createDefaultOrganizationMembershipTitleUuid,
+): OrganizationMembershipTitleDefinition {
+  return {
+    id: createOrganizationMembershipTitleId(createId),
+    label: ORGANIZATION_DEFAULT_MEMBERSHIP_TITLE_LABEL,
+    priority: ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[4],
+  }
+}
+
 export const organizationMembershipTitlePrioritySchema = z.union([
   z.literal(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[0]),
   z.literal(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[1]),
@@ -64,8 +76,15 @@ export type OrganizationPresetNpcRecommendation = z.infer<
   typeof organizationPresetNpcRecommendationSchema
 >
 
+export const organizationMembershipTitleIdSchema = z
+  .string()
+  .min(1)
+  .refine((id) => id.startsWith(ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX), {
+    message: 'Organization membership title id must use the omt_ prefix.',
+  })
+
 export const organizationMembershipTitleDefinitionSchema = z.object({
-  id: z.string().min(1),
+  id: organizationMembershipTitleIdSchema,
   sourceTitleId: vocabularyOptionIdSchema.optional(),
   label: z.string().trim().min(1).max(80),
   description: z.string().trim().min(1).optional(),
@@ -114,12 +133,17 @@ function validateUniqueOrganizationMembershipTitleDefinitions(
   })
 }
 
-export const organizationMembershipTitlesSchema = z
+const organizationMembershipTitleCatalogEntriesSchema = z
   .array(organizationMembershipTitleDefinitionSchema)
   .superRefine((titles, ctx) => {
     validateUniqueOrganizationMembershipTitleDefinitions(titles, ctx)
   })
-  .default([])
+
+export const organizationMembershipTitlesSchema =
+  organizationMembershipTitleCatalogEntriesSchema.min(
+    1,
+    'Organization must have at least one membership title.',
+  )
 
 export function snapshotOrganizationMembershipTitlesFromPreset(
   presetId: OrganizationAuthoringPresetId,
@@ -142,18 +166,35 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
   })
 }
 
-export function resolveOrganizationCreateMembershipTitles(input: {
-  sourcePresetId?: OrganizationAuthoringPresetId
-  titles?: readonly OrganizationMembershipTitleDefinition[]
-  createId?: () => string
-}): OrganizationMembershipTitleDefinition[] {
-  if (input.sourcePresetId !== undefined) {
-    return snapshotOrganizationMembershipTitlesFromPreset(
-      input.sourcePresetId,
-      input.createId ?? createDefaultOrganizationMembershipTitleUuid,
-    )
+/** Automatic picker default only when the catalog has exactly one title. */
+export function resolveSoleOrganizationMembershipTitleId(
+  titles: readonly OrganizationMembershipTitleDefinition[],
+): string | undefined {
+  if (titles.length !== 1) {
+    return undefined
   }
-  return [...(input.titles ?? [])]
+  return titles[0]?.id
+}
+
+/** Resolves membership titles for organization create — materializes Member when absent. */
+export function resolveOrganizationCreateMembershipTitles(input: {
+  titles?: readonly OrganizationMembershipTitleDefinition[]
+}): OrganizationMembershipTitleDefinition[] {
+  const titles = [...(input.titles ?? [])]
+  if (titles.length === 0) {
+    return organizationMembershipTitlesSchema.parse([
+      createDefaultOrganizationMembershipTitleDefinition(),
+    ])
+  }
+  return organizationMembershipTitlesSchema.parse(titles)
+}
+
+export function findRemovedOrganizationMembershipTitleIds(input: {
+  previousCatalog: readonly OrganizationMembershipTitleDefinition[]
+  nextCatalog: readonly OrganizationMembershipTitleDefinition[]
+}): string[] {
+  const nextIds = new Set(input.nextCatalog.map((title) => title.id))
+  return input.previousCatalog.filter((title) => !nextIds.has(title.id)).map((title) => title.id)
 }
 
 export function sortOrganizationMembershipTitleDefinitionsForDisplay<
@@ -172,6 +213,46 @@ export function sortOrganizationMembershipTitleDefinitionsForDisplay<
     .map(({ title }) => title)
 }
 
+type OrganizationMembershipTitleSemanticRow = {
+  normalizedLabel: string
+  priority: OrganizationMembershipTitlePriority
+  sourceTitleId?: string
+}
+
+function organizationMembershipTitleSemanticRows(
+  catalog: readonly OrganizationMembershipTitleDefinition[],
+): OrganizationMembershipTitleSemanticRow[] {
+  return catalog.map((row) => ({
+    normalizedLabel: normalizeOrganizationMembershipTitleLabel(row.label),
+    priority: row.priority,
+    ...(row.sourceTitleId !== undefined ? { sourceTitleId: row.sourceTitleId } : {}),
+  }))
+}
+
+/** Compares catalog shape to a preset snapshot (ignores org-local `omt_*` ids). */
+export function organizationMembershipTitleCatalogMatchesPresetSnapshot(
+  catalog: readonly OrganizationMembershipTitleDefinition[],
+  presetId: OrganizationAuthoringPresetId,
+): boolean {
+  const expected = snapshotOrganizationMembershipTitlesFromPreset(presetId, () => 'semantic-compare')
+  const currentRows = organizationMembershipTitleSemanticRows(catalog)
+  const expectedRows = organizationMembershipTitleSemanticRows(expected)
+  if (currentRows.length !== expectedRows.length) {
+    return false
+  }
+  return currentRows.every((row, index) => {
+    const expectedRow = expectedRows[index]
+    if (!expectedRow) {
+      return false
+    }
+    return (
+      row.normalizedLabel === expectedRow.normalizedLabel &&
+      row.priority === expectedRow.priority &&
+      row.sourceTitleId === expectedRow.sourceTitleId
+    )
+  })
+}
+
 export function resolveOrganizationMembershipTitleDefinitionByLabel(
   catalog: readonly OrganizationMembershipTitleDefinition[],
   title: string,
@@ -183,27 +264,24 @@ export function resolveOrganizationMembershipTitleDefinitionByLabel(
   )
 }
 
-export const organizationSourcePresetIdSchema = organizationAuthoringPresetIdSchema.optional()
-
 export { organizationAuthoringPresetIdSchema }
 
-/** Create input: preset provenance XOR explicit membership title catalog. */
 export function organizationCreateMembershipTitlesInputRefinement(
   value: {
-    sourcePresetId?: OrganizationAuthoringPresetId
     members?: {
       titles?: readonly OrganizationMembershipTitleDefinition[]
     }
   },
   ctx: z.RefinementCtx,
 ): void {
-  const hasPreset = value.sourcePresetId !== undefined
-  const hasTitles = value.members?.titles !== undefined && value.members.titles.length > 0
-  if (hasPreset && hasTitles) {
-    addCustomRefinementIssue(
-      ctx,
-      'Organization create input must not combine sourcePresetId with members.titles.',
-      ['members', 'titles'],
-    )
+  const titles = value.members?.titles
+  if (titles === undefined) {
+    return
+  }
+  if (titles.length === 0) {
+    addCustomRefinementIssue(ctx, 'Organization must have at least one membership title.', [
+      'members',
+      'titles',
+    ])
   }
 }

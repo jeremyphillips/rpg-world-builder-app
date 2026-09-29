@@ -1,6 +1,7 @@
 import { cloneElement, isValidElement, type ComponentProps, type ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { FieldMessageRegion } from './field-anatomy-regions'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintText, type FieldSize } from './field.client'
 import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
@@ -28,6 +29,9 @@ export interface FieldsetChromeAnatomyProps {
 export interface FieldsetChromeFrameProps {
   chrome?: FieldChrome
   size?: FieldSize
+  hint?: string
+  hintPosition?: FieldHintPosition
+  hintId?: string
   error?: string
   errorId: string
   fieldsetProps: ComponentProps<'fieldset'>
@@ -96,26 +100,35 @@ export function FieldsetChromeAnatomy({
   size = 'md',
   hintPosition = 'below-label',
   hint,
-  error,
   hintId,
   legend,
   children,
-}: Omit<FieldsetChromeAnatomyProps, 'errorId'>) {
+}: Omit<FieldsetChromeAnatomyProps, 'errorId' | 'error'>) {
   const belowLabelHint =
     hintPosition === 'below-label' && hint ? (
       <FieldHintBelowLabel hint={hint} hintId={hintId} />
     ) : null
-  const belowControlHint =
-    hintPosition === 'below-control' && hint && !error ? (
-      <FieldHintText id={hintId}>{hint}</FieldHintText>
-    ) : null
-
   return (
     <>
       {wrapLegendCluster(legend, { size, belowLabelHint })}
       {children}
-      {belowControlHint}
     </>
+  )
+}
+
+function FieldsetBelowControlHint({
+  hint,
+  hintId,
+  hintPosition = 'below-label',
+  error,
+  size = 'md',
+}: Pick<FieldsetChromeFrameProps, 'hint' | 'hintId' | 'hintPosition' | 'error' | 'size'>) {
+  if (hintPosition !== 'below-control' || !hint || !hintId || error) return null
+
+  return (
+    <FieldMessageRegion size={size}>
+      <FieldHintText id={hintId}>{hint}</FieldHintText>
+    </FieldMessageRegion>
   )
 }
 
@@ -123,6 +136,9 @@ export function FieldsetChromeAnatomy({
 export function FieldsetChromeFrame({
   chrome,
   size = 'md',
+  hint,
+  hintPosition,
+  hintId,
   error,
   errorId,
   fieldsetProps,
@@ -133,17 +149,26 @@ export function FieldsetChromeFrame({
 
   return (
     <FieldChromeShell chrome={chrome} size={size} className={anatomyStack}>
-      <fieldset
-        {...restFieldsetProps}
-        className={cn(
-          fieldSetResetClasses,
-          fieldSetChromeContainClasses,
-          anatomyStack,
-          fieldsetClassName,
-        )}
-      >
-        {children}
-      </fieldset>
+      <div className="flex min-w-0 flex-col">
+        <fieldset
+          {...restFieldsetProps}
+          className={cn(
+            fieldSetResetClasses,
+            fieldSetChromeContainClasses,
+            anatomyStack,
+            fieldsetClassName,
+          )}
+        >
+          {children}
+        </fieldset>
+        <FieldsetBelowControlHint
+          hint={hint}
+          hintId={hintId}
+          hintPosition={hintPosition}
+          error={error}
+          size={size}
+        />
+      </div>
       <FieldsetChromeError error={error} errorId={errorId} size={size} />
     </FieldChromeShell>
   )

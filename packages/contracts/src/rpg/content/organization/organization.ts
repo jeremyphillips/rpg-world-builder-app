@@ -6,9 +6,9 @@ import { organizationFormSchema } from '../../vocab/organization/form'
 import { organizationPracticeSchema } from '../../vocab/organization/practice'
 import { organizationConnectionsSchema } from './connections'
 import {
+  createDefaultOrganizationMembershipTitleDefinition,
   organizationCreateMembershipTitlesInputRefinement,
   organizationMembershipTitlesSchema,
-  organizationSourcePresetIdSchema,
   type OrganizationMembershipTitleDefinition,
 } from './membership-titles'
 import { createDraftInputSchema } from '../lib/content-input-schemas'
@@ -53,7 +53,9 @@ const defaultOrganizationMembersAffinity = {
 const defaultOrganizationMembers = {
   classAffinityIds: [] as string[],
   speciesAffinityIds: [] as string[],
-  titles: [] as OrganizationMembershipTitleDefinition[],
+  titles: [
+    createDefaultOrganizationMembershipTitleDefinition(() => 'schema-default'),
+  ] as OrganizationMembershipTitleDefinition[],
 }
 
 const organizationMembersAffinityFieldsSchema = z.object({
@@ -61,15 +63,21 @@ const organizationMembersAffinityFieldsSchema = z.object({
   speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.default([]),
 })
 
-/** Classification PATCH — affinities only; never titles. */
 export const organizationMemberAffinitiesUpdateSchema = z.object({
   classAffinityIds: organizationMembersClassAffinityIdsSchema.optional(),
   speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.optional(),
 })
 
+/** Organization update — affinities and/or a full membership title catalog replacement. */
+export const organizationMembersUpdateSchema = organizationMemberAffinitiesUpdateSchema.extend({
+  titles: organizationMembershipTitlesSchema.optional(),
+})
+
 export type OrganizationMemberAffinitiesUpdate = z.infer<
   typeof organizationMemberAffinitiesUpdateSchema
 >
+
+export type OrganizationMembersUpdate = z.infer<typeof organizationMembersUpdateSchema>
 
 export const organizationMembersSchema = organizationMembersAffinityFieldsSchema.extend({
   titles: organizationMembershipTitlesSchema,
@@ -108,7 +116,6 @@ const organizationBodyFieldsSchema = organizationClassificationBodyFieldsSchema
   .omit({ members: true })
   .extend({
     members: organizationMembersSchema.default(defaultOrganizationMembers),
-    sourcePresetId: organizationSourcePresetIdSchema,
   })
 
 /** Publish-complete organization body. */
@@ -124,7 +131,6 @@ const organizationBodyDraftFieldsSchema = mediaBearingDraftAuthoredContentBodySc
   .omit({ members: true })
   .extend({
     members: organizationMembersSchema.default(defaultOrganizationMembers),
-    sourcePresetId: organizationSourcePresetIdSchema,
   })
 
 /** Draft organization body — domain may remain unset until publish. */
@@ -147,9 +153,10 @@ export type OrganizationDraft = z.infer<typeof organizationDraftStoredSchema>
 /** Saved-reference read result; null preserves an explicitly missing/deleted reference. */
 export const organizationReferenceResolutionSchema = z.object({
   organizationId: z.string().min(1),
-  /** Descriptive membership title when present on the character connection. */
+  membershipTitleId: z.string().min(1).optional(),
+  titleReferenceStatus: z.enum(['none', 'resolved', 'broken']).optional(),
+  /** Resolved catalog label when `titleReferenceStatus` is `resolved`. */
   title: z.string().trim().min(1).max(80).optional(),
-  /** Presentation/order precedence when present on the character connection. */
   priority: z.number().int().optional(),
   organization: z.union([organizationSchema, organizationDraftStoredSchema]).nullable(),
 })
@@ -160,7 +167,6 @@ export const createOrganizationInputSchema = organizationClassificationBodyField
   .omit({ members: true })
   .extend({
     slug: slugSchema,
-    sourcePresetId: organizationSourcePresetIdSchema,
     members: organizationMembersWithOptionalTitlesSchema.default(
       defaultOrganizationMembersAffinity,
     ),
@@ -185,19 +191,19 @@ export const updateOrganizationInputSchema = organizationClassificationBodyField
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    members: organizationMemberAffinitiesUpdateSchema.optional(),
+    members: organizationMembersUpdateSchema.optional(),
   })
   .partial()
 
 export type UpdateOrganizationInput = z.infer<typeof updateOrganizationInputSchema>
 
 export const updateOrganizationDraftInputSchema = organizationBodyDraftFieldsSchema
-  .omit({ connections: true, sourcePresetId: true })
+  .omit({ connections: true })
   .extend({
     organizationForm: organizationFormSchema.nullable().optional(),
     functions: organizationFunctionsSchema.optional(),
     practices: organizationPracticesSchema.optional(),
-    members: organizationMemberAffinitiesUpdateSchema.optional(),
+    members: organizationMembersUpdateSchema.optional(),
   })
   .partial()
 

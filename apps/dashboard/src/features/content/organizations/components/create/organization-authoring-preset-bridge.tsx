@@ -2,30 +2,26 @@ import { useEffect, useRef } from 'react'
 import { useWatch } from 'react-hook-form'
 import {
   getOrganizationAuthoringPresetRecommendedPractices,
-  ORGANIZATION_AUTHORING_PRESET_IDS,
   type OrganizationAuthoringPresetId,
 } from '@rpg/contracts'
 
-import { useOrganizationAuthoringContext } from './organization-authoring-context'
-
-function isOrganizationAuthoringPresetId(value: unknown): value is OrganizationAuthoringPresetId {
-  return (
-    typeof value === 'string' &&
-    ORGANIZATION_AUTHORING_PRESET_IDS.includes(value as OrganizationAuthoringPresetId)
-  )
-}
-
-function resolveAuthoringPresetFieldPath(prefix?: string): string {
-  return prefix ? `${prefix}.authoringPresetId` : 'authoringPresetId'
-}
+import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
+import {
+  isOrganizationAuthoringPresetId,
+  organizationStartingPointFieldPath,
+} from '../../lib/presets/organization-starting-point.lib'
 
 export function OrganizationAuthoringPresetBridge({ prefix }: { prefix?: string }) {
   const { setPracticeRecommendations } = useOrganizationAuthoringContext()
-  const presetId = useWatch({ name: resolveAuthoringPresetFieldPath(prefix) })
+  const presetId = useWatch({ name: organizationStartingPointFieldPath(prefix) })
   const lastPositivePresetId = useRef<OrganizationAuthoringPresetId | null>(null)
 
   useEffect(() => {
     if (!isOrganizationAuthoringPresetId(presetId)) {
+      if (lastPositivePresetId.current !== null) {
+        lastPositivePresetId.current = null
+        setPracticeRecommendations([])
+      }
       return
     }
     if (lastPositivePresetId.current === presetId) {

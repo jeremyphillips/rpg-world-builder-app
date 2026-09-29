@@ -51,6 +51,13 @@ const ADDITIONAL_FACTORY_FILES = [
 
 const FACTORY_FILES = [...CONTENT_FACTORY_FILES, ...ADDITIONAL_FACTORY_FILES] as const
 
+type ContentFactoryBoundaryAnalysis = {
+  protectedTypeNames: string[]
+  violations: ContentFactoryBoundaryViolation[]
+}
+
+let cachedAnalysis: ContentFactoryBoundaryAnalysis | undefined
+
 function createDashboardProgram(): ts.Program {
   const dashboardRoot = join(SCAN_ROOT, '..')
   const configPath = ts.findConfigFile(dashboardRoot, ts.sys.fileExists, 'tsconfig.json')
@@ -226,16 +233,35 @@ function scanFile(
   return violations
 }
 
-export function collectContentFactoryBoundaryViolations(): ContentFactoryBoundaryViolation[] {
+function analyzeContentFactoryBoundary(): ContentFactoryBoundaryAnalysis {
   const program = createDashboardProgram()
   const protectedTypes = resolveProtectedTypeNames(program)
   const files = collectSourceFiles(SCAN_ROOT)
 
-  return files
+  const violations = files
     .flatMap((file) => scanFile(file, protectedTypes))
     .sort((left, right) =>
       left.file === right.file ? left.line - right.line : left.file.localeCompare(right.file),
     )
+
+  return {
+    protectedTypeNames: [...protectedTypes].sort(),
+    violations,
+  }
+}
+
+/** One dashboard program + filesystem scan per Vitest worker (shared by all boundary tests). */
+export function getContentFactoryBoundaryAnalysis(): ContentFactoryBoundaryAnalysis {
+  cachedAnalysis ??= analyzeContentFactoryBoundary()
+  return cachedAnalysis
+}
+
+export function collectContentFactoryBoundaryViolations(): ContentFactoryBoundaryViolation[] {
+  return getContentFactoryBoundaryAnalysis().violations
+}
+
+export function collectProtectedContentTypeNames(): string[] {
+  return getContentFactoryBoundaryAnalysis().protectedTypeNames
 }
 
 export function resolveProtectedTypeNamesForTest(program: ts.Program): string[] {

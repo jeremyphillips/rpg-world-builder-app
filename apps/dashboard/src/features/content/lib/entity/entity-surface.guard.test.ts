@@ -93,7 +93,7 @@ describe('entity surface architecture guard', () => {
 
   it('does not use legacy entity trailing or heading link props in feature code', () => {
     const legacyPropPattern =
-      /\b(?:EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard|DetailEntityRow|CrossContentRelationshipRow)[^;\n]*\b(?:action=|href=|endSlot=)/
+      /\b(?:EntityAnatomyHost|ContentEntityCard|DisclosureEntityCard|DetailEntityRow)[^;\n]*\b(?:action=|href=|endSlot=)/
 
     for (const path of featureImplementationFiles()) {
       const relativePath = relative(FEATURE_ROOT, path)

@@ -25,10 +25,21 @@ const getApp = useIntegrationApp()
 
 useIntegrationDb()
 
+const guildmasterTitleId = 'omt_guildmaster'
+const apprenticeTitleId = 'omt_apprentice'
+
 const minimalOrganizationInput = {
   slug: 'iron-circle',
   name: 'Iron Circle',
   organizationDomain: 'military',
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [
+      { id: guildmasterTitleId, label: 'Guildmaster', priority: 50 as const },
+      { id: apprenticeTitleId, label: 'Apprentice', priority: 10 as const },
+    ],
+  },
 } as const
 
 const membersPath = (campaignId: string, organizationId: string) =>
@@ -38,7 +49,7 @@ async function setOrganizationConnection(
   campaignId: string,
   characterId: string,
   organizationId: string,
-  details?: { title?: string; priority?: number },
+  details?: { membershipTitleId?: string },
 ) {
   await seedOrganizationMembershipEdge({
     campaignId,
@@ -233,12 +244,10 @@ describe('resolveOrganizationMembers', () => {
         joinedAt: new Date().toISOString(),
       }),
       setOrganizationConnection(campaign.id, recruit.id, organization.id, {
-        title: 'Apprentice',
-        priority: 10,
+        membershipTitleId: apprenticeTitleId,
       }),
       setOrganizationConnection(campaign.id, master.id, organization.id, {
-        title: 'Guildmaster',
-        priority: 50,
+        membershipTitleId: guildmasterTitleId,
       }),
     ])
 
@@ -254,8 +263,18 @@ describe('resolveOrganizationMembers', () => {
       'Zed Recruit',
     ])
     expect(result?.items.map((entry) => entry.membership)).toEqual([
-      { title: 'Guildmaster', priority: 50 },
-      { title: 'Apprentice', priority: 10 },
+      {
+        membershipTitleId: guildmasterTitleId,
+        titleReferenceStatus: 'resolved',
+        title: 'Guildmaster',
+        priority: 50,
+      },
+      {
+        membershipTitleId: apprenticeTitleId,
+        titleReferenceStatus: 'resolved',
+        title: 'Apprentice',
+        priority: 10,
+      },
     ])
   })
 
@@ -289,7 +308,7 @@ describe('resolveOrganizationMembers', () => {
         expect.objectContaining({
           characterType: 'npc',
           character: expect.objectContaining({ id: npc.id, name: 'Draft Ties' }),
-          membership: {},
+          membership: { titleReferenceStatus: 'none' },
         }),
       ],
       total: 1,
@@ -340,7 +359,7 @@ describe('organization members routes', () => {
         expect.objectContaining({
           characterType: 'npc',
           character: expect.objectContaining({ id: npc.id, name: 'Route Envoy' }),
-          membership: {},
+          membership: { titleReferenceStatus: 'none' },
         }),
       ],
       total: 1,
@@ -372,7 +391,7 @@ describe('organization members routes', () => {
             kind: 'organizationMembership',
             characterId: '__new_character__',
             organizationId,
-            details: { title: 'Guildmaster', priority: 50 },
+            details: { lifecycle: 'current', membershipTitleId: guildmasterTitleId },
           },
         ],
       })
@@ -388,7 +407,12 @@ describe('organization members routes', () => {
         expect.objectContaining({
           characterType: 'npc',
           character: expect.objectContaining({ name: 'Quick Envoy' }),
-          membership: { title: 'Guildmaster', priority: 50 },
+          membership: {
+            membershipTitleId: guildmasterTitleId,
+            titleReferenceStatus: 'resolved',
+            title: 'Guildmaster',
+            priority: 50,
+          },
         }),
       ],
       total: 1,

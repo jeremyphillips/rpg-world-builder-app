@@ -1,11 +1,13 @@
 import * as React from 'react'
 
-import { resolveOrganizationMembershipMetadata } from '@rpg/contracts'
+import {
+  resolveOrganizationMembershipMetadata,
+  resolveSoleOrganizationMembershipTitleId,
+} from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
 import {
   buildCharacterEntityCardModel,
-  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
   OrganizationMembershipTitleField,
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
@@ -97,13 +99,17 @@ export function OrganizationMemberPickerDrawer({
   candidatesLoading,
 }: OrganizationMemberPickerDrawerProps) {
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
-  const [selectedTitle, setSelectedTitle] = React.useState(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+  const soleTitleId = React.useMemo(
+    () => resolveSoleOrganizationMembershipTitleId(organization.members?.titles ?? []),
+    [organization.members?.titles],
+  )
+  const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(soleTitleId)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
   const resetMembershipConfig = React.useCallback(() => {
     setExpandedItemId(null)
-    setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
+    setSelectedTitle(soleTitleId)
     setSubmitError(null)
     setPending(false)
   }, [])
@@ -119,19 +125,27 @@ export function OrganizationMemberPickerDrawer({
     [onOpenChange, pending, resetMembershipConfig],
   )
 
-  const handleExpandedItemChange = React.useCallback((itemId: string | null) => {
-    setExpandedItemId(itemId)
-    setSelectedTitle(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
-    setSubmitError(null)
-  }, [])
+  const handleExpandedItemChange = React.useCallback(
+    (itemId: string | null) => {
+      setExpandedItemId(itemId)
+      setSelectedTitle(soleTitleId)
+      setSubmitError(null)
+    },
+    [soleTitleId],
+  )
 
   const commitMembership = React.useCallback(
     async (candidate: OrganizationMemberPickerCandidate) => {
       if (pending) return
 
-      const { title, priority } = resolveOrganizationMembershipMetadata({
+      if (selectedTitle === undefined || selectedTitle.trim() === '') {
+        setSubmitError('Choose a membership title before adding this member.')
+        return
+      }
+
+      const { membershipTitleId } = resolveOrganizationMembershipMetadata({
         titles: organization.members?.titles ?? [],
-        selectedTitle: titleFromMembershipRadioValue(selectedTitle),
+        selectedMembershipTitleId: titleFromMembershipRadioValue(selectedTitle),
       })
 
       setPending(true)
@@ -140,8 +154,7 @@ export function OrganizationMemberPickerDrawer({
         await onAdd({
           characterId: candidate.id,
           characterType: candidate.characterType,
-          ...(title !== undefined ? { title } : {}),
-          ...(priority !== undefined ? { priority } : {}),
+          membershipTitleId,
         })
         resetMembershipConfig()
         onOpenChange(false)
@@ -243,11 +256,7 @@ export function OrganizationMemberPickerDrawer({
           <div className="flex flex-col gap-4">
             <OrganizationMembershipTitleField
               titles={organization.members?.titles ?? []}
-              value={
-                expandedItemId === candidate.id
-                  ? selectedTitle
-                  : ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
-              }
+              value={expandedItemId === candidate.id ? selectedTitle : soleTitleId}
               onValueChange={setSelectedTitle}
               idPrefix={`organization-member-${candidate.id}`}
             />

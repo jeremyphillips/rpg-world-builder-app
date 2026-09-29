@@ -4,7 +4,6 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   buildQuickNpcContentOptions,
   buildQuickNpcDetailsFields,
@@ -32,7 +31,7 @@ const validValues = {
   classId: 'srd-cc-5.2.1:fighter',
   level: 3,
   alignment: 'ln',
-  membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+  membershipTitle: 'omt_member',
   requiredWeaponIds: [],
   requiredSpellIds: [],
 }
@@ -44,10 +43,8 @@ describe('isQuickNpcMembershipTitleSetupComplete', () => {
     expect(isQuickNpcMembershipTitleSetupComplete('   ')).toBe(false)
   })
 
-  it('treats explicit No title and organization titles as complete', () => {
-    expect(isQuickNpcMembershipTitleSetupComplete(ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)).toBe(
-      true,
-    )
+  it('treats catalog membership title ids as complete', () => {
+    expect(isQuickNpcMembershipTitleSetupComplete('omt_member')).toBe(true)
     expect(isQuickNpcMembershipTitleSetupComplete('Guildmaster')).toBe(true)
   })
 })
@@ -253,7 +250,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
       ),
     ).toMatchObject({
       speciesId: 'species-1',
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      membershipTitle: 'omt_guildmaster',
       classId: 'class-1',
       level: 2,
       name: 'Guard Captain',

@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
@@ -21,6 +21,23 @@ const spellOptions = [
 ]
 
 describe('ComboboxField', () => {
+  it('keeps sr-only labels out of the label region while naming the combobox', () => {
+    const { container } = render(
+      <ComboboxField
+        id="starting-point"
+        label="Starting point"
+        labelVisibility="srOnly"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+      />,
+    )
+
+    const labelRegion = container.querySelector('[data-field-label-region]')
+    expect(labelRegion?.childElementCount).toBe(0)
+    expect(screen.getByRole('combobox', { name: /Starting point/i })).toBeInTheDocument()
+  })
+
   it('labels the trigger and shows the placeholder', () => {
     render(
       <ComboboxField
@@ -101,6 +118,31 @@ describe('ComboboxField', () => {
     expect(screen.getByRole('combobox', { name: 'Primary weapon' })).toHaveTextContent('Longsword')
   })
 
+  it('shows a clear affordance in single-select mode and restores focus to the trigger', async () => {
+    const user = userEvent.setup()
+    const onClear = vi.fn()
+
+    render(
+      <ComboboxField
+        id="weapon"
+        label="Primary weapon"
+        options={weaponOptions}
+        multiple={false}
+        value="longsword"
+        clearable
+        clearAccessibleName="Clear Primary weapon"
+        onClear={onClear}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Clear Primary weapon' }))
+
+    expect(onClear).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(screen.getByRole('combobox', { name: 'Primary weapon' })).toHaveFocus()
+    })
+  })
+
   it('renders stale selections that are missing from options', () => {
     render(
       <ComboboxField
@@ -155,7 +197,11 @@ describe('ComboboxField', () => {
       />,
     )
 
-    expect(screen.getByText('Dagger').closest('.text-sm-meta')).toBeInTheDocument()
+    const chip = screen.getByText('Dagger').closest('span.inline-flex')
+    expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
+    expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass(
+      'size-control-action-compact',
+    )
   })
 
   it('opens with a chromeless search row that replaces the trigger', async () => {

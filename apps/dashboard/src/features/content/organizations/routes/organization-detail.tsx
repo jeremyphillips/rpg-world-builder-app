@@ -19,6 +19,7 @@ import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-b
 import { useClasses } from '../../classes/hooks/use-classes'
 import { useSpecies } from '../../species/hooks/use-species'
 import { OrganizationLocationConnectionsDetailSection } from '../components/location-connections/organization-location-connections-detail-section'
+import { OrganizationMembershipTitlesDetailSection } from '../components/members/organization-membership-titles-detail-section'
 import { OrganizationMembersDetailSection } from '../components/members/organization-members-detail-section'
 import { useOrganizations } from '../hooks/use-organizations'
 import {
@@ -75,6 +76,7 @@ export function OrganizationDetailContent({
     >
       <div className="space-y-8">
         <OrganizationMembersDetailSection campaignId={campaignId} organization={organization} />
+        <OrganizationMembershipTitlesDetailSection organization={organization} />
         <OrganizationLocationConnectionsDetailSection
           campaignId={campaignId}
           organization={organization}

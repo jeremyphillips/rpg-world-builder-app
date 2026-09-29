@@ -67,7 +67,7 @@ describe('OrganizationMembersSection', () => {
 
     const addButton = screen.getByRole('button', { name: 'Add member' })
     expect(addButton).toBeInTheDocument()
-    expect(addButton.closest('[data-slot="relationship-list-footer"]')).toBeInTheDocument()
+    expect(addButton.closest('[data-slot="entity-row-list-footer"]')).toBeInTheDocument()
   })
 
   it('renders the add action for managers only', () => {

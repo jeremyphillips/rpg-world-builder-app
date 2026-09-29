@@ -65,7 +65,7 @@ export const RecommendedBuild: Story = {
       context,
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: rogueClass.id,
         level: 9,
       }),
@@ -85,7 +85,7 @@ export const BuildMode: Story = {
         classId: '',
         level: 0,
       }),
-      titles: [],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
     })!,
   },
 }
@@ -97,7 +97,7 @@ export const UnresolvedClass: Story = {
       context,
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 9,
       }),

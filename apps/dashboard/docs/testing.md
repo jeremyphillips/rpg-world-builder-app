@@ -163,8 +163,14 @@ has no canvas; contrast runs in Storybook's addon-a11y instead).
 
 ## Performance rules
 
-- Pre-commit runs `pnpm test:affected:local` with `TURBO_CONCURRENCY=2` and
-  `VITEST_MAX_WORKERS=4` to avoid CPU oversubscription on laptops. Uncapped:
+- While iterating, run explicit Vitest file paths (`vitest run --bail=0 <paths>`).
+  Once those pass, `pnpm test:affected:collect` collects failures across the
+  affected package graph. It is diagnostic-only and is not part of pre-commit,
+  pre-push, or CI. Inventory: `.tmp/test-affected-collect.log`.
+- Pre-commit runs `pnpm test:affected:local` with `TURBO_CONCURRENCY=2`. Shared
+  Vitest config caps `maxWorkers` at 4. API integration stays at 2, and serial
+  projects stay serial. Do not set `VITEST_MAX_WORKERS`; Vitest applies it after
+  those rules and overwrites them. Uncapped package scheduling, still fail-fast:
   `pnpm test:affected`.
 - Pure logic → `.test.ts` (node project). Don't pay for jsdom you don't use.
 - `const user = userEvent.setup()` once per test; never the bare global

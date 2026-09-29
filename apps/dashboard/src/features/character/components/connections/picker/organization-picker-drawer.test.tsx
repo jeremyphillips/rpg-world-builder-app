@@ -30,20 +30,20 @@ describe('OrganizationPickerDrawer', () => {
     await user.click(screen.getByRole('button', { name: 'Add' }))
     expect(onAdd).not.toHaveBeenCalled()
     expect(screen.getByText('Title')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Guildmaster' })).not.toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Member' })).not.toBeChecked()
 
     await user.click(screen.getByRole('radio', { name: 'Guildmaster' }))
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
     expect(onAdd).toHaveBeenCalledWith({
       organizationId: 'organization-lantern-guild',
-      title: 'Guildmaster',
-      priority: 50,
+      membershipTitleId: 'omt_guildmaster',
     })
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('omits title and priority when No title is selected', async () => {
+  it('requires a title before adding when the catalog has multiple titles', async () => {
     const user = userEvent.setup()
     const onAdd = vi.fn()
 
@@ -59,7 +59,10 @@ describe('OrganizationPickerDrawer', () => {
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
-    expect(onAdd).toHaveBeenCalledWith({ organizationId: 'organization-city-council' })
+    expect(onAdd).not.toHaveBeenCalled()
+    expect(
+      screen.getByText('Choose a membership title before adding this organization.'),
+    ).toBeInTheDocument()
   })
 
   it('shows already-added organizations as added and prevents duplicate add', async () => {
@@ -147,7 +150,8 @@ describe('OrganizationPickerDrawer', () => {
     )
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Guildmaster' })).not.toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Member' })).not.toBeChecked()
   })
 
   it('closes from the keyboard', async () => {
@@ -181,10 +185,11 @@ describe('OrganizationPickerDrawer', () => {
     )
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0]!)
+    await user.click(screen.getByRole('radio', { name: 'Member' }))
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')
     expect(onOpenChange).not.toHaveBeenCalledWith(false)
-    expect(screen.getByRole('radio', { name: 'No title' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: 'Member' })).toBeChecked()
   })
 })

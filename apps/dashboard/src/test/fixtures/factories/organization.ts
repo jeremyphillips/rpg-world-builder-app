@@ -4,6 +4,11 @@ import { CONTENT_TIMESTAMP, STORY_CAMPAIGN_ID, STORY_RULESET_ID } from '../const
 
 export type OrganizationOverrides = Partial<Organization>
 
+/** Minimal valid catalog row for tests that override `members.titles`. */
+export const fixtureDefaultOrganizationMembershipTitles: OrganizationMembershipTitleDefinition[] = [
+  { id: 'omt_member', label: 'Member', priority: 10 },
+]
+
 const sampleMembershipTitles: OrganizationMembershipTitleDefinition[] = [
   {
     id: 'omt_fixture_chair',

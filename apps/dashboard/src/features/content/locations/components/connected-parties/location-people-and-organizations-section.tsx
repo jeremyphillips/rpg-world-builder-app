@@ -7,7 +7,7 @@ import {
 } from '@/features/character'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -235,12 +235,12 @@ export function LocationPeopleAndOrganizationsSectionBody({
 
   return (
     <ContentDetailSection bodyLayout="list" heading={heading} headingId={headingId} helper={helper}>
-      <RelationshipList.Root itemCount={rows.length} emptyLabel={sectionEmpty} action={addAction}>
+      <EntityRowList.Root itemCount={rows.length} emptyLabel={sectionEmpty} action={addAction}>
         {populatedSlots.map((slot) => {
           const slotRows = rowsForSlot(slot, rowsByBinding)
 
           return (
-            <RelationshipList.Group
+            <EntityRowList.Group
               key={peopleKindSlotKey(slot)}
               label={slot.heading}
               itemCount={slotRows.length}
@@ -249,7 +249,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
                 const rowCanEdit = canManage && onEditConnection && (canEditRow?.(row) ?? true)
                 const rowCanRemove =
                   canManage && onRemoveConnection && (canRemoveRow?.(row) ?? true)
-                const headingSuffix = resolveCharacterRowHeadingSuffix(
+                const classification = resolveCharacterRowHeadingSuffix(
                   row,
                   charactersById,
                   campaignId,
@@ -267,11 +267,11 @@ export function LocationPeopleAndOrganizationsSectionBody({
                 })
 
                 return (
-                  <RelationshipList.Row
+                  <EntityRowList.Row
                     key={row.relationshipId}
-                    title={row.subject.name}
-                    href={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
-                    headingSuffix={headingSuffix}
+                    heading={row.subject.name}
+                    headingHref={resolveLocationConnectedPartySubjectHref(campaignId, row.subject)}
+                    classification={classification}
                     menu={
                       actions.length > 0
                         ? {
@@ -289,10 +289,10 @@ export function LocationPeopleAndOrganizationsSectionBody({
                   />
                 )
               })}
-            </RelationshipList.Group>
+            </EntityRowList.Group>
           )
         })}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </ContentDetailSection>
   )
 }

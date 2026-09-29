@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
@@ -99,7 +98,7 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
   it('returns the campaign default for no title', () => {
     expect(
       resolveQuickNpcLevelForMembershipTitle({
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        membershipTitle: 'omt_member',
         titles: [guildmasterTitle],
         context,
       }),
@@ -109,7 +108,7 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
   it('seeds from the title recommendation when present', () => {
     expect(
       resolveQuickNpcLevelForMembershipTitle({
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         titles: [guildmasterTitle],
         context,
       }),
@@ -119,7 +118,7 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
   it('clamps recommended level to the campaign maximum', () => {
     expect(
       resolveQuickNpcLevelForMembershipTitle({
-        membershipTitle: 'Archmage',
+        membershipTitle: 'omt_archmage',
         titles: [highLevelTitle],
         context,
       }),
@@ -130,7 +129,7 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
 describe('applyQuickNpcSetupValueChange', () => {
   const baseValues: QuickNpcOrganizationMemberSetupValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
-    membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+    membershipTitle: 'omt_member',
     classId: fighterClass.id,
     level: 3,
   })
@@ -160,13 +159,13 @@ describe('applyQuickNpcSetupValueChange', () => {
           classId: '',
         }),
         setId: 'membershipTitle',
-        nextValue: 'Guildmaster',
+        nextValue: 'omt_guildmaster',
         ...changeArgs,
       }),
     ).toEqual(
       quickNpcMemberSetupValues({
         speciesId: '',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 8,
       }),
@@ -178,7 +177,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       applySetupChange({
         values: quickNpcMemberSetupValues({
           speciesId: '',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: '',
           level: 8,
         }),
@@ -189,7 +188,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual(
       quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:elf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: rogueClass.id,
         level: 8,
       }),
@@ -203,13 +202,13 @@ describe('applyQuickNpcSetupValueChange', () => {
           speciesId: 'srd-cc-5.2.1:elf',
         }),
         setId: 'membershipTitle',
-        nextValue: 'Guildmaster',
+        nextValue: 'omt_guildmaster',
         ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
       speciesId: 'srd-cc-5.2.1:elf',
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       level: 8,
       classId: rogueClass.id,
     })
@@ -220,12 +219,12 @@ describe('applyQuickNpcSetupValueChange', () => {
       applySetupChange({
         values: baseValues,
         setId: 'membershipTitle',
-        nextValue: 'Guildmaster',
+        nextValue: 'omt_guildmaster',
         ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       level: 8,
       classId: rogueClass.id,
     })
@@ -236,16 +235,16 @@ describe('applyQuickNpcSetupValueChange', () => {
       applySetupChange({
         values: quickNpcMemberSetupValues({
           ...baseValues,
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: rogueClass.id,
         }),
         setId: 'membershipTitle',
-        nextValue: 'Commander',
+        nextValue: 'omt_commander',
         ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
-      membershipTitle: 'Commander',
+      membershipTitle: 'omt_commander',
       level: 8,
       classId: '',
     })
@@ -256,12 +255,12 @@ describe('applyQuickNpcSetupValueChange', () => {
       applySetupChange({
         values: baseValues,
         setId: 'membershipTitle',
-        nextValue: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+        nextValue: 'omt_member',
         ...changeArgs,
       }),
     ).toEqual({
       ...baseValues,
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      membershipTitle: 'omt_member',
       level: 0,
       classId: '',
     })
@@ -310,7 +309,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       }),
     ).toEqual({
       ...baseValues,
-      membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
+      membershipTitle: 'omt_guildmaster',
       level: 1,
       classId: rogueClass.id,
     })
@@ -342,7 +341,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       applySetupChange({
         values: quickNpcMemberSetupValues({
           speciesId: baseValues.speciesId,
-          membershipTitle: 'Commander',
+          membershipTitle: 'omt_commander',
           classId: '',
           level: 0,
         }),
@@ -352,7 +351,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       }),
     ).toEqual({
       ...baseValues,
-      membershipTitle: 'Commander',
+      membershipTitle: 'omt_commander',
       level: 8,
       classId: '',
     })

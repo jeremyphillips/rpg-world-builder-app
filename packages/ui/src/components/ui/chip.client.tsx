@@ -33,7 +33,7 @@ export type ChipRemovableProps = ChipBaseProps & {
   mode: 'removable'
   onRemove: () => void
   removeLabel: string
-  size: 'md' | 'lg'
+  size?: CompactLabelSize
   selected?: never
   onSelectedChange?: never
   selectionRole?: never
@@ -87,7 +87,7 @@ function SelectableChip({
 
 function RemovableChip({
   children,
-  size,
+  size = 'md',
   onRemove,
   removeLabel,
   disabled,

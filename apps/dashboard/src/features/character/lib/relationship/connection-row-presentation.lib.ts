@@ -3,6 +3,7 @@ import {
   getCharacterRelationshipEdgeKindDisplayLabel,
   getCharacterRelationshipEdgeKindEntry,
   isViewerRelationshipSource,
+  resolveOrganizationMembershipTitleProjection,
   type CharacterRelationshipDraftEdge,
   type Location,
   type Organization,
@@ -74,8 +75,17 @@ function resolvePersonRoleLabel(
 
 function membershipTitle(
   edge: Extract<CharacterRelationshipDraftEdge, { kind: 'organizationMembership' }>,
+  organizationsById: Map<string, Organization>,
 ): string | undefined {
-  return edge.details?.title
+  const membershipTitleId = edge.details?.membershipTitleId
+  if (membershipTitleId === undefined) return undefined
+  const organization = organizationsById.get(edge.organizationId)
+  if (!organization) return undefined
+  const projection = resolveOrganizationMembershipTitleProjection({
+    catalog: organization.members.titles,
+    membershipTitleId,
+  })
+  return projection.status === 'resolved' ? projection.label : undefined
 }
 
 function resolveOrganizationRowPresentation(input: {
@@ -92,7 +102,7 @@ function resolveOrganizationRowPresentation(input: {
 
   return {
     heading: unavailable ? input.edge.organizationId : heading,
-    description: membershipTitle(input.edge),
+    description: membershipTitle(input.edge, input.organizationsById),
     headingHref,
     canViewRecord: Boolean(headingHref),
   }

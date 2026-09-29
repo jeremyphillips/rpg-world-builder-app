@@ -34,7 +34,11 @@ const organization = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+  },
 }
 
 describe('useOrganizationMembersDetail Quick NPC handoff', () => {

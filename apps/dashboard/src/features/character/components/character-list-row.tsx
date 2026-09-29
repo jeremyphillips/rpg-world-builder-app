@@ -1,6 +1,6 @@
 import type { CharacterRosterStatus } from '@rpg/contracts'
 
-import { DetailRowLeadingMedia, RelationshipList } from '@/features/content'
+import { DetailRowLeadingMedia, EntityRowList } from '@/features/content'
 
 import { buildCharacterListRowPresentation } from '../lib/display/character-list-row.lib'
 import type { CharacterListCardData } from './character-list-card.lib'
@@ -12,7 +12,7 @@ export type CharacterListRowProps = {
   rosterStatus?: CharacterRosterStatus
 }
 
-/** Compact list-row presentation for a character summary — composes RelationshipList.Row. */
+/** Compact list-row presentation for a character summary — composes EntityRowList.Row. */
 export function CharacterListRow({
   card,
   detailHref,
@@ -27,7 +27,7 @@ export function CharacterListRow({
   })
 
   return (
-    <RelationshipList.Row
+    <EntityRowList.Row
       {...row}
       leadingMedia={
         row.leadingMedia ? (

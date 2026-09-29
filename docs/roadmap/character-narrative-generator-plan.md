@@ -213,7 +213,11 @@ verify this explicitly during integration.
 
 First prove the model with approximately 24–36 entries and a few complete, reviewed
 compositions. Expand toward 80–120 entries only after coherence and fallback behavior
-work. Count is a budget, not a substitute for coverage.
+work. Count is a budget, not a substitute for coverage. Ongoing collection work follows
+the [character narrative authoring standard](../../packages/character-narrative-data/docs/authoring.md):
+every fragment must provide a concrete play hook, story passages must be grounded in
+events/actions/consequences, and expansion is driven by the documented coverage matrix
+rather than a raw total.
 
 Start with three themes: duty, belonging, and ambition. Each theme needs compatible
 motives across the supported alignment set; ambition is not inherently evil and duty
@@ -237,9 +241,11 @@ Illustrative lawful-good composition with an existing residence and organization
   I am looking for work that lets me help others while learning which responsibilities
   are mine to carry and which I must learn to share."
 
-This example demonstrates continuity, not a universal alignment template. Review
-samples for repetitive openings, unsupported claims, grammar after insertion, moral
-caricatures, and first-person consistency. Use neutral fantasy-adventure tone in v1;
+This example demonstrates continuity, not a universal alignment template. Review a
+fixed, reproducible seed/context fixture for repetitive openings, unsupported claims,
+grammar after insertion, moral caricatures, first-person consistency, and cross-slot
+coherence. Automated checks protect structure and obvious repetition; editorial review
+owns playable specificity and prose quality. Use neutral fantasy-adventure tone in v1;
 defer a tone selector.
 
 ## Implementation milestones
@@ -292,7 +298,11 @@ and link validation; no runtime behavior is changed by this plan.
 3. Explicit adventure hooks and visible campaign tensions as additional context.
 4. Linked entity mentions and stale-context detection without automatic prose rewrites.
 5. Additional affinities for resolved proficiencies, languages, spells, and equipment.
-6. Saved-character/NPC adapters that reuse the same engine, including multiclass context.
+6. Positive pair or story-arc linkage only if reproducible collection reviews show
+   cross-slot incoherence after editorial revision.
+7. Structured prose ingredients only with a concrete template or language-model
+   expansion consumer and its own architecture, security, and UX design.
+8. Saved-character/NPC adapters that reuse the same engine, including multiclass context.
 
 These are extension points, not v1 delivery requirements. Builder ordering remains a
 separate UX decision.

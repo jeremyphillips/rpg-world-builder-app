@@ -23,7 +23,7 @@ truth ([`.husky/pre-commit`](.husky/pre-commit),
 dependents via Turbo):
 
 ```text
-pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm lint:affected → pnpm typecheck:affected → pnpm test:affected
+pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm typecheck:affected → pnpm test:affected:local
 ```
 
 **Pre-push** (full suite before sharing):
@@ -38,6 +38,39 @@ when you need a production bundle of the bench app.
 **CI** mirrors pre-push coverage and fallow checks on every PR, with affected
 Turbo scope for typecheck, lint, and build (`gate:ci:quality`, `build:ci`). Skip hooks
 locally only when necessary: `HUSKY=0 git commit` / `HUSKY=0 git push`.
+
+## Test failures
+
+Iterate with explicit Vitest file paths, one process, no Turbo:
+
+```sh
+pnpm --filter <pkg> exec vitest run --bail=0 <paths>
+```
+
+For `@rpg/api`, pass `--project api:unit` or `--project api:integration` so pure
+lib tests do not boot Mongo.
+
+Once those focused tests pass, run `pnpm test:affected:collect`. It is
+diagnostic-only — not a pre-commit, pre-push, or CI gate. It uses the same
+`...[HEAD]` graph as `test:affected` and `test:affected:local`, and changes
+only orchestration: continue after package failures, concurrency 2, grouped
+output, and a durable inventory at `.tmp/test-affected-collect.log`.
+
+Cluster that inventory before editing:
+
+- **Deterministic regression** — same assertion, repeats when that file runs alone.
+- **Cascade** — import, setup, `beforeAll`, or provider failure. That is usually
+  the highest-confidence shared cause. A widespread failure is not automatically
+  the root cause.
+- **Infrastructure** — MongoMemoryServer, worker SIGTERM, cancelled Turbo tasks,
+  or timeouts while heavy packages run together. Rerun those files serially
+  before treating them as product bugs. This matters most for MongoMemoryServer
+  failures.
+- **Suspected flake** — passes when that file runs alone. Do not batch-fix.
+
+Do not add Vitest retries. Fix the highest-confidence shared cause, then rerun
+only the files that failed. After `test:affected:collect` is clean, run the
+pre-commit hook, then `pnpm gate:pre-push` once.
 
 ## fallow (code health)
 

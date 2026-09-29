@@ -12,8 +12,9 @@ type OrganizationMembers = {
 }
 ```
 
-**Familiar starting points** are create-only ephemeral projections — they seed domain / form /
-functions / practices / affinities and record `sourcePresetId` for title snapshotting at create.
+**Familiar starting points** are create-only draft UI (`startingPointId`) — they materialize domain /
+form / functions / practices / class affinities and membership titles into organization-owned form
+state. The association is not persisted on the organization record.
 
 | Concern                        | Where to read                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -49,11 +50,15 @@ Do not start from the frozen discovery corpus to learn the current shipped model
 
 - Registry: [`organization-authoring-preset.ts`](../../../packages/contracts/src/rpg/vocab/organization-authoring-preset.ts)
 - Create routes mount `OrganizationAuthoringFormShell` + `OrganizationAuthoringPresetBridge`.
-- Preset selection writes domain / form / functions / practices / affinities via
-  `buildOrganizationFormValueSyncs`, clears `authoringPresetId`, records `sourcePresetId` for
-  create, and sets **recommended practices** through
-  `ContentFormCtx.organizationPracticeRecommendationIds` (authoring guidance only).
-- Edit routes omit the preset combobox (`mode: 'edit'`).
+- Starting point selection writes domain / form / functions / practices / affinities / titles via
+  `buildOrganizationFormValueSyncs` while keeping an editable clearable `startingPointId` select.
+  **Recommended practices** flow through `ContentFormCtx.organizationPracticeRecommendationIds`
+  (authoring guidance only) while a starting point remains selected.
+- Removing the starting point clears the association and recommendations but retains materialized
+  profile values, class affinities, and titles.
+- Edit routes expose **Use familiar type…** on the Organization profile legend. The temporary
+  field replaces profile values plus class affinities after confirmation, leaves titles unchanged,
+  then closes.
 
 ### Membership title catalog
 
@@ -69,35 +74,36 @@ Organizations carry a snapshot catalog at `members.titles[]`. Three ID layers ap
 may hold custom titles with no vocabulary entry. Preset `titleId` refs stay compile-time typed;
 org title space stays open.
 
-**Create path:** dashboard sends `sourcePresetId` only when a familiar starting point was
-applied — the API snapshots vocabulary labels/descriptions + preset priorities into
-`members.titles[]` at `bodyFromCreateInput`. Manual create may supply explicit
-`members.titles` when no preset is used. Create input rejects combining both.
+**Create path:** dashboard sends explicit `members.titles[]` when a starting point materialized
+the catalog (or when authored manually). The API persists title rows as given.
 
 | Path          | Client sends               | API persists                                                                     |
 | ------------- | -------------------------- | -------------------------------------------------------------------------------- |
-| Preset create | `sourcePresetId`           | Vocabulary resolve → opaque `omt_*` ids + `members.titles` snapshot + provenance |
+| Materialized  | `members.titles` snapshot  | As given (validate ids; preserve order)                                          |
 | Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
 | Duplicate     | (N/A — server copies body) | Source title rows copied in order with new `omt_*` ids; `sourcePresetId` omitted |
 
-**Create XOR (API boundary):** `sourcePresetId` and a non-empty explicit `members.titles`
-catalog are mutually exclusive on create input. When `sourcePresetId` is present, the API
-resolver is authoritative — client omission of `members.titles` still yields the preset
-snapshot at persist.
+**Create path:** the dashboard materializes `members.titles` from the selected starting point
+(or authors titles manually) and sends the snapshot on create. The API validates ids and
+persists the catalog as given.
 
-**Edit path:** classification forms expose `members.classAffinityIds` and
-`members.speciesAffinityIds` only — never `members.titles`, `connections`, or
-`sourcePresetId`. Title catalog and location connections are owned by create and dedicated
-mutations respectively. Classification PATCH never modifies an existing `members.titles`
-snapshot.
+**Edit path:** classification forms expose `members.classAffinityIds`,
+`members.speciesAffinityIds`, and the membership title catalog for mutation. **Use familiar
+type…** replaces profile values and class affinities after confirmation but **never** replaces
+`members.titles`. `connections` stay off the classification form; location connections use
+dedicated mutations.
+
+**Referential integrity:** writes that remove a title id fail when character relationship edges
+still reference that `omt_*` id (including draft organization saves that run the same validation).
 
 **Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
 Mongo mapping, API serialization, duplication, and parse round-trips must preserve array
 order. Roster/display sort uses priority descending, then original array index as tie-break.
 
-**Character memberships:** connections persist `title` + `priority` strings/numbers for this
-pass. Renaming or deleting org titles does **not** propagate to existing character
-memberships until connections adopt `membershipTitleId` referencing organization-owned `id`s.
+**Character memberships:** relationship edges store optional `membershipTitleId` referencing
+organization-owned `omt_*` ids. Label and roster rank are projected from `members.titles` at read
+time; the create form shows the materialized catalog before save, and clearing a starting point
+does not erase it.
 
 **Retired:** classification-derived membership titles (five-slot resolver pipeline) were
 removed. Titles come only from the create-boundary snapshot or explicit manual catalog —
@@ -109,7 +115,12 @@ Detail: [`organization/membership-titles.ts`](../../../packages/contracts/src/rp
 ### Detail surfaces
 
 Organization detail stat rows show Domain, optional Form, Functions, Practices, and member
-class/species affinities (when present). Membership rosters intersect affinities with the NPC
+class/species affinities (when present). A **Membership titles** section lists `members.titles` in
+canonical hierarchy order (same sort as member-title pickers). Authoring forms edit label and rank;
+presets may seed the catalog at create. Once materialized, titles are organization-owned and are not
+replaced when applying a familiar type on edit.
+
+Membership rosters intersect affinities with the NPC
 playable catalog from `resolvePlayableBuilderContent` to badge recommended picker rows. The
 picker candidate list loads independently — recommendations decorate rows once that universe
 is ready; a failed build context degrades badges only.

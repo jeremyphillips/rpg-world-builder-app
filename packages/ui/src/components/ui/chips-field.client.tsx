@@ -264,6 +264,9 @@ export function ChipsField({
       <FieldsetChromeFrame
         chrome={chrome}
         size={size}
+        hint={hint}
+        hintPosition={hintPosition}
+        hintId={hintId}
         error={error}
         errorId={errorId}
         fieldsetProps={{
@@ -278,7 +281,6 @@ export function ChipsField({
           size={size}
           hintPosition={hintPosition}
           hint={hint}
-          error={error}
           hintId={hintId}
           legend={
             <legend id={legendId} className={labelVisibility === 'srOnly' ? 'sr-only' : undefined}>

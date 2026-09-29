@@ -27,8 +27,7 @@ export type OrganizationMemberPickerCandidate = CharacterPickerOption & {
 export type OrganizationMemberPickerCommit = {
   characterId: string
   characterType: 'pc' | 'npc'
-  title?: string
-  priority?: number
+  membershipTitleId: string
 }
 
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'

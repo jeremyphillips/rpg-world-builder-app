@@ -44,7 +44,7 @@ only — not a duplicate trailing badge.
 | Bordered static identity | `ContentEntityCard` |
 | Bordered identity with expandable domain content | `DisclosureEntityCard` |
 | Create-tab Add/Pending discovery or pending rows | `ContentEntityCard` + trailing action |
-| Detail hierarchy or typed relationship | `DetailEntityRow` / `RelationshipList` |
+| Detail hierarchy or typed relationship | `DetailEntityRow` / `EntityRowList` |
 | Anonymous form value or choice affordance | Purpose-built form/choice component |
 
 ### EntitySurfaceConfig (character / organization / location pickers)
@@ -526,7 +526,7 @@ That is not Add/discovery mode at the resting root. See
 
 ## Relationship rows
 
-Typed cross-content edges on detail pages use `CrossContentRelationshipRow` →
+Typed cross-content edges on detail pages use `EntityRowList.Row` →
 `DetailEntityRow` → `EntityAnatomy`, not card shells. See
 [cross-content-relationship-ui.md](./cross-content-relationship-ui.md).
 

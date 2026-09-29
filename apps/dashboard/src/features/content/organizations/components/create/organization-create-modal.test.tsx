@@ -52,15 +52,6 @@ vi.mock('../../../lib/campaign-access/campaign-availability-field', () => ({
   ),
 }))
 
-vi.mock('./organization-authoring-context', () => ({
-  OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
-  useOrganizationAuthoringContext: () => ({
-    practiceRecommendations: [],
-    setPracticeRecommendations: vi.fn(),
-    clearPracticeRecommendations: vi.fn(),
-  }),
-}))
-
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
     HTMLElement.prototype.hasPointerCapture = () => false
@@ -104,6 +95,7 @@ describe('OrganizationCreateModal', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'City Council')
+    await user.click(screen.getByRole('button', { name: 'Set up manually' }))
     await user.click(screen.getByRole('radio', { name: /Government/i }))
     await user.click(screen.getByRole('button', { name: 'Create organization' }))
 
@@ -168,11 +160,9 @@ describe('OrganizationCreateModal', () => {
       </QueryClientProvider>,
     )
 
-    await selectComboboxOption(user, /Start from familiar type/i, /Thieves' guild/i)
+    await selectComboboxOption(user, /Starting point/i, /Thieves' guild/i)
 
-    const presetCombobox = screen.getByRole('combobox', { name: /Start from familiar type/i })
-    expect(presetCombobox).toHaveTextContent(/Search familiar types/i)
-    expect(presetCombobox).not.toHaveTextContent(/Thieves' guild/i)
+    expect(screen.getByText(/Thieves' guild/i)).toBeInTheDocument()
 
     expect(screen.getByRole('radio', { name: /Criminal/i })).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByRole('combobox', { name: /^Form$/i })).toHaveTextContent(/Guild/i)
@@ -191,12 +181,15 @@ describe('OrganizationCreateModal', () => {
 
     const createInput = mutateAsync.mock.calls.at(-1)?.[0] as Record<string, unknown>
     expect(createInput).toMatchObject({
-      sourcePresetId: 'thieves_guild',
       organizationDomain: 'criminal',
       organizationForm: 'guild',
       functions: [],
       practices: ['theft'],
     })
-    expect(createInput).not.toHaveProperty('authoringPresetId')
+    expect(createInput).not.toHaveProperty('startingPointId')
+    expect(createInput).not.toHaveProperty('sourcePresetId')
+    expect(
+      (createInput.members as { titles?: unknown[] } | undefined)?.titles?.length ?? 0,
+    ).toBeGreaterThan(0)
   })
 })

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { HARBORFORD, DOCK_WARD, YAWNING_PORTAL } from '../fixtures'
+import { buildLocationDetailViewModel } from './location-display'
 import { childAuthoringTypesForParentKind } from './create/location-create-shortcuts'
 import {
   isDirectPlaceAuthoringTypeForSettlement,

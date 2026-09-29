@@ -14,14 +14,17 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "review:inventory": "pnpm exec tsx scripts/generate-foundation-inventory.mjs && pnpm --workspace-root exec prettier --write packages/character-narrative-data/docs/foundation-inventory.generated.md"
   },
   "dependencies": {
     "@rpg/contracts": "workspace:*"
   },
   "devDependencies": {
     "@rpg/config": "workspace:*",
+    "@types/node": "^25.9.2",
     "eslint": "^10.4.1",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   }

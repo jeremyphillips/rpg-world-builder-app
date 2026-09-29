@@ -222,7 +222,7 @@ Package-switch resolution state lives in
 no presentation). Modal UI lives in
 `character/components/builder/steps/equipment/package-switch/`.
 
-Title membership semantics (`ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE`, radio mappers) live in
+Title membership semantics (`'omt_member'`, radio mappers) live in
 `character/lib/organization-membership/organization-membership-title.lib.ts` when reused outside
 the connections subtree.
 

@@ -15,7 +15,7 @@ import type {
 } from '../../lib/location-connections/organization-location-connection-mutation-context'
 import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row'
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import {
   relationshipGroupUsesRootFamilyAdd,
   resolveOrganizationLocationConnectionFamilyPresentation,
@@ -124,13 +124,13 @@ export function OrganizationLocationConnectionsSection({
                 headingId={`organization-location-connections-${family}-heading`}
                 headingAs="h3"
               >
-                <RelationshipList.Root
+                <EntityRowList.Root
                   itemCount={familyItemCount}
                   emptyLabel={familyPresentation.empty}
                   action={addAction}
                 >
                   {familyGroup?.kindGroups.map((kindGroup) => (
-                    <RelationshipList.Group
+                    <EntityRowList.Group
                       key={kindGroup.kind}
                       label={familyGroup.kindHeading === 'show' ? kindGroup.kindLabel : undefined}
                       itemCount={kindGroup.items.length}
@@ -158,9 +158,9 @@ export function OrganizationLocationConnectionsSection({
                           onRemoveConnection={onRemoveConnection}
                         />
                       ))}
-                    </RelationshipList.Group>
+                    </EntityRowList.Group>
                   ))}
-                </RelationshipList.Root>
+                </EntityRowList.Root>
               </ContentDetailSection>
             )
           })}

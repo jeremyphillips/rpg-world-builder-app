@@ -31,7 +31,7 @@ const lanternGuild = {
   members: {
     classAffinityIds: [],
     speciesAffinityIds: [],
-    titles: [],
+    titles: [{ id: 'omt_guildmaster', label: 'Guildmaster', priority: 50 }],
   },
   connections: { locations: [] },
 } satisfies Organization
@@ -115,7 +115,7 @@ describe('buildNarrativeContext', () => {
           kind: 'organizationMembership' as const,
           characterId: '__new_character__',
           organizationId: lanternGuild.id,
-          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+          details: { lifecycle: 'current' as const, membershipTitleId: 'omt_guildmaster' },
         },
         {
           id: 'edge-missing-org',
@@ -251,7 +251,7 @@ describe('buildNarrativeContext', () => {
           kind: 'organizationMembership' as const,
           characterId: '__new_character__',
           organizationId: lanternGuild.id,
-          details: { lifecycle: 'current' as const, title: 'Guildmaster' },
+          details: { lifecycle: 'current' as const, membershipTitleId: 'omt_guildmaster' },
         },
         {
           id: 'conn-1',

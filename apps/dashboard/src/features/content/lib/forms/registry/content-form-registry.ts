@@ -67,6 +67,8 @@ export type ContentFormCtx = {
   locationParentLocationIdSeed?: string
   /** Live practice recommendations from preset bridge — authoring guidance only. */
   organizationPracticeRecommendationIds?: readonly OrganizationPractice[]
+  /** Standalone vs quick-create organization field visibility (`full` default). */
+  organizationFormPresentation?: 'full' | 'quick'
   /**
    * Parent content validation intent — `draft` when parent is unpublished/draft,
    * `publish` when editing published content. Drives read-only vs mutable table kind UI.
@@ -147,6 +149,8 @@ export interface ContentFormDef<
    * from `buildFields` (e.g. nested `movement` rows need `{ movement: [{ mode, feet }] }`).
    */
   createDefaultValues?: Partial<TFormValues>
+  /** Fresh create defaults per form instance (e.g. new opaque ids). Overrides `createDefaultValues` when set. */
+  resolveCreateDefaultValues?: () => Partial<TFormValues>
   /**
    * Maps validated form values to the API input shape.
    * Pass `{ entity }` on edit so slug and nested ids stay locked after create.
@@ -198,6 +202,16 @@ export type AnyContentFormDef = ContentFormDef<any, any, any, any>
  * Phase 3 registers `species`; subsequent phases register the remaining types.
  */
 export const contentFormRegistry: Record<string, AnyContentFormDef> = {}
+
+/** Create-shell default values — prefers `resolveCreateDefaultValues` when the def provides it. */
+export function resolveContentFormCreateDefaultValues(
+  def: Pick<AnyContentFormDef, 'createDefaultValues' | 'resolveCreateDefaultValues'>,
+): Partial<FieldValues> | undefined {
+  if (def.resolveCreateDefaultValues) {
+    return def.resolveCreateDefaultValues()
+  }
+  return def.createDefaultValues
+}
 
 /** Flat field list for drift tests — name field, then tabs or `buildFields`. */
 export function contentFormAllFields(

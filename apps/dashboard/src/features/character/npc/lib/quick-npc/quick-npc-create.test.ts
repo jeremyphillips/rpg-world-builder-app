@@ -37,7 +37,11 @@ const lanternGuild = {
   organizationDomain: 'occupational' as const,
   functions: [],
   practices: [],
-  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+  members: {
+    classAffinityIds: [],
+    speciesAffinityIds: [],
+    titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+  },
   connections: { locations: [] },
 }
 
@@ -74,7 +78,7 @@ describe('buildQuickNpcCreateInput', () => {
     const input = buildQuickNpcCreateInput({
       seed,
       context: quickNpcTestContext(),
-      membership: { organizationId: 'organization-1', title: 'Guildmaster', priority: 50 },
+      membership: { organizationId: 'organization-1', membershipTitleId: 'omt_guildmaster' },
     })
 
     expect(input).toMatchObject({
@@ -88,8 +92,7 @@ describe('buildQuickNpcCreateInput', () => {
       characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
       organizationId: 'organization-1',
       details: expect.objectContaining({
-        title: 'Guildmaster',
-        priority: 50,
+        membershipTitleId: 'omt_guildmaster',
       }),
     })
   })

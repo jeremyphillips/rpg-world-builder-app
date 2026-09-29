@@ -51,7 +51,7 @@ export const organizationMembershipProjectionFixture: CharacterRelationshipProje
   kind: 'organizationMembership',
   section: 'organizations',
   roleLabel: 'Member of Lantern Guild',
-  details: { lifecycle: 'current', title: 'Guildmaster' },
+  details: { lifecycle: 'current', membershipTitleId: 'omt_guildmaster' },
   visibility: 'dm_only',
   participantIds: [],
   referenceStatus: 'resolved',

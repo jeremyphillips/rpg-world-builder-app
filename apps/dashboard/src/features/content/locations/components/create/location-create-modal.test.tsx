@@ -70,7 +70,7 @@ const organizationCatalog = vi.hoisted(() => [
     members: {
       classAffinityIds: [],
       speciesAffinityIds: [],
-      titles: [],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
     },
     connections: { locations: [] },
   },
@@ -136,7 +136,7 @@ vi.mock('../../../organizations', () => ({
   useOrganizations: () => ({ data: organizationCatalog, isPending: false, isError: false }),
 }))
 
-vi.mock('../../../organizations/components/create/organization-authoring-context', () => ({
+vi.mock('../../../organizations/components/authoring/organization-authoring-context', () => ({
   OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
   useOrganizationAuthoringContext: () => ({
     practiceRecommendations: [],

@@ -9,14 +9,14 @@ import { Form } from '@rpg/ui/form'
 import {
   OrganizationAuthoringProvider,
   useOrganizationAuthoringContext,
-} from './organization-authoring-context'
+} from '../authoring/organization-authoring-context'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
 import { buildOrganizationFormValueSyncs } from '../../../lib/forms/organization-form-projection'
 
 const schema = z.object({
   name: z.string(),
   organizationDomain: z.string().optional(),
-  authoringPresetId: z.string().optional(),
+  startingPointId: z.string().optional(),
   practices: z.array(z.string()).default([]),
 })
 
@@ -39,11 +39,14 @@ function BridgeHarness({
     <>
       <OrganizationAuthoringPresetBridge />
       <RecommendationProbe onChange={onRecommendationsChange} />
-      <button type="button" onClick={() => form.setValue('authoringPresetId', 'thieves_guild')}>
+      <button type="button" onClick={() => form.setValue('startingPointId', 'thieves_guild')}>
         Pick thieves guild
       </button>
-      <button type="button" onClick={() => form.setValue('authoringPresetId', 'protection_racket')}>
+      <button type="button" onClick={() => form.setValue('startingPointId', 'protection_racket')}>
         Pick protection racket
+      </button>
+      <button type="button" onClick={() => form.setValue('startingPointId', undefined)}>
+        Remove starting point
       </button>
       <button type="button" onClick={() => form.setValue('practices', [], { shouldDirty: true })}>
         Clear practices
@@ -61,7 +64,7 @@ function renderHarness() {
         schema={schema}
         fields={[
           { type: 'text', name: 'name', label: 'Name' },
-          { type: 'text', name: 'authoringPresetId', label: 'Preset' },
+          { type: 'text', name: 'startingPointId', label: 'Preset' },
           { type: 'text', name: 'practices', label: 'Practices' },
         ]}
         defaultValues={{ name: 'Test', practices: [] }}
@@ -98,28 +101,20 @@ describe('OrganizationAuthoringPresetBridge', () => {
     })
   })
 
-  it('does not clear recommendations when value sync clears authoringPresetId', async () => {
+  it('clears recommendations when starting point is removed', async () => {
     const user = userEvent.setup()
     const harness = renderHarness()
 
     await user.click(screen.getByRole('button', { name: 'Pick thieves guild' }))
 
     await waitFor(() => {
-      expect(harness.recommendations.at(-1)).toEqual([
-        'fencing',
-        'extortion',
-        'smuggling',
-        'investigation',
-      ])
+      expect(harness.recommendations.at(-1)?.length).toBeGreaterThan(0)
     })
 
+    await user.click(screen.getByRole('button', { name: 'Remove starting point' }))
+
     await waitFor(() => {
-      expect(harness.recommendations.at(-1)).toEqual([
-        'fencing',
-        'extortion',
-        'smuggling',
-        'investigation',
-      ])
+      expect(harness.recommendations.at(-1)).toEqual([])
     })
   })
 

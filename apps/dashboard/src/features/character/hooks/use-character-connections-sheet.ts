@@ -107,13 +107,12 @@ export function useCharacterConnectionsSheet(input: {
   )
 
   const handleAddOrganization = React.useCallback(
-    async (organizationId: string, title?: string, priority?: number) => {
+    async (organizationId: string, membershipTitleId?: string) => {
       try {
         await mutations.createRelationship({
           idempotencyKey: createCharacterRelationshipIdempotencyKey(),
           relationship: buildOrganizationMembershipCreateInput(characterId, organizationId, {
-            ...(title !== undefined ? { title } : {}),
-            ...(priority !== undefined ? { priority } : {}),
+            ...(membershipTitleId !== undefined ? { membershipTitleId } : {}),
           }),
         })
       } catch (error) {
