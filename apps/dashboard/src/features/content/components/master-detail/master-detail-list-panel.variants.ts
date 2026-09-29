@@ -50,6 +50,7 @@ export function masterDetailListRowClasses(options: {
       hoverFamily: options.isSelected ? 'none' : 'selectable',
       selected: 'none',
       selectedHover: 'none',
+      hitTarget: 'pointer',
     }),
     !active && 'text-muted-foreground',
     options.isSelected && 'bg-surface-muted text-foreground hover:bg-surface-muted',

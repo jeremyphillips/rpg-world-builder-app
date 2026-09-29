@@ -12,7 +12,7 @@ export type CampaignDisplaySurface =
 export const campaignDisplayNameVariants = cva('inline-flex min-w-0 items-center gap-2', {
   variants: {
     surface: {
-      topbar: 'font-medium text-foreground-subtle hover:text-foreground',
+      topbar: 'cursor-pointer font-medium text-foreground-subtle hover:text-foreground',
       card: 'min-w-0',
       row: 'min-w-0',
       inlineMuted: 'text-sm text-muted-foreground',
@@ -75,7 +75,7 @@ export const campaignDisplayNameListVariants = cva('inline-flex min-w-0 items-ce
 })
 
 export const campaignDisplayNameListLinkVariants = cva(
-  'inline text-primary underline-offset-4 hover:underline',
+  'inline cursor-pointer text-primary underline-offset-4 hover:underline',
   {
     variants: {
       surface: {

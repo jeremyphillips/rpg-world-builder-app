@@ -20,7 +20,7 @@ const Checkbox = React.forwardRef<
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(
-      'peer size-4 shrink-0 rounded-sm text-primary',
+      'peer size-4 shrink-0 cursor-pointer rounded-sm text-primary',
       choiceControlIndicatorShellClasses,
       choiceControlIndicatorFocusClasses,
       choiceControlIndicatorCheckedBorderClasses,

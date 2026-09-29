@@ -32,7 +32,7 @@ export const dropTargetSurfaceVariants = cva(
         comfortable: 'min-h-48 gap-3 px-6 py-10',
       },
       state: {
-        idle: 'border-border bg-sunken text-muted-foreground',
+        idle: 'cursor-pointer border-border bg-sunken text-muted-foreground',
         active: dropTargetActiveSurfaceClasses,
         invalid: dropTargetInvalidSurfaceClasses,
         disabled: 'pointer-events-none border-border text-muted-foreground opacity-50',

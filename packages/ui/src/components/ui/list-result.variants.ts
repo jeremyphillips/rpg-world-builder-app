@@ -88,9 +88,17 @@ export const listResultItemShellVariants = cva('relative flex w-full items-stret
 })
 
 /** Main hit area — identity and decorative trailing chrome. */
-export const listResultItemMainVariants = cva(
-  'flex min-w-0 flex-1 items-start gap-2 px-3 py-2 text-left outline-none',
-)
+export const listResultItemMainVariants = cva('flex min-w-0 flex-1 items-start gap-2 px-3 py-2 text-left outline-none', {
+  variants: {
+    interactive: {
+      true: 'cursor-pointer',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    interactive: true,
+  },
+})
 
 /** Trailing action column — sibling to the main hit area, never nested inside it. */
 export const listResultItemTrailingActionVariants = cva(

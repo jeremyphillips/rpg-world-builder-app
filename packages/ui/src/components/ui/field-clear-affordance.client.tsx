@@ -27,7 +27,7 @@ export function FieldClearAffordanceButton({
       className={cn(
         groupedEndLabelSegmentShellClasses(size),
         selectCaretSlotWidthClasses[size],
-        'inline-flex shrink-0 items-center justify-center text-muted-foreground hover:text-foreground',
+        'inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground',
       )}
       aria-label={accessibleName}
       onClick={onClear}

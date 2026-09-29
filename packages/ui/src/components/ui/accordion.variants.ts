@@ -17,7 +17,7 @@ export const accordionItemVariants = cva('', {
 
 export const accordionTriggerVariants = cva(
   [
-    'flex flex-1 items-center justify-between gap-2 text-left transition-all',
+    'flex flex-1 cursor-pointer items-center justify-between gap-2 text-left transition-all',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
     '[&[data-state=open]>svg]:rotate-180',
   ],

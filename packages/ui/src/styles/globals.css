@@ -824,6 +824,15 @@
     font-family: var(--font-sans);
   }
 
+  /* Tailwind v4 preflight sets `cursor: default` on buttons — restore pointer on actionable controls. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
   ::selection {
     background-color: var(--color-primary);
     color: var(--color-primary-foreground);

@@ -50,7 +50,7 @@ export const inPageSectionNavLeafListClasses = cva('ml-3.5 mt-1 space-y-0.5 bord
 })
 
 export const inPageSectionNavSectionLinkClasses = cva(
-  'block rounded-md px-3 py-2 text-sm transition-colors',
+  'block cursor-pointer rounded-md px-3 py-2 text-sm transition-colors',
   {
     variants: {
       state: {
@@ -66,7 +66,7 @@ export const inPageSectionNavSectionLinkClasses = cva(
 )
 
 export const inPageSectionNavLeafLinkClasses = cva(
-  'block rounded-md py-1.5 pl-2 pr-3 text-sm transition-colors',
+  'block cursor-pointer rounded-md py-1.5 pl-2 pr-3 text-sm transition-colors',
   {
     variants: {
       active: {

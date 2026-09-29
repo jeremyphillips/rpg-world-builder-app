@@ -13,7 +13,7 @@ export const fileIconVariants = cva(
 )
 
 export const removeButtonVariants = cva([
-  'ml-auto shrink-0 rounded-sm p-1',
+  'ml-auto shrink-0 cursor-pointer rounded-sm p-1',
   'text-muted-foreground opacity-70 transition-opacity',
   'hover:opacity-100 hover:text-destructive',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',

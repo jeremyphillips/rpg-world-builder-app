@@ -50,7 +50,7 @@ export const toastDescriptionVariants = cva('text-sm text-muted-foreground')
 export const toastActionsVariants = cva('flex shrink-0 items-center gap-2')
 
 export const toastCloseVariants = cva(
-  'rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  'cursor-pointer rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
 )
 
 export type ToastVariantProps = VariantProps<typeof toastVariants>

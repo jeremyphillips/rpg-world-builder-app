@@ -11,6 +11,9 @@ import {
   fieldInputShellClasses,
 } from './field-input-chrome.variants'
 
+/** Popover/select/combobox triggers — pointer, not text caret. */
+export const fieldControlTriggerCursorClasses = 'cursor-pointer'
+
 /**
  * Look shared by every text-like field control: border, background, focus ring,
  * disabled state, and the error treatment. The error "outline border in error

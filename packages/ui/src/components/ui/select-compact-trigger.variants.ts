@@ -3,7 +3,7 @@ import type { FieldDigits } from './field-digit-metrics'
 import type { FieldSize } from './field-root.lib'
 import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldSizeTypographyClasses } from './field-sizing.variants'
-import { fieldControlVariants } from './field-control.variants'
+import { fieldControlTriggerCursorClasses, fieldControlVariants } from './field-control.variants'
 import {
   groupedSegmentShellClasses,
   resolveGroupedSegmentSurface,
@@ -70,12 +70,19 @@ export function selectTriggerShellClasses(
   options: { grouped: boolean; groupedPosition: 'start' | 'end' },
 ): string {
   if (options.grouped) {
-    return groupedSelectSegmentShellClasses(size, options.groupedPosition, {
-      surfaceRole: options.groupedPosition === 'end' ? 'unit' : 'value',
-    })
+    return cn(
+      groupedSelectSegmentShellClasses(size, options.groupedPosition, {
+        surfaceRole: options.groupedPosition === 'end' ? 'unit' : 'value',
+      }),
+      fieldControlTriggerCursorClasses,
+    )
   }
 
-  return cn(fieldControlVariants({ size }), 'inline-flex shrink-0 items-stretch px-0 py-0')
+  return cn(
+    fieldControlVariants({ size }),
+    fieldControlTriggerCursorClasses,
+    'inline-flex shrink-0 items-stretch px-0 py-0',
+  )
 }
 
 export function groupedValueSlotClasses(

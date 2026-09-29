@@ -220,6 +220,7 @@ export {
 } from './components/ui/text-action.variants'
 export {
   interactiveFocusVariants,
+  interactivePointerClasses,
   type InteractiveFocusVariantProps,
 } from './components/ui/interactive-focus.variants'
 export {
@@ -267,6 +268,7 @@ export {
 } from './components/ui/card'
 
 export {
+  fieldControlTriggerCursorClasses,
   fieldControlVariants,
   textareaVariants,
   fieldWidthVariants,

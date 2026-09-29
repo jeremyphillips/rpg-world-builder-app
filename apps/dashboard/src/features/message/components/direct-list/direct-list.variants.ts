@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 export const directListChromeInsetClasses = 'px-3'
 
 export const conversationListRowVariants = cva(
-  'flex items-start gap-3 px-3 py-3 transition-colors hover:bg-muted',
+  'flex cursor-pointer items-start gap-3 px-3 py-3 transition-colors hover:bg-muted',
   {
     variants: {
       selected: {

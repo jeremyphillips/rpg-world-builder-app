@@ -20,7 +20,7 @@ export const equipmentPickerPurchaseInsetPanelClasses = cn(
 export const equipmentPickerPurchaseInsetPanelContentClasses = 'space-y-3'
 
 export const equipmentPickerPurchaseRemoveActionClasses = cn(
-  'text-sm text-muted-foreground underline-offset-4 hover:text-destructive hover:underline',
+  'cursor-pointer text-sm text-muted-foreground underline-offset-4 hover:text-destructive hover:underline',
   interactiveFocusVariants({ context: 'standalone' }),
 )
 
