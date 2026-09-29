@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { Search } from 'lucide-react'
 
 import { Input } from './input.client'
-import { Tabs, TabsList, TabsTrigger } from './tabs.client'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs.client'
 import { Text } from './text'
 import type {
   CatalogToolbarProps,
@@ -57,6 +57,18 @@ function CatalogToolbarTabRow({
             <CatalogToolbarTabTrigger key={tab.id} tab={tab} />
           ))}
         </TabsList>
+        {tabs.items.map((tab) => (
+          <TabsContent
+            key={tab.id}
+            value={tab.id}
+            hidden
+            aria-hidden
+            tabIndex={-1}
+            className="sr-only"
+          >
+            {tab.label}
+          </TabsContent>
+        ))}
       </Tabs>
       {actions ? <div className="shrink-0">{actions}</div> : null}
     </div>

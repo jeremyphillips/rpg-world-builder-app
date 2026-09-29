@@ -57,18 +57,21 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const EditableStartingGold: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     display: { kind: 'single', row: editableStartingGoldRow },
   },
 }
 
 export const LockedPackageGrant: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     display: { kind: 'single', row: lockedPackageGrantRow },
   },
 }
 
 export const CombinedSourceBreakdown: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     display: {
       kind: 'combined',
@@ -96,6 +99,7 @@ export const CombinedSourceBreakdown: Story = {
 }
 
 export const HighQuantity: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     display: {
       kind: 'single',

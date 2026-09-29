@@ -29,4 +29,10 @@ export const EditorOpen: Story = {
     conversionEditorOpen: true,
     customizeControlsId: 'package-customize-editor',
   },
+  render: (args) => (
+    <>
+      <EquipmentStartingPackageToolbar {...args} />
+      <div id="package-customize-editor" hidden />
+    </>
+  ),
 }

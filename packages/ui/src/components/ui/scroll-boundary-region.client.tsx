@@ -114,6 +114,7 @@ export function ScrollBoundaryRegion({
       />
       <div
         ref={setViewportRef}
+        tabIndex={0}
         className={cn(scrollBoundaryRegionViewportClasses, viewportClassName)}
         {...viewportProps}
       >

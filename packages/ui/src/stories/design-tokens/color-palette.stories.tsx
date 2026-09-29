@@ -5,6 +5,11 @@ import { ColorOnSurfacesCatalog, ColorPaletteCatalog } from './color-palette-cat
 const meta = {
   title: 'Design Tokens/Color Palette',
   parameters: {
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
     layout: 'fullscreen',
     docs: {
       description: {

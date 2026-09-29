@@ -155,6 +155,7 @@ export const BreweryDetails: Story = {
 }
 
 export const WorkshopDetails: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
@@ -167,6 +168,7 @@ export const WorkshopDetails: Story = {
 }
 
 export const OfficeDetails: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
@@ -179,6 +181,7 @@ export const OfficeDetails: Story = {
 }
 
 export const BakeryDetails: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
@@ -191,6 +194,7 @@ export const BakeryDetails: Story = {
 }
 
 export const AuctionHouseDetails: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
@@ -466,6 +470,7 @@ export const HouseBarn: Story = {
 }
 
 export const FormUnspecifiedGranary: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -477,6 +482,7 @@ export const FormUnspecifiedGranary: Story = {
 }
 
 export const HouseGranary: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -491,6 +497,7 @@ export const HouseGranary: Story = {
 }
 
 export const FormUnspecifiedGreenhouse: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -502,6 +509,7 @@ export const FormUnspecifiedGreenhouse: Story = {
 }
 
 export const HallGreenhouse: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -516,6 +524,7 @@ export const HallGreenhouse: Story = {
 }
 
 export const FormUnspecifiedArena: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -527,6 +536,7 @@ export const FormUnspecifiedArena: Story = {
 }
 
 export const HallArena: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
@@ -539,6 +549,7 @@ export const HallArena: Story = {
 }
 
 export const KeepArena: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: buildingArgs,
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {

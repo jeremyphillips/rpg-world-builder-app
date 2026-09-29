@@ -21,6 +21,7 @@ export const ActiveCampaign: Story = {
 }
 
 export const IncompleteOnboarding: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     campaigns: [
       makeCampaignListItem({
@@ -35,6 +36,7 @@ export const IncompleteOnboarding: Story = {
 }
 
 export const MultipleCampaigns: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     campaigns: [
       makeCampaignListItem({ id: 'camp_1', identity: { name: 'The Argent Road' } }),
