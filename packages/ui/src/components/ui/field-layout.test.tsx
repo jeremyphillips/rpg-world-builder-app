@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
+import { FormFieldLabel } from '../../form/presentation/form-field-label.client'
 import { Field } from './field.client'
 import { FieldRowAnatomyProvider } from './field-row-anatomy.context'
 import { FieldLayout } from './field-layout'
@@ -61,6 +62,24 @@ describe('FieldLayout three-region anatomy', () => {
     expect(messageRegion).toContainElement(screen.getByRole('alert'))
     // Error replaces below-control hint
     expect(screen.queryByText('Helper.')).not.toBeInTheDocument()
+  })
+
+  it('keeps sr-only labels out of the label region layout slot', () => {
+    const { container } = render(
+      <Field.Root id="preset" anatomy>
+        <FieldLayout
+          labelVisibility="srOnly"
+          label={<FormFieldLabel label="Starting point" labelVisibility="srOnly" />}
+          control={<input aria-label="Starting point" />}
+        />
+      </Field.Root>,
+    )
+
+    const labelRegion = container.querySelector('[data-field-label-region]')
+    expect(labelRegion?.childElementCount).toBe(0)
+    expect(container.querySelector('[data-field-control-region]')).toHaveTextContent(
+      'Starting point',
+    )
   })
 
   it('renders an empty label region when the field has no label', () => {

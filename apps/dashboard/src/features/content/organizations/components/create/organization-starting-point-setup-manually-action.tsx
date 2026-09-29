@@ -1,7 +1,7 @@
 import { Button, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 
 import { ORGANIZATION_SET_UP_MANUALLY_LABEL } from '../../lib/presets/organization-form-copy.lib'
-import { useOrganizationAuthoringContext } from './organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
 
 /** Quick-create trailing legend action — reveals profile without a starting point preset. */
 export function OrganizationStartingPointSetupManuallyAction() {

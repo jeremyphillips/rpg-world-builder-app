@@ -243,6 +243,7 @@ export function ComboboxField({
       <FieldLayout
         hintPosition={hintPosition}
         wrapControl={false}
+        labelVisibility={labelVisibility}
         label={
           <FormFieldLabel
             label={label}

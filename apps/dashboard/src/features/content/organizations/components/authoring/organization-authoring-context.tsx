@@ -7,6 +7,9 @@ type OrganizationAuthoringContextValue = {
   presentation: OrganizationFormPresentation
   hasEnteredProfileSetup: boolean
   enterProfileSetup: () => void
+  editFamiliarTypeOpen: boolean
+  openEditFamiliarType: () => void
+  closeEditFamiliarType: () => void
   practiceRecommendations: OrganizationPractice[]
   setPracticeRecommendations: (ids: OrganizationPractice[]) => void
   clearPracticeRecommendations: () => void
@@ -27,9 +30,16 @@ export function OrganizationAuthoringProvider({
   const [hasEnteredProfileSetup, setHasEnteredProfileSetup] = useState(
     () => presentation !== 'quick',
   )
+  const [editFamiliarTypeOpen, setEditFamiliarTypeOpen] = useState(false)
 
   const enterProfileSetup = useCallback(() => {
     setHasEnteredProfileSetup(true)
+  }, [])
+  const openEditFamiliarType = useCallback(() => {
+    setEditFamiliarTypeOpen(true)
+  }, [])
+  const closeEditFamiliarType = useCallback(() => {
+    setEditFamiliarTypeOpen(false)
   }, [])
 
   const value = useMemo(
@@ -37,11 +47,22 @@ export function OrganizationAuthoringProvider({
       presentation,
       hasEnteredProfileSetup,
       enterProfileSetup,
+      editFamiliarTypeOpen,
+      openEditFamiliarType,
+      closeEditFamiliarType,
       practiceRecommendations,
       setPracticeRecommendations: setPracticeRecommendationsState,
       clearPracticeRecommendations: () => setPracticeRecommendationsState([]),
     }),
-    [enterProfileSetup, hasEnteredProfileSetup, practiceRecommendations, presentation],
+    [
+      closeEditFamiliarType,
+      editFamiliarTypeOpen,
+      enterProfileSetup,
+      hasEnteredProfileSetup,
+      openEditFamiliarType,
+      practiceRecommendations,
+      presentation,
+    ],
   )
 
   return (

@@ -16,7 +16,7 @@ import {
   organizationChangeStartingPointDialogBody,
   organizationChangeStartingPointDialogTitle,
 } from '../../lib/presets/organization-form-copy.lib'
-import { useOrganizationAuthoringContext } from './organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
 import {
   isOrganizationAuthoringPresetId,
   listOrganizationStartingPointConfirmOverwriteFieldLabels,

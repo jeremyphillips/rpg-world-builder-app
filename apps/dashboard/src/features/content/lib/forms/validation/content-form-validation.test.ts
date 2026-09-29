@@ -75,7 +75,7 @@ const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 const ORGANIZATION_SCHEMA_EXEMPT = [
   'startingPointId',
   /^members\.titles\b/,
-  /_organizationApplyFamiliarType$/,
+  /_organizationEditFamiliarType$/,
 ] as const
 
 /** Managed in the identity header via ManagedMediaField — not FormItem paths. */

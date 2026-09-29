@@ -6,7 +6,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
-import { OrganizationAuthoringProvider } from './organization-authoring-context'
+import { OrganizationAuthoringProvider } from '../authoring/organization-authoring-context'
 import { OrganizationStartingPointLegendAccessory } from './organization-starting-point-legend-accessory'
 import { OrganizationStartingPointSetupManuallyAction } from './organization-starting-point-setup-manually-action'
 import { OrganizationStartingPointField } from './organization-starting-point-field'

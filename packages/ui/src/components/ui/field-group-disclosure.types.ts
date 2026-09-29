@@ -41,6 +41,11 @@ export interface FieldGroupLegendDisclosure {
   defaultOpen?: boolean
   /** Stable key for uiStateKey persistence; falls back to group `id` or legend slug. */
   collapseKey?: string
+  /**
+   * When false, open state is not read from or written to `uiStateKey` storage —
+   * each mount uses `defaultOpen` only. Default `true`.
+   */
+  persistOpen?: boolean
 }
 
 /** Collapsed summary + expanded in-place editor for settings-style groups. Requires `FormProvider`. */

@@ -24,9 +24,10 @@ export const ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION =
 export const ORGANIZATION_OPTIONAL_DETAILS_GROUP_LEGEND = 'Optional details'
 export const ORGANIZATION_OPTIONAL_DETAILS_GROUP_DESCRIPTION = 'Member affinities and description'
 
-export const ORGANIZATION_APPLY_FAMILIAR_TYPE_LABEL = 'Apply familiar type…'
-export const ORGANIZATION_APPLY_FAMILIAR_TYPE_HINT =
-  'Replace organization profile fields and common member classes with values from a familiar type. Membership titles will not change.'
+export const ORGANIZATION_USE_FAMILIAR_TYPE_LABEL = 'Use familiar type…'
+export const ORGANIZATION_FAMILIAR_TYPE_LEGEND = 'Familiar type'
+export const ORGANIZATION_FAMILIAR_TYPE_HINT =
+  'Replaces profile values and common member classes. Membership titles will not change.'
 
 export const ORGANIZATION_DOMAIN_PUBLISH_MESSAGE = 'Choose an organization domain.'
 

@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { writeGroupCollapseOpen } from '../../form/config/group-collapse-storage.lib'
+
 import { Badge } from './badge'
 
 import { FieldGroup } from './field-group'
@@ -304,6 +306,26 @@ describe('FieldGroup', () => {
 
     await user.click(toggle)
     expect(screen.getByRole('textbox', { name: 'Detail' })).toBeInTheDocument()
+  })
+
+  it('ignores stored collapse state when persistOpen is false', () => {
+    writeGroupCollapseOpen('form-session', 'organization-quick-create-optional-details', true)
+
+    render(
+      <FieldGroup
+        id="organization-quick-create-optional-details"
+        uiStateKey="form-session"
+        legend="Optional details"
+        disclosure={{ variant: 'legend', defaultOpen: false, persistOpen: false }}
+      >
+        <TextField id="detail" label="Detail" />
+      </FieldGroup>,
+    )
+
+    expect(screen.getByRole('button', { name: /Optional details/i })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
   })
 
   it('toggles collapsible groups and drops body gap when closed', async () => {

@@ -27,9 +27,11 @@ function useGroupCollapseState(options: {
   collapseKey: string
   defaultOpen: boolean
   uiStateKey?: string
+  persistOpen?: boolean
 }): [boolean, (open: boolean) => void] {
+  const persistOpen = options.persistOpen ?? true
   const [open, setOpen] = React.useState(() => {
-    if (options.uiStateKey) {
+    if (persistOpen && options.uiStateKey) {
       const stored = readGroupCollapseOpen(options.uiStateKey, options.collapseKey)
       if (stored !== undefined) return stored
     }
@@ -39,11 +41,11 @@ function useGroupCollapseState(options: {
   const onOpenChange = React.useCallback(
     (next: boolean) => {
       setOpen(next)
-      if (options.uiStateKey) {
+      if (persistOpen && options.uiStateKey) {
         writeGroupCollapseOpen(options.uiStateKey, options.collapseKey, next)
       }
     },
-    [options.collapseKey, options.uiStateKey],
+    [options.collapseKey, options.uiStateKey, persistOpen],
   )
 
   return [open, onOpenChange]
@@ -96,10 +98,12 @@ export function StandardFieldGroupBody({
   children,
 }: StandardFieldGroupBodyProps) {
   const collapsible = disclosure ? isLegendDisclosure(disclosure) : false
+  const legendDisclosure = disclosure && isLegendDisclosure(disclosure) ? disclosure : undefined
   const [open, onOpenChange] = useGroupCollapseState({
     collapseKey,
     defaultOpen: resolveDisclosureDefaultOpen(disclosure),
     uiStateKey,
+    persistOpen: legendDisclosure?.persistOpen,
   })
 
   const hasBody = React.Children.count(children) > 0

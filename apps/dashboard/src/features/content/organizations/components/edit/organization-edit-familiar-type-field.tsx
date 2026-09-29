@@ -1,4 +1,4 @@
-import { useCallback, useId, useRef, useState } from 'react'
+import { useCallback, useId, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import {
   ORGANIZATION_AUTHORING_PRESETS,
@@ -6,11 +6,12 @@ import {
   type CharacterClass,
   type OrganizationAuthoringPresetId,
 } from '@rpg/contracts'
-import { Button, ComboboxField, ConfirmDialog, Text } from '@rpg/ui'
+import { ComboboxField, ConfirmDialog } from '@rpg/ui'
 
+import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
 import {
-  ORGANIZATION_APPLY_FAMILIAR_TYPE_HINT,
-  ORGANIZATION_APPLY_FAMILIAR_TYPE_LABEL,
+  ORGANIZATION_FAMILIAR_TYPE_HINT,
+  ORGANIZATION_FAMILIAR_TYPE_LEGEND,
   ORGANIZATION_STARTING_POINT_PLACEHOLDER,
   organizationApplyFamiliarTypeDialogBody,
   organizationApplyFamiliarTypeDialogTitle,
@@ -33,20 +34,24 @@ const presetOptions = ORGANIZATION_AUTHORING_PRESET_IDS.map((id) => {
   }
 })
 
-export type OrganizationApplyFamiliarTypeFieldProps = {
+export type OrganizationEditFamiliarTypeFieldProps = {
   prefix?: string
   discoverableClasses: readonly CharacterClass[]
 }
 
-export function OrganizationApplyFamiliarTypeField({
+export function OrganizationEditFamiliarTypeField({
   prefix,
   discoverableClasses,
-}: OrganizationApplyFamiliarTypeFieldProps) {
+}: OrganizationEditFamiliarTypeFieldProps) {
   const comboboxId = useId()
-  const applyButtonRef = useRef<HTMLButtonElement>(null)
   const form = useFormContext()
-  const [pickerOpen, setPickerOpen] = useState(false)
+  const { editFamiliarTypeOpen, closeEditFamiliarType } = useOrganizationAuthoringContext()
   const [pendingPresetId, setPendingPresetId] = useState<OrganizationAuthoringPresetId | null>(null)
+
+  const close = useCallback(() => {
+    setPendingPresetId(null)
+    closeEditFamiliarType()
+  }, [closeEditFamiliarType])
 
   const applyPreset = useCallback(
     (presetId: OrganizationAuthoringPresetId) => {
@@ -58,58 +63,38 @@ export function OrganizationApplyFamiliarTypeField({
       for (const [path, value] of Object.entries(patch)) {
         form.setValue(path, value, { shouldDirty: true, shouldValidate: true })
       }
-      setPickerOpen(false)
-      setPendingPresetId(null)
-      applyButtonRef.current?.focus()
+      close()
     },
-    [discoverableClasses, form, prefix],
+    [close, discoverableClasses, form, prefix],
   )
 
-  const handlePick = useCallback((nextValue: string) => {
-    if (!isOrganizationAuthoringPresetId(nextValue)) {
-      return
-    }
-    setPendingPresetId(nextValue)
-  }, [])
+  if (!editFamiliarTypeOpen) {
+    return null
+  }
 
   return (
-    <div className="flex flex-col gap-2">
-      <Button
-        ref={applyButtonRef}
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() => setPickerOpen((open) => !open)}
-      >
-        {ORGANIZATION_APPLY_FAMILIAR_TYPE_LABEL}
-      </Button>
-      {pickerOpen ? (
-        <>
-          <Text variant="muted">{ORGANIZATION_APPLY_FAMILIAR_TYPE_HINT}</Text>
-          <ComboboxField
-            id={comboboxId}
-            label={ORGANIZATION_APPLY_FAMILIAR_TYPE_LABEL}
-            options={presetOptions}
-            multiple={false}
-            placeholder={ORGANIZATION_STARTING_POINT_PLACEHOLDER}
-            value=""
-            onChange={(next) => {
-              if (typeof next === 'string') {
-                handlePick(next)
-              }
-            }}
-          />
-        </>
-      ) : null}
+    <>
+      <ComboboxField
+        id={comboboxId}
+        label={ORGANIZATION_FAMILIAR_TYPE_LEGEND}
+        hint={ORGANIZATION_FAMILIAR_TYPE_HINT}
+        hintPosition="below-control"
+        options={presetOptions}
+        multiple={false}
+        placeholder={ORGANIZATION_STARTING_POINT_PLACEHOLDER}
+        value=""
+        onChange={(nextValue) => {
+          if (typeof nextValue === 'string' && isOrganizationAuthoringPresetId(nextValue)) {
+            setPendingPresetId(nextValue)
+          }
+        }}
+      />
 
       {pendingPresetId ? (
         <ConfirmDialog
           open
           onOpenChange={(open) => {
-            if (!open) {
-              setPendingPresetId(null)
-              applyButtonRef.current?.focus()
-            }
+            if (!open) close()
           }}
           headline={organizationApplyFamiliarTypeDialogTitle(
             ORGANIZATION_AUTHORING_PRESETS[pendingPresetId].label,
@@ -122,12 +107,9 @@ export function OrganizationApplyFamiliarTypeField({
           )}
           confirmVariant="warning"
           onConfirm={() => applyPreset(pendingPresetId)}
-          onCancel={() => {
-            setPendingPresetId(null)
-            applyButtonRef.current?.focus()
-          }}
+          onCancel={close}
         />
       ) : null}
-    </div>
+    </>
   )
 }

@@ -21,6 +21,23 @@ const spellOptions = [
 ]
 
 describe('ComboboxField', () => {
+  it('keeps sr-only labels out of the label region while naming the combobox', () => {
+    const { container } = render(
+      <ComboboxField
+        id="starting-point"
+        label="Starting point"
+        labelVisibility="srOnly"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+      />,
+    )
+
+    const labelRegion = container.querySelector('[data-field-label-region]')
+    expect(labelRegion?.childElementCount).toBe(0)
+    expect(screen.getByRole('combobox', { name: /Starting point/i })).toBeInTheDocument()
+  })
+
   it('labels the trigger and shows the placeholder', () => {
     render(
       <ComboboxField

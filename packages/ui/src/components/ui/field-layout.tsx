@@ -1,5 +1,6 @@
 import type { ReactElement, ReactNode } from 'react'
 
+import type { FieldLabelVisibility } from '../../form/form-heading.lib'
 import { Field, type FieldSize } from './field.client'
 import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
@@ -23,6 +24,8 @@ export interface FieldLayoutProps {
   size?: FieldSize
   /** Default `single-line`. Use `content-sized` for multiline / compound shells. */
   controlBand?: FieldControlBand
+  /** When `srOnly`, the accessible label does not occupy the label region layout slot. */
+  labelVisibility?: FieldLabelVisibility
 }
 
 /**
@@ -44,10 +47,12 @@ export function FieldLayout({
   chrome,
   size = 'md',
   controlBand = 'single-line',
+  labelVisibility = 'visible',
 }: FieldLayoutProps) {
+  const showVisibleLabel = Boolean(label) && labelVisibility !== 'srOnly'
   const presentation = resolveFieldPresentation({
     size,
-    labelLayout: label ? 'stacked' : 'hidden',
+    labelLayout: showVisibleLabel ? 'stacked' : 'hidden',
     controlBand,
   })
 
@@ -57,11 +62,18 @@ export function FieldLayout({
     control
   )
 
-  const bandedControl = <div className={presentation.controlBandClassName}>{controlNode}</div>
+  const accessibleOnlyLabel = label && labelVisibility === 'srOnly' ? label : null
+
+  const bandedControl = (
+    <div className={presentation.controlBandClassName}>
+      {accessibleOnlyLabel}
+      {controlNode}
+    </div>
+  )
 
   const labelRegionContent =
     hintPosition === 'below-label' ? (
-      label ? (
+      showVisibleLabel ? (
         <div className={fieldLabelHintStackClasses}>
           {label}
           <Field.Hint />
@@ -69,9 +81,9 @@ export function FieldLayout({
       ) : (
         <Field.Hint />
       )
-    ) : (
+    ) : showVisibleLabel ? (
       label
-    )
+    ) : null
 
   const regions = (
     <>

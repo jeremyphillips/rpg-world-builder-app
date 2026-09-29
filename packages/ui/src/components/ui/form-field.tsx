@@ -154,6 +154,7 @@ export function FormField({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        labelVisibility={labelVisibility}
         label={labelNode(label, info, labelVisibility, required)}
         control={children}
         chrome={chrome}

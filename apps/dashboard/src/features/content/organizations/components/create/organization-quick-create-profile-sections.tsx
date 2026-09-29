@@ -6,7 +6,7 @@ import { buildOrganizationQuickCreateFollowOnFields } from '../../../lib/forms/o
 import type { OrganizationFormPresentation } from '../../lib/organization-form-presentation.lib'
 import type { OrganizationPractice } from '@rpg/contracts'
 
-import { useOrganizationAuthoringContext } from './organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
 
 export type OrganizationQuickCreateProfileSectionsProps = {
   prefix?: string

@@ -10,7 +10,7 @@ import {
 } from '../../../lib/forms/organization-form-projection'
 import { organizationCreateDefaultValues } from '../../../lib/forms/organization-form-projection'
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
-import { OrganizationAuthoringProvider } from './organization-authoring-context'
+import { OrganizationAuthoringProvider } from '../authoring/organization-authoring-context'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
 
 const schema = z.object({
@@ -27,9 +27,9 @@ const schema = z.object({
     .default({ classAffinityIds: [], speciesAffinityIds: [] }),
 })
 
-function renderQuickCreateForm() {
+function renderQuickCreateForm(options?: { uiStateKey?: string }) {
   const ctx = { ...makeContentFormCtx(), organizationFormPresentation: 'quick' as const }
-  render(
+  return render(
     <OrganizationAuthoringProvider presentation="quick">
       <Form
         schema={schema}
@@ -37,6 +37,7 @@ function renderQuickCreateForm() {
         defaultValues={organizationCreateDefaultValues}
         valueSyncs={buildOrganizationFormValueSyncs()}
         onSubmit={() => undefined}
+        uiStateKey={options?.uiStateKey}
         header={() => <OrganizationAuthoringPresetBridge />}
       />
     </OrganizationAuthoringProvider>,
@@ -75,5 +76,27 @@ describe('Organization quick create profile gating', () => {
     await waitFor(() => {
       expect(screen.getByRole('group', { name: /Organization profile/i })).toBeInTheDocument()
     })
+  })
+
+  it('remounts optional details collapsed after expand when uiStateKey is stable', async () => {
+    const user = userEvent.setup()
+    const uiStateKey = 'org-quick-create-optional-details'
+    const { unmount } = renderQuickCreateForm({ uiStateKey })
+
+    await user.click(screen.getByRole('button', { name: 'Set up manually' }))
+    await user.click(screen.getByRole('button', { name: /Optional details/i }))
+    expect(screen.getByRole('button', { name: /Optional details/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+
+    unmount()
+    renderQuickCreateForm({ uiStateKey })
+
+    await user.click(screen.getByRole('button', { name: 'Set up manually' }))
+    expect(screen.getByRole('button', { name: /Optional details/i })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
   })
 })
