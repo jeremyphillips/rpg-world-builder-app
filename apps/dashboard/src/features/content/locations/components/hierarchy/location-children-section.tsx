@@ -30,7 +30,10 @@ import type {
   LocationChildrenViewModel,
   LocationStructureRowVm,
 } from '../../lib/location-display'
-import type { LocationAuthoringType } from '../../lib/location-authoring-type'
+import {
+  resolveLocationAuthoringType,
+  type LocationAuthoringType,
+} from '../../lib/location-authoring-type'
 import {
   applyLocationParentReplacement,
   hasLocationParentReplacementContextMismatch,
@@ -55,8 +58,19 @@ export type LocationChildrenSectionProps = {
   canManage?: boolean
   parentLocationId: string
   parentKind: LocationKind
+  parentAuthoringType: LocationAuthoringType
   campaignId: string
   campaignLocations: readonly Location[]
+}
+
+function resolveRowParentAuthoringType(
+  row: LocationStructureRowVm,
+  campaignLocations: readonly Location[],
+): LocationAuthoringType {
+  const entity = campaignLocations.find((location) => location.id === row.item.id)
+  return entity
+    ? resolveLocationAuthoringType(entity)
+    : resolveLocationAuthoringType({ kind: row.kind })
 }
 
 function buildChildRowActions(
@@ -97,11 +111,13 @@ function resolveExpandableRowEndSlot({
   row,
   canManage,
   actions,
+  campaignLocations,
   onSelectAuthoringType,
 }: {
   row: LocationStructureRowVm
   canManage: boolean
   actions: readonly DetailOverflowAction[]
+  campaignLocations: readonly Location[]
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
 }) {
   const canAddChild =
@@ -111,6 +127,7 @@ function resolveExpandableRowEndSlot({
     <LocationAddChildMenu
       appearance="icon"
       parentKind={row.kind}
+      parentAuthoringType={resolveRowParentAuthoringType(row, campaignLocations)}
       triggerLabel={`Add location to ${row.item.name}`}
       menuHeading={`Add to ${row.item.name}`}
       onSelectAuthoringType={(authoringType) => onSelectAuthoringType(authoringType, row.item.id)}
@@ -161,6 +178,7 @@ function LocationStructurePreviewChildRows({
 function resolveStructureRowNestedContent({
   row,
   canManage,
+  campaignLocations,
   onMove,
   onView,
   onSelectAuthoringType,
@@ -168,6 +186,7 @@ function resolveStructureRowNestedContent({
 }: {
   row: LocationStructureRowVm
   canManage: boolean
+  campaignLocations: readonly Location[]
   onMove: (childId: string) => void
   onView: (href: string) => void
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
@@ -180,6 +199,7 @@ function resolveStructureRowNestedContent({
       <LocationStructureRows
         rows={row.children}
         canManage={canManage}
+        campaignLocations={campaignLocations}
         onMove={onMove}
         onView={onView}
         onSelectAuthoringType={onSelectAuthoringType}
@@ -214,11 +234,13 @@ function resolveStructureRowEndSlot({
   row,
   canManage,
   actions,
+  campaignLocations,
   onSelectAuthoringType,
 }: {
   row: LocationStructureRowVm
   canManage: boolean
   actions: readonly DetailOverflowAction[]
+  campaignLocations: readonly Location[]
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
 }) {
   if (row.canAddChildren) {
@@ -226,6 +248,7 @@ function resolveStructureRowEndSlot({
       row,
       canManage,
       actions,
+      campaignLocations,
       onSelectAuthoringType,
     })
   }
@@ -246,6 +269,7 @@ function LocationStructureRow({
   index,
   rowCount,
   canManage,
+  campaignLocations,
   onMove,
   onView,
   onSelectAuthoringType,
@@ -255,6 +279,7 @@ function LocationStructureRow({
   index: number
   rowCount: number
   canManage: boolean
+  campaignLocations: readonly Location[]
   onMove: (childId: string) => void
   onView: (href: string) => void
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
@@ -280,6 +305,7 @@ function LocationStructureRow({
   const nestedContent = resolveStructureRowNestedContent({
     row,
     canManage,
+    campaignLocations,
     onMove,
     onView,
     onSelectAuthoringType,
@@ -298,6 +324,7 @@ function LocationStructureRow({
           row,
           canManage,
           actions,
+          campaignLocations,
           onSelectAuthoringType,
         }),
       )}
@@ -309,6 +336,7 @@ function LocationStructureRow({
 function LocationStructureRows({
   rows,
   canManage,
+  campaignLocations,
   onMove,
   onView,
   onSelectAuthoringType,
@@ -316,6 +344,7 @@ function LocationStructureRows({
 }: {
   rows: readonly LocationStructureRowVm[]
   canManage: boolean
+  campaignLocations: readonly Location[]
   onMove: (childId: string) => void
   onView: (href: string) => void
   onSelectAuthoringType: (authoringType: LocationAuthoringType, parentLocationId: string) => void
@@ -330,6 +359,7 @@ function LocationStructureRows({
           index={index}
           rowCount={rows.length}
           canManage={canManage}
+          campaignLocations={campaignLocations}
           onMove={onMove}
           onView={onView}
           onSelectAuthoringType={onSelectAuthoringType}
@@ -380,6 +410,7 @@ function LocationChildRows({
 type LocationStructureGroupsProps = {
   groups: NonNullable<LocationChildrenViewModel['groups']>
   parentKind: LocationKind
+  parentAuthoringType: LocationAuthoringType
   canManage: boolean
   onSelectAuthoringType: (
     authoringType: LocationAuthoringType,
@@ -392,11 +423,13 @@ type LocationStructureGroupsProps = {
 function LocationStructureGroups({
   groups,
   parentKind,
+  parentAuthoringType,
   canManage,
   onSelectAuthoringType,
   onMove,
   onView,
-}: LocationStructureGroupsProps) {
+  campaignLocations,
+}: LocationStructureGroupsProps & { campaignLocations: readonly Location[] }) {
   const structureAuthoring = resolveStructureChildAuthoringOptions(
     parentKind,
     childAuthoringTypesForParentKind(parentKind),
@@ -428,6 +461,7 @@ function LocationStructureGroups({
         <LocationAddChildMenu
           appearance="group"
           parentKind={parentKind}
+          parentAuthoringType={parentAuthoringType}
           allowedAuthoringTypes={structureAuthoring.direct}
           onSelectAuthoringType={onSelectAuthoringType}
         />
@@ -449,6 +483,7 @@ function LocationStructureGroups({
             <LocationStructureRows
               rows={group.expandableItems}
               canManage={canManage}
+              campaignLocations={campaignLocations}
               onMove={onMove}
               onView={onView}
               onSelectAuthoringType={onSelectAuthoringType}
@@ -478,6 +513,7 @@ export function LocationChildrenSection({
   canManage = false,
   parentLocationId,
   parentKind,
+  parentAuthoringType,
   campaignId,
   campaignLocations,
 }: LocationChildrenSectionProps) {
@@ -572,6 +608,7 @@ export function LocationChildrenSection({
           !groups && canManage ? (
             <LocationAddChildMenu
               parentKind={parentKind}
+              parentAuthoringType={parentAuthoringType}
               onSelectAuthoringType={handleSelectAuthoringType}
             />
           ) : undefined
@@ -581,7 +618,9 @@ export function LocationChildrenSection({
           <LocationStructureGroups
             groups={groups}
             parentKind={parentKind}
+            parentAuthoringType={parentAuthoringType}
             canManage={canManage}
+            campaignLocations={campaignLocations}
             onSelectAuthoringType={handleSelectAuthoringType}
             onMove={openMoveDrawer}
             onView={(href) => navigate(href)}

@@ -257,6 +257,19 @@ City structure uses two subgroup header actions from one canonical eligibility p
 
 Both actions remain in the subgroup header for empty and populated states. Direct-location choices are a projection of canonical parent-child eligibility with District removed — not a separate hierarchy list. District row icon `+` remains a different scope (create under that District) and keeps compact ghost icon chrome. Flat Contained locations (non-settlement) still use panel `action` with the same compact text labeled menu (`Plus` from `lucide-react`).
 
+### Add-choice dropdown rows (multi-option adds)
+
+When an add control opens a menu of typed choices (not a single drawer launch), use
+**`EntityActionChoiceMenu`** (`content/lib/entity/action/entity-action-choice-menu.tsx`):
+
+- Each row: **label + required description** (stacked helper copy).
+- Panel width: `--popover-choice-menu-width`, applied viewport-safe on menu content.
+- Triggers: labeled add (`ActionButton`), subgroup header (`appearance="group"`), or compact icon (`appearance="icon"`).
+
+**`LocationAddChildMenu`** is the location-hierarchy option builder on top of that primitive (eligibility from `childAuthoringTypesForParentKind`, copy from `resolveLocationAuthoringOptionDescription`). Do not import `DropdownMenu` in feature add-choice entry points — compose through `EntityActionChoiceMenu` only (see `entity-action-choice-menu.guard.test.ts`).
+
+`EntityRowList` direct `action` / `headerAction` stays single-click until a roster/relationship surface needs a multi-option choice menu; wire that through the same primitive when it lands.
+
 ## Populated row vs empty container
 
 | Responsibility                    | Owner                                                                                                                                          |

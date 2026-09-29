@@ -331,6 +331,8 @@
 
   /* Popover menus — minimum readable width when the trigger is fit-sized. */
   --popover-menu-min-width: 15.625rem; /* 250px */
+  /* Labeled choice menus (add-type rows) — capped in CSS via min(..., 100vw). */
+  --popover-choice-menu-width: 18.75rem; /* 300px */
 
   /*
    * Icon glyph scale — general UI SSOT (decorative, inline, control icons).

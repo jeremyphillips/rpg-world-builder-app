@@ -1,19 +1,11 @@
 import type { LocationKind } from '@rpg/contracts'
-import {
-  ActionButton,
-  ActionIcon,
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@rpg/ui'
 
+import { EntityActionChoiceMenu } from '../../../lib/entity/action/entity-action-choice-menu'
 import {
   childAuthoringTypesForParentKind,
   getLocationAuthoringTypeLabel,
 } from '../../lib/create/location-create-shortcuts'
+import { resolveLocationAuthoringOptionDescription } from '../../lib/location-authoring-option-description.lib'
 import type { LocationAuthoringType } from '../../lib/location-authoring-type'
 
 type LocationAddChildMenuTriggerProps =
@@ -29,6 +21,8 @@ type LocationAddChildMenuTriggerProps =
 
 export type LocationAddChildMenuProps = {
   parentKind: LocationKind
+  /** Parent form authoring type — drives contextual option descriptions. */
+  parentAuthoringType: LocationAuthoringType
   onSelectAuthoringType: (authoringType: LocationAuthoringType) => void
   /**
    * Optional subset of types already resolved for this context (e.g. settlement direct
@@ -43,6 +37,7 @@ export type LocationAddChildMenuProps = {
 /** Detail-page menu of child location types derived from contracts hierarchy. */
 export function LocationAddChildMenu({
   parentKind,
+  parentAuthoringType,
   onSelectAuthoringType,
   allowedAuthoringTypes,
   menuHeading,
@@ -54,43 +49,23 @@ export function LocationAddChildMenu({
       ? canonicalTypes
       : canonicalTypes.filter((type) => allowedAuthoringTypes.includes(type))
 
-  if (childTypes.length === 0) {
-    return null
-  }
-
   const appearance = triggerProps.appearance ?? 'labeled'
   const labeledText = triggerProps.triggerLabel ?? 'Add location'
-  const trigger =
-    appearance === 'icon' ? (
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        density="compact"
-        aria-label={triggerProps.triggerLabel}
-      >
-        <ActionIcon action="add" />
-      </Button>
-    ) : (
-      <ActionButton action="add" variant="text" size="sm" density="compact">
-        {labeledText}
-      </ActionButton>
-    )
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {menuHeading ? <DropdownMenuLabel>{menuHeading}</DropdownMenuLabel> : null}
-        {childTypes.map((authoringType) => (
-          <DropdownMenuItem
-            key={authoringType}
-            onSelect={() => onSelectAuthoringType(authoringType)}
-          >
-            {getLocationAuthoringTypeLabel(authoringType, { parentKind })}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <EntityActionChoiceMenu
+      appearance={appearance}
+      triggerLabel={labeledText}
+      menuHeading={menuHeading}
+      items={childTypes.map((authoringType) => ({
+        id: authoringType,
+        label: getLocationAuthoringTypeLabel(authoringType, { parentKind }),
+        description: resolveLocationAuthoringOptionDescription({
+          parentAuthoringType,
+          childAuthoringType: authoringType,
+        }),
+        onSelect: () => onSelectAuthoringType(authoringType),
+      }))}
+    />
   )
 }

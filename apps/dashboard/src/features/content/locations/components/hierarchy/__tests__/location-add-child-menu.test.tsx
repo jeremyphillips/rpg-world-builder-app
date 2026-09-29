@@ -12,6 +12,7 @@ describe('LocationAddChildMenu', () => {
     render(
       <LocationAddChildMenu
         parentKind="settlement"
+        parentAuthoringType="settlement"
         onSelectAuthoringType={onSelectAuthoringType}
       />,
     )
@@ -20,7 +21,7 @@ describe('LocationAddChildMenu', () => {
     expect(addButton).toHaveClass('text-action-standalone', 'text-foreground')
 
     await user.click(addButton)
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
 
     expect(onSelectAuthoringType).toHaveBeenCalledWith('building')
   })
@@ -33,6 +34,7 @@ describe('LocationAddChildMenu', () => {
       <LocationAddChildMenu
         appearance="icon"
         parentKind="district"
+        parentAuthoringType="district"
         triggerLabel="Add location to Dock Ward"
         menuHeading="Add to Dock Ward"
         onSelectAuthoringType={onSelectAuthoringType}
@@ -42,7 +44,7 @@ describe('LocationAddChildMenu', () => {
     await user.click(screen.getByRole('button', { name: 'Add location to Dock Ward' }))
     expect(screen.getByText('Add to Dock Ward')).toBeInTheDocument()
     expect(screen.queryByRole('menuitem', { name: 'District' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
     expect(onSelectAuthoringType).toHaveBeenCalledWith('building')
   })
 
@@ -54,25 +56,57 @@ describe('LocationAddChildMenu', () => {
       <LocationAddChildMenu
         appearance="group"
         parentKind="settlement"
+        parentAuthoringType="settlement"
         allowedAuthoringTypes={['building', 'site', 'district']}
         onSelectAuthoringType={onSelectAuthoringType}
       />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Add location' }))
-    expect(screen.getByRole('menuitem', { name: 'Building' })).toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'Site' })).toBeInTheDocument()
-    expect(screen.getByRole('menuitem', { name: 'District' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Building/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /^Site\b/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /^District\b/i })).toBeInTheDocument()
     expect(screen.queryByRole('menuitem', { name: 'Fortification' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('menuitem', { name: 'Building' }))
+    await user.click(screen.getByRole('menuitem', { name: /Building/i }))
     expect(onSelectAuthoringType).toHaveBeenCalledWith('building')
+  })
+
+  it('shows contextual description for building under building', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationAddChildMenu
+        parentKind="structure"
+        parentAuthoringType="building"
+        onSelectAuthoringType={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /add location/i }))
+    expect(screen.getByText(/annex, tower, stable, or workshop/i)).toBeInTheDocument()
+  })
+
+  it('shows building description under site parent', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <LocationAddChildMenu
+        parentKind="site"
+        parentAuthoringType="site"
+        onSelectAuthoringType={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /add location/i }))
+    expect(screen.getByText(/annex, tower, stable, or workshop/i)).toBeInTheDocument()
   })
 
   it('returns null when the allowed subset has no canonical intersection', () => {
     const { container } = render(
       <LocationAddChildMenu
         parentKind="settlement"
+        parentAuthoringType="settlement"
         allowedAuthoringTypes={[]}
         onSelectAuthoringType={vi.fn()}
       />,

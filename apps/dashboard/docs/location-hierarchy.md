@@ -75,7 +75,8 @@ selection (no setup Continue on first pass). Overview/page create uses
 Continue** navigation boundary (radio selection alone does not navigate). Both consume
 `resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
 choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete. URL resume params
-(`settlementType`, `siteType`, `regionClassificationKind` + `regionType`) share the
+(`settlementType`, `siteType`, URL `regionClassificationKind` + `regionType` mapping to form
+`classification.kind` / `classification.type`) share the
 same shortcut contract.
 
 Building → Organizations relationship drafting stays on the Add/Pending composer
@@ -95,6 +96,11 @@ Orchestration lives in `@/lib/create-setup`; see `apps/dashboard/src/lib/create-
 
 Both subgroup actions derive from one `childAuthoringTypesForParentKind` result, projected
 by `resolveStructureChildAuthoringOptions`.
+
+Add-child menu rows use **`EntityActionChoiceMenu`** via `LocationAddChildMenu`. Helper copy
+resolves as **parent+child override → child-type default** in
+`location-authoring-option-description.lib.ts`. Tests exhaust every child type allowed under each
+parent kind from hierarchy SSOT (`childAuthoringTypesForParentKind`).
 
 The panel heading uses `` `${resolveLocationStructureHeadingNoun(location)} structure` ``
 from contracts display projection.
