@@ -15,52 +15,8 @@ import {
 import { BuilderOptionCardImage } from './builder/steps/shared/builder-option-card-image'
 import { CampaignDisplayName, buildCampaignDisplay } from '@/features/campaign'
 
-import {
-  resolveCharacterRosterStatusPresentation,
-  type CharacterRosterStatusPresentation,
-} from '../lib/campaign-roster-presentation'
+import { resolveCharacterRosterStatusPresentation } from '../lib/campaign-roster-presentation'
 import type { CharacterListCardData } from './character-list-card.lib'
-
-function CharacterListCardHeader({
-  card,
-  showCampaign,
-  controllerLine,
-  rosterPresentation,
-}: {
-  card: CharacterListCardData
-  showCampaign: boolean
-  controllerLine: string | undefined
-  rosterPresentation: CharacterRosterStatusPresentation | null
-}) {
-  return (
-    <CardHeader className={card.displayImagesByRole?.primary ? 'px-5 pb-3 pt-3' : undefined}>
-      <div className="flex items-start justify-between gap-2">
-        <CardTitle>{card.name}</CardTitle>
-        {rosterPresentation ? (
-          <Badge appearance={rosterPresentation.appearance} tone={rosterPresentation.tone}>
-            {rosterPresentation.label}
-          </Badge>
-        ) : null}
-      </div>
-      <CardDescription>{card.summary}</CardDescription>
-      {controllerLine ? (
-        <Text variant="small" className="text-muted-foreground">
-          {controllerLine}
-        </Text>
-      ) : null}
-      {showCampaign && card.campaign ? (
-        <CampaignDisplayName
-          display={buildCampaignDisplay({
-            id: card.campaign.id,
-            name: card.campaign.name,
-            emblemUrl: card.campaign.emblemUrl,
-          })}
-          surface="inlineMuted"
-        />
-      ) : null}
-    </CardHeader>
-  )
-}
 
 export type CharacterListCardProps = {
   card: CharacterListCardData
