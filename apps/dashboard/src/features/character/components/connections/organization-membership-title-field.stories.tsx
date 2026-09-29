@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../lib/organization-membership/organization-membership-title.lib'
-
 import { OrganizationMembershipTitleField } from './organization-membership-title-field'
 
 const sampleCatalog = [
@@ -29,11 +27,7 @@ function ControlledTitleField(
 
 export const Default: Story = {
   render: () => (
-    <ControlledTitleField
-      titles={sampleCatalog}
-      value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
-      idPrefix="story-membership"
-    />
+    <ControlledTitleField titles={sampleCatalog} value="omt_2" idPrefix="story-membership" />
   ),
 }
 

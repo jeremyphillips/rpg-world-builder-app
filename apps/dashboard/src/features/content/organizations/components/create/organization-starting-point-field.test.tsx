@@ -25,9 +25,12 @@ const schema = z.object({
   members: z
     .object({
       classAffinityIds: z.array(z.string()).default([]),
-      titles: z.array(z.unknown()).default([]),
+      titles: z.array(z.unknown()).default([{ id: 'omt_member', label: 'Member', priority: 10 }]),
     })
-    .default({ classAffinityIds: [], titles: [] }),
+    .default({
+      classAffinityIds: [],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 }],
+    }),
 })
 
 type HarnessValues = z.infer<typeof schema>
@@ -107,7 +110,10 @@ function renderStartingPointForm() {
           name: 'Test',
           functions: [],
           practices: [],
-          members: { classAffinityIds: [], titles: [] },
+          members: {
+            classAffinityIds: [],
+            titles: [{ id: 'omt_member', label: 'Member', priority: 10 }],
+          },
         }}
         valueSyncs={buildOrganizationFormValueSyncs()}
         onSubmit={() => undefined}

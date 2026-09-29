@@ -70,7 +70,11 @@ function resolveOrganizations(
     .flatMap((edge) => {
       const organization = available.get(edge.organizationId)
       if (!organization) return []
-      const title = edge.details?.title
+      const membershipTitleId = edge.details?.membershipTitleId
+      const title =
+        membershipTitleId === undefined
+          ? undefined
+          : organization.members.titles.find((entry) => entry.id === membershipTitleId)?.label
       const lifecycle = edge.details?.lifecycle ?? 'current'
       return [
         {

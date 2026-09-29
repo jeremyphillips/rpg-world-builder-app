@@ -1,14 +1,14 @@
 import {
   getNpcAuthoringTemplateClassAffinityIds,
   isClassProgressionApplicable,
-  resolveOrganizationMembershipTitleDefinitionByLabel,
+  resolveOrganizationMembershipTitleProjection,
   resolveOrganizationNpcClassRecommendationIds,
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
+import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
@@ -20,12 +20,17 @@ export function resolveQuickNpcSelectedTitleRecommendation(args: {
   if (args.membershipTitle === undefined) {
     return undefined
   }
-  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle)
-  if (persistedTitle === undefined) {
+  let membershipTitleId: string
+  try {
+    membershipTitleId = membershipTitleIdFromRadioValue(args.membershipTitle)
+  } catch {
     return undefined
   }
-  return resolveOrganizationMembershipTitleDefinitionByLabel(args.titles, persistedTitle)
-    ?.npcRecommendation
+  const projection = resolveOrganizationMembershipTitleProjection({
+    catalog: args.titles,
+    membershipTitleId,
+  })
+  return projection.status === 'resolved' ? projection.npcRecommendation : undefined
 }
 
 export function resolveQuickNpcClassRecommendationIds(args: {

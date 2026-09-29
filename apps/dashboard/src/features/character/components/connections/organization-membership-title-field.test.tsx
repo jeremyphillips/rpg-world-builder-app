@@ -2,8 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../lib/organization-membership/organization-membership-title.lib'
-
 import { OrganizationMembershipTitleField } from './organization-membership-title-field'
 
 const sampleCatalog = [
@@ -12,17 +10,17 @@ const sampleCatalog = [
 ]
 
 describe('OrganizationMembershipTitleField', () => {
-  it('renders catalog titles and No title', () => {
+  it('renders catalog titles only', () => {
     render(
       <OrganizationMembershipTitleField
         titles={sampleCatalog}
-        value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
+        value={undefined}
         onValueChange={() => undefined}
         idPrefix="test"
       />,
     )
 
-    expect(screen.getByLabelText('No title')).toBeInTheDocument()
+    expect(screen.queryByLabelText('No title')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByLabelText('Member')).toBeInTheDocument()
   })
@@ -34,13 +32,13 @@ describe('OrganizationMembershipTitleField', () => {
     render(
       <OrganizationMembershipTitleField
         titles={sampleCatalog}
-        value={ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE}
+        value={undefined}
         onValueChange={onValueChange}
         idPrefix="test"
       />,
     )
 
     await user.click(screen.getByLabelText('Guildmaster'))
-    expect(onValueChange).toHaveBeenCalledWith('Guildmaster')
+    expect(onValueChange).toHaveBeenCalledWith('omt_1')
   })
 })

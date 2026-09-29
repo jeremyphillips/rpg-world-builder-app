@@ -1,45 +1,53 @@
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
-import { sortOrganizationMembershipTitleDefinitionsForDisplay } from '@rpg/contracts'
-
-/** UI-only sentinel — never persisted as a membership title. */
-export const ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE = '__no_title__'
+import {
+  resolveSoleOrganizationMembershipTitleId,
+  sortOrganizationMembershipTitleDefinitionsForDisplay,
+} from '@rpg/contracts'
 
 export function buildOrganizationMembershipTitleRadioOptions(input: {
   titles: readonly OrganizationMembershipTitleDefinition[]
-  /** Current persisted/selected title — appended when absent from catalog. */
-  currentValue?: string
+  /** Current persisted/selected catalog id. */
+  currentMembershipTitleId?: string
 }): { value: string; label: string }[] {
   const suggestions = sortOrganizationMembershipTitleDefinitionsForDisplay(input.titles)
-  const suggestionValues = new Set<string>(suggestions.map((entry) => entry.label))
-  const options = [
-    { value: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE, label: 'No title' },
-    ...suggestions.map((entry) => ({ value: entry.label, label: entry.label })),
-  ]
+  return suggestions.map((entry) => ({ value: entry.id, label: entry.label }))
+}
 
-  const current = input.currentValue?.trim()
+/** Maps radio value → persisted membership title id. */
+export function membershipTitleIdFromRadioValue(value: string): string {
+  const membershipTitleId = value.trim()
+  if (membershipTitleId === '') {
+    throw new Error('Organization membership title id is required.')
+  }
+  return membershipTitleId
+}
+
+/** Maps persisted membership title id → radio value. */
+export function membershipRadioValueFromMembershipTitleId(
+  membershipTitleId: string | undefined | null,
+  catalog?: readonly OrganizationMembershipTitleDefinition[],
+): string | undefined {
   if (
-    current &&
-    current !== ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE &&
-    !suggestionValues.has(current)
+    membershipTitleId === undefined ||
+    membershipTitleId === null ||
+    membershipTitleId.trim() === ''
   ) {
-    options.push({ value: current, label: current })
+    return resolveSoleOrganizationMembershipTitleId(catalog ?? [])
   }
-
-  return options
+  if (catalog !== undefined && !catalog.some((entry) => entry.id === membershipTitleId)) {
+    return resolveSoleOrganizationMembershipTitleId(catalog)
+  }
+  return membershipTitleId
 }
 
-/** Maps radio value → optional persisted title (undefined when No title). */
-export function titleFromMembershipRadioValue(value: string): string | undefined {
-  if (value === ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE || value.trim() === '') {
-    return undefined
-  }
-  return value
+/** @deprecated Use membershipTitleIdFromRadioValue — label-based mapping removed. */
+export function titleFromMembershipRadioValue(value: string): string {
+  return membershipTitleIdFromRadioValue(value)
 }
 
-/** Maps optional persisted title → radio value. */
-export function membershipRadioValueFromTitle(title: string | undefined | null): string {
-  if (title === undefined || title === null || title.trim() === '') {
-    return ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
-  }
-  return title
+/** @deprecated Use membershipRadioValueFromMembershipTitleId. */
+export function membershipRadioValueFromTitle(
+  title: string | undefined | null,
+): string | undefined {
+  return membershipRadioValueFromMembershipTitleId(title)
 }

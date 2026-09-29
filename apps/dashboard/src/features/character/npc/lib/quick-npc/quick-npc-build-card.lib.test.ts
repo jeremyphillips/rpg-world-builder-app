@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 
-import { ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   formatQuickNpcClassRecommendationHelper,
   formatQuickNpcLevelRecommendationPrompt,
@@ -28,8 +27,8 @@ describe('formatQuickNpcLevelRecommendationPrompt', () => {
   it('returns undefined when the title has no recommendation', () => {
     expect(
       formatQuickNpcLevelRecommendationPrompt({
-        membershipTitle: ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-        titles: [],
+        membershipTitle: 'omt_member',
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
       }),
     ).toBeUndefined()
   })
@@ -37,7 +36,7 @@ describe('formatQuickNpcLevelRecommendationPrompt', () => {
   it('formats the recommended level prompt from the selected title', () => {
     expect(
       formatQuickNpcLevelRecommendationPrompt({
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         titles: [guildmasterTitle],
       }),
     ).toBe('Recommended for Guildmaster: Level 5.')

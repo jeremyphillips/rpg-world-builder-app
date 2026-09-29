@@ -51,6 +51,7 @@ describe('GET /api/campaigns/:campaignId/content/organizations/references/:chara
     expect(response.body.organizationReferences).toEqual([
       {
         organizationId: organization.id,
+        titleReferenceStatus: 'none',
         organization: expect.objectContaining({
           id: organization.id,
           name: 'Shadow Guild',

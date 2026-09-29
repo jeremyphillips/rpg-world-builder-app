@@ -70,7 +70,7 @@ const organizationCatalog = vi.hoisted(() => [
     members: {
       classAffinityIds: [],
       speciesAffinityIds: [],
-      titles: [],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
     },
     connections: { locations: [] },
   },

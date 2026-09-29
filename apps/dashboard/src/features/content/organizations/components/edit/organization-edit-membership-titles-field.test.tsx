@@ -1,16 +1,18 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
+import { OrganizationMembershipTitlesRegistration } from '../authoring/organization-membership-titles-registration'
 import { OrganizationEditMembershipTitlesField } from './organization-edit-membership-titles-field'
 
 const schema = z.object({
   members: z.object({
+    classAffinityIds: z.array(z.string()).default([]),
     titles: z.array(
       z.object({
         id: z.string(),
@@ -32,12 +34,21 @@ const changedTitles: OrganizationMembershipTitleDefinition[] = [
 
 function FormHarness() {
   const form = useFormContext<z.infer<typeof schema>>()
+  const { replace } = useFieldArray({ control: form.control, name: 'members.titles' })
   return (
     <div>
-      <button type="button" onClick={() => form.setValue('members.titles', changedTitles)}>
+      <button type="button" onClick={() => replace(changedTitles)}>
         Change titles
       </button>
-      <button type="button" onClick={() => form.reset()}>
+      <button
+        type="button"
+        onClick={() => {
+          form.reset({
+            members: { classAffinityIds: [], titles: initialTitles },
+          })
+          replace(initialTitles)
+        }}
+      >
         Reset titles
       </button>
     </div>
@@ -78,8 +89,47 @@ describe('OrganizationEditMembershipTitlesField', () => {
   it('renders current form members.titles', () => {
     renderTitlesField()
     const group = titlesGroup()
-    expect(within(group).getByText('Chair')).toBeInTheDocument()
-    expect(within(group).getByText('Clerk')).toBeInTheDocument()
+    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
+    expect(within(group).getByDisplayValue('Clerk')).toBeInTheDocument()
+  })
+
+  it('renders titles when a sibling registers members without titles', () => {
+    render(
+      <Form
+        schema={schema}
+        fields={[
+          {
+            kind: 'slot',
+            name: '_organizationMembershipTitlesRegistration',
+            render: () => <OrganizationMembershipTitlesRegistration />,
+          },
+          {
+            type: 'chips',
+            name: 'members.classAffinityIds',
+            label: 'Class affinities',
+            options: [{ value: 'class-fighter', label: 'Fighter' }],
+            multiple: true,
+          },
+          {
+            kind: 'group',
+            legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
+            fields: [
+              {
+                kind: 'slot',
+                name: '_organizationMembershipTitles',
+                render: () => <OrganizationEditMembershipTitlesField />,
+              },
+            ],
+          },
+        ]}
+        defaultValues={{ members: { classAffinityIds: [], titles: initialTitles } }}
+        onSubmit={() => undefined}
+      />,
+    )
+
+    const group = titlesGroup()
+    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
+    expect(within(group).getByDisplayValue('Clerk')).toBeInTheDocument()
   })
 
   it('renders under an embedded namespace prefix', () => {
@@ -108,16 +158,14 @@ describe('OrganizationEditMembershipTitlesField', () => {
     )
 
     const group = titlesGroup()
-    expect(within(group).getByText('Chair')).toBeInTheDocument()
+    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
   })
 
-  it('exposes no mutation controls inside the titles group', () => {
+  it('exposes editable membership title controls inside the titles group', () => {
     renderTitlesField()
     const group = titlesGroup()
-    expect(within(group).queryAllByRole('button')).toHaveLength(0)
-    expect(within(group).queryAllByRole('textbox')).toHaveLength(0)
-    expect(within(group).queryAllByRole('checkbox')).toHaveLength(0)
-    expect(within(group).queryAllByRole('radio')).toHaveLength(0)
+    expect(within(group).getAllByRole('textbox').length).toBeGreaterThan(0)
+    expect(within(group).getByRole('button', { name: 'Add title' })).toBeInTheDocument()
   })
 
   it('updates when form state changes and reset restores the catalog', async () => {
@@ -125,12 +173,14 @@ describe('OrganizationEditMembershipTitlesField', () => {
     renderTitlesField()
 
     await user.click(screen.getByRole('button', { name: 'Change titles' }))
-    expect(screen.getByText('Initiate')).toBeInTheDocument()
-    expect(screen.queryByText('Chair')).not.toBeInTheDocument()
+    expect(screen.getByDisplayValue('Initiate')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Chair')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Reset titles' }))
-    expect(screen.getByText('Chair')).toBeInTheDocument()
-    expect(screen.getByText('Clerk')).toBeInTheDocument()
-    expect(screen.queryByText('Initiate')).not.toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Chair')).toBeInTheDocument()
+      expect(screen.getByDisplayValue('Clerk')).toBeInTheDocument()
+    })
+    expect(screen.queryByDisplayValue('Initiate')).not.toBeInTheDocument()
   })
 })

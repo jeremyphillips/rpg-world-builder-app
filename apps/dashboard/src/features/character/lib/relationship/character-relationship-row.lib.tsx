@@ -47,6 +47,12 @@ function resolveApiOrganizationMembership(
     relationshipId: membership.relationshipId,
     revision: membership.revision,
     organizationId: membership.organizationId,
+    ...(membership.membershipTitleId !== undefined
+      ? { membershipTitleId: membership.membershipTitleId }
+      : {}),
+    ...(membership.titleReferenceStatus !== undefined
+      ? { titleReferenceStatus: membership.titleReferenceStatus }
+      : {}),
     ...(membership.title !== undefined ? { title: membership.title } : {}),
     ...('priority' in membership && membership.priority !== undefined
       ? { priority: membership.priority }

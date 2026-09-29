@@ -98,7 +98,7 @@ describe('organization member class affinities integration', () => {
       members: {
         classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
         speciesAffinityIds: [],
-        titles: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
       },
       connections: { locations: [] },
     })

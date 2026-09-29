@@ -179,7 +179,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['transport'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Royal Exchequer',
@@ -187,7 +187,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Ironworking Consortium',
@@ -195,7 +195,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'company',
       functions: ['production', 'trade'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
     {
       name: 'Royal Host',
@@ -203,7 +203,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'force',
       functions: ['warfare', 'defense'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     },
   ] satisfies Array<OrganizationFormValues>)('persists $name without preset identity', (values) => {
     const input = buildOrganizationCreateInput(values)
@@ -223,7 +223,7 @@ describe('organization authoring vocab smoke', () => {
       organizationDomain: 'criminal',
       practices: ['extortion'],
       functions: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input.practices).toEqual(['extortion'])
     expect(input).not.toHaveProperty('startingPointId')
@@ -236,7 +236,7 @@ describe('organization authoring vocab smoke', () => {
       organizationForm: 'office',
       functions: ['administration', 'defense'],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     const reopened = organizationToFormValues({
       ...saved,

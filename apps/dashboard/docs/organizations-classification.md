@@ -99,9 +99,10 @@ existing `members.titles` snapshot.
 Mongo mapping, API serialization, duplication, and parse round-trips must preserve array
 order. Roster/display sort uses priority descending, then original array index as tie-break.
 
-**Character memberships:** connections persist `title` + `priority` strings/numbers for this
-pass. Renaming or deleting org titles does **not** propagate to existing character
-memberships until connections adopt `membershipTitleId` referencing organization-owned `id`s.
+**Character memberships:** relationship edges store optional `membershipTitleId` referencing
+organization-owned `omt_*` ids. Label and roster rank are projected from `members.titles` at read
+time; the create form shows the materialized catalog before save, and clearing a starting point
+does not erase it.
 
 **Retired:** classification-derived membership titles (five-slot resolver pipeline) were
 removed. Titles come only from the create-boundary snapshot or explicit manual catalog —
@@ -113,9 +114,9 @@ Detail: [`organization/membership-titles.ts`](../../../packages/contracts/src/rp
 ### Detail surfaces
 
 Organization detail stat rows show Domain, optional Form, Functions, Practices, and member
-class/species affinities (when present). A read-only **Membership titles** section lists
-`members.titles` in canonical hierarchy order (same sort as member-title pickers). Presets may
-seed the catalog at create; once materialized, titles are organization-owned and are not
+class/species affinities (when present). A **Membership titles** section lists `members.titles` in
+canonical hierarchy order (same sort as member-title pickers). Authoring forms edit label and rank;
+presets may seed the catalog at create. Once materialized, titles are organization-owned and are not
 replaced when applying a familiar type on edit.
 
 Membership rosters intersect affinities with the NPC

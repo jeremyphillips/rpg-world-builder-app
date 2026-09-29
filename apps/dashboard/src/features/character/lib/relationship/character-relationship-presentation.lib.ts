@@ -30,10 +30,15 @@ export type CharacterRelationshipRowPresentation = {
   headingHref?: string
 }
 
+const UNKNOWN_ORGANIZATION_MEMBERSHIP_TITLE_LABEL = 'Unknown title'
+
 function organizationMembershipTitle(
   membership: CharacterOrganizationMembershipEdge,
   organization: Organization | null | undefined,
 ): string | null {
+  if ('titleReferenceStatus' in membership && membership.titleReferenceStatus === 'broken') {
+    return UNKNOWN_ORGANIZATION_MEMBERSHIP_TITLE_LABEL
+  }
   if (membership.title) return membership.title
   const domain = organization?.organizationDomain
   return domain ? getOrganizationDomainLabel(domain) : null

@@ -42,11 +42,12 @@ describe('organization membership title snapshot', () => {
   })
 
   it('resolves create input from explicit members.titles at the boundary', () => {
-    const titles = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'fixed')
+    let count = 0
+    const titles = snapshotOrganizationMembershipTitlesFromPreset('bank', () => `fixed-${++count}`)
     const resolved = resolveOrganizationCreateMembershipTitles({ titles })
     expect(resolved).toHaveLength(7)
     expect(resolved[0]?.sourceTitleId).toBe('treasurer')
-    expect(resolved[0]?.id).toBe('omt_fixed')
+    expect(resolved[0]?.id).toBe('omt_fixed-1')
   })
 
   it('accepts explicit members.titles when no preset is provided', () => {

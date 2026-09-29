@@ -1,15 +1,11 @@
 import {
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
-  resolveOrganizationMembershipTitleDefinitionByLabel,
   type CharacterBuildContext,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
-import {
-  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-  titleFromMembershipRadioValue,
-} from '../../../lib/organization-membership/organization-membership-title.lib'
+import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
@@ -43,22 +39,18 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
     return defaultLevel
   }
 
-  if (
-    args.membershipTitle.trim() === '' ||
-    args.membershipTitle === ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE
-  ) {
+  if (args.membershipTitle.trim() === '') {
     return defaultLevel
   }
 
-  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle)
-  if (persistedTitle === undefined) {
+  let membershipTitleId: string
+  try {
+    membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle)
+  } catch {
     return defaultLevel
   }
 
-  const definition = resolveOrganizationMembershipTitleDefinitionByLabel(
-    args.titles,
-    persistedTitle,
-  )
+  const definition = args.titles.find((entry) => entry.id === membershipTitleId)
   const recommendation = definition?.npcRecommendation
   if (recommendation === undefined) {
     return defaultLevel

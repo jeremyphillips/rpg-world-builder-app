@@ -47,8 +47,8 @@ export type EditOrganizationMembershipDrawerProps = {
   onOpenChange: (open: boolean) => void
   organization: EditOrganizationMembershipOrganization
   characterName: string
-  currentTitle?: string
+  currentMembershipTitleId?: string
   copy?: EditOrganizationMembershipDrawerCopy
-  onSave: (title?: string) => Promise<void>
+  onSave: (membershipTitleId?: string) => Promise<void>
   onRemove: () => Promise<void>
 }

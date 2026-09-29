@@ -23,7 +23,9 @@ import {
   slugSchema,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
+  createDefaultOrganizationMembershipTitleDefinition,
   organizationMembershipTitlesSchema,
+  resolveOrganizationCreateMembershipTitles,
   vocabularyTermFieldCopy,
   type CharacterClass,
   type ContentValidationIntent,
@@ -45,6 +47,7 @@ import { OrganizationQuickCreateProfileSections } from '../../organizations/comp
 import { OrganizationStartingPointLegendAccessory } from '../../organizations/components/create/organization-starting-point-legend-accessory'
 import { OrganizationStartingPointSetupManuallyAction } from '../../organizations/components/create/organization-starting-point-setup-manually-action'
 import { OrganizationStartingPointField } from '../../organizations/components/create/organization-starting-point-field'
+import { OrganizationMembershipTitlesRegistration } from '../../organizations/components/authoring/organization-membership-titles-registration'
 import type { OrganizationFormPresentation } from '../../organizations/lib/organization-form-presentation.lib'
 import {
   ORGANIZATION_DOMAIN_FIELD_HINT,
@@ -176,11 +179,21 @@ export const organizationDraftFormSchema = withManagedContentMediaFormSchema(
 
 export type OrganizationFormValues = z.infer<typeof organizationFormSchema>
 
-export const organizationCreateDefaultValues: Partial<OrganizationFormValues> = {
-  functions: [],
-  practices: [],
-  members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+export function createOrganizationCreateDefaultValues(): Partial<OrganizationFormValues> {
+  return {
+    functions: [],
+    practices: [],
+    members: {
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [createDefaultOrganizationMembershipTitleDefinition()],
+    },
+  }
 }
+
+/** @deprecated Prefer `createOrganizationCreateDefaultValues()` for a fresh `omt_*` per create session. */
+export const organizationCreateDefaultValues: Partial<OrganizationFormValues> =
+  createOrganizationCreateDefaultValues()
 
 export { nameField as organizationNameField }
 
@@ -312,6 +325,14 @@ function buildOrganizationProfileGroup(options: {
   }
 }
 
+function buildOrganizationMembershipTitlesRegistrationSlot(prefix?: string): FormItem {
+  return {
+    kind: 'slot',
+    name: fieldPath(prefix, '_organizationMembershipTitlesRegistration'),
+    render: () => createElement(OrganizationMembershipTitlesRegistration, { prefix }),
+  }
+}
+
 function buildOrganizationMembershipTitlesReadOnlyGroup(prefix?: string): FormItem {
   return {
     kind: 'group',
@@ -337,6 +358,7 @@ function buildOrganizationOptionalDetailsGroup(
   },
   descriptionFieldItem: FormItem,
 ): FormItem {
+  const { prefix } = options
   const memberAffinityFields = buildOrganizationMemberAffinityFields(ctx, options)
   return {
     kind: 'group',
@@ -357,6 +379,7 @@ function buildOrganizationOptionalDetailsGroup(
         description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
         fields: memberAffinityFields,
       },
+      buildOrganizationMembershipTitlesReadOnlyGroup(prefix),
       descriptionFieldItem,
     ],
   }
@@ -409,9 +432,7 @@ export function buildOrganizationQuickCreateFollowOnFields(
       },
     ]
 
-    if (ctx.mode === 'edit') {
-      fullPresentationFields.push(buildOrganizationMembershipTitlesReadOnlyGroup(prefix))
-    }
+    fullPresentationFields.push(buildOrganizationMembershipTitlesReadOnlyGroup(prefix))
 
     fullPresentationFields.push(descriptionFieldItem)
 
@@ -485,6 +506,8 @@ export function buildOrganizationFields(
       ],
     })
   }
+
+  fields.push(buildOrganizationMembershipTitlesRegistrationSlot(prefix))
 
   if (presentation === 'quick') {
     fields.push({
@@ -566,7 +589,9 @@ function organizationValuesForInputParse(
     members: {
       classAffinityIds: values.members?.classAffinityIds ?? [],
       speciesAffinityIds: values.members?.speciesAffinityIds ?? [],
-      titles: values.members?.titles ?? [],
+      titles: resolveOrganizationCreateMembershipTitles({
+        titles: values.members?.titles,
+      }),
     },
     ...(values.organizationDomain !== undefined
       ? { organizationDomain: values.organizationDomain }

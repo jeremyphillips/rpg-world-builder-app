@@ -128,7 +128,7 @@ describe('initial Organization semantic flows', () => {
       organizationForm: 'network',
       practices: ['smuggling'],
       functions: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: { classAffinityIds: [], speciesAffinityIds: [] },
     })
     expect(input).toMatchObject({
       organizationDomain: 'criminal',

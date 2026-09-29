@@ -160,9 +160,11 @@ export function ConnectionsStepDrawers({
           ),
         }))}
         onAdd={(selection) => {
+          if (selection.membershipTitleId === undefined) {
+            return
+          }
           const edge = createOrganizationMembershipDraftEdge(selection.organizationId, {
-            title: selection.title,
-            priority: selection.priority,
+            membershipTitleId: selection.membershipTitleId,
           })
           onUpdateEdges(upsertDraftEdge(relationshipEdges, edge))
         }}
@@ -218,7 +220,10 @@ export function ConnectionsStepDrawers({
           }}
           organization={editingOrganization}
           characterName="this character"
-          currentTitle={editingMembershipEdge.details?.title}
+          currentMembershipTitleId={
+            (editingMembershipEdge.details as { membershipTitleId?: string } | undefined)
+              ?.membershipTitleId
+          }
           onSave={async (title) => {
             const nextEdge = updateDraftEdgeDetails(editingMembershipEdge, {
               ...(title !== undefined ? { title } : {}),

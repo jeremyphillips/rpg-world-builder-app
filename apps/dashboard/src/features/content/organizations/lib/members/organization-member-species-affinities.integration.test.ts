@@ -83,7 +83,7 @@ describe('organization member species affinities integration', () => {
       members: {
         classAffinityIds: [],
         speciesAffinityIds: [elf.id, dwarf.id, halfling.id],
-        titles: [],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
       },
       connections: { locations: [] },
     })

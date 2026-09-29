@@ -69,11 +69,15 @@ export function formatQuickNpcLevelRecommendationPrompt(args: {
   if (recommendation === undefined) {
     return undefined
   }
-  const persistedTitle = titleFromMembershipRadioValue(args.membershipTitle ?? '')
-  if (persistedTitle === undefined) {
+  const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
+  if (membershipTitleId === undefined) {
     return undefined
   }
-  return `Recommended for ${persistedTitle}: Level ${recommendation.level}.`
+  const titleEntry = args.titles.find((entry) => entry.id === membershipTitleId)
+  if (titleEntry === undefined) {
+    return undefined
+  }
+  return `Recommended for ${titleEntry.label}: Level ${recommendation.level}.`
 }
 
 export function formatQuickNpcClassRecommendationHelper(args: {

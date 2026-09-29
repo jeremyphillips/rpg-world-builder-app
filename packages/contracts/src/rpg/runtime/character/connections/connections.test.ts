@@ -11,49 +11,35 @@ describe('characterConnectionsSchema', () => {
     })
   })
 
-  it('accepts unique organization memberships with optional titles and priority', () => {
+  it('accepts unique organization memberships with membershipTitleId', () => {
     expect(
       characterConnectionsSchema.parse({
         organizations: [
-          { organizationId: 'organization-1' },
-          { organizationId: 'organization-2', title: 'Guildmaster', priority: 50 },
+          { organizationId: 'organization-1', membershipTitleId: 'omt_member' },
+          { organizationId: 'organization-2', membershipTitleId: 'omt_guildmaster' },
         ],
       }),
     ).toEqual({
       organizations: [
-        { organizationId: 'organization-1' },
-        { organizationId: 'organization-2', title: 'Guildmaster', priority: 50 },
+        { organizationId: 'organization-1', membershipTitleId: 'omt_member' },
+        { organizationId: 'organization-2', membershipTitleId: 'omt_guildmaster' },
       ],
       locations: [],
     })
   })
 
-  it('trims titles, rejects empty titles, and never invents Member', () => {
-    expect(
-      characterConnectionsSchema.parse({
-        organizations: [{ organizationId: 'organization-1', title: '  Master  ' }],
-      }).organizations[0],
-    ).toEqual({ organizationId: 'organization-1', title: 'Master' })
-
+  it('rejects missing and empty membershipTitleId values', () => {
     expect(
       characterConnectionsSchema.safeParse({
-        organizations: [{ organizationId: 'organization-1', title: '   ' }],
+        organizations: [{ organizationId: 'organization-1', membershipTitleId: '   ' }],
       }).success,
     ).toBe(false)
 
     expect(
-      characterConnectionsSchema.parse({
+      characterConnectionsSchema.safeParse({
         organizations: [{ organizationId: 'organization-1' }],
-      }).organizations[0],
-    ).toEqual({ organizationId: 'organization-1' })
-  })
-
-  it('accepts arbitrary persisted title text that is not a suggestion', () => {
-    expect(
-      characterConnectionsSchema.parse({
-        organizations: [{ organizationId: 'organization-1', title: 'Custom Chronicler' }],
-      }).organizations[0]?.title,
-    ).toBe('Custom Chronicler')
+      }).success,
+    ).toBe(false)
   })
 
   it('rejects empty and duplicate organization memberships', () => {

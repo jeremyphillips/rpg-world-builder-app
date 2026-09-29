@@ -29,7 +29,11 @@ describe('organization body contracts', () => {
       organizationDomain: 'occupational',
       functions: [],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+      },
       connections: { locations: [] },
     })
 
@@ -63,7 +67,11 @@ describe('organization body contracts', () => {
       name: 'Untitled Organization',
       functions: [],
       practices: [],
-      members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+      members: {
+        classAffinityIds: [],
+        speciesAffinityIds: [],
+        titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+      },
       connections: { locations: [] },
     })
   })
@@ -223,7 +231,10 @@ describe('organization authoring inputs', () => {
       }),
     ).toEqual({
       organizationDomain: 'academic',
-      members: { classAffinityIds: ['class-fighter'] },
+      members: {
+        classAffinityIds: ['class-fighter'],
+        titles: [{ id: 'omt_a', label: 'Custom', priority: 10 }],
+      },
     })
 
     expect(
@@ -249,7 +260,11 @@ describe('organization authoring inputs', () => {
         name: 'Lantern Guild',
         organizationDomain: 'occupational',
       }).members,
-    ).toEqual({ classAffinityIds: [], speciesAffinityIds: [], titles: [] })
+    ).toEqual({
+      classAffinityIds: [],
+      speciesAffinityIds: [],
+      titles: [{ id: 'omt_schema-default', label: 'Member', priority: 10 }],
+    })
   })
 
   it('accepts create input with explicit members.titles', () => {
@@ -284,6 +299,8 @@ describe('organization authoring inputs', () => {
       membershipTitles: [{ id: 'omt_legacy', label: 'Boss', priority: 50 }],
     })
     expect(parsed).not.toHaveProperty('membershipTitles')
-    expect(parsed.members.titles).toEqual([])
+    expect(parsed.members.titles).toEqual([
+      { id: 'omt_schema-default', label: 'Member', priority: 10 },
+    ])
   })
 })

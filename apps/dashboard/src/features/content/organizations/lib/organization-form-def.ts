@@ -9,7 +9,7 @@ import {
   buildOrganizationCreateInput,
   buildOrganizationFields,
   buildOrganizationFormValueSyncs,
-  organizationCreateDefaultValues,
+  createOrganizationCreateDefaultValues,
   organizationDraftFormSchema,
   organizationFormSchema,
   organizationNameField,
@@ -30,7 +30,7 @@ const organizationFormDef: ContentFormDef<
   draftSchema: organizationDraftFormSchema,
   coverage: 'structural',
   nameField: organizationNameField,
-  createDefaultValues: organizationCreateDefaultValues,
+  createDefaultValues: createOrganizationCreateDefaultValues(),
   buildFields: buildOrganizationFields,
   valueSyncs: (ctx) =>
     buildOrganizationFormValueSyncs(undefined, resolveDiscoverableOrganizationMemberClasses(ctx)),

@@ -100,7 +100,7 @@ function renderBuildCard(
     overrides.values ??
     quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       classId: rogueClass.id,
       level: 9,
     })
@@ -148,7 +148,7 @@ describe('QuickNpcBuildCard', () => {
         classId: '',
         level: 0,
       }),
-      titles: [],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
     })
 
     renderWithProviders(
@@ -166,7 +166,7 @@ describe('QuickNpcBuildCard', () => {
     const { onClassChange } = renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: rogueClass.id,
         level: 9,
       }),
@@ -201,7 +201,7 @@ describe('QuickNpcBuildCard', () => {
     renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: rogueClass.id,
         level: 9,
       }),
@@ -219,7 +219,7 @@ describe('QuickNpcBuildCard', () => {
     renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: fighterClass.id,
         level: 9,
       }),
@@ -232,7 +232,7 @@ describe('QuickNpcBuildCard', () => {
     renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 9,
       }),
@@ -255,7 +255,7 @@ describe('QuickNpcBuildCard', () => {
       applySetupChange({
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: rogueClass.id,
           level: 9,
         }),
@@ -276,7 +276,7 @@ describe('QuickNpcBuildCard', () => {
     const { onClassChange } = renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 0,
       }),
@@ -310,7 +310,7 @@ describe('QuickNpcBuildCard', () => {
     const members = { classAffinityIds: [rogueClass.id] }
     const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       classId: '',
       level: 0,
     })
@@ -363,7 +363,7 @@ describe('QuickNpcBuildCard', () => {
     const members = { classAffinityIds: [rogueClass.id, fighterClass.id] }
     const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       classId: '',
       level: 0,
     })

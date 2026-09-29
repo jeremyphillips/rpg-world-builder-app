@@ -2,10 +2,7 @@ import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 
-import {
-  buildOrganizationMembershipTitleRadioOptions,
-  ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE,
-} from '@/features/character/lib/organization-membership/organization-membership-title.lib'
+import { buildOrganizationMembershipTitleRadioOptions } from '@/features/character/lib/organization-membership/organization-membership-title.lib'
 
 import { OrganizationMembershipTitlesSummary } from './organization-membership-titles-summary'
 
@@ -53,39 +50,20 @@ describe('OrganizationMembershipTitlesSummary', () => {
     expect(screen.queryByText('20')).not.toBeInTheDocument()
   })
 
-  it('matches picker catalog options after excluding the picker sentinel', () => {
+  it('matches picker catalog options', () => {
     render(<OrganizationMembershipTitlesSummary titles={sampleCatalog} />)
 
     const summaryLabels = listItemLabels()
     const pickerLabels = buildOrganizationMembershipTitleRadioOptions({
       titles: sampleCatalog,
-    })
-      .filter((option) => option.value !== ORGANIZATION_MEMBERSHIP_NO_TITLE_VALUE)
-      .map((option) => option.label)
+    }).map((option) => option.label)
 
     expect(summaryLabels).toEqual(pickerLabels)
   })
 
-  it('does not render picker-only out-of-catalog compatibility values', () => {
+  it('does not render out-of-catalog membership title ids in the summary', () => {
     render(<OrganizationMembershipTitlesSummary titles={sampleCatalog} />)
 
-    const pickerWithLegacy = buildOrganizationMembershipTitleRadioOptions({
-      titles: sampleCatalog,
-      currentValue: 'Sea Lord',
-    }).map((option) => option.label)
-
-    expect(pickerWithLegacy).toContain('Sea Lord')
-    expect(listItemLabels()).not.toContain('Sea Lord')
-  })
-
-  it('renders the empty state for missing and empty catalogs', () => {
-    const { rerender } = render(<OrganizationMembershipTitlesSummary />)
-    expect(screen.getByText('No membership titles')).toBeInTheDocument()
-    expect(screen.getByText('Members can still be added without a title.')).toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
-
-    rerender(<OrganizationMembershipTitlesSummary titles={[]} />)
-    expect(screen.getByText('No membership titles')).toBeInTheDocument()
-    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.queryByText('omt_missing')).not.toBeInTheDocument()
   })
 })

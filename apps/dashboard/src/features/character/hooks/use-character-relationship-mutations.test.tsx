@@ -48,7 +48,7 @@ describe('useCharacterRelationshipMutations', () => {
         kind: 'organizationMembership',
         characterId: 'char-1',
         organizationId: 'org-1',
-        details: { lifecycle: 'current', priority: 50 },
+        details: { lifecycle: 'current', membershipTitleId: 'omt_captain' },
       },
     })
     updateMock.mockResolvedValue({
@@ -64,7 +64,7 @@ describe('useCharacterRelationshipMutations', () => {
         kind: 'organizationMembership',
         characterId: 'char-1',
         organizationId: 'org-1',
-        details: { lifecycle: 'current', priority: 50, title: 'Captain' },
+        details: { lifecycle: 'current', membershipTitleId: 'omt_captain' },
       },
     })
     deleteMock.mockResolvedValue({ ok: true })
@@ -114,7 +114,7 @@ describe('useCharacterRelationshipMutations', () => {
     invalidateSpy.mockClear()
     await result.current.updateRelationship('edge-1', {
       expectedRevision: 1,
-      details: { title: 'Captain' },
+      details: { membershipTitleId: 'omt_captain' },
     })
     await waitFor(() => {
       expect(invalidateSpy).toHaveBeenCalledWith({

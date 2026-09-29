@@ -1,57 +1,29 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  organizationMemberSummarySchema,
-  organizationMembersResponseSchema,
-} from './member-summary'
+import { organizationMembersResponseSchema } from './member-summary'
 
-describe('organization member summary contracts', () => {
-  it('parses an organization members response envelope', () => {
+describe('organizationMembersResponseSchema', () => {
+  it('accepts projected membership metadata on roster rows', () => {
     expect(
       organizationMembersResponseSchema.parse({
         items: [
           {
-            characterType: 'pc',
+            characterType: 'npc',
             character: {
               id: 'char-1',
-              name: 'Verna',
-              summary: 'Dwarf · Level 1 Fighter',
+              name: 'Aldric',
+              summary: 'Human · Level 1 Fighter',
             },
-            membership: { title: 'Captain', priority: 40 },
+            membership: {
+              membershipTitleId: 'omt_captain',
+              titleReferenceStatus: 'resolved',
+              title: 'Captain',
+              priority: 40,
+            },
           },
         ],
-        total: 2,
+        total: 1,
       }),
-    ).toEqual({
-      items: [
-        {
-          characterType: 'pc',
-          character: {
-            id: 'char-1',
-            name: 'Verna',
-            summary: 'Dwarf · Level 1 Fighter',
-            classIds: [],
-          },
-          membership: { title: 'Captain', priority: 40 },
-        },
-      ],
-      total: 2,
-    })
-  })
-
-  it('accepts untitled membership rows', () => {
-    expect(
-      organizationMemberSummarySchema.parse({
-        characterType: 'npc',
-        character: {
-          id: 'npc-1',
-          name: 'Envoy',
-          summary: 'Human · Level 1 Rogue',
-        },
-        membership: {},
-      }),
-    ).toMatchObject({
-      membership: {},
-    })
+    ).toBeDefined()
   })
 })

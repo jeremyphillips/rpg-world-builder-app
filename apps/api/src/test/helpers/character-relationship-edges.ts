@@ -13,7 +13,7 @@ export async function seedOrganizationMembershipEdge(input: {
   characterId: string
   organizationId: string
   actorUserId?: string
-  details?: { title?: string; priority?: number }
+  details?: { membershipTitleId?: string }
 }): Promise<void> {
   const canonicalEndpointsKey = buildCharacterRelationshipCanonicalKey({
     kind: 'organizationMembership',

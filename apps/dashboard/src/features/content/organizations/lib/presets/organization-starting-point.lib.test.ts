@@ -50,7 +50,10 @@ describe('organization starting point helpers', () => {
       organizationForm: patch.organizationForm,
       functions: patch.functions,
       practices: patch.practices,
-      members: { classAffinityIds: patch['members.classAffinityIds'], titles: [] },
+      members: {
+        classAffinityIds: patch['members.classAffinityIds'],
+        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+      },
     }
     expect(organizationStartingPointIsCustomized(unchanged, { discoverableClasses: [] })).toBe(
       false,

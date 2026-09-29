@@ -65,8 +65,11 @@ Organization familiar starting points (`organization-form-projection.ts`):
 - Edit exposes `OrganizationEditFamiliarTypeField` from the **Organization profile**
   legend action. The temporary picker replaces profile values plus class affinities,
   never membership titles, and closes after cancel or successful apply.
-- Edit also surfaces a read-only **Membership titles** group (`OrganizationEditMembershipTitlesField`)
-  between member affinities and description — catalog from form `members.titles`, canonical sort.
+- Full create, Quick Create Optional details, and edit surface the same editable **Membership titles**
+  group (`OrganizationEditMembershipTitlesField` → `OrganizationMembershipTitlesEditor`) between member
+  affinities and description — catalog from form `members.titles` (min one row), canonical sort in
+  read-only summaries. `OrganizationMembershipTitlesRegistration` keeps `members.titles` registered
+  with `shouldUnregister: false` so Quick Create optional disclosure does not drop the catalog.
 - Optional **Form** uses shared `select` `clearable` (accessible name `Clear Form`).
 - **Functions** — multi **`chips`** with outline chrome and hint
   _What this organization broadly does._ Options from `ORGANIZATION_FUNCTION_IDS`.

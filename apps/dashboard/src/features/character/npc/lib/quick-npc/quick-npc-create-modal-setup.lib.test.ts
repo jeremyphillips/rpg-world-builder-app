@@ -89,7 +89,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
     expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toBeUndefined()
   })
 
-  it('reveals species after explicit No title without downstream setup sets', () => {
+  it('reveals species after membership title is chosen without downstream setup sets', () => {
     const values = quickNpcMemberSetupWithNoTitle()
     const sets = buildQuickNpcCreateSetupSets({
       createContext: memberCreateContext,
@@ -163,7 +163,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       context: multiClassContext,
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 5,
       }),
@@ -225,7 +225,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       context: multiClassContext,
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: '',
         level: 5,
       }),
@@ -251,7 +251,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       createContext: memberCreateContext,
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 5,
       }),
@@ -299,20 +299,21 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
   it('includes Build with level-only copy when no title recommendation exists', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
       createContext: memberCreateContext,
-      values: quickNpcMemberSetupWithNoTitle({
+      values: quickNpcMemberSetupValues({
+        membershipTitle: 'omt_member',
         speciesId: 'srd-cc-5.2.1:dwarf',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 1,
       }),
       context,
-      titles: [guildmasterTitle],
+      titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
     })
 
     expect(rows).toEqual([
       {
         id: 'membershipTitle',
         label: 'Role',
-        value: 'No title',
+        value: 'Member',
         editTarget: { type: 'set', id: 'membershipTitle' },
       },
       {
@@ -405,7 +406,7 @@ describe('isQuickNpcBuildResolved', () => {
         context: multiClassContext,
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
-          membershipTitle: 'Guildmaster',
+          membershipTitle: 'omt_guildmaster',
           classId: rogueClass.id,
           level: 5,
         }),
@@ -418,7 +419,7 @@ describe('quickNpcBuildRevision', () => {
   const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
   const memberBaseValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
-    membershipTitle: 'Guildmaster',
+    membershipTitle: 'omt_guildmaster',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
   })
@@ -430,7 +431,7 @@ describe('quickNpcBuildRevision', () => {
 
   it('derives member revision from membershipTitle, speciesId, level, and classId', () => {
     expect(quickNpcBuildRevision(memberBaseValues)).toBe(
-      `Guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+      `omt_guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
     expect(quickNpcBuildRevision({ ...memberBaseValues, membershipTitle: 'Other' })).not.toBe(
       quickNpcBuildRevision(memberBaseValues),

@@ -41,22 +41,42 @@ describe('organization form projection', () => {
     ).toMatchObject({ startingPointId: undefined })
   })
 
-  it('surfaces read-only membership titles on edit after member affinities', () => {
-    const items = buildOrganizationFields(makeContentFormCtx({ mode: 'edit' }))
-    const fields = collectFields(items)
-    const groupLegends = items
-      .flatMap((item) => ('kind' in item && item.kind === 'group' ? [item] : []))
-      .map((group) => group.legend ?? group.heading?.label)
+  it('surfaces read-only membership titles on create and edit after member affinities', () => {
+    for (const mode of ['create', 'edit'] as const) {
+      const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode })))
+      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
+      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
+      const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
+      const affinitiesIndex = fields.findIndex(({ name }) => name === 'members.classAffinityIds')
+      const titlesSlotIndex = fields.findIndex(
+        ({ name }) => name === '_organizationMembershipTitles',
+      )
+      expect(titlesSlotIndex).toBeGreaterThan(affinitiesIndex)
+      expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
+    }
+  })
 
-    expect(groupLegends).toEqual(['Organization profile', 'Member affinities', 'Membership titles'])
-    expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
-    const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
-    const titlesSlotIndex = fields.findIndex(({ name }) => name === '_organizationMembershipTitles')
-    expect(titlesSlotIndex).toBeGreaterThan(-1)
-    expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
-    expect(
-      collectFields(buildOrganizationFields(makeContentFormCtx())).map(({ name }) => name),
-    ).not.toContain('_organizationMembershipTitles')
+  it('mounts membership title registration outside quick-create optional details', () => {
+    const topLevel = collectFields(
+      buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' }),
+    )
+    expect(topLevel.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
+
+    const followOn = buildOrganizationQuickCreateFollowOnFields(makeContentFormCtx(), {
+      presentation: 'quick',
+    })
+    const optionalDetails = followOn.find(
+      (item): item is Extract<FormItem, { kind: 'group' }> =>
+        'kind' in item &&
+        item.kind === 'group' &&
+        item.id === 'organization-quick-create-optional-details',
+    )
+    expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).toContain(
+      '_organizationMembershipTitles',
+    )
+    expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).not.toContain(
+      '_organizationMembershipTitlesRegistration',
+    )
   })
 
   it('places the edit familiar type utility inside the organization profile group', () => {
@@ -87,23 +107,27 @@ describe('organization form projection', () => {
 
     expect(standalone.map(({ name }) => name)).toEqual([
       'startingPointId',
+      '_organizationMembershipTitlesRegistration',
       'organizationDomain',
       'organizationForm',
       'functions',
       'practices',
       'members.classAffinityIds',
       'members.speciesAffinityIds',
+      '_organizationMembershipTitles',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
       'operatorOrganization.name',
       'operatorOrganization.startingPointId',
+      'operatorOrganization._organizationMembershipTitlesRegistration',
       'operatorOrganization.organizationDomain',
       'operatorOrganization.organizationForm',
       'operatorOrganization.functions',
       'operatorOrganization.practices',
       'operatorOrganization.members.classAffinityIds',
       'operatorOrganization.members.speciesAffinityIds',
+      'operatorOrganization._organizationMembershipTitles',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item
@@ -188,7 +212,14 @@ describe('organization form projection', () => {
 
   it('gates quick-create profile sections behind a follow-on slot', () => {
     const quick = buildOrganizationFields(makeContentFormCtx(), { presentation: 'quick' })
-    expect(quick.find((item) => 'kind' in item && item.kind === 'slot')).toMatchObject({
+    expect(
+      quick.find(
+        (item) =>
+          'kind' in item &&
+          item.kind === 'slot' &&
+          item.name === '_organizationQuickCreateProfileSections',
+      ),
+    ).toMatchObject({
       kind: 'slot',
       name: '_organizationQuickCreateProfileSections',
     })
@@ -255,7 +286,11 @@ describe('organization form projection', () => {
         organizationForm: 'company',
         practices: ['brewing'],
         functions: [],
-        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: 'omt_fixture', label: 'Member', priority: 10 }],
+        },
       }),
     ).toMatchObject({
       name: 'Red Dragon Brewing Company',
@@ -375,7 +410,7 @@ describe('organization form projection', () => {
       members: {
         classAffinityIds: ['class-fighter', 'class-barbarian', 'class-wizard'],
         speciesAffinityIds: [],
-        titles: [],
+        titles: [{ id: 'omt_fixture', label: 'Member', priority: 10 }],
       },
     })
     expect(input.members.classAffinityIds).toEqual([

@@ -1,5 +1,9 @@
 import type { Organization, OrganizationMemberSummary, PaginatedItems } from '@rpg/contracts'
-import { resolveOrganizationMembershipPriority, sortOrganizationMembers } from '@rpg/contracts'
+import {
+  projectOrganizationMemberMembership,
+  resolveOrganizationMembershipPriority,
+  sortOrganizationMembers,
+} from '@rpg/contracts'
 
 import { buildCampaignContentEligibilityIndex } from '../../campaign-invite'
 import { CharacterModel } from '../../character'
@@ -20,8 +24,7 @@ type CharacterMemberHit = {
 type MembershipEdge = {
   characterId: string
   details?: {
-    title?: string
-    priority?: number
+    membershipTitleId?: string
   }
 }
 
@@ -30,7 +33,7 @@ type MemberSortRow = {
   name: string
   priority?: number
   characterType: 'pc' | 'npc'
-  membership: MembershipEdge['details']
+  membershipTitleId?: string
   hit: CharacterMemberHit
 }
 
@@ -44,7 +47,7 @@ const CHARACTER_MEMBER_PROJECTION = {
 
 /**
  * Paginated organization Members roster — discovers members via content-usage
- * registration (authoritative_guard), then projects membership title/priority
+ * registration (authoritative_guard), then projects membership title metadata
  * from organizationMembership relationship edges and sorts canonically.
  */
 export async function resolveOrganizationMembers(input: {
@@ -62,6 +65,8 @@ export async function resolveOrganizationMembers(input: {
   if (!organization) {
     return null
   }
+
+  const titleCatalog = organization.members.titles ?? []
 
   const { blockers } = await resolveContentUsage(
     { campaignId, purpose: 'authoritative_guard' },
@@ -103,9 +108,10 @@ export async function resolveOrganizationMembers(input: {
     if (!hit) return []
 
     const membership = membershipByCharacterId.get(characterId)
+    const membershipTitleId = membership?.membershipTitleId
     const priority = resolveOrganizationMembershipPriority({
-      membership: membership ?? {},
-      titles: organization.members.titles ?? [],
+      membership: { membershipTitleId },
+      titles: titleCatalog,
     })
 
     return [
@@ -114,7 +120,7 @@ export async function resolveOrganizationMembers(input: {
         name: hit.name,
         ...(priority !== undefined ? { priority } : {}),
         characterType: hit.characterType,
-        membership,
+        ...(membershipTitleId !== undefined ? { membershipTitleId } : {}),
         hit,
       },
     ]
@@ -136,10 +142,10 @@ export async function resolveOrganizationMembers(input: {
       },
       contentIndex,
     }),
-    membership: {
-      ...(row.membership?.title !== undefined ? { title: row.membership.title } : {}),
-      ...(row.priority !== undefined ? { priority: row.priority } : {}),
-    },
+    membership: projectOrganizationMemberMembership({
+      catalog: titleCatalog,
+      membershipTitleId: row.membershipTitleId,
+    }),
   }))
 
   return { items, total }

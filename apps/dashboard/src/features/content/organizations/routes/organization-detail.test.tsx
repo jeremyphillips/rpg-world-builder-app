@@ -74,13 +74,18 @@ describe('OrganizationDetailContent', () => {
     expect(items).toEqual(['Chair', 'Clerk'])
   })
 
-  it('renders the membership titles empty state', () => {
+  it('renders a single membership title in the catalog', () => {
     renderDetail(
       makeOrganization({
-        members: { classAffinityIds: [], speciesAffinityIds: [], titles: [] },
+        members: {
+          classAffinityIds: [],
+          speciesAffinityIds: [],
+          titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+        },
       }),
     )
-    expect(screen.getByText('No membership titles')).toBeInTheDocument()
+    const list = screen.getByTestId('organization-membership-titles-list')
+    expect(within(list).getByRole('listitem')).toHaveTextContent('Member')
   })
 
   itAxe('has no axe accessibility violations', async () => {

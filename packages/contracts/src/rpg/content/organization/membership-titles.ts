@@ -26,6 +26,8 @@ const organizationAuthoringPresetIdSchema = z.enum(
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX = 'omt_' as const
 
+export const ORGANIZATION_DEFAULT_MEMBERSHIP_TITLE_LABEL = 'Member' as const
+
 type GlobalWithWebCrypto = typeof globalThis & {
   crypto?: {
     randomUUID?: () => string
@@ -45,6 +47,16 @@ export function createOrganizationMembershipTitleId(
   createId: () => string = createDefaultOrganizationMembershipTitleUuid,
 ): string {
   return `${ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX}${createId()}`
+}
+
+export function createDefaultOrganizationMembershipTitleDefinition(
+  createId: () => string = createDefaultOrganizationMembershipTitleUuid,
+): OrganizationMembershipTitleDefinition {
+  return {
+    id: createOrganizationMembershipTitleId(createId),
+    label: ORGANIZATION_DEFAULT_MEMBERSHIP_TITLE_LABEL,
+    priority: ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[4],
+  }
 }
 
 export const organizationMembershipTitlePrioritySchema = z.union([
@@ -114,12 +126,17 @@ function validateUniqueOrganizationMembershipTitleDefinitions(
   })
 }
 
-export const organizationMembershipTitlesSchema = z
+const organizationMembershipTitleCatalogEntriesSchema = z
   .array(organizationMembershipTitleDefinitionSchema)
   .superRefine((titles, ctx) => {
     validateUniqueOrganizationMembershipTitleDefinitions(titles, ctx)
   })
-  .default([])
+
+export const organizationMembershipTitlesSchema =
+  organizationMembershipTitleCatalogEntriesSchema.min(
+    1,
+    'Organization must have at least one membership title.',
+  )
 
 export function snapshotOrganizationMembershipTitlesFromPreset(
   presetId: OrganizationAuthoringPresetId,
@@ -142,11 +159,35 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
   })
 }
 
-/** Resolves membership titles for organization create — client-supplied catalog only. */
+/** Automatic picker default only when the catalog has exactly one title. */
+export function resolveSoleOrganizationMembershipTitleId(
+  titles: readonly OrganizationMembershipTitleDefinition[],
+): string | undefined {
+  if (titles.length !== 1) {
+    return undefined
+  }
+  return titles[0]?.id
+}
+
+/** Resolves membership titles for organization create — materializes Member when absent. */
 export function resolveOrganizationCreateMembershipTitles(input: {
   titles?: readonly OrganizationMembershipTitleDefinition[]
 }): OrganizationMembershipTitleDefinition[] {
-  return [...(input.titles ?? [])]
+  const titles = [...(input.titles ?? [])]
+  if (titles.length === 0) {
+    return organizationMembershipTitlesSchema.parse([
+      createDefaultOrganizationMembershipTitleDefinition(),
+    ])
+  }
+  return organizationMembershipTitlesSchema.parse(titles)
+}
+
+export function findRemovedOrganizationMembershipTitleIds(input: {
+  previousCatalog: readonly OrganizationMembershipTitleDefinition[]
+  nextCatalog: readonly OrganizationMembershipTitleDefinition[]
+}): string[] {
+  const nextIds = new Set(input.nextCatalog.map((title) => title.id))
+  return input.previousCatalog.filter((title) => !nextIds.has(title.id)).map((title) => title.id)
 }
 
 export function sortOrganizationMembershipTitleDefinitionsForDisplay<
@@ -178,12 +219,22 @@ export function resolveOrganizationMembershipTitleDefinitionByLabel(
 
 export { organizationAuthoringPresetIdSchema }
 
-/** Reserved for create-input membership title refinements (currently none). */
 export function organizationCreateMembershipTitlesInputRefinement(
-  _value: {
+  value: {
     members?: {
       titles?: readonly OrganizationMembershipTitleDefinition[]
     }
   },
-  _ctx: z.RefinementCtx,
-): void {}
+  ctx: z.RefinementCtx,
+): void {
+  const titles = value.members?.titles
+  if (titles === undefined) {
+    return
+  }
+  if (titles.length === 0) {
+    addCustomRefinementIssue(ctx, 'Organization must have at least one membership title.', [
+      'members',
+      'titles',
+    ])
+  }
+}

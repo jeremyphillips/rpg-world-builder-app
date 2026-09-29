@@ -165,7 +165,7 @@ describe('QuickNpcAuthoringForm', () => {
     const { props } = renderForm({
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
-        membershipTitle: 'Guildmaster',
+        membershipTitle: 'omt_guildmaster',
         classId: quickFighter.id,
         level: 1,
       }),
@@ -192,7 +192,7 @@ describe('QuickNpcAuthoringForm', () => {
       expect.objectContaining({
         kind: 'organizationMembership',
         organizationId: organization.id,
-        details: { lifecycle: 'current', title: 'Guildmaster', priority: 50 },
+        details: { lifecycle: 'current', membershipTitleId: 'omt_guildmaster' },
       }),
     ])
   })
@@ -212,7 +212,7 @@ describe('QuickNpcAuthoringForm', () => {
   it('shows membership title and recommended build in the setup summary', () => {
     const guildmasterSetup = quickNpcMemberSetupValues({
       speciesId: populatedBuilderCatalog.species[0]!.id,
-      membershipTitle: 'Guildmaster',
+      membershipTitle: 'omt_guildmaster',
       classId: quickFighter.id,
       level: 5,
     })

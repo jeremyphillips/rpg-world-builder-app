@@ -42,7 +42,7 @@ export function CharacterOrganizationMembershipDrawers({
           onOpenChange={onEditingOpenChange}
           organization={editingOrganization}
           characterName={characterName}
-          currentTitle={editingMembership.title}
+          currentMembershipTitleId={editingMembership.membershipTitleId}
           onSave={onSave}
           onRemove={onRemove}
         />

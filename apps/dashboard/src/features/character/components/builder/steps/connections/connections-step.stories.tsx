@@ -51,7 +51,7 @@ export const Selected: Story = {
           kind: 'organizationMembership',
           characterId: CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
           organizationId: lanternGuild.id,
-          details: { lifecycle: 'current', title: 'Guildmaster' },
+          details: { lifecycle: 'current', membershipTitleId: 'omt_guildmaster' },
         },
         {
           id: 'edge-place-1',

@@ -1,19 +1,26 @@
 import type { Organization } from '@rpg/contracts'
 import {
+  assertOrganizationMembershipTitlesCatalogUpdateAllowed,
   createOrganizationDraftInputSchema,
   createOrganizationInputSchema,
   organizationBodySchema,
   organizationDraftStoredSchema,
-  organizationSchema,
   organizationMembershipTitlesSchema,
+  organizationSchema,
   resolveOrganizationCreateMembershipTitles,
   updateOrganizationDraftInputSchema,
   updateOrganizationInputSchema,
 } from '@rpg/contracts'
 
+import { HttpError } from '../../../lib/http-error'
 import { homebrewContentEnvelope } from '../lib/homebrew-envelope'
 import type { ContentTypeConfig } from '../lib/content-type-config'
-import type { ContentWriteConfig, HomebrewDoc } from '../lib/content-write-config'
+import type {
+  ContentWriteConfig,
+  ContentWriteContext,
+  HomebrewDoc,
+} from '../lib/content-write-config'
+import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
 import {
   HomebrewOrganizationModel,
   type HomebrewOrganizationSchemaType,
@@ -82,6 +89,7 @@ function prepareHomebrewOrganizationUpdate(
   const affinities = members as {
     classAffinityIds?: unknown
     speciesAffinityIds?: unknown
+    titles?: unknown
   }
 
   return {
@@ -92,6 +100,52 @@ function prepareHomebrewOrganizationUpdate(
     ...(affinities.speciesAffinityIds !== undefined
       ? { 'members.speciesAffinityIds': affinities.speciesAffinityIds }
       : {}),
+    ...(affinities.titles !== undefined
+      ? {
+          'members.titles': organizationMembershipTitlesSchema.parse(affinities.titles),
+        }
+      : {}),
+  }
+}
+
+async function validateOrganizationMembershipTitlesBeforeWrite(
+  ctx: ContentWriteContext,
+): Promise<void> {
+  if (ctx.mode !== 'update' || !ctx.existing?.id) {
+    return
+  }
+
+  const members = ctx.input.members as { titles?: unknown } | undefined
+  if (members?.titles === undefined) {
+    return
+  }
+
+  const doc = await HomebrewOrganizationModel.findById(ctx.existing.id).lean<HomebrewDoc | null>()
+  if (!doc) {
+    throw new HttpError(404, 'not_found', 'Organization not found.')
+  }
+
+  const existing = toHomebrewOrganization(doc)
+  const nextCatalog = organizationMembershipTitlesSchema.parse(members.titles)
+  const edges = await CharacterRelationshipModel.find({
+    kind: 'organizationMembership',
+    organizationId: ctx.existing.id,
+  })
+    .select({ details: 1 })
+    .lean<Array<{ details?: { membershipTitleId?: string } }>>()
+
+  try {
+    assertOrganizationMembershipTitlesCatalogUpdateAllowed({
+      previousCatalog: existing.members.titles,
+      nextCatalog,
+      edges,
+    })
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim().length > 0
+        ? error.message
+        : 'Organization membership titles update is invalid.'
+    throw new HttpError(400, 'invalid_membership_titles', message)
   }
 }
 
@@ -120,6 +174,7 @@ export const organizationWriteConfig: ContentWriteConfig<Organization> = {
   toHomebrewEntity: toHomebrewOrganization,
   bodyFromCreateInput,
   prepareHomebrewUpdate: prepareHomebrewOrganizationUpdate,
+  validateBeforeWrite: validateOrganizationMembershipTitlesBeforeWrite,
   characterUsageBlocksDemotion: false,
 }
 
