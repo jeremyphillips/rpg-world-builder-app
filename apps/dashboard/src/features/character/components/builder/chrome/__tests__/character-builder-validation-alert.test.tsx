@@ -7,10 +7,12 @@ import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/con
 
 import { CharacterBuilderValidationAlert } from '../character-builder-validation-alert'
 
+import type * as ResolveValidationIssuePresentation from '../../../../lib/builder/resolve-validation-issue-presentation.lib'
+
 vi.mock('../../../../lib/builder/resolve-validation-issue-presentation.lib', async () => {
-  const actual = await vi.importActual<
-    typeof import('../../../../lib/builder/resolve-validation-issue-presentation.lib')
-  >('../../../../lib/builder/resolve-validation-issue-presentation.lib')
+  const actual = await vi.importActual<typeof ResolveValidationIssuePresentation>(
+    '../../../../lib/builder/resolve-validation-issue-presentation.lib',
+  )
 
   return {
     ...actual,

@@ -8,13 +8,14 @@ import {
   type EquipmentCost,
   type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
+  type ContentMedia,
   type ContentTypeKey,
 } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
 import type { ColumnDef } from '@rpg/ui'
 
 import { buildSourceColumn, stampDataColumns } from '@/lib/data-table/column-builders'
-import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
+import { ContentDisplayOverviewCell } from '@/features/media'
 
 import {
   resolveDashboardContentDisplay,
@@ -37,7 +38,7 @@ export type ContentBase = {
   rulesetId?: string
   source: ContentSource
   status: ContentStatus
-  media?: import('@rpg/contracts').ContentMedia
+  media?: ContentMedia
 }
 
 function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {

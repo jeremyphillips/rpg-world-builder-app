@@ -69,6 +69,7 @@ export {
   campaignDestinationListVariants,
   campaignDestinationRowVariants,
 } from './components/recovery/campaign-destination.variants'
+export { useUpdateCampaignCharacterMedia } from './hooks/use-update-campaign-character-media'
 export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
 export {
   useCampaignCharacters,

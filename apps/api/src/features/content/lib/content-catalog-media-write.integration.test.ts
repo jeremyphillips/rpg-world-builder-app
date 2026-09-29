@@ -7,7 +7,7 @@ import { catalogContentMediaExpectedRevisionField, emptyContentMediaSchema } fro
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { setMongoTransactionsEnabled } from '../../../lib/mongo-transaction'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
-import { createMediaAssetRecord } from '../../media/media.repository'
+import { createMediaAssetRecord } from '../../media'
 import { ClassPatchModel } from '../classes/class-patch.model'
 import { classWriteConfig } from '../classes/classes.config'
 import { resolveCatalogForCampaign } from '../content.service'

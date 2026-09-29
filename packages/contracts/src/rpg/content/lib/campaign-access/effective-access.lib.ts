@@ -1,6 +1,6 @@
-import type { ContentViewer } from '../../../campaign/campaign-content-viewer'
+import type { ContentViewer } from '../../../primitives/content-viewer'
 import type { ContentVisibilityMode } from '../../../vocab/content-visibility'
-import { isContentDiscoverableForViewer } from '../../../runtime/campaign/content-viewer-discovery'
+import { isContentDiscoverableForViewer } from './is-content-discoverable-for-viewer.lib'
 
 import { isBodyRowAvailable } from './body-row-availability'
 import {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { z } from 'zod'
+import type { RefinementCtx, ZodIssue } from 'zod'
 
 import { addCustomRefinementIssue, customZodIssue } from './add-custom-refinement-issue'
 
@@ -15,12 +15,12 @@ describe('customZodIssue', () => {
 
 describe('addCustomRefinementIssue', () => {
   it('adds a custom issue to the refinement context', () => {
-    const issues: z.ZodIssue[] = []
+    const issues: ZodIssue[] = []
     const ctx = {
-      addIssue: (issue: z.ZodIssue) => {
+      addIssue: (issue: ZodIssue) => {
         issues.push(issue)
       },
-    } as unknown as z.RefinementCtx
+    } as unknown as RefinementCtx
 
     addCustomRefinementIssue(ctx, 'required', ['level'])
 
@@ -28,12 +28,12 @@ describe('addCustomRefinementIssue', () => {
   })
 
   it('adds a pathless custom issue to the refinement context', () => {
-    const issues: z.ZodIssue[] = []
+    const issues: ZodIssue[] = []
     const ctx = {
-      addIssue: (issue: z.ZodIssue) => {
+      addIssue: (issue: ZodIssue) => {
         issues.push(issue)
       },
-    } as unknown as z.RefinementCtx
+    } as unknown as RefinementCtx
 
     addCustomRefinementIssue(ctx, 'invalid combination')
 

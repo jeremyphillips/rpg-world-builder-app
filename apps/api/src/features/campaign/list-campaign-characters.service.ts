@@ -3,7 +3,7 @@ import { isCampaignManager } from '@rpg/contracts'
 
 import { findPcsByIds } from '../character'
 import { buildCharacterCardSummaryDto } from '../character'
-import { resolveCampaignEmblemImageUrl } from '../campaign/lib/resolve-campaign-emblem-image-url.lib'
+import { resolveCampaignEmblemImageUrl } from '../campaign'
 import { HttpError } from '../../lib/http-error'
 import { buildCampaignContentEligibilityIndex } from '../campaign-invite'
 import { findUsersByIds } from '../user'

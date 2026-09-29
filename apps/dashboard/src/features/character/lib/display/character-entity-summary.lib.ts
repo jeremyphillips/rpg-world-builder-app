@@ -7,8 +7,7 @@ import type {
 } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import type { EntitySurfaceIdentity } from '@/features/content/lib/entity/summary/entity-surface-identity.types'
-import type { EntitySummaryStatusItem } from '@/features/content/lib/entity/summary/entity-summary-status.types'
+import type { EntitySurfaceIdentity, EntitySummaryStatusItem } from '@/features/content'
 import {
   CHARACTER_SUMMARY_SEPARATOR,
   formatCharacterSummary,

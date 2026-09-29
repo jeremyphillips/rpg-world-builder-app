@@ -1,7 +1,7 @@
 import type { PcCharacter, PcCharacterListItem } from '@rpg/contracts'
 
 import { findCampaignById, listOpenParticipationsForCharacters } from '../campaign'
-import { resolveCampaignEmblemImageUrl } from '../campaign/lib/resolve-campaign-emblem-image-url.lib'
+import { resolveCampaignEmblemImageUrl } from '../campaign'
 
 /** Attach route context and optional open-campaign label for personal character list cards. */
 export async function enrichPcsWithOpenCampaign(

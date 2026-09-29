@@ -124,9 +124,9 @@ function RadioOptionCardShellPrimaryRow({
 
 export function RadioOptionCardShellLayout({
   itemProps,
-  visualControl,
-  icon,
-  variant,
+  visualControl: _visualControl,
+  icon: _icon,
+  variant: _variant,
   density,
   leadingControl,
   effectiveControlPosition,

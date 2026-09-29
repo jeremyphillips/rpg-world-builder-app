@@ -1,15 +1,15 @@
 import { ComboboxField, SelectField } from '@rpg/ui'
 
-import { useCampaignAccessParticipantRoster } from '@/features/content/lib/campaign-access/use-campaign-access-participant-roster'
-import { buildCampaignAccessVisibilityOptions } from '@/features/content/lib/campaign-access/campaign-access-options.lib'
 import {
+  buildCampaignAccessVisibilityOptions,
   CAMPAIGN_ACCESS_PARTICIPANTS_HINT,
   CAMPAIGN_ACCESS_PARTICIPANTS_LABEL,
   CAMPAIGN_ACCESS_PARTICIPANTS_TOOLTIP,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_HINT,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_LABEL,
   CAMPAIGN_ACCESS_PLAYER_ACCESS_TOOLTIP,
-} from '@/features/content/lib/campaign-access/campaign-access-labels'
+  useCampaignAccessParticipantRoster,
+} from '@/features/content'
 
 import type { ConnectionDetailsFormState } from '../../../lib/relationship/connection-details-fields.lib'
 

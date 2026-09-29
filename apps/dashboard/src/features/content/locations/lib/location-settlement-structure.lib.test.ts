@@ -10,6 +10,7 @@ import {
   resolveLocationStructureProfile,
   resolveStructureChildAuthoringOptions,
 } from './location-structure.lib'
+import { buildLocationDetailViewModel } from './location-display'
 
 describe('partitionLocationsByStructureGroup (settlement)', () => {
   it('groups districts separately from direct places', () => {

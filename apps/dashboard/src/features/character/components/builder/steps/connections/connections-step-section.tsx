@@ -12,7 +12,7 @@ import {
   filterDraftEdgesBySection,
   type ConnectionTopLevelSectionId,
 } from '../../../../lib/relationship/connection-section-catalog'
-import { getConnectionSectionIcon } from '../../../../lib/relationship/connection-section-icons'
+import { CONNECTION_SECTION_ICONS } from '../../../../lib/relationship/connection-section-icons'
 import {
   draftEdgeHasEditableDetails,
   removeDraftEdgeById,
@@ -94,7 +94,7 @@ export function ConnectionsStepSection({
   const navigate = useNavigate()
   const section = CONNECTION_SECTION_CATALOG[sectionId]
   const sectionEdges = filterDraftEdgesBySection(relationshipEdges, sectionId)
-  const SectionIcon = getConnectionSectionIcon(sectionId)
+  const SectionIcon = CONNECTION_SECTION_ICONS[sectionId]
   const locationsReady = stepData.locationsQueryStatus.status === 'success'
 
   const addAction = resolveConnectionsStepSectionAddAction({

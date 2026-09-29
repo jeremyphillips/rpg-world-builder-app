@@ -13,7 +13,7 @@ import {
 import {
   mediaBearingAuthoredContentBodySchema,
   mediaBearingDraftAuthoredContentBodySchema,
-} from '../../../shared/media/media-bearing-content'
+} from '../lib/media/media-bearing-content'
 import { customContentTraitSchema, normalizeContentTrait } from '../lib/grants'
 import type { GrantGroup } from '../lib/grants'
 import {

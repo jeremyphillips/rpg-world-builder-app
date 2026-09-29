@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { characterVitalPatchSchema } from '../../runtime/character/update-character-vital'
+import { campaignCharacterVitalPatchSchema } from './campaign-character-vital-patch'
 import { campaignRosterPatchSchema } from './update-roster'
 
 /** Vital and roster patches for campaign PCs and NPCs with open participation. */
 export const campaignParticipatingCharacterStatusPatchSchema = z.object({
-  vital: characterVitalPatchSchema.optional(),
+  vital: campaignCharacterVitalPatchSchema.optional(),
   roster: campaignRosterPatchSchema.optional(),
 })
 

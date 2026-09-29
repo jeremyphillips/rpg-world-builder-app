@@ -13,7 +13,7 @@ import {
   vocabularyUsageContextForCampaign,
 } from '../../vocabulary'
 import { resolveGameTermDisplayImage } from '../lib/resolve-game-term-display-image.lib'
-import { requireCampaignRuleset } from '../../vocabulary/lib/patch-document'
+import { requireCampaignRuleset } from '../../vocabulary'
 import type { NamedContentEntity } from '../lib/project-content-document'
 import type { SearchSource } from '../lib/search-source.types'
 

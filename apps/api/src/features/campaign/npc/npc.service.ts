@@ -18,9 +18,9 @@ import {
   toNpcListCharacterSummary,
   updateCharacterVital,
 } from '../../character'
-import { updateCharacterMediaRecord } from '../../character/lib/update-character-media.lib'
-import { createCharacterRelationshipsFromDraftEdges } from '../../character-relationships/lib/create-character-relationships-from-draft'
-import { resolveCampaignCharacterRelationshipBlockers } from '../../character-relationships/lib/character-relationship-deletion-guards'
+import { updateCharacterMediaRecord } from '../../character'
+import { createCharacterRelationshipsFromDraftEdges } from '../../character-relationships'
+import { resolveCampaignCharacterRelationshipBlockers } from '../../character-relationships'
 import { HttpError } from '../../../lib/http-error'
 import { areMongoTransactionsEnabled, runInTransaction } from '../../../lib/mongo-transaction'
 import type { WithMongoSession } from '../../../lib/mongo-session'

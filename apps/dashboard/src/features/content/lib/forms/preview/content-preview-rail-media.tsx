@@ -1,9 +1,6 @@
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
 
-import {
-  ContentMediaFallback,
-  ContentMediaImage,
-} from '@/features/media/components/content-media-image'
+import { ContentMediaFallback, ContentMediaImage } from '@/features/media'
 
 export type ContentPreviewRailMediaProps = {
   displayImage?: ContentDisplayImage

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { contentDisplayImageSchema } from '../../../shared/media/content-display-image-dto'
+import { contentDisplayImageSchema } from '../../primitives/media/content-display-image-dto'
 import { characterClassEntrySchema, characterSpeciesSchema } from '../character/sheet/core'
 import { characterVitalStateSchema } from '../character/sheet/character-vital'
 import { npcCharacterSchema } from '../character/sheet'

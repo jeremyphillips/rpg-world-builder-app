@@ -13,7 +13,7 @@ import {
   prepareContentMediaReconciliation,
   reconcileReferencesWithSession,
   type ReconcileContentMediaResult,
-} from '../../media/lib/reconcile-content-media'
+} from '../../media'
 import { CampaignRulesetPatchModel } from './campaign-ruleset-patch.model'
 
 export type UpdateVocabularyEntryMediaResult =

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Alert, Button, ConfirmDialog, Modal, ToastScopeProvider } from '@rpg/ui'
 import { formatFieldMessage } from '@rpg/contracts'
 import { useMediaManager } from '../hooks/use-media-manager'
@@ -60,7 +60,9 @@ function MediaManagerSessionContent({
     validation,
     notifyRejectedDrop,
   } = controller
-  dismissRef.current = dismiss
+  useEffect(() => {
+    dismissRef.current = dismiss
+  }, [dismiss])
 
   const bodyDrop = useMediaManagerBodyDrop({
     onAdd: uploads.add,

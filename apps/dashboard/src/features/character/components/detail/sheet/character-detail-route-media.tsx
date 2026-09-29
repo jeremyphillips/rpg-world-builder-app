@@ -1,6 +1,6 @@
 import type { ContentMedia } from '@rpg/contracts'
 
-import { useUpdateCampaignCharacterMedia } from '@/features/campaign/hooks/use-update-campaign-character-media'
+import { useUpdateCampaignCharacterMedia } from '@/features/campaign'
 
 import {
   resolveCharacterMediaScope,

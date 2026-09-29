@@ -14,6 +14,8 @@ import {
   isEmptyNarrativeText,
 } from './identity-narrative-generate-action.lib'
 
+import type * as ContentFeature from '@/features/content'
+
 const generateCharacterNarrativeMock = vi.hoisted(() => vi.fn())
 const locationsQueryState = vi.hoisted(() => ({
   data: [] as (typeof harborfordSettlement)[] | undefined,
@@ -33,9 +35,13 @@ vi.mock('@rpg/character-narrative-integrations', () => ({
   generateCharacterNarrative: generateCharacterNarrativeMock,
 }))
 
-vi.mock('@/features/content', () => ({
-  useLocations: () => locationsQueryState,
-}))
+vi.mock('@/features/content', async (importOriginal) => {
+  const actual = await importOriginal<typeof ContentFeature>()
+  return {
+    ...actual,
+    useLocations: () => locationsQueryState,
+  }
+})
 
 vi.mock('@/features/campaign', () => ({
   useCampaignCharacters: () => charactersQueryState,

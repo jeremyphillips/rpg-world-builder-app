@@ -8,7 +8,7 @@ import type {
 } from '@rpg/contracts'
 import { applyCharacterVitalTransitionMetadata } from '@rpg/contracts'
 
-import { resolveCrossCampaignCharacterRelationshipBlockers } from '../character-relationships/lib/character-relationship-deletion-guards'
+import { resolveCrossCampaignCharacterRelationshipBlockers } from '../character-relationships'
 import { assertStandalonePcCreateRestrictions } from './assert-standalone-pc-create'
 import { updateCharacterMediaRecord } from './lib/update-character-media.lib'
 import {

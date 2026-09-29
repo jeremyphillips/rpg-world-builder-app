@@ -25,3 +25,4 @@ export {
 } from './campaign-character-access.service'
 export { CampaignCharacterParticipationModel } from './participation/campaign-character-participation.model'
 export { resolveMemberOpenParticipatingCharacterIds } from './participation/resolve-member-open-participating-character-ids.lib'
+export { resolveCampaignEmblemImageUrl } from './lib/resolve-campaign-emblem-image-url.lib'

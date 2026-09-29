@@ -13,7 +13,7 @@ import type { GeneratedNarrative } from '@rpg/contracts/character-narrative'
 import type { CampaignCharacterCardDto } from '@rpg/contracts'
 import type { Location } from '@rpg/contracts/rpg/content'
 
-import { formatContentListLoadErrorMessage } from '@/features/content/lib/content-type-labels'
+import { formatContentListLoadErrorMessage } from '@/features/content'
 
 import type { IdentityFormValues } from '../../../../lib/steps/identity-form-fields'
 import { identityFormValuesToDraft } from '../../../../lib/steps/identity-form-values'

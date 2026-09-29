@@ -13,7 +13,7 @@ import {
   NPC_ROSTER_COLUMN_LABEL,
   NPC_VITAL_COLUMN_LABEL,
 } from './npc-overview-labels'
-import { ContentDisplayOverviewCell } from '@/features/media/components/content-display-overview-cell'
+import { ContentDisplayOverviewCell } from '@/features/media'
 
 import type { NpcOverviewTableRow } from './npc-overview-row'
 

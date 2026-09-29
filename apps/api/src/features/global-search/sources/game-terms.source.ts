@@ -8,7 +8,7 @@ import {
 import { resolveVocabularyOptionsForViewer } from '../../vocabulary'
 import type { SearchSource } from '../lib/search-source.types'
 import { resolveGameTermDisplayImage } from '../lib/resolve-game-term-display-image.lib'
-import { requireCampaignRuleset } from '../../vocabulary/lib/patch-document'
+import { requireCampaignRuleset } from '../../vocabulary'
 
 function labelField(text: string): GlobalSearchField {
   return { text, weight: 1, role: 'label' }

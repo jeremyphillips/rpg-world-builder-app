@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useNotificationBellMenu } from './use-notification-bell-menu'
 
+import type * as Ui from '@rpg/ui'
+
 const markSeenMutate = vi.fn()
 const markReadMutateAsync = vi.fn()
 const markAllReadMutateAsync = vi.fn()
@@ -12,7 +14,7 @@ vi.mock('react-router-dom', () => ({
 }))
 
 vi.mock('@rpg/ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@rpg/ui')>()
+  const actual = await importOriginal<typeof Ui>()
   return {
     ...actual,
     toast: {

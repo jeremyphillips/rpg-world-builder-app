@@ -1,7 +1,7 @@
 import type { CampaignCharacterGetResponse, CharacterMediaPatchInput } from '@rpg/contracts'
 
 import { findPcById } from '../character'
-import { updateCharacterMediaRecord } from '../character/lib/update-character-media.lib'
+import { updateCharacterMediaRecord } from '../character'
 import { authorizeCampaignCharacterAccess } from './campaign-character-access.service'
 import {
   assertCampaignCharacterMediaPatchAllowed,

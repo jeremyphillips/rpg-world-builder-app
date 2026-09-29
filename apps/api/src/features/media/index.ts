@@ -5,5 +5,20 @@ export {
   getMediaAssetRendition,
   uploadMediaAsset,
 } from './media.service'
-export { reconcileContentMedia } from './lib/reconcile-content-media'
+export {
+  createMediaAssetRecord,
+  findMediaAssetsByIds,
+  findMediaReferencesForAssetId,
+  findMediaReferencesForSubject,
+} from './media.repository'
+export { MediaReferenceModel } from './media-reference.model'
+export {
+  prepareContentMediaReconciliation,
+  reconcileContentMedia,
+  reconcileReferencesWithSession,
+  type ReconcileContentMediaResult,
+} from './lib/reconcile-content-media'
 export { reclaimExpiredAssets } from './lib/reclaim-expired-assets'
+export { resolveMediaArtworkUrl } from './lib/media-artwork-url.lib'
+export { resolveMediaAssetUrl } from './lib/resolve-media-asset-url.lib'
+export { assertMediaAssetReadable } from './lib/assert-media-asset-readable.lib'

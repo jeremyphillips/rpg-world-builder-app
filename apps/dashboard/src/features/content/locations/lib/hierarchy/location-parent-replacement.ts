@@ -2,6 +2,8 @@ import {
   isContentReferenceable,
   validateLocationParentAssignment,
   getParentRequirement,
+  type ContentDisplayFallback,
+  type ContentDisplayImage,
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
@@ -34,8 +36,8 @@ export type LocationParentReplacementMode = 'change' | 'set'
 export type LocationParentReplacementCurrentSnapshot = {
   parentLocationId: string
   entity: DrawerEntityPresentation
-  displayImage?: import('@rpg/contracts').ContentDisplayImage
-  fallback?: import('@rpg/contracts').ContentDisplayFallback
+  displayImage?: ContentDisplayImage
+  fallback?: ContentDisplayFallback
   unavailable?: boolean
 }
 

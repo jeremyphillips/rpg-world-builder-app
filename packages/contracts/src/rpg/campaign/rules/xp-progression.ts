@@ -6,7 +6,7 @@ import { absoluteLevelSchema } from '../../primitives/level'
 import { formatGroupedNumber } from '../../primitives/number-format'
 import type { XpProgressionEntry } from '../../primitives/xp-progression'
 import { xpRequiredForLevel } from '../../primitives/xp-progression'
-import { xpProgressionValidationMessages } from '../../content/xp-progression'
+import { xpProgressionValidationMessages } from '../../primitives/xp-progression-messages'
 
 // ---------------------------------------------------------------------------
 // XP thresholds — campaign rules overrides for character level advancement.

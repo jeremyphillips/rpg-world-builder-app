@@ -16,8 +16,7 @@ export type MediaImageProps = MediaImageVariantProps & {
   placeholderLabel?: string
 }
 
-/** Reserved-dimension image surface with explicit error and placeholder states. */
-export function MediaImage({
+function MediaImageContent({
   src,
   alt = '',
   shape,
@@ -28,10 +27,6 @@ export function MediaImage({
   const [status, setStatus] = React.useState<'loading' | 'loaded' | 'error'>(
     src ? 'loading' : 'error',
   )
-
-  React.useEffect(() => {
-    setStatus(src ? 'loading' : 'error')
-  }, [src])
 
   const showImage = Boolean(src) && status !== 'error'
 
@@ -58,4 +53,9 @@ export function MediaImage({
       )}
     </span>
   )
+}
+
+/** Reserved-dimension image surface with explicit error and placeholder states. */
+export function MediaImage(props: MediaImageProps) {
+  return <MediaImageContent key={props.src ?? ''} {...props} />
 }

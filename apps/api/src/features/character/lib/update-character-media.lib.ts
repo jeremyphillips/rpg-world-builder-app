@@ -8,7 +8,7 @@ import {
   prepareContentMediaReconciliation,
   reconcileReferencesWithSession,
   type ReconcileContentMediaResult,
-} from '../../media/lib/reconcile-content-media'
+} from '../../media'
 import { serializeMediaScopeKey } from '@rpg/contracts'
 import { CharacterModel } from '../character.model'
 

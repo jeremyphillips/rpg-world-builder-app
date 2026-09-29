@@ -1,4 +1,4 @@
-import { useId, useMemo, useRef, useState, type FormEvent } from 'react'
+import { useId, useMemo, useState, type FormEvent } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { BookOpen, Info } from 'lucide-react'
 import { FormProvider, useForm, useFormState, useWatch, type Resolver } from 'react-hook-form'
@@ -170,7 +170,7 @@ function ClassSpellbookAcquisitionModalContent({
   const formId = useId()
   const gainModeHeadingId = useId()
   const regularFieldsIdPrefix = useId()
-  const initialGainModeRef = useRef(initialGainMode)
+  const [initialGainModeSnapshot] = useState(initialGainMode)
   const [gainMode, setGainMode] = useState<SpellbookGainMode>(initialGainMode)
 
   const hostConfig = useMemo(
@@ -208,7 +208,7 @@ function ClassSpellbookAcquisitionModalContent({
 
   const regularAlert = formatRegularGainAlert({ starting, perLevel, throughLevel })
 
-  const isDirty = regularDirty || tableDirty || gainMode !== initialGainModeRef.current
+  const isDirty = regularDirty || tableDirty || gainMode !== initialGainModeSnapshot
 
   const unsavedChanges = useUnsavedChangesConfirm({ isDirty })
 

@@ -22,7 +22,7 @@ import {
   deleteCharacterRelationshipItem,
   listCharacterRelationships,
   updateCharacterRelationshipItem,
-} from '../character-relationships/character-relationship.handlers'
+} from '../character-relationships'
 
 export const campaignRouter: Router = Router()
 

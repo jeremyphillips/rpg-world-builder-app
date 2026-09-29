@@ -11,7 +11,7 @@ import {
 } from '@rpg/contracts'
 
 import { CharacterModel } from '../../character'
-import { CharacterRelationshipModel } from '../../character-relationships/character-relationship.model'
+import { CharacterRelationshipModel } from '../../character-relationships'
 import { HttpError } from '../../../lib/http-error'
 import type { HomebrewDoc } from '../lib/content-write-config'
 import { HomebrewLocationModel } from '../locations/homebrew-location.model'

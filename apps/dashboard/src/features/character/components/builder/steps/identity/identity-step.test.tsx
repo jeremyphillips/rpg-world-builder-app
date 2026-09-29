@@ -15,6 +15,9 @@ import {
 import { IdentityStep } from './identity-step'
 import { identityStepTestContext } from './identity-step.fixtures'
 
+import type * as ContentFeature from '@/features/content'
+import type * as CampaignFeature from '@/features/campaign'
+
 const generateCharacterSpeciesNameMock = vi.hoisted(() => vi.fn())
 
 vi.mock('@/features/auth', () => ({
@@ -26,7 +29,7 @@ import { useSession as useSessionFn } from '@/features/auth'
 const useSession = vi.mocked(useSessionFn)
 
 vi.mock('@/features/content', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/content')>()
+  const actual = await importOriginal<typeof ContentFeature>()
   return {
     ...actual,
     useLocations: () => ({
@@ -39,7 +42,7 @@ vi.mock('@/features/content', async (importOriginal) => {
 })
 
 vi.mock('@/features/campaign', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/features/campaign')>()
+  const actual = await importOriginal<typeof CampaignFeature>()
   return {
     ...actual,
     useCampaignCharacters: () => ({

@@ -6,7 +6,7 @@ import {
   type MediaAsset,
 } from '@rpg/contracts'
 
-import { createUploadSession, uploadMediaFile } from '@/features/media/api/media-api'
+import { createUploadSession, uploadMediaFile } from '@/features/media'
 
 /** Read oriented pixel dimensions from a local image file. */
 export function readImageFileDimensions(file: File): Promise<{ width: number; height: number }> {

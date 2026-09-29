@@ -141,7 +141,9 @@ export function useMediaManager({
   const [confirm, setConfirm] = useState<MediaManagerConfirm | null>(null)
   const removedSnapshots = useRef(new Map<string, RemovedImageSnapshot>())
   const stateRef = useRef(state)
-  stateRef.current = state
+  useEffect(() => {
+    stateRef.current = state
+  }, [state])
   const mutationsLocked = saving
   const uploadScopeReady = isMediaUploadScopeReady(scope)
   const knownAssets = useMemo(

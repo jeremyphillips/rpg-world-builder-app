@@ -12,13 +12,13 @@ import {
   buildCharacterPickerOptionEntitySummary,
   buildCharacterPickerOptionSearchText,
 } from '../../../lib/picker/character-picker-option.lib'
-import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
-import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
-import { buildLocationEntityCardModelFromClassification } from '@/features/content/locations/lib/location-display'
 import {
+  buildLocationContentDisplayImageInput,
+  buildLocationEntityCardModelFromClassification,
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
-} from '@/features/content/organizations/lib/organization-display'
+  getContentDisplayImage,
+} from '@/features/content'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
   PLACE_CONNECTION_ROLE_OPTIONS,

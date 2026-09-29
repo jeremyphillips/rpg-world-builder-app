@@ -10,6 +10,8 @@ import {
   type CampaignDisplayListSurface,
 } from './campaign-display-name.variants'
 
+const CampaignIdentityIcon = contentIdentityIcon('campaign')
+
 export type CampaignDisplayNameListProps = {
   displays: readonly CampaignDisplayVM[]
   surface?: CampaignDisplayListSurface
@@ -29,7 +31,6 @@ export function CampaignDisplayNameList({
   if (displays.length === 0) return null
 
   const singleDisplay = displays.length === 1 ? displays[0] : undefined
-  const CampaignIdentityIcon = contentIdentityIcon('campaign')
 
   return (
     <span className={cn(campaignDisplayNameListVariants({ surface }), className)}>

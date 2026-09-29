@@ -12,6 +12,8 @@ export {
 } from './components/media-manager'
 export { ManagedMediaField, type ManagedMediaFieldProps } from './components/managed-media-field'
 export { DetailMediaField, type DetailMediaFieldProps } from './components/detail-media-field'
+export { createUploadSession, uploadMediaFile } from './api/media-api'
+export { ContentDisplayOverviewCell } from './components/content-display-overview-cell'
 export {
   mediaErrorMessage,
   mediaImageUrl,

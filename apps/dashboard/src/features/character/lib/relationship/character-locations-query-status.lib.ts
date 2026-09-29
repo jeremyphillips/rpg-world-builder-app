@@ -1,6 +1,6 @@
 import { getErrorMessage } from '@rpg/contracts'
 
-import { formatContentListLoadErrorMessage } from '@/features/content/lib/content-type-labels'
+import { formatContentListLoadErrorMessage } from '@/features/content'
 
 export type CharacterLocationsQueryStatus =
   | { status: 'idle' }

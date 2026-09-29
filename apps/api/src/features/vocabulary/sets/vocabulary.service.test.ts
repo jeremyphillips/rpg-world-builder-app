@@ -6,7 +6,7 @@ import { CREATURE_TYPE_SET_ID, createUploadRoleAssignment } from '@rpg/contracts
 
 import { HttpError } from '../../../lib/http-error'
 import { setMongoTransactionsEnabled } from '../../../lib/mongo-transaction'
-import { createMediaAssetRecord } from '../../media/media.repository'
+import { createMediaAssetRecord } from '../../media'
 import { makeTestCampaign } from '../../../test/fixtures/campaigns'
 import { useIntegrationDb } from '../../../test/setup/integration-db'
 import { CampaignRulesetPatchModel } from '../lib/campaign-ruleset-patch.model'

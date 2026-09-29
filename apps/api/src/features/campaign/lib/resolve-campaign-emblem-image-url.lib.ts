@@ -1,6 +1,6 @@
 import type { ContentMedia } from '@rpg/contracts'
 
-import { resolveMediaAssetUrl } from '../../media/lib/resolve-media-asset-url.lib'
+import { resolveMediaAssetUrl } from '../../media'
 
 export function resolveCampaignEmblemImageUrl(media: ContentMedia | undefined): string | undefined {
   const assignment = media?.roles.emblem

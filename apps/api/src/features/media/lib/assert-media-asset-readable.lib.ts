@@ -2,8 +2,8 @@ import { isCampaignPcMediaScopeKey, resolveCampaignPcMediaScopeKeys } from '@rpg
 
 import { HttpError } from '../../../lib/http-error'
 import { CampaignMembershipModel } from '../../campaign'
-import { listOpenParticipationsForCharacters } from '../../campaign/participation/campaign-character-participation.repository'
-import { CharacterModel } from '../../character/character.model'
+import { listOpenParticipationsForCharacters } from '../../campaign'
+import { CharacterModel } from '../../character'
 import type { MediaAssetDoc } from '../media-asset.model'
 import { findMediaReferencesForAssetId } from '../media.repository'
 import { assertMediaScopeAuthorized } from './scope.lib'

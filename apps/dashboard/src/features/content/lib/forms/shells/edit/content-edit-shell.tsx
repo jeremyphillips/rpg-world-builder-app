@@ -380,7 +380,7 @@ function ContentEditFormBody({
         if (serverMedia === undefined) throw error
 
         form.resetField('media', { defaultValue: serverMedia })
-        throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE)
+        throw new Error(CONTENT_MEDIA_STALE_FORM_MESSAGE, { cause: error })
       }
       const savedRecord = saved as typeof entity & { media?: ContentMedia }
       const baseline = stripEditEnvelopeFromFormDefaults(

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { buildCharacterEntityCardModel } from '@/features/character/lib/display/character-entity-summary.lib'
+import { buildCharacterEntityCardModel } from '@/features/character'
 
 import { YAWNING_PORTAL, LOCATIONS_LIST } from '../../../../locations/fixtures'
 import { CITY_COUNCIL } from '../../../../organizations/fixtures'

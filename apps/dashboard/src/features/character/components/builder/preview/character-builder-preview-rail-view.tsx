@@ -5,7 +5,7 @@ import type {
   ChoiceSet,
 } from '@rpg/contracts'
 import { PreviewRail, type PreviewRailLayout } from '@rpg/ui'
-import { ContentPreviewRailMedia } from '@/features/content/lib/forms/preview/content-preview-rail-media'
+import { ContentPreviewRailMedia } from '@/features/content'
 import { resolveCharacterPrimaryDisplayImage } from '../../../lib/display/resolve-character-display-image'
 
 import { getBuilderDraftNarrative } from '../../../lib/builder-preview/character-builder-preview-panel.lib'

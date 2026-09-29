@@ -1,7 +1,7 @@
-export { contentMediaSchema } from '../../shared/media/content-media'
+export { contentMediaSchema } from '../primitives/media/content-media'
 export {
   contentDisplayImageSchema,
   contentDisplayImagesByRoleSchema,
   type ContentDisplayImageDto,
   type ContentDisplayImagesByRole,
-} from '../../shared/media/content-display-image-dto'
+} from '../primitives/media/content-display-image-dto'

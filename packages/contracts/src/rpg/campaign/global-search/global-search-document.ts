@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { contentDisplayImageSchema } from '../../../shared/media/content-display-image-dto'
+import { contentDisplayImageSchema } from '../../primitives/media/content-display-image-dto'
 import { globalSearchViewerCharacterRelationshipsSchema } from './global-search-viewer-character-relationships'
 import { globalSearchFieldSchema } from './global-search-field'
 import { globalSearchFilterGroupSchema } from './filter-group'
