@@ -108,7 +108,7 @@ export const characterBuilderStepRailClasses = 'space-y-1'
 
 /** Host-owned navigation accent — row hover/focus only; selected left-rail stays local (F9). */
 export const characterBuilderStepRailItemClasses = cn(
-  'relative flex w-full items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover',
+  'relative flex w-full cursor-pointer items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover',
   interactiveFocusVariants({ context: 'standalone' }),
 )
 

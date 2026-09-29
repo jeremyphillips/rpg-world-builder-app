@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 export const sidebarNavSectionDisclosureTriggerClasses =
-  'flex w-full items-center gap-2 rounded-md px-3 pb-1 pt-3 text-left transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'flex w-full cursor-pointer items-center gap-2 rounded-md px-3 pb-1 pt-3 text-left transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 export const sidebarNavSectionDisclosureStaticHeaderClasses =
   'flex w-full items-center gap-2 px-3 pb-1 pt-3 text-left'

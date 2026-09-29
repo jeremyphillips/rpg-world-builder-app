@@ -28,6 +28,22 @@ maps belong at Layer 2 until a non-entity primitive proves a design-system-wide 
 
 Features do not assemble `focus-visible:ring-*` stacks.
 
+### Cursor (`interactivePointerClasses`, globals base)
+
+Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` restores
+`cursor: pointer` on enabled buttons in `@layer base`. Compose `interactivePointerClasses`
+(or `hitTarget: 'pointer'` on `interactiveRowVariants`) for non-button hit targets.
+
+| Surface | Cursor |
+| ------- | ------ |
+| Buttons, icon ghosts, disclosure triggers | `pointer` |
+| Text inputs / textarea | `text` (UA default) |
+| Select/combobox/dropdown triggers | `pointer` |
+| Menu / listbox options in popovers | `pointer` |
+| Drag handles | `grab` / `grabbing` (`dragHandleVariants`) |
+| Disabled controls | `not-allowed` or `pointer-events-none` |
+| Static rows (no activation) | `default` (e.g. preview rail static sections) |
+
 ### `iconGhostControlVariants({ hover, layout })`
 
 Compact (24px) icon-only ghost controls. Composes internal control-action geometry with
@@ -45,6 +61,7 @@ Orthogonal row fills — not layout:
 | `selected`      | `none` \| `bordered` \| `fill`         |
 | `selectedHover` | `none` \| `row`                        |
 | `selectedData`  | `none` \| `selected` \| `checked`      |
+| `hitTarget`     | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
 
 | `hoverFamily` | Meaning                    | Hover token          |
 | ------------- | -------------------------- | -------------------- |

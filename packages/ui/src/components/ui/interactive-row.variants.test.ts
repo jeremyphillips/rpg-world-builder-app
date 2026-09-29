@@ -43,4 +43,9 @@ describe('interactiveRowVariants', () => {
   it('applies inactive state independently of hover family', () => {
     expect(interactiveRowVariants({ state: 'inactive' })).toContain('border-dashed')
   })
+
+  it('applies pointer cursor when the row is an explicit hit target', () => {
+    expect(interactiveRowVariants({ hitTarget: 'pointer' })).toContain('cursor-pointer')
+    expect(interactiveRowVariants({ hitTarget: 'none' })).not.toContain('cursor-pointer')
+  })
 })

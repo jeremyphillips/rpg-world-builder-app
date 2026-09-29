@@ -10,6 +10,7 @@ describe('iconGhostControlVariants', () => {
     expect(classes).toContain('focus-visible:ring-2')
     expect(classes).not.toContain('focus-visible:ring-offset-2')
     expect(classes).toContain('hover:text-foreground')
+    expect(classes).toContain('cursor-pointer')
   })
 
   it('supports semantic destructive hover tones', () => {

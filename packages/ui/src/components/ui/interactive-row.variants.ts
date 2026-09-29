@@ -1,5 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { interactivePointerClasses } from './interactive-focus.variants'
+
 /**
  * Orthogonal row interaction policy — capability (hover), semantic state, and selection fills.
  * Hosts own layout, inset, separators, and left-rail accents; they compose this for fills only.
@@ -36,6 +38,10 @@ export const interactiveRowVariants = cva('transition-colors', {
       selected: 'data-[state=selected]:bg-row-selected',
       checked: 'data-[state=checked]:bg-row-selected',
     },
+    hitTarget: {
+      none: '',
+      pointer: interactivePointerClasses,
+    },
   },
   compoundVariants: [
     {
@@ -63,6 +69,7 @@ export const interactiveRowVariants = cva('transition-colors', {
     selected: 'none',
     selectedHover: 'none',
     selectedData: 'none',
+    hitTarget: 'none',
   },
 })
 

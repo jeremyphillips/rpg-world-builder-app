@@ -2,7 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { controlActionCompactIconClasses } from './control-action.variants'
-import { interactiveFocusVariants } from './interactive-focus.variants'
+import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
 
 /**
  * Icon-only ghost control chrome — compact control-action hit target with embedded focus.
@@ -11,6 +11,7 @@ import { interactiveFocusVariants } from './interactive-focus.variants'
 export const iconGhostControlVariants = cva(
   cn(
     'inline-flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground',
+    interactivePointerClasses,
     controlActionCompactIconClasses,
     interactiveFocusVariants({ context: 'embedded' }),
   ),

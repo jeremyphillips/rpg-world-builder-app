@@ -22,3 +22,10 @@ export const interactiveFocusVariants = cva(
 )
 
 export type InteractiveFocusVariantProps = VariantProps<typeof interactiveFocusVariants>
+
+/**
+ * Explicit pointer cursor for interactive hit targets. Tailwind v4 preflight sets
+ * `button { cursor: default }`; globals base restores pointer on buttons, but
+ * row shells and non-button targets still compose this in variants.
+ */
+export const interactivePointerClasses = 'cursor-pointer'

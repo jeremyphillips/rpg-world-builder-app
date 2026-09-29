@@ -5,7 +5,7 @@ export const breadcrumbListVariants =
 
 export const breadcrumbItemVariants = 'inline-flex items-center gap-1.5'
 
-export const breadcrumbLinkVariants = 'transition-colors hover:text-foreground'
+export const breadcrumbLinkVariants = 'cursor-pointer transition-colors hover:text-foreground'
 
 export const breadcrumbPageVariants = 'font-normal text-foreground'
 

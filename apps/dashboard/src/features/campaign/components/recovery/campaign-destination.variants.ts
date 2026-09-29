@@ -11,7 +11,11 @@ export const campaignDestinationListVariants = cva(
 export const campaignDestinationRowVariants = cva(
   cn(
     'flex w-full items-center gap-3 p-6 text-left',
-    interactiveRowVariants({ interaction: 'hoverable', hoverFamily: 'navigation' }),
+    interactiveRowVariants({
+      interaction: 'hoverable',
+      hoverFamily: 'navigation',
+      hitTarget: 'pointer',
+    }),
     interactiveFocusVariants({ context: 'standalone' }),
   ),
 )

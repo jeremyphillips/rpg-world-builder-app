@@ -90,7 +90,7 @@ export function ListResultItem({
     disabled,
     interactive,
   })
-  const mainClassName = cn(listResultItemMainVariants(), className)
+  const mainClassName = cn(listResultItemMainVariants({ interactive }), className)
 
   const main = asChild ? (
     React.isValidElement<{ className?: string; disabled?: boolean; children?: React.ReactNode }>(
