@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { DetailCollectionPanel } from '../detail-collection-panel'
-import { RelationshipList } from '../../../../relationship/list/relationship-list'
+import { EntityRowList } from '../../../../entity/row-list/entity-row-list'
 
 const meta = {
   title: 'Content/Detail/DetailCollectionPanel',
@@ -19,11 +19,11 @@ export const WithRelationshipBody: Story = {
       headingId="story-territorial-authority-heading"
       helper="Organizations that govern, control, or claim this location."
     >
-      <RelationshipList.Root itemCount={1}>
-        <RelationshipList.Group itemCount={1} label="Governs">
-          <RelationshipList.Row title="City Council" />
-        </RelationshipList.Group>
-      </RelationshipList.Root>
+      <EntityRowList.Root itemCount={1}>
+        <EntityRowList.Group itemCount={1} label="Governs">
+          <EntityRowList.Row heading="City Council" />
+        </EntityRowList.Group>
+      </EntityRowList.Root>
     </DetailCollectionPanel>
   ),
 }

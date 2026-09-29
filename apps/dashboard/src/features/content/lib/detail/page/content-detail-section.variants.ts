@@ -1,7 +1,7 @@
 /**
  * Content detail section body layouts:
  * - prose: section-owned padding for mixed prose content
- * - list: unpadded — host owns row/list chrome (RelationshipList, DetailCollectionRowList, …)
+ * - list: unpadded — host owns row/list chrome (EntityRowList, DetailCollectionRowList, …)
  * - flush: unpadded — full-bleed child owns layout (tables, item stacks, …)
  */
 

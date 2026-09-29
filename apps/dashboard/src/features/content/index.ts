@@ -55,19 +55,20 @@ export type {
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'
 export { EntityAnatomyHost } from './lib/entity/anatomy/entity-anatomy'
-export { CrossContentRelationshipRow } from './lib/relationship/list/row/cross-content-relationship-row'
-export type { CrossContentRelationshipRowProps } from './lib/relationship/list/row/cross-content-relationship-row'
-export { RelationshipList } from './lib/relationship/list/relationship-list'
+export { EntityRowList } from './lib/entity/row-list/entity-row-list'
 export type {
-  RelationshipListAction,
-  RelationshipListEmptyProps,
-  RelationshipListFooterProps,
-  RelationshipListGroupProps,
-  RelationshipListRootProps,
-  RelationshipListRowProps,
-  RelationshipListSupplementaryProps,
-  RelationshipRowMenuItem,
-} from './lib/relationship/list/relationship-list'
+  EntityRowListAction,
+  EntityRowListEmptyProps,
+  EntityRowListFooterProps,
+  EntityRowListGroupProps,
+  EntityRowListMenu,
+  EntityRowListMenuItem,
+  EntityRowListRootProps,
+  EntityRowListRowCustomTrailingProps,
+  EntityRowListRowMenuProps,
+  EntityRowListRowProps,
+  EntityRowListSupplementaryProps,
+} from './lib/entity/row-list/entity-row-list'
 export { DetailCollectionPanel } from './lib/detail/collection/panel/detail-collection-panel'
 export type { DetailCollectionPanelProps } from './lib/detail/collection/panel/detail-collection-panel'
 export { contentDetailHeroEyebrowClasses } from './lib/detail/page/content-detail-layout.variants'

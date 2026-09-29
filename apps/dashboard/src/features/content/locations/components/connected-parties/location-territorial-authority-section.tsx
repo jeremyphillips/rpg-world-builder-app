@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -184,9 +184,9 @@ function renderTerritorialRelationshipRow(input: {
   })
 
   return (
-    <RelationshipList.Row
-      title={input.row.subject.name}
-      href={ROUTES.content.organizations.detail(input.campaignId, input.row.subject.id)}
+    <EntityRowList.Row
+      heading={input.row.subject.name}
+      headingHref={ROUTES.content.organizations.detail(input.campaignId, input.row.subject.id)}
       menu={
         actions.length > 0
           ? {
@@ -255,7 +255,7 @@ export function LocationTerritorialAuthoritySectionBody({
       headingId={TERRITORIAL_AUTHORITY_HEADING_ID}
       helper={showHelper ? TERRITORIAL_AUTHORITY_SECTION_HELPER : undefined}
     >
-      <RelationshipList.Root itemCount={rootItemCount}>
+      <EntityRowList.Root itemCount={rootItemCount}>
         {SINGLETON_KINDS.map((kind) => {
           const row = kind === 'governs' ? governsRow : controlsRow
           const copy = TERRITORIAL_AUTHORITY_SLOT_COPY[kind]
@@ -265,7 +265,7 @@ export function LocationTerritorialAuthoritySectionBody({
           }
 
           return (
-            <RelationshipList.Group
+            <EntityRowList.Group
               key={kind}
               label={copy.heading}
               itemCount={row ? 1 : 0}
@@ -289,12 +289,12 @@ export function LocationTerritorialAuthoritySectionBody({
                     ...resolveRowPermissions(row),
                   })
                 : null}
-            </RelationshipList.Group>
+            </EntityRowList.Group>
           )
         })}
 
         {showClaimsGroup ? (
-          <RelationshipList.Group
+          <EntityRowList.Group
             label={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.heading}
             itemCount={claimRows.length}
             emptyLabel={TERRITORIAL_AUTHORITY_SLOT_COPY.claims.empty}
@@ -320,9 +320,9 @@ export function LocationTerritorialAuthoritySectionBody({
                 ...resolveRowPermissions(row),
               }),
             )}
-          </RelationshipList.Group>
+          </EntityRowList.Group>
         ) : null}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </ContentDetailSection>
   )
 }

@@ -3,7 +3,7 @@ import type { CampaignPartyPcListItem } from '@rpg/contracts'
 import { ROUTES } from '@/app/routes'
 import { CharacterListRow } from '@/features/character'
 import { normalizePartyController, resolveCharacterControllerDisplay } from '@/features/character'
-import { DetailCollectionPanel, RelationshipList } from '@/features/content'
+import { DetailCollectionPanel, EntityRowList } from '@/features/content'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -29,12 +29,9 @@ export function CampaignOverviewPartySection({
       headerAlign="center"
       bodySurface="transparent"
     >
-      <RelationshipList.Root
-        itemCount={party.length}
-        emptyLabel={CAMPAIGN_OVERVIEW_EMPTY_TEXT.party}
-      >
+      <EntityRowList.Root itemCount={party.length} emptyLabel={CAMPAIGN_OVERVIEW_EMPTY_TEXT.party}>
         {party.length > 0 ? (
-          <RelationshipList.Group itemCount={party.length}>
+          <EntityRowList.Group itemCount={party.length}>
             {party.map((entry) => (
               <CharacterListRow
                 key={entry.character.id}
@@ -47,9 +44,9 @@ export function CampaignOverviewPartySection({
                 rosterStatus={entry.roster.status}
               />
             ))}
-          </RelationshipList.Group>
+          </EntityRowList.Group>
         ) : null}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </DetailCollectionPanel>
   )
 }

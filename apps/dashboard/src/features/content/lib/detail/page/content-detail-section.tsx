@@ -22,7 +22,7 @@ export type ContentDetailSectionProps = Omit<
   /**
    * Semantic body chrome contract (not “looks unpadded”):
    * - `prose` — section applies outer padding
-   * - `list` — host owns row/list chrome (RelationshipList, …)
+   * - `list` — host owns row/list chrome (EntityRowList, …)
    * - `flush` — full-bleed child owns layout (tables, flush item stacks, …)
    */
   bodyLayout?: ContentDetailSectionBodyLayout

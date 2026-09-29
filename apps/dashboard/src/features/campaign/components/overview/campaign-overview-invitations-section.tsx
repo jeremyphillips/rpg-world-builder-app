@@ -1,6 +1,6 @@
 import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 
-import { DetailCollectionPanel, RelationshipList } from '@/features/content'
+import { DetailCollectionPanel, EntityRowList } from '@/features/content'
 
 import {
   CAMPAIGN_OVERVIEW_EMPTY_TEXT,
@@ -25,18 +25,18 @@ export function CampaignOverviewInvitationsSection({
       headerAlign="center"
       bodySurface="transparent"
     >
-      <RelationshipList.Root
+      <EntityRowList.Root
         itemCount={invites.length}
         emptyLabel={CAMPAIGN_OVERVIEW_EMPTY_TEXT.invitations}
       >
         {invites.length > 0 ? (
-          <RelationshipList.Group itemCount={invites.length}>
+          <EntityRowList.Group itemCount={invites.length}>
             {invites.map((invite) => (
               <CampaignOverviewInviteRow key={invite.id} campaignId={campaignId} invite={invite} />
             ))}
-          </RelationshipList.Group>
+          </EntityRowList.Group>
         ) : null}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </DetailCollectionPanel>
   )
 }

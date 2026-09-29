@@ -4,14 +4,8 @@ import type {
   CharacterRelationshipDraftEdges,
 } from '@rpg/contracts'
 import { ActionIcon, IconContainer, SplitButton } from '@rpg/ui'
-import { cn } from '@rpg/ui'
 
-import {
-  DetailCollectionPanel,
-  RelationshipList,
-  detailCollectionRecordSeparatorVariants,
-  type DetailOverflowAction,
-} from '@/features/content'
+import { DetailCollectionPanel, EntityRowList, type DetailOverflowAction } from '@/features/content'
 
 import {
   CONNECTION_SECTION_CATALOG,
@@ -134,9 +128,9 @@ export function ConnectionsStepSection({
         />
       }
     >
-      <RelationshipList.Root itemCount={sectionEdges.length} emptyLabel={emptyLabel}>
+      <EntityRowList.Root itemCount={sectionEdges.length} emptyLabel={emptyLabel}>
         {sectionEdges.length > 0 ? (
-          <ul className={cn(detailCollectionRecordSeparatorVariants(), 'px-4')}>
+          <EntityRowList.Group itemCount={sectionEdges.length}>
             {sectionEdges.map((edge) => {
               const presentation = resolveConnectionRowPresentation({
                 edge,
@@ -162,10 +156,10 @@ export function ConnectionsStepSection({
               })
 
               return (
-                <RelationshipList.Row
+                <EntityRowList.Row
                   key={edge.id}
-                  title={presentation.heading}
-                  href={presentation.headingHref}
+                  heading={presentation.heading}
+                  headingHref={presentation.headingHref}
                   description={unavailableLabel ?? presentation.description ?? undefined}
                   menu={{
                     label: `Actions for ${presentation.heading}`,
@@ -175,9 +169,9 @@ export function ConnectionsStepSection({
                 />
               )
             })}
-          </ul>
+          </EntityRowList.Group>
         ) : null}
-      </RelationshipList.Root>
+      </EntityRowList.Root>
     </DetailCollectionPanel>
   )
 }

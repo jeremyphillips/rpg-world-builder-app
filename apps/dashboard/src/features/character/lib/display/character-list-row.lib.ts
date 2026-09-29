@@ -1,10 +1,7 @@
 import type { CharacterRosterStatus } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import {
-  buildEntitySurfaceLeadingMediaNode,
-  type RelationshipListRowProps,
-} from '@/features/content'
+import { buildEntitySurfaceLeadingMediaNode, type EntityRowListRowProps } from '@/features/content'
 
 import { resolveCharacterRosterStatusPresentation } from '../campaign-roster-presentation'
 import type { CharacterListCardData } from '../../components/character-list-card.lib'
@@ -22,7 +19,10 @@ export type BuildCharacterListRowPresentationInput = {
 
 export function buildCharacterListRowPresentation(
   input: BuildCharacterListRowPresentationInput,
-): Pick<RelationshipListRowProps, 'title' | 'href' | 'description' | 'status' | 'leadingMedia'> {
+): Pick<
+  EntityRowListRowProps,
+  'heading' | 'headingHref' | 'description' | 'status' | 'leadingMedia'
+> {
   const vm = buildCharacterEntitySummaryVmFromTransport({
     id: input.card.id,
     name: input.card.name,
@@ -59,8 +59,8 @@ export function buildCharacterListRowPresentation(
   const description = [input.card.summary, input.controllerLine].filter(Boolean).join(' · ')
 
   return {
-    title: input.card.name,
-    href: input.detailHref,
+    heading: input.card.name,
+    headingHref: input.detailHref,
     description: description || undefined,
     status: identity.status,
     leadingMedia,

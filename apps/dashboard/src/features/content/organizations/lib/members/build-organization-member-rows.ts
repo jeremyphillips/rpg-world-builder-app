@@ -1,4 +1,8 @@
-import type { OrganizationMembersResponse, OrganizationMemberSummary } from '@rpg/contracts'
+import type {
+  ContentDisplayImage,
+  OrganizationMembersResponse,
+  OrganizationMemberSummary,
+} from '@rpg/contracts'
 
 import {
   buildCharacterEntitySummaryVmFromTransport,
@@ -17,6 +21,7 @@ export type OrganizationMemberRowVm = {
   /** `PC · Dwarf · Level 1 Fighter` — the character identity line under the name. */
   identityLine: string
   detailHref: string
+  displayImage?: ContentDisplayImage
 }
 
 export type OrganizationMembersViewModel = {
@@ -48,6 +53,9 @@ export function buildOrganizationMemberRows(
           : {}),
         identityLine: formatCharacterInlineSummary(summary, { includeCharacterType: true }),
         detailHref: resolveCampaignCharacterDetailHref(routeContext, member),
+        ...(member.character.displayImagesByRole?.portrait
+          ? { displayImage: member.character.displayImagesByRole.portrait }
+          : {}),
       }
     }),
     total: members.total,

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { RelationshipList } from '@/features/content'
+import { EntityRowList } from '@/features/content'
 
 import { CHARACTER_CONTROLLER_DISPLAY } from '../lib/display/character-display-labels'
 import { CharacterListRow } from './character-list-row'
@@ -14,10 +14,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof CharacterListRow>
 
-export const InRelationshipList: Story = {
+export const InEntityRowList: Story = {
   render: () => (
-    <RelationshipList.Root itemCount={1}>
-      <RelationshipList.Group itemCount={1}>
+    <EntityRowList.Root itemCount={1}>
+      <EntityRowList.Group itemCount={1}>
         <CharacterListRow
           card={{
             id: 'char_1',
@@ -28,7 +28,7 @@ export const InRelationshipList: Story = {
           controllerLine={CHARACTER_CONTROLLER_DISPLAY.playedBy('Player One')}
           rosterStatus="active"
         />
-      </RelationshipList.Group>
-    </RelationshipList.Root>
+      </EntityRowList.Group>
+    </EntityRowList.Root>
   ),
 }

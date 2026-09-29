@@ -9,7 +9,7 @@ import type { Location } from '@rpg/contracts'
 import { buildLocationsById } from '../../../locations/lib/location-display'
 import { ALDERMERE, YAWNING_PORTAL, LOCATIONS_LIST } from '../../../locations/fixtures'
 import { buildOrganizationLocationConnectionCards } from '../../lib/location-connections/build-organization-location-connection-cards'
-import { RelationshipList } from '../../../lib/relationship/list/relationship-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
 import { OrganizationLocationConnectionListRow } from './organization-location-connection-list-row'
 
 const CAMPAIGN_ID = 'camp_1'
@@ -42,11 +42,11 @@ const mutationContext = {
 function renderListRow(props: ComponentProps<typeof OrganizationLocationConnectionListRow>) {
   return render(
     <MemoryRouter>
-      <RelationshipList.Root itemCount={1}>
-        <RelationshipList.Group itemCount={1}>
+      <EntityRowList.Root itemCount={1}>
+        <EntityRowList.Group itemCount={1}>
           <OrganizationLocationConnectionListRow {...props} />
-        </RelationshipList.Group>
-      </RelationshipList.Root>
+        </EntityRowList.Group>
+      </EntityRowList.Root>
     </MemoryRouter>,
   )
 }

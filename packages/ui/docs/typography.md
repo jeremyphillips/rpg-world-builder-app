@@ -243,7 +243,7 @@ Detail-page subgroup labels (for example Districts under City structure, or Gove
 under Territorial Authority) use `<Eyebrow size="sm">` with the default muted tone.
 Pass **title-case** copy at the call site — the composite applies uppercase. Dashboard
 layout for grouped collection subgroups is `DetailCollectionGroup`; relationship
-sections use `RelationshipList.Group` with the same eyebrow/header chrome via shared
+sections use `EntityRowList.Group` with the same eyebrow/header chrome via shared
 collection-body tokens (see
 [cross-content-relationship-ui.md](../../../apps/dashboard/docs/cross-content-relationship-ui.md#collection-oriented-detail-surfaces)).
 

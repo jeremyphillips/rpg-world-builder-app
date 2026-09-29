@@ -42,7 +42,7 @@ components/edit/
 components/members/
   OrganizationMembersDetailSection
   ├── OrganizationMembersSection
-  │     └── DetailCollectionPanel → RelationshipList (relationship body)
+  │     └── DetailCollectionPanel → EntityRowList (relationship body)
   ├── OrganizationMembershipTitlesDetailSection
   │     └── OrganizationMembershipTitlesSummary
   └── OrganizationMembersDetailDrawers
@@ -51,7 +51,7 @@ components/members/
 components/location-connections/
   OrganizationLocationConnectionsDetailSection
   ├── OrganizationLocationConnectionsSection
-  │     └── DetailCollectionPanel × family → RelationshipList
+  │     └── DetailCollectionPanel × family → EntityRowList
   │           └── OrganizationLocationConnectionListRow
   └── OrganizationLocationConnectionLinkDrawer
 ```

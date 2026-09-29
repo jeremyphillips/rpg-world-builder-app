@@ -2,7 +2,7 @@
 
 Organization detail **location connections** — forward typed-edge sections and the
 sequenced add/change/replace drawer. Each family panel uses `DetailCollectionPanel`
-with `RelationshipList` as the collection body (not grouped collection Group/RowList).
+with `EntityRowList` as the collection body (not grouped collection Group/RowList).
 Drawer composition roots stay in this folder.
 
 Orientation: [drawer-architecture.md](../../../../../docs/drawer-architecture.md).
@@ -16,7 +16,7 @@ organization detail route
   └─ OrganizationLocationConnectionsDetailSection
        └─ OrganizationLocationConnectionsSection
             └─ DetailCollectionPanel × family
-                 └─ RelationshipList → OrganizationLocationConnectionListRow
+                 └─ EntityRowList → OrganizationLocationConnectionListRow
        └─ OrganizationLocationConnectionLinkDrawer (G2/G3/G4 by mode)
             ├─ CatalogEntityPickerSheet
             ├─ DrawerContext / KindField / SubjectField

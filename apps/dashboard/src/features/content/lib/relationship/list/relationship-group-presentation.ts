@@ -37,14 +37,14 @@ export function resolveOrganizationLocationConnectionFamilyPresentation(
   return ORGANIZATION_LOCATION_CONNECTION_FAMILY_PRESENTATION[family]
 }
 
-/** Labeled structural groups: empty slots use `RelationshipList.Group` `headerAction`. */
+/** Labeled structural groups: empty slots use `EntityRowList.Group` `headerAction`. */
 export function relationshipGroupUsesLabeledSlotActions(
   presentation: RelationshipGroupPresentation,
 ): boolean {
   return presentation === 'meaningful_slots'
 }
 
-/** Family-level add and section empty copy live on `RelationshipList.Root`. */
+/** Family-level add and section empty copy live on `EntityRowList.Root`. */
 export function relationshipGroupUsesRootFamilyAdd(
   presentation: RelationshipGroupPresentation,
 ): boolean {

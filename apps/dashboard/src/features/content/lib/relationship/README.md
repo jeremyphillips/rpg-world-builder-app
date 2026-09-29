@@ -20,11 +20,11 @@ consumer outside `content` needs it.
 > typed-edge policy is promoted into `relationship/` only after **multiple
 > relationship families** demonstrate the same semantics.
 
-| Question                       | Answer                                                                                                                                                                                         |
-| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What belongs here?             | Typed-edge list chrome, drawer primitives, nested-create lifecycle, and **family adapters** once edge semantics are shared enough to colocate.                                                 |
-| What stays in feature modules? | Copy, VMs, POST mutations, and domain eligibility only one family needs.                                                                                                                       |
-| When does `adapters/` appear?  | When **two domains** share typed-edge policy (eligibility, kind families, cardinality, alternatives, mutation semantics) — not when a second consumer merely reuses `RelationshipList` chrome. |
+| Question                       | Answer                                                                                                                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What belongs here?             | Typed-edge list chrome, drawer primitives, nested-create lifecycle, and **family adapters** once edge semantics are shared enough to colocate.                                              |
+| What stays in feature modules? | Copy, VMs, POST mutations, and domain eligibility only one family needs.                                                                                                                    |
+| When does `adapters/` appear?  | When **two domains** share typed-edge policy (eligibility, kind families, cardinality, alternatives, mutation semantics) — not when a second consumer merely reuses `EntityRowList` chrome. |
 
 ## Folder taxonomy
 
@@ -47,12 +47,12 @@ Feature `*-link-drawer.tsx` files are **composition roots** in
 | Folder                 | Supported imports                                                                                                                                                                            |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `core/`                | `relationship-candidate-set`, `relationship-mutation-capabilities`, `relationship-mutation-mode`                                                                                             |
-| `list/`                | `relationship-list` (`RelationshipList`), `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement)                                             |
+| `list/`                | `relationship-overflow-actions`, `relationship-group-presentation` (typed-edge group action placement); list chrome → `lib/entity/row-list/entity-row-list` (`EntityRowList`)                |
 | `drawer/`              | `drawer-context`, `relationship-drawer-subject-field`, `relationship-drawer-field-labels` (`RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL`)                                                   |
 | `nested-create/`       | `use-relationship-picker-nested-create`, intent resolvers, `revalidateCreated*` helpers                                                                                                      |
 | `location-connection/` | eligibility, duplicate-keys, drawer-intent, kind-options, kind-options-copy (type), kind-decision-presentation, KindField, alternatives, invalidate, current-endpoint, mutation-mode aliases |
 
-**Private:** `list/row/cross-content-relationship-row` (use `RelationshipList.Row`
+**Private:** `list/row/cross-content-relationship-row` (use `EntityRowList.Row`
 only), list Empty/Footer internals, nested-create modals/handoff helpers (reached via the hook).
 
 ## Drawer composition grammars
@@ -83,7 +83,7 @@ Do **not** extend InvOrg/InvChar `add` without `addKind` with sequenced overlay
 ### `relationship-group-presentation.ts` — **shared list group policy**
 
 Classifies typed-edge sections into `meaningful_slots` (labeled structural groups with
-`Group` `headerAction`) vs `sparse_groups` (family-level add on `RelationshipList.Root`).
+`Group` `headerAction`) vs `sparse_groups` (family-level add on `EntityRowList.Root`).
 Wired by location territorial/people sections and organization forward family sections.
 Domain copy stays in feature `lib/` — this module owns **action placement semantics** only.
 
@@ -104,13 +104,13 @@ co-located drawer tests. InvOrg/InvChar stay composition-only. Persistence stays
 
 ## Guards
 
-- [`detail/detail-collection-grammar.guard.test.ts`](../detail/detail-collection-grammar.guard.test.ts) — typed-edge sections use `RelationshipList` for subgroup/list anatomy; must not import grouped collection body components or `list/row/**` directly.
+- [`detail/detail-collection-grammar.guard.test.ts`](../detail/detail-collection-grammar.guard.test.ts) — typed-edge sections use `EntityRowList` for subgroup/list anatomy; must not import grouped collection body components or `list/row/**` directly.
 - [`drawer/sequenced-relationship-drawer-drift.test.ts`](./drawer/sequenced-relationship-drawer-drift.test.ts) — nested-create hook boundaries.
 - [`entity/entity-drawer-surface.guard.test.ts`](../entity/entity-drawer-surface.guard.test.ts) — entity drawer layers vs relationship drawer.
 
 ## Collection-body style contract
 
-`RelationshipList.Group` imports group header and record separator tokens from
+`EntityRowList.Group` imports group header and record separator tokens from
 [`detail/collection/detail-collection-chrome.variants.ts`](../detail/collection/detail-collection-chrome.variants.ts)
 — the same public contract used by grouped collection body primitives. Do not import
 private `detail-collection-group.variants.ts` or `detail-collection-row-list.variants.ts`
