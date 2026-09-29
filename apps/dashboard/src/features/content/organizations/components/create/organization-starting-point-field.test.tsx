@@ -1,4 +1,4 @@
-import { createElement } from 'react'
+import { createElement, useEffect } from 'react'
 import { describe, expect, it } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -58,9 +58,15 @@ async function waitForThievesGuildMaterialized(user: ReturnType<typeof userEvent
   })
 }
 
-function Harness() {
+function Harness({
+  onRegisterReader,
+}: {
+  onRegisterReader: (read: () => Record<string, unknown>) => void
+}) {
   const form = useFormContext<HarnessValues>()
-  readHarnessValues = () => form.getValues()
+  useEffect(() => {
+    onRegisterReader(() => form.getValues())
+  }, [form, onRegisterReader])
 
   return (
     <>
@@ -79,6 +85,10 @@ function Harness() {
       </button>
     </>
   )
+}
+
+function registerHarnessReader(read: () => Record<string, unknown>) {
+  readHarnessValues = read
 }
 
 function renderStartingPointForm() {
@@ -117,7 +127,7 @@ function renderStartingPointForm() {
         }}
         valueSyncs={buildOrganizationFormValueSyncs()}
         onSubmit={() => undefined}
-        header={() => <Harness />}
+        header={() => <Harness onRegisterReader={registerHarnessReader} />}
       />
     </OrganizationAuthoringProvider>,
   )
