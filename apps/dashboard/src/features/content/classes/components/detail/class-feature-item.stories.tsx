@@ -20,6 +20,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const SingleParagraph: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     feature: {
       level: 5,

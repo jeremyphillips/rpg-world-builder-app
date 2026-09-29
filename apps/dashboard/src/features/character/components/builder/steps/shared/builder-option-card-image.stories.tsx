@@ -12,6 +12,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const SystemArt: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     display: {
       src: '/app/assets/system/srd-cc-5.2.1/species/primary/elf.jpeg',

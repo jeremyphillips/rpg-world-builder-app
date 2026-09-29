@@ -70,14 +70,16 @@ export function SelectionSummaryRow({
           : selectionSummaryCardRowClasses
       }
     >
-      <div className={selectionSummaryCardRowCopyColumnClasses}>
+      <dt className={selectionSummaryCardRowLabelVariants()}>{label}:</dt>
+      <dd className={cn(selectionSummaryCardRowCopyColumnClasses, 'min-w-0')}>
         <div className={selectionSummaryCardRowPrimaryLineClasses}>
-          <dt className={selectionSummaryCardRowLabelVariants()}>{label}:</dt>
-          <dd className="min-w-0">{valueContent}</dd>
+          <span className="min-w-0 flex-1">{valueContent}</span>
+          {action ? (
+            <div className={selectionSummaryCardRowActionColumnClasses}>{action}</div>
+          ) : null}
         </div>
         {helper ? <p className={selectionSummaryCardRowHelperVariants()}>{helper}</p> : null}
-      </div>
-      {action ? <div className={selectionSummaryCardRowActionColumnClasses}>{action}</div> : null}
+      </dd>
     </div>
   )
 }

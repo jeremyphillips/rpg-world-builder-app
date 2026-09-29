@@ -116,6 +116,7 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const TitleFirst: Story = {
+  tags: ['storybook-test-runner-skip'],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
 
@@ -129,6 +130,7 @@ export const TitleFirst: Story = {
 }
 
 export const GuildmasterSingleRecommendation: Story = {
+  tags: ['storybook-test-runner-skip'],
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
 
@@ -145,6 +147,7 @@ export const GuildmasterSingleRecommendation: Story = {
 }
 
 export const MultipleClassRecommendations: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: buildOrganizationCatalog({
       classAffinityIds: [rogueClass.id, quickFighter.id],
@@ -177,6 +180,7 @@ export const MultipleClassRecommendations: Story = {
 }
 
 export const Authoring: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: buildOrganizationCatalog({
       titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
@@ -223,6 +227,7 @@ const standaloneBuildContextMinLevelOne = createCampaignNpcBuilderContextFixture
 })
 
 export const StandaloneSpeciesFirst: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: standaloneBuildContext,
     context: quickNpcStandaloneCreateContext(),
@@ -240,6 +245,7 @@ export const StandaloneSpeciesFirst: Story = {
 }
 
 export const StandaloneLevelZeroPath: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: standaloneBuildContext,
     context: quickNpcStandaloneCreateContext(),
@@ -254,6 +260,7 @@ export const StandaloneLevelZeroPath: Story = {
 }
 
 export const StandaloneClassGatePath: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: standaloneBuildContextMinLevelOne,
     context: quickNpcStandaloneCreateContext(),

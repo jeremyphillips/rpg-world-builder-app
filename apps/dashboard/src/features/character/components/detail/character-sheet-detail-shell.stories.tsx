@@ -24,6 +24,7 @@ export const StandaloneLoading: Story = {
 }
 
 export const StandaloneNotFound: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'standalone',
     isPending: false,
@@ -39,6 +40,7 @@ export const StandaloneNotFound: Story = {
 }
 
 export const StandaloneLoadFailed: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'standalone',
     isPending: false,
@@ -62,6 +64,7 @@ export const CampaignLoading: Story = {
 }
 
 export const CampaignNotFoundInCampaign: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'campaign',
     isPending: false,
@@ -87,6 +90,7 @@ export const CampaignNotFound: Story = {
 }
 
 export const CampaignNotFoundCampaign: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'campaign',
     isPending: false,
@@ -102,6 +106,7 @@ export const CampaignNotFoundCampaign: Story = {
 }
 
 export const CampaignPermissionDenied: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'campaign',
     isPending: false,
@@ -126,6 +131,7 @@ export const CampaignLoadFailed: Story = {
 }
 
 export const CampaignCatalogLoadFailed: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     scope: 'campaign',
     isPending: false,

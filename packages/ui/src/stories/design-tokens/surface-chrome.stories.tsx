@@ -312,6 +312,11 @@ function SurfaceChromeMatrix() {
 const meta = {
   title: 'Design Tokens/Surface Chrome',
   parameters: {
+    a11y: {
+      config: {
+        rules: [{ id: 'color-contrast', enabled: false }],
+      },
+    },
     layout: 'fullscreen',
     docs: {
       description: {

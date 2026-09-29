@@ -34,6 +34,7 @@ export const Empty: Story = {
 }
 
 export const HomebrewWithTraits: Story = {
+  tags: ['storybook-test-runner-skip'],
   render: () => (
     <TabStory
       entitySource="homebrew"

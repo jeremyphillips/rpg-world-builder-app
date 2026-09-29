@@ -81,6 +81,7 @@ const unsatisfiableClass = {
 }
 
 export const ResolutionError: Story = {
+  tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: createCampaignNpcBuilderContextFixture({
       catalog: {

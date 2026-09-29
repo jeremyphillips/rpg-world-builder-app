@@ -74,7 +74,11 @@ export function SheetMediaScroll({ media, header, children, className }: SheetMe
 
   return (
     <div className={sheetMediaScrollRootVariants()}>
-      <div ref={viewportRef} className={cn(sheetMediaScrollViewportVariants(), className)}>
+      <div
+        ref={viewportRef}
+        tabIndex={0}
+        className={cn(sheetMediaScrollViewportVariants(), className)}
+      >
         <div className={sheetMediaScrollMediaVariants()}>{media}</div>
         <div
           ref={sentinelRef}
