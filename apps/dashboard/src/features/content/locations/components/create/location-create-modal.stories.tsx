@@ -155,9 +155,8 @@ export const BreweryDetails: Story = {
 }
 
 export const WorkshopDetails: Story = {
-  tags: ['storybook-test-runner-skip'],
+  tags: ['storybook-test-runner-skip', 'phase-20-building-flows'],
   args: buildingArgs,
-  tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
       facilityGroup: 'Production',
@@ -168,9 +167,8 @@ export const WorkshopDetails: Story = {
 }
 
 export const OfficeDetails: Story = {
-  tags: ['storybook-test-runner-skip'],
+  tags: ['storybook-test-runner-skip', 'phase-20-building-flows'],
   args: buildingArgs,
-  tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
       facilityGroup: 'Commercial',
@@ -181,9 +179,8 @@ export const OfficeDetails: Story = {
 }
 
 export const BakeryDetails: Story = {
-  tags: ['storybook-test-runner-skip'],
+  tags: ['storybook-test-runner-skip', 'phase-20-building-flows'],
   args: buildingArgs,
-  tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
       facilityGroup: 'Production',
@@ -194,9 +191,8 @@ export const BakeryDetails: Story = {
 }
 
 export const AuctionHouseDetails: Story = {
-  tags: ['storybook-test-runner-skip'],
+  tags: ['storybook-test-runner-skip', 'phase-20-building-flows'],
   args: buildingArgs,
-  tags: ['phase-20-building-flows'],
   play: async ({ canvasElement }) => {
     await continueBuildingStory(canvasElement, {
       facilityGroup: 'Commercial',

@@ -18,6 +18,7 @@ import { getContentTypeItemLabel } from '@/features/content/lib/content-type-lab
 import { ContentMediaFallback, ContentMediaImage } from './content-media-image'
 import { ContentDetailEditAction } from './content-detail-edit-action'
 import { ContentDetailStatRows } from './content-detail-stat-rows'
+import { DEFAULT_HERO_STAT_ROW_COLUMN_COUNT } from './partition-hero-stat-row-groups.lib'
 import {
   contentDetailHeroCardClasses,
   contentDetailHeroCardContentClasses,
@@ -63,6 +64,11 @@ export type ContentDetailLayoutProps = {
   actions?: ReactNode
   /** Static metadata rows in the hero card. Ignored when `metadata` is set. */
   statRows?: ContentStatRowData[]
+  /**
+   * How many side-by-side metadata groups to form once there are more than three rows.
+   * Default {@link DEFAULT_HERO_STAT_ROW_COLUMN_COUNT}. Omit on heroes that use the default.
+   */
+  statRowColumns?: number
   /** Hook-driven or custom metadata in the hero card; takes precedence over `statRows`. */
   metadata?: ReactNode
   /** HTML description source for the hero excerpt (plain text, clamped). Ignored when `heroDescription` is false. */
@@ -101,6 +107,7 @@ export function ContentDetailLayout({
   editHref,
   actions,
   statRows,
+  statRowColumns = DEFAULT_HERO_STAT_ROW_COLUMN_COUNT,
   metadata,
   descriptionHtml,
   heroDescription = true,
@@ -128,7 +135,9 @@ export function ContentDetailLayout({
 
   const heroMetadata =
     metadata ??
-    (statRows && statRows.length > 0 ? <ContentDetailStatRows statRows={statRows} /> : null)
+    (statRows && statRows.length > 0 ? (
+      <ContentDetailStatRows statRows={statRows} columnCount={statRowColumns} />
+    ) : null)
   const showHeroImage = displayImage != null || displayFallback != null
   const heroFrame: ContentMediaImageFrame =
     mediaPresentation.frame === 'emblem' && mediaPresentation.size === 'emblem-lg'

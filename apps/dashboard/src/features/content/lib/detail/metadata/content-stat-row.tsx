@@ -49,7 +49,11 @@ export function ContentStatRowHeroPair({
 
   return (
     <>
-      <Text as="span" className={contentStatRowLabelVariants({ size, layout })}>
+      <Text
+        as="span"
+        className={contentStatRowLabelVariants({ size, layout })}
+        data-slot="content-stat-row-label"
+      >
         {label}
         {infoOnLabel ? (
           <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />
