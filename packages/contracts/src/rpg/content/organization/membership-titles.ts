@@ -76,8 +76,15 @@ export type OrganizationPresetNpcRecommendation = z.infer<
   typeof organizationPresetNpcRecommendationSchema
 >
 
+export const organizationMembershipTitleIdSchema = z
+  .string()
+  .min(1)
+  .refine((id) => id.startsWith(ORGANIZATION_MEMBERSHIP_TITLE_ID_PREFIX), {
+    message: 'Organization membership title id must use the omt_ prefix.',
+  })
+
 export const organizationMembershipTitleDefinitionSchema = z.object({
-  id: z.string().min(1),
+  id: organizationMembershipTitleIdSchema,
   sourceTitleId: vocabularyOptionIdSchema.optional(),
   label: z.string().trim().min(1).max(80),
   description: z.string().trim().min(1).optional(),
@@ -204,6 +211,46 @@ export function sortOrganizationMembershipTitleDefinitionsForDisplay<
       return left.index - right.index
     })
     .map(({ title }) => title)
+}
+
+type OrganizationMembershipTitleSemanticRow = {
+  normalizedLabel: string
+  priority: OrganizationMembershipTitlePriority
+  sourceTitleId?: string
+}
+
+function organizationMembershipTitleSemanticRows(
+  catalog: readonly OrganizationMembershipTitleDefinition[],
+): OrganizationMembershipTitleSemanticRow[] {
+  return catalog.map((row) => ({
+    normalizedLabel: normalizeOrganizationMembershipTitleLabel(row.label),
+    priority: row.priority,
+    ...(row.sourceTitleId !== undefined ? { sourceTitleId: row.sourceTitleId } : {}),
+  }))
+}
+
+/** Compares catalog shape to a preset snapshot (ignores org-local `omt_*` ids). */
+export function organizationMembershipTitleCatalogMatchesPresetSnapshot(
+  catalog: readonly OrganizationMembershipTitleDefinition[],
+  presetId: OrganizationAuthoringPresetId,
+): boolean {
+  const expected = snapshotOrganizationMembershipTitlesFromPreset(presetId, () => 'semantic-compare')
+  const currentRows = organizationMembershipTitleSemanticRows(catalog)
+  const expectedRows = organizationMembershipTitleSemanticRows(expected)
+  if (currentRows.length !== expectedRows.length) {
+    return false
+  }
+  return currentRows.every((row, index) => {
+    const expectedRow = expectedRows[index]
+    if (!expectedRow) {
+      return false
+    }
+    return (
+      row.normalizedLabel === expectedRow.normalizedLabel &&
+      row.priority === expectedRow.priority &&
+      row.sourceTitleId === expectedRow.sourceTitleId
+    )
+  })
 }
 
 export function resolveOrganizationMembershipTitleDefinitionByLabel(

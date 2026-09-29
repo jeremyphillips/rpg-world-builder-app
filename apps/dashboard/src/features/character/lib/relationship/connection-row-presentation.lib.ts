@@ -3,6 +3,7 @@ import {
   getCharacterRelationshipEdgeKindDisplayLabel,
   getCharacterRelationshipEdgeKindEntry,
   isViewerRelationshipSource,
+  resolveOrganizationMembershipTitleProjection,
   type CharacterRelationshipDraftEdge,
   type Location,
   type Organization,
@@ -79,8 +80,12 @@ function membershipTitle(
   const membershipTitleId = edge.details?.membershipTitleId
   if (membershipTitleId === undefined) return undefined
   const organization = organizationsById.get(edge.organizationId)
-  const row = organization?.members.titles.find((entry) => entry.id === membershipTitleId)
-  return row?.label
+  if (!organization) return undefined
+  const projection = resolveOrganizationMembershipTitleProjection({
+    catalog: organization.members.titles,
+    membershipTitleId,
+  })
+  return projection.status === 'resolved' ? projection.label : undefined
 }
 
 function resolveOrganizationRowPresentation(input: {

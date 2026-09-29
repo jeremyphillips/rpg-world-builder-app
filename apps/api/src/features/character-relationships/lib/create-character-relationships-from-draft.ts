@@ -5,6 +5,7 @@ import type { CharacterRelationshipDraftEdge } from '@rpg/contracts'
 import type { WithMongoSession } from '../../../lib/mongo-session'
 import { createCharacterRelationshipRecord } from '../character-relationship.repository'
 import { assertCreateCharacterRelationshipEndpoints } from './assert-relationship-endpoints'
+import { assertOrganizationMembershipTitleIdForRelationshipWrite } from './validate-organization-membership-title.lib'
 import { toCreateRelationshipInput } from './create-character-relationships-from-draft.lib'
 
 export async function createCharacterRelationshipsFromDraftEdges(input: {
@@ -17,6 +18,12 @@ export async function createCharacterRelationshipsFromDraftEdges(input: {
   for (const edge of input.edges) {
     const relationship = toCreateRelationshipInput(edge, input.characterId)
     await assertCreateCharacterRelationshipEndpoints(input.campaignId, relationship, input.options)
+    if (relationship.kind === 'organizationMembership') {
+      await assertOrganizationMembershipTitleIdForRelationshipWrite({
+        organizationId: relationship.organizationId,
+        details: relationship.details,
+      })
+    }
     await createCharacterRelationshipRecord(
       {
         id: randomUUID(),

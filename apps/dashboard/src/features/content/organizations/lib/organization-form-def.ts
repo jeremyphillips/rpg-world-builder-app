@@ -31,6 +31,7 @@ const organizationFormDef: ContentFormDef<
   coverage: 'structural',
   nameField: organizationNameField,
   createDefaultValues: createOrganizationCreateDefaultValues(),
+  resolveCreateDefaultValues: createOrganizationCreateDefaultValues,
   buildFields: buildOrganizationFields,
   valueSyncs: (ctx) =>
     buildOrganizationFormValueSyncs(undefined, resolveDiscoverableOrganizationMemberClasses(ctx)),

@@ -1,6 +1,7 @@
 import type { Location } from '@rpg/contracts/rpg/content'
 import {
   indexCharacterBuildCatalog,
+  resolveOrganizationMembershipTitleProjection,
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -74,7 +75,13 @@ function resolveOrganizations(
       const title =
         membershipTitleId === undefined
           ? undefined
-          : organization.members.titles.find((entry) => entry.id === membershipTitleId)?.label
+          : (() => {
+              const projection = resolveOrganizationMembershipTitleProjection({
+                catalog: organization.members.titles,
+                membershipTitleId,
+              })
+              return projection.status === 'resolved' ? projection.label : undefined
+            })()
       const lifecycle = edge.details?.lifecycle ?? 'current'
       return [
         {

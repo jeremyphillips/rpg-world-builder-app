@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createOrganizationInputSchema } from './organization'
 import {
+  organizationMembershipTitleCatalogMatchesPresetSnapshot,
   organizationMembershipTitlesSchema,
   organizationPresetNpcRecommendationSchema,
   resolveOrganizationCreateMembershipTitles,
@@ -78,6 +79,33 @@ describe('organization membership title snapshot', () => {
         },
       }).success,
     ).toBe(true)
+  })
+
+  it('rejects organization title ids without the omt_ prefix', () => {
+    expect(
+      organizationMembershipTitlesSchema.safeParse([
+        {
+          id: 'not_omt',
+          label: 'Invalid',
+          priority: 10,
+        },
+      ]).success,
+    ).toBe(false)
+  })
+
+  it('matches preset snapshots by semantic shape ignoring omt ids', () => {
+    const presetSnapshot = snapshotOrganizationMembershipTitlesFromPreset('bank', () => 'a')
+    const renamedIds = presetSnapshot.map((title, index) => ({
+      ...title,
+      id: `omt_renamed-${index}`,
+    }))
+    expect(organizationMembershipTitleCatalogMatchesPresetSnapshot(renamedIds, 'bank')).toBe(true)
+    expect(
+      organizationMembershipTitleCatalogMatchesPresetSnapshot(
+        [{ id: 'omt_x', label: 'Only title', priority: 10 }],
+        'bank',
+      ),
+    ).toBe(false)
   })
 
   it('accepts custom org titles without a canonical vocabulary entry', () => {

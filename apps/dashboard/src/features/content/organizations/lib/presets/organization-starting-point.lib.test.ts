@@ -6,7 +6,6 @@ import {
   listOrganizationStartingPointConfirmOverwriteFieldLabels,
   organizationAuthoringPresetComboboxDescription,
   organizationStartingPointIsCustomized,
-  ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION,
 } from './organization-starting-point.lib'
 
 describe('organization starting point helpers', () => {
@@ -52,7 +51,7 @@ describe('organization starting point helpers', () => {
       practices: patch.practices,
       members: {
         classAffinityIds: patch['members.classAffinityIds'],
-        titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+        titles: patch['members.titles'],
       },
     }
     expect(organizationStartingPointIsCustomized(unchanged, { discoverableClasses: [] })).toBe(
@@ -88,26 +87,55 @@ describe('organization starting point helpers', () => {
     ).toEqual(['Domain'])
   })
 
-  it('excludes membership titles from customized detection by contract', () => {
-    expect(ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION).toBe(
-      true,
-    )
+  it('treats membership title divergence as customized state', () => {
     const patch = buildOrganizationStartingPointValueSyncPatch('bank', {
       discoverableClasses: [],
     })
-    const customizedDomain = organizationStartingPointIsCustomized(
-      {
-        startingPointId: 'bank',
-        organizationDomain: 'government',
-        organizationForm: patch.organizationForm,
-        functions: patch.functions,
-        practices: patch.practices,
-        'members.classAffinityIds': patch['members.classAffinityIds'],
-        'members.titles': [],
-      },
-      { discoverableClasses: [] },
-    )
-    expect(customizedDomain).toBe(true)
+    const profileMatch = {
+      startingPointId: 'bank',
+      organizationDomain: patch.organizationDomain,
+      organizationForm: patch.organizationForm,
+      functions: patch.functions,
+      practices: patch.practices,
+      'members.classAffinityIds': patch['members.classAffinityIds'],
+    }
+    expect(
+      organizationStartingPointIsCustomized(
+        { ...profileMatch, 'members.titles': [] },
+        { discoverableClasses: [] },
+      ),
+    ).toBe(false)
+    expect(
+      organizationStartingPointIsCustomized(
+        {
+          ...profileMatch,
+          'members.titles': [{ id: 'omt_custom', label: 'Custom rank', priority: 10 as const }],
+        },
+        { discoverableClasses: [] },
+      ),
+    ).toBe(true)
+  })
+
+  it('includes membership titles in confirm overwrite labels when the catalog diverges', () => {
+    const patch = buildOrganizationStartingPointValueSyncPatch('thieves_guild', {
+      discoverableClasses: [],
+    })
+    const values = {
+      startingPointId: 'thieves_guild',
+      organizationDomain: patch.organizationDomain,
+      organizationForm: patch.organizationForm,
+      functions: patch.functions,
+      practices: patch.practices,
+      'members.classAffinityIds': patch['members.classAffinityIds'],
+      'members.titles': [{ id: 'omt_custom', label: 'Custom rank', priority: 10 as const }],
+    }
+    expect(
+      listOrganizationStartingPointConfirmOverwriteFieldLabels(values, {
+        currentPresetId: 'thieves_guild',
+        nextPresetId: 'army',
+        discoverableClasses: [],
+      }),
+    ).toEqual(['Membership titles'])
   })
 
   it('builds edit familiar-type patches without membership titles', () => {

@@ -39,8 +39,8 @@ import { intentToStatus } from './content-create-intent'
 import { createWithDeferredCampaignAccess } from '../../../campaign-access/create-with-deferred-campaign-access'
 import { CAMPAIGN_ACCESS_CREATE_DEFERRED_ERROR } from '../../../campaign-access/campaign-access-labels'
 import { useContentFormSubmit } from '../submit/content-form-submit'
-import { createOrganizationCreateDefaultValues } from '../../organization-form-projection'
 import { resolveContentFormNavigationFields } from '../host/content-form-host-projection'
+import { resolveContentFormCreateDefaultValues } from '../../registry/content-form-registry'
 
 export interface ContentCreateShellProps {
   /** Route key identifying the content type (e.g. `'species'`). */
@@ -183,9 +183,7 @@ function ContentCreateFormBody({
         ctx={ctx}
         schema={resolveContentFormSchema(def, ctx, 'draft')}
         defaultValues={{
-          ...(def.routeKey === 'organizations'
-            ? createOrganizationCreateDefaultValues()
-            : def.createDefaultValues),
+          ...resolveContentFormCreateDefaultValues(def),
           ...initialValues,
           media: emptyContentMediaSchema,
         }}

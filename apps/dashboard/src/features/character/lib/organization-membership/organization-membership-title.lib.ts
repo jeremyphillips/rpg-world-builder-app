@@ -35,7 +35,7 @@ export function membershipRadioValueFromMembershipTitleId(
     return resolveSoleOrganizationMembershipTitleId(catalog ?? [])
   }
   if (catalog !== undefined && !catalog.some((entry) => entry.id === membershipTitleId)) {
-    return resolveSoleOrganizationMembershipTitleId(catalog)
+    return undefined
   }
   return membershipTitleId
 }

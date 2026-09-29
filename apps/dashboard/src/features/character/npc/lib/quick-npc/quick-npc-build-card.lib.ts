@@ -3,6 +3,7 @@ import {
   getNpcAuthoringTemplateEntry,
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
+  resolveOrganizationMembershipTitleProjection,
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type NpcAuthoringTemplateEntry,
@@ -73,11 +74,14 @@ export function formatQuickNpcLevelRecommendationPrompt(args: {
   if (membershipTitleId === undefined) {
     return undefined
   }
-  const titleEntry = args.titles.find((entry) => entry.id === membershipTitleId)
-  if (titleEntry === undefined) {
+  const projection = resolveOrganizationMembershipTitleProjection({
+    catalog: args.titles,
+    membershipTitleId,
+  })
+  if (projection.status !== 'resolved') {
     return undefined
   }
-  return `Recommended for ${titleEntry.label}: Level ${recommendation.level}.`
+  return `Recommended for ${projection.label}: Level ${recommendation.level}.`
 }
 
 export function formatQuickNpcClassRecommendationHelper(args: {

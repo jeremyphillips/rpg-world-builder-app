@@ -83,17 +83,18 @@ the catalog (or when authored manually). The API persists title rows as given.
 | Manual create | optional `members.titles`  | As given (validate ids; preserve order)                                          |
 | Duplicate     | (N/A — server copies body) | Source title rows copied in order with new `omt_*` ids; `sourcePresetId` omitted |
 
-**Create XOR (API boundary):** `sourcePresetId` and a non-empty explicit `members.titles`
-catalog are mutually exclusive on create input. When `sourcePresetId` is present, the API
-resolver is authoritative — client omission of `members.titles` still yields the preset
-snapshot at persist.
+**Create path:** the dashboard materializes `members.titles` from the selected starting point
+(or authors titles manually) and sends the snapshot on create. The API validates ids and
+persists the catalog as given.
 
-**Edit path:** classification forms expose `members.classAffinityIds` and
-`members.speciesAffinityIds` for mutation. `members.titles` is **read-only** on edit
-(surfaced from saved form state; not replaced by **Use familiar type…**). `connections` and
-`sourcePresetId` stay off the classification form. Title catalog edits and location
-connections use dedicated mutations respectively. Classification PATCH never modifies an
-existing `members.titles` snapshot.
+**Edit path:** classification forms expose `members.classAffinityIds`,
+`members.speciesAffinityIds`, and the membership title catalog for mutation. **Use familiar
+type…** replaces profile values and class affinities after confirmation but **never** replaces
+`members.titles`. `connections` stay off the classification form; location connections use
+dedicated mutations.
+
+**Referential integrity:** writes that remove a title id fail when character relationship edges
+still reference that `omt_*` id (including draft organization saves that run the same validation).
 
 **Array order:** preset and stored `members.titles` order is meaningful — snapshot creation,
 Mongo mapping, API serialization, duplication, and parse round-trips must preserve array

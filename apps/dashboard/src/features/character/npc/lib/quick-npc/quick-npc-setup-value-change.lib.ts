@@ -1,6 +1,7 @@
 import {
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
+  resolveOrganizationMembershipTitleProjection,
   type CharacterBuildContext,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
@@ -50,13 +51,19 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
     return defaultLevel
   }
 
-  const definition = args.titles.find((entry) => entry.id === membershipTitleId)
-  const recommendation = definition?.npcRecommendation
-  if (recommendation === undefined) {
+  const projection = resolveOrganizationMembershipTitleProjection({
+    catalog: args.titles,
+    membershipTitleId,
+  })
+  if (projection.status !== 'resolved' || projection.npcRecommendation === undefined) {
     return defaultLevel
   }
 
-  return clampLevel(recommendation.level, levelConstraints.minLevel, levelConstraints.maxLevel)
+  return clampLevel(
+    projection.npcRecommendation.level,
+    levelConstraints.minLevel,
+    levelConstraints.maxLevel,
+  )
 }
 
 type QuickNpcSetupValueChangeArgs = {

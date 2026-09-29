@@ -4,6 +4,7 @@ import {
   listOrganizationPresetOwnedEditableDivergentFieldKeys,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   resolveOrganizationPresetMemberClassAffinityIds,
+  organizationMembershipTitleCatalogMatchesPresetSnapshot,
   snapshotOrganizationMembershipTitlesFromPreset,
   type CharacterClass,
   type OrganizationAuthoringPresetId,
@@ -165,6 +166,42 @@ const ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS: Record<
   classAffinityIds: 'Classes',
 }
 
+const ORGANIZATION_STARTING_POINT_MEMBERSHIP_TITLES_OVERWRITE_LABEL = 'Membership titles' as const
+
+function readOrganizationMembershipTitles(
+  values: Record<string, unknown>,
+  prefix?: string,
+): OrganizationMembershipTitleDefinition[] | undefined {
+  const path = organizationFieldPath(prefix, 'members.titles')
+  const direct = values[path]
+  if (Array.isArray(direct)) {
+    return direct as OrganizationMembershipTitleDefinition[]
+  }
+  const segments = path.split('.')
+  if (segments.length < 2) {
+    return undefined
+  }
+  let current: unknown = values
+  for (const segment of segments) {
+    if (!current || typeof current !== 'object') {
+      return undefined
+    }
+    current = (current as Record<string, unknown>)[segment]
+  }
+  return Array.isArray(current) ? (current as OrganizationMembershipTitleDefinition[]) : undefined
+}
+
+export function organizationMembershipTitlesDivergeFromPreset(
+  values: Record<string, unknown>,
+  options: { prefix?: string; presetId: OrganizationAuthoringPresetId },
+): boolean {
+  const titles = readOrganizationMembershipTitles(values, options.prefix)
+  if (!titles || titles.length === 0) {
+    return false
+  }
+  return !organizationMembershipTitleCatalogMatchesPresetSnapshot(titles, options.presetId)
+}
+
 function resolvePresetOwnedEditableSnapshot(
   presetId: OrganizationAuthoringPresetId,
   discoverableClasses: readonly CharacterClass[],
@@ -209,9 +246,21 @@ export function listOrganizationStartingPointConfirmOverwriteFieldLabels(
     current,
     fromIncomingPreset,
   )
-  return overwriteKeys
+  const profileLabels = overwriteKeys
     .filter((key) => customizedKeySet.has(key))
     .map((key) => ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS[key])
+
+  if (
+    organizationMembershipTitlesDivergeFromPreset(values, {
+      prefix: options.prefix,
+      presetId: options.currentPresetId,
+    }) &&
+    !profileLabels.includes(ORGANIZATION_STARTING_POINT_MEMBERSHIP_TITLES_OVERWRITE_LABEL)
+  ) {
+    return [...profileLabels, ORGANIZATION_STARTING_POINT_MEMBERSHIP_TITLES_OVERWRITE_LABEL]
+  }
+
+  return profileLabels
 }
 
 export function organizationStartingPointIsCustomized(
@@ -233,15 +282,17 @@ export function organizationStartingPointIsCustomized(
     startingPointId,
     options.discoverableClasses,
   )
-  return !organizationPresetOwnedEditableMatchesPreset(current, startingPointId, resolvedClassIds)
+  const profileCustomized = !organizationPresetOwnedEditableMatchesPreset(
+    current,
+    startingPointId,
+    resolvedClassIds,
+  )
+  const titlesCustomized = organizationMembershipTitlesDivergeFromPreset(values, {
+    prefix: options.prefix,
+    presetId: startingPointId,
+  })
+  return profileCustomized || titlesCustomized
 }
-
-/**
- * Membership titles are excluded from customized detection because create does not expose an
- * independent title editor. Extend detection before adding create-time title authoring.
- */
-export const ORGANIZATION_STARTING_POINT_TITLE_DIVERGENCE_EXCLUDED_FROM_CUSTOMIZED_DETECTION =
-  true as const
 
 /** Edit-time familiar type apply — profile + class affinities only (never titles). */
 export function buildOrganizationEditFamiliarTypeFormPatch(

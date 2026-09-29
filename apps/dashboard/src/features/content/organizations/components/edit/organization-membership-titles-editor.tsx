@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useController, useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 import {
-  createOrganizationMembershipTitleId,
   sortOrganizationMembershipTitleDefinitionsForDisplay,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
@@ -115,14 +114,13 @@ export function OrganizationMembershipTitlesEditor({
   }, [fieldPath, getValues, replace, watchedTitleIds])
 
   const sortedIndices = React.useMemo(() => {
-    const titles = getValues(fieldPath) as OrganizationMembershipTitleDefinition[] | undefined
-    const catalog = titles ?? []
+    const catalog = watchedTitles ?? []
     const sorted = sortOrganizationMembershipTitleDefinitionsForDisplay(catalog)
     return sorted.map((entry) => catalog.findIndex((row) => row.id === entry.id))
-  }, [fieldPath, fields, getValues])
+  }, [watchedTitles])
 
   const handleAdd = React.useCallback(() => {
-    append(createOrganizationMembershipTitleFormRow(createOrganizationMembershipTitleId))
+    append(createOrganizationMembershipTitleFormRow())
   }, [append])
 
   return (

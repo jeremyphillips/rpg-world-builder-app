@@ -35,4 +35,8 @@ describe('organization membership title radio helpers', () => {
   it('leaves multi-catalog selection unset when membership title id is missing', () => {
     expect(membershipRadioValueFromMembershipTitleId(undefined, catalog)).toBeUndefined()
   })
+
+  it('leaves selection unset when the stored id is missing from the catalog', () => {
+    expect(membershipRadioValueFromMembershipTitleId('omt_missing', catalog)).toBeUndefined()
+  })
 })
