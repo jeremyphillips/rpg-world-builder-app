@@ -49,6 +49,7 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 | Sidebar PC build       | `/characters/new`                                  | build   | pc   | ruleset    | user      |
 | Sidebar PC import      | `/characters/import`                               | import  | pc   | ruleset    | user      |
 | NPC build              | `/campaigns/:id/npcs/new`                          | build   | npc  | campaign   | campaign  |
+| NPC overview create    | `/campaigns/:id/npcs` → split action (see below)   | build   | npc  | campaign   | campaign  |
 | NPC import             | `/campaigns/:id/npcs/import`                       | import  | npc  | campaign   | campaign  |
 | Campaign PC onboarding | `/campaigns/:id/onboarding`                        | build   | pc   | campaign   | user      |
 | Quick NPC (org member) | organization detail → Add member drawer → modal    | build   | npc  | campaign   | campaign  |
@@ -60,16 +61,30 @@ packages/contracts/src/character-import/                   # adapt + finalize im
 NPC authoring routes require campaign `owner` or `co-owner` (see campaign feature
 README). Default `/characters/*` never carries campaign id in the URL.
 
+### NPC overview (`NpcsOverview`)
+
+Campaign managers use **Create NPC** (`ContentCreateSplitAction`) beside **Import NPC**:
+
+| Mode                | Behavior                                                                                                                                                                                                                            |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create from scratch | Navigate to `/campaigns/:id/npcs/new` (empty builder).                                                                                                                                                                              |
+| Start with setup…   | `QuickNpcCreateModal` with `context: { kind: 'standalone' }` and `setupCompletion: 'handoff'` — Species → Build, then navigate to the builder with `location.state.builderSeed` from `buildCharacterBuilderDraftFromQuickNpcSetup`. |
+| Quick create…       | Same modal in default **authoring** mode — setup then Details/Requirements tabs; submit posts `POST /npcs` and stays on the overview.                                                                                               |
+
+`CharacterBuilderShell` applies the seed once after session-storage hydration via `replaceDraft`, then
+the create route clears router state with a replace navigation so hydration does not race the seed.
+See [create-flow.md](./create-flow.md#split-create-actions).
+
 ### Quick NPC (organization member)
 
 Campaign managers create an NPC and stamp organization membership in one flow from the
 organization detail **Members** section — no full builder route.
 
-| Layer                                               | Responsibility                                                                                                            |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions         |
-| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)                      |
-| `QuickNpcCreateModal` (character feature)           | Setup (title → species → build card) → TabbedForm authoring (Details / Requirements); `usePendingAwareOpenChange`; create |
+| Layer                                               | Responsibility                                                                                                                |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Organizations hook (`useOrganizationMembersDetail`) | Overlay modes only: `add` \| `createNpc` \| edit/remove \| `null`; context pass-through; cancel/success reactions             |
+| `OrganizationMemberPickerDrawer`                    | Relationship picker; `auxiliaryAction` **Create new NPC** delegates to parent (no `bodyReplacement`)                          |
+| `QuickNpcCreateModal` (character feature)           | Setup → TabbedForm authoring (Details / Requirements) or handoff to full builder; `setupCompletion: 'authoring' \| 'handoff'` |
 
 **Dismiss paths:** Cancel / X / Escape during authoring → `createNpc` → `add` (drawer stays
 open with preserved search). Success → `null` (all overlays close). Pending submit blocks dismiss.

@@ -271,8 +271,14 @@ async function continueSettlementSetup(user: ReturnType<typeof userEvent.setup>)
 
 async function chooseBuildingForm(user: ReturnType<typeof userEvent.setup>, form: BuildingForm) {
   const label = BUILDING_FORM_ENTRIES[form].label
-  await user.click(screen.getByRole('combobox', { name: 'Form' }))
-  await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
+  const detailsFormCombobox = screen.queryByRole('combobox', { name: 'Form' })
+  if (detailsFormCombobox) {
+    await user.click(detailsFormCombobox)
+    await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
+    return
+  }
+
+  await user.click(screen.getByRole('radio', { name: (name) => name.startsWith(label) }))
 }
 
 async function chooseBuildingFacilityType(
@@ -295,9 +301,38 @@ async function chooseBuildingFacilityType(
   await user.click(screen.getByRole('option', { name: (name) => name.startsWith(label) }))
 }
 
-async function continueBuildingDetails() {
+async function continueBuildingDetails(
+  user: ReturnType<typeof userEvent.setup> = userEvent.setup(),
+) {
   expect(await screen.findByRole('heading', { name: 'Create building' })).toBeInTheDocument()
-  expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+
+  await waitFor(async () => {
+    if (screen.queryByRole('textbox', { name: 'Name' })) {
+      return
+    }
+
+    const formPrompt = screen.queryByRole('radiogroup', {
+      name: 'What physical form does this building have?',
+    })
+    if (formPrompt) {
+      const selectedForm = within(formPrompt).queryAllByRole('radio', { checked: true })
+      if (selectedForm.length === 0) {
+        await user.click(screen.getByRole('button', { name: 'Skip / Not specified' }))
+      }
+    }
+
+    const browseAll = screen.queryByRole('radio', { name: /Browse all/i })
+    if (browseAll && browseAll.getAttribute('aria-checked') !== 'true') {
+      await user.click(browseAll)
+    }
+
+    const continueButton = screen.queryByRole('button', { name: 'Continue' })
+    if (continueButton && !(continueButton as HTMLButtonElement).disabled) {
+      await user.click(continueButton)
+    }
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()
+  })
 }
 
 async function submitCreateForm(
@@ -357,16 +392,14 @@ describe('LocationCreateModal', () => {
     })
   })
 
-  it('shows inline Form and Facility type comboboxes for building create', async () => {
+  it('opens building create on the setup step before details', async () => {
     renderModal(buildingIntent)
 
     expect(screen.getByRole('heading', { name: 'Create building' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Form' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Facility type' })).toBeInTheDocument()
     expect(
-      screen.queryByRole('radiogroup', { name: 'What physical form does this building have?' }),
-    ).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument()
+      screen.getByRole('radiogroup', { name: 'What physical form does this building have?' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('textbox', { name: 'Name' })).not.toBeInTheDocument()
   })
 
   it('renders settlement-type create headings after setup continue', async () => {
@@ -404,7 +437,7 @@ describe('LocationCreateModal', () => {
     renderModal(buildingIntent)
     await continueBuildingDetails()
 
-    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Organizations' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toBeInTheDocument()
   })
@@ -607,7 +640,6 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'house')
     await continueBuildingDetails()
 
-    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Ash House')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -635,7 +667,6 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'tower')
     await continueBuildingDetails()
 
-    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Tower')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'North Spire')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -657,7 +688,6 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'hall')
     await continueBuildingDetails()
 
-    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Hall')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Great Hall')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -679,7 +709,6 @@ describe('LocationCreateModal', () => {
     await chooseBuildingForm(user, 'keep')
     await continueBuildingDetails()
 
-    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('Keep')
     await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Stone Keep')
     await user.click(screen.getByRole('button', { name: 'Create building' }))
 
@@ -955,7 +984,6 @@ describe('LocationCreateModal', () => {
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveTextContent(
       'A landmark by the quay.',
     )
-    expect(screen.getByRole('combobox', { name: 'Form' })).toHaveTextContent('House')
     expect(screen.getByRole('combobox', { name: 'Facility type' })).toHaveTextContent('Temple')
 
     await user.click(screen.getByRole('button', { name: 'Create building' }))

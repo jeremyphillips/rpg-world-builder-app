@@ -9,6 +9,7 @@ const REPO_ROOT = join(__dirname, '../../../../../../../..')
 const ADD_CHOICE_ENTRY_POINT_FILES = [
   'apps/dashboard/src/features/content/locations/components/hierarchy/location-add-child-menu.tsx',
   'apps/dashboard/src/features/content/lib/entity/action/entity-action-choice-menu.tsx',
+  'apps/dashboard/src/lib/create-flow/content-create-split-action.tsx',
 ] as const
 
 const FORBIDDEN_DROPDOWN_IMPORT = /\bDropdownMenu\b/
@@ -30,7 +31,7 @@ describe('entity action choice menu entry points', () => {
       expect(source, `${relativePath} must not import DropdownMenu directly`).not.toMatch(
         FORBIDDEN_DROPDOWN_IMPORT,
       )
-      expect(source).toMatch(/EntityActionChoiceMenu/)
+      expect(source).toMatch(/EntityActionChoiceMenu|SplitButton/)
     }
   })
 })

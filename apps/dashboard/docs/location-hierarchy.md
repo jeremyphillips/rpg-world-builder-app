@@ -76,18 +76,21 @@ Immediate children only. Expandable region rows split counts:
 
 ### Create setup
 
-Settlement, Region, and Site use the shared setup gate
-(`LOCATION_AUTHORING_TYPES_WITH_CREATE_SETUP`) before the full create form. Building uses the same
-setup model inside `LocationCreateModal` (sequential Form → Facility with explicit skip on optional
-Form). Detail Add location runs setup inside `LocationCreateModal` with **auto-advance** on the final
-selection (no setup Continue on first pass). Overview/page create uses
-`LocationCreateSetupHost` → `LocationCreateSetupSession` with the same choice sets but an **explicit
-Continue** navigation boundary (radio selection alone does not navigate). Both consume
-`resolveLocationCreateModalSetupModel` / `applyLocationCreateModalSetupValueChange` for
-choice-set ids, `dependsOn`, `visibleWhenComplete`, `summaryGroup`, and complete. URL resume params
-(`settlementType`, `siteType`, URL `regionClassificationKind` + `regionType` mapping to form
-`classification.kind` / `classification.type`) share the
-same shortcut contract.
+Overview and detail entry points use `LocationCreateModal` for setup. When the intent omits
+`authoringType`, the modal prepends a **Location type** step, then type-specific choice sets
+(building, settlement, site, region). Eligible types are discovered dynamically via
+`resolveLocationCreateSetupAuthoringTypes()` (empty setup values must yield at least one choice set).
+
+**Handoff mode** (`setupCompletion: 'handoff'`) navigates to the full create page with URL prefill
+(including `buildingForm` / `facilityGroup` when applicable). **Details mode** keeps the name/details
+step in the modal. The create page always renders the editable location type field; `?type=…` prefills
+without a setup gate.
+
+Setup choice sets share `resolveLocationCreateModalSetupModel` /
+`applyLocationCreateModalSetupValueChange` for ids, `dependsOn`, `visibleWhenComplete`, and summary
+groups. URL prefill params (`type`, `settlementType`, `siteType`, region classification, building form,
+facility group) round-trip through `parseLocationCreatePrefillFromSearchParams` /
+`buildLocationCreatePrefillHref`.
 
 Building → Organizations relationship drafting stays on the Add/Pending composer
 (not `CreateSetupPanel`) with a **resting vs composing** workspace: completed

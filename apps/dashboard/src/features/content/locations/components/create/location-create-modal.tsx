@@ -31,6 +31,7 @@ import {
   type LocationCreateIntent,
 } from '../../lib/create/session/location-create-session'
 import type { LocationFixedCreateContext } from '../../lib/forms/location-form-ctx'
+import type { LocationCreateSetupResult } from '../../lib/create/session/location-create-session'
 import { formatLocationFixedCreateHeading } from '../../lib/create/location-create-shortcuts'
 import {
   applyLocationCreateModalSetupValueChange,
@@ -77,6 +78,12 @@ export type LocationCreateModalProps = {
   formOptionsCtx?: ContentFormCtx
   /** Called after persistence and caller handoff succeed. */
   onCreated?: OnContentCreated
+  /** Setup completion: details step in modal, or hand off to full create page. */
+  setupCompletion?: 'details' | 'handoff'
+  onSetupHandoff?: (
+    fixedCreate: LocationFixedCreateContext,
+    result: LocationCreateSetupResult,
+  ) => void
 }
 
 type LocationCreateModalPhase = 'setup' | 'details'
@@ -96,7 +103,7 @@ type LocationCreateModalState = {
 
 function createInitialState(intent: LocationCreateIntent): LocationCreateModalState {
   const session = resolveLocationCreateSession(intent)
-  const formKey = `location-create-modal-${intent.authoringType}-${intent.parentLocationId ?? 'overview'}`
+  const formKey = `location-create-modal-${intent.authoringType ?? 'typeless'}-${intent.parentLocationId ?? 'overview'}`
   const emptySetup = { ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES }
 
   if (session.status === 'needsSetup') {
@@ -359,9 +366,16 @@ function LocationCreateModalDetailsForm({
 function useLocationCreateModalController({
   intent,
   onOpenChange,
+  setupCompletion = 'details',
+  onSetupHandoff,
 }: {
   intent: LocationCreateIntent
   onOpenChange: (open: boolean) => void
+  setupCompletion?: 'details' | 'handoff'
+  onSetupHandoff?: (
+    fixedCreate: LocationFixedCreateContext,
+    result: LocationCreateSetupResult,
+  ) => void
 }) {
   const [state, setState] = React.useState(() => createInitialState(intent))
   const [detailsPending, setDetailsPending] = React.useState(false)
@@ -403,6 +417,11 @@ function useLocationCreateModalController({
       const result = model.complete()
       if (!result) return
       const fixedCreate = completeLocationCreateSetup(intent, result)
+      if (setupCompletion === 'handoff') {
+        onSetupHandoff?.(fixedCreate, result)
+        trustedClose()
+        return
+      }
       setState((current) => ({
         ...current,
         phase: 'details',
@@ -423,7 +442,7 @@ function useLocationCreateModalController({
             : current.buildingSetupApplication,
       }))
     },
-    [intent, state.setupValues],
+    [intent, onSetupHandoff, setupCompletion, state.setupValues, trustedClose],
   )
 
   const handleBackToSetup = React.useCallback(() => {
@@ -510,6 +529,8 @@ function LocationCreateModalSession({
   createContext = STANDALONE_CONTENT_CREATE_CONTEXT,
   formOptionsCtx,
   onCreated,
+  setupCompletion = 'details',
+  onSetupHandoff,
 }: LocationCreateModalProps) {
   const {
     state,
@@ -525,7 +546,12 @@ function LocationCreateModalSession({
     detailsPending,
     setDetailsPending,
     trustedClose,
-  } = useLocationCreateModalController({ intent, onOpenChange })
+  } = useLocationCreateModalController({
+    intent,
+    onOpenChange,
+    setupCompletion,
+    onSetupHandoff,
+  })
   const [requestedTabId, setRequestedTabId] = React.useState('details')
   const [detailsStatus, setDetailsStatus] = React.useState<CreateWorkflowPanelStatus>({
     invalid: false,

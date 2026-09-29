@@ -4,7 +4,10 @@ import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
   isLocationCreateModalSetupComplete,
+  LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
   resolveLocationCreateModalSetupModel,
+  resolveLocationCreateSetupAuthoringTypes,
+  requiresLocationCreateSetup,
 } from './location-create-modal-setup.lib'
 import {
   REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
@@ -73,7 +76,37 @@ describe('applyLocationCreateModalSetupValueChange', () => {
   })
 })
 
+describe('resolveLocationCreateSetupAuthoringTypes', () => {
+  it('includes building, settlement, site, and region and excludes vessel and district', () => {
+    const types = resolveLocationCreateSetupAuthoringTypes()
+    expect(types).toEqual(expect.arrayContaining(['building', 'settlement', 'site', 'region']))
+    expect(types).not.toContain('vessel')
+    expect(types).not.toContain('district')
+    expect(requiresLocationCreateSetup('building')).toBe(true)
+    expect(requiresLocationCreateSetup('vessel')).toBe(false)
+  })
+})
+
 describe('resolveLocationCreateModalSetupModel', () => {
+  it('resets type-specific values when authoring type changes in the type step', () => {
+    const withSite = applyLocationCreateModalSetupValueChange({
+      values: {
+        ...EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
+        authoringType: 'site',
+        siteType: 'ruin',
+      },
+      event: {
+        setId: LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
+        previousValue: 'site',
+        nextValue: 'settlement',
+        invalidatedSetIds: [],
+      },
+    })
+
+    expect(withSite.authoringType).toBe('settlement')
+    expect(withSite.siteType).toBe('')
+  })
+
   it('sequences optional Form before Facility discovery', () => {
     const model = resolveLocationCreateModalSetupModel({
       intent: { authoringType: 'building' },

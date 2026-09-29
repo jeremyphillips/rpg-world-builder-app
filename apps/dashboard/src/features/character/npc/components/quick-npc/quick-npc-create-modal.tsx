@@ -52,6 +52,8 @@ export type QuickNpcCreateModalProps = {
   /** Called when the user dismisses authoring — parent should restore the add drawer. */
   onCancel: () => void
   onCreated?: OnContentCreated
+  setupCompletion?: 'authoring' | 'handoff'
+  onSetupHandoff?: (setup: QuickNpcSetupValues) => void
 }
 
 type QuickNpcCreateModalPhase = 'setup' | 'authoring'
@@ -99,6 +101,8 @@ function QuickNpcCreateModalSession({
   context,
   onCancel,
   onCreated,
+  setupCompletion = 'authoring',
+  onSetupHandoff,
 }: QuickNpcCreateModalProps) {
   const [state, setState] = React.useState(() => createInitialState(buildContext, context))
   const [authoringPending, setAuthoringPending] = React.useState(false)
@@ -133,17 +137,25 @@ function QuickNpcCreateModalSession({
     [buildContext, classAffinityIds, context, speciesAffinityIds, state.setupValues, titles],
   )
 
-  const handleContinueFromSetup = React.useCallback((values: QuickNpcSetupValues) => {
-    setState((current) => ({
-      ...current,
-      phase: 'authoring',
-      setupValues: values,
-      authoringValues: {
-        requiredWeaponIds: [],
-        requiredSpellIds: [],
-      },
-    }))
-  }, [])
+  const handleContinueFromSetup = React.useCallback(
+    (values: QuickNpcSetupValues) => {
+      if (setupCompletion === 'handoff') {
+        onSetupHandoff?.(values)
+        trustedClose()
+        return
+      }
+      setState((current) => ({
+        ...current,
+        phase: 'authoring',
+        setupValues: values,
+        authoringValues: {
+          requiredWeaponIds: [],
+          requiredSpellIds: [],
+        },
+      }))
+    },
+    [onSetupHandoff, setupCompletion, trustedClose],
+  )
 
   const externalDecisions = React.useMemo(
     () => [

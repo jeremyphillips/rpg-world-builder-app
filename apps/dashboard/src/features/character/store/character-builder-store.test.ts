@@ -4,6 +4,7 @@ import {
   CHARACTER_BUILDER_DRAFT_VERSION,
   createEmptyCharacterBuilderDraft,
   createPersistedCharacterBuilderState,
+  type CharacterBuilderDraft,
   type CharacterBuilderDraftScope,
 } from '@rpg/contracts'
 
@@ -253,5 +254,32 @@ describe('character-builder-store', () => {
     store.getState().startOver()
     expect(store.getState().draft).toEqual(createEmptyCharacterBuilderDraft())
     expect(sessionStorage.getItem(storageKey)).toBeNull()
+  })
+
+  it('replaceDraft clears pending restore and applies the new draft', async () => {
+    const store = createCharacterBuilderStore({ storageKey, scope: standaloneScope })
+
+    await vi.waitFor(() => {
+      expect(store.getState()._hasHydrated).toBe(true)
+    })
+
+    store.setState({
+      hasPendingRestore: true,
+      pendingRestoredDraft: {
+        ...createEmptyCharacterBuilderDraft(),
+        identity: { name: 'Stale' },
+      },
+    })
+
+    const seeded: CharacterBuilderDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      species: { speciesId: 'human' },
+      touchedStepIds: ['species'],
+    }
+    store.getState().replaceDraft(seeded)
+
+    expect(store.getState().draft.species.speciesId).toBe('human')
+    expect(store.getState().hasPendingRestore).toBe(false)
+    expect(store.getState().pendingRestoredDraft).toBeNull()
   })
 })

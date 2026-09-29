@@ -12,6 +12,8 @@ import {
   STRUCTURE_TYPE_IDS,
   isRegionClassificationKind,
   getRegionTypeIds,
+  type BuildingFacilityAuthoringGroup,
+  type BuildingForm,
   type LocationKind,
   type RegionClassification,
   type SettlementType,
@@ -22,20 +24,19 @@ import {
 import { ROUTES } from '@/app/routes'
 
 import {
+  buildBuildingClassificationFromCreateSetup,
+  isBuildingFacilityAuthoringGroup,
+  isBuildingForm,
+} from './setup/location-building-create-setup.lib'
+import {
   isDeferredLocationAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
   UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
   UNCLASSIFIED_STRUCTURE_LABEL,
-  requiresLocationCreateSetup,
   type LocationAuthoringType,
 } from '../location-authoring-type'
 import { resolveRegionRelationshipLabel } from '../location-contextual-terminology.lib'
-import {
-  completeLocationCreateSetup,
-  fixedCreateFromIntent,
-  type LocationCreateIntent,
-  type LocationCreateSetupResult,
-} from './session/location-create-session'
+import type { LocationCreateSetupResult } from './session/location-create-session'
 import type { LocationFixedCreateContext } from '../forms/location-form-ctx'
 
 export const LOCATION_CREATE_TYPE_SEARCH_PARAM = 'type'
@@ -44,18 +45,15 @@ export const LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM = 'settlementType'
 export const LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM = 'siteType'
 export const LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM = 'regionClassificationKind'
 export const LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM = 'regionType'
+export const LOCATION_CREATE_BUILDING_FORM_SEARCH_PARAM = 'buildingForm'
+export const LOCATION_CREATE_FACILITY_GROUP_SEARCH_PARAM = 'facilityGroup'
 
-/** UI preference — promoted overview shortcuts referencing the authoring-type registry. */
-export const LOCATION_CREATE_PROMOTED_AUTHORING_TYPES = [
+/** UI preference — menu ordering for derived child-location shortcuts. */
+export const LOCATION_CHILD_AUTHORING_TYPE_MENU_ORDER = [
   'building',
   'settlement',
   'site',
   'region',
-] as const satisfies readonly LocationAuthoringType[]
-
-/** UI preference — menu ordering for derived child-location shortcuts. */
-export const LOCATION_CHILD_AUTHORING_TYPE_MENU_ORDER = [
-  ...LOCATION_CREATE_PROMOTED_AUTHORING_TYPES,
   'district',
   'interior',
   'fortification',
@@ -67,10 +65,15 @@ export const LOCATION_CHILD_AUTHORING_TYPE_MENU_ORDER = [
   'world',
 ] as const satisfies readonly LocationAuthoringType[]
 
-export type LocationCreateSessionParseResult =
-  | { kind: 'unrestricted' }
-  | { kind: 'needsSetup'; intent: LocationCreateIntent }
-  | { kind: 'ready'; fixedCreate: LocationFixedCreateContext }
+export type LocationCreatePrefill = {
+  authoringType?: LocationAuthoringType
+  parentLocationId?: string
+  settlementType?: SettlementType
+  siteType?: SiteType
+  classification?: RegionClassification
+  buildingForm?: BuildingForm
+  facilityGroup?: BuildingFacilityAuthoringGroup
+}
 
 type NonStructureLocationKind = Exclude<LocationKind, 'structure'>
 
@@ -207,58 +210,45 @@ function parseRegionClassificationParam(
   return { kind: kindParam, type: typeParam } as RegionClassification
 }
 
-function parseSetupResultFromSearchParams(
-  authoringType: LocationAuthoringType,
-  searchParams: URLSearchParams,
-): LocationCreateSetupResult | undefined {
-  if (authoringType === 'settlement') {
-    const settlementType = parseSettlementTypeParam(searchParams)
-    return settlementType ? { kind: 'settlement', settlementType } : undefined
-  }
-
-  if (authoringType === 'site') {
-    const siteType = parseSiteTypeParam(searchParams)
-    return siteType ? { kind: 'site', siteType } : undefined
-  }
-
-  if (authoringType === 'region') {
-    const classification = parseRegionClassificationParam(searchParams)
-    return classification ? { kind: 'region', classification } : undefined
-  }
-
-  return undefined
+function parseBuildingFormParam(searchParams: URLSearchParams): BuildingForm | undefined {
+  const value = searchParams.get(LOCATION_CREATE_BUILDING_FORM_SEARCH_PARAM)
+  return value && isBuildingForm(value) ? value : undefined
 }
 
-/**
- * Parses create-route search params into an authoritative fixed session, setup gate, or
- * unrestricted create. Uses the same setup rules as `resolveLocationCreateSession`.
- */
-export function parseLocationCreateSessionFromSearchParams(
+function parseFacilityGroupParam(
   searchParams: URLSearchParams,
-): LocationCreateSessionParseResult {
+): BuildingFacilityAuthoringGroup | undefined {
+  const value = searchParams.get(LOCATION_CREATE_FACILITY_GROUP_SEARCH_PARAM)
+  return value && isBuildingFacilityAuthoringGroup(value) ? value : undefined
+}
+
+/** Parses editable create-page prefill from URL search params (no setup gate). */
+export function parseLocationCreatePrefillFromSearchParams(
+  searchParams: URLSearchParams,
+): LocationCreatePrefill {
   const authoringType = parseAuthoringTypeParam(searchParams)
-  if (!authoringType) {
-    return { kind: 'unrestricted' }
-  }
+  const parentLocationId = parseLocationCreateSoftParent(searchParams)
+  const prefill: LocationCreatePrefill = {}
 
-  const intent: LocationCreateIntent = { authoringType }
+  if (authoringType) prefill.authoringType = authoringType
+  if (parentLocationId) prefill.parentLocationId = parentLocationId
 
-  if (requiresLocationCreateSetup(authoringType)) {
-    const setupResult = parseSetupResultFromSearchParams(authoringType, searchParams)
-    if (!setupResult) {
-      return { kind: 'needsSetup', intent }
-    }
+  const settlementType = parseSettlementTypeParam(searchParams)
+  if (settlementType) prefill.settlementType = settlementType
 
-    return {
-      kind: 'ready',
-      fixedCreate: completeLocationCreateSetup(intent, setupResult),
-    }
-  }
+  const siteType = parseSiteTypeParam(searchParams)
+  if (siteType) prefill.siteType = siteType
 
-  return {
-    kind: 'ready',
-    fixedCreate: fixedCreateFromIntent(intent),
-  }
+  const classification = parseRegionClassificationParam(searchParams)
+  if (classification) prefill.classification = classification
+
+  const buildingForm = parseBuildingFormParam(searchParams)
+  if (buildingForm) prefill.buildingForm = buildingForm
+
+  const facilityGroup = parseFacilityGroupParam(searchParams)
+  if (facilityGroup) prefill.facilityGroup = facilityGroup
+
+  return prefill
 }
 
 /** Soft parent prefill for the create page — editable unless fixed in contained create. */
@@ -267,66 +257,115 @@ export function parseLocationCreateSoftParent(searchParams: URLSearchParams): st
   return parentParam || undefined
 }
 
-export function buildLocationFixedCreateHref(
+export function buildLocationCreatePrefillHref(
   campaignId: string,
-  fixedCreate: LocationFixedCreateContext,
+  prefill: LocationCreatePrefill,
   softParentLocationId?: string,
 ): string {
   const base = ROUTES.content.locations.create(campaignId)
   const params = new URLSearchParams()
 
-  params.set(LOCATION_CREATE_TYPE_SEARCH_PARAM, fixedCreate.authoringType)
-  if (fixedCreate.settlementType) {
-    params.set(LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM, fixedCreate.settlementType)
+  if (prefill.authoringType) {
+    params.set(LOCATION_CREATE_TYPE_SEARCH_PARAM, prefill.authoringType)
   }
-  if (fixedCreate.siteType) {
-    params.set(LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM, fixedCreate.siteType)
+  if (prefill.settlementType) {
+    params.set(LOCATION_CREATE_SETTLEMENT_TYPE_SEARCH_PARAM, prefill.settlementType)
   }
-  if (fixedCreate.classification) {
-    params.set(
-      LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM,
-      fixedCreate.classification.kind,
-    )
-    params.set(LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM, fixedCreate.classification.type)
+  if (prefill.siteType) {
+    params.set(LOCATION_CREATE_SITE_TYPE_SEARCH_PARAM, prefill.siteType)
   }
-  if (softParentLocationId) {
-    params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, softParentLocationId)
+  if (prefill.classification) {
+    params.set(LOCATION_CREATE_REGION_CLASSIFICATION_KIND_SEARCH_PARAM, prefill.classification.kind)
+    params.set(LOCATION_CREATE_REGION_TYPE_SEARCH_PARAM, prefill.classification.type)
+  }
+  if (prefill.buildingForm) {
+    params.set(LOCATION_CREATE_BUILDING_FORM_SEARCH_PARAM, prefill.buildingForm)
+  }
+  if (prefill.facilityGroup) {
+    params.set(LOCATION_CREATE_FACILITY_GROUP_SEARCH_PARAM, prefill.facilityGroup)
   }
 
-  return `${base}?${params.toString()}`
+  const parentLocationId = prefill.parentLocationId ?? softParentLocationId
+  if (parentLocationId) {
+    params.set(LOCATION_CREATE_PARENT_SEARCH_PARAM, parentLocationId)
+  }
+
+  const query = params.toString()
+  return query ? `${base}?${query}` : base
+}
+
+export function buildLocationFixedCreateHref(
+  campaignId: string,
+  fixedCreate: LocationFixedCreateContext,
+  softParentLocationId?: string,
+): string {
+  return buildLocationCreatePrefillHref(
+    campaignId,
+    {
+      authoringType: fixedCreate.authoringType,
+      settlementType: fixedCreate.settlementType,
+      siteType: fixedCreate.siteType,
+      classification: fixedCreate.classification,
+      parentLocationId:
+        fixedCreate.parent?.kind === 'fixed' ? fixedCreate.parent.locationId : softParentLocationId,
+    },
+    softParentLocationId,
+  )
+}
+
+export function buildLocationCreateHandoffHref(
+  campaignId: string,
+  fixedCreate: LocationFixedCreateContext,
+  setupResult: LocationCreateSetupResult,
+  softParentLocationId?: string,
+): string {
+  const prefill: LocationCreatePrefill = {
+    authoringType: fixedCreate.authoringType,
+    settlementType: fixedCreate.settlementType,
+    siteType: fixedCreate.siteType,
+    classification: fixedCreate.classification,
+    parentLocationId:
+      fixedCreate.parent?.kind === 'fixed' ? fixedCreate.parent.locationId : softParentLocationId,
+  }
+
+  if (setupResult.kind === 'building') {
+    if (setupResult.form) prefill.buildingForm = setupResult.form
+    if (setupResult.facilityAuthoringGroup) {
+      prefill.facilityGroup = setupResult.facilityAuthoringGroup
+    }
+  }
+
+  return buildLocationCreatePrefillHref(campaignId, prefill, softParentLocationId)
+}
+
+function buildingSetupProjectionFromPrefill(prefill: LocationCreatePrefill) {
+  if (!prefill.buildingForm && !prefill.facilityGroup) return undefined
+  return buildBuildingClassificationFromCreateSetup({
+    ...(prefill.buildingForm ? { form: prefill.buildingForm } : {}),
+    ...(prefill.facilityGroup ? { facilityAuthoringGroup: prefill.facilityGroup } : {}),
+  })
 }
 
 export function buildLocationCreateInitialValues(
-  prefill: {
-    authoringType?: LocationAuthoringType
-    parentLocationId?: string
-    settlementType?: SettlementType
-    siteType?: SiteType
-    classification?: RegionClassification
-  },
+  prefill: LocationCreatePrefill,
   defaults?: { parentLocationId?: string },
 ): Record<string, unknown> | undefined {
   const parentLocationId = prefill.parentLocationId ?? defaults?.parentLocationId
   const initialValues: Record<string, unknown> = {}
 
-  if (parentLocationId) {
-    initialValues.parentLocationId = parentLocationId
-  }
-  if (prefill.authoringType) {
-    initialValues.authoringType = prefill.authoringType
-  }
-  if (prefill.settlementType) {
-    initialValues.settlementType = prefill.settlementType
-  }
-  if (prefill.siteType) {
-    initialValues.siteType = prefill.siteType
-  }
+  if (parentLocationId) initialValues.parentLocationId = parentLocationId
+  if (prefill.authoringType) initialValues.authoringType = prefill.authoringType
+  if (prefill.settlementType) initialValues.settlementType = prefill.settlementType
+  if (prefill.siteType) initialValues.siteType = prefill.siteType
   if (prefill.classification) {
     initialValues.classification = {
       kind: prefill.classification.kind,
       type: prefill.classification.type,
     }
   }
+
+  const buildingClassification = buildingSetupProjectionFromPrefill(prefill)
+  if (buildingClassification) initialValues.classification = buildingClassification
 
   return Object.keys(initialValues).length > 0 ? initialValues : undefined
 }

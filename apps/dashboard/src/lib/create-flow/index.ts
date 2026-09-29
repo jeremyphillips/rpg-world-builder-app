@@ -65,6 +65,15 @@ export {
   type CreateCompositionSummaryRow,
 } from './create-composition-summary'
 export {
+  ContentCreateSplitAction,
+  type ContentCreateSplitActionProps,
+} from './content-create-split-action'
+export {
+  CONTENT_CREATE_FROM_SCRATCH_LABEL,
+  CONTENT_CREATE_QUICK_CREATE_LABEL,
+  CONTENT_CREATE_START_WITH_SETUP_LABEL,
+} from './content-create-split-action.copy'
+export {
   createCompositionComposerStackClasses,
   createCompositionReviewClasses,
   createCompositionStageHeadingRowClasses,

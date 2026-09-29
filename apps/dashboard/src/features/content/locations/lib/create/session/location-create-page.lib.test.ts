@@ -3,15 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { resolveLocationCreatePageModel } from './location-create-page.lib'
 
 describe('resolveLocationCreatePageModel', () => {
-  it('maps ready fixed sessions to initial values and fixed create context', () => {
+  it('maps prefill to initial values and optional facility narrowing context', () => {
     expect(
       resolveLocationCreatePageModel(
-        { kind: 'ready', fixedCreate: { authoringType: 'building' } },
+        { authoringType: 'building', facilityGroup: 'production' },
         'location-soft-parent',
         'location-primary-world',
       ),
     ).toEqual({
-      fixedCreate: { authoringType: 'building' },
+      formCtx: { buildingFacilityAuthoringGroup: 'production' },
       initialValues: {
         authoringType: 'building',
         parentLocationId: 'location-soft-parent',
@@ -19,10 +19,8 @@ describe('resolveLocationCreatePageModel', () => {
     })
   })
 
-  it('maps unrestricted sessions to soft parent initial values only', () => {
-    expect(
-      resolveLocationCreatePageModel({ kind: 'unrestricted' }, undefined, 'location-primary-world'),
-    ).toEqual({
+  it('defaults parent from soft URL param or primary world', () => {
+    expect(resolveLocationCreatePageModel({}, undefined, 'location-primary-world')).toEqual({
       initialValues: { parentLocationId: 'location-primary-world' },
     })
   })

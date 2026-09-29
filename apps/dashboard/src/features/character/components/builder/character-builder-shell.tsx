@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import {
@@ -107,6 +107,9 @@ export type CharacterBuilderShellProps = {
   onExitClick?: () => void
   /** Invite onboarding terminal failures that invalidate the current builder session. */
   onInviteUnavailable?: (reason: CampaignInviteUnavailableReason) => void
+  /** One-shot draft seed applied after session storage hydration. */
+  builderSeed?: CharacterBuilderDraft
+  onBuilderSeedApplied?: () => void
 }
 
 /** Full-viewport builder chrome: step rail, step panel, live preview, footer nav. */
@@ -116,6 +119,8 @@ export function CharacterBuilderShell({
   catalogIndex,
   onExitClick,
   onInviteUnavailable,
+  builderSeed,
+  onBuilderSeedApplied,
 }: CharacterBuilderShellProps) {
   const navigate = useNavigate()
   const chrome = getBuilderChromeCopyForContext(context)
@@ -140,6 +145,7 @@ export function CharacterBuilderShell({
   )
   const draft = useCharacterBuilderStore(context, (state) => state.draft)
   const patchDraft = useCharacterBuilderStore(context, (state) => state.patchDraft)
+  const replaceDraft = useCharacterBuilderStore(context, (state) => state.replaceDraft)
   const clearPersistedDraft = useCharacterBuilderStore(
     context,
     (state) => state.clearPersistedDraft,
@@ -163,6 +169,15 @@ export function CharacterBuilderShell({
   const [pendingEquipmentPickerFocus, setPendingEquipmentPickerFocus] = useState<
     EquipmentPickerFocusIntent | undefined
   >()
+  const appliedBuilderSeedRef = useRef<CharacterBuilderDraft | null>(null)
+
+  useEffect(() => {
+    if (!hasHydrated || !builderSeed) return
+    if (appliedBuilderSeedRef.current === builderSeed) return
+    appliedBuilderSeedRef.current = builderSeed
+    replaceDraft(builderSeed)
+    onBuilderSeedApplied?.()
+  }, [builderSeed, hasHydrated, onBuilderSeedApplied, replaceDraft])
 
   const resolvedChoiceSets = useResolvedChoiceSets(draft, context)
 
