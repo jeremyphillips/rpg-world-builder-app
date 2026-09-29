@@ -1,8 +1,12 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig, mergeConfig } from 'vitest/config'
+import base from '@rpg/config/vitest/base'
 
-export default defineConfig({
-  test: {
-    include: ['src/**/*.test.ts'],
-    environment: 'node',
-  },
-})
+export default mergeConfig(
+  base,
+  defineConfig({
+    test: {
+      include: ['src/**/*.test.ts'],
+      environment: 'node',
+    },
+  }),
+)

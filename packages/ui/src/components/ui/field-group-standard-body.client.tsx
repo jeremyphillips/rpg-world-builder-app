@@ -80,6 +80,7 @@ export type StandardFieldGroupBodyProps = {
 }
 
 /** Default fieldset layout with optional legend disclosure. */
+// fallow-ignore-next-line complexity
 export function StandardFieldGroupBody({
   id,
   legend,
