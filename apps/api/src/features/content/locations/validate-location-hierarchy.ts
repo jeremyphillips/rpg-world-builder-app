@@ -182,8 +182,13 @@ async function validateDirectChildrenForKindChange(
 }
 
 /** Cross-record hierarchy validation for publish-complete location writes. */
+// fallow-ignore-next-line complexity
 export async function validateLocationHierarchy(ctx: ContentWriteContext): Promise<void> {
   const { kind, parentLocationId, locationId } = mergedLocationFields(ctx)
+
+  if (ctx.validationIntent === 'draft' && !parentLocationId) {
+    return
+  }
 
   if (!parentLocationId) {
     const blockers = validateLocationParentAssignment({
