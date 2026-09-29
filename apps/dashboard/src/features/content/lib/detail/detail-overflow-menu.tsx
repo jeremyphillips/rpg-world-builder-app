@@ -27,6 +27,8 @@ export type DetailOverflowMenuProps = {
   triggerIcon?: 'horizontal' | 'vertical'
 }
 
+const OVERFLOW_MENU_ICON_STEP = 'md' as const
+
 /** Standard destructive delete action with trash icon for detail overflow menus. */
 export function detailOverflowDeleteAction(
   label: string,
@@ -35,8 +37,32 @@ export function detailOverflowDeleteAction(
   return {
     id: 'delete',
     label,
-    icon: <ActionIcon action="delete" />,
+    icon: <ActionIcon action="delete" step={OVERFLOW_MENU_ICON_STEP} />,
     destructive: true,
+    onSelect,
+  }
+}
+
+export function detailOverflowViewAction(
+  label: string,
+  onSelect: () => void,
+): DetailOverflowAction {
+  return {
+    id: 'view',
+    label,
+    icon: <ActionIcon action="view" step={OVERFLOW_MENU_ICON_STEP} />,
+    onSelect,
+  }
+}
+
+export function detailOverflowMoveAction(
+  label: string,
+  onSelect: () => void,
+): DetailOverflowAction {
+  return {
+    id: 'move',
+    label,
+    icon: <ActionIcon action="waypoints" step={OVERFLOW_MENU_ICON_STEP} />,
     onSelect,
   }
 }

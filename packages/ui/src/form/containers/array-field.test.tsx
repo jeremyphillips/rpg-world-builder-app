@@ -217,7 +217,7 @@ describe('ArrayFieldRenderer', () => {
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Class' })).toBeInTheDocument())
 
     const itemShell = screen.getByRole('group', { name: /Item #1/ })
-    expect(itemShell).toHaveClass('bg-surface-subtle')
+    expect(itemShell).toHaveClass('bg-surface-faint')
     const nest = addButton.closest('[data-field-dependent-nest]')
     expect(nest).toHaveClass('bg-background')
     expect(nest).toContainElement(itemShell)
@@ -2065,6 +2065,9 @@ describe('ArrayFieldRenderer', () => {
         expect(flatShell).toHaveAttribute('data-array-item-content-layout', 'inline')
         expect(document.querySelector('[data-array-item-anatomy-inline-row]')).toBeInTheDocument()
         expect(document.querySelector('[data-array-item-anatomy-grid]')).toBeInTheDocument()
+        const itemShell = document.querySelector('[data-array-item-prefix="rows.0"]')
+        expect(itemShell).toHaveClass('bg-surface-faint')
+        expect(itemShell).not.toHaveClass('bg-surface-subtle')
 
         unmount()
       }

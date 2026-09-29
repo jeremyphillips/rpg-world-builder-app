@@ -21,6 +21,8 @@ import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/deta
 import { DetailCollectionRowList } from '../../../lib/detail/collection/row-list/detail-collection-row-list'
 import {
   DetailOverflowMenu,
+  detailOverflowMoveAction,
+  detailOverflowViewAction,
   type DetailOverflowAction,
 } from '../../../lib/detail/detail-overflow-menu'
 import type {
@@ -65,16 +67,12 @@ function buildChildRowActions(
 ): DetailOverflowAction[] {
   return canManage
     ? [
-        {
-          id: 'view',
-          label: LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation,
-          onSelect: () => onView(item.href),
-        },
-        {
-          id: 'move',
-          label: LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation,
-          onSelect: () => onMove(item.id),
-        },
+        detailOverflowViewAction(LOCATION_PARENT_MOVE_ACTION_LABELS.viewLocation, () =>
+          onView(item.href),
+        ),
+        detailOverflowMoveAction(LOCATION_PARENT_MOVE_ACTION_LABELS.moveLocation, () =>
+          onMove(item.id),
+        ),
       ]
     : []
 }

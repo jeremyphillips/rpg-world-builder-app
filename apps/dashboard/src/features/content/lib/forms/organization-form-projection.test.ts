@@ -24,6 +24,7 @@ function collectFields(items: readonly FormItem[]): Array<{ name: string; item: 
   const fields: Array<{ name: string; item: FormItem }> = []
   for (const item of items) {
     if ('name' in item && typeof item.name === 'string') fields.push({ name: item.name, item })
+    if ('kind' in item && item.kind === 'array') continue
     if ('fields' in item && Array.isArray(item.fields)) fields.push(...collectFields(item.fields))
   }
   return fields
@@ -41,18 +42,16 @@ describe('organization form projection', () => {
     ).toMatchObject({ startingPointId: undefined })
   })
 
-  it('surfaces read-only membership titles on create and edit after member affinities', () => {
+  it('surfaces editable membership titles on create and edit after member affinities', () => {
     for (const mode of ['create', 'edit'] as const) {
       const fields = collectFields(buildOrganizationFields(makeContentFormCtx({ mode })))
-      expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitles')
+      expect(fields.map(({ name }) => name)).toContain('members.titles')
       expect(fields.map(({ name }) => name)).toContain('_organizationMembershipTitlesRegistration')
       const descriptionIndex = fields.findIndex(({ name }) => name === 'description')
       const affinitiesIndex = fields.findIndex(({ name }) => name === 'members.classAffinityIds')
-      const titlesSlotIndex = fields.findIndex(
-        ({ name }) => name === '_organizationMembershipTitles',
-      )
-      expect(titlesSlotIndex).toBeGreaterThan(affinitiesIndex)
-      expect(descriptionIndex).toBeGreaterThan(titlesSlotIndex)
+      const titlesIndex = fields.findIndex(({ name }) => name === 'members.titles')
+      expect(titlesIndex).toBeGreaterThan(affinitiesIndex)
+      expect(descriptionIndex).toBeGreaterThan(titlesIndex)
     }
   })
 
@@ -72,7 +71,7 @@ describe('organization form projection', () => {
         item.id === 'organization-quick-create-optional-details',
     )
     expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).toContain(
-      '_organizationMembershipTitles',
+      'members.titles',
     )
     expect(collectFields(optionalDetails?.fields ?? []).map(({ name }) => name)).not.toContain(
       '_organizationMembershipTitlesRegistration',
@@ -114,7 +113,7 @@ describe('organization form projection', () => {
       'practices',
       'members.classAffinityIds',
       'members.speciesAffinityIds',
-      '_organizationMembershipTitles',
+      'members.titles',
       'description',
     ])
     expect(embedded.map(({ name }) => name)).toEqual([
@@ -127,7 +126,7 @@ describe('organization form projection', () => {
       'operatorOrganization.practices',
       'operatorOrganization.members.classAffinityIds',
       'operatorOrganization.members.speciesAffinityIds',
-      'operatorOrganization._organizationMembershipTitles',
+      'operatorOrganization.members.titles',
       'operatorOrganization.description',
     ])
     const standaloneFunctions = standalone.find(({ name }) => name === 'functions')?.item

@@ -1,3 +1,7 @@
+import { createElement } from 'react'
+
+import { ActionIcon, type ActionIconVerb } from '@rpg/ui'
+
 import type { DetailOverflowAction } from '../../detail/detail-overflow-menu'
 import type {
   RelationshipMutationCapabilities,
@@ -10,6 +14,23 @@ export type RelationshipOverflowActionId =
   | 'changeTarget'
   | 'replaceSubject'
   | 'remove'
+
+const OVERFLOW_MENU_ICON_STEP = 'md' as const
+
+const RELATIONSHIP_OVERFLOW_ACTION_ICON: Record<RelationshipOverflowActionId, ActionIconVerb> = {
+  view: 'view',
+  changeKind: 'edit',
+  changeTarget: 'waypoints',
+  replaceSubject: 'waypoints',
+  remove: 'delete',
+}
+
+function relationshipOverflowActionIcon(id: RelationshipOverflowActionId) {
+  return createElement(ActionIcon, {
+    action: RELATIONSHIP_OVERFLOW_ACTION_ICON[id],
+    step: OVERFLOW_MENU_ICON_STEP,
+  })
+}
 
 const MUTATION_ACTION_IDS = [
   'changeKind',
@@ -51,6 +72,7 @@ function pushAlternativeMutationAction(
     label: input.operation?.isResolving
       ? `${input.label} — ${RELATIONSHIP_OVERFLOW_RESOLVING_LABEL}`
       : input.label,
+    icon: relationshipOverflowActionIcon(input.id),
     disabled: input.operation?.isResolving,
     onSelect: input.onSelect,
   })
@@ -69,6 +91,7 @@ export function buildRelationshipOverflowActions(input: {
     actions.push({
       id: 'view',
       label: input.labels.view ?? 'View',
+      icon: relationshipOverflowActionIcon('view'),
       onSelect: input.handlers.view,
     })
   }
@@ -98,6 +121,7 @@ export function buildRelationshipOverflowActions(input: {
     actions.push({
       id: 'remove',
       label: input.labels.remove ?? 'Remove',
+      icon: relationshipOverflowActionIcon('remove'),
       destructive: true,
       onSelect: input.handlers.remove,
     })

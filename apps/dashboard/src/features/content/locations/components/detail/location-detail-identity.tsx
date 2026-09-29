@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Button, Text } from '@rpg/ui'
+import { ActionIcon, Button, Text } from '@rpg/ui'
 
 import { ContentStatRow } from '../../../lib/detail/metadata/content-stat-row'
 import {
@@ -63,8 +63,15 @@ export function LocationDetailIdentity({
           {parentReplacementAction && onParentReplacementAction ? (
             <>
               {' '}
-              <Button type="button" variant="text" size="sm" onClick={onParentReplacementAction}>
-                {LOCATION_PARENT_REPLACEMENT_ACTION_LABELS[parentReplacementAction]}
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                density="compact"
+                aria-label={LOCATION_PARENT_REPLACEMENT_ACTION_LABELS[parentReplacementAction]}
+                onClick={onParentReplacementAction}
+              >
+                <ActionIcon action="waypoints" step="md" />
               </Button>
             </>
           ) : null}

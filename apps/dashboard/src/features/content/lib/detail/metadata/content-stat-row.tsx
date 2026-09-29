@@ -12,7 +12,7 @@ import {
 export type { ContentStatRowSize, ContentStatRowLayout } from './content-stat-row.variants'
 export type ContentStatRowProps = Pick<
   ContentStatRowData,
-  'label' | 'value' | 'info' | 'infoPlacement' | 'infoAriaLabel'
+  'label' | 'value' | 'valueContent' | 'info' | 'infoPlacement' | 'infoAriaLabel'
 > & {
   size?: ContentStatRowSize
   layout?: ContentStatRowLayout
@@ -39,6 +39,7 @@ function StatRowInfo({
 export function ContentStatRowHeroPair({
   label,
   value,
+  valueContent,
   info,
   infoPlacement = 'value',
   infoAriaLabel,
@@ -60,7 +61,7 @@ export function ContentStatRowHeroPair({
         ) : null}
       </Text>
       <Text as="span" className={contentStatRowValueVariants({ size, layout })}>
-        {value}
+        {valueContent ?? value}
         {!infoOnLabel ? (
           <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />
         ) : null}

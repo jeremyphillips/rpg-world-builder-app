@@ -17,6 +17,8 @@ describe('buildRelationshipOverflowActions', () => {
     })
 
     expect(actions).toHaveLength(2)
+    expect(actions[0]?.icon).toBeDefined()
+    expect(actions[1]?.icon).toBeDefined()
     actions[0]?.onSelect()
     actions[1]?.onSelect()
     expect(view).toHaveBeenCalledOnce()

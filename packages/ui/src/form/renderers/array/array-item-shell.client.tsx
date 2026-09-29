@@ -134,6 +134,7 @@ export interface ArrayItemShellProps extends ArrayItemLeadingChromeOptions {
   itemPrefix?: string
   dragging?: boolean
   layout?: 'default' | 'compactRow'
+  hasItemHeader?: boolean
   className?: string
   main: React.ReactNode
   actions?: React.ReactNode
@@ -147,6 +148,7 @@ export function ArrayItemShell({
   collapsible,
   dragging = false,
   layout = 'default',
+  hasItemHeader,
   className,
   main,
   actions,
@@ -164,6 +166,7 @@ export function ArrayItemShell({
       surface={resolveArrayItemShellSurface({
         explicit: arrayItemSurface,
         collapsible: collapsible ?? false,
+        hasItemHeader,
       })}
       tone={arrayItemTone}
       className={className}

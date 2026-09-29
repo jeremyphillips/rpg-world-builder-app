@@ -4,6 +4,7 @@ import {
   CANVAS_SURFACE,
   DEFAULT_ARRAY_ITEM_SURFACE,
   DEFAULT_FLAT_ARRAY_ITEM_SURFACE,
+  DEFAULT_FLAT_NO_HEADER_ARRAY_ITEM_SURFACE,
   DEFAULT_DEPENDENT_SURFACE,
   DEFAULT_PANEL_SURFACE,
   resolveSurfaceClasses,
@@ -66,6 +67,13 @@ describe('resolveSurfaceClasses', () => {
     const classes = resolveSurfaceClasses(DEFAULT_FLAT_ARRAY_ITEM_SURFACE)
     expect(classes).toContain('bg-surface-subtle')
     expect(classes).toContain('[--surface-current:var(--surface-subtle)]')
+    expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
+  })
+
+  it('uses approved tokens for flat no-header array item surface', () => {
+    const classes = resolveSurfaceClasses(DEFAULT_FLAT_NO_HEADER_ARRAY_ITEM_SURFACE)
+    expect(classes).toContain('bg-surface-faint')
+    expect(classes).toContain('[--surface-current:var(--surface-faint)]')
     expectOnlyApprovedTokens(classes, APPROVED_SURFACE_TOKENS)
   })
 

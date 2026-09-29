@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { RichTextContent, Text } from '@rpg/ui'
 import { classesOfferingSkillChoice } from '@rpg/contracts'
@@ -16,13 +17,16 @@ import { ContentDetailSection } from '../../lib/detail/page/content-detail-secti
 import { ContentStatusNameBadge } from '../../lib/overview/content-status-name-badge'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import { contentEditHref } from '../../lib/detail/page/content-edit-href'
-import { ContentStatRow } from '../../lib/detail/metadata/content-stat-row'
-import { ContentLinkBadge } from '../../lib/detail/metadata/content-link-badge'
+import { ContentStatRowInlineLinks } from '../../lib/detail/metadata/content-stat-row-inline-links'
+import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
 import { ContentUsageReferencesSection } from '../../lib/usage/content-usage-references-section'
-import { buildSkillProficiencyDetailViewModel } from '../lib/skill-proficiency-display'
+import {
+  buildSkillProficiencyDetailViewModel,
+  buildSkillProficiencyHeroStatRows,
+  SKILL_PROFICIENCY_DETAIL_STAT_LABELS,
+} from '../lib/skill-proficiency-display'
 
 const SKILL_EXAMPLES_HEADING_ID = 'skill-examples-heading'
-const CLASS_SKILL_CHOICES_HEADING_ID = 'class-skill-choices-heading'
 
 function SkillExamplesList({
   examples,
@@ -46,37 +50,6 @@ function SkillExamplesList({
   )
 }
 
-function ClassSkillChoicesList({
-  campaignId,
-  skillSlug,
-}: {
-  campaignId: string
-  skillSlug: string
-}) {
-  const { data: classes = [], isPending } = useClasses(campaignId)
-  const offeringClasses = classesOfferingSkillChoice(skillSlug, classes)
-
-  if (offeringClasses.length === 0 && !isPending) return null
-
-  return (
-    <ContentDetailSection heading="Class skill choices" headingId={CLASS_SKILL_CHOICES_HEADING_ID}>
-      {isPending ? (
-        <Text variant="muted">Loading…</Text>
-      ) : (
-        <ul className="flex flex-wrap gap-2" role="list">
-          {offeringClasses.map((cls) => (
-            <li key={cls.slug}>
-              <ContentLinkBadge to={ROUTES.content.classes.detail(campaignId, cls.id)}>
-                {cls.name}
-              </ContentLinkBadge>
-            </li>
-          ))}
-        </ul>
-      )}
-    </ContentDetailSection>
-  )
-}
-
 type SkillDetailContentProps = {
   skill: SkillProficiency
   campaignId: string
@@ -86,6 +59,34 @@ type SkillDetailContentProps = {
 export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
   const viewModel = buildSkillProficiencyDetailViewModel(skill)
+  const { data: classes = [], isPending: classesPending } = useClasses(campaignId)
+  const offeringClasses = classesOfferingSkillChoice(skill.slug, classes)
+
+  const statRows = useMemo((): ContentStatRowData[] => {
+    const rows = buildSkillProficiencyHeroStatRows(viewModel.governingAbilityLabel)
+
+    if (classesPending) {
+      rows.push({
+        label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
+        value: 'Loading…',
+      })
+    } else if (offeringClasses.length > 0) {
+      rows.push({
+        label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
+        value: offeringClasses.map((cls) => cls.name).join(', '),
+        valueContent: (
+          <ContentStatRowInlineLinks
+            items={offeringClasses.map((cls) => ({
+              to: ROUTES.content.classes.detail(campaignId, cls.id),
+              label: cls.name,
+            }))}
+          />
+        ),
+      })
+    }
+
+    return rows
+  }, [campaignId, classesPending, offeringClasses, viewModel.governingAbilityLabel])
 
   return (
     <ContentDetailLayout
@@ -96,25 +97,17 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
       campaignId={campaignId}
       editHref={contentEditHref('skillProficiencies', campaignId, skillId)}
       heroDescription={false}
+      statRows={statRows}
       descriptionContent={
         skill.description ? (
           <RichTextContent html={skill.description} size="md" tone="muted" />
         ) : undefined
-      }
-      metadata={
-        <div className="space-y-4">
-          <ContentStatRow label="Governing Ability" value={viewModel.governingAbilityLabel} />
-          {viewModel.summarySentence ? (
-            <Text variant="muted">{viewModel.summarySentence}</Text>
-          ) : null}
-        </div>
       }
     >
       <SkillExamplesList
         examples={viewModel.examples}
         sectionTitle={viewModel.examplesSectionTitle}
       />
-      <ClassSkillChoicesList campaignId={campaignId} skillSlug={skill.slug} />
       <ContentUsageReferencesSection
         campaignId={campaignId}
         routeKey="skill-proficiencies"

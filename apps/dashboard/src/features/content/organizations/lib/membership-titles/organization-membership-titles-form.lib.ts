@@ -5,6 +5,12 @@ import {
   type OrganizationMembershipTitleDefinition,
   type OrganizationMembershipTitlePriority,
 } from '@rpg/contracts'
+import type { FormItem } from '@rpg/ui/form'
+
+import {
+  ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
+  ORGANIZATION_SECTION_LABELS,
+} from '../organization-display'
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_PRIORITY_LABELS: Record<
   OrganizationMembershipTitlePriority,
@@ -39,4 +45,74 @@ export function parseOrganizationMembershipTitlePriorityValue(
     return parsed as OrganizationMembershipTitlePriority
   }
   return 10
+}
+
+function membershipTitlesFieldName(prefix?: string): string {
+  return prefix ? `${prefix}.members.titles` : 'members.titles'
+}
+
+/** Coerces select string priorities before contract parse on submit. */
+export function normalizeOrganizationMembershipTitleFormRows(
+  titles: readonly OrganizationMembershipTitleDefinition[] | undefined,
+): OrganizationMembershipTitleDefinition[] | undefined {
+  if (!titles) return undefined
+  return titles.map((row) => ({
+    ...row,
+    priority:
+      typeof row.priority === 'string'
+        ? parseOrganizationMembershipTitlePriorityValue(row.priority)
+        : row.priority,
+  }))
+}
+
+export function buildOrganizationMembershipTitlesArrayField(prefix?: string): FormItem {
+  return {
+    kind: 'array',
+    id: 'organization-membership-titles',
+    name: membershipTitlesFieldName(prefix),
+    heading: {
+      label: ORGANIZATION_SECTION_LABELS.membershipTitles,
+      hint: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
+    },
+    min: 1,
+    addAction: { label: 'Add title', layout: 'inline' },
+    appendDefaults: () => createOrganizationMembershipTitleFormRow(),
+    item: {
+      variant: 'compact',
+      headerVisibility: 'hidden',
+      reorder: false,
+      header: {
+        fallback: (index) => `Membership title ${index + 1}`,
+      },
+    },
+    fields: [
+      {
+        kind: 'row',
+        fields: [
+          {
+            type: 'text',
+            name: 'label',
+            label: 'Label',
+            required: true,
+            width: 'full',
+          },
+          {
+            type: 'select',
+            name: 'priority',
+            label: 'Rank',
+            required: true,
+            width: 'md',
+            options: organizationMembershipTitlePriorityOptions,
+          },
+          {
+            type: 'text',
+            name: 'id',
+            label: 'Title ID',
+            labelVisibility: 'srOnly',
+            required: true,
+          },
+        ],
+      },
+    ],
+  }
 }

@@ -160,6 +160,7 @@ export function FlatNoHeaderArrayFieldItem({
       collapsible={collapsible}
       dragging={dragging}
       layout="compactRow"
+      hasItemHeader={false}
       className={shellClassName}
       main={inlineMain ?? stackedMain}
     />

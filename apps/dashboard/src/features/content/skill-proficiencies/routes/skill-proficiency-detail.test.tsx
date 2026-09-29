@@ -52,14 +52,22 @@ describe('SkillDetailContent summary and examples', () => {
     mockClassesQuery({ data: [] })
   })
 
-  it('renders the summary lead sentence', () => {
+  it('does not render the summary lead sentence in the hero', () => {
     renderSkillDetail(ATHLETICS)
 
     expect(
-      screen.getByText(
+      screen.queryByText(
         'Athletics covers physical challenges involving strength, movement, and force.',
       ),
-    ).toBeInTheDocument()
+    ).not.toBeInTheDocument()
+  })
+
+  it('renders governing ability in the hero metadata grid without a colon', () => {
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByText('Governing Ability')).toBeInTheDocument()
+    expect(screen.getByText('Strength')).toBeInTheDocument()
+    expect(screen.queryByText(/Governing Ability:/)).not.toBeInTheDocument()
   })
 
   it('renders the examples section with list items', () => {
@@ -77,12 +85,13 @@ describe('SkillDetailContent class skill choices', () => {
     useClasses.mockReset()
   })
 
-  it('renders the class skill choices section heading', () => {
+  it('renders class skill choices in hero metadata', () => {
     mockClassesQuery({ data: [FIGHTER] })
 
     renderSkillDetail(ATHLETICS)
 
-    expect(screen.getByRole('heading', { name: 'Class skill choices' })).toBeInTheDocument()
+    expect(screen.getByText('Class skill choices')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Class skill choices' })).not.toBeInTheDocument()
   })
 
   it('links to the catalog class id for a class offering this skill', () => {
@@ -97,12 +106,12 @@ describe('SkillDetailContent class skill choices', () => {
     )
   })
 
-  it('omits the section when no class offers this skill', () => {
+  it('omits the class skill choices row when no class offers this skill', () => {
     mockClassesQuery({ data: [] })
 
     renderSkillDetail(ATHLETICS)
 
-    expect(screen.queryByRole('heading', { name: 'Class skill choices' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Class skill choices')).not.toBeInTheDocument()
   })
 
   it('links homebrew classes by catalog id', () => {
@@ -121,7 +130,7 @@ describe('SkillDetailContent class skill choices', () => {
     expect(link).toHaveAttribute('href', ROUTES.content.classes.detail(STORY_CAMPAIGN_ID, 'abc123'))
   })
 
-  it('shows a loading state while classes are pending', () => {
+  it('shows a loading state in hero metadata while classes are pending', () => {
     mockClassesQuery({ isPending: true, data: undefined })
 
     renderSkillDetail(ATHLETICS)

@@ -9,7 +9,10 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import {
+  detailOverflowActionsToRowMenuItems,
+  EntityRowList,
+} from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -191,13 +194,7 @@ function renderTerritorialRelationshipRow(input: {
         actions.length > 0
           ? {
               label: `Actions for ${input.row.subject.name}`,
-              items: actions.map((action) => ({
-                id: action.id,
-                label: action.label,
-                destructive: action.destructive,
-                disabled: action.disabled,
-                onSelect: action.onSelect,
-              })),
+              items: detailOverflowActionsToRowMenuItems(actions),
             }
           : undefined
       }

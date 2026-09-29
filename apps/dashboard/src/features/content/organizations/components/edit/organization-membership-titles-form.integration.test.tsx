@@ -5,12 +5,11 @@ import { Form } from '@rpg/ui/form'
 
 import { OrganizationAuthoringProvider } from '../authoring/organization-authoring-context'
 import { OrganizationMembershipTitlesRegistration } from '../authoring/organization-membership-titles-registration'
-import { OrganizationEditMembershipTitlesField } from './organization-edit-membership-titles-field'
 import {
   buildOrganizationFormValueSyncs,
   organizationDraftFormSchema,
 } from '../../../lib/forms/organization-form-projection'
-import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
+import { buildOrganizationMembershipTitlesArrayField } from '../../lib/membership-titles/organization-membership-titles-form.lib'
 import { snapshotOrganizationMembershipTitlesFromPreset } from '@rpg/contracts'
 
 function ValuesProbe() {
@@ -43,17 +42,7 @@ describe('organization membership titles form integration', () => {
               options: [{ value: 'class-rogue', label: 'Rogue' }],
               multiple: true,
             },
-            {
-              kind: 'group',
-              legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-              fields: [
-                {
-                  kind: 'slot',
-                  name: '_organizationMembershipTitles',
-                  render: () => <OrganizationEditMembershipTitlesField />,
-                },
-              ],
-            },
+            buildOrganizationMembershipTitlesArrayField(),
           ]}
           defaultValues={{
             members: { classAffinityIds: ['class-rogue'], speciesAffinityIds: [], titles },

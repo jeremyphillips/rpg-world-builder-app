@@ -7,7 +7,10 @@ import {
 } from '@/features/character'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import {
+  detailOverflowActionsToRowMenuItems,
+  EntityRowList,
+} from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -276,13 +279,7 @@ export function LocationPeopleAndOrganizationsSectionBody({
                       actions.length > 0
                         ? {
                             label: `Actions for ${row.subject.name}`,
-                            items: actions.map((action) => ({
-                              id: action.id,
-                              label: action.label,
-                              destructive: action.destructive,
-                              disabled: action.disabled,
-                              onSelect: action.onSelect,
-                            })),
+                            items: detailOverflowActionsToRowMenuItems(actions),
                           }
                         : undefined
                     }

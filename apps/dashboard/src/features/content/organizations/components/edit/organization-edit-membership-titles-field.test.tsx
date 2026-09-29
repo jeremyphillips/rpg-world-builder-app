@@ -6,9 +6,8 @@ import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 import type { OrganizationMembershipTitleDefinition } from '@rpg/contracts'
 
-import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'
+import { buildOrganizationMembershipTitlesArrayField } from '../../lib/membership-titles/organization-membership-titles-form.lib'
 import { OrganizationMembershipTitlesRegistration } from '../authoring/organization-membership-titles-registration'
-import { OrganizationEditMembershipTitlesField } from './organization-edit-membership-titles-field'
 
 const schema = z.object({
   members: z.object({
@@ -17,7 +16,7 @@ const schema = z.object({
       z.object({
         id: z.string(),
         label: z.string(),
-        priority: z.number(),
+        priority: z.union([z.number(), z.string()]),
       }),
     ),
   }),
@@ -37,15 +36,20 @@ function FormHarness() {
   const { replace } = useFieldArray({ control: form.control, name: 'members.titles' })
   return (
     <div>
-      <button type="button" onClick={() => replace(changedTitles)}>
+      <button
+        type="button"
+        onClick={() => {
+          replace(changedTitles)
+          form.setValue('members.titles', changedTitles, { shouldDirty: true })
+        }}
+      >
         Change titles
       </button>
       <button
         type="button"
         onClick={() => {
-          form.reset({
-            members: { classAffinityIds: [], titles: initialTitles },
-          })
+          const resetMembers = { classAffinityIds: [], titles: initialTitles }
+          form.reset({ members: resetMembers })
           replace(initialTitles)
         }}
       >
@@ -60,20 +64,12 @@ function renderTitlesField(prefix?: string) {
     <Form
       schema={schema}
       fields={[
+        buildOrganizationMembershipTitlesArrayField(prefix),
         {
-          kind: 'group',
-          legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-          fields: [
-            {
-              kind: 'slot',
-              name: prefix
-                ? `${prefix}._organizationMembershipTitles`
-                : '_organizationMembershipTitles',
-              render: () => <OrganizationEditMembershipTitlesField prefix={prefix} />,
-            },
-          ],
+          kind: 'slot',
+          name: '_harness',
+          render: () => <FormHarness />,
         },
-        { kind: 'slot', name: '_harness', render: () => <FormHarness /> },
       ]}
       defaultValues={{ members: { titles: initialTitles } }}
       onSubmit={() => undefined}
@@ -81,16 +77,20 @@ function renderTitlesField(prefix?: string) {
   )
 }
 
-function titlesGroup(): HTMLElement {
-  return screen.getByRole('group', { name: ORGANIZATION_SECTION_LABELS.membershipTitles })
+function titlesFieldset(): HTMLElement {
+  const fieldset = document.getElementById('organization-membership-titles')
+  if (!fieldset) {
+    throw new Error('Expected membership titles fieldset')
+  }
+  return fieldset
 }
 
-describe('OrganizationEditMembershipTitlesField', () => {
+describe('Organization membership titles array field', () => {
   it('renders current form members.titles', () => {
     renderTitlesField()
-    const group = titlesGroup()
-    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
-    expect(within(group).getByDisplayValue('Clerk')).toBeInTheDocument()
+    const fieldset = titlesFieldset()
+    expect(within(fieldset).getByDisplayValue('Chair')).toBeInTheDocument()
+    expect(within(fieldset).getByDisplayValue('Clerk')).toBeInTheDocument()
   })
 
   it('renders titles when a sibling registers members without titles', () => {
@@ -110,26 +110,16 @@ describe('OrganizationEditMembershipTitlesField', () => {
             options: [{ value: 'class-fighter', label: 'Fighter' }],
             multiple: true,
           },
-          {
-            kind: 'group',
-            legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-            fields: [
-              {
-                kind: 'slot',
-                name: '_organizationMembershipTitles',
-                render: () => <OrganizationEditMembershipTitlesField />,
-              },
-            ],
-          },
+          buildOrganizationMembershipTitlesArrayField(),
         ]}
         defaultValues={{ members: { classAffinityIds: [], titles: initialTitles } }}
         onSubmit={() => undefined}
       />,
     )
 
-    const group = titlesGroup()
-    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
-    expect(within(group).getByDisplayValue('Clerk')).toBeInTheDocument()
+    const fieldset = titlesFieldset()
+    expect(within(fieldset).getByDisplayValue('Chair')).toBeInTheDocument()
+    expect(within(fieldset).getByDisplayValue('Clerk')).toBeInTheDocument()
   })
 
   it('renders under an embedded namespace prefix', () => {
@@ -137,35 +127,22 @@ describe('OrganizationEditMembershipTitlesField', () => {
     render(
       <Form
         schema={embeddedSchema}
-        fields={[
-          {
-            kind: 'group',
-            legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-            fields: [
-              {
-                kind: 'slot',
-                name: 'operatorOrganization._organizationMembershipTitles',
-                render: () => (
-                  <OrganizationEditMembershipTitlesField prefix="operatorOrganization" />
-                ),
-              },
-            ],
-          },
-        ]}
+        fields={[buildOrganizationMembershipTitlesArrayField('operatorOrganization')]}
         defaultValues={{ operatorOrganization: { members: { titles: initialTitles } } }}
         onSubmit={() => undefined}
       />,
     )
 
-    const group = titlesGroup()
-    expect(within(group).getByDisplayValue('Chair')).toBeInTheDocument()
+    const fieldset = titlesFieldset()
+    expect(within(fieldset).getByDisplayValue('Chair')).toBeInTheDocument()
   })
 
   it('exposes editable membership title controls inside the titles group', () => {
     renderTitlesField()
-    const group = titlesGroup()
-    expect(within(group).getAllByRole('textbox').length).toBeGreaterThan(0)
-    expect(within(group).getByRole('button', { name: 'Add title' })).toBeInTheDocument()
+    const fieldset = titlesFieldset()
+    expect(within(fieldset).getAllByRole('textbox').length).toBeGreaterThan(0)
+    expect(within(fieldset).getByRole('button', { name: 'Add title' })).toBeInTheDocument()
+    expect(within(fieldset).getAllByRole('button', { name: /Remove/ }).length).toBeGreaterThan(0)
   })
 
   it('updates when form state changes and reset restores the catalog', async () => {
@@ -173,7 +150,9 @@ describe('OrganizationEditMembershipTitlesField', () => {
     renderTitlesField()
 
     await user.click(screen.getByRole('button', { name: 'Change titles' }))
-    expect(screen.getByDisplayValue('Initiate')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Initiate')).toBeInTheDocument()
+    })
     expect(screen.queryByDisplayValue('Chair')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Reset titles' }))

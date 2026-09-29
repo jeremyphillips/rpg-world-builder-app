@@ -41,7 +41,10 @@ import { descriptionField, nameField } from './fields/content-identity-form-fiel
 import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
 import { OrganizationEditFamiliarTypeField } from '../../organizations/components/edit/organization-edit-familiar-type-field'
-import { OrganizationEditMembershipTitlesField } from '../../organizations/components/edit/organization-edit-membership-titles-field'
+import {
+  buildOrganizationMembershipTitlesArrayField,
+  normalizeOrganizationMembershipTitleFormRows,
+} from '../../organizations/lib/membership-titles/organization-membership-titles-form.lib'
 import { OrganizationUseFamiliarTypeAction } from '../../organizations/components/edit/organization-use-familiar-type-action'
 import { OrganizationQuickCreateProfileSections } from '../../organizations/components/create/organization-quick-create-profile-sections'
 import { OrganizationStartingPointLegendAccessory } from '../../organizations/components/create/organization-starting-point-legend-accessory'
@@ -78,11 +81,6 @@ import {
   buildMemberSpeciesAffinityChipOptions,
   ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
 } from '../../organizations/lib/members/organization-member-species-chip-options.lib'
-import {
-  ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
-  ORGANIZATION_SECTION_LABELS,
-} from '../../organizations/lib/organization-display'
-
 const organizationDomainOptions = toOptions(
   ORGANIZATION_DOMAIN_IDS,
   Object.fromEntries(
@@ -333,20 +331,8 @@ function buildOrganizationMembershipTitlesRegistrationSlot(prefix?: string): For
   }
 }
 
-function buildOrganizationMembershipTitlesReadOnlyGroup(prefix?: string): FormItem {
-  return {
-    kind: 'group',
-    id: 'organization-membership-titles',
-    legend: ORGANIZATION_SECTION_LABELS.membershipTitles,
-    description: ORGANIZATION_MEMBERSHIP_TITLES_DESCRIPTION,
-    fields: [
-      {
-        kind: 'slot',
-        name: fieldPath(prefix, '_organizationMembershipTitles'),
-        render: () => createElement(OrganizationEditMembershipTitlesField, { prefix }),
-      },
-    ],
-  }
+function buildOrganizationMembershipTitlesField(prefix?: string): FormItem {
+  return buildOrganizationMembershipTitlesArrayField(prefix)
 }
 
 function buildOrganizationOptionalDetailsGroup(
@@ -379,7 +365,7 @@ function buildOrganizationOptionalDetailsGroup(
         description: ORGANIZATION_MEMBER_AFFINITIES_GROUP_DESCRIPTION,
         fields: memberAffinityFields,
       },
-      buildOrganizationMembershipTitlesReadOnlyGroup(prefix),
+      buildOrganizationMembershipTitlesField(prefix),
       descriptionFieldItem,
     ],
   }
@@ -432,7 +418,7 @@ export function buildOrganizationQuickCreateFollowOnFields(
       },
     ]
 
-    fullPresentationFields.push(buildOrganizationMembershipTitlesReadOnlyGroup(prefix))
+    fullPresentationFields.push(buildOrganizationMembershipTitlesField(prefix))
 
     fullPresentationFields.push(descriptionFieldItem)
 
@@ -590,7 +576,7 @@ function organizationValuesForInputParse(
       classAffinityIds: values.members?.classAffinityIds ?? [],
       speciesAffinityIds: values.members?.speciesAffinityIds ?? [],
       titles: resolveOrganizationCreateMembershipTitles({
-        titles: values.members?.titles,
+        titles: normalizeOrganizationMembershipTitleFormRows(values.members?.titles),
       }),
     },
     ...(values.organizationDomain !== undefined

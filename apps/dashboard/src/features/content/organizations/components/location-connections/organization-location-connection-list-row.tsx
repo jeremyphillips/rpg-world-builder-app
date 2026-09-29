@@ -3,7 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import type { OrganizationLocationConnectionKind } from '@rpg/contracts'
 
 import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
-import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import {
+  detailOverflowActionsToRowMenuItems,
+  EntityRowList,
+} from '../../../lib/entity/row-list/entity-row-list'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -160,13 +163,7 @@ export function OrganizationLocationConnectionListRow({
         actions.length > 0
           ? {
               label: `Actions for ${presentation.heading}`,
-              items: actions.map((action) => ({
-                id: action.id,
-                label: action.label,
-                destructive: action.destructive,
-                disabled: action.disabled,
-                onSelect: action.onSelect,
-              })),
+              items: detailOverflowActionsToRowMenuItems(actions),
             }
           : undefined
       }

@@ -155,7 +155,7 @@ export function ContentDetailLayout({
         <CardContent className={contentDetailHeroCardContentClasses}>
           <div className={contentDetailHeroGridClasses(mediaPresentation)}>
             <div className={contentDetailHeroMainClasses}>
-              <Eyebrow size="md" tone="muted" className={contentDetailHeroEyebrowClasses}>
+              <Eyebrow size="sm" tone="muted" className={contentDetailHeroEyebrowClasses}>
                 {resolvedClassificationLabel}
               </Eyebrow>
               <div className={contentDetailHeroTitleRowClasses}>
