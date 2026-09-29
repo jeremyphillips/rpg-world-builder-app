@@ -76,7 +76,7 @@ export const contentDetailStatRowsGroupClasses = 'h-fit w-max max-w-full flex-no
  * @see stat-row-group-layout.constants STAT_ROW_GROUP_DIVIDER_INSET_FROM_TRAILING_EDGE
  */
 export const contentDetailStatRowsGroupTrailingDividerClasses =
-  'relative before:pointer-events-none before:absolute before:inset-y-0 before:-right-6 before:w-px before:bg-border-subtle'
+  'relative before:pointer-events-none before:absolute before:inset-y-0 before:-right-[var(--content-detail-stat-divider-inset,1.5rem)] before:w-px before:bg-border-subtle'
 
 export type ContentStatRowSize = NonNullable<VariantProps<typeof contentStatRowVariants>['size']>
 export type ContentStatRowLayout = NonNullable<

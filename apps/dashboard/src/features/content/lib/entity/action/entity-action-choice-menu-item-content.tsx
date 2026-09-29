@@ -1,5 +1,11 @@
 import { cn } from '@rpg/ui'
 
+import {
+  entityActionChoiceMenuItemContentClasses,
+  entityActionChoiceMenuItemDescriptionClasses,
+  entityActionChoiceMenuItemLabelClasses,
+} from './entity-action-choice-menu.variants'
+
 export type EntityActionChoiceMenuItemContentProps = {
   label: string
   description: string
@@ -11,9 +17,9 @@ export function EntityActionChoiceMenuItemContent({
   description,
 }: EntityActionChoiceMenuItemContentProps) {
   return (
-    <span className={cn('flex min-w-0 flex-col gap-0.5')}>
-      <span className="text-sm">{label}</span>
-      <span className="text-xs leading-snug text-muted-foreground">{description}</span>
+    <span className={cn(entityActionChoiceMenuItemContentClasses)}>
+      <span className={entityActionChoiceMenuItemLabelClasses}>{label}</span>
+      <span className={entityActionChoiceMenuItemDescriptionClasses}>{description}</span>
     </span>
   )
 }

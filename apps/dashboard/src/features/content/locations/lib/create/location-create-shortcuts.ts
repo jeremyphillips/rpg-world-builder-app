@@ -22,6 +22,7 @@ import {
 import { ROUTES } from '@/app/routes'
 
 import {
+  isDeferredLocationAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
   UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
   UNCLASSIFIED_STRUCTURE_LABEL,
@@ -142,12 +143,6 @@ function sortAuthoringTypes(types: readonly LocationAuthoringType[]): LocationAu
   )
 }
 
-/** Parents that may add only the Building authoring type until broader structure kinds return. */
-const BUILDING_ONLY_CHILD_PARENT_KINDS = [
-  'site',
-  'structure',
-] as const satisfies readonly LocationKind[]
-
 /** Derives child authoring types valid under a parent location kind via contracts hierarchy. */
 export function childAuthoringTypesForParentKind(
   parentKind: LocationKind,
@@ -161,12 +156,7 @@ export function childAuthoringTypesForParentKind(
     }
   }
 
-  const sorted = sortAuthoringTypes([...types])
-  if ((BUILDING_ONLY_CHILD_PARENT_KINDS as readonly string[]).includes(parentKind)) {
-    return sorted.filter((type) => type === 'building')
-  }
-
-  return sorted
+  return sortAuthoringTypes([...types]).filter((type) => !isDeferredLocationAuthoringType(type))
 }
 
 function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthoringType | undefined {
@@ -174,7 +164,11 @@ function parseAuthoringTypeParam(searchParams: URLSearchParams): LocationAuthori
   if (!typeParam || !(LOCATION_AUTHORING_TYPE_IDS as readonly string[]).includes(typeParam)) {
     return undefined
   }
-  return typeParam as LocationAuthoringType
+  const authoringType = typeParam as LocationAuthoringType
+  if (isDeferredLocationAuthoringType(authoringType)) {
+    return undefined
+  }
+  return authoringType
 }
 
 function parseSettlementTypeParam(searchParams: URLSearchParams): SettlementType | undefined {

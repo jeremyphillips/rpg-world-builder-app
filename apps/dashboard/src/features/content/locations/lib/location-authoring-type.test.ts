@@ -8,6 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import {
+  buildLocationAuthoringTypeComboboxOptions,
   buildLocationAuthoringTypeOptions,
   canonicalFieldsForAuthoringType,
   clearInvalidFieldsForAuthoringType,
@@ -76,6 +77,11 @@ describe('location authoring type mapping', () => {
     expect(resolveLocationAuthoringType({ kind: 'structure' })).toBe(
       UNCLASSIFIED_STRUCTURE_AUTHORING_TYPE,
     )
+  })
+
+  it('omits deferred authoring types from create combobox options', () => {
+    const values = buildLocationAuthoringTypeComboboxOptions().map((option) => option.value)
+    expect(values).not.toContain('interior')
   })
 
   it('projects grouped options from contracts labels with unclassified structure last', () => {

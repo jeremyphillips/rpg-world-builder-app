@@ -11,7 +11,10 @@ import {
 } from '@rpg/ui'
 
 import { EntityActionChoiceMenuItemContent } from './entity-action-choice-menu-item-content'
-import { entityActionChoiceMenuContentClasses } from './entity-action-choice-menu.variants'
+import {
+  entityActionChoiceMenuContentClasses,
+  entityActionChoiceMenuItemClasses,
+} from './entity-action-choice-menu.variants'
 
 export type EntityActionChoiceMenuItem = {
   id: string
@@ -72,7 +75,7 @@ export function EntityActionChoiceMenu({
         {items.map((item) => (
           <DropdownMenuItem
             key={item.id}
-            className="h-auto items-start py-2"
+            className={cn(entityActionChoiceMenuItemClasses)}
             disabled={item.disabled}
             onSelect={() => item.onSelect()}
           >

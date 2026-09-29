@@ -278,9 +278,14 @@ describe('childAuthoringTypesForParentKind', () => {
     )
   })
 
-  it('offers only building under site and structure parents', () => {
-    expect(childAuthoringTypesForParentKind('site')).toEqual(['building'])
-    expect(childAuthoringTypesForParentKind('structure')).toEqual(['building'])
+  it('offers structure authoring types under site and structure parents', () => {
+    expect(childAuthoringTypesForParentKind('site')).toEqual(
+      expect.arrayContaining(['building', 'fortification', 'structure']),
+    )
+    expect(childAuthoringTypesForParentKind('structure')).toEqual(
+      expect.arrayContaining(['building', 'fortification', 'structure']),
+    )
+    expect(childAuthoringTypesForParentKind('site')).not.toContain('interior')
   })
 
   it('lists promoted overview shortcuts from the registry ids', () => {

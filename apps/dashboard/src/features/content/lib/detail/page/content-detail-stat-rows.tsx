@@ -13,6 +13,7 @@ import {
   DEFAULT_HERO_STAT_ROW_COLUMN_COUNT,
   partitionHeroStatRowGroups,
 } from './partition-hero-stat-row-groups.lib'
+import { STAT_ROW_GROUP_DIVIDER_INSET_FROM_TRAILING_EDGE } from './stat-row-group-layout.constants'
 import { useContentDetailStatRowGroupLayout } from './use-content-detail-stat-row-group-layout'
 
 const ContentDetailStatRowsGroup = forwardRef<
@@ -23,10 +24,16 @@ const ContentDetailStatRowsGroup = forwardRef<
     labelColumnWidthPx?: number
   }
 >(function ContentDetailStatRowsGroup({ statRows, showTrailingDivider, labelColumnWidthPx }, ref) {
-  const style: CSSProperties | undefined =
-    labelColumnWidthPx !== undefined
-      ? ({ '--content-detail-stat-label-col': `${labelColumnWidthPx}px` } as CSSProperties)
-      : undefined
+  const style: CSSProperties | undefined = (() => {
+    const vars: Record<string, string> = {}
+    if (labelColumnWidthPx !== undefined) {
+      vars['--content-detail-stat-label-col'] = `${labelColumnWidthPx}px`
+    }
+    if (showTrailingDivider) {
+      vars['--content-detail-stat-divider-inset'] = STAT_ROW_GROUP_DIVIDER_INSET_FROM_TRAILING_EDGE
+    }
+    return Object.keys(vars).length > 0 ? (vars as CSSProperties) : undefined
+  })()
 
   return (
     <div

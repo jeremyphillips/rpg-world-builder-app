@@ -2,7 +2,10 @@
 
 Parent/child placement for locations is defined once in `@rpg/contracts`
 [`LOCATION_KIND_DEFINITIONS`](../../../packages/contracts/src/rpg/content/location/hierarchy.ts).
-All create, move, bulk, and parent-picker surfaces derive eligibility from that SSOT.
+Add-child menus and the create-form parent combobox derive allowed parent/child kinds from
+that SSOT (`childAuthoringTypesForParentKind`, `getAllowedParentKinds`). Create type pickers
+also omit **`LOCATION_AUTHORING_TYPES_DEFERRED`** (currently Interior). Move, bulk, and other
+parent-picker surfaces use the same hierarchy rules.
 
 ## Shape
 
@@ -26,6 +29,13 @@ Settlement
 - **Settlement may also parent place kinds directly** — “Direct locations” in City structure.
 - **Region may parent Region** — nested regions remain `kind: 'region'`. UI copy uses
   **Subregion** when the parent is a Region (derived relationship label only).
+- **Site may not parent Site** — nested sites are invalid on publish-complete writes.
+- **Interior authoring is deferred** — `kind: 'interior'` remains in contracts for existing
+  records; new create menus omit it until hierarchy and classification widen. Contracts currently
+  allow only an interior parent for interior kinds.
+- **Parent field visibility** — the create-form parent combobox unmounts when
+  `getParentRequirement` is `forbidden` (e.g. Plane) so stale `parentLocationId` values clear
+  under `shouldUnregister`.
 
 ## Location structure authoring
 
@@ -99,8 +109,8 @@ by `resolveStructureChildAuthoringOptions`.
 
 Add-child menu rows use **`EntityActionChoiceMenu`** via `LocationAddChildMenu`. Helper copy
 resolves as **parent+child override → child-type default** in
-`location-authoring-option-description.lib.ts`. Tests exhaust every child type allowed under each
-parent kind from hierarchy SSOT (`childAuthoringTypesForParentKind`).
+`location-authoring-option-description.lib.ts`. Tests exhaust every add-child type from
+`childAuthoringTypesForParentKind` (contracts hierarchy minus deferred authoring types).
 
 The panel heading uses `` `${resolveLocationStructureHeadingNoun(location)} structure` ``
 from contracts display projection.

@@ -48,7 +48,7 @@ const membershipTitlePriorityFromFormValue = formSelectNumberSchema(
   organizationMembershipTitlePrioritySchema,
 )
 
-function membershipTitlesFieldName(prefix?: string): string {
+export function membersTitlesFieldPath(prefix?: string): string {
   return prefix ? `${prefix}.members.titles` : 'members.titles'
 }
 
@@ -80,7 +80,7 @@ export function buildOrganizationMembershipTitlesArrayField(prefix?: string): Fo
   return {
     kind: 'array',
     id: 'organization-membership-titles',
-    name: membershipTitlesFieldName(prefix),
+    name: membersTitlesFieldPath(prefix),
     keyName: ORGANIZATION_MEMBERSHIP_TITLE_FIELD_ARRAY_KEY,
     heading: {
       label: ORGANIZATION_SECTION_LABELS.membershipTitles,

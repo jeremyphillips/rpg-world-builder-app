@@ -266,7 +266,7 @@ When an add control opens a menu of typed choices (not a single drawer launch), 
 - Panel width: `--popover-choice-menu-width`, applied viewport-safe on menu content.
 - Triggers: labeled add (`ActionButton`), subgroup header (`appearance="group"`), or compact icon (`appearance="icon"`).
 
-**`LocationAddChildMenu`** is the location-hierarchy option builder on top of that primitive (eligibility from `childAuthoringTypesForParentKind`, copy from `resolveLocationAuthoringOptionDescription`). Do not import `DropdownMenu` in feature add-choice entry points — compose through `EntityActionChoiceMenu` only (see `entity-action-choice-menu.guard.test.ts`).
+**`LocationAddChildMenu`** is the location-hierarchy option builder on top of that primitive (eligibility from `childAuthoringTypesForParentKind` — contracts hierarchy minus `LOCATION_AUTHORING_TYPES_DEFERRED`; copy from `resolveLocationAuthoringOptionDescription`). Do not import `DropdownMenu` in feature add-choice entry points — compose through `EntityActionChoiceMenu` only (see `entity-action-choice-menu.guard.test.ts`).
 
 `EntityRowList` direct `action` / `headerAction` stays single-click until a roster/relationship surface needs a multi-option choice menu; wire that through the same primitive when it lands.
 

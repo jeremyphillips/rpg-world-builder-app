@@ -35,7 +35,7 @@ describe('resolveLocationAuthoringOptionDescription', () => {
     ).toContain('annex')
   })
 
-  it('covers every child type allowed under each parent kind in hierarchy SSOT', () => {
+  it('covers every add-child menu type from contracts hierarchy minus deferred authoring', () => {
     for (const parentKind of LOCATION_KIND_IDS) {
       const childTypes = childAuthoringTypesForParentKind(parentKind)
       if (childTypes.length === 0) {

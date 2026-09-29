@@ -59,7 +59,11 @@ type SkillDetailContentProps = {
 export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailContentProps) {
   useSetBreadcrumbLabel(skill.name)
   const viewModel = buildSkillProficiencyDetailViewModel(skill)
-  const { data: classes = [], isPending: classesPending } = useClasses(campaignId)
+  const {
+    data: classes = [],
+    isPending: classesPending,
+    isError: classesError,
+  } = useClasses(campaignId)
   const offeringClasses = classesOfferingSkillChoice(skill.slug, classes)
 
   const statRows = useMemo((): ContentStatRowData[] => {
@@ -69,6 +73,11 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
       rows.push({
         label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
         value: 'Loading…',
+      })
+    } else if (classesError) {
+      rows.push({
+        label: SKILL_PROFICIENCY_DETAIL_STAT_LABELS.classSkillChoices,
+        value: formatContentListLoadErrorMessage('classes'),
       })
     } else if (offeringClasses.length > 0) {
       rows.push({
@@ -86,7 +95,7 @@ export function SkillDetailContent({ skill, campaignId, skillId }: SkillDetailCo
     }
 
     return rows
-  }, [campaignId, classesPending, offeringClasses, viewModel.governingAbilityLabel])
+  }, [campaignId, classesError, classesPending, offeringClasses, viewModel.governingAbilityLabel])
 
   return (
     <ContentDetailLayout

@@ -9,6 +9,7 @@ import { formatContentCreateActionLabel } from '../../content-type-labels'
 import { QUICK_NPC_CREATE_SUBMIT_LABEL } from '@/features/character'
 import {
   canonicalFieldsForAuthoringType,
+  isDeferredLocationAuthoringType,
   LOCATION_AUTHORING_TYPE_IDS,
   type LocationAuthoringType,
 } from '../../../locations/lib/location-authoring-type'
@@ -43,7 +44,7 @@ export type RelationshipPickerCreateIntent =
     }
   | { target: 'character'; id: 'npc'; label: string }
 
-const PARENT_REQUIRED_AUTHORING_TYPES = new Set<LocationAuthoringType>(['district', 'interior'])
+const PARENT_REQUIRED_AUTHORING_TYPES = new Set<LocationAuthoringType>(['district'])
 
 const KIND_AUTHORING_TYPE_OVERRIDES: Partial<
   Record<OrganizationLocationConnectionKind, readonly LocationAuthoringType[]>
@@ -107,6 +108,7 @@ function resolveLocationCreateIntents(
 
   const eligibleAuthoringTypes = LOCATION_AUTHORING_TYPE_IDS.filter(
     (authoringType) =>
+      !isDeferredLocationAuthoringType(authoringType) &&
       (!kindOverride || kindOverride.includes(authoringType)) &&
       authoringTypeEligibleForOrganizationKind(authoringType, input.selectedKind) &&
       authoringTypeAllowedForBrowseScope(authoringType, input.activeBrowseScope) &&

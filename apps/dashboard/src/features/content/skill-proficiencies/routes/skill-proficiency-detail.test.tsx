@@ -138,4 +138,12 @@ describe('SkillDetailContent class skill choices', () => {
     expect(screen.getByText('Loading…')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Fighter' })).not.toBeInTheDocument()
   })
+
+  it('shows a load error in hero metadata when the classes query fails', () => {
+    mockClassesQuery({ isError: true, data: undefined })
+
+    renderSkillDetail(ATHLETICS)
+
+    expect(screen.getByText('Could not load classes.')).toBeInTheDocument()
+  })
 })

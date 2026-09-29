@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useController, useFormContext, useWatch } from 'react-hook-form'
 
-import { membersTitlesFieldPath } from './organization-membership-titles-registration.lib'
+import { membersTitlesFieldPath } from '../../lib/membership-titles/organization-membership-titles-form.lib'
 
 function OrganizationMembershipTitleDomainIdRegistration({
   prefix,

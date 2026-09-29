@@ -38,7 +38,10 @@ import {
   buildParentLocationComboboxOptionsResolve,
   buildParentLocationFilterSelectResolve,
 } from '../hierarchy/location-parent-combobox.lib'
-import { LOCATION_PARENT_FIELD_HINT } from '../hierarchy/location-parent-picker'
+import {
+  LOCATION_PARENT_FIELD_HINT,
+  parentLocationFieldVisibility,
+} from '../hierarchy/location-parent-picker'
 import { LocationSettlementStartingDistrictsSlot } from '../../components/create/composition/location-settlement-starting-districts-slot'
 import type { SettlementStructureAuthoringGuidance } from '../create/composition/location-settlement-create-composition.lib'
 
@@ -210,6 +213,7 @@ export function buildLocationFields(
       ),
       filterSelectResolve: buildParentLocationFilterSelectResolve(),
       hint: LOCATION_PARENT_FIELD_HINT,
+      visibility: parentLocationFieldVisibility(),
       width: 'full',
     })
   }
