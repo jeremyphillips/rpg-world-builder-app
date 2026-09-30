@@ -121,6 +121,19 @@ describe('resolveSelectionSourceProvenance', () => {
     })
   })
 
+  it('attributes level 0 baseline sources to the campaign', () => {
+    expect(
+      resolveSelectionSourceProvenance(
+        { kind: 'characterCreation', sourceId: 'levelZeroNpcs', grantId: 'baseline' },
+        catalogIndex,
+      ),
+    ).toMatchObject({
+      ownerKind: 'campaign',
+      ownerLabel: 'Level 0',
+      primaryLabel: 'Level 0',
+    })
+  })
+
   it('falls back when catalog rows are missing', () => {
     expect(
       resolveSelectionSourceProvenance(
@@ -260,6 +273,9 @@ describe('formatChoiceSetProvenanceParentContext', () => {
     expect(
       formatChoiceSetProvenanceParentContext({ ownerKind: 'heritage', ownerLabel: 'High Elf' }),
     ).toBe('High Elf heritage')
+    expect(
+      formatChoiceSetProvenanceParentContext({ ownerKind: 'npcTemplate', ownerLabel: 'Guard' }),
+    ).toBe('Guard role')
   })
 })
 
@@ -356,6 +372,15 @@ describe('formatCompactSelectionSourceLabel', () => {
         catalogIndex,
       ),
     ).toBe('Rogue')
+  })
+
+  it('maps level 0 character creation sources to Level 0', () => {
+    expect(
+      formatCompactSelectionSourceLabel(
+        [{ kind: 'characterCreation', sourceId: 'levelZeroNpcs', grantId: 'baseline' }],
+        catalogIndex,
+      ),
+    ).toBe('Level 0')
   })
 
   it('maps character creation sources to Origin', () => {

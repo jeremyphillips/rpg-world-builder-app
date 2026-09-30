@@ -23,6 +23,6 @@ describe('buildQuickNpcAutomaticPreferences', () => {
     })
 
     expect(preferences.abilityPriority?.[0]).toBe('dex')
-    expect(preferences.skillSlugs?.[0]).toBe('perception')
+    expect(preferences.skills?.[0]).toMatchObject({ id: 'perception', sources: ['template'] })
   })
 })

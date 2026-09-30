@@ -9,14 +9,15 @@ path as a manually built character.
 
 ## Modules
 
-| Export                               | Module                                         | Purpose                                                                     |
-| ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------------------- |
-| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment)    |
-| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)          |
-| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
-| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                    |
-| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                        |
-| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure          |
+| Export                               | Module                                             | Purpose                                                                     |
+| ------------------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------- |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`            | Zod schema for the compact seed (name, species, class, level, alignment)    |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`            | Seed content validation against the build context (UI-independent)          |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts`     | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts`     | Advisory weapon options from starting-equipment packages                    |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`        | Advisory spell ChoiceSet options at seed class/level                        |
+| `resolveAutomaticChoiceSelections`   | `automatic/resolve-automatic-choice-selections.ts` | Required ChoiceSet fill loop, with per-value `suggestedBy`                  |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`         | Seed, choice loop, magic items, weapon grants, constraint checks            |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -73,12 +74,22 @@ passed to finalize as engine options.
 ## Soft preferences
 
 `resolveNpcTemplateRecommendations` turns a user role, title recommendation, organization
-default, and species language affinities into ordered preferences. Commoner is the
-resolver-only fallback and is not written onto the draft. `toAutomaticNpcBuildPreferences`
-feeds `resolveAutomaticNpcBuild`.
+default, and species language affinities into ordered `SourcedRecommendation` lists.
+Species language order lives there, not in a second pass inside the filler.
+Commoner is the resolver-only fallback and is not written onto the draft.
+`toAutomaticNpcBuildPreferences` passes those lists through to `resolveAutomaticNpcBuild`.
+
+The required-ChoiceSet loop is `resolveAutomaticChoiceSelections`. It returns the draft,
+the resolved graph, and `suggestedBy` for each id the fill added (`[]` when the id came
+from canonical order). Seeded allowance ids are not attributed. `resolveAutomaticNpcBuild`
+runs that loop, then magic-item grants, required-weapon grants, and constraint checks.
 
 Fill order for each required ChoiceSet is hard constraints, then soft preferences, then
-the canonical first-eligible option. Already-held skills, tools, and languages are skipped.
+the canonical first-eligible option. Already-held skills, tools, and languages are skipped
+and do not count toward the required pick. Held ids come from finalize-equivalent
+proficiency assembly (`resolveHeldProficiencyKeys`), excluding the ChoiceSet being filled,
+so class-fixed items, ruleset languages, and earlier ChoiceSet selections are all visible
+to later fills.
 A preference that does not appear in the ChoiceSet is ignored. Soft preferences never fail
 a build.
 

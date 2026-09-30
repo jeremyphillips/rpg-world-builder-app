@@ -15,6 +15,19 @@ export const LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE: CharacterSelectionSource[] 
   { kind: 'characterCreation', sourceId: 'levelZeroNpcs', grantId: 'baseline' },
 ]
 
+/** Retained species languages are attributed to the species, not the level-0 baseline. */
+export const LEVEL_ZERO_SPECIES_LANGUAGE_GRANT_ID = 'language-affinities'
+
+export function levelZeroSpeciesLanguageSource(speciesId: string): CharacterSelectionSource[] {
+  return [
+    {
+      kind: 'speciesTrait',
+      sourceId: speciesId,
+      grantId: LEVEL_ZERO_SPECIES_LANGUAGE_GRANT_ID,
+    },
+  ]
+}
+
 /** Template training layered onto the campaign baseline. Classless drafts only. */
 export function levelZeroTemplateTraining(draft: CharacterBuilderDraft) {
   const templateId = draft.npcTemplateId

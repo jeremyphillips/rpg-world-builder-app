@@ -145,14 +145,14 @@ describe('resolveNpcTemplateRecommendations', () => {
     expect(chosen.classes).toEqual([{ id: 'srd-cc-5.2.1:fighter', sources: ['user'] }])
   })
 
-  it('flattens preferences in recommendation order', () => {
+  it('keeps sourced preferences in recommendation order', () => {
     const recommendations = resolveNpcTemplateRecommendations({
       level: 1,
       userTemplateId: 'scout',
       playableClasses,
     })
     const preferences = toAutomaticNpcBuildPreferences(recommendations)
-    expect(preferences.skillSlugs?.[0]).toBe('perception')
+    expect(preferences.skills?.[0]).toMatchObject({ id: 'perception', sources: ['template'] })
     expect(preferences.abilityPriority?.[0]).toBe('dex')
   })
 })

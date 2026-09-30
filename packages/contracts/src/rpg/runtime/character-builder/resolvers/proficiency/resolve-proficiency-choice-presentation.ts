@@ -43,8 +43,15 @@ export type ProficiencyHeadingSourceCoverage = 'owner' | 'feature' | 'generic'
 
 export type ProficiencyChoicePresentation = {
   heading: string
+  /** Semantic source description; must read without the heading. */
+  sourceLabel?: string
+  /** Builder density: sourceLabel only for feature/generic coverage. */
   sourceLine?: string
   headingSourceCoverage: ProficiencyHeadingSourceCoverage
+}
+
+export type ProficiencyChoiceSetPresentation = ProficiencyChoicePresentation & {
+  poolDescription: string
 }
 
 function choiceDomainFor(choiceType: ChoiceSet['choiceType']): ProficiencyChoiceDomain | undefined {
@@ -62,7 +69,7 @@ function genericHeadingForDomain(domain: ProficiencyChoiceDomain): string {
   return getProficiencyDomainLabel(domain)
 }
 
-function resolveSourceLine(
+function resolveSourceLabel(
   provenance: Pick<ChoiceSet, 'provenance'>['provenance'],
 ): string | undefined {
   if (!provenance) return undefined
@@ -101,21 +108,32 @@ function shouldShowSourceLine(coverage: ProficiencyHeadingSourceCoverage): boole
   return coverage === 'feature' || coverage === 'generic'
 }
 
-/** Resolves proficiency choice block heading and source line from ChoiceSet provenance. */
+/** Identity primitive: heading, semantic source, and Builder-gated source line. */
 export function resolveProficiencyChoicePresentation(
   choiceSet: Pick<ChoiceSet, 'choiceType' | 'provenance'>,
 ): ProficiencyChoicePresentation {
   const domain = choiceDomainFor(choiceSet.choiceType)
   const { heading, headingSourceCoverage } = resolveHeading(choiceSet.provenance, domain)
-  const resolvedSourceLine = resolveSourceLine(choiceSet.provenance)
+  const sourceLabel = resolveSourceLabel(choiceSet.provenance)
   const sourceLine =
-    shouldShowSourceLine(headingSourceCoverage) && resolvedSourceLine
-      ? resolvedSourceLine
-      : undefined
+    shouldShowSourceLine(headingSourceCoverage) && sourceLabel ? sourceLabel : undefined
 
-  return sourceLine
-    ? { heading, headingSourceCoverage, sourceLine }
-    : { heading, headingSourceCoverage }
+  return {
+    heading,
+    headingSourceCoverage,
+    ...(sourceLabel ? { sourceLabel } : {}),
+    ...(sourceLine ? { sourceLine } : {}),
+  }
+}
+
+/** Preferred UI-model consumer API for heading, source, and pool copy. */
+export function resolveProficiencyChoiceSetPresentation(
+  choiceSet: ChoiceSet,
+): ProficiencyChoiceSetPresentation {
+  return {
+    ...resolveProficiencyChoicePresentation(choiceSet),
+    poolDescription: formatProficiencyPoolDescription(choiceSet),
+  }
 }
 
 function proficiencyChoiceSourcePriority(choiceSet: ChoiceSet): number {

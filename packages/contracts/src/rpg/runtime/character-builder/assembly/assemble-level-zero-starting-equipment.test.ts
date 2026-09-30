@@ -91,11 +91,16 @@ describe('fillChoiceSetWithConstraintAwareSelection held skills', () => {
       draft: createEmptyCharacterBuilderDraft(),
       choiceSet,
       constraints: undefined,
-      preferences: { skillSlugs: ['athletics', 'perception'] },
+      preferences: {
+        skills: [
+          { id: 'athletics', sources: [] },
+          { id: 'perception', sources: [] },
+        ],
+      },
       heldKeys: new Set(['athletics']),
       characterClass: undefined,
       catalogIndex: {} as unknown as CharacterBuildCatalogIndex,
     })
-    expect(filled?.choiceSelections[choiceSet.id]).toEqual(['srd-cc-5.2.1:perception'])
+    expect(filled?.draft.choiceSelections[choiceSet.id]).toEqual(['srd-cc-5.2.1:perception'])
   })
 })

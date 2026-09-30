@@ -121,7 +121,12 @@ describe('resolveAutomaticNpcBuild', () => {
     const result = resolveAutomaticNpcBuild({
       seed: fighterSeed(),
       context,
-      preferences: { skillSlugs: ['athletics', 'acrobatics'] },
+      preferences: {
+        skills: [
+          { id: 'athletics', sources: [] },
+          { id: 'acrobatics', sources: [] },
+        ],
+      },
       allowanceSelections: { [choiceSetId]: selectedIds },
     })
 

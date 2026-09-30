@@ -3,17 +3,12 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../content/equipment'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
 import { getNpcTemplateEntry } from '../../../vocab/npc/npc-template'
-import { buildChoiceSetId, type ChoiceSet } from '../choice-set'
+import { buildChoiceSetId } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import { athleticsSkill, createCharacterBuildContext, dwarfSpecies } from '../test-fixtures'
 import { npcTemplateSkillChoiceSetId } from '../resolvers/npc-template/resolve-npc-template-role-choices'
 
-import {
-  npcStartingChoiceAllowanceIds,
-  pruneNpcStartingChoiceOverrides,
-  resolveNpcStartingChoiceAllowances,
-  resolveNpcStartingChoices,
-} from './resolve-npc-starting-choices'
+import { resolveNpcStartingChoices } from './resolve-npc-starting-choices'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -76,25 +71,6 @@ function guardContext(): CharacterBuildContext {
   }
 }
 
-function skillChoiceSet(id: string, min: number): ChoiceSet {
-  return {
-    id,
-    sourceType: 'npcTemplate',
-    sourceId: 'guard',
-    choiceType: 'skillProficiency',
-    label: 'Choose skills',
-    min,
-    max: min,
-    required: true,
-    options: [
-      { id: athleticsSkill.id, label: 'Athletics' },
-      { id: perception.id, label: 'Perception' },
-      { id: stealth.id, label: 'Stealth' },
-    ],
-    provenance: { ownerKind: 'npcTemplate', ownerLabel: 'Guard' },
-  }
-}
-
 describe('resolveNpcStartingChoices', () => {
   const context = guardContext()
   const seed = {
@@ -103,8 +79,16 @@ describe('resolveNpcStartingChoices', () => {
     npcTemplateId: 'guard' as const,
   }
   const preferences = {
-    skillSlugs: ['perception', 'athletics', 'intimidation', 'insight'],
-    toolSlugs: ['thieves-tools', 'disguise-kit'],
+    skills: [
+      { id: 'perception', sources: ['template' as const] },
+      { id: 'athletics', sources: ['template' as const] },
+      { id: 'intimidation', sources: ['template' as const] },
+      { id: 'insight', sources: ['template' as const] },
+    ],
+    tools: [
+      { id: 'thieves-tools', sources: ['template' as const] },
+      { id: 'disguise-kit', sources: ['template' as const] },
+    ],
   }
 
   it('shows Guard kit as a fixed grant and a 2-skill canonical fill', () => {
@@ -112,26 +96,23 @@ describe('resolveNpcStartingChoices', () => {
       context,
       seed,
       preferences,
-      suggestionOwnerLabel: 'Guard',
     })
 
-    const equipment = choices.entries.find((entry) => entry.kind === 'equipment')
+    const equipment = choices.contributions.find((entry) => entry.category === 'equipment')
     expect(equipment).toMatchObject({
-      ownership: 'fixed-grant',
-      editable: false,
+      mechanic: 'fixed-grant',
       selectedIds: [spear.id],
-      provenance: { ownerKind: 'npcTemplate', ownerLabel: 'Guard' },
+      owner: { ownerKind: 'npcTemplate', ownerLabel: 'Guard' },
     })
 
-    const skills = choices.entries.find((entry) => entry.kind === 'skill')
+    const skills = choices.contributions.find((entry) => entry.category === 'skill')
     expect(skills).toMatchObject({
-      ownership: 'allowance-fill',
-      editable: true,
+      mechanic: 'choice-allowance',
       overridden: false,
       choiceSetId: npcTemplateSkillChoiceSetId('guard'),
-      allowance: { chosen: 2, required: 2 },
+      allowance: { min: 2, max: 2 },
       selectedIds: [perception.id, athleticsSkill.id],
-      provenance: { suggestionOwnerLabel: 'Guard', suggestedBy: 'template' },
+      owner: { ownerKind: 'npcTemplate', ownerLabel: 'Guard' },
     })
     expect(getNpcTemplateEntry('guard')?.recommendations.skillSlugs[0]).toBe('perception')
   })
@@ -142,41 +123,44 @@ describe('resolveNpcStartingChoices', () => {
       context,
       seed,
       preferences,
-      suggestionOwnerLabel: 'Guard',
       startingChoiceOverrides: {
         [choiceSetId]: [athleticsSkill.id, stealth.id],
       },
     })
 
-    const skills = choices.entries.find((entry) => entry.choiceSetId === choiceSetId)
+    const skills = choices.contributions.find(
+      (entry) => entry.mechanic === 'choice-allowance' && entry.choiceSetId === choiceSetId,
+    )
     expect(skills?.selectedIds).toEqual([athleticsSkill.id, stealth.id])
-    expect(skills?.overridden).toBe(true)
-    expect(skills?.provenance.suggestedBy).toBeUndefined()
+    expect(skills?.mechanic === 'choice-allowance' ? skills.overridden : false).toBe(true)
+    expect(skills?.mechanic === 'choice-allowance' ? skills.suggestedBy : undefined).toBeUndefined()
     expect(skills?.selectedIds).not.toContain(perception.id)
   })
 
   it('restores the canonical fill when the override key is removed', () => {
+    const choiceSetId = npcTemplateSkillChoiceSetId('guard')
     const withOverride = resolveNpcStartingChoices({
       context,
       seed,
       preferences,
       startingChoiceOverrides: {
-        [npcTemplateSkillChoiceSetId('guard')]: [athleticsSkill.id, stealth.id],
+        [choiceSetId]: [athleticsSkill.id, stealth.id],
       },
     })
-    const choiceSetId = npcTemplateSkillChoiceSetId('guard')
-    expect(
-      withOverride.entries.find((entry) => entry.choiceSetId === choiceSetId)?.overridden,
-    ).toBe(true)
+    const overridden = withOverride.contributions.find(
+      (entry) => entry.mechanic === 'choice-allowance' && entry.choiceSetId === choiceSetId,
+    )
+    expect(overridden?.mechanic === 'choice-allowance' ? overridden.overridden : false).toBe(true)
 
     const restored = resolveNpcStartingChoices({
       context,
       seed,
       preferences,
-      suggestionOwnerLabel: 'Guard',
     })
     expect(
-      restored.entries.find((entry) => entry.choiceSetId === choiceSetId)?.selectedIds,
+      restored.contributions.find(
+        (entry) => entry.mechanic === 'choice-allowance' && entry.choiceSetId === choiceSetId,
+      )?.selectedIds,
     ).toEqual([perception.id, athleticsSkill.id])
   })
 
@@ -188,72 +172,145 @@ describe('resolveNpcStartingChoices', () => {
       requiredWeaponIds: [spear.id, longsword.id, spear.id],
     })
 
-    const weapons = choices.entries.find((entry) => entry.kind === 'weapon')
+    const weapons = choices.contributions.find((entry) => entry.category === 'weapon')
     expect(weapons?.selectedIds).toEqual([longsword.id])
-    expect(weapons?.ownership).toBe('manual')
+    expect(weapons?.mechanic).toBe('explicit-constraint')
   })
 
   it('drops an override when its choice-set id is no longer active', () => {
-    const active = new Set(
-      npcStartingChoiceAllowanceIds(resolveNpcStartingChoices({ context, seed, preferences })),
-    )
-    const pruned = pruneNpcStartingChoiceOverrides(
-      {
-        [npcTemplateSkillChoiceSetId('guard')]: [athleticsSkill.id, stealth.id],
+    const choiceSetId = npcTemplateSkillChoiceSetId('guard')
+    const resolved = resolveNpcStartingChoices({
+      context,
+      seed,
+      preferences,
+      startingChoiceOverrides: {
+        [choiceSetId]: [athleticsSkill.id, stealth.id],
         'npcTemplate:criminal:skills': [stealth.id],
       },
-      active,
+    })
+    expect(resolved.removedOverrideIds).toEqual(['npcTemplate:criminal:skills'])
+    const skills = resolved.contributions.find(
+      (entry) => entry.mechanic === 'choice-allowance' && entry.choiceSetId === choiceSetId,
     )
-    expect(pruned).toEqual({
-      [npcTemplateSkillChoiceSetId('guard')]: [athleticsSkill.id, stealth.id],
-    })
+    expect(skills?.selectedIds).toEqual([athleticsSkill.id, stealth.id])
   })
 
-  it('keeps two skill allowances independent', () => {
-    const firstId = buildChoiceSetId('npcTemplate', 'guard', 'skills')
-    const secondId = buildChoiceSetId('class', 'srd-cc-5.2.1:fighter', 'class-skills')
-    const entries = resolveNpcStartingChoiceAllowances({
-      choiceSets: [skillChoiceSet(firstId, 2), skillChoiceSet(secondId, 1)],
-      overrides: {
-        [firstId]: [athleticsSkill.id, stealth.id],
-        [secondId]: [perception.id],
+  it('keeps Elf and Fighter skill overrides independent', () => {
+    const fighterContext = {
+      ...context,
+      catalog: {
+        ...context.catalog,
+        species: [
+          ...context.catalog.species,
+          {
+            ...dwarfSpecies,
+            id: `${RULESET}:elf`,
+            slug: 'elf',
+            name: 'Elf',
+            languageAffinities: ['elvish'],
+            traits: [
+              {
+                kind: 'custom' as const,
+                id: 'keen-senses',
+                name: 'Keen Senses',
+                description: '<p>Choose one skill.</p>',
+                grantGroups: [
+                  {
+                    grants: [
+                      {
+                        kind: 'skillProficiency' as const,
+                        grant: {
+                          kind: 'choice' as const,
+                          choose: 1,
+                          pool: {
+                            source: 'explicit' as const,
+                            skillIds: ['perception', 'athletics', 'stealth'],
+                          },
+                        },
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        classes: [
+          ...context.catalog.classes,
+          {
+            id: `${RULESET}:fighter`,
+            slug: 'fighter',
+            rulesetId: RULESET,
+            source: 'system' as const,
+            status: 'published' as const,
+            campaignId: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            name: 'Fighter',
+            primaryAbilities: ['str' as const],
+            hitDie: 10 as const,
+            proficiencies: {
+              savingThrows: ['str' as const, 'con' as const],
+              armor: { categories: ['light' as const], items: [] },
+              weapons: { categories: ['simple' as const], items: [] },
+              skills: { categories: [], items: [] },
+            },
+            characterCreation: {
+              proficiencies: {
+                skills: {
+                  choices: [
+                    {
+                      id: 'class-skills',
+                      choose: 1,
+                      from: ['perception', 'athletics', 'stealth'],
+                    },
+                  ],
+                },
+              },
+            },
+            features: [],
+          },
+        ],
       },
-      preferences: { skillSlugs: ['perception', 'athletics'] },
+    }
+    const keenId = `species:${RULESET}:elf:trait:keen-senses:skillProficiency`
+    const fighterId = buildChoiceSetId('class', `${RULESET}:fighter`, 'class-skills')
+    const choices = resolveNpcStartingChoices({
+      context: fighterContext,
+      seed: { speciesId: `${RULESET}:elf`, classId: `${RULESET}:fighter`, level: 1 },
+      preferences,
+      startingChoiceOverrides: {
+        [keenId]: [perception.id],
+        [fighterId]: [athleticsSkill.id],
+      },
     })
-
-    expect(entries.map((entry) => entry.choiceSetId)).toEqual([firstId, secondId])
-    expect(entries[0]?.selectedIds).toEqual([athleticsSkill.id, stealth.id])
-    expect(entries[1]?.selectedIds).toEqual([perception.id])
+    const keen = choices.contributions.find((entry) => entry.id === keenId)
+    const fighter = choices.contributions.find(
+      (entry) => entry.mechanic === 'choice-allowance' && entry.choiceSetId === fighterId,
+    )
+    expect(keen?.selectedIds).toEqual([perception.id])
+    expect(fighter?.selectedIds).toEqual([athleticsSkill.id])
   })
 
-  it('treats a criminal tool recommendation as an allowance fill', () => {
-    const toolSet: ChoiceSet = {
-      id: buildChoiceSetId('npcTemplate', 'criminal', 'tools'),
-      sourceType: 'npcTemplate',
-      sourceId: 'criminal',
-      choiceType: 'toolProficiency',
-      label: 'Choose 1 role tool',
-      min: 1,
-      max: 1,
-      required: true,
-      options: [
-        { id: `${RULESET}:thieves-tools`, label: "Thieves' Tools" },
-        { id: `${RULESET}:disguise-kit`, label: 'Disguise Kit' },
-      ],
-      provenance: { ownerKind: 'npcTemplate', ownerLabel: 'Criminal' },
+  it('records scout arrows with their kit quantity', () => {
+    const arrows = equipmentSchema.parse({
+      ...spear,
+      id: `${RULESET}:arrows`,
+      slug: 'arrows',
+      name: 'Arrows',
+    })
+    const scoutContext = {
+      ...context,
+      catalog: { ...context.catalog, equipment: [...context.catalog.equipment, arrows] },
     }
-    const [entry] = resolveNpcStartingChoiceAllowances({
-      choiceSets: [toolSet],
-      preferences: { toolSlugs: ['thieves-tools', 'disguise-kit'] },
-      suggestionOwnerLabel: 'Criminal',
+    const choices = resolveNpcStartingChoices({
+      context: scoutContext,
+      seed: { speciesId: dwarfSpecies.id, level: 0, npcTemplateId: 'scout' },
+      preferences,
     })
-
-    expect(entry).toMatchObject({
-      kind: 'tool',
-      ownership: 'allowance-fill',
-      editable: true,
-      selectedIds: [`${RULESET}:thieves-tools`],
-      allowance: { required: 1, chosen: 1 },
-    })
+    const kit = choices.contributions.find(
+      (entry) => entry.id === 'fixed:equipment:npcTemplate:scout:kit',
+    )
+    expect(kit?.mechanic === 'fixed-grant' ? kit.quantities?.[arrows.id] : undefined).toBe(20)
   })
 })

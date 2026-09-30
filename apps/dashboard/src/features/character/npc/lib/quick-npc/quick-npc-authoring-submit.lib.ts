@@ -1,5 +1,4 @@
 import {
-  getNpcTemplateEntry,
   npcStartingChoiceAllowanceSelections,
   npcStartingChoiceIncompleteOverride,
   npcStartingChoiceManualConstraints,
@@ -18,10 +17,7 @@ import {
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
-import {
-  buildQuickNpcAutomaticPreferences,
-  resolveQuickNpcTemplateRecommendations,
-} from './quick-npc-template-recommendations.lib'
+import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
 
 function resolveQuickNpcMembershipPayload(
   createContext: Extract<QuickNpcCreateContext, { kind: 'organization-member' }>,
@@ -66,13 +62,6 @@ export function buildQuickNpcAuthoringCreateInput(args: {
     organizationTemplateId: organization?.members?.npcTemplateId,
   }
   const preferences = buildQuickNpcAutomaticPreferences(preferenceArgs)
-  const recommendations = resolveQuickNpcTemplateRecommendations({
-    ...preferenceArgs,
-    lockInUserClass: true,
-  })
-  const templateLabel = recommendations.npcTemplateId
-    ? getNpcTemplateEntry(recommendations.npcTemplateId)?.label
-    : undefined
   const startingChoices = resolveNpcStartingChoices({
     context: args.buildContext,
     seed: buildQuickNpcSeed(values),
@@ -80,7 +69,6 @@ export function buildQuickNpcAuthoringCreateInput(args: {
     requiredWeaponIds: values.requiredWeaponIds,
     requiredSpellIds: values.requiredSpellIds,
     preferences,
-    ...(templateLabel ? { suggestionOwnerLabel: templateLabel } : {}),
   })
   const incomplete = npcStartingChoiceIncompleteOverride(startingChoices)
   if (incomplete) {

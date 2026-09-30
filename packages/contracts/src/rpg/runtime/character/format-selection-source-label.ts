@@ -235,6 +235,15 @@ function resolveCharacterCreationProvenance(
   source: CharacterSelectionSource,
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): SelectionSourceProvenance {
+  if (source.sourceId === 'levelZeroNpcs') {
+    return {
+      sourceKind: 'characterCreation',
+      ownerKind: 'campaign',
+      primaryLabel: 'Level 0',
+      ownerLabel: 'Level 0',
+    }
+  }
+
   if (source.grantId === LANGUAGE_GRANTS_SOURCE_ID) {
     const primaryLabel = resolveOriginLanguageGrantLabel(catalogIndex)
 
@@ -320,7 +329,7 @@ export function formatChoiceSetProvenanceParentContext(
     case 'feat':
       return `${provenance.ownerLabel} ${getContentTypeSentenceForm('feats')}`
     case 'npcTemplate':
-      return provenance.ownerLabel
+      return `${provenance.ownerLabel} role`
     default:
       return undefined
   }
@@ -390,6 +399,7 @@ function formatCompactSingleSelectionSourceLabel(
   }
 
   if (source.kind === 'characterCreation') {
+    if (source.sourceId === 'levelZeroNpcs') return 'Level 0'
     return ORIGIN_PROVENANCE_LABEL
   }
 

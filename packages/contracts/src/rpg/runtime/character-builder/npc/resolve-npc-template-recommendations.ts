@@ -1,6 +1,7 @@
 import type { CharacterClass } from '../../../content/classes/class'
 import type { AutomaticNpcBuildPreferences } from '../automatic/automatic-npc-build-seed'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
+import { type NpcRecommendationSource, type SourcedRecommendation } from '../sourced-recommendation'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import {
   getNpcTemplateEntry,
@@ -13,21 +14,11 @@ import {
   type SourcedClassRecommendation,
 } from '../../character/organization-membership/organization-member-class-recommendations'
 
-export const NPC_RECOMMENDATION_SOURCES = [
-  'user',
-  'title',
-  'organization',
-  'template',
-  'species',
-  'campaign',
-] as const
-
-export type NpcRecommendationSource = (typeof NPC_RECOMMENDATION_SOURCES)[number]
-
-export type SourcedRecommendation = {
-  id: string
-  sources: NpcRecommendationSource[]
-}
+export {
+  NPC_RECOMMENDATION_SOURCES,
+  type NpcRecommendationSource,
+  type SourcedRecommendation,
+} from '../sourced-recommendation'
 
 export type NpcTemplateRecommendationTitle = {
   templateId?: NpcTemplateId
@@ -215,14 +206,14 @@ export function resolveNpcTemplateRecommendations(
   }
 }
 
-/** Flattens a recommendation set into the soft-preference input of automatic build. */
+/** Copies a recommendation set into the soft-preference input of automatic build. */
 export function toAutomaticNpcBuildPreferences(
   recommendations: NpcTemplateRecommendationSet,
 ): AutomaticNpcBuildPreferences {
   return {
     abilityPriority: recommendations.abilityPriority,
-    skillSlugs: recommendations.skills.map((entry) => entry.id),
-    toolSlugs: recommendations.tools.map((entry) => entry.id),
-    languageIds: recommendations.languages.map((entry) => entry.id),
+    skills: recommendations.skills,
+    tools: recommendations.tools,
+    languages: recommendations.languages,
   }
 }

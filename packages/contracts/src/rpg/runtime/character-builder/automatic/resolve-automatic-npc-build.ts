@@ -4,8 +4,8 @@ import { resolveAbilityGenerationMethod } from '../ability/ability-generation'
 import { resolveBuilderStandardArray } from '../ability/resolve-builder-standard-array'
 import { resolveClassAbilityScoreOrder } from '../ability/resolve-class-ability-score-order'
 import { resolveStandardArrayAssignment } from '../../../primitives/standard-array'
-import { buildChoiceSetId, isChoiceSetSatisfied, type ChoiceSet } from '../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import type { ChoiceSet } from '../choice-set'
 import type { CharacterClass } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
@@ -15,35 +15,26 @@ import {
   magicItemGrantIncompleteIssueCode,
 } from '../resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveMagicItemAcquisitionState } from '../resolvers/equipment/resolve-magic-item-acquisition-state'
+import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
 import {
   readMagicItemSelections,
   resolveMagicItemAllowanceEligibility,
   resolveMagicItemGrantProgress,
   wouldViolateDuplicatePolicy,
 } from '../resolvers/equipment/resolve-magic-item-grant-progress'
-import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
-import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
-import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 
 import {
-  fillChoiceSetWithConstraintAwareSelection,
-  automaticNpcConstraintFailureIssue,
   applyRequiredWeaponEquipmentGrants,
   validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
+import { resolveAutomaticChoiceSelections } from './resolve-automatic-choice-selections'
 import {
   normalizeAutomaticNpcBuildConstraints,
   type AutomaticNpcBuildConstraints,
 } from './automatic-npc-build-constraints'
-import { collectSourcedGrants } from '../assembly/collect-sourced-grants'
-import {
-  levelZeroBaselineLanguageIds,
-  levelZeroSpeciesLanguageIds,
-} from '../assembly/level-zero-baseline-proficiency-entries'
-import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import {
   validateAutomaticNpcBuildSeed,
@@ -95,12 +86,6 @@ export type ResolveAutomaticNpcBuildArgs = {
   context: CharacterBuildContext
 }
 
-/**
- * Safety guard against resolver bugs only — termination is progress-based
- * (every iteration adds selections, marks equipment skipped once, or fails).
- */
-const AUTOMATIC_BUILD_ITERATION_CEILING = 64
-
 // Level 0 Quick NPC ability assignment uses the level-based standard array resolver.
 function mergeClassAndTemplateAbilityOrder(
   classPrimary: readonly Ability[],
@@ -128,15 +113,15 @@ function mergeClassAndTemplateAbilityOrder(
 }
 
 function seedAbilityScores(
-  seed: AutomaticNpcBuildSeed,
+  level: AutomaticNpcBuildSeed['level'],
   context: CharacterBuildContext,
   characterClass: CharacterClass | undefined,
   preferences: AutomaticNpcBuildPreferences | undefined,
 ): CharacterBuilderDraft['abilities']['scores'] {
-  const standardArray = resolveBuilderStandardArray(context, seed.level)
+  const standardArray = resolveBuilderStandardArray(context, level)
   const templatePriority = preferences?.abilityPriority
 
-  if (seed.level === 0) {
+  if (level === 0) {
     if (templatePriority && templatePriority.length === ABILITY_IDS.length) {
       return resolveStandardArrayAssignment({
         standardArray,
@@ -146,7 +131,7 @@ function seedAbilityScores(
     return deriveDeterministicAbilityAssignment([], standardArray)
   }
 
-  if (characterClass && isClassProgressionApplicable(seed.level)) {
+  if (characterClass && isClassProgressionApplicable(level)) {
     const classOrder = resolveClassAbilityScoreOrder({
       abilityScoreOrder: characterClass.characterCreation?.abilityScoreOrder,
       primaryAbilities: characterClass.primaryAbilities,
@@ -163,10 +148,21 @@ function seedAbilityScores(
   return deriveDeterministicAbilityAssignment(characterClass?.primaryAbilities ?? [], standardArray)
 }
 
-function seedDraft(
-  seed: AutomaticNpcBuildSeed,
+export type AutomaticChoiceDraftSeed = {
+  speciesId: string
+  classId?: string
+  level: AutomaticNpcBuildSeed['level']
+  npcTemplateId?: AutomaticNpcBuildSeed['npcTemplateId']
+  name?: string
+  alignment?: AutomaticNpcBuildSeed['alignment']
+  gender?: AutomaticNpcBuildSeed['gender']
+}
+
+/** Structural draft shared by automatic build and the starting-choice projection. */
+export function seedAutomaticChoiceDraft(
+  seed: AutomaticChoiceDraftSeed,
   context: CharacterBuildContext,
-  preferences: AutomaticNpcBuildPreferences | undefined,
+  preferences?: AutomaticNpcBuildPreferences,
 ): CharacterBuilderDraft {
   const abilityRules = context.characterCreationRules.abilityGeneration
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
@@ -175,7 +171,12 @@ function seedDraft(
   const empty = createEmptyCharacterBuilderDraft()
   return {
     ...empty,
-    identity: { name: seed.name.trim(), alignment: seed.alignment, gender: seed.gender },
+    identity: {
+      ...empty.identity,
+      ...(seed.name !== undefined ? { name: seed.name.trim() } : {}),
+      ...(seed.alignment !== undefined ? { alignment: seed.alignment } : {}),
+      ...(seed.gender !== undefined ? { gender: seed.gender } : {}),
+    },
     species: { speciesId: seed.speciesId },
     class: {
       ...(seed.classId && isClassProgressionApplicable(seed.level)
@@ -186,145 +187,10 @@ function seedDraft(
     ...(seed.npcTemplateId ? { npcTemplateId: seed.npcTemplateId } : {}),
     abilities: {
       method: resolveAbilityGenerationMethod(abilityRules),
-      scores: seedAbilityScores(seed, context, characterClass, preferences),
+      scores: seedAbilityScores(seed.level, context, characterClass, preferences),
     },
     equipment: cloneEquipmentDraftChannel(empty),
   }
-}
-
-function addHeldKey(keys: Set<string>, value: string | undefined): void {
-  if (!value) return
-  keys.add(value)
-  const separator = value.lastIndexOf(':')
-  if (separator >= 0) keys.add(value.slice(separator + 1))
-}
-
-function addChoiceSelectionKeys(keys: Set<string>, draft: CharacterBuilderDraft): void {
-  for (const selections of Object.values(draft.choiceSelections)) {
-    for (const optionId of selections ?? []) addHeldKey(keys, optionId)
-  }
-}
-
-function addFixedGrantKeys(
-  keys: Set<string>,
-  draft: CharacterBuilderDraft,
-  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
-): void {
-  const characterClass = draft.class.classId
-    ? catalogIndex.classes.get(draft.class.classId)
-    : undefined
-  for (const sourced of collectSourcedGrants(draft, catalogIndex, characterClass)) {
-    const grant = sourced.grant
-    if (grant.kind === 'skillProficiency' && grant.grant.kind === 'fixed') {
-      for (const skillId of grant.grant.skillIds) addHeldKey(keys, skillId)
-    }
-    if (grant.kind === 'toolProficiency' && grant.grant.kind === 'fixed') {
-      for (const toolId of grant.grant.toolSlugs ?? []) addHeldKey(keys, toolId)
-    }
-  }
-}
-
-function addLevelZeroLanguageKeys(
-  keys: Set<string>,
-  draft: CharacterBuilderDraft,
-  context: CharacterBuildContext,
-  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
-): void {
-  if (!isBuilderLevelZeroClassless(draft, context)) return
-  const species = draft.species.speciesId
-    ? catalogIndex.species.get(draft.species.speciesId)
-    : undefined
-  const rules = context.characterCreationRules.levelZeroNpcs
-  for (const languageId of levelZeroBaselineLanguageIds(rules, context.catalog.languages)) {
-    addHeldKey(keys, languageId)
-  }
-  for (const languageId of levelZeroSpeciesLanguageIds(species, rules)) {
-    addHeldKey(keys, languageId)
-  }
-}
-
-function collectHeldProficiencyKeys(
-  draft: CharacterBuilderDraft,
-  context: CharacterBuildContext,
-  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
-): Set<string> {
-  const keys = new Set<string>()
-  addChoiceSelectionKeys(keys, draft)
-  addFixedGrantKeys(keys, draft, catalogIndex)
-  addLevelZeroLanguageKeys(keys, draft, context, catalogIndex)
-  return keys
-}
-
-function languagePreferencesWithSpecies(
-  draft: CharacterBuilderDraft,
-  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
-  preferences: AutomaticNpcBuildPreferences | undefined,
-): AutomaticNpcBuildPreferences | undefined {
-  const species = draft.species.speciesId
-    ? catalogIndex.species.get(draft.species.speciesId)
-    : undefined
-  const speciesLanguages = species?.languageAffinities ?? []
-  if (speciesLanguages.length === 0 && !preferences) return preferences
-
-  const seen = new Set<string>()
-  const languageIds: string[] = []
-  for (const languageId of [...speciesLanguages, ...(preferences?.languageIds ?? [])]) {
-    if (seen.has(languageId)) continue
-    seen.add(languageId)
-    languageIds.push(languageId)
-  }
-
-  return { ...preferences, languageIds }
-}
-
-function isEquipmentSkipped(draft: CharacterBuilderDraft): boolean {
-  return draft.equipment?.skipped === true
-}
-
-function findUnsatisfiedRequiredChoiceSet(
-  draft: CharacterBuilderDraft,
-  choiceSets: readonly ChoiceSet[],
-): ChoiceSet | undefined {
-  return choiceSets.find(
-    (choiceSet) =>
-      choiceSet.required &&
-      !(isEquipmentSkipped(draft) && getChoiceSetStepId(choiceSet) === 'equipment') &&
-      !isChoiceSetSatisfied(choiceSet, draft.choiceSelections[choiceSet.id] ?? []),
-  )
-}
-
-/**
- * Mirrors the builder's escape hatch: when the class's top-level starting
- * equipment ChoiceSet has no options, the build continues without starting
- * equipment (`equipment.skipped`) instead of failing.
- */
-function isEmptyTopLevelStartingEquipmentChoiceSet(
-  choiceSet: ChoiceSet,
-  draft: CharacterBuilderDraft,
-): boolean {
-  return (
-    choiceSet.options.length === 0 &&
-    draft.class.classId !== undefined &&
-    choiceSet.id === startingEquipmentChoiceSetId(draft.class.classId)
-  )
-}
-
-function heritageChoiceSetIdFor(choiceSet: ChoiceSet): string {
-  return buildChoiceSetId('species', choiceSet.sourceId, 'heritage')
-}
-
-function applyChoiceSetSelection(
-  choiceSet: ChoiceSet,
-  next: CharacterBuilderDraft,
-): CharacterBuilderDraft {
-  const selections = next.choiceSelections[choiceSet.id] ?? []
-
-  // Heritage selections dual-write species.heritageId (mirrors the species step).
-  if (choiceSet.sourceType === 'species' && choiceSet.id === heritageChoiceSetIdFor(choiceSet)) {
-    return { ...next, species: { ...next.species, heritageId: selections[0] } }
-  }
-
-  return next
 }
 
 type MagicItemGrantCompletion =
@@ -452,7 +318,7 @@ export function resolveAutomaticNpcBuild({
 
   const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
 
-  let draft = seedDraft(seed, context, preferences)
+  let draft = seedAutomaticChoiceDraft(seed, context, preferences)
   if (allowanceSelections) {
     const choiceSelections = { ...draft.choiceSelections }
     for (const [choiceSetId, selectedIds] of Object.entries(allowanceSelections)) {
@@ -460,73 +326,39 @@ export function resolveAutomaticNpcBuild({
     }
     draft = { ...draft, choiceSelections }
   }
+
+  const choices = resolveAutomaticChoiceSelections({
+    draft,
+    context,
+    preferences,
+    constraints: normalizedConstraints,
+  })
+  if (!choices.ok) return choices
+
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  const resolvedPreferences = languagePreferencesWithSpecies(draft, catalogIndex, preferences)
+  const completion = completeMagicItemGrantSelections(choices.draft, context)
+  if (!completion.ok) return completion
 
-  for (let iteration = 0; iteration < AUTOMATIC_BUILD_ITERATION_CEILING; iteration += 1) {
-    const choiceSets = resolveAvailableChoices(draft, context)
-    const target = findUnsatisfiedRequiredChoiceSet(draft, choiceSets)
+  const grantCompletion = applyRequiredWeaponEquipmentGrants({
+    draft: completion.draft,
+    constraints: normalizedConstraints,
+    context,
+    catalogIndex,
+  })
+  if (!grantCompletion.ok) return grantCompletion
 
-    if (!target) {
-      const completion = completeMagicItemGrantSelections(draft, context)
-      if (!completion.ok) return completion
-
-      const grantCompletion = applyRequiredWeaponEquipmentGrants({
-        draft: completion.draft,
-        constraints: normalizedConstraints,
-        context,
-        catalogIndex,
-      })
-      if (!grantCompletion.ok) return grantCompletion
-
-      const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
-        grantCompletion.draft,
-        normalizedConstraints,
-        catalogIndex,
-      )
-      if (constraintIssue) {
-        return { ok: false, issues: [constraintIssue] }
-      }
-
-      return {
-        ok: true,
-        draft: grantCompletion.draft,
-        resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
-      }
-    }
-
-    if (isEmptyTopLevelStartingEquipmentChoiceSet(target, draft)) {
-      draft = { ...draft, equipment: cloneEquipmentDraftChannel(draft, { skipped: true }) }
-      continue
-    }
-
-    const characterClass =
-      target.sourceType === 'class' ? catalogIndex.classes.get(target.sourceId) : undefined
-    const next = fillChoiceSetWithConstraintAwareSelection({
-      draft,
-      choiceSet: target,
-      constraints: normalizedConstraints,
-      preferences: resolvedPreferences,
-      heldKeys: collectHeldProficiencyKeys(draft, context, catalogIndex),
-      characterClass,
-      catalogIndex,
-    })
-    if (next === null) {
-      return {
-        ok: false,
-        issues: [automaticNpcConstraintFailureIssue(normalizedConstraints, target, catalogIndex)],
-      }
-    }
-    draft = applyChoiceSetSelection(target, next)
+  const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
+    grantCompletion.draft,
+    normalizedConstraints,
+    catalogIndex,
+  )
+  if (constraintIssue) {
+    return { ok: false, issues: [constraintIssue] }
   }
 
   return {
-    ok: false,
-    issues: [
-      validationIssue(
-        'automatic_resolution_stalled',
-        characterBuilderValidationMessages.automaticResolutionStalled(),
-      ),
-    ],
+    ok: true,
+    draft: grantCompletion.draft,
+    resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
   }
 }

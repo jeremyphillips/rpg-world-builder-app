@@ -15,6 +15,8 @@ import {
   inventoryContainsEquipmentId,
 } from '../resolvers/equipment/derive-equipment-draft-entries'
 import { ensureEquipmentGrant } from '../resolvers/equipment/ensure-equipment-grant'
+import { optionIdentityKeys, optionIsHeld } from '../option-identity'
+import type { NpcRecommendationSource, SourcedRecommendation } from '../sourced-recommendation'
 import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
 import type { AutomaticNpcBuildPreferences } from './automatic-npc-build-seed'
 import { startingEquipmentOptionProvidesWeapon } from './list-reachable-starting-weapons'
@@ -99,22 +101,15 @@ function selectStartingEquipmentPackageIds(args: {
   return fallback.length > 0 ? fallback : null
 }
 
-function preferenceSlugsForChoiceSet(
+function preferenceEntriesForChoiceSet(
   choiceSet: ChoiceSet,
   preferences: AutomaticNpcBuildPreferences | undefined,
-): readonly string[] {
+): readonly SourcedRecommendation[] {
   if (!preferences) return []
-  if (choiceSet.choiceType === 'skillProficiency') return preferences.skillSlugs ?? []
-  if (choiceSet.choiceType === 'toolProficiency') return preferences.toolSlugs ?? []
-  if (choiceSet.choiceType === 'language') return preferences.languageIds ?? []
+  if (choiceSet.choiceType === 'skillProficiency') return preferences.skills ?? []
+  if (choiceSet.choiceType === 'toolProficiency') return preferences.tools ?? []
+  if (choiceSet.choiceType === 'language') return preferences.languages ?? []
   return []
-}
-
-function optionIdentityKeys(optionId: string): string[] {
-  const keys = [optionId]
-  const separator = optionId.lastIndexOf(':')
-  if (separator >= 0) keys.push(optionId.slice(separator + 1))
-  return keys
 }
 
 const HELD_SKIP_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
@@ -123,32 +118,66 @@ const HELD_SKIP_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
   'language',
 ])
 
-function optionIsHeld(
+function choiceOptionIsHeld(
   choiceSet: ChoiceSet,
   optionId: string,
   heldKeys: ReadonlySet<string> | undefined,
 ): boolean {
   if (!HELD_SKIP_CHOICE_TYPES.has(choiceSet.choiceType)) return false
   if (!heldKeys || heldKeys.size === 0) return false
-  return optionIdentityKeys(optionId).some((key) => heldKeys.has(key))
+  return optionIsHeld(optionId, heldKeys)
 }
 
-function softPreferenceOptionIds(
-  choiceSet: ChoiceSet,
-  preferences: AutomaticNpcBuildPreferences | undefined,
-  heldKeys: ReadonlySet<string> | undefined,
-): string[] {
-  const slugs = preferenceSlugsForChoiceSet(choiceSet, preferences)
-  if (slugs.length === 0) return []
+function matchChoiceOption(choiceSet: ChoiceSet, idOrSlug: string): string | undefined {
+  return choiceSet.options.find((option) => optionIdentityKeys(option.id).includes(idOrSlug))?.id
+}
 
-  const preferred: string[] = []
-  for (const slug of slugs) {
-    const option = choiceSet.options.find((entry) => optionIdentityKeys(entry.id).includes(slug))
-    if (!option || preferred.includes(option.id) || optionIsHeld(choiceSet, option.id, heldKeys))
-      continue
-    preferred.push(option.id)
+/**
+ * Preference-then-canonical fill for one ChoiceSet.
+ * Already-held options are skipped and do not satisfy the required count.
+ * `suggestedBy` records the sources for each added id. Canonical order is `[]`.
+ * Ids already present in `current` are not attributed.
+ */
+export function selectChoiceSetFill(args: {
+  choiceSet: ChoiceSet
+  current: readonly string[]
+  preferences?: AutomaticNpcBuildPreferences
+  heldKeys?: ReadonlySet<string>
+  hardPreferredIds?: readonly string[]
+}): {
+  additions: string[]
+  suggestedBy: Record<string, readonly NpcRecommendationSource[]>
+} {
+  const needed = Math.max(0, args.choiceSet.min - args.current.length)
+  if (needed === 0) return { additions: [], suggestedBy: {} }
+
+  const preferences = preferenceEntriesForChoiceSet(args.choiceSet, args.preferences)
+  const selected = new Set(args.current)
+  const additions: string[] = []
+  const suggestedBy: Record<string, readonly NpcRecommendationSource[]> = {}
+
+  function take(optionId: string, sources: readonly NpcRecommendationSource[] | undefined): void {
+    if (additions.length >= needed) return
+    if (selected.has(optionId) || additions.includes(optionId)) return
+    if (choiceOptionIsHeld(args.choiceSet, optionId, args.heldKeys)) return
+    additions.push(optionId)
+    suggestedBy[optionId] = sources ? [...sources] : []
   }
-  return preferred
+
+  for (const optionId of args.hardPreferredIds ?? []) {
+    if (!args.choiceSet.options.some((option) => option.id === optionId)) continue
+    take(optionId, undefined)
+  }
+
+  for (const preference of preferences) {
+    const optionId = matchChoiceOption(args.choiceSet, preference.id)
+    if (!optionId) continue
+    take(optionId, preference.sources)
+  }
+
+  for (const option of args.choiceSet.options) take(option.id, undefined)
+
+  return { additions, suggestedBy }
 }
 
 /**
@@ -156,6 +185,12 @@ function softPreferenceOptionIds(
  * then remaining first-eligible defaults in canonical resolver order.
  * Soft preferences never fail a build. Already-held options are skipped.
  */
+export type ConstraintAwareChoiceFill = {
+  draft: CharacterBuilderDraft
+  /** Sources for ids this call added. Seeded ids are absent. */
+  suggestedBy: Record<string, readonly NpcRecommendationSource[]>
+}
+
 export function fillChoiceSetWithConstraintAwareSelection(args: {
   draft: CharacterBuilderDraft
   choiceSet: ChoiceSet
@@ -164,11 +199,10 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
   heldKeys?: ReadonlySet<string>
   characterClass: CharacterClass | undefined
   catalogIndex: CharacterBuildCatalogIndex
-}): CharacterBuilderDraft | null {
+}): ConstraintAwareChoiceFill | null {
   const { draft, choiceSet, constraints, preferences, heldKeys, characterClass, catalogIndex } =
     args
   const current = draft.choiceSelections[choiceSet.id] ?? []
-  const selectedIds = new Set(current)
 
   if (
     constraints &&
@@ -184,39 +218,34 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
       catalogIndex,
     })
     if (packageIds === null) return null
-    if (packageIds.length === 0) return draft
+    if (packageIds.length === 0) return { draft, suggestedBy: {} }
     const selections = [...current, ...packageIds]
     return {
-      ...draft,
-      choiceSelections: { ...draft.choiceSelections, [choiceSet.id]: selections },
+      draft: {
+        ...draft,
+        choiceSelections: { ...draft.choiceSelections, [choiceSet.id]: selections },
+      },
+      suggestedBy: {},
     }
   }
 
-  const preferredIds = preferredConstraintOptionIds(choiceSet, constraints).filter(
-    (optionId) => !optionIsHeld(choiceSet, optionId, heldKeys),
-  )
-  const softIds = softPreferenceOptionIds(choiceSet, preferences, heldKeys).filter(
-    (optionId) => !preferredIds.includes(optionId),
-  )
-  const canonicalOrder = choiceSet.options.map((option) => option.id)
-  const orderedEligible = [
-    ...preferredIds.filter((optionId) => !selectedIds.has(optionId)),
-    ...softIds.filter((optionId) => !selectedIds.has(optionId)),
-    ...canonicalOrder.filter(
-      (optionId) =>
-        !selectedIds.has(optionId) &&
-        !preferredIds.includes(optionId) &&
-        !softIds.includes(optionId) &&
-        !optionIsHeld(choiceSet, optionId, heldKeys),
-    ),
-  ]
-  const additions = orderedEligible.slice(0, Math.max(0, choiceSet.min - current.length))
-  if (additions.length === 0) return null
+  const filled = selectChoiceSetFill({
+    choiceSet,
+    current,
+    preferences,
+    heldKeys,
+    hardPreferredIds: preferredConstraintOptionIds(choiceSet, constraints),
+  })
+  if (filled.additions.length === 0) return null
+  const additions = filled.additions
 
   const selections = [...current, ...additions]
   return {
-    ...draft,
-    choiceSelections: { ...draft.choiceSelections, [choiceSet.id]: selections },
+    draft: {
+      ...draft,
+      choiceSelections: { ...draft.choiceSelections, [choiceSet.id]: selections },
+    },
+    suggestedBy: filled.suggestedBy,
   }
 }
 

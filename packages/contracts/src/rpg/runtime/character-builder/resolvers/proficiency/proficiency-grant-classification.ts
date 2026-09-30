@@ -1,13 +1,15 @@
 import type { CharacterSelectionSource } from '../../../character/sheet/selection-sources'
+import { classifySelectionSourceMechanic } from './selection-source-mechanic'
 
-/** Returns true when any provenance record ties the entry to a resolved ChoiceSet id. */
+/** Returns true when any provenance record is a resolved ChoiceSet outcome. */
 export function isChoiceDerivedProficiencyGrant(
   sources: CharacterSelectionSource[] | undefined,
   choiceSetIds: ReadonlySet<string>,
 ): boolean {
   return (
-    sources?.some((source) => source.grantId !== undefined && choiceSetIds.has(source.grantId)) ??
-    false
+    sources?.some(
+      (source) => classifySelectionSourceMechanic(source, choiceSetIds) === 'choice-derived',
+    ) ?? false
   )
 }
 

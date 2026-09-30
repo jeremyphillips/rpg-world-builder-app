@@ -1,355 +1,470 @@
-import { getNpcTemplateEntry } from '../../../vocab/npc/npc-template'
-import { toEquipmentContentId } from '../../creature/equipment'
+import { assembleCharacterProficiencies } from '../assembly/assemble-proficiencies'
+import { assembleLevelZeroStartingEquipment } from '../assembly/assemble-level-zero-starting-equipment'
 import type { AutomaticNpcBuildConstraints } from '../automatic/automatic-npc-build-constraints'
 import { normalizeAutomaticNpcBuildConstraints } from '../automatic/automatic-npc-build-constraints'
 import type { AutomaticNpcBuildPreferences } from '../automatic/automatic-npc-build-seed'
-import type { AutomaticNpcBuildSeed } from '../automatic/automatic-npc-build-seed'
+import { resolveAutomaticChoiceSelections } from '../automatic/resolve-automatic-choice-selections'
+import { seedAutomaticChoiceDraft } from '../automatic/resolve-automatic-npc-build'
+import type { ChoiceSet, ChoiceSetProvenance } from '../choice-set'
+import { buildChoiceSetId } from '../choice-set'
+import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import type { CharacterBuilderDraft } from '../draft/draft'
+import { optionIdentitiesOverlap } from '../option-identity'
+import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
 import {
-  levelZeroBaselineLanguageIds,
-  levelZeroSpeciesLanguageIds,
-} from '../assembly/level-zero-baseline-proficiency-entries'
-import type { ChoiceSet, ChoiceSetOwnerKind } from '../choice-set'
+  buildSelectionSourceLabelCatalogIndex,
+  resolveSelectionSourceProvenance,
+} from '../../character/format-selection-source-label'
+import { CHARACTER_EQUIPMENT_INVENTORY_BUCKETS } from '../../character/sheet/equipment-inventory'
+import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
+import { inventoryContainsEquipmentId } from '../resolvers/equipment/derive-equipment-draft-entries'
+import type { NpcRecommendationSource } from '../sourced-recommendation'
 import {
-  indexCharacterBuildCatalog,
-  type CharacterBuildCatalogIndex,
-  type CharacterBuildContext,
-} from '../context'
-import { createEmptyCharacterBuilderDraft } from '../draft/draft'
-import {
-  isBuilderLevelZeroClassless,
-  isClassProgressionApplicable,
-} from '../progression/character-level-policy'
-import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
-import type { NpcRecommendationSource } from './resolve-npc-template-recommendations'
+  collectFixedGrantPairs,
+  groupFixedGrantPairs,
+  type FixedGrantStreamCategory,
+  type FixedGrantValueStream,
+} from './collect-fixed-grant-pairs'
 
-export const NPC_STARTING_CHOICE_KINDS = [
+export const STARTING_CHOICE_CATEGORIES = {
+  skill: { choiceTypes: ['skillProficiency'], fixedStream: 'proficiencies.skills' },
+  tool: { choiceTypes: ['toolProficiency'], fixedStream: 'proficiencies.tools' },
+  language: { choiceTypes: ['language'], fixedStream: 'proficiencies.languages' },
+  equipment: { choiceTypes: [], fixedStream: 'levelZeroInventory' },
+  weapon: { constraint: 'requiredWeaponIds' },
+  spell: { constraint: 'requiredSpellIds' },
+} as const
+
+export type StartingChoiceCategory = keyof typeof STARTING_CHOICE_CATEGORIES
+
+export type StartingChoiceOwner = Pick<
+  ChoiceSetProvenance,
+  'ownerKind' | 'ownerLabel' | 'featureLabel'
+>
+
+type StartingChoiceContributionBase = {
+  id: string
+  category: StartingChoiceCategory
+  owner: StartingChoiceOwner
+  selectedIds: readonly string[]
+}
+
+export type StartingChoiceContribution = StartingChoiceContributionBase &
+  (
+    | {
+        mechanic: 'fixed-grant'
+        source: CharacterSelectionSource
+        quantities?: Readonly<Record<string, number>>
+      }
+    | {
+        mechanic: 'choice-allowance'
+        choiceSetId: string
+        allowance: { min: number; max: number }
+        overridden: boolean
+        /** Traced by the fill. Absent for overridden allowances. [] = canonical order. */
+        suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+      }
+    | {
+        mechanic: 'explicit-constraint'
+        constraint: 'requiredWeaponIds' | 'requiredSpellIds'
+      }
+  )
+
+export type NpcStartingChoices = {
+  contributions: readonly StartingChoiceContribution[]
+  removedOverrideIds: readonly string[]
+  /** Pass B draft. The picker applies a local fill on top of this. */
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
+}
+
+const CATEGORY_ORDER: readonly StartingChoiceCategory[] = [
   'skill',
   'tool',
   'language',
   'equipment',
   'weapon',
   'spell',
-] as const
+]
 
-export type NpcStartingChoiceKind = (typeof NPC_STARTING_CHOICE_KINDS)[number]
+const ALLOWANCE_CATEGORIES = new Set<StartingChoiceCategory>(['skill', 'tool', 'language'])
 
-export const NPC_STARTING_CHOICE_OWNERSHIPS = ['fixed-grant', 'allowance-fill', 'manual'] as const
-
-export type NpcStartingChoiceOwnership = (typeof NPC_STARTING_CHOICE_OWNERSHIPS)[number]
-
-export type NpcStartingChoiceProvenance = {
-  ownerKind?: ChoiceSetOwnerKind
-  ownerLabel?: string
-  suggestionOwnerLabel?: string
-  suggestedBy?: NpcRecommendationSource
-}
-
-export type NpcStartingChoiceEntry = {
-  kind: NpcStartingChoiceKind
-  ownership: NpcStartingChoiceOwnership
-  selectedIds: readonly string[]
-  allowance?: { chosen: number; required: number }
-  provenance: NpcStartingChoiceProvenance
-  choiceSetId?: string
-  editable: boolean
-  overridden: boolean
-}
-
-export type NpcStartingChoices = {
-  entries: readonly NpcStartingChoiceEntry[]
-}
-
-const ALLOWANCE_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
-  'skillProficiency',
-  'toolProficiency',
-  'language',
-])
-
-function optionIdentityKeys(optionId: string): string[] {
-  const keys = [optionId]
-  const separator = optionId.lastIndexOf(':')
-  if (separator >= 0) keys.push(optionId.slice(separator + 1))
-  return keys
-}
-
-function idsOverlap(left: string, right: string): boolean {
-  const rightKeys = new Set(optionIdentityKeys(right))
-  return optionIdentityKeys(left).some((key) => rightKeys.has(key))
-}
-
-function isHeld(id: string, heldKeys: ReadonlySet<string>): boolean {
-  return optionIdentityKeys(id).some((key) => heldKeys.has(key))
-}
-
-function matchOptionId(choiceSet: ChoiceSet, idOrSlug: string): string | undefined {
-  return choiceSet.options.find((option) => optionIdentityKeys(option.id).includes(idOrSlug))?.id
-}
-
-function kindForChoiceSet(choiceSet: ChoiceSet): NpcStartingChoiceKind | undefined {
+function categoryForChoiceSet(choiceSet: ChoiceSet): StartingChoiceCategory | undefined {
   if (choiceSet.choiceType === 'skillProficiency') return 'skill'
   if (choiceSet.choiceType === 'toolProficiency') return 'tool'
   if (choiceSet.choiceType === 'language') return 'language'
   return undefined
 }
 
-function preferenceIdsForKind(
-  kind: NpcStartingChoiceKind,
-  preferences: AutomaticNpcBuildPreferences | undefined,
-): readonly string[] {
-  if (!preferences) return []
-  if (kind === 'skill') return preferences.skillSlugs ?? []
-  if (kind === 'tool') return preferences.toolSlugs ?? []
-  if (kind === 'language') return preferences.languageIds ?? []
-  return []
+function isStartingChoiceAllowance(choiceSet: ChoiceSet): boolean {
+  const category = categoryForChoiceSet(choiceSet)
+  return (
+    category !== undefined &&
+    ALLOWANCE_CATEGORIES.has(category) &&
+    choiceSet.required &&
+    choiceSet.min > 0
+  )
 }
 
-function rememberHeld(heldKeys: Set<string>, id: string): void {
-  for (const key of optionIdentityKeys(id)) heldKeys.add(key)
+function ownerFromChoiceSet(choiceSet: ChoiceSet): StartingChoiceOwner {
+  const provenance = choiceSet.provenance
+  return {
+    ...(provenance?.ownerKind ? { ownerKind: provenance.ownerKind } : {}),
+    ...(provenance?.ownerLabel ? { ownerLabel: provenance.ownerLabel } : {}),
+    ...(provenance?.featureLabel ? { featureLabel: provenance.featureLabel } : {}),
+  }
 }
 
-/**
- * Complete fill for one allowance. An override is used as-is after eligibility
- * clamping and is never padded with recommendation ids.
- */
-// fallow-ignore-next-line complexity
-export function resolveNpcStartingChoiceAllowances(args: {
+function ownerFromSource(
+  source: CharacterSelectionSource,
+  context: CharacterBuildContext,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): StartingChoiceOwner {
+  const labelCatalog = buildSelectionSourceLabelCatalogIndex({
+    catalogIndex,
+    characterCreationRules: context.characterCreationRules,
+  })
+  const resolved = resolveSelectionSourceProvenance(source, labelCatalog)
+  const featureLabel =
+    resolved.primaryLabel && resolved.primaryLabel !== resolved.ownerLabel
+      ? resolved.primaryLabel
+      : undefined
+
+  return {
+    ...(resolved.ownerKind ? { ownerKind: resolved.ownerKind } : {}),
+    ...(resolved.ownerLabel ? { ownerLabel: resolved.ownerLabel } : {}),
+    ...(featureLabel ? { featureLabel } : {}),
+  }
+}
+
+function fixedContributionId(
+  category: FixedGrantStreamCategory,
+  source: CharacterSelectionSource,
+): string {
+  return `fixed:${category}:${source.kind}:${source.sourceId ?? ''}:${source.grantId ?? ''}`
+}
+
+function dedupeIds(ids: readonly string[]): string[] {
+  const selected: string[] = []
+  for (const id of ids) {
+    if (selected.some((existing) => optionIdentitiesOverlap(existing, id))) continue
+    selected.push(id)
+  }
+  return selected
+}
+
+function proficiencyStreams(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
   choiceSets: readonly ChoiceSet[]
-  overrides?: Record<string, readonly string[]>
-  preferences?: AutomaticNpcBuildPreferences
-  suggestionOwnerLabel?: string
-  heldKeys?: ReadonlySet<string>
-}): NpcStartingChoiceEntry[] {
-  const heldKeys = new Set(args.heldKeys ?? [])
-  const entries: NpcStartingChoiceEntry[] = []
+}): FixedGrantValueStream[] {
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const characterClass = args.draft.class.classId
+    ? catalogIndex.classes.get(args.draft.class.classId)
+    : undefined
+  const proficiencies = assembleCharacterProficiencies(
+    args.draft,
+    catalogIndex,
+    args.choiceSets,
+    characterClass,
+    args.context,
+  )
 
-  for (const choiceSet of args.choiceSets) {
-    const kind = kindForChoiceSet(choiceSet)
-    if (!kind || !ALLOWANCE_CHOICE_TYPES.has(choiceSet.choiceType)) continue
-    if (choiceSet.min <= 0) continue
+  return [
+    {
+      category: 'skill',
+      rows: proficiencies.skills.map((entry) => ({
+        valueId: entry.skill,
+        sources: entry.sources,
+      })),
+    },
+    {
+      category: 'tool',
+      rows: proficiencies.tools.flatMap((entry) => {
+        const valueId =
+          entry.toolId ?? (entry.toolCategory ? `category:${entry.toolCategory}` : undefined)
+        if (!valueId) return []
+        return [{ valueId, sources: entry.sources }]
+      }),
+    },
+    {
+      category: 'language',
+      rows: proficiencies.languages.map((entry) => ({
+        valueId: entry.language,
+        sources: entry.sources,
+      })),
+    },
+  ]
+}
 
-    const override = args.overrides?.[choiceSet.id]
-    const overridden = override !== undefined
-    const selectedIds: string[] = []
+function levelZeroInventoryStream(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+}): FixedGrantValueStream {
+  if (!isBuilderLevelZeroClassless(args.draft, args.context)) {
+    return { category: 'equipment', rows: [] }
+  }
 
-    if (overridden) {
-      for (const rawId of override) {
-        const optionId = matchOptionId(choiceSet, rawId)
-        if (!optionId || selectedIds.includes(optionId) || isHeld(optionId, heldKeys)) continue
-        selectedIds.push(optionId)
-        if (selectedIds.length >= choiceSet.max) break
-      }
-    } else {
-      for (const rawId of preferenceIdsForKind(kind, args.preferences)) {
-        if (selectedIds.length >= choiceSet.min) break
-        const optionId = matchOptionId(choiceSet, rawId)
-        if (!optionId || selectedIds.includes(optionId) || isHeld(optionId, heldKeys)) continue
-        selectedIds.push(optionId)
-      }
-      for (const option of choiceSet.options) {
-        if (selectedIds.length >= choiceSet.min) break
-        if (selectedIds.includes(option.id) || isHeld(option.id, heldKeys)) continue
-        selectedIds.push(option.id)
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const assembled = assembleLevelZeroStartingEquipment(args.draft, {
+    rulesetId: args.context.rulesetId,
+    levelZeroRules: args.context.characterCreationRules.levelZeroNpcs,
+    catalogIndex,
+  })
+  const rows: FixedGrantValueStream['rows'][number][] = []
+  for (const bucket of CHARACTER_EQUIPMENT_INVENTORY_BUCKETS) {
+    for (const entry of assembled.equipment[bucket]) {
+      rows.push({
+        valueId: entry.equipmentId,
+        quantity: entry.quantity,
+        sources: entry.sources,
+      })
+    }
+  }
+  return { category: 'equipment', rows }
+}
+
+function levelZeroInventory(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+}) {
+  if (!isBuilderLevelZeroClassless(args.draft, args.context)) return undefined
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  return assembleLevelZeroStartingEquipment(args.draft, {
+    rulesetId: args.context.rulesetId,
+    levelZeroRules: args.context.characterCreationRules.levelZeroNpcs,
+    catalogIndex,
+  }).equipment
+}
+
+function withHeritageOption(
+  draft: CharacterBuilderDraft,
+  speciesId: string,
+  heritageOptionId: string | undefined,
+): CharacterBuilderDraft {
+  if (!heritageOptionId) return draft
+  const choiceSetId = buildChoiceSetId('species', speciesId, 'heritage')
+  return {
+    ...draft,
+    species: { ...draft.species, heritageId: heritageOptionId },
+    choiceSelections: {
+      ...draft.choiceSelections,
+      [choiceSetId]: [heritageOptionId],
+    },
+  }
+}
+
+function pruneOverrides(args: {
+  overrides: Record<string, readonly string[]> | undefined
+  allowanceSets: readonly ChoiceSet[]
+}): { pruned: Record<string, string[]>; removedOverrideIds: string[] } {
+  const setsById = new Map(args.allowanceSets.map((choiceSet) => [choiceSet.id, choiceSet]))
+  const pruned: Record<string, string[]> = {}
+  const removedOverrideIds: string[] = []
+
+  for (const [choiceSetId, selectedIds] of Object.entries(args.overrides ?? {})) {
+    const choiceSet = setsById.get(choiceSetId)
+    if (!choiceSet) {
+      removedOverrideIds.push(choiceSetId)
+      continue
+    }
+
+    const allowed = new Set(choiceSet.options.map((option) => option.id))
+    const kept = selectedIds.filter((optionId) => allowed.has(optionId))
+    if (kept.length === 0 && selectedIds.length > 0) {
+      removedOverrideIds.push(choiceSetId)
+      continue
+    }
+    pruned[choiceSetId] = kept
+  }
+
+  return { pruned, removedOverrideIds }
+}
+
+function allowanceContributions(args: {
+  choiceSets: readonly ChoiceSet[]
+  draft: CharacterBuilderDraft
+  suggestedBy: Readonly<
+    Record<string, Readonly<Record<string, readonly NpcRecommendationSource[]>>>
+  >
+  overriddenIds: ReadonlySet<string>
+}): StartingChoiceContribution[] {
+  return args.choiceSets.filter(isStartingChoiceAllowance).map((choiceSet) => {
+    const category = categoryForChoiceSet(choiceSet)!
+    const overridden = args.overriddenIds.has(choiceSet.id)
+    const selectedIds = args.draft.choiceSelections[choiceSet.id] ?? []
+    const traced = args.suggestedBy[choiceSet.id]
+
+    return {
+      id: choiceSet.id,
+      category,
+      mechanic: 'choice-allowance' as const,
+      owner: ownerFromChoiceSet(choiceSet),
+      selectedIds,
+      choiceSetId: choiceSet.id,
+      allowance: { min: choiceSet.min, max: choiceSet.max },
+      overridden,
+      ...(!overridden && traced ? { suggestedBy: traced } : {}),
+    }
+  })
+}
+
+function fixedContributions(args: {
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  choiceSets: readonly ChoiceSet[]
+}): StartingChoiceContribution[] {
+  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
+  const choiceSetIds = new Set(args.choiceSets.map((choiceSet) => choiceSet.id))
+  const pairs = collectFixedGrantPairs(
+    [
+      ...proficiencyStreams(args),
+      levelZeroInventoryStream({ draft: args.draft, context: args.context }),
+    ],
+    choiceSetIds,
+  )
+
+  return groupFixedGrantPairs(pairs).map((group) => {
+    const quantities: Record<string, number> = {}
+    for (const value of group.values) {
+      if (value.quantity !== undefined && value.quantity > 1) {
+        quantities[value.valueId] = value.quantity
       }
     }
 
-    for (const id of selectedIds) rememberHeld(heldKeys, id)
-
-    entries.push({
-      kind,
-      ownership: 'allowance-fill',
-      selectedIds,
-      allowance: { chosen: selectedIds.length, required: choiceSet.min },
-      provenance: {
-        ownerKind: choiceSet.provenance?.ownerKind,
-        ownerLabel: choiceSet.provenance?.ownerLabel,
-        ...(!overridden && args.suggestionOwnerLabel
-          ? { suggestionOwnerLabel: args.suggestionOwnerLabel, suggestedBy: 'template' as const }
-          : {}),
-      },
-      choiceSetId: choiceSet.id,
-      editable: true,
-      overridden,
-    })
-  }
-
-  return entries
+    return {
+      id: fixedContributionId(group.category, group.source),
+      category: group.category,
+      mechanic: 'fixed-grant' as const,
+      owner: ownerFromSource(group.source, args.context, catalogIndex),
+      source: group.source,
+      selectedIds: group.values.map((value) => value.valueId),
+      ...(Object.keys(quantities).length > 0 ? { quantities } : {}),
+    }
+  })
 }
 
-function seedDraftForChoices(
-  seed: Pick<AutomaticNpcBuildSeed, 'speciesId' | 'classId' | 'level' | 'npcTemplateId'>,
-): ReturnType<typeof createEmptyCharacterBuilderDraft> {
-  const empty = createEmptyCharacterBuilderDraft()
-  return {
-    ...empty,
-    species: { speciesId: seed.speciesId },
-    class: {
-      ...(seed.classId && isClassProgressionApplicable(seed.level)
-        ? { classId: seed.classId }
-        : {}),
-      level: seed.level,
-    },
-    ...(seed.npcTemplateId ? { npcTemplateId: seed.npcTemplateId } : {}),
-  }
-}
-
-function fixedLanguageEntries(args: {
+function constraintContributions(args: {
+  requiredWeaponIds?: readonly string[]
+  requiredSpellIds?: readonly string[]
+  draft: CharacterBuilderDraft
   context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  draft: ReturnType<typeof seedDraftForChoices>
-}): NpcStartingChoiceEntry[] {
-  if (!isBuilderLevelZeroClassless(args.draft, args.context)) return []
+}): StartingChoiceContribution[] {
+  const inventory = levelZeroInventory({ draft: args.draft, context: args.context })
+  const weapons = dedupeIds(args.requiredWeaponIds ?? []).filter(
+    (weaponId) => !inventory || !inventoryContainsEquipmentId(inventory, weaponId),
+  )
+  const spells = dedupeIds(args.requiredSpellIds ?? [])
+  const contributions: StartingChoiceContribution[] = []
 
-  const rules = args.context.characterCreationRules.levelZeroNpcs
-  const species = args.draft.species.speciesId
-    ? args.catalogIndex.species.get(args.draft.species.speciesId)
-    : undefined
-  const entries: NpcStartingChoiceEntry[] = []
-  const baseline = levelZeroBaselineLanguageIds(rules, args.context.catalog.languages)
-  if (baseline.length > 0) {
-    entries.push({
-      kind: 'language',
-      ownership: 'fixed-grant',
-      selectedIds: baseline,
-      provenance: { ownerKind: 'campaign', ownerLabel: 'Level 0' },
-      editable: false,
-      overridden: false,
+  if (weapons.length > 0) {
+    contributions.push({
+      id: 'constraint:requiredWeaponIds',
+      category: 'weapon',
+      mechanic: 'explicit-constraint',
+      constraint: 'requiredWeaponIds',
+      owner: {},
+      selectedIds: weapons,
     })
   }
-  const speciesLanguages = levelZeroSpeciesLanguageIds(species, rules)
-  if (speciesLanguages.length > 0) {
-    entries.push({
-      kind: 'language',
-      ownership: 'fixed-grant',
-      selectedIds: speciesLanguages,
-      provenance: { ownerKind: 'species', ownerLabel: species?.name },
-      editable: false,
-      overridden: false,
+
+  if (spells.length > 0) {
+    contributions.push({
+      id: 'constraint:requiredSpellIds',
+      category: 'spell',
+      mechanic: 'explicit-constraint',
+      constraint: 'requiredSpellIds',
+      owner: {},
+      selectedIds: spells,
     })
   }
-  return entries
+
+  return contributions
 }
 
-function fixedKitEntry(args: {
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  draft: ReturnType<typeof seedDraftForChoices>
-}): NpcStartingChoiceEntry | undefined {
-  if (!isBuilderLevelZeroClassless(args.draft, args.context)) return undefined
-  const templateId = args.draft.npcTemplateId
-  const template = templateId ? getNpcTemplateEntry(templateId) : undefined
-  const kit = template?.levelZero?.kit ?? []
-  if (!template || kit.length === 0) return undefined
-
-  const selectedIds: string[] = []
-  for (const item of kit) {
-    const equipmentId = toEquipmentContentId(args.context.rulesetId, item.slug)
-    if (!args.catalogIndex.equipment.has(equipmentId)) continue
-    if (selectedIds.some((id) => idsOverlap(id, equipmentId))) continue
-    selectedIds.push(equipmentId)
-  }
-  if (selectedIds.length === 0) return undefined
-
-  return {
-    kind: 'equipment',
-    ownership: 'fixed-grant',
-    selectedIds,
-    provenance: { ownerKind: 'npcTemplate', ownerLabel: template.label },
-    editable: false,
-    overridden: false,
-  }
+function orderContributions(
+  contributions: readonly StartingChoiceContribution[],
+): StartingChoiceContribution[] {
+  const mechanicOrder = { 'fixed-grant': 0, 'choice-allowance': 1, 'explicit-constraint': 2 }
+  return [...contributions].sort((left, right) => {
+    const categoryDelta =
+      CATEGORY_ORDER.indexOf(left.category) - CATEGORY_ORDER.indexOf(right.category)
+    if (categoryDelta !== 0) return categoryDelta
+    return mechanicOrder[left.mechanic] - mechanicOrder[right.mechanic]
+  })
 }
 
-function manualEntry(args: {
-  kind: 'weapon' | 'spell'
-  ids: readonly string[]
-  satisfiedIds: readonly string[]
-}): NpcStartingChoiceEntry | undefined {
-  const selectedIds: string[] = []
-  for (const id of args.ids) {
-    if (args.satisfiedIds.some((satisfied) => idsOverlap(satisfied, id))) continue
-    if (selectedIds.some((selected) => idsOverlap(selected, id))) continue
-    selectedIds.push(id)
-  }
-  if (selectedIds.length === 0) return undefined
-  return {
-    kind: args.kind,
-    ownership: 'manual',
-    selectedIds,
-    provenance: {},
-    editable: true,
-    overridden: false,
-  }
-}
-
-// fallow-ignore-next-line complexity
 export function resolveNpcStartingChoices(args: {
   context: CharacterBuildContext
-  seed: Pick<AutomaticNpcBuildSeed, 'speciesId' | 'classId' | 'level' | 'npcTemplateId'>
+  seed: {
+    speciesId: string
+    classId?: string
+    level: CharacterBuilderDraft['class']['level']
+    npcTemplateId?: CharacterBuilderDraft['npcTemplateId']
+  }
+  /**
+   * Selected heritage option. Dependent allowances appear only after heritage
+   * is on the draft. Quick NPC does not choose heritage, so this stays unset
+   * there and matches the automatic build.
+   */
+  heritageOptionId?: string
   startingChoiceOverrides?: Record<string, readonly string[]>
   requiredWeaponIds?: readonly string[]
   requiredSpellIds?: readonly string[]
   preferences?: AutomaticNpcBuildPreferences
-  suggestionOwnerLabel?: string
 }): NpcStartingChoices {
-  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
-  const draft = seedDraftForChoices(args.seed)
-  const choiceSets = resolveAvailableChoices(draft, args.context)
-  const languages = fixedLanguageEntries({ context: args.context, catalogIndex, draft })
-  const heldKeys = new Set<string>()
-  for (const entry of languages) {
-    for (const id of entry.selectedIds) rememberHeld(heldKeys, id)
-  }
-
-  const allowances = resolveNpcStartingChoiceAllowances({
-    choiceSets,
-    overrides: args.startingChoiceOverrides,
+  const baseDraft = withHeritageOption(
+    seedAutomaticChoiceDraft(args.seed, args.context, args.preferences),
+    args.seed.speciesId,
+    args.heritageOptionId,
+  )
+  const graph = resolveAutomaticChoiceSelections({
+    draft: baseDraft,
+    context: args.context,
     preferences: args.preferences,
-    suggestionOwnerLabel: args.suggestionOwnerLabel,
-    heldKeys,
   })
-  const kit = fixedKitEntry({ context: args.context, catalogIndex, draft })
-  const satisfiedIds = [
-    ...(kit?.selectedIds ?? []),
-    ...allowances.flatMap((entry) => entry.selectedIds),
-    ...languages.flatMap((entry) => entry.selectedIds),
-  ]
-  const weapon = manualEntry({
-    kind: 'weapon',
-    ids: args.requiredWeaponIds ?? [],
-    satisfiedIds,
+  const graphSets = graph.ok ? graph.resolvedChoiceSets : []
+  const allowanceSets = graphSets.filter(isStartingChoiceAllowance)
+  const { pruned, removedOverrideIds } = pruneOverrides({
+    overrides: args.startingChoiceOverrides,
+    allowanceSets,
   })
-  const spell = manualEntry({
-    kind: 'spell',
-    ids: args.requiredSpellIds ?? [],
-    satisfiedIds: [...satisfiedIds, ...(weapon?.selectedIds ?? [])],
-  })
-
-  return {
-    entries: [
-      ...languages,
-      ...allowances,
-      ...(kit ? [kit] : []),
-      ...(weapon ? [weapon] : []),
-      ...(spell ? [spell] : []),
-    ],
+  const seededDraft = {
+    ...baseDraft,
+    choiceSelections: {
+      ...baseDraft.choiceSelections,
+      ...Object.fromEntries(
+        Object.entries(pruned).map(([choiceSetId, selectedIds]) => [choiceSetId, [...selectedIds]]),
+      ),
+    },
   }
-}
+  const current = resolveAutomaticChoiceSelections({
+    draft: seededDraft,
+    context: args.context,
+    preferences: args.preferences,
+    pinnedChoiceSetIds: new Set(Object.keys(pruned)),
+  })
+  const draft = current.ok ? current.draft : seededDraft
+  const resolvedChoiceSets = current.ok ? current.resolvedChoiceSets : graphSets
+  const suggestedBy = current.ok ? current.suggestedBy : {}
 
-/** Drops overrides whose choice-set id is no longer an active allowance. */
-export function pruneNpcStartingChoiceOverrides(
-  overrides: Record<string, readonly string[]>,
-  activeChoiceSetIds: ReadonlySet<string>,
-): Record<string, string[]> {
-  const next: Record<string, string[]> = {}
-  for (const [choiceSetId, selectedIds] of Object.entries(overrides)) {
-    if (!activeChoiceSetIds.has(choiceSetId)) continue
-    next[choiceSetId] = [...selectedIds]
-  }
-  return next
-}
+  const contributions = orderContributions([
+    ...fixedContributions({ draft, context: args.context, choiceSets: resolvedChoiceSets }),
+    ...allowanceContributions({
+      choiceSets: resolvedChoiceSets,
+      draft,
+      suggestedBy,
+      overriddenIds: new Set(Object.keys(pruned)),
+    }),
+    ...constraintContributions({
+      requiredWeaponIds: args.requiredWeaponIds,
+      requiredSpellIds: args.requiredSpellIds,
+      draft,
+      context: args.context,
+    }),
+  ])
 
-export function npcStartingChoiceAllowanceIds(choices: NpcStartingChoices): string[] {
-  return choices.entries.flatMap((entry) => (entry.choiceSetId ? [entry.choiceSetId] : []))
+  return { contributions, removedOverrideIds, draft, resolvedChoiceSets }
 }
 
 /** Complete allowance fills to seed before automatic top-up. Short overrides are omitted. */
@@ -357,10 +472,10 @@ export function npcStartingChoiceAllowanceSelections(
   choices: NpcStartingChoices,
 ): Record<string, string[]> {
   const selections: Record<string, string[]> = {}
-  for (const entry of choices.entries) {
-    if (entry.ownership !== 'allowance-fill' || !entry.choiceSetId || !entry.allowance) continue
-    if (entry.allowance.chosen < entry.allowance.required) continue
-    selections[entry.choiceSetId] = [...entry.selectedIds]
+  for (const contribution of choices.contributions) {
+    if (contribution.mechanic !== 'choice-allowance') continue
+    if (contribution.selectedIds.length < contribution.allowance.min) continue
+    selections[contribution.choiceSetId] = [...contribution.selectedIds]
   }
   return selections
 }
@@ -368,11 +483,15 @@ export function npcStartingChoiceAllowanceSelections(
 export function npcStartingChoiceManualConstraints(
   choices: NpcStartingChoices,
 ): AutomaticNpcBuildConstraints | undefined {
-  const weapons = choices.entries.find(
-    (entry) => entry.kind === 'weapon' && entry.ownership === 'manual',
+  const weapons = choices.contributions.find(
+    (contribution) =>
+      contribution.mechanic === 'explicit-constraint' &&
+      contribution.constraint === 'requiredWeaponIds',
   )
-  const spells = choices.entries.find(
-    (entry) => entry.kind === 'spell' && entry.ownership === 'manual',
+  const spells = choices.contributions.find(
+    (contribution) =>
+      contribution.mechanic === 'explicit-constraint' &&
+      contribution.constraint === 'requiredSpellIds',
   )
   return normalizeAutomaticNpcBuildConstraints({
     requiredWeaponIds: weapons ? [...weapons.selectedIds] : [],
@@ -382,11 +501,11 @@ export function npcStartingChoiceManualConstraints(
 
 export function npcStartingChoiceIncompleteOverride(
   choices: NpcStartingChoices,
-): NpcStartingChoiceEntry | undefined {
-  return choices.entries.find(
-    (entry) =>
-      entry.overridden &&
-      entry.allowance !== undefined &&
-      entry.allowance.chosen < entry.allowance.required,
+): StartingChoiceContribution | undefined {
+  return choices.contributions.find(
+    (contribution) =>
+      contribution.mechanic === 'choice-allowance' &&
+      contribution.overridden &&
+      contribution.selectedIds.length < contribution.allowance.min,
   )
 }

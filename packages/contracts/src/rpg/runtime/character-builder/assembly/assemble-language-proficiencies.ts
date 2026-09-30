@@ -21,6 +21,7 @@ import {
   LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE,
   levelZeroBaselineLanguageIds,
   levelZeroSpeciesLanguageIds,
+  levelZeroSpeciesLanguageSource,
 } from './level-zero-baseline-proficiency-entries'
 
 // ---------------------------------------------------------------------------
@@ -148,11 +149,21 @@ export function assembleLanguageProficiencyEntries(
     const baselineIds = levelZeroBaselineLanguageIds(rules, languages)
     const speciesIds = levelZeroSpeciesLanguageIds(species, rules)
 
-    for (const language of [...new Set([...baselineIds, ...speciesIds])]) {
+    for (const language of baselineIds) {
       levelZeroEntries.push({
         language,
         sources: LEVEL_ZERO_BASELINE_PROFICIENCY_SOURCE,
       })
+    }
+
+    if (species) {
+      const speciesSources = levelZeroSpeciesLanguageSource(species.id)
+      for (const language of speciesIds) {
+        levelZeroEntries.push({
+          language,
+          sources: speciesSources,
+        })
+      }
     }
   }
 

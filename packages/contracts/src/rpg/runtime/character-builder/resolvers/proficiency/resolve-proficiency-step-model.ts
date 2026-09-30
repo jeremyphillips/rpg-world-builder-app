@@ -22,9 +22,8 @@ import {
 import type { CharacterSelectionSource } from '../../../character/sheet/selection-sources'
 import { isFixedProficiencyGrant } from './proficiency-grant-classification'
 import {
-  formatProficiencyCategorySubhead,
   formatProficiencyChoiceBlockCompactAddLabel,
-  formatProficiencyPoolDescription,
+  formatProficiencyCategorySubhead,
   formatProficiencySectionEmptyMessage,
   formatProficiencySingleSetSupportingCopy,
   resolveProficiencyAggregateCount,
@@ -36,7 +35,7 @@ import type {
   BuilderChoiceSectionModel,
 } from '../../builder-choice-section-model'
 import {
-  resolveProficiencyChoicePresentation,
+  resolveProficiencyChoiceSetPresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
 
@@ -323,7 +322,7 @@ function buildSelectedRows(
 function buildChoiceBlock(
   choiceSet: ChoiceSet,
   draft: CharacterBuilderDraft,
-  presentation: ReturnType<typeof resolveProficiencyChoicePresentation>,
+  presentation: ReturnType<typeof resolveProficiencyChoiceSetPresentation>,
 ): ProficiencyChoiceBlock {
   const selections = draft.choiceSelections[choiceSet.id] ?? []
   const selectedCount = selections.length
@@ -335,7 +334,7 @@ function buildChoiceBlock(
     selectedCount,
     min: choiceSet.min,
     max: choiceSet.max,
-    poolDescription: formatProficiencyPoolDescription(choiceSet),
+    poolDescription: presentation.poolDescription,
     compactAddLabel: formatProficiencyChoiceBlockCompactAddLabel(choiceSet, selectedCount),
     isFull: selectedCount >= choiceSet.max,
     isOverSelected: selectedCount > choiceSet.max,
@@ -370,7 +369,7 @@ function buildInteractiveSection(
   const sortedChoiceSets = sortProficiencyChoiceSets(choiceSets)
   const presentations = sortedChoiceSets.map((choiceSet) => ({
     choiceSet,
-    presentation: resolveProficiencyChoicePresentation(choiceSet),
+    presentation: resolveProficiencyChoiceSetPresentation(choiceSet),
   }))
   const choiceBlocks = presentations.map(({ choiceSet, presentation }) =>
     buildChoiceBlock(choiceSet, draft, presentation),

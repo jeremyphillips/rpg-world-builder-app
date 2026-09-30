@@ -10,6 +10,7 @@ import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
+import type { SourcedRecommendation } from '../sourced-recommendation'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 
@@ -32,12 +33,15 @@ export const automaticNpcBuildSeedSchema = z.object({
   npcTemplateId: npcTemplateIdSchema.optional(),
 })
 
-/** Soft ordering for automatic choice fill. Never fails a build and never adds slots. */
+/**
+ * Soft ordering for automatic choice fill. Never fails a build and never adds slots.
+ * Skill, tool, and language lists keep the recommendation source on each id.
+ */
 export type AutomaticNpcBuildPreferences = {
   abilityPriority?: readonly Ability[]
-  skillSlugs?: readonly string[]
-  toolSlugs?: readonly string[]
-  languageIds?: readonly string[]
+  skills?: readonly SourcedRecommendation[]
+  tools?: readonly SourcedRecommendation[]
+  languages?: readonly SourcedRecommendation[]
 }
 
 export const automaticNpcBuildAbilityPrioritySchema = z.array(abilitySchema).length(6)

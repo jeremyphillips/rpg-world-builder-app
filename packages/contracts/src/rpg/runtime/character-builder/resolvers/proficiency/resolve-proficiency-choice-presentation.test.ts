@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ChoiceSet } from '../../choice-set'
 import {
   resolveProficiencyChoicePresentation,
+  resolveProficiencyChoiceSetPresentation,
   sortProficiencyChoiceSets,
 } from './resolve-proficiency-choice-presentation'
 
@@ -20,6 +21,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Rogue Skills',
       headingSourceCoverage: 'owner',
+      sourceLabel: 'Rogue class',
     })
   })
 
@@ -36,6 +38,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Skillful',
       headingSourceCoverage: 'feature',
+      sourceLabel: 'Human species trait',
       sourceLine: 'Human species trait',
     })
   })
@@ -53,6 +56,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Primal Aptitude',
       headingSourceCoverage: 'feature',
+      sourceLabel: 'Circle of the Moon subclass',
       sourceLine: 'Circle of the Moon subclass',
     })
   })
@@ -70,6 +74,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'High Elf',
       headingSourceCoverage: 'feature',
+      sourceLabel: 'High Elf heritage',
       sourceLine: 'High Elf heritage',
     })
   })
@@ -86,6 +91,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Druid Skills',
       headingSourceCoverage: 'owner',
+      sourceLabel: 'Druid class',
     })
   })
 
@@ -101,6 +107,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Origin Languages',
       headingSourceCoverage: 'owner',
+      sourceLabel: 'Origin',
     })
   })
 
@@ -115,6 +122,7 @@ describe('resolveProficiencyChoicePresentation', () => {
     expect(resolveProficiencyChoicePresentation(choiceSet)).toEqual({
       heading: 'Language',
       headingSourceCoverage: 'generic',
+      sourceLabel: 'Origin',
       sourceLine: 'Origin',
     })
   })
@@ -184,5 +192,126 @@ describe('sortProficiencyChoiceSets', () => {
         (choiceSet) => choiceSet.id,
       ),
     ).toEqual([classSkills.id, classFeature.id, speciesTrait.id])
+  })
+})
+
+describe('resolveProficiencyChoiceSetPresentation', () => {
+  it('composes heading, ungated source, gated source line, and pool copy for Keen Senses', () => {
+    const choiceSet: ChoiceSet = {
+      id: 'species:srd-cc-5.2.1:elf:trait:keen-senses:skillProficiency',
+      sourceType: 'species',
+      sourceId: 'srd-cc-5.2.1:elf',
+      choiceType: 'skillProficiency',
+      label: 'Keen Senses',
+      min: 1,
+      max: 1,
+      required: true,
+      options: [
+        { id: 'insight', label: 'Insight' },
+        { id: 'perception', label: 'Perception' },
+        { id: 'survival', label: 'Survival' },
+      ],
+      provenance: {
+        ownerKind: 'species',
+        ownerLabel: 'Elf',
+        featureLabel: 'Keen Senses',
+      },
+    }
+
+    expect(resolveProficiencyChoiceSetPresentation(choiceSet)).toEqual({
+      heading: 'Keen Senses',
+      headingSourceCoverage: 'feature',
+      sourceLabel: 'Elf species trait',
+      sourceLine: 'Elf species trait',
+      poolDescription: 'Choose from Insight, Perception, and Survival.',
+    })
+  })
+
+  it('keeps Fighter Skills source ungated but omits Builder source line', () => {
+    const choiceSet: ChoiceSet = {
+      id: 'class:srd-cc-5.2.1:fighter:class-skills',
+      sourceType: 'class',
+      sourceId: 'srd-cc-5.2.1:fighter',
+      choiceType: 'skillProficiency',
+      label: 'Fighter Skills',
+      min: 2,
+      max: 2,
+      required: true,
+      options: [
+        { id: 'acrobatics', label: 'Acrobatics' },
+        { id: 'athletics', label: 'Athletics' },
+        { id: 'history', label: 'History' },
+        { id: 'intimidation', label: 'Intimidation' },
+        { id: 'perception', label: 'Perception' },
+      ],
+      provenance: {
+        ownerKind: 'class',
+        ownerLabel: 'Fighter',
+        choiceLabel: 'Fighter Skills',
+      },
+    }
+
+    expect(resolveProficiencyChoiceSetPresentation(choiceSet)).toEqual({
+      heading: 'Fighter Skills',
+      headingSourceCoverage: 'owner',
+      sourceLabel: 'Fighter class',
+      poolDescription: 'Choose from Acrobatics, Athletics, History, Intimidation, and Perception.',
+    })
+  })
+
+  it('names Origin Languages with Origin as the semantic source', () => {
+    const choiceSet: ChoiceSet = {
+      id: 'ruleset:srd-cc-5.2.1:origin-languages',
+      sourceType: 'ruleset',
+      sourceId: 'srd-cc-5.2.1',
+      choiceType: 'language',
+      label: 'Origin Languages',
+      min: 2,
+      max: 2,
+      required: true,
+      options: [
+        { id: 'dwarvish', label: 'Dwarvish' },
+        { id: 'elvish', label: 'Elvish' },
+        { id: 'giant', label: 'Giant' },
+      ],
+      provenance: {
+        ownerKind: 'origin',
+        choiceLabel: 'Origin Languages',
+      },
+    }
+
+    expect(resolveProficiencyChoiceSetPresentation(choiceSet)).toEqual({
+      heading: 'Origin Languages',
+      headingSourceCoverage: 'owner',
+      sourceLabel: 'Origin',
+      poolDescription: 'Choose from Dwarvish, Elvish, and Giant.',
+    })
+  })
+
+  it('uses Guard role as the semantic source for a role skill allowance', () => {
+    const choiceSet: ChoiceSet = {
+      id: 'npcTemplate:guard:skills',
+      sourceType: 'npcTemplate',
+      sourceId: 'guard',
+      choiceType: 'skillProficiency',
+      label: 'Choose 1 role skill',
+      min: 1,
+      max: 1,
+      required: true,
+      poolSource: 'any',
+      options: [{ id: 'athletics', label: 'Athletics' }],
+      provenance: {
+        ownerKind: 'npcTemplate',
+        ownerLabel: 'Guard',
+        choiceLabel: 'Choose 1 role skill',
+      },
+    }
+
+    expect(resolveProficiencyChoiceSetPresentation(choiceSet)).toEqual({
+      heading: 'Choose 1 role skill',
+      headingSourceCoverage: 'owner',
+      sourceLabel: 'Guard role',
+      poolDescription: 'Choose any 1 skill proficiency.',
+    })
   })
 })
