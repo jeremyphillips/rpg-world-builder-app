@@ -4,12 +4,13 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 
 ## Layers
 
-| Layer          | Owner                                                                          | Consumer API                                                                       |
-| -------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| Identity       | `CONTENT_DISPLAY_FALLBACK_ICONS` + contracts `ContentDisplayFallback` keys     | `contentIdentityIcon(key)`, `ContentDisplayFallbackIcon`                           |
-| Surface policy | `resolveContentDisplayFallback`, `resolveContentDisplayFallbackForContentType` | Chooses which identity key (or `generic`) a surface uses                           |
-| Section        | Feature-local maps (form tabs, connections, builder facts)                     | `contentIdentityIcon` for semantic aliases; direct Lucide for section-owned glyphs |
-| Action         | `ACTION_ICONS`                                                                 | `ActionIcon`, `ActionButton`, remove/add wrappers                                  |
+| Layer          | Owner                                                                          | Consumer API                                                                             |
+| -------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Identity       | `CONTENT_DISPLAY_FALLBACK_ICONS` + contracts `ContentDisplayFallback` keys     | `contentIdentityIcon(key)`, `ContentDisplayFallbackIcon`                                 |
+| Surface policy | `resolveContentDisplayFallback`, `resolveContentDisplayFallbackForContentType` | Chooses which identity key (or `generic`) a surface uses                                 |
+| Section        | Feature-local maps (form tabs, connections, builder facts)                     | `contentIdentityIcon` for semantic aliases; direct Lucide for section-owned glyphs       |
+| Granted choice | `GrantedChoiceLeadingIcon` (builder choice-section)                            | `BadgeCheck` leading affordance on granted `ContentEntityCard` rows — not an action verb |
+| Action         | `ACTION_ICONS`                                                                 | `ActionIcon`, `ActionButton`, remove/add wrappers                                        |
 
 `campaign` and `generic` may share a component today but are separate map entries — do not alias one to the other.
 

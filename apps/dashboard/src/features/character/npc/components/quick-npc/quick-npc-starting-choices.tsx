@@ -1,7 +1,10 @@
 import * as React from 'react'
+import { ChevronDown } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
-import { ActionButton, Button, ChoiceSelectionCounter, ComboboxField, cn } from '@rpg/ui'
+import { EntityActionChoiceMenu } from '@/features/content'
+
+import { Button, ChoiceSelectionCounter, ComboboxField, Eyebrow, StatusDot, cn } from '@rpg/ui'
 import {
   optionIdentitiesOverlap,
   type CharacterBuildContext,
@@ -20,7 +23,6 @@ import {
 import type { QuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
 import {
   formatFixedGrantProvenance,
-  formatStartingChoiceProvenance,
   groupStartingChoicesByKind,
   normalizeStartingChoiceOverride,
   resolveCanonicalStartingChoiceAllowance,
@@ -28,6 +30,8 @@ import {
   resolveStartingChoiceSuggestionLabels,
   startingChoiceAlsoGrantedHint,
   startingChoiceAllowancePresentation,
+  resolveStartingChoiceCategoryAllowanceStatus,
+  startingChoiceCategorySummary,
   startingChoiceDisplayLabels,
   startingChoiceHasNamedAttribution,
   startingChoiceKindLabel,
@@ -36,33 +40,40 @@ import {
   startingChoiceShowSuggestedReset,
   startingChoiceSuggestionHint,
 } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
-import { EyebrowActionHeader } from '@/lib/create-setup'
 
+import { ChoiceGrantedRow } from '../../../components/builder/steps/shared/choice-section/choice-granted-row'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
+import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
 import {
-  quickNpcStartingChoiceAllowanceEditClasses,
-  quickNpcStartingChoiceAllowanceEditStackClasses,
+  quickNpcStartingChoiceAddFooterClasses,
   quickNpcStartingChoiceAllowanceHintClasses,
-  quickNpcStartingChoiceCounterRowClasses,
   quickNpcStartingChoiceEmptyClasses,
-  quickNpcStartingChoiceGrantedBlockClasses,
-  quickNpcStartingChoiceGrantedLabelClasses,
+  quickNpcStartingChoiceExpandedPanelClasses,
   quickNpcStartingChoiceHeadingClasses,
   quickNpcStartingChoiceIdentityStackClasses,
-  quickNpcStartingChoiceOptionRowClasses,
+  quickNpcStartingChoiceInnerPanelClasses,
+  quickNpcStartingChoiceInnerSectionClasses,
   quickNpcStartingChoiceOptionsContainerClasses,
-  quickNpcStartingChoiceOptionsListClasses,
   quickNpcStartingChoiceProvenanceClasses,
-  quickNpcStartingChoiceSectionBodyClasses,
-  quickNpcStartingChoiceSectionClasses,
+  quickNpcStartingChoiceRowActionsClasses,
+  quickNpcStartingChoiceRowCaretClasses,
+  quickNpcStartingChoiceRowCaretExpandedClasses,
+  quickNpcStartingChoiceRowHeaderClasses,
+  quickNpcStartingChoiceRowStatusSlotClasses,
+  quickNpcStartingChoiceRowClasses,
+  quickNpcStartingChoiceRowSummaryClasses,
   quickNpcStartingChoicesClasses,
+  quickNpcStartingChoiceSelectedListClasses,
   quickNpcStartingChoiceStatusAfterOptionsClasses,
   quickNpcStartingChoiceStatusRowClasses,
   quickNpcStartingChoiceSuggestionHintClasses,
-  quickNpcStartingChoiceValueClasses,
 } from './quick-npc-starting-choices.variants'
 
-const ADD_STARTING_CHOICE_LABEL = '+ Add starting choice'
+const QUICK_NPC_ADD_STARTING_CHOICE_LABEL = 'Add starting choice'
+const QUICK_NPC_ADD_STARTING_CHOICE_WEAPON_DESCRIPTION =
+  'Require a weapon this NPC must carry or use.'
+const QUICK_NPC_ADD_STARTING_CHOICE_SPELL_DESCRIPTION =
+  'Require a spell this NPC must know or prepare.'
 
 export type QuickNpcStartingChoicesProps = {
   setup: QuickNpcSetupValues
@@ -83,7 +94,6 @@ export function QuickNpcStartingChoices({
   const requiredWeaponIds = form.watch(QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME) ?? []
   const requiredSpellIds = form.watch(QUICK_NPC_REQUIRED_SPELL_FIELD_NAME) ?? []
   const [expandedKind, setExpandedKind] = React.useState<StartingChoiceCategory | null>(null)
-  const [addMenuOpen, setAddMenuOpen] = React.useState(false)
 
   const choices = React.useMemo(
     () =>
@@ -120,21 +130,6 @@ export function QuickNpcStartingChoices({
     form.setValue(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME, next, { shouldDirty: true })
   }
 
-  function beginEdit(kind: StartingChoiceCategory) {
-    if (kind === 'skill' || kind === 'tool' || kind === 'language') {
-      const next = { ...overrides }
-      for (const entry of choices.contributions) {
-        if (entry.category !== kind || entry.mechanic !== 'choice-allowance' || entry.overridden) {
-          continue
-        }
-        next[entry.choiceSetId] = [...entry.selectedIds]
-      }
-      writeOverrides(next)
-    }
-    setExpandedKind(kind)
-    setAddMenuOpen(false)
-  }
-
   function finishEdit(kind: StartingChoiceCategory) {
     if (kind === 'skill' || kind === 'tool' || kind === 'language') {
       const next = { ...overrides }
@@ -162,134 +157,190 @@ export function QuickNpcStartingChoices({
     setExpandedKind(null)
   }
 
+  function beginEdit(kind: StartingChoiceCategory) {
+    if (expandedKind && expandedKind !== kind) {
+      finishEdit(expandedKind)
+    }
+    if (kind === 'skill' || kind === 'tool' || kind === 'language') {
+      const next = { ...overrides }
+      for (const entry of choices.contributions) {
+        if (entry.category !== kind || entry.mechanic !== 'choice-allowance' || entry.overridden) {
+          continue
+        }
+        next[entry.choiceSetId] = [...entry.selectedIds]
+      }
+      writeOverrides(next)
+    }
+    setExpandedKind(kind)
+  }
+
+  function toggleCategory(kind: StartingChoiceCategory) {
+    if (expandedKind === kind) {
+      finishEdit(kind)
+      return
+    }
+    beginEdit(kind)
+  }
+
+  const showContainer = categories.length > 0 || addableKinds.length > 0
+
+  if (!showContainer) {
+    return (
+      <p className={quickNpcStartingChoiceEmptyClasses}>No starting choices have been added.</p>
+    )
+  }
+
   return (
     <div className={quickNpcStartingChoicesClasses}>
-      {categories.length === 0 ? (
-        <p className={quickNpcStartingChoiceEmptyClasses}>No starting choices have been added.</p>
-      ) : (
-        categories.map((category) => {
-          const expanded = expandedKind === category.kind
-          const valueLabel = category.entries
-            .flatMap((entry) =>
-              startingChoiceDisplayLabels({ context: buildContext, choices, contribution: entry }),
-            )
-            .join(', ')
-          return (
-            <section key={category.kind} className={quickNpcStartingChoiceSectionClasses}>
-              <EyebrowActionHeader
-                eyebrow={category.label}
-                actionLabel={expanded ? 'Done' : category.canChange ? 'Change' : undefined}
-                actionAriaLabel={
-                  expanded ? `Done editing ${category.label}` : `Change ${category.label}`
-                }
-                onAction={
-                  expanded
-                    ? () => finishEdit(category.kind)
-                    : category.canChange
-                      ? () => beginEdit(category.kind)
-                      : undefined
-                }
-              />
-              <div className={quickNpcStartingChoiceSectionBodyClasses}>
-                {expanded ? (
-                  <StartingChoiceEditor
-                    categoryKind={category.kind}
-                    entries={category.entries}
-                    choices={choices}
-                    suggestionLabels={suggestionLabels}
-                    setup={setup}
-                    buildContext={buildContext}
-                    createContext={createContext}
-                    optionSets={optionSets}
-                    satisfiedIds={satisfiedIds}
-                    overrides={overrides}
-                    requiredWeaponIds={requiredWeaponIds}
-                    requiredSpellIds={requiredSpellIds}
-                    onOverridesChange={writeOverrides}
-                  />
-                ) : (
-                  <>
-                    {valueLabel ? (
-                      <p className={quickNpcStartingChoiceValueClasses}>{valueLabel}</p>
-                    ) : null}
-                    {category.entries.map((entry) => {
-                      if (entry.mechanic === 'choice-allowance') {
-                        const presentation = startingChoiceAllowancePresentation(choices, entry)
-                        return (
-                          <AllowanceFillStatusRow
-                            key={entry.id}
-                            heading={presentation?.heading}
-                            sourceLabel={presentation?.sourceLabel}
-                            selectedCount={entry.selectedIds.length}
-                            required={entry.allowance.min}
-                          />
-                        )
-                      }
-                      const provenance = formatStartingChoiceProvenance(entry, buildContext)
-                      if (!provenance) return null
-                      return (
-                        <p key={entry.id} className={quickNpcStartingChoiceProvenanceClasses}>
-                          {provenance}
-                        </p>
-                      )
-                    })}
-                  </>
-                )}
-              </div>
-            </section>
-          )
+      {categories.map((category) => {
+        const expanded = expandedKind === category.kind
+        const summary = startingChoiceCategorySummary({
+          context: buildContext,
+          choices,
+          entries: category.entries,
         })
-      )}
+        const allowanceStatus = resolveStartingChoiceCategoryAllowanceStatus({
+          entries: category.entries,
+          overrides,
+        })
+        return (
+          <StartingChoiceCategoryRow
+            key={category.kind}
+            eyebrow={category.label}
+            summary={summary}
+            allowanceStatus={allowanceStatus}
+            expanded={expanded}
+            onToggle={() => toggleCategory(category.kind)}
+            panel={
+              <StartingChoiceEditor
+                categoryKind={category.kind}
+                entries={category.entries}
+                choices={choices}
+                suggestionLabels={suggestionLabels}
+                setup={setup}
+                buildContext={buildContext}
+                createContext={createContext}
+                optionSets={optionSets}
+                satisfiedIds={satisfiedIds}
+                overrides={overrides}
+                requiredWeaponIds={requiredWeaponIds}
+                requiredSpellIds={requiredSpellIds}
+                onOverridesChange={writeOverrides}
+              />
+            }
+          />
+        )
+      })}
       {expandedKind === 'weapon' && !categories.some((category) => category.kind === 'weapon') ? (
-        <ManualDraftEditor
-          kind="weapon"
-          optionSets={optionSets}
-          satisfiedIds={satisfiedIds}
-          onDone={() => setExpandedKind(null)}
+        <StartingChoiceCategoryRow
+          eyebrow={startingChoiceKindLabel('weapon')}
+          summary=""
+          allowanceStatus="none"
+          expanded
+          onToggle={() => finishEdit('weapon')}
+          panel={
+            <ManualDraftEditor kind="weapon" optionSets={optionSets} satisfiedIds={satisfiedIds} />
+          }
         />
       ) : null}
       {expandedKind === 'spell' && !categories.some((category) => category.kind === 'spell') ? (
-        <ManualDraftEditor
-          kind="spell"
-          optionSets={optionSets}
-          satisfiedIds={satisfiedIds}
-          onDone={() => setExpandedKind(null)}
+        <StartingChoiceCategoryRow
+          eyebrow={startingChoiceKindLabel('spell')}
+          summary=""
+          allowanceStatus="none"
+          expanded
+          onToggle={() => finishEdit('spell')}
+          panel={
+            <ManualDraftEditor kind="spell" optionSets={optionSets} satisfiedIds={satisfiedIds} />
+          }
         />
       ) : null}
       {addableKinds.length > 0 ? (
-        <div className="flex flex-col gap-y-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setAddMenuOpen((open) => !open)}
-          >
-            {ADD_STARTING_CHOICE_LABEL}
-          </Button>
-          {addMenuOpen ? (
-            <div className="flex flex-col gap-y-1" role="menu">
-              {addableKinds.map((kind) => (
-                <Button
-                  key={kind}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => beginEdit(kind)}
-                >
-                  {startingChoiceKindLabel(kind).replace(/s$/, '')}
-                </Button>
-              ))}
-            </div>
-          ) : null}
+        <div className={quickNpcStartingChoiceAddFooterClasses}>
+          <EntityActionChoiceMenu
+            triggerLabel={QUICK_NPC_ADD_STARTING_CHOICE_LABEL}
+            menuHeading={QUICK_NPC_ADD_STARTING_CHOICE_LABEL}
+            items={addableKinds.map((kind) => ({
+              id: kind,
+              label: startingChoiceKindLabel(kind).replace(/s$/, ''),
+              description:
+                kind === 'weapon'
+                  ? QUICK_NPC_ADD_STARTING_CHOICE_WEAPON_DESCRIPTION
+                  : QUICK_NPC_ADD_STARTING_CHOICE_SPELL_DESCRIPTION,
+              onSelect: () => beginEdit(kind),
+            }))}
+          />
         </div>
       ) : null}
     </div>
   )
 }
 
+const STARTING_CHOICE_CATEGORY_STATUS_LABEL = {
+  complete: 'All required choices complete',
+  incomplete: 'Required choices incomplete',
+} as const
+
+function StartingChoiceCategoryRow({
+  eyebrow,
+  summary,
+  allowanceStatus,
+  expanded,
+  onToggle,
+  panel,
+}: {
+  eyebrow: string
+  summary: string
+  allowanceStatus: ReturnType<typeof resolveStartingChoiceCategoryAllowanceStatus>
+  expanded: boolean
+  onToggle: () => void
+  panel: React.ReactNode
+}) {
+  const statusLabel =
+    allowanceStatus === 'none' ? undefined : STARTING_CHOICE_CATEGORY_STATUS_LABEL[allowanceStatus]
+  const actionLabel = expanded ? `Done editing ${eyebrow}` : `Expand ${eyebrow}`
+  const ariaLabel = statusLabel ? `${actionLabel}. ${statusLabel}.` : actionLabel
+
+  return (
+    <section className={quickNpcStartingChoiceRowClasses}>
+      <button
+        type="button"
+        className={quickNpcStartingChoiceRowHeaderClasses}
+        aria-expanded={expanded}
+        aria-label={ariaLabel}
+        onClick={onToggle}
+      >
+        <Eyebrow size="sm" className="shrink-0">
+          {eyebrow}
+        </Eyebrow>
+        <span className={quickNpcStartingChoiceRowSummaryClasses}>{summary}</span>
+        <span className={quickNpcStartingChoiceRowActionsClasses}>
+          <span className={quickNpcStartingChoiceRowStatusSlotClasses}>
+            {allowanceStatus === 'complete' ? (
+              <StatusDot tone="success" size="md" />
+            ) : allowanceStatus === 'incomplete' ? (
+              <StatusDot tone="warning" size="md" />
+            ) : null}
+          </span>
+          <ChevronDown
+            className={cn(
+              quickNpcStartingChoiceRowCaretClasses,
+              expanded && quickNpcStartingChoiceRowCaretExpandedClasses,
+            )}
+            aria-hidden
+          />
+        </span>
+      </button>
+      {expanded ? (
+        <div className={quickNpcStartingChoiceExpandedPanelClasses}>
+          <div className={quickNpcStartingChoiceInnerPanelClasses}>{panel}</div>
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
 function AllowanceFillStatusRow({
-  heading,
-  sourceLabel,
   selectedCount,
   required,
   showReset,
@@ -297,8 +348,6 @@ function AllowanceFillStatusRow({
   onReset,
   className,
 }: {
-  heading?: string
-  sourceLabel?: string
   selectedCount: number
   required: number
   showReset?: boolean
@@ -308,16 +357,7 @@ function AllowanceFillStatusRow({
 }) {
   return (
     <div className={cn(quickNpcStartingChoiceStatusRowClasses, className)}>
-      <div className={quickNpcStartingChoiceIdentityStackClasses}>
-        <div className={quickNpcStartingChoiceCounterRowClasses}>
-          {heading ? <span className={quickNpcStartingChoiceHeadingClasses}>{heading}</span> : null}
-          {heading ? <span className={quickNpcStartingChoiceProvenanceClasses}>·</span> : null}
-          <ChoiceSelectionCounter selectedCount={selectedCount} max={required} />
-        </div>
-        {sourceLabel ? (
-          <p className={quickNpcStartingChoiceProvenanceClasses}>{sourceLabel}</p>
-        ) : null}
-      </div>
+      <ChoiceSelectionCounter selectedCount={selectedCount} max={required} />
       {showReset && resetLabel && onReset ? (
         <Button type="button" variant="text" size="sm" density="compact" onClick={onReset}>
           {resetLabel}
@@ -365,8 +405,6 @@ function StartingChoiceEditor({
         satisfiedIds={satisfiedIds.filter(
           (id) => !manual?.selectedIds.some((selected) => optionIdentitiesOverlap(selected, id)),
         )}
-        onDone={() => undefined}
-        hideDone
       />
     )
   }
@@ -375,27 +413,32 @@ function StartingChoiceEditor({
   const allowanceEntries = entries.filter((entry) => entry.mechanic === 'choice-allowance')
 
   return (
-    <div className={quickNpcStartingChoiceAllowanceEditStackClasses}>
-      {fixedEntries.length > 0 ? (
-        <div className={quickNpcStartingChoiceGrantedBlockClasses}>
-          <p className={quickNpcStartingChoiceGrantedLabelClasses}>Granted</p>
-          {fixedEntries.map((entry) => {
-            const labels = startingChoiceDisplayLabels({
-              context: buildContext,
-              choices,
-              contribution: entry,
-            })
-            return (
-              <div key={entry.id}>
-                <p className={quickNpcStartingChoiceValueClasses}>{labels.join(', ')}</p>
-                <p className={quickNpcStartingChoiceProvenanceClasses}>
-                  {formatFixedGrantProvenance(entry, buildContext)}
-                </p>
-              </div>
-            )
-          })}
-        </div>
-      ) : null}
+    <>
+      {fixedEntries.map((entry) => {
+        const labels = startingChoiceDisplayLabels({
+          context: buildContext,
+          choices,
+          contribution: entry,
+        })
+        const sourceLabel = formatFixedGrantProvenance(entry, buildContext)
+        return (
+          <div key={entry.id} className={quickNpcStartingChoiceInnerSectionClasses}>
+            <ul className={quickNpcStartingChoiceSelectedListClasses}>
+              {labels.map((label) => (
+                <li key={`${entry.id}-${label}`}>
+                  <ChoiceGrantedRow
+                    row={{
+                      id: `${entry.id}:${label}`,
+                      label,
+                      sourceLabel,
+                    }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      })}
       {allowanceEntries.map((entry) => {
         const selectedIds = overrides[entry.choiceSetId] ?? [...entry.selectedIds]
         const labels = selectedIds.map((id, index) => {
@@ -446,7 +489,7 @@ function StartingChoiceEditor({
           onOverridesChange({ ...overrides, [choiceSetId]: nextIds })
         }
         return (
-          <div key={entry.id} className={quickNpcStartingChoiceAllowanceEditClasses}>
+          <div key={entry.id} className={quickNpcStartingChoiceInnerSectionClasses}>
             {presentation ? (
               <div className={quickNpcStartingChoiceIdentityStackClasses}>
                 <p className={quickNpcStartingChoiceHeadingClasses}>{presentation.heading}</p>
@@ -462,10 +505,10 @@ function StartingChoiceEditor({
             ) : null}
             <div className={quickNpcStartingChoiceOptionsContainerClasses}>
               {labels.length > 0 ? (
-                <div className={quickNpcStartingChoiceOptionsListClasses}>
+                <ul className={quickNpcStartingChoiceSelectedListClasses}>
                   {labels.map((label, index) => {
                     const selectedId = selectedIds[index]
-                    const alsoGranted = selectedId
+                    const alsoGrantedHint = selectedId
                       ? startingChoiceAlsoGrantedHint(
                           entry,
                           choices.contributions,
@@ -474,30 +517,18 @@ function StartingChoiceEditor({
                         )
                       : undefined
                     return (
-                      <div key={selectedId} className={quickNpcStartingChoiceOptionRowClasses}>
-                        <span className={quickNpcStartingChoiceValueClasses}>
-                          {label}
-                          {alsoGranted ? (
-                            <span className={quickNpcStartingChoiceSuggestionHintClasses}>
-                              {' '}
-                              · {alsoGranted}
-                            </span>
-                          ) : null}
-                        </span>
-                        <ActionButton
-                          action="remove"
-                          variant="ghost"
-                          size="icon"
-                          density="compact"
-                          aria-label={`Remove ${label}`}
-                          onClick={() => {
+                      <li key={selectedId}>
+                        <QuickNpcStartingChoiceSelectedRow
+                          label={label}
+                          alsoGrantedHint={alsoGrantedHint}
+                          onRemove={() => {
                             updateSelectedIds(selectedIds.filter((id) => id !== selectedId))
                           }}
                         />
-                      </div>
+                      </li>
                     )
                   })}
-                </div>
+                </ul>
               ) : null}
               {selectedIds.length < required && options.length > 0 ? (
                 <ComboboxField
@@ -533,7 +564,7 @@ function StartingChoiceEditor({
           </div>
         )
       })}
-    </div>
+    </>
   )
 }
 
@@ -541,14 +572,10 @@ function ManualDraftEditor({
   kind,
   optionSets,
   satisfiedIds,
-  onDone,
-  hideDone = false,
 }: {
   kind: 'weapon' | 'spell'
   optionSets: QuickNpcRequirementOptionSets
   satisfiedIds: readonly string[]
-  onDone: () => void
-  hideDone?: boolean
 }) {
   const weapons = optionSets.weapons.filter(
     (entry) => !satisfiedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)),
@@ -557,15 +584,7 @@ function ManualDraftEditor({
     (entry) => !satisfiedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)),
   )
   return (
-    <div className="flex flex-col gap-y-2">
-      {hideDone ? null : (
-        <EyebrowActionHeader
-          eyebrow={startingChoiceKindLabel(kind)}
-          actionLabel="Done"
-          actionAriaLabel={`Done editing ${startingChoiceKindLabel(kind)}`}
-          onAction={onDone}
-        />
-      )}
+    <div className={quickNpcStartingChoiceInnerSectionClasses}>
       <QuickNpcRequirementsFields
         optionSets={{
           weapons: kind === 'weapon' ? weapons : [],

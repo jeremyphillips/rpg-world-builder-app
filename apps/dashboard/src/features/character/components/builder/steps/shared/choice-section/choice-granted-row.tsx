@@ -1,10 +1,9 @@
 import type { BuilderChoiceGrantedRow } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
-import { BadgeCheck } from 'lucide-react'
 
 import { ContentEntityCard } from '@/features/content'
 
-import { choiceGrantedRowIconClasses } from './choice-granted-row.variants'
+import { GrantedChoiceLeadingIcon } from './granted-choice-leading-icon'
 
 export type ChoiceGrantedRowProps = {
   row: BuilderChoiceGrantedRow
@@ -21,7 +20,7 @@ export function ChoiceGrantedRow({ row }: ChoiceGrantedRowProps) {
           </Text>
         ) : undefined,
       }}
-      leading={<BadgeCheck className={choiceGrantedRowIconClasses} aria-hidden />}
+      leading={<GrantedChoiceLeadingIcon />}
       density="compact"
     />
   )

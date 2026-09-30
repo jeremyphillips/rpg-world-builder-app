@@ -16,8 +16,10 @@ import {
 } from '../../../lib/fixtures/character-builder-fixtures'
 import {
   formatFixedGrantProvenance,
+  formatStartingChoiceCategorySummary,
   formatStartingChoiceProvenance,
   groupStartingChoicesByKind,
+  resolveStartingChoiceCategoryAllowanceStatus,
   normalizeStartingChoiceOverride,
   startingChoiceAllowancePresentation,
   startingChoiceFillsMatch,
@@ -63,6 +65,31 @@ function fixedGrant(): Extract<StartingChoiceContribution, { mechanic: 'fixed-gr
 }
 
 const buildContext = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
+
+describe('formatStartingChoiceCategorySummary', () => {
+  it('joins up to three unique labels', () => {
+    expect(formatStartingChoiceCategorySummary(['Perception', 'Athletics', 'Intimidation'])).toBe(
+      'Perception, Athletics, Intimidation',
+    )
+  })
+
+  it('dedupes labels and truncates with + N more', () => {
+    expect(
+      formatStartingChoiceCategorySummary([
+        'Perception',
+        'Perception',
+        'Athletics',
+        'Intimidation',
+        'Stealth',
+        'Survival',
+      ]),
+    ).toBe('Perception, Athletics, Intimidation + 2 more')
+  })
+
+  it('returns empty string when no labels', () => {
+    expect(formatStartingChoiceCategorySummary([])).toBe('')
+  })
+})
 
 describe('formatStartingChoiceProvenance', () => {
   it('uses grant-card copy for fixed grants and manual copy for constraints', () => {
@@ -266,6 +293,45 @@ describe('startingChoiceShowSuggestedReset', () => {
         overridden: false,
       }),
     ).toBe(false)
+  })
+})
+
+describe('resolveStartingChoiceCategoryAllowanceStatus', () => {
+  it('returns none when the category has no choice allowances', () => {
+    expect(
+      resolveStartingChoiceCategoryAllowanceStatus({
+        entries: [fixedGrant()],
+        overrides: {},
+      }),
+    ).toBe('none')
+  })
+
+  it('returns incomplete when any allowance is underfilled', () => {
+    expect(
+      resolveStartingChoiceCategoryAllowanceStatus({
+        entries: [
+          allowance({
+            selectedIds: ['perception'],
+            allowance: { min: 2, max: 2 },
+          }),
+        ],
+        overrides: {},
+      }),
+    ).toBe('incomplete')
+  })
+
+  it('returns complete when every allowance meets its minimum', () => {
+    expect(
+      resolveStartingChoiceCategoryAllowanceStatus({
+        entries: [
+          allowance({
+            selectedIds: ['athletics', 'perception'],
+            allowance: { min: 2, max: 2 },
+          }),
+        ],
+        overrides: {},
+      }),
+    ).toBe('complete')
   })
 })
 
