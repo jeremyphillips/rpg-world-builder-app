@@ -170,7 +170,7 @@ describe('QuickNpcAuthoringForm', () => {
     const user = userEvent.setup()
     renderAuthoringForm()
 
-    await user.click(screen.getByRole('button', { name: /requirements/i }))
+    await user.click(screen.getByRole('button', { name: /starting choices/i }))
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() => {

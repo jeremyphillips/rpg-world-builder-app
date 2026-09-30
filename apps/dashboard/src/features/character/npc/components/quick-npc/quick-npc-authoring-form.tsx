@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useWatch, type UseFormReturn } from 'react-hook-form'
+import { type UseFormReturn } from 'react-hook-form'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
 import { Button, SelectionSummaryCard } from '@rpg/ui'
@@ -24,7 +24,6 @@ import {
   buildQuickNpcDetailsFields,
   buildQuickNpcRequirementsFields,
   buildQuickNpcTabs,
-  countQuickNpcConfiguredRequirements,
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   type QuickNpcAuthoringTabFormValues,
@@ -39,7 +38,7 @@ import { resolveCharacterSpeciesNameGenerationSupport } from '../../../lib/namin
 import { generateNameActionIcon } from '../../../lib/naming/species-name-generation-action-icon'
 import { GENERATE_NAME_ACTION_LABEL } from '../../../lib/naming/species-name-generation-labels'
 import { buildQuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
-import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
+import { QuickNpcStartingChoices } from './quick-npc-starting-choices'
 import {
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateContext,
@@ -66,7 +65,7 @@ export type QuickNpcAuthoringFormProps = {
 function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  configuredCount: number
+  createContext: QuickNpcCreateContext
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }): TabbedFormTab[] {
@@ -74,7 +73,6 @@ function buildQuickNpcAuthoringTabs(args: {
     setup: args.setup,
     context: args.buildContext,
   })
-  const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
   const generationSupport = resolveCharacterSpeciesNameGenerationSupport({
     speciesId: args.setup.speciesId,
     context: args.buildContext,
@@ -100,11 +98,15 @@ function buildQuickNpcAuthoringTabs(args: {
       nameTrailingAction,
       nameHint,
     }),
-    requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
-    configuredCount: args.configuredCount,
-    requirementsHeader: hasRequirements ? (
-      <QuickNpcRequirementsFields optionSets={optionSets} />
-    ) : undefined,
+    requirementsFields: buildQuickNpcRequirementsFields(),
+    requirementsHeader: (
+      <QuickNpcStartingChoices
+        setup={args.setup}
+        buildContext={args.buildContext}
+        createContext={args.createContext}
+        optionSets={optionSets}
+      />
+    ),
   })
 }
 
@@ -112,13 +114,13 @@ function QuickNpcAuthoringTabsSync({
   form,
   setup,
   buildContext,
-  configuredCount,
+  createContext,
   onTabsChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabFormValues>
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  configuredCount: number
+  createContext: QuickNpcCreateContext
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
   const { trailingAction, nameHint } = useSpeciesNameTrailingAction({
@@ -132,11 +134,11 @@ function QuickNpcAuthoringTabsSync({
       buildQuickNpcAuthoringTabs({
         setup,
         buildContext,
-        configuredCount,
+        createContext,
         nameTrailingAction: trailingAction,
         nameHint,
       }),
-    [buildContext, configuredCount, nameHint, setup, trailingAction],
+    [buildContext, createContext, nameHint, setup, trailingAction],
   )
 
   React.useLayoutEffect(() => {
@@ -146,40 +148,8 @@ function QuickNpcAuthoringTabsSync({
   return null
 }
 
-function RequirementCountWatcher({
-  form,
-  fallback,
-  onConfiguredCountChange,
-}: {
-  form: UseFormReturn<QuickNpcAuthoringTabFormValues>
-  fallback: Pick<QuickNpcAuthoringTabFormValues, 'requiredWeaponIds' | 'requiredSpellIds'>
-  onConfiguredCountChange: (count: number) => void
-}) {
-  const requiredWeaponIds = useWatch({
-    control: form.control,
-    name: 'requiredWeaponIds',
-    defaultValue: fallback.requiredWeaponIds,
-  })
-  const requiredSpellIds = useWatch({
-    control: form.control,
-    name: 'requiredSpellIds',
-    defaultValue: fallback.requiredSpellIds,
-  })
-
-  const configuredCount = countQuickNpcConfiguredRequirements({
-    requiredWeaponIds: requiredWeaponIds ?? [],
-    requiredSpellIds: requiredSpellIds ?? [],
-  })
-
-  React.useEffect(() => {
-    onConfiguredCountChange(configuredCount)
-  }, [configuredCount, onConfiguredCountChange])
-
-  return null
-}
-
 /**
- * Quick NPC authoring body — TabbedForm Details / Requirements after setup.
+ * Quick NPC authoring body — TabbedForm Details / Starting choices after setup.
  */
 export function QuickNpcAuthoringForm({
   campaignId,
@@ -195,14 +165,13 @@ export function QuickNpcAuthoringForm({
 }: QuickNpcAuthoringFormProps) {
   const createFlowDensity = useCreateFlowFormDensity()
   const { mutateAsync, isPending, isSuccess } = useCreateNpc()
-  const [configuredCount, setConfiguredCount] = React.useState(0)
   const organization =
     createContext.kind === 'organization-member' ? createContext.organization : undefined
   const [tabs, setTabs] = React.useState<TabbedFormTab[]>(() =>
     buildQuickNpcAuthoringTabs({
       setup,
       buildContext,
-      configuredCount: 0,
+      createContext,
     }),
   )
 
@@ -276,13 +245,8 @@ export function QuickNpcAuthoringForm({
             form={form}
             setup={setup}
             buildContext={buildContext}
-            configuredCount={configuredCount}
+            createContext={createContext}
             onTabsChange={setTabs}
-          />
-          <RequirementCountWatcher
-            form={form}
-            fallback={defaultValues}
-            onConfiguredCountChange={setConfiguredCount}
           />
           <SelectionSummaryCard
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}

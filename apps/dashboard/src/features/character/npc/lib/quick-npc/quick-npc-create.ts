@@ -65,6 +65,7 @@ export function buildQuickNpcCreateInput(args: {
   context: CharacterBuildContext
   constraints?: AutomaticNpcBuildConstraints
   preferences?: AutomaticNpcBuildPreferences
+  allowanceSelections?: Record<string, readonly string[]>
   membership?: QuickNpcMembership
 }): CreateNpcRequestInput {
   const resolution = resolveAutomaticNpcBuild({
@@ -72,6 +73,7 @@ export function buildQuickNpcCreateInput(args: {
     context: args.context,
     ...(args.constraints ? { constraints: args.constraints } : {}),
     ...(args.preferences ? { preferences: args.preferences } : {}),
+    ...(args.allowanceSelections ? { allowanceSelections: args.allowanceSelections } : {}),
   })
   if (!resolution.ok) {
     throw new CharacterBuildFinalizationError(resolution.issues)
@@ -88,12 +90,20 @@ export function buildQuickNpcCreateInput(args: {
 
 const MAX_QUICK_NPC_ISSUE_MESSAGES = 3
 
+export class QuickNpcStartingChoiceIncompleteError extends Error {
+  constructor() {
+    super('Choose the required number of starting choices before creating this NPC.')
+    this.name = 'QuickNpcStartingChoiceIncompleteError'
+  }
+}
+
 /**
  * Maps builder validation issues to a single inline form error using the
  * existing issue messages. Returns undefined for non-builder errors so
  * callers fall back to their generic failure copy.
  */
 export function formatQuickNpcCreationError(error: unknown): string | undefined {
+  if (error instanceof QuickNpcStartingChoiceIncompleteError) return error.message
   if (!isCharacterBuildFinalizationError(error)) return undefined
 
   const messages = [...new Set(error.validationIssues.map((issue) => issue.message))]

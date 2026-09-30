@@ -114,6 +114,22 @@ function fighterSeed(overrides: Partial<AutomaticNpcBuildSeed> = {}): AutomaticN
 }
 
 describe('resolveAutomaticNpcBuild', () => {
+  it('keeps preseeded allowance selections ahead of preference order', () => {
+    const context = automaticTestContext()
+    const choiceSetId = buildChoiceSetId('class', automaticFighter.id, 'class-skills')
+    const selectedIds = [`${RULESET}:acrobatics`, `${RULESET}:athletics`]
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed(),
+      context,
+      preferences: { skillSlugs: ['athletics', 'acrobatics'] },
+      allowanceSelections: { [choiceSetId]: selectedIds },
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.draft.choiceSelections[choiceSetId]).toEqual(selectedIds)
+  })
+
   it('completes a fighter build with deterministic first-eligible selections', () => {
     const context = automaticTestContext()
     const result = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })

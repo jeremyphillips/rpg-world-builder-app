@@ -43,6 +43,9 @@ import type { QuickNpcCreateContext } from './quick-npc-create-context'
 
 export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
+export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOverrides'
+
+export const QUICK_NPC_STARTING_CHOICES_TAB_LABEL = 'Starting choices' as const
 
 export const QUICK_NPC_DETAILS_TAB_ID = 'details' as const
 export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
@@ -204,6 +207,7 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
       .pipe(alignmentSchema),
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
+    startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
   })
 
   return z.intersection(quickNpcSetupSchema(maxLevel, minLevel), authoringFields)
@@ -226,6 +230,7 @@ export function quickNpcAuthoringTabSchema() {
       .pipe(alignmentSchema),
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
+    startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
   })
 }
 
@@ -240,6 +245,7 @@ export const quickNpcAuthoringTabDefaultValues = {
   alignment: 'n',
   requiredWeaponIds: [],
   requiredSpellIds: [],
+  startingChoiceOverrides: {},
 } satisfies QuickNpcAuthoringTabFormValues
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
@@ -323,10 +329,6 @@ export type QuickNpcRequirementCategories = {
 
 export type { QuickNpcRequirementOptionSets }
 
-function formatRequirementsTabLabel(configuredCount: number): string {
-  return configuredCount > 0 ? `Requirements (${configuredCount})` : 'Requirements'
-}
-
 export type QuickNpcDetailsFieldsArgs = {
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
@@ -379,7 +381,6 @@ export function buildQuickNpcRequirementsFields(): FormItem[] {
 export function buildQuickNpcTabs(args: {
   detailsFields: FormItem[]
   requirementsFields: FormItem[]
-  configuredCount: number
   requirementsHeader?: ReactNode
 }): TabbedFormTab[] {
   const tabs: TabbedFormTab[] = [
@@ -406,7 +407,7 @@ export function buildQuickNpcTabs(args: {
   if (args.requirementsFields.length > 0 || args.requirementsHeader) {
     tabs.push({
       id: QUICK_NPC_REQUIREMENTS_TAB_ID,
-      label: formatRequirementsTabLabel(args.configuredCount),
+      label: QUICK_NPC_STARTING_CHOICES_TAB_LABEL,
       leadingIcon: createElement(ListTodo, { 'aria-hidden': true }),
       fields: args.requirementsFields,
       ...(args.requirementsHeader ? { header: args.requirementsHeader } : {}),

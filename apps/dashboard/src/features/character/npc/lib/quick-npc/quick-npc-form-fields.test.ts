@@ -35,6 +35,7 @@ const validValues = {
   npcTemplateId: 'guard',
   requiredWeaponIds: [],
   requiredSpellIds: [],
+  startingChoiceOverrides: {},
 }
 
 describe('isQuickNpcMembershipTitleSetupComplete', () => {
@@ -201,6 +202,7 @@ describe('buildQuickNpcDetailsFields', () => {
       alignment: 'n',
       requiredWeaponIds: [],
       requiredSpellIds: [],
+      startingChoiceOverrides: {},
     })
   })
 })
@@ -223,7 +225,6 @@ describe('buildQuickNpcTabs validation wiring', () => {
           width: 'full',
         },
       ],
-      configuredCount: 0,
     })
 
     const detailsTab = tabs.find((tab) => tab.id === QUICK_NPC_DETAILS_TAB_ID)
@@ -255,6 +256,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           alignment: 'ln',
           requiredWeaponIds: [],
           requiredSpellIds: [],
+          startingChoiceOverrides: {},
         },
       ),
     ).toMatchObject({

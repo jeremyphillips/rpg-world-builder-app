@@ -1,7 +1,6 @@
 import type { SpellAcquisitionHeader, SpellLevelTabModel } from '@rpg/contracts'
-import { Heading, Tabs, TabsList, TabsTrigger, Text } from '@rpg/ui'
+import { ChoiceSelectionCounter, Heading, Tabs, TabsList, TabsTrigger, Text } from '@rpg/ui'
 
-import { ChoiceSelectionCounter } from '../shared/choice-section/choice-selection-counter'
 import {
   formatSpellLevelTabOrdinal,
   resolveNarrowSpellLevelTabLayout,

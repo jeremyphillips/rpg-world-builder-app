@@ -5,12 +5,11 @@ import {
   type BuilderChoiceSelectedRow,
 } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { EmptyPanel, Heading, Text } from '@rpg/ui'
+import { ChoiceSelectionCounter, EmptyPanel, Heading, Text } from '@rpg/ui'
 
 import { ChoiceAddAction } from './choice-add-action'
 import { ChoiceSectionValidationMessages } from './choice-section-validation-messages'
 import { ChoiceSelectedRow } from './choice-selected-row'
-import { ChoiceSelectionCounter } from './choice-selection-counter'
 import {
   choiceBlockRowClasses,
   choiceBlockRowContentClasses,

@@ -1,16 +1,11 @@
 import type { ReactNode } from 'react'
 
-import {
-  cn,
-  Eyebrow,
-  SelectionSummaryChangeAction,
-  selectionSummaryCardRowHelperVariants,
-} from '@rpg/ui'
+import { cn, selectionSummaryCardRowHelperVariants } from '@rpg/ui'
 
+import { EyebrowActionHeader } from './eyebrow-action-header'
 import {
   setupAttributeRowBodyClasses,
   setupAttributeRowClasses,
-  setupAttributeRowHeaderClasses,
   setupAttributeRowValueClasses,
 } from './setup-attribute-row.variants'
 
@@ -36,31 +31,6 @@ function SetupAttributeRowCollapsedValue({ value }: { value: ReactNode }) {
   return <div className={setupAttributeRowValueClasses}>{value}</div>
 }
 
-function SetupAttributeRowHeader({
-  eyebrow,
-  changeLabel,
-  onChange,
-}: {
-  eyebrow: string
-  changeLabel?: string
-  onChange?: () => void
-}) {
-  const showChange = changeLabel != null && onChange != null
-
-  return (
-    <div className={setupAttributeRowHeaderClasses}>
-      <Eyebrow size="sm">{eyebrow}</Eyebrow>
-      {showChange ? (
-        <SelectionSummaryChangeAction
-          changeLabel={changeLabel}
-          ariaLabel={changeLabel}
-          onChange={onChange}
-        />
-      ) : null}
-    </div>
-  )
-}
-
 export function SetupAttributeRow({
   eyebrow,
   value,
@@ -77,7 +47,7 @@ export function SetupAttributeRow({
 
   return (
     <div className={className ?? setupAttributeRowClasses}>
-      <SetupAttributeRowHeader eyebrow={eyebrow} changeLabel={changeLabel} onChange={onChange} />
+      <EyebrowActionHeader eyebrow={eyebrow} actionLabel={changeLabel} onAction={onChange} />
       {editing ? <div className={setupAttributeRowBodyClasses}>{children}</div> : null}
       {showCollapsedValue ? <SetupAttributeRowCollapsedValue value={value} /> : null}
       {showHelper ? <SetupAttributeRowHelper helper={helper} /> : null}

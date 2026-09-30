@@ -128,6 +128,7 @@ function QuickNpcCreateModalSession({
         authoringValues: {
           requiredWeaponIds: [],
           requiredSpellIds: [],
+          startingChoiceOverrides: {},
         },
       }))
     },
@@ -244,6 +245,7 @@ function QuickNpcCreateModalSession({
         ...current.authoringValues,
         requiredWeaponIds: [],
         requiredSpellIds: [],
+        startingChoiceOverrides: {},
       },
     }))
   }, [])

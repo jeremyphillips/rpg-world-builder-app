@@ -54,6 +54,8 @@ export {
 
 export { createSetupModalBodyClasses } from './create-setup.variants'
 
+export { EyebrowActionHeader, type EyebrowActionHeaderProps } from './eyebrow-action-header'
+
 export { SetupAttributeRow, type SetupAttributeRowProps } from './setup-attribute-row'
 
 export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models'

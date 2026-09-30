@@ -201,6 +201,10 @@ export {
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonForwardingProps, type ButtonProps } from './components/ui/button.client'
 export { ActionButton, type ActionButtonProps } from './components/ui/action-button.client'
+export {
+  ChoiceSelectionCounter,
+  type ChoiceSelectionCounterProps,
+} from './components/ui/choice-selection-counter.client'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
   ACTION_ICONS,

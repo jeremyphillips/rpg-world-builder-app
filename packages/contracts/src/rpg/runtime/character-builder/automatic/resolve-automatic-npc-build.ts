@@ -87,6 +87,11 @@ export type ResolveAutomaticNpcBuildArgs = {
   constraints?: AutomaticNpcBuildConstraints
   /** Soft ordering. Missing preferences fall through to canonical choice order. */
   preferences?: AutomaticNpcBuildPreferences
+  /**
+   * Complete allowance fills already decided by Starting choices.
+   * Seeded before top-up so preference merging cannot replace or extend them.
+   */
+  allowanceSelections?: Record<string, readonly string[]>
   context: CharacterBuildContext
 }
 
@@ -439,6 +444,7 @@ export function resolveAutomaticNpcBuild({
   seed,
   constraints,
   preferences,
+  allowanceSelections,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
@@ -447,6 +453,13 @@ export function resolveAutomaticNpcBuild({
   const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
 
   let draft = seedDraft(seed, context, preferences)
+  if (allowanceSelections) {
+    const choiceSelections = { ...draft.choiceSelections }
+    for (const [choiceSetId, selectedIds] of Object.entries(allowanceSelections)) {
+      choiceSelections[choiceSetId] = [...selectedIds]
+    }
+    draft = { ...draft, choiceSelections }
+  }
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
   const resolvedPreferences = languagePreferencesWithSpecies(draft, catalogIndex, preferences)
 

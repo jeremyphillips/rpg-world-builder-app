@@ -1,6 +1,10 @@
-import { formatChoiceChosenCounter, type ChoiceCounterVerb } from '@rpg/contracts'
-import { SemanticText, StatusIcon, Text } from '@rpg/ui'
+'use client'
 
+import { formatChoiceChosenCounter, type ChoiceCounterVerb } from '@rpg/contracts'
+
+import { SemanticText } from './semantic-text/semantic-text'
+import { StatusIcon } from './status-icon.client'
+import { Text } from './text'
 import {
   choiceSelectionCounterClasses,
   choiceSelectionCounterLabelClasses,

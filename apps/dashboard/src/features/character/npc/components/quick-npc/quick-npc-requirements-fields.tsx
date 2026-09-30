@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import { Button, ComboboxField } from '@rpg/ui'
+import { ActionButton, ComboboxField } from '@rpg/ui'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
 import {
@@ -81,9 +81,14 @@ function WeaponRequirementsField({ entries }: { entries: QuickNpcWeaponRequireme
             <div className="min-w-0 flex-1">
               <QuickNpcWeaponRequirementPreview entry={entry} />
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-              {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
-            </Button>
+            <ActionButton
+              action="remove"
+              variant="ghost"
+              size="icon"
+              density="compact"
+              aria-label={`${QUICK_NPC_REQUIREMENT_REMOVE_LABEL} ${option.label}`}
+              onClick={onRemove}
+            />
           </div>
         )
       }}
@@ -130,9 +135,14 @@ function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirement
             <div className="min-w-0 flex-1">
               <QuickNpcSpellRequirementPreview entry={entry} />
             </div>
-            <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-              {QUICK_NPC_REQUIREMENT_REMOVE_LABEL}
-            </Button>
+            <ActionButton
+              action="remove"
+              variant="ghost"
+              size="icon"
+              density="compact"
+              aria-label={`${QUICK_NPC_REQUIREMENT_REMOVE_LABEL} ${option.label}`}
+              onClick={onRemove}
+            />
           </div>
         )
       }}
