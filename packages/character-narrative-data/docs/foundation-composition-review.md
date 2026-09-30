@@ -2,7 +2,7 @@
 
 Review date: 2026-09-29
 
-Collection revision: `foundation-5`
+Collection revision: `foundation-6`
 
 Fixture: 24 fixed seed/context cases in
 [`foundation-composition-review.generated.md`](foundation-composition-review.generated.md)
@@ -20,6 +20,8 @@ The reviewed fixture passes the actionable-fragment authoring standard:
 - Bonds identify concrete debts, records, keys, letters, promises, places,
   people, possessions, or unresolved events that another character can affect.
 - Flaws create predictable trouble through behavior under pressure.
+- Motivations name a target state with visible milestones, opposition, or a
+  deadline rather than merely describing preferred work or a worldview.
 - Experiences use specific roles, objects, and acts and leave a witness, debt,
   record, grievance, investigation, missing answer, or other consequence open.
 - Generic class and species labels appear only in social or training situations

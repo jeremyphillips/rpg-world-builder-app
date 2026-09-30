@@ -1,12 +1,12 @@
 import { narrativeCollectionSchema } from '@rpg/contracts/character-narrative'
 
 export const foundationCollection = narrativeCollectionSchema.parse({
-  revision: 'foundation-5',
+  revision: 'foundation-6',
   fragments: [
     {
       id: 'duty-foundation-1',
       slot: 'personalityTraits',
-      text: 'I keep careful track of the commitments I make.',
+      text: 'Before I promise anything, I write the name, deadline, and consequence in a pocket ledger.',
       themeIds: ['duty'],
       requires: [],
       affinities: [],
@@ -17,7 +17,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'duty-foundation-2',
       slot: 'personalityTraits',
-      text: 'I prepare for a difficult conversation before I begin it.',
+      text: 'Before a difficult conversation, I rehearse my first sentence and decide what I will not promise.',
       themeIds: ['duty'],
       requires: [],
       affinities: [],
@@ -171,7 +171,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'belonging-foundation-8',
       slot: 'motivation',
-      text: 'Before I join a company, I watch who gets interrupted, who gets the last bowl, and whose mistakes are forgiven.',
+      text: 'I want to build a company where the last bowl, the floor, and a second chance are offered without rank.',
       themeIds: ['belonging'],
       requires: [],
       affinities: [],
@@ -182,7 +182,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ambition-foundation-1',
       slot: 'personalityTraits',
-      text: 'I turn distant goals into small tasks I can begin today.',
+      text: 'For every distant goal, I mark one door to knock on before sunset.',
       themeIds: ['ambition'],
       requires: [],
       affinities: [],
@@ -259,7 +259,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ambition-foundation-8',
       slot: 'motivation',
-      text: 'I am seeking a public test of my skill, but I will not sacrifice the people who helped me merely to claim the result alone.',
+      text: 'I am preparing for the capital’s open trial, where I intend to win a master’s seal without hiding who trained me.',
       themeIds: ['ambition'],
       requires: [],
       affinities: [],
@@ -282,7 +282,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'lg-flaws',
       slot: 'flaws',
-      text: 'I can be slow to forgive a broken promise, even when the person is trying to make amends.',
+      text: 'When someone breaks a promise to me, I keep demanding proof long after they have made amends.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -306,7 +306,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'lg-motivation',
       slot: 'motivation',
-      text: 'I seek escort routes, shelters, and watch posts where the people at risk can reject my plan before I enforce it.',
+      text: 'I am mapping a chain of guarded shelters where travelers can reach the next locked door before nightfall.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -354,7 +354,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ng-motivation',
       slot: 'motivation',
-      text: 'I look for dry wells, broken handcarts, and empty watches that everyone passes because no reward is posted.',
+      text: 'I intend to restore the dry well, broken handcart, and empty night watch in the poorest ward before winter.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -402,7 +402,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cg-motivation',
       slot: 'motivation',
-      text: 'I bring debtors copies of their contracts, a hidden purse, and two routes out, then let them choose whether to run.',
+      text: 'I am opening two escape routes from the debtors’ quarter and leaving every captive a contract copy and a hidden purse.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -426,7 +426,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ln-flaws',
       slot: 'flaws',
-      text: 'I can mistake a clear procedure for a complete understanding of a problem.',
+      text: 'If the procedure gives me an answer, I stop listening to facts that do not fit its boxes.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -450,7 +450,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ln-motivation',
       slot: 'motivation',
-      text: 'I am looking for a post with written standards, public records, and a superior who cannot change either after I act.',
+      text: 'I intend to win the records post and publish its standards where neither my superior nor I can alter them in private.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -498,7 +498,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'n-motivation',
       slot: 'motivation',
-      text: 'Before I choose a side, I collect two witnesses, keep one route open, and name the hour when delay becomes its own choice.',
+      text: 'I want to broker a season-long truce between two feuding market streets before their next levy comes due.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -522,7 +522,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cn-flaws',
       slot: 'flaws',
-      text: 'I abandon useful routines simply because they begin to feel like expectations.',
+      text: 'The moment a useful routine becomes expected, I skip it just to prove I still can.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -546,7 +546,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cn-motivation',
       slot: 'motivation',
-      text: 'I take jobs with unmapped routes, but I leave one paid obligation pinned above my bed until it is finished.',
+      text: 'I mean to chart the unmapped road beyond the salt marsh and return before the paid notice above my bed expires.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -570,7 +570,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'le-flaws',
       slot: 'flaws',
-      text: 'When a plan depends on my control, I reject simpler compromises and turn small resistance into a contest of authority.',
+      text: 'When a subordinate resists my plan, I add conditions until agreeing is easier than arguing.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -594,7 +594,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'le-motivation',
       slot: 'motivation',
-      text: 'I seek authority over a durable system of favors and obligations, preferring predictable leverage to wasteful cruelty or spectacle.',
+      text: 'I am building a chain of debtors in every town on the north road so I never have to bargain from weakness again.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -618,7 +618,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ne-flaws',
       slot: 'flaws',
-      text: 'I treat sincere generosity as hidden leverage and often insult the few people who meant to help freely.',
+      text: 'When someone offers me something freely, I immediately start looking for the price they have not named.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -666,7 +666,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ce-flaws',
       slot: 'flaws',
-      text: 'I let resentment turn a manageable setback into a personal vendetta.',
+      text: 'When someone crosses me, I keep pushing long after I have already gotten what I wanted.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -714,7 +714,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'lg-flaws-alt',
       slot: 'flaws',
-      text: 'I stay to offer mercy when leaving would stop the harm from spreading further.',
+      text: 'When mercy fails once, I offer it again even while the same offender keeps causing harm.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -738,7 +738,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'lg-motivation-alt',
       slot: 'motivation',
-      text: 'I look for broken arrangements where one honest witness can force correction without turning every dispute into a private crusade.',
+      text: 'I want to reopen the poorhouse audit and put its missing witness before a magistrate who cannot bury the record.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -786,7 +786,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ng-motivation-alt',
       slot: 'motivation',
-      text: 'I seek neglected gardens, empty sickrooms, and unpaid watches where the work remains after the audience leaves.',
+      text: 'I am restoring an abandoned physic garden so the empty sickroom beside it can reopen before fever season.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -810,7 +810,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cg-flaws-alt',
       slot: 'flaws',
-      text: 'I treat any rule I did not choose as a personal insult and provoke avoidable confrontations.',
+      text: 'When a rule blocks me, I challenge the person enforcing it before I look for another route.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -834,7 +834,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cg-motivation-alt',
       slot: 'motivation',
-      text: 'I seek communities where members can leave, return, and negotiate terms without a single authority defining belonging for them.',
+      text: 'I want to establish a refuge where anyone can leave without permission and still find the door open when they return.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -858,7 +858,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ln-flaws-alt',
       slot: 'flaws',
-      text: 'I reject useful improvisation because it was not part of the plan I announced.',
+      text: 'If an improvisation was not in the plan I announced, I reject it even while that plan is failing.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -906,7 +906,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'n-flaws-alt',
       slot: 'flaws',
-      text: 'I treat every strong opinion as suspect and withhold support until the argument exhausts itself.',
+      text: 'When everyone else chooses a side quickly, I assume I am the only one still thinking clearly.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -930,7 +930,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'n-motivation-alt',
       slot: 'motivation',
-      text: 'I look for situations where a measured compromise can hold long enough for better facts to arrive.',
+      text: 'I want to negotiate one season of peace between the quarry crews before either side hires more guards.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -954,7 +954,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cn-flaws-alt',
       slot: 'flaws',
-      text: 'I treat a surprise invitation as a trap and sabotage plans before anyone can disappoint me.',
+      text: 'When a surprise invitation arrives, I invent a reason to ruin the plan before anyone can withdraw it.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -978,7 +978,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'cn-motivation-alt',
       slot: 'motivation',
-      text: 'I chase openings that let me test a new skill or route, but I leave a note about where I can be found when the test runs longer than promised.',
+      text: 'I am charting an unmarked route through the western hills and leaving supply notes at every place I might turn aside.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -1002,7 +1002,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'le-flaws-alt',
       slot: 'flaws',
-      text: 'I confuse loyalty with ownership and treat dissent as theft from the structure I control.',
+      text: 'When a loyal follower disagrees with me, I seize the duties and access I once trusted them to hold.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -1074,7 +1074,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'ne-motivation-alt',
       slot: 'motivation',
-      text: 'I look for partners who profit when I succeed, so their help arrives before my need becomes visible weakness.',
+      text: 'I am binding three river merchants to my venture so each loses more from abandoning me than from seeing me succeed.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -1409,7 +1409,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'context-20',
       slot: 'flaws',
-      text: 'I keep using a worn-out possession until it fails at the worst moment because replacing it feels like admitting defeat.',
+      text: 'I patch the same worn-out tool after every failure and reach for it again when the next job turns dangerous.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -1442,7 +1442,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'context-23',
       slot: 'personalityTraits',
-      text: 'I arrange my belongings the same way whenever I stop to rest.',
+      text: 'Whenever I stop to rest, I point my boots toward the exit and sleep with the map under my left hand.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],
@@ -1680,7 +1680,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'foundation-flaw-loyalty-1',
       slot: 'flaws',
-      text: 'I defend people I consider mine long after the evidence says they caused the trouble.',
+      text: 'When a companion is accused, I attack the accuser’s story before I ask whether my companion is guilty.',
       themeIds: ['belonging', 'duty'],
       requires: [],
       affinities: [],
@@ -1691,7 +1691,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'foundation-flaw-proof-1',
       slot: 'flaws',
-      text: 'A challenge to my competence makes me attempt the hardest solution before the sensible one.',
+      text: 'When my competence is challenged, I attempt the hardest solution before the sensible one.',
       themeIds: ['ambition'],
       requires: [],
       affinities: [],
@@ -1702,7 +1702,7 @@ export const foundationCollection = narrativeCollectionSchema.parse({
     {
       id: 'foundation-flaw-secrecy-1',
       slot: 'flaws',
-      text: 'Under pressure, I conceal one mistake to preserve trust and create a larger betrayal when it surfaces.',
+      text: 'When I make a mistake under pressure, I hide it and let my companions keep relying on the false account.',
       themeIds: ['duty', 'belonging', 'ambition'],
       requires: [],
       affinities: [],

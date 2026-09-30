@@ -60,4 +60,5 @@ only when the character is in a campaign scope.
 pnpm --filter @rpg/character-narrative-integrations typecheck
 pnpm --filter @rpg/character-narrative-integrations lint
 pnpm --filter @rpg/character-narrative-integrations test
+pnpm --filter @rpg/character-narrative-integrations review:foundation
 ```

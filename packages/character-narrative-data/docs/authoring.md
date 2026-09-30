@@ -43,10 +43,13 @@ contradiction.
 
 ### Personality traits
 
-Write a visible tell or repeated behavior, not a broad adjective.
+Write a visible tell or repeated behavior, not a broad adjective or a summary of
+how the character approaches life. Prefer language the player can perform nearly
+verbatim.
 
 - Pass: “I memorize the exits before I sit down.”
 - Reject: “I am curious about other people.”
+- Reject: “I keep careful track of my commitments.”
 
 ### Ideals
 
@@ -74,11 +77,29 @@ but must not invent facts about that reference.
 ### Flaws
 
 Create predictable pressure with an observable consequence. State what the
-character does when the pressure appears, not only what they feel.
+character does when the pressure appears, not the psychological pattern that
+explains the behavior. Prefer a trigger followed by an action the player can
+perform nearly verbatim.
 
-- Pass: “I assume hesitation means betrayal and confront people before I have
-  proof.”
-- Reject: “I read too much into changes in tone.”
+- Pass: “When someone offers me something freely, I look for the price they have
+  not named.”
+- Pass: “When someone crosses me, I keep pushing after I have already gotten what
+  I wanted.”
+- Reject: “I treat generosity as hidden leverage.”
+- Reject: “I let resentment become a vendetta.”
+
+### Motivations
+
+Name or strongly imply a target state the character can make progress toward in
+play. A motivation should create destinations, milestones, opposition, and
+decisions for the campaign. A general preference, job category, or repeated
+method is not enough.
+
+- Pass: “I am building a chain of debtors in every town on the north road.”
+- Pass: “I want to establish a refuge where anyone can leave freely and still
+  return.”
+- Reject: “I seek authority over a durable system of favors.”
+- Reject: “I look for communities that value freedom.”
 
 ### Experience and story prose
 
@@ -201,6 +222,15 @@ Before accepting an expansion:
 
 Automated tests protect structure and obvious regressions. They do not certify
 literary quality.
+
+When changing the foundation collection:
+
+1. Bump its `revision`.
+2. Run `pnpm --filter @rpg/character-narrative-data review:inventory`.
+3. Run `pnpm --filter @rpg/character-narrative-integrations review:foundation`.
+4. Update `foundation-composition-review.md` when the editorial acceptance
+   statement changes.
+5. Run the data and integrations package tests.
 
 ## Deferred structured ingredients
 

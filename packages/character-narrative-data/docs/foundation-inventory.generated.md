@@ -1,6 +1,6 @@
 # Foundation collection inventory
 
-Generated from collection revision `foundation-5`. Do not edit
+Generated from collection revision `foundation-6`. Do not edit
 this file directly. Regenerate it with:
 
 ```bash
@@ -263,9 +263,9 @@ Only fragments whose `alignmentIds` include the alignment.
 
 ```json
 {
-  "direct": 90,
-  "pressure": 70,
-  "tension": 22
+  "direct": 91,
+  "pressure": 71,
+  "tension": 20
 }
 ```
 

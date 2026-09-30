@@ -52,6 +52,16 @@ export const LINTABLE_PLACEHOLDER_PHRASES = [
   'my being {{species.name}}',
 ] as const
 
+export const LINTABLE_SUMMARY_PHRASES = [
+  'i keep careful track of the commitments',
+  'i turn distant goals into small tasks',
+  'i let resentment turn',
+  'i treat sincere generosity as hidden leverage',
+  'i treat every strong opinion as suspect',
+  'i seek authority over a durable system',
+  'i seek communities where members can leave',
+] as const
+
 export type HookShape = 'direct' | 'pressure' | 'tension'
 
 const tensionPattern =
