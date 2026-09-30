@@ -24,10 +24,13 @@ Data entries are complete sentences or short passages. Supported tokens include
 requires and must not make campaign claims that are not represented by the
 supplied reference.
 
-All additions and revisions must pass the
-[character narrative authoring standard](docs/authoring.md). Schema validity does
-not replace the guide's playable-specificity, experience, distinctiveness, and
-editorial composition checks.
+All additions and revisions must pass the canonical
+[character narrative authoring standard](docs/authoring.md). Agents editing any
+narrative collection must read it first. The generator's editorial goal is a
+playable handle: concrete, externally actionable, unresolved material that a
+player or GM can bring back into play. Schema validity does not replace the
+guide's actionability, specificity, experience, distinctiveness, and editorial
+composition checks.
 
 The current collection's
 [coverage inventory](docs/foundation-inventory.generated.md),
