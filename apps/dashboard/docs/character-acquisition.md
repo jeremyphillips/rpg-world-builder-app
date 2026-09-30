@@ -65,11 +65,11 @@ README). Default `/characters/*` never carries campaign id in the URL.
 
 Campaign managers use **Create NPC** (`ContentCreateSplitAction`) beside **Import NPC**:
 
-| Mode                | Behavior                                                                                                                                                                                                                            |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Create from scratch | Navigate to `/campaigns/:id/npcs/new` (empty builder).                                                                                                                                                                              |
-| Start with setup…   | `QuickNpcCreateModal` with `context: { kind: 'standalone' }` and `setupCompletion: 'handoff'` — Species → Build, then navigate to the builder with `location.state.builderSeed` from `buildCharacterBuilderDraftFromQuickNpcSetup`. |
-| Quick create…       | Same modal in default **authoring** mode — setup then Details/Requirements tabs; submit posts `POST /npcs` and stays on the overview.                                                                                               |
+| Mode                | Behavior                                                                                                                                                                                                                                                                          |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create from scratch | Navigate to `/campaigns/:id/npcs/new` (empty builder).                                                                                                                                                                                                                            |
+| Start with setup…   | `QuickNpcCreateModal` with `context: { kind: 'standalone' }` and `setupCompletion: 'handoff'` — Role → Species → Build, then navigate to the builder with `location.state.builderSeed` from `buildCharacterBuilderDraftFromQuickNpcSetup` (includes `npcTemplateId` when chosen). |
+| Quick create…       | Same modal in default **authoring** mode — Role → Species → Build, then Details/Requirements tabs; submit posts `POST /npcs` with template preferences from `resolveNpcTemplateRecommendations` and stays on the overview.                                                        |
 
 `CharacterBuilderShell` applies the seed once after session-storage hydration via `replaceDraft`, then
 the create route clears router state with a replace navigation so hydration does not race the seed.

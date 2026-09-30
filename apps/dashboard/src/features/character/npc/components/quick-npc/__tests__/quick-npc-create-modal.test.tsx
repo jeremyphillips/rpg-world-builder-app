@@ -25,6 +25,7 @@ import {
   QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
   QUICK_NPC_STANDALONE_SETUP_HEADLINE,
 } from '../../../lib/quick-npc/quick-npc-create-modal-setup.lib'
+import { QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT } from '../../../lib/quick-npc/quick-npc-npc-template-option.lib'
 import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 
 const createNpcMock = vi.hoisted(() => vi.fn())
@@ -624,7 +625,12 @@ describe('QuickNpcCreateModal standalone context', () => {
     })
   }
 
+  async function selectStandaloneRole(user: ReturnType<typeof userEvent.setup>, name: RegExp) {
+    await user.click(screen.getByRole('radio', { name }))
+  }
+
   async function completeStandaloneSetup(user: ReturnType<typeof userEvent.setup>) {
+    await selectStandaloneRole(user, /guard/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     const changeLevelButton = screen.queryByRole('button', {
       name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
@@ -636,19 +642,22 @@ describe('QuickNpcCreateModal standalone context', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }))
   }
 
-  it('shows species first without title or member copy', () => {
+  it('shows role first without title or member copy', () => {
     renderStandaloneModal()
 
     expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_HEADLINE)).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_DESCRIPTION)).toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /guildmaster/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
+    expect(screen.getByText(QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT)).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   })
 
-  it('shows build after species without title gating', async () => {
+  it('shows build after role and species without title gating', async () => {
     const user = userEvent.setup()
     renderStandaloneModal()
 
+    await selectStandaloneRole(user, /guard/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     expect(
       screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
@@ -659,6 +668,7 @@ describe('QuickNpcCreateModal standalone context', () => {
     const user = userEvent.setup()
     renderStandaloneModal()
 
+    await selectStandaloneRole(user, /commoner/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Continue' }))
@@ -669,6 +679,7 @@ describe('QuickNpcCreateModal standalone context', () => {
     const user = userEvent.setup()
     renderStandaloneModal({ buildContext: standaloneBuildContextMinLevelOne })
 
+    await selectStandaloneRole(user, /commoner/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await selectBuildCardClass(user, /fighter/i)

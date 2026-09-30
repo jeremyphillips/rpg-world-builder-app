@@ -121,6 +121,7 @@ function QuickNpcCreateModalSession({
   const titles = organizationMembers?.titles ?? []
   const classAffinityIds = organizationMembers?.classAffinityIds
   const speciesAffinityIds = organizationMembers?.speciesAffinityIds
+  const organizationTemplateId = organizationMembers?.npcTemplateId
 
   const setupSets = React.useMemo(
     () =>
@@ -207,6 +208,7 @@ function QuickNpcCreateModalSession({
         context: buildContext,
         titles,
         organizationClassAffinityIds: classAffinityIds,
+        organizationTemplateId,
       })
 
       const nextSets = buildQuickNpcCreateSetupSets({
@@ -239,7 +241,15 @@ function QuickNpcCreateModalSession({
         setupValues: nextValues,
       }))
     },
-    [buildContext, classAffinityIds, context, handleContinueFromSetup, speciesAffinityIds, titles],
+    [
+      buildContext,
+      classAffinityIds,
+      context,
+      handleContinueFromSetup,
+      organizationTemplateId,
+      speciesAffinityIds,
+      titles,
+    ],
   )
 
   const returnToAuthoring = React.useCallback(() => {
@@ -329,7 +339,7 @@ function QuickNpcCreateModalSession({
           />
         ) : (
           <QuickNpcAuthoringForm
-            key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
+            key={`${state.setupValues.contextKind === 'standalone' ? (state.setupValues.npcTemplateId ?? '') : ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
             campaignId={campaignId}
             buildContext={buildContext}
             createContext={context}

@@ -18,6 +18,7 @@ import {
   QUICK_NPC_STANDALONE_SETUP_HEADLINE,
   QUICK_NPC_TITLE_FIELD_PROMPT,
 } from '../../../lib/quick-npc/quick-npc-create-modal-setup.lib'
+import { QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT } from '../../../lib/quick-npc/quick-npc-npc-template-option.lib'
 import {
   quickNpcOrganizationMemberCreateContext,
   quickNpcStandaloneCreateContext,
@@ -226,7 +227,7 @@ const standaloneBuildContextMinLevelOne = createCampaignNpcBuilderContextFixture
   },
 })
 
-export const StandaloneSpeciesFirst: Story = {
+export const StandaloneRoleFirst: Story = {
   tags: ['storybook-test-runner-skip'],
   args: {
     buildContext: standaloneBuildContext,
@@ -239,7 +240,9 @@ export const StandaloneSpeciesFirst: Story = {
     await expect(canvas.getByText(QUICK_NPC_STANDALONE_SETUP_DESCRIPTION)).toBeVisible()
     expect(canvas.queryByText(QUICK_NPC_TITLE_FIELD_PROMPT)).not.toBeInTheDocument()
     expect(canvas.queryByText(QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION)).not.toBeInTheDocument()
+    await expect(canvas.getByText(QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT)).toBeVisible()
     expect(canvas.queryByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).not.toBeInTheDocument()
+    expect(canvas.queryByRole('radio', { name: /dwarf/i })).not.toBeInTheDocument()
     await expect(canvas.getByRole('button', { name: 'Continue' })).toBeDisabled()
   },
 }
@@ -253,6 +256,7 @@ export const StandaloneLevelZeroPath: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
 
+    await userEvent.click(canvas.getByRole('radio', { name: /commoner/i }))
     await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
     await expect(canvas.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeVisible()
     await expect(canvas.getByRole('button', { name: 'Continue' })).toBeEnabled()
@@ -268,6 +272,7 @@ export const StandaloneClassGatePath: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
 
+    await userEvent.click(canvas.getByRole('radio', { name: /guard/i }))
     await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
     await expect(canvas.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await userEvent.click(canvas.getByRole('radio', { name: /fighter/i }))

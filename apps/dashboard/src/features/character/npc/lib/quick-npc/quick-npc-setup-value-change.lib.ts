@@ -8,8 +8,13 @@ import {
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
-import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
-import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
+import {
+  isQuickNpcOrganizationMemberSetup,
+  isQuickNpcStandaloneSetup,
+  resolveQuickNpcDefaultLevel,
+  type QuickNpcSetupValues,
+} from './quick-npc-form-fields'
+import type { NpcTemplateId } from '@rpg/contracts'
 import { isCreateSetupChoiceComplete, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
 
@@ -72,6 +77,7 @@ type QuickNpcSetupValueChangeArgs = {
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
   organizationClassAffinityIds?: readonly string[]
+  organizationTemplateId?: NpcTemplateId
 }
 
 function applyRecommendedClassSeeding(args: QuickNpcSetupValueChangeArgs): QuickNpcSetupValues {
@@ -97,6 +103,20 @@ export function applyQuickNpcSetupValueChange(
   args: QuickNpcSetupValueChangeArgs,
 ): QuickNpcSetupValues {
   const { setId, nextValue } = args.event
+
+  if (setId === 'npcTemplateId') {
+    if (!isQuickNpcStandaloneSetup(args.values)) {
+      return args.values
+    }
+
+    const nextValues: QuickNpcSetupValues = {
+      ...args.values,
+      npcTemplateId: String(nextValue) as NpcTemplateId,
+      classId: '',
+    }
+
+    return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
+  }
 
   if (setId === 'speciesId') {
     const nextValues = applyLevelClassSideEffects({

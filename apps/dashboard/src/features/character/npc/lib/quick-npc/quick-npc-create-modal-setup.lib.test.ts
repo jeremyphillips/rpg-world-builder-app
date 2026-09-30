@@ -76,7 +76,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
     ])
   })
 
-  it('returns only species setup set for standalone context', () => {
+  it('returns role and species setup sets for standalone context', () => {
     const values = createQuickNpcSetupDefaultValues(context, standaloneCreateContext)
     const sets = buildQuickNpcCreateSetupSets({
       createContext: standaloneCreateContext,
@@ -85,8 +85,42 @@ describe('buildQuickNpcCreateSetupSets', () => {
       titles: [],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId'])
-    expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toBeUndefined()
+    expect(sets.map((set) => set.id)).toEqual(['npcTemplateId', 'speciesId'])
+    expect(sets.find((set) => set.id === 'npcTemplateId')?.isComplete).toBe(false)
+    expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toEqual([
+      'npcTemplateId',
+    ])
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    expect(resolveCreateSetupActiveSetId({ sets: sequenceItems })).toBe('npcTemplateId')
+    expect(
+      resolveCreateSetupVisibleSetIds({
+        sets: sequenceItems,
+        activeSetId: 'npcTemplateId',
+      }),
+    ).toEqual(['npcTemplateId'])
+  })
+
+  it('reveals species after standalone role is chosen', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      createContext: standaloneCreateContext,
+      context,
+      values: quickNpcStandaloneSetupValues({ npcTemplateId: 'guard' }),
+      titles: [],
+    })
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    expect(resolveCreateSetupActiveSetId({ sets: sequenceItems })).toBe('speciesId')
   })
 
   it('reveals species after membership title is chosen without downstream setup sets', () => {
@@ -138,11 +172,26 @@ describe('resolveQuickNpcBuildCardModel', () => {
     ).toBeNull()
   })
 
-  it('returns build card after species is complete for standalone context', () => {
+  it('returns null until role and species are complete for standalone context', () => {
+    expect(
+      resolveQuickNpcBuildCardModel({
+        createContext: standaloneCreateContext,
+        context,
+        values: quickNpcStandaloneSetupValues({
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 0,
+        }),
+        titles: [],
+      }),
+    ).toBeNull()
+  })
+
+  it('returns recommended build card after role and species are complete for standalone context', () => {
     const model = resolveQuickNpcBuildCardModel({
       createContext: standaloneCreateContext,
       context,
       values: quickNpcStandaloneSetupValues({
+        npcTemplateId: 'guard',
         speciesId: 'srd-cc-5.2.1:dwarf',
         level: 0,
       }),
@@ -150,8 +199,9 @@ describe('resolveQuickNpcBuildCardModel', () => {
     })
 
     expect(model).toMatchObject({
-      mode: 'build',
-      sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
+      mode: 'recommended',
+      sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+      templateLabel: 'Guard',
       level: 0,
       classProgressionApplicable: false,
     })
@@ -281,10 +331,11 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
     ])
   })
 
-  it('omits Role row for standalone context', () => {
+  it('includes Role row for standalone context when a template is chosen', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
       createContext: standaloneCreateContext,
       values: quickNpcStandaloneSetupValues({
+        npcTemplateId: 'scout',
         speciesId: 'srd-cc-5.2.1:dwarf',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 1,
@@ -293,7 +344,26 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       titles: [],
     })
 
-    expect(rows.map((row) => row.id)).toEqual(['speciesId', 'quickNpcBuild'])
+    expect(rows).toEqual([
+      {
+        id: 'npcTemplateId',
+        label: 'Role',
+        value: 'Scout',
+        editTarget: { type: 'set', id: 'npcTemplateId' },
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        editTarget: { type: 'set', id: 'speciesId' },
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Scout · Level 1 Fighter',
+        editTarget: { type: 'external', id: 'quickNpcBuild' },
+      },
+    ])
   })
 
   it('includes Build with level-only copy when no title recommendation exists', () => {
@@ -392,6 +462,7 @@ describe('isQuickNpcBuildResolved', () => {
       isQuickNpcBuildResolved({
         context,
         values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 0,
@@ -424,6 +495,7 @@ describe('quickNpcBuildRevision', () => {
     level: 5,
   })
   const standaloneBaseValues = quickNpcStandaloneSetupValues({
+    npcTemplateId: 'guard',
     speciesId: 'srd-cc-5.2.1:dwarf',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
@@ -438,9 +510,9 @@ describe('quickNpcBuildRevision', () => {
     )
   })
 
-  it('derives standalone revision from speciesId, level, and classId only', () => {
+  it('derives standalone revision from npcTemplateId, speciesId, level, and classId', () => {
     expect(quickNpcBuildRevision(standaloneBaseValues)).toBe(
-      `srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+      `guard:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
     expect(quickNpcBuildRevision(standaloneBaseValues)).not.toContain('Guildmaster')
     expect(quickNpcBuildRevision({ ...standaloneBaseValues, level: 3 })).not.toBe(

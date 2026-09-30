@@ -53,12 +53,14 @@ export function QuickNpcCreateSetupPhase({
         titles: organization?.members?.titles ?? [],
         members: {
           classAffinityIds: organization?.members?.classAffinityIds,
+          npcTemplateId: organization?.members?.npcTemplateId,
         },
       }),
     [
       buildContext,
       createContext,
       organization?.members?.classAffinityIds,
+      organization?.members?.npcTemplateId,
       organization?.members?.titles,
       setupValues,
     ],

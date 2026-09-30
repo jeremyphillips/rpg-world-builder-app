@@ -16,6 +16,7 @@ import {
 import {
   quickNpcMemberSetupValues,
   quickNpcMemberSetupWithNoTitle,
+  quickNpcStandaloneSetupValues,
 } from './quick-npc-test-fixtures'
 
 const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
@@ -79,13 +80,17 @@ function applySetupChange(
   const previousValue =
     setId === 'speciesId'
       ? values.speciesId
-      : setId === 'membershipTitle'
-        ? isQuickNpcOrganizationMemberSetup(values)
-          ? (values.membershipTitle ?? '')
+      : setId === 'npcTemplateId'
+        ? 'npcTemplateId' in values
+          ? (values.npcTemplateId ?? '')
           : ''
-        : setId === 'classId'
-          ? values.classId
-          : values.level
+        : setId === 'membershipTitle'
+          ? isQuickNpcOrganizationMemberSetup(values)
+            ? (values.membershipTitle ?? '')
+            : ''
+          : setId === 'classId'
+            ? values.classId
+            : values.level
 
   return applyQuickNpcSetupValueChange({
     values,
@@ -127,6 +132,56 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
 })
 
 describe('applyQuickNpcSetupValueChange', () => {
+  it('reseeds class when standalone role changes without touching level or species', () => {
+    expect(
+      applySetupChange({
+        values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 0,
+          classId: '',
+        }),
+        setId: 'npcTemplateId',
+        nextValue: 'criminal',
+        context: multiClassContext,
+        titles: [],
+        organizationClassAffinityIds: [],
+      }),
+    ).toEqual(
+      quickNpcStandaloneSetupValues({
+        npcTemplateId: 'criminal',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        level: 0,
+        classId: '',
+      }),
+    )
+  })
+
+  it('auto-seeds class when standalone role resolves to one recommendation at classed level', () => {
+    expect(
+      applySetupChange({
+        values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 5,
+          classId: '',
+        }),
+        setId: 'npcTemplateId',
+        nextValue: 'criminal',
+        context: multiClassContext,
+        titles: [],
+        organizationClassAffinityIds: [],
+      }),
+    ).toEqual(
+      quickNpcStandaloneSetupValues({
+        npcTemplateId: 'criminal',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        level: 5,
+        classId: rogueClass.id,
+      }),
+    )
+  })
+
   const baseValues: QuickNpcOrganizationMemberSetupValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: 'omt_member',

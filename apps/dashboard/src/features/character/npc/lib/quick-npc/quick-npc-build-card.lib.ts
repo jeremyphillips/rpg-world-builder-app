@@ -7,6 +7,7 @@ import {
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
   type NpcTemplateEntry,
+  type NpcTemplateId,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
@@ -16,6 +17,7 @@ import {
   buildQuickNpcContentOptions,
   isQuickNpcMembershipTitleSetupComplete,
   isQuickNpcOrganizationMemberSetup,
+  isQuickNpcStandaloneSetup,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
@@ -126,6 +128,13 @@ function isQuickNpcBuildCardBlocked(args: {
     return true
   }
 
+  if (args.createContext.kind === 'standalone') {
+    return (
+      !isQuickNpcStandaloneSetup(args.values) ||
+      !isCreateSetupChoiceComplete(args.values.npcTemplateId)
+    )
+  }
+
   if (args.createContext.kind === 'organization-member') {
     return (
       !isQuickNpcOrganizationMemberSetup(args.values) ||
@@ -145,7 +154,7 @@ export function resolveQuickNpcBuildCardModel(args: {
   context: CharacterBuildContext
   values: QuickNpcSetupValues
   titles: readonly OrganizationMembershipTitleDefinition[]
-  members?: { classAffinityIds?: readonly string[] }
+  members?: { classAffinityIds?: readonly string[]; npcTemplateId?: NpcTemplateId }
 }): QuickNpcBuildCardModel | null {
   const { values, context, titles } = args
 
@@ -159,8 +168,10 @@ export function resolveQuickNpcBuildCardModel(args: {
     membershipTitle,
     titles,
   })
-  const templateEntry: NpcTemplateEntry | undefined =
-    titleRecommendation === undefined
+  const standaloneTemplateId = isQuickNpcStandaloneSetup(values) ? values.npcTemplateId : undefined
+  const templateEntry: NpcTemplateEntry | undefined = standaloneTemplateId
+    ? getNpcTemplateEntry(standaloneTemplateId)
+    : titleRecommendation === undefined
       ? undefined
       : getNpcTemplateEntry(titleRecommendation.templateId)
 
@@ -171,6 +182,7 @@ export function resolveQuickNpcBuildCardModel(args: {
     context,
     titles,
     organizationClassAffinityIds: args.members?.classAffinityIds,
+    organizationTemplateId: args.members?.npcTemplateId,
   })
   const classOptionGroups = resolveQuickNpcClassOptionGroups({
     classOptions,
@@ -186,12 +198,13 @@ export function resolveQuickNpcBuildCardModel(args: {
   const classTerm = getContentTypeTerm('classes')
   const selectedClassLabel = classOptions.find((option) => option.value === values.classId)?.label
 
+  const hasTemplateIdentity = templateEntry !== undefined
+
   return {
-    mode: titleRecommendation === undefined ? 'build' : 'recommended',
-    sectionEyebrow:
-      titleRecommendation === undefined
-        ? QUICK_NPC_BUILD_FIELD_LABEL
-        : QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+    mode: hasTemplateIdentity ? 'recommended' : 'build',
+    sectionEyebrow: hasTemplateIdentity
+      ? QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL
+      : QUICK_NPC_BUILD_FIELD_LABEL,
     ...(templateEntry
       ? { templateLabel: templateEntry.label, templateDescription: templateEntry.description }
       : {}),

@@ -16,9 +16,11 @@ import {
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
   resolvePlayableBuilderContent,
+  npcTemplateIdSchema,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
+  type NpcTemplateId,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -53,6 +55,8 @@ export type QuickNpcSetupCoreValues = {
 
 export type QuickNpcStandaloneSetupValues = QuickNpcSetupCoreValues & {
   contextKind: 'standalone'
+  /** Setup-only unset until the user chooses a catalog role. */
+  npcTemplateId?: NpcTemplateId
 }
 
 export type QuickNpcOrganizationMemberSetupValues = QuickNpcSetupCoreValues & {
@@ -133,6 +137,7 @@ function quickNpcSetupCoreFields(maxLevel: number, minLevel: number) {
 export function quickNpcStandaloneSetupSchema(maxLevel: number, minLevel: number) {
   return quickNpcSetupCoreFields(maxLevel, minLevel).extend({
     contextKind: z.literal('standalone'),
+    npcTemplateId: z.string().min(1, 'Choose a role.').pipe(npcTemplateIdSchema),
   })
 }
 
@@ -255,6 +260,9 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
     level: values.level,
     alignment: values.alignment,
     gender: values.gender,
+    ...(isQuickNpcStandaloneSetup(values) && values.npcTemplateId
+      ? { npcTemplateId: values.npcTemplateId }
+      : {}),
   }
 }
 

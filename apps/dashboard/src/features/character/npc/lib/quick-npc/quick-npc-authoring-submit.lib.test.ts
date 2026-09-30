@@ -7,7 +7,12 @@ import {
   populatedBuilderCatalog,
 } from '../../../lib/fixtures/character-builder-fixtures'
 import { buildQuickNpcAuthoringCreateInput } from './quick-npc-authoring-submit.lib'
-import { quickNpcAuthoringTabDefaultValues } from './quick-npc-form-fields'
+import {
+  buildQuickNpcSeed,
+  mergeQuickNpcAuthoringValues,
+  quickNpcAuthoringTabDefaultValues,
+} from './quick-npc-form-fields'
+import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
 import {
   quickNpcMemberSetupValues,
   quickNpcOrganizationMemberCreateContext,
@@ -108,6 +113,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
     const input = buildQuickNpcAuthoringCreateInput({
       createContext: quickNpcStandaloneCreateContext(),
       setup: quickNpcStandaloneSetupValues({
+        npcTemplateId: 'guard',
         speciesId: populatedBuilderCatalog.species[0]!.id,
         classId: quickFighter.id,
         level: 1,
@@ -117,6 +123,25 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
     })
 
     expect(input.relationshipEdges).toEqual([])
+  })
+
+  it('includes standalone npcTemplateId and template preferences on create assembly', () => {
+    const setup = quickNpcStandaloneSetupValues({
+      npcTemplateId: 'guard',
+      speciesId: populatedBuilderCatalog.species[0]!.id,
+      classId: quickFighter.id,
+      level: 1,
+    })
+    const values = mergeQuickNpcAuthoringValues(setup, tabValues)
+
+    expect(buildQuickNpcSeed(values).npcTemplateId).toBe('guard')
+    expect(
+      buildQuickNpcAutomaticPreferences({
+        values,
+        context: buildContext,
+        titles: [],
+      }).abilityPriority?.[0],
+    ).toBe('str')
   })
 
   it('stores membershipTitleId for member setup', () => {

@@ -11,6 +11,7 @@ import {
   type QuickNpcAuthoringTabValues,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
+import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
 
 function resolveQuickNpcMembershipPayload(
   createContext: Extract<QuickNpcCreateContext, { kind: 'organization-member' }>,
@@ -44,9 +45,21 @@ export function buildQuickNpcAuthoringCreateInput(args: {
       ? resolveQuickNpcMembershipPayload(args.createContext, args.setup)
       : undefined
 
+  const organization =
+    args.createContext.kind === 'organization-member' ? args.createContext.organization : undefined
+
+  const preferences = buildQuickNpcAutomaticPreferences({
+    values,
+    context: args.buildContext,
+    titles: organization?.members?.titles ?? [],
+    organizationClassAffinityIds: organization?.members?.classAffinityIds,
+    organizationTemplateId: organization?.members?.npcTemplateId,
+  })
+
   return buildQuickNpcCreateInput({
     seed: buildQuickNpcSeed(values),
     context: args.buildContext,
+    preferences,
     ...(constraints ? { constraints } : {}),
     ...(membership ? { membership } : {}),
   })

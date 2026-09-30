@@ -1,4 +1,5 @@
 import type {
+  NpcTemplateId,
   OrganizationDomain,
   OrganizationForm,
   OrganizationFunction,
@@ -20,6 +21,7 @@ export type QuickNpcCreateFormOrganization = {
   members?: {
     classAffinityIds?: readonly string[]
     speciesAffinityIds?: readonly string[]
+    npcTemplateId?: NpcTemplateId
     titles?: readonly OrganizationMembershipTitleDefinition[]
   }
 }
