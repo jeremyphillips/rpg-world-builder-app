@@ -1,23 +1,30 @@
 # Foundation composition editorial review
 
-Review date: 2026-09-28
+Review date: 2026-09-29
 
-Collection revision: `foundation-4`
+Collection revision: `foundation-5`
 
 Fixture: 24 fixed seed/context cases in
 [`foundation-composition-review.generated.md`](foundation-composition-review.generated.md)
 
 ## Acceptance
 
-The reviewed fixture passes the authoring standard:
+The reviewed fixture passes the actionable-fragment authoring standard:
 
-- Traits provide repeatable table behaviors.
-- Ideals supply decision rules rather than broad virtues.
-- Bonds identify actionable debts, promises, places, people, work, or unresolved
-  events.
-- Flaws create predictable trouble through a behavior under pressure.
-- Every experience includes a concrete circumstance and action or consequence;
-  most include all three.
+- Every composition exceeds the 65% externally actionable target. The 24 cases
+  contain 192 selected fragments; inward-facing lines appear only as contrast to
+  behaviors, obligations, relationships, and live consequences.
+- Traits provide repeatable table behaviors and recognizable triggers.
+- Ideals reveal values through choices or routines rather than essay-like moral
+  claims.
+- Bonds identify concrete debts, records, keys, letters, promises, places,
+  people, possessions, or unresolved events that another character can affect.
+- Flaws create predictable trouble through behavior under pressure.
+- Experiences use specific roles, objects, and acts and leave a witness, debt,
+  record, grievance, investigation, missing answer, or other consequence open.
+- Generic class and species labels appear only in social or training situations
+  where the explicit taxonomy is natural, rather than as template-shaped
+  character summaries.
 - Alignment-sensitive slots now have two explicitly tagged candidates per
   alignment. Pairs were checked for different methods or pressures (for example
   lawful good promise-keeping versus speaking up about wrongdoing; chaotic evil
@@ -29,7 +36,7 @@ The reviewed fixture passes the authoring standard:
 - Sparse and missing-alignment contexts still produce complete, concrete
   compositions.
 
-The inventory reports 170 fragments, explicit alignment coverage of at least two
+The inventory reports 182 fragments, explicit alignment coverage of at least two
 per alignment for ideals, flaws, choice, and motivation, all declared relationship
 conditions, all three inferred hook shapes, no repeated four-word openings, and no
 text-overlap clusters at the editorial review threshold.

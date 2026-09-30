@@ -1,6 +1,6 @@
 # Foundation collection inventory
 
-Generated from collection revision `foundation-4`. Do not edit
+Generated from collection revision `foundation-5`. Do not edit
 this file directly. Regenerate it with:
 
 ```bash
@@ -14,15 +14,15 @@ from slot and prose markers, so reviewers must confirm the classification.
 
 ```json
 {
-  "total": 170,
+  "total": 182,
   "bySlot": {
-    "personalityTraits": 18,
-    "ideals": 24,
-    "bonds": 27,
-    "flaws": 29,
-    "experience": 26,
-    "choice": 23,
-    "motivation": 23
+    "personalityTraits": 20,
+    "ideals": 26,
+    "bonds": 29,
+    "flaws": 31,
+    "experience": 27,
+    "choice": 24,
+    "motivation": 25
   }
 }
 ```
@@ -32,39 +32,39 @@ from slot and prose markers, so reviewers must confirm the classification.
 ```json
 {
   "personalityTraits": {
-    "duty": 13,
-    "belonging": 14,
-    "ambition": 13
-  },
-  "ideals": {
-    "duty": 22,
-    "belonging": 20,
-    "ambition": 20
-  },
-  "bonds": {
-    "duty": 23,
-    "belonging": 20,
+    "duty": 14,
+    "belonging": 16,
     "ambition": 14
   },
-  "flaws": {
+  "ideals": {
+    "duty": 23,
+    "belonging": 22,
+    "ambition": 21
+  },
+  "bonds": {
     "duty": 25,
-    "belonging": 25,
-    "ambition": 25
+    "belonging": 21,
+    "ambition": 15
+  },
+  "flaws": {
+    "duty": 26,
+    "belonging": 26,
+    "ambition": 27
   },
   "experience": {
-    "duty": 20,
-    "belonging": 22,
+    "duty": 21,
+    "belonging": 23,
     "ambition": 18
   },
   "choice": {
     "duty": 21,
-    "belonging": 20,
-    "ambition": 20
+    "belonging": 21,
+    "ambition": 21
   },
   "motivation": {
-    "duty": 21,
-    "belonging": 20,
-    "ambition": 21
+    "duty": 22,
+    "belonging": 22,
+    "ambition": 22
   }
 }
 ```
@@ -76,28 +76,50 @@ Generic fragments plus fragments explicitly tagged for the alignment.
 ```json
 {
   "personalityTraits": {
-    "lg": 18,
-    "ng": 18,
-    "cg": 18,
-    "ln": 18,
-    "n": 18,
-    "cn": 18,
-    "le": 18,
-    "ne": 18,
-    "ce": 18
+    "lg": 20,
+    "ng": 20,
+    "cg": 20,
+    "ln": 20,
+    "n": 20,
+    "cn": 20,
+    "le": 20,
+    "ne": 20,
+    "ce": 20
   },
   "ideals": {
-    "lg": 9,
-    "ng": 8,
-    "cg": 8,
-    "ln": 8,
-    "n": 8,
-    "cn": 8,
-    "le": 8,
-    "ne": 8,
-    "ce": 8
+    "lg": 11,
+    "ng": 10,
+    "cg": 10,
+    "ln": 10,
+    "n": 10,
+    "cn": 10,
+    "le": 10,
+    "ne": 10,
+    "ce": 10
   },
   "bonds": {
+    "lg": 29,
+    "ng": 29,
+    "cg": 29,
+    "ln": 29,
+    "n": 29,
+    "cn": 29,
+    "le": 29,
+    "ne": 29,
+    "ce": 29
+  },
+  "flaws": {
+    "lg": 15,
+    "ng": 15,
+    "cg": 15,
+    "ln": 15,
+    "n": 15,
+    "cn": 16,
+    "le": 15,
+    "ne": 15,
+    "ce": 15
+  },
+  "experience": {
     "lg": 27,
     "ng": 27,
     "cg": 27,
@@ -108,49 +130,27 @@ Generic fragments plus fragments explicitly tagged for the alignment.
     "ne": 27,
     "ce": 27
   },
-  "flaws": {
-    "lg": 13,
-    "ng": 13,
-    "cg": 13,
-    "ln": 13,
-    "n": 13,
-    "cn": 14,
-    "le": 13,
-    "ne": 13,
-    "ce": 13
-  },
-  "experience": {
-    "lg": 26,
-    "ng": 26,
-    "cg": 26,
-    "ln": 26,
-    "n": 26,
-    "cn": 26,
-    "le": 26,
-    "ne": 26,
-    "ce": 26
-  },
   "choice": {
-    "lg": 7,
-    "ng": 7,
-    "cg": 7,
-    "ln": 7,
-    "n": 7,
-    "cn": 7,
-    "le": 7,
-    "ne": 7,
-    "ce": 7
+    "lg": 8,
+    "ng": 8,
+    "cg": 8,
+    "ln": 8,
+    "n": 8,
+    "cn": 8,
+    "le": 8,
+    "ne": 8,
+    "ce": 8
   },
   "motivation": {
-    "lg": 7,
-    "ng": 7,
-    "cg": 7,
-    "ln": 7,
-    "n": 7,
-    "cn": 7,
-    "le": 7,
-    "ne": 7,
-    "ce": 7
+    "lg": 9,
+    "ng": 9,
+    "cg": 9,
+    "ln": 9,
+    "n": 9,
+    "cn": 9,
+    "le": 9,
+    "ne": 9,
+    "ce": 9
   }
 }
 ```
@@ -263,9 +263,9 @@ Only fragments whose `alignmentIds` include the alignment.
 
 ```json
 {
-  "direct": 58,
-  "pressure": 67,
-  "tension": 45
+  "direct": 90,
+  "pressure": 70,
+  "tension": 22
 }
 ```
 

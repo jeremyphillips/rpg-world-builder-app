@@ -13,6 +13,8 @@ import {
   findHighTextOverlap,
   findRepeatedOpenings,
   LINTABLE_GENERIC_PHRASES,
+  LINTABLE_PLACEHOLDER_PHRASES,
+  LINTABLE_RETROSPECTIVE_PHRASES,
 } from './foundation-audit.test-support'
 import { foundationCollection } from './foundation'
 
@@ -30,7 +32,7 @@ const MIN_EXPLICIT_ALIGNMENT_COVERAGE = 2
 
 describe('foundation narrative collection', () => {
   it('loads validated authored fragments', () => {
-    expect(foundationCollection.revision).toBe('foundation-4')
+    expect(foundationCollection.revision).toBe('foundation-5')
     expect(foundationCollection.fragments).not.toHaveLength(0)
   })
 
@@ -105,7 +107,13 @@ describe('foundation narrative collection', () => {
       .map((fragment) => fragment.text.toLowerCase())
       .join('\n')
 
-    for (const phrase of LINTABLE_GENERIC_PHRASES) {
+    const disallowedPhrases = [
+      ...LINTABLE_GENERIC_PHRASES,
+      ...LINTABLE_RETROSPECTIVE_PHRASES,
+      ...LINTABLE_PLACEHOLDER_PHRASES,
+    ]
+
+    for (const phrase of disallowedPhrases) {
       expect(normalizedText, phrase).not.toContain(phrase)
     }
 

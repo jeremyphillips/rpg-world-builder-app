@@ -31,6 +31,27 @@ export const LINTABLE_GENERIC_PHRASES = [
   'gave me a new perspective',
 ] as const
 
+export const LINTABLE_RETROSPECTIVE_PHRASES = [
+  'i learned that',
+  'this taught me',
+  'taught me to',
+  'i believe ',
+  'i know that',
+  'which made me',
+  'made me wary of',
+  'proves its strength by',
+  'without claiming',
+] as const
+
+export const LINTABLE_PLACEHOLDER_PHRASES = [
+  'someone made a costly promise',
+  'something they valued',
+  'a threatened place',
+  'allies and resources',
+  'my training as a {{class.name}}',
+  'my being {{species.name}}',
+] as const
+
 export type HookShape = 'direct' | 'pressure' | 'tension'
 
 const tensionPattern =

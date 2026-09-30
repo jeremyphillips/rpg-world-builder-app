@@ -61,10 +61,12 @@ pnpm --filter @rpg/character-narrative-integrations review:foundation
 \`\`\`
 
 Review the stable cases below against the
-[authoring standard](authoring.md): playable specificity, voice, concreteness,
-meaningful consequences, non-caricatured alignment, distinctiveness, and
-cross-fragment coherence. Automated tests validate structure; this artifact exists
-for editorial comparison.
+[authoring standard](authoring.md). At least 65% of selected fragments should be
+externally actionable: another character can challenge, threaten, demand, expose,
+or help complete the hook, or the fragment supplies a repeatable response to a
+recognizable trigger. Reject retrospective morals, placeholder nouns, completed
+arcs, and visible class/species template machinery. Automated tests validate
+structure; this artifact exists for the required editorial comparison.
 
 ${sections.join('\n')}
 `

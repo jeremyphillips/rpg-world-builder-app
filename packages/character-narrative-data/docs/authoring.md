@@ -1,7 +1,26 @@
 # Character narrative authoring
 
-This guide is the acceptance standard for authored narrative fragments. A valid
-schema is necessary, but it does not make a fragment playable.
+This guide is the acceptance standard for authored narrative fragments and the
+canonical reference for agents editing a narrative collection. A valid schema is
+necessary, but it does not make a fragment playable.
+
+## Editorial objective
+
+Write handles that a player or GM can pull during play, not summaries of who a
+character is. Favor concrete, external, unresolved material over conclusions
+about the character. A strong fragment creates behavior, tension, an obligation,
+a relationship, a discoverable secret, or a thing another character can
+challenge, threaten, demand, expose, or help complete.
+
+The collection should contain friction rather than finished interpretation.
+After reading a fragment, a player should wonder what happens when it comes up.
+Do not complete that story on the player's behalf.
+
+At least 65% of a reviewed composition fixture should be externally actionable.
+A fragment counts when it gives another player or the GM a clear handle, or when
+it tells the player what their character predictably does under a recognizable
+condition. Introspection may remain as contrast, but it must not dominate a
+composition.
 
 ## Hard acceptance test
 
@@ -11,7 +30,7 @@ Every fragment must answer at least one concrete play question for its slot:
 - **Ideal:** What choice will this push me toward?
 - **Bond:** Who or what can pull me into action?
 - **Flaw:** How will this predictably create trouble?
-- **Experience:** What happened, what did I do, and what changed because of it?
+- **Experience:** What happened, what did I do, and what consequence is still live?
 - **Choice:** What did I choose when alternatives had meaningful costs?
 - **Motivation:** What present goal will make me act?
 
@@ -31,11 +50,14 @@ Write a visible tell or repeated behavior, not a broad adjective.
 
 ### Ideals
 
-Write a decision rule, especially one that can carry a cost. The fragment should
-help answer, “What would my character choose here?”
+Write a decision rule or visible behavior, especially one that can carry a cost.
+Show the value instead of naming or defending it. The fragment should help
+answer, “What would my character choose here?”
 
 - Pass: “If I give my word, I keep it even when I regret giving it.”
+- Pass: “When food is short, I watch who gets served last.”
 - Reject: “I value loyalty.”
+- Reject: “A community proves its strength by how it treats its weakest member.”
 
 ### Bonds
 
@@ -60,18 +82,25 @@ character does when the pressure appears, not only what they feel.
 
 ### Experience and story prose
 
-Write remembered experience, not therapeutic self-analysis. Use concrete
-circumstances, people, places, routines, choices, failures, and turning points.
-Reflection may follow an event, but it must not replace the event.
+Write unfinished business rooted in remembered experience, not therapeutic
+self-analysis or a miniature completed character arc. Use concrete
+circumstances, roles, places, objects, routines, choices, failures, and
+consequences. Reflection may follow an event, but it must not explain the lesson
+when the event can demonstrate it.
 
 Every experience or story passage must contain at least two of:
 
 1. a concrete circumstance or event;
 2. a concrete choice or action;
-3. a consequence or lasting change.
+3. an unresolved consequence or lasting change that can return during play.
 
-“My training taught me patience” fails. “My master made me explain every failed
-spell before trying again; I still dissect problems that way” passes.
+“My training taught me patience” fails. “My old mentor made me name the footing,
+distance, and commitment of every charge; I still do that when a plan becomes
+complicated” passes.
+
+Prefer one sharp cause and one live consequence over a
+cause → action → consequence → interpretation chain. Split passages that contain
+several independent hooks.
 
 ## Hook shapes
 
@@ -89,6 +118,27 @@ contradiction.
 
 Use first person and neutral fantasy-adventure language. Prefer concrete verbs,
 objects, routines, and consequences over summaries of self-discovery.
+
+Use concrete roles, possessions, places, and acts instead of portable placeholder
+nouns. Proper names are optional; specificity is not.
+
+- Prefer “the quartermaster” to “someone.”
+- Prefer “their ledger” to “something they valued.”
+- Prefer “the traveler nobody would share a fire with” to “the outsider.”
+- Prefer “the river village” to “a threatened place.”
+- Prefer “a dying soldier's promise to his sister” to “a costly promise.”
+
+Do not state the moral when behavior can reveal it. Heavily revise constructions
+such as “I learned that,” “this taught me,” “I believe,” “I know that,” “which
+made me,” “made me wary of,” “proves its strength by,” and “without claiming.”
+
+Class, species, heritage, and culture references must sound like lived
+experience, not template inputs. Naturalize them through training habits,
+physical experience, social treatment, possessions, rituals, or relationships.
+Avoid “as a {{class.name}}” and “being {{species.name}}” unless a character would
+naturally use the explicit label in that situation. An ancestry reference should
+invoke an actual social or physical consequence rather than merely announce the
+taxonomy.
 
 The collection quality tests reject the following generic constructions anywhere
 in the collection:
@@ -143,8 +193,11 @@ Before accepting an expansion:
 2. Resolve unexplained gaps rather than pursuing a raw fragment count.
 3. Review exact duplicates, repeated sentence openings, and high-overlap phrase
    clusters.
-4. Rerun the fixed composition fixture and review playable specificity, voice,
-   concreteness, consequences, alignment variety, and cross-fragment coherence.
+4. Rerun the fixed composition fixture and confirm at least 65% of its selected
+   fragments are externally actionable.
+5. Review playable specificity, voice, concreteness, live consequences,
+   alignment variety, and cross-fragment coherence. Reject passages whose main
+   work is retrospective interpretation.
 
 Automated tests protect structure and obvious regressions. They do not certify
 literary quality.

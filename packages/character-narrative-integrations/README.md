@@ -9,6 +9,11 @@ residences and places supplied by the caller, campaign characters for person
 roles, class, species, heritage, culture, and character kind without exposing
 unrelated catalog data to the generator.
 
+The integration supplies facts; it does not define narrative voice. Collection
+authors and agents must follow the canonical
+[character narrative authoring standard](../character-narrative-data/docs/authoring.md),
+which favors concrete, externally actionable, unresolved play hooks.
+
 ## Responsibilities
 
 - Project builder state into `NarrativeGenerationContext` and bounded

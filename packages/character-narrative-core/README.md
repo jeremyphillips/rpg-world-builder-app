@@ -7,6 +7,13 @@ bonds, flaws, and a three-part first-person backstory. It has no React, network,
 catalog, or campaign dependencies. The caller supplies a validated collection and
 a normalized generation context.
 
+Composition does not repair vague or over-interpreted prose. Authored fragments
+must follow the canonical
+[character narrative authoring standard](../character-narrative-data/docs/authoring.md):
+optimize for concrete, externally actionable, unresolved play hooks rather than
+character summaries or completed arcs. Prose and editorial acceptance remain
+owned by `@rpg/character-narrative-data`.
+
 ## Responsibilities
 
 - Enforce alignment compatibility before weighting candidates.

@@ -14,7 +14,7 @@ export interface FoundationCompositionReviewCase {
 
 const alignments = ALIGNMENTS
 const sparseSeeds = [1, 2, 3, 6, 7, 8, 11, 22, 4]
-const richSeeds = [1, 4, 6, 7, 9, 10, 12, 16, 19]
+const richSeeds = [4, 6, 7, 9, 13, 16, 19, 20, 21]
 
 const baseContext: NarrativeGenerationContext = {
   characterKind: 'pc',
