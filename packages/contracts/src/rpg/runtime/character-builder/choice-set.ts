@@ -13,6 +13,7 @@ export const CHOICE_SOURCE_TYPES = [
   'class',
   'ruleset',
   'spellcasting',
+  'npcTemplate',
 ] as const
 
 export type ChoiceSourceType = (typeof CHOICE_SOURCE_TYPES)[number]
@@ -45,6 +46,7 @@ export const CHOICE_SET_OWNER_KINDS = [
   'feat',
   'ruleset',
   'campaign',
+  'npcTemplate',
 ] as const
 
 export type ChoiceSetOwnerKind = (typeof CHOICE_SET_OWNER_KINDS)[number]

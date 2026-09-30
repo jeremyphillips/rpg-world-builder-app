@@ -70,6 +70,24 @@ passed to finalize as engine options.
    returns `ok: false` with the existing `choice_set_unsatisfied` issue for
    the stuck ChoiceSet. No partial character is ever produced.
 
+## Soft preferences
+
+`resolveNpcTemplateRecommendations` turns a user role, title recommendation, organization
+default, and species language affinities into ordered preferences. Commoner is the
+resolver-only fallback and is not written onto the draft. `toAutomaticNpcBuildPreferences`
+feeds `resolveAutomaticNpcBuild`.
+
+Fill order for each required ChoiceSet is hard constraints, then soft preferences, then
+the canonical first-eligible option. Already-held skills, tools, and languages are skipped.
+A preference that does not appear in the ChoiceSet is ignored. Soft preferences never fail
+a build.
+
+Classed automatic builds keep class primary abilities in the top standard-array slots and
+use the role ability order for the rest. A complete level-0 role ability order assigns the
+standard array directly.
+
+Role detail → [npc-templates.md](npc-templates.md).
+
 ## Constraints (Quick NPC requirements)
 
 Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:

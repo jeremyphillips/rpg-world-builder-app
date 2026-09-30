@@ -101,15 +101,16 @@ open with preserved search). Success → `null` (all overlays close). Pending su
   to authoring. Reopening Title or Species or changing Level/Class changes the revision, invalidating
   any prior confirmation until the user confirms again. Same-value reselect dismisses without clearing Build.
   When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
-  build** identity (template label + description) plus in-row Class and Level editors. Without a
+  build** identity (role label + description) plus in-row Class and Level editors. Without a
   title recommendation, the card shows **Build** with Class and Level only
   — default campaign level is not labeled as a recommendation.
 - **Level** — reseeded from the title recommendation (clamped to campaign constraints) on Title
   change; user-owned across Species changes. Level 0 clears class and omits the Class row.
-- **Class** — ranked from merged template + organization class affinities inside the build card;
-  when exactly one eligible recommendation exists after Species is complete, `classId` is
+- **Class** — ranked from the title class override when present, otherwise the role's class
+  preferences, merged with organization class affinities. A title override replaces the role
+  list. When exactly one eligible recommendation exists after Species is complete, `classId` is
   auto-seeded and collapses like a manual selection. Cardinality and eligibility logic live in
-  `applyQuickNpcSetupValueChange`, not in the card.
+  `applyQuickNpcSetupValueChange`, not in the card. Class recommendations are empty at level 0.
 
 Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
 create convention). Title change preserves Species but reseeds Build, Level, and Class. Setup events
@@ -120,8 +121,9 @@ returning from authoring without material changes.
 
 **Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
 `requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `relationshipEdges`, then
-`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. No
-template id is persisted on the created NPC.
+`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. The
+builder draft stores `npcTemplateId` when a title or user selects a role. The Commoner fallback
+never writes that field. The created NPC record does not persist a role id.
 
 **Requirements tab:** multi-add combobox pickers compose canonical equipment/spell compact row VMs
 and equipment `not_proficient` callouts only (`visibleStatuses: ['not_proficient']` on the shared

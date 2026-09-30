@@ -67,7 +67,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 9 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 9 },
 } as const
 
 const rogueClass = {
@@ -131,7 +131,7 @@ describe('QuickNpcBuildCard', () => {
     renderBuildCard()
 
     expect(screen.getByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).toBeInTheDocument()
-    expect(screen.getByText('Covert operator')).toBeInTheDocument()
+    expect(screen.getByText('Criminal')).toBeInTheDocument()
     expect(screen.getByText('Rogue')).toBeInTheDocument()
     expect(screen.getByText('9')).toBeInTheDocument()
     expect(screen.getByText(/Recommended for Guildmaster: Level 9\./)).toBeInTheDocument()
@@ -156,7 +156,7 @@ describe('QuickNpcBuildCard', () => {
     )
 
     expect(screen.getByText(QUICK_NPC_BUILD_FIELD_LABEL)).toBeInTheDocument()
-    expect(screen.queryByText('Covert operator')).not.toBeInTheDocument()
+    expect(screen.queryByText('Criminal')).not.toBeInTheDocument()
     expect(screen.queryByText(/Recommended for/)).not.toBeInTheDocument()
     expect(screen.getByText('0')).toBeInTheDocument()
   })

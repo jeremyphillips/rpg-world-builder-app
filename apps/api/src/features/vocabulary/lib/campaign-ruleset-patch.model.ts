@@ -131,16 +131,6 @@ const languageProficiencyGrantSetSchema = new Schema(
   { _id: false },
 )
 
-const characterWealthGrantSchema = new Schema(
-  {
-    cp: { type: Number },
-    sp: { type: Number },
-    gp: { type: Number },
-    pp: { type: Number },
-  },
-  { _id: false },
-)
-
 const levelZeroNpcsSchema = new Schema(
   {
     enabled: { type: Boolean },
@@ -151,7 +141,7 @@ const levelZeroNpcsSchema = new Schema(
     weaponProficiencies: { type: proficiencyGrantSetSchema, default: undefined },
     languageProficiencies: { type: languageProficiencyGrantSetSchema, default: undefined },
     retainSpeciesLanguages: { type: Boolean },
-    startingWealth: { type: characterWealthGrantSchema, default: undefined },
+    wealthTiers: { type: Schema.Types.Mixed, default: undefined },
     standardArray: { type: [Number], default: undefined },
   },
   { _id: false },

@@ -13,6 +13,7 @@ import { characterBuilderDraftScopeSchema } from './draft-scope'
 import { magicItemGrantSelectionSchema } from '../equipment/magic-item-selection'
 import { characterRelationshipDraftEdgesSchema } from '../../character-relationships/draft'
 import { contentMediaSchema } from '../../../primitives/media/content-media'
+import { npcTemplateIdSchema } from '../../../vocab/npc/npc-template'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -154,6 +155,11 @@ export const characterBuilderDraftSchema = z.object({
    * keyed by deterministic ChoiceSet id (choice-set.ts, BENCH-078).
    */
   choiceSelections: z.record(z.string(), z.array(z.string().min(1))),
+  /**
+   * Selected NPC role. Absent means no template was chosen.
+   * The Commoner resolver fallback never writes this field.
+   */
+  npcTemplateId: npcTemplateIdSchema.optional(),
   /** Equipment decisions only — inventory and wealth are derived at finalize. */
   equipment: characterBuilderDraftEquipmentSchema.optional(),
   currentStepId: characterBuilderStepIdSchema.optional(),
@@ -179,7 +185,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 6
+export const CHARACTER_BUILDER_DRAFT_VERSION = 7
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

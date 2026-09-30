@@ -49,7 +49,7 @@ const membershipTitles = [
     id: 'omt_guildmaster',
     label: 'Guildmaster',
     priority: 50 as const,
-    npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+    npcRecommendation: { templateId: 'criminal' as const, level: 5 },
   },
 ] as const
 
@@ -227,7 +227,7 @@ describe('QuickNpcAuthoringForm', () => {
     })
 
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
-    expect(screen.getByText('Covert operator · Level 5 Fighter')).toBeInTheDocument()
+    expect(screen.getByText('Criminal · Level 5 Fighter')).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {

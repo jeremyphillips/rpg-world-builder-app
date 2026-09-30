@@ -7,6 +7,7 @@ import type {
 import {
   DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
   DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
+  DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS,
   DEFAULT_LEVEL_ZERO_NPCS_ENABLED,
   DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
@@ -54,7 +55,7 @@ export function mapLevelZeroNpcsToFormValues(
       items: [...levelZeroNpcs.languageProficiencies.items],
     },
     levelZeroRetainSpeciesLanguages: levelZeroNpcs.retainSpeciesLanguages,
-    levelZeroStartingWealth: wealthGrantMoneyToForm(levelZeroNpcs.startingWealth),
+    levelZeroStartingWealth: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.modest),
     levelZeroStandardArray: mapStandardArrayToFormValues(levelZeroNpcs.standardArray),
   }
 }
@@ -72,7 +73,12 @@ export function levelZeroNpcsDefaultFormValues(): LevelZeroNpcsFormValues {
       categories: [],
     },
     retainSpeciesLanguages: DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
-    startingWealth: undefined,
+    wealthTiers: {
+      poor: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.poor },
+      modest: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.modest },
+      comfortable: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.comfortable },
+      wealthy: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.wealthy },
+    },
     standardArray: [...DEFAULT_STANDARD_ARRAY],
   })
 }
@@ -97,6 +103,19 @@ function buildLevelZeroWeaponProficienciesPatch(
   ) as WeaponProficiencyGrantSet
 }
 
+function levelZeroModestWealthPatch(
+  values: LevelZeroNpcsFormValues,
+): Pick<CampaignLevelZeroNpcsPatch, 'wealthTiers'> {
+  const modest = normalizeCharacterWealthGrant(
+    wealthGrantMoneyFromForm(values.levelZeroStartingWealth),
+  )
+  return {
+    wealthTiers: {
+      modest: modest ?? { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.modest },
+    },
+  }
+}
+
 function buildFullLevelZeroNpcsPatchInput(
   values: LevelZeroNpcsFormValues,
 ): CampaignLevelZeroNpcsPatch {
@@ -112,9 +131,7 @@ function buildFullLevelZeroNpcsPatchInput(
       categories: [],
     },
     retainSpeciesLanguages: values.levelZeroRetainSpeciesLanguages,
-    startingWealth: normalizeCharacterWealthGrant(
-      wealthGrantMoneyFromForm(values.levelZeroStartingWealth),
-    ),
+    ...levelZeroModestWealthPatch(values),
     standardArray: parseStandardArrayFormValues(values.levelZeroStandardArray),
   }
 }
@@ -178,12 +195,7 @@ function buildSparseLevelZeroNpcsPatchInput(
     }
   }
 
-  const startingWealth = normalizeCharacterWealthGrant(
-    wealthGrantMoneyFromForm(values.levelZeroStartingWealth),
-  )
-  if (startingWealth !== undefined) {
-    patch.startingWealth = startingWealth
-  }
+  Object.assign(patch, levelZeroModestWealthPatch(values))
 
   const standardArray = buildStandardArrayPatchInput(
     values.levelZeroStandardArray,

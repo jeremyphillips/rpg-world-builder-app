@@ -38,8 +38,16 @@ import {
   normalizeAutomaticNpcBuildConstraints,
   type AutomaticNpcBuildConstraints,
 } from './automatic-npc-build-constraints'
+import { collectSourcedGrants } from '../assembly/collect-sourced-grants'
+import {
+  levelZeroBaselineLanguageIds,
+  levelZeroSpeciesLanguageIds,
+} from '../assembly/level-zero-baseline-proficiency-entries'
+import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
+import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import {
   validateAutomaticNpcBuildSeed,
+  type AutomaticNpcBuildPreferences,
   type AutomaticNpcBuildSeed,
 } from './automatic-npc-build-seed'
 
@@ -77,6 +85,8 @@ export type AutomaticNpcBuildResult = AutomaticNpcBuildSuccess | AutomaticNpcBui
 export type ResolveAutomaticNpcBuildArgs = {
   seed: AutomaticNpcBuildSeed
   constraints?: AutomaticNpcBuildConstraints
+  /** Soft ordering. Missing preferences fall through to canonical choice order. */
+  preferences?: AutomaticNpcBuildPreferences
   context: CharacterBuildContext
 }
 
@@ -87,22 +97,58 @@ export type ResolveAutomaticNpcBuildArgs = {
 const AUTOMATIC_BUILD_ITERATION_CEILING = 64
 
 // Level 0 Quick NPC ability assignment uses the level-based standard array resolver.
+function mergeClassAndTemplateAbilityOrder(
+  classPrimary: readonly Ability[],
+  templatePriority: readonly Ability[] | undefined,
+): Ability[] {
+  const seen = new Set<Ability>()
+  const order: Ability[] = []
+  const templateOrder = templatePriority ?? []
+
+  for (const ability of classPrimary) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+  for (const ability of templateOrder) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+  for (const ability of ABILITY_IDS) {
+    if (seen.has(ability)) continue
+    order.push(ability)
+  }
+  return order
+}
+
 function seedAbilityScores(
   seed: AutomaticNpcBuildSeed,
   context: CharacterBuildContext,
   characterClass: CharacterClass | undefined,
+  preferences: AutomaticNpcBuildPreferences | undefined,
 ): CharacterBuilderDraft['abilities']['scores'] {
   const standardArray = resolveBuilderStandardArray(context, seed.level)
+  const templatePriority = preferences?.abilityPriority
 
   if (seed.level === 0) {
+    if (templatePriority && templatePriority.length === ABILITY_IDS.length) {
+      return resolveStandardArrayAssignment({
+        standardArray,
+        abilityScoreOrder: templatePriority,
+      })
+    }
     return deriveDeterministicAbilityAssignment([], standardArray)
   }
 
   if (characterClass && isClassProgressionApplicable(seed.level)) {
-    const order = resolveClassAbilityScoreOrder({
+    const classOrder = resolveClassAbilityScoreOrder({
       abilityScoreOrder: characterClass.characterCreation?.abilityScoreOrder,
       primaryAbilities: characterClass.primaryAbilities,
     })
+    const order = templatePriority
+      ? mergeClassAndTemplateAbilityOrder(characterClass.primaryAbilities, templatePriority)
+      : classOrder
     return resolveStandardArrayAssignment({
       standardArray,
       abilityScoreOrder: order,
@@ -115,6 +161,7 @@ function seedAbilityScores(
 function seedDraft(
   seed: AutomaticNpcBuildSeed,
   context: CharacterBuildContext,
+  preferences: AutomaticNpcBuildPreferences | undefined,
 ): CharacterBuilderDraft {
   const abilityRules = context.characterCreationRules.abilityGeneration
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
@@ -131,12 +178,98 @@ function seedDraft(
         : {}),
       level: seed.level,
     },
+    ...(seed.npcTemplateId ? { npcTemplateId: seed.npcTemplateId } : {}),
     abilities: {
       method: resolveAbilityGenerationMethod(abilityRules),
-      scores: seedAbilityScores(seed, context, characterClass),
+      scores: seedAbilityScores(seed, context, characterClass, preferences),
     },
     equipment: cloneEquipmentDraftChannel(empty),
   }
+}
+
+function addHeldKey(keys: Set<string>, value: string | undefined): void {
+  if (!value) return
+  keys.add(value)
+  const separator = value.lastIndexOf(':')
+  if (separator >= 0) keys.add(value.slice(separator + 1))
+}
+
+function addChoiceSelectionKeys(keys: Set<string>, draft: CharacterBuilderDraft): void {
+  for (const selections of Object.values(draft.choiceSelections)) {
+    for (const optionId of selections ?? []) addHeldKey(keys, optionId)
+  }
+}
+
+function addFixedGrantKeys(
+  keys: Set<string>,
+  draft: CharacterBuilderDraft,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): void {
+  const characterClass = draft.class.classId
+    ? catalogIndex.classes.get(draft.class.classId)
+    : undefined
+  for (const sourced of collectSourcedGrants(draft, catalogIndex, characterClass)) {
+    const grant = sourced.grant
+    if (grant.kind === 'skillProficiency' && grant.grant.kind === 'fixed') {
+      for (const skillId of grant.grant.skillIds) addHeldKey(keys, skillId)
+    }
+    if (grant.kind === 'toolProficiency' && grant.grant.kind === 'fixed') {
+      for (const toolId of grant.grant.toolSlugs ?? []) addHeldKey(keys, toolId)
+    }
+  }
+}
+
+function addLevelZeroLanguageKeys(
+  keys: Set<string>,
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): void {
+  if (!isBuilderLevelZeroClassless(draft, context)) return
+  const species = draft.species.speciesId
+    ? catalogIndex.species.get(draft.species.speciesId)
+    : undefined
+  const rules = context.characterCreationRules.levelZeroNpcs
+  for (const languageId of levelZeroBaselineLanguageIds(rules, context.catalog.languages)) {
+    addHeldKey(keys, languageId)
+  }
+  for (const languageId of levelZeroSpeciesLanguageIds(species, rules)) {
+    addHeldKey(keys, languageId)
+  }
+}
+
+function collectHeldProficiencyKeys(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): Set<string> {
+  const keys = new Set<string>()
+  addChoiceSelectionKeys(keys, draft)
+  addFixedGrantKeys(keys, draft, catalogIndex)
+  addLevelZeroLanguageKeys(keys, draft, context, catalogIndex)
+  return keys
+}
+
+function languagePreferencesWithSpecies(
+  draft: CharacterBuilderDraft,
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+  preferences: AutomaticNpcBuildPreferences | undefined,
+): AutomaticNpcBuildPreferences | undefined {
+  const species = draft.species.speciesId
+    ? catalogIndex.species.get(draft.species.speciesId)
+    : undefined
+  const speciesLanguages = species?.languageAffinities ?? []
+  if (speciesLanguages.length === 0 && !preferences) return preferences
+
+  const seen = new Set<string>()
+  const languageIds: string[] = []
+  for (const languageId of [...speciesLanguages, ...(preferences?.languageIds ?? [])]) {
+    if (seen.has(languageId)) continue
+    seen.add(languageId)
+    languageIds.push(languageId)
+  }
+
+  return { ...preferences, languageIds }
 }
 
 function isEquipmentSkipped(draft: CharacterBuilderDraft): boolean {
@@ -305,6 +438,7 @@ function completeMagicItemGrantSelections(
 export function resolveAutomaticNpcBuild({
   seed,
   constraints,
+  preferences,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
@@ -312,8 +446,9 @@ export function resolveAutomaticNpcBuild({
 
   const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
 
-  let draft = seedDraft(seed, context)
+  let draft = seedDraft(seed, context, preferences)
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const resolvedPreferences = languagePreferencesWithSpecies(draft, catalogIndex, preferences)
 
   for (let iteration = 0; iteration < AUTOMATIC_BUILD_ITERATION_CEILING; iteration += 1) {
     const choiceSets = resolveAvailableChoices(draft, context)
@@ -358,6 +493,8 @@ export function resolveAutomaticNpcBuild({
       draft,
       choiceSet: target,
       constraints: normalizedConstraints,
+      preferences: resolvedPreferences,
+      heldKeys: collectHeldProficiencyKeys(draft, context, catalogIndex),
       characterClass,
       catalogIndex,
     })

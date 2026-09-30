@@ -1,12 +1,12 @@
 import {
   getContentTypeTerm,
-  getNpcAuthoringTemplateEntry,
+  getNpcTemplateEntry,
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
   resolveOrganizationMembershipTitleProjection,
   resolvePlayableBuilderContent,
   type CharacterBuildContext,
-  type NpcAuthoringTemplateEntry,
+  type NpcTemplateEntry,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
@@ -67,7 +67,7 @@ export function formatQuickNpcLevelRecommendationPrompt(args: {
     return undefined
   }
   const recommendation = resolveQuickNpcSelectedTitleRecommendation(args)
-  if (recommendation === undefined) {
+  if (recommendation?.level === undefined) {
     return undefined
   }
   const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
@@ -159,10 +159,10 @@ export function resolveQuickNpcBuildCardModel(args: {
     membershipTitle,
     titles,
   })
-  const templateEntry: NpcAuthoringTemplateEntry | undefined =
+  const templateEntry: NpcTemplateEntry | undefined =
     titleRecommendation === undefined
       ? undefined
-      : getNpcAuthoringTemplateEntry(titleRecommendation.templateId)
+      : getNpcTemplateEntry(titleRecommendation.templateId)
 
   const { classOptions } = buildQuickNpcContentOptions(context)
   const playableContent = resolvePlayableBuilderContent(context)

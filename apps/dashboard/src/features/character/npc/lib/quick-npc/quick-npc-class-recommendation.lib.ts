@@ -1,5 +1,5 @@
 import {
-  getNpcAuthoringTemplateClassAffinityIds,
+  getNpcTemplateEntry,
   isClassProgressionApplicable,
   resolveOrganizationMembershipTitleProjection,
   resolveOrganizationNpcClassRecommendationIds,
@@ -45,16 +45,20 @@ export function resolveQuickNpcClassRecommendationIds(args: {
       : undefined,
     titles: args.titles,
   })
+  if (!isClassProgressionApplicable(args.values.level)) return []
+
   const playableClasses = resolvePlayableBuilderContent(args.context).classes
+  const template = titleRecommendation
+    ? getNpcTemplateEntry(titleRecommendation.templateId)
+    : undefined
+  const classOverride = titleRecommendation?.classPreferenceOverrideSlugs
 
   return resolveOrganizationNpcClassRecommendationIds({
-    templateClassAffinitySlugs:
-      titleRecommendation === undefined
-        ? undefined
-        : getNpcAuthoringTemplateClassAffinityIds(titleRecommendation.templateId),
+    templateClassAffinitySlugs: classOverride ?? template?.recommendations.classPreferenceSlugs,
+    templateSource: classOverride ? 'title' : 'template',
     organizationClassAffinityIds: args.organizationClassAffinityIds,
     playableClasses,
-  })
+  }).map((entry) => entry.id)
 }
 
 /** Seeds exactly one eligible recommendation; otherwise leaves Class unresolved. */

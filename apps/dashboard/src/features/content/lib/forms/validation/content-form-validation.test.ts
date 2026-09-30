@@ -76,6 +76,8 @@ const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 const ORGANIZATION_STARTING_POINT_EXEMPT = [
   'startingPointId',
   /_organizationEditFamiliarType$/,
+  /** Default NPC role round-trips on the members object. The role picker is a later surface. */
+  'members.npcTemplateId',
 ] as const
 
 /**

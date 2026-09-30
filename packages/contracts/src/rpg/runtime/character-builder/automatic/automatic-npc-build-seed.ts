@@ -1,8 +1,10 @@
 import { z } from 'zod'
 
 import { builderLevelSchema } from '../../../primitives/level'
+import { abilitySchema, type Ability } from '../../../vocab/ability'
 import { alignmentSchema } from '../../../vocab/alignment'
 import { genderSchema } from '../../../vocab/character-gender'
+import { npcTemplateIdSchema } from '../../../vocab/npc/npc-template'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
@@ -26,7 +28,19 @@ export const automaticNpcBuildSeedSchema = z.object({
   alignment: alignmentSchema,
   /** Required — finalSubmit validation requires a gender. */
   gender: genderSchema,
+  /** Selected NPC role. Omitted when the caller did not choose one. */
+  npcTemplateId: npcTemplateIdSchema.optional(),
 })
+
+/** Soft ordering for automatic choice fill. Never fails a build and never adds slots. */
+export type AutomaticNpcBuildPreferences = {
+  abilityPriority?: readonly Ability[]
+  skillSlugs?: readonly string[]
+  toolSlugs?: readonly string[]
+  languageIds?: readonly string[]
+}
+
+export const automaticNpcBuildAbilityPrioritySchema = z.array(abilitySchema).length(6)
 
 export type AutomaticNpcBuildSeed = z.infer<typeof automaticNpcBuildSeedSchema>
 

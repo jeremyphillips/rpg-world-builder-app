@@ -7,7 +7,7 @@ import {
   ORGANIZATION_AUTHORING_PRESET_IDS,
   type OrganizationAuthoringPresetId,
 } from '../../vocab/organization/authoring-preset'
-import { npcAuthoringTemplateIdSchema } from '../../vocab/organization/npc-authoring-template'
+import { npcTemplateIdSchema } from '../../vocab/npc/npc-template'
 import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from '../../vocab/organization/member-title-entry'
 import type { OrganizationMembershipTitlePriority } from '../../vocab/organization/member-title-entry'
 import {
@@ -16,6 +16,7 @@ import {
 } from '../../vocab/organization/membership-title'
 import { comparePriorityDescending } from '../../vocab/types'
 import { vocabularyOptionIdSchema } from '../../vocab/vocabulary'
+import type { OrganizationPresetMembershipTitleRef } from '../../vocab/organization/preset-membership-title-refs'
 
 const organizationAuthoringPresetIdSchema = z.enum(
   ORGANIZATION_AUTHORING_PRESET_IDS as [
@@ -67,9 +68,18 @@ export const organizationMembershipTitlePrioritySchema = z.union([
   z.literal(ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES[4]),
 ])
 
+const preferenceSlugListSchema = z.array(z.string().min(1))
+
 export const organizationPresetNpcRecommendationSchema = z.object({
-  templateId: npcAuthoringTemplateIdSchema,
-  level: z.number().int().min(0).max(MAX_CHARACTER_LEVEL),
+  templateId: npcTemplateIdSchema,
+  /** Absent means the campaign minimum level. */
+  level: z.number().int().min(0).max(MAX_CHARACTER_LEVEL).optional(),
+  /** Replaces the template's classPreferenceSlugs. */
+  classPreferenceOverrideSlugs: preferenceSlugListSchema.optional(),
+  /** Prepended ahead of the template's skillSlugs. Does not add skill slots. */
+  skillPreferenceSlugs: preferenceSlugListSchema.optional(),
+  /** Prepended ahead of the template's toolSlugs. Does not add tool slots. */
+  toolPreferenceSlugs: preferenceSlugListSchema.optional(),
 })
 
 export type OrganizationPresetNpcRecommendation = z.infer<
@@ -145,6 +155,24 @@ export const organizationMembershipTitlesSchema =
     'Organization must have at least one membership title.',
   )
 
+function copyPresetNpcRecommendation(
+  recommendation: NonNullable<OrganizationPresetMembershipTitleRef['npcRecommendation']>,
+): OrganizationMembershipTitleDefinition['npcRecommendation'] {
+  return {
+    templateId: recommendation.templateId,
+    ...(recommendation.level !== undefined ? { level: recommendation.level } : {}),
+    ...(recommendation.classPreferenceOverrideSlugs
+      ? { classPreferenceOverrideSlugs: [...recommendation.classPreferenceOverrideSlugs] }
+      : {}),
+    ...(recommendation.skillPreferenceSlugs
+      ? { skillPreferenceSlugs: [...recommendation.skillPreferenceSlugs] }
+      : {}),
+    ...(recommendation.toolPreferenceSlugs
+      ? { toolPreferenceSlugs: [...recommendation.toolPreferenceSlugs] }
+      : {}),
+  }
+}
+
 export function snapshotOrganizationMembershipTitlesFromPreset(
   presetId: OrganizationAuthoringPresetId,
   createId: () => string = createDefaultOrganizationMembershipTitleUuid,
@@ -161,7 +189,9 @@ export function snapshotOrganizationMembershipTitlesFromPreset(
       label: entry.label,
       description: entry.description,
       priority: ref.priority as OrganizationMembershipTitlePriority,
-      ...(ref.npcRecommendation !== undefined ? { npcRecommendation: ref.npcRecommendation } : {}),
+      ...(ref.npcRecommendation !== undefined
+        ? { npcRecommendation: copyPresetNpcRecommendation(ref.npcRecommendation) }
+        : {}),
     }
   })
 }
@@ -234,7 +264,10 @@ export function organizationMembershipTitleCatalogMatchesPresetSnapshot(
   catalog: readonly OrganizationMembershipTitleDefinition[],
   presetId: OrganizationAuthoringPresetId,
 ): boolean {
-  const expected = snapshotOrganizationMembershipTitlesFromPreset(presetId, () => 'semantic-compare')
+  const expected = snapshotOrganizationMembershipTitlesFromPreset(
+    presetId,
+    () => 'semantic-compare',
+  )
   const currentRows = organizationMembershipTitleSemanticRows(catalog)
   const expectedRows = organizationMembershipTitleSemanticRows(expected)
   if (currentRows.length !== expectedRows.length) {

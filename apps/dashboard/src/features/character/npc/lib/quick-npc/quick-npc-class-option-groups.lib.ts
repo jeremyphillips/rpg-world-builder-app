@@ -35,7 +35,7 @@ export function resolveQuickNpcClassOptionGroups(input: {
       templateClassAffinitySlugs: input.templateClassAffinitySlugs,
       organizationClassAffinityIds: input.classAffinityIds,
       playableClasses: input.playableClasses,
-    })
+    }).map((entry) => entry.id)
 
   return resolveQuickNpcAffinityOptionGroups({
     options: input.classOptions,
@@ -59,7 +59,7 @@ export function buildQuickNpcClassRadioCardPresentation(input: {
       templateClassAffinitySlugs: input.templateClassAffinitySlugs,
       organizationClassAffinityIds: input.classAffinityIds,
       playableClasses: input.playableClasses,
-    })
+    }).map((entry) => entry.id)
 
   return buildQuickNpcAffinityRadioCardPresentation({
     options: input.classOptions,

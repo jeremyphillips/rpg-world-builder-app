@@ -13,6 +13,8 @@ function selectionKindForSourceType(
       return 'classFeature'
     case 'ruleset':
       return 'characterCreation'
+    case 'npcTemplate':
+      return 'npcTemplate'
     default:
       return 'classFeature'
   }

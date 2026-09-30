@@ -16,6 +16,7 @@ import {
 } from '../resolvers/equipment/derive-equipment-draft-entries'
 import { ensureEquipmentGrant } from '../resolvers/equipment/ensure-equipment-grant'
 import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
+import type { AutomaticNpcBuildPreferences } from './automatic-npc-build-seed'
 import { startingEquipmentOptionProvidesWeapon } from './list-reachable-starting-weapons'
 
 function preferredConstraintOptionIds(
@@ -98,18 +99,74 @@ function selectStartingEquipmentPackageIds(args: {
   return fallback.length > 0 ? fallback : null
 }
 
+function preferenceSlugsForChoiceSet(
+  choiceSet: ChoiceSet,
+  preferences: AutomaticNpcBuildPreferences | undefined,
+): readonly string[] {
+  if (!preferences) return []
+  if (choiceSet.choiceType === 'skillProficiency') return preferences.skillSlugs ?? []
+  if (choiceSet.choiceType === 'toolProficiency') return preferences.toolSlugs ?? []
+  if (choiceSet.choiceType === 'language') return preferences.languageIds ?? []
+  return []
+}
+
+function optionIdentityKeys(optionId: string): string[] {
+  const keys = [optionId]
+  const separator = optionId.lastIndexOf(':')
+  if (separator >= 0) keys.push(optionId.slice(separator + 1))
+  return keys
+}
+
+const HELD_SKIP_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
+  'skillProficiency',
+  'toolProficiency',
+  'language',
+])
+
+function optionIsHeld(
+  choiceSet: ChoiceSet,
+  optionId: string,
+  heldKeys: ReadonlySet<string> | undefined,
+): boolean {
+  if (!HELD_SKIP_CHOICE_TYPES.has(choiceSet.choiceType)) return false
+  if (!heldKeys || heldKeys.size === 0) return false
+  return optionIdentityKeys(optionId).some((key) => heldKeys.has(key))
+}
+
+function softPreferenceOptionIds(
+  choiceSet: ChoiceSet,
+  preferences: AutomaticNpcBuildPreferences | undefined,
+  heldKeys: ReadonlySet<string> | undefined,
+): string[] {
+  const slugs = preferenceSlugsForChoiceSet(choiceSet, preferences)
+  if (slugs.length === 0) return []
+
+  const preferred: string[] = []
+  for (const slug of slugs) {
+    const option = choiceSet.options.find((entry) => optionIdentityKeys(entry.id).includes(slug))
+    if (!option || preferred.includes(option.id) || optionIsHeld(choiceSet, option.id, heldKeys))
+      continue
+    preferred.push(option.id)
+  }
+  return preferred
+}
+
 /**
- * Fills one required ChoiceSet with constraint-aware first picks, then remaining
- * first-eligible defaults in canonical resolver order.
+ * Fills one required ChoiceSet with hard constraints, then soft preferences,
+ * then remaining first-eligible defaults in canonical resolver order.
+ * Soft preferences never fail a build. Already-held options are skipped.
  */
 export function fillChoiceSetWithConstraintAwareSelection(args: {
   draft: CharacterBuilderDraft
   choiceSet: ChoiceSet
   constraints: AutomaticNpcBuildConstraints | undefined
+  preferences?: AutomaticNpcBuildPreferences
+  heldKeys?: ReadonlySet<string>
   characterClass: CharacterClass | undefined
   catalogIndex: CharacterBuildCatalogIndex
 }): CharacterBuilderDraft | null {
-  const { draft, choiceSet, constraints, characterClass, catalogIndex } = args
+  const { draft, choiceSet, constraints, preferences, heldKeys, characterClass, catalogIndex } =
+    args
   const current = draft.choiceSelections[choiceSet.id] ?? []
   const selectedIds = new Set(current)
 
@@ -135,12 +192,22 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
     }
   }
 
-  const preferredIds = preferredConstraintOptionIds(choiceSet, constraints)
+  const preferredIds = preferredConstraintOptionIds(choiceSet, constraints).filter(
+    (optionId) => !optionIsHeld(choiceSet, optionId, heldKeys),
+  )
+  const softIds = softPreferenceOptionIds(choiceSet, preferences, heldKeys).filter(
+    (optionId) => !preferredIds.includes(optionId),
+  )
   const canonicalOrder = choiceSet.options.map((option) => option.id)
   const orderedEligible = [
     ...preferredIds.filter((optionId) => !selectedIds.has(optionId)),
+    ...softIds.filter((optionId) => !selectedIds.has(optionId)),
     ...canonicalOrder.filter(
-      (optionId) => !selectedIds.has(optionId) && !preferredIds.includes(optionId),
+      (optionId) =>
+        !selectedIds.has(optionId) &&
+        !preferredIds.includes(optionId) &&
+        !softIds.includes(optionId) &&
+        !optionIsHeld(choiceSet, optionId, heldKeys),
     ),
   ]
   const additions = orderedEligible.slice(0, Math.max(0, choiceSet.min - current.length))

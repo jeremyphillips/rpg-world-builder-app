@@ -51,6 +51,7 @@ describe('organization starting point helpers', () => {
       practices: patch.practices,
       members: {
         classAffinityIds: patch['members.classAffinityIds'],
+        npcTemplateId: patch['members.npcTemplateId'],
         titles: patch['members.titles'],
       },
     }
@@ -77,6 +78,7 @@ describe('organization starting point helpers', () => {
       functions: patch.functions,
       practices: patch.practices,
       'members.classAffinityIds': patch['members.classAffinityIds'],
+      'members.npcTemplateId': patch['members.npcTemplateId'],
     }
     expect(
       listOrganizationStartingPointConfirmOverwriteFieldLabels(values, {
@@ -98,6 +100,7 @@ describe('organization starting point helpers', () => {
       functions: patch.functions,
       practices: patch.practices,
       'members.classAffinityIds': patch['members.classAffinityIds'],
+      'members.npcTemplateId': patch['members.npcTemplateId'],
     }
     expect(
       organizationStartingPointIsCustomized(
@@ -127,6 +130,7 @@ describe('organization starting point helpers', () => {
       functions: patch.functions,
       practices: patch.practices,
       'members.classAffinityIds': patch['members.classAffinityIds'],
+      'members.npcTemplateId': patch['members.npcTemplateId'],
       'members.titles': [{ id: 'omt_custom', label: 'Custom rank', priority: 10 as const }],
     }
     expect(

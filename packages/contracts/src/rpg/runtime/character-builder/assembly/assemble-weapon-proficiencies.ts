@@ -4,7 +4,10 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
-import { levelZeroBaselineWeaponEntries } from './level-zero-baseline-proficiency-entries'
+import {
+  levelZeroBaselineWeaponEntries,
+  levelZeroTemplateTraining,
+} from './level-zero-baseline-proficiency-entries'
 import { assembleGrantWeaponProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 
@@ -76,6 +79,28 @@ function mergeKey(entry: CharacterWeaponProficiencyEntry): string {
   return entry.weaponId ? `weapon:${entry.weaponId}` : `category:${entry.weaponCategory}`
 }
 
+function templateWeaponTrainingEntries(
+  draft: CharacterBuilderDraft,
+): CharacterWeaponProficiencyEntry[] {
+  const templateId = draft.npcTemplateId
+  const weapons = levelZeroTemplateTraining(draft)?.weapons
+  if (!templateId || !weapons) return []
+
+  const sources = [{ kind: 'npcTemplate' as const, sourceId: templateId, grantId: 'training' }]
+  return [
+    ...weapons.categories.map((weaponCategory) => ({
+      weaponCategory,
+      rank: 'proficient' as const,
+      sources,
+    })),
+    ...weapons.items.map((weaponId) => ({
+      weaponId,
+      rank: 'proficient' as const,
+      sources,
+    })),
+  ]
+}
+
 /** Merges weapon proficiency rows, combining sources when the same target appears twice. */
 export function mergeWeaponProficiencyEntries(
   entries: CharacterWeaponProficiencyEntry[],
@@ -113,7 +138,10 @@ export function assembleWeaponProficiencyEntries(
   const selectedEntries = selectedWeaponProficiencies(draft, catalogIndex, choiceSets)
   const levelZeroEntries =
     context && isBuilderLevelZeroClassless(draft, context)
-      ? levelZeroBaselineWeaponEntries(context.characterCreationRules.levelZeroNpcs)
+      ? [
+          ...levelZeroBaselineWeaponEntries(context.characterCreationRules.levelZeroNpcs),
+          ...templateWeaponTrainingEntries(draft),
+        ]
       : []
 
   return mergeWeaponProficiencyEntries([

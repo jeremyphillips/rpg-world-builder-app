@@ -101,7 +101,12 @@ describe('finalizeNpcCharacterBuild', () => {
           enabled: true,
           baseHitDie: 6,
           standardArray: [12, 11, 10, 9, 8, 7],
-          startingWealth: { gp: 5 },
+          wealthTiers: {
+            poor: { gp: 1 },
+            modest: { gp: 5 },
+            comfortable: { gp: 10 },
+            wealthy: { gp: 25 },
+          },
         },
       },
     })

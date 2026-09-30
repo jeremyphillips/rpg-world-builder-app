@@ -27,28 +27,45 @@ export function resolveOrganizationMemberClassRecommendationIds(input: {
   return intersectPersistedContentIds(input.classAffinityIds, input.playableClasses)
 }
 
-function appendUniqueClassIds(
-  target: string[],
-  source: readonly string[],
+export const ORGANIZATION_NPC_CLASS_RECOMMENDATION_SOURCES = [
+  'user',
+  'title',
+  'organization',
+  'template',
+] as const
+
+export type OrganizationNpcClassRecommendationSource =
+  (typeof ORGANIZATION_NPC_CLASS_RECOMMENDATION_SOURCES)[number]
+
+export type SourcedClassRecommendation = {
+  id: string
+  sources: OrganizationNpcClassRecommendationSource[]
+}
+
+function pushSourcedClassRecommendation(
+  target: SourcedClassRecommendation[],
+  classId: string,
+  sources: readonly OrganizationNpcClassRecommendationSource[],
   seen: Set<string>,
-  shouldInclude: (classId: string) => boolean,
 ): void {
-  for (const classId of source) {
-    if (!shouldInclude(classId) || seen.has(classId)) continue
-    target.push(classId)
-    seen.add(classId)
-  }
+  if (seen.has(classId)) return
+  seen.add(classId)
+  target.push({ id: classId, sources: [...sources] })
 }
 
 /**
  * Merges template slug seeds and organization class affinity ids into one deduped ordered list.
  * Ranking: both sources → template-only → organization-only. Eligibility follows playable classes.
+ * Each id keeps the sources that contributed it.
  */
 export function resolveOrganizationNpcClassRecommendationIds(input: {
   templateClassAffinitySlugs?: readonly string[]
+  /** Provenance for the slug list. Title overrides and explicit user slugs replace the template list. */
+  templateSource?: Exclude<OrganizationNpcClassRecommendationSource, 'organization'>
   organizationClassAffinityIds?: readonly string[]
   playableClasses: readonly CharacterClass[]
-}): string[] {
+}): SourcedClassRecommendation[] {
+  const templateSource = input.templateSource ?? 'template'
   const templateIds = resolveClassAffinitySlugsToIds(
     input.templateClassAffinitySlugs ?? [],
     input.playableClasses,
@@ -61,23 +78,22 @@ export function resolveOrganizationNpcClassRecommendationIds(input: {
   const templateIdSet = new Set(templateIds)
   const organizationIdSet = new Set(organizationIds)
   const seen = new Set<string>()
-  const both: string[] = []
-  const templateOnly: string[] = []
-  const organizationOnly: string[] = []
+  const both: SourcedClassRecommendation[] = []
+  const templateOnly: SourcedClassRecommendation[] = []
+  const organizationOnly: SourcedClassRecommendation[] = []
 
-  appendUniqueClassIds(both, templateIds, seen, (classId) => organizationIdSet.has(classId))
-  appendUniqueClassIds(
-    templateOnly,
-    templateIds,
-    seen,
-    (classId) => !organizationIdSet.has(classId),
-  )
-  appendUniqueClassIds(
-    organizationOnly,
-    organizationIds,
-    seen,
-    (classId) => !templateIdSet.has(classId),
-  )
+  for (const classId of templateIds) {
+    if (!organizationIdSet.has(classId)) continue
+    pushSourcedClassRecommendation(both, classId, [templateSource, 'organization'], seen)
+  }
+  for (const classId of templateIds) {
+    if (organizationIdSet.has(classId)) continue
+    pushSourcedClassRecommendation(templateOnly, classId, [templateSource], seen)
+  }
+  for (const classId of organizationIds) {
+    if (templateIdSet.has(classId)) continue
+    pushSourcedClassRecommendation(organizationOnly, classId, ['organization'], seen)
+  }
 
   return [...both, ...templateOnly, ...organizationOnly]
 }

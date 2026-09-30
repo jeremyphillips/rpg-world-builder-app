@@ -44,7 +44,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 8 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 8 },
 } as const
 
 const martialCommanderTitle = {
@@ -52,14 +52,14 @@ const martialCommanderTitle = {
   label: 'Commander',
   description: 'Field commander.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'martial_commander' as const, level: 8 },
+  npcRecommendation: { templateId: 'guard' as const, level: 8 },
 } as const
 
 const highLevelTitle = {
   ...guildmasterTitle,
   id: 'omt_archmage',
   label: 'Archmage',
-  npcRecommendation: { templateId: 'arcane_practitioner' as const, level: 25 },
+  npcRecommendation: { templateId: 'scholar' as const, level: 25 },
 } as const
 
 const changeArgs = {

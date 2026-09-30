@@ -27,6 +27,7 @@ import {
   organizationMembershipTitleDefinitionSchema,
   organizationMembershipTitlePrioritySchema,
   organizationMembershipTitlesSchema,
+  npcTemplateIdSchema,
   resolveOrganizationCreateMembershipTitles,
   vocabularyTermFieldCopy,
   type CharacterClass,
@@ -139,6 +140,7 @@ const organizationMembershipTitlesFormSchema = z
 const organizationMembersFormFieldsSchema = z.object({
   classAffinityIds: z.array(z.string().min(1)).default([]),
   speciesAffinityIds: z.array(z.string().min(1)).default([]),
+  npcTemplateId: npcTemplateIdSchema.optional(),
   titles: organizationMembershipTitlesFormSchema.optional(),
 })
 
@@ -548,6 +550,9 @@ export function organizationToFormValues(entity: Organization): Partial<Organiza
     members: {
       classAffinityIds: entity.members.classAffinityIds,
       speciesAffinityIds: entity.members.speciesAffinityIds,
+      ...(entity.members.npcTemplateId !== undefined
+        ? { npcTemplateId: entity.members.npcTemplateId }
+        : {}),
       titles: entity.members.titles,
     },
   }
@@ -587,6 +592,9 @@ function organizationValuesForInputParse(
     members: {
       classAffinityIds: values.members?.classAffinityIds ?? [],
       speciesAffinityIds: values.members?.speciesAffinityIds ?? [],
+      ...(values.members?.npcTemplateId !== undefined
+        ? { npcTemplateId: values.members.npcTemplateId }
+        : {}),
       titles: resolveOrganizationCreateMembershipTitles({
         titles: normalizeOrganizationMembershipTitleFormRows(values.members?.titles),
       }),

@@ -19,7 +19,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 9 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 9 },
 } as const
 
 const rogueClass = {

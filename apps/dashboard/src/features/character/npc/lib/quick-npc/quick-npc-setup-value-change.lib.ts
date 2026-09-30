@@ -60,7 +60,7 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
   }
 
   return clampLevel(
-    projection.npcRecommendation.level,
+    projection.npcRecommendation.level ?? defaultLevel,
     levelConstraints.minLevel,
     levelConstraints.maxLevel,
   )

@@ -2,6 +2,8 @@ import type { OrganizationForm } from './form'
 import type { OrganizationFunction } from './function'
 import type { OrganizationPractice } from './practice'
 import type { OrganizationDomain } from './domain'
+import type { NpcTemplateId } from '../npc/npc-template'
+import { resolveOrganizationPresetMemberNpcTemplateId } from './preset-member-npc-templates'
 import {
   applyOrganizationAuthoringPreset,
   type OrganizationAuthoringPresetId,
@@ -14,6 +16,7 @@ export type OrganizationPresetOwnedEditableSnapshot = {
   functions: readonly OrganizationFunction[]
   practices: readonly OrganizationPractice[]
   classAffinityIds: readonly string[]
+  npcTemplateId?: NpcTemplateId
 }
 
 export function buildOrganizationPresetOwnedEditableSnapshot(
@@ -21,12 +24,14 @@ export function buildOrganizationPresetOwnedEditableSnapshot(
   classAffinityIds: readonly string[],
 ): OrganizationPresetOwnedEditableSnapshot {
   const recipe = applyOrganizationAuthoringPreset(presetId)
+  const npcTemplateId = resolveOrganizationPresetMemberNpcTemplateId(presetId)
   return {
     organizationDomain: recipe.organizationDomain,
     ...(recipe.organizationForm !== undefined ? { organizationForm: recipe.organizationForm } : {}),
     functions: recipe.functions,
     practices: recipe.practices,
     classAffinityIds,
+    ...(npcTemplateId !== undefined ? { npcTemplateId } : {}),
   }
 }
 
@@ -80,7 +85,7 @@ export function organizationPresetOwnedEditableMatchesRecipe(
   ) {
     return false
   }
-  return true
+  return current.npcTemplateId === expected.npcTemplateId
 }
 
 export function organizationPresetOwnedEditableMatchesPreset(
@@ -99,6 +104,7 @@ export type OrganizationPresetOwnedEditableFieldKey =
   | 'functions'
   | 'practices'
   | 'classAffinityIds'
+  | 'npcTemplateId'
 
 const ORGANIZATION_PRESET_OWNED_EDITABLE_FIELD_KEY_ORDER = [
   'organizationDomain',
@@ -106,6 +112,7 @@ const ORGANIZATION_PRESET_OWNED_EDITABLE_FIELD_KEY_ORDER = [
   'functions',
   'practices',
   'classAffinityIds',
+  'npcTemplateId',
 ] as const satisfies readonly OrganizationPresetOwnedEditableFieldKey[]
 
 function practicesDiffer(
@@ -164,6 +171,9 @@ export function listOrganizationPresetOwnedEditableDivergentFieldKeys(
   }
   if (classAffinityIdsDiffer(current.classAffinityIds, expected.classAffinityIds)) {
     divergent.add('classAffinityIds')
+  }
+  if (current.npcTemplateId !== expected.npcTemplateId) {
+    divergent.add('npcTemplateId')
   }
   return ORGANIZATION_PRESET_OWNED_EDITABLE_FIELD_KEY_ORDER.filter((key) => divergent.has(key))
 }

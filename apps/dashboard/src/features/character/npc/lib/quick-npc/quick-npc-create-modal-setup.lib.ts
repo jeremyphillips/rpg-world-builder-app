@@ -1,6 +1,6 @@
 import {
   getContentTypeTerm,
-  getNpcAuthoringTemplateLabel,
+  getNpcTemplateLabel,
   indexCharacterBuildCatalog,
   isClassProgressionApplicable,
   resolvePlayableBuilderContent,
@@ -162,7 +162,7 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
       titles: args.titles,
     })
     if (recommendation !== undefined) {
-      parts.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
+      parts.push(getNpcTemplateLabel(recommendation.templateId))
     }
   }
 

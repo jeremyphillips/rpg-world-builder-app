@@ -4,6 +4,7 @@ import { organizationDomainSchema } from '../../vocab/organization/domain'
 import { organizationFunctionSchema } from '../../vocab/organization/function'
 import { organizationFormSchema } from '../../vocab/organization/form'
 import { organizationPracticeSchema } from '../../vocab/organization/practice'
+import { npcTemplateIdSchema } from '../../vocab/npc/npc-template'
 import { organizationConnectionsSchema } from './connections'
 import {
   createDefaultOrganizationMembershipTitleDefinition,
@@ -61,11 +62,14 @@ const defaultOrganizationMembers = {
 const organizationMembersAffinityFieldsSchema = z.object({
   classAffinityIds: organizationMembersClassAffinityIdsSchema.default([]),
   speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.default([]),
+  /** Default NPC role for members when a title does not recommend one. */
+  npcTemplateId: npcTemplateIdSchema.optional(),
 })
 
 export const organizationMemberAffinitiesUpdateSchema = z.object({
   classAffinityIds: organizationMembersClassAffinityIdsSchema.optional(),
   speciesAffinityIds: organizationMembersSpeciesAffinityIdsSchema.optional(),
+  npcTemplateId: npcTemplateIdSchema.optional(),
 })
 
 /** Organization update — affinities and/or a full membership title catalog replacement. */

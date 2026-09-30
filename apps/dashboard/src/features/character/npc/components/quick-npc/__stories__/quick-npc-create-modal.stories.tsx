@@ -35,7 +35,7 @@ const guildmasterTitle: OrganizationMembershipTitleDefinition = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50,
-  npcRecommendation: { templateId: 'covert_operator', level: 9 },
+  npcRecommendation: { templateId: 'criminal', level: 9 },
 }
 
 const quickFighter = {
@@ -138,7 +138,7 @@ export const GuildmasterSingleRecommendation: Story = {
     await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
 
     await expect(canvas.getByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).toBeVisible()
-    await expect(canvas.getByText('Covert operator')).toBeVisible()
+    await expect(canvas.getByText('Criminal')).toBeVisible()
     await expect(canvas.getByText(/Recommended for Guildmaster: Level 9\./)).toBeVisible()
     await expect(canvas.getByText('Rogue')).toBeVisible()
     expect(canvas.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()

@@ -9,7 +9,7 @@ import {
 } from './authoring-preset'
 import { getOrganizationMembershipTitleEntry } from './membership-title'
 import { ORGANIZATION_MEMBERSHIP_TITLE_PRIORITIES } from './member-title-entry'
-import { getNpcAuthoringTemplateEntry } from './npc-authoring-template'
+import { getNpcTemplateEntry } from '../npc/npc-template'
 import { ORGANIZATION_PRESET_MEMBERSHIP_TITLE_REFS } from './preset-membership-title-refs'
 import { ORGANIZATION_DOMAIN_IDS } from './domain'
 import { ORGANIZATION_FORM_IDS } from './form'
@@ -81,7 +81,7 @@ describe('organization authoring presets', () => {
       for (const ref of refs) {
         pairCount += 1
         expect(ref.npcRecommendation, `${presetId}:${ref.titleId}`).toBeDefined()
-        expect(getNpcAuthoringTemplateEntry(ref.npcRecommendation.templateId)).toBeDefined()
+        expect(getNpcTemplateEntry(ref.npcRecommendation.templateId)).toBeDefined()
         expect(ref.npcRecommendation.level).toBeGreaterThanOrEqual(0)
         expect(ref.npcRecommendation.level).toBeLessThanOrEqual(20)
         expect(ref.npcRecommendation.level).not.toBe(ref.priority)
@@ -98,35 +98,37 @@ describe('organization authoring presets', () => {
       (ref) => ref.titleId === 'captain',
     )
     expect(armyCaptain?.npcRecommendation).toEqual({
-      templateId: 'martial_officer',
+      templateId: 'guard',
       level: 6,
+      classPreferenceOverrideSlugs: ['fighter', 'paladin'],
     })
     expect(shippingCaptain?.npcRecommendation).toEqual({
-      templateId: 'maritime_officer',
+      templateId: 'guard',
       level: 6,
     })
   })
 
-  it('maps specialized organization leaders to role-fitting templates rather than civic_leader', () => {
+  it('maps specialized organization leaders onto their v1 roles', () => {
     const thievesGuildmaster = ORGANIZATION_AUTHORING_PRESETS.thieves_guild.members.titles.find(
       (ref) => ref.titleId === 'guildmaster',
     )
     expect(thievesGuildmaster?.npcRecommendation).toEqual({
-      templateId: 'covert_operator',
+      templateId: 'criminal',
       level: 9,
     })
 
     const gangBoss = ORGANIZATION_AUTHORING_PRESETS.gang.members.titles.find(
       (ref) => ref.titleId === 'boss',
     )
-    expect(gangBoss?.npcRecommendation?.templateId).toBe('covert_operator')
+    expect(gangBoss?.npcRecommendation?.templateId).toBe('criminal')
 
     const mageRector = ORGANIZATION_AUTHORING_PRESETS.mage_college.members.titles.find(
       (ref) => ref.titleId === 'rector',
     )
     expect(mageRector?.npcRecommendation).toEqual({
-      templateId: 'arcane_practitioner',
+      templateId: 'scholar',
       level: 10,
+      classPreferenceOverrideSlugs: ['wizard', 'sorcerer'],
     })
   })
 

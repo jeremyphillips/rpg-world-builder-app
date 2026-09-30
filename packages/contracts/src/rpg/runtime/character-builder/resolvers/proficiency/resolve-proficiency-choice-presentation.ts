@@ -19,6 +19,7 @@ export const PROFICIENCY_CHOICE_SOURCE_PRIORITY = {
   heritage: 40,
   origin: 50,
   feat: 60,
+  npcTemplate: 65,
   ruleset: 70,
   campaign: 80,
 } as const satisfies Record<ChoiceSetOwnerKind, number>

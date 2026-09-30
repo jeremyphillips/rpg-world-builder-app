@@ -179,7 +179,7 @@ describe('organization classification writes', () => {
       sourceTitleId: 'treasurer',
       label: 'Treasurer',
       priority: 50,
-      npcRecommendation: { templateId: 'administrator', level: 3 },
+      npcRecommendation: { templateId: 'commoner', level: 3 },
     })
     expect(created.members.titles.every((title) => title.id.startsWith('omt_'))).toBe(true)
   })
@@ -382,7 +382,7 @@ describe('organization classification writes', () => {
             sourceTitleId: 'enforcer',
             label: 'Enforcer',
             priority: 30,
-            npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+            npcRecommendation: { templateId: 'guard', level: 5 },
           },
         ],
       },
@@ -400,7 +400,7 @@ describe('organization classification writes', () => {
     expect(duplicate.members.titles[0]).toMatchObject({
       label: 'Enforcer',
       priority: 30,
-      npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+      npcRecommendation: { templateId: 'guard', level: 5 },
     })
     expect(duplicate.members.titles[0]?.id).not.toBe('omt_enforcer')
   })

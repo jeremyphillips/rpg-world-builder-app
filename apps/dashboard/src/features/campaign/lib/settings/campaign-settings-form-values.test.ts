@@ -75,6 +75,15 @@ const defaultProgressionPatch = {
   extendedProgression: null,
 } as const
 
+/** The single purse field always writes the modest tier so a default save can clear a custom purse. */
+const defaultLevelZeroWealthPatch = {
+  levelZeroNpcs: {
+    wealthTiers: {
+      modest: { gp: 5 },
+    },
+  },
+} as const
+
 const defaultMulticlassingFields = {
   multiclassingEnabled: DEFAULT_MULTICLASSING_ENABLED,
   primaryAbilityMinimumEnabled: DEFAULT_PRIMARY_ABILITY_MINIMUM_ENABLED,
@@ -138,6 +147,7 @@ describe('buildCharacterCreationPatchInput', () => {
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
       progression: defaultProgressionPatch,
+      ...defaultLevelZeroWealthPatch,
     })
   })
 
@@ -160,6 +170,7 @@ describe('buildCharacterCreationPatchInput', () => {
         ...defaultProgressionPatch,
         extendedProgression: { tierName: 'Epic Destiny', maxLevel: 30 },
       },
+      ...defaultLevelZeroWealthPatch,
     })
   })
 
@@ -223,6 +234,7 @@ describe('buildCharacterCreationPatchInput', () => {
           speciesPolicy: { enabled: true },
         },
       },
+      ...defaultLevelZeroWealthPatch,
     })
   })
 
@@ -321,6 +333,7 @@ describe('buildCharacterCreationPatchInputFromCreateWizard', () => {
       startingLevel: 3,
       importedCharacters: { policy: 'approval_required' },
       progression: defaultProgressionPatch,
+      ...defaultLevelZeroWealthPatch,
     })
   })
 })
@@ -341,6 +354,7 @@ describe('buildCreateCampaignInput', () => {
         startingLevel: 3,
         importedCharacters: { policy: 'approval_required' },
         progression: defaultProgressionPatch,
+        ...defaultLevelZeroWealthPatch,
       },
       flavor: {
         playStyle: ['dungeon_crawl'],

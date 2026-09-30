@@ -571,23 +571,21 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 `vocabularyOptionIdSchema` and catalog seeds; see
 [docs/vocabulary.md](../../../docs/vocabulary.md).
 
-**NPC authoring templates** ([`npc-authoring-template.ts`](../src/rpg/vocab/organization/npc-authoring-template.ts))
-follow the same two-layer pattern with an extended entry shape:
+**NPC roles** ([`npc-template.ts`](../src/rpg/vocab/npc/npc-template.ts)) follow the same
+two-layer pattern (`NPC_TEMPLATE_TERM` + `NPC_TEMPLATE_ENTRIES`) with an extended entry:
+class, skill, tool, and language preferences, an ability order, and a level-0 role layer
+(wealth tier, kit, training, role-choice counts). Recommendations bias automatic selection
+and never grant capabilities. The level-0 layer grants only for a classless NPC whose
+draft stores `npcTemplateId`. Catalog detail →
+[`npc-templates.md`](character-builder/npc-templates.md).
 
-```ts
-export type NpcAuthoringTemplateEntry = GameTermEntry & {
-  readonly searchTerms?: readonly string[]
-  readonly classAffinityIds?: readonly string[] // canonical class slug seeds
-}
-```
-
-`NPC_AUTHORING_TEMPLATE_TERM` + `NPC_AUTHORING_TEMPLATE_ENTRIES` (22 archetypes) supply display
-labels for Quick NPC recommended-build readouts. Optional `classAffinityIds` are baseline canonical
-class recommendations — organization `members.classAffinityIds` remain the path for
-organization-specific or homebrew classes. Preset membership-title refs carry contextual
-`{ templateId, level }` recommendations that snapshot into organization-owned titles at create;
-see [`organization/membership-titles.ts`](../src/rpg/content/organization/membership-titles.ts) and
-`resolveOrganizationNpcClassRecommendationIds` in
+Preset membership-title refs carry contextual
+`{ templateId, level?, classPreferenceOverrideSlugs?, skillPreferenceSlugs?, toolPreferenceSlugs? }`
+recommendations that snapshot into organization-owned titles at create. A title class
+override replaces the template class list. Title skill and tool preferences are prepended
+and do not add slots. See
+[`organization/membership-titles.ts`](../src/rpg/content/organization/membership-titles.ts)
+and `resolveOrganizationNpcClassRecommendationIds` in
 [`organization-member-class-recommendations.ts`](../src/rpg/runtime/character/organization-member-class-recommendations.ts).
 
 ### Catalog content-type terms (`CONTENT_TYPE_TERMS`)

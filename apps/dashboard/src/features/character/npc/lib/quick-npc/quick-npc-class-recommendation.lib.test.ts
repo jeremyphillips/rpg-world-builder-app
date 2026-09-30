@@ -60,7 +60,7 @@ describe('resolveQuickNpcClassRecommendationIds', () => {
     label: 'Guildmaster',
     description: 'Head of the guild.',
     priority: 50 as const,
-    npcRecommendation: { templateId: 'covert_operator' as const, level: 9 },
+    npcRecommendation: { templateId: 'criminal' as const, level: 9 },
   } as const
 
   it('merges template and organization affinities for the current title', () => {
@@ -119,7 +119,7 @@ describe('applyQuickNpcRecommendedClassSeeding', () => {
     label: 'Guildmaster',
     description: 'Head of the guild.',
     priority: 50 as const,
-    npcRecommendation: { templateId: 'covert_operator' as const, level: 9 },
+    npcRecommendation: { templateId: 'criminal' as const, level: 9 },
   } as const
 
   it('auto-seeds a single eligible recommendation', () => {

@@ -40,7 +40,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 5 },
 } as const
 
 describe('buildQuickNpcCreateSetupSets', () => {
@@ -174,7 +174,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'recommended',
       sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
-      templateLabel: 'Covert operator',
+      templateLabel: 'Criminal',
       level: 5,
       levelPrompt: 'Recommended for Guildmaster: Level 5.',
       classProgressionApplicable: true,
@@ -275,7 +275,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       {
         id: 'quickNpcBuild',
         label: 'Build',
-        value: 'Covert operator · Level 5 Fighter',
+        value: 'Criminal · Level 5 Fighter',
         editTarget: { type: 'external', id: 'quickNpcBuild' },
       },
     ])

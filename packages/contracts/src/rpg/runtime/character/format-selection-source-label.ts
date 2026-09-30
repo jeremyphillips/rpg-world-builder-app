@@ -15,6 +15,7 @@ import type {
   CharacterSelectionSource,
   CharacterSelectionSourceKind,
 } from './sheet/selection-sources'
+import { getNpcTemplateLabel } from '../../vocab/npc/npc-template'
 import type { VocabularyTerm } from '../../vocab/types'
 import type { ChoiceSetOwnerKind, ChoiceSetProvenance } from '../character-builder/choice-set'
 
@@ -85,6 +86,7 @@ const STATIC_SELECTION_SOURCE_LABELS: Partial<Record<CharacterSelectionSourceKin
   backgroundStartingEquipment: 'From background starting equipment',
   startingWealthTier: 'Granted by starting wealth',
   equipment: 'Starting equipment',
+  npcTemplate: 'Granted by NPC role',
 }
 
 const CLASS_GRANT_SOURCE_KINDS = new Set<CharacterSelectionSourceKind>([
@@ -282,6 +284,13 @@ export function resolveSelectionSourceProvenance(
       return resolveClassSpellcastingProvenance(source, catalogIndex)
     case 'characterCreation':
       return resolveCharacterCreationProvenance(source, catalogIndex)
+    case 'npcTemplate':
+      return {
+        sourceKind: source.kind,
+        ownerKind: 'npcTemplate',
+        primaryLabel: source.sourceId ? getNpcTemplateLabel(source.sourceId) : 'NPC role',
+        ownerLabel: source.sourceId ? getNpcTemplateLabel(source.sourceId) : undefined,
+      }
     default:
       return resolveDefaultProvenance(source)
   }
@@ -310,6 +319,8 @@ export function formatChoiceSetProvenanceParentContext(
       return `${provenance.ownerLabel} subclass`
     case 'feat':
       return `${provenance.ownerLabel} ${getContentTypeSentenceForm('feats')}`
+    case 'npcTemplate':
+      return provenance.ownerLabel
     default:
       return undefined
   }
