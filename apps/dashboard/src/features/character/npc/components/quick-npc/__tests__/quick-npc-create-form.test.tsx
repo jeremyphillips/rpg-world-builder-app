@@ -166,6 +166,7 @@ describe('QuickNpcAuthoringForm', () => {
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: quickFighter.id,
         level: 1,
       }),
@@ -213,6 +214,7 @@ describe('QuickNpcAuthoringForm', () => {
     const guildmasterSetup = quickNpcMemberSetupValues({
       speciesId: populatedBuilderCatalog.species[0]!.id,
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       classId: quickFighter.id,
       level: 5,
     })
@@ -246,6 +248,7 @@ describe('QuickNpcAuthoringForm', () => {
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
       setup: quickNpcMemberSetupWithNoTitle({
         speciesId: populatedBuilderCatalog.species[0]!.id,
+        npcTemplateId: 'criminal',
         classId: unsatisfiableFighter.id,
         level: 1,
       }),

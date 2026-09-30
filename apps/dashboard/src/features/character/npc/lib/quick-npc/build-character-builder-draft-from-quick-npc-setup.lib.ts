@@ -21,7 +21,7 @@ export function buildCharacterBuilderDraftFromQuickNpcSetup(
     draft.class.classId = setup.classId
   }
 
-  if (setup.contextKind === 'standalone' && setup.npcTemplateId) {
+  if (setup.npcTemplateId) {
     draft.npcTemplateId = setup.npcTemplateId
   }
 

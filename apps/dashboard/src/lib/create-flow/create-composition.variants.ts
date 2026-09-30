@@ -1,4 +1,4 @@
-import { cn } from '@rpg/ui'
+import { cn, selectionSummaryCardListClasses } from '@rpg/ui'
 
 /** 8px — composer subsection title to review body. */
 export const createCompositionComposerStackClasses = cn('flex flex-col gap-2')
@@ -15,5 +15,5 @@ export const createCompositionStageStackClasses = cn('flex flex-col gap-2.5')
 /** Heading row with optional trailing stage action. */
 export const createCompositionStageHeadingRowClasses = cn('flex items-center justify-between gap-2')
 
-/** Vertical stack for completed-decision summary rows. */
-export const createCompositionSummaryRowsClasses = cn('flex flex-col')
+/** Completed-decision summary rows — same grid tracks as `SelectionSummaryCard`. */
+export const createCompositionSummaryRowsClasses = selectionSummaryCardListClasses

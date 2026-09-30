@@ -26,7 +26,6 @@ import {
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { buildQuickNpcSpeciesRadioCardPresentation } from './quick-npc-species-option-groups.lib'
-import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 import {
   buildNpcTemplateRadioOptions,
   QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT,
@@ -35,7 +34,7 @@ import { isQuickNpcStandaloneSetup } from './quick-npc-form-fields'
 
 export const QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE = 'Set up member' as const
 export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
-  "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation." as const
+  'Choose a role and starting build from this organization’s recommendations.' as const
 export const QUICK_NPC_STANDALONE_SETUP_HEADLINE = 'Set up NPC' as const
 export const QUICK_NPC_STANDALONE_SETUP_DESCRIPTION =
   'Choose a role, species, and starting character options.' as const
@@ -76,6 +75,7 @@ export function quickNpcBuildRevision(values: QuickNpcSetupValues): string {
 
   return [
     values.membershipTitle ?? '',
+    values.npcTemplateId ?? '',
     values.speciesId,
     String(values.level),
     values.classId,
@@ -93,10 +93,7 @@ export function isQuickNpcBuildResolved(args: {
   values: QuickNpcSetupValues
   context: CharacterBuildContext
 }): boolean {
-  if (
-    isQuickNpcStandaloneSetup(args.values) &&
-    !isCreateSetupChoiceComplete(args.values.npcTemplateId)
-  ) {
+  if (!isCreateSetupChoiceComplete(args.values.npcTemplateId)) {
     return false
   }
 
@@ -175,14 +172,8 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
   const parts: string[] = []
   if (isQuickNpcStandaloneSetup(args.values) && args.values.npcTemplateId) {
     parts.push(getNpcTemplateLabel(args.values.npcTemplateId))
-  } else if (isQuickNpcOrganizationMemberSetup(args.values)) {
-    const recommendation = resolveQuickNpcSelectedTitleRecommendation({
-      membershipTitle: args.values.membershipTitle,
-      titles: args.titles,
-    })
-    if (recommendation !== undefined) {
-      parts.push(getNpcTemplateLabel(recommendation.templateId))
-    }
+  } else if (isQuickNpcOrganizationMemberSetup(args.values) && args.values.npcTemplateId) {
+    parts.push(getNpcTemplateLabel(args.values.npcTemplateId))
   }
 
   const className = resolveQuickNpcClassDisplayLabel(args.values.classId, args.catalogIndex)

@@ -152,8 +152,7 @@ describe('CreateSetupPanel', () => {
 
     render(<GroupedSetupHarness sets={sets} />)
 
-    expect(screen.getByText('Title')).toBeInTheDocument()
-    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guildmaster, Change title' })).toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
   })
 

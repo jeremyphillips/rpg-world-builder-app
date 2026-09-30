@@ -7,6 +7,7 @@ import { useQuickNpcBuildCardExpandedAttribute } from '../../lib/quick-npc/quick
 import {
   BuildCardClassAttributeRow,
   BuildCardLevelAttributeRow,
+  BuildCardRoleAttributeRow,
   BuildCardTemplateIdentity,
 } from './quick-npc-build-card-parts'
 import {
@@ -19,6 +20,7 @@ export type QuickNpcBuildCardProps = {
   model: QuickNpcBuildCardModel
   onClassChange: (classId: string) => void
   onLevelChange: (level: number) => void
+  onRoleChange?: (npcTemplateId: string) => void
   className?: string
 }
 
@@ -26,14 +28,18 @@ export function QuickNpcBuildCard({
   model,
   onClassChange,
   onLevelChange,
+  onRoleChange,
   className,
 }: QuickNpcBuildCardProps) {
   const baseId = React.useId()
   const [expanded, setExpanded] = useQuickNpcBuildCardExpandedAttribute({
     classProgressionApplicable: model.classProgressionApplicable,
     classId: model.classId,
+    roleRowEnabled: model.roleRow != null,
+    npcTemplateId: model.roleRow?.npcTemplateId ?? '',
   })
 
+  const roleExpanded = model.roleRow != null && expanded === 'role'
   const classExpanded = model.classProgressionApplicable && expanded === 'class'
   const levelExpanded = expanded === 'level'
 
@@ -46,7 +52,7 @@ export function QuickNpcBuildCard({
     <section className={className ?? quickNpcBuildCardSectionClasses}>
       <Eyebrow size="md">{model.sectionEyebrow}</Eyebrow>
       <article className={quickNpcBuildCardShellClasses}>
-        {model.templateLabel ? (
+        {model.showTemplateIdentity && model.templateLabel ? (
           <BuildCardTemplateIdentity
             templateLabel={model.templateLabel}
             templateDescription={model.templateDescription}
@@ -54,6 +60,26 @@ export function QuickNpcBuildCard({
         ) : null}
 
         <div className={quickNpcBuildCardAttributesShellClasses}>
+          {model.roleRow && onRoleChange ? (
+            <BuildCardRoleAttributeRow
+              baseId={baseId}
+              roleRow={model.roleRow}
+              expanded={roleExpanded}
+              onToggle={() => setExpanded(roleExpanded ? null : 'role')}
+              onRoleChange={(npcTemplateId) => {
+                onRoleChange(npcTemplateId)
+                setExpanded(null)
+              }}
+            />
+          ) : null}
+
+          <BuildCardLevelAttributeRow
+            model={model}
+            expanded={levelExpanded}
+            onToggle={() => setExpanded(levelExpanded ? null : 'level')}
+            onLevelChange={onLevelChange}
+          />
+
           <BuildCardClassAttributeRow
             baseId={baseId}
             model={model}
@@ -63,14 +89,6 @@ export function QuickNpcBuildCard({
               setExpanded(classExpanded ? null : 'class')
             }}
             onClassChange={handleClassChange}
-          />
-
-          <BuildCardLevelAttributeRow
-            model={model}
-            expanded={levelExpanded}
-            onToggle={() => setExpanded(levelExpanded ? null : 'level')}
-            onLevelChange={onLevelChange}
-            showDivider
           />
         </div>
       </article>

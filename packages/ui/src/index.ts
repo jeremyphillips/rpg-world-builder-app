@@ -462,6 +462,7 @@ export {
   type SelectionSummaryChangeActionProps,
   type SelectionSummaryRowProps,
 } from './components/ui/selection-summary-card'
+export { selectionSummaryCardListClasses } from './components/ui/selection-summary-card.variants'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown-field.client'

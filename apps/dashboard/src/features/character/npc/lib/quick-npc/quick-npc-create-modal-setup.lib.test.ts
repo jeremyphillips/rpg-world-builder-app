@@ -22,7 +22,9 @@ import {
   createQuickNpcSetupDefaultValues,
   isQuickNpcMembershipTitleSetupComplete,
 } from './quick-npc-form-fields'
+import { QUICK_NPC_RECOMMENDED_GROUP_EYEBROW } from './quick-npc-affinity-option-groups.lib'
 import { resolveQuickNpcClassOptionGroups } from './quick-npc-class-option-groups.lib'
+import { QUICK_NPC_ROLE_ALL_GROUP_EYEBROW } from './quick-npc-npc-template-option.lib'
 import { resolveCreateSetupActiveSetId, resolveCreateSetupVisibleSetIds } from '@/lib/create-setup'
 import {
   quickNpcMemberSetupValues,
@@ -201,6 +203,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'recommended',
       sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+      showTemplateIdentity: true,
       templateLabel: 'Guard',
       level: 0,
       classProgressionApplicable: false,
@@ -214,6 +217,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 5,
       }),
@@ -224,14 +228,26 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'recommended',
       sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
-      templateLabel: 'Criminal',
+      showTemplateIdentity: false,
+      roleRow: {
+        npcTemplateId: 'criminal',
+        selectedRoleLabel: 'Criminal',
+        roleProvenanceHelper: 'Suggested by Guildmaster',
+      },
       level: 5,
       levelPrompt: 'Recommended for Guildmaster: Level 5.',
       classProgressionApplicable: true,
     })
-    expect(model?.classOptionGroups.optionGroups?.[0]?.options).toEqual([
+    expect(model?.classOptionPresentation.optionGroups?.[0]?.options).toEqual([
       { value: rogueClass.id, label: 'Rogue' },
     ])
+    expect(model?.roleRow?.roleOptionPresentation.optionGroups?.[0]).toMatchObject({
+      eyebrow: QUICK_NPC_RECOMMENDED_GROUP_EYEBROW,
+      options: [{ value: 'criminal', label: 'Criminal' }],
+    })
+    expect(model?.roleRow?.roleOptionPresentation.optionGroups?.[1]?.eyebrow).toBe(
+      QUICK_NPC_ROLE_ALL_GROUP_EYEBROW,
+    )
   })
 
   it('returns build mode without template identity or recommended level helper', () => {
@@ -253,6 +269,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       classProgressionApplicable: false,
     })
     expect(model?.templateLabel).toBeUndefined()
+    expect(model?.roleRow?.npcTemplateId).toBe('')
     expect(model?.levelPrompt).toBeUndefined()
   })
 
@@ -276,6 +293,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 5,
       }),
@@ -283,9 +301,9 @@ describe('resolveQuickNpcBuildCardModel', () => {
       members: { classAffinityIds: [fighterClass.id] },
     })
 
-    expect(model?.classOptionGroups.optionGroups).toEqual(
+    expect(model?.classOptionPresentation.optionGroups).toEqual(
       resolveQuickNpcClassOptionGroups({
-        classOptions: model!.classOptionGroups.options,
+        classOptions: model!.classOptionPresentation.options,
         recommendedClassIds: model!.recommendedClassIds,
         playableClasses: multiClassContext.catalog.classes,
       }).optionGroups,
@@ -302,6 +320,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 5,
       }),
@@ -478,6 +497,7 @@ describe('isQuickNpcBuildResolved', () => {
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'omt_guildmaster',
+          npcTemplateId: 'criminal',
           classId: rogueClass.id,
           level: 5,
         }),
@@ -491,6 +511,7 @@ describe('quickNpcBuildRevision', () => {
   const memberBaseValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: 'omt_guildmaster',
+    npcTemplateId: 'criminal',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
   })
@@ -501,9 +522,9 @@ describe('quickNpcBuildRevision', () => {
     level: 5,
   })
 
-  it('derives member revision from membershipTitle, speciesId, level, and classId', () => {
+  it('derives member revision from membershipTitle, npcTemplateId, speciesId, level, and classId', () => {
     expect(quickNpcBuildRevision(memberBaseValues)).toBe(
-      `omt_guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+      `omt_guildmaster:criminal:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
     expect(quickNpcBuildRevision({ ...memberBaseValues, membershipTitle: 'Other' })).not.toBe(
       quickNpcBuildRevision(memberBaseValues),

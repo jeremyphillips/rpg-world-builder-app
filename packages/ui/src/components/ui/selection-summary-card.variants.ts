@@ -5,23 +5,19 @@ export const selectionSummaryCardSectionClasses = 'flex flex-col gap-y-2'
 export const selectionSummaryCardShellClasses =
   'overflow-hidden rounded-md border border-border bg-surface-muted px-3 py-1'
 
-export const selectionSummaryCardListClasses = 'flex flex-col'
+/** Shared column tracks: label | value | change action (values align across rows). */
+export const selectionSummaryCardListClasses =
+  'grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-5'
 
-export const selectionSummaryCardRowClasses =
-  'flex justify-between gap-3 py-0.5 first:pt-0 last:pb-0'
+/** Full-width row group — border-top spans all columns (avoids broken segment dividers). */
+export const selectionSummaryCardRowGroupClasses =
+  'col-span-3 grid grid-cols-subgrid items-center py-0.5'
 
-export const selectionSummaryCardRowDividerClasses = 'border-t border-border-subtle'
-
-export const selectionSummaryCardRowCopyColumnClasses = 'flex min-w-0 flex-1 flex-col'
-
-/** Primary label/value band — matches compact control height (24px). */
-export const selectionSummaryCardRowPrimaryLineClasses =
-  'flex min-h-control-action-compact min-w-0 flex-1 flex-wrap items-center gap-x-1.5'
-
-export const selectionSummaryCardRowActionColumnClasses =
-  'flex shrink-0 self-start min-h-control-action-compact items-center'
+export const selectionSummaryCardRowGroupDividerClasses = 'border-t border-border-subtle pt-0.5'
 
 export const selectionSummaryCardRowLabelVariants = cva('text-sm text-muted-foreground')
+
+export const selectionSummaryCardRowValueCellClasses = 'min-w-0'
 
 export const selectionSummaryCardRowValueVariants = cva(
   'text-sm font-body-emphasis text-foreground',
@@ -30,6 +26,11 @@ export const selectionSummaryCardRowValueVariants = cva(
 export const selectionSummaryCardRowValueButtonClasses =
   'cursor-pointer border-0 bg-transparent p-0 text-left transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm'
 
-export const selectionSummaryCardRowHelperVariants = cva('w-full text-xs text-muted-foreground')
+export const selectionSummaryCardRowActionColumnClasses =
+  'flex min-h-control-action-compact shrink-0 items-center justify-end'
+
+export const selectionSummaryCardRowHelperVariants = cva(
+  'col-start-2 text-xs text-muted-foreground',
+)
 
 export const selectionSummaryCardChangeActionClasses = 'shrink-0'

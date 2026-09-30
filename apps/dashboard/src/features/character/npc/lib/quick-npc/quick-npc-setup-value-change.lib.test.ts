@@ -221,6 +221,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       quickNpcMemberSetupValues({
         speciesId: '',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 8,
       }),
@@ -244,6 +245,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:elf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: rogueClass.id,
         level: 8,
       }),
@@ -264,6 +266,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       ...baseValues,
       speciesId: 'srd-cc-5.2.1:elf',
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       level: 8,
       classId: rogueClass.id,
     })
@@ -280,6 +283,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual({
       ...baseValues,
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       level: 8,
       classId: rogueClass.id,
     })
@@ -300,6 +304,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual({
       ...baseValues,
       membershipTitle: 'omt_commander',
+      npcTemplateId: 'guard',
       level: 8,
       classId: '',
     })

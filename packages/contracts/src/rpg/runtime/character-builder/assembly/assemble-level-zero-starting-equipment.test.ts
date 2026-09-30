@@ -32,7 +32,7 @@ describe('assembleLevelZeroStartingEquipment', () => {
       levelZeroRules: { wealthTiers },
       catalogIndex: catalogWith([]),
     })
-    expect(assembled.wealth.gp).toBe(5)
+    expect(assembled.wealth.gp).toBe(10)
     expect(assembled.equipment.weapons).toEqual([])
   })
 

@@ -38,17 +38,12 @@ export const DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS = true
 
 export const DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES = true
 
-/**
- * Default classless purses. Anchored to SRD hireling wages in service.json:
- * poor is about 5 days of untrained wages, modest is about 2.5 days of skilled
- * wages, and wealthy is about half of the 50 GP background budget.
- * No v1 template selects wealthy.
- */
+/** Default starting liquid funds per wealth tier (campaign-configurable). */
 export const DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS = {
   poor: { gp: 1 },
-  modest: { gp: 5 },
-  comfortable: { gp: 10 },
-  wealthy: { gp: 25 },
+  modest: { gp: 10 },
+  comfortable: { gp: 50 },
+  wealthy: { gp: 200 },
 } as const satisfies Record<NpcWealthTierId, CharacterWealthGrant>
 
 /** Classless NPCs with no template use the modest purse. */

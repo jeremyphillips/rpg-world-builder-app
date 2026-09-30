@@ -5,6 +5,9 @@ import { mapFieldOptionsToRadioCardOptions } from '../../../lib/choice-sets/choi
 
 export const QUICK_NPC_AFFINITY_RECOMMENDED_EYEBROW = 'Recommended for this organization' as const
 
+/** Shared eyebrow for build-card recommended / all-other groups (class, role, …). */
+export const QUICK_NPC_RECOMMENDED_GROUP_EYEBROW = 'Recommended' as const
+
 export type QuickNpcAffinityOption = {
   value: string
   label: string
@@ -82,12 +85,16 @@ export function buildQuickNpcAffinityRadioCardPresentation(input: {
   recommendedGroupEyebrow: string
   allOtherGroupEyebrow: string
   allOtherGroupId: string
+  /** When set, used for labels/descriptions instead of mapping {@link input.options} only. */
+  radioCardOptions?: readonly RadioCardOption[]
 }): {
   options: RadioCardOption[]
   optionGroups?: RadioCardOptionGroup[]
 } {
   const grouped = resolveQuickNpcAffinityOptionGroups(input)
-  const options = mapFieldOptionsToRadioCardOptions(input.options)
+  const options: RadioCardOption[] = input.radioCardOptions
+    ? [...input.radioCardOptions]
+    : mapFieldOptionsToRadioCardOptions(input.options)
 
   if (!grouped.optionGroups) {
     return { options }
@@ -104,6 +111,20 @@ export function buildQuickNpcAffinityRadioCardPresentation(input: {
         const radioOption = radioOptionsByValue.get(option.value)
         return radioOption ? [radioOption] : []
       }),
+    })),
+  }
+}
+
+/** Props spread for {@link RadioCardField} from affinity presentation output. */
+export function spreadQuickNpcRadioCardFieldPresentation(presentation: {
+  options: readonly RadioCardOption[]
+  optionGroups?: readonly RadioCardOptionGroup[]
+}) {
+  return {
+    options: [...presentation.options],
+    optionGroups: presentation.optionGroups?.map((group) => ({
+      ...group,
+      options: [...group.options],
     })),
   }
 }

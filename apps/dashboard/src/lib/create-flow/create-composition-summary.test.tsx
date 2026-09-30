@@ -21,7 +21,8 @@ describe('CreateCompositionSummary', () => {
       />,
     )
 
-    expect(screen.getByText('Relationship:')).toBeInTheDocument()
+    expect(screen.getByText('Relationship')).toBeInTheDocument()
+    expect(screen.queryByText('Relationship:')).not.toBeInTheDocument()
     expect(screen.getByText('Owner')).toBeInTheDocument()
   })
 
@@ -35,8 +36,10 @@ describe('CreateCompositionSummary', () => {
       />,
     )
 
-    expect(screen.getByText('Relationship:')).toBeInTheDocument()
-    expect(screen.getByText('Organization:')).toBeInTheDocument()
+    expect(screen.getByText('Relationship')).toBeInTheDocument()
+    expect(screen.queryByText('Relationship:')).not.toBeInTheDocument()
+    expect(screen.getByText('Organization')).toBeInTheDocument()
+    expect(screen.queryByText('Organization:')).not.toBeInTheDocument()
     expect(screen.getByText('Harbor Guild')).toBeInTheDocument()
   })
 

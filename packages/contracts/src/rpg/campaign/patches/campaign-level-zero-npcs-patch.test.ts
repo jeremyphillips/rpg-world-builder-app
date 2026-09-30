@@ -27,9 +27,9 @@ describe('resolveLevelZeroNpcRules', () => {
       retainSpeciesLanguages: true,
       wealthTiers: {
         poor: { gp: 1 },
-        modest: { gp: 5 },
-        comfortable: { gp: 10 },
-        wealthy: { gp: 25 },
+        modest: { gp: 10 },
+        comfortable: { gp: 50 },
+        wealthy: { gp: 200 },
       },
       standardArray: [...DEFAULT_STANDARD_ARRAY],
     })
@@ -71,16 +71,16 @@ describe('resolveLevelZeroNpcRules', () => {
       }).wealthTiers,
     ).toEqual({
       poor: { gp: 1 },
-      modest: { gp: 5 },
+      modest: { gp: 10 },
       comfortable: { gp: 40 },
-      wealthy: { gp: 25 },
+      wealthy: { gp: 200 },
     })
   })
 
   it('treats default-equal tier overrides as a sparse default', () => {
     expect(
       isSparseDefaultLevelZeroNpcsPatch({
-        wealthTiers: { modest: { gp: 5 }, poor: { gp: 1 } },
+        wealthTiers: { modest: { gp: 10 }, poor: { gp: 1 } },
       }),
     ).toBe(true)
     expect(

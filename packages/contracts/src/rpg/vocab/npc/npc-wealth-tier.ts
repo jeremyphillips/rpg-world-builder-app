@@ -19,22 +19,21 @@ export const NPC_WEALTH_TIER_ENTRIES = {
   poor: {
     label: 'Poor',
     description:
-      'A few days of untrained wages. Used by ordinary unskilled roles such as Commoner.',
+      'Very little ready coin — enough for basic daily expenses, with little room for unexpected costs.',
   },
   modest: {
     label: 'Modest',
-    description:
-      'A short stretch of skilled wages. The middle purse for most roles, and the purse for an NPC with no template.',
+    description: 'A practical purse for ordinary working characters with some money set aside.',
   },
   comfortable: {
     label: 'Comfortable',
     description:
-      'Above a working purse without reaching a major trader or patron. Used by Merchant.',
+      'Meaningful ready money — enough to absorb expenses, replace gear, or make a significant purchase.',
   },
   wealthy: {
     label: 'Wealthy',
     description:
-      'Reserved for future title or organization wealth context. No v1 template selects this tier.',
+      'Substantial available funds for prosperous merchants, patrons, officials, or unusually well-funded roles.',
   },
 } as const satisfies Record<string, GameTermEntry>
 

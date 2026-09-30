@@ -27,6 +27,7 @@ import {
   organizationMembershipTitleDefinitionSchema,
   organizationMembershipTitlePrioritySchema,
   organizationMembershipTitlesSchema,
+  organizationPresetNpcRecommendationSchema,
   npcTemplateIdSchema,
   resolveOrganizationCreateMembershipTitles,
   vocabularyTermFieldCopy,
@@ -44,6 +45,8 @@ import { descriptionField, nameField } from './fields/content-identity-form-fiel
 import { finalizeContentInput, slugForInputParse } from './registry/content-form-key-helpers'
 import { rankOrganizationPracticeComboboxOptions } from '../../organizations/lib/authoring/organization-practice-combobox-ranking'
 import { OrganizationEditFamiliarTypeField } from '../../organizations/components/edit/organization-edit-familiar-type-field'
+import { buildNpcTemplateFieldOptions } from '@/lib/npc-template/npc-template-form-options.lib'
+
 import {
   buildOrganizationMembershipTitlesArrayField,
   normalizeOrganizationMembershipTitleFormRows,
@@ -76,6 +79,7 @@ import {
   organizationStartingPointFieldPath,
 } from '../../organizations/lib/presets/organization-starting-point.lib'
 import { resolveDiscoverableOrganizationMemberClasses } from '../../organizations/lib/members/organization-member-class-discoverable.lib'
+import { ORGANIZATION_MEMBER_NPC_TEMPLATE_FIELD_HINT } from '../../organizations/lib/members/organization-member-class-chip-options.lib'
 import {
   buildMemberClassAffinityChipOptions,
   ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT,
@@ -127,11 +131,23 @@ function fieldPath(prefix: string | undefined, name: string): string {
   return prefix ? `${prefix}.${name}` : name
 }
 
-const organizationMembershipTitleFormRowSchema = organizationMembershipTitleDefinitionSchema.extend(
-  {
+const organizationMembershipTitleNpcRecommendationFormSchema = z.preprocess((value) => {
+  if (value == null || typeof value !== 'object') {
+    return undefined
+  }
+  const templateId = (value as { templateId?: unknown }).templateId
+  if (templateId === '' || templateId == null) {
+    return undefined
+  }
+  return value
+}, organizationPresetNpcRecommendationSchema.optional())
+
+const organizationMembershipTitleFormRowSchema = organizationMembershipTitleDefinitionSchema
+  .omit({ npcRecommendation: true })
+  .extend({
     priority: formSelectNumberSchema(organizationMembershipTitlePrioritySchema),
-  },
-)
+    npcRecommendation: organizationMembershipTitleNpcRecommendationFormSchema,
+  })
 
 const organizationMembershipTitlesFormSchema = z
   .array(organizationMembershipTitleFormRowSchema)
@@ -140,7 +156,7 @@ const organizationMembershipTitlesFormSchema = z
 const organizationMembersFormFieldsSchema = z.object({
   classAffinityIds: z.array(z.string().min(1)).default([]),
   speciesAffinityIds: z.array(z.string().min(1)).default([]),
-  npcTemplateId: npcTemplateIdSchema.optional(),
+  npcTemplateId: draftOptionalSelect(npcTemplateIdSchema),
   titles: organizationMembershipTitlesFormSchema.optional(),
 })
 
@@ -296,6 +312,18 @@ function buildOrganizationMemberAffinityFields(
         selectedMemberSpeciesAffinityIds ?? ctx.organizationMemberSpeciesAffinitySeedIds ?? [],
       ),
       multiple: true,
+    },
+    {
+      type: 'select',
+      name: fieldPath(prefix, 'members.npcTemplateId'),
+      label: 'Default NPC role',
+      hint: {
+        text: ORGANIZATION_MEMBER_NPC_TEMPLATE_FIELD_HINT,
+        position: 'below-control',
+      },
+      options: buildNpcTemplateFieldOptions(),
+      clearable: true,
+      clearAccessibleName: 'Clear default NPC role',
     },
   ]
 }
@@ -578,6 +606,7 @@ function organizationFormFieldForInput(
   return {}
 }
 
+// fallow-ignore-next-line complexity
 function organizationValuesForInputParse(
   values: OrganizationFormValues,
   ctx: ContentFormInputCtx<Organization> | undefined,
@@ -592,9 +621,7 @@ function organizationValuesForInputParse(
     members: {
       classAffinityIds: values.members?.classAffinityIds ?? [],
       speciesAffinityIds: values.members?.speciesAffinityIds ?? [],
-      ...(values.members?.npcTemplateId !== undefined
-        ? { npcTemplateId: values.members.npcTemplateId }
-        : {}),
+      ...(values.members?.npcTemplateId ? { npcTemplateId: values.members.npcTemplateId } : {}),
       titles: resolveOrganizationCreateMembershipTitles({
         titles: normalizeOrganizationMembershipTitleFormRows(values.members?.titles),
       }),

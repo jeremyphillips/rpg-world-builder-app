@@ -13,7 +13,6 @@ import {
 
 import {
   isQuickNpcOrganizationMemberSetup,
-  isQuickNpcStandaloneSetup,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
@@ -39,7 +38,7 @@ export function resolveQuickNpcTemplateRecommendations(args: {
 
   return resolveNpcTemplateRecommendations({
     level: args.values.level,
-    userTemplateId: isQuickNpcStandaloneSetup(args.values) ? args.values.npcTemplateId : undefined,
+    userTemplateId: args.values.npcTemplateId,
     ...(args.lockInUserClass &&
     args.values.classId &&
     isClassProgressionApplicable(args.values.level)

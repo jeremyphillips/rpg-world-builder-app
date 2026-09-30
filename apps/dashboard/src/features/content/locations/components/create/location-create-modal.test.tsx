@@ -427,7 +427,7 @@ describe('LocationCreateModal', () => {
     expect(
       screen.queryByRole('radiogroup', { name: SETTLEMENT_CREATE_SETUP_PROMPT }),
     ).not.toBeInTheDocument()
-    expect(screen.getByText(SETTLEMENT_CREATE_SETUP_FIELD_LABEL)).toBeInTheDocument()
+    expect(screen.getAllByText(SETTLEMENT_CREATE_SETUP_FIELD_LABEL).length).toBeGreaterThan(0)
     expect(screen.getByText('City')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change settlement type' })).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Name' })).toBeInTheDocument()

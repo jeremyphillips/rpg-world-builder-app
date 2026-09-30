@@ -1,6 +1,8 @@
 import type {
   ArmorProficiencyGrantSet,
   CampaignLevelZeroNpcsPatch,
+  CharacterWealthGrant,
+  LevelZeroNpcWealthTiers,
   ResolvedCampaignCharacterCreationPatch,
   WeaponProficiencyGrantSet,
 } from '@rpg/contracts'
@@ -13,7 +15,9 @@ import {
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS,
   DEFAULT_STANDARD_ARRAY,
+  NPC_WEALTH_TIER_IDS,
   normalizeCharacterWealthGrant,
+  type NpcWealthTierId,
 } from '@rpg/contracts'
 
 import {
@@ -28,6 +32,7 @@ import {
 } from '@/lib/forms/wealth-grant-form-fields'
 
 import type { LevelZeroNpcsFormValues } from './level-zero-npc-form-fields'
+import { LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS } from './level-zero-npc-form-fields'
 import {
   xorGrantSetFromForm,
   xorGrantSetModeFromGrantSet,
@@ -55,7 +60,10 @@ export function mapLevelZeroNpcsToFormValues(
       items: [...levelZeroNpcs.languageProficiencies.items],
     },
     levelZeroRetainSpeciesLanguages: levelZeroNpcs.retainSpeciesLanguages,
-    levelZeroStartingWealth: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.modest),
+    levelZeroWealthTierPoor: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.poor),
+    levelZeroWealthTierModest: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.modest),
+    levelZeroWealthTierComfortable: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.comfortable),
+    levelZeroWealthTierWealthy: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.wealthy),
     levelZeroStandardArray: mapStandardArrayToFormValues(levelZeroNpcs.standardArray),
   }
 }
@@ -103,17 +111,46 @@ function buildLevelZeroWeaponProficienciesPatch(
   ) as WeaponProficiencyGrantSet
 }
 
-function levelZeroModestWealthPatch(
+function wealthGrantFromTierFormField(
   values: LevelZeroNpcsFormValues,
-): Pick<CampaignLevelZeroNpcsPatch, 'wealthTiers'> {
-  const modest = normalizeCharacterWealthGrant(
-    wealthGrantMoneyFromForm(values.levelZeroStartingWealth),
+  tierId: NpcWealthTierId,
+): CharacterWealthGrant | undefined {
+  const path = LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS[tierId]
+  const formValue = values[path as keyof LevelZeroNpcsFormValues] as
+    | Parameters<typeof wealthGrantMoneyFromForm>[0]
+    | undefined
+  return normalizeCharacterWealthGrant(wealthGrantMoneyFromForm(formValue))
+}
+
+function wealthGrantsEqual(
+  left: CharacterWealthGrant | undefined,
+  right: CharacterWealthGrant | undefined,
+): boolean {
+  const normalizedLeft = normalizeCharacterWealthGrant(left)
+  const normalizedRight = normalizeCharacterWealthGrant(right)
+  const denominations = ['cp', 'sp', 'gp', 'pp'] as const
+  return denominations.every(
+    (denomination) => normalizedLeft?.[denomination] === normalizedRight?.[denomination],
   )
-  return {
-    wealthTiers: {
-      modest: modest ?? { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.modest },
-    },
+}
+
+function buildLevelZeroWealthTiersPatchInput(
+  values: LevelZeroNpcsFormValues,
+  options: { sparse: boolean },
+): LevelZeroNpcWealthTiers | undefined {
+  const tiers: LevelZeroNpcWealthTiers = {}
+  for (const tierId of NPC_WEALTH_TIER_IDS) {
+    const grant = wealthGrantFromTierFormField(values, tierId)
+    const resolved = grant ?? { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId] }
+    if (options.sparse) {
+      if (!wealthGrantsEqual(resolved, DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId])) {
+        tiers[tierId] = resolved
+      }
+      continue
+    }
+    tiers[tierId] = resolved
   }
+  return Object.keys(tiers).length > 0 ? tiers : undefined
 }
 
 function buildFullLevelZeroNpcsPatchInput(
@@ -131,7 +168,14 @@ function buildFullLevelZeroNpcsPatchInput(
       categories: [],
     },
     retainSpeciesLanguages: values.levelZeroRetainSpeciesLanguages,
-    ...levelZeroModestWealthPatch(values),
+    wealthTiers: Object.fromEntries(
+      NPC_WEALTH_TIER_IDS.map((tierId) => [
+        tierId,
+        wealthGrantFromTierFormField(values, tierId) ?? {
+          ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId],
+        },
+      ]),
+    ) as LevelZeroNpcWealthTiers,
     standardArray: parseStandardArrayFormValues(values.levelZeroStandardArray),
   }
 }
@@ -195,7 +239,10 @@ function buildSparseLevelZeroNpcsPatchInput(
     }
   }
 
-  Object.assign(patch, levelZeroModestWealthPatch(values))
+  const wealthTiers = buildLevelZeroWealthTiersPatchInput(values, { sparse: true })
+  if (wealthTiers) {
+    patch.wealthTiers = wealthTiers
+  }
 
   const standardArray = buildStandardArrayPatchInput(
     values.levelZeroStandardArray,

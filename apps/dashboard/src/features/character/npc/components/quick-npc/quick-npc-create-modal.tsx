@@ -339,7 +339,7 @@ function QuickNpcCreateModalSession({
           />
         ) : (
           <QuickNpcAuthoringForm
-            key={`${state.setupValues.contextKind === 'standalone' ? (state.setupValues.npcTemplateId ?? '') : ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
+            key={`${state.setupValues.npcTemplateId ?? ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
             campaignId={campaignId}
             buildContext={buildContext}
             createContext={context}

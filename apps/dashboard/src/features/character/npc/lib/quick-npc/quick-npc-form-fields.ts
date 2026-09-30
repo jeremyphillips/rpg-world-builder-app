@@ -51,12 +51,12 @@ export type QuickNpcSetupCoreValues = {
   speciesId: string
   classId: string
   level: number
+  /** Catalog NPC role when chosen in setup or on the org-member build card. */
+  npcTemplateId?: NpcTemplateId
 }
 
 export type QuickNpcStandaloneSetupValues = QuickNpcSetupCoreValues & {
   contextKind: 'standalone'
-  /** Setup-only unset until the user chooses a catalog role. */
-  npcTemplateId?: NpcTemplateId
 }
 
 export type QuickNpcOrganizationMemberSetupValues = QuickNpcSetupCoreValues & {
@@ -147,6 +147,7 @@ export function quickNpcOrganizationMemberSetupSchema(maxLevel: number, minLevel
     membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
       message: 'Choose a membership title.',
     }),
+    npcTemplateId: z.string().min(1, 'Choose a role.').pipe(npcTemplateIdSchema),
   })
 }
 
@@ -260,9 +261,7 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
     level: values.level,
     alignment: values.alignment,
     gender: values.gender,
-    ...(isQuickNpcStandaloneSetup(values) && values.npcTemplateId
-      ? { npcTemplateId: values.npcTemplateId }
-      : {}),
+    ...(values.npcTemplateId ? { npcTemplateId: values.npcTemplateId } : {}),
   }
 }
 

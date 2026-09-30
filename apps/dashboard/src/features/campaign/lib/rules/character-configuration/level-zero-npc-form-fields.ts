@@ -3,11 +3,15 @@ import {
   ARMOR_CATEGORIES,
   ARMOR_CATEGORY_ENTRIES,
   CLASS_HIT_DICE,
+  NPC_WEALTH_TIER_IDS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   formatHitDie,
+  getNpcWealthTierEntry,
+  getNpcWealthTierLabel,
   hitDieSchema,
   levelZeroProficiencyBonusSchema,
+  type NpcWealthTierId,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
@@ -35,7 +39,13 @@ export const LEVEL_ZERO_WEAPON_CATEGORIES_PATH = 'levelZeroWeaponProficiencies.c
 export const LEVEL_ZERO_WEAPON_ITEMS_PATH = 'levelZeroWeaponProficiencies.items' as const
 
 export const LEVEL_ZERO_LANGUAGE_ITEMS_PATH = 'levelZeroLanguageProficiencies.items' as const
-export const LEVEL_ZERO_STARTING_WEALTH_PATH = 'levelZeroStartingWealth' as const
+
+export const LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS = {
+  poor: 'levelZeroWealthTierPoor',
+  modest: 'levelZeroWealthTierModest',
+  comfortable: 'levelZeroWealthTierComfortable',
+  wealthy: 'levelZeroWealthTierWealthy',
+} as const satisfies Record<NpcWealthTierId, string>
 
 const hitDieOptions: FieldOption[] = CLASS_HIT_DICE.map((face) => ({
   value: String(face),
@@ -89,7 +99,25 @@ export const levelZeroNpcsFormSchema = z.object({
   levelZeroWeaponProficiencies: levelZeroWeaponProficienciesFormSchema,
   levelZeroLanguageProficiencies: levelZeroLanguageProficienciesFormSchema,
   levelZeroRetainSpeciesLanguages: z.boolean(),
-  levelZeroStartingWealth: z
+  levelZeroWealthTierPoor: z
+    .object({
+      amount: z.coerce.number().min(0),
+      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
+    })
+    .optional(),
+  levelZeroWealthTierModest: z
+    .object({
+      amount: z.coerce.number().min(0),
+      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
+    })
+    .optional(),
+  levelZeroWealthTierComfortable: z
+    .object({
+      amount: z.coerce.number().min(0),
+      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
+    })
+    .optional(),
+  levelZeroWealthTierWealthy: z
     .object({
       amount: z.coerce.number().min(0),
       currency: z.enum(['cp', 'sp', 'gp', 'pp']),
@@ -101,7 +129,10 @@ export const levelZeroNpcsFormSchema = z.object({
 export type LevelZeroNpcsFormValues = z.infer<typeof levelZeroNpcsFormSchema> & {
   levelZeroBaseHitDie: z.infer<typeof hitDieSchema>
   levelZeroProficiencyBonus: z.infer<typeof levelZeroProficiencyBonusSchema>
-  levelZeroStartingWealth?: WealthGrantMoneyForm
+  levelZeroWealthTierPoor?: WealthGrantMoneyForm
+  levelZeroWealthTierModest?: WealthGrantMoneyForm
+  levelZeroWealthTierComfortable?: WealthGrantMoneyForm
+  levelZeroWealthTierWealthy?: WealthGrantMoneyForm
 }
 
 export type LevelZeroNpcsFieldOptions = {
@@ -213,7 +244,21 @@ export function levelZeroNpcsFields({
                 defaultValue: true,
                 separator: 'subtle',
               },
-              ...wealthGrantMoneyField(LEVEL_ZERO_STARTING_WEALTH_PATH),
+              {
+                kind: 'group',
+                legend: 'Wealth tiers',
+                description:
+                  'Wealth tiers represent starting liquid funds, not total assets, property, income, or social class.',
+                fields: NPC_WEALTH_TIER_IDS.map((tierId) => {
+                  const [field] = wealthGrantMoneyField(LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS[tierId])
+                  return {
+                    ...field!,
+                    label: getNpcWealthTierLabel(tierId),
+                    hint: getNpcWealthTierEntry(tierId)?.description,
+                    separator: 'subtle' as const,
+                  }
+                }),
+              },
             ],
           },
         },

@@ -32,6 +32,7 @@ const validValues = {
   level: 3,
   alignment: 'ln',
   membershipTitle: 'omt_member',
+  npcTemplateId: 'guard',
   requiredWeaponIds: [],
   requiredSpellIds: [],
 }
@@ -124,6 +125,7 @@ describe('buildQuickNpcSeed', () => {
       level: 3,
       alignment: 'ln',
       gender: 'male',
+      npcTemplateId: 'guard',
     })
   })
 
@@ -142,6 +144,7 @@ describe('buildQuickNpcSeed', () => {
       level: 0,
       alignment: 'ln',
       gender: 'male',
+      npcTemplateId: 'guard',
     })
   })
 })

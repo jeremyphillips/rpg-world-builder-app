@@ -1,10 +1,12 @@
 import * as React from 'react'
 
-export type QuickNpcBuildExpandedAttribute = 'class' | 'level' | null
+export type QuickNpcBuildExpandedAttribute = 'role' | 'class' | 'level' | null
 
 type QuickNpcBuildCardExpansionSync = {
   classProgressionApplicable: boolean
   classId: string
+  roleRowEnabled: boolean
+  npcTemplateId: string
 }
 
 function resolveQuickNpcBuildCardExpandedSync(
@@ -15,8 +17,25 @@ function resolveQuickNpcBuildCardExpandedSync(
   const { classProgressionApplicable, classId } = current
   const { classProgressionApplicable: wasApplicable, classId: wasClassId } = previous
 
+  if (expanded === 'role' && !current.roleRowEnabled) {
+    return null
+  }
+
   if (!classProgressionApplicable) {
     return expanded === 'class' ? null : expanded
+  }
+
+  if (current.roleRowEnabled && current.npcTemplateId === '') {
+    return expanded === 'class' || expanded === 'level' ? expanded : 'role'
+  }
+
+  if (
+    current.roleRowEnabled &&
+    previous.npcTemplateId === '' &&
+    current.npcTemplateId !== '' &&
+    classId === ''
+  ) {
+    return 'class'
   }
 
   if (classId !== '') {
@@ -36,28 +55,37 @@ function resolveQuickNpcBuildCardExpandedSync(
 export function useQuickNpcBuildCardExpandedAttribute(args: {
   classProgressionApplicable: boolean
   classId: string
+  roleRowEnabled: boolean
+  npcTemplateId: string
 }): [
   QuickNpcBuildExpandedAttribute,
   React.Dispatch<React.SetStateAction<QuickNpcBuildExpandedAttribute>>,
 ] {
-  const { classProgressionApplicable, classId } = args
-  const [expanded, setExpanded] = React.useState<QuickNpcBuildExpandedAttribute>(() =>
-    classProgressionApplicable && classId === '' ? 'class' : null,
-  )
+  const { classProgressionApplicable, classId, roleRowEnabled, npcTemplateId } = args
+  const [expanded, setExpanded] = React.useState<QuickNpcBuildExpandedAttribute>(() => {
+    if (roleRowEnabled && npcTemplateId === '') return 'role'
+    return classProgressionApplicable && classId === '' ? 'class' : null
+  })
   const [syncState, setSyncState] = React.useState<QuickNpcBuildCardExpansionSync>(() => ({
     classProgressionApplicable,
     classId,
+    roleRowEnabled,
+    npcTemplateId,
   }))
 
   if (
     classProgressionApplicable !== syncState.classProgressionApplicable ||
-    classId !== syncState.classId
+    classId !== syncState.classId ||
+    roleRowEnabled !== syncState.roleRowEnabled ||
+    npcTemplateId !== syncState.npcTemplateId
   ) {
     const nextExpanded = resolveQuickNpcBuildCardExpandedSync(expanded, syncState, {
       classProgressionApplicable,
       classId,
+      roleRowEnabled,
+      npcTemplateId,
     })
-    const nextSync = { classProgressionApplicable, classId }
+    const nextSync = { classProgressionApplicable, classId, roleRowEnabled, npcTemplateId }
 
     setSyncState(nextSync)
     if (nextExpanded !== expanded) {

@@ -52,6 +52,21 @@ describe('levelZeroNpcsFields', () => {
     ).toBe(true)
   })
 
+  it('includes a wealth tiers group with one purse field per tier', () => {
+    const allow = expectAllowDependent(
+      levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),
+    )
+
+    const wealthGroup = allow.dependents.fields.find(
+      (field) => isContainer(field) && field.kind === 'group' && field.legend === 'Wealth tiers',
+    )
+    expect(wealthGroup).toBeDefined()
+    if (!wealthGroup || !isContainer(wealthGroup) || wealthGroup.kind !== 'group') {
+      throw new Error('Expected wealth tiers group')
+    }
+    expect(wealthGroup.fields).toHaveLength(4)
+  })
+
   it('keeps nested grant-set dependents on the default nest without panel chrome', () => {
     const allow = expectAllowDependent(
       levelZeroNpcsFields({ languageOptions: [], armorOptions: [], weaponOptions: [] }),

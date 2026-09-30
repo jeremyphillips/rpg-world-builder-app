@@ -55,6 +55,7 @@ export function QuickNpcCreateSetupPhase({
           classAffinityIds: organization?.members?.classAffinityIds,
           npcTemplateId: organization?.members?.npcTemplateId,
         },
+        organizationName: organization?.name,
       }),
     [
       buildContext,
@@ -62,6 +63,7 @@ export function QuickNpcCreateSetupPhase({
       organization?.members?.classAffinityIds,
       organization?.members?.npcTemplateId,
       organization?.members?.titles,
+      organization?.name,
       setupValues,
     ],
   )
@@ -99,6 +101,17 @@ export function QuickNpcCreateSetupPhase({
               nextValue: level,
               invalidatedSetIds: [],
             })
+          }
+          onRoleChange={
+            createContext.kind === 'organization-member'
+              ? (npcTemplateId) =>
+                  onSetupValueChange({
+                    setId: 'npcTemplateId',
+                    previousValue: setupValues.npcTemplateId ?? '',
+                    nextValue: npcTemplateId,
+                    invalidatedSetIds: [],
+                  })
+              : undefined
           }
         />
       ) : null}

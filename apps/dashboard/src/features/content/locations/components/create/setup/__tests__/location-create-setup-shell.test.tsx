@@ -221,7 +221,7 @@ describe('location create setup', () => {
 
     await user.click(screen.getByRole('radio', { name: (name) => name.startsWith('Political') }))
 
-    expect(screen.getByText('Classification')).toBeInTheDocument()
+    expect(screen.getAllByText('Classification').length).toBeGreaterThan(0)
     expect(screen.getByText('Political')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change classification' })).toBeInTheDocument()
     expect(

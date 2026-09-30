@@ -129,6 +129,24 @@ async function setBuildCardLevel(user: ReturnType<typeof userEvent.setup>, level
   await user.type(levelInput, level)
 }
 
+async function selectBuildCardRole(
+  user: ReturnType<typeof userEvent.setup>,
+  roleName: RegExp = /^guard$/i,
+) {
+  let roleRadio = screen.queryByRole('radio', { name: roleName })
+  if (!roleRadio) {
+    const changeRole = screen.queryByRole('button', { name: 'Change role' })
+    if (changeRole) {
+      await user.click(changeRole)
+    }
+    roleRadio = await screen.findByRole('radio', { name: roleName })
+  }
+
+  if (roleRadio.getAttribute('aria-checked') !== 'true') {
+    await user.click(roleRadio)
+  }
+}
+
 async function selectBuildCardClass(user: ReturnType<typeof userEvent.setup>, className: RegExp) {
   let classRadio = screen.queryByRole('radio', { name: className })
   if (!classRadio) {
@@ -152,6 +170,7 @@ async function completeSetup(user: ReturnType<typeof userEvent.setup>) {
     await user.click(dwarfRadio)
   }
 
+  await selectBuildCardRole(user, /^criminal$/i)
   await setBuildCardLevel(user, '1')
   await selectBuildCardClass(user, /fighter/i)
 
@@ -305,7 +324,7 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByText("Choose this member's role in the organization.")).toBeInTheDocument()
     expect(
       screen.getByText(
-        "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation.",
+        'Choose a role and starting build from this organization’s recommendations.',
       ),
     ).toBeInTheDocument()
   })
@@ -453,10 +472,11 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    await selectBuildCardRole(user)
     await setBuildCardLevel(user, '1')
+    await selectBuildCardClass(user, /rogue/i)
 
     expect(screen.getByText('Rogue')).toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
@@ -512,6 +532,7 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    await selectBuildCardRole(user)
     await setBuildCardLevel(user, '1')
 
     await waitFor(() => {
@@ -575,6 +596,7 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /^member$/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+    await selectBuildCardRole(user)
     await setBuildCardLevel(user, '1')
     await selectBuildCardClass(user, /rogue/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()

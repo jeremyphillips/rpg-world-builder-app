@@ -76,8 +76,6 @@ const EQUIPMENT_KIND_EXEMPT = ['kind'] as const
 const ORGANIZATION_STARTING_POINT_EXEMPT = [
   'startingPointId',
   /_organizationEditFamiliarType$/,
-  /** Default NPC role round-trips on the members object. The role picker is a later surface. */
-  'members.npcTemplateId',
 ] as const
 
 /**
@@ -88,7 +86,10 @@ const ORGANIZATION_MEMBERSHIP_TITLES_ROW_EXEMPT = [
   'members.titles.*.id',
   'members.titles.*.sourceTitleId',
   'members.titles.*.description',
-  'members.titles.*.npcRecommendation',
+  'members.titles.*.npcRecommendation.level',
+  'members.titles.*.npcRecommendation.classPreferenceOverrideSlugs',
+  'members.titles.*.npcRecommendation.skillPreferenceSlugs',
+  'members.titles.*.npcRecommendation.toolPreferenceSlugs',
 ] as const
 
 const ORGANIZATION_SCHEMA_EXEMPT = [

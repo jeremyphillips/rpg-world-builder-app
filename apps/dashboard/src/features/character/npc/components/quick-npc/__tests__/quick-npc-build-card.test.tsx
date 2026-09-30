@@ -101,6 +101,7 @@ function renderBuildCard(
     quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       classId: rogueClass.id,
       level: 9,
     })
@@ -120,7 +121,12 @@ function renderBuildCard(
   const onLevelChange = vi.fn()
 
   renderWithProviders(
-    <QuickNpcBuildCard model={model} onClassChange={onClassChange} onLevelChange={onLevelChange} />,
+    <QuickNpcBuildCard
+      model={model}
+      onClassChange={onClassChange}
+      onLevelChange={onLevelChange}
+      onRoleChange={vi.fn()}
+    />,
   )
 
   return { onClassChange, onLevelChange, model }
@@ -167,6 +173,7 @@ describe('QuickNpcBuildCard', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: rogueClass.id,
         level: 9,
       }),
@@ -202,6 +209,7 @@ describe('QuickNpcBuildCard', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: rogueClass.id,
         level: 9,
       }),
@@ -220,6 +228,7 @@ describe('QuickNpcBuildCard', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: fighterClass.id,
         level: 9,
       }),
@@ -233,6 +242,7 @@ describe('QuickNpcBuildCard', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 9,
       }),
@@ -311,6 +321,7 @@ describe('QuickNpcBuildCard', () => {
     const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       classId: '',
       level: 0,
     })
@@ -336,7 +347,14 @@ describe('QuickNpcBuildCard', () => {
         throw new Error('expected build card model')
       }
 
-      return <QuickNpcBuildCard model={model} onClassChange={vi.fn()} onLevelChange={vi.fn()} />
+      return (
+        <QuickNpcBuildCard
+          model={model}
+          onClassChange={vi.fn()}
+          onLevelChange={vi.fn()}
+          onRoleChange={vi.fn()}
+        />
+      )
     }
 
     const { rerender } = renderWithProviders(<BuildCardAtLevel level={0} />)
@@ -364,6 +382,7 @@ describe('QuickNpcBuildCard', () => {
     const baseValues = quickNpcMemberSetupValues({
       speciesId: 'srd-cc-5.2.1:dwarf',
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       classId: '',
       level: 0,
     })
@@ -389,7 +408,14 @@ describe('QuickNpcBuildCard', () => {
         throw new Error('expected build card model')
       }
 
-      return <QuickNpcBuildCard model={model} onClassChange={vi.fn()} onLevelChange={vi.fn()} />
+      return (
+        <QuickNpcBuildCard
+          model={model}
+          onClassChange={vi.fn()}
+          onLevelChange={vi.fn()}
+          onRoleChange={vi.fn()}
+        />
+      )
     }
 
     const { rerender } = renderWithProviders(<BuildCardAtLevel level={0} />)

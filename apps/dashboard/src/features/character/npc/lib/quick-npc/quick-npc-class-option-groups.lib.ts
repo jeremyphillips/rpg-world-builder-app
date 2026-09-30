@@ -7,12 +7,13 @@ import type { FieldOption } from '@rpg/ui/form'
 
 import {
   buildQuickNpcAffinityRadioCardPresentation,
+  QUICK_NPC_RECOMMENDED_GROUP_EYEBROW,
   resolveQuickNpcAffinityOptionGroups,
   type QuickNpcAffinityOption,
   type QuickNpcAffinityOptionGroup,
 } from './quick-npc-affinity-option-groups.lib'
 
-export const QUICK_NPC_CLASS_RECOMMENDED_EYEBROW = 'Recommended' as const
+export const QUICK_NPC_CLASS_RECOMMENDED_EYEBROW = QUICK_NPC_RECOMMENDED_GROUP_EYEBROW
 export const QUICK_NPC_CLASS_AFFINITY_GROUP_EYEBROW = QUICK_NPC_CLASS_RECOMMENDED_EYEBROW
 export const QUICK_NPC_CLASS_ALL_GROUP_EYEBROW = `All other ${getContentTypeSentenceForm('classes', 2)}`
 
