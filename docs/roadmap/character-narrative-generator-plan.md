@@ -285,9 +285,9 @@ defer a tone selector.
 - Review representative outputs across alignments and contexts; automated checks cannot
   replace prose quality review.
 
-At implementation time run the affected pre-commit gates using the current hook
-scripts as source of truth, regenerate JSON schemas when required, and run the full
-pre-push coverage/health/build gates before sharing. Do not suppress code-health
+At implementation time use focused validation by default ([agent-validation.md](../agent-validation.md)).
+Run the pre-commit hook at commit checkpoints and `pnpm gate:pre-push` at push/PR
+checkpoints; regenerate JSON schemas when required. Do not suppress code-health
 findings without consulting the user. The planning document itself needs formatting
 and link validation; no runtime behavior is changed by this plan.
 

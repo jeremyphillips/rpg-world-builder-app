@@ -687,7 +687,8 @@ contracts and their consumers together, avoiding an interim broken application.
 **Completion criteria**
 
 - Required acceptance cases pass; no unresolved data-loss, permission, or crop-parity gaps.
-- Current pre-commit gates pass and `pnpm gate:pre-push` passes before sharing.
+- At a **push/PR checkpoint**, pre-commit and `pnpm gate:pre-push` pass before sharing
+  (not required after every agent task—see [agent-validation.md](../agent-validation.md)).
 - Document remaining intentional deferrals: manual rotation, Primary crop/focal-point
   controls, drag reordering, bulk removal, and separate avatar/banner modernization.
 
@@ -717,5 +718,5 @@ ownership into the private asset collection.
 - Portrait controls exist only for Character (PC/NPC). Class, Species, Location,
   Organization, and all Equipment families use Primary-only policy. Excluded types
   do not acquire collection controls or change persistence contracts.
-- Follow current hook scripts for affected checks. Run `pnpm gate:pre-push` once
-  before sharing implementation; it includes coverage, coverage health, and build.
+- During implementation, use focused tests and affected checks as warranted. Run
+  pre-commit and `pnpm gate:pre-push` once at a push/PR checkpoint before sharing.

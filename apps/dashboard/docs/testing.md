@@ -163,10 +163,13 @@ has no canvas; contrast runs in Storybook's addon-a11y instead).
 
 ## Performance rules
 
-- While iterating, run explicit Vitest file paths (`vitest run --bail=0 <paths>`).
-  Once those pass, `pnpm test:affected:collect` collects failures across the
-  affected package graph. It is diagnostic-only and is not part of pre-commit,
-  pre-push, or CI. Inventory: `.tmp/test-affected-collect.log`.
+- **Agents (default):** run explicit Vitest file paths (`vitest run --bail=0 <paths>`)
+  plus targeted typecheck/lint when relevant. Do not run pre-commit, `gate:pre-push`,
+  root `pnpm build`, or full coverage unless the user asks for a commit or push/PR
+  checkpoint ([AGENTS.md](../../../AGENTS.md) **Agent validation**).
+- **Optional diagnostic:** `pnpm test:affected:collect` gathers failures across the
+  affected package graph when warranted; not required to finish a task. Inventory:
+  `.tmp/test-affected-collect.log`. Not part of pre-commit, pre-push, or CI.
 - Pre-commit runs `pnpm test:affected:local` with `TURBO_CONCURRENCY=2`. Shared
   Vitest config caps `maxWorkers` at 4. API integration stays at 2, and serial
   projects stay serial. Do not set `VITEST_MAX_WORKERS`; Vitest applies it after

@@ -14,22 +14,57 @@ user explicitly asks.
 
 ## Quality gate
 
-Work is **not done** until the tiered gates pass. Hook scripts are the source of
-truth ([`.husky/pre-commit`](.husky/pre-commit),
+Hook scripts define **repository checkpoints** ([`.husky/pre-commit`](.husky/pre-commit),
 [`.husky/pre-push`](.husky/pre-push)); package scripts in root `package.json`
-(`gate:*`, `*:affected`) must stay in sync.
+(`gate:*`, `*:affected`) must stay in sync with those hooks. Agents invoke hooks
+only when the user asks for the matching checkpoint (see below)—not after every task.
 
-**Pre-commit** (fast, affected scope — packages changed since `HEAD` plus
-dependents via Turbo):
+### Agent validation (default)
+
+For normal Cursor work, finish after **focused validation** of changed behavior.
+
+**Do not** run the pre-commit hook, `pnpm gate:pre-push`, root `pnpm build`, or
+`pnpm coverage` during ordinary agent tasks unless the user explicitly requests a
+**commit/checkpoint**, **push/PR/full validation**, or equivalent.
+
+Default loop:
+
+```text
+narrowest relevant Vitest paths → targeted typecheck/lint when useful → broader affected checks only if warranted
+```
+
+- **Tests:** `pnpm --filter <pkg> exec vitest run --bail=0 <paths>` (one process, no Turbo).
+  For `@rpg/api`, pass `--project api:unit` or `--project api:integration` so pure lib
+  tests do not boot Mongo.
+- **Types / lint:** package or `pnpm typecheck:affected` / `pnpm lint:affected` when the
+  edit needs them—not by default every time.
+- **Affected graph:** use `pnpm test:affected`, `pnpm test:affected:local`, or
+  `pnpm lint:affected` / `pnpm typecheck:affected` when shared packages, wide blast
+  radius, or unclear regressions justify the cost—not as a routine end-of-task step.
+- **`pnpm test:affected:collect`:** optional **diagnostic** on the same `...[HEAD]` graph
+  as `test:affected:local` (continue after failures, inventory at
+  `.tmp/test-affected-collect.log`). Not required to finish a task; not a hook or CI gate.
+
+When finishing, **report** which checks ran and which repository gates (pre-commit,
+pre-push) were **intentionally deferred**.
+
+### Repository gates (checkpoints)
+
+| User intent | What to run |
+| ----------- | ----------- |
+| Commit / checkpoint | Pre-commit hook (see sequence below), or the user’s explicit equivalent |
+| Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once |
+
+**Pre-commit** (fast, affected scope — packages changed since `HEAD` plus dependents via Turbo):
 
 ```text
 pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm typecheck:affected → pnpm test:affected:local
 ```
 
-**Pre-push** (full suite before sharing):
+**Pre-push** (full suite before sharing; single script):
 
 ```text
-pnpm gate:pre-push  →  pnpm coverage → pnpm gate:fallow-health:coverage → pnpm build
+pnpm gate:pre-push   # coverage → gate:fallow-health:coverage → build
 ```
 
 `pnpm build` excludes `@rpg/bench` (internal dev tooling). Use `pnpm build:bench`
@@ -39,24 +74,22 @@ when you need a production bundle of the bench app.
 Turbo scope for typecheck, lint, and build (`gate:ci:quality`, `build:ci`). Skip hooks
 locally only when necessary: `HUSKY=0 git commit` / `HUSKY=0 git push`.
 
+### Implementation plans
+
+Phased plans must **not** auto-append `test:affected:collect → pre-commit → gate:pre-push`
+to every phase or milestone. Prefer the default agent loop above; name **commit** and
+**push/PR** checkpoints explicitly when full gates belong in the schedule—not after
+each prompt-sized slice of work. Plan footers and verification sections →
+[docs/agent-validation.md](docs/agent-validation.md).
+
 ## Test failures
 
-Iterate with explicit Vitest file paths, one process, no Turbo:
+Start with explicit Vitest file paths (see **Agent validation**). When many packages
+might fail or the root cause is unclear, optionally run `pnpm test:affected:collect`
+once to gather a durable inventory (`.tmp/test-affected-collect.log`). It is
+diagnostic-only—not a pre-commit, pre-push, CI, or end-of-task gate.
 
-```sh
-pnpm --filter <pkg> exec vitest run --bail=0 <paths>
-```
-
-For `@rpg/api`, pass `--project api:unit` or `--project api:integration` so pure
-lib tests do not boot Mongo.
-
-Once those focused tests pass, run `pnpm test:affected:collect`. It is
-diagnostic-only — not a pre-commit, pre-push, or CI gate. It uses the same
-`...[HEAD]` graph as `test:affected` and `test:affected:local`, and changes
-only orchestration: continue after package failures, concurrency 2, grouped
-output, and a durable inventory at `.tmp/test-affected-collect.log`.
-
-Cluster that inventory before editing:
+Cluster collect output before editing:
 
 - **Deterministic regression** — same assertion, repeats when that file runs alone.
 - **Cascade** — import, setup, `beforeAll`, or provider failure. That is usually
@@ -69,8 +102,8 @@ Cluster that inventory before editing:
 - **Suspected flake** — passes when that file runs alone. Do not batch-fix.
 
 Do not add Vitest retries. Fix the highest-confidence shared cause, then rerun
-only the files that failed. After `test:affected:collect` is clean, run the
-pre-commit hook, then `pnpm gate:pre-push` once.
+only the files that failed. Run repository gates only on **commit/checkpoint** or
+**push/PR/full validation** requests—not as the default follow-up to a clean collect.
 
 ## fallow (code health)
 

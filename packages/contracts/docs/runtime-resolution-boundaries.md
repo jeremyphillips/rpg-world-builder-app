@@ -363,7 +363,8 @@ When cleaning up an existing resolution file:
 4. **Rename** to filename conventions above; update `choice-sources.ts` and barrels.
 5. **Move tests** with the code — one test file per layer module.
 6. **Delete** old broad modules; avoid permanent re-export barrels.
-7. **Run** `pnpm typecheck:affected` and `pnpm test:affected` in `@rpg/contracts`.
+7. **Run** focused Vitest paths for touched modules; add `pnpm typecheck:affected` or
+   `pnpm test:affected` when shared contracts warrant the wider graph.
 
 ### Promotion criteria (builder → creature)
 
