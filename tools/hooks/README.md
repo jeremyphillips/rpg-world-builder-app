@@ -33,15 +33,22 @@ output. CI runs `pnpm gate:json-schemas` on every PR.
 
 Skip all hooks locally: `HUSKY=0 git commit` / `HUSKY=0 git push`.
 
+## Agent invocation (when to run gates)
+
+Agents follow [AGENTS.md](../../AGENTS.md) **Agent validation** by default: narrow
+Vitest paths and targeted typecheck/lint—not hooks or pre-push—unless the user
+requests a **commit/checkpoint** (pre-commit) or **push/PR/full validation**
+(pre-commit, then `pnpm gate:pre-push` once).
+
 ## Diagnostic collect
 
-`pnpm test:affected:collect` is not a gate. It does not run from pre-commit,
-pre-push, or CI. Agents use explicit Vitest file paths while iterating. Once
-those pass, `test:affected:collect` runs the same `...[HEAD]` graph as
-`test:affected` and `test:affected:local` with `--continue=always`, concurrency
-2, and grouped failure output. The inventory is `.tmp/test-affected-collect.log`.
-Cluster and resolve those failures before the repository gates. Do not add
-Vitest retries.
+`pnpm test:affected:collect` is not a gate and is **not** required to finish a task.
+It does not run from pre-commit, pre-push, or CI. Use explicit Vitest file paths first;
+optionally run collect when the affected graph may have multiple failures. Same
+`...[HEAD]` graph as `test:affected` and `test:affected:local`, with
+`--continue=always`, concurrency 2, and grouped failure output. Inventory:
+`.tmp/test-affected-collect.log`. Cluster failures before widening fixes. Do not add
+Vitest retries. Repository gates belong at commit/push checkpoints only.
 
 ## Turbo task dependencies
 

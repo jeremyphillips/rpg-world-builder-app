@@ -168,9 +168,9 @@ Stop at the lowest tier that answers the question.
 
 ---
 
-## Required gates
+## Required verification
 
-Work is not done until affected drift tests pass:
+Run the drift tests that apply to the layers you touched (focused paths first):
 
 | Layer             | Test                                                             |
 | ----------------- | ---------------------------------------------------------------- |
@@ -184,7 +184,8 @@ Work is not done until affected drift tests pass:
 | Dashboard test factories | `content-test-factory-registry.test.ts` + `content-test-factory-semantics.test.ts` |
 | Icon registry     | `icon-registry-identity-ban.test.ts` (sidebar + alias consumers); expand `icon-registry-scope-ban.test.ts` when migrating action verbs in the new folder |
 
-Plus pre-commit affected scope per [`AGENTS.md`](../../../AGENTS.md).
+Pre-commit and pre-push hooks run only at user-requested checkpoints — see
+[`AGENTS.md`](../../../AGENTS.md) and [docs/agent-validation.md](../../../docs/agent-validation.md).
 
 ---
 

@@ -462,25 +462,21 @@ connections. Transport DTOs in `@rpg/contracts`.
 
 ## Verification
 
-During implementation, run targeted tests for each changed package. Before the
-work is complete, run the content-type drift suites plus the repository gates:
+During implementation, run targeted tests for each changed package. When blast radius
+warrants it, run content-type drift suites and affected typecheck/tests:
 
 ```text
 pnpm --filter @rpg/content-types test
 pnpm gate:json-schemas
 pnpm typecheck:affected
 pnpm test:affected
-pnpm gate:fallow-dupes
-pnpm gate:fallow-health
 ```
 
-Before sharing:
+At a **push/PR checkpoint** before sharing (see [agent-validation.md](../agent-validation.md)):
 
 ```text
+# pre-commit hook, then:
 pnpm gate:pre-push
-pnpm coverage
-pnpm gate:fallow-health:coverage
-pnpm build
 ```
 
 Required behavior coverage:

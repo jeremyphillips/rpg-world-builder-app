@@ -354,13 +354,13 @@ Key behavioral tests:
   the collection limit. Both layouts honor the same override.
 - Keyboard/focus restoration and axe assertions follow the repository CI policy.
 
-Run focused tests while developing, then required affected lint/typecheck/tests,
-lint-staged and fallow health/duplication gates. Regenerate JSON schemas when Zod
-inputs change. For sharing, run `pnpm gate:pre-push` (currently coverage, coverage
-health, and build). Check hook/package definitions at implementation time: the
-current pre-commit hook uses `test:affected:local` and does not explicitly run
-`lint:affected`, despite the prose quality-gate description; do not silently omit
-the documented lint gate or change hook policy as part of this UI work.
+Run focused tests while developing; add affected lint/typecheck/tests when warranted.
+Regenerate JSON schemas when Zod inputs change. At a push/PR checkpoint, run
+pre-commit then `pnpm gate:pre-push` before sharing ([agent-validation.md](../agent-validation.md)).
+Check hook/package definitions at implementation time: the pre-commit hook uses
+`test:affected:local` and does not explicitly run `lint:affected`, despite older
+prose; do not silently omit the documented lint gate or change hook policy as part
+of this UI work.
 
 Update `packages/ui/docs/forms.md`, the dashboard media feature README, and the
 existing content-media-management roadmap with final component/config contracts

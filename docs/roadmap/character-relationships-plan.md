@@ -440,7 +440,8 @@ existing backstory beats; richer context does not require more segments.
    three-role binding, and the foundation relationship fragment pack.
 7. **Document and verify.** Update architecture, contracts structure, cross-content
    policy, dashboard builder docs, and all affected package READMEs. Run the current
-   tiered repository gates and full pre-push gates before sharing implementation.
+   focused validation during work; pre-commit and `pnpm gate:pre-push` at push/PR
+   checkpoints before sharing ([agent-validation.md](../agent-validation.md)).
    **Done:** docs and acceptance tests added in Phase 8 wrap-up.
 
 This is a dev-only project: make a direct schema/consumer cutover. Update fixtures
