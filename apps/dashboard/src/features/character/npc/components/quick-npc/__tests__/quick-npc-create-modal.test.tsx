@@ -12,7 +12,6 @@ import {
   populatedBuilderCatalog,
 } from '@/features/character'
 import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../../../lib/quick-npc/quick-npc-class-option-groups.lib'
-import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 import { renderWithProviders } from '@/test/render'
 
 import { QuickNpcCreateModal } from '../quick-npc-create-modal'
@@ -22,6 +21,7 @@ import {
   quickNpcTestOrganization,
 } from '../../../lib/quick-npc/quick-npc-test-fixtures'
 import {
+  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
   QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
   QUICK_NPC_STANDALONE_SETUP_HEADLINE,
 } from '../../../lib/quick-npc/quick-npc-create-modal-setup.lib'
@@ -117,13 +117,6 @@ async function fillAuthoringDetails(user: ReturnType<typeof userEvent.setup>, na
 }
 
 async function setBuildCardLevel(user: ReturnType<typeof userEvent.setup>, level: string) {
-  const changeLevelButton = screen.queryByRole('button', {
-    name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
-  })
-  if (changeLevelButton) {
-    await user.click(changeLevelButton)
-  }
-
   const levelInput = await screen.findByRole('spinbutton', { name: 'Level' })
   await user.clear(levelInput)
   await user.type(levelInput, level)
@@ -208,31 +201,23 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
   })
 
   it('hides the build card until title and species are both complete', async () => {
     const user = userEvent.setup()
     renderModal()
 
-    expect(
-      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton', { name: 'Level' })).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
-    expect(
-      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton', { name: 'Level' })).not.toBeInTheDocument()
     expect(screen.queryByText('Selections')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change title' })).toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: /what species/i })).toBeInTheDocument()
 
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
   })
 
   it('hides the build card when title is reopened', async () => {
@@ -241,14 +226,10 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Change title' }))
-    expect(
-      screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('spinbutton', { name: 'Level' })).not.toBeInTheDocument()
   })
 
   it('preserves manual class and level when title is reconfirmed without a value change', async () => {
@@ -257,7 +238,7 @@ describe('QuickNpcCreateModal', () => {
 
     await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    await screen.findByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL })
+    await screen.findByRole('spinbutton', { name: 'Level' })
     await setBuildCardLevel(user, '3')
     await selectBuildCardClass(user, /fighter/i)
 
@@ -265,10 +246,7 @@ describe('QuickNpcCreateModal', () => {
     await user.click(screen.getByRole('radio', { name: /guildmaster/i }))
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
     expect(screen.getByRole('spinbutton', { name: 'Level' })).toHaveValue(3)
     expect(screen.getByText('Fighter')).toBeInTheDocument()
   })
@@ -284,9 +262,7 @@ describe('QuickNpcCreateModal', () => {
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Details' })).not.toBeInTheDocument()
   })
@@ -312,20 +288,31 @@ describe('QuickNpcCreateModal', () => {
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: /what species/i })).not.toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
   })
 
   it('shows setup-phase headline and description', () => {
     renderModal()
 
+    expect(screen.getByText(QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE)).toBeInTheDocument()
     expect(screen.getByText("Choose this member's role in the organization.")).toBeInTheDocument()
     expect(
       screen.getByText(
         'Choose a role and starting build from this organization’s recommendations.',
       ),
+    ).toBeInTheDocument()
+  })
+
+  it('keeps organization-member headline in authoring and updates description', async () => {
+    const user = userEvent.setup()
+    renderModal()
+
+    await completeSetup(user)
+
+    expect(screen.getByText(QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE)).toBeInTheDocument()
+    expect(
+      screen.getByText(`Create a new NPC as a member of ${organization.name}.`),
     ).toBeInTheDocument()
   })
 
@@ -654,15 +641,20 @@ describe('QuickNpcCreateModal standalone context', () => {
   async function completeStandaloneSetup(user: ReturnType<typeof userEvent.setup>) {
     await selectStandaloneRole(user, /guard/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    const changeLevelButton = screen.queryByRole('button', {
-      name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
-    })
-    if (changeLevelButton) {
-      await setBuildCardLevel(user, '1')
-      await selectBuildCardClass(user, /fighter/i)
-    }
+    await setBuildCardLevel(user, '1')
+    await selectBuildCardClass(user, /fighter/i)
     await user.click(screen.getByRole('button', { name: 'Continue' }))
   }
+
+  it('keeps standalone headline in authoring and updates description', async () => {
+    const user = userEvent.setup()
+    renderStandaloneModal()
+
+    await completeStandaloneSetup(user)
+
+    expect(screen.getByText(QUICK_NPC_STANDALONE_SETUP_HEADLINE)).toBeInTheDocument()
+    expect(screen.getByText('Create a new NPC.')).toBeInTheDocument()
+  })
 
   it('shows role first without title or member copy', () => {
     renderStandaloneModal()
@@ -681,9 +673,7 @@ describe('QuickNpcCreateModal standalone context', () => {
 
     await selectStandaloneRole(user, /guard/i)
     await user.click(screen.getByRole('radio', { name: /dwarf/i }))
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
   })
 
   it('confirms Level 0 build without class', async () => {

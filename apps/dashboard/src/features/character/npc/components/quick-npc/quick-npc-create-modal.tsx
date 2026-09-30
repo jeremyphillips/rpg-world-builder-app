@@ -27,11 +27,8 @@ import { applyQuickNpcSetupValueChange } from '../../lib/quick-npc/quick-npc-set
 import {
   buildQuickNpcCreateSetupSets,
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
-  QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
-  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
-  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
-  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
   resolveQuickNpcBuildExternalDecision,
+  resolveQuickNpcModalChrome,
 } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
 import {
   QuickNpcAuthoringForm,
@@ -40,8 +37,6 @@ import {
 import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase'
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
-
-export const QUICK_NPC_CREATE_TITLE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 
 export type QuickNpcCreateModalProps = {
   open: boolean
@@ -72,25 +67,6 @@ function createInitialState(
     phase: 'setup',
     setupValues: createQuickNpcSetupDefaultValues(buildContext, createContext),
   }
-}
-
-function resolveQuickNpcSetupHeadline(context: QuickNpcCreateContext): string {
-  return context.kind === 'standalone'
-    ? QUICK_NPC_STANDALONE_SETUP_HEADLINE
-    : QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
-}
-
-function resolveQuickNpcSetupDescription(context: QuickNpcCreateContext): string {
-  return context.kind === 'standalone'
-    ? QUICK_NPC_STANDALONE_SETUP_DESCRIPTION
-    : QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION
-}
-
-function resolveQuickNpcAuthoringDescription(context: QuickNpcCreateContext): string {
-  if (context.kind === 'standalone') {
-    return 'Create a new NPC.'
-  }
-  return `Create a new NPC as a member of ${context.organization.name}.`
 }
 
 function QuickNpcCreateModalSession({
@@ -288,6 +264,8 @@ function QuickNpcCreateModalSession({
     handleSetupSummaryEdit({ type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID })
   }, [handleSetupSummaryEdit])
 
+  const modalChrome = resolveQuickNpcModalChrome(context, state.phase)
+
   const handleAuthoringCreated = React.useCallback(
     async (result: { contentType: 'npcs'; id: string }) => {
       try {
@@ -307,14 +285,8 @@ function QuickNpcCreateModalSession({
       <CreateModalShell
         open={open}
         onOpenChange={handleDismiss}
-        headline={
-          state.phase === 'setup' ? resolveQuickNpcSetupHeadline(context) : QUICK_NPC_CREATE_TITLE
-        }
-        description={
-          state.phase === 'setup'
-            ? resolveQuickNpcSetupDescription(context)
-            : resolveQuickNpcAuthoringDescription(context)
-        }
+        headline={modalChrome.headline}
+        description={modalChrome.description}
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
         footer={
           state.phase === 'setup' ? (
@@ -359,7 +331,7 @@ function QuickNpcCreateModalSession({
 
 /**
  * Quick NPC creation modal — setup then TabbedForm authoring. Cancel/X/Escape during
- * authoring returns to the add-member drawer; success closes all overlays.
+ * authoring returns to the parent create surface; success closes nested overlays.
  */
 export function QuickNpcCreateModal(props: QuickNpcCreateModalProps) {
   if (!props.open) return null

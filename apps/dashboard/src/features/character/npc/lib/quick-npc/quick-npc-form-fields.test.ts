@@ -178,10 +178,16 @@ describe('buildQuickNpcContentOptions', () => {
 })
 
 describe('buildQuickNpcDetailsFields', () => {
-  it('includes gender, name, and alignment', () => {
+  it('includes gender, name, and alignment in one field group', () => {
     const fields = buildQuickNpcDetailsFields()
 
-    expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+    expect(fields).toHaveLength(1)
+    expect(fields[0]).toMatchObject({
+      kind: 'group',
+      fieldChrome: { variant: 'none' },
+    })
+    const groupFields = fields[0] && 'fields' in fields[0] ? fields[0].fields : []
+    expect(groupFields.map((field) => ('name' in field ? field.name : null))).toEqual([
       'gender',
       'name',
       'alignment',

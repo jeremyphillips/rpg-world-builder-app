@@ -8,7 +8,6 @@ import {
   populatedBuilderCatalog,
 } from '../../../../lib/fixtures/character-builder-fixtures'
 import { QUICK_NPC_CLASS_ALL_GROUP_EYEBROW } from '../../../lib/quick-npc/quick-npc-class-option-groups.lib'
-import { QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 import {
   QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
@@ -140,7 +139,7 @@ export const GuildmasterSingleRecommendation: Story = {
 
     await expect(canvas.getByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).toBeVisible()
     await expect(canvas.getByText('Criminal')).toBeVisible()
-    await expect(canvas.getByText(/Recommended for Guildmaster: Level 9\./)).toBeVisible()
+    await expect(canvas.getByText(/Suggested by Guildmaster\./)).toBeVisible()
     await expect(canvas.getByText('Rogue')).toBeVisible()
     expect(canvas.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
     await expect(canvas.getByRole('button', { name: 'Continue' })).toBeEnabled()
@@ -167,7 +166,6 @@ export const MultipleClassRecommendations: Story = {
 
     await userEvent.click(canvas.getByRole('radio', { name: /no title/i }))
     await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
-    await userEvent.click(canvas.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
     const levelInput = canvas.getByRole('spinbutton', { name: 'Level' })
     await userEvent.clear(levelInput)
     await userEvent.type(levelInput, '1')
@@ -199,7 +197,6 @@ export const Authoring: Story = {
     const canvas = within(canvasElement.ownerDocument.body)
     await userEvent.click(canvas.getByRole('radio', { name: /no title/i }))
     await userEvent.click(canvas.getByRole('radio', { name: /dwarf/i }))
-    await userEvent.click(canvas.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
     const levelInput = canvas.getByRole('spinbutton', { name: 'Level' })
     await userEvent.clear(levelInput)
     await userEvent.type(levelInput, '1')

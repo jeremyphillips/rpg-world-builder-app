@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export type QuickNpcBuildExpandedAttribute = 'role' | 'class' | 'level' | null
+export type QuickNpcBuildExpandedAttribute = 'role' | 'class' | null
 
 type QuickNpcBuildCardExpansionSync = {
   classProgressionApplicable: boolean
@@ -18,6 +18,9 @@ function resolveQuickNpcBuildCardExpandedSync(
   const { classProgressionApplicable: wasApplicable, classId: wasClassId } = previous
 
   if (expanded === 'role' && !current.roleRowEnabled) {
+    if (classProgressionApplicable && classId === '') {
+      return 'class'
+    }
     return null
   }
 
@@ -26,7 +29,7 @@ function resolveQuickNpcBuildCardExpandedSync(
   }
 
   if (current.roleRowEnabled && current.npcTemplateId === '') {
-    return expanded === 'class' || expanded === 'level' ? expanded : 'role'
+    return expanded === 'class' ? expanded : 'role'
   }
 
   if (

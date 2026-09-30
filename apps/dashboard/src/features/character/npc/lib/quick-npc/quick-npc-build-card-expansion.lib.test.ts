@@ -89,9 +89,9 @@ describe('useQuickNpcBuildCardExpandedAttribute', () => {
     )
 
     act(() => {
-      result.current[1]('level')
+      result.current[1]('role')
     })
-    expect(result.current[0]).toBe('level')
+    expect(result.current[0]).toBe('role')
 
     rerender({
       classProgressionApplicable: true,

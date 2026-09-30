@@ -38,8 +38,40 @@ export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
 export const QUICK_NPC_STANDALONE_SETUP_HEADLINE = 'Set up NPC' as const
 export const QUICK_NPC_STANDALONE_SETUP_DESCRIPTION =
   'Choose a role, species, and starting character options.' as const
-export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
+
+export type QuickNpcModalPhase = 'setup' | 'authoring'
+
+export function resolveQuickNpcSetupDescription(context: QuickNpcCreateContext): string {
+  return context.kind === 'standalone'
+    ? QUICK_NPC_STANDALONE_SETUP_DESCRIPTION
+    : QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION
+}
+
+export function resolveQuickNpcAuthoringDescription(context: QuickNpcCreateContext): string {
+  if (context.kind === 'standalone') {
+    return 'Create a new NPC.'
+  }
+  return `Create a new NPC as a member of ${context.organization.name}.`
+}
+
+function resolveQuickNpcModalHeadline(context: QuickNpcCreateContext): string {
+  return context.kind === 'standalone'
+    ? QUICK_NPC_STANDALONE_SETUP_HEADLINE
+    : QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
+}
+
+export function resolveQuickNpcModalChrome(
+  context: QuickNpcCreateContext,
+  phase: QuickNpcModalPhase,
+): { headline: string; description: string } {
+  const headline = resolveQuickNpcModalHeadline(context)
+  const description =
+    phase === 'setup'
+      ? resolveQuickNpcSetupDescription(context)
+      : resolveQuickNpcAuthoringDescription(context)
+  return { headline, description }
+}
 export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
 export const QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP = 'selections' as const
 export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
@@ -124,14 +156,11 @@ export function resolveQuickNpcBuildExternalDecision(args: {
 }
 
 export {
-  formatQuickNpcLevelRecommendationPrompt,
   isQuickNpcBuildCardVisible,
   resolveQuickNpcBuildCardModel,
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
-  QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
   QUICK_NPC_BUILD_DONE_LABEL,
   QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
-  QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL,
 } from './quick-npc-build-card.lib'
 export { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 export type { QuickNpcBuildCardModel } from './quick-npc-build-card.lib'

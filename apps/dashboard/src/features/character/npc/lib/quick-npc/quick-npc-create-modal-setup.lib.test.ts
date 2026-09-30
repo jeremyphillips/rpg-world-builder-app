@@ -12,6 +12,11 @@ import {
   quickNpcBuildRevision,
   resolveQuickNpcBuildExternalDecision,
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+  QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
+  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+  resolveQuickNpcModalChrome,
 } from './quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_BUILD_FIELD_LABEL,
@@ -36,6 +41,27 @@ import {
 
 const memberCreateContext = quickNpcOrganizationMemberCreateContext()
 const standaloneCreateContext = quickNpcStandaloneCreateContext()
+
+describe('resolveQuickNpcModalChrome', () => {
+  it('returns stable headlines and phase-specific descriptions', () => {
+    expect(resolveQuickNpcModalChrome(standaloneCreateContext, 'setup')).toEqual({
+      headline: QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+      description: QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+    })
+    expect(resolveQuickNpcModalChrome(standaloneCreateContext, 'authoring')).toEqual({
+      headline: QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+      description: 'Create a new NPC.',
+    })
+    expect(resolveQuickNpcModalChrome(memberCreateContext, 'setup')).toEqual({
+      headline: QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+      description: QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
+    })
+    expect(resolveQuickNpcModalChrome(memberCreateContext, 'authoring')).toEqual({
+      headline: QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+      description: `Create a new NPC as a member of ${memberCreateContext.organization.name}.`,
+    })
+  })
+})
 
 const guildmasterTitle = {
   id: 'omt_guildmaster',
@@ -202,11 +228,11 @@ describe('resolveQuickNpcBuildCardModel', () => {
 
     expect(model).toMatchObject({
       mode: 'recommended',
-      sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
+      sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
       showTemplateIdentity: true,
       templateLabel: 'Guard',
-      level: 0,
-      classProgressionApplicable: false,
+      levelRow: { level: 0 },
+      classRow: { classProgressionApplicable: false },
     })
   })
 
@@ -232,13 +258,15 @@ describe('resolveQuickNpcBuildCardModel', () => {
       roleRow: {
         npcTemplateId: 'criminal',
         selectedRoleLabel: 'Criminal',
-        roleProvenanceHelper: 'Suggested by Guildmaster',
+        helper: 'Suggested by Guildmaster.',
       },
-      level: 5,
-      levelPrompt: 'Recommended for Guildmaster: Level 5.',
-      classProgressionApplicable: true,
+      levelRow: {
+        level: 5,
+        helper: 'Suggested by Guildmaster.',
+      },
+      classRow: { classProgressionApplicable: true },
     })
-    expect(model?.classOptionPresentation.optionGroups?.[0]?.options).toEqual([
+    expect(model?.classRow.classOptionPresentation.optionGroups?.[0]?.options).toEqual([
       { value: rogueClass.id, label: 'Rogue' },
     ])
     expect(model?.roleRow?.roleOptionPresentation.optionGroups?.[0]).toMatchObject({
@@ -265,12 +293,12 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'build',
       sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
-      level: 0,
-      classProgressionApplicable: false,
+      levelRow: { level: 0 },
+      classRow: { classProgressionApplicable: false },
     })
     expect(model?.templateLabel).toBeUndefined()
     expect(model?.roleRow?.npcTemplateId).toBe('')
-    expect(model?.levelPrompt).toBeUndefined()
+    expect(model?.levelRow.helper).toBeUndefined()
   })
 
   it('merges title template and organization class affinities for class recommendations', () => {
@@ -301,10 +329,10 @@ describe('resolveQuickNpcBuildCardModel', () => {
       members: { classAffinityIds: [fighterClass.id] },
     })
 
-    expect(model?.classOptionPresentation.optionGroups).toEqual(
+    expect(model?.classRow.classOptionPresentation.optionGroups).toEqual(
       resolveQuickNpcClassOptionGroups({
-        classOptions: model!.classOptionPresentation.options,
-        recommendedClassIds: model!.recommendedClassIds,
+        classOptions: model!.classRow.classOptionPresentation.options,
+        recommendedClassIds: model!.classRow.recommendedClassIds,
         playableClasses: multiClassContext.catalog.classes,
       }).optionGroups,
     )

@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   mapContentCreateContextToQuickNpcCreateContext,
   QUICK_NPC_CREATE_SUBMIT_LABEL,
+  type QuickNpcCreateContext,
 } from './quick-npc-create-context'
+import { quickNpcOrganizationMemberCreateContext } from './quick-npc-test-fixtures'
 
 describe('mapContentCreateContextToQuickNpcCreateContext', () => {
   it('maps standalone content create context to standalone quick npc context', () => {
@@ -20,6 +22,18 @@ describe('mapContentCreateContextToQuickNpcCreateContext', () => {
         relationshipVocabulary: 'organization_location_connection',
       }),
     ).toEqual({ kind: 'standalone' })
+  })
+})
+
+describe('organization-member QuickNpcCreateContext entry path', () => {
+  it('preserves organization-member context passed from org roster (not via ContentCreateContext map)', () => {
+    const context = quickNpcOrganizationMemberCreateContext()
+    const roundTrip: QuickNpcCreateContext = context
+
+    expect(roundTrip).toEqual(context)
+    expect(mapContentCreateContextToQuickNpcCreateContext({ kind: 'standalone' })).not.toEqual(
+      context,
+    )
   })
 })
 

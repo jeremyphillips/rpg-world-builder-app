@@ -10,11 +10,9 @@ import { renderWithProviders } from '@/test/render'
 
 import {
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
-  QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
   QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
   QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER,
   QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
-  QUICK_NPC_BUILD_DONE_LABEL,
   QUICK_NPC_BUILD_FIELD_LABEL,
   QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
   resolveQuickNpcBuildCardModel,
@@ -111,6 +109,7 @@ function renderBuildCard(
     values,
     titles: [guildmasterTitle],
     members: overrides.members ?? { classAffinityIds: [rogueClass.id] },
+    organizationName: quickNpcTestOrganization.name,
   })
 
   if (!model) {
@@ -133,18 +132,17 @@ function renderBuildCard(
 }
 
 describe('QuickNpcBuildCard', () => {
-  it('renders recommended build identity, class, and level inside one card', () => {
+  it('renders recommended build identity, class, level stepper, and provenance helpers', () => {
     renderBuildCard()
 
     expect(screen.getByText(QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.getByText('Criminal')).toBeInTheDocument()
     expect(screen.getByText('Rogue')).toBeInTheDocument()
-    expect(screen.getByText('9')).toBeInTheDocument()
-    expect(screen.getByText(/Recommended for Guildmaster: Level 9\./)).toBeInTheDocument()
-    expect(screen.queryByRole('spinbutton', { name: 'Level' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Suggested by Guildmaster.').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
   })
 
-  it('renders build mode without template identity or recommended level helper', () => {
+  it('renders build mode without template identity or title level helper', () => {
     const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
     const model = resolveQuickNpcBuildCardModel({
       createContext,
@@ -155,6 +153,7 @@ describe('QuickNpcBuildCard', () => {
         level: 0,
       }),
       titles: [{ id: 'omt_member', label: 'Member', priority: 10 as const }],
+      organizationName: quickNpcTestOrganization.name,
     })
 
     renderWithProviders(
@@ -163,8 +162,8 @@ describe('QuickNpcBuildCard', () => {
 
     expect(screen.getByText(QUICK_NPC_BUILD_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.queryByText('Criminal')).not.toBeInTheDocument()
-    expect(screen.queryByText(/Recommended for/)).not.toBeInTheDocument()
-    expect(screen.getByText('0')).toBeInTheDocument()
+    expect(screen.queryByText(/Suggested by/)).not.toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toHaveValue(0)
   })
 
   it('expands class inside the class row and collapses after selection', async () => {
@@ -187,43 +186,17 @@ describe('QuickNpcBuildCard', () => {
     expect(screen.queryByRole('radio', { name: /fighter/i })).not.toBeInTheDocument()
   })
 
-  it('expands level inside the level row and collapses with Done', async () => {
+  it('changes level via the always-visible stepper', async () => {
     const user = userEvent.setup()
     const { onLevelChange } = renderBuildCard()
 
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
     const levelInput = screen.getByRole('spinbutton', { name: 'Level' })
-    expect(levelInput).toBeInTheDocument()
-
     await user.clear(levelInput)
     await user.type(levelInput, '7')
     expect(onLevelChange).toHaveBeenCalled()
-
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_DONE_LABEL }))
-    expect(screen.queryByRole('spinbutton', { name: 'Level' })).not.toBeInTheDocument()
   })
 
-  it('opens only one editor at a time', async () => {
-    const user = userEvent.setup()
-    renderBuildCard({
-      values: quickNpcMemberSetupValues({
-        speciesId: 'srd-cc-5.2.1:dwarf',
-        membershipTitle: 'omt_guildmaster',
-        npcTemplateId: 'criminal',
-        classId: rogueClass.id,
-        level: 9,
-      }),
-    })
-
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }))
-    expect(screen.getByRole('radio', { name: /fighter/i })).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
-    expect(screen.queryByRole('radio', { name: /fighter/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('spinbutton', { name: 'Level' })).toBeInTheDocument()
-  })
-
-  it('shows class recommendation helper when current class diverges', () => {
+  it('shows class override helper when current class diverges', () => {
     renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
@@ -234,7 +207,7 @@ describe('QuickNpcBuildCard', () => {
       }),
     })
 
-    expect(screen.getByText('Recommended: Rogue')).toBeInTheDocument()
+    expect(screen.getByText('Lantern Guild suggests Rogue.')).toBeInTheDocument()
   })
 
   it('starts with class editor expanded when class is unresolved', () => {
@@ -282,7 +255,6 @@ describe('QuickNpcBuildCard', () => {
   })
 
   it('keeps the class row visible and non-interactive at level 0', async () => {
-    const user = userEvent.setup()
     const { onClassChange } = renderBuildCard({
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
@@ -295,18 +267,12 @@ describe('QuickNpcBuildCard', () => {
     expect(screen.getByText('CLASS')).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
     const helper = screen.getByText(QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER)
-    expect(helper).toHaveClass('text-xs')
+    expect(helper).toHaveClass('text-sm')
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }),
     ).not.toBeInTheDocument()
     expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
-    expect(screen.getByText('0')).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }),
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole('button', { name: QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL }))
-    expect(screen.queryByRole('radio', { name: /rogue/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('spinbutton', { name: 'Level' })).toHaveValue(0)
     expect(onClassChange).not.toHaveBeenCalled()
   })
 
@@ -341,6 +307,7 @@ describe('QuickNpcBuildCard', () => {
         values,
         titles: [guildmasterTitle],
         members,
+        organizationName: quickNpcTestOrganization.name,
       })
 
       if (!model) {
@@ -402,6 +369,7 @@ describe('QuickNpcBuildCard', () => {
         values,
         titles: [guildmasterTitle],
         members,
+        organizationName: quickNpcTestOrganization.name,
       })
 
       if (!model) {

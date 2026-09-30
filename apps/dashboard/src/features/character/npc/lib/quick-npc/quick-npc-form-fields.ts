@@ -346,22 +346,28 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {})
 
   return [
     {
-      type: 'chips',
-      name: 'gender',
-      label: 'Gender',
-      multiple: false,
-      options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
-      required: true,
-      width: 'full',
-    },
-    nameField,
-    {
-      type: 'select',
-      name: 'alignment',
-      label: 'Alignment',
-      options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
-      required: true,
-      width: 'full',
+      kind: 'group',
+      fieldChrome: { variant: 'none' },
+      fields: [
+        {
+          type: 'chips',
+          name: 'gender',
+          label: 'Gender',
+          multiple: false,
+          options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
+          required: true,
+          width: 'full',
+        },
+        nameField,
+        {
+          type: 'select',
+          name: 'alignment',
+          label: 'Alignment',
+          options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
+          required: true,
+          width: 'full',
+        },
+      ],
     },
   ]
 }

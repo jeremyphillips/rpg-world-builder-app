@@ -30,7 +30,7 @@ export const selectionSummaryCardRowActionColumnClasses =
   'flex min-h-control-action-compact shrink-0 items-center justify-end'
 
 export const selectionSummaryCardRowHelperVariants = cva(
-  'col-start-2 text-xs text-muted-foreground',
+  'col-start-2 text-sm text-muted-foreground',
 )
 
 export const selectionSummaryCardChangeActionClasses = 'shrink-0'

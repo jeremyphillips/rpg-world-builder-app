@@ -33,15 +33,14 @@ export function QuickNpcBuildCard({
 }: QuickNpcBuildCardProps) {
   const baseId = React.useId()
   const [expanded, setExpanded] = useQuickNpcBuildCardExpandedAttribute({
-    classProgressionApplicable: model.classProgressionApplicable,
-    classId: model.classId,
+    classProgressionApplicable: model.classRow.classProgressionApplicable,
+    classId: model.classRow.classId,
     roleRowEnabled: model.roleRow != null,
     npcTemplateId: model.roleRow?.npcTemplateId ?? '',
   })
 
   const roleExpanded = model.roleRow != null && expanded === 'role'
-  const classExpanded = model.classProgressionApplicable && expanded === 'class'
-  const levelExpanded = expanded === 'level'
+  const classExpanded = model.classRow.classProgressionApplicable && expanded === 'class'
 
   const handleClassChange = (nextClassId: string) => {
     onClassChange(nextClassId)
@@ -73,19 +72,14 @@ export function QuickNpcBuildCard({
             />
           ) : null}
 
-          <BuildCardLevelAttributeRow
-            model={model}
-            expanded={levelExpanded}
-            onToggle={() => setExpanded(levelExpanded ? null : 'level')}
-            onLevelChange={onLevelChange}
-          />
+          <BuildCardLevelAttributeRow levelRow={model.levelRow} onLevelChange={onLevelChange} />
 
           <BuildCardClassAttributeRow
             baseId={baseId}
-            model={model}
+            classRow={model.classRow}
             expanded={classExpanded}
             onToggle={() => {
-              if (!model.classProgressionApplicable) return
+              if (!model.classRow.classProgressionApplicable) return
               setExpanded(classExpanded ? null : 'class')
             }}
             onClassChange={handleClassChange}

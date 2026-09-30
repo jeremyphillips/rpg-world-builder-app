@@ -6,7 +6,7 @@ export const quickNpcBuildCardSectionClasses = 'flex flex-col gap-y-3'
 export const quickNpcBuildCardSetupOffsetClasses = 'mt-4'
 
 export const quickNpcBuildCardShellClasses =
-  'flex flex-col gap-y-4 rounded-md border border-border bg-surface-lift px-3 py-2.5'
+  'flex flex-col gap-y-4 rounded-md border border-border bg-surface-lift px-3 py-3'
 
 export const quickNpcBuildCardIdentityRowClasses = 'flex flex-wrap items-center gap-2'
 
@@ -20,12 +20,6 @@ export const quickNpcBuildCardAttributeRowClasses =
 /** Attribute row header — 11px eyebrow (`Eyebrow` sm) with value/editor below. */
 export const quickNpcBuildCardAttributeHeaderClasses =
   'flex flex-wrap items-center justify-between gap-2'
-
-export const quickNpcBuildCardAttributeValueClasses = 'text-base font-body-emphasis text-foreground'
-
-export const quickNpcBuildCardAttributeHelperClasses = 'mt-0.5 text-sm text-muted-foreground'
-
-export const quickNpcBuildCardLevelPromptClasses = 'mt-0.5 text-xs text-muted-foreground'
 
 export const quickNpcBuildCardLevelEditorClasses = 'flex flex-wrap items-center gap-3'
 

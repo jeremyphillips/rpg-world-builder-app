@@ -1,92 +1,24 @@
-import * as React from 'react'
-import { CheckIcon } from 'lucide-react'
+import { NumberStepper, RadioCardField, Text } from '@rpg/ui'
 
-import {
-  Badge,
-  Eyebrow,
-  NumberStepper,
-  RadioCardField,
-  SelectionSummaryChangeAction,
-  Text,
-} from '@rpg/ui'
+import { SetupAttributeRow } from '@/lib/create-setup/setup-attribute-row'
 
 import { spreadQuickNpcRadioCardFieldPresentation } from '../../lib/quick-npc/quick-npc-affinity-option-groups.lib'
-import type { QuickNpcBuildCardModel } from '../../lib/quick-npc/quick-npc-build-card.lib'
-import {
-  QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
-  QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER,
-  QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
-  QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL,
-  resolveQuickNpcBuildCardExpandActionLabel,
-  type QuickNpcBuildCardExpandActionKind,
-  type QuickNpcBuildCardRoleRow,
+import type {
+  QuickNpcBuildCardClassRow,
+  QuickNpcBuildCardLevelRow,
+  QuickNpcBuildCardRoleRow,
 } from '../../lib/quick-npc/quick-npc-build-card.lib'
 import {
-  quickNpcBuildCardAttributeHeaderClasses,
-  quickNpcBuildCardAttributeHelperClasses,
-  quickNpcBuildCardAttributeRowClasses,
-  quickNpcBuildCardAttributeValueClasses,
+  QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
+  QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL,
+  resolveQuickNpcBuildCardExpandActionLabel,
+} from '../../lib/quick-npc/quick-npc-build-card.lib'
+import {
   quickNpcBuildCardDescriptionVariants,
   quickNpcBuildCardIdentityRowClasses,
   quickNpcBuildCardIdentityTitleClasses,
   quickNpcBuildCardLevelEditorClasses,
-  quickNpcBuildCardLevelPromptClasses,
 } from './quick-npc-build-card.variants'
-
-type BuildAttributeRowProps = {
-  eyebrow: string
-  expandActionKind?: QuickNpcBuildCardExpandActionKind
-  expanded?: boolean
-  onAction?: () => void
-  value: React.ReactNode
-  helper?: string
-  helperClassName?: string
-  children?: React.ReactNode
-}
-
-export function BuildAttributeRow({
-  eyebrow,
-  expandActionKind,
-  expanded: rowExpanded = false,
-  onAction,
-  value,
-  helper,
-  helperClassName,
-  children,
-}: BuildAttributeRowProps) {
-  const editing = children !== undefined
-  const actionLabel =
-    expandActionKind != null
-      ? resolveQuickNpcBuildCardExpandActionLabel(expandActionKind, rowExpanded)
-      : undefined
-
-  return (
-    <div className={quickNpcBuildCardAttributeRowClasses}>
-      <div className={quickNpcBuildCardAttributeHeaderClasses}>
-        <Eyebrow size="sm">{eyebrow}</Eyebrow>
-        {actionLabel != null && onAction != null ? (
-          <SelectionSummaryChangeAction
-            changeLabel={actionLabel}
-            ariaLabel={actionLabel}
-            onChange={onAction}
-          />
-        ) : null}
-      </div>
-      {editing ? (
-        children
-      ) : (
-        <>
-          <div className={quickNpcBuildCardAttributeValueClasses}>{value}</div>
-          {helper ? (
-            <Text className={helperClassName ?? quickNpcBuildCardAttributeHelperClasses}>
-              {helper}
-            </Text>
-          ) : null}
-        </>
-      )}
-    </div>
-  )
-}
 
 type BuildCardRoleAttributeRowProps = {
   baseId: string
@@ -104,13 +36,12 @@ export function BuildCardRoleAttributeRow({
   onRoleChange,
 }: BuildCardRoleAttributeRowProps) {
   return (
-    <BuildAttributeRow
+    <SetupAttributeRow
       eyebrow="ROLE"
-      expandActionKind="role"
-      expanded={expanded}
-      onAction={onToggle}
+      changeLabel={resolveQuickNpcBuildCardExpandActionLabel('role', expanded)}
+      onChange={onToggle}
       value={roleRow.selectedRoleLabel}
-      helper={expanded ? undefined : roleRow.roleProvenanceHelper}
+      helper={expanded ? undefined : roleRow.helper}
     >
       {expanded ? (
         <RadioCardField
@@ -124,7 +55,7 @@ export function BuildCardRoleAttributeRow({
           {...spreadQuickNpcRadioCardFieldPresentation(roleRow.roleOptionPresentation)}
         />
       ) : undefined}
-    </BuildAttributeRow>
+    </SetupAttributeRow>
   )
 }
 
@@ -141,9 +72,6 @@ export function BuildCardTemplateIdentity({
         <Text as="h3" className={quickNpcBuildCardIdentityTitleClasses}>
           {templateLabel}
         </Text>
-        <Badge appearance="soft" tone="neutral" size="sm" leadingIcon={<CheckIcon />}>
-          {QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL}
-        </Badge>
       </div>
       {templateDescription ? (
         <Text as="p" className={quickNpcBuildCardDescriptionVariants()}>
@@ -156,7 +84,7 @@ export function BuildCardTemplateIdentity({
 
 type BuildCardClassEditorProps = {
   baseId: string
-  model: QuickNpcBuildCardModel
+  classRow: QuickNpcBuildCardClassRow
   expanded: boolean
   onToggle: () => void
   onClassChange: (classId: string) => void
@@ -164,92 +92,73 @@ type BuildCardClassEditorProps = {
 
 export function BuildCardClassAttributeRow({
   baseId,
-  model,
+  classRow,
   expanded,
   onToggle,
   onClassChange,
 }: BuildCardClassEditorProps) {
-  if (!model.classProgressionApplicable) {
+  if (!classRow.classProgressionApplicable) {
     return (
-      <BuildAttributeRow
-        eyebrow={model.classTermLabel.toUpperCase()}
+      <SetupAttributeRow
+        eyebrow={classRow.termLabel.toUpperCase()}
         value={QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL}
-        helper={QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER}
-        helperClassName={quickNpcBuildCardLevelPromptClasses}
+        helper={classRow.helper}
       />
     )
   }
 
   const collapsedClassValue =
-    model.classId === '' ? QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL : (model.selectedClassLabel ?? '')
+    classRow.classId === ''
+      ? QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL
+      : (classRow.selectedClassLabel ?? '')
 
   return (
-    <BuildAttributeRow
-      eyebrow={model.classTermLabel.toUpperCase()}
-      expandActionKind="class"
-      expanded={expanded}
-      onAction={onToggle}
+    <SetupAttributeRow
+      eyebrow={classRow.termLabel.toUpperCase()}
+      changeLabel={resolveQuickNpcBuildCardExpandActionLabel('class', expanded)}
+      onChange={onToggle}
       value={collapsedClassValue}
-      helper={expanded ? undefined : model.classRecommendationHelper}
+      helper={expanded ? undefined : classRow.helper}
     >
       {expanded ? (
         <RadioCardField
           id={`${baseId}-class`}
-          label={model.classTermLabel}
+          label={classRow.termLabel}
           labelVisibility="srOnly"
           density="compact"
           width="full"
-          value={model.classId}
+          value={classRow.classId}
           onValueChange={onClassChange}
-          {...spreadQuickNpcRadioCardFieldPresentation(model.classOptionPresentation)}
+          {...spreadQuickNpcRadioCardFieldPresentation(classRow.classOptionPresentation)}
         />
       ) : undefined}
-    </BuildAttributeRow>
+    </SetupAttributeRow>
   )
 }
 
 type BuildCardLevelAttributeRowProps = {
-  model: QuickNpcBuildCardModel
-  expanded: boolean
-  onToggle: () => void
+  levelRow: QuickNpcBuildCardLevelRow
   onLevelChange: (level: number) => void
 }
 
 export function BuildCardLevelAttributeRow({
-  model,
-  expanded,
-  onToggle,
+  levelRow,
   onLevelChange,
 }: BuildCardLevelAttributeRowProps) {
   return (
-    <BuildAttributeRow
-      eyebrow="LEVEL"
-      expandActionKind="level"
-      expanded={expanded}
-      onAction={onToggle}
-      value={model.level}
-      helper={expanded ? undefined : model.levelPrompt}
-      helperClassName={quickNpcBuildCardLevelPromptClasses}
-    >
-      {expanded ? (
-        <div className="flex flex-col gap-y-3">
-          <div className={quickNpcBuildCardLevelEditorClasses}>
-            <NumberStepper
-              aria-label="Level"
-              size="sm"
-              bordered
-              digits={2}
-              min={model.levelConstraints.minLevel}
-              max={model.levelConstraints.maxLevel}
-              value={model.level}
-              onChange={onLevelChange}
-            />
-          </div>
-          {model.levelPrompt ? (
-            <Text className={quickNpcBuildCardLevelPromptClasses}>{model.levelPrompt}</Text>
-          ) : null}
-        </div>
-      ) : undefined}
-    </BuildAttributeRow>
+    <SetupAttributeRow eyebrow="LEVEL" showHelperWhileEditing helper={levelRow.helper}>
+      <div className={quickNpcBuildCardLevelEditorClasses}>
+        <NumberStepper
+          aria-label="Level"
+          size="sm"
+          bordered
+          digits={2}
+          min={levelRow.levelConstraints.minLevel}
+          max={levelRow.levelConstraints.maxLevel}
+          value={levelRow.level}
+          onChange={onLevelChange}
+        />
+      </div>
+    </SetupAttributeRow>
   )
 }
