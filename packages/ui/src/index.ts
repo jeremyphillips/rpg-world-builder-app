@@ -621,12 +621,12 @@ export {
   type ListResultListProps,
   type ListResultEmptyProps,
 } from './components/ui/list-result-list.client'
+export { ListResultItem, type ListResultItemProps } from './components/ui/list-result-item.client'
 export {
-  ListResultItem,
-  ListResultItemIdentity,
-  type ListResultItemProps,
-  type ListResultItemIdentityProps,
-} from './components/ui/list-result-item.client'
+  IdentityRow,
+  type IdentityRowProps,
+  type IdentityRowSize,
+} from './components/ui/identity-row.client'
 export {
   listResultToolbarVariants,
   listResultGroupHeadingVariants,
@@ -820,12 +820,9 @@ export {
   type DropdownMenuItemContentProps,
 } from './components/ui/dropdown-menu-item-content'
 export {
-  DropdownMenuChoiceItemContent,
-  type DropdownMenuChoiceItemContentProps,
-} from './components/ui/dropdown-menu-choice-item-content'
-export {
   dropdownMenuChoiceContentClasses,
   dropdownMenuChoiceItemClasses,
+  dropdownMenuChoiceItemVariants,
 } from './components/ui/dropdown-menu-choice.variants'
 export {
   UserMenuTrigger,

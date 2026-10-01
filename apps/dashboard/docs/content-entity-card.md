@@ -45,7 +45,8 @@ only — not a duplicate trailing badge.
 | Bordered identity with expandable domain content | `DisclosureEntityCard` |
 | Create-tab Add/Pending discovery or pending rows | `ContentEntityCard` + trailing action |
 | Detail hierarchy or typed relationship | `DetailEntityRow` / `EntityRowList` |
-| Anonymous form value or choice affordance | Purpose-built form/choice component |
+| Combobox option, list-result row, or choice-menu item text (label + optional classification + supporting line) | `@rpg/ui` `IdentityRow` inside the host shell (`ListResultItem`, `DropdownMenuItem`, …) — `size` `sm` / `md` (default, 14px heading) / `lg`; not `FieldSizeToken` |
+| Custom combobox interiors (`renderOption`) or non-entity pickers | Purpose-built row content |
 
 ### EntitySurfaceConfig (character / organization / location pickers)
 

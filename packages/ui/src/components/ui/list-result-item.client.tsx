@@ -3,45 +3,20 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
+import { IdentityRow, type IdentityRowSize } from './identity-row.client'
 import {
-  listResultItemClassificationVariants,
   listResultItemMainVariants,
-  listResultItemMetadataVariants,
-  listResultItemNameVariants,
   listResultItemShellVariants,
   listResultItemTrailingActionVariants,
 } from './list-result.variants'
 
-export interface ListResultItemIdentityProps {
-  name: string
+export type ListResultItemProps = {
+  name?: string
   classification?: string
   metadata?: React.ReactNode
-}
-
-export function ListResultItemIdentity({
-  name,
-  classification,
-  metadata,
-}: ListResultItemIdentityProps) {
-  return (
-    <div className="min-w-0 flex-1">
-      <p className="text-sm">
-        <span className={listResultItemNameVariants()}>{name}</span>
-        {classification ? (
-          <>
-            <span className="text-muted-foreground"> · </span>
-            <span className={listResultItemClassificationVariants()}>{classification}</span>
-          </>
-        ) : null}
-      </p>
-      {metadata ? <p className={listResultItemMetadataVariants()}>{metadata}</p> : null}
-    </div>
-  )
-}
-
-export interface ListResultItemProps extends Partial<ListResultItemIdentityProps> {
   /** Replaces the default identity block while keeping row chrome. */
   content?: React.ReactNode
+  size?: IdentityRowSize
   /** Keyboard / pointer highlight — independent of selected. */
   highlighted?: boolean
   /** Persisted selection (e.g. combobox value) — independent of highlighted. */
@@ -65,6 +40,7 @@ export function ListResultItem({
   classification,
   metadata,
   content,
+  size = 'md',
   highlighted = false,
   selected = false,
   disabled = false,
@@ -79,7 +55,12 @@ export function ListResultItem({
   const identity = content ?? (
     <>
       {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
-      <ListResultItemIdentity name={name} classification={classification} metadata={metadata} />
+      <IdentityRow
+        heading={name}
+        classification={classification}
+        supporting={metadata}
+        size={size}
+      />
       {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
     </>
   )
@@ -90,7 +71,7 @@ export function ListResultItem({
     disabled,
     interactive,
   })
-  const mainClassName = cn(listResultItemMainVariants({ interactive }), className)
+  const mainClassName = cn(listResultItemMainVariants({ interactive, size }), className)
 
   const main = asChild ? (
     React.isValidElement<{ className?: string; disabled?: boolean; children?: React.ReactNode }>(

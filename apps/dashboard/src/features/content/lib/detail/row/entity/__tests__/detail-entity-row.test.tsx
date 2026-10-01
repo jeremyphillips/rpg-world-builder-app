@@ -26,7 +26,7 @@ describe('DetailEntityRow', () => {
     )
     expect(
       screen.getByRole('link', { name: 'The Silver Eel' }).parentElement?.parentElement,
-    ).toHaveTextContent('The Silver Eel·Building · Tavern')
+    ).toHaveTextContent('The Silver Eel · Building · Tavern')
     expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
     expect(container.firstElementChild).toHaveClass('px-4', 'py-1')
@@ -44,9 +44,9 @@ describe('DetailEntityRow', () => {
     )
 
     const headingRow = screen.getByRole('link', { name: 'Braggi' }).parentElement?.parentElement
-    expect(headingRow).toHaveTextContent('Braggi·NPC · Human · Level 3 Fighter')
+    expect(headingRow).toHaveTextContent('Braggi · NPC · Human · Level 3 Fighter')
     expect(screen.getByText('NPC · Human · Level 3 Fighter')).toBeInTheDocument()
-    expect(headingRow?.querySelector('[aria-hidden="true"]')).toHaveTextContent('·')
+    expect(headingRow?.querySelector('[aria-hidden="true"]')?.textContent).toContain('·')
   })
 
   it('truncates the entity name before the classification suffix', () => {

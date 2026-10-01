@@ -1,11 +1,21 @@
+import { cva } from 'class-variance-authority'
+
 /** Viewport-safe choice menu width — target ~300px, shrink on narrow viewports. */
 export const dropdownMenuChoiceContentClasses =
   'w-[min(var(--popover-choice-menu-width),calc(100vw-2rem))]'
 
-export const dropdownMenuChoiceItemClasses = 'h-auto items-start py-2'
+export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
+  variants: {
+    size: {
+      sm: 'py-1',
+      md: 'py-2',
+      lg: 'py-2.5',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+})
 
-export const dropdownMenuChoiceItemContentClasses = 'flex min-w-0 flex-col gap-0.5'
-
-export const dropdownMenuChoiceItemLabelClasses = 'text-sm'
-
-export const dropdownMenuChoiceItemDescriptionClasses = 'text-xs leading-snug text-muted-foreground'
+/** @deprecated Prefer `dropdownMenuChoiceItemVariants({ size })`. */
+export const dropdownMenuChoiceItemClasses = dropdownMenuChoiceItemVariants({ size: 'md' })

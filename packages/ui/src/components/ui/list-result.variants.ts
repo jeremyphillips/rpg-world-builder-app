@@ -2,6 +2,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 
+import type { IdentityRowSize } from './identity-row.variants'
+
 /** Slot-based toolbar — search and optional filter rows; hosts own control state. */
 export const listResultToolbarVariants = cva('border-b border-border bg-input')
 
@@ -88,27 +90,32 @@ export const listResultItemShellVariants = cva('relative flex w-full items-stret
 })
 
 /** Main hit area — identity and decorative trailing chrome. */
-export const listResultItemMainVariants = cva('flex min-w-0 flex-1 items-start gap-2 px-3 py-2 text-left outline-none', {
-  variants: {
-    interactive: {
-      true: 'cursor-pointer',
-      false: '',
+export const listResultItemMainVariants = cva(
+  'flex min-w-0 flex-1 items-start text-left outline-none',
+  {
+    variants: {
+      size: {
+        sm: 'gap-1 px-2 py-1',
+        md: 'gap-2 px-3 py-2',
+        lg: 'gap-2 px-4 py-2',
+      },
+      interactive: {
+        true: 'cursor-pointer',
+        false: '',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+      interactive: true,
     },
   },
-  defaultVariants: {
-    interactive: true,
-  },
-})
+)
+
+export type ListResultItemSize = IdentityRowSize
 
 /** Trailing action column — sibling to the main hit area, never nested inside it. */
 export const listResultItemTrailingActionVariants = cva(
   'flex shrink-0 items-center self-stretch border-l border-border-faint px-2',
 )
-
-export const listResultItemNameVariants = cva('truncate font-body-emphasis text-sm')
-
-export const listResultItemClassificationVariants = cva('truncate text-sm text-muted-foreground')
-
-export const listResultItemMetadataVariants = cva('truncate text-xs text-muted-foreground')
 
 export type ListResultGroupHeadingVariantProps = VariantProps<typeof listResultGroupHeadingVariants>

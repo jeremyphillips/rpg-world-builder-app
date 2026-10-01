@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
-import { DropdownMenuChoiceItemContent } from './dropdown-menu-choice-item-content'
+import { IdentityRow } from './identity-row.client'
 import {
   dropdownMenuChoiceContentClasses,
   dropdownMenuChoiceItemClasses,
@@ -117,9 +117,12 @@ export function SplitButton({
                       onSelect={() => item.onSelect()}
                     >
                       {item.description ? (
-                        <DropdownMenuChoiceItemContent
-                          label={item.label}
-                          description={item.description}
+                        <IdentityRow
+                          heading={item.label}
+                          supporting={item.description}
+                          supportingWrap
+                          size="md"
+                          className="flex-none"
                         />
                       ) : (
                         item.label

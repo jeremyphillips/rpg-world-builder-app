@@ -7,10 +7,10 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  IdentityRow,
   cn,
 } from '@rpg/ui'
 
-import { EntityActionChoiceMenuItemContent } from './entity-action-choice-menu-item-content'
 import {
   entityActionChoiceMenuContentClasses,
   entityActionChoiceMenuItemClasses,
@@ -79,7 +79,13 @@ export function EntityActionChoiceMenu({
             disabled={item.disabled}
             onSelect={() => item.onSelect()}
           >
-            <EntityActionChoiceMenuItemContent label={item.label} description={item.description} />
+            <IdentityRow
+              heading={item.label}
+              supporting={item.description}
+              supportingWrap
+              size="md"
+              className="flex-none"
+            />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
