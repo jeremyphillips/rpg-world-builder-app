@@ -8,11 +8,14 @@ export const quickNpcStartingChoiceRowClasses =
 export const quickNpcStartingChoiceRowHeaderClasses =
   'col-span-3 grid grid-cols-subgrid items-center gap-x-5 px-3 py-2.5 text-left'
 
-export const quickNpcStartingChoiceRowSummaryClasses = 'min-w-0 truncate text-xs text-foreground'
+export const quickNpcStartingChoiceRowEyebrowSlotClasses = 'col-start-1 shrink-0'
 
-/** Status dot + caret — fixed dot slot keeps carets aligned when status is `none`. */
+export const quickNpcStartingChoiceRowSummarySlotClasses =
+  'col-start-2 min-w-0 truncate text-xs text-foreground'
+
+/** Status dot + caret — column 3 so rows without summary text stay end-aligned. */
 export const quickNpcStartingChoiceRowActionsClasses =
-  'flex min-h-control-action-compact shrink-0 items-center justify-end gap-1.5'
+  'col-start-3 flex min-h-control-action-compact shrink-0 items-center justify-end gap-1.5'
 
 export const quickNpcStartingChoiceRowStatusSlotClasses =
   'flex size-2.5 shrink-0 items-center justify-center'

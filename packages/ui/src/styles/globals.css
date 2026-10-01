@@ -376,6 +376,11 @@
   z-index: var(--z-toast);
 }
 
+@utility text-control-action-xs {
+  font-size: var(--text-control-action-xs);
+  line-height: var(--text-control-action-xs--line-height);
+}
+
 @utility h-control-action-xs {
   height: var(--control-action-xs-height);
 }

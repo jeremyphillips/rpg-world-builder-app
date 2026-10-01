@@ -33,7 +33,7 @@ describe('SelectionOptionCard', () => {
     expect(screen.getByText('Gold: 10 gp')).toBeInTheDocument()
   })
 
-  it('renders compact header actions without ad-hoc sizing overrides', () => {
+  it('renders comfortable-density header actions at sm compact control size', () => {
     render(
       <SelectionOptionCard
         selected
@@ -48,7 +48,31 @@ describe('SelectionOptionCard', () => {
     expect(action.className).toContain(selectionOptionCardHeaderActionClasses)
     expect(action.className).toContain('h-6')
     expect(action.className).toContain('text-action-standalone')
+    expect(action.className).not.toContain('text-control-action-xs')
     expect(action.className).not.toContain('h-auto')
+  })
+
+  it('renders compact-density header actions at xs control-action typography', () => {
+    render(
+      <SelectionOptionCard
+        selected
+        density="compact"
+        headerEndSlot={
+          <SelectionOptionCardHeaderAction
+            label="Change package"
+            density="compact"
+            onClick={() => undefined}
+          />
+        }
+        label="Selected package"
+      />,
+    )
+
+    const action = screen.getByRole('button', { name: 'Change package' })
+    expect(action.className).toContain('text-control-action-xs')
+    expect(action.className).toContain('h-control-action-compact')
+    expect(action.className).not.toMatch(/\btext-sm\b/)
+    expect(action.className).not.toMatch(/\btext-xs\b/)
   })
 
   it('applies compact density typography on summary title, description, and eyebrow', () => {

@@ -37,7 +37,11 @@ export const SelectedSummaryCompact: Story = {
     density: 'compact',
     headerEyebrow: 'Selected package',
     headerEndSlot: (
-      <SelectionOptionCardHeaderAction label="Change package" onClick={() => undefined} />
+      <SelectionOptionCardHeaderAction
+        label="Change package"
+        density="compact"
+        onClick={() => undefined}
+      />
     ),
   },
 }
@@ -73,7 +77,11 @@ export const VisualParityComparison: Story = {
         summaryLines={['Gold remaining: 12 gp', 'Items selected: 4']}
         headerEyebrow="Selected package"
         headerEndSlot={
-          <SelectionOptionCardHeaderAction label="Change package" onClick={() => undefined} />
+          <SelectionOptionCardHeaderAction
+            label="Change package"
+            density="compact"
+            onClick={() => undefined}
+          />
         }
       />
     </div>
@@ -104,6 +112,7 @@ function CompactStateTransitionDemo() {
           headerEndSlot={
             <SelectionOptionCardHeaderAction
               label="Change package"
+              density="compact"
               onClick={() => setSelected(false)}
             />
           }

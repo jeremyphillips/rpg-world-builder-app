@@ -45,6 +45,7 @@ function StartingEquipmentDensityParityDemo() {
           headerEndSlot={
             <SelectionOptionCardHeaderAction
               label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+              density="compact"
               onClick={() => setSelected(false)}
             />
           }

@@ -114,6 +114,13 @@ describe('QuickNpcStartingChoices', () => {
     expect(screen.getByText('Elf species trait')).toBeInTheDocument()
   })
 
+  it('pins row actions to the third subgrid column', () => {
+    render(<StartingChoicesHarness />)
+
+    const expandSkills = screen.getByRole('button', { name: /expand skills/i })
+    expect(expandSkills.querySelector('.col-start-3')).toBeInTheDocument()
+  })
+
   it('collapses when Done is activated on the open row', async () => {
     const user = userEvent.setup()
     render(<StartingChoicesHarness />)

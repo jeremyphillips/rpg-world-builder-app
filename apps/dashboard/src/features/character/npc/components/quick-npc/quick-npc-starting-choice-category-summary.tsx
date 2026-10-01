@@ -1,6 +1,6 @@
 import { formatStartingChoiceCategorySummary } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
 
-import { quickNpcStartingChoiceRowSummaryClasses } from './quick-npc-starting-choices.variants'
+import { quickNpcStartingChoiceRowSummarySlotClasses } from './quick-npc-starting-choices.variants'
 
 export type QuickNpcStartingChoiceCategorySummaryProps = {
   labels: readonly string[]
@@ -13,5 +13,5 @@ export function QuickNpcStartingChoiceCategorySummary({
   const summary = formatStartingChoiceCategorySummary(labels)
   if (!summary) return null
 
-  return <span className={quickNpcStartingChoiceRowSummaryClasses}>{summary}</span>
+  return <span className={quickNpcStartingChoiceRowSummarySlotClasses}>{summary}</span>
 }

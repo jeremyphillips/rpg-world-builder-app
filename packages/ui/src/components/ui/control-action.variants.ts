@@ -56,6 +56,12 @@ export const controlActionXsCompactTextWithIconClasses = cn(
   iconGlyphDescendantClasses.xs,
 )
 
+/** Text-only compact xs control — 24px height + 10px type; Button `variant="text"` `size="xs"` compact. */
+export const controlActionXsCompactTextOnlyClasses = cn(
+  controlActionCompactHeightClasses,
+  'px-0 text-control-action-xs',
+)
+
 /** Smallest icon control — 24px hit target + xs (10px) glyph; Button `size="icon-xs"` (density-independent). */
 export const controlActionXsIconClasses = cn(
   controlActionCompactSizeClasses,

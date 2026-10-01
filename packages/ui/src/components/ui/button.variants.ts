@@ -6,6 +6,7 @@ import {
   controlActionDefaultIconClasses,
   controlActionLgIconClasses,
   controlActionCompactTextWithIconClasses,
+  controlActionXsCompactTextOnlyClasses,
   controlActionXsCompactTextWithIconClasses,
   controlActionXsIconClasses,
   controlActionXsTextClasses,
@@ -128,7 +129,14 @@ export const buttonVariants = cva(
       {
         variant: 'text',
         size: 'xs',
+        density: 'default',
         class: 'text-sm',
+      },
+      {
+        variant: 'text',
+        size: 'xs',
+        density: 'compact',
+        class: cn('w-fit', controlActionXsCompactTextOnlyClasses, textButtonTransparentClasses),
       },
       {
         variant: 'text',

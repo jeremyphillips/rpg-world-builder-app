@@ -27,13 +27,17 @@ describe('buttonVariants matrix', () => {
     expect(compactClasses).toContain('px-2')
   })
 
-  it('keeps text variant typography off control-action-xs when size is xs', () => {
-    for (const density of ['default', 'compact'] as const) {
-      const classes = classesFor({ variant: 'text', size: 'xs', density })
-      expect(classes).toContain('text-sm')
-      expect(classes).not.toContain('text-control-action-xs')
-      expect(classes).toContain(density === 'default' ? 'h-8' : 'h-6')
-    }
+  it('applies control-action-xs typography to text xs compact actions', () => {
+    const compactClasses = classesFor({ variant: 'text', size: 'xs', density: 'compact' })
+    expect(compactClasses).toContain('text-control-action-xs')
+    expect(compactClasses).toContain('h-control-action-compact')
+  })
+
+  it('keeps text xs default density on the general text-sm scale', () => {
+    const classes = classesFor({ variant: 'text', size: 'xs', density: 'default' })
+    expect(classes).toContain('text-sm')
+    expect(classes).not.toContain('text-control-action-xs')
+    expect(classes).toContain('h-8')
   })
 
   it('normalizes attached xs to the same geometry as attached sm', () => {

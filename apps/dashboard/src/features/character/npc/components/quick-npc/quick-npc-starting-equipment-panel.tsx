@@ -15,10 +15,7 @@ import {
 } from '@rpg/ui'
 
 import { StartingEquipmentOptionSection } from '@/features/character/components/equipment/starting-package/starting-equipment-option-section'
-import {
-  EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL,
-  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
-} from '@/features/character/lib/equipment/equipment-step.lib'
+import { EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL } from '@/features/character/lib/equipment/equipment-step.lib'
 
 import { EntityAnatomyHost } from '@/features/content'
 
@@ -53,6 +50,7 @@ import {
   quickNpcStartingChoiceSelectedListClasses,
 } from './quick-npc-starting-choices.variants'
 
+const QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL = 'Additional Equipment'
 const QUICK_NPC_GRANTED_EQUIPMENT_SECTION_LABEL = 'Granted Equipment'
 const QUICK_NPC_GRANTED_EQUIPMENT_DESCRIPTION =
   'Items provided automatically by species, origin, role, or other grants.'
@@ -229,7 +227,7 @@ function QuickNpcAdditionalEquipmentSection({
 
   const addDisabled = kindOptions.length === 0
   const additionalTitle = hasPackages
-    ? EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL
+    ? QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL
     : EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL
   const additionalDescription = hasPackages
     ? QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION

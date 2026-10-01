@@ -33,6 +33,7 @@ export function StartingEquipmentOptionSummaryCard({
         showChangePackage ? (
           <SelectionOptionCardHeaderAction
             label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+            density={density}
             onClick={onChangePackage}
           />
         ) : undefined

@@ -70,6 +70,7 @@ import {
   quickNpcStartingChoiceRowActionsClasses,
   quickNpcStartingChoiceRowCaretClasses,
   quickNpcStartingChoiceRowCaretExpandedClasses,
+  quickNpcStartingChoiceRowEyebrowSlotClasses,
   quickNpcStartingChoiceRowHeaderClasses,
   quickNpcStartingChoiceRowStatusSlotClasses,
   quickNpcStartingChoiceRowClasses,
@@ -368,7 +369,7 @@ function StartingChoiceCategoryRow({
         aria-label={ariaLabel}
         onClick={onToggle}
       >
-        <Eyebrow size="sm" className="shrink-0">
+        <Eyebrow size="sm" className={quickNpcStartingChoiceRowEyebrowSlotClasses}>
           {eyebrow}
         </Eyebrow>
         <QuickNpcStartingChoiceCategorySummary labels={summaryLabels} />

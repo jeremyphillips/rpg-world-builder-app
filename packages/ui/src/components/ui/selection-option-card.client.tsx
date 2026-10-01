@@ -81,6 +81,8 @@ export type SelectionOptionCardHeaderActionProps = {
   label: string
   onClick: () => void
   ariaLabel?: string
+  /** Match the parent card density — compact cards use the xs control-action label size. */
+  density?: SelectionOptionCardDensity
 }
 
 /** Compact link action for the selection card header row. */
@@ -88,14 +90,20 @@ export function SelectionOptionCardHeaderAction({
   label,
   onClick,
   ariaLabel,
+  density = 'default',
 }: SelectionOptionCardHeaderActionProps) {
+  const buttonSize = density === 'compact' ? 'xs' : 'sm'
+
   return (
     <Button
       type="button"
       variant="text"
-      size="sm"
+      size={buttonSize}
       density="compact"
-      className={selectionOptionCardHeaderActionClasses}
+      className={cn(
+        selectionOptionCardHeaderActionClasses,
+        density === 'compact' && 'text-control-action-xs',
+      )}
       aria-label={ariaLabel}
       onClick={onClick}
     >

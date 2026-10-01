@@ -347,7 +347,7 @@ function QuickNpcCreateModalSession({
 }
 
 /**
- * Quick NPC creation modal — setup then TabbedForm authoring. Cancel/X/Escape during
+ * Quick NPC creation modal — setup then TabbedForm authoring. Cancel/X during
  * authoring returns to the parent create surface; success closes nested overlays.
  */
 export function QuickNpcCreateModal(props: QuickNpcCreateModalProps) {
