@@ -28,8 +28,12 @@ function applyContribution(
       equipment.id,
       contribution.tier,
       contribution.reason,
-      contribution.sourceKey,
       specificity,
+      {
+        ...(contribution.source ? { source: contribution.source } : {}),
+        ...(contribution.basis ? { basis: contribution.basis } : {}),
+        ...(contribution.choiceSetId ? { choiceSetId: contribution.choiceSetId } : {}),
+      },
     )
   }
 }

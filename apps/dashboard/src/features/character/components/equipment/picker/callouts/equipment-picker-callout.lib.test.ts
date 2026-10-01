@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
   EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -85,7 +84,7 @@ describe('equipment-picker-callout.lib', () => {
         recommendation: { tier: 'essential', reasons: ['classToolNeed'] },
       })
       expect(getEquipmentPickerCallout(essentialTool)).toEqual({
-        label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
+        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
         intent: 'recommended',
         importance: 'high',
       })
@@ -228,7 +227,7 @@ describe('equipment-picker-callout.lib', () => {
         },
       })
 
-      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_CLASS_TOOL_LABEL)
+      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_PROFICIENT_LABEL)
     })
 
     it('maps spellcasting focus to recommended medium', () => {
@@ -292,7 +291,7 @@ describe('equipment-picker-callout.lib', () => {
         },
       }
 
-      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_CLASS_TOOL_LABEL)
+      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_PROFICIENT_LABEL)
     })
   })
 })

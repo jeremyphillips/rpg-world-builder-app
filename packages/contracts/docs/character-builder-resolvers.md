@@ -404,6 +404,29 @@ UI surfaces should call `resolveProficiencyChoiceSetPresentation` rather than co
 identity primitive with pool-description helpers. Fixed-grant rows keep grant-card density;
 do not rewrite grant-card copy to match ChoiceSet allowance copy.
 
+## Recommendation sources
+
+Shared recommendation vocabulary lives in
+`runtime/character-builder/recommendation/`. A requirement is never a recommendation
+strength. Soft signals, requirement definitions, option state, and active-choice
+relevance are separate facts. Domain policies compose the shared comparator primitives.
+
+`RecommendationSourceRef` uses `kind: 'role'` at this boundary. Adapters map
+`NpcRecommendationSource` and organization class sources from `template` onto `role`,
+and map Quick NPC display sources (`title`, `organization`, `role`). `campaign` has
+no recommendation-source mapping.
+
+`formatRecommendationSourceLabel` canonical density reads "Fighter class", "Guard role",
+"Captain title", and "Elf species". Quick NPC choice hints and attribute helpers call
+the same formatter at `choice-hint` and `attribute-helper` density so existing
+"Suggested by …" sentences stay unchanged. Both dashboard composers
+(`startingChoiceItemSuggestionHint` and `formatSuggestionHelper`) build those sentences
+with `formatSuggestedBySentence` / `formatSourceSuggestsSentence`.
+
+Equipment evidence carries an optional `source`. Proficiency compatibility evidence
+has none. Picker rows keep that evidence on `state.evidence` and the split facts on
+`state.resolved`.
+
 ## Related helpers
 
 | Helper                                | Location                                                 | Purpose                                                      |

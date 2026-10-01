@@ -81,13 +81,11 @@ describe('equipment recommendation specificity ranks', () => {
         {
           reason: 'unresolvedToolProficiencyChoice',
           tier: 'strong',
-          sourceKey: 'pool',
           specificity: 'broad_pool',
         },
         {
           reason: 'availableInStartingOption',
           tier: 'strong',
-          sourceKey: 'grant',
           specificity: 'exact',
         },
       ]),

@@ -98,7 +98,7 @@ describe('resolveProficiencyPickerItems', () => {
     const stealth = items.find((item) => item.optionId === stealthSkill.id)
     expect(stealth?.state.isAlreadyGranted).toBe(true)
     expect(stealth?.state.canSelect).toBe(false)
-    expect(stealth?.state.disabledReasons[0]).toContain('Already granted by')
+    expect(stealth?.state.disabledReasons[0]).toBe('Already granted by Rogue')
   })
 
   it('marks species language affinities as recommended in language ChoiceSets', () => {

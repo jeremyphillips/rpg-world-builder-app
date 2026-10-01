@@ -11,8 +11,8 @@ import {
   type PickerItemStateBase,
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
+import { formatStandardSelectionSourceLabel } from '../../../character/format-selection-source-label'
 import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
-import { formatProficiencySourceLabel } from './format-proficiency-source-label'
 
 export type ProficiencyPickerItemState = PickerItemStateBase & {
   isAlreadySelected: boolean
@@ -84,7 +84,7 @@ function grantedDisabledReason(
   sources: CharacterProficiencies['skills'][number]['sources'],
   catalogIndex: CharacterBuildCatalogIndex,
 ): string {
-  const sourceLabel = formatProficiencySourceLabel(sources, catalogIndex)
+  const sourceLabel = formatStandardSelectionSourceLabel(sources, catalogIndex)
   return `Already granted by ${sourceLabel}`
 }
 

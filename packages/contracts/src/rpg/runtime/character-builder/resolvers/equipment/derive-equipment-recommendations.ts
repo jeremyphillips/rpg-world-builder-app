@@ -14,11 +14,9 @@ import {
 } from '../../../../vocab/equipment/spellcasting-gear-kind'
 import {
   NEUTRAL_EQUIPMENT_RECOMMENDATION,
-  type EquipmentRecommendation,
   type EquipmentRecommendationRule,
   type EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
-import { equipmentIdMatchesReference } from '../../../creature/equipment-id-match'
 import { listEquipmentMatchingPool, toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -29,6 +27,7 @@ import {
   addRecommendationContribution,
   toEquipmentRecommendation,
   type AccumulatorMap,
+  type DerivedEquipmentRecommendation,
 } from './equipment-recommendation-accumulator'
 import {
   applyRecommendationContributions,
@@ -36,6 +35,11 @@ import {
   deriveStartingEquipmentRecommendationContributions,
   listSelectedStartingEquipmentGrantIds,
 } from './derive-equipment-recommendation-contributions'
+import { classRecommendationSource } from './equipment-recommendation-evidence'
+import {
+  listOwnedEquipmentIds,
+  projectEquipmentCatalogFacts,
+} from './project-equipment-option-facts'
 import { specificityForMatchCount } from './equipment-recommendation-specificity'
 
 /** MVP builds level-1 characters; the level-up wizard will pass real levels. */
@@ -90,19 +94,6 @@ function resolveFocusInferenceIds(
   return listFallbackStartingEquipmentGrantIds(characterClass, catalogIndex)
 }
 
-function isFixedClassToolGrant(equipment: Equipment, characterClass: CharacterClass): boolean {
-  if (equipment.kind !== 'tool') return false
-
-  const items = characterClass.proficiencies.tools?.items ?? []
-  return items.some((reference) =>
-    equipmentIdMatchesReference({
-      reference,
-      equipment,
-      rulesetId: characterClass.rulesetId,
-    }),
-  )
-}
-
 /** Authored `spellcasting.focusKinds` wins; otherwise infer from focus gear in starting packages. */
 function resolveFocusKinds(
   characterClass: CharacterClass,
@@ -147,15 +138,11 @@ function applyAuthoredRules(args: {
 
     for (const equipment of matches) {
       if (rule.tag !== undefined && !(equipment.tags ?? []).includes(rule.tag)) continue
-      addRecommendationContribution(
-        accumulators,
-        equipment.id,
-        tier,
-        reason,
-        `${characterClass.id}:authored-rule`,
-        specificity,
-        rule.label,
-      )
+      addRecommendationContribution(accumulators, equipment.id, tier, reason, specificity, {
+        source: classRecommendationSource(characterClass.id),
+        basis: 'authored',
+        label: rule.label,
+      })
     }
   }
 }
@@ -183,8 +170,11 @@ function applyRequiredGearContributions(args: {
       equipment.id,
       'essential',
       'classRequired',
-      `${args.characterClass.id}:required-gear`,
       specificity,
+      {
+        source: classRecommendationSource(args.characterClass.id),
+        basis: 'inferred',
+      },
     )
   }
 }
@@ -212,8 +202,11 @@ function applyRecommendedGearContributions(args: {
       equipment.id,
       'strong',
       'classSuggested',
-      `${args.characterClass.id}:recommended-gear`,
       specificity,
+      {
+        source: classRecommendationSource(args.characterClass.id),
+        basis: 'inferred',
+      },
     )
   }
 }
@@ -224,13 +217,15 @@ function applySpellcastingFocusContributions(args: {
   catalogIndex: CharacterBuildCatalogIndex
   classLevel: number
   startingEquipmentIds: readonly string[]
-}): void {
-  const { accumulators, characterClass, catalogIndex, classLevel, startingEquipmentIds } = args
+  ownedIds: ReadonlySet<string>
+}): string[] {
+  const { accumulators, characterClass, catalogIndex, classLevel, startingEquipmentIds, ownedIds } =
+    args
   const spellcasting = characterClass.spellcasting
-  if (!spellcasting) return
+  if (!spellcasting) return []
 
   const focusKinds = resolveFocusKinds(characterClass, catalogIndex, startingEquipmentIds)
-  if (focusKinds.length === 0) return
+  if (focusKinds.length === 0) return []
 
   const focusTier: EquipmentRecommendationTier = isSpellcastingActiveAtLevel(
     characterClass,
@@ -249,56 +244,44 @@ function applySpellcastingFocusContributions(args: {
     )
   })
   const specificity = specificityForMatchCount(matches.length)
+  const satisfied = matches.some((equipment) => ownedIds.has(equipment.id))
 
-  for (const equipment of matches) {
-    addRecommendationContribution(
-      accumulators,
-      equipment.id,
-      focusTier,
-      'spellcastingFocus',
-      `${characterClass.id}:spellcasting-focus`,
-      specificity,
-    )
+  if (!satisfied) {
+    for (const equipment of matches) {
+      addRecommendationContribution(
+        accumulators,
+        equipment.id,
+        focusTier,
+        'spellcastingFocus',
+        specificity,
+        {
+          source: classRecommendationSource(characterClass.id),
+          basis: 'inferred',
+        },
+      )
+    }
   }
+
+  return matches.map((equipment) => equipment.id)
 }
 
 function applyProficiencyContributions(
   accumulators: AccumulatorMap,
   equipment: Equipment,
   proficiencies: CharacterProficiencies,
-  characterClass: CharacterClass,
 ): void {
-  if (isFixedClassToolGrant(equipment, characterClass)) {
-    addRecommendationContribution(
-      accumulators,
-      equipment.id,
-      'essential',
-      'classToolNeed',
-      `${characterClass.id}:fixed-tool`,
-      'exact',
-    )
-  }
-
   if (equipment.kind !== 'weapon' && equipment.kind !== 'armor' && equipment.kind !== 'tool') {
     return
   }
 
   if (isEquipmentProficient(equipment, proficiencies)) {
-    addRecommendationContribution(
-      accumulators,
-      equipment.id,
-      'compatible',
-      'proficient',
-      `${characterClass.id}:proficiency`,
-      'exact',
-    )
+    addRecommendationContribution(accumulators, equipment.id, 'compatible', 'proficient', 'exact')
   } else {
     addRecommendationContribution(
       accumulators,
       equipment.id,
       'notRecommended',
       'notProficient',
-      `${characterClass.id}:proficiency`,
       'exact',
     )
   }
@@ -314,7 +297,7 @@ function applyProficiencyContributions(
  */
 export function deriveEquipmentRecommendations(
   args: DeriveEquipmentRecommendationsArgs,
-): ReadonlyMap<string, EquipmentRecommendation> {
+): ReadonlyMap<string, DerivedEquipmentRecommendation> {
   const { characterClass, catalogIndex, proficiencies, draft, choiceSets } = args
   const classLevel = args.classLevel ?? DEFAULT_CLASS_LEVEL
   const accumulators: AccumulatorMap = new Map()
@@ -340,6 +323,7 @@ export function deriveEquipmentRecommendations(
   }
 
   const startingEquipmentIds = resolveFocusInferenceIds(characterClass, catalogIndex, draft)
+  const ownedIds = listOwnedEquipmentIds({ characterClass, catalogIndex, draft })
 
   applyRequiredGearContributions({
     accumulators,
@@ -347,12 +331,13 @@ export function deriveEquipmentRecommendations(
     catalogIndex,
   })
 
-  applySpellcastingFocusContributions({
+  const focusEligibleIds = applySpellcastingFocusContributions({
     accumulators,
     characterClass,
     catalogIndex,
     classLevel,
     startingEquipmentIds,
+    ownedIds,
   })
 
   applyRecommendedGearContributions({
@@ -381,14 +366,36 @@ export function deriveEquipmentRecommendations(
     classLevel,
   })
 
-  const recommendations = new Map<string, EquipmentRecommendation>()
+  const recommendations = new Map<string, DerivedEquipmentRecommendation>()
   for (const equipment of catalogIndex.equipment.values()) {
-    applyProficiencyContributions(accumulators, equipment, proficiencies, characterClass)
+    applyProficiencyContributions(accumulators, equipment, proficiencies)
     const accumulator = accumulators.get(equipment.id)
     recommendations.set(
       equipment.id,
-      accumulator ? toEquipmentRecommendation(accumulator) : NEUTRAL_EQUIPMENT_RECOMMENDATION,
+      accumulator
+        ? toEquipmentRecommendation(accumulator)
+        : { ...NEUTRAL_EQUIPMENT_RECOMMENDATION, evidence: [] },
     )
+  }
+
+  const evidenceById = new Map(
+    [...recommendations.entries()].map(([equipmentId, recommendation]) => [
+      equipmentId,
+      recommendation.evidence,
+    ]),
+  )
+  const facts = projectEquipmentCatalogFacts({
+    classId: characterClass.id,
+    equipment: catalogIndex.equipment,
+    evidenceById,
+    proficiencies,
+    focusEligibleIds,
+    ownedIds,
+  })
+
+  for (const [equipmentId, recommendation] of recommendations) {
+    const resolved = facts.get(equipmentId)
+    if (resolved) recommendations.set(equipmentId, { ...recommendation, resolved })
   }
 
   return recommendations

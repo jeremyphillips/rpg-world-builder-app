@@ -2,8 +2,11 @@ import {
   assembleCharacterProficiencies,
   buildSelectionSourceLabelCatalogIndex,
   formatGrantCardProficiencySourceLabel,
+  formatRecommendationSourceLabel,
   formatStandardSelectionSourceLabel,
+  formatSuggestedBySentence,
   getNpcTemplateEntry,
+  npcRecommendationSourceKind,
   indexCharacterBuildCatalog,
   optionIdentitiesOverlap,
   resolveNpcStartingChoices,
@@ -57,10 +60,17 @@ function suggestionSourceLabel(
   source: NpcRecommendationSource,
   labels: StartingChoiceSuggestionLabels,
 ): string | undefined {
-  if (source === 'template') return labels.template ? `${labels.template} role` : undefined
-  if (source === 'title') return labels.title
-  if (source === 'species') return labels.species ? `${labels.species} species` : undefined
-  return undefined
+  const kind = npcRecommendationSourceKind(source)
+  if (!kind) return undefined
+  const name =
+    kind === 'role'
+      ? labels.template
+      : kind === 'title'
+        ? labels.title
+        : kind === 'species'
+          ? labels.species
+          : undefined
+  return formatRecommendationSourceLabel({ kind }, { name, density: 'choice-hint' })
 }
 
 /**
@@ -76,7 +86,7 @@ export function startingChoiceItemSuggestionHint(args: {
   const sources = args.suggestedBy?.[args.selectedId] ?? []
   if (sources.length !== 1) return undefined
   const label = suggestionSourceLabel(sources[0]!, args.labels ?? {})
-  return label ? `Suggested by ${label}` : undefined
+  return label ? formatSuggestedBySentence(label) : undefined
 }
 
 export function startingChoiceSuggestionHint(args: {
@@ -93,7 +103,7 @@ export function startingChoiceSuggestionHint(args: {
     return undefined
   }
   const label = suggestionSourceLabel(source, args.labels ?? {})
-  return label ? `Suggested by ${label}` : undefined
+  return label ? formatSuggestedBySentence(label) : undefined
 }
 
 export function startingChoiceHasNamedAttribution(args: {

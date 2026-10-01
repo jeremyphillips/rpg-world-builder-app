@@ -1,12 +1,17 @@
 import {
+  formatRecommendationSourceLabel,
+  formatSourceSuggestsSentence,
+  formatSuggestedBySentence,
   getNpcTemplateEntry,
   getNpcTemplateLabel,
   indexCharacterBuildCatalog,
   intersectPersistedContentIds,
   resolveOrganizationMembershipTitleProjection,
+  SUGGESTED_BY_PREFIX,
   type CharacterBuildContext,
   type NpcTemplateId,
   type OrganizationMembershipTitleDefinition,
+  type RecommendationSourceKind,
 } from '@rpg/contracts'
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
@@ -17,17 +22,28 @@ import { isQuickNpcMembershipTitleSetupComplete } from './quick-npc-form-fields'
 export const QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER =
   'Classes are available from level 1.' as const
 
-export const QUICK_NPC_SUGGESTED_BY_PREFIX = 'Suggested by' as const
+export const QUICK_NPC_SUGGESTED_BY_PREFIX = SUGGESTED_BY_PREFIX
 
 export type FormatSuggestionHelperInput = {
   currentValue: string | number | undefined
   suggestedValue: string | number | undefined
   sourceLabel: string | undefined
+  sourceKind?: RecommendationSourceKind
   suggestedDisplay?: string
 }
 
+function resolveSuggestionSourceLabel(input: FormatSuggestionHelperInput): string | undefined {
+  const name = input.sourceLabel?.trim()
+  if (!name) return undefined
+  if (!input.sourceKind) return name
+  return formatRecommendationSourceLabel(
+    { kind: input.sourceKind },
+    { name, density: 'attribute-helper' },
+  )
+}
+
 export function formatSuggestionHelper(input: FormatSuggestionHelperInput): string | undefined {
-  const sourceLabel = input.sourceLabel?.trim()
+  const sourceLabel = resolveSuggestionSourceLabel(input)
   if (!sourceLabel) {
     return undefined
   }
@@ -43,14 +59,14 @@ export function formatSuggestionHelper(input: FormatSuggestionHelperInput): stri
     input.currentValue !== undefined &&
     input.currentValue === input.suggestedValue
   ) {
-    return `${QUICK_NPC_SUGGESTED_BY_PREFIX} ${sourceLabel}.`
+    return formatSuggestedBySentence(sourceLabel, { trailingPeriod: true })
   }
 
   const display = suggestedDisplay ?? String(input.suggestedValue)
   if (!display) {
     return undefined
   }
-  return `${sourceLabel} suggests ${display}.`
+  return formatSourceSuggestsSentence(sourceLabel, display)
 }
 
 const DISPLAY_SOURCE_PRECEDENCE = ['title', 'organization', 'role'] as const
@@ -241,6 +257,7 @@ export function resolveQuickNpcClassRowHelper(args: {
         currentValue: args.classId,
         suggestedValue: args.classId,
         sourceLabel: source.label,
+        sourceKind: source.kind,
       })
     }
   }
@@ -258,6 +275,7 @@ export function resolveQuickNpcClassRowHelper(args: {
       suggestedValue: source.classIds[0],
       suggestedDisplay,
       sourceLabel: source.label,
+      sourceKind: source.kind,
     })
   }
 
@@ -332,6 +350,7 @@ export function resolveQuickNpcRoleRowHelper(args: {
         currentValue: args.selectedTemplateId,
         suggestedValue: args.selectedTemplateId,
         sourceLabel: source.label,
+        sourceKind: source.kind,
       })
     }
   }
@@ -342,6 +361,7 @@ export function resolveQuickNpcRoleRowHelper(args: {
       suggestedValue: source.templateId,
       suggestedDisplay: getNpcTemplateLabel(source.templateId),
       sourceLabel: source.label,
+      sourceKind: source.kind,
     })
   }
 
@@ -382,6 +402,7 @@ export function resolveQuickNpcLevelRowHelper(args: {
     currentValue: args.level,
     suggestedValue: titleRecommendation.level,
     sourceLabel: projection.label,
+    sourceKind: 'title',
     suggestedDisplay: `level ${titleRecommendation.level}`,
   })
 }

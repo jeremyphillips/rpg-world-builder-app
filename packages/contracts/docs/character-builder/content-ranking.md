@@ -76,22 +76,46 @@ rank only after search.
 
 ### Comparator steps (recommendation / best-match tiebreaker)
 
-1. **Recommendation tier** — `compareEquipmentRecommendationTiers` (essential → strong → compatible → neutral → notRecommended). Constants: [`equipment-recommendation.ts`](../src/rpg/content/equipment-recommendation.ts) `EQUIPMENT_RECOMMENDATION_TIER_RANK`.
-2. **Recommendation specificity** — collapsed `recommendation.specificity` via `compareEquipmentRecommendationSpecificity` (exact → narrow_pool → broad_pool). Pool expansion thresholds are classified at contribution time in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts): 1 match = exact, 2–5 = narrow_pool, 6+ = broad_pool; `{ kind: 'equipment' }` selectors are always exact.
-3. **Best reason** — lowest rank among `recommendation.reasons` via `getBestEquipmentRecommendationReasonRank`. Constants: `EQUIPMENT_RECOMMENDATION_REASON_RANK`.
-4. **Starting affordability** — `state.isAffordable` (`true` before `false`). Deprioritizes items that exceed the package starting budget without hiding them (unless the dashboard `filterOutUnaffordable` prop is on).
-5. **Kind bucket** — `getEquipmentRecommendationKindRank` (weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other). Constants: [`equipment-picker-item-kind-rank.ts`](../src/rpg/runtime/character-builder/resolvers/picker/equipment-picker-item-kind-rank.ts).
-6. **Weapon category** — `getEquipmentWeaponCategoryBrowseRank` when both rows are weapons; martial-first only when `preferMartialWeaponBrowseOrder` is set on the browse context.
-7. **Name** — `localeCompare` (base sensitivity).
+Resolved rows sort with `compareIntentionalEquipmentRanking` in
+[`equipment-ranking-policy.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-ranking-policy.ts).
+Requirements, soft recommendations, and option state are separate facts. Selection and
+choice state never change recommendation strength.
+
+1. **Unsatisfied requirements** — exact candidates, then any-of candidates (`compareActiveRequirement`). A satisfied any-of pool keeps the satisfier and drops the other candidates. Spellcasting focus is one any-of requirement owned by the class.
+2. **Active-choice eligibility** — only when `activeChoice` is `pool` or `package` and the row is in that open pool.
+3. **Context relevance** — only when `activeChoice` is not `none`. `allowance` does not reorder equipment recommendations; magic-item action rank handles that workflow. The general Add Equipment drawer passes `none`, so open pools and alternative packages do not lift rows there.
+4. **Soft strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility state, not a signal, so a fixed class tool such as thieves' tools sorts as proficient gear rather than an essential class-tool need.
+5. **Specificity** — exact → narrow_pool → broad_pool on the soft signals. Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts).
+6. **Source priority** — provisional tie-break after strength and specificity: user, title, role, class, subclass, organization, species, origin, feat.
+7. **Alternative package** — `inAlternativePackage` is a late tie-break only.
+8. **Canonical** — starting affordability, kind bucket, weapon category, then name.
+
+`rankingMode: 'parity'` keeps the previous tier → specificity → reason order for rows that still need it. Rows without `resolved` facts use that legacy order automatically.
 
 ### Recommendation reason ranks
 
-Lower ranks list first within the same tier (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
+The legacy reason enum still feeds badges until presentation facts replace it. It is not the browse order for resolved rows.
+
+Lower historical ranks (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
 
 `classRequired` → `classToolNeed` → `selectedToolProficiency` → `spellcastingFocus` →
 `startingEquipment` → `unresolvedToolProficiencyChoice` → `startingEquipmentChoice` →
 `classToolCategory` → `availableInStartingOption` → `classSuggested` → `proficient` →
 `notProficient`.
+
+`classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
+
+### Legacy comparator steps
+
+`compareLegacyEquipmentPickerItems` remains for `rankingMode: 'parity'` and for rows that have no split facts:
+
+1. **Recommendation tier** — `compareEquipmentRecommendationTiers` (essential → strong → compatible → neutral → notRecommended).
+2. **Recommendation specificity** — collapsed `recommendation.specificity`.
+3. **Best reason** — `getBestEquipmentRecommendationReasonRank`.
+4. **Starting affordability** — `state.isAffordable` (`true` before `false`).
+5. **Kind bucket** — `getEquipmentRecommendationKindRank` (weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other).
+6. **Weapon category** — martial-first only when `preferMartialWeaponBrowseOrder` is set.
+7. **Name** — `localeCompare` (base sensitivity).
 
 Inference layers live in `derive-equipment-recommendation-contributions.ts` (proficiency
 pools, starting-equipment pools, fulfillment-aware gold elevation).

@@ -8,8 +8,11 @@ import {
   type EquipmentRecommendation,
 } from '../../../../content/equipment-recommendation'
 import type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
+import { compareIntentionalEquipmentRanking } from '../equipment/equipment-ranking-policy'
 import { getEquipmentRecommendationKindRank } from './equipment-picker-item-kind-rank'
 import { getEquipmentWeaponCategoryBrowseRank } from './equipment-picker-item-weapon-category-rank'
+import type { SourcedEquipmentRecommendationEvidence } from '../equipment/equipment-recommendation-evidence'
+import type { ResolvedEquipmentOption } from '../equipment/project-equipment-option-facts'
 import type { EquipmentPurchaseAvailability } from '../equipment/resolve-equipment-purchase-availability'
 import type { MagicItemActionState } from './magic-item-picker-action-rank'
 import type { PickerItemStateBase } from './picker-item-state'
@@ -36,6 +39,10 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
   purchaseAvailability: EquipmentPurchaseAvailability
   /** Tiered classification; `isRecommended` mirrors essential/strong recommendation tiers. */
   recommendation: EquipmentRecommendation
+  /** Contributing evidence, including typed sources. Proficiency rows omit `source`. */
+  evidence?: readonly SourcedEquipmentRecommendationEvidence[]
+  /** Split requirement, soft recommendation, and option-state facts. */
+  resolved?: ResolvedEquipmentOption
   /** Populated in magic-items workflow only — drives actionability best-match rank. */
   magicItemAction?: MagicItemActionState
 }
@@ -48,12 +55,25 @@ export type EquipmentPickerItem = {
 }
 
 /**
- * Stable picker browse ordering: tier → specificity → best reason → starting affordability
- * → kind bucket → weapon category → name. Search (`CatalogPickerSheet` / `rankItems`) stays
- * text-score-first; an empty query preserves this order. Kind and weapon-category ranks
- * are tiebreakers only after tier, specificity, reason, and affordability.
+ * Stable picker browse ordering. Rows with split facts use the equipment ranking policy:
+ * unsatisfied requirements, active-choice relevance, soft strength, specificity, source
+ * tie-break, then canonical order. Rows without facts keep the legacy tier/reason order.
+ * Search stays text-score-first; an empty query preserves this order.
  */
 export function compareEquipmentPickerItemsByRecommendation(
+  left: EquipmentPickerItem,
+  right: EquipmentPickerItem,
+  context?: EquipmentPickerBrowseSortContext,
+): number {
+  if (context?.rankingMode !== 'parity' && left.state.resolved && right.state.resolved) {
+    return compareIntentionalEquipmentRanking(left, right, context)
+  }
+
+  return compareLegacyEquipmentPickerItems(left, right, context)
+}
+
+/** Pre-split browse order: tier, specificity, reason, then canonical tie-breaks. */
+export function compareLegacyEquipmentPickerItems(
   left: EquipmentPickerItem,
   right: EquipmentPickerItem,
   context?: EquipmentPickerBrowseSortContext,

@@ -1,6 +1,5 @@
 import {
   buildSpellPickerCompactSummary,
-  compareEquipmentPickerItemsByRecommendation,
   indexCharacterBuildCatalog,
   listReachableSpellOptions,
   normalizeAutomaticNpcBuildConstraints,
@@ -15,6 +14,7 @@ import {
   buildEquipmentPickerRecommendationContext,
   buildMinimalCharacterBuilderDraftForRecommendations,
 } from '@/features/character/lib/equipment/equipment-picker-recommendation-context.lib'
+import { sortEquipmentPickerItems } from '@/features/character/lib/equipment/sort-equipment-picker-items.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 
@@ -32,17 +32,6 @@ export type QuickNpcSpellRequirementOption = {
 export type QuickNpcRequirementOptionSets = {
   weapons: QuickNpcWeaponRequirementOption[]
   spells: QuickNpcSpellRequirementOption[]
-}
-
-function sortPickerItems(
-  items: EquipmentPickerItem[],
-  browseSortContext: ReturnType<
-    typeof buildEquipmentPickerRecommendationContext
-  >['browseSortContext'],
-): EquipmentPickerItem[] {
-  return [...items].sort((left, right) =>
-    compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
-  )
 }
 
 /** Single resolver for campaign-available weapon requirement options. */
@@ -69,7 +58,7 @@ export function resolveQuickNpcWeaponRequirementOptions(args: {
     catalogIndex,
   })
 
-  return sortPickerItems(items, browseSortContext).map((pickerItem) => ({
+  return sortEquipmentPickerItems(items, browseSortContext).map((pickerItem) => ({
     option: { value: pickerItem.equipment.id, label: pickerItem.equipment.name },
     pickerItem,
     row: buildEquipmentPickerRowViewModel(pickerItem.equipment),

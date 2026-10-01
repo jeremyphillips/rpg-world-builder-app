@@ -50,6 +50,7 @@ export function resolveQuickNpcTemplateRecommendations(args: {
           classPreferenceOverrideSlugs: titleRecommendation.classPreferenceOverrideSlugs,
           skillPreferenceSlugs: titleRecommendation.skillPreferenceSlugs,
           toolPreferenceSlugs: titleRecommendation.toolPreferenceSlugs,
+          equipmentPreferenceSlugs: titleRecommendation.equipmentPreferenceSlugs,
         }
       : undefined,
     organizationTemplateId: args.organizationTemplateId,

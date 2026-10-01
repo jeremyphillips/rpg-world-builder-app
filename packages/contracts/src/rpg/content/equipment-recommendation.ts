@@ -92,7 +92,6 @@ export type EquipmentRecommendation = {
 export type EquipmentRecommendationEvidence = {
   reason: EquipmentRecommendationReason
   tier: EquipmentRecommendationTier
-  sourceKey: string
   specificity: EquipmentRecommendationSpecificity
 }
 

@@ -1,5 +1,4 @@
 import {
-  compareEquipmentPickerItemsByRecommendation,
   indexCharacterBuildCatalog,
   isEquipmentPickerSupportedEquipment,
   optionIdentitiesOverlap,
@@ -15,6 +14,7 @@ import {
   buildEquipmentPickerRecommendationContext,
   buildMinimalCharacterBuilderDraftForRecommendations,
 } from '@/features/character/lib/equipment/equipment-picker-recommendation-context.lib'
+import { sortEquipmentPickerItems } from '@/features/character/lib/equipment/sort-equipment-picker-items.lib'
 import { resolveEquipmentKindFilterOptions } from '@/features/character/components/equipment/picker/drawer/equipment-picker-drawer.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
@@ -47,17 +47,6 @@ export function splitQuickNpcAdditionalEquipmentIds(args: {
   }
 
   return { requiredWeaponIds, manualEquipmentGrantIds }
-}
-
-function sortPickerItems(
-  items: EquipmentPickerItem[],
-  browseSortContext: ReturnType<
-    typeof buildEquipmentPickerRecommendationContext
-  >['browseSortContext'],
-): EquipmentPickerItem[] {
-  return [...items].sort((left, right) =>
-    compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
-  )
 }
 
 export function resolveQuickNpcAdditionalEquipmentOptions(args: {
@@ -106,7 +95,7 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
     catalogIndex,
   })
 
-  return sortPickerItems(items, browseSortContext).map((pickerItem) => ({
+  return sortEquipmentPickerItems(items, browseSortContext).map((pickerItem) => ({
     option: { value: pickerItem.equipment.id, label: pickerItem.equipment.name },
     pickerItem,
     row: buildEquipmentPickerRowViewModel(pickerItem.equipment),

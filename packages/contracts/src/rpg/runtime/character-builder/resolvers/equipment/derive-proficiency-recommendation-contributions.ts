@@ -18,6 +18,7 @@ import {
   readSelectedStartingEquipmentOptionId,
 } from './resolve-starting-equipment-choice-sets'
 import type { EquipmentRecommendationContribution } from './equipment-recommendation-contribution'
+import { classRecommendationSource } from './equipment-recommendation-evidence'
 
 export function poolHasSemanticCategories(pool: ToolProficiencyPool): boolean {
   return pool.source === 'filtered' && (pool.toolCategories?.length ?? 0) > 0
@@ -151,18 +152,6 @@ export function hasUnfulfilledCategoryEquipmentNeed(args: {
   return true
 }
 
-function fixedClassToolContributions(
-  characterClass: CharacterClass,
-): EquipmentRecommendationContribution[] {
-  const classId = characterClass.id
-  return (characterClass.proficiencies.tools?.items ?? []).map((toolReference) => ({
-    selector: { kind: 'equipment' as const, equipmentId: toolReference },
-    tier: 'essential' as const,
-    reason: 'classToolNeed' as const,
-    sourceKey: `${classId}:fixed-tool:${toolReference}`,
-  }))
-}
-
 function contributionsForResolvedToolChoice(args: {
   choiceSetId: string
   selections: readonly string[]
@@ -173,7 +162,8 @@ function contributionsForResolvedToolChoice(args: {
     selector: { kind: 'equipment' as const, equipmentId: optionId },
     tier: 'strong' as const,
     reason: 'selectedToolProficiency' as const,
-    sourceKey: choiceSetId,
+    dedupeKey: `${choiceSetId}:${optionId}`,
+    choiceSetId,
   }))
 }
 
@@ -188,7 +178,8 @@ function contributionForUnresolvedToolChoice(args: {
     selector: { kind: 'tool_proficiency_pool', pool },
     tier: 'strong',
     reason: 'unresolvedToolProficiencyChoice',
-    sourceKey: choiceSetId,
+    dedupeKey: choiceSetId,
+    choiceSetId,
     excludeEquipmentIds: selectedIds,
   }
 }
@@ -233,7 +224,10 @@ function contributionForPersistentToolCategory(args: {
     selector: { kind: 'tool_proficiency_pool', pool: categoryPool },
     tier: elevateCategory ? 'strong' : 'compatible',
     reason: 'classToolCategory',
-    sourceKey: `${choiceSetId}:category`,
+    dedupeKey: `${choiceSetId}:category`,
+    source: classRecommendationSource(classId),
+    basis: 'affinity',
+    choiceSetId,
     excludeEquipmentIds: selectedIds,
   }
 }
@@ -300,7 +294,6 @@ export function deriveProficiencyRecommendationContributions(args: {
   const toolChoices = characterClass.characterCreation?.proficiencies?.tools?.choices ?? []
 
   return [
-    ...fixedClassToolContributions(characterClass),
     ...toolChoices.flatMap((choice) =>
       contributionsForToolProficiencyChoice({
         choice,

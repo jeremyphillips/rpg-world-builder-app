@@ -338,7 +338,7 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(dagger.id)?.tier).toBe('compatible')
   })
 
-  it('marks item-level tool proficiencies as essential class tool needs', () => {
+  it('folds fixed tool proficiency into proficient compatibility instead of an essential class tool need', () => {
     const { catalogIndex, proficiencies } = buildContext(rogueClass, [thievesTools, longsword])
 
     const recommendations = deriveEquipmentRecommendations({
@@ -348,9 +348,20 @@ describe('deriveEquipmentRecommendations', () => {
     })
 
     expect(recommendations.get(thievesTools.id)).toMatchObject({
-      tier: 'essential',
-      reasons: expect.arrayContaining(['classToolNeed']),
+      tier: 'compatible',
+      reasons: ['proficient'],
     })
+    expect(recommendations.get(thievesTools.id)?.reasons).not.toContain('classToolNeed')
+    expect(recommendations.get(thievesTools.id)?.resolved?.state.compatibility).toMatchObject({
+      proficient: true,
+    })
+    expect(
+      recommendations.get(thievesTools.id)?.resolved?.state.compatibility?.proficiencySources,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'classFeature', sourceId: rogueClass.id }),
+      ]),
+    )
     expect(recommendations.get(longsword.id)?.tier).toBe('compatible')
   })
 
@@ -367,7 +378,81 @@ describe('deriveEquipmentRecommendations', () => {
       tier: 'essential',
       reasons: ['spellcastingFocus'],
     })
+    expect(recommendations.get(arcaneCrystal.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({
+        requirementId: `${storedWizard.id}:spellcasting-focus`,
+        rule: 'anyOf',
+        role: 'candidate',
+      }),
+    ])
     expect(recommendations.get(holySymbol.id)?.tier).toBe('neutral')
+  })
+
+  it('drops other focus candidates once one focus is owned', () => {
+    const wand = equipmentSchema.parse({
+      ...arcaneCrystal,
+      id: `${RULESET}:wand`,
+      slug: 'wand',
+      name: 'Wand',
+    })
+    const before = buildContext(storedWizard, [arcaneCrystal, wand, dagger])
+    const beforeRecommendations = deriveEquipmentRecommendations({
+      characterClass: storedWizard,
+      catalogIndex: before.catalogIndex,
+      proficiencies: before.proficiencies,
+      draft: before.draft,
+    })
+    const beforeItems = resolveEquipmentPickerItems({
+      equipment: [arcaneCrystal, wand, dagger],
+      proficiencies: before.proficiencies,
+      recommendations: beforeRecommendations,
+    })
+    const beforeOrder = [...beforeItems]
+      .sort(compareEquipmentPickerItemsByRecommendation)
+      .map((item) => item.equipment.name)
+
+    const owned = buildContext(storedWizard, [arcaneCrystal, wand, dagger], {
+      equipment: {
+        mode: 'gold',
+        purchases: [
+          {
+            equipmentId: arcaneCrystal.id,
+            quantity: 1,
+            sourceMode: 'startingGold',
+          },
+        ],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    })
+    const ownedRecommendations = deriveEquipmentRecommendations({
+      characterClass: storedWizard,
+      catalogIndex: owned.catalogIndex,
+      proficiencies: owned.proficiencies,
+      draft: owned.draft,
+    })
+
+    expect(ownedRecommendations.get(arcaneCrystal.id)?.tier).not.toBe('essential')
+    expect(ownedRecommendations.get(wand.id)?.reasons ?? []).not.toContain('spellcastingFocus')
+    expect(ownedRecommendations.get(arcaneCrystal.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({ role: 'satisfier' }),
+    ])
+    expect(ownedRecommendations.get(wand.id)?.resolved?.requirements).toEqual([])
+    expect(ownedRecommendations.get(wand.id)?.resolved?.state.compatibility).toMatchObject({
+      spellcastingFocusFor: { kind: 'class', id: storedWizard.id },
+    })
+
+    const ownedItems = resolveEquipmentPickerItems({
+      equipment: [arcaneCrystal, wand, dagger],
+      proficiencies: owned.proficiencies,
+      recommendations: ownedRecommendations,
+    })
+    const ownedOrder = [...ownedItems]
+      .sort(compareEquipmentPickerItemsByRecommendation)
+      .map((item) => item.equipment.name)
+
+    expect(beforeOrder).toEqual(['Crystal', 'Wand', 'Dagger'])
+    expect(ownedOrder).toEqual(['Dagger', 'Crystal', 'Wand'])
   })
 
   it('demotes focus gear to strong while spellcasting is not yet active', () => {
@@ -1082,6 +1167,11 @@ describe('resolveEquipmentPickerItems', () => {
     const daggerItem = items.find((item) => item.equipment.id === dagger.id)!
     expect(daggerItem.state.isRecommended).toBe(false)
     expect(daggerItem.state.recommendation.tier).toBe('compatible')
+    const proficientEvidence = daggerItem.state.evidence?.find(
+      (entry) => entry.reason === 'proficient',
+    )
+    expect(proficientEvidence).toMatchObject({ reason: 'proficient', tier: 'compatible' })
+    expect(proficientEvidence?.source).toBeUndefined()
   })
 
   it('excludes vehicle and service rows from picker results', () => {

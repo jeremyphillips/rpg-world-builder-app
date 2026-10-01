@@ -1,7 +1,6 @@
 import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
   EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
@@ -83,7 +82,7 @@ function getEssentialRecommendationCandidate(
     return {
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation,
       callout: {
-        label: EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
+        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
         intent: 'recommended',
         importance: 'high',
       },
@@ -100,12 +99,18 @@ function getEssentialRecommendationCandidate(
   }
 }
 
+function isClassGrantedProficientTool(item: EquipmentPickerItem): boolean {
+  if (item.equipment.kind !== 'tool') return false
+  const compatibility = item.state.resolved?.state.compatibility
+  return Boolean(compatibility?.proficient && (compatibility.proficiencySources?.length ?? 0) > 0)
+}
+
 function getCompatibilityCandidate(
   item: EquipmentPickerItem,
 ): EquipmentCalloutCandidate | undefined {
   const { reasons } = item.state.recommendation
 
-  if (reasons.includes('selectedToolProficiency')) {
+  if (reasons.includes('selectedToolProficiency') || isClassGrantedProficientTool(item)) {
     return {
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.compatibility,
       callout: {
