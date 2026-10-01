@@ -31,6 +31,10 @@ export type NpcTemplateRecommendations = {
   /** Empty unless the role works through tools. */
   readonly toolSlugs: readonly string[]
   readonly languageIds: readonly string[]
+  /** Ordered weapon equipment slugs. Bias only; never grants. */
+  readonly weaponSlugs: readonly string[]
+  /** Ordered armor equipment slugs. Bias only; never grants. */
+  readonly armorSlugs: readonly string[]
 }
 
 export type NpcTemplateKitItem = {
@@ -101,6 +105,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['animal-handling', 'athletics', 'perception', 'insight'],
       toolSlugs: [],
       languageIds: [],
+      weaponSlugs: ['club'],
+      armorSlugs: [],
     },
     levelZero: {
       wealthTier: 'poor',
@@ -119,6 +125,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['perception', 'athletics', 'intimidation', 'insight'],
       toolSlugs: [],
       languageIds: [],
+      weaponSlugs: ['spear', 'greatsword', 'javelin'],
+      armorSlugs: ['leather-armor', 'chain-mail'],
     },
     levelZero: {
       wealthTier: 'modest',
@@ -141,6 +149,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['perception', 'survival', 'stealth', 'nature'],
       toolSlugs: [],
       languageIds: [],
+      weaponSlugs: ['shortbow', 'dagger', 'longbow', 'scimitar'],
+      armorSlugs: ['leather-armor', 'studded-leather'],
     },
     levelZero: {
       wealthTier: 'modest',
@@ -168,6 +178,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['persuasion', 'insight', 'history', 'animal-handling'],
       toolSlugs: [],
       languageIds: ['dwarvish', 'elvish', 'halfling', 'gnomish'],
+      weaponSlugs: ['dagger'],
+      armorSlugs: [],
     },
     levelZero: {
       wealthTier: 'comfortable',
@@ -186,6 +198,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['persuasion', 'insight', 'investigation', 'history'],
       toolSlugs: ARTISAN_TOOL_SLUGS,
       languageIds: [],
+      weaponSlugs: [],
+      armorSlugs: [],
     },
     levelZero: {
       wealthTier: 'modest',
@@ -204,6 +218,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['history', 'arcana', 'investigation', 'religion'],
       toolSlugs: [],
       languageIds: ['draconic', 'elvish', 'dwarvish', 'giant'],
+      weaponSlugs: ['quarterstaff'],
+      armorSlugs: [],
     },
     levelZero: {
       wealthTier: 'modest',
@@ -222,6 +238,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['religion', 'insight', 'medicine', 'persuasion'],
       toolSlugs: [],
       languageIds: [],
+      weaponSlugs: ['mace'],
+      armorSlugs: ['chain-shirt', 'shield'],
     },
     levelZero: {
       wealthTier: 'modest',
@@ -243,6 +261,8 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['stealth', 'sleight-of-hand', 'deception', 'perception'],
       toolSlugs: ['thieves-tools', 'disguise-kit', 'forgery-kit'],
       languageIds: [],
+      weaponSlugs: ['dagger', 'shortsword', 'shortbow'],
+      armorSlugs: ['leather-armor'],
     },
     levelZero: {
       wealthTier: 'modest',

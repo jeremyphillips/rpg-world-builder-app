@@ -155,4 +155,23 @@ describe('resolveNpcTemplateRecommendations', () => {
     expect(preferences.skills?.[0]).toMatchObject({ id: 'perception', sources: ['template'] })
     expect(preferences.abilityPriority?.[0]).toBe('dex')
   })
+
+  it('merges user then role weapon and armor preferences into an equipment stream', () => {
+    const recommendations = resolveNpcTemplateRecommendations({
+      level: 1,
+      userTemplateId: 'guard',
+      userWeaponSlugs: ['longbow'],
+      playableClasses,
+    })
+    expect(recommendations.weapons[0]).toEqual({ id: 'longbow', sources: ['user'] })
+    expect(recommendations.weapons.map((entry) => entry.id)).toContain('spear')
+    expect(recommendations.armor.map((entry) => entry.id)).toContain('leather-armor')
+    const preferences = toAutomaticNpcBuildPreferences(recommendations)
+    expect(preferences.equipmentPreferences?.[0]).toMatchObject({
+      kind: 'weapon',
+      slug: 'longbow',
+      source: 'user',
+    })
+    expect(preferences.equipmentPreferences?.some((entry) => entry.slug === 'spear')).toBe(true)
+  })
 })

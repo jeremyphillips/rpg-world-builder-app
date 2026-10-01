@@ -1,5 +1,7 @@
 import type { CharacterClass } from '../../../content/classes/class'
+import { buildEquipmentPreferenceStream } from '../automatic/equipment-preference-stream'
 import type { AutomaticNpcBuildPreferences } from '../automatic/automatic-npc-build-seed'
+import type { NpcEquipmentPreferenceEntry } from '../automatic/equipment-preference-stream'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { type NpcRecommendationSource, type SourcedRecommendation } from '../sourced-recommendation'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
@@ -36,6 +38,8 @@ export type ResolveNpcTemplateRecommendationsInput = {
   userSkillSlugs?: readonly string[]
   userToolSlugs?: readonly string[]
   userLanguageIds?: readonly string[]
+  userWeaponSlugs?: readonly string[]
+  userArmorSlugs?: readonly string[]
   /** Full six-ability permutation. Wins ability order when complete. */
   userAbilityPriority?: readonly Ability[]
   title?: NpcTemplateRecommendationTitle
@@ -57,6 +61,9 @@ export type NpcTemplateRecommendationSet = {
   skills: SourcedRecommendation[]
   tools: SourcedRecommendation[]
   languages: SourcedRecommendation[]
+  weapons: SourcedRecommendation[]
+  armor: SourcedRecommendation[]
+  equipmentPreferences: readonly NpcEquipmentPreferenceEntry[]
   abilityPriority: readonly Ability[]
 }
 
@@ -184,10 +191,31 @@ function resolveLanguageRecommendations(
   ])
 }
 
+function resolveWeaponRecommendations(
+  input: ResolveNpcTemplateRecommendationsInput,
+  templateSlugs: readonly string[],
+): SourcedRecommendation[] {
+  return mergeOrderedRecommendations([
+    { ids: input.userWeaponSlugs ?? [], source: 'user' },
+    { ids: templateSlugs, source: 'template' },
+  ])
+}
+
+function resolveArmorRecommendations(
+  input: ResolveNpcTemplateRecommendationsInput,
+  templateSlugs: readonly string[],
+): SourcedRecommendation[] {
+  return mergeOrderedRecommendations([
+    { ids: input.userArmorSlugs ?? [], source: 'user' },
+    { ids: templateSlugs, source: 'template' },
+  ])
+}
+
 /**
  * One source-aware recommendation set for Quick NPC and automatic build.
  * Recommendations order existing choices. They never add slots, grants, or equipment.
  */
+// fallow-ignore-next-line complexity
 export function resolveNpcTemplateRecommendations(
   input: ResolveNpcTemplateRecommendationsInput,
 ): NpcTemplateRecommendationSet {
@@ -202,6 +230,14 @@ export function resolveNpcTemplateRecommendations(
     skills: resolveSkillRecommendations(input, recommendations?.skillSlugs ?? []),
     tools: resolveToolRecommendations(input, recommendations?.toolSlugs ?? []),
     languages: resolveLanguageRecommendations(input, recommendations?.languageIds ?? []),
+    weapons: resolveWeaponRecommendations(input, recommendations?.weaponSlugs ?? []),
+    armor: resolveArmorRecommendations(input, recommendations?.armorSlugs ?? []),
+    equipmentPreferences: buildEquipmentPreferenceStream({
+      userWeaponSlugs: input.userWeaponSlugs,
+      userArmorSlugs: input.userArmorSlugs,
+      templateWeaponSlugs: recommendations?.weaponSlugs ?? [],
+      templateArmorSlugs: recommendations?.armorSlugs ?? [],
+    }),
     abilityPriority: resolveAbilityPriority(input, recommendations?.abilityPriority),
   }
 }
@@ -215,5 +251,8 @@ export function toAutomaticNpcBuildPreferences(
     skills: recommendations.skills,
     tools: recommendations.tools,
     languages: recommendations.languages,
+    weapons: recommendations.weapons,
+    armor: recommendations.armor,
+    equipmentPreferences: recommendations.equipmentPreferences,
   }
 }

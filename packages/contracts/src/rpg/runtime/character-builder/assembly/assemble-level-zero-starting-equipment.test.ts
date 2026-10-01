@@ -5,6 +5,7 @@ import type { Equipment } from '../../../content/equipment'
 import { toEquipmentContentId } from '../../creature/equipment'
 import { fillChoiceSetWithConstraintAwareSelection } from '../automatic/automatic-npc-build-constraint-selection'
 import type { CharacterBuildCatalogIndex } from '../context'
+import { createCharacterBuildContext } from '../test-fixtures'
 import type { ChoiceSet } from '../choice-set'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { assembleLevelZeroStartingEquipment } from './assemble-level-zero-starting-equipment'
@@ -100,6 +101,7 @@ describe('fillChoiceSetWithConstraintAwareSelection held skills', () => {
       heldKeys: new Set(['athletics']),
       characterClass: undefined,
       catalogIndex: {} as unknown as CharacterBuildCatalogIndex,
+      context: createCharacterBuildContext(),
     })
     expect(filled?.draft.choiceSelections[choiceSet.id]).toEqual(['srd-cc-5.2.1:perception'])
   })

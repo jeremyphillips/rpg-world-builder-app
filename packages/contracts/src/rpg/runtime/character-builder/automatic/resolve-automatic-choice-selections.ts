@@ -162,6 +162,7 @@ export function resolveAutomaticChoiceSelections({
       }),
       characterClass,
       catalogIndex,
+      context,
     })
     if (filled === null) {
       return {

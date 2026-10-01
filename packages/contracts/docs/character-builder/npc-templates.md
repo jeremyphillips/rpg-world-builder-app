@@ -41,7 +41,8 @@ not cast. `wealthy` exists in the wealth-tier vocab and is unused by v1 roles.
 4. Class, only when class progression applies: user class ids replace the list. Otherwise a title `classPreferenceOverrideSlugs` replaces the role class list. Organization class affinities merge after that, ranked both → role/title → organization.
 5. Skills and tools: user, then title preferences, then the role. Title preferences are prepended and do not create slots.
 6. Languages: user, then species affinities, then the role. Species affinities order picks; they do not expand pools.
-7. Ability order: a complete user permutation wins; otherwise the role order.
+7. Weapons and armor: user, then the role. Title weapon/armor preferences are reserved for a future pass. They order class starting-equipment packages, nested equipment pools, and weapon or armor proficiency choices when option ids match. Held level-0 kit items are removed from the bias stream before scoring. Package scoring includes direct grants and one level of reachable nested pool contents.
+8. Ability order: a complete user permutation wins; otherwise the role order.
 
 `toAutomaticNpcBuildPreferences` flattens that result for automatic build. Soft preferences never fail a build. Held skills, tools, and languages are skipped. On a classed build, class primary abilities keep the top standard-array slots and the role orders the rest.
 

@@ -10,6 +10,7 @@ import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
+import type { NpcEquipmentPreferenceEntry } from './equipment-preference-stream'
 import type { SourcedRecommendation } from '../sourced-recommendation'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
@@ -42,6 +43,9 @@ export type AutomaticNpcBuildPreferences = {
   skills?: readonly SourcedRecommendation[]
   tools?: readonly SourcedRecommendation[]
   languages?: readonly SourcedRecommendation[]
+  weapons?: readonly SourcedRecommendation[]
+  armor?: readonly SourcedRecommendation[]
+  equipmentPreferences?: readonly NpcEquipmentPreferenceEntry[]
 }
 
 export const automaticNpcBuildAbilityPrioritySchema = z.array(abilitySchema).length(6)
