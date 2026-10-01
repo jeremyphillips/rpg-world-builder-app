@@ -1,7 +1,9 @@
 import {
+  getNpcTemplateEntry,
   indexCharacterBuildCatalog,
   isEquipmentPickerSupportedEquipment,
   optionIdentitiesOverlap,
+  resolveNpcTemplateEffectiveEquipmentPreferences,
   resolvePlayableBuilderContent,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -88,11 +90,22 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
     classId: args.setup.classId,
     level: args.setup.level,
   })
+  const roleId = args.setup.npcTemplateId
   const { items, browseSortContext } = buildEquipmentPickerRecommendationContext({
     equipment,
     draft,
     characterClass,
     catalogIndex,
+    ...(roleId
+      ? {
+          recommendationContext: {
+            roleId,
+            roleEquipmentPreferenceSlugs: resolveNpcTemplateEffectiveEquipmentPreferences(
+              getNpcTemplateEntry(roleId)?.recommendations.equipment,
+            ),
+          },
+        }
+      : {}),
   })
 
   return sortEquipmentPickerItems(items, browseSortContext).map((pickerItem) => ({

@@ -13,6 +13,7 @@ import {
   equipmentPickerMagicItemProgressFixture,
   equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
+  equipmentResolvedFixture,
 } from './equipment-picker-drawer.fixtures'
 
 const meta = {
@@ -149,6 +150,75 @@ export const OwnedStackable: Story = {
         story: 'Owned stackables show an owned-count badge and Add in the header row.',
       },
     },
+  },
+}
+
+export const RecommendationFacts: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [
+      {
+        ...equipmentPickerItemsFixture[0]!,
+        state: {
+          ...equipmentPickerItemsFixture[0]!.state,
+          resolved: equipmentResolvedFixture(
+            {
+              requirements: [
+                {
+                  requirementId: 'wizard:spellbook',
+                  owner: { kind: 'class', id: 'wizard' },
+                  rule: 'exact',
+                  role: 'candidate',
+                },
+              ],
+            },
+            (source) => (source.kind === 'class' ? 'Wizard' : undefined),
+          ),
+        },
+      },
+      {
+        ...equipmentPickerItemsFixture[2]!,
+        state: {
+          ...equipmentPickerItemsFixture[2]!.state,
+          resolved: equipmentResolvedFixture(
+            {
+              recommendation: {
+                strength: 'strong',
+                signals: [
+                  {
+                    strength: 'strong',
+                    basis: 'preference',
+                    specificity: 'exact',
+                    source: { kind: 'role', id: 'guard' },
+                  },
+                  {
+                    strength: 'strong',
+                    basis: 'authored',
+                    specificity: 'exact',
+                    source: { kind: 'class', id: 'fighter' },
+                  },
+                  {
+                    strength: 'strong',
+                    basis: 'preference',
+                    specificity: 'exact',
+                    source: { kind: 'user' },
+                  },
+                ],
+              },
+            },
+            (source) => {
+              if (source.kind === 'role') return 'Guard'
+              if (source.kind === 'class') return 'Fighter'
+              return undefined
+            },
+          ),
+        },
+      },
+    ],
+    budget: equipmentPickerBudgetFixture,
+    filterOutUnaffordable: false,
+    onCommitAdd: () => undefined,
   },
 }
 

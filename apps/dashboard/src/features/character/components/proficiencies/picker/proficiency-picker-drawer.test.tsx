@@ -162,6 +162,26 @@ describe('ProficiencyPickerDrawer', () => {
       state: {
         ...proficiencyPickerLanguageItemsFixture[0]!.state,
         isRecommended: true,
+        recommendation: {
+          strength: 'strong' as const,
+          signals: [
+            {
+              strength: 'strong' as const,
+              basis: 'affinity' as const,
+              specificity: 'exact' as const,
+              source: { kind: 'species' as const, id: 'srd-cc-5.2.1:dwarf' },
+            },
+          ],
+        },
+        presentation: {
+          facts: [
+            {
+              kind: 'recommendation' as const,
+              label: 'Recommended',
+              sourceLabels: ['Dwarf species'],
+            },
+          ],
+        },
       },
     }
 

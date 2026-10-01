@@ -116,7 +116,7 @@ describe('equipment preference stream', () => {
     expect(filtered.map((entry) => entry.slug)).toEqual(['longsword'])
   })
 
-  it('leaves suggestedBy unset when two sources tie on the winning tuple', () => {
+  it('keeps every source that ties on the winning tuple', () => {
     const stream = [
       {
         slug: 'longsword',
@@ -136,7 +136,10 @@ describe('equipment preference stream', () => {
       stream,
       catalogIndex: catalogIndex(),
     })
-    expect(suggestedSourcesForEquipmentPreferenceMatch(stream, match, [longsword.id])).toEqual([])
+    expect(suggestedSourcesForEquipmentPreferenceMatch(stream, match, [longsword.id])).toEqual([
+      'title',
+      'template',
+    ])
   })
 
   it('does not treat an unmaterialized role default as held', () => {

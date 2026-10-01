@@ -1,18 +1,26 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  grantedByLabel,
+  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+  OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
+  OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_PROFICIENT_LABEL,
+  OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
+  OPTION_PRESENTATION_STARTING_OPTION_LABEL,
+  requiredByLabel,
+  type ResolvedEquipmentOption,
+} from '@rpg/contracts'
+
+import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-  EQUIPMENT_PICKER_PROFICIENT_LABEL,
-  EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
-  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerItem,
 } from '../drawer/equipment-picker-drawer.types'
-import { equipmentPickerItemsFixture } from '../drawer/equipment-picker-drawer.fixtures'
+import {
+  equipmentPickerItemsFixture,
+  equipmentResolvedFixture,
+} from '../drawer/equipment-picker-drawer.fixtures'
 import {
   getEquipmentPickerCallout,
   selectHighestPriorityCallout,
@@ -70,143 +78,125 @@ describe('equipment-picker-callout.lib', () => {
       }
     }
 
-    it('maps recommendation tiers sparsely with intent and importance', () => {
-      const longsword = equipmentPickerItemsFixture[0]!
-      expect(getEquipmentPickerCallout(longsword)).toEqual({
-        label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
-        intent: 'recommended',
-        importance: 'medium',
+    function presentedItem(
+      resolved: Partial<ResolvedEquipmentOption>,
+      state: Partial<EquipmentPickerItem['state']> = {},
+    ): EquipmentPickerItem {
+      return badgeItem({
+        ...state,
+        recommendation: state.recommendation ?? {
+          tier: 'neutral',
+          reasons: [],
+          specificity: 'exact',
+        },
+        resolved: equipmentResolvedFixture(resolved),
       })
+    }
+
+    it('maps presentation facts to a single badge', () => {
+      const longsword = equipmentPickerItemsFixture[0]!
+      expect(getEquipmentPickerCallout(longsword)?.label).toBe(OPTION_PRESENTATION_IN_PACKAGE_LABEL)
 
       expect(getEquipmentPickerCallout(equipmentPickerItemsFixture[2]!)).toBeUndefined()
 
-      const essentialTool = badgeItem({
-        recommendation: { tier: 'essential', reasons: ['classToolNeed'] },
+      const required = presentedItem({
+        requirements: [
+          {
+            requirementId: 'wizard:spellbook',
+            owner: { kind: 'class', id: 'wizard' },
+            rule: 'exact',
+            role: 'candidate',
+          },
+        ],
       })
-      expect(getEquipmentPickerCallout(essentialTool)).toEqual({
-        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
-        intent: 'recommended',
-        importance: 'high',
-      })
+      expect(getEquipmentPickerCallout(required)?.label).toBe(requiredByLabel('Class'))
 
-      const essentialRule = badgeItem({
-        recommendation: { tier: 'essential', reasons: ['classRequired'] },
-      })
-      expect(getEquipmentPickerCallout(essentialRule)).toEqual({
-        label: EQUIPMENT_PICKER_ESSENTIAL_LABEL,
-        intent: 'recommended',
-        importance: 'high',
-      })
-
-      const labeledRule = badgeItem({
-        recommendation: {
-          tier: 'essential',
-          reasons: ['classRequired'],
-          label: 'Spellbook',
+      const labeledRule = presentedItem(
+        {
+          requirements: [
+            {
+              requirementId: 'wizard:spellbook',
+              owner: { kind: 'class', id: 'wizard' },
+              rule: 'exact',
+              role: 'candidate',
+            },
+          ],
         },
-      })
-      expect(getEquipmentPickerCallout(labeledRule)?.label).toBe(EQUIPMENT_PICKER_ESSENTIAL_LABEL)
-    })
-
-    it('shows Proficiency available for unresolved tool proficiency pools', () => {
-      const item = badgeItem({
-        isProficient: false,
-        isRecommended: true,
-        recommendation: {
-          tier: 'strong',
-          reasons: ['unresolvedToolProficiencyChoice', 'notProficient'],
+        {
+          recommendation: {
+            tier: 'essential',
+            reasons: ['classRequired'],
+            specificity: 'exact',
+            label: 'Spellbook',
+          },
         },
-      })
-
-      expect(getEquipmentPickerCallout(item)).toEqual({
-        label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-        intent: 'info',
-        importance: 'low',
-      })
-    })
-
-    it('prefers Proficiency available over Starting option and Not proficient', () => {
-      const item = badgeItem({
-        isProficient: false,
-        isRecommended: true,
-        recommendation: {
-          tier: 'strong',
-          reasons: ['unresolvedToolProficiencyChoice', 'startingEquipmentChoice', 'notProficient'],
-        },
-      })
-
-      expect(getEquipmentPickerCallout(item)?.label).toBe(
-        EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
       )
+      expect(getEquipmentPickerCallout(labeledRule)?.label).toBe(requiredByLabel('Class'))
     })
 
-    it('shows Proficient only for selected tool proficiency reason', () => {
-      const item = badgeItem({
-        isProficient: true,
-        isRecommended: true,
-        recommendation: { tier: 'strong', reasons: ['selectedToolProficiency'] },
-      })
+    it('shows an open pool as a starting option and keeps alternative packages on the gold path', () => {
+      const openPool = presentedItem(
+        {
+          state: {
+            choice: { inOpenPool: true, inSelectedPackage: false, inAlternativePackage: false },
+          },
+        },
+        { isProficient: false },
+      )
+      expect(getEquipmentPickerCallout(openPool)?.label).toBe(
+        OPTION_PRESENTATION_STARTING_OPTION_LABEL,
+      )
 
-      expect(getEquipmentPickerCallout(item)).toEqual({
-        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
+      const alternative = presentedItem({
+        state: {
+          choice: { inOpenPool: false, inSelectedPackage: false, inAlternativePackage: true },
+        },
+      })
+      expect(getEquipmentPickerCallout(alternative, { isGoldShoppingPath: true })?.label).toBe(
+        OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+      )
+      expect(getEquipmentPickerCallout(alternative, { isGoldShoppingPath: false })).toBeUndefined()
+    })
+
+    it('shows Proficient with grant provenance and Recommended with sources', () => {
+      const proficient = presentedItem({
+        state: {
+          compatibility: {
+            proficient: true,
+            proficiencySources: [{ kind: 'classFeature', sourceId: 'rogue', grantId: 'tools' }],
+          },
+        },
+      })
+      expect(getEquipmentPickerCallout(proficient)).toMatchObject({
+        label: OPTION_PRESENTATION_PROFICIENT_LABEL,
         intent: 'compatible',
-        importance: 'medium',
-      })
-    })
-
-    it('shows Common for your class for category siblings', () => {
-      const item = badgeItem({
-        isProficient: false,
-        isRecommended: false,
-        recommendation: { tier: 'compatible', reasons: ['classToolCategory'] },
+        title: grantedByLabel('Class'),
       })
 
-      expect(getEquipmentPickerCallout(item)).toEqual({
-        label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-        intent: 'info',
-        importance: 'low',
+      const recommended = presentedItem({
+        recommendation: {
+          strength: 'compatible',
+          signals: [
+            {
+              strength: 'compatible',
+              basis: 'affinity',
+              specificity: 'broad_pool',
+              source: { kind: 'class', id: 'bard' },
+              detail: { kind: 'toolCategory', toolCategory: 'tool' },
+            },
+          ],
+        },
       })
-    })
-
-    it('shows Standard gear for gold-path fixed grants', () => {
-      const item = badgeItem({
-        isProficient: true,
-        isRecommended: true,
-        recommendation: { tier: 'strong', reasons: ['availableInStartingOption', 'proficient'] },
-      })
-
-      expect(getEquipmentPickerCallout(item, { isGoldShoppingPath: true })).toEqual({
-        label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-        intent: 'info',
-        importance: 'low',
-      })
-      expect(getEquipmentPickerCallout(item, { isGoldShoppingPath: false })).toBeUndefined()
-    })
-
-    it('shows Starting option for unresolved package pools without proficiency overlap', () => {
-      const item = badgeItem({
-        isProficient: true,
-        isRecommended: true,
-        recommendation: { tier: 'strong', reasons: ['startingEquipmentChoice', 'proficient'] },
-      })
-
-      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)
-    })
-
-    it('leaves ordinary proficient weapons without a callout', () => {
-      const item = badgeItem({
-        isProficient: true,
-        isRecommended: false,
-        recommendation: { tier: 'compatible', reasons: ['proficient'] },
-      })
-
-      expect(getEquipmentPickerCallout(item)).toBeUndefined()
+      expect(getEquipmentPickerCallout(recommended)?.label).toBe(
+        OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
+      )
     })
 
     it('shows Not proficient for unrelated tools', () => {
       const item = badgeItem({
         isProficient: false,
         isRecommended: false,
+        resolved: undefined,
         recommendation: { tier: 'notRecommended', reasons: ['notProficient'] },
       })
 
@@ -214,30 +204,39 @@ describe('equipment-picker-callout.lib', () => {
         label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
         intent: 'warning',
         importance: 'medium',
+        factKind: 'caution',
       })
     })
 
-    it('prefers essential blockers over proficiency-state copy', () => {
-      const item = badgeItem({
-        isProficient: false,
-        isRecommended: true,
-        recommendation: {
-          tier: 'essential',
-          reasons: ['classToolNeed', 'unresolvedToolProficiencyChoice'],
+    it('prefers a requirement over an open pool', () => {
+      const item = presentedItem(
+        {
+          requirements: [
+            {
+              requirementId: 'wizard:spellbook',
+              owner: { kind: 'class', id: 'wizard' },
+              rule: 'exact',
+              role: 'candidate',
+            },
+          ],
+          state: {
+            choice: { inOpenPool: true, inSelectedPackage: false, inAlternativePackage: false },
+          },
         },
-      })
+        { isProficient: false },
+      )
 
-      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_PROFICIENT_LABEL)
+      expect(getEquipmentPickerCallout(item)?.label).toBe(requiredByLabel('Class'))
     })
 
-    it('maps spellcasting focus to recommended medium', () => {
-      const item = badgeItem({
-        recommendation: { tier: 'essential', reasons: ['spellcastingFocus'] },
+    it('maps leftover spellcasting focus compatibility to the focus label', () => {
+      const item = presentedItem({
+        state: { compatibility: { spellcastingFocusFor: { kind: 'class', id: 'wizard' } } },
       })
 
-      expect(getEquipmentPickerCallout(item)).toEqual({
-        label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
-        intent: 'recommended',
+      expect(getEquipmentPickerCallout(item)).toMatchObject({
+        label: OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
+        intent: 'info',
         importance: 'medium',
       })
     })
@@ -262,6 +261,7 @@ describe('equipment-picker-callout.lib', () => {
         label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
         intent: 'warning',
         importance: 'medium',
+        factKind: 'caution',
       })
     })
   })
@@ -274,24 +274,32 @@ describe('equipment-picker-callout.lib', () => {
         label: EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
         intent: 'blocking',
         importance: 'high',
+        factKind: 'blocking',
       })
     })
 
-    it('prefers essential recommendation over general recommendation', () => {
-      const item: EquipmentPickerItem = {
+    it('prefers a requirement badge over package state', () => {
+      const item = {
         ...equipmentPickerItemsFixture[0]!,
         state: {
           ...equipmentPickerItemsFixture[0]!.state,
-          isProficient: false,
-          recommendation: {
-            tier: 'essential',
-            reasons: ['classToolNeed', 'startingEquipmentChoice'],
-            specificity: 'exact',
-          },
+          resolved: equipmentResolvedFixture({
+            requirements: [
+              {
+                requirementId: 'wizard:spellbook',
+                owner: { kind: 'class', id: 'wizard' },
+                rule: 'exact',
+                role: 'candidate',
+              },
+            ],
+            state: {
+              choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
+            },
+          }),
         },
       }
 
-      expect(getEquipmentPickerCallout(item)?.label).toBe(EQUIPMENT_PICKER_PROFICIENT_LABEL)
+      expect(getEquipmentPickerCallout(item)?.label).toBe(requiredByLabel('Class'))
     })
   })
 })

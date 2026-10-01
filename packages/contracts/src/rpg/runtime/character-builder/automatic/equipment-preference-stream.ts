@@ -135,7 +135,16 @@ export function bestEquipmentPreferenceMatchForReachableIds(args: {
   return best
 }
 
-/** Sources to record when exactly one recommendation source owns the winning tuple. */
+const SUGGESTED_SOURCE_ORDER = [
+  'user',
+  'title',
+  'organization',
+  'template',
+  'species',
+  'campaign',
+] as const satisfies readonly NpcRecommendationSource[]
+
+/** Every source that owns the winning tuple, in source-priority order. */
 export function suggestedSourcesForEquipmentPreferenceMatch(
   stream: readonly NpcEquipmentPreferenceEntry[],
   match: EquipmentPreferenceMatch | undefined,
@@ -153,6 +162,7 @@ export function suggestedSourcesForEquipmentPreferenceMatch(
     }
   }
 
-  if (owners.size !== 1) return []
-  return [owners.values().next().value!]
+  return [...owners].sort(
+    (left, right) => SUGGESTED_SOURCE_ORDER.indexOf(left) - SUGGESTED_SOURCE_ORDER.indexOf(right),
+  )
 }

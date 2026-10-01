@@ -6,6 +6,7 @@ import { BuilderInventoryRemoveAction } from '../../../components/builder/invent
 export type QuickNpcStartingChoiceSelectedRowProps = {
   label: string
   suggestionHint?: string
+  suggestionTitle?: string
   alsoGrantedHint?: string
   onRemove: () => void
 }
@@ -14,6 +15,7 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
 export function QuickNpcStartingChoiceSelectedRow({
   label,
   suggestionHint,
+  suggestionTitle,
   alsoGrantedHint,
   onRemove,
 }: QuickNpcStartingChoiceSelectedRowProps) {
@@ -23,7 +25,7 @@ export function QuickNpcStartingChoiceSelectedRow({
       entity={{
         heading: label,
         description: description ? (
-          <Text variant="caption" className="text-muted-foreground">
+          <Text variant="caption" title={suggestionTitle} className="text-muted-foreground">
             {description}
           </Text>
         ) : undefined,

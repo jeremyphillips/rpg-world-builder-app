@@ -64,7 +64,7 @@ const resolveCanonicalStartingChoiceAllowanceMock = vi.hoisted(() =>
   vi.fn(
     (): {
       selectedIds: readonly string[]
-      suggestedBy?: Readonly<Record<string, readonly ('template' | 'title' | 'species')[]>>
+      suggestedBy?: Readonly<Record<string, readonly { kind: 'role'; id: 'guard' }[]>>
     } => ({ selectedIds: ['perception'] }),
   ),
 )
@@ -186,7 +186,7 @@ describe('QuickNpcStartingChoices', () => {
     const user = userEvent.setup()
     resolveCanonicalStartingChoiceAllowanceMock.mockReturnValue({
       selectedIds: ['perception'],
-      suggestedBy: { perception: ['template'] },
+      suggestedBy: { perception: [{ kind: 'role', id: 'guard' }] },
     })
     render(
       <StartingChoicesHarness

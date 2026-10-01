@@ -21,6 +21,7 @@ export {
   recommendationSourceRefFromDisplaySourceKind,
   recommendationSourceRefFromKind,
   recommendationSourceRefFromNpcRecommendationSource,
+  recommendationSourceRefsFromNpcSources,
   recommendationSourceRefFromOrganizationClassSource,
   RECOMMENDATION_DISPLAY_SOURCE_KINDS,
 } from './recommendation-source-adapters'
@@ -65,3 +66,30 @@ export {
 } from './recommendation-comparators'
 
 export { resolveOptionContextRelevance } from './option-context-relevance'
+
+export {
+  grantedByLabel,
+  includedQuantityLabel,
+  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+  OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
+  OPTION_PRESENTATION_FACT_KINDS,
+  OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
+  OPTION_PRESENTATION_PROFICIENT_LABEL,
+  OPTION_PRESENTATION_RECOMMENDED_LABEL,
+  OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
+  OPTION_PRESENTATION_STARTING_OPTION_LABEL,
+  recommendationSourceLabels,
+  requiredByLabel,
+  satisfiesFocusRequirementLabel,
+  softRecommendationFact,
+} from './resolve-option-presentation-facts'
+export type {
+  OptionPresentationFact,
+  OptionPresentationFactKind,
+  OptionPresentationFacts,
+  RecommendationSourceName,
+} from './resolve-option-presentation-facts'
+
+export { resolveEquipmentPresentationFacts } from './resolve-equipment-presentation-facts'
+export type { EquipmentOpenPoolKind } from './resolve-equipment-presentation-facts'

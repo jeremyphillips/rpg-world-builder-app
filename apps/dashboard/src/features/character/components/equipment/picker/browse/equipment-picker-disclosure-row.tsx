@@ -10,7 +10,10 @@ import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce'
 import { buildEquipmentPickerEntityStatus } from '../callouts/equipment-picker-callout-presentation.lib'
-import { getEquipmentPickerCallout } from '../callouts/equipment-picker-callout.lib'
+import {
+  getEquipmentPickerCallout,
+  getEquipmentPickerSecondaryLabels,
+} from '../callouts/equipment-picker-callout.lib'
 import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
 import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
 
@@ -38,7 +41,9 @@ export function EquipmentPickerDisclosureRow({
 
   const item = rowArgs.item
   const row = buildEquipmentPickerRowViewModel(item.equipment)
-  const callout = getEquipmentPickerCallout(item, { isGoldShoppingPath })
+  const calloutContext = { isGoldShoppingPath }
+  const callout = getEquipmentPickerCallout(item, calloutContext)
+  const secondaryLabels = getEquipmentPickerSecondaryLabels(item, calloutContext)
   const addButtonLabel = resolveAcquisitionCommitButtonLabel({
     isPending,
     successQuantity,
@@ -88,6 +93,7 @@ export function EquipmentPickerDisclosureRow({
         ),
         status: buildEquipmentPickerEntityStatus({
           callout,
+          secondaryLabels,
           statusItems: presentation.statusItems,
         }),
       }}

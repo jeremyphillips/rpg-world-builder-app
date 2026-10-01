@@ -81,12 +81,14 @@ Commoner is the resolver-only fallback and is not written onto the draft.
 
 The required-ChoiceSet loop is `resolveAutomaticChoiceSelections`. It returns the draft,
 the resolved graph, and `suggestedBy` for each id the fill added (`[]` when the id came
-from canonical order). Seeded allowance ids are not attributed. `resolveAutomaticNpcBuild`
+from canonical order). Each value is a `RecommendationSourceRef` list. Package bias keeps
+every source that owns the winning tuple. Seeded allowance ids are not attributed. `resolveAutomaticNpcBuild`
 runs that loop, then magic-item grants, required-weapon grants, and constraint checks.
 
-Fill order for each required ChoiceSet is hard constraints, then soft preferences, then
-the canonical first-eligible option. Already-held skills, tools, and languages are skipped
-and do not count toward the required pick. Held ids come from finalize-equivalent
+Fill order for each required ChoiceSet is hard constraints, then class spell recommendations,
+then soft preferences, then the canonical first-eligible option. Class spell recommendations
+are recorded as `suggestedBy` refs `{ kind: 'class', id }`. Already-held skills, tools, and
+languages are skipped and do not count toward the required pick. Held ids come from finalize-equivalent
 proficiency assembly (`resolveHeldProficiencyKeys`), excluding the ChoiceSet being filled,
 so class-fixed items, ruleset languages, and earlier ChoiceSet selections are all visible
 to later fills.

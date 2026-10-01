@@ -37,6 +37,13 @@ import {
 } from './derive-equipment-recommendation-contributions'
 import { classRecommendationSource } from './equipment-recommendation-evidence'
 import {
+  resolveEquipmentPresentationFacts,
+  type EquipmentOpenPoolKind,
+  type RecommendationSourceName,
+  type RecommendationSourceRef,
+} from '../../recommendation'
+import { getNpcTemplateLabel, type NpcTemplateId } from '../../../../vocab/npc/npc-template'
+import {
   listOwnedEquipmentIds,
   projectEquipmentCatalogFacts,
 } from './project-equipment-option-facts'
@@ -45,6 +52,16 @@ import { specificityForMatchCount } from './equipment-recommendation-specificity
 /** MVP builds level-1 characters; the level-up wizard will pass real levels. */
 const DEFAULT_CLASS_LEVEL = 1
 
+/** Class is the derive argument. Role, title, species, and user preferences are optional peers. */
+export type EquipmentRecommendationContext = {
+  speciesId?: string
+  roleId?: NpcTemplateId
+  title?: { organizationId: string; titleId: string }
+  userEquipmentPreferenceSlugs?: readonly string[]
+  titleEquipmentPreferenceSlugs?: readonly string[]
+  roleEquipmentPreferenceSlugs?: readonly string[]
+}
+
 export type DeriveEquipmentRecommendationsArgs = {
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
@@ -52,6 +69,7 @@ export type DeriveEquipmentRecommendationsArgs = {
   classLevel?: number
   draft?: CharacterBuilderDraft
   choiceSets?: readonly ChoiceSet[]
+  recommendationContext?: EquipmentRecommendationContext
 }
 
 /** Named starting-package items for focus inference when no package is selected yet. */
@@ -366,6 +384,12 @@ export function deriveEquipmentRecommendations(
     classLevel,
   })
 
+  applyContextEquipmentPreferences({
+    accumulators,
+    catalogIndex,
+    recommendationContext: args.recommendationContext,
+  })
+
   const recommendations = new Map<string, DerivedEquipmentRecommendation>()
   for (const equipment of catalogIndex.equipment.values()) {
     applyProficiencyContributions(accumulators, equipment, proficiencies)
@@ -393,10 +417,111 @@ export function deriveEquipmentRecommendations(
     ownedIds,
   })
 
+  const sourceName = equipmentRecommendationSourceName(catalogIndex)
   for (const [equipmentId, recommendation] of recommendations) {
     const resolved = facts.get(equipmentId)
-    if (resolved) recommendations.set(equipmentId, { ...recommendation, resolved })
+    if (!resolved) continue
+    recommendations.set(equipmentId, {
+      ...recommendation,
+      resolved: {
+        ...resolved,
+        presentation: resolveEquipmentPresentationFacts({
+          resolved,
+          sourceName,
+          authoredLabel: recommendation.label,
+          openPoolKind: openPoolKindFromEvidence(recommendation.evidence),
+        }),
+      },
+    })
   }
 
   return recommendations
+}
+
+function applyContextEquipmentPreferences(args: {
+  accumulators: AccumulatorMap
+  catalogIndex: CharacterBuildCatalogIndex
+  recommendationContext: EquipmentRecommendationContext | undefined
+}): void {
+  const context = args.recommendationContext
+  if (!context) return
+  if (context.userEquipmentPreferenceSlugs?.length) {
+    applyEquipmentPreferenceSignals({
+      accumulators: args.accumulators,
+      catalogIndex: args.catalogIndex,
+      slugs: context.userEquipmentPreferenceSlugs,
+      source: { kind: 'user' },
+    })
+  }
+  if (
+    context.title &&
+    context.titleEquipmentPreferenceSlugs &&
+    context.titleEquipmentPreferenceSlugs.length > 0
+  ) {
+    applyEquipmentPreferenceSignals({
+      accumulators: args.accumulators,
+      catalogIndex: args.catalogIndex,
+      slugs: context.titleEquipmentPreferenceSlugs,
+      source: {
+        kind: 'title',
+        organizationId: context.title.organizationId,
+        titleId: context.title.titleId,
+      },
+    })
+  }
+  if (context.roleId && context.roleEquipmentPreferenceSlugs?.length) {
+    applyEquipmentPreferenceSignals({
+      accumulators: args.accumulators,
+      catalogIndex: args.catalogIndex,
+      slugs: context.roleEquipmentPreferenceSlugs,
+      source: { kind: 'role', id: context.roleId },
+    })
+  }
+}
+
+/**
+ * Preference slugs are soft signals. The legacy reason stays `classSuggested` so the
+ * tier lift is unchanged; provenance is the source ref, not a new reason.
+ */
+function applyEquipmentPreferenceSignals(args: {
+  accumulators: AccumulatorMap
+  catalogIndex: CharacterBuildCatalogIndex
+  slugs: readonly string[]
+  source: RecommendationSourceRef
+}): void {
+  const slugs = new Set(args.slugs)
+  for (const equipment of args.catalogIndex.equipment.values()) {
+    if (!slugs.has(equipment.slug)) continue
+    addRecommendationContribution(
+      args.accumulators,
+      equipment.id,
+      'strong',
+      'classSuggested',
+      'exact',
+      { source: args.source, basis: 'preference' },
+    )
+  }
+}
+
+function equipmentRecommendationSourceName(
+  catalogIndex: CharacterBuildCatalogIndex,
+): RecommendationSourceName {
+  return (source) => {
+    if (source.kind === 'class') return catalogIndex.classes.get(source.id)?.name
+    if (source.kind === 'species') return catalogIndex.species.get(source.id)?.name
+    if (source.kind === 'role') return getNpcTemplateLabel(source.id)
+    return undefined
+  }
+}
+
+function openPoolKindFromEvidence(
+  evidence: readonly { reason: string }[],
+): EquipmentOpenPoolKind | undefined {
+  if (evidence.some((entry) => entry.reason === 'unresolvedToolProficiencyChoice')) {
+    return 'toolProficiency'
+  }
+  if (evidence.some((entry) => entry.reason === 'startingEquipmentChoice')) {
+    return 'startingEquipment'
+  }
+  return undefined
 }

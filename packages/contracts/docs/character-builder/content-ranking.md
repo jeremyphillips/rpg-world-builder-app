@@ -105,6 +105,8 @@ Lower historical ranks (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
 
 `classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
 
+Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by Wizard class", "Spellcasting focus", "In your package"). The dashboard maps those facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
+
 ### Legacy comparator steps
 
 `compareLegacyEquipmentPickerItems` remains for `rankingMode: 'parity'` and for rows that have no split facts:

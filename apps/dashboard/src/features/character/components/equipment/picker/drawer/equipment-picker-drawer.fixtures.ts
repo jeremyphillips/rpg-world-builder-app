@@ -1,4 +1,10 @@
-import type { Equipment } from '@rpg/contracts'
+import {
+  NEUTRAL_OPTION_RECOMMENDATION,
+  resolveEquipmentPresentationFacts,
+  type Equipment,
+  type RecommendationSourceName,
+  type ResolvedEquipmentOption,
+} from '@rpg/contracts'
 
 import { makeEquipment } from '@/test/fixtures/factories/equipment'
 import { pickEquipment } from '@/test/fixtures/pick'
@@ -65,6 +71,22 @@ export const equipmentPickerPotionFixture = pickEquipment('potion-of-healing')
 
 const purchaseAvailabilityAvailable = { status: 'available' as const }
 const purchaseAvailabilityUnaffordable = { status: 'unaffordable' as const, shortfallCp: 1 }
+
+export function equipmentResolvedFixture(
+  overrides: Partial<ResolvedEquipmentOption> = {},
+  sourceName?: RecommendationSourceName,
+): ResolvedEquipmentOption {
+  const resolved: ResolvedEquipmentOption = {
+    requirements: [],
+    recommendation: NEUTRAL_OPTION_RECOMMENDATION,
+    state: {},
+    ...overrides,
+  }
+  return {
+    ...resolved,
+    presentation: resolveEquipmentPresentationFacts({ resolved, sourceName }),
+  }
+}
 
 export function pickerState(
   state: Omit<EquipmentPickerItem['state'], 'purchaseAvailability'> & {
@@ -153,6 +175,11 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
         reasons: ['startingEquipment', 'proficient'],
         specificity: 'exact',
       },
+      resolved: equipmentResolvedFixture({
+        state: {
+          choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
+        },
+      }),
       disabledReasons: [],
     },
   }),

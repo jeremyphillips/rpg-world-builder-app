@@ -18,6 +18,12 @@ import {
 import { ensureEquipmentGrant } from '../resolvers/equipment/ensure-equipment-grant'
 import { optionIdentityKeys, optionIsHeld } from '../option-identity'
 import type { NpcRecommendationSource, SourcedRecommendation } from '../sourced-recommendation'
+import {
+  recommendationSourceRefsFromNpcSources,
+  type RecommendationSourceIdentity,
+  type RecommendationSourceRef,
+} from '../recommendation'
+import { resolveRecommendedSpellIdsForChoiceSet } from '../resolvers/spellcasting/resolve-spell-recommendations'
 import type { AutomaticNpcBuildConstraints } from './automatic-npc-build-constraints'
 import type { AutomaticNpcBuildPreferences } from './automatic-npc-build-seed'
 import {
@@ -32,6 +38,38 @@ import {
 } from './equipment-preference-stream'
 import { collectReachableStartingEquipmentFromPackage } from './list-reachable-starting-equipment'
 import { startingEquipmentOptionProvidesWeapon } from './list-reachable-starting-weapons'
+
+function recommendationIdentityForFill(
+  draft: CharacterBuilderDraft,
+  preferences: AutomaticNpcBuildPreferences | undefined,
+): RecommendationSourceIdentity {
+  return {
+    ...preferences?.recommendationIdentity,
+    classId: draft.class.classId ?? preferences?.recommendationIdentity?.classId,
+    speciesId: draft.species.speciesId ?? preferences?.recommendationIdentity?.speciesId,
+    roleId: draft.npcTemplateId ?? preferences?.recommendationIdentity?.roleId,
+  }
+}
+
+function classRecommendedSpellOptionIds(args: {
+  choiceSet: ChoiceSet
+  characterClass: CharacterClass | undefined
+  catalogIndex: CharacterBuildCatalogIndex
+  classLevel: number
+}): string[] {
+  if (!args.characterClass) return []
+  if (args.choiceSet.choiceType !== 'spell' && args.choiceSet.choiceType !== 'cantrip') return []
+  return [
+    ...resolveRecommendedSpellIdsForChoiceSet({
+      spellcasting: args.characterClass.spellcasting,
+      choiceSetId: args.choiceSet.id,
+      classId: args.characterClass.id,
+      classLevel: args.classLevel,
+      choiceSetOptionIds: args.choiceSet.options.map((option) => option.id),
+      catalogSpellsById: args.catalogIndex.spells,
+    }),
+  ]
+}
 
 function preferredConstraintOptionIds(
   choiceSet: ChoiceSet,
@@ -113,7 +151,7 @@ function selectStartingEquipmentPackageByPreferences(args: {
   context: CharacterBuildContext
 }): {
   packageIds: string[]
-  suggestedBy: Record<string, readonly NpcRecommendationSource[]>
+  suggestedBy: Record<string, readonly RecommendationSourceRef[]>
 } | null {
   const { choiceSet, current, characterClass, catalogIndex, preferences, draft, context } = args
   const needed = Math.max(0, choiceSet.min - current.length)
@@ -161,11 +199,10 @@ function selectStartingEquipmentPackageByPreferences(args: {
   const winner = ranked[0]
   if (!winner) return null
 
-  const suggestedBy: Record<string, readonly NpcRecommendationSource[]> = {}
-  const sources = suggestedSourcesForEquipmentPreferenceMatch(
-    stream,
-    winner.match,
-    winner.reachableIds,
+  const suggestedBy: Record<string, readonly RecommendationSourceRef[]> = {}
+  const sources = recommendationSourceRefsFromNpcSources(
+    suggestedSourcesForEquipmentPreferenceMatch(stream, winner.match, winner.reachableIds),
+    recommendationIdentityForFill(draft, preferences),
   )
   if (sources.length > 0) suggestedBy[winner.optionId] = sources
 
@@ -347,7 +384,7 @@ function appendEquipmentPreferenceOrderedOptions(args: {
   equipmentPreferenceContext: CharacterBuildContext
   canonicalOptions: ChoiceSet['options']
   needed: number
-  take: (optionId: string, sources: readonly NpcRecommendationSource[] | undefined) => void
+  take: (optionId: string, sources: readonly RecommendationSourceRef[] | undefined) => void
   additions: readonly string[]
 }): void {
   const stream = filterHeldEquipmentPreferences(
@@ -365,7 +402,10 @@ function appendEquipmentPreferenceOrderedOptions(args: {
       stream,
       catalogIndex: args.equipmentPreferenceCatalogIndex,
     })
-    const sources = suggestedSourcesForEquipmentPreferenceMatch(stream, match, [option.id])
+    const sources = recommendationSourceRefsFromNpcSources(
+      suggestedSourcesForEquipmentPreferenceMatch(stream, match, [option.id]),
+      recommendationIdentityForFill(args.equipmentPreferenceDraft, args.preferences),
+    )
     args.take(option.id, sources.length > 0 ? sources : undefined)
   }
 }
@@ -429,6 +469,88 @@ function resolveStartingEquipmentPackageFill(args: {
   }
 }
 
+type ChoiceFillTake = (
+  optionId: string,
+  sources: readonly RecommendationSourceRef[] | undefined,
+) => void
+
+type ChoiceSetFillState = {
+  additions: string[]
+  suggestedBy: Record<string, readonly RecommendationSourceRef[]>
+}
+
+function createChoiceFillTake(args: {
+  needed: number
+  selected: ReadonlySet<string>
+  state: ChoiceSetFillState
+  choiceSet: ChoiceSet
+  heldKeys?: ReadonlySet<string>
+}): ChoiceFillTake {
+  return (optionId, sources) => {
+    if (args.state.additions.length >= args.needed) return
+    if (args.selected.has(optionId) || args.state.additions.includes(optionId)) return
+    if (choiceOptionIsHeld(args.choiceSet, optionId, args.heldKeys)) return
+    args.state.additions.push(optionId)
+    args.state.suggestedBy[optionId] = sources ? [...sources] : []
+  }
+}
+
+function takeListedChoiceOptions(args: {
+  ids: readonly string[]
+  choiceSet: ChoiceSet
+  take: ChoiceFillTake
+  sourcesFor: (optionId: string) => readonly RecommendationSourceRef[] | undefined
+}): void {
+  for (const optionId of args.ids) {
+    if (!args.choiceSet.options.some((option) => option.id === optionId)) continue
+    args.take(optionId, args.sourcesFor(optionId))
+  }
+}
+
+function takePreferenceChoiceOptions(args: {
+  choiceSet: ChoiceSet
+  preferences: readonly SourcedRecommendation[]
+  identity: RecommendationSourceIdentity
+  take: ChoiceFillTake
+}): void {
+  for (const preference of args.preferences) {
+    const optionId = matchChoiceOption(args.choiceSet, preference.id)
+    if (!optionId) continue
+    args.take(optionId, recommendationSourceRefsFromNpcSources(preference.sources, args.identity))
+  }
+}
+
+function takeCanonicalChoiceOptions(
+  args: Parameters<typeof selectChoiceSetFill>[0] & {
+    needed: number
+    state: ChoiceSetFillState
+    take: ChoiceFillTake
+  },
+): void {
+  if (!usesEquipmentPreferenceOrderingForChoiceSet(args)) {
+    for (const option of args.choiceSet.options) args.take(option.id, undefined)
+    return
+  }
+
+  appendEquipmentPreferenceOrderedOptions({
+    choiceSet: args.choiceSet,
+    preferences: args.preferences,
+    equipmentPreferenceCatalogIndex: args.equipmentPreferenceCatalogIndex!,
+    equipmentPreferenceDraft: args.equipmentPreferenceDraft!,
+    equipmentPreferenceContext: args.equipmentPreferenceContext!,
+    canonicalOptions: equipmentChoiceOptionsInPreferenceOrder({
+      choiceSet: args.choiceSet,
+      preferences: args.preferences,
+      draft: args.equipmentPreferenceDraft!,
+      catalogIndex: args.equipmentPreferenceCatalogIndex!,
+      context: args.equipmentPreferenceContext!,
+    }),
+    needed: args.needed,
+    take: args.take,
+    additions: args.state.additions,
+  })
+}
+
 /**
  * Preference-then-canonical fill for one ChoiceSet.
  * Already-held options are skipped and do not satisfy the required count.
@@ -441,69 +563,48 @@ export function selectChoiceSetFill(args: {
   preferences?: AutomaticNpcBuildPreferences
   heldKeys?: ReadonlySet<string>
   hardPreferredIds?: readonly string[]
+  /** Class spell recommendations, after hard constraints and before canonical order. */
+  classRecommendedIds?: readonly string[]
+  classSource?: RecommendationSourceRef
+  recommendationIdentity?: RecommendationSourceIdentity
   equipmentPreferenceCatalogIndex?: CharacterBuildCatalogIndex
   equipmentPreferenceDraft?: CharacterBuilderDraft
   equipmentPreferenceContext?: CharacterBuildContext
-}): {
-  additions: string[]
-  suggestedBy: Record<string, readonly NpcRecommendationSource[]>
-} {
+}): ChoiceSetFillState {
   const needed = Math.max(0, args.choiceSet.min - args.current.length)
   if (needed === 0) return { additions: [], suggestedBy: {} }
 
-  const preferences = preferenceEntriesForChoiceSet(args.choiceSet, args.preferences)
-  const selected = new Set(args.current)
-  const additions: string[] = []
-  const suggestedBy: Record<string, readonly NpcRecommendationSource[]> = {}
+  const state: ChoiceSetFillState = { additions: [], suggestedBy: {} }
+  const take = createChoiceFillTake({
+    needed,
+    selected: new Set(args.current),
+    state,
+    choiceSet: args.choiceSet,
+    heldKeys: args.heldKeys,
+  })
+  const classSource = args.classSource ? [args.classSource] : []
 
-  function take(optionId: string, sources: readonly NpcRecommendationSource[] | undefined): void {
-    if (additions.length >= needed) return
-    if (selected.has(optionId) || additions.includes(optionId)) return
-    if (choiceOptionIsHeld(args.choiceSet, optionId, args.heldKeys)) return
-    additions.push(optionId)
-    suggestedBy[optionId] = sources ? [...sources] : []
-  }
+  takeListedChoiceOptions({
+    ids: args.hardPreferredIds ?? [],
+    choiceSet: args.choiceSet,
+    take,
+    sourcesFor: () => undefined,
+  })
+  takeListedChoiceOptions({
+    ids: args.classRecommendedIds ?? [],
+    choiceSet: args.choiceSet,
+    take,
+    sourcesFor: () => classSource,
+  })
+  takePreferenceChoiceOptions({
+    choiceSet: args.choiceSet,
+    preferences: preferenceEntriesForChoiceSet(args.choiceSet, args.preferences),
+    identity: args.recommendationIdentity ?? {},
+    take,
+  })
+  takeCanonicalChoiceOptions({ ...args, needed, state, take })
 
-  for (const optionId of args.hardPreferredIds ?? []) {
-    if (!args.choiceSet.options.some((option) => option.id === optionId)) continue
-    take(optionId, undefined)
-  }
-
-  for (const preference of preferences) {
-    const optionId = matchChoiceOption(args.choiceSet, preference.id)
-    if (!optionId) continue
-    take(optionId, preference.sources)
-  }
-
-  const usesEquipmentPreferenceOrdering = usesEquipmentPreferenceOrderingForChoiceSet(args)
-
-  const canonicalOptions = usesEquipmentPreferenceOrdering
-    ? equipmentChoiceOptionsInPreferenceOrder({
-        choiceSet: args.choiceSet,
-        preferences: args.preferences,
-        draft: args.equipmentPreferenceDraft!,
-        catalogIndex: args.equipmentPreferenceCatalogIndex!,
-        context: args.equipmentPreferenceContext!,
-      })
-    : args.choiceSet.options
-
-  if (usesEquipmentPreferenceOrdering) {
-    appendEquipmentPreferenceOrderedOptions({
-      choiceSet: args.choiceSet,
-      preferences: args.preferences,
-      equipmentPreferenceCatalogIndex: args.equipmentPreferenceCatalogIndex!,
-      equipmentPreferenceDraft: args.equipmentPreferenceDraft!,
-      equipmentPreferenceContext: args.equipmentPreferenceContext!,
-      canonicalOptions,
-      needed,
-      take,
-      additions,
-    })
-  } else {
-    for (const option of canonicalOptions) take(option.id, undefined)
-  }
-
-  return { additions, suggestedBy }
+  return state
 }
 
 /**
@@ -514,7 +615,7 @@ export function selectChoiceSetFill(args: {
 export type ConstraintAwareChoiceFill = {
   draft: CharacterBuilderDraft
   /** Sources for ids this call added. Seeded ids are absent. */
-  suggestedBy: Record<string, readonly NpcRecommendationSource[]>
+  suggestedBy: Record<string, readonly RecommendationSourceRef[]>
 }
 
 export function fillChoiceSetWithConstraintAwareSelection(args: {
@@ -554,12 +655,21 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
     if (startingEquipmentFill) return startingEquipmentFill
   }
 
+  const identity = recommendationIdentityForFill(draft, preferences)
   const filled = selectChoiceSetFill({
     choiceSet,
     current,
     preferences,
     heldKeys,
     hardPreferredIds: preferredConstraintOptionIds(choiceSet, constraints),
+    classRecommendedIds: classRecommendedSpellOptionIds({
+      choiceSet,
+      characterClass,
+      catalogIndex,
+      classLevel: draft.class.level,
+    }),
+    ...(characterClass ? { classSource: { kind: 'class', id: characterClass.id } } : {}),
+    recommendationIdentity: identity,
     equipmentPreferenceCatalogIndex: catalogIndex,
     equipmentPreferenceDraft: draft,
     equipmentPreferenceContext: context,

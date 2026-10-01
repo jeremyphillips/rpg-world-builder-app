@@ -1,25 +1,30 @@
+import {
+  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+  OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
+  OPTION_PRESENTATION_PROFICIENT_LABEL,
+  OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
+  type OptionPresentationFact,
+} from '@rpg/contracts'
+
+import { formatInlineRecommendationSources } from '../../../../lib/recommendation/format-inline-recommendation-sources'
 import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-  EQUIPMENT_PICKER_ESSENTIAL_LABEL,
   EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-  EQUIPMENT_PICKER_PROFICIENT_LABEL,
-  EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
-  EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerCallout,
   type EquipmentPickerCalloutContext,
+  type EquipmentPickerCalloutFactKind,
   type EquipmentPickerCalloutSemanticStatus,
 } from '../drawer/equipment-picker-drawer.types'
 
 const EQUIPMENT_CALLOUT_SOURCE_PRIORITY = {
   disabledReason: 500,
   affordability: 400,
-  essentialRecommendation: 300,
+  requirement: 300,
   compatibility: 200,
-  generalRecommendation: 100,
+  recommendation: 100,
+  openPool: 120,
+  state: 80,
   proficiencyCaution: 50,
 } as const
 
@@ -38,12 +43,12 @@ export function selectHighestPriorityCallout(
   )?.callout
 }
 
-function getKnownBlockingCandidate(
-  disabledReasons: readonly string[],
-): EquipmentCalloutCandidate | undefined {
-  // TODO(equipment-callout): normalize first supported equipment disabledReason
-  void disabledReasons
-  return undefined
+function tracksProficiency(item: EquipmentPickerItem): boolean {
+  return (
+    item.equipment.kind === 'weapon' ||
+    item.equipment.kind === 'armor' ||
+    item.equipment.kind === 'tool'
+  )
 }
 
 function getAffordabilityCandidate(
@@ -57,153 +62,85 @@ function getAffordabilityCandidate(
       label: EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
       intent: 'blocking',
       importance: 'high',
+      factKind: 'blocking',
     },
   }
 }
 
-function getEssentialRecommendationCandidate(
-  item: EquipmentPickerItem,
-): EquipmentCalloutCandidate | undefined {
-  const { tier, reasons } = item.state.recommendation
-  if (tier !== 'essential') return undefined
-
-  if (reasons.includes('spellcastingFocus')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
-        intent: 'recommended',
-        importance: 'medium',
-      },
+function factPriority(fact: OptionPresentationFact): EquipmentCalloutCandidate['priority'] {
+  switch (fact.kind) {
+    case 'requirement':
+      return EQUIPMENT_CALLOUT_SOURCE_PRIORITY.requirement
+    case 'compatibility':
+      return EQUIPMENT_CALLOUT_SOURCE_PRIORITY.compatibility
+    case 'recommendation':
+      return EQUIPMENT_CALLOUT_SOURCE_PRIORITY.recommendation
+    case 'state':
+      return fact.label === OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL
+        ? EQUIPMENT_CALLOUT_SOURCE_PRIORITY.openPool
+        : EQUIPMENT_CALLOUT_SOURCE_PRIORITY.state
+    default: {
+      const _exhaustive: never = fact.kind
+      return _exhaustive
     }
   }
+}
 
-  if (reasons.includes('classToolNeed')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
-        intent: 'recommended',
-        importance: 'high',
-      },
-    }
-  }
+function factIntent(fact: OptionPresentationFact): EquipmentPickerCallout['intent'] {
+  if (fact.kind === 'requirement') return 'recommended'
+  if (fact.label === OPTION_PRESENTATION_PROFICIENT_LABEL) return 'compatible'
+  if (fact.kind === 'recommendation') return 'recommended'
+  return 'info'
+}
 
+function factImportance(fact: OptionPresentationFact): EquipmentPickerCallout['importance'] {
+  if (fact.kind === 'requirement') return 'high'
+  if (fact.label === OPTION_PRESENTATION_PROFICIENT_LABEL) return 'medium'
+  if (fact.label === OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL) return 'medium'
+  if (fact.kind === 'state') return 'low'
+  return 'medium'
+}
+
+function calloutFromFact(fact: OptionPresentationFact): EquipmentPickerCallout {
+  const sources = formatInlineRecommendationSources(fact.sourceLabels)
+  const title =
+    fact.kind === 'recommendation' ? sources.title || sources.inline || undefined : fact.detail
   return {
-    priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation,
-    callout: {
-      label: EQUIPMENT_PICKER_ESSENTIAL_LABEL,
-      intent: 'recommended',
-      importance: 'high',
-    },
+    label: fact.label,
+    intent: factIntent(fact),
+    importance: factImportance(fact),
+    factKind: fact.kind,
+    ...(fact.kind === 'recommendation' && sources.inline ? { sourceInline: sources.inline } : {}),
+    ...(title ? { title } : {}),
   }
 }
 
-function isClassGrantedProficientTool(item: EquipmentPickerItem): boolean {
-  if (item.equipment.kind !== 'tool') return false
-  const compatibility = item.state.resolved?.state.compatibility
-  return Boolean(compatibility?.proficient && (compatibility.proficiencySources?.length ?? 0) > 0)
+function visibleStateFact(fact: OptionPresentationFact, isGoldShoppingPath: boolean): boolean {
+  if (fact.label !== OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL) return true
+  return isGoldShoppingPath
 }
 
-function getCompatibilityCandidate(
-  item: EquipmentPickerItem,
-): EquipmentCalloutCandidate | undefined {
-  const { reasons } = item.state.recommendation
-
-  if (reasons.includes('selectedToolProficiency') || isClassGrantedProficientTool(item)) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.compatibility,
-      callout: {
-        label: EQUIPMENT_PICKER_PROFICIENT_LABEL,
-        intent: 'compatible',
-        importance: 'medium',
-      },
-    }
-  }
-
-  return undefined
-}
-
-function getGeneralRecommendationCandidate(
+function presentationCandidates(
   item: EquipmentPickerItem,
   context: EquipmentPickerCalloutContext,
-): EquipmentCalloutCandidate | undefined {
-  const { tier, reasons, label } = item.state.recommendation
+): EquipmentCalloutCandidate[] {
+  const facts = item.state.resolved?.presentation?.facts ?? []
   const isGoldShoppingPath = context.isGoldShoppingPath ?? false
-
-  if (reasons.includes('unresolvedToolProficiencyChoice')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-        intent: 'info',
-        importance: 'low',
+  return facts.flatMap((fact) => {
+    if (!visibleStateFact(fact, isGoldShoppingPath)) return []
+    return [
+      {
+        priority: factPriority(fact),
+        callout: calloutFromFact(fact),
       },
-    }
-  }
-
-  if (reasons.includes('classToolCategory')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
-        intent: 'info',
-        importance: 'low',
-      },
-    }
-  }
-
-  if (reasons.includes('startingEquipmentChoice')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
-        intent: 'recommended',
-        importance: 'medium',
-      },
-    }
-  }
-
-  if (reasons.includes('availableInStartingOption') && isGoldShoppingPath) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
-        intent: 'info',
-        importance: 'low',
-      },
-    }
-  }
-
-  if (tier === 'strong' && reasons.includes('startingEquipment')) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label: EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
-        intent: 'recommended',
-        importance: 'medium',
-      },
-    }
-  }
-
-  if (label) {
-    return {
-      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation,
-      callout: {
-        label,
-        intent: 'info',
-        importance: 'medium',
-      },
-    }
-  }
-
-  return undefined
+    ]
+  })
 }
 
 function getProficiencyCautionCandidate(
   item: EquipmentPickerItem,
 ): EquipmentCalloutCandidate | undefined {
-  if (item.state.isProficient) return undefined
+  if (item.state.isProficient || !tracksProficiency(item)) return undefined
 
   return {
     priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,
@@ -211,27 +148,32 @@ function getProficiencyCautionCandidate(
       label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
       intent: 'warning',
       importance: 'medium',
+      factKind: 'caution',
     },
   }
 }
 
-function resolveCalloutSemanticStatus(
+function semanticStatus(
   candidate: EquipmentCalloutCandidate,
 ): EquipmentPickerCalloutSemanticStatus | undefined {
-  switch (candidate.priority) {
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.disabledReason:
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.affordability:
+  const factKind: EquipmentPickerCalloutFactKind | undefined = candidate.callout.factKind
+  switch (factKind) {
+    case 'blocking':
       return 'blocking'
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.essentialRecommendation:
+    case 'requirement':
       return 'essential'
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.compatibility:
+    case 'compatibility':
       return 'compatibility'
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.generalRecommendation:
-      return candidate.callout.label === EQUIPMENT_PICKER_STANDARD_GEAR_LABEL ? 'standard' : 'info'
-    case EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution:
+    case 'caution':
       return 'not_proficient'
+    case 'state':
+      return candidate.callout.label === OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL
+        ? 'standard'
+        : 'info'
+    case 'recommendation':
+      return 'info'
     default:
-      return undefined
+      return 'info'
   }
 }
 
@@ -244,7 +186,7 @@ function filterCandidatesByVisibleStatuses(
 
   const allowed = new Set(visibleStatuses)
   return candidates.filter((candidate) => {
-    const status = resolveCalloutSemanticStatus(candidate)
+    const status = semanticStatus(candidate)
     return status !== undefined && allowed.has(status)
   })
 }
@@ -254,18 +196,15 @@ function collectEquipmentCalloutCandidates(
   context: EquipmentPickerCalloutContext,
 ): EquipmentCalloutCandidate[] {
   return [
-    getKnownBlockingCandidate(item.state.disabledReasons),
     getAffordabilityCandidate(item),
-    getEssentialRecommendationCandidate(item),
-    getCompatibilityCandidate(item),
-    getGeneralRecommendationCandidate(item, context),
+    ...presentationCandidates(item, context),
     getProficiencyCautionCandidate(item),
   ].filter((candidate): candidate is EquipmentCalloutCandidate => candidate !== undefined)
 }
 
 /**
- * Single-callout policy: highest-priority source wins; equal priorities keep the
- * first candidate in collection order.
+ * Single badge from presentation facts. Affordability and proficiency caution stay
+ * picker-state overlays. Source truncation is attached for the row to render.
  */
 export function getEquipmentPickerCallout(
   item: EquipmentPickerItem,
@@ -276,4 +215,54 @@ export function getEquipmentPickerCallout(
     context,
   )
   return selectHighestPriorityCallout(candidates)
+}
+
+function appendSourceInline(labels: string[], callout: EquipmentPickerCallout | undefined): void {
+  if (!callout?.sourceInline || callout.sourceInline === callout.label) return
+  labels.push(callout.sourceInline)
+}
+
+function appendSecondaryStateLabels(args: {
+  labels: string[]
+  facts: readonly OptionPresentationFact[]
+  callout: EquipmentPickerCallout | undefined
+  isGoldShoppingPath: boolean
+}): void {
+  for (const fact of args.facts) {
+    if (fact.kind !== 'state') continue
+    if (!visibleStateFact(fact, args.isGoldShoppingPath)) continue
+    if (fact.label === args.callout?.label) continue
+    args.labels.push(fact.label)
+  }
+}
+
+function appendCompatibilityDetail(
+  labels: string[],
+  facts: readonly OptionPresentationFact[],
+  callout: EquipmentPickerCallout | undefined,
+): void {
+  if (callout?.factKind !== 'compatibility' || !callout.title || labels.includes(callout.title)) {
+    return
+  }
+  const detail = facts.find((fact) => fact.label === callout.label)?.detail
+  if (detail) labels.push(detail)
+}
+
+/** State lines that are not the winning badge, plus truncated source chrome. */
+export function getEquipmentPickerSecondaryLabels(
+  item: EquipmentPickerItem,
+  context: EquipmentPickerCalloutContext = {},
+): string[] {
+  const callout = getEquipmentPickerCallout(item, context)
+  const labels: string[] = []
+  const facts = item.state.resolved?.presentation?.facts ?? []
+  appendSourceInline(labels, callout)
+  appendSecondaryStateLabels({
+    labels,
+    facts,
+    callout,
+    isGoldShoppingPath: context.isGoldShoppingPath ?? false,
+  })
+  appendCompatibilityDetail(labels, facts, callout)
+  return labels
 }

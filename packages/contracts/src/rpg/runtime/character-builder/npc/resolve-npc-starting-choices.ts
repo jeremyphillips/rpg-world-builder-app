@@ -18,7 +18,7 @@ import {
 import { CHARACTER_EQUIPMENT_INVENTORY_BUCKETS } from '../../character/sheet/equipment-inventory'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import { inventoryContainsEquipmentId } from '../resolvers/equipment/derive-equipment-draft-entries'
-import type { NpcRecommendationSource } from '../sourced-recommendation'
+import type { RecommendationSourceRef } from '../recommendation'
 import {
   collectFixedGrantPairs,
   groupFixedGrantPairs,
@@ -62,7 +62,7 @@ export type StartingChoiceContribution = StartingChoiceContributionBase &
         allowance: { min: number; max: number }
         overridden: boolean
         /** Traced by the fill. Absent for overridden allowances. [] = canonical order. */
-        suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+        suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
       }
     | {
         mechanic: 'explicit-constraint'
@@ -316,7 +316,7 @@ function allowanceContributions(args: {
   choiceSets: readonly ChoiceSet[]
   draft: CharacterBuilderDraft
   suggestedBy: Readonly<
-    Record<string, Readonly<Record<string, readonly NpcRecommendationSource[]>>>
+    Record<string, Readonly<Record<string, readonly RecommendationSourceRef[]>>>
   >
   overriddenIds: ReadonlySet<string>
 }): StartingChoiceContribution[] {

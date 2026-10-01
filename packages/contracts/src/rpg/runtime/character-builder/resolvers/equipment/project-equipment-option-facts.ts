@@ -13,6 +13,7 @@ import {
   type OptionState,
   type RecommendationSignal,
   type RecommendationSourceRef,
+  type OptionPresentationFacts,
   type RequirementDefinition,
   type RequirementState,
 } from '../../recommendation'
@@ -29,6 +30,7 @@ export type ResolvedEquipmentOption = {
   requirements: readonly OptionRequirement[]
   recommendation: OptionRecommendation
   state: OptionState
+  presentation?: OptionPresentationFacts
 }
 
 const CHOICE_REASONS = new Set([
@@ -243,6 +245,9 @@ function recommendationSignalFromEvidence(
       basis: entry.basis ?? (entry.reason === 'classToolCategory' ? 'affinity' : 'inferred'),
       specificity: entry.specificity,
       ...(entry.source ? { source: entry.source } : {}),
+      ...(entry.reason === 'classToolCategory'
+        ? { detail: { kind: 'toolCategory' as const, toolCategory: 'tool' } }
+        : {}),
     },
   ]
 }

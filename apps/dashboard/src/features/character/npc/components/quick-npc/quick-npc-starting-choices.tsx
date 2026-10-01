@@ -45,7 +45,7 @@ import {
   startingChoicePickerOptions,
   startingChoiceResetLabel,
   startingChoiceShowSuggestedReset,
-  startingChoiceItemSuggestionHint,
+  startingChoiceItemSuggestionCopy,
   groupStartingChoicesByKind,
 } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
 import {
@@ -568,8 +568,8 @@ function StartingChoiceEditor({
                           buildContext,
                         )
                       : undefined
-                    const suggestionHint = selectedId
-                      ? startingChoiceItemSuggestionHint({
+                    const suggestion = selectedId
+                      ? startingChoiceItemSuggestionCopy({
                           selectedId,
                           suggestedBy: canonical.suggestedBy,
                           labels: suggestionLabels,
@@ -579,7 +579,8 @@ function StartingChoiceEditor({
                       <li key={selectedId}>
                         <QuickNpcStartingChoiceSelectedRow
                           label={label}
-                          suggestionHint={suggestionHint}
+                          suggestionHint={suggestion?.hint}
+                          suggestionTitle={suggestion?.title}
                           alsoGrantedHint={alsoGrantedHint}
                           onRemove={() => {
                             updateSelectedIds(selectedIds.filter((id) => id !== selectedId))

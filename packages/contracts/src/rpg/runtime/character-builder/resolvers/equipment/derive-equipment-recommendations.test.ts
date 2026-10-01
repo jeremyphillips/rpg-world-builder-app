@@ -1130,6 +1130,37 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
     expect(luteIndex).toBeGreaterThanOrEqual(0)
     expect(leatherIndex).toBeLessThan(luteIndex)
   })
+
+  it('records role equipment preferences as strong role signals without a new reason', () => {
+    const { catalogIndex, proficiencies } = buildContext(storedBard, [lute])
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      recommendationContext: {
+        roleId: 'guard',
+        roleEquipmentPreferenceSlugs: ['lute'],
+        userEquipmentPreferenceSlugs: ['lute'],
+      },
+    })
+    const signals = recommendations.get(lute.id)?.resolved?.recommendation.signals ?? []
+    expect(signals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          strength: 'strong',
+          basis: 'preference',
+          source: { kind: 'role', id: 'guard' },
+        }),
+        expect.objectContaining({
+          strength: 'strong',
+          basis: 'preference',
+          source: { kind: 'user' },
+        }),
+      ]),
+    )
+    expect(recommendations.get(lute.id)?.resolved?.recommendation.strength).toBe('strong')
+    expect(recommendations.get(lute.id)?.reasons).not.toContain('roleSuggested')
+  })
 })
 
 describe('resolveEquipmentPickerItems', () => {

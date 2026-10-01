@@ -11,11 +11,20 @@ import {
   buildSpellPickerSearchText,
 } from './format-spell-picker-metadata'
 import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
+import {
+  NEUTRAL_OPTION_RECOMMENDATION,
+  softRecommendationFact,
+  type OptionPresentationFacts,
+  type OptionRecommendation,
+} from '../../recommendation'
 
 export type SpellPickerItemState = PickerItemStateBase & {
   isAlreadySelected: boolean
   isSelectionFull: boolean
   canSelect: boolean
+  /** Soft recommendation. `isRecommended` mirrors `strength === 'strong'` for browse parity. */
+  recommendation: OptionRecommendation
+  presentation?: OptionPresentationFacts
 }
 
 export type SpellPickerItem = {
@@ -36,6 +45,7 @@ function resolveSpellPickerItemState(
   selectedIds: readonly string[],
   choiceSetMax: number,
   recommendedSpellIds: ReadonlySet<string>,
+  classSource: { id: string; name: string | undefined } | undefined,
 ): SpellPickerItemState {
   const isAlreadySelected = selectedIds.includes(spellId)
   const isSelectionFull = selectedIds.length >= choiceSetMax
@@ -45,9 +55,30 @@ function resolveSpellPickerItemState(
     disabledReasons.push(PICKER_DISABLED_REASON_SELECTION_FULL)
   }
 
+  const recommended = recommendedSpellIds.has(spellId) && classSource !== undefined
+  const recommendation: OptionRecommendation = recommended
+    ? {
+        strength: 'strong',
+        signals: [
+          {
+            strength: 'strong',
+            basis: 'authored',
+            specificity: 'exact',
+            source: { kind: 'class', id: classSource.id },
+          },
+        ],
+      }
+    : NEUTRAL_OPTION_RECOMMENDATION
+  const recommendationFact = softRecommendationFact({
+    recommendation,
+    sourceName: (source) => (source.kind === 'class' ? classSource?.name : undefined),
+  })
+
   return {
     isAvailable: true,
-    isRecommended: recommendedSpellIds.has(spellId),
+    isRecommended: recommendation.strength === 'strong',
+    recommendation,
+    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
     isAlreadySelected,
     isSelectionFull,
     canSelect: !isAlreadySelected && !isSelectionFull,
@@ -96,6 +127,7 @@ export function resolveSpellPickerItems({
           selectedIds,
           choiceSet.max,
           recommendedSpellIds,
+          characterClass ? { id: characterClass.id, name: characterClass.name } : undefined,
         ),
         searchText: buildSpellPickerSearchText(spell),
         compactSummary: buildSpellPickerCompactSummary(spell),

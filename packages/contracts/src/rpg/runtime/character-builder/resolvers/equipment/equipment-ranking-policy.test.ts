@@ -61,6 +61,8 @@ describe('equipment ranking primitives', () => {
     ).toBe('none')
     expect(compareContextRelevance('activeTarget', 'none')).toBeLessThan(0)
     expect(compareStrength('strong', 'compatible')).toBeLessThan(0)
+    expect(compareSourcePriority('user', 'role')).toBeLessThan(0)
+    expect(compareSourcePriority('role', 'class')).toBeLessThan(0)
     expect(compareSourcePriority('user', 'class')).toBeLessThan(0)
   })
 })

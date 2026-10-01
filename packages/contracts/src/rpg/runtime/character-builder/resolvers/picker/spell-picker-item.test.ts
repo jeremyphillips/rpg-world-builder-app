@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { Spell } from '../../../../content/spell'
 import { buildSpellPickerCompactSummary } from '../spellcasting/format-spell-picker-metadata'
 import type { SpellPickerItem } from '../spellcasting/resolve-spell-picker-items'
+import { NEUTRAL_OPTION_RECOMMENDATION } from '../../recommendation'
 import { compareSpellPickerItemsByRecommendation } from './spell-picker-item'
 
 function makeSpellItem(
@@ -42,6 +43,9 @@ function makeSpellItem(
       isAlreadySelected: state.isAlreadySelected,
       isSelectionFull: state.isSelectionFull,
       isRecommended: state.isRecommended,
+      recommendation: state.isRecommended
+        ? { strength: 'strong', signals: [] }
+        : NEUTRAL_OPTION_RECOMMENDATION,
       canSelect: state.canSelect,
     },
   }

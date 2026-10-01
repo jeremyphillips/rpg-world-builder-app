@@ -26,6 +26,7 @@ import {
   startingChoiceHasNamedAttribution,
   startingChoiceResetLabel,
   startingChoiceShowSuggestedReset,
+  startingChoiceItemSuggestionCopy,
   startingChoiceItemSuggestionHint,
   startingChoiceSuggestionHint,
 } from './quick-npc-starting-choices.lib'
@@ -43,8 +44,8 @@ function allowance(
     choiceSetId: 'npcTemplate:guard:skills',
     overridden: false,
     suggestedBy: {
-      athletics: ['template'],
-      perception: ['template'],
+      athletics: [{ kind: 'role', id: 'guard' }],
+      perception: [{ kind: 'role', id: 'guard' }],
     },
     ...overrides,
   }
@@ -163,29 +164,48 @@ describe('startingChoiceAllowancePresentation', () => {
   })
 })
 
+const guardRole = { kind: 'role' as const, id: 'guard' as const }
+const captainTitle = {
+  kind: 'title' as const,
+  organizationId: 'watch',
+  titleId: 'captain',
+}
+const elfSpecies = { kind: 'species' as const, id: 'elf' }
+const userSource = { kind: 'user' as const }
+
 describe('startingChoiceItemSuggestionHint', () => {
-  it('labels only the item that has a single named source', () => {
+  it('shows up to two sources inline and truncates the rest', () => {
     expect(
       startingChoiceItemSuggestionHint({
         selectedId: 'athletics',
-        suggestedBy: { athletics: ['template'], perception: [] },
+        suggestedBy: { athletics: [guardRole], perception: [] },
         labels: { template: 'Guard' },
       }),
     ).toBe('Suggested by Guard role')
     expect(
       startingChoiceItemSuggestionHint({
         selectedId: 'perception',
-        suggestedBy: { athletics: ['template'], perception: [] },
+        suggestedBy: { athletics: [guardRole], perception: [] },
         labels: { template: 'Guard' },
       }),
     ).toBeUndefined()
     expect(
       startingChoiceItemSuggestionHint({
         selectedId: 'insight',
-        suggestedBy: { insight: ['template', 'title'] },
+        suggestedBy: { insight: [guardRole, captainTitle] },
         labels: { template: 'Guard', title: 'Captain' },
       }),
-    ).toBeUndefined()
+    ).toBe('Suggested by Guard role · Captain title')
+    expect(
+      startingChoiceItemSuggestionCopy({
+        selectedId: 'insight',
+        suggestedBy: { insight: [guardRole, captainTitle, elfSpecies, userSource] },
+        labels: { template: 'Guard', title: 'Captain', species: 'Elf' },
+      }),
+    ).toEqual({
+      hint: 'Suggested by Guard role +3',
+      title: 'Suggested by Guard role · Captain title · Elf species · You',
+    })
   })
 })
 
@@ -194,17 +214,17 @@ describe('startingChoiceSuggestionHint', () => {
     expect(
       startingChoiceSuggestionHint({
         selectedIds: ['athletics', 'perception'],
-        suggestedBy: { athletics: ['template'], perception: ['template'] },
+        suggestedBy: { athletics: [guardRole], perception: [guardRole] },
         labels: { template: 'Guard' },
       }),
     ).toBe('Suggested by Guard role')
     expect(
       startingChoiceSuggestionHint({
         selectedIds: ['common'],
-        suggestedBy: { common: ['species', 'template'] },
+        suggestedBy: { common: [elfSpecies, guardRole] },
         labels: { template: 'Guard', species: 'Elf' },
       }),
-    ).toBeUndefined()
+    ).toBe('Suggested by Elf species · Guard role')
     expect(
       startingChoiceSuggestionHint({
         selectedIds: ['insight'],
@@ -223,7 +243,7 @@ describe('startingChoiceSuggestionHint', () => {
     expect(
       startingChoiceSuggestionHint({
         selectedIds: ['perception'],
-        suggestedBy: { perception: ['template'] },
+        suggestedBy: { perception: [guardRole] },
         labels: {},
       }),
     ).toBeUndefined()
@@ -252,7 +272,7 @@ describe('startingChoiceHasNamedAttribution', () => {
     expect(
       startingChoiceHasNamedAttribution({
         selectedIds: ['athletics', 'insight'],
-        suggestedBy: { athletics: ['template'], insight: [] },
+        suggestedBy: { athletics: [guardRole], insight: [] },
         labels: { template: 'Guard' },
       }),
     ).toBe(true)

@@ -121,6 +121,16 @@ describe('resolveProficiencyPickerItems', () => {
     const elvish = items.find((item) => item.optionId === 'elvish')
 
     expect(dwarvish?.state.isRecommended).toBe(true)
+    expect(dwarvish?.state.recommendation).toMatchObject({
+      strength: 'strong',
+      signals: [
+        expect.objectContaining({
+          basis: 'affinity',
+          source: { kind: 'species', id: dwarfSpecies.id },
+        }),
+      ],
+    })
+    expect(dwarvish?.state.presentation?.facts[0]?.label).toBe('Recommended')
     expect(elvish?.state.isRecommended).toBe(false)
   })
 

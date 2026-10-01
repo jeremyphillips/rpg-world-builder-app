@@ -1,6 +1,7 @@
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   buildSpellPickerCompactSummary,
+  NEUTRAL_OPTION_RECOMMENDATION,
   type ChoiceSet,
   type SpellPickerItem,
 } from '@rpg/contracts'
@@ -85,6 +86,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: true,
       isSelectionFull: true,
       canSelect: false,
@@ -98,6 +100,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: true,
       isSelectionFull: true,
       canSelect: false,
@@ -111,6 +114,7 @@ export const spellPickerItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: false,
       isSelectionFull: true,
       canSelect: false,
@@ -125,6 +129,7 @@ export const spellPickerOpenItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: false,
       isSelectionFull: false,
       canSelect: true,
@@ -136,6 +141,7 @@ export const spellPickerOpenItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: false,
       isSelectionFull: false,
       canSelect: true,
@@ -147,6 +153,7 @@ export const spellPickerOpenItemsFixture: SpellPickerItem[] = [
     state: {
       isAvailable: true,
       isRecommended: false,
+      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
       isAlreadySelected: false,
       isSelectionFull: false,
       canSelect: true,

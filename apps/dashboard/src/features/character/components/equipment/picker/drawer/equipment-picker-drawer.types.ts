@@ -69,10 +69,23 @@ export type EquipmentPickerCalloutIntent =
 
 export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'
 
+export type EquipmentPickerCalloutFactKind =
+  | 'requirement'
+  | 'recommendation'
+  | 'compatibility'
+  | 'state'
+  | 'blocking'
+  | 'caution'
+
 export type EquipmentPickerCallout = {
   label: string
   intent: EquipmentPickerCalloutIntent
   importance: EquipmentPickerCalloutImportance
+  /** Full explanation when the visible label truncates sources. */
+  title?: string
+  factKind?: EquipmentPickerCalloutFactKind
+  /** Sources already truncated for inline chrome. */
+  sourceInline?: string
 }
 
 export type EquipmentPickerCalloutContext = {

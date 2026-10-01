@@ -5,6 +5,7 @@ import {
   createCatalogEntityRowRenderer,
   CatalogMetadataRenderer,
 } from '@/features/content'
+import { recommendationStatusItems } from '../../../lib/recommendation/format-inline-recommendation-sources'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
@@ -215,16 +216,7 @@ export function SpellPickerDrawer({
               />
             ),
             status: [
-              ...(recommendationsEnabled && item.state.isRecommended
-                ? [
-                    {
-                      kind: 'badge' as const,
-                      label: 'Recommended',
-                      appearance: 'outline' as const,
-                      tone: 'info' as const,
-                    },
-                  ]
-                : []),
+              ...(recommendationsEnabled ? recommendationStatusItems(item.state.presentation) : []),
               ...markers.map((marker) => ({
                 kind: 'text' as const,
                 label: marker,

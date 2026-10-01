@@ -459,7 +459,7 @@ describe('starting choice ownership', () => {
       max: 1,
     })
     expect(roleTool?.mechanic === 'choice-allowance' ? roleTool.suggestedBy : undefined).toEqual({
-      [thievesTools.id]: ['template'],
+      [thievesTools.id]: [{ kind: 'role', id: 'criminal' }],
     })
     expect(
       criminal.contributions.some(
@@ -505,11 +505,14 @@ describe('starting choice ownership', () => {
     const choices = resolveNpcStartingChoices({
       context,
       seed: { speciesId: elfSpecies.id, classId: fighterClass.id, level: 1 },
-      preferences: { skills: [{ id: 'perception', sources: ['template'] }] },
+      preferences: {
+        skills: [{ id: 'perception', sources: ['template'] }],
+        recommendationIdentity: { roleId: 'guard' },
+      },
     })
     const keen = choices.contributions.find((entry) => entry.id.includes('keen-senses'))
     expect(keen?.mechanic === 'choice-allowance' ? keen.suggestedBy : undefined).toEqual({
-      [perceptionSkill.id]: ['template'],
+      [perceptionSkill.id]: [{ kind: 'role', id: 'guard' }],
     })
   })
 
@@ -520,6 +523,7 @@ describe('starting choice ownership', () => {
       preferences: {
         languages: [{ id: 'elvish', sources: ['species', 'template'] }],
         skills: [{ id: 'athletics', sources: ['template'] }],
+        recommendationIdentity: { roleId: 'guard' },
       },
     })
     const origin = traced.contributions.find(
@@ -531,7 +535,10 @@ describe('starting choice ownership', () => {
     expect(elvish).toBe('elvish')
     expect(
       origin?.mechanic === 'choice-allowance' ? origin.suggestedBy?.elvish : undefined,
-    ).toEqual(['species', 'template'])
+    ).toEqual([
+      { kind: 'species', id: elfSpecies.id },
+      { kind: 'role', id: 'guard' },
+    ])
 
     const fighterSkills = traced.contributions.find(
       (entry) =>
@@ -542,7 +549,7 @@ describe('starting choice ownership', () => {
     expect(
       fighterSkills?.mechanic === 'choice-allowance' ? fighterSkills.suggestedBy : undefined,
     ).toEqual({
-      [athleticsSkill.id]: ['template'],
+      [athleticsSkill.id]: [{ kind: 'role', id: 'guard' }],
       [perceptionSkill.id]: [],
     })
   })

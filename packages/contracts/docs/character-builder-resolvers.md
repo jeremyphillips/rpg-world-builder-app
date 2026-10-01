@@ -427,6 +427,16 @@ Equipment evidence carries an optional `source`. Proficiency compatibility evide
 has none. Picker rows keep that evidence on `state.evidence` and the split facts on
 `state.resolved`.
 
+`resolveEquipmentPresentationFacts` turns those facts into semantic copy: "Required by
+Wizard class", "Satisfies Wizard focus requirement", "Proficient" with "Granted by Rogue
+class", "Recommended" plus source labels, and state labels such as "In your package".
+The dashboard owns badge tone, two-source inline truncation, and tooltips.
+Language and spell rows use the same soft-recommendation fact (`OptionRecommendation`)
+instead of a hardcoded "Recommended" string. `suggestedBy` stores
+`RecommendationSourceRef` values, including every package-bias source and class spell
+recommendations. Role equipment preferences are strong signals with `source: { kind: 'role' }`
+on `deriveEquipmentRecommendations`; the `NpcTemplate*` rename stays deferred.
+
 ## Related helpers
 
 | Helper                                | Location                                                 | Purpose                                                      |

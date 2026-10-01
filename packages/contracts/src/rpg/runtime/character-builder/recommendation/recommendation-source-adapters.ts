@@ -82,6 +82,29 @@ const RECOMMENDATION_SOURCE_REF_BUILDERS: Record<RecommendationSourceKind, IdRef
   user: () => ({ kind: 'user' }),
 }
 
+export function recommendationSourceRefsFromNpcSources(
+  sources: readonly NpcRecommendationSource[],
+  identity: RecommendationSourceIdentity = {},
+): RecommendationSourceRef[] {
+  const refs: RecommendationSourceRef[] = []
+  const seen = new Set<string>()
+  for (const source of sources) {
+    const ref = recommendationSourceRefFromNpcRecommendationSource(source, identity)
+    if (!ref) continue
+    const key = recommendationSourceRefKey(ref)
+    if (seen.has(key)) continue
+    seen.add(key)
+    refs.push(ref)
+  }
+  return refs
+}
+
+function recommendationSourceRefKey(source: RecommendationSourceRef): string {
+  if (source.kind === 'title') return `title:${source.organizationId}:${source.titleId}`
+  if (source.kind === 'user') return 'user'
+  return `${source.kind}:${source.id}`
+}
+
 export function recommendationSourceRefFromKind(
   kind: RecommendationSourceKind | undefined,
   identity: RecommendationSourceIdentity,

@@ -13,12 +13,21 @@ import {
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import { formatStandardSelectionSourceLabel } from '../../../character/format-selection-source-label'
 import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
+import {
+  NEUTRAL_OPTION_RECOMMENDATION,
+  softRecommendationFact,
+  type OptionPresentationFacts,
+  type OptionRecommendation,
+} from '../../recommendation'
 
 export type ProficiencyPickerItemState = PickerItemStateBase & {
   isAlreadySelected: boolean
   isAlreadyGranted: boolean
   isSelectionFull: boolean
   canSelect: boolean
+  /** Soft recommendation. `isRecommended` mirrors `strength === 'strong'` for browse parity. */
+  recommendation: OptionRecommendation
+  presentation?: OptionPresentationFacts
 }
 
 export type ProficiencyPickerItem = {
@@ -33,6 +42,27 @@ export type ResolveProficiencyPickerItemsArgs = {
   context: CharacterBuildContext
   choiceSetId: string
   proficiencies: CharacterProficiencies
+}
+
+function languageRecommendation(args: {
+  choiceType: ChoiceSet['choiceType']
+  optionId: string
+  recommendedLanguageIds: ReadonlySet<string>
+  speciesId: string | undefined
+}): OptionRecommendation {
+  if (args.choiceType !== 'language' || !args.speciesId) return NEUTRAL_OPTION_RECOMMENDATION
+  if (!args.recommendedLanguageIds.has(args.optionId)) return NEUTRAL_OPTION_RECOMMENDATION
+  return {
+    strength: 'strong',
+    signals: [
+      {
+        strength: 'strong',
+        basis: 'affinity',
+        specificity: 'exact',
+        source: { kind: 'species', id: args.speciesId },
+      },
+    ],
+  }
 }
 
 function resolveSkillSlug(optionId: string, catalogIndex: CharacterBuildCatalogIndex): string {
@@ -95,6 +125,7 @@ function resolveProficiencyPickerItemState(
   proficiencies: CharacterProficiencies,
   catalogIndex: CharacterBuildCatalogIndex,
   recommendedLanguageIds: ReadonlySet<string>,
+  draft: CharacterBuilderDraft,
 ): ProficiencyPickerItemState {
   const isAlreadySelected = selectedIds.includes(optionId)
   const isSelectionFull = selectedIds.length >= choiceSet.max
@@ -108,11 +139,23 @@ function resolveProficiencyPickerItemState(
     disabledReasons.push(PICKER_DISABLED_REASON_SELECTION_FULL)
   }
 
-  const isRecommended = choiceSet.choiceType === 'language' && recommendedLanguageIds.has(optionId)
+  const recommendation = languageRecommendation({
+    choiceType: choiceSet.choiceType,
+    optionId,
+    recommendedLanguageIds,
+    speciesId: draft.species.speciesId,
+  })
+  const recommendationFact = softRecommendationFact({
+    recommendation,
+    sourceName: (source) =>
+      source.kind === 'species' ? catalogIndex.species.get(source.id)?.name : undefined,
+  })
 
   return {
     isAvailable: true,
-    isRecommended,
+    isRecommended: recommendation.strength === 'strong',
+    recommendation,
+    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
     isAlreadySelected,
     isAlreadyGranted,
     isSelectionFull,
@@ -160,6 +203,7 @@ export function resolveProficiencyPickerItems({
         proficiencies,
         catalogIndex,
         recommendedLanguageIds,
+        draft,
       ),
       ...(skillRow ? { compactSummary: buildSkillProficiencyCompactSummary(skillRow) } : {}),
     }

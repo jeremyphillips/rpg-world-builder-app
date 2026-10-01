@@ -11,6 +11,7 @@ import { isClassProgressionApplicable } from '../progression/character-level-pol
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
 import type { NpcEquipmentPreferenceEntry } from './equipment-preference-stream'
+import type { RecommendationSourceIdentity } from '../recommendation'
 import type { SourcedRecommendation } from '../sourced-recommendation'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
@@ -44,6 +45,8 @@ export type AutomaticNpcBuildPreferences = {
   tools?: readonly SourcedRecommendation[]
   languages?: readonly SourcedRecommendation[]
   equipmentPreferences?: readonly NpcEquipmentPreferenceEntry[]
+  /** Ids used when `suggestedBy` stores recommendation source refs. */
+  recommendationIdentity?: RecommendationSourceIdentity
 }
 
 export const automaticNpcBuildAbilityPrioritySchema = z.array(abilitySchema).length(6)

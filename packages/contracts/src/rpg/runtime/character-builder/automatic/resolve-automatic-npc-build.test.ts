@@ -278,6 +278,43 @@ describe('resolveAutomaticNpcBuild', () => {
     ])
   })
 
+  it('ranks class spell recommendations ahead of the canonical fallback', () => {
+    const spellcasting = wizardClass.spellcasting
+    if (!spellcasting) throw new Error('wizard fixture is missing spellcasting')
+    const recommendedWizard = {
+      ...wizardClass,
+      spellcasting: {
+        ...spellcasting,
+        recommendations: [
+          { target: 'cantrips' as const, classLevel: 1, spellIds: ['prestidigitation'] },
+        ],
+      },
+    }
+    const context: CharacterBuildContext = {
+      ...spellcastingTestContext,
+      characterKind: 'npc',
+      catalog: {
+        ...spellcastingTestContext.catalog,
+        classes: spellcastingTestContext.catalog.classes.map((characterClass) =>
+          characterClass.id === wizardClass.id ? recommendedWizard : characterClass,
+        ),
+      },
+    }
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed({
+        speciesId: `${RULESET}:fixture-dwarf`,
+        classId: wizardClass.id,
+      }),
+      context,
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(
+      result.draft.choiceSelections[buildChoiceSetId('spellcasting', wizardClass.id, 'cantrips')],
+    ).toEqual([`${RULESET}:prestidigitation`, `${RULESET}:arcane-bolt`, `${RULESET}:mage-hand`])
+  })
+
   it('is insensitive to catalog insertion order (resolver-owned canonical order)', () => {
     const context: CharacterBuildContext = { ...spellcastingTestContext, characterKind: 'npc' }
     const reversedContext: CharacterBuildContext = {

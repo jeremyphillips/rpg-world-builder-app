@@ -5,7 +5,7 @@ import { characterBuilderValidationMessages } from '../messages/character-builde
 import { cloneEquipmentDraftChannel } from '../resolvers/equipment/equipment-draft-base'
 import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
-import type { NpcRecommendationSource } from '../sourced-recommendation'
+import type { RecommendationSourceRef } from '../recommendation'
 import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
@@ -29,7 +29,7 @@ const AUTOMATIC_BUILD_ITERATION_CEILING = 64
 /** choiceSetId → optionId → recommendation sources. Canonical picks are `[]`. */
 export type AutomaticChoiceSuggestedBy = Record<
   string,
-  Record<string, readonly NpcRecommendationSource[]>
+  Record<string, readonly RecommendationSourceRef[]>
 >
 
 export type ResolveAutomaticChoiceSelectionsArgs = {
@@ -151,7 +151,9 @@ export function resolveAutomaticChoiceSelections({
     }
 
     const characterClass =
-      target.sourceType === 'class' ? catalogIndex.classes.get(target.sourceId) : undefined
+      target.sourceType === 'class' || target.sourceType === 'spellcasting'
+        ? catalogIndex.classes.get(target.sourceId)
+        : undefined
     const filled = fillChoiceSetWithConstraintAwareSelection({
       draft,
       choiceSet: target,

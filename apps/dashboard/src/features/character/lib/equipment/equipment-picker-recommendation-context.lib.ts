@@ -12,6 +12,7 @@ import {
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
+  type EquipmentRecommendationContext,
 } from '@rpg/contracts'
 
 export type EquipmentPickerRecommendationSemanticInput = {
@@ -42,6 +43,7 @@ export type BuildEquipmentPickerRecommendationContextArgs = {
   catalogIndex: CharacterBuildCatalogIndex
   choiceSets?: readonly ChoiceSet[]
   budget?: EquipmentBudgetSummary
+  recommendationContext?: EquipmentRecommendationContext
 }
 
 export type EquipmentPickerRecommendationContext = {
@@ -55,7 +57,15 @@ export type EquipmentPickerRecommendationContext = {
 export function buildEquipmentPickerRecommendationContext(
   args: BuildEquipmentPickerRecommendationContextArgs,
 ): EquipmentPickerRecommendationContext {
-  const { equipment, draft, characterClass, catalogIndex, choiceSets = [], budget } = args
+  const {
+    equipment,
+    draft,
+    characterClass,
+    catalogIndex,
+    choiceSets = [],
+    budget,
+    recommendationContext,
+  } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
     catalogIndex,
@@ -69,6 +79,7 @@ export function buildEquipmentPickerRecommendationContext(
     classLevel: draft.class.level,
     draft,
     choiceSets,
+    recommendationContext,
   })
   const items = resolveEquipmentPickerItems({
     equipment,

@@ -6,7 +6,6 @@ import {
   formatStandardSelectionSourceLabel,
   formatSuggestedBySentence,
   getNpcTemplateEntry,
-  npcRecommendationSourceKind,
   indexCharacterBuildCatalog,
   optionIdentitiesOverlap,
   resolveNpcStartingChoices,
@@ -14,12 +13,14 @@ import {
   resolveProficiencyPickerItems,
   type CharacterBuildContext,
   type ChoiceSet,
-  type NpcRecommendationSource,
   type NpcStartingChoices,
+  type RecommendationSourceRef,
   type ProficiencyChoiceSetPresentation,
   type StartingChoiceCategory,
   type StartingChoiceContribution,
 } from '@rpg/contracts'
+
+import { formatInlineRecommendationSources } from '@/features/character/lib/recommendation/format-inline-recommendation-sources'
 
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
@@ -54,61 +55,97 @@ export type StartingChoiceSuggestionLabels = {
   template?: string
   title?: string
   species?: string
+  class?: string
+}
+
+export type StartingChoiceSuggestionCopy = {
+  hint: string
+  /** Full source list when the hint truncates to +N. */
+  title?: string
 }
 
 function suggestionSourceLabel(
-  source: NpcRecommendationSource,
+  source: RecommendationSourceRef,
   labels: StartingChoiceSuggestionLabels,
 ): string | undefined {
-  const kind = npcRecommendationSourceKind(source)
-  if (!kind) return undefined
   const name =
-    kind === 'role'
+    source.kind === 'role'
       ? labels.template
-      : kind === 'title'
+      : source.kind === 'title'
         ? labels.title
-        : kind === 'species'
+        : source.kind === 'species'
           ? labels.species
-          : undefined
-  return formatRecommendationSourceLabel({ kind }, { name, density: 'choice-hint' })
+          : source.kind === 'class'
+            ? labels.class
+            : undefined
+  if (source.kind !== 'user' && !name) return undefined
+  return formatRecommendationSourceLabel(source, { name })
 }
 
-/**
- * Explanatory copy only. Names a source when that one source traced every selected value.
- * An empty source list is canonical order and is never called a suggestion.
- */
+function suggestionCopy(
+  sources: readonly RecommendationSourceRef[],
+  labels: StartingChoiceSuggestionLabels,
+): StartingChoiceSuggestionCopy | undefined {
+  const sourceLabels = sources.flatMap((source) => suggestionSourceLabel(source, labels) ?? [])
+  if (sourceLabels.length === 0) return undefined
+  const formatted = formatInlineRecommendationSources(sourceLabels)
+  return {
+    hint: formatSuggestedBySentence(formatted.inline),
+    ...(formatted.title ? { title: formatSuggestedBySentence(formatted.title) } : {}),
+  }
+}
+
+function sameSourceSet(
+  left: readonly RecommendationSourceRef[],
+  right: readonly RecommendationSourceRef[],
+): boolean {
+  if (left.length !== right.length) return false
+  return left.every(
+    (source, index) => suggestionSourceKey(source) === suggestionSourceKey(right[index]!),
+  )
+}
+
+function suggestionSourceKey(source: RecommendationSourceRef): string {
+  if (source.kind === 'title') return `title:${source.organizationId}:${source.titleId}`
+  if (source.kind === 'user') return 'user'
+  return `${source.kind}:${source.id}`
+}
+
 /** Suggestion copy for one selected item. Empty source lists are canonical order. */
 export function startingChoiceItemSuggestionHint(args: {
   selectedId: string
-  suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
   labels?: StartingChoiceSuggestionLabels
 }): string | undefined {
+  return startingChoiceItemSuggestionCopy(args)?.hint
+}
+
+export function startingChoiceItemSuggestionCopy(args: {
+  selectedId: string
+  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
+  labels?: StartingChoiceSuggestionLabels
+}): StartingChoiceSuggestionCopy | undefined {
   const sources = args.suggestedBy?.[args.selectedId] ?? []
-  if (sources.length !== 1) return undefined
-  const label = suggestionSourceLabel(sources[0]!, args.labels ?? {})
-  return label ? formatSuggestedBySentence(label) : undefined
+  if (sources.length === 0) return undefined
+  return suggestionCopy(sources, args.labels ?? {})
 }
 
 export function startingChoiceSuggestionHint(args: {
   selectedIds: readonly string[]
-  suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
   labels?: StartingChoiceSuggestionLabels
 }): string | undefined {
   if (!args.suggestedBy || args.selectedIds.length === 0) return undefined
   const traced = args.selectedIds.map((id) => args.suggestedBy?.[id] ?? [])
   const first = traced[0]
-  if (!first || first.length !== 1) return undefined
-  const source = first[0]
-  if (!source || !traced.every((sources) => sources.length === 1 && sources[0] === source)) {
-    return undefined
-  }
-  const label = suggestionSourceLabel(source, args.labels ?? {})
-  return label ? formatSuggestedBySentence(label) : undefined
+  if (!first || first.length === 0) return undefined
+  if (!traced.every((sources) => sameSourceSet(sources, first))) return undefined
+  return suggestionCopy(first, args.labels ?? {})?.hint
 }
 
 export function startingChoiceHasNamedAttribution(args: {
   selectedIds: readonly string[]
-  suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
   labels?: StartingChoiceSuggestionLabels
 }): boolean {
   const labels = args.labels ?? {}
@@ -137,7 +174,7 @@ export function startingChoiceFillsMatch(
 
 export type CanonicalStartingChoiceAllowance = {
   selectedIds: readonly string[]
-  suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
 }
 
 function preferenceArgs(args: {
