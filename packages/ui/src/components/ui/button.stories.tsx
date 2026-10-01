@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { ArrowRight, Plus } from 'lucide-react'
+import { ArrowRight, Plus, Trash2 } from 'lucide-react'
 
 import { Button } from './button.client'
 
@@ -16,7 +16,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: ['default', 'sm', 'lg', 'icon', 'icon-lg'],
+      options: ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-lg'],
     },
     density: {
       control: 'select',
@@ -77,6 +77,68 @@ export const TextAccentWithIcon: Story = {
     <Button variant="text" tone="accent">
       Choose class
       <ArrowRight aria-hidden />
+    </Button>
+  ),
+}
+
+/**
+ * Desktop-dense micro-actions (10px labels, 28px / 24px chrome). Avoid as primary
+ * touch targets on mobile without review.
+ */
+export const ExtraSmallMicroActions: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="xs" variant="outline">
+        Change
+      </Button>
+      <Button size="xs" variant="ghost">
+        Reset
+      </Button>
+      <Button size="xs" density="compact" variant="ghost">
+        Remove
+      </Button>
+      <Button size="xs" variant="text">
+        Change
+      </Button>
+    </div>
+  ),
+}
+
+export const ExtraSmallDensityComparison: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-end gap-4">
+      <div className="flex flex-col items-start gap-1">
+        <span className="text-xs text-muted-foreground">xs default (28px)</span>
+        <Button size="xs" variant="outline">
+          Reset
+        </Button>
+      </div>
+      <div className="flex flex-col items-start gap-1">
+        <span className="text-xs text-muted-foreground">xs compact (24px)</span>
+        <Button size="xs" density="compact" variant="outline">
+          Reset
+        </Button>
+      </div>
+      <div className="flex flex-col items-start gap-1">
+        <span className="text-xs text-muted-foreground">sm (32px)</span>
+        <Button size="sm" variant="outline">
+          Reset
+        </Button>
+      </div>
+      <div className="flex flex-col items-start gap-1">
+        <span className="text-xs text-muted-foreground">sm compact (24px)</span>
+        <Button size="sm" density="compact" variant="outline">
+          Reset
+        </Button>
+      </div>
+    </div>
+  ),
+}
+
+export const IconExtraSmall: Story = {
+  render: () => (
+    <Button size="icon-xs" variant="ghost" aria-label="Remove">
+      <Trash2 aria-hidden />
     </Button>
   ),
 }

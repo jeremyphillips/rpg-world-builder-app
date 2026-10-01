@@ -6,6 +6,9 @@ import {
   controlActionDefaultIconClasses,
   controlActionLgIconClasses,
   controlActionCompactTextWithIconClasses,
+  controlActionXsCompactTextWithIconClasses,
+  controlActionXsIconClasses,
+  controlActionXsTextClasses,
 } from './control-action.variants'
 import { fieldGroupedSegmentEndClasses } from './field-input-chrome.variants'
 import { fieldGroupedControlActionPaddingClasses } from './field-sizing.variants'
@@ -53,9 +56,11 @@ export const buttonVariants = cva(
       },
       size: {
         default: '',
+        xs: '',
         sm: 'text-xs',
         lg: '',
         icon: '',
+        'icon-xs': '',
         'icon-lg': '',
       },
       density: {
@@ -72,6 +77,18 @@ export const buttonVariants = cva(
       },
       {
         variant: chromeButtonVariants,
+        size: 'xs',
+        density: 'default',
+        class: cn('rounded-md', controlActionXsTextClasses),
+      },
+      {
+        variant: chromeButtonVariants,
+        size: 'xs',
+        density: 'compact',
+        class: cn('rounded-md', controlActionXsCompactTextWithIconClasses),
+      },
+      {
+        variant: chromeButtonVariants,
         size: 'sm',
         density: 'default',
         class: 'h-8 rounded-md px-3',
@@ -83,6 +100,7 @@ export const buttonVariants = cva(
         class: 'h-10 rounded-md px-6',
       },
       { size: 'icon', density: 'default', class: controlActionDefaultIconClasses },
+      { size: 'icon-xs', class: controlActionXsIconClasses },
       { size: 'icon-lg', density: 'default', class: controlActionLgIconClasses },
       {
         variant: chromeButtonVariants,
@@ -109,6 +127,11 @@ export const buttonVariants = cva(
       },
       {
         variant: 'text',
+        size: 'xs',
+        class: 'text-sm',
+      },
+      {
+        variant: 'text',
         density: 'default',
         class: cn('h-8 px-0 w-fit', textButtonTransparentClasses),
       },
@@ -122,6 +145,15 @@ export const buttonVariants = cva(
         size: 'sm',
         class: cn(
           'h-full min-h-0 w-full py-0',
+          fieldGroupedControlActionPaddingClasses.sm,
+          fieldGroupedSegmentEndClasses,
+        ),
+      },
+      {
+        variant: 'attached',
+        size: 'xs',
+        class: cn(
+          'h-full min-h-0 w-full py-0 text-xs',
           fieldGroupedControlActionPaddingClasses.sm,
           fieldGroupedSegmentEndClasses,
         ),

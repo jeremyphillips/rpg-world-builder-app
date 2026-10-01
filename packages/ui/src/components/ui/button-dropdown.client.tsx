@@ -4,7 +4,7 @@ import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { ChevronDown } from 'lucide-react'
 
-import { buttonSizeToComboboxFieldSize } from '../../components/ui/field-sizing.variants'
+import { resolveComboboxSearchFieldSizeForButtonSize } from '../../components/ui/field-sizing.variants'
 import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
@@ -142,7 +142,7 @@ export function ButtonDropdown({
     setActiveIndex,
   } = useButtonDropdownControl({ groups, items, enableSearch, onSelectItem })
   const groupedSections = groupHeadingsForItems(displayItems, groups, searchActive)
-  const searchFieldSize = buttonSizeToComboboxFieldSize[size ?? 'default']
+  const searchFieldSize = resolveComboboxSearchFieldSizeForButtonSize(size)
 
   const highlightIndexForItem = React.useCallback(
     (item: ButtonDropdownItem) =>

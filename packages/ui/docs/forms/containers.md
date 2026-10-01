@@ -552,7 +552,7 @@ rows.
 | `addActionVariant` | Button visual style for the add control — mirrors `Button` `variant`; defaults to `outline`. |
 | `addActionLayout` | `stacked` (default) — add control below items; `inline` — add control right-aligned in the legend row (`shrink-0`). |
 | `showAddIcon` | When true (default), prefixes the add action with a `+` icon. Set `false` for non-add triggers (e.g. "Choose preset"). |
-| `addActionSize` | Optional `Button` size override for the add control (`sm`, `default`, `lg`); inherits from section rhythm when omitted. |
+| `addActionSize` | Optional `Button` size override for the add control (`xs`, `sm`, `default`, `lg`); inherits from section rhythm when omitted. |
 | `hideAddAction` | Omits the default add button (use an external slot instead). |
 | `hideItemRemove` | Omits the default per-item remove button (not merely disabled). Use with `itemRemoveSlot`. |
 | `itemRemoveSlot` | Custom remove control in the header actions rail; receives `ArrayFieldContext`. Pair with `hideItemRemove`. |

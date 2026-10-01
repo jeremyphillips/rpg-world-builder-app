@@ -10,6 +10,9 @@ import {
   controlActionDefaultSizeClasses,
   controlActionLgIconClasses,
   controlActionLgSizeClasses,
+  controlActionXsCompactTextWithIconClasses,
+  controlActionXsIconClasses,
+  controlActionXsTextClasses,
 } from './control-action.variants'
 
 describe('controlAction variants', () => {
@@ -41,5 +44,23 @@ describe('controlAction variants', () => {
   it('pairs large icon control with 40px hit target and lg glyph', () => {
     expect(controlActionLgIconClasses).toContain('size-control-action-lg')
     expect(controlActionLgIconClasses).toContain('[&_svg]:size-icon-glyph-lg')
+  })
+
+  it('locks xs text control to 28px height and 10px type', () => {
+    expect(controlActionXsTextClasses).toContain('h-control-action-xs')
+    expect(controlActionXsTextClasses).toContain('text-control-action-xs')
+    expect(controlActionXsTextClasses).toContain('[&_svg]:size-icon-glyph-xs')
+  })
+
+  it('locks xs compact text+icon to 24px height and xs glyph', () => {
+    expect(controlActionXsCompactTextWithIconClasses).toContain('h-control-action-compact')
+    expect(controlActionXsCompactTextWithIconClasses).toContain('text-control-action-xs')
+    expect(controlActionXsCompactTextWithIconClasses).toContain('[&_svg]:size-icon-glyph-xs')
+  })
+
+  it('locks xs icon control to 24px hit target and xs glyph', () => {
+    expect(controlActionXsIconClasses).toContain('size-control-action-compact')
+    expect(controlActionXsIconClasses).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(controlActionXsIconClasses).not.toContain('[&_svg]:size-icon-glyph-md')
   })
 })
