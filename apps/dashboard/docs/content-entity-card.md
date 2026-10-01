@@ -33,20 +33,34 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 
 ## Choose a surface
 
-| Need                                                                                   | Surface             |
-| -------------------------------------------------------------------------------------- | ------------------- |
-| Identity inside a search result, combobox, preview, destination, or master-detail host | `EntityAnatomyHost` |
+| Need                                                                | Surface                                                                                                                                                 |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Identity inside preview, destination, or master-detail host         | `EntityAnatomyHost`                                                                                                                                     |
+| Global search hit (link row)                                        | `InteractiveListRow` + `IdentityRow`; media/status via `projectSearchHitToInteractiveListPresentation` — not `EntityAnatomyHost` inside the link        |
+| Bordered static identity                                            | `ContentEntityCard`                                                                                                                                     |
+| Bordered identity with expandable domain content                    | `DisclosureEntityCard`                                                                                                                                  |
+| Create-tab Add/Pending discovery or pending rows                    | `ContentEntityCard` + trailing action                                                                                                                   |
+| Detail hierarchy or typed relationship                              | `DetailEntityRow` / `EntityRowList`                                                                                                                     |
+| Combobox option, action choice menu item, or split-button menu item | Shared interactive list chrome + `IdentityRow` (`ComboboxOptionRow` / `MenuChoiceRow`) — `InteractiveListSize` `sm` / `md` / `lg`; not `FieldSizeToken` |
+| Custom combobox interiors (`renderOption`) or non-entity pickers    | Purpose-built row content                                                                                                                               |
 
-Global search preview and results use `ListResultItem` row chrome with a **passive**
-compact `EntityAnatomyHost` inside the row link (no `headingHref`, leading utility,
-trailing action, or disclosure). Campaign-unavailable hits use entity `inactive` status
+### Interactive list chrome vs semantic hosts
+
+Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shared; the
+**host** sets ARIA semantics. Entity choice rows must render identity through these
+primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
+`data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).
+
+| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                          |
+| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | --------------------------------------------- |
+| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                 |
+| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy |
+| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                 |
+| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | `EntitySummary` → `IdentityRow` at compact    |
+| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                          |
+
+Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
-| Bordered static identity | `ContentEntityCard` |
-| Bordered identity with expandable domain content | `DisclosureEntityCard` |
-| Create-tab Add/Pending discovery or pending rows | `ContentEntityCard` + trailing action |
-| Detail hierarchy or typed relationship | `DetailEntityRow` / `EntityRowList` |
-| Combobox option, list-result row, or choice-menu item text (label + optional classification + supporting line) | `@rpg/ui` `IdentityRow` inside the host shell (`ListResultItem`, `DropdownMenuItem`, …) — `size` `sm` / `md` (default, 14px heading) / `lg`; not `FieldSizeToken` |
-| Custom combobox interiors (`renderOption`) or non-entity pickers | Purpose-built row content |
 
 ### EntitySurfaceConfig (character / organization / location pickers)
 

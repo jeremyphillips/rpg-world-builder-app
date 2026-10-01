@@ -9,10 +9,10 @@ import { cn } from '../../lib/utils'
 import { Button } from './button.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { comboboxContentVariants } from './combobox-field.variants'
-import { ListResultEmpty, ListResultList } from './list-result-list.client'
-import { ListResultGroupHeading } from './list-result-group-heading.client'
-import { ListResultItem } from './list-result-item.client'
-import { ListResultViewport } from './list-result-viewport.client'
+import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import { InteractiveListGroupHeading } from './interactive-list-group-heading.client'
+import { InteractiveListRow } from './interactive-list-row.client'
+import { InteractiveListViewport } from './interactive-list-viewport.client'
 import { useButtonDropdownControl } from './use-button-dropdown-control.client'
 import type {
   ButtonDropdownGroup,
@@ -78,7 +78,7 @@ function ButtonDropdownItemRow({
 }) {
   if (item.disabled) {
     return (
-      <ListResultItem
+      <InteractiveListRow
         name={item.label}
         metadata={resolveButtonDropdownMetadata(item)}
         disabled
@@ -88,7 +88,7 @@ function ButtonDropdownItemRow({
   }
 
   return (
-    <ListResultItem
+    <InteractiveListRow
       name={item.label}
       metadata={resolveButtonDropdownMetadata(item)}
       highlighted={isHighlighted}
@@ -97,16 +97,15 @@ function ButtonDropdownItemRow({
       <button
         id={optionId}
         type="button"
-        role="option"
-        aria-selected={false}
+        role="menuitem"
         onMouseEnter={onHighlight}
         onClick={onSelect}
       />
-    </ListResultItem>
+    </InteractiveListRow>
   )
 }
 
-/** Outline button that opens a searchable, grouped menu of list-result options. */
+/** Outline button that opens a searchable, grouped menu of interactive list rows. */
 export function ButtonDropdown({
   label,
   groups,
@@ -159,7 +158,7 @@ export function ButtonDropdown({
           size={size}
           density={density}
           className={cn(width === 'fit' && 'w-fit shrink-0', className)}
-          aria-haspopup="listbox"
+          aria-haspopup="menu"
           aria-expanded={open}
           aria-controls={listboxId}
         >
@@ -196,62 +195,67 @@ export function ButtonDropdown({
             />
           ) : null}
 
-          <ListResultViewport>
-            <ListResultList
+          <InteractiveListViewport>
+            <div
               ref={listboxRef}
               id={listboxId}
-              role="listbox"
+              role="menu"
               tabIndex={enableSearch ? undefined : -1}
               aria-label={label}
               aria-activedescendant={enableSearch ? undefined : activeOptionId}
               onKeyDown={enableSearch ? undefined : handleNavigationKeyDown}
             >
               {displayItems.length === 0 ? (
-                <ListResultEmpty>{emptyMessage}</ListResultEmpty>
+                <InteractiveList>
+                  <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
+                </InteractiveList>
               ) : searchActive ? (
-                displayItems.map((item) => (
-                  <ButtonDropdownItemRow
-                    key={item.id}
-                    item={item}
-                    optionId={`${generatedId}-option-${item.id}`}
-                    isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                    onHighlight={() => {
-                      const index = highlightIndexForItem(item)
-                      if (index >= 0) setActiveIndex(index)
-                    }}
-                    onSelect={() => selectItem(item.id)}
-                  />
-                ))
+                <InteractiveList>
+                  {displayItems.map((item) => (
+                    <ButtonDropdownItemRow
+                      key={item.id}
+                      item={item}
+                      optionId={`${generatedId}-option-${item.id}`}
+                      isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                      onHighlight={() => {
+                        const index = highlightIndexForItem(item)
+                        if (index >= 0) setActiveIndex(index)
+                      }}
+                      onSelect={() => selectItem(item.id)}
+                    />
+                  ))}
+                </InteractiveList>
               ) : (
                 groupedSections.map(({ group, items: sectionItems }) => (
-                  <div
-                    key={group?.id ?? '__ungrouped'}
-                    role="group"
-                    aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
-                  >
+                  <React.Fragment key={group?.id ?? '__ungrouped'}>
                     {group ? (
-                      <ListResultGroupHeading id={`${generatedId}-group-${group.id}`}>
+                      <InteractiveListGroupHeading id={`${generatedId}-group-${group.id}`}>
                         {group.label}
-                      </ListResultGroupHeading>
+                      </InteractiveListGroupHeading>
                     ) : null}
-                    {sectionItems.map((item) => (
-                      <ButtonDropdownItemRow
-                        key={item.id}
-                        item={item}
-                        optionId={`${generatedId}-option-${item.id}`}
-                        isHighlighted={highlightIndexForItem(item) === highlightedIndex}
-                        onHighlight={() => {
-                          const index = highlightIndexForItem(item)
-                          if (index >= 0) setActiveIndex(index)
-                        }}
-                        onSelect={() => selectItem(item.id)}
-                      />
-                    ))}
-                  </div>
+                    <InteractiveList
+                      role="group"
+                      aria-labelledby={group ? `${generatedId}-group-${group.id}` : undefined}
+                    >
+                      {sectionItems.map((item) => (
+                        <ButtonDropdownItemRow
+                          key={item.id}
+                          item={item}
+                          optionId={`${generatedId}-option-${item.id}`}
+                          isHighlighted={highlightIndexForItem(item) === highlightedIndex}
+                          onHighlight={() => {
+                            const index = highlightIndexForItem(item)
+                            if (index >= 0) setActiveIndex(index)
+                          }}
+                          onSelect={() => selectItem(item.id)}
+                        />
+                      ))}
+                    </InteractiveList>
+                  </React.Fragment>
                 ))
               )}
-            </ListResultList>
-          </ListResultViewport>
+            </div>
+          </InteractiveListViewport>
         </PopoverPrimitive.Content>
       </PopoverPrimitive.Portal>
     </PopoverPrimitive.Root>

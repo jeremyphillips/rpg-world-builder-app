@@ -127,9 +127,9 @@ describe('SpellResolutionOutcomes', () => {
     )
 
     expect(
-      await screen.findByRole('option', { name: /Damage — 1d4 Force damage/i }),
+      await screen.findByRole('menuitem', { name: /Damage — 1d4 Force damage/i }),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: /1d4\+1 Force damage/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /1d4\+1 Force damage/i })).not.toBeInTheDocument()
   })
 
   it('hides the add trigger when all effects are already applied', async () => {

@@ -1,6 +1,6 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 
-import { ListResultList } from '@rpg/ui'
+import { InteractiveList } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
 import { isGlobalSearchCampaignUnavailable } from '../../lib/global-search-result-presentation'
@@ -67,7 +67,7 @@ export function GlobalSearchFlatResults({
   }
 
   return (
-    <ListResultList>
+    <InteractiveList>
       {results.map((document) => (
         <SearchResultRow
           key={document.id}
@@ -78,6 +78,6 @@ export function GlobalSearchFlatResults({
           viewerCharacterRelationships={document.viewerCharacterRelationships}
         />
       ))}
-    </ListResultList>
+    </InteractiveList>
   )
 }

@@ -15,9 +15,9 @@ import {
   comboboxContentVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
-import { ListResultEmpty, ListResultList } from './list-result-list.client'
-import { ListResultItem } from './list-result-item.client'
-import { ListResultViewport } from './list-result-viewport.client'
+import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import { InteractiveListRow } from './interactive-list-row.client'
+import { InteractiveListViewport } from './interactive-list-viewport.client'
 import { ComboboxSearchField } from './combobox-field-parts.client'
 import { JoinedPair } from './joined-pair-field.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
@@ -224,13 +224,13 @@ function SearchableUnitSelect({
             onQueryChange={setQuery}
           />
 
-          <ListResultViewport>
-            <ListResultList id={listboxId} role="listbox" aria-label={label}>
+          <InteractiveListViewport>
+            <InteractiveList id={listboxId} role="listbox" aria-label={label}>
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((option) => {
                   const isSelected = option.value === unit
                   return (
-                    <ListResultItem
+                    <InteractiveListRow
                       key={option.value}
                       name={option.label}
                       metadata={option.metadata}
@@ -250,14 +250,14 @@ function SearchableUnitSelect({
                         aria-selected={isSelected}
                         onClick={() => handleSelect(option.value)}
                       />
-                    </ListResultItem>
+                    </InteractiveListRow>
                   )
                 })
               ) : (
-                <ListResultEmpty>{EMPTY_UNIT_MESSAGE}</ListResultEmpty>
+                <InteractiveListEmpty>{EMPTY_UNIT_MESSAGE}</InteractiveListEmpty>
               )}
-            </ListResultList>
-          </ListResultViewport>
+            </InteractiveList>
+          </InteractiveListViewport>
         </PopoverPrimitive.Content>
       </PopoverLayerPortal>
     </PopoverPrimitive.Root>

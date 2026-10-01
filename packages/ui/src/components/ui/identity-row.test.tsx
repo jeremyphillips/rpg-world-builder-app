@@ -81,13 +81,13 @@ describe('IdentityRow', () => {
   })
 })
 
-describe('IdentityRow in ListResultItem shell', () => {
+describe('IdentityRow in InteractiveListRow shell', () => {
   it('preserves heading truncate with start and end slots in a narrow row', async () => {
-    const { ListResultItem } = await import('./list-result-item.client')
+    const { InteractiveListRow } = await import('./interactive-list-row.client')
 
     render(
       <div className="w-48">
-        <ListResultItem
+        <InteractiveListRow
           name="Very Long Spell Name That Eventually Truncates"
           classification="Spell"
           startSlot={<span data-testid="start">◆</span>}

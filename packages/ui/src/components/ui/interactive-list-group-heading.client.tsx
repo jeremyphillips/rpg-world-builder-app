@@ -5,11 +5,11 @@ import * as React from 'react'
 import { cn } from '../../lib/utils'
 import { Eyebrow } from './eyebrow'
 import {
-  listResultGroupHeadingVariants,
-  type ListResultGroupHeadingVariantProps,
-} from './list-result.variants'
+  interactiveListGroupHeadingVariants,
+  type InteractiveListGroupHeadingVariantProps,
+} from './interactive-list.variants'
 
-export interface ListResultGroupHeadingProps extends ListResultGroupHeadingVariantProps {
+export interface InteractiveListGroupHeadingProps extends InteractiveListGroupHeadingVariantProps {
   /** Host-owned id for `aria-labelledby` / section labelling. */
   id?: string
   children: React.ReactNode
@@ -18,18 +18,18 @@ export interface ListResultGroupHeadingProps extends ListResultGroupHeadingVaria
   as?: 'div' | 'h2' | 'h3' | 'h4'
 }
 
-export function ListResultGroupHeading({
+export function InteractiveListGroupHeading({
   id,
   children,
   className,
   as: Component = 'div',
   first,
   follows,
-}: ListResultGroupHeadingProps) {
+}: InteractiveListGroupHeadingProps) {
   return (
     <Component
       id={id}
-      className={cn(listResultGroupHeadingVariants({ first, follows }), className)}
+      className={cn(interactiveListGroupHeadingVariants({ first, follows }), className)}
     >
       <Eyebrow size="sm">{children}</Eyebrow>
     </Component>

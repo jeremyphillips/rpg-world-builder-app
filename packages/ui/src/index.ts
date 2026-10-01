@@ -296,6 +296,8 @@ export {
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,
+  fieldSizeToInteractiveListSize,
+  resolveInteractiveListSizeForFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
   INLINE_HEADER_ACTION_BUTTON_SIZE,
@@ -604,37 +606,54 @@ export {
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
 export {
-  ListResultToolbar,
-  type ListResultToolbarProps,
-} from './components/ui/list-result-toolbar.client'
+  InteractiveListToolbar,
+  type InteractiveListToolbarProps,
+} from './components/ui/interactive-list-toolbar.client'
 export {
-  ListResultGroupHeading,
-  type ListResultGroupHeadingProps,
-} from './components/ui/list-result-group-heading.client'
+  InteractiveListGroupHeading,
+  type InteractiveListGroupHeadingProps,
+} from './components/ui/interactive-list-group-heading.client'
 export {
-  ListResultViewport,
-  type ListResultViewportProps,
-} from './components/ui/list-result-viewport.client'
+  InteractiveListViewport,
+  type InteractiveListViewportProps,
+} from './components/ui/interactive-list-viewport.client'
 export {
-  ListResultList,
-  ListResultEmpty,
-  type ListResultListProps,
-  type ListResultEmptyProps,
-} from './components/ui/list-result-list.client'
-export { ListResultItem, type ListResultItemProps } from './components/ui/list-result-item.client'
+  InteractiveList,
+  InteractiveListEmpty,
+  type InteractiveListProps,
+  type InteractiveListEmptyProps,
+} from './components/ui/interactive-list.client'
+export {
+  InteractiveListRow,
+  type InteractiveListRowProps,
+} from './components/ui/interactive-list-row.client'
+export {
+  ComboboxOptionRow,
+  type ComboboxOptionRowProps,
+} from './components/ui/combobox-option-row.client'
+export { MenuChoiceRow, type MenuChoiceRowProps } from './components/ui/menu-choice-row.client'
+export {
+  InteractiveListPanel,
+  type InteractiveListPanelProps,
+} from './components/ui/interactive-list-panel.client'
 export {
   IdentityRow,
   type IdentityRowProps,
   type IdentityRowSize,
 } from './components/ui/identity-row.client'
 export {
-  listResultToolbarVariants,
-  listResultGroupHeadingVariants,
-  listResultViewportVariants,
-  listResultListVariants,
-  listResultItemShellVariants,
-  listResultItemMainVariants,
-} from './components/ui/list-result.variants'
+  interactiveListToolbarVariants,
+  interactiveListGroupHeadingVariants,
+  interactiveListViewportVariants,
+  interactiveListSurfaceClasses,
+  interactiveListRowSeparatorClasses,
+  interactiveListVariants,
+  interactiveListRowChromeVariants,
+  interactiveListRowMainVariants,
+  menuChoiceItemResetVariants,
+  type InteractiveListSize,
+} from './components/ui/interactive-list.variants'
+export { identityRowSizeFromInteractiveListSize } from './components/ui/interactive-list.lib'
 export {
   PreviewRail,
   PreviewRailAction,
@@ -823,6 +842,7 @@ export {
   dropdownMenuChoiceContentClasses,
   dropdownMenuChoiceItemClasses,
   dropdownMenuChoiceItemVariants,
+  interactiveListChoiceMenuContentClasses,
 } from './components/ui/dropdown-menu-choice.variants'
 export {
   UserMenuTrigger,

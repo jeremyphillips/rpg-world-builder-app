@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { IdentityRow } from './identity-row.client'
-import { ListResultItem } from './list-result-item.client'
+import { InteractiveListRow } from './interactive-list-row.client'
 
 const meta = {
   title: 'UI/IdentityRow',
@@ -74,10 +74,10 @@ export const Sizes: Story = {
   ),
 }
 
-export const InListResultItemWithSlots: Story = {
+export const InInteractiveListRowWithSlots: Story = {
   render: () => (
     <div className="w-56 border border-border">
-      <ListResultItem
+      <InteractiveListRow
         name="Very Long Spell Name That Eventually Truncates"
         classification="Spell"
         metadata="Level 3 · Evocation"

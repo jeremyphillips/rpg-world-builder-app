@@ -28,6 +28,18 @@ function rowShell(link: HTMLElement): HTMLElement {
 }
 
 describe('SearchResultRow', () => {
+  it('uses selectable row-hover interaction on the list shell', () => {
+    renderWithProviders(
+      <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,
+    )
+
+    const link = screen.getByRole('link', { name: 'Fireball, Spell' })
+    const shell = rowShell(link)
+    expect(shell.className).toContain('hover:bg-row-hover')
+    expect(shell.className).not.toContain('control-hover')
+    expect(shell.className).not.toContain('bg-accent')
+  })
+
   it('renders presentation fields and navigates via link', () => {
     renderWithProviders(
       <SearchResultRow document={spellDocument()} href="/campaigns/c1/spells/fireball" />,

@@ -9,6 +9,7 @@ import { cn } from '../../lib/utils'
 import type { ButtonVariantProps } from './button.variants'
 import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+import type { InteractiveListSize } from './interactive-list.variants'
 
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
 
@@ -250,6 +251,19 @@ export function resolveComboboxSearchFieldSizeForButtonSize(
     return buttonTextSizeToComboboxFieldSize[size as keyof typeof buttonTextSizeToComboboxFieldSize]
   }
   return COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON
+}
+
+/** Combobox field band → interactive list row scale (not field typography). */
+export const fieldSizeToInteractiveListSize = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, InteractiveListSize>
+
+export function resolveInteractiveListSizeForFieldSize(
+  fieldSize: FieldSizeToken = 'md',
+): InteractiveListSize {
+  return fieldSizeToInteractiveListSize[fieldSize]
 }
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */

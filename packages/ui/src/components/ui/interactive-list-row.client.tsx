@@ -3,20 +3,22 @@
 import * as React from 'react'
 
 import { cn } from '../../lib/utils'
-import { IdentityRow, type IdentityRowSize } from './identity-row.client'
+import { IdentityRow } from './identity-row.client'
+import { identityRowSizeFromInteractiveListSize } from './interactive-list.lib'
+import type { InteractiveListSize } from './interactive-list.variants'
 import {
-  listResultItemMainVariants,
-  listResultItemShellVariants,
-  listResultItemTrailingActionVariants,
-} from './list-result.variants'
+  interactiveListRowChromeVariants,
+  interactiveListRowMainVariants,
+  interactiveListRowTrailingActionVariants,
+} from './interactive-list.variants'
 
-export type ListResultItemProps = {
+export type InteractiveListRowProps = {
   name?: string
   classification?: string
   metadata?: React.ReactNode
   /** Replaces the default identity block while keeping row chrome. */
   content?: React.ReactNode
-  size?: IdentityRowSize
+  size?: InteractiveListSize
   /** Keyboard / pointer highlight — independent of selected. */
   highlighted?: boolean
   /** Persisted selection (e.g. combobox value) — independent of highlighted. */
@@ -35,7 +37,7 @@ export type ListResultItemProps = {
   children?: React.ReactElement
 }
 
-export function ListResultItem({
+export function InteractiveListRow({
   name = '',
   classification,
   metadata,
@@ -51,27 +53,34 @@ export function ListResultItem({
   className,
   asChild = false,
   children,
-}: ListResultItemProps) {
-  const identity = content ?? (
+}: InteractiveListRowProps) {
+  const identitySize = identityRowSizeFromInteractiveListSize(size)
+
+  const identityCore = content ?? (
+    <IdentityRow
+      heading={name}
+      classification={classification}
+      supporting={metadata}
+      size={identitySize}
+    />
+  )
+
+  const identity = (
     <>
       {startSlot ? <div className="shrink-0">{startSlot}</div> : null}
-      <IdentityRow
-        heading={name}
-        classification={classification}
-        supporting={metadata}
-        size={size}
-      />
-      {endSlot ? <div className="shrink-0">{endSlot}</div> : null}
+      {identityCore}
+      {content == null && endSlot ? <div className="shrink-0">{endSlot}</div> : null}
     </>
   )
 
-  const shellClassName = listResultItemShellVariants({
+  const shellClassName = interactiveListRowChromeVariants({
+    host: 'row',
     highlighted,
     selected,
     disabled,
     interactive,
   })
-  const mainClassName = cn(listResultItemMainVariants({ interactive, size }), className)
+  const mainClassName = cn(interactiveListRowMainVariants({ interactive, size }), className)
 
   const main = asChild ? (
     React.isValidElement<{ className?: string; disabled?: boolean; children?: React.ReactNode }>(
@@ -98,7 +107,7 @@ export function ListResultItem({
     <div className={shellClassName}>
       {main}
       {trailingAction ? (
-        <div className={listResultItemTrailingActionVariants()}>{trailingAction}</div>
+        <div className={interactiveListRowTrailingActionVariants()}>{trailingAction}</div>
       ) : null}
     </div>
   )

@@ -496,7 +496,7 @@ describe('ArrayFieldRenderer', () => {
     expect(addButton).not.toHaveClass('border-interactive-outline')
 
     await user.click(addButton)
-    expect(screen.getByRole('option', { name: 'Movement bonus' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Movement bonus' })).toBeInTheDocument()
   })
 
   it('defaults flat array item shells to the subtle content plane', async () => {
@@ -1911,7 +1911,7 @@ describe('ArrayFieldRenderer', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    await user.click(screen.getByRole('option', { name: /Movement bonus/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Movement bonus/i }))
 
     expect(screen.getByDisplayValue('movement')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Walk +5')).toBeInTheDocument()
@@ -1980,7 +1980,7 @@ describe('ArrayFieldRenderer', () => {
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     expect(screen.getAllByText('Already added')).toHaveLength(2)
     expect(screen.queryByRole('option', { name: /Movement bonus/i })).not.toBeInTheDocument()
-    expect(screen.getByRole('option', { name: /Language/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Language/i })).toBeInTheDocument()
   })
 
   describe('item presentation matrix', () => {
