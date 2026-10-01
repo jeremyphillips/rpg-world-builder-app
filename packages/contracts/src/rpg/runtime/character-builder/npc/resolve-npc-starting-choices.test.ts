@@ -91,7 +91,7 @@ describe('resolveNpcStartingChoices', () => {
     ],
   }
 
-  it('shows Guard kit as a fixed grant and a 2-skill canonical fill', () => {
+  it('does not treat a Guard default loadout as a fixed equipment grant', () => {
     const choices = resolveNpcStartingChoices({
       context,
       seed,
@@ -99,11 +99,7 @@ describe('resolveNpcStartingChoices', () => {
     })
 
     const equipment = choices.contributions.find((entry) => entry.category === 'equipment')
-    expect(equipment).toMatchObject({
-      mechanic: 'fixed-grant',
-      selectedIds: [spear.id],
-      owner: { ownerKind: 'npcTemplate', ownerLabel: 'Guard' },
-    })
+    expect(equipment).toBeUndefined()
 
     const skills = choices.contributions.find((entry) => entry.category === 'skill')
     expect(skills).toMatchObject({
@@ -164,7 +160,7 @@ describe('resolveNpcStartingChoices', () => {
     ).toEqual([perception.id, athleticsSkill.id])
   })
 
-  it('omits a manual weapon already granted by the kit', () => {
+  it('keeps a required weapon when the role default was not materialized', () => {
     const choices = resolveNpcStartingChoices({
       context,
       seed,
@@ -173,7 +169,7 @@ describe('resolveNpcStartingChoices', () => {
     })
 
     const weapons = choices.contributions.find((entry) => entry.category === 'weapon')
-    expect(weapons?.selectedIds).toEqual([longsword.id])
+    expect(weapons?.selectedIds).toEqual([spear.id, longsword.id])
     expect(weapons?.mechanic).toBe('explicit-constraint')
   })
 
@@ -292,7 +288,7 @@ describe('resolveNpcStartingChoices', () => {
     expect(fighter?.selectedIds).toEqual([athleticsSkill.id])
   })
 
-  it('records scout arrows with their kit quantity', () => {
+  it('does not emit a fixed-grant contribution for the scout default loadout', () => {
     const arrows = equipmentSchema.parse({
       ...spear,
       id: `${RULESET}:arrows`,
@@ -308,9 +304,10 @@ describe('resolveNpcStartingChoices', () => {
       seed: { speciesId: dwarfSpecies.id, level: 0, npcTemplateId: 'scout' },
       preferences,
     })
-    const kit = choices.contributions.find(
-      (entry) => entry.id === 'fixed:equipment:npcTemplate:scout:kit',
-    )
-    expect(kit?.mechanic === 'fixed-grant' ? kit.quantities?.[arrows.id] : undefined).toBe(20)
+    expect(
+      choices.contributions.some(
+        (entry) => entry.category === 'equipment' && entry.mechanic === 'fixed-grant',
+      ),
+    ).toBe(false)
   })
 })

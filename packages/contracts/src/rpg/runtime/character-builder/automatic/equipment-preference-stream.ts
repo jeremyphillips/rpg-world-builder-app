@@ -1,15 +1,10 @@
-import { isArmorEquipment, type Equipment } from '../../../content/equipment'
-import { getNpcTemplateEntry } from '../../../vocab/npc/npc-template'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
 import { deriveEquipmentDraftEntries } from '../resolvers/equipment/derive-equipment-draft-entries'
 import { addOptionIdentityKeys, optionIdentityKeys } from '../option-identity'
 import type { NpcRecommendationSource } from '../sourced-recommendation'
 
-export type NpcEquipmentPreferenceKind = 'weapon' | 'armor'
-
-/** Lower `sourcePriority` and lower `index` win. Title rank is reserved for a future pass. */
+/** Lower `sourcePriority` and lower `index` win. */
 export const NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY = {
   user: 0,
   title: 1,
@@ -17,7 +12,6 @@ export const NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY = {
 } as const satisfies Partial<Record<NpcRecommendationSource, number>>
 
 export type NpcEquipmentPreferenceEntry = {
-  readonly kind: NpcEquipmentPreferenceKind
   readonly slug: string
   readonly source: NpcRecommendationSource
   readonly sourcePriority: number
@@ -32,43 +26,25 @@ export const NO_EQUIPMENT_PREFERENCE_MATCH: EquipmentPreferenceTuple = [
 ]
 
 export function buildEquipmentPreferenceStream(args: {
-  userWeaponSlugs?: readonly string[]
-  userArmorSlugs?: readonly string[]
-  templateWeaponSlugs?: readonly string[]
-  templateArmorSlugs?: readonly string[]
+  userSlugs?: readonly string[]
+  titleSlugs?: readonly string[]
+  templateSlugs?: readonly string[]
 }): NpcEquipmentPreferenceEntry[] {
   const entries: NpcEquipmentPreferenceEntry[] = []
 
   function append(
-    kind: NpcEquipmentPreferenceKind,
     slugs: readonly string[],
     source: NpcRecommendationSource,
     sourcePriority: number,
   ): void {
     slugs.forEach((slug, index) => {
-      entries.push({ kind, slug, source, sourcePriority, index })
+      entries.push({ slug, source, sourcePriority, index })
     })
   }
 
-  append(
-    'weapon',
-    args.userWeaponSlugs ?? [],
-    'user',
-    NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.user,
-  )
-  append('armor', args.userArmorSlugs ?? [], 'user', NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.user)
-  append(
-    'weapon',
-    args.templateWeaponSlugs ?? [],
-    'template',
-    NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.template,
-  )
-  append(
-    'armor',
-    args.templateArmorSlugs ?? [],
-    'template',
-    NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.template,
-  )
+  append(args.userSlugs ?? [], 'user', NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.user)
+  append(args.titleSlugs ?? [], 'title', NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.title)
+  append(args.templateSlugs ?? [], 'template', NPC_EQUIPMENT_PREFERENCE_SOURCE_PRIORITY.template)
 
   return entries
 }
@@ -87,30 +63,14 @@ export function compareEquipmentPreferenceTuples(
   return left[1] - right[1]
 }
 
-function equipmentKindForPreference(
-  equipment: Equipment | undefined,
-): NpcEquipmentPreferenceKind | undefined {
-  if (!equipment) return undefined
-  if (equipment.kind === 'weapon') return 'weapon'
-  if (isArmorEquipment(equipment)) return 'armor'
-  return undefined
-}
-
 export function preferenceEntryMatchesEquipmentId(
   entry: NpcEquipmentPreferenceEntry,
   equipmentId: string,
-  catalogIndex: CharacterBuildCatalogIndex,
 ): boolean {
-  if (entry.kind === 'weapon') {
-    const equipment = catalogIndex.equipment.get(equipmentId)
-    if (!equipment || equipment.kind !== 'weapon') return false
-  } else {
-    const equipment = catalogIndex.equipment.get(equipmentId)
-    if (!equipment || !isArmorEquipment(equipment)) return false
-  }
   return optionIdentityKeys(equipmentId).includes(entry.slug)
 }
 
+/** Slugs already in draft inventory. Catalog defaults are not held until materialized. */
 export function collectHeldEquipmentSlugKeys(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
@@ -123,16 +83,6 @@ export function collectHeldEquipmentSlugKeys(args: {
       addOptionIdentityKeys(keys, entry.equipmentId)
     }
   }
-
-  if (
-    args.context &&
-    isBuilderLevelZeroClassless(args.draft, args.context) &&
-    args.draft.npcTemplateId
-  ) {
-    const kit = getNpcTemplateEntry(args.draft.npcTemplateId)?.levelZero?.kit ?? []
-    for (const item of kit) keys.add(item.slug)
-  }
-
   return keys
 }
 
@@ -154,14 +104,9 @@ export function bestEquipmentPreferenceMatchForEquipmentId(args: {
   stream: readonly NpcEquipmentPreferenceEntry[]
   catalogIndex: CharacterBuildCatalogIndex
 }): EquipmentPreferenceMatch | undefined {
-  const equipment = args.catalogIndex.equipment.get(args.equipmentId)
-  const kind = equipmentKindForPreference(equipment)
-  if (!kind) return undefined
-
   let best: EquipmentPreferenceMatch | undefined
   for (const entry of args.stream) {
-    if (entry.kind !== kind) continue
-    if (!preferenceEntryMatchesEquipmentId(entry, args.equipmentId, args.catalogIndex)) continue
+    if (!preferenceEntryMatchesEquipmentId(entry, args.equipmentId)) continue
     const tuple = equipmentPreferenceTuple(entry)
     if (!best || compareEquipmentPreferenceTuples(tuple, best.tuple) < 0) {
       best = { tuple, entry }
@@ -193,7 +138,6 @@ export function bestEquipmentPreferenceMatchForReachableIds(args: {
 /** Sources to record when exactly one recommendation source owns the winning tuple. */
 export function suggestedSourcesForEquipmentPreferenceMatch(
   stream: readonly NpcEquipmentPreferenceEntry[],
-  catalogIndex: CharacterBuildCatalogIndex,
   match: EquipmentPreferenceMatch | undefined,
   reachableEquipmentIds: readonly string[],
 ): readonly NpcRecommendationSource[] {
@@ -202,10 +146,9 @@ export function suggestedSourcesForEquipmentPreferenceMatch(
   const owners = new Set<NpcRecommendationSource>()
   for (const equipmentId of reachableEquipmentIds) {
     for (const entry of stream) {
-      if (entry.kind !== match.entry.kind) continue
       if (equipmentPreferenceTuple(entry)[0] !== match.tuple[0]) continue
       if (equipmentPreferenceTuple(entry)[1] !== match.tuple[1]) continue
-      if (!preferenceEntryMatchesEquipmentId(entry, equipmentId, catalogIndex)) continue
+      if (!preferenceEntryMatchesEquipmentId(entry, equipmentId)) continue
       owners.add(entry.source)
     }
   }

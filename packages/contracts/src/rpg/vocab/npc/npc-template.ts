@@ -21,6 +21,23 @@ export type NpcTemplateRoleChoiceCounts = {
   readonly toolCount?: number
 }
 
+/** One piece of editable classless level-0 starting equipment. Not a grant. */
+export type NpcTemplateEquipmentLoadoutItem = {
+  readonly slug: string
+  readonly quantity?: number
+}
+
+/**
+ * Role equipment bias and classless starting state.
+ * `additionalPreferences` must not repeat `defaultLoadout` slugs.
+ */
+export type NpcTemplateEquipmentRecommendations = {
+  /** Ordered soft bias beyond the default loadout. Never grants equipment. */
+  readonly additionalPreferences: readonly string[]
+  /** Initial editable equipment for a classless level-0 NPC. The user may remove it. */
+  readonly defaultLoadout: readonly NpcTemplateEquipmentLoadoutItem[]
+}
+
 /** Bias automatic selection at every level. Never add capabilities. */
 export type NpcTemplateRecommendations = {
   /** Consulted only when class progression applies. */
@@ -31,25 +48,17 @@ export type NpcTemplateRecommendations = {
   /** Empty unless the role works through tools. */
   readonly toolSlugs: readonly string[]
   readonly languageIds: readonly string[]
-  /** Ordered weapon equipment slugs. Bias only; never grants. */
-  readonly weaponSlugs: readonly string[]
-  /** Ordered armor equipment slugs. Bias only; never grants. */
-  readonly armorSlugs: readonly string[]
-}
-
-export type NpcTemplateKitItem = {
-  readonly slug: string
-  readonly quantity?: number
+  readonly equipment: NpcTemplateEquipmentRecommendations
 }
 
 /**
- * Actual grants, choices, and equipment. Applies only to the classless
- * level-0 chassis. Absent means the template behaves like templateless on
- * that chassis: modest purse, no kit, no role choices.
+ * Wealth, training, and role choices for the classless level-0 chassis.
+ * Absent means the template behaves like templateless on that chassis:
+ * modest purse and no role choices. Equipment defaults live on
+ * `recommendations.equipment`, not here.
  */
 export type NpcTemplateLevelZero = {
   readonly wealthTier: NpcWealthTierId
-  readonly kit: readonly NpcTemplateKitItem[]
   readonly training?: {
     readonly weapons?: WeaponProficiencyGrantSet
     readonly armor?: ArmorProficiencyGrantSet
@@ -66,7 +75,7 @@ export type NpcTemplateEntry = GameTermEntry & {
 export const NPC_TEMPLATE_TERM = {
   label: 'NPC Role',
   description:
-    'Reusable role for NPC creation. Recommendations bias automatic selection and never add capabilities. The level-0 role layer grants choices, training, and equipment only on the classless chassis. Level and class remain contextual.',
+    'Reusable role for NPC creation. Recommendations bias automatic selection and never add capabilities. Equipment defaults are editable starting state for a classless level-0 NPC, not grants. The level-0 role layer grants training and role choices only on the classless chassis. Level and class remain contextual.',
   sentence: {
     singular: 'NPC role',
     plural: 'NPC roles',
@@ -105,12 +114,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['animal-handling', 'athletics', 'perception', 'insight'],
       toolSlugs: [],
       languageIds: [],
-      weaponSlugs: ['club'],
-      armorSlugs: [],
+      equipment: {
+        additionalPreferences: [],
+        defaultLoadout: [{ slug: 'club' }],
+      },
     },
     levelZero: {
       wealthTier: 'poor',
-      kit: [{ slug: 'club' }],
       roleChoices: { skillCount: 1, toolCount: 0 },
     },
   },
@@ -125,12 +135,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['perception', 'athletics', 'intimidation', 'insight'],
       toolSlugs: [],
       languageIds: [],
-      weaponSlugs: ['spear', 'greatsword', 'javelin'],
-      armorSlugs: ['leather-armor', 'chain-mail'],
+      equipment: {
+        additionalPreferences: ['greatsword', 'javelin', 'chain-mail'],
+        defaultLoadout: [{ slug: 'spear' }, { slug: 'leather-armor' }],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [{ slug: 'spear' }, { slug: 'leather-armor' }],
       training: {
         weapons: { categories: ['simple'], items: [] },
         armor: { categories: ['light'], items: [] },
@@ -149,17 +160,18 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['perception', 'survival', 'stealth', 'nature'],
       toolSlugs: [],
       languageIds: [],
-      weaponSlugs: ['shortbow', 'dagger', 'longbow', 'scimitar'],
-      armorSlugs: ['leather-armor', 'studded-leather'],
+      equipment: {
+        additionalPreferences: ['longbow', 'scimitar', 'studded-leather'],
+        defaultLoadout: [
+          { slug: 'shortbow' },
+          { slug: 'arrows', quantity: 20 },
+          { slug: 'leather-armor' },
+          { slug: 'dagger' },
+        ],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [
-        { slug: 'shortbow' },
-        { slug: 'arrows', quantity: 20 },
-        { slug: 'leather-armor' },
-        { slug: 'dagger' },
-      ],
       training: {
         weapons: { categories: ['simple'], items: [] },
         armor: { categories: ['light'], items: [] },
@@ -178,12 +190,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['persuasion', 'insight', 'history', 'animal-handling'],
       toolSlugs: [],
       languageIds: ['dwarvish', 'elvish', 'halfling', 'gnomish'],
-      weaponSlugs: ['dagger'],
-      armorSlugs: [],
+      equipment: {
+        additionalPreferences: [],
+        defaultLoadout: [{ slug: 'dagger' }, { slug: 'clothes-fine' }],
+      },
     },
     levelZero: {
       wealthTier: 'comfortable',
-      kit: [{ slug: 'dagger' }, { slug: 'clothes-fine' }],
       roleChoices: { skillCount: 2, toolCount: 0 },
     },
   },
@@ -198,12 +211,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['persuasion', 'insight', 'investigation', 'history'],
       toolSlugs: ARTISAN_TOOL_SLUGS,
       languageIds: [],
-      weaponSlugs: [],
-      armorSlugs: [],
+      equipment: {
+        additionalPreferences: [],
+        defaultLoadout: [],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [],
       roleChoices: { skillCount: 1, toolCount: 1 },
     },
   },
@@ -218,12 +232,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['history', 'arcana', 'investigation', 'religion'],
       toolSlugs: [],
       languageIds: ['draconic', 'elvish', 'dwarvish', 'giant'],
-      weaponSlugs: ['quarterstaff'],
-      armorSlugs: [],
+      equipment: {
+        additionalPreferences: [],
+        defaultLoadout: [{ slug: 'quarterstaff' }, { slug: 'book' }],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [{ slug: 'quarterstaff' }, { slug: 'book' }],
       roleChoices: { skillCount: 2, toolCount: 0 },
     },
   },
@@ -238,12 +253,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['religion', 'insight', 'medicine', 'persuasion'],
       toolSlugs: [],
       languageIds: [],
-      weaponSlugs: ['mace'],
-      armorSlugs: ['chain-shirt', 'shield'],
+      equipment: {
+        additionalPreferences: ['chain-shirt', 'shield'],
+        defaultLoadout: [{ slug: 'mace' }, { slug: 'holy-symbol-amulet' }],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [{ slug: 'mace' }, { slug: 'holy-symbol-amulet' }],
       training: {
         weapons: { categories: ['simple'], items: [] },
       },
@@ -261,12 +277,13 @@ export const NPC_TEMPLATE_ENTRIES = {
       skillSlugs: ['stealth', 'sleight-of-hand', 'deception', 'perception'],
       toolSlugs: ['thieves-tools', 'disguise-kit', 'forgery-kit'],
       languageIds: [],
-      weaponSlugs: ['dagger', 'shortsword', 'shortbow'],
-      armorSlugs: ['leather-armor'],
+      equipment: {
+        additionalPreferences: ['shortsword', 'shortbow', 'leather-armor'],
+        defaultLoadout: [{ slug: 'dagger' }, { slug: 'crowbar' }],
+      },
     },
     levelZero: {
       wealthTier: 'modest',
-      kit: [{ slug: 'dagger' }, { slug: 'crowbar' }],
       training: {
         weapons: { categories: ['simple'], items: [] },
       },
@@ -294,6 +311,30 @@ export function getNpcTemplateLabel(id: string): string {
 
 export function getNpcTemplateClassPreferenceSlugs(id: string): readonly string[] {
   return getNpcTemplateEntry(id)?.recommendations.classPreferenceSlugs ?? []
+}
+
+/**
+ * Role bias in preference order: default-loadout slugs, then additional
+ * preferences, with the first occurrence of each slug kept.
+ * This does not create equipment.
+ */
+export function resolveNpcTemplateEffectiveEquipmentPreferences(
+  equipment: NpcTemplateEquipmentRecommendations | undefined,
+): string[] {
+  if (!equipment) return []
+  const seen = new Set<string>()
+  const slugs: string[] = []
+  for (const item of equipment.defaultLoadout) {
+    if (seen.has(item.slug)) continue
+    seen.add(item.slug)
+    slugs.push(item.slug)
+  }
+  for (const slug of equipment.additionalPreferences) {
+    if (seen.has(slug)) continue
+    seen.add(slug)
+    slugs.push(slug)
+  }
+  return slugs
 }
 
 /** Role-choice counts for a template, defaulting to zero and capped by the limits. */

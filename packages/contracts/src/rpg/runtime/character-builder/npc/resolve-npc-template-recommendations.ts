@@ -8,6 +8,7 @@ import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import {
   getNpcTemplateEntry,
   NPC_TEMPLATE_FALLBACK_ID,
+  resolveNpcTemplateEffectiveEquipmentPreferences,
   type NpcTemplateId,
 } from '../../../vocab/npc/npc-template'
 import {
@@ -27,6 +28,8 @@ export type NpcTemplateRecommendationTitle = {
   classPreferenceOverrideSlugs?: readonly string[]
   skillPreferenceSlugs?: readonly string[]
   toolPreferenceSlugs?: readonly string[]
+  /** Prepended ahead of the role's effective equipment preferences. Does not grant equipment. */
+  equipmentPreferenceSlugs?: readonly string[]
 }
 
 export type ResolveNpcTemplateRecommendationsInput = {
@@ -38,8 +41,8 @@ export type ResolveNpcTemplateRecommendationsInput = {
   userSkillSlugs?: readonly string[]
   userToolSlugs?: readonly string[]
   userLanguageIds?: readonly string[]
-  userWeaponSlugs?: readonly string[]
-  userArmorSlugs?: readonly string[]
+  /** Ordered equipment slugs. Prepended ahead of title and role. Does not grant equipment. */
+  userEquipmentPreferenceSlugs?: readonly string[]
   /** Full six-ability permutation. Wins ability order when complete. */
   userAbilityPriority?: readonly Ability[]
   title?: NpcTemplateRecommendationTitle
@@ -61,8 +64,8 @@ export type NpcTemplateRecommendationSet = {
   skills: SourcedRecommendation[]
   tools: SourcedRecommendation[]
   languages: SourcedRecommendation[]
-  weapons: SourcedRecommendation[]
-  armor: SourcedRecommendation[]
+  /** Effective equipment bias: user, then title, then role. Never grants equipment. */
+  equipment: SourcedRecommendation[]
   equipmentPreferences: readonly NpcEquipmentPreferenceEntry[]
   abilityPriority: readonly Ability[]
 }
@@ -191,22 +194,13 @@ function resolveLanguageRecommendations(
   ])
 }
 
-function resolveWeaponRecommendations(
+function resolveEquipmentRecommendations(
   input: ResolveNpcTemplateRecommendationsInput,
   templateSlugs: readonly string[],
 ): SourcedRecommendation[] {
   return mergeOrderedRecommendations([
-    { ids: input.userWeaponSlugs ?? [], source: 'user' },
-    { ids: templateSlugs, source: 'template' },
-  ])
-}
-
-function resolveArmorRecommendations(
-  input: ResolveNpcTemplateRecommendationsInput,
-  templateSlugs: readonly string[],
-): SourcedRecommendation[] {
-  return mergeOrderedRecommendations([
-    { ids: input.userArmorSlugs ?? [], source: 'user' },
+    { ids: input.userEquipmentPreferenceSlugs ?? [], source: 'user' },
+    { ids: input.title?.equipmentPreferenceSlugs ?? [], source: 'title' },
     { ids: templateSlugs, source: 'template' },
   ])
 }
@@ -221,6 +215,10 @@ export function resolveNpcTemplateRecommendations(
 ): NpcTemplateRecommendationSet {
   const selected = resolveSelectedTemplate(input)
   const recommendations = getNpcTemplateEntry(selected.recommendationTemplateId)?.recommendations
+  const roleEquipmentSlugs = resolveNpcTemplateEffectiveEquipmentPreferences(
+    recommendations?.equipment,
+  )
+  const equipment = resolveEquipmentRecommendations(input, roleEquipmentSlugs)
 
   return {
     npcTemplateId: selected.npcTemplateId,
@@ -230,13 +228,11 @@ export function resolveNpcTemplateRecommendations(
     skills: resolveSkillRecommendations(input, recommendations?.skillSlugs ?? []),
     tools: resolveToolRecommendations(input, recommendations?.toolSlugs ?? []),
     languages: resolveLanguageRecommendations(input, recommendations?.languageIds ?? []),
-    weapons: resolveWeaponRecommendations(input, recommendations?.weaponSlugs ?? []),
-    armor: resolveArmorRecommendations(input, recommendations?.armorSlugs ?? []),
+    equipment,
     equipmentPreferences: buildEquipmentPreferenceStream({
-      userWeaponSlugs: input.userWeaponSlugs,
-      userArmorSlugs: input.userArmorSlugs,
-      templateWeaponSlugs: recommendations?.weaponSlugs ?? [],
-      templateArmorSlugs: recommendations?.armorSlugs ?? [],
+      userSlugs: input.userEquipmentPreferenceSlugs,
+      titleSlugs: input.title?.equipmentPreferenceSlugs,
+      templateSlugs: roleEquipmentSlugs,
     }),
     abilityPriority: resolveAbilityPriority(input, recommendations?.abilityPriority),
   }
@@ -251,8 +247,6 @@ export function toAutomaticNpcBuildPreferences(
     skills: recommendations.skills,
     tools: recommendations.tools,
     languages: recommendations.languages,
-    weapons: recommendations.weapons,
-    armor: recommendations.armor,
     equipmentPreferences: recommendations.equipmentPreferences,
   }
 }

@@ -27,7 +27,7 @@ function catalogWith(slugs: readonly string[]): CharacterBuildCatalogIndex {
 describe('assembleLevelZeroStartingEquipment', () => {
   const wealthTiers = resolveLevelZeroNpcWealthTiers()
 
-  it('gives a templateless classless NPC the modest purse and no kit', () => {
+  it('gives a templateless classless NPC the modest purse and no equipment', () => {
     const assembled = assembleLevelZeroStartingEquipment(createEmptyCharacterBuilderDraft(), {
       rulesetId: RULESET,
       levelZeroRules: { wealthTiers },
@@ -37,7 +37,7 @@ describe('assembleLevelZeroStartingEquipment', () => {
     expect(assembled.equipment.weapons).toEqual([])
   })
 
-  it('uses the role wealth tier and records kit provenance', () => {
+  it('uses the role wealth tier and does not read the default loadout', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       npcTemplateId: 'commoner' as const,
@@ -48,13 +48,72 @@ describe('assembleLevelZeroStartingEquipment', () => {
       catalogIndex: catalogWith(['club']),
     })
     expect(assembled.wealth.gp).toBe(1)
+    expect(assembled.equipment.weapons).toEqual([])
+  })
+
+  it('materializes draft equipment selections without treating them as role grants', () => {
+    const clubId = toEquipmentContentId(RULESET, 'club')
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      npcTemplateId: 'commoner' as const,
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        grants: [{ equipmentId: clubId, quantity: 1 }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const assembled = assembleLevelZeroStartingEquipment(draft, {
+      rulesetId: RULESET,
+      levelZeroRules: { wealthTiers },
+      catalogIndex: catalogWith(['club']),
+    })
     expect(assembled.equipment.weapons).toEqual([
       {
-        equipmentId: toEquipmentContentId(RULESET, 'club'),
+        equipmentId: clubId,
         quantity: 1,
-        sources: [{ kind: 'npcTemplate', sourceId: 'commoner', grantId: 'kit' }],
+        sources: [{ kind: 'grant' }],
       },
     ])
+  })
+
+  it('keeps a removed default gone and preserves an explicit quantity', () => {
+    const arrowsId = toEquipmentContentId(RULESET, 'arrows')
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      npcTemplateId: 'scout' as const,
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        grants: [{ equipmentId: arrowsId, quantity: 20 }],
+        removedPackageItemKeys: [],
+        customized: false,
+      },
+    }
+    const assembled = assembleLevelZeroStartingEquipment(draft, {
+      rulesetId: RULESET,
+      levelZeroRules: { wealthTiers },
+      catalogIndex: catalogWith(['arrows']),
+    })
+    expect(assembled.equipment.weapons).toEqual([
+      expect.objectContaining({
+        equipmentId: arrowsId,
+        quantity: 20,
+        sources: [{ kind: 'grant' }],
+      }),
+    ])
+    const cleared = assembleLevelZeroStartingEquipment(
+      { ...draft, equipment: { ...draft.equipment, grants: [] } },
+      {
+        rulesetId: RULESET,
+        levelZeroRules: { wealthTiers },
+        catalogIndex: catalogWith(['arrows', 'shortbow', 'dagger', 'leather-armor']),
+      },
+    )
+    expect(cleared.equipment.weapons).toEqual([])
+    expect(cleared.equipment.armor).toEqual([])
+    expect(cleared.equipment.gear).toEqual([])
   })
 
   it('uses merchant comfortable wealth and keeps a campaign override', () => {

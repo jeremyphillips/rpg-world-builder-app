@@ -26,6 +26,7 @@ import {
   startingChoiceHasNamedAttribution,
   startingChoiceResetLabel,
   startingChoiceShowSuggestedReset,
+  startingChoiceItemSuggestionHint,
   startingChoiceSuggestionHint,
 } from './quick-npc-starting-choices.lib'
 
@@ -159,6 +160,32 @@ describe('startingChoiceAllowancePresentation', () => {
     expect(startingChoiceAllowancePresentation(choices, contribution)).toEqual(
       resolveProficiencyChoiceSetPresentation(choiceSet),
     )
+  })
+})
+
+describe('startingChoiceItemSuggestionHint', () => {
+  it('labels only the item that has a single named source', () => {
+    expect(
+      startingChoiceItemSuggestionHint({
+        selectedId: 'athletics',
+        suggestedBy: { athletics: ['template'], perception: [] },
+        labels: { template: 'Guard' },
+      }),
+    ).toBe('Suggested by Guard role')
+    expect(
+      startingChoiceItemSuggestionHint({
+        selectedId: 'perception',
+        suggestedBy: { athletics: ['template'], perception: [] },
+        labels: { template: 'Guard' },
+      }),
+    ).toBeUndefined()
+    expect(
+      startingChoiceItemSuggestionHint({
+        selectedId: 'insight',
+        suggestedBy: { insight: ['template', 'title'] },
+        labels: { template: 'Guard', title: 'Captain' },
+      }),
+    ).toBeUndefined()
   })
 })
 

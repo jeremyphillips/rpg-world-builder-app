@@ -547,7 +547,7 @@ describe('starting choice ownership', () => {
     })
   })
 
-  it('gives baseline languages, retained species languages, and the kit distinct stable ids', () => {
+  it('gives baseline languages and retained species languages distinct stable ids', () => {
     const first = resolveNpcStartingChoices({
       context,
       seed: { speciesId: dwarfSpecies.id, level: 0, npcTemplateId: 'guard' },
@@ -568,7 +568,6 @@ describe('starting choice ownership', () => {
         `fixed:language:characterCreation:${RULESET}:language-grants`,
         'fixed:language:characterCreation:levelZeroNpcs:baseline',
         `fixed:language:speciesTrait:${dwarfSpecies.id}:language-affinities`,
-        'fixed:equipment:npcTemplate:guard:kit',
       ]),
     )
     expect(fixedIds(first).every((id) => !id.includes(':language:language:'))).toBe(true)

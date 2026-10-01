@@ -5,6 +5,7 @@ import { BuilderInventoryRemoveAction } from '../../../components/builder/invent
 
 export type QuickNpcStartingChoiceSelectedRowProps = {
   label: string
+  suggestionHint?: string
   alsoGrantedHint?: string
   onRemove: () => void
 }
@@ -12,16 +13,18 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
 /** Removable starting-choice row — same ContentEntityCard chrome as builder choice-selected-row. */
 export function QuickNpcStartingChoiceSelectedRow({
   label,
+  suggestionHint,
   alsoGrantedHint,
   onRemove,
 }: QuickNpcStartingChoiceSelectedRowProps) {
+  const description = [suggestionHint, alsoGrantedHint].filter(Boolean).join(' ')
   return (
     <ContentEntityCard
       entity={{
         heading: label,
-        description: alsoGrantedHint ? (
+        description: description ? (
           <Text variant="caption" className="text-muted-foreground">
-            {alsoGrantedHint}
+            {description}
           </Text>
         ) : undefined,
       }}

@@ -264,7 +264,6 @@ describe('equipment preference package bias', () => {
       ...rolePrefs,
       equipmentPreferences: [
         {
-          kind: 'weapon' as const,
           slug: 'longbow',
           source: 'user' as const,
           sourcePriority: 0,
@@ -301,7 +300,6 @@ describe('equipment preference package bias', () => {
         ...preferences,
         equipmentPreferences: [
           {
-            kind: 'weapon',
             slug: 'greataxe',
             source: 'user',
             sourcePriority: 0,

@@ -98,7 +98,7 @@ export const ResolutionError: Story = {
     initialValues: {
       name: 'Stalled Recruit',
       alignment: 'ln',
-      additionalEquipmentIds: [],
+      equipmentSelections: [],
       requiredSpellIds: [],
     },
   },

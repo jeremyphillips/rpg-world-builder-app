@@ -6,10 +6,10 @@ Eight closed roles in [`npc-template.ts`](../../src/rpg/vocab/npc/npc-template.t
 
 Recommendations and the level-0 role layer are separate.
 
-| Layer              | What it does                                                                                                                         |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Recommendations    | Bias automatic selection at every level. They never add capabilities.                                                                |
-| Level-0 role layer | Grants kit, training, a wealth-tier purse, and role choices. Classless chassis only, and only when the draft stores `npcTemplateId`. |
+| Layer              | What it does                                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Recommendations    | Bias automatic selection at every level. They never add capabilities.                                                           |
+| Level-0 role layer | Grants training, a wealth-tier purse, and role choices. Classless chassis only, and only when the draft stores `npcTemplateId`. |
 
 ## Catalog
 
@@ -41,7 +41,7 @@ not cast. `wealthy` exists in the wealth-tier vocab and is unused by v1 roles.
 4. Class, only when class progression applies: user class ids replace the list. Otherwise a title `classPreferenceOverrideSlugs` replaces the role class list. Organization class affinities merge after that, ranked both → role/title → organization.
 5. Skills and tools: user, then title preferences, then the role. Title preferences are prepended and do not create slots.
 6. Languages: user, then species affinities, then the role. Species affinities order picks; they do not expand pools.
-7. Weapons and armor: user, then the role. Title weapon/armor preferences are reserved for a future pass. They order class starting-equipment packages, nested equipment pools, and weapon or armor proficiency choices when option ids match. Held level-0 kit items are removed from the bias stream before scoring. Package scoring includes direct grants and one level of reachable nested pool contents.
+7. Equipment: user, then title `equipmentPreferenceSlugs`, then the role. The role list is `defaultLoadout` slugs, then `additionalPreferences`, deduped. `additionalPreferences` does not repeat default slugs. The list orders class starting-equipment packages, nested equipment pools, and weapon or armor proficiency choices when option ids match. It never grants equipment. Held inventory is removed from the bias stream before scoring. A default loadout is not held until it has been materialized onto the draft. Package scoring includes direct grants and one level of reachable nested pool contents.
 8. Ability order: a complete user permutation wins; otherwise the role order.
 
 `toAutomaticNpcBuildPreferences` flattens that result for automatic build. Soft preferences never fail a build. Held skills, tools, and languages are skipped. On a classed build, class primary abilities keep the top standard-array slots and the role orders the rest.
@@ -53,8 +53,13 @@ modest 5 gp, comfortable 10 gp, wealthy 25 gp. A classless NPC with no role uses
 Until the wealth-tier form exists, the dashboard's single purse field reads and writes
 `wealthTiers.modest`.
 
-Classless finalize and preview assemble the role kit, the selected role tool when the role
-offers one, campaign equipment grants, and the tier purse. Role training is merged with the
+Role equipment defaults are editable starting state, not grants. Role equipment preferences bias existing choices. Only explicit grant sources create immutable Granted Equipment.
+
+Classless finalize and preview assemble the selected role tool when the role
+offers one, equipment already written onto `draft.equipment.grants`, and the tier purse.
+`draft.equipment.grants` materializes selected starting equipment. Presence there is not an
+immutable grant, and those rows are not Granted Equipment. The assembler does not re-read
+`defaultLoadout`, so a removed default stays gone. Role training is merged with the
 campaign baseline and keeps provenance `grantId: 'training'`. Armor training stores
 categories; item slugs in a grant resolve to those categories.
 

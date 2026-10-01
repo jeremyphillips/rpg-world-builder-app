@@ -141,11 +141,25 @@ export function resolveQuickNpcStartingEquipmentPackageItemLabels(args: {
     })
 }
 
+export function resolveQuickNpcEquipmentCategoryStatus(args: {
+  choiceSets: readonly { id: string; required: boolean; min: number; max: number }[]
+  draftSelections: Readonly<Record<string, readonly string[]>>
+  overrides: Readonly<Record<string, readonly string[]>>
+}): 'complete' | 'incomplete' {
+  const required = args.choiceSets.filter((choiceSet) => choiceSet.required && choiceSet.min > 0)
+  if (required.length === 0) return 'complete'
+  for (const choiceSet of required) {
+    const selected = args.overrides[choiceSet.id] ?? args.draftSelections[choiceSet.id] ?? []
+    if (selected.length < choiceSet.min || selected.length > choiceSet.max) return 'incomplete'
+  }
+  return 'complete'
+}
+
 export function resolveStartingChoiceEquipmentCategoryLabels(args: {
   context: CharacterBuildContext
   choices: NpcStartingChoices
   setup: QuickNpcSetupValues
-  additionalEquipmentIds: readonly string[]
+  equipmentSelections: readonly { equipmentId: string; quantity: number }[]
   additionalOptionLabels: ReadonlyMap<string, string>
 }): string[] {
   const labels: string[] = [
@@ -156,9 +170,11 @@ export function resolveStartingChoiceEquipmentCategoryLabels(args: {
     }),
   ]
 
-  for (const equipmentId of args.additionalEquipmentIds) {
-    const label = args.additionalOptionLabels.get(equipmentId) ?? equipmentId
-    labels.push(label)
+  for (const selection of args.equipmentSelections) {
+    const label = args.additionalOptionLabels.get(selection.equipmentId) ?? selection.equipmentId
+    labels.push(
+      selection.quantity > 1 ? formatPackageInventoryRowTitle(label, selection.quantity) : label,
+    )
   }
 
   for (const entry of args.choices.contributions) {
@@ -176,7 +192,7 @@ export function startingChoiceEquipmentCategorySummary(args: {
   context: CharacterBuildContext
   choices: NpcStartingChoices
   setup: QuickNpcSetupValues
-  additionalEquipmentIds: readonly string[]
+  equipmentSelections: readonly { equipmentId: string; quantity: number }[]
   additionalOptionLabels: ReadonlyMap<string, string>
 }): string {
   return formatStartingChoiceCategorySummary(resolveStartingChoiceEquipmentCategoryLabels(args))

@@ -1,8 +1,9 @@
 import type { FormValueSync } from '@rpg/ui/form'
 
 import {
-  QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME,
+  QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
+  type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { resolveQuickNpcAdditionalEquipmentValidIds } from './quick-npc-additional-equipment.lib'
@@ -16,6 +17,21 @@ function asStringArray(value: unknown): string[] {
   return value.filter((entry): entry is string => typeof entry === 'string')
 }
 
+function asEquipmentSelections(value: unknown): QuickNpcEquipmentSelection[] {
+  if (!Array.isArray(value)) return []
+  return value.filter(
+    (entry): entry is QuickNpcEquipmentSelection =>
+      typeof entry === 'object' &&
+      entry !== null &&
+      'equipmentId' in entry &&
+      typeof entry.equipmentId === 'string' &&
+      'quantity' in entry &&
+      typeof entry.quantity === 'number' &&
+      'origin' in entry &&
+      (entry.origin === 'role-default' || entry.origin === 'manual'),
+  )
+}
+
 function syncRequirementSelections(
   values: Record<string, unknown>,
   setup: QuickNpcSetupValues,
@@ -27,10 +43,14 @@ function syncRequirementSelections(
   })
   const validEquipmentIds = resolveQuickNpcAdditionalEquipmentValidIds({ setup, context })
 
-  const additionalEquipmentIds = asStringArray(values[QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME])
+  const equipmentSelections = asEquipmentSelections(
+    values[QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME],
+  )
   const requiredSpellIds = asStringArray(values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME])
 
-  const filteredEquipment = additionalEquipmentIds.filter((id) => validEquipmentIds.has(id))
+  const filteredEquipment = equipmentSelections.filter((entry) =>
+    validEquipmentIds.has(entry.equipmentId),
+  )
   const intersected = intersectQuickNpcRequirementIds({
     requiredWeaponIds: [],
     requiredSpellIds,
@@ -39,13 +59,13 @@ function syncRequirementSelections(
   })
 
   const equipmentChanged =
-    filteredEquipment.length !== additionalEquipmentIds.length ? filteredEquipment : undefined
+    filteredEquipment.length !== equipmentSelections.length ? filteredEquipment : undefined
   const spellChanged = intersected?.requiredSpellIds
 
   if (!equipmentChanged && !spellChanged) return undefined
 
   return {
-    ...(equipmentChanged ? { [QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME]: equipmentChanged } : {}),
+    ...(equipmentChanged ? { [QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME]: equipmentChanged } : {}),
     ...(spellChanged ? { [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: spellChanged } : {}),
   }
 }

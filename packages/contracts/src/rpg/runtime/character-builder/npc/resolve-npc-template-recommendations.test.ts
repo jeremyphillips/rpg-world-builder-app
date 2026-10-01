@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { CharacterClass } from '../../../content/classes/class'
+import { getNpcTemplateEntry } from '../../../vocab/npc/npc-template'
 import {
   resolveNpcTemplateRecommendations,
   toAutomaticNpcBuildPreferences,
@@ -156,22 +157,40 @@ describe('resolveNpcTemplateRecommendations', () => {
     expect(preferences.abilityPriority?.[0]).toBe('dex')
   })
 
-  it('merges user then role weapon and armor preferences into an equipment stream', () => {
+  it('merges user, title, then role equipment preferences without duplicating defaults', () => {
+    expect(getNpcTemplateEntry('guard')?.recommendations.equipment.additionalPreferences).toEqual([
+      'greatsword',
+      'javelin',
+      'chain-mail',
+    ])
     const recommendations = resolveNpcTemplateRecommendations({
       level: 1,
       userTemplateId: 'guard',
-      userWeaponSlugs: ['longbow'],
+      userEquipmentPreferenceSlugs: ['longbow'],
+      title: { equipmentPreferenceSlugs: ['spear'] },
       playableClasses,
     })
-    expect(recommendations.weapons[0]).toEqual({ id: 'longbow', sources: ['user'] })
-    expect(recommendations.weapons.map((entry) => entry.id)).toContain('spear')
-    expect(recommendations.armor.map((entry) => entry.id)).toContain('leather-armor')
+    expect(recommendations.equipment.map((entry) => entry.id)).toEqual([
+      'longbow',
+      'spear',
+      'leather-armor',
+      'greatsword',
+      'javelin',
+      'chain-mail',
+    ])
+    expect(recommendations.equipment[0]).toEqual({ id: 'longbow', sources: ['user'] })
+    expect(recommendations.equipment[1]?.sources).toEqual(['title', 'template'])
     const preferences = toAutomaticNpcBuildPreferences(recommendations)
     expect(preferences.equipmentPreferences?.[0]).toMatchObject({
-      kind: 'weapon',
       slug: 'longbow',
       source: 'user',
     })
-    expect(preferences.equipmentPreferences?.some((entry) => entry.slug === 'spear')).toBe(true)
+    expect(preferences.equipmentPreferences?.[1]).toMatchObject({
+      slug: 'spear',
+      source: 'title',
+    })
+    expect(preferences.equipmentPreferences?.some((entry) => entry.slug === 'chain-mail')).toBe(
+      true,
+    )
   })
 })

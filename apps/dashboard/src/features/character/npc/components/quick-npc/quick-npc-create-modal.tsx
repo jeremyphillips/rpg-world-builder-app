@@ -16,8 +16,10 @@ import { formatNestedCreateHandoffFailure, invokeOnContentCreated } from '@/lib/
 import {
   createQuickNpcSetupDefaultValues,
   type QuickNpcAuthoringTabFormValues,
+  type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
+import type { QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
 import {
   resolveQuickNpcCreateOrganization,
   resolveQuickNpcCreateRemountKey,
@@ -61,6 +63,7 @@ type QuickNpcCreateModalState = {
   phase: QuickNpcCreateModalPhase
   setupValues: QuickNpcSetupValues
   authoringValues?: Partial<QuickNpcAuthoringTabFormValues>
+  equipmentBaseline?: QuickNpcEquipmentSeedContext
 }
 
 function createInitialState(
@@ -131,7 +134,7 @@ function QuickNpcCreateModalSession({
         phase: 'authoring',
         setupValues: values,
         authoringValues: {
-          additionalEquipmentIds: [],
+          equipmentSelections: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
         },
@@ -241,19 +244,27 @@ function QuickNpcCreateModalSession({
     }))
   }, [])
 
-  const handleSetupSummaryEdit = React.useCallback((target: SetupSummaryEditTarget) => {
-    pendingSetupSummaryEditRef.current = target
-    setState((current) => ({
-      ...current,
-      phase: 'setup',
-      authoringValues: {
-        ...current.authoringValues,
-        additionalEquipmentIds: [],
-        requiredSpellIds: [],
-        startingChoiceOverrides: {},
-      },
-    }))
-  }, [])
+  const handleSetupSummaryEdit = React.useCallback(
+    (target: SetupSummaryEditTarget, equipmentSelections: QuickNpcEquipmentSelection[]) => {
+      pendingSetupSummaryEditRef.current = target
+      setState((current) => ({
+        ...current,
+        phase: 'setup',
+        authoringValues: {
+          ...current.authoringValues,
+          equipmentSelections,
+          requiredSpellIds: [],
+          startingChoiceOverrides: {},
+        },
+        equipmentBaseline: {
+          templateId: current.setupValues.npcTemplateId,
+          classId: current.setupValues.classId,
+          level: current.setupValues.level,
+        },
+      }))
+    },
+    [],
+  )
 
   React.useLayoutEffect(() => {
     if (state.phase !== 'setup') return
@@ -267,9 +278,15 @@ function QuickNpcCreateModalSession({
     }
   }, [returnToAuthoring, sequenceModel, state.phase])
 
-  const handleChangeSetup = React.useCallback(() => {
-    handleSetupSummaryEdit({ type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID })
-  }, [handleSetupSummaryEdit])
+  const handleChangeSetup = React.useCallback(
+    (equipmentSelections?: QuickNpcEquipmentSelection[]) => {
+      handleSetupSummaryEdit(
+        { type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID },
+        equipmentSelections ?? [],
+      )
+    },
+    [handleSetupSummaryEdit],
+  )
 
   const modalChrome = resolveQuickNpcModalChrome(context, state.phase)
 
@@ -333,6 +350,7 @@ function QuickNpcCreateModalSession({
             createContext={context}
             setup={state.setupValues}
             initialValues={state.authoringValues}
+            equipmentBaseline={state.equipmentBaseline}
             onCancel={requestCancel}
             onChangeSetup={handleChangeSetup}
             onSetupSummaryEdit={handleSetupSummaryEdit}

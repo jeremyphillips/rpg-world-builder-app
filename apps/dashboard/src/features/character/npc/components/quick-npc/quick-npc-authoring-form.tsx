@@ -28,8 +28,13 @@ import {
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   type QuickNpcAuthoringTabFormValues,
+  type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
+import {
+  reconcileQuickNpcEquipmentSelections,
+  type QuickNpcEquipmentSeedContext,
+} from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
 import {
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
@@ -69,9 +74,13 @@ export type QuickNpcAuthoringFormProps = {
   createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
   initialValues?: Partial<QuickNpcAuthoringTabFormValues> | undefined
+  equipmentBaseline?: QuickNpcEquipmentSeedContext
   onCancel: () => void
-  onChangeSetup: () => void
-  onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
+  onChangeSetup: (equipmentSelections?: QuickNpcEquipmentSelection[]) => void
+  onSetupSummaryEdit: (
+    target: SetupSummaryEditTarget,
+    equipmentSelections: QuickNpcEquipmentSelection[],
+  ) => void
   onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
   previewButtonRef?: React.RefObject<HTMLButtonElement | null>
@@ -193,6 +202,7 @@ export function QuickNpcAuthoringForm({
   createContext,
   setup,
   initialValues,
+  equipmentBaseline,
   onCancel,
   onChangeSetup,
   onSetupSummaryEdit,
@@ -222,8 +232,18 @@ export function QuickNpcAuthoringForm({
     () => ({
       ...quickNpcAuthoringTabDefaultValues,
       ...initialValues,
+      equipmentSelections: reconcileQuickNpcEquipmentSelections({
+        current: initialValues?.equipmentSelections ?? [],
+        previous: equipmentBaseline ?? { level: setup.level },
+        next: {
+          templateId: setup.npcTemplateId,
+          classId: setup.classId,
+          level: setup.level,
+          rulesetId: buildContext.rulesetId,
+        },
+      }),
     }),
-    [initialValues],
+    [buildContext.rulesetId, equipmentBaseline, initialValues, setup],
   )
 
   const requirementCategoryKey = React.useMemo(() => {
@@ -245,7 +265,7 @@ export function QuickNpcAuthoringForm({
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabFormValues>({
     submit: async (tabValues) => {
       if (!isQuickNpcSetupStillValid(setup, buildContext)) {
-        onChangeSetup()
+        onChangeSetup(tabValues.equipmentSelections)
         return
       }
 
@@ -287,7 +307,7 @@ export function QuickNpcAuthoringForm({
 
   return (
     <TabbedForm<QuickNpcAuthoringTabFormValues>
-      key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
+      key={`${setup.npcTemplateId}:${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}
       tabs={tabs}
@@ -312,7 +332,8 @@ export function QuickNpcAuthoringForm({
             rows={mapSetupSummaryRowModelsToProps({
               rows: setupSummaryRows,
               changeLabel: QUICK_NPC_SETUP_CHANGE_LABEL,
-              onEdit: onSetupSummaryEdit,
+              onEdit: (target) =>
+                onSetupSummaryEdit(target, form.getValues().equipmentSelections ?? []),
             })}
           />
         </>

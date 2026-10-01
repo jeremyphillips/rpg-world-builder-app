@@ -1437,6 +1437,11 @@ function formatNpcRecommendation(recommendation) {
   if (recommendation.toolPreferenceSlugs?.length) {
     parts.push(`toolPreferenceSlugs: ${formatSlugList(recommendation.toolPreferenceSlugs)}`)
   }
+  if (recommendation.equipmentPreferenceSlugs?.length) {
+    parts.push(
+      `equipmentPreferenceSlugs: ${formatSlugList(recommendation.equipmentPreferenceSlugs)}`,
+    )
+  }
   return `{ ${parts.join(', ')} }`
 }
 
@@ -1466,6 +1471,7 @@ export type OrganizationPresetMembershipTitleRef = {
     readonly classPreferenceOverrideSlugs?: readonly string[]
     readonly skillPreferenceSlugs?: readonly string[]
     readonly toolPreferenceSlugs?: readonly string[]
+    readonly equipmentPreferenceSlugs?: readonly string[]
   }
 }
 

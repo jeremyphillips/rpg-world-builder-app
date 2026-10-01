@@ -26,19 +26,23 @@ export type QuickNpcAdditionalEquipmentOption = {
 }
 
 export function splitQuickNpcAdditionalEquipmentIds(args: {
-  additionalEquipmentIds: readonly string[]
+  equipmentSelections: readonly { equipmentId: string; origin: 'role-default' | 'manual' }[]
   catalogIndex: CharacterBuildCatalogIndex
+  /** Classless rows materialize as inventory, not hard weapon constraints. */
+  constrainManualWeapons: boolean
 }): { requiredWeaponIds: string[]; manualEquipmentGrantIds: string[] } {
   const requiredWeaponIds: string[] = []
   const manualEquipmentGrantIds: string[] = []
+  if (!args.constrainManualWeapons) return { requiredWeaponIds, manualEquipmentGrantIds }
 
-  for (const equipmentId of args.additionalEquipmentIds) {
-    const equipment = args.catalogIndex.equipment.get(equipmentId)
+  for (const selection of args.equipmentSelections) {
+    if (selection.origin !== 'manual') continue
+    const equipment = args.catalogIndex.equipment.get(selection.equipmentId)
     if (!equipment) continue
     if (equipment.kind === 'weapon') {
-      requiredWeaponIds.push(equipmentId)
+      requiredWeaponIds.push(selection.equipmentId)
     } else {
-      manualEquipmentGrantIds.push(equipmentId)
+      manualEquipmentGrantIds.push(selection.equipmentId)
     }
   }
 
@@ -62,11 +66,34 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
 }): QuickNpcAdditionalEquipmentOption[] {
   const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
   const characterClass = catalogIndex.classes.get(args.setup.classId)
-  if (!characterClass) return []
-
   const equipment = resolvePlayableBuilderContent(args.context).equipment.filter((row) =>
     isEquipmentPickerSupportedEquipment(row),
   )
+  if (!characterClass) {
+    return [...equipment]
+      .sort((left, right) => left.name.localeCompare(right.name))
+      .map((row) => ({
+        option: { value: row.id, label: row.name },
+        pickerItem: {
+          equipment: row,
+          state: {
+            isAvailable: true,
+            isRecommended: false,
+            disabledReasons: [],
+            isProficient: false,
+            isAffordable: true,
+            isWithinRemainingBudget: true,
+            purchaseAvailability: { status: 'available' as const },
+            recommendation: {
+              tier: 'neutral' as const,
+              reasons: [],
+              specificity: 'broad_pool' as const,
+            },
+          },
+        },
+        row: buildEquipmentPickerRowViewModel(row),
+      }))
+  }
   const draft = buildMinimalCharacterBuilderDraftForRecommendations({
     speciesId: args.setup.speciesId,
     classId: args.setup.classId,

@@ -33,7 +33,7 @@ const validValues = {
   alignment: 'ln',
   membershipTitle: 'omt_member',
   npcTemplateId: 'guard',
-  additionalEquipmentIds: [],
+  equipmentSelections: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
   generateNarrativeOnCreate: true,
@@ -202,7 +202,7 @@ describe('buildQuickNpcDetailsFields', () => {
       gender: '',
       name: '',
       alignment: 'n',
-      additionalEquipmentIds: [],
+      equipmentSelections: [],
       requiredSpellIds: [],
       startingChoiceOverrides: {},
       generateNarrativeOnCreate: true,
@@ -257,7 +257,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           gender: 'male',
           name: 'Guard Captain',
           alignment: 'ln',
-          additionalEquipmentIds: [],
+          equipmentSelections: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
           generateNarrativeOnCreate: true,
@@ -275,17 +275,14 @@ describe('buildQuickNpcTabs validation wiring', () => {
 
 describe('buildQuickNpcConstraints', () => {
   it('omits empty requirement fields', () => {
-    expect(
-      buildQuickNpcConstraints({ additionalEquipmentIds: [], requiredSpellIds: [] }, []),
-    ).toBeUndefined()
+    expect(buildQuickNpcConstraints({ requiredSpellIds: [] }, [])).toBeUndefined()
   })
 
   it('maps configured requirement id arrays', () => {
-    expect(
-      buildQuickNpcConstraints({ additionalEquipmentIds: [], requiredSpellIds: [] }, [
-        'srd-cc-5.2.1:longsword',
-      ]),
-    ).toEqual({ requiredWeaponIds: ['srd-cc-5.2.1:longsword'], requiredSpellIds: [] })
+    expect(buildQuickNpcConstraints({ requiredSpellIds: [] }, ['srd-cc-5.2.1:longsword'])).toEqual({
+      requiredWeaponIds: ['srd-cc-5.2.1:longsword'],
+      requiredSpellIds: [],
+    })
   })
 })
 
@@ -293,7 +290,7 @@ describe('countQuickNpcConfiguredRequirements', () => {
   it('counts additional equipment and spells in configured arrays', () => {
     expect(
       countQuickNpcConfiguredRequirements({
-        additionalEquipmentIds: ['weapon-1'],
+        equipmentSelections: [{ equipmentId: 'weapon-1', quantity: 1, origin: 'manual' }],
         requiredSpellIds: ['spell-1'],
       }),
     ).toBe(2)

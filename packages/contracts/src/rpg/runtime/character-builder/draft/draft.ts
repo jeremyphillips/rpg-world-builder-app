@@ -128,7 +128,10 @@ export type CharacterBuilderDraftEquipmentGrant = z.infer<
 export const characterBuilderDraftEquipmentSchema = z.object({
   mode: characterBuilderDraftEquipmentModeSchema,
   purchases: z.array(characterBuilderDraftEquipmentPurchaseSchema).default([]),
-  /** Ensure-at-least equipment grants — domain acquisition channel, not purchase-shaped. */
+  /**
+   * Ensure-at-least inventory materialization for selected starting equipment.
+   * Presence here is not an immutable grant and must not be shown as Granted Equipment.
+   */
   grants: z.array(characterBuilderDraftEquipmentGrantSchema).optional(),
   /** Magic-item grant selections keyed by allowanceId + equipmentId (upserted). */
   magicItemSelections: z.array(magicItemGrantSelectionSchema).optional(),

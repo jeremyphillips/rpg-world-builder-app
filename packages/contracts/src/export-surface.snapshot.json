@@ -2754,6 +2754,7 @@
     "resolveMulticlassingRules",
     "resolveNormalizedCropImageLayout",
     "resolveNpcStartingChoices",
+    "resolveNpcTemplateEffectiveEquipmentPreferences",
     "resolveNpcTemplateRecommendations",
     "resolveNpcTemplateRoleChoiceCounts",
     "resolveOptionalOrganizationMembershipTitleProjection",

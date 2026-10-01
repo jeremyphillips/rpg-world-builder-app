@@ -77,8 +77,8 @@ function catalogIndex(): CharacterBuildCatalogIndex {
 describe('equipment preference stream', () => {
   it('orders user preferences ahead of role preferences by tuple', () => {
     const stream = buildEquipmentPreferenceStream({
-      userWeaponSlugs: ['longsword'],
-      templateWeaponSlugs: ['spear', 'longsword', 'javelin'],
+      userSlugs: ['longsword'],
+      templateSlugs: ['spear', 'longsword', 'javelin'],
     })
     const match = bestEquipmentPreferenceMatchForReachableIds({
       equipmentIds: [longsword.id],
@@ -91,8 +91,9 @@ describe('equipment preference stream', () => {
 
   it('lets one user preference beat several role matches', () => {
     const stream = buildEquipmentPreferenceStream({
-      userWeaponSlugs: ['longsword'],
-      templateWeaponSlugs: ['spear', 'greatsword', 'javelin'],
+      userSlugs: ['longsword'],
+      titleSlugs: ['spear'],
+      templateSlugs: ['spear', 'greatsword', 'javelin'],
     })
     const userTuple = bestEquipmentPreferenceMatchForReachableIds({
       equipmentIds: [longsword.id],
@@ -109,7 +110,7 @@ describe('equipment preference stream', () => {
 
   it('drops preferences already held in inventory', () => {
     const stream = buildEquipmentPreferenceStream({
-      templateWeaponSlugs: ['spear', 'longsword'],
+      templateSlugs: ['spear', 'longsword'],
     })
     const filtered = filterHeldEquipmentPreferences(stream, new Set(['spear']))
     expect(filtered.map((entry) => entry.slug)).toEqual(['longsword'])
@@ -118,14 +119,12 @@ describe('equipment preference stream', () => {
   it('leaves suggestedBy unset when two sources tie on the winning tuple', () => {
     const stream = [
       {
-        kind: 'weapon' as const,
         slug: 'longsword',
         source: 'title' as const,
         sourcePriority: 1,
         index: 0,
       },
       {
-        kind: 'weapon' as const,
         slug: 'longsword',
         source: 'template' as const,
         sourcePriority: 1,
@@ -137,12 +136,10 @@ describe('equipment preference stream', () => {
       stream,
       catalogIndex: catalogIndex(),
     })
-    expect(
-      suggestedSourcesForEquipmentPreferenceMatch(stream, catalogIndex(), match, [longsword.id]),
-    ).toEqual([])
+    expect(suggestedSourcesForEquipmentPreferenceMatch(stream, match, [longsword.id])).toEqual([])
   })
 
-  it('treats level-0 kit slugs as held for preference filtering', () => {
+  it('does not treat an unmaterialized role default as held', () => {
     const context = createCharacterBuildContext({
       characterKind: 'npc',
       rulesScope: { type: 'campaign', campaignId: 'campaign-1', rulesetId: RULESET },
@@ -158,24 +155,25 @@ describe('equipment preference stream', () => {
       catalogIndex: catalogIndex(),
       context,
     })
-    const stream = buildEquipmentPreferenceStream({ templateWeaponSlugs: ['spear', 'longsword'] })
+    const stream = buildEquipmentPreferenceStream({ templateSlugs: ['spear', 'longsword'] })
     expect(filterHeldEquipmentPreferences(stream, held).map((entry) => entry.slug)).toEqual([
+      'spear',
       'longsword',
     ])
   })
 
   it('attributes suggestedBy when one source owns the winning tuple', () => {
     const stream = buildEquipmentPreferenceStream({
-      userWeaponSlugs: ['longsword'],
-      templateWeaponSlugs: ['spear'],
+      userSlugs: ['longsword'],
+      templateSlugs: ['spear'],
     })
     const match = bestEquipmentPreferenceMatchForReachableIds({
       equipmentIds: [longsword.id],
       stream,
       catalogIndex: catalogIndex(),
     })
-    expect(
-      suggestedSourcesForEquipmentPreferenceMatch(stream, catalogIndex(), match, [longsword.id]),
-    ).toEqual(['user'])
+    expect(suggestedSourcesForEquipmentPreferenceMatch(stream, match, [longsword.id])).toEqual([
+      'user',
+    ])
   })
 })

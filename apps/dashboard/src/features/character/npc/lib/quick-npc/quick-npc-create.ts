@@ -1,7 +1,9 @@
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
   CharacterBuildFinalizationError,
+  ensureEquipmentGrant,
   finalizeNpcCharacterBuild,
+  indexCharacterBuildCatalog,
   isCharacterBuildFinalizationError,
   resolveAutomaticNpcBuild,
   type AutomaticNpcBuildConstraints,
@@ -62,6 +64,11 @@ export type QuickNpcPrepareCreateArgs = {
   preferences?: AutomaticNpcBuildPreferences
   allowanceSelections?: Record<string, readonly string[]>
   manualEquipmentGrantIds?: readonly string[]
+  /**
+   * Selected starting equipment to materialize onto `draft.equipment.grants`.
+   * These rows are inventory, not immutable grants.
+   */
+  startingEquipmentGrants?: readonly { equipmentId: string; quantity: number }[]
   membership?: QuickNpcMembership
 }
 
@@ -75,6 +82,26 @@ export type QuickNpcPreparedCreate = {
  * Resolves the automatic build once, then finalizes to the wire input and returns
  * the final draft for narrative context (same membership + choice resolution).
  */
+export function materializeStartingEquipmentGrants(
+  draft: CharacterBuilderDraft,
+  context: CharacterBuildContext,
+  grants: readonly { equipmentId: string; quantity: number }[] | undefined,
+): CharacterBuilderDraft {
+  if (!grants || grants.length === 0) return draft
+  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  let next = draft
+  for (const grant of grants) {
+    const applied = ensureEquipmentGrant({
+      draft: next,
+      equipmentId: grant.equipmentId,
+      quantity: grant.quantity,
+      catalogIndex,
+    })
+    if (applied.ok) next = applied.draft
+  }
+  return next
+}
+
 export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
   const resolution = resolveAutomaticNpcBuild({
     seed: args.seed,
@@ -90,9 +117,10 @@ export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpc
     throw new CharacterBuildFinalizationError(resolution.issues)
   }
 
-  const draft = args.membership
+  let draft = args.membership
     ? withMembershipConnection(resolution.draft, args.membership)
     : resolution.draft
+  draft = materializeStartingEquipmentGrants(draft, args.context, args.startingEquipmentGrants)
 
   const input = finalizeNpcCharacterBuild(draft, args.context, {
     resolvedChoiceSets: resolution.resolvedChoiceSets,

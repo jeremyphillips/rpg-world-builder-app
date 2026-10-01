@@ -219,10 +219,13 @@ describe('QuickNpcAuthoringForm', () => {
     const { props } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Change build' }))
-    expect(props.onSetupSummaryEdit).toHaveBeenCalledWith({
-      type: 'external',
-      id: 'quickNpcBuild',
-    })
+    expect(props.onSetupSummaryEdit).toHaveBeenCalledWith(
+      {
+        type: 'external',
+        id: 'quickNpcBuild',
+      },
+      expect.any(Array),
+    )
     expect(createNpcMock).not.toHaveBeenCalled()
   })
 

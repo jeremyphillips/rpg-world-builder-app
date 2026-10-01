@@ -40,7 +40,15 @@ import type { QuickNpcCreateContext } from './quick-npc-create-context'
 // details (name, alignment) and optional requirements (weapon/spell constraints).
 // ---------------------------------------------------------------------------
 
-export const QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME = 'additionalEquipmentIds'
+export const QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME = 'equipmentSelections'
+
+export const quickNpcEquipmentSelectionSchema = z.object({
+  equipmentId: z.string().min(1),
+  quantity: z.number().int().min(1),
+  origin: z.enum(['role-default', 'manual']),
+})
+
+export type QuickNpcEquipmentSelection = z.infer<typeof quickNpcEquipmentSelectionSchema>
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOverrides'
 
@@ -211,7 +219,7 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    additionalEquipmentIds: z.array(z.string()),
+    equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
   })
@@ -234,7 +242,7 @@ export function quickNpcAuthoringTabSchema() {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    additionalEquipmentIds: z.array(z.string()),
+    equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
     [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: z.boolean(),
@@ -256,7 +264,7 @@ export const quickNpcAuthoringTabDefaultValues = {
   gender: '',
   name: '',
   alignment: 'n',
-  additionalEquipmentIds: [],
+  equipmentSelections: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
   [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: true,
@@ -287,7 +295,7 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
 }
 
 export function buildQuickNpcConstraints(
-  values: Pick<QuickNpcAuthoringValues, 'additionalEquipmentIds' | 'requiredSpellIds'>,
+  values: Pick<QuickNpcAuthoringValues, 'requiredSpellIds'>,
   requiredWeaponIds: readonly string[],
 ): AutomaticNpcBuildConstraints | undefined {
   return buildQuickNpcConstraintsFromArrays({
@@ -297,9 +305,9 @@ export function buildQuickNpcConstraints(
 }
 
 export function countQuickNpcConfiguredRequirements(
-  values: Pick<QuickNpcAuthoringValues, 'additionalEquipmentIds' | 'requiredSpellIds'>,
+  values: Pick<QuickNpcAuthoringValues, 'equipmentSelections' | 'requiredSpellIds'>,
 ): number {
-  return values.additionalEquipmentIds.length + values.requiredSpellIds.length
+  return values.equipmentSelections.length + values.requiredSpellIds.length
 }
 
 export type QuickNpcContentOptions = {

@@ -5,7 +5,7 @@ import {
   populatedBuilderCatalog,
 } from '../../../lib/fixtures/character-builder-fixtures'
 import {
-  QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME,
+  QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
@@ -42,9 +42,17 @@ describe('createQuickNpcFormValueSyncs', () => {
     const patch = sync.apply(
       {
         ...setup,
-        [QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME]: [
-          'srd-cc-5.2.1:weapon-not-in-catalog',
-          'srd-cc-5.2.1:another-invalid-weapon',
+        [QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME]: [
+          {
+            equipmentId: 'srd-cc-5.2.1:weapon-not-in-catalog',
+            quantity: 1,
+            origin: 'manual',
+          },
+          {
+            equipmentId: 'srd-cc-5.2.1:another-invalid-weapon',
+            quantity: 1,
+            origin: 'manual',
+          },
         ],
         [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: [],
       },
@@ -52,7 +60,7 @@ describe('createQuickNpcFormValueSyncs', () => {
     )
 
     expect(patch).toEqual({
-      [QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME]: [],
+      [QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME]: [],
     })
   })
 
@@ -66,7 +74,7 @@ describe('createQuickNpcFormValueSyncs', () => {
           classId: quickFighter.id,
           level: 1,
         }),
-        [QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME]: [],
+        [QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME]: [],
         [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: [],
       },
       ['name'],

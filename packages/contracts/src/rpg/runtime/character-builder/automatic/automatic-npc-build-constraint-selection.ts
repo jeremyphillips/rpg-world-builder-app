@@ -24,6 +24,7 @@ import {
   bestEquipmentPreferenceMatchForReachableIds,
   collectHeldEquipmentSlugKeys,
   compareEquipmentPreferenceTuples,
+  equipmentPreferenceTuple,
   filterHeldEquipmentPreferences,
   NO_EQUIPMENT_PREFERENCE_MATCH,
   suggestedSourcesForEquipmentPreferenceMatch,
@@ -163,7 +164,6 @@ function selectStartingEquipmentPackageByPreferences(args: {
   const suggestedBy: Record<string, readonly NpcRecommendationSource[]> = {}
   const sources = suggestedSourcesForEquipmentPreferenceMatch(
     stream,
-    catalogIndex,
     winner.match,
     winner.reachableIds,
   )
@@ -209,15 +209,49 @@ const CHOICE_SET_SOFT_PREFERENCE_KEYS = {
   skillProficiency: 'skills',
   toolProficiency: 'tools',
   language: 'languages',
-  weaponProficiency: 'weapons',
-  armorTraining: 'armor',
 } as const satisfies Partial<Record<ChoiceSet['choiceType'], keyof AutomaticNpcBuildPreferences>>
+
+const EQUIPMENT_CLASSIFIED_CHOICE_TYPES = new Set<ChoiceSet['choiceType']>([
+  'weaponProficiency',
+  'armorTraining',
+])
+
+/**
+ * Weapon and armor choices reuse the equipment preference stream. Option identity
+ * drops slugs that are not in that choice set, so this does not invent a grant.
+ */
+function sourcedEquipmentPreferences(
+  stream: readonly NpcEquipmentPreferenceEntry[] | undefined,
+): SourcedRecommendation[] {
+  if (!stream || stream.length === 0) return []
+  const sorted = [...stream].sort((left, right) =>
+    compareEquipmentPreferenceTuples(
+      equipmentPreferenceTuple(left),
+      equipmentPreferenceTuple(right),
+    ),
+  )
+  const sourcesBySlug = new Map<string, NpcRecommendationSource[]>()
+  const order: string[] = []
+  for (const entry of sorted) {
+    const sources = sourcesBySlug.get(entry.slug)
+    if (!sources) {
+      sourcesBySlug.set(entry.slug, [entry.source])
+      order.push(entry.slug)
+      continue
+    }
+    if (!sources.includes(entry.source)) sources.push(entry.source)
+  }
+  return order.map((id) => ({ id, sources: sourcesBySlug.get(id)! }))
+}
 
 function preferenceEntriesForChoiceSet(
   choiceSet: ChoiceSet,
   preferences: AutomaticNpcBuildPreferences | undefined,
 ): readonly SourcedRecommendation[] {
   if (!preferences) return []
+  if (EQUIPMENT_CLASSIFIED_CHOICE_TYPES.has(choiceSet.choiceType)) {
+    return sourcedEquipmentPreferences(preferences.equipmentPreferences)
+  }
   const key =
     CHOICE_SET_SOFT_PREFERENCE_KEYS[
       choiceSet.choiceType as keyof typeof CHOICE_SET_SOFT_PREFERENCE_KEYS
@@ -331,12 +365,7 @@ function appendEquipmentPreferenceOrderedOptions(args: {
       stream,
       catalogIndex: args.equipmentPreferenceCatalogIndex,
     })
-    const sources = suggestedSourcesForEquipmentPreferenceMatch(
-      stream,
-      args.equipmentPreferenceCatalogIndex,
-      match,
-      [option.id],
-    )
+    const sources = suggestedSourcesForEquipmentPreferenceMatch(stream, match, [option.id])
     args.take(option.id, sources.length > 0 ? sources : undefined)
   }
 }

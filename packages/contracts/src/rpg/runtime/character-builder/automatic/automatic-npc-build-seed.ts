@@ -43,8 +43,6 @@ export type AutomaticNpcBuildPreferences = {
   skills?: readonly SourcedRecommendation[]
   tools?: readonly SourcedRecommendation[]
   languages?: readonly SourcedRecommendation[]
-  weapons?: readonly SourcedRecommendation[]
-  armor?: readonly SourcedRecommendation[]
   equipmentPreferences?: readonly NpcEquipmentPreferenceEntry[]
 }
 

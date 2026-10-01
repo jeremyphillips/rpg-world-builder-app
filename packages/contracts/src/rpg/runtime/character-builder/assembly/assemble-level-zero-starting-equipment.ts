@@ -25,6 +25,22 @@ function npcTemplateSource(templateId: string, grantId: string): CharacterSelect
   return [{ kind: 'npcTemplate', sourceId: templateId, grantId }]
 }
 
+function inventoryWithQuantity(
+  inventory: CharacterEquipment,
+  equipmentId: string,
+  quantity: number,
+): CharacterEquipment | undefined {
+  for (const bucket of Object.keys(inventory) as (keyof CharacterEquipment)[]) {
+    const index = inventory[bucket].findIndex((entry) => entry.equipmentId === equipmentId)
+    if (index < 0) continue
+    const nextBucket = inventory[bucket].map((entry, entryIndex) =>
+      entryIndex === index ? { ...entry, quantity: Math.max(entry.quantity, quantity) } : entry,
+    )
+    return { ...inventory, [bucket]: nextBucket }
+  }
+  return undefined
+}
+
 function appendResolvedEquipment(args: {
   inventory: CharacterEquipment
   catalogIndex: CharacterBuildCatalogIndex
@@ -36,6 +52,8 @@ function appendResolvedEquipment(args: {
   const equipmentId = toEquipmentContentId(args.rulesetId, args.slugOrId)
   const equipment = args.catalogIndex.equipment.get(equipmentId)
   if (!equipment) return args.inventory
+  const merged = inventoryWithQuantity(args.inventory, equipment.id, args.quantity)
+  if (merged) return merged
   return appendEquipmentEntry(args.inventory, equipment, {
     equipmentId: equipment.id,
     quantity: args.quantity,
@@ -56,18 +74,6 @@ function appendTemplateEquipment(
   if (!templateId || !levelZero) return inventory
 
   let next = inventory
-  const kitSources = npcTemplateSource(templateId, 'kit')
-  for (const item of levelZero.kit) {
-    next = appendResolvedEquipment({
-      inventory: next,
-      catalogIndex: options.catalogIndex,
-      rulesetId: options.rulesetId,
-      slugOrId: item.slug,
-      quantity: item.quantity ?? 1,
-      sources: kitSources,
-    })
-  }
-
   const { toolCount } = resolveNpcTemplateRoleChoiceCounts(levelZero.roleChoices)
   if (toolCount !== 1) return next
 
@@ -108,9 +114,11 @@ function appendDraftEquipmentGrants(
 }
 
 /**
- * Classless level-0 inventory and purse. Adds the template kit, the picked role
- * tool when the template grants one tool choice, and draft equipment grants.
- * Templateless NPCs receive the modest purse and no kit.
+ * Classless level-0 inventory and purse. Adds the picked role tool when the
+ * template grants one tool choice, then draft equipment selections already
+ * written onto `draft.equipment.grants`. Those rows materialize inventory and
+ * are not immutable grants. Role default loadouts are not read here.
+ * Templateless NPCs receive the modest purse and no equipment.
  */
 export function assembleLevelZeroStartingEquipment(
   draft: CharacterBuilderDraft,

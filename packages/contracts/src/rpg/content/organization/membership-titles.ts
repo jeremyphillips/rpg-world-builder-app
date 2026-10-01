@@ -80,6 +80,8 @@ export const organizationPresetNpcRecommendationSchema = z.object({
   skillPreferenceSlugs: preferenceSlugListSchema.optional(),
   /** Prepended ahead of the template's toolSlugs. Does not add tool slots. */
   toolPreferenceSlugs: preferenceSlugListSchema.optional(),
+  /** Prepended ahead of the role's effective equipment preferences. Does not grant equipment. */
+  equipmentPreferenceSlugs: preferenceSlugListSchema.optional(),
 })
 
 export type OrganizationPresetNpcRecommendation = z.infer<
@@ -169,6 +171,9 @@ function copyPresetNpcRecommendation(
       : {}),
     ...(recommendation.toolPreferenceSlugs
       ? { toolPreferenceSlugs: [...recommendation.toolPreferenceSlugs] }
+      : {}),
+    ...(recommendation.equipmentPreferenceSlugs
+      ? { equipmentPreferenceSlugs: [...recommendation.equipmentPreferenceSlugs] }
       : {}),
   }
 }

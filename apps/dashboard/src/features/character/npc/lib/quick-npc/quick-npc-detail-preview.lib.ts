@@ -14,6 +14,8 @@ import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import { resolveQuickNpcCreateOrganization } from './quick-npc-create-context'
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
 import { splitQuickNpcAdditionalEquipmentIds } from './quick-npc-additional-equipment.lib'
+import { usesQuickNpcClassEquipment } from './quick-npc-equipment-selections.lib'
+import { materializeStartingEquipmentGrants } from './quick-npc-create'
 import {
   buildQuickNpcSeed,
   mergeQuickNpcAuthoringValues,
@@ -57,10 +59,18 @@ export function projectQuickNpcDetailPreview({
   let resolvedChoiceSets = resolveAvailableChoices(draft, buildContext)
 
   try {
+    const classed = usesQuickNpcClassEquipment(merged.classId, merged.level)
     const { requiredWeaponIds, manualEquipmentGrantIds } = splitQuickNpcAdditionalEquipmentIds({
-      additionalEquipmentIds: merged.additionalEquipmentIds,
+      equipmentSelections: merged.equipmentSelections,
       catalogIndex,
+      constrainManualWeapons: classed,
     })
+    const startingEquipmentGrants = classed
+      ? []
+      : merged.equipmentSelections.map((row) => ({
+          equipmentId: row.equipmentId,
+          quantity: row.quantity,
+        }))
     const startingChoices = resolveNpcStartingChoices({
       context: buildContext,
       seed,
@@ -82,7 +92,11 @@ export function projectQuickNpcDetailPreview({
     })
 
     if (resolution.ok) {
-      draft = resolution.draft
+      draft = materializeStartingEquipmentGrants(
+        resolution.draft,
+        buildContext,
+        startingEquipmentGrants,
+      )
       resolvedChoiceSets = resolution.resolvedChoiceSets
     }
   } catch {

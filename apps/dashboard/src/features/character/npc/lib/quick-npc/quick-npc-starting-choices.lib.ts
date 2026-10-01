@@ -67,6 +67,18 @@ function suggestionSourceLabel(
  * Explanatory copy only. Names a source when that one source traced every selected value.
  * An empty source list is canonical order and is never called a suggestion.
  */
+/** Suggestion copy for one selected item. Empty source lists are canonical order. */
+export function startingChoiceItemSuggestionHint(args: {
+  selectedId: string
+  suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>
+  labels?: StartingChoiceSuggestionLabels
+}): string | undefined {
+  const sources = args.suggestedBy?.[args.selectedId] ?? []
+  if (sources.length !== 1) return undefined
+  const label = suggestionSourceLabel(sources[0]!, args.labels ?? {})
+  return label ? `Suggested by ${label}` : undefined
+}
+
 export function startingChoiceSuggestionHint(args: {
   selectedIds: readonly string[]
   suggestedBy?: Readonly<Record<string, readonly NpcRecommendationSource[]>>

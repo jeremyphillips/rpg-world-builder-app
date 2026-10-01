@@ -12,6 +12,7 @@ export type OrganizationPresetMembershipTitleRef = {
     readonly classPreferenceOverrideSlugs?: readonly string[]
     readonly skillPreferenceSlugs?: readonly string[]
     readonly toolPreferenceSlugs?: readonly string[]
+    readonly equipmentPreferenceSlugs?: readonly string[]
   }
 }
 

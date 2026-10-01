@@ -573,14 +573,19 @@ Pattern: `*_TERM` + `*_ENTRIES` map → derived id tuple → `z.enum` schema →
 
 **NPC roles** ([`npc-template.ts`](../src/rpg/vocab/npc/npc-template.ts)) follow the same
 two-layer pattern (`NPC_TEMPLATE_TERM` + `NPC_TEMPLATE_ENTRIES`) with an extended entry:
-class, skill, tool, and language preferences, an ability order, and a level-0 role layer
-(wealth tier, kit, training, role-choice counts). Recommendations bias automatic selection
-and never grant capabilities. The level-0 layer grants only for a classless NPC whose
-draft stores `npcTemplateId`. Catalog detail →
+class, skill, tool, and language preferences, an equipment bias
+(`additionalPreferences` plus a classless `defaultLoadout`), an ability order, and a
+level-0 role layer (wealth tier, training, role-choice counts). Recommendations bias
+automatic selection and never grant capabilities. Role equipment defaults are editable
+starting state, not grants. Resolution prepends default-loadout slugs to
+`additionalPreferences`. `draft.equipment.grants` materializes selected starting equipment
+and is not an immutable grant. Only explicit grant sources create immutable Granted
+Equipment. The level-0 layer grants training and role choices only for a classless NPC
+whose draft stores `npcTemplateId`. Catalog detail →
 [`npc-templates.md`](character-builder/npc-templates.md).
 
 Preset membership-title refs carry contextual
-`{ templateId, level?, classPreferenceOverrideSlugs?, skillPreferenceSlugs?, toolPreferenceSlugs? }`
+`{ templateId, level?, classPreferenceOverrideSlugs?, skillPreferenceSlugs?, toolPreferenceSlugs?, equipmentPreferenceSlugs? }`
 recommendations that snapshot into organization-owned titles at create. A title class
 override replaces the template class list. Title skill and tool preferences are prepended
 and do not add slots. See

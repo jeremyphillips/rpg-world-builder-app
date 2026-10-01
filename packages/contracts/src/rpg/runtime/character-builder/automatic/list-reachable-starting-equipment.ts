@@ -1,4 +1,4 @@
-import { isArmorEquipment, type Equipment } from '../../../content/equipment'
+import type { Equipment } from '../../../content/equipment'
 import type { CharacterClass } from '../../../content/classes/class'
 import type { StartingEquipmentOption } from '../../../content/starting-equipment'
 import {
@@ -11,11 +11,8 @@ import { toEquipmentContentId } from '../../creature/equipment'
 import type { CharacterBuildCatalogIndex } from '../context'
 import { resolveEquipmentPoolChoiceOptions } from '../resolvers/equipment/equipment-pool-choice-options'
 import { resolveClassToolProficiencyChoice } from '../resolvers/equipment/resolve-proficiency-linked-equipment-grant'
-import type { NpcEquipmentPreferenceKind } from './equipment-preference-stream'
-
 export type ReachableStartingEquipmentItem = {
   id: string
-  kind: NpcEquipmentPreferenceKind
 }
 
 function addReachableItem(
@@ -25,19 +22,12 @@ function addReachableItem(
   equipmentId: string,
 ): void {
   if (!equipment || seen.has(equipmentId)) return
-  if (equipment.kind === 'weapon') {
-    seen.add(equipmentId)
-    items.push({ id: equipmentId, kind: 'weapon' })
-    return
-  }
-  if (isArmorEquipment(equipment)) {
-    seen.add(equipmentId)
-    items.push({ id: equipmentId, kind: 'armor' })
-  }
+  seen.add(equipmentId)
+  items.push({ id: equipmentId })
 }
 
 /**
- * Shallow reachable weapon and armor ids from one starting-equipment package:
+ * Shallow reachable equipment ids from one starting-equipment package:
  * direct grants, one-level nested equipment pools, and proficiency-linked pools.
  */
 export function collectReachableStartingEquipmentFromPackage(args: {
@@ -82,7 +72,6 @@ export function collectReachableStartingEquipmentFromPackage(args: {
 export function startingEquipmentPackageProvidesReachableSlug(args: {
   option: StartingEquipmentOption
   slug: string
-  kind: NpcEquipmentPreferenceKind
   characterClass: CharacterClass
   catalogIndex: CharacterBuildCatalogIndex
 }): boolean {
@@ -91,8 +80,5 @@ export function startingEquipmentPackageProvidesReachableSlug(args: {
     option: args.option,
     characterClass: args.characterClass,
     catalogIndex: args.catalogIndex,
-  }).some(
-    (item) =>
-      item.kind === args.kind && (item.id.endsWith(`:${args.slug}`) || item.id === args.slug),
-  )
+  }).some((item) => item.id.endsWith(`:${args.slug}`) || item.id === args.slug)
 }

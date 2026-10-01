@@ -74,10 +74,10 @@ describe('classifySelectionSourceMechanic', () => {
     ).toBe('purchase')
   })
 
-  it('keeps kit rows as fixed grants', () => {
+  it('keeps role training rows as fixed grants', () => {
     expect(
       classifySelectionSourceMechanic(
-        { kind: 'npcTemplate', sourceId: 'guard', grantId: 'kit' },
+        { kind: 'npcTemplate', sourceId: 'guard', grantId: 'training' },
         resolved,
       ),
     ).toBe('fixed-grant')

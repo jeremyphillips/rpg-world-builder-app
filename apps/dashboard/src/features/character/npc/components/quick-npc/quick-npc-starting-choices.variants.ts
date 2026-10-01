@@ -36,7 +36,10 @@ export const quickNpcStartingChoiceInnerSectionClasses =
 /** Spacing between {@link ContentEntityCard} choice rows (builder choice-block parity). */
 export const quickNpcStartingChoiceSelectedListClasses = 'flex flex-col gap-y-2'
 
-export const quickNpcStartingChoiceOptionsContainerClasses = 'flex flex-col gap-y-2'
+export const quickNpcStartingChoiceOptionsContainerClasses = 'flex flex-col'
+
+/** 8px above a + Add control. Applied only when selected rows sit above it. */
+export const quickNpcStartingChoiceAddControlClasses = 'mt-2'
 
 export const quickNpcStartingChoiceStatusAfterOptionsClasses = 'mt-2'
 
