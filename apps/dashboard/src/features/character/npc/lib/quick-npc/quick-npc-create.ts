@@ -9,6 +9,7 @@ import {
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type ChoiceSet,
   type CreateNpcRequestInput,
 } from '@rpg/contracts'
 
@@ -54,20 +55,26 @@ function withMembershipConnection(
   }
 }
 
-/**
- * Builds the `POST /api/campaigns/:id/npcs` payload from a Quick NPC seed.
- * Throws {@link CharacterBuildFinalizationError} carrying builder validation
- * issues when automatic resolution or finalization fails — no partial NPC is
- * ever produced.
- */
-export function buildQuickNpcCreateInput(args: {
+export type QuickNpcPrepareCreateArgs = {
   seed: AutomaticNpcBuildSeed
   context: CharacterBuildContext
   constraints?: AutomaticNpcBuildConstraints
   preferences?: AutomaticNpcBuildPreferences
   allowanceSelections?: Record<string, readonly string[]>
   membership?: QuickNpcMembership
-}): CreateNpcRequestInput {
+}
+
+export type QuickNpcPreparedCreate = {
+  draft: CharacterBuilderDraft
+  input: CreateNpcRequestInput
+  resolvedChoiceSets: readonly ChoiceSet[]
+}
+
+/**
+ * Resolves the automatic build once, then finalizes to the wire input and returns
+ * the final draft for narrative context (same membership + choice resolution).
+ */
+export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
   const resolution = resolveAutomaticNpcBuild({
     seed: args.seed,
     context: args.context,
@@ -83,9 +90,21 @@ export function buildQuickNpcCreateInput(args: {
     ? withMembershipConnection(resolution.draft, args.membership)
     : resolution.draft
 
-  return finalizeNpcCharacterBuild(draft, args.context, {
+  const input = finalizeNpcCharacterBuild(draft, args.context, {
     resolvedChoiceSets: resolution.resolvedChoiceSets,
   })
+
+  return { draft, input, resolvedChoiceSets: resolution.resolvedChoiceSets }
+}
+
+/**
+ * Builds the `POST /api/campaigns/:id/npcs` payload from a Quick NPC seed.
+ * Throws {@link CharacterBuildFinalizationError} carrying builder validation
+ * issues when automatic resolution or finalization fails — no partial NPC is
+ * ever produced.
+ */
+export function buildQuickNpcCreateInput(args: QuickNpcPrepareCreateArgs): CreateNpcRequestInput {
+  return prepareQuickNpcCreate(args).input
 }
 
 const MAX_QUICK_NPC_ISSUE_MESSAGES = 3

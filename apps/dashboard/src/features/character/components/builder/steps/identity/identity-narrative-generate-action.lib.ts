@@ -15,6 +15,7 @@ import type { Location } from '@rpg/contracts/rpg/content'
 
 import { formatContentListLoadErrorMessage } from '@/features/content'
 
+import { generatedNarrativeToCharacterNarrative } from '../../../../lib/narrative/generated-narrative-to-character-narrative.lib'
 import type { IdentityFormValues } from '../../../../lib/steps/identity-form-fields'
 import { identityFormValuesToDraft } from '../../../../lib/steps/identity-form-values'
 
@@ -34,19 +35,7 @@ export function isEmptyNarrativeText(value: string | undefined): boolean {
   )
 }
 
-export function escapeNarrativeHtml(value: string): string {
-  return value.replace(
-    /[&<>"']/g,
-    (character) =>
-      ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-      })[character] ?? character,
-  )
-}
+export { escapeNarrativeHtml } from '../../../../lib/narrative/generated-narrative-to-character-narrative.lib'
 
 type NarrativeSnapshot = {
   personalityTraits?: { value?: string }[]
@@ -195,9 +184,7 @@ export function applyGeneratedNarrativeToForm(
   if (isEmptyNarrativeText(current.backstory)) {
     form.setValue(
       'narrative.backstory',
-      narrative.backstoryParagraphs
-        .map((paragraph) => `<p>${escapeNarrativeHtml(paragraph)}</p>`)
-        .join(''),
+      generatedNarrativeToCharacterNarrative(narrative).backstory ?? '',
       { shouldDirty: true, shouldValidate: true },
     )
   }

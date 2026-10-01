@@ -69,6 +69,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
     gender: 'male' as const,
     name: 'Guard Captain',
     alignment: 'ln' as const,
+    generateNarrativeOnCreate: true,
   }
 
   it('stamps organization membership for organization-member context', () => {

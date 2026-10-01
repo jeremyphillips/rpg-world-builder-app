@@ -29,6 +29,15 @@ import { QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT } from '../../../lib/quick-npc/quic
 import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 
 const createNpcMock = vi.hoisted(() => vi.fn())
+const resolveQuickNpcAuthoringCreateInputMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../../../lib/quick-npc/quick-npc-narrative-on-create.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    resolveQuickNpcAuthoringCreateInput: resolveQuickNpcAuthoringCreateInputMock,
+  }
+})
 
 vi.mock('../../../api/npc-client', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
@@ -185,12 +194,18 @@ function renderModal(overrides: Partial<React.ComponentProps<typeof QuickNpcCrea
   return { props, ...renderWithProviders(<QuickNpcCreateModal {...props} />) }
 }
 
-describe('QuickNpcCreateModal', () => {
-  beforeEach(() => {
-    createNpcMock.mockReset()
-    createNpcMock.mockResolvedValue(npcDetail)
+beforeEach(async () => {
+  createNpcMock.mockReset()
+  createNpcMock.mockResolvedValue(npcDetail)
+  resolveQuickNpcAuthoringCreateInputMock.mockReset()
+  resolveQuickNpcAuthoringCreateInputMock.mockImplementation(async ({ prepareArgs }) => {
+    const { prepareQuickNpcAuthoringCreate } =
+      await import('../../../lib/quick-npc/quick-npc-authoring-submit.lib')
+    return prepareQuickNpcAuthoringCreate(prepareArgs).input
   })
+})
 
+describe('QuickNpcCreateModal', () => {
   it('renders a partial selections summary after title is chosen and species is active', async () => {
     const user = userEvent.setup()
     renderModal()

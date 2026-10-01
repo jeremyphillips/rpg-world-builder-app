@@ -47,6 +47,13 @@ export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOve
 
 export const QUICK_NPC_STARTING_CHOICES_TAB_LABEL = 'Starting choices' as const
 
+export const QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME = 'generateNarrativeOnCreate' as const
+
+export const QUICK_NPC_GENERATE_NARRATIVE_LABEL = 'Generate narrative' as const
+
+export const QUICK_NPC_GENERATE_NARRATIVE_HINT =
+  "Create a narrative from this NPC's final setup and choices." as const
+
 export const QUICK_NPC_DETAILS_TAB_ID = 'details' as const
 export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
 
@@ -231,13 +238,20 @@ export function quickNpcAuthoringTabSchema() {
     requiredWeaponIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
+    [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: z.boolean(),
   })
 }
 
 export type QuickNpcAuthoringTabValues = z.output<ReturnType<typeof quickNpcAuthoringTabSchema>>
 export type QuickNpcAuthoringTabFormValues = z.input<ReturnType<typeof quickNpcAuthoringTabSchema>>
 
-export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcAuthoringTabValues
+/** Authoring values used for automatic build — excludes UI-only tab fields. */
+export type QuickNpcBuildAuthoringValues = Omit<
+  QuickNpcAuthoringTabValues,
+  typeof QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME
+>
+
+export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcBuildAuthoringValues
 
 export const quickNpcAuthoringTabDefaultValues = {
   gender: '',
@@ -246,6 +260,7 @@ export const quickNpcAuthoringTabDefaultValues = {
   requiredWeaponIds: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
+  [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: true,
 } satisfies QuickNpcAuthoringTabFormValues
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
@@ -253,7 +268,8 @@ export function mergeQuickNpcAuthoringValues(
   setup: QuickNpcSetupValues,
   tab: QuickNpcAuthoringTabValues,
 ): QuickNpcAuthoringValues {
-  return { ...setup, ...tab }
+  const { [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: _generateNarrative, ...buildTab } = tab
+  return { ...setup, ...buildTab }
 }
 
 /** Maps validated authoring values to the automatic build resolver seed. */
@@ -368,6 +384,14 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {})
           options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
           required: true,
           width: 'full',
+        },
+        {
+          type: 'switch',
+          name: QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME,
+          label: QUICK_NPC_GENERATE_NARRATIVE_LABEL,
+          hint: QUICK_NPC_GENERATE_NARRATIVE_HINT,
+          defaultValue: true,
+          separator: 'subtle',
         },
       ],
     },

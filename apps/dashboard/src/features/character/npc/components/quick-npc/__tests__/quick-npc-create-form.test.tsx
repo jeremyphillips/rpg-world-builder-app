@@ -24,6 +24,16 @@ import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import { QuickNpcAuthoringForm } from '../quick-npc-authoring-form'
 
+const resolveQuickNpcAuthoringCreateInputMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../../../lib/quick-npc/quick-npc-narrative-on-create.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    resolveQuickNpcAuthoringCreateInput: resolveQuickNpcAuthoringCreateInputMock,
+  }
+})
+
 vi.mock('../../../api/npc-client', async (importOriginal) => ({
   ...(await importOriginal<typeof NpcClient>()),
   createNpc: vi.fn(),
@@ -145,9 +155,15 @@ async function fillAuthoringFields(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('QuickNpcAuthoringForm', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     createNpcMock.mockReset()
     createNpcMock.mockResolvedValue(npcDetail)
+    resolveQuickNpcAuthoringCreateInputMock.mockReset()
+    resolveQuickNpcAuthoringCreateInputMock.mockImplementation(async ({ prepareArgs }) => {
+      const { prepareQuickNpcAuthoringCreate } =
+        await import('../../../lib/quick-npc/quick-npc-authoring-submit.lib')
+      return prepareQuickNpcAuthoringCreate(prepareArgs).input
+    })
   })
 
   it('renders the details tab with Neutral alignment default', () => {

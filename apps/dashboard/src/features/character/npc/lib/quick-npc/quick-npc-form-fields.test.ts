@@ -36,6 +36,7 @@ const validValues = {
   requiredWeaponIds: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
+  generateNarrativeOnCreate: true,
 }
 
 describe('isQuickNpcMembershipTitleSetupComplete', () => {
@@ -192,6 +193,7 @@ describe('buildQuickNpcDetailsFields', () => {
       'gender',
       'name',
       'alignment',
+      'generateNarrativeOnCreate',
     ])
   })
 
@@ -203,6 +205,7 @@ describe('buildQuickNpcDetailsFields', () => {
       requiredWeaponIds: [],
       requiredSpellIds: [],
       startingChoiceOverrides: {},
+      generateNarrativeOnCreate: true,
     })
   })
 })
@@ -257,6 +260,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           requiredWeaponIds: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
+          generateNarrativeOnCreate: true,
         },
       ),
     ).toMatchObject({

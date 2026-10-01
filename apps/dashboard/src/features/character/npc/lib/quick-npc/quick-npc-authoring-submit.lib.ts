@@ -9,7 +9,12 @@ import {
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
-import { buildQuickNpcCreateInput, QuickNpcStartingChoiceIncompleteError } from './quick-npc-create'
+import {
+  prepareQuickNpcCreate,
+  type QuickNpcPrepareCreateArgs,
+  type QuickNpcPreparedCreate,
+  QuickNpcStartingChoiceIncompleteError,
+} from './quick-npc-create'
 import {
   buildQuickNpcSeed,
   isQuickNpcOrganizationMemberSetup,
@@ -38,13 +43,17 @@ function resolveQuickNpcMembershipPayload(
   }
 }
 
-// fallow-ignore-next-line complexity
-export function buildQuickNpcAuthoringCreateInput(args: {
+export type QuickNpcAuthoringPrepareArgs = {
   createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
   tabValues: QuickNpcAuthoringTabValues
   buildContext: CharacterBuildContext
-}) {
+}
+
+// fallow-ignore-next-line complexity
+export function assembleQuickNpcPrepareCreateArgs(
+  args: QuickNpcAuthoringPrepareArgs,
+): QuickNpcPrepareCreateArgs {
   const values = mergeQuickNpcAuthoringValues(args.setup, args.tabValues)
   const membership =
     args.createContext.kind === 'organization-member'
@@ -76,12 +85,23 @@ export function buildQuickNpcAuthoringCreateInput(args: {
   }
   const manualConstraints = npcStartingChoiceManualConstraints(startingChoices)
 
-  return buildQuickNpcCreateInput({
+  return {
     seed: buildQuickNpcSeed(values),
     context: args.buildContext,
     preferences,
     allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
     ...(manualConstraints ? { constraints: manualConstraints } : {}),
     ...(membership ? { membership } : {}),
-  })
+  }
+}
+
+export function prepareQuickNpcAuthoringCreate(
+  args: QuickNpcAuthoringPrepareArgs,
+): QuickNpcPreparedCreate {
+  return prepareQuickNpcCreate(assembleQuickNpcPrepareCreateArgs(args))
+}
+
+/** @deprecated Prefer {@link prepareQuickNpcAuthoringCreate} when narrative needs the resolved draft. */
+export function buildQuickNpcAuthoringCreateInput(args: QuickNpcAuthoringPrepareArgs) {
+  return prepareQuickNpcAuthoringCreate(args).input
 }
