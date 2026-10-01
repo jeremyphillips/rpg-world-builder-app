@@ -9,19 +9,19 @@ import {
   toCharacterDetailSource,
 } from '../../lib/display/character-display'
 import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
-import { CharacterDetailContent } from './character-detail-content'
+import { CharacterDetailSheet } from './character-detail-sheet'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 
 const meta = {
-  title: 'Character/CharacterDetailContent',
-  component: CharacterDetailContent,
+  title: 'Character/CharacterDetailSheet',
+  component: CharacterDetailSheet,
   parameters: { layout: 'padded' },
-} satisfies Meta<typeof CharacterDetailContent>
+} satisfies Meta<typeof CharacterDetailSheet>
 
 export default meta
-type Story = StoryObj<typeof CharacterDetailContent>
+type Story = StoryObj<typeof CharacterDetailSheet>
 
 export const Default: Story = {
   args: {

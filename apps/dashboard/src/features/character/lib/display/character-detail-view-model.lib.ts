@@ -1,6 +1,6 @@
 import type {
-  Character,
   CharacterBuildCatalogIndex,
+  CharacterDerivationInput,
   CharacterLocationReferenceResolution,
   CharacterProficiencies,
   Equipment,
@@ -18,7 +18,6 @@ import {
   formatWeaponDamageWithModifier,
   getGenderLabel,
   getCharacterLocationConnectionDisplayLabel,
-  getCharacterTotalLevel,
   getMovementModeLabel,
   getOrganizationDomainLabel,
   MOVEMENT_MODES,
@@ -26,9 +25,10 @@ import {
   resolveCharacterXpDisplay,
   resolveCreatureInitiativeModifier,
   resolveCreatureMovement,
+  createDefaultCharacterVitalState,
+  resolveEquippedArmorFromInventory,
   resolveTraitDisplay,
   resolveWeaponAttackAbilityModifier,
-  toCharacterSheetDerivationInput,
   weaponAttackBonus,
 } from '@rpg/contracts'
 
@@ -62,17 +62,60 @@ import type {
   CharacterProficiencyGroupId,
   CharacterProficienciesViewModel,
 } from './character-display-types'
+import {
+  characterDetailSourceSummaryInput,
+  type CharacterDetailSource,
+} from './character-detail-source.lib'
 import { formatContentReferenceLabel } from './format-content-reference-label'
 import { resolveCharacterVitalStatusPresentation } from './character-vital-presentation'
 import { formatCharacterSummaryFromCatalog } from './character-summary.lib'
 
 export type CharacterDisplayInput = {
-  character: Character
+  source: CharacterDetailSource
   catalogIndex: CharacterBuildCatalogIndex
   rules: ResolvedCharacterCreationRules
   xpProgression: Pick<XpProgressionBody, 'entries'>
   organizationReferences?: readonly OrganizationReferenceResolution[]
   locationReferences?: readonly CharacterLocationReferenceResolution[]
+}
+
+function getDetailSourceTotalLevel(source: CharacterDetailSource): number {
+  return source.classes.reduce((total, entry) => total + entry.level, 0)
+}
+
+function toCharacterDetailDerivationInput(
+  source: CharacterDetailSource,
+  catalogIndex: CharacterBuildCatalogIndex,
+  rules: ResolvedCharacterCreationRules,
+): CharacterDerivationInput {
+  const primaryClassId = source.classes.find((entry) => entry.classId)?.classId
+  const characterClass = primaryClassId ? catalogIndex.classes.get(primaryClassId) : undefined
+  const equippedArmor = resolveEquippedArmorFromInventory({
+    equipment: source.equipment,
+    catalog: catalogIndex.equipment,
+  })
+
+  return {
+    level: getDetailSourceTotalLevel(source),
+    armorClassBase: rules.armorClass.base,
+    abilityScores: source.abilityScores,
+    characterClass,
+    proficiencies: source.proficiencies,
+    skillProficiencies: Array.from(catalogIndex.skillProficiencies.values()),
+    equippedArmor: equippedArmor.length > 0 ? equippedArmor : undefined,
+  }
+}
+
+function resolveIdentitySummary(
+  source: CharacterDetailSource,
+  catalogIndex: CharacterBuildCatalogIndex,
+): string {
+  if (source.identitySummary) return source.identitySummary
+
+  const summaryInput = characterDetailSourceSummaryInput(source)
+  if (!summaryInput) return '—'
+
+  return formatCharacterSummaryFromCatalog(summaryInput, catalogIndex)
 }
 
 function isCharacterProficientWithWeapon(
@@ -87,21 +130,22 @@ function isCharacterProficientWithWeapon(
 }
 
 function buildActionRows(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   level: number,
 ): CharacterActionRowViewModel[] {
   const profBonus = proficiencyBonus(level)
   const rows: CharacterActionRowViewModel[] = []
+  const abilityScores = source.abilityScores ?? {}
 
-  for (const entry of character.equipment.weapons) {
+  for (const entry of source.equipment.weapons) {
     const equipment = catalogIndex.equipment.get(entry.equipmentId)
     if (!equipment || equipment.kind !== 'weapon' || !equipment.damage) continue
 
-    const abilityMod = resolveWeaponAttackAbilityModifier(equipment, character.abilityScores)
+    const abilityMod = resolveWeaponAttackAbilityModifier(equipment, abilityScores)
     if (abilityMod === undefined) continue
 
-    const isProficient = isCharacterProficientWithWeapon(character.proficiencies, equipment)
+    const isProficient = isCharacterProficientWithWeapon(source.proficiencies, equipment)
     const attack = weaponAttackBonus(abilityMod, isProficient, profBonus)
 
     rows.push({
@@ -116,11 +160,11 @@ function buildActionRows(
 }
 
 function buildSavingThrowSection(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterDetailListSection {
-  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const derivationInput = toCharacterDetailDerivationInput(source, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
 
   const items = profile.savingThrows
@@ -153,11 +197,11 @@ function buildProficiencyGroup(
 }
 
 function buildProficienciesSection(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterProficienciesViewModel {
-  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const derivationInput = toCharacterDetailDerivationInput(source, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
 
   const groups = [
@@ -180,7 +224,7 @@ function buildProficienciesSection(
     buildProficiencyGroup(
       'languages',
       CHARACTER_PROFICIENCY_GROUP_LABELS.languages,
-      character.proficiencies.languages.map((entry) => ({
+      source.proficiencies.languages.map((entry) => ({
         id: entry.language,
         label: resolveLanguagePreviewLabel(entry.language, catalogIndex),
       })),
@@ -188,7 +232,7 @@ function buildProficienciesSection(
     buildProficiencyGroup(
       'weapons',
       CHARACTER_PROFICIENCY_GROUP_LABELS.weapons,
-      character.proficiencies.weapons.map((weapon, index) => ({
+      source.proficiencies.weapons.map((weapon, index) => ({
         id: weapon.weaponId ?? `${weapon.weaponCategory ?? 'weapon'}-${index}`,
         label: weapon.weaponId
           ? (catalogIndex.equipment.get(weapon.weaponId)?.name ??
@@ -201,7 +245,7 @@ function buildProficienciesSection(
     buildProficiencyGroup(
       'tools',
       CHARACTER_PROFICIENCY_GROUP_LABELS.tools,
-      character.proficiencies.tools.map((tool, index) => ({
+      source.proficiencies.tools.map((tool, index) => ({
         id: tool.toolId ?? `${tool.toolCategory ?? 'tool'}-${index}`,
         label: tool.toolId
           ? (catalogIndex.equipment.get(tool.toolId)?.name ??
@@ -214,7 +258,7 @@ function buildProficienciesSection(
     buildProficiencyGroup(
       'armor',
       CHARACTER_PROFICIENCY_GROUP_LABELS.armor,
-      character.proficiencies.armor.map((armor, index) => ({
+      source.proficiencies.armor.map((armor, index) => ({
         id: `${armor.armorCategory}-${index}`,
         label: formatContentReferenceLabel(armor.armorCategory),
       })),
@@ -229,12 +273,13 @@ function buildProficienciesSection(
 }
 
 function buildClassFeaturesSection(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterDetailListSection {
   const items: CharacterDetailListItem[] = []
 
-  for (const classEntry of character.classes) {
+  for (const classEntry of source.classes) {
+    if (!classEntry.classId) continue
     const characterClass = catalogIndex.classes.get(classEntry.classId)
     if (!characterClass) continue
 
@@ -256,10 +301,19 @@ function buildClassFeaturesSection(
 }
 
 function buildSpeciesTraitsSection(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterDetailListSection {
-  const species = catalogIndex.species.get(character.species.id)
+  const speciesId = source.species?.id
+  if (!speciesId) {
+    return {
+      title: CHARACTER_SECTION_LABELS.speciesTraits,
+      items: [],
+      emptyText: CHARACTER_EMPTY_SECTION_TEXT.speciesTraits,
+    }
+  }
+
+  const species = catalogIndex.species.get(speciesId)
   if (!species) {
     return {
       title: CHARACTER_SECTION_LABELS.speciesTraits,
@@ -270,7 +324,7 @@ function buildSpeciesTraitsSection(
 
   const traits = [...species.traits]
   const heritageOption = species.heritage?.options.find(
-    (option) => option.id === character.species.heritageId,
+    (option) => option.id === source.species?.heritageId,
   )
   if (heritageOption) traits.push(heritageOption)
 
@@ -290,8 +344,8 @@ function buildSpeciesTraitsSection(
   }
 }
 
-function buildFeatsSection(character: Character): CharacterDetailListSection {
-  const items = character.feats.map((entry) => ({
+function buildFeatsSection(source: CharacterDetailSource): CharacterDetailListSection {
+  const items = source.feats.map((entry) => ({
     id: entry.featId,
     label: formatContentReferenceLabel(entry.featId),
     detail: entry.notes,
@@ -333,15 +387,17 @@ function resolveSpeedStatTile(species: Species | undefined): Pick<
 }
 
 function buildStats(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterDetailStatTile[] {
-  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const derivationInput = toCharacterDetailDerivationInput(source, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
-  const species = catalogIndex.species.get(character.species.id)
+  const species = source.species?.id ? catalogIndex.species.get(source.species.id) : undefined
   const speed = resolveSpeedStatTile(species)
-  const initiative = resolveCreatureInitiativeModifier(character.abilityScores.dex)
+  const dexScore = source.abilityScores?.dex
+  const initiative =
+    dexScore !== undefined ? resolveCreatureInitiativeModifier(dexScore) : undefined
   return [
     {
       id: 'ac',
@@ -368,29 +424,71 @@ function buildStats(
   ]
 }
 
+function hasCompleteAbilityScores(source: CharacterDetailSource): boolean {
+  if (!source.abilityScores) return false
+  return ABILITY_IDS.every((ability) => typeof source.abilityScores?.[ability] === 'number')
+}
+
+function allowDerivedHitPoints(source: CharacterDetailSource): boolean {
+  return hasCompleteAbilityScores(source) || source.hitPoints?.base !== undefined
+}
+
+function resolveHitPointsMaxDisplay(
+  source: CharacterDetailSource,
+  derivedMaxHp: number | undefined,
+): string {
+  const storedBase = source.hitPoints?.base
+  if (allowDerivedHitPoints(source) && derivedMaxHp !== undefined) {
+    return formatPreviewOptionalNumber(derivedMaxHp)
+  }
+  if (storedBase !== undefined) {
+    return formatPreviewOptionalNumber(storedBase)
+  }
+  return formatPreviewOptionalNumber(undefined)
+}
+
+function resolveHitPointsCurrentDisplay(
+  source: CharacterDetailSource,
+  maxDisplay: string,
+  derivedMaxHp: number | undefined,
+): string {
+  const storedCurrent = source.hitPoints?.current
+  if (storedCurrent !== undefined) {
+    return formatPreviewOptionalNumber(storedCurrent)
+  }
+
+  const hasResolvedMax =
+    allowDerivedHitPoints(source) &&
+    (derivedMaxHp !== undefined || source.hitPoints?.base !== undefined)
+  if (hasResolvedMax) return maxDisplay
+
+  return formatPreviewOptionalNumber(undefined)
+}
+
 function buildHitPoints(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterHitPointsViewModel {
-  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const derivationInput = toCharacterDetailDerivationInput(source, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
-  const maxHp = formatPreviewOptionalNumber(profile.maxHp ?? character.hitPoints.base)
-  const temporary = character.hitPoints.temporary
+  const max = resolveHitPointsMaxDisplay(source, profile.maxHp)
+  const current = resolveHitPointsCurrentDisplay(source, max, profile.maxHp)
+  const temporary = source.hitPoints?.temporary
 
   return {
-    current: formatPreviewOptionalNumber(character.hitPoints.current ?? character.hitPoints.base),
-    max: maxHp,
+    current,
+    max,
     temporary: temporary && temporary > 0 ? String(temporary) : '—',
   }
 }
 
 function buildAbilities(
-  character: Character,
+  source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
   rules: ResolvedCharacterCreationRules,
 ): CharacterAbilityTile[] {
-  const derivationInput = toCharacterSheetDerivationInput(character, catalogIndex, rules)
+  const derivationInput = toCharacterDetailDerivationInput(source, catalogIndex, rules)
   const profile = deriveCharacterProfile(derivationInput)
 
   return ABILITY_IDS.map((ability) => {
@@ -405,22 +503,23 @@ function buildAbilities(
 }
 
 function buildIdentityXp(
-  character: Character,
+  source: CharacterDetailSource,
   xpProgression: Pick<XpProgressionBody, 'entries'>,
 ): string | null {
-  const xp = resolveCharacterXpDisplay(character, xpProgression)
+  if (source.xp === undefined) return null
+  const xp = resolveCharacterXpDisplay({ xp: source.xp }, xpProgression)
   return xp === null ? null : String(xp)
 }
 
 export function buildCharacterDetailViewModel({
-  character,
+  source,
   catalogIndex,
   rules,
   xpProgression,
   organizationReferences = [],
   locationReferences = [],
 }: CharacterDisplayInput): CharacterDetailViewModel {
-  const level = getCharacterTotalLevel(character)
+  const level = getDetailSourceTotalLevel(source)
 
   const organizationItems = organizationReferences.map(
     ({ organizationId, organization, title }) => ({
@@ -444,36 +543,38 @@ export function buildCharacterDetailViewModel({
       : 'This location is missing or no longer available.',
   }))
 
+  const vital = source.vital ?? createDefaultCharacterVitalState()
+
   return {
-    id: character.id,
+    id: source.id,
     identity: {
-      name: character.name,
-      summary: formatCharacterSummaryFromCatalog(character, catalogIndex),
-      gender: getGenderLabel(character.gender),
-      xp: buildIdentityXp(character, xpProgression),
-      vital: character.vital,
-      vitalLabel: resolveCharacterVitalStatusPresentation(character.vital.status).label,
+      name: source.name,
+      summary: resolveIdentitySummary(source, catalogIndex),
+      gender: source.gender ? getGenderLabel(source.gender) : '—',
+      xp: buildIdentityXp(source, xpProgression),
+      vital,
+      vitalLabel: resolveCharacterVitalStatusPresentation(vital.status).label,
     },
-    stats: buildStats(character, catalogIndex, rules),
-    abilities: buildAbilities(character, catalogIndex, rules),
-    hitPoints: buildHitPoints(character, catalogIndex, rules),
-    actions: buildActionRows(character, catalogIndex, level),
-    savingThrows: buildSavingThrowSection(character, catalogIndex, rules),
-    proficiencies: buildProficienciesSection(character, catalogIndex, rules),
-    spells: buildCharacterSheetSpellCards(character, catalogIndex),
-    equipment: buildCharacterSheetEquipmentCards(character, catalogIndex),
+    stats: buildStats(source, catalogIndex, rules),
+    abilities: buildAbilities(source, catalogIndex, rules),
+    hitPoints: buildHitPoints(source, catalogIndex, rules),
+    actions: buildActionRows(source, catalogIndex, level),
+    savingThrows: buildSavingThrowSection(source, catalogIndex, rules),
+    proficiencies: buildProficienciesSection(source, catalogIndex, rules),
+    spells: buildCharacterSheetSpellCards({ spells: [...source.spells] }, catalogIndex),
+    equipment: buildCharacterSheetEquipmentCards(source, catalogIndex),
     wealth: {
       label: CHARACTER_SECTION_LABELS.wealth,
-      value: `${character.wealth.gp} gp`,
+      value: source.wealth !== undefined ? `${source.wealth.gp} gp` : '—',
     },
-    classFeatures: buildClassFeaturesSection(character, catalogIndex),
-    speciesTraits: buildSpeciesTraitsSection(character, catalogIndex),
-    feats: buildFeatsSection(character),
+    classFeatures: buildClassFeaturesSection(source, catalogIndex),
+    speciesTraits: buildSpeciesTraitsSection(source, catalogIndex),
+    feats: buildFeatsSection(source),
     connections: {
       title: CHARACTER_SECTION_LABELS.connections,
       items: [...organizationItems, ...locationItems],
       emptyText: CHARACTER_EMPTY_SECTION_TEXT.connections,
     },
-    narrative: character.narrative,
+    narrative: source.narrative,
   }
 }

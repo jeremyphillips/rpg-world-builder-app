@@ -1,5 +1,5 @@
 import { emptyContentMediaSchema } from '@rpg/contracts'
-import { Modal } from '@rpg/ui'
+import { DetailPreviewModal } from '@rpg/ui'
 
 import { useCampaignRules } from '@/features/campaign'
 import {
@@ -42,38 +42,36 @@ export function ClassPreviewPlayerHost({
   }
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="xl" layout="stable" stableSize="tall" closeLabel="Close preview">
-        <Modal.Header headline={CONTENT_PREVIEW_AS_PLAYER_LABEL} />
-        <Modal.Body>
-          <ClassDetailBody
-            name={name}
-            displayImage={getContentDisplayImage(
-              buildContentDisplayImageInput(
-                'classes',
-                {
-                  media:
-                    (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
-                  slug: values.slug ?? 'preview',
-                  source: ctx.entitySource ?? 'homebrew',
-                  rulesetId: ctx.rulesetId,
-                },
-                'detail',
-              ),
-            )}
-            displayFallback={resolveDashboardDetailDisplayFallback('class')}
-            imageName={name}
-            viewModel={viewModel as ClassDetailViewModel}
-            subclasses={subclasses}
-            subclassingEnabled={campaignRules.subclassing.enabled}
-            campaignId={ctx.campaignId ?? ''}
-            skillProficiencies={skillProficiencies}
-            skillsPending={skillsPending}
-            vocabulary={vocabulary}
-            pageShell={false}
-          />
-        </Modal.Body>
-      </Modal.Content>
-    </Modal.Root>
+    <DetailPreviewModal
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={CONTENT_PREVIEW_AS_PLAYER_LABEL}
+    >
+      <ClassDetailBody
+        name={name}
+        displayImage={getContentDisplayImage(
+          buildContentDisplayImageInput(
+            'classes',
+            {
+              media: (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
+              slug: values.slug ?? 'preview',
+              source: ctx.entitySource ?? 'homebrew',
+              rulesetId: ctx.rulesetId,
+            },
+            'detail',
+          ),
+        )}
+        displayFallback={resolveDashboardDetailDisplayFallback('class')}
+        imageName={name}
+        viewModel={viewModel as ClassDetailViewModel}
+        subclasses={subclasses}
+        subclassingEnabled={campaignRules.subclassing.enabled}
+        campaignId={ctx.campaignId ?? ''}
+        skillProficiencies={skillProficiencies}
+        skillsPending={skillsPending}
+        vocabulary={vocabulary}
+        pageShell={false}
+      />
+    </DetailPreviewModal>
   )
 }

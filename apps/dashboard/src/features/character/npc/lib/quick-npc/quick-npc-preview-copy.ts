@@ -1,0 +1,3 @@
+export const QUICK_NPC_PREVIEW_NPC_LABEL = 'Preview NPC' as const
+
+export const QUICK_NPC_PREVIEW_NPC_HEADLINE = QUICK_NPC_PREVIEW_NPC_LABEL

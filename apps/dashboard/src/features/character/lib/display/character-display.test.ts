@@ -8,6 +8,7 @@ import {
   buildCharacterCardViewModel,
   buildCharacterDetailViewModel,
   formatCharacterSummaryFromCatalog,
+  toCharacterDetailSource,
 } from './character-display'
 import { SAMPLE_PC, makeCampaignNpcListItem } from '../fixtures/character-fixtures'
 
@@ -88,7 +89,7 @@ describe('buildCharacterCardViewModel', () => {
 describe('buildCharacterDetailViewModel', () => {
   it('derives combat stats, XP, and structured ability tiles from the persisted sheet', () => {
     const viewModel = buildCharacterDetailViewModel({
-      character: SAMPLE_PC,
+      source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
@@ -132,7 +133,7 @@ describe('buildCharacterDetailViewModel', () => {
 
   it('maps saved organization reference resolutions for character detail', () => {
     const viewModel = buildCharacterDetailViewModel({
-      character: SAMPLE_PC,
+      source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
@@ -150,7 +151,7 @@ describe('buildCharacterDetailViewModel', () => {
 
   it('uses forward edge labels for character location connection detail', () => {
     const viewModel = buildCharacterDetailViewModel({
-      character: SAMPLE_PC,
+      source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },

@@ -8,7 +8,10 @@ import { useCanManageCampaign } from '@/features/campaign'
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { useCharacterOrganizationReferences } from '../../hooks/use-character-organization-references'
 import { useCharacterLocationReferences } from '../../hooks/use-character-location-references'
-import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
+import {
+  buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+} from '../../lib/display/character-display'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useNpcDeleteFlow } from './use-npc-delete-flow'
 import { useNpc } from './use-npcs'
@@ -27,7 +30,7 @@ export function useNpcDetailPage() {
     }
 
     return buildCharacterDetailViewModel({
-      character: npcQuery.data.character,
+      source: toCharacterDetailSource(npcQuery.data.character),
       catalogIndex: buildContextQuery.catalogIndex,
       rules: buildContextQuery.context.characterCreationRules,
       xpProgression: resolveCampaignXpProgressionForRules(

@@ -44,6 +44,11 @@ import {
   resolveQuickNpcAuthoringCreateInput,
 } from '../../lib/quick-npc/quick-npc-narrative-on-create.lib'
 import { QuickNpcStartingChoices } from './quick-npc-starting-choices'
+import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
+import {
+  quickNpcCreateFooterActionsClasses,
+  quickNpcCreateFooterLayoutClasses,
+} from './quick-npc-create-footer.variants'
 import {
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateContext,
@@ -68,6 +73,7 @@ export type QuickNpcAuthoringFormProps = {
   onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
   onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
+  previewButtonRef?: React.RefObject<HTMLButtonElement | null>
 }
 
 function buildQuickNpcAuthoringTabs(args: {
@@ -186,6 +192,7 @@ export function QuickNpcAuthoringForm({
   onSetupSummaryEdit,
   onCreated,
   onPendingChange,
+  previewButtonRef,
 }: QuickNpcAuthoringFormProps) {
   const queryClient = useQueryClient()
   const createFlowDensity = useCreateFlowFormDensity()
@@ -344,12 +351,24 @@ export function QuickNpcAuthoringForm({
                 </div>
               </div>
             ) : null}
-            <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
-              Cancel
-            </Button>
-            <FormShellSubmitButton disabled={isSubmitting || isSuccess}>
-              {isSubmitting ? 'Creating…' : QUICK_NPC_CREATE_SUBMIT_LABEL}
-            </FormShellSubmitButton>
+            <div className={quickNpcCreateFooterLayoutClasses()}>
+              <QuickNpcPreviewNpcButton
+                buttonRef={previewButtonRef}
+                buildContext={buildContext}
+                createContext={createContext}
+                setup={setup}
+                authoringValues={form.getValues()}
+                disabled={isSubmitting}
+              />
+              <div className={quickNpcCreateFooterActionsClasses()}>
+                <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
+                  Cancel
+                </Button>
+                <FormShellSubmitButton disabled={isSubmitting || isSuccess}>
+                  {isSubmitting ? 'Creating…' : QUICK_NPC_CREATE_SUBMIT_LABEL}
+                </FormShellSubmitButton>
+              </div>
+            </div>
           </>
         )
       }}

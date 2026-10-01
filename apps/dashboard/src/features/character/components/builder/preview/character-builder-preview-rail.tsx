@@ -19,6 +19,9 @@ import {
   BUILDER_PREVIEW_COMPACT_LABEL,
   BUILDER_PREVIEW_HEADER_TITLE,
 } from '../../../lib/builder-preview/builder-preview-rail-copy'
+import { CharacterDetailPreviewModal } from '../../detail/character-detail-preview-modal'
+import { projectCharacterBuilderDraftDetailPreview } from '../../../lib/display/character-detail-draft-projection.lib'
+import { BUILDER_PREVIEW_CHARACTER_SHEET_LABEL } from '../../../lib/builder-preview/builder-preview-rail-copy'
 import { CharacterBuilderPreviewRailPlaceholder } from './character-builder-preview-rail-section-bodies'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
 import { characterBuilderPreviewCompactTriggerClasses } from '../character-builder-shell.variants'
@@ -59,6 +62,7 @@ function CharacterBuilderPreviewRailBody({
     forStepId: CharacterBuilderStepId
     value: CharacterBuilderPreviewSectionId
   } | null>(null)
+  const [characterSheetPreviewOpen, setCharacterSheetPreviewOpen] = useState(false)
 
   const effectiveChoiceSets = useMemo(
     () => resolvedChoiceSets ?? (preview ? resolveAvailableChoices(draft, context) : []),
@@ -93,28 +97,53 @@ function CharacterBuilderPreviewRailBody({
     ],
   )
 
+  const characterSheetPreview = useMemo(
+    () =>
+      preview
+        ? projectCharacterBuilderDraftDetailPreview(
+            draft,
+            context,
+            catalogIndex,
+            effectiveChoiceSets,
+          )
+        : null,
+    [catalogIndex, context, draft, effectiveChoiceSets, preview],
+  )
+
   if (!preview || !projection) {
     return <CharacterBuilderPreviewRailPlaceholder />
   }
 
   return (
-    <CharacterBuilderPreviewRailView
-      chrome={chrome}
-      layout="fill"
-      hideHeader={hideHeader}
-      projection={projection}
-      preview={preview}
-      draft={draft}
-      catalogIndex={catalogIndex}
-      resolvedChoiceSets={effectiveChoiceSets}
-      openSectionId={projection.openSectionId}
-      onOpenSectionChange={(value) =>
-        setManualOpenSection({
-          forStepId: currentStepId,
-          value: value as CharacterBuilderPreviewSectionId,
-        })
-      }
-    />
+    <>
+      <CharacterBuilderPreviewRailView
+        chrome={chrome}
+        layout="fill"
+        hideHeader={hideHeader}
+        projection={projection}
+        preview={preview}
+        draft={draft}
+        catalogIndex={catalogIndex}
+        resolvedChoiceSets={effectiveChoiceSets}
+        openSectionId={projection.openSectionId}
+        onOpenSectionChange={(value) =>
+          setManualOpenSection({
+            forStepId: currentStepId,
+            value: value as CharacterBuilderPreviewSectionId,
+          })
+        }
+        onPreviewCharacterSheet={() => setCharacterSheetPreviewOpen(true)}
+      />
+      {characterSheetPreview ? (
+        <CharacterDetailPreviewModal
+          open={characterSheetPreviewOpen}
+          onOpenChange={setCharacterSheetPreviewOpen}
+          headline={BUILDER_PREVIEW_CHARACTER_SHEET_LABEL}
+          viewModel={characterSheetPreview.viewModel}
+          completeness={characterSheetPreview.completeness}
+        />
+      ) : null}
+    </>
   )
 }
 

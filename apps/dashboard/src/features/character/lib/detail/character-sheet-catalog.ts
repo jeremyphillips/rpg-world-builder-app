@@ -139,7 +139,7 @@ function resolveEquipmentOccurrenceId(
 }
 
 function buildEquipmentCards(
-  character: Character,
+  character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetEquipmentCard[] {
   const occurrenceCounts = new Map<string, number>()
@@ -176,7 +176,7 @@ function buildEquipmentCards(
 }
 
 function buildSpellCards(
-  character: Character,
+  character: Pick<Character, 'spells'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
   return character.spells.map((entry, index) => {
@@ -199,14 +199,14 @@ function buildSpellCards(
 }
 
 export function buildCharacterSheetEquipmentCards(
-  character: Character,
+  character: Pick<Character, 'equipment'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetEquipmentCard[] {
   return buildEquipmentCards(character, catalogIndex)
 }
 
 export function buildCharacterSheetSpellCards(
-  character: Character,
+  character: Pick<Character, 'spells'>,
   catalogIndex: CharacterBuildCatalogIndex,
 ): CharacterSheetSpellCard[] {
   return buildSpellCards(character, catalogIndex)

@@ -9,15 +9,7 @@ import { ContentDeletionBlockedDialog } from '@/features/content'
 
 import { useDeleteCharacter } from '../../hooks/use-delete-character'
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
-import { CharacterDetailAbilitiesRow } from './sheet/character-detail-abilities-row'
-import { CharacterDetailCombatRow } from './sheet/character-detail-combat-row'
-import { CharacterDetailHeader } from './sheet/character-detail-header'
-import {
-  characterDetailAbilitiesStatsSectionClasses,
-  characterDetailBodyGridClasses,
-} from './sheet/character-detail-sheet.variants'
-import { CharacterDetailStatsRow } from './sheet/character-detail-stats-row'
-import { CharacterDetailTabs } from './tabs/character-detail-tabs'
+import { CharacterDetailSheet } from './character-detail-sheet'
 
 export type CharacterDetailDeleteConfig = {
   open: boolean
@@ -39,20 +31,8 @@ export type CharacterDetailContentProps = {
 }
 
 /**
- * Read-only character sheet driven by the display registry view model.
- *
- * Shared by PC detail (`/characters/:id`) and NPC detail (`/campaigns/:id/npcs/:npcId`).
- *
- * Growth direction (phase 7 — detail polish):
- * - Keep sheet layout, tabs, and catalog rows kind-neutral here and in child `character-detail-*`
- *   components; both kinds use the same `CharacterDetailViewModel`.
- * - Route wrappers own kind-specific data loading and mutations (PC vs campaign NPC API).
- * - Hide user-ownership affordances on NPC surfaces: roster/submit-to-campaign links, PC delete
- *   defaults (`useDeleteCharacter`, `ROUTES.characters.list`), and copy that implies "your
- *   character". NPC routes should pass `deleteConfig` / `showDelete` instead of relying on PC
- *   defaults (see `npc-detail.tsx`).
- * - When adding PC-only actions (edit, campaign submission, transfer), gate with an explicit prop
- *   or `characterKind` — do not assume every detail view is user-owned.
+ * Route controller for PC and NPC detail — breadcrumb, delete, and dialogs.
+ * Sheet layout lives in {@link CharacterDetailSheet}.
  */
 export function CharacterDetailContent({
   viewModel,
@@ -95,12 +75,9 @@ export function CharacterDetailContent({
   }
 
   return (
-    <div className="space-y-6">
-      <CharacterDetailHeader
-        name={viewModel.identity.name}
-        summary={viewModel.identity.summary}
-        gender={viewModel.identity.gender}
-        xp={viewModel.identity.xp}
+    <>
+      <CharacterDetailSheet
+        viewModel={viewModel}
         identityMedia={identityMedia}
         statusSummary={statusSummary}
         statusActions={statusActions}
@@ -108,28 +85,6 @@ export function CharacterDetailContent({
         showDelete={showDelete}
         onDeleteClick={() => setDeleteDialogOpen(true)}
       />
-
-      <div className={characterDetailAbilitiesStatsSectionClasses}>
-        <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
-        <CharacterDetailStatsRow stats={viewModel.stats} hitPoints={viewModel.hitPoints} />
-      </div>
-      <div className={characterDetailBodyGridClasses}>
-        <CharacterDetailCombatRow
-          actions={viewModel.actions}
-          savingThrows={viewModel.savingThrows}
-          proficiencies={viewModel.proficiencies}
-        />
-        <CharacterDetailTabs
-          spells={viewModel.spells}
-          equipment={viewModel.equipment}
-          wealth={viewModel.wealth}
-          classFeatures={viewModel.classFeatures}
-          speciesTraits={viewModel.speciesTraits}
-          feats={viewModel.feats}
-          connections={viewModel.connections}
-          narrative={viewModel.narrative}
-        />
-      </div>
 
       <ConfirmDialog
         open={deleteDialogOpen}
@@ -153,6 +108,6 @@ export function CharacterDetailContent({
         entityName={viewModel.identity.name}
         blockers={deleteBlockers}
       />
-    </div>
+    </>
   )
 }

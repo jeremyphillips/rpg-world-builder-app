@@ -35,6 +35,8 @@ import {
   type QuickNpcCreateFormOrganization,
 } from './quick-npc-authoring-form'
 import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase'
+import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
+import { quickNpcCreateFooterLayoutClasses } from './quick-npc-create-footer.variants'
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
 
@@ -83,6 +85,7 @@ function QuickNpcCreateModalSession({
   const [state, setState] = React.useState(() => createInitialState(buildContext, context))
   const [authoringPending, setAuthoringPending] = React.useState(false)
   const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
+  const previewNpcButtonRef = React.useRef<HTMLButtonElement>(null)
   const setupValuesRef = React.useRef(state.setupValues)
   React.useEffect(() => {
     setupValuesRef.current = state.setupValues
@@ -292,11 +295,20 @@ function QuickNpcCreateModalSession({
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
         footer={
           state.phase === 'setup' ? (
-            <CreateSetupFooter
-              model={sequenceModel}
-              onCancel={requestCancel}
-              onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
-            />
+            <div className={quickNpcCreateFooterLayoutClasses()}>
+              <QuickNpcPreviewNpcButton
+                buttonRef={previewNpcButtonRef}
+                buildContext={buildContext}
+                createContext={context}
+                setup={state.setupValues}
+                authoringValues={state.authoringValues}
+              />
+              <CreateSetupFooter
+                model={sequenceModel}
+                onCancel={requestCancel}
+                onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+              />
+            </div>
           ) : (
             <FormShellFooterSlot />
           )
@@ -324,6 +336,7 @@ function QuickNpcCreateModalSession({
             onSetupSummaryEdit={handleSetupSummaryEdit}
             onCreated={handleAuthoringCreated}
             onPendingChange={setAuthoringPending}
+            previewButtonRef={previewNpcButtonRef}
           />
         )}
       </CreateModalShell>

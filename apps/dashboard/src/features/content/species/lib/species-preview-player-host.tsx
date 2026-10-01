@@ -1,5 +1,5 @@
 import { emptyContentMediaSchema } from '@rpg/contracts'
-import { Modal } from '@rpg/ui'
+import { DetailPreviewModal } from '@rpg/ui'
 
 import {
   useCreatureTypeVocabulary,
@@ -39,32 +39,30 @@ export function SpeciesPreviewPlayerHost({
   })
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="xl" layout="stable" stableSize="tall" closeLabel="Close preview">
-        <Modal.Header headline={CONTENT_PREVIEW_AS_PLAYER_LABEL} />
-        <Modal.Body>
-          <SpeciesDetailBody
-            name={name}
-            displayImage={getContentDisplayImage(
-              buildContentDisplayImageInput(
-                'species',
-                {
-                  media:
-                    (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
-                  slug: values.slug ?? 'preview',
-                  source: ctx.entitySource ?? 'homebrew',
-                  rulesetId: ctx.rulesetId,
-                },
-                'detail',
-              ),
-            )}
-            displayFallback={resolveDashboardDetailDisplayFallback('species')}
-            imageName={name}
-            viewModel={viewModel}
-            campaignId={ctx.campaignId ?? ''}
-          />
-        </Modal.Body>
-      </Modal.Content>
-    </Modal.Root>
+    <DetailPreviewModal
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={CONTENT_PREVIEW_AS_PLAYER_LABEL}
+    >
+      <SpeciesDetailBody
+        name={name}
+        displayImage={getContentDisplayImage(
+          buildContentDisplayImageInput(
+            'species',
+            {
+              media: (values as ContentPreviewDisplayImageValues).media ?? emptyContentMediaSchema,
+              slug: values.slug ?? 'preview',
+              source: ctx.entitySource ?? 'homebrew',
+              rulesetId: ctx.rulesetId,
+            },
+            'detail',
+          ),
+        )}
+        displayFallback={resolveDashboardDetailDisplayFallback('species')}
+        imageName={name}
+        viewModel={viewModel}
+        campaignId={ctx.campaignId ?? ''}
+      />
+    </DetailPreviewModal>
   )
 }

@@ -18,3 +18,8 @@ export function builderPreviewAttentionTitle(issueCount: number): string {
   if (issueCount === 1) return '1 section needs attention.'
   return `${issueCount} sections need attention.`
 }
+
+export const BUILDER_PREVIEW_CHARACTER_SHEET_LABEL = 'Preview character sheet' as const
+
+export const BUILDER_PREVIEW_CHARACTER_SHEET_HELPER =
+  'Preview the current character sheet.' as const

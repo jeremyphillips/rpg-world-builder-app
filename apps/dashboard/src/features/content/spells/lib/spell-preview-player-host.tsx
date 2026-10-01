@@ -1,4 +1,4 @@
-import { Modal } from '@rpg/ui'
+import { DetailPreviewModal } from '@rpg/ui'
 
 import { useDamageTypeVocabulary, useSpellSchoolVocabulary } from '@/features/vocabulary'
 import type { ContentPreviewPlayerPreviewProps } from '../../lib/forms/preview/content-form-preview.types'
@@ -24,18 +24,17 @@ export function SpellPreviewPlayerHost({
   })
 
   return (
-    <Modal.Root open={open} onOpenChange={onOpenChange}>
-      <Modal.Content size="xl" layout="stable" stableSize="tall" closeLabel="Close preview">
-        <Modal.Header headline={CONTENT_PREVIEW_AS_PLAYER_LABEL} />
-        <Modal.Body>
-          <SpellDetailBody
-            name={name}
-            imageName={name}
-            viewModel={viewModel}
-            campaignId={ctx.campaignId ?? ''}
-          />
-        </Modal.Body>
-      </Modal.Content>
-    </Modal.Root>
+    <DetailPreviewModal
+      open={open}
+      onOpenChange={onOpenChange}
+      headline={CONTENT_PREVIEW_AS_PLAYER_LABEL}
+    >
+      <SpellDetailBody
+        name={name}
+        imageName={name}
+        viewModel={viewModel}
+        campaignId={ctx.campaignId ?? ''}
+      />
+    </DetailPreviewModal>
   )
 }

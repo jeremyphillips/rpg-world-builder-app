@@ -8,7 +8,10 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../lib/fixtures/character-builder-fixtures'
-import { buildCharacterDetailViewModel } from '../lib/display/character-display'
+import {
+  buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+} from '../lib/display/character-display'
 import { SAMPLE_PC } from '../lib/fixtures/character-fixtures'
 import { CharacterDetail } from './character-detail'
 
@@ -31,7 +34,7 @@ const useBuildContext = vi.mocked(useBuildContextFn)
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  character: SAMPLE_PC,
+  source: toCharacterDetailSource(SAMPLE_PC),
   catalogIndex,
   rules: context.characterCreationRules,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },
