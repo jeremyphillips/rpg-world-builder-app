@@ -13,6 +13,7 @@ import { formatGrantPreviewLine } from '../../acquisition/equipment-acquisition-
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
+  EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
 } from '../drawer/equipment-picker-drawer.types'
 
 export type EquipmentPickerAction =
@@ -115,13 +116,13 @@ function resolvePurchasePresentation(args: {
 }): EquipmentPickerItemPresentation {
   const { availability, disabled } = args.rowActionVm
 
-  if (availability.status === 'unavailable') {
+  if (availability.status === 'unavailableForPurchase') {
     return {
       statusItems: [
         blockerStatusItem(
-          formatEquipmentPickerHeaderTrailingLabel({
-            blocker: { code: 'no_market_price' },
-          }),
+          availability.reason === 'unsupported_kind'
+            ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
+            : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
         ),
       ],
       action: { kind: 'none' },

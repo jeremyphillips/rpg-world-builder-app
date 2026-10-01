@@ -140,7 +140,6 @@ function makeMagicPickerItem(
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       purchaseAvailability: { status: 'available' },
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },

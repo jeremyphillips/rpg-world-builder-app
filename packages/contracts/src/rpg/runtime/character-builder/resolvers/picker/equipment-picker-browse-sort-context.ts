@@ -9,8 +9,12 @@ export type EquipmentPickerBrowseSortContext = {
    */
   activeChoice?: ActiveChoiceContext
   /**
-   * `parity` reproduces the pre-split tier and reason order.
-   * Omitted uses the split-fact policy when both rows carry `resolved` facts.
+   * Unsatisfied requirements that should lift matching candidates.
+   * Omitted treats every still-unsatisfied candidate requirement as active.
    */
-  rankingMode?: 'parity' | 'intentional'
+  activeRequirementIds?: ReadonlySet<string>
+  /** Gold-purchase lists rank `purchaseAvailability`. Other flows leave that fact unsorted. */
+  rankPurchaseAvailability?: boolean
+  /** When true, defined proficiency values order comparable rows. Omitted defaults to true. */
+  rankCompatibility?: boolean
 }

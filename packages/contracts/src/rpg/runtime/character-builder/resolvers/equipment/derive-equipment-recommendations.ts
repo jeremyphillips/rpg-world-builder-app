@@ -1,6 +1,5 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
-import type { Equipment } from '../../../../content/equipment'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
 import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
 import {
@@ -22,7 +21,6 @@ import type { CharacterProficiencies } from '../../../character/sheet/proficienc
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { ChoiceSet } from '../../choice-set'
-import { isEquipmentProficient } from './is-equipment-proficient'
 import {
   addRecommendationContribution,
   toEquipmentRecommendation,
@@ -283,28 +281,6 @@ function applySpellcastingFocusContributions(args: {
   return matches.map((equipment) => equipment.id)
 }
 
-function applyProficiencyContributions(
-  accumulators: AccumulatorMap,
-  equipment: Equipment,
-  proficiencies: CharacterProficiencies,
-): void {
-  if (equipment.kind !== 'weapon' && equipment.kind !== 'armor' && equipment.kind !== 'tool') {
-    return
-  }
-
-  if (isEquipmentProficient(equipment, proficiencies)) {
-    addRecommendationContribution(accumulators, equipment.id, 'compatible', 'proficient', 'exact')
-  } else {
-    addRecommendationContribution(
-      accumulators,
-      equipment.id,
-      'notRecommended',
-      'notProficient',
-      'exact',
-    )
-  }
-}
-
 /**
  * Tiered picker recommendations for every catalog equipment row.
  *
@@ -392,7 +368,6 @@ export function deriveEquipmentRecommendations(
 
   const recommendations = new Map<string, DerivedEquipmentRecommendation>()
   for (const equipment of catalogIndex.equipment.values()) {
-    applyProficiencyContributions(accumulators, equipment, proficiencies)
     const accumulator = accumulators.get(equipment.id)
     recommendations.set(
       equipment.id,

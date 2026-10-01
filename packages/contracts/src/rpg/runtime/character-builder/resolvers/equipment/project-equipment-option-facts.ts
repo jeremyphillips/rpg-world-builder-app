@@ -18,6 +18,8 @@ import {
   type RequirementState,
 } from '../../recommendation'
 import type { SourcedEquipmentRecommendationEvidence } from './equipment-recommendation-evidence'
+import { projectEquipmentCompatibility } from './project-equipment-compatibility'
+import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 import { classRecommendationSource } from './equipment-recommendation-evidence'
 import { listSelectedStartingEquipmentGrantIds } from './derive-starting-equipment-recommendation-contributions'
 import {
@@ -31,6 +33,8 @@ export type ResolvedEquipmentOption = {
   recommendation: OptionRecommendation
   state: OptionState
   presentation?: OptionPresentationFacts
+  /** Remaining-budget purchase fact. Stamped once when a picker row is resolved. */
+  purchaseAvailability?: EquipmentPurchaseAvailability
 }
 
 const CHOICE_REASONS = new Set([
@@ -215,13 +219,14 @@ function projectOptionRequirements(args: {
   return args.requirements.flatMap((definition, index) => {
     const state = args.requirementStates[index]!
     if (!definition.eligibleOptionIds.includes(args.equipment.id)) return []
-    if (state.satisfied && !state.satisfiedBy.includes(args.equipment.id)) return []
+    const ownsRequirement = state.satisfiedBy.includes(args.equipment.id)
     return [
       {
         requirementId: definition.requirementId,
         owner: definition.owner,
         rule: definition.rule,
-        role: state.satisfied ? 'satisfier' : 'candidate',
+        optionSatisfies: true,
+        role: !state.satisfied ? 'candidate' : ownsRequirement ? 'satisfier' : 'eligible',
       },
     ]
   })
@@ -297,26 +302,21 @@ function isOpenPoolChoiceReason(reason: SourcedEquipmentRecommendationEvidence['
 
 function projectCompatibilityState(args: {
   equipment: Equipment
-  evidence: readonly SourcedEquipmentRecommendationEvidence[]
   owner: RecommendationSourceRef
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
 }): OptionState['compatibility'] | undefined {
   const proficiencySources = toolProficiencySources(args.equipment, args.proficiencies)
   const isFocus = args.focusEligibleIds.includes(args.equipment.id)
-  const tracksProficiency = equipmentTracksProficiency(args.equipment)
-  if (!tracksProficiency && proficiencySources.length === 0 && !isFocus) return undefined
+  const compatibility = projectEquipmentCompatibility(args.equipment, args.proficiencies)
+  if (compatibility.proficient === undefined && proficiencySources.length === 0 && !isFocus) {
+    return undefined
+  }
   return {
-    ...(tracksProficiency
-      ? { proficient: args.evidence.some((entry) => entry.reason === 'proficient') }
-      : {}),
+    ...compatibility,
     ...(proficiencySources.length > 0 ? { proficiencySources } : {}),
     ...(isFocus ? { spellcastingFocusFor: args.owner } : {}),
   }
-}
-
-function equipmentTracksProficiency(equipment: Equipment): boolean {
-  return equipment.kind === 'weapon' || equipment.kind === 'armor' || equipment.kind === 'tool'
 }
 
 function toolProficiencySources(

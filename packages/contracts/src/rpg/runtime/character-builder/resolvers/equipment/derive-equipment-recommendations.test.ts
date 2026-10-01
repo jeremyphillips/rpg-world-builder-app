@@ -299,19 +299,15 @@ describe('deriveEquipmentRecommendations', () => {
       choiceSets: [],
     })
 
-    expect(recommendations.get(chainMail.id)).toMatchObject({
-      tier: 'compatible',
-      reasons: ['proficient'],
-    })
-    expect(recommendations.get(longsword.id)?.tier).toBe('compatible')
-    expect(recommendations.get(dagger.id)).toMatchObject({
-      tier: 'compatible',
-      reasons: ['proficient'],
-    })
+    expect(recommendations.get(chainMail.id)?.tier).toBe('neutral')
+    expect(recommendations.get(chainMail.id)?.resolved?.state.compatibility?.proficient).toBe(true)
+    expect(recommendations.get(longsword.id)?.tier).toBe('neutral')
+    expect(recommendations.get(dagger.id)?.tier).toBe('neutral')
+    expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
     expect(recommendations.get(rope.id)).toMatchObject({ tier: 'neutral', reasons: [] })
   })
 
-  it('ranks non-proficient weapon and armor gear as notRecommended for the wizard', () => {
+  it('does not turn missing proficiency into a not-recommended tier', () => {
     const { catalogIndex, proficiencies, draft } = buildContext(
       storedWizard,
       [chainMail, longsword, dagger],
@@ -330,12 +326,11 @@ describe('deriveEquipmentRecommendations', () => {
       choiceSets: [],
     })
 
-    expect(recommendations.get(chainMail.id)).toMatchObject({
-      tier: 'notRecommended',
-      reasons: ['notProficient'],
-    })
-    expect(recommendations.get(longsword.id)?.tier).toBe('notRecommended')
-    expect(recommendations.get(dagger.id)?.tier).toBe('compatible')
+    expect(recommendations.get(chainMail.id)?.tier).toBe('neutral')
+    expect(recommendations.get(chainMail.id)?.resolved?.state.compatibility?.proficient).toBe(false)
+    expect(recommendations.get(longsword.id)?.tier).toBe('neutral')
+    expect(recommendations.get(longsword.id)?.resolved?.state.compatibility?.proficient).toBe(false)
+    expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
   it('folds fixed tool proficiency into proficient compatibility instead of an essential class tool need', () => {
@@ -347,10 +342,6 @@ describe('deriveEquipmentRecommendations', () => {
       proficiencies,
     })
 
-    expect(recommendations.get(thievesTools.id)).toMatchObject({
-      tier: 'compatible',
-      reasons: ['proficient'],
-    })
     expect(recommendations.get(thievesTools.id)?.reasons).not.toContain('classToolNeed')
     expect(recommendations.get(thievesTools.id)?.resolved?.state.compatibility).toMatchObject({
       proficient: true,
@@ -362,7 +353,7 @@ describe('deriveEquipmentRecommendations', () => {
         expect.objectContaining({ kind: 'classFeature', sourceId: rogueClass.id }),
       ]),
     )
-    expect(recommendations.get(longsword.id)?.tier).toBe('compatible')
+    expect(recommendations.get(longsword.id)?.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
   it('marks authored focus kinds as essential when spellcasting is active', () => {
@@ -437,7 +428,9 @@ describe('deriveEquipmentRecommendations', () => {
     expect(ownedRecommendations.get(arcaneCrystal.id)?.resolved?.requirements).toEqual([
       expect.objectContaining({ role: 'satisfier' }),
     ])
-    expect(ownedRecommendations.get(wand.id)?.resolved?.requirements).toEqual([])
+    expect(ownedRecommendations.get(wand.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({ optionSatisfies: true, role: 'eligible' }),
+    ])
     expect(ownedRecommendations.get(wand.id)?.resolved?.state.compatibility).toMatchObject({
       spellcastingFocusFor: { kind: 'class', id: storedWizard.id },
     })
@@ -1022,7 +1015,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
 
     expect(recommendations.get(leatherArmor.id)).toMatchObject({
       tier: 'compatible',
-      reasons: expect.arrayContaining(['availableInStartingOption', 'proficient']),
+      reasons: expect.arrayContaining(['availableInStartingOption']),
     })
     expect(recommendations.get(leatherArmor.id)?.reasons).not.toContain('startingEquipmentChoice')
   })
@@ -1190,19 +1183,17 @@ describe('resolveEquipmentPickerItems', () => {
     const chainMailItem = items.find((item) => item.equipment.id === chainMail.id)!
     expect(chainMailItem.state.isAvailable).toBe(true)
     expect(chainMailItem.state.isProficient).toBe(false)
-    expect(chainMailItem.state.isAffordable).toBe(true)
+    expect(chainMailItem.state.purchaseAvailability.status).toBe('unaffordable')
+    expect(chainMailItem.state.resolved?.purchaseAvailability?.status).toBe('unaffordable')
     expect(chainMailItem.state.isWithinRemainingBudget).toBe(false)
     expect(chainMailItem.state.isRecommended).toBe(false)
-    expect(chainMailItem.state.recommendation.tier).toBe('notRecommended')
+    expect(chainMailItem.state.recommendation.tier).toBe('neutral')
+    expect(chainMailItem.state.resolved?.state.compatibility?.proficient).toBe(false)
 
     const daggerItem = items.find((item) => item.equipment.id === dagger.id)!
     expect(daggerItem.state.isRecommended).toBe(false)
-    expect(daggerItem.state.recommendation.tier).toBe('compatible')
-    const proficientEvidence = daggerItem.state.evidence?.find(
-      (entry) => entry.reason === 'proficient',
-    )
-    expect(proficientEvidence).toMatchObject({ reason: 'proficient', tier: 'compatible' })
-    expect(proficientEvidence?.source).toBeUndefined()
+    expect(daggerItem.state.evidence ?? []).toEqual([])
+    expect(daggerItem.state.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
   it('excludes vehicle and service rows from picker results', () => {

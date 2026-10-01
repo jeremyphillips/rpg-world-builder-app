@@ -72,7 +72,6 @@ export function resolveQuickNpcAdditionalEquipmentOptions(args: {
             isRecommended: false,
             disabledReasons: [],
             isProficient: false,
-            isAffordable: true,
             isWithinRemainingBudget: true,
             purchaseAvailability: { status: 'available' as const },
             recommendation: {

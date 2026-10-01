@@ -2,7 +2,7 @@ import type { EquipmentRecommendationEvidence } from '../../../../content/equipm
 import type { RecommendationSignalBasis, RecommendationSourceRef } from '../../recommendation'
 
 export type SourcedEquipmentRecommendationEvidence = EquipmentRecommendationEvidence & {
-  /** Absent for proficiency compatibility, which is not a sourced recommendation. */
+  /** Absent when the contributing reason has no recommendation source. */
   source?: RecommendationSourceRef
   basis?: RecommendationSignalBasis
   choiceSetId?: string
@@ -16,8 +16,6 @@ const UNSOURCED_EQUIPMENT_REASONS = new Set<EquipmentRecommendationEvidence['rea
   'classToolNeed',
   'selectedToolProficiency',
   'unresolvedToolProficiencyChoice',
-  'proficient',
-  'notProficient',
 ])
 
 export function sourceForEquipmentReason(

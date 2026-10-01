@@ -129,9 +129,11 @@ export function useEquipmentPickerController({
       filterOutUnaffordable,
       filterOutNonProficient,
       searchQuery: '',
+      budget: effectiveBudget,
     }),
     [
       filterOutNonProficient,
+      effectiveBudget,
       filterOutUnaffordable,
       kindOptions,
       magicItemGrantProgress,
@@ -178,8 +180,10 @@ export function useEquipmentPickerController({
         filterOutNonProficient,
         selectedKind,
         showAffordableOnly,
+        budget: effectiveBudget,
       }),
     [
+      effectiveBudget,
       filterOutNonProficient,
       filterOutUnaffordable,
       showAffordableOnly,
@@ -193,7 +197,13 @@ export function useEquipmentPickerController({
       filterAndSortEquipmentPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
         sortMode,
-        browseSortContext,
+        browseSortContext: {
+          preferMartialWeaponBrowseOrder:
+            browseSortContext?.preferMartialWeaponBrowseOrder ?? false,
+          ...browseSortContext,
+          rankPurchaseAvailability: workflowMode === 'purchase',
+          rankCompatibility: browseSortContext?.rankCompatibility ?? true,
+        },
         workflowMode,
       }),
     [browseSortContext, sortMode, workflowMode],

@@ -140,7 +140,12 @@ function presentationCandidates(
 function getProficiencyCautionCandidate(
   item: EquipmentPickerItem,
 ): EquipmentCalloutCandidate | undefined {
-  if (item.state.isProficient || !tracksProficiency(item)) return undefined
+  const proficient = item.state.resolved?.state.compatibility?.proficient
+  const notProficient =
+    proficient === undefined
+      ? !item.state.isProficient && tracksProficiency(item)
+      : proficient === false
+  if (!notProficient) return undefined
 
   return {
     priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,

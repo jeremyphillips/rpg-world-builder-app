@@ -67,12 +67,18 @@ export type RequirementState = {
   satisfiedBy: readonly string[]
 }
 
-/** Per-option view. Unsatisfied pool members are candidates; other candidates disappear once satisfied. */
+/**
+ * Per-option requirement fact. `optionSatisfies` stays true for every eligible option.
+ * `candidate` is an unsatisfied lift; `satisfier` is an option that currently fulfills it;
+ * `eligible` still satisfies the rule after another option has fulfilled it, without the lift.
+ */
 export type OptionRequirement = {
   requirementId: string
   owner: RecommendationSourceRef
   rule: RequirementRule
-  role: 'candidate' | 'satisfier'
+  /** This option could satisfy the requirement. Does not imply the requirement is unsatisfied. */
+  optionSatisfies: true
+  role: 'candidate' | 'satisfier' | 'eligible'
 }
 
 export type OptionState = {

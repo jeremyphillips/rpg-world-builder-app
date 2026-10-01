@@ -169,6 +169,7 @@ export const RecommendationFacts: Story = {
                   requirementId: 'wizard:spellbook',
                   owner: { kind: 'class', id: 'wizard' },
                   rule: 'exact',
+                  optionSatisfies: true,
                   role: 'candidate',
                 },
               ],

@@ -14,7 +14,10 @@ import {
 } from '@rpg/ui/filters'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
+import type {
+  EquipmentBudgetSummary,
+  EquipmentPickerItem,
+} from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
@@ -74,6 +77,7 @@ export type CreateEquipmentPickerFilterSchemaArgs = {
   filterOutUnaffordable: boolean
   filterOutNonProficient: boolean
   searchQuery: string
+  budget?: EquipmentBudgetSummary
 }
 
 function sanitizeEquipmentPickerKindSelection(
@@ -190,6 +194,7 @@ export function createEquipmentPickerFilterSchema(
                 filterOutNonProficient: args.filterOutNonProficient,
                 selectedKind: state.selectedKind ?? EQUIPMENT_PICKER_KIND_ALL,
                 showAffordableOnly: true,
+                budget: args.budget,
               })
             : undefined,
         getValue: (row) => row.state.isWithinRemainingBudget,

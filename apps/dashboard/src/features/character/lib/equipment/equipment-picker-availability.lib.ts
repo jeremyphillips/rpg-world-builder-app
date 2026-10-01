@@ -35,7 +35,7 @@ export function resolveEquipmentPickerRowAvailabilityVm(
   options?: EquipmentPickerAvailabilityOptions,
 ): EquipmentPickerRowAvailabilityVm {
   const contentAvailable = options?.contentAvailable ?? true
-  const purchaseEligible = item.state.purchaseAvailability.status !== 'unavailable'
+  const purchaseEligible = item.state.purchaseAvailability.status !== 'unavailableForPurchase'
   /** Remaining-budget signal stamped at `resolveEquipmentPickerItems` time. */
   const affordable = item.state.isWithinRemainingBudget
 

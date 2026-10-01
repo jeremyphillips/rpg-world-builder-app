@@ -79,15 +79,6 @@ export function addRecommendationContribution(
   }
 }
 
-function evidenceForSpecificityCollapse(
-  evidence: readonly SourcedEquipmentRecommendationEvidence[],
-): readonly SourcedEquipmentRecommendationEvidence[] {
-  const selective = evidence.filter(
-    (row) => row.reason !== 'proficient' && row.reason !== 'notProficient',
-  )
-  return selective.length > 0 ? selective : evidence
-}
-
 export type DerivedEquipmentRecommendation = EquipmentRecommendation & {
   evidence: readonly SourcedEquipmentRecommendationEvidence[]
   resolved?: ResolvedEquipmentOption
@@ -102,9 +93,7 @@ export function toEquipmentRecommendation(
   return {
     tier,
     reasons: [...accumulator.reasons],
-    specificity: getBestEquipmentRecommendationSpecificity(
-      evidenceForSpecificityCollapse(accumulator.evidence),
-    ),
+    specificity: getBestEquipmentRecommendationSpecificity(accumulator.evidence),
     ...(accumulator.label !== undefined ? { label: accumulator.label } : {}),
     evidence: accumulator.evidence,
   }

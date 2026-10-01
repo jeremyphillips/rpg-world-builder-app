@@ -201,7 +201,7 @@ describe('magic item acquisition contracts', () => {
       budget: undefined,
     })
 
-    expect(availability).toEqual({ status: 'unavailable', reason: 'no_market_price' })
+    expect(availability).toEqual({ status: 'unavailableForPurchase', reason: 'no_market_price' })
   })
 
   it('applies duplicate policy for common priced magic items', () => {
@@ -623,7 +623,7 @@ describe('magic item acquisition contracts', () => {
 
     expect(state).toEqual({
       kind: 'purchase',
-      availability: { status: 'unavailable', reason: 'no_market_price' },
+      availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
     })
   })
 

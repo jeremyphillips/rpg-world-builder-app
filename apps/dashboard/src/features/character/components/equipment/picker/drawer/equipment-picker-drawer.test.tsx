@@ -94,7 +94,6 @@ describe('EquipmentPickerDrawer', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -128,7 +127,6 @@ describe('EquipmentPickerDrawer', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -599,7 +597,6 @@ describe('EquipmentPickerDrawer', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,
@@ -619,7 +616,6 @@ describe('EquipmentPickerDrawer', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,

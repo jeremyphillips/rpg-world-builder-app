@@ -105,6 +105,7 @@ describe('equipment-picker-callout.lib', () => {
             requirementId: 'wizard:spellbook',
             owner: { kind: 'class', id: 'wizard' },
             rule: 'exact',
+            optionSatisfies: true,
             role: 'candidate',
           },
         ],
@@ -118,6 +119,7 @@ describe('equipment-picker-callout.lib', () => {
               requirementId: 'wizard:spellbook',
               owner: { kind: 'class', id: 'wizard' },
               rule: 'exact',
+              optionSatisfies: true,
               role: 'candidate',
             },
           ],
@@ -197,7 +199,7 @@ describe('equipment-picker-callout.lib', () => {
         isProficient: false,
         isRecommended: false,
         resolved: undefined,
-        recommendation: { tier: 'notRecommended', reasons: ['notProficient'] },
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'exact' },
       })
 
       expect(getEquipmentPickerCallout(item)).toEqual({
@@ -216,6 +218,7 @@ describe('equipment-picker-callout.lib', () => {
               requirementId: 'wizard:spellbook',
               owner: { kind: 'class', id: 'wizard' },
               rule: 'exact',
+              optionSatisfies: true,
               role: 'candidate',
             },
           ],
@@ -289,6 +292,7 @@ describe('equipment-picker-callout.lib', () => {
                 requirementId: 'wizard:spellbook',
                 owner: { kind: 'class', id: 'wizard' },
                 rule: 'exact',
+                optionSatisfies: true,
                 role: 'candidate',
               },
             ],

@@ -25,8 +25,6 @@ describe('equipment recommendation accumulator', () => {
       'exact',
       { source: { kind: 'class', id: 'test:bard' } },
     )
-    addRecommendationContribution(accumulators, 'test:lute', 'strong', 'notProficient', 'exact')
-
     const recommendation = toEquipmentRecommendation(accumulators.get('test:lute')!)
     expect(recommendation).toMatchObject({
       tier: 'strong',
@@ -34,16 +32,11 @@ describe('equipment recommendation accumulator', () => {
       reasons: expect.arrayContaining([
         'unresolvedToolProficiencyChoice',
         'availableInStartingOption',
-        'notProficient',
       ]),
     })
     const classEvidence = recommendation.evidence.find(
       (entry) => entry.reason === 'availableInStartingOption',
     )
-    const proficiencyEvidence = recommendation.evidence.find(
-      (entry) => entry.reason === 'notProficient',
-    )
     expect(classEvidence?.source).toEqual({ kind: 'class', id: 'test:bard' })
-    expect(proficiencyEvidence?.source).toBeUndefined()
   })
 })

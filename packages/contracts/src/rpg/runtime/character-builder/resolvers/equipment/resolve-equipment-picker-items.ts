@@ -10,7 +10,6 @@ import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { isEquipmentPickerSupportedKind } from '../picker/equipment-picker-supported-kinds'
 import type { EquipmentBudgetSummary } from './equipment-budget'
-import { isEquipmentAffordableAtStartingBudget } from './equipment-budget'
 import { isEquipmentProficient } from './is-equipment-proficient'
 import { resolveEquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 
@@ -45,6 +44,7 @@ export function resolveEquipmentPickerItems({
         equipment: row,
         budget,
       })
+      const resolved = derived?.resolved ? { ...derived.resolved, purchaseAvailability } : undefined
 
       return {
         equipment: row,
@@ -52,12 +52,11 @@ export function resolveEquipmentPickerItems({
           isAvailable: true,
           isRecommended: isRecommendedEquipmentTier(recommendation.tier),
           isProficient: isEquipmentProficient(row, proficiencies),
-          isAffordable: budget ? isEquipmentAffordableAtStartingBudget(row, budget) : true,
           isWithinRemainingBudget: purchaseAvailability.status === 'available',
           purchaseAvailability,
           recommendation,
           evidence: derived?.evidence ?? [],
-          ...(derived?.resolved ? { resolved: derived.resolved } : {}),
+          ...(resolved ? { resolved } : {}),
           disabledReasons: [],
         },
       }

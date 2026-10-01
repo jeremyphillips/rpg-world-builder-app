@@ -64,7 +64,7 @@ export function validateEquipmentPurchases(
       requestedQuantity: purchase.quantity,
     })
 
-    if (availability.status === 'unavailable') {
+    if (availability.status === 'unavailableForPurchase') {
       issues.push(
         validationIssue(
           EQUIPMENT_PURCHASE_INVALID_ITEM_CODE,

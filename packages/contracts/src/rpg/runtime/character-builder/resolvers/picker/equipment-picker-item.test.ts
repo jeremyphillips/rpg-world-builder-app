@@ -31,15 +31,24 @@ function makeEquipment(
   return { ...baseEquipmentFields, ...overrides } as Equipment
 }
 
+function strengthForTier(
+  tier: EquipmentRecommendation['tier'],
+): 'strong' | 'compatible' | 'neutral' {
+  if (tier === 'essential' || tier === 'strong') return 'strong'
+  if (tier === 'compatible') return 'compatible'
+  return 'neutral'
+}
+
 function makePickerItem(
   equipment: Equipment,
   recommendation: Pick<EquipmentRecommendation, 'tier' | 'reasons'> &
     Partial<Pick<EquipmentRecommendation, 'specificity' | 'label'>>,
-  affordability: Pick<EquipmentPickerItem['state'], 'isAffordable' | 'isWithinRemainingBudget'> = {
-    isAffordable: true,
-    isWithinRemainingBudget: true,
+  purchaseAvailability: EquipmentPickerItem['state']['purchaseAvailability'] = {
+    status: 'available',
   },
 ): EquipmentPickerItem {
+  const specificity = recommendation.specificity ?? 'exact'
+  const strength = strengthForTier(recommendation.tier)
   return {
     equipment,
     searchDocument: {
@@ -50,11 +59,20 @@ function makePickerItem(
       isAvailable: true,
       isRecommended: recommendation.tier === 'essential' || recommendation.tier === 'strong',
       isProficient: true,
-      ...affordability,
-      purchaseAvailability: { status: 'available' as const },
+      isWithinRemainingBudget: purchaseAvailability.status === 'available',
+      purchaseAvailability,
       recommendation: {
         ...recommendation,
-        specificity: recommendation.specificity ?? 'exact',
+        specificity,
+      },
+      resolved: {
+        requirements: [],
+        recommendation: {
+          strength,
+          signals: strength === 'neutral' ? [] : [{ strength, basis: 'inferred', specificity }],
+        },
+        state: {},
+        purchaseAvailability,
       },
       disabledReasons: [],
     },
@@ -171,7 +189,7 @@ describe('getEquipmentRecommendationKindRank', () => {
 })
 
 describe('compareEquipmentPickerItemsByRecommendation', () => {
-  it('orders essential classRequired before strong startingEquipment', () => {
+  it('orders an unsatisfied requirement ahead of a strong weapon', () => {
     const classRequired = makePickerItem(
       makeEquipment({
         id: 'test:spellbook',
@@ -183,6 +201,18 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
       }),
       { tier: 'essential', reasons: ['classRequired'] },
     )
+    classRequired.state.resolved = {
+      ...classRequired.state.resolved!,
+      requirements: [
+        {
+          requirementId: 'spellbook',
+          owner: { kind: 'class', id: 'wizard' },
+          rule: 'exact',
+          optionSatisfies: true,
+          role: 'candidate',
+        },
+      ],
+    }
     const startingWeapon = makePickerItem(
       makeEquipment({
         id: 'test:longsword',
@@ -203,7 +233,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     )
   })
 
-  it('orders classToolNeed before startingEquipment within the same tier', () => {
+  it('orders a weapon before a tool when recommendation strength ties', () => {
     const tool = makePickerItem(
       makeEquipment({
         id: 'test:thieves-tools',
@@ -230,10 +260,10 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
       { tier: 'essential', reasons: ['startingEquipment'] },
     )
 
-    expect(compareEquipmentPickerItemsByRecommendation(tool, weapon)).toBeLessThan(0)
+    expect(compareEquipmentPickerItemsByRecommendation(weapon, tool)).toBeLessThan(0)
   })
 
-  it('orders spellcastingFocus before classSuggested within the same tier', () => {
+  it('orders a strong recommendation ahead of a compatible peer', () => {
     const focus = makePickerItem(
       makeEquipment({
         id: 'test:wand',
@@ -254,7 +284,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         gearKind: 'spellcasting',
         spellcastingGearKind: 'component_pouch',
       }),
-      { tier: 'essential', reasons: ['classSuggested'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(focus, suggested)).toBeLessThan(0)
@@ -273,7 +303,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'slashing',
         properties: [],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
     const arrows = makePickerItem(
       makeEquipment({
@@ -283,7 +313,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'adventuring_gear',
         gearKind: 'ammunition',
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
     const shield = makePickerItem(
       makeEquipment({
@@ -294,7 +324,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         category: 'shields',
         acBonus: 2,
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
     const armor = makePickerItem(
       makeEquipment({
@@ -306,14 +336,14 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         baseAc: 11,
         addDexModifier: true,
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(weapon, arrows)).toBeLessThan(0)
     expect(compareEquipmentPickerItemsByRecommendation(shield, armor)).toBeLessThan(0)
   })
 
-  it('does not let kind rank outrank a better reason', () => {
+  it('lets recommendation strength outrank kind', () => {
     const classTool = makePickerItem(
       makeEquipment({
         id: 'test:thieves-tools',
@@ -337,7 +367,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'slashing',
         properties: [],
       }),
-      { tier: 'essential', reasons: ['startingEquipment'] },
+      { tier: 'neutral', reasons: [] },
     )
 
     expect(compareEquipmentPickerItemsByRecommendation(classTool, startingWeapon)).toBeLessThan(0)
@@ -352,7 +382,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         kind: 'adventuring_gear',
         gearKind: 'general',
       }),
-      { tier: 'neutral', reasons: ['proficient'] },
+      { tier: 'neutral', reasons: ['classSuggested'] },
     )
     const noReasons = makePickerItem(
       makeEquipment({
@@ -368,7 +398,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     expect(compareEquipmentPickerItemsByRecommendation(reasoned, noReasons)).toBeLessThan(0)
   })
 
-  it('orders starting-affordable rows above starting-unaffordable within the same tier and reason', () => {
+  it('orders available rows ahead of unaffordable rows when purchase ranking is on', () => {
     const affordable = makePickerItem(
       makeEquipment({
         id: 'test:staff',
@@ -379,7 +409,6 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         spellcastingGearKind: 'arcane_focus',
       }),
       { tier: 'essential', reasons: ['spellcastingFocus'] },
-      { isAffordable: true, isWithinRemainingBudget: true },
     )
     const unaffordable = makePickerItem(
       makeEquipment({
@@ -391,10 +420,13 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         spellcastingGearKind: 'arcane_focus',
       }),
       { tier: 'essential', reasons: ['spellcastingFocus'] },
-      { isAffordable: false, isWithinRemainingBudget: false },
+      { status: 'unaffordable', shortfallCp: 100 },
     )
+    const context = { preferMartialWeaponBrowseOrder: false, rankPurchaseAvailability: true }
 
-    expect(compareEquipmentPickerItemsByRecommendation(affordable, unaffordable)).toBeLessThan(0)
+    expect(
+      compareEquipmentPickerItemsByRecommendation(affordable, unaffordable, context),
+    ).toBeLessThan(0)
   })
 
   it('orders specificity before reason within the same tier', () => {
@@ -510,7 +542,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'slashing',
         properties: [],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
     const dagger = makePickerItem(
       makeEquipment({
@@ -524,7 +556,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'piercing',
         properties: ['finesse', 'light', 'thrown'],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
 
     expect(
@@ -547,7 +579,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'bludgeoning',
         properties: [],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
     const mace = makePickerItem(
       makeEquipment({
@@ -561,7 +593,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'bludgeoning',
         properties: [],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
 
     expect(
@@ -603,7 +635,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         damageType: 'slashing',
         properties: [],
       }),
-      { tier: 'compatible', reasons: ['proficient'] },
+      { tier: 'compatible', reasons: ['classSuggested'] },
     )
 
     expect(
