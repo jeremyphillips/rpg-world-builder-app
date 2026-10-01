@@ -47,7 +47,6 @@ export function useContentDetailStatRowGroupLayout(groupCount: number) {
 
   useLayoutEffect(() => {
     if (groupCount <= 0) {
-      setLayout(EMPTY_LAYOUT)
       return
     }
 
@@ -94,5 +93,9 @@ export function useContentDetailStatRowGroupLayout(groupCount: number) {
     groupRefs.current[index] = node
   }
 
-  return { hostRef, setGroupRef, layout }
+  return {
+    hostRef,
+    setGroupRef,
+    layout: groupCount <= 0 ? EMPTY_LAYOUT : layout,
+  }
 }

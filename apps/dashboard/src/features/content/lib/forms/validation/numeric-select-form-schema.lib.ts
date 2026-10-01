@@ -1,6 +1,5 @@
 import { expect } from 'vitest'
-import type { ZodType } from 'zod'
-import { z } from 'zod'
+import type { ZodError, ZodType } from 'zod'
 
 import {
   buildDefaultValues,
@@ -33,9 +32,7 @@ function normalizeZodPath(path: readonly (string | number)[]): string {
   return path.map((segment) => (typeof segment === 'number' ? '*' : segment)).join('.')
 }
 
-function issuePaths(
-  result: { success: true } | { success: false; error: z.ZodError },
-): Set<string> {
+function issuePaths(result: { success: true } | { success: false; error: ZodError }): Set<string> {
   if (result.success) return new Set()
   return new Set(
     result.error.issues.map((issue) => normalizeZodPath(issue.path as (string | number)[])),

@@ -207,7 +207,7 @@ export {
   organizationMembersQueryKey,
   useOrganizationMembers,
 } from './organizations'
-export { useLocations, locationsQueryKey } from './locations'
+export { listLocations, useLocations, locationsQueryKey } from './locations'
 export {
   buildLocationEntityCardModel,
   buildLocationEntityCardModelFromClassification,

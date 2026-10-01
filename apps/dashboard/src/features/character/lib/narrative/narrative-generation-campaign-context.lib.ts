@@ -3,11 +3,12 @@ import type { QueryClient } from '@tanstack/react-query'
 import { getErrorMessage } from '@rpg/contracts'
 import type { Location } from '@rpg/contracts/rpg/content'
 
-import { listCampaignCharacters } from '@/features/campaign/api/campaign-characters-client'
-import { campaignCharactersListQueryKey } from '@/features/campaign/hooks/use-campaign-characters'
-import { formatContentListLoadErrorMessage } from '@/features/content'
-import { listLocations } from '@/features/content/locations/api/locations-api'
-import { locationsQueryKey } from '@/features/content/locations/hooks/use-locations'
+import { campaignCharactersListQueryKey, listCampaignCharacters } from '@/features/campaign'
+import {
+  formatContentListLoadErrorMessage,
+  listLocations,
+  locationsQueryKey,
+} from '@/features/content'
 
 export type NarrativeGenerationCampaignContextFailureReason =
   | 'narrative-locations-load-failed'

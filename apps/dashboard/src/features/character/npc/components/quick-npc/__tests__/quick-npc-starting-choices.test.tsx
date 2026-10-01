@@ -78,8 +78,7 @@ const resolveCanonicalStartingChoiceAllowancesMock = vi.hoisted(() =>
 )
 
 vi.mock('../../../lib/quick-npc/quick-npc-starting-choices.lib', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../../../lib/quick-npc/quick-npc-starting-choices.lib')>()
+  const actual = (await importOriginal()) as Record<string, unknown>
   return {
     ...actual,
     resolveQuickNpcStartingChoices: resolveQuickNpcStartingChoicesMock,

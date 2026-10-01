@@ -1,12 +1,12 @@
 import {
   indexCharacterBuildCatalog,
   readSelectedStartingEquipmentOptionId,
-  resolveAvailableChoices,
   resolveStartingEquipmentChoiceSets,
   resolveStartingEquipmentOptionSummaries,
   startingEquipmentChoiceSetId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type ChoiceSet,
   type NpcStartingChoices,
   type StartingChoiceContribution,
 } from '@rpg/contracts'
@@ -45,7 +45,7 @@ export function resolveQuickNpcStartingEquipmentPackageContext(args: {
   characterClass: ReturnType<ReturnType<typeof indexCharacterBuildCatalog>['classes']['get']>
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
   summaries: ReturnType<typeof resolveStartingEquipmentOptionSummaries>
-  resolvedChoiceSets: ReturnType<typeof resolveAvailableChoices>
+  resolvedChoiceSets: readonly ChoiceSet[]
   draft: CharacterBuilderDraft
   selectedOptionId: string | undefined
   startingEquipmentChoiceSetId: string | undefined

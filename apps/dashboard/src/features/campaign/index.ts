@@ -75,6 +75,7 @@ export {
   useCampaignCharacters,
   campaignCharactersListQueryKey,
 } from './hooks/use-campaign-characters'
+export { listCampaignCharacters } from './api/campaign-characters-client'
 export { useCampaignCharacterNavigationContext } from './hooks/use-campaign-character-navigation-context'
 export {
   buildCampaignCharacterNavigationContext,
