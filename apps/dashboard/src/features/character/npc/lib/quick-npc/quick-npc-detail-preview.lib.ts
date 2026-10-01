@@ -13,6 +13,7 @@ import { projectCharacterDraftDetailSource } from '../../../lib/display/characte
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import { resolveQuickNpcCreateOrganization } from './quick-npc-create-context'
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
+import { splitQuickNpcAdditionalEquipmentIds } from './quick-npc-additional-equipment.lib'
 import {
   buildQuickNpcSeed,
   mergeQuickNpcAuthoringValues,
@@ -56,11 +57,15 @@ export function projectQuickNpcDetailPreview({
   let resolvedChoiceSets = resolveAvailableChoices(draft, buildContext)
 
   try {
+    const { requiredWeaponIds, manualEquipmentGrantIds } = splitQuickNpcAdditionalEquipmentIds({
+      additionalEquipmentIds: merged.additionalEquipmentIds,
+      catalogIndex,
+    })
     const startingChoices = resolveNpcStartingChoices({
       context: buildContext,
       seed,
       startingChoiceOverrides: merged.startingChoiceOverrides,
-      requiredWeaponIds: merged.requiredWeaponIds,
+      requiredWeaponIds,
       requiredSpellIds: merged.requiredSpellIds,
       preferences,
     })
@@ -70,6 +75,7 @@ export function projectQuickNpcDetailPreview({
       context: buildContext,
       preferences,
       allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
+      ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
       ...(npcStartingChoiceManualConstraints(startingChoices)
         ? { constraints: npcStartingChoiceManualConstraints(startingChoices) }
         : {}),

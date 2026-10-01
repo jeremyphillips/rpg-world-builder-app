@@ -396,9 +396,15 @@ export {
 export {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
+  type SelectionOptionCardDensity,
   type SelectionOptionCardHeaderActionProps,
   type SelectionOptionCardProps,
 } from './components/ui/selection-option-card.client'
+export {
+  SelectionOptionCardHeaderEyebrow,
+  resolveSelectionOptionCardEyebrowSize,
+  type SelectionOptionCardHeaderEyebrowProps,
+} from './components/ui/selection-option-card-anatomy.client'
 export {
   RadioOptionCard,
   RadioOptionCardDetailsAction,
@@ -410,7 +416,6 @@ export {
   RadioCard,
   radioCardVariants,
   resolveRadioCardDetailsAriaLabel,
-  type RadioCardDensity,
   type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
@@ -1090,6 +1095,10 @@ export {
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
+export {
+  ComboboxFilterSelect,
+  type ComboboxFilterSelectProps,
+} from './form/renderers/fields/combobox-filter-select.client'
 
 export {
   EditableGrid,
@@ -1157,6 +1166,7 @@ export {
 export {
   statusIconVariants,
   statusIconGlyphVariants,
+  STATUS_ICON_DEFAULT_SIZE,
   STATUS_ICON_VARIANTS,
   STATUS_ICON_TOOLTIP_LABELS,
   type StatusIconVariantProps,

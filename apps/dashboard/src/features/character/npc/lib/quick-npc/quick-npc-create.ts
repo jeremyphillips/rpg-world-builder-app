@@ -61,6 +61,7 @@ export type QuickNpcPrepareCreateArgs = {
   constraints?: AutomaticNpcBuildConstraints
   preferences?: AutomaticNpcBuildPreferences
   allowanceSelections?: Record<string, readonly string[]>
+  manualEquipmentGrantIds?: readonly string[]
   membership?: QuickNpcMembership
 }
 
@@ -81,6 +82,9 @@ export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpc
     ...(args.constraints ? { constraints: args.constraints } : {}),
     ...(args.preferences ? { preferences: args.preferences } : {}),
     ...(args.allowanceSelections ? { allowanceSelections: args.allowanceSelections } : {}),
+    ...(args.manualEquipmentGrantIds
+      ? { manualEquipmentGrantIds: args.manualEquipmentGrantIds }
+      : {}),
   })
   if (!resolution.ok) {
     throw new CharacterBuildFinalizationError(resolution.issues)

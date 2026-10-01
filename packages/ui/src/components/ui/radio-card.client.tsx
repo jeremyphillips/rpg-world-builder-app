@@ -9,7 +9,10 @@ import {
   RadioOptionCardDetailsAction,
   RadioOptionCardTitleAdornment,
 } from './radio-option-card.client'
-import type { SelectionOptionCardCopyWidth } from './selection-option-card-anatomy.client'
+import type {
+  SelectionOptionCardCopyWidth,
+  SelectionOptionCardDensity,
+} from './selection-option-card-anatomy.client'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 
 export function resolveRadioCardDetailsAriaLabel(label: string): string {
@@ -33,8 +36,6 @@ export function createRadioCardReselectClickHandler(
     }
   }
 }
-
-export type RadioCardDensity = 'default' | 'compact'
 
 export type RadioCardVariant = 'card' | 'row'
 
@@ -84,7 +85,7 @@ export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof Ra
   /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
   variant?: RadioCardVariant
-  density?: RadioCardDensity
+  density?: SelectionOptionCardDensity
   /**
    * Horizontal placement of the decorative radio control within each card.
    * Ignored when visualControl="icon".

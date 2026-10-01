@@ -725,6 +725,61 @@ export function applyRequiredWeaponEquipmentGrants(args: {
   return { ok: true, draft: nextDraft }
 }
 
+export type ManualEquipmentGrantCompletion =
+  | { ok: true; draft: CharacterBuilderDraft }
+  | { ok: false; issues: CharacterBuildValidationIssue[] }
+
+/**
+ * Grants explicit equipment ids still missing from assembled inventory.
+ * Callers must enforce campaign availability before invoking.
+ */
+export function applyManualEquipmentGrants(args: {
+  draft: CharacterBuilderDraft
+  equipmentIds: readonly string[]
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}): ManualEquipmentGrantCompletion {
+  const { equipmentIds, context, catalogIndex } = args
+  if (equipmentIds.length === 0) {
+    return { ok: true, draft: args.draft }
+  }
+
+  const availableEquipmentIds = new Set(
+    resolvePlayableBuilderContent(context).equipment.map((equipment) => equipment.id),
+  )
+  let nextDraft = args.draft
+
+  for (const equipmentId of equipmentIds) {
+    if (!availableEquipmentIds.has(equipmentId)) {
+      const equipment = catalogIndex.equipment.get(equipmentId)
+      return {
+        ok: false,
+        issues: [constraintUnsatisfiableIssue(equipment?.name ?? 'equipment')],
+      }
+    }
+
+    const inventory = deriveEquipmentDraftEntries(nextDraft, catalogIndex)
+    if (inventoryContainsEquipmentId(inventory, equipmentId)) continue
+
+    const grantResult = ensureEquipmentGrant({
+      draft: nextDraft,
+      equipmentId,
+      quantity: 1,
+      catalogIndex,
+    })
+    if (!grantResult.ok) {
+      const equipment = catalogIndex.equipment.get(equipmentId)
+      return {
+        ok: false,
+        issues: [constraintUnsatisfiableIssue(equipment?.name ?? 'equipment')],
+      }
+    }
+    nextDraft = grantResult.draft
+  }
+
+  return { ok: true, draft: nextDraft }
+}
+
 /** Verifies every hard requirement id appears in the resolved draft choice selections. */
 export function validateAutomaticNpcConstraintsSatisfied(
   draft: CharacterBuilderDraft,

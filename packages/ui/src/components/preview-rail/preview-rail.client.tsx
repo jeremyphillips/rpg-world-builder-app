@@ -344,7 +344,7 @@ export type PreviewRailSectionProps = {
 }
 
 function PreviewRailSectionMarker({ marker }: { marker: PreviewRailSectionMarker }) {
-  return <StatusIcon variant={marker} size="sm" />
+  return <StatusIcon variant={marker} size="md" />
 }
 
 function PreviewRailSectionStatus({
@@ -452,7 +452,7 @@ const PREVIEW_RAIL_STATUS_PANEL_TO_STATUS_ICON = {
 } as const satisfies Record<PreviewRailStatusPanelVariant, StatusIconVariant>
 
 function resolveStatusPanelIcon(variant: PreviewRailStatusPanelVariant) {
-  return <StatusIcon variant={PREVIEW_RAIL_STATUS_PANEL_TO_STATUS_ICON[variant]} size="md" />
+  return <StatusIcon variant={PREVIEW_RAIL_STATUS_PANEL_TO_STATUS_ICON[variant]} size="lg" />
 }
 
 export type PreviewRailStatusPanelProps = {

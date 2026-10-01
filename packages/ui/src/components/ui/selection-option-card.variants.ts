@@ -109,12 +109,12 @@ export const optionCardTitleVariants = cva('font-bold', {
   },
 })
 
-/** Chooser summary title — matches comfortable option heading scale. */
+/** Selected-summary title — same density scale as {@link optionCardTitleVariants}. */
 export const optionCardSummaryTitleVariants = cva('font-bold', {
   variants: {
     density: {
       default: 'text-base',
-      compact: 'text-base',
+      compact: 'text-sm',
     },
   },
   defaultVariants: {

@@ -40,6 +40,8 @@ import { quickNpcCreateFooterLayoutClasses } from './quick-npc-create-footer.var
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
 
+export { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
+
 export type QuickNpcCreateModalProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -129,7 +131,7 @@ function QuickNpcCreateModalSession({
         phase: 'authoring',
         setupValues: values,
         authoringValues: {
-          requiredWeaponIds: [],
+          additionalEquipmentIds: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
         },
@@ -246,7 +248,7 @@ function QuickNpcCreateModalSession({
       phase: 'setup',
       authoringValues: {
         ...current.authoringValues,
-        requiredWeaponIds: [],
+        additionalEquipmentIds: [],
         requiredSpellIds: [],
         startingChoiceOverrides: {},
       },

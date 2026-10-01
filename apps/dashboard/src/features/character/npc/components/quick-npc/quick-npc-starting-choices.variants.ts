@@ -39,6 +39,11 @@ export const quickNpcStartingChoiceStatusAfterOptionsClasses = 'mt-2'
 
 export const quickNpcStartingChoiceHeadingClasses = 'text-base font-body-emphasis text-foreground'
 
+export const quickNpcStartingChoiceHeadingRowClasses =
+  'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1'
+
+export const quickNpcStartingChoiceSubsectionDescriptionClasses = 'text-xs text-muted-foreground'
+
 export const quickNpcStartingChoiceProvenanceClasses = 'text-sm text-muted-foreground'
 
 export const quickNpcStartingChoiceAllowanceHintClasses = 'text-xs text-muted-foreground'

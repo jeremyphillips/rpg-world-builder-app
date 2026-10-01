@@ -89,6 +89,7 @@ function StartingChoicesHarness() {
         buildContext={buildContext}
         createContext={quickNpcStandaloneCreateContext()}
         optionSets={emptyOptionSets}
+        additionalEquipmentOptions={[]}
       />
     </FormProvider>
   )

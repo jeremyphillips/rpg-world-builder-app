@@ -9,6 +9,7 @@ import {
   optionCardDescriptionVariants,
   optionCardEmbeddedSlotVariants,
   optionCardSelectedChromeClasses,
+  optionCardSummaryTitleVariants,
   optionCardTitleVariants,
   selectionOptionCardShellVariants,
 } from './selection-option-card.variants'
@@ -60,6 +61,8 @@ describe('optionCard surface establishment', () => {
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pl-3')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pr-4')
     expect(optionCardTitleVariants({ density: 'compact' })).toContain('text-sm')
+    expect(optionCardSummaryTitleVariants({ density: 'compact' })).toContain('text-sm')
+    expect(optionCardSummaryTitleVariants({ density: 'default' })).toContain('text-base')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('text-xs')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('leading-snug')
   })

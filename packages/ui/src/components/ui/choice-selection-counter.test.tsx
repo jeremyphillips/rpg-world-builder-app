@@ -20,4 +20,18 @@ describe('ChoiceSelectionCounter', () => {
     expect(screen.getByText('2 / 2 chosen')).toBeInTheDocument()
     expect(container.querySelector('svg')).toBeTruthy()
   })
+
+  it('uses md typography and icon size by default', () => {
+    const { container } = render(<ChoiceSelectionCounter selectedCount={2} max={2} />)
+
+    expect(container.querySelector('.text-sm.font-medium.text-semantic-success')).toBeTruthy()
+    expect(container.querySelector('.size-4.rounded-full')).toBeTruthy()
+  })
+
+  it('supports compact sm sizing', () => {
+    const { container } = render(<ChoiceSelectionCounter selectedCount={2} max={2} size="sm" />)
+
+    expect(container.querySelector('.text-xs.font-medium.text-semantic-success')).toBeTruthy()
+    expect(container.querySelector('.size-3.rounded-full')).toBeTruthy()
+  })
 })

@@ -38,6 +38,7 @@ import {
 import { resolveCharacterSpeciesNameGenerationSupport } from '../../../lib/naming/character-species-name-generation.lib'
 import { generateNameActionIcon } from '../../../lib/naming/species-name-generation-action-icon'
 import { GENERATE_NAME_ACTION_LABEL } from '../../../lib/naming/species-name-generation-labels'
+import { resolveQuickNpcAdditionalEquipmentOptions } from '../../lib/quick-npc/quick-npc-additional-equipment.lib'
 import { buildQuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
 import {
   isQuickNpcNarrativeGenerationFailedError,
@@ -87,6 +88,10 @@ function buildQuickNpcAuthoringTabs(args: {
     setup: args.setup,
     context: args.buildContext,
   })
+  const additionalEquipmentOptions = resolveQuickNpcAdditionalEquipmentOptions({
+    setup: args.setup,
+    context: args.buildContext,
+  })
   const generationSupport = resolveCharacterSpeciesNameGenerationSupport({
     speciesId: args.setup.speciesId,
     context: args.buildContext,
@@ -119,6 +124,7 @@ function buildQuickNpcAuthoringTabs(args: {
         buildContext={args.buildContext}
         createContext={args.createContext}
         optionSets={optionSets}
+        additionalEquipmentOptions={additionalEquipmentOptions}
       />
     ),
   })

@@ -289,17 +289,25 @@ export function resolveStartingChoiceCategoryAllowanceStatus(args: {
   return 'complete'
 }
 
+export function startingChoiceAddPlaceholder(kind: StartingChoiceCategory): string {
+  switch (kind) {
+    case 'skill':
+      return '+ Add skill'
+    case 'tool':
+      return '+ Add tool'
+    case 'language':
+      return '+ Add language'
+    case 'spell':
+      return '+ Add spell'
+    default:
+      return '+ Add item'
+  }
+}
+
 export function groupStartingChoicesByKind(
   choices: NpcStartingChoices,
 ): StartingChoiceCategoryGroup[] {
-  const order: StartingChoiceCategory[] = [
-    'skill',
-    'tool',
-    'language',
-    'equipment',
-    'weapon',
-    'spell',
-  ]
+  const order: StartingChoiceCategory[] = ['skill', 'tool', 'language', 'equipment', 'spell']
   return order.flatMap((kind) => {
     const entries = choices.contributions
       .filter((entry) => entry.category === kind)
@@ -407,7 +415,7 @@ function formatStartingChoiceDisplayLabel(
 
 const STARTING_CHOICE_CATEGORY_SUMMARY_MAX_VISIBLE = 3
 
-/** Deduped category row summary — up to three labels, then "+ N more". */
+/** Deduped category row summary — up to three labels, then "+ N". */
 export function formatStartingChoiceCategorySummary(labels: readonly string[]): string {
   const unique: string[] = []
   const seen = new Set<string>()
@@ -422,7 +430,21 @@ export function formatStartingChoiceCategorySummary(labels: readonly string[]): 
   }
   const visible = unique.slice(0, STARTING_CHOICE_CATEGORY_SUMMARY_MAX_VISIBLE)
   const remaining = unique.length - STARTING_CHOICE_CATEGORY_SUMMARY_MAX_VISIBLE
-  return `${visible.join(', ')} + ${remaining} more`
+  return `${visible.join(', ')} + ${remaining}`
+}
+
+export function resolveStartingChoiceCategoryLabels(args: {
+  context: CharacterBuildContext
+  choices: NpcStartingChoices
+  entries: readonly StartingChoiceContribution[]
+}): string[] {
+  return args.entries.flatMap((entry) =>
+    startingChoiceDisplayLabels({
+      context: args.context,
+      choices: args.choices,
+      contribution: entry,
+    }),
+  )
 }
 
 export function startingChoiceCategorySummary(args: {
@@ -430,14 +452,7 @@ export function startingChoiceCategorySummary(args: {
   choices: NpcStartingChoices
   entries: readonly StartingChoiceContribution[]
 }): string {
-  const labels = args.entries.flatMap((entry) =>
-    startingChoiceDisplayLabels({
-      context: args.context,
-      choices: args.choices,
-      contribution: entry,
-    }),
-  )
-  return formatStartingChoiceCategorySummary(labels)
+  return formatStartingChoiceCategorySummary(resolveStartingChoiceCategoryLabels(args))
 }
 
 export function startingChoiceDisplayLabels(args: {

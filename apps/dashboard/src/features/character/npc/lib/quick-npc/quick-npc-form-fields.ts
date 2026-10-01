@@ -31,7 +31,6 @@ import {
 } from '@rpg/ui/form'
 import {
   buildQuickNpcConstraintsFromArrays,
-  countQuickNpcConfiguredRequirementsFromArrays,
   type QuickNpcRequirementOptionSets,
 } from './quick-npc-requirement-options.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
@@ -41,7 +40,7 @@ import type { QuickNpcCreateContext } from './quick-npc-create-context'
 // details (name, alignment) and optional requirements (weapon/spell constraints).
 // ---------------------------------------------------------------------------
 
-export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
+export const QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME = 'additionalEquipmentIds'
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOverrides'
 
@@ -212,7 +211,7 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    requiredWeaponIds: z.array(z.string()),
+    additionalEquipmentIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
   })
@@ -235,7 +234,7 @@ export function quickNpcAuthoringTabSchema() {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    requiredWeaponIds: z.array(z.string()),
+    additionalEquipmentIds: z.array(z.string()),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
     [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: z.boolean(),
@@ -257,7 +256,7 @@ export const quickNpcAuthoringTabDefaultValues = {
   gender: '',
   name: '',
   alignment: 'n',
-  requiredWeaponIds: [],
+  additionalEquipmentIds: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
   [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: true,
@@ -288,21 +287,19 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
 }
 
 export function buildQuickNpcConstraints(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
+  values: Pick<QuickNpcAuthoringValues, 'additionalEquipmentIds' | 'requiredSpellIds'>,
+  requiredWeaponIds: readonly string[],
 ): AutomaticNpcBuildConstraints | undefined {
   return buildQuickNpcConstraintsFromArrays({
-    requiredWeaponIds: values.requiredWeaponIds,
+    requiredWeaponIds: [...requiredWeaponIds],
     requiredSpellIds: values.requiredSpellIds,
   })
 }
 
 export function countQuickNpcConfiguredRequirements(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
+  values: Pick<QuickNpcAuthoringValues, 'additionalEquipmentIds' | 'requiredSpellIds'>,
 ): number {
-  return countQuickNpcConfiguredRequirementsFromArrays({
-    requiredWeaponIds: values.requiredWeaponIds,
-    requiredSpellIds: values.requiredSpellIds,
-  })
+  return values.additionalEquipmentIds.length + values.requiredSpellIds.length
 }
 
 export type QuickNpcContentOptions = {

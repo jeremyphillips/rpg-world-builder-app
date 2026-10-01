@@ -9,7 +9,13 @@ import type {
 } from '@rpg/contracts'
 
 import { getContentTypeMidSentenceLabel } from '@/features/content'
-import { isSelectedStartingEquipmentReady } from '../../../lib/equipment/equipment-step.lib'
+import type { SelectionOptionCardDensity } from '@rpg/ui'
+
+import {
+  countStartingEquipmentRadioOptions,
+  filterPackageStartingEquipmentSummaries,
+  isSelectedStartingEquipmentReady,
+} from '../../../lib/equipment/equipment-step.lib'
 import { StartingEquipmentOptionCards } from './starting-equipment-option-cards'
 import { StartingEquipmentOptionSummaryCard } from './starting-equipment-option-summary'
 
@@ -34,6 +40,8 @@ export type StartingEquipmentOptionSectionProps = {
   onChoiceSelectionChange: (choiceSetId: string, selection: readonly string[]) => void
   onChangePackage: () => void
   onCollapseChooser: () => void
+  includeGoldOption?: boolean
+  density?: SelectionOptionCardDensity
 }
 
 export function StartingEquipmentOptionSection({
@@ -49,10 +57,30 @@ export function StartingEquipmentOptionSection({
   onChoiceSelectionChange,
   onChangePackage,
   onCollapseChooser,
+  includeGoldOption = true,
+  density = 'default',
 }: StartingEquipmentOptionSectionProps) {
+  const cardSummaries = useMemo(
+    () =>
+      includeGoldOption
+        ? summaries
+        : filterPackageStartingEquipmentSummaries(characterClass, summaries),
+    [characterClass, includeGoldOption, summaries],
+  )
+
+  const showChangePackage = useMemo(
+    () =>
+      countStartingEquipmentRadioOptions({
+        characterClass,
+        summaries,
+        includeGoldOption,
+      }) > 1,
+    [characterClass, includeGoldOption, summaries],
+  )
+
   const selectedSummary = useMemo(
-    () => summaries.find((summary) => summary.optionId === selectedOptionId),
-    [selectedOptionId, summaries],
+    () => cardSummaries.find((summary) => summary.optionId === selectedOptionId),
+    [cardSummaries, selectedOptionId],
   )
 
   const showSummary = useMemo(() => {
@@ -83,13 +111,15 @@ export function StartingEquipmentOptionSection({
       {showSummary && selectedSummary ? (
         <StartingEquipmentOptionSummaryCard
           summary={selectedSummary}
+          density={density}
           onChangePackage={onChangePackage}
+          showChangePackage={showChangePackage}
         />
       ) : (
         <StartingEquipmentOptionCards
           characterClass={characterClass}
           catalogIndex={catalogIndex}
-          summaries={summaries}
+          summaries={cardSummaries}
           draft={draft}
           resolvedChoiceSets={resolvedChoiceSets}
           selectedOptionId={selectedOptionId}
@@ -98,6 +128,8 @@ export function StartingEquipmentOptionSection({
           onNestedPoolChange={onNestedPoolChange}
           onChoiceSelectionChange={onChoiceSelectionChange}
           onCollapseChooser={onCollapseChooser}
+          includeGoldOption={includeGoldOption}
+          density={density}
         />
       )}
     </section>

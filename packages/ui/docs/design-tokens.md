@@ -288,4 +288,5 @@ Neutral disc fills use dedicated Layer 2 recipes — not surface-relative ink ro
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
-Lucide `strokeWidth` than other variants.
+Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon size:
+`sm` and `md` discs → `size-status-icon-slash-sm`; `lg` disc → `size-status-icon-slash-md`.

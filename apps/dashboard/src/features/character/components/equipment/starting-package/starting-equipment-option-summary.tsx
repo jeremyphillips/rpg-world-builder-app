@@ -1,5 +1,9 @@
 import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
-import { Eyebrow, SelectionOptionCard, SelectionOptionCardHeaderAction } from '@rpg/ui'
+import {
+  SelectionOptionCard,
+  SelectionOptionCardHeaderAction,
+  type SelectionOptionCardDensity,
+} from '@rpg/ui'
 
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
@@ -9,22 +13,29 @@ import {
 
 export type StartingEquipmentOptionSummaryCardProps = {
   summary: StartingEquipmentOptionSummary
+  density: SelectionOptionCardDensity
   onChangePackage: () => void
+  showChangePackage?: boolean
 }
 
 export function StartingEquipmentOptionSummaryCard({
   summary,
+  density,
   onChangePackage,
+  showChangePackage = true,
 }: StartingEquipmentOptionSummaryCardProps) {
   return (
     <SelectionOptionCard
       selected
-      headerStartSlot={<Eyebrow>{EQUIPMENT_SELECTED_PACKAGE_EYEBROW}</Eyebrow>}
+      density={density}
+      headerEyebrow={EQUIPMENT_SELECTED_PACKAGE_EYEBROW}
       headerEndSlot={
-        <SelectionOptionCardHeaderAction
-          label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
-          onClick={onChangePackage}
-        />
+        showChangePackage ? (
+          <SelectionOptionCardHeaderAction
+            label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+            onClick={onChangePackage}
+          />
+        ) : undefined
       }
       label={summary.label}
       description={summary.description}

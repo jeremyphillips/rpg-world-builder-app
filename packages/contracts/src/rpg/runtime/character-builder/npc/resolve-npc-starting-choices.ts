@@ -254,6 +254,16 @@ function withHeritageOption(
   }
 }
 
+function filterOverrideSelection(
+  choiceSet: ChoiceSet,
+  selectedIds: readonly string[],
+): string[] | undefined {
+  const allowed = new Set(choiceSet.options.map((option) => option.id))
+  const kept = selectedIds.filter((optionId) => allowed.has(optionId))
+  if (kept.length === 0 && selectedIds.length > 0) return undefined
+  return kept
+}
+
 function pruneOverrides(args: {
   overrides: Record<string, readonly string[]> | undefined
   allowanceSets: readonly ChoiceSet[]
@@ -269,9 +279,8 @@ function pruneOverrides(args: {
       continue
     }
 
-    const allowed = new Set(choiceSet.options.map((option) => option.id))
-    const kept = selectedIds.filter((optionId) => allowed.has(optionId))
-    if (kept.length === 0 && selectedIds.length > 0) {
+    const kept = filterOverrideSelection(choiceSet, selectedIds)
+    if (!kept) {
       removedOverrideIds.push(choiceSetId)
       continue
     }
@@ -279,6 +288,28 @@ function pruneOverrides(args: {
   }
 
   return { pruned, removedOverrideIds }
+}
+
+function pinNonAllowanceChoiceSetOverrides(args: {
+  overrides: Record<string, readonly string[]> | undefined
+  choiceSets: readonly ChoiceSet[]
+  allowanceSetIds: ReadonlySet<string>
+}): { pinned: Record<string, string[]>; pinnedChoiceSetIds: string[] } {
+  const setsById = new Map(args.choiceSets.map((choiceSet) => [choiceSet.id, choiceSet]))
+  const pinned: Record<string, string[]> = {}
+  const pinnedChoiceSetIds: string[] = []
+
+  for (const [choiceSetId, selectedIds] of Object.entries(args.overrides ?? {})) {
+    if (args.allowanceSetIds.has(choiceSetId)) continue
+    const choiceSet = setsById.get(choiceSetId)
+    if (!choiceSet) continue
+    const kept = filterOverrideSelection(choiceSet, selectedIds)
+    if (!kept || kept.length === 0) continue
+    pinned[choiceSetId] = kept
+    pinnedChoiceSetIds.push(choiceSetId)
+  }
+
+  return { pinned, pinnedChoiceSetIds }
 }
 
 function allowanceContributions(args: {
@@ -425,16 +456,27 @@ export function resolveNpcStartingChoices(args: {
   })
   const graphSets = graph.ok ? graph.resolvedChoiceSets : []
   const allowanceSets = graphSets.filter(isStartingChoiceAllowance)
+  const allowanceSetIds = new Set(allowanceSets.map((choiceSet) => choiceSet.id))
   const { pruned, removedOverrideIds } = pruneOverrides({
     overrides: args.startingChoiceOverrides,
     allowanceSets,
   })
+  const { pinned: pinnedNonAllowance, pinnedChoiceSetIds: pinnedNonAllowanceIds } =
+    pinNonAllowanceChoiceSetOverrides({
+      overrides: args.startingChoiceOverrides,
+      choiceSets: graphSets,
+      allowanceSetIds,
+    })
+  const mergedPinnedSelections = { ...pruned, ...pinnedNonAllowance }
   const seededDraft = {
     ...baseDraft,
     choiceSelections: {
       ...baseDraft.choiceSelections,
       ...Object.fromEntries(
-        Object.entries(pruned).map(([choiceSetId, selectedIds]) => [choiceSetId, [...selectedIds]]),
+        Object.entries(mergedPinnedSelections).map(([choiceSetId, selectedIds]) => [
+          choiceSetId,
+          [...selectedIds],
+        ]),
       ),
     },
   }
@@ -442,7 +484,7 @@ export function resolveNpcStartingChoices(args: {
     draft: seededDraft,
     context: args.context,
     preferences: args.preferences,
-    pinnedChoiceSetIds: new Set(Object.keys(pruned)),
+    pinnedChoiceSetIds: new Set([...Object.keys(pruned), ...pinnedNonAllowanceIds]),
   })
   const draft = current.ok ? current.draft : seededDraft
   const resolvedChoiceSets = current.ok ? current.resolvedChoiceSets : graphSets
@@ -476,6 +518,12 @@ export function npcStartingChoiceAllowanceSelections(
     if (contribution.mechanic !== 'choice-allowance') continue
     if (contribution.selectedIds.length < contribution.allowance.min) continue
     selections[contribution.choiceSetId] = [...contribution.selectedIds]
+  }
+  for (const choiceSet of choices.resolvedChoiceSets) {
+    if (choiceSet.choiceType !== 'equipment') continue
+    const selectedIds = choices.draft.choiceSelections[choiceSet.id] ?? []
+    if (selectedIds.length < choiceSet.min) continue
+    selections[choiceSet.id] = [...selectedIds]
   }
   return selections
 }

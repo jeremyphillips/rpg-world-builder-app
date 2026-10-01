@@ -1,10 +1,11 @@
 import type { FormValueSync } from '@rpg/ui/form'
 
 import {
+  QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME,
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
-  QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME,
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
+import { resolveQuickNpcAdditionalEquipmentValidIds } from './quick-npc-additional-equipment.lib'
 import {
   intersectQuickNpcRequirementIds,
   resolveQuickNpcRequirementValidIds,
@@ -20,27 +21,32 @@ function syncRequirementSelections(
   setup: QuickNpcSetupValues,
   context: Parameters<typeof resolveQuickNpcRequirementValidIds>[0]['context'],
 ): Partial<Record<string, unknown>> | undefined {
-  const { weaponIds: validWeaponIds, spellIds: validSpellIds } = resolveQuickNpcRequirementValidIds(
-    {
-      setup,
-      context,
-    },
-  )
+  const { spellIds: validSpellIds } = resolveQuickNpcRequirementValidIds({
+    setup,
+    context,
+  })
+  const validEquipmentIds = resolveQuickNpcAdditionalEquipmentValidIds({ setup, context })
 
-  const requiredWeaponIds = asStringArray(values[QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME])
+  const additionalEquipmentIds = asStringArray(values[QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME])
   const requiredSpellIds = asStringArray(values[QUICK_NPC_REQUIRED_SPELL_FIELD_NAME])
 
+  const filteredEquipment = additionalEquipmentIds.filter((id) => validEquipmentIds.has(id))
   const intersected = intersectQuickNpcRequirementIds({
-    requiredWeaponIds,
+    requiredWeaponIds: [],
     requiredSpellIds,
-    validWeaponIds,
+    validWeaponIds: new Set(),
     validSpellIds,
   })
-  if (!intersected) return undefined
+
+  const equipmentChanged =
+    filteredEquipment.length !== additionalEquipmentIds.length ? filteredEquipment : undefined
+  const spellChanged = intersected?.requiredSpellIds
+
+  if (!equipmentChanged && !spellChanged) return undefined
 
   return {
-    [QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME]: intersected.requiredWeaponIds,
-    [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: intersected.requiredSpellIds,
+    ...(equipmentChanged ? { [QUICK_NPC_ADDITIONAL_EQUIPMENT_FIELD_NAME]: equipmentChanged } : {}),
+    ...(spellChanged ? { [QUICK_NPC_REQUIRED_SPELL_FIELD_NAME]: spellChanged } : {}),
   }
 }
 
@@ -57,7 +63,6 @@ export function createQuickNpcFormValueSyncs(
           return undefined
         }
 
-        // Title does not affect requirement reachability; standalone setup omits membership title.
         const setup: QuickNpcSetupValues = {
           contextKind: 'standalone',
           speciesId: typeof values.speciesId === 'string' ? values.speciesId : '',

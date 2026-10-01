@@ -22,6 +22,15 @@ export const STATUS_ICON_TOOLTIP_LABELS = {
   notConfigured: 'Not configured',
 } as const satisfies Record<StatusIconVariant, string>
 
+/**
+ * StatusIcon size semantics (semantic rename + 12px tier):
+ * - New `sm` → 12px disc (introduced compact tier)
+ * - Old `sm` (16px) → `md`
+ * - Old `md` (20px) → `lg`
+ * Default `md` keeps implicit 16px renders unchanged.
+ */
+export const STATUS_ICON_DEFAULT_SIZE = 'md' as const
+
 /** Default Lucide stroke width for every glyph except off-slash. */
 export const STATUS_ICON_STROKE_WIDTH = 4
 /** Heavier stroke for the off slash — reads lighter at a smaller glyph size. */
@@ -47,13 +56,14 @@ export const statusIconVariants = cva(
         notConfigured: statusIconNeutralDiscClasses,
       },
       size: {
-        sm: 'size-4',
-        md: 'size-5',
+        sm: 'size-3',
+        md: 'size-4',
+        lg: 'size-5',
       },
     },
     defaultVariants: {
       variant: 'ready',
-      size: 'sm',
+      size: STATUS_ICON_DEFAULT_SIZE,
     },
   },
 )
@@ -71,11 +81,13 @@ export const statusIconGlyphVariants = cva('', {
     size: {
       sm: '',
       md: '',
+      lg: '',
     },
   },
   compoundVariants: [
     { variant: 'ready', size: 'sm', class: iconGlyphRootClasses.xs },
-    { variant: 'ready', size: 'md', class: iconGlyphRootClasses.sm },
+    { variant: 'ready', size: 'md', class: iconGlyphRootClasses.xs },
+    { variant: 'ready', size: 'lg', class: iconGlyphRootClasses.sm },
     {
       variant: 'incomplete',
       size: 'sm',
@@ -84,6 +96,11 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'incomplete',
       size: 'md',
+      class: iconGlyphRootClasses.xs,
+    },
+    {
+      variant: 'incomplete',
+      size: 'lg',
       class: iconGlyphRootClasses.sm,
     },
     {
@@ -94,6 +111,11 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'none',
       size: 'md',
+      class: iconGlyphRootClasses.xs,
+    },
+    {
+      variant: 'none',
+      size: 'lg',
       class: iconGlyphRootClasses.sm,
     },
     {
@@ -104,6 +126,11 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'notConfigured',
       size: 'md',
+      class: iconGlyphRootClasses.xs,
+    },
+    {
+      variant: 'notConfigured',
+      size: 'lg',
       class: iconGlyphRootClasses.sm,
     },
     {
@@ -114,6 +141,11 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'needsAttention',
       size: 'md',
+      class: iconGlyphRootClasses.xs,
+    },
+    {
+      variant: 'needsAttention',
+      size: 'lg',
       class: iconGlyphRootClasses.sm,
     },
     {
@@ -124,12 +156,17 @@ export const statusIconGlyphVariants = cva('', {
     {
       variant: 'off',
       size: 'md',
+      class: 'size-status-icon-slash-sm',
+    },
+    {
+      variant: 'off',
+      size: 'lg',
       class: 'size-status-icon-slash-md',
     },
   ],
   defaultVariants: {
     variant: 'ready',
-    size: 'sm',
+    size: STATUS_ICON_DEFAULT_SIZE,
   },
 })
 

@@ -1,4 +1,5 @@
 import {
+  indexCharacterBuildCatalog,
   npcStartingChoiceAllowanceSelections,
   npcStartingChoiceIncompleteOverride,
   npcStartingChoiceManualConstraints,
@@ -23,6 +24,7 @@ import {
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
+import { splitQuickNpcAdditionalEquipmentIds } from './quick-npc-additional-equipment.lib'
 
 function resolveQuickNpcMembershipPayload(
   createContext: Extract<QuickNpcCreateContext, { kind: 'organization-member' }>,
@@ -71,11 +73,16 @@ export function assembleQuickNpcPrepareCreateArgs(
     organizationTemplateId: organization?.members?.npcTemplateId,
   }
   const preferences = buildQuickNpcAutomaticPreferences(preferenceArgs)
+  const catalogIndex = indexCharacterBuildCatalog(args.buildContext.catalog)
+  const { requiredWeaponIds, manualEquipmentGrantIds } = splitQuickNpcAdditionalEquipmentIds({
+    additionalEquipmentIds: values.additionalEquipmentIds,
+    catalogIndex,
+  })
   const startingChoices = resolveNpcStartingChoices({
     context: args.buildContext,
     seed: buildQuickNpcSeed(values),
     startingChoiceOverrides: values.startingChoiceOverrides,
-    requiredWeaponIds: values.requiredWeaponIds,
+    requiredWeaponIds,
     requiredSpellIds: values.requiredSpellIds,
     preferences,
   })
@@ -90,6 +97,7 @@ export function assembleQuickNpcPrepareCreateArgs(
     context: args.buildContext,
     preferences,
     allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
+    ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
     ...(manualConstraints ? { constraints: manualConstraints } : {}),
     ...(membership ? { membership } : {}),
   }

@@ -3,9 +3,9 @@ import { Eyebrow } from './eyebrow'
 import {
   RadioCard,
   createRadioCardReselectClickHandler,
-  type RadioCardDensity,
   type RadioCardOption,
 } from './radio-card.client'
+import type { SelectionOptionCardDensity } from './selection-option-card-anatomy.client'
 import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
 import { radioCardGroupGapVariants } from './radio-card.variants'
 import { RadioGroup } from './radio-group.client'
@@ -20,7 +20,7 @@ export type RadioCardOptionGroup = {
 export interface RadioCardFieldProps extends BaseRadioFieldProps {
   options: RadioCardOption[]
   optionGroups?: RadioCardOptionGroup[]
-  density?: RadioCardDensity
+  density?: SelectionOptionCardDensity
   name?: string
   disabled?: boolean
   value?: string
@@ -33,7 +33,7 @@ export interface RadioCardFieldProps extends BaseRadioFieldProps {
 type GroupedRadioCardOptionsProps = {
   idPrefix: string
   labelId: string
-  density?: RadioCardDensity
+  density?: SelectionOptionCardDensity
   optionGroups: RadioCardOptionGroup[]
   name?: string
   disabled?: boolean

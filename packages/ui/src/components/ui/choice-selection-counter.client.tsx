@@ -2,12 +2,14 @@
 
 import { formatChoiceChosenCounter, type ChoiceCounterVerb } from '@rpg/contracts'
 
-import { SemanticText } from './semantic-text/semantic-text'
 import { StatusIcon } from './status-icon.client'
-import { Text } from './text'
 import {
-  choiceSelectionCounterClasses,
-  choiceSelectionCounterLabelClasses,
+  CHOICE_SELECTION_COUNTER_DEFAULT_SIZE,
+  choiceSelectionCounterCompleteLabelVariants,
+  choiceSelectionCounterIncompleteLabelVariants,
+  choiceSelectionCounterStatusIconSize,
+  choiceSelectionCounterVariants,
+  type ChoiceSelectionCounterSize,
 } from './choice-selection-counter.variants'
 
 export type ChoiceSelectionCounterProps = {
@@ -16,6 +18,7 @@ export type ChoiceSelectionCounterProps = {
   verb?: ChoiceCounterVerb
   requiredToComplete?: boolean
   effectiveRequiredCount?: number
+  size?: ChoiceSelectionCounterSize
 }
 
 function isRequirementStyleSuccess({
@@ -32,24 +35,24 @@ function isRequirementStyleSuccess({
 }
 
 export function ChoiceSelectionCounter(props: ChoiceSelectionCounterProps) {
-  const { selectedCount, max, verb = 'chosen' } = props
+  const {
+    selectedCount,
+    max,
+    verb = 'chosen',
+    size = CHOICE_SELECTION_COUNTER_DEFAULT_SIZE,
+  } = props
   const label = formatChoiceChosenCounter(selectedCount, max, verb)
   const isComplete = isRequirementStyleSuccess(props)
+  const statusIconSize = choiceSelectionCounterStatusIconSize[size]
 
   if (!isComplete) {
-    return (
-      <Text variant="muted" className={choiceSelectionCounterLabelClasses}>
-        {label}
-      </Text>
-    )
+    return <span className={choiceSelectionCounterIncompleteLabelVariants({ size })}>{label}</span>
   }
 
   return (
-    <span className={choiceSelectionCounterClasses}>
-      <StatusIcon variant="ready" size="sm" tooltip={false} />
-      <SemanticText tone="success" emphasis="medium" className={choiceSelectionCounterLabelClasses}>
-        {label}
-      </SemanticText>
+    <span className={choiceSelectionCounterVariants({ size })}>
+      <StatusIcon variant="ready" size={statusIconSize} tooltip={false} />
+      <span className={choiceSelectionCounterCompleteLabelVariants({ size })}>{label}</span>
     </span>
   )
 }

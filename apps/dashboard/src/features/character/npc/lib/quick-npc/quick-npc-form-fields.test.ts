@@ -33,7 +33,7 @@ const validValues = {
   alignment: 'ln',
   membershipTitle: 'omt_member',
   npcTemplateId: 'guard',
-  requiredWeaponIds: [],
+  additionalEquipmentIds: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
   generateNarrativeOnCreate: true,
@@ -202,7 +202,7 @@ describe('buildQuickNpcDetailsFields', () => {
       gender: '',
       name: '',
       alignment: 'n',
-      requiredWeaponIds: [],
+      additionalEquipmentIds: [],
       requiredSpellIds: [],
       startingChoiceOverrides: {},
       generateNarrativeOnCreate: true,
@@ -222,8 +222,8 @@ describe('buildQuickNpcTabs validation wiring', () => {
       requirementsFields: [
         {
           type: 'select',
-          name: 'requiredWeaponIds',
-          label: 'Starting weapon',
+          name: 'additionalEquipmentIds',
+          label: 'Starting equipment',
           options: [],
           width: 'full',
         },
@@ -257,7 +257,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           gender: 'male',
           name: 'Guard Captain',
           alignment: 'ln',
-          requiredWeaponIds: [],
+          additionalEquipmentIds: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
           generateNarrativeOnCreate: true,
@@ -276,25 +276,24 @@ describe('buildQuickNpcTabs validation wiring', () => {
 describe('buildQuickNpcConstraints', () => {
   it('omits empty requirement fields', () => {
     expect(
-      buildQuickNpcConstraints({ requiredWeaponIds: [], requiredSpellIds: [] }),
+      buildQuickNpcConstraints({ additionalEquipmentIds: [], requiredSpellIds: [] }, []),
     ).toBeUndefined()
   })
 
   it('maps configured requirement id arrays', () => {
     expect(
-      buildQuickNpcConstraints({
-        requiredWeaponIds: ['srd-cc-5.2.1:longsword'],
-        requiredSpellIds: [],
-      }),
+      buildQuickNpcConstraints({ additionalEquipmentIds: [], requiredSpellIds: [] }, [
+        'srd-cc-5.2.1:longsword',
+      ]),
     ).toEqual({ requiredWeaponIds: ['srd-cc-5.2.1:longsword'], requiredSpellIds: [] })
   })
 })
 
 describe('countQuickNpcConfiguredRequirements', () => {
-  it('counts weapons and spells in configured arrays', () => {
+  it('counts additional equipment and spells in configured arrays', () => {
     expect(
       countQuickNpcConfiguredRequirements({
-        requiredWeaponIds: ['weapon-1'],
+        additionalEquipmentIds: ['weapon-1'],
         requiredSpellIds: ['spell-1'],
       }),
     ).toBe(2)

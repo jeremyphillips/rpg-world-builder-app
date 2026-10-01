@@ -73,7 +73,7 @@ describe('formatStartingChoiceCategorySummary', () => {
     )
   })
 
-  it('dedupes labels and truncates with + N more', () => {
+  it('dedupes labels and truncates with + N', () => {
     expect(
       formatStartingChoiceCategorySummary([
         'Perception',
@@ -83,7 +83,7 @@ describe('formatStartingChoiceCategorySummary', () => {
         'Stealth',
         'Survival',
       ]),
-    ).toBe('Perception, Athletics, Intimidation + 2 more')
+    ).toBe('Perception, Athletics, Intimidation + 2')
   })
 
   it('returns empty string when no labels', () => {
@@ -357,6 +357,6 @@ describe('groupStartingChoicesByKind', () => {
 
     const skills = categories.find((category) => category.kind === 'skill')
     expect(skills?.entries.map((row) => row.mechanic)).toEqual(['fixed-grant', 'choice-allowance'])
-    expect(categories.map((category) => category.kind)).toEqual(['skill', 'weapon'])
+    expect(categories.map((category) => category.kind)).toEqual(['skill'])
   })
 })

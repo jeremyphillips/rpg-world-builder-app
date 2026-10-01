@@ -27,6 +27,7 @@ import type { CharacterBuildValidationIssue } from '../validate/types'
 import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 
 import {
+  applyManualEquipmentGrants,
   applyRequiredWeaponEquipmentGrants,
   validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
@@ -83,6 +84,8 @@ export type ResolveAutomaticNpcBuildArgs = {
    * Seeded before top-up so preference merging cannot replace or extend them.
    */
   allowanceSelections?: Record<string, readonly string[]>
+  /** Non-weapon equipment ids granted after automatic fill (armor, gear, magic items, …). */
+  manualEquipmentGrantIds?: readonly string[]
   context: CharacterBuildContext
 }
 
@@ -311,6 +314,7 @@ export function resolveAutomaticNpcBuild({
   constraints,
   preferences,
   allowanceSelections,
+  manualEquipmentGrantIds,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
@@ -339,16 +343,24 @@ export function resolveAutomaticNpcBuild({
   const completion = completeMagicItemGrantSelections(choices.draft, context)
   if (!completion.ok) return completion
 
-  const grantCompletion = applyRequiredWeaponEquipmentGrants({
+  const weaponGrantCompletion = applyRequiredWeaponEquipmentGrants({
     draft: completion.draft,
     constraints: normalizedConstraints,
     context,
     catalogIndex,
   })
-  if (!grantCompletion.ok) return grantCompletion
+  if (!weaponGrantCompletion.ok) return weaponGrantCompletion
+
+  const manualGrantCompletion = applyManualEquipmentGrants({
+    draft: weaponGrantCompletion.draft,
+    equipmentIds: manualEquipmentGrantIds ?? [],
+    context,
+    catalogIndex,
+  })
+  if (!manualGrantCompletion.ok) return manualGrantCompletion
 
   const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
-    grantCompletion.draft,
+    manualGrantCompletion.draft,
     normalizedConstraints,
     catalogIndex,
   )
@@ -358,7 +370,7 @@ export function resolveAutomaticNpcBuild({
 
   return {
     ok: true,
-    draft: grantCompletion.draft,
-    resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
+    draft: manualGrantCompletion.draft,
+    resolvedChoiceSets: resolveAvailableChoices(manualGrantCompletion.draft, context),
   }
 }
