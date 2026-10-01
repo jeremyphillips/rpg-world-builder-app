@@ -70,37 +70,6 @@ export type SelectRootWithClearProps = {
   options: SelectFieldOptionListItem[]
 }
 
-function renderSelectTrigger(
-  {
-    id,
-    size,
-    digits,
-    sizingLabel,
-    sizingLabels,
-    onBlur,
-    placeholder,
-    grouped,
-  }: SelectTriggerConfig,
-  triggerRef: React.Ref<HTMLButtonElement>,
-) {
-  return (
-    <SelectTrigger
-      ref={triggerRef}
-      id={id}
-      size={size}
-      digits={digits}
-      sizingLabel={sizingLabel}
-      sizingLabels={sizingLabels}
-      grouped={grouped}
-      groupedPosition={grouped ? 'start' : undefined}
-      className={grouped ? 'min-w-0 w-full' : undefined}
-      onBlur={onBlur}
-    >
-      <SelectValue placeholder={placeholder} />
-    </SelectTrigger>
-  )
-}
-
 export function SelectRootWithClear({
   label,
   size,
@@ -117,7 +86,22 @@ export function SelectRootWithClear({
 }: SelectRootWithClearProps) {
   const triggerRef = React.useRef<HTMLButtonElement>(null)
   const showClear = clearable && resolvedValue !== undefined && !disabled
-  const trigger = renderSelectTrigger({ ...triggerConfig, grouped: showClear }, triggerRef)
+  const trigger = (
+    <SelectTrigger
+      ref={triggerRef}
+      id={triggerConfig.id}
+      size={triggerConfig.size}
+      digits={triggerConfig.digits}
+      sizingLabel={triggerConfig.sizingLabel}
+      sizingLabels={triggerConfig.sizingLabels}
+      grouped={showClear}
+      groupedPosition={showClear ? 'start' : undefined}
+      className={showClear ? 'min-w-0 w-full' : undefined}
+      onBlur={triggerConfig.onBlur}
+    >
+      <SelectValue placeholder={triggerConfig.placeholder} />
+    </SelectTrigger>
+  )
   const select = (
     <Select
       value={resolvedValue}

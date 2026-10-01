@@ -9,50 +9,52 @@ type QuickNpcBuildCardExpansionSync = {
   npcTemplateId: string
 }
 
-function resolveExpandedWhenRoleRowDisabled(
+function collapseRoleWhenRowDisabled(
   expanded: QuickNpcBuildExpandedAttribute,
   current: QuickNpcBuildCardExpansionSync,
-): QuickNpcBuildExpandedAttribute {
-  if (expanded !== 'role' || current.roleRowEnabled) {
-    return expanded
-  }
-  if (current.classProgressionApplicable && current.classId === '') {
-    return 'class'
-  }
-  return null
+): QuickNpcBuildExpandedAttribute | undefined {
+  if (expanded !== 'role' || current.roleRowEnabled) return undefined
+  return current.classProgressionApplicable && current.classId === '' ? 'class' : null
 }
 
-function resolveExpandedWhenClassApplicable(
+function resolveWhenClassProgressionDisabled(
+  expanded: QuickNpcBuildExpandedAttribute,
+  classProgressionApplicable: boolean,
+): QuickNpcBuildExpandedAttribute | undefined {
+  if (classProgressionApplicable) return undefined
+  return expanded === 'class' ? null : expanded
+}
+
+function resolveWhenRoleRowUnset(
+  expanded: QuickNpcBuildExpandedAttribute,
+  current: QuickNpcBuildCardExpansionSync,
+): QuickNpcBuildExpandedAttribute | undefined {
+  if (!current.roleRowEnabled || current.npcTemplateId !== '') return undefined
+  return expanded === 'class' ? expanded : 'role'
+}
+
+function resolveWhenTemplateSelectedWithEmptyClass(
+  previous: QuickNpcBuildCardExpansionSync,
+  current: QuickNpcBuildCardExpansionSync,
+): QuickNpcBuildExpandedAttribute | undefined {
+  const templateJustSelected =
+    current.roleRowEnabled &&
+    previous.npcTemplateId === '' &&
+    current.npcTemplateId !== '' &&
+    current.classId === ''
+  return templateJustSelected ? 'class' : undefined
+}
+
+function resolveWhenClassUnset(
   expanded: QuickNpcBuildExpandedAttribute,
   previous: QuickNpcBuildCardExpansionSync,
   current: QuickNpcBuildCardExpansionSync,
 ): QuickNpcBuildExpandedAttribute {
-  const { classProgressionApplicable, classId } = current
-
-  if (current.roleRowEnabled && current.npcTemplateId === '') {
-    return expanded === 'class' ? expanded : 'role'
-  }
-
-  if (
-    current.roleRowEnabled &&
-    previous.npcTemplateId === '' &&
-    current.npcTemplateId !== '' &&
-    classId === ''
-  ) {
-    return 'class'
-  }
-
-  if (classId !== '') {
-    return expanded
-  }
-
   const becameApplicable = previous.classProgressionApplicable === false
   const classIdBecameEmpty = previous.classId !== ''
-
   if (becameApplicable || classIdBecameEmpty) {
     return 'class'
   }
-
   return expanded
 }
 
@@ -61,16 +63,24 @@ function resolveQuickNpcBuildCardExpandedSync(
   previous: QuickNpcBuildCardExpansionSync,
   current: QuickNpcBuildCardExpansionSync,
 ): QuickNpcBuildExpandedAttribute {
-  const afterRole = resolveExpandedWhenRoleRowDisabled(expanded, current)
-  if (afterRole !== expanded) {
-    return afterRole
-  }
+  const roleCollapsed = collapseRoleWhenRowDisabled(expanded, current)
+  if (roleCollapsed !== undefined) return roleCollapsed
 
-  if (!current.classProgressionApplicable) {
-    return expanded === 'class' ? null : expanded
-  }
+  const withoutClassProgression = resolveWhenClassProgressionDisabled(
+    expanded,
+    current.classProgressionApplicable,
+  )
+  if (withoutClassProgression !== undefined) return withoutClassProgression
 
-  return resolveExpandedWhenClassApplicable(expanded, previous, current)
+  const roleRowUnset = resolveWhenRoleRowUnset(expanded, current)
+  if (roleRowUnset !== undefined) return roleRowUnset
+
+  const templateSelected = resolveWhenTemplateSelectedWithEmptyClass(previous, current)
+  if (templateSelected !== undefined) return templateSelected
+
+  if (current.classId !== '') return expanded
+
+  return resolveWhenClassUnset(expanded, previous, current)
 }
 
 export function useQuickNpcBuildCardExpandedAttribute(args: {
