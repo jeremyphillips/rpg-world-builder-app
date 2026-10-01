@@ -69,6 +69,8 @@ describe('Quick NPC sheet preview', () => {
     })
 
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(previewButton).toHaveFocus()
+    await waitFor(() => {
+      expect(previewButton).toHaveFocus()
+    })
   })
 })
