@@ -48,7 +48,6 @@ function resolveWhenTemplateSelectedWithEmptyClass(
 function resolveWhenClassUnset(
   expanded: QuickNpcBuildExpandedAttribute,
   previous: QuickNpcBuildCardExpansionSync,
-  current: QuickNpcBuildCardExpansionSync,
 ): QuickNpcBuildExpandedAttribute {
   const becameApplicable = previous.classProgressionApplicable === false
   const classIdBecameEmpty = previous.classId !== ''
@@ -80,7 +79,7 @@ function resolveQuickNpcBuildCardExpandedSync(
 
   if (current.classId !== '') return expanded
 
-  return resolveWhenClassUnset(expanded, previous, current)
+  return resolveWhenClassUnset(expanded, previous)
 }
 
 export function useQuickNpcBuildCardExpandedAttribute(args: {
