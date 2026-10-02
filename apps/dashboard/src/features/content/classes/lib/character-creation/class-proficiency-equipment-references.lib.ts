@@ -8,6 +8,7 @@ export type ProficiencyEquipmentReference = {
   packageId: string
   packageLabel: string
   itemIndex: number
+  entryId: string
 }
 
 function isProficiencyLinkedGrantRow(
@@ -35,6 +36,7 @@ export function findProficiencyEquipmentReferences(
         packageId: option.id ?? option.label,
         packageLabel: option.label,
         itemIndex,
+        entryId: item.id,
       })
     }
   }

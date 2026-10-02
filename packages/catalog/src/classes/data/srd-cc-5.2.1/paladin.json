@@ -106,34 +106,40 @@
               "kind": "grant",
               "equipmentSlug": "chain-mail",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "chain-mail"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shield",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "shield"
             },
             {
               "kind": "grant",
               "equipmentSlug": "longsword",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "longsword"
             },
             {
               "kind": "grant",
               "equipmentSlug": "javelin",
-              "quantity": 6
+              "quantity": 6,
+              "id": "javelin"
             },
             {
               "kind": "grant",
               "equipmentSlug": "holy-symbol-amulet",
-              "quantity": 1
+              "quantity": 1,
+              "id": "holy-symbol-amulet"
             },
             {
               "kind": "grant",
               "equipmentSlug": "priests-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "priests-pack"
             }
           ],
           "wealth": {

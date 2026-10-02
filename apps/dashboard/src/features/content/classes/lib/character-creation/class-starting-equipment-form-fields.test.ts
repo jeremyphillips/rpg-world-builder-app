@@ -112,6 +112,7 @@ describe('startingEquipmentOptionCompactSummary', () => {
         label: 'Standard Equipment',
         items: [
           {
+            id: 'spear',
             itemKind: 'grant',
             grantTargetSource: 'equipment',
             equipmentSlug: 'spear',
@@ -142,6 +143,7 @@ describe('startingEquipmentItemTitle', () => {
     expect(
       startingEquipmentItemTitle(
         {
+          id: 'javelin',
           itemKind: 'grant',
           grantTargetSource: 'equipment',
           equipmentSlug: 'javelin',
@@ -157,6 +159,7 @@ describe('startingEquipmentItemTitle', () => {
     expect(
       startingEquipmentItemTitle(
         {
+          id: 'greataxe',
           itemKind: 'grant',
           grantTargetSource: 'equipment',
           equipmentSlug: 'greataxe',
@@ -172,6 +175,7 @@ describe('startingEquipmentItemTitle', () => {
     expect(
       startingEquipmentItemTitle(
         {
+          id: 'class-tools-tool',
           itemKind: 'grant',
           grantTargetSource: 'proficiency_choice',
           proficiencyChoiceId: 'class-tools',
@@ -389,6 +393,7 @@ describe('startingEquipmentFormSchema validation', () => {
 
   it('round-trips a proficiency-linked grant target', () => {
     const linkedGrant = {
+      id: 'class-tools-tool',
       kind: 'grant' as const,
       target: { source: 'proficiency_choice' as const, choiceId: 'class-tools' },
       quantity: 1,

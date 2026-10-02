@@ -37,28 +37,33 @@
               "kind": "grant",
               "equipmentSlug": "chain-mail",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "chain-mail"
             },
             {
               "kind": "grant",
               "equipmentSlug": "greatsword",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "greatsword"
             },
             {
               "kind": "grant",
               "equipmentSlug": "flail",
-              "quantity": 1
+              "quantity": 1,
+              "id": "flail"
             },
             {
               "kind": "grant",
               "equipmentSlug": "javelin",
-              "quantity": 8
+              "quantity": 8,
+              "id": "javelin"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dungeoneers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "dungeoneers-pack"
             }
           ],
           "wealth": {
@@ -74,39 +79,46 @@
               "kind": "grant",
               "equipmentSlug": "studded-leather",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "studded-leather"
             },
             {
               "kind": "grant",
               "equipmentSlug": "scimitar",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "scimitar"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shortsword",
-              "quantity": 1
+              "quantity": 1,
+              "id": "shortsword"
             },
             {
               "kind": "grant",
               "equipmentSlug": "longbow",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "longbow"
             },
             {
               "kind": "grant",
               "equipmentSlug": "arrows",
-              "quantity": 20
+              "quantity": 20,
+              "id": "arrows"
             },
             {
               "kind": "grant",
               "equipmentSlug": "quiver",
-              "quantity": 1
+              "quantity": 1,
+              "id": "quiver"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dungeoneers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "dungeoneers-pack"
             }
           ],
           "wealth": {

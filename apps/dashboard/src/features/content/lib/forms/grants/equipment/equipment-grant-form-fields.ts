@@ -412,6 +412,7 @@ export function grantedEquipmentItemFields(
 export function equipmentChoiceGrantFields(
   ctx: ContentFormCtx,
   guard?: FieldVisibility,
+  options?: { lockChooseToOne?: boolean },
 ): FormItem[] {
   const equipmentOptions = referenceEquipmentFieldOptions(ctx.options?.equipment)
 
@@ -428,6 +429,7 @@ export function equipmentChoiceGrantFields(
           kind: 'number',
           name: 'choose',
           min: 1,
+          max: options?.lockChooseToOne ? 1 : undefined,
           digits: 1,
           defaultValue: 1,
         },
@@ -522,6 +524,8 @@ export type EquipmentGrantItemFieldsOptions = {
   allowProficiencyChoiceTarget?: boolean
   /** Class-specific link cue beneath proficiency-linked grant rows. */
   renderProficiencyLinkedGrantCue?: () => ReactElement | null
+  /** Starting equipment authors one pick per choice entry. */
+  lockChooseToOne?: boolean
 }
 
 export function equipmentGrantItemFields(
@@ -551,6 +555,6 @@ export function equipmentGrantItemFields(
       renderProficiencyLinkedGrantCue: opts.renderProficiencyLinkedGrantCue,
     }),
     ...(opts.extraFields ?? []),
-    ...equipmentChoiceGrantFields(ctx, guard),
+    ...equipmentChoiceGrantFields(ctx, guard, { lockChooseToOne: opts.lockChooseToOne }),
   ]
 }

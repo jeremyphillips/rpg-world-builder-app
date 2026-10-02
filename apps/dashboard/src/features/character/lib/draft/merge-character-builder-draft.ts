@@ -18,8 +18,8 @@ export function mergeCharacterBuilderDraft(
             ...(draft.equipment ?? {
               mode: 'package',
               purchases: [],
-              removedPackageItemKeys: [],
-              customized: false,
+              classPackage: { state: 'unresolved' as const },
+              editedSincePackageSelection: false,
             }),
             ...patch.equipment,
           }

@@ -205,13 +205,10 @@ function appendPackageItemsFromDraft(
   if (!shouldIncludePackageItems(context.option)) return inventory
 
   const { classId, characterClass, option, selectedOptionId } = context
-  const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
   const packageSources = classStartingEquipmentSource(classId, selectedOptionId)
   const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
 
-  return resolved.items.reduce((current, item, itemIndex) => {
-    const key = startingEquipmentPackageItemKey(classId, selectedOptionId, itemIndex)
-    if (removedKeys.has(key)) return current
+  return resolved.items.reduce((current, item) => {
     return appendResolvedPackageItem(current, item, packageSources)
   }, inventory)
 }

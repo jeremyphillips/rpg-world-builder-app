@@ -104,7 +104,12 @@ const storedDruid: ClassStored = {
           id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
-            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+            {
+              id: 'rope',
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'rope' },
+              quantity: 1,
+            },
           ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
@@ -163,8 +168,7 @@ function goldDraftWithPurchases(
         sourceMode: purchase.sourceMode ?? ('startingGold' as const),
         origin: purchase.origin ?? ('picker' as const),
       })),
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }
@@ -333,7 +337,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     const draft = goldDraftWithPurchases([
       { id: 'purchase-rope', equipmentId: rope.id, quantity: 62 },
     ])
-    draft.equipment!.customized = true
+    draft.equipment!.editedSincePackageSelection = true
 
     const evaluation = evaluateEquipmentPackageSwitch({
       draft,
@@ -366,7 +370,7 @@ describe('buildEquipmentPackageSwitchPatch', () => {
     expect(result.patch.equipment?.purchases).toEqual([
       expect.objectContaining({ equipmentId: rope.id, quantity: 9 }),
     ])
-    expect(result.patch.equipment?.customized).toBe(true)
+    expect(result.patch.equipment?.editedSincePackageSelection).toBe(true)
   })
 
   it('rejects stale commits without emitting a patch', () => {
@@ -496,6 +500,7 @@ describe('evaluateEquipmentPackageSwitch with Legend-tier funding', () => {
             label: 'Standard Equipment',
             items: [
               {
+                id: 'rope',
                 kind: 'grant',
                 target: { source: 'equipment', equipmentSlug: 'rope' },
                 quantity: 1,
@@ -540,8 +545,7 @@ describe('evaluateEquipmentPackageSwitch with Legend-tier funding', () => {
           sourceMode: 'startingGold' as const,
           origin: 'picker' as const,
         })),
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
   }

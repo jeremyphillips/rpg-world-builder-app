@@ -883,7 +883,6 @@ function listPackageInventoryRows(args: {
   budget?: EquipmentBudgetSummary
 }): EquipmentInventoryRow[] {
   const { draft, catalogIndex, characterClass, option, classId, selectedOptionId, budget } = args
-  const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
   const packageSources: CharacterSelectionSource[] = [
     { kind: 'classStartingEquipment', sourceId: classId, grantId: selectedOptionId },
   ]
@@ -891,7 +890,6 @@ function listPackageInventoryRows(args: {
 
   return resolved.items.flatMap((item, itemIndex) => {
     const packageItemKey = startingEquipmentPackageItemKey(classId, selectedOptionId, itemIndex)
-    if (removedKeys.has(packageItemKey)) return []
 
     const entry = packageEntryFromResolvedItem(item, packageSources)
     if (!entry) return []

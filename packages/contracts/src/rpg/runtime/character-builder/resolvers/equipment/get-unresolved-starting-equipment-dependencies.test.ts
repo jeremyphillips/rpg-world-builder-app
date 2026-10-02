@@ -28,6 +28,7 @@ const monkWithLinkedGrant: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,

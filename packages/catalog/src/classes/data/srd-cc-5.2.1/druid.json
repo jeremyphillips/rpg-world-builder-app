@@ -145,35 +145,41 @@
               "kind": "grant",
               "equipmentSlug": "leather-armor",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "leather-armor"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shield",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "shield"
             },
             {
               "kind": "grant",
               "equipmentSlug": "sickle",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "sickle"
             },
             {
               "kind": "grant",
               "equipmentSlug": "wooden-staff",
               "quantity": 1,
-              "equipped": false
+              "equipped": false,
+              "id": "wooden-staff"
             },
             {
               "kind": "grant",
               "equipmentSlug": "explorers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "explorers-pack"
             },
             {
               "kind": "grant",
               "equipmentSlug": "herbalism-kit",
-              "quantity": 1
+              "quantity": 1,
+              "id": "herbalism-kit"
             }
           ],
           "wealth": {

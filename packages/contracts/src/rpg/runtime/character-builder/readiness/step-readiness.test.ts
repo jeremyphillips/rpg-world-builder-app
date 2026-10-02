@@ -100,6 +100,7 @@ const equipmentBardClass: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
@@ -124,6 +125,7 @@ const equipmentMonkClass: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -299,8 +301,7 @@ describe('resolveBuilderStepReadiness', () => {
         equipment: {
           mode: 'package',
           purchases: [],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
           skipped: true,
         },
       })
@@ -345,8 +346,7 @@ describe('resolveBuilderStepReadiness', () => {
               origin: 'picker',
             },
           ],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
         },
       })
       const choiceSets = resolveAvailableChoices(draft, equipmentTestContext)
@@ -420,8 +420,7 @@ describe('resolveBuilderStepReadiness', () => {
         equipment: {
           mode: 'package',
           purchases: [],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
           skipped: true,
           magicItemSelections: [],
         },

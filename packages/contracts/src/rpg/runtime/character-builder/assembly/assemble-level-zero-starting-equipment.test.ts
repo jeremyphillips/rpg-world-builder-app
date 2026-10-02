@@ -60,8 +60,7 @@ describe('assembleLevelZeroStartingEquipment', () => {
         mode: 'package' as const,
         purchases: [],
         grants: [{ equipmentId: clubId, quantity: 1 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const assembled = assembleLevelZeroStartingEquipment(draft, {
@@ -87,8 +86,7 @@ describe('assembleLevelZeroStartingEquipment', () => {
         mode: 'package' as const,
         purchases: [],
         grants: [{ equipmentId: arrowsId, quantity: 20 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const assembled = assembleLevelZeroStartingEquipment(draft, {

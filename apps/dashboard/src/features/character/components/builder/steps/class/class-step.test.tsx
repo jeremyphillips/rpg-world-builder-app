@@ -193,8 +193,7 @@ describe('ClassStep', () => {
           { equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' as const },
           { equipmentId: 'srd-cc-5.2.1:sword', quantity: 1, sourceMode: 'startingGold' as const },
         ],
-        removedPackageItemKeys: ['srd-cc-5.2.1:wizard:standard-equipment:0'],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
@@ -213,8 +212,7 @@ describe('ClassStep', () => {
       choiceSelections: {},
       equipment: expect.objectContaining({
         mode: 'package',
-        customized: false,
-        removedPackageItemKeys: [],
+        editedSincePackageSelection: false,
         purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
       }),
     })

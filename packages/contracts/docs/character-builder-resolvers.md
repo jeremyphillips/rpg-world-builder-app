@@ -454,6 +454,17 @@ instead of a hardcoded "Recommended" string. `suggestedBy` stores
 recommendations. Role equipment preferences are strong signals with `source: { kind: 'role' }`
 on `deriveEquipmentRecommendations`; the `NpcTemplate*` rename stays deferred.
 
+## Starting-equipment contribution identity
+
+Each class starting-equipment entry is one independently quantifiable contribution:
+
+- An equipment grant resolves to one equipment id and its authored quantity. `equipped` and modifiers stay on that same inventory row.
+- A proficiency-linked grant resolves to one equipment id from the linked tool-proficiency answer, with the authored quantity.
+- A choice entry is constrained to `choose: 1` and materializes one selected equipment id at quantity 1. Additional picks are separate entries, each with its own id.
+- Assembly appends that one row. Pack contents, modifiers, and equipped state do not split an entry into several contributions.
+
+Override identity is therefore the authored entry `id`, unique within its package option. Identity for a contribution is `(classId, packageId, entryId)`. The shared equipment-grant choice schema still allows `choose >= 1` for other content.
+
 ## Related helpers
 
 | Helper                                | Location                                                   | Purpose                                                                                                                                         |

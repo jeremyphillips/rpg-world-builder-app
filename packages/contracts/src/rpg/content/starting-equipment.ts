@@ -31,8 +31,15 @@ export type StartingEquipmentGrantTarget = z.infer<typeof startingEquipmentGrant
 const PROFICIENCY_LINKED_GRANT_MODIFIERS_MESSAGE =
   'Proficiency-linked starting equipment grants cannot carry modifiers.'
 
+const DUPLICATE_CONTRIBUTION_ID_MESSAGE =
+  'Starting equipment contribution ids must be unique within an option.'
+
+/** Stable authored identity for one independently quantifiable package contribution. */
+export const startingEquipmentContributionIdSchema = z.string().min(1)
+
 const startingEquipmentGrantedItemObjectSchema = z
   .object({
+    id: startingEquipmentContributionIdSchema,
     kind: z.literal('grant'),
     target: startingEquipmentGrantTargetSchema,
     quantity: z.number().int().min(1).default(1),
@@ -122,12 +129,21 @@ export function resolveEquipmentModeFromOption(
  * Use `kind: 'grant'` with `target.source === 'proficiency_choice'` when the item
  * resolves from an existing character-creation tool proficiency ChoiceSet answer.
  */
+/**
+ * Starting-equipment choice rows are one contribution each.
+ * The shared equipment-grant choice schema still allows `choose >= 1` for other content.
+ */
+export const startingEquipmentItemChoiceObjectSchema = equipmentChoiceGrantObjectSchema.extend({
+  id: startingEquipmentContributionIdSchema,
+  choose: z.literal(1).default(1),
+})
+
 export const startingEquipmentItemChoiceSchema = z.preprocess(
   normalizeEquipmentChoiceGrant,
-  equipmentChoiceGrantObjectSchema,
+  startingEquipmentItemChoiceObjectSchema,
 )
 
-export type StartingEquipmentItemChoice = z.infer<typeof equipmentChoiceGrantObjectSchema>
+export type StartingEquipmentItemChoice = z.infer<typeof startingEquipmentItemChoiceObjectSchema>
 
 export const startingEquipmentItemSchema = z.preprocess(
   (input) => {
@@ -140,7 +156,7 @@ export const startingEquipmentItemSchema = z.preprocess(
   },
   z.discriminatedUnion('kind', [
     startingEquipmentGrantedItemObjectSchema,
-    equipmentChoiceGrantObjectSchema,
+    startingEquipmentItemChoiceObjectSchema,
   ]),
 )
 
@@ -154,6 +170,15 @@ export const startingEquipmentOptionSchema = contentChoiceOptionSchema
   })
   .refine((option) => option.items.length > 0 || option.wealth != null, {
     message: 'Starting equipment option must include items or be wealth-only',
+  })
+  .superRefine((option, ctx) => {
+    const seen = new Set<string>()
+    for (const [index, item] of option.items.entries()) {
+      if (seen.has(item.id)) {
+        addCustomRefinementIssue(ctx, DUPLICATE_CONTRIBUTION_ID_MESSAGE, ['items', index, 'id'])
+      }
+      seen.add(item.id)
+    }
   })
 
 export type StartingEquipmentOption = z.infer<typeof startingEquipmentOptionSchema>

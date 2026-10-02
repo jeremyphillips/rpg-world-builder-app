@@ -228,6 +228,37 @@ function regenerateConnectionsLocationsPathForDuplicate(result: Record<string, u
   }
 }
 
+function regenerateStartingEquipmentPathForDuplicate(result: Record<string, unknown>): void {
+  if (!('characterCreation' in result)) return
+  const characterCreation = result.characterCreation
+  if (typeof characterCreation !== 'object' || characterCreation === null) return
+
+  const startingEquipment = (characterCreation as { startingEquipment?: unknown }).startingEquipment
+  if (typeof startingEquipment !== 'object' || startingEquipment === null) return
+
+  const options = (startingEquipment as { options?: unknown }).options
+  if (!Array.isArray(options)) return
+
+  result.characterCreation = {
+    ...characterCreation,
+    startingEquipment: {
+      ...startingEquipment,
+      options: options.map((option) => {
+        if (typeof option !== 'object' || option === null) return option
+        const items = (option as { items?: unknown }).items
+        if (!Array.isArray(items)) return option
+        return {
+          ...option,
+          items: items.map((item) => {
+            if (typeof item !== 'object' || item === null) return item
+            return { ...item, id: randomUUID() }
+          }),
+        }
+      }),
+    },
+  }
+}
+
 function regenerateMembersTitlesPathForDuplicate(result: Record<string, unknown>): void {
   if (!('members' in result)) return
   const members = result.members
@@ -266,6 +297,9 @@ function regenerateNestedPathForDuplicate(
       return
     case 'members.titles':
       regenerateMembersTitlesPathForDuplicate(result)
+      return
+    case 'characterCreation.startingEquipment':
+      regenerateStartingEquipmentPathForDuplicate(result)
       return
     default: {
       const _exhaustive: never = path

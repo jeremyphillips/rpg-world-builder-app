@@ -77,6 +77,7 @@ export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModi
 
 export const startingEquipmentGrantedItemFormSchema = grantedEquipmentItemFormSchema
   .extend({
+    id: z.string().min(1),
     modifiers: z.array(startingEquipmentModifierFormSchema).optional(),
   })
   .superRefine((row, ctx) => {
@@ -119,6 +120,18 @@ export function refineStartingEquipmentProficiencyLinkRow(
 }
 
 export const startingEquipmentChoiceItemFormSchema = equipmentGrantChoiceItemFormSchema
+  .safeExtend({
+    id: z.string().min(1),
+  })
+  .superRefine((row, ctx) => {
+    if (row.choose !== 1) {
+      addCustomRefinementIssue(
+        ctx,
+        'Starting equipment choice entries must choose exactly one item.',
+        ['choose'],
+      )
+    }
+  })
 
 export const startingEquipmentItemFormSchema = z.discriminatedUnion('itemKind', [
   startingEquipmentGrantedItemFormSchema,
@@ -142,6 +155,19 @@ export const startingEquipmentOptionFormSchema = z
         'wealth',
         'amount',
       ])
+    }
+
+    const seen = new Set<string>()
+    for (const [index, item] of row.items.entries()) {
+      if (!('id' in item) || !item.id) continue
+      if (seen.has(item.id)) {
+        addCustomRefinementIssue(ctx, 'Item ids must be unique within a package.', [
+          'items',
+          index,
+          'id',
+        ])
+      }
+      seen.add(item.id)
     }
   })
 
@@ -266,9 +292,14 @@ const startingEquipmentGrantTargetSourceOptions = toOptions(
   STARTING_EQUIPMENT_GRANT_TARGET_SOURCE_LABELS,
 )
 
+export function createStartingEquipmentContributionId(): string {
+  return crypto.randomUUID()
+}
+
 export function startingEquipmentItemFields(ctx: ContentFormCtx): FormItem[] {
   return equipmentGrantItemFields(ctx, {
     allowProficiencyChoiceTarget: true,
+    lockChooseToOne: true,
     kindSelectLabel: STARTING_EQUIPMENT_ITEM_TYPE_LABEL,
     itemKindOptions: startingEquipmentItemKindOptions,
     grantTargetSourceOptions: startingEquipmentGrantTargetSourceOptions,
@@ -299,6 +330,12 @@ export function startingEquipmentOptionItemFields(ctx: ContentFormCtx): FormItem
       name: 'items',
       legend: 'Items',
       addAction: { label: 'Add item' },
+      appendDefaults: () => ({
+        id: createStartingEquipmentContributionId(),
+        itemKind: 'grant',
+        grantTargetSource: 'equipment',
+        quantity: 1,
+      }),
       item: {
         variant: 'detailed',
         collapsible: true,

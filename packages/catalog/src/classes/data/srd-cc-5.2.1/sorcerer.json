@@ -145,22 +145,26 @@
               "kind": "grant",
               "equipmentSlug": "spear",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "spear"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dagger",
-              "quantity": 2
+              "quantity": 2,
+              "id": "dagger"
             },
             {
               "kind": "grant",
               "equipmentSlug": "crystal",
-              "quantity": 1
+              "quantity": 1,
+              "id": "crystal"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dungeoneers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "dungeoneers-pack"
             }
           ],
           "wealth": {

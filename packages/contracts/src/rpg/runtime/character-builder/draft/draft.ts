@@ -14,6 +14,7 @@ import { magicItemGrantSelectionSchema } from '../equipment/magic-item-selection
 import { characterRelationshipDraftEdgesSchema } from '../../character-relationships/draft'
 import { contentMediaSchema } from '../../../primitives/media/content-media'
 import { npcTemplateIdSchema } from '../../../vocab/npc/npc-template'
+import { classPackageChoiceSchema } from '../resolvers/equipment/class-package-choice'
 
 // ---------------------------------------------------------------------------
 // CharacterBuilderDraft — the temporary workflow object. Allowed to represent
@@ -144,12 +145,13 @@ export const characterBuilderDraftEquipmentSchema = z.object({
   /** Magic-item grant selections keyed by allowanceId + equipmentId (upserted). */
   magicItemSelections: z.array(magicItemGrantSelectionSchema).optional(),
   /**
-   * Package slot keys `${classId}:${optionId}:${itemIndex}` removed from the
-   * selected starting package (index into option `items[]`, not equipmentId).
+   * Class starting-package decision. Absent means unresolved.
+   * Selected, declined, and unavailable are explicit.
    */
-  removedPackageItemKeys: z.array(z.string().min(1)).default([]),
-  customized: z.boolean().default(false),
-  /** User continued without starting equipment when no valid options exist. */
+  classPackage: classPackageChoiceSchema.optional(),
+  /** Builder inventory was edited after the current package selection. */
+  editedSincePackageSelection: z.boolean().default(false),
+  /** Builder only: skip starting equipment as a whole. Assembly short-circuits. */
   skipped: z.boolean().optional(),
 })
 
@@ -196,7 +198,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 7
+export const CHARACTER_BUILDER_DRAFT_VERSION = 8
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

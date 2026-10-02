@@ -119,6 +119,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Dagger Kit',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 1,
@@ -131,6 +132,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Sword Kit',
           items: [
             {
+              id: 'longsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'longsword' },
               quantity: 1,
@@ -143,6 +145,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Pool Kit',
           items: [
             {
+              id: 'martial-choice',
               kind: 'choice',
               choose: 1,
               pool: {

@@ -78,12 +78,14 @@ const storedBard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'musical-instrument-choice',
               kind: 'choice',
               choose: 1,
               pool: {
@@ -100,6 +102,7 @@ const storedBard: ClassStored = {
           label: 'Broken Package',
           items: [
             {
+              id: 'missing-cloak',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'missing-cloak' },
               quantity: 1,
@@ -111,6 +114,7 @@ const storedBard: ClassStored = {
           label: 'Empty Pool Package',
           items: [
             {
+              id: 'gaming-set-choice',
               kind: 'choice',
               choose: 1,
               pool: {

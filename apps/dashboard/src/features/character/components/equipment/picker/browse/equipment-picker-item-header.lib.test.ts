@@ -87,8 +87,7 @@ function draftWithGoldOption(): CharacterBuilderDraft {
       mode: 'gold',
       purchases: [],
       magicItemSelections: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }

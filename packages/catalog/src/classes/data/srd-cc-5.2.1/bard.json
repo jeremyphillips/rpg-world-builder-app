@@ -158,13 +158,15 @@
               "kind": "grant",
               "equipmentSlug": "leather-armor",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "leather-armor"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dagger",
               "quantity": 2,
-              "equipped": true
+              "equipped": true,
+              "id": "dagger"
             },
             {
               "kind": "choice",
@@ -173,12 +175,14 @@
                 "source": "filtered",
                 "equipmentKind": "tool",
                 "toolCategory": "musical_instrument"
-              }
+              },
+              "id": "musical-instrument-choice"
             },
             {
               "kind": "grant",
               "equipmentSlug": "entertainers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "entertainers-pack"
             }
           ],
           "wealth": {

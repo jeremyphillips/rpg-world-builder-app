@@ -40,6 +40,7 @@ const storedBarbarian: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'greataxe',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'greataxe' },
               quantity: 1,
@@ -111,8 +112,7 @@ describe('resolveEquipmentStepModel', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -150,8 +150,7 @@ describe('resolveEquipmentStepModel', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

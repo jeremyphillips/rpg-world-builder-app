@@ -114,6 +114,7 @@ export * from './resolvers/equipment/resolve-equipment-magic-item-grant-step-iss
 export * from './resolvers/equipment/resolve-equipment-step-readiness'
 export * from './resolvers/equipment/get-unresolved-starting-equipment-dependencies'
 export * from './resolvers/equipment/resolve-proficiency-linked-equipment-grant'
+export * from './resolvers/equipment/class-package-choice'
 export * from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 export * from './resolvers/equipment/equipment-pool-choice-options'
 export * from './resolvers/equipment/format-equipment-picker-metadata'

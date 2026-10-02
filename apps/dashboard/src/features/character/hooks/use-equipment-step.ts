@@ -484,7 +484,7 @@ export function useEquipmentStep(args: {
 
     const nextSelection = { optionId, nestedSelections }
 
-    if (draft.equipment?.customized) {
+    if (draft.equipment?.editedSincePackageSelection) {
       setPendingSelection(nextSelection)
       return
     }

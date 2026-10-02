@@ -174,22 +174,26 @@ const monkClass: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'spear',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'spear' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 5,
             },
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
             },
             {
+              id: 'explorers-pack',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'explorers-pack' },
               quantity: 1,
@@ -253,8 +257,7 @@ function monkStandardDraft(extra?: Partial<ReturnType<typeof createEmptyCharacte
     equipment: {
       mode: 'package' as const,
       purchases: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
       ...extra?.equipment,
     },
     ...extra,
@@ -310,8 +313,7 @@ describe('buildStartingPackageConversionPreview', () => {
       equipment: {
         mode: 'package',
         purchases: [{ equipmentId: torch.id, quantity: 2, sourceMode: 'startingGold' }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     })
 
@@ -370,6 +372,7 @@ describe('buildStartingPackageConversionPreview', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'free-token',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'free-token' },
                   quantity: 1,
@@ -406,8 +409,7 @@ describe('buildStartingPackageConversionPreview', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -499,8 +501,7 @@ describe('buildStartingPackageConversionPatch', () => {
     ).toBeUndefined()
     expect(patch?.choiceSelections?.[monkToolChoiceSetId]).toEqual([lute.id])
     expect(patch?.equipment?.mode).toBe('gold')
-    expect(patch?.equipment?.removedPackageItemKeys).toEqual([])
-    expect(patch?.equipment?.customized).toBe(true)
+    expect(patch?.equipment?.editedSincePackageSelection).toBe(true)
     expect(
       canConvertStartingPackageToGold({
         preview,
@@ -525,6 +526,7 @@ describe('buildStartingPackageConversionPatch', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'torch',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'torch' },
                   quantity: 2,
@@ -569,8 +571,7 @@ describe('buildStartingPackageConversionPatch', () => {
             origin: 'packageConversion' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -603,8 +604,7 @@ describe('buildStartingPackageConversionPatch', () => {
             origin: 'picker',
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     })
 
@@ -620,6 +620,7 @@ describe('buildStartingPackageConversionPatch', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'arrows',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'arrows' },
                   quantity: 20,

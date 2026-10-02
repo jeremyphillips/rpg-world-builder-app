@@ -52,8 +52,7 @@ function monkStandardDraft(extra?: {
       mode: 'package' as const,
       purchases: extra?.purchases ?? [],
       magicItemSelections: extra?.magicItemSelections ?? [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }
@@ -127,8 +126,7 @@ export const GoldOptionEmptyState: Story = {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     },
     catalogIndex: equipmentStepCatalogIndexFixture,
@@ -235,8 +233,7 @@ export const PackageWithLinkedProficiencyItem: Story = {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     },
     catalogIndex: equipmentStepCatalogIndexFixture,
@@ -263,8 +260,7 @@ export const GoldPurchasesWithStackableQuantities: Story = {
             origin: 'picker',
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     },
     catalogIndex: equipmentStepCatalogIndexFixture,
@@ -311,6 +307,7 @@ const monkWithTorchGrantCatalog = {
                 label: 'Standard Equipment',
                 items: [
                   {
+                    id: 'torch',
                     kind: 'grant',
                     target: { source: 'equipment', equipmentSlug: 'torch' },
                     quantity: 2,
@@ -351,8 +348,7 @@ export const PackageConversionSameOriginMerge: Story = {
             origin: 'picker',
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     },
     catalogIndex: monkWithTorchGrantCatalog,
@@ -379,6 +375,7 @@ const packageOnlyClassCatalog = {
                 label: 'Standard Equipment',
                 items: [
                   {
+                    id: 'spear',
                     kind: 'grant',
                     target: { source: 'equipment', equipmentSlug: 'spear' },
                     quantity: 1,

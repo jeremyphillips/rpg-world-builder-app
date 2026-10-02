@@ -53,8 +53,7 @@ function buildGoldDraft(
         sourceMode: purchase.sourceMode ?? ('startingGold' as const),
         origin: 'picker' as const,
       })),
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }

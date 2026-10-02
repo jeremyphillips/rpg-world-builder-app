@@ -41,45 +41,53 @@
               "kind": "grant",
               "equipmentSlug": "leather-armor",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "leather-armor"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dagger",
               "quantity": 2,
-              "equipped": true
+              "equipped": true,
+              "id": "dagger"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shortsword",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "shortsword"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shortbow",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "shortbow"
             },
             {
               "kind": "grant",
               "equipmentSlug": "arrows",
-              "quantity": 20
+              "quantity": 20,
+              "id": "arrows"
             },
             {
               "kind": "grant",
               "equipmentSlug": "quiver",
-              "quantity": 1
+              "quantity": 1,
+              "id": "quiver"
             },
             {
               "kind": "grant",
               "equipmentSlug": "thieves-tools",
-              "quantity": 1
+              "quantity": 1,
+              "id": "thieves-tools"
             },
             {
               "kind": "grant",
               "equipmentSlug": "burglars-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "burglars-pack"
             }
           ],
           "wealth": {

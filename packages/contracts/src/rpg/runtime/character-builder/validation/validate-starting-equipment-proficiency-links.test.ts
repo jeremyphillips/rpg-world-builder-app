@@ -50,6 +50,7 @@ const monkWithLinkedGrant: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -61,6 +62,7 @@ const monkWithLinkedGrant: ClassStored = {
           label: 'Alternate Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -138,6 +140,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'class-tools-tool',
                   kind: 'grant',
                   target: { source: 'proficiency_choice', choiceId: 'class-tools' },
                   quantity: 1,
@@ -172,11 +175,13 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'class-tools-tool',
                   kind: 'grant',
                   target: { source: 'proficiency_choice', choiceId: 'class-tools' },
                   quantity: 1,
                 },
                 {
+                  id: 'class-tools-tool-2',
                   kind: 'grant',
                   target: { source: 'proficiency_choice', choiceId: 'class-tools' },
                   quantity: 1,
@@ -188,6 +193,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
               label: 'Alternate Equipment',
               items: [
                 {
+                  id: 'class-tools-tool',
                   kind: 'grant',
                   target: { source: 'proficiency_choice', choiceId: 'class-tools' },
                   quantity: 1,
@@ -228,6 +234,7 @@ describe('validateStartingEquipmentProficiencyLinks', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'class-tools-tool',
                   kind: 'grant',
                   target: { source: 'proficiency_choice', choiceId: 'class-tools' },
                   quantity: 1,
@@ -260,8 +267,8 @@ describe('findStartingEquipmentGrantsReferencingProficiencyChoice', () => {
     expect(
       findStartingEquipmentGrantsReferencingProficiencyChoice(monkWithLinkedGrant, 'class-tools'),
     ).toEqual([
-      { optionId: 'standard-equipment', itemIndex: 0 },
-      { optionId: 'alternate', itemIndex: 0 },
+      { optionId: 'standard-equipment', itemIndex: 0, entryId: 'class-tools-tool' },
+      { optionId: 'alternate', itemIndex: 0, entryId: 'class-tools-tool' },
     ])
   })
 })

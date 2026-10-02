@@ -37,17 +37,20 @@
               "kind": "grant",
               "equipmentSlug": "greataxe",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "greataxe"
             },
             {
               "kind": "grant",
               "equipmentSlug": "javelin",
-              "quantity": 4
+              "quantity": 4,
+              "id": "javelin"
             },
             {
               "kind": "grant",
               "equipmentSlug": "explorers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "explorers-pack"
             }
           ],
           "wealth": {

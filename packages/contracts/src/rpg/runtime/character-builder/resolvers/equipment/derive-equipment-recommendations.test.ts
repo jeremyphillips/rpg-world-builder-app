@@ -179,12 +179,14 @@ const storedFighter: ClassStored = {
           label: 'Heavy Armor',
           items: [
             {
+              id: 'chain-mail',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'chain-mail' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'longsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'longsword' },
               quantity: 1,
@@ -244,6 +246,7 @@ const storedWizard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 2,
@@ -412,8 +415,7 @@ describe('deriveEquipmentRecommendations', () => {
             sourceMode: 'startingGold',
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     })
     const ownedRecommendations = deriveEquipmentRecommendations({
@@ -502,6 +504,7 @@ describe('deriveEquipmentRecommendations', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'holy-symbol',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'holy-symbol' },
                   quantity: 1,
@@ -724,17 +727,20 @@ const storedBard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 2,
             },
             {
+              id: 'musical-instrument-choice',
               kind: 'choice',
               choose: 1,
               pool: {
@@ -792,6 +798,7 @@ const storedMonk: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -914,7 +921,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
         [bardToolChoiceSetId]: [lute.id, flute.id, drum.id],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -978,7 +985,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -1025,7 +1032,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedMonk.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -1045,7 +1052,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -1100,7 +1107,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({

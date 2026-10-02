@@ -398,8 +398,7 @@ describe('finalizePcCharacterBuild', () => {
           purchases: [
             { equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
           ],
-          removedPackageItemKeys: [],
-          customized: true,
+          editedSincePackageSelection: true,
         },
       }),
       context,

@@ -103,8 +103,9 @@ function buildEquipmentDraftFromPurchase(args: {
     mode: resolveCachedEquipmentMode(draft, catalogIndex),
     purchases,
     magicItemSelections: draft.equipment?.magicItemSelections ?? [],
-    removedPackageItemKeys: draft.equipment?.removedPackageItemKeys ?? [],
-    customized: sourceMode === 'manual' ? true : (draft.equipment?.customized ?? false),
+    classPackage: draft.equipment?.classPackage,
+    editedSincePackageSelection:
+      sourceMode === 'manual' ? true : (draft.equipment?.editedSincePackageSelection ?? false),
     skipped: false,
   }
 }
@@ -141,8 +142,7 @@ function applySkipStartingEquipmentAction(): EquipmentStepActionResult {
         mode: 'package',
         purchases: [],
         magicItemSelections: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
         skipped: true,
       },
     },
@@ -157,8 +157,7 @@ function applyRemoveEntryAction(args: {
   const current = draft.equipment ?? {
     mode: 'package' as const,
     purchases: [],
-    removedPackageItemKeys: [],
-    customized: false,
+    editedSincePackageSelection: false,
   }
 
   if (target.kind === 'package') {

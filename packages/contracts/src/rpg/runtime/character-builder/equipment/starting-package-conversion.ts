@@ -324,16 +324,7 @@ function listPackageConversionItems(args: {
     draft,
     catalogIndex,
   )
-  const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
-
   return resolved.items.flatMap((item, itemIndex) => {
-    const packageItemKey = startingEquipmentPackageItemKey(
-      context.classId,
-      departingOptionId,
-      itemIndex,
-    )
-    if (removedKeys.has(packageItemKey)) return []
-
     const conversionItem = buildConversionItem({
       classId: context.classId,
       departingOptionId,
@@ -531,8 +522,7 @@ export function buildStartingPackageConversionPatch(args: {
       mode: 'gold',
       purchases: mergeConversionPurchases({ ...args, preview }),
       magicItemSelections: args.draft.equipment?.magicItemSelections ?? [],
-      removedPackageItemKeys: [],
-      customized: conversionWasCustomized(preview, args.selectedPackageItemKeys),
+      editedSincePackageSelection: conversionWasCustomized(preview, args.selectedPackageItemKeys),
       skipped: false,
     },
   }

@@ -250,10 +250,11 @@ describe('nested grant validation integration', () => {
       label: 'Standard',
       items: [
         {
-          itemKind: 'choice',
-          choose: 1,
-          poolSource: 'explicit',
-          poolEquipmentSlugs: [],
+          id: 'starting-equipment-item-test',
+          itemKind: 'grant',
+          grantTargetSource: 'equipment',
+          equipmentSlug: '',
+          quantity: 1,
         },
       ],
     }
@@ -270,13 +271,6 @@ describe('nested grant validation integration', () => {
 
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => {
-      expect(screen.getByRole('combobox', { name: /equipment/i })).toHaveAttribute(
-        'aria-invalid',
-        'true',
-      )
-    })
-
     const issues = prepareFormIssues(
       (
         await makeResolver(startingEquipmentGrantSchema, optionFields)(
@@ -289,7 +283,7 @@ describe('nested grant validation integration', () => {
     )
 
     expect(issues.map((issue) => issue.presentationPath ?? issue.path)).toContain(
-      'options.0.items.0.poolEquipmentSlugs',
+      'options.0.items.0.equipmentSlug',
     )
   })
 

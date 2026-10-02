@@ -92,6 +92,7 @@ describe('manual equipment does not steer the class package', () => {
             label: 'Spear Kit',
             items: [
               {
+                id: 'spear',
                 kind: 'grant' as const,
                 target: { source: 'equipment' as const, equipmentSlug: 'spear' },
                 quantity: 1,
@@ -104,6 +105,7 @@ describe('manual equipment does not steer the class package', () => {
             label: 'Axe Kit',
             items: [
               {
+                id: 'battleaxe',
                 kind: 'grant' as const,
                 target: { source: 'equipment' as const, equipmentSlug: 'battleaxe' },
                 quantity: 1,
@@ -287,6 +289,7 @@ describe('package, role, and manual quantities stay partitioned', () => {
             label: 'Spear Kit',
             items: [
               {
+                id: 'spear',
                 kind: 'grant' as const,
                 target: { source: 'equipment' as const, equipmentSlug: 'spear' },
                 quantity: 8,
@@ -317,8 +320,7 @@ describe('package, role, and manual quantities stay partitioned', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
   }

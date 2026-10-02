@@ -105,12 +105,14 @@ const storedDruid: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'shield',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'shield' },
               quantity: 1,
@@ -243,16 +245,14 @@ describe('assembleStartingEquipment', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [`${druidClass.id}:standard-equipment:0`],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
     const { equipment, wealth } = assembleStartingEquipment(draft, catalogIndex)
 
     expect(wealth).toEqual({ cp: 0, sp: 0, gp: 8, pp: 0 })
-    expect(equipment.armor).toHaveLength(1)
-    expect(equipment.armor[0]?.equipmentId).toBe(shield.id)
+    expect(equipment.armor.map((entry) => entry.equipmentId)).toEqual([leatherArmor.id, shield.id])
     expect(equipment.gear).toEqual([
       {
         equipmentId: `${RULESET}:rope`,
@@ -294,6 +294,7 @@ const monkWithLinkedGrant: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -480,8 +481,7 @@ describe('proficiency-linked starting equipment lifecycle', () => {
         mode: 'gold' as const,
         purchases: [],
         magicItemSelections: [{ allowanceId, equipmentId: commonPotion.id, quantity: 1 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

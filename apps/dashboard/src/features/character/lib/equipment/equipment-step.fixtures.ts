@@ -66,12 +66,14 @@ export const equipmentStepBardClassFixture = makeClassStored({
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'musical-instrument-choice',
               kind: 'choice',
               choose: 1,
               pool: {
@@ -115,22 +117,26 @@ export const equipmentStepMonkClassFixture = makeClassStored({
           label: 'Standard Equipment',
           items: [
             {
+              id: 'spear',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'spear' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 5,
             },
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
             },
             {
+              id: 'explorers-pack',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'explorers-pack' },
               quantity: 1,

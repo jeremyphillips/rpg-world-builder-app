@@ -27,6 +27,9 @@ export function readSelectedStartingEquipmentOptionId(
   draft: CharacterBuilderDraft,
   classId: string,
 ): string | undefined {
+  const choice = draft.equipment?.classPackage
+  if (choice?.state === 'selected') return choice.packageId
+  if (choice && choice.state !== 'unresolved') return undefined
   return draft.choiceSelections[startingEquipmentChoiceSetId(classId)]?.[0]
 }
 

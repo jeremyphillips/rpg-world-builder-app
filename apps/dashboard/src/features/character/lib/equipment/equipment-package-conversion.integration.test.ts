@@ -41,17 +41,20 @@ const monkWithTorchGrant = makeClassStored({
           label: 'Standard Equipment',
           items: [
             {
+              id: 'spear',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'spear' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 5,
             },
             {
+              id: 'torch',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'torch' },
               quantity: 2,
@@ -90,8 +93,7 @@ function monkPackageDraft() {
     equipment: {
       mode: 'package' as const,
       purchases: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }

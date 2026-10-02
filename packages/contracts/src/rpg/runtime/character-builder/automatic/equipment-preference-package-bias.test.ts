@@ -90,16 +90,19 @@ const packageFighter: ClassStored = {
           label: 'Heavy Armor',
           items: [
             {
+              id: 'chain-mail',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'chain-mail' },
               quantity: 1,
             },
             {
+              id: 'greatsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'greatsword' },
               quantity: 1,
             },
             {
+              id: 'javelin',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'javelin' },
               quantity: 1,
@@ -112,16 +115,19 @@ const packageFighter: ClassStored = {
           label: 'Skirmisher',
           items: [
             {
+              id: 'studded-leather',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'studded-leather' },
               quantity: 1,
             },
             {
+              id: 'scimitar',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'scimitar' },
               quantity: 1,
             },
             {
+              id: 'longbow',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'longbow' },
               quantity: 1,
@@ -151,6 +157,7 @@ const poolFighter: ClassStored = {
           label: 'Dagger Kit',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 1,
@@ -163,6 +170,7 @@ const poolFighter: ClassStored = {
           label: 'Pool Kit',
           items: [
             {
+              id: 'martial-choice',
               kind: 'choice',
               choose: 1,
               pool: { source: 'filtered', equipmentKind: 'weapon', weaponCategory: 'martial' },
@@ -191,6 +199,7 @@ const packageWizard: ClassStored = {
           label: 'Scholar',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 1,
@@ -203,6 +212,7 @@ const packageWizard: ClassStored = {
           label: 'Field Kit',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
@@ -230,6 +240,7 @@ const unmatchedWizard: ClassStored = {
           label: 'Scholar',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 1,
@@ -520,8 +531,7 @@ describe('equipment preference package bias', () => {
             sourceMode: 'startingGold' as const,
           },
         ],
-        removedPackageItemKeys: [`${packageFighter.id}:heavy-armor:0`],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
@@ -536,8 +546,8 @@ describe('equipment preference package bias', () => {
     expect(changed.equipment?.purchases).toEqual([
       { equipmentId: `${RULESET}:rope`, quantity: 1, sourceMode: 'manual' },
     ])
-    expect(changed.equipment?.removedPackageItemKeys).toEqual([])
-    expect(changed.equipment?.customized).toBe(false)
+    expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
+    expect(changed.equipment?.editedSincePackageSelection).toBe(false)
     expect(changed.equipment?.mode).toBe('package')
 
     const wizardFill = resolveAutomaticChoiceSelections({

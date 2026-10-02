@@ -15,8 +15,8 @@ function clearClassOwnedEquipmentChannel(
     mode: 'package',
     purchases: equipment.purchases.filter((purchase) => purchase.sourceMode === 'manual'),
     grants: [],
-    removedPackageItemKeys: [],
-    customized: false,
+    classPackage: { state: 'unresolved' },
+    editedSincePackageSelection: false,
     skipped: false,
   }
 }

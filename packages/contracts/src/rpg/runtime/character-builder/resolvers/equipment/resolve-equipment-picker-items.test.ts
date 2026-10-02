@@ -235,8 +235,7 @@ describe('resolveEquipmentPickerItems', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 

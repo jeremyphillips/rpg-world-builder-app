@@ -243,29 +243,34 @@
             {
               "kind": "grant",
               "equipmentSlug": "dagger",
-              "quantity": 2
+              "quantity": 2,
+              "id": "dagger"
             },
             {
               "kind": "grant",
               "equipmentSlug": "arcane-staff",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "arcane-staff"
             },
             {
               "kind": "grant",
               "equipmentSlug": "robe",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "robe"
             },
             {
               "kind": "grant",
               "equipmentSlug": "spellbook",
-              "quantity": 1
+              "quantity": 1,
+              "id": "spellbook"
             },
             {
               "kind": "grant",
               "equipmentSlug": "scholars-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "scholars-pack"
             }
           ],
           "wealth": {

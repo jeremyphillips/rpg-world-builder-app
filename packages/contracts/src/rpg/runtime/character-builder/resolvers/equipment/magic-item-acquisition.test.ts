@@ -157,8 +157,7 @@ function draftWithGoldOption() {
       mode: 'gold' as const,
       purchases: [],
       magicItemSelections: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }
@@ -319,6 +318,7 @@ describe('magic item acquisition contracts', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'rope',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'rope' },
                   quantity: 1,
@@ -357,8 +357,7 @@ describe('magic item acquisition contracts', () => {
         mode: 'package' as const,
         purchases: [],
         magicItemSelections: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

@@ -118,8 +118,7 @@ function buildMagicItemContext() {
       mode: 'gold' as const,
       purchases: [],
       magicItemSelections: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 

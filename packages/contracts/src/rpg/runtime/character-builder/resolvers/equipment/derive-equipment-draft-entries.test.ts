@@ -103,12 +103,14 @@ const storedDruid: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'shield',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'shield' },
               quantity: 1,
@@ -165,8 +167,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -200,7 +201,7 @@ describe('deriveEquipmentDraftEntries', () => {
     ])
   })
 
-  it('omits removed package slots by item key', () => {
+  it('keeps every package item when the draft has no quantity overrides', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
@@ -210,29 +211,13 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [
-          startingEquipmentPackageItemKey(storedDruid.id, 'standard-equipment', 0),
-        ],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
     const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
 
-    expect(equipment.armor).toEqual([
-      {
-        equipmentId: shield.id,
-        quantity: 1,
-        equipped: true,
-        sources: [
-          {
-            kind: 'classStartingEquipment',
-            sourceId: storedDruid.id,
-            grantId: 'standard-equipment',
-          },
-        ],
-      },
-    ])
+    expect(equipment.armor.map((entry) => entry.equipmentId)).toEqual([leatherArmor.id, shield.id])
   })
 
   it('includes package items when draft mode is stale gold but the selected option is a package', () => {
@@ -245,8 +230,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -268,8 +252,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -333,8 +316,7 @@ describe('deriveEquipmentDraftEntries', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
@@ -391,6 +373,7 @@ describe('deriveEquipmentDraftEntries', () => {
               label: 'Sword Kit',
               items: [
                 {
+                  id: 'longsword',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'longsword' },
                   quantity: 1,
@@ -423,8 +406,7 @@ describe('deriveEquipmentDraftEntries', () => {
         mode: 'package' as const,
         purchases: [],
         grants: [{ equipmentId: longsword.id, quantity: 1 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -459,6 +441,7 @@ describe('deriveEquipmentDraftEntries', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'leather-armor',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'leather-armor' },
                   quantity: 8,
@@ -498,8 +481,7 @@ describe('deriveEquipmentDraftEntries', () => {
               contribution: 'additional' as const,
             },
           ],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
         },
       }
       return inventoryQuantityForEquipmentId(
