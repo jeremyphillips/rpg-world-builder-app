@@ -113,7 +113,7 @@ export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 /** Sentinel for “all rarities” in the magic-items rarity filter. */
 export const EQUIPMENT_PICKER_RARITY_ALL = '__all_rarities__' as const
 
-export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Category'
+export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Equipment kind'
 export const EQUIPMENT_PICKER_RARITY_LABEL = 'Rarity'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'

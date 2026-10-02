@@ -47,6 +47,8 @@ import {
   type EquipmentStepRemoveTarget,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
+  getEquipmentKindCollectionLabel,
+  getEquipmentKindCompactLabel,
 } from '@rpg/contracts'
 
 import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
@@ -128,7 +130,17 @@ export function formatEquipmentGoldOptionStartingDescription(
   return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}.`
 }
 
-export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = 'Magic Items'
+export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
+  weapons: getEquipmentKindCollectionLabel('weapon'),
+  armor: getEquipmentKindCollectionLabel('armor'),
+  tools: getEquipmentKindCollectionLabel('tool'),
+  gear: getEquipmentKindCompactLabel('adventuring_gear'),
+  magicItems: getEquipmentKindCollectionLabel('magic_item'),
+  vehicles: getEquipmentKindCollectionLabel('vehicle'),
+  mounts: getEquipmentKindCollectionLabel('mount'),
+} as const satisfies Record<keyof CharacterEquipment, string>
+
+export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems
 
 export const EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL = 'Choose magic items'
 
@@ -273,16 +285,6 @@ export function formatEquipmentInventoryRemoveLabel(name: string, quantity: numb
   if (quantity <= 1) return `${EQUIPMENT_STEP_REMOVE_ITEM_LABEL} ${name}`
   return `${EQUIPMENT_STEP_REMOVE_ITEM_LABEL} all ${quantity} ${name}`
 }
-
-export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
-  weapons: 'Weapons',
-  armor: 'Armor',
-  tools: 'Tools',
-  gear: 'Gear',
-  magicItems: 'Magic Items',
-  vehicles: 'Vehicles',
-  mounts: 'Mounts',
-} as const satisfies Record<keyof CharacterEquipment, string>
 
 const EQUIPMENT_CHOICE_TYPES = STEP_CHOICE_TYPES_BY_STEP.equipment
 

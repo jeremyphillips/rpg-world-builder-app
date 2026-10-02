@@ -13,11 +13,11 @@ import {
   formatSkillProficiencyGrantSentence,
   formatToolProficiencyGrantSentence,
   formatWeaponProficiencyGrantSentence,
-  getArmorCategoryCompactLabel,
+  getArmorCategoryCollectionLabel,
   getArmorCategoryScopeForm,
   getSkillName,
   getToolCategoryLabel,
-  getWeaponCategoryCompactLabel,
+  getWeaponCategoryCollectionLabel,
   getWeaponCategorySentenceForm,
   isMeaningfulToolProficiencyPool,
 } from '@rpg/contracts'
@@ -210,7 +210,7 @@ export function weaponProficiencyGrantDetail(
 
   if (row.proficiencySource === 'category') {
     const labels = (row.weaponProficiencyCategories ?? []).map((category) =>
-      getWeaponCategoryCompactLabel(category),
+      getWeaponCategoryCollectionLabel(category),
     )
     if (!labels.length) return undefined
     return formatCompactMetadataList(labels)
@@ -655,7 +655,7 @@ export function armorTrainingGrantDetail(
 
   if (row.proficiencySource === 'category') {
     const labels = (row.armorTrainingCategories ?? []).map((category) =>
-      getArmorCategoryCompactLabel(category),
+      getArmorCategoryCollectionLabel(category),
     )
     if (!labels.length) return undefined
     return formatCompactMetadataList(labels)

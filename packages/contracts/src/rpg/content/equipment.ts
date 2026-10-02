@@ -134,6 +134,8 @@ export {
   EQUIPMENT_KIND_LABELS,
   EQUIPMENT_KINDS,
   equipmentKindSchema,
+  getEquipmentKindCollectionLabel,
+  getEquipmentKindCompactLabel,
   getEquipmentKindEntry,
   getEquipmentKindLabel,
   type EquipmentKind,

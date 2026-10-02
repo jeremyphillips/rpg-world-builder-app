@@ -515,7 +515,7 @@ Closed game-term maps live in `rpg/vocab/`. Shared shapes in `rpg/vocab/types.ts
 
 ```ts
 /** A value within a taxonomy. */
-export type GameTermEntry = { label; description; compactLabel?; sentence? }
+export type GameTermEntry = { label; description; compactLabel?; collectionLabel?; sentence? }
 
 /** The taxonomy concept (`*_TERM`) — same shape today; distinct for APIs and future metadata. */
 export type VocabularyTerm = GameTermEntry
@@ -550,6 +550,11 @@ belongs in that registry.
 
 - `vocabularyTermLabel(term, { number, casing })` — title or sentence forms from curated fields
 - `vocabularyTermFieldCopy(term, { multiple? })` — default form `{ label, placeholder }`
+- `getTermCompactLabel(entry)` — short identity; `getTermCollectionLabel(entry)` — set/category copy (sentence case)
+
+Do not use `compactLabel` for collection phrases. Dashboard hub/overview surfaces may
+title-case collection semantics for navigation; that presentation layer stays in apps,
+not in `collectionLabel`.
 
 **Relationship descriptions** (`GameTermEntry.description` on connection kinds and similar
 cross-content edges) must be **perspective- and context-neutral**. They appear in kind

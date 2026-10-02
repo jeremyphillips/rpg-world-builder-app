@@ -26,7 +26,7 @@ import {
 const rows: EquipmentInventoryRow[] = [
   {
     group: 'magicItems',
-    groupLabel: 'Magic Items',
+    groupLabel: 'Magic items',
     entry: {
       equipmentId: 'srd-cc-5.2.1:potion-of-healing',
       quantity: 2,
@@ -139,7 +139,7 @@ describe('EquipmentInventoryManageDisclosureCard', () => {
       ...rows,
       {
         group: 'magicItems',
-        groupLabel: 'Magic Items',
+        groupLabel: 'Magic items',
         entry: {
           equipmentId: equipmentStepPotionOfHealingFixture.id,
           quantity: 1,

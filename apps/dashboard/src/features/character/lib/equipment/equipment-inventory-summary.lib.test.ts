@@ -150,7 +150,7 @@ describe('equipment-inventory-summary.lib', () => {
   it('formats added-equipment provenance across grant and purchase sources', () => {
     const grant = row({
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       entry: {
         equipmentId: 'srd-cc-5.2.1:potion-of-healing',
         quantity: 2,
@@ -165,7 +165,7 @@ describe('equipment-inventory-summary.lib', () => {
     })
     const purchased = row({
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       entry: {
         equipmentId: 'srd-cc-5.2.1:potion-of-healing',
         quantity: 1,
@@ -334,7 +334,7 @@ describe('equipment-inventory-summary.lib', () => {
       'included',
       context,
     )
-    const magicItems = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Magic Items')
+    const magicItems = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Magic items')
 
     expect(magicItems?.entries).toHaveLength(1)
     expect(magicItems?.entries[0]).toMatchObject({

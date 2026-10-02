@@ -1,4 +1,9 @@
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import {
+  getTermCollectionLabel,
+  getTermCompactLabel,
+  type GameTermEntry,
+  type VocabularyTerm,
+} from '../types'
 import { vocabEnumFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
@@ -17,10 +22,12 @@ export const EQUIPMENT_KIND_TERM = {
 export const EQUIPMENT_KIND_ENTRIES = {
   weapon: {
     label: 'Weapon',
+    collectionLabel: 'Weapons',
     description: 'A weapon item such as a sword, bow, or thrown weapon.',
   },
   armor: {
     label: 'Armor',
+    collectionLabel: 'Armor',
     description: 'Armor or a shield used for protection.',
     sentence: {
       singular: 'piece of armor',
@@ -30,6 +37,7 @@ export const EQUIPMENT_KIND_ENTRIES = {
   adventuring_gear: {
     label: 'Adventuring Gear',
     compactLabel: 'Gear',
+    collectionLabel: 'Adventuring gear',
     description: 'General equipment used while adventuring.',
     sentence: {
       singular: 'piece of adventuring gear',
@@ -38,22 +46,27 @@ export const EQUIPMENT_KIND_ENTRIES = {
   },
   tool: {
     label: 'Tool',
+    collectionLabel: 'Tools',
     description: 'A tool set, kit, game set, or musical instrument.',
   },
   mount: {
     label: 'Mount',
+    collectionLabel: 'Mounts',
     description: 'A rideable animal or similar mount.',
   },
   vehicle: {
     label: 'Vehicle',
+    collectionLabel: 'Vehicles',
     description: 'A land or water vehicle.',
   },
   service: {
     label: 'Service',
+    collectionLabel: 'Services',
     description: 'A purchasable service.',
   },
   magic_item: {
     label: 'Magic Item',
+    collectionLabel: 'Magic items',
     description: 'A magical item such as a potion, scroll, or wondrous item.',
   },
 } as const satisfies Record<string, GameTermEntry>
@@ -76,6 +89,18 @@ export const equipmentKindSchema = vocabEnumFromEntries(EQUIPMENT_KIND_ENTRIES)
 /** Returns the display name for an equipment kind. Falls back to the raw value. */
 export function getEquipmentKindLabel(kind: string): string {
   return EQUIPMENT_KIND_LABELS[kind as EquipmentKind] ?? kind
+}
+
+/** Returns the collection label for an equipment kind. Falls back to the raw value. */
+export function getEquipmentKindCollectionLabel(kind: string): string {
+  const entry = getEquipmentKindEntry(kind)
+  return entry ? getTermCollectionLabel(entry) : kind
+}
+
+/** Returns the compact label for an equipment kind. Falls back to identity `label`. */
+export function getEquipmentKindCompactLabel(kind: string): string {
+  const entry = getEquipmentKindEntry(kind)
+  return entry ? getTermCompactLabel(entry) : kind
 }
 
 /** Returns the reference entry for an equipment kind, if known. */

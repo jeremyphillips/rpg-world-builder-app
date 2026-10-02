@@ -30,6 +30,9 @@ import {
   resolveTraitDisplay,
   resolveWeaponAttackAbilityModifier,
   weaponAttackBonus,
+  getWeaponCategoryLabel,
+  getArmorCategoryLabel,
+  getToolCategoryLabel,
 } from '@rpg/contracts'
 
 import { resolveLanguagePreviewLabel } from '../builder-preview/language-preview-label'
@@ -238,7 +241,7 @@ function buildProficienciesSection(
           ? (catalogIndex.equipment.get(weapon.weaponId)?.name ??
             formatContentReferenceLabel(weapon.weaponId))
           : weapon.weaponCategory
-            ? formatContentReferenceLabel(weapon.weaponCategory)
+            ? getWeaponCategoryLabel(weapon.weaponCategory)
             : 'Weapon proficiency',
       })),
     ),
@@ -251,7 +254,7 @@ function buildProficienciesSection(
           ? (catalogIndex.equipment.get(tool.toolId)?.name ??
             formatContentReferenceLabel(tool.toolId))
           : tool.toolCategory
-            ? formatContentReferenceLabel(tool.toolCategory)
+            ? getToolCategoryLabel(tool.toolCategory)
             : 'Tool proficiency',
       })),
     ),
@@ -260,7 +263,7 @@ function buildProficienciesSection(
       CHARACTER_PROFICIENCY_GROUP_LABELS.armor,
       source.proficiencies.armor.map((armor, index) => ({
         id: `${armor.armorCategory}-${index}`,
-        label: formatContentReferenceLabel(armor.armorCategory),
+        label: getArmorCategoryLabel(armor.armorCategory),
       })),
     ),
   ].filter((group): group is CharacterProficiencyGroup => group !== undefined)

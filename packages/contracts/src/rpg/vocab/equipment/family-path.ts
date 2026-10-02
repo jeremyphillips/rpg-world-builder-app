@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { EQUIPMENT_KIND_LABELS, type EquipmentKind } from './kind'
+import { getEquipmentKindCollectionLabel, type EquipmentKind } from './kind'
 
 /** URL path segments for equipment family overviews (kebab-case). */
 export const EQUIPMENT_FAMILY_PATHS = [
@@ -47,5 +47,5 @@ export function isEquipmentFamilyPath(path: string): path is EquipmentFamilyPath
 
 export function getEquipmentFamilyLabel(path: EquipmentFamilyPath): string {
   const kind = FAMILY_TO_KIND[path]
-  return EQUIPMENT_KIND_LABELS[kind]
+  return getEquipmentKindCollectionLabel(kind)
 }
