@@ -116,10 +116,10 @@ describe('equipment-compact-display', () => {
     })
   })
 
-  it('caps armor comparison groups and prefers restriction over weight', () => {
+  it('builds armor comparison groups with summary category labels', () => {
     expect(buildEquipmentCompactSummary(plateArmor)).toEqual({
       kindLabel: 'Armor',
-      comparisonGroups: ['AC 18', 'Heavy Armor', 'Str 15 required'],
+      comparisonGroups: ['AC 18', 'Heavy'],
     })
   })
 

@@ -262,6 +262,7 @@ function QuickNpcAdditionalEquipmentSection({
           id="quick-npc-additional-equipment"
           label="Add equipment"
           labelVisibility="srOnly"
+          multiple={false}
           options={comboboxOptions}
           value=""
           disabled={addDisabled}

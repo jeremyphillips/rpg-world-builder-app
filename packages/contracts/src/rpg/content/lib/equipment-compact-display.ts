@@ -5,7 +5,7 @@ import {
   getEquipmentKindLabel,
   getEquipmentSpellcastingGearKind,
 } from '../equipment'
-import { getArmorCategoryLabel } from '../../vocab/armor/category'
+import { getArmorCategorySummaryLabel } from '../../vocab/armor/category'
 import { getPhysicalDamageTypeLabel } from '../../vocab/damage/physical'
 import { getGearKindLabel } from '../../vocab/equipment/gear-kind'
 import {
@@ -117,7 +117,7 @@ function formatCompactArmorClass(equipment: Equipment): string | undefined {
 function formatCompactCategory(equipment: Equipment): string | undefined {
   switch (equipment.kind) {
     case 'armor':
-      return getArmorCategoryLabel(equipment.category)
+      return getArmorCategorySummaryLabel(equipment.category)
     case 'tool':
       return getToolCategoryLabel(equipment.toolCategory)
     case 'vehicle':
@@ -241,7 +241,7 @@ export const COMPACT_METADATA_LAYOUT = {
     fields: ['damage', 'properties'],
   },
   armor: {
-    fields: ['armorClass', 'category', { firstAvailable: ['restriction', 'weight'] }],
+    fields: ['armorClass', 'category'],
   },
   tool: {
     fields: ['category', { firstAvailable: ['crafts', 'weight'] }],
