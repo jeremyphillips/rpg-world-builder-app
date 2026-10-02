@@ -58,6 +58,8 @@ export function runAffectedTests(options) {
     inventory?.write(chunk)
   }
 
+  const affectedFilter = process.env.TURBO_AFFECTED_FILTER ?? '...[HEAD]'
+
   const child = spawn(
     'pnpm',
     [
@@ -70,7 +72,7 @@ export function runAffectedTests(options) {
       '--ui=stream',
       '--log-order=grouped',
       '--output-logs=errors-only',
-      '--filter=...[HEAD]',
+      `--filter=${affectedFilter}`,
       `--log-file=${turboLogPath}`,
     ],
     {

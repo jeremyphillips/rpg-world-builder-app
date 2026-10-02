@@ -43,9 +43,9 @@ narrowest relevant Vitest paths → targeted typecheck/lint when useful → broa
   radius, or unclear regressions justify the cost—not as a routine end-of-task step.
   Broad affected typecheck/tests run at **push** via `pnpm gate:pre-push`, not on every
   commit.
-- **`pnpm test:affected:gate`:** collect-all affected package tests (`--continue=always`,
-  failure summary, nonzero when any package fails). Invoked from `gate:pre-push`; do not
-  run manually before push unless debugging—the pre-push hook runs it.
+- **`pnpm test:affected:gate`:** collect-all package tests on the `…[origin/main]` graph
+  (`--continue=always`, failure summary, nonzero when any package fails). Invoked from
+  `gate:pre-push`; do not run manually before push unless debugging—the pre-push hook runs it.
 - **`pnpm test:affected:collect`:** optional **diagnostic** on the same `...[HEAD]` graph
   (continue after failures, inventory at `.tmp/test-affected-collect.log`). Not required
   before `test:affected:gate` or to finish a task; not a hook or CI gate.
@@ -71,7 +71,7 @@ Commit message format is enforced in **commit-msg** (`commitlint`), after pre-co
 **Pre-push** (broad affected correctness before sharing; single script):
 
 ```text
-pnpm gate:pre-push   # typecheck:affected → test:affected:gate → coverage → gate:fallow-health:coverage → build
+pnpm gate:pre-push   # typecheck:ci → test:affected:gate (…[origin/main]) → coverage → gate:fallow-health:coverage → build
 ```
 
 `pnpm build` excludes `@rpg/bench` (internal dev tooling). Use `pnpm build:bench`

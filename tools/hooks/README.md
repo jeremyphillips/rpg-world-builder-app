@@ -5,11 +5,11 @@ Shell helpers invoked from [`.husky/`](../../.husky/). Package scripts in the ro
 
 ## Tiered gates
 
-| When       | Scope                      | Tests / types                              | Coverage / CRAP     |
-| ---------- | -------------------------- | ------------------------------------------ | ------------------- |
-| Pre-commit | Staged + cheap repo checks | none (focused tests during dev)            | complexity only     |
-| Pre-push   | Affected + full            | `typecheck:affected`, `test:affected:gate` | via `pnpm coverage` |
-| CI         | Full                       | via `pnpm coverage`                        | coverage + CRAP     |
+| When       | Scope                      | Tests / types                        | Coverage / CRAP     |
+| ---------- | -------------------------- | ------------------------------------ | ------------------- |
+| Pre-commit | Staged + cheap repo checks | none (focused tests during dev)      | complexity only     |
+| Pre-push   | Since `origin/main` + full | `typecheck:ci`, `test:affected:gate` | via `pnpm coverage` |
+| CI         | Full                       | via `pnpm coverage`                  | coverage + CRAP     |
 
 **Pre-commit** sequence (fast checkpoint):
 
@@ -25,7 +25,7 @@ pnpm lint-staged
 **Pre-push** (`pnpm gate:pre-push`):
 
 ```text
-pnpm typecheck:affected
+pnpm typecheck:ci
 → pnpm test:affected:gate
 → pnpm coverage
 → pnpm gate:fallow-health:coverage
@@ -51,11 +51,11 @@ requests a **commit/checkpoint** (pre-commit + commit-msg) or **push/PR/full val
 
 ## Affected test commands
 
-| Script                  | Role                                                                                  |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| `test:affected:local`   | Interactive fail-fast affected tests (`TURBO_CONCURRENCY=2`)                          |
-| `test:affected:gate`    | Pre-push gate: `--continue=always`, prints failed packages, exits nonzero if any fail |
-| `test:affected:collect` | Optional diagnostic; same graph as gate, writes `.tmp/test-affected-collect.log`      |
+| Script                  | Role                                                                                        |
+| ----------------------- | ------------------------------------------------------------------------------------------- |
+| `test:affected:local`   | Interactive fail-fast affected tests (`TURBO_CONCURRENCY=2`)                                |
+| `test:affected:gate`    | Pre-push gate (`…[origin/main]`): `--continue=always`, failure summary, nonzero on any fail |
+| `test:affected:collect` | Optional diagnostic (`…[HEAD]`); writes `.tmp/test-affected-collect.log`                    |
 
 Do **not** require `test:affected:collect` before `test:affected:gate` or before push—the
 gate already collects all package failures in one run.

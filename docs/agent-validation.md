@@ -28,8 +28,9 @@ Finish by reporting checks run and which repository gates were deferred.
 | Commit / checkpoint         | Pre-commit hook ([`.husky/pre-commit`](../.husky/pre-commit)), then commit-msg commitlint on `git commit` |
 | Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once (or `git push`)                                           |
 
-Pre-commit is intentionally fast (no full affected package test suites). Broad affected
-typecheck and collect-all tests live in `pnpm gate:pre-push` (`test:affected:gate`).
+Pre-commit is intentionally fast (no full affected package test suites). Broad typecheck
+and collect-all affected tests since `origin/main` live in `pnpm gate:pre-push`
+(`typecheck:ci`, `test:affected:gate`).
 
 ## Writing implementation plans
 
