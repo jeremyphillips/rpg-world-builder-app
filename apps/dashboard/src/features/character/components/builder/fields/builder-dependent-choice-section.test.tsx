@@ -141,7 +141,7 @@ describe('BuilderDependentChoiceSection', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Elven Lineage' })).toHaveClass('text-sm')
-    expect(screen.getByText('Required')).toHaveClass('text-xs')
+    expect(screen.getByText('Required')).toHaveClass('text-control-action-xs')
   })
 
   it('renders resolved panel status at compact description scale', () => {
@@ -161,7 +161,7 @@ describe('BuilderDependentChoiceSection', () => {
       />,
     )
 
-    expect(screen.getByText('Selected: Drow')).toHaveClass('text-xs')
+    expect(screen.getByText('Selected: Drow')).toHaveClass('text-control-action-xs')
   })
 
   itAxe('has no axe accessibility violations', async () => {

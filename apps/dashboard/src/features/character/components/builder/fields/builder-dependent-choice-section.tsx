@@ -15,6 +15,7 @@ import {
   RadioCard,
   SelectionOptionCardEmbeddedPanel,
   SelectionOptionCardEmbeddedPanelHeader,
+  SelectionOptionCardEmbeddedPanelRowStatus,
   Text,
 } from '@rpg/ui'
 
@@ -50,14 +51,6 @@ export type BuilderDependentChoiceSectionProps = {
   onExpandedChange?: (expanded: boolean) => void
   /** Label for the expand affordance when a choice is resolved. Defaults to heritage copy. */
   changeLabel?: string
-}
-
-function EmbeddedStatusEndSlot({ children }: { children: string }) {
-  return (
-    <Text as="span" variant="muted" className="shrink-0 text-right text-xs leading-snug">
-      {children}
-    </Text>
-  )
 }
 
 export function BuilderDependentChoiceSection({
@@ -127,7 +120,9 @@ export function BuilderDependentChoiceSection({
             titleId={headingId}
             endSlot={
               sectionCopy.statusText ? (
-                <EmbeddedStatusEndSlot>{sectionCopy.statusText}</EmbeddedStatusEndSlot>
+                <SelectionOptionCardEmbeddedPanelRowStatus className="shrink-0 text-right leading-snug">
+                  {sectionCopy.statusText}
+                </SelectionOptionCardEmbeddedPanelRowStatus>
               ) : undefined
             }
             description={sectionCopy.helperText ?? undefined}
