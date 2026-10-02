@@ -48,7 +48,7 @@ import { referenceSpellcastingClassFieldOptions } from '../../lib/form-options/c
 import { draftOptionalSelect } from '../../lib/forms/validation/draft-form-schema-helpers'
 import {
   castingTimeUnitOptions,
-  conditionTagOptions,
+  buildConditionTagOptions,
   deliveryMethodChipOptions,
   durationKindOptions,
   durationUnitOptions,
@@ -644,6 +644,7 @@ function castingFields(): FormItem[] {
 
 function tagFields(ctx: ContentFormCtx): FormItem[] {
   const damageTypeOptions = buildActiveDamageTypeFieldOptions(ctx.damageTypeVocabulary)
+  const conditionTagOptions = buildConditionTagOptions(ctx)
 
   return [
     {

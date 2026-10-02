@@ -5,6 +5,7 @@ import {
   type VocabularyOption,
   type VocabularyOptionSetId,
 } from '@rpg/contracts'
+import { toOptions, type FieldOption } from '@rpg/ui/form'
 
 export type LabelActiveVocabulary = {
   labelById: Record<string, string>
@@ -55,4 +56,23 @@ export function buildVocabularyFromSeedSet<T>(
   build: (set: Pick<ResolvedVocabularyOptionSet, 'options'>) => T,
 ): T {
   return build({ options: buildSeedVocabularyOptions(setId) })
+}
+
+/** Alias for seed-only vocabulary map builders. */
+export const buildSeedVocabulary = buildVocabularyFromSeedSet
+
+/** Resolves a campaign label with id fallback when vocabulary is absent or unknown. */
+export function getVocabularyLabel(
+  vocabulary: LabelActiveVocabulary | undefined,
+  id: string,
+): string {
+  return vocabulary?.labelById[id] ?? id
+}
+
+/** Sorted combobox options from active vocabulary entries. */
+export function buildActiveVocabularyFieldOptions(
+  vocabulary: LabelActiveVocabulary | undefined,
+): FieldOption[] {
+  if (!vocabulary) return []
+  return toOptions([...vocabulary.activeIds].sort(), vocabulary.labelById)
 }

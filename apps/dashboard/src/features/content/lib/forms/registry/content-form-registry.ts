@@ -13,11 +13,14 @@ import type {
 import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
 
 import type {
+  ConditionVocabulary,
   CreatureTypeVocabulary,
   DamageTypeVocabulary,
   LanguageVocabulary,
   SenseVocabulary,
+  SizeVocabulary,
   SpellSchoolVocabulary,
+  WeaponPropertyVocabulary,
 } from '@/features/vocabulary'
 
 import type { ContentListQueryResult } from '../../list/content-client'
@@ -58,6 +61,12 @@ export type ContentFormCtx = {
   languageVocabulary?: LanguageVocabulary
   /** Campaign-resolved spell school labels, descriptions, and active ids. */
   spellSchoolVocabulary?: SpellSchoolVocabulary
+  /** Campaign-resolved creature size labels and active ids. */
+  sizeVocabulary?: SizeVocabulary
+  /** Campaign-resolved effect condition labels and active ids. */
+  conditionVocabulary?: ConditionVocabulary
+  /** Campaign-resolved weapon property labels and active ids. */
+  weaponPropertyVocabulary?: WeaponPropertyVocabulary
   options?: Partial<ContentFormOptionSets>
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]

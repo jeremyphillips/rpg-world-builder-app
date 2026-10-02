@@ -47,3 +47,29 @@ export {
   buildAttackResolutionModeFieldOptions,
   type AttackResolutionModeVocabulary,
 } from './lib/sets/attack-resolution-modes'
+export {
+  buildSizeVocabulary,
+  buildSeedSizeVocabulary,
+  buildActiveSizeFieldOptions,
+  getSizeLabelFromVocabulary,
+  type SizeVocabulary,
+} from './lib/sets/sizes'
+export {
+  buildConditionVocabulary,
+  buildSeedConditionVocabulary,
+  buildActiveConditionFieldOptions,
+  getConditionLabelFromVocabulary,
+  type ConditionVocabulary,
+} from './lib/sets/conditions'
+export {
+  buildWeaponPropertyVocabulary,
+  buildSeedWeaponPropertyVocabulary,
+  buildActiveWeaponPropertyFieldOptions,
+  getWeaponPropertyLabelFromVocabulary,
+  type WeaponPropertyVocabulary,
+} from './lib/sets/weapon-properties'
+export {
+  buildActiveVocabularyFieldOptions,
+  buildSeedVocabulary,
+  getVocabularyLabel,
+} from './lib/build-vocabulary-maps'

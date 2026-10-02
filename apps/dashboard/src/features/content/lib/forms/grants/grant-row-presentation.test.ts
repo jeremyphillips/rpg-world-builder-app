@@ -1,5 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import {
+  buildSeedDamageTypeVocabulary,
+  buildSeedLanguageVocabulary,
+  buildSeedSenseVocabulary,
+  getDamageTypeLabelFromVocabulary,
+  getLanguageLabelFromVocabulary,
+  getSenseLabelFromVocabulary,
+} from '@/features/vocabulary'
+
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import {
   formatCompactMetadataList,
@@ -12,8 +21,15 @@ import {
   type GrantRowPresentation,
 } from './grant-row-presentation.lib'
 
+const seedDamageTypes = buildSeedDamageTypeVocabulary()
+const seedLanguages = buildSeedLanguageVocabulary()
+const seedSenses = buildSeedSenseVocabulary()
+
 const headerContext = {
   rowLabels: GRANT_ROW_TYPE_LABELS,
+  resolveDamageTypeLabel: (id: string) => getDamageTypeLabelFromVocabulary(seedDamageTypes, id),
+  resolveLanguageLabel: (id: string) => getLanguageLabelFromVocabulary(seedLanguages, id),
+  resolveSenseLabel: (id: string) => getSenseLabelFromVocabulary(seedSenses, id),
   equipmentOptions: [],
   weaponOptions: [{ value: 'longsword', label: 'Longsword' }],
   toolOptions: [{ value: 'thieves-tools', label: "Thieves' Tools" }],

@@ -9,8 +9,6 @@ import {
   WEAPON_MASTERY_ENTRIES,
   WEAPON_MODES,
   WEAPON_MODE_ENTRIES,
-  WEAPON_PROPERTIES,
-  WEAPON_PROPERTY_ENTRIES,
   WEAPON_PROPERTY_TERM,
   weaponFormValuesHaveRange,
   type WeaponMastery,
@@ -25,7 +23,7 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel } from '@/features/vocabulary'
+import { buildActiveWeaponPropertyFieldOptions, vocabularyFieldLabel } from '@/features/vocabulary'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
 import {
@@ -41,11 +39,6 @@ const weaponCategoryOptions = toOptions(
 )
 const weaponModeOptions = toOptions(WEAPON_MODES, labelsFromEntries(WEAPON_MODE_ENTRIES))
 const weaponMasteryOptions = toOptions(WEAPON_MASTERIES, labelsFromEntries(WEAPON_MASTERY_ENTRIES))
-const weaponPropertyOptions = toOptions(
-  WEAPON_PROPERTIES,
-  labelsFromEntries(WEAPON_PROPERTY_ENTRIES),
-)
-
 function visibleWhenVersatile(): FieldVisibility {
   return {
     dependsOn: ['properties', 'hasDamage'],
@@ -134,7 +127,7 @@ export function weaponFormFieldGroup(ctx: ContentFormCtx): FormItem {
         type: 'chips',
         name: 'properties',
         label: vocabularyFieldLabel(WEAPON_PROPERTY_TERM, { plural: true }),
-        options: weaponPropertyOptions,
+        options: buildActiveWeaponPropertyFieldOptions(ctx.weaponPropertyVocabulary),
         optionAvailability: weaponPropertyOptionAvailability,
         hint: { resolve: weaponPropertyDynamicHint },
       },
