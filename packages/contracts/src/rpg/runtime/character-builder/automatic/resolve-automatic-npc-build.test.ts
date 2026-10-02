@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
 import type { Species } from '../../../content/species'
 import type { SkillProficiency } from '../../../content/skill-proficiency'
@@ -436,5 +437,128 @@ describe('resolveAutomaticNpcBuild', () => {
       resolvedChoiceSets: result.resolvedChoiceSets,
     })
     expect(input.classes).toEqual([{ classId: wizardClass.id, level: 5 }])
+  })
+
+  it('applies starting equipment grants additively after the package', () => {
+    const extraDagger = equipmentSchema.parse({
+      id: `${RULESET}:extra-dagger`,
+      slug: 'extra-dagger',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Extra Dagger',
+      description: '',
+      cost: { amount: 2, currency: 'gp' },
+      weight: { value: 1, unit: 'lb' },
+      kind: 'weapon',
+      category: 'simple',
+      mode: 'melee',
+      damage: { dice: { count: 1, faces: 4 } },
+      damageType: 'piercing',
+      properties: ['finesse', 'light', 'thrown'],
+      mastery: 'nick',
+    })
+    const baseContext = automaticTestContext()
+    const context = automaticTestContext({
+      catalog: {
+        ...baseContext.catalog,
+        equipment: [...baseContext.catalog.equipment, extraDagger],
+      },
+    })
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed(),
+      context,
+      startingEquipmentGrants: [{ equipmentId: extraDagger.id, quantity: 2 }],
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.draft.equipment?.grants).toEqual(
+      expect.arrayContaining([
+        { equipmentId: extraDagger.id, quantity: 2, contribution: 'additional' },
+      ]),
+    )
+  })
+
+  it('sums duplicate starting equipment grant ids', () => {
+    const extraDagger = equipmentSchema.parse({
+      id: `${RULESET}:extra-dagger`,
+      slug: 'extra-dagger',
+      rulesetId: RULESET,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Extra Dagger',
+      description: '',
+      cost: { amount: 2, currency: 'gp' },
+      weight: { value: 1, unit: 'lb' },
+      kind: 'weapon',
+      category: 'simple',
+      mode: 'melee',
+      damage: { dice: { count: 1, faces: 4 } },
+      damageType: 'piercing',
+      properties: ['finesse', 'light', 'thrown'],
+      mastery: 'nick',
+    })
+    const baseContext = automaticTestContext()
+    const context = automaticTestContext({
+      catalog: {
+        ...baseContext.catalog,
+        equipment: [...baseContext.catalog.equipment, extraDagger],
+      },
+    })
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed(),
+      context,
+      startingEquipmentGrants: [
+        { equipmentId: extraDagger.id, quantity: 2 },
+        { equipmentId: extraDagger.id, quantity: 3 },
+      ],
+    })
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.draft.equipment?.grants).toEqual(
+      expect.arrayContaining([
+        { equipmentId: extraDagger.id, quantity: 5, contribution: 'additional' },
+      ]),
+    )
+  })
+
+  it('fails when a starting equipment grant id is not playable', () => {
+    const context = automaticTestContext()
+    const result = resolveAutomaticNpcBuild({
+      seed: fighterSeed(),
+      context,
+      startingEquipmentGrants: [{ equipmentId: `${RULESET}:missing-rope`, quantity: 1 }],
+    })
+
+    expect(result.ok).toBe(false)
+    if (result.ok) return
+    expect(result.issues[0]?.code).toBe('automatic_constraint_unsatisfiable')
+  })
+
+  it('does not top up a pinned partial class skill selection', () => {
+    const context = automaticTestContext()
+    const choiceSetId = buildChoiceSetId('class', automaticFighter.id, 'class-skills')
+    const unpinned = resolveAutomaticNpcBuild({ seed: fighterSeed(), context })
+    expect(unpinned.ok).toBe(true)
+    if (!unpinned.ok) return
+    expect(unpinned.draft.choiceSelections[choiceSetId]).toHaveLength(2)
+
+    const pinned = resolveAutomaticNpcBuild({
+      seed: fighterSeed(),
+      context,
+      allowanceSelections: { [choiceSetId]: [athleticsSkill.id] },
+      pinnedChoiceSetIds: [choiceSetId],
+    })
+    expect(pinned.ok).toBe(true)
+    if (!pinned.ok) return
+    expect(pinned.draft.choiceSelections[choiceSetId]).toEqual([athleticsSkill.id])
   })
 })

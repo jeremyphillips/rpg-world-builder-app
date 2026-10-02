@@ -12,7 +12,7 @@ export const characterWealthGrantSchema = z
 
 export type CharacterWealthGrant = z.infer<typeof characterWealthGrantSchema>
 
-const WEALTH_GRANT_DENOMINATIONS = [
+export const WEALTH_GRANT_DENOMINATIONS = [
   'cp',
   'sp',
   'gp',
@@ -34,4 +34,34 @@ export function normalizeCharacterWealthGrant(
   }
 
   return Object.keys(result).length > 0 ? result : undefined
+}
+
+/**
+ * Normalizes a campaign wealth tier grant. Explicit zero is kept as `{ gp: 0 }`
+ * so Mongo minimize and sparse patch semantics treat the tier as authoritative.
+ */
+export function normalizeWealthTierGrant(
+  grant: CharacterWealthGrant | undefined,
+): CharacterWealthGrant {
+  if (!grant) return { gp: 0 }
+
+  const positive = normalizeCharacterWealthGrant(grant)
+  if (positive) return positive
+
+  for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+    if (grant[denomination] === 0) {
+      return { [denomination]: 0 }
+    }
+  }
+
+  return { gp: 0 }
+}
+
+export function characterWealthGrantsEqual(
+  left: CharacterWealthGrant | undefined,
+  right: CharacterWealthGrant | undefined,
+): boolean {
+  return WEALTH_GRANT_DENOMINATIONS.every(
+    (denomination) => (left?.[denomination] ?? undefined) === (right?.[denomination] ?? undefined),
+  )
 }

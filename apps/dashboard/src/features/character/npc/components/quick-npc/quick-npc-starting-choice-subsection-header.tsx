@@ -1,6 +1,6 @@
 import { ChoiceSelectionCounter, Heading, Text, type ChoiceSelectionCounterProps } from '@rpg/ui'
 
-import { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
+import { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from './quick-npc-starting-choices.variants'
 import {
   quickNpcStartingChoiceHeadingRowClasses,
   quickNpcStartingChoiceIdentityStackClasses,

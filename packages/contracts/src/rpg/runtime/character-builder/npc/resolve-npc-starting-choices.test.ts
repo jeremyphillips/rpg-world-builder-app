@@ -8,7 +8,10 @@ import type { CharacterBuildContext } from '../context'
 import { athleticsSkill, createCharacterBuildContext, dwarfSpecies } from '../test-fixtures'
 import { npcTemplateSkillChoiceSetId } from '../resolvers/npc-template/resolve-npc-template-role-choices'
 
-import { resolveNpcStartingChoices } from './resolve-npc-starting-choices'
+import {
+  resolveNpcStartingChoiceIssues,
+  resolveNpcStartingChoices,
+} from './resolve-npc-starting-choices'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -309,5 +312,109 @@ describe('resolveNpcStartingChoices', () => {
         (entry) => entry.category === 'equipment' && entry.mechanic === 'fixed-grant',
       ),
     ).toBe(false)
+  })
+})
+
+describe('resolveNpcStartingChoiceIssues', () => {
+  const context = guardContext()
+  const seed = {
+    speciesId: dwarfSpecies.id,
+    level: 0,
+    npcTemplateId: 'guard' as const,
+  }
+  const preferences = {
+    skills: [{ id: 'perception', sources: ['template' as const] }],
+  }
+
+  it('reports a pinned partial class starting-equipment package pick', () => {
+    const fighterContext = {
+      ...context,
+      catalog: {
+        ...context.catalog,
+        classes: [
+          {
+            id: `${RULESET}:fighter`,
+            slug: 'fighter',
+            rulesetId: RULESET,
+            source: 'system' as const,
+            status: 'published' as const,
+            campaignId: null,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            updatedAt: '2026-01-01T00:00:00.000Z',
+            name: 'Fighter',
+            primaryAbilities: ['str' as const],
+            hitDie: 10 as const,
+            proficiencies: {
+              savingThrows: ['str' as const, 'con' as const],
+              armor: { categories: ['light' as const], items: [] },
+              weapons: { categories: ['simple' as const], items: [] },
+              skills: { categories: [], items: [] },
+            },
+            characterCreation: {
+              proficiencies: {
+                skills: {
+                  choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }],
+                },
+              },
+              startingEquipment: {
+                choose: 1,
+                options: [
+                  {
+                    id: 'kit-a',
+                    label: 'Kit A',
+                    items: [
+                      {
+                        id: 'kit-a-spear',
+                        kind: 'grant' as const,
+                        target: { source: 'equipment' as const, equipmentSlug: spear.slug },
+                        quantity: 1,
+                      },
+                    ],
+                    wealth: { gp: 0 },
+                  },
+                ],
+              },
+            },
+            features: [],
+          },
+        ],
+      },
+    }
+    const packageChoiceSetId = buildChoiceSetId('class', `${RULESET}:fighter`, 'starting-equipment')
+    const choices = resolveNpcStartingChoices({
+      context: fighterContext,
+      seed: { speciesId: dwarfSpecies.id, classId: `${RULESET}:fighter`, level: 1 },
+      preferences,
+      startingChoiceOverrides: {
+        [packageChoiceSetId]: [],
+      },
+    })
+    const issues = resolveNpcStartingChoiceIssues(choices)
+    expect(choices.pinnedChoiceSetIds).toContain(packageChoiceSetId)
+    expect(issues).toEqual([
+      expect.objectContaining({
+        code: 'starting_choice_incomplete',
+        choiceSetId: packageChoiceSetId,
+      }),
+    ])
+  })
+
+  it('reports a partial skill allowance override', () => {
+    const choiceSetId = npcTemplateSkillChoiceSetId('guard')
+    const choices = resolveNpcStartingChoices({
+      context,
+      seed,
+      preferences,
+      startingChoiceOverrides: {
+        [choiceSetId]: [athleticsSkill.id],
+      },
+    })
+    const issues = resolveNpcStartingChoiceIssues(choices)
+    expect(issues).toEqual([
+      expect.objectContaining({
+        code: 'starting_choice_incomplete',
+        choiceSetId,
+      }),
+    ])
   })
 })

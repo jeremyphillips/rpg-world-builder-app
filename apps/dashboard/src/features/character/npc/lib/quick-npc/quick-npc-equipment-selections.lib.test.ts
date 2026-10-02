@@ -86,4 +86,22 @@ describe('reconcileQuickNpcEquipmentSelections', () => {
     })
     expect(kept).toHaveLength(1)
   })
+
+  it('preserves role default rows when the template is unchanged', () => {
+    const seeded = reconcileQuickNpcEquipmentSelections({
+      current: [],
+      previous: { templateId: 'guard', classId: '', level: 0 },
+      next: { templateId: 'guard', classId: '', level: 0, rulesetId: RULESET },
+    })
+    const withManual = [
+      ...seeded,
+      { equipmentId: id('rope'), quantity: 1, origin: 'manual' as const },
+    ]
+    const unchanged = reconcileQuickNpcEquipmentSelections({
+      current: withManual,
+      previous: { templateId: 'guard', classId: '', level: 0 },
+      next: { templateId: 'guard', classId: '', level: 0, rulesetId: RULESET },
+    })
+    expect(unchanged).toEqual(withManual)
+  })
 })

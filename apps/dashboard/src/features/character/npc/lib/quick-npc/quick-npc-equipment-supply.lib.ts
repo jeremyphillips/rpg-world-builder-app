@@ -41,8 +41,6 @@ type QuickNpcEquipmentSupply = {
 }
 
 export type QuickNpcEquipmentAllocation = {
-  requiredWeaponIds: string[]
-  manualEquipmentGrantIds: string[]
   startingEquipmentGrants: { equipmentId: string; quantity: number }[]
 }
 
@@ -79,8 +77,6 @@ export function projectQuickNpcEquipmentAllocations(args: {
 
   if (!args.classed) {
     return {
-      requiredWeaponIds: [],
-      manualEquipmentGrantIds: [],
       startingEquipmentGrants: [...totals.entries()].map(([equipmentId, total]) => ({
         equipmentId,
         quantity: total.quantity,
@@ -95,7 +91,7 @@ export function projectQuickNpcEquipmentAllocations(args: {
     startingEquipmentGrants.push({ equipmentId, quantity: total.manualQuantity })
   }
 
-  return { requiredWeaponIds: [], manualEquipmentGrantIds: [], startingEquipmentGrants }
+  return { startingEquipmentGrants }
 }
 
 function formSupplySource(
@@ -201,15 +197,16 @@ function packageSupplySource(
   )
 }
 
+type EquipmentInventoryRow = ReturnType<typeof listEquipmentInventoryRowsFromDraft>[number]
+
 function collectQuickNpcEquipmentSupplyFromDraft(args: {
   equipmentId: string
   classId: string
-  choices: NpcStartingChoices
-  catalogIndex: CharacterBuildCatalogIndex
+  packageInventoryRows: readonly EquipmentInventoryRow[]
 }): QuickNpcEquipmentSupply {
   const contributions: EquipmentSupplyContribution[] = []
   let quantity = 0
-  for (const row of listEquipmentInventoryRowsFromDraft(args.choices.draft, args.catalogIndex)) {
+  for (const row of args.packageInventoryRows) {
     if (row.removeTarget?.kind !== 'package') continue
     if (!overlaps(args.equipmentId, row.entry.equipmentId)) continue
     quantity += row.entry.quantity
@@ -225,6 +222,15 @@ function collectQuickNpcEquipmentSupplyFromDraft(args: {
   return { quantity, contributions }
 }
 
+export function listQuickNpcPackageInventoryRows(args: {
+  choices: NpcStartingChoices
+  catalogIndex: CharacterBuildCatalogIndex
+  classId?: string
+}): readonly EquipmentInventoryRow[] {
+  if (!args.classId) return []
+  return listEquipmentInventoryRowsFromDraft(args.choices.draft, args.catalogIndex)
+}
+
 export function collectQuickNpcEquipmentSupply(args: {
   equipmentId: string
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
@@ -232,11 +238,23 @@ export function collectQuickNpcEquipmentSupply(args: {
   choices: NpcStartingChoices
   catalogIndex: CharacterBuildCatalogIndex
   classId?: string
+  packageInventoryRows?: readonly EquipmentInventoryRow[]
 }): QuickNpcEquipmentSupply {
   const fromSelections = collectQuickNpcEquipmentSupplyFromSelections(args)
   const fromContributions = collectQuickNpcEquipmentSupplyFromContributions(args)
+  const packageInventoryRows =
+    args.packageInventoryRows ??
+    listQuickNpcPackageInventoryRows({
+      choices: args.choices,
+      catalogIndex: args.catalogIndex,
+      ...(args.classId ? { classId: args.classId } : {}),
+    })
   const fromDraft = args.classId
-    ? collectQuickNpcEquipmentSupplyFromDraft({ ...args, classId: args.classId })
+    ? collectQuickNpcEquipmentSupplyFromDraft({
+        equipmentId: args.equipmentId,
+        classId: args.classId,
+        packageInventoryRows,
+      })
     : { quantity: 0, contributions: [] }
 
   return {
@@ -258,6 +276,7 @@ export function presentQuickNpcEquipmentOption(args: {
   classId?: string
   sourceName?: RecommendationSourceName
   supplyCatalog?: SelectionSourceLabelCatalogIndex
+  packageInventoryRows?: readonly EquipmentInventoryRow[]
 }): EquipmentOptionRowPresentation {
   const equipment = args.entry.pickerItem.equipment
   const compact = buildEquipmentCompactSummary(equipment, 'compact-row')
@@ -269,6 +288,7 @@ export function presentQuickNpcEquipmentOption(args: {
     choices: args.choices,
     catalogIndex: args.catalogIndex,
     ...(args.classId ? { classId: args.classId } : {}),
+    ...(args.packageInventoryRows ? { packageInventoryRows: args.packageInventoryRows } : {}),
   })
   const addition = resolveEquipmentAdditionPolicy({
     equipment,
@@ -331,7 +351,15 @@ export function listSelectedQuickNpcAdditionalEquipment(args: {
   catalogIndex: CharacterBuildCatalogIndex
   roleId?: string
   classId?: string
+  packageInventoryRows?: readonly EquipmentInventoryRow[]
 }): QuickNpcSelectedAdditionalEquipmentRow[] {
+  const packageInventoryRows =
+    args.packageInventoryRows ??
+    listQuickNpcPackageInventoryRows({
+      choices: args.choices,
+      catalogIndex: args.catalogIndex,
+      ...(args.classId ? { classId: args.classId } : {}),
+    })
   const equipmentIds: string[] = []
   const seen = new Set<string>()
   for (const selection of args.equipmentSelections) {
@@ -348,6 +376,7 @@ export function listSelectedQuickNpcAdditionalEquipment(args: {
       equipmentSelections: args.equipmentSelections,
       choices: args.choices,
       catalogIndex: args.catalogIndex,
+      packageInventoryRows,
       ...(args.roleId ? { roleId: args.roleId } : {}),
       ...(args.classId ? { classId: args.classId } : {}),
     })
@@ -379,7 +408,15 @@ export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
   catalogIndex: CharacterBuildCatalogIndex
   setup: Pick<QuickNpcSetupValues, 'classId' | 'npcTemplateId'>
   sourceName?: RecommendationSourceName
+  packageInventoryRows?: readonly EquipmentInventoryRow[]
 }): Map<string, EquipmentOptionRowPresentation> {
+  const packageInventoryRows =
+    args.packageInventoryRows ??
+    listQuickNpcPackageInventoryRows({
+      choices: args.choices,
+      catalogIndex: args.catalogIndex,
+      ...(args.setup.classId ? { classId: args.setup.classId } : {}),
+    })
   return new Map(
     args.entries.map((entry) => [
       entry.option.value,
@@ -389,6 +426,7 @@ export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
         choices: args.choices,
         catalogIndex: args.catalogIndex,
         supplyCatalog: args.catalogIndex,
+        packageInventoryRows,
         ...(args.setup.npcTemplateId ? { roleId: args.setup.npcTemplateId } : {}),
         ...(args.setup.classId ? { classId: args.setup.classId } : {}),
         ...(args.sourceName ? { sourceName: args.sourceName } : {}),

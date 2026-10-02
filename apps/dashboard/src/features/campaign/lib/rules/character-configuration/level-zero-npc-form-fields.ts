@@ -4,6 +4,7 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   CLASS_HIT_DICE,
   NPC_WEALTH_TIER_IDS,
+  WEALTH_GRANT_DENOMINATIONS,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
   formatHitDie,
@@ -88,6 +89,11 @@ export const levelZeroLanguageProficienciesFormSchema = z.object({
   items: z.array(z.string()),
 })
 
+const levelZeroWealthTierMoneySchema = z.object({
+  amount: z.coerce.number().min(0),
+  currency: z.enum(WEALTH_GRANT_DENOMINATIONS),
+})
+
 export const levelZeroNpcsFormSchema = z.object({
   levelZeroNpcsEnabled: z.boolean(),
   levelZeroBaseHitDie: z.coerce.number().pipe(hitDieSchema),
@@ -99,30 +105,10 @@ export const levelZeroNpcsFormSchema = z.object({
   levelZeroWeaponProficiencies: levelZeroWeaponProficienciesFormSchema,
   levelZeroLanguageProficiencies: levelZeroLanguageProficienciesFormSchema,
   levelZeroRetainSpeciesLanguages: z.boolean(),
-  levelZeroWealthTierPoor: z
-    .object({
-      amount: z.coerce.number().min(0),
-      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
-    })
-    .optional(),
-  levelZeroWealthTierModest: z
-    .object({
-      amount: z.coerce.number().min(0),
-      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
-    })
-    .optional(),
-  levelZeroWealthTierComfortable: z
-    .object({
-      amount: z.coerce.number().min(0),
-      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
-    })
-    .optional(),
-  levelZeroWealthTierWealthy: z
-    .object({
-      amount: z.coerce.number().min(0),
-      currency: z.enum(['cp', 'sp', 'gp', 'pp']),
-    })
-    .optional(),
+  levelZeroWealthTierPoor: levelZeroWealthTierMoneySchema,
+  levelZeroWealthTierModest: levelZeroWealthTierMoneySchema,
+  levelZeroWealthTierComfortable: levelZeroWealthTierMoneySchema,
+  levelZeroWealthTierWealthy: levelZeroWealthTierMoneySchema,
   levelZeroStandardArray: z.array(z.coerce.number().int()).length(6),
 })
 

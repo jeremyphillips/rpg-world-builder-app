@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { ContentEntityCard } from '@/features/content'
 import { Text } from '@rpg/ui'
 
@@ -5,15 +7,17 @@ import { BuilderInventoryRemoveAction } from '../../../components/builder/invent
 
 export type QuickNpcStartingChoiceSelectedRowProps = {
   label: string
+  quantity?: ReactNode
   suggestionHint?: string
   suggestionTitle?: string
   alsoGrantedHint?: string
   onRemove: () => void
 }
 
-/** Removable starting-choice row — same ContentEntityCard chrome as builder choice-selected-row. */
+/** Removable starting-choice row — shared ContentEntityCard anatomy for skills, equipment, and spells. */
 export function QuickNpcStartingChoiceSelectedRow({
   label,
+  quantity,
   suggestionHint,
   suggestionTitle,
   alsoGrantedHint,
@@ -32,7 +36,12 @@ export function QuickNpcStartingChoiceSelectedRow({
       }}
       trailing={{
         kind: 'action',
-        content: <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />,
+        content: (
+          <div className="flex items-center gap-2">
+            {quantity}
+            <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />
+          </div>
+        ),
       }}
       density="compact"
     />

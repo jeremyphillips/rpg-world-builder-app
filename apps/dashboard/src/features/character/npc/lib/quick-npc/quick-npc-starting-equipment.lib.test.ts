@@ -3,14 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { resolveQuickNpcEquipmentCategoryStatus } from './quick-npc-starting-equipment.lib'
 
 describe('resolveQuickNpcEquipmentCategoryStatus', () => {
-  it('is complete when there are no required equipment choice sets', () => {
+  it('is none when there are no required equipment choice sets', () => {
     expect(
       resolveQuickNpcEquipmentCategoryStatus({
         choiceSets: [],
         draftSelections: {},
         overrides: {},
       }),
-    ).toBe('complete')
+    ).toBe('none')
   })
 
   it('stays incomplete until a required package is filled', () => {

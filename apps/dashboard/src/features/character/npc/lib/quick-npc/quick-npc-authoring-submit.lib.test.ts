@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
+import { buildChoiceSetId, CharacterBuildFinalizationError } from '@rpg/contracts'
+
 import type { CharacterBuildContext } from '@rpg/contracts'
 
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { buildQuickNpcAuthoringCreateInput } from './quick-npc-authoring-submit.lib'
+import { prepareQuickNpcAuthoringCreate } from './quick-npc-authoring-submit.lib'
 import {
   buildQuickNpcSeed,
   mergeQuickNpcAuthoringValues,
@@ -62,7 +64,7 @@ function quickNpcTestContext(): CharacterBuildContext {
   })
 }
 
-describe('buildQuickNpcAuthoringCreateInput', () => {
+describe('prepareQuickNpcAuthoringCreate', () => {
   const buildContext = quickNpcTestContext()
   const tabValues = {
     ...quickNpcAuthoringTabDefaultValues,
@@ -89,7 +91,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       },
     }
 
-    const input = buildQuickNpcAuthoringCreateInput({
+    const { input } = prepareQuickNpcAuthoringCreate({
       createContext: quickNpcOrganizationMemberCreateContext(organization),
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
@@ -111,7 +113,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
   })
 
   it('omits organization membership for standalone context', () => {
-    const input = buildQuickNpcAuthoringCreateInput({
+    const { input } = prepareQuickNpcAuthoringCreate({
       createContext: quickNpcStandaloneCreateContext(),
       setup: quickNpcStandaloneSetupValues({
         npcTemplateId: 'guard',
@@ -155,7 +157,7 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
       },
     }
 
-    const input = buildQuickNpcAuthoringCreateInput({
+    const { input } = prepareQuickNpcAuthoringCreate({
       createContext: quickNpcOrganizationMemberCreateContext(organization),
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
@@ -174,5 +176,28 @@ describe('buildQuickNpcAuthoringCreateInput', () => {
         details: { lifecycle: 'current', membershipTitleId: 'omt_member' },
       }),
     ])
+  })
+
+  it('throws the shared starting-choice issue when a class skill override is incomplete', () => {
+    const classSkillsId = buildChoiceSetId('class', quickFighter.id, 'class-skills')
+
+    expect(() =>
+      prepareQuickNpcAuthoringCreate({
+        createContext: quickNpcStandaloneCreateContext(),
+        setup: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'guard',
+          speciesId: populatedBuilderCatalog.species[0]!.id,
+          classId: quickFighter.id,
+          level: 1,
+        }),
+        tabValues: {
+          ...tabValues,
+          startingChoiceOverrides: {
+            [classSkillsId]: [],
+          },
+        },
+        buildContext: quickNpcTestContext(),
+      }),
+    ).toThrow(CharacterBuildFinalizationError)
   })
 })

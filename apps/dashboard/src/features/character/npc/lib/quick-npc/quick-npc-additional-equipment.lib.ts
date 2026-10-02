@@ -4,7 +4,6 @@ import {
   isEquipmentPickerSupportedEquipment,
   resolveNpcTemplateEffectiveEquipmentPreferences,
   resolvePlayableBuilderContent,
-  type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type EquipmentPickerItem,
   type EquipmentPickerSupportedKind,
@@ -16,40 +15,14 @@ import {
   buildMinimalCharacterBuilderDraftForRecommendations,
 } from '@/features/character/lib/equipment/equipment-picker-recommendation-context.lib'
 import { sortEquipmentPickerItems } from '@/features/character/lib/equipment/sort-equipment-picker-items.lib'
-import { resolveEquipmentKindFilterOptions } from '@/features/character/components/equipment/picker/drawer/equipment-picker-drawer.lib'
+import { resolveEquipmentKindFilterOptions } from '@/features/character/lib/equipment/equipment-kind-filter.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
-import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
 
 export type QuickNpcAdditionalEquipmentOption = {
   option: { value: string; label: string }
   pickerItem: EquipmentPickerItem
   row: ReturnType<typeof buildEquipmentPickerRowViewModel>
-}
-
-export function splitQuickNpcAdditionalEquipmentIds(args: {
-  equipmentSelections: readonly {
-    equipmentId: string
-    quantity: number
-    origin: 'role-default' | 'manual'
-  }[]
-  catalogIndex: CharacterBuildCatalogIndex
-  /** Classless rows sum every origin. Classed rows keep only manual additions. */
-  constrainManualWeapons: boolean
-}): { requiredWeaponIds: string[]; manualEquipmentGrantIds: string[] } {
-  const projected = projectQuickNpcEquipmentAllocations({
-    equipmentSelections: args.equipmentSelections.map((row) => ({
-      equipmentId: row.equipmentId,
-      quantity: row.quantity,
-      origin: row.origin,
-    })),
-    catalogIndex: args.catalogIndex,
-    classed: args.constrainManualWeapons,
-  })
-  return {
-    requiredWeaponIds: projected.requiredWeaponIds,
-    manualEquipmentGrantIds: projected.manualEquipmentGrantIds,
-  }
 }
 
 export function resolveQuickNpcAdditionalEquipmentOptions(args: {

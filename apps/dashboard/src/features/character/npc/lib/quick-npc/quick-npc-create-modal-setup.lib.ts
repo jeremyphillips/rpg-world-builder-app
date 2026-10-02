@@ -10,8 +10,6 @@ import {
 } from '@rpg/contracts'
 
 import { buildOrganizationMembershipTitleRadioOptions } from '../../../lib/organization-membership/organization-membership-title.lib'
-import type { ChoiceSelectionCounterProps } from '@rpg/ui'
-
 import {
   isCreateSetupChoiceComplete,
   resolveCreateSetupFooterActions,
@@ -48,11 +46,6 @@ export const QUICK_NPC_STANDALONE_SETUP_HEADLINE = 'Set up NPC' as const
 export const QUICK_NPC_STANDALONE_SETUP_DESCRIPTION =
   'Choose a role, species, and starting character options.' as const
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
-
-/** Compact choice counters across Quick NPC create authoring (setup + starting choices). */
-export const QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE = 'sm' as const satisfies NonNullable<
-  ChoiceSelectionCounterProps['size']
->
 
 export type QuickNpcModalPhase = 'setup' | 'authoring'
 

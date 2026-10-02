@@ -25,6 +25,15 @@ describe('buildLevelZeroNpcsPatchInput wealth tiers', () => {
     })
   })
 
+  it('round-trips an explicit zero wealth tier through sparse patch input', () => {
+    const values = levelZeroNpcsDefaultFormValues()
+    values.levelZeroWealthTierModest = { amount: 0, currency: 'gp' }
+
+    expect(buildLevelZeroNpcsPatchInput(values)).toEqual({
+      wealthTiers: { modest: { gp: 0 } },
+    })
+  })
+
   it('includes all tiers in full patch input', () => {
     const patch = buildLevelZeroNpcsPatchInput(levelZeroNpcsDefaultFormValues(), {
       includeDefaultLevelZeroNpcs: true,

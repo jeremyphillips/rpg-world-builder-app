@@ -61,8 +61,6 @@ describe('projectQuickNpcEquipmentAllocations', () => {
         { equipmentId: equipmentStepRationsFixture.id, quantity: 4, origin: 'manual' },
       ],
     })
-    expect(classed.requiredWeaponIds).toEqual([])
-    expect(classed.manualEquipmentGrantIds).toEqual([])
     expect(classed.startingEquipmentGrants).toEqual([
       { equipmentId: equipmentStepSpearFixture.id, quantity: 2 },
       { equipmentId: equipmentStepRationsFixture.id, quantity: 4 },
@@ -192,11 +190,9 @@ describe('manual equipment does not steer the class package', () => {
         { equipmentId: equipmentStepSpearFixture.id, quantity: 1, origin: 'manual' },
       ],
     })
-    expect(unowned.requiredWeaponIds).toEqual([])
     expect(unowned.startingEquipmentGrants).toEqual([
       { equipmentId: equipmentStepBattleaxeFixture.id, quantity: 1 },
     ])
-    expect(extraSpear.requiredWeaponIds).toEqual([])
     expect(extraSpear.startingEquipmentGrants).toEqual([
       { equipmentId: equipmentStepSpearFixture.id, quantity: 1 },
     ])
@@ -225,6 +221,7 @@ describe('manual equipment does not steer the class package', () => {
     const choices = {
       contributions: [],
       removedOverrideIds: [],
+      pinnedChoiceSetIds: [],
       draft: baseline.draft,
       resolvedChoiceSets: baseline.resolvedChoiceSets,
     } as NpcStartingChoices
@@ -329,6 +326,7 @@ describe('package, role, and manual quantities stay partitioned', () => {
     return {
       contributions: [],
       removedOverrideIds: [],
+      pinnedChoiceSetIds: [],
       draft: packageDraft(),
       resolvedChoiceSets: [],
     }
@@ -450,7 +448,6 @@ describe('package, role, and manual quantities stay partitioned', () => {
         ],
       }),
     ).toMatchObject({
-      requiredWeaponIds: [],
       startingEquipmentGrants: [{ equipmentId: equipmentStepSpearFixture.id, quantity: 1 }],
     })
 

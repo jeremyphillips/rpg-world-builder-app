@@ -25,7 +25,9 @@ import {
   isSparseDefaultMulticlassingPatch,
   isSparseDefaultSubclassingPatch,
   mergeStartingWealthRulesPatch,
-  normalizeCharacterWealthGrant,
+  characterWealthGrantsEqual,
+  normalizeWealthTierGrant,
+  WEALTH_GRANT_DENOMINATIONS,
   resolveStartingWealthRules,
   safeParseMergedCharacterCreationPatch,
   sameStandardArray,
@@ -476,10 +478,9 @@ function wealthGrantMatchesDefault(
   grant: CharacterWealthGrant | undefined,
   tierId: (typeof NPC_WEALTH_TIER_IDS)[number],
 ): boolean {
-  const normalized = normalizeCharacterWealthGrant(grant)
-  const fallback: CharacterWealthGrant = { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId] }
-  return (['cp', 'sp', 'gp', 'pp'] as const).every(
-    (denomination) => normalized?.[denomination] === fallback[denomination],
+  return characterWealthGrantsEqual(
+    grant === undefined ? undefined : normalizeWealthTierGrant(grant),
+    DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId],
   )
 }
 
@@ -501,9 +502,9 @@ function buildLevelZeroWealthTiersUpdateSet(
       ops.$unset[tierPrefix] = 1
       continue
     }
-    const normalized = normalizeCharacterWealthGrant(grant)
-    for (const denomination of ['cp', 'sp', 'gp', 'pp'] as const) {
-      const value = normalized?.[denomination]
+    const normalized = normalizeWealthTierGrant(grant)
+    for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+      const value = normalized[denomination]
       const path = `${tierPrefix}.${denomination}`
       if (value !== undefined) {
         ops.$set[path] = value

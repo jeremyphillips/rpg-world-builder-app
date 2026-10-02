@@ -224,11 +224,10 @@ describe('QuickNpcAuthoringForm', () => {
         type: 'external',
         id: 'quickNpcBuild',
       },
-      expect.any(Array),
-      {
+      expect.objectContaining({
         classPackage: { state: 'unresolved' },
         startingChoiceOverrides: {},
-      },
+      }),
     )
     expect(createNpcMock).not.toHaveBeenCalled()
   })

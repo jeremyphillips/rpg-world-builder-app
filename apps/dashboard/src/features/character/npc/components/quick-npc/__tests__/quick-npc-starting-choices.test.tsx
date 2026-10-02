@@ -1,4 +1,5 @@
 import type { ComponentProps } from 'react'
+import * as React from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -37,6 +38,7 @@ const mockChoices: NpcStartingChoices = {
     },
   ],
   removedOverrideIds: [],
+  pinnedChoiceSetIds: [],
   draft: {} as NpcStartingChoices['draft'],
   resolvedChoiceSets: [
     {
@@ -63,12 +65,15 @@ const mockChoices: NpcStartingChoices = {
 }
 
 const resolveQuickNpcStartingChoicesMock = vi.hoisted(() => vi.fn(() => mockChoices))
-const resolveCanonicalStartingChoiceAllowanceMock = vi.hoisted(() =>
+const resolveCanonicalStartingChoiceAllowancesMock = vi.hoisted(() =>
   vi.fn(
-    (): {
-      selectedIds: readonly string[]
-      suggestedBy?: Readonly<Record<string, readonly { kind: 'role'; id: 'guard' }[]>>
-    } => ({ selectedIds: ['perception'] }),
+    (): Map<
+      string,
+      {
+        selectedIds: readonly string[]
+        suggestedBy?: Readonly<Record<string, readonly { kind: 'role'; id: 'guard' }[]>>
+      }
+    > => new Map([['species:elf:keen-senses', { selectedIds: ['perception'] }]]),
   ),
 )
 
@@ -78,7 +83,7 @@ vi.mock('../../../lib/quick-npc/quick-npc-starting-choices.lib', async (importOr
   return {
     ...actual,
     resolveQuickNpcStartingChoices: resolveQuickNpcStartingChoicesMock,
-    resolveCanonicalStartingChoiceAllowance: resolveCanonicalStartingChoiceAllowanceMock,
+    resolveCanonicalStartingChoiceAllowances: resolveCanonicalStartingChoiceAllowancesMock,
     startingChoicePickerOptions: vi.fn(() => []),
   }
 })
@@ -89,16 +94,23 @@ function StartingChoicesHarness({
   setup,
   defaultValues,
   additionalEquipmentOptions = [],
+  formRef,
 }: {
   setup?: ComponentProps<typeof QuickNpcStartingChoices>['setup']
   defaultValues?: Partial<QuickNpcAuthoringTabFormValues>
   additionalEquipmentOptions?: ComponentProps<
     typeof QuickNpcStartingChoices
   >['additionalEquipmentOptions']
+  formRef?: React.MutableRefObject<ReturnType<
+    typeof useForm<QuickNpcAuthoringTabFormValues>
+  > | null>
 } = {}) {
   const form = useForm<QuickNpcAuthoringTabFormValues>({
     defaultValues: { ...quickNpcAuthoringTabDefaultValues, ...defaultValues },
   })
+  if (formRef) {
+    formRef.current = form
+  }
 
   return (
     <FormProvider {...form}>
@@ -125,11 +137,24 @@ describe('QuickNpcStartingChoices', () => {
     cleanup()
     resolveQuickNpcStartingChoicesMock.mockClear()
     resolveQuickNpcStartingChoicesMock.mockReturnValue(mockChoices)
-    resolveCanonicalStartingChoiceAllowanceMock.mockReset()
-    resolveCanonicalStartingChoiceAllowanceMock.mockReturnValue({
-      selectedIds: ['perception'],
-      suggestedBy: undefined,
-    })
+    resolveCanonicalStartingChoiceAllowancesMock.mockReset()
+    resolveCanonicalStartingChoiceAllowancesMock.mockReturnValue(
+      new Map([
+        ['species:elf:keen-senses', { selectedIds: ['perception'], suggestedBy: undefined }],
+      ]),
+    )
+  })
+
+  it('does not persist overrides when a category is only opened', async () => {
+    const user = userEvent.setup()
+    const formRef: React.MutableRefObject<ReturnType<
+      typeof useForm<QuickNpcAuthoringTabFormValues>
+    > | null> = { current: null }
+    render(<StartingChoicesHarness formRef={formRef} />)
+
+    await user.click(screen.getByRole('button', { name: /expand skills/i }))
+
+    expect(formRef.current?.getValues().startingChoiceOverrides).toEqual({})
   })
 
   it('shows collapsed category summary and expands on row activate', async () => {
@@ -187,10 +212,17 @@ describe('QuickNpcStartingChoices', () => {
 
   it('puts suggestion copy on the selected item', async () => {
     const user = userEvent.setup()
-    resolveCanonicalStartingChoiceAllowanceMock.mockReturnValue({
-      selectedIds: ['perception'],
-      suggestedBy: { perception: [{ kind: 'role', id: 'guard' }] },
-    })
+    resolveCanonicalStartingChoiceAllowancesMock.mockReturnValue(
+      new Map([
+        [
+          'species:elf:keen-senses',
+          {
+            selectedIds: ['perception'],
+            suggestedBy: { perception: [{ kind: 'role', id: 'guard' }] },
+          },
+        ],
+      ]),
+    )
     render(
       <StartingChoicesHarness
         setup={{
@@ -255,9 +287,8 @@ describe('QuickNpcStartingChoices', () => {
       />,
     )
 
-    expect(
-      screen.getByRole('button', { name: /all required choices complete/i }),
-    ).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /all required choices complete/i })).toBeNull()
+    expect(screen.queryByRole('button', { name: /required choices incomplete/i })).toBeNull()
     await user.click(screen.getByRole('button', { name: /expand equipment/i }))
     expect(screen.getByText('Add the items this NPC should start with.')).toBeInTheDocument()
     expect(screen.getAllByText(equipmentStepSpearFixture.name).length).toBeGreaterThan(0)

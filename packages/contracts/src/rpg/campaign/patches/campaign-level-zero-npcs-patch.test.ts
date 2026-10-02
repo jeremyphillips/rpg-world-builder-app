@@ -71,7 +71,7 @@ describe('resolveLevelZeroNpcRules', () => {
       }).wealthTiers,
     ).toEqual({
       poor: { gp: 1 },
-      modest: { gp: 10 },
+      modest: { gp: 0 },
       comfortable: { gp: 40 },
       wealthy: { gp: 200 },
     })

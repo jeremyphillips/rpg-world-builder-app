@@ -16,7 +16,10 @@ import {
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS,
   DEFAULT_STANDARD_ARRAY,
   NPC_WEALTH_TIER_IDS,
-  normalizeCharacterWealthGrant,
+  WEALTH_GRANT_DENOMINATIONS,
+  characterWealthGrantsEqual,
+  normalizeWealthTierGrant,
+  type Currency,
   type NpcWealthTierId,
 } from '@rpg/contracts'
 
@@ -26,10 +29,7 @@ import {
   parseStandardArrayFormValues,
 } from '@/lib/forms/standard-array-form-values'
 
-import {
-  wealthGrantMoneyFromForm,
-  wealthGrantMoneyToForm,
-} from '@/lib/forms/wealth-grant-form-fields'
+import type { WealthGrantMoneyForm } from '@/lib/forms/wealth-grant-form-fields'
 
 import type { LevelZeroNpcsFormValues } from './level-zero-npc-form-fields'
 import { LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS } from './level-zero-npc-form-fields'
@@ -60,10 +60,12 @@ export function mapLevelZeroNpcsToFormValues(
       items: [...levelZeroNpcs.languageProficiencies.items],
     },
     levelZeroRetainSpeciesLanguages: levelZeroNpcs.retainSpeciesLanguages,
-    levelZeroWealthTierPoor: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.poor),
-    levelZeroWealthTierModest: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.modest),
-    levelZeroWealthTierComfortable: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.comfortable),
-    levelZeroWealthTierWealthy: wealthGrantMoneyToForm(levelZeroNpcs.wealthTiers.wealthy),
+    levelZeroWealthTierPoor: wealthTierGrantMoneyToForm(levelZeroNpcs.wealthTiers.poor),
+    levelZeroWealthTierModest: wealthTierGrantMoneyToForm(levelZeroNpcs.wealthTiers.modest),
+    levelZeroWealthTierComfortable: wealthTierGrantMoneyToForm(
+      levelZeroNpcs.wealthTiers.comfortable,
+    ),
+    levelZeroWealthTierWealthy: wealthTierGrantMoneyToForm(levelZeroNpcs.wealthTiers.wealthy),
     levelZeroStandardArray: mapStandardArrayToFormValues(levelZeroNpcs.standardArray),
   }
 }
@@ -111,27 +113,37 @@ function buildLevelZeroWeaponProficienciesPatch(
   ) as WeaponProficiencyGrantSet
 }
 
+export function wealthTierGrantMoneyToForm(
+  grant: CharacterWealthGrant | undefined,
+): WealthGrantMoneyForm {
+  if (!grant) return { amount: 0, currency: 'gp' }
+
+  for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+    const value = grant[denomination]
+    if (value !== undefined) {
+      return { amount: value, currency: denomination as Currency }
+    }
+  }
+
+  return { amount: 0, currency: 'gp' }
+}
+
+export function wealthTierGrantMoneyFromForm(
+  wealth: WealthGrantMoneyForm | undefined,
+): CharacterWealthGrant {
+  if (!wealth) return { gp: 0 }
+  return normalizeWealthTierGrant({ [wealth.currency]: wealth.amount })
+}
+
 function wealthGrantFromTierFormField(
   values: LevelZeroNpcsFormValues,
   tierId: NpcWealthTierId,
-): CharacterWealthGrant | undefined {
+): CharacterWealthGrant {
   const path = LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS[tierId]
   const formValue = values[path as keyof LevelZeroNpcsFormValues] as
-    | Parameters<typeof wealthGrantMoneyFromForm>[0]
+    | WealthGrantMoneyForm
     | undefined
-  return normalizeCharacterWealthGrant(wealthGrantMoneyFromForm(formValue))
-}
-
-function wealthGrantsEqual(
-  left: CharacterWealthGrant | undefined,
-  right: CharacterWealthGrant | undefined,
-): boolean {
-  const normalizedLeft = normalizeCharacterWealthGrant(left)
-  const normalizedRight = normalizeCharacterWealthGrant(right)
-  const denominations = ['cp', 'sp', 'gp', 'pp'] as const
-  return denominations.every(
-    (denomination) => normalizedLeft?.[denomination] === normalizedRight?.[denomination],
-  )
+  return wealthTierGrantMoneyFromForm(formValue)
 }
 
 function buildLevelZeroWealthTiersPatchInput(
@@ -140,10 +152,9 @@ function buildLevelZeroWealthTiersPatchInput(
 ): LevelZeroNpcWealthTiers | undefined {
   const tiers: LevelZeroNpcWealthTiers = {}
   for (const tierId of NPC_WEALTH_TIER_IDS) {
-    const grant = wealthGrantFromTierFormField(values, tierId)
-    const resolved = grant ?? { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId] }
+    const resolved = wealthGrantFromTierFormField(values, tierId)
     if (options.sparse) {
-      if (!wealthGrantsEqual(resolved, DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId])) {
+      if (!characterWealthGrantsEqual(resolved, DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId])) {
         tiers[tierId] = resolved
       }
       continue
@@ -169,12 +180,7 @@ function buildFullLevelZeroNpcsPatchInput(
     },
     retainSpeciesLanguages: values.levelZeroRetainSpeciesLanguages,
     wealthTiers: Object.fromEntries(
-      NPC_WEALTH_TIER_IDS.map((tierId) => [
-        tierId,
-        wealthGrantFromTierFormField(values, tierId) ?? {
-          ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId],
-        },
-      ]),
+      NPC_WEALTH_TIER_IDS.map((tierId) => [tierId, wealthGrantFromTierFormField(values, tierId)]),
     ) as LevelZeroNpcWealthTiers,
     standardArray: parseStandardArrayFormValues(values.levelZeroStandardArray),
   }
@@ -256,13 +262,44 @@ function buildSparseLevelZeroNpcsPatchInput(
 }
 
 /** Maps flat level 0 NPC form fields to the nested patch shape. */
+type LevelZeroWealthTierFormKeys =
+  | 'levelZeroWealthTierPoor'
+  | 'levelZeroWealthTierModest'
+  | 'levelZeroWealthTierComfortable'
+  | 'levelZeroWealthTierWealthy'
+
+type LevelZeroNpcsPatchFormValues = Omit<LevelZeroNpcsFormValues, LevelZeroWealthTierFormKeys> & {
+  levelZeroWealthTierPoor?: WealthGrantMoneyForm
+  levelZeroWealthTierModest?: WealthGrantMoneyForm
+  levelZeroWealthTierComfortable?: WealthGrantMoneyForm
+  levelZeroWealthTierWealthy?: WealthGrantMoneyForm
+}
+
+function withLevelZeroWealthTierDefaults(
+  values: LevelZeroNpcsPatchFormValues,
+): LevelZeroNpcsFormValues {
+  const defaults = levelZeroNpcsDefaultFormValues()
+  return {
+    ...defaults,
+    ...values,
+    levelZeroWealthTierPoor: values.levelZeroWealthTierPoor ?? defaults.levelZeroWealthTierPoor,
+    levelZeroWealthTierModest:
+      values.levelZeroWealthTierModest ?? defaults.levelZeroWealthTierModest,
+    levelZeroWealthTierComfortable:
+      values.levelZeroWealthTierComfortable ?? defaults.levelZeroWealthTierComfortable,
+    levelZeroWealthTierWealthy:
+      values.levelZeroWealthTierWealthy ?? defaults.levelZeroWealthTierWealthy,
+  }
+}
+
 export function buildLevelZeroNpcsPatchInput(
-  values: LevelZeroNpcsFormValues,
+  values: LevelZeroNpcsPatchFormValues,
   options: { includeDefaultLevelZeroNpcs?: boolean } = {},
 ): CampaignLevelZeroNpcsPatch | undefined {
+  const normalized = withLevelZeroWealthTierDefaults(values)
   if (options.includeDefaultLevelZeroNpcs) {
-    return buildFullLevelZeroNpcsPatchInput(values)
+    return buildFullLevelZeroNpcsPatchInput(normalized)
   }
 
-  return buildSparseLevelZeroNpcsPatchInput(values)
+  return buildSparseLevelZeroNpcsPatchInput(normalized)
 }

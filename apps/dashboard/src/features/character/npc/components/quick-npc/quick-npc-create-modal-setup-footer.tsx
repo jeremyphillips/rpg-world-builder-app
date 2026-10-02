@@ -4,9 +4,10 @@ import type { CharacterBuildContext } from '@rpg/contracts'
 
 import { CreateSetupFooter, type CreateSetupSequenceModel } from '@/lib/create-setup'
 
-import type {
-  QuickNpcAuthoringTabFormValues,
-  QuickNpcSetupValues,
+import {
+  quickNpcAuthoringTabDefaultValues,
+  type QuickNpcAuthoringTabFormValues,
+  type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type { QuickNpcCreateContext } from '../../lib/quick-npc/quick-npc-create-context'
 import {
@@ -51,7 +52,7 @@ export function QuickNpcCreateModalSetupFooter({
           buildContext={buildContext}
           createContext={createContext}
           setup={setup}
-          authoringValues={authoringValues}
+          getAuthoringValues={() => ({ ...quickNpcAuthoringTabDefaultValues, ...authoringValues })}
         />
       ) : null}
       <CreateSetupFooter

@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 import {
   characterWealthGrantSchema,
+  characterWealthGrantsEqual,
   normalizeCharacterWealthGrant,
+  normalizeWealthTierGrant,
   type CharacterWealthGrant,
 } from '../../primitives/character-wealth-grant'
 import { NPC_WEALTH_TIER_IDS, type NpcWealthTierId } from '../../vocab/npc/npc-wealth-tier'
@@ -158,27 +160,17 @@ function resolveLevelZeroLanguageProficiencies(
   return languageProficiencyGrantSetSchema.parse(patch ?? DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES)
 }
 
-function wealthGrantsEqual(
-  left: CharacterWealthGrant | undefined,
-  right: CharacterWealthGrant | undefined,
-): boolean {
-  const normalizedLeft = normalizeCharacterWealthGrant(left)
-  const normalizedRight = normalizeCharacterWealthGrant(right)
-  const denominations = ['cp', 'sp', 'gp', 'pp'] as const
-  return denominations.every(
-    (denomination) => normalizedLeft?.[denomination] === normalizedRight?.[denomination],
-  )
-}
-
 /** Merges a sparse tier map onto the campaign defaults. */
 export function resolveLevelZeroNpcWealthTiers(
   patch?: LevelZeroNpcWealthTiers,
 ): ResolvedLevelZeroNpcWealthTiers {
   const resolved = {} as ResolvedLevelZeroNpcWealthTiers
   for (const tierId of NPC_WEALTH_TIER_IDS) {
-    resolved[tierId] = normalizeCharacterWealthGrant(patch?.[tierId]) ?? {
-      ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId],
+    if (patch && tierId in patch) {
+      resolved[tierId] = normalizeWealthTierGrant(patch[tierId])
+      continue
     }
+    resolved[tierId] = { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId] }
   }
   return resolved
 }
@@ -194,7 +186,7 @@ function wealthTiersMatchDefaults(patch?: LevelZeroNpcWealthTiers): boolean {
   if (!patch) return true
   const resolved = resolveLevelZeroNpcWealthTiers(patch)
   return NPC_WEALTH_TIER_IDS.every((tierId) =>
-    wealthGrantsEqual(resolved[tierId], DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId]),
+    characterWealthGrantsEqual(resolved[tierId], DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId]),
   )
 }
 

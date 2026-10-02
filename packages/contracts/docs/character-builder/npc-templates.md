@@ -50,8 +50,10 @@ not cast. `wealthy` exists in the wealth-tier vocab and is unused by v1 roles.
 
 Campaign `levelZeroNpcs.wealthTiers` replaces the old single purse. Defaults are poor 1 gp,
 modest 5 gp, comfortable 10 gp, wealthy 25 gp. A classless NPC with no role uses modest.
-Until the wealth-tier form exists, the dashboard's single purse field reads and writes
-`wealthTiers.modest`.
+
+Wealth tier semantics: each tier key on the patch is authoritative when present — **zero is
+valid**. An explicit zero purse is stored as `{ gp: 0 }` (Mongo-safe). Omitting a tier key means
+“use campaign default for that tier,” not “clear to zero.”
 
 Role equipment defaults are editable starting state, not grants. Role equipment preferences bias existing choices. Only explicit grant sources create immutable Granted Equipment.
 

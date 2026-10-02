@@ -119,17 +119,22 @@ contract from `@/lib/create-setup`. Setup footer states derive from `CreateSetup
 while choices auto-complete, disabled/enabled Continue while Build resolves, re-entry Continue when
 returning from authoring without material changes.
 
-**Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
-`requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `relationshipEdges`, then
-`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. The
-builder draft stores `npcTemplateId` when a title or user selects a role. The Commoner fallback
-never writes that field. The created NPC record does not persist a role id.
+**Create path:** `prepareQuickNpcCreate()` calls `resolveQuickNpcPreparedDraft()` (shared with
+Preview), then `finalizeNpcCharacterBuild()` when the prepared draft is valid — one
+`POST /api/campaigns/:id/npcs` with membership included. Manual equipment is quantity-based via
+`startingEquipmentGrants` inside `resolveAutomaticNpcBuild()`; spell requirements use
+`requiredSpellIds` constraints only. The builder draft stores `npcTemplateId` when a title or user
+selects a role. The Commoner fallback never writes that field. The created NPC record does not
+persist a role id.
 
-**Requirements tab:** multi-add combobox pickers compose canonical equipment/spell compact row VMs
-and equipment `not_proficient` callouts only (`visibleStatuses: ['not_proficient']` on the shared
-callout stack). Discovery lists individually reachable options; resolver authority decides joint
-satisfiability. Setup changes atomically intersect stale requirement ids with the reachable set.
-Name generation is independent of mechanical build determinism.
+**Starting choices tab:** categories (skills, tools, languages, equipment, spells) collapse into
+summary rows. Untouched allowances keep automatic fills; editing a category pins that choice set
+(an override key exists) and automatic resolution never tops it up. A partial explicit pick stays
+partial, blocks Create, and survives reopening setup — Preview shows the same structured issue.
+Classless role default equipment is editable starting state; classed builds add manual equipment
+with additive grants. Authoring values (overrides, spells, manual equipment, package customization)
+are reconciled when setup changes instead of blanket resets. Name generation is independent of
+mechanical build determinism.
 Overlay policy: [drawer-shell.md](./drawer-shell.md#overlay-modality-policy). Resolver detail:
 [automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
 

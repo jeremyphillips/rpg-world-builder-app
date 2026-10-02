@@ -1,3 +1,9 @@
+import type { ChoiceSelectionCounterProps } from '@rpg/ui'
+
+export const QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE = 'sm' as const satisfies NonNullable<
+  ChoiceSelectionCounterProps['size']
+>
+
 /** Outer shell — bordered list with aligned summary columns across rows. */
 export const quickNpcStartingChoicesClasses =
   'overflow-hidden rounded-md border border-border grid grid-cols-[max-content_minmax(0,1fr)_auto]'

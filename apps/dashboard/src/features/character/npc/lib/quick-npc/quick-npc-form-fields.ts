@@ -18,7 +18,6 @@ import {
   resolveCharacterLevelConstraints,
   resolvePlayableBuilderContent,
   npcTemplateIdSchema,
-  type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
   type NpcTemplateId,
@@ -30,10 +29,7 @@ import {
   type TabbedFormTab,
   type TrailingFieldActionConfig,
 } from '@rpg/ui/form'
-import {
-  buildQuickNpcConstraintsFromArrays,
-  type QuickNpcRequirementOptionSets,
-} from './quick-npc-requirement-options.lib'
+import type { QuickNpcRequirementOptionSets } from './quick-npc-requirement-options.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 
 // ---------------------------------------------------------------------------
@@ -297,22 +293,6 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
     gender: values.gender,
     ...(values.npcTemplateId ? { npcTemplateId: values.npcTemplateId } : {}),
   }
-}
-
-export function buildQuickNpcConstraints(
-  values: Pick<QuickNpcAuthoringValues, 'requiredSpellIds'>,
-  requiredWeaponIds: readonly string[],
-): AutomaticNpcBuildConstraints | undefined {
-  return buildQuickNpcConstraintsFromArrays({
-    requiredWeaponIds: [...requiredWeaponIds],
-    requiredSpellIds: values.requiredSpellIds,
-  })
-}
-
-export function countQuickNpcConfiguredRequirements(
-  values: Pick<QuickNpcAuthoringValues, 'equipmentSelections' | 'requiredSpellIds'>,
-): number {
-  return values.equipmentSelections.length + values.requiredSpellIds.length
 }
 
 export type QuickNpcContentOptions = {

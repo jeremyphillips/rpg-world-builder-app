@@ -19,7 +19,8 @@ export type QuickNpcPreviewNpcButtonProps = {
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
-  authoringValues?: Partial<QuickNpcAuthoringTabFormValues>
+  /** Read at click time so preview matches the latest form state. */
+  getAuthoringValues: () => Partial<QuickNpcAuthoringTabFormValues>
   disabled?: boolean
   buttonRef?: React.RefObject<HTMLButtonElement | null>
 }
@@ -28,7 +29,7 @@ export function QuickNpcPreviewNpcButton({
   buildContext,
   createContext,
   setup,
-  authoringValues,
+  getAuthoringValues,
   disabled = false,
   buttonRef,
 }: QuickNpcPreviewNpcButtonProps) {
@@ -41,7 +42,7 @@ export function QuickNpcPreviewNpcButton({
     setPreview(
       projectQuickNpcDetailPreview({
         setup,
-        authoringValues,
+        authoringValues: getAuthoringValues(),
         buildContext,
         createContext,
       }),
@@ -77,6 +78,7 @@ export function QuickNpcPreviewNpcButton({
           headline={QUICK_NPC_PREVIEW_NPC_HEADLINE}
           viewModel={preview.viewModel}
           completeness={preview.completeness}
+          previewNotice={preview.validationNotice}
         />
       ) : null}
     </>

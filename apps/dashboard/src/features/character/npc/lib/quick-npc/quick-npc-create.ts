@@ -1,9 +1,7 @@
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
   CharacterBuildFinalizationError,
-  ensureEquipmentGrant,
   finalizeNpcCharacterBuild,
-  indexCharacterBuildCatalog,
   isCharacterBuildFinalizationError,
   resolveAutomaticNpcBuild,
   type AutomaticNpcBuildConstraints,
@@ -11,6 +9,7 @@ import {
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type CharacterBuildValidationIssue,
   type ChoiceSet,
   type ClassPackageChoice,
   type CreateNpcRequestInput,
@@ -65,13 +64,14 @@ export type QuickNpcPrepareCreateArgs = {
   preferences?: AutomaticNpcBuildPreferences
   allowanceSelections?: Record<string, readonly string[]>
   classPackage?: ClassPackageChoice
-  manualEquipmentGrantIds?: readonly string[]
-  /**
-   * Selected starting equipment to materialize onto `draft.equipment.grants`.
-   * These rows are inventory, not immutable grants.
-   */
+  pinnedChoiceSetIds?: readonly string[]
   startingEquipmentGrants?: readonly { equipmentId: string; quantity: number }[]
   membership?: QuickNpcMembership
+  /** Seeded draft when automatic resolution fails — used for preview projection. */
+  fallbackDraft?: CharacterBuilderDraft
+  fallbackResolvedChoiceSets?: readonly ChoiceSet[]
+  /** Starting-choice issues prepended before automatic build issues. */
+  startingChoiceIssues?: readonly CharacterBuildValidationIssue[]
 }
 
 export type QuickNpcPreparedCreate = {
@@ -80,32 +80,23 @@ export type QuickNpcPreparedCreate = {
   resolvedChoiceSets: readonly ChoiceSet[]
 }
 
-/**
- * Resolves the automatic build once, then finalizes to the wire input and returns
- * the final draft for narrative context (same membership + choice resolution).
- */
-export function materializeStartingEquipmentGrants(
-  draft: CharacterBuilderDraft,
-  context: CharacterBuildContext,
-  grants: readonly { equipmentId: string; quantity: number }[] | undefined,
-): CharacterBuilderDraft {
-  if (!grants || grants.length === 0) return draft
-  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  let next = draft
-  for (const grant of grants) {
-    const applied = ensureEquipmentGrant({
-      draft: next,
-      equipmentId: grant.equipmentId,
-      quantity: grant.quantity,
-      catalogIndex,
-      contribution: 'additional',
-    })
-    if (applied.ok) next = applied.draft
-  }
-  return next
+export type QuickNpcPreparedDraft = {
+  ok: boolean
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
+  issues: CharacterBuildValidationIssue[]
 }
 
-export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
+/**
+ * Deterministically resolves the Quick NPC draft used by preview and create.
+ * Applies starting-choice issues first, then {@link resolveAutomaticNpcBuild},
+ * then optional organization membership on success.
+ */
+// fallow-ignore-next-line complexity
+export function resolveQuickNpcPreparedDraft(
+  args: QuickNpcPrepareCreateArgs,
+): QuickNpcPreparedDraft {
+  const startingIssues = [...(args.startingChoiceIssues ?? [])]
   const resolution = resolveAutomaticNpcBuild({
     seed: args.seed,
     context: args.context,
@@ -113,24 +104,59 @@ export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpc
     ...(args.preferences ? { preferences: args.preferences } : {}),
     ...(args.allowanceSelections ? { allowanceSelections: args.allowanceSelections } : {}),
     ...(args.classPackage ? { classPackage: args.classPackage } : {}),
-    ...(args.manualEquipmentGrantIds
-      ? { manualEquipmentGrantIds: args.manualEquipmentGrantIds }
+    ...(args.pinnedChoiceSetIds?.length ? { pinnedChoiceSetIds: args.pinnedChoiceSetIds } : {}),
+    ...(args.startingEquipmentGrants?.length
+      ? { startingEquipmentGrants: args.startingEquipmentGrants }
       : {}),
   })
+
+  const fallbackDraft = args.fallbackDraft
+  const fallbackChoiceSets = args.fallbackResolvedChoiceSets ?? []
+
   if (!resolution.ok) {
-    throw new CharacterBuildFinalizationError(resolution.issues)
+    if (!fallbackDraft) {
+      throw new CharacterBuildFinalizationError([...startingIssues, ...resolution.issues])
+    }
+    return {
+      ok: false,
+      draft: fallbackDraft,
+      resolvedChoiceSets: fallbackChoiceSets,
+      issues: [...startingIssues, ...resolution.issues],
+    }
   }
 
-  let draft = args.membership
+  if (startingIssues.length > 0) {
+    return {
+      ok: false,
+      draft: fallbackDraft ?? resolution.draft,
+      resolvedChoiceSets: resolution.resolvedChoiceSets,
+      issues: startingIssues,
+    }
+  }
+
+  const draft = args.membership
     ? withMembershipConnection(resolution.draft, args.membership)
     : resolution.draft
-  draft = materializeStartingEquipmentGrants(draft, args.context, args.startingEquipmentGrants)
 
-  const input = finalizeNpcCharacterBuild(draft, args.context, {
+  return {
+    ok: true,
+    draft,
     resolvedChoiceSets: resolution.resolvedChoiceSets,
+    issues: [],
+  }
+}
+
+export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
+  const prepared = resolveQuickNpcPreparedDraft(args)
+  if (!prepared.ok) {
+    throw new CharacterBuildFinalizationError(prepared.issues)
+  }
+
+  const input = finalizeNpcCharacterBuild(prepared.draft, args.context, {
+    resolvedChoiceSets: prepared.resolvedChoiceSets,
   })
 
-  return { draft, input, resolvedChoiceSets: resolution.resolvedChoiceSets }
+  return { draft: prepared.draft, input, resolvedChoiceSets: prepared.resolvedChoiceSets }
 }
 
 /**
@@ -145,20 +171,12 @@ export function buildQuickNpcCreateInput(args: QuickNpcPrepareCreateArgs): Creat
 
 const MAX_QUICK_NPC_ISSUE_MESSAGES = 3
 
-export class QuickNpcStartingChoiceIncompleteError extends Error {
-  constructor() {
-    super('Choose the required number of starting choices before creating this NPC.')
-    this.name = 'QuickNpcStartingChoiceIncompleteError'
-  }
-}
-
 /**
  * Maps builder validation issues to a single inline form error using the
  * existing issue messages. Returns undefined for non-builder errors so
  * callers fall back to their generic failure copy.
  */
 export function formatQuickNpcCreationError(error: unknown): string | undefined {
-  if (error instanceof QuickNpcStartingChoiceIncompleteError) return error.message
   if (!isCharacterBuildFinalizationError(error)) return undefined
 
   const messages = [...new Set(error.validationIssues.map((issue) => issue.message))]

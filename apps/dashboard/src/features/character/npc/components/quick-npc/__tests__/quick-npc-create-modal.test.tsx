@@ -432,7 +432,7 @@ describe('QuickNpcCreateModal', () => {
     expect(props.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('returns to setup from Build row Change and clears back to details on continue', async () => {
+  it('returns to setup from Build row Change and keeps authoring values on continue', async () => {
     const user = userEvent.setup()
     renderModal()
 
@@ -442,7 +442,7 @@ describe('QuickNpcCreateModal', () => {
 
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     await completeSetup(user)
-    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('')
+    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Draft NPC')
   })
 
   it('blocks cancel while creation is pending', async () => {
@@ -756,6 +756,49 @@ describe('QuickNpcCreateModal standalone context', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await selectBuildCardClass(user, /fighter/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  })
+
+  it('keeps authoring details after changing species and continuing setup again', async () => {
+    const user = userEvent.setup()
+    const elfSpecies = {
+      ...populatedBuilderCatalog.species[0]!,
+      id: 'srd-cc-5.2.1:elf',
+      slug: 'elf',
+      name: 'Elf',
+    }
+    renderStandaloneModal({
+      buildContext: createCampaignNpcBuilderContextFixture({
+        catalog: {
+          ...populatedBuilderCatalog,
+          classes: [quickFighter],
+          species: [populatedBuilderCatalog.species[0]!, elfSpecies],
+        },
+      }),
+    })
+
+    await completeStandaloneSetup(user)
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Town Scout')
+
+    await user.click(screen.getByRole('button', { name: 'Change species' }))
+    await user.click(screen.getByRole('radio', { name: /elf/i }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+
+    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Town Scout')
+    expect(screen.getByText('Elf')).toBeInTheDocument()
+  })
+
+  it('returns to authoring without changing setup when a setup edit is dismissed', async () => {
+    const user = userEvent.setup()
+    renderStandaloneModal()
+
+    await completeStandaloneSetup(user)
+    await user.type(screen.getByRole('textbox', { name: /name/i }), 'Town Scout')
+
+    await user.click(screen.getByRole('button', { name: 'Change species' }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+
+    expect(screen.getByRole('textbox', { name: /name/i })).toHaveValue('Town Scout')
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
   })
 
   it('creates without membership and calls onCreated', async () => {

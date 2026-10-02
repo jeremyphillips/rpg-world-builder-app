@@ -967,14 +967,39 @@ export type ManualEquipmentGrantCompletion =
  * Grants explicit equipment ids still missing from assembled inventory.
  * Callers must enforce campaign availability before invoking.
  */
+/** @deprecated Prefer {@link applyStartingEquipmentGrants} with explicit quantities. */
 export function applyManualEquipmentGrants(args: {
   draft: CharacterBuilderDraft
   equipmentIds: readonly string[]
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
 }): ManualEquipmentGrantCompletion {
-  const { equipmentIds, context, catalogIndex } = args
-  if (equipmentIds.length === 0) {
+  return applyStartingEquipmentGrants({
+    draft: args.draft,
+    grants: args.equipmentIds.map((equipmentId) => ({ equipmentId, quantity: 1 })),
+    context: args.context,
+    catalogIndex: args.catalogIndex,
+  })
+}
+
+// fallow-ignore-next-line complexity
+export function applyStartingEquipmentGrants(args: {
+  draft: CharacterBuilderDraft
+  grants: readonly { equipmentId: string; quantity: number }[]
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+}): ManualEquipmentGrantCompletion {
+  const { grants, context, catalogIndex } = args
+  if (grants.length === 0) {
+    return { ok: true, draft: args.draft }
+  }
+
+  const merged = new Map<string, number>()
+  for (const grant of grants) {
+    if (grant.quantity <= 0) continue
+    merged.set(grant.equipmentId, (merged.get(grant.equipmentId) ?? 0) + grant.quantity)
+  }
+  if (merged.size === 0) {
     return { ok: true, draft: args.draft }
   }
 
@@ -983,7 +1008,7 @@ export function applyManualEquipmentGrants(args: {
   )
   let nextDraft = args.draft
 
-  for (const equipmentId of equipmentIds) {
+  for (const [equipmentId, quantity] of merged) {
     if (!availableEquipmentIds.has(equipmentId)) {
       const equipment = catalogIndex.equipment.get(equipmentId)
       return {
@@ -992,14 +1017,12 @@ export function applyManualEquipmentGrants(args: {
       }
     }
 
-    const inventory = deriveEquipmentDraftEntries(nextDraft, catalogIndex)
-    if (inventoryContainsEquipmentId(inventory, equipmentId)) continue
-
     const grantResult = ensureEquipmentGrant({
       draft: nextDraft,
       equipmentId,
-      quantity: 1,
+      quantity,
       catalogIndex,
+      contribution: 'additional',
     })
     if (!grantResult.ok) {
       const equipment = catalogIndex.equipment.get(equipmentId)

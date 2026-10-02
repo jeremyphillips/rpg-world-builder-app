@@ -5,3 +5,7 @@ export const quickNpcCreateFooterLayoutClasses = cva(
 )
 
 export const quickNpcCreateFooterActionsClasses = cva('flex flex-wrap items-center gap-2')
+
+export const quickNpcNarrativeRecoveryClasses = cva('flex flex-col gap-2 pb-2')
+
+export const quickNpcNarrativeRecoveryActionsClasses = cva('flex flex-wrap gap-2')

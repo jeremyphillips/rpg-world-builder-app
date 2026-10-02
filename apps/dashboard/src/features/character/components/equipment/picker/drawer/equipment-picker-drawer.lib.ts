@@ -3,14 +3,12 @@ import {
   compareEquipmentPickerItemsByRecommendation,
   fitsStartingEquipmentBudget,
   compareMagicItemBestMatch,
-  EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
   formatWealthAsGold,
   isEquipmentPickerSupportedKind,
   moneyToCopper,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
-  type EquipmentPickerSupportedKind,
   type Money,
 } from '@rpg/contracts'
 
@@ -354,22 +352,10 @@ export function filterAndSortEquipmentPickerItems(
 
 export { getEquipmentPickerSearchText } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-export function resolveEquipmentPickerAllowedKinds(
-  allowedKinds?: readonly EquipmentPickerSupportedKind[],
-): EquipmentPickerSupportedKind[] {
-  const sourceKinds = allowedKinds ?? EQUIPMENT_PICKER_SUPPORTED_KINDS
-  return sourceKinds.filter(isEquipmentPickerSupportedKind)
-}
-
-export function resolveEquipmentKindFilterOptions(
-  items: readonly EquipmentPickerItem[],
-  allowedKinds?: readonly EquipmentPickerSupportedKind[],
-): EquipmentPickerSupportedKind[] {
-  const kindsInItems = new Set(
-    items.map((item) => item.equipment.kind).filter(isEquipmentPickerSupportedKind),
-  )
-  return resolveEquipmentPickerAllowedKinds(allowedKinds).filter((kind) => kindsInItems.has(kind))
-}
+export {
+  resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerAllowedKinds,
+} from '../../../../lib/equipment/equipment-kind-filter.lib'
 
 type EquipmentPickerStructuredFilterOptions = {
   filterOutUnaffordable: boolean

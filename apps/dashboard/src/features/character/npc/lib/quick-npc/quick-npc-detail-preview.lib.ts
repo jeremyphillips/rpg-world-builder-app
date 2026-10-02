@@ -1,24 +1,14 @@
 import {
-  npcStartingChoiceAllowanceSelections,
-  npcStartingChoiceManualConstraints,
-  resolveAutomaticNpcBuild,
-  resolveAvailableChoices,
-  resolveNpcStartingChoices,
-  seedAutomaticChoiceDraft,
+  CharacterBuildFinalizationError,
   indexCharacterBuildCatalog,
   type CharacterBuildContext,
 } from '@rpg/contracts'
 
 import { projectCharacterDraftDetailSource } from '../../../lib/display/character-detail-draft-projection.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
-import { resolveQuickNpcCreateOrganization } from './quick-npc-create-context'
-import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
-import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
-import { usesQuickNpcClassEquipment } from './quick-npc-equipment-selections.lib'
-import { materializeStartingEquipmentGrants } from './quick-npc-create'
+import { assembleQuickNpcPrepareCreateArgs } from './quick-npc-authoring-submit.lib'
+import { formatQuickNpcCreationError, resolveQuickNpcPreparedDraft } from './quick-npc-create'
 import {
-  buildQuickNpcSeed,
-  mergeQuickNpcAuthoringValues,
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabFormValues,
   type QuickNpcAuthoringTabValues,
@@ -43,68 +33,32 @@ export function projectQuickNpcDetailPreview({
     ...quickNpcAuthoringTabDefaultValues,
     ...authoringValues,
   } as QuickNpcAuthoringTabValues
-  const merged = mergeQuickNpcAuthoringValues(setup, tabValues)
-  const organization = resolveQuickNpcCreateOrganization(createContext)
 
-  const preferences = buildQuickNpcAutomaticPreferences({
-    values: merged,
-    context: buildContext,
-    titles: organization?.members?.titles ?? [],
-    organizationClassAffinityIds: organization?.members?.classAffinityIds,
-    organizationTemplateId: organization?.members?.npcTemplateId,
+  const prepareArgs = assembleQuickNpcPrepareCreateArgs({
+    createContext,
+    setup,
+    tabValues,
+    buildContext,
   })
+  const prepared = resolveQuickNpcPreparedDraft(prepareArgs)
+  const validationNotice =
+    prepared.issues.length > 0
+      ? formatQuickNpcCreationError(new CharacterBuildFinalizationError(prepared.issues))
+      : undefined
 
-  const seed = buildQuickNpcSeed(merged)
-  let draft = seedAutomaticChoiceDraft(seed, buildContext, preferences)
-  let resolvedChoiceSets = resolveAvailableChoices(draft, buildContext)
-
-  try {
-    const classed = usesQuickNpcClassEquipment(merged.classId, merged.level)
-    const { requiredWeaponIds, manualEquipmentGrantIds, startingEquipmentGrants } =
-      projectQuickNpcEquipmentAllocations({
-        equipmentSelections: merged.equipmentSelections,
-        catalogIndex,
-        classed,
-      })
-    const startingChoices = resolveNpcStartingChoices({
-      context: buildContext,
-      seed,
-      startingChoiceOverrides: merged.startingChoiceOverrides,
-      classPackage: merged.classPackage,
-      requiredWeaponIds,
-      requiredSpellIds: merged.requiredSpellIds,
-      preferences,
-    })
-
-    const resolution = resolveAutomaticNpcBuild({
-      seed,
-      context: buildContext,
-      preferences,
-      allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
-      classPackage: merged.classPackage,
-      ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
-      ...(npcStartingChoiceManualConstraints(startingChoices)
-        ? { constraints: npcStartingChoiceManualConstraints(startingChoices) }
-        : {}),
-    })
-
-    if (resolution.ok) {
-      draft = materializeStartingEquipmentGrants(
-        resolution.draft,
-        buildContext,
-        startingEquipmentGrants,
-      )
-      resolvedChoiceSets = resolution.resolvedChoiceSets
-    }
-  } catch {
-    // Keep the seeded partial draft — unresolved sections stay empty in the sheet.
-  }
-
-  return projectCharacterDraftDetailSource({
-    draft,
+  const projected = projectCharacterDraftDetailSource({
+    draft: prepared.draft,
     context: buildContext,
     catalogIndex,
-    resolvedChoiceSets,
+    resolvedChoiceSets: prepared.resolvedChoiceSets,
     xpProgression: { entries: [] },
   })
+
+  return {
+    ...projected,
+    completeness: {
+      showPreviewNotice: projected.completeness.showPreviewNotice || prepared.issues.length > 0,
+    },
+    validationNotice,
+  }
 }

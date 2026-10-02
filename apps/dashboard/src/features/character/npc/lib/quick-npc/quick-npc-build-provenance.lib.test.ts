@@ -31,6 +31,17 @@ const barbarianClass = {
   name: 'Barbarian',
 }
 
+const speciesId = populatedBuilderCatalog.species[0]!.id
+
+const setupBase = {
+  contextKind: 'organization-member' as const,
+  speciesId,
+  classId: '',
+  level: 6,
+  npcTemplateId: 'criminal' as const,
+  membershipTitle: '',
+}
+
 const context = createCampaignNpcBuilderContextFixture({
   catalog: {
     ...populatedBuilderCatalog,
@@ -52,6 +63,17 @@ const lieutenantTitle = {
     templateId: 'criminal' as const,
     level: 6,
     classPreferenceOverrideSlugs: ['rogue'],
+  },
+}
+
+const lieutenantBarbarianOverrideTitle = {
+  id: 'omt_lieutenant',
+  label: 'Lieutenant',
+  priority: 40 as const,
+  npcRecommendation: {
+    templateId: 'criminal' as const,
+    level: 6,
+    classPreferenceOverrideSlugs: ['barbarian'],
   },
 }
 
@@ -90,6 +112,7 @@ describe('resolveQuickNpcClassRowHelper', () => {
         organizationClassAffinityIds: [fighterClass.id],
         context,
         classOptions,
+        setup: { ...setupBase, classId: rogueClass.id, membershipTitle: 'omt_lieutenant' },
       }),
     ).toBe('Suggested by Lieutenant.')
   })
@@ -105,8 +128,25 @@ describe('resolveQuickNpcClassRowHelper', () => {
         organizationClassAffinityIds: [fighterClass.id],
         context,
         classOptions,
+        setup: { ...setupBase, classId: barbarianClass.id, membershipTitle: 'omt_lieutenant' },
       }),
     ).toBe('Lieutenant suggests Rogue.')
+  })
+
+  it('does not attribute a role-only class to the role when the title overrides the class list', () => {
+    expect(
+      resolveQuickNpcClassRowHelper({
+        classId: rogueClass.id,
+        membershipTitle: 'omt_lieutenant',
+        titles: [lieutenantBarbarianOverrideTitle],
+        selectedTemplateId: 'criminal',
+        organizationName: 'City Watch',
+        organizationClassAffinityIds: [fighterClass.id],
+        context,
+        classOptions,
+        setup: { ...setupBase, classId: rogueClass.id, membershipTitle: 'omt_lieutenant' },
+      }),
+    ).toBe('Lieutenant suggests Barbarian.')
   })
 
   it('attributes Fighter to organization when only org recommends it', () => {
@@ -127,6 +167,7 @@ describe('resolveQuickNpcClassRowHelper', () => {
         organizationClassAffinityIds: [fighterClass.id],
         context,
         classOptions,
+        setup: { ...setupBase, classId: fighterClass.id, membershipTitle: 'omt_member' },
       }),
     ).toBe('Suggested by City Watch.')
   })

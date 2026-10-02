@@ -9,15 +9,18 @@ path as a manually built character.
 
 ## Modules
 
-| Export                               | Module                                             | Purpose                                                                     |
-| ------------------------------------ | -------------------------------------------------- | --------------------------------------------------------------------------- |
-| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`            | Zod schema for the compact seed (name, species, class, level, alignment)    |
-| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`            | Seed content validation against the build context (UI-independent)          |
-| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts`     | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
-| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts`     | Advisory weapon options from starting-equipment packages                    |
-| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`        | Advisory spell ChoiceSet options at seed class/level                        |
-| `resolveAutomaticChoiceSelections`   | `automatic/resolve-automatic-choice-selections.ts` | Required ChoiceSet fill loop, with per-value `suggestedBy`                  |
-| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`         | Seed, choice loop, magic items, weapon grants, constraint checks            |
+| Export                               | Module                                             | Purpose                                                                      |
+| ------------------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`            | Zod schema for the compact seed (name, species, class, level, alignment)     |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`            | Seed content validation against the build context (UI-independent)           |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts`     | Optional hard requirements (`requiredSpellIds`; legacy weapon ids when used) |
+| `startingEquipmentGrants`            | `automatic/resolve-automatic-npc-build.ts`         | Quantity-based manual equipment applied after package resolution             |
+| `pinnedChoiceSetIds`                 | `automatic/resolve-automatic-npc-build.ts`         | Explicit starting-choice overrides that must not be topped up                |
+| `resolveNpcStartingChoiceIssues`     | `npc/resolve-npc-starting-choices.ts`              | Incomplete pinned allowances / package picks → validation issues             |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts`     | Advisory weapon options from starting-equipment packages                     |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`        | Advisory spell ChoiceSet options at seed class/level                         |
+| `resolveAutomaticChoiceSelections`   | `automatic/resolve-automatic-choice-selections.ts` | Required ChoiceSet fill loop, with per-value `suggestedBy`                   |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`         | Seed, choice loop, magic items, weapon grants, constraint checks             |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -118,15 +121,32 @@ standard array directly.
 
 Role detail → [npc-templates.md](npc-templates.md).
 
-## Constraints (Quick NPC requirements)
+## Manual equipment grants (Quick NPC)
+
+`startingEquipmentGrants` is an optional array of `{ equipmentId, quantity }` inputs to
+`resolveAutomaticNpcBuild`. Duplicate ids are merged by summing quantities. Each grant is applied
+with additive contribution semantics after automatic and package equipment; invalid ids fail the
+build with a validation issue — grants are never silently dropped.
+
+`pinnedChoiceSetIds` lists explicit starting-choice override keys. The automatic filler skips
+topping up those choice sets. Dashboard Quick NPC passes pinned ids from
+`npcStartingChoicePinnedChoiceSetIds`.
+
+`resolveNpcStartingChoiceIssues(choices)` returns `starting_choice_incomplete` when a pinned
+allowance or nested package pick is below its minimum. Create and Preview both consume these
+issues through the shared prepared-draft path.
+
+## Constraints (Quick NPC spell requirements)
 
 Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:
 
 ```ts
 resolveAutomaticNpcBuild({
   seed,
-  constraints?: { requiredWeaponIds: string[]; requiredSpellIds: string[] },
+  constraints?: { requiredSpellIds: string[] },
   context,
+  startingEquipmentGrants?: { equipmentId: string; quantity: number }[],
+  pinnedChoiceSetIds?: string[],
 })
 ```
 

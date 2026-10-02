@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import { ActionButton, ComboboxField } from '@rpg/ui'
+import { ComboboxField } from '@rpg/ui'
 import type { ComboboxFieldOption } from '@rpg/ui'
 
 import {
@@ -13,9 +13,9 @@ import type {
   QuickNpcSpellRequirementOption,
 } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
 import { QuickNpcSpellRequirementPreview } from './quick-npc-requirement-preview'
+import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
 
 const QUICK_NPC_SPELL_ADD_LABEL = '+ Add spell'
-const QUICK_NPC_REQUIREMENT_REMOVE_LABEL = 'Remove'
 
 function excludeSelectedOptions(
   options: ComboboxFieldOption[],
@@ -71,21 +71,7 @@ function SpellRequirementsField({ entries }: { entries: QuickNpcSpellRequirement
       renderSelectedItem={(option, { onRemove }) => {
         const entry = entryById.get(option.value)
         if (!entry) return null
-        return (
-          <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
-            <div className="min-w-0 flex-1">
-              <QuickNpcSpellRequirementPreview entry={entry} />
-            </div>
-            <ActionButton
-              action="remove"
-              variant="ghost"
-              size="icon"
-              density="compact"
-              aria-label={`${QUICK_NPC_REQUIREMENT_REMOVE_LABEL} ${option.label}`}
-              onClick={onRemove}
-            />
-          </div>
-        )
+        return <QuickNpcStartingChoiceSelectedRow label={option.label} onRemove={onRemove} />
       }}
     />
   )

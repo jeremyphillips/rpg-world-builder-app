@@ -8,6 +8,8 @@ export const quickNpcBuildCardSetupOffsetClasses = 'mt-4'
 export const quickNpcBuildCardShellClasses =
   'flex flex-col gap-y-4 rounded-md border border-border bg-surface-lift px-3 py-3'
 
+export const quickNpcBuildCardTemplateIdentityClasses = 'flex flex-col gap-y-2'
+
 export const quickNpcBuildCardIdentityRowClasses = 'flex flex-wrap items-center gap-2'
 
 export const quickNpcBuildCardIdentityTitleClasses = 'heading-style-card text-foreground'

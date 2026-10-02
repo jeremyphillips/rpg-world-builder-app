@@ -12,6 +12,8 @@ export type CharacterDetailPreviewModalProps = {
   headline: string
   viewModel: CharacterDetailViewModel
   completeness: CharacterDetailProjectionCompleteness
+  /** When set, replaces the default preview completeness notice. */
+  previewNotice?: string
 }
 
 export function CharacterDetailPreviewModal({
@@ -20,12 +22,16 @@ export function CharacterDetailPreviewModal({
   headline,
   viewModel,
   completeness,
+  previewNotice,
 }: CharacterDetailPreviewModalProps) {
+  const notice =
+    previewNotice ?? (completeness.showPreviewNotice ? CHARACTER_DETAIL_PREVIEW_NOTICE : undefined)
+
   return (
     <DetailPreviewModal open={open} onOpenChange={onOpenChange} headline={headline}>
-      {completeness.showPreviewNotice ? (
+      {notice ? (
         <Text variant="muted" className={characterDetailPreviewNoticeClasses()}>
-          {CHARACTER_DETAIL_PREVIEW_NOTICE}
+          {notice}
         </Text>
       ) : null}
       <CharacterDetailSheet viewModel={viewModel} />

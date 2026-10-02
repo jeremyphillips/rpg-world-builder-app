@@ -13,16 +13,10 @@ import {
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 import {
-  formatStartingChoiceCategorySummary,
-  resolveQuickNpcStartingChoices,
-} from './quick-npc-starting-choices.lib'
-import {
   filterPackageStartingEquipmentSummaries,
   formatPackageInventoryRowTitle,
   listEquipmentInventoryRowsFromDraft,
 } from '@/features/character/lib/equipment/equipment-step.lib'
-
-import type { QuickNpcCreateContext } from './quick-npc-create-context'
 
 const PACKAGE_GRANT_SOURCE_KINDS = new Set(['classStartingEquipment', 'startingGold'])
 
@@ -41,29 +35,6 @@ export function isGrantedEquipmentContribution(
     contribution.category === 'equipment' &&
     !PACKAGE_GRANT_SOURCE_KINDS.has(contribution.source.kind)
   )
-}
-
-export function resolveQuickNpcRecommendedStartingChoices(args: {
-  setup: QuickNpcSetupValues
-  context: CharacterBuildContext
-  createContext: QuickNpcCreateContext
-  startingChoiceOverrides?: Record<string, readonly string[]>
-  requiredSpellIds?: readonly string[]
-}): NpcStartingChoices {
-  const overrides = { ...(args.startingChoiceOverrides ?? {}) }
-  const classId = args.setup.classId
-  if (classId) {
-    delete overrides[startingEquipmentChoiceSetId(classId)]
-  }
-
-  return resolveQuickNpcStartingChoices({
-    setup: args.setup,
-    context: args.context,
-    createContext: args.createContext,
-    startingChoiceOverrides: overrides,
-    requiredWeaponIds: [],
-    requiredSpellIds: args.requiredSpellIds ?? [],
-  })
 }
 
 export function resolveQuickNpcStartingEquipmentPackageContext(args: {
@@ -141,13 +112,15 @@ export function resolveQuickNpcStartingEquipmentPackageItemLabels(args: {
     })
 }
 
+export type QuickNpcEquipmentCategoryStatus = 'none' | 'complete' | 'incomplete'
+
 export function resolveQuickNpcEquipmentCategoryStatus(args: {
   choiceSets: readonly { id: string; required: boolean; min: number; max: number }[]
   draftSelections: Readonly<Record<string, readonly string[]>>
   overrides: Readonly<Record<string, readonly string[]>>
-}): 'complete' | 'incomplete' {
+}): QuickNpcEquipmentCategoryStatus {
   const required = args.choiceSets.filter((choiceSet) => choiceSet.required && choiceSet.min > 0)
-  if (required.length === 0) return 'complete'
+  if (required.length === 0) return 'none'
   for (const choiceSet of required) {
     const selected = args.overrides[choiceSet.id] ?? args.draftSelections[choiceSet.id] ?? []
     if (selected.length < choiceSet.min || selected.length > choiceSet.max) return 'incomplete'
@@ -161,7 +134,9 @@ export function resolveStartingChoiceEquipmentCategoryLabels(args: {
   setup: QuickNpcSetupValues
   equipmentSelections: readonly { equipmentId: string; quantity: number }[]
   additionalOptionLabels: ReadonlyMap<string, string>
+  catalogIndex?: ReturnType<typeof indexCharacterBuildCatalog>
 }): string[] {
+  const catalogIndex = args.catalogIndex ?? indexCharacterBuildCatalog(args.context.catalog)
   const labels: string[] = [
     ...resolveQuickNpcStartingEquipmentPackageItemLabels({
       context: args.context,
@@ -180,20 +155,9 @@ export function resolveStartingChoiceEquipmentCategoryLabels(args: {
   for (const entry of args.choices.contributions) {
     if (!isGrantedEquipmentContribution(entry)) continue
     for (const id of entry.selectedIds) {
-      const catalog = indexCharacterBuildCatalog(args.context.catalog)
-      labels.push(catalog.equipment.get(id)?.name ?? id)
+      labels.push(catalogIndex.equipment.get(id)?.name ?? id)
     }
   }
 
   return labels.filter(Boolean)
-}
-
-export function startingChoiceEquipmentCategorySummary(args: {
-  context: CharacterBuildContext
-  choices: NpcStartingChoices
-  setup: QuickNpcSetupValues
-  equipmentSelections: readonly { equipmentId: string; quantity: number }[]
-  additionalOptionLabels: ReadonlyMap<string, string>
-}): string {
-  return formatStartingChoiceCategorySummary(resolveStartingChoiceEquipmentCategoryLabels(args))
 }

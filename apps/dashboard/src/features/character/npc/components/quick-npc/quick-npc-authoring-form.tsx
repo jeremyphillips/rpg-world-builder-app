@@ -19,7 +19,7 @@ import { useSpeciesNameTrailingAction } from '../../../hooks/use-species-name-tr
 import { useCreateNpc } from '../../hooks/use-create-npc'
 import { isQuickNpcSetupStillValid } from '../../lib/quick-npc/quick-npc-authoring-validation.lib'
 import { formatQuickNpcCreationError } from '../../lib/quick-npc/quick-npc-create'
-import { createQuickNpcFormValueSyncs } from '../../lib/quick-npc/quick-npc-form-sync'
+import { reconcileQuickNpcAuthoringRequirementValues } from '../../lib/quick-npc/quick-npc-authoring-requirements-reconcile.lib'
 import {
   buildQuickNpcDetailsFields,
   buildQuickNpcRequirementsFields,
@@ -28,11 +28,11 @@ import {
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   type QuickNpcAuthoringTabFormValues,
-  type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import { type QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
 import { resolveQuickNpcSetupChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
+import { pruneQuickNpcStartingChoiceOverrides } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
 import { readQuickNpcClassPackage } from '../../lib/quick-npc/quick-npc-package-customization.lib'
 import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
 import {
@@ -55,6 +55,8 @@ import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
 import {
   quickNpcCreateFooterActionsClasses,
   quickNpcCreateFooterLayoutClasses,
+  quickNpcNarrativeRecoveryActionsClasses,
+  quickNpcNarrativeRecoveryClasses,
 } from './quick-npc-create-footer.variants'
 import {
   QUICK_NPC_CREATE_SUBMIT_LABEL,
@@ -77,14 +79,10 @@ export type QuickNpcAuthoringFormProps = {
   initialValues?: Partial<QuickNpcAuthoringTabFormValues> | undefined
   equipmentBaseline?: QuickNpcEquipmentSeedContext
   onCancel: () => void
-  onChangeSetup: (equipmentSelections?: QuickNpcEquipmentSelection[]) => void
+  onChangeSetup: (authoringValues?: Partial<QuickNpcAuthoringTabFormValues>) => void
   onSetupSummaryEdit: (
     target: SetupSummaryEditTarget,
-    equipmentSelections: QuickNpcEquipmentSelection[],
-    packageAuthoring?: {
-      classPackage?: QuickNpcAuthoringTabFormValues['classPackage']
-      startingChoiceOverrides?: QuickNpcAuthoringTabFormValues['startingChoiceOverrides']
-    },
+    authoringValues: Partial<QuickNpcAuthoringTabFormValues>,
   ) => void
   onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
@@ -231,7 +229,6 @@ export function QuickNpcAuthoringForm({
   )
 
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
-  const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
   const editingLock = useQuickNpcEditingLock()
 
   const defaultValues = React.useMemo(() => {
@@ -248,14 +245,28 @@ export function QuickNpcAuthoringForm({
       },
       context: buildContext,
     })
+    const prunedOverrides = pruneQuickNpcStartingChoiceOverrides({
+      setup,
+      context: buildContext,
+      createContext,
+      overrides: reconciled.startingChoiceOverrides,
+    })
+    const requirementValues = reconcileQuickNpcAuthoringRequirementValues({
+      setup,
+      context: buildContext,
+      equipmentSelections: reconciled.equipmentSelections,
+      requiredSpellIds: initialValues?.requiredSpellIds ?? [],
+    })
+
     return {
       ...quickNpcAuthoringTabDefaultValues,
       ...initialValues,
-      equipmentSelections: reconciled.equipmentSelections,
-      startingChoiceOverrides: reconciled.startingChoiceOverrides,
+      equipmentSelections: requirementValues.equipmentSelections,
+      startingChoiceOverrides: prunedOverrides,
       classPackage: reconciled.classPackage,
+      requiredSpellIds: requirementValues.requiredSpellIds,
     }
-  }, [buildContext, equipmentBaseline, initialValues, setup])
+  }, [buildContext, createContext, equipmentBaseline, initialValues, setup])
 
   const requirementCategoryKey = React.useMemo(() => {
     const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
@@ -276,7 +287,12 @@ export function QuickNpcAuthoringForm({
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabFormValues>({
     submit: async (tabValues) => {
       if (!isQuickNpcSetupStillValid(setup, buildContext)) {
-        onChangeSetup(tabValues.equipmentSelections)
+        onChangeSetup({
+          equipmentSelections: tabValues.equipmentSelections,
+          requiredSpellIds: tabValues.requiredSpellIds,
+          startingChoiceOverrides: tabValues.startingChoiceOverrides,
+          classPackage: tabValues.classPackage,
+        })
         return
       }
 
@@ -336,7 +352,6 @@ export function QuickNpcAuthoringForm({
         return onSubmit(values, form)
       }}
       formError={formError ?? null}
-      valueSyncs={valueSyncs}
       stickyChrome={false}
       externalFooter
       header={(form) => (
@@ -358,16 +373,11 @@ export function QuickNpcAuthoringForm({
                 editingLock.requestFocus()
                 return
               }
-              const values = form.getValues()
               onSetupSummaryEdit(
                 targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
                   ? { type: 'external', id: targetSetId }
                   : { type: 'set', id: targetSetId },
-                values.equipmentSelections ?? [],
-                {
-                  classPackage: values.classPackage,
-                  startingChoiceOverrides: values.startingChoiceOverrides ?? {},
-                },
+                form.getValues(),
               )
             }}
           />
@@ -379,12 +389,12 @@ export function QuickNpcAuthoringForm({
         return (
           <>
             {showNarrativeRecovery ? (
-              <div className="flex flex-col gap-2 pb-2">
+              <div className={quickNpcNarrativeRecoveryClasses()}>
                 <Text variant="muted" className="text-sm">
                   Narrative generation failed. Retry or create this NPC without a generated
                   narrative.
                 </Text>
-                <div className="flex flex-wrap gap-2">
+                <div className={quickNpcNarrativeRecoveryActionsClasses()}>
                   <Button
                     type="button"
                     variant="secondary"
@@ -419,7 +429,7 @@ export function QuickNpcAuthoringForm({
                 buildContext={buildContext}
                 createContext={createContext}
                 setup={setup}
-                authoringValues={form.getValues()}
+                getAuthoringValues={() => form.getValues()}
                 disabled={isSubmitting}
               />
               <div className={quickNpcCreateFooterActionsClasses()}>

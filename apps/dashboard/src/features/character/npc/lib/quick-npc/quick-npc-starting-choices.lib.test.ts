@@ -28,7 +28,6 @@ import {
   startingChoiceShowSuggestedReset,
   startingChoiceItemSuggestionCopy,
   startingChoiceItemSuggestionHint,
-  startingChoiceSuggestionHint,
 } from './quick-npc-starting-choices.lib'
 
 function allowance(
@@ -151,11 +150,12 @@ describe('startingChoiceAllowancePresentation', () => {
     const choices = {
       contributions: [contribution],
       removedOverrideIds: [],
+      pinnedChoiceSetIds: [],
       draft: {} as NpcStartingChoices['draft'],
       resolvedChoiceSets: [choiceSet],
     } satisfies Pick<
       NpcStartingChoices,
-      'contributions' | 'removedOverrideIds' | 'draft' | 'resolvedChoiceSets'
+      'contributions' | 'removedOverrideIds' | 'pinnedChoiceSetIds' | 'draft' | 'resolvedChoiceSets'
     > as NpcStartingChoices
 
     expect(startingChoiceAllowancePresentation(choices, contribution)).toEqual(
@@ -209,47 +209,6 @@ describe('startingChoiceItemSuggestionHint', () => {
   })
 })
 
-describe('startingChoiceSuggestionHint', () => {
-  it('names a source only when that source covers every value', () => {
-    expect(
-      startingChoiceSuggestionHint({
-        selectedIds: ['athletics', 'perception'],
-        suggestedBy: { athletics: [guardRole], perception: [guardRole] },
-        labels: { template: 'Guard' },
-      }),
-    ).toBe('Suggested by Guard role')
-    expect(
-      startingChoiceSuggestionHint({
-        selectedIds: ['common'],
-        suggestedBy: { common: [elfSpecies, guardRole] },
-        labels: { template: 'Guard', species: 'Elf' },
-      }),
-    ).toBe('Suggested by Elf species · Guard role')
-    expect(
-      startingChoiceSuggestionHint({
-        selectedIds: ['insight'],
-        suggestedBy: { insight: [] },
-      }),
-    ).toBeUndefined()
-    expect(
-      startingChoiceSuggestionHint({
-        selectedIds: ['athletics'],
-        labels: { template: 'Guard' },
-      }),
-    ).toBeUndefined()
-  })
-
-  it('leaves the Commoner fallback unnamed', () => {
-    expect(
-      startingChoiceSuggestionHint({
-        selectedIds: ['perception'],
-        suggestedBy: { perception: [guardRole] },
-        labels: {},
-      }),
-    ).toBeUndefined()
-  })
-})
-
 describe('startingChoiceResetLabel', () => {
   it('uses suggested copy when the canonical fill has a named source', () => {
     expect(startingChoiceResetLabel({ count: 1, namedAttribution: true })).toBe(
@@ -299,14 +258,26 @@ describe('normalizeStartingChoiceOverride', () => {
       normalizeStartingChoiceOverride({
         currentIds: ['a', 'b'],
         canonicalIds: ['a', 'b'],
+        allowance: { min: 2, max: 2 },
       }),
     ).toBeUndefined()
     expect(
       normalizeStartingChoiceOverride({
         currentIds: ['b'],
-        canonicalIds: ['a'],
+        canonicalIds: ['a', 'b'],
+        allowance: { min: 2, max: 2 },
       }),
     ).toEqual(['b'])
+  })
+
+  it('keeps a partial override even when it is a prefix of the canonical fill', () => {
+    expect(
+      normalizeStartingChoiceOverride({
+        currentIds: ['a'],
+        canonicalIds: ['a', 'b'],
+        allowance: { min: 2, max: 2 },
+      }),
+    ).toEqual(['a'])
   })
 })
 
@@ -398,6 +369,7 @@ describe('groupStartingChoicesByKind', () => {
         fixedGrant(),
       ],
       removedOverrideIds: [],
+      pinnedChoiceSetIds: [],
       draft: {} as never,
       resolvedChoiceSets: [],
     })

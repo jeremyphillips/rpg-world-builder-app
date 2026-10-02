@@ -9,6 +9,9 @@ import {
   indexCharacterBuildCatalog,
   optionIdentitiesOverlap,
   resolveNpcStartingChoices,
+  STARTING_CHOICE_CATEGORY_ORDER,
+  startingChoiceCategoryLabel,
+  startingChoiceMechanicSortIndex,
   resolveProficiencyChoiceSetPresentation,
   resolveProficiencyPickerItems,
   type CharacterBuildContext,
@@ -33,23 +36,8 @@ import {
   resolveQuickNpcTemplateRecommendations,
 } from './quick-npc-template-recommendations.lib'
 
-const STARTING_CHOICE_PRESENTATION: Record<StartingChoiceCategory, { label: string }> = {
-  skill: { label: 'Skills' },
-  tool: { label: 'Tools' },
-  language: { label: 'Languages' },
-  equipment: { label: 'Equipment' },
-  weapon: { label: 'Weapons' },
-  spell: { label: 'Spells' },
-}
-
-const MECHANIC_ORDER: Record<StartingChoiceContribution['mechanic'], number> = {
-  'fixed-grant': 0,
-  'choice-allowance': 1,
-  'explicit-constraint': 2,
-}
-
 export function startingChoiceKindLabel(kind: StartingChoiceCategory): string {
-  return STARTING_CHOICE_PRESENTATION[kind].label
+  return startingChoiceCategoryLabel(kind)
 }
 
 export type StartingChoiceSuggestionLabels = {
@@ -96,22 +84,6 @@ function suggestionCopy(
   }
 }
 
-function sameSourceSet(
-  left: readonly RecommendationSourceRef[],
-  right: readonly RecommendationSourceRef[],
-): boolean {
-  if (left.length !== right.length) return false
-  return left.every(
-    (source, index) => suggestionSourceKey(source) === suggestionSourceKey(right[index]!),
-  )
-}
-
-function suggestionSourceKey(source: RecommendationSourceRef): string {
-  if (source.kind === 'title') return `title:${source.organizationId}:${source.titleId}`
-  if (source.kind === 'user') return 'user'
-  return `${source.kind}:${source.id}`
-}
-
 /** Suggestion copy for one selected item. Empty source lists are canonical order. */
 export function startingChoiceItemSuggestionHint(args: {
   selectedId: string
@@ -129,19 +101,6 @@ export function startingChoiceItemSuggestionCopy(args: {
   const sources = args.suggestedBy?.[args.selectedId] ?? []
   if (sources.length === 0) return undefined
   return suggestionCopy(sources, args.labels ?? {})
-}
-
-export function startingChoiceSuggestionHint(args: {
-  selectedIds: readonly string[]
-  suggestedBy?: Readonly<Record<string, readonly RecommendationSourceRef[]>>
-  labels?: StartingChoiceSuggestionLabels
-}): string | undefined {
-  if (!args.suggestedBy || args.selectedIds.length === 0) return undefined
-  const traced = args.selectedIds.map((id) => args.suggestedBy?.[id] ?? [])
-  const first = traced[0]
-  if (!first || first.length === 0) return undefined
-  if (!traced.every((sources) => sameSourceSet(sources, first))) return undefined
-  return suggestionCopy(first, args.labels ?? {})?.hint
 }
 
 export function startingChoiceHasNamedAttribution(args: {
@@ -200,7 +159,6 @@ export function resolveQuickNpcStartingChoices(args: {
   createContext: QuickNpcCreateContext
   startingChoiceOverrides?: Record<string, readonly string[]>
   classPackage?: ClassPackageChoice
-  requiredWeaponIds?: readonly string[]
   requiredSpellIds?: readonly string[]
 }): NpcStartingChoices {
   const preferences = buildQuickNpcAutomaticPreferences(preferenceArgs(args))
@@ -215,7 +173,6 @@ export function resolveQuickNpcStartingChoices(args: {
     },
     startingChoiceOverrides: args.startingChoiceOverrides,
     ...(args.classPackage ? { classPackage: args.classPackage } : {}),
-    requiredWeaponIds: args.requiredWeaponIds,
     requiredSpellIds: args.requiredSpellIds,
     preferences,
   })
@@ -228,27 +185,56 @@ export function resolveCanonicalStartingChoiceAllowance(args: {
   createContext: QuickNpcCreateContext
   choiceSetId: string
   startingChoiceOverrides?: Record<string, readonly string[]>
-  requiredWeaponIds?: readonly string[]
   requiredSpellIds?: readonly string[]
 }): CanonicalStartingChoiceAllowance {
-  const overrides = { ...(args.startingChoiceOverrides ?? {}) }
-  delete overrides[args.choiceSetId]
+  const batch = resolveCanonicalStartingChoiceAllowances(args)
+  return (
+    batch.get(args.choiceSetId) ?? {
+      selectedIds: [],
+      suggestedBy: undefined,
+    }
+  )
+}
+
+/** Canonical fills for every choice allowance — memoize at the UI boundary. */
+export function resolveCanonicalStartingChoiceAllowances(args: {
+  setup: QuickNpcSetupValues
+  context: CharacterBuildContext
+  createContext: QuickNpcCreateContext
+  startingChoiceOverrides?: Record<string, readonly string[]>
+  requiredSpellIds?: readonly string[]
+}): Map<string, CanonicalStartingChoiceAllowance> {
   const choices = resolveQuickNpcStartingChoices({
     setup: args.setup,
     context: args.context,
     createContext: args.createContext,
-    startingChoiceOverrides: overrides,
-    requiredWeaponIds: args.requiredWeaponIds,
+    startingChoiceOverrides: args.startingChoiceOverrides,
     requiredSpellIds: args.requiredSpellIds,
   })
-  const entry = choices.contributions.find(
-    (candidate) =>
-      candidate.mechanic === 'choice-allowance' && candidate.choiceSetId === args.choiceSetId,
+  const allowanceIds = choices.contributions.flatMap((entry) =>
+    entry.mechanic === 'choice-allowance' ? [entry.choiceSetId] : [],
   )
-  return {
-    selectedIds: entry?.selectedIds ?? [],
-    suggestedBy: entry?.mechanic === 'choice-allowance' ? entry.suggestedBy : undefined,
+  const map = new Map<string, CanonicalStartingChoiceAllowance>()
+  for (const choiceSetId of allowanceIds) {
+    const overrides = { ...(args.startingChoiceOverrides ?? {}) }
+    delete overrides[choiceSetId]
+    const canonicalChoices = resolveQuickNpcStartingChoices({
+      setup: args.setup,
+      context: args.context,
+      createContext: args.createContext,
+      startingChoiceOverrides: overrides,
+      requiredSpellIds: args.requiredSpellIds,
+    })
+    const entry = canonicalChoices.contributions.find(
+      (candidate) =>
+        candidate.mechanic === 'choice-allowance' && candidate.choiceSetId === choiceSetId,
+    )
+    map.set(choiceSetId, {
+      selectedIds: entry?.selectedIds ?? [],
+      suggestedBy: entry?.mechanic === 'choice-allowance' ? entry.suggestedBy : undefined,
+    })
   }
+  return map
 }
 
 export function startingChoiceShowSuggestedReset(args: {
@@ -352,34 +338,42 @@ export function resolveStartingChoiceCategoryAllowanceStatus(args: {
 }
 
 export function startingChoiceAddPlaceholder(kind: StartingChoiceCategory): string {
+  return `+ ${startingChoiceAddAccessibleName(kind)}`
+}
+
+export function startingChoiceAddAccessibleName(kind: StartingChoiceCategory): string {
   switch (kind) {
     case 'skill':
-      return '+ Add skill'
+      return 'Add skill'
     case 'tool':
-      return '+ Add tool'
+      return 'Add tool'
     case 'language':
-      return '+ Add language'
+      return 'Add language'
     case 'spell':
-      return '+ Add spell'
+      return 'Add spell'
     default:
-      return '+ Add item'
+      return 'Add item'
   }
 }
 
 export function groupStartingChoicesByKind(
   choices: NpcStartingChoices,
 ): StartingChoiceCategoryGroup[] {
-  const order: StartingChoiceCategory[] = ['skill', 'tool', 'language', 'equipment', 'spell']
-  return order.flatMap((kind) => {
+  return STARTING_CHOICE_CATEGORY_ORDER.flatMap((kind) => {
+    if (kind === 'weapon') return []
     const entries = choices.contributions
       .filter((entry) => entry.category === kind)
       .slice()
-      .sort((left, right) => MECHANIC_ORDER[left.mechanic] - MECHANIC_ORDER[right.mechanic])
+      .sort(
+        (left, right) =>
+          startingChoiceMechanicSortIndex(left.mechanic) -
+          startingChoiceMechanicSortIndex(right.mechanic),
+      )
     if (entries.length === 0) return []
     return [
       {
         kind,
-        label: STARTING_CHOICE_PRESENTATION[kind].label,
+        label: startingChoiceCategoryLabel(kind),
         entries,
         canChange: entries.some(
           (entry) =>
@@ -416,6 +410,48 @@ export function resolveStartingChoiceSuggestionLabels(args: {
     title: title?.label,
     species: species?.name,
   }
+}
+
+export function normalizeQuickNpcStartingChoiceOverrides(args: {
+  setup: QuickNpcSetupValues
+  context: CharacterBuildContext
+  createContext: QuickNpcCreateContext
+  overrides: Record<string, readonly string[]>
+  requiredSpellIds?: readonly string[]
+}): Record<string, string[]> {
+  const choices = resolveQuickNpcStartingChoices({
+    setup: args.setup,
+    context: args.context,
+    createContext: args.createContext,
+    startingChoiceOverrides: args.overrides,
+    requiredSpellIds: args.requiredSpellIds ?? [],
+  })
+  const canonicalAllowances = resolveCanonicalStartingChoiceAllowances({
+    setup: args.setup,
+    context: args.context,
+    createContext: args.createContext,
+    startingChoiceOverrides: args.overrides,
+    requiredSpellIds: args.requiredSpellIds ?? [],
+  })
+  const next: Record<string, string[]> = {}
+  for (const entry of choices.contributions) {
+    if (entry.mechanic !== 'choice-allowance') continue
+    const current = args.overrides[entry.choiceSetId] ?? [...entry.selectedIds]
+    const canonical = canonicalAllowances.get(entry.choiceSetId) ?? { selectedIds: [] }
+    const normalized = normalizeStartingChoiceOverride({
+      currentIds: current,
+      canonicalIds: canonical.selectedIds,
+      allowance: entry.allowance,
+    })
+    if (normalized) next[entry.choiceSetId] = normalized
+  }
+  for (const [choiceSetId, selectedIds] of Object.entries(args.overrides)) {
+    if (next[choiceSetId] !== undefined) continue
+    if (choices.pinnedChoiceSetIds.includes(choiceSetId)) {
+      next[choiceSetId] = [...selectedIds]
+    }
+  }
+  return next
 }
 
 export function pruneQuickNpcStartingChoiceOverrides(args: {
@@ -517,23 +553,32 @@ export function startingChoiceCategorySummary(args: {
   return formatStartingChoiceCategorySummary(resolveStartingChoiceCategoryLabels(args))
 }
 
+export function buildStartingChoiceOptionLabelIndex(
+  choices: NpcStartingChoices,
+): Map<string, string> {
+  const optionLabels = new Map<string, string>()
+  for (const choiceSet of choices.resolvedChoiceSets) {
+    for (const option of choiceSet.options) optionLabels.set(option.id, option.label)
+  }
+  return optionLabels
+}
+
 export function startingChoiceDisplayLabels(args: {
   context: CharacterBuildContext
   choices: NpcStartingChoices
   contribution: StartingChoiceContribution
+  catalogIndex?: ReturnType<typeof indexCharacterBuildCatalog>
+  optionLabels?: Map<string, string>
 }): string[] {
-  const optionLabels = new Map<string, string>()
-  for (const choiceSet of args.choices.resolvedChoiceSets) {
-    for (const option of choiceSet.options) optionLabels.set(option.id, option.label)
-  }
-  const catalog = indexCharacterBuildCatalog(args.context.catalog)
+  const catalogIndex = args.catalogIndex ?? indexCharacterBuildCatalog(args.context.catalog)
+  const optionLabels = args.optionLabels ?? buildStartingChoiceOptionLabelIndex(args.choices)
 
   return args.contribution.selectedIds.map((id) =>
     formatStartingChoiceDisplayLabel(
       resolveStartingChoiceSelectedIdLabel(
         id,
         optionLabels,
-        catalog,
+        catalogIndex,
         args.context.catalog.languages,
       ),
       args.contribution,
@@ -588,11 +633,20 @@ export function startingChoicePickerOptions(args: {
     }))
 }
 
-/** A fill equal to canonical deletes the override key. */
+/** Removes an override only when the selection is complete and matches the canonical fill. */
 export function normalizeStartingChoiceOverride(args: {
   currentIds: readonly string[]
   canonicalIds: readonly string[]
+  allowance?: { min: number; max: number }
 }): string[] | undefined {
-  if (startingChoiceFillsMatch(args.currentIds, args.canonicalIds)) return undefined
+  const allowance = args.allowance ?? {
+    min: args.canonicalIds.length,
+    max: args.canonicalIds.length,
+  }
+  const isComplete =
+    args.currentIds.length >= allowance.min && args.currentIds.length <= allowance.max
+  if (isComplete && startingChoiceFillsMatch(args.currentIds, args.canonicalIds)) {
+    return undefined
+  }
   return [...args.currentIds]
 }

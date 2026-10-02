@@ -18,6 +18,7 @@ import {
   quickNpcBuildCardIdentityRowClasses,
   quickNpcBuildCardIdentityTitleClasses,
   quickNpcBuildCardLevelEditorClasses,
+  quickNpcBuildCardTemplateIdentityClasses,
 } from './quick-npc-build-card.variants'
 
 type BuildCardRoleAttributeRowProps = {
@@ -67,7 +68,7 @@ export function BuildCardTemplateIdentity({
   templateDescription?: string
 }) {
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className={quickNpcBuildCardTemplateIdentityClasses}>
       <div className={quickNpcBuildCardIdentityRowClasses}>
         <Text as="h3" className={quickNpcBuildCardIdentityTitleClasses}>
           {templateLabel}

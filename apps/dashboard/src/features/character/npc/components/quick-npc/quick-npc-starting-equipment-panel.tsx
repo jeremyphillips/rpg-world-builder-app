@@ -11,7 +11,6 @@ import {
 } from '@rpg/contracts'
 import { declineClassPackage, selectClassPackage, type ClassPackageChoice } from '@rpg/contracts'
 import {
-  ActionButton,
   Button,
   ComboboxField,
   ComboboxFilterSelect,
@@ -34,7 +33,20 @@ import {
   filterPackageStartingEquipmentSummaries,
 } from '@/features/character/lib/equipment/equipment-step.lib'
 
-import { EntityAnatomyHost } from '@/features/content'
+import {
+  buildQuickNpcAdditionalEquipmentPresentationMap,
+  canAppendQuickNpcAdditionalEquipment,
+  incrementQuickNpcManualEquipmentSelection,
+  listQuickNpcPackageInventoryRows,
+  listSelectedQuickNpcAdditionalEquipment,
+  quickNpcEquipmentOptionAccessibleLabel,
+} from '../../lib/quick-npc/quick-npc-equipment-supply.lib'
+import {
+  formatManualEquipmentQuantityAccessibleLabel,
+  formatManualEquipmentQuantityLabel,
+} from '../../lib/quick-npc/quick-npc-equipment-presentation.lib'
+import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
+import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
 
 import {
   filterQuickNpcAdditionalEquipmentByKind,
@@ -49,17 +61,6 @@ import {
   type QuickNpcEquipmentSelection,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type { QuickNpcSetupValues } from '../../lib/quick-npc/quick-npc-form-fields'
-import {
-  buildQuickNpcAdditionalEquipmentPresentationMap,
-  canAppendQuickNpcAdditionalEquipment,
-  incrementQuickNpcManualEquipmentSelection,
-  listSelectedQuickNpcAdditionalEquipment,
-  quickNpcEquipmentOptionAccessibleLabel,
-} from '../../lib/quick-npc/quick-npc-equipment-supply.lib'
-import {
-  formatManualEquipmentQuantityAccessibleLabel,
-  formatManualEquipmentQuantityLabel,
-} from '../../lib/quick-npc/quick-npc-equipment-presentation.lib'
 import {
   buildQuickNpcPackageCustomizationRows,
   formatQuickNpcEffectivePackageDescription,
@@ -99,17 +100,16 @@ import {
   quickNpcPackageHeaderActionsClasses,
   quickNpcPackageNoPackageClasses,
 } from './quick-npc-package-customization.variants'
-import { quickNpcStartingChoiceAddControlClasses } from './quick-npc-starting-choices.variants'
+import {
+  quickNpcAdditionalEquipmentQuantityClasses,
+  quickNpcStartingChoiceAddControlClasses,
+  quickNpcStartingChoiceInnerSectionClasses,
+  quickNpcStartingChoiceSelectedListClasses,
+} from './quick-npc-starting-choices.variants'
 
 type QuickNpcStartingEquipmentPackageContext = NonNullable<
   ReturnType<typeof resolveQuickNpcStartingEquipmentPackageContext>
 >
-import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
-import {
-  quickNpcAdditionalEquipmentQuantityClasses,
-  quickNpcStartingChoiceInnerSectionClasses,
-  quickNpcStartingChoiceSelectedListClasses,
-} from './quick-npc-starting-choices.variants'
 
 const QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL = 'Additional Equipment'
 const QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION =
@@ -123,6 +123,7 @@ export type QuickNpcStartingEquipmentPanelProps = {
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
   additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
+  packageContext?: QuickNpcStartingEquipmentPackageContext | null
 }
 
 function equipmentRecommendationSourceName(
@@ -134,49 +135,6 @@ function equipmentRecommendationSourceName(
     if (source.kind === 'role') return getNpcTemplateLabel(source.id)
     return undefined
   }
-}
-
-function AdditionalEquipmentRow({
-  entry,
-  manualQuantity,
-  contextLabel,
-  onRemove,
-}: {
-  entry: QuickNpcAdditionalEquipmentOption
-  manualQuantity: number
-  contextLabel?: string
-  onRemove: () => void
-}) {
-  const manualLabel = formatManualEquipmentQuantityLabel(manualQuantity)
-  return (
-    <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
-      <div className="min-w-0 flex-1">
-        <EntityAnatomyHost
-          entity={{
-            heading: entry.option.label,
-            ...(contextLabel ? { description: contextLabel } : {}),
-          }}
-          density="compact"
-        />
-      </div>
-      {manualLabel ? (
-        <span className={quickNpcAdditionalEquipmentQuantityClasses}>
-          <span aria-hidden="true">{manualLabel}</span>
-          <span className={equipmentOptionQuantityAccessibleVariants()}>
-            {formatManualEquipmentQuantityAccessibleLabel(manualQuantity)}
-          </span>
-        </span>
-      ) : null}
-      <ActionButton
-        action="remove"
-        variant="ghost"
-        size="icon"
-        density="compact"
-        aria-label={`Remove ${entry.option.label}`}
-        onClick={onRemove}
-      />
-    </div>
-  )
 }
 
 function mergeNestedStartingChoiceOverrides(
@@ -672,16 +630,28 @@ function AdditionalEquipmentSelectedList({
   if (rows.length === 0) return null
   return (
     <ul className={quickNpcStartingChoiceSelectedListClasses}>
-      {rows.map(({ entry, equipmentId, manualQuantity, contextLabel }) => (
-        <li key={equipmentId}>
-          <AdditionalEquipmentRow
-            entry={entry}
-            manualQuantity={manualQuantity}
-            {...(contextLabel ? { contextLabel } : {})}
-            onRemove={() => onRemove(equipmentId)}
-          />
-        </li>
-      ))}
+      {rows.map(({ entry, equipmentId, manualQuantity, contextLabel }) => {
+        const manualLabel = formatManualEquipmentQuantityLabel(manualQuantity)
+        const quantity =
+          manualLabel !== undefined ? (
+            <span className={quickNpcAdditionalEquipmentQuantityClasses}>
+              <span aria-hidden="true">{manualLabel}</span>
+              <span className={equipmentOptionQuantityAccessibleVariants()}>
+                {formatManualEquipmentQuantityAccessibleLabel(manualQuantity)}
+              </span>
+            </span>
+          ) : undefined
+        return (
+          <li key={equipmentId}>
+            <QuickNpcStartingChoiceSelectedRow
+              label={entry.option.label}
+              {...(contextLabel ? { suggestionHint: contextLabel } : {})}
+              quantity={quantity}
+              onRemove={() => onRemove(equipmentId)}
+            />
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -760,11 +730,22 @@ function QuickNpcAdditionalEquipmentSection({
     () => equipmentRecommendationSourceName(catalogIndex),
     [catalogIndex],
   )
+  const packageInventoryRows = React.useMemo(
+    () =>
+      listQuickNpcPackageInventoryRows({
+        choices,
+        catalogIndex,
+        ...(setup.classId ? { classId: setup.classId } : {}),
+      }),
+    [catalogIndex, choices, setup.classId],
+  )
+
   const selectedAdditional = listSelectedQuickNpcAdditionalEquipment({
     equipmentSelections,
     additionalOptions,
     choices,
     catalogIndex,
+    packageInventoryRows,
     ...(setup.npcTemplateId ? { roleId: setup.npcTemplateId } : {}),
     ...(setup.classId ? { classId: setup.classId } : {}),
   })
@@ -780,14 +761,27 @@ function QuickNpcAdditionalEquipmentSection({
   const visibleEntries = activeKind
     ? filterQuickNpcAdditionalEquipmentByKind(additionalOptions, activeKind)
     : []
-  const presentationById = buildQuickNpcAdditionalEquipmentPresentationMap({
-    entries: visibleEntries,
-    equipmentSelections,
-    choices,
-    catalogIndex,
-    setup,
-    sourceName,
-  })
+  const presentationById = React.useMemo(
+    () =>
+      buildQuickNpcAdditionalEquipmentPresentationMap({
+        entries: visibleEntries,
+        equipmentSelections,
+        choices,
+        catalogIndex,
+        setup,
+        sourceName,
+        packageInventoryRows,
+      }),
+    [
+      catalogIndex,
+      choices,
+      equipmentSelections,
+      packageInventoryRows,
+      setup,
+      sourceName,
+      visibleEntries,
+    ],
+  )
   const comboboxOptions = toAdditionalEquipmentComboboxOptions(visibleEntries, presentationById)
   const addDisabled = kindOptions.length === 0
   const { title: additionalTitle, description: additionalDescription } =
@@ -828,6 +822,7 @@ export function QuickNpcStartingEquipmentPanel({
   choices,
   buildContext,
   additionalOptions,
+  packageContext: packageContextProp,
 }: QuickNpcStartingEquipmentPanelProps) {
   const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const overrides = form.watch(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME) ?? {}
@@ -835,11 +830,13 @@ export function QuickNpcStartingEquipmentPanel({
   const equipmentSelections = (form.watch(QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME) ??
     []) as QuickNpcEquipmentSelection[]
 
-  const packageContext = resolveQuickNpcStartingEquipmentPackageContext({
-    setup,
-    context: buildContext,
-    choices,
-  })
+  const packageContext =
+    packageContextProp ??
+    resolveQuickNpcStartingEquipmentPackageContext({
+      setup,
+      context: buildContext,
+      choices,
+    })
   const effective = packageContext
     ? resolveQuickNpcEffectiveClassPackage({
         formChoice,

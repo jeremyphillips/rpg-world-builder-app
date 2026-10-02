@@ -20,7 +20,10 @@ import type { CharacterSelectionSource } from '../../character/sheet/selection-s
 import { seedDraftClassPackage } from '../resolvers/equipment/class-package-choice'
 import type { ClassPackageChoice } from '../resolvers/equipment/class-package-choice'
 import { inventoryContainsEquipmentId } from '../resolvers/equipment/derive-equipment-draft-entries'
+import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { RecommendationSourceRef } from '../recommendation'
+import { validationIssue } from '../validate/issue'
+import type { CharacterBuildValidationIssue } from '../validate/types'
 import {
   collectFixedGrantPairs,
   groupFixedGrantPairs,
@@ -28,16 +31,74 @@ import {
   type FixedGrantValueStream,
 } from './collect-fixed-grant-pairs'
 
+export const STARTING_CHOICE_CATEGORY_TERM = 'starting_choice_category' as const
+
+export const STARTING_CHOICE_CATEGORY_ENTRIES = {
+  skill: { label: 'Skills' },
+  tool: { label: 'Tools' },
+  language: { label: 'Languages' },
+  equipment: { label: 'Equipment' },
+  weapon: { label: 'Weapons' },
+  spell: { label: 'Spells' },
+} as const satisfies Record<string, { label: string }>
+
+export const STARTING_CHOICE_CATEGORY_ORDER = [
+  'skill',
+  'tool',
+  'language',
+  'equipment',
+  'weapon',
+  'spell',
+] as const
+
+export type StartingChoiceCategory = keyof typeof STARTING_CHOICE_CATEGORY_ENTRIES
+
+export const STARTING_CHOICE_MECHANIC_ORDER = [
+  'fixed-grant',
+  'choice-allowance',
+  'explicit-constraint',
+] as const
+
 export const STARTING_CHOICE_CATEGORIES = {
-  skill: { choiceTypes: ['skillProficiency'], fixedStream: 'proficiencies.skills' },
-  tool: { choiceTypes: ['toolProficiency'], fixedStream: 'proficiencies.tools' },
-  language: { choiceTypes: ['language'], fixedStream: 'proficiencies.languages' },
-  equipment: { choiceTypes: [], fixedStream: 'levelZeroInventory' },
-  weapon: { constraint: 'requiredWeaponIds' },
-  spell: { constraint: 'requiredSpellIds' },
+  skill: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.skill.label,
+    order: 0,
+    choiceTypes: ['skillProficiency'] as const,
+    fixedStream: 'proficiencies.skills' as const,
+  },
+  tool: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.tool.label,
+    order: 1,
+    choiceTypes: ['toolProficiency'] as const,
+    fixedStream: 'proficiencies.tools' as const,
+  },
+  language: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.language.label,
+    order: 2,
+    choiceTypes: ['language'] as const,
+    fixedStream: 'proficiencies.languages' as const,
+  },
+  equipment: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.equipment.label,
+    order: 3,
+    choiceTypes: [] as const,
+    fixedStream: 'levelZeroInventory' as const,
+  },
+  weapon: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.weapon.label,
+    order: 4,
+    constraint: 'requiredWeaponIds' as const,
+  },
+  spell: {
+    label: STARTING_CHOICE_CATEGORY_ENTRIES.spell.label,
+    order: 5,
+    constraint: 'requiredSpellIds' as const,
+  },
 } as const
 
-export type StartingChoiceCategory = keyof typeof STARTING_CHOICE_CATEGORIES
+export function startingChoiceCategoryLabel(category: StartingChoiceCategory): string {
+  return STARTING_CHOICE_CATEGORY_ENTRIES[category].label
+}
 
 export type StartingChoiceOwner = Pick<
   ChoiceSetProvenance,
@@ -72,29 +133,40 @@ export type StartingChoiceContribution = StartingChoiceContributionBase &
       }
   )
 
+export function startingChoiceMechanicSortIndex(
+  mechanic: StartingChoiceContribution['mechanic'],
+): number {
+  const index = STARTING_CHOICE_MECHANIC_ORDER.indexOf(mechanic)
+  return index === -1 ? STARTING_CHOICE_MECHANIC_ORDER.length : index
+}
+
 export type NpcStartingChoices = {
   contributions: readonly StartingChoiceContribution[]
   removedOverrideIds: readonly string[]
+  /** Explicit override keys seeded before automatic top-up. */
+  pinnedChoiceSetIds: readonly string[]
   /** Pass B draft. The picker applies a local fill on top of this. */
   draft: CharacterBuilderDraft
   resolvedChoiceSets: readonly ChoiceSet[]
 }
 
-const CATEGORY_ORDER: readonly StartingChoiceCategory[] = [
-  'skill',
-  'tool',
-  'language',
-  'equipment',
-  'weapon',
-  'spell',
-]
+export const STARTING_CHOICE_INCOMPLETE_ISSUE_CODE = 'starting_choice_incomplete' as const
 
-const ALLOWANCE_CATEGORIES = new Set<StartingChoiceCategory>(['skill', 'tool', 'language'])
+const ALLOWANCE_CATEGORIES = new Set<StartingChoiceCategory>(
+  STARTING_CHOICE_CATEGORY_ORDER.filter((category) => {
+    const config = STARTING_CHOICE_CATEGORIES[category]
+    return 'choiceTypes' in config && config.choiceTypes.length > 0
+  }),
+)
 
 function categoryForChoiceSet(choiceSet: ChoiceSet): StartingChoiceCategory | undefined {
-  if (choiceSet.choiceType === 'skillProficiency') return 'skill'
-  if (choiceSet.choiceType === 'toolProficiency') return 'tool'
-  if (choiceSet.choiceType === 'language') return 'language'
+  for (const category of STARTING_CHOICE_CATEGORY_ORDER) {
+    const config = STARTING_CHOICE_CATEGORIES[category]
+    if (!('choiceTypes' in config)) continue
+    if ((config.choiceTypes as readonly string[]).includes(choiceSet.choiceType)) {
+      return category
+    }
+  }
   return undefined
 }
 
@@ -306,7 +378,7 @@ function pinNonAllowanceChoiceSetOverrides(args: {
     const choiceSet = setsById.get(choiceSetId)
     if (!choiceSet) continue
     const kept = filterOverrideSelection(choiceSet, selectedIds)
-    if (!kept || kept.length === 0) continue
+    if (kept === undefined) continue
     pinned[choiceSetId] = kept
     pinnedChoiceSetIds.push(choiceSetId)
   }
@@ -421,7 +493,8 @@ function orderContributions(
   const mechanicOrder = { 'fixed-grant': 0, 'choice-allowance': 1, 'explicit-constraint': 2 }
   return [...contributions].sort((left, right) => {
     const categoryDelta =
-      CATEGORY_ORDER.indexOf(left.category) - CATEGORY_ORDER.indexOf(right.category)
+      STARTING_CHOICE_CATEGORY_ORDER.indexOf(left.category) -
+      STARTING_CHOICE_CATEGORY_ORDER.indexOf(right.category)
     if (categoryDelta !== 0) return categoryDelta
     return mechanicOrder[left.mechanic] - mechanicOrder[right.mechanic]
   })
@@ -516,7 +589,15 @@ export function resolveNpcStartingChoices(args: {
     }),
   ])
 
-  return { contributions, removedOverrideIds, draft, resolvedChoiceSets }
+  const pinnedChoiceSetIds = [...Object.keys(pruned), ...pinnedNonAllowanceIds]
+
+  return {
+    contributions,
+    removedOverrideIds,
+    pinnedChoiceSetIds,
+    draft,
+    resolvedChoiceSets,
+  }
 }
 
 /** Complete allowance fills to seed before automatic top-up. Short overrides are omitted. */
@@ -557,6 +638,7 @@ export function npcStartingChoiceManualConstraints(
   })
 }
 
+/** @deprecated Prefer {@link resolveNpcStartingChoiceIssues}. */
 export function npcStartingChoiceIncompleteOverride(
   choices: NpcStartingChoices,
 ): StartingChoiceContribution | undefined {
@@ -566,4 +648,43 @@ export function npcStartingChoiceIncompleteOverride(
       contribution.overridden &&
       contribution.selectedIds.length < contribution.allowance.min,
   )
+}
+
+export function npcStartingChoicePinnedChoiceSetIds(
+  choices: NpcStartingChoices,
+): readonly string[] {
+  return choices.pinnedChoiceSetIds
+}
+
+export function resolveNpcStartingChoiceIssues(
+  choices: NpcStartingChoices,
+): CharacterBuildValidationIssue[] {
+  const issues: CharacterBuildValidationIssue[] = []
+  const message = characterBuilderValidationMessages.startingChoiceIncomplete()
+  const pinned = new Set(choices.pinnedChoiceSetIds)
+
+  for (const contribution of choices.contributions) {
+    if (contribution.mechanic !== 'choice-allowance') continue
+    if (!contribution.overridden) continue
+    if (contribution.selectedIds.length >= contribution.allowance.min) continue
+    issues.push(
+      validationIssue(STARTING_CHOICE_INCOMPLETE_ISSUE_CODE, message, {
+        choiceSetId: contribution.choiceSetId,
+      }),
+    )
+  }
+
+  for (const choiceSet of choices.resolvedChoiceSets) {
+    if (choiceSet.choiceType !== 'equipment') continue
+    if (!pinned.has(choiceSet.id)) continue
+    const selectedIds = choices.draft.choiceSelections[choiceSet.id] ?? []
+    if (selectedIds.length >= choiceSet.min) continue
+    issues.push(
+      validationIssue(STARTING_CHOICE_INCOMPLETE_ISSUE_CODE, message, {
+        choiceSetId: choiceSet.id,
+      }),
+    )
+  }
+
+  return issues
 }

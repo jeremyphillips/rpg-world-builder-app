@@ -214,6 +214,7 @@ export function resolveQuickNpcBuildCardModel(args: {
         organizationClassAffinityIds: args.members?.classAffinityIds,
         context,
         classOptions,
+        setup: values,
       })
     : QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER
 

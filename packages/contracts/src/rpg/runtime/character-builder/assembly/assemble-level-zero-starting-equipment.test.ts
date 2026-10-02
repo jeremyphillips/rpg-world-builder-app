@@ -114,6 +114,20 @@ describe('assembleLevelZeroStartingEquipment', () => {
     expect(cleared.equipment.gear).toEqual([])
   })
 
+  it('yields no coins when the role wealth tier is explicitly zero', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      npcTemplateId: 'commoner' as const,
+    }
+    const tiers = resolveLevelZeroNpcWealthTiers({ poor: { gp: 0 } })
+    const assembled = assembleLevelZeroStartingEquipment(draft, {
+      rulesetId: RULESET,
+      levelZeroRules: { wealthTiers: tiers },
+      catalogIndex: catalogWith([]),
+    })
+    expect(assembled.wealth).toEqual({ cp: 0, sp: 0, gp: 0, pp: 0 })
+  })
+
   it('uses merchant comfortable wealth and keeps a campaign override', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),

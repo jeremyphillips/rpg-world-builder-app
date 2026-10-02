@@ -1,8 +1,9 @@
 import {
   indexCharacterBuildCatalog,
   npcStartingChoiceAllowanceSelections,
-  npcStartingChoiceIncompleteOverride,
   npcStartingChoiceManualConstraints,
+  npcStartingChoicePinnedChoiceSetIds,
+  resolveNpcStartingChoiceIssues,
   resolveNpcStartingChoices,
   resolveOrganizationMembershipMetadata,
   type CharacterBuildContext,
@@ -12,9 +13,9 @@ import { titleFromMembershipRadioValue } from '../../../lib/organization-members
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
   prepareQuickNpcCreate,
+  resolveQuickNpcPreparedDraft,
   type QuickNpcPrepareCreateArgs,
   type QuickNpcPreparedCreate,
-  QuickNpcStartingChoiceIncompleteError,
 } from './quick-npc-create'
 import {
   buildQuickNpcSeed,
@@ -26,6 +27,7 @@ import {
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
 import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
 import { usesQuickNpcClassEquipment } from './quick-npc-equipment-selections.lib'
+import { normalizeQuickNpcStartingChoiceOverrides } from './quick-npc-starting-choices.lib'
 
 function resolveQuickNpcMembershipPayload(
   createContext: Extract<QuickNpcCreateContext, { kind: 'organization-member' }>,
@@ -76,25 +78,27 @@ export function assembleQuickNpcPrepareCreateArgs(
   const preferences = buildQuickNpcAutomaticPreferences(preferenceArgs)
   const catalogIndex = indexCharacterBuildCatalog(args.buildContext.catalog)
   const classed = usesQuickNpcClassEquipment(values.classId, values.level)
-  const { requiredWeaponIds, manualEquipmentGrantIds, startingEquipmentGrants } =
-    projectQuickNpcEquipmentAllocations({
-      equipmentSelections: values.equipmentSelections,
-      catalogIndex,
-      classed,
-    })
+  const { startingEquipmentGrants } = projectQuickNpcEquipmentAllocations({
+    equipmentSelections: values.equipmentSelections,
+    catalogIndex,
+    classed,
+  })
+  const startingChoiceOverrides = normalizeQuickNpcStartingChoiceOverrides({
+    setup: args.setup,
+    context: args.buildContext,
+    createContext: args.createContext,
+    overrides: values.startingChoiceOverrides,
+    requiredSpellIds: values.requiredSpellIds,
+  })
   const startingChoices = resolveNpcStartingChoices({
     context: args.buildContext,
     seed: buildQuickNpcSeed(values),
-    startingChoiceOverrides: values.startingChoiceOverrides,
+    startingChoiceOverrides,
     classPackage: values.classPackage,
-    requiredWeaponIds,
     requiredSpellIds: values.requiredSpellIds,
     preferences,
   })
-  const incomplete = npcStartingChoiceIncompleteOverride(startingChoices)
-  if (incomplete) {
-    throw new QuickNpcStartingChoiceIncompleteError()
-  }
+  const startingChoiceIssues = resolveNpcStartingChoiceIssues(startingChoices)
   const manualConstraints = npcStartingChoiceManualConstraints(startingChoices)
 
   return {
@@ -102,11 +106,14 @@ export function assembleQuickNpcPrepareCreateArgs(
     context: args.buildContext,
     preferences,
     allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
-    ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
+    pinnedChoiceSetIds: npcStartingChoicePinnedChoiceSetIds(startingChoices),
     ...(startingEquipmentGrants.length > 0 ? { startingEquipmentGrants } : {}),
     ...(manualConstraints ? { constraints: manualConstraints } : {}),
     classPackage: values.classPackage,
     ...(membership ? { membership } : {}),
+    fallbackDraft: startingChoices.draft,
+    fallbackResolvedChoiceSets: startingChoices.resolvedChoiceSets,
+    startingChoiceIssues,
   }
 }
 
@@ -116,7 +123,6 @@ export function prepareQuickNpcAuthoringCreate(
   return prepareQuickNpcCreate(assembleQuickNpcPrepareCreateArgs(args))
 }
 
-/** @deprecated Prefer {@link prepareQuickNpcAuthoringCreate} when narrative needs the resolved draft. */
-export function buildQuickNpcAuthoringCreateInput(args: QuickNpcAuthoringPrepareArgs) {
-  return prepareQuickNpcAuthoringCreate(args).input
+export function resolveQuickNpcAuthoringPreparedDraft(args: QuickNpcAuthoringPrepareArgs) {
+  return resolveQuickNpcPreparedDraft(assembleQuickNpcPrepareCreateArgs(args))
 }

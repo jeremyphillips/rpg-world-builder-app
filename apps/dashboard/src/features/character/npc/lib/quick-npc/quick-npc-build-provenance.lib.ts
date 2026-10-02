@@ -2,22 +2,24 @@ import {
   formatRecommendationSourceLabel,
   formatSourceSuggestsSentence,
   formatSuggestedBySentence,
-  getNpcTemplateEntry,
   getNpcTemplateLabel,
-  indexCharacterBuildCatalog,
-  intersectPersistedContentIds,
   resolveOrganizationMembershipTitleProjection,
   SUGGESTED_BY_PREFIX,
   type CharacterBuildContext,
   type NpcTemplateId,
   type OrganizationMembershipTitleDefinition,
+  type OrganizationNpcClassRecommendationSource,
   type RecommendationSourceKind,
 } from '@rpg/contracts'
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
-import { isQuickNpcMembershipTitleSetupComplete } from './quick-npc-form-fields'
+import {
+  isQuickNpcMembershipTitleSetupComplete,
+  type QuickNpcSetupValues,
+} from './quick-npc-form-fields'
+import { resolveQuickNpcTemplateRecommendations } from './quick-npc-template-recommendations.lib'
 
 export const QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER =
   'Classes are available from level 1.' as const
@@ -69,157 +71,58 @@ export function formatSuggestionHelper(input: FormatSuggestionHelperInput): stri
   return formatSourceSuggestsSentence(sourceLabel, display)
 }
 
-const DISPLAY_SOURCE_PRECEDENCE = ['title', 'organization', 'role'] as const
+const CLASS_RECOMMENDATION_SOURCE_ORDER: OrganizationNpcClassRecommendationSource[] = [
+  'title',
+  'organization',
+  'template',
+]
 
-type DisplaySourceKind = (typeof DISPLAY_SOURCE_PRECEDENCE)[number]
-
-type ClassDisplaySource = {
-  kind: DisplaySourceKind
-  label: string
-  classIds: readonly string[]
+function recommendationSourceKind(
+  source: OrganizationNpcClassRecommendationSource,
+): RecommendationSourceKind | undefined {
+  if (source === 'template') return 'role'
+  if (source === 'title' || source === 'organization') return source
+  return undefined
 }
 
-function resolveClassIdsFromSlugs(
-  slugs: readonly string[],
-  playableClassIds: ReadonlySet<string>,
-  slugToId: ReadonlyMap<string, string>,
-): string[] {
-  const ids: string[] = []
-  for (const slug of slugs) {
-    const classId = slugToId.get(slug)
-    if (classId && playableClassIds.has(classId)) {
-      ids.push(classId)
-    }
-  }
-  return ids
-}
-
-function resolveTitleClassDisplaySource(args: {
+export function resolveQuickNpcSelectedTitleLabel(args: {
   membershipTitle: string | undefined
   titles: readonly OrganizationMembershipTitleDefinition[]
-  playableClassIds: ReadonlySet<string>
-  slugToId: ReadonlyMap<string, string>
-}): ClassDisplaySource | undefined {
+}): string | undefined {
   if (!isQuickNpcMembershipTitleSetupComplete(args.membershipTitle)) {
     return undefined
   }
-
-  const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: args.membershipTitle,
-    titles: args.titles,
-  })
-  const overrideSlugs = titleRecommendation?.classPreferenceOverrideSlugs
-  if (!overrideSlugs?.length) {
-    return undefined
-  }
-
   const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
   if (membershipTitleId === undefined) {
     return undefined
   }
-
   const projection = resolveOrganizationMembershipTitleProjection({
     catalog: args.titles,
     membershipTitleId,
   })
-  if (projection.status !== 'resolved') {
-    return undefined
-  }
-
-  return {
-    kind: 'title',
-    label: projection.label,
-    classIds: resolveClassIdsFromSlugs(overrideSlugs, args.playableClassIds, args.slugToId),
-  }
+  return projection.status === 'resolved' ? projection.label : undefined
 }
 
-function resolveOrganizationClassDisplaySource(args: {
-  organizationName?: string
-  organizationClassAffinityIds?: readonly string[]
-  playableClasses: readonly { id: string }[]
-}): ClassDisplaySource | undefined {
-  const orgName = args.organizationName?.trim()
-  if (!orgName || !args.organizationClassAffinityIds?.length) {
-    return undefined
-  }
-
-  return {
-    kind: 'organization',
-    label: orgName,
-    classIds: intersectPersistedContentIds(args.organizationClassAffinityIds, args.playableClasses),
-  }
-}
-
-function resolveRoleClassDisplaySource(args: {
-  selectedTemplateId: NpcTemplateId | undefined
-  playableClassIds: ReadonlySet<string>
-  slugToId: ReadonlyMap<string, string>
-}): ClassDisplaySource | undefined {
-  if (!args.selectedTemplateId) {
-    return undefined
-  }
-
-  const template = getNpcTemplateEntry(args.selectedTemplateId)
-  const slugs = template?.recommendations.classPreferenceSlugs ?? []
-  if (slugs.length === 0) {
-    return undefined
-  }
-
-  return {
-    kind: 'role',
-    label: getNpcTemplateLabel(args.selectedTemplateId),
-    classIds: resolveClassIdsFromSlugs(slugs, args.playableClassIds, args.slugToId),
-  }
-}
-
-function resolveQuickNpcClassDisplaySources(args: {
+function classRecommendationSourceLabel(args: {
+  source: OrganizationNpcClassRecommendationSource
   membershipTitle: string | undefined
   titles: readonly OrganizationMembershipTitleDefinition[]
-  selectedTemplateId: NpcTemplateId | undefined
   organizationName?: string
-  organizationClassAffinityIds?: readonly string[]
-  context: CharacterBuildContext
-}): ClassDisplaySource[] {
-  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
-  const playableClasses = [...catalogIndex.classes.values()]
-  const playableClassIds = new Set(catalogIndex.classes.keys())
-  const slugToId = new Map(
-    playableClasses.map((characterClass) => [characterClass.slug, characterClass.id]),
-  )
-
-  const byKind = new Map<DisplaySourceKind, ClassDisplaySource>()
-  const titleSource = resolveTitleClassDisplaySource({
-    membershipTitle: args.membershipTitle,
-    titles: args.titles,
-    playableClassIds,
-    slugToId,
-  })
-  if (titleSource) {
-    byKind.set('title', titleSource)
+  selectedTemplateId: NpcTemplateId | undefined
+}): string | undefined {
+  if (args.source === 'title') {
+    return resolveQuickNpcSelectedTitleLabel({
+      membershipTitle: args.membershipTitle,
+      titles: args.titles,
+    })
   }
-
-  const organizationSource = resolveOrganizationClassDisplaySource({
-    organizationName: args.organizationName,
-    organizationClassAffinityIds: args.organizationClassAffinityIds,
-    playableClasses,
-  })
-  if (organizationSource) {
-    byKind.set('organization', organizationSource)
+  if (args.source === 'organization') {
+    return args.organizationName?.trim() || undefined
   }
-
-  const roleSource = resolveRoleClassDisplaySource({
-    selectedTemplateId: args.selectedTemplateId,
-    playableClassIds,
-    slugToId,
-  })
-  if (roleSource) {
-    byKind.set('role', roleSource)
+  if (args.source === 'template' && args.selectedTemplateId) {
+    return getNpcTemplateLabel(args.selectedTemplateId)
   }
-
-  return DISPLAY_SOURCE_PRECEDENCE.flatMap((kind) => {
-    const source = byKind.get(kind)
-    return source ? [source] : []
-  })
+  return undefined
 }
 
 function formatClassLabels(
@@ -243,39 +146,66 @@ export function resolveQuickNpcClassRowHelper(args: {
   organizationClassAffinityIds?: readonly string[]
   context: CharacterBuildContext
   classOptions: readonly { value: string; label: string }[]
+  setup: QuickNpcSetupValues
 }): string | undefined {
   if (!args.classId) {
     return undefined
   }
 
   const labelsById = new Map(args.classOptions.map((option) => [option.value, option.label]))
-  const sources = resolveQuickNpcClassDisplaySources(args)
+  const recommendations = resolveQuickNpcTemplateRecommendations({
+    values: args.setup,
+    context: args.context,
+    titles: args.titles,
+    organizationClassAffinityIds: args.organizationClassAffinityIds,
+    organizationTemplateId: args.selectedTemplateId,
+  })
 
-  for (const source of sources) {
-    if (source.classIds.includes(args.classId)) {
-      return formatSuggestionHelper({
-        currentValue: args.classId,
-        suggestedValue: args.classId,
-        sourceLabel: source.label,
-        sourceKind: source.kind,
+  const match = recommendations.classes.find((entry) => entry.id === args.classId)
+  if (match) {
+    const source = CLASS_RECOMMENDATION_SOURCE_ORDER.find((candidate) =>
+      match.sources.includes(candidate),
+    )
+    if (source) {
+      const sourceLabel = classRecommendationSourceLabel({
+        source,
+        membershipTitle: args.membershipTitle,
+        titles: args.titles,
+        organizationName: args.organizationName,
+        selectedTemplateId: args.selectedTemplateId,
       })
+      if (sourceLabel) {
+        return formatSuggestionHelper({
+          currentValue: args.classId,
+          suggestedValue: args.classId,
+          sourceLabel,
+          sourceKind: recommendationSourceKind(source),
+        })
+      }
     }
   }
 
-  for (const source of sources) {
-    if (source.classIds.length === 0) {
-      continue
-    }
-    const suggestedDisplay = formatClassLabels(source.classIds, labelsById)
-    if (!suggestedDisplay) {
-      continue
-    }
+  for (const entry of recommendations.classes) {
+    if (entry.id === args.classId) continue
+    const source = CLASS_RECOMMENDATION_SOURCE_ORDER.find((candidate) =>
+      entry.sources.includes(candidate),
+    )
+    if (!source) continue
+    const sourceLabel = classRecommendationSourceLabel({
+      source,
+      membershipTitle: args.membershipTitle,
+      titles: args.titles,
+      organizationName: args.organizationName,
+      selectedTemplateId: args.selectedTemplateId,
+    })
+    const suggestedDisplay = formatClassLabels([entry.id], labelsById)
+    if (!sourceLabel || !suggestedDisplay) continue
     return formatSuggestionHelper({
       currentValue: args.classId,
-      suggestedValue: source.classIds[0],
+      suggestedValue: entry.id,
       suggestedDisplay,
-      sourceLabel: source.label,
-      sourceKind: source.kind,
+      sourceLabel,
+      sourceKind: recommendationSourceKind(source),
     })
   }
 
@@ -385,23 +315,18 @@ export function resolveQuickNpcLevelRowHelper(args: {
     return undefined
   }
 
-  const membershipTitleId = titleFromMembershipRadioValue(args.membershipTitle ?? '')
-  if (membershipTitleId === undefined) {
-    return undefined
-  }
-
-  const projection = resolveOrganizationMembershipTitleProjection({
-    catalog: args.titles,
-    membershipTitleId,
+  const titleLabel = resolveQuickNpcSelectedTitleLabel({
+    membershipTitle: args.membershipTitle,
+    titles: args.titles,
   })
-  if (projection.status !== 'resolved') {
+  if (!titleLabel) {
     return undefined
   }
 
   return formatSuggestionHelper({
     currentValue: args.level,
     suggestedValue: titleRecommendation.level,
-    sourceLabel: projection.label,
+    sourceLabel: titleLabel,
     sourceKind: 'title',
     suggestedDisplay: `level ${titleRecommendation.level}`,
   })

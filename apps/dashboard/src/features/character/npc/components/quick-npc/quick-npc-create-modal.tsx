@@ -15,7 +15,6 @@ import { formatNestedCreateHandoffFailure, invokeOnContentCreated } from '@/lib/
 import {
   createQuickNpcSetupDefaultValues,
   type QuickNpcAuthoringTabFormValues,
-  type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type { QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
@@ -41,7 +40,7 @@ import { QuickNpcCreateModalSetupFooter } from './quick-npc-create-modal-setup-f
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
 
-export { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
+export { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from './quick-npc-starting-choices.variants'
 
 export type QuickNpcCreateModalProps = {
   open: boolean
@@ -132,11 +131,14 @@ function QuickNpcCreateModalSession({
         ...current,
         phase: 'authoring',
         setupValues: values,
-        authoringValues: {
-          equipmentSelections: [],
-          requiredSpellIds: [],
-          startingChoiceOverrides: {},
-        },
+        authoringValues:
+          current.authoringValues ??
+          ({
+            equipmentSelections: [],
+            requiredSpellIds: [],
+            startingChoiceOverrides: {},
+          } satisfies Partial<QuickNpcAuthoringTabFormValues>),
+        equipmentBaseline: current.authoringValues ? undefined : current.equipmentBaseline,
       }))
     },
     [onSetupHandoff, setupCompletion, trustedClose],
@@ -244,42 +246,21 @@ function QuickNpcCreateModalSession({
   }, [])
 
   const handleSetupSummaryEdit = React.useCallback(
-    (
-      target: SetupSummaryEditTarget,
-      equipmentSelections: QuickNpcEquipmentSelection[],
-      packageAuthoring?: {
-        classPackage?: QuickNpcAuthoringTabFormValues['classPackage']
-        startingChoiceOverrides?: QuickNpcAuthoringTabFormValues['startingChoiceOverrides']
-      },
-    ) => {
+    (target: SetupSummaryEditTarget, authoringValues: Partial<QuickNpcAuthoringTabFormValues>) => {
       pendingSetupSummaryEditRef.current = target
-      setState((current) => {
-        const classId = current.setupValues.classId
-        const nestedMarker = classId ? `class:${classId}:starting-equipment:` : undefined
-        const startingChoiceOverrides = Object.fromEntries(
-          Object.entries(packageAuthoring?.startingChoiceOverrides ?? {}).filter(([choiceSetId]) =>
-            nestedMarker ? choiceSetId.includes(nestedMarker) : false,
-          ),
-        )
-        return {
-          ...current,
-          phase: 'setup',
-          authoringValues: {
-            ...current.authoringValues,
-            equipmentSelections,
-            requiredSpellIds: [],
-            startingChoiceOverrides,
-            ...(packageAuthoring?.classPackage
-              ? { classPackage: packageAuthoring.classPackage }
-              : {}),
-          },
-          equipmentBaseline: {
-            templateId: current.setupValues.npcTemplateId,
-            classId: current.setupValues.classId,
-            level: current.setupValues.level,
-          },
-        }
-      })
+      setState((current) => ({
+        ...current,
+        phase: 'setup',
+        authoringValues: {
+          ...current.authoringValues,
+          ...authoringValues,
+        },
+        equipmentBaseline: {
+          templateId: current.setupValues.npcTemplateId,
+          classId: current.setupValues.classId,
+          level: current.setupValues.level,
+        },
+      }))
     },
     [],
   )
@@ -297,10 +278,10 @@ function QuickNpcCreateModalSession({
   }, [returnToAuthoring, sequenceModel, state.phase])
 
   const handleChangeSetup = React.useCallback(
-    (equipmentSelections?: QuickNpcEquipmentSelection[]) => {
+    (authoringValues?: Partial<QuickNpcAuthoringTabFormValues>) => {
       handleSetupSummaryEdit(
         { type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID },
-        equipmentSelections ?? [],
+        authoringValues ?? {},
       )
     },
     [handleSetupSummaryEdit],

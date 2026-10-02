@@ -31,8 +31,8 @@ import type { CharacterBuildValidationIssue } from '../validate/types'
 import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 
 import {
-  applyManualEquipmentGrants,
   applyRequiredWeaponEquipmentGrants,
+  applyStartingEquipmentGrants,
   validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
 import { resolveAutomaticChoiceSelections } from './resolve-automatic-choice-selections'
@@ -90,8 +90,12 @@ export type ResolveAutomaticNpcBuildArgs = {
   allowanceSelections?: Record<string, readonly string[]>
   /** Caller-owned package decision seeded before automatic choice fill. */
   classPackage?: ClassPackageChoice
-  /** Non-weapon equipment ids granted after automatic fill (armor, gear, magic items, …). */
-  manualEquipmentGrantIds?: readonly string[]
+  /**
+   * Choice set ids with explicit user overrides — automatic fill never tops these up.
+   */
+  pinnedChoiceSetIds?: readonly string[]
+  /** Manual starting equipment applied additively after automatic/package resolution. */
+  startingEquipmentGrants?: readonly { equipmentId: string; quantity: number }[]
   context: CharacterBuildContext
 }
 
@@ -315,13 +319,15 @@ function completeMagicItemGrantSelections(
  * contextual patches such as connections — for the single authoritative
  * finalSubmit validation.
  */
+// fallow-ignore-next-line complexity
 export function resolveAutomaticNpcBuild({
   seed,
   constraints,
   preferences,
   allowanceSelections,
   classPackage,
-  manualEquipmentGrantIds,
+  pinnedChoiceSetIds,
+  startingEquipmentGrants,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
@@ -346,6 +352,7 @@ export function resolveAutomaticNpcBuild({
     context,
     preferences,
     constraints: normalizedConstraints,
+    ...(pinnedChoiceSetIds?.length ? { pinnedChoiceSetIds: new Set(pinnedChoiceSetIds) } : {}),
   })
   if (!choices.ok) return choices
 
@@ -361,16 +368,16 @@ export function resolveAutomaticNpcBuild({
   })
   if (!weaponGrantCompletion.ok) return weaponGrantCompletion
 
-  const manualGrantCompletion = applyManualEquipmentGrants({
+  const startingGrantCompletion = applyStartingEquipmentGrants({
     draft: weaponGrantCompletion.draft,
-    equipmentIds: manualEquipmentGrantIds ?? [],
+    grants: startingEquipmentGrants ?? [],
     context,
     catalogIndex,
   })
-  if (!manualGrantCompletion.ok) return manualGrantCompletion
+  if (!startingGrantCompletion.ok) return startingGrantCompletion
 
   const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
-    manualGrantCompletion.draft,
+    startingGrantCompletion.draft,
     normalizedConstraints,
     catalogIndex,
   )
@@ -380,7 +387,7 @@ export function resolveAutomaticNpcBuild({
 
   return {
     ok: true,
-    draft: manualGrantCompletion.draft,
-    resolvedChoiceSets: resolveAvailableChoices(manualGrantCompletion.draft, context),
+    draft: startingGrantCompletion.draft,
+    resolvedChoiceSets: resolveAvailableChoices(startingGrantCompletion.draft, context),
   }
 }
