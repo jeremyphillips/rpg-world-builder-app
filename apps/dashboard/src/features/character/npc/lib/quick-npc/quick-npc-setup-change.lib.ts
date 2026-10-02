@@ -1,8 +1,10 @@
 import {
   dropClassOwnedChoiceOverrides,
   normalizeClassPackageChoice,
+  reconcileEquipmentForClassChange,
   UNRESOLVED_CLASS_PACKAGE,
   type CharacterBuildContext,
+  type CharacterBuilderDraftEquipment,
   type ClassPackageChoice,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -34,6 +36,30 @@ function retainPackageNestedOverrides(args: {
     retained[choiceSetId] = [...selectedIds]
   }
   return retained
+}
+
+function manualPurchasesFromSelections(
+  equipmentSelections: readonly QuickNpcEquipmentSelection[],
+): CharacterBuilderDraftEquipment['purchases'] {
+  return equipmentSelections
+    .filter((row) => row.origin === 'manual')
+    .map((row) => ({
+      equipmentId: row.equipmentId,
+      quantity: row.quantity,
+      sourceMode: 'manual' as const,
+    }))
+}
+
+function manualSelectionsFromPurchases(
+  purchases: CharacterBuilderDraftEquipment['purchases'],
+): QuickNpcEquipmentSelection[] {
+  return purchases
+    .filter((purchase) => purchase.sourceMode === 'manual')
+    .map((purchase) => ({
+      equipmentId: purchase.equipmentId,
+      quantity: purchase.quantity,
+      origin: 'manual' as const,
+    }))
 }
 
 function copyOverrides(
@@ -81,6 +107,49 @@ function sameClassPackageChoice(args: {
   }
 }
 
+function reconcileQuickNpcAuthoringEquipment(args: {
+  classPackage: ClassPackageChoice | undefined
+  equipmentSelections: readonly QuickNpcEquipmentSelection[]
+  previous: QuickNpcEquipmentSeedContext
+  next: QuickNpcEquipmentSeedContext & { rulesetId: SystemRulesetId }
+  context: CharacterBuildContext
+}): {
+  equipmentSelections: QuickNpcEquipmentSelection[]
+  classPackage: ClassPackageChoice | undefined
+} {
+  const reconciledEquipment = reconcileEquipmentForClassChange({
+    equipment: {
+      mode: 'package',
+      purchases: manualPurchasesFromSelections(args.equipmentSelections),
+      classPackage: args.classPackage ?? UNRESOLVED_CLASS_PACKAGE,
+      editedSincePackageSelection: false,
+    },
+    previous: { classId: args.previous.classId, level: args.previous.level },
+    next: { classId: args.next.classId, level: args.next.level },
+    context: args.context,
+  })
+  const roleRows = args.equipmentSelections.filter((row) => row.origin === 'role-default')
+  return {
+    classPackage: reconciledEquipment?.classPackage,
+    equipmentSelections: reconcileQuickNpcEquipmentSelections({
+      current: [
+        ...roleRows,
+        ...manualSelectionsFromPurchases(reconciledEquipment?.purchases ?? []),
+      ],
+      previous: args.previous,
+      next: args.next,
+    }),
+  }
+}
+
+function resolveResetClassPackage(args: {
+  classChanged: boolean
+  reconciledClassPackage: ClassPackageChoice | undefined
+}): ClassPackageChoice {
+  if (!args.classChanged) return UNRESOLVED_CLASS_PACKAGE
+  return args.reconciledClassPackage ?? UNRESOLVED_CLASS_PACKAGE
+}
+
 /**
  * Reconciles Quick NPC authoring when setup changes. Replaces the blanket
  * reset for the class package while leaving non-package starting choices on
@@ -98,11 +167,7 @@ export function resolveQuickNpcSetupChangeAuthoringState(args: {
   startingChoiceOverrides: Record<string, string[]>
   equipmentSelections: QuickNpcEquipmentSelection[]
 } {
-  const equipmentSelections = reconcileQuickNpcEquipmentSelections({
-    current: args.equipmentSelections,
-    previous: args.previous,
-    next: args.next,
-  })
+  const equipment = reconcileQuickNpcAuthoringEquipment(args)
   const classChanged = (args.previous.classId || undefined) !== (args.next.classId || undefined)
   const clearedOverrides = classChanged
     ? dropClassOwnedChoiceOverrides({
@@ -115,9 +180,12 @@ export function resolveQuickNpcSetupChangeAuthoringState(args: {
     args.next.classId === undefined || classReplacesStartingPackages(args.context, args.next.level)
   if (classChanged || packagesUnavailable) {
     return {
-      classPackage: UNRESOLVED_CLASS_PACKAGE,
+      classPackage: resolveResetClassPackage({
+        classChanged,
+        reconciledClassPackage: equipment.classPackage,
+      }),
       startingChoiceOverrides: clearedOverrides,
-      equipmentSelections,
+      equipmentSelections: equipment.equipmentSelections,
     }
   }
 
@@ -127,7 +195,7 @@ export function resolveQuickNpcSetupChangeAuthoringState(args: {
     classId: args.next.classId,
     context: args.context,
   })
-  return { ...preserved, equipmentSelections }
+  return { ...preserved, equipmentSelections: equipment.equipmentSelections }
 }
 
 /** @deprecated Use {@link resolveQuickNpcSetupChangeAuthoringState}. */

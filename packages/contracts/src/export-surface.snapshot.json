@@ -2622,6 +2622,7 @@
     "recommendationSourceRefFromNpcRecommendationSource",
     "recommendationSourceRefFromOrganizationClassSource",
     "recommendationSourceRefsFromNpcSources",
+    "reconcileEquipmentForClassChange",
     "reconcileMagicItemSelections",
     "referencesEqual",
     "referencingCharacterSummarySchema",

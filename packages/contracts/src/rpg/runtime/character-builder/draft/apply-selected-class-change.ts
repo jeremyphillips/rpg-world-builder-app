@@ -1,19 +1,59 @@
 import { choiceSetIdIsOwnedBy } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
+import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
+import { isEquipmentPickerSupportedEquipment } from '../resolvers/picker/equipment-picker-supported-kinds'
 import { pruneInvalidBuilderSelections } from './prune-invalid-builder-selections'
-import type { CharacterBuilderDraft, CharacterBuilderDraftEquipment } from './draft'
+import type {
+  CharacterBuilderDraft,
+  CharacterBuilderDraftEquipment,
+  CharacterBuilderDraftEquipmentPurchase,
+} from './draft'
 
 const CLASS_OWNED_CHOICE_SOURCE_TYPES = ['class', 'spellcasting'] as const
 
-function clearClassOwnedEquipmentChannel(
-  equipment: CharacterBuilderDraftEquipment | undefined,
-): CharacterBuilderDraftEquipment | undefined {
-  if (!equipment) return equipment
+export type EquipmentClassChangeContext = {
+  classId?: string
+  level: number
+}
+
+function sameClassId(previous: string | undefined, next: string | undefined): boolean {
+  return (previous || undefined) === (next || undefined)
+}
+
+function retainedManualPurchases(
+  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
+  context: CharacterBuildContext,
+): CharacterBuilderDraftEquipmentPurchase[] {
+  const playableEquipmentIds = new Set(
+    resolvePlayableBuilderContent(context)
+      .equipment.filter((equipment) => isEquipmentPickerSupportedEquipment(equipment))
+      .map((equipment) => equipment.id),
+  )
+
+  return purchases.filter(
+    (purchase) =>
+      purchase.sourceMode === 'manual' && playableEquipmentIds.has(purchase.equipmentId),
+  )
+}
+
+/**
+ * Class-independent equipment retention. Manual purchases that are still valid
+ * catalog items stay. Class packages, package-derived purchases, and grants reset.
+ * Proficiency and recommendation do not remove a manual purchase.
+ */
+export function reconcileEquipmentForClassChange(args: {
+  equipment: CharacterBuilderDraftEquipment | undefined
+  previous: EquipmentClassChangeContext
+  next: EquipmentClassChangeContext
+  context: CharacterBuildContext
+}): CharacterBuilderDraftEquipment | undefined {
+  if (!args.equipment) return args.equipment
+  if (sameClassId(args.previous.classId, args.next.classId)) return args.equipment
 
   return {
-    ...equipment,
+    ...args.equipment,
     mode: 'package',
-    purchases: equipment.purchases.filter((purchase) => purchase.sourceMode === 'manual'),
+    purchases: retainedManualPurchases(args.equipment.purchases, args.context),
     grants: [],
     classPackage: { state: 'unresolved' },
     editedSincePackageSelection: false,
@@ -46,7 +86,18 @@ export function applySelectedClassChange(args: {
 
   return {
     ...nextDraft,
-    equipment: clearClassOwnedEquipmentChannel(nextDraft.equipment),
+    equipment: reconcileEquipmentForClassChange({
+      equipment: nextDraft.equipment,
+      previous: {
+        classId: args.draft.class.classId,
+        level: args.draft.class.level,
+      },
+      next: {
+        classId: args.nextClassId,
+        level: args.draft.class.level,
+      },
+      context: args.context,
+    }),
   }
 }
 
