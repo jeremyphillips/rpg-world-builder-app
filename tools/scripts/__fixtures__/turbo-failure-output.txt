@@ -1,0 +1,5 @@
+@rpg/contracts:test: ERROR: command finished with error: command (/path) pnpm run test exited (1)
+@rpg/dashboard:test: ERROR: command finished with error: command (/path) pnpm run test exited (1)
+
+ Tasks:    0 successful, 2 total
+Failed:    @rpg/contracts#test, @rpg/dashboard#test

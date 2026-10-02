@@ -168,13 +168,15 @@ has no canvas; contrast runs in Storybook's addon-a11y instead).
   root `pnpm build`, or full coverage unless the user asks for a commit or push/PR
   checkpoint ([AGENTS.md](../../../AGENTS.md) **Agent validation**).
 - **Optional diagnostic:** `pnpm test:affected:collect` gathers failures across the
-  affected package graph when warranted; not required to finish a task. Inventory:
-  `.tmp/test-affected-collect.log`. Not part of pre-commit, pre-push, or CI.
-- Pre-commit runs `pnpm test:affected:local` with `TURBO_CONCURRENCY=2`. Shared
-  Vitest config caps `maxWorkers` at 4. API integration stays at 2, and serial
-  projects stay serial. Do not set `VITEST_MAX_WORKERS`; Vitest applies it after
-  those rules and overwrites them. Uncapped package scheduling, still fail-fast:
-  `pnpm test:affected`.
+  affected package graph when warranted; not required to finish a task or before push.
+  Inventory: `.tmp/test-affected-collect.log`.
+- **Pre-push** runs `pnpm test:affected:gate` (collect-all affected package tests) via
+  `pnpm gate:pre-push`. Pre-commit does **not** run the full affected dashboard suite.
+- During work, use explicit Vitest paths or `pnpm test:affected:local` (fail-fast,
+  `TURBO_CONCURRENCY=2`). Shared Vitest config caps `maxWorkers` at 4. API integration
+  stays at 2, and serial projects stay serial. Do not set `VITEST_MAX_WORKERS`; Vitest
+  applies it after those rules and overwrites them. Uncapped package scheduling, still
+  fail-fast: `pnpm test:affected`.
 - Pure logic → `.test.ts` (node project). Don't pay for jsdom you don't use.
 - `const user = userEvent.setup()` once per test; never the bare global
   `userEvent.click(...)`.
