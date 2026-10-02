@@ -1,0 +1,9 @@
+[
+  {
+    "source": "turbo",
+    "level": "error",
+    "timestamp": 1,
+    "text": "@rpg/contracts#test: command (/path) pnpm run test exited (1)"
+  },
+  { "source": "turbo", "level": "info", "timestamp": 2, "text": "Failed:    @rpg/contracts#test" }
+]

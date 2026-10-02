@@ -41,30 +41,37 @@ narrowest relevant Vitest paths → targeted typecheck/lint when useful → broa
 - **Affected graph:** use `pnpm test:affected`, `pnpm test:affected:local`, or
   `pnpm lint:affected` / `pnpm typecheck:affected` when shared packages, wide blast
   radius, or unclear regressions justify the cost—not as a routine end-of-task step.
+  Broad affected typecheck/tests run at **push** via `pnpm gate:pre-push`, not on every
+  commit.
+- **`pnpm test:affected:gate`:** collect-all affected package tests (`--continue=always`,
+  failure summary, nonzero when any package fails). Invoked from `gate:pre-push`; do not
+  run manually before push unless debugging—the pre-push hook runs it.
 - **`pnpm test:affected:collect`:** optional **diagnostic** on the same `...[HEAD]` graph
-  as `test:affected:local` (continue after failures, inventory at
-  `.tmp/test-affected-collect.log`). Not required to finish a task; not a hook or CI gate.
+  (continue after failures, inventory at `.tmp/test-affected-collect.log`). Not required
+  before `test:affected:gate` or to finish a task; not a hook or CI gate.
 
 When finishing, **report** which checks ran and which repository gates (pre-commit,
 pre-push) were **intentionally deferred**.
 
 ### Repository gates (checkpoints)
 
-| User intent | What to run |
-| ----------- | ----------- |
-| Commit / checkpoint | Pre-commit hook (see sequence below), or the user’s explicit equivalent |
-| Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once |
+| User intent                 | What to run                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------- |
+| Commit / checkpoint         | Pre-commit hook (see sequence below), or the user’s explicit equivalent                       |
+| Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once (or `git push`, which runs the pre-push hook) |
 
-**Pre-commit** (fast, affected scope — packages changed since `HEAD` plus dependents via Turbo):
+**Pre-commit** (fast local checkpoint — cheap checks only):
 
 ```text
-pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes → pnpm typecheck:affected → pnpm test:affected:local
+pnpm lint-staged → regenerate JSON schemas (when @rpg/contracts Zod inputs change) → pnpm gate:fallow-health → pnpm gate:fallow-dupes
 ```
 
-**Pre-push** (full suite before sharing; single script):
+Commit message format is enforced in **commit-msg** (`commitlint`), after pre-commit succeeds.
+
+**Pre-push** (broad affected correctness before sharing; single script):
 
 ```text
-pnpm gate:pre-push   # coverage → gate:fallow-health:coverage → build
+pnpm gate:pre-push   # typecheck:affected → test:affected:gate → coverage → gate:fallow-health:coverage → build
 ```
 
 `pnpm build` excludes `@rpg/bench` (internal dev tooling). Use `pnpm build:bench`

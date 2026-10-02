@@ -9,24 +9,25 @@ type QuickNpcBuildCardExpansionSync = {
   npcTemplateId: string
 }
 
-function resolveQuickNpcBuildCardExpandedSync(
+function resolveExpandedWhenRoleRowDisabled(
+  expanded: QuickNpcBuildExpandedAttribute,
+  current: QuickNpcBuildCardExpansionSync,
+): QuickNpcBuildExpandedAttribute {
+  if (expanded !== 'role' || current.roleRowEnabled) {
+    return expanded
+  }
+  if (current.classProgressionApplicable && current.classId === '') {
+    return 'class'
+  }
+  return null
+}
+
+function resolveExpandedWhenClassApplicable(
   expanded: QuickNpcBuildExpandedAttribute,
   previous: QuickNpcBuildCardExpansionSync,
   current: QuickNpcBuildCardExpansionSync,
 ): QuickNpcBuildExpandedAttribute {
   const { classProgressionApplicable, classId } = current
-  const { classProgressionApplicable: wasApplicable, classId: wasClassId } = previous
-
-  if (expanded === 'role' && !current.roleRowEnabled) {
-    if (classProgressionApplicable && classId === '') {
-      return 'class'
-    }
-    return null
-  }
-
-  if (!classProgressionApplicable) {
-    return expanded === 'class' ? null : expanded
-  }
 
   if (current.roleRowEnabled && current.npcTemplateId === '') {
     return expanded === 'class' ? expanded : 'role'
@@ -45,14 +46,31 @@ function resolveQuickNpcBuildCardExpandedSync(
     return expanded
   }
 
-  const becameApplicable = wasApplicable === false
-  const classIdBecameEmpty = wasClassId !== ''
+  const becameApplicable = previous.classProgressionApplicable === false
+  const classIdBecameEmpty = previous.classId !== ''
 
   if (becameApplicable || classIdBecameEmpty) {
     return 'class'
   }
 
   return expanded
+}
+
+function resolveQuickNpcBuildCardExpandedSync(
+  expanded: QuickNpcBuildExpandedAttribute,
+  previous: QuickNpcBuildCardExpansionSync,
+  current: QuickNpcBuildCardExpansionSync,
+): QuickNpcBuildExpandedAttribute {
+  const afterRole = resolveExpandedWhenRoleRowDisabled(expanded, current)
+  if (afterRole !== expanded) {
+    return afterRole
+  }
+
+  if (!current.classProgressionApplicable) {
+    return expanded === 'class' ? null : expanded
+  }
+
+  return resolveExpandedWhenClassApplicable(expanded, previous, current)
 }
 
 export function useQuickNpcBuildCardExpandedAttribute(args: {

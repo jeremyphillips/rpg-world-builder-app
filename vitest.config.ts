@@ -17,6 +17,7 @@ export default defineConfig({
       '!apps/bench/vitest.config.ts',
       'apps/bench/vitest.*.config.ts',
       'tools/*/vitest.config.ts',
+      'tools/scripts/vitest.config.ts',
     ],
   },
 })

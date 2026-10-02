@@ -6,9 +6,10 @@ alwaysApply: true
 Follow the conventions in [AGENTS.md](../../AGENTS.md).
 
 **Default agent work:** focused validation (narrow tests, targeted typecheck/lint,
-optional affected checks)—see AGENTS.md **Agent validation**. Finish without running
-hooks, `gate:pre-push`, root `pnpm build`, or `pnpm coverage` unless the user asks
-for a commit/checkpoint or push/PR/full validation.
+optional affected checks)—see AGENTS.md **Agent validation**. Pre-commit is fast;
+broad affected tests run at push via `gate:pre-push`. Finish without running hooks,
+`gate:pre-push`, root `pnpm build`, or `pnpm coverage` unless the user asks for a
+commit/checkpoint or push/PR/full validation.
 
 **Repository hooks** ([`.husky/pre-commit`](../../.husky/pre-commit),
 [`.husky/pre-push`](../../.husky/pre-push)) run only at those checkpoints.

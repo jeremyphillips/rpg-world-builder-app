@@ -12,8 +12,9 @@ focused behavioral tests → targeted typecheck/lint as relevant → broader aff
 
 - Narrowest Vitest paths for changed behavior.
 - `pnpm typecheck:affected`, `pnpm lint:affected`, or package-scoped checks when useful.
-- `pnpm test:affected*` only when blast radius or shared packages warrant it.
+- `pnpm test:affected:local` (fail-fast) when the affected graph warrants it during work.
 - `pnpm test:affected:collect` is **optional** diagnostic (`.tmp/test-affected-collect.log`).
+  It is **not** a mandatory step before push or before `test:affected:gate`.
 
 Do **not** run pre-commit, `pnpm gate:pre-push`, root `pnpm build`, or `pnpm coverage`
 unless the user requests a checkpoint below.
@@ -22,10 +23,13 @@ Finish by reporting checks run and which repository gates were deferred.
 
 ## Checkpoints (user-requested)
 
-| Intent | Run |
-| ------ | --- |
-| Commit / checkpoint | Pre-commit hook ([`.husky/pre-commit`](../.husky/pre-commit)) |
-| Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once |
+| Intent                      | Run                                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Commit / checkpoint         | Pre-commit hook ([`.husky/pre-commit`](../.husky/pre-commit)), then commit-msg commitlint on `git commit` |
+| Push / PR / full validation | Pre-commit once, then `pnpm gate:pre-push` once (or `git push`)                                           |
+
+Pre-commit is intentionally fast (no full affected package test suites). Broad affected
+typecheck and collect-all tests live in `pnpm gate:pre-push` (`test:affected:gate`).
 
 ## Writing implementation plans
 
