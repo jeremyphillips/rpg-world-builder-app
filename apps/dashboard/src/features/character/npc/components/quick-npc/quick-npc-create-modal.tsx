@@ -23,6 +23,8 @@ import {
   resolveQuickNpcCreateRemountKey,
   type QuickNpcCreateContext,
 } from '../../lib/quick-npc/quick-npc-create-context'
+import { readQuickNpcClassPackage } from '../../lib/quick-npc/quick-npc-package-customization.lib'
+import { resolveQuickNpcSetupChangeAuthoringState } from '../../lib/quick-npc/quick-npc-setup-change.lib'
 import { applyQuickNpcSetupValueChange } from '../../lib/quick-npc/quick-npc-setup-value-change.lib'
 import {
   buildQuickNpcCreateSetupSets,
@@ -127,21 +129,54 @@ function QuickNpcCreateModalSession({
         trustedClose()
         return
       }
-      setState((current) => ({
-        ...current,
-        phase: 'authoring',
-        setupValues: values,
-        authoringValues:
-          current.authoringValues ??
-          ({
-            equipmentSelections: [],
+      setState((current) => {
+        if (!current.authoringValues) {
+          return {
+            ...current,
+            phase: 'authoring',
+            setupValues: values,
+            authoringValues: {
+              equipmentSelections: [],
+              requiredSpellIds: [],
+              startingChoiceOverrides: {},
+            },
+          }
+        }
+
+        const reconciled = resolveQuickNpcSetupChangeAuthoringState({
+          classPackage: readQuickNpcClassPackage(current.authoringValues.classPackage),
+          overrides: current.authoringValues.startingChoiceOverrides ?? {},
+          equipmentSelections: current.authoringValues.equipmentSelections ?? [],
+          previous: current.equipmentBaseline ?? { level: values.level },
+          next: {
+            templateId: values.npcTemplateId,
+            classId: values.classId,
+            level: values.level,
+            rulesetId: buildContext.rulesetId,
+          },
+          context: buildContext,
+        })
+
+        return {
+          ...current,
+          phase: 'authoring',
+          setupValues: values,
+          authoringValues: {
+            ...current.authoringValues,
+            equipmentSelections: reconciled.equipmentSelections,
+            startingChoiceOverrides: reconciled.startingChoiceOverrides,
+            classPackage: reconciled.classPackage,
             requiredSpellIds: [],
-            startingChoiceOverrides: {},
-          } satisfies Partial<QuickNpcAuthoringTabFormValues>),
-        equipmentBaseline: current.authoringValues ? undefined : current.equipmentBaseline,
-      }))
+          },
+          equipmentBaseline: {
+            templateId: values.npcTemplateId,
+            classId: values.classId,
+            level: values.level,
+          },
+        }
+      })
     },
-    [onSetupHandoff, setupCompletion, trustedClose],
+    [buildContext, onSetupHandoff, setupCompletion, trustedClose],
   )
 
   const externalDecisions = React.useMemo(

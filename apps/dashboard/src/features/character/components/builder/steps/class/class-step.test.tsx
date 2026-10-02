@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 
 import { pickClass, pickSkillProficiency } from '@/features/content'
+import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   createStandaloneBuilderContextFixture,
@@ -181,7 +182,13 @@ describe('ClassStep', () => {
   it('clears another class package state and keeps a manual purchase', async () => {
     const user = userEvent.setup()
     const onDraftChange = vi.fn()
-    const context = createContext()
+    const rope = pickEquipment('rope')
+    const context = createStandaloneBuilderContextFixture({
+      catalog: {
+        ...createContext().catalog,
+        equipment: [rope],
+      },
+    })
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       choiceSelections: {
@@ -190,7 +197,7 @@ describe('ClassStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [
-          { equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' as const },
+          { equipmentId: rope.id, quantity: 1, sourceMode: 'manual' as const },
           { equipmentId: 'srd-cc-5.2.1:sword', quantity: 1, sourceMode: 'startingGold' as const },
         ],
         editedSincePackageSelection: true,
@@ -213,7 +220,7 @@ describe('ClassStep', () => {
       equipment: expect.objectContaining({
         mode: 'package',
         editedSincePackageSelection: false,
-        purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
+        purchases: [{ equipmentId: rope.id, quantity: 1, sourceMode: 'manual' }],
       }),
     })
   })

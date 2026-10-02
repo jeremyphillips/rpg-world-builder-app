@@ -266,6 +266,7 @@ function packageContext(classEntries: ClassStored | readonly ClassStored[]) {
         weapon('scimitar'),
         weapon('longbow'),
         weapon('dagger', 'simple'),
+        weapon('rope', 'simple'),
         weapon('greataxe'),
         armor('chain-mail', 'heavy'),
         armor('studded-leather', 'light'),

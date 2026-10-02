@@ -28,6 +28,7 @@ import {
 import { QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT } from '../../../lib/quick-npc/quick-npc-npc-template-option.lib'
 import { QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL } from '../../../lib/quick-npc/quick-npc-build-card.lib'
 import { QUICK_NPC_PREVIEW_NPC_LABEL } from '../../../lib/quick-npc/quick-npc-preview-copy'
+import { pickEquipment } from '@/test/fixtures/pick'
 
 const createNpcMock = vi.hoisted(() => vi.fn())
 const resolveQuickNpcAuthoringCreateInputMock = vi.hoisted(() => vi.fn())
@@ -756,6 +757,48 @@ describe('QuickNpcCreateModal standalone context', () => {
     expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
     await selectBuildCardClass(user, /fighter/i)
     expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled()
+  })
+
+  it('keeps manually added equipment after the class changes', async () => {
+    const user = userEvent.setup()
+    const spear = pickEquipment('spear')
+    const rogue = {
+      ...quickFighter,
+      id: 'srd-cc-5.2.1:rogue',
+      slug: 'rogue',
+      name: 'Rogue',
+    }
+    renderStandaloneModal({
+      buildContext: createCampaignNpcBuilderContextFixture({
+        catalog: {
+          ...populatedBuilderCatalog,
+          classes: [quickFighter, rogue],
+          equipment: [spear],
+        },
+      }),
+    })
+
+    await completeStandaloneSetup(user)
+    await user.click(screen.getByRole('button', { name: 'Starting choices' }))
+    await user.click(screen.getByRole('button', { name: /expand equipment/i }))
+    await user.click(screen.getByRole('combobox', { name: 'Add equipment' }))
+    await user.click(screen.getByRole('option', { name: /spear/i }))
+    expect(screen.getByRole('button', { name: 'Remove Spear' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Change build' }))
+    await selectBuildCardClass(user, /rogue/i)
+
+    const continueButton = screen.queryByRole('button', { name: 'Continue' })
+    if (continueButton) {
+      await user.click(continueButton)
+    }
+
+    await user.click(screen.getByRole('button', { name: 'Starting choices' }))
+    const equipmentSection = screen.queryByRole('button', { name: /expand equipment/i })
+    if (equipmentSection) {
+      await user.click(equipmentSection)
+    }
+    expect(screen.getByRole('button', { name: 'Remove Spear' })).toBeInTheDocument()
   })
 
   it('keeps authoring details after changing species and continuing setup again', async () => {
