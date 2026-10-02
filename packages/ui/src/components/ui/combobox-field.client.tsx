@@ -28,6 +28,7 @@ import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
 import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
 import { useFormSectionContext } from '../../form/context/form-section.context'
+import { useComposedRef } from './use-composed-ref.client'
 import { resolveFormDensity } from '../../form/form-density'
 import { useComboboxControl } from './use-combobox-control.client'
 import type { FieldLabelPresentationProps } from './field-label-props'
@@ -92,17 +93,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
   } = props
   const control = useComboboxControl(props)
   const triggerRef = React.useRef<HTMLButtonElement>(null)
-  const setTriggerRef = React.useCallback(
-    (node: HTMLButtonElement | null) => {
-      triggerRef.current = node
-      if (typeof triggerRefProp === 'function') {
-        triggerRefProp(node)
-      } else if (triggerRefProp) {
-        ;(triggerRefProp as React.MutableRefObject<HTMLButtonElement | null>).current = node
-      }
-    },
-    [triggerRefProp],
-  )
+  const setTriggerRef = useComposedRef(triggerRef, triggerRefProp)
   const showClear = clearable && !multiple && selected.length > 0 && !control.isInteractionDisabled
   const clearLabel = clearAccessibleName ?? `Clear ${label}`
 

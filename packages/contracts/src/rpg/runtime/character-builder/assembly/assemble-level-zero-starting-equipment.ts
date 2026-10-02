@@ -73,7 +73,7 @@ function appendTemplateEquipment(
   const levelZero = templateId ? getNpcTemplateEntry(templateId)?.levelZero : undefined
   if (!templateId || !levelZero) return inventory
 
-  let next = inventory
+  const next = inventory
   const { toolCount } = resolveNpcTemplateRoleChoiceCounts(levelZero.roleChoices)
   if (toolCount !== 1) return next
 

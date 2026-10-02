@@ -48,30 +48,32 @@ export function ComboboxFieldRenderer({
     config.filterSelect ? resolveComboboxFilterDefaultValue(config.filterSelect) : undefined,
   )
 
-  React.useEffect(() => {
-    if (!config.filterSelect) return
+  const effectiveCategoryFilter = React.useMemo(() => {
+    if (!config.filterSelect) return undefined
     const isValid = config.filterSelect.options.some((option) => option.value === categoryFilter)
-    if (!isValid) {
-      setCategoryFilter(resolveComboboxFilterDefaultValue(config.filterSelect))
-    }
+    if (isValid) return categoryFilter
+    return resolveComboboxFilterDefaultValue(config.filterSelect)
   }, [categoryFilter, config.filterSelect])
 
   const resolveFilteredOptions = React.useMemo((): ResolveComboboxFilteredOptions | undefined => {
     const formResolver = config.filterSelect
-      ? composeComboboxResolveFilteredOptions(categoryFilter!, config.resolveFilteredOptions)
+      ? composeComboboxResolveFilteredOptions(
+          effectiveCategoryFilter!,
+          config.resolveFilteredOptions,
+        )
       : config.resolveFilteredOptions
 
     if (!formResolver) return undefined
 
     return (options, query, selected) =>
       toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
-  }, [categoryFilter, config.filterSelect, config.resolveFilteredOptions])
+  }, [effectiveCategoryFilter, config.filterSelect, config.resolveFilteredOptions])
 
   const filter = config.filterSelect ? (
     <ComboboxFilterSelect
       ariaLabel={config.filterSelect.ariaLabel}
       options={config.filterSelect.options}
-      value={categoryFilter!}
+      value={effectiveCategoryFilter!}
       onValueChange={setCategoryFilter}
     />
   ) : undefined
