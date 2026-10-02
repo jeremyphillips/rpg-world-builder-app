@@ -5,8 +5,6 @@ import {
   CASTING_TIME_UNIT_ENTRIES,
   DURATION_UNITS,
   DURATION_UNIT_ENTRIES,
-  EFFECT_CONDITION_ENTRIES,
-  EFFECT_CONDITION_IDS,
   formatSpellLevel,
   MAX_SPELL_CONTENT_LEVEL,
   MIN_SPELL_CONTENT_LEVEL,
@@ -21,6 +19,9 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FieldOption } from '@rpg/ui/form'
 
+import { buildActiveConditionFieldOptions } from '@/features/vocabulary'
+
+import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { CANTRIP_LEVEL_LABEL } from './format-spell-metadata'
 
 export const SPELL_DURATION_KINDS = ['instantaneous', 'timed', 'special'] as const
@@ -113,9 +114,6 @@ export const functionTagOptions = toOptions(
   ) as Record<(typeof SPELL_FUNCTION_TAGS)[number], string>,
 )
 
-export const conditionTagOptions = toOptions(
-  EFFECT_CONDITION_IDS,
-  Object.fromEntries(
-    EFFECT_CONDITION_IDS.map((c) => [c, EFFECT_CONDITION_ENTRIES[c].label]),
-  ) as Record<(typeof EFFECT_CONDITION_IDS)[number], string>,
-)
+export function buildConditionTagOptions(ctx: ContentFormCtx) {
+  return buildActiveConditionFieldOptions(ctx.conditionVocabulary)
+}

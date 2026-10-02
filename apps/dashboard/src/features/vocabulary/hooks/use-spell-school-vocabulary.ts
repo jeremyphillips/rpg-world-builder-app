@@ -1,14 +1,8 @@
 import { SPELL_SCHOOL_SET_ID } from '@rpg/contracts'
 
-import { buildSpellSchoolVocabulary } from '../lib/sets/spell-schools'
-import { useVocabularySet } from './use-vocabulary-set'
+import { useVocabularySetDescriptionMaps } from './use-vocabulary-set-description-maps'
 
-/** Campaign-resolved spell school labels and active ids for forms and tables. */
+/** Campaign-resolved spell school labels, descriptions, and active ids. */
 export function useSpellSchoolVocabulary(campaignId: string | undefined) {
-  const query = useVocabularySet(campaignId, SPELL_SCHOOL_SET_ID)
-
-  return {
-    ...query,
-    vocabulary: query.data ? buildSpellSchoolVocabulary(query.data) : undefined,
-  }
+  return useVocabularySetDescriptionMaps(campaignId, SPELL_SCHOOL_SET_ID)
 }

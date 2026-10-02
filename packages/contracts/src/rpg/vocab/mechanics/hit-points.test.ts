@@ -4,12 +4,18 @@ import { vocabularyTermLabel } from '../types'
 import { HIT_POINTS_TERM } from './hit-points'
 
 describe('HIT_POINTS_TERM', () => {
-  it('uses title-case Hit Points in authoring prose', () => {
+  it('uses lowercase sentence forms for generated prose', () => {
     expect(vocabularyTermLabel(HIT_POINTS_TERM, { number: 'plural', casing: 'sentence' })).toBe(
-      'Hit Points',
+      'hit points',
     )
     expect(vocabularyTermLabel(HIT_POINTS_TERM, { number: 'singular', casing: 'sentence' })).toBe(
-      'Hit Point',
+      'hit point',
+    )
+  })
+
+  it('keeps title label on the term for editorial surfaces', () => {
+    expect(vocabularyTermLabel(HIT_POINTS_TERM, { number: 'singular', casing: 'title' })).toBe(
+      'Hit Points',
     )
   })
 

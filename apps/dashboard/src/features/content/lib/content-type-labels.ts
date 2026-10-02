@@ -1,4 +1,5 @@
 import {
+  capitalizeFirst,
   getContentTypeTerm,
   resolveChoicePlaceholder,
   vocabularyTermLabel,
@@ -6,18 +7,12 @@ import {
   type FieldNoun,
 } from '@rpg/contracts'
 
-/** Capitalizes the first letter of each word for hub and navigation surfaces. */
-function titleCaseWords(value: string): string {
-  return value.replace(/\b\w/g, (character) => character.toUpperCase())
-}
-
 /** Plural title case for sidebar, breadcrumbs, and overview headings. */
 export function getContentTypeCollectionLabel(key: ContentTypeKey): string {
-  const phrase = vocabularyTermLabel(getContentTypeTerm(key), {
+  return vocabularyTermLabel(getContentTypeTerm(key), {
     number: 'plural',
-    casing: 'sentence',
+    casing: 'title',
   })
-  return titleCaseWords(phrase)
 }
 
 /** Singular title case for create headings and item references. */
@@ -34,7 +29,7 @@ export function getContentTypeSentenceLabel(
     number: options?.plural ? 'plural' : 'singular',
     casing: 'sentence',
   })
-  return phrase.charAt(0).toUpperCase() + phrase.slice(1)
+  return capitalizeFirst(phrase)
 }
 
 /** Compact label when the content-type term defines one; otherwise undefined. */

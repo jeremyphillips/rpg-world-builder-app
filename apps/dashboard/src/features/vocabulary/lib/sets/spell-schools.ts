@@ -1,9 +1,10 @@
 import { SPELL_SCHOOL_SET_ID, type ResolvedVocabularyOptionSet } from '@rpg/contracts'
-import { toOptions, type FieldOption } from '@rpg/ui/form'
 
 import {
+  buildActiveVocabularyFieldOptions,
   buildLabelDescriptionActiveVocabulary,
   buildVocabularyFromSeedSet,
+  getVocabularyLabel,
   type LabelDescriptionActiveVocabulary,
 } from '../build-vocabulary-maps'
 
@@ -21,19 +22,9 @@ export function buildSeedSpellSchoolVocabulary(): SpellSchoolVocabulary {
   return buildVocabularyFromSeedSet(SPELL_SCHOOL_SET_ID, buildSpellSchoolVocabulary)
 }
 
-export function buildActiveSpellSchoolFieldOptions(
-  vocabulary: SpellSchoolVocabulary | undefined,
-): FieldOption[] {
-  if (!vocabulary) return []
-  return toOptions([...vocabulary.activeIds].sort(), vocabulary.labelById)
-}
+export const buildActiveSpellSchoolFieldOptions = buildActiveVocabularyFieldOptions
 
-export function getSpellSchoolLabelFromVocabulary(
-  vocabulary: SpellSchoolVocabulary | undefined,
-  id: string,
-): string {
-  return vocabulary?.labelById[id] ?? id
-}
+export const getSpellSchoolLabelFromVocabulary = getVocabularyLabel
 
 export function getSpellSchoolDescriptionFromVocabulary(
   vocabulary: SpellSchoolVocabulary | undefined,

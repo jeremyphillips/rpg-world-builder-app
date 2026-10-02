@@ -18,11 +18,14 @@ import { useCampaignRules } from '@/features/campaign'
 import { useRulesetPatch } from '@/features/homebrew'
 import { resolveCampaignSpellcastingProgression } from '@/lib/campaign-spellcasting-progression.lib'
 import {
+  useConditionVocabulary,
   useCreatureTypeVocabulary,
   useDamageTypeVocabulary,
   useLanguageVocabulary,
   useSenseVocabulary,
+  useSizeVocabulary,
   useSpellSchoolVocabulary,
+  useWeaponPropertyVocabulary,
 } from '@/features/vocabulary'
 
 import { useClasses } from '../../classes/hooks/use-classes'
@@ -124,7 +127,19 @@ function useContentFormVocabulary(campaignId: string | undefined) {
   const senseQuery = useSenseVocabulary(campaignId)
   const languageQuery = useLanguageVocabulary(campaignId)
   const spellSchoolQuery = useSpellSchoolVocabulary(campaignId)
-  const queries = [creatureTypeQuery, damageTypeQuery, senseQuery, languageQuery, spellSchoolQuery]
+  const sizeQuery = useSizeVocabulary(campaignId)
+  const conditionQuery = useConditionVocabulary(campaignId)
+  const weaponPropertyQuery = useWeaponPropertyVocabulary(campaignId)
+  const queries = [
+    creatureTypeQuery,
+    damageTypeQuery,
+    senseQuery,
+    languageQuery,
+    spellSchoolQuery,
+    sizeQuery,
+    conditionQuery,
+    weaponPropertyQuery,
+  ]
 
   return {
     creatureTypeVocabulary: creatureTypeQuery.vocabulary,
@@ -132,6 +147,9 @@ function useContentFormVocabulary(campaignId: string | undefined) {
     senseVocabulary: senseQuery.vocabulary,
     languageVocabulary: languageQuery.vocabulary,
     spellSchoolVocabulary: spellSchoolQuery.vocabulary,
+    sizeVocabulary: sizeQuery.vocabulary,
+    conditionVocabulary: conditionQuery.vocabulary,
+    weaponPropertyVocabulary: weaponPropertyQuery.vocabulary,
     isPending: isAnyPending(...queries),
     isError: isAnyError(...queries),
   }
@@ -268,6 +286,9 @@ export function useContentFormOptions(campaignId: string | undefined): {
       senseVocabulary: vocabulary.senseVocabulary,
       languageVocabulary: vocabulary.languageVocabulary,
       spellSchoolVocabulary: vocabulary.spellSchoolVocabulary,
+      sizeVocabulary: vocabulary.sizeVocabulary,
+      conditionVocabulary: vocabulary.conditionVocabulary,
+      weaponPropertyVocabulary: vocabulary.weaponPropertyVocabulary,
       options,
     }),
     [campaignId, rulesetId, campaignRules, spellcastingProgression, vocabulary, options],

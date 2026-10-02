@@ -51,6 +51,33 @@ export function getVocabularyTermLabel(term: VocabularyTerm): string {
  * Grammatical label from a taxonomy concept — not surface-specific.
  * Title + singular → `term.label`. All other combinations use curated `sentence` forms.
  */
+const TITLE_CASE_MINOR_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'for',
+  'in',
+  'of',
+  'on',
+  'or',
+  'the',
+  'to',
+])
+
+/** Title-case presentation for hub and navigation copy (derived, not stored on terms). */
+export function titleCaseLabel(phrase: string): string {
+  const words = phrase.trim().split(/\s+/).filter(Boolean)
+  return words
+    .map((word, index) => {
+      const lower = word.toLowerCase()
+      if (index > 0 && TITLE_CASE_MINOR_WORDS.has(lower)) {
+        return lower
+      }
+      return capitalizeFirst(lower)
+    })
+    .join(' ')
+}
+
 export function vocabularyTermLabel(
   term: VocabularyTerm,
   options: VocabularyTermLabelOptions = {},
@@ -62,7 +89,12 @@ export function vocabularyTermLabel(
     return term.label
   }
 
-  return getTermSentenceForm(term, number === 'singular' ? 1 : 2)
+  const sentenceForm = getTermSentenceForm(term, number === 'singular' ? 1 : 2)
+  if (casing === 'title' && number === 'plural') {
+    return titleCaseLabel(sentenceForm)
+  }
+
+  return sentenceForm
 }
 
 export type VocabularyTermFieldCopyOptions = {
@@ -103,6 +135,25 @@ export function capitalizeFirst(value: string): string {
 /** Lowercase display label for simple generated prose. */
 export function getTermLabelSingular(label: string): string {
   return label.toLowerCase()
+}
+
+/** Entry maps that participate in counted noun phrases must declare sentence forms. */
+export type CountableTermEntry = GameTermEntry & {
+  readonly sentence: {
+    readonly singular: string
+    readonly plural: string
+  }
+}
+
+/** Strict counted phrase — no heuristic plural fallback. */
+export function formatTermCount(entry: CountableTermEntry, count: number): string {
+  const noun = count === 1 ? entry.sentence.singular : entry.sentence.plural
+  return `${count} ${noun}`
+}
+
+/** Strict counted accessor for curated entry maps. */
+export function getCountedTermForm(entry: CountableTermEntry, count: number): string {
+  return count === 1 ? entry.sentence.singular : entry.sentence.plural
 }
 
 /** Simple plural derivation for vocab labels; explicit sentence overrides handle exceptions. */

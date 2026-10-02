@@ -9,7 +9,7 @@ export const HIT_POINTS_TERM = {
   description:
     "A creature's health pool; damage reduces current hit points and healing restores them.",
   sentence: {
-    singular: 'Hit Point',
-    plural: 'Hit Points',
+    singular: 'hit point',
+    plural: 'hit points',
   },
 } as const satisfies VocabularyTerm

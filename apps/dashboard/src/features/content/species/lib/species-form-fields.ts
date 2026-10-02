@@ -1,8 +1,6 @@
 import { createElement } from 'react'
 import { z } from 'zod'
 import {
-  CREATURE_SIZES,
-  CREATURE_SIZE_ENTRIES,
   CREATURE_SIZE_TERM,
   CREATURE_TYPE_TERM,
   addCustomRefinementIssue,
@@ -16,7 +14,11 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
-import { vocabularyFieldLabel, vocabularySelectFieldForTerm } from '@/features/vocabulary'
+import {
+  buildActiveSizeFieldOptions,
+  vocabularyFieldLabel,
+  vocabularySelectFieldForTerm,
+} from '@/features/vocabulary'
 
 import { getCharacterCreatureTypeFieldOptions } from './creature-type-field-options'
 import {
@@ -61,14 +63,6 @@ import {
   traitRowDraftFormSchema,
   traitRowFormSchema,
 } from './species-trait-form-fields'
-
-const creatureSizeOptions = toOptions(
-  CREATURE_SIZES,
-  Object.fromEntries(CREATURE_SIZES.map((s) => [s, CREATURE_SIZE_ENTRIES[s].label])) as Record<
-    (typeof CREATURE_SIZES)[number],
-    string
-  >,
-)
 
 /** Species form validation messages (tier 3 form overrides). */
 export const speciesValidationMessages = {
@@ -176,7 +170,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
               type: 'chips',
               name: 'sizes',
               label: getVocabularyTermLabel(CREATURE_SIZE_TERM),
-              options: creatureSizeOptions,
+              options: buildActiveSizeFieldOptions(ctx.sizeVocabulary),
               required: true,
             },
             descriptionField(ctx),

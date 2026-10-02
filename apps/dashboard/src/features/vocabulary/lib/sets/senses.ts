@@ -1,35 +1,12 @@
-import { SENSE_SET_ID, type ResolvedVocabularyOptionSet } from '@rpg/contracts'
-import { toOptions, type FieldOption } from '@rpg/ui/form'
+import { SENSE_SET_ID } from '@rpg/contracts'
 
-import { buildLabelActiveVocabulary, buildVocabularyFromSeedSet } from '../build-vocabulary-maps'
+import { createLabelVocabularySetHelpers, type LabelActiveVocabulary } from './label-vocabulary-set'
 
-export type SenseVocabulary = {
-  labelById: Record<string, string>
-  activeIds: ReadonlySet<string>
-}
+const helpers = createLabelVocabularySetHelpers(SENSE_SET_ID)
 
-/** Build label/active-id maps from a resolved senses set. */
-export function buildSenseVocabulary(
-  set: Pick<ResolvedVocabularyOptionSet, 'options'>,
-): SenseVocabulary {
-  return buildLabelActiveVocabulary(set)
-}
+export type SenseVocabulary = LabelActiveVocabulary
 
-/** Default ruleset seed vocabulary for flows without a campaign id. */
-export function buildSeedSenseVocabulary(): SenseVocabulary {
-  return buildVocabularyFromSeedSet(SENSE_SET_ID, buildSenseVocabulary)
-}
-
-export function buildActiveSenseFieldOptions(
-  vocabulary: SenseVocabulary | undefined,
-): FieldOption[] {
-  if (!vocabulary) return []
-  return toOptions([...vocabulary.activeIds].sort(), vocabulary.labelById)
-}
-
-export function getSenseLabelFromVocabulary(
-  vocabulary: SenseVocabulary | undefined,
-  id: string,
-): string {
-  return vocabulary?.labelById[id] ?? id
-}
+export const buildSenseVocabulary = helpers.build
+export const buildSeedSenseVocabulary = helpers.buildSeed
+export const buildActiveSenseFieldOptions = helpers.buildActiveFieldOptions
+export const getSenseLabelFromVocabulary = helpers.getLabel

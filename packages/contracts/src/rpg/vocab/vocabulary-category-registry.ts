@@ -21,14 +21,9 @@ export type VocabularyCategory = {
   internalOnly: boolean
 }
 
-function titleCaseWords(value: string): string {
-  return value.replace(/\b\w/g, (character) => character.toUpperCase())
-}
-
 /** Hub / navigation label — title-cased plural taxonomy name. */
 export function vocabularyCategoryHubLabel(term: VocabularyTerm): string {
-  const phrase = vocabularyTermLabel(term, { number: 'plural', casing: 'sentence' })
-  return titleCaseWords(phrase)
+  return vocabularyTermLabel(term, { number: 'plural', casing: 'title' })
 }
 
 function isInternalOnlySetId(setId: VocabularyOptionSetId): boolean {

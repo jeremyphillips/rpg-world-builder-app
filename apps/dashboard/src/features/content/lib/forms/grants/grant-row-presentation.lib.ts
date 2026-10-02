@@ -8,10 +8,7 @@ import {
   formatSenseGrantSentence,
   formatSpellsGrantSentence,
   formatSlugAsLabel,
-  getDamageTypeLabel,
   getFeatCategorySentenceForm,
-  getLanguageLabel,
-  getSenseLabel,
   type FeatCategory,
   type MovementGrantPayload,
   type MovementMode,
@@ -54,6 +51,9 @@ export type GrantRowHeaderContext = {
   armorOptions: FieldOption[]
   skillOptions: FieldOption[]
   spellOptions: FieldOption[]
+  resolveDamageTypeLabel?: (id: string) => string
+  resolveLanguageLabel?: (id: string) => string
+  resolveSenseLabel?: (id: string) => string
 }
 
 /** Semantic row copy — renderer decides header band vs body description placement. */
@@ -123,24 +123,33 @@ export function movementFormValuesToGrantPayload(values: {
   return { mode, operation, feet: feet as never }
 }
 
-function resolveDamageTypeDetail(damageTypes: string[] | undefined): string | undefined {
+function resolveDamageTypeDetail(
+  damageTypes: string[] | undefined,
+  ctx: GrantRowHeaderContext,
+): string | undefined {
   if (!damageTypes?.length) return undefined
-  return formatCompactMetadataList(damageTypes.map((id) => getDamageTypeLabel(id)))
+  const resolveLabel = ctx.resolveDamageTypeLabel ?? ((id: string) => id)
+  return formatCompactMetadataList(damageTypes.map((id) => resolveLabel(id)))
 }
 
-function resolveLanguageDetail(languageId: string | undefined): string | undefined {
+function resolveLanguageDetail(
+  languageId: string | undefined,
+  ctx: GrantRowHeaderContext,
+): string | undefined {
   if (!languageId) return undefined
-  return getLanguageLabel(languageId)
+  return ctx.resolveLanguageLabel?.(languageId) ?? languageId
 }
 
 function resolveSenseDetail(
   type: string | undefined,
   range: number | string | undefined,
+  ctx: GrantRowHeaderContext,
 ): string | undefined {
   if (!type || range === undefined || range === '') return undefined
   const numericRange = typeof range === 'number' ? range : Number(range)
   if (!Number.isFinite(numericRange)) return undefined
-  return `${getSenseLabel(type)} ${numericRange} ft`
+  const label = ctx.resolveSenseLabel?.(type) ?? type
+  return `${label} ${numericRange} ft`
 }
 
 function resolveFeatChoiceDetail(
@@ -259,15 +268,18 @@ type GrantRowDetailFormatter = (
 ) => string | undefined
 
 const GRANT_ROW_DETAIL_BY_TYPE: Partial<Record<string, GrantRowDetailFormatter>> = {
-  resistances: (values) => resolveDamageTypeDetail(values['resistances'] as string[] | undefined),
-  damageType: (values) => resolveDamageTypeDetail(values['damageType'] as string[] | undefined),
-  senses: (values) =>
+  resistances: (values, ctx) =>
+    resolveDamageTypeDetail(values['resistances'] as string[] | undefined, ctx),
+  damageType: (values, ctx) =>
+    resolveDamageTypeDetail(values['damageType'] as string[] | undefined, ctx),
+  senses: (values, ctx) =>
     resolveSenseDetail(
       values['senseType'] as string | undefined,
       values['senseRange'] as number | string | undefined,
+      ctx,
     ),
   movement: (values) => resolveMovementDetail(values),
-  languages: (values) => resolveLanguageDetail(values['language'] as string | undefined),
+  languages: (values, ctx) => resolveLanguageDetail(values['language'] as string | undefined, ctx),
   featChoice: (values) =>
     resolveFeatChoiceDetail(
       values['featCategory'] as string | undefined,

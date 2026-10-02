@@ -72,9 +72,9 @@ describe('vocabularyTermLabel', () => {
     )
   })
 
-  it('uses sentence plural for title plural until explicit title metadata exists', () => {
+  it('derives title plural from sentence forms via titleCaseLabel', () => {
     expect(vocabularyTermLabel(CREATURE_TYPE_TERM, { number: 'plural', casing: 'title' })).toBe(
-      'creature types',
+      'Creature Types',
     )
   })
 })

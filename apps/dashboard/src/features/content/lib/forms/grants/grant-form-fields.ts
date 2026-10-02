@@ -40,6 +40,9 @@ import {
   buildActiveDamageTypeFieldOptions,
   buildActiveLanguageFieldOptions,
   buildActiveSenseFieldOptions,
+  getDamageTypeLabelFromVocabulary,
+  getLanguageLabelFromVocabulary,
+  getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
 
 import { GrantTypePersistField } from './grant-type-persist-field'
@@ -647,9 +650,13 @@ function buildGrantRowHeaderContext(
   ctx: ContentFormCtx,
 ): GrantRowHeaderContext {
   const referenceEquipment = ctx.options?.equipment?.forReference() ?? []
+  const { damageTypeVocabulary, languageVocabulary, senseVocabulary } = ctx
 
   return {
     rowLabels: labels,
+    resolveDamageTypeLabel: (id) => getDamageTypeLabelFromVocabulary(damageTypeVocabulary, id),
+    resolveLanguageLabel: (id) => getLanguageLabelFromVocabulary(languageVocabulary, id),
+    resolveSenseLabel: (id) => getSenseLabelFromVocabulary(senseVocabulary, id),
     equipmentOptions: referenceEquipmentFieldOptions(ctx.options?.equipment),
     weaponOptions: toSortedContentFieldOptions(
       referenceEquipment.filter(isWeaponEquipment),
