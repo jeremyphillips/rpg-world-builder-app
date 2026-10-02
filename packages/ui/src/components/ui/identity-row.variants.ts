@@ -7,6 +7,10 @@ export const identityRowRootVariants = cva('min-w-0 flex-1')
 
 export const identityRowHeadingLineVariants = cva('flex min-w-0 items-baseline')
 
+export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
+
+export const identityRowHeadingEndVariants = cva('shrink-0 text-xs text-muted-foreground')
+
 export const identityRowHeadingVariants = cva(
   'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
   {

@@ -5,6 +5,7 @@ import {
 } from '../../../character/format-selection-source-label'
 import { getNpcTemplateLabel } from '../../../../vocab/npc/npc-template'
 import type { EquipmentSupplySource } from '../../recommendation/recommendation-envelope'
+import type { EquipmentAdditionPolicy } from './resolve-equipment-addition-policy'
 import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 
 const EMPTY_SUPPLY_CATALOG: SelectionSourceLabelCatalogIndex = { classes: new Map() }
@@ -72,7 +73,21 @@ export function formatEquipmentSupplySourceLabels(
     .join(' · ')
 }
 
-export type EquipmentAdditionMode = 'single' | 'quantity'
+export type EquipmentAdditionMode = EquipmentAdditionPolicy
+
+/**
+ * Another copy may be added only when the addition constraint allows it.
+ * Ownership does not forbid the action by itself: a singleton may take its
+ * first copy, and a blocked row stays closed at quantity 0.
+ */
+export function canAddAnotherEquipmentCopy(
+  quantity: number,
+  addition: EquipmentAdditionMode,
+): boolean {
+  if (addition === 'blocked') return false
+  if (addition === 'single') return quantity <= 0
+  return true
+}
 
 /**
  * Merges live quantity and supply into a resolved option.
@@ -87,7 +102,7 @@ export function projectEquipmentSelection(args: {
 }): ResolvedEquipmentOption {
   const quantity = Math.max(0, Math.floor(args.quantity))
   const sources = dedupeEquipmentSupplySources(args.sources)
-  const canAddMore = quantity === 0 || args.addition === 'quantity'
+  const canAddMore = canAddAnotherEquipmentCopy(quantity, args.addition)
   return {
     requirements: args.resolved.requirements,
     recommendation: args.resolved.recommendation,

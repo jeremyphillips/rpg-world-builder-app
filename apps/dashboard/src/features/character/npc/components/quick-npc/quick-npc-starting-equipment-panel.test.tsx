@@ -120,7 +120,7 @@ describe('QuickNpcStartingEquipmentPanel', () => {
     cleanup()
   })
 
-  it('shows compact option anatomy and keeps an included singleton visible but disabled', async () => {
+  it('keeps an owned weapon addable and increments its manual quantity', async () => {
     const user = userEvent.setup()
     render(
       <PanelHarness
@@ -137,10 +137,13 @@ describe('QuickNpcStartingEquipmentPanel', () => {
     expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('Weapon')
     expect(screen.queryByRole('option', { name: /rations/i })).toBeNull()
     const spear = screen.getByRole('option', { name: /spear/i })
-    expect(spear).toBeDisabled()
-    expect(spear).toHaveTextContent('Included')
+    expect(spear).toBeEnabled()
+    expect(spear).toHaveTextContent('×1')
+    expect(spear).toHaveTextContent('Quantity 1')
     expect(spear).toHaveTextContent('Weapon')
     expect(spear).toHaveTextContent('Recommended by Guard role')
+    await user.click(spear)
+    expect(screen.getByText('2 × Spear')).toBeTruthy()
   })
 
   it('filters the add-equipment list when a category is selected', async () => {

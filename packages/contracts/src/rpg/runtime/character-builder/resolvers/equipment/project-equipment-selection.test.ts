@@ -55,15 +55,33 @@ describe('projectEquipmentSelection', () => {
     expect(projected.state.compatibility).toEqual({ proficient: false })
   })
 
-  it('disables further adds for a singleton that is already included', () => {
-    const projected = projectEquipmentSelection({
+  it('allows the first copy of a singleton and blocks a second', () => {
+    const open = projectEquipmentSelection({
+      resolved: resolved(),
+      quantity: 0,
+      sources: [],
+      addition: 'single',
+    })
+    const owned = projectEquipmentSelection({
       resolved: resolved(),
       quantity: 1,
       sources: [{ kind: 'role', id: 'guard' }],
       addition: 'single',
     })
+    expect(open.state.selection?.canAddMore).toBe(true)
+    expect(owned.state.selection?.canAddMore).toBe(false)
+    expect(owned.state.selection?.quantity).toBe(1)
+  })
+
+  it('blocks a prohibited row even when quantity is zero', () => {
+    const projected = projectEquipmentSelection({
+      resolved: resolved(),
+      quantity: 0,
+      sources: [],
+      addition: 'blocked',
+    })
+    expect(projected.state.selection?.selected).toBe(false)
     expect(projected.state.selection?.canAddMore).toBe(false)
-    expect(projected.state.selection?.quantity).toBe(1)
   })
 
   it('keeps recommendation sources independent from supply sources', () => {

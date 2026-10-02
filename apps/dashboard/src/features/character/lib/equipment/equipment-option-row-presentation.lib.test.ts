@@ -11,9 +11,9 @@ import {
 } from '@rpg/contracts'
 
 import {
-  EQUIPMENT_OPTION_INCLUDED_LABEL,
   equipmentOptionAccessibleLabel,
   equipmentOptionInlineClauses,
+  equipmentOptionQuantityAccessibleLabel,
   resolveEquipmentOptionRowPresentation,
 } from './equipment-option-row-presentation.lib'
 
@@ -116,7 +116,41 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     })
   })
 
-  it('shows an included singleton as disabled trailing state', () => {
+  it('shows owned quantity without disabling a row that can take another copy', () => {
+    const presentation = present(
+      projectEquipmentSelection({
+        resolved: resolved(),
+        quantity: 1,
+        sources: [{ kind: 'role', id: 'guard' }],
+        addition: 'quantity',
+      }),
+      [],
+    )
+    expect(presentation.trailingState).toEqual({
+      label: '×1',
+      accessibleLabel: equipmentOptionQuantityAccessibleLabel(1),
+    })
+    expect(presentation.disabled).toBe(false)
+    expect(presentation.metadata).toEqual([])
+    expect(equipmentOptionInlineClauses(presentation).map((clause) => clause.kind)).toEqual([
+      'supply',
+    ])
+  })
+
+  it('disables a zero-quantity row when another copy is blocked', () => {
+    const presentation = present(
+      projectEquipmentSelection({
+        resolved: resolved(),
+        quantity: 0,
+        sources: [],
+        addition: 'blocked',
+      }),
+    )
+    expect(presentation.trailingState).toBeUndefined()
+    expect(presentation.disabled).toBe(true)
+  })
+
+  it('disables an owned singleton when the addition constraint is single', () => {
     const presentation = present(
       projectEquipmentSelection({
         resolved: resolved(),
@@ -124,17 +158,9 @@ describe('resolveEquipmentOptionRowPresentation', () => {
         sources: [{ kind: 'role', id: 'guard' }],
         addition: 'single',
       }),
-      [],
     )
-    expect(presentation.trailingState).toEqual({
-      label: EQUIPMENT_OPTION_INCLUDED_LABEL,
-      accessibleLabel: EQUIPMENT_OPTION_INCLUDED_LABEL,
-    })
+    expect(presentation.trailingState?.label).toBe('×1')
     expect(presentation.disabled).toBe(true)
-    expect(presentation.metadata).toEqual([])
-    expect(equipmentOptionInlineClauses(presentation).map((clause) => clause.kind)).toEqual([
-      'supply',
-    ])
   })
 
   it('shows included multi-quantity as a selectable count', () => {

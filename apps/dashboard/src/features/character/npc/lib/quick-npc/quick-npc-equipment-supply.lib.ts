@@ -7,7 +7,6 @@ import {
   resolveEquipmentAdditionPolicy,
   type CharacterBuildCatalogIndex,
   type CharacterSelectionSource,
-  type Equipment,
   type EquipmentSupplySource,
   type NpcStartingChoices,
   type RecommendationSourceName,
@@ -24,7 +23,7 @@ import { listEquipmentInventoryRowsFromDraft } from '@/features/character/lib/eq
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import type { QuickNpcAdditionalEquipmentOption } from './quick-npc-additional-equipment.lib'
-import type { QuickNpcEquipmentSelection } from './quick-npc-form-fields'
+import type { QuickNpcEquipmentSelection, QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isGrantedEquipmentContribution } from './quick-npc-starting-equipment.lib'
 
 export type QuickNpcEquipmentAllocation = {
@@ -40,8 +39,9 @@ type QuantityBucket = {
 }
 
 /**
- * Aggregates duplicate origins, keeps classed weapon requirements idempotent,
- * and preserves quantities for classed manual nonweapon grants.
+ * Aggregates duplicate origins. Classless rows persist every origin's total.
+ * Classed rows persist only the manual Add equipment contribution, for every
+ * equipment kind. That contribution never becomes a weapon-id constraint.
  */
 export function projectQuickNpcEquipmentAllocations(args: {
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
@@ -74,25 +74,14 @@ export function projectQuickNpcEquipmentAllocations(args: {
     }
   }
 
-  const requiredWeaponIds: string[] = []
-  const manualEquipmentGrantIds: string[] = []
   const startingEquipmentGrants: QuickNpcEquipmentAllocation['startingEquipmentGrants'] = []
   for (const [equipmentId, total] of totals) {
-    if (!total.hasManual) continue
-    const equipment = args.catalogIndex.equipment.get(equipmentId)
-    if (!equipment) continue
-    if (equipment.kind === 'weapon') {
-      requiredWeaponIds.push(equipmentId)
-      continue
-    }
-    if (total.manualQuantity > 1) {
-      startingEquipmentGrants.push({ equipmentId, quantity: total.manualQuantity })
-    } else {
-      manualEquipmentGrantIds.push(equipmentId)
-    }
+    if (!total.hasManual || total.manualQuantity < 1) continue
+    if (!args.catalogIndex.equipment.get(equipmentId)) continue
+    startingEquipmentGrants.push({ equipmentId, quantity: total.manualQuantity })
   }
 
-  return { requiredWeaponIds, manualEquipmentGrantIds, startingEquipmentGrants }
+  return { requiredWeaponIds: [], manualEquipmentGrantIds: [], startingEquipmentGrants }
 }
 
 function formSupplySource(
@@ -188,22 +177,6 @@ export function collectQuickNpcEquipmentSupply(args: {
   }
 }
 
-export function quickNpcEquipmentAdditionPolicy(args: {
-  equipment: Equipment
-  classed: boolean
-}): 'single' | 'quantity' {
-  if (args.classed && args.equipment.kind === 'weapon') {
-    return resolveEquipmentAdditionPolicy({
-      equipment: args.equipment,
-      context: { kind: 'requirement', idempotentClassedWeapon: true },
-    })
-  }
-  return resolveEquipmentAdditionPolicy({
-    equipment: args.equipment,
-    context: { kind: 'grant' },
-  })
-}
-
 export function presentQuickNpcEquipmentOption(args: {
   entry: QuickNpcAdditionalEquipmentOption
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
@@ -211,7 +184,6 @@ export function presentQuickNpcEquipmentOption(args: {
   choices: NpcStartingChoices
   catalogIndex: CharacterBuildCatalogIndex
   classId?: string
-  classed: boolean
   sourceName?: RecommendationSourceName
   supplyCatalog?: SelectionSourceLabelCatalogIndex
 }): EquipmentOptionRowPresentation {
@@ -226,7 +198,10 @@ export function presentQuickNpcEquipmentOption(args: {
     catalogIndex: args.catalogIndex,
     ...(args.classId ? { classId: args.classId } : {}),
   })
-  const addition = quickNpcEquipmentAdditionPolicy({ equipment, classed: args.classed })
+  const addition = resolveEquipmentAdditionPolicy({
+    equipment,
+    context: { kind: 'grant' },
+  })
   const baseResolved: ResolvedEquipmentOption = args.entry.pickerItem.state.resolved ?? {
     requirements: [],
     recommendation: { strength: 'neutral', signals: [] },
@@ -252,4 +227,85 @@ export function quickNpcEquipmentOptionAccessibleLabel(
   presentation: EquipmentOptionRowPresentation,
 ): string {
   return equipmentOptionAccessibleLabel(presentation)
+}
+
+export type QuickNpcSelectedAdditionalEquipmentRow = {
+  entry: QuickNpcAdditionalEquipmentOption
+  equipmentId: string
+  quantity: number
+}
+
+export function listSelectedQuickNpcAdditionalEquipment(args: {
+  equipmentSelections: readonly QuickNpcEquipmentSelection[]
+  additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
+}): QuickNpcSelectedAdditionalEquipmentRow[] {
+  const totals = new Map<string, number>()
+  for (const selection of args.equipmentSelections) {
+    totals.set(selection.equipmentId, (totals.get(selection.equipmentId) ?? 0) + selection.quantity)
+  }
+  return [...totals.entries()].flatMap(([equipmentId, quantity]) => {
+    const entry = args.additionalOptions.find((option) => option.option.value === equipmentId)
+    return entry ? [{ entry, equipmentId, quantity }] : []
+  })
+}
+
+export function buildQuickNpcAdditionalEquipmentPresentationMap(args: {
+  entries: readonly QuickNpcAdditionalEquipmentOption[]
+  equipmentSelections: readonly QuickNpcEquipmentSelection[]
+  choices: NpcStartingChoices
+  catalogIndex: CharacterBuildCatalogIndex
+  setup: Pick<QuickNpcSetupValues, 'classId' | 'npcTemplateId'>
+  sourceName?: RecommendationSourceName
+}): Map<string, EquipmentOptionRowPresentation> {
+  return new Map(
+    args.entries.map((entry) => [
+      entry.option.value,
+      presentQuickNpcEquipmentOption({
+        entry,
+        equipmentSelections: args.equipmentSelections,
+        choices: args.choices,
+        catalogIndex: args.catalogIndex,
+        supplyCatalog: args.catalogIndex,
+        ...(args.setup.npcTemplateId ? { roleId: args.setup.npcTemplateId } : {}),
+        ...(args.setup.classId ? { classId: args.setup.classId } : {}),
+        ...(args.sourceName ? { sourceName: args.sourceName } : {}),
+      }),
+    ]),
+  )
+}
+
+export function canAppendQuickNpcAdditionalEquipment(args: {
+  entry: QuickNpcAdditionalEquipmentOption | undefined
+  equipmentSelections: readonly QuickNpcEquipmentSelection[]
+  choices: NpcStartingChoices
+  catalogIndex: CharacterBuildCatalogIndex
+  setup: Pick<QuickNpcSetupValues, 'classId' | 'npcTemplateId'>
+}): boolean {
+  if (!args.entry) return false
+  return !presentQuickNpcEquipmentOption({
+    entry: args.entry,
+    equipmentSelections: args.equipmentSelections,
+    choices: args.choices,
+    catalogIndex: args.catalogIndex,
+    supplyCatalog: args.catalogIndex,
+    ...(args.setup.npcTemplateId ? { roleId: args.setup.npcTemplateId } : {}),
+    ...(args.setup.classId ? { classId: args.setup.classId } : {}),
+  }).disabled
+}
+
+export function incrementQuickNpcManualEquipmentSelection(args: {
+  equipmentSelections: readonly QuickNpcEquipmentSelection[]
+  equipmentId: string
+}): QuickNpcEquipmentSelection[] {
+  const manualIndex = args.equipmentSelections.findIndex(
+    (row) => row.equipmentId === args.equipmentId && row.origin === 'manual',
+  )
+  const next = [...args.equipmentSelections]
+  if (manualIndex >= 0) {
+    const current = next[manualIndex]!
+    next[manualIndex] = { ...current, quantity: current.quantity + 1 }
+  } else {
+    next.push({ equipmentId: args.equipmentId, quantity: 1, origin: 'manual' })
+  }
+  return next
 }

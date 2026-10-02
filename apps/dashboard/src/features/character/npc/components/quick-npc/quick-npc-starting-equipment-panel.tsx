@@ -37,10 +37,11 @@ import {
   type QuickNpcEquipmentSelection,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type { QuickNpcSetupValues } from '../../lib/quick-npc/quick-npc-form-fields'
-import { usesQuickNpcClassEquipment } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
 import {
-  presentQuickNpcEquipmentOption,
-  quickNpcEquipmentAdditionPolicy,
+  buildQuickNpcAdditionalEquipmentPresentationMap,
+  canAppendQuickNpcAdditionalEquipment,
+  incrementQuickNpcManualEquipmentSelection,
+  listSelectedQuickNpcAdditionalEquipment,
   quickNpcEquipmentOptionAccessibleLabel,
 } from '../../lib/quick-npc/quick-npc-equipment-supply.lib'
 import {
@@ -218,21 +219,13 @@ function QuickNpcAdditionalEquipmentSection({
     () => indexCharacterBuildCatalog(buildContext.catalog),
     [buildContext.catalog],
   )
-  const classed = usesQuickNpcClassEquipment(setup.classId, setup.level)
   const sourceName = React.useMemo(
     () => equipmentRecommendationSourceName(catalogIndex),
     [catalogIndex],
   )
-  const selectedTotals = new Map<string, number>()
-  for (const selection of equipmentSelections) {
-    selectedTotals.set(
-      selection.equipmentId,
-      (selectedTotals.get(selection.equipmentId) ?? 0) + selection.quantity,
-    )
-  }
-  const selectedAdditional = [...selectedTotals.entries()].flatMap(([equipmentId, quantity]) => {
-    const entry = additionalOptions.find((option) => option.option.value === equipmentId)
-    return entry ? [{ entry, equipmentId, quantity }] : []
+  const selectedAdditional = listSelectedQuickNpcAdditionalEquipment({
+    equipmentSelections,
+    additionalOptions,
   })
 
   const kindOptions = resolveQuickNpcAdditionalEquipmentKindOptions(additionalOptions)
@@ -246,22 +239,14 @@ function QuickNpcAdditionalEquipmentSection({
   const visibleEntries = activeKind
     ? filterQuickNpcAdditionalEquipmentByKind(additionalOptions, activeKind)
     : []
-  const presentationById = new Map(
-    visibleEntries.map((entry) => [
-      entry.option.value,
-      presentQuickNpcEquipmentOption({
-        entry,
-        equipmentSelections,
-        ...(setup.npcTemplateId ? { roleId: setup.npcTemplateId } : {}),
-        choices,
-        catalogIndex,
-        ...(setup.classId ? { classId: setup.classId } : {}),
-        classed,
-        sourceName,
-        supplyCatalog: catalogIndex,
-      }),
-    ]),
-  )
+  const presentationById = buildQuickNpcAdditionalEquipmentPresentationMap({
+    entries: visibleEntries,
+    equipmentSelections,
+    choices,
+    catalogIndex,
+    setup,
+    sourceName,
+  })
   const comboboxOptions: ComboboxFieldOption[] = visibleEntries.map((entry) => {
     const presentation = presentationById.get(entry.option.value)
     const disabled = presentation?.disabled === true
@@ -371,28 +356,23 @@ export function QuickNpcStartingEquipmentPanel({
 
   function appendAdditionalEquipment(equipmentId: string) {
     const entry = additionalOptions.find((option) => option.option.value === equipmentId)
-    if (!entry) return
-    const classed = usesQuickNpcClassEquipment(setup.classId, setup.level)
-    const policy = quickNpcEquipmentAdditionPolicy({
-      equipment: entry.pickerItem.equipment,
-      classed,
-    })
-    const included = equipmentSelections
-      .filter((row) => row.equipmentId === equipmentId)
-      .reduce((sum, row) => sum + row.quantity, 0)
-    if (included > 0 && policy === 'single') return
-
-    const manualIndex = equipmentSelections.findIndex(
-      (row) => row.equipmentId === equipmentId && row.origin === 'manual',
-    )
-    const next = [...equipmentSelections]
-    if (manualIndex >= 0) {
-      const current = next[manualIndex]!
-      next[manualIndex] = { ...current, quantity: current.quantity + 1 }
-    } else {
-      next.push({ equipmentId, quantity: 1, origin: 'manual' })
+    const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
+    if (
+      !canAppendQuickNpcAdditionalEquipment({
+        entry,
+        equipmentSelections,
+        choices,
+        catalogIndex,
+        setup,
+      })
+    ) {
+      return
     }
-    form.setValue(QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME, next, { shouldDirty: true })
+    form.setValue(
+      QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
+      incrementQuickNpcManualEquipmentSelection({ equipmentSelections, equipmentId }),
+      { shouldDirty: true },
+    )
   }
 
   function removeAdditionalEquipment(equipmentId: string) {

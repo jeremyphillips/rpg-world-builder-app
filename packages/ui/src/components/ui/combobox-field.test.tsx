@@ -538,4 +538,47 @@ describe('ComboboxField', () => {
     expect(fireBolt).toHaveAttribute('aria-label', 'Fire Bolt')
     expect(within(fireBolt).getByTestId('custom-interior')).toBeInTheDocument()
   })
+
+  it('omits the selection column for single-select custom options', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        renderOption={(option) => <span data-testid="custom-interior">{option.label}</span>}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    const dagger = screen.getByRole('option', { name: 'Dagger' })
+    expect(within(dagger).getByTestId('custom-interior')).toBeInTheDocument()
+    expect(dagger.querySelector('.lucide-check')).toBeNull()
+    expect(dagger.querySelector('span.size-4.shrink-0')).toBeNull()
+  })
+
+  it('shows a check only on selected multi-select options', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="spells"
+        label="Spells"
+        options={spellOptions}
+        multiple
+        value={['fire-bolt']}
+        renderOption={(option) => (
+          <span data-testid="custom-interior">{option.metadata ?? option.label}</span>
+        )}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Spells' }))
+    const fireBolt = screen.getByRole('option', { name: 'Fire Bolt' })
+    const magicMissile = screen.getByRole('option', { name: 'Magic Missile' })
+    expect(fireBolt.querySelector('.lucide-check')).not.toBeNull()
+    expect(magicMissile.querySelector('.lucide-check')).toBeNull()
+    expect(magicMissile.querySelector('span.size-4.shrink-0')).toBeNull()
+  })
 })

@@ -74,6 +74,7 @@ export * from './resolvers/equipment/derive-equipment-recommendations'
 export type { ResolvedEquipmentOption } from './resolvers/equipment/project-equipment-option-facts'
 export {
   adaptCharacterSelectionToEquipmentSupply,
+  canAddAnotherEquipmentCopy,
   dedupeEquipmentSupplySources,
   formatEquipmentSupplySourceLabel,
   formatEquipmentSupplySourceLabels,

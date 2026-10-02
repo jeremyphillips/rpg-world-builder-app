@@ -34,7 +34,7 @@ export function splitQuickNpcAdditionalEquipmentIds(args: {
     origin: 'role-default' | 'manual'
   }[]
   catalogIndex: CharacterBuildCatalogIndex
-  /** Classless rows materialize as inventory, not hard weapon constraints. */
+  /** Classless rows sum every origin. Classed rows keep only manual additions. */
   constrainManualWeapons: boolean
 }): { requiredWeaponIds: string[]; manualEquipmentGrantIds: string[] } {
   const projected = projectQuickNpcEquipmentAllocations({

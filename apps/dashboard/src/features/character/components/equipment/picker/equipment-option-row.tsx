@@ -5,8 +5,8 @@ import {
   type EquipmentOptionRowPresentation,
 } from '../../../lib/equipment/equipment-option-row-presentation.lib'
 import {
+  equipmentOptionQuantityAccessibleVariants,
   equipmentOptionRowIdentityVariants,
-  equipmentOptionRowTrailingVariants,
   equipmentOptionRowVariants,
 } from './equipment-option-row.variants'
 
@@ -31,6 +31,7 @@ export function EquipmentOptionRow({
     .map((clause) => clause.label)
     .join(' · ')
   const classification = classificationLabel(presentation)
+  const trailing = presentation.trailingState
 
   return (
     <div className={equipmentOptionRowVariants()} title={presentation.secondaryTitle}>
@@ -39,13 +40,18 @@ export function EquipmentOptionRow({
         heading={presentation.identity}
         classification={classification || undefined}
         supporting={inline || undefined}
+        headingEnd={
+          trailing ? (
+            <>
+              <span aria-hidden="true">{trailing.label}</span>
+              <span className={equipmentOptionQuantityAccessibleVariants()}>
+                {trailing.accessibleLabel}
+              </span>
+            </>
+          ) : undefined
+        }
         size="sm"
       />
-      {presentation.trailingState ? (
-        <span className={equipmentOptionRowTrailingVariants()}>
-          {presentation.trailingState.label}
-        </span>
-      ) : null}
     </div>
   )
 }

@@ -21,8 +21,10 @@ profile, into ordered clauses (`requirement`, compatibility caution, `recommenda
   package, and shopping-path state as picker overlays.
 - **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
   the combobox option). Inline copy shows two clauses. The row title keeps the rest.
-  An included singleton stays visible and disabled. A quantity item stays selectable
-  and increments a separate `manual` allocation.
+  The row shows the resolved owned quantity as `×N` on the heading line. That
+  figure is the authoritative total, not the persisted manual grant. A manual
+  Add equipment action stores only its own additive quantity and does not steer
+  the class package. The row is disabled only when another copy cannot be added.
 
 Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
 `EquipmentSupplySource`. A role grant is not a recommendation.

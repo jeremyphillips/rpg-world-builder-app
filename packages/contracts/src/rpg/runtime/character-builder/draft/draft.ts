@@ -115,10 +115,18 @@ export type NormalizedCharacterBuilderDraftEquipmentPurchase =
 
 export type CharacterBuilderDraftEquipmentPurchase = PersistedCharacterBuilderDraftEquipmentPurchase
 
+export const EQUIPMENT_GRANT_CONTRIBUTIONS = ['ensure', 'additional'] as const
+
+export type EquipmentGrantContribution = (typeof EQUIPMENT_GRANT_CONTRIBUTIONS)[number]
+
 export const characterBuilderDraftEquipmentGrantSchema = z.object({
   equipmentId: z.string().min(1),
-  /** Ensure-at-least quantity target — assembly computes shortfall vs other channels. */
+  /**
+   * `ensure` (default) raises assembled inventory to this quantity.
+   * `additional` adds this quantity on top of package and other channels.
+   */
   quantity: z.number().int().min(1),
+  contribution: z.enum(EQUIPMENT_GRANT_CONTRIBUTIONS).optional(),
 })
 
 export type CharacterBuilderDraftEquipmentGrant = z.infer<

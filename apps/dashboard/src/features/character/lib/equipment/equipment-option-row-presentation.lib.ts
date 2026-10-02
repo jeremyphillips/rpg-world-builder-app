@@ -1,6 +1,5 @@
 import {
   formatEquipmentSupplySourceLabels,
-  includedQuantityLabel,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
   resolveEquipmentPresentationFacts,
   type EquipmentSupplySource,
@@ -12,8 +11,11 @@ import {
 
 import { formatInlineRecommendationSources } from '../recommendation/format-inline-recommendation-sources'
 
-export const EQUIPMENT_OPTION_INCLUDED_LABEL = 'Included'
 export const EQUIPMENT_OPTION_ROW_INLINE_CLAUSE_LIMIT = 2
+
+export function equipmentOptionQuantityAccessibleLabel(quantity: number): string {
+  return `Quantity ${quantity}`
+}
 
 export const EQUIPMENT_OPTION_SECONDARY_CLAUSE_KINDS = [
   'requirement',
@@ -123,15 +125,9 @@ function trailingState(
 ): EquipmentOptionTrailingState | undefined {
   const selection = resolved.state.selection
   if (!selection || selection.quantity <= 0) return undefined
-  if (!selection.canAddMore) {
-    return {
-      label: EQUIPMENT_OPTION_INCLUDED_LABEL,
-      accessibleLabel: EQUIPMENT_OPTION_INCLUDED_LABEL,
-    }
-  }
   return {
     label: `×${selection.quantity}`,
-    accessibleLabel: includedQuantityLabel(selection.quantity),
+    accessibleLabel: equipmentOptionQuantityAccessibleLabel(selection.quantity),
   }
 }
 
@@ -207,7 +203,7 @@ export function resolveEquipmentOptionRowPresentation(args: {
     ...(trailing ? { trailingState: trailing } : {}),
     secondaryClauses,
     ...(secondaryTitle ? { secondaryTitle } : {}),
-    disabled: Boolean(selection?.selected && !selection.canAddMore),
+    disabled: selection ? !selection.canAddMore : false,
   }
 }
 

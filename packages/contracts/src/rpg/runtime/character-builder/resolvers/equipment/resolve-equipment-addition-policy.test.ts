@@ -23,32 +23,17 @@ describe('resolveEquipmentAdditionPolicy', () => {
     )
   })
 
-  it('returns single for a blocked acquisition even when the item is stackable', () => {
+  it('returns blocked for a blocked acquisition even when the item is stackable', () => {
     expect(
       resolveEquipmentAdditionPolicy({
         equipment: stackable,
         context: { kind: 'acquisition', blocked: true },
       }),
-    ).toBe('single')
+    ).toBe('blocked')
     expect(
       resolveEquipmentAdditionPolicy({
         equipment: stackable,
         context: { kind: 'acquisition', blocked: false },
-      }),
-    ).toBe('quantity')
-  })
-
-  it('returns single for an idempotent classed weapon requirement', () => {
-    expect(
-      resolveEquipmentAdditionPolicy({
-        equipment: stackable,
-        context: { kind: 'requirement', idempotentClassedWeapon: true },
-      }),
-    ).toBe('single')
-    expect(
-      resolveEquipmentAdditionPolicy({
-        equipment: stackable,
-        context: { kind: 'requirement', idempotentClassedWeapon: false },
       }),
     ).toBe('quantity')
   })

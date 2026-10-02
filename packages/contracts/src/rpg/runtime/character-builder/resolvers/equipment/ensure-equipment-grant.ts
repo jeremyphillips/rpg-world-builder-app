@@ -1,5 +1,5 @@
 import type { CharacterBuildCatalogIndex } from '../../context'
-import type { CharacterBuilderDraft } from '../../draft/draft'
+import type { CharacterBuilderDraft, EquipmentGrantContribution } from '../../draft/draft'
 import { cloneEquipmentDraftChannel } from './equipment-draft-base'
 
 export type EnsureEquipmentGrantFailure = {
@@ -15,15 +15,17 @@ export type EnsureEquipmentGrantSuccess = {
 export type EnsureEquipmentGrantResult = EnsureEquipmentGrantSuccess | EnsureEquipmentGrantFailure
 
 /**
- * Ensures the draft's grant channel targets at least `quantity` for `equipmentId`.
- * Acquisition semantics only — callers must enforce campaign/content availability
- * before invoking. Never consults purchase affordability or budget planners.
+ * Writes the draft grant channel for `equipmentId`.
+ * `ensure` raises the stored quantity. `additional` replaces it with the
+ * caller's additive amount. Callers must enforce availability first.
+ * Never consults purchase affordability or budget planners.
  */
 export function ensureEquipmentGrant(args: {
   draft: CharacterBuilderDraft
   equipmentId: string
   quantity: number
   catalogIndex: CharacterBuildCatalogIndex
+  contribution?: EquipmentGrantContribution
 }): EnsureEquipmentGrantResult {
   const { draft, equipmentId, quantity, catalogIndex } = args
 
@@ -36,12 +38,20 @@ export function ensureEquipmentGrant(args: {
 
   if (existingIndex >= 0) {
     const existing = grants[existingIndex]!
-    grants[existingIndex] = {
-      equipmentId: existing.equipmentId,
-      quantity: Math.max(existing.quantity, quantity),
-    }
+    grants[existingIndex] =
+      args.contribution === 'additional'
+        ? { equipmentId, quantity, contribution: 'additional' }
+        : {
+            equipmentId: existing.equipmentId,
+            quantity: Math.max(existing.quantity, quantity),
+            ...(existing.contribution ? { contribution: existing.contribution } : {}),
+          }
   } else {
-    grants.push({ equipmentId, quantity })
+    grants.push({
+      equipmentId,
+      quantity,
+      ...(args.contribution ? { contribution: args.contribution } : {}),
+    })
   }
 
   return {

@@ -119,10 +119,16 @@ interface ComboboxOptionItemProps {
   isSelected: boolean
   isHighlighted: boolean
   isDisabled: boolean
+  multiple: boolean
   size: FieldSize
   renderOption?: ComboboxRenderOption
   onHighlight: () => void
   onSelect: () => void
+}
+
+function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean) {
+  if (!multiple || !isSelected) return undefined
+  return <Check className="size-4 shrink-0" aria-hidden />
 }
 
 function ComboboxOptionItem({
@@ -131,19 +137,21 @@ function ComboboxOptionItem({
   isSelected,
   isHighlighted,
   isDisabled,
+  multiple,
   size,
   renderOption,
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
   const rowSize = resolveInteractiveListSizeForFieldSize(size)
-  const checkSlot = isSelected ? (
-    <Check className="size-4 shrink-0" aria-hidden />
-  ) : (
-    <span className="size-4 shrink-0" aria-hidden />
-  )
+  const selectionEndSlot = comboboxSelectionEndSlot(multiple, isSelected)
 
   if (renderOption) {
+    const optionContent = renderOption(option, {
+      selected: isSelected,
+      disabled: isDisabled,
+      size,
+    })
     return (
       <ComboboxOptionRow
         optionId={optionId}
@@ -153,12 +161,14 @@ function ComboboxOptionItem({
         size={rowSize}
         ariaLabel={option.label}
         renderContent={
-          <span className="flex min-w-0 flex-1 items-center gap-2">
-            <span className="min-w-0 flex-1">
-              {renderOption(option, { selected: isSelected, disabled: isDisabled, size })}
+          selectionEndSlot ? (
+            <span className="flex min-w-0 flex-1 items-center gap-2">
+              <span className="min-w-0 flex-1">{optionContent}</span>
+              {selectionEndSlot}
             </span>
-            {checkSlot}
-          </span>
+          ) : (
+            optionContent
+          )
         }
         onHighlight={onHighlight}
         onSelect={onSelect}
@@ -176,7 +186,7 @@ function ComboboxOptionItem({
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
-      endSlot={checkSlot}
+      endSlot={selectionEndSlot}
       onHighlight={onHighlight}
       onSelect={onSelect}
     />
@@ -337,6 +347,7 @@ export function ComboboxPanel({
                   isSelected={isSelected}
                   isHighlighted={index === highlightedIndex}
                   isDisabled={isDisabled}
+                  multiple={multiple}
                   size={size}
                   renderOption={renderOption}
                   onHighlight={() => onHighlight(index)}

@@ -71,11 +71,11 @@ export const RequiredAndNotProficient: Story = {
   },
 }
 
-export const IncludedSingleton: Story = {
+export const OwnedQuantity: Story = {
   args: {
     presentation: {
       ...base,
-      trailingState: { label: 'Included', accessibleLabel: 'Included' },
+      trailingState: { label: '×1', accessibleLabel: 'Quantity 1' },
       secondaryClauses: [
         {
           kind: 'supply',
@@ -85,7 +85,32 @@ export const IncludedSingleton: Story = {
         },
       ],
       secondaryTitle: 'Guard role',
-      disabled: true,
+      disabled: false,
+    },
+  },
+}
+
+export const LongName: Story = {
+  render: (args) => (
+    <div className="w-56 border border-border p-2">
+      <EquipmentOptionRow {...args} />
+    </div>
+  ),
+  args: {
+    presentation: {
+      ...base,
+      identity: 'Very Long Weapon Name That Should Truncate Before The Quantity',
+      trailingState: { label: '×2', accessibleLabel: 'Quantity 2' },
+      secondaryClauses: [
+        {
+          kind: 'supply',
+          label: 'Fighter starting equipment',
+          badgeLabel: 'Fighter starting equipment',
+          sourceLabels: [],
+        },
+      ],
+      secondaryTitle: 'Fighter starting equipment',
+      disabled: false,
     },
   },
 }
@@ -97,7 +122,7 @@ export const IncludedQuantity: Story = {
       identity: 'Arrow',
       kindLabel: 'Adventuring Gear',
       metadata: ['Ammunition'],
-      trailingState: { label: '×20', accessibleLabel: '×20 included' },
+      trailingState: { label: '×20', accessibleLabel: 'Quantity 20' },
       secondaryClauses: [
         {
           kind: 'supply',

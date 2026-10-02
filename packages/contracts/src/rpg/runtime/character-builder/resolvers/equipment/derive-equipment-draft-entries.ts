@@ -87,10 +87,46 @@ function appendGrantsFromDraft(
   for (const grant of draft.equipment?.grants ?? []) {
     const equipment = catalogIndex.equipment.get(grant.equipmentId)
     if (!equipment) continue
-    result = ensureGrantQuantityInInventory(result, equipment, grant.quantity)
+    result =
+      grant.contribution === 'additional'
+        ? addGrantQuantityOnTop(result, equipment, grant.quantity)
+        : ensureGrantQuantityInInventory(result, equipment, grant.quantity)
   }
 
   return result
+}
+
+/** Adds `quantity` on top of package and other channels. */
+function addGrantQuantityOnTop(
+  inventory: CharacterEquipment,
+  equipment: Equipment,
+  quantity: number,
+): CharacterEquipment {
+  if (quantity <= 0) return inventory
+  const bucket = inventoryBucketForEquipment(equipment)
+  const sources = grantSelectionSource()
+  const existingIndex = inventory[bucket].findIndex((entry) => entry.equipmentId === equipment.id)
+
+  if (existingIndex >= 0) {
+    const existing = inventory[bucket][existingIndex]!
+    const updatedEntry: CharacterEquipmentEntry = {
+      ...existing,
+      quantity: existing.quantity + quantity,
+      sources: mergeSelectionSources(existing.sources, sources),
+    }
+    return {
+      ...inventory,
+      [bucket]: inventory[bucket].map((entry, index) =>
+        index === existingIndex ? updatedEntry : entry,
+      ),
+    }
+  }
+
+  return appendEquipmentEntry(inventory, equipment, {
+    equipmentId: equipment.id,
+    quantity,
+    sources,
+  })
 }
 
 /**

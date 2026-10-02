@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   identityRowClassificationVariants,
+  identityRowHeadingEndVariants,
   identityRowHeadingVariants,
 } from './identity-row.variants'
 import { IdentityRow } from './identity-row.client'
@@ -72,6 +73,28 @@ describe('IdentityRow', () => {
 
     expect(screen.getByText('Only heading')).toBeInTheDocument()
     expect(screen.queryByText('Secondary')).not.toBeInTheDocument()
+  })
+
+  it('keeps headingEnd shrink-0 beside a truncated heading', () => {
+    render(
+      <div className="w-40">
+        <IdentityRow
+          heading="Very Long Weapon Name That Should Truncate Before The Quantity"
+          classification="Weapon"
+          headingEnd={<span>x2</span>}
+          size="sm"
+        />
+      </div>,
+    )
+
+    const heading = screen.getByText(
+      'Very Long Weapon Name That Should Truncate Before The Quantity',
+    )
+    const quantity = screen.getByText('x2')
+    expect(heading).toHaveClass('truncate')
+    expect(quantity.parentElement).toHaveClass('shrink-0')
+    expect(quantity.parentElement?.className).toContain(identityRowHeadingEndVariants())
+    expect(screen.getByText('Weapon')).toHaveClass('shrink-0')
   })
 
   it('uses text-xs heading at sm size', () => {

@@ -96,6 +96,7 @@ export function materializeStartingEquipmentGrants(
       equipmentId: grant.equipmentId,
       quantity: grant.quantity,
       catalogIndex,
+      contribution: 'additional',
     })
     if (applied.ok) next = applied.draft
   }
