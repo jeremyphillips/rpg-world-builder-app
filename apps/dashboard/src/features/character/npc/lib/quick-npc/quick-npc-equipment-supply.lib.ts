@@ -23,8 +23,22 @@ import { listEquipmentInventoryRowsFromDraft } from '@/features/character/lib/eq
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import type { QuickNpcAdditionalEquipmentOption } from './quick-npc-additional-equipment.lib'
+import {
+  formatQuickNpcAdditionalEquipmentContext,
+  presentQuickNpcEquipmentSupplyClauses,
+} from './quick-npc-equipment-presentation.lib'
 import type { QuickNpcEquipmentSelection, QuickNpcSetupValues } from './quick-npc-form-fields'
 import { isGrantedEquipmentContribution } from './quick-npc-starting-equipment.lib'
+
+export type EquipmentSupplyContribution = {
+  source: EquipmentSupplySource
+  quantity: number
+}
+
+type QuickNpcEquipmentSupply = {
+  quantity: number
+  contributions: EquipmentSupplyContribution[]
+}
 
 export type QuickNpcEquipmentAllocation = {
   requiredWeaponIds: string[]
@@ -97,36 +111,94 @@ function overlaps(equipmentId: string, candidateId: string): boolean {
   return optionIdentitiesOverlap(equipmentId, candidateId)
 }
 
+function equipmentSupplyContributionKey(source: EquipmentSupplySource): string {
+  switch (source.kind) {
+    case 'manual':
+      return 'manual'
+    case 'role':
+    case 'role-default':
+      return `${source.kind}:${source.id}`
+    case 'recorded': {
+      const recorded = source.source
+      return `recorded:${recorded.kind}:${recorded.sourceId ?? ''}:${recorded.grantId ?? ''}`
+    }
+    default: {
+      const _exhaustive: never = source
+      return _exhaustive
+    }
+  }
+}
+
+function mergeEquipmentSupplyContributions(
+  parts: readonly EquipmentSupplyContribution[],
+): EquipmentSupplyContribution[] {
+  const buckets = new Map<string, EquipmentSupplyContribution>()
+  for (const part of parts) {
+    if (part.quantity <= 0) continue
+    const key = equipmentSupplyContributionKey(part.source)
+    const current = buckets.get(key)
+    buckets.set(
+      key,
+      current
+        ? { source: current.source, quantity: current.quantity + part.quantity }
+        : { source: part.source, quantity: part.quantity },
+    )
+  }
+  return [...buckets.values()]
+}
+
 function collectQuickNpcEquipmentSupplyFromSelections(args: {
   equipmentId: string
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   roleId?: string
-}): { quantity: number; sources: EquipmentSupplySource[] } {
-  const sources: EquipmentSupplySource[] = []
+}): QuickNpcEquipmentSupply {
+  const contributions: EquipmentSupplyContribution[] = []
   let quantity = 0
   for (const row of args.equipmentSelections) {
     if (!overlaps(args.equipmentId, row.equipmentId)) continue
     quantity += row.quantity
-    sources.push(formSupplySource(row.origin, args.roleId))
+    contributions.push({
+      source: formSupplySource(row.origin, args.roleId),
+      quantity: row.quantity,
+    })
   }
-  return { quantity, sources }
+  return { quantity, contributions }
 }
 
 function collectQuickNpcEquipmentSupplyFromContributions(args: {
   equipmentId: string
   choices: NpcStartingChoices
-}): { quantity: number; sources: EquipmentSupplySource[] } {
-  const sources: EquipmentSupplySource[] = []
+}): QuickNpcEquipmentSupply {
+  const contributions: EquipmentSupplyContribution[] = []
   let quantity = 0
   for (const contribution of args.choices.contributions) {
     if (!isGrantedEquipmentContribution(contribution)) continue
     for (const selectedId of contribution.selectedIds) {
       if (!overlaps(args.equipmentId, selectedId)) continue
-      quantity += contribution.quantities?.[selectedId] ?? 1
-      sources.push(adaptCharacterSelectionToEquipmentSupply(contribution.source))
+      const quantityForId = contribution.quantities?.[selectedId] ?? 1
+      quantity += quantityForId
+      contributions.push({
+        source: adaptCharacterSelectionToEquipmentSupply(contribution.source),
+        quantity: quantityForId,
+      })
     }
   }
-  return { quantity, sources }
+  return { quantity, contributions }
+}
+
+function packageSupplySource(
+  recorded: readonly EquipmentSupplySource[],
+  classId: string,
+  equipmentId: string,
+): EquipmentSupplySource {
+  return (
+    recorded[0] ??
+    adaptCharacterSelectionToEquipmentSupply({
+      kind: 'classStartingEquipment',
+      sourceId: classId,
+      grantId: equipmentId,
+    } satisfies CharacterSelectionSource)
+  )
 }
 
 function collectQuickNpcEquipmentSupplyFromDraft(args: {
@@ -134,27 +206,23 @@ function collectQuickNpcEquipmentSupplyFromDraft(args: {
   classId: string
   choices: NpcStartingChoices
   catalogIndex: CharacterBuildCatalogIndex
-}): { quantity: number; sources: EquipmentSupplySource[] } {
-  const sources: EquipmentSupplySource[] = []
+}): QuickNpcEquipmentSupply {
+  const contributions: EquipmentSupplyContribution[] = []
   let quantity = 0
   for (const row of listEquipmentInventoryRowsFromDraft(args.choices.draft, args.catalogIndex)) {
     if (row.removeTarget?.kind !== 'package') continue
     if (!overlaps(args.equipmentId, row.entry.equipmentId)) continue
     quantity += row.entry.quantity
-    const recorded = (row.entry.sources ?? []).map(adaptCharacterSelectionToEquipmentSupply)
-    if (recorded.length > 0) {
-      sources.push(...recorded)
-      continue
-    }
-    sources.push(
-      adaptCharacterSelectionToEquipmentSupply({
-        kind: 'classStartingEquipment',
-        sourceId: args.classId,
-        grantId: row.entry.equipmentId,
-      } satisfies CharacterSelectionSource),
-    )
+    contributions.push({
+      source: packageSupplySource(
+        (row.entry.sources ?? []).map(adaptCharacterSelectionToEquipmentSupply),
+        args.classId,
+        row.entry.equipmentId,
+      ),
+      quantity: row.entry.quantity,
+    })
   }
-  return { quantity, sources }
+  return { quantity, contributions }
 }
 
 export function collectQuickNpcEquipmentSupply(args: {
@@ -164,16 +232,20 @@ export function collectQuickNpcEquipmentSupply(args: {
   choices: NpcStartingChoices
   catalogIndex: CharacterBuildCatalogIndex
   classId?: string
-}): { quantity: number; sources: EquipmentSupplySource[] } {
+}): QuickNpcEquipmentSupply {
   const fromSelections = collectQuickNpcEquipmentSupplyFromSelections(args)
   const fromContributions = collectQuickNpcEquipmentSupplyFromContributions(args)
   const fromDraft = args.classId
     ? collectQuickNpcEquipmentSupplyFromDraft({ ...args, classId: args.classId })
-    : { quantity: 0, sources: [] as EquipmentSupplySource[] }
+    : { quantity: 0, contributions: [] }
 
   return {
     quantity: fromSelections.quantity + fromContributions.quantity + fromDraft.quantity,
-    sources: [...fromSelections.sources, ...fromContributions.sources, ...fromDraft.sources],
+    contributions: mergeEquipmentSupplyContributions([
+      ...fromSelections.contributions,
+      ...fromContributions.contributions,
+      ...fromDraft.contributions,
+    ]),
   }
 }
 
@@ -210,16 +282,21 @@ export function presentQuickNpcEquipmentOption(args: {
   const resolved = projectEquipmentSelection({
     resolved: baseResolved,
     quantity: supply.quantity,
-    sources: supply.sources,
+    sources: supply.contributions.map((contribution) => contribution.source),
     addition,
   })
+  const supplyCatalog = args.supplyCatalog ?? args.catalogIndex
   return resolveEquipmentOptionRowPresentation({
     identity: row.name,
     kindLabel: getEquipmentKindLabel(equipment.kind),
     metadata: compact.comparisonGroups,
     resolved,
+    supplyClauses: presentQuickNpcEquipmentSupplyClauses({
+      contributions: supply.contributions,
+      catalog: supplyCatalog,
+    }),
     ...(args.sourceName ? { sourceName: args.sourceName } : {}),
-    ...(args.supplyCatalog ? { supplyCatalog: args.supplyCatalog } : {}),
+    supplyCatalog,
   })
 }
 
@@ -232,20 +309,66 @@ export function quickNpcEquipmentOptionAccessibleLabel(
 export type QuickNpcSelectedAdditionalEquipmentRow = {
   entry: QuickNpcAdditionalEquipmentOption
   equipmentId: string
-  quantity: number
+  manualQuantity: number
+  totalQuantity: number
+  contextLabel?: string
+}
+
+function manualSelectionQuantity(
+  equipmentSelections: readonly QuickNpcEquipmentSelection[],
+  equipmentId: string,
+): number {
+  return equipmentSelections.reduce((total, row) => {
+    if (row.equipmentId !== equipmentId || row.origin !== 'manual') return total
+    return total + row.quantity
+  }, 0)
 }
 
 export function listSelectedQuickNpcAdditionalEquipment(args: {
   equipmentSelections: readonly QuickNpcEquipmentSelection[]
   additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
+  choices: NpcStartingChoices
+  catalogIndex: CharacterBuildCatalogIndex
+  roleId?: string
+  classId?: string
 }): QuickNpcSelectedAdditionalEquipmentRow[] {
-  const totals = new Map<string, number>()
+  const equipmentIds: string[] = []
+  const seen = new Set<string>()
   for (const selection of args.equipmentSelections) {
-    totals.set(selection.equipmentId, (totals.get(selection.equipmentId) ?? 0) + selection.quantity)
+    if (seen.has(selection.equipmentId)) continue
+    seen.add(selection.equipmentId)
+    equipmentIds.push(selection.equipmentId)
   }
-  return [...totals.entries()].flatMap(([equipmentId, quantity]) => {
+
+  return equipmentIds.flatMap((equipmentId) => {
     const entry = args.additionalOptions.find((option) => option.option.value === equipmentId)
-    return entry ? [{ entry, equipmentId, quantity }] : []
+    if (!entry) return []
+    const supply = collectQuickNpcEquipmentSupply({
+      equipmentId,
+      equipmentSelections: args.equipmentSelections,
+      choices: args.choices,
+      catalogIndex: args.catalogIndex,
+      ...(args.roleId ? { roleId: args.roleId } : {}),
+      ...(args.classId ? { classId: args.classId } : {}),
+    })
+    const manualQuantity = manualSelectionQuantity(args.equipmentSelections, equipmentId)
+    const contextLabel = formatQuickNpcAdditionalEquipmentContext({
+      totalQuantity: supply.quantity,
+      manualQuantity,
+      supplyClauses: presentQuickNpcEquipmentSupplyClauses({
+        contributions: supply.contributions,
+        catalog: args.catalogIndex,
+      }),
+    })
+    return [
+      {
+        entry,
+        equipmentId,
+        manualQuantity,
+        totalQuantity: supply.quantity,
+        ...(contextLabel ? { contextLabel } : {}),
+      },
+    ]
   })
 }
 

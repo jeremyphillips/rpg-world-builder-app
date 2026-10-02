@@ -12,6 +12,7 @@ import {
 } from './apply-equipment-intents'
 import {
   deriveEquipmentDraftEntries,
+  inventoryQuantityForEquipmentId,
   startingEquipmentPackageItemKey,
 } from './derive-equipment-draft-entries'
 
@@ -443,5 +444,71 @@ describe('deriveEquipmentDraftEntries', () => {
         ],
       },
     ])
+  })
+
+  it('adds an additional grant on top of package quantity', () => {
+    const packedClass: ClassStored = {
+      ...storedDruid,
+      id: `${RULESET}:packed-druid`,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+                  quantity: 8,
+                  equipped: true,
+                },
+              ],
+              wealth: { gp: 0 },
+            },
+          ],
+        },
+      },
+    }
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [packedClass],
+      spells: [],
+      equipment: [leatherArmor],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    function owned(grantQuantity: number) {
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: packedClass.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(packedClass.id)]: ['standard-equipment'],
+        },
+        equipment: {
+          mode: 'package' as const,
+          purchases: [],
+          grants: [
+            {
+              equipmentId: leatherArmor.id,
+              quantity: grantQuantity,
+              contribution: 'additional' as const,
+            },
+          ],
+          removedPackageItemKeys: [],
+          customized: false,
+        },
+      }
+      return inventoryQuantityForEquipmentId(
+        deriveEquipmentDraftEntries(draft, catalogIndex),
+        leatherArmor.id,
+      )
+    }
+
+    expect(owned(1)).toBe(9)
+    expect(owned(2)).toBe(10)
   })
 })

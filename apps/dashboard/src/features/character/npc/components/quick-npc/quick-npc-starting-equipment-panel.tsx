@@ -17,11 +17,10 @@ import {
 } from '@rpg/ui'
 
 import { EquipmentOptionRow } from '@/features/character/components/equipment/picker/equipment-option-row'
+import type { EquipmentOptionRowPresentation } from '@/features/character/lib/equipment/equipment-option-row-presentation.lib'
+import { equipmentOptionQuantityAccessibleVariants } from '@/features/character/components/equipment/picker/equipment-option-row.variants'
 import { StartingEquipmentOptionSection } from '@/features/character/components/equipment/starting-package/starting-equipment-option-section'
-import {
-  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
-  formatPackageInventoryRowTitle,
-} from '@/features/character/lib/equipment/equipment-step.lib'
+import { EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL } from '@/features/character/lib/equipment/equipment-step.lib'
 
 import { EntityAnatomyHost } from '@/features/content'
 
@@ -45,6 +44,10 @@ import {
   quickNpcEquipmentOptionAccessibleLabel,
 } from '../../lib/quick-npc/quick-npc-equipment-supply.lib'
 import {
+  formatManualEquipmentQuantityAccessibleLabel,
+  formatManualEquipmentQuantityLabel,
+} from '../../lib/quick-npc/quick-npc-equipment-presentation.lib'
+import {
   formatStartingChoiceItemCount,
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
@@ -55,6 +58,7 @@ type QuickNpcStartingEquipmentPackageContext = NonNullable<
 >
 import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
 import {
+  quickNpcAdditionalEquipmentQuantityClasses,
   quickNpcStartingChoiceInnerSectionClasses,
   quickNpcStartingChoiceSelectedListClasses,
 } from './quick-npc-starting-choices.variants'
@@ -88,20 +92,35 @@ function equipmentRecommendationSourceName(
 
 function AdditionalEquipmentRow({
   entry,
-  quantity,
+  manualQuantity,
+  contextLabel,
   onRemove,
 }: {
   entry: QuickNpcAdditionalEquipmentOption
-  quantity: number
+  manualQuantity: number
+  contextLabel?: string
   onRemove: () => void
 }) {
-  const heading =
-    quantity > 1 ? formatPackageInventoryRowTitle(entry.option.label, quantity) : entry.option.label
+  const manualLabel = formatManualEquipmentQuantityLabel(manualQuantity)
   return (
     <div className="flex items-start gap-2 rounded-md border border-border bg-card px-3 py-2">
       <div className="min-w-0 flex-1">
-        <EntityAnatomyHost entity={{ heading }} density="compact" />
+        <EntityAnatomyHost
+          entity={{
+            heading: entry.option.label,
+            ...(contextLabel ? { description: contextLabel } : {}),
+          }}
+          density="compact"
+        />
       </div>
+      {manualLabel ? (
+        <span className={quickNpcAdditionalEquipmentQuantityClasses}>
+          <span aria-hidden="true">{manualLabel}</span>
+          <span className={equipmentOptionQuantityAccessibleVariants()}>
+            {formatManualEquipmentQuantityAccessibleLabel(manualQuantity)}
+          </span>
+        </span>
+      ) : null}
       <ActionButton
         action="remove"
         variant="ghost"
@@ -205,6 +224,116 @@ type QuickNpcAdditionalEquipmentSectionProps = {
   removeAdditionalEquipment: (equipmentId: string) => void
 }
 
+function additionalEquipmentSectionCopy(hasPackages: boolean) {
+  if (hasPackages) {
+    return {
+      title: QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL,
+      description: QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION,
+    }
+  }
+  return {
+    title: EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+    description: QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION,
+  }
+}
+
+function toAdditionalEquipmentComboboxOptions(
+  entries: readonly QuickNpcAdditionalEquipmentOption[],
+  presentationById: ReadonlyMap<string, EquipmentOptionRowPresentation>,
+): ComboboxFieldOption[] {
+  return entries.map((entry) => {
+    const presentation = presentationById.get(entry.option.value)
+    return {
+      ...entry.option,
+      disabled: presentation?.disabled === true,
+      label: presentation
+        ? quickNpcEquipmentOptionAccessibleLabel(presentation)
+        : entry.option.label,
+      metadata: presentation?.secondaryTitle,
+    }
+  })
+}
+
+function AdditionalEquipmentSelectedList({
+  rows,
+  onRemove,
+}: {
+  rows: ReturnType<typeof listSelectedQuickNpcAdditionalEquipment>
+  onRemove: (equipmentId: string) => void
+}) {
+  if (rows.length === 0) return null
+  return (
+    <ul className={quickNpcStartingChoiceSelectedListClasses}>
+      {rows.map(({ entry, equipmentId, manualQuantity, contextLabel }) => (
+        <li key={equipmentId}>
+          <AdditionalEquipmentRow
+            entry={entry}
+            manualQuantity={manualQuantity}
+            {...(contextLabel ? { contextLabel } : {})}
+            onRemove={() => onRemove(equipmentId)}
+          />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function AdditionalEquipmentPicker({
+  options,
+  presentationById,
+  kindOptions,
+  activeKind,
+  disabled,
+  onSelect,
+  onKindChange,
+}: {
+  options: ComboboxFieldOption[]
+  presentationById: ReadonlyMap<string, EquipmentOptionRowPresentation>
+  kindOptions: ReturnType<typeof resolveQuickNpcAdditionalEquipmentKindOptions>
+  activeKind: (typeof kindOptions)[number] | undefined
+  disabled: boolean
+  onSelect: (equipmentId: string) => void
+  onKindChange: (kind: (typeof kindOptions)[number]) => void
+}) {
+  return (
+    <ComboboxField
+      id="quick-npc-additional-equipment"
+      label="Add equipment"
+      labelVisibility="srOnly"
+      multiple={false}
+      options={options}
+      value=""
+      disabled={disabled}
+      renderOption={(option) => {
+        const presentation = presentationById.get(option.value)
+        return presentation ? <EquipmentOptionRow presentation={presentation} /> : option.label
+      }}
+      onChange={(next) => {
+        const value = Array.isArray(next) ? next[0] : next
+        if (!value) return
+        onSelect(value)
+      }}
+      placeholder={QUICK_NPC_ADD_ITEM_PLACEHOLDER}
+      emptyMessage="No matching items"
+      filter={
+        !disabled && activeKind ? (
+          <ComboboxFilterSelect
+            ariaLabel={QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL}
+            value={activeKind}
+            options={kindOptions.map((kind) => ({
+              value: kind,
+              label: getEquipmentKindLabel(kind),
+            }))}
+            onValueChange={(next) => {
+              onKindChange(next as (typeof kindOptions)[number])
+            }}
+          />
+        ) : undefined
+      }
+    />
+  )
+}
+
 function QuickNpcAdditionalEquipmentSection({
   setup,
   choices,
@@ -226,6 +355,10 @@ function QuickNpcAdditionalEquipmentSection({
   const selectedAdditional = listSelectedQuickNpcAdditionalEquipment({
     equipmentSelections,
     additionalOptions,
+    choices,
+    catalogIndex,
+    ...(setup.npcTemplateId ? { roleId: setup.npcTemplateId } : {}),
+    ...(setup.classId ? { classId: setup.classId } : {}),
   })
 
   const kindOptions = resolveQuickNpcAdditionalEquipmentKindOptions(additionalOptions)
@@ -247,26 +380,10 @@ function QuickNpcAdditionalEquipmentSection({
     setup,
     sourceName,
   })
-  const comboboxOptions: ComboboxFieldOption[] = visibleEntries.map((entry) => {
-    const presentation = presentationById.get(entry.option.value)
-    const disabled = presentation?.disabled === true
-    return {
-      ...entry.option,
-      disabled,
-      label: presentation
-        ? quickNpcEquipmentOptionAccessibleLabel(presentation)
-        : entry.option.label,
-      metadata: presentation?.secondaryTitle,
-    }
-  })
-
+  const comboboxOptions = toAdditionalEquipmentComboboxOptions(visibleEntries, presentationById)
   const addDisabled = kindOptions.length === 0
-  const additionalTitle = hasPackages
-    ? QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL
-    : EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL
-  const additionalDescription = hasPackages
-    ? QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION
-    : QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION
+  const { title: additionalTitle, description: additionalDescription } =
+    additionalEquipmentSectionCopy(hasPackages)
 
   return (
     <div className={quickNpcStartingChoiceInnerSectionClasses}>
@@ -275,58 +392,23 @@ function QuickNpcAdditionalEquipmentSection({
         itemCountLabel={formatStartingChoiceItemCount(selectedAdditional.length)}
         description={additionalDescription}
       />
-      {selectedAdditional.length > 0 ? (
-        <ul className={quickNpcStartingChoiceSelectedListClasses}>
-          {selectedAdditional.map(({ entry, equipmentId, quantity }) => (
-            <li key={equipmentId}>
-              <AdditionalEquipmentRow
-                entry={entry}
-                quantity={quantity}
-                onRemove={() => removeAdditionalEquipment(equipmentId)}
-              />
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      <AdditionalEquipmentSelectedList
+        rows={selectedAdditional}
+        onRemove={removeAdditionalEquipment}
+      />
       <div
         className={
           selectedAdditional.length > 0 ? quickNpcStartingChoiceAddControlClasses : undefined
         }
       >
-        <ComboboxField
-          id="quick-npc-additional-equipment"
-          label="Add equipment"
-          labelVisibility="srOnly"
-          multiple={false}
+        <AdditionalEquipmentPicker
           options={comboboxOptions}
-          value=""
+          presentationById={presentationById}
+          kindOptions={kindOptions}
+          activeKind={activeKind}
           disabled={addDisabled}
-          renderOption={(option) => {
-            const presentation = presentationById.get(option.value)
-            return presentation ? <EquipmentOptionRow presentation={presentation} /> : option.label
-          }}
-          onChange={(next) => {
-            const value = Array.isArray(next) ? next[0] : next
-            if (!value) return
-            appendAdditionalEquipment(value)
-          }}
-          placeholder={QUICK_NPC_ADD_ITEM_PLACEHOLDER}
-          emptyMessage="No matching items"
-          filter={
-            !addDisabled && activeKind ? (
-              <ComboboxFilterSelect
-                ariaLabel={QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL}
-                value={activeKind}
-                options={kindOptions.map((kind) => ({
-                  value: kind,
-                  label: getEquipmentKindLabel(kind),
-                }))}
-                onValueChange={(next) => {
-                  setSelectedKind(next as (typeof kindOptions)[number])
-                }}
-              />
-            ) : undefined
-          }
+          onSelect={appendAdditionalEquipment}
+          onKindChange={setSelectedKind}
         />
       </div>
     </div>

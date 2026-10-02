@@ -219,6 +219,50 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     expect(equipmentOptionAccessibleLabel(presentation)).toContain('Guard role')
   })
 
+  it('keeps recommendation and package supply when a role clause repeats the recommendation', () => {
+    const presentation = resolveEquipmentOptionRowPresentation({
+      identity: 'Javelin',
+      kindLabel: 'Weapon',
+      metadata: ['1d6 Piercing'],
+      sourceName,
+      resolved: projectEquipmentSelection({
+        resolved: resolved({
+          recommendation: {
+            strength: 'strong',
+            signals: [
+              {
+                strength: 'strong',
+                basis: 'preference',
+                specificity: 'exact',
+                source: { kind: 'role', id: 'guard' },
+              },
+            ],
+          },
+        }),
+        quantity: 10,
+        sources: [{ kind: 'manual' }],
+        addition: 'quantity',
+      }),
+      supplyClauses: [
+        {
+          label: 'Fighter package ×8',
+          source: {
+            kind: 'recorded',
+            source: { kind: 'classStartingEquipment', sourceId: 'fighter', grantId: 'kit' },
+          },
+        },
+        { label: 'Guard role ×1', source: { kind: 'role', id: 'guard' } },
+      ],
+    })
+    expect(presentation.trailingState?.label).toBe('×10')
+    expect(equipmentOptionInlineClauses(presentation).map((clause) => clause.label)).toEqual([
+      `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Guard role`,
+      'Fighter package ×8',
+    ])
+    expect(presentation.secondaryTitle).not.toContain('Added manually')
+    expect(presentation.secondaryTitle).not.toContain('Guard role ×1')
+  })
+
   it('shows not proficient with a recommendation without rewriting the recommendation', () => {
     const recommendation = {
       strength: 'strong' as const,

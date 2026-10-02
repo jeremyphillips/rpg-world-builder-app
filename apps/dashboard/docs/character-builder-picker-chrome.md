@@ -22,9 +22,18 @@ profile, into ordered clauses (`requirement`, compatibility caution, `recommenda
 - **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
   the combobox option). Inline copy shows two clauses. The row title keeps the rest.
   The row shows the resolved owned quantity as `×N` on the heading line. That
-  figure is the authoritative total, not the persisted manual grant. A manual
-  Add equipment action stores only its own additive quantity and does not steer
-  the class package. The row is disabled only when another copy cannot be added.
+  figure is the authoritative total, not the persisted manual grant. Quick NPC
+  passes atomic `EquipmentOptionSupplyClause` values into the row resolver and
+  leaves manual contributions out of that list. `formatEquipmentSupplySourceLabel`
+  still describes a manual source as “Added manually”; the picker simply does not
+  pass that source. A role supply clause is dropped when the recommendation
+  already names that role. Additional Equipment shows `+N` for the persisted
+  manual contribution. Its context line is omitted when that contribution is at
+  least the resolved total, and otherwise names the total plus one automatic
+  source, collapsing any further origins. Inventory breakdown remains the
+  exhaustive provenance surface. A manual Add equipment action stores only its
+  own additive quantity and does not steer the class package. The row is
+  disabled only when another copy cannot be added.
 
 Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
 `EquipmentSupplySource`. A role grant is not a recommendation.

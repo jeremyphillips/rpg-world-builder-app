@@ -38,6 +38,12 @@ export type EquipmentOptionSecondaryClause = {
   discriminator?: OptionPresentationFact['discriminator']
 }
 
+/** Atomic supply fact. Quick NPC produces these; this module does not import NPC types. */
+export type EquipmentOptionSupplyClause = {
+  label: string
+  source: EquipmentSupplySource
+}
+
 export type EquipmentOptionTrailingState = {
   label: string
   accessibleLabel: string
@@ -112,12 +118,37 @@ function supplyClause(
   if (sources.length === 0) return undefined
   const label = formatEquipmentSupplySourceLabels(sources, catalogIndex)
   if (!label) return undefined
+  return supplyClauseFromLabel(label)
+}
+
+function supplyClauseFromLabel(label: string): EquipmentOptionSecondaryClause {
   return {
     kind: 'supply',
     label,
     badgeLabel: label,
     sourceLabels: [],
   }
+}
+
+function recommendedRoleIds(resolved: ResolvedEquipmentOption): ReadonlySet<string> {
+  const ids = new Set<string>()
+  for (const signal of resolved.recommendation.signals) {
+    const source = signal.source
+    if (source?.kind === 'role') ids.add(source.id)
+  }
+  return ids
+}
+
+/** Drops a role supply clause already named by the recommendation. */
+function visibleSupplyClauses(
+  clauses: readonly EquipmentOptionSupplyClause[],
+  resolved: ResolvedEquipmentOption,
+): EquipmentOptionSupplyClause[] {
+  const roleIds = recommendedRoleIds(resolved)
+  return clauses.filter((clause) => {
+    if (clause.source.kind !== 'role' && clause.source.kind !== 'role-default') return true
+    return !roleIds.has(clause.source.id)
+  })
 }
 
 function trailingState(
@@ -146,14 +177,21 @@ function clauseFromFact(fact: OptionPresentationFact): EquipmentOptionSecondaryC
 function buildEquipmentOptionSecondaryClauses(args: {
   facts: readonly OptionPresentationFact[]
   selectionSources: readonly EquipmentSupplySource[]
+  supplyClauses?: readonly EquipmentOptionSupplyClause[]
   supplyCatalog?: SelectionSourceLabelCatalogIndex
+  resolved: ResolvedEquipmentOption
 }): EquipmentOptionSecondaryClause[] {
   const secondaryClauses = args.facts.flatMap((fact) => {
     const clause = clauseFromFact(fact)
     return clause ? [clause] : []
   })
-  const supply = supplyClause(args.selectionSources, args.supplyCatalog)
-  if (supply) secondaryClauses.push(supply)
+  const supply = args.supplyClauses
+    ? visibleSupplyClauses(args.supplyClauses, args.resolved).map((clause) =>
+        supplyClauseFromLabel(clause.label),
+      )
+    : supplyClause(args.selectionSources, args.supplyCatalog)
+  if (Array.isArray(supply)) secondaryClauses.push(...supply)
+  else if (supply) secondaryClauses.push(supply)
   secondaryClauses.sort((left, right) => clauseRank(left) - clauseRank(right))
   return secondaryClauses
 }
@@ -182,6 +220,11 @@ export function resolveEquipmentOptionRowPresentation(args: {
   resolved: ResolvedEquipmentOption
   sourceName?: RecommendationSourceName
   supplyCatalog?: SelectionSourceLabelCatalogIndex
+  /**
+   * Preformatted supply facts. When set, selection sources are not joined into
+   * a supply sentence. Callers choose which origins to include.
+   */
+  supplyClauses?: readonly EquipmentOptionSupplyClause[]
 }): EquipmentOptionRowPresentation {
   const facts = resolveEquipmentPresentationFacts({
     resolved: args.resolved,
@@ -190,7 +233,9 @@ export function resolveEquipmentOptionRowPresentation(args: {
   const secondaryClauses = buildEquipmentOptionSecondaryClauses({
     facts: facts.facts,
     selectionSources: args.resolved.state.selection?.sources ?? [],
+    ...(args.supplyClauses ? { supplyClauses: args.supplyClauses } : {}),
     supplyCatalog: args.supplyCatalog,
+    resolved: args.resolved,
   })
 
   const trailing = trailingState(args.resolved)
