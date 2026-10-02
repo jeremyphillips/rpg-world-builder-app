@@ -260,7 +260,7 @@ export const optionCardEmbeddedSlotVariants = cva(
       {
         tone: 'panel',
         density: 'compact',
-        class: '-mb-2 -ml-3 -mr-4 mt-2 rounded-b-card pb-2 pt-2',
+        class: '-mx-4 -mb-2 mt-2 rounded-b-card',
       },
     ],
     defaultVariants: {
@@ -282,6 +282,28 @@ export const optionCardFooterSlotVariants = cva('min-w-0', {
     density: 'default',
   },
 })
+
+/** Inner embedded panel body — symmetric 12px padding. */
+export const optionCardEmbeddedPanelContentClasses = 'flex flex-col gap-3 p-3'
+
+export const optionCardEmbeddedPanelHeaderClasses = 'flex flex-col gap-0.5'
+
+export const optionCardEmbeddedPanelHeaderRowClasses = 'flex items-start justify-between gap-3'
+
+export const optionCardEmbeddedPanelListClasses = 'flex flex-col'
+
+export const optionCardEmbeddedPanelRowClasses =
+  'flex min-h-8 items-center justify-between gap-3 border-t border-border-subtle py-1.5'
+
+export const optionCardEmbeddedPanelRowLabelClasses = cn(
+  'min-w-0 flex-1',
+  optionCardCompactSecondaryTypographyClasses,
+)
+
+export const optionCardEmbeddedPanelRowControlsClasses = 'flex shrink-0 items-center gap-2'
+
+export const optionCardEmbeddedPanelRowStatusClasses =
+  'text-control-action-xs text-muted-foreground'
 
 export const selectionOptionCardAnatomyRootVariants = cva('flex w-full min-w-0 items-start', {
   variants: {

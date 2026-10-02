@@ -10,7 +10,13 @@
 import type { Ref } from 'react'
 
 import type { RadioCardOption } from '@rpg/ui'
-import { Button, RadioCard, Text, cn } from '@rpg/ui'
+import {
+  Button,
+  RadioCard,
+  SelectionOptionCardEmbeddedPanel,
+  SelectionOptionCardEmbeddedPanelHeader,
+  Text,
+} from '@rpg/ui'
 
 import type { DependentChoiceSectionCopy } from '../../../lib/builder/builder-dependent-choice.lib'
 import {
@@ -23,8 +29,6 @@ import { BuilderDependentChoiceSectionHeader } from './builder-dependent-choice-
 import {
   builderDependentChoiceSectionClasses,
   builderDependentChoiceSectionCopyClasses,
-  builderDependentChoiceSectionEmbeddedClasses,
-  builderDependentChoiceSectionEmbeddedPaddingClasses,
   builderDependentChoiceSectionRadioGroupClasses,
 } from './builder-dependent-choice-section.variants'
 
@@ -46,6 +50,14 @@ export type BuilderDependentChoiceSectionProps = {
   onExpandedChange?: (expanded: boolean) => void
   /** Label for the expand affordance when a choice is resolved. Defaults to heritage copy. */
   changeLabel?: string
+}
+
+function EmbeddedStatusEndSlot({ children }: { children: string }) {
+  return (
+    <Text as="span" variant="muted" className="shrink-0 text-right text-xs leading-snug">
+      {children}
+    </Text>
+  )
 }
 
 export function BuilderDependentChoiceSection({
@@ -75,49 +87,69 @@ export function BuilderDependentChoiceSection({
   const headingId = `${idPrefix}-heading`
   const changeButtonId = `${idPrefix}-change`
 
+  const radioGroup = (
+    <RadioCard
+      variant="row"
+      density="compact"
+      className={builderDependentChoiceSectionRadioGroupClasses}
+      value={value}
+      onValueChange={handleValueChange}
+      options={visibleOptions}
+      idPrefix={idPrefix}
+    />
+  )
+
+  const changeButton =
+    isResolved && !expanded ? (
+      <Button
+        type="button"
+        variant="text"
+        size="sm"
+        id={changeButtonId}
+        onClick={() => setExpanded(true)}
+      >
+        {changeLabel}
+      </Button>
+    ) : null
+
   return (
     <section
       ref={sectionRef}
       role="region"
       aria-labelledby={headingId}
-      className={cn(
-        embedded
-          ? builderDependentChoiceSectionEmbeddedClasses
-          : builderDependentChoiceSectionClasses,
-        embedded ? builderDependentChoiceSectionEmbeddedPaddingClasses : undefined,
-      )}
+      className={embedded ? undefined : builderDependentChoiceSectionClasses}
     >
-      <div className={cn(builderDependentChoiceSectionCopyClasses, 'border-0')}>
-        <BuilderDependentChoiceSectionHeader
-          title={title}
-          headingId={headingId}
-          sectionCopy={sectionCopy}
-          embedded={embedded}
-        />
-        {sectionCopy.helperText ? <Text variant="muted">{sectionCopy.helperText}</Text> : null}
-      </div>
-
-      <RadioCard
-        variant="row"
-        density="compact"
-        className={builderDependentChoiceSectionRadioGroupClasses}
-        value={value}
-        onValueChange={handleValueChange}
-        options={visibleOptions}
-        idPrefix={idPrefix}
-      />
-
-      {isResolved && !expanded ? (
-        <Button
-          type="button"
-          variant="text"
-          size="sm"
-          id={changeButtonId}
-          onClick={() => setExpanded(true)}
-        >
-          {changeLabel}
-        </Button>
-      ) : null}
+      {embedded ? (
+        <SelectionOptionCardEmbeddedPanel>
+          <SelectionOptionCardEmbeddedPanelHeader
+            title={title}
+            titleAs="h3"
+            titleId={headingId}
+            endSlot={
+              sectionCopy.statusText ? (
+                <EmbeddedStatusEndSlot>{sectionCopy.statusText}</EmbeddedStatusEndSlot>
+              ) : undefined
+            }
+            description={sectionCopy.helperText ?? undefined}
+          />
+          {radioGroup}
+          {changeButton}
+        </SelectionOptionCardEmbeddedPanel>
+      ) : (
+        <>
+          <div className={builderDependentChoiceSectionCopyClasses}>
+            <BuilderDependentChoiceSectionHeader
+              title={title}
+              headingId={headingId}
+              sectionCopy={sectionCopy}
+              embedded={false}
+            />
+            {sectionCopy.helperText ? <Text variant="muted">{sectionCopy.helperText}</Text> : null}
+          </div>
+          {radioGroup}
+          {changeButton}
+        </>
+      )}
     </section>
   )
 }

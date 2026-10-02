@@ -126,7 +126,7 @@ describe('BuilderDependentChoiceSection', () => {
     expect(onValueChange).toHaveBeenCalledWith('drow')
   })
 
-  it('renders embedded panel heading at the 15px text-md scale', () => {
+  it('renders embedded panel heading at compact card title scale', () => {
     render(
       <BuilderDependentChoiceSection
         embedded
@@ -140,11 +140,11 @@ describe('BuilderDependentChoiceSection', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Elven Lineage' })).toHaveClass('text-md')
-    expect(screen.getByText('Required')).toHaveClass('text-md')
+    expect(screen.getByRole('heading', { name: 'Elven Lineage' })).toHaveClass('text-sm')
+    expect(screen.getByText('Required')).toHaveClass('text-xs')
   })
 
-  it('renders resolved panel status at the 15px text-md scale', () => {
+  it('renders resolved panel status at compact description scale', () => {
     render(
       <BuilderDependentChoiceSection
         embedded
@@ -161,7 +161,7 @@ describe('BuilderDependentChoiceSection', () => {
       />,
     )
 
-    expect(screen.getByText('Selected: Drow')).toHaveClass('text-md')
+    expect(screen.getByText('Selected: Drow')).toHaveClass('text-xs')
   })
 
   itAxe('has no axe accessibility violations', async () => {

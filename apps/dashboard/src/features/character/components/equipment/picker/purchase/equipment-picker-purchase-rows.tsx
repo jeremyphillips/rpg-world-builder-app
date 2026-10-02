@@ -58,7 +58,6 @@ export function PurchaseQuantityRow({
       <div className={equipmentPickerPurchaseQuantityStepperShimClasses}>
         <NumberStepper
           aria-label={`${EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL} for ${equipmentName}`}
-          size="sm"
           bordered={true}
           digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
           min={1}

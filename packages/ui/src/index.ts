@@ -405,6 +405,18 @@ export {
   type SelectionOptionCardProps,
 } from './components/ui/selection-option-card.client'
 export {
+  SelectionOptionCardEmbeddedPanel,
+  SelectionOptionCardEmbeddedPanelHeader,
+  SelectionOptionCardEmbeddedPanelList,
+  SelectionOptionCardEmbeddedPanelRow,
+  SelectionOptionCardEmbeddedPanelRowStatus,
+  type SelectionOptionCardEmbeddedPanelHeaderProps,
+  type SelectionOptionCardEmbeddedPanelListProps,
+  type SelectionOptionCardEmbeddedPanelProps,
+  type SelectionOptionCardEmbeddedPanelRowProps,
+  type SelectionOptionCardEmbeddedPanelRowStatusProps,
+} from './components/ui/selection-option-card-embedded-panel.client'
+export {
   SelectionOptionCardHeaderEyebrow,
   SelectionOptionCardTitleMeta,
   resolveSelectionOptionCardEyebrowSize,

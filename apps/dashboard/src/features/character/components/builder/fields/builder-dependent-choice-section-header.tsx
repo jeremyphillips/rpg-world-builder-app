@@ -1,11 +1,7 @@
-import { Heading, Text, cn } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import type { DependentChoiceSectionCopy } from '../../../lib/builder/builder-dependent-choice.lib'
-import {
-  builderDependentChoiceSectionHeaderClasses,
-  builderDependentChoiceSectionPanelHeadingClasses,
-  builderDependentChoiceSectionPanelStatusClasses,
-} from './builder-dependent-choice-section.variants'
+import { builderDependentChoiceSectionHeaderClasses } from './builder-dependent-choice-section.variants'
 
 export type BuilderDependentChoiceSectionHeaderProps = {
   title: string
@@ -20,25 +16,15 @@ export function BuilderDependentChoiceSectionHeader({
   sectionCopy,
   embedded,
 }: BuilderDependentChoiceSectionHeaderProps) {
+  if (embedded) return null
+
   return (
     <div className={builderDependentChoiceSectionHeaderClasses}>
-      {embedded ? (
-        <h3 id={headingId} className={builderDependentChoiceSectionPanelHeadingClasses}>
-          {title}
-        </h3>
-      ) : (
-        <Heading variant="subsection" as="h3" id={headingId}>
-          {title}
-        </Heading>
-      )}
+      <Heading variant="subsection" as="h3" id={headingId}>
+        {title}
+      </Heading>
       {sectionCopy.statusText ? (
-        <Text
-          variant="muted"
-          className={cn(
-            'shrink-0 text-right',
-            embedded ? builderDependentChoiceSectionPanelStatusClasses : undefined,
-          )}
-        >
+        <Text variant="muted" className="shrink-0 text-right">
           {sectionCopy.statusText}
         </Text>
       ) : null}

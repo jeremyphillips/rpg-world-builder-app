@@ -150,7 +150,6 @@ export function BuildCardLevelAttributeRow({
       <div className={quickNpcBuildCardLevelEditorClasses}>
         <NumberStepper
           aria-label="Level"
-          size="sm"
           bordered
           digits={2}
           min={levelRow.levelConstraints.minLevel}

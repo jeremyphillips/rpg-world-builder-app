@@ -171,15 +171,19 @@ Do **not** combine `digits` with mixed-length enum labels — use full-width siz
 
 ### Number stepper (field-adjacent chrome)
 
-Stepper side buttons align to **field control height**, not generic compact action hit targets:
+`NumberStepper` resolves `size` from an optional prop or from `useFieldControlSize()` via
+`resolveNumberStepperSizeFromFieldSize`. Form density never maps to **`xs`** — compact forms
+inherit **`sm` (32px)**; comfortable default is **`md` (36px)**.
 
-| Stepper `size` | Button hit target | Glyph     |
-| -------------- | ----------------- | --------- |
-| `sm`           | `size-8` (32px)   | sm (12px) |
-| `md`           | `size-8` (32px)   | md (14px) |
+| Stepper `size` | Root height | Side buttons | Typical use                                      |
+| -------------- | ----------- | ------------ | ------------------------------------------------ |
+| `xs`           | 24px `h-6`  | `size-6`     | Dense embedded panels — **explicit opt-in only** |
+| `sm`           | 32px `h-8`  | `size-8`     | Compact form fields (field `sm`)                 |
+| `md`           | 36px `h-9`  | `size-8`     | Comfortable fields / default outside forms       |
+| `lg`           | 40px `h-10` | `size-9`     | Large form fields (field `lg`)                   |
 
-Width formulas in `numberStepperWidthVariants` account for two 32px button columns.
-See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).
+Width formulas in `numberStepperWidthVariants` use **3rem** side columns for `xs` and **4rem**
+for `sm` / `md` / `lg`. See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).
 
 ## Dense settings rows
 

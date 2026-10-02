@@ -29,7 +29,6 @@ export function EquipmentInventoryQuantityControl({
     <div className={equipmentInventoryRowQuantityClasses}>
       <NumberStepper
         aria-label={`${row.equipmentName} quantity`}
-        size="sm"
         bordered={true}
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={minQuantity}

@@ -96,7 +96,7 @@ non-stackable value lines follow the same resolver; see
 
 Inventory and drawer purchase panels share `@rpg/ui` `NumberStepper`:
 
-- `size="sm"`, `bordered={true}` in cart and drawer bodies
+- Omit `size` outside forms — defaults to **md (36px)**; `bordered={true}` in cart and drawer bodies
 - `digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}` (2)
 
 ## Picker

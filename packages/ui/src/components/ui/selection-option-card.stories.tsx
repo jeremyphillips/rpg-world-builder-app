@@ -5,6 +5,14 @@ import { Button } from './button.client'
 import { RadioGroup } from './radio-group.client'
 import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
 import { SelectionOptionCardTitleMeta } from './selection-option-card-anatomy.client'
+import { NumberStepper } from './number-stepper.client'
+import {
+  SelectionOptionCardEmbeddedPanel,
+  SelectionOptionCardEmbeddedPanelHeader,
+  SelectionOptionCardEmbeddedPanelList,
+  SelectionOptionCardEmbeddedPanelRow,
+  SelectionOptionCardEmbeddedPanelRowStatus,
+} from './selection-option-card-embedded-panel.client'
 import {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
@@ -48,7 +56,37 @@ export const SelectedWithEmbedded: Story = {
     label: 'Heavy Armor',
     description: 'Chain Mail, Greatsword, and 8 Javelins.',
     embeddedTone: 'panel',
-    embedded: <p>Customize Heavy Armor</p>,
+    embedded: (
+      <SelectionOptionCardEmbeddedPanel>
+        <SelectionOptionCardEmbeddedPanelHeader
+          title="Customize Heavy Armor"
+          description="Adjust what this NPC keeps from the selected package."
+        />
+        <SelectionOptionCardEmbeddedPanelList>
+          <SelectionOptionCardEmbeddedPanelRow label="Javelin">
+            <NumberStepper
+              size="xs"
+              min={0}
+              max={8}
+              value={6}
+              aria-label="Quantity of Javelin kept from Heavy Armor"
+              onChange={() => undefined}
+            />
+            <Button type="button" variant="text" size="xs" density="compact">
+              Remove
+            </Button>
+          </SelectionOptionCardEmbeddedPanelRow>
+          <SelectionOptionCardEmbeddedPanelRow label="Flail">
+            <SelectionOptionCardEmbeddedPanelRowStatus>
+              Removed
+            </SelectionOptionCardEmbeddedPanelRowStatus>
+            <Button type="button" variant="text" size="xs" density="compact">
+              Restore
+            </Button>
+          </SelectionOptionCardEmbeddedPanelRow>
+        </SelectionOptionCardEmbeddedPanelList>
+      </SelectionOptionCardEmbeddedPanel>
+    ),
   },
 }
 

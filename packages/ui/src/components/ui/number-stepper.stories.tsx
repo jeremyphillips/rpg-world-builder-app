@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
+import { FormSectionProvider } from '../../form/context/form-section.context'
 import { NumberStepper } from './number-stepper.client'
 
 function NumberStepperHarness(
@@ -23,12 +24,33 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Comfortable default with bordered pill container. */
+/** Comfortable default with bordered pill container (md / 36px). */
 export const Default: Story = {}
 
-/** Compact bordered stepper (sm). */
-export const CompactBordered: Story = {
+export const ExtraSmall: Story = {
+  args: { size: 'xs', min: 0, max: 8 },
+}
+
+/** Compact form field scale (sm / 32px). */
+export const Small: Story = {
   args: { size: 'sm' },
+}
+
+export const Medium: Story = {
+  args: { size: 'md' },
+}
+
+export const Large: Story = {
+  args: { size: 'lg' },
+}
+
+export const FromCompactFormContext: Story = {
+  name: 'Default from compact form context',
+  render: (args) => (
+    <FormSectionProvider density="compact">
+      <NumberStepperHarness {...args} />
+    </FormSectionProvider>
+  ),
 }
 
 /** Compact borderless stepper for dense inventory rows. */

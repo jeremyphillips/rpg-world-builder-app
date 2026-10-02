@@ -262,8 +262,7 @@ describe('RadioCard', () => {
 
     const panel = screen.getByText('Configuration panel').parentElement
     expect(panel).toHaveTextContent('Configuration panel')
-    expect(panel?.className).toContain('-ml-3')
-    expect(panel?.className).toContain('-mr-4')
+    expect(panel?.className).toContain('-mx-4')
     expect(panel?.className).toContain('rounded-b-card')
   })
 

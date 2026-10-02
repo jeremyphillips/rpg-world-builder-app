@@ -257,7 +257,7 @@ Module: [`control-action.variants.ts`](../src/components/ui/control-action.varia
 Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
 
 **Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
-buttons (align to field `h-8` / 32px), spinner sizing.
+geometry (its own `xs`–`lg` ladder in `number-stepper.variants.ts`), spinner sizing.
 
 ### Named pairings
 
