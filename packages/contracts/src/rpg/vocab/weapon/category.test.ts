@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   WEAPON_CATEGORIES,
-  getWeaponCategoryCompactLabel,
+  getWeaponCategoryCollectionLabel,
   getWeaponCategoryEntry,
   getWeaponCategoryLabel,
   getWeaponCategoryPreviewLabel,
@@ -40,8 +40,8 @@ describe('weapon category vocabulary', () => {
   it('returns sentence and compact forms', () => {
     expect(getWeaponCategorySentenceForm('simple', 1)).toBe('simple weapon')
     expect(getWeaponCategorySentenceForm('simple', 2)).toBe('simple weapons')
-    expect(getWeaponCategoryCompactLabel('simple')).toBe('Simple weapons')
-    expect(getWeaponCategoryCompactLabel('martial')).toBe('Martial weapons')
+    expect(getWeaponCategoryCollectionLabel('simple')).toBe('Simple weapons')
+    expect(getWeaponCategoryCollectionLabel('martial')).toBe('Martial weapons')
     expect(getWeaponCategoryPreviewLabel('simple')).toBe('simple')
     expect(getWeaponCategoryPreviewLabel('martial')).toBe('martial')
     expect(getWeaponCategorySummaryLabel('simple')).toBe('Simple')

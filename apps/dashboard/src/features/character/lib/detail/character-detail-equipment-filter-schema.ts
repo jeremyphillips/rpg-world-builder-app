@@ -1,5 +1,5 @@
 import {
-  getEquipmentKindLabel,
+  getEquipmentKindCollectionLabel,
   isEquipmentPickerSupportedKind,
   type EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
@@ -53,7 +53,7 @@ export function createCharacterDetailEquipmentFilterSchema(
           { value: CHARACTER_DETAIL_EQUIPMENT_KIND_ALL, label: 'All' },
           ...args.kindOptions.map((kind) => ({
             value: kind,
-            label: getEquipmentKindLabel(kind),
+            label: getEquipmentKindCollectionLabel(kind),
           })),
         ],
         matches: (card, value) => {

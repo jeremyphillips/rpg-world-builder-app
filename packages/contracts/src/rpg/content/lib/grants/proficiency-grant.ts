@@ -4,7 +4,7 @@ import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-
 import { joinNaturalList } from '../../../primitives/prose'
 import {
   armorCategorySchema,
-  getArmorCategoryCompactLabel,
+  getArmorCategoryCollectionLabel,
   getArmorCategoryLabel,
   getArmorCategoryScopeForm,
   getArmorCategorySentenceForm,
@@ -25,7 +25,7 @@ import {
   getProficiencyPoolSelectedPhrase,
 } from '../../../vocab/proficiency'
 import {
-  getWeaponCategoryCompactLabel,
+  getWeaponCategoryCollectionLabel,
   getWeaponCategoryLabel,
   getWeaponCategorySentenceForm,
   weaponCategorySchema,
@@ -540,7 +540,7 @@ function collectFixedWeaponCompactLabels(
     labels.push(resolveWeaponName?.(slug) ?? formatVocabularySlugLabel(slug))
   })
   grant.weaponCategories?.forEach((category) => {
-    labels.push(getWeaponCategoryCompactLabel(category))
+    labels.push(getWeaponCategoryCollectionLabel(category))
   })
   return labels
 }
@@ -568,7 +568,7 @@ function collectFixedArmorCompactLabels(
     labels.push(resolveArmorName?.(slug) ?? formatVocabularySlugLabel(slug))
   })
   grant.armorCategories?.forEach((category) => {
-    labels.push(getArmorCategoryCompactLabel(category))
+    labels.push(getArmorCategoryCollectionLabel(category))
   })
   return labels
 }

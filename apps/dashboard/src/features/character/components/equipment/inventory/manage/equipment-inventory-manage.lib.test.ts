@@ -37,7 +37,7 @@ describe('equipment-inventory-manage.lib', () => {
         sources: [{ kind: 'startingWealthTier', sourceId: 'tier', grantId: 'allowance' }],
       },
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       sourceLabel: 'Common choice',
       removeTarget: {
         kind: 'magicItemGrant',
@@ -88,7 +88,7 @@ describe('equipment-inventory-manage.lib', () => {
     })
     const grant = row({
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       sourceLabel: 'Common choice',
       entry: { equipmentId: 'potion', quantity: 2, sources: [] },
       removeTarget: {
@@ -99,7 +99,7 @@ describe('equipment-inventory-manage.lib', () => {
     })
     const singleGrant = row({
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       sourceLabel: 'Common choice',
       entry: { equipmentId: 'potion', quantity: 1, sources: [] },
       removeTarget: {
@@ -131,7 +131,7 @@ describe('equipment-inventory-manage.lib', () => {
     const sources = resolveEquipmentInventoryManageSources([
       row({
         group: 'magicItems',
-        groupLabel: 'Magic Items',
+        groupLabel: 'Magic items',
         sourceLabel: 'Common choice',
         entry: { equipmentId: 'potion', quantity: 2, sources: [] },
         removeTarget: {

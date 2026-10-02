@@ -1,6 +1,7 @@
 import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 import { formatVocabularySlugLabel } from '../format-slug-label'
 import {
+  getTermCollectionLabel,
   getTermCompactLabel,
   getTermSentenceForm,
   type GameTermEntry,
@@ -25,6 +26,7 @@ export const WEAPON_CATEGORY_ENTRIES = {
   simple: {
     label: 'Simple Weapon',
     compactLabel: 'simple',
+    collectionLabel: 'Simple weapons',
     description:
       'Simple weapons are easy to use. Most creatures can wield a simple weapon even without training.',
     sentence: {
@@ -35,6 +37,7 @@ export const WEAPON_CATEGORY_ENTRIES = {
   martial: {
     label: 'Martial Weapon',
     compactLabel: 'martial',
+    collectionLabel: 'Martial weapons',
     description:
       'Martial weapons require training to use effectively. Most warriors use martial weapons because of their superior damage and versatility.',
     sentence: {
@@ -67,13 +70,10 @@ export function getWeaponCategorySentenceForm(category: string, count = 1): stri
   return getTermSentenceForm({ label: category, description: '' }, count)
 }
 
-/** Compact summary label for proficiency grants (e.g. "Simple weapons"). */
-export function getWeaponCategoryCompactLabel(category: string): string {
+/** Collection label for proficiency grants and filters (e.g. "Simple weapons"). */
+export function getWeaponCategoryCollectionLabel(category: string): string {
   const entry = getWeaponCategoryEntry(category)
-  if (entry) {
-    const phrase = getTermSentenceForm(entry, 2)
-    return `${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}`
-  }
+  if (entry) return getTermCollectionLabel(entry)
   return `${formatVocabularySlugLabel(category)} weapons`
 }
 

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import {
-  getEquipmentKindLabel,
+  getEquipmentKindCollectionLabel,
   getNpcTemplateLabel,
   indexCharacterBuildCatalog,
   type CharacterBuildContext,
@@ -116,7 +116,7 @@ const QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION =
   'Add specific items this NPC should start with in addition to its package.'
 const QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION = 'Add the items this NPC should start with.'
 const QUICK_NPC_ADD_ITEM_PLACEHOLDER = '+ Add item'
-const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment category'
+const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment kind'
 
 export type QuickNpcStartingEquipmentPanelProps = {
   setup: QuickNpcSetupValues
@@ -700,7 +700,7 @@ function AdditionalEquipmentPicker({
             value={activeKind}
             options={kindOptions.map((kind) => ({
               value: kind,
-              label: getEquipmentKindLabel(kind),
+              label: getEquipmentKindCollectionLabel(kind),
             }))}
             onValueChange={(next) => {
               onKindChange(next as (typeof kindOptions)[number])

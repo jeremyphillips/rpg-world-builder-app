@@ -16,7 +16,7 @@ import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-
 const rows: EquipmentInventoryRow[] = [
   {
     group: 'magicItems',
-    groupLabel: 'Magic Items',
+    groupLabel: 'Magic items',
     entry: {
       equipmentId: 'srd-cc-5.2.1:potion-of-healing',
       quantity: 2,
@@ -72,7 +72,7 @@ export const MixedSource: Story = {
       ...rows,
       {
         group: 'magicItems',
-        groupLabel: 'Magic Items',
+        groupLabel: 'Magic items',
         entry: {
           equipmentId: equipmentStepPotionOfHealingFixture.id,
           quantity: 1,

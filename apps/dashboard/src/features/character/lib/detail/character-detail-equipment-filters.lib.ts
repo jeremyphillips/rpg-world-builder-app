@@ -14,7 +14,7 @@ import type { CharacterSheetEquipmentCard } from './character-sheet-catalog'
 
 export const CHARACTER_DETAIL_EQUIPMENT_KIND_ALL = '__all__' as const
 
-export const CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL = 'Category'
+export const CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL = 'Equipment kind'
 export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL = 'Sort'
 export const CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL = 'Reset view'
 export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER = 'Search equipment'

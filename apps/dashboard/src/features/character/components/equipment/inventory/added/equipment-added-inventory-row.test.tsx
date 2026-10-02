@@ -16,7 +16,7 @@ import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equ
 
 const grantRow: EquipmentInventoryRow = {
   group: 'magicItems',
-  groupLabel: 'Magic Items',
+  groupLabel: 'Magic items',
   entry: {
     equipmentId: 'srd-cc-5.2.1:potion-of-healing',
     quantity: 2,
@@ -106,7 +106,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
   it('renders manage without trash controls for mixed grant and purchase rows', () => {
     const purchaseRow: EquipmentInventoryRow = {
       group: 'magicItems',
-      groupLabel: 'Magic Items',
+      groupLabel: 'Magic items',
       entry: {
         equipmentId: 'srd-cc-5.2.1:potion-of-healing',
         quantity: 1,

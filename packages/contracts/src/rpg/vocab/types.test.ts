@@ -18,7 +18,11 @@ import { CREATURE_TYPE_TERM } from './creature-type'
 import { DAMAGE_TYPE_TERM } from './damage/vocabulary'
 import { MAGIC_ITEM_RARITY_ENTRIES, MAGIC_ITEM_RARITY_TERM } from './magic-item/rarity'
 import { MOVEMENT_MODE_ENTRIES } from './movement-mode'
+import { EQUIPMENT_KIND_ENTRIES } from './equipment/kind'
 import {
+  capitalizeFirst,
+  getTermCollectionLabel,
+  getTermCompactLabel,
   getTermSentenceForm,
   getVocabularyTermLabel,
   pluralizeTermLabel,
@@ -91,6 +95,32 @@ describe('vocabularyTermFieldCopy', () => {
 describe('vocabulary term helpers', () => {
   it('returns the title-case label for a vocabulary concept', () => {
     expect(getVocabularyTermLabel(MAGIC_ITEM_RARITY_TERM)).toBe('Magic Item Rarity')
+  })
+})
+
+describe('getTermCollectionLabel', () => {
+  it('returns authored collectionLabel when present', () => {
+    expect(getTermCollectionLabel(EQUIPMENT_KIND_ENTRIES.adventuring_gear)).toBe('Adventuring gear')
+  })
+
+  it('falls back to capitalized plural sentence form', () => {
+    expect(getTermCollectionLabel(EQUIPMENT_KIND_ENTRIES.tool)).toBe('Tools')
+  })
+
+  it('uses authored armor collection label instead of pieces-of-armor fallback', () => {
+    expect(getTermCollectionLabel(EQUIPMENT_KIND_ENTRIES.armor)).toBe('Armor')
+  })
+
+  it('keeps compactLabel independent of collectionLabel', () => {
+    expect(getTermCompactLabel(EQUIPMENT_KIND_ENTRIES.adventuring_gear)).toBe('Gear')
+    expect(getTermCollectionLabel(EQUIPMENT_KIND_ENTRIES.adventuring_gear)).toBe('Adventuring gear')
+  })
+})
+
+describe('capitalizeFirst', () => {
+  it('uppercases the first character only', () => {
+    expect(capitalizeFirst('simple weapons')).toBe('Simple weapons')
+    expect(capitalizeFirst('')).toBe('')
   })
 })
 

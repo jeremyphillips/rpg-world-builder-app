@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   EQUIPMENT_KIND_ENTRIES,
   EQUIPMENT_KINDS,
+  getEquipmentKindCollectionLabel,
+  getEquipmentKindCompactLabel,
   getEquipmentKindLabel,
   equipmentKindSchema,
 } from './kind'
@@ -25,5 +27,12 @@ describe('equipmentKindSchema', () => {
   it('returns labels and falls back for unknown kinds', () => {
     expect(getEquipmentKindLabel('magic_item')).toBe('Magic Item')
     expect(getEquipmentKindLabel('teleporter')).toBe('teleporter')
+  })
+
+  it('returns collection and compact labels from vocab entries', () => {
+    expect(getEquipmentKindCollectionLabel('weapon')).toBe('Weapons')
+    expect(getEquipmentKindCollectionLabel('magic_item')).toBe('Magic items')
+    expect(getEquipmentKindCompactLabel('adventuring_gear')).toBe('Gear')
+    expect(getEquipmentKindCollectionLabel('adventuring_gear')).toBe('Adventuring gear')
   })
 })

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   ARMOR_CATEGORIES,
   armorCategorySchema,
-  getArmorCategoryCompactLabel,
+  getArmorCategoryCollectionLabel,
   getArmorCategoryEntry,
   getArmorCategoryLabel,
   getArmorCategoryPreviewLabel,
@@ -42,8 +42,8 @@ describe('armor category vocabulary', () => {
     expect(getArmorCategorySentenceForm('light', 2)).toBe('suits of light armor')
     expect(getArmorCategoryScopeForm('heavy')).toBe('heavy armor')
     expect(getArmorCategoryScopeForm('shields')).toBe('shield')
-    expect(getArmorCategoryCompactLabel('light')).toBe('Light armor')
-    expect(getArmorCategoryCompactLabel('shields')).toBe('Shield')
+    expect(getArmorCategoryCollectionLabel('light')).toBe('Light armor')
+    expect(getArmorCategoryCollectionLabel('shields')).toBe('Shields')
     expect(getArmorCategoryPreviewLabel('light')).toBe('light')
     expect(getArmorCategoryPreviewLabel('medium')).toBe('medium')
     expect(getArmorCategoryPreviewLabel('shields')).toBe('shields')

@@ -393,6 +393,25 @@ Contracts grammar (`vocabularyTermLabel`, `vocabularyTermFieldCopy`) is
 surface-neutral. Dashboard wrappers (`vocabularyHubLabel`, `vocabularyFieldLabel`)
 apply product casing conventions.
 
+### `GameTermEntry` display layers
+
+Closed reference entries expose up to four semantic layers plus an optional
+presentation casing step in apps:
+
+| Field | Role | Example |
+| ----- | ---- | ------- |
+| `label` | Canonical identity / title | Adventuring Gear / Skill Proficiency |
+| `compactLabel` | Short identity for tight spaces | Gear / Skills |
+| `sentence` | Counted prose for generated sentences | piece(s) of adventuring gear |
+| `collectionLabel` | Set or category name (sentence case) | Adventuring gear / Skill proficiencies |
+
+Use `getTermCollectionLabel(entry)` for collection copy; it prefers authored
+`collectionLabel` and otherwise capitalizes the plural `sentence` form. Do not
+overload `compactLabel` for set names. Hub and overview headings may apply an
+explicit title-case presentation layer (`vocabularyHubLabel`,
+`getContentTypeCollectionLabel`) on top of the same semantic phrase — that casing
+is not taxonomy data and must not be written back into `collectionLabel`.
+
 ### Campaign vocab vs closed reference sets
 
 | Source                                                    | Examples                                                                                                                   | Consumption                                                                                                                                             |

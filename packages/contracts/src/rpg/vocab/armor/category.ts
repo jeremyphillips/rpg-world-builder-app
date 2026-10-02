@@ -2,6 +2,7 @@ import { keysFromEntries, vocabEnumFromEntries } from '../enum-schema'
 
 import { formatVocabularySlugLabel } from '../format-slug-label'
 import {
+  getTermCollectionLabel,
   getTermCompactLabel,
   getTermLabelSingular,
   getTermSentenceForm,
@@ -27,6 +28,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   light: {
     label: 'Light Armor',
     compactLabel: 'light',
+    collectionLabel: 'Light armor',
     description: '1 minute to don or doff.',
     sentence: {
       singular: 'suit of light armor',
@@ -36,6 +38,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   medium: {
     label: 'Medium Armor',
     compactLabel: 'medium',
+    collectionLabel: 'Medium armor',
     description: '5 minutes to don and 1 minute to doff.',
     sentence: {
       singular: 'suit of medium armor',
@@ -45,6 +48,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   heavy: {
     label: 'Heavy Armor',
     compactLabel: 'heavy',
+    collectionLabel: 'Heavy armor',
     description: '10 minutes to don and 5 minutes to doff.',
     sentence: {
       singular: 'suit of heavy armor',
@@ -54,6 +58,7 @@ export const ARMOR_CATEGORY_ENTRIES = {
   shields: {
     label: 'Shield',
     compactLabel: 'shields',
+    collectionLabel: 'Shields',
     description: 'Utilize action to don or doff.',
     sentence: {
       singular: 'shield',
@@ -92,12 +97,11 @@ export function getArmorCategoryScopeForm(category: string): string {
   return getTermLabelSingular(formatVocabularySlugLabel(category))
 }
 
-/** Compact summary label for armor training grants (e.g. "Light armor"). */
-export function getArmorCategoryCompactLabel(category: string): string {
-  if (category === 'shields') return 'Shield'
+/** Collection label for armor training grants (e.g. "Light armor", "Shields"). */
+export function getArmorCategoryCollectionLabel(category: string): string {
   const entry = getArmorCategoryEntry(category)
-  if (!entry) return formatVocabularySlugLabel(category)
-  return entry.label.replace(/ Armor$/, ' armor')
+  if (entry) return getTermCollectionLabel(entry)
+  return formatVocabularySlugLabel(category)
 }
 
 /** Short preview label for rail summaries (e.g. "Light", "Shields"). */

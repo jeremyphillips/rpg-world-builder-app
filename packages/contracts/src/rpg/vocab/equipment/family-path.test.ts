@@ -12,7 +12,8 @@ describe('equipment family path helpers', () => {
   it('maps equipment kinds to overview path segments', () => {
     expect(equipmentKindToFamilyPath('weapon')).toBe('weapons')
     expect(familyPathToEquipmentKind('weapons')).toBe('weapon')
-    expect(getEquipmentFamilyLabel('weapons')).toBeTruthy()
+    expect(getEquipmentFamilyLabel('weapons')).toBe('Weapons')
+    expect(getEquipmentFamilyLabel('adventuring-gear')).toBe('Adventuring gear')
   })
 
   it('validates known family paths', () => {

@@ -6,6 +6,8 @@ export type GameTermEntry = {
   readonly description: string
   /** Compact-surface display label; falls back to `label` when absent. */
   readonly compactLabel?: string
+  /** Category or set name in UI (sentence case); not a substitute for `compactLabel`. */
+  readonly collectionLabel?: string
   /** Counted noun phrase forms for generated sentences, not replacement labels. */
   readonly sentence?: {
     readonly singular?: string
@@ -84,12 +86,18 @@ export function vocabularyTermFieldCopy(
     number: options.multiple ? 'plural' : 'singular',
     casing: 'sentence',
   })
-  const label = phrase.charAt(0).toUpperCase() + phrase.slice(1)
+  const label = capitalizeFirst(phrase)
 
   return {
     label,
     placeholder: resolveChoicePlaceholder(nounFromTerm(term), options.multiple === true),
   }
+}
+
+/** Sentence-case first character for derived collection copy. */
+export function capitalizeFirst(value: string): string {
+  if (value.length === 0) return value
+  return `${value.charAt(0).toUpperCase()}${value.slice(1)}`
 }
 
 /** Lowercase display label for simple generated prose. */
@@ -113,4 +121,10 @@ export function getTermSentenceForm(entry: GameTermEntry, count: number): string
 /** Compact-surface display label; falls back to `label` when `compactLabel` is absent. */
 export function getTermCompactLabel(entry: GameTermEntry): string {
   return entry.compactLabel ?? entry.label
+}
+
+/** Collection or set display label; falls back to capitalized plural sentence form. */
+export function getTermCollectionLabel(entry: GameTermEntry): string {
+  if (entry.collectionLabel) return entry.collectionLabel
+  return capitalizeFirst(getTermSentenceForm(entry, 2))
 }

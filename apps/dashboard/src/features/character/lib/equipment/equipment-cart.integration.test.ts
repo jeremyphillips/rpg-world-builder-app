@@ -125,7 +125,7 @@ describe('equipment cart integration', () => {
     ).toBe(true)
 
     const magicItemEntries = viewModel.addedEquipment.find(
-      (group) => group.groupLabel === 'Magic Items',
+      (group) => group.groupLabel === 'Magic items',
     )?.entries
     expect(magicItemEntries).toHaveLength(1)
     expect(magicItemEntries?.[0]).toMatchObject({

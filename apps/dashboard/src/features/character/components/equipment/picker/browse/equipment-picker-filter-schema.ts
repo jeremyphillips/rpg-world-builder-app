@@ -1,5 +1,5 @@
 import {
-  getEquipmentKindLabel,
+  getEquipmentKindCollectionLabel,
   getMagicItemRarityLabel,
   type MagicItemGrantProgress,
 } from '@rpg/contracts'
@@ -171,7 +171,7 @@ export function createEquipmentPickerFilterSchema(
           { value: EQUIPMENT_PICKER_KIND_ALL, label: 'All' },
           ...args.kindOptions.map((kind) => ({
             value: kind,
-            label: getEquipmentKindLabel(kind),
+            label: getEquipmentKindCollectionLabel(kind),
           })),
         ],
         matches: (row, value) =>

@@ -12,6 +12,7 @@ import {
   getProficiencyGrantCompactManageLabel,
   getProficiencyGrantCompactSuffix,
   getProficiencyGrantManageLabel,
+  getProficiencyDomainCollectionLabel,
   getProficiencyDomainCompactLabel,
   getProficiencyDomainLabel,
   getProficiencyDomainSentenceForm,
@@ -39,6 +40,10 @@ describe('proficiency grant vocabulary', () => {
   it('returns compact domain labels for tight UI surfaces', () => {
     expect(getProficiencyDomainCompactLabel('skill')).toBe('Skills')
     expect(getProficiencyDomainCompactLabel('weapon')).toBe('Weapon Proficiency')
+  })
+
+  it('returns collection domain labels for set-style copy', () => {
+    expect(getProficiencyDomainCollectionLabel('skill')).toBe('Skill proficiencies')
   })
 
   it('returns compact suffixes and pool phrases', () => {
