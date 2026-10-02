@@ -1,9 +1,10 @@
 import * as React from 'react'
-import { useWatch, type UseFormReturn } from 'react-hook-form'
+import { useQueryClient } from '@tanstack/react-query'
+import { type UseFormReturn } from 'react-hook-form'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
-import { Button, SelectionSummaryCard } from '@rpg/ui'
-import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
+import { Button, Text } from '@rpg/ui'
+import { SetupSummaryRows, type SetupSummaryEditTarget } from '@/lib/create-setup'
 import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
 import {
   FormShellSubmitButton,
@@ -17,20 +18,25 @@ import { useSubmitHandler } from '@/lib/use-submit-handler'
 import { useSpeciesNameTrailingAction } from '../../../hooks/use-species-name-trailing-action'
 import { useCreateNpc } from '../../hooks/use-create-npc'
 import { isQuickNpcSetupStillValid } from '../../lib/quick-npc/quick-npc-authoring-validation.lib'
-import { buildQuickNpcAuthoringCreateInput } from '../../lib/quick-npc/quick-npc-authoring-submit.lib'
 import { formatQuickNpcCreationError } from '../../lib/quick-npc/quick-npc-create'
-import { createQuickNpcFormValueSyncs } from '../../lib/quick-npc/quick-npc-form-sync'
+import { reconcileQuickNpcAuthoringRequirementValues } from '../../lib/quick-npc/quick-npc-authoring-requirements-reconcile.lib'
 import {
   buildQuickNpcDetailsFields,
   buildQuickNpcRequirementsFields,
   buildQuickNpcTabs,
-  countQuickNpcConfiguredRequirements,
+  QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME,
   quickNpcAuthoringTabDefaultValues,
   quickNpcAuthoringTabSchema,
   type QuickNpcAuthoringTabFormValues,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
+import { type QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
+import { resolveQuickNpcSetupChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
+import { pruneQuickNpcStartingChoiceOverrides } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
+import { readQuickNpcClassPackage } from '../../lib/quick-npc/quick-npc-package-customization.lib'
+import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
 import {
+  QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
   resolveQuickNpcSetupSummaryRows,
@@ -38,8 +44,20 @@ import {
 import { resolveCharacterSpeciesNameGenerationSupport } from '../../../lib/naming/character-species-name-generation.lib'
 import { generateNameActionIcon } from '../../../lib/naming/species-name-generation-action-icon'
 import { GENERATE_NAME_ACTION_LABEL } from '../../../lib/naming/species-name-generation-labels'
+import { resolveQuickNpcAdditionalEquipmentOptions } from '../../lib/quick-npc/quick-npc-additional-equipment.lib'
 import { buildQuickNpcRequirementOptionSets } from '../../lib/quick-npc/quick-npc-requirement-options.lib'
-import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
+import {
+  isQuickNpcNarrativeGenerationFailedError,
+  resolveQuickNpcAuthoringCreateInput,
+} from '../../lib/quick-npc/quick-npc-narrative-on-create.lib'
+import { QuickNpcStartingChoices } from './quick-npc-starting-choices'
+import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
+import {
+  quickNpcCreateFooterActionsClasses,
+  quickNpcCreateFooterLayoutClasses,
+  quickNpcNarrativeRecoveryActionsClasses,
+  quickNpcNarrativeRecoveryClasses,
+} from './quick-npc-create-footer.variants'
 import {
   QUICK_NPC_CREATE_SUBMIT_LABEL,
   type QuickNpcCreateContext,
@@ -50,23 +68,31 @@ export type { QuickNpcCreateFormOrganization } from '../../lib/quick-npc/quick-n
 
 export const QUICK_NPC_CREATE_FALLBACK_ERROR = 'Could not create this NPC.' as const
 
+export const QUICK_NPC_NARRATIVE_RETRY_LABEL = 'Retry narrative' as const
+export const QUICK_NPC_CREATE_WITHOUT_NARRATIVE_LABEL = 'Create without narrative' as const
+
 export type QuickNpcAuthoringFormProps = {
   campaignId: string
   buildContext: CharacterBuildContext
   createContext: QuickNpcCreateContext
   setup: QuickNpcSetupValues
   initialValues?: Partial<QuickNpcAuthoringTabFormValues> | undefined
+  equipmentBaseline?: QuickNpcEquipmentSeedContext
   onCancel: () => void
-  onChangeSetup: () => void
-  onSetupSummaryEdit: (target: SetupSummaryEditTarget) => void
+  onChangeSetup: (authoringValues?: Partial<QuickNpcAuthoringTabFormValues>) => void
+  onSetupSummaryEdit: (
+    target: SetupSummaryEditTarget,
+    authoringValues: Partial<QuickNpcAuthoringTabFormValues>,
+  ) => void
   onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
+  previewButtonRef?: React.RefObject<HTMLButtonElement | null>
 }
 
 function buildQuickNpcAuthoringTabs(args: {
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  configuredCount: number
+  createContext: QuickNpcCreateContext
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
 }): TabbedFormTab[] {
@@ -74,7 +100,10 @@ function buildQuickNpcAuthoringTabs(args: {
     setup: args.setup,
     context: args.buildContext,
   })
-  const hasRequirements = optionSets.weapons.length > 0 || optionSets.spells.length > 0
+  const additionalEquipmentOptions = resolveQuickNpcAdditionalEquipmentOptions({
+    setup: args.setup,
+    context: args.buildContext,
+  })
   const generationSupport = resolveCharacterSpeciesNameGenerationSupport({
     speciesId: args.setup.speciesId,
     context: args.buildContext,
@@ -100,11 +129,16 @@ function buildQuickNpcAuthoringTabs(args: {
       nameTrailingAction,
       nameHint,
     }),
-    requirementsFields: hasRequirements ? buildQuickNpcRequirementsFields() : [],
-    configuredCount: args.configuredCount,
-    requirementsHeader: hasRequirements ? (
-      <QuickNpcRequirementsFields optionSets={optionSets} />
-    ) : undefined,
+    requirementsFields: buildQuickNpcRequirementsFields(),
+    requirementsHeader: (
+      <QuickNpcStartingChoices
+        setup={args.setup}
+        buildContext={args.buildContext}
+        createContext={args.createContext}
+        optionSets={optionSets}
+        additionalEquipmentOptions={additionalEquipmentOptions}
+      />
+    ),
   })
 }
 
@@ -112,13 +146,13 @@ function QuickNpcAuthoringTabsSync({
   form,
   setup,
   buildContext,
-  configuredCount,
+  createContext,
   onTabsChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabFormValues>
   setup: QuickNpcSetupValues
   buildContext: CharacterBuildContext
-  configuredCount: number
+  createContext: QuickNpcCreateContext
   onTabsChange: (tabs: TabbedFormTab[]) => void
 }) {
   const { trailingAction, nameHint } = useSpeciesNameTrailingAction({
@@ -132,11 +166,11 @@ function QuickNpcAuthoringTabsSync({
       buildQuickNpcAuthoringTabs({
         setup,
         buildContext,
-        configuredCount,
+        createContext,
         nameTrailingAction: trailingAction,
         nameHint,
       }),
-    [buildContext, configuredCount, nameHint, setup, trailingAction],
+    [buildContext, createContext, nameHint, setup, trailingAction],
   )
 
   React.useLayoutEffect(() => {
@@ -146,40 +180,24 @@ function QuickNpcAuthoringTabsSync({
   return null
 }
 
-function RequirementCountWatcher({
+function QuickNpcSubmitPendingSync({
   form,
-  fallback,
-  onConfiguredCountChange,
+  onPendingChange,
 }: {
   form: UseFormReturn<QuickNpcAuthoringTabFormValues>
-  fallback: Pick<QuickNpcAuthoringTabFormValues, 'requiredWeaponIds' | 'requiredSpellIds'>
-  onConfiguredCountChange: (count: number) => void
+  onPendingChange?: (pending: boolean) => void
 }) {
-  const requiredWeaponIds = useWatch({
-    control: form.control,
-    name: 'requiredWeaponIds',
-    defaultValue: fallback.requiredWeaponIds,
-  })
-  const requiredSpellIds = useWatch({
-    control: form.control,
-    name: 'requiredSpellIds',
-    defaultValue: fallback.requiredSpellIds,
-  })
-
-  const configuredCount = countQuickNpcConfiguredRequirements({
-    requiredWeaponIds: requiredWeaponIds ?? [],
-    requiredSpellIds: requiredSpellIds ?? [],
-  })
+  const isSubmitting = form.formState.isSubmitting
 
   React.useEffect(() => {
-    onConfiguredCountChange(configuredCount)
-  }, [configuredCount, onConfiguredCountChange])
+    onPendingChange?.(isSubmitting)
+  }, [isSubmitting, onPendingChange])
 
   return null
 }
 
 /**
- * Quick NPC authoring body — TabbedForm Details / Requirements after setup.
+ * Quick NPC authoring body — TabbedForm Details / Starting choices after setup.
  */
 export function QuickNpcAuthoringForm({
   campaignId,
@@ -187,39 +205,68 @@ export function QuickNpcAuthoringForm({
   createContext,
   setup,
   initialValues,
+  equipmentBaseline,
   onCancel,
   onChangeSetup,
   onSetupSummaryEdit,
   onCreated,
   onPendingChange,
+  previewButtonRef,
 }: QuickNpcAuthoringFormProps) {
+  const queryClient = useQueryClient()
   const createFlowDensity = useCreateFlowFormDensity()
-  const { mutateAsync, isPending, isSuccess } = useCreateNpc()
-  const [configuredCount, setConfiguredCount] = React.useState(0)
+  const { mutateAsync, isSuccess } = useCreateNpc()
   const organization =
     createContext.kind === 'organization-member' ? createContext.organization : undefined
+  const skipNarrativeGenerationRef = React.useRef(false)
+  const [showNarrativeRecovery, setShowNarrativeRecovery] = React.useState(false)
   const [tabs, setTabs] = React.useState<TabbedFormTab[]>(() =>
     buildQuickNpcAuthoringTabs({
       setup,
       buildContext,
-      configuredCount: 0,
+      createContext,
     }),
   )
-
-  React.useEffect(() => {
-    onPendingChange?.(isPending)
-  }, [isPending, onPendingChange])
 
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
-  const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
+  const editingLock = useQuickNpcEditingLock()
 
-  const defaultValues = React.useMemo(
-    () => ({
+  const defaultValues = React.useMemo(() => {
+    const reconciled = resolveQuickNpcSetupChangeAuthoringState({
+      classPackage: readQuickNpcClassPackage(initialValues?.classPackage),
+      overrides: initialValues?.startingChoiceOverrides ?? {},
+      equipmentSelections: initialValues?.equipmentSelections ?? [],
+      previous: equipmentBaseline ?? { level: setup.level },
+      next: {
+        templateId: setup.npcTemplateId,
+        classId: setup.classId,
+        level: setup.level,
+        rulesetId: buildContext.rulesetId,
+      },
+      context: buildContext,
+    })
+    const prunedOverrides = pruneQuickNpcStartingChoiceOverrides({
+      setup,
+      context: buildContext,
+      createContext,
+      overrides: reconciled.startingChoiceOverrides,
+    })
+    const requirementValues = reconcileQuickNpcAuthoringRequirementValues({
+      setup,
+      context: buildContext,
+      equipmentSelections: reconciled.equipmentSelections,
+      requiredSpellIds: initialValues?.requiredSpellIds ?? [],
+    })
+
+    return {
       ...quickNpcAuthoringTabDefaultValues,
       ...initialValues,
-    }),
-    [initialValues],
-  )
+      equipmentSelections: requirementValues.equipmentSelections,
+      startingChoiceOverrides: prunedOverrides,
+      classPackage: reconciled.classPackage,
+      requiredSpellIds: requirementValues.requiredSpellIds,
+    }
+  }, [buildContext, createContext, equipmentBaseline, initialValues, setup])
 
   const requirementCategoryKey = React.useMemo(() => {
     const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
@@ -240,34 +287,71 @@ export function QuickNpcAuthoringForm({
   const { onSubmit, formError } = useSubmitHandler<QuickNpcAuthoringTabFormValues>({
     submit: async (tabValues) => {
       if (!isQuickNpcSetupStillValid(setup, buildContext)) {
-        onChangeSetup()
+        onChangeSetup({
+          equipmentSelections: tabValues.equipmentSelections,
+          requiredSpellIds: tabValues.requiredSpellIds,
+          startingChoiceOverrides: tabValues.startingChoiceOverrides,
+          classPackage: tabValues.classPackage,
+        })
         return
       }
 
-      const input = buildQuickNpcAuthoringCreateInput({
-        createContext,
-        setup,
-        tabValues: schema.parse(tabValues),
-        buildContext,
-      })
+      const parsed = schema.parse(tabValues)
+      const skipNarrativeGeneration = skipNarrativeGenerationRef.current
+      skipNarrativeGenerationRef.current = false
 
-      const npc = await mutateAsync({ campaignId, input })
-      await onCreated({ contentType: 'npcs', id: npc.character.id })
+      try {
+        const input = await resolveQuickNpcAuthoringCreateInput({
+          prepareArgs: {
+            createContext,
+            setup,
+            tabValues: parsed,
+            buildContext,
+          },
+          buildContext,
+          campaignId,
+          queryClient,
+          generateNarrativeOnCreate: parsed[QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME],
+          skipNarrativeGeneration,
+        })
+
+        setShowNarrativeRecovery(false)
+        const npc = await mutateAsync({ campaignId, input })
+        await onCreated({ contentType: 'npcs', id: npc.character.id })
+      } catch (error) {
+        if (isQuickNpcNarrativeGenerationFailedError(error)) {
+          setShowNarrativeRecovery(true)
+        }
+        throw error
+      }
     },
     fallbackMessage: QUICK_NPC_CREATE_FALLBACK_ERROR,
-    mapError: formatQuickNpcCreationError,
+    mapError: (error) => {
+      if (isQuickNpcNarrativeGenerationFailedError(error)) return error.message
+      return formatQuickNpcCreationError(error)
+    },
   })
 
   return (
     <TabbedForm<QuickNpcAuthoringTabFormValues>
-      key={`${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
+      onBeforeActiveTabChange={() => {
+        if (!editingLock.isLocked) return true
+        editingLock.requestFocus()
+        return false
+      }}
+      key={`${setup.npcTemplateId}:${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}
       tabs={tabs}
       defaultValues={defaultValues}
-      onSubmit={onSubmit}
+      onSubmit={(values, form) => {
+        if (editingLock.isLocked) {
+          editingLock.requestFocus()
+          return
+        }
+        return onSubmit(values, form)
+      }}
       formError={formError ?? null}
-      valueSyncs={valueSyncs}
       stickyChrome={false}
       externalFooter
       header={(form) => (
@@ -276,34 +360,90 @@ export function QuickNpcAuthoringForm({
             form={form}
             setup={setup}
             buildContext={buildContext}
-            configuredCount={configuredCount}
+            createContext={createContext}
             onTabsChange={setTabs}
           />
-          <RequirementCountWatcher
-            form={form}
-            fallback={defaultValues}
-            onConfiguredCountChange={setConfiguredCount}
-          />
-          <SelectionSummaryCard
+          <QuickNpcSubmitPendingSync form={form} onPendingChange={onPendingChange} />
+          <SetupSummaryRows
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
-            rows={mapSetupSummaryRowModelsToProps({
-              rows: setupSummaryRows,
-              changeLabel: QUICK_NPC_SETUP_CHANGE_LABEL,
-              onEdit: onSetupSummaryEdit,
-            })}
+            rows={setupSummaryRows}
+            changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+            onNavigate={(targetSetId) => {
+              if (editingLock.isLocked) {
+                editingLock.requestFocus()
+                return
+              }
+              onSetupSummaryEdit(
+                targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
+                  ? { type: 'external', id: targetSetId }
+                  : { type: 'set', id: targetSetId },
+                form.getValues(),
+              )
+            }}
           />
         </>
       )}
-      footer={() => (
-        <>
-          <Button type="button" variant="outline" disabled={isPending} onClick={onCancel}>
-            Cancel
-          </Button>
-          <FormShellSubmitButton disabled={isPending || isSuccess}>
-            {QUICK_NPC_CREATE_SUBMIT_LABEL}
-          </FormShellSubmitButton>
-        </>
-      )}
+      footer={(form) => {
+        const isSubmitting = form.formState.isSubmitting
+
+        return (
+          <>
+            {showNarrativeRecovery ? (
+              <div className={quickNpcNarrativeRecoveryClasses()}>
+                <Text variant="muted" className="text-sm">
+                  Narrative generation failed. Retry or create this NPC without a generated
+                  narrative.
+                </Text>
+                <div className={quickNpcNarrativeRecoveryActionsClasses()}>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      setShowNarrativeRecovery(false)
+                      void form.handleSubmit((values) => onSubmit(values, form))()
+                    }}
+                  >
+                    {QUICK_NPC_NARRATIVE_RETRY_LABEL}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      skipNarrativeGenerationRef.current = true
+                      setShowNarrativeRecovery(false)
+                      void form.handleSubmit((values) => onSubmit(values, form))()
+                    }}
+                  >
+                    {QUICK_NPC_CREATE_WITHOUT_NARRATIVE_LABEL}
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+            <div className={quickNpcCreateFooterLayoutClasses()}>
+              <QuickNpcPreviewNpcButton
+                buttonRef={previewButtonRef}
+                buildContext={buildContext}
+                createContext={createContext}
+                setup={setup}
+                getAuthoringValues={() => form.getValues()}
+                disabled={isSubmitting}
+              />
+              <div className={quickNpcCreateFooterActionsClasses()}>
+                <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
+                  Cancel
+                </Button>
+                <FormShellSubmitButton disabled={isSubmitting || isSuccess}>
+                  {isSubmitting ? 'Creating…' : QUICK_NPC_CREATE_SUBMIT_LABEL}
+                </FormShellSubmitButton>
+              </div>
+            </div>
+          </>
+        )
+      }}
     />
   )
 }

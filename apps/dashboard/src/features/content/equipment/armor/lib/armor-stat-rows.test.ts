@@ -17,9 +17,10 @@ describe('getArmorStatRows', () => {
     expect(labels).not.toContain('Strength Required')
   })
 
-  it('includes strength requirement for heavy armor', () => {
+  it('uses summary category labels and omits strength requirement for heavy armor', () => {
     const rows = getArmorStatRows(PLATE)
-    expect(rows.find((row) => row.label === 'Strength Required')?.value).toBe('15')
+    expect(rows.find((row) => row.label === 'Category')?.value).toBe('Heavy')
+    expect(rows.find((row) => row.label === 'Strength Required')).toBeUndefined()
     expect(rows.find((row) => row.label === 'Stealth')?.value).toBe('Disadvantage')
   })
 })

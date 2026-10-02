@@ -58,7 +58,7 @@ describe('GlobalSearchGroupSection', () => {
 
     expect(screen.queryByRole('link', { name: /Show all/i })).not.toBeInTheDocument()
     expect(container.querySelector('section')).not.toHaveClass('pb-4')
-    expect(container.querySelector('.divide-y')).toBeInTheDocument()
+    expect(container.querySelector('[class*="[&>*+*]:border-t"]')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Game terms · 2/i })).toBeInTheDocument()
   })
 
@@ -77,7 +77,7 @@ describe('GlobalSearchGroupSection', () => {
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
     expect(heading).toHaveClass('bg-surface-faint', 'pt-2')
-    expect(list).toHaveClass('divide-y', 'divide-border-faint')
+    expect(list).toHaveClass('[&>*+*]:border-t', '[&>*+*]:border-border-faint')
     expect(row).toHaveClass('px-3', 'py-2')
   })
 

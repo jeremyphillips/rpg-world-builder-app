@@ -2,13 +2,23 @@ import type {
   EquipmentRecommendationReason,
   EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
+import type {
+  RecommendationScope,
+  RecommendationSignalBasis,
+  RecommendationSourceRef,
+} from '../../recommendation'
 import type { EquipmentRecommendationSelector } from './equipment-recommendation-selector'
 
 export type EquipmentRecommendationContribution = {
   selector: EquipmentRecommendationSelector
   tier: EquipmentRecommendationTier
   reason: EquipmentRecommendationReason
-  sourceKey: string
+  /** Distinguishes slots that share a recommendation source, such as two package rows. */
+  dedupeKey: string
+  source?: RecommendationSourceRef
+  scope?: RecommendationScope
+  basis?: RecommendationSignalBasis
+  choiceSetId?: string
   excludeEquipmentIds?: ReadonlySet<string>
 }
 

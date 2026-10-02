@@ -133,33 +133,39 @@
               "kind": "grant",
               "equipmentSlug": "leather-armor",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "leather-armor"
             },
             {
               "kind": "grant",
               "equipmentSlug": "sickle",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "sickle"
             },
             {
               "kind": "grant",
               "equipmentSlug": "dagger",
-              "quantity": 2
+              "quantity": 2,
+              "id": "dagger"
             },
             {
               "kind": "grant",
               "equipmentSlug": "orb",
-              "quantity": 1
+              "quantity": 1,
+              "id": "orb"
             },
             {
               "kind": "grant",
               "equipmentSlug": "book-occult-lore",
-              "quantity": 1
+              "quantity": 1,
+              "id": "book-occult-lore"
             },
             {
               "kind": "grant",
               "equipmentSlug": "scholars-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "scholars-pack"
             }
           ],
           "wealth": {

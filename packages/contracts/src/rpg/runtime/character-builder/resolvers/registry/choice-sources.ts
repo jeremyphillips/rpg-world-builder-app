@@ -10,6 +10,7 @@ import { resolveSpeciesTraitGrantChoices } from '../species/resolve-species-trai
 import { resolveStartingEquipmentChoices } from '../equipment/resolve-starting-equipment-choices'
 import { whenClassProgressionApplicable } from './when-class-progression-applicable'
 import { isBuilderLevelZeroClassless } from '../../progression/character-level-policy'
+import { resolveNpcTemplateRoleChoices } from '../npc-template/resolve-npc-template-role-choices'
 
 /**
  * Ordered registry of choice-source resolvers. `resolveAvailableChoices` iterates
@@ -24,6 +25,7 @@ export const CHOICE_SOURCE_RESOLVERS: readonly ChoiceSourceResolver[] = [
     isBuilderLevelZeroClassless(draft, context)
       ? resolveLevelZeroBaselineGrantChoices(draft, context, catalogIndex)
       : [],
+  resolveNpcTemplateRoleChoices,
   whenClassProgressionApplicable(resolveClassSkillChoices),
   whenClassProgressionApplicable(resolveClassToolChoices),
   whenClassProgressionApplicable(resolveClassFeatureGrantChoices),

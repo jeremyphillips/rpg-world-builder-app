@@ -127,7 +127,7 @@ describe('CreateSetupPanel', () => {
     expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
   })
 
-  it('renders standalone partial summary cards for completed non-active sets', () => {
+  it('renders a summary row for a resolved set while the next editor stays open', () => {
     const sets: CreateSetupSet[] = [
       {
         id: 'title',
@@ -152,9 +152,24 @@ describe('CreateSetupPanel', () => {
 
     render(<GroupedSetupHarness sets={sets} />)
 
-    expect(screen.getByText('Title')).toBeInTheDocument()
-    expect(screen.getByText('Guildmaster')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Guildmaster, Change title' })).toBeInTheDocument()
     expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
+  })
+
+  it('keeps a resolved downstream row when navigating back to an earlier set', async () => {
+    const user = userEvent.setup()
+    render(<DependentSetupHarness />)
+
+    await user.click(screen.getByRole('radio', { name: 'Dwarf' }))
+    await user.click(screen.getByRole('radio', { name: 'Fighter' }))
+    await user.click(screen.getByRole('button', { name: 'Change species' }))
+
+    expect(screen.getByRole('radiogroup', { name: 'Choose a species' })).toBeInTheDocument()
+    expect(screen.queryByRole('radiogroup', { name: 'Choose a class' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('Dwarf').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Fighter').length).toBeGreaterThan(0)
+    expect(screen.queryByRole('button', { name: 'Change species' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change class' })).toBeInTheDocument()
   })
 
   it('activates the next incomplete set after species invalidates class', async () => {

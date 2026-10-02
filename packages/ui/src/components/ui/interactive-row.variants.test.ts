@@ -1,6 +1,20 @@
 import { describe, expect, it } from 'vitest'
 
-import { interactiveRowVariants } from './interactive-row.variants'
+import {
+  interactiveRowVariants,
+  selectableRowHighlightFillClasses,
+  selectableRowMenuHighlightFillClasses,
+  selectableRowPointerHoverClasses,
+} from './interactive-row.variants'
+
+describe('selectable row recipe constants', () => {
+  it('uses row-hover for pointer, highlight, and menu highlight fills', () => {
+    expect(selectableRowPointerHoverClasses).toBe('hover:bg-row-hover')
+    expect(selectableRowHighlightFillClasses).toBe('bg-row-hover')
+    expect(selectableRowMenuHighlightFillClasses).toContain('data-[highlighted]:bg-row-hover')
+    expect(selectableRowPointerHoverClasses).not.toContain('control-hover')
+  })
+})
 
 describe('interactiveRowVariants', () => {
   it('applies selectable row hover for editor/selection contexts', () => {

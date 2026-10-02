@@ -44,7 +44,7 @@ describe('ButtonDropdown', () => {
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     expect(screen.getByText('Proficiencies & training')).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search Add grant' })).toBeInTheDocument()
-    expect(screen.getByRole('option', { name: /Skill proficiency/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Skill proficiency/i })).toBeInTheDocument()
     expect(screen.getByText(/Already added/i)).toBeInTheDocument()
   })
 
@@ -61,7 +61,7 @@ describe('ButtonDropdown', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    await user.click(screen.getByRole('option', { name: /Movement bonus/i }))
+    await user.click(screen.getByRole('menuitem', { name: /Movement bonus/i }))
     expect(onSelectItem).toHaveBeenCalledWith('movement-bonus')
     expect(screen.queryByRole('searchbox', { name: 'Search Add grant' })).not.toBeInTheDocument()
   })
@@ -75,8 +75,8 @@ describe('ButtonDropdown', () => {
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     await user.type(screen.getByRole('searchbox', { name: 'Search Add grant' }), 'walking')
 
-    expect(screen.getByRole('option', { name: /Movement bonus/i })).toBeInTheDocument()
-    expect(screen.queryByRole('option', { name: /Skill proficiency/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Movement bonus/i })).toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /Skill proficiency/i })).not.toBeInTheDocument()
     expect(screen.queryByText('Proficiencies & training')).not.toBeInTheDocument()
   })
 
@@ -154,7 +154,7 @@ describe('ButtonDropdown', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
     expect(
-      screen.getByRole('listbox', { name: 'Add grant' }).parentElement?.parentElement,
+      screen.getByRole('menu', { name: 'Add grant' }).parentElement?.parentElement,
     ).toHaveClass('min-w-[var(--popover-menu-min-width)]')
   })
 

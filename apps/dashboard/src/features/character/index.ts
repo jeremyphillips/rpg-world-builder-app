@@ -114,10 +114,7 @@ export {
   type QuickNpcCreateFormOrganization,
   type QuickNpcCreateContext,
 } from './npc/lib/quick-npc/quick-npc-create-context'
-export {
-  QuickNpcCreateModal,
-  QUICK_NPC_CREATE_TITLE,
-} from './npc/components/quick-npc/quick-npc-create-modal'
+export { QuickNpcCreateModal } from './npc/components/quick-npc/quick-npc-create-modal'
 export {
   QuickNpcAuthoringForm,
   type QuickNpcAuthoringFormProps,
@@ -130,7 +127,21 @@ export { buildQuickNpcClassRadioCardPresentation } from './npc/lib/quick-npc/qui
 export { resolveQuickNpcClassOptionGroups } from './npc/lib/quick-npc/quick-npc-class-option-groups.lib'
 export { buildQuickNpcSpeciesRadioCardPresentation } from './npc/lib/quick-npc/quick-npc-species-option-groups.lib'
 export {
+  CharacterDetailSheet,
+  type CharacterDetailSheetProps,
+} from './components/detail/character-detail-sheet'
+export {
+  CharacterDetailPreviewModal,
+  type CharacterDetailPreviewModalProps,
+} from './components/detail/character-detail-preview-modal'
+export {
   buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+  projectCharacterDraftDetailSource,
+  projectCharacterBuilderDraftDetailPreview,
+  type CharacterDetailSource,
+  type CharacterDetailProjectionCompleteness,
+  type CharacterDisplayInput,
   buildCharacterCardViewModel,
   buildCharacterEntitySummaryVmFromCatalog,
   buildCharacterEntitySummaryVmFromTransport,

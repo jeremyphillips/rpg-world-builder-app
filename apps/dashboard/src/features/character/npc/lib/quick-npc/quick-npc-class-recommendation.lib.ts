@@ -1,17 +1,15 @@
 import {
-  getNpcAuthoringTemplateClassAffinityIds,
   isClassProgressionApplicable,
   resolveOrganizationMembershipTitleProjection,
-  resolveOrganizationNpcClassRecommendationIds,
-  resolvePlayableBuilderContent,
   type CharacterBuildContext,
+  type NpcTemplateId,
   type OrganizationMembershipTitleDefinition,
 } from '@rpg/contracts'
 
 import { membershipTitleIdFromRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
-import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
+import { resolveQuickNpcTemplateRecommendations } from './quick-npc-template-recommendations.lib'
 
 export function resolveQuickNpcSelectedTitleRecommendation(args: {
   membershipTitle: string | undefined
@@ -38,23 +36,17 @@ export function resolveQuickNpcClassRecommendationIds(args: {
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
   organizationClassAffinityIds?: readonly string[]
+  organizationTemplateId?: NpcTemplateId
 }): string[] {
-  const titleRecommendation = resolveQuickNpcSelectedTitleRecommendation({
-    membershipTitle: isQuickNpcOrganizationMemberSetup(args.values)
-      ? args.values.membershipTitle
-      : undefined,
+  const recommendations = resolveQuickNpcTemplateRecommendations({
+    values: args.values,
+    context: args.context,
     titles: args.titles,
-  })
-  const playableClasses = resolvePlayableBuilderContent(args.context).classes
-
-  return resolveOrganizationNpcClassRecommendationIds({
-    templateClassAffinitySlugs:
-      titleRecommendation === undefined
-        ? undefined
-        : getNpcAuthoringTemplateClassAffinityIds(titleRecommendation.templateId),
     organizationClassAffinityIds: args.organizationClassAffinityIds,
-    playableClasses,
+    organizationTemplateId: args.organizationTemplateId,
   })
+
+  return recommendations.classes.map((entry) => entry.id)
 }
 
 /** Seeds exactly one eligible recommendation; otherwise leaves Class unresolved. */
@@ -69,6 +61,7 @@ export function applyQuickNpcRecommendedClassSeeding(args: {
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
   organizationClassAffinityIds?: readonly string[]
+  organizationTemplateId?: NpcTemplateId
 }): QuickNpcSetupValues {
   if (!isClassProgressionApplicable(args.values.level)) {
     return { ...args.values, classId: '' }

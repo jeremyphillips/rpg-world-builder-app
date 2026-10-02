@@ -142,4 +142,47 @@ describe('resolveAvailableChoices', () => {
       max: 1,
     })
   })
+
+  it('keeps ChoiceSet ids unique across fixture drafts', () => {
+    const elf = {
+      ...builderTestContext.catalog.species[0]!,
+      id: 'srd-cc-5.2.1:elf',
+      slug: 'elf',
+      name: 'Elf',
+      heritage: {
+        id: 'elven-lineage',
+        name: 'Elven Lineage',
+        choose: 1,
+        options: [
+          { kind: 'custom' as const, id: 'high-elf', name: 'High Elf' },
+          { kind: 'custom' as const, id: 'wood-elf', name: 'Wood Elf' },
+        ],
+      },
+    }
+    const context = {
+      ...builderTestContext,
+      catalog: {
+        ...builderTestContext.catalog,
+        species: [elf, ...builderTestContext.catalog.species],
+      },
+    }
+    const heritageId = 'species:srd-cc-5.2.1:elf:heritage'
+    const drafts = [
+      createEmptyCharacterBuilderDraft(),
+      draftWith({
+        species: { speciesId: builderTestContext.catalog.species[0]!.id },
+        class: { classId: fighterClass.id, level: 1 },
+      }),
+      draftWith({
+        species: { speciesId: elf.id, heritageId: 'high-elf' },
+        class: { classId: fighterClass.id, level: 1 },
+        choiceSelections: { [heritageId]: ['high-elf'] },
+      }),
+    ]
+
+    for (const draft of drafts) {
+      const ids = resolveAvailableChoices(draft, context).map((choiceSet) => choiceSet.id)
+      expect(new Set(ids).size).toBe(ids.length)
+    }
+  })
 })

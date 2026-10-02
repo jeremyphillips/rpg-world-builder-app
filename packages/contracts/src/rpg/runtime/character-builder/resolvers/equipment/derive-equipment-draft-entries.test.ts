@@ -10,8 +10,10 @@ import {
   applyEquipmentPurchaseIntent,
   resolveEquipmentAcquisitionBuilderContext,
 } from './apply-equipment-intents'
+import { declineClassPackage, selectClassPackage } from './class-package-choice'
 import {
   deriveEquipmentDraftEntries,
+  inventoryQuantityForEquipmentId,
   startingEquipmentPackageItemKey,
 } from './derive-equipment-draft-entries'
 
@@ -102,12 +104,14 @@ const storedDruid: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'shield',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'shield' },
               quantity: 1,
@@ -164,8 +168,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -199,7 +202,7 @@ describe('deriveEquipmentDraftEntries', () => {
     ])
   })
 
-  it('omits removed package slots by item key', () => {
+  it('keeps every package item when the draft has no quantity overrides', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: storedDruid.id, level: 1 as const },
@@ -209,29 +212,13 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [
-          startingEquipmentPackageItemKey(storedDruid.id, 'standard-equipment', 0),
-        ],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
     const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
 
-    expect(equipment.armor).toEqual([
-      {
-        equipmentId: shield.id,
-        quantity: 1,
-        equipped: true,
-        sources: [
-          {
-            kind: 'classStartingEquipment',
-            sourceId: storedDruid.id,
-            grantId: 'standard-equipment',
-          },
-        ],
-      },
-    ])
+    expect(equipment.armor.map((entry) => entry.equipmentId)).toEqual([leatherArmor.id, shield.id])
   })
 
   it('includes package items when draft mode is stale gold but the selected option is a package', () => {
@@ -244,8 +231,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -267,8 +253,7 @@ describe('deriveEquipmentDraftEntries', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -332,8 +317,7 @@ describe('deriveEquipmentDraftEntries', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
@@ -390,6 +374,7 @@ describe('deriveEquipmentDraftEntries', () => {
               label: 'Sword Kit',
               items: [
                 {
+                  id: 'longsword',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'longsword' },
                   quantity: 1,
@@ -422,8 +407,7 @@ describe('deriveEquipmentDraftEntries', () => {
         mode: 'package' as const,
         purchases: [],
         grants: [{ equipmentId: longsword.id, quantity: 1 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -443,5 +427,110 @@ describe('deriveEquipmentDraftEntries', () => {
         ],
       },
     ])
+  })
+
+  it('adds an additional grant on top of package quantity', () => {
+    const packedClass: ClassStored = {
+      ...storedDruid,
+      id: `${RULESET}:packed-druid`,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  id: 'leather-armor',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+                  quantity: 8,
+                  equipped: true,
+                },
+              ],
+              wealth: { gp: 0 },
+            },
+          ],
+        },
+      },
+    }
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [packedClass],
+      spells: [],
+      equipment: [leatherArmor],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    function owned(grantQuantity: number) {
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: packedClass.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(packedClass.id)]: ['standard-equipment'],
+        },
+        equipment: {
+          mode: 'package' as const,
+          purchases: [],
+          grants: [
+            {
+              equipmentId: leatherArmor.id,
+              quantity: grantQuantity,
+              contribution: 'additional' as const,
+            },
+          ],
+          editedSincePackageSelection: false,
+        },
+      }
+      return inventoryQuantityForEquipmentId(
+        deriveEquipmentDraftEntries(draft, catalogIndex),
+        leatherArmor.id,
+      )
+    }
+
+    expect(owned(1)).toBe(9)
+    expect(owned(2)).toBe(10)
+  })
+
+  it('omits a package entry at quantity 0 and keeps additional grants when declined', () => {
+    const catalogIndex = makeCatalogIndex()
+    const selected = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+        classPackage: {
+          ...selectClassPackage('standard-equipment', 'explicit'),
+          overrides: { entryQuantities: { shield: 0 } },
+        },
+        grants: [{ equipmentId: rope.id, quantity: 2, contribution: 'additional' as const }],
+      },
+    }
+
+    const reduced = deriveEquipmentDraftEntries(selected, catalogIndex)
+    expect(inventoryQuantityForEquipmentId(reduced, shield.id)).toBe(0)
+    expect(inventoryQuantityForEquipmentId(reduced, leatherArmor.id)).toBe(1)
+    expect(inventoryQuantityForEquipmentId(reduced, rope.id)).toBe(2)
+
+    const declined = deriveEquipmentDraftEntries(
+      {
+        ...selected,
+        equipment: {
+          ...selected.equipment,
+          classPackage: declineClassPackage(),
+        },
+      },
+      catalogIndex,
+    )
+    expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
+    expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
   })
 })

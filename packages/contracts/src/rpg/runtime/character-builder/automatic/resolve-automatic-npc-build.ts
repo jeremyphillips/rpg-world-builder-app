@@ -4,42 +4,46 @@ import { resolveAbilityGenerationMethod } from '../ability/ability-generation'
 import { resolveBuilderStandardArray } from '../ability/resolve-builder-standard-array'
 import { resolveClassAbilityScoreOrder } from '../ability/resolve-class-ability-score-order'
 import { resolveStandardArrayAssignment } from '../../../primitives/standard-array'
-import { buildChoiceSetId, isChoiceSetSatisfied, type ChoiceSet } from '../choice-set'
 import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import type { ChoiceSet } from '../choice-set'
 import type { CharacterClass } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
+import {
+  seedDraftClassPackage,
+  type ClassPackageChoice,
+} from '../resolvers/equipment/class-package-choice'
 import { cloneEquipmentDraftChannel } from '../resolvers/equipment/equipment-draft-base'
 import {
   formatMagicItemGrantIncompleteLabel,
   magicItemGrantIncompleteIssueCode,
 } from '../resolvers/equipment/resolve-equipment-magic-item-grant-step-issues'
 import { resolveMagicItemAcquisitionState } from '../resolvers/equipment/resolve-magic-item-acquisition-state'
+import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
 import {
   readMagicItemSelections,
   resolveMagicItemAllowanceEligibility,
   resolveMagicItemGrantProgress,
   wouldViolateDuplicatePolicy,
 } from '../resolvers/equipment/resolve-magic-item-grant-progress'
-import { startingEquipmentChoiceSetId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
-import { resolveAvailableChoices } from '../resolvers/registry/resolve-choices'
-import { getChoiceSetStepId } from '../steps'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 import type { MagicItemGrantSelection } from '../equipment/magic-item-selection'
 
 import {
-  fillChoiceSetWithConstraintAwareSelection,
-  automaticNpcConstraintFailureIssue,
   applyRequiredWeaponEquipmentGrants,
+  applyStartingEquipmentGrants,
   validateAutomaticNpcConstraintsSatisfied,
 } from './automatic-npc-build-constraint-selection'
+import { resolveAutomaticChoiceSelections } from './resolve-automatic-choice-selections'
 import {
   normalizeAutomaticNpcBuildConstraints,
   type AutomaticNpcBuildConstraints,
 } from './automatic-npc-build-constraints'
+import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
 import {
   validateAutomaticNpcBuildSeed,
+  type AutomaticNpcBuildPreferences,
   type AutomaticNpcBuildSeed,
 } from './automatic-npc-build-seed'
 
@@ -77,32 +81,77 @@ export type AutomaticNpcBuildResult = AutomaticNpcBuildSuccess | AutomaticNpcBui
 export type ResolveAutomaticNpcBuildArgs = {
   seed: AutomaticNpcBuildSeed
   constraints?: AutomaticNpcBuildConstraints
+  /** Soft ordering. Missing preferences fall through to canonical choice order. */
+  preferences?: AutomaticNpcBuildPreferences
+  /**
+   * Complete allowance fills already decided by Starting choices.
+   * Seeded before top-up so preference merging cannot replace or extend them.
+   */
+  allowanceSelections?: Record<string, readonly string[]>
+  /** Caller-owned package decision seeded before automatic choice fill. */
+  classPackage?: ClassPackageChoice
+  /**
+   * Choice set ids with explicit user overrides — automatic fill never tops these up.
+   */
+  pinnedChoiceSetIds?: readonly string[]
+  /** Manual starting equipment applied additively after automatic/package resolution. */
+  startingEquipmentGrants?: readonly { equipmentId: string; quantity: number }[]
   context: CharacterBuildContext
 }
 
-/**
- * Safety guard against resolver bugs only — termination is progress-based
- * (every iteration adds selections, marks equipment skipped once, or fails).
- */
-const AUTOMATIC_BUILD_ITERATION_CEILING = 64
-
 // Level 0 Quick NPC ability assignment uses the level-based standard array resolver.
+function mergeClassAndTemplateAbilityOrder(
+  classPrimary: readonly Ability[],
+  templatePriority: readonly Ability[] | undefined,
+): Ability[] {
+  const seen = new Set<Ability>()
+  const order: Ability[] = []
+  const templateOrder = templatePriority ?? []
+
+  for (const ability of classPrimary) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+  for (const ability of templateOrder) {
+    if (seen.has(ability)) continue
+    seen.add(ability)
+    order.push(ability)
+  }
+  for (const ability of ABILITY_IDS) {
+    if (seen.has(ability)) continue
+    order.push(ability)
+  }
+  return order
+}
+
 function seedAbilityScores(
-  seed: AutomaticNpcBuildSeed,
+  level: AutomaticNpcBuildSeed['level'],
   context: CharacterBuildContext,
   characterClass: CharacterClass | undefined,
+  preferences: AutomaticNpcBuildPreferences | undefined,
 ): CharacterBuilderDraft['abilities']['scores'] {
-  const standardArray = resolveBuilderStandardArray(context, seed.level)
+  const standardArray = resolveBuilderStandardArray(context, level)
+  const templatePriority = preferences?.abilityPriority
 
-  if (seed.level === 0) {
+  if (level === 0) {
+    if (templatePriority && templatePriority.length === ABILITY_IDS.length) {
+      return resolveStandardArrayAssignment({
+        standardArray,
+        abilityScoreOrder: templatePriority,
+      })
+    }
     return deriveDeterministicAbilityAssignment([], standardArray)
   }
 
-  if (characterClass && isClassProgressionApplicable(seed.level)) {
-    const order = resolveClassAbilityScoreOrder({
+  if (characterClass && isClassProgressionApplicable(level)) {
+    const classOrder = resolveClassAbilityScoreOrder({
       abilityScoreOrder: characterClass.characterCreation?.abilityScoreOrder,
       primaryAbilities: characterClass.primaryAbilities,
     })
+    const order = templatePriority
+      ? mergeClassAndTemplateAbilityOrder(characterClass.primaryAbilities, templatePriority)
+      : classOrder
     return resolveStandardArrayAssignment({
       standardArray,
       abilityScoreOrder: order,
@@ -112,9 +161,21 @@ function seedAbilityScores(
   return deriveDeterministicAbilityAssignment(characterClass?.primaryAbilities ?? [], standardArray)
 }
 
-function seedDraft(
-  seed: AutomaticNpcBuildSeed,
+export type AutomaticChoiceDraftSeed = {
+  speciesId: string
+  classId?: string
+  level: AutomaticNpcBuildSeed['level']
+  npcTemplateId?: AutomaticNpcBuildSeed['npcTemplateId']
+  name?: string
+  alignment?: AutomaticNpcBuildSeed['alignment']
+  gender?: AutomaticNpcBuildSeed['gender']
+}
+
+/** Structural draft shared by automatic build and the starting-choice projection. */
+export function seedAutomaticChoiceDraft(
+  seed: AutomaticChoiceDraftSeed,
   context: CharacterBuildContext,
+  preferences?: AutomaticNpcBuildPreferences,
 ): CharacterBuilderDraft {
   const abilityRules = context.characterCreationRules.abilityGeneration
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
@@ -123,7 +184,12 @@ function seedDraft(
   const empty = createEmptyCharacterBuilderDraft()
   return {
     ...empty,
-    identity: { name: seed.name.trim(), alignment: seed.alignment, gender: seed.gender },
+    identity: {
+      ...empty.identity,
+      ...(seed.name !== undefined ? { name: seed.name.trim() } : {}),
+      ...(seed.alignment !== undefined ? { alignment: seed.alignment } : {}),
+      ...(seed.gender !== undefined ? { gender: seed.gender } : {}),
+    },
     species: { speciesId: seed.speciesId },
     class: {
       ...(seed.classId && isClassProgressionApplicable(seed.level)
@@ -131,62 +197,13 @@ function seedDraft(
         : {}),
       level: seed.level,
     },
+    ...(seed.npcTemplateId ? { npcTemplateId: seed.npcTemplateId } : {}),
     abilities: {
       method: resolveAbilityGenerationMethod(abilityRules),
-      scores: seedAbilityScores(seed, context, characterClass),
+      scores: seedAbilityScores(seed.level, context, characterClass, preferences),
     },
     equipment: cloneEquipmentDraftChannel(empty),
   }
-}
-
-function isEquipmentSkipped(draft: CharacterBuilderDraft): boolean {
-  return draft.equipment?.skipped === true
-}
-
-function findUnsatisfiedRequiredChoiceSet(
-  draft: CharacterBuilderDraft,
-  choiceSets: readonly ChoiceSet[],
-): ChoiceSet | undefined {
-  return choiceSets.find(
-    (choiceSet) =>
-      choiceSet.required &&
-      !(isEquipmentSkipped(draft) && getChoiceSetStepId(choiceSet) === 'equipment') &&
-      !isChoiceSetSatisfied(choiceSet, draft.choiceSelections[choiceSet.id] ?? []),
-  )
-}
-
-/**
- * Mirrors the builder's escape hatch: when the class's top-level starting
- * equipment ChoiceSet has no options, the build continues without starting
- * equipment (`equipment.skipped`) instead of failing.
- */
-function isEmptyTopLevelStartingEquipmentChoiceSet(
-  choiceSet: ChoiceSet,
-  draft: CharacterBuilderDraft,
-): boolean {
-  return (
-    choiceSet.options.length === 0 &&
-    draft.class.classId !== undefined &&
-    choiceSet.id === startingEquipmentChoiceSetId(draft.class.classId)
-  )
-}
-
-function heritageChoiceSetIdFor(choiceSet: ChoiceSet): string {
-  return buildChoiceSetId('species', choiceSet.sourceId, 'heritage')
-}
-
-function applyChoiceSetSelection(
-  choiceSet: ChoiceSet,
-  next: CharacterBuilderDraft,
-): CharacterBuilderDraft {
-  const selections = next.choiceSelections[choiceSet.id] ?? []
-
-  // Heritage selections dual-write species.heritageId (mirrors the species step).
-  if (choiceSet.sourceType === 'species' && choiceSet.id === heritageChoiceSetIdFor(choiceSet)) {
-    return { ...next, species: { ...next.species, heritageId: selections[0] } }
-  }
-
-  return next
 }
 
 type MagicItemGrantCompletion =
@@ -302,9 +319,15 @@ function completeMagicItemGrantSelections(
  * contextual patches such as connections — for the single authoritative
  * finalSubmit validation.
  */
+// fallow-ignore-next-line complexity
 export function resolveAutomaticNpcBuild({
   seed,
   constraints,
+  preferences,
+  allowanceSelections,
+  classPackage,
+  pinnedChoiceSetIds,
+  startingEquipmentGrants,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
   const seedIssues = validateAutomaticNpcBuildSeed(seed, context)
@@ -312,71 +335,59 @@ export function resolveAutomaticNpcBuild({
 
   const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
 
-  let draft = seedDraft(seed, context)
+  let draft = seedDraftClassPackage(
+    seedAutomaticChoiceDraft(seed, context, preferences),
+    classPackage,
+  )
+  if (allowanceSelections) {
+    const choiceSelections = { ...draft.choiceSelections }
+    for (const [choiceSetId, selectedIds] of Object.entries(allowanceSelections)) {
+      choiceSelections[choiceSetId] = [...selectedIds]
+    }
+    draft = { ...draft, choiceSelections }
+  }
+
+  const choices = resolveAutomaticChoiceSelections({
+    draft,
+    context,
+    preferences,
+    constraints: normalizedConstraints,
+    ...(pinnedChoiceSetIds?.length ? { pinnedChoiceSetIds: new Set(pinnedChoiceSetIds) } : {}),
+  })
+  if (!choices.ok) return choices
+
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+  const completion = completeMagicItemGrantSelections(choices.draft, context)
+  if (!completion.ok) return completion
 
-  for (let iteration = 0; iteration < AUTOMATIC_BUILD_ITERATION_CEILING; iteration += 1) {
-    const choiceSets = resolveAvailableChoices(draft, context)
-    const target = findUnsatisfiedRequiredChoiceSet(draft, choiceSets)
+  const weaponGrantCompletion = applyRequiredWeaponEquipmentGrants({
+    draft: completion.draft,
+    constraints: normalizedConstraints,
+    context,
+    catalogIndex,
+  })
+  if (!weaponGrantCompletion.ok) return weaponGrantCompletion
 
-    if (!target) {
-      const completion = completeMagicItemGrantSelections(draft, context)
-      if (!completion.ok) return completion
+  const startingGrantCompletion = applyStartingEquipmentGrants({
+    draft: weaponGrantCompletion.draft,
+    grants: startingEquipmentGrants ?? [],
+    context,
+    catalogIndex,
+  })
+  if (!startingGrantCompletion.ok) return startingGrantCompletion
 
-      const grantCompletion = applyRequiredWeaponEquipmentGrants({
-        draft: completion.draft,
-        constraints: normalizedConstraints,
-        context,
-        catalogIndex,
-      })
-      if (!grantCompletion.ok) return grantCompletion
-
-      const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
-        grantCompletion.draft,
-        normalizedConstraints,
-        catalogIndex,
-      )
-      if (constraintIssue) {
-        return { ok: false, issues: [constraintIssue] }
-      }
-
-      return {
-        ok: true,
-        draft: grantCompletion.draft,
-        resolvedChoiceSets: resolveAvailableChoices(grantCompletion.draft, context),
-      }
-    }
-
-    if (isEmptyTopLevelStartingEquipmentChoiceSet(target, draft)) {
-      draft = { ...draft, equipment: cloneEquipmentDraftChannel(draft, { skipped: true }) }
-      continue
-    }
-
-    const characterClass =
-      target.sourceType === 'class' ? catalogIndex.classes.get(target.sourceId) : undefined
-    const next = fillChoiceSetWithConstraintAwareSelection({
-      draft,
-      choiceSet: target,
-      constraints: normalizedConstraints,
-      characterClass,
-      catalogIndex,
-    })
-    if (next === null) {
-      return {
-        ok: false,
-        issues: [automaticNpcConstraintFailureIssue(normalizedConstraints, target, catalogIndex)],
-      }
-    }
-    draft = applyChoiceSetSelection(target, next)
+  const constraintIssue = validateAutomaticNpcConstraintsSatisfied(
+    startingGrantCompletion.draft,
+    normalizedConstraints,
+    catalogIndex,
+  )
+  if (constraintIssue) {
+    return { ok: false, issues: [constraintIssue] }
   }
 
   return {
-    ok: false,
-    issues: [
-      validationIssue(
-        'automatic_resolution_stalled',
-        characterBuilderValidationMessages.automaticResolutionStalled(),
-      ),
-    ],
+    ok: true,
+    draft: startingGrantCompletion.draft,
+    resolvedChoiceSets: resolveAvailableChoices(startingGrantCompletion.draft, context),
   }
 }

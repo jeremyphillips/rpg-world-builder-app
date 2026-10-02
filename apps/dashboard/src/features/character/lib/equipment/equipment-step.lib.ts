@@ -338,6 +338,34 @@ export function hasSelectableStartingEquipmentOption(
   return summaries.some((summary) => summary.isSelectable)
 }
 
+/** Package starting options only — excludes wealth-only (starting gold) packages. */
+export function filterPackageStartingEquipmentSummaries(
+  characterClass: CharacterClass,
+  summaries: readonly StartingEquipmentOptionSummary[],
+): StartingEquipmentOptionSummary[] {
+  const packageOptionIds = new Set(
+    (characterClass.characterCreation?.startingEquipment?.options ?? [])
+      .filter((option) => !isStartingGoldOption(option))
+      .map((option) => option.id),
+  )
+  return summaries.filter((summary) => packageOptionIds.has(summary.optionId))
+}
+
+export function countStartingEquipmentRadioOptions(args: {
+  characterClass: CharacterClass
+  summaries: readonly StartingEquipmentOptionSummary[]
+  includeGoldOption?: boolean
+}): number {
+  const packageCount = filterPackageStartingEquipmentSummaries(
+    args.characterClass,
+    args.summaries,
+  ).length
+  if (args.includeGoldOption === false) return packageCount
+  return (
+    packageCount + (hasGoldStartingEquipmentOption(args.summaries, args.characterClass) ? 1 : 0)
+  )
+}
+
 export function shouldShowEquipmentFallback(
   summaries: readonly StartingEquipmentOptionSummary[],
 ): boolean {
@@ -855,7 +883,6 @@ function listPackageInventoryRows(args: {
   budget?: EquipmentBudgetSummary
 }): EquipmentInventoryRow[] {
   const { draft, catalogIndex, characterClass, option, classId, selectedOptionId, budget } = args
-  const removedKeys = new Set(draft.equipment?.removedPackageItemKeys ?? [])
   const packageSources: CharacterSelectionSource[] = [
     { kind: 'classStartingEquipment', sourceId: classId, grantId: selectedOptionId },
   ]
@@ -863,7 +890,6 @@ function listPackageInventoryRows(args: {
 
   return resolved.items.flatMap((item, itemIndex) => {
     const packageItemKey = startingEquipmentPackageItemKey(classId, selectedOptionId, itemIndex)
-    if (removedKeys.has(packageItemKey)) return []
 
     const entry = packageEntryFromResolvedItem(item, packageSources)
     if (!entry) return []

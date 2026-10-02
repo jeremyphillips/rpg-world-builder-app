@@ -110,8 +110,7 @@ describe('characterBuilderDraftSchema', () => {
     expect(parsed.equipment).toEqual({
       mode: 'package',
       purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     })
   })
 
@@ -129,8 +128,7 @@ describe('characterBuilderDraftSchema', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const persisted = createPersistedCharacterBuilderState(draft, standaloneScope)

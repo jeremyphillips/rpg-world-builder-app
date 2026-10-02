@@ -76,7 +76,12 @@ const storedDruid: ClassStored = {
           id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
-            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+            {
+              id: 'rope',
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'rope' },
+              quantity: 1,
+            },
           ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
@@ -121,8 +126,7 @@ function goldDraftWithRope(quantity: number) {
           origin: 'picker' as const,
         },
       ],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }
@@ -152,8 +156,7 @@ describe('applyEquipmentStepAction', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -203,8 +206,7 @@ describe('applyEquipmentStepAction', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -268,7 +270,7 @@ describe('applyEquipmentStepAction', () => {
   it('applies resolve_package_switch when draft quantities fit the target allowance', () => {
     const catalogIndex = packageSwitchCatalogIndex()
     const draft = goldDraftWithRope(62)
-    draft.equipment!.customized = true
+    draft.equipment!.editedSincePackageSelection = true
     const choiceSetId = startingEquipmentChoiceSetId(storedDruid.id)
     const targetFunding = resolveStartingEquipmentFundingOptions({
       draft,

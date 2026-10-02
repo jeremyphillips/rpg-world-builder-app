@@ -61,6 +61,10 @@ export const characterBuilderValidationMessages = {
     ({ label, min }) =>
       min === 1 ? `Choose an option for ${label}.` : `Choose at least ${min} options for ${label}.`,
   ),
+  startingChoiceIncomplete: defineMessage(
+    'validation.characterBuilder.startingChoiceIncomplete',
+    () => 'Choose the required number of starting choices before creating this NPC.',
+  ),
   choiceSetTooMany: defineMessage<{ label: string; max: number }>(
     'validation.characterBuilder.choiceSetTooMany',
     ({ label, max }) =>

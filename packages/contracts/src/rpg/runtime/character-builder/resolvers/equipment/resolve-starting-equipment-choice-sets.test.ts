@@ -85,6 +85,7 @@ describe('resolveStartingEquipmentChoiceSets', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'simple-choice',
                   kind: 'choice',
                   choose: 1,
                   pool: { source: 'filtered', equipmentKind: 'weapon', weaponCategory: 'simple' },
@@ -97,6 +98,7 @@ describe('resolveStartingEquipmentChoiceSets', () => {
               available: false,
               items: [
                 {
+                  id: 'simple-choice',
                   kind: 'choice',
                   choose: 1,
                   pool: { source: 'filtered', equipmentKind: 'weapon', weaponCategory: 'simple' },

@@ -6,7 +6,7 @@ import { wealthToCopper } from '../../../../primitives/wealth'
 import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
-import { deriveEquipmentBudgetSummary } from './equipment-budget'
+import { deriveEquipmentBudgetSummary, fitsStartingEquipmentBudget } from './equipment-budget'
 import { NEUTRAL_EQUIPMENT_RECOMMENDATION } from '../../../../content/equipment-recommendation'
 import { resolveEquipmentPickerItems } from './resolve-equipment-picker-items'
 
@@ -113,7 +113,7 @@ describe('resolveEquipmentPickerItems', () => {
       recommendations,
     })
 
-    expect(item!.state.isAffordable).toBe(true)
+    expect(item!.state.purchaseAvailability.status).toBe('available')
     expect(item!.state.isWithinRemainingBudget).toBe(true)
   })
 
@@ -129,7 +129,7 @@ describe('resolveEquipmentPickerItems', () => {
       },
     })
 
-    expect(item!.state.isAffordable).toBe(true)
+    expect(item!.state.purchaseAvailability.status).toBe('available')
     expect(item!.state.isWithinRemainingBudget).toBe(true)
   })
 
@@ -145,7 +145,14 @@ describe('resolveEquipmentPickerItems', () => {
       },
     })
 
-    expect(item!.state.isAffordable).toBe(true)
+    expect(
+      fitsStartingEquipmentBudget(chainMail, {
+        starting: { cp: 0, sp: 0, gp: 100, pp: 0 },
+        spent: { cp: 0, sp: 0, gp: 60, pp: 0 },
+        remaining: { cp: 0, sp: 0, gp: 40, pp: 0 },
+      }),
+    ).toBe(true)
+    expect(item!.state.purchaseAvailability.status).toBe('unaffordable')
     expect(item!.state.isWithinRemainingBudget).toBe(false)
   })
 
@@ -161,7 +168,7 @@ describe('resolveEquipmentPickerItems', () => {
       },
     })
 
-    expect(item!.state.isAffordable).toBe(false)
+    expect(item!.state.purchaseAvailability.status).toBe('unaffordable')
     expect(item!.state.isWithinRemainingBudget).toBe(false)
   })
 
@@ -195,7 +202,7 @@ describe('resolveEquipmentPickerItems', () => {
     })
 
     expect(item!.state.purchaseAvailability).toEqual({
-      status: 'unavailable',
+      status: 'unavailableForPurchase',
       reason: 'no_market_price',
     })
     expect(item!.state.isWithinRemainingBudget).toBe(false)
@@ -228,8 +235,7 @@ describe('resolveEquipmentPickerItems', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 

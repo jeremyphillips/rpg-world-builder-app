@@ -21,7 +21,7 @@ describe('organization membership title snapshot', () => {
       label: 'Treasurer',
       description: expect.any(String),
       priority: 50,
-      npcRecommendation: { templateId: 'administrator', level: 3 },
+      npcRecommendation: { templateId: 'commoner', level: 3 },
     })
     expect(snapshot.map((title) => title.id)).toEqual([
       'omt_uuid-1',
@@ -201,10 +201,10 @@ describe('organization membership title npcRecommendation', () => {
   it('validates templateId and level without coupling to title priority', () => {
     expect(
       organizationPresetNpcRecommendationSchema.parse({
-        templateId: 'martial_specialist',
+        templateId: 'guard',
         level: 5,
       }),
-    ).toEqual({ templateId: 'martial_specialist', level: 5 })
+    ).toEqual({ templateId: 'guard', level: 5 })
     expect(
       organizationPresetNpcRecommendationSchema.safeParse({
         templateId: 'veteran',
@@ -226,11 +226,11 @@ describe('organization membership title npcRecommendation', () => {
         sourceTitleId: 'proprietor',
         label: 'Proprietor',
         priority: 50,
-        npcRecommendation: { templateId: 'civic_leader', level: 0 },
+        npcRecommendation: { templateId: 'commoner', level: 0 },
       },
     ])
     expect(withLevelZero[0]?.npcRecommendation).toEqual({
-      templateId: 'civic_leader',
+      templateId: 'commoner',
       level: 0,
     })
 
@@ -248,8 +248,9 @@ describe('organization membership title npcRecommendation', () => {
     const snapshot = snapshotOrganizationMembershipTitlesFromPreset('thieves_guild', () => 'a')
     const enforcer = snapshot.find((title) => title.sourceTitleId === 'enforcer')
     expect(enforcer?.npcRecommendation).toEqual({
-      templateId: 'martial_specialist',
+      templateId: 'guard',
       level: 5,
+      classPreferenceOverrideSlugs: ['fighter', 'barbarian'],
     })
     expect(enforcer?.npcRecommendation?.level).not.toBe(enforcer?.priority)
   })
@@ -273,11 +274,11 @@ describe('organization membership title npcRecommendation', () => {
         sourceTitleId: 'enforcer',
         label: 'Enforcer',
         priority: 30,
-        npcRecommendation: { templateId: 'martial_specialist', level: 5 },
+        npcRecommendation: { templateId: 'guard', level: 5 },
       },
     ])
     expect(stored[0]?.npcRecommendation).toEqual({
-      templateId: 'martial_specialist',
+      templateId: 'guard',
       level: 5,
     })
     expect(stored[0]).not.toHaveProperty('label', 'Martial specialist')

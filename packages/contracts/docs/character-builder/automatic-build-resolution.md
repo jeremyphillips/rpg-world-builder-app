@@ -9,14 +9,18 @@ path as a manually built character.
 
 ## Modules
 
-| Export                               | Module                                         | Purpose                                                                     |
-| ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------------------- |
-| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`        | Zod schema for the compact seed (name, species, class, level, alignment)    |
-| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`        | Seed content validation against the build context (UI-independent)          |
-| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts` | Optional hard requirements (`requiredWeaponIds`, `requiredSpellIds` arrays) |
-| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts` | Advisory weapon options from starting-equipment packages                    |
-| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`    | Advisory spell ChoiceSet options at seed class/level                        |
-| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`     | Seed + optional constraints + context → completed draft or failure          |
+| Export                               | Module                                             | Purpose                                                                      |
+| ------------------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `automaticNpcBuildSeedSchema`        | `automatic/automatic-npc-build-seed.ts`            | Zod schema for the compact seed (name, species, class, level, alignment)     |
+| `validateAutomaticNpcBuildSeed`      | `automatic/automatic-npc-build-seed.ts`            | Seed content validation against the build context (UI-independent)           |
+| `automaticNpcBuildConstraintsSchema` | `automatic/automatic-npc-build-constraints.ts`     | Optional hard requirements (`requiredSpellIds`; legacy weapon ids when used) |
+| `startingEquipmentGrants`            | `automatic/resolve-automatic-npc-build.ts`         | Quantity-based manual equipment applied after package resolution             |
+| `pinnedChoiceSetIds`                 | `automatic/resolve-automatic-npc-build.ts`         | Explicit starting-choice overrides that must not be topped up                |
+| `resolveNpcStartingChoiceIssues`     | `npc/resolve-npc-starting-choices.ts`              | Incomplete pinned allowances / package picks → validation issues             |
+| `listReachableStartingWeapons`       | `automatic/list-reachable-starting-weapons.ts`     | Advisory weapon options from starting-equipment packages                     |
+| `listReachableSpellOptions`          | `automatic/list-reachable-spell-options.ts`        | Advisory spell ChoiceSet options at seed class/level                         |
+| `resolveAutomaticChoiceSelections`   | `automatic/resolve-automatic-choice-selections.ts` | Required ChoiceSet fill loop, with per-value `suggestedBy`                   |
+| `resolveAutomaticNpcBuild`           | `automatic/resolve-automatic-npc-build.ts`         | Seed, choice loop, magic items, weapon grants, constraint checks             |
 
 The resolver is pure: it operates only over the supplied
 `CharacterBuildContext` (no HTTP, no persistence). Callers assemble the
@@ -70,15 +74,79 @@ passed to finalize as engine options.
    returns `ok: false` with the existing `choice_set_unsatisfied` issue for
    the stuck ChoiceSet. No partial character is ever produced.
 
-## Constraints (Quick NPC requirements)
+## Soft preferences
+
+`resolveNpcTemplateRecommendations` turns a user role, title recommendation, organization
+default, and species language affinities into ordered `SourcedRecommendation` lists.
+Species language order lives there, not in a second pass inside the filler.
+Commoner is the resolver-only fallback and is not written onto the draft.
+`toAutomaticNpcBuildPreferences` passes those lists through to `resolveAutomaticNpcBuild`.
+
+The required-ChoiceSet loop is `resolveAutomaticChoiceSelections`. It returns the draft,
+the resolved graph, and `suggestedBy` for each id the fill added (`[]` when the id came
+from canonical order). Each value is a `RecommendationSourceRef` list. Package bias keeps
+every source that owns the winning tuple. Seeded allowance ids are not attributed. `resolveAutomaticNpcBuild`
+runs that loop, then magic-item grants, required-weapon grants, and constraint checks.
+
+Fill order for each required ChoiceSet is:
+
+1. Legal candidates from the current character. A class starting-equipment package and its
+   nested pools come only from the selected class. Selections outside that set do not count
+   toward `min` and are removed.
+2. Hard constraints, then class spell recommendations.
+3. Soft preferences. User, title, and role equipment preferences are global: they stay active
+   when the selected class is not the role's suggested class, and they only reorder options
+   that are already legal. A preference that matches nothing is ignored and does not fail the
+   build.
+4. The canonical first-eligible option.
+
+Class-authored equipment signals use `{ kind: 'class', classId }` and apply only for that
+class. `suggestedBy` is recorded only for a winner that is already a legal option of the
+selected class. Changing class drops the previous class's package, nested pools, and
+class-owned equipment channel, then the next fill resolves the new class from scratch.
+Manual purchases stay.
+
+Class spell recommendations are recorded as `suggestedBy` refs `{ kind: 'class', id }`.
+Already-held skills, tools, and
+languages are skipped and do not count toward the required pick. Held ids come from finalize-equivalent
+proficiency assembly (`resolveHeldProficiencyKeys`), excluding the ChoiceSet being filled,
+so class-fixed items, ruleset languages, and earlier ChoiceSet selections are all visible
+to later fills.
+A preference that does not appear in the ChoiceSet is ignored. Soft preferences never fail
+a build.
+
+Classed automatic builds keep class primary abilities in the top standard-array slots and
+use the role ability order for the rest. A complete level-0 role ability order assigns the
+standard array directly.
+
+Role detail → [npc-templates.md](npc-templates.md).
+
+## Manual equipment grants (Quick NPC)
+
+`startingEquipmentGrants` is an optional array of `{ equipmentId, quantity }` inputs to
+`resolveAutomaticNpcBuild`. Duplicate ids are merged by summing quantities. Each grant is applied
+with additive contribution semantics after automatic and package equipment; invalid ids fail the
+build with a validation issue — grants are never silently dropped.
+
+`pinnedChoiceSetIds` lists explicit starting-choice override keys. The automatic filler skips
+topping up those choice sets. Dashboard Quick NPC passes pinned ids from
+`npcStartingChoicePinnedChoiceSetIds`.
+
+`resolveNpcStartingChoiceIssues(choices)` returns `starting_choice_incomplete` when a pinned
+allowance or nested package pick is below its minimum. Create and Preview both consume these
+issues through the shared prepared-draft path.
+
+## Constraints (Quick NPC spell requirements)
 
 Hard constraints are optional inputs to `resolveAutomaticNpcBuild`:
 
 ```ts
 resolveAutomaticNpcBuild({
   seed,
-  constraints?: { requiredWeaponIds: string[]; requiredSpellIds: string[] },
+  constraints?: { requiredSpellIds: string[] },
   context,
+  startingEquipmentGrants?: { equipmentId: string; quantity: number }[],
+  pinnedChoiceSetIds?: string[],
 })
 ```
 

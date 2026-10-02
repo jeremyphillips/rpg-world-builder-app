@@ -26,12 +26,11 @@ describe('equipment recommendation tiers', () => {
     expect(isRecommendedEquipmentTier('strong')).toBe(true)
     expect(isRecommendedEquipmentTier('compatible')).toBe(false)
     expect(isRecommendedEquipmentTier('neutral')).toBe(false)
-    expect(isRecommendedEquipmentTier('notRecommended')).toBe(false)
   })
 
-  it('orders tiers essential-first and notRecommended-last', () => {
+  it('orders tiers essential-first and neutral-last', () => {
     expect(compareEquipmentRecommendationTiers('essential', 'strong')).toBeLessThan(0)
-    expect(compareEquipmentRecommendationTiers('notRecommended', 'neutral')).toBeGreaterThan(0)
+    expect(compareEquipmentRecommendationTiers('neutral', 'compatible')).toBeGreaterThan(0)
     expect(compareEquipmentRecommendationTiers('compatible', 'compatible')).toBe(0)
   })
 })
@@ -56,7 +55,7 @@ describe('equipment recommendation reason ranks', () => {
 
   it('returns positive infinity when reasons are empty', () => {
     expect(getBestEquipmentRecommendationReasonRank(['classRequired'])).toBe(0)
-    expect(getBestEquipmentRecommendationReasonRank(['proficient', 'classToolNeed'])).toBe(
+    expect(getBestEquipmentRecommendationReasonRank(['classSuggested', 'classToolNeed'])).toBe(
       EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed,
     )
     expect(getBestEquipmentRecommendationReasonRank([])).toBe(Number.POSITIVE_INFINITY)
@@ -81,13 +80,11 @@ describe('equipment recommendation specificity ranks', () => {
         {
           reason: 'unresolvedToolProficiencyChoice',
           tier: 'strong',
-          sourceKey: 'pool',
           specificity: 'broad_pool',
         },
         {
           reason: 'availableInStartingOption',
           tier: 'strong',
-          sourceKey: 'grant',
           specificity: 'exact',
         },
       ]),

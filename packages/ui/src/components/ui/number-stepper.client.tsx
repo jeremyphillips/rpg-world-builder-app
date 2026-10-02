@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { Minus, Plus } from 'lucide-react'
 
+import { useFieldControlSize } from '../../form/context/form-section.context'
 import { cn } from '../../lib/utils'
 import { buildStepOptions, normalizeInputValue, stepNumber } from './number-input.lib'
 import { useNumberInput } from './number-input.use.client'
@@ -49,7 +50,8 @@ export function NumberStepper({
   autoFocus,
   onBlur,
 }: NumberStepperProps) {
-  const resolvedSize = resolveNumberStepperSize(size)
+  const fieldSize = useFieldControlSize()
+  const resolvedSize = resolveNumberStepperSize(size, fieldSize)
   const stepOptions = React.useMemo(
     () => buildStepOptions(step, min, max, min, max, false),
     [max, min, step],

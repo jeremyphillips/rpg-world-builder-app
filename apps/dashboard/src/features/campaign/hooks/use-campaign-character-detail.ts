@@ -5,7 +5,11 @@ import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progress
 import { useBuildContext } from '@/features/character'
 import { useCharacterOrganizationReferences } from '@/features/character'
 import { useCharacterLocationReferences } from '@/features/character'
-import { buildCharacterDetailViewModel, type CharacterDetailViewModel } from '@/features/character'
+import {
+  buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+  type CharacterDetailViewModel,
+} from '@/features/character'
 import {
   combineQueryError,
   combineQueryPending,
@@ -39,7 +43,7 @@ export function useCampaignCharacterDetail(
     if (!character || !catalogIndex || !context) return null
 
     return buildCharacterDetailViewModel({
-      character,
+      source: toCharacterDetailSource(character),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: resolveCampaignXpProgressionForRules(

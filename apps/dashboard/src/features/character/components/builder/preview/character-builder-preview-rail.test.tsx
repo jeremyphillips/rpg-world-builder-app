@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import {
   buildCharacterPreview,
@@ -17,6 +18,7 @@ import { PREVIEW_UNNAMED_CHARACTER } from '../../../lib/builder-preview/preview-
 import { CharacterBuilderPreviewRail } from './character-builder-preview-rail'
 import { CharacterBuilderPreviewRailView } from './character-builder-preview-rail-view'
 import { projectBuilderPreviewRail } from '../../../lib/builder-preview/builder-preview-projection.lib'
+import { BUILDER_PREVIEW_CHARACTER_SHEET_LABEL } from '../../../lib/builder-preview/builder-preview-rail-copy'
 
 describe('CharacterBuilderPreviewRail', () => {
   const context = createStandaloneBuilderContextFixture()
@@ -99,5 +101,19 @@ describe('CharacterBuilderPreviewRail', () => {
     expect(screen.queryByRole('heading', { name: 'Character preview' })).not.toBeInTheDocument()
     expect(screen.getByText(PREVIEW_UNNAMED_CHARACTER)).toBeInTheDocument()
     expect(screen.getByText('Builder incomplete')).toBeInTheDocument()
+  })
+
+  it('opens the character sheet preview from the rail footer action', async () => {
+    const user = userEvent.setup()
+
+    render(<CharacterBuilderPreviewRail {...railProps} />)
+
+    await user.click(screen.getByRole('button', { name: BUILDER_PREVIEW_CHARACTER_SHEET_LABEL }))
+    expect(
+      screen.getByRole('dialog', { name: BUILDER_PREVIEW_CHARACTER_SHEET_LABEL }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: PREVIEW_UNNAMED_CHARACTER, level: 1 }),
+    ).toBeInTheDocument()
   })
 })

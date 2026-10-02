@@ -39,7 +39,13 @@ const summary = {
 
 describe('StartingEquipmentOptionSummaryCard', () => {
   it('renders the selected package summary and change action', () => {
-    render(<StartingEquipmentOptionSummaryCard summary={summary} onChangePackage={vi.fn()} />)
+    render(
+      <StartingEquipmentOptionSummaryCard
+        summary={summary}
+        density="default"
+        onChangePackage={vi.fn()}
+      />,
+    )
 
     expect(screen.getByText(EQUIPMENT_SELECTED_PACKAGE_EYEBROW)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Starting Gold' })).toBeInTheDocument()
@@ -52,7 +58,11 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     const onChangePackage = vi.fn()
 
     render(
-      <StartingEquipmentOptionSummaryCard summary={summary} onChangePackage={onChangePackage} />,
+      <StartingEquipmentOptionSummaryCard
+        summary={summary}
+        density="default"
+        onChangePackage={onChangePackage}
+      />,
     )
 
     await user.click(screen.getByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }))
@@ -60,9 +70,50 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     expect(onChangePackage).toHaveBeenCalledTimes(1)
   })
 
+  it('replaces the change action and description when the caller supplies them', () => {
+    render(
+      <StartingEquipmentOptionSummaryCard
+        summary={summary}
+        density="compact"
+        onChangePackage={vi.fn()}
+        description="Chain Mail and 4 GP."
+        headerEndSlot={<button type="button">Package actions</button>}
+        titleAdornment={<span>Customized</span>}
+        embedded={<p>Customize Starting Gold</p>}
+      />,
+    )
+
+    expect(screen.getByText('Chain Mail and 4 GP.')).toBeInTheDocument()
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+    expect(screen.getByText('Customize Starting Gold')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Package actions' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('omits the change action when showChangePackage is false', () => {
+    render(
+      <StartingEquipmentOptionSummaryCard
+        summary={summary}
+        density="default"
+        onChangePackage={vi.fn()}
+        showChangePackage={false}
+      />,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: EQUIPMENT_CHANGE_PACKAGE_LABEL }),
+    ).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
-      <StartingEquipmentOptionSummaryCard summary={summary} onChangePackage={vi.fn()} />,
+      <StartingEquipmentOptionSummaryCard
+        summary={summary}
+        density="default"
+        onChangePackage={vi.fn()}
+      />,
     )
 
     await expectNoAxeViolations(container)

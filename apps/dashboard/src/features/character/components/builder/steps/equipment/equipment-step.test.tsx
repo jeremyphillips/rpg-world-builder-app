@@ -171,8 +171,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const { onDraftChange } = renderEquipmentStep(draft)
@@ -204,8 +203,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -234,8 +232,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -261,8 +258,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -289,8 +285,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -319,8 +314,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -348,8 +342,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const { onDraftChange } = renderEquipmentStep(draft)
@@ -389,8 +382,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const { onDraftChange } = renderEquipmentStep(draft)
@@ -447,8 +439,7 @@ describe('EquipmentStep', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const { onDraftChange } = renderEquipmentStep(draft)
@@ -486,8 +477,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -520,8 +510,7 @@ describe('EquipmentStep', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -553,8 +542,7 @@ describe('EquipmentStep', () => {
               origin: 'picker' as const,
             },
           ],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
         },
       }
     }
@@ -609,8 +597,7 @@ describe('EquipmentStep', () => {
               origin: 'picker' as const,
             },
           ],
-          removedPackageItemKeys: [],
-          customized: false,
+          editedSincePackageSelection: false,
         },
       }
       const { onDraftChange } = renderEquipmentStep(draft)
@@ -675,8 +662,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -717,8 +703,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const { onDraftChange } = renderMonkEquipmentStep(draft)
@@ -744,8 +729,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -808,8 +792,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -842,8 +825,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -880,8 +862,7 @@ describe('EquipmentStep monk proficiency-linked grants', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

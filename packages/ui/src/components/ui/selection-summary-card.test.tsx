@@ -10,7 +10,7 @@ describe('SelectionSummaryCard', () => {
     const user = userEvent.setup()
     const onChangeTitle = vi.fn()
 
-    render(
+    const { container } = render(
       <SelectionSummaryCard
         eyebrow="Selections"
         rows={[
@@ -34,8 +34,13 @@ describe('SelectionSummaryCard', () => {
     )
 
     expect(screen.getByText('Selections')).toBeInTheDocument()
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.queryByText('Title:')).not.toBeInTheDocument()
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByText('Gnome')).toBeInTheDocument()
+
+    const list = container.querySelector('dl')
+    expect(list).toHaveClass('grid')
 
     await user.click(screen.getByRole('button', { name: 'Change title' }))
     expect(onChangeTitle).toHaveBeenCalledOnce()

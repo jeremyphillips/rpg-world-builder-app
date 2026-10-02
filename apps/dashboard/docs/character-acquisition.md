@@ -65,11 +65,11 @@ README). Default `/characters/*` never carries campaign id in the URL.
 
 Campaign managers use **Create NPC** (`ContentCreateSplitAction`) beside **Import NPC**:
 
-| Mode                | Behavior                                                                                                                                                                                                                            |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Create from scratch | Navigate to `/campaigns/:id/npcs/new` (empty builder).                                                                                                                                                                              |
-| Start with setup…   | `QuickNpcCreateModal` with `context: { kind: 'standalone' }` and `setupCompletion: 'handoff'` — Species → Build, then navigate to the builder with `location.state.builderSeed` from `buildCharacterBuilderDraftFromQuickNpcSetup`. |
-| Quick create…       | Same modal in default **authoring** mode — setup then Details/Requirements tabs; submit posts `POST /npcs` and stays on the overview.                                                                                               |
+| Mode                | Behavior                                                                                                                                                                                                                                                                          |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create from scratch | Navigate to `/campaigns/:id/npcs/new` (empty builder).                                                                                                                                                                                                                            |
+| Start with setup…   | `QuickNpcCreateModal` with `context: { kind: 'standalone' }` and `setupCompletion: 'handoff'` — Role → Species → Build, then navigate to the builder with `location.state.builderSeed` from `buildCharacterBuilderDraftFromQuickNpcSetup` (includes `npcTemplateId` when chosen). |
+| Quick create…       | Same modal in default **authoring** mode — Role → Species → Build, then Details/Requirements tabs; submit posts `POST /npcs` with template preferences from `resolveNpcTemplateRecommendations` and stays on the overview.                                                        |
 
 `CharacterBuilderShell` applies the seed once after session-storage hydration via `replaceDraft`, then
 the create route clears router state with a replace navigation so hydration does not race the seed.
@@ -101,15 +101,16 @@ open with preserved search). Success → `null` (all overlays close). Pending su
   to authoring. Reopening Title or Species or changing Level/Class changes the revision, invalidating
   any prior confirmation until the user confirms again. Same-value reselect dismisses without clearing Build.
   When the selected title carries a snapshotted `npcRecommendation`, the card shows **Recommended
-  build** identity (template label + description) plus in-row Class and Level editors. Without a
+  build** identity (role label + description) plus in-row Class and Level editors. Without a
   title recommendation, the card shows **Build** with Class and Level only
   — default campaign level is not labeled as a recommendation.
 - **Level** — reseeded from the title recommendation (clamped to campaign constraints) on Title
   change; user-owned across Species changes. Level 0 clears class and omits the Class row.
-- **Class** — ranked from merged template + organization class affinities inside the build card;
-  when exactly one eligible recommendation exists after Species is complete, `classId` is
+- **Class** — ranked from the title class override when present, otherwise the role's class
+  preferences, merged with organization class affinities. A title override replaces the role
+  list. When exactly one eligible recommendation exists after Species is complete, `classId` is
   auto-seeded and collapses like a manual selection. Cardinality and eligibility logic live in
-  `applyQuickNpcSetupValueChange`, not in the card.
+  `applyQuickNpcSetupValueChange`, not in the card. Class recommendations are empty at level 0.
 
 Setup mutations flow through `applyQuickNpcSetupValueChange` inside functional `setState` (location
 create convention). Title change preserves Species but reseeds Build, Level, and Class. Setup events
@@ -118,16 +119,22 @@ contract from `@/lib/create-setup`. Setup footer states derive from `CreateSetup
 while choices auto-complete, disabled/enabled Continue while Build resolves, re-entry Continue when
 returning from authoring without material changes.
 
-**Create path:** `buildQuickNpcCreateInput()` runs `resolveAutomaticNpcBuild()` (optional
-`requiredWeaponIds` / `requiredSpellIds` hard constraints), injects `relationshipEdges`, then
-`finalizeNpcCharacterBuild()` — one `POST /api/campaigns/:id/npcs` with membership included. No
-template id is persisted on the created NPC.
+**Create path:** `prepareQuickNpcCreate()` calls `resolveQuickNpcPreparedDraft()` (shared with
+Preview), then `finalizeNpcCharacterBuild()` when the prepared draft is valid — one
+`POST /api/campaigns/:id/npcs` with membership included. Manual equipment is quantity-based via
+`startingEquipmentGrants` inside `resolveAutomaticNpcBuild()`; spell requirements use
+`requiredSpellIds` constraints only. The builder draft stores `npcTemplateId` when a title or user
+selects a role. The Commoner fallback never writes that field. The created NPC record does not
+persist a role id.
 
-**Requirements tab:** multi-add combobox pickers compose canonical equipment/spell compact row VMs
-and equipment `not_proficient` callouts only (`visibleStatuses: ['not_proficient']` on the shared
-callout stack). Discovery lists individually reachable options; resolver authority decides joint
-satisfiability. Setup changes atomically intersect stale requirement ids with the reachable set.
-Name generation is independent of mechanical build determinism.
+**Starting choices tab:** categories (skills, tools, languages, equipment, spells) collapse into
+summary rows. Untouched allowances keep automatic fills; editing a category pins that choice set
+(an override key exists) and automatic resolution never tops it up. A partial explicit pick stays
+partial, blocks Create, and survives reopening setup — Preview shows the same structured issue.
+Classless role default equipment is editable starting state; classed builds add manual equipment
+with additive grants. Authoring values (overrides, spells, manual equipment, package customization)
+are reconciled when setup changes instead of blanket resets. Name generation is independent of
+mechanical build determinism.
 Overlay policy: [drawer-shell.md](./drawer-shell.md#overlay-modality-policy). Resolver detail:
 [automatic-build-resolution.md](../../../packages/contracts/docs/character-builder/automatic-build-resolution.md).
 

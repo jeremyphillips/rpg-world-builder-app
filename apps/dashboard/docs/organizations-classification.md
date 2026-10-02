@@ -8,13 +8,16 @@ is required on publish.
 type OrganizationMembers = {
   classAffinityIds: string[]
   speciesAffinityIds: string[]
+  npcTemplateId?: NpcTemplateId // default role when a title has none
   titles: OrganizationMembershipTitleDefinition[] // snapshot catalog
 }
 ```
 
 **Familiar starting points** are create-only draft UI (`startingPointId`) — they materialize domain /
-form / functions / practices / class affinities and membership titles into organization-owned form
-state. The association is not persisted on the organization record.
+form / functions / practices / class affinities, the default NPC role, and membership titles into
+organization-owned form state. The association is not persisted on the organization record.
+`members.npcTemplateId` is persisted and owned-editable. The role picker itself is a later
+surface; create and edit already round-trip the preset value.
 
 | Concern                        | Where to read                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

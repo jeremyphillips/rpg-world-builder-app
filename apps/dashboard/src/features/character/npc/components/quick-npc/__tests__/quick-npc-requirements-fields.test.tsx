@@ -3,34 +3,36 @@ import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL } from '../../../../components/equipment/picker/drawer/equipment-picker-drawer.types'
-import {
-  createEquipmentStepContextFixture,
-  equipmentStepBardClassFixture,
-  equipmentStepBattleaxeFixture,
-} from '../../../../lib/equipment/equipment-step.fixtures'
 import {
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabFormValues,
 } from '../../../lib/quick-npc/quick-npc-form-fields'
-import { quickNpcMemberSetupWithNoTitle } from '../../../lib/quick-npc/quick-npc-test-fixtures'
-import { buildQuickNpcRequirementOptionSets } from '../../../lib/quick-npc/quick-npc-requirement-options.lib'
+import type { QuickNpcRequirementOptionSets } from '../../../lib/quick-npc/quick-npc-requirement-options.lib'
 import { QuickNpcRequirementsFields } from '../quick-npc-requirements-fields'
 
-const setup = quickNpcMemberSetupWithNoTitle({
-  speciesId: 'species-1',
-  classId: equipmentStepBardClassFixture.id,
-  level: 1,
-})
+const spellOptionSets: QuickNpcRequirementOptionSets = {
+  weapons: [],
+  spells: [
+    {
+      option: { value: 'srd-cc-5.2.1:fire-bolt', label: 'Fire Bolt' },
+      compactSummary: {
+        castingSummary: ['Action', '120 ft', 'Instantaneous'],
+        classification: {
+          levelLabel: 'Cantrip',
+          descriptors: ['Evocation'],
+        },
+      },
+    },
+  ],
+}
 
-function RequirementsFieldsHarness() {
+function RequirementsFieldsHarness({
+  optionSets = spellOptionSets,
+}: {
+  optionSets?: QuickNpcRequirementOptionSets
+}) {
   const form = useForm<QuickNpcAuthoringTabFormValues>({
     defaultValues: quickNpcAuthoringTabDefaultValues,
-  })
-
-  const optionSets = buildQuickNpcRequirementOptionSets({
-    setup,
-    context: createEquipmentStepContextFixture(),
   })
 
   return (
@@ -52,17 +54,21 @@ beforeAll(() => {
 })
 
 describe('QuickNpcRequirementsFields', () => {
-  it('lists campaign-available non-proficient weapons in the combobox panel', async () => {
+  it('renders nothing when spell requirements are unavailable', () => {
+    const { container } = render(
+      <RequirementsFieldsHarness optionSets={{ weapons: [], spells: [] }} />,
+    )
+
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('lists reachable spells in the combobox panel', async () => {
     const user = userEvent.setup()
     render(<RequirementsFieldsHarness />)
 
-    await user.click(screen.getByRole('combobox', { name: 'Weapons' }))
-    await user.type(screen.getByRole('searchbox', { name: 'Search Weapons' }), 'battle')
+    await user.click(screen.getByRole('combobox', { name: 'Spells' }))
+    await user.type(screen.getByRole('searchbox', { name: 'Search Spells' }), 'fire')
 
-    const battleaxeOption = screen.getByRole('option', {
-      name: new RegExp(equipmentStepBattleaxeFixture.name, 'i'),
-    })
-    expect(battleaxeOption).toBeInTheDocument()
-    expect(screen.getByText(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: /Fire Bolt/i })).toBeInTheDocument()
   })
 })

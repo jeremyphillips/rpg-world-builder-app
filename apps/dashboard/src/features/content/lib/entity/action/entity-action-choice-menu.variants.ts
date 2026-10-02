@@ -1,4 +1,1 @@
-export {
-  dropdownMenuChoiceContentClasses as entityActionChoiceMenuContentClasses,
-  dropdownMenuChoiceItemClasses as entityActionChoiceMenuItemClasses,
-} from '@rpg/ui'
+export { interactiveListChoiceMenuContentClasses as entityActionChoiceMenuContentClasses } from '@rpg/ui'

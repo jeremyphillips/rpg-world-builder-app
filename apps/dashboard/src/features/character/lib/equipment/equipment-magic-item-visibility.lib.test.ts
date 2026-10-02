@@ -119,8 +119,7 @@ describe('isMagicItemPickerItemVisible', () => {
         mode: 'gold' as const,
         purchases: [],
         magicItemSelections: [{ allowanceId, equipmentId: rareAmulet.id, quantity: 1 }],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -166,8 +165,7 @@ describe('isMagicItemPickerItemVisible', () => {
         magicItemSelections: [
           { allowanceId: rareAllowanceId, equipmentId: rareAmulet.id, quantity: 1 },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

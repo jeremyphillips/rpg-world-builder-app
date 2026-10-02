@@ -25,12 +25,8 @@ import {
   assembleGrantedSpells,
   mergeCharacterSpellEntries,
 } from '../assembly/assemble-granted-spells'
+import { assembleLevelZeroStartingEquipment } from '../assembly/assemble-level-zero-starting-equipment'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
-import {
-  characterWealthFromGrant,
-  EMPTY_CHARACTER_EQUIPMENT,
-} from '../../character/sheet/equipment-inventory'
-import { normalizeCharacterWealthGrant } from '../../../primitives/character-wealth-grant'
 import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 import { validateCharacterBuild } from '../validate/validate-character-build'
 import { validationIssue } from '../validate/issue'
@@ -224,20 +220,6 @@ function requireCompleteAbilityScores(draft: CharacterBuilderDraft): Record<Abil
   return complete
 }
 
-function assembleLevelZeroStartingEquipment(
-  _draft: CharacterBuilderDraft,
-  levelZeroRules: CharacterBuildContext['characterCreationRules']['levelZeroNpcs'],
-): {
-  equipment: ReturnType<typeof assembleStartingEquipment>['equipment']
-  wealth: ReturnType<typeof assembleStartingEquipment>['wealth']
-} {
-  const normalizedWealth = normalizeCharacterWealthGrant(levelZeroRules.startingWealth)
-  return {
-    equipment: { ...EMPTY_CHARACTER_EQUIPMENT },
-    wealth: characterWealthFromGrant(normalizedWealth),
-  }
-}
-
 function assertPcFinalizationContext(context: CharacterBuildContext): void {
   if (context.characterKind === 'npc') {
     throw new CharacterBuildFinalizationError([
@@ -288,7 +270,11 @@ export function assembleCharacterBuildSheet(
 
   const levelZeroRules = context.characterCreationRules.levelZeroNpcs
   const { equipment, wealth } = isClasslessLevelZero
-    ? assembleLevelZeroStartingEquipment(effectiveDraft, levelZeroRules)
+    ? assembleLevelZeroStartingEquipment(effectiveDraft, {
+        rulesetId: context.rulesetId,
+        levelZeroRules,
+        catalogIndex,
+      })
     : assembleStartingEquipment(effectiveDraft, catalogIndex, {
         startingWealth: context.characterCreationRules.startingWealth,
         rulesetId: context.rulesetId,

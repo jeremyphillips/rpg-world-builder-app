@@ -1,4 +1,10 @@
-import type { Equipment } from '@rpg/contracts'
+import {
+  NEUTRAL_OPTION_RECOMMENDATION,
+  resolveEquipmentPresentationFacts,
+  type Equipment,
+  type RecommendationSourceName,
+  type ResolvedEquipmentOption,
+} from '@rpg/contracts'
 
 import { makeEquipment } from '@/test/fixtures/factories/equipment'
 import { pickEquipment } from '@/test/fixtures/pick'
@@ -66,6 +72,22 @@ export const equipmentPickerPotionFixture = pickEquipment('potion-of-healing')
 const purchaseAvailabilityAvailable = { status: 'available' as const }
 const purchaseAvailabilityUnaffordable = { status: 'unaffordable' as const, shortfallCp: 1 }
 
+export function equipmentResolvedFixture(
+  overrides: Partial<ResolvedEquipmentOption> = {},
+  sourceName?: RecommendationSourceName,
+): ResolvedEquipmentOption {
+  const resolved: ResolvedEquipmentOption = {
+    requirements: [],
+    recommendation: NEUTRAL_OPTION_RECOMMENDATION,
+    state: {},
+    ...overrides,
+  }
+  return {
+    ...resolved,
+    presentation: resolveEquipmentPresentationFacts({ resolved, sourceName }),
+  }
+}
+
 export function pickerState(
   state: Omit<EquipmentPickerItem['state'], 'purchaseAvailability'> & {
     purchaseAvailability?: EquipmentPickerItem['state']['purchaseAvailability']
@@ -102,7 +124,6 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
@@ -115,7 +136,6 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: false,
       purchaseAvailability: purchaseAvailabilityUnaffordable,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
@@ -129,7 +149,6 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: false,
       isWithinRemainingBudget: false,
       purchaseAvailability: purchaseAvailabilityUnaffordable,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
@@ -146,13 +165,17 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: true,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       recommendation: {
         tier: 'strong',
-        reasons: ['startingEquipment', 'proficient'],
+        reasons: ['startingEquipment'],
         specificity: 'exact',
       },
+      resolved: equipmentResolvedFixture({
+        state: {
+          choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
+        },
+      }),
       disabledReasons: [],
     },
   }),
@@ -163,10 +186,9 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: false,
-      isAffordable: true,
       isWithinRemainingBudget: false,
       purchaseAvailability: purchaseAvailabilityUnaffordable,
-      recommendation: { tier: 'notRecommended', reasons: ['notProficient'], specificity: 'exact' },
+      recommendation: { tier: 'neutral', reasons: [], specificity: 'exact' },
       disabledReasons: [],
     },
   }),
@@ -177,7 +199,6 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],
@@ -193,7 +214,6 @@ export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
       disabledReasons: [],

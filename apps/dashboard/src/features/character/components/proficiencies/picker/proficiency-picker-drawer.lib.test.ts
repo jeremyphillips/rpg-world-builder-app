@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { NEUTRAL_OPTION_RECOMMENDATION } from '@rpg/contracts'
+
 import {
   proficiencyPickerAcrobaticsOptionId,
   proficiencyPickerItemsFixture,
@@ -92,6 +94,7 @@ describe('proficiency-picker-drawer.lib', () => {
         isAvailable: true,
         disabledReasons: [],
         isRecommended: false,
+        recommendation: NEUTRAL_OPTION_RECOMMENDATION,
         canSelect: true,
         isAlreadySelected: false,
         isAlreadyGranted: false,
@@ -105,6 +108,7 @@ describe('proficiency-picker-drawer.lib', () => {
         isAvailable: true,
         disabledReasons: [],
         isRecommended: true,
+        recommendation: { strength: 'strong', signals: [] },
         canSelect: true,
         isAlreadySelected: false,
         isAlreadyGranted: false,
@@ -128,6 +132,7 @@ describe('proficiency-picker-drawer.lib', () => {
         isAvailable: true,
         disabledReasons: [],
         isRecommended: true,
+        recommendation: { strength: 'strong', signals: [] },
         canSelect: true,
         isAlreadySelected: false,
         isAlreadyGranted: false,
@@ -141,6 +146,7 @@ describe('proficiency-picker-drawer.lib', () => {
         isAvailable: true,
         disabledReasons: [],
         isRecommended: false,
+        recommendation: NEUTRAL_OPTION_RECOMMENDATION,
         canSelect: true,
         isAlreadySelected: false,
         isAlreadyGranted: false,

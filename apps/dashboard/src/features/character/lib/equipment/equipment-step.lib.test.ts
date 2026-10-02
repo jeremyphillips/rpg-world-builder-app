@@ -142,8 +142,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -176,8 +175,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -246,8 +244,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -283,8 +280,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -325,8 +321,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -356,8 +351,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -384,8 +378,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -401,11 +394,10 @@ describe('equipment-step.lib', () => {
       },
     })
 
-    expect(patch!.equipment?.removedPackageItemKeys).toEqual([])
-    expect(patch!.equipment?.customized).toBe(false)
+    expect(patch!.equipment?.editedSincePackageSelection).toBe(false)
   })
 
-  it('still hides legacy removed package items from inventory rows', () => {
+  it('lists package rows without a removed-item deny list', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -415,14 +407,13 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [`${equipmentStepBardClassFixture.id}:standard-equipment:0`],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
     const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
 
-    expect(rows).toHaveLength(0)
+    expect(rows.length).toBeGreaterThan(0)
   })
 
   it('builds package and gold selection patches', () => {
@@ -490,8 +481,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -572,8 +562,7 @@ describe('equipment-step.lib', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -604,8 +593,7 @@ describe('equipment-step.lib', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -668,8 +656,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -748,8 +735,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -782,8 +768,7 @@ describe('equipment-step.lib', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -836,8 +821,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -873,8 +857,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -915,8 +898,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -946,8 +928,7 @@ describe('equipment-step.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -984,8 +965,7 @@ describe('equipment purchase quantity regressions', () => {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

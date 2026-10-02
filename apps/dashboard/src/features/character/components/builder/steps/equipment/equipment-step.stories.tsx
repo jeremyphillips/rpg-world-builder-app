@@ -77,8 +77,7 @@ export const GoldShopping: Story = {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -159,8 +158,7 @@ export const MagicItemGrants: Story = {
       equipment: {
         mode: 'gold' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
         magicItemSelections: [],
       },
     }

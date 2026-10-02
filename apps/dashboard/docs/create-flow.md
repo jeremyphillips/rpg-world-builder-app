@@ -70,6 +70,11 @@ Footer actions published into `CreateModalShell` must use `Modal.FooterActions`
 action buttons directly in the shell footer slot — `Modal.Footer` is a vertical
 dock and unwrapped buttons stack full width.
 
+Dismissal is intentional only: `closeOnOutsideClick` and `closeOnEscape` default
+to `false` so Escape and backdrop clicks do not discard in-progress create work.
+Use header Close, Cancel, or domain-specific handlers; opt in with
+`closeOnEscape` / `closeOnOutsideClick` when a flow needs keyboard dismiss.
+
 When the form body and footer render in separate DOM trees (modal shell footer slot),
 `FormShellSubmitButton` uses the canonical `requestSubmit` reference published on
 `FormShellFooterModel` — the same function as inline `useSchemaFormSubmit().requestSubmit`.
@@ -310,7 +315,9 @@ Recorded before the relationship-first refinement. Findings:
    titles from `OrganizationMembershipTitleField`. Relationship-first building
    composition uses `RadioCardField` for active kind and `CreateCompositionSummary`
    rows for completed decisions inside the Organizations composer. Sequenced location
-   and Quick NPC setup use `CreateSetupPanel` with setup-style summary rows.
+   and Quick NPC setup use `CreateSetupPanel` with setup-style summary rows. Those rows come from
+   `resolveSetupSummaryRows`: a resolved value stays listed in registry order, including while its
+   editor is open (no Change) and after the user navigates back to an earlier step.
    Relationship drawers use `LocationConnectionKindField` for active kind and
    `SelectionSummaryCard` for completed kind rows; change-kind drawers keep the
    kind field expanded only. Do not lift title vocabulary into shared UI.

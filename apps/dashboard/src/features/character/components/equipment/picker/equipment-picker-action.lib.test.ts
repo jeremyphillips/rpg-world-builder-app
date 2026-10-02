@@ -10,7 +10,7 @@ describe('equipment-picker-action.lib', () => {
   it('maps purchase unavailability to disabled row state', () => {
     const vm = buildEquipmentPickerRowActionViewModel({
       kind: 'purchase',
-      availability: { status: 'unavailable', reason: 'no_market_price' },
+      availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
     })
 
     expect(vm).toMatchObject({

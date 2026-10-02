@@ -123,7 +123,7 @@ export function CharacterBuilderStepRail({
               >
                 <StatusIcon
                   variant={resolveStepStatusIconVariant(visualStatus)}
-                  size="sm"
+                  size="md"
                   className={characterBuilderStepRailIconClasses}
                 />
                 <span className="min-w-0 space-y-0.5">

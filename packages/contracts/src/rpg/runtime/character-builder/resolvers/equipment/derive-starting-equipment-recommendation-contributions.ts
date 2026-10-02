@@ -24,6 +24,7 @@ import type {
   EquipmentRecommendationContribution,
   StartingEquipmentContributionContext,
 } from './equipment-recommendation-contribution'
+import { sourceForEquipmentReason } from './equipment-recommendation-evidence'
 
 function listFulfilledPackageEquipmentIds(args: {
   selectedOption: StartingEquipmentOption
@@ -59,12 +60,12 @@ function tierForAvailableInStartingOption(
 
 function contributionForStartingGrant(args: {
   item: Extract<StartingEquipmentItem, { kind: 'grant' }>
-  sourceKey: string
+  dedupeKey: string
   characterClass: CharacterClass
   context: StartingEquipmentContributionContext
   fulfilledIds: Set<string>
 }): EquipmentRecommendationContribution[] {
-  const { item, sourceKey, characterClass, context, fulfilledIds } = args
+  const { item, dedupeKey, characterClass, context, fulfilledIds } = args
 
   if (isProficiencyLinkedStartingEquipmentGrant(item)) return []
 
@@ -79,7 +80,8 @@ function contributionForStartingGrant(args: {
       selector: { kind: 'equipment', equipmentId },
       tier: tierForAvailableInStartingOption(context),
       reason: 'availableInStartingOption',
-      sourceKey,
+      dedupeKey,
+      source: sourceForEquipmentReason('availableInStartingOption', characterClass.id),
     },
   ]
 }
@@ -96,12 +98,13 @@ function contributionForStartingItem(args: {
 }): EquipmentRecommendationContribution[] {
   const { item, itemIndex, optionId, classId, characterClass, draft, context, fulfilledIds } = args
 
-  const sourceKey = `${classId}:starting-equipment:${optionId}:${itemIndex}`
+  const dedupeKey = `${classId}:starting-equipment:${optionId}:${itemIndex}`
+  const source = sourceForEquipmentReason('availableInStartingOption', classId)
 
   if (item.kind === 'grant') {
     return contributionForStartingGrant({
       item,
-      sourceKey,
+      dedupeKey,
       characterClass,
       context,
       fulfilledIds,
@@ -120,7 +123,8 @@ function contributionForStartingItem(args: {
         selector: { kind: 'equipment_pool', pool: item.pool },
         tier: 'compatible',
         reason: 'availableInStartingOption',
-        sourceKey,
+        dedupeKey,
+        source,
       },
     ]
   }
@@ -131,7 +135,9 @@ function contributionForStartingItem(args: {
         selector: { kind: 'equipment_pool', pool: item.pool },
         tier: 'strong',
         reason: 'startingEquipmentChoice',
-        sourceKey,
+        dedupeKey,
+        source,
+        choiceSetId,
       },
     ]
   }
@@ -140,7 +146,9 @@ function contributionForStartingItem(args: {
     selector: { kind: 'equipment', equipmentId },
     tier: 'strong' as const,
     reason: 'startingEquipment' as const,
-    sourceKey,
+    dedupeKey: `${dedupeKey}:${equipmentId}`,
+    source,
+    choiceSetId,
   }))
 }
 
@@ -155,15 +163,15 @@ function listGoldAlternativeStartingOptions(
   )
 }
 
-function dedupeContributionsBySourceKey(
+function dedupeContributionsByKey(
   contributions: readonly EquipmentRecommendationContribution[],
 ): EquipmentRecommendationContribution[] {
-  const seenSourceKeys = new Set<string>()
+  const seenKeys = new Set<string>()
   const deduped: EquipmentRecommendationContribution[] = []
 
   for (const contribution of contributions) {
-    if (seenSourceKeys.has(contribution.sourceKey)) continue
-    seenSourceKeys.add(contribution.sourceKey)
+    if (seenKeys.has(contribution.dedupeKey)) continue
+    seenKeys.add(contribution.dedupeKey)
     deduped.push(contribution)
   }
 
@@ -244,7 +252,7 @@ export function deriveStartingEquipmentRecommendationContributions(args: {
         }),
       )
     }
-    return dedupeContributionsBySourceKey(contributions)
+    return dedupeContributionsByKey(contributions)
   }
 
   const fulfilledIds = listFulfilledPackageEquipmentIds({

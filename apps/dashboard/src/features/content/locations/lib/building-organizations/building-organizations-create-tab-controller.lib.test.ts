@@ -85,7 +85,7 @@ describe('resolveBuildingOrganizationComposerView', () => {
     ])
   })
 
-  it('hides downstream UI while editing relationship', () => {
+  it('keeps resolved rows while editing relationship and hides downstream editors', () => {
     const view = resolveBuildingOrganizationComposerView({
       composerStage: 'discovery',
       editingDecision: 'relationship',
@@ -98,7 +98,17 @@ describe('resolveBuildingOrganizationComposerView', () => {
     })
 
     expect(view.activeDecision).toBe('relationship')
-    expect(view.summaryRows).toEqual([])
+    expect(view.summaryRows).toEqual([
+      { id: 'relationship', decision: 'relationship', label: 'Relationship', value: 'Owner' },
+      {
+        id: 'organization',
+        decision: 'organizationResolved',
+        label: 'Organization',
+        value: 'City Bank · Commercial',
+      },
+    ])
+    expect(view.showRelationshipChange).toBe(false)
+    expect(view.showOrganizationChange).toBe(true)
     expect(view.showDiscovery).toBe(false)
     expect(view.showBranch).toBe(false)
     expect(view.showBranch && view.activeDecision === 'relationship').toBe(false)
@@ -119,9 +129,8 @@ describe('resolveBuildingOrganizationComposerView', () => {
 
     expect(view.activeDecision).toBe('organization')
     expect(view.showDiscovery).toBe(true)
-    expect(view.summaryRows).toEqual([
-      { id: 'relationship', decision: 'relationship', label: 'Relationship', value: 'Owner' },
-    ])
+    expect(view.showOrganizationChange).toBe(false)
+    expect(view.summaryRows.map((row) => row.value)).toEqual(['Owner', 'City Bank · Commercial'])
   })
 })
 

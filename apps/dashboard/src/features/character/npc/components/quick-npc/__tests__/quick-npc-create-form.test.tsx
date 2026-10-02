@@ -24,6 +24,16 @@ import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import { QuickNpcAuthoringForm } from '../quick-npc-authoring-form'
 
+const resolveQuickNpcAuthoringCreateInputMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../../../lib/quick-npc/quick-npc-narrative-on-create.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    resolveQuickNpcAuthoringCreateInput: resolveQuickNpcAuthoringCreateInputMock,
+  }
+})
+
 vi.mock('../../../api/npc-client', async (importOriginal) => ({
   ...(await importOriginal<typeof NpcClient>()),
   createNpc: vi.fn(),
@@ -49,7 +59,7 @@ const membershipTitles = [
     id: 'omt_guildmaster',
     label: 'Guildmaster',
     priority: 50 as const,
-    npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+    npcRecommendation: { templateId: 'criminal' as const, level: 5 },
   },
 ] as const
 
@@ -145,9 +155,15 @@ async function fillAuthoringFields(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('QuickNpcAuthoringForm', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     createNpcMock.mockReset()
     createNpcMock.mockResolvedValue(npcDetail)
+    resolveQuickNpcAuthoringCreateInputMock.mockReset()
+    resolveQuickNpcAuthoringCreateInputMock.mockImplementation(async ({ prepareArgs }) => {
+      const { prepareQuickNpcAuthoringCreate } =
+        await import('../../../lib/quick-npc/quick-npc-authoring-submit.lib')
+      return prepareQuickNpcAuthoringCreate(prepareArgs).input
+    })
   })
 
   it('renders the details tab with Neutral alignment default', () => {
@@ -166,6 +182,7 @@ describe('QuickNpcAuthoringForm', () => {
       setup: quickNpcMemberSetupValues({
         speciesId: populatedBuilderCatalog.species[0]!.id,
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: quickFighter.id,
         level: 1,
       }),
@@ -202,10 +219,16 @@ describe('QuickNpcAuthoringForm', () => {
     const { props } = renderForm()
 
     await user.click(screen.getByRole('button', { name: 'Change build' }))
-    expect(props.onSetupSummaryEdit).toHaveBeenCalledWith({
-      type: 'external',
-      id: 'quickNpcBuild',
-    })
+    expect(props.onSetupSummaryEdit).toHaveBeenCalledWith(
+      {
+        type: 'external',
+        id: 'quickNpcBuild',
+      },
+      expect.objectContaining({
+        classPackage: { state: 'unresolved' },
+        startingChoiceOverrides: {},
+      }),
+    )
     expect(createNpcMock).not.toHaveBeenCalled()
   })
 
@@ -213,6 +236,7 @@ describe('QuickNpcAuthoringForm', () => {
     const guildmasterSetup = quickNpcMemberSetupValues({
       speciesId: populatedBuilderCatalog.species[0]!.id,
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       classId: quickFighter.id,
       level: 5,
     })
@@ -227,7 +251,7 @@ describe('QuickNpcAuthoringForm', () => {
     })
 
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
-    expect(screen.getByText('Covert operator · Level 5 Fighter')).toBeInTheDocument()
+    expect(screen.getByText('Criminal · Level 5 Fighter')).toBeInTheDocument()
   })
 
   it('surfaces builder issues inline and keeps the form open when resolution fails', async () => {
@@ -246,6 +270,7 @@ describe('QuickNpcAuthoringForm', () => {
       buildContext: buildContextFixture({ classes: [unsatisfiableFighter] }),
       setup: quickNpcMemberSetupWithNoTitle({
         speciesId: populatedBuilderCatalog.species[0]!.id,
+        npcTemplateId: 'criminal',
         classId: unsatisfiableFighter.id,
         level: 1,
       }),

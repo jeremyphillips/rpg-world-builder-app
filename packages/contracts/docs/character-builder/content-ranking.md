@@ -76,25 +76,41 @@ rank only after search.
 
 ### Comparator steps (recommendation / best-match tiebreaker)
 
-1. **Recommendation tier** — `compareEquipmentRecommendationTiers` (essential → strong → compatible → neutral → notRecommended). Constants: [`equipment-recommendation.ts`](../src/rpg/content/equipment-recommendation.ts) `EQUIPMENT_RECOMMENDATION_TIER_RANK`.
-2. **Recommendation specificity** — collapsed `recommendation.specificity` via `compareEquipmentRecommendationSpecificity` (exact → narrow_pool → broad_pool). Pool expansion thresholds are classified at contribution time in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts): 1 match = exact, 2–5 = narrow_pool, 6+ = broad_pool; `{ kind: 'equipment' }` selectors are always exact.
-3. **Best reason** — lowest rank among `recommendation.reasons` via `getBestEquipmentRecommendationReasonRank`. Constants: `EQUIPMENT_RECOMMENDATION_REASON_RANK`.
-4. **Starting affordability** — `state.isAffordable` (`true` before `false`). Deprioritizes items that exceed the package starting budget without hiding them (unless the dashboard `filterOutUnaffordable` prop is on).
-5. **Kind bucket** — `getEquipmentRecommendationKindRank` (weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other). Constants: [`equipment-picker-item-kind-rank.ts`](../src/rpg/runtime/character-builder/resolvers/picker/equipment-picker-item-kind-rank.ts).
-6. **Weapon category** — `getEquipmentWeaponCategoryBrowseRank` when both rows are weapons; martial-first only when `preferMartialWeaponBrowseOrder` is set on the browse context.
-7. **Name** — `localeCompare` (base sensitivity).
+Resolved rows sort with `compareIntentionalEquipmentRanking` in
+[`equipment-ranking-policy.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-ranking-policy.ts).
+Requirements, soft recommendations, and option state are separate facts. Selection and
+choice state never change recommendation strength.
+
+1. **Active requirement / active choice** — unsatisfied `candidate` requirements (`compareActiveRequirement`), then open-pool eligibility when `activeChoice` is `pool` or `package`. A satisfied pool keeps `optionSatisfies` on every eligible option; only the owned option is a `satisfier`, and the others stay `eligible` with no lift. Spellcasting focus is one any-of requirement owned by the class.
+2. **Context relevance** — only when `activeChoice` is not `none`. `allowance` does not reorder equipment recommendations; magic-item action rank handles that workflow. The general Add Equipment drawer passes `none`, so open pools and alternative packages do not lift rows there.
+3. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility, not a signal.
+4. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat), then `inAlternativePackage` as a tie-break. Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts).
+5. **Purchase actionability** — only when `rankPurchaseAvailability` is set (gold purchase lists). Order is `available`, then `unaffordable`, then `unavailableForPurchase`. A strong or required row still outranks a neutral purchasable row. Unaffected lists leave this fact unsorted.
+6. **Compatibility** — only when `rankCompatibility` is set (the default) and both rows have a defined `compatibility.proficient`. `true` before `false`. Rows that do not track proficiency stay ties on this axis.
+7. **Canonical fallback** — kind bucket, weapon category, then name.
+
+Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.
 
 ### Recommendation reason ranks
 
-Lower ranks list first within the same tier (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
+The legacy reason enum still feeds badges until presentation facts replace it. It is not the browse order for resolved rows.
+
+Lower historical ranks (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
 
 `classRequired` → `classToolNeed` → `selectedToolProficiency` → `spellcastingFocus` →
 `startingEquipment` → `unresolvedToolProficiencyChoice` → `startingEquipmentChoice` →
-`classToolCategory` → `availableInStartingOption` → `classSuggested` → `proficient` →
-`notProficient`.
+`classToolCategory` → `availableInStartingOption` → `classSuggested`.
+
+Proficiency is not a recommendation reason. `compatibility.proficient` is `true`, `false`, or omitted when the item does not track proficiency.
+
+`classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
+
+Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by Wizard class", "Spellcasting focus", "In your package"). The dashboard maps those facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
+
+Canonical kind order is weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other. Weapon category is martial-first only when `preferMartialWeaponBrowseOrder` is set. Name uses `localeCompare` (base sensitivity).
 
 Inference layers live in `derive-equipment-recommendation-contributions.ts` (proficiency
-pools, starting-equipment pools, fulfillment-aware gold elevation).
+pools, starting-equipment pools, fulfillment-aware gold elevation). Proficiency compatibility is projected from the character and the equipment row, not from those recommendation contributions.
 
 ### Equipment picker sort modes
 
@@ -165,20 +181,19 @@ production default `reset_view`):
 
 Action buttons show no counts.
 
-## Picker state: dual affordability
+## Picker purchase availability
 
-`resolveEquipmentPickerItems` maps budget helpers onto picker state:
+`resolveEquipmentPickerItems` stamps `purchaseAvailability` once from remaining budget and copies that same object onto `state.resolved`. Action, badges, and purchase-list sort all read it.
 
-| State field               | Budget helper                           | Semantics                                                                                     |
-| ------------------------- | --------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `isAffordable`            | `isEquipmentAffordableAtStartingBudget` | UI shorthand; stable across purchases. Drives `filterOutUnaffordable` and browse-sort step 3. |
-| `isWithinRemainingBudget` | `isEquipmentWithinRemainingBudget`      | Dynamic; drives purchase disable and remaining-budget disabled notes.                         |
+| Status                   | Meaning                                                                                |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| `available`              | Priced, and the remaining purse covers quantity 1 (or no budget is set)                |
+| `unaffordable`           | Priced above `budget.remaining`; `shortfallCp` is the gap                              |
+| `unavailableForPurchase` | `no_market_price` presents as "Not for sale"; `unsupported_kind` as "Unavailable here" |
 
-When **no budget** is passed to `resolveEquipmentPickerItems`, both fields default
-to `true`. That means budget gating is inactive — not that a comparison ran.
+`isWithinRemainingBudget` is `purchaseAvailability.status === 'available'`. When no budget is passed, priced rows stay `available`.
 
-`remaining <= starting` is guaranteed by `deriveEquipmentBudgetSummary`; a
-starting-unaffordable / remaining-affordable (`false` / `true`) pair cannot occur.
+`fitsStartingEquipmentBudget` is not picker state. `filterOutUnaffordable` calls it with the package starting purse and skips unpriced rows.
 
 ## Dashboard disabled-note precedence
 
@@ -186,7 +201,7 @@ In `equipment-picker-drawer.lib.ts`, `getEquipmentPickerDisabledNote` maps
 `resolveEquipmentPickerPurchaseActionState` reasons to copy:
 
 1. `blocked` — `disabledReasons[0]` (structural restrictions; not content availability)
-2. `not_purchasable` — not for sale / unsupported purchase channel
+2. `not_purchasable` — "Not for sale" for `no_market_price`, "Unavailable here" for `unsupported_kind`
 3. `unaffordable` — `{cost} needed · {remaining} remaining` via `budget.remaining`
 4. `undefined` when purchase action is enabled
 
@@ -200,16 +215,14 @@ collapsed `isEquipmentPickerItemDisabled` bit. Row availability fields live in
 | `purchaseEligible` | Purchase channel supported                                                                     |
 | `affordable`       | Remaining budget covers qty=1 (`purchaseAvailability.status === 'available'`)                  |
 
-`isAffordable` (starting budget) remains for browse ranking and `filterOutUnaffordable` only.
-
 ## Dashboard affordability filters
 
 The equipment picker exposes two independent affordability controls:
 
-| Control                                            | Source                          | Default | Semantics                                                                                                                                                                       |
-| -------------------------------------------------- | ------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `filterOutUnaffordable` prop                       | `state.isAffordable`            | `false` | When `true`, hides rows above the package starting budget; default shows them disabled instead.                                                                                 |
-| **Affordable now** checkbox (`showAffordableOnly`) | `state.isWithinRemainingBudget` | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
+| Control                                            | Source                                           | Default | Semantics                                                                                                                                                                       |
+| -------------------------------------------------- | ------------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `filterOutUnaffordable` prop                       | `fitsStartingEquipmentBudget(equipment, budget)` | `false` | When `true` and a budget is passed, hides priced rows above the package starting purse. Unpriced rows stay visible.                                                             |
+| **Affordable now** checkbox (`showAffordableOnly`) | `purchaseAvailability.status === 'available'`    | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
 Browse context (search, category, sort) is **preserved** across drawer
 close/reopen within a builder session. **Reset view** (default) resets the full view;
@@ -240,14 +253,15 @@ preview or combat semantics.
 3. **Starting-equipment / class recommendation source** — `startingEquipmentChoice` →
    **Starting option**; `availableInStartingOption` → **Standard gear** on gold path
    only (`isGoldShoppingPath` on the drawer)
-4. **Not proficient** — when `!isProficient` and no higher-priority reason applies
+4. **Not proficient** — when `compatibility.proficient === false` and no higher-priority fact applies
 
 Proficiency-state badges outrank ordinary recommendation-source badges (e.g. a Bard
 instrument with both `unresolvedToolProficiencyChoice` and `startingEquipmentChoice`
 shows **Proficiency available**). Essential blockers outrank generic proficiency copy.
 
-Ordinary weapon/armor category proficiency (`proficient` reason, `isProficient: true`
-without `selectedToolProficiency`) stays **badge-less**.
+Ordinary weapon/armor category proficiency (`compatibility.proficient === true`
+without `selectedToolProficiency`) stays **badge-less**. Missing proficiency is a
+caution, not a recommendation tier.
 
 ## Starting-equipment contribution context
 

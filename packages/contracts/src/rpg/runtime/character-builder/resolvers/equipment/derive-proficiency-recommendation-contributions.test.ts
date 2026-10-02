@@ -29,6 +29,7 @@ const storedBardWithStartingEquipment: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'lute',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'lute' },
               quantity: 1,
@@ -99,6 +100,7 @@ describe('isGoldShoppingPath', () => {
     label: 'Standard Equipment',
     items: [
       {
+        id: 'lute',
         kind: 'grant',
         target: { source: 'equipment', equipmentSlug: 'lute' },
         quantity: 1,

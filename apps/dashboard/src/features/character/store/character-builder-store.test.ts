@@ -209,8 +209,7 @@ describe('character-builder-store', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
       touchedStepIds: ['equipment' as const],
     }

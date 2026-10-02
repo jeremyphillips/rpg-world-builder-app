@@ -6,10 +6,8 @@ import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/ru
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import {
-  resolveEquippedArmorFromInventory,
-  EMPTY_CHARACTER_EQUIPMENT,
-} from '../../character/sheet/equipment-inventory'
+import { resolveEquippedArmorFromInventory } from '../../character/sheet/equipment-inventory'
+import { assembleLevelZeroStartingEquipment } from '../assembly/assemble-level-zero-starting-equipment'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
 
 /** Adapts a builder draft into the global character derivation input shape. */
@@ -26,7 +24,11 @@ export function toCharacterDerivationInput(
   const isLevelZeroNpc = draft.class.level === 0 && rules.levelZeroNpcs.enabled
 
   const equipment = isLevelZeroNpc
-    ? { ...EMPTY_CHARACTER_EQUIPMENT }
+    ? assembleLevelZeroStartingEquipment(draft, {
+        rulesetId,
+        levelZeroRules: rules.levelZeroNpcs,
+        catalogIndex,
+      }).equipment
     : assembleStartingEquipment(draft, catalogIndex, {
         startingWealth: rules.startingWealth,
         rulesetId,

@@ -12,6 +12,11 @@ import {
   quickNpcBuildRevision,
   resolveQuickNpcBuildExternalDecision,
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+  QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
+  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+  resolveQuickNpcModalChrome,
 } from './quick-npc-create-modal-setup.lib'
 import {
   QUICK_NPC_BUILD_FIELD_LABEL,
@@ -22,7 +27,9 @@ import {
   createQuickNpcSetupDefaultValues,
   isQuickNpcMembershipTitleSetupComplete,
 } from './quick-npc-form-fields'
+import { QUICK_NPC_RECOMMENDED_GROUP_EYEBROW } from './quick-npc-affinity-option-groups.lib'
 import { resolveQuickNpcClassOptionGroups } from './quick-npc-class-option-groups.lib'
+import { QUICK_NPC_ROLE_ALL_GROUP_EYEBROW } from './quick-npc-npc-template-option.lib'
 import { resolveCreateSetupActiveSetId, resolveCreateSetupVisibleSetIds } from '@/lib/create-setup'
 import {
   quickNpcMemberSetupValues,
@@ -35,12 +42,33 @@ import {
 const memberCreateContext = quickNpcOrganizationMemberCreateContext()
 const standaloneCreateContext = quickNpcStandaloneCreateContext()
 
+describe('resolveQuickNpcModalChrome', () => {
+  it('returns stable headlines and phase-specific descriptions', () => {
+    expect(resolveQuickNpcModalChrome(standaloneCreateContext, 'setup')).toEqual({
+      headline: QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+      description: QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
+    })
+    expect(resolveQuickNpcModalChrome(standaloneCreateContext, 'authoring')).toEqual({
+      headline: QUICK_NPC_STANDALONE_SETUP_HEADLINE,
+      description: 'Create a new NPC.',
+    })
+    expect(resolveQuickNpcModalChrome(memberCreateContext, 'setup')).toEqual({
+      headline: QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+      description: QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
+    })
+    expect(resolveQuickNpcModalChrome(memberCreateContext, 'authoring')).toEqual({
+      headline: QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
+      description: `Create a new NPC as a member of ${memberCreateContext.organization.name}.`,
+    })
+  })
+})
+
 const guildmasterTitle = {
   id: 'omt_guildmaster',
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 5 },
 } as const
 
 describe('buildQuickNpcCreateSetupSets', () => {
@@ -76,7 +104,7 @@ describe('buildQuickNpcCreateSetupSets', () => {
     ])
   })
 
-  it('returns only species setup set for standalone context', () => {
+  it('returns role and species setup sets for standalone context', () => {
     const values = createQuickNpcSetupDefaultValues(context, standaloneCreateContext)
     const sets = buildQuickNpcCreateSetupSets({
       createContext: standaloneCreateContext,
@@ -85,8 +113,42 @@ describe('buildQuickNpcCreateSetupSets', () => {
       titles: [],
     })
 
-    expect(sets.map((set) => set.id)).toEqual(['speciesId'])
-    expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toBeUndefined()
+    expect(sets.map((set) => set.id)).toEqual(['npcTemplateId', 'speciesId'])
+    expect(sets.find((set) => set.id === 'npcTemplateId')?.isComplete).toBe(false)
+    expect(sets.find((set) => set.id === 'speciesId')?.visibleWhenComplete).toEqual([
+      'npcTemplateId',
+    ])
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    expect(resolveCreateSetupActiveSetId({ sets: sequenceItems })).toBe('npcTemplateId')
+    expect(
+      resolveCreateSetupVisibleSetIds({
+        sets: sequenceItems,
+        activeSetId: 'npcTemplateId',
+      }),
+    ).toEqual(['npcTemplateId'])
+  })
+
+  it('reveals species after standalone role is chosen', () => {
+    const sets = buildQuickNpcCreateSetupSets({
+      createContext: standaloneCreateContext,
+      context,
+      values: quickNpcStandaloneSetupValues({ npcTemplateId: 'guard' }),
+      titles: [],
+    })
+
+    const sequenceItems = sets.map((set) => ({
+      id: set.id,
+      isComplete: set.isComplete,
+      required: set.required,
+      visibleWhenComplete: set.visibleWhenComplete,
+    }))
+    expect(resolveCreateSetupActiveSetId({ sets: sequenceItems })).toBe('speciesId')
   })
 
   it('reveals species after membership title is chosen without downstream setup sets', () => {
@@ -138,11 +200,26 @@ describe('resolveQuickNpcBuildCardModel', () => {
     ).toBeNull()
   })
 
-  it('returns build card after species is complete for standalone context', () => {
+  it('returns null until role and species are complete for standalone context', () => {
+    expect(
+      resolveQuickNpcBuildCardModel({
+        createContext: standaloneCreateContext,
+        context,
+        values: quickNpcStandaloneSetupValues({
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 0,
+        }),
+        titles: [],
+      }),
+    ).toBeNull()
+  })
+
+  it('returns recommended build card after role and species are complete for standalone context', () => {
     const model = resolveQuickNpcBuildCardModel({
       createContext: standaloneCreateContext,
       context,
       values: quickNpcStandaloneSetupValues({
+        npcTemplateId: 'guard',
         speciesId: 'srd-cc-5.2.1:dwarf',
         level: 0,
       }),
@@ -150,10 +227,12 @@ describe('resolveQuickNpcBuildCardModel', () => {
     })
 
     expect(model).toMatchObject({
-      mode: 'build',
+      mode: 'recommended',
       sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
-      level: 0,
-      classProgressionApplicable: false,
+      showTemplateIdentity: true,
+      templateLabel: 'Guard',
+      levelRow: { level: 0 },
+      classRow: { classProgressionApplicable: false },
     })
   })
 
@@ -164,6 +243,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 5,
       }),
@@ -174,14 +254,28 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'recommended',
       sectionEyebrow: QUICK_NPC_RECOMMENDED_BUILD_FIELD_LABEL,
-      templateLabel: 'Covert operator',
-      level: 5,
-      levelPrompt: 'Recommended for Guildmaster: Level 5.',
-      classProgressionApplicable: true,
+      showTemplateIdentity: false,
+      roleRow: {
+        npcTemplateId: 'criminal',
+        selectedRoleLabel: 'Criminal',
+        helper: 'Suggested by Guildmaster.',
+      },
+      levelRow: {
+        level: 5,
+        helper: 'Suggested by Guildmaster.',
+      },
+      classRow: { classProgressionApplicable: true },
     })
-    expect(model?.classOptionGroups.optionGroups?.[0]?.options).toEqual([
+    expect(model?.classRow.classOptionPresentation.optionGroups?.[0]?.options).toEqual([
       { value: rogueClass.id, label: 'Rogue' },
     ])
+    expect(model?.roleRow?.roleOptionPresentation.optionGroups?.[0]).toMatchObject({
+      eyebrow: QUICK_NPC_RECOMMENDED_GROUP_EYEBROW,
+      options: [{ value: 'criminal', label: 'Criminal' }],
+    })
+    expect(model?.roleRow?.roleOptionPresentation.optionGroups?.[1]?.eyebrow).toBe(
+      QUICK_NPC_ROLE_ALL_GROUP_EYEBROW,
+    )
   })
 
   it('returns build mode without template identity or recommended level helper', () => {
@@ -199,11 +293,12 @@ describe('resolveQuickNpcBuildCardModel', () => {
     expect(model).toMatchObject({
       mode: 'build',
       sectionEyebrow: QUICK_NPC_BUILD_FIELD_LABEL,
-      level: 0,
-      classProgressionApplicable: false,
+      levelRow: { level: 0 },
+      classRow: { classProgressionApplicable: false },
     })
     expect(model?.templateLabel).toBeUndefined()
-    expect(model?.levelPrompt).toBeUndefined()
+    expect(model?.roleRow?.npcTemplateId).toBe('')
+    expect(model?.levelRow.helper).toBeUndefined()
   })
 
   it('merges title template and organization class affinities for class recommendations', () => {
@@ -226,6 +321,7 @@ describe('resolveQuickNpcBuildCardModel', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 5,
       }),
@@ -233,10 +329,10 @@ describe('resolveQuickNpcBuildCardModel', () => {
       members: { classAffinityIds: [fighterClass.id] },
     })
 
-    expect(model?.classOptionGroups.optionGroups).toEqual(
+    expect(model?.classRow.classOptionPresentation.optionGroups).toEqual(
       resolveQuickNpcClassOptionGroups({
-        classOptions: model!.classOptionGroups.options,
-        recommendedClassIds: model!.recommendedClassIds,
+        classOptions: model!.classRow.classOptionPresentation.options,
+        recommendedClassIds: model!.classRow.recommendedClassIds,
         playableClasses: multiClassContext.catalog.classes,
       }).optionGroups,
     )
@@ -252,6 +348,7 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       values: quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:dwarf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 5,
       }),
@@ -264,27 +361,28 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
         id: 'membershipTitle',
         label: 'Role',
         value: 'Guildmaster',
-        editTarget: { type: 'set', id: 'membershipTitle' },
+        targetSetId: 'membershipTitle',
       },
       {
         id: 'speciesId',
         label: 'Species',
         value: 'Dwarf',
-        editTarget: { type: 'set', id: 'speciesId' },
+        targetSetId: 'speciesId',
       },
       {
         id: 'quickNpcBuild',
         label: 'Build',
-        value: 'Covert operator · Level 5 Fighter',
-        editTarget: { type: 'external', id: 'quickNpcBuild' },
+        value: 'Criminal · Level 5 Fighter',
+        targetSetId: 'quickNpcBuild',
       },
     ])
   })
 
-  it('omits Role row for standalone context', () => {
+  it('includes Role row for standalone context when a template is chosen', () => {
     const rows = resolveQuickNpcSetupSummaryRows({
       createContext: standaloneCreateContext,
       values: quickNpcStandaloneSetupValues({
+        npcTemplateId: 'scout',
         speciesId: 'srd-cc-5.2.1:dwarf',
         classId: populatedBuilderCatalog.classes[0]!.id,
         level: 1,
@@ -293,7 +391,26 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       titles: [],
     })
 
-    expect(rows.map((row) => row.id)).toEqual(['speciesId', 'quickNpcBuild'])
+    expect(rows).toEqual([
+      {
+        id: 'npcTemplateId',
+        label: 'Role',
+        value: 'Scout',
+        targetSetId: 'npcTemplateId',
+      },
+      {
+        id: 'speciesId',
+        label: 'Species',
+        value: 'Dwarf',
+        targetSetId: 'speciesId',
+      },
+      {
+        id: 'quickNpcBuild',
+        label: 'Build',
+        value: 'Scout · Level 1 Fighter',
+        targetSetId: 'quickNpcBuild',
+      },
+    ])
   })
 
   it('includes Build with level-only copy when no title recommendation exists', () => {
@@ -314,19 +431,19 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
         id: 'membershipTitle',
         label: 'Role',
         value: 'Member',
-        editTarget: { type: 'set', id: 'membershipTitle' },
+        targetSetId: 'membershipTitle',
       },
       {
         id: 'speciesId',
         label: 'Species',
         value: 'Dwarf',
-        editTarget: { type: 'set', id: 'speciesId' },
+        targetSetId: 'speciesId',
       },
       {
         id: 'quickNpcBuild',
         label: 'Build',
         value: 'Level 1 Fighter',
-        editTarget: { type: 'external', id: 'quickNpcBuild' },
+        targetSetId: 'quickNpcBuild',
       },
     ])
   })
@@ -354,8 +471,38 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       id: 'quickNpcBuild',
       label: 'Build',
       value: 'Level 0',
-      editTarget: { type: 'external', id: 'quickNpcBuild' },
+      targetSetId: 'quickNpcBuild',
     })
+  })
+
+  it('describes the selected class instead of a role recommendation', () => {
+    const wizard = {
+      ...populatedBuilderCatalog.classes[0]!,
+      id: 'srd-cc-5.2.1:wizard',
+      slug: 'wizard',
+      name: 'Wizard',
+    }
+    const wizardContext = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [populatedBuilderCatalog.classes[0]!, wizard],
+      },
+    })
+    const rows = resolveQuickNpcSetupSummaryRows({
+      createContext: memberCreateContext,
+      values: quickNpcMemberSetupValues({
+        membershipTitle: 'omt_guildmaster',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        npcTemplateId: 'criminal',
+        classId: wizard.id,
+        level: 1,
+      }),
+      context: wizardContext,
+      titles: [guildmasterTitle],
+    })
+
+    expect(rows.find((row) => row.id === 'quickNpcBuild')?.value).toBe('Criminal · Level 1 Wizard')
+    expect(rows.find((row) => row.id === 'quickNpcBuild')?.value).not.toMatch(/recommended/i)
   })
 })
 
@@ -392,6 +539,7 @@ describe('isQuickNpcBuildResolved', () => {
       isQuickNpcBuildResolved({
         context,
         values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 0,
@@ -407,6 +555,7 @@ describe('isQuickNpcBuildResolved', () => {
         values: quickNpcMemberSetupValues({
           speciesId: 'srd-cc-5.2.1:dwarf',
           membershipTitle: 'omt_guildmaster',
+          npcTemplateId: 'criminal',
           classId: rogueClass.id,
           level: 5,
         }),
@@ -420,27 +569,29 @@ describe('quickNpcBuildRevision', () => {
   const memberBaseValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: 'omt_guildmaster',
+    npcTemplateId: 'criminal',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
   })
   const standaloneBaseValues = quickNpcStandaloneSetupValues({
+    npcTemplateId: 'guard',
     speciesId: 'srd-cc-5.2.1:dwarf',
     classId: populatedBuilderCatalog.classes[0]!.id,
     level: 5,
   })
 
-  it('derives member revision from membershipTitle, speciesId, level, and classId', () => {
+  it('derives member revision from membershipTitle, npcTemplateId, speciesId, level, and classId', () => {
     expect(quickNpcBuildRevision(memberBaseValues)).toBe(
-      `omt_guildmaster:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+      `omt_guildmaster:criminal:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
     expect(quickNpcBuildRevision({ ...memberBaseValues, membershipTitle: 'Other' })).not.toBe(
       quickNpcBuildRevision(memberBaseValues),
     )
   })
 
-  it('derives standalone revision from speciesId, level, and classId only', () => {
+  it('derives standalone revision from npcTemplateId, speciesId, level, and classId', () => {
     expect(quickNpcBuildRevision(standaloneBaseValues)).toBe(
-      `srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
+      `guard:srd-cc-5.2.1:dwarf:5:${populatedBuilderCatalog.classes[0]!.id}`,
     )
     expect(quickNpcBuildRevision(standaloneBaseValues)).not.toContain('Guildmaster')
     expect(quickNpcBuildRevision({ ...standaloneBaseValues, level: 3 })).not.toBe(

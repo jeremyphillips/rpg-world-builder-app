@@ -1,6 +1,6 @@
 import {
   getContentTypeTerm,
-  getNpcAuthoringTemplateLabel,
+  getNpcTemplateLabel,
   indexCharacterBuildCatalog,
   isClassProgressionApplicable,
   resolvePlayableBuilderContent,
@@ -12,10 +12,17 @@ import {
 import { buildOrganizationMembershipTitleRadioOptions } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
   isCreateSetupChoiceComplete,
+  resolveCreateSetupFooterActions,
+  resolveCreateSetupSequenceSetIds,
+  resolveSetupSummaryRows,
   type CreateSetupExternalDecision,
+  type CreateSetupFooterAction,
   type CreateSetupSet,
-  type SetupSummaryRowModel,
+  type CreateSetupSummaryDefinition,
+  type SetupSummaryRow,
 } from '@/lib/create-setup'
+
+import { QUICK_NPC_PREVIEW_NPC_LABEL } from './quick-npc-preview-copy'
 
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import {
@@ -26,16 +33,52 @@ import {
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { buildQuickNpcSpeciesRadioCardPresentation } from './quick-npc-species-option-groups.lib'
-import { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
+import {
+  buildNpcTemplateRadioOptions,
+  QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT,
+} from './quick-npc-npc-template-option.lib'
+import { isQuickNpcStandaloneSetup } from './quick-npc-form-fields'
 
 export const QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE = 'Set up member' as const
 export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
-  "Choose the member's role and starting character options. Recommendations come from this organization and can be changed before creation." as const
+  'Choose a role and starting build from this organization’s recommendations.' as const
 export const QUICK_NPC_STANDALONE_SETUP_HEADLINE = 'Set up NPC' as const
 export const QUICK_NPC_STANDALONE_SETUP_DESCRIPTION =
-  'Choose species and starting character options.' as const
-export const QUICK_NPC_SETUP_HEADLINE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
+  'Choose a role, species, and starting character options.' as const
 export const QUICK_NPC_SETUP_CHANGE_LABEL = 'Change' as const
+
+export type QuickNpcModalPhase = 'setup' | 'authoring'
+
+export function resolveQuickNpcSetupDescription(context: QuickNpcCreateContext): string {
+  return context.kind === 'standalone'
+    ? QUICK_NPC_STANDALONE_SETUP_DESCRIPTION
+    : QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION
+}
+
+export function resolveQuickNpcAuthoringDescription(context: QuickNpcCreateContext): string {
+  if (context.kind === 'standalone') {
+    return 'Create a new NPC.'
+  }
+  return `Create a new NPC as a member of ${context.organization.name}.`
+}
+
+function resolveQuickNpcModalHeadline(context: QuickNpcCreateContext): string {
+  return context.kind === 'standalone'
+    ? QUICK_NPC_STANDALONE_SETUP_HEADLINE
+    : QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
+}
+
+export function resolveQuickNpcModalChrome(
+  context: QuickNpcCreateContext,
+  phase: QuickNpcModalPhase,
+): { headline: string; description: string } {
+  const headline = resolveQuickNpcModalHeadline(context)
+  const description =
+    phase === 'setup'
+      ? resolveQuickNpcSetupDescription(context)
+      : resolveQuickNpcAuthoringDescription(context)
+  return { headline, description }
+}
 export const QUICK_NPC_SETUP_SELECTIONS_EYEBROW = 'Selections' as const
 export const QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP = 'selections' as const
 export const QUICK_NPC_SETUP_SUMMARY_EYEBROW = 'Setup' as const
@@ -59,13 +102,54 @@ export type QuickNpcSetupModel = {
 
 export const QUICK_NPC_BUILD_EXTERNAL_DECISION_ID = 'quickNpcBuild' as const
 
+export const QUICK_NPC_CREATE_SETUP_FOOTER_ACTIONS = [
+  {
+    id: 'preview',
+    label: QUICK_NPC_PREVIEW_NPC_LABEL,
+    visibility: 'final-set',
+  },
+] as const satisfies readonly CreateSetupFooterAction[]
+
+export type QuickNpcCreateSetupFooterContext = {
+  setupSets: readonly CreateSetupSet[]
+  externalDecisions: readonly CreateSetupExternalDecision[]
+  activeSetId: string | null
+  isEditingUpstream: boolean
+}
+
+export function resolveQuickNpcCreateSetupFooterActions(
+  args: QuickNpcCreateSetupFooterContext,
+): CreateSetupFooterAction[] {
+  return resolveCreateSetupFooterActions(QUICK_NPC_CREATE_SETUP_FOOTER_ACTIONS, {
+    sequenceSetIds: resolveCreateSetupSequenceSetIds({
+      sets: args.setupSets,
+      externalDecisions: args.externalDecisions,
+    }),
+    activeSetId: args.activeSetId,
+    isEditingUpstream: args.isEditingUpstream,
+    externalDecisions: args.externalDecisions,
+  })
+}
+
+export function quickNpcCreateSetupShowsPreviewNpc(
+  actions: readonly CreateSetupFooterAction[],
+): boolean {
+  return actions.some((action) => action.id === 'preview')
+}
+
 export function quickNpcBuildRevision(values: QuickNpcSetupValues): string {
   if (values.contextKind === 'standalone') {
-    return [values.speciesId, String(values.level), values.classId].join(':')
+    return [
+      values.npcTemplateId ?? '',
+      values.speciesId,
+      String(values.level),
+      values.classId,
+    ].join(':')
   }
 
   return [
     values.membershipTitle ?? '',
+    values.npcTemplateId ?? '',
     values.speciesId,
     String(values.level),
     values.classId,
@@ -83,6 +167,10 @@ export function isQuickNpcBuildResolved(args: {
   values: QuickNpcSetupValues
   context: CharacterBuildContext
 }): boolean {
+  if (!isCreateSetupChoiceComplete(args.values.npcTemplateId)) {
+    return false
+  }
+
   const levelConstraints = resolveCharacterLevelConstraints({
     characterKind: args.context.characterKind,
     rulesScope: args.context.rulesScope,
@@ -110,19 +198,86 @@ export function resolveQuickNpcBuildExternalDecision(args: {
 }
 
 export {
-  formatQuickNpcLevelRecommendationPrompt,
   isQuickNpcBuildCardVisible,
   resolveQuickNpcBuildCardModel,
   QUICK_NPC_BUILD_CHANGE_CLASS_LABEL,
-  QUICK_NPC_BUILD_CHANGE_LEVEL_LABEL,
   QUICK_NPC_BUILD_DONE_LABEL,
   QUICK_NPC_BUILD_CHOOSE_CLASS_LABEL,
-  QUICK_NPC_BUILD_RECOMMENDED_BADGE_LABEL,
 } from './quick-npc-build-card.lib'
 export { resolveQuickNpcSelectedTitleRecommendation } from './quick-npc-class-recommendation.lib'
 export type { QuickNpcBuildCardModel } from './quick-npc-build-card.lib'
 
-export type QuickNpcAuthoringSetupSummaryRow = SetupSummaryRowModel
+export type QuickNpcSetupSummaryState = {
+  createContext: QuickNpcCreateContext
+  values: QuickNpcSetupValues
+  context: CharacterBuildContext
+  titles: readonly OrganizationMembershipTitleDefinition[]
+}
+
+export const QUICK_NPC_SETUP_SUMMARY = [
+  {
+    id: 'membershipTitle',
+    label: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
+    targetSetId: 'membershipTitle',
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
+    resolveValue: (state) => {
+      if (state.createContext.kind !== 'organization-member') return null
+      if (!isQuickNpcOrganizationMemberSetup(state.values)) return null
+      if (!isQuickNpcMembershipTitleSetupComplete(state.values.membershipTitle)) return null
+      return resolveQuickNpcMembershipTitleDisplayLabel(state.values.membershipTitle, state.titles)
+    },
+  },
+  {
+    id: 'npcTemplateId',
+    label: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
+    targetSetId: 'npcTemplateId',
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
+    resolveValue: (state) => {
+      if (!isQuickNpcStandaloneSetup(state.values) || !state.values.npcTemplateId) return null
+      return getNpcTemplateLabel(state.values.npcTemplateId)
+    },
+  },
+  {
+    id: 'speciesId',
+    label: QUICK_NPC_AUTHORING_SETUP_SPECIES_LABEL,
+    targetSetId: 'speciesId',
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
+    resolveValue: (state) => {
+      if (!state.values.speciesId) return null
+      return resolveQuickNpcSpeciesDisplayLabel(
+        state.values.speciesId,
+        indexCharacterBuildCatalog(state.context.catalog),
+      )
+    },
+  },
+  {
+    id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+    label: QUICK_NPC_AUTHORING_SETUP_BUILD_LABEL,
+    targetSetId: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
+    resolveValue: (state) => resolveQuickNpcBuildSummaryValue(state),
+  },
+] as const satisfies readonly CreateSetupSummaryDefinition<QuickNpcSetupSummaryState>[]
+
+function resolveQuickNpcBuildSummaryValue(state: QuickNpcSetupSummaryState): string | null {
+  const classSelected = Boolean(state.values.classId)
+  if (
+    !isQuickNpcBuildResolved({ values: state.values, context: state.context }) &&
+    !classSelected
+  ) {
+    return null
+  }
+
+  return formatQuickNpcAuthoringBuildSummaryValue({
+    values: state.values,
+    titles: state.titles,
+    catalogIndex: indexCharacterBuildCatalog(state.context.catalog),
+  })
+}
 
 export function resolveQuickNpcMembershipTitleDisplayLabel(
   membershipTitle: string | undefined,
@@ -156,14 +311,10 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
   catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
 }): string {
   const parts: string[] = []
-  if (isQuickNpcOrganizationMemberSetup(args.values)) {
-    const recommendation = resolveQuickNpcSelectedTitleRecommendation({
-      membershipTitle: args.values.membershipTitle,
-      titles: args.titles,
-    })
-    if (recommendation !== undefined) {
-      parts.push(getNpcAuthoringTemplateLabel(recommendation.templateId))
-    }
+  if (isQuickNpcStandaloneSetup(args.values) && args.values.npcTemplateId) {
+    parts.push(getNpcTemplateLabel(args.values.npcTemplateId))
+  } else if (isQuickNpcOrganizationMemberSetup(args.values) && args.values.npcTemplateId) {
+    parts.push(getNpcTemplateLabel(args.values.npcTemplateId))
   }
 
   const className = resolveQuickNpcClassDisplayLabel(args.values.classId, args.catalogIndex)
@@ -176,49 +327,22 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
   return parts.join(' · ')
 }
 
-/** Structured Role / Species / Build rows for authoring-phase SelectionSummaryCard. */
+/** Role / Species / Build rows from current setup state, in registry order. */
 export function resolveQuickNpcSetupSummaryRows(args: {
   createContext: QuickNpcCreateContext
   values: QuickNpcSetupValues
   context: CharacterBuildContext
   titles?: readonly OrganizationMembershipTitleDefinition[]
-}): QuickNpcAuthoringSetupSummaryRow[] {
-  const titles = args.titles ?? []
-  const catalogIndex = indexCharacterBuildCatalog(args.context.catalog)
-  const rows: QuickNpcAuthoringSetupSummaryRow[] = []
-
-  if (args.createContext.kind === 'organization-member') {
-    rows.push({
-      id: 'membershipTitle',
-      label: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
-      value: resolveQuickNpcMembershipTitleDisplayLabel(
-        isQuickNpcOrganizationMemberSetup(args.values) ? args.values.membershipTitle : undefined,
-        titles,
-      ),
-      editTarget: { type: 'set', id: 'membershipTitle' },
-    })
-  }
-
-  rows.push(
+}): SetupSummaryRow[] {
+  return resolveSetupSummaryRows(
     {
-      id: 'speciesId',
-      label: QUICK_NPC_AUTHORING_SETUP_SPECIES_LABEL,
-      value: resolveQuickNpcSpeciesDisplayLabel(args.values.speciesId, catalogIndex),
-      editTarget: { type: 'set', id: 'speciesId' },
+      createContext: args.createContext,
+      values: args.values,
+      context: args.context,
+      titles: args.titles ?? [],
     },
-    {
-      id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
-      label: QUICK_NPC_AUTHORING_SETUP_BUILD_LABEL,
-      value: formatQuickNpcAuthoringBuildSummaryValue({
-        values: args.values,
-        titles,
-        catalogIndex,
-      }),
-      editTarget: { type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID },
-    },
+    QUICK_NPC_SETUP_SUMMARY,
   )
-
-  return rows
 }
 
 type QuickNpcSetupSetBuilderArgs = {
@@ -230,7 +354,7 @@ type QuickNpcSetupSetBuilderArgs = {
 
 function buildQuickNpcSpeciesSetupSet(
   args: Pick<QuickNpcSetupSetBuilderArgs, 'values' | 'speciesTermLabel' | 'speciesPresentation'> & {
-    gateOnMembershipTitle: boolean
+    visibleWhenComplete?: readonly string[]
   },
 ): CreateSetupSet {
   return {
@@ -245,10 +369,26 @@ function buildQuickNpcSpeciesSetupSet(
       ? { optionGroups: args.speciesPresentation.optionGroups }
       : {}),
     value: args.values.speciesId,
-    ...(args.gateOnMembershipTitle ? { visibleWhenComplete: ['membershipTitle'] as const } : {}),
+    ...(args.visibleWhenComplete ? { visibleWhenComplete: args.visibleWhenComplete } : {}),
     summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
     summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
     isComplete: isCreateSetupChoiceComplete(args.values.speciesId),
+  }
+}
+
+function buildQuickNpcNpcTemplateSetupSet(values: QuickNpcSetupValues): CreateSetupSet {
+  const npcTemplateId = isQuickNpcStandaloneSetup(values) ? (values.npcTemplateId ?? '') : ''
+
+  return {
+    id: 'npcTemplateId',
+    kind: 'choice',
+    fieldLabel: QUICK_NPC_AUTHORING_SETUP_ROLE_LABEL,
+    prompt: QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT,
+    options: buildNpcTemplateRadioOptions(),
+    value: npcTemplateId,
+    summaryGroup: QUICK_NPC_SETUP_SELECTIONS_SUMMARY_GROUP,
+    summaryGroupEyebrow: QUICK_NPC_SETUP_SELECTIONS_EYEBROW,
+    isComplete: isCreateSetupChoiceComplete(npcTemplateId),
   }
 }
 
@@ -295,9 +435,10 @@ export function buildQuickNpcCreateSetupSets(args: {
 
   if (args.createContext.kind === 'standalone') {
     return [
+      buildQuickNpcNpcTemplateSetupSet(values),
       buildQuickNpcSpeciesSetupSet({
         ...setBuilderArgs,
-        gateOnMembershipTitle: false,
+        visibleWhenComplete: ['npcTemplateId'],
       }),
     ]
   }
@@ -309,7 +450,7 @@ export function buildQuickNpcCreateSetupSets(args: {
     }),
     buildQuickNpcSpeciesSetupSet({
       ...setBuilderArgs,
-      gateOnMembershipTitle: true,
+      visibleWhenComplete: ['membershipTitle'],
     }),
   ]
 }

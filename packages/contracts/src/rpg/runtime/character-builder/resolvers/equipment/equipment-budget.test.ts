@@ -63,7 +63,12 @@ const storedDruid: ClassStored = {
           id: 'standard-equipment',
           label: 'Standard Equipment',
           items: [
-            { kind: 'grant', target: { source: 'equipment', equipmentSlug: 'rope' }, quantity: 1 },
+            {
+              id: 'rope',
+              kind: 'grant',
+              target: { source: 'equipment', equipmentSlug: 'rope' },
+              quantity: 1,
+            },
           ],
           wealth: { gp: 9, sp: 5, cp: 3 },
         },
@@ -106,8 +111,7 @@ describe('deriveEquipmentBudgetSummary', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: true,
+        editedSincePackageSelection: true,
       },
     }
 
@@ -314,8 +318,7 @@ describe('deriveEquipmentBudgetSummaryFromFunding', () => {
             origin: 'picker' as const,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

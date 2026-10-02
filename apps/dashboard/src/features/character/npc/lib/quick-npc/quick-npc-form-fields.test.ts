@@ -8,9 +8,7 @@ import {
   buildQuickNpcContentOptions,
   buildQuickNpcDetailsFields,
   buildQuickNpcSeed,
-  buildQuickNpcConstraints,
   buildQuickNpcTabs,
-  countQuickNpcConfiguredRequirements,
   createQuickNpcSetupDefaultValues,
   isQuickNpcMembershipTitleSetupComplete,
   mergeQuickNpcAuthoringValues,
@@ -32,8 +30,11 @@ const validValues = {
   level: 3,
   alignment: 'ln',
   membershipTitle: 'omt_member',
-  requiredWeaponIds: [],
+  npcTemplateId: 'guard',
+  equipmentSelections: [],
   requiredSpellIds: [],
+  startingChoiceOverrides: {},
+  generateNarrativeOnCreate: true,
 }
 
 describe('isQuickNpcMembershipTitleSetupComplete', () => {
@@ -124,6 +125,7 @@ describe('buildQuickNpcSeed', () => {
       level: 3,
       alignment: 'ln',
       gender: 'male',
+      npcTemplateId: 'guard',
     })
   })
 
@@ -142,6 +144,7 @@ describe('buildQuickNpcSeed', () => {
       level: 0,
       alignment: 'ln',
       gender: 'male',
+      npcTemplateId: 'guard',
     })
   })
 })
@@ -175,13 +178,20 @@ describe('buildQuickNpcContentOptions', () => {
 })
 
 describe('buildQuickNpcDetailsFields', () => {
-  it('includes gender, name, and alignment', () => {
+  it('includes gender, name, and alignment in one field group', () => {
     const fields = buildQuickNpcDetailsFields()
 
-    expect(fields.map((field) => ('name' in field ? field.name : null))).toEqual([
+    expect(fields).toHaveLength(1)
+    expect(fields[0]).toMatchObject({
+      kind: 'group',
+      fieldChrome: { variant: 'none' },
+    })
+    const groupFields = fields[0] && 'fields' in fields[0] ? fields[0].fields : []
+    expect(groupFields.map((field) => ('name' in field ? field.name : null))).toEqual([
       'gender',
       'name',
       'alignment',
+      'generateNarrativeOnCreate',
     ])
   })
 
@@ -190,8 +200,11 @@ describe('buildQuickNpcDetailsFields', () => {
       gender: '',
       name: '',
       alignment: 'n',
-      requiredWeaponIds: [],
+      equipmentSelections: [],
       requiredSpellIds: [],
+      startingChoiceOverrides: {},
+      classPackage: { state: 'unresolved' },
+      generateNarrativeOnCreate: true,
     })
   })
 })
@@ -208,13 +221,12 @@ describe('buildQuickNpcTabs validation wiring', () => {
       requirementsFields: [
         {
           type: 'select',
-          name: 'requiredWeaponIds',
-          label: 'Starting weapon',
+          name: 'additionalEquipmentIds',
+          label: 'Starting equipment',
           options: [],
           width: 'full',
         },
       ],
-      configuredCount: 0,
     })
 
     const detailsTab = tabs.find((tab) => tab.id === QUICK_NPC_DETAILS_TAB_ID)
@@ -244,8 +256,11 @@ describe('buildQuickNpcTabs validation wiring', () => {
           gender: 'male',
           name: 'Guard Captain',
           alignment: 'ln',
-          requiredWeaponIds: [],
+          equipmentSelections: [],
           requiredSpellIds: [],
+          startingChoiceOverrides: {},
+          classPackage: { state: 'unresolved' },
+          generateNarrativeOnCreate: true,
         },
       ),
     ).toMatchObject({
@@ -255,33 +270,5 @@ describe('buildQuickNpcTabs validation wiring', () => {
       level: 2,
       name: 'Guard Captain',
     })
-  })
-})
-
-describe('buildQuickNpcConstraints', () => {
-  it('omits empty requirement fields', () => {
-    expect(
-      buildQuickNpcConstraints({ requiredWeaponIds: [], requiredSpellIds: [] }),
-    ).toBeUndefined()
-  })
-
-  it('maps configured requirement id arrays', () => {
-    expect(
-      buildQuickNpcConstraints({
-        requiredWeaponIds: ['srd-cc-5.2.1:longsword'],
-        requiredSpellIds: [],
-      }),
-    ).toEqual({ requiredWeaponIds: ['srd-cc-5.2.1:longsword'], requiredSpellIds: [] })
-  })
-})
-
-describe('countQuickNpcConfiguredRequirements', () => {
-  it('counts weapons and spells in configured arrays', () => {
-    expect(
-      countQuickNpcConfiguredRequirements({
-        requiredWeaponIds: ['weapon-1'],
-        requiredSpellIds: ['spell-1'],
-      }),
-    ).toBe(2)
   })
 })

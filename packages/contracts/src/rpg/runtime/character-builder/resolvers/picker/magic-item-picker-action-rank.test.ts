@@ -118,8 +118,7 @@ function buildMagicItemContext() {
       mode: 'gold' as const,
       purchases: [],
       magicItemSelections: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 
@@ -140,7 +139,6 @@ function makeMagicPickerItem(
       isAvailable: true,
       isRecommended: false,
       isProficient: true,
-      isAffordable: true,
       isWithinRemainingBudget: true,
       purchaseAvailability: { status: 'available' },
       recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },

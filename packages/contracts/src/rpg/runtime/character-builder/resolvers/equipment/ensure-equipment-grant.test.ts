@@ -118,8 +118,7 @@ describe('ensureEquipmentGrant', () => {
         mode: 'gold' as const,
         purchases: [],
         grants: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

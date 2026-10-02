@@ -9,7 +9,11 @@ import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
-import { fieldSizeToChipSize } from './field-sizing.variants'
+import {
+  fieldSizeToChipSize,
+  resolveInteractiveListSizeForFieldSize,
+} from './field-sizing.variants'
+import { ComboboxOptionRow } from './combobox-option-row.client'
 import { Spinner } from './spinner'
 import { isComboboxOptionDisabled } from './combobox-field.lib'
 import type {
@@ -27,10 +31,9 @@ import {
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
-import { ListResultEmpty, ListResultList } from './list-result-list.client'
-import { ListResultItem } from './list-result-item.client'
-import { ListResultToolbar } from './list-result-toolbar.client'
-import { ListResultViewport } from './list-result-viewport.client'
+import { InteractiveListEmpty } from './interactive-list.client'
+import { InteractiveListPanel } from './interactive-list-panel.client'
+import { InteractiveListToolbar } from './interactive-list-toolbar.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
 
 interface ComboboxTriggerProps {
@@ -116,10 +119,16 @@ interface ComboboxOptionItemProps {
   isSelected: boolean
   isHighlighted: boolean
   isDisabled: boolean
+  multiple: boolean
   size: FieldSize
   renderOption?: ComboboxRenderOption
   onHighlight: () => void
   onSelect: () => void
+}
+
+function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean) {
+  if (!multiple || !isSelected) return undefined
+  return <Check className="size-4 shrink-0" aria-hidden />
 }
 
 function ComboboxOptionItem({
@@ -128,68 +137,59 @@ function ComboboxOptionItem({
   isSelected,
   isHighlighted,
   isDisabled,
+  multiple,
   size,
   renderOption,
   onHighlight,
   onSelect,
 }: ComboboxOptionItemProps) {
-  const checkSlot = isSelected ? (
-    <Check className="size-4 shrink-0" aria-hidden />
-  ) : (
-    <span className="size-4 shrink-0" aria-hidden />
-  )
+  const rowSize = resolveInteractiveListSizeForFieldSize(size)
+  const selectionEndSlot = comboboxSelectionEndSlot(multiple, isSelected)
 
   if (renderOption) {
+    const optionContent = renderOption(option, {
+      selected: isSelected,
+      disabled: isDisabled,
+      size,
+    })
     return (
-      <ListResultItem
+      <ComboboxOptionRow
+        optionId={optionId}
         highlighted={isHighlighted}
         selected={isSelected}
         disabled={isDisabled}
-        content={
-          <span className="flex min-w-0 flex-1 items-center gap-2">
-            <span className="min-w-0 flex-1">
-              {renderOption(option, { selected: isSelected, disabled: isDisabled, size })}
+        size={rowSize}
+        ariaLabel={option.label}
+        renderContent={
+          selectionEndSlot ? (
+            <span className="flex min-w-0 flex-1 items-center gap-2">
+              <span className="min-w-0 flex-1">{optionContent}</span>
+              {selectionEndSlot}
             </span>
-            {checkSlot}
-          </span>
+          ) : (
+            optionContent
+          )
         }
-        asChild
-      >
-        <button
-          id={optionId}
-          type="button"
-          role="option"
-          aria-selected={isSelected}
-          aria-label={option.label}
-          disabled={isDisabled}
-          onMouseEnter={onHighlight}
-          onClick={onSelect}
-        />
-      </ListResultItem>
+        onHighlight={onHighlight}
+        onSelect={onSelect}
+      />
     )
   }
 
   return (
-    <ListResultItem
-      name={option.label}
-      classification={option.classification}
-      metadata={option.metadata}
+    <ComboboxOptionRow
+      optionId={optionId}
       highlighted={isHighlighted}
       selected={isSelected}
       disabled={isDisabled}
-      endSlot={checkSlot}
-      asChild
-    >
-      <button
-        id={optionId}
-        type="button"
-        role="option"
-        aria-selected={isSelected}
-        disabled={isDisabled}
-        onMouseEnter={onHighlight}
-        onClick={onSelect}
-      />
-    </ListResultItem>
+      size={rowSize}
+      heading={option.label}
+      classification={option.classification}
+      supporting={option.metadata}
+      endSlot={selectionEndSlot}
+      onHighlight={onHighlight}
+      onSelect={onSelect}
+    />
   )
 }
 
@@ -220,7 +220,7 @@ export function ComboboxSearchField({
   onSearchKeyDown,
 }: ComboboxSearchFieldProps) {
   return (
-    <ListResultToolbar
+    <InteractiveListToolbar
       search={
         <div className={comboboxSearchRowVariants({ size })}>
           <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
@@ -323,41 +323,42 @@ export function ComboboxPanel({
           />
         ) : null}
 
-        <ListResultViewport>
-          <ListResultList
-            ref={listboxRef}
-            id={listboxId}
-            role="listbox"
-            tabIndex={enableSearch ? undefined : -1}
-            aria-label={label}
-            aria-multiselectable={multiple || undefined}
-            aria-activedescendant={enableSearch ? undefined : activeOptionId}
-            onKeyDown={enableSearch ? undefined : onNavigationKeyDown}
-          >
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option, index) => {
-                const isSelected = selected.includes(option.value)
-                const isDisabled = isComboboxOptionDisabled(option, multiple, atMax, isSelected)
-                return (
-                  <ComboboxOptionItem
-                    key={option.value}
-                    option={option}
-                    optionId={`${generatedId}-option-${option.value}`}
-                    isSelected={isSelected}
-                    isHighlighted={index === highlightedIndex}
-                    isDisabled={isDisabled}
-                    size={size}
-                    renderOption={renderOption}
-                    onHighlight={() => onHighlight(index)}
-                    onSelect={() => onSelect(option.value)}
-                  />
-                )
-              })
-            ) : (
-              <ListResultEmpty>{emptyMessage}</ListResultEmpty>
-            )}
-          </ListResultList>
-        </ListResultViewport>
+        <InteractiveListPanel
+          listProps={{
+            ref: listboxRef,
+            id: listboxId,
+            role: 'listbox',
+            tabIndex: enableSearch ? undefined : -1,
+            'aria-label': label,
+            'aria-multiselectable': multiple || undefined,
+            'aria-activedescendant': enableSearch ? undefined : activeOptionId,
+            onKeyDown: enableSearch ? undefined : onNavigationKeyDown,
+          }}
+        >
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option, index) => {
+              const isSelected = selected.includes(option.value)
+              const isDisabled = isComboboxOptionDisabled(option, multiple, atMax, isSelected)
+              return (
+                <ComboboxOptionItem
+                  key={option.value}
+                  option={option}
+                  optionId={`${generatedId}-option-${option.value}`}
+                  isSelected={isSelected}
+                  isHighlighted={index === highlightedIndex}
+                  isDisabled={isDisabled}
+                  multiple={multiple}
+                  size={size}
+                  renderOption={renderOption}
+                  onHighlight={() => onHighlight(index)}
+                  onSelect={() => onSelect(option.value)}
+                />
+              )
+            })
+          ) : (
+            <InteractiveListEmpty>{emptyMessage}</InteractiveListEmpty>
+          )}
+        </InteractiveListPanel>
       </PopoverPrimitive.Content>
     </PopoverLayerPortal>
   )

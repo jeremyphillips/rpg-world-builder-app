@@ -108,8 +108,7 @@ describe('equipment-acquisition-panel.lib', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const context = createEquipmentStepContextWithMagicItemGrantsFixture()
@@ -145,8 +144,7 @@ describe('equipment-acquisition-panel.lib', () => {
             quantity: 1,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 

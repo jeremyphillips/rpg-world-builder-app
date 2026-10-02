@@ -1,15 +1,14 @@
 import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
+  fitsStartingEquipmentBudget,
   compareMagicItemBestMatch,
-  EQUIPMENT_PICKER_SUPPORTED_KINDS,
   formatMoney,
   formatWealthAsGold,
   isEquipmentPickerSupportedKind,
   moneyToCopper,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
-  type EquipmentPickerSupportedKind,
   type Money,
 } from '@rpg/contracts'
 
@@ -42,6 +41,7 @@ import {
 import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
+  EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
@@ -352,51 +352,48 @@ export function filterAndSortEquipmentPickerItems(
 
 export { getEquipmentPickerSearchText } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-export function resolveEquipmentPickerAllowedKinds(
-  allowedKinds?: readonly EquipmentPickerSupportedKind[],
-): EquipmentPickerSupportedKind[] {
-  const sourceKinds = allowedKinds ?? EQUIPMENT_PICKER_SUPPORTED_KINDS
-  return sourceKinds.filter(isEquipmentPickerSupportedKind)
+export {
+  resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerAllowedKinds,
+} from '../../../../lib/equipment/equipment-kind-filter.lib'
+
+type EquipmentPickerStructuredFilterOptions = {
+  filterOutUnaffordable: boolean
+  filterOutNonProficient: boolean
+  selectedKind: EquipmentPickerKindFilter
+  showAffordableOnly?: boolean
+  /** Starting package purse. Required for `filterOutUnaffordable`; not a picker-row fact. */
+  budget?: EquipmentBudgetSummary
 }
 
-export function resolveEquipmentKindFilterOptions(
-  items: readonly EquipmentPickerItem[],
-  allowedKinds?: readonly EquipmentPickerSupportedKind[],
-): EquipmentPickerSupportedKind[] {
-  const kindsInItems = new Set(
-    items.map((item) => item.equipment.kind).filter(isEquipmentPickerSupportedKind),
-  )
-  return resolveEquipmentPickerAllowedKinds(allowedKinds).filter((kind) => kindsInItems.has(kind))
+function exceedsStartingPackageBudget(
+  item: EquipmentPickerItem,
+  options: Pick<EquipmentPickerStructuredFilterOptions, 'filterOutUnaffordable' | 'budget'>,
+): boolean {
+  if (!options.filterOutUnaffordable || !options.budget) return false
+  if (!canPurchaseEquipment(item.equipment)) return false
+  return !fitsStartingEquipmentBudget(item.equipment, options.budget)
+}
+
+function equipmentPickerItemMatchesStructuredFilters(
+  item: EquipmentPickerItem,
+  options: EquipmentPickerStructuredFilterOptions,
+): boolean {
+  if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
+  if (exceedsStartingPackageBudget(item, options)) return false
+  if (options.filterOutNonProficient && !item.state.isProficient) return false
+  if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
+  if (options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) {
+    return item.equipment.kind === options.selectedKind
+  }
+  return true
 }
 
 export function filterEquipmentPickerItems(
   items: readonly EquipmentPickerItem[],
-  options: {
-    filterOutUnaffordable: boolean
-    filterOutNonProficient: boolean
-    selectedKind: EquipmentPickerKindFilter
-    showAffordableOnly?: boolean
-  },
+  options: EquipmentPickerStructuredFilterOptions,
 ): EquipmentPickerItem[] {
-  return items.filter((item) => {
-    if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
-    if (
-      options.filterOutUnaffordable &&
-      canPurchaseEquipment(item.equipment) &&
-      !item.state.isAffordable
-    ) {
-      return false
-    }
-    if (options.filterOutNonProficient && !item.state.isProficient) return false
-    if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
-    if (
-      options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL &&
-      item.equipment.kind !== options.selectedKind
-    ) {
-      return false
-    }
-    return true
-  })
+  return items.filter((item) => equipmentPickerItemMatchesStructuredFilters(item, options))
 }
 
 /**
@@ -411,6 +408,7 @@ export function countEquipmentPickerAffordableHiddenImpact(
     filterOutNonProficient: boolean
     selectedKind: EquipmentPickerKindFilter
     showAffordableOnly: boolean
+    budget?: EquipmentBudgetSummary
   },
 ): number {
   if (!options.showAffordableOnly) return 0
@@ -420,6 +418,7 @@ export function countEquipmentPickerAffordableHiddenImpact(
     filterOutUnaffordable: options.filterOutUnaffordable,
     filterOutNonProficient: options.filterOutNonProficient,
     selectedKind: options.selectedKind,
+    budget: options.budget,
   }
 
   const beforeAffordable = filterEquipmentPickerItems(searchScoped, {
@@ -435,7 +434,7 @@ export function countEquipmentPickerAffordableHiddenImpact(
   return hiddenCount > 0 ? hiddenCount : 0
 }
 
-/** Stable unified-list ordering: essential → strong → compatible → neutral → not proficient. */
+/** Best-match order from resolved equipment facts. */
 export function sortEquipmentPickerItems(
   items: readonly EquipmentPickerItem[],
   browseSortContext?: EquipmentPickerBrowseSortContext,
@@ -467,7 +466,10 @@ export function getEquipmentPickerDisabledNote(
   }
 
   if (action.reason === 'not_purchasable') {
-    return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
+    return item.state.purchaseAvailability.status === 'unavailableForPurchase' &&
+      item.state.purchaseAvailability.reason === 'unsupported_kind'
+      ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
+      : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
   }
 
   if (action.reason === 'unaffordable') {

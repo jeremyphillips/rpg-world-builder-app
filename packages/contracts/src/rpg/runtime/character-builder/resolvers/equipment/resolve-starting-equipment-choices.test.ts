@@ -79,12 +79,14 @@ const storedBard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'musical-instrument-choice',
               kind: 'choice',
               choose: 1,
               pool: {

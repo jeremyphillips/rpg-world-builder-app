@@ -10,17 +10,13 @@ import { Button, type ButtonForwardingProps } from './button.client'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './dropdown-menu.client'
-import { DropdownMenuChoiceItemContent } from './dropdown-menu-choice-item-content'
-import {
-  dropdownMenuChoiceContentClasses,
-  dropdownMenuChoiceItemClasses,
-} from './dropdown-menu-choice.variants'
+import { InteractiveList } from './interactive-list.client'
+import { MenuChoiceRow } from './menu-choice-row.client'
+import { interactiveListChoiceMenuContentClasses } from './dropdown-menu-choice.variants'
 import {
   splitButtonChevronIconClasses,
   splitButtonChevronVariants,
@@ -100,33 +96,26 @@ export function SplitButton({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
-            className={useChoiceMenuLayout ? cn(dropdownMenuChoiceContentClasses) : undefined}
+            className={
+              useChoiceMenuLayout ? cn(interactiveListChoiceMenuContentClasses) : undefined
+            }
           >
             {menuGroups.map((group, groupIndex) => (
               <React.Fragment key={group.id}>
                 {groupIndex > 0 ? <DropdownMenuSeparator /> : null}
-                <DropdownMenuGroup>
-                  {group.label ? <DropdownMenuLabel>{group.label}</DropdownMenuLabel> : null}
+                {group.label ? <DropdownMenuLabel>{group.label}</DropdownMenuLabel> : null}
+                <InteractiveList>
                   {group.items.map((item) => (
-                    <DropdownMenuItem
+                    <MenuChoiceRow
                       key={item.id}
-                      className={
-                        useChoiceMenuLayout ? cn(dropdownMenuChoiceItemClasses) : undefined
-                      }
+                      heading={item.label}
+                      supporting={item.description}
+                      supportingWrap={item.description != null}
                       disabled={item.disabled}
                       onSelect={() => item.onSelect()}
-                    >
-                      {item.description ? (
-                        <DropdownMenuChoiceItemContent
-                          label={item.label}
-                          description={item.description}
-                        />
-                      ) : (
-                        item.label
-                      )}
-                    </DropdownMenuItem>
+                    />
                   ))}
-                </DropdownMenuGroup>
+                </InteractiveList>
               </React.Fragment>
             ))}
           </DropdownMenuContent>

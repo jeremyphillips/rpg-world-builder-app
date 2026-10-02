@@ -23,6 +23,8 @@ export const CHARACTER_SELECTION_SOURCE_KINDS = [
   'manual',
   /** Generic equipment grant — not purchase-shaped and not automation-coupled. */
   'grant',
+  /** NPC role template — `sourceId` = template id, `grantId` = choice set id or `training`. */
+  'npcTemplate',
 ] as const
 
 export const characterSelectionSourceKindSchema = z.enum(CHARACTER_SELECTION_SOURCE_KINDS)
@@ -43,6 +45,7 @@ export type CharacterSelectionSourceKind = z.infer<typeof characterSelectionSour
  * - `backgroundStartingEquipment` — reserved for future background content; same shape as class
  * - `startingWealthTier` — `sourceId` = starting wealth table id, `grantId` = tier id
  * - `characterCreation` — `sourceId` = ruleset id, `grantId` = proficiency choice/grant id
+ * - `npcTemplate` — `sourceId` = template id, `grantId` = choice set id or `training`
  */
 export const characterSelectionSourceSchema = z
   .object({

@@ -9,6 +9,7 @@ import {
   addCustomRefinementIssue,
   alignmentSchema,
   characterBuilderValidationMessages,
+  classPackageChoiceSchema,
   formatFieldMessage,
   genderSchema,
   getAlignmentLabel,
@@ -16,9 +17,10 @@ import {
   isClassProgressionApplicable,
   resolveCharacterLevelConstraints,
   resolvePlayableBuilderContent,
-  type AutomaticNpcBuildConstraints,
+  npcTemplateIdSchema,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
+  type NpcTemplateId,
 } from '@rpg/contracts'
 import {
   toOptions,
@@ -27,11 +29,7 @@ import {
   type TabbedFormTab,
   type TrailingFieldActionConfig,
 } from '@rpg/ui/form'
-import {
-  buildQuickNpcConstraintsFromArrays,
-  countQuickNpcConfiguredRequirementsFromArrays,
-  type QuickNpcRequirementOptionSets,
-} from './quick-npc-requirement-options.lib'
+import type { QuickNpcRequirementOptionSets } from './quick-npc-requirement-options.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 
 // ---------------------------------------------------------------------------
@@ -39,8 +37,27 @@ import type { QuickNpcCreateContext } from './quick-npc-create-context'
 // details (name, alignment) and optional requirements (weapon/spell constraints).
 // ---------------------------------------------------------------------------
 
-export const QUICK_NPC_REQUIRED_WEAPON_FIELD_NAME = 'requiredWeaponIds'
+export const QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME = 'equipmentSelections'
+
+export const quickNpcEquipmentSelectionSchema = z.object({
+  equipmentId: z.string().min(1),
+  quantity: z.number().int().min(1),
+  origin: z.enum(['role-default', 'manual']),
+})
+
+export type QuickNpcEquipmentSelection = z.infer<typeof quickNpcEquipmentSelectionSchema>
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
+export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOverrides'
+export const QUICK_NPC_CLASS_PACKAGE_FIELD_NAME = 'classPackage'
+
+export const QUICK_NPC_STARTING_CHOICES_TAB_LABEL = 'Starting choices' as const
+
+export const QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME = 'generateNarrativeOnCreate' as const
+
+export const QUICK_NPC_GENERATE_NARRATIVE_LABEL = 'Generate narrative' as const
+
+export const QUICK_NPC_GENERATE_NARRATIVE_HINT =
+  "Create a narrative from this NPC's final setup and choices." as const
 
 export const QUICK_NPC_DETAILS_TAB_ID = 'details' as const
 export const QUICK_NPC_REQUIREMENTS_TAB_ID = 'requirements' as const
@@ -49,6 +66,8 @@ export type QuickNpcSetupCoreValues = {
   speciesId: string
   classId: string
   level: number
+  /** Catalog NPC role when chosen in setup or on the org-member build card. */
+  npcTemplateId?: NpcTemplateId
 }
 
 export type QuickNpcStandaloneSetupValues = QuickNpcSetupCoreValues & {
@@ -133,6 +152,7 @@ function quickNpcSetupCoreFields(maxLevel: number, minLevel: number) {
 export function quickNpcStandaloneSetupSchema(maxLevel: number, minLevel: number) {
   return quickNpcSetupCoreFields(maxLevel, minLevel).extend({
     contextKind: z.literal('standalone'),
+    npcTemplateId: z.string().min(1, 'Choose a role.').pipe(npcTemplateIdSchema),
   })
 }
 
@@ -142,6 +162,7 @@ export function quickNpcOrganizationMemberSetupSchema(maxLevel: number, minLevel
     membershipTitle: z.string().refine((value) => isQuickNpcMembershipTitleSetupComplete(value), {
       message: 'Choose a membership title.',
     }),
+    npcTemplateId: z.string().min(1, 'Choose a role.').pipe(npcTemplateIdSchema),
   })
 }
 
@@ -196,8 +217,10 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    requiredWeaponIds: z.array(z.string()),
+    equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
+    startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
+    classPackage: classPackageChoiceSchema.default({ state: 'unresolved' }),
   })
 
   return z.intersection(quickNpcSetupSchema(maxLevel, minLevel), authoringFields)
@@ -218,22 +241,34 @@ export function quickNpcAuthoringTabSchema() {
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
       .pipe(alignmentSchema),
-    requiredWeaponIds: z.array(z.string()),
+    equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
+    startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
+    classPackage: classPackageChoiceSchema.default({ state: 'unresolved' }),
+    [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: z.boolean(),
   })
 }
 
 export type QuickNpcAuthoringTabValues = z.output<ReturnType<typeof quickNpcAuthoringTabSchema>>
 export type QuickNpcAuthoringTabFormValues = z.input<ReturnType<typeof quickNpcAuthoringTabSchema>>
 
-export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcAuthoringTabValues
+/** Authoring values used for automatic build — excludes UI-only tab fields. */
+export type QuickNpcBuildAuthoringValues = Omit<
+  QuickNpcAuthoringTabValues,
+  typeof QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME
+>
+
+export type QuickNpcAuthoringValues = QuickNpcSetupValues & QuickNpcBuildAuthoringValues
 
 export const quickNpcAuthoringTabDefaultValues = {
   gender: '',
   name: '',
   alignment: 'n',
-  requiredWeaponIds: [],
+  equipmentSelections: [],
   requiredSpellIds: [],
+  startingChoiceOverrides: {},
+  classPackage: { state: 'unresolved' },
+  [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: true,
 } satisfies QuickNpcAuthoringTabFormValues
 
 /** Merges outer Setup values with TabbedForm authoring tab values for create/finalize. */
@@ -241,7 +276,8 @@ export function mergeQuickNpcAuthoringValues(
   setup: QuickNpcSetupValues,
   tab: QuickNpcAuthoringTabValues,
 ): QuickNpcAuthoringValues {
-  return { ...setup, ...tab }
+  const { [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: _generateNarrative, ...buildTab } = tab
+  return { ...setup, ...buildTab }
 }
 
 /** Maps validated authoring values to the automatic build resolver seed. */
@@ -255,25 +291,8 @@ export function buildQuickNpcSeed(values: QuickNpcAuthoringValues): AutomaticNpc
     level: values.level,
     alignment: values.alignment,
     gender: values.gender,
+    ...(values.npcTemplateId ? { npcTemplateId: values.npcTemplateId } : {}),
   }
-}
-
-export function buildQuickNpcConstraints(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
-): AutomaticNpcBuildConstraints | undefined {
-  return buildQuickNpcConstraintsFromArrays({
-    requiredWeaponIds: values.requiredWeaponIds,
-    requiredSpellIds: values.requiredSpellIds,
-  })
-}
-
-export function countQuickNpcConfiguredRequirements(
-  values: Pick<QuickNpcAuthoringValues, 'requiredWeaponIds' | 'requiredSpellIds'>,
-): number {
-  return countQuickNpcConfiguredRequirementsFromArrays({
-    requiredWeaponIds: values.requiredWeaponIds,
-    requiredSpellIds: values.requiredSpellIds,
-  })
 }
 
 export type QuickNpcContentOptions = {
@@ -316,10 +335,6 @@ export type QuickNpcRequirementCategories = {
 
 export type { QuickNpcRequirementOptionSets }
 
-function formatRequirementsTabLabel(configuredCount: number): string {
-  return configuredCount > 0 ? `Requirements (${configuredCount})` : 'Requirements'
-}
-
 export type QuickNpcDetailsFieldsArgs = {
   nameTrailingAction?: TrailingFieldActionConfig
   nameHint?: string
@@ -339,22 +354,36 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {})
 
   return [
     {
-      type: 'chips',
-      name: 'gender',
-      label: 'Gender',
-      multiple: false,
-      options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
-      required: true,
-      width: 'full',
-    },
-    nameField,
-    {
-      type: 'select',
-      name: 'alignment',
-      label: 'Alignment',
-      options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
-      required: true,
-      width: 'full',
+      kind: 'group',
+      fieldChrome: { variant: 'none' },
+      fields: [
+        {
+          type: 'chips',
+          name: 'gender',
+          label: 'Gender',
+          multiple: false,
+          options: toOptions(CHARACTER_GENDERS, GENDER_LABELS),
+          required: true,
+          width: 'full',
+        },
+        nameField,
+        {
+          type: 'select',
+          name: 'alignment',
+          label: 'Alignment',
+          options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
+          required: true,
+          width: 'full',
+        },
+        {
+          type: 'switch',
+          name: QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME,
+          label: QUICK_NPC_GENERATE_NARRATIVE_LABEL,
+          hint: QUICK_NPC_GENERATE_NARRATIVE_HINT,
+          defaultValue: true,
+          separator: 'subtle',
+        },
+      ],
     },
   ]
 }
@@ -366,7 +395,6 @@ export function buildQuickNpcRequirementsFields(): FormItem[] {
 export function buildQuickNpcTabs(args: {
   detailsFields: FormItem[]
   requirementsFields: FormItem[]
-  configuredCount: number
   requirementsHeader?: ReactNode
 }): TabbedFormTab[] {
   const tabs: TabbedFormTab[] = [
@@ -393,7 +421,7 @@ export function buildQuickNpcTabs(args: {
   if (args.requirementsFields.length > 0 || args.requirementsHeader) {
     tabs.push({
       id: QUICK_NPC_REQUIREMENTS_TAB_ID,
-      label: formatRequirementsTabLabel(args.configuredCount),
+      label: QUICK_NPC_STARTING_CHOICES_TAB_LABEL,
       leadingIcon: createElement(ListTodo, { 'aria-hidden': true }),
       fields: args.requirementsFields,
       ...(args.requirementsHeader ? { header: args.requirementsHeader } : {}),

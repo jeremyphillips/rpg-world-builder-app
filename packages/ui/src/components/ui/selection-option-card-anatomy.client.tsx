@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../../lib/utils'
+import { Eyebrow } from './eyebrow'
+import type { EyebrowVariantProps } from './eyebrow.variants'
 import { textVariants } from './text.variants'
 import {
   optionCardBodyVariants,
@@ -28,6 +30,28 @@ export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 export const SELECTION_OPTION_CARD_SUMMARY_SEPARATOR = ' · '
 
 export type SelectionOptionCardDensity = 'default' | 'compact'
+
+/** Default card eyebrow is `sm`; compact density steps down one size. */
+export function resolveSelectionOptionCardEyebrowSize(
+  density: SelectionOptionCardDensity,
+): NonNullable<EyebrowVariantProps['size']> {
+  return density === 'compact' ? 'xs' : 'sm'
+}
+
+export type SelectionOptionCardHeaderEyebrowProps = {
+  density?: SelectionOptionCardDensity
+  /** Overrides density-derived eyebrow size when a surface needs an exception. */
+  size?: EyebrowVariantProps['size']
+  children: string
+}
+
+export function SelectionOptionCardHeaderEyebrow({
+  density = 'default',
+  size,
+  children,
+}: SelectionOptionCardHeaderEyebrowProps) {
+  return <Eyebrow size={size ?? resolveSelectionOptionCardEyebrowSize(density)}>{children}</Eyebrow>
+}
 
 export type SelectionOptionCardAnatomyProps = {
   density?: SelectionOptionCardDensity

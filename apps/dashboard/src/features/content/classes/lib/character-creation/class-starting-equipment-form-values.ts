@@ -15,8 +15,9 @@ import {
 import { applyStableIdsForChoiceOptions } from '../../../lib/forms/registry/content-form-key-helpers'
 import {
   equipmentGrantFromFormRow,
-  equipmentGrantToFormRow,
+  equipmentPoolToFormRow,
 } from '../../../lib/forms/grants/equipment/equipment-grant-form-values'
+import { createStartingEquipmentContributionId } from './class-starting-equipment-form-fields'
 import {
   type StartingEquipmentDraftForm,
   type StartingEquipmentForm,
@@ -24,11 +25,15 @@ import {
   type StartingEquipmentOptionForm,
 } from './class-starting-equipment-form-fields'
 
+type StartingEquipmentGrantItemForm = Extract<StartingEquipmentItemForm, { itemKind: 'grant' }>
+type StartingEquipmentChoiceItemForm = Extract<StartingEquipmentItemForm, { itemKind: 'choice' }>
+
 function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEquipmentItemForm {
   if (item.kind === 'grant') {
     const proficiencyChoiceId = startingEquipmentGrantProficiencyChoiceId(item)
     if (proficiencyChoiceId) {
       return {
+        id: item.id,
         itemKind: 'grant',
         grantTargetSource: 'proficiency_choice',
         proficiencyChoiceId,
@@ -38,6 +43,7 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
     }
 
     return {
+      id: item.id,
       itemKind: 'grant',
       grantTargetSource: 'equipment',
       equipmentSlug: startingEquipmentGrantEquipmentSlug(item) ?? '',
@@ -49,42 +55,80 @@ function startingEquipmentItemToFormRow(item: StartingEquipmentItem): StartingEq
       })),
     }
   }
-  return equipmentGrantToFormRow(item)
+  return {
+    id: item.id,
+    itemKind: 'choice',
+    choose: 1,
+    ...equipmentPoolToFormRow(item.pool),
+  }
+}
+
+function startingEquipmentProficiencyGrantFromFormRow(
+  row: StartingEquipmentGrantItemForm,
+): StartingEquipmentGrantedItem {
+  const item: StartingEquipmentGrantedItem = {
+    id: row.id,
+    kind: 'grant',
+    target: { source: 'proficiency_choice', choiceId: row.proficiencyChoiceId! },
+    quantity: row.quantity ?? 1,
+  }
+  if (row.equipped !== undefined) {
+    item.equipped = row.equipped
+  }
+  return item
+}
+
+function startingEquipmentEquipmentGrantFromFormRow(
+  row: StartingEquipmentGrantItemForm,
+): StartingEquipmentGrantedItem {
+  const grant = equipmentGrantFromFormRow(row)
+  if (grant.kind !== 'grant') {
+    throw new Error('Starting equipment grant rows require an equipment slug in v1')
+  }
+
+  const item: StartingEquipmentGrantedItem = {
+    id: row.id || createStartingEquipmentContributionId(),
+    kind: 'grant',
+    target: { source: 'equipment', equipmentSlug: grant.equipmentSlug },
+    quantity: grant.quantity ?? 1,
+  }
+  if (grant.equipped !== undefined) {
+    item.equipped = grant.equipped
+  }
+  if (row.modifiers?.length) {
+    item.modifiers = row.modifiers
+  }
+  return item
+}
+
+function startingEquipmentGrantFromFormRow(
+  row: StartingEquipmentGrantItemForm,
+): StartingEquipmentGrantedItem {
+  if (row.grantTargetSource === 'proficiency_choice') {
+    return startingEquipmentProficiencyGrantFromFormRow(row)
+  }
+  return startingEquipmentEquipmentGrantFromFormRow(row)
+}
+
+function startingEquipmentChoiceFromFormRow(
+  row: StartingEquipmentChoiceItemForm,
+): StartingEquipmentItem {
+  const choice = equipmentGrantFromFormRow({ ...row, choose: 1 })
+  if (choice.kind !== 'choice') {
+    throw new Error('Starting equipment choice rows require a choice grant')
+  }
+  return {
+    ...choice,
+    id: row.id || createStartingEquipmentContributionId(),
+    choose: 1,
+  }
 }
 
 function startingEquipmentItemFromFormRow(row: StartingEquipmentItemForm): StartingEquipmentItem {
   if (row.itemKind === 'grant') {
-    if (row.grantTargetSource === 'proficiency_choice') {
-      const item: StartingEquipmentGrantedItem = {
-        kind: 'grant',
-        target: { source: 'proficiency_choice', choiceId: row.proficiencyChoiceId! },
-        quantity: row.quantity ?? 1,
-      }
-      if (row.equipped !== undefined) {
-        item.equipped = row.equipped
-      }
-      return item
-    }
-
-    const grant = equipmentGrantFromFormRow(row)
-    if (grant.kind !== 'grant') {
-      throw new Error('Starting equipment grant rows require an equipment slug in v1')
-    }
-
-    const item: StartingEquipmentGrantedItem = {
-      kind: 'grant',
-      target: { source: 'equipment', equipmentSlug: grant.equipmentSlug },
-      quantity: grant.quantity ?? 1,
-    }
-    if (grant.equipped !== undefined) {
-      item.equipped = grant.equipped
-    }
-    if (row.modifiers?.length) {
-      item.modifiers = row.modifiers
-    }
-    return item
+    return startingEquipmentGrantFromFormRow(row)
   }
-  return equipmentGrantFromFormRow(row) as StartingEquipmentItem
+  return startingEquipmentChoiceFromFormRow(row)
 }
 
 export function startingEquipmentOptionToFormRow(

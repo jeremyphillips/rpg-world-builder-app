@@ -15,18 +15,25 @@ const DRUID_STARTING_EQUIPMENT = {
       id: 'standard-equipment',
       label: 'Standard Equipment',
       items: [
-        { kind: 'grant', equipmentSlug: 'leather-armor', quantity: 1, equipped: true },
-        { kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
-        { kind: 'grant', equipmentSlug: 'sickle', quantity: 1, equipped: true },
         {
+          id: 'leather-armor',
+          kind: 'grant',
+          equipmentSlug: 'leather-armor',
+          quantity: 1,
+          equipped: true,
+        },
+        { id: 'shield', kind: 'grant', equipmentSlug: 'shield', quantity: 1, equipped: true },
+        { id: 'sickle', kind: 'grant', equipmentSlug: 'sickle', quantity: 1, equipped: true },
+        {
+          id: 'quarterstaff',
           kind: 'grant',
           equipmentSlug: 'quarterstaff',
           quantity: 1,
           equipped: false,
           modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
         },
-        { kind: 'grant', equipmentSlug: 'explorers-pack', quantity: 1 },
-        { kind: 'grant', equipmentSlug: 'herbalism-kit', quantity: 1 },
+        { id: 'explorers-pack', kind: 'grant', equipmentSlug: 'explorers-pack', quantity: 1 },
+        { id: 'herbalism-kit', kind: 'grant', equipmentSlug: 'herbalism-kit', quantity: 1 },
       ],
       wealth: { gp: 9 },
     },
@@ -43,12 +50,14 @@ describe('startingEquipmentGrantedItemSchema', () => {
   it('normalizes legacy equipmentSlug grants to target.source equipment', () => {
     expect(
       startingEquipmentGrantedItemSchema.parse({
+        id: 'spear',
         kind: 'grant',
         equipmentSlug: 'spear',
         quantity: 1,
         equipped: true,
       }),
     ).toEqual({
+      id: 'spear',
       kind: 'grant',
       target: { source: 'equipment', equipmentSlug: 'spear' },
       quantity: 1,
@@ -59,11 +68,13 @@ describe('startingEquipmentGrantedItemSchema', () => {
   it('accepts proficiency_choice targets without modifiers', () => {
     expect(
       startingEquipmentGrantedItemSchema.parse({
+        id: 'class-tools-tool',
         kind: 'grant',
         target: { source: 'proficiency_choice', choiceId: 'class-tools' },
         quantity: 1,
       }),
     ).toEqual({
+      id: 'class-tools-tool',
       kind: 'grant',
       target: { source: 'proficiency_choice', choiceId: 'class-tools' },
       quantity: 1,
@@ -73,6 +84,7 @@ describe('startingEquipmentGrantedItemSchema', () => {
   it('rejects modifiers on proficiency_choice grants', () => {
     expect(
       startingEquipmentGrantedItemSchema.safeParse({
+        id: 'class-tools-tool',
         kind: 'grant',
         target: { source: 'proficiency_choice', choiceId: 'class-tools' },
         modifiers: [{ kind: 'spellcasting_focus', spellcastingGearKind: 'druidic_focus' }],
@@ -102,7 +114,7 @@ describe('startingEquipmentChoiceSchema', () => {
         {
           id: 'standard-equipment',
           label: 'Standard Equipment',
-          items: [{ kind: 'grant', equipmentSlug: 'spear', quantity: 1 }],
+          items: [{ id: 'spear', kind: 'grant', equipmentSlug: 'spear', quantity: 1 }],
           available: false,
         },
       ],
@@ -177,6 +189,7 @@ describe('startingEquipmentChoiceSchema', () => {
             label: 'Standard Equipment',
             items: [
               {
+                id: 'musical-instrument-choice',
                 kind: 'choice',
                 choose: 1,
                 pool: {
@@ -210,6 +223,7 @@ describe('startingEquipmentChoiceSchema', () => {
             label: 'Standard Equipment',
             items: [
               {
+                id: 'empty-choice',
                 kind: 'choice',
                 choose: 1,
                 label: 'Pick one',
@@ -232,6 +246,7 @@ describe('startingEquipmentChoiceSchema', () => {
             label: 'Standard Equipment',
             items: [
               {
+                id: 'musical-instrument-choice',
                 kind: 'choice',
                 choose: 1,
                 from: { toolCategories: ['musical_instrument'] },
@@ -241,6 +256,7 @@ describe('startingEquipmentChoiceSchema', () => {
         ],
       }).options[0]?.items[0],
     ).toMatchObject({
+      id: 'musical-instrument-choice',
       kind: 'choice',
       pool: {
         source: 'filtered',
@@ -248,6 +264,80 @@ describe('startingEquipmentChoiceSchema', () => {
         toolCategory: 'musical_instrument',
       },
     })
+  })
+
+  it('rejects missing and duplicate contribution ids', () => {
+    expect(
+      startingEquipmentChoiceSchema.safeParse({
+        choose: 1,
+        options: [
+          {
+            id: 'standard-equipment',
+            label: 'Standard Equipment',
+            items: [{ kind: 'grant', equipmentSlug: 'spear', quantity: 1 }],
+          },
+        ],
+      }).success,
+    ).toBe(false)
+
+    const duplicate = startingEquipmentChoiceSchema.safeParse({
+      choose: 1,
+      options: [
+        {
+          id: 'standard-equipment',
+          label: 'Standard Equipment',
+          items: [
+            { id: 'spear', kind: 'grant', equipmentSlug: 'spear', quantity: 1 },
+            { id: 'spear', kind: 'grant', equipmentSlug: 'javelin', quantity: 1 },
+          ],
+        },
+      ],
+    })
+    expect(duplicate.success).toBe(false)
+  })
+
+  it('allows two entries to share an equipment slug when their ids differ', () => {
+    const parsed = startingEquipmentChoiceSchema.parse({
+      choose: 1,
+      options: [
+        {
+          id: 'standard-equipment',
+          label: 'Standard Equipment',
+          items: [
+            { id: 'dagger', kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
+            { id: 'dagger-2', kind: 'grant', equipmentSlug: 'dagger', quantity: 1 },
+          ],
+        },
+      ],
+    })
+
+    expect(parsed.options[0]?.items.map((item) => item.id)).toEqual(['dagger', 'dagger-2'])
+  })
+
+  it('rejects starting-equipment choice entries with choose greater than 1', () => {
+    expect(
+      startingEquipmentChoiceSchema.safeParse({
+        choose: 1,
+        options: [
+          {
+            id: 'standard-equipment',
+            label: 'Standard Equipment',
+            items: [
+              {
+                id: 'musical-instrument-choice',
+                kind: 'choice',
+                choose: 2,
+                pool: {
+                  source: 'filtered',
+                  equipmentKind: 'tool',
+                  toolCategory: 'musical_instrument',
+                },
+              },
+            ],
+          },
+        ],
+      }).success,
+    ).toBe(false)
   })
 })
 

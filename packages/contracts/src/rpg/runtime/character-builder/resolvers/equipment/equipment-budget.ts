@@ -38,13 +38,24 @@ export {
   wealthToCopper,
 }
 
-/** Returns true when the item cost fits in the starting (package) budget. */
-export function isEquipmentAffordableAtStartingBudget(
+/**
+ * Package-setup filter only. True when the item has a market price within the starting purse.
+ * Unpriced rows are not a starting-budget miss; purchase availability covers those.
+ */
+export function fitsStartingEquipmentBudget(
   equipment: Equipment,
   budget: EquipmentBudgetSummary,
 ): boolean {
   if (!canPurchaseEquipment(equipment)) return false
   return moneyToCopper(equipment.cost) <= wealthToCopper(budget.starting)
+}
+
+/** @deprecated Use {@link fitsStartingEquipmentBudget}. */
+export function isEquipmentAffordableAtStartingBudget(
+  equipment: Equipment,
+  budget: EquipmentBudgetSummary,
+): boolean {
+  return fitsStartingEquipmentBudget(equipment, budget)
 }
 
 /** Returns true when the item cost fits in the remaining budget after purchases. */

@@ -72,12 +72,11 @@ describe('equipment-display', () => {
       ])
     })
 
-    it('builds plate armor compact metadata segments with restriction over weight', () => {
+    it('builds plate armor compact metadata segments', () => {
       const equipment = pickEquipment('plate-armor')
       expect(buildEquipmentPickerRowViewModel(equipment).comparisonGroups).toEqual([
         'AC 18',
-        'Heavy Armor',
-        'Str 15 required',
+        'Heavy',
       ])
     })
 

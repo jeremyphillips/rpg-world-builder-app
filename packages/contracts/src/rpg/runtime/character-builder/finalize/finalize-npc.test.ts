@@ -101,7 +101,12 @@ describe('finalizeNpcCharacterBuild', () => {
           enabled: true,
           baseHitDie: 6,
           standardArray: [12, 11, 10, 9, 8, 7],
-          startingWealth: { gp: 5 },
+          wealthTiers: {
+            poor: { gp: 1 },
+            modest: { gp: 10 },
+            comfortable: { gp: 50 },
+            wealthy: { gp: 200 },
+          },
         },
       },
     })
@@ -120,7 +125,7 @@ describe('finalizeNpcCharacterBuild', () => {
 
     expect(createNpcRequestInputSchema.safeParse(input).success).toBe(true)
     expect(input.classes).toEqual([])
-    expect(input.wealth).toEqual({ cp: 0, sp: 0, gp: 5, pp: 0 })
+    expect(input.wealth).toEqual({ cp: 0, sp: 0, gp: 10, pp: 0 })
     expect(input.hitPoints).toEqual({ base: 6, current: 6, temporary: 0 })
   })
 })

@@ -1,6 +1,6 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { ListResultGroupHeading, ListResultList, cn } from '@rpg/ui'
+import { InteractiveListGroupHeading, InteractiveList, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
@@ -54,15 +54,20 @@ export function GlobalSearchGroupSection({
       aria-label={`${groupLabel}, ${section.totalCount} results`}
       className={globalSearchGroupSectionVariants({ state })}
     >
-      <ListResultGroupHeading id={headingId} as="h2" first={sectionIndex === 0} follows={follows}>
+      <InteractiveListGroupHeading
+        id={headingId}
+        as="h2"
+        first={sectionIndex === 0}
+        follows={follows}
+      >
         {groupLabel}
         <span className={globalSearchGroupHeadingCountClasses}>
           {' · '}
           {section.totalCount}
         </span>
-      </ListResultGroupHeading>
+      </InteractiveListGroupHeading>
 
-      <ListResultList>
+      <InteractiveList>
         {section.items.map((document) => (
           <SearchResultRow
             key={document.id}
@@ -73,7 +78,7 @@ export function GlobalSearchGroupSection({
             viewerCharacterRelationships={document.viewerCharacterRelationships}
           />
         ))}
-      </ListResultList>
+      </InteractiveList>
 
       {showGroupAction ? (
         onShowAll ? (

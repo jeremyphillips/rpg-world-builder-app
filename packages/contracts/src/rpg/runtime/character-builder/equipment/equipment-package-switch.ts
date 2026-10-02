@@ -356,8 +356,7 @@ function buildPackageSwitchSelectionPatch(args: {
     equipment: {
       mode: resolveEquipmentModeFromOption(args.targetOptionShape),
       purchases: args.purchases,
-      removedPackageItemKeys: [],
-      customized: args.draft.equipment?.customized ?? false,
+      editedSincePackageSelection: args.draft.equipment?.editedSincePackageSelection ?? false,
       skipped: false,
     },
   }

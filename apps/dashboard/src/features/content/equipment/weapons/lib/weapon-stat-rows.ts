@@ -2,7 +2,6 @@ import type { WeaponEquipment } from '@rpg/contracts'
 import {
   formatDice,
   formatEquipmentCostLabel,
-  formatWeight,
   formatWeaponDamage,
   formatWeaponProperties,
   formatWeaponRange,
@@ -38,7 +37,6 @@ export function getWeaponStatRows(item: WeaponEquipment): ContentStatRowData[] {
       infoAriaLabel: `About ${getWeaponMasteryLabel(item.mastery)}`,
     },
     ...(item.range ? [{ label: 'Range', value: formatWeaponRange(item.range) }] : []),
-    ...(item.weight ? [{ label: 'Weight', value: formatWeight(item.weight) }] : []),
     { label: 'Cost', value: formatEquipmentCostLabel(item.cost) ?? 'No market price' },
     ...(item.specialRules ? [{ label: 'Special Rules', value: item.specialRules }] : []),
   ]

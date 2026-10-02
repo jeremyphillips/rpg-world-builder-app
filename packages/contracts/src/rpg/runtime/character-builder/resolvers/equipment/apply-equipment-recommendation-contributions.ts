@@ -12,6 +12,7 @@ function applyContribution(
   contribution: EquipmentRecommendationContribution,
   catalogIndex: CharacterBuildCatalogIndex,
   rulesetId: string,
+  selectedClassId: string | undefined,
 ): void {
   const matches = expandRecommendationSelector({
     selector: contribution.selector,
@@ -28,8 +29,14 @@ function applyContribution(
       equipment.id,
       contribution.tier,
       contribution.reason,
-      contribution.sourceKey,
       specificity,
+      {
+        ...(contribution.source ? { source: contribution.source } : {}),
+        ...(contribution.scope ? { scope: contribution.scope } : {}),
+        ...(contribution.basis ? { basis: contribution.basis } : {}),
+        ...(contribution.choiceSetId ? { choiceSetId: contribution.choiceSetId } : {}),
+        ...(selectedClassId ? { selectedClassId } : {}),
+      },
     )
   }
 }
@@ -39,10 +46,11 @@ export function applyRecommendationContributions(args: {
   contributions: readonly EquipmentRecommendationContribution[]
   catalogIndex: CharacterBuildCatalogIndex
   rulesetId: string
+  selectedClassId?: string
 }): void {
-  const { accumulators, contributions, catalogIndex, rulesetId } = args
+  const { accumulators, contributions, catalogIndex, rulesetId, selectedClassId } = args
 
   for (const contribution of contributions) {
-    applyContribution(accumulators, contribution, catalogIndex, rulesetId)
+    applyContribution(accumulators, contribution, catalogIndex, rulesetId, selectedClassId)
   }
 }

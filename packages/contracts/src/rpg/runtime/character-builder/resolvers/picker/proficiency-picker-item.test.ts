@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { NEUTRAL_OPTION_RECOMMENDATION } from '../../recommendation'
 import { compareProficiencyPickerItemsByRecommendation } from './proficiency-picker-item'
 import type { ProficiencyPickerItem } from '../proficiency/resolve-proficiency-picker-items'
 
@@ -20,6 +21,9 @@ function makeProficiencyItem(
       isAlreadyGranted: state.isAlreadyGranted,
       isSelectionFull: state.isSelectionFull,
       isRecommended: state.isRecommended,
+      recommendation: state.isRecommended
+        ? { strength: 'strong', signals: [] }
+        : NEUTRAL_OPTION_RECOMMENDATION,
       canSelect: state.canSelect,
     },
   }

@@ -21,6 +21,10 @@ export function buildCharacterBuilderDraftFromQuickNpcSetup(
     draft.class.classId = setup.classId
   }
 
+  if (setup.npcTemplateId) {
+    draft.npcTemplateId = setup.npcTemplateId
+  }
+
   draft.touchedStepIds = ['species', 'class']
 
   return draft

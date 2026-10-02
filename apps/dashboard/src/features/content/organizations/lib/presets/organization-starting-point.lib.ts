@@ -4,6 +4,7 @@ import {
   listOrganizationPresetOwnedEditableDivergentFieldKeys,
   ORGANIZATION_AUTHORING_PRESET_IDS,
   resolveOrganizationPresetMemberClassAffinityIds,
+  resolveOrganizationPresetMemberNpcTemplateId,
   organizationMembershipTitleCatalogMatchesPresetSnapshot,
   snapshotOrganizationMembershipTitlesFromPreset,
   type CharacterClass,
@@ -75,6 +76,7 @@ export type OrganizationStartingPointMaterializedPatch = {
   practices: ReturnType<typeof applyOrganizationAuthoringPreset>['practices']
   members: {
     classAffinityIds: string[]
+    npcTemplateId?: ReturnType<typeof resolveOrganizationPresetMemberNpcTemplateId>
     titles: OrganizationMembershipTitleDefinition[]
   }
 }
@@ -85,6 +87,7 @@ export function materializeOrganizationStartingPointPatch(
   discoverableClasses: readonly CharacterClass[],
 ): OrganizationStartingPointMaterializedPatch {
   const recipe = applyOrganizationAuthoringPreset(presetId)
+  const npcTemplateId = resolveOrganizationPresetMemberNpcTemplateId(presetId)
   return {
     startingPointId: presetId,
     organizationDomain: recipe.organizationDomain,
@@ -96,6 +99,7 @@ export function materializeOrganizationStartingPointPatch(
         presetId,
         discoverableClasses,
       ),
+      ...(npcTemplateId !== undefined ? { npcTemplateId } : {}),
       titles: snapshotOrganizationMembershipTitlesFromPreset(presetId),
     },
   }
@@ -119,6 +123,7 @@ export function buildOrganizationStartingPointValueSyncPatch(
     [organizationFieldPath(prefix, 'practices')]: materialized.practices,
     [organizationFieldPath(prefix, 'members.classAffinityIds')]:
       materialized.members.classAffinityIds,
+    [organizationFieldPath(prefix, 'members.npcTemplateId')]: materialized.members.npcTemplateId,
     [organizationFieldPath(prefix, 'members.titles')]: materialized.members.titles,
   }
 }
@@ -152,7 +157,32 @@ export function readOrganizationPresetOwnedEditableSnapshot(
       values,
       organizationFieldPath(prefix, 'members.classAffinityIds'),
     ),
+    ...readNpcTemplateId(values, prefix),
   }
+}
+
+function readStringField(values: Record<string, unknown>, path: string): string | undefined {
+  const direct = values[path]
+  if (typeof direct === 'string' && direct.length > 0) return direct
+
+  const segments = path.split('.')
+  let current: unknown = values
+  for (const segment of segments) {
+    if (!current || typeof current !== 'object') return undefined
+    current = (current as Record<string, unknown>)[segment]
+  }
+  return typeof current === 'string' && current.length > 0 ? current : undefined
+}
+
+function readNpcTemplateId(
+  values: Record<string, unknown>,
+  prefix?: string,
+):
+  | { npcTemplateId: OrganizationPresetOwnedEditableSnapshot['npcTemplateId'] }
+  | Record<string, never> {
+  const value = readStringField(values, organizationFieldPath(prefix, 'members.npcTemplateId'))
+  if (!value) return {}
+  return { npcTemplateId: value as OrganizationPresetOwnedEditableSnapshot['npcTemplateId'] }
 }
 
 const ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS: Record<
@@ -164,6 +194,7 @@ const ORGANIZATION_STARTING_POINT_OVERWRITE_FIELD_LABELS: Record<
   functions: 'Functions',
   practices: 'Practices',
   classAffinityIds: 'Classes',
+  npcTemplateId: 'Default NPC role',
 }
 
 const ORGANIZATION_STARTING_POINT_MEMBERSHIP_TITLES_OVERWRITE_LABEL = 'Membership titles' as const
@@ -309,5 +340,6 @@ export function buildOrganizationEditFamiliarTypeFormPatch(
     [organizationFieldPath(prefix, 'practices')]: materialized.practices,
     [organizationFieldPath(prefix, 'members.classAffinityIds')]:
       materialized.members.classAffinityIds,
+    [organizationFieldPath(prefix, 'members.npcTemplateId')]: materialized.members.npcTemplateId,
   }
 }

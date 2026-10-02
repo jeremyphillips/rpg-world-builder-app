@@ -9,6 +9,7 @@ import {
   optionCardDescriptionVariants,
   optionCardEmbeddedSlotVariants,
   optionCardSelectedChromeClasses,
+  optionCardSummaryTitleVariants,
   optionCardTitleVariants,
   selectionOptionCardShellVariants,
 } from './selection-option-card.variants'
@@ -60,14 +61,18 @@ describe('optionCard surface establishment', () => {
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pl-3')
     expect(radioCardVariants({ variant: 'card', density: 'compact' })).toContain('pr-4')
     expect(optionCardTitleVariants({ density: 'compact' })).toContain('text-sm')
+    expect(optionCardSummaryTitleVariants({ density: 'compact' })).toContain('text-sm')
+    expect(optionCardSummaryTitleVariants({ density: 'default' })).toContain('text-base')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('text-xs')
     expect(optionCardDescriptionVariants({ density: 'compact' })).toContain('leading-snug')
   })
 
-  it('aligns compact embedded panel inset with 12px option shell padding', () => {
+  it('breaks compact embedded panel out to the card horizontal edges', () => {
     expect(optionCardCompactBodyInsetClasses).toBe('pl-[calc(0.75rem+1rem+0.75rem)]')
-    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-ml-3')
-    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-mr-4')
+    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-mx-4')
+    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain(
+      'rounded-b-card',
+    )
   })
 
   it('removes compact title/description gap via shared body stack token', () => {

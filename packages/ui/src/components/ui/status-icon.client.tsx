@@ -6,6 +6,7 @@ import { Check, CircleAlert, Ellipsis, Minus, Slash } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import {
+  STATUS_ICON_DEFAULT_SIZE,
   STATUS_ICON_OFF_SLASH_STROKE_WIDTH,
   STATUS_ICON_STROKE_WIDTH,
   STATUS_ICON_TOOLTIP_LABELS,
@@ -133,7 +134,7 @@ export function StatusIcon({
   ...props
 }: StatusIconProps) {
   const resolvedVariant = variant ?? 'ready'
-  const resolvedSize = size ?? 'sm'
+  const resolvedSize = size ?? STATUS_ICON_DEFAULT_SIZE
   const showTooltip = tooltip !== false
 
   const icon = showTooltip ? (

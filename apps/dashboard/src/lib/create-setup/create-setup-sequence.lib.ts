@@ -73,6 +73,52 @@ export function resolveCreateSetupSetExpanded({
  * Reveal completed or optional predecessors plus the active set. When no question is
  * active (exhaustion), returns all eligible-now complete sets for summary rendering.
  */
+/** Registered sequence: choice sets in array order, then external decisions in registration order. */
+export function resolveCreateSetupSequenceSetIds({
+  sets,
+  externalDecisions = [],
+}: {
+  sets: readonly Pick<CreateSetupSequenceItem, 'id'>[]
+  externalDecisions?: readonly Pick<CreateSetupExternalDecision, 'id'>[]
+}): string[] {
+  return [...sets.map((set) => set.id), ...externalDecisions.map((decision) => decision.id)]
+}
+
+/**
+ * Active id in the registered sequence — an open choice set, or the first external decision when
+ * choice sets are exhausted and the user is not editing an upstream set.
+ */
+export function resolveCreateSetupActiveSequenceSetId({
+  activeSetId,
+  isEditingUpstream = false,
+  externalDecisions = [],
+}: {
+  activeSetId: string | null
+  isEditingUpstream?: boolean
+  externalDecisions?: readonly Pick<CreateSetupExternalDecision, 'id'>[]
+}): string | null {
+  if (activeSetId != null) {
+    return activeSetId
+  }
+  if (isEditingUpstream || externalDecisions.length === 0) {
+    return null
+  }
+  return externalDecisions[0]?.id ?? null
+}
+
+export function resolveCreateSetupIsFinalSet({
+  sequenceSetIds,
+  activeSequenceSetId,
+}: {
+  sequenceSetIds: readonly string[]
+  activeSequenceSetId: string | null
+}): boolean {
+  if (activeSequenceSetId == null || sequenceSetIds.length === 0) {
+    return false
+  }
+  return activeSequenceSetId === sequenceSetIds.at(-1)
+}
+
 export function resolveCreateSetupVisibleSetIds({
   sets,
   activeSetId,

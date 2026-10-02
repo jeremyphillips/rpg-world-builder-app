@@ -4,7 +4,7 @@ import type {
   CharacterBuilderDraft,
   ChoiceSet,
 } from '@rpg/contracts'
-import { PreviewRail, type PreviewRailLayout } from '@rpg/ui'
+import { ActionIcon, PreviewRail, type PreviewRailLayout } from '@rpg/ui'
 import { ContentPreviewRailMedia } from '@/features/content'
 import { resolveCharacterPrimaryDisplayImage } from '../../../lib/display/resolve-character-display-image'
 
@@ -12,6 +12,8 @@ import { getBuilderDraftNarrative } from '../../../lib/builder-preview/character
 import type { BuilderPreviewRailProjection } from '../../../lib/builder-preview/builder-preview-projection.lib'
 import {
   BUILDER_PREVIEW_HEADER_TITLE,
+  BUILDER_PREVIEW_CHARACTER_SHEET_HELPER,
+  BUILDER_PREVIEW_CHARACTER_SHEET_LABEL,
   BUILDER_PREVIEW_SECTIONS_DESCRIPTION,
   BUILDER_PREVIEW_SECTIONS_TITLE,
 } from '../../../lib/builder-preview/builder-preview-rail-copy'
@@ -35,6 +37,7 @@ export type CharacterBuilderPreviewRailViewProps = {
   resolvedChoiceSets: readonly ChoiceSet[]
   openSectionId: string
   onOpenSectionChange: (value: string) => void
+  onPreviewCharacterSheet?: () => void
 }
 
 function CharacterBuilderPreviewSectionBody({
@@ -101,6 +104,7 @@ export function CharacterBuilderPreviewRailView({
   resolvedChoiceSets,
   openSectionId,
   onOpenSectionChange,
+  onPreviewCharacterSheet,
 }: CharacterBuilderPreviewRailViewProps) {
   return (
     <PreviewRail chrome={chrome} layout={layout}>
@@ -154,6 +158,14 @@ export function CharacterBuilderPreviewRailView({
       </PreviewRail.ScrollRegion>
       <PreviewRail.Footer>
         <PreviewRail.StatusPanel {...projection.footerPanel} />
+        {onPreviewCharacterSheet ? (
+          <PreviewRail.Action
+            label={BUILDER_PREVIEW_CHARACTER_SHEET_LABEL}
+            helperText={BUILDER_PREVIEW_CHARACTER_SHEET_HELPER}
+            icon={<ActionIcon action="view" />}
+            onClick={onPreviewCharacterSheet}
+          />
+        ) : null}
       </PreviewRail.Footer>
     </PreviewRail>
   )

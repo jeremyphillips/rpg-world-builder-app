@@ -8,10 +8,16 @@ import {
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 
-import { resolveQuickNpcDefaultLevel, type QuickNpcSetupValues } from './quick-npc-form-fields'
-import { isQuickNpcOrganizationMemberSetup } from './quick-npc-form-fields'
+import {
+  isQuickNpcOrganizationMemberSetup,
+  isQuickNpcStandaloneSetup,
+  resolveQuickNpcDefaultLevel,
+  type QuickNpcSetupValues,
+} from './quick-npc-form-fields'
+import type { NpcTemplateId } from '@rpg/contracts'
 import { isCreateSetupChoiceComplete, type CreateSetupValueChangeEvent } from '@/lib/create-setup'
 import { applyQuickNpcRecommendedClassSeeding } from './quick-npc-class-recommendation.lib'
+import { resolveQuickNpcSuggestedNpcTemplateId } from './quick-npc-suggested-npc-template.lib'
 
 function clampLevel(level: number, minLevel: number, maxLevel: number): number {
   return Math.min(maxLevel, Math.max(minLevel, level))
@@ -60,7 +66,7 @@ export function resolveQuickNpcLevelForMembershipTitle(args: {
   }
 
   return clampLevel(
-    projection.npcRecommendation.level,
+    projection.npcRecommendation.level ?? defaultLevel,
     levelConstraints.minLevel,
     levelConstraints.maxLevel,
   )
@@ -72,6 +78,7 @@ type QuickNpcSetupValueChangeArgs = {
   context: CharacterBuildContext
   titles: readonly OrganizationMembershipTitleDefinition[]
   organizationClassAffinityIds?: readonly string[]
+  organizationTemplateId?: NpcTemplateId
 }
 
 function applyRecommendedClassSeeding(args: QuickNpcSetupValueChangeArgs): QuickNpcSetupValues {
@@ -80,6 +87,7 @@ function applyRecommendedClassSeeding(args: QuickNpcSetupValueChangeArgs): Quick
     context: args.context,
     titles: args.titles,
     organizationClassAffinityIds: args.organizationClassAffinityIds,
+    organizationTemplateId: args.organizationTemplateId,
   })
 }
 
@@ -93,17 +101,46 @@ function applyRecommendedClassSeedingWhenSpeciesComplete(
   return applyRecommendedClassSeeding(args)
 }
 
+// fallow-ignore-next-line complexity
 export function applyQuickNpcSetupValueChange(
   args: QuickNpcSetupValueChangeArgs,
 ): QuickNpcSetupValues {
   const { setId, nextValue } = args.event
 
+  if (setId === 'npcTemplateId') {
+    if (
+      !isQuickNpcStandaloneSetup(args.values) &&
+      !isQuickNpcOrganizationMemberSetup(args.values)
+    ) {
+      return args.values
+    }
+
+    const nextValues: QuickNpcSetupValues = {
+      ...args.values,
+      npcTemplateId: String(nextValue) as NpcTemplateId,
+      classId: '',
+    }
+
+    return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
+  }
+
   if (setId === 'speciesId') {
-    const nextValues = applyLevelClassSideEffects({
+    let nextValues = applyLevelClassSideEffects({
       ...args.values,
       speciesId: String(nextValue),
       classId: '',
     })
+
+    if (isQuickNpcOrganizationMemberSetup(nextValues)) {
+      const suggestedTemplateId = resolveQuickNpcSuggestedNpcTemplateId({
+        membershipTitle: nextValues.membershipTitle,
+        titles: args.titles,
+        organizationTemplateId: args.organizationTemplateId,
+      })
+      if (suggestedTemplateId) {
+        nextValues = { ...nextValues, npcTemplateId: suggestedTemplateId }
+      }
+    }
 
     return applyRecommendedClassSeedingWhenSpeciesComplete({ ...args, values: nextValues })
   }
@@ -114,9 +151,15 @@ export function applyQuickNpcSetupValueChange(
     }
 
     const membershipTitle = String(nextValue)
+    const suggestedTemplateId = resolveQuickNpcSuggestedNpcTemplateId({
+      membershipTitle,
+      titles: args.titles,
+      organizationTemplateId: args.organizationTemplateId,
+    })
     const nextValues: QuickNpcSetupValues = {
       ...args.values,
       membershipTitle,
+      npcTemplateId: suggestedTemplateId,
       level: resolveQuickNpcLevelForMembershipTitle({
         membershipTitle,
         titles: args.titles,

@@ -1,11 +1,10 @@
 import type { BuilderChoiceBlock, BuilderChoiceSectionModel } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
-import { Heading } from '@rpg/ui'
+import { ChoiceSelectionCounter, Heading } from '@rpg/ui'
 
 import { ChoiceAddAction } from './choice-add-action'
 import { ChoiceSectionValidationMessages } from './choice-section-validation-messages'
 import { ChoiceSectionSupportingCopy } from './choice-section-supporting-copy'
-import { ChoiceSelectionCounter } from './choice-selection-counter'
 import {
   choiceSectionHeaderActionClasses,
   choiceSectionHeaderClasses,

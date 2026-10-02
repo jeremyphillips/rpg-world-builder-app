@@ -1,5 +1,11 @@
+import type { ReactNode } from 'react'
+
 import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
-import { Eyebrow, SelectionOptionCard, SelectionOptionCardHeaderAction } from '@rpg/ui'
+import {
+  SelectionOptionCard,
+  SelectionOptionCardHeaderAction,
+  type SelectionOptionCardDensity,
+} from '@rpg/ui'
 
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
@@ -9,26 +15,48 @@ import {
 
 export type StartingEquipmentOptionSummaryCardProps = {
   summary: StartingEquipmentOptionSummary
+  density: SelectionOptionCardDensity
   onChangePackage: () => void
+  showChangePackage?: boolean
+  titleAdornment?: ReactNode
+  /** Replaces the default Change package action when provided. */
+  headerEndSlot?: ReactNode
+  description?: string
+  embedded?: ReactNode
+  embeddedTone?: 'divider' | 'panel'
 }
 
 export function StartingEquipmentOptionSummaryCard({
   summary,
+  density,
   onChangePackage,
+  showChangePackage = true,
+  titleAdornment,
+  headerEndSlot,
+  description,
+  embedded,
+  embeddedTone,
 }: StartingEquipmentOptionSummaryCardProps) {
+  const defaultHeaderEndSlot = showChangePackage ? (
+    <SelectionOptionCardHeaderAction
+      label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+      density={density}
+      onClick={onChangePackage}
+    />
+  ) : undefined
+
   return (
     <SelectionOptionCard
       selected
-      headerStartSlot={<Eyebrow>{EQUIPMENT_SELECTED_PACKAGE_EYEBROW}</Eyebrow>}
-      headerEndSlot={
-        <SelectionOptionCardHeaderAction
-          label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
-          onClick={onChangePackage}
-        />
-      }
+      density={density}
+      headerEyebrow={EQUIPMENT_SELECTED_PACKAGE_EYEBROW}
+      headerEndSlot={headerEndSlot === undefined ? defaultHeaderEndSlot : headerEndSlot}
       label={summary.label}
-      description={summary.description}
+      titleAdornment={titleAdornment}
+      description={description ?? summary.description}
       summaryLines={startingEquipmentOptionFundingSummaryLines(summary)}
+      embedded={embedded}
+      {...(embeddedTone ? { embeddedTone } : {})}
     />
   )
 }

@@ -7,7 +7,10 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import { isBuilderLevelZeroClassless } from '../progression/character-level-policy'
-import { levelZeroBaselineArmorEntries } from './level-zero-baseline-proficiency-entries'
+import {
+  levelZeroBaselineArmorEntries,
+  levelZeroTemplateTraining,
+} from './level-zero-baseline-proficiency-entries'
 import { assembleGrantArmorProficiencyEntries } from './assemble-grant-proficiencies'
 import { selectionSourceFromChoiceSet } from './selection-source-from-choice-set'
 
@@ -83,6 +86,25 @@ function selectedArmorProficiencies(
   return entries
 }
 
+function templateArmorTrainingEntries(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  rulesetId: string,
+): CharacterArmorProficiencyEntry[] {
+  const templateId = draft.npcTemplateId
+  const armor = levelZeroTemplateTraining(draft)?.armor
+  if (!templateId || !armor) return []
+
+  const sources = [{ kind: 'npcTemplate' as const, sourceId: templateId, grantId: 'training' }]
+  const categories = [...armor.categories]
+  for (const item of armor.items) {
+    const category = resolveArmorCategoryFromOption(item, catalogIndex, rulesetId)
+    if (category && !categories.includes(category)) categories.push(category)
+  }
+
+  return categories.map((armorCategory) => ({ armorCategory, sources }))
+}
+
 /** Merges armor proficiency rows, combining sources when the same category appears twice. */
 export function mergeArmorProficiencyEntries(
   entries: CharacterArmorProficiencyEntry[],
@@ -119,7 +141,12 @@ export function assembleArmorProficiencyEntries(
   const selectedEntries = selectedArmorProficiencies(draft, catalogIndex, choiceSets, rulesetId)
   const levelZeroEntries =
     context && isBuilderLevelZeroClassless(draft, context)
-      ? levelZeroBaselineArmorEntries(context.characterCreationRules.levelZeroNpcs)
+      ? [
+          ...levelZeroBaselineArmorEntries(context.characterCreationRules.levelZeroNpcs, (item) =>
+            resolveArmorCategoryFromOption(item, catalogIndex, rulesetId),
+          ),
+          ...templateArmorTrainingEntries(draft, catalogIndex, rulesetId),
+        ]
       : []
 
   return mergeArmorProficiencyEntries([

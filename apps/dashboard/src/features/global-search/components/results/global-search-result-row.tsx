@@ -6,9 +6,9 @@ import {
   type GlobalSearchDocument,
   type ViewerCharacterRelationships,
 } from '@rpg/contracts'
-import { ListResultItem, cn, interactiveFocusVariants } from '@rpg/ui'
+import { IdentityRow, InteractiveListRow, cn, interactiveFocusVariants } from '@rpg/ui'
 
-import { EntityAnatomyHost, projectEntitySurfaceIdentityToSummaryModel } from '@/features/content'
+import { projectSearchHitToInteractiveListPresentation } from '@/features/content'
 import { INACTIVE_ROW_BADGE_LABEL } from '@/lib/availability'
 import { CharacterRelationshipIndicator } from '@/lib/character-relationships/character-relationship-indicator'
 
@@ -47,23 +47,29 @@ export function SearchResultRow({
 
   const wiredDisplayImage = wireGlobalSearchDisplayImage(displayImage)
 
-  const entity = projectEntitySurfaceIdentityToSummaryModel(
-    {
-      heading: title,
-      classification: typeLabel,
-      ...(secondary ? { metadata: secondary } : {}),
-      fallback: resolveContentDisplayFallbackForSearchTarget(target),
-      ...(wiredDisplayImage ? { displayImage: wiredDisplayImage } : {}),
-      ...(campaignUnavailable
-        ? { status: [{ kind: 'inactive', label: INACTIVE_ROW_BADGE_LABEL }] }
-        : {}),
-    },
-    'compact',
-  )
+  const presentation = projectSearchHitToInteractiveListPresentation({
+    heading: title,
+    classification: typeLabel,
+    ...(secondary ? { metadata: secondary } : {}),
+    fallback: resolveContentDisplayFallbackForSearchTarget(target),
+    ...(wiredDisplayImage ? { displayImage: wiredDisplayImage } : {}),
+    ...(campaignUnavailable
+      ? { status: [{ kind: 'inactive', label: INACTIVE_ROW_BADGE_LABEL }] }
+      : {}),
+  })
 
   return (
-    <ListResultItem
-      content={<EntityAnatomyHost density="compact" entity={entity} />}
+    <InteractiveListRow
+      startSlot={presentation.startSlot}
+      content={
+        <IdentityRow
+          heading={presentation.heading}
+          classification={presentation.classification}
+          supporting={presentation.supporting}
+          status={presentation.status}
+          size="md"
+        />
+      }
       className={className}
       trailingAction={
         viewerCharacterRelationships ? (
@@ -80,6 +86,6 @@ export function SearchResultRow({
         onClick={onActivate}
         aria-label={accessibleName}
       />
-    </ListResultItem>
+    </InteractiveListRow>
   )
 }

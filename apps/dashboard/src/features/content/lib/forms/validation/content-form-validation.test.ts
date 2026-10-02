@@ -86,7 +86,10 @@ const ORGANIZATION_MEMBERSHIP_TITLES_ROW_EXEMPT = [
   'members.titles.*.id',
   'members.titles.*.sourceTitleId',
   'members.titles.*.description',
-  'members.titles.*.npcRecommendation',
+  'members.titles.*.npcRecommendation.level',
+  'members.titles.*.npcRecommendation.classPreferenceOverrideSlugs',
+  'members.titles.*.npcRecommendation.skillPreferenceSlugs',
+  'members.titles.*.npcRecommendation.toolPreferenceSlugs',
 ] as const
 
 const ORGANIZATION_SCHEMA_EXEMPT = [

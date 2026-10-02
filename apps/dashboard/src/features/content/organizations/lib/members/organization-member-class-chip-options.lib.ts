@@ -10,6 +10,9 @@ import {
   resolveOrganizationMemberClassCatalogClasses,
 } from './organization-member-class-discoverable.lib'
 
+export const ORGANIZATION_MEMBER_NPC_TEMPLATE_FIELD_HINT =
+  'Default NPC role when a membership title does not recommend one. Quick create can still override this per member.' as const
+
 export const ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT =
   'Classes commonly associated with members.'
 

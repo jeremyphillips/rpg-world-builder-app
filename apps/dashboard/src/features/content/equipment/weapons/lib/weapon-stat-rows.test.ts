@@ -16,6 +16,7 @@ describe('getWeaponStatRows', () => {
     expect(labels).toContain('Damage')
     expect(labels).toContain('Versatile')
     expect(labels).not.toContain('Range')
+    expect(labels).not.toContain('Weight')
   })
 
   it('includes range for a ranged weapon', () => {

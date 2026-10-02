@@ -106,6 +106,10 @@ export {
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'
+export {
+  projectSearchHitToInteractiveListPresentation,
+  type SearchHitInteractiveListPresentation,
+} from './lib/entity/surfaces/search-hit-interactive-list.lib'
 export { DetailRowLeadingMedia } from './lib/detail/row/detail-row-leading-media'
 export type { DetailRowLeadingMediaProps } from './lib/detail/row/detail-row-leading-media'
 export { DetailRowLeadingAvatar } from './lib/detail/row/detail-row-leading-avatar'

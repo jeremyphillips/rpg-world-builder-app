@@ -48,8 +48,7 @@ describe('validateEquipment', () => {
       equipment: {
         mode: 'package' as const,
         purchases: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
         magicItemSelections: [],
       },
     }

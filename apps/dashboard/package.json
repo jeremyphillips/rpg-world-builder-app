@@ -8,7 +8,7 @@
     "build": "vite build",
     "analyze": "ANALYZE=true vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist storybook-static",
+    "clean": "rm -rf dist storybook-static node_modules/.cache/storybook",
     "typecheck": "tsc -p tsconfig.json",
     "lint": "eslint .",
     "test": "vitest run",

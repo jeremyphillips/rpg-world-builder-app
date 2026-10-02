@@ -76,6 +76,26 @@ describe('SpellPickerDrawer', () => {
       state: {
         ...spellPickerOpenItemsFixture[0]!.state,
         isRecommended: true,
+        recommendation: {
+          strength: 'strong' as const,
+          signals: [
+            {
+              strength: 'strong' as const,
+              basis: 'authored' as const,
+              specificity: 'exact' as const,
+              source: { kind: 'class' as const, id: 'srd-cc-5.2.1:wizard' },
+            },
+          ],
+        },
+        presentation: {
+          facts: [
+            {
+              kind: 'recommendation' as const,
+              label: 'Recommended',
+              sourceLabels: ['Wizard class'],
+            },
+          ],
+        },
       },
     }
 

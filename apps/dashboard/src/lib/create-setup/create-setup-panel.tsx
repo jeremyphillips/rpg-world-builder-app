@@ -6,6 +6,7 @@ import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
 import { CreateSetupFooter } from './create-setup-footer'
 import { buildCreateSetupPanelItems } from './create-setup-panel-items'
 import { useCreateSetupSequence } from './use-create-setup-sequence'
+import type { SetupSummaryCard } from './resolve-setup-summary-rows.lib'
 import type {
   CreateSetupExternalDecision,
   CreateSetupSequenceModel,
@@ -20,6 +21,10 @@ export type CreateSetupPanelProps = {
   onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
   changeLabel?: string
   className?: string
+  /** Overrides the default choice-set summary. */
+  summaryCards?: readonly SetupSummaryCard[]
+  activeSummaryTargetId?: string | null
+  onSummaryNavigate?: (targetSetId: string) => void
 }
 
 /** Ordered setup stack — sequencer + kind-specific controls. */
@@ -29,6 +34,9 @@ export function CreateSetupPanel({
   onSetupValueChange,
   changeLabel = CREATE_SETUP_DEFAULT_CHANGE_LABEL,
   className = createSetupModalBodyClasses,
+  summaryCards,
+  activeSummaryTargetId,
+  onSummaryNavigate,
 }: CreateSetupPanelProps) {
   const baseId = useId()
 
@@ -38,6 +46,9 @@ export function CreateSetupPanel({
     model,
     changeLabel,
     onSetupValueChange,
+    ...(summaryCards ? { summaryCards } : {}),
+    ...(activeSummaryTargetId !== undefined ? { activeSummaryTargetId } : {}),
+    ...(onSummaryNavigate ? { onSummaryNavigate } : {}),
   })
 
   return <div className={className}>{panelItems}</div>
@@ -59,7 +70,7 @@ export type CreateSetupShellProps = {
   externalDecisions?: readonly CreateSetupExternalDecision[]
 }
 
-/** Shared create-setup modal: partial summary rows + ID-sequenced expansion. */
+/** Shared create-setup modal: resolved summary rows + ID-sequenced expansion. */
 export function CreateSetupShell({
   open,
   onOpenChange,

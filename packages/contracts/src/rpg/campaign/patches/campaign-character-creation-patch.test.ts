@@ -8,6 +8,7 @@ import {
 import { DEFAULT_STANDARD_ARRAY } from '../../primitives/standard-array'
 import { resolveStartingWealthRules, startingWealthRulesSchema } from '../rules/starting-wealth'
 import { resolveCharacterCreationPatch } from './campaign-character-creation-patch'
+import { DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS } from './campaign-level-zero-npcs-patch'
 import { extendedProgressionAt } from '../../../test/fixtures/character-creation-patch'
 import {
   MINIMAL_TIER_A_ID,
@@ -77,7 +78,12 @@ describe('resolveCharacterCreationPatch', () => {
       weaponProficiencies: { categories: [], items: [] },
       languageProficiencies: { items: ['common'], categories: [] },
       retainSpeciesLanguages: true,
-      startingWealth: undefined,
+      wealthTiers: {
+        poor: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.poor },
+        modest: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.modest },
+        comfortable: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.comfortable },
+        wealthy: { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS.wealthy },
+      },
       standardArray: [...DEFAULT_STANDARD_ARRAY],
     })
 

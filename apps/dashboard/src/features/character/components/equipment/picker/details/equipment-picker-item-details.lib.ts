@@ -17,7 +17,7 @@ export function resolveEquipmentPickerItemDetailsDisabled(args: {
 
   return (
     args.itemState.disabledReasons.length > 0 ||
-    args.itemState.purchaseAvailability.status === 'unavailable' ||
+    args.itemState.purchaseAvailability.status === 'unavailableForPurchase' ||
     args.itemState.purchaseAvailability.status === 'unaffordable'
   )
 }

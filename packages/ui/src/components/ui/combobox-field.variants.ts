@@ -1,7 +1,10 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { establishSurfaceCurrent } from './surface-current.lib'
+import {
+  interactiveListPanelVariants,
+  interactiveListPopoverHostClasses,
+} from './interactive-list.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 import type { FieldSize } from './field.client'
 
@@ -18,27 +21,11 @@ export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
 } as const satisfies Record<FieldSizeToken, number>
 
 /** Popover panel wrapping the search field and scrollable option list. */
-export const comboboxContentVariants = cva(
+export const comboboxContentVariants = (options?: { triggerWidth?: 'match' | 'fit' }) =>
   cn(
-    'z-50 overflow-hidden rounded-md border border-border bg-background p-0 text-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-    establishSurfaceCurrent('background'),
-  ),
-  {
-    variants: {
-      /**
-       * `match` — panel width follows the trigger (field comboboxes).
-       * `fit` — panel grows to at least `--popover-menu-min-width` (fit triggers).
-       */
-      triggerWidth: {
-        match: 'w-[var(--radix-popover-trigger-width)] min-w-[var(--radix-popover-trigger-width)]',
-        fit: 'w-max min-w-[var(--popover-menu-min-width)]',
-      },
-    },
-    defaultVariants: {
-      triggerWidth: 'match',
-    },
-  },
-)
+    interactiveListPanelVariants({ triggerWidth: options?.triggerWidth ?? 'match' }),
+    interactiveListPopoverHostClasses,
+  )
 
 /**
  * Search row pinned to the top of the combobox panel — matches trigger field-control

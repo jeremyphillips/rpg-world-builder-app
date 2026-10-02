@@ -7,7 +7,7 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '@/features/character'
-import { buildCharacterDetailViewModel } from '@/features/character'
+import { buildCharacterDetailViewModel, toCharacterDetailSource } from '@/features/character'
 import { SAMPLE_PC } from '@/features/character'
 import type * as CharacterFeature from '@/features/character'
 
@@ -40,7 +40,7 @@ const useCampaignCharacterNavigationContext = vi.mocked(useCampaignCharacterNavi
 const context = createPopulatedStandaloneBuilderContextFixture()
 const catalogIndex = createStandaloneBuilderCatalogIndexFixture(context)
 const viewModel = buildCharacterDetailViewModel({
-  character: SAMPLE_PC,
+  source: toCharacterDetailSource(SAMPLE_PC),
   catalogIndex,
   rules: context.characterCreationRules,
   xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },

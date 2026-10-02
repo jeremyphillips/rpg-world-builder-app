@@ -4,6 +4,7 @@ import {
   DEFAULT_IMPORTED_CHARACTERS_POLICY,
   DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
   DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
+  DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS,
   DEFAULT_LEVEL_ZERO_NPCS_ENABLED,
   DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS,
   DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
@@ -17,19 +18,23 @@ import {
   DEFAULT_STANDARD_ARRAY,
   DEFAULT_SUBCLASS_CHOICES_ENABLED,
   MAX_CHARACTER_LEVEL,
+  NPC_WEALTH_TIER_IDS,
   isDefaultCharacterCreationStandardArray,
   isEmptyProficiencyGrantSet,
   isSparseDefaultLevelZeroNpcsPatch,
   isSparseDefaultMulticlassingPatch,
   isSparseDefaultSubclassingPatch,
   mergeStartingWealthRulesPatch,
-  normalizeCharacterWealthGrant,
+  characterWealthGrantsEqual,
+  normalizeWealthTierGrant,
+  WEALTH_GRANT_DENOMINATIONS,
   resolveStartingWealthRules,
   safeParseMergedCharacterCreationPatch,
   sameStandardArray,
   sameStringSet,
   validateSubclassChoicesEnabledChange,
 } from '@rpg/contracts'
+import type { CharacterWealthGrant } from '@rpg/contracts'
 import type {
   CampaignCharacterCreationPatch,
   CampaignLevelZeroNpcsPatch,
@@ -469,24 +474,43 @@ function buildLevelZeroLanguageProficienciesUpdateSet(
   ops.$unset[`${prefix}.categories`] = 1
 }
 
-function buildLevelZeroStartingWealthUpdateSet(
+function wealthGrantMatchesDefault(
+  grant: CharacterWealthGrant | undefined,
+  tierId: (typeof NPC_WEALTH_TIER_IDS)[number],
+): boolean {
+  return characterWealthGrantsEqual(
+    grant === undefined ? undefined : normalizeWealthTierGrant(grant),
+    DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId],
+  )
+}
+
+function buildLevelZeroWealthTiersUpdateSet(
   ops: MongoUpdateOps,
   prefix: string,
-  startingWealth: CampaignLevelZeroNpcsPatch['startingWealth'],
+  wealthTiers: CampaignLevelZeroNpcsPatch['wealthTiers'],
 ): void {
-  const normalized = normalizeCharacterWealthGrant(startingWealth)
-  if (normalized === undefined) {
+  if (wealthTiers === undefined) {
     ops.$unset[prefix] = 1
     return
   }
 
-  for (const denomination of ['cp', 'sp', 'gp', 'pp'] as const) {
-    const value = normalized[denomination]
-    const path = `${prefix}.${denomination}`
-    if (value !== undefined) {
-      ops.$set[path] = value
-    } else {
-      ops.$unset[path] = 1
+  for (const tierId of NPC_WEALTH_TIER_IDS) {
+    if (!(tierId in wealthTiers)) continue
+    const grant = wealthTiers[tierId]
+    const tierPrefix = `${prefix}.${tierId}`
+    if (grant === undefined || wealthGrantMatchesDefault(grant, tierId)) {
+      ops.$unset[tierPrefix] = 1
+      continue
+    }
+    const normalized = normalizeWealthTierGrant(grant)
+    for (const denomination of WEALTH_GRANT_DENOMINATIONS) {
+      const value = normalized[denomination]
+      const path = `${tierPrefix}.${denomination}`
+      if (value !== undefined) {
+        ops.$set[path] = value
+      } else {
+        ops.$unset[path] = 1
+      }
     }
   }
 }
@@ -558,12 +582,8 @@ function buildLevelZeroNpcsUpdateSet(
     )
   }
 
-  if ('startingWealth' in levelZeroNpcs) {
-    buildLevelZeroStartingWealthUpdateSet(
-      ops,
-      `${l0Prefix}.startingWealth`,
-      levelZeroNpcs.startingWealth,
-    )
+  if ('wealthTiers' in levelZeroNpcs) {
+    buildLevelZeroWealthTiersUpdateSet(ops, `${l0Prefix}.wealthTiers`, levelZeroNpcs.wealthTiers)
   }
 
   if (levelZeroNpcs.standardArray !== undefined) {

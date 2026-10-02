@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { FormSectionProvider } from '../../form/context/form-section.context'
 import { NumberStepper } from './number-stepper.client'
 
 function Harness({ initial = 3, max = 10 }: { initial?: number; max?: number }) {
@@ -49,6 +50,36 @@ describe('NumberStepper', () => {
     expect(root).toHaveClass('rounded-full')
     expect(root).toHaveClass('border')
     expect(root).toHaveClass('border-input')
+  })
+
+  it('defaults to md height outside form context', () => {
+    const { container } = render(<Harness />)
+    expect(container.firstElementChild).toHaveClass('h-9')
+  })
+
+  it('inherits sm height from compact form context when size is omitted', () => {
+    const { container } = render(
+      <FormSectionProvider density="compact">
+        <Harness />
+      </FormSectionProvider>,
+    )
+    expect(container.firstElementChild).toHaveClass('h-8')
+  })
+
+  it('keeps xs when explicitly requested', () => {
+    const { container } = render(
+      <FormSectionProvider density="compact">
+        <NumberStepper
+          aria-label="Quantity"
+          size="xs"
+          value={2}
+          min={0}
+          max={8}
+          onChange={() => undefined}
+        />
+      </FormSectionProvider>,
+    )
+    expect(container.firstElementChild).toHaveClass('h-6')
   })
 
   it('uses global input fill on stepper buttons with primary hover text', () => {

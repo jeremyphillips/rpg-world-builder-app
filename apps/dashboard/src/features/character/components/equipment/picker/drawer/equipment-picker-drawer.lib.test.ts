@@ -38,14 +38,14 @@ function pickerSearchDocument(id: string, text: string) {
 }
 
 describe('equipment-picker-drawer.lib', () => {
-  it('sorts items by recommendation tier with not-proficient gear last', () => {
+  it('sorts items by resolved facts and canonical kind', () => {
     const sorted = sortEquipmentPickerItems([
       equipmentPickerItemsFixture[1]!,
       equipmentPickerItemsFixture[2]!,
       equipmentPickerItemsFixture[0]!,
     ])
 
-    expect(sorted.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope', 'Chain Mail'])
+    expect(sorted.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])
   })
 
   it('sorts compatible proficient items above neutral peers in a unified list', () => {
@@ -62,7 +62,21 @@ describe('equipment-picker-drawer.lib', () => {
       state: {
         ...neutralRope.state,
         isRecommended: false,
-        recommendation: { tier: 'compatible', reasons: ['proficient'], specificity: 'exact' },
+        recommendation: { tier: 'compatible', reasons: ['classSuggested'], specificity: 'exact' },
+        resolved: {
+          requirements: [],
+          recommendation: {
+            strength: 'compatible',
+            signals: [
+              {
+                strength: 'compatible',
+                basis: 'inferred',
+                specificity: 'exact',
+              },
+            ],
+          },
+          state: {},
+        },
       },
     }
 
@@ -83,7 +97,6 @@ describe('equipment-picker-drawer.lib', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -95,6 +108,7 @@ describe('equipment-picker-drawer.lib', () => {
         filterOutUnaffordable: true,
         filterOutNonProficient: true,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        budget: equipmentPickerBudgetFixture,
       },
     )
 
@@ -109,6 +123,7 @@ describe('equipment-picker-drawer.lib', () => {
         filterOutUnaffordable: true,
         filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
+        budget: equipmentPickerBudgetFixture,
       }),
     ).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
@@ -129,7 +144,6 @@ describe('equipment-picker-drawer.lib', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -189,7 +203,6 @@ describe('equipment-picker-drawer.lib', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,
@@ -209,7 +222,6 @@ describe('equipment-picker-drawer.lib', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,
@@ -251,9 +263,8 @@ describe('equipment-picker-drawer.lib', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[0]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
-        purchaseAvailability: { status: 'unavailable', reason: 'no_market_price' },
+        purchaseAvailability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
       },
     }
 
@@ -364,11 +375,10 @@ describe('equipment-picker-drawer.lib', () => {
         isAvailable: true,
         isRecommended: false,
         isProficient: true,
-        isAffordable: true,
         isWithinRemainingBudget: true,
         recommendation: {
-          tier: 'notRecommended',
-          reasons: ['notProficient'],
+          tier: 'neutral',
+          reasons: [],
           specificity: 'exact',
         },
         disabledReasons: ['Unavailable'],
@@ -409,7 +419,6 @@ describe('equipment-picker-drawer.lib', () => {
         isAvailable: true,
         isRecommended: false,
         isProficient: true,
-        isAffordable: true,
         isWithinRemainingBudget: true,
         recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         disabledReasons: [],
@@ -428,7 +437,6 @@ describe('equipment-picker-drawer.lib', () => {
         isAvailable: true,
         isRecommended: false,
         isProficient: true,
-        isAffordable: true,
         isWithinRemainingBudget: true,
         recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         disabledReasons: [],
@@ -456,7 +464,6 @@ describe('equipment-picker-drawer.lib', () => {
         isAvailable: true,
         isRecommended: false,
         isProficient: true,
-        isAffordable: true,
         isWithinRemainingBudget: true,
         recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         disabledReasons: [],
@@ -475,7 +482,6 @@ describe('equipment-picker-drawer.lib', () => {
         isAvailable: true,
         isRecommended: true,
         isProficient: true,
-        isAffordable: true,
         isWithinRemainingBudget: true,
         recommendation: {
           tier: 'strong',
@@ -648,6 +654,7 @@ describe('equipment-picker-drawer.lib', () => {
         filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         showAffordableOnly: true,
+        budget: equipmentPickerBudgetFixture,
       }),
     ).toBe(1)
 
@@ -658,6 +665,7 @@ describe('equipment-picker-drawer.lib', () => {
         filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         showAffordableOnly: true,
+        budget: equipmentPickerBudgetFixture,
       }),
     ).toBe(0)
   })
@@ -670,6 +678,7 @@ describe('equipment-picker-drawer.lib', () => {
         filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         showAffordableOnly: false,
+        budget: equipmentPickerBudgetFixture,
       }),
     ).toBe(0)
   })

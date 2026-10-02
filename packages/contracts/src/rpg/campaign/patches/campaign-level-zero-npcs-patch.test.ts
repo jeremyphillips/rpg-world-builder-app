@@ -5,6 +5,7 @@ import {
   campaignLevelZeroNpcsPatchSchema,
   DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
   DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
+  DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS,
   DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS,
   isSparseDefaultLevelZeroNpcsPatch,
   levelZeroArmorGrantSchema,
@@ -24,7 +25,12 @@ describe('resolveLevelZeroNpcRules', () => {
       weaponProficiencies: { categories: [], items: [] },
       languageProficiencies: DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
       retainSpeciesLanguages: true,
-      startingWealth: undefined,
+      wealthTiers: {
+        poor: { gp: 1 },
+        modest: { gp: 10 },
+        comfortable: { gp: 50 },
+        wealthy: { gp: 200 },
+      },
       standardArray: [...DEFAULT_STANDARD_ARRAY],
     })
   })
@@ -55,13 +61,33 @@ describe('resolveLevelZeroNpcRules', () => {
     })
   })
 
-  it('normalizes starting wealth with no positive coins to undefined', () => {
+  it('fills wealth tiers from defaults and keeps sparse overrides', () => {
+    expect(resolveLevelZeroNpcRules(undefined).wealthTiers).toEqual(
+      DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS,
+    )
     expect(
-      resolveLevelZeroNpcRules({ startingWealth: { cp: 0, gp: 0 } }).startingWealth,
-    ).toBeUndefined()
-    expect(resolveLevelZeroNpcRules({ startingWealth: { gp: 15 } }).startingWealth).toEqual({
-      gp: 15,
+      resolveLevelZeroNpcRules({
+        wealthTiers: { modest: { gp: 0 }, comfortable: { gp: 40 } },
+      }).wealthTiers,
+    ).toEqual({
+      poor: { gp: 1 },
+      modest: { gp: 0 },
+      comfortable: { gp: 40 },
+      wealthy: { gp: 200 },
     })
+  })
+
+  it('treats default-equal tier overrides as a sparse default', () => {
+    expect(
+      isSparseDefaultLevelZeroNpcsPatch({
+        wealthTiers: { modest: { gp: 10 }, poor: { gp: 1 } },
+      }),
+    ).toBe(true)
+    expect(
+      isSparseDefaultLevelZeroNpcsPatch({
+        wealthTiers: { modest: { gp: 15 } },
+      }),
+    ).toBe(false)
   })
 })
 

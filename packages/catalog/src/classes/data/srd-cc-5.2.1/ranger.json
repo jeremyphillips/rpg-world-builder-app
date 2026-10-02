@@ -106,44 +106,52 @@
               "kind": "grant",
               "equipmentSlug": "studded-leather",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "studded-leather"
             },
             {
               "kind": "grant",
               "equipmentSlug": "scimitar",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "scimitar"
             },
             {
               "kind": "grant",
               "equipmentSlug": "shortsword",
-              "quantity": 1
+              "quantity": 1,
+              "id": "shortsword"
             },
             {
               "kind": "grant",
               "equipmentSlug": "longbow",
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "longbow"
             },
             {
               "kind": "grant",
               "equipmentSlug": "arrows",
-              "quantity": 20
+              "quantity": 20,
+              "id": "arrows"
             },
             {
               "kind": "grant",
               "equipmentSlug": "quiver",
-              "quantity": 1
+              "quantity": 1,
+              "id": "quiver"
             },
             {
               "kind": "grant",
               "equipmentSlug": "sprig-of-mistletoe",
-              "quantity": 1
+              "quantity": 1,
+              "id": "sprig-of-mistletoe"
             },
             {
               "kind": "grant",
               "equipmentSlug": "explorers-pack",
-              "quantity": 1
+              "quantity": 1,
+              "id": "explorers-pack"
             }
           ],
           "wealth": {

@@ -4,7 +4,10 @@ import {
   createPopulatedStandaloneBuilderContextFixture,
   createStandaloneBuilderCatalogIndexFixture,
 } from '../../lib/fixtures/character-builder-fixtures'
-import { buildCharacterDetailViewModel } from '../../lib/display/character-display'
+import {
+  buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+} from '../../lib/display/character-display'
 import { SAMPLE_PC } from '../../lib/fixtures/character-fixtures'
 import { CharacterDetailContent } from './character-detail-content'
 
@@ -23,7 +26,7 @@ type Story = StoryObj<typeof CharacterDetailContent>
 export const Default: Story = {
   args: {
     viewModel: buildCharacterDetailViewModel({
-      character: SAMPLE_PC,
+      source: toCharacterDetailSource(SAMPLE_PC),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: { entries: [{ level: 1, xpRequired: 0 }] },

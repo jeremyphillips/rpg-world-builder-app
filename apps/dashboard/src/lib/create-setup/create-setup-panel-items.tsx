@@ -1,16 +1,16 @@
 import type { ReactNode } from 'react'
-import { Button, RadioCardField, SelectionSummaryCard, SelectionSummaryChangeAction } from '@rpg/ui'
+import { Button, RadioCardField, SelectionSummaryCard } from '@rpg/ui'
 
-import {
-  resolveCreateSetupPartialSummaryRows,
-  resolveCreateSetupPartialSummarySegments,
-  resolveCreateSetupSummaryGroupDisplayEyebrow,
-} from './create-setup-completed-choice-groups.lib'
 import {
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
 } from './create-setup-sequence.lib'
-import { CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW } from './create-setup.constants'
+import {
+  createChoiceSetSummaryDefinitions,
+  resolveSetupSummaryCards,
+  type SetupSummaryCard,
+} from './resolve-setup-summary-rows.lib'
+import { mapSetupSummaryRowsToSelectionProps } from './setup-summary-row-models'
 import type {
   CreateSetupChoiceSet,
   CreateSetupSequenceModel,
@@ -24,6 +24,11 @@ export type BuildCreateSetupPanelItemsInput = {
   model: CreateSetupSequenceModel
   changeLabel: string
   onSetupValueChange: (event: CreateSetupValueChangeEvent) => void
+  /** When omitted, rows are derived from choice sets. */
+  summaryCards?: readonly SetupSummaryCard[]
+  /** When omitted, the active choice set is the row without Change. */
+  activeSummaryTargetId?: string | null
+  onSummaryNavigate?: (targetSetId: string) => void
 }
 
 function emitSetupValueChange(
@@ -96,123 +101,51 @@ function renderActiveChoiceSet(set: CreateSetupChoiceSet, input: BuildCreateSetu
   )
 }
 
-function renderPartialSummaryCard(
+function resolvePanelSummaryCards(
   input: BuildCreateSetupPanelItemsInput,
-  eyebrow: string,
-  setIds: readonly string[],
-): ReactNode {
-  const choiceSetById = buildCreateSetupChoiceSetMap(input.sets)
-  const rows = resolveCreateSetupPartialSummaryRows({
-    setIds,
-    setById: choiceSetById,
-  })
+): readonly SetupSummaryCard[] {
+  return (
+    input.summaryCards ??
+    resolveSetupSummaryCards(input.sets, createChoiceSetSummaryDefinitions(input.sets))
+  )
+}
 
-  if (rows.length === 0) {
-    return null
-  }
+function renderSummaryCard(
+  input: BuildCreateSetupPanelItemsInput,
+  card: SetupSummaryCard,
+): ReactNode {
+  if (card.rows.length === 0) return null
+
+  const activeTargetId =
+    input.activeSummaryTargetId !== undefined
+      ? input.activeSummaryTargetId
+      : input.model.activeSetId
+  const onNavigate =
+    input.onSummaryNavigate ?? ((targetSetId: string) => input.model.reopen(targetSetId))
 
   return (
     <SelectionSummaryCard
-      key={`summary-${setIds.join('-')}`}
-      eyebrow={eyebrow}
-      rows={rows.map((row) => {
-        const valueActionAriaLabel = `Change ${row.label.toLowerCase()}`
-
-        return {
-          label: row.label,
-          value: row.valueLabel,
-          onValueClick: () => input.model.reopen(row.setId),
-          valueActionAriaLabel,
-          action: (
-            <SelectionSummaryChangeAction
-              changeLabel={input.changeLabel}
-              ariaLabel={valueActionAriaLabel}
-              onChange={() => input.model.reopen(row.setId)}
-            />
-          ),
-        }
+      key={card.id}
+      eyebrow={card.eyebrow}
+      rows={mapSetupSummaryRowsToSelectionProps({
+        rows: card.rows,
+        activeTargetId,
+        changeLabel: input.changeLabel,
+        onNavigate,
       })}
     />
   )
 }
 
-function resolveSummarySegmentKey(
-  segment: ReturnType<typeof resolveCreateSetupPartialSummarySegments>[number],
-): string {
-  return segment.kind === 'group' ? `group:${segment.summaryGroup}` : `standalone:${segment.setId}`
-}
-
-function resolveSummaryCardEyebrow(
-  sets: readonly CreateSetupSet[],
-  setById: Map<string, CreateSetupSet>,
-  segment: ReturnType<typeof resolveCreateSetupPartialSummarySegments>[number],
-): string {
-  if (segment.kind === 'group') {
-    return resolveCreateSetupSummaryGroupDisplayEyebrow(sets, segment.summaryGroup)
-  }
-
-  const standaloneSet = setById.get(segment.setId)
-  return (
-    standaloneSet?.summaryGroupEyebrow ??
-    standaloneSet?.fieldLabel ??
-    CREATE_SETUP_DEFAULT_GROUPED_SUMMARY_EYEBROW
-  )
-}
-
-function findSummarySegmentForSet(
-  setId: string,
-  summarySegments: ReturnType<typeof resolveCreateSetupPartialSummarySegments>,
-) {
-  return summarySegments.find((candidate) => {
-    if (candidate.kind === 'standalone') {
-      return candidate.setId === setId
-    }
-    return candidate.setIds.includes(setId)
-  })
-}
-
-function appendCompletedSummaryItem(
-  input: BuildCreateSetupPanelItemsInput,
-  args: {
-    set: CreateSetupSet
-    sets: readonly CreateSetupSet[]
-    setById: Map<string, CreateSetupSet>
-    summarySegments: ReturnType<typeof resolveCreateSetupPartialSummarySegments>
-    renderedSummaryKeys: Set<string>
-    panelItems: ReactNode[]
-  },
-): boolean {
-  const segment = findSummarySegmentForSet(args.set.id, args.summarySegments)
-  if (!segment) {
-    return false
-  }
-
-  const summaryKey = resolveSummarySegmentKey(segment)
-  if (args.renderedSummaryKeys.has(summaryKey)) {
-    return true
-  }
-  args.renderedSummaryKeys.add(summaryKey)
-
-  const eyebrow = resolveSummaryCardEyebrow(args.sets, args.setById, segment)
-  const setIds = segment.kind === 'group' ? segment.setIds : [segment.setId]
-  const summaryCard = renderPartialSummaryCard(input, eyebrow, setIds)
-  if (summaryCard) {
-    args.panelItems.push(summaryCard)
-  }
-
-  return true
-}
-
 export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInput): ReactNode[] {
   const { model, sets } = input
   const setById = buildCreateSetupSetMap(sets)
-  const summarySegments = resolveCreateSetupPartialSummarySegments({
-    sets,
-    visibleSetIds: model.visibleSetIds,
-    activeSetId: model.activeSetId,
-  })
-  const renderedSummaryKeys = new Set<string>()
   const panelItems: ReactNode[] = []
+
+  for (const card of resolvePanelSummaryCards(input)) {
+    const summaryCard = renderSummaryCard(input, card)
+    if (summaryCard) panelItems.push(summaryCard)
+  }
 
   for (const setId of model.visibleSetIds) {
     const set = setById.get(setId)
@@ -224,34 +157,12 @@ export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInpu
       reopenSetId: model.reopenSetId,
     })
 
-    if (!isActive && set.isComplete) {
-      appendCompletedSummaryItem(input, {
-        set,
-        sets,
-        setById,
-        summarySegments,
-        renderedSummaryKeys,
-        panelItems,
-      })
-      continue
-    }
-
     if (isActive) {
       panelItems.push(renderActiveChoiceSet(set, input))
     }
   }
 
   return panelItems
-}
-
-export function buildCreateSetupChoiceSetMap(
-  sets: readonly CreateSetupSet[],
-): Map<string, CreateSetupChoiceSet> {
-  const map = new Map<string, CreateSetupChoiceSet>()
-  for (const set of sets) {
-    map.set(set.id, set)
-  }
-  return map
 }
 
 export function buildCreateSetupSetMap(

@@ -9,13 +9,12 @@ import {
   selectionSummaryCardChangeActionClasses,
   selectionSummaryCardListClasses,
   selectionSummaryCardRowActionColumnClasses,
-  selectionSummaryCardRowCopyColumnClasses,
-  selectionSummaryCardRowClasses,
-  selectionSummaryCardRowDividerClasses,
+  selectionSummaryCardRowGroupClasses,
+  selectionSummaryCardRowGroupDividerClasses,
   selectionSummaryCardRowHelperVariants,
   selectionSummaryCardRowLabelVariants,
-  selectionSummaryCardRowPrimaryLineClasses,
   selectionSummaryCardRowValueButtonClasses,
+  selectionSummaryCardRowValueCellClasses,
   selectionSummaryCardRowValueVariants,
   selectionSummaryCardSectionClasses,
   selectionSummaryCardShellClasses,
@@ -64,22 +63,15 @@ export function SelectionSummaryRow({
 
   return (
     <div
-      className={
-        showDivider
-          ? `${selectionSummaryCardRowClasses} ${selectionSummaryCardRowDividerClasses}`
-          : selectionSummaryCardRowClasses
-      }
+      className={cn(
+        selectionSummaryCardRowGroupClasses,
+        showDivider ? selectionSummaryCardRowGroupDividerClasses : undefined,
+      )}
     >
-      <dt className={selectionSummaryCardRowLabelVariants()}>{label}:</dt>
-      <dd className={cn(selectionSummaryCardRowCopyColumnClasses, 'min-w-0')}>
-        <div className={selectionSummaryCardRowPrimaryLineClasses}>
-          <span className="min-w-0 flex-1">{valueContent}</span>
-          {action ? (
-            <div className={selectionSummaryCardRowActionColumnClasses}>{action}</div>
-          ) : null}
-        </div>
-        {helper ? <p className={selectionSummaryCardRowHelperVariants()}>{helper}</p> : null}
-      </dd>
+      <dt className={selectionSummaryCardRowLabelVariants()}>{label}</dt>
+      <dd className={selectionSummaryCardRowValueCellClasses}>{valueContent}</dd>
+      <dd className={selectionSummaryCardRowActionColumnClasses}>{action ?? null}</dd>
+      {helper ? <dd className={selectionSummaryCardRowHelperVariants()}>{helper}</dd> : null}
     </div>
   )
 }

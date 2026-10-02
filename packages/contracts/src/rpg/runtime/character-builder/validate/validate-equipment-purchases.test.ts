@@ -82,8 +82,7 @@ function purchaseDraft(
     equipment: {
       mode: 'package' as const,
       purchases,
-      removedPackageItemKeys: [],
-      customized: true,
+      editedSincePackageSelection: true,
     },
   }
 }

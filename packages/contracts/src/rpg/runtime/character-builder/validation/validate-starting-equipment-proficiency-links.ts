@@ -23,6 +23,7 @@ export type StartingEquipmentProficiencyLinkIssueCode =
 export type StartingEquipmentProficiencyLinkIssue = {
   optionId: string
   itemIndex: number
+  entryId: string
   choiceId: string
   code: StartingEquipmentProficiencyLinkIssueCode
   message: string
@@ -31,16 +32,18 @@ export type StartingEquipmentProficiencyLinkIssue = {
 export type StartingEquipmentProficiencyChoiceReference = {
   optionId: string
   itemIndex: number
+  entryId: string
 }
 
 function proficiencyLinkIssue(
   optionId: string,
   itemIndex: number,
+  entryId: string,
   choiceId: string,
   code: StartingEquipmentProficiencyLinkIssueCode,
   message: string,
 ): StartingEquipmentProficiencyLinkIssue {
-  return { optionId, itemIndex, choiceId, code, message }
+  return { optionId, itemIndex, entryId, choiceId, code, message }
 }
 
 function proficiencyLinkedGrantsInOption(
@@ -69,6 +72,7 @@ function validateLinkedGrantRow(args: {
       proficiencyLinkIssue(
         optionId,
         itemIndex,
+        grant.id,
         choiceId,
         'modifiers_not_allowed',
         'Proficiency-linked starting equipment grants cannot carry modifiers.',
@@ -81,6 +85,7 @@ function validateLinkedGrantRow(args: {
       proficiencyLinkIssue(
         optionId,
         itemIndex,
+        grant.id,
         choiceId,
         'missing_choice',
         `Linked proficiency choice "${choiceId}" is not defined on this class.`,
@@ -94,6 +99,7 @@ function validateLinkedGrantRow(args: {
       proficiencyLinkIssue(
         optionId,
         itemIndex,
+        grant.id,
         choiceId,
         'ineligible_choice',
         `Linked proficiency choice "${choiceId}" is not eligible for equipment linkage.`,
@@ -106,6 +112,7 @@ function validateLinkedGrantRow(args: {
       proficiencyLinkIssue(
         optionId,
         itemIndex,
+        grant.id,
         choiceId,
         'duplicate_link',
         `Starting equipment package "${optionId}" references proficiency choice "${choiceId}" more than once.`,
@@ -158,7 +165,7 @@ export function findStartingEquipmentGrantsReferencingProficiencyChoice(
     for (const { grant, itemIndex } of proficiencyLinkedGrantsInOption(option)) {
       const linkedChoiceId = startingEquipmentGrantProficiencyChoiceId(grant)
       if (linkedChoiceId === choiceId) {
-        references.push({ optionId: option.id, itemIndex })
+        references.push({ optionId: option.id, itemIndex, entryId: grant.id })
       }
     }
   }

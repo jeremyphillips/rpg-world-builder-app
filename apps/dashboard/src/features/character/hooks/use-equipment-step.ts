@@ -219,20 +219,27 @@ export function useEquipmentStep(args: {
     targetOptionId: string,
   ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
   const showPurchaseWorkflow = shouldShowEquipmentPurchaseWorkflow(draft, selectedOptionId, budget)
-  const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(
-    () =>
-      characterClass
-        ? resolveEquipmentStepPickerItems({
-            draft,
-            characterClass,
-            catalogIndex,
-            choiceSets: resolvedChoiceSets,
-            budget,
-            context,
-          })
-        : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false } },
-    [budget, catalogIndex, characterClass, context, draft, resolvedChoiceSets],
-  )
+  const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(() => {
+    const resolved = characterClass
+      ? resolveEquipmentStepPickerItems({
+          draft,
+          characterClass,
+          catalogIndex,
+          choiceSets: resolvedChoiceSets,
+          budget,
+          context,
+        })
+      : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false as const } }
+    return {
+      items: resolved.items,
+      browseSortContext: {
+        ...resolved.browseSortContext,
+        activeChoice: focusedAllowanceId
+          ? { kind: 'allowance' as const, allowanceId: focusedAllowanceId }
+          : { kind: 'none' as const },
+      },
+    }
+  }, [budget, catalogIndex, characterClass, context, draft, focusedAllowanceId, resolvedChoiceSets])
   const magicItemWorkflow = useEquipmentMagicItemWorkflow({
     draft,
     context,
@@ -477,7 +484,7 @@ export function useEquipmentStep(args: {
 
     const nextSelection = { optionId, nestedSelections }
 
-    if (draft.equipment?.customized) {
+    if (draft.equipment?.editedSincePackageSelection) {
       setPendingSelection(nextSelection)
       return
     }

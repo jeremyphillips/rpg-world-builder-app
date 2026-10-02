@@ -259,28 +259,28 @@
               "startingWealth": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema31"
+                    "$ref": "#/definitions/__schema32"
                   }
                 ]
               },
               "proficiencyGrants": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema34"
+                    "$ref": "#/definitions/__schema35"
                   }
                 ]
               },
               "proficiencyChoices": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema35"
+                    "$ref": "#/definitions/__schema36"
                   }
                 ]
               },
               "standardArray": {
                 "allOf": [
                   {
-                    "$ref": "#/definitions/__schema36"
+                    "$ref": "#/definitions/__schema37"
                   }
                 ]
               }
@@ -988,28 +988,36 @@
         "retainSpeciesLanguages": {
           "type": "boolean"
         },
-        "startingWealth": {
+        "wealthTiers": {
           "type": "object",
           "properties": {
-            "cp": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            "poor": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema29"
+                }
+              ]
             },
-            "sp": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            "modest": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema29"
+                }
+              ]
             },
-            "gp": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            "comfortable": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema29"
+                }
+              ]
             },
-            "pp": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 9007199254740991
+            "wealthy": {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/__schema29"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -1017,7 +1025,7 @@
         "standardArray": {
           "allOf": [
             {
-              "$ref": "#/definitions/__schema29"
+              "$ref": "#/definitions/__schema30"
             }
           ]
         }
@@ -1095,19 +1103,45 @@
       "description": "standard | rare"
     },
     "__schema29": {
+      "type": "object",
+      "properties": {
+        "cp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "gp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "pp": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": false
+    },
+    "__schema30": {
       "minItems": 6,
       "maxItems": 6,
       "type": "array",
       "items": {
-        "$ref": "#/definitions/__schema30"
+        "$ref": "#/definitions/__schema31"
       }
     },
-    "__schema30": {
+    "__schema31": {
       "type": "integer",
       "minimum": 1,
       "maximum": 30
     },
-    "__schema31": {
+    "__schema32": {
       "type": "object",
       "properties": {
         "imageKey": {
@@ -1142,13 +1176,13 @@
           "minItems": 1,
           "type": "array",
           "items": {
-            "$ref": "#/definitions/__schema32"
+            "$ref": "#/definitions/__schema33"
           }
         }
       },
       "additionalProperties": false
     },
-    "__schema32": {
+    "__schema33": {
       "type": "object",
       "properties": {
         "minLevel": {
@@ -1276,7 +1310,7 @@
           "default": [],
           "allOf": [
             {
-              "$ref": "#/definitions/__schema33"
+              "$ref": "#/definitions/__schema34"
             }
           ]
         }
@@ -1291,7 +1325,7 @@
       ],
       "additionalProperties": false
     },
-    "__schema33": {
+    "__schema34": {
       "type": "array",
       "items": {
         "type": "object",
@@ -1321,7 +1355,7 @@
         "additionalProperties": false
       }
     },
-    "__schema34": {
+    "__schema35": {
       "type": "object",
       "properties": {
         "languages": {
@@ -1334,7 +1368,7 @@
       },
       "additionalProperties": false
     },
-    "__schema35": {
+    "__schema36": {
       "type": "object",
       "properties": {
         "languages": {
@@ -1386,10 +1420,10 @@
       },
       "additionalProperties": false
     },
-    "__schema36": {
+    "__schema37": {
       "allOf": [
         {
-          "$ref": "#/definitions/__schema29"
+          "$ref": "#/definitions/__schema30"
         }
       ]
     }

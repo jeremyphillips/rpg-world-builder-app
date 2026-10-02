@@ -12,7 +12,10 @@ import { CharacterVitalSummary } from '../components/detail/status/character-vit
 import { StandaloneCharacterRedirectGuard } from '../components/standalone-character-redirect-guard'
 import { useBuildContext } from '../hooks/use-build-context'
 import { useCharacter } from '../hooks/use-character'
-import { buildCharacterDetailViewModel } from '../lib/display/character-display'
+import {
+  buildCharacterDetailViewModel,
+  toCharacterDetailSource,
+} from '../lib/display/character-display'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 
 function CharacterDetailBody() {
@@ -36,7 +39,7 @@ function CharacterDetailBody() {
     if (!character || !catalogIndex || !context) return null
 
     return buildCharacterDetailViewModel({
-      character,
+      source: toCharacterDetailSource(character),
       catalogIndex,
       rules: context.characterCreationRules,
       xpProgression: resolveCampaignXpProgressionForRules(

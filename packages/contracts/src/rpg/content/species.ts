@@ -82,8 +82,9 @@ export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
   sizes: z.array(creatureSizeSchema).min(1),
   movement: movementSpeedsSchema,
   /**
-   * Recommended language ids for origin picks. Marks selectable ChoiceSet options
-   * as recommended in the UI; does not grant languages or expand selectable pools.
+   * Recommended language ids. They order origin language picks and do not expand
+   * selectable pools. On the classless level-0 chassis they are granted when
+   * `retainSpeciesLanguages` is enabled. They do not grant languages once a class applies.
    */
   languageAffinities: z.array(languageIdSchema).optional(),
   /** Cultural affiliation and naming capability for generator integration. */
@@ -103,6 +104,7 @@ export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   creatureType: creatureTypeSchema,
   sizes: z.array(creatureSizeSchema).default([]),
   movement: movementSpeedsDraftSchema,
+  /** See {@link speciesBodySchema} `languageAffinities`. */
   languageAffinities: z.array(languageIdSchema).optional(),
   culture: speciesCultureConfigSchema.optional(),
   traits: z.array(speciesBodyTraitSchema).default([]),

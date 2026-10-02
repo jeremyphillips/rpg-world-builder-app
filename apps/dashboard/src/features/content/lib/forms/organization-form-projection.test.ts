@@ -153,6 +153,7 @@ describe('organization form projection', () => {
       'practices',
       'members.classAffinityIds',
       'members.speciesAffinityIds',
+      'members.npcTemplateId',
       'members.titles',
       'description',
     ])
@@ -166,6 +167,7 @@ describe('organization form projection', () => {
       'operatorOrganization.practices',
       'operatorOrganization.members.classAffinityIds',
       'operatorOrganization.members.speciesAffinityIds',
+      'operatorOrganization.members.npcTemplateId',
       'operatorOrganization.members.titles',
       'operatorOrganization.description',
     ])

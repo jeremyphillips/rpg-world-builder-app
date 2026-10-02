@@ -9,6 +9,41 @@ Drawer grammars and full surface inventory: [drawer-architecture.md](./drawer-ar
 
 Resolver catalog: [character-builder-resolvers.md](../../../packages/contracts/docs/character-builder-resolvers.md).
 
+## Equipment row semantics
+
+Catalog facts, recommendations, and requirements stay on `ResolvedEquipmentOption`.
+Live quantity and supply are projected with `projectEquipmentSelection`.
+`resolveEquipmentOptionRowPresentation` turns that pair, plus a compact metadata
+profile, into ordered clauses (`requirement`, compatibility caution, `recommendation`,
+`supply`). It does not merge those models into one fact bag.
+
+- **Builder** maps the clauses onto the existing callout badge and keeps affordability,
+  package, and shopping-path state as picker overlays.
+- **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
+  the combobox option). Inline copy shows two clauses. The row title keeps the rest.
+  The row shows the resolved owned quantity as `×N` on the heading line. That
+  figure is the authoritative total, not the persisted manual grant and not the
+  package's retained quantity. Package customization edits how many of an
+  authored package entry the NPC keeps (`0` through the authored quantity).
+  Additional Equipment shows `+N` for the manual add on top of that retained
+  quantity. With a package javelin reduced to 6 and a manual `+2`, the picker
+  total is `×8`. With the package entry removed and the same manual add, the
+  picker total is `×2`. Quick NPC
+  passes atomic `EquipmentOptionSupplyClause` values into the row resolver and
+  leaves manual contributions out of that list. `formatEquipmentSupplySourceLabel`
+  still describes a manual source as “Added manually”; the picker simply does not
+  pass that source. A role supply clause is dropped when the recommendation
+  already names that role. Additional Equipment shows `+N` for the persisted
+  manual contribution. Its context line is omitted when that contribution is at
+  least the resolved total, and otherwise names the total plus one automatic
+  source, collapsing any further origins. Inventory breakdown remains the
+  exhaustive provenance surface. A manual Add equipment action stores only its
+  own additive quantity and does not steer the class package. The row is
+  disabled only when another copy cannot be added.
+
+Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
+`EquipmentSupplySource`. A role grant is not a recommendation.
+
 ## Architectural rule
 
 Evaluate every new picker against this stack:

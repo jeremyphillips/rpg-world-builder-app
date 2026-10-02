@@ -46,6 +46,7 @@ export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
+export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
 
 export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
@@ -69,10 +70,23 @@ export type EquipmentPickerCalloutIntent =
 
 export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'
 
+export type EquipmentPickerCalloutFactKind =
+  | 'requirement'
+  | 'recommendation'
+  | 'compatibility'
+  | 'state'
+  | 'blocking'
+  | 'caution'
+
 export type EquipmentPickerCallout = {
   label: string
   intent: EquipmentPickerCalloutIntent
   importance: EquipmentPickerCalloutImportance
+  /** Full explanation when the visible label truncates sources. */
+  title?: string
+  factKind?: EquipmentPickerCalloutFactKind
+  /** Sources already truncated for inline chrome. */
+  sourceInline?: string
 }
 
 export type EquipmentPickerCalloutContext = {

@@ -5,9 +5,13 @@ import {
   isCharacterBuildFinalizationError,
   resolveAutomaticNpcBuild,
   type AutomaticNpcBuildConstraints,
+  type AutomaticNpcBuildPreferences,
   type AutomaticNpcBuildSeed,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
+  type CharacterBuildValidationIssue,
+  type ChoiceSet,
+  type ClassPackageChoice,
   type CreateNpcRequestInput,
 } from '@rpg/contracts'
 
@@ -53,34 +57,116 @@ function withMembershipConnection(
   }
 }
 
-/**
- * Builds the `POST /api/campaigns/:id/npcs` payload from a Quick NPC seed.
- * Throws {@link CharacterBuildFinalizationError} carrying builder validation
- * issues when automatic resolution or finalization fails — no partial NPC is
- * ever produced.
- */
-export function buildQuickNpcCreateInput(args: {
+export type QuickNpcPrepareCreateArgs = {
   seed: AutomaticNpcBuildSeed
   context: CharacterBuildContext
   constraints?: AutomaticNpcBuildConstraints
+  preferences?: AutomaticNpcBuildPreferences
+  allowanceSelections?: Record<string, readonly string[]>
+  classPackage?: ClassPackageChoice
+  pinnedChoiceSetIds?: readonly string[]
+  startingEquipmentGrants?: readonly { equipmentId: string; quantity: number }[]
   membership?: QuickNpcMembership
-}): CreateNpcRequestInput {
+  /** Seeded draft when automatic resolution fails — used for preview projection. */
+  fallbackDraft?: CharacterBuilderDraft
+  fallbackResolvedChoiceSets?: readonly ChoiceSet[]
+  /** Starting-choice issues prepended before automatic build issues. */
+  startingChoiceIssues?: readonly CharacterBuildValidationIssue[]
+}
+
+export type QuickNpcPreparedCreate = {
+  draft: CharacterBuilderDraft
+  input: CreateNpcRequestInput
+  resolvedChoiceSets: readonly ChoiceSet[]
+}
+
+export type QuickNpcPreparedDraft = {
+  ok: boolean
+  draft: CharacterBuilderDraft
+  resolvedChoiceSets: readonly ChoiceSet[]
+  issues: CharacterBuildValidationIssue[]
+}
+
+/**
+ * Deterministically resolves the Quick NPC draft used by preview and create.
+ * Applies starting-choice issues first, then {@link resolveAutomaticNpcBuild},
+ * then optional organization membership on success.
+ */
+// fallow-ignore-next-line complexity
+export function resolveQuickNpcPreparedDraft(
+  args: QuickNpcPrepareCreateArgs,
+): QuickNpcPreparedDraft {
+  const startingIssues = [...(args.startingChoiceIssues ?? [])]
   const resolution = resolveAutomaticNpcBuild({
     seed: args.seed,
     context: args.context,
     ...(args.constraints ? { constraints: args.constraints } : {}),
+    ...(args.preferences ? { preferences: args.preferences } : {}),
+    ...(args.allowanceSelections ? { allowanceSelections: args.allowanceSelections } : {}),
+    ...(args.classPackage ? { classPackage: args.classPackage } : {}),
+    ...(args.pinnedChoiceSetIds?.length ? { pinnedChoiceSetIds: args.pinnedChoiceSetIds } : {}),
+    ...(args.startingEquipmentGrants?.length
+      ? { startingEquipmentGrants: args.startingEquipmentGrants }
+      : {}),
   })
+
+  const fallbackDraft = args.fallbackDraft
+  const fallbackChoiceSets = args.fallbackResolvedChoiceSets ?? []
+
   if (!resolution.ok) {
-    throw new CharacterBuildFinalizationError(resolution.issues)
+    if (!fallbackDraft) {
+      throw new CharacterBuildFinalizationError([...startingIssues, ...resolution.issues])
+    }
+    return {
+      ok: false,
+      draft: fallbackDraft,
+      resolvedChoiceSets: fallbackChoiceSets,
+      issues: [...startingIssues, ...resolution.issues],
+    }
+  }
+
+  if (startingIssues.length > 0) {
+    return {
+      ok: false,
+      draft: fallbackDraft ?? resolution.draft,
+      resolvedChoiceSets: resolution.resolvedChoiceSets,
+      issues: startingIssues,
+    }
   }
 
   const draft = args.membership
     ? withMembershipConnection(resolution.draft, args.membership)
     : resolution.draft
 
-  return finalizeNpcCharacterBuild(draft, args.context, {
+  return {
+    ok: true,
+    draft,
     resolvedChoiceSets: resolution.resolvedChoiceSets,
+    issues: [],
+  }
+}
+
+export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
+  const prepared = resolveQuickNpcPreparedDraft(args)
+  if (!prepared.ok) {
+    throw new CharacterBuildFinalizationError(prepared.issues)
+  }
+
+  const input = finalizeNpcCharacterBuild(prepared.draft, args.context, {
+    resolvedChoiceSets: prepared.resolvedChoiceSets,
   })
+
+  return { draft: prepared.draft, input, resolvedChoiceSets: prepared.resolvedChoiceSets }
+}
+
+/**
+ * Builds the `POST /api/campaigns/:id/npcs` payload from a Quick NPC seed.
+ * Throws {@link CharacterBuildFinalizationError} carrying builder validation
+ * issues when automatic resolution or finalization fails — no partial NPC is
+ * ever produced.
+ */
+export function buildQuickNpcCreateInput(args: QuickNpcPrepareCreateArgs): CreateNpcRequestInput {
+  return prepareQuickNpcCreate(args).input
 }
 
 const MAX_QUICK_NPC_ISSUE_MESSAGES = 3

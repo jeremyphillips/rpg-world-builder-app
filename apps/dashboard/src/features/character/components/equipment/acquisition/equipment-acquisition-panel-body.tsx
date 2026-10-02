@@ -195,7 +195,6 @@ function AcquisitionNextActionQuantityRow({
       </Text>
       <NumberStepper
         aria-label={nextAction.quantityLabel}
-        size="sm"
         bordered
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={1}

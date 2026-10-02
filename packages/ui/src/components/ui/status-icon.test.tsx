@@ -117,13 +117,20 @@ describe('StatusIcon', () => {
     const { container: mdContainer } = render(
       <StatusIcon variant="off" size="md" tooltip={false} />,
     )
+    const { container: lgContainer } = render(
+      <StatusIcon variant="off" size="lg" tooltip={false} />,
+    )
 
     expect(smContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-sm')
     expect(smContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
       String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
     )
-    expect(mdContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-md')
+    expect(mdContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-sm')
     expect(mdContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
+      String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
+    )
+    expect(lgContainer.querySelector('svg')).toHaveClass('size-status-icon-slash-md')
+    expect(lgContainer.querySelector('svg')?.getAttribute('stroke-width')).toBe(
       String(STATUS_ICON_OFF_SLASH_STROKE_WIDTH),
     )
   })
@@ -135,9 +142,18 @@ describe('StatusIcon', () => {
     const { container: mdContainer } = render(
       <StatusIcon variant="ready" size="md" tooltip={false} />,
     )
+    const { container: lgContainer } = render(
+      <StatusIcon variant="ready" size="lg" tooltip={false} />,
+    )
 
-    expect(getStatusIconDisc(smContainer)).toHaveClass('size-4')
-    expect(getStatusIconDisc(mdContainer)).toHaveClass('size-5')
+    expect(getStatusIconDisc(smContainer)).toHaveClass('size-3')
+    expect(getStatusIconDisc(mdContainer)).toHaveClass('size-4')
+    expect(getStatusIconDisc(lgContainer)).toHaveClass('size-5')
+  })
+
+  it('defaults to md disc size when size is omitted', () => {
+    const { container } = render(<StatusIcon variant="ready" tooltip={false} />)
+    expect(getStatusIconDisc(container)).toHaveClass('size-4')
   })
 
   itAxe('has no axe accessibility violations', async () => {

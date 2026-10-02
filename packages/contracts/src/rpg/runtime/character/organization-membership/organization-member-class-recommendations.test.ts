@@ -61,9 +61,15 @@ describe('resolveOrganizationNpcClassRecommendationIds', () => {
   const paladin = makeClass('paladin')
   const playableClasses = [fighter, rogue, wizard, paladin]
 
+  function ids(
+    input: Parameters<typeof resolveOrganizationNpcClassRecommendationIds>[0],
+  ): string[] {
+    return resolveOrganizationNpcClassRecommendationIds(input).map((entry) => entry.id)
+  }
+
   it('falls back to organization affinities when no template slugs are provided', () => {
     expect(
-      resolveOrganizationNpcClassRecommendationIds({
+      ids({
         organizationClassAffinityIds: [wizard.id, rogue.id, fighter.id],
         playableClasses,
       }),
@@ -72,7 +78,7 @@ describe('resolveOrganizationNpcClassRecommendationIds', () => {
 
   it('falls back to template affinities when no organization affinities are provided', () => {
     expect(
-      resolveOrganizationNpcClassRecommendationIds({
+      ids({
         templateClassAffinitySlugs: ['rogue', 'fighter'],
         playableClasses,
       }),
@@ -81,7 +87,7 @@ describe('resolveOrganizationNpcClassRecommendationIds', () => {
 
   it('returns an empty list when neither affinity source yields eligible classes', () => {
     expect(
-      resolveOrganizationNpcClassRecommendationIds({
+      ids({
         templateClassAffinitySlugs: ['monk'],
         organizationClassAffinityIds: [makeClass('monk').id],
         playableClasses: [fighter],
@@ -89,19 +95,37 @@ describe('resolveOrganizationNpcClassRecommendationIds', () => {
     ).toEqual([])
   })
 
-  it('ranks shared classes first, then template-only, then organization-only', () => {
+  it('ranks shared classes first, then template-only, then organization-only and keeps sources', () => {
     expect(
       resolveOrganizationNpcClassRecommendationIds({
         templateClassAffinitySlugs: ['fighter', 'rogue'],
         organizationClassAffinityIds: [rogue.id, wizard.id],
         playableClasses,
       }),
-    ).toEqual([rogue.id, fighter.id, wizard.id])
+    ).toEqual([
+      { id: rogue.id, sources: ['template', 'organization'] },
+      { id: fighter.id, sources: ['template'] },
+      { id: wizard.id, sources: ['organization'] },
+    ])
+  })
+
+  it('tags a title override as title rather than template', () => {
+    expect(
+      resolveOrganizationNpcClassRecommendationIds({
+        templateClassAffinitySlugs: ['fighter', 'paladin'],
+        templateSource: 'title',
+        organizationClassAffinityIds: [fighter.id],
+        playableClasses,
+      }),
+    ).toEqual([
+      { id: fighter.id, sources: ['title', 'organization'] },
+      { id: paladin.id, sources: ['title'] },
+    ])
   })
 
   it('dedupes recommendations and drops ineligible classes', () => {
     expect(
-      resolveOrganizationNpcClassRecommendationIds({
+      ids({
         templateClassAffinitySlugs: ['rogue', 'rogue'],
         organizationClassAffinityIds: [rogue.id, wizard.id, makeClass('monk').id],
         playableClasses: [fighter, rogue, wizard],
@@ -111,7 +135,7 @@ describe('resolveOrganizationNpcClassRecommendationIds', () => {
 
   it('preserves template order within the template-only tier', () => {
     expect(
-      resolveOrganizationNpcClassRecommendationIds({
+      ids({
         templateClassAffinitySlugs: ['paladin', 'fighter'],
         organizationClassAffinityIds: [],
         playableClasses,

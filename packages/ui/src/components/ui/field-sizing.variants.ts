@@ -9,6 +9,7 @@ import { cn } from '../../lib/utils'
 import type { ButtonVariantProps } from './button.variants'
 import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+import type { InteractiveListSize } from './interactive-list.variants'
 
 export type FieldSizeToken = 'sm' | 'md' | 'lg'
 
@@ -225,14 +226,45 @@ export function resolveArrayAddButtonSize(
   return fieldSizeToArrayAddButtonSize[sectionSize]
 }
 
-/** Maps outline button size to combobox search row field size. */
-export const buttonSizeToComboboxFieldSize = {
+/**
+ * Textual Button sizes → combobox search row field band. Compatibility mapping for
+ * dropdown UX — not field geometry parity with icon hit targets.
+ */
+export const buttonTextSizeToComboboxFieldSize = {
+  xs: 'sm',
   sm: 'sm',
   default: 'md',
   lg: 'lg',
-  icon: 'md',
-  'icon-lg': 'lg',
-} as const satisfies Record<'sm' | 'default' | 'lg' | 'icon' | 'icon-lg', FieldSizeToken>
+} as const satisfies Record<'xs' | 'sm' | 'default' | 'lg', FieldSizeToken>
+
+/** Icon button sizes do not imply a field band; use for dropdown search rows only. */
+export const COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON = 'md' as const satisfies FieldSizeToken
+
+/** Resolves combobox search field size from Button `size` (textual vs icon). */
+export function resolveComboboxSearchFieldSizeForButtonSize(
+  size?: ButtonVariantProps['size'] | null,
+): FieldSizeToken {
+  if (size == null || size === 'default') {
+    return buttonTextSizeToComboboxFieldSize.default
+  }
+  if (size in buttonTextSizeToComboboxFieldSize) {
+    return buttonTextSizeToComboboxFieldSize[size as keyof typeof buttonTextSizeToComboboxFieldSize]
+  }
+  return COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON
+}
+
+/** Combobox field band → interactive list row scale (not field typography). */
+export const fieldSizeToInteractiveListSize = {
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+} as const satisfies Record<FieldSizeToken, InteractiveListSize>
+
+export function resolveInteractiveListSizeForFieldSize(
+  fieldSize: FieldSizeToken = 'md',
+): InteractiveListSize {
+  return fieldSizeToInteractiveListSize[fieldSize]
+}
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */
 export const fieldDigitTrailingIconClasses = {

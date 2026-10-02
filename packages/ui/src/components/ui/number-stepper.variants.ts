@@ -1,14 +1,19 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldControlSizeClasses } from './field-sizing.variants'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+
+export type NumberStepperSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export const numberStepperRootVariants = cva('inline-flex items-center', {
   variants: {
     size: {
+      xs: 'h-6',
       sm: 'h-8',
       md: 'h-9',
+      lg: 'h-10',
     },
     bordered: {
       true: 'overflow-hidden rounded-full border border-input bg-transparent shadow-sm',
@@ -26,8 +31,10 @@ export const numberStepperButtonVariants = cva(
   {
     variants: {
       size: {
+        xs: cn('size-6', iconGlyphDescendantClasses.xs),
         sm: cn('size-8', iconGlyphDescendantClasses.sm),
         md: cn('size-8', iconGlyphDescendantClasses.md),
+        lg: cn('size-9', iconGlyphDescendantClasses.md),
       },
     },
     defaultVariants: {
@@ -41,8 +48,10 @@ export const numberStepperInputVariants = cva(
   {
     variants: {
       size: {
+        xs: `${fieldControlSizeClasses.sm} h-full px-0 text-xs`,
         sm: `${fieldControlSizeClasses.sm} h-full px-0`,
         md: `${fieldControlSizeClasses.md} h-full px-0`,
+        lg: `${fieldControlSizeClasses.lg} h-full px-0`,
       },
     },
     defaultVariants: {
@@ -60,31 +69,60 @@ export const numberStepperInputDigitWidths = {
   5: 'w-[5ch] min-w-[5ch]',
 } as const satisfies Record<1 | 2 | 3 | 4 | 5, string>
 
+const sideButtonWidthFourRem = '4rem'
+const sideButtonWidthThreeRem = '3rem'
+
 /**
  * Digit-based stepper widths: N×ch for the value slot plus two side-button columns.
- * Button columns match `numberStepperButtonVariants` (sm/md: 2×size-8 / 32px field chrome).
  */
 export const numberStepperWidthVariants = {
+  xs: {
+    1: `w-[calc(1*1ch+${sideButtonWidthThreeRem})]`,
+    2: `w-[calc(2*1ch+${sideButtonWidthThreeRem})]`,
+    3: `w-[calc(3*1ch+${sideButtonWidthThreeRem})]`,
+    4: `w-[calc(4*1ch+${sideButtonWidthThreeRem})]`,
+    5: `w-[calc(5*1ch+${sideButtonWidthThreeRem})]`,
+  },
   sm: {
-    1: 'w-[calc(1*1ch+4rem)]',
-    2: 'w-[calc(2*1ch+4rem)]',
-    3: 'w-[calc(3*1ch+4rem)]',
-    4: 'w-[calc(4*1ch+4rem)]',
-    5: 'w-[calc(5*1ch+4rem)]',
+    1: `w-[calc(1*1ch+${sideButtonWidthFourRem})]`,
+    2: `w-[calc(2*1ch+${sideButtonWidthFourRem})]`,
+    3: `w-[calc(3*1ch+${sideButtonWidthFourRem})]`,
+    4: `w-[calc(4*1ch+${sideButtonWidthFourRem})]`,
+    5: `w-[calc(5*1ch+${sideButtonWidthFourRem})]`,
   },
   md: {
-    1: 'w-[calc(1*1ch+4rem)]',
-    2: 'w-[calc(2*1ch+4rem)]',
-    3: 'w-[calc(3*1ch+4rem)]',
-    4: 'w-[calc(4*1ch+4rem)]',
-    5: 'w-[calc(5*1ch+4rem)]',
+    1: `w-[calc(1*1ch+${sideButtonWidthFourRem})]`,
+    2: `w-[calc(2*1ch+${sideButtonWidthFourRem})]`,
+    3: `w-[calc(3*1ch+${sideButtonWidthFourRem})]`,
+    4: `w-[calc(4*1ch+${sideButtonWidthFourRem})]`,
+    5: `w-[calc(5*1ch+${sideButtonWidthFourRem})]`,
   },
-} as const satisfies Record<'sm' | 'md', Record<1 | 2 | 3 | 4 | 5, string>>
+  lg: {
+    1: `w-[calc(1*1ch+${sideButtonWidthFourRem})]`,
+    2: `w-[calc(2*1ch+${sideButtonWidthFourRem})]`,
+    3: `w-[calc(3*1ch+${sideButtonWidthFourRem})]`,
+    4: `w-[calc(4*1ch+${sideButtonWidthFourRem})]`,
+    5: `w-[calc(5*1ch+${sideButtonWidthFourRem})]`,
+  },
+} as const satisfies Record<NumberStepperSize, Record<1 | 2 | 3 | 4 | 5, string>>
 
 export type NumberStepperDigits = keyof (typeof numberStepperWidthVariants)['md']
 
 export type NumberStepperVariantProps = VariantProps<typeof numberStepperRootVariants>
 
-export function resolveNumberStepperSize(size: NumberStepperVariantProps['size']): 'sm' | 'md' {
-  return size === 'sm' ? 'sm' : 'md'
+/** Maps field control scale to stepper tier — never resolves to `xs`. */
+export function resolveNumberStepperSizeFromFieldSize(
+  fieldSize: FieldSizeToken,
+): NumberStepperSize {
+  if (fieldSize === 'sm') return 'sm'
+  if (fieldSize === 'lg') return 'lg'
+  return 'md'
+}
+
+export function resolveNumberStepperSize(
+  explicit: NumberStepperVariantProps['size'],
+  fieldSize: FieldSizeToken,
+): NumberStepperSize {
+  if (explicit) return explicit
+  return resolveNumberStepperSizeFromFieldSize(fieldSize)
 }

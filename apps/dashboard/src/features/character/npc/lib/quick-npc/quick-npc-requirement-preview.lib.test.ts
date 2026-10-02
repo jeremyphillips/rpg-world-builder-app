@@ -17,7 +17,6 @@ describe('quick-npc-requirement-preview.lib', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           purchaseAvailability: { status: 'available' as const },
           recommendation: { tier: 'neutral' as const, reasons: [], specificity: 'exact' as const },

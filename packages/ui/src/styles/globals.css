@@ -351,6 +351,9 @@
    * Control action hit targets — generic control chrome (icon buttons, row actions).
    * Field control bands remain in field-sizing; number-stepper aligns to field height.
    */
+  --control-action-xs-height: 1.75rem; /* 28px — dense labeled buttons (Button size xs) */
+  --text-control-action-xs: 0.625rem; /* 10px — compact control labels; not general body type */
+  --text-control-action-xs--line-height: 0.875rem; /* 14px */
   --control-action-compact-height: 1.5rem;
   --control-action-default-height: 2.25rem;
   --control-action-lg-height: 2.5rem;
@@ -371,6 +374,15 @@
 
 @utility z-toast {
   z-index: var(--z-toast);
+}
+
+@utility text-control-action-xs {
+  font-size: var(--text-control-action-xs);
+  line-height: var(--text-control-action-xs--line-height);
+}
+
+@utility h-control-action-xs {
+  height: var(--control-action-xs-height);
 }
 
 @utility h-control-action-compact {

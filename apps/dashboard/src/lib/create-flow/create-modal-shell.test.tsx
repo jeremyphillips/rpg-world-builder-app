@@ -66,11 +66,37 @@ describe('CreateModalShell', () => {
 
     expect(modalContentSpy).toHaveBeenCalled()
     const contentProps = modalContentSpy.mock.calls.at(-1)?.[0]
-    expect(contentProps).toMatchObject({ layout: 'stable', stableSize: 'tall' })
+    expect(contentProps).toMatchObject({
+      layout: 'stable',
+      stableSize: 'tall',
+      closeOnEscape: false,
+      closeOnOutsideClick: false,
+    })
     expect(document.querySelectorAll('[data-create-modal-body]')).toHaveLength(1)
     expect(document.querySelectorAll('[data-create-modal-content]')).toHaveLength(1)
     expect(document.querySelector('[data-create-modal-content]')).toHaveClass('overflow-y-auto')
     expect(document.querySelectorAll('[data-create-modal-footer]')).toHaveLength(1)
+  })
+
+  it('does not close on Escape by default', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    render(
+      <CreateModalShell
+        open
+        onOpenChange={onOpenChange}
+        headline="Create place"
+        footer={<button type="button">Create</button>}
+      >
+        <p>Details</p>
+      </CreateModalShell>,
+    )
+
+    await screen.findByRole('dialog')
+    await user.keyboard('{Escape}')
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    expect(onOpenChange).not.toHaveBeenCalled()
   })
 
   it('keeps inactive tab content mounted and reports normalized panel issues', async () => {

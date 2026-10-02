@@ -99,6 +99,7 @@ export const HomebrewWithStartingEquipment: Story = {
             label: 'Standard Equipment',
             items: [
               {
+                id: 'dagger',
                 itemKind: 'grant',
                 grantTargetSource: 'equipment',
                 equipmentSlug: 'dagger',

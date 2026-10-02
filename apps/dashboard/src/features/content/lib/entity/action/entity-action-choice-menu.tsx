@@ -4,17 +4,14 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  InteractiveList,
+  MenuChoiceRow,
   cn,
 } from '@rpg/ui'
 
-import { EntityActionChoiceMenuItemContent } from './entity-action-choice-menu-item-content'
-import {
-  entityActionChoiceMenuContentClasses,
-  entityActionChoiceMenuItemClasses,
-} from './entity-action-choice-menu.variants'
+import { entityActionChoiceMenuContentClasses } from './entity-action-choice-menu.variants'
 
 export type EntityActionChoiceMenuItem = {
   id: string
@@ -72,16 +69,18 @@ export function EntityActionChoiceMenu({
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="end" className={cn(entityActionChoiceMenuContentClasses)}>
         {menuHeading ? <DropdownMenuLabel>{menuHeading}</DropdownMenuLabel> : null}
-        {items.map((item) => (
-          <DropdownMenuItem
-            key={item.id}
-            className={cn(entityActionChoiceMenuItemClasses)}
-            disabled={item.disabled}
-            onSelect={() => item.onSelect()}
-          >
-            <EntityActionChoiceMenuItemContent label={item.label} description={item.description} />
-          </DropdownMenuItem>
-        ))}
+        <InteractiveList>
+          {items.map((item) => (
+            <MenuChoiceRow
+              key={item.id}
+              heading={item.label}
+              supporting={item.description}
+              supportingWrap
+              disabled={item.disabled}
+              onSelect={() => item.onSelect()}
+            />
+          ))}
+        </InteractiveList>
       </DropdownMenuContent>
     </DropdownMenu>
   )

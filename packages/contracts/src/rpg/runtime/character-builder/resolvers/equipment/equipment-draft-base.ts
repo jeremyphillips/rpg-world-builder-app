@@ -4,8 +4,8 @@ const EMPTY_EQUIPMENT_DRAFT = {
   mode: 'package' as const,
   purchases: [],
   grants: [],
-  removedPackageItemKeys: [],
-  customized: false,
+  classPackage: { state: 'unresolved' as const },
+  editedSincePackageSelection: false,
   magicItemSelections: [],
 }
 

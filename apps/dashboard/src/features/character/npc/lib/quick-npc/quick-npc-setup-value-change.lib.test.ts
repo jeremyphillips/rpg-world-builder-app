@@ -16,6 +16,7 @@ import {
 import {
   quickNpcMemberSetupValues,
   quickNpcMemberSetupWithNoTitle,
+  quickNpcStandaloneSetupValues,
 } from './quick-npc-test-fixtures'
 
 const context = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
@@ -44,7 +45,7 @@ const guildmasterTitle = {
   label: 'Guildmaster',
   description: 'Head of the guild.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'covert_operator' as const, level: 8 },
+  npcRecommendation: { templateId: 'criminal' as const, level: 8 },
 } as const
 
 const martialCommanderTitle = {
@@ -52,14 +53,14 @@ const martialCommanderTitle = {
   label: 'Commander',
   description: 'Field commander.',
   priority: 50 as const,
-  npcRecommendation: { templateId: 'martial_commander' as const, level: 8 },
+  npcRecommendation: { templateId: 'guard' as const, level: 8 },
 } as const
 
 const highLevelTitle = {
   ...guildmasterTitle,
   id: 'omt_archmage',
   label: 'Archmage',
-  npcRecommendation: { templateId: 'arcane_practitioner' as const, level: 25 },
+  npcRecommendation: { templateId: 'scholar' as const, level: 25 },
 } as const
 
 const changeArgs = {
@@ -79,13 +80,17 @@ function applySetupChange(
   const previousValue =
     setId === 'speciesId'
       ? values.speciesId
-      : setId === 'membershipTitle'
-        ? isQuickNpcOrganizationMemberSetup(values)
-          ? (values.membershipTitle ?? '')
+      : setId === 'npcTemplateId'
+        ? 'npcTemplateId' in values
+          ? (values.npcTemplateId ?? '')
           : ''
-        : setId === 'classId'
-          ? values.classId
-          : values.level
+        : setId === 'membershipTitle'
+          ? isQuickNpcOrganizationMemberSetup(values)
+            ? (values.membershipTitle ?? '')
+            : ''
+          : setId === 'classId'
+            ? values.classId
+            : values.level
 
   return applyQuickNpcSetupValueChange({
     values,
@@ -127,6 +132,56 @@ describe('resolveQuickNpcLevelForMembershipTitle', () => {
 })
 
 describe('applyQuickNpcSetupValueChange', () => {
+  it('reseeds class when standalone role changes without touching level or species', () => {
+    expect(
+      applySetupChange({
+        values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 0,
+          classId: '',
+        }),
+        setId: 'npcTemplateId',
+        nextValue: 'criminal',
+        context: multiClassContext,
+        titles: [],
+        organizationClassAffinityIds: [],
+      }),
+    ).toEqual(
+      quickNpcStandaloneSetupValues({
+        npcTemplateId: 'criminal',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        level: 0,
+        classId: '',
+      }),
+    )
+  })
+
+  it('auto-seeds class when standalone role resolves to one recommendation at classed level', () => {
+    expect(
+      applySetupChange({
+        values: quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
+          speciesId: 'srd-cc-5.2.1:dwarf',
+          level: 5,
+          classId: '',
+        }),
+        setId: 'npcTemplateId',
+        nextValue: 'criminal',
+        context: multiClassContext,
+        titles: [],
+        organizationClassAffinityIds: [],
+      }),
+    ).toEqual(
+      quickNpcStandaloneSetupValues({
+        npcTemplateId: 'criminal',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        level: 5,
+        classId: rogueClass.id,
+      }),
+    )
+  })
+
   const baseValues: QuickNpcOrganizationMemberSetupValues = quickNpcMemberSetupValues({
     speciesId: 'srd-cc-5.2.1:dwarf',
     membershipTitle: 'omt_member',
@@ -166,6 +221,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       quickNpcMemberSetupValues({
         speciesId: '',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: '',
         level: 8,
       }),
@@ -189,6 +245,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       quickNpcMemberSetupValues({
         speciesId: 'srd-cc-5.2.1:elf',
         membershipTitle: 'omt_guildmaster',
+        npcTemplateId: 'criminal',
         classId: rogueClass.id,
         level: 8,
       }),
@@ -209,6 +266,7 @@ describe('applyQuickNpcSetupValueChange', () => {
       ...baseValues,
       speciesId: 'srd-cc-5.2.1:elf',
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       level: 8,
       classId: rogueClass.id,
     })
@@ -225,6 +283,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual({
       ...baseValues,
       membershipTitle: 'omt_guildmaster',
+      npcTemplateId: 'criminal',
       level: 8,
       classId: rogueClass.id,
     })
@@ -245,6 +304,7 @@ describe('applyQuickNpcSetupValueChange', () => {
     ).toEqual({
       ...baseValues,
       membershipTitle: 'omt_commander',
+      npcTemplateId: 'guard',
       level: 8,
       classId: '',
     })

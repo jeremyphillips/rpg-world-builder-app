@@ -84,6 +84,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
         'field-group-legend',
         'field-subgroup-legend',
         'field-array-legend',
+        'control-action-xs',
       ],
       'font-weight': [
         'heading-display',

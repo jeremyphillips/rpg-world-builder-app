@@ -47,8 +47,7 @@ const goldDraft = {
         origin: 'picker' as const,
       },
     ],
-    removedPackageItemKeys: [],
-    customized: false,
+    editedSincePackageSelection: false,
   },
 }
 

@@ -1,13 +1,18 @@
 import { z } from 'zod'
 
 import { builderLevelSchema } from '../../../primitives/level'
+import { abilitySchema, type Ability } from '../../../vocab/ability'
 import { alignmentSchema } from '../../../vocab/alignment'
 import { genderSchema } from '../../../vocab/character-gender'
+import { npcTemplateIdSchema } from '../../../vocab/npc/npc-template'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import type { CharacterBuildContext } from '../context'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { resolvePlayableBuilderContent } from '../preview/resolve-playable-builder-content'
 import { validateBuilderCharacterLevel } from '../progression/builder-level'
+import type { NpcEquipmentPreferenceEntry } from './equipment-preference-stream'
+import type { RecommendationSourceIdentity } from '../recommendation'
+import type { SourcedRecommendation } from '../sourced-recommendation'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 
@@ -26,7 +31,25 @@ export const automaticNpcBuildSeedSchema = z.object({
   alignment: alignmentSchema,
   /** Required — finalSubmit validation requires a gender. */
   gender: genderSchema,
+  /** Selected NPC role. Omitted when the caller did not choose one. */
+  npcTemplateId: npcTemplateIdSchema.optional(),
 })
+
+/**
+ * Soft ordering for automatic choice fill. Never fails a build and never adds slots.
+ * Skill, tool, and language lists keep the recommendation source on each id.
+ */
+export type AutomaticNpcBuildPreferences = {
+  abilityPriority?: readonly Ability[]
+  skills?: readonly SourcedRecommendation[]
+  tools?: readonly SourcedRecommendation[]
+  languages?: readonly SourcedRecommendation[]
+  equipmentPreferences?: readonly NpcEquipmentPreferenceEntry[]
+  /** Ids used when `suggestedBy` stores recommendation source refs. */
+  recommendationIdentity?: RecommendationSourceIdentity
+}
+
+export const automaticNpcBuildAbilityPrioritySchema = z.array(abilitySchema).length(6)
 
 export type AutomaticNpcBuildSeed = z.infer<typeof automaticNpcBuildSeedSchema>
 

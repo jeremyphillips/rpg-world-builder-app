@@ -1,15 +1,11 @@
 import type { SearchDocument } from '@rpg/search/types'
 
 import type { Equipment } from '../../../../content/equipment'
-import {
-  compareEquipmentRecommendationSpecificity,
-  compareEquipmentRecommendationTiers,
-  getBestEquipmentRecommendationReasonRank,
-  type EquipmentRecommendation,
-} from '../../../../content/equipment-recommendation'
+import type { EquipmentRecommendation } from '../../../../content/equipment-recommendation'
 import type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
-import { getEquipmentRecommendationKindRank } from './equipment-picker-item-kind-rank'
-import { getEquipmentWeaponCategoryBrowseRank } from './equipment-picker-item-weapon-category-rank'
+import { compareIntentionalEquipmentRanking } from '../equipment/equipment-ranking-policy'
+import type { SourcedEquipmentRecommendationEvidence } from '../equipment/equipment-recommendation-evidence'
+import type { ResolvedEquipmentOption } from '../equipment/project-equipment-option-facts'
 import type { EquipmentPurchaseAvailability } from '../equipment/resolve-equipment-purchase-availability'
 import type { MagicItemActionState } from './magic-item-picker-action-rank'
 import type { PickerItemStateBase } from './picker-item-state'
@@ -23,19 +19,18 @@ export {
 export type EquipmentPickerItemState = PickerItemStateBase & {
   isProficient: boolean
   /**
-   * UI shorthand: fits starting budget. When no budget applies, always `true` — budget
-   * gating is inactive, not proof that a comparison ran.
-   */
-  isAffordable: boolean
-  /**
-   * Fits remaining budget after purchases. When no budget applies, always `true` — budget
-   * gating is inactive, not proof that a comparison ran.
+   * Fits remaining budget and is for sale. Derived from `purchaseAvailability.status === 'available'`.
+   * When no budget applies, priced rows stay available.
    */
   isWithinRemainingBudget: boolean
-  /** Wealth-aware purchase gate for quantity=1 — null cost is unavailable, never unaffordable. */
+  /** Wealth-aware purchase gate for quantity=1. Remaining budget decides unaffordable. */
   purchaseAvailability: EquipmentPurchaseAvailability
   /** Tiered classification; `isRecommended` mirrors essential/strong recommendation tiers. */
   recommendation: EquipmentRecommendation
+  /** Contributing evidence, including typed sources. Proficiency rows omit `source`. */
+  evidence?: readonly SourcedEquipmentRecommendationEvidence[]
+  /** Split requirement, soft recommendation, and option-state facts. */
+  resolved?: ResolvedEquipmentOption
   /** Populated in magic-items workflow only — drives actionability best-match rank. */
   magicItemAction?: MagicItemActionState
 }
@@ -48,53 +43,14 @@ export type EquipmentPickerItem = {
 }
 
 /**
- * Stable picker browse ordering: tier → specificity → best reason → starting affordability
- * → kind bucket → weapon category → name. Search (`CatalogPickerSheet` / `rankItems`) stays
- * text-score-first; an empty query preserves this order. Kind and weapon-category ranks
- * are tiebreakers only after tier, specificity, reason, and affordability.
+ * Best-match browse order from resolved equipment facts: active requirement and choice,
+ * relevance, recommendation strength, specificity and source, then purchase actionability
+ * and proficiency when the browse context enables them, then canonical kind and name.
  */
 export function compareEquipmentPickerItemsByRecommendation(
   left: EquipmentPickerItem,
   right: EquipmentPickerItem,
   context?: EquipmentPickerBrowseSortContext,
 ): number {
-  const tierOrder = compareEquipmentRecommendationTiers(
-    left.state.recommendation.tier,
-    right.state.recommendation.tier,
-  )
-  if (tierOrder !== 0) return tierOrder
-
-  const specificityOrder = compareEquipmentRecommendationSpecificity(
-    left.state.recommendation.specificity,
-    right.state.recommendation.specificity,
-  )
-  if (specificityOrder !== 0) return specificityOrder
-
-  const leftReasonRank = getBestEquipmentRecommendationReasonRank(left.state.recommendation.reasons)
-  const rightReasonRank = getBestEquipmentRecommendationReasonRank(
-    right.state.recommendation.reasons,
-  )
-  if (leftReasonRank !== rightReasonRank) return leftReasonRank - rightReasonRank
-
-  if (left.state.isAffordable !== right.state.isAffordable) {
-    return left.state.isAffordable ? -1 : 1
-  }
-
-  const leftKindRank = getEquipmentRecommendationKindRank(left.equipment)
-  const rightKindRank = getEquipmentRecommendationKindRank(right.equipment)
-  if (leftKindRank !== rightKindRank) return leftKindRank - rightKindRank
-
-  const preferMartial = context?.preferMartialWeaponBrowseOrder ?? false
-  const leftWeaponCategoryRank = getEquipmentWeaponCategoryBrowseRank(left.equipment, preferMartial)
-  const rightWeaponCategoryRank = getEquipmentWeaponCategoryBrowseRank(
-    right.equipment,
-    preferMartial,
-  )
-  if (leftWeaponCategoryRank !== rightWeaponCategoryRank) {
-    return leftWeaponCategoryRank - rightWeaponCategoryRank
-  }
-
-  return left.equipment.name.localeCompare(right.equipment.name, undefined, {
-    sensitivity: 'base',
-  })
+  return compareIntentionalEquipmentRanking(left, right, context)
 }

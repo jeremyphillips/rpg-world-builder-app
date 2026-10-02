@@ -9,10 +9,10 @@ import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
-import { ListResultEmpty, ListResultList } from './list-result-list.client'
-import { ListResultItem } from './list-result-item.client'
-import { ListResultToolbar } from './list-result-toolbar.client'
-import { ListResultViewport } from './list-result-viewport.client'
+import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
+import { InteractiveListRow } from './interactive-list-row.client'
+import { InteractiveListToolbar } from './interactive-list-toolbar.client'
+import { InteractiveListViewport } from './interactive-list-viewport.client'
 import {
   buildExternalLinkPickerValue,
   buildInternalLinkPickerValue,
@@ -189,7 +189,7 @@ function RichTextLinkPickerForm({
 
         <TabsContent value="internal" className="space-y-3">
           <div className="overflow-hidden rounded-md border border-border">
-            <ListResultToolbar
+            <InteractiveListToolbar
               search={
                 <div className="relative flex h-8 w-full items-center">
                   <Search className="pointer-events-none absolute left-0 size-3.5 text-muted-foreground" />
@@ -222,10 +222,10 @@ function RichTextLinkPickerForm({
               }
             />
 
-            <ListResultViewport className="max-h-40">
+            <InteractiveListViewport className="max-h-40">
               {selectedInternalOption ? (
-                <ListResultList>
-                  <ListResultItem
+                <InteractiveList>
+                  <InteractiveListRow
                     name={selectedInternalOption.title}
                     classification={resolveInternalLinkClassification(
                       selectedInternalOption.contentType,
@@ -246,14 +246,14 @@ function RichTextLinkPickerForm({
                       </Button>
                     }
                   />
-                </ListResultList>
+                </InteractiveList>
               ) : (
-                <ListResultList>
+                <InteractiveList>
                   {filteredInternalOptions.length === 0 ? (
-                    <ListResultEmpty>{EMPTY_SEARCH_MESSAGE}</ListResultEmpty>
+                    <InteractiveListEmpty>{EMPTY_SEARCH_MESSAGE}</InteractiveListEmpty>
                   ) : (
                     filteredInternalOptions.map((option) => (
-                      <ListResultItem
+                      <InteractiveListRow
                         key={option.id}
                         name={option.title}
                         classification={resolveInternalLinkClassification(
@@ -273,12 +273,12 @@ function RichTextLinkPickerForm({
                             }
                           }}
                         />
-                      </ListResultItem>
+                      </InteractiveListRow>
                     ))
                   )}
-                </ListResultList>
+                </InteractiveList>
               )}
-            </ListResultViewport>
+            </InteractiveListViewport>
           </div>
 
           <Input

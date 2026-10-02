@@ -187,6 +187,43 @@ describe('regenerateNestedContentKeysForDuplicate', () => {
     expect(new Set(locations.map((row) => row.id)).size).toBe(2)
   })
 
+  it('regenerates starting-equipment contribution ids on class duplication', () => {
+    const body = regenerateNestedContentKeysForDuplicate(
+      {
+        characterCreation: {
+          startingEquipment: {
+            choose: 1,
+            options: [
+              {
+                id: 'standard-equipment',
+                label: 'Standard Equipment',
+                items: [
+                  { id: 'javelin', kind: 'grant', quantity: 8 },
+                  { id: 'flail', kind: 'grant', quantity: 1 },
+                ],
+              },
+            ],
+          },
+        },
+      },
+      {
+        destinationSlug: 'fighter-copy',
+        nestedIdRegeneration: { paths: ['characterCreation.startingEquipment'] },
+      },
+    )
+
+    const items = (
+      body.characterCreation as {
+        startingEquipment: { options: Array<{ items: Array<{ id: string; kind: string }> }> }
+      }
+    ).startingEquipment.options[0]?.items
+
+    expect(items?.map((item) => item.kind)).toEqual(['grant', 'grant'])
+    expect(items?.[0]?.id).not.toBe('javelin')
+    expect(items?.[1]?.id).not.toBe('flail')
+    expect(new Set(items?.map((item) => item.id)).size).toBe(2)
+  })
+
   it('implements every nestedIdRegeneration path declared in CONTENT_TYPE_CAPABILITIES', () => {
     const declaredPaths = new Set<NestedContentIdRegenerationPath>()
     for (const capability of Object.values(CONTENT_TYPE_CAPABILITIES)) {

@@ -5,7 +5,6 @@ import { toast, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import {
-  CreateSetupFooter,
   notifyCreateSetupValueChangeCompletion,
   useCreateSetupSequence,
   type SetupSummaryEditTarget,
@@ -18,6 +17,7 @@ import {
   type QuickNpcAuthoringTabFormValues,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
+import type { QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
 import {
   resolveQuickNpcCreateOrganization,
   resolveQuickNpcCreateRemountKey,
@@ -27,21 +27,20 @@ import { applyQuickNpcSetupValueChange } from '../../lib/quick-npc/quick-npc-set
 import {
   buildQuickNpcCreateSetupSets,
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
-  QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION,
-  QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE,
-  QUICK_NPC_STANDALONE_SETUP_DESCRIPTION,
-  QUICK_NPC_STANDALONE_SETUP_HEADLINE,
   resolveQuickNpcBuildExternalDecision,
+  resolveQuickNpcModalChrome,
 } from '../../lib/quick-npc/quick-npc-create-modal-setup.lib'
 import {
   QuickNpcAuthoringForm,
   type QuickNpcCreateFormOrganization,
 } from './quick-npc-authoring-form'
+import { QuickNpcEditingLockProvider } from './quick-npc-editing-lock'
 import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase'
+import { QuickNpcCreateModalSetupFooter } from './quick-npc-create-modal-setup-footer'
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
 
-export const QUICK_NPC_CREATE_TITLE = QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
+export { QUICK_NPC_CREATE_CHOICE_SELECTION_COUNTER_SIZE } from './quick-npc-starting-choices.variants'
 
 export type QuickNpcCreateModalProps = {
   open: boolean
@@ -62,6 +61,7 @@ type QuickNpcCreateModalState = {
   phase: QuickNpcCreateModalPhase
   setupValues: QuickNpcSetupValues
   authoringValues?: Partial<QuickNpcAuthoringTabFormValues>
+  equipmentBaseline?: QuickNpcEquipmentSeedContext
 }
 
 function createInitialState(
@@ -72,25 +72,6 @@ function createInitialState(
     phase: 'setup',
     setupValues: createQuickNpcSetupDefaultValues(buildContext, createContext),
   }
-}
-
-function resolveQuickNpcSetupHeadline(context: QuickNpcCreateContext): string {
-  return context.kind === 'standalone'
-    ? QUICK_NPC_STANDALONE_SETUP_HEADLINE
-    : QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE
-}
-
-function resolveQuickNpcSetupDescription(context: QuickNpcCreateContext): string {
-  return context.kind === 'standalone'
-    ? QUICK_NPC_STANDALONE_SETUP_DESCRIPTION
-    : QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION
-}
-
-function resolveQuickNpcAuthoringDescription(context: QuickNpcCreateContext): string {
-  if (context.kind === 'standalone') {
-    return 'Create a new NPC.'
-  }
-  return `Create a new NPC as a member of ${context.organization.name}.`
 }
 
 function QuickNpcCreateModalSession({
@@ -107,6 +88,7 @@ function QuickNpcCreateModalSession({
   const [state, setState] = React.useState(() => createInitialState(buildContext, context))
   const [authoringPending, setAuthoringPending] = React.useState(false)
   const pendingSetupSummaryEditRef = React.useRef<SetupSummaryEditTarget | null>(null)
+  const previewNpcButtonRef = React.useRef<HTMLButtonElement>(null)
   const setupValuesRef = React.useRef(state.setupValues)
   React.useEffect(() => {
     setupValuesRef.current = state.setupValues
@@ -121,6 +103,7 @@ function QuickNpcCreateModalSession({
   const titles = organizationMembers?.titles ?? []
   const classAffinityIds = organizationMembers?.classAffinityIds
   const speciesAffinityIds = organizationMembers?.speciesAffinityIds
+  const organizationTemplateId = organizationMembers?.npcTemplateId
 
   const setupSets = React.useMemo(
     () =>
@@ -148,10 +131,14 @@ function QuickNpcCreateModalSession({
         ...current,
         phase: 'authoring',
         setupValues: values,
-        authoringValues: {
-          requiredWeaponIds: [],
-          requiredSpellIds: [],
-        },
+        authoringValues:
+          current.authoringValues ??
+          ({
+            equipmentSelections: [],
+            requiredSpellIds: [],
+            startingChoiceOverrides: {},
+          } satisfies Partial<QuickNpcAuthoringTabFormValues>),
+        equipmentBaseline: current.authoringValues ? undefined : current.equipmentBaseline,
       }))
     },
     [onSetupHandoff, setupCompletion, trustedClose],
@@ -207,6 +194,7 @@ function QuickNpcCreateModalSession({
         context: buildContext,
         titles,
         organizationClassAffinityIds: classAffinityIds,
+        organizationTemplateId,
       })
 
       const nextSets = buildQuickNpcCreateSetupSets({
@@ -239,7 +227,15 @@ function QuickNpcCreateModalSession({
         setupValues: nextValues,
       }))
     },
-    [buildContext, classAffinityIds, context, handleContinueFromSetup, speciesAffinityIds, titles],
+    [
+      buildContext,
+      classAffinityIds,
+      context,
+      handleContinueFromSetup,
+      organizationTemplateId,
+      speciesAffinityIds,
+      titles,
+    ],
   )
 
   const returnToAuthoring = React.useCallback(() => {
@@ -249,18 +245,25 @@ function QuickNpcCreateModalSession({
     }))
   }, [])
 
-  const handleSetupSummaryEdit = React.useCallback((target: SetupSummaryEditTarget) => {
-    pendingSetupSummaryEditRef.current = target
-    setState((current) => ({
-      ...current,
-      phase: 'setup',
-      authoringValues: {
-        ...current.authoringValues,
-        requiredWeaponIds: [],
-        requiredSpellIds: [],
-      },
-    }))
-  }, [])
+  const handleSetupSummaryEdit = React.useCallback(
+    (target: SetupSummaryEditTarget, authoringValues: Partial<QuickNpcAuthoringTabFormValues>) => {
+      pendingSetupSummaryEditRef.current = target
+      setState((current) => ({
+        ...current,
+        phase: 'setup',
+        authoringValues: {
+          ...current.authoringValues,
+          ...authoringValues,
+        },
+        equipmentBaseline: {
+          templateId: current.setupValues.npcTemplateId,
+          classId: current.setupValues.classId,
+          level: current.setupValues.level,
+        },
+      }))
+    },
+    [],
+  )
 
   React.useLayoutEffect(() => {
     if (state.phase !== 'setup') return
@@ -274,9 +277,27 @@ function QuickNpcCreateModalSession({
     }
   }, [returnToAuthoring, sequenceModel, state.phase])
 
-  const handleChangeSetup = React.useCallback(() => {
-    handleSetupSummaryEdit({ type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID })
-  }, [handleSetupSummaryEdit])
+  const handleChangeSetup = React.useCallback(
+    (authoringValues?: Partial<QuickNpcAuthoringTabFormValues>) => {
+      handleSetupSummaryEdit(
+        { type: 'external', id: QUICK_NPC_BUILD_EXTERNAL_DECISION_ID },
+        authoringValues ?? {},
+      )
+    },
+    [handleSetupSummaryEdit],
+  )
+
+  const modalChrome = resolveQuickNpcModalChrome(context, state.phase)
+
+  const setupFooterContext = React.useMemo(
+    () => ({
+      setupSets,
+      externalDecisions,
+      activeSetId: sequenceModel.activeSetId,
+      isEditingUpstream: sequenceModel.isEditingUpstream,
+    }),
+    [externalDecisions, sequenceModel.activeSetId, sequenceModel.isEditingUpstream, setupSets],
+  )
 
   const handleAuthoringCreated = React.useCallback(
     async (result: { contentType: 'npcs'; id: string }) => {
@@ -297,19 +318,19 @@ function QuickNpcCreateModalSession({
       <CreateModalShell
         open={open}
         onOpenChange={handleDismiss}
-        headline={
-          state.phase === 'setup' ? resolveQuickNpcSetupHeadline(context) : QUICK_NPC_CREATE_TITLE
-        }
-        description={
-          state.phase === 'setup'
-            ? resolveQuickNpcSetupDescription(context)
-            : resolveQuickNpcAuthoringDescription(context)
-        }
+        headline={modalChrome.headline}
+        description={modalChrome.description}
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
         footer={
           state.phase === 'setup' ? (
-            <CreateSetupFooter
-              model={sequenceModel}
+            <QuickNpcCreateModalSetupFooter
+              buildContext={buildContext}
+              createContext={context}
+              setup={state.setupValues}
+              authoringValues={state.authoringValues}
+              previewNpcButtonRef={previewNpcButtonRef}
+              sequenceModel={sequenceModel}
+              footerContext={setupFooterContext}
               onCancel={requestCancel}
               onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
             />
@@ -328,19 +349,23 @@ function QuickNpcCreateModalSession({
             onSetupValueChange={handleSetupValueChange}
           />
         ) : (
-          <QuickNpcAuthoringForm
-            key={`${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
-            campaignId={campaignId}
-            buildContext={buildContext}
-            createContext={context}
-            setup={state.setupValues}
-            initialValues={state.authoringValues}
-            onCancel={requestCancel}
-            onChangeSetup={handleChangeSetup}
-            onSetupSummaryEdit={handleSetupSummaryEdit}
-            onCreated={handleAuthoringCreated}
-            onPendingChange={setAuthoringPending}
-          />
+          <QuickNpcEditingLockProvider>
+            <QuickNpcAuthoringForm
+              key={`${state.setupValues.npcTemplateId ?? ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
+              campaignId={campaignId}
+              buildContext={buildContext}
+              createContext={context}
+              setup={state.setupValues}
+              initialValues={state.authoringValues}
+              equipmentBaseline={state.equipmentBaseline}
+              onCancel={requestCancel}
+              onChangeSetup={handleChangeSetup}
+              onSetupSummaryEdit={handleSetupSummaryEdit}
+              onCreated={handleAuthoringCreated}
+              onPendingChange={setAuthoringPending}
+              previewButtonRef={previewNpcButtonRef}
+            />
+          </QuickNpcEditingLockProvider>
         )}
       </CreateModalShell>
     </FormShellFooterScope>
@@ -348,8 +373,8 @@ function QuickNpcCreateModalSession({
 }
 
 /**
- * Quick NPC creation modal — setup then TabbedForm authoring. Cancel/X/Escape during
- * authoring returns to the add-member drawer; success closes all overlays.
+ * Quick NPC creation modal — setup then TabbedForm authoring. Cancel/X during
+ * authoring returns to the parent create surface; success closes nested overlays.
  */
 export function QuickNpcCreateModal(props: QuickNpcCreateModalProps) {
   if (!props.open) return null

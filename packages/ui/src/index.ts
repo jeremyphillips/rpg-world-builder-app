@@ -201,6 +201,10 @@ export {
 } from './components/ui/sidebar-nav-section-disclosure.client'
 export { Button, type ButtonForwardingProps, type ButtonProps } from './components/ui/button.client'
 export { ActionButton, type ActionButtonProps } from './components/ui/action-button.client'
+export {
+  ChoiceSelectionCounter,
+  type ChoiceSelectionCounterProps,
+} from './components/ui/choice-selection-counter.client'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
   ACTION_ICONS,
@@ -289,7 +293,11 @@ export {
   fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
   fieldGroupedControlStartPaddingClasses,
-  buttonSizeToComboboxFieldSize,
+  buttonTextSizeToComboboxFieldSize,
+  COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
+  resolveComboboxSearchFieldSizeForButtonSize,
+  fieldSizeToInteractiveListSize,
+  resolveInteractiveListSizeForFieldSize,
   fieldSizeToArrayAddButtonSize,
   fieldSizeToAttachedButtonSize,
   INLINE_HEADER_ACTION_BUTTON_SIZE,
@@ -392,9 +400,28 @@ export {
 export {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
+  type SelectionOptionCardDensity,
   type SelectionOptionCardHeaderActionProps,
   type SelectionOptionCardProps,
 } from './components/ui/selection-option-card.client'
+export {
+  SelectionOptionCardEmbeddedPanel,
+  SelectionOptionCardEmbeddedPanelHeader,
+  SelectionOptionCardEmbeddedPanelList,
+  SelectionOptionCardEmbeddedPanelRow,
+  SelectionOptionCardEmbeddedPanelRowStatus,
+  type SelectionOptionCardEmbeddedPanelHeaderProps,
+  type SelectionOptionCardEmbeddedPanelListProps,
+  type SelectionOptionCardEmbeddedPanelProps,
+  type SelectionOptionCardEmbeddedPanelRowProps,
+  type SelectionOptionCardEmbeddedPanelRowStatusProps,
+} from './components/ui/selection-option-card-embedded-panel.client'
+export {
+  SelectionOptionCardHeaderEyebrow,
+  SelectionOptionCardTitleMeta,
+  resolveSelectionOptionCardEyebrowSize,
+  type SelectionOptionCardHeaderEyebrowProps,
+} from './components/ui/selection-option-card-anatomy.client'
 export {
   RadioOptionCard,
   RadioOptionCardDetailsAction,
@@ -406,7 +433,6 @@ export {
   RadioCard,
   radioCardVariants,
   resolveRadioCardDetailsAriaLabel,
-  type RadioCardDensity,
   type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,
@@ -462,6 +488,10 @@ export {
   type SelectionSummaryChangeActionProps,
   type SelectionSummaryRowProps,
 } from './components/ui/selection-summary-card'
+export {
+  selectionSummaryCardListClasses,
+  selectionSummaryCardRowHelperVariants,
+} from './components/ui/selection-summary-card.variants'
 export { JsonField, type JsonFieldProps } from './components/ui/json-field.client'
 export { RichTextField, type RichTextFieldProps } from './components/ui/rich-text-field'
 export { MarkdownField, type MarkdownFieldProps } from './components/ui/markdown-field.client'
@@ -589,37 +619,54 @@ export {
   type RichTextLinkPickerContentTypeOption,
 } from './components/ui/rich-text-link-picker.client'
 export {
-  ListResultToolbar,
-  type ListResultToolbarProps,
-} from './components/ui/list-result-toolbar.client'
+  InteractiveListToolbar,
+  type InteractiveListToolbarProps,
+} from './components/ui/interactive-list-toolbar.client'
 export {
-  ListResultGroupHeading,
-  type ListResultGroupHeadingProps,
-} from './components/ui/list-result-group-heading.client'
+  InteractiveListGroupHeading,
+  type InteractiveListGroupHeadingProps,
+} from './components/ui/interactive-list-group-heading.client'
 export {
-  ListResultViewport,
-  type ListResultViewportProps,
-} from './components/ui/list-result-viewport.client'
+  InteractiveListViewport,
+  type InteractiveListViewportProps,
+} from './components/ui/interactive-list-viewport.client'
 export {
-  ListResultList,
-  ListResultEmpty,
-  type ListResultListProps,
-  type ListResultEmptyProps,
-} from './components/ui/list-result-list.client'
+  InteractiveList,
+  InteractiveListEmpty,
+  type InteractiveListProps,
+  type InteractiveListEmptyProps,
+} from './components/ui/interactive-list.client'
 export {
-  ListResultItem,
-  ListResultItemIdentity,
-  type ListResultItemProps,
-  type ListResultItemIdentityProps,
-} from './components/ui/list-result-item.client'
+  InteractiveListRow,
+  type InteractiveListRowProps,
+} from './components/ui/interactive-list-row.client'
 export {
-  listResultToolbarVariants,
-  listResultGroupHeadingVariants,
-  listResultViewportVariants,
-  listResultListVariants,
-  listResultItemShellVariants,
-  listResultItemMainVariants,
-} from './components/ui/list-result.variants'
+  ComboboxOptionRow,
+  type ComboboxOptionRowProps,
+} from './components/ui/combobox-option-row.client'
+export { MenuChoiceRow, type MenuChoiceRowProps } from './components/ui/menu-choice-row.client'
+export {
+  InteractiveListPanel,
+  type InteractiveListPanelProps,
+} from './components/ui/interactive-list-panel.client'
+export {
+  IdentityRow,
+  type IdentityRowProps,
+  type IdentityRowSize,
+} from './components/ui/identity-row.client'
+export {
+  interactiveListToolbarVariants,
+  interactiveListGroupHeadingVariants,
+  interactiveListViewportVariants,
+  interactiveListSurfaceClasses,
+  interactiveListRowSeparatorClasses,
+  interactiveListVariants,
+  interactiveListRowChromeVariants,
+  interactiveListRowMainVariants,
+  menuChoiceItemResetVariants,
+  type InteractiveListSize,
+} from './components/ui/interactive-list.variants'
+export { identityRowSizeFromInteractiveListSize } from './components/ui/interactive-list.lib'
 export {
   PreviewRail,
   PreviewRailAction,
@@ -805,12 +852,10 @@ export {
   type DropdownMenuItemContentProps,
 } from './components/ui/dropdown-menu-item-content'
 export {
-  DropdownMenuChoiceItemContent,
-  type DropdownMenuChoiceItemContentProps,
-} from './components/ui/dropdown-menu-choice-item-content'
-export {
   dropdownMenuChoiceContentClasses,
   dropdownMenuChoiceItemClasses,
+  dropdownMenuChoiceItemVariants,
+  interactiveListChoiceMenuContentClasses,
 } from './components/ui/dropdown-menu-choice.variants'
 export {
   UserMenuTrigger,
@@ -926,6 +971,11 @@ export {
 } from './components/ui/dialog-panel-action-row.client'
 export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
+export {
+  DetailPreviewModal,
+  DETAIL_PREVIEW_MODAL_CLOSE_LABEL,
+  type DetailPreviewModalProps,
+} from './components/ui/detail-preview-modal.client'
 export { Sheet, type SheetContentProps, type SheetHeaderProps } from './components/ui/sheet.client'
 export {
   SheetMediaScroll,
@@ -1077,6 +1127,10 @@ export {
   type ComboboxRenderSelectedItem,
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
+export {
+  ComboboxFilterSelect,
+  type ComboboxFilterSelectProps,
+} from './form/renderers/fields/combobox-filter-select.client'
 
 export {
   EditableGrid,
@@ -1144,6 +1198,7 @@ export {
 export {
   statusIconVariants,
   statusIconGlyphVariants,
+  STATUS_ICON_DEFAULT_SIZE,
   STATUS_ICON_VARIANTS,
   STATUS_ICON_TOOLTIP_LABELS,
   type StatusIconVariantProps,

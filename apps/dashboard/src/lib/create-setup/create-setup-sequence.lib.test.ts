@@ -3,8 +3,11 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   isCreateSetupChoiceComplete,
   notifyCreateSetupCompletionTransition,
+  resolveCreateSetupActiveSequenceSetId,
   resolveCreateSetupActiveSetId,
+  resolveCreateSetupIsFinalSet,
   resolveCreateSetupIsComplete,
+  resolveCreateSetupSequenceSetIds,
   resolveCreateSetupPendingExplicitDecisions,
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
@@ -303,6 +306,87 @@ describe('create-setup-sequence', () => {
       expect(isCreateSetupChoiceComplete('city')).toBe(true)
       expect(isCreateSetupChoiceComplete('')).toBe(false)
       expect(isCreateSetupChoiceComplete(null)).toBe(false)
+    })
+  })
+
+  describe('resolveCreateSetupSequenceSetIds', () => {
+    it('lists choice sets then external decisions in registration order', () => {
+      expect(
+        resolveCreateSetupSequenceSetIds({
+          sets: sequence([
+            { id: 'membershipTitle', isComplete: true },
+            { id: 'speciesId', isComplete: true },
+          ]),
+          externalDecisions: [{ id: 'quickNpcBuild' }],
+        }),
+      ).toEqual(['membershipTitle', 'speciesId', 'quickNpcBuild'])
+    })
+  })
+
+  describe('resolveCreateSetupActiveSequenceSetId', () => {
+    it('prefers an active choice set over external decisions', () => {
+      expect(
+        resolveCreateSetupActiveSequenceSetId({
+          activeSetId: 'speciesId',
+          externalDecisions: [{ id: 'quickNpcBuild' }],
+        }),
+      ).toBe('speciesId')
+    })
+
+    it('uses the first external decision when choice sets are exhausted', () => {
+      expect(
+        resolveCreateSetupActiveSequenceSetId({
+          activeSetId: null,
+          externalDecisions: [{ id: 'quickNpcBuild' }],
+        }),
+      ).toBe('quickNpcBuild')
+    })
+
+    it('returns null while editing upstream with exhausted choice sets', () => {
+      expect(
+        resolveCreateSetupActiveSequenceSetId({
+          activeSetId: null,
+          isEditingUpstream: true,
+          externalDecisions: [{ id: 'quickNpcBuild' }],
+        }),
+      ).toBeNull()
+    })
+  })
+
+  describe('resolveCreateSetupIsFinalSet', () => {
+    const quickNpcSequence = ['membershipTitle', 'speciesId', 'quickNpcBuild']
+
+    it('is final only for the last registered id', () => {
+      expect(
+        resolveCreateSetupIsFinalSet({
+          sequenceSetIds: quickNpcSequence,
+          activeSequenceSetId: 'quickNpcBuild',
+        }),
+      ).toBe(true)
+      expect(
+        resolveCreateSetupIsFinalSet({
+          sequenceSetIds: quickNpcSequence,
+          activeSequenceSetId: 'membershipTitle',
+        }),
+      ).toBe(false)
+    })
+
+    it('treats ids absent from the registered sequence as non-final', () => {
+      expect(
+        resolveCreateSetupIsFinalSet({
+          sequenceSetIds: quickNpcSequence,
+          activeSequenceSetId: 'npcTemplateId',
+        }),
+      ).toBe(false)
+    })
+
+    it('makes the previous id non-final when a later set is registered', () => {
+      expect(
+        resolveCreateSetupIsFinalSet({
+          sequenceSetIds: [...quickNpcSequence, 'extraStep'],
+          activeSequenceSetId: 'quickNpcBuild',
+        }),
+      ).toBe(false)
     })
   })
 

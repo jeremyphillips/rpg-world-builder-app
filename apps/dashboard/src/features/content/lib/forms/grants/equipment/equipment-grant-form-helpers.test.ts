@@ -65,7 +65,11 @@ describe('equipmentGrantToFormRow / equipmentGrantFromFormRow', () => {
       poolEquipmentKind: 'tool',
       poolToolCategory: 'musical_instrument',
     })
-    expect(equipmentGrantFromFormRow(row)).toEqual(instrumentChoice)
+    expect(equipmentGrantFromFormRow(row)).toEqual({
+      kind: instrumentChoice!.kind,
+      choose: instrumentChoice!.choose,
+      pool: instrumentChoice!.pool,
+    })
   })
 })
 
@@ -243,20 +247,18 @@ describe('equipmentGrantItemFields', () => {
     const chooseField = fields.find(
       (field) => 'name' in field && field.name === EQUIPMENT_CHOICE_POOL_SENTENCE_FIELD_NAME,
     )
-    expect(chooseField).toMatchObject({
-      type: 'inlineSentence',
-      segments: expect.arrayContaining([
-        { kind: 'text', value: 'Character chooses', tone: 'label' },
-        { kind: 'number', name: 'choose', min: 1, digits: 1, defaultValue: 1 },
-        { kind: 'text', value: 'item(s) from', tone: 'label' },
-        expect.objectContaining({
-          kind: 'select',
-          name: 'poolSource',
-          defaultValue: 'filtered',
-          ariaLabel: 'Pool source',
-        }),
-      ]),
-    })
+    expect(chooseField).toMatchObject({ type: 'inlineSentence' })
+    expect(chooseField && 'segments' in chooseField ? chooseField.segments : []).toEqual([
+      { kind: 'text', value: 'Character chooses', tone: 'label' },
+      { kind: 'number', name: 'choose', min: 1, digits: 1, defaultValue: 1 },
+      { kind: 'text', value: 'item(s) from', tone: 'label' },
+      expect.objectContaining({
+        kind: 'select',
+        name: 'poolSource',
+        defaultValue: 'filtered',
+        ariaLabel: 'Pool source',
+      }),
+    ])
     expect(fields.some((field) => 'name' in field && field.name === 'label')).toBe(false)
   })
 

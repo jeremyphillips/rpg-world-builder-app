@@ -21,9 +21,9 @@ import {
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
-  EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
+import { OPTION_PRESENTATION_IN_PACKAGE_LABEL } from '@rpg/contracts'
 import {
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
@@ -78,7 +78,7 @@ describe('EquipmentPickerDrawer', () => {
     const list = screen.getByRole('list')
 
     expect(within(list).getByText('Longsword')).toBeInTheDocument()
-    expect(within(list).getByText(EQUIPMENT_PICKER_STARTING_OPTION_LABEL)).toBeInTheDocument()
+    expect(within(list).getByText(OPTION_PRESENTATION_IN_PACKAGE_LABEL)).toBeInTheDocument()
     expect(within(list).getByText('Rope')).toBeInTheDocument()
   })
 
@@ -94,7 +94,6 @@ describe('EquipmentPickerDrawer', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -128,7 +127,6 @@ describe('EquipmentPickerDrawer', () => {
       },
       state: {
         ...equipmentPickerItemsFixture[1]!.state,
-        isAffordable: false,
         isWithinRemainingBudget: false,
         isProficient: true,
       },
@@ -599,7 +597,6 @@ describe('EquipmentPickerDrawer', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,
@@ -619,7 +616,6 @@ describe('EquipmentPickerDrawer', () => {
           isAvailable: true,
           isRecommended: false,
           isProficient: true,
-          isAffordable: true,
           isWithinRemainingBudget: true,
           recommendation: {
             tier: 'neutral' as const,

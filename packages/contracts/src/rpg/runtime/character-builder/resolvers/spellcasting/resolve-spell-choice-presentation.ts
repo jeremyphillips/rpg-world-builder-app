@@ -11,6 +11,7 @@ export const SPELL_CHOICE_SOURCE_PRIORITY = {
   heritage: 50,
   origin: 55,
   feat: 60,
+  npcTemplate: 65,
   ruleset: 70,
   campaign: 80,
 } as const

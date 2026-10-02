@@ -179,12 +179,14 @@ const storedFighter: ClassStored = {
           label: 'Heavy Armor',
           items: [
             {
+              id: 'chain-mail',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'chain-mail' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'longsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'longsword' },
               quantity: 1,
@@ -244,6 +246,7 @@ const storedWizard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 2,
@@ -299,19 +302,15 @@ describe('deriveEquipmentRecommendations', () => {
       choiceSets: [],
     })
 
-    expect(recommendations.get(chainMail.id)).toMatchObject({
-      tier: 'compatible',
-      reasons: ['proficient'],
-    })
-    expect(recommendations.get(longsword.id)?.tier).toBe('compatible')
-    expect(recommendations.get(dagger.id)).toMatchObject({
-      tier: 'compatible',
-      reasons: ['proficient'],
-    })
+    expect(recommendations.get(chainMail.id)?.tier).toBe('neutral')
+    expect(recommendations.get(chainMail.id)?.resolved?.state.compatibility?.proficient).toBe(true)
+    expect(recommendations.get(longsword.id)?.tier).toBe('neutral')
+    expect(recommendations.get(dagger.id)?.tier).toBe('neutral')
+    expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
     expect(recommendations.get(rope.id)).toMatchObject({ tier: 'neutral', reasons: [] })
   })
 
-  it('ranks non-proficient weapon and armor gear as notRecommended for the wizard', () => {
+  it('does not turn missing proficiency into a not-recommended tier', () => {
     const { catalogIndex, proficiencies, draft } = buildContext(
       storedWizard,
       [chainMail, longsword, dagger],
@@ -330,15 +329,14 @@ describe('deriveEquipmentRecommendations', () => {
       choiceSets: [],
     })
 
-    expect(recommendations.get(chainMail.id)).toMatchObject({
-      tier: 'notRecommended',
-      reasons: ['notProficient'],
-    })
-    expect(recommendations.get(longsword.id)?.tier).toBe('notRecommended')
-    expect(recommendations.get(dagger.id)?.tier).toBe('compatible')
+    expect(recommendations.get(chainMail.id)?.tier).toBe('neutral')
+    expect(recommendations.get(chainMail.id)?.resolved?.state.compatibility?.proficient).toBe(false)
+    expect(recommendations.get(longsword.id)?.tier).toBe('neutral')
+    expect(recommendations.get(longsword.id)?.resolved?.state.compatibility?.proficient).toBe(false)
+    expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
-  it('marks item-level tool proficiencies as essential class tool needs', () => {
+  it('folds fixed tool proficiency into proficient compatibility instead of an essential class tool need', () => {
     const { catalogIndex, proficiencies } = buildContext(rogueClass, [thievesTools, longsword])
 
     const recommendations = deriveEquipmentRecommendations({
@@ -347,11 +345,18 @@ describe('deriveEquipmentRecommendations', () => {
       proficiencies,
     })
 
-    expect(recommendations.get(thievesTools.id)).toMatchObject({
-      tier: 'essential',
-      reasons: expect.arrayContaining(['classToolNeed']),
+    expect(recommendations.get(thievesTools.id)?.reasons).not.toContain('classToolNeed')
+    expect(recommendations.get(thievesTools.id)?.resolved?.state.compatibility).toMatchObject({
+      proficient: true,
     })
-    expect(recommendations.get(longsword.id)?.tier).toBe('compatible')
+    expect(
+      recommendations.get(thievesTools.id)?.resolved?.state.compatibility?.proficiencySources,
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'classFeature', sourceId: rogueClass.id }),
+      ]),
+    )
+    expect(recommendations.get(longsword.id)?.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
   it('marks authored focus kinds as essential when spellcasting is active', () => {
@@ -367,7 +372,82 @@ describe('deriveEquipmentRecommendations', () => {
       tier: 'essential',
       reasons: ['spellcastingFocus'],
     })
+    expect(recommendations.get(arcaneCrystal.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({
+        requirementId: `${storedWizard.id}:spellcasting-focus`,
+        rule: 'anyOf',
+        role: 'candidate',
+      }),
+    ])
     expect(recommendations.get(holySymbol.id)?.tier).toBe('neutral')
+  })
+
+  it('drops other focus candidates once one focus is owned', () => {
+    const wand = equipmentSchema.parse({
+      ...arcaneCrystal,
+      id: `${RULESET}:wand`,
+      slug: 'wand',
+      name: 'Wand',
+    })
+    const before = buildContext(storedWizard, [arcaneCrystal, wand, dagger])
+    const beforeRecommendations = deriveEquipmentRecommendations({
+      characterClass: storedWizard,
+      catalogIndex: before.catalogIndex,
+      proficiencies: before.proficiencies,
+      draft: before.draft,
+    })
+    const beforeItems = resolveEquipmentPickerItems({
+      equipment: [arcaneCrystal, wand, dagger],
+      proficiencies: before.proficiencies,
+      recommendations: beforeRecommendations,
+    })
+    const beforeOrder = [...beforeItems]
+      .sort(compareEquipmentPickerItemsByRecommendation)
+      .map((item) => item.equipment.name)
+
+    const owned = buildContext(storedWizard, [arcaneCrystal, wand, dagger], {
+      equipment: {
+        mode: 'gold',
+        purchases: [
+          {
+            equipmentId: arcaneCrystal.id,
+            quantity: 1,
+            sourceMode: 'startingGold',
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    })
+    const ownedRecommendations = deriveEquipmentRecommendations({
+      characterClass: storedWizard,
+      catalogIndex: owned.catalogIndex,
+      proficiencies: owned.proficiencies,
+      draft: owned.draft,
+    })
+
+    expect(ownedRecommendations.get(arcaneCrystal.id)?.tier).not.toBe('essential')
+    expect(ownedRecommendations.get(wand.id)?.reasons ?? []).not.toContain('spellcastingFocus')
+    expect(ownedRecommendations.get(arcaneCrystal.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({ role: 'satisfier' }),
+    ])
+    expect(ownedRecommendations.get(wand.id)?.resolved?.requirements).toEqual([
+      expect.objectContaining({ optionSatisfies: true, role: 'eligible' }),
+    ])
+    expect(ownedRecommendations.get(wand.id)?.resolved?.state.compatibility).toMatchObject({
+      spellcastingFocusFor: { kind: 'class', id: storedWizard.id },
+    })
+
+    const ownedItems = resolveEquipmentPickerItems({
+      equipment: [arcaneCrystal, wand, dagger],
+      proficiencies: owned.proficiencies,
+      recommendations: ownedRecommendations,
+    })
+    const ownedOrder = [...ownedItems]
+      .sort(compareEquipmentPickerItemsByRecommendation)
+      .map((item) => item.equipment.name)
+
+    expect(beforeOrder).toEqual(['Crystal', 'Wand', 'Dagger'])
+    expect(ownedOrder).toEqual(['Dagger', 'Crystal', 'Wand'])
   })
 
   it('demotes focus gear to strong while spellcasting is not yet active', () => {
@@ -424,6 +504,7 @@ describe('deriveEquipmentRecommendations', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'holy-symbol',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'holy-symbol' },
                   quantity: 1,
@@ -646,17 +727,20 @@ const storedBard: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'leather-armor',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'leather-armor' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 2,
             },
             {
+              id: 'musical-instrument-choice',
               kind: 'choice',
               choose: 1,
               pool: {
@@ -714,6 +798,7 @@ const storedMonk: ClassStored = {
           label: 'Standard Equipment',
           items: [
             {
+              id: 'class-tools-tool',
               kind: 'grant',
               target: { source: 'proficiency_choice', choiceId: 'class-tools' },
               quantity: 1,
@@ -836,7 +921,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
         [bardToolChoiceSetId]: [lute.id, flute.id, drum.id],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -900,7 +985,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -937,7 +1022,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
 
     expect(recommendations.get(leatherArmor.id)).toMatchObject({
       tier: 'compatible',
-      reasons: expect.arrayContaining(['availableInStartingOption', 'proficient']),
+      reasons: expect.arrayContaining(['availableInStartingOption']),
     })
     expect(recommendations.get(leatherArmor.id)?.reasons).not.toContain('startingEquipmentChoice')
   })
@@ -947,7 +1032,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedMonk.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -967,7 +1052,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -1022,7 +1107,7 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
       choiceSelections: {
         [startingEquipmentChoiceSetId(storedBard.id)]: ['starting-gold'],
       },
-      equipment: { mode: 'gold', purchases: [], removedPackageItemKeys: [], customized: false },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
     })
 
     const recommendations = deriveEquipmentRecommendations({
@@ -1044,6 +1129,37 @@ describe('deriveEquipmentRecommendations proficiency inference', () => {
     expect(leatherIndex).toBeGreaterThanOrEqual(0)
     expect(luteIndex).toBeGreaterThanOrEqual(0)
     expect(leatherIndex).toBeLessThan(luteIndex)
+  })
+
+  it('records role equipment preferences as strong role signals without a new reason', () => {
+    const { catalogIndex, proficiencies } = buildContext(storedBard, [lute])
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedBard,
+      catalogIndex,
+      proficiencies,
+      recommendationContext: {
+        roleId: 'guard',
+        roleEquipmentPreferenceSlugs: ['lute'],
+        userEquipmentPreferenceSlugs: ['lute'],
+      },
+    })
+    const signals = recommendations.get(lute.id)?.resolved?.recommendation.signals ?? []
+    expect(signals).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          strength: 'strong',
+          basis: 'preference',
+          source: { kind: 'role', id: 'guard' },
+        }),
+        expect.objectContaining({
+          strength: 'strong',
+          basis: 'preference',
+          source: { kind: 'user' },
+        }),
+      ]),
+    )
+    expect(recommendations.get(lute.id)?.resolved?.recommendation.strength).toBe('strong')
+    expect(recommendations.get(lute.id)?.reasons).not.toContain('roleSuggested')
   })
 })
 
@@ -1074,14 +1190,17 @@ describe('resolveEquipmentPickerItems', () => {
     const chainMailItem = items.find((item) => item.equipment.id === chainMail.id)!
     expect(chainMailItem.state.isAvailable).toBe(true)
     expect(chainMailItem.state.isProficient).toBe(false)
-    expect(chainMailItem.state.isAffordable).toBe(true)
+    expect(chainMailItem.state.purchaseAvailability.status).toBe('unaffordable')
+    expect(chainMailItem.state.resolved?.purchaseAvailability?.status).toBe('unaffordable')
     expect(chainMailItem.state.isWithinRemainingBudget).toBe(false)
     expect(chainMailItem.state.isRecommended).toBe(false)
-    expect(chainMailItem.state.recommendation.tier).toBe('notRecommended')
+    expect(chainMailItem.state.recommendation.tier).toBe('neutral')
+    expect(chainMailItem.state.resolved?.state.compatibility?.proficient).toBe(false)
 
     const daggerItem = items.find((item) => item.equipment.id === dagger.id)!
     expect(daggerItem.state.isRecommended).toBe(false)
-    expect(daggerItem.state.recommendation.tier).toBe('compatible')
+    expect(daggerItem.state.evidence ?? []).toEqual([])
+    expect(daggerItem.state.resolved?.state.compatibility?.proficient).toBe(true)
   })
 
   it('excludes vehicle and service rows from picker results', () => {

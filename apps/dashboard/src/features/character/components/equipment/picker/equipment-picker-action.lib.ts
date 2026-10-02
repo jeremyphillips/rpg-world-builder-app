@@ -9,6 +9,7 @@ import {
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
+  EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
 } from './drawer/equipment-picker-drawer.types'
 import { formatEquipmentUnaffordableReason } from './drawer/equipment-picker-drawer.lib'
 import type { EquipmentPickerItem } from './drawer/equipment-picker-drawer.types'
@@ -77,11 +78,15 @@ function buildPurchaseRowActionViewModel(
   },
 ): Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }> {
   const { availability } = actionState
-  const disabled = availability.status === 'unavailable' || availability.status === 'unaffordable'
+  const disabled =
+    availability.status === 'unavailableForPurchase' || availability.status === 'unaffordable'
 
   let disabledNote: string | undefined
-  if (availability.status === 'unavailable') {
-    disabledNote = EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
+  if (availability.status === 'unavailableForPurchase') {
+    disabledNote =
+      availability.reason === 'unsupported_kind'
+        ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
+        : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
   } else if (availability.status === 'unaffordable' && options?.pickerItem && options.budget) {
     disabledNote = formatEquipmentUnaffordableReason(options.pickerItem, options.budget)
   }

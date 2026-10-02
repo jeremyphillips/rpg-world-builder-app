@@ -8,6 +8,7 @@ import {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 
+import { recommendationStatusItems } from '../../../lib/recommendation/format-inline-recommendation-sources'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
@@ -152,16 +153,7 @@ export function ProficiencyPickerDrawer({
         buildEntity: (item) => {
           const disabledNote = getProficiencyPickerDisabledNote(item)
           const status = [
-            ...(item.state.isRecommended
-              ? [
-                  {
-                    kind: 'badge' as const,
-                    label: 'Recommended',
-                    appearance: 'outline' as const,
-                    tone: 'info' as const,
-                  },
-                ]
-              : []),
+            ...recommendationStatusItems(item.state.presentation),
             ...(disabledNote
               ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
               : []),

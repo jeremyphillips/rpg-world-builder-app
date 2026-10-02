@@ -70,8 +70,7 @@ function packageDraftWithMagicItemGrant() {
           quantity: 1,
         },
       ],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }

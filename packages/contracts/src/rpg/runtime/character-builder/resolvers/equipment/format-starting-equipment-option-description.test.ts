@@ -100,28 +100,33 @@ const storedFighter: ClassStored = {
           label: 'Heavy Armor',
           items: [
             {
+              id: 'chain-mail',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'chain-mail' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'greatsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'greatsword' },
               quantity: 1,
               equipped: true,
             },
             {
+              id: 'flail',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'flail' },
               quantity: 1,
             },
             {
+              id: 'javelin',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'javelin' },
               quantity: 8,
             },
             {
+              id: 'dungeoneers-pack',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dungeoneers-pack' },
               quantity: 1,

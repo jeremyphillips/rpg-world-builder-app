@@ -8,7 +8,13 @@ export * from './automatic/automatic-npc-build-constraints'
 export * from './automatic/automatic-npc-build-seed'
 export * from './automatic/list-reachable-spell-options'
 export * from './automatic/list-reachable-starting-weapons'
+export * from './automatic/resolve-automatic-choice-selections'
 export * from './automatic/resolve-automatic-npc-build'
+export * from './automatic/resolve-held-proficiency-keys'
+export * from './option-identity'
+export * from './recommendation'
+export * from './npc/resolve-npc-template-recommendations'
+export * from './npc/resolve-npc-starting-choices'
 export * from './assembly/assemble-language-proficiencies'
 export * from './assembly/assemble-proficiencies'
 export * from './assembly/assemble-skill-proficiencies'
@@ -51,6 +57,7 @@ export * from './finalize/finalize-npc'
 export * from './mode-scope'
 export * from './preview/preview'
 export * from './preview/builder-summary-parts'
+export * from './draft/apply-selected-class-change'
 export * from './draft/prune-invalid-builder-selections'
 export * from './readiness/resolve-unresolved-choice-set-summaries'
 export * from './readiness/resolve-review-blocking-summary'
@@ -64,6 +71,24 @@ export * from './resolvers/picker/equipment-picker-supported-kinds'
 export * from './resolvers/equipment/derive-equipment-draft-entries'
 export * from './resolvers/equipment/ensure-equipment-grant'
 export * from './resolvers/equipment/derive-equipment-recommendations'
+export type { ResolvedEquipmentOption } from './resolvers/equipment/project-equipment-option-facts'
+export {
+  adaptCharacterSelectionToEquipmentSupply,
+  canAddAnotherEquipmentCopy,
+  dedupeEquipmentSupplySources,
+  formatEquipmentSupplySourceLabel,
+  formatEquipmentSupplySourceLabels,
+  projectEquipmentSelection,
+} from './resolvers/equipment/project-equipment-selection'
+export type { EquipmentAdditionMode } from './resolvers/equipment/project-equipment-selection'
+export {
+  resolveEquipmentAdditionPolicy,
+  EQUIPMENT_ADDITION_POLICIES,
+} from './resolvers/equipment/resolve-equipment-addition-policy'
+export type {
+  EquipmentAdditionContext,
+  EquipmentAdditionPolicy,
+} from './resolvers/equipment/resolve-equipment-addition-policy'
 export * from './resolvers/equipment/equipment-budget'
 export * from './resolvers/equipment/resolve-starting-equipment-funding'
 export * from './resolvers/equipment/apply-equipment-step-action'
@@ -89,6 +114,7 @@ export * from './resolvers/equipment/resolve-equipment-magic-item-grant-step-iss
 export * from './resolvers/equipment/resolve-equipment-step-readiness'
 export * from './resolvers/equipment/get-unresolved-starting-equipment-dependencies'
 export * from './resolvers/equipment/resolve-proficiency-linked-equipment-grant'
+export * from './resolvers/equipment/class-package-choice'
 export * from './resolvers/equipment/resolve-starting-equipment-choice-sets'
 export * from './resolvers/equipment/equipment-pool-choice-options'
 export * from './resolvers/equipment/format-equipment-picker-metadata'
@@ -110,6 +136,7 @@ export * from './resolvers/proficiency/format-proficiency-step-copy'
 export * from './resolvers/proficiency/resolve-proficiency-choice-presentation'
 export * from './resolvers/proficiency/format-saving-throw-proficiency-label'
 export * from './resolvers/proficiency/proficiency-grant-classification'
+export * from './resolvers/proficiency/selection-source-mechanic'
 export * from './resolvers/proficiency/resolve-proficiencies-step-readiness'
 export * from './resolvers/proficiency/resolve-proficiency-picker-items'
 export * from './resolvers/proficiency/resolve-proficiency-step-model'

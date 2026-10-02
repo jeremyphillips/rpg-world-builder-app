@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   resolveCreateSetupChoiceValueLabel,
-  resolveCreateSetupPartialSummaryRows,
-  resolveCreateSetupPartialSummarySegments,
   resolveCreateSetupSummaryGroupMemberIds,
 } from './create-setup-completed-choice-groups.lib'
 import type { CreateSetupChoiceSet } from './create-setup.types'
@@ -47,64 +45,6 @@ describe('create-setup-completed-choice-groups', () => {
         }),
       ),
     ).toBe('Not specified')
-  })
-
-  it('builds partial summary rows for completed non-active sets', () => {
-    const setById = new Map<string, CreateSetupChoiceSet>([
-      [
-        'membershipTitle',
-        buildChoiceSet({
-          id: 'membershipTitle',
-          fieldLabel: 'Title',
-          options: [{ value: 'guildmaster', label: 'Guildmaster' }],
-          value: 'guildmaster',
-        }),
-      ],
-    ])
-
-    expect(
-      resolveCreateSetupPartialSummaryRows({
-        setIds: ['membershipTitle'],
-        setById,
-      }),
-    ).toEqual([{ setId: 'membershipTitle', label: 'Title', valueLabel: 'Guildmaster' }])
-  })
-
-  it('resolves partial summary segments for grouped and standalone sets', () => {
-    const sets = [
-      buildChoiceSet({
-        id: 'membershipTitle',
-        fieldLabel: 'Title',
-        summaryGroup: 'selections',
-        options: [{ value: 'guildmaster', label: 'Guildmaster' }],
-        value: 'guildmaster',
-      }),
-      buildChoiceSet({
-        id: 'speciesId',
-        fieldLabel: 'Species',
-        summaryGroup: 'selections',
-        options: [{ value: 'gnome', label: 'Gnome' }],
-        value: '',
-        isComplete: false,
-      }),
-      buildChoiceSet({
-        id: 'siteType',
-        fieldLabel: 'Site type',
-        options: [{ value: 'landmark', label: 'Landmark' }],
-        value: 'landmark',
-      }),
-    ]
-
-    expect(
-      resolveCreateSetupPartialSummarySegments({
-        sets,
-        visibleSetIds: ['membershipTitle', 'speciesId', 'siteType'],
-        activeSetId: 'speciesId',
-      }),
-    ).toEqual([
-      { kind: 'group', summaryGroup: 'selections', setIds: ['membershipTitle'] },
-      { kind: 'standalone', setId: 'siteType' },
-    ])
   })
 
   it('preserves summary group membership by set declaration, not adjacency', () => {

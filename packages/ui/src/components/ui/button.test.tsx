@@ -22,6 +22,28 @@ describe('Button', () => {
     expect(button).toHaveClass('h-8')
   })
 
+  it('applies xs size classes for chrome and icon-xs', () => {
+    const { rerender } = render(
+      <Button size="xs" variant="outline">
+        Reset
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass(
+      'text-control-action-xs',
+      'h-control-action-xs',
+    )
+
+    rerender(
+      <Button size="icon-xs" variant="ghost" aria-label="Remove">
+        <span aria-hidden>×</span>
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveClass(
+      'size-control-action-compact',
+      '[&_svg]:size-icon-glyph-xs',
+    )
+  })
+
   it('applies compact density heights for each size', () => {
     const { rerender } = render(
       <Button size="sm" density="compact">

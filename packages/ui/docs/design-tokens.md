@@ -247,24 +247,30 @@ Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
 
 Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts)
 
-| Step    | px  | Utility                       | Role                            |
-| ------- | --- | ----------------------------- | ------------------------------- |
-| compact | 24  | `size-control-action-compact` | Row actions, collapsible chrome |
-| default | 36  | `size-control-action-default` | Default icon buttons            |
-| lg      | 40  | `size-control-action-lg`      | Large icon buttons              |
+| Step    | px  | Utility                       | Role                                                          |
+| ------- | --- | ----------------------------- | ------------------------------------------------------------- |
+| xs      | 28  | `h-control-action-xs`         | Dense labeled buttons (`Button` `size="xs"`, default density) |
+| compact | 24  | `size-control-action-compact` | Row actions, collapsible chrome, `icon-xs`                    |
+| default | 36  | `size-control-action-default` | Default icon buttons                                          |
+| lg      | 40  | `size-control-action-lg`      | Large icon buttons                                            |
+
+Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
 
 **Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
-buttons (align to field `h-8` / 32px), spinner sizing.
+geometry (its own `xs`–`lg` ladder in `number-stepper.variants.ts`), spinner sizing.
 
 ### Named pairings
 
-| Recipe                                    | Hit     | Glyph |
-| ----------------------------------------- | ------- | ----- | ----------------------- |
-| `controlActionCompactIconClasses`         | compact | md    |
-| `controlActionCompactTextClasses`         | compact | —     |
-| `controlActionCompactTextWithIconClasses` | compact | sm    |
-| `controlActionDefaultIconClasses`         | default | lg    |
-| `controlActionLgIconClasses`              | lg      | lg    | Button `size="icon-lg"` |
+| Recipe                                      | Hit       | Glyph |
+| ------------------------------------------- | --------- | ----- | --------------------------------------------- |
+| `controlActionCompactIconClasses`           | compact   | md    |
+| `controlActionCompactTextClasses`           | compact   | —     |
+| `controlActionCompactTextWithIconClasses`   | compact   | sm    |
+| `controlActionDefaultIconClasses`           | default   | lg    |
+| `controlActionLgIconClasses`                | lg        | lg    | Button `size="icon-lg"`                       |
+| `controlActionXsTextClasses`                | xs (28px) | xs    | Button `size="xs"`, default density           |
+| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | Button `size="xs"`, compact density           |
+| `controlActionXsIconClasses`                | compact   | xs    | Button `size="icon-xs"` (density-independent) |
 
 Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
 `control-action.variants.test.ts`.
@@ -288,4 +294,5 @@ Neutral disc fills use dedicated Layer 2 recipes — not surface-relative ink ro
 
 The off-slash glyph is **not** on the 10/12/14/16 icon-glyph ladder. It uses
 `size-status-icon-slash-sm` (6px) and `size-status-icon-slash-md` (8px) with a heavier
-Lucide `strokeWidth` than other variants.
+Lucide `strokeWidth` than other variants. Pair slash utilities with StatusIcon size:
+`sm` and `md` discs → `size-status-icon-slash-sm`; `lg` disc → `size-status-icon-slash-md`.

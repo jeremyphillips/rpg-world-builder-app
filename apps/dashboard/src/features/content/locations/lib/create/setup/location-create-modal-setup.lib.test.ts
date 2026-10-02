@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createChoiceSetSummaryDefinitions, resolveSetupSummaryRows } from '@/lib/create-setup'
+
 import {
   applyLocationCreateModalSetupValueChange,
   EMPTY_LOCATION_CREATE_MODAL_SETUP_VALUES,
@@ -9,6 +11,7 @@ import {
   resolveLocationCreateSetupAuthoringTypes,
   requiresLocationCreateSetup,
 } from './location-create-modal-setup.lib'
+import { buildLocationCreateSetupSets } from './location-create-setup.lib'
 import {
   REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
   REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
@@ -31,6 +34,18 @@ describe('applyLocationCreateModalSetupValueChange', () => {
 
     expect(next.classification.kind).toBe('geographic')
     expect(next.classification.type).toBe('')
+
+    const model = resolveLocationCreateModalSetupModel({
+      intent: { authoringType: 'region' },
+      values: next,
+    })
+    const sets = buildLocationCreateSetupSets(model!.choiceSets)
+    const rows = resolveSetupSummaryRows(sets, createChoiceSetSummaryDefinitions(sets))
+
+    expect(rows.map((row) => row.id)).toEqual([REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID])
+    expect(rows.some((row) => row.id === REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID)).toBe(
+      false,
+    )
   })
 
   it('marks building form as skipped without a value', () => {
@@ -161,7 +176,12 @@ describe('resolveLocationCreateModalSetupModel', () => {
       kind: 'building',
       facilityAuthoringGroup: 'production',
     })
-    expect(model?.summaryEntries.map((entry) => entry.valueLabel)).toEqual(['Production'])
+    const sets = buildLocationCreateSetupSets(model!.choiceSets)
+    expect(
+      resolveSetupSummaryRows(sets, createChoiceSetSummaryDefinitions(sets)).map(
+        (row) => row.value,
+      ),
+    ).toEqual(['Not specified', 'Production'])
     expect(model?.complete()).not.toHaveProperty('facilityType')
   })
 

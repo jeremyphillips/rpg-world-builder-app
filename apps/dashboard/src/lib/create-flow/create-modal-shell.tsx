@@ -98,6 +98,7 @@ export type CreateModalShellProps = {
   footer: React.ReactNode
   size?: ModalContentProps['size']
   closeOnOutsideClick?: boolean
+  /** Default false — create workflows dismiss via explicit Cancel/Close, not Escape. */
   closeOnEscape?: boolean
   'aria-busy'?: boolean
 }
@@ -278,7 +279,7 @@ export function CreateModalShell({
   footer,
   size = 'md',
   closeOnOutsideClick = false,
-  closeOnEscape = true,
+  closeOnEscape = false,
   'aria-busy': ariaBusy,
 }: CreateModalShellProps) {
   return (

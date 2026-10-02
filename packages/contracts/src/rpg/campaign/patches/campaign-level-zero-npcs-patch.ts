@@ -2,9 +2,12 @@ import { z } from 'zod'
 
 import {
   characterWealthGrantSchema,
+  characterWealthGrantsEqual,
   normalizeCharacterWealthGrant,
+  normalizeWealthTierGrant,
   type CharacterWealthGrant,
 } from '../../primitives/character-wealth-grant'
+import { NPC_WEALTH_TIER_IDS, type NpcWealthTierId } from '../../vocab/npc/npc-wealth-tier'
 import {
   DEFAULT_STANDARD_ARRAY,
   sameStandardArray,
@@ -36,6 +39,30 @@ export const DEFAULT_LEVEL_ZERO_PROFICIENCY_BONUS = 2
 export const DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_TRAITS = true
 
 export const DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES = true
+
+/** Default starting liquid funds per wealth tier (campaign-configurable). */
+export const DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS = {
+  poor: { gp: 1 },
+  modest: { gp: 10 },
+  comfortable: { gp: 50 },
+  wealthy: { gp: 200 },
+} as const satisfies Record<NpcWealthTierId, CharacterWealthGrant>
+
+/** Classless NPCs with no template use the modest purse. */
+export const LEVEL_ZERO_NPC_DEFAULT_WEALTH_TIER = 'modest' as const satisfies NpcWealthTierId
+
+export const levelZeroNpcWealthTiersSchema = z
+  .object({
+    poor: characterWealthGrantSchema.optional(),
+    modest: characterWealthGrantSchema.optional(),
+    comfortable: characterWealthGrantSchema.optional(),
+    wealthy: characterWealthGrantSchema.optional(),
+  })
+  .strict()
+
+export type LevelZeroNpcWealthTiers = z.infer<typeof levelZeroNpcWealthTiersSchema>
+
+export type ResolvedLevelZeroNpcWealthTiers = Record<NpcWealthTierId, CharacterWealthGrant>
 
 export const DEFAULT_LEVEL_ZERO_EMPTY_GRANT = {
   categories: [],
@@ -78,7 +105,7 @@ export const campaignLevelZeroNpcsPatchSchema = z
     weaponProficiencies: levelZeroWeaponGrantSchema.optional(),
     languageProficiencies: languageProficiencyGrantSetSchema.optional(),
     retainSpeciesLanguages: z.boolean().optional(),
-    startingWealth: characterWealthGrantSchema.optional(),
+    wealthTiers: levelZeroNpcWealthTiersSchema.optional(),
     standardArray: standardArraySchema.optional(),
   })
   .strict()
@@ -98,7 +125,12 @@ export const resolvedCampaignLevelZeroNpcsPatchSchema = z.object({
   weaponProficiencies: levelZeroWeaponGrantSchema,
   languageProficiencies: languageProficiencyGrantSetSchema,
   retainSpeciesLanguages: z.boolean(),
-  startingWealth: characterWealthGrantSchema.optional(),
+  wealthTiers: z.object({
+    poor: characterWealthGrantSchema,
+    modest: characterWealthGrantSchema,
+    comfortable: characterWealthGrantSchema,
+    wealthy: characterWealthGrantSchema,
+  }),
   standardArray: standardArraySchema,
 })
 
@@ -128,10 +160,34 @@ function resolveLevelZeroLanguageProficiencies(
   return languageProficiencyGrantSetSchema.parse(patch ?? DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES)
 }
 
-function resolveLevelZeroStartingWealth(
-  patch?: CampaignLevelZeroNpcsPatch['startingWealth'],
-): CharacterWealthGrant | undefined {
-  return normalizeCharacterWealthGrant(patch)
+/** Merges a sparse tier map onto the campaign defaults. */
+export function resolveLevelZeroNpcWealthTiers(
+  patch?: LevelZeroNpcWealthTiers,
+): ResolvedLevelZeroNpcWealthTiers {
+  const resolved = {} as ResolvedLevelZeroNpcWealthTiers
+  for (const tierId of NPC_WEALTH_TIER_IDS) {
+    if (patch && tierId in patch) {
+      resolved[tierId] = normalizeWealthTierGrant(patch[tierId])
+      continue
+    }
+    resolved[tierId] = { ...DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId] }
+  }
+  return resolved
+}
+
+export function resolveLevelZeroNpcWealthTierPurse(
+  patch: LevelZeroNpcWealthTiers | undefined,
+  tierId: NpcWealthTierId,
+): CharacterWealthGrant {
+  return resolveLevelZeroNpcWealthTiers(patch)[tierId]
+}
+
+function wealthTiersMatchDefaults(patch?: LevelZeroNpcWealthTiers): boolean {
+  if (!patch) return true
+  const resolved = resolveLevelZeroNpcWealthTiers(patch)
+  return NPC_WEALTH_TIER_IDS.every((tierId) =>
+    characterWealthGrantsEqual(resolved[tierId], DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS[tierId]),
+  )
 }
 
 /** Default level 0 NPC rules for new campaigns before any explicit patch is stored. */
@@ -145,7 +201,7 @@ export function defaultLevelZeroNpcRules(): ResolvedCampaignLevelZeroNpcsPatch {
     weaponProficiencies: resolveLevelZeroWeaponProficiencies(),
     languageProficiencies: resolveLevelZeroLanguageProficiencies(),
     retainSpeciesLanguages: DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES,
-    startingWealth: undefined,
+    wealthTiers: resolveLevelZeroNpcWealthTiers(),
     standardArray: [...DEFAULT_STANDARD_ARRAY],
   }
 }
@@ -166,7 +222,7 @@ export function resolveLevelZeroNpcRules(
     weaponProficiencies: resolveLevelZeroWeaponProficiencies(patch.weaponProficiencies),
     languageProficiencies: resolveLevelZeroLanguageProficiencies(patch.languageProficiencies),
     retainSpeciesLanguages: patch.retainSpeciesLanguages ?? defaults.retainSpeciesLanguages,
-    startingWealth: resolveLevelZeroStartingWealth(patch.startingWealth),
+    wealthTiers: resolveLevelZeroNpcWealthTiers(patch.wealthTiers),
     standardArray: standardArraySchema.parse(patch.standardArray ?? [...DEFAULT_STANDARD_ARRAY]),
   }
 }
@@ -197,7 +253,7 @@ export function isSparseDefaultLevelZeroNpcsPatch(patch?: CampaignLevelZeroNpcsP
     isEmptyProficiencyGrantSet(resolved.weaponProficiencies) &&
     isDefaultLevelZeroLanguageProficiencies(resolved.languageProficiencies) &&
     resolved.retainSpeciesLanguages === DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES &&
-    resolved.startingWealth === undefined &&
+    wealthTiersMatchDefaults(patch?.wealthTiers) &&
     sameStandardArray(resolved.standardArray, DEFAULT_STANDARD_ARRAY)
   )
 }

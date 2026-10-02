@@ -174,6 +174,19 @@ export function SignInForm({ onSubmit, formError }) {
 }
 ```
 
+## Interactive list chrome
+
+Picker-like rows share one visual system (`InteractiveListSize` owns row geometry) in Storybook **UI/InteractiveList**:
+
+- **`InteractiveListRow`** — row frame, highlight/selected wash, `startSlot` / `endSlot` / `trailingAction`.
+- **`IdentityRow`** — heading, classification, supporting copy (typography subordinate to `InteractiveListSize`).
+- **`ComboboxOptionRow`** — `listbox` / `option` with required `selected` → `aria-selected`.
+- **`MenuChoiceRow`** — `menuitem`; highlight from Radix `data-[highlighted]` only (no `aria-selected`).
+- **`InteractiveListPanel`** — neutral scroll body; compositions set `listbox` or `menu` on the host.
+- **`InteractiveList`** — row-list surface + `interactiveListRowSeparatorClasses` (`[&>*+*]:border-t` + `border-border-faint`); wrap row adapters only, not headings/separators.
+
+Do not use option/listbox semantics for action menus. Search hits and ordinary commands use link or button hosts instead.
+
 ## Forms
 
 The form system is two layers: RHF-agnostic field primitives (compound `Field.*`,

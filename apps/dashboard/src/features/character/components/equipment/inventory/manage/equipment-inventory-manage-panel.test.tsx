@@ -102,8 +102,7 @@ describe('EquipmentInventoryManageDisclosureCard', () => {
             quantity: 1,
           },
         ],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
     const context = createEquipmentStepContextWithMagicItemGrantsFixture()

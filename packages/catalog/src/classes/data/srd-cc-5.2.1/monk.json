@@ -40,7 +40,8 @@
                 "equipmentSlug": "spear"
               },
               "quantity": 1,
-              "equipped": true
+              "equipped": true,
+              "id": "spear"
             },
             {
               "kind": "grant",
@@ -48,7 +49,8 @@
                 "source": "equipment",
                 "equipmentSlug": "dagger"
               },
-              "quantity": 5
+              "quantity": 5,
+              "id": "dagger"
             },
             {
               "kind": "grant",
@@ -56,7 +58,8 @@
                 "source": "proficiency_choice",
                 "choiceId": "class-tools"
               },
-              "quantity": 1
+              "quantity": 1,
+              "id": "class-tools-tool"
             },
             {
               "kind": "grant",
@@ -64,7 +67,8 @@
                 "source": "equipment",
                 "equipmentSlug": "explorers-pack"
               },
-              "quantity": 1
+              "quantity": 1,
+              "id": "explorers-pack"
             }
           ],
           "wealth": {
@@ -129,19 +133,31 @@
               "entries": [
                 {
                   "level": 1,
-                  "value": { "count": 1, "faces": 6 }
+                  "value": {
+                    "count": 1,
+                    "faces": 6
+                  }
                 },
                 {
                   "level": 5,
-                  "value": { "count": 1, "faces": 8 }
+                  "value": {
+                    "count": 1,
+                    "faces": 8
+                  }
                 },
                 {
                   "level": 11,
-                  "value": { "count": 1, "faces": 10 }
+                  "value": {
+                    "count": 1,
+                    "faces": 10
+                  }
                 },
                 {
                   "level": 17,
-                  "value": { "count": 1, "faces": 12 }
+                  "value": {
+                    "count": 1,
+                    "faces": 12
+                  }
                 }
               ]
             }

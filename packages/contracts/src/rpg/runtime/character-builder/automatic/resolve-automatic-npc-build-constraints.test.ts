@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
+import { indexCharacterBuildCatalog } from '../context'
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import { buildChoiceSetId } from '../choice-set'
 import type { CharacterBuildContext } from '../context'
 import { spellcastingTestContext, wizardClass } from '../spellcasting-test-fixtures'
@@ -15,6 +17,7 @@ import type { AutomaticNpcBuildSeed } from './automatic-npc-build-seed'
 import { listReachableSpellOptions } from './list-reachable-spell-options'
 import { listReachableStartingWeapons } from './list-reachable-starting-weapons'
 import { resolveAutomaticNpcBuild } from './resolve-automatic-npc-build'
+import { fillChoiceSetWithConstraintAwareSelection } from './automatic-npc-build-constraint-selection'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -116,6 +119,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Dagger Kit',
           items: [
             {
+              id: 'dagger',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'dagger' },
               quantity: 1,
@@ -128,6 +132,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Sword Kit',
           items: [
             {
+              id: 'longsword',
               kind: 'grant',
               target: { source: 'equipment', equipmentSlug: 'longsword' },
               quantity: 1,
@@ -140,6 +145,7 @@ const weaponConstraintFighter: ClassStored = {
           label: 'Pool Kit',
           items: [
             {
+              id: 'martial-choice',
               kind: 'choice',
               choose: 1,
               pool: {
@@ -435,5 +441,53 @@ describe('automatic NPC discovery helpers', () => {
 
     expect(options.some((option) => option.id === `${RULESET}:magic-missile`)).toBe(true)
     expect(options.some((option) => option.id === `${RULESET}:fireball`)).toBe(false)
+  })
+
+  it('records class spell recommendations after required spells', () => {
+    const context: CharacterBuildContext = { ...spellcastingTestContext, characterKind: 'npc' }
+    const catalogIndex = indexCharacterBuildCatalog(context.catalog)
+    const choiceSetId = buildChoiceSetId('spellcasting', wizardClass.id, 'cantrips')
+    const requiredId = `${RULESET}:arcane-bolt`
+    const recommendedId = `${RULESET}:prestidigitation`
+    const spellcasting = wizardClass.spellcasting
+    if (!spellcasting) throw new Error('wizard fixture is missing spellcasting')
+    const filled = fillChoiceSetWithConstraintAwareSelection({
+      draft: {
+        ...createEmptyCharacterBuilderDraft(),
+        species: { speciesId: dwarfSpecies.id },
+        class: { classId: wizardClass.id, level: 1 },
+      },
+      choiceSet: {
+        id: choiceSetId,
+        sourceType: 'spellcasting',
+        sourceId: wizardClass.id,
+        choiceType: 'cantrip',
+        label: 'Cantrips',
+        min: 2,
+        max: 2,
+        required: true,
+        options: [
+          { id: requiredId, label: 'Arcane Bolt' },
+          { id: recommendedId, label: 'Prestidigitation' },
+          { id: `${RULESET}:mage-hand`, label: 'Mage Hand' },
+        ],
+      },
+      constraints: { requiredWeaponIds: [], requiredSpellIds: [requiredId] },
+      characterClass: {
+        ...wizardClass,
+        spellcasting: {
+          ...spellcasting,
+          recommendations: [{ target: 'cantrips', classLevel: 1, spellIds: ['prestidigitation'] }],
+        },
+      },
+      catalogIndex,
+      context,
+    })
+
+    expect(filled?.draft.choiceSelections[choiceSetId]).toEqual([requiredId, recommendedId])
+    expect(filled?.suggestedBy).toEqual({
+      [requiredId]: [],
+      [recommendedId]: [{ kind: 'class', id: wizardClass.id }],
+    })
   })
 })

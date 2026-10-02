@@ -162,7 +162,11 @@ const configRulesObjectSchema = z.object({
       items: ['common'],
     })),
   levelZeroRetainSpeciesLanguages: z.boolean().default(DEFAULT_LEVEL_ZERO_RETAIN_SPECIES_LANGUAGES),
-  levelZeroStartingWealth: levelZeroNpcsFormSchema.shape.levelZeroStartingWealth.optional(),
+  levelZeroWealthTierPoor: levelZeroNpcsFormSchema.shape.levelZeroWealthTierPoor.optional(),
+  levelZeroWealthTierModest: levelZeroNpcsFormSchema.shape.levelZeroWealthTierModest.optional(),
+  levelZeroWealthTierComfortable:
+    levelZeroNpcsFormSchema.shape.levelZeroWealthTierComfortable.optional(),
+  levelZeroWealthTierWealthy: levelZeroNpcsFormSchema.shape.levelZeroWealthTierWealthy.optional(),
   levelZeroStandardArray: standardArrayFormSchema.default(standardArrayDefaultFormValues),
   xpThresholdOverrides: xpThresholdOverrideEntriesSchema.default([]),
   slotProgressions: z

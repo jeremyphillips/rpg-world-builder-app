@@ -29,6 +29,7 @@ export const EQUIPMENT_KIND_ENTRIES = {
   },
   adventuring_gear: {
     label: 'Adventuring Gear',
+    compactLabel: 'Gear',
     description: 'General equipment used while adventuring.',
     sentence: {
       singular: 'piece of adventuring gear',

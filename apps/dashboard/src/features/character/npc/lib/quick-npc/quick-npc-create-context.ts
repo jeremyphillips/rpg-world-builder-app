@@ -1,4 +1,5 @@
 import type {
+  NpcTemplateId,
   OrganizationDomain,
   OrganizationForm,
   OrganizationFunction,
@@ -20,6 +21,7 @@ export type QuickNpcCreateFormOrganization = {
   members?: {
     classAffinityIds?: readonly string[]
     speciesAffinityIds?: readonly string[]
+    npcTemplateId?: NpcTemplateId
     titles?: readonly OrganizationMembershipTitleDefinition[]
   }
 }
@@ -50,7 +52,11 @@ export function resolveQuickNpcCreateOrganization(
   return context.kind === 'organization-member' ? context.organization : undefined
 }
 
-/** Lossy map — relationship-target semantics do not flow into Quick NPC context today. */
+/**
+ * Lossy map — relationship-target semantics do not flow into Quick NPC context today.
+ * See [create-flow.md](../../../../../../docs/create-flow.md) and
+ * `mapContentCreateContextToQuickNpcCreateContext` tests in `quick-npc-create-context.test.ts`.
+ */
 export function mapContentCreateContextToQuickNpcCreateContext(
   context: ContentCreateContext,
 ): QuickNpcCreateContext {

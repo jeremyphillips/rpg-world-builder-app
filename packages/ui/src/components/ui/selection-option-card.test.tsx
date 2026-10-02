@@ -7,9 +7,35 @@ import {
   SelectionOptionCardHeaderAction,
 } from './selection-option-card.client'
 import { selectionOptionCardHeaderActionClasses } from './selection-option-card.variants'
-import { optionCardSelectedChromeClasses } from './selection-option-card.variants'
+import {
+  optionCardDescriptionVariants,
+  optionCardSelectedChromeClasses,
+  optionCardSummaryTitleVariants,
+} from './selection-option-card.variants'
 
 describe('SelectionOptionCard', () => {
+  it('renders title adornment and embedded content only when provided', () => {
+    const { rerender } = render(
+      <SelectionOptionCard selected label="Heavy Armor" description="Chain Mail." />,
+    )
+
+    expect(screen.queryByText('Customized')).not.toBeInTheDocument()
+    expect(screen.queryByText('Customize Heavy Armor')).not.toBeInTheDocument()
+
+    rerender(
+      <SelectionOptionCard
+        selected
+        label="Heavy Armor"
+        description="Chain Mail."
+        titleAdornment={<span>Customized</span>}
+        embedded={<p>Customize Heavy Armor</p>}
+      />,
+    )
+
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+    expect(screen.getByText('Customize Heavy Armor')).toBeInTheDocument()
+  })
+
   it('renders header slots, label, description, and summary lines', () => {
     render(
       <SelectionOptionCard
@@ -29,7 +55,7 @@ describe('SelectionOptionCard', () => {
     expect(screen.getByText('Gold: 10 gp')).toBeInTheDocument()
   })
 
-  it('renders compact header actions without ad-hoc sizing overrides', () => {
+  it('renders comfortable-density header actions at sm compact control size', () => {
     render(
       <SelectionOptionCard
         selected
@@ -44,7 +70,57 @@ describe('SelectionOptionCard', () => {
     expect(action.className).toContain(selectionOptionCardHeaderActionClasses)
     expect(action.className).toContain('h-6')
     expect(action.className).toContain('text-action-standalone')
+    expect(action.className).not.toContain('text-control-action-xs')
     expect(action.className).not.toContain('h-auto')
+  })
+
+  it('renders compact-density header actions at xs control-action typography', () => {
+    render(
+      <SelectionOptionCard
+        selected
+        density="compact"
+        headerEndSlot={
+          <SelectionOptionCardHeaderAction
+            label="Change package"
+            density="compact"
+            onClick={() => undefined}
+          />
+        }
+        label="Selected package"
+      />,
+    )
+
+    const action = screen.getByRole('button', { name: 'Change package' })
+    expect(action.className).toContain('text-control-action-xs')
+    expect(action.className).toContain('h-control-action-compact')
+    expect(action.className).not.toMatch(/\btext-sm\b/)
+    expect(action.className).not.toMatch(/\btext-xs\b/)
+  })
+
+  it('applies compact density typography on summary title, description, and eyebrow', () => {
+    render(
+      <SelectionOptionCard
+        selected
+        density="compact"
+        headerEyebrow="Selected package"
+        label="Equipment package A"
+        description="Includes shield and sword."
+        summaryLines={['Gold: 10 gp']}
+      />,
+    )
+
+    const title = screen.getByRole('heading', { name: 'Equipment package A' })
+    for (const token of optionCardSummaryTitleVariants({ density: 'compact' }).split(' ')) {
+      expect(title.className).toContain(token)
+    }
+
+    const description = screen.getByText('Includes shield and sword.')
+    for (const token of optionCardDescriptionVariants({ density: 'compact' }).split(' ')) {
+      expect(description.className).toContain(token)
+    }
+
+    const eyebrow = screen.getByText('Selected package')
+    expect(eyebrow.className).toContain('eyebrow-style-xs')
   })
 
   it('applies shared selected chrome classes when selected', () => {

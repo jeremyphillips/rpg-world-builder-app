@@ -11,6 +11,7 @@ export type NestedContentIdRegenerationPath =
   | 'resolution'
   | 'connections.locations'
   | 'members.titles'
+  | 'characterCreation.startingEquipment'
 
 /** Per-type nested authored-id regeneration policy for duplication. */
 export type NestedIdRegeneration =
@@ -29,7 +30,7 @@ export interface ContentTypeCapability {
 export const CONTENT_TYPE_CAPABILITIES: Record<ContentTypeKey, ContentTypeCapability> = {
   classes: {
     canDuplicate: true,
-    nestedIdRegeneration: { paths: ['features'] },
+    nestedIdRegeneration: { paths: ['features', 'characterCreation.startingEquipment'] },
   },
   spells: {
     canDuplicate: true,

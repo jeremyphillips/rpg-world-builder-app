@@ -10,15 +10,30 @@ describe('useQuickNpcBuildCardExpandedAttribute', () => {
   it('closes class expansion when class progression becomes inapplicable', () => {
     const { result, rerender } = renderHook(
       ({ classProgressionApplicable, classId }) =>
-        useQuickNpcBuildCardExpandedAttribute({ classProgressionApplicable, classId }),
+        useQuickNpcBuildCardExpandedAttribute({
+          classProgressionApplicable,
+          classId,
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        }),
       {
-        initialProps: { classProgressionApplicable: true, classId: '' },
+        initialProps: {
+          classProgressionApplicable: true,
+          classId: '',
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        },
       },
     )
 
     expect(result.current[0]).toBe('class')
 
-    rerender({ classProgressionApplicable: false, classId: '' })
+    rerender({
+      classProgressionApplicable: false,
+      classId: '',
+      roleRowEnabled: false,
+      npcTemplateId: '',
+    })
 
     expect(result.current[0]).toBeNull()
   })
@@ -26,15 +41,30 @@ describe('useQuickNpcBuildCardExpandedAttribute', () => {
   it('opens class when progression becomes applicable with an empty classId', () => {
     const { result, rerender } = renderHook(
       ({ classProgressionApplicable, classId }) =>
-        useQuickNpcBuildCardExpandedAttribute({ classProgressionApplicable, classId }),
+        useQuickNpcBuildCardExpandedAttribute({
+          classProgressionApplicable,
+          classId,
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        }),
       {
-        initialProps: { classProgressionApplicable: false, classId: '' },
+        initialProps: {
+          classProgressionApplicable: false,
+          classId: '',
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        },
       },
     )
 
     expect(result.current[0]).toBeNull()
 
-    rerender({ classProgressionApplicable: true, classId: '' })
+    rerender({
+      classProgressionApplicable: true,
+      classId: '',
+      roleRowEnabled: false,
+      npcTemplateId: '',
+    })
 
     expect(result.current[0]).toBe('class')
   })
@@ -42,19 +72,47 @@ describe('useQuickNpcBuildCardExpandedAttribute', () => {
   it('reopens class when classId is cleared externally', () => {
     const { result, rerender } = renderHook(
       ({ classProgressionApplicable, classId }) =>
-        useQuickNpcBuildCardExpandedAttribute({ classProgressionApplicable, classId }),
+        useQuickNpcBuildCardExpandedAttribute({
+          classProgressionApplicable,
+          classId,
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        }),
       {
-        initialProps: { classProgressionApplicable: true, classId: 'rogue-id' },
+        initialProps: {
+          classProgressionApplicable: true,
+          classId: 'rogue-id',
+          roleRowEnabled: false,
+          npcTemplateId: '',
+        },
       },
     )
 
     act(() => {
-      result.current[1]('level')
+      result.current[1]('role')
     })
-    expect(result.current[0]).toBe('level')
+    expect(result.current[0]).toBe('role')
 
-    rerender({ classProgressionApplicable: true, classId: '' })
+    rerender({
+      classProgressionApplicable: true,
+      classId: '',
+      roleRowEnabled: false,
+      npcTemplateId: '',
+    })
 
     expect(result.current[0]).toBe('class')
+  })
+
+  it('opens role when the org-member role row is enabled and unset', () => {
+    const { result } = renderHook(() =>
+      useQuickNpcBuildCardExpandedAttribute({
+        classProgressionApplicable: true,
+        classId: '',
+        roleRowEnabled: true,
+        npcTemplateId: '',
+      }),
+    )
+
+    expect(result.current[0]).toBe('role')
   })
 })

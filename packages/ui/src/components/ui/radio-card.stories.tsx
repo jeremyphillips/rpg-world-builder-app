@@ -2,7 +2,15 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { action } from 'storybook/actions'
 import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 
+import { Button } from './button.client'
+import { NumberStepper } from './number-stepper.client'
 import { RadioCard } from './radio-card.client'
+import {
+  SelectionOptionCardEmbeddedPanel,
+  SelectionOptionCardEmbeddedPanelHeader,
+  SelectionOptionCardEmbeddedPanelList,
+  SelectionOptionCardEmbeddedPanelRow,
+} from './selection-option-card-embedded-panel.client'
 
 const options = [
   {
@@ -250,13 +258,35 @@ export const EmbeddedDependentChoice: Story = {
         onDetails: action('onDetails'),
         embeddedSlotTone: 'panel',
         embeddedContent: (
-          <div className="space-y-2">
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-sm font-semibold">Gnomish Lineage</p>
-              <p className="text-sm text-muted-foreground">Required</p>
-            </div>
-            <p className="text-sm text-muted-foreground">Choose one option.</p>
-          </div>
+          <SelectionOptionCardEmbeddedPanel>
+            <SelectionOptionCardEmbeddedPanelHeader
+              title="Gnomish Lineage"
+              titleAs="h3"
+              description="Choose one option."
+              endSlot={
+                <span className="shrink-0 text-right text-xs leading-snug text-muted-foreground">
+                  Required
+                </span>
+              }
+            />
+            <SelectionOptionCardEmbeddedPanelList>
+              <SelectionOptionCardEmbeddedPanelRow label="Forest Gnome">
+                <Button type="button" variant="text" size="xs" density="compact">
+                  Select
+                </Button>
+              </SelectionOptionCardEmbeddedPanelRow>
+              <SelectionOptionCardEmbeddedPanelRow label="Rock Gnome">
+                <NumberStepper
+                  size="xs"
+                  min={0}
+                  max={1}
+                  value={1}
+                  aria-label="Example"
+                  onChange={() => undefined}
+                />
+              </SelectionOptionCardEmbeddedPanelRow>
+            </SelectionOptionCardEmbeddedPanelList>
+          </SelectionOptionCardEmbeddedPanel>
         ),
       },
       {

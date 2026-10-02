@@ -98,7 +98,7 @@ describe('resolveProficiencyPickerItems', () => {
     const stealth = items.find((item) => item.optionId === stealthSkill.id)
     expect(stealth?.state.isAlreadyGranted).toBe(true)
     expect(stealth?.state.canSelect).toBe(false)
-    expect(stealth?.state.disabledReasons[0]).toContain('Already granted by')
+    expect(stealth?.state.disabledReasons[0]).toBe('Already granted by Rogue')
   })
 
   it('marks species language affinities as recommended in language ChoiceSets', () => {
@@ -121,6 +121,16 @@ describe('resolveProficiencyPickerItems', () => {
     const elvish = items.find((item) => item.optionId === 'elvish')
 
     expect(dwarvish?.state.isRecommended).toBe(true)
+    expect(dwarvish?.state.recommendation).toMatchObject({
+      strength: 'strong',
+      signals: [
+        expect.objectContaining({
+          basis: 'affinity',
+          source: { kind: 'species', id: dwarfSpecies.id },
+        }),
+      ],
+    })
+    expect(dwarvish?.state.presentation?.facts[0]?.label).toBe('Recommended')
     expect(elvish?.state.isRecommended).toBe(false)
   })
 

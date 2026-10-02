@@ -7,6 +7,8 @@ import {
 } from '@rpg/contracts'
 import type { FormItem } from '@rpg/ui/form'
 
+import { buildNpcTemplateFieldOptions } from '@/lib/npc-template/npc-template-form-options.lib'
+
 import { formSelectNumberSchema } from '../../../lib/forms/validation/draft-form-schema-helpers'
 
 import {
@@ -16,6 +18,9 @@ import {
 
 /** RHF `useFieldArray` keyName — must not match persisted catalog row `id` (`omt_*`). */
 export const ORGANIZATION_MEMBERSHIP_TITLE_FIELD_ARRAY_KEY = '_fieldArrayKey' as const
+
+export const ORGANIZATION_MEMBERSHIP_TITLE_NPC_ROLE_FIELD_HINT =
+  'Biases Quick create and automatic build for members with this title. Level and skill or tool preferences stay preset-owned until edited elsewhere.' as const
 
 export const ORGANIZATION_MEMBERSHIP_TITLE_PRIORITY_LABELS: Record<
   OrganizationMembershipTitlePriority,
@@ -65,14 +70,19 @@ export function normalizeOrganizationMembershipTitleFormRows(
 ): OrganizationMembershipTitleDefinition[] | undefined {
   if (!titles) return undefined
   return titles.map((row) => {
-    if (typeof row.priority !== 'string') {
-      return row as OrganizationMembershipTitleDefinition
+    let next: OrganizationMembershipTitleDefinition = row as OrganizationMembershipTitleDefinition
+    if (typeof row.priority === 'string') {
+      const parsed = membershipTitlePriorityFromFormValue.safeParse(row.priority)
+      next = {
+        ...row,
+        priority: parsed.success ? parsed.data : row.priority,
+      } as OrganizationMembershipTitleDefinition
     }
-    const parsed = membershipTitlePriorityFromFormValue.safeParse(row.priority)
-    return {
-      ...row,
-      priority: parsed.success ? parsed.data : row.priority,
-    } as OrganizationMembershipTitleDefinition
+    if (next.npcRecommendation && !next.npcRecommendation.templateId) {
+      const { npcRecommendation: _removed, ...rest } = next
+      return rest
+    }
+    return next
   })
 }
 
@@ -117,6 +127,18 @@ export function buildOrganizationMembershipTitlesArrayField(prefix?: string): Fo
             options: organizationMembershipTitlePriorityOptions,
           },
         ],
+      },
+      {
+        type: 'select',
+        name: 'npcRecommendation.templateId',
+        label: 'NPC role',
+        hint: {
+          text: ORGANIZATION_MEMBERSHIP_TITLE_NPC_ROLE_FIELD_HINT,
+          position: 'below-control',
+        },
+        options: buildNpcTemplateFieldOptions(),
+        clearable: true,
+        clearAccessibleName: 'Clear NPC role recommendation',
       },
     ],
   }

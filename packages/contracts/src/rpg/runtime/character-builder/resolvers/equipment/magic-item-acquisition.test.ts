@@ -157,8 +157,7 @@ function draftWithGoldOption() {
       mode: 'gold' as const,
       purchases: [],
       magicItemSelections: [],
-      removedPackageItemKeys: [],
-      customized: false,
+      editedSincePackageSelection: false,
     },
   }
 }
@@ -201,7 +200,7 @@ describe('magic item acquisition contracts', () => {
       budget: undefined,
     })
 
-    expect(availability).toEqual({ status: 'unavailable', reason: 'no_market_price' })
+    expect(availability).toEqual({ status: 'unavailableForPurchase', reason: 'no_market_price' })
   })
 
   it('applies duplicate policy for common priced magic items', () => {
@@ -319,6 +318,7 @@ describe('magic item acquisition contracts', () => {
               label: 'Standard Equipment',
               items: [
                 {
+                  id: 'rope',
                   kind: 'grant',
                   target: { source: 'equipment', equipmentSlug: 'rope' },
                   quantity: 1,
@@ -357,8 +357,7 @@ describe('magic item acquisition contracts', () => {
         mode: 'package' as const,
         purchases: [],
         magicItemSelections: [],
-        removedPackageItemKeys: [],
-        customized: false,
+        editedSincePackageSelection: false,
       },
     }
 
@@ -623,7 +622,7 @@ describe('magic item acquisition contracts', () => {
 
     expect(state).toEqual({
       kind: 'purchase',
-      availability: { status: 'unavailable', reason: 'no_market_price' },
+      availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
     })
   })
 

@@ -78,6 +78,15 @@ const EQUIPMENT_CALLOUT_LABEL_PRESENTATION = {
 export function getEquipmentCalloutPresentation(
   callout: EquipmentPickerCallout,
 ): EquipmentCalloutPresentation {
+  if (callout.factKind === 'requirement') {
+    return { appearance: 'strong', tone: 'info' }
+  }
+  if (callout.factKind === 'blocking') {
+    return { appearance: 'soft', tone: 'destructive', leadingIcon: 'warning' }
+  }
+  if (callout.factKind === 'caution') {
+    return { appearance: 'soft', tone: 'warning', leadingIcon: 'warning' }
+  }
   return (
     EQUIPMENT_CALLOUT_LABEL_PRESENTATION[
       callout.label as keyof typeof EQUIPMENT_CALLOUT_LABEL_PRESENTATION
@@ -96,16 +105,26 @@ export function mapEquipmentCalloutToStatusItem(
     appearance: presentation.appearance,
     tone: presentation.tone,
     leadingIcon: presentation.leadingIcon,
+    ...(callout.title ? { title: callout.title } : {}),
   }
 }
 
-function buildEquipmentPickerStatus(
-  callout: EquipmentPickerCallout | undefined,
-  statusItems: readonly EntitySummaryStatusItem[] | undefined,
-): readonly EntitySummaryStatusItem[] | undefined {
+function buildEquipmentPickerStatus(args: {
+  callout: EquipmentPickerCallout | undefined
+  secondaryLabels?: readonly string[]
+  statusItems?: readonly EntitySummaryStatusItem[]
+}): readonly EntitySummaryStatusItem[] | undefined {
   const items = [
-    ...(callout ? [mapEquipmentCalloutToStatusItem(callout)] : []),
-    ...(statusItems ?? []),
+    ...(args.callout ? [mapEquipmentCalloutToStatusItem(args.callout)] : []),
+    ...(args.secondaryLabels ?? []).map(
+      (label) =>
+        ({
+          kind: 'text',
+          label,
+          variant: 'muted',
+        }) as const,
+    ),
+    ...(args.statusItems ?? []),
   ]
 
   return items.length > 0 ? items : undefined
@@ -113,7 +132,8 @@ function buildEquipmentPickerStatus(
 
 export function buildEquipmentPickerEntityStatus(args: {
   callout: EquipmentPickerCallout | undefined
+  secondaryLabels?: readonly string[]
   statusItems?: readonly EntitySummaryStatusItem[]
 }): readonly EntitySummaryStatusItem[] | undefined {
-  return buildEquipmentPickerStatus(args.callout, args.statusItems)
+  return buildEquipmentPickerStatus(args)
 }

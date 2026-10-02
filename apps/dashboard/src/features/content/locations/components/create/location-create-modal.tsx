@@ -4,8 +4,11 @@ import { FormShellFooterScope, FormShellFooterSlot, FormShellSubmitButton } from
 
 import {
   CreateSetupFooter,
+  createChoiceSetSummaryDefinitions,
   notifyCreateSetupValueChangeCompletion,
+  resolveSetupSummaryRows,
   type SetupSummaryEditTarget,
+  type SetupSummaryRow,
 } from '@/lib/create-setup'
 import {
   CreateModalShell,
@@ -49,10 +52,6 @@ import {
 } from '../../lib/building-organizations/building-organization-create-drafts'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../../lib/create/setup/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../../lib/create/setup/location-create-setup.lib'
-import {
-  resolveLocationSetupSummaryRows,
-  type LocationSetupSummaryEntry,
-} from '../../lib/create/setup/location-setup-summary-rows.lib'
 import {
   LocationCreateModalSetupPanel,
   useLocationCreateModalSetupSequence,
@@ -145,15 +144,27 @@ function resolveModalHeadline({
 
 const MULTI_SETUP_EYEBROW = 'Setup' as const
 
-function resolveAuthoringSetupSummary(
-  entries: readonly LocationSetupSummaryEntry[],
-): { eyebrow: string; rows: ReturnType<typeof resolveLocationSetupSummaryRows> } | null {
-  const rows = resolveLocationSetupSummaryRows(entries)
+function resolveAuthoringSetupSummary(rows: readonly SetupSummaryRow[]): {
+  eyebrow: string
+  rows: {
+    id: string
+    label: string
+    value: string
+    helper?: string
+    editTarget: { type: 'set'; id: string }
+  }[]
+} | null {
   if (rows.length === 0) return null
 
   return {
     eyebrow: rows.length === 1 ? rows[0]!.label : MULTI_SETUP_EYEBROW,
-    rows,
+    rows: rows.map((row) => ({
+      id: row.id,
+      label: row.label,
+      value: row.value,
+      ...(row.secondary ? { helper: row.secondary } : {}),
+      editTarget: { type: 'set', id: row.targetSetId },
+    })),
   }
 }
 
@@ -661,7 +672,9 @@ function LocationCreateModalSession({
     />
   )
   const resolvedSetupSummary = setupModel
-    ? resolveAuthoringSetupSummary(setupModel.summaryEntries)
+    ? resolveAuthoringSetupSummary(
+        resolveSetupSummaryRows(setupSets, createChoiceSetSummaryDefinitions(setupSets)),
+      )
     : null
   const setupSummary =
     showDetails && state.hadSetup && resolvedSetupSummary

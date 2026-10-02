@@ -9,7 +9,13 @@ import {
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
-import { ComboboxField, RadioCard, Text, type RadioCardOption } from '@rpg/ui'
+import {
+  ComboboxField,
+  RadioCard,
+  Text,
+  type RadioCardOption,
+  type SelectionOptionCardDensity,
+} from '@rpg/ui'
 
 import { ChoiceSetField } from '../../builder/fields/choice-set-field'
 import {
@@ -22,6 +28,7 @@ import {
   listNestedPoolsForOption,
   listProficiencyLinksForOption,
   resolveProficiencyLinkFieldState,
+  filterPackageStartingEquipmentSummaries,
   startingEquipmentOptionFundingSummaryLines,
   type StartingEquipmentNestedPool,
 } from '../../../lib/equipment/equipment-step.lib'
@@ -50,6 +57,9 @@ export type StartingEquipmentOptionCardsProps = {
   ) => void
   onChoiceSelectionChange: (choiceSetId: string, selection: readonly string[]) => void
   onCollapseChooser: () => void
+  /** When false, wealth-only starting gold options are omitted from the radio list. Default true. */
+  includeGoldOption?: boolean
+  density?: SelectionOptionCardDensity
 }
 
 type PendingNestedSelections = Record<string, Record<string, string[]>>
@@ -256,7 +266,7 @@ function StartingEquipmentNestedFields({
   )
 }
 
-function buildPackageRadioCardOption({
+export function buildPackageRadioCardOption({
   summary,
   characterClass,
   catalogIndex,
@@ -313,7 +323,7 @@ function buildPackageRadioCardOption({
   }
 }
 
-function buildGoldRadioCardOption(summary: StartingEquipmentOptionSummary): RadioCardOption {
+export function buildGoldRadioCardOption(summary: StartingEquipmentOptionSummary): RadioCardOption {
   return {
     value: summary.optionId,
     disabled: !summary.isSelectable,
@@ -339,17 +349,16 @@ export function StartingEquipmentOptionCards({
   onNestedPoolChange,
   onChoiceSelectionChange,
   onCollapseChooser,
+  includeGoldOption = true,
+  density = 'default',
 }: StartingEquipmentOptionCardsProps) {
   const [pendingNestedSelections, setPendingNestedSelections] = useState<PendingNestedSelections>(
     {},
   )
 
   const options = characterClass.characterCreation?.startingEquipment?.options ?? []
-  const goldOption = options.find(isStartingGoldOption)
-  const packageOptionIds = new Set(
-    options.filter((option) => !isStartingGoldOption(option)).map((option) => option.id),
-  )
-  const packageSummaries = summaries.filter((summary) => packageOptionIds.has(summary.optionId))
+  const goldOption = includeGoldOption ? options.find(isStartingGoldOption) : undefined
+  const packageSummaries = filterPackageStartingEquipmentSummaries(characterClass, summaries)
   const goldSummary = goldOption
     ? summaries.find((summary) => summary.optionId === goldOption.id)
     : undefined
@@ -404,6 +413,7 @@ export function StartingEquipmentOptionCards({
   return (
     <RadioCard
       aria-label="Starting equipment options"
+      density={density}
       value={selectedOptionId ?? ''}
       onValueChange={(optionId) => {
         if (!optionId) return

@@ -47,6 +47,15 @@ vi.mock('../../../lib/quick-npc/quick-npc-requirement-options.lib', async (impor
 
 const createNpcMock = vi.hoisted(() => vi.fn())
 const generateCharacterSpeciesNameMock = vi.hoisted(() => vi.fn())
+const resolveQuickNpcAuthoringCreateInputMock = vi.hoisted(() => vi.fn())
+
+vi.mock('../../../lib/quick-npc/quick-npc-narrative-on-create.lib', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    resolveQuickNpcAuthoringCreateInput: resolveQuickNpcAuthoringCreateInputMock,
+  }
+})
 
 vi.mock('../../../../lib/naming/character-species-name-generation.lib', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
@@ -128,10 +137,16 @@ function renderAuthoringForm(
 }
 
 describe('QuickNpcAuthoringForm', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     createNpcMock.mockReset()
     generateCharacterSpeciesNameMock.mockReset()
     generateCharacterSpeciesNameMock.mockResolvedValue({ ok: true, name: 'Thorin Stonehelm' })
+    resolveQuickNpcAuthoringCreateInputMock.mockReset()
+    resolveQuickNpcAuthoringCreateInputMock.mockImplementation(async ({ prepareArgs }) => {
+      const { prepareQuickNpcAuthoringCreate } =
+        await import('../../../lib/quick-npc/quick-npc-authoring-submit.lib')
+      return prepareQuickNpcAuthoringCreate(prepareArgs).input
+    })
   })
 
   it('populates the name field when Generate is clicked', async () => {
@@ -170,7 +185,7 @@ describe('QuickNpcAuthoringForm', () => {
     const user = userEvent.setup()
     renderAuthoringForm()
 
-    await user.click(screen.getByRole('button', { name: /requirements/i }))
+    await user.click(screen.getByRole('button', { name: /starting choices/i }))
     await user.click(screen.getByRole('button', { name: 'Create NPC' }))
 
     await waitFor(() => {
@@ -186,7 +201,9 @@ describe('QuickNpcAuthoringForm', () => {
     expect(screen.getByText('Setup')).toBeInTheDocument()
     expect(screen.getByText('Guildmaster')).toBeInTheDocument()
     expect(screen.getByText('Dwarf')).toBeInTheDocument()
-    expect(screen.getByText(/Fighter/)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Level 1 Fighter, Change build' }),
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change role' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change species' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change build' })).toBeInTheDocument()

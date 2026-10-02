@@ -21,7 +21,6 @@ export const EQUIPMENT_RECOMMENDATION_TIERS = [
   'strong',
   'compatible',
   'neutral',
-  'notRecommended',
 ] as const
 
 export type EquipmentRecommendationTier = (typeof EQUIPMENT_RECOMMENDATION_TIERS)[number]
@@ -32,7 +31,6 @@ export const EQUIPMENT_RECOMMENDATION_TIER_RANK = {
   strong: 1,
   compatible: 2,
   neutral: 3,
-  notRecommended: 4,
 } as const satisfies Record<EquipmentRecommendationTier, number>
 
 export const EQUIPMENT_RECOMMENDATION_REASONS = [
@@ -56,10 +54,6 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
   'classToolCategory',
   /** Item appears in an unselected or preview starting-equipment branch. */
   'availableInStartingOption',
-  /** Weapon/armor/tool covered by the character's proficiencies. */
-  'proficient',
-  /** Weapon/armor/tool outside the character's proficiencies. */
-  'notProficient',
 ] as const
 
 export type EquipmentRecommendationReason = (typeof EQUIPMENT_RECOMMENDATION_REASONS)[number]
@@ -92,7 +86,6 @@ export type EquipmentRecommendation = {
 export type EquipmentRecommendationEvidence = {
   reason: EquipmentRecommendationReason
   tier: EquipmentRecommendationTier
-  sourceKey: string
   specificity: EquipmentRecommendationSpecificity
 }
 
@@ -107,7 +100,7 @@ export function isRecommendedEquipmentTier(tier: EquipmentRecommendationTier): b
   return EQUIPMENT_RECOMMENDATION_TIER_RANK[tier] <= EQUIPMENT_RECOMMENDATION_TIER_RANK.strong
 }
 
-/** Comparator over tiers — essential first, not-recommended last. */
+/** Comparator over tiers — essential first, neutral last. */
 export function compareEquipmentRecommendationTiers(
   left: EquipmentRecommendationTier,
   right: EquipmentRecommendationTier,
@@ -131,8 +124,6 @@ export const EQUIPMENT_RECOMMENDATION_REASON_RANK = {
   classToolCategory: 7,
   availableInStartingOption: 8,
   classSuggested: 9,
-  proficient: 10,
-  notProficient: 11,
 } as const satisfies Record<EquipmentRecommendationReason, number>
 
 /** Best (lowest) reason rank for browse ordering; empty reasons sort after reasoned peers. */

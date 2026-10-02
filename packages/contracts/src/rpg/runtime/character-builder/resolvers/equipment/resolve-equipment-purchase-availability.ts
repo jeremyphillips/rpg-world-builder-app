@@ -9,7 +9,10 @@ import {
 export type EquipmentPurchaseAvailability =
   | { status: 'available' }
   | { status: 'unaffordable'; shortfallCp: number }
-  | { status: 'unavailable'; reason: EquipmentPurchaseUnavailableReason }
+  | {
+      status: 'unavailableForPurchase'
+      reason: EquipmentPurchaseUnavailableReason
+    }
 
 /** Wealth-aware purchase gate — null cost is unavailable, never unaffordable. */
 export function resolveEquipmentPurchaseAvailability(args: {
@@ -21,7 +24,7 @@ export function resolveEquipmentPurchaseAvailability(args: {
   const pricing = resolveEquipmentPurchasePricing(equipment)
 
   if (pricing.status === 'unavailable') {
-    return { status: 'unavailable', reason: pricing.reason }
+    return { status: 'unavailableForPurchase', reason: pricing.reason }
   }
 
   if (!budget) {

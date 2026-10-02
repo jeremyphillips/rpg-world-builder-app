@@ -47,6 +47,7 @@ describe('isQuickNpcSetupStillValid', () => {
       isQuickNpcSetupStillValid(
         quickNpcMemberSetupWithNoTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
+          npcTemplateId: 'criminal',
           classId: 'srd-cc-5.2.1:fighter',
           level: 1,
         }),
@@ -86,6 +87,7 @@ describe('isQuickNpcSetupStillValid', () => {
       isQuickNpcSetupStillValid(
         quickNpcMemberSetupWithNoTitle({
           speciesId: 'srd-cc-5.2.1:dwarf',
+          npcTemplateId: 'commoner',
           classId: '',
           level: 0,
         }),
@@ -98,6 +100,7 @@ describe('isQuickNpcSetupStillValid', () => {
     expect(
       isQuickNpcSetupStillValid(
         quickNpcStandaloneSetupValues({
+          npcTemplateId: 'guard',
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: 'srd-cc-5.2.1:fighter',
           level: 1,
@@ -124,6 +127,7 @@ describe('isQuickNpcSetupStillValid', () => {
     expect(
       isQuickNpcSetupStillValid(
         quickNpcStandaloneSetupValues({
+          npcTemplateId: 'commoner',
           speciesId: 'srd-cc-5.2.1:dwarf',
           classId: '',
           level: 0,

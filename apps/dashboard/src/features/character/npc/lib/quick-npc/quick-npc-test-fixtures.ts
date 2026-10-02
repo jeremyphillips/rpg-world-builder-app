@@ -21,7 +21,7 @@ export const quickNpcTestOrganization = {
         label: 'Guildmaster',
         description: 'Head of the guild.',
         priority: 50 as const,
-        npcRecommendation: { templateId: 'covert_operator' as const, level: 5 },
+        npcRecommendation: { templateId: 'criminal' as const, level: 5 },
       },
     ],
   },
