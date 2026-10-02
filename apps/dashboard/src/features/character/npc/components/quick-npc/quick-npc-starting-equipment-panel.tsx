@@ -9,18 +9,30 @@ import {
   type NpcStartingChoices,
   type RecommendationSourceName,
 } from '@rpg/contracts'
+import { declineClassPackage, selectClassPackage, type ClassPackageChoice } from '@rpg/contracts'
 import {
   ActionButton,
+  Button,
   ComboboxField,
   ComboboxFilterSelect,
+  ConfirmDialog,
+  RowActionsMenu,
+  SelectionOptionCardHeaderAction,
+  SelectionOptionCardTitleMeta,
   type ComboboxFieldOption,
+  type RowActionMenuItem,
 } from '@rpg/ui'
 
 import { EquipmentOptionRow } from '@/features/character/components/equipment/picker/equipment-option-row'
 import type { EquipmentOptionRowPresentation } from '@/features/character/lib/equipment/equipment-option-row-presentation.lib'
 import { equipmentOptionQuantityAccessibleVariants } from '@/features/character/components/equipment/picker/equipment-option-row.variants'
-import { StartingEquipmentOptionSection } from '@/features/character/components/equipment/starting-package/starting-equipment-option-section'
-import { EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL } from '@/features/character/lib/equipment/equipment-step.lib'
+import { StartingEquipmentOptionCards } from '@/features/character/components/equipment/starting-package/starting-equipment-option-cards'
+import { StartingEquipmentOptionSummaryCard } from '@/features/character/components/equipment/starting-package/starting-equipment-option-summary'
+import {
+  EQUIPMENT_CHANGE_PACKAGE_LABEL,
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  filterPackageStartingEquipmentSummaries,
+} from '@/features/character/lib/equipment/equipment-step.lib'
 
 import { EntityAnatomyHost } from '@/features/content'
 
@@ -30,6 +42,7 @@ import {
   type QuickNpcAdditionalEquipmentOption,
 } from '../../lib/quick-npc/quick-npc-additional-equipment.lib'
 import {
+  QUICK_NPC_CLASS_PACKAGE_FIELD_NAME,
   QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
   QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME,
   type QuickNpcAuthoringTabFormValues,
@@ -48,9 +61,44 @@ import {
   formatManualEquipmentQuantityLabel,
 } from '../../lib/quick-npc/quick-npc-equipment-presentation.lib'
 import {
+  buildQuickNpcPackageCustomizationRows,
+  formatQuickNpcEffectivePackageDescription,
+  formatQuickNpcPackageWealthLabel,
+  QUICK_NPC_CANCEL_LABEL,
+  QUICK_NPC_CHOOSE_PACKAGE_LABEL,
+  QUICK_NPC_CUSTOMIZE_PACKAGE_LABEL,
+  QUICK_NPC_DECLINED_ADDITIONAL_EQUIPMENT_DESCRIPTION,
+  QUICK_NPC_EDIT_CUSTOMIZATION_LABEL,
+  QUICK_NPC_NO_STARTING_PACKAGE_BODY,
+  QUICK_NPC_NO_STARTING_PACKAGE_HEADING,
+  QUICK_NPC_PACKAGE_ACTIONS_LABEL,
+  QUICK_NPC_PACKAGE_CUSTOMIZED_LABEL,
+  QUICK_NPC_PACKAGE_SECTION_DESCRIPTION,
+  QUICK_NPC_REMOVE_PACKAGE_LABEL,
+  QUICK_NPC_RESTORE_PACKAGE_DEFAULTS_LABEL,
+  quickNpcCanChangePackage,
+  quickNpcPackageDraftIsDirty,
+  quickNpcPackageDraftQuantities,
+  quickNpcUsePackageLabel,
+  removeQuickNpcPackageDraftEntry,
+  readQuickNpcClassPackage,
+  resolveQuickNpcEffectiveClassPackage,
+  restoreQuickNpcPackageDraftEntry,
+  saveQuickNpcPackageCustomization,
+  selectQuickNpcClassPackage,
+  setQuickNpcPackageDraftQuantity,
+  quickNpcPackageIsCustomized,
+} from '../../lib/quick-npc/quick-npc-package-customization.lib'
+import {
   formatStartingChoiceItemCount,
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
+import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
+import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
+import {
+  quickNpcPackageHeaderActionsClasses,
+  quickNpcPackageNoPackageClasses,
+} from './quick-npc-package-customization.variants'
 import { quickNpcStartingChoiceAddControlClasses } from './quick-npc-starting-choices.variants'
 
 type QuickNpcStartingEquipmentPackageContext = NonNullable<
@@ -67,8 +115,6 @@ const QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL = 'Additional Equipment'
 const QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION =
   'Add specific items this NPC should start with in addition to its package.'
 const QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION = 'Add the items this NPC should start with.'
-const QUICK_NPC_STARTING_PACKAGE_DESCRIPTION =
-  'Choose the class equipment package this NPC starts with.'
 const QUICK_NPC_ADD_ITEM_PLACEHOLDER = '+ Add item'
 const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment category'
 
@@ -151,63 +197,419 @@ type QuickNpcStartingEquipmentPackageSectionProps = {
   writeOverrides: (next: Record<string, string[]>) => void
 }
 
+function dropPackageChoiceOverride(
+  overrides: Record<string, string[]>,
+  choiceSetId: string | undefined,
+): Record<string, string[]> {
+  if (!choiceSetId) return overrides
+  const next = { ...overrides }
+  delete next[choiceSetId]
+  return next
+}
+
+// fallow-ignore-next-line complexity
 function QuickNpcStartingEquipmentPackageSection({
   packageContext,
+  setup,
+  buildContext,
   overrides,
+  formChoice,
   writeOverrides,
-}: QuickNpcStartingEquipmentPackageSectionProps) {
+  writeClassPackage,
+}: QuickNpcStartingEquipmentPackageSectionProps & {
+  setup: QuickNpcSetupValues
+  buildContext: CharacterBuildContext
+  formChoice: ClassPackageChoice
+  writeClassPackage: (next: ClassPackageChoice) => void
+}) {
+  const { register: registerEditingLock } = useQuickNpcEditingLock()
+  const saveButtonRef = React.useRef<HTMLButtonElement>(null)
+  const [showLockMessage, setShowLockMessage] = React.useState(false)
   const [isPackageChooserExpanded, setIsPackageChooserExpanded] = React.useState(false)
-  const className = packageContext.characterClass?.name
-  const startingChoiceSet = packageContext.resolvedChoiceSets.find(
-    (choiceSet) => choiceSet.id === packageContext.startingEquipmentChoiceSetId,
+  const [chooserFromDeclined, setChooserFromDeclined] = React.useState(false)
+  const [disclosureOpen, setDisclosureOpen] = React.useState(false)
+  const [confirm, setConfirm] = React.useState<'change' | 'remove' | 'restore' | null>(null)
+  const [pendingPackageId, setPendingPackageId] = React.useState<string | undefined>()
+  const submittedQuantities = quickNpcPackageDraftQuantities(formChoice)
+  const [draftQuantities, setDraftQuantities] = React.useState(submittedQuantities)
+
+  const effective = resolveQuickNpcEffectiveClassPackage({
+    formChoice,
+    draft: packageContext.draft,
+    setup,
+    context: buildContext,
+  })
+  const selectedOption =
+    effective.state === 'selected'
+      ? packageContext.characterClass?.characterCreation?.startingEquipment?.options.find(
+          (option) => option.id === effective.packageId,
+        )
+      : undefined
+  const selectedSummary = packageContext.summaries.find(
+    (summary) => summary.optionId === selectedOption?.id,
   )
-  const packageSelectedCount = packageContext.selectedOptionId ? 1 : 0
-  const packageSelectionMax = startingChoiceSet?.max ?? 1
+  const rows =
+    selectedOption && selectedSummary
+      ? buildQuickNpcPackageCustomizationRows({
+          option: selectedOption,
+          orderedItems: selectedSummary.orderedItems,
+          entryQuantities: disclosureOpen ? draftQuantities : submittedQuantities,
+        })
+      : []
+  const description =
+    selectedOption && selectedSummary
+      ? formatQuickNpcEffectivePackageDescription({
+          option: selectedOption,
+          orderedItems: selectedSummary.orderedItems,
+          entryQuantities: disclosureOpen
+            ? quickNpcPackageDraftQuantities(formChoice)
+            : submittedQuantities,
+        })
+      : selectedSummary?.description
+  const wealthLabel = formatQuickNpcPackageWealthLabel(selectedOption)
+  const customized = quickNpcPackageIsCustomized(formChoice)
+  const canChangePackage =
+    packageContext.characterClass !== undefined &&
+    quickNpcCanChangePackage({
+      characterClass: packageContext.characterClass,
+      summaries: packageContext.summaries,
+    })
+  const dirty = quickNpcPackageDraftIsDirty(draftQuantities, submittedQuantities)
+  const packageSummaries = packageContext.characterClass
+    ? filterPackageStartingEquipmentSummaries(
+        packageContext.characterClass,
+        packageContext.summaries,
+      )
+    : []
+  const onlyPackage = packageSummaries.length === 1 ? packageSummaries[0] : undefined
+
+  React.useEffect(() => {
+    if (!disclosureOpen || !dirty) {
+      registerEditingLock(null)
+      return
+    }
+    registerEditingLock({
+      requestFocus: () => {
+        setShowLockMessage(true)
+        saveButtonRef.current?.focus()
+      },
+    })
+    return () => registerEditingLock(null)
+  }, [dirty, disclosureOpen, registerEditingLock])
+
+  if (effective.state === 'unavailable' || !packageContext.characterClass) return null
+
+  function writeExplicitPackage(
+    packageId: string,
+    nestedSelections: Record<string, readonly string[]>,
+  ) {
+    writeClassPackage(selectClassPackage(packageId, 'explicit'))
+    writeOverrides(
+      dropPackageChoiceOverride(
+        mergeNestedStartingChoiceOverrides(overrides, nestedSelections),
+        packageContext.startingEquipmentChoiceSetId,
+      ),
+    )
+    setDisclosureOpen(false)
+    setIsPackageChooserExpanded(false)
+    setChooserFromDeclined(false)
+    setDraftQuantities({})
+  }
+
+  function requestPackageChange(
+    packageId: string,
+    nestedSelections: Record<string, readonly string[]>,
+  ) {
+    if (customized && effective.state === 'selected' && effective.packageId !== packageId) {
+      setPendingPackageId(packageId)
+      setConfirm('change')
+      return
+    }
+    writeExplicitPackage(packageId, nestedSelections)
+  }
+
+  function openDisclosure() {
+    if (effective.state === 'selected' && formChoice.state !== 'selected') {
+      writeClassPackage(selectQuickNpcClassPackage(effective.packageId))
+    }
+    const quantities = quickNpcPackageDraftQuantities(
+      effective.state === 'selected' && formChoice.state === 'selected'
+        ? formChoice
+        : { state: 'unresolved' },
+    )
+    setDraftQuantities(quantities)
+    setShowLockMessage(false)
+    setDisclosureOpen(true)
+    setIsPackageChooserExpanded(false)
+  }
+
+  const menuItems: RowActionMenuItem[] = customized
+    ? [
+        {
+          kind: 'action',
+          id: 'edit',
+          label: QUICK_NPC_EDIT_CUSTOMIZATION_LABEL,
+          onSelect: openDisclosure,
+        },
+        {
+          kind: 'action',
+          id: 'restore',
+          label: QUICK_NPC_RESTORE_PACKAGE_DEFAULTS_LABEL,
+          onSelect: () => setConfirm('restore'),
+        },
+        {
+          kind: 'action',
+          id: 'remove',
+          label: QUICK_NPC_REMOVE_PACKAGE_LABEL,
+          destructive: true,
+          separatorBefore: true,
+          onSelect: () => setConfirm('remove'),
+        },
+      ]
+    : [
+        {
+          kind: 'action',
+          id: 'customize',
+          label: QUICK_NPC_CUSTOMIZE_PACKAGE_LABEL,
+          onSelect: openDisclosure,
+        },
+        {
+          kind: 'action',
+          id: 'remove',
+          label: QUICK_NPC_REMOVE_PACKAGE_LABEL,
+          destructive: true,
+          separatorBefore: true,
+          onSelect: () => writeClassPackage(declineClassPackage()),
+        },
+      ]
+
+  const currentLabel = selectedSummary?.label ?? 'this package'
+  const nextLabel =
+    packageSummaries.find((summary) => summary.optionId === pendingPackageId)?.label ??
+    'the next package'
 
   return (
     <div className={quickNpcStartingChoiceInnerSectionClasses}>
       <QuickNpcStartingChoiceSubsectionHeader
         title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}
-        selectionCounter={{
-          selectedCount: packageSelectedCount,
-          max: packageSelectionMax,
-        }}
-        subtitle={className ? `${className} class` : undefined}
-        description={QUICK_NPC_STARTING_PACKAGE_DESCRIPTION}
+        subtitle={
+          packageContext.characterClass.name
+            ? `${packageContext.characterClass.name} class`
+            : undefined
+        }
+        description={QUICK_NPC_PACKAGE_SECTION_DESCRIPTION}
       />
-      <StartingEquipmentOptionSection
-        characterClass={packageContext.characterClass!}
-        catalogIndex={packageContext.catalogIndex}
-        summaries={packageContext.summaries}
-        draft={packageContext.draft}
-        resolvedChoiceSets={packageContext.resolvedChoiceSets}
-        selectedOptionId={packageContext.selectedOptionId}
-        isPackageChooserExpanded={isPackageChooserExpanded}
-        includeGoldOption={false}
-        density="compact"
-        onSelectOption={(optionId, nestedSelections) => {
-          const choiceSetId = packageContext.startingEquipmentChoiceSetId
-          if (!choiceSetId) return
-          writeOverrides({
-            ...mergeNestedStartingChoiceOverrides(overrides, nestedSelections),
-            [choiceSetId]: [optionId],
-          })
-          setIsPackageChooserExpanded(false)
+      {effective.state === 'selected' && selectedSummary && !isPackageChooserExpanded ? (
+        <StartingEquipmentOptionSummaryCard
+          summary={selectedSummary}
+          density="compact"
+          onChangePackage={() => {
+            setChooserFromDeclined(false)
+            setIsPackageChooserExpanded(true)
+          }}
+          description={description}
+          titleAdornment={
+            customized && !disclosureOpen ? (
+              <SelectionOptionCardTitleMeta>
+                {QUICK_NPC_PACKAGE_CUSTOMIZED_LABEL}
+              </SelectionOptionCardTitleMeta>
+            ) : undefined
+          }
+          headerEndSlot={
+            disclosureOpen ? null : (
+              <span className={quickNpcPackageHeaderActionsClasses}>
+                {canChangePackage ? (
+                  <SelectionOptionCardHeaderAction
+                    label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+                    density="compact"
+                    onClick={() => {
+                      setChooserFromDeclined(false)
+                      setIsPackageChooserExpanded(true)
+                    }}
+                  />
+                ) : null}
+                <RowActionsMenu
+                  triggerLabel={QUICK_NPC_PACKAGE_ACTIONS_LABEL}
+                  triggerSize="compact"
+                  items={menuItems}
+                />
+              </span>
+            )
+          }
+          embedded={
+            disclosureOpen ? (
+              <QuickNpcPackageCustomizationPanel
+                packageLabel={selectedSummary.label}
+                rows={rows}
+                {...(wealthLabel ? { wealthLabel } : {})}
+                draftQuantities={draftQuantities}
+                submittedQuantities={submittedQuantities}
+                showLockMessage={showLockMessage}
+                saveButtonRef={saveButtonRef}
+                onChangeQuantity={(entryId, packageQuantity, quantity) =>
+                  setDraftQuantities((current) =>
+                    setQuickNpcPackageDraftQuantity({
+                      entryId,
+                      packageQuantity,
+                      quantity,
+                      entryQuantities: current,
+                    }),
+                  )
+                }
+                onRemove={(entryId, packageQuantity) =>
+                  setDraftQuantities((current) =>
+                    removeQuickNpcPackageDraftEntry({
+                      entryId,
+                      packageQuantity,
+                      entryQuantities: current,
+                    }),
+                  )
+                }
+                onRestore={(entryId) =>
+                  setDraftQuantities((current) =>
+                    restoreQuickNpcPackageDraftEntry({ entryId, entryQuantities: current }),
+                  )
+                }
+                onRestoreAll={() => setDraftQuantities({})}
+                onCancel={() => {
+                  setDraftQuantities(submittedQuantities)
+                  setDisclosureOpen(false)
+                  setShowLockMessage(false)
+                }}
+                onSave={() => {
+                  if (!selectedOption) return
+                  writeClassPackage(
+                    saveQuickNpcPackageCustomization({
+                      packageId: selectedOption.id,
+                      entryQuantities: draftQuantities,
+                      option: selectedOption,
+                    }),
+                  )
+                  setDisclosureOpen(false)
+                  setShowLockMessage(false)
+                }}
+              />
+            ) : undefined
+          }
+          embeddedTone="panel"
+        />
+      ) : null}
+      {effective.state === 'declined' && !isPackageChooserExpanded ? (
+        <div className={quickNpcPackageNoPackageClasses}>
+          <p className="text-sm font-body-emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</p>
+          <p className="text-xs text-muted-foreground">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
+          <Button
+            type="button"
+            size="xs"
+            density="compact"
+            onClick={() => {
+              if (onlyPackage) {
+                writeExplicitPackage(onlyPackage.optionId, {})
+                return
+              }
+              setChooserFromDeclined(true)
+              setIsPackageChooserExpanded(true)
+            }}
+          >
+            {onlyPackage
+              ? quickNpcUsePackageLabel(onlyPackage.label)
+              : QUICK_NPC_CHOOSE_PACKAGE_LABEL}
+          </Button>
+        </div>
+      ) : null}
+      {isPackageChooserExpanded || effective.state === 'unresolved' ? (
+        <>
+          <StartingEquipmentOptionCards
+            characterClass={packageContext.characterClass}
+            catalogIndex={packageContext.catalogIndex}
+            summaries={packageSummaries}
+            draft={packageContext.draft}
+            resolvedChoiceSets={packageContext.resolvedChoiceSets}
+            {...(effective.state === 'selected' ? { selectedOptionId: effective.packageId } : {})}
+            isPackageChooserExpanded={isPackageChooserExpanded || effective.state === 'unresolved'}
+            includeGoldOption={false}
+            density="compact"
+            onSelectOption={(optionId, nestedSelections) =>
+              requestPackageChange(optionId, nestedSelections)
+            }
+            onNestedPoolChange={(_optionId, choiceSetId, selection, nestedSelections) => {
+              writeOverrides({
+                ...mergeNestedStartingChoiceOverrides(overrides, nestedSelections),
+                [choiceSetId]: [...selection],
+              })
+            }}
+            onChoiceSelectionChange={(choiceSetId, selection) => {
+              writeOverrides({ ...overrides, [choiceSetId]: [...selection] })
+            }}
+            onCollapseChooser={() => {
+              setIsPackageChooserExpanded(false)
+              setChooserFromDeclined(false)
+            }}
+          />
+          {chooserFromDeclined ? (
+            <Button
+              type="button"
+              variant="text"
+              size="xs"
+              density="compact"
+              onClick={() => {
+                setIsPackageChooserExpanded(false)
+                setChooserFromDeclined(false)
+              }}
+            >
+              {QUICK_NPC_CANCEL_LABEL}
+            </Button>
+          ) : null}
+        </>
+      ) : null}
+      <ConfirmDialog
+        open={confirm === 'change'}
+        onOpenChange={(open) => {
+          if (!open) setConfirm(null)
         }}
-        onNestedPoolChange={(_optionId, choiceSetId, selection, nestedSelections) => {
-          writeOverrides({
-            ...mergeNestedStartingChoiceOverrides(overrides, nestedSelections),
-            [choiceSetId]: [...selection],
-          })
+        headline="Change package?"
+        description={`Your customization of ${currentLabel} will be discarded. ${nextLabel} starts with its default items. Additional Equipment isn't affected.`}
+        confirmLabel={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+        cancelLabel={QUICK_NPC_CANCEL_LABEL}
+        confirmVariant="warning"
+        onConfirm={() => {
+          if (pendingPackageId) writeExplicitPackage(pendingPackageId, {})
+          setConfirm(null)
         }}
-        onChoiceSelectionChange={(choiceSetId, selection) => {
-          writeOverrides({
-            ...overrides,
-            [choiceSetId]: [...selection],
-          })
+      />
+      <ConfirmDialog
+        open={confirm === 'remove'}
+        onOpenChange={(open) => {
+          if (!open) setConfirm(null)
         }}
-        onChangePackage={() => setIsPackageChooserExpanded(true)}
-        onCollapseChooser={() => setIsPackageChooserExpanded(false)}
+        headline="Remove package?"
+        description={`${currentLabel} and your customization will be removed. Additional Equipment isn't affected.`}
+        confirmLabel={QUICK_NPC_REMOVE_PACKAGE_LABEL}
+        cancelLabel={QUICK_NPC_CANCEL_LABEL}
+        confirmVariant="destructive"
+        onConfirm={() => {
+          writeClassPackage(declineClassPackage())
+          setDisclosureOpen(false)
+          setConfirm(null)
+        }}
+      />
+      <ConfirmDialog
+        open={confirm === 'restore'}
+        onOpenChange={(open) => {
+          if (!open) setConfirm(null)
+        }}
+        headline="Restore package defaults?"
+        description={`Your customization of ${currentLabel} will be discarded and every item returns to its package quantity.`}
+        confirmLabel="Restore defaults"
+        cancelLabel={QUICK_NPC_CANCEL_LABEL}
+        confirmVariant="warning"
+        onConfirm={() => {
+          if (effective.state === 'selected') {
+            writeClassPackage(selectQuickNpcClassPackage(effective.packageId))
+          }
+          setDraftQuantities({})
+          setConfirm(null)
+        }}
       />
     </div>
   )
@@ -217,18 +619,24 @@ type QuickNpcAdditionalEquipmentSectionProps = {
   setup: QuickNpcSetupValues
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
-  hasPackages: boolean
+  equipmentMode: 'package' | 'declined' | 'none'
   equipmentSelections: QuickNpcEquipmentSelection[]
   additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
   appendAdditionalEquipment: (equipmentId: string) => void
   removeAdditionalEquipment: (equipmentId: string) => void
 }
 
-function additionalEquipmentSectionCopy(hasPackages: boolean) {
-  if (hasPackages) {
+function additionalEquipmentSectionCopy(mode: 'package' | 'declined' | 'none') {
+  if (mode === 'package') {
     return {
       title: QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL,
       description: QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION,
+    }
+  }
+  if (mode === 'declined') {
+    return {
+      title: QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL,
+      description: QUICK_NPC_DECLINED_ADDITIONAL_EQUIPMENT_DESCRIPTION,
     }
   }
   return {
@@ -338,7 +746,7 @@ function QuickNpcAdditionalEquipmentSection({
   setup,
   choices,
   buildContext,
-  hasPackages,
+  equipmentMode,
   equipmentSelections,
   additionalOptions,
   appendAdditionalEquipment,
@@ -383,7 +791,7 @@ function QuickNpcAdditionalEquipmentSection({
   const comboboxOptions = toAdditionalEquipmentComboboxOptions(visibleEntries, presentationById)
   const addDisabled = kindOptions.length === 0
   const { title: additionalTitle, description: additionalDescription } =
-    additionalEquipmentSectionCopy(hasPackages)
+    additionalEquipmentSectionCopy(equipmentMode)
 
   return (
     <div className={quickNpcStartingChoiceInnerSectionClasses}>
@@ -423,6 +831,7 @@ export function QuickNpcStartingEquipmentPanel({
 }: QuickNpcStartingEquipmentPanelProps) {
   const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const overrides = form.watch(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME) ?? {}
+  const formChoice = readQuickNpcClassPackage(form.watch(QUICK_NPC_CLASS_PACKAGE_FIELD_NAME))
   const equipmentSelections = (form.watch(QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME) ??
     []) as QuickNpcEquipmentSelection[]
 
@@ -431,9 +840,27 @@ export function QuickNpcStartingEquipmentPanel({
     context: buildContext,
     choices,
   })
+  const effective = packageContext
+    ? resolveQuickNpcEffectiveClassPackage({
+        formChoice,
+        draft: packageContext.draft,
+        setup,
+        context: buildContext,
+      })
+    : { state: 'unavailable' as const }
+  const equipmentMode =
+    effective.state === 'declined'
+      ? 'declined'
+      : effective.state === 'unavailable' || !packageContext
+        ? 'none'
+        : 'package'
 
   function writeOverrides(next: Record<string, string[]>) {
     form.setValue(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME, next, { shouldDirty: true })
+  }
+
+  function writeClassPackage(next: ClassPackageChoice) {
+    form.setValue(QUICK_NPC_CLASS_PACKAGE_FIELD_NAME, next, { shouldDirty: true })
   }
 
   function appendAdditionalEquipment(equipmentId: string) {
@@ -473,11 +900,15 @@ export function QuickNpcStartingEquipmentPanel({
 
   return (
     <>
-      {packageContext ? (
+      {packageContext && effective.state !== 'unavailable' ? (
         <QuickNpcStartingEquipmentPackageSection
           packageContext={packageContext}
+          setup={setup}
+          buildContext={buildContext}
           overrides={overrides}
+          formChoice={formChoice}
           writeOverrides={writeOverrides}
+          writeClassPackage={writeClassPackage}
         />
       ) : null}
 
@@ -485,7 +916,7 @@ export function QuickNpcStartingEquipmentPanel({
         setup={setup}
         choices={choices}
         buildContext={buildContext}
-        hasPackages={packageContext !== null}
+        equipmentMode={equipmentMode}
         equipmentSelections={equipmentSelections}
         additionalOptions={additionalOptions}
         appendAdditionalEquipment={appendAdditionalEquipment}

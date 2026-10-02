@@ -10,6 +10,7 @@ import {
   applyEquipmentPurchaseIntent,
   resolveEquipmentAcquisitionBuilderContext,
 } from './apply-equipment-intents'
+import { declineClassPackage, selectClassPackage } from './class-package-choice'
 import {
   deriveEquipmentDraftEntries,
   inventoryQuantityForEquipmentId,
@@ -492,5 +493,44 @@ describe('deriveEquipmentDraftEntries', () => {
 
     expect(owned(1)).toBe(9)
     expect(owned(2)).toBe(10)
+  })
+
+  it('omits a package entry at quantity 0 and keeps additional grants when declined', () => {
+    const catalogIndex = makeCatalogIndex()
+    const selected = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+        classPackage: {
+          ...selectClassPackage('standard-equipment', 'explicit'),
+          overrides: { entryQuantities: { shield: 0 } },
+        },
+        grants: [{ equipmentId: rope.id, quantity: 2, contribution: 'additional' as const }],
+      },
+    }
+
+    const reduced = deriveEquipmentDraftEntries(selected, catalogIndex)
+    expect(inventoryQuantityForEquipmentId(reduced, shield.id)).toBe(0)
+    expect(inventoryQuantityForEquipmentId(reduced, leatherArmor.id)).toBe(1)
+    expect(inventoryQuantityForEquipmentId(reduced, rope.id)).toBe(2)
+
+    const declined = deriveEquipmentDraftEntries(
+      {
+        ...selected,
+        equipment: {
+          ...selected.equipment,
+          classPackage: declineClassPackage(),
+        },
+      },
+      catalogIndex,
+    )
+    expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
+    expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
   })
 })

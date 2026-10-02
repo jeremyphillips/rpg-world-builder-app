@@ -32,7 +32,9 @@ import {
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import { type QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
-import { resolveQuickNpcClassChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
+import { resolveQuickNpcSetupChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
+import { readQuickNpcClassPackage } from '../../lib/quick-npc/quick-npc-package-customization.lib'
+import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
 import {
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
   QUICK_NPC_SETUP_CHANGE_LABEL,
@@ -79,6 +81,10 @@ export type QuickNpcAuthoringFormProps = {
   onSetupSummaryEdit: (
     target: SetupSummaryEditTarget,
     equipmentSelections: QuickNpcEquipmentSelection[],
+    packageAuthoring?: {
+      classPackage?: QuickNpcAuthoringTabFormValues['classPackage']
+      startingChoiceOverrides?: QuickNpcAuthoringTabFormValues['startingChoiceOverrides']
+    },
   ) => void
   onCreated: (result: { contentType: 'npcs'; id: string }) => void | Promise<void>
   onPendingChange?: (pending: boolean) => void
@@ -226,9 +232,11 @@ export function QuickNpcAuthoringForm({
 
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
   const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
+  const editingLock = useQuickNpcEditingLock()
 
   const defaultValues = React.useMemo(() => {
-    const reconciled = resolveQuickNpcClassChangeAuthoringState({
+    const reconciled = resolveQuickNpcSetupChangeAuthoringState({
+      classPackage: readQuickNpcClassPackage(initialValues?.classPackage),
       overrides: initialValues?.startingChoiceOverrides ?? {},
       equipmentSelections: initialValues?.equipmentSelections ?? [],
       previous: equipmentBaseline ?? { level: setup.level },
@@ -238,14 +246,16 @@ export function QuickNpcAuthoringForm({
         level: setup.level,
         rulesetId: buildContext.rulesetId,
       },
+      context: buildContext,
     })
     return {
       ...quickNpcAuthoringTabDefaultValues,
       ...initialValues,
       equipmentSelections: reconciled.equipmentSelections,
       startingChoiceOverrides: reconciled.startingChoiceOverrides,
+      classPackage: reconciled.classPackage,
     }
-  }, [buildContext.rulesetId, equipmentBaseline, initialValues, setup])
+  }, [buildContext, equipmentBaseline, initialValues, setup])
 
   const requirementCategoryKey = React.useMemo(() => {
     const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
@@ -308,12 +318,23 @@ export function QuickNpcAuthoringForm({
 
   return (
     <TabbedForm<QuickNpcAuthoringTabFormValues>
+      onBeforeActiveTabChange={() => {
+        if (!editingLock.isLocked) return true
+        editingLock.requestFocus()
+        return false
+      }}
       key={`${setup.npcTemplateId}:${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
       density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
       schema={schema}
       tabs={tabs}
       defaultValues={defaultValues}
-      onSubmit={onSubmit}
+      onSubmit={(values, form) => {
+        if (editingLock.isLocked) {
+          editingLock.requestFocus()
+          return
+        }
+        return onSubmit(values, form)
+      }}
       formError={formError ?? null}
       valueSyncs={valueSyncs}
       stickyChrome={false}
@@ -332,14 +353,23 @@ export function QuickNpcAuthoringForm({
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
             rows={setupSummaryRows}
             changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
-            onNavigate={(targetSetId) =>
+            onNavigate={(targetSetId) => {
+              if (editingLock.isLocked) {
+                editingLock.requestFocus()
+                return
+              }
+              const values = form.getValues()
               onSetupSummaryEdit(
                 targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
                   ? { type: 'external', id: targetSetId }
                   : { type: 'set', id: targetSetId },
-                form.getValues().equipmentSelections ?? [],
+                values.equipmentSelections ?? [],
+                {
+                  classPackage: values.classPackage,
+                  startingChoiceOverrides: values.startingChoiceOverrides ?? {},
+                },
               )
-            }
+            }}
           />
         </>
       )}

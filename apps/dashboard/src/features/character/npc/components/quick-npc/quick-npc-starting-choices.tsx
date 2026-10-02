@@ -20,6 +20,7 @@ import {
   type QuickNpcAdditionalEquipmentOption,
 } from '../../lib/quick-npc/quick-npc-additional-equipment.lib'
 import {
+  QUICK_NPC_CLASS_PACKAGE_FIELD_NAME,
   QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
   type QuickNpcEquipmentSelection,
   QUICK_NPC_REQUIRED_SPELL_FIELD_NAME,
@@ -55,6 +56,11 @@ import {
   resolveStartingChoiceEquipmentCategoryLabels,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
 
+import {
+  QUICK_NPC_CATEGORY_NO_PACKAGE_SUMMARY,
+  readQuickNpcClassPackage,
+} from '../../lib/quick-npc/quick-npc-package-customization.lib'
+import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
 import { QuickNpcStartingChoiceCategorySummary } from './quick-npc-starting-choice-category-summary'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
@@ -109,6 +115,8 @@ export function QuickNpcStartingChoices({
 }: QuickNpcStartingChoicesProps) {
   const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const overrides = form.watch(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME) ?? {}
+  const classPackage = form.watch(QUICK_NPC_CLASS_PACKAGE_FIELD_NAME)
+  const editingLock = useQuickNpcEditingLock()
   const equipmentSelections = (form.watch(QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME) ??
     []) as QuickNpcEquipmentSelection[]
   const requiredSpellIds = form.watch(QUICK_NPC_REQUIRED_SPELL_FIELD_NAME) ?? []
@@ -135,10 +143,19 @@ export function QuickNpcStartingChoices({
         context: buildContext,
         createContext,
         startingChoiceOverrides: overrides,
+        classPackage: readQuickNpcClassPackage(classPackage),
         requiredWeaponIds,
         requiredSpellIds,
       }),
-    [buildContext, createContext, overrides, requiredSpellIds, requiredWeaponIds, setup],
+    [
+      buildContext,
+      classPackage,
+      createContext,
+      overrides,
+      requiredSpellIds,
+      requiredWeaponIds,
+      setup,
+    ],
   )
 
   const baseCategories = groupStartingChoicesByKind(choices)
@@ -240,6 +257,10 @@ export function QuickNpcStartingChoices({
   }
 
   function toggleCategory(kind: StartingChoiceCategory) {
+    if (editingLock.isLocked) {
+      editingLock.requestFocus()
+      return
+    }
     if (expandedKind === kind) {
       finishEdit(kind)
       return
@@ -259,7 +280,7 @@ export function QuickNpcStartingChoices({
     <div className={quickNpcStartingChoicesClasses}>
       {categories.map((category) => {
         const expanded = expandedKind === category.kind
-        const summaryLabels =
+        const equipmentLabels =
           category.kind === 'equipment'
             ? resolveStartingChoiceEquipmentCategoryLabels({
                 context: buildContext,
@@ -268,6 +289,12 @@ export function QuickNpcStartingChoices({
                 equipmentSelections,
                 additionalOptionLabels,
               })
+            : []
+        const summaryLabels =
+          category.kind === 'equipment'
+            ? equipmentLabels.length === 0 && classPackage?.state === 'declined'
+              ? [QUICK_NPC_CATEGORY_NO_PACKAGE_SUMMARY]
+              : equipmentLabels
             : resolveStartingChoiceCategoryLabels({
                 context: buildContext,
                 choices,

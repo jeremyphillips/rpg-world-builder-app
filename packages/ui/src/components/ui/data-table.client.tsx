@@ -494,6 +494,8 @@ export interface RowActionsMenuProps {
   triggerLabel: string
   /** Ghost icon trigger for table rows; outline icon for page overflow menus. */
   triggerVariant?: 'ghost-icon' | 'outline-icon'
+  /** Compact cards use the icon-xs trigger so the header row stays aligned. */
+  triggerSize?: 'default' | 'compact'
   /** Disables the trigger while a row action mutation is pending. */
   disabled?: boolean
   /** Dropdown content width utility classes. */
@@ -537,11 +539,13 @@ export function RowActionsMenu({
   footer,
   triggerLabel,
   triggerVariant = 'ghost-icon',
+  triggerSize = 'default',
   disabled = false,
   contentClassName = 'w-48',
   triggerRef,
 }: RowActionsMenuProps) {
-  const triggerClassName = triggerVariant === 'outline-icon' ? undefined : 'size-8 p-0'
+  const triggerClassName =
+    triggerSize === 'compact' || triggerVariant === 'outline-icon' ? undefined : 'size-8 p-0'
 
   return (
     <DropdownMenu>
@@ -549,7 +553,8 @@ export function RowActionsMenu({
         <Button
           ref={triggerRef}
           variant={triggerVariant === 'outline-icon' ? 'outline' : 'ghost'}
-          size="sm"
+          size={triggerSize === 'compact' ? 'icon-xs' : 'sm'}
+          density={triggerSize === 'compact' ? 'compact' : 'default'}
           className={triggerClassName}
           aria-label={triggerLabel}
           disabled={disabled}

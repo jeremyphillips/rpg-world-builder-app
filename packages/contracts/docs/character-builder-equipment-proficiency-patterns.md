@@ -92,7 +92,9 @@ starting equipment on one instrument).
 }
 ```
 
-**Runtime:** nested equipment ChoiceSet via `nestedStartingEquipmentChoiceSetId`.
+**Runtime:** nested equipment ChoiceSet via `nestedStartingEquipmentChoiceSetId` (`starting-equipment:{optionId}:{itemIndex}`). The entry `id` is the quantity-override identity; `choose` is locked to `1`.
+
+Class authoring assigns a stable `id` per contribution (`crypto.randomUUID()` on new rows) and preserves it across reorder. Ids are unique within a package option. Duplicating a class regenerates them. A multi-pick is several choice entries, each with its own id.
 
 ## Authoring UX
 

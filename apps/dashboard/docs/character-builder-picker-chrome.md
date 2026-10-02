@@ -22,7 +22,13 @@ profile, into ordered clauses (`requirement`, compatibility caution, `recommenda
 - **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
   the combobox option). Inline copy shows two clauses. The row title keeps the rest.
   The row shows the resolved owned quantity as `×N` on the heading line. That
-  figure is the authoritative total, not the persisted manual grant. Quick NPC
+  figure is the authoritative total, not the persisted manual grant and not the
+  package's retained quantity. Package customization edits how many of an
+  authored package entry the NPC keeps (`0` through the authored quantity).
+  Additional Equipment shows `+N` for the manual add on top of that retained
+  quantity. With a package javelin reduced to 6 and a manual `+2`, the picker
+  total is `×8`. With the package entry removed and the same manual add, the
+  picker total is `×2`. Quick NPC
   passes atomic `EquipmentOptionSupplyClause` values into the row resolver and
   leaves manual contributions out of that list. `formatEquipmentSupplySourceLabel`
   still describes a manual source as “Added manually”; the picker simply does not

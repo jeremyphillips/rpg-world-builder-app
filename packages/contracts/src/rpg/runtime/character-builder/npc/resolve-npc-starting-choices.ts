@@ -17,6 +17,8 @@ import {
 } from '../../character/format-selection-source-label'
 import { CHARACTER_EQUIPMENT_INVENTORY_BUCKETS } from '../../character/sheet/equipment-inventory'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
+import { seedDraftClassPackage } from '../resolvers/equipment/class-package-choice'
+import type { ClassPackageChoice } from '../resolvers/equipment/class-package-choice'
 import { inventoryContainsEquipmentId } from '../resolvers/equipment/derive-equipment-draft-entries'
 import type { RecommendationSourceRef } from '../recommendation'
 import {
@@ -440,14 +442,22 @@ export function resolveNpcStartingChoices(args: {
    */
   heritageOptionId?: string
   startingChoiceOverrides?: Record<string, readonly string[]>
+  /**
+   * Caller-owned package decision. Unresolved leaves the automatic fill free
+   * to choose. Declined and explicit selections are seeded before that fill.
+   */
+  classPackage?: ClassPackageChoice
   requiredWeaponIds?: readonly string[]
   requiredSpellIds?: readonly string[]
   preferences?: AutomaticNpcBuildPreferences
 }): NpcStartingChoices {
-  const baseDraft = withHeritageOption(
-    seedAutomaticChoiceDraft(args.seed, args.context, args.preferences),
-    args.seed.speciesId,
-    args.heritageOptionId,
+  const baseDraft = seedDraftClassPackage(
+    withHeritageOption(
+      seedAutomaticChoiceDraft(args.seed, args.context, args.preferences),
+      args.seed.speciesId,
+      args.heritageOptionId,
+    ),
+    args.classPackage,
   )
   const graph = resolveAutomaticChoiceSelections({
     draft: baseDraft,

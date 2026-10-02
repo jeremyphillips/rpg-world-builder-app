@@ -465,6 +465,22 @@ Each class starting-equipment entry is one independently quantifiable contributi
 
 Override identity is therefore the authored entry `id`, unique within its package option. Identity for a contribution is `(classId, packageId, entryId)`. The shared equipment-grant choice schema still allows `choose >= 1` for other content.
 
+## Class package choice
+
+`draft.equipment.classPackage` is the Quick NPC package decision. The builder still fills the top-level starting-equipment ChoiceSet; Quick NPC seeds this union before that fill.
+
+| State                              | Meaning                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------- |
+| `unresolved`                       | No caller decision. Automatic fill may choose a package.                        |
+| `unavailable`                      | This class has no package to choose here.                                       |
+| `declined`                         | The class package contributes nothing. Grants, magic items, and purchases stay. |
+| `selected` + `intent: 'automatic'` | Recommendation. Empty `entryQuantities`. The fill may replace the package.      |
+| `selected` + `intent: 'explicit'`  | Caller pinned the package. `entryQuantities` may reduce authored quantities.    |
+
+A missing override key means the authored quantity. `0` drops the contribution. A value above the authored quantity clamps. Writing the authored quantity deletes the key. `isClassPackageCustomized` is true only for an explicit selection with at least one override.
+
+Nested pool ChoiceSets are still `starting-equipment:{optionId}:{itemIndex}`. A choice entry whose effective quantity is `0` does not emit a nested set. Declined and unavailable omit the starting-equipment ChoiceSets entirely.
+
 ## Related helpers
 
 | Helper                                | Location                                                   | Purpose                                                                                                                                         |

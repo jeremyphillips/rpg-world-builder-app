@@ -2,6 +2,7 @@ import type { StartingEquipmentOption } from '../../../../content/starting-equip
 import { addCustomRefinementIssue } from '../../../../../lib/add-custom-refinement-issue'
 import { z } from 'zod'
 
+import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuilderDraft, CharacterBuilderDraftEquipment } from '../../draft/draft'
 
 export const CLASS_PACKAGE_INTENTS = ['automatic', 'explicit'] as const
@@ -155,6 +156,39 @@ export function equipmentWithClassPackage(
     skipped: equipment?.skipped,
     classPackage,
   }
+}
+
+/**
+ * Applies a caller-owned package decision before automatic fill.
+ * Unresolved leaves the fill free to choose. Declined and unavailable omit a
+ * package selection. Explicit and automatic selections are written so a later
+ * fill treats the package ChoiceSet as already satisfied.
+ */
+export function seedDraftClassPackage(
+  draft: CharacterBuilderDraft,
+  classPackage: ClassPackageChoice | undefined,
+): CharacterBuilderDraft {
+  if (!classPackage || classPackage.state === 'unresolved') return draft
+
+  const next = draftWithClassPackage(draft, classPackage)
+  const classId = draft.class.classId
+  if (!classId) return next
+
+  if (classPackage.state === 'selected') {
+    return {
+      ...next,
+      choiceSelections: {
+        ...next.choiceSelections,
+        [buildChoiceSetId('class', classId, 'starting-equipment')]: [classPackage.packageId],
+      },
+    }
+  }
+
+  if (classPackage.state !== 'declined') return next
+
+  const choiceSelections = { ...next.choiceSelections }
+  delete choiceSelections[buildChoiceSetId('class', classId, 'starting-equipment')]
+  return { ...next, choiceSelections }
 }
 
 export function draftWithClassPackage(

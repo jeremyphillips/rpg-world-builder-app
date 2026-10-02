@@ -9,6 +9,7 @@ import {
   addCustomRefinementIssue,
   alignmentSchema,
   characterBuilderValidationMessages,
+  classPackageChoiceSchema,
   formatFieldMessage,
   genderSchema,
   getAlignmentLabel,
@@ -51,6 +52,7 @@ export const quickNpcEquipmentSelectionSchema = z.object({
 export type QuickNpcEquipmentSelection = z.infer<typeof quickNpcEquipmentSelectionSchema>
 export const QUICK_NPC_REQUIRED_SPELL_FIELD_NAME = 'requiredSpellIds'
 export const QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME = 'startingChoiceOverrides'
+export const QUICK_NPC_CLASS_PACKAGE_FIELD_NAME = 'classPackage'
 
 export const QUICK_NPC_STARTING_CHOICES_TAB_LABEL = 'Starting choices' as const
 
@@ -222,6 +224,7 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
     equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
+    classPackage: classPackageChoiceSchema.default({ state: 'unresolved' }),
   })
 
   return z.intersection(quickNpcSetupSchema(maxLevel, minLevel), authoringFields)
@@ -245,6 +248,7 @@ export function quickNpcAuthoringTabSchema() {
     equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
+    classPackage: classPackageChoiceSchema.default({ state: 'unresolved' }),
     [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: z.boolean(),
   })
 }
@@ -267,6 +271,7 @@ export const quickNpcAuthoringTabDefaultValues = {
   equipmentSelections: [],
   requiredSpellIds: [],
   startingChoiceOverrides: {},
+  classPackage: { state: 'unresolved' },
   [QUICK_NPC_GENERATE_NARRATIVE_FIELD_NAME]: true,
 } satisfies QuickNpcAuthoringTabFormValues
 

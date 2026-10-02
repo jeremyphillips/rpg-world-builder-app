@@ -205,6 +205,7 @@ describe('buildQuickNpcDetailsFields', () => {
       equipmentSelections: [],
       requiredSpellIds: [],
       startingChoiceOverrides: {},
+      classPackage: { state: 'unresolved' },
       generateNarrativeOnCreate: true,
     })
   })
@@ -260,6 +261,7 @@ describe('buildQuickNpcTabs validation wiring', () => {
           equipmentSelections: [],
           requiredSpellIds: [],
           startingChoiceOverrides: {},
+          classPackage: { state: 'unresolved' },
           generateNarrativeOnCreate: true,
         },
       ),

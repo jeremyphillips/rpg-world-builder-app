@@ -12,6 +12,7 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
+  type ClassPackageChoice,
   type CreateNpcRequestInput,
 } from '@rpg/contracts'
 
@@ -63,6 +64,7 @@ export type QuickNpcPrepareCreateArgs = {
   constraints?: AutomaticNpcBuildConstraints
   preferences?: AutomaticNpcBuildPreferences
   allowanceSelections?: Record<string, readonly string[]>
+  classPackage?: ClassPackageChoice
   manualEquipmentGrantIds?: readonly string[]
   /**
    * Selected starting equipment to materialize onto `draft.equipment.grants`.
@@ -110,6 +112,7 @@ export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpc
     ...(args.constraints ? { constraints: args.constraints } : {}),
     ...(args.preferences ? { preferences: args.preferences } : {}),
     ...(args.allowanceSelections ? { allowanceSelections: args.allowanceSelections } : {}),
+    ...(args.classPackage ? { classPackage: args.classPackage } : {}),
     ...(args.manualEquipmentGrantIds
       ? { manualEquipmentGrantIds: args.manualEquipmentGrantIds }
       : {}),

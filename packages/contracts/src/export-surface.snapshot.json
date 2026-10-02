@@ -2956,6 +2956,7 @@
     "scaledDiceFormulaSchema",
     "scaledDiceRollAverage",
     "seedAutomaticChoiceDraft",
+    "seedDraftClassPackage",
     "selectCampaignInputSchema",
     "selectClassPackage",
     "selectDisplaySourceForRole",

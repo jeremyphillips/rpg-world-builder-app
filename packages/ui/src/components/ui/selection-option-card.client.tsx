@@ -12,6 +12,7 @@ import {
 } from './selection-option-card-anatomy.client'
 import type { EyebrowVariantProps } from './eyebrow.variants'
 import {
+  optionCardEmbeddedSlotVariants,
   selectionOptionCardBodyVariants,
   selectionOptionCardHeaderActionClasses,
   selectionOptionCardHeaderActionSlotVariants,
@@ -40,8 +41,16 @@ export type SelectionOptionCardProps = {
   headerEyebrowSize?: EyebrowVariantProps['size']
   headerEndSlot?: ReactNode
   label: string
+  /** Inline content after the title. Callers pass `SelectionOptionCardTitleMeta`. */
+  titleAdornment?: ReactNode
   description?: string
   summaryLines?: string[]
+  /**
+   * Nested region below the description. The card owns the chrome via
+   * `optionCardEmbeddedSlotVariants`.
+   */
+  embedded?: ReactNode
+  embeddedTone?: 'divider' | 'panel'
   className?: string
 }
 
@@ -122,8 +131,11 @@ export function SelectionOptionCard({
   headerEyebrowSize,
   headerEndSlot,
   label,
+  titleAdornment,
   description,
   summaryLines,
+  embedded,
+  embeddedTone = 'divider',
   className,
 }: SelectionOptionCardProps) {
   const Comp = asChild ? Slot : 'div'
@@ -148,8 +160,16 @@ export function SelectionOptionCard({
           density={density}
           headerRow={headerRow}
           label={label}
+          titleAdornment={titleAdornment}
           description={description}
           summaryLines={summaryLines}
+          embedded={
+            embedded ? (
+              <div className={optionCardEmbeddedSlotVariants({ density, tone: embeddedTone })}>
+                {embedded}
+              </div>
+            ) : undefined
+          }
           useSummaryTitle
         />
       </div>

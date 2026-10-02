@@ -9,6 +9,10 @@ import type { ChoiceSet } from '../choice-set'
 import type { CharacterClass } from '../../../content/classes/class'
 import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '../draft/draft'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
+import {
+  seedDraftClassPackage,
+  type ClassPackageChoice,
+} from '../resolvers/equipment/class-package-choice'
 import { cloneEquipmentDraftChannel } from '../resolvers/equipment/equipment-draft-base'
 import {
   formatMagicItemGrantIncompleteLabel,
@@ -84,6 +88,8 @@ export type ResolveAutomaticNpcBuildArgs = {
    * Seeded before top-up so preference merging cannot replace or extend them.
    */
   allowanceSelections?: Record<string, readonly string[]>
+  /** Caller-owned package decision seeded before automatic choice fill. */
+  classPackage?: ClassPackageChoice
   /** Non-weapon equipment ids granted after automatic fill (armor, gear, magic items, …). */
   manualEquipmentGrantIds?: readonly string[]
   context: CharacterBuildContext
@@ -314,6 +320,7 @@ export function resolveAutomaticNpcBuild({
   constraints,
   preferences,
   allowanceSelections,
+  classPackage,
   manualEquipmentGrantIds,
   context,
 }: ResolveAutomaticNpcBuildArgs): AutomaticNpcBuildResult {
@@ -322,7 +329,10 @@ export function resolveAutomaticNpcBuild({
 
   const normalizedConstraints = normalizeAutomaticNpcBuildConstraints(constraints)
 
-  let draft = seedAutomaticChoiceDraft(seed, context, preferences)
+  let draft = seedDraftClassPackage(
+    seedAutomaticChoiceDraft(seed, context, preferences),
+    classPackage,
+  )
   if (allowanceSelections) {
     const choiceSelections = { ...draft.choiceSelections }
     for (const [choiceSetId, selectedIds] of Object.entries(allowanceSelections)) {

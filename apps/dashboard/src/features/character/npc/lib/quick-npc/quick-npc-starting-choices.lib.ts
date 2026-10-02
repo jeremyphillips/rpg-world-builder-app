@@ -12,6 +12,7 @@ import {
   resolveProficiencyChoiceSetPresentation,
   resolveProficiencyPickerItems,
   type CharacterBuildContext,
+  type ClassPackageChoice,
   type ChoiceSet,
   type NpcStartingChoices,
   type RecommendationSourceRef,
@@ -198,6 +199,7 @@ export function resolveQuickNpcStartingChoices(args: {
   context: CharacterBuildContext
   createContext: QuickNpcCreateContext
   startingChoiceOverrides?: Record<string, readonly string[]>
+  classPackage?: ClassPackageChoice
   requiredWeaponIds?: readonly string[]
   requiredSpellIds?: readonly string[]
 }): NpcStartingChoices {
@@ -212,6 +214,7 @@ export function resolveQuickNpcStartingChoices(args: {
       ...(args.setup.npcTemplateId ? { npcTemplateId: args.setup.npcTemplateId } : {}),
     },
     startingChoiceOverrides: args.startingChoiceOverrides,
+    ...(args.classPackage ? { classPackage: args.classPackage } : {}),
     requiredWeaponIds: args.requiredWeaponIds,
     requiredSpellIds: args.requiredSpellIds,
     preferences,

@@ -225,6 +225,10 @@ describe('QuickNpcAuthoringForm', () => {
         id: 'quickNpcBuild',
       },
       expect.any(Array),
+      {
+        classPackage: { state: 'unresolved' },
+        startingChoiceOverrides: {},
+      },
     )
     expect(createNpcMock).not.toHaveBeenCalled()
   })

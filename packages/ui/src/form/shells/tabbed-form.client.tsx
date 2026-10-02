@@ -126,6 +126,11 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
    * Preview trigger below `xl`).
    */
   tabRowTrailing?: React.ReactNode
+  /**
+   * Return false to keep the current tab. Used by leave guards that must focus
+   * an in-panel action instead of navigating.
+   */
+  onBeforeActiveTabChange?: (nextTabId: string) => boolean
 }
 
 function buildExternalFooterContent(
@@ -178,10 +183,18 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   publishPresentationEnabled,
   aside,
   tabRowTrailing,
+  onBeforeActiveTabChange,
 }: TabbedFormProps<TFieldValues>) {
   const generatedFormId = React.useId()
   const formId = id ?? generatedFormId
-  const [activeTabId, setActiveTabId] = React.useState(tabs[0]?.id ?? '')
+  const [activeTabId, setActiveTabIdState] = React.useState(tabs[0]?.id ?? '')
+  const setActiveTabId = React.useCallback(
+    (nextTabId: string) => {
+      if (onBeforeActiveTabChange && !onBeforeActiveTabChange(nextTabId)) return
+      setActiveTabIdState(nextTabId)
+    },
+    [onBeforeActiveTabChange],
+  )
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = React.useState(false)
   const markSubmitAttempted = React.useCallback(() => {
     setHasAttemptedSubmit(true)

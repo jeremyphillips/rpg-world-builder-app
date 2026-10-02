@@ -406,6 +406,7 @@ export {
 } from './components/ui/selection-option-card.client'
 export {
   SelectionOptionCardHeaderEyebrow,
+  SelectionOptionCardTitleMeta,
   resolveSelectionOptionCardEyebrowSize,
   type SelectionOptionCardHeaderEyebrowProps,
 } from './components/ui/selection-option-card-anatomy.client'

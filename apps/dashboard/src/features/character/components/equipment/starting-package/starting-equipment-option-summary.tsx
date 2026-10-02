@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
 import {
   SelectionOptionCard,
@@ -16,6 +18,12 @@ export type StartingEquipmentOptionSummaryCardProps = {
   density: SelectionOptionCardDensity
   onChangePackage: () => void
   showChangePackage?: boolean
+  titleAdornment?: ReactNode
+  /** Replaces the default Change package action when provided. */
+  headerEndSlot?: ReactNode
+  description?: string
+  embedded?: ReactNode
+  embeddedTone?: 'divider' | 'panel'
 }
 
 export function StartingEquipmentOptionSummaryCard({
@@ -23,24 +31,32 @@ export function StartingEquipmentOptionSummaryCard({
   density,
   onChangePackage,
   showChangePackage = true,
+  titleAdornment,
+  headerEndSlot,
+  description,
+  embedded,
+  embeddedTone,
 }: StartingEquipmentOptionSummaryCardProps) {
+  const defaultHeaderEndSlot = showChangePackage ? (
+    <SelectionOptionCardHeaderAction
+      label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
+      density={density}
+      onClick={onChangePackage}
+    />
+  ) : undefined
+
   return (
     <SelectionOptionCard
       selected
       density={density}
       headerEyebrow={EQUIPMENT_SELECTED_PACKAGE_EYEBROW}
-      headerEndSlot={
-        showChangePackage ? (
-          <SelectionOptionCardHeaderAction
-            label={EQUIPMENT_CHANGE_PACKAGE_LABEL}
-            density={density}
-            onClick={onChangePackage}
-          />
-        ) : undefined
-      }
+      headerEndSlot={headerEndSlot === undefined ? defaultHeaderEndSlot : headerEndSlot}
       label={summary.label}
-      description={summary.description}
+      titleAdornment={titleAdornment}
+      description={description ?? summary.description}
       summaryLines={startingEquipmentOptionFundingSummaryLines(summary)}
+      embedded={embedded}
+      {...(embeddedTone ? { embeddedTone } : {})}
     />
   )
 }

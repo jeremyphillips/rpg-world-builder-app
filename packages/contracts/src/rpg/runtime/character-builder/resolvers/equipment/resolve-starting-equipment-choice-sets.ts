@@ -9,6 +9,7 @@ import {
 import { buildChoiceSetId, type ChoiceSet } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { readClassPackageChoice, resolvePackageEntryQuantity } from './class-package-choice'
 import { resolveEquipmentPoolChoiceOptions } from './equipment-pool-choice-options'
 
 export function startingEquipmentChoiceSetId(classId: string): string {
@@ -63,6 +64,9 @@ export function resolveStartingEquipmentChoiceSets(
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   if (!startingEquipment) return []
 
+  const packageChoice = readClassPackageChoice(draft.equipment)
+  if (packageChoice.state === 'declined' || packageChoice.state === 'unavailable') return []
+
   const choiceSets: ChoiceSet[] = [
     {
       id: startingEquipmentChoiceSetId(characterClass.id),
@@ -89,8 +93,12 @@ export function resolveStartingEquipmentChoiceSets(
   )
   if (!selectedOption) return choiceSets
 
+  const entryQuantities =
+    packageChoice.state === 'selected' ? packageChoice.overrides.entryQuantities : undefined
+
   for (const [itemIndex, item] of selectedOption.items.entries()) {
     if (item.kind !== 'choice') continue
+    if (resolvePackageEntryQuantity(1, item.id, entryQuantities) <= 0) continue
     choiceSets.push(
       nestedChoiceSetForItem(characterClass, selectedOptionId, item, itemIndex, catalogIndex),
     )

@@ -70,6 +70,7 @@ export function projectQuickNpcDetailPreview({
       context: buildContext,
       seed,
       startingChoiceOverrides: merged.startingChoiceOverrides,
+      classPackage: merged.classPackage,
       requiredWeaponIds,
       requiredSpellIds: merged.requiredSpellIds,
       preferences,
@@ -80,6 +81,7 @@ export function projectQuickNpcDetailPreview({
       context: buildContext,
       preferences,
       allowanceSelections: npcStartingChoiceAllowanceSelections(startingChoices),
+      classPackage: merged.classPackage,
       ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
       ...(npcStartingChoiceManualConstraints(startingChoices)
         ? { constraints: npcStartingChoiceManualConstraints(startingChoices) }

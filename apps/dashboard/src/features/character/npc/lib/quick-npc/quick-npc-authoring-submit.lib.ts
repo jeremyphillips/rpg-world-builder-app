@@ -86,6 +86,7 @@ export function assembleQuickNpcPrepareCreateArgs(
     context: args.buildContext,
     seed: buildQuickNpcSeed(values),
     startingChoiceOverrides: values.startingChoiceOverrides,
+    classPackage: values.classPackage,
     requiredWeaponIds,
     requiredSpellIds: values.requiredSpellIds,
     preferences,
@@ -104,6 +105,7 @@ export function assembleQuickNpcPrepareCreateArgs(
     ...(manualEquipmentGrantIds.length > 0 ? { manualEquipmentGrantIds } : {}),
     ...(startingEquipmentGrants.length > 0 ? { startingEquipmentGrants } : {}),
     ...(manualConstraints ? { constraints: manualConstraints } : {}),
+    classPackage: values.classPackage,
     ...(membership ? { membership } : {}),
   }
 }

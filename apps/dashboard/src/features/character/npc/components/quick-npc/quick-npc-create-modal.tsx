@@ -35,6 +35,7 @@ import {
   QuickNpcAuthoringForm,
   type QuickNpcCreateFormOrganization,
 } from './quick-npc-authoring-form'
+import { QuickNpcEditingLockProvider } from './quick-npc-editing-lock'
 import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase'
 import { QuickNpcCreateModalSetupFooter } from './quick-npc-create-modal-setup-footer'
 
@@ -243,23 +244,42 @@ function QuickNpcCreateModalSession({
   }, [])
 
   const handleSetupSummaryEdit = React.useCallback(
-    (target: SetupSummaryEditTarget, equipmentSelections: QuickNpcEquipmentSelection[]) => {
+    (
+      target: SetupSummaryEditTarget,
+      equipmentSelections: QuickNpcEquipmentSelection[],
+      packageAuthoring?: {
+        classPackage?: QuickNpcAuthoringTabFormValues['classPackage']
+        startingChoiceOverrides?: QuickNpcAuthoringTabFormValues['startingChoiceOverrides']
+      },
+    ) => {
       pendingSetupSummaryEditRef.current = target
-      setState((current) => ({
-        ...current,
-        phase: 'setup',
-        authoringValues: {
-          ...current.authoringValues,
-          equipmentSelections,
-          requiredSpellIds: [],
-          startingChoiceOverrides: {},
-        },
-        equipmentBaseline: {
-          templateId: current.setupValues.npcTemplateId,
-          classId: current.setupValues.classId,
-          level: current.setupValues.level,
-        },
-      }))
+      setState((current) => {
+        const classId = current.setupValues.classId
+        const nestedMarker = classId ? `class:${classId}:starting-equipment:` : undefined
+        const startingChoiceOverrides = Object.fromEntries(
+          Object.entries(packageAuthoring?.startingChoiceOverrides ?? {}).filter(([choiceSetId]) =>
+            nestedMarker ? choiceSetId.includes(nestedMarker) : false,
+          ),
+        )
+        return {
+          ...current,
+          phase: 'setup',
+          authoringValues: {
+            ...current.authoringValues,
+            equipmentSelections,
+            requiredSpellIds: [],
+            startingChoiceOverrides,
+            ...(packageAuthoring?.classPackage
+              ? { classPackage: packageAuthoring.classPackage }
+              : {}),
+          },
+          equipmentBaseline: {
+            templateId: current.setupValues.npcTemplateId,
+            classId: current.setupValues.classId,
+            level: current.setupValues.level,
+          },
+        }
+      })
     },
     [],
   )
@@ -348,21 +368,23 @@ function QuickNpcCreateModalSession({
             onSetupValueChange={handleSetupValueChange}
           />
         ) : (
-          <QuickNpcAuthoringForm
-            key={`${state.setupValues.npcTemplateId ?? ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
-            campaignId={campaignId}
-            buildContext={buildContext}
-            createContext={context}
-            setup={state.setupValues}
-            initialValues={state.authoringValues}
-            equipmentBaseline={state.equipmentBaseline}
-            onCancel={requestCancel}
-            onChangeSetup={handleChangeSetup}
-            onSetupSummaryEdit={handleSetupSummaryEdit}
-            onCreated={handleAuthoringCreated}
-            onPendingChange={setAuthoringPending}
-            previewButtonRef={previewNpcButtonRef}
-          />
+          <QuickNpcEditingLockProvider>
+            <QuickNpcAuthoringForm
+              key={`${state.setupValues.npcTemplateId ?? ''}:${state.setupValues.speciesId}:${state.setupValues.classId}:${state.setupValues.level}`}
+              campaignId={campaignId}
+              buildContext={buildContext}
+              createContext={context}
+              setup={state.setupValues}
+              initialValues={state.authoringValues}
+              equipmentBaseline={state.equipmentBaseline}
+              onCancel={requestCancel}
+              onChangeSetup={handleChangeSetup}
+              onSetupSummaryEdit={handleSetupSummaryEdit}
+              onCreated={handleAuthoringCreated}
+              onPendingChange={setAuthoringPending}
+              previewButtonRef={previewNpcButtonRef}
+            />
+          </QuickNpcEditingLockProvider>
         )}
       </CreateModalShell>
     </FormShellFooterScope>

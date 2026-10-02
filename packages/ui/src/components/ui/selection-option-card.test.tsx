@@ -14,6 +14,28 @@ import {
 } from './selection-option-card.variants'
 
 describe('SelectionOptionCard', () => {
+  it('renders title adornment and embedded content only when provided', () => {
+    const { rerender } = render(
+      <SelectionOptionCard selected label="Heavy Armor" description="Chain Mail." />,
+    )
+
+    expect(screen.queryByText('Customized')).not.toBeInTheDocument()
+    expect(screen.queryByText('Customize Heavy Armor')).not.toBeInTheDocument()
+
+    rerender(
+      <SelectionOptionCard
+        selected
+        label="Heavy Armor"
+        description="Chain Mail."
+        titleAdornment={<span>Customized</span>}
+        embedded={<p>Customize Heavy Armor</p>}
+      />,
+    )
+
+    expect(screen.getByText('Customized')).toBeInTheDocument()
+    expect(screen.getByText('Customize Heavy Armor')).toBeInTheDocument()
+  })
+
   it('renders header slots, label, description, and summary lines', () => {
     render(
       <SelectionOptionCard

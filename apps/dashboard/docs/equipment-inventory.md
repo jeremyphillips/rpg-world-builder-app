@@ -26,15 +26,26 @@ option is chosen.
 - **Customize** and **Change option** text links sit above the package card.
   Customize swaps the card body for the starting-gold conversion editor until
   cancel or commit.
-- Package rows do not write `removedPackageItemKeys`; legacy keys are still read
-  for session migration.
+- `draft.equipment.classPackage` records the package decision: `unresolved`,
+  `unavailable`, `declined`, or `selected` with `intent: 'automatic' | 'explicit'`.
+  Explicit selections may store sparse `entryQuantities` overrides. A missing key
+  is the authored quantity; `0` drops that contribution.
+- `editedSincePackageSelection` (formerly `customized`) is the builder signal that
+  inventory changed after the current package selection. Quick NPC customization
+  is `entryQuantities`, not this flag.
+- `equipment.skipped` is builder-only. It short-circuits starting-equipment
+  assembly. Quick NPC "no package" is `classPackage.state === 'declined'` (or
+  `unavailable` when the class has nothing to offer) and still assembles grants,
+  magic items, and purchases.
+- The top-level package ChoiceSet remains the builder's selection record. Quick
+  NPC seeds `classPackage` before automatic fill so a declined or explicit
+  package is not replaced.
 
 Conversion commit (`buildStartingPackageConversionPatch` in contracts):
 
 1. Switches to the gold starting-equipment option.
-2. Clears `removedPackageItemKeys`.
-3. Creates purchases with `origin: 'packageConversion'`.
-4. Merges **same-origin** stackable rows only (v1 does not merge across
+2. Creates purchases with `origin: 'packageConversion'`.
+3. Merges **same-origin** stackable rows only (v1 does not merge across
    `origin`).
 
 ## Purchased cart (quantity surface)

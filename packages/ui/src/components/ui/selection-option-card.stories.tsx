@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Button } from './button.client'
 import { RadioGroup } from './radio-group.client'
 import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
+import { SelectionOptionCardTitleMeta } from './selection-option-card-anatomy.client'
 import {
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
@@ -29,6 +30,25 @@ export const SelectedSummary: Story = {
     headerEndSlot: (
       <SelectionOptionCardHeaderAction label="Change package" onClick={() => undefined} />
     ),
+  },
+}
+
+export const SelectedWithTitleAdornment: Story = {
+  args: {
+    headerEyebrow: 'Selected package',
+    label: 'Heavy Armor',
+    titleAdornment: <SelectionOptionCardTitleMeta>Customized</SelectionOptionCardTitleMeta>,
+    description: 'Chain Mail, Greatsword, 6 Javelins, and 4 GP.',
+  },
+}
+
+export const SelectedWithEmbedded: Story = {
+  args: {
+    headerEyebrow: 'Selected package',
+    label: 'Heavy Armor',
+    description: 'Chain Mail, Greatsword, and 8 Javelins.',
+    embeddedTone: 'panel',
+    embedded: <p>Customize Heavy Armor</p>,
   },
 }
 
