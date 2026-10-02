@@ -13,7 +13,7 @@ import { projectCharacterDraftDetailSource } from '../../../lib/display/characte
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import { resolveQuickNpcCreateOrganization } from './quick-npc-create-context'
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
-import { splitQuickNpcAdditionalEquipmentIds } from './quick-npc-additional-equipment.lib'
+import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
 import { usesQuickNpcClassEquipment } from './quick-npc-equipment-selections.lib'
 import { materializeStartingEquipmentGrants } from './quick-npc-create'
 import {
@@ -60,17 +60,12 @@ export function projectQuickNpcDetailPreview({
 
   try {
     const classed = usesQuickNpcClassEquipment(merged.classId, merged.level)
-    const { requiredWeaponIds, manualEquipmentGrantIds } = splitQuickNpcAdditionalEquipmentIds({
-      equipmentSelections: merged.equipmentSelections,
-      catalogIndex,
-      constrainManualWeapons: classed,
-    })
-    const startingEquipmentGrants = classed
-      ? []
-      : merged.equipmentSelections.map((row) => ({
-          equipmentId: row.equipmentId,
-          quantity: row.quantity,
-        }))
+    const { requiredWeaponIds, manualEquipmentGrantIds, startingEquipmentGrants } =
+      projectQuickNpcEquipmentAllocations({
+        equipmentSelections: merged.equipmentSelections,
+        catalogIndex,
+        classed,
+      })
     const startingChoices = resolveNpcStartingChoices({
       context: buildContext,
       seed,

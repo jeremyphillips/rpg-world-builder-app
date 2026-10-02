@@ -8,6 +8,9 @@ export {
 export {
   CreateSetupFooter,
   deriveCreateSetupFooterState,
+  resolveCreateSetupFooterActions,
+  type CreateSetupFooterAction,
+  type CreateSetupFooterActionVisibility,
   type CreateSetupFooterProps,
   type CreateSetupFooterState,
 } from './create-setup-footer'
@@ -19,24 +22,33 @@ export {
 } from './create-setup.constants'
 
 export {
-  isCreateSetupSummaryEligibleSet,
   resolveCreateSetupChoiceValueLabel,
-  resolveCreateSetupPartialSummaryRows,
-  resolveCreateSetupPartialSummarySegments,
   resolveCreateSetupSummaryGroupDisplayEyebrow,
   resolveCreateSetupSummaryGroupEyebrow,
   resolveCreateSetupSummaryGroupMemberIds,
   resolveCreateSetupSummaryGroups,
   resolveCreateSetupSummaryRowLabel,
-  type CreateSetupGroupedChoiceRow,
-  type CreateSetupPartialSummarySegment,
 } from './create-setup-completed-choice-groups.lib'
+
+export {
+  createChoiceSetSummaryDefinitions,
+  resolveSetupSummaryCards,
+  resolveSetupSummaryRows,
+  type CreateSetupSummaryDefinition,
+  type SetupSummaryCard,
+  type SetupSummaryRow,
+} from './resolve-setup-summary-rows.lib'
+
+export { SetupSummaryRows, type SetupSummaryRowsProps } from './setup-summary-rows'
 
 export {
   isCreateSetupChoiceComplete,
   notifyCreateSetupCompletionTransition,
+  resolveCreateSetupActiveSequenceSetId,
   resolveCreateSetupActiveSetId,
+  resolveCreateSetupIsFinalSet,
   resolveCreateSetupIsComplete,
+  resolveCreateSetupSequenceSetIds,
   resolveCreateSetupPendingExplicitDecisions,
   resolveCreateSetupSetExpanded,
   resolveCreateSetupSetIdsToInvalidate,
@@ -58,7 +70,10 @@ export { EyebrowActionHeader, type EyebrowActionHeaderProps } from './eyebrow-ac
 
 export { SetupAttributeRow, type SetupAttributeRowProps } from './setup-attribute-row'
 
-export { mapSetupSummaryRowModelsToProps } from './setup-summary-row-models'
+export {
+  mapSetupSummaryRowModelsToProps,
+  mapSetupSummaryRowsToSelectionProps,
+} from './setup-summary-row-models'
 
 export type {
   CreateSetupChoiceSet,

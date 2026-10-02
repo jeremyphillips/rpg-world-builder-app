@@ -5,7 +5,6 @@ import { toast, usePendingAwareOpenChange } from '@rpg/ui'
 import { FormShellFooterScope, FormShellFooterSlot } from '@rpg/ui/form'
 
 import {
-  CreateSetupFooter,
   notifyCreateSetupValueChangeCompletion,
   useCreateSetupSequence,
   type SetupSummaryEditTarget,
@@ -37,8 +36,7 @@ import {
   type QuickNpcCreateFormOrganization,
 } from './quick-npc-authoring-form'
 import { QuickNpcCreateSetupPhase } from './quick-npc-create-setup-phase'
-import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
-import { quickNpcCreateFooterLayoutClasses } from './quick-npc-create-footer.variants'
+import { QuickNpcCreateModalSetupFooter } from './quick-npc-create-modal-setup-footer'
 
 export type { QuickNpcCreateFormOrganization, QuickNpcCreateContext }
 
@@ -290,6 +288,16 @@ function QuickNpcCreateModalSession({
 
   const modalChrome = resolveQuickNpcModalChrome(context, state.phase)
 
+  const setupFooterContext = React.useMemo(
+    () => ({
+      setupSets,
+      externalDecisions,
+      activeSetId: sequenceModel.activeSetId,
+      isEditingUpstream: sequenceModel.isEditingUpstream,
+    }),
+    [externalDecisions, sequenceModel.activeSetId, sequenceModel.isEditingUpstream, setupSets],
+  )
+
   const handleAuthoringCreated = React.useCallback(
     async (result: { contentType: 'npcs'; id: string }) => {
       try {
@@ -314,20 +322,17 @@ function QuickNpcCreateModalSession({
         contentMode={state.phase === 'setup' ? 'scroll' : 'managed'}
         footer={
           state.phase === 'setup' ? (
-            <div className={quickNpcCreateFooterLayoutClasses()}>
-              <QuickNpcPreviewNpcButton
-                buttonRef={previewNpcButtonRef}
-                buildContext={buildContext}
-                createContext={context}
-                setup={state.setupValues}
-                authoringValues={state.authoringValues}
-              />
-              <CreateSetupFooter
-                model={sequenceModel}
-                onCancel={requestCancel}
-                onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
-              />
-            </div>
+            <QuickNpcCreateModalSetupFooter
+              buildContext={buildContext}
+              createContext={context}
+              setup={state.setupValues}
+              authoringValues={state.authoringValues}
+              previewNpcButtonRef={previewNpcButtonRef}
+              sequenceModel={sequenceModel}
+              footerContext={setupFooterContext}
+              onCancel={requestCancel}
+              onSetupComplete={() => handleContinueFromSetup(state.setupValues)}
+            />
           ) : (
             <FormShellFooterSlot />
           )

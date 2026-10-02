@@ -9,6 +9,24 @@ Drawer grammars and full surface inventory: [drawer-architecture.md](./drawer-ar
 
 Resolver catalog: [character-builder-resolvers.md](../../../packages/contracts/docs/character-builder-resolvers.md).
 
+## Equipment row semantics
+
+Catalog facts, recommendations, and requirements stay on `ResolvedEquipmentOption`.
+Live quantity and supply are projected with `projectEquipmentSelection`.
+`resolveEquipmentOptionRowPresentation` turns that pair, plus a compact metadata
+profile, into ordered clauses (`requirement`, compatibility caution, `recommendation`,
+`supply`). It does not merge those models into one fact bag.
+
+- **Builder** maps the clauses onto the existing callout badge and keeps affordability,
+  package, and shopping-path state as picker overlays.
+- **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
+  the combobox option). Inline copy shows two clauses. The row title keeps the rest.
+  An included singleton stays visible and disabled. A quantity item stays selectable
+  and increments a separate `manual` allocation.
+
+Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
+`EquipmentSupplySource`. A role grant is not a recommendation.
+
 ## Architectural rule
 
 Evaluate every new picker against this stack:

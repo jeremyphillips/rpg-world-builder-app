@@ -3,6 +3,7 @@ import {
   formatEquipmentCostLabel,
   getEquipmentKindLabel,
   type Equipment,
+  type EquipmentCompactSummaryProfile,
   type EquipmentKind,
 } from '@rpg/contracts'
 
@@ -87,8 +88,9 @@ function buildEquipmentStatRows(
 
 export function buildEquipmentPickerRowViewModel(
   equipment: Equipment,
+  profile: EquipmentCompactSummaryProfile = 'standard',
 ): EquipmentPickerRowViewModel {
-  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment)
+  const { kindLabel, comparisonGroups } = buildEquipmentCompactSummary(equipment, profile)
 
   return {
     name: equipment.name,

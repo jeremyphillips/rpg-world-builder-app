@@ -2,7 +2,6 @@ import {
   getNpcTemplateEntry,
   indexCharacterBuildCatalog,
   isEquipmentPickerSupportedEquipment,
-  optionIdentitiesOverlap,
   resolveNpcTemplateEffectiveEquipmentPreferences,
   resolvePlayableBuilderContent,
   type CharacterBuildCatalogIndex,
@@ -20,6 +19,7 @@ import { sortEquipmentPickerItems } from '@/features/character/lib/equipment/sor
 import { resolveEquipmentKindFilterOptions } from '@/features/character/components/equipment/picker/drawer/equipment-picker-drawer.lib'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
+import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
 
 export type QuickNpcAdditionalEquipmentOption = {
   option: { value: string; label: string }
@@ -28,27 +28,28 @@ export type QuickNpcAdditionalEquipmentOption = {
 }
 
 export function splitQuickNpcAdditionalEquipmentIds(args: {
-  equipmentSelections: readonly { equipmentId: string; origin: 'role-default' | 'manual' }[]
+  equipmentSelections: readonly {
+    equipmentId: string
+    quantity: number
+    origin: 'role-default' | 'manual'
+  }[]
   catalogIndex: CharacterBuildCatalogIndex
   /** Classless rows materialize as inventory, not hard weapon constraints. */
   constrainManualWeapons: boolean
 }): { requiredWeaponIds: string[]; manualEquipmentGrantIds: string[] } {
-  const requiredWeaponIds: string[] = []
-  const manualEquipmentGrantIds: string[] = []
-  if (!args.constrainManualWeapons) return { requiredWeaponIds, manualEquipmentGrantIds }
-
-  for (const selection of args.equipmentSelections) {
-    if (selection.origin !== 'manual') continue
-    const equipment = args.catalogIndex.equipment.get(selection.equipmentId)
-    if (!equipment) continue
-    if (equipment.kind === 'weapon') {
-      requiredWeaponIds.push(selection.equipmentId)
-    } else {
-      manualEquipmentGrantIds.push(selection.equipmentId)
-    }
+  const projected = projectQuickNpcEquipmentAllocations({
+    equipmentSelections: args.equipmentSelections.map((row) => ({
+      equipmentId: row.equipmentId,
+      quantity: row.quantity,
+      origin: row.origin,
+    })),
+    catalogIndex: args.catalogIndex,
+    classed: args.constrainManualWeapons,
+  })
+  return {
+    requiredWeaponIds: projected.requiredWeaponIds,
+    manualEquipmentGrantIds: projected.manualEquipmentGrantIds,
   }
-
-  return { requiredWeaponIds, manualEquipmentGrantIds }
 }
 
 export function resolveQuickNpcAdditionalEquipmentOptions(args: {
@@ -121,29 +122,15 @@ export function resolveQuickNpcAdditionalEquipmentValidIds(args: {
   return new Set(resolveQuickNpcAdditionalEquipmentOptions(args).map((entry) => entry.option.value))
 }
 
-export function resolveQuickNpcAdditionalEquipmentKindOptions(args: {
-  entries: readonly QuickNpcAdditionalEquipmentOption[]
-  selectedIds: readonly string[]
-  excludedIds: readonly string[]
-}): EquipmentPickerSupportedKind[] {
-  const available = args.entries.filter(
-    (entry) =>
-      !args.selectedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)) &&
-      !args.excludedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)),
-  )
-  return resolveEquipmentKindFilterOptions(available.map((entry) => entry.pickerItem))
+export function resolveQuickNpcAdditionalEquipmentKindOptions(
+  entries: readonly QuickNpcAdditionalEquipmentOption[],
+): EquipmentPickerSupportedKind[] {
+  return resolveEquipmentKindFilterOptions(entries.map((entry) => entry.pickerItem))
 }
 
 export function filterQuickNpcAdditionalEquipmentByKind(
   entries: readonly QuickNpcAdditionalEquipmentOption[],
   kind: EquipmentPickerSupportedKind,
-  selectedIds: readonly string[],
-  excludedIds: readonly string[],
 ): QuickNpcAdditionalEquipmentOption[] {
-  return entries.filter(
-    (entry) =>
-      entry.pickerItem.equipment.kind === kind &&
-      !selectedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)) &&
-      !excludedIds.some((id) => optionIdentitiesOverlap(id, entry.option.value)),
-  )
+  return entries.filter((entry) => entry.pickerItem.equipment.kind === kind)
 }

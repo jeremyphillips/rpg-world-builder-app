@@ -102,6 +102,26 @@ function preferredConstraintOptionIds(
   )
 }
 
+function legalChoiceOptionIds(choiceSet: ChoiceSet): Set<string> {
+  return new Set(choiceSet.options.map((option) => option.id))
+}
+
+/** Selections outside the current ChoiceSet do not count as satisfied. */
+function retainLegalChoiceSelections(
+  current: readonly string[],
+  legalOptionIds: ReadonlySet<string>,
+): string[] {
+  return current.filter((optionId) => legalOptionIds.has(optionId))
+}
+
+function authoredStartingEquipmentOptionIds(characterClass: CharacterClass): Set<string> {
+  const startingEquipment = characterClass.characterCreation?.startingEquipment
+  if (!startingEquipment) return new Set()
+  return new Set(
+    availableStartingEquipmentOptions(startingEquipment.options).map((option) => option.id),
+  )
+}
+
 function startingPackageProvidesAllRequiredWeapons(args: {
   option: StartingEquipmentOption
   requiredWeaponIds: readonly string[]
@@ -141,6 +161,44 @@ function scoreStartingEquipmentPackageOption(args: {
   }
 }
 
+function scoreStartingEquipmentPackageChoiceOption(args: {
+  option: ChoiceSet['options'][number]
+  canonicalIndex: number
+  startingEquipment: NonNullable<CharacterClass['characterCreation']>['startingEquipment']
+  authoredOptionIds: ReadonlySet<string>
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  stream: readonly NpcEquipmentPreferenceEntry[]
+}) {
+  const packageOption = args.startingEquipment?.options.find((entry) => entry.id === args.option.id)
+  if (
+    !packageOption ||
+    !args.authoredOptionIds.has(args.option.id) ||
+    isStartingGoldOption(packageOption)
+  ) {
+    return {
+      optionId: args.option.id,
+      tuple: NO_EQUIPMENT_PREFERENCE_MATCH,
+      match: undefined,
+      reachableIds: [] as string[],
+      canonicalIndex: args.canonicalIndex,
+    }
+  }
+  const scored = scoreStartingEquipmentPackageOption({
+    option: packageOption,
+    characterClass: args.characterClass,
+    catalogIndex: args.catalogIndex,
+    stream: args.stream,
+  })
+  return {
+    optionId: args.option.id,
+    tuple: scored.tuple,
+    match: scored.match,
+    reachableIds: scored.reachableIds,
+    canonicalIndex: args.canonicalIndex,
+  }
+}
+
 function selectStartingEquipmentPackageByPreferences(args: {
   choiceSet: ChoiceSet
   current: readonly string[]
@@ -152,10 +210,17 @@ function selectStartingEquipmentPackageByPreferences(args: {
 }): {
   packageIds: string[]
   suggestedBy: Record<string, readonly RecommendationSourceRef[]>
+  legalCurrent: string[]
 } | null {
   const { choiceSet, current, characterClass, catalogIndex, preferences, draft, context } = args
-  const needed = Math.max(0, choiceSet.min - current.length)
-  if (needed === 0) return { packageIds: [], suggestedBy: {} }
+  const authoredOptionIds = authoredStartingEquipmentOptionIds(characterClass)
+  const legalOptionIds = legalChoiceOptionIds(choiceSet)
+  for (const optionId of [...legalOptionIds]) {
+    if (!authoredOptionIds.has(optionId)) legalOptionIds.delete(optionId)
+  }
+  const legalCurrent = retainLegalChoiceSelections(current, legalOptionIds)
+  const needed = Math.max(0, choiceSet.min - legalCurrent.length)
+  if (needed === 0) return { packageIds: [], suggestedBy: {}, legalCurrent }
 
   const startingEquipment = characterClass.characterCreation?.startingEquipment
   const stream = filterHeldEquipmentPreferences(
@@ -165,48 +230,73 @@ function selectStartingEquipmentPackageByPreferences(args: {
   if (!startingEquipment || stream.length === 0) return null
 
   const ranked = choiceSet.options
-    .map((option, canonicalIndex) => {
-      const packageOption = startingEquipment.options.find((entry) => entry.id === option.id)
-      if (!packageOption || isStartingGoldOption(packageOption)) {
-        return {
-          optionId: option.id,
-          tuple: NO_EQUIPMENT_PREFERENCE_MATCH,
-          match: undefined,
-          reachableIds: [] as string[],
-          canonicalIndex,
-        }
-      }
-      const scored = scoreStartingEquipmentPackageOption({
-        option: packageOption,
+    .map((option, canonicalIndex) =>
+      scoreStartingEquipmentPackageChoiceOption({
+        option,
+        canonicalIndex,
+        startingEquipment,
+        authoredOptionIds,
         characterClass,
         catalogIndex,
         stream,
-      })
-      return {
-        optionId: option.id,
-        tuple: scored.tuple,
-        match: scored.match,
-        reachableIds: scored.reachableIds,
-        canonicalIndex,
-      }
-    })
+      }),
+    )
     .sort((left, right) => {
       const tupleDelta = compareEquipmentPreferenceTuples(left.tuple, right.tuple)
       if (tupleDelta !== 0) return tupleDelta
       return left.canonicalIndex - right.canonicalIndex
     })
 
-  const winner = ranked[0]
+  return packagePreferenceWinnerResult({
+    ranked,
+    authoredOptionIds,
+    needed,
+    legalCurrent,
+    stream,
+    draft,
+    preferences,
+  })
+}
+
+function packagePreferenceWinnerResult(args: {
+  ranked: Array<{
+    optionId: string
+    match: ReturnType<typeof scoreStartingEquipmentPackageOption>['match']
+    reachableIds: string[]
+  }>
+  authoredOptionIds: ReadonlySet<string>
+  needed: number
+  legalCurrent: string[]
+  stream: readonly NpcEquipmentPreferenceEntry[]
+  draft: CharacterBuilderDraft
+  preferences: AutomaticNpcBuildPreferences
+}): {
+  packageIds: string[]
+  suggestedBy: Record<string, readonly RecommendationSourceRef[]>
+  legalCurrent: string[]
+} | null {
+  const winner = args.ranked.find((entry) => args.authoredOptionIds.has(entry.optionId))
   if (!winner) return null
 
   const suggestedBy: Record<string, readonly RecommendationSourceRef[]> = {}
-  const sources = recommendationSourceRefsFromNpcSources(
-    suggestedSourcesForEquipmentPreferenceMatch(stream, winner.match, winner.reachableIds),
-    recommendationIdentityForFill(draft, preferences),
-  )
+  const sources =
+    winner.match && args.authoredOptionIds.has(winner.optionId)
+      ? recommendationSourceRefsFromNpcSources(
+          suggestedSourcesForEquipmentPreferenceMatch(
+            args.stream,
+            winner.match,
+            winner.reachableIds,
+          ),
+          recommendationIdentityForFill(args.draft, args.preferences),
+        )
+      : []
   if (sources.length > 0) suggestedBy[winner.optionId] = sources
 
-  return { packageIds: [winner.optionId].slice(0, needed), suggestedBy }
+  return {
+    packageIds: [winner.optionId].slice(0, args.needed),
+    suggestedBy,
+    legalCurrent: args.legalCurrent,
+  }
 }
 
 function selectStartingEquipmentPackageIds(args: {
@@ -217,7 +307,8 @@ function selectStartingEquipmentPackageIds(args: {
   catalogIndex: CharacterBuildCatalogIndex
 }): string[] | null {
   const { choiceSet, current, constraints, characterClass, catalogIndex } = args
-  const needed = Math.max(0, choiceSet.min - current.length)
+  const legalCurrent = retainLegalChoiceSelections(current, legalChoiceOptionIds(choiceSet))
+  const needed = Math.max(0, choiceSet.min - legalCurrent.length)
   if (needed === 0) return []
 
   const startingEquipment = characterClass.characterCreation?.startingEquipment
@@ -431,7 +522,6 @@ function resolveStartingEquipmentPackageFill(args: {
       catalogIndex: args.catalogIndex,
     })
     if (packageIds === null) return null
-    if (packageIds.length === 0) return { draft: args.draft, suggestedBy: {} }
     return {
       draft: {
         ...args.draft,
@@ -462,7 +552,7 @@ function resolveStartingEquipmentPackageFill(args: {
       ...args.draft,
       choiceSelections: {
         ...args.draft.choiceSelections,
-        [args.choiceSet.id]: [...args.current, ...preferred.packageIds],
+        [args.choiceSet.id]: [...preferred.legalCurrent, ...preferred.packageIds],
       },
     },
     suggestedBy: preferred.suggestedBy,
@@ -571,13 +661,17 @@ export function selectChoiceSetFill(args: {
   equipmentPreferenceDraft?: CharacterBuilderDraft
   equipmentPreferenceContext?: CharacterBuildContext
 }): ChoiceSetFillState {
-  const needed = Math.max(0, args.choiceSet.min - args.current.length)
+  const legalCurrent = retainLegalChoiceSelections(
+    args.current,
+    legalChoiceOptionIds(args.choiceSet),
+  )
+  const needed = Math.max(0, args.choiceSet.min - legalCurrent.length)
   if (needed === 0) return { additions: [], suggestedBy: {} }
 
   const state: ChoiceSetFillState = { additions: [], suggestedBy: {} }
   const take = createChoiceFillTake({
     needed,
-    selected: new Set(args.current),
+    selected: new Set(legalCurrent),
     state,
     choiceSet: args.choiceSet,
     heldKeys: args.heldKeys,
@@ -639,12 +733,13 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
     context,
   } = args
   const current = draft.choiceSelections[choiceSet.id] ?? []
+  const legalCurrent = retainLegalChoiceSelections(current, legalChoiceOptionIds(choiceSet))
 
   if (characterClass) {
     const startingEquipmentFill = resolveStartingEquipmentPackageFill({
       draft,
       choiceSet,
-      current,
+      current: legalCurrent,
       constraints,
       preferences,
       characterClass,
@@ -658,7 +753,7 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
   const identity = recommendationIdentityForFill(draft, preferences)
   const filled = selectChoiceSetFill({
     choiceSet,
-    current,
+    current: legalCurrent,
     preferences,
     heldKeys,
     hardPreferredIds: preferredConstraintOptionIds(choiceSet, constraints),
@@ -674,10 +769,10 @@ export function fillChoiceSetWithConstraintAwareSelection(args: {
     equipmentPreferenceDraft: draft,
     equipmentPreferenceContext: context,
   })
-  if (filled.additions.length === 0) return null
+  if (filled.additions.length === 0 && legalCurrent.length === current.length) return null
   const additions = filled.additions
 
-  const selections = [...current, ...additions]
+  const selections = [...legalCurrent, ...additions]
   return {
     draft: {
       ...draft,

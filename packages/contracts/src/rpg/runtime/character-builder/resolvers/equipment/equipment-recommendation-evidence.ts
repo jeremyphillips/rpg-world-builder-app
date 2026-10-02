@@ -1,9 +1,15 @@
 import type { EquipmentRecommendationEvidence } from '../../../../content/equipment-recommendation'
-import type { RecommendationSignalBasis, RecommendationSourceRef } from '../../recommendation'
+import type {
+  RecommendationScope,
+  RecommendationSignalBasis,
+  RecommendationSourceRef,
+} from '../../recommendation'
+import { recommendationScopeIdentity } from '../../recommendation'
 
 export type SourcedEquipmentRecommendationEvidence = EquipmentRecommendationEvidence & {
   /** Absent when the contributing reason has no recommendation source. */
   source?: RecommendationSourceRef
+  scope?: RecommendationScope
   basis?: RecommendationSignalBasis
   choiceSetId?: string
 }
@@ -32,6 +38,7 @@ export function equipmentEvidenceIdentity(
   return [
     evidence.reason,
     evidence.source ? recommendationSourceIdentity(evidence.source) : '',
+    recommendationScopeIdentity(evidence.scope),
     evidence.choiceSetId ?? '',
     evidence.specificity,
   ].join(':')

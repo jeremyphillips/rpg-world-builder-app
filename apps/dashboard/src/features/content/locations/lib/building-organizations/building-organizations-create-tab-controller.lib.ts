@@ -15,7 +15,11 @@ import {
   type BuildingOrganizationRelationshipDraft,
   type BuildingOrganizationRelationshipKindOption,
 } from './building-organization-create-drafts'
-import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from '@/lib/create-setup'
+import {
+  CREATE_SETUP_DEFAULT_CHANGE_LABEL,
+  resolveSetupSummaryRows,
+  type CreateSetupSummaryDefinition,
+} from '@/lib/create-setup'
 
 import {
   BUILDING_NEW_ORGANIZATION_FORM_ID,
@@ -339,7 +343,66 @@ function resolveStageComposerView(input: {
   }
 }
 
-export function resolveBuildingOrganizationComposerView(input: {
+type BuildingOrganizationSetupSummaryState = {
+  kindLabel: string | null
+  organizationName: string | null
+  organizationDomainLabel: string | null
+  hasKind: boolean
+  hasResolvedOrganization: boolean
+}
+
+const BUILDING_ORGANIZATION_SETUP_SUMMARY = [
+  {
+    id: 'relationship',
+    label: BUILDING_ORGANIZATIONS_RELATIONSHIP_EYEBROW,
+    targetSetId: 'relationship',
+    resolveValue: (state: BuildingOrganizationSetupSummaryState) =>
+      state.hasKind ? state.kindLabel : null,
+  },
+  {
+    id: 'organization',
+    label: BUILDING_ORGANIZATIONS_ORGANIZATION_EYEBROW,
+    targetSetId: 'organization',
+    resolveValue: (state: BuildingOrganizationSetupSummaryState) => {
+      if (!state.hasResolvedOrganization || !state.organizationName) return null
+      return state.organizationDomainLabel
+        ? `${state.organizationName} · ${state.organizationDomainLabel}`
+        : state.organizationName
+    },
+  },
+] as const satisfies readonly CreateSetupSummaryDefinition<BuildingOrganizationSetupSummaryState>[]
+
+function toBuildingOrganizationComposerSummaryRow(
+  row: ReturnType<typeof resolveSetupSummaryRows<BuildingOrganizationSetupSummaryState>>[number],
+): BuildingOrganizationComposerSummaryRow {
+  return {
+    id: row.id === 'organization' ? 'organization' : 'relationship',
+    decision: row.id === 'organization' ? 'organizationResolved' : 'relationship',
+    label: row.label,
+    value: row.value,
+  }
+}
+
+function applyBuildingOrganizationResolvedSummary(
+  view: BuildingOrganizationComposerView,
+  input: BuildingOrganizationSetupSummaryState & { relationshipKindCount: number },
+): BuildingOrganizationComposerView {
+  const summaryRows = resolveSetupSummaryRows(input, BUILDING_ORGANIZATION_SETUP_SUMMARY).map(
+    toBuildingOrganizationComposerSummaryRow,
+  )
+
+  return {
+    ...view,
+    summaryRows,
+    showRelationshipChange:
+      input.relationshipKindCount > 1 && view.activeDecision !== 'relationship',
+    showOrganizationChange:
+      summaryRows.some((row) => row.id === 'organization') &&
+      view.activeDecision !== 'organization',
+  }
+}
+
+function resolveBuildingOrganizationComposerStageView(input: {
   composerStage: BuildingOrganizationComposerStage
   editingDecision: BuildingOrganizationEditingDecision | null
   kindLabel: string | null
@@ -382,6 +445,15 @@ export function resolveBuildingOrganizationComposerView(input: {
     hasResolvedOrganization: input.hasResolvedOrganization,
     relationshipKindCount: input.relationshipKindCount,
   })
+}
+
+export function resolveBuildingOrganizationComposerView(
+  input: Parameters<typeof resolveBuildingOrganizationComposerStageView>[0],
+): BuildingOrganizationComposerView {
+  return applyBuildingOrganizationResolvedSummary(
+    resolveBuildingOrganizationComposerStageView(input),
+    input,
+  )
 }
 
 export const BUILDING_ORGANIZATION_COMPOSER_CHANGE_LABEL = CREATE_SETUP_DEFAULT_CHANGE_LABEL

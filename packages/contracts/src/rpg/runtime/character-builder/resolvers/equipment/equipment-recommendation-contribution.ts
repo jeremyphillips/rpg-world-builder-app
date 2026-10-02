@@ -2,7 +2,11 @@ import type {
   EquipmentRecommendationReason,
   EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
-import type { RecommendationSignalBasis, RecommendationSourceRef } from '../../recommendation'
+import type {
+  RecommendationScope,
+  RecommendationSignalBasis,
+  RecommendationSourceRef,
+} from '../../recommendation'
 import type { EquipmentRecommendationSelector } from './equipment-recommendation-selector'
 
 export type EquipmentRecommendationContribution = {
@@ -12,6 +16,7 @@ export type EquipmentRecommendationContribution = {
   /** Distinguishes slots that share a recommendation source, such as two package rows. */
   dedupeKey: string
   source?: RecommendationSourceRef
+  scope?: RecommendationScope
   basis?: RecommendationSignalBasis
   choiceSetId?: string
   excludeEquipmentIds?: ReadonlySet<string>

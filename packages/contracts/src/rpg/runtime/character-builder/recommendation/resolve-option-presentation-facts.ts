@@ -12,12 +12,28 @@ export const OPTION_PRESENTATION_FACT_KINDS = [
 
 export type OptionPresentationFactKind = (typeof OPTION_PRESENTATION_FACT_KINDS)[number]
 
+/**
+ * Stable semantic tag. Dashboard adapters branch on this value.
+ * The requirement, recommendation, selection, and compatibility models stay authoritative.
+ */
+export const OPTION_PRESENTATION_DISCRIMINATORS = [
+  'required',
+  'satisfies',
+  'recommended',
+  'included',
+  'proficient',
+  'not-proficient',
+] as const
+
+export type OptionPresentationDiscriminator = (typeof OPTION_PRESENTATION_DISCRIMINATORS)[number]
+
 /** Semantic copy. Chrome (tone, truncation, tooltip placement) stays in the dashboard. */
 export type OptionPresentationFact = {
   kind: OptionPresentationFactKind
   label: string
   detail?: string
   sourceLabels: readonly string[]
+  discriminator?: OptionPresentationDiscriminator
 }
 
 export type OptionPresentationFacts = {
@@ -26,6 +42,7 @@ export type OptionPresentationFacts = {
 
 export const OPTION_PRESENTATION_RECOMMENDED_LABEL = 'Recommended'
 export const OPTION_PRESENTATION_PROFICIENT_LABEL = 'Proficient'
+export const OPTION_PRESENTATION_NOT_PROFICIENT_LABEL = 'Not proficient'
 export const OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 export const OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL = 'Common for your class'
 export const OPTION_PRESENTATION_IN_PACKAGE_LABEL = 'In your package'
@@ -90,6 +107,7 @@ export function softRecommendationFact(args: {
     : (args.authoredLabel ?? OPTION_PRESENTATION_RECOMMENDED_LABEL)
   return {
     kind: 'recommendation',
+    discriminator: 'recommended',
     label,
     sourceLabels,
   }

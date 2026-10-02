@@ -3,8 +3,11 @@ import { useFormContext } from 'react-hook-form'
 
 import {
   getEquipmentKindLabel,
+  getNpcTemplateLabel,
+  indexCharacterBuildCatalog,
   type CharacterBuildContext,
   type NpcStartingChoices,
+  type RecommendationSourceName,
 } from '@rpg/contracts'
 import {
   ActionButton,
@@ -13,6 +16,7 @@ import {
   type ComboboxFieldOption,
 } from '@rpg/ui'
 
+import { EquipmentOptionRow } from '@/features/character/components/equipment/picker/equipment-option-row'
 import { StartingEquipmentOptionSection } from '@/features/character/components/equipment/starting-package/starting-equipment-option-section'
 import {
   EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
@@ -33,6 +37,12 @@ import {
   type QuickNpcEquipmentSelection,
 } from '../../lib/quick-npc/quick-npc-form-fields'
 import type { QuickNpcSetupValues } from '../../lib/quick-npc/quick-npc-form-fields'
+import { usesQuickNpcClassEquipment } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
+import {
+  presentQuickNpcEquipmentOption,
+  quickNpcEquipmentAdditionPolicy,
+  quickNpcEquipmentOptionAccessibleLabel,
+} from '../../lib/quick-npc/quick-npc-equipment-supply.lib'
 import {
   formatStartingChoiceItemCount,
   resolveQuickNpcStartingEquipmentPackageContext,
@@ -62,7 +72,17 @@ export type QuickNpcStartingEquipmentPanelProps = {
   choices: NpcStartingChoices
   buildContext: CharacterBuildContext
   additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
-  excludedEquipmentIds: readonly string[]
+}
+
+function equipmentRecommendationSourceName(
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>,
+): RecommendationSourceName {
+  return (source) => {
+    if (source.kind === 'class') return catalogIndex.classes.get(source.id)?.name
+    if (source.kind === 'species') return catalogIndex.species.get(source.id)?.name
+    if (source.kind === 'role') return getNpcTemplateLabel(source.id)
+    return undefined
+  }
 }
 
 function AdditionalEquipmentRow({
@@ -174,56 +194,86 @@ function QuickNpcStartingEquipmentPackageSection({
 }
 
 type QuickNpcAdditionalEquipmentSectionProps = {
+  setup: QuickNpcSetupValues
+  choices: NpcStartingChoices
+  buildContext: CharacterBuildContext
   hasPackages: boolean
   equipmentSelections: QuickNpcEquipmentSelection[]
   additionalOptions: readonly QuickNpcAdditionalEquipmentOption[]
-  excludedEquipmentIds: readonly string[]
   appendAdditionalEquipment: (equipmentId: string) => void
   removeAdditionalEquipment: (equipmentId: string) => void
 }
 
 function QuickNpcAdditionalEquipmentSection({
+  setup,
+  choices,
+  buildContext,
   hasPackages,
   equipmentSelections,
   additionalOptions,
-  excludedEquipmentIds,
   appendAdditionalEquipment,
   removeAdditionalEquipment,
 }: QuickNpcAdditionalEquipmentSectionProps) {
-  const selectedIds = equipmentSelections.map((row) => row.equipmentId)
-  const selectedAdditional = equipmentSelections.flatMap((selection) => {
-    const entry = additionalOptions.find((option) => option.option.value === selection.equipmentId)
-    return entry ? [{ entry, selection }] : []
+  const catalogIndex = React.useMemo(
+    () => indexCharacterBuildCatalog(buildContext.catalog),
+    [buildContext.catalog],
+  )
+  const classed = usesQuickNpcClassEquipment(setup.classId, setup.level)
+  const sourceName = React.useMemo(
+    () => equipmentRecommendationSourceName(catalogIndex),
+    [catalogIndex],
+  )
+  const selectedTotals = new Map<string, number>()
+  for (const selection of equipmentSelections) {
+    selectedTotals.set(
+      selection.equipmentId,
+      (selectedTotals.get(selection.equipmentId) ?? 0) + selection.quantity,
+    )
+  }
+  const selectedAdditional = [...selectedTotals.entries()].flatMap(([equipmentId, quantity]) => {
+    const entry = additionalOptions.find((option) => option.option.value === equipmentId)
+    return entry ? [{ entry, equipmentId, quantity }] : []
   })
 
-  const kindOptions = resolveQuickNpcAdditionalEquipmentKindOptions({
-    entries: additionalOptions,
-    selectedIds,
-    excludedIds: excludedEquipmentIds,
-  })
+  const kindOptions = resolveQuickNpcAdditionalEquipmentKindOptions(additionalOptions)
 
   const [selectedKind, setSelectedKind] = React.useState<(typeof kindOptions)[number] | undefined>(
     kindOptions[0],
   )
+  const activeKind =
+    selectedKind && kindOptions.includes(selectedKind) ? selectedKind : kindOptions[0]
 
-  React.useEffect(() => {
-    if (kindOptions.length === 0) {
-      setSelectedKind(undefined)
-      return
-    }
-    if (!selectedKind || !kindOptions.includes(selectedKind)) {
-      setSelectedKind(kindOptions[0])
-    }
-  }, [kindOptions, selectedKind])
-
-  const comboboxOptions: ComboboxFieldOption[] = selectedKind
-    ? filterQuickNpcAdditionalEquipmentByKind(
-        additionalOptions,
-        selectedKind,
-        selectedIds,
-        excludedEquipmentIds,
-      ).map((entry) => entry.option)
+  const visibleEntries = activeKind
+    ? filterQuickNpcAdditionalEquipmentByKind(additionalOptions, activeKind)
     : []
+  const presentationById = new Map(
+    visibleEntries.map((entry) => [
+      entry.option.value,
+      presentQuickNpcEquipmentOption({
+        entry,
+        equipmentSelections,
+        ...(setup.npcTemplateId ? { roleId: setup.npcTemplateId } : {}),
+        choices,
+        catalogIndex,
+        ...(setup.classId ? { classId: setup.classId } : {}),
+        classed,
+        sourceName,
+        supplyCatalog: catalogIndex,
+      }),
+    ]),
+  )
+  const comboboxOptions: ComboboxFieldOption[] = visibleEntries.map((entry) => {
+    const presentation = presentationById.get(entry.option.value)
+    const disabled = presentation?.disabled === true
+    return {
+      ...entry.option,
+      disabled,
+      label: presentation
+        ? quickNpcEquipmentOptionAccessibleLabel(presentation)
+        : entry.option.label,
+      metadata: presentation?.secondaryTitle,
+    }
+  })
 
   const addDisabled = kindOptions.length === 0
   const additionalTitle = hasPackages
@@ -242,12 +292,12 @@ function QuickNpcAdditionalEquipmentSection({
       />
       {selectedAdditional.length > 0 ? (
         <ul className={quickNpcStartingChoiceSelectedListClasses}>
-          {selectedAdditional.map(({ entry, selection }) => (
-            <li key={selection.equipmentId}>
+          {selectedAdditional.map(({ entry, equipmentId, quantity }) => (
+            <li key={equipmentId}>
               <AdditionalEquipmentRow
                 entry={entry}
-                quantity={selection.quantity}
-                onRemove={() => removeAdditionalEquipment(selection.equipmentId)}
+                quantity={quantity}
+                onRemove={() => removeAdditionalEquipment(equipmentId)}
               />
             </li>
           ))}
@@ -266,6 +316,10 @@ function QuickNpcAdditionalEquipmentSection({
           options={comboboxOptions}
           value=""
           disabled={addDisabled}
+          renderOption={(option) => {
+            const presentation = presentationById.get(option.value)
+            return presentation ? <EquipmentOptionRow presentation={presentation} /> : option.label
+          }}
           onChange={(next) => {
             const value = Array.isArray(next) ? next[0] : next
             if (!value) return
@@ -274,10 +328,10 @@ function QuickNpcAdditionalEquipmentSection({
           placeholder={QUICK_NPC_ADD_ITEM_PLACEHOLDER}
           emptyMessage="No matching items"
           filter={
-            !addDisabled && selectedKind ? (
+            !addDisabled && activeKind ? (
               <ComboboxFilterSelect
                 ariaLabel={QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL}
-                value={selectedKind}
+                value={activeKind}
                 options={kindOptions.map((kind) => ({
                   value: kind,
                   label: getEquipmentKindLabel(kind),
@@ -299,7 +353,6 @@ export function QuickNpcStartingEquipmentPanel({
   choices,
   buildContext,
   additionalOptions,
-  excludedEquipmentIds,
 }: QuickNpcStartingEquipmentPanelProps) {
   const form = useFormContext<QuickNpcAuthoringTabFormValues>()
   const overrides = form.watch(QUICK_NPC_STARTING_CHOICE_OVERRIDES_FIELD_NAME) ?? {}
@@ -317,18 +370,41 @@ export function QuickNpcStartingEquipmentPanel({
   }
 
   function appendAdditionalEquipment(equipmentId: string) {
-    if (equipmentSelections.some((row) => row.equipmentId === equipmentId)) return
-    form.setValue(
-      QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
-      [...equipmentSelections, { equipmentId, quantity: 1, origin: 'manual' }],
-      { shouldDirty: true },
+    const entry = additionalOptions.find((option) => option.option.value === equipmentId)
+    if (!entry) return
+    const classed = usesQuickNpcClassEquipment(setup.classId, setup.level)
+    const policy = quickNpcEquipmentAdditionPolicy({
+      equipment: entry.pickerItem.equipment,
+      classed,
+    })
+    const included = equipmentSelections
+      .filter((row) => row.equipmentId === equipmentId)
+      .reduce((sum, row) => sum + row.quantity, 0)
+    if (included > 0 && policy === 'single') return
+
+    const manualIndex = equipmentSelections.findIndex(
+      (row) => row.equipmentId === equipmentId && row.origin === 'manual',
     )
+    const next = [...equipmentSelections]
+    if (manualIndex >= 0) {
+      const current = next[manualIndex]!
+      next[manualIndex] = { ...current, quantity: current.quantity + 1 }
+    } else {
+      next.push({ equipmentId, quantity: 1, origin: 'manual' })
+    }
+    form.setValue(QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME, next, { shouldDirty: true })
   }
 
   function removeAdditionalEquipment(equipmentId: string) {
+    const hasManual = equipmentSelections.some(
+      (row) => row.equipmentId === equipmentId && row.origin === 'manual',
+    )
     form.setValue(
       QUICK_NPC_EQUIPMENT_SELECTION_FIELD_NAME,
-      equipmentSelections.filter((row) => row.equipmentId !== equipmentId),
+      equipmentSelections.filter((row) => {
+        if (row.equipmentId !== equipmentId) return true
+        return hasManual ? row.origin !== 'manual' : false
+      }),
       { shouldDirty: true },
     )
   }
@@ -344,10 +420,12 @@ export function QuickNpcStartingEquipmentPanel({
       ) : null}
 
       <QuickNpcAdditionalEquipmentSection
+        setup={setup}
+        choices={choices}
+        buildContext={buildContext}
         hasPackages={packageContext !== null}
         equipmentSelections={equipmentSelections}
         additionalOptions={additionalOptions}
-        excludedEquipmentIds={excludedEquipmentIds}
         appendAdditionalEquipment={appendAdditionalEquipment}
         removeAdditionalEquipment={removeAdditionalEquipment}
       />

@@ -21,6 +21,7 @@ import {
   equipmentPickerItemsFixture,
   equipmentResolvedFixture,
 } from '../drawer/equipment-picker-drawer.fixtures'
+import { resolveEquipmentOptionRowPresentation } from '../../../../lib/equipment/equipment-option-row-presentation.lib'
 import {
   getEquipmentPickerCallout,
   selectHighestPriorityCallout,
@@ -279,6 +280,36 @@ describe('equipment-picker-callout.lib', () => {
         importance: 'high',
         factKind: 'blocking',
       })
+    })
+
+    it('reads the requirement badge from the shared row projection', () => {
+      const base = equipmentPickerItemsFixture[0]!
+      const item: EquipmentPickerItem = {
+        ...base,
+        state: {
+          ...base.state,
+          resolved: equipmentResolvedFixture({
+            requirements: [
+              {
+                requirementId: 'wizard:spellbook',
+                owner: { kind: 'class', id: 'wizard' },
+                rule: 'exact',
+                optionSatisfies: true,
+                role: 'candidate',
+              },
+            ],
+          }),
+        },
+      }
+      const presentation = resolveEquipmentOptionRowPresentation({
+        identity: item.equipment.name,
+        kindLabel: 'Weapon',
+        resolved: item.state.resolved!,
+      })
+      expect(getEquipmentPickerCallout(item)?.label).toBe(
+        presentation.secondaryClauses.find((clause) => clause.kind === 'requirement')?.badgeLabel,
+      )
+      expect(getEquipmentPickerCallout(equipmentPickerItemsFixture[1]!)?.factKind).toBe('blocking')
     })
 
     it('prefers a requirement badge over package state', () => {

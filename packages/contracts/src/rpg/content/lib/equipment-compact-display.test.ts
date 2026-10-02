@@ -144,6 +144,74 @@ describe('equipment-compact-display', () => {
     })
   })
 
+  it('emits at most one compact-row fact and never uses weight', () => {
+    expect(buildEquipmentCompactSummary(dagger, 'compact-row').comparisonGroups).toEqual([
+      '1d4 Piercing',
+    ])
+    expect(buildEquipmentCompactSummary(plateArmor, 'compact-row').comparisonGroups).toEqual([
+      'AC 18',
+    ])
+    expect(buildEquipmentCompactSummary(holySymbolAmulet, 'compact-row').comparisonGroups).toEqual([
+      'Spellcasting',
+    ])
+    expect(buildEquipmentCompactSummary(bracersOfDefense, 'compact-row').comparisonGroups).toEqual([
+      'Rare',
+    ])
+    expect(buildEquipmentCompactSummary(ridingHorse, 'compact-row').comparisonGroups).toEqual([
+      '60 ft.',
+    ])
+    expect(
+      buildEquipmentCompactSummary(
+        {
+          ...dagger,
+          name: 'Wagon',
+          kind: 'vehicle',
+          vehicleCategory: 'land',
+          speed: { value: 30, unit: 'ft' },
+        } as Equipment,
+        'compact-row',
+      ).comparisonGroups,
+    ).toEqual(['30 ft.'])
+    expect(
+      buildEquipmentCompactSummary(
+        {
+          ...dagger,
+          name: "Smith's Tools",
+          kind: 'tool',
+          toolCategory: 'artisan',
+          ability: 'str',
+          utilizes: [{ description: 'Repair', dc: 10 }],
+          weight: { value: 8, unit: 'lb' },
+        } as Equipment,
+        'compact-row',
+      ).comparisonGroups,
+    ).toEqual(["Artisan's Tools"])
+    expect(
+      buildEquipmentCompactSummary(
+        {
+          ...dagger,
+          name: 'Skilled Hireling',
+          kind: 'service',
+          serviceCategory: 'hireling',
+          duration: { value: 1, unit: 'day' },
+          weight: undefined,
+        } as Equipment,
+        'compact-row',
+      ).comparisonGroups,
+    ).toEqual(['Per day'])
+    expect(
+      buildEquipmentCompactSummary(
+        { ...bracersOfDefense, rarity: undefined } as Equipment,
+        'compact-row',
+      ).comparisonGroups,
+    ).toEqual([])
+    for (const equipment of [dagger, plateArmor, holySymbolAmulet, ridingHorse]) {
+      expect(
+        buildEquipmentCompactSummary(equipment, 'compact-row').comparisonGroups.join(' '),
+      ).not.toMatch(/lb/)
+    }
+  })
+
   it('exposes per-kind compact layouts', () => {
     expect(COMPACT_METADATA_LAYOUT.weapon?.fields).toEqual(['damage', 'properties'])
     expect(COMPACT_METADATA_LAYOUT.magic_item?.fields).toEqual([

@@ -10,6 +10,7 @@ import {
   OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
+  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
   OPTION_PRESENTATION_STARTING_OPTION_LABEL,
@@ -47,6 +48,9 @@ export function resolveEquipmentPresentationFacts(args: {
   const proficient = proficientFact(args.resolved, args.sourceName)
   if (proficient) facts.push(proficient)
 
+  const notProficient = notProficientFact(args.resolved)
+  if (notProficient) facts.push(notProficient)
+
   facts.push(...stateFacts(args))
   return { facts }
 }
@@ -62,6 +66,7 @@ function primaryRequirementFact(
   if (candidate) {
     return {
       kind: 'requirement',
+      discriminator: 'required',
       label: requiredByLabel(ownerLabel(candidate.owner, sourceName)),
       sourceLabels: [ownerLabel(candidate.owner, sourceName)],
     }
@@ -73,12 +78,14 @@ function primaryRequirementFact(
   if (satisfier.rule === 'anyOf' && focusDefinition) {
     return {
       kind: 'requirement',
+      discriminator: 'satisfies',
       label: satisfiesFocusRequirementLabel(ownerName(satisfier.owner, sourceName)),
       sourceLabels: [ownerLabel(satisfier.owner, sourceName)],
     }
   }
   return {
     kind: 'requirement',
+    discriminator: 'required',
     label: requiredByLabel(ownerLabel(satisfier.owner, sourceName)),
     sourceLabels: [ownerLabel(satisfier.owner, sourceName)],
   }
@@ -106,9 +113,20 @@ function proficientFact(
   if (sourceLabels.length === 0) return undefined
   return {
     kind: 'compatibility',
+    discriminator: 'proficient',
     label: OPTION_PRESENTATION_PROFICIENT_LABEL,
     detail: grantedByLabel(sourceLabels[0]!),
     sourceLabels,
+  }
+}
+
+function notProficientFact(resolved: ResolvedEquipmentOption): OptionPresentationFact | undefined {
+  if (resolved.state.compatibility?.proficient !== false) return undefined
+  return {
+    kind: 'compatibility',
+    discriminator: 'not-proficient',
+    label: OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+    sourceLabels: [],
   }
 }
 
@@ -122,6 +140,7 @@ function stateFacts(args: {
   if (args.ownedQuantity !== undefined && args.ownedQuantity > 0) {
     facts.push({
       kind: 'state',
+      discriminator: 'included',
       label: includedQuantityLabel(args.ownedQuantity),
       sourceLabels: [],
     })

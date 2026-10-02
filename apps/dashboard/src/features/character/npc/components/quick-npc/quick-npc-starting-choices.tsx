@@ -189,14 +189,6 @@ export function QuickNpcStartingChoices({
     [buildContext, createContext, setup],
   )
 
-  const excludedEquipmentIds = React.useMemo(
-    () =>
-      equipmentEntries.flatMap((entry) =>
-        entry.mechanic === 'fixed-grant' ? [...entry.selectedIds] : [],
-      ),
-    [equipmentEntries],
-  )
-
   const addableSpell = optionSets.spells.length > 0
 
   function writeOverrides(next: Record<string, string[]>) {
@@ -322,7 +314,6 @@ export function QuickNpcStartingChoices({
                 requiredWeaponIds={requiredWeaponIds}
                 requiredSpellIds={requiredSpellIds}
                 additionalEquipmentOptions={additionalEquipmentOptions}
-                excludedEquipmentIds={excludedEquipmentIds}
                 onOverridesChange={writeOverrides}
               />
             }
@@ -436,7 +427,6 @@ function StartingChoiceEditor({
   requiredWeaponIds,
   requiredSpellIds,
   additionalEquipmentOptions,
-  excludedEquipmentIds,
   onOverridesChange,
 }: {
   categoryKind: StartingChoiceCategory
@@ -451,7 +441,6 @@ function StartingChoiceEditor({
   requiredWeaponIds: readonly string[]
   requiredSpellIds: readonly string[]
   additionalEquipmentOptions: readonly QuickNpcAdditionalEquipmentOption[]
-  excludedEquipmentIds: readonly string[]
   onOverridesChange: (next: Record<string, string[]>) => void
 }) {
   if (categoryKind === 'equipment') {
@@ -462,7 +451,6 @@ function StartingChoiceEditor({
           choices={choices}
           buildContext={buildContext}
           additionalOptions={additionalEquipmentOptions}
-          excludedEquipmentIds={excludedEquipmentIds}
         />
         <GrantedCategorySubsection
           categoryLabel={startingChoiceKindLabel(categoryKind)}

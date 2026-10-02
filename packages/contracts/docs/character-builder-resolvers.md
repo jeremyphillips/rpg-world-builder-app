@@ -429,8 +429,25 @@ has none. Picker rows keep that evidence on `state.evidence` and the split facts
 
 `resolveEquipmentPresentationFacts` turns those facts into semantic copy: "Required by
 Wizard class", "Satisfies Wizard focus requirement", "Proficient" with "Granted by Rogue
-class", "Recommended" plus source labels, and state labels such as "In your package".
-The dashboard owns badge tone, two-source inline truncation, and tooltips.
+class", "Not proficient", "Recommended" plus source labels, and state labels such as
+"In your package". Each of those copies may carry a presentation discriminator
+(`required`, `satisfies`, `recommended`, `included`, `proficient`, `not-proficient`).
+The discriminator is a one-way label for adapters. It does not replace
+`OptionRequirement`, `OptionRecommendation`, `OptionState.selection`, or compatibility.
+
+`projectEquipmentSelection` merges live quantity and supply onto `OptionState.selection`
+without changing recommendation strength or requirement roles. Supply sources use
+`EquipmentSupplySource`. Legacy persisted `npcTemplate` records adapt to `role` or
+`role-default` at that boundary. Recommendation sources stay on
+`OptionRecommendation`. `resolveEquipmentAdditionPolicy` is the single vs quantity
+decision (`grant`, `inventory`, blocked `acquisition`, or an idempotent classed-weapon
+`requirement`). Row UI calls that policy instead of `isEquipmentStackable`.
+
+The dashboard owns badge tone, two-source inline truncation, and tooltips. Builder
+callouts and Quick NPC combobox rows both read
+`resolveEquipmentOptionRowPresentation`, then keep their own chrome. Supply phrases
+use selection-source formatting (`Guard role`, `Fighter starting equipment`). They
+are not recommendation copy.
 Language and spell rows use the same soft-recommendation fact (`OptionRecommendation`)
 instead of a hardcoded "Recommended" string. `suggestedBy` stores
 `RecommendationSourceRef` values, including every package-bias source and class spell
@@ -439,13 +456,15 @@ on `deriveEquipmentRecommendations`; the `NpcTemplate*` rename stays deferred.
 
 ## Related helpers
 
-| Helper                                | Location                                                 | Purpose                                                      |
-| ------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
-| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                  | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`.     |
-| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`         | Shared grant-group walk for traits and features.             |
-| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`   | Maps creature pool rows to `ChoiceSetOption[]`.              |
-| `indexCharacterBuildCatalog`          | `context.ts`                                             | Builds by-id lookup maps for resolver consumption.           |
-| `indexPlayableBuilderCatalog`         | `preview/index-playable-builder-catalog.ts`              | Indexes `resolvePlayableBuilderContent` for validation only. |
-| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`               | Equipment picker `comparisonGroups` + `kindLabel`.           |
-| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts` | Spell picker `castingSummary` + `classification`.            |
-| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`       | Skill proficiency ability label + catalog `exampleUses`.     |
+| Helper                                | Location                                                   | Purpose                                                                                                                                         |
+| ------------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contentGrantToChoiceSets`            | `resolvers/grants/grant-choice-sets.ts`                    | Maps atomic `ContentGrant` choice shapes to `ChoiceSet`.                                                                                        |
+| `unlockedGrantChoiceSets`             | `resolvers/grants/unlocked-grant-choice-sets.ts`           | Shared grant-group walk for traits and features.                                                                                                |
+| `resolveEquipmentPoolChoiceOptions`   | `resolvers/equipment/equipment-pool-choice-options.ts`     | Maps creature pool rows to `ChoiceSetOption[]`.                                                                                                 |
+| `indexCharacterBuildCatalog`          | `context.ts`                                               | Builds by-id lookup maps for resolver consumption.                                                                                              |
+| `indexPlayableBuilderCatalog`         | `preview/index-playable-builder-catalog.ts`                | Indexes `resolvePlayableBuilderContent` for validation only.                                                                                    |
+| `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`                 | Equipment `comparisonGroups` + `kindLabel`. `standard` is the builder layout. `compact-row` emits one kind-specific fact and never uses weight. |
+| `projectEquipmentSelection`           | `resolvers/equipment/project-equipment-selection.ts`       | Live quantity, add-more, and supply sources on a resolved option.                                                                               |
+| `resolveEquipmentAdditionPolicy`      | `resolvers/equipment/resolve-equipment-addition-policy.ts` | `single` or `quantity` for grant, inventory, acquisition, and requirement context.                                                              |
+| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts`   | Spell picker `castingSummary` + `classification`.                                                                                               |
+| `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`         | Skill proficiency ability label + catalog `exampleUses`.                                                                                        |

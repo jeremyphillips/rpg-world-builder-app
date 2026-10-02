@@ -22,7 +22,6 @@ import type {
   LocationCreateIntent,
   LocationCreateSetupResult,
 } from '../session/location-create-session'
-import type { LocationSetupSummaryEntry } from './location-setup-summary-rows.lib'
 import {
   BUILDING_CREATE_SETUP_FACILITY_FIELD_LABEL,
   BUILDING_CREATE_SETUP_FACILITY_PROMPT,
@@ -32,7 +31,6 @@ import {
   BUILDING_CREATE_SETUP_HEADLINE,
   BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_EYEBROW,
   BUILDING_CREATE_SETUP_IDENTITY_SUMMARY_GROUP,
-  buildBuildingCreateSetupSummaryEntries,
   buildBuildingFacilityAuthoringGroupRadioOptions,
   buildBuildingFormRadioOptions,
   applyBuildingCreateSetupSelectionChange,
@@ -118,16 +116,11 @@ export type LocationCreateModalSetupModel = {
   subhead?: string | false
   choiceSets: LocationCreateModalSetupChoiceSetConfig[]
   complete: () => LocationCreateSetupResult | null
-  summaryEntries: LocationSetupSummaryEntry[]
 }
 
 /** True when every choice set is complete (including projection-safe facility readiness). */
 export function isLocationCreateModalSetupComplete(model: LocationCreateModalSetupModel): boolean {
   return model.choiceSets.every((set) => set.isComplete)
-}
-
-function optionLabel(options: readonly RadioCardOption[], value: string): string {
-  return options.find((option) => option.value === value)?.label ?? value
 }
 
 function isBuildingFormSetupComplete(values: LocationCreateModalSetupValues): boolean {
@@ -175,9 +168,6 @@ function resolveBuildingSetupModel(
       },
     ],
     complete: () => (projection ? { kind: 'building', ...projection } : null),
-    summaryEntries: projection
-      ? buildBuildingCreateSetupSummaryEntries(projection, values.buildingFacilityAuthoringGroup)
-      : [],
   }
 }
 
@@ -243,15 +233,6 @@ export function resolveLocationCreateModalSetupModelForAuthoringType(
         values.siteType && isSiteType(values.siteType)
           ? { kind: 'site', siteType: values.siteType }
           : null,
-      summaryEntries: values.siteType
-        ? [
-            {
-              setId: 'siteType',
-              fieldLabel: SITE_CREATE_SETUP_FIELD_LABEL,
-              valueLabel: optionLabel(options, values.siteType),
-            },
-          ]
-        : [],
     }
   }
 
@@ -273,15 +254,6 @@ export function resolveLocationCreateModalSetupModelForAuthoringType(
         values.settlementType && isSettlementType(values.settlementType)
           ? { kind: 'settlement', settlementType: values.settlementType }
           : null,
-      summaryEntries: values.settlementType
-        ? [
-            {
-              setId: 'settlementType',
-              fieldLabel: SETTLEMENT_CREATE_SETUP_FIELD_LABEL,
-              valueLabel: optionLabel(options, values.settlementType),
-            },
-          ]
-        : [],
     }
   }
 
@@ -323,21 +295,6 @@ export function resolveLocationCreateModalSetupModelForAuthoringType(
         },
       ],
       complete: () => (classification ? { kind: 'region', classification } : null),
-      summaryEntries:
-        values.classification.kind && values.classification.type
-          ? [
-              {
-                setId: REGION_CREATE_SETUP_CLASSIFICATION_KIND_SET_ID,
-                fieldLabel: REGION_CREATE_SETUP_CLASSIFICATION_FIELD_LABEL,
-                valueLabel: optionLabel(kindOptions, values.classification.kind),
-              },
-              {
-                setId: REGION_CREATE_SETUP_CLASSIFICATION_TYPE_SET_ID,
-                fieldLabel: typeFieldLabel,
-                valueLabel: optionLabel(typeOptions, values.classification.type),
-              },
-            ]
-          : [],
     }
   }
 
@@ -384,7 +341,6 @@ export function resolveLocationCreateModalSetupModel({
       headline: LOCATION_CREATE_MODAL_HEADLINE,
       choiceSets: [typeChoiceSet],
       complete: () => null,
-      summaryEntries: [],
     }
   }
 
@@ -398,14 +354,7 @@ export function resolveLocationCreateModalSetupModel({
       headline: LOCATION_CREATE_MODAL_HEADLINE,
       choiceSets: [typeChoiceSet],
       complete: () => null,
-      summaryEntries: [],
     }
-  }
-
-  const typeSummaryEntry = {
-    setId: LOCATION_CREATE_MODAL_AUTHORING_TYPE_SET_ID,
-    fieldLabel: LOCATION_CREATE_MODAL_TYPE_FIELD_LABEL,
-    valueLabel: optionLabel(typeChoiceSet.options, values.authoringType),
   }
 
   const dependentSets = typeModel.choiceSets.map((set) => ({
@@ -421,7 +370,6 @@ export function resolveLocationCreateModalSetupModel({
     subhead: typeModel.subhead,
     choiceSets: [typeChoiceSet, ...dependentSets],
     complete: () => typeModel.complete(),
-    summaryEntries: [typeSummaryEntry, ...typeModel.summaryEntries],
   }
 }
 

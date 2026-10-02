@@ -8,6 +8,7 @@ import {
   OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
+  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
@@ -55,8 +56,10 @@ describe('resolveEquipmentPresentationFacts', () => {
 
     expect(facts.facts[0]).toMatchObject({
       kind: 'requirement',
+      discriminator: 'required',
       label: requiredByLabel('Wizard class'),
     })
+    expect(facts.facts[0]?.label).toBe(requiredByLabel('Wizard class'))
     expect(facts.facts.some((fact) => fact.label === 'Spellbook')).toBe(false)
   })
 
@@ -98,6 +101,7 @@ describe('resolveEquipmentPresentationFacts', () => {
       satisfiesFocusRequirementLabel('Wizard'),
       includedQuantityLabel(1),
     ])
+    expect(satisfier.facts.map((fact) => fact.discriminator)).toEqual(['satisfies', 'included'])
 
     const other = resolveEquipmentPresentationFacts({
       resolved: resolved({
@@ -164,6 +168,34 @@ describe('resolveEquipmentPresentationFacts', () => {
       }),
     })
     expect(proficientOnly.facts).toEqual([])
+  })
+
+  it('projects not-proficient without changing recommendation strength or copy', () => {
+    const recommendation = {
+      strength: 'strong' as const,
+      signals: [
+        {
+          strength: 'strong' as const,
+          basis: 'authored' as const,
+          specificity: 'exact' as const,
+          source: wizard,
+        },
+      ],
+    }
+    const option = resolved({
+      recommendation,
+      state: { compatibility: { proficient: false } },
+    })
+    const facts = resolveEquipmentPresentationFacts({ resolved: option, sourceName })
+    expect(option.recommendation).toBe(recommendation)
+    expect(facts.facts.find((fact) => fact.discriminator === 'recommended')).toMatchObject({
+      label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
+      sourceLabels: ['Wizard class'],
+    })
+    expect(facts.facts.find((fact) => fact.discriminator === 'not-proficient')).toMatchObject({
+      kind: 'compatibility',
+      label: OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+    })
   })
 
   it('labels affinity, package membership, and open pools as state or compatibility', () => {

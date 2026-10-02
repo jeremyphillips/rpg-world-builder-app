@@ -3,8 +3,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { type UseFormReturn } from 'react-hook-form'
 
 import type { CharacterBuildContext } from '@rpg/contracts'
-import { Button, SelectionSummaryCard, Text } from '@rpg/ui'
-import { mapSetupSummaryRowModelsToProps, type SetupSummaryEditTarget } from '@/lib/create-setup'
+import { Button, Text } from '@rpg/ui'
+import { SetupSummaryRows, type SetupSummaryEditTarget } from '@/lib/create-setup'
 import { useCreateFlowFormDensity, CREATE_FLOW_FORM_DENSITY } from '@/lib/create-flow'
 import {
   FormShellSubmitButton,
@@ -31,11 +31,10 @@ import {
   type QuickNpcEquipmentSelection,
   type QuickNpcSetupValues,
 } from '../../lib/quick-npc/quick-npc-form-fields'
+import { type QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
+import { resolveQuickNpcClassChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
 import {
-  reconcileQuickNpcEquipmentSelections,
-  type QuickNpcEquipmentSeedContext,
-} from '../../lib/quick-npc/quick-npc-equipment-selections.lib'
-import {
+  QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
   QUICK_NPC_SETUP_CHANGE_LABEL,
   QUICK_NPC_SETUP_SUMMARY_EYEBROW,
   resolveQuickNpcSetupSummaryRows,
@@ -228,23 +227,25 @@ export function QuickNpcAuthoringForm({
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
   const valueSyncs = React.useMemo(() => createQuickNpcFormValueSyncs(buildContext), [buildContext])
 
-  const defaultValues = React.useMemo(
-    () => ({
+  const defaultValues = React.useMemo(() => {
+    const reconciled = resolveQuickNpcClassChangeAuthoringState({
+      overrides: initialValues?.startingChoiceOverrides ?? {},
+      equipmentSelections: initialValues?.equipmentSelections ?? [],
+      previous: equipmentBaseline ?? { level: setup.level },
+      next: {
+        templateId: setup.npcTemplateId,
+        classId: setup.classId,
+        level: setup.level,
+        rulesetId: buildContext.rulesetId,
+      },
+    })
+    return {
       ...quickNpcAuthoringTabDefaultValues,
       ...initialValues,
-      equipmentSelections: reconcileQuickNpcEquipmentSelections({
-        current: initialValues?.equipmentSelections ?? [],
-        previous: equipmentBaseline ?? { level: setup.level },
-        next: {
-          templateId: setup.npcTemplateId,
-          classId: setup.classId,
-          level: setup.level,
-          rulesetId: buildContext.rulesetId,
-        },
-      }),
-    }),
-    [buildContext.rulesetId, equipmentBaseline, initialValues, setup],
-  )
+      equipmentSelections: reconciled.equipmentSelections,
+      startingChoiceOverrides: reconciled.startingChoiceOverrides,
+    }
+  }, [buildContext.rulesetId, equipmentBaseline, initialValues, setup])
 
   const requirementCategoryKey = React.useMemo(() => {
     const optionSets = buildQuickNpcRequirementOptionSets({ setup, context: buildContext })
@@ -327,14 +328,18 @@ export function QuickNpcAuthoringForm({
             onTabsChange={setTabs}
           />
           <QuickNpcSubmitPendingSync form={form} onPendingChange={onPendingChange} />
-          <SelectionSummaryCard
+          <SetupSummaryRows
             eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
-            rows={mapSetupSummaryRowModelsToProps({
-              rows: setupSummaryRows,
-              changeLabel: QUICK_NPC_SETUP_CHANGE_LABEL,
-              onEdit: (target) =>
-                onSetupSummaryEdit(target, form.getValues().equipmentSelections ?? []),
-            })}
+            rows={setupSummaryRows}
+            changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+            onNavigate={(targetSetId) =>
+              onSetupSummaryEdit(
+                targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
+                  ? { type: 'external', id: targetSetId }
+                  : { type: 'set', id: targetSetId },
+                form.getValues().equipmentSelections ?? [],
+              )
+            }
           />
         </>
       )}

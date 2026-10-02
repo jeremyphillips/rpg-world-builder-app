@@ -251,7 +251,9 @@ describe('location create setup', () => {
       screen.getByRole('radiogroup', { name: 'What kind of region are you creating?' }),
     ).toBeInTheDocument()
     expect(screen.queryByRole('radiogroup', { name: 'Political type' })).not.toBeInTheDocument()
-    expect(screen.queryByText('Kingdom')).not.toBeInTheDocument()
+    expect(screen.getByText('Kingdom')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Change political type' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Change classification' })).not.toBeInTheDocument()
   })
 
   it('clears dependsOn downstream values when an upstream choice changes', async () => {

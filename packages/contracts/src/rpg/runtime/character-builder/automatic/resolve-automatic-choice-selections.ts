@@ -64,6 +64,29 @@ function isEquipmentSkipped(draft: CharacterBuilderDraft): boolean {
   return draft.equipment?.skipped === true
 }
 
+function stripIllegalChoiceSelections(
+  draft: CharacterBuilderDraft,
+  choiceSets: readonly ChoiceSet[],
+): CharacterBuilderDraft {
+  const choiceSetsById = new Map(choiceSets.map((choiceSet) => [choiceSet.id, choiceSet]))
+  let changed = false
+  const nextSelections: CharacterBuilderDraft['choiceSelections'] = { ...draft.choiceSelections }
+
+  for (const [choiceSetId, selectedIds] of Object.entries(nextSelections)) {
+    const choiceSet = choiceSetsById.get(choiceSetId)
+    if (!choiceSet) continue
+    const legalOptionIds = new Set(choiceSet.options.map((option) => option.id))
+    const legalIds = selectedIds.filter((optionId) => legalOptionIds.has(optionId))
+    if (legalIds.length === selectedIds.length) continue
+    changed = true
+    if (legalIds.length === 0) delete nextSelections[choiceSetId]
+    else nextSelections[choiceSetId] = legalIds
+  }
+
+  if (!changed) return draft
+  return { ...draft, choiceSelections: nextSelections }
+}
+
 function findUnsatisfiedRequiredChoiceSet(
   draft: CharacterBuilderDraft,
   choiceSets: readonly ChoiceSet[],
@@ -134,6 +157,7 @@ export function resolveAutomaticChoiceSelections({
 
   for (let iteration = 0; iteration < AUTOMATIC_BUILD_ITERATION_CEILING; iteration += 1) {
     const choiceSets = resolveAvailableChoices(draft, context)
+    draft = stripIllegalChoiceSelections(draft, choiceSets)
     const target = findUnsatisfiedRequiredChoiceSet(draft, choiceSets, pinnedChoiceSetIds)
 
     if (!target) {

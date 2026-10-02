@@ -24,7 +24,7 @@ import {
   type QuickNpcSetupValues,
 } from './quick-npc-form-fields'
 import { buildQuickNpcAutomaticPreferences } from './quick-npc-template-recommendations.lib'
-import { splitQuickNpcAdditionalEquipmentIds } from './quick-npc-additional-equipment.lib'
+import { projectQuickNpcEquipmentAllocations } from './quick-npc-equipment-supply.lib'
 import { usesQuickNpcClassEquipment } from './quick-npc-equipment-selections.lib'
 
 function resolveQuickNpcMembershipPayload(
@@ -76,17 +76,12 @@ export function assembleQuickNpcPrepareCreateArgs(
   const preferences = buildQuickNpcAutomaticPreferences(preferenceArgs)
   const catalogIndex = indexCharacterBuildCatalog(args.buildContext.catalog)
   const classed = usesQuickNpcClassEquipment(values.classId, values.level)
-  const { requiredWeaponIds, manualEquipmentGrantIds } = splitQuickNpcAdditionalEquipmentIds({
-    equipmentSelections: values.equipmentSelections,
-    catalogIndex,
-    constrainManualWeapons: classed,
-  })
-  const startingEquipmentGrants = classed
-    ? []
-    : values.equipmentSelections.map((row) => ({
-        equipmentId: row.equipmentId,
-        quantity: row.quantity,
-      }))
+  const { requiredWeaponIds, manualEquipmentGrantIds, startingEquipmentGrants } =
+    projectQuickNpcEquipmentAllocations({
+      equipmentSelections: values.equipmentSelections,
+      catalogIndex,
+      classed,
+    })
   const startingChoices = resolveNpcStartingChoices({
     context: args.buildContext,
     seed: buildQuickNpcSeed(values),

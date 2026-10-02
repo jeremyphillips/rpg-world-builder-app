@@ -361,19 +361,19 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
         id: 'membershipTitle',
         label: 'Role',
         value: 'Guildmaster',
-        editTarget: { type: 'set', id: 'membershipTitle' },
+        targetSetId: 'membershipTitle',
       },
       {
         id: 'speciesId',
         label: 'Species',
         value: 'Dwarf',
-        editTarget: { type: 'set', id: 'speciesId' },
+        targetSetId: 'speciesId',
       },
       {
         id: 'quickNpcBuild',
         label: 'Build',
         value: 'Criminal · Level 5 Fighter',
-        editTarget: { type: 'external', id: 'quickNpcBuild' },
+        targetSetId: 'quickNpcBuild',
       },
     ])
   })
@@ -396,19 +396,19 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
         id: 'npcTemplateId',
         label: 'Role',
         value: 'Scout',
-        editTarget: { type: 'set', id: 'npcTemplateId' },
+        targetSetId: 'npcTemplateId',
       },
       {
         id: 'speciesId',
         label: 'Species',
         value: 'Dwarf',
-        editTarget: { type: 'set', id: 'speciesId' },
+        targetSetId: 'speciesId',
       },
       {
         id: 'quickNpcBuild',
         label: 'Build',
         value: 'Scout · Level 1 Fighter',
-        editTarget: { type: 'external', id: 'quickNpcBuild' },
+        targetSetId: 'quickNpcBuild',
       },
     ])
   })
@@ -431,19 +431,19 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
         id: 'membershipTitle',
         label: 'Role',
         value: 'Member',
-        editTarget: { type: 'set', id: 'membershipTitle' },
+        targetSetId: 'membershipTitle',
       },
       {
         id: 'speciesId',
         label: 'Species',
         value: 'Dwarf',
-        editTarget: { type: 'set', id: 'speciesId' },
+        targetSetId: 'speciesId',
       },
       {
         id: 'quickNpcBuild',
         label: 'Build',
         value: 'Level 1 Fighter',
-        editTarget: { type: 'external', id: 'quickNpcBuild' },
+        targetSetId: 'quickNpcBuild',
       },
     ])
   })
@@ -471,8 +471,38 @@ describe('resolveQuickNpcSetupSummaryRows', () => {
       id: 'quickNpcBuild',
       label: 'Build',
       value: 'Level 0',
-      editTarget: { type: 'external', id: 'quickNpcBuild' },
+      targetSetId: 'quickNpcBuild',
     })
+  })
+
+  it('describes the selected class instead of a role recommendation', () => {
+    const wizard = {
+      ...populatedBuilderCatalog.classes[0]!,
+      id: 'srd-cc-5.2.1:wizard',
+      slug: 'wizard',
+      name: 'Wizard',
+    }
+    const wizardContext = createCampaignNpcBuilderContextFixture({
+      catalog: {
+        ...populatedBuilderCatalog,
+        classes: [populatedBuilderCatalog.classes[0]!, wizard],
+      },
+    })
+    const rows = resolveQuickNpcSetupSummaryRows({
+      createContext: memberCreateContext,
+      values: quickNpcMemberSetupValues({
+        membershipTitle: 'omt_guildmaster',
+        speciesId: 'srd-cc-5.2.1:dwarf',
+        npcTemplateId: 'criminal',
+        classId: wizard.id,
+        level: 1,
+      }),
+      context: wizardContext,
+      titles: [guildmasterTitle],
+    })
+
+    expect(rows.find((row) => row.id === 'quickNpcBuild')?.value).toBe('Criminal · Level 1 Wizard')
+    expect(rows.find((row) => row.id === 'quickNpcBuild')?.value).not.toMatch(/recommended/i)
   })
 })
 

@@ -6,6 +6,10 @@ import {
   type OptionPresentationFact,
 } from '@rpg/contracts'
 
+import {
+  resolveEquipmentOptionRowPresentation,
+  type EquipmentOptionSecondaryClause,
+} from '../../../../lib/equipment/equipment-option-row-presentation.lib'
 import { formatInlineRecommendationSources } from '../../../../lib/recommendation/format-inline-recommendation-sources'
 import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
 import {
@@ -120,13 +124,61 @@ function visibleStateFact(fact: OptionPresentationFact, isGoldShoppingPath: bool
   return isGoldShoppingPath
 }
 
+function calloutFromClause(
+  clause: EquipmentOptionSecondaryClause,
+): EquipmentCalloutCandidate | undefined {
+  if (clause.kind === 'supply') return undefined
+  if (clause.discriminator === 'not-proficient') {
+    return {
+      priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,
+      callout: {
+        label: clause.badgeLabel,
+        intent: 'warning',
+        importance: 'medium',
+        factKind: 'caution',
+      },
+    }
+  }
+  const fact: OptionPresentationFact = {
+    kind:
+      clause.kind === 'requirement'
+        ? 'requirement'
+        : clause.kind === 'recommendation'
+          ? 'recommendation'
+          : 'compatibility',
+    label: clause.badgeLabel,
+    sourceLabels: clause.sourceLabels,
+    ...(clause.title ? { detail: clause.title } : {}),
+    ...(clause.discriminator ? { discriminator: clause.discriminator } : {}),
+  }
+  return {
+    priority: factPriority(fact),
+    callout: calloutFromFact(fact),
+  }
+}
+
+function semanticClauseCandidates(item: EquipmentPickerItem): EquipmentCalloutCandidate[] {
+  const resolved = item.state.resolved
+  if (!resolved) return []
+  const presentation = resolveEquipmentOptionRowPresentation({
+    identity: item.equipment.name,
+    kindLabel: '',
+    resolved,
+  })
+  return presentation.secondaryClauses.flatMap((clause) => {
+    const candidate = calloutFromClause(clause)
+    return candidate ? [candidate] : []
+  })
+}
+
 function presentationCandidates(
   item: EquipmentPickerItem,
   context: EquipmentPickerCalloutContext,
 ): EquipmentCalloutCandidate[] {
   const facts = item.state.resolved?.presentation?.facts ?? []
   const isGoldShoppingPath = context.isGoldShoppingPath ?? false
-  return facts.flatMap((fact) => {
+  const stateCandidates = facts.flatMap((fact) => {
+    if (fact.kind !== 'state' || fact.discriminator === 'included') return []
     if (!visibleStateFact(fact, isGoldShoppingPath)) return []
     return [
       {
@@ -135,6 +187,7 @@ function presentationCandidates(
       },
     ]
   })
+  return [...semanticClauseCandidates(item), ...stateCandidates]
 }
 
 function getProficiencyCautionCandidate(
@@ -200,10 +253,12 @@ function collectEquipmentCalloutCandidates(
   item: EquipmentPickerItem,
   context: EquipmentPickerCalloutContext,
 ): EquipmentCalloutCandidate[] {
+  const semantic = presentationCandidates(item, context)
+  const semanticHasCaution = semantic.some((candidate) => candidate.callout.factKind === 'caution')
   return [
     getAffordabilityCandidate(item),
-    ...presentationCandidates(item, context),
-    getProficiencyCautionCandidate(item),
+    ...semantic,
+    semanticHasCaution ? undefined : getProficiencyCautionCandidate(item),
   ].filter((candidate): candidate is EquipmentCalloutCandidate => candidate !== undefined)
 }
 

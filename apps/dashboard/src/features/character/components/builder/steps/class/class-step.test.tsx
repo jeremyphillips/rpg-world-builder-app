@@ -46,6 +46,7 @@ describe('ClassStep', () => {
     await user.click(screen.getByRole('radio', { name: /Fighter/i }))
     expect(onDraftChange).toHaveBeenCalledWith({
       class: { classId: fighter.id, level: 1 },
+      choiceSelections: {},
     })
   })
 
@@ -172,8 +173,51 @@ describe('ClassStep', () => {
 
     expect(onDraftChange).toHaveBeenCalledWith({
       class: { classId: fighter.id, level: 1 },
+      choiceSelections: {},
     })
     expect(screen.queryByRole('heading', { name: 'Proficiencies' })).not.toBeInTheDocument()
+  })
+
+  it('clears another class package state and keeps a manual purchase', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const context = createContext()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      choiceSelections: {
+        'spellcasting:srd-cc-5.2.1:wizard:cantrips': ['srd-cc-5.2.1:fire-bolt'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          { equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' as const },
+          { equipmentId: 'srd-cc-5.2.1:sword', quantity: 1, sourceMode: 'startingGold' as const },
+        ],
+        removedPackageItemKeys: ['srd-cc-5.2.1:wizard:standard-equipment:0'],
+        customized: true,
+      },
+    }
+
+    render(
+      <ClassStep
+        context={context}
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Fighter/i }))
+    expect(onDraftChange).toHaveBeenCalledWith({
+      class: { classId: fighter.id, level: 1 },
+      choiceSelections: {},
+      equipment: expect.objectContaining({
+        mode: 'package',
+        customized: false,
+        removedPackageItemKeys: [],
+        purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'manual' }],
+      }),
+    })
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -141,6 +141,15 @@ export function buildChoiceSetId(
   return `${sourceType}:${sourceId}:${slot}`
 }
 
+/** True when the id was built for this granting source, including nested slots. */
+export function choiceSetIdIsOwnedBy(
+  choiceSetId: string,
+  sourceType: ChoiceSourceType,
+  sourceId: string,
+): boolean {
+  return choiceSetId.startsWith(buildChoiceSetId(sourceType, sourceId, ''))
+}
+
 // ---------------------------------------------------------------------------
 // Satisfaction helpers
 // ---------------------------------------------------------------------------

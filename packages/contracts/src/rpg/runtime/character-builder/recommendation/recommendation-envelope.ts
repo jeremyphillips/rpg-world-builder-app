@@ -81,14 +81,27 @@ export type OptionRequirement = {
   role: 'candidate' | 'satisfier' | 'eligible'
 }
 
+/**
+ * Supply provenance for a live equipment row.
+ * Legacy `npcTemplate` records are adapted to `role` / `role-default` before they reach this type.
+ */
+export type EquipmentSupplySource =
+  | { kind: 'manual' }
+  | { kind: 'role'; id: string }
+  | { kind: 'role-default'; id: string }
+  | { kind: 'recorded'; source: CharacterSelectionSource }
+
+/** Live inclusion for one equipment option. Recommendation facts stay on {@link OptionRecommendation}. */
+export type EquipmentOptionSelection = {
+  selected: boolean
+  quantity: number
+  canAddMore: boolean
+  removable: boolean
+  sources: readonly EquipmentSupplySource[]
+}
+
 export type OptionState = {
-  selection?: {
-    selected: boolean
-    quantity?: number
-    grants: CharacterSelectionSource[]
-    removable: boolean
-    reselectable: boolean
-  }
+  selection?: EquipmentOptionSelection
   choice?: {
     choiceSetId?: string
     inOpenPool: boolean

@@ -315,7 +315,9 @@ Recorded before the relationship-first refinement. Findings:
    titles from `OrganizationMembershipTitleField`. Relationship-first building
    composition uses `RadioCardField` for active kind and `CreateCompositionSummary`
    rows for completed decisions inside the Organizations composer. Sequenced location
-   and Quick NPC setup use `CreateSetupPanel` with setup-style summary rows.
+   and Quick NPC setup use `CreateSetupPanel` with setup-style summary rows. Those rows come from
+   `resolveSetupSummaryRows`: a resolved value stays listed in registry order, including while its
+   editor is open (no Change) and after the user navigates back to an earlier step.
    Relationship drawers use `LocationConnectionKindField` for active kind and
    `SelectionSummaryCard` for completed kind rows; change-kind drawers keep the
    kind field expanded only. Do not lift title vocabulary into shared UI.

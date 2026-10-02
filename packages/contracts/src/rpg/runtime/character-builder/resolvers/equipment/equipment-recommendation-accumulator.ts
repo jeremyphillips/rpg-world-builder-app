@@ -8,7 +8,14 @@ import {
   type EquipmentRecommendationSpecificity,
   type EquipmentRecommendationTier,
 } from '../../../../content/equipment-recommendation'
-import type { RecommendationSignalBasis, RecommendationSourceRef } from '../../recommendation'
+import {
+  classRecommendationScope,
+  GLOBAL_RECOMMENDATION_SCOPE,
+  recommendationScopeApplies,
+  type RecommendationScope,
+  type RecommendationSignalBasis,
+  type RecommendationSourceRef,
+} from '../../recommendation'
 import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 import type { SourcedEquipmentRecommendationEvidence } from './equipment-recommendation-evidence'
 import { equipmentEvidenceIdentity } from './equipment-recommendation-evidence'
@@ -25,9 +32,55 @@ export type AccumulatorMap = Map<string, RecommendationAccumulator>
 
 export type AddRecommendationContributionOptions = {
   source?: RecommendationSourceRef
+  scope?: RecommendationScope
+  /** When set, class-scoped signals for a different class are dropped. */
+  selectedClassId?: string
   label?: string
   basis?: RecommendationSignalBasis
   choiceSetId?: string
+}
+
+function scopeForContribution(
+  options: AddRecommendationContributionOptions,
+): RecommendationScope | undefined {
+  if (options.scope) return options.scope
+  if (options.source?.kind === 'class') return classRecommendationScope(options.source.id)
+  if (
+    options.source?.kind === 'role' ||
+    options.source?.kind === 'user' ||
+    options.source?.kind === 'title'
+  ) {
+    return GLOBAL_RECOMMENDATION_SCOPE
+  }
+  return undefined
+}
+
+function mergeRecommendationContribution(
+  existing: RecommendationAccumulator,
+  args: {
+    rank: number
+    specificityRank: number
+    reason: EquipmentRecommendationReason
+    nextEvidence: SourcedEquipmentRecommendationEvidence
+    label?: string
+  },
+): void {
+  existing.reasons.add(args.reason)
+  const key = equipmentEvidenceIdentity(args.nextEvidence)
+  if (!existing.evidence.some((entry) => equipmentEvidenceIdentity(entry) === key)) {
+    existing.evidence.push(args.nextEvidence)
+  }
+
+  if (args.rank < existing.minRank) {
+    existing.minRank = args.rank
+    existing.label = args.label ?? existing.label
+  } else if (args.rank === existing.minRank && existing.label === undefined) {
+    existing.label = args.label
+  }
+
+  if (args.specificityRank < existing.minSpecificityRank) {
+    existing.minSpecificityRank = args.specificityRank
+  }
 }
 
 export function addRecommendationContribution(
@@ -38,6 +91,9 @@ export function addRecommendationContribution(
   specificity: EquipmentRecommendationSpecificity,
   options: AddRecommendationContributionOptions = {},
 ): void {
+  const scope = scopeForContribution(options)
+  if (!recommendationScopeApplies(scope, options.selectedClassId)) return
+
   const rank = EQUIPMENT_RECOMMENDATION_TIER_RANK[tier]
   const specificityRank = EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[specificity]
   const existing = accumulators.get(equipmentId)
@@ -46,6 +102,7 @@ export function addRecommendationContribution(
     tier,
     specificity,
     ...(options.source ? { source: options.source } : {}),
+    ...(scope ? { scope } : {}),
     ...(options.basis ? { basis: options.basis } : {}),
     ...(options.choiceSetId ? { choiceSetId: options.choiceSetId } : {}),
   }
@@ -61,22 +118,13 @@ export function addRecommendationContribution(
     return
   }
 
-  existing.reasons.add(reason)
-  const key = equipmentEvidenceIdentity(nextEvidence)
-  if (!existing.evidence.some((entry) => equipmentEvidenceIdentity(entry) === key)) {
-    existing.evidence.push(nextEvidence)
-  }
-
-  if (rank < existing.minRank) {
-    existing.minRank = rank
-    existing.label = options.label ?? existing.label
-  } else if (rank === existing.minRank && existing.label === undefined) {
-    existing.label = options.label
-  }
-
-  if (specificityRank < existing.minSpecificityRank) {
-    existing.minSpecificityRank = specificityRank
-  }
+  mergeRecommendationContribution(existing, {
+    rank,
+    specificityRank,
+    reason,
+    nextEvidence,
+    label: options.label,
+  })
 }
 
 export type DerivedEquipmentRecommendation = EquipmentRecommendation & {

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import {
+  applySelectedClassChange,
   characterBuilderStepSelectionMessages,
   formatFieldMessage,
   resolvePlayableBuilderContent,
@@ -37,6 +38,19 @@ export type ClassStepProps = {
 
 export function ClassStep({ context, draft, validationIssues, onDraftChange }: ClassStepProps) {
   const [detailsClassId, setDetailsClassId] = useState<string | null>(null)
+
+  const selectClass = (classId: string) => {
+    const next = applySelectedClassChange({
+      draft,
+      nextClassId: classId || undefined,
+      context,
+    })
+    onDraftChange({
+      class: next.class,
+      choiceSelections: next.choiceSelections,
+      ...(draft.equipment ? { equipment: next.equipment } : {}),
+    })
+  }
 
   const classes = useMemo(() => resolvePlayableBuilderContent(context).classes, [context])
 
@@ -89,12 +103,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
         reserveSummaryBadgeRow
         value={draft.class.classId ?? ''}
         onValueChange={(classId) => {
-          onDraftChange({
-            class: {
-              ...draft.class,
-              classId: classId || undefined,
-            },
-          })
+          selectClass(classId)
         }}
         options={options}
         idPrefix="character-builder-class"
@@ -125,12 +134,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
               <Button
                 onClick={() => {
                   if (!detailsClassId) return
-                  onDraftChange({
-                    class: {
-                      ...draft.class,
-                      classId: detailsClassId,
-                    },
-                  })
+                  selectClass(detailsClassId)
                   setDetailsClassId(null)
                 }}
               >

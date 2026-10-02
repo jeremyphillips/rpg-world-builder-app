@@ -10,7 +10,7 @@ rows from `@rpg/ui`; the active decision renders as an expanded `RadioCardField`
 
 ```text
 sequencer  → order, visibility, visibleWhenComplete, dependsOn, active/complete, invalidation
-panel      → active RadioCardField + partial summary rows (no collapse chrome)
+panel      → resolved summary rows + active RadioCardField (no collapse chrome)
 footer     → derived from completion semantics (Cancel-only / disabled Continue / enabled Continue / re-entry)
 ```
 
@@ -20,11 +20,12 @@ footer     → derived from completion semantics (Cancel-only / disabled Continu
 - **Sequence model** (`useCreateSetupSequence`) is owned by the feature setup phase and passed to
   `CreateSetupPanel`, `CreateSetupFooter`, and sibling UI (e.g. Quick NPC Build card). One instance
   — no forked reopen state.
-- **Panel** (`create-setup-panel-items.tsx`) maps active sets to `RadioCardField` with
-  reselect opt-in; completed non-active sets render partial rows in declared `summaryGroup` cards
-  (or standalone single-row cards when ungrouped).
-- **`summaryGroup`** — set-level semantic grouping. A group renders whenever it has ≥1 completed
-  non-active row. Ungrouped completed sets get their own standalone card — never join an implicit group.
+- **Panel** (`create-setup-panel-items.tsx`) renders resolved summary rows first, then the active
+  `RadioCardField`. Summary rows come from `resolveSetupSummaryRows` and a per-flow registry.
+  Choice-set flows use `createChoiceSetSummaryDefinitions` unless they pass their own cards.
+- **`summaryGroup`** — set-level card grouping only. A group renders whenever it has ≥1 resolved
+  value, including the active row and downstream values. Ungrouped resolved sets get their own
+  standalone card — never join an implicit group. Grouping does not hide rows.
 - **`skipLabel` / `skippedValueLabel`** — optional sets expose explicit skip; skipping emits
   `onSetupValueChange({ skipped: true, ... })` and the feature records resolved-without-value.
 - **`isComplete`** on each set is caller-owned; the sequencer reads it but does not derive it from values.
@@ -82,12 +83,26 @@ explicit decision confirmed / auto-complete  → transition (onSetupComplete)
 setup re-entered, already complete         → [Cancel] [Continue]  (re-entry; no auto-fire)
 ```
 
+Extra setup footer actions (e.g. Quick NPC Preview) declare `CreateSetupFooterAction` entries with
+`visibility: 'always' | 'final-set'`. `resolveCreateSetupFooterActions` filters them using the
+**registered** sequence (`resolveCreateSetupSequenceSetIds`) and the active sequence id
+(`resolveCreateSetupActiveSequenceSetId`), not progressive `visibleSetIds` — the latter is only for
+editor reveal.
+
 ## Summary model
 
-- **Setup phase** — partial `SelectionSummaryCard` rows from completed decisions; row-level Change reopens.
-  Active/reopened sets are omitted from summary rows.
-- **Authoring phase** — `SelectionSummaryCard` with card-level Change; rows from feature `resolveXSetupSummaryRows()`.
-- **Shared renderer** — `SelectionSummaryCard` / `SelectionSummaryRow` from `@rpg/ui` for both phases.
+`resolveSetupSummaryRows(state, registry)` lists every definition whose `resolveValue` is non-empty,
+in registry order. It does not look at the active step, and it does not decide whether a dependent
+value is still valid. Applicators clear or replace invalid values first; the next resolve describes
+the resulting state.
+
+- **Resolved value** — render the row.
+- **No resolved value** — omit the row.
+- **Open editor** — render the row and omit Change (`targetSetId === activeTargetId`).
+- **Any other row** — render Change, which navigates to `targetSetId`.
+- **Order** — registry order, not completion history. Navigating backward does not hide downstream rows.
+- **Editors** — downstream controls still hide while an earlier set is the open editor.
+- **Authoring phase** — the same rows, with `activeTargetId` null so every row keeps Change.
 
 Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
 
@@ -122,13 +137,14 @@ Create-modal radio cards represent **active decisions only**; completed setup de
 
 ## UX invariants
 
-- **Progressive reveal** — downstream setup UI stays hidden until upstream choices are complete, and
-  hides again while an upstream choice is being edited.
+- **Progressive reveal** — downstream editors stay hidden until upstream choices are complete, and
+  hide again while an upstream choice is being edited. Summary rows for values that are still
+  resolved stay visible.
 - **Same-value reselect** — re-confirming the current choice dismisses edit mode without emitting a
   value change or clearing downstream state.
 - **Single mutation channel** — feature applicators own all setup transitions; the panel emits
   `onSetupValueChange` only for genuine changes.
-- **Partial summaries** — completed decisions only; no placeholder rows for unresolved sets.
+- **Resolved summaries** — rows describe current values only; no placeholder rows for unresolved sets.
 - **Optional sets** — explicit skip completes the set for reveal; optional sets never auto-pass-through
   to the next question.
 

@@ -85,9 +85,26 @@ from canonical order). Each value is a `RecommendationSourceRef` list. Package b
 every source that owns the winning tuple. Seeded allowance ids are not attributed. `resolveAutomaticNpcBuild`
 runs that loop, then magic-item grants, required-weapon grants, and constraint checks.
 
-Fill order for each required ChoiceSet is hard constraints, then class spell recommendations,
-then soft preferences, then the canonical first-eligible option. Class spell recommendations
-are recorded as `suggestedBy` refs `{ kind: 'class', id }`. Already-held skills, tools, and
+Fill order for each required ChoiceSet is:
+
+1. Legal candidates from the current character. A class starting-equipment package and its
+   nested pools come only from the selected class. Selections outside that set do not count
+   toward `min` and are removed.
+2. Hard constraints, then class spell recommendations.
+3. Soft preferences. User, title, and role equipment preferences are global: they stay active
+   when the selected class is not the role's suggested class, and they only reorder options
+   that are already legal. A preference that matches nothing is ignored and does not fail the
+   build.
+4. The canonical first-eligible option.
+
+Class-authored equipment signals use `{ kind: 'class', classId }` and apply only for that
+class. `suggestedBy` is recorded only for a winner that is already a legal option of the
+selected class. Changing class drops the previous class's package, nested pools, and
+class-owned equipment channel, then the next fill resolves the new class from scratch.
+Manual purchases stay.
+
+Class spell recommendations are recorded as `suggestedBy` refs `{ kind: 'class', id }`.
+Already-held skills, tools, and
 languages are skipped and do not count toward the required pick. Held ids come from finalize-equivalent
 proficiency assembly (`resolveHeldProficiencyKeys`), excluding the ChoiceSet being filled,
 so class-fixed items, ruleset languages, and earlier ChoiceSet selections are all visible

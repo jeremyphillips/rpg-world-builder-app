@@ -35,6 +35,7 @@ import {
 } from './derive-equipment-recommendation-contributions'
 import { classRecommendationSource } from './equipment-recommendation-evidence'
 import {
+  GLOBAL_RECOMMENDATION_SCOPE,
   resolveEquipmentPresentationFacts,
   type EquipmentOpenPoolKind,
   type RecommendationSourceName,
@@ -158,6 +159,7 @@ function applyAuthoredRules(args: {
         source: classRecommendationSource(characterClass.id),
         basis: 'authored',
         label: rule.label,
+        selectedClassId: characterClass.id,
       })
     }
   }
@@ -190,6 +192,7 @@ function applyRequiredGearContributions(args: {
       {
         source: classRecommendationSource(args.characterClass.id),
         basis: 'inferred',
+        selectedClassId: args.characterClass.id,
       },
     )
   }
@@ -222,6 +225,7 @@ function applyRecommendedGearContributions(args: {
       {
         source: classRecommendationSource(args.characterClass.id),
         basis: 'inferred',
+        selectedClassId: args.characterClass.id,
       },
     )
   }
@@ -273,6 +277,7 @@ function applySpellcastingFocusContributions(args: {
         {
           source: classRecommendationSource(characterClass.id),
           basis: 'inferred',
+          selectedClassId: characterClass.id,
         },
       )
     }
@@ -313,6 +318,7 @@ export function deriveEquipmentRecommendations(
       ],
       catalogIndex,
       rulesetId: characterClass.rulesetId,
+      selectedClassId: characterClass.id,
     })
   }
 
@@ -364,6 +370,7 @@ export function deriveEquipmentRecommendations(
     accumulators,
     catalogIndex,
     recommendationContext: args.recommendationContext,
+    selectedClassId: characterClass.id,
   })
 
   const recommendations = new Map<string, DerivedEquipmentRecommendation>()
@@ -417,15 +424,18 @@ function applyContextEquipmentPreferences(args: {
   accumulators: AccumulatorMap
   catalogIndex: CharacterBuildCatalogIndex
   recommendationContext: EquipmentRecommendationContext | undefined
+  selectedClassId: string
 }): void {
   const context = args.recommendationContext
   if (!context) return
+  const selectedClassId = args.selectedClassId
   if (context.userEquipmentPreferenceSlugs?.length) {
     applyEquipmentPreferenceSignals({
       accumulators: args.accumulators,
       catalogIndex: args.catalogIndex,
       slugs: context.userEquipmentPreferenceSlugs,
       source: { kind: 'user' },
+      selectedClassId,
     })
   }
   if (
@@ -442,6 +452,7 @@ function applyContextEquipmentPreferences(args: {
         organizationId: context.title.organizationId,
         titleId: context.title.titleId,
       },
+      selectedClassId,
     })
   }
   if (context.roleId && context.roleEquipmentPreferenceSlugs?.length) {
@@ -450,6 +461,7 @@ function applyContextEquipmentPreferences(args: {
       catalogIndex: args.catalogIndex,
       slugs: context.roleEquipmentPreferenceSlugs,
       source: { kind: 'role', id: context.roleId },
+      selectedClassId,
     })
   }
 }
@@ -463,6 +475,7 @@ function applyEquipmentPreferenceSignals(args: {
   catalogIndex: CharacterBuildCatalogIndex
   slugs: readonly string[]
   source: RecommendationSourceRef
+  selectedClassId: string
 }): void {
   const slugs = new Set(args.slugs)
   for (const equipment of args.catalogIndex.equipment.values()) {
@@ -473,7 +486,12 @@ function applyEquipmentPreferenceSignals(args: {
       'strong',
       'classSuggested',
       'exact',
-      { source: args.source, basis: 'preference' },
+      {
+        source: args.source,
+        basis: 'preference',
+        scope: GLOBAL_RECOMMENDATION_SCOPE,
+        selectedClassId: args.selectedClassId,
+      },
     )
   }
 }

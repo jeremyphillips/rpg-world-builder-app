@@ -6,10 +6,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { NpcStartingChoices, StartingChoiceContribution } from '@rpg/contracts'
 
+import { buildEquipmentPickerRowViewModel } from '@/features/content'
+
 import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../../../lib/fixtures/character-builder-fixtures'
+import { equipmentStepSpearFixture } from '../../../../lib/equipment/equipment-step.fixtures'
 import {
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabFormValues,
@@ -220,13 +223,33 @@ describe('QuickNpcStartingChoices', () => {
           level: 0,
         }}
         defaultValues={{
-          equipmentSelections: [{ equipmentId: 'club', quantity: 1, origin: 'role-default' }],
+          equipmentSelections: [
+            { equipmentId: equipmentStepSpearFixture.id, quantity: 1, origin: 'role-default' },
+          ],
         }}
         additionalEquipmentOptions={[
           {
-            option: { value: 'club', label: 'Club' },
-            pickerItem: {} as never,
-            row: {} as never,
+            option: {
+              value: equipmentStepSpearFixture.id,
+              label: equipmentStepSpearFixture.name,
+            },
+            pickerItem: {
+              equipment: equipmentStepSpearFixture,
+              state: {
+                isAvailable: true,
+                isRecommended: false,
+                disabledReasons: [],
+                isProficient: false,
+                isWithinRemainingBudget: true,
+                purchaseAvailability: { status: 'available' as const },
+                recommendation: {
+                  tier: 'neutral' as const,
+                  reasons: [],
+                  specificity: 'broad_pool' as const,
+                },
+              },
+            },
+            row: buildEquipmentPickerRowViewModel(equipmentStepSpearFixture),
           },
         ]}
       />,
@@ -237,7 +260,7 @@ describe('QuickNpcStartingChoices', () => {
     ).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: /expand equipment/i }))
     expect(screen.getByText('Add the items this NPC should start with.')).toBeInTheDocument()
-    expect(screen.getAllByText('Club').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(equipmentStepSpearFixture.name).length).toBeGreaterThan(0)
     expect(screen.getByRole('combobox', { name: 'Add equipment' }).closest('.mt-2')).toBeTruthy()
     expect(screen.queryByText('Granted Equipment')).not.toBeInTheDocument()
   })

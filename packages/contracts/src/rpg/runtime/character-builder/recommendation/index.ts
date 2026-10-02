@@ -1,6 +1,14 @@
 export type { RecommendationSourceKind, RecommendationSourceRef } from './recommendation-source-ref'
 export { RECOMMENDATION_SOURCE_KINDS } from './recommendation-source-ref'
 
+export type { RecommendationScope } from './recommendation-scope'
+export {
+  GLOBAL_RECOMMENDATION_SCOPE,
+  classRecommendationScope,
+  recommendationScopeApplies,
+  recommendationScopeIdentity,
+} from './recommendation-scope'
+
 export {
   formatRecommendationSourceLabel,
   RECOMMENDATION_SOURCE_LABEL_DENSITIES,
@@ -33,6 +41,8 @@ export type {
 export type {
   ActiveChoiceContext,
   OptionContextRelevance,
+  EquipmentOptionSelection,
+  EquipmentSupplySource,
   OptionRecommendation,
   OptionRequirement,
   OptionState,
@@ -72,8 +82,10 @@ export {
   includedQuantityLabel,
   OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
+  OPTION_PRESENTATION_DISCRIMINATORS,
   OPTION_PRESENTATION_FACT_KINDS,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
@@ -85,6 +97,7 @@ export {
   softRecommendationFact,
 } from './resolve-option-presentation-facts'
 export type {
+  OptionPresentationDiscriminator,
   OptionPresentationFact,
   OptionPresentationFactKind,
   OptionPresentationFacts,

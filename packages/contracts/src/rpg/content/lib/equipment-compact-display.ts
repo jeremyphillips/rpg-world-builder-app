@@ -13,6 +13,7 @@ import {
   getHolySymbolUsageLabel,
 } from '../../vocab/equipment/holy-symbol-usage'
 import { getServiceCategoryLabel } from '../../vocab/equipment/service-category'
+import { formatServiceDuration } from '../../vocab/equipment/service-duration'
 import { getSpellcastingGearKindLabel } from '../../vocab/equipment/spellcasting-gear-kind'
 import { getToolCategoryLabel } from '../../vocab/equipment/tool-category'
 import { getVehicleCategoryLabel } from '../../vocab/equipment/vehicle-category'
@@ -49,6 +50,7 @@ export type CompactFieldId =
   | 'rarity'
   | 'attunement'
   | 'primaryMechanic'
+  | 'serviceDuration'
 
 export type CompactFieldSlot = CompactFieldId | { firstAvailable: CompactFieldId[] }
 
@@ -84,9 +86,11 @@ function isRedundantCompactSegment(
   segment: string,
   comparisonGroups: readonly string[],
   kindLabel: string,
+  identity?: string,
 ): boolean {
   const normalized = normalizeCompactSegment(segment)
   if (normalized === normalizeCompactSegment(kindLabel)) return true
+  if (identity && normalized === normalizeCompactSegment(identity)) return true
   return comparisonGroups.some((existing) => normalizeCompactSegment(existing) === normalized)
 }
 
@@ -189,8 +193,14 @@ function formatCompactCrafts(equipment: Equipment): string | undefined {
 }
 
 function formatCompactSpeed(equipment: Equipment): string | undefined {
-  if (equipment.kind !== 'mount') return undefined
+  if (equipment.kind !== 'mount' && equipment.kind !== 'vehicle') return undefined
   return formatSpeedRate(equipment.speed)
+}
+
+function formatCompactServiceDuration(equipment: Equipment): string | undefined {
+  if (equipment.kind !== 'service' || !equipment.duration) return undefined
+  const formatted = formatServiceDuration(equipment.duration)
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }
 
 function formatCompactTrait(_equipment: Equipment): string | undefined {
@@ -234,6 +244,7 @@ const COMPACT_FIELD_FORMATTERS: Record<
   rarity: formatCompactRarity,
   attunement: formatCompactAttunement,
   primaryMechanic: formatCompactPrimaryMechanic,
+  serviceDuration: formatCompactServiceDuration,
 }
 
 export const COMPACT_METADATA_LAYOUT = {
@@ -259,6 +270,22 @@ export const COMPACT_METADATA_LAYOUT = {
     fields: ['category'],
   },
 } satisfies Partial<Record<EquipmentKind, EquipmentCompactLayout>>
+
+/** One kind-specific fact for compact identity rows. */
+export const COMPACT_ROW_METADATA_LAYOUT = {
+  weapon: { fields: ['damage'], maxSegments: 1 },
+  armor: { fields: ['armorClass'], maxSegments: 1 },
+  tool: { fields: ['category'], maxSegments: 1 },
+  mount: { fields: ['speed'], maxSegments: 1 },
+  magic_item: { fields: ['rarity'], maxSegments: 1 },
+  vehicle: { fields: ['speed'], maxSegments: 1 },
+  service: { fields: ['serviceDuration'], maxSegments: 1 },
+  adventuring_gear: { fields: ['gearKind'], maxSegments: 1 },
+} satisfies Record<EquipmentKind, EquipmentCompactLayout>
+
+export const EQUIPMENT_COMPACT_SUMMARY_PROFILES = ['standard', 'compact-row'] as const
+
+export type EquipmentCompactSummaryProfile = (typeof EQUIPMENT_COMPACT_SUMMARY_PROFILES)[number]
 
 const ADVENTURING_GEAR_BRANCH_LAYOUTS = {
   holy_symbol: {
@@ -302,7 +329,13 @@ function resolveAdventuringGearLayout(
   }
 }
 
-function resolveEquipmentCompactLayout(equipment: Equipment): EquipmentCompactLayout {
+function resolveEquipmentCompactLayout(
+  equipment: Equipment,
+  profile: EquipmentCompactSummaryProfile,
+): EquipmentCompactLayout {
+  if (profile === 'compact-row') {
+    return COMPACT_ROW_METADATA_LAYOUT[equipment.kind]
+  }
   if (equipment.kind === 'adventuring_gear') {
     return resolveAdventuringGearLayout(equipment)
   }
@@ -319,10 +352,11 @@ function pushCompactSegment(
   segment: string | undefined,
   kindLabel: string,
   maxSegments: number,
+  identity: string,
 ): boolean {
   if (!segment || comparisonGroups.length >= maxSegments)
     return comparisonGroups.length >= maxSegments
-  if (isRedundantCompactSegment(segment, comparisonGroups, kindLabel)) {
+  if (isRedundantCompactSegment(segment, comparisonGroups, kindLabel, identity)) {
     return comparisonGroups.length >= maxSegments
   }
   comparisonGroups.push(segment)
@@ -347,6 +381,7 @@ function assembleComparisonGroups(
           formatCompactField(equipment, slot),
           kindLabel,
           maxSegments,
+          equipment.name,
         )
       ) {
         break
@@ -356,7 +391,12 @@ function assembleComparisonGroups(
 
     for (const fieldId of slot.firstAvailable) {
       const segment = formatCompactField(equipment, fieldId)
-      if (!segment || isRedundantCompactSegment(segment, comparisonGroups, kindLabel)) continue
+      if (
+        !segment ||
+        isRedundantCompactSegment(segment, comparisonGroups, kindLabel, equipment.name)
+      ) {
+        continue
+      }
       comparisonGroups.push(segment)
       break
     }
@@ -365,9 +405,12 @@ function assembleComparisonGroups(
   return comparisonGroups
 }
 
-export function buildEquipmentCompactSummary(equipment: Equipment): EquipmentCompactSummary {
+export function buildEquipmentCompactSummary(
+  equipment: Equipment,
+  profile: EquipmentCompactSummaryProfile = 'standard',
+): EquipmentCompactSummary {
   const kindLabel = getEquipmentKindLabel(equipment.kind)
-  const layout = resolveEquipmentCompactLayout(equipment)
+  const layout = resolveEquipmentCompactLayout(equipment, profile)
 
   return {
     kindLabel,

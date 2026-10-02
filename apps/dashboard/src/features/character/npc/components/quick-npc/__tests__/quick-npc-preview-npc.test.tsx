@@ -52,7 +52,10 @@ describe('Quick NPC sheet preview', () => {
       />,
     )
 
-    const previewButton = screen.getByRole('button', { name: QUICK_NPC_PREVIEW_NPC_LABEL })
+    await user.click(screen.getByRole('radio', { name: /guard/i }))
+    await user.click(screen.getByRole('radio', { name: /dwarf/i }))
+
+    const previewButton = await screen.findByRole('button', { name: QUICK_NPC_PREVIEW_NPC_LABEL })
     await user.click(previewButton)
 
     expect(screen.getByRole('dialog', { name: QUICK_NPC_PREVIEW_NPC_LABEL })).toBeInTheDocument()

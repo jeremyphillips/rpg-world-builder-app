@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { deriveCreateSetupFooterState } from './create-setup-footer'
+import {
+  deriveCreateSetupFooterState,
+  resolveCreateSetupFooterActions,
+  type CreateSetupFooterAction,
+} from './create-setup-footer'
 import {
   resolveCreateSetupIsComplete,
   resolveCreateSetupPendingExplicitDecisions,
@@ -62,6 +66,63 @@ describe('CreateSetupFooter', () => {
         ),
       ).toBe('re-entry-continue')
     })
+  })
+})
+
+describe('resolveCreateSetupFooterActions', () => {
+  const quickNpcContext = {
+    sequenceSetIds: ['membershipTitle', 'speciesId', 'quickNpcBuild'],
+    externalDecisions: [{ id: 'quickNpcBuild' }],
+  }
+
+  const previewAction: CreateSetupFooterAction = {
+    id: 'preview',
+    label: 'Preview NPC',
+    visibility: 'final-set',
+  }
+
+  it('drops final-set actions off the last registered step', () => {
+    expect(
+      resolveCreateSetupFooterActions([previewAction], {
+        ...quickNpcContext,
+        activeSetId: 'membershipTitle',
+      }),
+    ).toEqual([])
+  })
+
+  it('keeps final-set actions on the last registered step', () => {
+    expect(
+      resolveCreateSetupFooterActions([previewAction], {
+        ...quickNpcContext,
+        activeSetId: null,
+      }),
+    ).toEqual([previewAction])
+  })
+
+  it('keeps always-visible actions on every step', () => {
+    const alwaysAction: CreateSetupFooterAction = {
+      id: 'help',
+      label: 'Help',
+      visibility: 'always',
+    }
+
+    expect(
+      resolveCreateSetupFooterActions([alwaysAction, previewAction], {
+        ...quickNpcContext,
+        activeSetId: 'speciesId',
+      }),
+    ).toEqual([alwaysAction])
+  })
+
+  it('preserves disabled on visible actions', () => {
+    const disabledPreview = { ...previewAction, disabled: true }
+
+    expect(
+      resolveCreateSetupFooterActions([disabledPreview], {
+        ...quickNpcContext,
+        activeSetId: null,
+      }),
+    ).toEqual([disabledPreview])
   })
 })
 

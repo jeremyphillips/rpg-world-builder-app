@@ -57,6 +57,7 @@ export * from './finalize/finalize-npc'
 export * from './mode-scope'
 export * from './preview/preview'
 export * from './preview/builder-summary-parts'
+export * from './draft/apply-selected-class-change'
 export * from './draft/prune-invalid-builder-selections'
 export * from './readiness/resolve-unresolved-choice-set-summaries'
 export * from './readiness/resolve-review-blocking-summary'
@@ -71,6 +72,22 @@ export * from './resolvers/equipment/derive-equipment-draft-entries'
 export * from './resolvers/equipment/ensure-equipment-grant'
 export * from './resolvers/equipment/derive-equipment-recommendations'
 export type { ResolvedEquipmentOption } from './resolvers/equipment/project-equipment-option-facts'
+export {
+  adaptCharacterSelectionToEquipmentSupply,
+  dedupeEquipmentSupplySources,
+  formatEquipmentSupplySourceLabel,
+  formatEquipmentSupplySourceLabels,
+  projectEquipmentSelection,
+} from './resolvers/equipment/project-equipment-selection'
+export type { EquipmentAdditionMode } from './resolvers/equipment/project-equipment-selection'
+export {
+  resolveEquipmentAdditionPolicy,
+  EQUIPMENT_ADDITION_POLICIES,
+} from './resolvers/equipment/resolve-equipment-addition-policy'
+export type {
+  EquipmentAdditionContext,
+  EquipmentAdditionPolicy,
+} from './resolvers/equipment/resolve-equipment-addition-policy'
 export * from './resolvers/equipment/equipment-budget'
 export * from './resolvers/equipment/resolve-starting-equipment-funding'
 export * from './resolvers/equipment/apply-equipment-step-action'
