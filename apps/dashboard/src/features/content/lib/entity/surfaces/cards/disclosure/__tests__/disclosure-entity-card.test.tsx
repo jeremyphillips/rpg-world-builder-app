@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 
+import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
+
 import { DisclosureEntityCard } from '../disclosure-entity-card'
 import {
   entityBodyInlineEndClasses as disclosureEntityCardBodyInlineEndClasses,
@@ -28,6 +30,18 @@ const mockDragHandleProps = {
 
 function bodyFor(label: string): HTMLElement {
   return screen.getByText(label).parentElement as HTMLElement
+}
+
+function ghostRemoveUtility(label: string) {
+  return (
+    <button
+      type="button"
+      className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}
+      aria-label={`Remove ${label}`}
+    >
+      <ActionIcon action="remove" step="md" />
+    </button>
+  )
 }
 
 describe('DisclosureEntityCard', () => {
@@ -79,7 +93,9 @@ describe('DisclosureEntityCard', () => {
       'calc(var(--entity-surface-inline-start) + var(--entity-content-offset))',
     )
     expect(article).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*2)]')
-    expect(article).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(article).toHaveClass(
+      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
+    )
     expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
@@ -90,9 +106,9 @@ describe('DisclosureEntityCard', () => {
     const cases = [
       { id: 'none', trailing: undefined, label: 'Body none' },
       {
-        id: 'delete',
-        trailing: { kind: 'action' as const, content: <button type="button">Remove</button> },
-        label: 'Body delete',
+        id: 'utility-remove',
+        trailing: { kind: 'utility' as const, content: ghostRemoveUtility('Body utility') },
+        label: 'Body utility remove',
       },
       {
         id: 'add',
@@ -135,14 +151,14 @@ describe('DisclosureEntityCard', () => {
     expect(new Set(classNames).size).toBe(1)
   })
 
-  it('publishes compact surface inset tokens without coupling to trailing chrome', () => {
+  it('publishes compact surface inset tokens and utility end inset for ghost trailing', () => {
     const { container } = render(
       <DisclosureEntityCard
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
         density="compact"
-        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+        trailing={{ kind: 'utility', content: ghostRemoveUtility('Harbor District') }}
         defaultCollapsed={false}
       >
         <p>Compact body</p>
@@ -152,8 +168,10 @@ describe('DisclosureEntityCard', () => {
     const shell = container.querySelector('[role="group"]') as HTMLElement
     const article = container.querySelector('article') as HTMLElement
     expect(article).toHaveClass('[--entity-surface-inset:calc(var(--spacing)*4)]')
-    expect(article).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
+    expect(article).toHaveClass(
+      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
+    )
+    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
     expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
   })
@@ -258,14 +276,14 @@ describe('DisclosureEntityCard', () => {
         itemId="harbor"
         toolbarAriaLabel="Harbor District"
         entity={HARBOR_DISTRICT_ENTITY}
-        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+        trailing={{ kind: 'utility', content: ghostRemoveUtility('Harbor District') }}
         defaultCollapsed={false}
       >
         <p>Expanded inventory details</p>
       </DisclosureEntityCard>,
     )
 
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remove Harbor District' })).toBeInTheDocument()
   })
 
   it('fills the header region so short-heading trailing aligns to column 3', () => {
@@ -276,7 +294,7 @@ describe('DisclosureEntityCard', () => {
           toolbarAriaLabel="Harbor District"
           entity={{ heading: 'Light' }}
           density="compact"
-          trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+          trailing={{ kind: 'utility', content: ghostRemoveUtility('Light') }}
           defaultCollapsed={false}
         >
           <p>Body</p>
@@ -296,6 +314,7 @@ describe('DisclosureEntityCard', () => {
     expect(anatomy).toHaveAttribute('data-row-anatomy')
     expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
     expect(trailing).toHaveAttribute('data-row-anatomy-column', 'trailing')
+    expect(trailing).toHaveAttribute('data-row-anatomy-slot', 'full')
     expect(trailing.compareDocumentPosition(content)).toBe(Node.DOCUMENT_POSITION_PRECEDING)
   })
 
@@ -313,7 +332,7 @@ describe('DisclosureEntityCard', () => {
           }}
           density="compact"
           dragHandleProps={mockDragHandleProps}
-          trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+          trailing={{ kind: 'utility', content: ghostRemoveUtility('Speak with Animals') }}
           defaultCollapsed={false}
         >
           <p>Body</p>
@@ -326,6 +345,7 @@ describe('DisclosureEntityCard', () => {
     const anatomy = content.parentElement as HTMLElement
 
     expect(anatomy).toHaveClass('w-full')
+    expect(trailing).toHaveAttribute('data-row-anatomy-slot', 'full')
     expect(content).toHaveClass('min-w-0')
     expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
     expect(trailing).toHaveAttribute('data-row-anatomy-column', 'trailing')

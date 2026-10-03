@@ -36,15 +36,15 @@ Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` re
 `cursor: pointer` on enabled buttons in `@layer base`. Compose `interactivePointerClasses`
 (or `hitTarget: 'pointer'` on `interactiveRowVariants`) for non-button hit targets.
 
-| Surface | Cursor |
-| ------- | ------ |
-| Buttons, icon ghosts, disclosure triggers | `pointer` |
-| Text inputs / textarea | `text` (UA default) |
-| Select/combobox/dropdown triggers | `pointer` |
-| Menu / listbox options in popovers | `pointer` |
-| Drag handles | `grab` / `grabbing` (`dragHandleVariants`) |
-| Disabled controls | `not-allowed` or `pointer-events-none` |
-| Static rows (no activation) | `default` (e.g. preview rail static sections) |
+| Surface                                   | Cursor                                        |
+| ----------------------------------------- | --------------------------------------------- |
+| Buttons, icon ghosts, disclosure triggers | `pointer`                                     |
+| Text inputs / textarea                    | `text` (UA default)                           |
+| Select/combobox/dropdown triggers         | `pointer`                                     |
+| Menu / listbox options in popovers        | `pointer`                                     |
+| Drag handles                              | `grab` / `grabbing` (`dragHandleVariants`)    |
+| Disabled controls                         | `not-allowed` or `pointer-events-none`        |
+| Static rows (no activation)               | `default` (e.g. preview rail static sections) |
 
 ### `iconGhostControlVariants({ hover, layout })`
 
@@ -55,14 +55,14 @@ embedded focus. List-row removes use this primitive — features must not size r
 
 Orthogonal row fills — not layout:
 
-| Axis            | Values                                 |
-| --------------- | -------------------------------------- |
-| `interaction`   | `static` \| `hoverable`                |
-| `state`         | `default` \| `inactive` \| `disabled`  |
-| `hoverFamily`   | `none` \| `selectable` \| `navigation` |
-| `selected`      | `none` \| `bordered` \| `fill`         |
-| `selectedHover` | `none` \| `row`                        |
-| `selectedData`  | `none` \| `selected` \| `checked`      |
+| Axis            | Values                                                        |
+| --------------- | ------------------------------------------------------------- |
+| `interaction`   | `static` \| `hoverable`                                       |
+| `state`         | `default` \| `inactive` \| `disabled`                         |
+| `hoverFamily`   | `none` \| `selectable` \| `navigation`                        |
+| `selected`      | `none` \| `bordered` \| `fill`                                |
+| `selectedHover` | `none` \| `row`                                               |
+| `selectedData`  | `none` \| `selected` \| `checked`                             |
 | `hitTarget`     | `none` \| `pointer` (`cursor-pointer` on clickable row hosts) |
 
 | `hoverFamily` | Meaning                    | Hover token          |
@@ -101,21 +101,21 @@ Bench/score-token whole-surface drag stays outside `dragSurfaceVariants`.
 
 Vertical alignment for row-track surfaces (entity cards, spanning utilities). Hosts own
 columns and inset; `RowAnatomy` owns row tracks and cell placement only. Entity anatomy maps
-trailing **kinds** to cells — features do not pass `trailingAlign`, `headingBand`, or ad-hoc
-`self-*` on rail wrappers.
+trailing **kinds** to cells — features do not pass `trailingAlign`, `headingBand`,
+`actionsAlign`, `rowAlign`, or ad-hoc `self-*` on rail wrappers.
 
 Detail: [row-anatomy.md](./row-anatomy.md). Live recipes: dashboard Storybook **Recipes /
 Cards and Rows**.
 
 ## Layer 2 presentation
 
-| Primitive                                    | Owner        | Consumers                               |
-| -------------------------------------------- | ------------ | --------------------------------------- |
-| `supportingTextDensityVariants`              | content-card | EntitySummary, ContentCard body         |
-| `contentCardDensityInsetVariants`            | content-card | EntityCardFrame, ContentCard shell      |
-| `contentCardIdentityColumnGapVariants`       | content-card | ContentCard body, EntityAnatomy content |
-| `entity-card-heading-comfortable` (@utility) | globals      | Comfortable entity card titles          |
-| `rowAnatomyTracksVariants` / `RowAnatomyCell` | row-anatomy | EntityAnatomy (row tracks + cells)      |
+| Primitive                                     | Owner        | Consumers                               |
+| --------------------------------------------- | ------------ | --------------------------------------- |
+| `supportingTextDensityVariants`               | content-card | EntitySummary, ContentCard body         |
+| `contentCardDensityInsetVariants`             | content-card | EntityCardFrame, ContentCard shell      |
+| `contentCardIdentityColumnGapVariants`        | content-card | ContentCard body, EntityAnatomy content |
+| `entity-card-heading-comfortable` (@utility)  | globals      | Comfortable entity card titles          |
+| `rowAnatomyTracksVariants` / `RowAnatomyCell` | row-anatomy  | EntityAnatomy (row tracks + cells)      |
 
 Vertical alignment of identity rows has one owner — the row-track grid. Cells never
 self-align or offset; see [row-anatomy.md](./row-anatomy.md).
