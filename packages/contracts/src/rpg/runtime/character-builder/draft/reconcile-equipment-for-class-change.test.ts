@@ -106,7 +106,7 @@ describe('reconcileEquipmentForClassChange', () => {
     expect(next).toBe(current)
   })
 
-  it('keeps an explicit picker-cart purchase and drops untagged startingGold', () => {
+  it('keeps picker and converted carts and drops untagged startingGold', () => {
     const next = reconcileEquipmentForClassChange({
       equipment: equipment({
         purchases: [
@@ -134,6 +134,12 @@ describe('reconcileEquipmentForClassChange', () => {
       {
         equipmentId: longsword.id,
         quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: longsword.id,
+        quantity: 2,
         sourceMode: 'startingGold',
         origin: 'picker',
       },

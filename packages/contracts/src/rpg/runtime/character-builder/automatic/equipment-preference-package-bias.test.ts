@@ -539,6 +539,24 @@ describe('equipment preference package bias', () => {
     ).toBeUndefined()
     expect(changed.equipment?.purchases).toEqual([
       { equipmentId: ropeId, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+      {
+        equipmentId: `${RULESET}:chain-mail`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:greatsword`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:javelin`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
     ])
     expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
   })
@@ -587,7 +605,29 @@ describe('equipment preference package bias', () => {
     expect(changed.choiceSelections[nestedPoolId]).toBeUndefined()
     expect(changed.equipment?.purchases).toEqual([
       { equipmentId: `${RULESET}:rope`, quantity: 1, sourceMode: 'manual' },
+      {
+        equipmentId: `${RULESET}:chain-mail`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:greatsword`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:javelin`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
     ])
+    const carriedInventory = equipmentIdsOf(
+      deriveEquipmentDraftEntries(changed, indexCharacterBuildCatalog(context.catalog)),
+    )
+    expect(carriedInventory).not.toContain(`${RULESET}:chain-mail`)
     expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
     expect(changed.equipment?.editedSincePackageSelection).toBe(false)
     expect(changed.equipment?.mode).toBe('package')
@@ -612,9 +652,15 @@ describe('equipment preference package bias', () => {
     const wizardInventory = equipmentIdsOf(
       deriveEquipmentDraftEntries(wizardFill.draft, catalogIndex),
     )
-    expect(wizardInventory).toContain(`${RULESET}:leather-armor`)
-    expect(wizardInventory).not.toContain(`${RULESET}:chain-mail`)
-    expect(wizardInventory).not.toContain(`${RULESET}:greatsword`)
+    expect(wizardInventory).toEqual(
+      expect.arrayContaining([
+        `${RULESET}:leather-armor`,
+        `${RULESET}:chain-mail`,
+        `${RULESET}:greatsword`,
+        `${RULESET}:javelin`,
+        `${RULESET}:rope`,
+      ]),
+    )
 
     const back = applySelectedClassChange({
       draft: wizardFill.draft,
@@ -624,6 +670,30 @@ describe('equipment preference package bias', () => {
     expect(back.choiceSelections[fighterPackageId]).toBeUndefined()
     expect(back.equipment?.purchases).toEqual([
       { equipmentId: `${RULESET}:rope`, quantity: 1, sourceMode: 'manual' },
+      {
+        equipmentId: `${RULESET}:chain-mail`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:greatsword`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:javelin`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+      {
+        equipmentId: `${RULESET}:leather-armor`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
     ])
 
     const scoutPreferences = toAutomaticNpcBuildPreferences(
