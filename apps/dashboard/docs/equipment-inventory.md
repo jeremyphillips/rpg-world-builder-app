@@ -25,7 +25,7 @@ no starting option is selected, `resolveStartingEquipmentResolution` returns
   "Ready". The preview `equipmentSummary` stays empty until an option is selected.
 - **Choosing an option:** the normal package-switch evaluation fits the cart to the new
   allowance. Starting Gold that covers the cart applies directly; an option that cannot
-  cover it opens the resolution modal with selection copy ("Resolve purchases for this
+  cover it opens the resolution modal with selection copy ("Adjust purchases for this
   option" / "Choose option"). Cancel leaves the option unresolved with the cart intact.
 
 ## Source groups

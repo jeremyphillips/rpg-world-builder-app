@@ -16,7 +16,7 @@ import {
   buildPackageSwitchDraftPurchasedGroups,
   mapBlockingReasonToMessage,
   packageSwitchDraftHasEdits,
-  resolvePackageSwitchDescription,
+  resolvePackageSwitchDescriptionParts,
   resolvePackageSwitchModalState,
 } from './equipment-package-switch-resolution.lib'
 
@@ -67,7 +67,7 @@ describe('equipment-package-switch-resolution.lib', () => {
         kind: 'draftOverBudget',
         amountOverBudgetCp: 400,
       }),
-    ).toBe('Remove 4 GP more to continue.')
+    ).toBe('Remove 4 GP to continue.')
   })
 
   it('builds draft purchased groups with staged removal rows at quantity zero', () => {
@@ -105,11 +105,11 @@ describe('equipment-package-switch-resolution.lib', () => {
     })!
 
     expect(resolvePackageSwitchModalState({ evaluation, isInitialSelection: true })).toMatchObject({
-      title: 'Resolve purchases for this option',
+      title: 'Adjust purchases for this option',
       confirmLabel: 'Choose option',
     })
     expect(resolvePackageSwitchModalState({ evaluation })).toMatchObject({
-      title: 'Resolve purchases before switching',
+      title: 'Adjust purchases before switching',
       confirmLabel: 'Switch package',
     })
   })
@@ -142,9 +142,9 @@ describe('equipment-package-switch-resolution.lib', () => {
       targetFunding: targetFundingFor('standard-equipment'),
     })!
 
-    expect(resolvePackageSwitchDescription(evaluation)).toContain('Standard Equipment allows')
-    expect(resolvePackageSwitchDescription(evaluation)).toContain(
-      'Your inventory will not change until you confirm.',
-    )
+    expect(resolvePackageSwitchDescriptionParts(evaluation)).toEqual({
+      lead: expect.stringMatching(/^Standard Equipment provides .+ for purchases\.$/),
+      detail: 'Reduce your current purchases to fit this amount.',
+    })
   })
 })

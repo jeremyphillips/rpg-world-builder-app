@@ -561,7 +561,7 @@ describe('EquipmentStep', () => {
       await openPackageSwitchToStandard(user)
 
       expect(
-        screen.getByRole('heading', { name: 'Resolve purchases before switching' }),
+        screen.getByRole('heading', { name: 'Adjust purchases before switching' }),
       ).toBeInTheDocument()
       expect(onDraftChange).not.toHaveBeenCalled()
     })
@@ -576,7 +576,7 @@ describe('EquipmentStep', () => {
 
       expect(onDraftChange).not.toHaveBeenCalled()
       expect(
-        screen.queryByRole('heading', { name: 'Resolve purchases before switching' }),
+        screen.queryByRole('heading', { name: 'Adjust purchases before switching' }),
       ).not.toBeInTheDocument()
     })
 
@@ -739,7 +739,7 @@ describe('EquipmentStep', () => {
       await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
 
       expect(
-        screen.getByRole('heading', { name: 'Resolve purchases for this option' }),
+        screen.getByRole('heading', { name: 'Adjust purchases for this option' }),
       ).toBeInTheDocument()
       await user.click(screen.getByRole('button', { name: 'Cancel' }))
       expect(onDraftChange).not.toHaveBeenCalled()

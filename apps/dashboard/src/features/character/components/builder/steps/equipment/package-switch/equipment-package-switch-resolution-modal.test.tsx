@@ -77,7 +77,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Resolve purchases before switching' }),
+      screen.getByRole('heading', { name: 'Adjust purchases before switching' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Rope')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Switch package' })).toBeDisabled()
@@ -97,7 +97,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     )
 
     const scrollRegion = screen
-      .getByRole('heading', { name: 'Purchased with starting gold' })
+      .getByRole('heading', { name: 'Current purchases' })
       .closest('section')?.parentElement
 
     expect(scrollRegion).not.toBeNull()

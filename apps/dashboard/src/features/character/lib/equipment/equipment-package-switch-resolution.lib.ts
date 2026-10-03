@@ -15,12 +15,11 @@ import {
 } from './equipment-step.lib'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
 
-export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Resolve purchases before switching'
+export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Adjust purchases before switching'
 
 export const PACKAGE_SWITCH_BLOCKED_TITLE = 'Cannot switch packages'
 
-export const PACKAGE_SWITCH_SAFETY_NOTE =
-  'Changes are only applied when you select "Switch package."'
+export const PACKAGE_SWITCH_SAFETY_NOTE = 'Changes apply only when you switch packages.'
 
 export const PACKAGE_SWITCH_STAGED_REMOVAL_LABEL = 'Staged for removal'
 
@@ -29,14 +28,19 @@ export const PACKAGE_SWITCH_STALE_INVENTORY_MESSAGE =
 
 export const PACKAGE_SWITCH_CONFIRM_LABEL = 'Switch package'
 
-export const PACKAGE_SELECTION_RESOLUTION_TITLE = 'Resolve purchases for this option'
+export const PACKAGE_SELECTION_RESOLUTION_TITLE = 'Adjust purchases for this option'
 
 export const PACKAGE_SELECTION_CONFIRM_LABEL = 'Choose option'
 
-export const PACKAGE_SELECTION_SAFETY_NOTE =
-  'Changes are only applied when you select "Choose option."'
+export const PACKAGE_SELECTION_SAFETY_NOTE = 'Changes apply only when you choose this option.'
 
 export const PACKAGE_SWITCH_CANCEL_LABEL = 'Cancel'
+
+export const PACKAGE_SWITCH_BUDGET_CURRENT_PURCHASES_LABEL = 'Current purchases'
+
+export const PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL = 'Available with this option'
+
+export const PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE = 'Current purchases'
 
 export function formatPackageSwitchWealth(costCp: number): string {
   return formatWealth(copperToWealth(costCp))
@@ -54,7 +58,7 @@ export function mapBlockingReasonToMessage(
     case 'staleCommittedInventory':
       return PACKAGE_SWITCH_STALE_INVENTORY_MESSAGE
     case 'draftOverBudget':
-      return `Remove ${formatPackageSwitchWealth(reason.amountOverBudgetCp)} more to continue.`
+      return `Remove ${formatPackageSwitchWealth(reason.amountOverBudgetCp)} to continue.`
     case 'invalidDraftQuantity':
       return 'One or more item quantities are invalid. Review your changes and try again.'
     case 'missingTargetOption':
@@ -109,13 +113,15 @@ export function resolvePackageSwitchCommitErrorFromIssues(
   return undefined
 }
 
-export function resolvePackageSwitchDescription(
+export function resolvePackageSwitchDescriptionParts(
   evaluation: EquipmentPackageSwitchEvaluation,
-): string {
+): { lead: string; detail: string } {
   const allowance = formatPackageSwitchWealth(evaluation.budget.targetAllowanceCp)
-  const initialOverage = formatPackageSwitchWealth(evaluation.budget.initialAmountOverBudgetCp)
 
-  return `${evaluation.targetOptionLabel} allows ${allowance} of purchased items. Reduce your current purchases by ${initialOverage} to switch packages. Your inventory will not change until you confirm.`
+  return {
+    lead: `${evaluation.targetOptionLabel} provides ${allowance} for purchases.`,
+    detail: 'Reduce your current purchases to fit this amount.',
+  }
 }
 
 export function resolvePackageSwitchBudgetStatusLabel(
@@ -262,7 +268,7 @@ function resolvePackageSwitchModalDescription(
   isBlocked: boolean,
 ): string | undefined {
   if (!isBlocked) {
-    return resolvePackageSwitchDescription(evaluation)
+    return undefined
   }
 
   if (!evaluation.blockingReason) {
@@ -319,6 +325,7 @@ export function resolvePackageSwitchModalState(args: {
       : PACKAGE_SWITCH_CONFIRM_LABEL,
     safetyNote: isInitialSelection ? PACKAGE_SELECTION_SAFETY_NOTE : PACKAGE_SWITCH_SAFETY_NOTE,
     description: resolvePackageSwitchModalDescription(evaluation, isBlocked),
+    descriptionParts: !isBlocked ? resolvePackageSwitchDescriptionParts(evaluation) : undefined,
     confirmDisabled,
     helperMessage: resolvePackageSwitchHelperMessage(evaluation, confirmDisabled, isBlocked),
   }

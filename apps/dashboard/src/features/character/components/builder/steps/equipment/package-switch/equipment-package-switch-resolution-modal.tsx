@@ -18,10 +18,7 @@ import {
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body'
 import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer'
-import {
-  equipmentPackageSwitchResolutionModalBodyClasses,
-  equipmentPackageSwitchResolutionModalHeadlineClasses,
-} from './equipment-package-switch-resolution-modal.variants'
+import { equipmentPackageSwitchResolutionModalBodyClasses } from './equipment-package-switch-resolution-modal.variants'
 
 export type EquipmentPackageSwitchResolutionModalProps = {
   open: boolean
@@ -97,8 +94,16 @@ export function EquipmentPackageSwitchResolutionModal({
       >
         <Modal.Header
           headline={modalState.title}
-          description={modalState.description}
-          headlineClassName={equipmentPackageSwitchResolutionModalHeadlineClasses}
+          description={
+            modalState.descriptionParts ? (
+              <>
+                <span className="block">{modalState.descriptionParts.lead}</span>
+                <span className="block">{modalState.descriptionParts.detail}</span>
+              </>
+            ) : (
+              modalState.description
+            )
+          }
         />
         <Modal.Body className={equipmentPackageSwitchResolutionModalBodyClasses}>
           <EquipmentPackageSwitchResolutionModalBody
