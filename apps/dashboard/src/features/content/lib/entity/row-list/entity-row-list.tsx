@@ -258,7 +258,7 @@ function EntityRowListRow(props: EntityRowListRowProps) {
       ? (trailing ?? undefined)
       : actions.length > 0
         ? {
-            kind: 'action' as const,
+            kind: 'utility' as const,
             content: (
               <DetailOverflowMenu
                 actions={actions}
@@ -269,7 +269,6 @@ function EntityRowListRow(props: EntityRowListRowProps) {
           }
         : undefined
 
-  const trailingAlign = overflowTriggerIcon === 'vertical' ? 'center' : 'start'
 
   return (
     <li>
@@ -282,7 +281,6 @@ function EntityRowListRow(props: EntityRowListRowProps) {
         metadata={resolvedStatus}
         leadingMedia={leadingMedia}
         trailing={resolvedTrailing}
-        trailingAlign={trailingAlign}
       />
     </li>
   )

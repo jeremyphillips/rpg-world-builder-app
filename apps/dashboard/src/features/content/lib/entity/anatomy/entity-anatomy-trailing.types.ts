@@ -1,7 +1,14 @@
 import type { ReactElement } from 'react'
 
+/** Labeled commit control (Add, Select, Edit) — aligns with the heading band. */
 export type EntityAnatomyTrailingAction = {
   kind: 'action'
+  content: ReactElement
+}
+
+/** Ghost icon utility or utility cluster (remove, overflow, stepper) — centers on the row. */
+export type EntityAnatomyTrailingUtility = {
+  kind: 'utility'
   content: ReactElement
 }
 
@@ -22,5 +29,6 @@ export type EntityAnatomyTrailingGroup = {
 
 export type EntityAnatomyTrailing =
   | EntityAnatomyTrailingAction
+  | EntityAnatomyTrailingUtility
   | EntityAnatomyTrailingIndicator
   | EntityAnatomyTrailingGroup

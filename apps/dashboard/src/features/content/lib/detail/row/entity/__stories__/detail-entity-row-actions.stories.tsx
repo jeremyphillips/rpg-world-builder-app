@@ -23,7 +23,7 @@ export const UtilityAndOverflow: Story = {
       headingHref="/campaigns/demo/locations/dock-ward"
       classification="District · 1 location"
       trailing={{
-        kind: 'action',
+        kind: 'utility',
         content: (
           <DetailEntityRowActions>
             <Button

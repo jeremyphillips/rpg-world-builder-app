@@ -2,17 +2,26 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
+import {
+  ENTITY_BODY_INLINE_END_VAR,
+  ENTITY_BODY_INLINE_START_VAR,
+} from '../../../../anatomy/entity-geometry.tokens'
 import { entityCardContentInsetVariants } from '../../content/entity-card-content.variants'
-import { disclosureEntityCardBodyInlineStartClasses } from '../disclosure-entity-card.variants'
+import {
+  entityBodyInlineEndClasses,
+  entityBodyInlineStartClasses,
+} from '../../../entity-surface-inset.variants'
 
-const VARIANTS_PATH = join(__dirname, '../disclosure-entity-card.variants.ts')
+const INSET_VARIANTS_PATH = join(__dirname, '../../../entity-surface-inset.variants.ts')
 
-describe('disclosureEntityCardBodyInlineStartClasses', () => {
-  it('uses a fully static Tailwind utility token', () => {
-    expect(disclosureEntityCardBodyInlineStartClasses).toBe('pl-[var(--entity-body-inline-start)]')
+describe('entity body inline classes', () => {
+  it('use fully static Tailwind utility tokens that match the token var names', () => {
+    expect(entityBodyInlineStartClasses).toBe(`pl-[var(${ENTITY_BODY_INLINE_START_VAR})]`)
+    expect(entityBodyInlineEndClasses).toBe(`pr-[var(${ENTITY_BODY_INLINE_END_VAR})]`)
 
-    const source = readFileSync(VARIANTS_PATH, 'utf8')
+    const source = readFileSync(INSET_VARIANTS_PATH, 'utf8')
     expect(source).toContain("'pl-[var(--entity-body-inline-start)]'")
+    expect(source).toContain("'pr-[var(--entity-body-inline-end)]'")
     expect(source).not.toMatch(/`\$\{/)
   })
 })

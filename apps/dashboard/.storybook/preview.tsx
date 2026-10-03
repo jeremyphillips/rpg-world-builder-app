@@ -3,6 +3,12 @@ import { createStorybookPreview } from '@rpg/config/storybook/preview-base'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
+import {
+  rowAnatomyOutlineGlobalTypes,
+  rowAnatomyOutlineInitialGlobals,
+  withRowAnatomyOutline,
+} from '../src/stories/card-recipes/with-row-anatomy-outline'
+
 import '../src/index.css'
 
 const withMemoryRouter: Decorator = (Story) => (
@@ -12,5 +18,7 @@ const withMemoryRouter: Decorator = (Story) => (
 )
 
 export default createStorybookPreview({
-  decorators: [withMemoryRouter],
+  decorators: [withMemoryRouter, withRowAnatomyOutline],
+  globalTypes: rowAnatomyOutlineGlobalTypes,
+  initialGlobals: rowAnatomyOutlineInitialGlobals,
 })

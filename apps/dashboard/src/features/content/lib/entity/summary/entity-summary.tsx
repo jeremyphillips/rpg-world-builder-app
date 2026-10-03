@@ -1,138 +1,80 @@
 import type { ReactNode } from 'react'
-import { ContentCardHeading, IdentityRow, type ContentCardDensity } from '@rpg/ui'
+import {
+  ContentCardHeading,
+  IdentityRowHeadingLine,
+  IdentityRowSupporting,
+  type ContentCardDensity,
+  type IdentityRowSize,
+} from '@rpg/ui'
 
 import type { EntitySummaryModel } from './entity-summary.types'
+import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { EntitySummaryStatusItemView } from './entity-summary-status'
 import {
-  entitySummaryStatusRowVariants,
-  entitySummaryDescriptionVariants,
-  entitySummaryHeadingBandVariants,
   entitySummaryHeadingEndValueVariants,
   entitySummaryHeadingRowVariants,
+  entitySummaryStatusRowVariants,
 } from './entity-summary.variants'
 
-function renderEntitySummaryStatus(
-  entity: EntitySummaryModel,
-  density: ContentCardDensity,
-): ReactNode | undefined {
-  if (!entity.status || entity.status.length === 0) {
-    return undefined
-  }
-
-  return (
-    <div className={entitySummaryStatusRowVariants()} data-entity-summary-status-row>
-      {entity.status.map((status, index) => (
-        <EntitySummaryStatusItemView key={index} item={status} density={density} />
-      ))}
-    </div>
-  )
+/** Supporting copy scale per density — compact `text-xs`, comfortable `text-sm`. */
+const ENTITY_SUMMARY_SUPPORTING_SIZE: Record<ContentCardDensity, IdentityRowSize> = {
+  compact: 'md',
+  comfortable: 'lg',
 }
 
-export type EntitySummaryHeadingBand = 'control' | 'natural'
-
-export type EntitySummaryProps = {
-  entity: EntitySummaryModel
-  density?: ContentCardDensity
-  /** When `control`, wraps the heading in a compact-control-height band for rail alignment. */
-  headingBand?: EntitySummaryHeadingBand
+export type EntitySummaryHeadingProps = Pick<EntitySummaryModel, 'heading' | 'classification'> & {
+  density: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
 }
 
-function EntitySummaryCompact({
-  entity,
+/** Heading line — placed in the host band cell. Density selects typography only. */
+export function EntitySummaryHeading({
+  heading,
+  classification,
   density,
-  headingBand,
   headingEndValue,
-}: EntitySummaryProps & { density: ContentCardDensity }) {
-  const status = renderEntitySummaryStatus(entity, density)
-
-  const identity =
-    headingEndValue != null ? (
-      <>
-        <div className={entitySummaryHeadingRowVariants()}>
-          <IdentityRow
-            heading={entity.heading}
-            classification={entity.classification}
-            size="md"
-            className="min-w-0 flex-1"
-          />
-          <span className={entitySummaryHeadingEndValueVariants({ density })}>
-            {headingEndValue}
-          </span>
-        </div>
-        <IdentityRow supporting={entity.description} status={status} size="md" />
-      </>
-    ) : (
-      <IdentityRow
-        heading={entity.heading}
-        classification={entity.classification}
-        supporting={entity.description}
-        status={status}
-        size="md"
-      />
-    )
-
-  const body = (
-    <div className="min-w-0 flex-1">
-      {headingBand === 'control' ? (
-        <div className={entitySummaryHeadingBandVariants()} data-entity-summary-band="control">
-          {identity}
-        </div>
-      ) : (
-        identity
-      )}
-    </div>
-  )
-
-  return body
-}
-
-export function EntitySummary({
-  entity,
-  density = 'comfortable',
-  headingBand = 'natural',
-  headingEndValue,
-}: EntitySummaryProps) {
-  if (density === 'compact') {
-    return (
-      <EntitySummaryCompact
-        entity={entity}
-        density={density}
-        headingBand={headingBand}
-        headingEndValue={headingEndValue}
-      />
-    )
-  }
-
-  const heading = (
+}: EntitySummaryHeadingProps) {
+  return (
     <div className={entitySummaryHeadingRowVariants()}>
-      <div className="min-w-0 flex-1">
-        <ContentCardHeading
-          heading={entity.heading}
-          classification={entity.classification}
-          density={density}
-        />
-      </div>
+      {density === 'compact' ? (
+        <IdentityRowHeadingLine heading={heading} classification={classification} size="md" />
+      ) : (
+        <ContentCardHeading heading={heading} classification={classification} density={density} />
+      )}
       {headingEndValue != null ? (
         <span className={entitySummaryHeadingEndValueVariants({ density })}>{headingEndValue}</span>
       ) : null}
     </div>
   )
+}
 
+/** Description line — placed in the host meta cell. */
+export function EntitySummaryDescription({
+  children,
+  density,
+}: {
+  children: ReactNode
+  density: ContentCardDensity
+}) {
   return (
-    <div className="min-w-0 flex-1">
-      {headingBand === 'control' ? (
-        <div className={entitySummaryHeadingBandVariants()} data-entity-summary-band="control">
-          {heading}
-        </div>
-      ) : (
-        heading
-      )}
-      {entity.description ? (
-        <div className={entitySummaryDescriptionVariants({ density })}>{entity.description}</div>
-      ) : null}
-      {renderEntitySummaryStatus(entity, density)}
+    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>{children}</IdentityRowSupporting>
+  )
+}
+
+/** Status lane — placed in the host status cell; the cell owns the top offset. */
+export function EntitySummaryStatus({
+  items,
+  density,
+}: {
+  items: readonly EntitySummaryStatusItem[]
+  density: ContentCardDensity
+}) {
+  return (
+    <div className={entitySummaryStatusRowVariants()} data-entity-summary-status-row>
+      {items.map((status, index) => (
+        <EntitySummaryStatusItemView key={index} item={status} density={density} />
+      ))}
     </div>
   )
 }

@@ -2,10 +2,10 @@ import { cva } from 'class-variance-authority'
 
 import { cn, collapsibleListItemBodyFrameClasses, establishSurfaceCurrent } from '@rpg/ui'
 
-import { ENTITY_SURFACE_INLINE_END_VAR } from '../../anatomy/entity-geometry.tokens'
-
-const catalogEntityRowBodyInlineStartClasses = 'pl-[var(--entity-body-inline-start)]'
-const catalogEntityRowBodyInlineEndClasses = `pr-[var(${ENTITY_SURFACE_INLINE_END_VAR})]`
+import {
+  entityBodyInlineEndClasses,
+  entityBodyInlineStartClasses,
+} from '../entity-surface-inset.variants'
 
 /** Expanded body wash — entity-aware inline start/end; replaces CLI catalog bleed. */
 export const catalogEntityRowBodyWashVariants = cva(
@@ -13,7 +13,7 @@ export const catalogEntityRowBodyWashVariants = cva(
     collapsibleListItemBodyFrameClasses,
     'bg-surface-muted',
     establishSurfaceCurrent('surface-muted'),
-    catalogEntityRowBodyInlineStartClasses,
-    catalogEntityRowBodyInlineEndClasses,
+    entityBodyInlineStartClasses,
+    entityBodyInlineEndClasses,
   ),
 )

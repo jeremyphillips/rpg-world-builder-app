@@ -39,6 +39,10 @@
       "types": "./src/storybook/with-theme-context.tsx",
       "default": "./src/storybook/with-theme-context.tsx"
     },
+    "./storybook/row-anatomy-geometry": {
+      "types": "./src/storybook/row-anatomy-geometry.ts",
+      "default": "./src/storybook/row-anatomy-geometry.ts"
+    },
     "./vitest/setup": {
       "types": "./src/vitest/setup.ts",
       "default": "./src/vitest/setup.ts"

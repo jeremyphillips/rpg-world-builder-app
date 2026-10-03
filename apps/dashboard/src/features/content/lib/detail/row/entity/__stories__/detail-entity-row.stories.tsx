@@ -29,7 +29,7 @@ export const WithOverflow: Story = {
         headingHref="/campaigns/demo/locations/silver-eel"
         classification="Building · Tavern"
         trailing={{
-          kind: 'action',
+          kind: 'utility',
           content: (
             <DetailOverflowMenu
               triggerLabel="Actions for The Silver Eel"
@@ -46,7 +46,7 @@ export const WithOverflow: Story = {
         headingHref="/campaigns/demo/locations/guildhouse"
         classification="Building · Guildhall"
         trailing={{
-          kind: 'action',
+          kind: 'utility',
           content: (
             <DetailOverflowMenu
               triggerLabel="Actions for Thieves' Guildhouse"
@@ -90,7 +90,7 @@ export const WithDisclosure: Story = {
           ),
         }}
         trailing={{
-          kind: 'action',
+          kind: 'utility',
           content: (
             <DetailOverflowMenu
               triggerLabel="Actions for Dock Ward"

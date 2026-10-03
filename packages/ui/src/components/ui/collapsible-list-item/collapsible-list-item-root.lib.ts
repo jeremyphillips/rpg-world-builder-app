@@ -3,7 +3,10 @@ import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
 import type { CollapsibleListItemDragHandleProps } from './collapsible-list-item-toolbar.client'
 import type { CollapsibleListItemActionsAlign } from './collapsible-list-item-shell.client'
-import type { CollapsibleListItemLeadingChromeOptions } from './collapsible-list-item.variants'
+import type {
+  CollapsibleListItemLeadingChromeOptions,
+  CollapsibleListItemRowLayout,
+} from './collapsible-list-item.variants'
 
 export type CollapsibleListItemDragHandleConfig = {
   attributes: DraggableAttributes
@@ -11,11 +14,14 @@ export type CollapsibleListItemDragHandleConfig = {
   isDragging?: boolean
 }
 
+/** `entity-card` hosts own header alignment (RowAnatomy), so they always take the header-row shell. */
 export function resolveCollapsibleListItemActionsAlign(
   actionsAlign: CollapsibleListItemActionsAlign | undefined,
   reserveDragHandleSlot: boolean,
   layout: 'default' | 'compactRow',
+  rowLayout: CollapsibleListItemRowLayout = 'default',
 ): CollapsibleListItemActionsAlign {
+  if (rowLayout === 'entity-card') return 'center'
   return actionsAlign ?? (reserveDragHandleSlot || layout === 'compactRow' ? 'start' : 'center')
 }
 

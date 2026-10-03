@@ -451,6 +451,10 @@ export {
   type ArrayItemInlineRowProps,
 } from './renderers/array/array-item-inline-row.client'
 export {
+  ArrayItemAnatomyGrid,
+  type ArrayItemAnatomyGridProps,
+} from './renderers/array/array-item-anatomy-grid.client'
+export {
   ArrayItemRowShell,
   type ArrayItemRowShellProps,
 } from './renderers/array/array-item-row-shell.client'

@@ -2,6 +2,8 @@ import type { CSSProperties } from 'react'
 import type { ContentCardDensity } from '@rpg/ui'
 
 import {
+  ENTITY_BODY_INLINE_END_VALUE,
+  ENTITY_BODY_INLINE_END_VAR,
   ENTITY_BODY_INLINE_START_VALUE,
   ENTITY_BODY_INLINE_START_VAR,
   ENTITY_CONTENT_INDENT_VAR,
@@ -25,6 +27,7 @@ export const ENTITY_LEADING_SIZE_VALUE = ENTITY_UTILITY_SIZE_VALUE
 export const ENTITY_LEADING_GAP_VALUE = 'calc(var(--spacing)*1)'
 
 export {
+  ENTITY_BODY_INLINE_END_VAR,
   ENTITY_BODY_INLINE_START_VAR,
   ENTITY_CONTENT_INDENT_VAR,
   ENTITY_CONTENT_OFFSET_VAR,
@@ -58,7 +61,7 @@ export function buildEntityLeadingChromeSizeStyle(): CSSProperties {
   } as CSSProperties
 }
 
-/** Publishes canonical content offset and migration aliases on disclosure surfaces. */
+/** Publishes canonical content offset, body inline edges, and migration aliases on disclosure surfaces. */
 export function buildEntityContentOffsetStyle({
   count,
   density,
@@ -72,6 +75,7 @@ export function buildEntityContentOffsetStyle({
     [ENTITY_LEADING_SIZE_VAR]: geometry.utilitySize,
     [ENTITY_CONTENT_OFFSET_VAR]: geometry.contentOffset,
     [ENTITY_BODY_INLINE_START_VAR]: ENTITY_BODY_INLINE_START_VALUE,
+    [ENTITY_BODY_INLINE_END_VAR]: ENTITY_BODY_INLINE_END_VALUE,
     [ENTITY_LEADING_OFFSET_VAR]: `var(${ENTITY_CONTENT_OFFSET_VAR})`,
     [ENTITY_CONTENT_INDENT_VAR]: `var(${ENTITY_CONTENT_OFFSET_VAR})`,
   } as CSSProperties

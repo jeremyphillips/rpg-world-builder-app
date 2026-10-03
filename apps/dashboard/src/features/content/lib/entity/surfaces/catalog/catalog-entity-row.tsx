@@ -4,6 +4,7 @@ import { CollapsibleListItem } from '@rpg/ui'
 import { EntityAnatomyHost } from '../../anatomy/entity-anatomy'
 import { buildEntityContentOffsetStyle } from '../../anatomy/entity-leading-rail.lib'
 import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
+import { resolveEntitySurfaceEdges } from '../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { EntityCardContent } from '../cards/content/entity-card-content'
 import { EntityCardFrame } from '../cards/content/entity-card-frame'
@@ -51,7 +52,7 @@ export function CatalogEntityRow({
     <EntityCardFrame
       density={CATALOG_ENTITY_ROW_DENSITY}
       surface="catalogRow"
-      leadingUtilityCount={isDisclosure ? 1 : 0}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount: isDisclosure ? 1 : 0, trailing })}
       style={contentOffsetStyle}
     >
       <CollapsibleListItem
@@ -63,7 +64,6 @@ export function CatalogEntityRow({
         density={CATALOG_ENTITY_ROW_DENSITY}
         toolbarCompact
         toolbarLeadingChrome="none"
-        actionsAlign="center"
         collapsible={isDisclosure && collapsible}
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}

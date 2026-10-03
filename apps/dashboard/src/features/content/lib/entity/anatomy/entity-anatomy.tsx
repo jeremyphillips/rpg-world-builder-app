@@ -1,19 +1,23 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { contentCardHeadingLinkVariants, type ContentCardDensity } from '@rpg/ui'
+import {
+  RowAnatomyCell,
+  contentCardHeadingLinkVariants,
+  rowAnatomyRootProps,
+  type ContentCardDensity,
+} from '@rpg/ui'
 
 import { EntityLeadingRail } from './entity-leading-rail'
-import { EntityAnatomyTrailingSlot } from './entity-anatomy-trailing'
+import { EntityAnatomyTrailingCells } from './entity-anatomy-trailing'
 import type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
-import { EntitySummary } from '../summary/entity-summary'
-import type { EntitySummaryModel } from '../summary/entity-summary.types'
+import type { EntityAnatomyColumn } from './entity-anatomy.types'
 import {
-  entityAnatomyVariants,
-  entityAnatomyContentVariants,
-  entityAnatomyLeadingSlotVariants,
-  entityAnatomyHostRootVariants,
-  entityAnatomyTrailingSlotVariants,
-} from './entity-anatomy.variants'
+  EntitySummaryDescription,
+  EntitySummaryHeading,
+  EntitySummaryStatus,
+} from '../summary/entity-summary'
+import type { EntitySummaryModel } from '../summary/entity-summary.types'
+import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
 
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 
@@ -24,7 +28,6 @@ export type EntityAnatomyProps = {
   /** Ordered leading utilities; Anatomy is the sole EntityLeadingRail wrapper. */
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityAnatomyTrailing
-  trailingAlign?: 'start' | 'center'
   density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
@@ -37,69 +40,79 @@ export type EntityAnatomyHostProps = {
   /** Exactly one leading utility when set — never a multi-control group or fragment. */
   leading?: ReactNode
   trailing?: EntityAnatomyTrailing
-  /** Vertical alignment of the trailing rail within the anatomy grid row. */
-  trailingAlign?: 'start' | 'center'
   density?: ContentCardDensity
 }
 
-function resolveLinkedHeading(
-  entity: EntitySummaryModel,
-  headingHref: string | undefined,
-): EntitySummaryModel {
+function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefined): ReactNode {
   if (!headingHref) {
-    return entity
+    return heading
   }
 
-  return {
-    ...entity,
-    heading: (
-      <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
-        {entity.heading}
-      </Link>
-    ),
-  }
+  return (
+    <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
+      {heading}
+    </Link>
+  )
 }
 
+/** Row-track entity anatomy — every part is a RowAnatomy cell; trailing kind selects its cell. */
 export function EntityAnatomy({
   entity,
   headingHref,
   leadingUtilities,
   trailing,
-  trailingAlign = 'start',
   density = 'comfortable',
   headingEndValue,
 }: EntityAnatomyProps) {
-  const resolvedEntity = resolveLinkedHeading(entity, headingHref)
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
-  const hasControlChrome = resolvedLeadingUtilities.length > 0 || trailing != null
+  const hasStatus = entity.status != null && entity.status.length > 0
 
   return (
-    <div className={entityAnatomyVariants({ density })}>
+    <div className={entityAnatomyVariants({ density })} {...rowAnatomyRootProps}>
       {resolvedLeadingUtilities.length > 0 ? (
-        <div className={entityAnatomyLeadingSlotVariants()} data-entity-item-slot="leading">
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={{ slot: 'band', column: 'leading' }}
+          data-entity-item-slot="leading"
+        >
           <EntityLeadingRail density={density}>{resolvedLeadingUtilities}</EntityLeadingRail>
-        </div>
+        </RowAnatomyCell>
       ) : null}
-      <div className={entityAnatomyContentVariants({ density })} data-entity-item-slot="content">
-        {resolvedEntity.media ? (
-          // Alignment-only wrapper — leading media must be self-bounded (e.g. DetailRowLeadingMedia).
-          <div className="shrink-0">{resolvedEntity.media}</div>
-        ) : null}
-        <EntitySummary
-          entity={resolvedEntity}
+      {entity.media ? (
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={{ slot: 'band', column: 'media' }}
+          data-entity-item-slot="media"
+        >
+          {entity.media}
+        </RowAnatomyCell>
+      ) : null}
+      <RowAnatomyCell<EntityAnatomyColumn>
+        cell={{ slot: 'band', column: 'content' }}
+        data-entity-item-slot="content"
+      >
+        <EntitySummaryHeading
+          heading={resolveLinkedHeading(entity.heading, headingHref)}
+          classification={entity.classification}
           density={density}
-          headingBand={hasControlChrome ? 'control' : 'natural'}
           headingEndValue={headingEndValue}
         />
-      </div>
-      {trailing ? (
-        <div
-          className={entityAnatomyTrailingSlotVariants({ density, align: trailingAlign })}
-          data-entity-item-slot="trailing"
+      </RowAnatomyCell>
+      {entity.description ? (
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={{ slot: 'meta', column: 'content' }}
+          data-entity-item-slot="description"
         >
-          <EntityAnatomyTrailingSlot trailing={trailing} />
-        </div>
+          <EntitySummaryDescription density={density}>{entity.description}</EntitySummaryDescription>
+        </RowAnatomyCell>
       ) : null}
+      {hasStatus ? (
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={{ slot: 'status', column: 'content' }}
+          data-entity-item-slot="status"
+        >
+          <EntitySummaryStatus items={entity.status!} density={density} />
+        </RowAnatomyCell>
+      ) : null}
+      <EntityAnatomyTrailingCells trailing={trailing} />
     </div>
   )
 }
@@ -109,7 +122,6 @@ export function EntityAnatomyHost({
   headingHref,
   leading,
   trailing,
-  trailingAlign,
   density = 'comfortable',
 }: EntityAnatomyHostProps) {
   return (
@@ -119,7 +131,6 @@ export function EntityAnatomyHost({
         headingHref={headingHref}
         leadingUtilities={leading != null ? [leading] : undefined}
         trailing={trailing}
-        trailingAlign={trailingAlign}
         density={density}
       />
     </div>

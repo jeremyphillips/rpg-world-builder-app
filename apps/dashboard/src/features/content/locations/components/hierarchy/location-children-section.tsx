@@ -89,10 +89,10 @@ function buildChildRowActions(
 
 import type { ReactElement } from 'react'
 
-function detailEntityRowActionTrailing(
+function detailEntityRowUtilityTrailing(
   content: ReactElement | undefined,
 ): EntityAnatomyTrailing | undefined {
-  return content ? { kind: 'action', content } : undefined
+  return content ? { kind: 'utility', content } : undefined
 }
 
 function resolveStructureRowClassification(row: LocationStructureRowVm): string {
@@ -322,7 +322,7 @@ function LocationStructureRow({
       classification={resolveStructureRowClassification(row)}
       inset={inset}
       disclosure={resolveStructureRowDisclosure(row, nestedContent)}
-      trailing={detailEntityRowActionTrailing(
+      trailing={detailEntityRowUtilityTrailing(
         resolveStructureRowEndSlot({
           row,
           canManage,
@@ -401,7 +401,7 @@ function LocationChildRows({
             headingHref={item.href}
             classification={item.summaryLine}
             inset={inset}
-            trailing={detailEntityRowActionTrailing(
+            trailing={detailEntityRowUtilityTrailing(
               canManage ? (
                 <DetailOverflowMenu actions={actions} triggerLabel={`Actions for ${item.name}`} />
               ) : undefined,

@@ -8,7 +8,7 @@ import { Form, type FormItem } from '@rpg/ui/form'
 import { createGrantArrayItemShell } from './grant-array-item-shell.lib'
 import { GRANT_ROW_TYPE_LABELS } from './grant-form-schema'
 import { resolveGrantRowPresentation } from './grant-row-presentation.lib'
-import { disclosureEntityCardBodyInlineStartClasses } from '../../entity/surfaces/cards/disclosure/disclosure-entity-card.variants'
+import { entityBodyInlineStartClasses as disclosureEntityCardBodyInlineStartClasses } from '../../entity/surfaces/entity-surface-inset.variants'
 import { ENTITY_CONTENT_OFFSET_VAR } from '../../entity/anatomy/entity-geometry.tokens'
 
 const grantRowSchema = z.object({
@@ -166,7 +166,7 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(ability.closest('[hidden]')).toBeNull()
     const body = ability.closest('[class*="border-t"]')
     expect(body?.className).toContain(disclosureEntityCardBodyInlineStartClasses)
-    expect(body?.className).toContain('pr-[var(--entity-surface-inline-end)]')
+    expect(body?.className).toContain('pr-[var(--entity-body-inline-end)]')
     expect(body).toHaveClass('border-t')
     expect(body).toHaveClass('bg-background')
     expect(body?.className).not.toContain('content-column-indent')
@@ -176,8 +176,14 @@ describe('grant array DisclosureEntityCard shell', () => {
     expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
       'calc(2 * calc(var(--spacing)*6)',
     )
-    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
+    expect(article).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*1)]')
+    expect(article).toHaveClass(
+      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
+    )
+    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
+    expect(article.style.getPropertyValue('--entity-body-inline-end')).toBe(
+      'var(--entity-surface-inset)',
+    )
     const shell = firstRow.querySelector('[role="group"]') as HTMLElement
     expect(shell.style.getPropertyValue('--content-column-indent')).toBe('')
     expect(shell.className).not.toContain('--entity-surface-inline-start')

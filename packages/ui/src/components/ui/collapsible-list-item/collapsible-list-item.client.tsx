@@ -164,6 +164,7 @@ function CollapsibleListItemRoot({
     actionsAlignProp,
     reserveDragHandleSlot,
     layout,
+    rowLayout,
   )
   const leadingChrome = buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible)
   const resolvedDragHandleProps = resolveCollapsibleListItemDragHandleProps(

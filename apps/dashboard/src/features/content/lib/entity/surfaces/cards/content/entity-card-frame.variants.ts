@@ -2,6 +2,10 @@ import { cva } from 'class-variance-authority'
 
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
+import {
+  ENTITY_SURFACE_DEFAULT_EDGES,
+  type EntitySurfaceEdges,
+} from '../../../anatomy/entity-surface-edges.lib'
 import { entitySurfaceInsetVariants } from '../../entity-surface-inset.variants'
 
 export type EntityCardSurface = 'card' | 'subtle' | 'catalogRow'
@@ -32,15 +36,15 @@ export function entityCardFrameVariants({
   density,
   surface = 'card',
   disabled = false,
-  leading = false,
+  edges = ENTITY_SURFACE_DEFAULT_EDGES,
 }: {
   density: 'compact' | 'comfortable'
   surface?: EntityCardSurface
   disabled?: boolean
-  leading?: boolean
+  edges?: EntitySurfaceEdges
 }) {
   return cn(
     entityCardFrameShellVariants({ surface, disabled }),
-    entitySurfaceInsetVariants({ density, leading }),
+    entitySurfaceInsetVariants({ density, start: edges.start, end: edges.end }),
   )
 }

@@ -62,8 +62,14 @@ describe('entity surface closed API', () => {
       headingHref?: string
       leading?: React.ReactNode
       trailing?: EntityAnatomyHostProps['trailing']
-      trailingAlign?: EntityAnatomyHostProps['trailingAlign']
       density?: EntityAnatomyHostProps['density']
     }>()
+  })
+
+  it('entity surfaces expose no vertical alignment knobs — trailing kind selects the cell', () => {
+    type AlignKeys = 'trailingAlign' | 'actionsAlign' | 'rowAlign' | 'headingBand'
+    expectTypeOf<Extract<keyof EntityAnatomyHostProps, AlignKeys>>().toEqualTypeOf<never>()
+    expectTypeOf<Extract<keyof ContentEntityCardProps, AlignKeys>>().toEqualTypeOf<never>()
+    expectTypeOf<Extract<keyof DisclosureEntityCardProps, AlignKeys>>().toEqualTypeOf<never>()
   })
 })

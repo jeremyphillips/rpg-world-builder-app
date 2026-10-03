@@ -125,7 +125,7 @@ export function BuildingOrganizationsCreateTab(props: BuildingOrganizationsCreat
             })}
             density="compact"
             trailing={{
-              kind: 'action',
+              kind: 'utility',
               content: (
                 <DetailOverflowMenu
                   triggerLabel={BUILDING_ORGANIZATIONS_OVERFLOW_LABEL}

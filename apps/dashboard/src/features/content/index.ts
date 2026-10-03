@@ -50,7 +50,6 @@ export {
 export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
 export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
-export { EntitySummary } from './lib/entity/summary/entity-summary'
 export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
@@ -89,6 +88,7 @@ export type {
 export { contentDetailNavItemId } from './lib/detail/page/content-detail-nav-anchor-id'
 export { detailCollectionRecordSeparatorVariants } from './lib/detail/collection/detail-collection-chrome.variants'
 export type { DetailOverflowAction } from './lib/detail/detail-overflow-menu'
+export { DetailEntityRowActions } from './lib/detail/row/entity/detail-entity-row-actions'
 export { buildLocationConnectedPartyCharactersById } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export type { CharacterPickerOption } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export { CatalogEntityRow } from './lib/entity/surfaces/catalog/catalog-entity-row'

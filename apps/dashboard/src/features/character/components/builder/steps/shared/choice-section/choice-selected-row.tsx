@@ -28,7 +28,7 @@ export function ChoiceSelectedRow({ row, onRemove }: ChoiceSelectedRowProps) {
           : undefined,
       }}
       trailing={{
-        kind: 'action',
+        kind: 'utility',
         content: <BuilderInventoryRemoveAction itemLabel={row.label} onRemove={onRemove} />,
       }}
       density="compact"

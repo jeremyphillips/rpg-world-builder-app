@@ -660,9 +660,28 @@ export {
 } from './components/ui/interactive-list-panel.client'
 export {
   IdentityRow,
+  IdentityRowHeadingLine,
+  IdentityRowSupporting,
+  type IdentityRowHeadingLineProps,
   type IdentityRowProps,
   type IdentityRowSize,
+  type IdentityRowSupportingProps,
 } from './components/ui/identity-row.client'
+export {
+  ROW_ANATOMY_COLUMN_ATTRIBUTE,
+  ROW_ANATOMY_ROOT_ATTRIBUTE,
+  ROW_ANATOMY_SLOT_ATTRIBUTE,
+  RowAnatomyCell,
+  rowAnatomyCellClasses,
+  rowAnatomyRootProps,
+  rowAnatomyTracksVariants,
+  type RowAnatomyBand,
+  type RowAnatomyCellProps,
+  type RowAnatomyCellSpec,
+  type RowAnatomySecondaryColumn,
+  type RowAnatomySlot,
+  type RowColumn,
+} from './components/ui/row-anatomy'
 export {
   interactiveListToolbarVariants,
   interactiveListGroupHeadingVariants,

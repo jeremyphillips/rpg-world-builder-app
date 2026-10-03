@@ -188,9 +188,11 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    const disclosureRoot = screen.getByRole('link', { name: 'Dock Ward' }).closest('[style]')
-    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
+    const disclosureRoot = screen
+      .getByRole('link', { name: 'Dock Ward' })
+      .closest('[style*="--entity-content-offset"]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
 
     const headerRow = disclosureRoot?.firstElementChild as HTMLElement
     expect(headerRow.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
@@ -220,7 +222,7 @@ describe('DetailEntityRow', () => {
     const expandedRegion = container.querySelector('[id]')
     expect(expandedRegion).toHaveClass('mb-2')
     expect(expandedRegion).toHaveClass('pl-[var(--entity-surface-inline-start)]')
-    expect(expandedRegion).toHaveClass('pr-[var(--entity-surface-inline-end)]')
+    expect(expandedRegion).toHaveClass('pr-[var(--entity-body-inline-end)]')
     expect(expandedRegion?.firstElementChild).toHaveClass('pl-[var(--entity-content-offset)]')
     expect(expandedRegion?.firstElementChild?.firstElementChild).toHaveClass(
       'border-l',
@@ -261,7 +263,9 @@ describe('DetailEntityRow', () => {
 
     await user.click(screen.getByRole('button', { name: 'Show locations in Dock Ward' }))
 
-    const disclosureItem = screen.getByRole('link', { name: 'Dock Ward' }).closest('[style]')
+    const disclosureItem = screen
+      .getByRole('link', { name: 'Dock Ward' })
+      .closest('[style*="--entity-content-offset"]')
     const expandedRegion = disclosureItem?.querySelector('[id]')
     expect(expandedRegion).toBeInTheDocument()
     expect(expandedRegion?.previousElementSibling).not.toHaveClass('border-t')

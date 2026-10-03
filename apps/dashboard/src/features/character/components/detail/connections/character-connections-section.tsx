@@ -109,7 +109,7 @@ export function CharacterConnectionsSection({
                             trailing={
                               canEdit && row.capabilities.canUpdateDetails
                                 ? {
-                                    kind: 'action',
+                                    kind: 'utility',
                                     content: (
                                       <ActionButton
                                         action="edit"

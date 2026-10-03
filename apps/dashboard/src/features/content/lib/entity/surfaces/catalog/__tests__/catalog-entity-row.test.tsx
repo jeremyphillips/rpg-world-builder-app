@@ -37,7 +37,8 @@ describe('CatalogEntityRow', () => {
 
     const frame = container.querySelector('article') as HTMLElement
     expect(frame).toHaveClass('bg-catalog-picker-row-surface')
-    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
+    expect(frame).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(frame).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*1)]')
     expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
       'calc(var(--spacing)*6)',
     )
@@ -72,7 +73,8 @@ describe('CatalogEntityRow', () => {
     )
 
     const frame = container.querySelector('article') as HTMLElement
-    expect(frame).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*4)]')
+    expect(frame).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-inset)]')
+    expect(frame).toHaveClass('[--entity-surface-inset:calc(var(--spacing)*4)]')
     expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
 
     const contentInset = entityCardContentFromShell(container)

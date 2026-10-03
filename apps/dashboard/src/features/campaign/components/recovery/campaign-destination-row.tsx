@@ -64,7 +64,6 @@ export function CampaignDestinationRow({
               : undefined,
         }}
         trailing={{ kind: 'indicator', variant: 'chevron' }}
-        trailingAlign="center"
       />
     </Link>
   )

@@ -53,7 +53,7 @@ export function EntityDisclosureArrayItemShell({
         toolbarAriaLabel={toolbarAriaLabel ?? header.ariaLabel}
         entity={entity}
         headingHref={headingHref}
-        trailing={action ? { kind: 'action', content: action as ReactElement } : undefined}
+        trailing={action ? { kind: 'utility', content: action as ReactElement } : undefined}
         collapsed={collapsed}
         onToggleCollapse={onToggleCollapse}
         dragHandleProps={
