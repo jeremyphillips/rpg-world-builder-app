@@ -389,8 +389,6 @@ export {
   type UseSubmitHandlerResult,
 } from './hooks/use-submit-handler.client'
 export {
-  ARRAY_ITEM_HEADER_DIVIDER,
-  ARRAY_ITEM_TEXT_SEPARATOR,
   joinArrayItemSummaryParts,
   type ResolvedArrayItemHeader,
 } from './config/array/array-item-config.lib'

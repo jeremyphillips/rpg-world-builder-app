@@ -12,10 +12,9 @@ import { getRegionTypeLabelForKind } from '../../vocab/location/region/region-cl
 import { getSettlementTypeLabel } from '../../vocab/location/region/settlement-type'
 import { getSiteTypeLabel } from '../../vocab/location/region/site-type'
 import { getStructureTypeLabel } from '../../vocab/location/building/structure-type'
+import { joinInlineMetadata } from '../../primitives/inline-metadata.js'
 import type { BuildingClassification } from './building-classification'
 import type { Location } from './location'
-
-export const LOCATION_DISPLAY_SUMMARY_SEPARATOR = ' · ' as const
 
 export type LocationDisplaySummary = {
   typeLabel: string
@@ -167,7 +166,7 @@ export function resolveLocationClassificationDisplay(
 
   return {
     parts,
-    text: parts.join(LOCATION_DISPLAY_SUMMARY_SEPARATOR),
+    text: joinInlineMetadata(parts),
   }
 }
 

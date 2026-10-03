@@ -156,7 +156,7 @@ describe('LocationInverseOrganizationConnectionLinkDrawer replace organization',
   const currentOrganizationEndpoint = {
     entity: {
       heading: CITY_COUNCIL.name,
-      headingSuffix: ' · Government',
+      classification: 'Government',
     },
     fallback: 'organization' as const,
   }

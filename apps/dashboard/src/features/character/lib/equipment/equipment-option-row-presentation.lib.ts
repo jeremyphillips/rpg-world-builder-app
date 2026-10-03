@@ -10,6 +10,7 @@ import {
 } from '@rpg/contracts'
 
 import { formatInlineRecommendationSources } from '../recommendation/format-inline-recommendation-sources'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const EQUIPMENT_OPTION_ROW_INLINE_CLAUSE_LIMIT = 2
 
@@ -206,7 +207,7 @@ function secondaryTitleFromClauses(clauses: EquipmentOptionSecondaryClause[]): s
       return `${clause.badgeLabel}. ${clause.title}`
     return clause.label
   })
-  return parts.length > 0 ? parts.join(' · ') : undefined
+  return parts.length > 0 ? joinInlineMetadata(parts) : undefined
 }
 
 /**

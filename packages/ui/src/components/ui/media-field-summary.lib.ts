@@ -1,3 +1,5 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 export const MEDIA_FIELD_SUMMARY_MANAGE_IMAGES_LABEL = 'Manage images'
 
 export type CompactSummaryCopy = {
@@ -30,14 +32,14 @@ export function resolveCompactAttachmentCountLabel(
   if (maxItems === 1) {
     if (galleryCount === 0) return 'No image'
     const base = '1 image'
-    return uploadCount >= maxItems ? `${base} · Limit reached` : base
+    return uploadCount >= maxItems ? joinInlineMetadata([base, 'Limit reached']) : base
   }
 
   if (galleryCount === 0) return 'No images'
 
   const noun = galleryCount === 1 ? 'image' : 'images'
   const base = `${galleryCount} ${noun}`
-  if (uploadCount >= maxItems) return `${base} · Limit reached`
+  if (uploadCount >= maxItems) return joinInlineMetadata([base, 'Limit reached'])
   return base
 }
 

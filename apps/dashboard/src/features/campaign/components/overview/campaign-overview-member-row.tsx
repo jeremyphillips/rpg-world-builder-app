@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getAssetUrl, type CampaignOverviewMemberListItem } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { ActionIcon, ConfirmDialog, type BadgeTone } from '@rpg/ui'
 
 import type { DetailOverflowAction } from '@/features/content'
@@ -37,7 +38,7 @@ function memberOnboardingStatus(
 function buildMemberRoleDescription(member: CampaignOverviewMemberListItem): string {
   const role = formatCampaignRoleLabel(member.role)
   if (member.inviteAcceptedAt) {
-    return `${role} · ${formatMemberInviteAcceptedLine(member.inviteAcceptedAt)}`
+    return joinInlineMetadata([role, formatMemberInviteAcceptedLine(member.inviteAcceptedAt)])
   }
   return role
 }

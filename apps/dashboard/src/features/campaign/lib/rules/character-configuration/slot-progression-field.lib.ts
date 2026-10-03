@@ -9,6 +9,7 @@ import {
   type PactSlotRow,
   type SlotProgression,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import {
   createFixedLevelsTableBuilderDraft,
@@ -407,9 +408,12 @@ export function formatSlotProgressionMetadata(
   const authoredMaxLevel = progression.rows.reduce((max, row) => Math.max(max, row.level), 0)
   const derivedCount = Math.max(0, effectiveMaxLevel - authoredMaxLevel)
   const kindLabel = progression.kind === 'pact' ? 'Pact' : 'Leveled'
-  const derivedSuffix =
-    derivedCount > 0 ? ` · ${derivedCount} level${derivedCount === 1 ? '' : 's'} derived` : ''
-  return `${effectiveMaxLevel} levels${derivedSuffix} · ${kindLabel}`
+  const parts = [`${effectiveMaxLevel} levels`]
+  if (derivedCount > 0) {
+    parts.push(`${derivedCount} level${derivedCount === 1 ? '' : 's'} derived`)
+  }
+  parts.push(kindLabel)
+  return joinInlineMetadata(parts)
 }
 
 export function buildSlotProgressionDraft(

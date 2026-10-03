@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
-import { cn, Text } from '@rpg/ui'
+import { cn, InlineMetadata, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
@@ -50,7 +50,10 @@ export function AdminUserContextLine() {
 
   return (
     <Text variant="muted" className="text-sm">
-      {user.email} · {PLATFORM_ROLE_ENTRIES[user.platformRole].label}
+      <InlineMetadata role="supporting" density="comfortable">
+        <InlineMetadata.Item>{user.email}</InlineMetadata.Item>
+        <InlineMetadata.Item>{PLATFORM_ROLE_ENTRIES[user.platformRole].label}</InlineMetadata.Item>
+      </InlineMetadata>
     </Text>
   )
 }

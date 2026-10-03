@@ -5,60 +5,57 @@ import type { ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 import {
   contentCardHeadingVariants,
-  contentCardMixedHeadingNameVariants,
   contentCardMixedHeadingRowVariants,
-  contentCardMixedHeadingSeparatorVariants,
+  contentCardMixedHeadingNameVariants,
   contentCardMixedHeadingSuffixVariants,
   type ContentCardDensity,
 } from './content-card.variants'
+import { InlineMetadata } from './inline-metadata'
 
-const HEADING_SUFFIX_LEADING_SEPARATOR = ' · ' as const
+function isPresent(value: ReactNode): boolean {
+  return value != null && value !== '' && value !== false
+}
 
-function splitHeadingSuffix(headingSuffix: ReactNode): {
-  hasLeadingSeparator: boolean
-  suffixText: ReactNode
-} {
-  if (
-    typeof headingSuffix === 'string' &&
-    headingSuffix.startsWith(HEADING_SUFFIX_LEADING_SEPARATOR)
-  ) {
-    return {
-      hasLeadingSeparator: true,
-      suffixText: headingSuffix.slice(HEADING_SUFFIX_LEADING_SEPARATOR.length),
-    }
+function classificationItems(classification: ReactNode | readonly ReactNode[]): ReactNode[] {
+  if (Array.isArray(classification)) {
+    return classification.filter(isPresent)
   }
-
-  return { hasLeadingSeparator: false, suffixText: headingSuffix }
+  return isPresent(classification) ? [classification] : []
 }
 
 export type ContentCardHeadingProps = {
   heading: ReactNode
-  headingSuffix?: ReactNode
+  classification?: ReactNode | readonly ReactNode[]
   density?: ContentCardDensity
   className?: string
 }
 
 export function ContentCardHeading({
   heading,
-  headingSuffix,
+  classification,
   density = 'comfortable',
   className,
 }: ContentCardHeadingProps) {
-  if (!headingSuffix) {
+  const items = classification ? classificationItems(classification) : []
+
+  if (items.length === 0) {
     return <div className={cn(contentCardHeadingVariants({ density }), className)}>{heading}</div>
   }
 
-  const { hasLeadingSeparator, suffixText } = splitHeadingSuffix(headingSuffix)
+  const metaDensity = density === 'compact' ? 'compact' : 'comfortable'
 
   return (
     <div className={cn(contentCardMixedHeadingRowVariants({ density }), className)}>
-      <span className={contentCardMixedHeadingNameVariants()}>{heading}</span>
-      {hasLeadingSeparator ? (
-        <span className={contentCardMixedHeadingSeparatorVariants()} aria-hidden>
-          ·
-        </span>
-      ) : null}
-      <span className={contentCardMixedHeadingSuffixVariants()}>{suffixText}</span>
+      <InlineMetadata role="heading" density={metaDensity} wrap={false} className="min-w-0 flex-1">
+        <InlineMetadata.Item truncate className={contentCardMixedHeadingNameVariants()}>
+          {heading}
+        </InlineMetadata.Item>
+        {items.map((item, index) => (
+          <InlineMetadata.Item key={index} className={contentCardMixedHeadingSuffixVariants()}>
+            {item}
+          </InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
     </div>
   )
 }

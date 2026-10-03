@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { Text } from '@rpg/ui'
+import { InlineMetadata, Text } from '@rpg/ui'
 import { useFilterState } from '@rpg/ui/filters'
 
 import { ROUTES } from '@/app/routes'
@@ -68,7 +68,12 @@ export function AdminUserCharactersPage() {
       <PageHeader heading="Characters" />
       <Text variant="muted">Player characters owned by this user.</Text>
       <Text variant="muted" className="text-sm">
-        {user.email} · {user.characterCount} character{user.characterCount === 1 ? '' : 's'}
+        <InlineMetadata role="supporting" density="comfortable">
+          <InlineMetadata.Item>{user.email}</InlineMetadata.Item>
+          <InlineMetadata.Item>
+            {user.characterCount} character{user.characterCount === 1 ? '' : 's'}
+          </InlineMetadata.Item>
+        </InlineMetadata>
       </Text>
       <AdminUserCharactersList />
     </PageShell>

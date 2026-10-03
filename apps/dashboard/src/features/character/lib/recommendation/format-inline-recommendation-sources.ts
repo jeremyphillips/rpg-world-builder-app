@@ -1,8 +1,7 @@
 import type { OptionPresentationFacts } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type { EntitySummaryStatusItem } from '@/features/content'
-
-const INLINE_SOURCE_JOIN = ' · '
 
 export function recommendationStatusItems(
   presentation: OptionPresentationFacts | undefined,
@@ -28,9 +27,9 @@ export function formatInlineRecommendationSources(labels: readonly string[]): {
   title?: string
 } {
   if (labels.length === 0) return { inline: '' }
-  if (labels.length <= 2) return { inline: labels.join(INLINE_SOURCE_JOIN) }
+  if (labels.length <= 2) return { inline: joinInlineMetadata(labels) }
   return {
     inline: `${labels[0]} +${labels.length - 1}`,
-    title: labels.join(INLINE_SOURCE_JOIN),
+    title: joinInlineMetadata(labels),
   }
 }

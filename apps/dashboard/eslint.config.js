@@ -1,4 +1,5 @@
 import { buildingArchetypeAppQuarantine } from '@rpg/config/eslint/building-archetype-quarantine'
+import { inlineMetadataSeparatorRestrictions } from '@rpg/config/eslint/inline-metadata-separator-restrictions'
 import react from '@rpg/config/eslint/react'
 import storybook from 'eslint-plugin-storybook'
 
@@ -101,6 +102,7 @@ const dashboardSemanticStyleLayerGuards = {
   rules: {
     'no-restricted-syntax': [
       'error',
+      ...inlineMetadataSeparatorRestrictions,
       {
         selector: 'Literal[value=/hover:bg-row-(hover|selected)/]',
         message:
@@ -173,6 +175,7 @@ const dashboardDragHandleGuard = {
   rules: {
     'no-restricted-syntax': [
       'error',
+      ...inlineMetadataSeparatorRestrictions,
       {
         selector: 'Literal[value=/cursor-grab/]',
         message:
@@ -189,6 +192,7 @@ const dashboardFormFieldGuards = {
   rules: {
     'no-restricted-syntax': [
       'error',
+      ...inlineMetadataSeparatorRestrictions,
       {
         selector: 'Property[key.name="legendSize"]',
         message: 'legendSize was removed — nest named groups under a section for subsection scale.',
@@ -286,6 +290,7 @@ const dashboardContentPickerPolicyGuards = {
     ],
     'no-restricted-syntax': [
       'error',
+      ...inlineMetadataSeparatorRestrictions,
       {
         selector:
           "BinaryExpression[operator='==='] > MemberExpression[property.name='status'][object.property.name='status'] + Literal[value='draft']",
@@ -330,6 +335,7 @@ const dashboardCharacterBuilderPlayActorGuard = {
   rules: {
     'no-restricted-syntax': [
       'error',
+      ...inlineMetadataSeparatorRestrictions,
       {
         selector: "Property[key.name='playActor'] > Identifier[name='undefined']",
         message:

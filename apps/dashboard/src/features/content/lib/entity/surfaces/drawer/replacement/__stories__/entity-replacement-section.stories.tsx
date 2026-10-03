@@ -17,7 +17,7 @@ export const LocationReplacement: Story = {
     current: {
       entity: {
         heading: 'Dock Ward',
-        headingSuffix: ' · District',
+        classification: 'District',
         supportingText: 'Located in Harborford',
       },
     },

@@ -11,41 +11,6 @@ import {
   entitySummaryHeadingRowVariants,
 } from './entity-summary.variants'
 
-const CLASSIFICATION_SEPARATOR = ' · ' as const
-
-function stripLeadingClassificationSeparator(classification: ReactNode): ReactNode | undefined {
-  if (classification == null || classification === '') {
-    return undefined
-  }
-
-  if (typeof classification === 'string' && classification.startsWith(CLASSIFICATION_SEPARATOR)) {
-    return classification.slice(CLASSIFICATION_SEPARATOR.length)
-  }
-
-  return classification
-}
-
-function resolveClassificationSuffix(classification: ReactNode): ReactNode | undefined {
-  if (classification == null || classification === '') {
-    return undefined
-  }
-
-  if (typeof classification === 'string' && classification.startsWith(CLASSIFICATION_SEPARATOR)) {
-    return classification
-  }
-
-  if (typeof classification === 'string') {
-    return `${CLASSIFICATION_SEPARATOR}${classification}`
-  }
-
-  return (
-    <>
-      {CLASSIFICATION_SEPARATOR}
-      {classification}
-    </>
-  )
-}
-
 function renderEntitySummaryStatus(
   entity: EntitySummaryModel,
   density: ContentCardDensity,
@@ -88,7 +53,7 @@ function EntitySummaryCompact({
         <div className={entitySummaryHeadingRowVariants()}>
           <IdentityRow
             heading={entity.heading}
-            classification={stripLeadingClassificationSeparator(entity.classification)}
+            classification={entity.classification}
             size="md"
             className="min-w-0 flex-1"
           />
@@ -101,7 +66,7 @@ function EntitySummaryCompact({
     ) : (
       <IdentityRow
         heading={entity.heading}
-        classification={stripLeadingClassificationSeparator(entity.classification)}
+        classification={entity.classification}
         supporting={entity.description}
         status={status}
         size="md"
@@ -140,13 +105,12 @@ export function EntitySummary({
     )
   }
 
-  const headingSuffix = resolveClassificationSuffix(entity.classification)
   const heading = (
     <div className={entitySummaryHeadingRowVariants()}>
       <div className="min-w-0 flex-1">
         <ContentCardHeading
           heading={entity.heading}
-          headingSuffix={headingSuffix}
+          classification={entity.classification}
           density={density}
         />
       </div>

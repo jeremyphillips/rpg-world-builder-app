@@ -6,6 +6,7 @@
   "exports": {
     "./eslint/base": "./src/eslint/base.js",
     "./eslint/building-archetype-quarantine": "./src/eslint/building-archetype-quarantine.js",
+    "./eslint/inline-metadata-separator-restrictions": "./src/eslint/inline-metadata-separator-restrictions.js",
     "./eslint/react": "./src/eslint/react.js",
     "./prettier": "./src/prettier/index.js",
     "./vitest/base": "./src/vitest/base.js",

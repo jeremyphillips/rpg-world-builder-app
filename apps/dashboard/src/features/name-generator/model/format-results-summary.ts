@@ -5,6 +5,7 @@ import { getConvention } from '@rpg/name-generator-data'
 
 import { DEFAULT_RULESET_ID, GENDER_STYLE_LABELS } from './name-generator.constants'
 import type { NameGeneratorFilters, NameGeneratorResultsSummary } from './name-generator-filters'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 function getSpeciesLabel(speciesId: string | undefined): string | undefined {
   if (speciesId === undefined) {
@@ -22,7 +23,7 @@ function buildFilterSubtitle(filters: NameGeneratorFilters): string | undefined 
     filters.genderStyle !== undefined ? GENDER_STYLE_LABELS[filters.genderStyle] : undefined,
   ].filter((segment): segment is string => segment !== undefined)
 
-  return segments.length > 0 ? segments.join(' · ') : undefined
+  return segments.length > 0 ? joinInlineMetadata(segments) : undefined
 }
 
 function getDominantLanguageLabel(

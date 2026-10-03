@@ -16,7 +16,7 @@ export const SingleLocation: Story = {
     entities: [
       {
         heading: 'Yawning Portal',
-        headingSuffix: ' · Building · Tavern',
+        classification: 'Building · Tavern',
         supportingText: 'Located in Dock Ward',
       },
     ],
@@ -28,11 +28,11 @@ export const LocationAndOrganization: Story = {
     entities: [
       {
         heading: 'Port City',
-        headingSuffix: ' · Settlement · City',
+        classification: 'Settlement · City',
       },
       {
         heading: 'City Council',
-        headingSuffix: ' · Organization',
+        classification: 'Organization',
       },
     ],
   },
@@ -43,7 +43,7 @@ export const LinkedName: Story = {
     entities: [
       {
         heading: 'The Monarchy',
-        headingSuffix: ' · Organization',
+        classification: 'Organization',
         href: '/campaigns/demo/organizations/monarchy',
       },
     ],

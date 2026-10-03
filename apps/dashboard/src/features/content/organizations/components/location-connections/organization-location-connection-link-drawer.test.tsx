@@ -437,7 +437,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         currentEndpoint={{
           entity: {
             heading: 'Thieves Guildhouse',
-            headingSuffix: ' · Structure',
+            classification: 'Structure',
           },
         }}
         onSubmit={onSubmit}
@@ -506,7 +506,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         currentEndpoint={{
           entity: {
             heading: 'Legacy Port HQ',
-            headingSuffix: ' · Settlement',
+            classification: 'Settlement',
           },
         }}
         onSubmit={vi.fn()}
@@ -652,7 +652,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         currentEndpoint={{
           entity: {
             heading: 'Lankhmar',
-            headingSuffix: ' · Settlement · City',
+            classification: 'Settlement · City',
             supportingText: 'Located in Nehwon',
           },
         }}
@@ -712,7 +712,7 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         currentEndpoint={{
           entity: {
             heading: 'Kingdom of Foo',
-            headingSuffix: ' · Region · Kingdom',
+            classification: 'Region · Kingdom',
             supportingText: 'Located in Nehwon',
           },
         }}

@@ -1,4 +1,5 @@
 import type { Organization, OrganizationLocationConnectionKind } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type {
   CreateCompositionChildWorkflowCommitTarget,
@@ -229,7 +230,7 @@ function buildOrganizationSummaryRow(
   organizationDomainLabel?: string | null,
 ): BuildingOrganizationComposerSummaryRow {
   const value = organizationDomainLabel
-    ? `${organizationName} · ${organizationDomainLabel}`
+    ? joinInlineMetadata([organizationName, organizationDomainLabel])
     : organizationName
   return {
     id: 'organization',
@@ -366,7 +367,7 @@ const BUILDING_ORGANIZATION_SETUP_SUMMARY = [
     resolveValue: (state: BuildingOrganizationSetupSummaryState) => {
       if (!state.hasResolvedOrganization || !state.organizationName) return null
       return state.organizationDomainLabel
-        ? `${state.organizationName} · ${state.organizationDomainLabel}`
+        ? joinInlineMetadata([state.organizationName, state.organizationDomainLabel])
         : state.organizationName
     },
   },

@@ -3,6 +3,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import boundaries from 'eslint-plugin-boundaries'
 import prettier from 'eslint-config-prettier'
+import { inlineMetadataSeparatorProductionGuard } from './inline-metadata-separator-restrictions.js'
 
 /**
  * Shared base ESLint flat config.
@@ -15,7 +16,8 @@ import prettier from 'eslint-config-prettier'
  * (`index.ts` / `index.tsx`); deep cross-feature imports are disallowed.
  * Imports within the same feature are unrestricted.
  */
-export default tseslint.config(
+export default [
+  ...tseslint.config(
   {
     ignores: [
       '**/dist/**',
@@ -91,4 +93,6 @@ export default tseslint.config(
     },
   },
   prettier,
-)
+  ),
+  inlineMetadataSeparatorProductionGuard,
+]

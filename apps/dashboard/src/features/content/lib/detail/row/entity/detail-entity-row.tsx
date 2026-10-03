@@ -27,7 +27,7 @@ export type DetailEntityRowProps = {
   heading: ReactNode
   headingHref?: string
   /** Muted classification text rendered inline after the heading (includes leading separator). */
-  headingSuffix?: ReactNode
+  classification?: ReactNode
   subheading?: ReactNode
   metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]
   /** Leading entity media lane — domain types project to a node upstream. */
@@ -85,7 +85,7 @@ function DetailEntityRowIdentity(
     DetailEntityRowProps,
     | 'heading'
     | 'headingHref'
-    | 'headingSuffix'
+    | 'classification'
     | 'subheading'
     | 'metadata'
     | 'trailing'
@@ -98,7 +98,7 @@ function DetailEntityRowIdentity(
   const {
     heading,
     headingHref,
-    headingSuffix,
+    classification,
     subheading,
     metadata,
     leadingMedia,
@@ -109,7 +109,7 @@ function DetailEntityRowIdentity(
 
   const summaryModel = projectEntitySummaryModel({
     heading,
-    classification: headingSuffix,
+    classification: classification,
     description: subheading,
     status: metadata,
   })
@@ -132,7 +132,7 @@ function DetailEntityRowIdentity(
 export function DetailEntityRow({
   heading,
   headingHref,
-  headingSuffix,
+  classification,
   subheading,
   metadata,
   leadingMedia,
@@ -151,7 +151,7 @@ export function DetailEntityRow({
         <DetailEntityRowIdentity
           heading={heading}
           headingHref={headingHref}
-          headingSuffix={headingSuffix}
+          classification={classification}
           subheading={subheading}
           metadata={metadata}
           leadingMedia={leadingMedia}
@@ -176,7 +176,7 @@ export function DetailEntityRow({
         <DetailEntityRowIdentity
           heading={heading}
           headingHref={headingHref}
-          headingSuffix={headingSuffix}
+          classification={classification}
           subheading={subheading}
           metadata={metadata}
           leadingMedia={leadingMedia}

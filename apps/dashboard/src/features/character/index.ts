@@ -147,7 +147,7 @@ export {
   buildCharacterEntitySummaryVmFromTransport,
   buildCharacterEntitySummarySearchText,
   formatCharacterInlineSummary,
-  formatCharacterMixedHeadingSuffix,
+  formatCharacterMixedClassification,
   buildCharacterEntityContextPresentation,
   buildCharacterEntityCardModel,
   type BuildCharacterEntityCardModelOptions,

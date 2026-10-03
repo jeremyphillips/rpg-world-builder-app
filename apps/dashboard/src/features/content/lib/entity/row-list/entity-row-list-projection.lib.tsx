@@ -2,24 +2,19 @@ import type { ReactNode } from 'react'
 
 import type { EntitySummaryStatusItem } from '../summary/entity-summary-status.types'
 
-/** Inline suffix lane: classification first, then headingAccessory (callers own separators). */
-export function composeEntityRowListHeadingSuffix(
+/** Inline suffix lane: classification first, then headingAccessory (separator-free parts). */
+export function composeEntityRowListClassification(
   classification?: ReactNode,
   headingAccessory?: ReactNode,
-): ReactNode | undefined {
-  if (classification == null || classification === '') {
-    return headingAccessory == null || headingAccessory === '' ? undefined : headingAccessory
+): readonly ReactNode[] {
+  const parts: ReactNode[] = []
+  if (classification != null && classification !== '') {
+    parts.push(classification)
   }
-  if (headingAccessory == null || headingAccessory === '') {
-    return classification
+  if (headingAccessory != null && headingAccessory !== '') {
+    parts.push(headingAccessory)
   }
-
-  return (
-    <>
-      {classification}
-      {headingAccessory}
-    </>
-  )
+  return parts
 }
 
 export function resolveEntityRowListOverflowTriggerLabel(

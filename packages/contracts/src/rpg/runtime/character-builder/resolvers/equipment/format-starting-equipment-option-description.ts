@@ -5,9 +5,8 @@ import {
   characterWealthFromGrant,
   type CharacterWealth,
 } from '../../../character/sheet/equipment-inventory'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
-
-const STARTING_EQUIPMENT_COMPACT_SUMMARY_SEPARATOR = ' · '
 
 /** Compact package stats for authoring previews — item count plus formatted baseline wealth. */
 export function formatStartingEquipmentOptionCompactSummary(args: {
@@ -24,7 +23,7 @@ export function formatStartingEquipmentOptionCompactSummary(args: {
     parts.push(formatWealth(characterWealthFromGrant(args.wealth)))
   }
 
-  return parts.join(STARTING_EQUIPMENT_COMPACT_SUMMARY_SEPARATOR)
+  return joinInlineMetadata(parts)
 }
 
 export const DEFAULT_STANDARD_EQUIPMENT_LABEL = 'standard equipment'

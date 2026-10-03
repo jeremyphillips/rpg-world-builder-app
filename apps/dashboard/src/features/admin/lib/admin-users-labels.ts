@@ -2,6 +2,7 @@ import type { AdminUserCampaignCounts, AdminUserDeleteBlockReason } from '@rpg/c
 import { USER_RECENT_ACTIVITY_DAYS } from '@rpg/contracts'
 
 import { formatRelativeRecency } from '@/lib/datetime/format-datetime'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const ADMIN_USERS_TABLE_KEY = 'admin-users'
 
@@ -27,7 +28,7 @@ export function formatAdminUserCampaignCounts(counts: AdminUserCampaignCounts): 
     segments.push(`${counts.joined} joined`)
   }
 
-  return segments.length > 0 ? segments.join(' · ') : '—'
+  return segments.length > 0 ? joinInlineMetadata(segments) : '—'
 }
 
 function startOfDay(date: Date): Date {

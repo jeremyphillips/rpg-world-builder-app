@@ -17,7 +17,7 @@ export const Default: Story = {
   args: {
     heading: 'The Silver Eel',
     headingHref: '/campaigns/demo/locations/silver-eel',
-    headingSuffix: ' · Building · Tavern',
+    classification: 'Building · Tavern',
   },
 }
 
@@ -27,7 +27,7 @@ export const WithOverflow: Story = {
       <DetailEntityRow
         heading="The Silver Eel"
         headingHref="/campaigns/demo/locations/silver-eel"
-        headingSuffix=" · Building · Tavern"
+        classification="Building · Tavern"
         trailing={{
           kind: 'action',
           content: (
@@ -44,7 +44,7 @@ export const WithOverflow: Story = {
       <DetailEntityRow
         heading="Thieves' Guildhouse"
         headingHref="/campaigns/demo/locations/guildhouse"
-        headingSuffix=" · Building · Guildhall"
+        classification="Building · Guildhall"
         trailing={{
           kind: 'action',
           content: (
@@ -68,7 +68,7 @@ export const WithDisclosure: Story = {
       <DetailEntityRow
         heading="Dock Ward"
         headingHref="/campaigns/demo/locations/dock-ward"
-        headingSuffix=" · District · 2 locations"
+        classification="District · 2 locations"
         disclosure={{
           mode: 'expandable',
           label: 'locations in Dock Ward',
@@ -77,13 +77,13 @@ export const WithDisclosure: Story = {
               <DetailEntityRow
                 heading="The Silver Eel"
                 headingHref="/campaigns/demo/locations/silver-eel"
-                headingSuffix=" · Building · Tavern"
+                classification="Building · Tavern"
                 inset="parent"
               />
               <DetailEntityRow
                 heading="Thieves' Guildhouse"
                 headingHref="/campaigns/demo/locations/guildhouse"
-                headingSuffix=" · Building · Guildhall"
+                classification="Building · Guildhall"
                 inset="parent"
               />
             </DetailCollectionRowList>
@@ -105,7 +105,7 @@ export const WithDisclosure: Story = {
       <DetailEntityRow
         heading="Scholar's Quarter"
         headingHref="/campaigns/demo/locations/scholars-quarter"
-        headingSuffix=" · District · 0 locations"
+        classification="District · 0 locations"
         disclosure={{ mode: 'reserved' }}
       />
     </DetailCollectionRowList>

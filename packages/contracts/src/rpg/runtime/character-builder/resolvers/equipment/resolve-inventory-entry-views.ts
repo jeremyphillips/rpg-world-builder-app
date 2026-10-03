@@ -9,6 +9,7 @@ import type {
 } from './equipment-acquisition-types'
 import type { MagicItemGrantSelection } from '../../equipment/magic-item-selection'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
 
 function mergeSourceAllocation(
   sources: EquipmentSourceAllocation[],
@@ -128,5 +129,5 @@ export function formatInventorySourceSummary(
     }
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }

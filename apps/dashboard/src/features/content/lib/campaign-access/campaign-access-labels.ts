@@ -16,6 +16,7 @@ import {
   formatActionBlockedTitle,
 } from '@/lib/actions'
 import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-blocker-copy'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'
@@ -70,7 +71,7 @@ export function formatCampaignAccessParticipantOptionLabel(
   name: string,
   playerDisplayName: string,
 ): string {
-  return `${name} · ${playerDisplayName}`
+  return joinInlineMetadata([name, playerDisplayName])
 }
 
 /** Inline create-time warning when the deferred campaign-access PATCH fails. */

@@ -4,6 +4,7 @@ import type {
   CharacterCampaignWarning,
   CharacterCampaignWarningCategory,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
@@ -88,5 +89,5 @@ export function formatComboboxBlockingDescription(
   const reason = formatBlockingReason(primary)
   const remaining = issues.length - 1
   if (remaining <= 0) return reason
-  return `${reason} · ${remaining} more issue${remaining === 1 ? '' : 's'}`
+  return joinInlineMetadata([reason, `${remaining} more issue${remaining === 1 ? '' : 's'}`])
 }

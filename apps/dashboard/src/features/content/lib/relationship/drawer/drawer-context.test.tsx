@@ -12,7 +12,7 @@ describe('DrawerContext', () => {
         entities={[
           {
             heading: 'Yawning Portal',
-            headingSuffix: ' · Building · Tavern',
+            classification: 'Building · Tavern',
             supportingText: 'Located in Dock Ward',
           },
         ]}
@@ -28,8 +28,8 @@ describe('DrawerContext', () => {
     const { container } = render(
       <DrawerContext
         entities={[
-          { heading: 'Port City', headingSuffix: ' · Settlement' },
-          { heading: 'City Council', headingSuffix: ' · Organization' },
+          { heading: 'Port City', classification: 'Settlement' },
+          { heading: 'City Council', classification: 'Organization' },
         ]}
       />,
     )
@@ -66,7 +66,7 @@ describe('DrawerContext', () => {
         entities={[
           {
             heading: 'Aldermere',
-            headingSuffix: ' · World',
+            classification: 'World',
           },
         ]}
       />,
@@ -81,7 +81,7 @@ describe('DrawerContext', () => {
         entities={[
           {
             heading: 'Yawning Portal',
-            headingSuffix: ' · Building · Tavern',
+            classification: 'Building · Tavern',
             supportingText: 'Located in Dock Ward',
           },
         ]}

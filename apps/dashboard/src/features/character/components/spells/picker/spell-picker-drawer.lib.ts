@@ -12,6 +12,7 @@ import {
   type SpellPickerCompactSummary,
   type SpellPickerItem,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { normalizeSearchQuery } from '@rpg/ui'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
@@ -415,7 +416,7 @@ export function resolveSpellPickerMethodFilterOptions(
 
 export function formatSpellPickerMechanicsTriggerLabel(activeCount: number): string {
   if (activeCount === 0) return SPELL_PICKER_MECHANICS_LABEL
-  return `${SPELL_PICKER_MECHANICS_LABEL} · ${activeCount}`
+  return joinInlineMetadata([SPELL_PICKER_MECHANICS_LABEL, activeCount])
 }
 
 export function getSpellPickerCastingTimeFilterLabel(filter: SpellPickerCastingTimeFilter): string {

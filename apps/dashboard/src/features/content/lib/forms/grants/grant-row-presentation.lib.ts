@@ -16,6 +16,7 @@ import {
   type SenseId,
   type UsageFrequency,
 } from '@rpg/contracts'
+import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { formatCompactMetadataList } from './grant-compact-metadata.lib'
@@ -81,9 +82,9 @@ function isRedundantDetail(heading: string, detail: string | undefined): boolean
   const normalizedDetail = normalizePresentationPart(detail)
   if (normalizedDetail === normalizedHeading) return true
   if (normalizedDetail.startsWith(`${normalizedHeading} —`)) return true
-  if (normalizedDetail.startsWith(`${normalizedHeading} ·`)) return true
+  if (normalizedDetail.startsWith(`${normalizedHeading} ${INLINE_METADATA_SEPARATOR}`)) return true
   const headingPrefix = new RegExp(
-    `^${normalizedHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[,—·]`,
+    `^${normalizedHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[,—${INLINE_METADATA_SEPARATOR}]`,
   )
   return headingPrefix.test(normalizedDetail)
 }

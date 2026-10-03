@@ -26,8 +26,7 @@ import {
   formatWeight,
   MOUNT_CARRYING_CAPACITY_LABEL,
 } from '../../primitives/units'
-
-export const EQUIPMENT_COMPACT_SEPARATOR = ' · '
+import { joinInlineMetadata } from '../../primitives/inline-metadata.js'
 
 export const EQUIPMENT_COMPACT_DEFAULT_MAX_SEGMENTS = 3
 
@@ -75,7 +74,7 @@ export function joinCompactSegments(...segments: Array<string | undefined>): str
       return Boolean(segment)
     })
 
-  return values.length > 0 ? values.join(EQUIPMENT_COMPACT_SEPARATOR) : undefined
+  return values.length > 0 ? joinInlineMetadata(values) : undefined
 }
 
 function normalizeCompactSegment(value: string): string {
@@ -96,9 +95,9 @@ function isRedundantCompactSegment(
 
 function formatCompactWeaponProperties(equipment: Equipment): string | undefined {
   if (equipment.kind !== 'weapon' || equipment.properties.length === 0) return undefined
-  return equipment.properties
-    .map((property) => getWeaponPropertyLabel(property))
-    .join(EQUIPMENT_COMPACT_SEPARATOR)
+  return joinInlineMetadata(
+    equipment.properties.map((property) => getWeaponPropertyLabel(property)),
+  )
 }
 
 function formatCompactDamage(equipment: Equipment): string | undefined {
@@ -109,7 +108,7 @@ function formatCompactDamage(equipment: Equipment): string | undefined {
 function formatCompactProperties(equipment: Equipment): string | undefined {
   if (equipment.kind === 'weapon') return formatCompactWeaponProperties(equipment)
   if (equipment.kind !== 'adventuring_gear' || !equipment.properties?.length) return undefined
-  return equipment.properties.join(EQUIPMENT_COMPACT_SEPARATOR)
+  return joinInlineMetadata(equipment.properties)
 }
 
 function formatCompactArmorClass(equipment: Equipment): string | undefined {

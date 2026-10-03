@@ -74,7 +74,7 @@ export const HeadingWithSuffixCompact: Story = {
   args: {
     density: 'compact',
     heading: 'Yawning Portal',
-    headingSuffix: ' · Building · Tavern',
+    classification: 'Building · Tavern',
     subheading: 'Located in Dock Ward',
   },
 }

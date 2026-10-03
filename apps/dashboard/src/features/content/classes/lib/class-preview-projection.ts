@@ -6,6 +6,7 @@ import {
   getArmorCategoryPreviewLabel,
   getWeaponCategoryPreviewLabel,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { formatPreviewRailOverflowList, type PreviewRailFact } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -264,7 +265,7 @@ function buildSpellcastingSection(values: ClassFormValues): ContentPreviewSectio
     derivedKind: 'ready',
     status:
       spellcasting?.slotProgressionId && values.spellSelectionModel
-        ? `${spellcasting.slotProgressionId} · ${selectionLabel}`
+        ? joinInlineMetadata([spellcasting.slotProgressionId, selectionLabel])
         : CONTENT_PREVIEW_STATUS_READY,
     facts: spellcastingFacts(spellcasting, values.spellSelectionModel, values.features),
   }
@@ -331,9 +332,10 @@ function buildCharacterCreationFacts(
     label: CLASS_PREVIEW_FACT_LABELS.skillChoices,
     value:
       skillFrom.length > 0
-        ? `Choose ${skillChoose} · ${formatPreviewRailOverflowList(
-            skillFrom.map((slug) => skillLabel(slug, ctx)),
-          )}`
+        ? joinInlineMetadata([
+            `Choose ${skillChoose}`,
+            formatPreviewRailOverflowList(skillFrom.map((slug) => skillLabel(slug, ctx))),
+          ])
         : CONTENT_PREVIEW_NOT_SET,
   })
 

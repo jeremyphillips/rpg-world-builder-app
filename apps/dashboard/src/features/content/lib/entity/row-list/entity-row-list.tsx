@@ -11,7 +11,7 @@ import { DetailEntityRow } from '../../detail/row/entity/detail-entity-row'
 import type { EntityAnatomyTrailing } from '../anatomy/entity-anatomy-trailing.types'
 import type { EntitySummaryStatusItem } from '../summary/entity-summary-status.types'
 import {
-  composeEntityRowListHeadingSuffix,
+  composeEntityRowListClassification,
   normalizeEntityRowListStatus,
   resolveEntityRowListOverflowTriggerLabel,
 } from './entity-row-list-projection.lib'
@@ -247,7 +247,10 @@ function EntityRowListRow(props: EntityRowListRowProps) {
   } = props
 
   const resolvedStatus = normalizeEntityRowListStatus(status)
-  const headingSuffix = composeEntityRowListHeadingSuffix(classification, headingAccessory)
+  const resolvedClassification = composeEntityRowListClassification(
+    classification,
+    headingAccessory,
+  )
 
   const actions = menu ? toOverflowActions(menu.items) : []
   const resolvedTrailing: EntityAnatomyTrailing | undefined =
@@ -274,7 +277,7 @@ function EntityRowListRow(props: EntityRowListRowProps) {
         inset="parent"
         heading={heading}
         headingHref={headingHref}
-        headingSuffix={headingSuffix}
+        classification={resolvedClassification}
         subheading={description}
         metadata={resolvedStatus}
         leadingMedia={leadingMedia}

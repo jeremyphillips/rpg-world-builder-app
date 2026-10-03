@@ -5,6 +5,7 @@ import { buildEntitySurfaceLeadingMediaNode, type EntityRowListRowProps } from '
 
 import { resolveCharacterRosterStatusPresentation } from '../campaign-roster-presentation'
 import type { CharacterListCardData } from '../../components/character-list-card.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   buildCharacterEntityCardModel,
   buildCharacterEntitySummaryVmFromTransport,
@@ -56,7 +57,7 @@ export function buildCharacterListRowPresentation(
 
   const leadingMedia = buildEntitySurfaceLeadingMediaNode(identity, 'compact')
 
-  const description = [input.card.summary, input.controllerLine].filter(Boolean).join(' · ')
+  const description = joinInlineMetadata([input.card.summary, input.controllerLine]) || undefined
 
   return {
     heading: input.card.name,

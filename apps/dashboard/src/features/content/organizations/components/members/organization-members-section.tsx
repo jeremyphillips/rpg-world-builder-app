@@ -126,7 +126,7 @@ function OrganizationMembersRosterBody({
               key={row.characterId}
               heading={row.name}
               headingHref={row.detailHref}
-              headingAccessory={row.title ? ` · ${row.title}` : undefined}
+              headingAccessory={row.title || undefined}
               description={row.identityLine || undefined}
               leadingMedia={buildOrganizationMemberLeadingMedia(row)}
               menu={toRowMenu(row, actions)}

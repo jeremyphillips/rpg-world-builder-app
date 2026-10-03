@@ -1,7 +1,9 @@
 import { loadSeedSpells } from '@rpg/catalog/spells'
 import type { GrantGroup, SpeciesTrait } from '@rpg/contracts'
 
-import { GRANT_SUMMARY_JOIN, type GrantDisplayVocabulary } from '../forms/grants/grant-display'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
+import { type GrantDisplayVocabulary } from '../forms/grants/grant-display'
 
 import { pickClass, pickEquipment, pickSpecies, pickSpell } from './pick'
 import { STORY_RULESET_ID } from './constants'
@@ -102,7 +104,7 @@ export function getDrowHeritageSpellCatalog() {
 export const DROW_HERITAGE_GROUPED_SUMMARY_WITH_SUFFIX = [
   {
     label: 'L1',
-    text: `Darkvision 120 ft${GRANT_SUMMARY_JOIN}Dancing Lights cantrip`,
+    text: joinInlineMetadata(['Darkvision 120 ft', 'Dancing Lights cantrip']),
   },
   {
     label: 'L3',

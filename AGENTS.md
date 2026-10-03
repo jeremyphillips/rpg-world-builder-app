@@ -165,6 +165,10 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   with no directive.
 - Shared primitives live in `packages/ui` so both `dashboard` and `public` can
   consume them. Authoring detail → [packages/ui/README.md](packages/ui/README.md).
+- Inline metadata (` · ` between compact label segments): use
+  `joinInlineMetadata` (strings) or `InlineMetadata` (JSX) — see
+  [packages/ui/docs/inline-metadata.md](packages/ui/docs/inline-metadata.md).
+  Do not hand-roll middle-dot separators in production code.
 - Forms: prefer the schema-driven `<Form>` (`@rpg/ui/form`) — the only
   `react-hook-form`-aware surface — over hand-wiring primitives. Layer choice,
   the a11y contract, `size`/`width` tokens, and conditional fields are documented

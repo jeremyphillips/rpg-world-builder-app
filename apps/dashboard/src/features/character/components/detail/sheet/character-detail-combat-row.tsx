@@ -1,4 +1,4 @@
-import { Eyebrow, Text } from '@rpg/ui'
+import { Eyebrow, InlineMetadata, Text } from '@rpg/ui'
 
 import {
   CHARACTER_EMPTY_SECTION_TEXT,
@@ -53,7 +53,10 @@ function CharacterDetailActionsPanel({ actions }: { actions: CharacterActionRowV
               <li key={action.id} className="rounded-md bg-surface-strong px-3 py-2 text-sm">
                 <div className="font-medium">{action.name}</div>
                 <div className="text-muted-foreground">
-                  Attack {action.attackBonus} · Damage {action.damage}
+                  <InlineMetadata role="supporting" density="compact">
+                    <InlineMetadata.Item>Attack {action.attackBonus}</InlineMetadata.Item>
+                    <InlineMetadata.Item>Damage {action.damage}</InlineMetadata.Item>
+                  </InlineMetadata>
                 </div>
               </li>
             ))}

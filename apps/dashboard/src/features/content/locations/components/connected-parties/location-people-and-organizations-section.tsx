@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import {
   buildCharacterEntitySummaryVmFromTransport,
-  formatCharacterMixedHeadingSuffix,
+  formatCharacterMixedClassification,
 } from '@/features/character'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
@@ -168,7 +168,7 @@ function resolveCharacterRowHeadingSuffix(
     href,
   })
 
-  return formatCharacterMixedHeadingSuffix(summary)
+  return formatCharacterMixedClassification(summary)
 }
 
 export type LocationPeopleAndOrganizationsSectionBodyProps = {

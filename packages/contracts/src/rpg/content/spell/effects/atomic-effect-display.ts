@@ -2,6 +2,7 @@ import {
   getSpellAtomicEffectKindLabel,
   type SpellAtomicEffectKind,
 } from '../../../vocab/spell/atomic-effect-kind'
+import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
 import type { RollValue } from '../../../primitives/mechanics/roll'
 import type { SpellResolutionTargetKind } from '../resolution/vocab'
 
@@ -168,7 +169,6 @@ export function buildAtomicEffectDisplay(
 }
 
 const PLAIN_TEXT_KIND_SEPARATOR = ' — '
-const PLAIN_TEXT_DETAIL_SEPARATOR = ' · '
 
 /** Default plain-text title for menus, tooltips, and non-React surfaces. */
 export function formatAtomicEffectDisplayTitle(display: AtomicEffectDisplay): string {
@@ -182,7 +182,7 @@ export function formatAtomicEffectDisplayTitle(display: AtomicEffectDisplay): st
   if (!mechanicalSummary) return title
 
   if (customLabel) {
-    return `${title}${PLAIN_TEXT_DETAIL_SEPARATOR}${mechanicalSummary}`
+    return joinInlineMetadata([title, mechanicalSummary])
   }
 
   return `${kindLabel}${PLAIN_TEXT_KIND_SEPARATOR}${mechanicalSummary}`

@@ -15,7 +15,7 @@ type ConsumerPresentationKeys =
 
 type LegacyContentEntityCardKeys =
   | 'heading'
-  | 'headingSuffix'
+  | 'classification'
   | 'subheading'
   | 'metadata'
   | 'fallback'

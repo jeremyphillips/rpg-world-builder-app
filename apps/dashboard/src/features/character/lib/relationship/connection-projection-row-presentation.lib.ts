@@ -2,6 +2,7 @@ import type { CharacterRelationshipProjectionRow } from '@rpg/contracts'
 
 import { ROUTES } from '@/app/routes'
 
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   UNAVAILABLE_LOCATION_LABEL,
   UNAVAILABLE_ORGANIZATION_LABEL,
@@ -71,7 +72,7 @@ export function resolveProjectionRowMetadataSummary(
     if (details.isPrimary) parts.push('Primary')
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function resolveProjectionRowPresentation(

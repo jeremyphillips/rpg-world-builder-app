@@ -1,3 +1,5 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 /** Shared title while an external file drag is over an active drop target. */
 export const DROP_TARGET_ACTIVE_TITLE = 'Drop to upload'
 
@@ -75,7 +77,7 @@ export function resolveDropTargetRequirements(input: {
   const typeClause = joinAcceptLabels(labels)
 
   if (input.maxSize === undefined) return typeClause
-  return `${typeClause} · ${formatMaxSize(input.maxSize)}`
+  return joinInlineMetadata([typeClause, formatMaxSize(input.maxSize)])
 }
 
 function formatMaxSize(maxSize: number): string {

@@ -1,6 +1,6 @@
 import { useId, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { Button, InsetPanel, NumberInput, Text } from '@rpg/ui'
+import { Button, InlineMetadata, InsetPanel, NumberInput, Text } from '@rpg/ui'
 
 import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
 import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
@@ -92,13 +92,14 @@ export function TableBuilderExtendedProgressionDock() {
               >
                 <div className={tableBuilderAuthoringDockPanelClasses}>
                   <p className={tableBuilderAuthoringDockHeadingClasses}>
-                    <span className={tableBuilderAuthoringDockHeadingTitleClasses}>
-                      Extended progression
-                    </span>
-                    <span className={tableBuilderAuthoringDockHeadingMetaClasses}>
-                      {' '}
-                      · Levels {action.extendedStartsAt}–{action.extendedEndLevel}
-                    </span>
+                    <InlineMetadata role="supporting" density="compact" wrap={false}>
+                      <InlineMetadata.Item className={tableBuilderAuthoringDockHeadingTitleClasses}>
+                        Extended progression
+                      </InlineMetadata.Item>
+                      <InlineMetadata.Item className={tableBuilderAuthoringDockHeadingMetaClasses}>
+                        Levels {action.extendedStartsAt}–{action.extendedEndLevel}
+                      </InlineMetadata.Item>
+                    </InlineMetadata>
                   </p>
                   <div className={tableBuilderAuthoringDockInputRowClasses}>
                     <label

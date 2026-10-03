@@ -11,6 +11,7 @@ import {
   type EquipmentPickerBrowseSortContext,
   type Money,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending, type Comparator } from '@rpg/search/ranking'
@@ -102,7 +103,7 @@ export function formatEquipmentUnaffordableReason(
 
   const need = formatMoney(amounts.required)
   const have = formatWealthAsGold(amounts.remaining)
-  return `${need} needed · ${have} remaining`
+  return joinInlineMetadata([`${need} needed`, `${have} remaining`])
 }
 
 /** Structured filters only — category, affordable toggle, or magic-item rarity. Excludes search. */

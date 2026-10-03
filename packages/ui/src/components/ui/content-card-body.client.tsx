@@ -16,7 +16,7 @@ import {
 
 export type ContentCardBodyProps = {
   heading: ReactNode
-  headingSuffix?: ReactNode
+  classification?: ReactNode | readonly ReactNode[]
   subheading?: ReactNode
   metadata?: ReactNode
   media?: ReactNode
@@ -31,7 +31,7 @@ export type ContentCardBodyProps = {
 /** @internal Layout-only entity row anatomy — use {@link ContentCard} or dashboard `ContentEntityCard`. */
 export function ContentCardBody({
   heading,
-  headingSuffix,
+  classification,
   subheading,
   metadata,
   media,
@@ -55,7 +55,7 @@ export function ContentCardBody({
       <div className="min-w-0 flex-1">
         <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
           <div className="min-w-0 flex-1">
-            <ContentCardHeading heading={heading} headingSuffix={headingSuffix} density={density} />
+            <ContentCardHeading heading={heading} classification={classification} density={density} />
           </div>
           {headingEndSlot ? (
             <div className={contentCardHeadingEndSlotVariants()}>{headingEndSlot}</div>

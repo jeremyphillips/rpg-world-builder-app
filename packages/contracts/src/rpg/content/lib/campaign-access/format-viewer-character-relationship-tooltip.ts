@@ -1,3 +1,4 @@
+import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
 import { joinNaturalList } from '../../../primitives/prose'
 
 import { CLASS_CONTENT_TYPE_TERM, SPECIES_CONTENT_TYPE_TERM } from '../content-type-terms'
@@ -103,7 +104,7 @@ function formatGroupClause(
 export function formatViewerCharacterRelationshipTooltip(
   envelope: ViewerCharacterRelationships,
 ): string {
-  return sortGroups(envelope.groups)
-    .map((group) => formatGroupClause(group, envelope))
-    .join(' · ')
+  return joinInlineMetadata(
+    sortGroups(envelope.groups).map((group) => formatGroupClause(group, envelope)),
+  )
 }

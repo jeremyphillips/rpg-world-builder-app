@@ -1,4 +1,5 @@
 import type { ActionPlanUnchangedReason } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type BulkActionDescriptor = {
   nounSingular: string
@@ -105,7 +106,7 @@ export function formatWouldChangeUnchangedSummary(
     return wouldChangeSegment
   }
 
-  return `${wouldChangeSegment} · ${unchangedSegment}`
+  return joinInlineMetadata([wouldChangeSegment, unchangedSegment])
 }
 
 export type FormatBulkResolveTallyInput = {
@@ -145,7 +146,7 @@ export function formatBulkResolveTally(input: FormatBulkResolveTallyInput): stri
     parts.push(unchangedLabel)
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function formatBlockedOfWouldChangeDescription(input: {

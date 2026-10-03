@@ -185,7 +185,7 @@ describe('resolveOrganizationForwardCurrentLocationEndpoint', () => {
     ).toEqual({
       entity: {
         heading: 'Yawning Portal',
-        headingSuffix: ' · Building · Brewery',
+        classification: 'Building · Brewery',
         href: undefined,
         supportingText: 'Located in Dock Ward',
       },

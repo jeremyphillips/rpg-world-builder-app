@@ -14,8 +14,8 @@ type Story = StoryObj<typeof DetailCollectionRowList>
 export const StructuralSeparators: Story = {
   render: () => (
     <DetailCollectionRowList separator="structural">
-      <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
-      <DetailEntityRow inset="parent" heading="Market Ward" headingSuffix="·District" />
+      <DetailEntityRow inset="parent" heading="Dock Ward" classification="·District" />
+      <DetailEntityRow inset="parent" heading="Market Ward" classification="·District" />
     </DetailCollectionRowList>
   ),
 }

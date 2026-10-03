@@ -4,6 +4,7 @@ import {
   type CharacterClass,
   type Species,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
@@ -33,8 +34,6 @@ export type OrganizationMemberPickerCommit = {
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
 export const ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL = 'Recommended'
 
-const ORGANIZATION_MEMBER_STATUS_BADGE_SEPARATOR = ' · ' as const
-
 const organizationMemberNameCollator = new Intl.Collator(undefined, {
   sensitivity: 'base',
   numeric: true,
@@ -63,7 +62,10 @@ export function formatOrganizationMemberPickerStatusBadgeLabel(membershipTitle?:
     return ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL
   }
 
-  return `${ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL}${ORGANIZATION_MEMBER_STATUS_BADGE_SEPARATOR}${membershipTitle}`
+  return joinInlineMetadata([
+    ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
+    membershipTitle,
+  ])
 }
 
 function resolveOrganizationMemberPickerSelectionPolicy(

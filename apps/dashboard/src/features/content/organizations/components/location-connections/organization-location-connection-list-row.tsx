@@ -154,7 +154,7 @@ export function OrganizationLocationConnectionListRow({
     <EntityRowList.Row
       heading={presentation.heading}
       headingHref={item.target?.href}
-      classification={presentation.headingSuffix}
+      classification={presentation.classification}
       description={presentation.supportingText}
       status={
         item.target == null ? [{ kind: 'badge', label: 'Unavailable', tone: 'warning' }] : undefined

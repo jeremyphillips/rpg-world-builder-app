@@ -1,3 +1,5 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 import type { ArraySectionMeta } from './resolve-field-order'
 import { resolveFieldOrderIndex } from './resolve-field-order'
 import { joinArrayItemSummaryParts } from '../config/array/array-item-config.lib'
@@ -18,7 +20,7 @@ export function buildFieldSummaryText(
 
   const named = parts.slice(0, maxNamed)
   const extra = parts.length - maxNamed
-  return `${joinArrayItemSummaryParts(named)} · +${extra} more`
+  return joinInlineMetadata([joinArrayItemSummaryParts(named), `+${extra} more`])
 }
 
 function compareIssues(left: FormIssue, right: FormIssue, fieldOrder: readonly string[]): number {

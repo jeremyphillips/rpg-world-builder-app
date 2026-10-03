@@ -11,7 +11,7 @@ describe('EntityReplacementSection', () => {
         current={{
           entity: {
             heading: 'City Council',
-            headingSuffix: ' · Government',
+            classification: 'Government',
           },
           unavailable: true,
         }}
@@ -38,7 +38,7 @@ describe('EntityReplacementSection', () => {
         current={{
           entity: {
             heading: 'Harborford',
-            headingSuffix: ' · Settlement',
+            classification: 'Settlement',
           },
         }}
         showNewSection={false}

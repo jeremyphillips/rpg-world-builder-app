@@ -54,6 +54,7 @@ import {
 
 import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
 import { buildEquipmentPickerRecommendationContext } from './equipment-picker-recommendation-context.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
@@ -1066,7 +1067,7 @@ export function formatMagicItemGrantProgressLabel(
   const parts = progress.map(
     (entry) => `${entry.selected}/${entry.capacity} ${getMagicItemRarityLabel(entry.rarity)}`,
   )
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function resolveEquipmentOwnedQuantity(args: {

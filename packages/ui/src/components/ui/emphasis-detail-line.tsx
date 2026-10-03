@@ -6,6 +6,7 @@ import {
   emphasisDetailLineRootVariants,
   emphasisDetailLineSecondaryVariants,
 } from './emphasis-detail-line.variants'
+import { InlineMetadata } from './inline-metadata'
 
 import type { ContentTone } from './visual-vocabulary.types'
 
@@ -39,13 +40,18 @@ export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
   return (
     <Comp className={cn(emphasisDetailLineRootVariants(), className)} {...props}>
       {prefix ? <>{prefix} </> : null}
-      <strong className={emphasisDetailLinePrimaryVariants()}>{primary}</strong>
       {secondary ? (
-        <span className={emphasisDetailLineSecondaryVariants({ tone: secondaryTone })}>
-          {' · '}
-          {secondary}
-        </span>
-      ) : null}
+        <InlineMetadata role="supporting" density="comfortable" wrap={false}>
+          <InlineMetadata.Item>
+            <strong className={emphasisDetailLinePrimaryVariants()}>{primary}</strong>
+          </InlineMetadata.Item>
+          <InlineMetadata.Item className={emphasisDetailLineSecondaryVariants({ tone: secondaryTone })}>
+            {secondary}
+          </InlineMetadata.Item>
+        </InlineMetadata>
+      ) : (
+        <strong className={emphasisDetailLinePrimaryVariants()}>{primary}</strong>
+      )}
     </Comp>
   )
 }
