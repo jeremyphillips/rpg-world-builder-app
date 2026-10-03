@@ -78,7 +78,7 @@ describe('CollapsibleListItem', () => {
     expect(body).not.toHaveAttribute('aria-hidden', 'true')
   })
 
-  it('centers actions on the title row when actionsAlign is center', () => {
+  it('centers actions on the title row for default disclosure layout', () => {
     const { container } = render(
       <CollapsibleListItem
         itemId="epsilon"
@@ -87,7 +87,6 @@ describe('CollapsibleListItem', () => {
         collapsible
         collapsed={false}
         onToggleCollapse={vi.fn()}
-        actionsAlign="center"
         header={<span>Epsilon header</span>}
         summary={<span>Warning badge</span>}
         body={<p>Expanded details</p>}
@@ -147,7 +146,6 @@ describe('CollapsibleListItem', () => {
         collapsible
         collapsed
         onToggleCollapse={vi.fn()}
-        actionsAlign="center"
         header={<span>Theta header</span>}
         summary={<span>Theta summary</span>}
         body={<p>Expanded details</p>}
@@ -169,7 +167,6 @@ describe('CollapsibleListItem', () => {
         collapsible
         collapsed={false}
         onToggleCollapse={vi.fn()}
-        actionsAlign="center"
         header={<span>Eta header</span>}
         body={<p>Expanded details</p>}
       />,
@@ -191,7 +188,6 @@ describe('CollapsibleListItem', () => {
       toolbarAriaLabel: 'Iota item',
       collapsible: true,
       onToggleCollapse: vi.fn(),
-      actionsAlign: 'center' as const,
       header: <span>Iota header</span>,
       summary: <span>Iota summary</span>,
       body: <p>Expanded details</p>,
@@ -222,7 +218,6 @@ describe('CollapsibleListItem', () => {
         collapsible
         collapsed={false}
         onToggleCollapse={vi.fn()}
-        actionsAlign="center"
         header={<span>Entity card header</span>}
         body={<p>Entity card details</p>}
       />,

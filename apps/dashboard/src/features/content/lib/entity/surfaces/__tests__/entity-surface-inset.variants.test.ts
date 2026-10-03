@@ -3,30 +3,34 @@ import { describe, expect, it } from 'vitest'
 import { entitySurfaceInsetVariants } from '../entity-surface-inset.variants'
 
 describe('entitySurfaceInsetVariants', () => {
-  it('uses full density inset on both edges when no leading chrome is present', () => {
-    expect(entitySurfaceInsetVariants({ density: 'compact', leading: false })).toContain(
-      '[--entity-surface-inline-start:calc(var(--spacing)*4)]',
+  it('publishes base and utility inset values per density', () => {
+    expect(entitySurfaceInsetVariants({ density: 'compact' })).toContain(
+      '[--entity-surface-inset:calc(var(--spacing)*4)]',
     )
-    expect(entitySurfaceInsetVariants({ density: 'compact', leading: false })).toContain(
-      '[--entity-surface-inline-end:calc(var(--spacing)*4)]',
+    expect(entitySurfaceInsetVariants({ density: 'compact' })).toContain(
+      '[--entity-surface-utility-inset:calc(var(--spacing)*1)]',
     )
-    expect(entitySurfaceInsetVariants({ density: 'comfortable', leading: false })).toContain(
-      '[--entity-surface-inline-start:calc(var(--spacing)*5)]',
+    expect(entitySurfaceInsetVariants({ density: 'comfortable' })).toContain(
+      '[--entity-surface-inset:calc(var(--spacing)*5)]',
+    )
+    expect(entitySurfaceInsetVariants({ density: 'comfortable' })).toContain(
+      '[--entity-surface-utility-inset:calc(var(--spacing)*2)]',
     )
   })
 
-  it('reduces start inset only when leading chrome is present', () => {
-    expect(entitySurfaceInsetVariants({ density: 'compact', leading: true })).toContain(
-      '[--entity-surface-inline-start:calc(var(--spacing)*1)]',
-    )
-    expect(entitySurfaceInsetVariants({ density: 'compact', leading: true })).toContain(
-      '[--entity-surface-inline-end:calc(var(--spacing)*4)]',
-    )
-    expect(entitySurfaceInsetVariants({ density: 'comfortable', leading: true })).toContain(
-      '[--entity-surface-inline-start:calc(var(--spacing)*2)]',
-    )
-    expect(entitySurfaceInsetVariants({ density: 'comfortable', leading: true })).toContain(
-      '[--entity-surface-inline-end:calc(var(--spacing)*5)]',
-    )
+  it('uses the base inset on both edges by default', () => {
+    const classes = entitySurfaceInsetVariants({ density: 'compact' })
+    expect(classes).toContain('[--entity-surface-inline-start:var(--entity-surface-inset)]')
+    expect(classes).toContain('[--entity-surface-inline-end:var(--entity-surface-inset)]')
+  })
+
+  it('tightens each edge independently', () => {
+    const start = entitySurfaceInsetVariants({ density: 'compact', start: 'utility' })
+    expect(start).toContain('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(start).toContain('[--entity-surface-inline-end:var(--entity-surface-inset)]')
+
+    const end = entitySurfaceInsetVariants({ density: 'comfortable', end: 'utility' })
+    expect(end).toContain('[--entity-surface-inline-start:var(--entity-surface-inset)]')
+    expect(end).toContain('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
   })
 })

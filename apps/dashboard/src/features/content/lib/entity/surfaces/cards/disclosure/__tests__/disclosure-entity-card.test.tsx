@@ -5,9 +5,9 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { DisclosureEntityCard } from '../disclosure-entity-card'
 import {
-  disclosureEntityCardBodyInlineEndClasses,
-  disclosureEntityCardBodyInlineStartClasses,
-} from '../disclosure-entity-card.variants'
+  entityBodyInlineEndClasses as disclosureEntityCardBodyInlineEndClasses,
+  entityBodyInlineStartClasses as disclosureEntityCardBodyInlineStartClasses,
+} from '../../../entity-surface-inset.variants'
 import {
   ENTITY_BODY_INLINE_START_VAR,
   ENTITY_CONTENT_OFFSET_VAR,
@@ -78,8 +78,9 @@ describe('DisclosureEntityCard', () => {
     expect(article.style.getPropertyValue(ENTITY_BODY_INLINE_START_VAR)).toBe(
       'calc(var(--entity-surface-inline-start) + var(--entity-content-offset))',
     )
-    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*2)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*5)]')
+    expect(article).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*2)]')
+    expect(article).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
     expect(shell.className).not.toContain('--entity-surface-inline-start')
@@ -150,8 +151,9 @@ describe('DisclosureEntityCard', () => {
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
     const article = container.querySelector('article') as HTMLElement
-    expect(article).toHaveClass('[--entity-surface-inline-start:calc(var(--spacing)*1)]')
-    expect(article).toHaveClass('[--entity-surface-inline-end:calc(var(--spacing)*4)]')
+    expect(article).toHaveClass('[--entity-surface-inset:calc(var(--spacing)*4)]')
+    expect(article).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
     expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
   })
@@ -290,9 +292,10 @@ describe('DisclosureEntityCard', () => {
     const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
 
     expect(headerWrap).toHaveClass('w-full', 'min-w-0')
-    expect(anatomy).toHaveClass('w-full', 'grid-cols-[auto_minmax(0,1fr)_auto]')
-    expect(content).toHaveClass('col-start-2')
-    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+    expect(anatomy).toHaveClass('w-full')
+    expect(anatomy).toHaveAttribute('data-row-anatomy')
+    expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
+    expect(trailing).toHaveAttribute('data-row-anatomy-column', 'trailing')
     expect(trailing.compareDocumentPosition(content)).toBe(Node.DOCUMENT_POSITION_PRECEDING)
   })
 
@@ -323,8 +326,13 @@ describe('DisclosureEntityCard', () => {
     const anatomy = content.parentElement as HTMLElement
 
     expect(anatomy).toHaveClass('w-full')
-    expect(content).toHaveClass('col-start-2', 'min-w-0')
-    expect(trailing).toHaveClass('col-start-3', 'justify-self-end')
+    expect(content).toHaveClass('min-w-0')
+    expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
+    expect(trailing).toHaveAttribute('data-row-anatomy-column', 'trailing')
+    expect(container.querySelector('[data-entity-item-slot="description"]')).toHaveAttribute(
+      'data-row-anatomy-slot',
+      'meta',
+    )
     expect(
       screen.getByText(/Character has Speak with Animals always prepared/i),
     ).toBeInTheDocument()

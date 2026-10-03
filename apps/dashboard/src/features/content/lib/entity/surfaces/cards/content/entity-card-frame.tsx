@@ -3,14 +3,18 @@ import { cn } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
 import { buildEntityLeadingChromeSizeStyle } from '../../../anatomy/entity-leading-rail.lib'
+import {
+  ENTITY_SURFACE_DEFAULT_EDGES,
+  type EntitySurfaceEdges,
+} from '../../../anatomy/entity-surface-edges.lib'
 import { entityCardFrameVariants, type EntityCardSurface } from './entity-card-frame.variants'
 
 type EntityCardFrameProps = {
   density?: ContentCardDensity
   surface?: EntityCardSurface
   disabled?: boolean
-  /** Occupied leading utilities (0–1) — publishes utility column size and asymmetric start inset when present. */
-  leadingUtilityCount?: number
+  /** From `resolveEntitySurfaceEdges` — utility edges tighten the start/end inset. */
+  edges?: EntitySurfaceEdges
   style?: CSSProperties
   children: ReactNode
 }
@@ -20,20 +24,21 @@ export function EntityCardFrame({
   density = 'comfortable',
   surface = 'card',
   disabled = false,
-  leadingUtilityCount = 0,
+  edges = ENTITY_SURFACE_DEFAULT_EDGES,
   style,
   children,
 }: EntityCardFrameProps) {
-  const leading = leadingUtilityCount > 0
-  const leadingChromeStyle = (leading ? buildEntityLeadingChromeSizeStyle() : undefined) as
-    | CSSProperties
-    | undefined
+  const leadingChromeStyle = (
+    edges.start === 'utility' ? buildEntityLeadingChromeSizeStyle() : undefined
+  ) as CSSProperties | undefined
 
   return (
     <article
-      className={cn(entityCardFrameVariants({ density, surface, disabled, leading }))}
+      className={cn(entityCardFrameVariants({ density, surface, disabled, edges }))}
       style={{ ...leadingChromeStyle, ...style }}
       data-disabled={disabled ? true : undefined}
+      data-entity-surface-start={edges.start}
+      data-entity-surface-end={edges.end}
     >
       {children}
     </article>

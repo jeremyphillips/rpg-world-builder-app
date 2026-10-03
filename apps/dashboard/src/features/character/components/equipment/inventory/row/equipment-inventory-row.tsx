@@ -116,7 +116,7 @@ export function EquipmentInventoryRowItem({
     return (
       <ContentEntityCard
         entity={entity}
-        trailing={{ kind: 'action', content: actions }}
+        trailing={{ kind: 'utility', content: actions }}
         density="compact"
         disabled={row.stagedRemoval}
       />
@@ -135,7 +135,7 @@ export function EquipmentInventoryRowItem({
       trailing={
         actionsRow
           ? {
-              kind: 'action',
+              kind: 'utility',
               content: (
                 <InventoryRowActions
                   row={actionsRow}

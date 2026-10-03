@@ -95,7 +95,6 @@ describe('Entity card surface rhythm contract', () => {
         collapsible
         collapsed={false}
         onToggleCollapse={vi.fn()}
-        actionsAlign="center"
         header={<span>Damage — 1d10 Fire damage</span>}
         summary={<span>Inflicts 1d10 Fire damage.</span>}
         body={<p>Effect fields</p>}

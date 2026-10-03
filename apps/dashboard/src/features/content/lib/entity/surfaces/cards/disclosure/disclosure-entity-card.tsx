@@ -10,6 +10,7 @@ import {
   resolveEntityLeadingUtilityCount,
 } from '../../../anatomy/entity-leading-rail.lib'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
+import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from '../content/entity-card-content'
 import { EntityCardFrame } from '../content/entity-card-frame'
@@ -68,7 +69,7 @@ export function DisclosureEntityCard({
       density={density}
       surface="subtle"
       disabled={disabled}
-      leadingUtilityCount={leadingUtilityCount}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
       style={leadingOffsetStyle}
     >
       <CollapsibleListItem
@@ -82,7 +83,6 @@ export function DisclosureEntityCard({
         dragHandleProps={dragHandleProps}
         rowLayout="entity-card"
         density={density}
-        actionsAlign="center"
         toolbarCompact
         toolbarLeadingChrome="none"
         className={disclosureEntityCardListItemVariants()}

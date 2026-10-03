@@ -15,11 +15,11 @@ import {
   type CollapsibleListItemLeadingChromeOptions,
   type CollapsibleListItemRowLayout,
 } from './collapsible-list-item.variants'
-import type { CollapsibleListItemActionsAlign } from './collapsible-list-item-shell.client'
+import type { CollapsibleListItemHeaderActionsPlacement } from './collapsible-list-item-root.lib'
 
 interface CollapsibleListItemShellContentProps {
   layout: 'default' | 'compactRow'
-  actionsAlign: CollapsibleListItemActionsAlign
+  headerActionsPlacement: CollapsibleListItemHeaderActionsPlacement
   rowLayout: CollapsibleListItemRowLayout
   density: CollapsibleListItemDensity
   leadingChrome: CollapsibleListItemLeadingChromeOptions
@@ -79,7 +79,7 @@ function CollapsibleListItemCenterActionsContent({
 
 export function CollapsibleListItemShellContent({
   layout,
-  actionsAlign,
+  headerActionsPlacement,
   rowLayout,
   density,
   leadingChrome,
@@ -90,7 +90,7 @@ export function CollapsibleListItemShellContent({
 }: CollapsibleListItemShellContentProps) {
   const headerRowClasses = collapsibleListItemHeaderRowClassesForRowLayout(rowLayout)
   const resolvedActions =
-    actions && actionsAlign === 'center' ? (
+    actions && headerActionsPlacement === 'center' ? (
       <CollapsibleListItemActions centered>{actions}</CollapsibleListItemActions>
     ) : (
       actions
@@ -100,7 +100,7 @@ export function CollapsibleListItemShellContent({
     return toolbar
   }
 
-  if (actionsAlign === 'center') {
+  if (headerActionsPlacement === 'center') {
     return (
       <CollapsibleListItemCenterActionsContent
         headerRowClasses={headerRowClasses}

@@ -74,7 +74,7 @@ export function resolveOrganizationMembershipApiTrailing(
 
   if (context.mode === 'draft') {
     return {
-      kind: 'action',
+      kind: 'utility',
       content: (
         <BuilderInventoryRemoveAction
           itemLabel={label}
@@ -86,7 +86,7 @@ export function resolveOrganizationMembershipApiTrailing(
 
   if (canEditOrganizationMembershipTitle(membership, context, organization)) {
     return {
-      kind: 'action',
+      kind: 'utility',
       content: (
         <ActionButton
           action="edit"
@@ -105,7 +105,7 @@ export function resolveOrganizationMembershipApiTrailing(
 
   if (shouldOfferUnresolvedMembershipRemoval(membership, context, unavailable)) {
     return {
-      kind: 'action',
+      kind: 'utility',
       content: (
         <BuilderInventoryRemoveAction
           itemLabel={label}
@@ -134,7 +134,7 @@ export function resolveResidenceApiTrailing(
   if (disabled) return undefined
 
   return {
-    kind: 'action',
+    kind: 'utility',
     content: (
       <BuilderInventoryRemoveAction itemLabel={label} onRemove={() => onRemove(edge, index)} />
     ),

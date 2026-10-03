@@ -11,6 +11,7 @@ import {
   contentCardHeadingRowVariants,
   contentCardMetadataVariants,
   contentCardSubheadingVariants,
+  resolveContentCardBodyCrossAxis,
   type ContentCardDensity,
 } from './content-card.variants'
 
@@ -24,7 +25,6 @@ export type ContentCardBodyProps = {
   endSlot?: ReactNode
   footer?: ReactNode
   density?: ContentCardDensity
-  rowAlign?: 'start' | 'center'
   className?: string
 }
 
@@ -39,23 +39,26 @@ export function ContentCardBody({
   endSlot,
   footer,
   density = 'comfortable',
-  rowAlign: rowAlignProp,
   className,
 }: ContentCardBodyProps) {
   const hasSecondaryText = Boolean(subheading || metadata)
-  const rowAlign = rowAlignProp ?? (hasSecondaryText ? 'start' : 'center')
+  const crossAxis = resolveContentCardBodyCrossAxis(hasSecondaryText)
   const headingRowRhythm = resolveContentCardHeadingRowRhythm({
     hasSecondaryText,
     hasHeadingEndSlot: Boolean(headingEndSlot),
   })
 
   return (
-    <div className={cn(contentCardBodyVariants({ density, rowAlign }), className)}>
+    <div className={cn(contentCardBodyVariants({ density, crossAxis }), className)}>
       {media ? <div className="shrink-0">{media}</div> : null}
       <div className="min-w-0 flex-1">
         <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
           <div className="min-w-0 flex-1">
-            <ContentCardHeading heading={heading} classification={classification} density={density} />
+            <ContentCardHeading
+              heading={heading}
+              classification={classification}
+              density={density}
+            />
           </div>
           {headingEndSlot ? (
             <div className={contentCardHeadingEndSlotVariants()}>{headingEndSlot}</div>

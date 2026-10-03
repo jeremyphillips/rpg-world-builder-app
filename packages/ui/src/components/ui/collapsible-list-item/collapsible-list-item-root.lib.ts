@@ -2,8 +2,13 @@ import type { DraggableAttributes } from '@dnd-kit/core'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 
 import type { CollapsibleListItemDragHandleProps } from './collapsible-list-item-toolbar.client'
-import type { CollapsibleListItemActionsAlign } from './collapsible-list-item-shell.client'
-import type { CollapsibleListItemLeadingChromeOptions } from './collapsible-list-item.variants'
+import type {
+  CollapsibleListItemLeadingChromeOptions,
+  CollapsibleListItemRowLayout,
+} from './collapsible-list-item.variants'
+
+/** Resolved shell placement for trailing header actions — not a public prop. */
+export type CollapsibleListItemHeaderActionsPlacement = 'start' | 'center'
 
 export type CollapsibleListItemDragHandleConfig = {
   attributes: DraggableAttributes
@@ -11,12 +16,17 @@ export type CollapsibleListItemDragHandleConfig = {
   isDragging?: boolean
 }
 
-export function resolveCollapsibleListItemActionsAlign(
-  actionsAlign: CollapsibleListItemActionsAlign | undefined,
-  reserveDragHandleSlot: boolean,
+/**
+ * Trailing actions on the title row (`center`) vs the default side rail (`start`).
+ * `entity-card` and default disclosure rows center; compact inline rows stay on the rail.
+ */
+export function resolveCollapsibleListItemHeaderActionsPlacement(
   layout: 'default' | 'compactRow',
-): CollapsibleListItemActionsAlign {
-  return actionsAlign ?? (reserveDragHandleSlot || layout === 'compactRow' ? 'start' : 'center')
+  rowLayout: CollapsibleListItemRowLayout = 'default',
+): CollapsibleListItemHeaderActionsPlacement {
+  if (rowLayout === 'entity-card') return 'center'
+  if (layout === 'compactRow') return 'start'
+  return 'center'
 }
 
 export function resolveCollapsibleListItemDragHandleProps(

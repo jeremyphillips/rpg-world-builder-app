@@ -12,53 +12,46 @@ export const entitySurfaceHorizontalInsetClasses =
   'pl-[var(--entity-surface-inline-start)] pr-[var(--entity-surface-inline-end)]'
 
 /**
- * Publishes surface inset tokens on card shells (CEC, DEC article).
+ * Expanded body inline edges — static literals (Tailwind cannot read interpolated classes).
+ * Values are published by `buildEntityContentOffsetStyle`.
+ */
+export const entityBodyInlineStartClasses = 'pl-[var(--entity-body-inline-start)]'
+
+export const entityBodyInlineEndClasses = 'pr-[var(--entity-body-inline-end)]'
+
+/**
+ * Publishes surface inset tokens on card shells (CEC, DEC article, catalog row, detail row).
+ * Density publishes two base values; each edge independently picks one.
  *
- * |              | no leading | leading present |
- * | compact      | 16px start | 4px start       |
- * | comfortable  | 20px start | 8px start       |
- * | end (both)   | 16px / 20px unchanged       |
+ * |             | default edge | utility edge |
+ * | compact     | 16px         | 4px          |
+ * | comfortable | 20px         | 8px          |
+ *
+ * `start: 'utility'` — leading grip/caret present.
+ * `end: 'utility'` — trailing `utility` or chevron `indicator` (ghost 24px controls).
+ * Expanded bodies always use the default end via `--entity-body-inline-end`.
  */
 export const entitySurfaceInsetVariants = cva('', {
   variants: {
     density: {
-      compact: '',
-      comfortable: '',
+      compact:
+        '[--entity-surface-inset:calc(var(--spacing)*4)] [--entity-surface-utility-inset:calc(var(--spacing)*1)]',
+      comfortable:
+        '[--entity-surface-inset:calc(var(--spacing)*5)] [--entity-surface-utility-inset:calc(var(--spacing)*2)]',
     },
-    leading: {
-      true: '',
-      false: '',
+    start: {
+      default: '[--entity-surface-inline-start:var(--entity-surface-inset)]',
+      utility: '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
+    },
+    end: {
+      default: '[--entity-surface-inline-end:var(--entity-surface-inset)]',
+      utility: '[--entity-surface-inline-end:var(--entity-surface-utility-inset)]',
     },
   },
-  compoundVariants: [
-    {
-      density: 'compact',
-      leading: false,
-      class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*4)] [--entity-surface-inline-end:calc(var(--spacing)*4)]',
-    },
-    {
-      density: 'compact',
-      leading: true,
-      class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*1)] [--entity-surface-inline-end:calc(var(--spacing)*4)]',
-    },
-    {
-      density: 'comfortable',
-      leading: false,
-      class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*5)] [--entity-surface-inline-end:calc(var(--spacing)*5)]',
-    },
-    {
-      density: 'comfortable',
-      leading: true,
-      class:
-        '[--entity-surface-inline-start:calc(var(--spacing)*2)] [--entity-surface-inline-end:calc(var(--spacing)*5)]',
-    },
-  ],
   defaultVariants: {
     density: 'comfortable',
-    leading: false,
+    start: 'default',
+    end: 'default',
   },
 })
 

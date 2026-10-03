@@ -59,16 +59,21 @@ export const contentCardBodyVariants = cva('flex min-w-0 w-full', {
       compact: resolveContentCardIdentityColumnGapClasses('compact'),
       comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
     },
-    rowAlign: {
-      start: 'items-start',
+    crossAxis: {
+      top: 'items-start',
       center: 'items-center',
     },
   },
   defaultVariants: {
     density: 'comfortable',
-    rowAlign: 'start',
+    crossAxis: 'top',
   },
 })
+
+/** Top-align media/end slot when secondary lines exist; center on heading-only rows. */
+export function resolveContentCardBodyCrossAxis(hasSecondaryText: boolean): 'top' | 'center' {
+  return hasSecondaryText ? 'top' : 'center'
+}
 
 export const contentCardHeadingRowVariants = cva('flex min-w-0 items-center gap-2', {
   variants: {

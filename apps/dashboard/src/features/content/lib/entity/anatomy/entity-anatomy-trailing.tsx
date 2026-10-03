@@ -1,19 +1,19 @@
 import { ChevronRight } from 'lucide-react'
-import { Text } from '@rpg/ui'
+import { RowAnatomyCell, Text } from '@rpg/ui'
 
+import type { EntityAnatomyColumn } from './entity-anatomy.types'
+import { resolveEntityAnatomyTrailingCells } from './entity-anatomy-trailing.lib'
 import type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
 } from './entity-anatomy-trailing.types'
 import {
   entityAnatomyTrailingActionVariants,
-  entityAnatomyTrailingGroupPrimaryVariants,
   entityAnatomyTrailingGroupSecondaryVariants,
-  entityAnatomyTrailingGroupVariants,
   entityAnatomyTrailingIndicatorVariants,
 } from './entity-anatomy-trailing.variants'
 
-type EntityAnatomyTrailingSlotProps = {
+type EntityAnatomyTrailingCellsProps = {
   trailing?: EntityAnatomyTrailing
 }
 
@@ -51,31 +51,10 @@ function EntityAnatomyTrailingSecondaryView({
   }
 }
 
-function EntityAnatomyTrailingGroup({
-  trailing,
-}: {
-  trailing: Extract<EntityAnatomyTrailing, { kind: 'group' }>
-}) {
-  return (
-    <div className={entityAnatomyTrailingGroupVariants()}>
-      <div className={entityAnatomyTrailingGroupPrimaryVariants()}>{trailing.primary}</div>
-      {trailing.secondary ? (
-        <div className={entityAnatomyTrailingGroupSecondaryVariants()}>
-          <EntityAnatomyTrailingSecondaryView secondary={trailing.secondary} />
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
-/** Internal trailing rail renderer — not exported to feature consumers. */
-export function EntityAnatomyTrailingSlot({ trailing }: EntityAnatomyTrailingSlotProps) {
-  if (!trailing) {
-    return null
-  }
-
+function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTrailing }) {
   switch (trailing.kind) {
     case 'action':
+    case 'utility':
       return <div className={entityAnatomyTrailingActionVariants()}>{trailing.content}</div>
     case 'indicator':
       return (
@@ -91,10 +70,42 @@ export function EntityAnatomyTrailingSlot({ trailing }: EntityAnatomyTrailingSlo
         </div>
       )
     case 'group':
-      return <EntityAnatomyTrailingGroup trailing={trailing} />
+      return <div className={entityAnatomyTrailingActionVariants()}>{trailing.primary}</div>
     default: {
       const _exhaustive: never = trailing
       return _exhaustive
     }
   }
+}
+
+/** Internal trailing renderer — one RowAnatomy cell per trailing part; kind selects the cell. */
+export function EntityAnatomyTrailingCells({ trailing }: EntityAnatomyTrailingCellsProps) {
+  if (!trailing) {
+    return null
+  }
+
+  const cells = resolveEntityAnatomyTrailingCells(trailing)
+  const secondary = trailing.kind === 'group' ? trailing.secondary : undefined
+
+  return (
+    <>
+      <RowAnatomyCell<EntityAnatomyColumn>
+        cell={cells.primary}
+        data-entity-item-slot="trailing"
+        data-entity-trailing-kind={trailing.kind}
+      >
+        <EntityAnatomyTrailingPrimary trailing={trailing} />
+      </RowAnatomyCell>
+      {cells.secondary && secondary ? (
+        <RowAnatomyCell<EntityAnatomyColumn>
+          cell={cells.secondary}
+          data-entity-item-slot="trailing-secondary"
+        >
+          <div className={entityAnatomyTrailingGroupSecondaryVariants()}>
+            <EntityAnatomyTrailingSecondaryView secondary={secondary} />
+          </div>
+        </RowAnatomyCell>
+      ) : null}
+    </>
+  )
 }

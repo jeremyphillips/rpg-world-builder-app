@@ -1,6 +1,10 @@
 import type { ReactNode } from 'react'
 
-import { ContentEntityCard, type EntitySummaryStatusItem } from '@/features/content'
+import {
+  ContentEntityCard,
+  DetailEntityRowActions,
+  type EntitySummaryStatusItem,
+} from '@/features/content'
 import { Text } from '@rpg/ui'
 
 import { BuilderInventoryRemoveAction } from '../../../components/builder/inventory/builder-inventory-remove-action'
@@ -39,13 +43,16 @@ export function QuickNpcStartingChoiceSelectedRow({
         ...(status?.length ? { status } : {}),
       }}
       trailing={{
-        kind: 'action',
-        content: (
-          <div className="flex items-center gap-2">
-            {quantity}
+        kind: 'utility',
+        content:
+          quantity != null ? (
+            <DetailEntityRowActions>
+              {quantity}
+              <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />
+            </DetailEntityRowActions>
+          ) : (
             <BuilderInventoryRemoveAction itemLabel={label} onRemove={onRemove} />
-          </div>
-        ),
+          ),
       }}
       density="compact"
     />

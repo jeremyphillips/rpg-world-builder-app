@@ -3,13 +3,18 @@
 Entity identity uses one stack:
 
 ```text
-EntitySummaryModel → EntitySummary → EntityAnatomy → embedded host | ContentEntityCard | DisclosureEntityCard
+EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) → embedded host | ContentEntityCard | DisclosureEntityCard
 ```
 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
 `EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single leading utility,
-semantic trailing (`action` | `indicator` | `group`), and density.
+semantic trailing (`action` | `utility` | `indicator` | `group`), and density.
+
+Vertical alignment is owned by the shared row-track grid in `@rpg/ui`
+(`RowAnatomy` — band / meta / status tracks with slack gutters). Entity anatomy places
+each slot into a named column and a track; it never self-aligns or offsets cells. See
+[`packages/ui/docs/row-anatomy.md`](../../../packages/ui/docs/row-anatomy.md).
 
 **Each visual concern has one owner.** When debugging inset, alignment, or chrome, ask
 which semantic layer owns the concern — see [Ownership hierarchy](#ownership-hierarchy).
@@ -17,8 +22,8 @@ which semantic layer owns the concern — see [Ownership hierarchy](#ownership-h
 ## Module layout (`lib/entity/`)
 
 ```text
-summary/   — EntitySummaryModel, EntitySummary, projection, media
-anatomy/   — EntityAnatomy, EntityAnatomyHost, leading rail, geometry tokens
+summary/   — EntitySummaryModel, EntitySummary parts (heading / description / status), projection, media
+anatomy/   — EntityAnatomy, EntityAnatomyHost, trailing cells, leading rail, surface edges, geometry tokens
 surfaces/  — CEC, DEC, catalog rows; imports anatomy/ + summary/ only via dependency direction
   cards/content/     ContentEntityCard, EntityCardFrame, EntityCardContent (internal)
   cards/disclosure/  DisclosureEntityCard, DisclosureEntityCardHeader
@@ -32,6 +37,12 @@ Dependency direction: `surfaces → anatomy → summary`. `summary/` must not im
 `surfaces/entity-surface-inset.variants.ts`.
 
 ## Choose a surface
+
+Every card and row surface — entity and non-entity — is rendered side by side in the
+dashboard Storybook page **Recipes / Cards and Rows**
+(`apps/dashboard/src/stories/card-recipes/`), with its composition chain, density,
+leading/trailing kinds, and anatomy classification. Toggle **Show anatomy** in the toolbar
+to outline row-track grids and cells.
 
 | Need                                                                | Surface                                                                                                                                                 |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,13 +62,13 @@ Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shar
 primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
 `data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).
 
-| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                          |
-| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | --------------------------------------------- |
-| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                 |
-| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy |
-| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                 |
-| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | `EntitySummary` → `IdentityRow` at compact    |
-| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                          |
+| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
+| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
+| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
+| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
+| Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
+| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
@@ -69,7 +80,7 @@ Compact catalog and bordered cards share one **data-only** identity contract:
 - Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection always paints compact media (image or fallback icon).
 - Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
 - Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
-- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'group'` for inventory quantity and icon-remove controls.
+- **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
 
 The host keeps its own navigation, hover, selection, separators, drag behavior, and
 domain controls. Never put a full-row link in `EntitySummaryModel`; when a host owns
@@ -85,7 +96,9 @@ do not redefine it.
 ```text
 Foundational UI policy          (@rpg/ui — focus, icon controls, drag, interactive rows)
         ↓
-Entity anatomy                  (EntityAnatomyHost — three-column grid, leading/trailing rails)
+Row tracks                      (@rpg/ui RowAnatomy — band / meta / status tracks, slack gutters)
+        ↓
+Entity anatomy                  (EntityAnatomyHost — named columns, slot → cell mapping)
         ↓
 Surface/card shell              (EntityCardFrame — perimeter; EntityCardContent — header inset)
         ↓
@@ -105,12 +118,14 @@ drag chrome, or interactive-row fills.
 | Concern                        | Target owner                        | Notes                                                               |
 | ------------------------------ | ----------------------------------- | ------------------------------------------------------------------- |
 | Card perimeter                 | `EntityCardFrame`                   | Border, radius, surface identity, disabled chrome; **no padding**   |
-| Card header/content inset      | `EntityCardContent`                 | Horizontal + vertical inset from `entitySurfaceInsetVariants`       |
+| Card header/content inset      | `EntityCardContent`                 | Vertical inset; horizontal inset via frame edge vars                |
+| Surface edge inset             | `EntityCardFrame`                   | `resolveEntitySurfaceEdges` → `entitySurfaceInsetVariants` per edge |
+| Vertical alignment             | `RowAnatomy` (`@rpg/ui`)            | Band / meta / status tracks; cells never self-align or offset       |
 | Section vs card inset          | Feature section / host              | e.g. equipment panel `px-4 py-4` is section padding, not card inset |
 | Embedded row inset             | Host                                | SearchResultRow, master-detail list — not entity card surfaces      |
-| EntityAnatomyHost columns      | EntityAnatomyHost anatomy           | leading → col 1; content → col 2; trailing → col 3                  |
+| EntityAnatomyHost columns      | EntityAnatomyHost anatomy           | Named lines `[leading] [media] [content] [trailing]`                |
 | Leading content offset         | `EntityCardFrame` (when needed)     | `--entity-content-offset` on frame root for aligned sibling regions |
-| Trailing rail                  | EntityAnatomyHost semantic trailing | `action` \| `indicator` \| `group` — no parallel entity `endSlot`   |
+| Trailing rail                  | EntityAnatomyHost semantic trailing | `action` \| `utility` \| `indicator` \| `group` — no `endSlot`      |
 | Disclosure behavior            | CollapsibleListItem                 | Collapse state, ARIA, structural DOM                                |
 | CLI header vertical rhythm     | CollapsibleListItem                 | **Default rows only** — not `rowLayout="entity-card"`               |
 | CLI body frame                 | CollapsibleListItem                 | `collapsibleListItemBodyFrameClasses` (divider + `py-3`)            |
@@ -127,10 +142,11 @@ drag chrome, or interactive-row fills.
 
 ### Owns
 
-- Three-column placement (`leading` | content | trailing)
+- Named-column placement (`[leading]` | `[media]` | `[content]` | `[trailing]`) on RowAnatomy tracks
+- Slot → cell mapping (heading → band, description → meta, status → status, trailing per kind)
 - Leading-rail geometry via `EntityLeadingRail` (`utilityGap`, `contentGap`, `padding-inline-end`)
-- EntitySummary composition inside the content column
-- Semantic trailing seam (`action` | `indicator` | `group`)
+- EntitySummary parts inside the content column
+- Semantic trailing seam (`action` | `utility` | `indicator` | `group`)
 
 ### Does not own
 
@@ -154,8 +170,9 @@ drag chrome, or interactive-row fills.
 - Introduce parallel trailing APIs (`endSlot`, `headingEndSlot`) on entity surfaces
 - Publish `--entity-content-offset` (only surfaces with aligned sibling regions)
 
-Optional DOM children must never alter grid-track ownership: leading → column 1; content
-→ column 2 always; trailing → column 3.
+Optional DOM children must never alter grid-track ownership: every cell names its column
+(`leading`, `media`, `content`, `trailing`) and its track slot. Absent slots leave their
+`auto` column at zero width.
 
 ### Leading utilities contract
 
@@ -419,7 +436,24 @@ like `compact`.
 
 ---
 
-## Leading geometry contract
+## Edge geometry contract
+
+Surface inset is resolved **per edge** by `resolveEntitySurfaceEdges` and published by
+`EntityCardFrame` / `DetailEntityRow` as `--entity-surface-inline-start` / `-end`:
+
+| Edge  | `utility` when                            | Value                                         |
+| ----- | ----------------------------------------- | --------------------------------------------- |
+| start | at least one leading utility              | `--entity-surface-utility-inset` (tight)      |
+| end   | `utility` trailing or chevron `indicator` | `--entity-surface-utility-inset` (tight)      |
+| other | —                                         | `--entity-surface-inset` (density base inset) |
+
+A trailing ghost utility therefore sits as far from the end edge as a leading caret sits
+from the start edge (`UtilityEdgeParity` story). Disclosed bodies always use the base
+inset at the end edge (`--entity-body-inline-end`) — a header utility never narrows the
+body. Body classes are the static literals `entityBodyInlineStartClasses` /
+`entityBodyInlineEndClasses`.
+
+### Leading geometry
 
 Leading utilities (grip, disclosure caret, or a single host utility) share one geometry
 policy via `resolveEntityLeadingGeometry({ count, density })`:
@@ -438,7 +472,8 @@ publish `--leading-chrome-size` when a leading utility is present.
 
 `EntityCardFrame` publishes surface inset tokens and `--entity-content-offset` when
 leading utilities are present. Body inline-start = surface start inset + content offset.
-Inline-end = surface end inset only.
+Body inline-end = base surface inset (`--entity-body-inline-end`), independent of the
+header end edge.
 
 DER keeps host `px-4` on the header row; disclosed body uses host inset + content offset
 via `detailEntityRowDisclosureContentVariants` — host inset is not folded into the geometry
@@ -459,18 +494,28 @@ free-form `ReactNode` slots:
 
 ```text
 trailing
-├── action      → ReactElement control only
+├── action      → ReactElement labeled commit control
+├── utility     → ReactElement ghost icon utility or utility cluster
 ├── indicator   → chevron | quantity variants
 └── group
     ├── primary   → ReactElement control composition
     └── secondary → price | quantity | grantPreview metadata variants
 ```
 
-| Kind        | Type contract                                   | Use                                              |
-| ----------- | ----------------------------------------------- | ------------------------------------------------ |
-| `action`    | `content: ReactElement`                         | Add, delete, overflow, selection controls        |
-| `indicator` | `variant: 'chevron' \| 'quantity'`              | Destination chevrons, quiet qty labels           |
-| `group`     | `primary: ReactElement`, structured `secondary` | Commerce stacks (qty + Add, price/grant preview) |
+`resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell (two
+for `group`). Kinds never choose their own alignment.
+
+| Kind        | Type contract                                   | Cell                             | Use                                                |
+| ----------- | ----------------------------------------------- | -------------------------------- | -------------------------------------------------- |
+| `action`    | `content: ReactElement`                         | `band`                           | Labeled commit — Add, Select, Edit                 |
+| `utility`   | `content: ReactElement`                         | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit |
+| `indicator` | `variant: 'chevron'`                            | `full`                           | Destination chevrons                               |
+| `indicator` | `variant: 'quantity'`                           | `band`                           | Quiet qty labels aligned with the heading          |
+| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)   |
+
+`utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
+A 36px stepper in a compact row grows the row through the slack gutters; heading and
+description stay on their tracks and the stepper centers on the full row.
 
 **Status and classification never use trailing.** Role labels (`Member`), availability
 (`Unavailable`), and callouts (`Spellcasting focus`) belong in `EntitySummary.status`.
@@ -491,10 +536,10 @@ but must not grow solely to push classification away from the name. `EntitySumma
 ## EntitySummary status lane
 
 ```text
-EntitySummary
-├── heading row → heading · classification
-├── description
-└── status row (mt-1)
+EntitySummary parts            RowAnatomy cell
+├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
+├── EntitySummaryDescription  → meta
+└── EntitySummaryStatus       → status (track offset owned by the cell, not the row)
     └── EntitySummaryStatusItem[]
 ```
 
@@ -570,6 +615,11 @@ prevent regression:
 
 | Guard / test                               | Enforces                                                                     |
 | ------------------------------------------ | ---------------------------------------------------------------------------- |
+| `entity-alignment-matrix.stories.tsx`      | Real-browser geometry: every leading × trailing × depth × media combination  |
+| `UtilityEdgeParity` story                  | Trailing utility end inset equals leading caret start inset                  |
+| `card-recipes.stories.tsx` (`AllRecipes`)  | Every row-track recipe passes `expectRowAnatomyAligned`                      |
+| `card-recipes.registry.test.ts`            | Every entity surface and row primitive has a classified recipe               |
+| `row-anatomy-alignment.guard.test.ts`      | Retired align props banned; no self-align / `mt-*` compensation in anatomy   |
 | `entity-anatomy.guard.test.ts`             | EntityAnatomyHost variants stay inset-free; hosts use Frame + Content        |
 | `entity-surface.guard.test.ts`             | Entity-backed grants use DEC shell bridge, not generic ArrayItem card        |
 | `entity-card-surface.contract.test.ts`     | Frame owns perimeter only; Content owns inset                                |
@@ -580,7 +630,7 @@ prevent regression:
 | `collapsible-list-item.variants.test.ts`   | Entity-card body classes exclude legacy inset                                |
 | `catalog-entity-row.stories.tsx`           | Flat + disclosure rhythm side-by-side; location picker drawer context        |
 | `content-card.variants.test.ts`            | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks     |
-| `entity-summary.test.tsx`                  | Classification adjacent; status lane spacing and density-sized badges        |
+| `entity-summary.test.tsx`                  | Classification adjacent; density-sized badges; parts carry no track offsets  |
 | `entity-summary-status.type.test.ts`       | Status prop is structured data, not ReactNode                                |
 | `entity-anatomy-trailing.type.test.ts`     | Trailing action/group primary require ReactElement; closed secondary         |
 | AGENTS.md component rule                   | No consumer padding overrides on entity surfaces                             |
@@ -628,11 +678,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                         |
-| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); heading-band min-height matches frame size; outer row `items-start` |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                           |
-| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.             |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); media grows the RowAnatomy band track; heading centers on the band |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                          |
+| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.            |
 
 Portrait role copy targets compact circle/square tokens. Saved role presentation (crop,
 then focal) wins over surface defaults for both system and upload sources.

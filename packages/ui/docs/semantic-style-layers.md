@@ -7,6 +7,8 @@ hover fills, and drag chrome.
 ```text
 Layer 1 — foundational interaction policy (@rpg/ui)
         ↓
+Row tracks — RowAnatomy (band / meta / status, slack gutters; see row-anatomy.md)
+        ↓
 Layer 2 — shared presentation (entity / content-card / detail)
         ↓
 Layer 3 — host / collection structure (inset, separators, orchestration)
@@ -95,6 +97,16 @@ adds opacity/group wiring only.
 
 Bench/score-token whole-surface drag stays outside `dragSurfaceVariants`.
 
+### Row tracks (`RowAnatomy`)
+
+Vertical alignment for row-track surfaces (entity cards, spanning utilities). Hosts own
+columns and inset; `RowAnatomy` owns row tracks and cell placement only. Entity anatomy maps
+trailing **kinds** to cells — features do not pass `trailingAlign`, `headingBand`, or ad-hoc
+`self-*` on rail wrappers.
+
+Detail: [row-anatomy.md](./row-anatomy.md). Live recipes: dashboard Storybook **Recipes /
+Cards and Rows**.
+
 ## Layer 2 presentation
 
 | Primitive                                    | Owner        | Consumers                               |
@@ -103,6 +115,10 @@ Bench/score-token whole-surface drag stays outside `dragSurfaceVariants`.
 | `contentCardDensityInsetVariants`            | content-card | EntityCardFrame, ContentCard shell      |
 | `contentCardIdentityColumnGapVariants`       | content-card | ContentCard body, EntityAnatomy content |
 | `entity-card-heading-comfortable` (@utility) | globals      | Comfortable entity card titles          |
+| `rowAnatomyTracksVariants` / `RowAnatomyCell` | row-anatomy | EntityAnatomy (row tracks + cells)      |
+
+Vertical alignment of identity rows has one owner — the row-track grid. Cells never
+self-align or offset; see [row-anatomy.md](./row-anatomy.md).
 
 ## Feature guardrails (dashboard ESLint)
 
@@ -121,3 +137,5 @@ drag contract), **F5** (unavailable entity presentation), **F3** per-surface aud
 
 Entity/card ownership at Layer 2–3 (anatomy, surfaces, hosts) →
 [dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).
+
+Row-track vertical alignment → [row-anatomy.md](./row-anatomy.md).

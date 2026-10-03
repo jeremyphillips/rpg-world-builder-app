@@ -4,6 +4,7 @@ import { ContentCardHeadingAction, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
+import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from './entity-card-content'
 import { EntityCardFrame } from './entity-card-frame'
@@ -36,7 +37,7 @@ export function ContentEntityCard({
     <EntityCardFrame
       density={resolvedDensity}
       disabled={disabled}
-      leadingUtilityCount={leading ? 1 : 0}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount: leading ? 1 : 0, trailing })}
       surface="card"
     >
       <EntityCardContent density={resolvedDensity}>

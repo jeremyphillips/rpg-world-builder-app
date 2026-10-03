@@ -18,7 +18,7 @@ function resolveContentCardChrome(
   return 'standalone'
 }
 
-export type ContentCardProps = Omit<ContentCardBodyProps, 'rowAlign' | 'className'> & {
+export type ContentCardProps = Omit<ContentCardBodyProps, 'className'> & {
   density?: ContentCardDensity
   /** Who draws the outer shell — card (`standalone`) or host (`embedded`). */
   chrome?: ContentCardChrome
@@ -44,8 +44,6 @@ export function ContentCard({
   className,
   'data-disabled': dataDisabled,
 }: ContentCardProps) {
-  const hasSecondaryText = Boolean(subheading || metadata)
-  const rowAlign = hasSecondaryText ? 'start' : 'center'
   const resolvedChrome = resolveContentCardChrome(chrome, surface)
   const filledSurface = surface === 'card' ? 'bg-card' : undefined
 
@@ -68,7 +66,6 @@ export function ContentCard({
         endSlot={endSlot}
         footer={footer}
         density={density}
-        rowAlign={rowAlign}
       />
     </article>
   )

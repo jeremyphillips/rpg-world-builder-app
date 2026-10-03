@@ -89,17 +89,20 @@ function IdentityRowHeadingContent({
   )
 }
 
-function IdentityRowHeadingLine({
-  heading,
-  classification,
-  headingEnd,
-  size,
-}: {
+export type IdentityRowHeadingLineProps = {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
   headingEnd?: ReactNode
-  size: IdentityRowSize
-}) {
+  size?: IdentityRowSize
+}
+
+/** Heading + classification line — row-track hosts place it in their band cell. */
+export function IdentityRowHeadingLine({
+  heading,
+  classification,
+  headingEnd,
+  size = 'md',
+}: IdentityRowHeadingLineProps) {
   const content = (
     <IdentityRowHeadingContent heading={heading} classification={classification} size={size} />
   )
@@ -117,6 +120,17 @@ function IdentityRowHeadingLine({
       ) : null}
     </div>
   )
+}
+
+export type IdentityRowSupportingProps = {
+  children: ReactNode
+  size?: IdentityRowSize
+  wrap?: boolean
+}
+
+/** Supporting copy line — row-track hosts place it in their meta cell. */
+export function IdentityRowSupporting({ children, size = 'md', wrap = false }: IdentityRowSupportingProps) {
+  return <div className={identityRowSupportingVariants({ size, wrap })}>{children}</div>
 }
 
 /** Shared compact entity identity — heading truncates; classification stays shrink-0 on the first line. */
@@ -151,9 +165,9 @@ export function IdentityRow({
           />
         ) : null}
         {showSupporting ? (
-          <div className={identityRowSupportingVariants({ size, wrap: supportingWrap })}>
+          <IdentityRowSupporting size={size} wrap={supportingWrap}>
             {supporting}
-          </div>
+          </IdentityRowSupporting>
         ) : null}
         {showStatus ? <div className={identityRowStatusVariants()}>{status}</div> : null}
       </div>

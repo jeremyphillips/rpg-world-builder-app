@@ -6,6 +6,7 @@ import { cn } from '@rpg/ui'
 import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
 import { buildEntityContentOffsetStyle } from '../../../entity/anatomy/entity-leading-rail.lib'
+import { resolveEntitySurfaceEdges } from '../../../entity/anatomy/entity-surface-edges.lib'
 import { projectEntitySummaryModel } from '../../../entity/summary/entity-summary-projection.lib'
 import type { EntitySummaryStatusItem } from '../../../entity/summary/entity-summary-status.types'
 import { entitySurfaceInsetVariants } from '../../../entity/surfaces/entity-surface-inset.variants'
@@ -33,7 +34,6 @@ export type DetailEntityRowProps = {
   /** Leading entity media lane — domain types project to a node upstream. */
   leadingMedia?: ReactNode
   trailing?: EntityAnatomyTrailing
-  trailingAlign?: 'start' | 'center'
   inset?: 'self' | 'parent'
   disclosure?: DetailEntityRowDisclosure
   className?: string
@@ -89,7 +89,6 @@ function DetailEntityRowIdentity(
     | 'subheading'
     | 'metadata'
     | 'trailing'
-    | 'trailingAlign'
     | 'leadingMedia'
   > & {
     leadingUtilities?: readonly ReactNode[]
@@ -103,7 +102,6 @@ function DetailEntityRowIdentity(
     metadata,
     leadingMedia,
     trailing,
-    trailingAlign,
     leadingUtilities,
   } = props
 
@@ -123,7 +121,6 @@ function DetailEntityRowIdentity(
       headingHref={headingHref}
       leadingUtilities={leadingUtilities}
       trailing={trailing}
-      trailingAlign={trailingAlign}
       density={DETAIL_ENTITY_ROW_DENSITY}
     />
   )
@@ -137,7 +134,6 @@ export function DetailEntityRow({
   metadata,
   leadingMedia,
   trailing,
-  trailingAlign,
   inset = 'self',
   disclosure,
   className,
@@ -145,9 +141,21 @@ export function DetailEntityRow({
   const contentId = useId()
   const [collapsed, setCollapsed] = useState(true)
 
+  const flatEdges =
+    inset === 'self' ? resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing }) : undefined
+
   if (!disclosure) {
     return (
-      <div className={cn(detailEntityRowVariants({ inset }), className)}>
+      <div
+        className={cn(
+          detailEntityRowVariants({ inset }),
+          flatEdges &&
+            entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, ...flatEdges }),
+          className,
+        )}
+        data-entity-surface-start={flatEdges?.start}
+        data-entity-surface-end={flatEdges?.end}
+      >
         <DetailEntityRowIdentity
           heading={heading}
           headingHref={headingHref}
@@ -156,7 +164,6 @@ export function DetailEntityRow({
           metadata={metadata}
           leadingMedia={leadingMedia}
           trailing={trailing}
-          trailingAlign={trailingAlign}
         />
       </div>
     )
@@ -167,7 +174,10 @@ export function DetailEntityRow({
       className={cn(
         detailEntityRowDisclosureItemVariants(),
         inset === 'self' &&
-          entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, leading: true }),
+          entitySurfaceInsetVariants({
+            density: DETAIL_ENTITY_ROW_DENSITY,
+            ...resolveEntitySurfaceEdges({ leadingUtilityCount: 1, trailing }),
+          }),
         className,
       )}
       style={DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE}
@@ -181,7 +191,6 @@ export function DetailEntityRow({
           metadata={metadata}
           leadingMedia={leadingMedia}
           trailing={trailing}
-          trailingAlign={trailingAlign}
           leadingUtilities={[
             <DetailEntityRowDisclosureUtility
               key="disclosure-utility"

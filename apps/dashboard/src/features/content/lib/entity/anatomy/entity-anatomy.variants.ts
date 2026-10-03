@@ -1,18 +1,25 @@
 import { cva } from 'class-variance-authority'
 
-import { resolveContentCardIdentityColumnGapClasses } from '@rpg/ui'
+import { cn, rowAnatomyTracksVariants, type ContentCardDensity, type RowAnatomyBand } from '@rpg/ui'
 
 /** Embedded EntityAnatomyHost host — anatomy only; collection inset owned by the host. */
 export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
 
-/** Grid cross-axis — top-aligned so rails pin to the heading band, not full summary height. */
-export const entityAnatomyVariants = cva(
-  'grid min-w-0 w-full grid-cols-[auto_minmax(0,1fr)_auto] items-start',
+/**
+ * Column template — EntityAnatomy owns columns and horizontal spacing; RowAnatomy owns rows.
+ * Empty `auto` columns collapse to 0, so absent rails add no phantom spacing.
+ * Media → content gap mirrors `contentCardIdentityColumnGapVariants`; the leading content
+ * gap lives on EntityLeadingRail padding-inline-end.
+ */
+export const entityAnatomyColumnsVariants = cva(
+  'min-w-0 w-full grid-cols-[[leading]_auto_[media]_auto_[content]_minmax(0,1fr)_[trailing]_auto] [&>[data-row-anatomy-column=trailing]]:justify-self-end',
   {
     variants: {
       density: {
-        compact: 'gap-y-1',
-        comfortable: 'gap-y-1',
+        compact:
+          '[&>[data-row-anatomy-column=media]]:me-2 [&>[data-row-anatomy-column=trailing]]:ms-2',
+        comfortable:
+          '[&>[data-row-anatomy-column=media]]:me-4 [&>[data-row-anatomy-column=trailing]]:ms-3',
       },
     },
     defaultVariants: {
@@ -21,42 +28,9 @@ export const entityAnatomyVariants = cva(
   },
 )
 
-/** Leading rail track — contentGap lives on EntityLeadingRail padding-inline-end. */
-export const entityAnatomyLeadingSlotVariants = cva('col-start-1 row-start-1 min-w-0')
-
-/** Content track — always column 2 so summary owns the flexible column. */
-export const entityAnatomyContentVariants = cva(
-  'col-start-2 row-start-1 flex min-w-0 items-start',
-  {
-    variants: {
-      density: {
-        compact: resolveContentCardIdentityColumnGapClasses('compact'),
-        comfortable: resolveContentCardIdentityColumnGapClasses('comfortable'),
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
-)
-
-/** Trailing rail track — only rendered when `trailing` is set. */
-export const entityAnatomyTrailingSlotVariants = cva(
-  'col-start-3 row-start-1 min-w-0 justify-self-end',
-  {
-    variants: {
-      density: {
-        compact: 'ml-2',
-        comfortable: 'ml-3',
-      },
-      align: {
-        start: '',
-        center: 'self-center',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-      align: 'start',
-    },
-  },
-)
+export function entityAnatomyVariants({
+  density = 'comfortable',
+  band = 'control',
+}: { density?: ContentCardDensity; band?: RowAnatomyBand } = {}) {
+  return cn(rowAnatomyTracksVariants({ band }), entityAnatomyColumnsVariants({ density }))
+}

@@ -35,7 +35,7 @@ export const WithMetaAndRemove: Story = {
       status: [{ kind: 'badge', label: 'Stale', appearance: 'soft', tone: 'neutral' }],
     },
     trailing: {
-      kind: 'action',
+      kind: 'utility',
       content: <BuilderInventoryRemoveAction itemLabel="Stealth" onRemove={() => undefined} />,
     },
     density: 'compact',

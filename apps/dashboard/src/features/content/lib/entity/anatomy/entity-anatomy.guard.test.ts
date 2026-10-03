@@ -6,9 +6,10 @@ import { describe, expect, it } from 'vitest'
 const ENTITY_ROOT = join(__dirname, '..')
 
 describe('entity anatomy guard', () => {
-  it('keeps status row spacing on the canonical lane', () => {
+  it('leaves status row offset to the RowAnatomy status cell', () => {
     const source = readFileSync(join(ENTITY_ROOT, 'summary/entity-summary.variants.ts'), 'utf8')
-    expect(source).toMatch(/entitySummaryStatusRowVariants[\s\S]*mt-1/)
+    expect(source).toMatch(/entitySummaryStatusRowVariants/)
+    expect(source).not.toMatch(/\bmt-\S+/)
   })
 
   it('does not assign collection inset on EntityAnatomyHost root', () => {
@@ -44,19 +45,18 @@ describe('entity anatomy guard', () => {
     expect(frameSource).toMatch(/buildEntityLeadingChromeSizeStyle/)
   })
 
-  it('keeps explicit grid tracks without global horizontal gap', () => {
+  it('owns named column lines without a global horizontal gap; rows come from RowAnatomy', () => {
     const variantsSource = readFileSync(
       join(ENTITY_ROOT, 'anatomy/entity-anatomy.variants.ts'),
       'utf8',
     )
-    const anatomyBlock = variantsSource.slice(
-      variantsSource.indexOf('export const entityAnatomyVariants'),
-      variantsSource.indexOf('export const entityAnatomyLeadingSlotVariants'),
-    )
 
-    expect(variantsSource).toMatch(/col-start-2/)
-    expect(variantsSource).toMatch(/col-start-3/)
-    expect(anatomyBlock).not.toMatch(/\bgap-x-/)
+    expect(variantsSource).toContain(
+      'grid-cols-[[leading]_auto_[media]_auto_[content]_minmax(0,1fr)_[trailing]_auto]',
+    )
+    expect(variantsSource).toMatch(/rowAnatomyTracksVariants\(/)
+    expect(variantsSource).not.toMatch(/\bgrid-rows-|\brow-start-|\bcol-start-/)
+    expect(variantsSource).not.toMatch(/\bgap-x-/)
   })
 
   it('keeps DEC on entity-card CLI row layout without consumer padding props', () => {

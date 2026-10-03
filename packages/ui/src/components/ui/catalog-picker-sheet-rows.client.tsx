@@ -116,7 +116,6 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         rowLayout={rowLayout}
         surface={rowSurface}
         toolbarCompact={toolbarCompact}
-        actionsAlign="center"
         collapsible={hasDetails}
         showDragHandle={false}
         collapsed={controlledExpansion ? !isExpanded : undefined}

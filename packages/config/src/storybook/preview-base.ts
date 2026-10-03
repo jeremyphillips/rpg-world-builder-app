@@ -4,6 +4,8 @@ import { withThemeByClassName } from '@storybook/addon-themes'
 export type CreateStorybookPreviewOptions = {
   decorators?: Decorator[]
   parameters?: Preview['parameters']
+  globalTypes?: Preview['globalTypes']
+  initialGlobals?: Preview['initialGlobals']
 }
 
 /**
@@ -12,9 +14,11 @@ export type CreateStorybookPreviewOptions = {
  * from app packages (e.g. `@rpg/ui/storybook/with-theme-context`).
  */
 export function createStorybookPreview(options: CreateStorybookPreviewOptions = {}): Preview {
-  const { decorators = [], parameters: extraParameters } = options
+  const { decorators = [], parameters: extraParameters, globalTypes, initialGlobals } = options
 
   return {
+    ...(globalTypes ? { globalTypes } : {}),
+    ...(initialGlobals ? { initialGlobals } : {}),
     decorators: [
       withThemeByClassName({
         themes: { light: '', dark: 'dark' },
