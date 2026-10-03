@@ -1,5 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import {
+  ROW_IDENTITY_STACK_GAP_CLASS,
+  ROW_IDENTITY_STATUS_OFFSET_CLASS,
+} from './row-anatomy/row-identity-rhythm.tokens'
+
 /** Row identity text scale — not `FieldSizeToken` (field md is 15px `text-md`). */
 export type IdentityRowSize = 'sm' | 'md' | 'lg'
 
@@ -71,13 +76,13 @@ export const identityRowSupportingVariants = cva('text-muted-foreground', {
   },
 })
 
-export const identityRowStatusVariants = cva('mt-1')
+export const identityRowStatusVariants = cva(ROW_IDENTITY_STATUS_OFFSET_CLASS)
 
 export const identityRowStackVariants = cva('flex min-w-0 flex-col', {
   variants: {
     size: {
-      sm: 'gap-0.5',
-      md: 'gap-0.5',
+      sm: ROW_IDENTITY_STACK_GAP_CLASS,
+      md: ROW_IDENTITY_STACK_GAP_CLASS,
       lg: 'gap-1',
     },
   },

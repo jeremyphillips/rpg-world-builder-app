@@ -140,11 +140,19 @@ function CatalogEntityRowRecipe() {
   return (
     <CatalogEntityRow
       toolbarLabel="Longsword"
-      domIds={{ itemId: 'recipe-catalog', titleId: 'recipe-catalog-title', bodyId: 'recipe-catalog-body' }}
+      domIds={{
+        itemId: 'recipe-catalog',
+        titleId: 'recipe-catalog-title',
+        bodyId: 'recipe-catalog-body',
+      }}
       collapsible
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
-      entity={{ heading: 'Longsword', classification: 'Martial weapon', description: '1d8 slashing' }}
+      entity={{
+        heading: 'Longsword',
+        classification: 'Martial weapon',
+        description: '1d8 slashing',
+      }}
       trailing={{
         kind: 'group',
         primary: (
@@ -277,7 +285,11 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     anatomy: 'row-track',
     render: () => (
       <ContentEntityCard
-        entity={{ heading: 'Harbor District', classification: 'Settlement', description: 'Located in Grey Coast' }}
+        entity={{
+          heading: 'Harbor District',
+          classification: 'Settlement',
+          description: 'Located in Grey Coast',
+        }}
         density="compact"
         trailing={{ kind: 'action', content: <SelectAction /> }}
       />
@@ -346,7 +358,10 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     trailing: 'none',
     anatomy: 'row-track',
     render: () => (
-      <EntityAnatomyHost entity={{ heading: 'Grey Coast', classification: 'Region' }} density="compact" />
+      <EntityAnatomyHost
+        entity={{ heading: 'Grey Coast', classification: 'Region' }}
+        density="compact"
+      />
     ),
   },
   {
@@ -410,7 +425,11 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => (
       <CatalogEntitySurfaceRow
         toolbarLabel="Fireball"
-        domIds={{ itemId: 'recipe-surface-row', titleId: 'recipe-surface-row-title', bodyId: 'recipe-surface-row-body' }}
+        domIds={{
+          itemId: 'recipe-surface-row',
+          titleId: 'recipe-surface-row-title',
+          bodyId: 'recipe-surface-row-body',
+        }}
         surface={{
           identity: {
             heading: 'Fireball',
@@ -427,7 +446,7 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     name: 'Detail entity row — remove utility',
     section: 'detail-rows',
     component: 'DetailEntityRow',
-    chain: ['DetailEntityRow', 'EntityAnatomyHost', 'EntityAnatomy', 'RowAnatomyCell'],
+    chain: ['DetailEntityRow', 'EntityAnatomy', 'RowAnatomyCell'],
     useWhen: 'Relationship and collection rows on detail pages.',
     density: 'compact',
     leading: 'none',
@@ -508,7 +527,13 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     render: () => (
       <InteractiveList>
         <InteractiveListRow
-          content={<IdentityRow heading="Fireball" classification="Spell" supporting="Level 3 · Evocation" />}
+          content={
+            <IdentityRow
+              heading="Fireball"
+              classification="Spell"
+              supporting="Level 3 · Evocation"
+            />
+          }
           trailingAction={<RemoveUtility label="Fireball" />}
         />
       </InteractiveList>
@@ -633,7 +658,11 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
             label: 'Class',
             value: 'Fighter',
             action: (
-              <SelectionSummaryChangeAction changeLabel="Change" ariaLabel="Change class" onChange={noop} />
+              <SelectionSummaryChangeAction
+                changeLabel="Change"
+                ariaLabel="Change class"
+                onChange={noop}
+              />
             ),
           },
           { label: 'Subclass', value: 'Champion' },

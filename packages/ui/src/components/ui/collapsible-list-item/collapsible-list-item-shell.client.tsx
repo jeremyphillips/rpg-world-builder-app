@@ -33,14 +33,14 @@ export type {
   CollapsibleListItemDensity,
 } from './collapsible-list-item.variants'
 
-export type CollapsibleListItemActionsAlign = 'start' | 'center'
+import type { CollapsibleListItemHeaderActionsPlacement } from './collapsible-list-item-root.lib'
 
 export interface CollapsibleListItemShellProps extends CollapsibleListItemLeadingChromeOptions {
   titleId: string
   itemPrefix?: string
   dragging?: boolean
   layout?: 'default' | 'compactRow'
-  actionsAlign?: CollapsibleListItemActionsAlign
+  headerActionsPlacement: CollapsibleListItemHeaderActionsPlacement
   /** Non-form shell presets — bypass surface/tone axes. */
   preset?: CollapsibleListItemShellPreset
   /** Catalog row layout — `entity-card` drops content inset for embedded entity cards. */
@@ -81,7 +81,7 @@ export function CollapsibleListItemShell({
   collapsible,
   dragging = false,
   layout = 'default',
-  actionsAlign = 'start',
+  headerActionsPlacement,
   preset = 'default',
   rowLayout = 'default',
   density = 'compact',
@@ -106,7 +106,7 @@ export function CollapsibleListItemShell({
 
   const shellLayout = resolveCollapsibleListItemShellLayout({
     layout,
-    actionsAlign,
+    headerActionsPlacement,
     rowLayout,
   })
   const resolvedToolbar = toolbar ?? main
@@ -134,7 +134,7 @@ export function CollapsibleListItemShell({
     >
       <CollapsibleListItemShellContent
         layout={layout}
-        actionsAlign={actionsAlign}
+        headerActionsPlacement={headerActionsPlacement}
         rowLayout={rowLayout}
         density={density}
         leadingChrome={leadingChrome}

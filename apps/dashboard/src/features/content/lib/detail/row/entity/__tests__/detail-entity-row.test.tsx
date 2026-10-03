@@ -29,7 +29,9 @@ describe('DetailEntityRow', () => {
     ).toHaveTextContent('The Silver Eel · Building · Tavern')
     expect(screen.getByText('Building · Tavern')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Actions' })).toBeInTheDocument()
-    expect(container.firstElementChild).toHaveClass('px-4', 'py-1')
+    expect(container.firstElementChild).toHaveClass('py-1')
+    expect(container.firstElementChild).toHaveClass('pl-[var(--entity-surface-inline-start)]')
+    expect(container.firstElementChild).toHaveClass('pr-[var(--entity-surface-inline-end)]')
   })
 
   it('keeps the leading separator visible beside the classification suffix', () => {
@@ -113,7 +115,8 @@ describe('DetailEntityRow', () => {
       </MemoryRouter>,
     )
 
-    expect(container.firstElementChild).toHaveClass('min-w-0', 'py-1', 'px-4')
+    expect(container.firstElementChild).toHaveClass('min-w-0', 'py-1')
+    expect(container.firstElementChild).toHaveClass('pl-[var(--entity-surface-inline-start)]')
     expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument()
   })
 
@@ -173,6 +176,28 @@ describe('DetailEntityRow', () => {
     expect(screen.getByText('Preview child')).toBeInTheDocument()
   })
 
+  it('tightens flat row end inset for utility trailing', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DetailEntityRow
+          heading="The Silver Eel"
+          trailing={{
+            kind: 'utility',
+            content: (
+              <button type="button" aria-label="Remove The Silver Eel">
+                Remove
+              </button>
+            ),
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    const root = container.firstElementChild as HTMLElement
+    expect(root).toHaveAttribute('data-entity-surface-end', 'utility')
+    expect(root).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
+  })
+
   it('publishes compact surface inset on self-inset disclosure rows', () => {
     const { container } = render(
       <MemoryRouter>
@@ -191,7 +216,9 @@ describe('DetailEntityRow', () => {
     const disclosureRoot = screen
       .getByRole('link', { name: 'Dock Ward' })
       .closest('[style*="--entity-content-offset"]')
-    expect(disclosureRoot).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
+    expect(disclosureRoot).toHaveClass(
+      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
+    )
     expect(disclosureRoot).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
 
     const headerRow = disclosureRoot?.firstElementChild as HTMLElement

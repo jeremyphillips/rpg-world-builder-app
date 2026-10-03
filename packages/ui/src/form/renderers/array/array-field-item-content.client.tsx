@@ -176,7 +176,6 @@ function FlatLabeledArrayFieldItem({
         hasItemHeader: true,
       })}
       tone={arrayItemTone}
-      actionsAlign="center"
       className={shellClassName}
       header={<ArrayItemHeaderContent header={header} />}
       summary={summaryNode}
@@ -264,7 +263,6 @@ function DetailedArrayFieldItem({
         collapsible,
       })}
       tone={arrayItemTone}
-      actionsAlign="center"
       header={<ArrayItemHeaderContent header={header} />}
       summary={summaryNode}
       body={fieldsNode}

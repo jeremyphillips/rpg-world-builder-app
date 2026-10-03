@@ -141,9 +141,21 @@ export function DetailEntityRow({
   const contentId = useId()
   const [collapsed, setCollapsed] = useState(true)
 
+  const flatEdges =
+    inset === 'self' ? resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing }) : undefined
+
   if (!disclosure) {
     return (
-      <div className={cn(detailEntityRowVariants({ inset }), className)}>
+      <div
+        className={cn(
+          detailEntityRowVariants({ inset }),
+          flatEdges &&
+            entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, ...flatEdges }),
+          className,
+        )}
+        data-entity-surface-start={flatEdges?.start}
+        data-entity-surface-end={flatEdges?.end}
+      >
         <DetailEntityRowIdentity
           heading={heading}
           headingHref={headingHref}

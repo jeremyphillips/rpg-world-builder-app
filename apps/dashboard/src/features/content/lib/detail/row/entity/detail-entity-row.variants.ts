@@ -10,7 +10,7 @@ import {
 export const detailEntityRowVariants = cva('min-w-0 py-1', {
   variants: {
     inset: {
-      self: 'px-4',
+      self: entitySurfaceHorizontalInsetClasses,
       parent: '',
     },
   },
@@ -53,7 +53,9 @@ export const detailEntityRowDisclosureContentVariants = cva('mb-2', {
 })
 
 /** Indents preview rail by disclosure utility + content gap — rail-to-copy gap stays on the group. */
-export const detailEntityRowDisclosurePreviewOffsetVariants = cva('pl-[var(--entity-content-offset)]')
+export const detailEntityRowDisclosurePreviewOffsetVariants = cva(
+  'pl-[var(--entity-content-offset)]',
+)
 
 /** Left rail wrapping disclosure preview child rows. */
 export const detailEntityRowDisclosurePreviewGroupVariants = cva(

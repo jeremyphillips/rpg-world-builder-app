@@ -33,7 +33,6 @@ export type { CollapsibleListItemActionsProps } from './collapsible-list-item-ac
 
 export { CollapsibleListItemShell } from './collapsible-list-item-shell.client'
 export type {
-  CollapsibleListItemActionsAlign,
   CollapsibleListItemShellPreset,
   CollapsibleListItemShellProps,
 } from './collapsible-list-item-shell.client'

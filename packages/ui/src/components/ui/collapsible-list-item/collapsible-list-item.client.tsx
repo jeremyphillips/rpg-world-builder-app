@@ -6,7 +6,6 @@ import { cn } from '../../../lib/utils'
 import { CollapsibleListItemActions } from './collapsible-list-item-actions.client'
 import {
   CollapsibleListItemShell,
-  type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellPreset,
 } from './collapsible-list-item-shell.client'
 import type { SemanticSurfaceTone } from '../field-surface.variants'
@@ -27,7 +26,7 @@ import {
 } from './collapsible-list-item.variants'
 import {
   buildCollapsibleListItemLeadingChrome,
-  resolveCollapsibleListItemActionsAlign,
+  resolveCollapsibleListItemHeaderActionsPlacement,
   resolveCollapsibleListItemDragHandleProps,
   type CollapsibleListItemDragHandleConfig,
 } from './collapsible-list-item-root.lib'
@@ -54,7 +53,6 @@ export interface CollapsibleListItemProps {
   surface?: SurfaceConfig
   tone?: SemanticSurfaceTone
   layout?: 'default' | 'compactRow'
-  actionsAlign?: CollapsibleListItemActionsAlign
   toolbarCompact?: boolean
   /** When `none`, disclosure/drag controls render in entity leading rail instead of toolbar. */
   toolbarLeadingChrome?: CollapsibleListItemToolbarLeadingChromePlacement
@@ -137,7 +135,6 @@ function CollapsibleListItemRoot({
   surface,
   tone,
   layout = 'default',
-  actionsAlign: actionsAlignProp,
   toolbarCompact = false,
   toolbarLeadingChrome = 'toolbar',
   bodyClassName,
@@ -160,12 +157,7 @@ function CollapsibleListItemRoot({
   )
   const reserveDragHandleSlot = showDragHandle
   const gripVisible = Boolean(dragHandleProps)
-  const actionsAlign = resolveCollapsibleListItemActionsAlign(
-    actionsAlignProp,
-    reserveDragHandleSlot,
-    layout,
-    rowLayout,
-  )
+  const headerActionsPlacement = resolveCollapsibleListItemHeaderActionsPlacement(layout, rowLayout)
   const leadingChrome = buildCollapsibleListItemLeadingChrome(reserveDragHandleSlot, collapsible)
   const resolvedDragHandleProps = resolveCollapsibleListItemDragHandleProps(
     toolbarAriaLabel,
@@ -225,7 +217,7 @@ function CollapsibleListItemRoot({
         collapsible={collapsible}
         dragging={contextValue.dragging}
         layout={layout}
-        actionsAlign={actionsAlign}
+        headerActionsPlacement={headerActionsPlacement}
         preset={preset}
         rowLayout={rowLayout}
         density={density}
@@ -246,10 +238,10 @@ function CollapsibleListItemRoot({
             compact={toolbarCompact}
             leadingChromePlacement={toolbarLeadingChrome}
             header={header}
-            summary={actionsAlign === 'center' ? undefined : summary}
+            summary={headerActionsPlacement === 'center' ? undefined : summary}
           />
         }
-        summary={actionsAlign === 'center' ? summary : undefined}
+        summary={headerActionsPlacement === 'center' ? summary : undefined}
         body={
           body ? (
             <CollapsibleListItemBody
@@ -283,6 +275,9 @@ function CollapsibleListItemCompoundRoot({
   const reserveDragHandleSlot = props.showDragHandle ?? false
   const gripVisible = Boolean(props.dragHandleProps)
   const collapsible = props.collapsible ?? false
+  const layout = props.layout ?? 'default'
+  const rowLayout = props.rowLayout ?? 'default'
+  const headerActionsPlacement = resolveCollapsibleListItemHeaderActionsPlacement(layout, rowLayout)
   const [collapsed, handleToggleCollapse] = useCollapseState(
     props.collapsed,
     props.onToggleCollapse,
@@ -333,9 +328,10 @@ function CollapsibleListItemCompoundRoot({
         showDragHandle={reserveDragHandleSlot}
         collapsible={collapsible}
         dragging={contextValue.dragging}
-        layout={contextValue.layout}
+        layout={layout}
+        headerActionsPlacement={headerActionsPlacement}
         preset={contextValue.preset}
-        rowLayout={contextValue.rowLayout}
+        rowLayout={rowLayout}
         surface={contextValue.surface}
         tone={contextValue.tone}
         className={props.className}

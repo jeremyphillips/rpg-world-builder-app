@@ -17,6 +17,7 @@ import {
   EntitySummaryStatus,
 } from '../summary/entity-summary'
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
+import { resolveEntityAnatomyBand } from './entity-anatomy-band.lib'
 import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
 
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
@@ -66,9 +67,10 @@ export function EntityAnatomy({
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
   const hasStatus = entity.status != null && entity.status.length > 0
+  const band = resolveEntityAnatomyBand(entity.media)
 
   return (
-    <div className={entityAnatomyVariants({ density })} {...rowAnatomyRootProps}>
+    <div className={entityAnatomyVariants({ density, band })} {...rowAnatomyRootProps}>
       {resolvedLeadingUtilities.length > 0 ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'band', column: 'leading' }}
@@ -101,7 +103,9 @@ export function EntityAnatomy({
           cell={{ slot: 'meta', column: 'content' }}
           data-entity-item-slot="description"
         >
-          <EntitySummaryDescription density={density}>{entity.description}</EntitySummaryDescription>
+          <EntitySummaryDescription density={density}>
+            {entity.description}
+          </EntitySummaryDescription>
         </RowAnatomyCell>
       ) : null}
       {hasStatus ? (

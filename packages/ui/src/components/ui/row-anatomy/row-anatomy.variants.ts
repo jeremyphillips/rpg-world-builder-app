@@ -1,6 +1,10 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import {
+  ROW_IDENTITY_META_OFFSET_CLASS,
+  ROW_IDENTITY_STATUS_OFFSET_CLASS,
+} from './row-identity-rhythm.tokens'
 import type { RowAnatomyCellSpec } from './row-anatomy.types'
 
 export const ROW_ANATOMY_ROOT_ATTRIBUTE = 'data-row-anatomy'
@@ -45,9 +49,17 @@ export function rowAnatomyCellClasses(cell: RowAnatomyCellSpec<string>): string 
     case 'band':
       return cn(ROW_ANATOMY_CELL_BASE_CLASSES, 'row-start-[band] self-center')
     case 'meta':
-      return cn(ROW_ANATOMY_CELL_BASE_CLASSES, 'row-start-[meta] self-start mt-0.5')
+      return cn(
+        ROW_ANATOMY_CELL_BASE_CLASSES,
+        'row-start-[meta] self-start',
+        ROW_IDENTITY_META_OFFSET_CLASS,
+      )
     case 'status':
-      return cn(ROW_ANATOMY_CELL_BASE_CLASSES, 'row-start-[status] self-start mt-1')
+      return cn(
+        ROW_ANATOMY_CELL_BASE_CLASSES,
+        'row-start-[status] self-start',
+        ROW_IDENTITY_STATUS_OFFSET_CLASS,
+      )
     case 'full':
       return cn(ROW_ANATOMY_CELL_BASE_CLASSES, ROW_ANATOMY_SPAN_ALL_ROWS_CLASSES, 'self-center')
     case 'stretch':

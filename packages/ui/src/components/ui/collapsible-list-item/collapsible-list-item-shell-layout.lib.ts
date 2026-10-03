@@ -4,21 +4,21 @@ import {
   type CollapsibleListItemRowLayout,
   type CollapsibleListItemShellPreset,
 } from './collapsible-list-item.variants'
-import type { CollapsibleListItemActionsAlign } from './collapsible-list-item-shell.client'
+import type { CollapsibleListItemHeaderActionsPlacement } from './collapsible-list-item-root.lib'
 
 export function resolveCollapsibleListItemShellLayout({
   layout,
-  actionsAlign,
+  headerActionsPlacement,
   rowLayout,
 }: {
   layout: 'default' | 'compactRow'
-  actionsAlign: CollapsibleListItemActionsAlign
+  headerActionsPlacement: CollapsibleListItemHeaderActionsPlacement
   rowLayout: CollapsibleListItemRowLayout
 }): 'default' | 'compactRow' | 'headerActions' | 'entityCardHeaderActions' {
   if (layout === 'compactRow') {
     return 'compactRow'
   }
-  if (actionsAlign !== 'center') {
+  if (headerActionsPlacement !== 'center') {
     return 'default'
   }
   return rowLayout === 'entity-card' ? 'entityCardHeaderActions' : 'headerActions'

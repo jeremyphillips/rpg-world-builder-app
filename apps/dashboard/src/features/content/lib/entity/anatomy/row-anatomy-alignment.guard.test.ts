@@ -24,8 +24,8 @@ function isProductionSource(filePath: string): boolean {
   )
 }
 
-/** Props removed when the entity family moved onto RowAnatomy — row geometry has one owner. */
-const RETIRED_ALIGNMENT_PROPS = /\b(trailingAlign|headingBand)\b/
+/** Retired alignment props — row geometry and CLI rhythm resolve internally. */
+const RETIRED_ALIGNMENT_PROPS = /\b(trailingAlign|headingBand|actionsAlign|rowAlign)\b/
 
 /** Self-alignment and offset utilities that compensate for track geometry. */
 const COMPENSATION_UTILITIES =
@@ -41,7 +41,7 @@ const INNER_CONTENT_ALIGNMENT_ALLOWLIST = new Set([
 ])
 
 describe('row anatomy alignment guard', () => {
-  it('bans retired alignment props across dashboard and @rpg/ui sources', () => {
+  it('bans retired alignment props across dashboard and @rpg/ui production sources', () => {
     const sources = [...walkSources(DASHBOARD_SRC), ...walkSources(UI_SRC)].filter(
       isProductionSource,
     )
@@ -51,15 +51,6 @@ describe('row anatomy alignment guard', () => {
 
     expect(sources.some((filePath) => filePath.endsWith('entity-anatomy.tsx'))).toBe(true)
     expect(sources.some((filePath) => filePath.endsWith('row-anatomy-cell.tsx'))).toBe(true)
-    expect(violations).toEqual([])
-  })
-
-  it('bans actionsAlign / rowAlign inside the entity family', () => {
-    const violations = walkSources(ENTITY_ROOT)
-      .filter(isProductionSource)
-      .filter((filePath) => /\b(actionsAlign|rowAlign)\b/.test(readFileSync(filePath, 'utf8')))
-      .map((filePath) => relative(ENTITY_ROOT, filePath))
-
     expect(violations).toEqual([])
   })
 

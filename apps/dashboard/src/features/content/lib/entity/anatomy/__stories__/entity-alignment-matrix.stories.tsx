@@ -14,6 +14,7 @@ import {
 } from '@rpg/ui/storybook/row-anatomy-geometry'
 
 import { ContentEntityCard, DetailRowLeadingMedia, DisclosureEntityCard } from '@/features/content'
+import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import type { EntityAnatomyTrailing } from '../entity-anatomy-trailing.types'
 
@@ -234,6 +235,15 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
           trailing={{ kind: 'utility', content: <RemoveUtility label="Longsword" /> }}
         />
       </div>
+      {density === 'compact' ? (
+        <div data-edge-case="compact-detail-trailing-remove">
+          <DetailEntityRow
+            heading="The Silver Eel"
+            classification="Building · Tavern"
+            trailing={{ kind: 'utility', content: <RemoveUtility label="The Silver Eel" /> }}
+          />
+        </div>
+      ) : null}
       <div data-edge-case={`${density}-leading-caret`}>
         <DisclosureEntityCard
           itemId={`${density}-caret`}
@@ -275,6 +285,17 @@ export const UtilityEdgeParity: Story = {
       const caretInsets = measureGlyphInsets(caret, '[aria-expanded] svg')
       await expect(Math.abs(removeInsets.end - caretInsets.start)).toBeLessThanOrEqual(1)
     }
-    await expectRowAnatomyAligned(canvasElement, { minGrids: DENSITIES.length * 2 })
+
+    const detailRemove = canvasElement.querySelector<HTMLElement>(
+      '[data-edge-case="compact-detail-trailing-remove"]',
+    )!
+    const compactCaret = canvasElement.querySelector<HTMLElement>(
+      '[data-edge-case="compact-leading-caret"]',
+    )!
+    const detailInsets = measureGlyphInsets(detailRemove, '[data-entity-item-slot="trailing"] svg')
+    const caretInsets = measureGlyphInsets(compactCaret, '[aria-expanded] svg')
+    await expect(Math.abs(detailInsets.end - caretInsets.start)).toBeLessThanOrEqual(1)
+
+    await expectRowAnatomyAligned(canvasElement, { minGrids: DENSITIES.length * 2 + 1 })
   },
 }

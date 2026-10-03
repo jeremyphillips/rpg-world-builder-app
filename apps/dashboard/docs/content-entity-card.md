@@ -62,13 +62,13 @@ Visual row recipes (`InteractiveListRow`, `InteractiveListSize`, slots) are shar
 primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/wash from Radix
 `data-[highlighted]` only (no parallel `:hover` rail on `MenuChoiceRow`).
 
-| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                          |
-| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | --------------------------------------------- |
-| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                 |
-| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy |
-| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                 |
+| Mode                                    | Visual chrome                                                                        | Semantic host                                  | Text                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------ | ---------------------------------------------- | ---------------------------------------------- |
+| Combobox / true single-select           | `InteractiveList` + `ComboboxOptionRow`                                              | `listbox` / `option`, truthful `aria-selected` | `IdentityRow`                                  |
+| Action choice menu / split-button items | `InteractiveList` + `MenuChoiceRow` inside `interactiveListChoiceMenuContentClasses` | `menu` / `menuitem`                            | `IdentityRow` when the item has identity copy  |
+| Search hit                              | `InteractiveListRow` slots                                                           | link                                           | `IdentityRow`                                  |
 | Detail / relationship section           | `DetailEntityRow` / `EntityRowList`                                                  | section row                                    | EntitySummary parts → `IdentityRowHeadingLine` |
-| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                          |
+| Bordered catalog + disclosure           | `CatalogEntityRow` / DEC                                                             | card / disclosure                              | anatomy + card frame                           |
 
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
@@ -441,11 +441,11 @@ like `compact`.
 Surface inset is resolved **per edge** by `resolveEntitySurfaceEdges` and published by
 `EntityCardFrame` / `DetailEntityRow` as `--entity-surface-inline-start` / `-end`:
 
-| Edge  | `utility` when                       | Value                                          |
-| ----- | ------------------------------------ | ---------------------------------------------- |
-| start | at least one leading utility         | `--entity-surface-utility-inset` (tight)       |
-| end   | `trailing.kind === 'utility'`        | `--entity-surface-utility-inset` (tight)       |
-| other | —                                    | `--entity-surface-inset` (density base inset)  |
+| Edge  | `utility` when                            | Value                                         |
+| ----- | ----------------------------------------- | --------------------------------------------- |
+| start | at least one leading utility              | `--entity-surface-utility-inset` (tight)      |
+| end   | `utility` trailing or chevron `indicator` | `--entity-surface-utility-inset` (tight)      |
+| other | —                                         | `--entity-surface-inset` (density base inset) |
 
 A trailing ghost utility therefore sits as far from the end edge as a leading caret sits
 from the start edge (`UtilityEdgeParity` story). Disclosed bodies always use the base
@@ -505,13 +505,13 @@ trailing
 `resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell (two
 for `group`). Kinds never choose their own alignment.
 
-| Kind        | Type contract                                   | Cell                          | Use                                                 |
-| ----------- | ----------------------------------------------- | ----------------------------- | --------------------------------------------------- |
-| `action`    | `content: ReactElement`                         | `band`                        | Labeled commit — Add, Select, Edit                  |
-| `utility`   | `content: ReactElement`                         | `full` (row-centered)         | Remove, overflow menu, quantity stepper, icon edit  |
-| `indicator` | `variant: 'chevron'`                            | `full`                        | Destination chevrons                                |
-| `indicator` | `variant: 'quantity'`                           | `band`                        | Quiet qty labels aligned with the heading           |
-| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview) |
+| Kind        | Type contract                                   | Cell                             | Use                                                |
+| ----------- | ----------------------------------------------- | -------------------------------- | -------------------------------------------------- |
+| `action`    | `content: ReactElement`                         | `band`                           | Labeled commit — Add, Select, Edit                 |
+| `utility`   | `content: ReactElement`                         | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit |
+| `indicator` | `variant: 'chevron'`                            | `full`                           | Destination chevrons                               |
+| `indicator` | `variant: 'quantity'`                           | `band`                           | Quiet qty labels aligned with the heading          |
+| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)   |
 
 `utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
 A 36px stepper in a compact row grows the row through the slack gutters; heading and
@@ -678,11 +678,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                         |
-| ------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                        |
+| ------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); media grows the RowAnatomy band track; heading centers on the band |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                           |
-| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.             |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                          |
+| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.            |
 
 Portrait role copy targets compact circle/square tokens. Saved role presentation (crop,
 then focal) wins over surface defaults for both system and upload sources.

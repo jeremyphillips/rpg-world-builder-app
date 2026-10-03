@@ -1039,7 +1039,6 @@ export {
   type CollapsibleListItemDragHandleConfig,
   type CollapsibleListItemDragHandleProps,
   type CollapsibleListItemProps,
-  type CollapsibleListItemActionsAlign,
   type CollapsibleListItemShellProps,
   type CollapsibleListItemShellPreset,
   type CollapsibleListItemRowLayout,
