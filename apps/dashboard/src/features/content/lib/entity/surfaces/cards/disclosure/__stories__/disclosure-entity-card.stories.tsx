@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
+import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
+
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
 import { DisclosureEntityCard } from '../disclosure-entity-card'
 import { HARBOR_DISTRICT_ENTITY } from '../../../../__tests__/entity.fixture'
@@ -24,6 +26,18 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+function GhostRemoveUtility({ label }: { label: string }) {
+  return (
+    <button
+      type="button"
+      className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}
+      aria-label={`Remove ${label}`}
+    >
+      <ActionIcon action="remove" step="md" />
+    </button>
+  )
+}
 
 function DisclosureEntityCardDemo({
   density = 'comfortable',
@@ -95,9 +109,12 @@ export const BodyEndInsetInvariant: Story = {
         [
           { id: 'none', trailing: undefined, label: 'No trailing action' },
           {
-            id: 'delete',
-            trailing: { kind: 'action' as const, content: <button type="button">Remove</button> },
-            label: 'Delete action',
+            id: 'utility-remove',
+            trailing: {
+              kind: 'utility' as const,
+              content: <GhostRemoveUtility label="Compact" />,
+            },
+            label: 'Ghost remove utility',
           },
           {
             id: 'add',
@@ -150,7 +167,7 @@ export const PilotInventoryRow: Story = {
         }}
         density="compact"
         defaultCollapsed={false}
-        trailing={{ kind: 'action', content: <button type="button">Remove</button> }}
+        trailing={{ kind: 'utility', content: <GhostRemoveUtility label="Longsword" /> }}
       >
         <dl className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
           <div>
