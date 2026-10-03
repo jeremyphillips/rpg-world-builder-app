@@ -31,19 +31,18 @@ import {
 import { dispatchEquipmentPackageSwitchAction } from './apply-equipment-package-switch-actions'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
 
-import { readSelectedStartingEquipmentOptionId } from './resolve-starting-equipment-choice-sets'
+import {
+  readSelectedStartingEquipmentOptionId,
+  resolveStartingEquipmentResolution,
+} from './resolve-starting-equipment-choice-sets'
 
 type CharacterBuilderDraftEquipmentPurchase = NonNullable<
   CharacterBuilderDraft['equipment']
 >['purchases'][number]
 
-function readEquipmentPurchaseQuantity(
-  draft: CharacterBuilderDraft,
-  equipmentId: string,
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode'],
-): number {
+function readPickerPurchaseQuantity(draft: CharacterBuilderDraft, equipmentId: string): number {
   const purchase = (draft.equipment?.purchases ?? []).find(
-    (entry) => entry.equipmentId === equipmentId && entry.sourceMode === sourceMode,
+    (entry) => entry.equipmentId === equipmentId && entry.sourceMode === 'startingGold',
   )
   return purchase?.quantity ?? 0
 }
@@ -66,14 +65,13 @@ function resolveCachedEquipmentMode(
   return option ? resolveEquipmentModeFromOption(option) : 'package'
 }
 
-function upsertEquipmentPurchase(args: {
+function upsertPickerPurchase(args: {
   purchases: CharacterBuilderDraftEquipmentPurchase[]
   equipment: Equipment
   equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
 }): CharacterBuilderDraftEquipmentPurchase[] {
-  const { purchases, equipment, equipmentId, sourceMode, quantity } = args
+  const { purchases, equipment, equipmentId, quantity } = args
 
   const normalizedPurchases = purchases.map((_, index) =>
     normalizeEquipmentPurchase(purchases, index),
@@ -84,7 +82,7 @@ function upsertEquipmentPurchase(args: {
     incoming: {
       equipmentId,
       quantity,
-      sourceMode,
+      sourceMode: 'startingGold',
       origin: 'picker',
     },
     equipment,
@@ -95,17 +93,15 @@ function buildEquipmentDraftFromPurchase(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   purchases: CharacterBuilderDraftEquipmentPurchase[]
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
 }): CharacterBuilderDraft['equipment'] {
-  const { draft, catalogIndex, purchases, sourceMode } = args
+  const { draft, catalogIndex, purchases } = args
 
   return {
     mode: resolveCachedEquipmentMode(draft, catalogIndex),
     purchases,
     magicItemSelections: draft.equipment?.magicItemSelections ?? [],
     classPackage: draft.equipment?.classPackage,
-    editedSincePackageSelection:
-      sourceMode === 'manual' ? true : (draft.equipment?.editedSincePackageSelection ?? false),
+    editedSincePackageSelection: draft.equipment?.editedSincePackageSelection ?? false,
     skipped: false,
   }
 }
@@ -114,18 +110,16 @@ function canIncreasePurchaseQuantity(args: {
   equipment: Equipment
   draft: CharacterBuilderDraft
   equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
   budget?: EquipmentBudgetSummary
 }): boolean {
-  const { equipment, draft, equipmentId, sourceMode, quantity, budget } = args
-  if (sourceMode === 'manual') return false
+  const { equipment, draft, equipmentId, quantity, budget } = args
   if (quantity < 1) return false
 
-  const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
+  const currentQuantity = readPickerPurchaseQuantity(draft, equipmentId)
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
-    sourceMode,
+    sourceMode: 'startingGold',
     budget,
     currentQuantity,
     isPurchaseRow: true,
@@ -194,15 +188,13 @@ function applyAddPurchaseAction(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   equipmentId: string
-  sourceMode: CharacterBuilderDraftEquipmentPurchase['sourceMode']
   quantity: number
   budget?: EquipmentBudgetSummary
   acquisitionContext?: EquipmentAcquisitionBuilderContext
 }): EquipmentStepActionResult {
-  const { draft, catalogIndex, equipmentId, sourceMode, quantity, budget, acquisitionContext } =
-    args
+  const { draft, catalogIndex, equipmentId, quantity, budget, acquisitionContext } = args
 
-  if (sourceMode === 'startingGold' && acquisitionContext) {
+  if (acquisitionContext) {
     const equipment = catalogIndex.equipment.get(equipmentId)
     if (!equipment) {
       return {
@@ -232,7 +224,6 @@ function applyAddPurchaseAction(args: {
       equipment,
       draft,
       equipmentId,
-      sourceMode,
       quantity,
       budget,
     })
@@ -249,12 +240,10 @@ function applyAddPurchaseAction(args: {
       equipment: buildEquipmentDraftFromPurchase({
         draft,
         catalogIndex,
-        sourceMode,
-        purchases: upsertEquipmentPurchase({
+        purchases: upsertPickerPurchase({
           purchases: [...(draft.equipment?.purchases ?? [])],
           equipment,
           equipmentId,
-          sourceMode,
           quantity,
         }),
       }),
@@ -306,7 +295,6 @@ function applyPurchaseIntentAction(args: {
 }): EquipmentStepActionResult {
   return applyAddPurchaseAction({
     ...args,
-    sourceMode: 'startingGold',
     quantity: args.requestedQuantity,
   })
 }
@@ -411,7 +399,7 @@ function applySetPurchaseQuantityAction(args: {
   const limits = resolveEquipmentPurchaseQuantityLimits({
     equipment,
     sourceMode: purchase.sourceMode,
-    origin: purchase.origin,
+    origin: purchase.sourceMode === 'startingGold' ? purchase.origin : undefined,
     budget,
     currentQuantity: purchase.quantity,
     isPurchaseRow: true,
@@ -421,6 +409,15 @@ function applySetPurchaseQuantityAction(args: {
     return {
       status: 'invalid',
       issues: [{ code: 'quantity_not_editable', reference: { purchaseId } }],
+    }
+  }
+
+  const fundingUnresolved =
+    resolveStartingEquipmentResolution(draft, catalogIndex) === 'unresolvedWithPurchases'
+  if (fundingUnresolved && quantity > purchase.quantity) {
+    return {
+      status: 'invalid',
+      issues: [{ code: 'quantity_not_allowed', reference: { equipmentId: purchase.equipmentId } }],
     }
   }
 
@@ -526,7 +523,6 @@ function dispatchCoreEquipmentStepAction(
       return applyAddPurchaseAction({
         ...args,
         equipmentId: action.equipmentId,
-        sourceMode: action.sourceMode,
         quantity: action.quantity ?? 1,
       })
     case 'remove_entry':

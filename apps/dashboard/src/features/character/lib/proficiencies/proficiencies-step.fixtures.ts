@@ -104,6 +104,7 @@ export function createEmptyProficienciesStepPreviewFixture(): CharacterBuildPrev
       armor: [],
     },
     equipmentSummary: [],
+    startingEquipmentPending: false,
     unresolvedChoiceSetIds: [],
     warnings: [],
   }

@@ -6,10 +6,27 @@ dashboard IA and how the UI composes existing row controls.
 
 ## Pending cart after class change
 
-When the selected class changes, the previous starting package's resolved items and
-any picker or converted purchases remain on the draft and render in **Purchased Equipment**
-while the starting option is unresolved. Those rows use pending copy and are not treated
-as funded inventory until the player picks a starting package or starting gold.
+A class change keeps only the player's own purchases (picker and manual rows; see
+`reconcileEquipmentForClassChange` in contracts). The previous package's items are never
+copied into the cart, and package-conversion rows drop. When retained purchases exist and
+no starting option is selected, `resolveStartingEquipmentResolution` returns
+`unresolvedWithPurchases` and the step shows a pending state:
+
+- **Layout:** the inventory view model uses `layout: 'pending'`, so only the
+  **Added Equipment** column renders (single column, no Starting Equipment column). Rows
+  show the source label "Pending purchase", never "Purchased".
+- **Funding:** `resolveEquipmentStepFundingState` returns `unresolved`, and the guidance
+  area shows a "Starting funds not set" card with the pending cost formatted by
+  `formatWealth` (for example "5 SP selected"). It never shows "0 GP remaining".
+- **Browse and quantities:** **Browse equipment** stays hidden until an option is selected.
+  Retained rows can only be decreased or removed; contracts rejects quantity increases
+  while the option is unresolved.
+- **Preview rail:** Equipment shows "Starting equipment not resolved" (incomplete), never
+  "Ready". The preview `equipmentSummary` stays empty until an option is selected.
+- **Choosing an option:** the normal package-switch evaluation fits the cart to the new
+  allowance. Starting Gold that covers the cart applies directly; an option that cannot
+  cover it opens the resolution modal with selection copy ("Resolve purchases for this
+  option" / "Choose option"). Cancel leaves the option unresolved with the cart intact.
 
 ## Source groups
 

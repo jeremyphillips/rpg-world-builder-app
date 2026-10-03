@@ -46,13 +46,16 @@ function buildGoldDraft(
     },
     equipment: {
       mode: 'gold' as const,
-      purchases: purchases.map((purchase) => ({
-        id: purchase.id,
-        equipmentId: purchase.equipmentId,
-        quantity: purchase.quantity,
-        sourceMode: purchase.sourceMode ?? ('startingGold' as const),
-        origin: 'picker' as const,
-      })),
+      purchases: purchases.map((purchase) => {
+        const row = {
+          id: purchase.id,
+          equipmentId: purchase.equipmentId,
+          quantity: purchase.quantity,
+        }
+        return purchase.sourceMode === 'manual'
+          ? { ...row, sourceMode: 'manual' as const }
+          : { ...row, sourceMode: 'startingGold' as const, origin: 'picker' as const }
+      }),
       editedSincePackageSelection: false,
     },
   }
@@ -62,6 +65,7 @@ type PackageSwitchResolutionModalStoryArgs = {
   initialQuantities: Record<string, number>
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+  isInitialSelection?: boolean
   purchases: Array<{
     id: string
     equipmentId: string
@@ -74,6 +78,7 @@ function PackageSwitchResolutionModalStory({
   initialQuantities,
   commitErrorReason,
   staleNotice = false,
+  isInitialSelection = false,
   purchases,
 }: PackageSwitchResolutionModalStoryArgs) {
   const [open, setOpen] = useState(true)
@@ -102,6 +107,7 @@ function PackageSwitchResolutionModalStory({
       draftQuantitiesByPurchaseId={draftQuantities}
       commitErrorReason={commitErrorReason}
       staleNotice={staleNotice}
+      isInitialSelection={isInitialSelection}
       onOpenChange={setOpen}
       onDraftQuantityChange={(purchaseId, quantity) => {
         setDraftQuantities((current) => ({ ...current, [purchaseId]: quantity }))
@@ -125,6 +131,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const OverBudget: Story = {}
+
+export const InitialSelectionAfterClassChange: Story = {
+  args: {
+    isInitialSelection: true,
+  },
+}
 
 export const StagedRemoval: Story = {
   args: {

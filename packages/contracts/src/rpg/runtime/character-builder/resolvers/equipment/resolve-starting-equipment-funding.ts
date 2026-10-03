@@ -157,7 +157,7 @@ export function resolveSelectedStartingEquipmentFunding(args: {
   return resolveStartingEquipmentFundingOptions(args).get(selectedOptionId)
 }
 
-function sumPurchaseCostCp(
+export function sumPurchaseCostCp(
   purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
   catalogIndex: CharacterBuildCatalogIndex,
 ): number {

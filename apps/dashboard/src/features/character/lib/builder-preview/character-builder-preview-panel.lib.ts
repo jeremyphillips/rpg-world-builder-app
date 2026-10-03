@@ -54,10 +54,17 @@ export function resolveProficienciesSectionHint({
   return ''
 }
 
-export function resolveEquipmentPreviewEmptyHint(hasCharacterClass: boolean): string {
+export const EQUIPMENT_PREVIEW_PENDING_STATUS = 'Starting equipment not resolved'
+
+export function resolveEquipmentPreviewEmptyHint(
+  hasCharacterClass: boolean,
+  startingEquipmentPending = false,
+): string {
   if (!hasCharacterClass) {
     return formatStepReadinessMessage(characterBuilderStepReadinessMessages.equipmentBlockedNoClass)
   }
+
+  if (startingEquipmentPending) return EQUIPMENT_PREVIEW_PENDING_STATUS
 
   return 'Nothing selected yet.'
 }

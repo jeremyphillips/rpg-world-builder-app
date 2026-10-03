@@ -6,8 +6,15 @@ import {
   EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
   EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
+  type EquipmentStepFundingState,
 } from '../../../lib/equipment/equipment-step.lib'
-import { formatEquipmentBudgetGuidanceCopy } from './equipment-acquisition-guidance.lib'
+import {
+  EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION,
+  EQUIPMENT_UNRESOLVED_FUNDING_HEADING,
+  formatEquipmentBudgetGuidanceCopy,
+  formatEquipmentUnresolvedFundingSelectedLabel,
+  resolveFundingGuidanceCard,
+} from './equipment-acquisition-guidance.lib'
 import {
   equipmentAcquisitionGuidanceBadgeListClasses,
   equipmentAcquisitionGuidanceCardClasses,
@@ -21,7 +28,7 @@ import {
 
 export type EquipmentAcquisitionGuidanceProps = {
   showPurchaseWorkflow: boolean
-  budget?: EquipmentBudgetSummary
+  fundingState: EquipmentStepFundingState
   onOpenPurchasePicker: () => void
   showMagicItemGrants: boolean
   magicItemProgress: readonly MagicItemGrantProgress[]
@@ -53,6 +60,22 @@ function EquipmentPurchaseGuidanceCard({
       >
         {EQUIPMENT_STEP_BROWSE_LABEL}
       </Button>
+    </article>
+  )
+}
+
+function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: number }) {
+  return (
+    <article className={equipmentAcquisitionGuidanceCardClasses}>
+      <Heading variant="subsection" as="h3">
+        {EQUIPMENT_UNRESOLVED_FUNDING_HEADING}
+      </Heading>
+      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+        {EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION}
+      </Text>
+      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
+        {formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp)}
+      </Text>
     </article>
   )
 }
@@ -93,28 +116,41 @@ function EquipmentMagicItemGuidanceCard({
   )
 }
 
+function EquipmentFundingGuidanceCard({
+  fundingState,
+  onBrowse,
+}: {
+  fundingState: Exclude<EquipmentStepFundingState, { kind: 'none' }>
+  onBrowse: () => void
+}) {
+  if (fundingState.kind === 'unresolved') {
+    return <EquipmentUnresolvedFundingCard pendingCostCp={fundingState.pendingCostCp} />
+  }
+  return <EquipmentPurchaseGuidanceCard budget={fundingState.budget} onBrowse={onBrowse} />
+}
+
 export function EquipmentAcquisitionGuidance({
   showPurchaseWorkflow,
-  budget,
+  fundingState,
   onOpenPurchasePicker,
   showMagicItemGrants,
   magicItemProgress,
   onOpenMagicItemsPicker,
 }: EquipmentAcquisitionGuidanceProps) {
-  const showPurchase = showPurchaseWorkflow && budget !== undefined
+  const fundingCard = resolveFundingGuidanceCard(fundingState, showPurchaseWorkflow)
   const showMagic = showMagicItemGrants && magicItemProgress.length > 0
 
-  if (!showPurchase && !showMagic) return null
+  if (!fundingCard && !showMagic) return null
 
   const gridClass =
-    showPurchase && showMagic
+    fundingCard && showMagic
       ? equipmentAcquisitionGuidanceGridTwoColumnClasses
       : equipmentAcquisitionGuidanceGridClasses
 
   return (
     <section aria-label="Acquisition guidance" className={gridClass}>
-      {showPurchase ? (
-        <EquipmentPurchaseGuidanceCard budget={budget} onBrowse={onOpenPurchasePicker} />
+      {fundingCard ? (
+        <EquipmentFundingGuidanceCard fundingState={fundingCard} onBrowse={onOpenPurchasePicker} />
       ) : null}
       {showMagic ? (
         <EquipmentMagicItemGuidanceCard

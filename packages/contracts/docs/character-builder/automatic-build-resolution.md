@@ -104,12 +104,18 @@ Class-authored equipment signals use `{ kind: 'class', classId }` and apply only
 class. `suggestedBy` is recorded only for a winner that is already a legal option of the
 selected class. Changing class drops the previous class's package selection, nested pools, and
 class-owned equipment channel, then the next fill resolves the new class from scratch.
-The gear from that package — fixed items, resolved nested picks, and quantity overrides —
-is copied onto the draft as pending picker purchases before the selection is cleared.
-Manual purchases stay. Picker-cart rows and package-conversion rows stay; conversion rows
-are retagged `origin: 'picker'` so they no longer belong to the previous package. Untagged
-`startingGold` rows drop. Proficiency does not prune a retained row. Assembled inventory
-still waits for a resolved starting option; the pending cart is draft state until then.
+The previous package's gear is never copied into purchases.
+`reconcileEquipmentForClassChange` is the only place that decides which purchases survive:
+`manual` rows and `startingGold` rows with `origin: 'picker'` stay unchanged (same `id`,
+quantity, and `unitCostCp`) while their equipment is still playable picker content;
+`origin: 'packageConversion'` rows belong to the previous class and drop.
+`pruneInvalidBuilderSelections` never rewrites purchases. Proficiency does not prune a
+retained row. Assembled inventory still waits for a resolved starting option; when the next
+option is selected, `evaluateEquipmentPackageSwitch` fits the retained cart to its funding.
+
+`origin` is structural: the purchase schema is a discriminated union on `sourceMode`, and
+every `startingGold` row must carry `origin` (`picker` or `packageConversion`). `manual`
+rows have no `origin`. Normalization only assigns missing ids and never invents an origin.
 
 Class spell recommendations are recorded as `suggestedBy` refs `{ kind: 'class', id }`.
 Already-held skills, tools, and

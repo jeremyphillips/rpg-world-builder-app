@@ -43,6 +43,7 @@ describe('ReviewStep', () => {
           ac: undefined,
           spellcasting: null,
           equipmentSummary: [],
+          startingEquipmentPending: false,
           unresolvedChoiceSetIds: ['class:srd-cc-5.2.1:fighter:class-skills'],
           warnings: ['Unarmored Defense is not modeled in AC yet.'],
         }}

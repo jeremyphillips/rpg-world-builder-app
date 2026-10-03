@@ -1,7 +1,16 @@
+import { cva } from 'class-variance-authority'
+
 export const equipmentInventorySummaryClasses = 'space-y-6'
 
-export const equipmentInventorySummaryGridClasses =
-  'grid grid-cols-1 gap-6 xl:grid-cols-2 xl:items-start'
+export const equipmentInventorySummaryGridVariants = cva('grid grid-cols-1 gap-6', {
+  variants: {
+    layout: {
+      split: 'xl:grid-cols-2 xl:items-start',
+      pending: '',
+    },
+  },
+  defaultVariants: { layout: 'split' },
+})
 
 export const equipmentInventoryColumnClasses = 'flex min-w-0 flex-col space-y-3'
 

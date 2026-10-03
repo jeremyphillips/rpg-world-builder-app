@@ -10,7 +10,7 @@ import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/ru
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
-import { readSelectedStartingEquipmentOptionId } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
+import { resolveStartingEquipmentResolution } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import { toCharacterDerivationInput } from './preview-adapter'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
@@ -30,6 +30,8 @@ export type {
 export type CharacterBuildPreview = CharacterDerivedProfile & {
   proficiencies: CharacterProficiencies
   equipmentSummary: string[]
+  /** Purchases were retained but no starting equipment option is selected yet. */
+  startingEquipmentPending: boolean
   unresolvedChoiceSetIds: string[]
   warnings: string[]
 }
@@ -37,7 +39,6 @@ export type CharacterBuildPreview = CharacterDerivedProfile & {
 function resolveBuilderEquipmentSummary(
   draft: CharacterBuilderDraft,
   choiceSets: readonly ChoiceSet[],
-  catalogIndex: CharacterBuildCatalogIndex,
 ): string[] {
   const labels: string[] = []
 
@@ -49,14 +50,6 @@ function resolveBuilderEquipmentSummary(
       const option = choiceSet.options.find((entry) => entry.id === selectedId)
       if (option) labels.push(option.label)
     }
-  }
-
-  const classId = draft.class.classId
-  if (classId && readSelectedStartingEquipmentOptionId(draft, classId)) return labels
-
-  for (const purchase of draft.equipment?.purchases ?? []) {
-    const name = catalogIndex.equipment.get(purchase.equipmentId)?.name
-    if (name) labels.push(name)
   }
 
   return labels
@@ -143,7 +136,9 @@ export function buildCharacterPreview(
   return {
     ...derived,
     proficiencies: derivationInput.proficiencies,
-    equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets, catalogIndex),
+    equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets),
+    startingEquipmentPending:
+      resolveStartingEquipmentResolution(draft, catalogIndex) === 'unresolvedWithPurchases',
     unresolvedChoiceSetIds: resolveBuilderUnresolvedChoiceSetIds(draft, choiceSets),
     warnings: resolveBuilderAdvisoryWarnings(draft, catalogIndex, rules, rulesetId),
   }

@@ -30,7 +30,7 @@ const meta = {
   parameters: { layout: 'padded' },
   args: {
     showPurchaseWorkflow: true,
-    budget: equipmentPickerBudgetFixture,
+    fundingState: { kind: 'funded', budget: equipmentPickerBudgetFixture },
     onOpenPurchasePicker: () => undefined,
     showMagicItemGrants: true,
     magicItemProgress,
@@ -53,6 +53,15 @@ export const PurchaseOnly: Story = {
 export const MagicItemsOnly: Story = {
   args: {
     showPurchaseWorkflow: false,
-    budget: undefined,
+    fundingState: { kind: 'none' },
+  },
+}
+
+export const UnresolvedFunding: Story = {
+  args: {
+    showPurchaseWorkflow: false,
+    fundingState: { kind: 'unresolved', pendingCostCp: 5150 },
+    showMagicItemGrants: false,
+    magicItemProgress: [],
   },
 }

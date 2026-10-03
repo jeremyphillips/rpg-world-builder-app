@@ -6,6 +6,7 @@ import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { validateChoiceSets } from '../../validate/validate-choice-sets'
 import {
   resolveStartingEquipmentChoiceSets,
+  resolveStartingEquipmentResolution,
   startingEquipmentChoiceSetId,
 } from './resolve-starting-equipment-choice-sets'
 
@@ -133,5 +134,68 @@ describe('resolveStartingEquipmentChoiceSets', () => {
     )
 
     expect(choiceSets).toHaveLength(1)
+  })
+})
+
+describe('resolveStartingEquipmentResolution', () => {
+  const catalogIndex = indexCharacterBuildCatalog({
+    species: [],
+    classes: [storedClass],
+    spells: [],
+    equipment: [],
+    skillProficiencies: [],
+    organizations: [],
+    languages: [],
+  })
+  const classDraft = {
+    ...createEmptyCharacterBuilderDraft(),
+    class: { classId: storedClass.id, level: 1 as const },
+  }
+  const ropePurchase = {
+    equipmentId: `${RULESET}:rope`,
+    quantity: 1,
+    sourceMode: 'startingGold' as const,
+    origin: 'picker' as const,
+  }
+
+  it('is notApplicable without a class or without starting options', () => {
+    expect(
+      resolveStartingEquipmentResolution(createEmptyCharacterBuilderDraft(), catalogIndex),
+    ).toBe('notApplicable')
+    expect(
+      resolveStartingEquipmentResolution(
+        { ...classDraft, class: { classId: `${RULESET}:unknown`, level: 1 } },
+        catalogIndex,
+      ),
+    ).toBe('notApplicable')
+  })
+
+  it('is unresolvedEmpty when no option is selected and no purchases exist', () => {
+    expect(resolveStartingEquipmentResolution(classDraft, catalogIndex)).toBe('unresolvedEmpty')
+  })
+
+  it('is unresolvedWithPurchases when no option is selected but purchases are retained', () => {
+    const draft = {
+      ...classDraft,
+      equipment: {
+        mode: 'package' as const,
+        purchases: [ropePurchase],
+        editedSincePackageSelection: false,
+      },
+    }
+    expect(resolveStartingEquipmentResolution(draft, catalogIndex)).toBe('unresolvedWithPurchases')
+  })
+
+  it('is selected when an option is selected', () => {
+    const draft = {
+      ...classDraft,
+      choiceSelections: { [startingEquipmentChoiceSetId(storedClass.id)]: ['starting-gold'] },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [ropePurchase],
+        editedSincePackageSelection: false,
+      },
+    }
+    expect(resolveStartingEquipmentResolution(draft, catalogIndex)).toBe('selected')
   })
 })

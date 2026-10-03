@@ -86,15 +86,11 @@ export type CharacterBuilderDraftEquipmentPurchaseOrigin = z.infer<
   typeof characterBuilderDraftEquipmentPurchaseOriginSchema
 >
 
-export const characterBuilderDraftEquipmentPurchaseSchema = z.object({
+const characterBuilderDraftEquipmentPurchaseBaseSchema = z.object({
   /** Stable row identity for targeting and React keys; assigned on create or hydration. */
   id: z.string().min(1).optional(),
   equipmentId: z.string().min(1),
   quantity: z.number().int().min(1),
-  /** Stamped when the purchase is added; never reinterpreted from mode or catalog. */
-  sourceMode: characterBuilderDraftEquipmentPurchaseSourceModeSchema,
-  /** Provenance for display and quantity policy — not a parallel editability engine. */
-  origin: characterBuilderDraftEquipmentPurchaseOriginSchema.optional(),
   equipped: z.boolean().optional(),
   /** Deep-copied equipment configuration; uses canonical content modifier shape. */
   modifiers: z.array(equipmentModifierSchema).optional(),
@@ -102,17 +98,36 @@ export const characterBuilderDraftEquipmentPurchaseSchema = z.object({
   unitCostCp: z.number().int().min(0).optional(),
 })
 
-/** Parsed persisted purchase row — `id` and `origin` optional until hydration normalization. */
+const startingGoldEquipmentPurchaseSchema = characterBuilderDraftEquipmentPurchaseBaseSchema.extend(
+  {
+    /** Stamped when the purchase is added; never reinterpreted from mode or catalog. */
+    sourceMode: z.literal('startingGold'),
+    /** Provenance: user picker intent vs. a converted class package. Required. */
+    origin: characterBuilderDraftEquipmentPurchaseOriginSchema,
+  },
+)
+
+const manualEquipmentPurchaseSchema = characterBuilderDraftEquipmentPurchaseBaseSchema.extend({
+  sourceMode: z.literal('manual'),
+})
+
+export const characterBuilderDraftEquipmentPurchaseSchema = z.discriminatedUnion('sourceMode', [
+  startingGoldEquipmentPurchaseSchema,
+  manualEquipmentPurchaseSchema,
+])
+
+export type StartingGoldEquipmentPurchase = z.infer<typeof startingGoldEquipmentPurchaseSchema>
+
+export type ManualEquipmentPurchase = z.infer<typeof manualEquipmentPurchaseSchema>
+
+/** Parsed persisted purchase row — `id` optional until hydration normalization. */
 export type PersistedCharacterBuilderDraftEquipmentPurchase = z.infer<
   typeof characterBuilderDraftEquipmentPurchaseSchema
 >
 
 /** Runtime purchase row after identity normalization — required by mutation and VM APIs. */
 export type NormalizedCharacterBuilderDraftEquipmentPurchase =
-  PersistedCharacterBuilderDraftEquipmentPurchase & {
-    id: string
-    origin: CharacterBuilderDraftEquipmentPurchaseOrigin
-  }
+  PersistedCharacterBuilderDraftEquipmentPurchase & { id: string }
 
 export type CharacterBuilderDraftEquipmentPurchase = PersistedCharacterBuilderDraftEquipmentPurchase
 
@@ -198,7 +213,7 @@ export function createEmptyCharacterBuilderDraft(): CharacterBuilderDraft {
 // rehydration drops mismatched or unparseable state instead of migrating.
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_BUILDER_DRAFT_VERSION = 8
+export const CHARACTER_BUILDER_DRAFT_VERSION = 9
 
 export const persistedCharacterBuilderStateSchema = z.object({
   version: z.literal(CHARACTER_BUILDER_DRAFT_VERSION),

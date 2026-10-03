@@ -278,7 +278,12 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(result.applied).toBe(true)
     expect(result.draft.equipment?.mode).toBe('package')
     expect(result.draft.equipment?.purchases).toEqual([
-      expect.objectContaining({ equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold' }),
+      expect.objectContaining({
+        equipmentId: rope.id,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      }),
     ])
 
     const equipment = deriveEquipmentDraftEntries(result.draft, catalogIndex)

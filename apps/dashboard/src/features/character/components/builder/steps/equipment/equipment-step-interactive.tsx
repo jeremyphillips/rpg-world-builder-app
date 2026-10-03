@@ -120,9 +120,9 @@ export function EquipmentStepInteractive({
   })
 
   const showAcquisitionGuidance =
-    selectedOptionId !== undefined &&
     !showFallback &&
-    (step.showPurchaseWorkflow || step.showMagicItemGrants)
+    (step.fundingState.kind === 'unresolved' ||
+      (selectedOptionId !== undefined && (step.showPurchaseWorkflow || step.showMagicItemGrants)))
 
   const inventoryEmptyMessage = resolveEquipmentInventoryEmptyMessage({
     classOptionsReplaced: step.classOptionsReplaced,
@@ -144,7 +144,7 @@ export function EquipmentStepInteractive({
         {showAcquisitionGuidance ? (
           <EquipmentAcquisitionGuidance
             showPurchaseWorkflow={step.showPurchaseWorkflow}
-            budget={budget}
+            fundingState={step.fundingState}
             onOpenPurchasePicker={() => step.openPicker('purchase')}
             showMagicItemGrants={step.showMagicItemGrants}
             magicItemProgress={step.acquisition.progress}
@@ -234,6 +234,7 @@ export function EquipmentStepInteractive({
           commitErrorReason={pendingPackageSwitch.commitErrorReason}
           staleNotice={pendingPackageSwitch.staleNotice}
           isCommitting={isPackageSwitchCommitting}
+          isInitialSelection={pendingPackageSwitch.isInitialSelection}
           onOpenChange={(open) => {
             if (!open) dismissPackageSwitch()
           }}

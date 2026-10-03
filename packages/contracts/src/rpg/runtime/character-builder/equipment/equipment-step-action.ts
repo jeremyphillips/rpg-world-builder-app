@@ -27,7 +27,6 @@ export type EquipmentStepAction =
   | {
       kind: 'add_purchase'
       equipmentId: string
-      sourceMode: NonNullable<CharacterBuilderDraft['equipment']>['purchases'][number]['sourceMode']
       quantity?: number
     }
   | { kind: 'remove_entry'; target: EquipmentStepRemoveTarget }

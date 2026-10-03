@@ -29,6 +29,13 @@ export const PACKAGE_SWITCH_STALE_INVENTORY_MESSAGE =
 
 export const PACKAGE_SWITCH_CONFIRM_LABEL = 'Switch package'
 
+export const PACKAGE_SELECTION_RESOLUTION_TITLE = 'Resolve purchases for this option'
+
+export const PACKAGE_SELECTION_CONFIRM_LABEL = 'Choose option'
+
+export const PACKAGE_SELECTION_SAFETY_NOTE =
+  'Changes are only applied when you select "Choose option."'
+
 export const PACKAGE_SWITCH_CANCEL_LABEL = 'Cancel'
 
 export function formatPackageSwitchWealth(costCp: number): string {
@@ -288,8 +295,10 @@ export function resolvePackageSwitchModalState(args: {
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
   isCommitting?: boolean
+  /** No starting option was selected before this request (e.g. after a class change). */
+  isInitialSelection?: boolean
 }) {
-  const { evaluation } = args
+  const { evaluation, isInitialSelection = false } = args
   const isBlocked = evaluation.status === 'blocked'
   const confirmDisabled = !evaluation.budget.isDraftValid || Boolean(args.isCommitting)
 
@@ -300,7 +309,15 @@ export function resolvePackageSwitchModalState(args: {
       evaluation.targetOptionLabel,
     ),
     staleMessage: resolvePackageSwitchStaleMessage(args.staleNotice, args.commitErrorReason),
-    title: isBlocked ? PACKAGE_SWITCH_BLOCKED_TITLE : PACKAGE_SWITCH_RESOLUTION_TITLE,
+    title: isBlocked
+      ? PACKAGE_SWITCH_BLOCKED_TITLE
+      : isInitialSelection
+        ? PACKAGE_SELECTION_RESOLUTION_TITLE
+        : PACKAGE_SWITCH_RESOLUTION_TITLE,
+    confirmLabel: isInitialSelection
+      ? PACKAGE_SELECTION_CONFIRM_LABEL
+      : PACKAGE_SWITCH_CONFIRM_LABEL,
+    safetyNote: isInitialSelection ? PACKAGE_SELECTION_SAFETY_NOTE : PACKAGE_SWITCH_SAFETY_NOTE,
     description: resolvePackageSwitchModalDescription(evaluation, isBlocked),
     confirmDisabled,
     helperMessage: resolvePackageSwitchHelperMessage(evaluation, confirmDisabled, isBlocked),

@@ -33,7 +33,7 @@ function monkStandardDraft(extra?: {
     equipmentId: string
     quantity: number
     sourceMode: 'startingGold'
-    origin?: 'picker'
+    origin: 'picker'
   }>
   magicItemSelections?: Array<{
     allowanceId: string
@@ -111,6 +111,29 @@ export const StandardPackageWithPurchases: Story = {
         },
       ],
     }),
+    catalogIndex: cartCatalogIndex,
+  },
+}
+
+export const PendingRetainedPurchases: Story = {
+  args: {
+    draft: {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        classPackage: { state: 'unresolved' as const },
+        editedSincePackageSelection: false,
+      },
+    },
     catalogIndex: cartCatalogIndex,
   },
 }

@@ -20,10 +20,13 @@ import {
 import { EquipmentAddedInventoryColumn } from '../added/equipment-added-inventory-column'
 import { EquipmentInventoryColumn } from '../column/equipment-inventory-column'
 import { EquipmentStartingPackageSection } from '../../starting-package/equipment-starting-package-section'
-import { buildEquipmentInventoryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import {
+  buildEquipmentInventoryViewModel,
+  type EquipmentInventoryStartingChannel,
+} from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import {
   equipmentGoldOptionPanelClasses,
-  equipmentInventorySummaryGridClasses,
+  equipmentInventorySummaryGridVariants,
 } from '../equipment-inventory.variants'
 
 export type EquipmentInventorySummaryProps = {
@@ -53,7 +56,7 @@ export type EquipmentInventorySummaryProps = {
 }
 
 function EquipmentInventoryStartingSection({
-  viewModel,
+  startingEquipment,
   draft,
   catalogIndex,
   goldOptionFunding,
@@ -66,7 +69,7 @@ function EquipmentInventoryStartingSection({
   onCancelConversion,
   onCommitConversion,
 }: {
-  viewModel: NonNullable<ReturnType<typeof buildEquipmentInventoryViewModel>>
+  startingEquipment: EquipmentInventoryStartingChannel
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   goldOptionFunding?: ResolvedStartingEquipmentFunding
@@ -79,10 +82,10 @@ function EquipmentInventoryStartingSection({
   onCancelConversion?: () => void
   onCommitConversion?: (preview: StartingPackageConversionPreview) => void
 }) {
-  if (viewModel.startingEquipment.kind === 'package') {
+  if (startingEquipment.kind === 'package') {
     return (
       <EquipmentStartingPackageSection
-        packageGroup={viewModel.startingEquipment.group}
+        packageGroup={startingEquipment.group}
         draft={draft}
         catalogIndex={catalogIndex}
         goldOptionFunding={goldOptionFunding}
@@ -102,10 +105,10 @@ function EquipmentInventoryStartingSection({
     <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
       <div className={equipmentGoldOptionPanelClasses}>
         <Heading variant="group" as="h4">
-          {viewModel.startingEquipment.message}
+          {startingEquipment.message}
         </Heading>
         <Text as="p" className="text-sm text-muted-foreground">
-          {viewModel.startingEquipment.description}
+          {startingEquipment.description}
         </Text>
       </div>
     </EquipmentInventoryColumn>
@@ -144,21 +147,23 @@ export function EquipmentInventorySummary({
   }
 
   return (
-    <div className={equipmentInventorySummaryGridClasses}>
-      <EquipmentInventoryStartingSection
-        viewModel={viewModel}
-        draft={draft}
-        catalogIndex={catalogIndex}
-        goldOptionFunding={goldOptionFunding}
-        conversionEditorOpen={conversionEditorOpen}
-        selectedPackageItemKeys={selectedPackageItemKeys}
-        conversionCommitStatusMessage={conversionCommitStatusMessage}
-        onCustomizePackage={onCustomizePackage}
-        onChangeEquipmentOption={onChangeEquipmentOption}
-        onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
-        onCancelConversion={onCancelConversion}
-        onCommitConversion={onCommitConversion}
-      />
+    <div className={equipmentInventorySummaryGridVariants({ layout: viewModel.layout })}>
+      {viewModel.layout === 'split' ? (
+        <EquipmentInventoryStartingSection
+          startingEquipment={viewModel.startingEquipment}
+          draft={draft}
+          catalogIndex={catalogIndex}
+          goldOptionFunding={goldOptionFunding}
+          conversionEditorOpen={conversionEditorOpen}
+          selectedPackageItemKeys={selectedPackageItemKeys}
+          conversionCommitStatusMessage={conversionCommitStatusMessage}
+          onCustomizePackage={onCustomizePackage}
+          onChangeEquipmentOption={onChangeEquipmentOption}
+          onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
+          onCancelConversion={onCancelConversion}
+          onCommitConversion={onCommitConversion}
+        />
+      ) : null}
 
       <EquipmentAddedInventoryColumn
         addedEquipment={viewModel.addedEquipment}
@@ -166,7 +171,9 @@ export function EquipmentInventorySummary({
         context={context}
         catalogIndex={catalogIndex}
         budget={budget}
-        reserveToolbarRow={viewModel.startingEquipment.kind === 'package'}
+        reserveToolbarRow={
+          viewModel.layout === 'split' && viewModel.startingEquipment.kind === 'package'
+        }
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
         onReleaseGrant={onReleaseGrant ?? (() => undefined)}

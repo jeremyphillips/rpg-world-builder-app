@@ -70,12 +70,13 @@ function legacyIdForRow(
 }
 
 describe('normalizeEquipmentPurchase', () => {
-  it('assigns deterministic legacy ids and origin without changing normalized rows', () => {
+  it('assigns deterministic legacy ids without changing normalized rows', () => {
     const purchases = [
       {
         equipmentId: `${RULESET}:rope`,
         quantity: 2,
         sourceMode: 'startingGold' as const,
+        origin: 'picker' as const,
       },
     ]
 
@@ -85,9 +86,19 @@ describe('normalizeEquipmentPurchase', () => {
     expect(first).toEqual({
       ...purchases[0],
       id: legacyIdForRow(purchases, 0),
-      origin: 'picker',
     })
     expect(second).toBe(first)
+  })
+
+  it('never invents origin on manual rows', () => {
+    const purchases = [
+      { equipmentId: `${RULESET}:rope`, quantity: 1, sourceMode: 'manual' as const },
+    ]
+
+    const normalized = normalizeEquipmentPurchase(purchases, 0)
+
+    expect(normalized).toEqual({ ...purchases[0], id: legacyIdForRow(purchases, 0) })
+    expect('origin' in normalized).toBe(false)
   })
 
   it('distinguishes duplicate legacy rows by occurrence index', () => {
@@ -96,11 +107,13 @@ describe('normalizeEquipmentPurchase', () => {
         equipmentId: `${RULESET}:rope`,
         quantity: 1,
         sourceMode: 'startingGold' as const,
+        origin: 'picker' as const,
       },
       {
         equipmentId: `${RULESET}:rope`,
         quantity: 2,
         sourceMode: 'startingGold' as const,
+        origin: 'picker' as const,
       },
     ]
 

@@ -198,7 +198,12 @@ describe('ClassStep', () => {
         mode: 'gold' as const,
         purchases: [
           { equipmentId: rope.id, quantity: 1, sourceMode: 'manual' as const },
-          { equipmentId: 'srd-cc-5.2.1:sword', quantity: 1, sourceMode: 'startingGold' as const },
+          {
+            equipmentId: 'srd-cc-5.2.1:sword',
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
         ],
         editedSincePackageSelection: true,
       },
@@ -275,6 +280,51 @@ describe('ClassStep', () => {
         ],
       }),
     })
+  })
+
+  it('does not copy the selected starting package into purchases on class change', async () => {
+    const user = userEvent.setup()
+    const onDraftChange = vi.fn()
+    const wizard = pickClass('wizard')
+    const context = createStandaloneBuilderContextFixture({
+      catalog: { ...createContext().catalog, classes: [fighter, wizard] },
+    })
+    const packageOption = fighter.characterCreation?.startingEquipment?.options.find(
+      (option) => option.items.length > 0,
+    )
+    expect(packageOption).toBeDefined()
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: fighter.id, level: 1 as const },
+      choiceSelections: {
+        [`class:${fighter.id}:starting-equipment`]: [packageOption!.id],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    render(
+      <ClassStep
+        context={context}
+        draft={draft}
+        validationIssues={[]}
+        onDraftChange={onDraftChange}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Wizard/i }))
+    expect(onDraftChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        class: { classId: wizard.id, level: 1 },
+        equipment: expect.objectContaining({
+          purchases: [],
+          classPackage: { state: 'unresolved' },
+        }),
+      }),
+    )
   })
 
   itAxe('has no axe accessibility violations', async () => {

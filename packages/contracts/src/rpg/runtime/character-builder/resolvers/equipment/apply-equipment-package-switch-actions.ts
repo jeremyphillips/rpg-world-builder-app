@@ -1,7 +1,6 @@
 import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
 import {
   isStartingGoldOption,
-  resolveEquipmentModeFromOption,
   type StartingEquipmentOption,
 } from '../../../../content/starting-equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
@@ -13,6 +12,7 @@ import type {
 } from '../../equipment/equipment-step-action'
 import {
   buildEquipmentPackageSwitchPatch,
+  buildPackageSwitchSelectionPatch,
   evaluateEquipmentPackageSwitch,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchInventorySnapshot,
@@ -158,24 +158,16 @@ function applySelectPackageAction(
     return { status: 'needs_resolution', resolution: evaluation }
   }
 
-  const mode = resolveEquipmentModeFromOption(optionResult.option)
-
   return {
     status: 'applied',
-    patch: {
-      choiceSelections: {
-        ...args.draft.choiceSelections,
-        ...args.nestedSelections,
-        [args.choiceSetId]: [args.optionId],
-      },
-      equipment: {
-        mode,
-        purchases: args.draft.equipment?.purchases ?? [],
-        magicItemSelections: args.draft.equipment?.magicItemSelections ?? [],
-        editedSincePackageSelection: args.draft.equipment?.editedSincePackageSelection ?? false,
-        skipped: false,
-      },
-    },
+    patch: buildPackageSwitchSelectionPatch({
+      draft: args.draft,
+      targetOption: optionResult.option,
+      targetOptionShape: optionResult.option,
+      choiceSetId: args.choiceSetId,
+      nestedSelections: args.nestedSelections,
+      purchases: args.draft.equipment?.purchases ?? [],
+    }),
   }
 }
 

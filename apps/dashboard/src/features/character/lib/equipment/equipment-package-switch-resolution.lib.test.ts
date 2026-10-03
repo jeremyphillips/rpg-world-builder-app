@@ -17,6 +17,7 @@ import {
   mapBlockingReasonToMessage,
   packageSwitchDraftHasEdits,
   resolvePackageSwitchDescription,
+  resolvePackageSwitchModalState,
 } from './equipment-package-switch-resolution.lib'
 
 const rope = pickEquipment('rope')
@@ -93,6 +94,24 @@ describe('equipment-package-switch-resolution.lib', () => {
     expect(display.row.stagedRemoval).toBe(true)
     expect(display.row.sourceLabel).toBe(PACKAGE_SWITCH_STAGED_REMOVAL_LABEL)
     expect(display.row.maxQuantity).toBe(62)
+  })
+
+  it('uses selection copy when no option was selected before the request', () => {
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft: goldDraft,
+      catalogIndex,
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor('standard-equipment'),
+    })!
+
+    expect(resolvePackageSwitchModalState({ evaluation, isInitialSelection: true })).toMatchObject({
+      title: 'Resolve purchases for this option',
+      confirmLabel: 'Choose option',
+    })
+    expect(resolvePackageSwitchModalState({ evaluation })).toMatchObject({
+      title: 'Resolve purchases before switching',
+      confirmLabel: 'Switch package',
+    })
   })
 
   it('detects draft edits against committed quantities', () => {

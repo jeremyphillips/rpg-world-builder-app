@@ -312,7 +312,9 @@ describe('buildStartingPackageConversionPreview', () => {
     const draft = monkStandardDraft({
       equipment: {
         mode: 'package',
-        purchases: [{ equipmentId: torch.id, quantity: 2, sourceMode: 'startingGold' }],
+        purchases: [
+          { equipmentId: torch.id, quantity: 2, sourceMode: 'startingGold', origin: 'picker' },
+        ],
         editedSincePackageSelection: false,
       },
     })
@@ -665,9 +667,10 @@ describe('buildStartingPackageConversionPatch', () => {
     })
 
     expect(patch?.equipment?.purchases).toHaveLength(2)
-    expect(patch?.equipment?.purchases?.map((purchase) => purchase.origin).sort()).toEqual([
-      'packageConversion',
-      'picker',
-    ])
+    expect(
+      patch?.equipment?.purchases
+        ?.map((purchase) => (purchase.sourceMode === 'startingGold' ? purchase.origin : undefined))
+        .sort(),
+    ).toEqual(['packageConversion', 'picker'])
   })
 })

@@ -27,7 +27,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={onOpenPurchasePicker}
         showMagicItemGrants
         magicItemProgress={magicItemProgress}
@@ -53,6 +53,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow={false}
+        fundingState={{ kind: 'none' }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants
         magicItemProgress={magicItemProgress}
@@ -68,7 +69,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants={false}
         magicItemProgress={[]}
@@ -80,11 +81,32 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.queryByRole('heading', { name: 'Magic item choices' })).not.toBeInTheDocument()
   })
 
+  it('renders the unresolved funding card without remaining copy or Browse', () => {
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow={false}
+        fundingState={{ kind: 'unresolved', pendingCostCp: 50 }}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants={false}
+        magicItemProgress={[]}
+        onOpenMagicItemsPicker={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose a starting equipment option to determine your available funds.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('5 SP selected')).toBeInTheDocument()
+    expect(screen.queryByText(/remaining/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants
         magicItemProgress={magicItemProgress}

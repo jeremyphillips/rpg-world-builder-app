@@ -31,6 +31,7 @@ export type EquipmentPackageSwitchResolutionModalProps = {
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
   isCommitting?: boolean
+  isInitialSelection?: boolean
   onOpenChange: (open: boolean) => void
   onDraftQuantityChange: (purchaseId: string, quantity: number) => void
   onConfirm: () => void
@@ -44,6 +45,7 @@ export function EquipmentPackageSwitchResolutionModal({
   commitErrorReason,
   staleNotice = false,
   isCommitting = false,
+  isInitialSelection = false,
   onOpenChange,
   onDraftQuantityChange,
   onConfirm,
@@ -68,6 +70,7 @@ export function EquipmentPackageSwitchResolutionModal({
     commitErrorReason,
     staleNotice,
     isCommitting,
+    isInitialSelection,
   })
 
   const handleSetPurchaseQuantity = (
@@ -103,6 +106,7 @@ export function EquipmentPackageSwitchResolutionModal({
             draftQuantitiesByPurchaseId={draftQuantitiesByPurchaseId}
             purchasedGroups={purchasedGroups}
             isBlocked={modalState.isBlocked}
+            safetyNote={modalState.safetyNote}
             staleMessage={modalState.staleMessage}
             inlineError={modalState.inlineError}
             onSetPurchaseQuantity={handleSetPurchaseQuantity}
@@ -113,6 +117,7 @@ export function EquipmentPackageSwitchResolutionModal({
           <Modal.FooterActions>
             <EquipmentPackageSwitchResolutionModalFooter
               isBlocked={modalState.isBlocked}
+              confirmLabel={modalState.confirmLabel}
               confirmDisabled={modalState.confirmDisabled}
               isCommitting={isCommitting}
               helperMessage={modalState.helperMessage}

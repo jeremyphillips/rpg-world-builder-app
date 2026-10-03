@@ -169,7 +169,7 @@ describe('buildCharacterPreview', () => {
     expect(preview.warnings.some((warning) => warning.includes('Unarmored Defense'))).toBe(true)
   })
 
-  it('lists pending cart purchases while starting equipment is unresolved', () => {
+  it('marks retained purchases as pending without listing them while starting equipment is unresolved', () => {
     const rope = equipmentSchema.parse({
       rulesetId: RULESET_ID,
       source: 'system',
@@ -204,11 +204,35 @@ describe('buildCharacterPreview', () => {
           editedSincePackageSelection: false,
         },
       },
-      indexCharacterBuildCatalog({ ...builderTestCatalog, equipment: [rope] }),
+      indexCharacterBuildCatalog({
+        ...builderTestCatalog,
+        classes: builderTestCatalog.classes.map((characterClass) =>
+          characterClass.id === 'srd-cc-5.2.1:fighter'
+            ? {
+                ...characterClass,
+                characterCreation: {
+                  startingEquipment: {
+                    choose: 1,
+                    options: [
+                      {
+                        id: 'starting-gold',
+                        label: 'Starting Gold',
+                        items: [],
+                        wealth: { gp: 50 },
+                      },
+                    ],
+                  },
+                },
+              }
+            : characterClass,
+        ),
+        equipment: [rope],
+      }),
       builderTestRules,
       RULESET_ID,
     )
 
-    expect(preview.equipmentSummary).toEqual(['Rope'])
+    expect(preview.equipmentSummary).toEqual([])
+    expect(preview.startingEquipmentPending).toBe(true)
   })
 })

@@ -343,4 +343,108 @@ describe('applyEquipmentStepAction', () => {
       issues: [{ code: 'package_switch_stale_inventory' }],
     })
   })
+
+  describe('with retained purchases and no starting option selected', () => {
+    function unresolvedDraftWithRope(quantity: number) {
+      const draft = goldDraftWithRope(quantity)
+      return {
+        ...draft,
+        choiceSelections: {},
+        equipment: {
+          ...draft.equipment,
+          mode: 'package' as const,
+          classPackage: { state: 'unresolved' as const },
+          magicItemSelections: [],
+        },
+      }
+    }
+
+    it('applies Starting Gold without changing purchases', () => {
+      const catalogIndex = packageSwitchCatalogIndex()
+      const draft = unresolvedDraftWithRope(2)
+      const choiceSetId = startingEquipmentChoiceSetId(storedDruid.id)
+
+      const result = applyEquipmentStepAction({
+        draft,
+        catalogIndex,
+        action: {
+          kind: 'select_package',
+          optionId: 'starting-gold',
+          choiceSetId,
+          nestedSelections: {},
+        },
+      })
+
+      expect(result.status).toBe('applied')
+      if (result.status !== 'applied') return
+      expect(result.patch.choiceSelections?.[choiceSetId]).toEqual(['starting-gold'])
+      expect(result.patch.equipment?.purchases).toEqual(draft.equipment.purchases)
+      expect(result.patch.equipment?.magicItemSelections).toEqual([])
+    })
+
+    it('needs resolution with editable rows when the package allowance is too small', () => {
+      const catalogIndex = packageSwitchCatalogIndex()
+      const draft = unresolvedDraftWithRope(12)
+
+      const result = applyEquipmentStepAction({
+        draft,
+        catalogIndex,
+        action: {
+          kind: 'select_package',
+          optionId: 'standard-equipment',
+          choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
+          nestedSelections: {},
+        },
+      })
+
+      expect(result.status).toBe('needs_resolution')
+      if (result.status !== 'needs_resolution') return
+      expect(result.resolution.status).toBe('resolvable')
+      expect(result.resolution.editableItems).toEqual([
+        expect.objectContaining({ purchaseId: 'purchase-rope', committedQuantity: 12 }),
+      ])
+    })
+
+    it('rejects a quantity increase and allows a decrease', () => {
+      const catalogIndex = packageSwitchCatalogIndex()
+      const draft = unresolvedDraftWithRope(3)
+
+      const increase = applyEquipmentStepAction({
+        draft,
+        catalogIndex,
+        action: { kind: 'set_purchase_quantity', purchaseId: 'purchase-rope', quantity: 4 },
+      })
+      expect(increase.status).toBe('invalid')
+
+      const decrease = applyEquipmentStepAction({
+        draft,
+        catalogIndex,
+        action: { kind: 'set_purchase_quantity', purchaseId: 'purchase-rope', quantity: 2 },
+      })
+      expect(decrease.status).toBe('applied')
+      if (decrease.status !== 'applied') return
+      expect(decrease.patch.equipment?.purchases[0]?.quantity).toBe(2)
+    })
+  })
+
+  it('keeps magic item selections in the noConflict select_package patch', () => {
+    const catalogIndex = packageSwitchCatalogIndex()
+    const draft = goldDraftWithRope(1)
+    const magicItemSelections = [{ allowanceId: 'allowance-1', equipmentId: rope.id, quantity: 1 }]
+
+    const result = applyEquipmentStepAction({
+      draft: { ...draft, equipment: { ...draft.equipment, magicItemSelections } },
+      catalogIndex,
+      action: {
+        kind: 'select_package',
+        optionId: 'standard-equipment',
+        choiceSetId: startingEquipmentChoiceSetId(storedDruid.id),
+        nestedSelections: {},
+      },
+    })
+
+    expect(result.status).toBe('applied')
+    if (result.status !== 'applied') return
+    expect(result.patch.equipment?.magicItemSelections).toEqual(magicItemSelections)
+  })
 })
