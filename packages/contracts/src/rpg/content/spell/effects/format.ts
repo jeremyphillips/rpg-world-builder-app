@@ -32,11 +32,11 @@ function formatDamageRoll(roll: RollValue, damageTypeId: string, lowercaseType =
 }
 
 function hitPointsLabel(register: EffectSentenceRegister, plural: boolean): string {
-  const phrase = vocabularyTermLabel(HIT_POINTS_TERM, {
-    number: plural ? 'plural' : 'singular',
-    casing: 'sentence',
-  })
-  return register === 'resolution-preview' ? phrase.toLowerCase() : phrase
+  const number = plural ? 'plural' : 'singular'
+  if (register === 'resolution-preview') {
+    return vocabularyTermLabel(HIT_POINTS_TERM, { number, casing: 'sentence' }).toLowerCase()
+  }
+  return vocabularyTermLabel(HIT_POINTS_TERM, { number, casing: 'title' })
 }
 
 function previewSubject(recipient: EffectRecipient): string {

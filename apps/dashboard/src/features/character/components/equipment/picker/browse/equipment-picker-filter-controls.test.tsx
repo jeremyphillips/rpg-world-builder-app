@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_CATEGORY_LABEL,
+  type EquipmentPickerItem,
+} from '../drawer/equipment-picker-drawer.types'
 import {
   EquipmentPickerFilterRowControls,
   EquipmentPickerPrimaryFilterControls,
@@ -73,7 +76,7 @@ describe('EquipmentPickerFilterControls', () => {
       />,
     )
 
-    expect(screen.getByText('Category')).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_CATEGORY_LABEL)).toBeInTheDocument()
     expect(screen.queryByText('Rarity')).not.toBeInTheDocument()
   })
 })

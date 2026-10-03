@@ -222,7 +222,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
 
     expect(
@@ -261,7 +261,7 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    const weaponChip = screen.getByRole('radio', { name: 'Weapon' })
+    const weaponChip = screen.getByRole('radio', { name: 'Weapons' })
     await user.click(weaponChip)
     expect(weaponChip).toHaveAttribute('aria-checked', 'true')
 
@@ -284,7 +284,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
