@@ -26,6 +26,8 @@ export interface ConfirmDialogProps {
   headlineClassName?: string
   /** Optional supporting copy — maps to `AlertDialog.Description`. */
   description?: React.ReactNode
+  /** Optional body rendered after the description (lists, block content). */
+  children?: React.ReactNode
   /** Confirm button label. */
   confirmLabel?: string
   /** Cancel button label. */
@@ -52,6 +54,7 @@ export function ConfirmDialog({
   onOpenChange,
   headline,
   description,
+  children,
   headlineClassName,
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
@@ -86,6 +89,7 @@ export function ConfirmDialog({
               </AlertDialogPrimitive.Description>
             ) : null}
           </div>
+          {children}
           <div className={dialogPanelActionRowClasses}>
             <AlertDialogPrimitive.Cancel asChild>
               <Button variant="outline" onClick={onCancel}>

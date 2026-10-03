@@ -46,6 +46,12 @@ import {
   formatManualEquipmentQuantityLabel,
 } from '../../lib/quick-npc/quick-npc-equipment-presentation.lib'
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
+import { useQuickNpcPreparedBuildValue } from '../../hooks/use-quick-npc-prepared-build'
+import {
+  buildAdvisoryStatusItems,
+  indexBuildAdvisoriesByEquipmentId,
+  lookupBuildAdvisoriesForEquipment,
+} from '../../../lib/build-advisories/build-advisory-presentation.lib'
 import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
 
 import {
@@ -622,11 +628,18 @@ function toAdditionalEquipmentComboboxOptions(
 
 function AdditionalEquipmentSelectedList({
   rows,
+  rulesetId,
   onRemove,
 }: {
   rows: ReturnType<typeof listSelectedQuickNpcAdditionalEquipment>
+  rulesetId: string
   onRemove: (equipmentId: string) => void
 }) {
+  const prepared = useQuickNpcPreparedBuildValue()
+  const advisoryIndex = React.useMemo(
+    () => indexBuildAdvisoriesByEquipmentId(prepared?.advisories ?? []),
+    [prepared],
+  )
   if (rows.length === 0) return null
   return (
     <ul className={quickNpcStartingChoiceSelectedListClasses}>
@@ -641,11 +654,15 @@ function AdditionalEquipmentSelectedList({
               </span>
             </span>
           ) : undefined
+        const status = buildAdvisoryStatusItems(
+          lookupBuildAdvisoriesForEquipment(advisoryIndex, equipmentId, rulesetId),
+        )
         return (
           <li key={equipmentId}>
             <QuickNpcStartingChoiceSelectedRow
               label={entry.option.label}
               {...(contextLabel ? { suggestionHint: contextLabel } : {})}
+              status={status}
               quantity={quantity}
               onRemove={() => onRemove(equipmentId)}
             />
@@ -796,6 +813,7 @@ function QuickNpcAdditionalEquipmentSection({
       />
       <AdditionalEquipmentSelectedList
         rows={selectedAdditional}
+        rulesetId={buildContext.rulesetId}
         onRemove={removeAdditionalEquipment}
       />
       <div

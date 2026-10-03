@@ -10,11 +10,11 @@ export type EntitySummaryStatusBadge = {
   title?: string
 }
 
-/** Supporting status annotation — ritual/concentration markers, disabled notes. Not a generic third-line slot. */
+/** Supporting status annotation — ritual/concentration markers, disabled notes, warnings. Not a generic third-line slot. */
 export type EntitySummaryStatusText = {
   kind: 'text'
   label: string
-  variant?: 'muted'
+  variant?: 'muted' | 'warning'
 }
 
 /** Circle-slash inactive row metadata — matches InlineInactiveStatus presentation. */

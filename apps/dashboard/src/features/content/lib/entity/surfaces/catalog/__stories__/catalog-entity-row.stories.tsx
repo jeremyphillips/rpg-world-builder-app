@@ -132,3 +132,21 @@ export const DisclosureToggle: Story = {
     )
   },
 }
+
+/** Warning text status renders as its own line under the description. */
+export const WarningStatusText: Story = {
+  render: () => (
+    <div className="max-w-xl">
+      <CatalogEntityRow
+        toolbarLabel="Greatsword"
+        domIds={{ ...domIds, itemId: 'warning-row' }}
+        entity={{
+          heading: 'Greatsword',
+          classification: 'Martial weapon',
+          description: '2 total · Fighter package ×1',
+          status: [{ kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' }],
+        }}
+      />
+    </div>
+  ),
+}

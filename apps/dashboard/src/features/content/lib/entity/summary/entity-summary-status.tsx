@@ -39,7 +39,7 @@ export function EntitySummaryStatusItemView({
     case 'text':
       return (
         <div className={entitySummaryStatusVariants({ density })}>
-          <Text variant={item.variant === 'muted' ? 'muted' : undefined}>{item.label}</Text>
+          <Text variant={item.variant}>{item.label}</Text>
         </div>
       )
     case 'inactive':

@@ -500,12 +500,16 @@ EntitySummary
 
 `EntitySummaryModel.status` accepts structured `EntitySummaryStatusItem` values only:
 
-| Kind              | Use                                                                 |
-| ----------------- | ------------------------------------------------------------------- |
-| `badge`           | Discrete state / callout — Member, Equipped, Spellcasting focus     |
-| `text`            | Supporting annotation — ritual markers, disabled notes (not a dump) |
-| `inactive`        | Circle-slash inactive metadata (search unavailable rows)            |
-| `validationError` | Master-detail validation indicator                                  |
+| Kind              | Use                                                                           |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `badge`           | Discrete state / callout — Member, Equipped, Spellcasting focus               |
+| `text`            | Supporting annotation — ritual markers, disabled notes, warnings (not a dump) |
+| `inactive`        | Circle-slash inactive metadata (search unavailable rows)                      |
+| `validationError` | Master-detail validation indicator                                            |
+
+`text` items take `variant: 'muted' | 'warning'` — a plain visual tone only. Warning text renders as its own
+status line under the description (e.g. a build advisory under `10 total · Fighter package ×8`); never concatenate
+it into the description. Domain mapping (e.g. build advisories → status items) stays in the consuming feature.
 
 EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
 

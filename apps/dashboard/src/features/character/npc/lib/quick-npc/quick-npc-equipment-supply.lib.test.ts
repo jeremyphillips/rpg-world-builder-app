@@ -4,6 +4,7 @@ import {
   createEmptyCharacterBuilderDraft,
   deriveEquipmentDraftEntries,
   indexCharacterBuildCatalog,
+  selectClassPackage,
   startingEquipmentChoiceSetId,
   type CharacterBuildContext,
   type NpcStartingChoices,
@@ -486,5 +487,68 @@ describe('package, role, and manual quantities stay partitioned', () => {
         equipmentStepSpearFixture.id,
       ),
     ).toBe(10)
+  })
+
+  describe('package entry quantity overrides', () => {
+    function choicesWith(entryQuantities?: Record<string, number>): NpcStartingChoices {
+      const draft = packageDraft()
+      return {
+        ...choices(),
+        draft: entryQuantities
+          ? {
+              ...draft,
+              equipment: {
+                ...draft.equipment,
+                classPackage: {
+                  ...selectClassPackage('spear-kit', 'explicit'),
+                  overrides: { entryQuantities },
+                },
+              },
+            }
+          : draft,
+      }
+    }
+
+    function present(entryQuantities?: Record<string, number>) {
+      const liveChoices = choicesWith(entryQuantities)
+      const equipmentSelections = [
+        { equipmentId: equipmentStepSpearFixture.id, quantity: 1, origin: 'manual' as const },
+      ]
+      return {
+        option: presentQuickNpcEquipmentOption({
+          entry: spearOption(),
+          equipmentSelections,
+          choices: liveChoices,
+          catalogIndex: partitionedCatalog,
+          classId: kitClass.id,
+          supplyCatalog: partitionedCatalog,
+        }),
+        selected: listSelectedQuickNpcAdditionalEquipment({
+          equipmentSelections,
+          additionalOptions: [spearOption()],
+          choices: liveChoices,
+          catalogIndex: partitionedCatalog,
+          classId: kitClass.id,
+        })[0],
+      }
+    }
+
+    it('drops the package clause and context line when the entry is overridden to 0', () => {
+      const { option, selected } = present({ spear: 0 })
+      expect(option.trailingState?.label).toBe('×1')
+      expect(option.secondaryTitle ?? '').not.toContain('Monk package')
+      expect(selected?.manualQuantity).toBe(1)
+      expect(selected?.contextLabel).toBeUndefined()
+    })
+
+    it('uses the effective quantity for a partial reduction and restores on reset', () => {
+      const reduced = present({ spear: 3 })
+      expect(reduced.option.trailingState?.label).toBe('×4')
+      expect(reduced.selected?.contextLabel).toBe('4 total · Monk package ×3')
+
+      const restored = present()
+      expect(restored.option.trailingState?.label).toBe('×9')
+      expect(restored.selected?.contextLabel).toBe('9 total · Monk package ×8')
+    })
   })
 })

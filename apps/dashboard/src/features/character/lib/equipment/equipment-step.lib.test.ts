@@ -13,6 +13,7 @@ import {
   resolveCharacterCreationPatch,
   resolveStartingEquipmentOptionSummaries,
   formatSelectionSourceLabel,
+  selectClassPackage,
   startingEquipmentChoiceSetId,
   wealthToCopper,
   type CharacterBuildContext,
@@ -414,6 +415,31 @@ describe('equipment-step.lib', () => {
     const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
 
     expect(rows.length).toBeGreaterThan(0)
+  })
+
+  it('applies package entry quantity overrides to package rows', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+        classPackage: {
+          ...selectClassPackage('standard-equipment', 'explicit'),
+          overrides: { entryQuantities: { 'leather-armor': 0 } },
+        },
+      },
+    }
+
+    const rows = listEquipmentInventoryRowsFromDraft(draft, equipmentStepCatalogIndexFixture)
+
+    expect(rows.some((row) => row.entry.equipmentId === equipmentStepLeatherArmorFixture.id)).toBe(
+      false,
+    )
   })
 
   it('builds package and gold selection patches', () => {

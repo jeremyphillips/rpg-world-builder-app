@@ -15,6 +15,7 @@ import {
   type CharacterCampaignWarning,
   type CampaignInviteUnavailableReason,
   type EquipmentPickerFocusIntent,
+  resolveCharacterBuildAdvisoriesForDraft,
 } from '@rpg/contracts'
 import type {
   CharacterBuildAcquisition,
@@ -36,6 +37,9 @@ import { useCompleteCampaignOnboarding } from '@/features/campaign'
 
 import { useResolvedChoiceSets } from '../../hooks/use-resolved-choice-sets'
 import { useCharacterPreview } from '../../hooks/use-character-preview'
+import { useCharacterBuildAdvisories } from '../../hooks/use-character-build-advisories'
+import { useCharacterBuildAdvisoryConfirm } from '../../hooks/use-character-build-advisory-confirm'
+import { CharacterBuildAdvisoriesProvider } from '../build-advisories/character-build-advisories-provider'
 import { useCharacterBuilderStore } from '../../hooks/use-character-builder-store'
 import { useCreateCharacter } from '../../hooks/use-create-character'
 import { useCreateNpc } from '../../npc/hooks/use-create-npc'
@@ -256,6 +260,11 @@ export function CharacterBuilderShell({
     [applyDraftPatch],
   )
 
+  const advisories = useCharacterBuildAdvisories(draft, context, resolvedChoiceSets)
+  const { confirmAdvisories, dialog: advisoryConfirmDialog } = useCharacterBuildAdvisoryConfirm({
+    characterKind: context.characterKind,
+  })
+
   const canCreateCharacter = useMemo(
     () => validateBuilderFinalSubmit(draft, context, resolvedChoiceSets).ok,
     [context, draft, resolvedChoiceSets],
@@ -441,6 +450,11 @@ export function CharacterBuilderShell({
       return
     }
 
+    const createAdvisories = resolveCharacterBuildAdvisoriesForDraft(draft, context, {
+      resolvedChoiceSets,
+    })
+    if (!(await confirmAdvisories(createAdvisories))) return
+
     try {
       const destination = await finalizeBuilderCharacter({
         acquisition: resolveBuildAcquisition(context),
@@ -474,8 +488,9 @@ export function CharacterBuilderShell({
   }
 
   return (
-    <>
+    <CharacterBuildAdvisoriesProvider advisories={advisories} rulesetId={context.rulesetId}>
       <CharacterBuilderDraftRestore context={context} />
+      {advisoryConfirmDialog}
 
       {rejectedDraftRestoreReason ? (
         <Alert
@@ -617,6 +632,6 @@ export function CharacterBuilderShell({
           </div>
         </div>
       </div>
-    </>
+    </CharacterBuildAdvisoriesProvider>
   )
 }

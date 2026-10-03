@@ -12,10 +12,6 @@ import {
   formatNarrativeGenerationCampaignContextFailure,
 } from '../../../lib/narrative/narrative-generation-campaign-context.lib'
 import { generatedNarrativeToCharacterNarrative } from '../../../lib/narrative/generated-narrative-to-character-narrative.lib'
-import {
-  prepareQuickNpcAuthoringCreate,
-  type QuickNpcAuthoringPrepareArgs,
-} from './quick-npc-authoring-submit.lib'
 import type { QuickNpcPreparedCreate } from './quick-npc-create'
 
 export class QuickNpcNarrativeGenerationFailedError extends Error {
@@ -57,15 +53,16 @@ export async function mergeQuickNpcGeneratedNarrativeOntoInput(args: {
   }
 }
 
+/** Applies optional narrative generation to an already-prepared create. */
 export async function resolveQuickNpcAuthoringCreateInput(args: {
-  prepareArgs: QuickNpcAuthoringPrepareArgs
+  prepared: QuickNpcPreparedCreate
   buildContext: CharacterBuildContext
   campaignId: string
   queryClient: QueryClient
   generateNarrativeOnCreate: boolean
   skipNarrativeGeneration: boolean
 }): Promise<CreateNpcRequestInput> {
-  const prepared = prepareQuickNpcAuthoringCreate(args.prepareArgs)
+  const { prepared } = args
   if (!args.generateNarrativeOnCreate || args.skipNarrativeGeneration) {
     return prepared.input
   }

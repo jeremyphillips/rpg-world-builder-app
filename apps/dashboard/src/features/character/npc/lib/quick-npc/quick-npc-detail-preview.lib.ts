@@ -7,7 +7,11 @@ import {
 import { projectCharacterDraftDetailSource } from '../../../lib/display/character-detail-draft-projection.lib'
 import type { QuickNpcCreateContext } from './quick-npc-create-context'
 import { assembleQuickNpcPrepareCreateArgs } from './quick-npc-authoring-submit.lib'
-import { formatQuickNpcCreationError, resolveQuickNpcPreparedDraft } from './quick-npc-create'
+import {
+  formatQuickNpcCreationError,
+  resolveQuickNpcPreparedDraft,
+  type QuickNpcPreparedDraft,
+} from './quick-npc-create'
 import {
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabFormValues,
@@ -28,7 +32,6 @@ export function projectQuickNpcDetailPreview({
   buildContext,
   createContext,
 }: ProjectQuickNpcDetailPreviewArgs) {
-  const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
   const tabValues = {
     ...quickNpcAuthoringTabDefaultValues,
     ...authoringValues,
@@ -40,7 +43,21 @@ export function projectQuickNpcDetailPreview({
     tabValues,
     buildContext,
   })
-  const prepared = resolveQuickNpcPreparedDraft(prepareArgs)
+  return projectQuickNpcDetailPreviewFromPrepared({
+    prepared: resolveQuickNpcPreparedDraft(prepareArgs),
+    buildContext,
+  })
+}
+
+/** Projects an already-prepared Quick NPC draft (e.g. the live authoring build). */
+export function projectQuickNpcDetailPreviewFromPrepared({
+  prepared,
+  buildContext,
+}: {
+  prepared: QuickNpcPreparedDraft
+  buildContext: CharacterBuildContext
+}) {
+  const catalogIndex = indexCharacterBuildCatalog(buildContext.catalog)
   const validationNotice =
     prepared.issues.length > 0
       ? formatQuickNpcCreationError(new CharacterBuildFinalizationError(prepared.issues))

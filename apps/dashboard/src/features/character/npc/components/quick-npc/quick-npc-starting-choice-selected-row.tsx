@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import { ContentEntityCard } from '@/features/content'
+import { ContentEntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import { Text } from '@rpg/ui'
 
 import { BuilderInventoryRemoveAction } from '../../../components/builder/inventory/builder-inventory-remove-action'
@@ -11,6 +11,8 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
   suggestionHint?: string
   suggestionTitle?: string
   alsoGrantedHint?: string
+  /** Separate status lines under the description (e.g. build advisories). */
+  status?: EntitySummaryStatusItem[]
   onRemove: () => void
 }
 
@@ -21,6 +23,7 @@ export function QuickNpcStartingChoiceSelectedRow({
   suggestionHint,
   suggestionTitle,
   alsoGrantedHint,
+  status,
   onRemove,
 }: QuickNpcStartingChoiceSelectedRowProps) {
   const description = [suggestionHint, alsoGrantedHint].filter(Boolean).join(' ')
@@ -33,6 +36,7 @@ export function QuickNpcStartingChoiceSelectedRow({
             {description}
           </Text>
         ) : undefined,
+        ...(status?.length ? { status } : {}),
       }}
       trailing={{
         kind: 'action',

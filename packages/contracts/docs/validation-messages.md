@@ -161,6 +161,31 @@ copy for species heritage and future subclass steps. Ids use
 `formatFieldMessage(...)` — see
 [character-builder-copy.md](../../../apps/dashboard/docs/character-builder-copy.md).
 
+#### Build advisories vs validation issues
+
+`CharacterBuildValidationIssue` always **blocks** (step submit, final submit, finalize).
+`CharacterBuildAdvisory` (`rpg/character-builder/build-advisory.ts`) is a **non-blocking**
+consequence of a valid build — e.g. `equipment_not_proficient` for owned weapons, armor, or
+shields the assembled proficiencies do not cover. Create is still allowed after the user
+confirms "Create character anyway" / "Create NPC anyway"
+(`getCharacterBuildCreateWithWarningsMessages(characterKind)`).
+
+- **Shape:** a `code`-discriminated union; each member carries only typed facts (no stored
+  prose, severity, or key).
+- **Copy:** derived at render time by `resolveCharacterBuildAdvisoryMessage` from
+  `characterBuilderAdvisoryMessages` (`validation.characterBuilderAdvisory.*`).
+- **Source of facts:** `resolveCharacterBuildAdvisoriesForDraft` evaluates the same
+  `resolveCharacterBuildLoadout` result finalize persists; it returns `[]` when the loadout
+  cannot resolve a class, so incomplete builds never produce false positives.
+- **Dedupe / order:** deduped by `characterBuildAdvisoryKey`, ordered by
+  `CHARACTER_BUILD_ADVISORY_CODE_ORDER`, then a per-code comparator.
+- **Adding a code:** add a union member, a message case, a key case, an entry in
+  `CHARACTER_BUILD_ADVISORY_CODE_ORDER`, and a rule in `ADVISORY_RULES`. Create flows, the
+  confirm dialog, and row lookups need no change.
+
+`CharacterBuildPreview.warnings` stays separate: preview-fidelity notes ("not reflected in
+preview"), shown alongside advisories on Review but never gating create.
+
 **Future surface catalogs** (add only when those UI flows ship):
 
 | Catalog const                          | Scope prefix                      | Owns                                                                  |
