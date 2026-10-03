@@ -105,4 +105,38 @@ describe('reconcileEquipmentForClassChange', () => {
 
     expect(next).toBe(current)
   })
+
+  it('keeps an explicit picker-cart purchase and drops untagged startingGold', () => {
+    const next = reconcileEquipmentForClassChange({
+      equipment: equipment({
+        purchases: [
+          {
+            equipmentId: longsword.id,
+            quantity: 1,
+            sourceMode: 'startingGold',
+            origin: 'picker',
+          },
+          { equipmentId: `${RULESET}:greatsword`, quantity: 1, sourceMode: 'startingGold' },
+          {
+            equipmentId: longsword.id,
+            quantity: 2,
+            sourceMode: 'startingGold',
+            origin: 'packageConversion',
+          },
+        ],
+      }),
+      previous: { classId: `${RULESET}:fighter`, level: 1 },
+      next: { classId: `${RULESET}:wizard`, level: 1 },
+      context,
+    })
+
+    expect(next?.purchases).toEqual([
+      {
+        equipmentId: longsword.id,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
+    ])
+  })
 })

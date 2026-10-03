@@ -10,6 +10,7 @@ import {
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
+  equipmentStepRationsFixture,
   createEquipmentStepContextWithMagicItemGrantsFixture,
 } from './equipment-step.fixtures'
 import type { EquipmentInventoryRow } from './equipment-step.lib'
@@ -385,5 +386,29 @@ describe('equipment-inventory-summary.lib', () => {
     expect(viewModel?.startingEquipment.kind).toBe('package')
     expect(weapons?.entries).toHaveLength(1)
     expect(weapons?.entries[0]?.equipmentName).toBe('Battleaxe')
+  })
+  it('shows a pending cart when the class has starting options but none is selected', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepRationsFixture.id,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
+
+    expect(viewModel?.startingEquipment.kind).toBe('pending_option')
+    expect(viewModel?.addedEquipment.flatMap((group) => group.entries)).toHaveLength(1)
+    expect(viewModel?.addedEquipment[0]?.entries[0]?.equipmentName).toBe('Rations')
   })
 })

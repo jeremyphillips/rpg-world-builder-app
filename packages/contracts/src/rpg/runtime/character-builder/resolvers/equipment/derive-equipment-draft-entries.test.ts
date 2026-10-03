@@ -534,6 +534,29 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
     expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
   })
+
+  it('does not assemble purchases while the starting equipment option is unresolved', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: leatherArmor.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
+
+    expect(inventoryQuantityForEquipmentId(equipment, leatherArmor.id)).toBe(0)
+  })
 })
 
 describe('resolveEffectiveStartingEquipmentPackageItems', () => {

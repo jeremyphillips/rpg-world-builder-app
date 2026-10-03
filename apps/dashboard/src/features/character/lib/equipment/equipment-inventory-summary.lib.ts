@@ -21,6 +21,8 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  EQUIPMENT_PENDING_OPTION_SECTION_DESCRIPTION,
+  EQUIPMENT_PENDING_OPTION_SECTION_MESSAGE,
   formatEquipmentGoldOptionStartingDescription,
   listEquipmentInventoryRowsFromDraft,
   shouldShowMagicItemGrants,
@@ -209,6 +211,7 @@ export type EquipmentInventoryViewModel = {
   startingEquipment:
     | { kind: 'package'; group: StartingPackageInventoryGroup }
     | { kind: 'gold_option'; message: string; description: string }
+    | { kind: 'pending_option'; message: string; description: string }
   addedEquipment: AddedEquipmentCategoryGroup[]
 }
 
@@ -432,8 +435,22 @@ export function buildEquipmentInventoryViewModel(
 
   const characterClass = catalogIndex.classes.get(classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  if (!characterClass || !startingEquipment) return undefined
+
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!characterClass || !startingEquipment || !selectedOptionId) return undefined
+  if (!selectedOptionId) {
+    const pendingRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
+    if (pendingRows.length === 0) return undefined
+
+    return {
+      startingEquipment: {
+        kind: 'pending_option' as const,
+        message: EQUIPMENT_PENDING_OPTION_SECTION_MESSAGE,
+        description: EQUIPMENT_PENDING_OPTION_SECTION_DESCRIPTION,
+      },
+      addedEquipment: groupAddedEquipmentByCategory(aggregateAddedEquipmentRows(pendingRows)),
+    }
+  }
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return undefined

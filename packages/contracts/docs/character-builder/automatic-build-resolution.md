@@ -104,7 +104,7 @@ Class-authored equipment signals use `{ kind: 'class', classId }` and apply only
 class. `suggestedBy` is recorded only for a winner that is already a legal option of the
 selected class. Changing class drops the previous class's package, nested pools, and
 class-owned equipment channel, then the next fill resolves the new class from scratch.
-Manual purchases stay.
+Manual purchases stay. Character Builder picker-cart rows (`startingGold` with `origin: 'picker'`) stay on the draft as pending purchases until the next starting-equipment option is chosen; untagged or package-conversion `startingGold` rows drop. Proficiency does not prune a retained row; assembled inventory still waits for a resolved starting option.
 
 Class spell recommendations are recorded as `suggestedBy` refs `{ kind: 'class', id }`.
 Already-held skills, tools, and

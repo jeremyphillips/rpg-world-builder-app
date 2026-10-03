@@ -83,6 +83,13 @@ export const EQUIPMENT_INVENTORY_EMPTY_MESSAGE = 'No equipment selected yet.'
 export const EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE =
   'Choose a starting equipment option above to populate your inventory.'
 
+export const EQUIPMENT_PENDING_CART_SOURCE_LABEL = 'Pending until you choose starting equipment'
+
+export const EQUIPMENT_PENDING_OPTION_SECTION_MESSAGE = 'Starting equipment not chosen yet'
+
+export const EQUIPMENT_PENDING_OPTION_SECTION_DESCRIPTION =
+  'Your added items stay in the cart below. Pick a starting package or starting gold to fund them.'
+
 export const EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to set your starting equipment'
 
 export const EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION =
@@ -920,6 +927,47 @@ function listPackageInventoryRows(args: {
   })
 }
 
+function listPendingPurchaseInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+}): EquipmentInventoryRow[] {
+  const { draft, catalogIndex, budget } = args
+
+  return (draft.equipment?.purchases ?? []).flatMap((purchase, purchaseIndex) => {
+    const equipment = catalogIndex.equipment.get(purchase.equipmentId)
+    if (!equipment) return []
+
+    const sources: CharacterSelectionSource[] =
+      purchase.sourceMode === 'manual' ? [{ kind: 'manual' }] : []
+    const entry: CharacterEquipmentEntry = {
+      equipmentId: purchase.equipmentId,
+      quantity: purchase.quantity,
+      equipped: purchase.equipped,
+      modifiers: purchase.modifiers,
+      sources,
+    }
+    const purchaseId = resolveEquipmentPurchaseId(draft.equipment?.purchases ?? [], purchaseIndex)
+    const sourceLabel =
+      purchase.sourceMode === 'manual'
+        ? formatSelectionSourceLabel(sources, catalogIndex)
+        : EQUIPMENT_PENDING_CART_SOURCE_LABEL
+
+    return [
+      buildInventoryRowPresentation({
+        entry,
+        equipment,
+        sourceLabel,
+        sourceMode: purchase.sourceMode,
+        origin: purchase.origin,
+        budget,
+        isPurchaseRow: true,
+        purchaseId,
+      }),
+    ]
+  })
+}
+
 function listPurchaseInventoryRows(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
@@ -1184,8 +1232,12 @@ export function listEquipmentInventoryRowsFromDraft(
 
   const characterClass = catalogIndex.classes.get(classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  if (!characterClass || !startingEquipment) return []
+
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!characterClass || !startingEquipment || !selectedOptionId) return []
+  if (!selectedOptionId) {
+    return listPendingPurchaseInventoryRows({ draft, catalogIndex, budget })
+  }
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []

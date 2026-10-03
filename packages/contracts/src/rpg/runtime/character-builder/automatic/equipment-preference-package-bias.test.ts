@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
+
 import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
 import { createCharacterBuildContext, dwarfSpecies, athleticsSkill } from '../test-fixtures'
@@ -500,6 +502,45 @@ describe('equipment preference package bias', () => {
     expect(unmatchedAttribution.ok).toBe(true)
     if (!unmatchedAttribution.ok) return
     expect(unmatchedAttribution.suggestedBy[unmatchedChoiceSetId]?.scholar ?? []).toEqual([])
+  })
+
+  it('retains an explicit picker cart row across class change', () => {
+    const classes = [packageFighter, packageWizard]
+    const context = packageContext(classes)
+    const ropeId = `${RULESET}:rope`
+    const drafted = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: packageFighter.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(packageFighter.id)]: ['heavy-armor'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: ropeId,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: true,
+      },
+    }
+
+    const changed = applySelectedClassChange({
+      draft: drafted,
+      nextClassId: packageWizard.id,
+      context,
+    })
+
+    expect(
+      changed.choiceSelections[startingEquipmentChoiceSetId(packageFighter.id)],
+    ).toBeUndefined()
+    expect(changed.equipment?.purchases).toEqual([
+      { equipmentId: ropeId, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+    ])
+    expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
   })
 
   it('clears a fighter package on a wizard class change and re-resolves fighter from scratch', () => {

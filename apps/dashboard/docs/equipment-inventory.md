@@ -4,6 +4,13 @@ Dashboard layout and editing rules for the Equipment step inventory. Contracts
 resolvers and conversion commit logic live in `@rpg/contracts`; this doc covers
 dashboard IA and how the UI composes existing row controls.
 
+## Pending cart after class change
+
+When the selected class changes, explicit picker-cart purchases remain on the draft
+and render in **Purchased Equipment** while the starting option is unresolved. Those
+rows use pending copy and are not treated as funded inventory until the player picks
+a starting package or starting gold.
+
 ## Source groups
 
 Inventory is split into two sections. Package-owned and purchased rows never

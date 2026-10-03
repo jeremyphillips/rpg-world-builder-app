@@ -20,26 +20,39 @@ function sameClassId(previous: string | undefined, next: string | undefined): bo
   return (previous || undefined) === (next || undefined)
 }
 
-function retainedManualPurchases(
-  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
-  context: CharacterBuildContext,
-): CharacterBuilderDraftEquipmentPurchase[] {
-  const playableEquipmentIds = new Set(
+function playablePickerEquipmentIds(context: CharacterBuildContext): Set<string> {
+  return new Set(
     resolvePlayableBuilderContent(context)
       .equipment.filter((equipment) => isEquipmentPickerSupportedEquipment(equipment))
       .map((equipment) => equipment.id),
   )
+}
 
-  return purchases.filter(
-    (purchase) =>
-      purchase.sourceMode === 'manual' && playableEquipmentIds.has(purchase.equipmentId),
-  )
+function isRetainedUserCartPurchase(
+  purchase: CharacterBuilderDraftEquipmentPurchase,
+  playableEquipmentIds: ReadonlySet<string>,
+): boolean {
+  if (!playableEquipmentIds.has(purchase.equipmentId)) return false
+  if (purchase.sourceMode === 'manual') return true
+  if (purchase.sourceMode === 'startingGold') {
+    return purchase.origin === 'picker'
+  }
+  return false
+}
+
+function retainedPurchasesOnClassChange(
+  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
+  context: CharacterBuildContext,
+): CharacterBuilderDraftEquipmentPurchase[] {
+  const playableEquipmentIds = playablePickerEquipmentIds(context)
+  return purchases.filter((purchase) => isRetainedUserCartPurchase(purchase, playableEquipmentIds))
 }
 
 /**
- * Class-independent equipment retention. Manual purchases that are still valid
- * catalog items stay. Class packages, package-derived purchases, and grants reset.
- * Proficiency and recommendation do not remove a manual purchase.
+ * Class-independent equipment retention. Manual purchases and explicit picker-cart
+ * (`startingGold` + `origin: 'picker'`) that are still playable catalog items stay.
+ * Untagged or package-conversion startingGold rows drop. Class packages, grants,
+ * and package-edit flags reset. Proficiency does not remove a retained purchase.
  */
 export function reconcileEquipmentForClassChange(args: {
   equipment: CharacterBuilderDraftEquipment | undefined
@@ -53,7 +66,7 @@ export function reconcileEquipmentForClassChange(args: {
   return {
     ...args.equipment,
     mode: 'package',
-    purchases: retainedManualPurchases(args.equipment.purchases, args.context),
+    purchases: retainedPurchasesOnClassChange(args.equipment.purchases, args.context),
     grants: [],
     classPackage: { state: 'unresolved' },
     editedSincePackageSelection: false,
@@ -63,7 +76,7 @@ export function reconcileEquipmentForClassChange(args: {
 
 /**
  * Switches the selected class and drops state owned by the previous class.
- * Manual purchases stay. Automatic package and pool selections are not kept
+ * Retained user cart and manual purchases stay. Automatic package and pool selections are not kept
  * for a later switch back; the next fill resolves the new class from scratch.
  */
 export function applySelectedClassChange(args: {
