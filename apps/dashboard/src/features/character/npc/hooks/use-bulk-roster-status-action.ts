@@ -7,15 +7,12 @@ import {
   type CharacterBulkRosterFormValues,
 } from '@rpg/contracts'
 
-import {
-  notifyActionOutcomes,
-  NPC_ROSTER_STATUS_ACTION,
-  type ActionLifecycleCloseEvent,
-} from '@/lib/actions'
+import { notifyActionOutcomes, type ActionLifecycleCloseEvent } from '@/lib/actions'
 
 import { mapNpcDetailToListItem } from '../api/npc-client'
 import { npcQueryKey, npcsQueryKey } from './use-npcs'
 import { applyBulkRosterStatusToTargets } from '../lib/bulk/bulk-roster-status-action.lib'
+import { NPC_ROSTER_BULK_DESCRIPTOR } from '../lib/npc-roster-action.lib'
 
 export type UseBulkRosterStatusActionOptions = {
   campaignId: string
@@ -69,8 +66,8 @@ export function useBulkRosterStatusAction({ campaignId, rows }: UseBulkRosterSta
       notifyActionOutcomes({
         outcomes: event.outcomes,
         closeReason: event.reason,
-        nounPlural: NPC_ROSTER_STATUS_ACTION.nounPlural,
-        nounSingular: NPC_ROSTER_STATUS_ACTION.nounSingular,
+        nounPlural: NPC_ROSTER_BULK_DESCRIPTOR.nounPlural,
+        nounSingular: NPC_ROSTER_BULK_DESCRIPTOR.nounSingular,
       })
     },
     [],

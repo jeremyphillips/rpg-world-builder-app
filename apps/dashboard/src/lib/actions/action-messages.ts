@@ -2,7 +2,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 export type ActionDescriptor = {
   nounSingular: string
   nounPlural: string
-  actionKind: 'availability-off' | 'availability' | 'disable' | 'roster-status'
+  actionKind: 'availability-off' | 'availability' | 'disable'
 }
 
 export type ActionBlockedMode = 'single' | 'bulk-all' | 'bulk-partial'
@@ -38,21 +38,18 @@ const ACTION_BLOCKED_TITLE_BY_KIND: Record<ActionDescriptor['actionKind'], strin
   'availability-off': 'Cannot turn off availability',
   availability: 'Some items could not be updated',
   disable: 'Cannot disable vocabulary entry',
-  'roster-status': 'Some characters could not be updated',
 }
 
 const ACTION_BLOCKED_BULK_ALL_TITLE_BY_KIND: Record<ActionDescriptor['actionKind'], string> = {
   'availability-off': 'Cannot turn off availability',
   availability: 'Cannot update campaign availability',
   disable: 'Cannot disable selected entries',
-  'roster-status': 'Cannot update roster status',
 }
 
 const ACTION_BLOCKED_BULK_PARTIAL_TITLE_BY_KIND: Record<ActionDescriptor['actionKind'], string> = {
   'availability-off': 'Some items could not be made unavailable',
   availability: 'Some items could not be updated',
   disable: 'Some entries could not be disabled',
-  'roster-status': 'Some characters could not be updated',
 }
 
 export function formatActionBlockedTitle({ mode, action }: ActionBlockedTitleInput): string {
@@ -253,10 +250,4 @@ export const VOCABULARY_DISABLE_ACTION: ActionDescriptor = {
   nounSingular: 'entry',
   nounPlural: 'entries',
   actionKind: 'disable',
-}
-
-export const NPC_ROSTER_STATUS_ACTION: ActionDescriptor = {
-  nounSingular: 'NPC',
-  nounPlural: 'NPCs',
-  actionKind: 'roster-status',
 }

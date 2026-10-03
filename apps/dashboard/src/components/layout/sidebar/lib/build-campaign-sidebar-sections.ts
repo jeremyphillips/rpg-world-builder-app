@@ -1,6 +1,7 @@
 import { ROUTES } from '@/app/routes'
 import type { CampaignCharacterNavModel } from '@/features/campaign'
 import { isCampaignCharactersNavActive } from '@/features/campaign'
+import { getCharacterTypeNavLabel } from '@/features/character/lib/display/character-type-labels'
 import { findVisibleSidebarContent, VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
 import { buildAdminSidebarItems } from './build-admin-sidebar-items'
@@ -64,7 +65,11 @@ function buildCampaignSectionItems(
 
 function buildWorldSectionItems(campaignId: string): SidebarNavItem[] {
   const items: SidebarNavItem[] = [
-    sidebarNavItem({ id: 'npcs', label: 'NPCs', href: ROUTES.campaign.npcs.list(campaignId) }),
+    sidebarNavItem({
+      id: 'npcs',
+      label: getCharacterTypeNavLabel('npc'),
+      href: ROUTES.campaign.npcs.list(campaignId),
+    }),
   ]
 
   const organizations = findVisibleSidebarContent('organizations')
