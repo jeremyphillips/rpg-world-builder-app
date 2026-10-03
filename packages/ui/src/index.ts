@@ -218,6 +218,12 @@ export {
   ChoiceSelectionCounter,
   type ChoiceSelectionCounterProps,
 } from './components/ui/choice-selection-counter.client'
+export {
+  MetadataList,
+  type MetadataListItem,
+  type MetadataListProps,
+} from './components/ui/metadata-list'
+export { type MetadataListSize } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
   ACTION_ICONS,

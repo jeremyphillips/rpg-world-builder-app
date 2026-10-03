@@ -1,6 +1,9 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
-import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
+import {
+  ContentStatList,
+  type ContentStatRowSize,
+} from '../../lib/detail/metadata/content-stat-row'
 import { type EquipmentDetailViewModel } from '../lib/equipment-display'
 
 export type EquipmentDetailMetadataProps = {
@@ -38,21 +41,7 @@ export function EquipmentDetailMetadata({
         </Heading>
       ) : null}
 
-      {statRows.length > 0 ? (
-        <div className="space-y-1">
-          {statRows.map((row) => (
-            <ContentStatRow
-              key={row.label}
-              size={statRowSize}
-              label={row.label}
-              value={row.value}
-              info={row.info}
-              infoPlacement={row.infoPlacement}
-              infoAriaLabel={row.infoAriaLabel}
-            />
-          ))}
-        </div>
-      ) : null}
+      {statRows.length > 0 ? <ContentStatList rows={statRows} size={statRowSize} /> : null}
 
       {viewModel.description ? (
         <RichTextContent html={viewModel.description} size="md" tone="muted" />

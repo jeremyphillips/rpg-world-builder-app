@@ -76,7 +76,19 @@ export const identityRowSupportingVariants = cva('text-muted-foreground', {
   },
 })
 
-export const identityRowStatusVariants = cva(ROW_IDENTITY_STATUS_OFFSET_CLASS)
+export const identityRowStatusVariants = cva('', {
+  variants: {
+    spacing: {
+      /** Badges sit slightly below the metadata line. */
+      offset: ROW_IDENTITY_STATUS_OFFSET_CLASS,
+      /** Text advisories share the stack gap with the supporting metadata line. */
+      flush: '',
+    },
+  },
+  defaultVariants: {
+    spacing: 'offset',
+  },
+})
 
 export const identityRowStackVariants = cva('flex min-w-0 flex-col', {
   variants: {

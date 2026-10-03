@@ -1,7 +1,7 @@
 import { Check, TriangleAlert } from 'lucide-react'
 import { AlertCircle } from 'lucide-react'
 
-import { Badge, InlineInactiveStatus, Text, type BadgeSize, type ContentCardDensity } from '@rpg/ui'
+import { Badge, InlineInactiveStatus, type BadgeSize, type ContentCardDensity } from '@rpg/ui'
 
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
@@ -38,8 +38,13 @@ export function EntitySummaryStatusItemView({
       )
     case 'text':
       return (
-        <div className={entitySummaryStatusVariants({ density })}>
-          <Text variant={item.variant}>{item.label}</Text>
+        <div
+          className={entitySummaryStatusVariants({
+            density,
+            tone: item.variant === 'warning' ? 'warning' : 'muted',
+          })}
+        >
+          {item.label}
         </div>
       )
     case 'inactive':

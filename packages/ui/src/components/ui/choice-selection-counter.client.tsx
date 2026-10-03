@@ -31,6 +31,7 @@ function isRequirementStyleSuccess({
   if (selectedCount > max) return false
 
   const threshold = effectiveRequiredCount ?? max
+  if (threshold <= 0) return false
   return selectedCount >= threshold
 }
 

@@ -11,13 +11,13 @@ import {
 } from '@rpg/contracts'
 import { declineClassPackage, selectClassPackage, type ClassPackageChoice } from '@rpg/contracts'
 import {
+  Badge,
   Button,
   ComboboxField,
   ComboboxFilterSelect,
   ConfirmDialog,
   RowActionsMenu,
   SelectionOptionCardHeaderAction,
-  SelectionOptionCardTitleMeta,
   type ComboboxFieldOption,
   type RowActionMenuItem,
 } from '@rpg/ui'
@@ -374,9 +374,9 @@ function QuickNpcStartingEquipmentPackageSection({
           description={description}
           titleAdornment={
             customized && !disclosureOpen ? (
-              <SelectionOptionCardTitleMeta>
+              <Badge tone="neutral" size="sm" appearance="soft" aria-hidden className="shrink-0">
                 {QUICK_NPC_PACKAGE_CUSTOMIZED_LABEL}
-              </SelectionOptionCardTitleMeta>
+              </Badge>
             ) : undefined
           }
           headerEndSlot={

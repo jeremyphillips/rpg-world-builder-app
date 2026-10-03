@@ -10,7 +10,7 @@ describe('formatChoiceSetDrawerHeading', () => {
     expect(formatChoiceSetDrawerHeading('armorTraining')).toBe('Choose armor training')
     expect(formatChoiceSetDrawerHeading('language')).toBe('Choose language')
     expect(formatChoiceSetDrawerHeading('cantrip')).toBe('Choose cantrip')
-    expect(formatChoiceSetDrawerHeading('spell')).toBe('Choose spell')
+    expect(formatChoiceSetDrawerHeading('spell')).toBe('Choose spells')
     expect(formatChoiceSetDrawerHeading('equipment')).toBe('Choose equipment')
     expect(formatChoiceSetDrawerHeading('feat')).toBe('Choose feat')
   })

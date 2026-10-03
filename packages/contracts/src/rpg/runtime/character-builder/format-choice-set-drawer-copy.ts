@@ -20,7 +20,7 @@ export function formatChoiceSetDrawerHeading(choiceType: ChoiceSet['choiceType']
     case 'cantrip':
       return 'Choose cantrip'
     case 'spell':
-      return 'Choose spell'
+      return `Choose ${getContentTypeSentenceForm('spells', 2)}`
     case 'equipment':
       return `Choose ${getContentTypeSentenceForm('equipment', 1)}`
     case 'feat':

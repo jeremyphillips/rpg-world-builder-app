@@ -1,11 +1,15 @@
-import { InfoTooltip, Text } from '@rpg/ui'
+import {
+  InfoTooltip,
+  MetadataList,
+  Text,
+  type MetadataListItem,
+  type MetadataListSize,
+} from '@rpg/ui'
 
 import type { ContentStatRowData } from './content-stat-rows'
 import {
   contentStatRowLabelVariants,
   contentStatRowValueVariants,
-  contentStatRowVariants,
-  type ContentStatRowLayout,
   type ContentStatRowSize,
 } from './content-stat-row.variants'
 
@@ -15,7 +19,6 @@ export type ContentStatRowProps = Pick<
   'label' | 'value' | 'valueContent' | 'info' | 'infoPlacement' | 'infoAriaLabel'
 > & {
   size?: ContentStatRowSize
-  layout?: ContentStatRowLayout
 }
 
 function StatRowInfo({
@@ -70,32 +73,62 @@ export function ContentStatRowHeroPair({
   )
 }
 
+function toMetadataListSize(size: ContentStatRowSize): MetadataListSize {
+  return size === 'sm' ? 'sm' : 'default'
+}
+
+function toMetadataListItem(
+  row: Pick<
+    ContentStatRowData,
+    'id' | 'label' | 'value' | 'valueContent' | 'info' | 'infoPlacement' | 'infoAriaLabel'
+  >,
+): MetadataListItem {
+  const infoOnLabel = row.infoPlacement === 'label'
+  const info = row.info ? (
+    <StatRowInfo label={row.label} info={row.info} infoAriaLabel={row.infoAriaLabel} />
+  ) : null
+
+  return {
+    id: row.id ?? row.label,
+    label: (
+      <>
+        {row.label}
+        {infoOnLabel ? info : null}
+      </>
+    ),
+    value: (
+      <>
+        {row.valueContent ?? row.value}
+        {!infoOnLabel ? info : null}
+      </>
+    ),
+  }
+}
+
+/** Aligned label/value list for stacked content metadata. */
+export function ContentStatList({
+  rows,
+  size = 'default',
+}: {
+  rows: readonly ContentStatRowData[]
+  size?: ContentStatRowSize
+}) {
+  return <MetadataList size={toMetadataListSize(size)} items={rows.map(toMetadataListItem)} />
+}
+
 export function ContentStatRow({
   label,
   value,
+  valueContent,
   info,
   infoPlacement = 'value',
   infoAriaLabel,
   size = 'default',
-  layout = 'inline',
 }: ContentStatRowProps) {
-  const infoOnLabel = infoPlacement === 'label'
-
   return (
-    <Text as="p" className={contentStatRowVariants({ size, layout })}>
-      <Text as="span" className={contentStatRowLabelVariants({ size, layout })}>
-        {label}
-        {infoOnLabel ? (
-          <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />
-        ) : null}
-      </Text>
-      :{' '}
-      <Text as="span" className={contentStatRowValueVariants({ size, layout })}>
-        {value}
-        {!infoOnLabel ? (
-          <StatRowInfo label={label} info={info} infoAriaLabel={infoAriaLabel} />
-        ) : null}
-      </Text>
-    </Text>
+    <ContentStatList
+      size={size}
+      rows={[{ label, value, valueContent, info, infoPlacement, infoAriaLabel }]}
+    />
   )
 }

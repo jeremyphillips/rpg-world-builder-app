@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react'
 
-import { Text } from '@rpg/ui'
-
 import type { EntitySummaryModel, EntitySummaryStatusItem } from '@/features/content'
 import type { EquipmentInventoryRow } from '../../../lib/equipment/equipment-step.lib'
 import type { EquipmentInventoryDisplayItem } from '../../../lib/equipment/equipment-inventory-summary.lib'
@@ -25,14 +23,9 @@ function resolveInventoryHeading(equipmentName: string, stagedRemoval = false): 
   )
 }
 
-function resolveInventoryDescription(detailLabel?: string): ReactNode | undefined {
+function resolveInventoryDescription(detailLabel?: string): string | undefined {
   if (!detailLabel) return undefined
-
-  return (
-    <Text as="span" variant="caption" className="text-muted-foreground opacity-80">
-      {detailLabel}
-    </Text>
-  )
+  return detailLabel
 }
 
 function resolveRowStatus(

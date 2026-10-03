@@ -16,10 +16,9 @@ describe('ContentStatRow', () => {
   it('applies compact 14px typography when size is sm', () => {
     render(<ContentStatRow label="Category" value="Martial" size="sm" />)
 
-    const row = screen.getByText('Category').closest('p')
+    const row = screen.getByText('Category').closest('dl')
     expect(row).toHaveClass('text-sm')
-    expect(screen.getByText('Category')).toHaveClass('text-sm')
-    expect(screen.getByText('Martial')).toHaveClass('text-sm')
+    expect(row).not.toHaveTextContent('Category:')
   })
 
   it('renders an info tooltip trigger beside the value by default', () => {

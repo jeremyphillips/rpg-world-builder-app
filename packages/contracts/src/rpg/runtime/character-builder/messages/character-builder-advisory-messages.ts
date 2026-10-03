@@ -1,5 +1,11 @@
 import { defineMessage, formatFieldMessage } from '../../../../validation/define-message'
-import type { CharacterBuildAdvisory } from '../../../character-builder/build-advisory'
+import type {
+  CharacterBuildAdvisory,
+  EquipmentAdvisoryClass,
+} from '../../../character-builder/build-advisory'
+import { getArmorCategorySentenceForm } from '../../../vocab/armor/category'
+import { EQUIPMENT_KIND_ENTRIES } from '../../../vocab/equipment/kind'
+import { getTermLabelSingular, getTermSentenceForm } from '../../../vocab/types'
 
 // ---------------------------------------------------------------------------
 // Character build advisory messages — non-blocking build consequences.
@@ -7,18 +13,37 @@ import type { CharacterBuildAdvisory } from '../../../character-builder/build-ad
 // See docs/validation-messages.md.
 // ---------------------------------------------------------------------------
 
+/** Counted noun for “Not proficient with this …”. Armor stays the kind label, not “piece of armor”. */
+function notProficientEquipmentNoun(equipmentClass: EquipmentAdvisoryClass): string {
+  switch (equipmentClass) {
+    case 'weapon':
+      return getTermSentenceForm(EQUIPMENT_KIND_ENTRIES.weapon, 1)
+    case 'armor':
+      return getTermLabelSingular(EQUIPMENT_KIND_ENTRIES.armor.label)
+    case 'shield':
+      return getArmorCategorySentenceForm('shields', 1)
+    default: {
+      const _exhaustive: never = equipmentClass
+      return _exhaustive
+    }
+  }
+}
+
+function notProficientWith(noun: string): string {
+  return `Not proficient with this ${noun}`
+}
+
 export const characterBuilderAdvisoryMessages = {
   notProficientWeapon: defineMessage(
     'validation.characterBuilderAdvisory.notProficientWeapon',
-    () => 'Not proficient with this weapon',
+    () => notProficientWith(notProficientEquipmentNoun('weapon')),
   ),
-  notProficientArmor: defineMessage(
-    'validation.characterBuilderAdvisory.notProficientArmor',
-    () => 'Not proficient with this armor',
+  notProficientArmor: defineMessage('validation.characterBuilderAdvisory.notProficientArmor', () =>
+    notProficientWith(notProficientEquipmentNoun('armor')),
   ),
   notProficientShield: defineMessage(
     'validation.characterBuilderAdvisory.notProficientShield',
-    () => 'Not proficient with this shield',
+    () => notProficientWith(notProficientEquipmentNoun('shield')),
   ),
 }
 
