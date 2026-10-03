@@ -13,6 +13,7 @@ import { Text } from '@rpg/ui'
 import { resolveReviewReadyMessage } from '../../../../lib/builder-preview/review-step-display'
 import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { ReviewAdvisoryWarnings } from './review-advisory-warnings'
+import { useCharacterBuildAdvisoriesValue } from '../../../../hooks/use-character-build-advisories-context'
 import { ReviewRequiredItems } from './review-required-items'
 import { ReviewStepSummary } from './review-step-summary'
 
@@ -37,6 +38,7 @@ export function ReviewStep({
   validationHeading,
   onNavigateToStep,
 }: ReviewStepProps) {
+  const advisories = useCharacterBuildAdvisoriesValue()
   const blockingSummary = useMemo(
     () => resolveReviewBlockingSummary(draft, context, resolvedChoiceSets, validationIssues),
     [context, draft, resolvedChoiceSets, validationIssues],
@@ -60,7 +62,7 @@ export function ReviewStep({
           requiredItems={blockingSummary.requiredItems}
           onNavigateToStep={onNavigateToStep}
         />
-        <ReviewAdvisoryWarnings warnings={preview?.warnings ?? []} />
+        <ReviewAdvisoryWarnings advisories={advisories} notes={preview?.warnings ?? []} />
         {readyMessage ? <Text variant="muted">{readyMessage}</Text> : null}
       </div>
     </BuilderStepFrame>

@@ -159,11 +159,9 @@ describe('QuickNpcAuthoringForm', () => {
     createNpcMock.mockReset()
     createNpcMock.mockResolvedValue(npcDetail)
     resolveQuickNpcAuthoringCreateInputMock.mockReset()
-    resolveQuickNpcAuthoringCreateInputMock.mockImplementation(async ({ prepareArgs }) => {
-      const { prepareQuickNpcAuthoringCreate } =
-        await import('../../../lib/quick-npc/quick-npc-authoring-submit.lib')
-      return prepareQuickNpcAuthoringCreate(prepareArgs).input
-    })
+    resolveQuickNpcAuthoringCreateInputMock.mockImplementation(
+      async ({ prepared }: { prepared: { input: unknown } }) => prepared.input,
+    )
   })
 
   it('renders the details tab with Neutral alignment default', () => {

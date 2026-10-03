@@ -4,7 +4,6 @@ import { createCharacterInputSchema } from '../../character/create-input'
 import type { CreateCharacterInput } from '../../character/create-input'
 import { formatFieldMessage } from '../../../../validation/define-message'
 import { ABILITY_IDS, type Ability } from '../../../vocab/ability'
-import { assembleCharacterProficiencies } from '../assembly/assemble-proficiencies'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
 import {
   DEFAULT_BUILDER_HIT_POINT_SOURCE,
@@ -16,7 +15,7 @@ import {
   isLevelZeroNpcPermitted,
   sanitizeClassForLevel,
 } from '../progression/character-level-policy'
-import { indexCharacterBuildCatalog, type CharacterBuildContext } from '../context'
+import type { CharacterBuildContext } from '../context'
 import { indexPlayableBuilderCatalog } from '../preview/index-playable-builder-catalog'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
@@ -25,8 +24,10 @@ import {
   assembleGrantedSpells,
   mergeCharacterSpellEntries,
 } from '../assembly/assemble-granted-spells'
-import { assembleLevelZeroStartingEquipment } from '../assembly/assemble-level-zero-starting-equipment'
-import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
+import {
+  resolveCharacterBuildLoadout,
+  type CharacterBuildLoadoutFailureReason,
+} from '../assembly/resolve-character-build-loadout'
 import { mapCreateInputZodIssueMessage } from './finalize-zod-issue-messages'
 import { validateCharacterBuild } from '../validate/validate-character-build'
 import { validationIssue } from '../validate/issue'
@@ -179,6 +180,22 @@ function resolveFinalizeCatalogIssues(
   return issues
 }
 
+const LOADOUT_FAILURE_MESSAGES = {
+  class_required: characterBuilderValidationMessages.classRequired,
+  class_not_in_catalog: characterBuilderValidationMessages.classNotInCatalog,
+  class_not_permitted_at_level_zero:
+    characterBuilderValidationMessages.classNotPermittedAtLevelZero,
+} as const satisfies Record<CharacterBuildLoadoutFailureReason, unknown>
+
+function loadoutFailureIssue(
+  reason: CharacterBuildLoadoutFailureReason,
+): CharacterBuildValidationResult['issues'][number] {
+  return validationIssue(reason, LOADOUT_FAILURE_MESSAGES[reason](), {
+    path: 'class.classId',
+    stepId: 'class',
+  })
+}
+
 function parseCreateCharacterInput(input: unknown): CreateCharacterInput {
   const parsed = createCharacterInputSchema.safeParse(input)
   if (!parsed.success) {
@@ -246,39 +263,31 @@ export function assembleCharacterBuildSheet(
   }
 
   const choiceSets = options.resolvedChoiceSets ?? []
-  const catalogIndex = indexCharacterBuildCatalog(context.catalog)
   const playableIndex = indexPlayableBuilderCatalog(context)
-  const effectiveDraft = sanitizeClassForLevel(draft)
-  const isClasslessLevelZero = isBuilderLevelZeroClassless(draft, context)
 
   const catalogIssues = resolveFinalizeCatalogIssues(draft, playableIndex, context)
   if (catalogIssues.length > 0) {
     throw new CharacterBuildFinalizationError(catalogIssues)
   }
 
-  const classId = effectiveDraft.class.classId
-  const speciesId = effectiveDraft.species.speciesId!
-  const characterClass = classId ? catalogIndex.classes.get(classId) : undefined
-  const abilityScores = requireCompleteAbilityScores(effectiveDraft)
-  const proficiencies = assembleCharacterProficiencies(
+  const loadoutResult = resolveCharacterBuildLoadout(draft, context, choiceSets)
+  if (!loadoutResult.ok) {
+    throw new CharacterBuildFinalizationError([loadoutFailureIssue(loadoutResult.reason)])
+  }
+
+  const {
     effectiveDraft,
     catalogIndex,
-    choiceSets,
     characterClass,
-    context,
-  )
-
+    isClasslessLevelZero,
+    proficiencies,
+    equipment,
+    wealth,
+  } = loadoutResult.loadout
+  const classId = effectiveDraft.class.classId
+  const speciesId = effectiveDraft.species.speciesId!
+  const abilityScores = requireCompleteAbilityScores(effectiveDraft)
   const levelZeroRules = context.characterCreationRules.levelZeroNpcs
-  const { equipment, wealth } = isClasslessLevelZero
-    ? assembleLevelZeroStartingEquipment(effectiveDraft, {
-        rulesetId: context.rulesetId,
-        levelZeroRules,
-        catalogIndex,
-      })
-    : assembleStartingEquipment(effectiveDraft, catalogIndex, {
-        startingWealth: context.characterCreationRules.startingWealth,
-        rulesetId: context.rulesetId,
-      })
 
   const maxHp = resolveBuilderMaxHitPoints(effectiveDraft, characterClass, {
     source: DEFAULT_BUILDER_HIT_POINT_SOURCE,

@@ -36,3 +36,11 @@ export const WithQuantity: Story = {
     ),
   },
 }
+
+export const WithAdvisoryStatus: Story = {
+  args: {
+    label: 'Greatsword',
+    suggestionHint: '2 total · Fighter package ×1',
+    status: [{ kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' }],
+  },
+}

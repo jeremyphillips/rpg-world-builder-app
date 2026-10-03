@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   CHARACTER_RELATIONSHIP_DRAFT_NEW_CHARACTER_ENDPOINT,
+  createEmptyCharacterBuilderDraft,
   isCharacterBuildFinalizationError,
   type CharacterBuildContext,
 } from '@rpg/contracts'
@@ -10,7 +11,25 @@ import {
   createCampaignNpcBuilderContextFixture,
   populatedBuilderCatalog,
 } from '../../../lib/fixtures/character-builder-fixtures'
-import { buildQuickNpcCreateInput, formatQuickNpcCreationError } from './quick-npc-create'
+import {
+  createEquipmentStepContextFixture,
+  equipmentStepBattleaxeFixture,
+  equipmentStepCatalogFixture,
+  equipmentStepDaggerFixture,
+  equipmentStepMonkClassFixture,
+} from '../../../lib/equipment/equipment-step.fixtures'
+import { makeSpecies } from '@/test/fixtures/factories/species'
+import { prepareQuickNpcAuthoringCreate } from './quick-npc-authoring-submit.lib'
+import {
+  buildQuickNpcCreateInput,
+  formatQuickNpcCreationError,
+  resolveQuickNpcPreparedDraft,
+} from './quick-npc-create'
+import { quickNpcAuthoringTabDefaultValues } from './quick-npc-form-fields'
+import {
+  quickNpcStandaloneCreateContext,
+  quickNpcStandaloneSetupValues,
+} from './quick-npc-test-fixtures'
 
 /** Fighter variant whose skill choice is satisfiable by the fixture catalog. */
 const quickFighter = {
@@ -151,5 +170,65 @@ describe('formatQuickNpcCreationError', () => {
   it('returns undefined for non-builder errors so callers use their fallback', () => {
     expect(formatQuickNpcCreationError(new Error('network down'))).toBeUndefined()
     expect(formatQuickNpcCreationError(undefined)).toBeUndefined()
+  })
+})
+
+describe('Quick NPC build advisories', () => {
+  const species = makeSpecies({ slug: 'scout', name: 'Scout' })
+  const context = createEquipmentStepContextFixture({
+    catalog: {
+      ...equipmentStepCatalogFixture,
+      species: [species],
+      classes: [equipmentStepMonkClassFixture],
+    },
+  })
+
+  function prepared(equipmentId: string) {
+    return prepareQuickNpcAuthoringCreate({
+      createContext: quickNpcStandaloneCreateContext(),
+      setup: quickNpcStandaloneSetupValues({
+        speciesId: species.id,
+        classId: equipmentStepMonkClassFixture.id,
+        level: 1,
+      }),
+      tabValues: {
+        ...quickNpcAuthoringTabDefaultValues,
+        gender: 'female',
+        name: 'Scout',
+        alignment: 'ln',
+        equipmentSelections: [{ equipmentId, quantity: 1, origin: 'manual' }],
+      },
+      buildContext: context,
+    })
+  }
+
+  it('flags a retained manual weapon the class is not proficient with', () => {
+    expect(prepared(equipmentStepBattleaxeFixture.id).advisories).toEqual([
+      expect.objectContaining({
+        code: 'equipment_not_proficient',
+        subject: expect.objectContaining({ equipmentId: equipmentStepBattleaxeFixture.id }),
+      }),
+    ])
+    expect(prepared(equipmentStepDaggerFixture.id).advisories).toEqual([])
+  })
+
+  it('returns no advisories for a classless fallback draft', () => {
+    const fallbackDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+        grants: [{ equipmentId: equipmentStepBattleaxeFixture.id, quantity: 1 }],
+      },
+    }
+    const result = resolveQuickNpcPreparedDraft({
+      seed: { name: 'Scout', speciesId: species.id, level: 1, alignment: 'ln', gender: 'female' },
+      context,
+      fallbackDraft,
+      startingChoiceIssues: [{ code: 'class_required', message: 'Choose a class.' }],
+    })
+    expect(result.ok).toBe(false)
+    expect(result.advisories).toEqual([])
   })
 })

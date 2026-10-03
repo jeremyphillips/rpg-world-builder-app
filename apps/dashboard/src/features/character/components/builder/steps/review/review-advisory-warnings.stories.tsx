@@ -10,14 +10,31 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof ReviewAdvisoryWarnings>
 
-export const WithWarnings: Story = {
+export const WithNotes: Story = {
   args: {
-    warnings: ['Name is not set.', 'Class is not selected.'],
+    notes: ['Unarmored Defense may change AC; not reflected in preview.'],
+  },
+}
+
+export const WithAdvisoriesAndNotes: Story = {
+  args: {
+    advisories: [
+      {
+        code: 'equipment_not_proficient',
+        subject: {
+          kind: 'equipment',
+          equipmentId: 'srd-cc-5.2.1:greatsword',
+          label: 'Greatsword',
+          equipmentClass: 'weapon',
+        },
+      },
+    ],
+    notes: ['Unarmored Defense may change AC; not reflected in preview.'],
   },
 }
 
 export const Empty: Story = {
   args: {
-    warnings: [],
+    notes: [],
   },
 }

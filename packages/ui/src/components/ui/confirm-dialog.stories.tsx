@@ -81,3 +81,29 @@ export const Destructive: StoryObj = {
     )
   },
 }
+
+/** Block body content (lists) goes in `children`, rendered after the description. */
+export const WithBody: StoryObj = {
+  render: () => {
+    const [open, setOpen] = useState(false)
+    return (
+      <>
+        <Button onClick={() => setOpen(true)}>Create</Button>
+        <ConfirmDialog
+          open={open}
+          onOpenChange={setOpen}
+          headline="Create with warnings?"
+          description="This build has warnings you may want to review before creating it."
+          confirmLabel="Create character anyway"
+          cancelLabel="Go back"
+          onConfirm={action('confirm')}
+          onCancel={action('cancel')}
+        >
+          <ul className="list-disc pl-5">
+            <li>Greatsword — Not proficient with this weapon</li>
+          </ul>
+        </ConfirmDialog>
+      </>
+    )
+  },
+}

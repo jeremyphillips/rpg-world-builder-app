@@ -16,7 +16,10 @@ import {
   resolveQuickNpcAuthoringPreparedDraft,
 } from './quick-npc-authoring-submit.lib'
 import { formatQuickNpcCreationError, resolveQuickNpcPreparedDraft } from './quick-npc-create'
-import { projectQuickNpcDetailPreview } from './quick-npc-detail-preview.lib'
+import {
+  projectQuickNpcDetailPreview,
+  projectQuickNpcDetailPreviewFromPrepared,
+} from './quick-npc-detail-preview.lib'
 import {
   quickNpcAuthoringTabDefaultValues,
   type QuickNpcAuthoringTabValues,
@@ -147,5 +150,32 @@ describe('projectQuickNpcDetailPreview', () => {
     const fromPreview = resolveQuickNpcPreparedDraft(assembleQuickNpcPrepareCreateArgs(args))
 
     expect(fromCreate).toEqual(fromPreview)
+  })
+})
+
+describe('projectQuickNpcDetailPreviewFromPrepared', () => {
+  it('matches the setup entry point for the same inputs', () => {
+    const setup = quickNpcStandaloneSetupValues({
+      speciesId: populatedBuilderCatalog.species[0]!.id,
+      classId: quickFighter.id,
+      level: 1,
+    })
+    const createContext = quickNpcStandaloneCreateContext()
+    const fromSetup = projectQuickNpcDetailPreview({
+      setup,
+      authoringValues: tabValues,
+      buildContext,
+      createContext,
+    })
+    const fromPrepared = projectQuickNpcDetailPreviewFromPrepared({
+      prepared: resolveQuickNpcAuthoringPreparedDraft({
+        setup,
+        tabValues,
+        buildContext,
+        createContext,
+      }),
+      buildContext,
+    })
+    expect(fromPrepared).toEqual(fromSetup)
   })
 })

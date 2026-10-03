@@ -4,9 +4,11 @@ import {
   finalizeNpcCharacterBuild,
   isCharacterBuildFinalizationError,
   resolveAutomaticNpcBuild,
+  resolveCharacterBuildAdvisoriesForDraft,
   type AutomaticNpcBuildConstraints,
   type AutomaticNpcBuildPreferences,
   type AutomaticNpcBuildSeed,
+  type CharacterBuildAdvisory,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuildValidationIssue,
@@ -78,6 +80,7 @@ export type QuickNpcPreparedCreate = {
   draft: CharacterBuilderDraft
   input: CreateNpcRequestInput
   resolvedChoiceSets: readonly ChoiceSet[]
+  advisories: readonly CharacterBuildAdvisory[]
 }
 
 export type QuickNpcPreparedDraft = {
@@ -85,6 +88,20 @@ export type QuickNpcPreparedDraft = {
   draft: CharacterBuilderDraft
   resolvedChoiceSets: readonly ChoiceSet[]
   issues: CharacterBuildValidationIssue[]
+  /** Non-blocking advisories for the returned draft; `[]` when its class is unresolved. */
+  advisories: readonly CharacterBuildAdvisory[]
+}
+
+function withAdvisories(
+  prepared: Omit<QuickNpcPreparedDraft, 'advisories'>,
+  context: CharacterBuildContext,
+): QuickNpcPreparedDraft {
+  return {
+    ...prepared,
+    advisories: resolveCharacterBuildAdvisoriesForDraft(prepared.draft, context, {
+      resolvedChoiceSets: prepared.resolvedChoiceSets,
+    }),
+  }
 }
 
 /**
@@ -117,33 +134,37 @@ export function resolveQuickNpcPreparedDraft(
     if (!fallbackDraft) {
       throw new CharacterBuildFinalizationError([...startingIssues, ...resolution.issues])
     }
-    return {
-      ok: false,
-      draft: fallbackDraft,
-      resolvedChoiceSets: fallbackChoiceSets,
-      issues: [...startingIssues, ...resolution.issues],
-    }
+    return withAdvisories(
+      {
+        ok: false,
+        draft: fallbackDraft,
+        resolvedChoiceSets: fallbackChoiceSets,
+        issues: [...startingIssues, ...resolution.issues],
+      },
+      args.context,
+    )
   }
 
   if (startingIssues.length > 0) {
-    return {
-      ok: false,
-      draft: fallbackDraft ?? resolution.draft,
-      resolvedChoiceSets: resolution.resolvedChoiceSets,
-      issues: startingIssues,
-    }
+    return withAdvisories(
+      {
+        ok: false,
+        draft: fallbackDraft ?? resolution.draft,
+        resolvedChoiceSets: resolution.resolvedChoiceSets,
+        issues: startingIssues,
+      },
+      args.context,
+    )
   }
 
   const draft = args.membership
     ? withMembershipConnection(resolution.draft, args.membership)
     : resolution.draft
 
-  return {
-    ok: true,
-    draft,
-    resolvedChoiceSets: resolution.resolvedChoiceSets,
-    issues: [],
-  }
+  return withAdvisories(
+    { ok: true, draft, resolvedChoiceSets: resolution.resolvedChoiceSets, issues: [] },
+    args.context,
+  )
 }
 
 export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpcPreparedCreate {
@@ -156,7 +177,12 @@ export function prepareQuickNpcCreate(args: QuickNpcPrepareCreateArgs): QuickNpc
     resolvedChoiceSets: prepared.resolvedChoiceSets,
   })
 
-  return { draft: prepared.draft, input, resolvedChoiceSets: prepared.resolvedChoiceSets }
+  return {
+    draft: prepared.draft,
+    input,
+    resolvedChoiceSets: prepared.resolvedChoiceSets,
+    advisories: prepared.advisories,
+  }
 }
 
 /**

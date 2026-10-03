@@ -14,6 +14,7 @@ import { declineClassPackage, selectClassPackage } from './class-package-choice'
 import {
   deriveEquipmentDraftEntries,
   inventoryQuantityForEquipmentId,
+  resolveEffectiveStartingEquipmentPackageItems,
   startingEquipmentPackageItemKey,
 } from './derive-equipment-draft-entries'
 
@@ -532,5 +533,73 @@ describe('deriveEquipmentDraftEntries', () => {
     )
     expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
     expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
+  })
+})
+
+describe('resolveEffectiveStartingEquipmentPackageItems', () => {
+  const option = storedDruid.characterCreation!.startingEquipment!.options[0]!
+
+  function draftWithOverrides(entryQuantities: Record<string, number>) {
+    return {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+        classPackage: {
+          ...selectClassPackage('standard-equipment', 'explicit'),
+          overrides: { entryQuantities },
+        },
+      },
+    }
+  }
+
+  it('omits an entry overridden to quantity 0 and keeps authored item indexes', () => {
+    const items = resolveEffectiveStartingEquipmentPackageItems(
+      draftWithOverrides({ 'leather-armor': 0 }),
+      storedDruid,
+      option,
+      makeCatalogIndex(),
+    )
+    expect(items.map(({ itemIndex, quantity }) => ({ itemIndex, quantity }))).toEqual([
+      { itemIndex: 1, quantity: 1 },
+    ])
+  })
+
+  it('uses the overridden quantity for a partial stack reduction', () => {
+    const stacked: ClassStored = {
+      ...storedDruid,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  id: 'rope',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'rope' },
+                  quantity: 8,
+                },
+              ],
+              wealth: { gp: 0 },
+            },
+          ],
+        },
+      },
+    }
+    const items = resolveEffectiveStartingEquipmentPackageItems(
+      draftWithOverrides({ rope: 3 }),
+      stacked,
+      stacked.characterCreation!.startingEquipment!.options[0]!,
+      makeCatalogIndex(),
+    )
+    expect(items.map((entry) => entry.quantity)).toEqual([3])
   })
 })

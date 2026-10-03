@@ -51,7 +51,13 @@ import {
   resolveQuickNpcAuthoringCreateInput,
 } from '../../lib/quick-npc/quick-npc-narrative-on-create.lib'
 import { QuickNpcStartingChoices } from './quick-npc-starting-choices'
-import { QuickNpcPreviewNpcButton } from './quick-npc-preview-npc-button'
+import { QuickNpcAuthoringPreviewButton } from './quick-npc-authoring-preview-button'
+import {
+  QuickNpcPreparedBuildProvider,
+  QuickNpcPreparedBuildSync,
+} from './quick-npc-prepared-build-context'
+import { useCharacterBuildAdvisoryConfirm } from '../../../hooks/use-character-build-advisory-confirm'
+import { prepareQuickNpcAuthoringCreate } from '../../lib/quick-npc/quick-npc-authoring-submit.lib'
 import {
   quickNpcCreateFooterActionsClasses,
   quickNpcCreateFooterLayoutClasses,
@@ -229,6 +235,9 @@ export function QuickNpcAuthoringForm({
   )
 
   const schema = React.useMemo(() => quickNpcAuthoringTabSchema(), [])
+  const { confirmAdvisories, dialog: advisoryConfirmDialog } = useCharacterBuildAdvisoryConfirm({
+    characterKind: buildContext.characterKind,
+  })
   const editingLock = useQuickNpcEditingLock()
 
   const defaultValues = React.useMemo(() => {
@@ -301,13 +310,16 @@ export function QuickNpcAuthoringForm({
       skipNarrativeGenerationRef.current = false
 
       try {
+        const prepared = prepareQuickNpcAuthoringCreate({
+          createContext,
+          setup,
+          tabValues: parsed,
+          buildContext,
+        })
+        if (!(await confirmAdvisories(prepared.advisories))) return
+
         const input = await resolveQuickNpcAuthoringCreateInput({
-          prepareArgs: {
-            createContext,
-            setup,
-            tabValues: parsed,
-            buildContext,
-          },
+          prepared,
           buildContext,
           campaignId,
           queryClient,
@@ -333,117 +345,131 @@ export function QuickNpcAuthoringForm({
   })
 
   return (
-    <TabbedForm<QuickNpcAuthoringTabFormValues>
-      onBeforeActiveTabChange={() => {
-        if (!editingLock.isLocked) return true
-        editingLock.requestFocus()
-        return false
-      }}
-      key={`${setup.npcTemplateId}:${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
-      density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
-      schema={schema}
-      tabs={tabs}
-      defaultValues={defaultValues}
-      onSubmit={(values, form) => {
-        if (editingLock.isLocked) {
+    <QuickNpcPreparedBuildProvider>
+      {advisoryConfirmDialog}
+      <TabbedForm<QuickNpcAuthoringTabFormValues>
+        onBeforeActiveTabChange={() => {
+          if (!editingLock.isLocked) return true
           editingLock.requestFocus()
-          return
-        }
-        return onSubmit(values, form)
-      }}
-      formError={formError ?? null}
-      stickyChrome={false}
-      externalFooter
-      header={(form) => (
-        <>
-          <QuickNpcAuthoringTabsSync
-            form={form}
-            setup={setup}
-            buildContext={buildContext}
-            createContext={createContext}
-            onTabsChange={setTabs}
-          />
-          <QuickNpcSubmitPendingSync form={form} onPendingChange={onPendingChange} />
-          <SetupSummaryRows
-            eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
-            rows={setupSummaryRows}
-            changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
-            onNavigate={(targetSetId) => {
-              if (editingLock.isLocked) {
-                editingLock.requestFocus()
-                return
-              }
-              onSetupSummaryEdit(
-                targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
-                  ? { type: 'external', id: targetSetId }
-                  : { type: 'set', id: targetSetId },
-                form.getValues(),
-              )
-            }}
-          />
-        </>
-      )}
-      footer={(form) => {
-        const isSubmitting = form.formState.isSubmitting
-
-        return (
+          return false
+        }}
+        key={`${setup.npcTemplateId}:${setup.speciesId}:${setup.classId}:${setup.level}:${requirementCategoryKey}`}
+        density={createFlowDensity ?? CREATE_FLOW_FORM_DENSITY}
+        schema={schema}
+        tabs={tabs}
+        defaultValues={defaultValues}
+        onSubmit={(values, form) => {
+          if (editingLock.isLocked) {
+            editingLock.requestFocus()
+            return
+          }
+          return onSubmit(values, form)
+        }}
+        formError={formError ?? null}
+        stickyChrome={false}
+        externalFooter
+        header={(form) => (
           <>
-            {showNarrativeRecovery ? (
-              <div className={quickNpcNarrativeRecoveryClasses()}>
-                <Text variant="muted" className="text-sm">
-                  Narrative generation failed. Retry or create this NPC without a generated
-                  narrative.
-                </Text>
-                <div className={quickNpcNarrativeRecoveryActionsClasses()}>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      setShowNarrativeRecovery(false)
-                      void form.handleSubmit((values) => onSubmit(values, form))()
-                    }}
-                  >
-                    {QUICK_NPC_NARRATIVE_RETRY_LABEL}
-                  </Button>
+            <QuickNpcAuthoringTabsSync
+              form={form}
+              setup={setup}
+              buildContext={buildContext}
+              createContext={createContext}
+              onTabsChange={setTabs}
+            />
+            <QuickNpcSubmitPendingSync form={form} onPendingChange={onPendingChange} />
+            <QuickNpcPreparedBuildSync
+              form={form}
+              setup={setup}
+              buildContext={buildContext}
+              createContext={createContext}
+            />
+            <SetupSummaryRows
+              eyebrow={QUICK_NPC_SETUP_SUMMARY_EYEBROW}
+              rows={setupSummaryRows}
+              changeLabel={QUICK_NPC_SETUP_CHANGE_LABEL}
+              onNavigate={(targetSetId) => {
+                if (editingLock.isLocked) {
+                  editingLock.requestFocus()
+                  return
+                }
+                onSetupSummaryEdit(
+                  targetSetId === QUICK_NPC_BUILD_EXTERNAL_DECISION_ID
+                    ? { type: 'external', id: targetSetId }
+                    : { type: 'set', id: targetSetId },
+                  form.getValues(),
+                )
+              }}
+            />
+          </>
+        )}
+        footer={(form) => {
+          const isSubmitting = form.formState.isSubmitting
+
+          return (
+            <>
+              {showNarrativeRecovery ? (
+                <div className={quickNpcNarrativeRecoveryClasses()}>
+                  <Text variant="muted" className="text-sm">
+                    Narrative generation failed. Retry or create this NPC without a generated
+                    narrative.
+                  </Text>
+                  <div className={quickNpcNarrativeRecoveryActionsClasses()}>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        setShowNarrativeRecovery(false)
+                        void form.handleSubmit((values) => onSubmit(values, form))()
+                      }}
+                    >
+                      {QUICK_NPC_NARRATIVE_RETRY_LABEL}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        skipNarrativeGenerationRef.current = true
+                        setShowNarrativeRecovery(false)
+                        void form.handleSubmit((values) => onSubmit(values, form))()
+                      }}
+                    >
+                      {QUICK_NPC_CREATE_WITHOUT_NARRATIVE_LABEL}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
+              <div className={quickNpcCreateFooterLayoutClasses()}>
+                <QuickNpcAuthoringPreviewButton
+                  buttonRef={previewButtonRef}
+                  buildContext={buildContext}
+                  createContext={createContext}
+                  setup={setup}
+                  getAuthoringValues={() => form.getValues()}
+                  disabled={isSubmitting}
+                />
+                <div className={quickNpcCreateFooterActionsClasses()}>
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
                     disabled={isSubmitting}
-                    onClick={() => {
-                      skipNarrativeGenerationRef.current = true
-                      setShowNarrativeRecovery(false)
-                      void form.handleSubmit((values) => onSubmit(values, form))()
-                    }}
+                    onClick={onCancel}
                   >
-                    {QUICK_NPC_CREATE_WITHOUT_NARRATIVE_LABEL}
+                    Cancel
                   </Button>
+                  <FormShellSubmitButton disabled={isSubmitting || isSuccess}>
+                    {isSubmitting ? 'Creating…' : QUICK_NPC_CREATE_SUBMIT_LABEL}
+                  </FormShellSubmitButton>
                 </div>
               </div>
-            ) : null}
-            <div className={quickNpcCreateFooterLayoutClasses()}>
-              <QuickNpcPreviewNpcButton
-                buttonRef={previewButtonRef}
-                buildContext={buildContext}
-                createContext={createContext}
-                setup={setup}
-                getAuthoringValues={() => form.getValues()}
-                disabled={isSubmitting}
-              />
-              <div className={quickNpcCreateFooterActionsClasses()}>
-                <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
-                  Cancel
-                </Button>
-                <FormShellSubmitButton disabled={isSubmitting || isSuccess}>
-                  {isSubmitting ? 'Creating…' : QUICK_NPC_CREATE_SUBMIT_LABEL}
-                </FormShellSubmitButton>
-              </div>
-            </div>
-          </>
-        )
-      }}
-    />
+            </>
+          )
+        }}
+      />
+    </QuickNpcPreparedBuildProvider>
   )
 }

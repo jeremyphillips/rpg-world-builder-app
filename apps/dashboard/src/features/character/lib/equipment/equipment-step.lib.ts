@@ -13,7 +13,7 @@ import {
   resolveEquipmentPoolChoiceOptions,
   resolveEquipmentPurchaseId,
   resolveEquipmentPurchaseQuantityLimits,
-  resolveStartingEquipmentOption,
+  resolveEffectiveStartingEquipmentPackageItems,
   startingEquipmentChoiceSetId,
   startingEquipmentGrantProficiencyChoiceId,
   startingEquipmentPackageItemKey,
@@ -49,6 +49,7 @@ import {
   type StartingEquipmentOptionSummary,
   getEquipmentKindCollectionLabel,
   getEquipmentKindCompactLabel,
+  type EffectiveStartingEquipmentPackageItem,
 } from '@rpg/contracts'
 
 import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
@@ -669,14 +670,15 @@ function inventoryGroupForEquipment(
 }
 
 function packageEntryFromResolvedItem(
-  item: ReturnType<typeof resolveStartingEquipmentOption>['items'][number],
+  item: EffectiveStartingEquipmentPackageItem['item'],
   sources: CharacterSelectionSource[],
+  quantity: number,
 ): CharacterEquipmentEntry | undefined {
   if (item.kind === 'grant') {
     if (!item.equipment) return undefined
     return {
       equipmentId: item.equipmentId,
-      quantity: item.grant.quantity ?? 1,
+      quantity,
       equipped: item.grant.equipped,
       modifiers: item.grant.modifiers,
       sources,
@@ -687,7 +689,7 @@ function packageEntryFromResolvedItem(
     if (item.status !== 'resolved' || !item.equipmentId || !item.equipment) return undefined
     return {
       equipmentId: item.equipmentId,
-      quantity: item.grant.quantity ?? 1,
+      quantity,
       equipped: item.grant.equipped,
       modifiers: item.grant.modifiers,
       sources,
@@ -698,7 +700,7 @@ function packageEntryFromResolvedItem(
 
   return {
     equipmentId: item.selectedEquipmentId,
-    quantity: 1,
+    quantity,
     sources,
   }
 }
@@ -888,12 +890,17 @@ function listPackageInventoryRows(args: {
   const packageSources: CharacterSelectionSource[] = [
     { kind: 'classStartingEquipment', sourceId: classId, grantId: selectedOptionId },
   ]
-  const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
+  const items = resolveEffectiveStartingEquipmentPackageItems(
+    draft,
+    characterClass,
+    option,
+    catalogIndex,
+  )
 
-  return resolved.items.flatMap((item, itemIndex) => {
+  return items.flatMap(({ item, itemIndex, quantity }) => {
     const packageItemKey = startingEquipmentPackageItemKey(classId, selectedOptionId, itemIndex)
 
-    const entry = packageEntryFromResolvedItem(item, packageSources)
+    const entry = packageEntryFromResolvedItem(item, packageSources, quantity)
     if (!entry) return []
 
     const equipment = catalogIndex.equipment.get(entry.equipmentId)

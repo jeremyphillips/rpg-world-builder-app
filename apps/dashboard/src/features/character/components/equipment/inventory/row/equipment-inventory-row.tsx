@@ -9,6 +9,7 @@ import {
 import { type EquipmentInventoryDisplayItem } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import { buildEquipmentInventoryDisplayEntity } from '../equipment-inventory-entity.lib'
 import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantity-control'
+import { useEquipmentAdvisoryStatus } from '../../../../hooks/use-character-build-advisories-context'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowQtyLabelClasses,
@@ -96,7 +97,10 @@ export function EquipmentInventoryRowItem({
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
-  const entity = buildEquipmentInventoryDisplayEntity(display, detailLabelOverride)
+  const advisoryStatus = useEquipmentAdvisoryStatus(
+    display.kind === 'single' ? display.row.entry.equipmentId : display.equipmentId,
+  )
+  const entity = buildEquipmentInventoryDisplayEntity(display, detailLabelOverride, advisoryStatus)
 
   if (display.kind === 'single') {
     const { row } = display

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { Text } from '@rpg/ui'
 
-import type { EntitySummaryModel } from '@/features/content'
+import type { EntitySummaryModel, EntitySummaryStatusItem } from '@/features/content'
 import type { EquipmentInventoryRow } from '../../../lib/equipment/equipment-step.lib'
 import type { EquipmentInventoryDisplayItem } from '../../../lib/equipment/equipment-inventory-summary.lib'
 import { resolveCombinedInventoryDetailLineLabel } from '../../../lib/equipment/equipment-inventory-summary.lib'
@@ -34,17 +34,15 @@ function resolveInventoryDescription(detailLabel?: string): ReactNode | undefine
   )
 }
 
-function resolveEquippedStatus(equipped: boolean) {
-  if (!equipped) return undefined
-
-  return [
-    {
-      kind: 'badge' as const,
-      label: 'Equipped',
-      appearance: 'soft' as const,
-      tone: 'success' as const,
-    },
-  ]
+function resolveRowStatus(
+  equipped: boolean,
+  extraStatus: readonly EntitySummaryStatusItem[] = [],
+): EntitySummaryStatusItem[] | undefined {
+  const status: EntitySummaryStatusItem[] = equipped
+    ? [{ kind: 'badge', label: 'Equipped', appearance: 'soft', tone: 'success' }]
+    : []
+  status.push(...extraStatus)
+  return status.length > 0 ? status : undefined
 }
 
 export function buildEquipmentInventoryRowEntity(args: {
@@ -52,17 +50,20 @@ export function buildEquipmentInventoryRowEntity(args: {
   detailLabel?: string
   equipped?: boolean
   stagedRemoval?: boolean
+  /** Appended after the Equipped badge (e.g. build advisory warnings). */
+  extraStatus?: readonly EntitySummaryStatusItem[]
 }): EntitySummaryModel {
   return {
     heading: resolveInventoryHeading(args.equipmentName, args.stagedRemoval),
     description: resolveInventoryDescription(args.detailLabel),
-    status: resolveEquippedStatus(Boolean(args.equipped)),
+    status: resolveRowStatus(Boolean(args.equipped), args.extraStatus),
   }
 }
 
 export function buildEquipmentInventoryDisplayEntity(
   display: EquipmentInventoryDisplayItem,
   detailLabelOverride?: string,
+  extraStatus?: readonly EntitySummaryStatusItem[],
 ): EntitySummaryModel {
   if (display.kind === 'single') {
     const { row } = display
@@ -71,6 +72,7 @@ export function buildEquipmentInventoryDisplayEntity(
       detailLabel: detailLabelOverride ?? resolveDetailLineLabel(row),
       equipped: Boolean(row.entry.equipped),
       stagedRemoval: row.stagedRemoval,
+      extraStatus,
     })
   }
 
@@ -81,5 +83,6 @@ export function buildEquipmentInventoryDisplayEntity(
     equipmentName: display.equipmentName,
     detailLabel,
     equipped,
+    extraStatus,
   })
 }

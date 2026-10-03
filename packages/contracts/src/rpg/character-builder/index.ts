@@ -8,4 +8,5 @@ export {
   characterBuildValidationIssueSchema,
   type CharacterBuildValidationIssue,
 } from './validation-issue'
+export * from './build-advisory'
 export { resolveCharacterBuildStepForIssuePath } from './resolve-character-build-step-for-issue-path'

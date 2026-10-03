@@ -207,11 +207,42 @@ function appendPackageItemsFromDraft(
 
   const { classId, characterClass, option, selectedOptionId } = context
   const packageSources = classStartingEquipmentSource(classId, selectedOptionId)
-  const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
+  const items = resolveEffectiveStartingEquipmentPackageItems(
+    draft,
+    characterClass,
+    option,
+    catalogIndex,
+  )
 
-  return resolved.items.reduce((current, item) => {
-    return appendResolvedPackageItem(current, item, packageSources, draft)
+  return items.reduce((current, { item, quantity }) => {
+    return appendResolvedPackageItem(current, item, packageSources, quantity)
   }, inventory)
+}
+
+export type EffectiveStartingEquipmentPackageItem = {
+  item: ResolvedStartingEquipmentItem
+  itemIndex: number
+  /** Effective quantity after package entry overrides; always > 0. */
+  quantity: number
+}
+
+/**
+ * Resolved package items with `entryQuantities` overrides applied; items whose
+ * effective quantity is ≤ 0 are omitted. `itemIndex` is the authored slot index.
+ */
+export function resolveEffectiveStartingEquipmentPackageItems(
+  draft: CharacterBuilderDraft,
+  characterClass: ClassStored,
+  option: StartingEquipmentOption,
+  catalogIndex: CharacterBuildCatalogIndex,
+): EffectiveStartingEquipmentPackageItem[] {
+  const resolved = resolveStartingEquipmentOption(characterClass, option, draft, catalogIndex)
+  const result: EffectiveStartingEquipmentPackageItem[] = []
+  resolved.items.forEach((item, itemIndex) => {
+    const quantity = effectivePackageItemQuantity(draft, item)
+    if (quantity > 0) result.push({ item, itemIndex, quantity })
+  })
+  return result
 }
 
 function appendPurchasesFromDraft(
@@ -354,11 +385,8 @@ function appendResolvedPackageItem(
   inventory: CharacterEquipment,
   item: ResolvedStartingEquipmentItem,
   sources: CharacterSelectionSource[],
-  draft: CharacterBuilderDraft,
+  quantity: number,
 ): CharacterEquipment {
-  const quantity = effectivePackageItemQuantity(draft, item)
-  if (quantity <= 0) return inventory
-
   if (item.kind === 'grant') {
     if (!item.equipment) return inventory
     return appendEquipmentEntry(inventory, item.equipment, {

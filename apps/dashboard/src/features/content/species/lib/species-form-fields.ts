@@ -12,7 +12,7 @@ import {
   slugSchema,
   type CreatureTypeId,
 } from '@rpg/contracts'
-import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+import { type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 import {
   buildActiveSizeFieldOptions,

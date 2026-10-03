@@ -9,7 +9,11 @@ import {
   QUICK_NPC_PREVIEW_NPC_HEADLINE,
   QUICK_NPC_PREVIEW_NPC_LABEL,
 } from '../../lib/quick-npc/quick-npc-preview-copy'
-import { projectQuickNpcDetailPreview } from '../../lib/quick-npc/quick-npc-detail-preview.lib'
+import {
+  projectQuickNpcDetailPreview,
+  projectQuickNpcDetailPreviewFromPrepared,
+} from '../../lib/quick-npc/quick-npc-detail-preview.lib'
+import type { QuickNpcPreparedDraft } from '../../lib/quick-npc/quick-npc-create'
 import type {
   QuickNpcAuthoringTabFormValues,
   QuickNpcSetupValues,
@@ -21,6 +25,8 @@ export type QuickNpcPreviewNpcButtonProps = {
   setup: QuickNpcSetupValues
   /** Read at click time so preview matches the latest form state. */
   getAuthoringValues: () => Partial<QuickNpcAuthoringTabFormValues>
+  /** Live prepared build; when present, preview projects it instead of re-preparing. */
+  prepared?: QuickNpcPreparedDraft | null
   disabled?: boolean
   buttonRef?: React.RefObject<HTMLButtonElement | null>
 }
@@ -30,6 +36,7 @@ export function QuickNpcPreviewNpcButton({
   createContext,
   setup,
   getAuthoringValues,
+  prepared,
   disabled = false,
   buttonRef,
 }: QuickNpcPreviewNpcButtonProps) {
@@ -40,12 +47,14 @@ export function QuickNpcPreviewNpcButton({
 
   const handleOpen = () => {
     setPreview(
-      projectQuickNpcDetailPreview({
-        setup,
-        authoringValues: getAuthoringValues(),
-        buildContext,
-        createContext,
-      }),
+      prepared
+        ? projectQuickNpcDetailPreviewFromPrepared({ prepared, buildContext })
+        : projectQuickNpcDetailPreview({
+            setup,
+            authoringValues: getAuthoringValues(),
+            buildContext,
+            createContext,
+          }),
     )
     setOpen(true)
   }
