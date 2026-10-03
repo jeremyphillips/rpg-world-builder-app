@@ -3,6 +3,7 @@ import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-iss
 
 import { defineMessage } from '../../../validation/define-message'
 import { absoluteLevelSchema } from '../../primitives/level'
+import { joinInlineMetadata } from '../../primitives/inline-metadata'
 import { formatGroupedNumber } from '../../primitives/number-format'
 import type { XpProgressionEntry } from '../../primitives/xp-progression'
 import { xpRequiredForLevel } from '../../primitives/xp-progression'
@@ -136,11 +137,14 @@ export function formatXpThresholdsSummary(summary: Omit<XpThresholdsSummary, 'la
   const levelPart = `${summary.levelCount} level${summary.levelCount === 1 ? '' : 's'}`
   switch (summary.status) {
     case 'system_default':
-      return `${levelPart} · System default`
+      return joinInlineMetadata([levelPart, 'System default'])
     case 'derived':
-      return `${levelPart} · ${summary.derivedCount} threshold${summary.derivedCount === 1 ? '' : 's'} derived`
+      return joinInlineMetadata([
+        levelPart,
+        `${summary.derivedCount} threshold${summary.derivedCount === 1 ? '' : 's'} derived`,
+      ])
     case 'campaign_override':
-      return `${levelPart} · Campaign override`
+      return joinInlineMetadata([levelPart, 'Campaign override'])
   }
 }
 

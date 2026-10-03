@@ -97,7 +97,7 @@ describe('located-in presentation helpers', () => {
 
     expect(buildLocationEntityContextPresentation(summary)).toEqual({
       heading: 'Yawning Portal',
-      headingSuffix: ' · Building · Brewery',
+      classification: 'Building · Brewery',
       supportingText: 'Located in Dock Ward',
     })
   })

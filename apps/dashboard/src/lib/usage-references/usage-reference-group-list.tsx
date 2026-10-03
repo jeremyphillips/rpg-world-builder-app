@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Text } from '@rpg/ui'
+import { Button, InlineMetadata, Text } from '@rpg/ui'
 import { ChevronDown } from 'lucide-react'
 import type { VocabularyUsageReference } from '@rpg/contracts'
 
@@ -74,7 +74,10 @@ export function UsageReferenceGroupList({
           <section key={group.key} className="space-y-2">
             <div className="flex items-center justify-between gap-3">
               <Text variant="small" className="font-medium text-foreground">
-                {group.label} · {group.count}
+                <InlineMetadata role="heading" density="compact" wrap={false}>
+                  <InlineMetadata.Item>{group.label}</InlineMetadata.Item>
+                  <InlineMetadata.Item>{group.count}</InlineMetadata.Item>
+                </InlineMetadata>
               </Text>
               <Button
                 type="button"

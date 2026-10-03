@@ -1,4 +1,4 @@
-export const CHARACTER_SUMMARY_SEPARATOR = ' · ' as const
+import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
 
 export type CharacterSummaryParts = {
   species?: {
@@ -66,5 +66,5 @@ export function formatCharacterSummarySegments(parts: CharacterSummaryParts): st
 }
 
 export function formatCharacterSummary(parts: CharacterSummaryParts): string {
-  return formatCharacterSummarySegments(parts).join(CHARACTER_SUMMARY_SEPARATOR)
+  return joinInlineMetadata(formatCharacterSummarySegments(parts))
 }

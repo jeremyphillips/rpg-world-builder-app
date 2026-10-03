@@ -39,6 +39,7 @@ import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type CharacterDetailEquipmentTabProps = {
   cards: readonly CharacterSheetEquipmentCard[]
@@ -61,10 +62,12 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
       toolbarAriaLabel={toolbarLabel}
       entity={{
         heading: header.name,
-        description: <CatalogMetadataRenderer lines={header.metadataLines} />,
+        description: (
+          <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />
+        ),
         status:
           footerLabels.length > 0
-            ? [{ kind: 'text', label: footerLabels.join(' · '), variant: 'muted' }]
+            ? [{ kind: 'text', label: joinInlineMetadata(footerLabels), variant: 'muted' }]
             : undefined,
       }}
       trailing={{

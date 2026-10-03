@@ -43,6 +43,19 @@ export {
   EmphasisDetailLine,
   type EmphasisDetailLineProps,
 } from './components/ui/emphasis-detail-line'
+export {
+  InlineMetadata,
+  InlineMetadataItem,
+  type InlineMetadataDensity,
+  type InlineMetadataItemProps,
+  type InlineMetadataProps,
+  type InlineMetadataRole,
+} from './components/ui/inline-metadata'
+export {
+  inlineMetadataItemVariants,
+  inlineMetadataRootVariants,
+  inlineMetadataSeparatorVariants,
+} from './components/ui/inline-metadata.variants'
 export { Alert, type AlertDensity, type AlertProps, type AlertVariant } from './components/ui/alert'
 export {
   alertVariants,
@@ -363,11 +376,7 @@ export {
   type DiceFormulaOperator,
   type DiceFormulaValue,
 } from './components/ui/dice-formula-field.lib'
-export {
-  ARRAY_ITEM_HEADER_DIVIDER,
-  ARRAY_ITEM_TEXT_SEPARATOR,
-  joinArrayItemSummaryParts,
-} from './form/config/array/array-item-config.lib'
+export { joinArrayItemSummaryParts } from './form/config/array/array-item-config.lib'
 export {
   SelectField,
   type SelectFieldProps,

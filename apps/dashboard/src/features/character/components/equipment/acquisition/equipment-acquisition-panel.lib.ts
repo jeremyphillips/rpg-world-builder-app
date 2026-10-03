@@ -33,6 +33,7 @@ import {
   resolveAllowanceRarity,
 } from './equipment-acquisition-format.lib'
 import { resolveEquipmentInventoryManageSources } from '../inventory/manage/equipment-inventory-manage.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export {
   formatGrantPreviewLine,
@@ -140,7 +141,7 @@ function formatMixedAcquisitionPreviewLine(args: {
       ? `1 copy for ${args.totalPurchasePrice}`
       : `${args.purchaseQuantity} copies for ${args.totalPurchasePrice}`
 
-  return `${grantPart} · ${purchasePart}`
+  return joinInlineMetadata([grantPart, purchasePart])
 }
 
 function resolvePurchaseTotalPriceLabel(args: {
@@ -227,8 +228,8 @@ function formatPurchasePreviewLine(args: {
   if (!unitLabel) return undefined
 
   return args.purchaseQuantity === 1
-    ? `Purchased · ${unitLabel}`
-    : `${args.purchaseQuantity} purchased · ${unitLabel} each`
+    ? joinInlineMetadata(['Purchased', unitLabel])
+    : joinInlineMetadata([`${args.purchaseQuantity} purchased`, `${unitLabel} each`])
 }
 
 function buildNextActionPreviewLines(args: {

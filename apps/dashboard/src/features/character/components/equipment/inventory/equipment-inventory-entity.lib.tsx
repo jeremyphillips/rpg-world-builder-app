@@ -6,11 +6,12 @@ import type { EntitySummaryModel, EntitySummaryStatusItem } from '@/features/con
 import type { EquipmentInventoryRow } from '../../../lib/equipment/equipment-step.lib'
 import type { EquipmentInventoryDisplayItem } from '../../../lib/equipment/equipment-inventory-summary.lib'
 import { resolveCombinedInventoryDetailLineLabel } from '../../../lib/equipment/equipment-inventory-summary.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined {
   if (row.stagedRemoval) return row.sourceLabel
   if (row.priceLineLabel) return row.priceLineLabel
-  if (row.bundleLabel) return `${row.sourceLabel} · ${row.bundleLabel}`
+  if (row.bundleLabel) return joinInlineMetadata([row.sourceLabel, row.bundleLabel])
   return row.sourceLabel
 }
 

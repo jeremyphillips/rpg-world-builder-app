@@ -1,5 +1,6 @@
 import { BUILDER_STEPS, formatFieldMessage } from '@rpg/contracts'
 import type { CharacterBuildValidationIssue } from '@rpg/contracts/rpg/character-builder'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type ValidationIssuePresentation = {
   message: string
@@ -12,7 +13,7 @@ export function shouldInlineValidationTechnicalDetails(): boolean {
 }
 
 function formatTechnicalDetails(path: string | undefined, code: string): string | undefined {
-  if (path && code) return `${path} · ${code}`
+  if (path && code) return joinInlineMetadata([path, code])
   if (path) return path
   if (code) return code
   return undefined

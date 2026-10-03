@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-import { StatusDot, Text, heroMetaClasses } from '@rpg/ui'
+import { InlineMetadata, StatusDot, Text, heroMetaClasses } from '@rpg/ui'
 
 import { buildCampaignMetaSegments, type CampaignMeta } from '../lib/campaign-meta.lib'
 
@@ -14,19 +13,20 @@ export function CampaignMetaLine({ meta, includeRecency, countsPending }: Campai
 
   return (
     <Text variant="muted" className={heroMetaClasses} as="span">
-      {segments.map((segment, index) => (
-        <Fragment key={`${segment.kind}-${index}`}>
-          {index > 0 ? ' · ' : null}
-          {segment.kind === 'status' ? (
-            <>
-              <StatusDot tone={meta.statusTone} />
-              {segment.text}
-            </>
-          ) : (
-            segment.text
-          )}
-        </Fragment>
-      ))}
+      <InlineMetadata role="supporting" density="comfortable" wrap>
+        {segments.map((segment, index) => (
+          <InlineMetadata.Item key={`${segment.kind}-${index}`}>
+            {segment.kind === 'status' ? (
+              <>
+                <StatusDot tone={meta.statusTone} />
+                {segment.text}
+              </>
+            ) : (
+              segment.text
+            )}
+          </InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
     </Text>
   )
 }

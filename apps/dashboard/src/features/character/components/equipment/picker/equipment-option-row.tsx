@@ -1,3 +1,4 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { IdentityRow } from '@rpg/ui'
 
 import {
@@ -17,9 +18,7 @@ export type EquipmentOptionRowProps = {
 }
 
 function classificationLabel(presentation: EquipmentOptionRowPresentation): string {
-  return [presentation.kindLabel, ...presentation.metadata]
-    .filter((part) => part.length > 0)
-    .join(' · ')
+  return joinInlineMetadata([presentation.kindLabel, ...presentation.metadata])
 }
 
 /** Compact equipment identity for combobox options. The host row owns selection chrome. */
@@ -27,9 +26,9 @@ export function EquipmentOptionRow({
   presentation,
   maxInlineClauses = 2,
 }: EquipmentOptionRowProps) {
-  const inline = equipmentOptionInlineClauses(presentation, maxInlineClauses)
-    .map((clause) => clause.label)
-    .join(' · ')
+  const inline = joinInlineMetadata(
+    equipmentOptionInlineClauses(presentation, maxInlineClauses).map((clause) => clause.label),
+  )
   const classification = classificationLabel(presentation)
   const trailing = presentation.trailingState
 

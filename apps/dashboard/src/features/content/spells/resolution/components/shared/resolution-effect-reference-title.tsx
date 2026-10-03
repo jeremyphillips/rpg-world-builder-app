@@ -1,4 +1,4 @@
-import { cn } from '@rpg/ui'
+import { cn, InlineMetadata } from '@rpg/ui'
 
 import {
   formatEffectReferenceTitle,
@@ -7,7 +7,6 @@ import {
 } from '../../lib/form/resolution-effect-reference.lib'
 
 const KIND_SEPARATOR = ' — '
-const DETAIL_SEPARATOR = ' · '
 
 export type ResolutionEffectReferenceTitleProps = {
   reference: EffectReferenceState
@@ -20,7 +19,7 @@ function renderResolvedTitle(reference: Extract<EffectReferenceState, { kind: 'r
   const { kindLabel, customLabel, mechanicalSummary } = reference.display.segments
   const detailTone = 'text-muted-foreground'
 
-  return (
+  const kindBlock = (
     <>
       <span>{kindLabel}</span>
       {customLabel ? (
@@ -31,14 +30,29 @@ function renderResolvedTitle(reference: Extract<EffectReferenceState, { kind: 'r
           <span>{customLabel}</span>
         </>
       ) : null}
-      {mechanicalSummary ? (
-        <>
-          <span className={detailTone} aria-hidden>
-            {customLabel ? DETAIL_SEPARATOR : KIND_SEPARATOR}
-          </span>
-          <span className={customLabel ? detailTone : undefined}>{mechanicalSummary}</span>
-        </>
-      ) : null}
+    </>
+  )
+
+  if (!mechanicalSummary) {
+    return kindBlock
+  }
+
+  if (customLabel) {
+    return (
+      <InlineMetadata role="supporting" density="compact" wrap={false}>
+        <InlineMetadata.Item>{kindBlock}</InlineMetadata.Item>
+        <InlineMetadata.Item className={detailTone}>{mechanicalSummary}</InlineMetadata.Item>
+      </InlineMetadata>
+    )
+  }
+
+  return (
+    <>
+      <span>{kindLabel}</span>
+      <span className={detailTone} aria-hidden>
+        {KIND_SEPARATOR}
+      </span>
+      <span>{mechanicalSummary}</span>
     </>
   )
 }

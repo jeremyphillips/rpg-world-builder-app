@@ -21,7 +21,7 @@ export const UtilityAndOverflow: Story = {
     <DetailEntityRow
       heading="Dock Ward"
       headingHref="/campaigns/demo/locations/dock-ward"
-      headingSuffix=" · District · 1 location"
+      classification="District · 1 location"
       trailing={{
         kind: 'action',
         content: (

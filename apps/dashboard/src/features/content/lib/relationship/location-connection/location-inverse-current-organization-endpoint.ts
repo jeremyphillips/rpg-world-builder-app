@@ -31,7 +31,7 @@ export function resolveLocationInverseCurrentOrganizationEndpoint(input: {
   return {
     entity: {
       heading: row.subject.name,
-      headingSuffix: kindLabel ? ` · ${kindLabel}` : undefined,
+      classification: kindLabel,
     },
     displayImage: organization
       ? getContentDisplayImage(buildOrganizationContentDisplayImageInput(organization, 'compact'))

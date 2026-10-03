@@ -9,7 +9,7 @@ describe('DrawerEntityBlock', () => {
     render(
       <DrawerEntityBlock
         heading="Dock Ward"
-        headingSuffix=" · District"
+        classification="District"
         supportingText="Located in Harborford"
       />,
     )

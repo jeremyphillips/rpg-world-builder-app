@@ -3,6 +3,7 @@ import {
   formatGeneralTableMetadata,
   type ContentTable,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { tableBuilderKindLabel } from '../../lib/table-builder/table-builder-kind-options.lib'
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -17,7 +18,10 @@ export function formatFeatureTableMetadata(table: ContentTable): string {
   const breakpointCount = collectProgressionTableBreakpoints(table).length
   const columnLabel = columnCount === 1 ? 'column' : 'columns'
   const breakpointLabel = breakpointCount === 1 ? 'breakpoint' : 'breakpoints'
-  return `${columnCount} ${columnLabel} · ${breakpointCount} ${breakpointLabel}`
+  return joinInlineMetadata([
+    `${columnCount} ${columnLabel}`,
+    `${breakpointCount} ${breakpointLabel}`,
+  ])
 }
 
 export function featureTableKindLabel(table: ContentTable): string {

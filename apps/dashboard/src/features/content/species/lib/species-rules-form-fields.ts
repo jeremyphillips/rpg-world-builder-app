@@ -6,6 +6,7 @@ import {
   speciesMulticlassingSchema,
   type SpeciesClassPolicyMode,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { effectiveMaxFromCtx } from '../../lib/form-options/content-campaign-rules'
@@ -235,7 +236,7 @@ export function speciesLevelLimitsFields(ctx: ContentFormCtx): FormItem[] {
                   const classId = values['classId'] as string | undefined
                   const maxLevelValue = values['maxLevel'] as string | number | undefined
                   if (classId && maxLevelValue !== undefined) {
-                    return `${classId} · level ${maxLevelValue}`
+                    return joinInlineMetadata([`${classId}`, `level ${maxLevelValue}`])
                   }
                   return undefined
                 },

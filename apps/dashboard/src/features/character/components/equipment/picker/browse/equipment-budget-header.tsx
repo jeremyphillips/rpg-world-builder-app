@@ -1,5 +1,5 @@
 import { formatWealthAsGold, type EquipmentBudgetSummary } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { InlineMetadata, Text } from '@rpg/ui'
 
 import {
   equipmentBudgetHeaderMetaClasses,
@@ -18,7 +18,10 @@ export function EquipmentBudgetHeader({ budget }: EquipmentBudgetHeaderProps) {
         {formatWealthAsGold(budget.remaining)} remaining
       </Text>
       <Text as="p" className={equipmentBudgetHeaderMetaClasses}>
-        {formatWealthAsGold(budget.starting)} starting · {formatWealthAsGold(budget.spent)} spent
+        <InlineMetadata role="supporting" density="compact">
+          <InlineMetadata.Item>{formatWealthAsGold(budget.starting)} starting</InlineMetadata.Item>
+          <InlineMetadata.Item>{formatWealthAsGold(budget.spent)} spent</InlineMetadata.Item>
+        </InlineMetadata>
       </Text>
     </div>
   )

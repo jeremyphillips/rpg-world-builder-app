@@ -17,6 +17,7 @@ import {
 import { useVocabularySets } from '@/features/vocabulary'
 import { GAME_TERMS_VOCABULARY_CATEGORIES } from '../lib/hub/vocabulary-set-registry'
 import { GAME_TERMS_HUB_LABEL } from '../lib/detail/game-terms-fallback'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 const GAME_TERMS_HUB_DESCRIPTION =
   'Browse and customize the closed vocabulary sets that shape how rules read in this campaign.'
@@ -79,7 +80,7 @@ export function VocabularyHubContent({ campaignId }: VocabularyHubContentProps) 
                       <span className="font-medium text-foreground">{category.label}</span>
                       <Text variant="small">{category.description}</Text>
                       <Text variant="muted" className="text-xs">
-                        {metadataParts.join(' · ')}
+                        {joinInlineMetadata(metadataParts)}
                       </Text>
                     </div>
                     <ChevronRight aria-hidden className={campaignDestinationChevronClasses} />

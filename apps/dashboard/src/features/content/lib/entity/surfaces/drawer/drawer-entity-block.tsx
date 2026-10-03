@@ -13,7 +13,7 @@ const DRAWER_ENTITY_DENSITY = 'compact' as const
 
 export function DrawerEntityBlock({
   heading,
-  headingSuffix,
+  classification,
   supportingText,
   href,
   className,
@@ -23,7 +23,7 @@ export function DrawerEntityBlock({
       <EntityAnatomy
         entity={projectEntitySummaryModel({
           heading,
-          classification: headingSuffix,
+          classification: classification,
           description: supportingText,
         })}
         headingHref={href}

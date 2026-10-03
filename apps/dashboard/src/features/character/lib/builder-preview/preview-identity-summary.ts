@@ -5,6 +5,7 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { PREVIEW_RAIL_EMPTY_TEXT } from '@rpg/ui'
 
 import {
@@ -14,8 +15,6 @@ import {
 import { resolveCatalogEntryName } from './review-step-display'
 
 export const PREVIEW_UNNAMED_CHARACTER = 'Unnamed character'
-export const PREVIEW_LEVEL_CLASS_SEPARATOR = ' · '
-
 function catalogEntries<T extends { id: string; name: string }>(
   map: ReadonlyMap<string, T>,
 ): readonly T[] {
@@ -53,7 +52,7 @@ export function getPreviewLevelClassLine(
   const level = draft.class.level
 
   if (!draft.class.classId) {
-    return `Level ${level}${PREVIEW_LEVEL_CLASS_SEPARATOR}${PREVIEW_RAIL_EMPTY_TEXT}`
+    return joinInlineMetadata([`Level ${level}`, PREVIEW_RAIL_EMPTY_TEXT])
   }
 
   const parts = resolveBuilderCharacterSummaryParts(

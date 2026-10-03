@@ -1,6 +1,6 @@
 import { useId, useMemo } from 'react'
 
-import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
+import { Badge, Button, Heading, InlineMetadata, NumberStepper, Text } from '@rpg/ui'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
@@ -68,8 +68,12 @@ function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel
   return (
     <div className={equipmentAcquisitionPanelSourceQuantityWrapClasses}>
       <span className={equipmentAcquisitionPanelSourceQuantityInlineClasses}>
-        <span>{source.quantityLabel}</span>
-        <span className="hidden min-[22rem]:inline"> · {source.spendSuffix}</span>
+        <InlineMetadata role="supporting" density="compact" wrap>
+          <InlineMetadata.Item>{source.quantityLabel}</InlineMetadata.Item>
+          <InlineMetadata.Item className="hidden min-[22rem]:inline">
+            {source.spendSuffix}
+          </InlineMetadata.Item>
+        </InlineMetadata>
       </span>
       <span className={`${equipmentAcquisitionPanelSourceSpendSuffixClasses} min-[22rem]:hidden`}>
         {source.spendSuffix}

@@ -9,7 +9,7 @@ import {
   buildCharacterEntitySummaryVmFromCatalog,
   buildCharacterEntitySummaryVmFromTransport,
   formatCharacterInlineSummary,
-  formatCharacterMixedHeadingSuffix,
+  formatCharacterMixedClassification,
 } from './character-entity-summary.lib'
 
 const context = createPopulatedStandaloneBuilderContextFixture()
@@ -83,7 +83,7 @@ describe('formatCharacterInlineSummary', () => {
   })
 })
 
-describe('formatCharacterMixedHeadingSuffix', () => {
+describe('formatCharacterMixedClassification', () => {
   it('prefixes the inline mixed summary with the row separator', () => {
     const vm = buildCharacterEntitySummaryVmFromTransport({
       id: 'char-1',
@@ -92,6 +92,6 @@ describe('formatCharacterMixedHeadingSuffix', () => {
       characterType: 'pc',
     })
 
-    expect(formatCharacterMixedHeadingSuffix(vm)).toBe(' · PC · Dwarf · Level 1 Fighter')
+    expect(formatCharacterMixedClassification(vm)).toBe('PC · Dwarf · Level 1 Fighter')
   })
 })

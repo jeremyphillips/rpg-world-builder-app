@@ -6,6 +6,7 @@ import {
   Badge,
   cn,
   DialogPanelScrollRegion,
+  InlineMetadata,
   Modal,
   SelectionSummaryCard,
   Tabs,
@@ -28,7 +29,6 @@ import { resolveActiveCreateTabId } from './resolve-active-create-tab'
 import {
   createModalShellBodyVariants,
   createModalShellContentVariants,
-  createModalShellIssueSeparatorClasses,
   createModalShellTabContentVariants,
   createModalShellTabContentViewportClasses,
   createModalShellTabsListRegionVariants,
@@ -111,9 +111,6 @@ function formatIssueAttentionLabel(count: number | undefined): string {
 function CreateModalShellIssueBadge({ count }: { count: number | undefined }) {
   return (
     <>
-      <span aria-hidden className={createModalShellIssueSeparatorClasses}>
-        {' · '}
-      </span>
       {count == null ? (
         <Badge
           appearance="soft"
@@ -210,11 +207,17 @@ function CreateModalShellTabs({
                 data-create-tab-trigger={tab.id}
                 disabled={tab.disabled}
               >
-                {tab.label}
-                {tab.optional ? ' (optional)' : null}
-                {tab.status.invalid ? (
-                  <CreateModalShellIssueBadge count={tab.status.issueCount} />
-                ) : null}
+                <InlineMetadata role="heading" density="compact" wrap={false}>
+                  <InlineMetadata.Item>
+                    {tab.label}
+                    {tab.optional ? ' (optional)' : null}
+                  </InlineMetadata.Item>
+                  {tab.status.invalid ? (
+                    <InlineMetadata.Item>
+                      <CreateModalShellIssueBadge count={tab.status.issueCount} />
+                    </InlineMetadata.Item>
+                  ) : null}
+                </InlineMetadata>
               </TabsTrigger>
             )
           })}

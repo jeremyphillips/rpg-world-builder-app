@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import { getOrganizationDomainLabel } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   Button,
   ConfirmDialog,
@@ -118,7 +119,7 @@ export function EditOrganizationMembershipDrawer({
         open={open}
         onOpenChange={handleOpenChange}
         title={copy.drawerTitle}
-        description={`${organization.name} · ${kindLabel}`}
+        description={joinInlineMetadata([organization.name, kindLabel])}
         bodyMode="composed"
       >
         <DrawerShell.Body className={drawerShellBodyVariants({ mode: 'managed' })}>

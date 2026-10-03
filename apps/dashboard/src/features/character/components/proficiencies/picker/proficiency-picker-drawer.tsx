@@ -163,6 +163,7 @@ export function ProficiencyPickerDrawer({
             heading: item.label,
             description: item.compactSummary ? (
               <CatalogMetadataRenderer
+                density="compact"
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,

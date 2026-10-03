@@ -38,6 +38,7 @@ import {
   QUICK_NPC_NPC_TEMPLATE_FIELD_PROMPT,
 } from './quick-npc-npc-template-option.lib'
 import { isQuickNpcStandaloneSetup } from './quick-npc-form-fields'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const QUICK_NPC_ORG_MEMBER_SETUP_HEADLINE = 'Set up member' as const
 export const QUICK_NPC_ORG_MEMBER_SETUP_DESCRIPTION =
@@ -324,7 +325,7 @@ function formatQuickNpcAuthoringBuildSummaryValue(args: {
     parts.push(`Level ${args.values.level}`)
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 /** Role / Species / Build rows from current setup state, in registry order. */

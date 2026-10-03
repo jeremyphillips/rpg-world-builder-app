@@ -3,7 +3,7 @@ import type { FieldOption } from '@rpg/ui/form'
 
 import { formatContentReferenceLabel } from '@/features/character'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from '../../../organizations/lib/members/organization-member-class-chip-options.lib'
+import { formatContentReferenceUnresolvedLabel } from '../../../organizations/lib/members/organization-member-class-chip-options.lib'
 import { buildParentLocationOptions } from './location-parent-picker'
 
 function buildAuthorizedParentLocationDisplay(input: {
@@ -48,6 +48,6 @@ export function buildParentLocationFieldOptions(
       visibleCatalog,
     }),
     formatUnresolvedLabel: (locationId) =>
-      `${formatContentReferenceLabel(locationId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`,
+      formatContentReferenceUnresolvedLabel(formatContentReferenceLabel(locationId)),
   })
 }

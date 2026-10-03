@@ -77,9 +77,7 @@ import {
   type GrantGroup,
   type Spell,
 } from '@rpg/contracts'
-
-/** Separator for compact grant summary lists. */
-export const GRANT_SUMMARY_JOIN = ' · ' as const
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type GrantDisplayVocabulary = {
   resolveSenseLabel: (type: string) => string
@@ -595,13 +593,13 @@ export function formatGrantSummaryInline(
   const parts = buildDisplayParts(model.flatItems, options)
   const { parts: visibleParts, overflowCount } = applyMaxItems(parts, options?.maxItems)
 
-  const text = visibleParts.join(GRANT_SUMMARY_JOIN)
+  const text = joinInlineMetadata(visibleParts)
   if (overflowCount === undefined || overflowCount === 0) {
     return text
   }
 
   return text.length > 0
-    ? `${text}${GRANT_SUMMARY_JOIN}+${overflowCount} more`
+    ? joinInlineMetadata([text, `+${overflowCount} more`])
     : `+${overflowCount} more`
 }
 
@@ -612,7 +610,7 @@ export function formatGrantSummaryByLevel(
   return model.groups
     .map((group) => ({
       label: group.label,
-      text: buildDisplayParts(group.items, options).join(GRANT_SUMMARY_JOIN),
+      text: joinInlineMetadata(buildDisplayParts(group.items, options)),
     }))
     .filter((entry) => entry.text.length > 0)
 }

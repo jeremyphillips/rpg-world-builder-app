@@ -31,7 +31,7 @@ export type ContentCardProps = Omit<ContentCardBodyProps, 'rowAlign' | 'classNam
 // Future variants should be added only when demonstrated by a real ContentCard consumer.
 export function ContentCard({
   heading,
-  headingSuffix,
+  classification,
   subheading,
   metadata,
   media,
@@ -60,7 +60,7 @@ export function ContentCard({
     >
       <ContentCardBody
         heading={heading}
-        headingSuffix={headingSuffix}
+        classification={classification}
         subheading={subheading}
         metadata={metadata}
         media={media}

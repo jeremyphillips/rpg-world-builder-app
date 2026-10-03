@@ -10,6 +10,7 @@ import {
   resolveCampaignStatusLabel,
   resolveCampaignViewerFacetLabel,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { INVALID_DATETIME_FALLBACK, formatRelativeRecency } from '@/lib/datetime/format-datetime'
 
@@ -109,7 +110,7 @@ export function buildCampaignMetaSegments(
 }
 
 export function formatCampaignMetaPlainText(segments: readonly CampaignMetaSegment[]): string {
-  return segments.map((segment) => segment.text).join(' · ')
+  return joinInlineMetadata(segments.map((segment) => segment.text))
 }
 
 export function buildCampaignDestinationMeta(

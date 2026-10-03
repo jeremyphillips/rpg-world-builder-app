@@ -25,6 +25,7 @@ import { SemanticText } from '../ui/semantic-text/semantic-text'
 import { StatusDot } from '../ui/status-dot'
 import { StatusIcon } from '../ui/status-icon.client'
 import type { StatusIconVariant } from '../ui/status-icon.variants'
+import { InlineMetadata } from '../ui/inline-metadata'
 import { Text } from '../ui/text'
 import type {
   PreviewRailAvailability,
@@ -42,7 +43,6 @@ import {
   previewRailActionButtonClasses,
   previewRailActionHelperTextClasses,
   previewRailActionStackClasses,
-  previewRailAvailabilityDetailSeparatorClasses,
   previewRailAvailabilityInactiveIconClasses,
   previewRailAvailabilityRowClasses,
   previewRailDividerClasses,
@@ -197,15 +197,14 @@ function PreviewRailAvailabilityLine({
       ) : (
         <CircleSlash aria-hidden className={previewRailAvailabilityInactiveIconClasses} />
       )}
-      <span className="font-medium">{statusLabel}</span>
-      {detail ? (
-        <>
-          <span aria-hidden className={previewRailAvailabilityDetailSeparatorClasses}>
-            ·
-          </span>
-          <span className="truncate">{detail}</span>
-        </>
-      ) : null}
+      <InlineMetadata role="supporting" density="compact" wrap={false} className="min-w-0 flex-1">
+        <InlineMetadata.Item className="font-medium">{statusLabel}</InlineMetadata.Item>
+        {detail ? (
+          <InlineMetadata.Item truncate className="truncate">
+            {detail}
+          </InlineMetadata.Item>
+        ) : null}
+      </InlineMetadata>
     </p>
   )
 }

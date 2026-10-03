@@ -1,6 +1,6 @@
 import type { GlobalSearchDocument } from '@rpg/contracts'
 import { getGlobalSearchFilterGroupLabel } from '@rpg/contracts'
-import { InteractiveListGroupHeading, InteractiveList, cn } from '@rpg/ui'
+import { InlineMetadata, InteractiveListGroupHeading, InteractiveList, cn } from '@rpg/ui'
 import { Link } from 'react-router-dom'
 
 import { GLOBAL_SEARCH_COPY } from '../../lib/global-search-copy'
@@ -60,11 +60,12 @@ export function GlobalSearchGroupSection({
         first={sectionIndex === 0}
         follows={follows}
       >
-        {groupLabel}
-        <span className={globalSearchGroupHeadingCountClasses}>
-          {' · '}
-          {section.totalCount}
-        </span>
+        <InlineMetadata role="heading" density="compact" wrap={false}>
+          <InlineMetadata.Item>{groupLabel}</InlineMetadata.Item>
+          <InlineMetadata.Item className={globalSearchGroupHeadingCountClasses}>
+            {section.totalCount}
+          </InlineMetadata.Item>
+        </InlineMetadata>
       </InteractiveListGroupHeading>
 
       <InteractiveList>

@@ -27,7 +27,7 @@ import {
 
 export type SelectionOptionCardCopyWidth = 'fill' | 'content'
 
-export const SELECTION_OPTION_CARD_SUMMARY_SEPARATOR = ' · '
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type SelectionOptionCardDensity = 'default' | 'compact'
 
@@ -251,7 +251,7 @@ export function SelectionOptionCardAnatomy({
 }: SelectionOptionCardAnatomyProps) {
   const summaryText =
     summaryItems && summaryItems.length > 0
-      ? summaryItems.join(SELECTION_OPTION_CARD_SUMMARY_SEPARATOR)
+      ? joinInlineMetadata(summaryItems)
       : undefined
   const titleRow = (
     <SelectionOptionCardTitleRow

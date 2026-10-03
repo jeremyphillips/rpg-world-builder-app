@@ -1,4 +1,5 @@
 import { formatDice, type Dice } from '../../primitives/dice'
+import { joinInlineMetadata } from '../../primitives/inline-metadata'
 
 import type { GeneralTable } from './general-table'
 import type { ProgressionTableColumn } from './table-column'
@@ -25,7 +26,10 @@ export function formatTableValue(column: TableColumnDef, value: TableCellValue):
 export function formatGeneralTableMetadata(table: Pick<GeneralTable, 'columns' | 'rows'>): string {
   const columnCount = table.columns.length
   const rowCount = table.rows.length
-  return `${columnCount} column${columnCount === 1 ? '' : 's'} · ${rowCount} row${rowCount === 1 ? '' : 's'}`
+  return joinInlineMetadata([
+    `${columnCount} column${columnCount === 1 ? '' : 's'}`,
+    `${rowCount} row${rowCount === 1 ? '' : 's'}`,
+  ])
 }
 
 /** Display SSOT for progression table cell values. */

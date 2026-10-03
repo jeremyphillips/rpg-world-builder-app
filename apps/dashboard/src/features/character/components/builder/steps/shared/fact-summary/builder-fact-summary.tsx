@@ -6,6 +6,7 @@ import type {
 import { cn, Heading, IconContainer } from '@rpg/ui'
 import type { LucideIcon } from 'lucide-react'
 
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   builderFactSummaryCategoryLabelClasses,
   builderFactSummaryClasses,
@@ -194,7 +195,7 @@ function GrantedFactSummary({
                       <FactSummaryValue
                         value={
                           sourceGroup.valueLabels.length > 0
-                            ? sourceGroup.valueLabels.join(' · ')
+                            ? joinInlineMetadata(sourceGroup.valueLabels)
                             : undefined
                         }
                         unsetText={sourceGroup.unsetText}

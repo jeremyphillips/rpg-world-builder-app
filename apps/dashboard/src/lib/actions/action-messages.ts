@@ -1,3 +1,4 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 export type ActionDescriptor = {
   nounSingular: string
   nounPlural: string
@@ -161,7 +162,7 @@ export function formatBulkActionSummary(input: ActionBulkSummaryInput): string {
     parts.push(`${input.failed} failed`)
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function formatActionSuccess(

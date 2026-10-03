@@ -47,7 +47,7 @@ Detail and relationship rows compose **`EntityAnatomyHost`** (via `DetailEntityR
 | Row / drawer prop  | Entity summary field          | Notes                                                                                   |
 | ------------------ | ----------------------------- | --------------------------------------------------------------------------------------- |
 | `heading`          | `heading`                     | Entity name                                                                             |
-| `classification`   | `classification`              | Inline muted kind/context after the title (may include leading `·`)                     |
+| `classification`   | `classification`              | Inline muted kind/context after the title (separator-free; `InlineMetadata` renders `·`) |
 | `headingAccessory` | (composed into inline suffix) | Membership titles, roles, and other compact qualifiers — distinct from `classification` |
 | `description`      | `description`                 | Second-line disambiguation (e.g. Located in …)                                          |
 | `status`           | `status`                      | Trailing metadata such as availability badges                                           |

@@ -18,8 +18,9 @@ import {
   buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
-  GRANT_SUMMARY_JOIN,
 } from './grant-display'
+
+const GRANT_SUMMARY_JOIN = ' · ' as const
 
 const vocabulary = buildCatalogDrowGrantDisplayVocabulary()
 

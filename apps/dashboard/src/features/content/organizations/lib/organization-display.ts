@@ -26,6 +26,7 @@ import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/
 import type { LocationEntitySummaryVm } from '../../locations/lib/location-display'
 import { resolveOrganizationMemberClassAffinityDisplayLabel } from './members/organization-member-class-chip-options.lib'
 import { resolveOrganizationMemberSpeciesAffinityDisplayLabel } from './members/organization-member-species-chip-options.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const ORGANIZATION_SECTION_LABELS = {
   members: 'Members',
@@ -47,7 +48,7 @@ export const ORGANIZATION_MEMBERSHIP_TITLES_EMPTY_SUPPORT =
 
 export const ORGANIZATION_MEMBERSHIP_TITLES_HEADING_ID = 'organization-membership-titles-heading'
 
-export const ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX = ' · Organization' as const
+export const ORGANIZATION_DRAWER_CONTEXT_TYPE_LABEL = 'Organization' as const
 
 export type OrganizationEntitySummaryVm = {
   id: string
@@ -103,7 +104,7 @@ export function buildOrganizationDrawerEntityPresentation(
 ): DrawerEntityPresentation {
   return {
     heading: organization.name,
-    headingSuffix: ORGANIZATION_DRAWER_CONTEXT_TYPE_SUFFIX,
+    classification: ORGANIZATION_DRAWER_CONTEXT_TYPE_LABEL,
   }
 }
 
@@ -172,7 +173,9 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Functions',
-              value: organization.functions.map(getOrganizationFunctionLabel).join(' · '),
+              value: joinInlineMetadata(
+                organization.functions.map(getOrganizationFunctionLabel),
+              ),
             },
           ]
         : []),
@@ -180,7 +183,9 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Practices',
-              value: organization.practices.map(getOrganizationPracticeLabel).join(' · '),
+              value: joinInlineMetadata(
+                organization.practices.map(getOrganizationPracticeLabel),
+              ),
             },
           ]
         : []),
@@ -188,14 +193,14 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Member class affinities',
-              value: organization.members.classAffinityIds
-                .map((classId) =>
+              value: joinInlineMetadata(
+                organization.members.classAffinityIds.map((classId) =>
                   resolveOrganizationMemberClassAffinityDisplayLabel(classId, {
                     selectableClasses: campaignUseClasses,
                     catalogClasses,
                   }),
-                )
-                .join(' · '),
+                ),
+              ),
             },
           ]
         : []),
@@ -203,14 +208,14 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Member species affinities',
-              value: organization.members.speciesAffinityIds
-                .map((speciesId) =>
+              value: joinInlineMetadata(
+                organization.members.speciesAffinityIds.map((speciesId) =>
                   resolveOrganizationMemberSpeciesAffinityDisplayLabel(speciesId, {
                     selectableSpecies: campaignUseSpecies,
                     catalogSpecies,
                   }),
-                )
-                .join(' · '),
+                ),
+              ),
             },
           ]
         : []),

@@ -262,7 +262,6 @@ export {
   buildSpellGrantVocabulary,
   formatGrantSummaryByLevel,
   formatGrantSummaryInline,
-  GRANT_SUMMARY_JOIN,
   type GrantDisplayVocabulary,
   type GrantSummaryFormatOptions,
   type GrantSummaryGroup,

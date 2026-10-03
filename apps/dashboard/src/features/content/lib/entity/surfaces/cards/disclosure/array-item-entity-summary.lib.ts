@@ -1,3 +1,4 @@
+import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 import type { ResolvedArrayItemHeader } from '@rpg/ui/form'
 
 import type { EntitySummaryStatusItem } from '../../../summary/entity-summary-status.types'
@@ -12,9 +13,15 @@ function isRedundantClassification(heading: string, classification: string): boo
   const normalizedClassification = normalizeSummaryPart(classification)
   if (normalizedClassification === normalizedHeading) return true
   if (normalizedClassification.startsWith(`${normalizedHeading} —`)) return true
-  if (normalizedClassification.startsWith(`${normalizedHeading} ·`)) return true
+  if (
+    normalizedClassification.startsWith(
+      `${normalizedHeading} ${INLINE_METADATA_SEPARATOR}`,
+    )
+  ) {
+    return true
+  }
   const headingPrefix = new RegExp(
-    `^${normalizedHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[,—·]`,
+    `^${normalizedHeading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*[,—${INLINE_METADATA_SEPARATOR}]`,
   )
   return headingPrefix.test(normalizedClassification)
 }

@@ -1,3 +1,4 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import type { FormValueSync } from '@rpg/ui/form'
 
 import type {
@@ -26,9 +27,18 @@ export const SPELL_SELECTION_MODEL_OPTIONS = [
 ] as const
 
 export const SPELL_SELECTION_CHANGE_PACKAGE_OPTIONS = [
-  { value: 'levelUp:1', label: 'When gaining a class level · Replace 1' },
-  { value: 'longRest:1', label: 'After a Long Rest · Replace 1' },
-  { value: 'longRest:all', label: 'After a Long Rest · Replace all' },
+  {
+    value: 'levelUp:1',
+    label: joinInlineMetadata(['When gaining a class level', 'Replace 1']),
+  },
+  {
+    value: 'longRest:1',
+    label: joinInlineMetadata(['After a Long Rest', 'Replace 1']),
+  },
+  {
+    value: 'longRest:all',
+    label: joinInlineMetadata(['After a Long Rest', 'Replace all']),
+  },
   { value: 'none', label: 'Cannot normally replace' },
 ] as const
 
@@ -107,11 +117,17 @@ export function formatRegularGainSummary(input: {
       ? { starting: input.starting, perLevel: input.perLevel, throughLevel: input.throughLevel }
       : detectRegularGain(input.acquisition)
   if (regular) {
-    return `Start with ${regular.starting} · Gain ${regular.perLevel} each level through level ${regular.throughLevel}`
+    return joinInlineMetadata([
+      `Start with ${regular.starting}`,
+      `Gain ${regular.perLevel} each level through level ${regular.throughLevel}`,
+    ])
   }
   const acquisition = input.acquisition
   const count = acquisition?.curve.rows.length ?? 0
-  return `Spell acquisition varies by class level · ${count} change level${count === 1 ? '' : 's'}`
+  return joinInlineMetadata([
+    'Spell acquisition varies by class level',
+    `${count} change level${count === 1 ? '' : 's'}`,
+  ])
 }
 
 export function formatRegularGainAlert(input: {

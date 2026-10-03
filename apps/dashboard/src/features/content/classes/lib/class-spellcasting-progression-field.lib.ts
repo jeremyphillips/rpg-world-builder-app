@@ -1,4 +1,5 @@
 import type { ClassSpellcastingProgression, ClassSpellSelection } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   classCapacityProgressionValidationMessages,
   resolveSpellSelectionColumnLabel,
@@ -316,5 +317,8 @@ export function formatClassSpellcastingProgressionMetadata(input: {
   const changeLevels = mergedRowsFromProgression(input.progression, columnKeys).length
   const columnLabel = columnCount === 1 ? 'column' : 'columns'
   const levelLabel = changeLevels === 1 ? 'change level' : 'change levels'
-  return `${columnCount} ${columnLabel} · ${changeLevels} ${levelLabel}`
+  return joinInlineMetadata([
+    `${columnCount} ${columnLabel}`,
+    `${changeLevels} ${levelLabel}`,
+  ])
 }

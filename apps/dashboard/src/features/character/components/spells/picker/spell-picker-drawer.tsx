@@ -212,6 +212,7 @@ export function SpellPickerDrawer({
             heading: item.spell.name,
             description: (
               <CatalogMetadataRenderer
+                density="compact"
                 lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ),

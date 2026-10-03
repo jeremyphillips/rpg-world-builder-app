@@ -1,3 +1,5 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 import { formatOverviewResultLabel } from '@/lib/data-table/overview-selection-cluster.lib'
 
 /**
@@ -7,8 +9,6 @@ import { formatOverviewResultLabel } from '@/lib/data-table/overview-selection-c
  * - Game Terms vocabulary hub (`N terms`, see vocabulary-hub.tsx)
  * - Empty-state notices with content-specific plural nouns
  */
-/** Shared middle-dot separator for count/availability summary fragments. */
-export const AVAILABILITY_COUNT_SUMMARY_SEPARATOR = ' · '
 
 export type AvailabilityCountSummaryParts = {
   segments: string[]
@@ -29,9 +29,7 @@ export function formatUnavailableAvailabilityCount(count: number): string | null
 export function joinAvailabilityCountSummarySegments(
   segments: readonly (string | null | undefined)[],
 ): string {
-  return segments
-    .filter((segment): segment is string => Boolean(segment))
-    .join(AVAILABILITY_COUNT_SUMMARY_SEPARATOR)
+  return joinInlineMetadata(segments)
 }
 
 /**

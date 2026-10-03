@@ -10,7 +10,6 @@ import {
   fieldGroupSummaryStatusLineVariants,
 } from './field-group-summary-disclosure.variants'
 import {
-  fieldGroupSummaryStatusDetailSeparatorClasses,
   fieldGroupSummaryStatusIndicatorVariants,
   fieldGroupSummaryStatusLabelVariants,
   fieldGroupSummaryStatusSecondaryClasses,
@@ -25,6 +24,7 @@ import {
   fieldGroupSummaryTriggerSizeVariants,
   fieldGroupSummaryTriggerTypographyClasses,
 } from './field-group-summary-trigger.variants'
+import { InlineMetadata } from './inline-metadata'
 import { Text } from './text'
 
 export type FieldGroupSummaryTriggerProps = Omit<
@@ -78,9 +78,13 @@ function FieldGroupSummaryStatusRow({
   if (!status) return null
 
   const tone = status.tone ?? 'neutral'
+  const density = size === 'sm' ? 'compact' : 'comfortable'
 
   return (
-    <span
+    <InlineMetadata
+      role="supporting"
+      density={density}
+      wrap={false}
       className={cn(
         fieldGroupSummaryStatusLineVariants({ size }),
         fieldGroupSummaryTriggerTypographyClasses,
@@ -88,30 +92,31 @@ function FieldGroupSummaryStatusRow({
       )}
     >
       {status.indicator === 'dot' ? (
-        <span
-          aria-hidden
-          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot', tone })}
-        />
+        <InlineMetadata.Item>
+          <span
+            aria-hidden
+            className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot', tone })}
+          />
+        </InlineMetadata.Item>
       ) : null}
       {status.indicator === 'inactive' ? (
-        <CircleSlash
-          aria-hidden
-          className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
-        />
+        <InlineMetadata.Item>
+          <CircleSlash
+            aria-hidden
+            className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
+          />
+        </InlineMetadata.Item>
       ) : null}
-      <span
+      <InlineMetadata.Item
         className={cn(
           fieldGroupSummaryStatusLabelVariants({ tone }),
           fieldGroupSummaryTriggerTypographyClasses,
         )}
       >
         {status.label}
-      </span>
+      </InlineMetadata.Item>
       {summary.detail ? (
-        <>
-          <span aria-hidden className={fieldGroupSummaryStatusDetailSeparatorClasses}>
-            ·
-          </span>
+        <InlineMetadata.Item truncate>
           <Text
             as="span"
             variant="muted"
@@ -119,9 +124,9 @@ function FieldGroupSummaryStatusRow({
           >
             {summary.detail}
           </Text>
-        </>
+        </InlineMetadata.Item>
       ) : null}
-    </span>
+    </InlineMetadata>
   )
 }
 

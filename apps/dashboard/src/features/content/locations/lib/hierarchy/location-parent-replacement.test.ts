@@ -94,7 +94,7 @@ describe('resolveLocationParentReplacementCurrentSnapshot', () => {
       parentLocationId: DOCK_WARD.id,
       entity: {
         heading: DOCK_WARD.name,
-        headingSuffix: ' · District',
+        classification: 'District',
         supportingText: 'Located in Harborford',
       },
       fallback: 'location',

@@ -3,6 +3,7 @@ import {
   type ActionPlanUnchangedReason,
   type UsageBlockerSourceKey,
 } from '@rpg/contracts'
+import { formatInlineMetadataTail } from '@rpg/contracts/primitives'
 
 import {
   formatAllSelectedDescriptorCount,
@@ -16,6 +17,7 @@ import {
   formatActionBlockedTitle,
 } from '@/lib/actions'
 import { formatUsageBlockerBulkDescription } from '@/lib/usage-references/usage-blocker-copy'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 /** Subgroup legend for the campaign access disclosure. */
 export const CAMPAIGN_ACCESS_SECTION_LEGEND = 'Campaign availability'
@@ -70,7 +72,7 @@ export function formatCampaignAccessParticipantOptionLabel(
   name: string,
   playerDisplayName: string,
 ): string {
-  return `${name} · ${playerDisplayName}`
+  return joinInlineMetadata([name, playerDisplayName])
 }
 
 /** Inline create-time warning when the deferred campaign-access PATCH fails. */
@@ -88,7 +90,7 @@ export const CAMPAIGN_ACCESS_CHANGE_LABEL = 'Change'
 export const CAMPAIGN_ACCESS_DONE_LABEL = 'Done'
 
 /** Quiet suffix appended to the collapsed summary when the form is dirty. */
-export const CAMPAIGN_ACCESS_UNSAVED_SUFFIX = ' · Unsaved'
+export const CAMPAIGN_ACCESS_UNSAVED_SUFFIX = formatInlineMetadataTail(['Unsaved'])
 
 /** Blocked availability-off dialog headline. */
 export function formatCampaignAccessBlockedHeadline(): string {

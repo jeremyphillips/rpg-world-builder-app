@@ -9,11 +9,11 @@ import { resolveContentDisplayFallback } from '@rpg/contracts'
 
 import type { EntitySurfaceIdentity, EntitySummaryStatusItem } from '@/features/content'
 import {
-  CHARACTER_SUMMARY_SEPARATOR,
   formatCharacterSummary,
   formatCharacterSummarySegments,
   getCharacterTypeLabel,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { resolveDashboardCharacterSummaryParts } from './character-summary.lib'
 
@@ -97,25 +97,25 @@ export function formatCharacterInlineSummary(
     segments.push(vm.identitySummary)
   }
 
-  return segments.filter(Boolean).join(CHARACTER_SUMMARY_SEPARATOR)
+  return joinInlineMetadata(segments)
 }
 
-export function formatCharacterMixedHeadingSuffix(
+export function formatCharacterMixedClassification(
   vm: CharacterEntitySummaryVm,
 ): string | undefined {
   const inlineSummary = formatCharacterInlineSummary(vm, { includeCharacterType: true })
-  return inlineSummary ? ` · ${inlineSummary}` : undefined
+  return inlineSummary || undefined
 }
 
 export function buildCharacterEntityContextPresentation(vm: CharacterEntitySummaryVm): {
   heading: string
-  headingSuffix?: string
+  classification?: string
   supportingText?: string
   href?: string
 } {
   return {
     heading: vm.name,
-    headingSuffix: ` · ${vm.characterType.label}`,
+    classification: vm.characterType.label,
     supportingText: vm.identitySummary || undefined,
     href: vm.href,
   }

@@ -14,6 +14,7 @@ import { InteractiveListGroupHeading } from './interactive-list-group-heading.cl
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListViewport } from './interactive-list-viewport.client'
 import { useButtonDropdownControl } from './use-button-dropdown-control.client'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import type {
   ButtonDropdownGroup,
   ButtonDropdownItem,
@@ -60,7 +61,7 @@ function groupHeadingsForItems(
 
 function resolveButtonDropdownMetadata(item: ButtonDropdownItem): string | undefined {
   const parts = [item.metadata, item.note].filter((part) => part && part.length > 0)
-  return parts.length > 0 ? parts.join(' · ') : undefined
+  return parts.length > 0 ? joinInlineMetadata(parts) : undefined
 }
 
 function ButtonDropdownItemRow({

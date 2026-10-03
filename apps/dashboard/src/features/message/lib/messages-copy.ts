@@ -1,3 +1,5 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 export const MESSAGES_SCOPE_COPY = {
   chipRemoveLabel: 'Clear campaign filter',
   showAllLabel: 'Show all',
@@ -85,7 +87,10 @@ export function formatMessagesScopeSummary(scopedCount: number, hiddenCount: num
       ? 'conversation outside this campaign hidden'
       : 'conversations outside this campaign hidden'
 
-  return `${scopedCount} ${shownLabel} · ${hiddenCount} ${hiddenLabel}`
+  return joinInlineMetadata([
+    `${scopedCount} ${shownLabel}`,
+    `${hiddenCount} ${hiddenLabel}`,
+  ])
 }
 
 export function formatMessagesOutOfScopeSupporting(campaignName: string): string {
@@ -105,7 +110,10 @@ export function formatMessagesLoadedScopeHint(loadedCount: number, scopedCount: 
   const scopedLabel =
     scopedCount === 1 ? 'conversation in this campaign' : 'conversations in this campaign'
 
-  return `${loadedCount} ${loadedLabel} · ${scopedCount} ${scopedLabel}`
+  return joinInlineMetadata([
+    `${loadedCount} ${loadedLabel}`,
+    `${scopedCount} ${scopedLabel}`,
+  ])
 }
 
 export function formatMessagesUnreadBadge(count: number): string {

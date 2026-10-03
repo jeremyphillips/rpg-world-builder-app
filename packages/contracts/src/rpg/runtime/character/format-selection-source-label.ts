@@ -18,6 +18,7 @@ import type {
 import { getNpcTemplateLabel } from '../../vocab/npc/npc-template'
 import type { VocabularyTerm } from '../../vocab/types'
 import type { ChoiceSetOwnerKind, ChoiceSetProvenance } from '../character-builder/choice-set'
+import { joinInlineMetadata } from '../../primitives/inline-metadata'
 
 // ---------------------------------------------------------------------------
 // Shared provenance labels for character rows (equipment, proficiencies, …).
@@ -95,7 +96,6 @@ const CLASS_GRANT_SOURCE_KINDS = new Set<CharacterSelectionSourceKind>([
   'classSpellcasting',
 ])
 
-const GRANT_CARD_LABEL_JOIN = ' · ' as const
 const MULTI_SOURCE_LABEL_JOIN = ', ' as const
 
 function classNameForSource(
@@ -375,16 +375,16 @@ function formatSingleSelectionSourceLabel(
   return formatLegacySingleSelectionSourceLabel(provenance, source, catalogIndex)
 }
 
-function prefixForRowKind(rowKind: SelectionSourceRowKind | undefined): string {
+function categoryLabelForRowKind(rowKind: SelectionSourceRowKind | undefined): string | undefined {
   switch (rowKind) {
     case 'weaponCategory':
-      return 'Weapon category · '
+      return 'Weapon category'
     case 'armorCategory':
-      return 'Armor training · '
+      return 'Armor training'
     case 'toolCategory':
-      return 'Tool proficiency · '
+      return 'Tool proficiency'
     default:
-      return ''
+      return undefined
   }
 }
 
@@ -429,7 +429,7 @@ function formatStandardSingleLabel(
     provenance.primaryLabel &&
     provenance.primaryLabel !== provenance.ownerLabel
   ) {
-    return `${provenance.ownerLabel} · ${provenance.primaryLabel}`
+    return joinInlineMetadata([provenance.ownerLabel, provenance.primaryLabel])
   }
 
   if (provenance.ownerLabel) {
@@ -450,7 +450,10 @@ function formatGrantCardSingleLabel(
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): string {
   if (provenance.primaryLabel && provenance.parentContext) {
-    return `Granted by ${provenance.primaryLabel}${GRANT_CARD_LABEL_JOIN}${provenance.parentContext}`
+    return joinInlineMetadata([
+      `Granted by ${provenance.primaryLabel}`,
+      provenance.parentContext,
+    ])
   }
 
   if (provenance.primaryLabel) {
@@ -485,14 +488,14 @@ export function formatSelectionSourceLabel(
   const uniqueLabels = dedupeLabels(labels)
   const combined = uniqueLabels.join(MULTI_SOURCE_LABEL_JOIN)
 
-  const prefix = prefixForRowKind(options.rowKind)
-  if (!prefix) return combined
+  const categoryLabel = categoryLabelForRowKind(options.rowKind)
+  if (!categoryLabel) return combined
 
   if (uniqueLabels.length === 1 && uniqueLabels[0]?.startsWith('Granted by ')) {
-    return `${prefix}${uniqueLabels[0]}`
+    return joinInlineMetadata([categoryLabel, uniqueLabels[0]])
   }
 
-  return `${prefix}${combined}`
+  return joinInlineMetadata([categoryLabel, combined])
 }
 
 /** Compact provenance labels for tight summary rows (class name, Origin, …). */
@@ -535,5 +538,7 @@ export function formatGrantCardSelectionSourceLabel(
     return formatGrantCardSingleLabel(provenance, source, catalogIndex)
   })
 
-  return joinMultiSourceLabels(labels, GRANT_CARD_LABEL_JOIN, 'Unknown source')
+  const uniqueLabels = dedupeLabels(labels)
+  if (!uniqueLabels.length) return 'Unknown source'
+  return joinInlineMetadata(uniqueLabels)
 }

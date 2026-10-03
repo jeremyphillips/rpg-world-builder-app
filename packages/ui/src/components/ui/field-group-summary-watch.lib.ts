@@ -2,6 +2,8 @@ import * as React from 'react'
 import type { Control, FieldValues } from 'react-hook-form'
 import { useWatch } from 'react-hook-form'
 
+import { formatInlineMetadataTail } from '@rpg/contracts/primitives'
+
 import { resolveDependsOnWatchName } from '../../form/config/form-depends-on.lib'
 
 function readWatchedValue(values: Record<string, unknown>, path: string): unknown {
@@ -29,4 +31,4 @@ export function useSummaryDisclosureWatchedValues<TFieldValues extends FieldValu
 
 export const DEFAULT_SUMMARY_OPEN_LABEL = 'Change'
 export const DEFAULT_SUMMARY_CLOSE_LABEL = 'Done'
-export const DEFAULT_SUMMARY_UNSAVED_SUFFIX = ' · Unsaved'
+export const DEFAULT_SUMMARY_UNSAVED_SUFFIX = formatInlineMetadataTail(['Unsaved'])

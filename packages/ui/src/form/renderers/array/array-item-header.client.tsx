@@ -10,15 +10,14 @@ import {
   CollapsibleListItemDragHandle,
 } from '../../../components/ui/collapsible-list-item/collapsible-list-item-toolbar.client'
 import type { ArrayItemHeaderConfig } from '../../field-config'
+import { InlineMetadata } from '../../../components/ui/inline-metadata'
 import {
   resolveArrayItemHeaderLabels,
-  ARRAY_ITEM_HEADER_DIVIDER,
   type ResolvedArrayItemHeader,
 } from '../../config/array/array-item-config.lib'
 import {
   arrayItemChromeColumnClasses,
   arrayItemHeaderContentClasses,
-  arrayItemHeaderDividerClasses,
   arrayItemHeaderFallbackClasses,
   arrayItemHeaderShellClasses,
   arrayItemHeaderSummaryClasses,
@@ -46,19 +45,14 @@ export function ArrayItemDragHandle(props: ArrayItemDragHandleProps) {
 export function renderArrayItemTitleLine(header: ResolvedArrayItemHeader): React.ReactNode {
   if (header.primary) {
     return (
-      <>
-        <span>{header.primary}</span>
+      <InlineMetadata role="heading" density="compact" wrap={false}>
+        <InlineMetadata.Item>{header.primary}</InlineMetadata.Item>
         {header.showFallbackInTitle ? (
-          <>
-            {header.showDivider ? (
-              <span className={arrayItemHeaderDividerClasses} aria-hidden>
-                {ARRAY_ITEM_HEADER_DIVIDER}
-              </span>
-            ) : null}
-            <span className={arrayItemHeaderFallbackClasses}>{header.fallback}</span>
-          </>
+          <InlineMetadata.Item className={arrayItemHeaderFallbackClasses}>
+            {header.fallback}
+          </InlineMetadata.Item>
         ) : null}
-      </>
+      </InlineMetadata>
     )
   }
 

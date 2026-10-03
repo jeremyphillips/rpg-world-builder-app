@@ -31,6 +31,7 @@ import {
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailSpellFilterControls } from './character-detail-spell-filter-controls'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export type CharacterDetailSpellsTabProps = {
   cards: readonly CharacterSheetSpellCard[]
@@ -49,7 +50,9 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
       toolbarAriaLabel={toolbarLabel}
       entity={{
         heading: header.name,
-        description: <CatalogMetadataRenderer lines={header.metadataLines} />,
+        description: (
+          <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />
+        ),
         status: [
           ...header.markers.map((marker) => ({
             kind: 'text' as const,
@@ -60,7 +63,7 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
             ? [
                 {
                   kind: 'text' as const,
-                  label: header.footerLabels.join(' · '),
+                  label: joinInlineMetadata(header.footerLabels),
                   variant: 'muted' as const,
                 },
               ]

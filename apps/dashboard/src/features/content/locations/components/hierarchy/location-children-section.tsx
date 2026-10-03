@@ -1,12 +1,8 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
-import {
-  getErrorMessage,
-  LOCATION_DISPLAY_SUMMARY_SEPARATOR,
-  type Location,
-  type LocationKind,
-} from '@rpg/contracts'
+import { getErrorMessage, type Location, type LocationKind } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { ActionButton, Text, toast } from '@rpg/ui'
 
 import { DetailEntityRow } from '../../../lib/detail/row/entity/detail-entity-row'
@@ -99,12 +95,12 @@ function detailEntityRowActionTrailing(
   return content ? { kind: 'action', content } : undefined
 }
 
-function resolveStructureRowHeadingSuffix(row: LocationStructureRowVm): string {
+function resolveStructureRowClassification(row: LocationStructureRowVm): string {
   const parts = [row.item.summaryLine]
   if (row.countPhrase) {
     parts.push(row.countPhrase)
   }
-  return `${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${parts.join(LOCATION_DISPLAY_SUMMARY_SEPARATOR)}`
+  return joinInlineMetadata(parts)
 }
 
 function resolveExpandableRowEndSlot({
@@ -164,7 +160,7 @@ function LocationStructurePreviewChildRows({
           key={child.item.id}
           heading={child.item.name}
           headingHref={child.item.href}
-          headingSuffix={resolveStructureRowHeadingSuffix(child)}
+          classification={resolveStructureRowClassification(child)}
           inset={inset}
           className={detailEntityRowDisclosurePreviewRowVariants({
             edge: resolveDetailEntityRowDisclosurePreviewRowEdge(childIndex, rows.length),
@@ -301,7 +297,7 @@ function LocationStructureRow({
       <DetailEntityRow
         heading={row.item.name}
         headingHref={row.item.href}
-        headingSuffix={resolveStructureRowHeadingSuffix(row)}
+        classification={resolveStructureRowClassification(row)}
         inset={inset}
         disclosure={reserveDisclosureGutter ? { mode: 'reserved' } : undefined}
         className={previewClassName}
@@ -323,7 +319,7 @@ function LocationStructureRow({
     <DetailEntityRow
       heading={row.item.name}
       headingHref={row.item.href}
-      headingSuffix={resolveStructureRowHeadingSuffix(row)}
+      classification={resolveStructureRowClassification(row)}
       inset={inset}
       disclosure={resolveStructureRowDisclosure(row, nestedContent)}
       trailing={detailEntityRowActionTrailing(
@@ -403,7 +399,7 @@ function LocationChildRows({
             key={item.id}
             heading={item.name}
             headingHref={item.href}
-            headingSuffix={`${LOCATION_DISPLAY_SUMMARY_SEPARATOR}${item.summaryLine}`}
+            classification={item.summaryLine}
             inset={inset}
             trailing={detailEntityRowActionTrailing(
               canManage ? (

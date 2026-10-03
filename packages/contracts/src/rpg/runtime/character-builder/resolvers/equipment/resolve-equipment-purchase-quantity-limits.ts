@@ -6,6 +6,7 @@ import { copperToDisplayWealth, formatWealth } from '../../../../primitives/weal
 import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft/draft'
 import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
 import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 
 /** Hard cap per purchase row (bundle units). */
 export const EQUIPMENT_PURCHASE_QUANTITY_MAX = 99
@@ -125,12 +126,12 @@ function formatBundledInventoryPriceLine(
   const unitCopy = `${unitPrice} per bundle`
 
   if (quantity <= 1) {
-    return bundleLabel ? `${unitCopy} · ${bundleLabel}` : unitCopy
+    return bundleLabel ? joinInlineMetadata([unitCopy, bundleLabel]) : unitCopy
   }
 
   const parts = [unitCopy, `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`]
   if (bundleLabel) parts.push(bundleLabel)
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 function formatNonBundledInventoryPriceLine(args: {
@@ -144,7 +145,10 @@ function formatNonBundledInventoryPriceLine(args: {
 
   if (stackable && !useValueSuffix) {
     if (quantity <= 1) return unitPrice
-    return `${unitPrice} each · ${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`
+    return joinInlineMetadata([
+      `${unitPrice} each`,
+      `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`,
+    ])
   }
 
   if (quantity <= 1) {
@@ -153,8 +157,8 @@ function formatNonBundledInventoryPriceLine(args: {
 
   const total = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
   return useValueSuffix
-    ? `${unitPrice} value · ${total} total value`
-    : `${unitPrice} · ${total} total`
+    ? joinInlineMetadata([`${unitPrice} value`, `${total} total value`])
+    : joinInlineMetadata([unitPrice, `${total} total`])
 }
 
 /** Single-line price copy for inventory rows. */

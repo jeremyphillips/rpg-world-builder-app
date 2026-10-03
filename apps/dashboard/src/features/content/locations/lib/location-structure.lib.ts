@@ -1,6 +1,7 @@
 import type { Location, LocationKind } from '@rpg/contracts'
 
 import type { LocationAuthoringType } from './location-authoring-type'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   resolveRegionRelationshipLabel,
   resolveRegionRelationshipLabelPlural,
@@ -195,7 +196,7 @@ export function formatLocationStructureSplitCount(
     parts.push(formatCount(locationCount, 'location', 'locations'))
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function isDistrictAuthoringTypeForSettlement(authoringType: string): boolean {

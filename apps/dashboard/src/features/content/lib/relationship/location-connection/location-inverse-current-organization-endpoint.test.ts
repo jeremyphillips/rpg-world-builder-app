@@ -38,7 +38,7 @@ describe('resolveLocationInverseCurrentOrganizationEndpoint', () => {
     ).toEqual({
       entity: {
         heading: 'City Council',
-        headingSuffix: ' · Government',
+        classification: 'Government',
       },
       displayImage: undefined,
       fallback: 'organization',

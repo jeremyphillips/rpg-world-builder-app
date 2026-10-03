@@ -85,6 +85,7 @@ export function EquipmentPickerDisclosureRow({
         classification: row.kindLabel,
         description: (
           <CatalogMetadataRenderer
+            density="compact"
             lines={mapEquipmentCompactSummaryToMetadataLines({
               kindLabel: row.kindLabel,
               comparisonGroups: row.comparisonGroups,

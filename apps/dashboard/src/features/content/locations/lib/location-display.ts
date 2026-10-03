@@ -323,7 +323,7 @@ export function buildLocationEntityContextPresentation(
 
   return {
     heading: vm.name,
-    headingSuffix: vm.classification.text ? ` · ${vm.classification.text}` : undefined,
+    classification: vm.classification.text || undefined,
     supportingText: nearestParent ? formatLocatedInSupportingText(nearestParent.name) : undefined,
     href: vm.href,
   }

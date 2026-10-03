@@ -11,18 +11,18 @@ import {
   identityRowHeadingLineVariants,
   identityRowHeadingVariants,
   identityRowRootVariants,
-  identityRowSeparatorVariants,
   identityRowStackVariants,
   identityRowStatusVariants,
   identityRowSupportingVariants,
   type IdentityRowSize,
 } from './identity-row.variants'
+import { InlineMetadata } from './inline-metadata'
 
 export type { IdentityRowSize } from './identity-row.variants'
 
 export type IdentityRowProps = {
   heading?: ReactNode
-  classification?: ReactNode
+  classification?: ReactNode | readonly ReactNode[]
   supporting?: ReactNode
   supportingWrap?: boolean
   /** End of the heading line. Not status copy, which stays under supporting text. */
@@ -36,8 +36,16 @@ function isPresent(value: ReactNode | undefined): value is ReactNode {
   return value != null && value !== '' && value !== false
 }
 
-function hasHeadingLine(heading: ReactNode | undefined, classification: ReactNode | undefined) {
-  return isPresent(classification) || isPresent(heading)
+function classificationParts(
+  classification?: ReactNode | readonly ReactNode[],
+): ReactNode[] {
+  if (classification == null || classification === '' || classification === false) {
+    return []
+  }
+  if (Array.isArray(classification)) {
+    return classification.filter(isPresent)
+  }
+  return [classification]
 }
 
 function IdentityRowHeadingContent({
@@ -46,26 +54,38 @@ function IdentityRowHeadingContent({
   size,
 }: {
   heading?: ReactNode
-  classification?: ReactNode
+  classification?: ReactNode | readonly ReactNode[]
   size: IdentityRowSize
 }) {
   const showHeading = isPresent(heading)
-  const showClassification = isPresent(classification)
+  const parts = classificationParts(classification)
+
+  if (!showHeading && parts.length === 0) {
+    return null
+  }
+
+  if (!showHeading && parts.length === 1) {
+    return (
+      <span className={identityRowClassificationVariants({ size })}>{parts[0]}</span>
+    )
+  }
 
   return (
-    <>
-      {showHeading ? <span className={identityRowHeadingVariants({ size })}>{heading}</span> : null}
-      {showClassification ? (
-        <>
-          {showHeading ? (
-            <span className={identityRowSeparatorVariants({ size })} aria-hidden>
-              {' · '}
-            </span>
-          ) : null}
-          <span className={identityRowClassificationVariants({ size })}>{classification}</span>
-        </>
+    <InlineMetadata role="heading" density="compact" wrap={false} className="min-w-0">
+      {showHeading ? (
+        <InlineMetadata.Item truncate className={identityRowHeadingVariants({ size })}>
+          {heading}
+        </InlineMetadata.Item>
       ) : null}
-    </>
+      {parts.map((part, index) => (
+        <InlineMetadata.Item
+          key={index}
+          className={identityRowClassificationVariants({ size })}
+        >
+          {part}
+        </InlineMetadata.Item>
+      ))}
+    </InlineMetadata>
   )
 }
 
@@ -76,7 +96,7 @@ function IdentityRowHeadingLine({
   size,
 }: {
   heading?: ReactNode
-  classification?: ReactNode
+  classification?: ReactNode | readonly ReactNode[]
   headingEnd?: ReactNode
   size: IdentityRowSize
 }) {
@@ -110,7 +130,8 @@ export function IdentityRow({
   size = 'md',
   className,
 }: IdentityRowProps) {
-  const showHeadingLine = hasHeadingLine(heading, classification)
+  const showHeadingLine =
+    isPresent(heading) || classificationParts(classification).length > 0
   const showSupporting = isPresent(supporting)
   const showStatus = isPresent(status)
 

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 import type { Ticket } from '@rpg/contracts/dev-bench'
 import { getTicketCreatedByLabel } from '@rpg/contracts/dev-bench'
-import { Text } from '@rpg/ui'
+import { InlineMetadata, Text } from '@rpg/ui'
 import { ExternalLink } from 'lucide-react'
 
 import {
@@ -49,9 +49,12 @@ function formatTimestamp(iso: string): string {
 export function TicketMetaTimestamps({ ticket }: TicketMetaTimestampsProps) {
   return (
     <Text variant="muted" className="text-xs">
-      Created {formatTimestamp(ticket.createdAt)} by {getTicketCreatedByLabel(ticket.createdBy)}
-      {' · '}
-      Updated {formatTimestamp(ticket.updatedAt)}
+      <InlineMetadata role="supporting" density="compact">
+        <InlineMetadata.Item>
+          Created {formatTimestamp(ticket.createdAt)} by {getTicketCreatedByLabel(ticket.createdBy)}
+        </InlineMetadata.Item>
+        <InlineMetadata.Item>Updated {formatTimestamp(ticket.updatedAt)}</InlineMetadata.Item>
+      </InlineMetadata>
     </Text>
   )
 }

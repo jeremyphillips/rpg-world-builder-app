@@ -5,6 +5,7 @@ import {
 } from '@rpg/contracts'
 
 import type { EquipmentOptionSupplyClause } from '@/features/character/lib/equipment/equipment-option-row-presentation.lib'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 type EquipmentSupplyContribution = {
   source: EquipmentSupplySource
@@ -98,5 +99,5 @@ export function formatQuickNpcAdditionalEquipmentContext(args: {
   const hidden = ordered.length - shown.length
   const parts = [`${args.totalQuantity} total`, ...shown.map((clause) => clause.label)]
   if (hidden > 0) parts.push(otherSourcesLabel(hidden))
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }

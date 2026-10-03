@@ -19,7 +19,7 @@ export const Default: Story = {
     label: 'Districts',
     children: (
       <DetailCollectionRowList separator="structural">
-        <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
+        <DetailEntityRow inset="parent" heading="Dock Ward" classification="District" />
       </DetailCollectionRowList>
     ),
   },
@@ -37,7 +37,7 @@ export const InsidePanel: Story = {
         }
       >
         <DetailCollectionRowList separator="structural">
-          <DetailEntityRow inset="parent" heading="Dock Ward" headingSuffix="·District" />
+          <DetailEntityRow inset="parent" heading="Dock Ward" classification="District" />
         </DetailCollectionRowList>
       </DetailCollectionGroup>
       <DetailCollectionGroup

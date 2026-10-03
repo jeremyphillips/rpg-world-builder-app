@@ -10,7 +10,7 @@ describe('EntityReplacementCurrentField', () => {
         label="Current location"
         entity={{
           heading: "Thieves' Guildhouse",
-          headingSuffix: ' · Building · Guildhall',
+          classification: 'Building · Guildhall',
           supportingText: 'Located in Dock Ward',
         }}
       />,

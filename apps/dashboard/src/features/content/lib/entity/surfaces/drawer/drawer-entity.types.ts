@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 /** Plain-string projection for VM mappers and Current snapshots. */
 export type DrawerEntityPresentation = {
   heading: string
-  headingSuffix?: string
+  classification?: string
   supportingText?: string
   href?: string
 }
@@ -11,7 +11,7 @@ export type DrawerEntityPresentation = {
 /** Render-ready props consumed by DrawerEntityBlock. */
 export type DrawerEntityBlockModel = {
   heading: ReactNode
-  headingSuffix?: ReactNode
+  classification?: ReactNode
   supportingText?: ReactNode
   href?: string
 }

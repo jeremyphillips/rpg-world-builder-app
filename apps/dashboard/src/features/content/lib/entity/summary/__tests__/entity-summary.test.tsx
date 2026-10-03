@@ -21,8 +21,10 @@ describe('EntitySummary mixed heading', () => {
 
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(classification.className).toMatch(/\bshrink-0\b/)
-    expect(mixedHeadingRow.childNodes[0]).toBe(name)
-    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent).toContain(
+      '·',
+    )
+    expect(mixedHeadingRow).toHaveTextContent('Fire Bolt · Spell')
   })
 
   it('preserves outer summary flex-1 for EntityAnatomyHost content column ownership', () => {

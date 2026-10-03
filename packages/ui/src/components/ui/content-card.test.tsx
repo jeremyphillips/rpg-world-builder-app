@@ -94,14 +94,15 @@ describe('ContentCard', () => {
       <ContentCard
         density="compact"
         heading="Kingdom of Foo"
-        headingSuffix=" · Region · Kingdom"
+        classification={['Region', 'Kingdom']}
         metadata="Located in Nehwon"
         endSlot={<button type="button">Select</button>}
       />,
     )
 
     expect(screen.getByText('Kingdom of Foo')).toBeInTheDocument()
-    expect(screen.getByText('Region · Kingdom')).toBeInTheDocument()
+    expect(screen.getByText('Region')).toBeInTheDocument()
+    expect(screen.getByText('Kingdom')).toBeInTheDocument()
     expect(screen.getByText('Located in Nehwon')).toHaveClass(
       contentCardMetadataVariants({ density: 'compact' }),
     )
@@ -112,26 +113,23 @@ describe('ContentCard', () => {
     render(
       <ContentCard
         heading="Fire Bolt"
-        headingSuffix=" · Spell"
+        classification="Spell"
         endSlot={<button type="button">Add</button>}
       />,
     )
 
     const name = screen.getByText('Fire Bolt')
-    const classification = screen.getByText('Spell')
-    const mixedHeadingRow = name.parentElement as HTMLElement
+    const classificationLabel = screen.getByText('Spell')
 
     expect(name).toHaveClass(contentCardMixedHeadingNameVariants())
     expect(name).toHaveClass('min-w-0', 'shrink', 'truncate')
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(name.className).not.toMatch(/\bmax-w-\[60%\]/)
 
-    expect(classification).toHaveClass(contentCardMixedHeadingSuffixVariants())
-    expect(classification).toHaveClass('shrink-0')
-    expect(classification.className).not.toMatch(/\bflex-1\b/)
-
-    expect(mixedHeadingRow.childNodes[0]).toBe(name)
-    expect(mixedHeadingRow.childNodes[2]).toBe(classification)
+    expect(classificationLabel).toHaveClass(contentCardMixedHeadingSuffixVariants())
+    expect(classificationLabel).toHaveClass('shrink-0')
+    expect(classificationLabel.className).not.toMatch(/\bflex-1\b/)
+    expect(document.querySelector('[data-inline-metadata-separator]')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
   })
 
@@ -140,7 +138,7 @@ describe('ContentCard', () => {
       <div className="w-32">
         <ContentCard
           heading="Very Long Spell Name That Eventually Truncates"
-          headingSuffix=" · Spell"
+          classification="Spell"
         />
       </div>,
     )

@@ -1,4 +1,5 @@
 import { singularizeLabel } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type { ButtonVariantProps } from '../../../components/ui/button.variants'
 import type {
@@ -131,15 +132,9 @@ export function resolveArrayItemHeader(
   return resolveArrayItemConfig(config).header ?? defaultArrayItemHeader(legend)
 }
 
-/** Middle-dot separator for array item header labels and summary segments. */
-export const ARRAY_ITEM_TEXT_SEPARATOR = ' · '
-
-/** Single middle dot rendered between primary and fallback header labels. */
-export const ARRAY_ITEM_HEADER_DIVIDER = '·'
-
-/** Joins non-empty summary/header segments with {@link ARRAY_ITEM_TEXT_SEPARATOR}. */
+/** Joins non-empty summary/header segments with shared inline metadata spacing. */
 export function joinArrayItemSummaryParts(parts: readonly string[]): string {
-  return parts.filter((part) => part.length > 0).join(ARRAY_ITEM_TEXT_SEPARATOR)
+  return joinInlineMetadata(parts)
 }
 
 export function resolveArrayItemPrimaryLabel(

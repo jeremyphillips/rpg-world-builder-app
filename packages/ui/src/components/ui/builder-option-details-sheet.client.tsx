@@ -10,6 +10,7 @@ import { type SheetSurface } from './sheet.variants'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   builderOptionDetailsHeroImageVariants,
   builderOptionDetailsMetadataListVariants,
@@ -90,7 +91,7 @@ function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
         ))
       ) : item.metadata && item.metadata.length > 0 ? (
         <Text variant="small" className="text-muted-foreground">
-          {item.metadata.join(' · ')}
+          {joinInlineMetadata(item.metadata)}
         </Text>
       ) : null}
       {item.optionPool ? (

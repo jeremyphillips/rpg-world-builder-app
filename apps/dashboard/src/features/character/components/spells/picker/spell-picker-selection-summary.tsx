@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react'
 
-import { Text } from '@rpg/ui'
+import { InlineMetadata, Text } from '@rpg/ui'
 
 import { spellPickerSelectionSummaryClasses } from './spell-picker-selection-summary.variants'
 
@@ -10,6 +10,15 @@ export type SpellPickerSelectionSummaryProps = {
   metadata?: string
 }
 
+function SelectionCount({ complete, countText }: { complete: boolean; countText: string }) {
+  return (
+    <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
+      {complete ? <Check aria-hidden className="size-3.5 shrink-0" /> : null}
+      <span>{countText}</span>
+    </span>
+  )
+}
+
 export function SpellPickerSelectionSummary({
   complete = false,
   countText,
@@ -17,16 +26,16 @@ export function SpellPickerSelectionSummary({
 }: SpellPickerSelectionSummaryProps) {
   return (
     <Text as="span" variant="muted" className={spellPickerSelectionSummaryClasses}>
-      <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
-        {complete ? <Check aria-hidden className="size-3.5 shrink-0" /> : null}
-        <span>{countText}</span>
-      </span>
       {metadata ? (
-        <>
-          <span aria-hidden> · </span>
-          <span>{metadata}</span>
-        </>
-      ) : null}
+        <InlineMetadata role="supporting" density="compact">
+          <InlineMetadata.Item>
+            <SelectionCount complete={complete} countText={countText} />
+          </InlineMetadata.Item>
+          <InlineMetadata.Item>{metadata}</InlineMetadata.Item>
+        </InlineMetadata>
+      ) : (
+        <SelectionCount complete={complete} countText={countText} />
+      )}
     </Text>
   )
 }

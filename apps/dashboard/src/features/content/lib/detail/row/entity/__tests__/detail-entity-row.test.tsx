@@ -14,7 +14,7 @@ describe('DetailEntityRow', () => {
         <DetailEntityRow
           heading="The Silver Eel"
           headingHref="/locations/silver-eel"
-          headingSuffix=" · Building · Tavern"
+          classification="Building · Tavern"
           trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,
@@ -38,7 +38,7 @@ describe('DetailEntityRow', () => {
         <DetailEntityRow
           heading="Braggi"
           headingHref="/characters/braggi"
-          headingSuffix=" · NPC · Human · Level 3 Fighter"
+          classification="NPC · Human · Level 3 Fighter"
         />
       </MemoryRouter>,
     )
@@ -46,7 +46,9 @@ describe('DetailEntityRow', () => {
     const headingRow = screen.getByRole('link', { name: 'Braggi' }).parentElement?.parentElement
     expect(headingRow).toHaveTextContent('Braggi · NPC · Human · Level 3 Fighter')
     expect(screen.getByText('NPC · Human · Level 3 Fighter')).toBeInTheDocument()
-    expect(headingRow?.querySelector('[aria-hidden="true"]')?.textContent).toContain('·')
+    expect(headingRow?.querySelector('[data-inline-metadata-separator]')?.textContent).toContain(
+      '·',
+    )
   })
 
   it('truncates the entity name before the classification suffix', () => {
@@ -55,7 +57,7 @@ describe('DetailEntityRow', () => {
         <DetailEntityRow
           heading="Verna Stormcaller"
           headingHref="/characters/verna"
-          headingSuffix=" · PC · Elf (Drow) · Level 8 · Fighter 5 (Battle Master) / Rogue 3 (Assassin)"
+          classification="PC · Elf (Drow) · Level 8 · Fighter 5 (Battle Master) / Rogue 3 (Assassin)"
           trailing={{ kind: 'action', content: <button type="button">Actions</button> }}
         />
       </MemoryRouter>,

@@ -19,6 +19,7 @@ import {
 import { isSubclassChoiceFeatureRow } from './class-subclass-choice-features'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const CLASS_STAT_LABELS = {
   hitDie: 'Hit Die',
@@ -391,7 +392,7 @@ export function buildClassCardViewModel(characterClass: CharacterClass): ClassCa
 
   return {
     label: characterClass.name,
-    description: `${abilities} · d${characterClass.hitDie} Hit Die`,
+    description: joinInlineMetadata([`${abilities}`, `d${characterClass.hitDie} Hit Die`]),
   }
 }
 

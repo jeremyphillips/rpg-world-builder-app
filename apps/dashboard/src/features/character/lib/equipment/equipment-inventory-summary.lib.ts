@@ -17,6 +17,7 @@ import {
   type EquipmentSourceAllocation,
 } from '@rpg/contracts'
 
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
@@ -85,7 +86,7 @@ export function formatEquipmentInventorySourceBreakdownLabel(
   if (breakdown.purchased > 0) parts.push(`${breakdown.purchased} purchased`)
   if (breakdown.manual > 0) parts.push(`${breakdown.manual} manual`)
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 export function resolveCombinedInventoryDetailLineLabel(
@@ -102,10 +103,10 @@ export function resolveCombinedInventoryDetailLineLabel(
       quantity: display.totalQuantity,
       priceContext: 'startingGold',
     })
-    return display.bundleLabel ? `${priceLine} · ${display.bundleLabel}` : priceLine
+    return display.bundleLabel ? joinInlineMetadata([priceLine, display.bundleLabel]) : priceLine
   }
 
-  if (display.bundleLabel) return `${display.breakdownLabel} · ${display.bundleLabel}`
+  if (display.bundleLabel) return joinInlineMetadata([display.breakdownLabel, display.bundleLabel])
   return display.breakdownLabel
 }
 
@@ -260,7 +261,7 @@ function formatPurchaseProvenancePart(
   }
 
   const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
-  return quantity === 1 ? `Purchased · ${totalLabel}` : `${quantity} purchased for ${totalLabel}`
+  return quantity === 1 ? joinInlineMetadata(['Purchased', totalLabel]) : `${quantity} purchased for ${totalLabel}`
 }
 
 /** Formats aggregated added-equipment provenance for inventory subtitles. */
@@ -293,7 +294,7 @@ export function formatAddedEquipmentProvenanceLabel(
     parts.push(formatPurchaseProvenancePart(purchaseRows, purchaseQuantity))
   }
 
-  return parts.join(' · ')
+  return joinInlineMetadata(parts)
 }
 
 function aggregateAddedEquipmentRows(

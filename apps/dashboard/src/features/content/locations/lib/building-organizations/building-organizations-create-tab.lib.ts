@@ -3,6 +3,7 @@ import {
   getOrganizationLocationConnectionLabel,
   type Organization,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type { EntitySummaryModel } from '../../../lib/entity/summary/entity-summary.types'
 import type {
@@ -96,7 +97,7 @@ export function buildBuildingOrganizationPendingEntity(input: {
   const relationshipLabel = getOrganizationLocationConnectionLabel(input.relationship.kind)
   return {
     heading: relationshipOrganizationName(input),
-    classification: domainLabel ? `${domainLabel} · ${relationshipLabel}` : relationshipLabel,
+    classification: domainLabel ? joinInlineMetadata([domainLabel, relationshipLabel]) : relationshipLabel,
     ...(input.relationship.organization.kind === 'new'
       ? {
           status: [
