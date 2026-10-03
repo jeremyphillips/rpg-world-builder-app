@@ -195,7 +195,7 @@ export function formatSpellPickerSelectionMetadata(
   }
   const base = `${characterClassName} spells`
   if (activePreparedLevel === undefined) return base
-  return `${base} · ${formatSpellLevel(activePreparedLevel)} level`
+  return joinInlineMetadata([base, `${formatSpellLevel(activePreparedLevel)} level`])
 }
 
 export function resolveActivePreparedLevelSuffix(

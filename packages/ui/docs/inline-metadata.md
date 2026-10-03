@@ -4,8 +4,9 @@ Compact inline labels (`Weapon · 1d6 Piercing`) share one spacing contract acro
 
 ## String SSOT (`@rpg/contracts`)
 
-- `joinInlineMetadata(parts)` — drops null/undefined/false/blank strings; keeps numbers (including `0`); joins with ` · ` (word spaces around the middle dot).
-- `INLINE_METADATA_SEPARATOR` — the glyph only (`·`); do not hand-roll ` · ` in production code.
+- `joinInlineMetadata(parts)` — drops null/undefined/false/blank strings; keeps numbers (including `0`); joins with `·` (word spaces around the middle dot).
+- `formatInlineMetadataTail(parts)` — same predicate as `joinInlineMetadata`, but prefixes the joined tail with a leading `·` for copy rendered after separate primary text (for example field-group “Unsaved” suffix spans).
+- `INLINE_METADATA_SEPARATOR` — the glyph only (`·`); do not hand-roll `·` in production code.
 
 Import from `@rpg/contracts/primitives`.
 
@@ -48,10 +49,13 @@ Future direction:
 - feature components should not invent local density defaults.
 
 Until that foundation exists, ambiguous consumers must choose density explicitly.
+That is intentional for this migration: passing `density` at each leaf is
+acceptable when the host surface has not yet adopted a shared density token.
 Do not introduce a global InlineMetadata default to conceal missing surface
 density ownership.
 
 Candidate surfaces identified during the migration:
+
 - CampaignMetaLine
 - admin header/meta surfaces
 - EquipmentBudgetHeader

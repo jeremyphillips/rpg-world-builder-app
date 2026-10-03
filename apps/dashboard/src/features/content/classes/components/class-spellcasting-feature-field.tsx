@@ -1,3 +1,4 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { useWatch } from 'react-hook-form'
 import { Text } from '@rpg/ui'
 
@@ -22,7 +23,7 @@ export function ClassSpellcastingFeatureField() {
   return (
     <FeatureTableRow
       title={summary.name}
-      metadata={`Level ${summary.level} · Edit on the Features tab`}
+      metadata={joinInlineMetadata([`Level ${summary.level}`, 'Edit on the Features tab'])}
       typeLabel="Spellcasting feature"
     />
   )

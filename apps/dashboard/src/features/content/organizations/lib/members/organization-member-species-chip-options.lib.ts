@@ -1,5 +1,6 @@
 import type { Species } from '@rpg/contracts'
 import { unionPersistedOptions } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../../lib/campaign-access/campaign-access-table-labels'
@@ -10,12 +11,10 @@ import {
   resolveOrganizationMemberSpeciesCatalogSpecies,
 } from './organization-member-species-discoverable.lib'
 
-import { CONTENT_REFERENCE_UNRESOLVED_SUFFIX } from './organization-member-class-chip-options.lib'
+import { formatContentReferenceUnresolvedLabel } from './organization-member-class-chip-options.lib'
 
 export const ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT =
   'Species commonly associated with members.'
-
-const UNAVAILABLE_CHIP_LABEL_SUFFIX = `· ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`
 
 export function resolveOrganizationMemberSpeciesAffinityDisplayLabel(
   speciesId: string,
@@ -32,10 +31,10 @@ export function resolveOrganizationMemberSpeciesAffinityDisplayLabel(
 
   const catalogSpecies = input.catalogSpecies.find((species) => species.id === speciesId)
   if (catalogSpecies) {
-    return `${catalogSpecies.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`
+    return joinInlineMetadata([catalogSpecies.name, CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL])
   }
 
-  return `${formatContentReferenceLabel(speciesId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`
+  return formatContentReferenceUnresolvedLabel(formatContentReferenceLabel(speciesId))
 }
 
 function buildSelectableMemberSpeciesChipOptions(
@@ -63,7 +62,7 @@ function buildAuthorizedMemberSpeciesDisplay(input: {
     const catalogSpecies = input.catalogSpecies.find((species) => species.id === speciesId)
     if (catalogSpecies) {
       authorizedDisplay.set(speciesId, {
-        label: `${catalogSpecies.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`,
+        label: joinInlineMetadata([catalogSpecies.name, CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL]),
       })
     }
   }
@@ -78,16 +77,17 @@ export function buildMemberSpeciesAffinityChipOptions(
   const discoverableSpecies = resolveDiscoverableOrganizationMemberSpecies(ctx)
   const catalogSpecies = resolveOrganizationMemberSpeciesCatalogSpecies(ctx)
   const selectable = buildSelectableMemberSpeciesChipOptions(discoverableSpecies)
+  const authorizedDisplay = buildAuthorizedMemberSpeciesDisplay({
+    selectedIds,
+    discoverableSpecies,
+    catalogSpecies,
+  })
 
   return unionPersistedOptions({
     selectable,
     persistedIds: selectedIds,
-    authorizedDisplay: buildAuthorizedMemberSpeciesDisplay({
-      selectedIds,
-      discoverableSpecies,
-      catalogSpecies,
-    }),
+    authorizedDisplay,
     formatUnresolvedLabel: (speciesId) =>
-      `${formatContentReferenceLabel(speciesId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`,
+      formatContentReferenceUnresolvedLabel(formatContentReferenceLabel(speciesId)),
   })
 }

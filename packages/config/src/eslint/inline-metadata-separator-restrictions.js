@@ -8,19 +8,23 @@ export const INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE =
 
 export const inlineMetadataSeparatorRestrictions = [
   {
-    selector: "Literal[value=/^\\s*·\\s*$/]",
+    selector: 'Literal[value=/^\\s*·\\s*$/]',
     message: INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE,
   },
   {
-    selector: "Literal[value=/^·\\s|\\s·$/]",
+    selector: 'Literal[value=/^·\\s|\\s·$/]',
     message: INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE,
   },
   {
-    selector: "TemplateElement[value.raw=/^\\s*·\\s|\\s·\\s*$/]",
+    selector: 'TemplateElement[value.raw=/^\\s*·\\s|\\s·\\s*$/]',
     message: INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE,
   },
   {
-    selector: "JSXText[value=/(^|\\s)·(\\s|$)/]",
+    selector: 'TemplateElement[value.raw=/ · /]',
+    message: INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE,
+  },
+  {
+    selector: 'JSXText[value=/(^|\\s)·(\\s|$)/]',
     message: INLINE_METADATA_SEPARATOR_RESTRICTION_MESSAGE,
   },
 ]

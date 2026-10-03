@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { INLINE_METADATA_SEPARATOR, joinInlineMetadata } from './inline-metadata'
+import {
+  formatInlineMetadataTail,
+  INLINE_METADATA_SEPARATOR,
+  joinInlineMetadata,
+} from './inline-metadata'
 
 describe('joinInlineMetadata', () => {
   it('joins two and many items with canonical spacing', () => {
@@ -24,5 +28,17 @@ describe('joinInlineMetadata', () => {
     expect(joinInlineMetadata(['only'])).toBe('only')
     expect(joinInlineMetadata([])).toBe('')
     expect(joinInlineMetadata([null])).toBe('')
+  })
+})
+
+describe('formatInlineMetadataTail', () => {
+  it('prefixes joined tail with canonical leading separator spacing', () => {
+    expect(formatInlineMetadataTail(['Unsaved'])).toBe(' · Unsaved')
+    expect(formatInlineMetadataTail(['A', 'B'])).toBe(' · A · B')
+  })
+
+  it('returns empty string when tail is empty', () => {
+    expect(formatInlineMetadataTail([])).toBe('')
+    expect(formatInlineMetadataTail(['', null])).toBe('')
   })
 })

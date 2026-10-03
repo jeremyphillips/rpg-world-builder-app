@@ -1,4 +1,5 @@
 import { formatWealthAsGold, type EquipmentBudgetSummary } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export function formatEquipmentBudgetGuidanceCopy(budget: EquipmentBudgetSummary): {
   heading: string
@@ -6,6 +7,9 @@ export function formatEquipmentBudgetGuidanceCopy(budget: EquipmentBudgetSummary
 } {
   return {
     heading: `${formatWealthAsGold(budget.remaining)} remaining`,
-    description: `${formatWealthAsGold(budget.starting)} starting · ${formatWealthAsGold(budget.spent)} spent`,
+    description: joinInlineMetadata([
+      `${formatWealthAsGold(budget.starting)} starting`,
+      `${formatWealthAsGold(budget.spent)} spent`,
+    ]),
   }
 }

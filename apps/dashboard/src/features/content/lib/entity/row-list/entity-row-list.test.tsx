@@ -77,8 +77,8 @@ describe('EntityRowList layout mechanics', () => {
             <EntityRowList.Row
               heading="Aldric"
               headingHref="/characters/1"
-              classification=" · NPC"
-              headingAccessory=" · Guildmaster"
+              classification="NPC"
+              headingAccessory="Guildmaster"
             />
           </EntityRowList.Group>
         </EntityRowList.Root>

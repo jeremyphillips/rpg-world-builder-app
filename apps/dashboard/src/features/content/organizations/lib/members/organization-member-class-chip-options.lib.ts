@@ -1,5 +1,6 @@
 import type { CharacterClass } from '@rpg/contracts'
 import { unionPersistedOptions } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import type { FieldOption } from '@rpg/ui/form'
 
 import { CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL } from '../../../lib/campaign-access/campaign-access-table-labels'
@@ -16,9 +17,11 @@ export const ORGANIZATION_MEMBER_NPC_TEMPLATE_FIELD_HINT =
 export const ORGANIZATION_MEMBER_CLASS_AFFINITY_FIELD_HINT =
   'Classes commonly associated with members.'
 
-export const CONTENT_REFERENCE_UNRESOLVED_SUFFIX = '· Unresolved reference'
+const CONTENT_REFERENCE_UNRESOLVED_LABEL = 'Unresolved reference'
 
-const UNAVAILABLE_CHIP_LABEL_SUFFIX = `· ${CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL}`
+export function formatContentReferenceUnresolvedLabel(referenceLabel: string): string {
+  return joinInlineMetadata([referenceLabel, CONTENT_REFERENCE_UNRESOLVED_LABEL])
+}
 
 export function resolveOrganizationMemberClassAffinityDisplayLabel(
   classId: string,
@@ -39,10 +42,10 @@ export function resolveOrganizationMemberClassAffinityDisplayLabel(
 
   const catalogClass = input.catalogClasses.find((characterClass) => characterClass.id === classId)
   if (catalogClass) {
-    return `${catalogClass.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`
+    return joinInlineMetadata([catalogClass.name, CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL])
   }
 
-  return `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`
+  return formatContentReferenceUnresolvedLabel(formatContentReferenceLabel(classId))
 }
 
 function buildSelectableMemberClassChipOptions(
@@ -74,7 +77,7 @@ function buildAuthorizedMemberClassDisplay(input: {
     )
     if (catalogClass) {
       authorizedDisplay.set(classId, {
-        label: `${catalogClass.name} ${UNAVAILABLE_CHIP_LABEL_SUFFIX}`,
+        label: joinInlineMetadata([catalogClass.name, CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_LABEL]),
       })
     }
   }
@@ -89,16 +92,17 @@ export function buildMemberClassAffinityChipOptions(
   const discoverableClasses = resolveDiscoverableOrganizationMemberClasses(ctx)
   const catalogClasses = resolveOrganizationMemberClassCatalogClasses(ctx)
   const selectable = buildSelectableMemberClassChipOptions(discoverableClasses)
+  const authorizedDisplay = buildAuthorizedMemberClassDisplay({
+    selectedIds,
+    discoverableClasses,
+    catalogClasses,
+  })
 
   return unionPersistedOptions({
     selectable,
     persistedIds: selectedIds,
-    authorizedDisplay: buildAuthorizedMemberClassDisplay({
-      selectedIds,
-      discoverableClasses,
-      catalogClasses,
-    }),
+    authorizedDisplay,
     formatUnresolvedLabel: (classId) =>
-      `${formatContentReferenceLabel(classId)} ${CONTENT_REFERENCE_UNRESOLVED_SUFFIX}`,
+      formatContentReferenceUnresolvedLabel(formatContentReferenceLabel(classId)),
   })
 }

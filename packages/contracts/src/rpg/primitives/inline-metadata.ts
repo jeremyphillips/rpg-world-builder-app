@@ -25,3 +25,13 @@ export function joinInlineMetadata(parts: readonly InlineMetadataPart[]): string
   if (kept.length === 0) return ''
   return kept.join(JOINED_SEPARATOR)
 }
+
+/**
+ * Leading ` · ` plus joined tail segments for copy shown after separate primary text
+ * (for example disclosure “Unsaved” suffix spans).
+ */
+export function formatInlineMetadataTail(parts: readonly InlineMetadataPart[]): string {
+  const tail = joinInlineMetadata(parts)
+  if (!tail) return ''
+  return `${JOINED_SEPARATOR}${tail}`
+}

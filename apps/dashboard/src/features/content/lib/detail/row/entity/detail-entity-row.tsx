@@ -26,7 +26,7 @@ export type DetailEntityRowDisclosure =
 export type DetailEntityRowProps = {
   heading: ReactNode
   headingHref?: string
-  /** Muted classification text rendered inline after the heading (includes leading separator). */
+  /** Muted classification segments; separators are composed by entity identity chrome. */
   classification?: ReactNode
   subheading?: ReactNode
   metadata?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]

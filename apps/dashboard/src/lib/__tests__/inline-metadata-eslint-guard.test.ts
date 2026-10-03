@@ -32,4 +32,25 @@ describe('inline metadata ESLint guard (dashboard no-restricted-syntax merge)', 
 
     expect(result?.messages.some((m) => m.ruleId === 'no-restricted-syntax')).toBe(true)
   })
+
+  it('reports hand-rolled template metadata separators', async () => {
+    const eslint = new ESLint({
+      overrideConfig: [
+        {
+          files: ['**/*.{ts,tsx}'],
+          languageOptions: {
+            parserOptions: { ecmaFeatures: { jsx: true } },
+          },
+          rules: {
+            'no-restricted-syntax': ['error', ...inlineMetadataSeparatorRestrictions],
+          },
+        },
+      ],
+    })
+
+    const code = `export function Bad(a: string, b: string) { return \`\${a} · \${b}\` }`
+    const [result] = await eslint.lintText(code, { filePath: 'src/features/example/bad.ts' })
+
+    expect(result?.messages.some((m) => m.ruleId === 'no-restricted-syntax')).toBe(true)
+  })
 })

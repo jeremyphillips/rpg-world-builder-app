@@ -10,6 +10,7 @@ import {
   type ResolvedStartingEquipmentFunding,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { Button, CheckboxField, Heading, Text } from '@rpg/ui'
 
 import {
@@ -45,7 +46,7 @@ function formatConversionBudgetLine(preview: StartingPackageConversionPreview): 
     copperToWealth(preview.budget.existingPurchaseCostCp + preview.budget.selectedConversionCostCp),
   )
 
-  return `${remaining} remaining · ${starting} starting · ${spent} spent`
+  return joinInlineMetadata([`${remaining} remaining`, `${starting} starting`, `${spent} spent`])
 }
 
 export function EquipmentPackageConversionEditor({

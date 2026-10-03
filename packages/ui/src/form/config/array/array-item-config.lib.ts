@@ -134,7 +134,7 @@ export function resolveArrayItemHeader(
 
 /** Joins non-empty summary/header segments with shared inline metadata spacing. */
 export function joinArrayItemSummaryParts(parts: readonly string[]): string {
-  return joinInlineMetadata(parts.filter((part) => part.length > 0))
+  return joinInlineMetadata(parts)
 }
 
 export function resolveArrayItemPrimaryLabel(

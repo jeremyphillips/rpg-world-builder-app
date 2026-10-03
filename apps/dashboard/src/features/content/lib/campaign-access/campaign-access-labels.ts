@@ -3,6 +3,7 @@ import {
   type ActionPlanUnchangedReason,
   type UsageBlockerSourceKey,
 } from '@rpg/contracts'
+import { formatInlineMetadataTail } from '@rpg/contracts/primitives'
 
 import {
   formatAllSelectedDescriptorCount,
@@ -89,7 +90,7 @@ export const CAMPAIGN_ACCESS_CHANGE_LABEL = 'Change'
 export const CAMPAIGN_ACCESS_DONE_LABEL = 'Done'
 
 /** Quiet suffix appended to the collapsed summary when the form is dirty. */
-export const CAMPAIGN_ACCESS_UNSAVED_SUFFIX = ' · Unsaved'
+export const CAMPAIGN_ACCESS_UNSAVED_SUFFIX = formatInlineMetadataTail(['Unsaved'])
 
 /** Blocked availability-off dialog headline. */
 export function formatCampaignAccessBlockedHeadline(): string {

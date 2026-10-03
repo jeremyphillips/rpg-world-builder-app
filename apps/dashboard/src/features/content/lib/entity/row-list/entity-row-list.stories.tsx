@@ -38,7 +38,7 @@ export const UnlabeledGroup: Story = {
       <EntityRowList.Group itemCount={1}>
         <EntityRowList.Row
           heading="Guild Envoy"
-          headingAccessory=" · Journeyman"
+          headingAccessory="Journeyman"
           description="NPC · Human"
         />
       </EntityRowList.Group>
