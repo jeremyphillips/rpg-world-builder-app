@@ -79,7 +79,7 @@ describe('CharacterDetailEquipmentTab', () => {
       screen.queryByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('radio', { name: 'Weapon' }))
+    await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     expect(within(list).getByText('Dagger')).toBeInTheDocument()
     expect(within(list).queryByText('Chain Mail')).not.toBeInTheDocument()
   })

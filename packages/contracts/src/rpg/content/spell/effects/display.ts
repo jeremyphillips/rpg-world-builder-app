@@ -68,7 +68,7 @@ export function formatAtomicEffectSummary(effect: SpellAtomicEffect): string {
     case 'healing':
       return `${formatRollValue(effect.roll)} healing`
     case 'temporary-hit-points':
-      return `${formatRollValue(effect.roll)} temporary ${vocabularyTermLabel(HIT_POINTS_TERM, { number: 'plural', casing: 'sentence' })}`
+      return `${formatRollValue(effect.roll)} temporary ${vocabularyTermLabel(HIT_POINTS_TERM, { number: 'plural', casing: 'title' })}`
     default: {
       const _exhaustive: never = effect
       return _exhaustive

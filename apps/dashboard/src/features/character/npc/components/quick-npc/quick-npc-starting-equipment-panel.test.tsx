@@ -134,7 +134,7 @@ describe('QuickNpcStartingEquipmentPanel', () => {
 
     expect(screen.getByRole('button', { name: 'Remove Spear' })).toBeTruthy()
     await user.click(screen.getByRole('combobox', { name: 'Add equipment' }))
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent('Weapon')
+    expect(screen.getByRole('combobox', { name: 'Equipment kind' })).toHaveTextContent('Weapons')
     expect(screen.queryByRole('option', { name: /rations/i })).toBeNull()
     const spear = screen.getByRole('option', { name: /spear/i })
     expect(spear.firstElementChild).toHaveClass('w-full')
@@ -155,11 +155,11 @@ describe('QuickNpcStartingEquipmentPanel', () => {
     render(<PanelHarness />)
 
     await user.click(screen.getByRole('combobox', { name: 'Add equipment' }))
-    await user.click(screen.getByRole('combobox', { name: 'Equipment category' }))
-    await user.click(screen.getByRole('option', { name: 'Adventuring Gear' }))
+    await user.click(screen.getByRole('combobox', { name: 'Equipment kind' }))
+    await user.click(screen.getByRole('option', { name: 'Adventuring gear' }))
 
-    expect(screen.getByRole('combobox', { name: 'Equipment category' })).toHaveTextContent(
-      'Adventuring Gear',
+    expect(screen.getByRole('combobox', { name: 'Equipment kind' })).toHaveTextContent(
+      'Adventuring gear',
     )
     expect(screen.getByRole('option', { name: /rations/i })).toBeTruthy()
     expect(screen.queryByRole('option', { name: /spear/i })).toBeNull()
