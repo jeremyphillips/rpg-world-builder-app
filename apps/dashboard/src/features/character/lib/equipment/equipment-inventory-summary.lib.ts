@@ -268,7 +268,7 @@ function formatPurchaseProvenancePart(
   if (pending) {
     const totalLabel = equipment ? formatEquipmentPurchaseTotalPriceLabel(equipment, quantity) : ''
     return totalLabel
-      ? `${EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL} · ${totalLabel}`
+      ? joinInlineMetadata([EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL, totalLabel])
       : EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
   }
   if (!equipment || quantity <= 0) {
@@ -276,7 +276,9 @@ function formatPurchaseProvenancePart(
   }
 
   const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
-  return quantity === 1 ? joinInlineMetadata(['Purchased', totalLabel]) : `${quantity} purchased for ${totalLabel}`
+  return quantity === 1
+    ? joinInlineMetadata(['Purchased', totalLabel])
+    : `${quantity} purchased for ${totalLabel}`
 }
 
 /** Formats aggregated added-equipment provenance for inventory subtitles. */
