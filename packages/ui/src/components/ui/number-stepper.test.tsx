@@ -103,6 +103,31 @@ describe('NumberStepper', () => {
     expect(increaseButton).toHaveClass('disabled:[&_svg]:text-input-disabled')
   })
 
+  it('does not focus the value input when the stepper is disabled', async () => {
+    const user = userEvent.setup()
+
+    render(<NumberStepper aria-label="Quantity" value={3} disabled onChange={vi.fn()} />)
+
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toBeDisabled()
+
+    await user.click(input)
+    expect(input).not.toHaveFocus()
+  })
+
+  it('does not focus the value input when both step buttons are disabled', async () => {
+    const user = userEvent.setup()
+
+    render(<NumberStepper aria-label="Quantity" value={3} min={3} max={3} onChange={vi.fn()} />)
+
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toBeDisabled()
+    expect(input).toHaveAttribute('readonly')
+
+    await user.click(input)
+    expect(input).not.toHaveFocus()
+  })
+
   it('styles the full stepper as sunken when both step buttons are disabled', () => {
     const { container } = render(
       <NumberStepper aria-label="Quantity" value={3} min={3} max={3} onChange={() => undefined} />,

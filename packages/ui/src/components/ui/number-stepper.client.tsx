@@ -168,8 +168,10 @@ export function NumberStepper({
         type="number"
         inputMode="numeric"
         aria-label={ariaLabel}
-        disabled={disabled}
-        autoFocus={autoFocus}
+        disabled={stepperLocked}
+        readOnly={stepperLocked}
+        tabIndex={stepperLocked ? -1 : undefined}
+        autoFocus={stepperLocked ? undefined : autoFocus}
         onBlur={onBlur}
         onChange={handleInputChange}
         className={cn(

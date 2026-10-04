@@ -1,4 +1,4 @@
-import { cn, emptyStateWellSurfaceClasses, interactiveFocusVariants } from '@rpg/ui'
+import { cn, establishSurfaceCurrent, interactiveFocusVariants } from '@rpg/ui'
 
 export const equipmentPickerPurchaseRowClasses = 'flex items-center justify-between gap-3 text-sm'
 
@@ -13,8 +13,8 @@ export const equipmentPickerPurchaseDividerClasses = 'border-b border-border'
 export const equipmentPickerPurchaseQuantityStepperShimClasses = 'relative shrink-0'
 
 export const equipmentPickerPurchaseInsetPanelClasses = cn(
-  'rounded border px-3 py-2',
-  emptyStateWellSurfaceClasses,
+  'rounded border border-border bg-surface-faint px-3 py-2',
+  establishSurfaceCurrent('surface-faint'),
 )
 
 export const equipmentPickerPurchaseInsetPanelContentClasses = 'space-y-3'
