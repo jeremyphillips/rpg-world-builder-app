@@ -20,26 +20,34 @@ function sameClassId(previous: string | undefined, next: string | undefined): bo
   return (previous || undefined) === (next || undefined)
 }
 
-function retainedManualPurchases(
-  purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
-  context: CharacterBuildContext,
-): CharacterBuilderDraftEquipmentPurchase[] {
-  const playableEquipmentIds = new Set(
+function playablePickerEquipmentIds(context: CharacterBuildContext): Set<string> {
+  return new Set(
     resolvePlayableBuilderContent(context)
       .equipment.filter((equipment) => isEquipmentPickerSupportedEquipment(equipment))
       .map((equipment) => equipment.id),
   )
+}
 
-  return purchases.filter(
-    (purchase) =>
-      purchase.sourceMode === 'manual' && playableEquipmentIds.has(purchase.equipmentId),
-  )
+function isUserOwnedPurchase(purchase: CharacterBuilderDraftEquipmentPurchase): boolean {
+  switch (purchase.sourceMode) {
+    case 'manual':
+      return true
+    case 'startingGold':
+      switch (purchase.origin) {
+        case 'picker':
+          return true
+        case 'packageConversion':
+          return false
+      }
+  }
 }
 
 /**
- * Class-independent equipment retention. Manual purchases that are still valid
- * catalog items stay. Class packages, package-derived purchases, and grants reset.
- * Proficiency and recommendation do not remove a manual purchase.
+ * Sole authority over which purchases survive a class change. Manual rows and
+ * picker rows that are still playable catalog items stay unchanged.
+ * Package-conversion rows belong to the previous class and drop. Grants, the
+ * package selection, and package-edit flags reset. Proficiency does not remove
+ * a retained purchase.
  */
 export function reconcileEquipmentForClassChange(args: {
   equipment: CharacterBuilderDraftEquipment | undefined
@@ -50,10 +58,13 @@ export function reconcileEquipmentForClassChange(args: {
   if (!args.equipment) return args.equipment
   if (sameClassId(args.previous.classId, args.next.classId)) return args.equipment
 
+  const playableEquipmentIds = playablePickerEquipmentIds(args.context)
   return {
     ...args.equipment,
     mode: 'package',
-    purchases: retainedManualPurchases(args.equipment.purchases, args.context),
+    purchases: args.equipment.purchases.filter(
+      (purchase) => isUserOwnedPurchase(purchase) && playableEquipmentIds.has(purchase.equipmentId),
+    ),
     grants: [],
     classPackage: { state: 'unresolved' },
     editedSincePackageSelection: false,
@@ -63,8 +74,8 @@ export function reconcileEquipmentForClassChange(args: {
 
 /**
  * Switches the selected class and drops state owned by the previous class.
- * Manual purchases stay. Automatic package and pool selections are not kept
- * for a later switch back; the next fill resolves the new class from scratch.
+ * Selections are pruned, then equipment is reconciled. The next fill resolves
+ * the new class from scratch.
  */
 export function applySelectedClassChange(args: {
   draft: CharacterBuilderDraft

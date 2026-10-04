@@ -42,7 +42,9 @@ beforeAll(() => {
 })
 
 describe('EquipmentPickerDrawer', () => {
-  it('renders picker header titles and shows cannot-afford callout with disabled quick-add', () => {
+  it('renders picker header titles and shows cannot-afford callout with disabled quick-add', async () => {
+    const user = userEvent.setup()
+
     render(
       <EquipmentPickerDrawer
         open
@@ -58,10 +60,15 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(within(list).getByText('Chain Mail')).toBeInTheDocument()
     expect(within(list).getByText('Armor')).toBeInTheDocument()
-    expect(screen.getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)).toBeInTheDocument()
-    expect(within(list).getByText(/75 GP needed/i)).toBeInTheDocument()
-    expect(within(list).getByText(/40 GP remaining/i)).toBeInTheDocument()
+    const cannotAffordBadge = screen.getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)
+    expect(cannotAffordBadge).toBeInTheDocument()
+    expect(within(list).queryByText(/75 GP needed/i)).not.toBeInTheDocument()
+    expect(within(list).queryByText(/40 GP remaining/i)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
+
+    await user.hover(cannotAffordBadge)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('75 GP needed')
+    expect(screen.getByRole('tooltip')).toHaveTextContent('40 GP remaining')
   })
 
   it('shows recommendation badges in the unified list', () => {

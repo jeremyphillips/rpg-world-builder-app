@@ -9,12 +9,12 @@ import {
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
   OPTION_PRESENTATION_STARTING_OPTION_LABEL,
   requiredByLabel,
+  resolveEquipmentNotProficientMessage,
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
 
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   type EquipmentPickerItem,
 } from '../drawer/equipment-picker-drawer.types'
 import {
@@ -204,10 +204,10 @@ describe('equipment-picker-callout.lib', () => {
       })
 
       expect(getEquipmentPickerCallout(item)).toEqual({
-        label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-        intent: 'warning',
+        label: resolveEquipmentNotProficientMessage('weapon'),
+        intent: 'info',
         importance: 'medium',
-        factKind: 'caution',
+        factKind: 'guidance',
       })
     })
 
@@ -262,10 +262,10 @@ describe('equipment-picker-callout.lib', () => {
       }
 
       expect(getEquipmentPickerCallout(item, { visibleStatuses: ['not_proficient'] })).toEqual({
-        label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-        intent: 'warning',
+        label: resolveEquipmentNotProficientMessage('weapon'),
+        intent: 'info',
         importance: 'medium',
-        factKind: 'caution',
+        factKind: 'guidance',
       })
     })
   })

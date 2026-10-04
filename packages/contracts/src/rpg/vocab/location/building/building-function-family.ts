@@ -7,7 +7,7 @@
  */
 import { keysFromEntries, vocabEnumFromEntries } from '../../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../../types'
-import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 
 export const BUILDING_FUNCTION_FAMILY_TERM = {
   label: 'Building Function Family',

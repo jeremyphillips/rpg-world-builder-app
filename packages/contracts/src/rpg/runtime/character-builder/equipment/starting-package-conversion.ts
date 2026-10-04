@@ -10,6 +10,7 @@ import type {
   CharacterBuilderDraft,
   CharacterBuilderDraftEquipmentPurchase,
   NormalizedCharacterBuilderDraftEquipmentPurchase,
+  StartingGoldEquipmentPurchase,
 } from '../draft/draft'
 import {
   createEquipmentPurchaseId,
@@ -433,9 +434,9 @@ function selectedConversionPurchases(args: {
   preview: StartingPackageConversionPreview
   selectedPackageItemKeys: ReadonlySet<string>
   catalogIndex: CharacterBuildCatalogIndex
-}): NormalizedCharacterBuilderDraftEquipmentPurchase[] {
+}): Array<StartingGoldEquipmentPurchase & { id: string }> {
   const { preview, selectedPackageItemKeys, catalogIndex } = args
-  const purchases: NormalizedCharacterBuilderDraftEquipmentPurchase[] = []
+  const purchases: Array<StartingGoldEquipmentPurchase & { id: string }> = []
 
   for (const item of preview.items) {
     if (!selectedPackageItemKeys.has(item.packageItemKey)) continue

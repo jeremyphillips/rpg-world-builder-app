@@ -13,6 +13,7 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
+import { createEquipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 
 const rope = pickEquipment('rope')
@@ -20,7 +21,7 @@ const silverNeedle = pickEquipment('silver-needle')
 const dagger = pickEquipment('dagger')
 const storedDruid = storedDruidClassStored
 
-const catalogIndex = indexCharacterBuildCatalog({
+const storyCatalog = {
   species: [],
   classes: [storedDruid],
   spells: [],
@@ -28,7 +29,9 @@ const catalogIndex = indexCharacterBuildCatalog({
   skillProficiencies: [],
   organizations: [],
   languages: [],
-})
+}
+const catalogIndex = indexCharacterBuildCatalog(storyCatalog)
+const storyContext = createEquipmentStepContextFixture({ catalog: storyCatalog })
 
 function buildGoldDraft(
   purchases: Array<{
@@ -46,13 +49,16 @@ function buildGoldDraft(
     },
     equipment: {
       mode: 'gold' as const,
-      purchases: purchases.map((purchase) => ({
-        id: purchase.id,
-        equipmentId: purchase.equipmentId,
-        quantity: purchase.quantity,
-        sourceMode: purchase.sourceMode ?? ('startingGold' as const),
-        origin: 'picker' as const,
-      })),
+      purchases: purchases.map((purchase) => {
+        const row = {
+          id: purchase.id,
+          equipmentId: purchase.equipmentId,
+          quantity: purchase.quantity,
+        }
+        return purchase.sourceMode === 'manual'
+          ? { ...row, sourceMode: 'manual' as const }
+          : { ...row, sourceMode: 'startingGold' as const, origin: 'picker' as const }
+      }),
       editedSincePackageSelection: false,
     },
   }
@@ -62,6 +68,7 @@ type PackageSwitchResolutionModalStoryArgs = {
   initialQuantities: Record<string, number>
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+  isInitialSelection?: boolean
   purchases: Array<{
     id: string
     equipmentId: string
@@ -74,6 +81,7 @@ function PackageSwitchResolutionModalStory({
   initialQuantities,
   commitErrorReason,
   staleNotice = false,
+  isInitialSelection = false,
   purchases,
 }: PackageSwitchResolutionModalStoryArgs) {
   const [open, setOpen] = useState(true)
@@ -98,10 +106,14 @@ function PackageSwitchResolutionModalStory({
     <EquipmentPackageSwitchResolutionModal
       open={open}
       catalogIndex={catalogIndex}
+      draft={draft}
+      context={storyContext}
+      choiceSets={[]}
       evaluation={evaluation}
       draftQuantitiesByPurchaseId={draftQuantities}
       commitErrorReason={commitErrorReason}
       staleNotice={staleNotice}
+      isInitialSelection={isInitialSelection}
       onOpenChange={setOpen}
       onDraftQuantityChange={(purchaseId, quantity) => {
         setDraftQuantities((current) => ({ ...current, [purchaseId]: quantity }))
@@ -125,6 +137,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const OverBudget: Story = {}
+
+export const InitialSelectionAfterClassChange: Story = {
+  args: {
+    isInitialSelection: true,
+  },
+}
 
 export const StagedRemoval: Story = {
   args: {

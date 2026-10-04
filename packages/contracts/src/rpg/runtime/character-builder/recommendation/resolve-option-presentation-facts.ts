@@ -42,7 +42,6 @@ export type OptionPresentationFacts = {
 
 export const OPTION_PRESENTATION_RECOMMENDED_LABEL = 'Recommended'
 export const OPTION_PRESENTATION_PROFICIENT_LABEL = 'Proficient'
-export const OPTION_PRESENTATION_NOT_PROFICIENT_LABEL = 'Not proficient'
 export const OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
 export const OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL = 'Common for your class'
 export const OPTION_PRESENTATION_IN_PACKAGE_LABEL = 'In your package'

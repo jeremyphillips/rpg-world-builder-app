@@ -5,7 +5,7 @@ import { buildSeedSpellSchoolVocabulary } from '@/features/vocabulary'
 import { formatContentCollectionAvailabilityCaption } from '@/features/content/lib/content-type-labels'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
-import { spellsColumns } from '../lib/spells-overview-columns'
+import { spellsColumns } from '../lib/spells-overview-columns.lib'
 
 const STORY_SPELL_SCHOOL_VOCABULARY = buildSeedSpellSchoolVocabulary()
 

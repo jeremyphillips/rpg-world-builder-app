@@ -12,6 +12,7 @@ import {
   type ResolvedCampaignSubclassingPatch,
 } from './patches/campaign-subclassing-patch'
 import type { CreatureTypeId } from '../vocab/creature-type'
+import { joinInlineMetadata } from '../primitives/inline-metadata'
 import {
   ABSOLUTE_MAX_CHARACTER_LEVEL,
   buildLevelOptions,
@@ -133,7 +134,10 @@ export function formatExtendedLevelRange(input: LevelRangeSummaryInput): string 
   const standardMax = input.maxCharacterLevel
   const extendedMax = input.extendedMaxLevel ?? standardMax + DEFAULT_EXTENDED_LEVEL_OFFSET
   const tierLabel = input.extendedTierName?.trim() || 'extended'
-  return `Range: 1–${standardMax} standard · ${standardMax + 1}–${extendedMax} ${tierLabel}`
+  return joinInlineMetadata([
+    `Range: 1–${standardMax} standard`,
+    `${standardMax + 1}–${extendedMax} ${tierLabel}`,
+  ])
 }
 
 /** Default extended max when the user enables extended progression. */

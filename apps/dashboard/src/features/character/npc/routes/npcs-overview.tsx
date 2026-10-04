@@ -13,6 +13,13 @@ import { buildCharacterBuilderDraftFromQuickNpcSetup } from '../lib/quick-npc/bu
 import { useCampaignBuildContext } from '../../hooks/use-campaign-build-context'
 import { resolveQueryErrorLabel } from '@/lib/query/query-state.lib'
 import { useNpcs } from '../hooks/use-npcs'
+import {
+  formatCharacterTypeCreatePrimaryLabel,
+  formatCharacterTypeImportActionLabel,
+  formatCharacterTypeLoadErrorMessage,
+  getCharacterTypeItemLabel,
+  getCharacterTypeNavLabel,
+} from '../../lib/display/character-type-labels'
 
 export function NpcsOverview() {
   const { campaignId = '' } = useParams<{ campaignId: string }>()
@@ -45,7 +52,7 @@ export function NpcsOverview() {
         to={ROUTES.campaign.npcs.import(campaignId)}
         className={buttonVariants({ size: 'sm', variant: 'outline' })}
       >
-        Import NPC
+        {formatCharacterTypeImportActionLabel('npc')}
       </Link>
       {context ? (
         <>
@@ -68,8 +75,8 @@ export function NpcsOverview() {
             }}
           />
           <ContentCreateSplitAction
-            entityLabel="NPC"
-            primaryLabel="Create NPC"
+            entityLabel={getCharacterTypeItemLabel('npc')}
+            primaryLabel={formatCharacterTypeCreatePrimaryLabel('npc')}
             onCreateFromScratch={() => navigate(ROUTES.campaign.npcs.new(campaignId))}
             onStartWithSetup={() => setModalMode('handoff')}
             onQuickCreate={() => setModalMode('authoring')}
@@ -81,11 +88,11 @@ export function NpcsOverview() {
 
   return (
     <OverviewPageShell
-      heading="NPCs"
+      heading={getCharacterTypeNavLabel('npc')}
       isPending={isPending}
       isError={isError}
       errorLabel={errorLabel}
-      defaultErrorLabel="Could not load NPCs."
+      defaultErrorLabel={formatCharacterTypeLoadErrorMessage('npc')}
       actions={actions}
     >
       {catalogIndex ? (

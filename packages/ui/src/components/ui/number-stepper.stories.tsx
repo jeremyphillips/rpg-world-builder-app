@@ -70,3 +70,29 @@ export const AtMax: Story = {
   render: (args) => <NumberStepperHarness {...args} min={1} max={5} />,
   args: { max: 5 },
 }
+
+export const RemoveAtMin: Story = {
+  render: (args) => {
+    const [value, setValue] = React.useState(2)
+    if (value < 1) {
+      return <p className="text-sm text-muted-foreground">Row removed.</p>
+    }
+    return (
+      <NumberStepper
+        {...args}
+        value={value}
+        min={1}
+        max={8}
+        onChange={setValue}
+        minAction={{
+          mode: 'remove',
+          removeAriaLabel: 'Remove item',
+          onRemove: () => setValue(0),
+        }}
+      />
+    )
+  },
+  args: {
+    'aria-label': 'Quantity',
+  },
+}

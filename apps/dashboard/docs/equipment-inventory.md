@@ -4,6 +4,30 @@ Dashboard layout and editing rules for the Equipment step inventory. Contracts
 resolvers and conversion commit logic live in `@rpg/contracts`; this doc covers
 dashboard IA and how the UI composes existing row controls.
 
+## Pending cart after class change
+
+A class change keeps only the player's own purchases (picker and manual rows; see
+`reconcileEquipmentForClassChange` in contracts). The previous package's items are never
+copied into the cart, and package-conversion rows drop. When retained purchases exist and
+no starting option is selected, `resolveStartingEquipmentResolution` returns
+`unresolvedWithPurchases` and the step shows a pending state:
+
+- **Layout:** the inventory view model uses `layout: 'pending'`, so only the
+  **Added Equipment** column renders (single column, no Starting Equipment column). Rows
+  show the source label "Pending purchase", never "Purchased".
+- **Funding:** `resolveEquipmentStepFundingState` returns `unresolved`, and the guidance
+  area shows a "Starting funds not set" card with the pending cost formatted by
+  `formatWealth` (for example "5 SP selected"). It never shows "0 GP remaining".
+- **Browse and quantities:** **Browse equipment** stays hidden until an option is selected.
+  Retained rows can only be decreased or removed; contracts rejects quantity increases
+  while the option is unresolved.
+- **Preview rail:** Equipment shows "Starting equipment not resolved" (incomplete), never
+  "Ready". The preview `equipmentSummary` stays empty until an option is selected.
+- **Choosing an option:** the normal package-switch evaluation fits the cart to the new
+  allowance. Starting Gold that covers the cart applies directly; an option that cannot
+  cover it opens the resolution modal with selection copy ("Adjust purchases for this
+  option" / "Choose option"). Cancel leaves the option unresolved with the cart intact.
+
 ## Source groups
 
 Inventory is split into two sections. Package-owned and purchased rows never
@@ -69,7 +93,7 @@ parent row only (`7 total · 5 included · 2 purchased`).
 
 | Purchase                                                       | Controls                                                            |
 | -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Stackable `startingGold` (`origin: picker`)                    | Line 1: `NumberStepper` + Remove text; line 2: price                |
+| Stackable `startingGold` (`origin: picker`)                    | Line 1: `NumberStepper` (trash at qty 1 removes row); line 2: price |
 | Non-stackable `startingGold`                                   | qty locked at 1, full-row Remove                                    |
 | Converted non-stackable (`origin: packageConversion`, qty > 1) | qty locked at authored amount, full-row Remove                      |
 | Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows |
@@ -85,8 +109,10 @@ non-stackable value lines follow the same resolver; see
 
 ### Remove semantics
 
-- **Remove** is a trash icon button, not visible text. `aria-label` still describes
-  the full action (e.g. `Remove all 2 Rations`).
+- **Remove** uses `NumberStepper` `minAction={{ mode: 'remove', … }}`: at qty 1 the
+  left control becomes trash (destructive tone on hover/focus only). `aria-label`
+  still describes the full action (e.g. `Remove all 2 Rations`). Button click only —
+  typed or keyboard decrement never removes the row.
 - Only `removeTarget.kind === 'purchase'` rows render Remove. Package grants
   clear `removeTarget` in `buildInventoryRowPresentation`.
 - Combined rows: only purchased-editable sub-rows get Remove; package portions
@@ -125,6 +151,14 @@ Remaining after purchase                        …
   `resolveEquipmentStepPurchaseMaxQuantity` (fixes prior clamp-at-1 bug).
 - Header rail still shows quick **Add another** for owned stackables; bulk
   quantity is chosen in the expanded body.
+
+## Proficiency warnings
+
+Full Builder and Quick NPC share `equipment_not_proficient`, the equipment-id index, and `buildAdvisoryStatusItems`. Each experience projects those facts onto its own rows.
+
+Owned and selected equipment renders the advisory as a warning. Browse-only options use the same sentence as muted selection guidance. Review and create confirmation stay aggregate advisory lists.
+
+Builder inventory and package-switch cards read `advisoryStatusItems` from the view model. They do not resolve proficiency while rendering. Pending explicit purchases can produce an advisory before a starting option funds them; they stay out of resolved inventory.
 
 ## Package switch resolution
 

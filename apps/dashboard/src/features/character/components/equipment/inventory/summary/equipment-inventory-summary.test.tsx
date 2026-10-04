@@ -20,6 +20,7 @@ import {
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
   formatEquipmentGoldOptionStartingDescription,
 } from '../../../../lib/equipment/equipment-step.lib'
@@ -441,5 +442,38 @@ describe('EquipmentInventorySummary', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  it('renders only Added Equipment for retained purchases without a starting option', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepLeatherArmorFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    expect(screen.getByText('Added Equipment')).toBeInTheDocument()
+    expect(screen.getByText('Leather Armor')).toBeInTheDocument()
+    expect(screen.getByText(/^Pending purchase/)).toBeInTheDocument()
+    expect(screen.queryByText(/Purchased/)).not.toBeInTheDocument()
+    expect(screen.queryByText(EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL)).not.toBeInTheDocument()
   })
 })

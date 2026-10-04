@@ -1,7 +1,16 @@
 import { Check, TriangleAlert } from 'lucide-react'
 import { AlertCircle } from 'lucide-react'
 
-import { Badge, InlineInactiveStatus, Text, type BadgeSize, type ContentCardDensity } from '@rpg/ui'
+import {
+  Badge,
+  InlineInactiveStatus,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  type BadgeSize,
+  type ContentCardDensity,
+} from '@rpg/ui'
 
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
@@ -24,22 +33,43 @@ export function EntitySummaryStatusItemView({
   density: ContentCardDensity
 }) {
   switch (item.kind) {
-    case 'badge':
-      return (
+    case 'badge': {
+      const badge = (
         <Badge
           appearance={item.appearance}
           tone={item.tone}
           size={resolveStatusBadgeSize(density)}
           leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
-          title={item.title}
+          title={item.tooltip ? undefined : item.title}
         >
           {item.label}
         </Badge>
       )
+
+      if (!item.tooltip) {
+        return badge
+      }
+
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex">{badge}</span>
+            </TooltipTrigger>
+            <TooltipContent>{item.tooltip}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )
+    }
     case 'text':
       return (
-        <div className={entitySummaryStatusVariants({ density })}>
-          <Text variant={item.variant}>{item.label}</Text>
+        <div
+          className={entitySummaryStatusVariants({
+            density,
+            tone: item.variant === 'warning' ? 'warning' : 'muted',
+          })}
+        >
+          {item.label}
         </div>
       )
     case 'inactive':

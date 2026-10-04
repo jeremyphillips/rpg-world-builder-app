@@ -7,7 +7,7 @@ import { getNpcTemplateLabel } from '../../../../vocab/npc/npc-template'
 import type { EquipmentSupplySource } from '../../recommendation/recommendation-envelope'
 import type { EquipmentAdditionPolicy } from './resolve-equipment-addition-policy'
 import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
-import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 
 const EMPTY_SUPPLY_CATALOG: SelectionSourceLabelCatalogIndex = { classes: new Map() }
 

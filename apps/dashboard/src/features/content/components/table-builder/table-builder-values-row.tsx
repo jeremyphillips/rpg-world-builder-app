@@ -121,7 +121,7 @@ function TableBuilderValuesRowRestoreButton({
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <button
             type="button"
             className={iconGhostControlVariants({ hover: 'accent', layout: 'flex' })}

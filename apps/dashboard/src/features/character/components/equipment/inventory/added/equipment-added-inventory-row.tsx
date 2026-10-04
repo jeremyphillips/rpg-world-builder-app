@@ -20,7 +20,6 @@ import {
 } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import { buildEquipmentInventoryRowEntity } from '../equipment-inventory-entity.lib'
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
-import { useEquipmentAdvisoryStatus } from '../../../../hooks/use-character-build-advisories-context'
 import {
   grantedQuantity,
   resolveDistinctAcquisitionSourceKinds,
@@ -49,7 +48,6 @@ function GrantOnlySingleReleaseRow({
   entry: AddedEquipmentEntryViewModel
   onReleaseGrant: EquipmentAddedInventoryRowItemProps['onReleaseGrant']
 }) {
-  const advisoryStatus = useEquipmentAdvisoryStatus(entry.equipmentId)
   const row = entry.rows.find((candidate) => candidate.removeTarget?.kind === 'magicItemGrant')
   if (!row?.removeTarget || row.removeTarget.kind !== 'magicItemGrant') return null
 
@@ -60,7 +58,7 @@ function GrantOnlySingleReleaseRow({
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
         detailLabel: entry.provenanceLabel,
-        extraStatus: advisoryStatus,
+        extraStatus: entry.advisoryStatusItems,
       })}
       trailing={{
         kind: 'action',
@@ -111,7 +109,6 @@ function ManagedInventoryRow({
   const [internalOpen, setInternalOpen] = useState(false)
   const isOpen = open ?? internalOpen
   const equipment = entry.rows.find((row) => row.equipment)?.equipment
-  const advisoryStatus = useEquipmentAdvisoryStatus(entry.equipmentId)
 
   const handleToggleCollapse = useCallback(() => {
     const next = !isOpen
@@ -128,7 +125,7 @@ function ManagedInventoryRow({
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
         detailLabel: entry.provenanceLabel,
-        extraStatus: advisoryStatus,
+        extraStatus: entry.advisoryStatusItems,
       })}
       trailing={{
         kind: 'indicator',

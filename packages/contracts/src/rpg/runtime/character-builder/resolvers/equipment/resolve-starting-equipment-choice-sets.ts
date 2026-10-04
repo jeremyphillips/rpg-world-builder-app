@@ -34,6 +34,29 @@ export function readSelectedStartingEquipmentOptionId(
   return draft.choiceSelections[startingEquipmentChoiceSetId(classId)]?.[0]
 }
 
+export type StartingEquipmentResolution =
+  /** No class, or the class has no starting equipment options. */
+  | 'notApplicable'
+  /** Options exist, none selected, no purchases. */
+  | 'unresolvedEmpty'
+  /** Options exist, none selected, purchases retained (e.g. after a class change). */
+  | 'unresolvedWithPurchases'
+  | 'selected'
+
+export function resolveStartingEquipmentResolution(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): StartingEquipmentResolution {
+  const classId = draft.class.classId
+  if (!classId) return 'notApplicable'
+  const options = catalogIndex.classes.get(classId)?.characterCreation?.startingEquipment?.options
+  if (!options?.length) return 'notApplicable'
+  if (readSelectedStartingEquipmentOptionId(draft, classId)) return 'selected'
+  return (draft.equipment?.purchases.length ?? 0) > 0
+    ? 'unresolvedWithPurchases'
+    : 'unresolvedEmpty'
+}
+
 function nestedChoiceSetForItem(
   characterClass: CharacterClass,
   optionId: string,

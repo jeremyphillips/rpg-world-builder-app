@@ -3,7 +3,10 @@ import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/money'
 import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
-import type { CharacterBuilderDraftEquipmentPurchase } from '../../draft/draft'
+import type {
+  CharacterBuilderDraftEquipmentPurchase,
+  CharacterBuilderDraftEquipmentPurchaseOrigin,
+} from '../../draft/draft'
 import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
 import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
@@ -56,7 +59,7 @@ export function resolveEquipmentAcquisitionMaxQuantity(args: {
 export function resolveEquipmentPurchaseQuantityLimits(args: {
   equipment: Equipment
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
+  origin?: CharacterBuilderDraftEquipmentPurchaseOrigin
   budget?: EquipmentBudgetSummary
   currentQuantity: number
   isPurchaseRow: boolean

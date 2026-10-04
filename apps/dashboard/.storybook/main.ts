@@ -8,6 +8,12 @@ export default createStorybookMainConfig({
       ...viteConfig.resolve.alias,
       '@': new URL('../src', import.meta.url).pathname,
     }
+    viteConfig.optimizeDeps ??= {}
+    viteConfig.optimizeDeps.exclude = [
+      ...(viteConfig.optimizeDeps.exclude ?? []),
+      '@rpg/contracts',
+      '@rpg/contracts/primitives',
+    ]
     return viteConfig
   },
 })

@@ -1,6 +1,7 @@
 import type { CampaignInviteAdminListItem } from '@rpg/contracts'
 import type { CampaignRole } from '@rpg/contracts'
 import { ApiError } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { formatRelativeOrDate, formatShortDate } from '@/lib/datetime/format-datetime'
 
@@ -86,14 +87,17 @@ export function formatInvitationStatusLine(
   const expiryLabel = formatInviteExpiryLabel(invite.expiresAt)
 
   if (invite.deliveryStatus === 'failed') {
-    return `${INVITE_DELIVERY_STATUS_COPY.failed} · Expires ${expiryLabel}`
+    return joinInlineMetadata([INVITE_DELIVERY_STATUS_COPY.failed, `Expires ${expiryLabel}`])
   }
 
   if (invite.deliveryStatus === 'sent' && invite.sentAt) {
-    return `${INVITE_DELIVERY_STATUS_COPY.sent} ${formatRelativeOrDate(invite.sentAt)} · Expires ${expiryLabel}`
+    return joinInlineMetadata([
+      `${INVITE_DELIVERY_STATUS_COPY.sent} ${formatRelativeOrDate(invite.sentAt)}`,
+      `Expires ${expiryLabel}`,
+    ])
   }
 
-  return `Pending · Expires ${expiryLabel}`
+  return joinInlineMetadata(['Pending', `Expires ${expiryLabel}`])
 }
 
 export function formatMemberInviteAcceptedLine(inviteAcceptedAt: string): string {

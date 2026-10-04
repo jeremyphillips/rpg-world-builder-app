@@ -1,7 +1,6 @@
 import { useCallback, useRef } from 'react'
 import {
   resolveEffectiveBuilderSteps,
-  resolveBuilderStepDescription,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -126,21 +125,16 @@ export function CharacterBuilderStepRail({
                   size="md"
                   className={characterBuilderStepRailIconClasses}
                 />
-                <span className="min-w-0 space-y-0.5">
-                  <Text
-                    as="span"
-                    variant="body"
-                    className={cn(
-                      'block font-medium',
-                      isActive && characterBuilderStepRailItemLabelActiveClasses,
-                    )}
-                  >
-                    {step.label}
-                  </Text>
-                  <Text as="span" variant="muted" className="block text-xs">
-                    {resolveBuilderStepDescription(context, step.id)}
-                  </Text>
-                </span>
+                <Text
+                  as="span"
+                  variant="body"
+                  className={cn(
+                    'min-w-0 font-medium',
+                    isActive && characterBuilderStepRailItemLabelActiveClasses,
+                  )}
+                >
+                  {step.label}
+                </Text>
               </button>
             </li>
           )

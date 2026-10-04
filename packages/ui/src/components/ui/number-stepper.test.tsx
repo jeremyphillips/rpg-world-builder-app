@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -41,7 +41,9 @@ describe('NumberStepper', () => {
     const input = screen.getByLabelText('Quantity')
     expect(input).toHaveValue(12)
     expect(input).toHaveClass('text-foreground')
-    expect(input).toHaveClass('w-[2ch]')
+    expect(input).toHaveClass('w-[36px]')
+    expect(input).toHaveClass('border-x')
+    expect(input).toHaveClass('border-border-faint')
   })
 
   it('applies bordered pill styles by default', () => {
@@ -82,14 +84,190 @@ describe('NumberStepper', () => {
     expect(container.firstElementChild).toHaveClass('h-6')
   })
 
-  it('uses global input fill on stepper buttons with primary hover text', () => {
+  it('uses global input fill on stepper buttons with background hover', () => {
     render(<Harness />)
 
     const decreaseButton = screen.getByLabelText('Decrease Quantity')
     expect(decreaseButton).toHaveClass('bg-input')
-    expect(decreaseButton).toHaveClass('hover:bg-input')
+    expect(decreaseButton).toHaveClass('hover:bg-background')
     expect(decreaseButton).toHaveClass('hover:text-primary')
     expect(decreaseButton).toHaveClass('active:text-primary')
+  })
+
+  it('styles a single disabled stepper button with sunken fill and disabled icon tone', () => {
+    render(<Harness initial={10} max={10} />)
+
+    const increaseButton = screen.getByLabelText('Increase Quantity')
+    expect(increaseButton).toBeDisabled()
+    expect(increaseButton).toHaveClass('disabled:bg-sunken')
+    expect(increaseButton).toHaveClass('disabled:[&_svg]:text-input-disabled')
+  })
+
+  it('does not focus the value input when the stepper is disabled', async () => {
+    const user = userEvent.setup()
+
+    render(<NumberStepper aria-label="Quantity" value={3} disabled onChange={vi.fn()} />)
+
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toBeDisabled()
+
+    await user.click(input)
+    expect(input).not.toHaveFocus()
+  })
+
+  it('does not focus the value input when both step buttons are disabled', async () => {
+    const user = userEvent.setup()
+
+    render(<NumberStepper aria-label="Quantity" value={3} min={3} max={3} onChange={vi.fn()} />)
+
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toBeDisabled()
+    expect(input).toHaveAttribute('readonly')
+
+    await user.click(input)
+    expect(input).not.toHaveFocus()
+  })
+
+  it('styles the full stepper as sunken when both step buttons are disabled', () => {
+    const { container } = render(
+      <NumberStepper aria-label="Quantity" value={3} min={3} max={3} onChange={() => undefined} />,
+    )
+
+    expect(container.firstElementChild).toHaveClass('bg-sunken')
+    expect(screen.getByLabelText('Quantity')).toHaveClass('text-input-disabled')
+    expect(screen.getByLabelText('Decrease Quantity')).toBeDisabled()
+    expect(screen.getByLabelText('Increase Quantity')).toBeDisabled()
+  })
+
+  describe('minAction', () => {
+    it('disables the left control at min in default mode', () => {
+      render(<Harness initial={1} />)
+      expect(screen.getByLabelText('Decrease Quantity')).toBeDisabled()
+    })
+
+    it('decrements above min in remove mode', async () => {
+      const user = userEvent.setup()
+
+      function Controlled() {
+        const [value, setValue] = React.useState(2)
+        return (
+          <NumberStepper
+            aria-label="Quantity"
+            value={value}
+            min={1}
+            max={5}
+            minAction={{
+              mode: 'remove',
+              removeAriaLabel: 'Remove item',
+              onRemove: vi.fn(),
+            }}
+            onChange={setValue}
+          />
+        )
+      }
+
+      render(<Controlled />)
+      await user.click(screen.getByLabelText('Decrease Quantity'))
+      expect(screen.getByLabelText('Quantity')).toHaveValue(1)
+    })
+
+    it('calls onRemove at min in remove mode without changing value', async () => {
+      const user = userEvent.setup()
+      const onRemove = vi.fn()
+
+      render(
+        <NumberStepper
+          aria-label="Quantity"
+          value={1}
+          min={1}
+          max={5}
+          minAction={{
+            mode: 'remove',
+            removeAriaLabel: 'Remove item',
+            onRemove,
+          }}
+          onChange={vi.fn()}
+        />,
+      )
+
+      expect(screen.getByLabelText('Remove item')).toBeEnabled()
+      await user.click(screen.getByLabelText('Remove item'))
+      expect(onRemove).toHaveBeenCalledTimes(1)
+    })
+
+    it('allows removal when min equals max', async () => {
+      const user = userEvent.setup()
+      const onRemove = vi.fn()
+
+      render(
+        <NumberStepper
+          aria-label="Quantity"
+          value={1}
+          min={1}
+          max={1}
+          minAction={{
+            mode: 'remove',
+            removeAriaLabel: 'Remove item',
+            onRemove,
+          }}
+          onChange={vi.fn()}
+        />,
+      )
+
+      const removeButton = screen.getByLabelText('Remove item')
+      expect(removeButton).toBeEnabled()
+      expect(removeButton).toHaveClass('hover:text-destructive')
+      expect(screen.getByLabelText('Increase Quantity')).toBeDisabled()
+      await user.click(removeButton)
+      expect(onRemove).toHaveBeenCalledTimes(1)
+    })
+
+    it('disables remove at min when the whole stepper is disabled', () => {
+      render(
+        <NumberStepper
+          aria-label="Quantity"
+          value={1}
+          min={1}
+          max={5}
+          disabled
+          minAction={{
+            mode: 'remove',
+            removeAriaLabel: 'Remove item',
+            onRemove: vi.fn(),
+          }}
+          onChange={vi.fn()}
+        />,
+      )
+
+      expect(screen.getByLabelText('Remove item')).toBeDisabled()
+    })
+
+    it('keeps the same left button node when switching from decrement to remove', async () => {
+      const user = userEvent.setup()
+
+      function Controlled() {
+        const [value, setValue] = React.useState(2)
+        return (
+          <NumberStepper
+            aria-label="Quantity"
+            value={value}
+            min={1}
+            max={5}
+            minAction={{
+              mode: 'remove',
+              removeAriaLabel: 'Remove item',
+              onRemove: vi.fn(),
+            }}
+            onChange={setValue}
+          />
+        )
+      }
+
+      render(<Controlled />)
+      const leftButton = screen.getByLabelText('Decrease Quantity')
+      await user.click(leftButton)
+      expect(screen.getByLabelText('Remove item')).toBe(leftButton)
+    })
   })
 
   it('omits border classes when borderless', () => {

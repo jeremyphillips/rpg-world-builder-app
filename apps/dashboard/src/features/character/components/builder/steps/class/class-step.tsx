@@ -48,7 +48,7 @@ export function ClassStep({ context, draft, validationIssues, onDraftChange }: C
     onDraftChange({
       class: next.class,
       choiceSelections: next.choiceSelections,
-      ...(draft.equipment ? { equipment: next.equipment } : {}),
+      ...(next.equipment ? { equipment: next.equipment } : {}),
     })
   }
 

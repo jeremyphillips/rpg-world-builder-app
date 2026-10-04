@@ -240,7 +240,7 @@ export function RadioOptionCardDetailsAction({
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <Button
             type="button"
             variant="text"

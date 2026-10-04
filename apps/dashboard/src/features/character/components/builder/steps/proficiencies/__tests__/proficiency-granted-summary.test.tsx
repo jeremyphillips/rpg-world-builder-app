@@ -19,7 +19,7 @@ describe('ProficiencyGrantedSummary', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Saving Throws')).toBeInTheDocument()
     expect(screen.getByText('Dexterity · Intelligence')).toBeInTheDocument()
-    expect(screen.getAllByText('Rogue').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Rogue')).not.toBeInTheDocument()
     expect(screen.queryByText('Granted by Rogue')).not.toBeInTheDocument()
     expect(screen.queryByText('Thieves Tools')).not.toBeInTheDocument()
     expect(screen.getByText('Weapons')).toBeInTheDocument()

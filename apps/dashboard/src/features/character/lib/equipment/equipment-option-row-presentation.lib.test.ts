@@ -2,11 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
-  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
   projectEquipmentSelection,
   requiredByLabel,
+  resolveEquipmentNotProficientMessage,
   satisfiesFocusRequirementLabel,
+  type Equipment,
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
 
@@ -18,6 +19,7 @@ import {
 } from './equipment-option-row-presentation.lib'
 
 const wizard = { kind: 'class' as const, id: 'wizard' }
+const longsword = { kind: 'weapon', id: 'longsword', name: 'Longsword' } as Equipment
 const fighter = { kind: 'class' as const, id: 'fighter' }
 const sourceName = (source: { kind: string; id?: string }) => {
   if (source.kind === 'class' && source.id === 'wizard') return 'Wizard'
@@ -38,6 +40,7 @@ function resolved(overrides: Partial<ResolvedEquipmentOption> = {}): ResolvedEqu
 function present(option: ResolvedEquipmentOption, metadata: readonly string[] = ['1d8 Slashing']) {
   return resolveEquipmentOptionRowPresentation({
     identity: 'Longsword',
+    equipment: longsword,
     kindLabel: 'Weapon',
     metadata,
     resolved: option,
@@ -210,7 +213,7 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     const inline = equipmentOptionInlineClauses(presentation).map((clause) => clause.label)
     expect(inline).toEqual([
       satisfiesFocusRequirementLabel('Wizard'),
-      OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+      resolveEquipmentNotProficientMessage('weapon'),
     ])
     expect(presentation.secondaryTitle).toContain(
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Fighter class`,
@@ -282,7 +285,7 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     const presentation = present(option)
     expect(option.recommendation).toBe(recommendation)
     expect(equipmentOptionInlineClauses(presentation).map((clause) => clause.label)).toEqual([
-      OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+      resolveEquipmentNotProficientMessage('weapon'),
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Fighter class`,
     ])
   })

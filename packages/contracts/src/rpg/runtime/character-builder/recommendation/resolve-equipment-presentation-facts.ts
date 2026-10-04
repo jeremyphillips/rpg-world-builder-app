@@ -1,6 +1,11 @@
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
+import type { Equipment } from '../../../content/equipment'
 import { getNpcTemplateLabel, type NpcTemplateId } from '../../../vocab/npc/npc-template'
 
+import {
+  equipmentAdvisoryClass,
+  resolveEquipmentNotProficientMessage,
+} from '../messages/character-builder-advisory-messages'
 import type { ResolvedEquipmentOption } from '../resolvers/equipment/project-equipment-option-facts'
 import { formatRecommendationSourceLabel } from './format-recommendation-source-label'
 import type { RecommendationSourceRef } from './recommendation-source-ref'
@@ -10,7 +15,6 @@ import {
   OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
-  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
   OPTION_PRESENTATION_STARTING_OPTION_LABEL,
@@ -26,6 +30,7 @@ export type EquipmentOpenPoolKind = 'toolProficiency' | 'startingEquipment'
 
 export function resolveEquipmentPresentationFacts(args: {
   resolved: ResolvedEquipmentOption
+  equipment?: Equipment
   sourceName?: RecommendationSourceName
   authoredLabel?: string
   openPoolKind?: EquipmentOpenPoolKind
@@ -48,7 +53,7 @@ export function resolveEquipmentPresentationFacts(args: {
   const proficient = proficientFact(args.resolved, args.sourceName)
   if (proficient) facts.push(proficient)
 
-  const notProficient = notProficientFact(args.resolved)
+  const notProficient = notProficientFact(args.resolved, args.equipment)
   if (notProficient) facts.push(notProficient)
 
   facts.push(...stateFacts(args))
@@ -120,12 +125,17 @@ function proficientFact(
   }
 }
 
-function notProficientFact(resolved: ResolvedEquipmentOption): OptionPresentationFact | undefined {
-  if (resolved.state.compatibility?.proficient !== false) return undefined
+function notProficientFact(
+  resolved: ResolvedEquipmentOption,
+  equipment: Equipment | undefined,
+): OptionPresentationFact | undefined {
+  if (resolved.state.compatibility?.proficient !== false || !equipment) return undefined
+  const equipmentClass = equipmentAdvisoryClass(equipment)
+  if (!equipmentClass) return undefined
   return {
     kind: 'compatibility',
     discriminator: 'not-proficient',
-    label: OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+    label: resolveEquipmentNotProficientMessage(equipmentClass),
     sourceLabels: [],
   }
 }

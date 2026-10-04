@@ -413,6 +413,7 @@ describe('deriveEquipmentRecommendations', () => {
             equipmentId: arcaneCrystal.id,
             quantity: 1,
             sourceMode: 'startingGold',
+            origin: 'picker',
           },
         ],
         editedSincePackageSelection: false,

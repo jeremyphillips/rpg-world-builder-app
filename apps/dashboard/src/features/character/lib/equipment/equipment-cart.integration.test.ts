@@ -103,6 +103,7 @@ describe('equipment cart integration', () => {
         equipmentId: equipmentStepBattleaxeFixture.id,
         quantity: 1,
         sourceMode: 'startingGold',
+        origin: 'picker',
       }),
     ])
 
@@ -114,10 +115,12 @@ describe('equipment cart integration', () => {
       cartContext,
     )
 
-    expect(viewModel?.startingEquipment.kind).toBe('package')
-    if (viewModel?.startingEquipment.kind !== 'package') return
+    expect(viewModel?.layout === 'split' && viewModel.startingEquipment.kind).toBe('package')
+    if (viewModel?.layout !== 'split' || viewModel.startingEquipment.kind !== 'package') return
 
-    expect(viewModel.startingEquipment.group.optionLabel).toBe('Standard Equipment')
+    expect(viewModel.layout === 'split' && viewModel.startingEquipment.group.optionLabel).toBe(
+      'Standard Equipment',
+    )
     expect(
       viewModel.startingEquipment.group.categoryGroups.some((group) =>
         group.rows.some((row) => row.equipmentName === 'Spear'),

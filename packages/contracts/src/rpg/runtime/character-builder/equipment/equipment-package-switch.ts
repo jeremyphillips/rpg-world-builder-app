@@ -339,7 +339,7 @@ function resolvePackageSwitchStatus(args: {
   }
 }
 
-function buildPackageSwitchSelectionPatch(args: {
+export function buildPackageSwitchSelectionPatch(args: {
   draft: CharacterBuilderDraft
   targetOption: { id: string }
   targetOptionShape: Parameters<typeof resolveEquipmentModeFromOption>[0]
@@ -356,6 +356,7 @@ function buildPackageSwitchSelectionPatch(args: {
     equipment: {
       mode: resolveEquipmentModeFromOption(args.targetOptionShape),
       purchases: args.purchases,
+      magicItemSelections: args.draft.equipment?.magicItemSelections ?? [],
       editedSincePackageSelection: args.draft.equipment?.editedSincePackageSelection ?? false,
       skipped: false,
     },

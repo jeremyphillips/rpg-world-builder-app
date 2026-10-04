@@ -35,9 +35,9 @@ import {
   readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
-  resolvePurchaseSourceMode,
   resolveStartingGoldPurchaseId,
   shouldShowEquipmentPurchaseWorkflow,
+  resolveEquipmentStepFundingState,
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow'
@@ -61,6 +61,7 @@ export type PendingEquipmentPackageSwitch = {
   committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+  isInitialSelection: boolean
 }
 
 function resolveGoldOptionFundingFromClass(
@@ -75,13 +76,13 @@ function resolveGoldOptionFundingFromClass(
 
 function collectOwnedPurchaseQuantities(
   draft: CharacterBuilderDraft,
-  activePurchaseSourceMode: ReturnType<typeof resolvePurchaseSourceMode> | undefined,
+  showBudget: boolean,
 ): Record<string, number> {
-  if (!activePurchaseSourceMode) return {}
+  if (!showBudget) return {}
 
   const quantities: Record<string, number> = {}
   for (const purchase of draft.equipment?.purchases ?? []) {
-    if (purchase.sourceMode === activePurchaseSourceMode) {
+    if (purchase.sourceMode === 'startingGold') {
       quantities[purchase.equipmentId] = purchase.quantity
     }
   }
@@ -219,6 +220,10 @@ export function useEquipmentStep(args: {
     targetOptionId: string,
   ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
   const showPurchaseWorkflow = shouldShowEquipmentPurchaseWorkflow(draft, selectedOptionId, budget)
+  const fundingState = useMemo(
+    () => resolveEquipmentStepFundingState({ draft, catalogIndex, budget }),
+    [budget, catalogIndex, draft],
+  )
   const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(() => {
     const resolved = characterClass
       ? resolveEquipmentStepPickerItems({
@@ -262,10 +267,9 @@ export function useEquipmentStep(args: {
         : undefined,
     [budget, catalogIndex, context.characterCreationRules, context.rulesetId, draft, showBudget],
   )
-  const activePurchaseSourceMode = showBudget ? resolvePurchaseSourceMode() : undefined
   const ownedPurchaseQuantities = useMemo(
-    () => collectOwnedPurchaseQuantities(draft, activePurchaseSourceMode),
-    [activePurchaseSourceMode, draft.equipment?.purchases],
+    () => collectOwnedPurchaseQuantities(draft, showBudget),
+    [showBudget, draft.equipment?.purchases],
   )
 
   const applyEquipmentAction = (
@@ -303,6 +307,7 @@ export function useEquipmentStep(args: {
       nestedSelections,
       draftQuantitiesByPurchaseId: initPackageSwitchDraftQuantities(evaluation),
       committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
+      isInitialSelection: selectedOptionId === undefined,
     })
   }
 
@@ -591,7 +596,6 @@ export function useEquipmentStep(args: {
     applyEquipmentAction({
       kind: 'add_purchase',
       equipmentId: item.equipment.id,
-      sourceMode: resolvePurchaseSourceMode(),
       quantity,
     })
   }
@@ -626,8 +630,7 @@ export function useEquipmentStep(args: {
     const purchaseId = resolveStartingGoldPurchaseId(draft, equipmentId)
     if (!purchaseId) return
 
-    const sourceMode = resolvePurchaseSourceMode()
-    const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
+    const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, 'startingGold')
 
     if (currentQuantity <= 1) {
       handleRemoveFromInventory(item)
@@ -666,6 +669,7 @@ export function useEquipmentStep(args: {
     focusedAllowanceId,
     setFocusedAllowanceId,
     budget,
+    fundingState,
     pickerItems: magicItemWorkflow.filteredPickerItems,
     allPickerItems: pickerItems,
     pickerBrowseSortContext,

@@ -4,6 +4,7 @@ import {
   type Equipment,
   type EquipmentAcquisitionPlan,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { clampEquipmentStepQuantity } from '../../../../lib/equipment/equipment-quantity.lib'
 import {
@@ -57,7 +58,7 @@ export function formatGrantSecondaryPrice(
   if (plan.purchaseQuantity <= 0) return undefined
   const total = formatEquipmentPurchaseTotalPriceLabel(equipment, plan.purchaseQuantity)
   if (!total) return undefined
-  return `${formatMoney(equipment.cost!)} each · ${total} total`
+  return joinInlineMetadata([`${formatMoney(equipment.cost!)} each`, `${total} total`])
 }
 
 function resolvePlanAllocation(plan: EquipmentAcquisitionPlan) {

@@ -223,4 +223,50 @@ describe('builder-preview-projection.lib', () => {
       expandable: true,
     })
   })
+
+  it('marks equipment incomplete and never Ready while starting equipment is pending', () => {
+    const fighterStored = makeClassStored({ slug: 'fixture-fighter', name: 'Fighter' })
+    const fighterContext = createStandaloneBuilderContextFixture({
+      catalog: {
+        species: [],
+        classes: [fighterStored],
+        spells: [],
+        equipment: [],
+        skillProficiencies: [],
+        organizations: [],
+        languages: [],
+      },
+    })
+    const fighterCatalogIndex = createStandaloneBuilderCatalogIndexFixture(fighterContext)
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: fighterStored.id, level: 1 as const },
+    }
+    const resolvedChoiceSets = resolveAvailableChoices(draft, fighterContext)
+    const preview = buildCharacterPreview(
+      draft,
+      fighterCatalogIndex,
+      fighterContext.characterCreationRules,
+      fighterContext.rulesetId,
+      { resolvedChoiceSets },
+    )
+
+    const projection = projectBuilderPreviewRail({
+      draft,
+      context: fighterContext,
+      catalogIndex: fighterCatalogIndex,
+      preview: { ...preview, equipmentSummary: ['Rope'], startingEquipmentPending: true },
+      resolvedChoiceSets,
+      currentStepId: 'equipment',
+      manualOpenSection: null,
+      canCreateCharacter: false,
+      validationVisibleStepIds: [],
+      validationIssues: [],
+    })
+
+    expect(projection?.sections.find((section) => section.id === 'equipment')).toMatchObject({
+      marker: 'incomplete',
+      status: 'Starting equipment not resolved',
+    })
+  })
 })

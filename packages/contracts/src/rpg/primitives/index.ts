@@ -10,7 +10,12 @@ export * from './area-geometry'
 export * from './wealth'
 export * from './character-wealth-grant'
 export * from './prose'
-export * from './inline-metadata'
+export {
+  INLINE_METADATA_SEPARATOR,
+  formatInlineMetadataTail,
+  joinInlineMetadata,
+  type InlineMetadataPart,
+} from './inline-metadata'
 export * from './ruleset'
 export * from './same-string-set'
 export * from './format-slug'

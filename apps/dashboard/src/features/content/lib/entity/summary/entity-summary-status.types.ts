@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import type { BadgeAppearance, BadgeTone } from '@rpg/ui'
 
 /** Discrete state or callout — Member, Equipped, Spellcasting focus, Unavailable. */
@@ -8,6 +10,8 @@ export type EntitySummaryStatusBadge = {
   appearance?: BadgeAppearance
   leadingIcon?: 'check' | 'warning'
   title?: string
+  /** Rich tooltip body — when set, renders a hover/focus tooltip instead of native `title`. */
+  tooltip?: ReactNode
 }
 
 /** Supporting status annotation — ritual/concentration markers, disabled notes, warnings. Not a generic third-line slot. */

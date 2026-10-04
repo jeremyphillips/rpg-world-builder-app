@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import type { Equipment } from '../../../content/equipment'
+import { resolveEquipmentNotProficientMessage } from '../messages/character-builder-advisory-messages'
 import { NEUTRAL_OPTION_RECOMMENDATION } from './recommendation-envelope'
 import {
   grantedByLabel,
@@ -8,7 +10,6 @@ import {
   OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
-  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
@@ -19,6 +20,7 @@ import { resolveEquipmentPresentationFacts } from './resolve-equipment-presentat
 import type { ResolvedEquipmentOption } from '../resolvers/equipment/project-equipment-option-facts'
 
 const wizard = { kind: 'class' as const, id: 'wizard' }
+const longsword = { kind: 'weapon', id: 'longsword', name: 'Longsword' } as Equipment
 
 function resolved(overrides: Partial<ResolvedEquipmentOption> = {}): ResolvedEquipmentOption {
   return {
@@ -186,7 +188,11 @@ describe('resolveEquipmentPresentationFacts', () => {
       recommendation,
       state: { compatibility: { proficient: false } },
     })
-    const facts = resolveEquipmentPresentationFacts({ resolved: option, sourceName })
+    const facts = resolveEquipmentPresentationFacts({
+      resolved: option,
+      sourceName,
+      equipment: longsword,
+    })
     expect(option.recommendation).toBe(recommendation)
     expect(facts.facts.find((fact) => fact.discriminator === 'recommended')).toMatchObject({
       label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
@@ -194,7 +200,7 @@ describe('resolveEquipmentPresentationFacts', () => {
     })
     expect(facts.facts.find((fact) => fact.discriminator === 'not-proficient')).toMatchObject({
       kind: 'compatibility',
-      label: OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+      label: resolveEquipmentNotProficientMessage('weapon'),
     })
   })
 

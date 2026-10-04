@@ -7,7 +7,6 @@ import {
   EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
   EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
   EQUIPMENT_PICKER_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
@@ -63,11 +62,6 @@ const EQUIPMENT_CALLOUT_LABEL_PRESENTATION = {
     tone: 'success',
     leadingIcon: 'check',
   },
-  [EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL]: {
-    appearance: 'soft',
-    tone: 'warning',
-    leadingIcon: 'warning',
-  },
   [EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL]: {
     appearance: 'soft',
     tone: 'destructive',
@@ -97,6 +91,14 @@ export function getEquipmentCalloutPresentation(
 export function mapEquipmentCalloutToStatusItem(
   callout: EquipmentPickerCallout,
 ): EntitySummaryStatusItem {
+  if (callout.factKind === 'guidance') {
+    return {
+      kind: 'text',
+      variant: 'muted',
+      label: callout.label,
+    }
+  }
+
   const presentation = getEquipmentCalloutPresentation(callout)
 
   return {

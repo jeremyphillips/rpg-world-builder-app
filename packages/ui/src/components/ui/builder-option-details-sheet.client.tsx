@@ -7,13 +7,13 @@ import { Heading } from './heading'
 import { RichTextContent } from './rich-text-content'
 import { Sheet } from './sheet.client'
 import { type SheetSurface } from './sheet.variants'
+import { MetadataList } from './metadata-list'
 import { Text } from './text'
 import { InfoTooltip } from './tooltip.client'
 import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   builderOptionDetailsHeroImageVariants,
-  builderOptionDetailsMetadataListVariants,
   builderOptionDetailsSectionVariants,
   type BuilderOptionPrimaryActionPlacement,
 } from './builder-option-details-sheet.variants'
@@ -57,20 +57,6 @@ export type BuilderOptionDetailsSheetProps = {
   surface?: SheetSurface
   /** Full-bleed artwork rendered above padded header/body content. */
   heroImage?: React.ReactNode
-}
-
-function MetadataRow({ label, value }: BuilderOptionDetailsMetadata) {
-  return (
-    <Text variant="emphasis" as="p">
-      <Text variant="emphasis" as="span">
-        {label}
-      </Text>
-      :{' '}
-      <Text variant="muted" as="span">
-        {value}
-      </Text>
-    </Text>
-  )
 }
 
 function SectionItem({ item }: { item: BuilderOptionDetailsSectionItem }) {
@@ -174,11 +160,7 @@ export function BuilderOptionDetailsSheet({
   const bodyContent = (
     <>
       {visibleMetadata && visibleMetadata.length > 0 ? (
-        <div className={builderOptionDetailsMetadataListVariants()}>
-          {visibleMetadata.map((row) => (
-            <MetadataRow key={row.label} label={row.label} value={row.value} />
-          ))}
-        </div>
+        <MetadataList items={visibleMetadata} size="sm" />
       ) : null}
       {descriptionHtml ? (
         <RichTextContent

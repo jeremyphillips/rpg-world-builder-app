@@ -258,7 +258,12 @@ describe('magic item acquisition contracts', () => {
       equipment: {
         ...draftWithGoldOption().equipment!,
         purchases: [
-          { equipmentId: commonPotion.id, quantity: 1, sourceMode: 'startingGold' as const },
+          {
+            equipmentId: commonPotion.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
         ],
       },
     }
@@ -658,7 +663,14 @@ describe('magic item acquisition contracts', () => {
       ...draftWithGoldOption(),
       equipment: {
         ...draftWithGoldOption().equipment!,
-        purchases: [{ equipmentId: goldSink.id, quantity: 1, sourceMode: 'startingGold' as const }],
+        purchases: [
+          {
+            equipmentId: goldSink.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
         magicItemSelections: [],
       },
     }

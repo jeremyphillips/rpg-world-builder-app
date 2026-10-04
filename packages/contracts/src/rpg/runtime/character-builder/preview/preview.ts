@@ -10,6 +10,7 @@ import type { ResolvedSpellcastingProgressionConfig } from '../../../campaign/ru
 import type { CharacterBuildCatalogIndex, ResolvedCharacterCreationRules } from '../context'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { resolveStartingEquipmentResolution } from '../resolvers/equipment/resolve-starting-equipment-choice-sets'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import { toCharacterDerivationInput } from './preview-adapter'
 import { assembleStartingEquipment } from '../assembly/assemble-starting-equipment'
@@ -29,6 +30,8 @@ export type {
 export type CharacterBuildPreview = CharacterDerivedProfile & {
   proficiencies: CharacterProficiencies
   equipmentSummary: string[]
+  /** Purchases were retained but no starting equipment option is selected yet. */
+  startingEquipmentPending: boolean
   unresolvedChoiceSetIds: string[]
   warnings: string[]
 }
@@ -134,6 +137,8 @@ export function buildCharacterPreview(
     ...derived,
     proficiencies: derivationInput.proficiencies,
     equipmentSummary: resolveBuilderEquipmentSummary(draft, choiceSets),
+    startingEquipmentPending:
+      resolveStartingEquipmentResolution(draft, catalogIndex) === 'unresolvedWithPurchases',
     unresolvedChoiceSetIds: resolveBuilderUnresolvedChoiceSetIds(draft, choiceSets),
     warnings: resolveBuilderAdvisoryWarnings(draft, catalogIndex, rules, rulesetId),
   }

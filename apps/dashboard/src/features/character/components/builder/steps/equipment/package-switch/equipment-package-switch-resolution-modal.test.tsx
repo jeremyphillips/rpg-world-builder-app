@@ -13,6 +13,7 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
+import { equipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
 
@@ -68,6 +69,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 62 }}
         onOpenChange={vi.fn()}
@@ -77,7 +81,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: 'Resolve purchases before switching' }),
+      screen.getByRole('heading', { name: 'Adjust purchases before switching' }),
     ).toBeInTheDocument()
     expect(screen.getByText('Rope')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Switch package' })).toBeDisabled()
@@ -88,6 +92,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 62 }}
         onOpenChange={vi.fn()}
@@ -97,7 +104,7 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
     )
 
     const scrollRegion = screen
-      .getByRole('heading', { name: 'Purchased with starting gold' })
+      .getByRole('heading', { name: 'Current purchases' })
       .closest('section')?.parentElement
 
     expect(scrollRegion).not.toBeNull()
@@ -113,6 +120,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 9 }}
         onOpenChange={vi.fn()}
@@ -151,6 +161,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={blockedDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={blockedEvaluation}
         draftQuantitiesByPurchaseId={{}}
         onOpenChange={vi.fn()}

@@ -218,6 +218,12 @@ export {
   ChoiceSelectionCounter,
   type ChoiceSelectionCounterProps,
 } from './components/ui/choice-selection-counter.client'
+export {
+  MetadataList,
+  type MetadataListItem,
+  type MetadataListProps,
+} from './components/ui/metadata-list'
+export { type MetadataListSize } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
   ACTION_ICONS,
@@ -272,6 +278,7 @@ export {
 export {
   NumberStepper,
   type NumberStepperDigits,
+  type NumberStepperMinAction,
   type NumberStepperProps,
 } from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
@@ -837,6 +844,7 @@ export {
   TooltipProvider,
   InfoTooltip,
   type InfoTooltipProps,
+  type TooltipTriggerProps,
 } from './components/ui/tooltip.client'
 
 export {

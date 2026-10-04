@@ -3,7 +3,10 @@ import { Heading, RichTextContent } from '@rpg/ui'
 import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
 
 import { ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
-import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
+import {
+  ContentStatList,
+  type ContentStatRowSize,
+} from '../../lib/detail/metadata/content-stat-row'
 import { SPELL_DETAIL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
 
 export type SpellDetailMetadataProps = {
@@ -26,21 +29,7 @@ export function SpellDetailMetadata({
 
   return (
     <section className="space-y-3" aria-label={omitSectionTitle ? 'Spell details' : undefined}>
-      {statRows.length > 0 ? (
-        <div className="space-y-1">
-          {statRows.map((row) => (
-            <ContentStatRow
-              key={row.label}
-              size={statRowSize}
-              label={row.label}
-              value={row.value}
-              info={row.info}
-              infoPlacement={row.infoPlacement}
-              infoAriaLabel={row.infoAriaLabel}
-            />
-          ))}
-        </div>
-      ) : null}
+      {statRows.length > 0 ? <ContentStatList rows={statRows} size={statRowSize} /> : null}
 
       {viewModel.descriptionHtml ? (
         viewModel.descriptionTables?.length ? (

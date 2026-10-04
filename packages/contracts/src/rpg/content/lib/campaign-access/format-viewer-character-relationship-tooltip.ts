@@ -1,4 +1,4 @@
-import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 import { joinNaturalList } from '../../../primitives/prose'
 
 import { CLASS_CONTENT_TYPE_TERM, SPECIES_CONTENT_TYPE_TERM } from '../content-type-terms'

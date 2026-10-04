@@ -26,7 +26,7 @@ import {
   formatWeight,
   MOUNT_CARRYING_CAPACITY_LABEL,
 } from '../../primitives/units'
-import { joinInlineMetadata } from '../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../primitives/inline-metadata'
 
 export const EQUIPMENT_COMPACT_DEFAULT_MAX_SEGMENTS = 3
 

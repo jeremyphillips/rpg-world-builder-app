@@ -10,6 +10,7 @@ import {
 import {
   collectPreviewSpellLabels,
   formatPreviewSpellsSubsection,
+  resolveEquipmentPreviewEmptyHint,
 } from './character-builder-preview-panel.lib'
 
 const context = createSpellsStepContextFixture()
@@ -58,5 +59,10 @@ describe('character-builder-preview-panel.lib', () => {
       resolvedText: null,
       emptyHint: 'Not applicable for this class.',
     })
+  })
+
+  it('uses the pending hint while starting equipment is unresolved', () => {
+    expect(resolveEquipmentPreviewEmptyHint(true, true)).toBe('Starting equipment not resolved')
+    expect(resolveEquipmentPreviewEmptyHint(true, false)).toBe('Nothing selected yet.')
   })
 })

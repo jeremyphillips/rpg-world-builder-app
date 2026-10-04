@@ -15,15 +15,27 @@ export type EquipmentInventoryQuantityControlProps = {
   row: EquipmentInventoryRow
   allowZeroQuantity?: boolean
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onRemove?: () => void
+  removeAriaLabel?: string
 }
 
 export function EquipmentInventoryQuantityControl({
   row,
   allowZeroQuantity = false,
   onSetPurchaseQuantity,
+  onRemove,
+  removeAriaLabel,
 }: EquipmentInventoryQuantityControlProps) {
   const maxQuantity = row.maxQuantity ?? EQUIPMENT_PURCHASE_QUANTITY_MAX
   const minQuantity = allowZeroQuantity ? 0 : 1
+  const minAction =
+    onRemove && removeAriaLabel && minQuantity >= 1
+      ? ({
+          mode: 'remove',
+          onRemove,
+          removeAriaLabel,
+        } as const)
+      : undefined
 
   return (
     <div className={equipmentInventoryRowQuantityClasses}>
@@ -35,6 +47,7 @@ export function EquipmentInventoryQuantityControl({
         max={maxQuantity}
         value={row.entry.quantity}
         disabled={!onSetPurchaseQuantity}
+        minAction={minAction}
         onChange={(next) => {
           if (!row.quantityTarget || !onSetPurchaseQuantity) return
           const clamped = allowZeroQuantity

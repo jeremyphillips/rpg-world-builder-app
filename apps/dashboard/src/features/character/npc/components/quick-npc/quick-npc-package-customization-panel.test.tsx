@@ -22,6 +22,32 @@ const rows = [
 ]
 
 describe('QuickNpcPackageCustomizationPanel', () => {
+  it('shows a shared advisory sentence on a retained package row', () => {
+    render(
+      <QuickNpcPackageCustomizationPanel
+        packageLabel="Heavy Armor"
+        rows={[
+          {
+            ...rows[0]!,
+            advisoryLabel: 'Not proficient with this armor',
+          },
+          rows[1]!,
+        ]}
+        draftQuantities={{}}
+        submittedQuantities={{}}
+        showLockMessage={false}
+        onChangeQuantity={vi.fn()}
+        onRemove={vi.fn()}
+        onRestore={vi.fn()}
+        onRestoreAll={vi.fn()}
+        onCancel={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('Not proficient with this armor')).toBeTruthy()
+  })
+
   it('disables save until a quantity changes and restores a removed singleton', async () => {
     const user = userEvent.setup()
     const onRemove = vi.fn()

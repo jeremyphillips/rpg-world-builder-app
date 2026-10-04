@@ -12,7 +12,7 @@ import { getRegionTypeLabelForKind } from '../../vocab/location/region/region-cl
 import { getSettlementTypeLabel } from '../../vocab/location/region/settlement-type'
 import { getSiteTypeLabel } from '../../vocab/location/region/site-type'
 import { getStructureTypeLabel } from '../../vocab/location/building/structure-type'
-import { joinInlineMetadata } from '../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../primitives/inline-metadata'
 import type { BuildingClassification } from './building-classification'
 import type { Location } from './location'
 

@@ -6,6 +6,7 @@ import {
   getToolCategoryLabel,
   type Alignment,
 } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   CHARACTER_IMPORT_SERVER_OWNED_FIELDS,
   partitionDispositionEntries,
@@ -197,7 +198,7 @@ export function formatSpeciesValue(species: RecognizedSpeciesPreview): string {
 }
 
 export function formatClassValue(entry: RecognizedClassPreview): string {
-  const parts = [`${entry.sourceValue} · Level ${entry.level}`]
+  const parts = [joinInlineMetadata([entry.sourceValue, `Level ${entry.level}`])]
   if (entry.subclassSourceValue) {
     parts.push(`(${entry.subclassSourceValue})`)
   }

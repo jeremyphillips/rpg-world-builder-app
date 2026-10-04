@@ -45,7 +45,7 @@ describe('spell-picker-drawer.lib', () => {
 
   it('formats drawer title and selection summary metadata', () => {
     expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_CANTRIPS)).toBe('Choose cantrip')
-    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe('Choose spell')
+    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe('Choose spells')
     expect(formatSpellPickerSelectionCountText(1, 3)).toBe('1 of 3 selected')
     expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_CANTRIPS, 'Wizard')).toBe(
       'Wizard cantrips',

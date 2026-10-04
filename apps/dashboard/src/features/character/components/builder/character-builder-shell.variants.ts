@@ -61,15 +61,16 @@ export const characterBuilderFormScrollViewportClasses =
   'h-full min-h-0 overflow-y-auto scrollbar-slim pe-0 ps-0 pb-6'
 
 /**
- * Three-column body — step nav, form (docked footer), preview aside.
- * Preview column is hidden below `xl`; compact sheet trigger lives in the form column.
+ * Step nav stays a 200px column. Preview is the third column from `xl`.
+ * Compact sheet trigger lives in the form column below `xl`.
  */
 export const characterBuilderShellBodyClasses = cn(
-  'grid min-h-0 flex-1 grid-cols-1 overflow-hidden',
+  'grid min-h-0 flex-1 overflow-hidden',
   characterBuilderShellBodyColumnGapClasses,
   // Literal strings only — Tailwind must see the full class at scan time (no template interpolation).
-  'xl:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_280px]',
-  '2xl:grid-cols-[minmax(12rem,16rem)_minmax(0,1fr)_21rem]',
+  'grid-cols-[200px_minmax(0,1fr)]',
+  'xl:grid-cols-[200px_minmax(0,1fr)_280px]',
+  '2xl:grid-cols-[200px_minmax(0,1fr)_21rem]',
 )
 
 /** Left step nav — independent scroll via {@link ScrollBoundaryRegion}. */
@@ -108,7 +109,7 @@ export const characterBuilderStepRailClasses = 'space-y-1'
 
 /** Host-owned navigation accent — row hover/focus only; selected left-rail stays local (F9). */
 export const characterBuilderStepRailItemClasses = cn(
-  'relative flex w-full cursor-pointer items-start gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover',
+  'relative flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-row-hover',
   interactiveFocusVariants({ context: 'standalone' }),
 )
 
@@ -117,7 +118,7 @@ export const characterBuilderStepRailItemActiveClasses =
 
 export const characterBuilderStepRailItemLabelActiveClasses = 'font-semibold text-foreground'
 
-export const characterBuilderStepRailIconClasses = 'mt-0.5 shrink-0'
+export const characterBuilderStepRailIconClasses = 'shrink-0'
 
 export const characterBuilderStepPanelClasses = cn(
   'min-h-full min-w-0 space-y-4 rounded-lg border border-border bg-surface-lift p-6',

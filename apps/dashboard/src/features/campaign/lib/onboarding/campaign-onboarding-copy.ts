@@ -1,9 +1,11 @@
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+
 export const CAMPAIGN_INVITATION_COPY = {
   cardTitle: 'Campaign invitation',
   body: (inviterDisplayName: string) => `${inviterDisplayName} invited you to join this campaign.`,
   action: 'Review invitation',
   homeSectionHeading: (count: number) =>
-    count > 1 ? `Campaign invitations · ${count}` : 'Campaign invitation',
+    count > 1 ? joinInlineMetadata(['Campaign invitations', count]) : 'Campaign invitation',
   indexSectionHeading: 'Invitations',
 } as const
 

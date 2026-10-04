@@ -1,9 +1,6 @@
 import { Button, Text } from '@rpg/ui'
 
-import {
-  PACKAGE_SWITCH_CANCEL_LABEL,
-  PACKAGE_SWITCH_CONFIRM_LABEL,
-} from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
+import { PACKAGE_SWITCH_CANCEL_LABEL } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionFooterActionsClasses,
   equipmentPackageSwitchResolutionFooterClasses,
@@ -12,6 +9,7 @@ import {
 
 export function EquipmentPackageSwitchResolutionModalFooter({
   isBlocked,
+  confirmLabel,
   confirmDisabled,
   isCommitting = false,
   helperMessage,
@@ -19,6 +17,7 @@ export function EquipmentPackageSwitchResolutionModalFooter({
   onConfirm,
 }: {
   isBlocked: boolean
+  confirmLabel: string
   confirmDisabled: boolean
   isCommitting?: boolean
   helperMessage?: string
@@ -38,7 +37,7 @@ export function EquipmentPackageSwitchResolutionModalFooter({
         </Button>
         {!isBlocked ? (
           <Button type="button" disabled={confirmDisabled} onClick={onConfirm}>
-            {isCommitting ? 'Switching…' : PACKAGE_SWITCH_CONFIRM_LABEL}
+            {isCommitting ? 'Switching…' : confirmLabel}
           </Button>
         ) : null}
       </div>

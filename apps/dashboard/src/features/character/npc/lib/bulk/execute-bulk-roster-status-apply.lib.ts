@@ -5,8 +5,11 @@ import {
   type CharacterBulkRosterFormValues,
 } from '@rpg/contracts'
 
+import { formatDescriptorCount } from '@/lib/actions'
+
 import { mapNpcDetailToListItem, patchNpcStatus } from '../../api/npc-client'
 import type { CampaignNpcDetail } from '../../api/npc-client'
+import { NPC_ROSTER_BULK_DESCRIPTOR } from '../npc-roster-action.lib'
 
 const BULK_UPDATE_CONCURRENCY = 5
 
@@ -40,11 +43,11 @@ function partitionApplicableRows(
 }
 
 function formatBulkRosterStatusFullSuccess(count: number) {
-  return `Updated roster status for ${count} NPC${count === 1 ? '' : 's'}.`
+  return `Updated roster status for ${formatDescriptorCount(count, NPC_ROSTER_BULK_DESCRIPTOR)}.`
 }
 
 function formatBulkRosterStatusPartialSuccess(updatedCount: number, failedCount: number) {
-  return `Updated ${updatedCount} NPC${updatedCount === 1 ? '' : 's'}. ${failedCount} failed.`
+  return `Updated ${formatDescriptorCount(updatedCount, NPC_ROSTER_BULK_DESCRIPTOR)}. ${failedCount} failed.`
 }
 
 async function applyRowsWithConcurrency(

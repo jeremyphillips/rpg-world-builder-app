@@ -1,18 +1,22 @@
 import { describe, expect, it } from 'vitest'
 
+import { resolveEquipmentNotProficientMessage } from '@rpg/contracts'
+
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_CLASS_TOOL_LABEL,
   EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL,
   EQUIPMENT_PICKER_ESSENTIAL_LABEL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
   EQUIPMENT_PICKER_PROFICIENT_LABEL,
   EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL,
   EQUIPMENT_PICKER_STANDARD_GEAR_LABEL,
   EQUIPMENT_PICKER_STARTING_OPTION_LABEL,
 } from '../drawer/equipment-picker-drawer.types'
-import { getEquipmentCalloutPresentation } from './equipment-picker-callout-presentation.lib'
+import {
+  getEquipmentCalloutPresentation,
+  mapEquipmentCalloutToStatusItem,
+} from './equipment-picker-callout-presentation.lib'
 
 describe('equipment-picker-callout-presentation.lib', () => {
   function presentationFor(label: string) {
@@ -66,11 +70,18 @@ describe('equipment-picker-callout-presentation.lib', () => {
       tone: 'success',
       leadingIcon: 'check',
     })
-    expect(presentationFor(EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL)).toEqual({
-      appearance: 'soft',
-      tone: 'warning',
-      leadingIcon: 'warning',
-    })
+  })
+
+  it('renders browse-only proficiency guidance as muted text', () => {
+    const label = resolveEquipmentNotProficientMessage('weapon')
+    expect(
+      mapEquipmentCalloutToStatusItem({
+        label,
+        intent: 'info',
+        importance: 'medium',
+        factKind: 'guidance',
+      }),
+    ).toEqual({ kind: 'text', variant: 'muted', label })
   })
 
   it('maps cannot afford to soft negative with warning icon', () => {

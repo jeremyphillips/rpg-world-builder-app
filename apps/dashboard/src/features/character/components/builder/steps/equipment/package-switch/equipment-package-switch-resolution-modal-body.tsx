@@ -9,8 +9,8 @@ import {
 import { EquipmentInventoryColumn } from '../../../../equipment/inventory/column/equipment-inventory-column'
 import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section'
 import {
+  PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,
   type buildPackageSwitchDraftPurchasedGroups,
-  PACKAGE_SWITCH_SAFETY_NOTE,
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionAlertClasses,
@@ -25,6 +25,7 @@ export type EquipmentPackageSwitchResolutionModalBodyProps = {
   draftQuantitiesByPurchaseId: Record<string, number>
   purchasedGroups: ReturnType<typeof buildPackageSwitchDraftPurchasedGroups>
   isBlocked: boolean
+  safetyNote: string
   staleMessage?: string
   inlineError?: string
   onSetPurchaseQuantity: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
@@ -35,6 +36,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
   evaluation,
   draftQuantitiesByPurchaseId,
   isBlocked,
+  safetyNote,
   purchasedGroups,
   staleMessage,
   inlineError,
@@ -64,7 +66,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
           />
 
           <div className={equipmentPackageSwitchResolutionModalInventoryScrollClasses}>
-            <EquipmentInventoryColumn title="Purchased with starting gold">
+            <EquipmentInventoryColumn title={PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}>
               <EquipmentPurchasedInventorySection
                 purchased={purchasedGroups}
                 showGroupHeadings={false}
@@ -76,7 +78,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
           </div>
 
           <Text as="p" className={equipmentPackageSwitchResolutionSafetyNoteClasses}>
-            {PACKAGE_SWITCH_SAFETY_NOTE}
+            {safetyNote}
           </Text>
         </>
       )}

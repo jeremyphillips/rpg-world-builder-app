@@ -27,6 +27,7 @@ import {
 } from './builder-preview-rail-copy'
 import {
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
+  EQUIPMENT_PREVIEW_PENDING_STATUS,
   getBuilderDraftNarrative,
   type CharacterBuilderPreviewSectionId,
 } from './character-builder-preview-panel.lib'
@@ -212,6 +213,16 @@ function resolveEquipmentPresentation(
       label: PREVIEW_SECTION_LABELS.equipment,
       marker: 'off',
       status: 'Off',
+      expandable: true,
+    }
+  }
+
+  if (preview.startingEquipmentPending) {
+    return {
+      id: 'equipment',
+      label: PREVIEW_SECTION_LABELS.equipment,
+      marker: 'incomplete',
+      status: EQUIPMENT_PREVIEW_PENDING_STATUS,
       expandable: true,
     }
   }

@@ -22,6 +22,8 @@ export type StartingEquipmentOptionSummaryCardProps = {
   /** Replaces the default Change package action when provided. */
   headerEndSlot?: ReactNode
   description?: string
+  /** Owned-equipment advisory sentences for this package. */
+  advisoryLabels?: readonly string[]
   embedded?: ReactNode
   embeddedTone?: 'divider' | 'panel'
 }
@@ -34,6 +36,7 @@ export function StartingEquipmentOptionSummaryCard({
   titleAdornment,
   headerEndSlot,
   description,
+  advisoryLabels = [],
   embedded,
   embeddedTone,
 }: StartingEquipmentOptionSummaryCardProps) {
@@ -54,7 +57,7 @@ export function StartingEquipmentOptionSummaryCard({
       label={summary.label}
       titleAdornment={titleAdornment}
       description={description ?? summary.description}
-      summaryLines={startingEquipmentOptionFundingSummaryLines(summary)}
+      summaryLines={[...startingEquipmentOptionFundingSummaryLines(summary), ...advisoryLabels]}
       embedded={embedded}
       {...(embeddedTone ? { embeddedTone } : {})}
     />

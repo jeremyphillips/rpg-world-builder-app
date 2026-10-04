@@ -409,6 +409,7 @@ export function deriveEquipmentRecommendations(
         ...resolved,
         presentation: resolveEquipmentPresentationFacts({
           resolved,
+          equipment: catalogIndex.equipment.get(equipmentId),
           sourceName,
           authoredLabel: recommendation.label,
           openPoolKind: openPoolKindFromEvidence(recommendation.evidence),

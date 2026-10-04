@@ -1,3 +1,5 @@
+import type { EntitySummaryStatusItem } from '@/features/content'
+
 import {
   buildChoiceSetId,
   deriveEquipmentBudgetSummary,
@@ -26,6 +28,8 @@ import {
   resolvePlayableBuilderContent,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantEligibility,
+  resolveStartingEquipmentResolution,
+  sumPurchaseCostCp,
   type resolveMagicItemGrantProgressList,
   readMagicItemSelections,
   standardStartingWealthTableId,
@@ -34,6 +38,7 @@ import {
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterBuilderDraftEquipmentPurchase,
+  type CharacterBuilderDraftEquipmentPurchaseOrigin,
   type CharacterClass,
   type CharacterEquipment,
   type CharacterEquipmentEntry,
@@ -82,6 +87,8 @@ export const EQUIPMENT_INVENTORY_EMPTY_MESSAGE = 'No equipment selected yet.'
 
 export const EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE =
   'Choose a starting equipment option above to populate your inventory.'
+
+export const EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL = 'Pending purchase'
 
 export const EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to set your starting equipment'
 
@@ -281,6 +288,8 @@ export type EquipmentInventoryRow = {
   quantityTarget?: EquipmentInventoryQuantityTarget
   /** Package-switch modal: row is staged at quantity zero but still visible. */
   stagedRemoval?: boolean
+  /** Warning lines from the shared advisory index. Builder view models always set this. */
+  advisoryStatusItems?: readonly EntitySummaryStatusItem[]
 }
 
 export function formatEquipmentInventoryRemoveLabel(name: string, quantity: number): string {
@@ -592,8 +601,29 @@ export function shouldShowEquipmentShopping(
   return option !== undefined && isStartingGoldOption(option)
 }
 
-export function resolvePurchaseSourceMode(): CharacterBuilderDraftEquipmentPurchase['sourceMode'] {
-  return 'startingGold'
+export type EquipmentStepFundingState =
+  | { kind: 'none' }
+  | { kind: 'unresolved'; pendingCostCp: number }
+  | { kind: 'funded'; budget: EquipmentBudgetSummary }
+
+export function resolveEquipmentStepFundingState(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+}): EquipmentStepFundingState {
+  const { draft, catalogIndex, budget } = args
+  switch (resolveStartingEquipmentResolution(draft, catalogIndex)) {
+    case 'unresolvedWithPurchases':
+      return {
+        kind: 'unresolved',
+        pendingCostCp: sumPurchaseCostCp(draft.equipment?.purchases ?? [], catalogIndex),
+      }
+    case 'selected':
+      return budget ? { kind: 'funded', budget } : { kind: 'none' }
+    case 'notApplicable':
+    case 'unresolvedEmpty':
+      return { kind: 'none' }
+  }
 }
 
 export function resolveEquipmentStepBudget(
@@ -779,11 +809,13 @@ function buildInventoryRowPresentation(args: {
   equipment: Equipment
   sourceLabel: string
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
+  origin?: CharacterBuilderDraftEquipmentPurchaseOrigin
   budget?: EquipmentBudgetSummary
   isPurchaseRow: boolean
   purchaseId?: string
   packageItemKey?: string
+  /** Unfunded rows can only be decreased or removed. */
+  decreaseOnly?: boolean
 }): EquipmentInventoryRow {
   const {
     entry,
@@ -795,6 +827,7 @@ function buildInventoryRowPresentation(args: {
     isPurchaseRow,
     purchaseId,
     packageItemKey,
+    decreaseOnly = false,
   } = args
   const group = inventoryGroupForEquipment(equipment)
   const stackable = isEquipmentStackable(equipment)
@@ -818,7 +851,7 @@ function buildInventoryRowPresentation(args: {
     sourceLabel,
     isStackable: stackable,
     quantityMode: limits.editable ? 'editable' : 'locked',
-    maxQuantity: limits.editable ? limits.max : undefined,
+    maxQuantity: limits.editable ? (decreaseOnly ? entry.quantity : limits.max) : undefined,
     priceLineLabel: resolveInventoryRowPriceLineLabel({
       equipment,
       quantity: entry.quantity,
@@ -844,7 +877,7 @@ function purchaseRowFromEntry(args: {
   purchaseId?: string
   packageItemKey?: string
   sourceMode?: CharacterBuilderDraftEquipmentPurchase['sourceMode']
-  origin?: CharacterBuilderDraftEquipmentPurchase['origin']
+  origin?: CharacterBuilderDraftEquipmentPurchaseOrigin
   budget?: EquipmentBudgetSummary
   packageOptionLabel?: string
 }): EquipmentInventoryRow {
@@ -920,20 +953,29 @@ function listPackageInventoryRows(args: {
   })
 }
 
+type PurchaseInventoryFunding =
+  | { kind: 'selected'; classId: string; selectedOptionId: string }
+  | { kind: 'unresolved' }
+
 function listPurchaseInventoryRows(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
-  classId: string
-  selectedOptionId: string
+  funding: PurchaseInventoryFunding
   budget?: EquipmentBudgetSummary
 }): EquipmentInventoryRow[] {
-  const { draft, catalogIndex, classId, selectedOptionId, budget } = args
+  const { draft, catalogIndex, funding, budget } = args
+  const purchases = draft.equipment?.purchases ?? []
 
-  return (draft.equipment?.purchases ?? []).flatMap((purchase, purchaseIndex) => {
+  return purchases.flatMap((purchase, purchaseIndex) => {
     const equipment = catalogIndex.equipment.get(purchase.equipmentId)
     if (!equipment) return []
 
-    const sources = purchaseSourcesForDraft(purchase, classId, selectedOptionId)
+    const sources =
+      funding.kind === 'selected'
+        ? purchaseSourcesForDraft(purchase, funding.classId, funding.selectedOptionId)
+        : purchase.sourceMode === 'manual'
+          ? [{ kind: 'manual' as const }]
+          : []
     const entry: CharacterEquipmentEntry = {
       equipmentId: purchase.equipmentId,
       quantity: purchase.quantity,
@@ -941,17 +983,21 @@ function listPurchaseInventoryRows(args: {
       modifiers: purchase.modifiers,
       sources,
     }
-    const purchaseId = resolveEquipmentPurchaseId(draft.equipment?.purchases ?? [], purchaseIndex)
 
     return [
-      purchaseRowFromEntry({
+      buildInventoryRowPresentation({
         entry,
         equipment,
-        catalogIndex,
-        purchaseId,
+        sourceLabel:
+          funding.kind === 'unresolved'
+            ? EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
+            : formatSelectionSourceLabel(sources, catalogIndex),
         sourceMode: purchase.sourceMode,
-        origin: purchase.origin ?? 'picker',
-        budget,
+        origin: purchase.sourceMode === 'startingGold' ? purchase.origin : undefined,
+        budget: funding.kind === 'selected' ? budget : undefined,
+        isPurchaseRow: true,
+        purchaseId: resolveEquipmentPurchaseId(purchases, purchaseIndex),
+        decreaseOnly: funding.kind === 'unresolved',
       }),
     ]
   })
@@ -1184,8 +1230,12 @@ export function listEquipmentInventoryRowsFromDraft(
 
   const characterClass = catalogIndex.classes.get(classId)
   const startingEquipment = characterClass?.characterCreation?.startingEquipment
+  if (!characterClass || !startingEquipment) return []
+
   const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!characterClass || !startingEquipment || !selectedOptionId) return []
+  if (!selectedOptionId) {
+    return listPurchaseInventoryRows({ draft, catalogIndex, funding: { kind: 'unresolved' } })
+  }
 
   const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
   if (!option) return []
@@ -1205,7 +1255,12 @@ export function listEquipmentInventoryRowsFromDraft(
   return [
     ...packageRows,
     ...(context ? listMagicItemGrantInventoryRows({ draft, catalogIndex, context }) : []),
-    ...listPurchaseInventoryRows({ draft, catalogIndex, classId, selectedOptionId, budget }),
+    ...listPurchaseInventoryRows({
+      draft,
+      catalogIndex,
+      funding: { kind: 'selected', classId, selectedOptionId },
+      budget,
+    }),
   ]
 }
 

@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
@@ -454,6 +455,7 @@ describe('EquipmentStep', () => {
               equipmentId: rationsId,
               quantity: 3,
               sourceMode: 'startingGold',
+              origin: 'picker',
             }),
           ],
         }),
@@ -559,7 +561,7 @@ describe('EquipmentStep', () => {
       await openPackageSwitchToStandard(user)
 
       expect(
-        screen.getByRole('heading', { name: 'Resolve purchases before switching' }),
+        screen.getByRole('heading', { name: 'Adjust purchases before switching' }),
       ).toBeInTheDocument()
       expect(onDraftChange).not.toHaveBeenCalled()
     })
@@ -574,7 +576,7 @@ describe('EquipmentStep', () => {
 
       expect(onDraftChange).not.toHaveBeenCalled()
       expect(
-        screen.queryByRole('heading', { name: 'Resolve purchases before switching' }),
+        screen.queryByRole('heading', { name: 'Adjust purchases before switching' }),
       ).not.toBeInTheDocument()
     })
 
@@ -594,7 +596,6 @@ describe('EquipmentStep', () => {
               equipmentId: equipmentStepBreastplateFixture.id,
               quantity: 1,
               sourceMode: 'manual' as const,
-              origin: 'picker' as const,
             },
           ],
           editedSincePackageSelection: false,
@@ -636,8 +637,124 @@ describe('EquipmentStep', () => {
                 equipmentId: rationsId,
                 quantity: 38,
                 sourceMode: 'startingGold',
+                origin: 'picker',
               }),
             ],
+          }),
+        }),
+      )
+    })
+  })
+
+  describe('retained purchases after a class change', () => {
+    const rationsId = equipmentStepRationsFixture.id
+    const choiceSetId = startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)
+
+    function unresolvedDraftWithRations(quantity: number): CharacterBuilderDraft {
+      return {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: equipmentStepBardClassFixture.id, level: 1 },
+        equipment: {
+          mode: 'package',
+          purchases: [
+            {
+              id: 'purchase-rations',
+              equipmentId: rationsId,
+              quantity,
+              sourceMode: 'startingGold',
+              origin: 'picker',
+            },
+          ],
+          classPackage: { state: 'unresolved' },
+          editedSincePackageSelection: false,
+        },
+      }
+    }
+
+    function StatefulEquipmentStep({
+      initialDraft,
+      onDraftChange,
+    }: {
+      initialDraft: CharacterBuilderDraft
+      onDraftChange: (patch: Partial<CharacterBuilderDraft>) => void
+    }) {
+      const [draft, setDraft] = useState(initialDraft)
+      return (
+        <EquipmentStep
+          context={context}
+          draft={draft}
+          resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+          validationIssues={[]}
+          onDraftChange={(patch) => {
+            onDraftChange(patch)
+            setDraft((current) => ({ ...current, ...patch }))
+          }}
+          onNavigateToStep={vi.fn()}
+        />
+      )
+    }
+
+    function renderStateful(initialDraft: CharacterBuilderDraft) {
+      const onDraftChange = vi.fn()
+      render(<StatefulEquipmentStep initialDraft={initialDraft} onDraftChange={onDraftChange} />)
+      return { onDraftChange }
+    }
+
+    it('renders the retained cart with unresolved funding and no Browse', () => {
+      renderEquipmentStep(unresolvedDraftWithRations(2))
+
+      expect(screen.getByText('Added Equipment')).toBeInTheDocument()
+      expect(screen.getByText('Rations')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: /remaining/ })).not.toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('keeps the cart and shows the new budget when choosing Starting Gold', async () => {
+      const user = userEvent.setup()
+      const { onDraftChange } = renderStateful(unresolvedDraftWithRations(2))
+
+      await user.click(screen.getByRole('radio', { name: /^Starting Gold/ }))
+
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          choiceSelections: expect.objectContaining({ [choiceSetId]: ['starting-gold'] }),
+          equipment: expect.objectContaining({
+            purchases: [expect.objectContaining({ equipmentId: rationsId, quantity: 2 })],
+          }),
+        }),
+      )
+      expect(screen.getByRole('heading', { name: /GP remaining/ })).toBeInTheDocument()
+      expect(
+        screen.queryByRole('heading', { name: 'Starting funds not set' }),
+      ).not.toBeInTheDocument()
+    })
+
+    it('resolves the cart through the selection modal when choosing a standard package', async () => {
+      const user = userEvent.setup()
+      const { onDraftChange } = renderStateful(unresolvedDraftWithRations(40))
+
+      await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
+
+      expect(
+        screen.getByRole('heading', { name: 'Adjust purchases for this option' }),
+      ).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: 'Cancel' }))
+      expect(onDraftChange).not.toHaveBeenCalled()
+      expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
+
+      await user.click(screen.getByRole('radio', { name: /^Standard Equipment/ }))
+      await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+      await user.click(screen.getByRole('button', { name: 'Decrease Rations quantity' }))
+      await user.click(screen.getByRole('button', { name: 'Choose option' }))
+
+      expect(onDraftChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          choiceSelections: expect.objectContaining({ [choiceSetId]: ['standard-equipment'] }),
+          equipment: expect.objectContaining({
+            purchases: [expect.objectContaining({ equipmentId: rationsId, quantity: 38 })],
           }),
         }),
       )

@@ -45,6 +45,41 @@ describe('buildAbilityRecommendationPanelModel', () => {
     expect(model.showAppliedState).toBe(true)
   })
 
+  it('lists the full standard-array order, not only primary abilities', () => {
+    const model = buildAbilityRecommendationPanelModel({
+      classInput: {
+        className: 'Fighter',
+        primaryAbilities: ['str', 'dex'],
+        abilityScoreOrder: ['str', 'dex', 'con', 'cha', 'wis', 'int'],
+      },
+      recommendation: {
+        primary: ['str'],
+        secondary: ['dex'],
+        suggestedAssignment: {
+          str: 15,
+          dex: 14,
+          con: 13,
+          cha: 12,
+          wis: 10,
+          int: 8,
+        },
+      },
+      currentScores: {},
+      showSuggestedAssignment: true,
+      canApplySuggestions: true,
+    })
+
+    expect(model.suggestedText).toContain('15')
+    expect(model.suggestedText).toContain('Constitution')
+    expect(model.suggestedText).toContain('Intelligence')
+    expect(model.suggestedText?.indexOf('Strength')).toBeLessThan(
+      model.suggestedText?.indexOf('Constitution') ?? -1,
+    )
+    expect(model.suggestedText?.indexOf('Constitution')).toBeLessThan(
+      model.suggestedText?.indexOf('Charisma') ?? -1,
+    )
+  })
+
   it('shows Replace when applying would overwrite existing assignments', () => {
     const model = buildAbilityRecommendationPanelModel({
       classInput: fighterClassInput,

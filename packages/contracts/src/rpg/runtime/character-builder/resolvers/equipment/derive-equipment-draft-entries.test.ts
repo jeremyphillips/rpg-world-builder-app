@@ -159,6 +159,30 @@ describe('startingEquipmentPackageItemKey', () => {
 })
 
 describe('deriveEquipmentDraftEntries', () => {
+  it('leaves unresolved picker purchases out of resolved inventory', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: shield.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+        classPackage: { state: 'unresolved' as const },
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
+    expect(equipment.armor.map((entry) => entry.equipmentId)).not.toContain(shield.id)
+    expect(equipment.weapons.map((entry) => entry.equipmentId)).not.toContain(shield.id)
+  })
+
   it('includes package grants with classStartingEquipment sources', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -278,7 +302,12 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(result.applied).toBe(true)
     expect(result.draft.equipment?.mode).toBe('package')
     expect(result.draft.equipment?.purchases).toEqual([
-      expect.objectContaining({ equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold' }),
+      expect.objectContaining({
+        equipmentId: rope.id,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      }),
     ])
 
     const equipment = deriveEquipmentDraftEntries(result.draft, catalogIndex)
@@ -533,6 +562,29 @@ describe('deriveEquipmentDraftEntries', () => {
     )
     expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
     expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
+  })
+
+  it('does not assemble purchases while the starting equipment option is unresolved', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: leatherArmor.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
+
+    expect(inventoryQuantityForEquipmentId(equipment, leatherArmor.id)).toBe(0)
   })
 })
 

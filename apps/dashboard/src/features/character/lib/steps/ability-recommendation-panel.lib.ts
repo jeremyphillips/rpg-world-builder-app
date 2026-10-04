@@ -4,6 +4,7 @@ import {
   formatAbilityRecommendationSuggestedInline,
   formatFieldMessage,
   getAbilityLabel,
+  resolveClassAbilityScoreOrder,
   resolveSuggestedAssignmentActionState,
   type Ability,
   type AbilityScoreRecommendation,
@@ -26,7 +27,12 @@ export function suggestedAssignmentPairLabels(
   classInput: AbilityScoreRecommendationClassInput,
   assignment: Partial<Record<Ability, number>>,
 ): string[] {
-  return classInput.primaryAbilities.flatMap((ability) => {
+  const order = resolveClassAbilityScoreOrder({
+    abilityScoreOrder: classInput.abilityScoreOrder,
+    primaryAbilities: classInput.primaryAbilities,
+  })
+
+  return order.flatMap((ability) => {
     const score = assignment[ability]
     if (typeof score !== 'number') return []
     return [

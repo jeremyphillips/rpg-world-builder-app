@@ -28,6 +28,8 @@ export type IdentityRowProps = {
   /** End of the heading line. Not status copy, which stays under supporting text. */
   headingEnd?: ReactNode
   status?: ReactNode
+  /** `flush` matches supporting-line spacing. Badges keep the default offset. */
+  statusSpacing?: 'offset' | 'flush'
   size?: IdentityRowSize
   className?: string
 }
@@ -141,6 +143,7 @@ export function IdentityRow({
   supportingWrap = false,
   headingEnd,
   status,
+  statusSpacing = 'offset',
   size = 'md',
   className,
 }: IdentityRowProps) {
@@ -169,7 +172,9 @@ export function IdentityRow({
             {supporting}
           </IdentityRowSupporting>
         ) : null}
-        {showStatus ? <div className={identityRowStatusVariants()}>{status}</div> : null}
+        {showStatus ? (
+          <div className={identityRowStatusVariants({ spacing: statusSpacing })}>{status}</div>
+        ) : null}
       </div>
     </div>
   )

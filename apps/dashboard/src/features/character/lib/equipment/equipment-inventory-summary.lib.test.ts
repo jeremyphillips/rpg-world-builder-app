@@ -10,6 +10,7 @@ import {
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
+  equipmentStepRationsFixture,
   createEquipmentStepContextWithMagicItemGrantsFixture,
 } from './equipment-step.fixtures'
 import type { EquipmentInventoryRow } from './equipment-step.lib'
@@ -200,11 +201,15 @@ describe('equipment-inventory-summary.lib', () => {
 
     const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
 
-    expect(viewModel?.startingEquipment.kind).toBe('package')
-    if (viewModel?.startingEquipment.kind !== 'package') return
+    expect(viewModel?.layout === 'split' && viewModel.startingEquipment.kind).toBe('package')
+    if (viewModel?.layout !== 'split' || viewModel.startingEquipment.kind !== 'package') return
 
-    expect(viewModel.startingEquipment.group.optionLabel).toBe('Standard Equipment')
-    expect(viewModel.startingEquipment.group.customize.status).toBe('available')
+    expect(viewModel.layout === 'split' && viewModel.startingEquipment.group.optionLabel).toBe(
+      'Standard Equipment',
+    )
+    expect(viewModel.layout === 'split' && viewModel.startingEquipment.group.customize.status).toBe(
+      'available',
+    )
     expect(viewModel.addedEquipment.every((group) => group.entries.length === 0)).toBe(true)
   })
 
@@ -223,6 +228,7 @@ describe('equipment-inventory-summary.lib', () => {
     }
 
     expect(buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)).toEqual({
+      layout: 'split',
       startingEquipment: {
         kind: 'gold_option',
         message: 'No package gear in this option',
@@ -255,7 +261,7 @@ describe('equipment-inventory-summary.lib', () => {
       createEquipmentStepContextWithMagicItemGrantsFixture(),
     )
 
-    expect(viewModel?.startingEquipment).toEqual({
+    expect(viewModel?.layout === 'split' && viewModel.startingEquipment).toEqual({
       kind: 'gold_option',
       message: 'No package gear in this option',
       description:
@@ -287,7 +293,7 @@ describe('equipment-inventory-summary.lib', () => {
     const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
     const gearEntries = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Gear')
 
-    expect(viewModel?.startingEquipment.kind).toBe('package')
+    expect(viewModel?.layout === 'split' && viewModel.startingEquipment.kind).toBe('package')
     expect(gearEntries?.entries).toHaveLength(1)
     expect(gearEntries?.entries[0]?.totalQuantity).toBe(2)
     expect(gearEntries?.entries[0]?.sources).toEqual([{ kind: 'startingGold', quantity: 2 }])
@@ -382,8 +388,32 @@ describe('equipment-inventory-summary.lib', () => {
     const viewModel = buildEquipmentInventoryViewModel(draft, catalogIndex)
     const weapons = viewModel?.addedEquipment.find((group) => group.groupLabel === 'Weapons')
 
-    expect(viewModel?.startingEquipment.kind).toBe('package')
+    expect(viewModel?.layout === 'split' && viewModel.startingEquipment.kind).toBe('package')
     expect(weapons?.entries).toHaveLength(1)
     expect(weapons?.entries[0]?.equipmentName).toBe('Battleaxe')
+  })
+  it('uses the single-column pending layout when purchases are retained without an option', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepRationsFixture.id,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
+
+    expect(viewModel?.layout).toBe('pending')
+    expect(viewModel?.addedEquipment.flatMap((group) => group.entries)).toHaveLength(1)
+    expect(viewModel?.addedEquipment[0]?.entries[0]?.equipmentName).toBe('Rations')
   })
 })
