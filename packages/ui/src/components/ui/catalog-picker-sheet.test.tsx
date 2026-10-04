@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { createRoot } from 'react-dom/client'
+import { flushSync } from 'react-dom'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -20,6 +22,44 @@ const items: DemoItem[] = [
 ]
 
 describe('CatalogPickerSheet', () => {
+  it('paints the sheet shell before catalog results', async () => {
+    const container = document.createElement('div')
+    document.body.appendChild(container)
+    const root = createRoot(container)
+
+    try {
+      flushSync(() => {
+        root.render(
+          <CatalogPickerSheet
+            open
+            onOpenChange={vi.fn()}
+            title="Catalog"
+            items={items}
+            getItemKey={(item) => item.id}
+            getSearchText={(item) => item.searchText}
+            renderItemHeader={(item) => <span>{item.name}</span>}
+          />,
+        )
+      })
+
+      expect(document.body.textContent).not.toContain('Alpha Item')
+      expect(document.body.querySelector('[aria-label="Loading"]')).toBeTruthy()
+      expect(screen.getByRole('textbox', { name: 'Search catalog' })).toBeInTheDocument()
+
+      await act(async () => {
+        await Promise.resolve()
+      })
+
+      expect(screen.getByText('Alpha Item')).toBeInTheDocument()
+      expect(document.body.querySelector('[aria-label="Loading"]')).toBeNull()
+    } finally {
+      act(() => {
+        root.unmount()
+      })
+      container.remove()
+    }
+  })
+
   it('filters rows by search query', async () => {
     const user = userEvent.setup()
 
@@ -306,7 +346,7 @@ describe('CatalogPickerSheet', () => {
     )
 
     expect(screen.getByText('Alpha Item details').parentElement).not.toHaveAttribute('hidden')
-    expect(screen.getByText('Beta Item details').parentElement).toHaveAttribute('hidden')
+    expect(screen.queryByText('Beta Item details')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Expand beta' }))
     expect(onExpandedItemChange).toHaveBeenCalledWith('beta')
@@ -326,7 +366,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    expect(screen.getByText('Alpha Item details').parentElement).toHaveAttribute('hidden')
+    expect(screen.queryByText('Alpha Item details')).not.toBeInTheDocument()
     expect(screen.getByText('Beta Item details').parentElement).not.toHaveAttribute('hidden')
   })
 

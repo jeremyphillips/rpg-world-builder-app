@@ -89,6 +89,21 @@ describe('CatalogEntityRow', () => {
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
   })
 
+  it('keeps the disclosure trigger before details are mounted', () => {
+    render(
+      <CatalogEntityRow
+        toolbarLabel="Rope"
+        domIds={domIds}
+        collapsible
+        collapsed
+        onToggleCollapse={() => undefined}
+        entity={{ heading: 'Rope' }}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Expand Rope' })).toBeInTheDocument()
+  })
+
   it('aligns expanded body with entity inline start and end inset', () => {
     render(
       <CatalogEntityRow

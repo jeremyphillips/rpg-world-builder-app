@@ -47,6 +47,29 @@ const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
 const DEFAULT_NO_SCOPED_ITEMS_MESSAGE = 'No items match this view.'
 const DEFAULT_NO_ITEMS_MESSAGE = 'No items are available.'
 
+/** Matches sheet close `duration-150` so a reopen still defers after the exit slide. */
+const CATALOG_PICKER_RESULTS_RESET_DELAY_MS = 150
+
+function useCatalogPickerResultsReady(open: boolean): boolean {
+  const [ready, setReady] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!open) {
+      const resetTimer = window.setTimeout(() => {
+        setReady(false)
+      }, CATALOG_PICKER_RESULTS_RESET_DELAY_MS)
+      return () => window.clearTimeout(resetTimer)
+    }
+
+    React.startTransition(() => {
+      setReady(true)
+    })
+    return undefined
+  }, [open])
+
+  return ready
+}
+
 function resolveEmptyMessage({
   hasSearchOrFilters,
   isScopedView,
@@ -63,6 +86,54 @@ function resolveEmptyMessage({
   if (hasSearchOrFilters) return noResultsMessage
   if (isScopedView) return noScopedItemsMessage
   return noItemsMessage
+}
+
+function shouldDeferCatalogPickerResults({
+  open,
+  pickerEnabled,
+  hasBodyReplacement,
+  loading,
+  hasVisibleItems,
+  resultsReady,
+}: {
+  open: boolean
+  pickerEnabled: boolean
+  hasBodyReplacement: boolean
+  loading: boolean
+  hasVisibleItems: boolean
+  resultsReady: boolean
+}): boolean {
+  return (
+    open && pickerEnabled && !hasBodyReplacement && !loading && hasVisibleItems && !resultsReady
+  )
+}
+
+function resolveCatalogPickerSheetBodyContent({
+  loading,
+  deferResults,
+  isEmpty,
+  emptyState,
+  emptyMessage,
+  results,
+}: {
+  loading: boolean
+  deferResults: boolean
+  isEmpty: boolean
+  emptyState?: React.ReactNode
+  emptyMessage: string
+  results: React.ReactNode
+}): React.ReactNode {
+  if (loading || deferResults) {
+    return (
+      <div className={catalogPickerSheetLoadingVariants()}>
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+  if (isEmpty) {
+    return <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
+  }
+  return results
 }
 
 function CatalogPickerSheetEmpty({
@@ -134,6 +205,7 @@ export function CatalogPickerSheet<TItem>({
   expandedItemId,
   onExpandedItemChange,
 }: CatalogPickerSheetProps<TItem>) {
+  const resultsReady = useCatalogPickerResultsReady(open)
   const {
     searchQuery,
     setSearchQuery,
@@ -181,15 +253,23 @@ export function CatalogPickerSheet<TItem>({
     onExpandedItemChange,
   } as CatalogPickerSheetProps<TItem>
 
-  const bodyContent = loading ? (
-    <div className={catalogPickerSheetLoadingVariants()}>
-      <Spinner size="lg" />
-    </div>
-  ) : visibleItems.length === 0 ? (
-    <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
-  ) : (
-    <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
-  )
+  const bodyContent = resolveCatalogPickerSheetBodyContent({
+    loading,
+    deferResults: shouldDeferCatalogPickerResults({
+      open,
+      pickerEnabled,
+      hasBodyReplacement: bodyReplacement !== undefined,
+      loading,
+      hasVisibleItems: visibleItems.length > 0,
+      resultsReady,
+    }),
+    isEmpty: visibleItems.length === 0,
+    emptyState,
+    emptyMessage,
+    results: (
+      <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
+    ),
+  })
 
   const actionHelpers = React.useMemo(
     () => ({

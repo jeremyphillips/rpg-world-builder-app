@@ -40,7 +40,7 @@ export function CatalogEntityRow({
   trailing,
   headingHref,
 }: CatalogEntityRowProps) {
-  const isDisclosure = details != null
+  const isDisclosure = collapsible
   const contentOffsetStyle = isDisclosure
     ? buildEntityContentOffsetStyle({
         count: 1,
@@ -90,7 +90,7 @@ export function CatalogEntityRow({
           </EntityCardContent>
         }
         summary={summary}
-        body={isDisclosure ? details : undefined}
+        body={details}
       />
     </EntityCardFrame>
   )

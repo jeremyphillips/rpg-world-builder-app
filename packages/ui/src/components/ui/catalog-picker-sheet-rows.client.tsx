@@ -13,42 +13,24 @@ import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
-function resolveCollapsibleRowRenderArgs<TItem>({
-  item,
-  itemKey,
-  toolbarLabel,
-  renderItemSummary,
-  renderItemDetails,
-  expandedItemId,
-  onExpandedItemChange,
-}: {
-  item: TItem
-  itemKey: string
-  toolbarLabel: string
-  renderItemSummary?: (item: TItem) => React.ReactNode
-  renderItemDetails?: (item: TItem) => React.ReactNode
-  expandedItemId?: string | null
-  onExpandedItemChange?: (itemId: string | null) => void
-}): CatalogPickerCollapsibleRowRenderArgs<TItem> {
-  const domIds = resolveCollapsibleListItemDomIds(itemKey)
-  const hasDetails = Boolean(renderItemDetails)
+function useCatalogPickerRowExpansion(
+  itemKey: string,
+  expandedItemId: string | null | undefined,
+  onExpandedItemChange: ((itemId: string | null) => void) | undefined,
+) {
   const controlledExpansion = expandedItemId !== undefined
-  const isExpanded = controlledExpansion ? expandedItemId === itemKey : undefined
+  const [uncontrolledExpanded, setUncontrolledExpanded] = React.useState(false)
+  const isExpanded = controlledExpansion ? expandedItemId === itemKey : uncontrolledExpanded
 
-  return {
-    item,
-    itemKey,
-    toolbarLabel,
-    domIds,
-    collapsible: hasDetails,
-    collapsed: controlledExpansion ? !isExpanded : undefined,
-    onToggleCollapse:
-      controlledExpansion && onExpandedItemChange
-        ? () => onExpandedItemChange(isExpanded ? null : itemKey)
-        : undefined,
-    summary: renderItemSummary?.(item),
-    details: hasDetails ? renderItemDetails?.(item) : undefined,
-  }
+  const onToggleCollapse = React.useCallback(() => {
+    if (controlledExpansion) {
+      onExpandedItemChange?.(isExpanded ? null : itemKey)
+      return
+    }
+    setUncontrolledExpanded((current) => !current)
+  }, [controlledExpansion, isExpanded, itemKey, onExpandedItemChange])
+
+  return { isExpanded, onToggleCollapse }
 }
 
 function CatalogPickerCollapsibleItemRow<TItem>({
@@ -82,28 +64,32 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   expandedItemId?: string | null
   onExpandedItemChange?: (itemId: string | null) => void
 }) {
+  const { isExpanded, onToggleCollapse } = useCatalogPickerRowExpansion(
+    itemKey,
+    expandedItemId,
+    onExpandedItemChange,
+  )
+  const domIds = resolveCollapsibleListItemDomIds(itemKey)
+  const hasDetails = Boolean(renderItemDetails)
+  const details = isExpanded ? renderItemDetails?.(item) : undefined
+
   if (renderCollapsibleRow) {
     return (
       <div data-picker-item-key={itemKey}>
-        {renderCollapsibleRow(
-          resolveCollapsibleRowRenderArgs({
-            item,
-            itemKey,
-            toolbarLabel,
-            renderItemSummary,
-            renderItemDetails,
-            expandedItemId,
-            onExpandedItemChange,
-          }),
-        )}
+        {renderCollapsibleRow({
+          item,
+          itemKey,
+          toolbarLabel,
+          domIds,
+          collapsible: hasDetails,
+          collapsed: !isExpanded,
+          onToggleCollapse,
+          summary: renderItemSummary?.(item),
+          details,
+        })}
       </div>
     )
   }
-
-  const domIds = resolveCollapsibleListItemDomIds(itemKey)
-  const hasDetails = Boolean(renderItemDetails)
-  const controlledExpansion = expandedItemId !== undefined
-  const isExpanded = controlledExpansion ? expandedItemId === itemKey : undefined
 
   return (
     <div data-picker-item-key={itemKey}>
@@ -118,16 +104,12 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         toolbarCompact={toolbarCompact}
         collapsible={hasDetails}
         showDragHandle={false}
-        collapsed={controlledExpansion ? !isExpanded : undefined}
-        onToggleCollapse={
-          controlledExpansion && onExpandedItemChange
-            ? () => onExpandedItemChange(isExpanded ? null : itemKey)
-            : undefined
-        }
+        collapsed={!isExpanded}
+        onToggleCollapse={onToggleCollapse}
         header={renderItemHeader!(item)}
         summary={renderItemSummary?.(item)}
         actions={renderItemActions?.(item)}
-        body={hasDetails ? renderItemDetails?.(item) : undefined}
+        body={details}
       />
     </div>
   )

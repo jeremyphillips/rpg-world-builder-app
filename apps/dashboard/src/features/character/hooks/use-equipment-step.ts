@@ -224,27 +224,33 @@ export function useEquipmentStep(args: {
     () => resolveEquipmentStepFundingState({ draft, catalogIndex, budget }),
     [budget, catalogIndex, draft],
   )
-  const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(() => {
-    const resolved = characterClass
-      ? resolveEquipmentStepPickerItems({
-          draft,
-          characterClass,
-          catalogIndex,
-          choiceSets: resolvedChoiceSets,
-          budget,
-          context,
-        })
-      : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false as const } }
-    return {
-      items: resolved.items,
-      browseSortContext: {
-        ...resolved.browseSortContext,
-        activeChoice: focusedAllowanceId
-          ? { kind: 'allowance' as const, allowanceId: focusedAllowanceId }
-          : { kind: 'none' as const },
-      },
+  const pickerItemResult = useMemo(() => {
+    if (!characterClass) {
+      return {
+        items: [] as EquipmentPickerItem[],
+        browseSortContext: { preferMartialWeaponBrowseOrder: false as const },
+      }
     }
-  }, [budget, catalogIndex, characterClass, context, draft, focusedAllowanceId, resolvedChoiceSets])
+
+    return resolveEquipmentStepPickerItems({
+      draft,
+      characterClass,
+      catalogIndex,
+      choiceSets: resolvedChoiceSets,
+      budget,
+      context,
+    })
+  }, [budget, catalogIndex, characterClass, context, draft, resolvedChoiceSets])
+  const pickerItems = pickerItemResult.items
+  const pickerBrowseSortContext = useMemo(
+    () => ({
+      ...pickerItemResult.browseSortContext,
+      activeChoice: focusedAllowanceId
+        ? { kind: 'allowance' as const, allowanceId: focusedAllowanceId }
+        : { kind: 'none' as const },
+    }),
+    [focusedAllowanceId, pickerItemResult.browseSortContext],
+  )
   const magicItemWorkflow = useEquipmentMagicItemWorkflow({
     draft,
     context,
