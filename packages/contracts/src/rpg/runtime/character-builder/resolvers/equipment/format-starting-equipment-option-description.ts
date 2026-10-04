@@ -1,11 +1,11 @@
 import type { CharacterWealthGrant } from '../../../../content/lib/grants/wealth-grant'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 import { joinNaturalList } from '../../../../primitives/prose'
 import { formatWealth, formatWealthAsGold, wealthToCopper } from '../../../../primitives/wealth'
 import {
   characterWealthFromGrant,
   type CharacterWealth,
 } from '../../../character/sheet/equipment-inventory'
-import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
 
 /** Compact package stats for authoring previews — item count plus formatted baseline wealth. */

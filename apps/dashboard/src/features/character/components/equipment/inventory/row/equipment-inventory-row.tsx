@@ -64,6 +64,7 @@ function InventoryRowActions({
   const showStepper = row.quantityMode === 'editable' && row.quantityTarget !== undefined
   const showQtyLabel = row.quantityMode === 'locked' && row.entry.quantity > 1
   const showRemove = canRemovePurchaseRow(row, onRemoveItem)
+  const removeViaStepper = showStepper && showRemove
 
   if (!showStepper && !showQtyLabel && !showRemove) return null
 
@@ -74,6 +75,8 @@ function InventoryRowActions({
           row={row}
           allowZeroQuantity={allowZeroQuantity}
           onSetPurchaseQuantity={onSetPurchaseQuantity}
+          onRemove={removeViaStepper ? () => onRemoveItem!(row.removeTarget) : undefined}
+          removeAriaLabel={removeViaStepper ? row.removeLabel : undefined}
         />
       ) : null}
       {showQtyLabel ? (
@@ -81,7 +84,7 @@ function InventoryRowActions({
           Qty {row.entry.quantity}
         </Text>
       ) : null}
-      {showRemove ? (
+      {showRemove && !removeViaStepper ? (
         <InventoryRemoveIconButton
           removeLabel={row.removeLabel}
           onRemove={() => onRemoveItem!(row.removeTarget)}

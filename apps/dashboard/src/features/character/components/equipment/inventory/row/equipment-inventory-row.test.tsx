@@ -58,7 +58,8 @@ describe('EquipmentInventoryRowItem', () => {
     )
 
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove all 2 Rations' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Decrease Rations quantity' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Increase Rations quantity' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))

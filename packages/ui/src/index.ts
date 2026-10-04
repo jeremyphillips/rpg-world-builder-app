@@ -278,6 +278,7 @@ export {
 export {
   NumberStepper,
   type NumberStepperDigits,
+  type NumberStepperMinAction,
   type NumberStepperProps,
 } from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'

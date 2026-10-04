@@ -93,7 +93,7 @@ parent row only (`7 total · 5 included · 2 purchased`).
 
 | Purchase                                                       | Controls                                                            |
 | -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Stackable `startingGold` (`origin: picker`)                    | Line 1: `NumberStepper` + Remove text; line 2: price                |
+| Stackable `startingGold` (`origin: picker`)                    | Line 1: `NumberStepper` (trash at qty 1 removes row); line 2: price |
 | Non-stackable `startingGold`                                   | qty locked at 1, full-row Remove                                    |
 | Converted non-stackable (`origin: packageConversion`, qty > 1) | qty locked at authored amount, full-row Remove                      |
 | Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows |
@@ -109,8 +109,10 @@ non-stackable value lines follow the same resolver; see
 
 ### Remove semantics
 
-- **Remove** is a trash icon button, not visible text. `aria-label` still describes
-  the full action (e.g. `Remove all 2 Rations`).
+- **Remove** uses `NumberStepper` `minAction={{ mode: 'remove', … }}`: at qty 1 the
+  left control becomes trash (destructive tone on hover/focus only). `aria-label`
+  still describes the full action (e.g. `Remove all 2 Rations`). Button click only —
+  typed or keyboard decrement never removes the row.
 - Only `removeTarget.kind === 'purchase'` rows render Remove. Package grants
   clear `removeTarget` in `buildInventoryRowPresentation`.
 - Combined rows: only purchased-editable sub-rows get Remove; package portions

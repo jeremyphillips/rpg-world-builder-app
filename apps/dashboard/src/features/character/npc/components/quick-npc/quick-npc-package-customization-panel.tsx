@@ -96,27 +96,20 @@ export function QuickNpcPackageCustomizationPanel({
               ) : row.kind === 'stack' ? (
                 <NumberStepper
                   size="xs"
-                  min={0}
+                  min={1}
                   max={row.packageQuantity}
                   value={row.retainedQuantity}
                   aria-label={quickNpcQuantityAriaLabel(row.label, packageLabel)}
+                  minAction={{
+                    mode: 'remove',
+                    removeAriaLabel: quickNpcRemoveAriaLabel(row.label, packageLabel),
+                    onRemove: () => onRemove(row.entryId, row.packageQuantity),
+                  }}
                   onChange={(quantity) =>
                     onChangeQuantity(row.entryId, row.packageQuantity, quantity)
                   }
                 />
-              ) : null}
-              {removed ? (
-                <Button
-                  type="button"
-                  variant="text"
-                  size="xs"
-                  density="compact"
-                  aria-label={quickNpcRestoreAriaLabel(row.label)}
-                  onClick={() => onRestore(row.entryId)}
-                >
-                  {QUICK_NPC_RESTORE_LABEL}
-                </Button>
-              ) : (
+              ) : removed ? null : (
                 <Button
                   type="button"
                   variant="text"
@@ -128,6 +121,18 @@ export function QuickNpcPackageCustomizationPanel({
                   {QUICK_NPC_REMOVE_LABEL}
                 </Button>
               )}
+              {removed ? (
+                <Button
+                  type="button"
+                  variant="text"
+                  size="xs"
+                  density="compact"
+                  aria-label={quickNpcRestoreAriaLabel(row.label)}
+                  onClick={() => onRestore(row.entryId)}
+                >
+                  {QUICK_NPC_RESTORE_LABEL}
+                </Button>
+              ) : null}
             </SelectionOptionCardEmbeddedPanelRow>
           )
         })}
