@@ -64,6 +64,9 @@ describe('EquipmentPickerDrawer', () => {
     expect(cannotAffordBadge).toBeInTheDocument()
     expect(within(list).queryByText(/75 GP needed/i)).not.toBeInTheDocument()
     expect(within(list).queryByText(/40 GP remaining/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
+    expect(screen.getByText('100 GP budget · 15 GP spent')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
 
     await user.hover(cannotAffordBadge)

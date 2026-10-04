@@ -27,6 +27,7 @@ import {
   resolveEquipmentAcquisitionPlan,
   resolvePlayableBuilderContent,
   resolveMagicItemAcquisitionState,
+  resolveMagicItemGrantRequirement,
   resolveMagicItemGrantEligibility,
   resolveStartingEquipmentResolution,
   sumPurchaseCostCp,
@@ -152,8 +153,6 @@ export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
 export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems
 
 export const EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL = 'Choose magic items'
-
-export const EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL = 'Magic item choices'
 
 export const EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL = 'Release choice'
 
@@ -1013,6 +1012,7 @@ function listMagicItemGrantInventoryRows(args: {
     draft,
     context,
     catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(context.characterKind),
   })
 
   const allowanceById = new Map(acquisition.allowances.map((entry) => [entry.id, entry]))
@@ -1076,6 +1076,7 @@ export function resolveEquipmentStepAcquisitionState(args: {
     draft: args.draft,
     context: args.context,
     catalogIndex: args.catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(args.context.characterKind),
   })
 }
 

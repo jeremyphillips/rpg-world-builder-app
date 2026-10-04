@@ -3,6 +3,7 @@ import {
   assembleClassSpellcasting,
   assembleGrantedSpells,
   assembleStartingEquipment,
+  resolveMagicItemGrantRequirement,
   characterWealthFromGrant,
   EMPTY_CHARACTER_EQUIPMENT,
   getCharacterBuilderTotalLevel,
@@ -62,6 +63,7 @@ function resolveDraftEquipment(
   return assembleStartingEquipment(draft, catalogIndex, {
     startingWealth: rules.startingWealth,
     rulesetId: context.rulesetId,
+    magicItemRequirement: resolveMagicItemGrantRequirement(context.characterKind),
   })
 }
 

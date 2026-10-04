@@ -72,6 +72,4 @@ export const equipmentInventoryDisclosureTriggerClasses = cn(
 
 export const equipmentAddedInventoryPanelFilledClasses = 'rounded-lg border border-border px-4 py-4'
 
-export const equipmentAcquisitionGuidanceCardActionClasses = 'self-start'
-
 export const equipmentAcquisitionGuidanceCardDescriptionClasses = 'text-sm text-muted-foreground'

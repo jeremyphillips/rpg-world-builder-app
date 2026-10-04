@@ -101,6 +101,7 @@ function buildMagicItemContext() {
   const context = resolveEquipmentAcquisitionBuilderContext({
     context: {
       rulesetId: RULESET,
+      characterKind: 'pc',
       characterCreationRules: { startingWealth },
       catalog: { equipment: [commonPotion] },
     },

@@ -4,7 +4,6 @@ import {
   fitsStartingEquipmentBudget,
   compareMagicItemBestMatch,
   formatMoney,
-  formatWealthAsGold,
   isEquipmentPickerSupportedKind,
   moneyToCopper,
   type CharacterWealth,
@@ -19,6 +18,7 @@ import { chainComparators, compareNumberDescending, type Comparator } from '@rpg
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
+import { formatEquipmentResourceWealth } from '../../acquisition/equipment-acquisition-guidance.lib'
 
 import { type EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
@@ -102,7 +102,7 @@ export function formatEquipmentUnaffordableReason(
   if (!amounts) return ''
 
   const need = formatMoney(amounts.required)
-  const have = formatWealthAsGold(amounts.remaining)
+  const have = formatEquipmentResourceWealth(amounts.remaining)
   return joinInlineMetadata([`${need} needed`, `${have} remaining`])
 }
 

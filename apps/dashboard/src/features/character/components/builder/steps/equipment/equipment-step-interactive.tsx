@@ -147,6 +147,7 @@ export function EquipmentStepInteractive({
             fundingState={step.fundingState}
             onOpenPurchasePicker={() => step.openPicker('purchase')}
             showMagicItemGrants={step.showMagicItemGrants}
+            magicItemAllowances={step.acquisition.allowances}
             magicItemProgress={step.acquisition.progress}
             onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
           />

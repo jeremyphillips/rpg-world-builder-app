@@ -11,6 +11,7 @@ Lucide remains the default glyph set. **One owner per semantic role** — charac
 | Section        | Feature-local maps (form tabs, connections, builder facts)                     | `contentIdentityIcon` for semantic aliases; direct Lucide for section-owned glyphs       |
 | Granted choice | `GrantedChoiceLeadingIcon` (builder choice-section)                            | `BadgeCheck` leading affordance on granted `ContentEntityCard` rows — not an action verb |
 | Action         | `ACTION_ICONS`                                                                 | `ActionIcon`, `ActionButton`, remove/add wrappers                                        |
+| Resource       | `RESOURCE_ICONS`                                                               | `resourceIcon('currency' \| 'magicItem')` — Coins and Gem; not content identity or verbs |
 
 `campaign` and `generic` may share a component today but are separate map entries — do not alias one to the other.
 
@@ -32,4 +33,4 @@ Overflow triggers: **`overflow`**, **`overflowVertical`**, **`overflowMenu`**.
 
 ## Custom icons later
 
-Maps store `AppIcon` components. Swap one registry entry (Lucide → custom) without changing call sites that use `contentIdentityIcon` or `ACTION_ICONS`.
+Maps store `AppIcon` components. Swap one registry entry (Lucide → custom) without changing call sites that use `contentIdentityIcon`, `resourceIcon`, or `ACTION_ICONS`.

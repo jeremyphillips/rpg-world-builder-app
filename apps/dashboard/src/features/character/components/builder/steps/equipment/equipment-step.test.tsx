@@ -37,7 +37,10 @@ import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
   EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
-import { EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
+} from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../../../equipment/picker/purchase/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step'
 
@@ -328,8 +331,12 @@ describe('EquipmentStep', () => {
       .getAllByRole('listitem')
       .find((row) => within(row).queryByText(equipmentStepBreastplateFixture.name))!
 
-    expect(within(breastplateRow).getByText('400 GP needed')).toBeInTheDocument()
+    expect(within(breastplateRow).queryByText(/400 GP needed/)).not.toBeInTheDocument()
     expect(within(breastplateRow).getByRole('button', { name: 'Add' })).toBeDisabled()
+
+    await user.hover(within(breastplateRow).getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL))
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('400 GP needed')
+    expect(screen.getByRole('tooltip')).toHaveTextContent('90 GP remaining')
   })
 
   it('adds a gold purchase from the picker drawer', async () => {

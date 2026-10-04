@@ -1,67 +1,33 @@
-import type { EquipmentBudgetSummary, MagicItemGrantProgress } from '@rpg/contracts'
-import { getMagicItemRarityLabel } from '@rpg/contracts'
-import { Badge, Button, Heading, Text } from '@rpg/ui'
+import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
+import { Heading, Text } from '@rpg/ui'
 
 import {
   EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
-  EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
   type EquipmentStepFundingState,
 } from '../../../lib/equipment/equipment-step.lib'
 import {
   EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION,
   EQUIPMENT_UNRESOLVED_FUNDING_HEADING,
-  formatEquipmentBudgetGuidanceCopy,
   formatEquipmentUnresolvedFundingSelectedLabel,
-  resolveFundingGuidanceCard,
+  resolveEquipmentAcquisitionGuidanceView,
+  type EquipmentAcquisitionGuidanceAction,
 } from './equipment-acquisition-guidance.lib'
 import {
-  equipmentAcquisitionGuidanceBadgeListClasses,
   equipmentAcquisitionGuidanceCardClasses,
   equipmentAcquisitionGuidanceGridClasses,
-  equipmentAcquisitionGuidanceGridTwoColumnClasses,
 } from './equipment-acquisition-guidance.variants'
-import {
-  equipmentAcquisitionGuidanceCardActionClasses,
-  equipmentAcquisitionGuidanceCardDescriptionClasses,
-} from './equipment-acquisition-panel.variants'
+import { equipmentAcquisitionGuidanceCardDescriptionClasses } from './equipment-acquisition-panel.variants'
+import { EquipmentResourceSummary } from './equipment-resource-summary'
 
 export type EquipmentAcquisitionGuidanceProps = {
   showPurchaseWorkflow: boolean
   fundingState: EquipmentStepFundingState
   onOpenPurchasePicker: () => void
   showMagicItemGrants: boolean
+  magicItemAllowances: readonly MagicItemAllowance[]
   magicItemProgress: readonly MagicItemGrantProgress[]
   onOpenMagicItemsPicker: () => void
-}
-
-function EquipmentPurchaseGuidanceCard({
-  budget,
-  onBrowse,
-}: {
-  budget: EquipmentBudgetSummary
-  onBrowse: () => void
-}) {
-  const copy = formatEquipmentBudgetGuidanceCopy(budget)
-
-  return (
-    <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <Heading variant="subsection" as="h3">
-        {copy.heading}
-      </Heading>
-      <Text as="p" className={equipmentAcquisitionGuidanceCardDescriptionClasses}>
-        {copy.description}
-      </Text>
-      <Button
-        type="button"
-        size="sm"
-        className={equipmentAcquisitionGuidanceCardActionClasses}
-        onClick={onBrowse}
-      >
-        {EQUIPMENT_STEP_BROWSE_LABEL}
-      </Button>
-    </article>
-  )
 }
 
 function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: number }) {
@@ -80,53 +46,20 @@ function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: numb
   )
 }
 
-function EquipmentMagicItemGuidanceCard({
-  progress,
-  onChoose,
-}: {
-  progress: readonly MagicItemGrantProgress[]
-  onChoose: () => void
-}) {
-  return (
-    <article className={equipmentAcquisitionGuidanceCardClasses}>
-      <Heading variant="subsection" as="h3">
-        {EQUIPMENT_MAGIC_ITEMS_PROGRESS_LABEL}
-      </Heading>
-      <div className={equipmentAcquisitionGuidanceBadgeListClasses}>
-        {progress.map((entry) => (
-          <Badge
-            key={entry.allowanceId}
-            appearance="outline"
-            tone={entry.isFilled ? 'success' : 'neutral'}
-            size="sm"
-          >
-            {entry.selected}/{entry.capacity} {getMagicItemRarityLabel(entry.rarity)}
-          </Badge>
-        ))}
-      </div>
-      <Button
-        type="button"
-        size="sm"
-        className={equipmentAcquisitionGuidanceCardActionClasses}
-        onClick={onChoose}
-      >
-        {EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL}
-      </Button>
-    </article>
-  )
+const GUIDANCE_ACTION_LABELS: Record<EquipmentAcquisitionGuidanceAction, string> = {
+  browse: EQUIPMENT_STEP_BROWSE_LABEL,
+  'choose-magic': EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
 }
 
-function EquipmentFundingGuidanceCard({
-  fundingState,
-  onBrowse,
-}: {
-  fundingState: Exclude<EquipmentStepFundingState, { kind: 'none' }>
-  onBrowse: () => void
-}) {
-  if (fundingState.kind === 'unresolved') {
-    return <EquipmentUnresolvedFundingCard pendingCostCp={fundingState.pendingCostCp} />
-  }
-  return <EquipmentPurchaseGuidanceCard budget={fundingState.budget} onBrowse={onBrowse} />
+function guidanceActionHandler(
+  action: EquipmentAcquisitionGuidanceAction,
+  handlers: Pick<
+    EquipmentAcquisitionGuidanceProps,
+    'onOpenPurchasePicker' | 'onOpenMagicItemsPicker'
+  >,
+): () => void {
+  if (action === 'browse') return handlers.onOpenPurchasePicker
+  return handlers.onOpenMagicItemsPicker
 }
 
 export function EquipmentAcquisitionGuidance({
@@ -134,28 +67,40 @@ export function EquipmentAcquisitionGuidance({
   fundingState,
   onOpenPurchasePicker,
   showMagicItemGrants,
+  magicItemAllowances,
   magicItemProgress,
   onOpenMagicItemsPicker,
 }: EquipmentAcquisitionGuidanceProps) {
-  const fundingCard = resolveFundingGuidanceCard(fundingState, showPurchaseWorkflow)
-  const showMagic = showMagicItemGrants && magicItemProgress.length > 0
+  const view = resolveEquipmentAcquisitionGuidanceView({
+    showPurchaseWorkflow,
+    fundingState,
+    showMagicItemGrants,
+    magicItemAllowances,
+    magicItemProgress,
+  })
+  if (!view) return null
 
-  if (!fundingCard && !showMagic) return null
-
-  const gridClass =
-    fundingCard && showMagic
-      ? equipmentAcquisitionGuidanceGridTwoColumnClasses
-      : equipmentAcquisitionGuidanceGridClasses
+  const action = view.action
+    ? {
+        label: GUIDANCE_ACTION_LABELS[view.action],
+        onClick: guidanceActionHandler(view.action, {
+          onOpenPurchasePicker,
+          onOpenMagicItemsPicker,
+        }),
+      }
+    : undefined
 
   return (
-    <section aria-label="Acquisition guidance" className={gridClass}>
-      {fundingCard ? (
-        <EquipmentFundingGuidanceCard fundingState={fundingCard} onBrowse={onOpenPurchasePicker} />
+    <section aria-label="Acquisition guidance" className={equipmentAcquisitionGuidanceGridClasses}>
+      {view.unresolvedPendingCostCp !== undefined ? (
+        <EquipmentUnresolvedFundingCard pendingCostCp={view.unresolvedPendingCostCp} />
       ) : null}
-      {showMagic ? (
-        <EquipmentMagicItemGuidanceCard
-          progress={magicItemProgress}
-          onChoose={onOpenMagicItemsPicker}
+      {view.currency || view.slots ? (
+        <EquipmentResourceSummary
+          density="comfortable"
+          currency={view.currency}
+          slots={view.slots}
+          action={action}
         />
       ) : null}
     </section>

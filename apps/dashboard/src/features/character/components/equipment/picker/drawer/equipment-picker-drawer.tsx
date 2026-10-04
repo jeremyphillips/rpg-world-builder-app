@@ -29,7 +29,8 @@ import {
   type EquipmentPickerItem,
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
-import { EquipmentBudgetHeader } from '../browse/equipment-budget-header'
+import { formatEquipmentBudgetGuidanceCopy } from '../../acquisition/equipment-acquisition-guidance.lib'
+import { EquipmentResourceSummary } from '../../acquisition/equipment-resource-summary'
 import { EquipmentPickerItemDetails } from '../details/equipment-picker-item-details'
 import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclosure-row'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
@@ -202,7 +203,10 @@ export function EquipmentPickerDrawer({
             fullWidth
           />
         ) : picker.effectiveBudget ? (
-          <EquipmentBudgetHeader budget={picker.effectiveBudget} />
+          <EquipmentResourceSummary
+            density="compact"
+            currency={formatEquipmentBudgetGuidanceCopy(picker.effectiveBudget)}
+          />
         ) : undefined
       }
       transformVisibleItems={picker.transformVisibleItems}

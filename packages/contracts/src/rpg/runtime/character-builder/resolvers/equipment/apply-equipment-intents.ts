@@ -1,4 +1,6 @@
 import type { Equipment } from '../../../../content/equipment'
+import type { CharacterKind } from '../../../character-acquisition/kind'
+import { resolveMagicItemGrantRequirement } from '../../character-kind-policy'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import {
   mergeCompatiblePurchasedEntries,
@@ -127,6 +129,7 @@ export function applyMagicItemAcquisitionIntent(args: {
 export function resolveEquipmentAcquisitionBuilderContext(args: {
   context: {
     rulesetId: EquipmentAcquisitionBuilderContext['rulesetId']
+    characterKind: CharacterKind
     characterCreationRules: { startingWealth: EquipmentAcquisitionBuilderContext['startingWealth'] }
     catalog: { equipment: Equipment[] }
   }
@@ -138,5 +141,6 @@ export function resolveEquipmentAcquisitionBuilderContext(args: {
     rulesetId: args.context.rulesetId,
     startingWealthTableId: args.startingWealthTableId,
     startingWealth: args.context.characterCreationRules.startingWealth,
+    magicItemRequirement: resolveMagicItemGrantRequirement(args.context.characterKind),
   }
 }

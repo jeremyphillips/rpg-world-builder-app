@@ -34,6 +34,7 @@ import {
 } from '../../../../campaign/rules/starting-wealth'
 import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type { SystemRulesetId } from '../../../../primitives/ruleset'
+import type { MagicItemAllowanceRequirement } from '../../equipment/magic-item-selection'
 
 function grantSelectionSource(): CharacterSelectionSource[] {
   return [{ kind: 'grant' }]
@@ -274,6 +275,7 @@ function appendMagicItemGrantsFromDraft(
   startingWealth: StartingWealthRules | undefined,
   rulesetId: string,
   inventory: CharacterEquipment,
+  requirement: MagicItemAllowanceRequirement,
 ): CharacterEquipment {
   const selections = readMagicItemSelections(draft)
   if (selections.length === 0) return inventory
@@ -285,7 +287,11 @@ function appendMagicItemGrantsFromDraft(
   if (!tier) return inventory
 
   const startingWealthTableId = standardStartingWealthTableId(rulesetId as SystemRulesetId)
-  const allowances = resolveMagicItemGrantAllowances({ startingWealthTableId, tier })
+  const allowances = resolveMagicItemGrantAllowances({
+    startingWealthTableId,
+    tier,
+    requirement,
+  })
   const allowanceById = new Map(allowances.map((entry) => [entry.id, entry]))
 
   let result = inventory
@@ -466,7 +472,11 @@ function purchasesForContext(
 export function deriveEquipmentDraftEntries(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
-  options?: { startingWealth?: StartingWealthRules; rulesetId?: SystemRulesetId },
+  options?: {
+    startingWealth?: StartingWealthRules
+    rulesetId?: SystemRulesetId
+    magicItemRequirement?: MagicItemAllowanceRequirement
+  },
 ): CharacterEquipment {
   const context = resolveEquipmentDraftContext(draft, catalogIndex)
   if (!context && !draft.class.classId) return EMPTY_CHARACTER_EQUIPMENT
@@ -482,6 +492,7 @@ export function deriveEquipmentDraftEntries(
           options?.startingWealth,
           rulesetId,
           withPackage,
+          options?.magicItemRequirement ?? 'exact',
         )
 
   return appendGrantsFromDraft(

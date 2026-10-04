@@ -3,6 +3,7 @@ import {
   formatWealthAsGold,
   getMagicItemRarityLabel,
   resolveMagicItemAcquisitionState,
+  resolveMagicItemGrantRequirement,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -40,6 +41,7 @@ export function resolveAllowanceRarity(args: {
     draft: args.draft,
     context: args.context,
     catalogIndex: args.catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(args.context.characterKind),
   })
 
   return acquisition.allowances.find((allowance) => allowance.id === args.allowanceId)?.rarity

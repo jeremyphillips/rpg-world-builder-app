@@ -7,6 +7,7 @@ import {
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
   resolveMagicItemAcquisitionState,
+  resolveMagicItemGrantRequirement,
   resolveStartingEquipmentResolution,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -450,7 +451,14 @@ function buildGoldOptionChannel(args: {
 }): EquipmentInventoryStartingChannel {
   const { draft, catalogIndex, context } = args
   const showMagicItemGrants = context
-    ? shouldShowMagicItemGrants(resolveMagicItemAcquisitionState({ draft, context, catalogIndex }))
+    ? shouldShowMagicItemGrants(
+        resolveMagicItemAcquisitionState({
+          draft,
+          context,
+          catalogIndex,
+          requirement: resolveMagicItemGrantRequirement(context.characterKind),
+        }),
+      )
     : false
   return {
     kind: 'gold_option',

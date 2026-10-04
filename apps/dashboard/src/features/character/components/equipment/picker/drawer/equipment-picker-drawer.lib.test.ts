@@ -190,6 +190,16 @@ describe('equipment-picker-drawer.lib', () => {
     )
   })
 
+  it('keeps silver and copper in the unaffordable remaining half', () => {
+    const chainMail = equipmentPickerItemsFixture[1]!
+    expect(
+      formatEquipmentUnaffordableReason(chainMail, {
+        ...equipmentPickerBudgetFixture,
+        remaining: { cp: 0, sp: 6, gp: 74, pp: 0 },
+      }),
+    ).toBe('75 GP needed · 74 GP 6 SP remaining')
+  })
+
   it('excludes vehicle and service kinds from category filter and results', () => {
     const items = [
       ...equipmentPickerItemsFixture,

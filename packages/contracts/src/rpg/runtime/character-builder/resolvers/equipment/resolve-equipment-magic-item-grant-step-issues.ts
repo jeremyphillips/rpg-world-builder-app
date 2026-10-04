@@ -1,3 +1,4 @@
+import { resolveMagicItemGrantRequirement } from '../../character-kind-policy'
 import { getMagicItemRarityLabel } from '../../../../vocab/magic-item/rarity'
 import type { CharacterBuildContext } from '../../context'
 import { indexCharacterBuildCatalog } from '../../context'
@@ -30,6 +31,7 @@ export function resolveUnresolvedMagicItemGrantIssues(args: {
     draft: args.draft,
     context: args.context,
     catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(args.context.characterKind),
   })
 
   if (acquisition.allowances.length === 0) return []
@@ -58,6 +60,7 @@ export function resolveMagicItemGrantReviewProgress(args: {
     draft: args.draft,
     context: args.context,
     catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(args.context.characterKind),
   })
 
   const allowance = acquisition.allowances.find((entry) => entry.id === args.allowanceId)

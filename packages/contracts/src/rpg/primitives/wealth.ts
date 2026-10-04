@@ -70,8 +70,15 @@ export function subtractFromWealth(wealth: CoinWealth, amount: Money | number): 
   return copperToWealth(wealthToCopper(wealth) - costCp)
 }
 
+export type FormatWealthOptions = {
+  /** Between denomination parts. Default keeps the comma join used by existing surfaces. */
+  separator?: string
+}
+
+const DEFAULT_WEALTH_SEPARATOR = ', '
+
 /** Formats multi-denomination wealth for compact UI (GP, SP, CP — no PP parts). */
-export function formatWealth(wealth: CoinWealth): string {
+export function formatWealth(wealth: CoinWealth, options?: FormatWealthOptions): string {
   const display = copperToDisplayWealth(wealthToCopper(wealth))
   const parts: string[] = []
 
@@ -82,7 +89,7 @@ export function formatWealth(wealth: CoinWealth): string {
     }
   }
 
-  return parts.length > 0 ? parts.join(', ') : '0 GP'
+  return parts.length > 0 ? parts.join(options?.separator ?? DEFAULT_WEALTH_SEPARATOR) : '0 GP'
 }
 
 /** Display-only: normalizes wealth to a single GP total (no PP/SP/CP parts). */

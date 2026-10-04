@@ -5,6 +5,7 @@ import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import type {
   MagicItemAllowance,
+  MagicItemAllowanceRequirement,
   MagicItemGrantProgress,
 } from '../../equipment/magic-item-selection'
 import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
@@ -18,6 +19,8 @@ export type EquipmentAcquisitionBuilderContext = {
   rulesetId: SystemRulesetId
   startingWealthTableId: string
   startingWealth: StartingWealthRules
+  /** Resolved from character kind before this context is built. */
+  magicItemRequirement: MagicItemAllowanceRequirement
 }
 
 // ---------------------------------------------------------------------------

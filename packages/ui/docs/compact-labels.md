@@ -26,6 +26,18 @@ selectable, clickable, or togglable labels use **Chip** or **Button** instead. T
 They are independent — do not shift hue to signal importance or selection. Every tone ×
 appearance combination is valid.
 
+**Emphasis** is visual weight, orthogonal to tone and appearance. It is presentation, not
+status and not a disabled state.
+
+| Emphasis  | Effect                                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| `default` | Tone foreground                                                                                  |
+| `subdued` | Text and icons use `text-muted-foreground`. The well and border stay (for example neutral soft). |
+
+Do not paint subdued labels with `text-foreground-disabled`, field-disabled wells, or
+`disabled:opacity-50`. Those tokens mean an unavailable control. `Badge` has no `disabled`
+prop. Pass `emphasis="subdued"` for completed or exhausted labels.
+
 - **Selected chips** use **selected-control** tokens (`bg-selected-control`, …), not `tone="success"`.
 - **Semantic soft badges** (`appearance="soft"`) are not the same surface as a selected chip.
 

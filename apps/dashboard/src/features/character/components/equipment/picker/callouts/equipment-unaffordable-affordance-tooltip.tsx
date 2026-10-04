@@ -1,8 +1,9 @@
 import { CircleAlert } from 'lucide-react'
 
-import { formatMoney, formatWealthAsGold } from '@rpg/contracts'
+import { formatMoney } from '@rpg/contracts'
 import { EmphasisDetailLine, Text } from '@rpg/ui'
 
+import { formatEquipmentResourceWealth } from '../../acquisition/equipment-acquisition-guidance.lib'
 import type { EquipmentUnaffordableAmounts } from '../drawer/equipment-picker-drawer.lib'
 
 export function EquipmentUnaffordableAffordanceTooltip({
@@ -11,7 +12,7 @@ export function EquipmentUnaffordableAffordanceTooltip({
   amounts: EquipmentUnaffordableAmounts
 }) {
   const need = formatMoney(amounts.required)
-  const have = formatWealthAsGold(amounts.remaining)
+  const have = formatEquipmentResourceWealth(amounts.remaining)
 
   return (
     <Text as="span" variant="warning" className="flex items-start gap-1.5 text-xs">

@@ -26,6 +26,17 @@ export const NeutralSoft: Story = {
   args: { appearance: 'soft', tone: 'neutral', children: 'Homebrew' },
 }
 
+export const SubduedEmphasis: Story = {
+  name: 'Subdued emphasis',
+  args: {
+    appearance: 'soft',
+    tone: 'neutral',
+    emphasis: 'subdued',
+    size: 'sm',
+    children: 'Complete',
+  },
+}
+
 export const Outline: Story = {
   args: { appearance: 'outline', tone: 'neutral', children: 'Outline' },
 }

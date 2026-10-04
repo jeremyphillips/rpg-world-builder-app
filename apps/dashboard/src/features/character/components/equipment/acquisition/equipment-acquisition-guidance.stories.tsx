@@ -1,9 +1,26 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import type { MagicItemGrantProgress } from '@rpg/contracts'
+import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
 
 import { equipmentPickerBudgetFixture } from '../picker/drawer/equipment-picker-drawer.fixtures'
 import { EquipmentAcquisitionGuidance } from './equipment-acquisition-guidance'
+
+const magicItemAllowances: MagicItemAllowance[] = [
+  {
+    id: 'allowance-common',
+    source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+    rarity: 'common',
+    count: 2,
+    requirement: 'exact',
+  },
+  {
+    id: 'allowance-uncommon',
+    source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+    rarity: 'uncommon',
+    count: 1,
+    requirement: 'up_to',
+  },
+]
 
 const magicItemProgress: MagicItemGrantProgress[] = [
   {
@@ -33,6 +50,7 @@ const meta = {
     fundingState: { kind: 'funded', budget: equipmentPickerBudgetFixture },
     onOpenPurchasePicker: () => undefined,
     showMagicItemGrants: true,
+    magicItemAllowances,
     magicItemProgress,
     onOpenMagicItemsPicker: () => undefined,
   },
@@ -46,6 +64,7 @@ export const DualWorkflow: Story = {}
 export const PurchaseOnly: Story = {
   args: {
     showMagicItemGrants: false,
+    magicItemAllowances: [],
     magicItemProgress: [],
   },
 }
@@ -62,6 +81,14 @@ export const UnresolvedFunding: Story = {
     showPurchaseWorkflow: false,
     fundingState: { kind: 'unresolved', pendingCostCp: 5150 },
     showMagicItemGrants: false,
+    magicItemAllowances: [],
     magicItemProgress: [],
+  },
+}
+
+export const UnresolvedFundingWithMagicItems: Story = {
+  args: {
+    showPurchaseWorkflow: false,
+    fundingState: { kind: 'unresolved', pendingCostCp: 5150 },
   },
 }

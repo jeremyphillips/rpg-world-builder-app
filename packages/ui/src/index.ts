@@ -230,6 +230,12 @@ export {
   ACTION_ICON_VERBS,
   type ActionIconVerb,
 } from './components/ui/action-icons.map'
+export {
+  RESOURCE_ICONS,
+  RESOURCE_ICON_ROLES,
+  resourceIcon,
+  type ResourceIconRole,
+} from './components/ui/resource-icons.map'
 export { type AppIcon } from './components/ui/app-icon.types'
 export { buttonVariants } from './components/ui/button.variants'
 export { Link, type LinkProps } from './components/ui/link'

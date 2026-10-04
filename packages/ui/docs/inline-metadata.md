@@ -58,7 +58,7 @@ Candidate surfaces identified during the migration:
 
 - CampaignMetaLine
 - admin header/meta surfaces
-- EquipmentBudgetHeader
+- EquipmentResourceSummary
 - EmphasisDetailLine
 - CatalogMetadataRenderer
 - PreviewRail

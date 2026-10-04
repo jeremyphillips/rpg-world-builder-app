@@ -3,6 +3,7 @@ import {
   standardStartingWealthTableId,
 } from '../../../../campaign/rules/starting-wealth'
 import { wealthToCopper } from '../../../../primitives/wealth'
+import type { MagicItemAllowanceRequirement } from '../../equipment/magic-item-selection'
 import type { CharacterBuildCatalogIndex, CharacterBuildContext } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
 import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
@@ -18,6 +19,7 @@ export function resolveMagicItemAcquisitionState(args: {
   draft: CharacterBuilderDraft
   context: Pick<CharacterBuildContext, 'rulesetId' | 'characterCreationRules'>
   catalogIndex: CharacterBuildCatalogIndex
+  requirement: MagicItemAllowanceRequirement
 }): ResolvedMagicItemAcquisitionState {
   const { draft, context, catalogIndex } = args
   const startingWealth = context.characterCreationRules.startingWealth
@@ -25,7 +27,13 @@ export function resolveMagicItemAcquisitionState(args: {
   const tier = resolveStartingWealthTierForBuilder(startingWealth, startingLevel)
   const startingWealthTableId = standardStartingWealthTableId(context.rulesetId)
 
-  const allowances = tier ? resolveMagicItemGrantAllowances({ startingWealthTableId, tier }) : []
+  const allowances = tier
+    ? resolveMagicItemGrantAllowances({
+        startingWealthTableId,
+        tier,
+        requirement: args.requirement,
+      })
+    : []
 
   const selections = readMagicItemSelections(draft)
   const progress = resolveMagicItemGrantProgressList({ allowances, selections })

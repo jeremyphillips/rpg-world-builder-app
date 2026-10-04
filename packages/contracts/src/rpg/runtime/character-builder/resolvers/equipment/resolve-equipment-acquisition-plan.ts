@@ -34,6 +34,7 @@ function resolveActiveAllowances(
   return resolveMagicItemGrantAllowances({
     startingWealthTableId: context.startingWealthTableId,
     tier,
+    requirement: context.magicItemRequirement,
   })
 }
 

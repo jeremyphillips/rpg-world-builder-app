@@ -285,6 +285,7 @@ describe('deriveEquipmentDraftEntries', () => {
     const context = resolveEquipmentAcquisitionBuilderContext({
       context: {
         rulesetId: RULESET,
+        characterKind: 'pc',
         characterCreationRules: { startingWealth },
         catalog: { equipment: [leatherArmor, shield, rope] },
       },

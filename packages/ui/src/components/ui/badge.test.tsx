@@ -56,6 +56,23 @@ describe('Badge', () => {
     )
   })
 
+  it('mutes subdued emphasis without a disabled well', () => {
+    render(
+      <Badge appearance="soft" tone="neutral" emphasis="subdued">
+        Complete
+      </Badge>,
+    )
+    const el = screen.getByText('Complete')
+    expect(el).toHaveClass(
+      'text-muted-foreground',
+      'bg-semantic-neutral-soft',
+      'border-semantic-neutral-border',
+    )
+    expect(el).not.toHaveClass('text-semantic-neutral-soft-foreground')
+    expect(el.className).not.toContain('text-foreground-disabled')
+    expect(el).not.toHaveAttribute('aria-disabled')
+  })
+
   it('uses counter layout for compact numeric badges', () => {
     render(
       <Badge appearance="soft" tone="destructive" size="sm" layout="counter">
