@@ -9,7 +9,7 @@ import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equ
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce'
-import { enrichEquipmentPickerStatusWithAffordabilityTooltip } from '../callouts/equipment-unaffordable-affordance-tooltip'
+import { enrichEquipmentPickerStatusWithAffordabilityTooltip } from '../callouts/equipment-unaffordable-affordance-tooltip.lib'
 import { buildEquipmentPickerEntityStatus } from '../callouts/equipment-picker-callout-presentation.lib'
 import {
   getEquipmentPickerCallout,

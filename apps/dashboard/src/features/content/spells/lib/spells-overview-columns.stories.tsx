@@ -4,7 +4,7 @@ import { DataTable } from '@rpg/ui'
 import { buildSeedSpellSchoolVocabulary } from '@/features/vocabulary'
 import { STORY_CAMPAIGN_ID } from '../../lib/fixtures/constants'
 import { SPELL_LIST } from '../fixtures'
-import { spellsColumns } from './spells-overview-columns'
+import { spellsColumns } from './spells-overview-columns.lib'
 
 const STORY_SPELL_SCHOOL_VOCABULARY = buildSeedSpellSchoolVocabulary()
 

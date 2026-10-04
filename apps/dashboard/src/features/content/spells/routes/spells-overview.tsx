@@ -10,7 +10,7 @@ import {
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { useSpells, useSpellsUsageMeta } from '../hooks/use-spells'
-import { spellsColumns, spellsFilterSchema } from '../lib/spells-overview-columns'
+import { spellsColumns, spellsFilterSchema } from '../lib/spells-overview-columns.lib'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
 import { ContentOverviewTable } from '../../lib/overview/content-overview-table'
 
