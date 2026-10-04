@@ -10,7 +10,7 @@ export const equipmentPickerPurchaseDividerClasses = 'border-b border-border'
  * Optical inset on the quantity stepper — shifts the control toward the label without
  * margin bleed (see body wash `-ml-2` / inner `pl-2` pairing in item-details variants).
  */
-export const equipmentPickerPurchaseQuantityStepperShimClasses = 'relative right-2 shrink-0'
+export const equipmentPickerPurchaseQuantityStepperShimClasses = 'relative shrink-0'
 
 export const equipmentPickerPurchaseInsetPanelClasses = cn(
   'rounded border px-3 py-2',

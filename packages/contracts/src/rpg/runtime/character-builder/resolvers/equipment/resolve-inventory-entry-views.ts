@@ -9,7 +9,7 @@ import type {
 } from './equipment-acquisition-types'
 import type { MagicItemGrantSelection } from '../../equipment/magic-item-selection'
 import { readMagicItemSelections } from './resolve-magic-item-grant-progress'
-import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 
 function mergeSourceAllocation(
   sources: EquipmentSourceAllocation[],
