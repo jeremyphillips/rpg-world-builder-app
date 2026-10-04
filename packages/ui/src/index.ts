@@ -843,6 +843,7 @@ export {
   TooltipProvider,
   InfoTooltip,
   type InfoTooltipProps,
+  type TooltipTriggerProps,
 } from './components/ui/tooltip.client'
 
 export {

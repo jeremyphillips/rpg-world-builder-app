@@ -9,12 +9,16 @@ import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equ
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { EquipmentPickerCommerce } from './equipment-picker-commerce'
+import { enrichEquipmentPickerStatusWithAffordabilityTooltip } from '../callouts/equipment-unaffordable-affordance-tooltip'
 import { buildEquipmentPickerEntityStatus } from '../callouts/equipment-picker-callout-presentation.lib'
 import {
   getEquipmentPickerCallout,
   getEquipmentPickerSecondaryLabels,
 } from '../callouts/equipment-picker-callout.lib'
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
+import type {
+  EquipmentBudgetSummary,
+  EquipmentPickerItem,
+} from '../drawer/equipment-picker-drawer.types'
 import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
 
 const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
@@ -24,6 +28,7 @@ export type EquipmentPickerDisclosureRowProps = {
   presentation: EquipmentPickerItemPresentation
   ownedQuantity: number
   isGoldShoppingPath?: boolean
+  budget?: EquipmentBudgetSummary
   onCommit?: () => boolean
 }
 
@@ -32,6 +37,7 @@ export function EquipmentPickerDisclosureRow({
   presentation,
   ownedQuantity,
   isGoldShoppingPath = false,
+  budget,
   onCommit,
 }: EquipmentPickerDisclosureRowProps) {
   const { isPending, successQuantity, commitFailed, commitQuantity } =
@@ -92,11 +98,15 @@ export function EquipmentPickerDisclosureRow({
             })}
           />
         ),
-        status: buildEquipmentPickerEntityStatus({
-          callout,
-          secondaryLabels,
-          statusItems: presentation.statusItems,
-        }),
+        status: enrichEquipmentPickerStatusWithAffordabilityTooltip(
+          buildEquipmentPickerEntityStatus({
+            callout,
+            secondaryLabels,
+            statusItems: presentation.statusItems,
+          }),
+          item,
+          budget,
+        ),
       }}
       trailing={trailing}
     />

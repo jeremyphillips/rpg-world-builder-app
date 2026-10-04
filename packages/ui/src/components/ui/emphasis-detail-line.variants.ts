@@ -4,7 +4,17 @@ import type { ContentTone } from './visual-vocabulary.types'
 
 export const emphasisDetailLineRootVariants = cva('')
 
-export const emphasisDetailLinePrimaryVariants = cva('font-body-emphasis tabular-nums')
+export const emphasisDetailLinePrimaryVariants = cva('font-body-emphasis tabular-nums', {
+  variants: {
+    tone: {
+      default: '',
+      warning: 'text-warning',
+    },
+  },
+  defaultVariants: {
+    tone: 'default',
+  },
+})
 
 const CONTENT_TONE_SECONDARY_CLASSES: Record<
   Extract<ContentTone, 'secondary' | 'disabled'>,

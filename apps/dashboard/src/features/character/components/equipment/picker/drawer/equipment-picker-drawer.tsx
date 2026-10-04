@@ -1,16 +1,14 @@
 import * as React from 'react'
-import { CircleAlert } from 'lucide-react'
 
-import { EmphasisDetailLine, SegmentedControl, Text } from '@rpg/ui'
+import { SegmentedControl } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet, getContentTypeItemLabel } from '@/features/content'
-import { formatChoiceSetDrawerHeading, formatMoney, formatWealthAsGold } from '@rpg/contracts'
+import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
 import {
   countEquipmentPickerClearableCriteria,
-  getEquipmentUnaffordableAmounts,
   getEquipmentPickerSearchText,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
@@ -111,31 +109,6 @@ function EquipmentPickerToolbarActions({
       label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
       onClick={onResetView}
     />
-  )
-}
-
-function EquipmentPickerRowSummary({
-  item,
-  budget,
-}: {
-  item: EquipmentPickerItem
-  budget?: EquipmentPickerDrawerProps['budget']
-}) {
-  const amounts = getEquipmentUnaffordableAmounts(item, budget)
-  if (!amounts) return null
-
-  const need = formatMoney(amounts.required)
-  const have = formatWealthAsGold(amounts.remaining)
-
-  return (
-    <Text as="p" variant="warning" className="flex items-start gap-1.5 text-xs">
-      <CircleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-      <EmphasisDetailLine
-        primary={`${need} needed`}
-        secondary={`${have} remaining`}
-        secondaryTone="disabled"
-      />
-    </Text>
   )
 }
 
@@ -305,15 +278,11 @@ export function EquipmentPickerDrawer({
             presentation={presentation}
             ownedQuantity={ownedQuantity}
             isGoldShoppingPath={isGoldShoppingPath}
+            budget={picker.effectiveBudget}
             onCommit={canQuickAdd ? () => picker.handleHeaderCommit(item) : undefined}
           />
         )
       }}
-      renderItemSummary={(item) =>
-        picker.isMagicItemsWorkflow ? null : (
-          <EquipmentPickerRowSummary item={item} budget={picker.effectiveBudget} />
-        )
-      }
       renderItemDetails={(item) => {
         const addQuantity = picker.addQuantities[item.equipment.id] ?? 1
         const rowActionVm = resolveRowVm(item, addQuantity)
