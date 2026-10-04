@@ -4,6 +4,7 @@ import {
   resolveEquipmentPresentationFacts,
   type EquipmentSupplySource,
   type OptionPresentationFact,
+  type Equipment,
   type RecommendationSourceName,
   type ResolvedEquipmentOption,
   type SelectionSourceLabelCatalogIndex,
@@ -219,6 +220,7 @@ export function resolveEquipmentOptionRowPresentation(args: {
   kindLabel: string
   metadata?: readonly string[]
   resolved: ResolvedEquipmentOption
+  equipment?: Equipment
   sourceName?: RecommendationSourceName
   supplyCatalog?: SelectionSourceLabelCatalogIndex
   /**
@@ -229,6 +231,7 @@ export function resolveEquipmentOptionRowPresentation(args: {
 }): EquipmentOptionRowPresentation {
   const facts = resolveEquipmentPresentationFacts({
     resolved: args.resolved,
+    ...(args.equipment ? { equipment: args.equipment } : {}),
     ...(args.sourceName ? { sourceName: args.sourceName } : {}),
   })
   const secondaryClauses = buildEquipmentOptionSecondaryClauses({

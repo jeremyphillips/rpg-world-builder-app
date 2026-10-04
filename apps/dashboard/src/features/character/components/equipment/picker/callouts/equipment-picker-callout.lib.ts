@@ -1,4 +1,6 @@
 import {
+  equipmentAdvisoryClass,
+  resolveEquipmentNotProficientMessage,
   OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
@@ -11,11 +13,10 @@ import {
   type EquipmentOptionSecondaryClause,
 } from '../../../../lib/equipment/equipment-option-row-presentation.lib'
 import { formatInlineRecommendationSources } from '../../../../lib/recommendation/format-inline-recommendation-sources'
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
   type EquipmentPickerCallout,
+  type EquipmentPickerItem,
   type EquipmentPickerCalloutContext,
   type EquipmentPickerCalloutFactKind,
   type EquipmentPickerCalloutSemanticStatus,
@@ -133,9 +134,9 @@ function calloutFromClause(
       priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,
       callout: {
         label: clause.badgeLabel,
-        intent: 'warning',
+        intent: 'info',
         importance: 'medium',
-        factKind: 'caution',
+        factKind: 'guidance',
       },
     }
   }
@@ -164,6 +165,7 @@ function semanticClauseCandidates(item: EquipmentPickerItem): EquipmentCalloutCa
     identity: item.equipment.name,
     kindLabel: '',
     resolved,
+    equipment: item.equipment,
   })
   return presentation.secondaryClauses.flatMap((clause) => {
     const candidate = calloutFromClause(clause)
@@ -199,14 +201,16 @@ function getProficiencyCautionCandidate(
       ? !item.state.isProficient && tracksProficiency(item)
       : proficient === false
   if (!notProficient) return undefined
+  const equipmentClass = equipmentAdvisoryClass(item.equipment)
+  if (!equipmentClass) return undefined
 
   return {
     priority: EQUIPMENT_CALLOUT_SOURCE_PRIORITY.proficiencyCaution,
     callout: {
-      label: EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL,
-      intent: 'warning',
+      label: resolveEquipmentNotProficientMessage(equipmentClass),
+      intent: 'info',
       importance: 'medium',
-      factKind: 'caution',
+      factKind: 'guidance',
     },
   }
 }
@@ -223,6 +227,7 @@ function semanticStatus(
     case 'compatibility':
       return 'compatibility'
     case 'caution':
+    case 'guidance':
       return 'not_proficient'
     case 'state':
       return candidate.callout.label === OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL
@@ -254,7 +259,10 @@ function collectEquipmentCalloutCandidates(
   context: EquipmentPickerCalloutContext,
 ): EquipmentCalloutCandidate[] {
   const semantic = presentationCandidates(item, context)
-  const semanticHasCaution = semantic.some((candidate) => candidate.callout.factKind === 'caution')
+  const semanticHasCaution = semantic.some(
+    (candidate) =>
+      candidate.callout.factKind === 'caution' || candidate.callout.factKind === 'guidance',
+  )
   return [
     getAffordabilityCandidate(item),
     ...semantic,

@@ -6,7 +6,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { equipmentStepBardClassFixture } from '../../../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
-import { CharacterBuildAdvisoriesProvider } from '../../../build-advisories/character-build-advisories-provider'
 
 const editableStackableRow: EquipmentInventoryRow = {
   group: 'gear',
@@ -28,23 +27,19 @@ const editableStackableRow: EquipmentInventoryRow = {
 }
 
 describe('EquipmentInventoryRowItem', () => {
-  it('renders a build advisory as a warning status line', () => {
+  it('renders a build advisory from the row without an advisory provider', () => {
     render(
-      <CharacterBuildAdvisoriesProvider
-        advisories={[
-          {
-            code: 'equipment_not_proficient',
-            subject: {
-              kind: 'equipment',
-              equipmentId: editableStackableRow.entry.equipmentId,
-              label: 'Rations',
-              equipmentClass: 'weapon',
-            },
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            advisoryStatusItems: [
+              { kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' },
+            ],
           },
-        ]}
-      >
-        <EquipmentInventoryRowItem display={{ kind: 'single', row: editableStackableRow }} />
-      </CharacterBuildAdvisoriesProvider>,
+        }}
+      />,
     )
 
     expect(screen.getByText('Not proficient with this weapon')).toBeInTheDocument()

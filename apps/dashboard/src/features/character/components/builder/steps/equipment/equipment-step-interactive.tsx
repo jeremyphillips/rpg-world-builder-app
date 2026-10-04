@@ -159,6 +159,7 @@ export function EquipmentStepInteractive({
           budget={budget}
           goldOptionFunding={step.goldOptionFunding}
           classOptionPolicy={step.classOptionPolicy}
+          resolvedChoiceSets={step.resolvedChoiceSets}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
@@ -229,6 +230,9 @@ export function EquipmentStepInteractive({
         <EquipmentPackageSwitchResolutionModal
           open
           catalogIndex={catalogIndex}
+          draft={draft}
+          context={step.context}
+          choiceSets={step.resolvedChoiceSets}
           evaluation={packageSwitchEvaluation}
           draftQuantitiesByPurchaseId={pendingPackageSwitch.draftQuantitiesByPurchaseId}
           commitErrorReason={pendingPackageSwitch.commitErrorReason}

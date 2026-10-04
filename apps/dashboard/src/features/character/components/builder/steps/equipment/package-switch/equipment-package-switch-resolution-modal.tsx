@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
+  CharacterBuildContext,
+  CharacterBuilderDraft,
+  ChoiceSet,
   EquipmentPackageSwitchBlockingReason,
   EquipmentPackageSwitchEvaluation,
 } from '@rpg/contracts'
@@ -23,6 +26,9 @@ import { equipmentPackageSwitchResolutionModalBodyClasses } from './equipment-pa
 export type EquipmentPackageSwitchResolutionModalProps = {
   open: boolean
   catalogIndex: CharacterBuildCatalogIndex
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  choiceSets: readonly ChoiceSet[]
   evaluation: EquipmentPackageSwitchEvaluation
   draftQuantitiesByPurchaseId: Record<string, number>
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
@@ -37,6 +43,9 @@ export type EquipmentPackageSwitchResolutionModalProps = {
 export function EquipmentPackageSwitchResolutionModal({
   open,
   catalogIndex,
+  draft,
+  context,
+  choiceSets,
   evaluation,
   draftQuantitiesByPurchaseId,
   commitErrorReason,
@@ -59,8 +68,11 @@ export function EquipmentPackageSwitchResolutionModal({
         evaluation,
         draftQuantitiesByPurchaseId,
         catalogIndex,
+        draft,
+        context,
+        choiceSets,
       }),
-    [catalogIndex, draftQuantitiesByPurchaseId, evaluation],
+    [catalogIndex, choiceSets, context, draft, draftQuantitiesByPurchaseId, evaluation],
   )
   const modalState = resolvePackageSwitchModalState({
     evaluation,

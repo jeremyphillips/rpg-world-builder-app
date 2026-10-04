@@ -3,6 +3,9 @@ import {
   formatEquipmentInventoryPriceLine,
   formatWealth,
   type CharacterBuildCatalogIndex,
+  type CharacterBuildContext,
+  type CharacterBuilderDraft,
+  type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchEvaluation,
   type EquipmentStepActionIssue,
@@ -14,6 +17,7 @@ import {
   type EquipmentInventoryRow,
 } from './equipment-step.lib'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
+import { enrichEquipmentInventoryRows } from './equipment-inventory-row-advisories.lib'
 
 export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Adjust purchases before switching'
 
@@ -166,8 +170,11 @@ export function buildPackageSwitchDraftPurchasedGroups(args: {
   evaluation: EquipmentPackageSwitchEvaluation
   draftQuantitiesByPurchaseId: Record<string, number>
   catalogIndex: CharacterBuildCatalogIndex
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  choiceSets: readonly ChoiceSet[]
 }): PurchasedCategoryGroup[] {
-  const displays = args.evaluation.editableItems.flatMap((item) => {
+  const built = args.evaluation.editableItems.flatMap((item) => {
     const equipment = args.catalogIndex.equipment.get(item.equipmentId)
     if (!equipment) return []
 
@@ -212,6 +219,17 @@ export function buildPackageSwitchDraftPurchasedGroups(args: {
 
     return [{ kind: 'single' as const, row }]
   })
+
+  const enrichedRows = enrichEquipmentInventoryRows({
+    rows: built.map((display) => display.row),
+    draft: args.draft,
+    context: args.context,
+    choiceSets: args.choiceSets,
+  })
+  const displays = built.map((display, index) => ({
+    ...display,
+    row: enrichedRows[index] ?? display.row,
+  }))
 
   if (displays.length === 0) return []
 

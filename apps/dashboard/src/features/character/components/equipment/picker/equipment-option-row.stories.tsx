@@ -53,8 +53,8 @@ export const RequiredAndNotProficient: Story = {
         },
         {
           kind: 'compatibility',
-          label: 'Not proficient',
-          badgeLabel: 'Not proficient',
+          label: 'Not proficient with this weapon',
+          badgeLabel: 'Not proficient with this weapon',
           sourceLabels: [],
           discriminator: 'not-proficient',
         },
@@ -66,7 +66,8 @@ export const RequiredAndNotProficient: Story = {
           discriminator: 'recommended',
         },
       ],
-      secondaryTitle: 'Required by Wizard class · Not proficient · Recommended by Fighter class',
+      secondaryTitle:
+        'Required by Wizard class · Not proficient with this weapon · Recommended by Fighter class',
     },
   },
 }

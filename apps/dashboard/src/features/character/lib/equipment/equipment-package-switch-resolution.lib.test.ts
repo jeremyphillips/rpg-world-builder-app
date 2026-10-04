@@ -4,10 +4,17 @@ import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
+  resolveEquipmentNotProficientMessage,
   resolveStartingEquipmentFundingOptions,
 } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
+import {
+  equipmentStepBattleaxeFixture,
+  equipmentStepCatalogIndexFixture,
+  equipmentStepContextFixture,
+  equipmentStepMonkClassFixture,
+} from './equipment-step.fixtures'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
@@ -82,6 +89,9 @@ describe('equipment-package-switch-resolution.lib', () => {
       evaluation,
       draftQuantitiesByPurchaseId: { 'purchase-rope': 0 },
       catalogIndex,
+      draft: goldDraft,
+      context: equipmentStepContextFixture,
+      choiceSets: [],
     })
 
     expect(groups).toHaveLength(1)
@@ -94,6 +104,58 @@ describe('equipment-package-switch-resolution.lib', () => {
     expect(display.row.stagedRemoval).toBe(true)
     expect(display.row.sourceLabel).toBe(PACKAGE_SWITCH_STAGED_REMOVAL_LABEL)
     expect(display.row.maxQuantity).toBe(62)
+  })
+
+  it('stamps the shared proficiency warning onto a package-switch row', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            id: 'purchase-axe',
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+    const targetFunding = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+    }).get('standard-equipment')!
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      targetOptionId: 'standard-equipment',
+      targetFunding,
+    })!
+
+    const groups = buildPackageSwitchDraftPurchasedGroups({
+      evaluation,
+      draftQuantitiesByPurchaseId: { 'purchase-axe': 1 },
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      draft,
+      context: equipmentStepContextFixture,
+      choiceSets: [],
+    })
+    const display = groups[0]?.displays[0]
+    expect(display?.kind).toBe('single')
+    if (display?.kind !== 'single') return
+    expect(display.row.advisoryStatusItems).toEqual([
+      {
+        kind: 'text',
+        variant: 'warning',
+        label: resolveEquipmentNotProficientMessage('weapon'),
+      },
+    ])
   })
 
   it('uses selection copy when no option was selected before the request', () => {

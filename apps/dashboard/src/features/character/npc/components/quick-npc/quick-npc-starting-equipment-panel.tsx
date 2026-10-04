@@ -212,7 +212,12 @@ function QuickNpcStartingEquipmentPackageSection({
   const selectedSummary = packageContext.summaries.find(
     (summary) => summary.optionId === selectedOption?.id,
   )
-  const rows =
+  const prepared = useQuickNpcPreparedBuildValue()
+  const advisoryIndex = React.useMemo(
+    () => indexBuildAdvisoriesByEquipmentId(prepared?.advisories ?? []),
+    [prepared],
+  )
+  const rows = (
     selectedOption && selectedSummary
       ? buildQuickNpcPackageCustomizationRows({
           option: selectedOption,
@@ -220,6 +225,13 @@ function QuickNpcStartingEquipmentPackageSection({
           entryQuantities: disclosureOpen ? draftQuantities : submittedQuantities,
         })
       : []
+  ).map((row) => {
+    if (!row.equipmentId || row.retainedQuantity <= 0) return row
+    const advisoryLabel = buildAdvisoryStatusItems(
+      lookupBuildAdvisoriesForEquipment(advisoryIndex, row.equipmentId, buildContext.rulesetId),
+    )[0]?.label
+    return advisoryLabel ? { ...row, advisoryLabel } : row
+  })
   const description =
     selectedOption && selectedSummary
       ? formatQuickNpcEffectivePackageDescription({
@@ -372,6 +384,7 @@ function QuickNpcStartingEquipmentPackageSection({
             setIsPackageChooserExpanded(true)
           }}
           description={description}
+          advisoryLabels={rows.flatMap((row) => (row.advisoryLabel ? [row.advisoryLabel] : []))}
           titleAdornment={
             customized && !disclosureOpen ? (
               <Badge tone="neutral" size="sm" appearance="soft" aria-hidden className="shrink-0">

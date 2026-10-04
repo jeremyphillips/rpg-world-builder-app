@@ -1,3 +1,5 @@
+import type { EntitySummaryStatusItem } from '@/features/content'
+
 import {
   buildChoiceSetId,
   deriveEquipmentBudgetSummary,
@@ -286,6 +288,8 @@ export type EquipmentInventoryRow = {
   quantityTarget?: EquipmentInventoryQuantityTarget
   /** Package-switch modal: row is staged at quantity zero but still visible. */
   stagedRemoval?: boolean
+  /** Warning lines from the shared advisory index. Builder view models always set this. */
+  advisoryStatusItems?: readonly EntitySummaryStatusItem[]
 }
 
 export function formatEquipmentInventoryRemoveLabel(name: string, quantity: number): string {

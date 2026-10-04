@@ -30,8 +30,6 @@ export type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
-
 /** Sparse recommendation badges — most rows (including proficient gear) get none. */
 export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
 export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
@@ -77,6 +75,7 @@ export type EquipmentPickerCalloutFactKind =
   | 'state'
   | 'blocking'
   | 'caution'
+  | 'guidance'
 
 export type EquipmentPickerCallout = {
   label: string

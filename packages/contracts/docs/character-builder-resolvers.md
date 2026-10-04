@@ -429,7 +429,7 @@ has none. Picker rows keep that evidence on `state.evidence` and the split facts
 
 `resolveEquipmentPresentationFacts` turns those facts into semantic copy: "Required by
 Wizard class", "Satisfies Wizard focus requirement", "Proficient" with "Granted by Rogue
-class", "Not proficient", "Recommended" plus source labels, and state labels such as
+class", the equipment proficiency advisory sentence, "Recommended" plus source labels, and state labels such as
 "In your package". Each of those copies may carry a presentation discriminator
 (`required`, `satisfies`, `recommended`, `included`, `proficient`, `not-proficient`).
 The discriminator is a one-way label for adapters. It does not replace

@@ -12,6 +12,8 @@ import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '..
 import { builderTestCatalog, createCharacterBuildContext, storedFighter } from '../test-fixtures'
 import { luteTool } from '../proficiency-test-fixtures'
 import { resolveCharacterBuildLoadout } from '../assembly/resolve-character-build-loadout'
+import { reconcileEquipmentForClassChange } from '../draft/apply-selected-class-change'
+import { deriveEquipmentDraftEntries } from '../resolvers/equipment/derive-equipment-draft-entries'
 import {
   resolveCharacterBuildAdvisories,
   resolveCharacterBuildAdvisoriesForDraft,
@@ -161,6 +163,81 @@ describe('resolveCharacterBuildAdvisoriesForDraft', () => {
   it('returns [] when the loadout cannot resolve a class', () => {
     expect(advisoryIds(draftWith(undefined, [greatsword.id]))).toEqual([])
     expect(advisoryIds(draftWith(`${RULESET}:missing`, [greatsword.id]))).toEqual([])
+  })
+
+  it('flags an unresolved explicit purchase without adding it to resolved inventory', () => {
+    const draft: CharacterBuilderDraft = {
+      ...draftWith(scholar.id, []),
+      equipment: {
+        mode: 'package',
+        purchases: [
+          {
+            equipmentId: greatsword.id,
+            quantity: 1,
+            sourceMode: 'startingGold',
+            origin: 'picker',
+          },
+        ],
+        editedSincePackageSelection: false,
+        grants: [],
+        classPackage: { state: 'unresolved' },
+      },
+    }
+
+    expect(advisoryIds(draft)).toEqual([greatsword.id])
+    expect(
+      deriveEquipmentDraftEntries(draft, catalogIndex).weapons.map((entry) => entry.equipmentId),
+    ).not.toContain(greatsword.id)
+  })
+
+  it('dedupes a resolved grant and a pending purchase of the same weapon', () => {
+    const draft = draftWith(scholar.id, [greatsword.id])
+    draft.equipment = {
+      ...draft.equipment!,
+      purchases: [
+        {
+          equipmentId: greatsword.id,
+          quantity: 1,
+          sourceMode: 'startingGold',
+          origin: 'picker',
+        },
+      ],
+      classPackage: { state: 'unresolved' },
+    }
+
+    expect(advisoryIds(draft)).toEqual([greatsword.id])
+  })
+
+  it('keeps a purchase across a class change and flags the new class', () => {
+    const retained = reconcileEquipmentForClassChange({
+      equipment: {
+        mode: 'package',
+        purchases: [
+          {
+            equipmentId: greatsword.id,
+            quantity: 1,
+            sourceMode: 'startingGold',
+            origin: 'picker',
+          },
+        ],
+        editedSincePackageSelection: false,
+        grants: [{ equipmentId: greatsword.id, quantity: 1 }],
+        classPackage: { state: 'unresolved' },
+      },
+      previous: { classId: storedFighter.id, level: 1 },
+      next: { classId: scholar.id, level: 1 },
+      context,
+    })
+
+    const draft: CharacterBuilderDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: scholar.id, level: 1 },
+      equipment: retained,
+    }
+
+    expect(retained?.purchases.map((purchase) => purchase.equipmentId)).toEqual([greatsword.id])
+    expect(advisoryIds(draft)).toEqual([greatsword.id])
+    expect(advisoryIds({ ...draft, class: { classId: storedFighter.id, level: 1 } })).toEqual([])
   })
 })
 

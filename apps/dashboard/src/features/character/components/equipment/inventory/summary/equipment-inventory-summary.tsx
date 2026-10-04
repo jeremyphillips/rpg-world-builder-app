@@ -4,6 +4,7 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
+  ChoiceSet,
   ClassOptionPolicy,
   EquipmentBudgetSummary,
   ResolvedStartingEquipmentFunding,
@@ -36,6 +37,7 @@ export type EquipmentInventorySummaryProps = {
   budget?: EquipmentBudgetSummary
   goldOptionFunding?: ResolvedStartingEquipmentFunding
   classOptionPolicy?: ClassOptionPolicy
+  resolvedChoiceSets?: readonly ChoiceSet[]
   conversionEditorOpen?: boolean
   selectedPackageItemKeys?: ReadonlySet<string>
   conversionCommitStatusMessage?: string
@@ -122,6 +124,7 @@ export function EquipmentInventorySummary({
   budget,
   goldOptionFunding,
   classOptionPolicy = 'included',
+  resolvedChoiceSets = [],
   conversionEditorOpen = false,
   selectedPackageItemKeys = new Set(),
   conversionCommitStatusMessage,
@@ -138,8 +141,16 @@ export function EquipmentInventorySummary({
   emptyMessage = EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
 }: EquipmentInventorySummaryProps) {
   const viewModel = useMemo(
-    () => buildEquipmentInventoryViewModel(draft, catalogIndex, budget, classOptionPolicy, context),
-    [budget, catalogIndex, classOptionPolicy, context, draft],
+    () =>
+      buildEquipmentInventoryViewModel(
+        draft,
+        catalogIndex,
+        budget,
+        classOptionPolicy,
+        context,
+        resolvedChoiceSets,
+      ),
+    [budget, catalogIndex, classOptionPolicy, context, draft, resolvedChoiceSets],
   )
 
   if (!viewModel) {

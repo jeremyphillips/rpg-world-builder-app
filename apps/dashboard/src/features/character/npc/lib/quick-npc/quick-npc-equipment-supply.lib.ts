@@ -310,6 +310,7 @@ export function presentQuickNpcEquipmentOption(args: {
     identity: row.name,
     kindLabel: getEquipmentKindLabel(equipment.kind),
     metadata: compact.comparisonGroups,
+    equipment,
     resolved,
     supplyClauses: presentQuickNpcEquipmentSupplyClauses({
       contributions: supply.contributions,

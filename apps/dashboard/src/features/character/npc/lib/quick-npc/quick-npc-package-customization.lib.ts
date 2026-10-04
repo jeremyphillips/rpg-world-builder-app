@@ -61,6 +61,9 @@ export type QuickNpcPackageCustomizationRow = {
   packageQuantity: number
   retainedQuantity: number
   kind: 'singleton' | 'stack'
+  equipmentId?: string
+  /** Warning sentence from the shared advisory index. Owned rows only. */
+  advisoryLabel?: string
 }
 
 export function quickNpcUsePackageLabel(packageLabel: string): string {
@@ -176,6 +179,14 @@ export function resolveQuickNpcEffectiveClassPackage(args: {
   return selectClassPackage(packageId, 'automatic')
 }
 
+function itemEquipmentId(item: StartingEquipmentOptionSummaryItem): string | undefined {
+  if (item.kind === 'grant') return item.equipmentId
+  if (item.kind === 'proficiency_linked_grant' && item.status === 'resolved') {
+    return item.resolvedEquipment?.id
+  }
+  return undefined
+}
+
 function itemLabel(item: StartingEquipmentOptionSummaryItem, fallback: string): string {
   if (item.kind === 'grant') return item.equipment?.name ?? item.equipmentSlug
   if (item.kind === 'choice') return item.poolLabel || fallback
@@ -192,6 +203,7 @@ export function buildQuickNpcPackageCustomizationRows(args: {
     const summary = args.orderedItems[index]
     if (!summary) return []
     const packageQuantity = item.kind === 'grant' ? (item.quantity ?? 1) : 1
+    const equipmentId = itemEquipmentId(summary)
     return [
       {
         entryId: item.id,
@@ -203,6 +215,7 @@ export function buildQuickNpcPackageCustomizationRows(args: {
           args.entryQuantities,
         ),
         kind: packageQuantity > 1 ? 'stack' : 'singleton',
+        ...(equipmentId ? { equipmentId } : {}),
       },
     ]
   })

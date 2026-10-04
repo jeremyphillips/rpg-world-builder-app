@@ -13,6 +13,7 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
+import { createEquipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 
 const rope = pickEquipment('rope')
@@ -20,7 +21,7 @@ const silverNeedle = pickEquipment('silver-needle')
 const dagger = pickEquipment('dagger')
 const storedDruid = storedDruidClassStored
 
-const catalogIndex = indexCharacterBuildCatalog({
+const storyCatalog = {
   species: [],
   classes: [storedDruid],
   spells: [],
@@ -28,7 +29,9 @@ const catalogIndex = indexCharacterBuildCatalog({
   skillProficiencies: [],
   organizations: [],
   languages: [],
-})
+}
+const catalogIndex = indexCharacterBuildCatalog(storyCatalog)
+const storyContext = createEquipmentStepContextFixture({ catalog: storyCatalog })
 
 function buildGoldDraft(
   purchases: Array<{
@@ -103,6 +106,9 @@ function PackageSwitchResolutionModalStory({
     <EquipmentPackageSwitchResolutionModal
       open={open}
       catalogIndex={catalogIndex}
+      draft={draft}
+      context={storyContext}
+      choiceSets={[]}
       evaluation={evaluation}
       draftQuantitiesByPurchaseId={draftQuantities}
       commitErrorReason={commitErrorReason}

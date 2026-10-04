@@ -3,6 +3,7 @@ import type {
   CharacterBuildAdvisory,
   EquipmentAdvisoryClass,
 } from '../../../character-builder/build-advisory'
+import type { Equipment } from '../../../content/equipment'
 import { getArmorCategorySentenceForm } from '../../../vocab/armor/category'
 import { EQUIPMENT_KIND_ENTRIES } from '../../../vocab/equipment/kind'
 import { getTermLabelSingular, getTermSentenceForm } from '../../../vocab/types'
@@ -53,9 +54,22 @@ const NOT_PROFICIENT_MESSAGES = {
   shield: characterBuilderAdvisoryMessages.notProficientShield,
 } as const
 
+export function equipmentAdvisoryClass(equipment: Equipment): EquipmentAdvisoryClass | undefined {
+  if (equipment.kind === 'weapon') return 'weapon'
+  if (equipment.kind === 'armor') return equipment.category === 'shields' ? 'shield' : 'armor'
+  return undefined
+}
+
+/** Player-facing sentence for one equipment class. Shared by advisories and picker guidance. */
+export function resolveEquipmentNotProficientMessage(
+  equipmentClass: EquipmentAdvisoryClass,
+): string {
+  return formatFieldMessage(NOT_PROFICIENT_MESSAGES[equipmentClass]())
+}
+
 export function resolveCharacterBuildAdvisoryMessage(advisory: CharacterBuildAdvisory): string {
   switch (advisory.code) {
     case 'equipment_not_proficient':
-      return formatFieldMessage(NOT_PROFICIENT_MESSAGES[advisory.subject.equipmentClass]())
+      return resolveEquipmentNotProficientMessage(advisory.subject.equipmentClass)
   }
 }

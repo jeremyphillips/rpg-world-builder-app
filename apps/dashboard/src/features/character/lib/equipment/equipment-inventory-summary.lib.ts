@@ -13,12 +13,15 @@ import {
   type CharacterBuilderDraft,
   type CharacterEquipment,
   type CharacterWealthGrant,
+  type ChoiceSet,
   type ClassOptionPolicy,
   type EquipmentBudgetSummary,
   type EquipmentSourceAllocation,
 } from '@rpg/contracts'
 
+import type { EntitySummaryStatusItem } from '@/features/content'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
+import { enrichEquipmentInventoryRows } from './equipment-inventory-row-advisories.lib'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
@@ -199,6 +202,7 @@ export type AddedEquipmentEntryViewModel = {
   sources: EquipmentSourceAllocation[]
   provenanceLabel: string
   rows: EquipmentInventoryRow[]
+  advisoryStatusItems: readonly EntitySummaryStatusItem[]
 }
 
 export type AddedEquipmentCategoryGroup = {
@@ -352,6 +356,7 @@ function aggregateAddedEquipmentRows(
         sources,
         provenanceLabel: formatAddedEquipmentProvenanceLabel(entryRows, pending),
         rows: entryRows,
+        advisoryStatusItems: first.advisoryStatusItems ?? [],
       },
     ]
   })
@@ -473,18 +478,41 @@ function resolveSelectedStartingOption(
   return { selectedOptionId, option, startingEquipment }
 }
 
+function listBuilderInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
+  choiceSets: readonly ChoiceSet[]
+}): EquipmentInventoryRow[] {
+  const rows = listEquipmentInventoryRowsFromDraft(
+    args.draft,
+    args.catalogIndex,
+    args.budget,
+    args.context,
+  )
+  if (!args.context) return rows
+  return enrichEquipmentInventoryRows({
+    rows,
+    draft: args.draft,
+    context: args.context,
+    choiceSets: args.choiceSets,
+  })
+}
+
 function buildSplitInventoryViewModel(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
   classOptionPolicy: ClassOptionPolicy
   context?: CharacterBuildContext
+  choiceSets: readonly ChoiceSet[]
 }): EquipmentInventoryViewModel | undefined {
-  const { draft, catalogIndex, budget, classOptionPolicy, context } = args
+  const { draft, catalogIndex, budget, classOptionPolicy, context, choiceSets } = args
   const selected = resolveSelectedStartingOption(draft, catalogIndex)
   if (!selected) return undefined
 
-  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
+  const allRows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, choiceSets })
   const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
   const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
 
@@ -509,13 +537,14 @@ export function buildEquipmentInventoryViewModel(
   budget?: EquipmentBudgetSummary,
   classOptionPolicy: ClassOptionPolicy = 'included',
   context?: CharacterBuildContext,
+  choiceSets: readonly ChoiceSet[] = [],
 ): EquipmentInventoryViewModel | undefined {
   switch (resolveStartingEquipmentResolution(draft, catalogIndex)) {
     case 'notApplicable':
     case 'unresolvedEmpty':
       return undefined
     case 'unresolvedWithPurchases': {
-      const rows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
+      const rows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, choiceSets })
       return {
         layout: 'pending',
         addedEquipment: groupAddedEquipmentByCategory(aggregateAddedEquipmentRows(rows, true)),
@@ -528,6 +557,7 @@ export function buildEquipmentInventoryViewModel(
         budget,
         classOptionPolicy,
         context,
+        choiceSets,
       })
   }
 }

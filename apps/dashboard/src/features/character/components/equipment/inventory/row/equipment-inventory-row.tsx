@@ -7,9 +7,10 @@ import {
   type EquipmentInventoryRow,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { type EquipmentInventoryDisplayItem } from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import type { EntitySummaryStatusItem } from '@/features/content'
+
 import { buildEquipmentInventoryDisplayEntity } from '../equipment-inventory-entity.lib'
 import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantity-control'
-import { useEquipmentAdvisoryStatus } from '../../../../hooks/use-character-build-advisories-context'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowQtyLabelClasses,
@@ -90,6 +91,14 @@ function InventoryRowActions({
   )
 }
 
+function advisoryStatusForDisplay(
+  display: EquipmentInventoryDisplayItem,
+): readonly EntitySummaryStatusItem[] {
+  if (display.kind === 'single') return display.row.advisoryStatusItems ?? []
+  const withStatus = display.rows.find((row) => (row.advisoryStatusItems?.length ?? 0) > 0)
+  return withStatus?.advisoryStatusItems ?? display.rows[0]?.advisoryStatusItems ?? []
+}
+
 export function EquipmentInventoryRowItem({
   display,
   allowZeroQuantity = false,
@@ -97,10 +106,11 @@ export function EquipmentInventoryRowItem({
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
-  const advisoryStatus = useEquipmentAdvisoryStatus(
-    display.kind === 'single' ? display.row.entry.equipmentId : display.equipmentId,
+  const entity = buildEquipmentInventoryDisplayEntity(
+    display,
+    detailLabelOverride,
+    advisoryStatusForDisplay(display),
   )
-  const entity = buildEquipmentInventoryDisplayEntity(display, detailLabelOverride, advisoryStatus)
 
   if (display.kind === 'single') {
     const { row } = display

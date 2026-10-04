@@ -253,7 +253,7 @@ preview or combat semantics.
 3. **Starting-equipment / class recommendation source** — `startingEquipmentChoice` →
    **Starting option**; `availableInStartingOption` → **Standard gear** on gold path
    only (`isGoldShoppingPath` on the drawer)
-4. **Not proficient** — when `compatibility.proficient === false` and no higher-priority fact applies
+4. **Not proficient** — when `compatibility.proficient === false` and no higher-priority fact applies. The sentence comes from `resolveEquipmentNotProficientMessage`.
 
 Proficiency-state badges outrank ordinary recommendation-source badges (e.g. a Bard
 instrument with both `unresolvedToolProficiencyChoice` and `startingEquipmentChoice`

@@ -150,6 +150,14 @@ Remaining after purchase                        …
 - Header rail still shows quick **Add another** for owned stackables; bulk
   quantity is chosen in the expanded body.
 
+## Proficiency warnings
+
+Full Builder and Quick NPC share `equipment_not_proficient`, the equipment-id index, and `buildAdvisoryStatusItems`. Each experience projects those facts onto its own rows.
+
+Owned and selected equipment renders the advisory as a warning. Browse-only options use the same sentence as muted selection guidance. Review and create confirmation stay aggregate advisory lists.
+
+Builder inventory and package-switch cards read `advisoryStatusItems` from the view model. They do not resolve proficiency while rendering. Pending explicit purchases can produce an advisory before a starting option funds them; they stay out of resolved inventory.
+
 ## Package switch resolution
 
 When the player changes starting-equipment options, retained `startingGold`

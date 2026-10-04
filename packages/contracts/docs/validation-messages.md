@@ -174,8 +174,12 @@ confirms "Create character anyway" / "Create NPC anyway"
   prose, severity, or key).
 - **Copy:** derived at render time by `resolveCharacterBuildAdvisoryMessage` from
   `characterBuilderAdvisoryMessages` (`validation.characterBuilderAdvisory.*`).
-- **Source of facts:** `resolveCharacterBuildAdvisoriesForDraft` evaluates the same
-  `resolveCharacterBuildLoadout` result finalize persists; it returns `[]` when the loadout
+  `resolveEquipmentNotProficientMessage` is the only player-facing proficiency sentence.
+  Browse guidance uses that sentence with lighter chrome; owned cards use it as a warning.
+- **Source of facts:** `resolveCharacterBuildAdvisoriesForDraft` evaluates the loadout
+  finalize persists. Proficiency subjects also include pending explicit purchases (picker or
+  manual) that are still on the draft because no starting option has funded them. Those
+  purchases stay out of resolved inventory. The resolver returns `[]` when the loadout
   cannot resolve a class, so incomplete builds never produce false positives.
 - **Dedupe / order:** deduped by `characterBuildAdvisoryKey`, ordered by
   `CHARACTER_BUILD_ADVISORY_CODE_ORDER`, then a per-code comparator.

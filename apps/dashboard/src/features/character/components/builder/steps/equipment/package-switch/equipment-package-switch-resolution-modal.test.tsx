@@ -13,6 +13,7 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
+import { equipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
 
@@ -68,6 +69,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 62 }}
         onOpenChange={vi.fn()}
@@ -88,6 +92,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 62 }}
         onOpenChange={vi.fn()}
@@ -113,6 +120,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={goldDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={evaluation}
         draftQuantitiesByPurchaseId={{ 'purchase-rope': 9 }}
         onOpenChange={vi.fn()}
@@ -151,6 +161,9 @@ describe('EquipmentPackageSwitchResolutionModal', () => {
       <EquipmentPackageSwitchResolutionModal
         open
         catalogIndex={catalogIndex}
+        draft={blockedDraft}
+        context={equipmentStepContextFixture}
+        choiceSets={[]}
         evaluation={blockedEvaluation}
         draftQuantitiesByPurchaseId={{}}
         onOpenChange={vi.fn()}

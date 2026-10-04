@@ -47,6 +47,7 @@ function entry(
     totalQuantity: rows.reduce((sum, row) => sum + row.entry.quantity, 0),
     sources: [],
     provenanceLabel: '2 Common choices',
+    advisoryStatusItems: [],
     rows,
     ...overrides,
   }
@@ -62,6 +63,30 @@ const defaultProps = {
 }
 
 describe('EquipmentAddedInventoryRowItem', () => {
+  it('shows one proficiency warning when several rows share an equipment id', () => {
+    const advisoryStatusItems = [
+      {
+        kind: 'text' as const,
+        variant: 'warning' as const,
+        label: 'Not proficient with this weapon',
+      },
+    ]
+    render(
+      <EquipmentAddedInventoryRowItem
+        entry={entry(
+          [
+            { ...grantRow, advisoryStatusItems },
+            { ...grantRow, advisoryStatusItems },
+          ],
+          { advisoryStatusItems },
+        )}
+        {...defaultProps}
+      />,
+    )
+
+    expect(screen.getAllByText('Not proficient with this weapon')).toHaveLength(1)
+  })
+
   it('renders inline release for a single grant copy', async () => {
     const user = userEvent.setup()
     const onReleaseGrant = vi.fn()

@@ -31,6 +31,7 @@ import {
   type QuickNpcPackageCustomizationRow,
 } from '../../lib/quick-npc/quick-npc-package-customization.lib'
 import {
+  quickNpcPackageAdvisoryClasses,
   quickNpcPackageCustomizationFooterActionsClasses,
   quickNpcPackageCustomizationFooterClasses,
   quickNpcPackageCustomizationLockClasses,
@@ -83,6 +84,11 @@ export function QuickNpcPackageCustomizationPanel({
           const removed = row.retainedQuantity === 0
           return (
             <SelectionOptionCardEmbeddedPanelRow key={row.entryId} label={row.label}>
+              {row.advisoryLabel && !removed ? (
+                <SelectionOptionCardEmbeddedPanelRowStatus>
+                  <span className={quickNpcPackageAdvisoryClasses}>{row.advisoryLabel}</span>
+                </SelectionOptionCardEmbeddedPanelRowStatus>
+              ) : null}
               {removed ? (
                 <SelectionOptionCardEmbeddedPanelRowStatus>
                   {QUICK_NPC_REMOVED_LABEL}
