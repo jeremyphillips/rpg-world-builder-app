@@ -8,6 +8,8 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import { validationIssue } from '../validate/issue'
 import type { CharacterBuildValidationIssue } from '../validate/types'
 
+import { allowsLevelZeroForKind, locksCampaignStartingLevel } from '../character-kind-policy'
+
 import {
   isClassProgressionApplicable,
   isLevelZeroNpcPermitted,
@@ -84,11 +86,12 @@ function validateLevelZeroIssues(
 ): CharacterBuildValidationIssue[] {
   if (input.level !== 0) return []
 
-  const pcAtLevelZero = input.characterKind === 'pc'
-  const npcWithoutFeature =
-    input.characterKind === 'npc' && !input.characterCreationRules.levelZeroNpcs.enabled
+  const permitted = allowsLevelZeroForKind(
+    input.characterKind,
+    input.characterCreationRules.levelZeroNpcs.enabled,
+  )
 
-  return pcAtLevelZero || npcWithoutFeature ? [levelZeroNotPermittedIssue()] : []
+  return permitted ? [] : [levelZeroNotPermittedIssue()]
 }
 
 export function validateBuilderCharacterLevel(
@@ -101,7 +104,7 @@ export function validateBuilderCharacterLevel(
     rulesScope: input.rulesScope,
     characterCreationRules: input.characterCreationRules,
   })
-  const isCampaignPc = input.characterKind === 'pc' && input.rulesScope.type === 'campaign'
+  const lockStartingLevel = locksCampaignStartingLevel(input.characterKind, input.rulesScope.type)
 
   if (input.level < minLevel) {
     issues.push(
@@ -127,7 +130,7 @@ export function validateBuilderCharacterLevel(
     )
   }
 
-  if (isCampaignPc && input.level !== input.characterCreationRules.startingLevel) {
+  if (lockStartingLevel && input.level !== input.characterCreationRules.startingLevel) {
     issues.push(
       validationIssue(
         'level_must_match_starting_level',
