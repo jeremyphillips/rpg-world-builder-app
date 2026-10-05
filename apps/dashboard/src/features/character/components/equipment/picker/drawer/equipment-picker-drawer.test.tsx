@@ -1,14 +1,17 @@
+import { useState } from 'react'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemAllowancesFixture,
   equipmentPickerMagicItemProgressFixture,
   equipmentPickerMagicItemsFixture,
   equipmentPickerRowboatFixture,
@@ -681,6 +684,65 @@ describe('EquipmentPickerDrawer', () => {
     expect(onFocusedAllowanceIdChange).toHaveBeenCalledWith(
       equipmentPickerMagicItemProgressFixture[1]!.allowanceId,
     )
+  })
+
+  it('shows a magic-item summary without a workflow segment when purchase is unavailable', () => {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={equipmentPickerMagicItemsFixture}
+        workflowMode="magic_items"
+        workflowModes={['magic_items']}
+        magicItemAllowances={equipmentPickerMagicItemAllowancesFixture}
+        magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
+        onCommitAdd={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Up to Uncommon · 1 available')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Purchase' })).not.toBeInTheDocument()
+  })
+
+  it('swaps the resource summary when the dual-workflow segment changes mode', async () => {
+    const user = userEvent.setup()
+
+    function DualWorkflowDrawer() {
+      const [workflowMode, setWorkflowMode] = useState<EquipmentPickerWorkflowMode>('purchase')
+
+      return (
+        <EquipmentPickerDrawer
+          open
+          onOpenChange={vi.fn()}
+          items={equipmentPickerItemsFixture}
+          budget={workflowMode === 'purchase' ? equipmentPickerBudgetFixture : undefined}
+          workflowMode={workflowMode}
+          workflowModes={['purchase', 'magic_items']}
+          onWorkflowModeChange={setWorkflowMode}
+          magicItemAllowances={equipmentPickerMagicItemAllowancesFixture}
+          magicItemGrantProgress={equipmentPickerMagicItemProgressFixture}
+          onCommitAdd={vi.fn()}
+        />
+      )
+    }
+
+    render(<DualWorkflowDrawer />)
+
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Magic items' }))
+
+    expect(screen.queryByRole('heading', { name: '40 GP remaining' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Up to Uncommon · 1 available')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Purchase' }))
+
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Up to Uncommon · 1 available')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -10,7 +10,7 @@ export const equipmentAcquisitionPanelSectionHeadingClasses =
 export const equipmentAcquisitionPanelSourceListClasses = 'space-y-3'
 
 export const equipmentAcquisitionPanelSourceRowClasses =
-  'grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-3'
+  'grid grid-cols-[minmax(0,1fr)_auto_auto] items-start gap-x-3'
 
 export const equipmentAcquisitionPanelSourceMetaClasses = 'min-w-0'
 
@@ -21,9 +21,6 @@ export const equipmentAcquisitionPanelSourceQuantityClasses =
 
 export const equipmentAcquisitionPanelSourceQuantityWrapClasses =
   'flex min-w-0 flex-col items-end text-right'
-
-export const equipmentAcquisitionPanelSourceQuantityInlineClasses =
-  'text-sm tabular-nums text-muted-foreground'
 
 export const equipmentAcquisitionPanelSourceSpendSuffixClasses = 'text-sm text-muted-foreground'
 

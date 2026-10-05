@@ -11,6 +11,7 @@ import {
   entityAnatomyTrailingActionVariants,
   entityAnatomyTrailingGroupSecondaryVariants,
   entityAnatomyTrailingIndicatorVariants,
+  entityAnatomyTrailingQuantityLabelVariants,
 } from './entity-anatomy-trailing.variants'
 
 type EntityAnatomyTrailingCellsProps = {
@@ -27,7 +28,7 @@ function EntityAnatomyTrailingQuantityLabel({
   if (quantity <= 1) return null
 
   return (
-    <Text as="span" variant="muted">
+    <Text as="span" variant="muted" className={entityAnatomyTrailingQuantityLabelVariants()}>
       {format === 'label' ? `Qty ${quantity}` : `×${quantity}`}
     </Text>
   )

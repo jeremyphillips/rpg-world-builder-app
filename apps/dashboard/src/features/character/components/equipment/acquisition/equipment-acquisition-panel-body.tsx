@@ -1,6 +1,6 @@
 import { useId, useMemo } from 'react'
 
-import { Badge, Button, Heading, InlineMetadata, NumberStepper, Text } from '@rpg/ui'
+import { Badge, Button, Heading, NumberStepper, Text } from '@rpg/ui'
 import {
   clampEquipmentStepQuantity,
   EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS,
@@ -36,7 +36,6 @@ import {
   equipmentAcquisitionPanelSourceListClasses,
   equipmentAcquisitionPanelSourceMetaClasses,
   equipmentAcquisitionPanelSourceQuantityClasses,
-  equipmentAcquisitionPanelSourceQuantityInlineClasses,
   equipmentAcquisitionPanelSourceQuantityWrapClasses,
   equipmentAcquisitionPanelSourceRowClasses,
   equipmentAcquisitionPanelSourceSpendSuffixClasses,
@@ -67,15 +66,10 @@ function OwnedSourceQuantity({ source }: { source: EquipmentOwnedSourceViewModel
 
   return (
     <div className={equipmentAcquisitionPanelSourceQuantityWrapClasses}>
-      <span className={equipmentAcquisitionPanelSourceQuantityInlineClasses}>
-        <InlineMetadata role="supporting" density="compact" wrap>
-          <InlineMetadata.Item>{source.quantityLabel}</InlineMetadata.Item>
-          <InlineMetadata.Item className="hidden min-[22rem]:inline">
-            {source.spendSuffix}
-          </InlineMetadata.Item>
-        </InlineMetadata>
-      </span>
-      <span className={`${equipmentAcquisitionPanelSourceSpendSuffixClasses} min-[22rem]:hidden`}>
+      <Text as="span" className={equipmentAcquisitionPanelSourceQuantityClasses}>
+        {source.quantityLabel}
+      </Text>
+      <span className={equipmentAcquisitionPanelSourceSpendSuffixClasses}>
         {source.spendSuffix}
       </span>
     </div>
@@ -204,7 +198,7 @@ function AcquisitionNextActionQuantityRow({
         min={1}
         max={nextAction.maxQuantity}
         value={quantity}
-        disabled={isPending}
+        disabled={isPending || nextAction.quantityDisabled}
         onChange={(next) =>
           onQuantityChange(clampEquipmentStepQuantity(next, nextAction.maxQuantity))
         }

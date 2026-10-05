@@ -158,5 +158,58 @@ describe('equipment-acquisition-panel.lib', () => {
     })
 
     expect(mixedViewModel.nextAction.previewLines).toEqual(['Common choice · 1 copy for 50 GP'])
+    expect(mixedViewModel.nextAction.quantityDisabled).toBe(false)
+    expect(mixedViewModel.nextAction.maxQuantity).toBeGreaterThan(0)
+    expect(mixedViewModel.nextAction.maxQuantity).toBeLessThan(99)
+  })
+
+  it('disables the quantity stepper when no additional copy can be committed', () => {
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+      tierId: 'hero',
+      rarity: 'common',
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            id: 'spent-gold',
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+            unitCostCp: 9_999_999,
+          },
+        ],
+        magicItemSelections: [
+          {
+            allowanceId,
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 10,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const viewModel = buildEquipmentAcquisitionPanelViewModel({
+      draft,
+      context: createEquipmentStepContextWithMagicItemGrantsFixture(),
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipment: equipmentStepPotionOfHealingFixture,
+      rows: [],
+      requestedQuantity: 1,
+    })
+
+    expect(viewModel.nextAction.showQuantity).toBe(true)
+    expect(viewModel.nextAction.quantityDisabled).toBe(true)
+    expect(viewModel.nextAction.disabled).toBe(true)
+    expect(viewModel.nextAction.maxQuantity).toBe(1)
   })
 })

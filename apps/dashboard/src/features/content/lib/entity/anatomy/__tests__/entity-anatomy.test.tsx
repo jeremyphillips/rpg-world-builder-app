@@ -127,6 +127,7 @@ describe('EntityAnatomy trailing kind to cell', () => {
       trailing: { kind: 'indicator', variant: 'quantity', quantity: 3 },
     })
     expect(cellOf(quantity.slot('trailing')).slot).toBe('band')
+    expect(screen.getByText('×3')).toHaveClass('text-sm')
   })
 
   it('splits group into a band primary and a meta secondary', () => {

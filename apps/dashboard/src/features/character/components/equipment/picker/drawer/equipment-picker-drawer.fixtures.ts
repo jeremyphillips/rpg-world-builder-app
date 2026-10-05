@@ -221,6 +221,31 @@ export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
   }),
 ]
 
+export const equipmentPickerMagicItemAllowancesFixture = [
+  {
+    id: 'startingWealthTier:srd-cc-5.2.1-standard:hero:common',
+    source: {
+      kind: 'startingWealthTier' as const,
+      sourceId: 'srd-cc-5.2.1-standard',
+      tierId: 'hero',
+    },
+    rarity: 'common' as const,
+    count: 2,
+    requirement: 'exact' as const,
+  },
+  {
+    id: 'startingWealthTier:srd-cc-5.2.1-standard:hero:uncommon',
+    source: {
+      kind: 'startingWealthTier' as const,
+      sourceId: 'srd-cc-5.2.1-standard',
+      tierId: 'hero',
+    },
+    rarity: 'uncommon' as const,
+    count: 1,
+    requirement: 'up_to' as const,
+  },
+]
+
 export const equipmentPickerMagicItemProgressFixture = [
   {
     allowanceId: 'startingWealthTier:srd-cc-5.2.1-standard:hero:common',

@@ -31,10 +31,14 @@ export function formatEquipmentResourceWealth(wealth: CoinWealth): string {
   return formatWealth(wealth, { separator: EQUIPMENT_RESOURCE_WEALTH_SEPARATOR })
 }
 
-export function formatEquipmentBudgetGuidanceCopy(budget: EquipmentBudgetSummary): {
+export type EquipmentBudgetGuidanceCopy = {
   heading: string
   subheading: string
-} {
+}
+
+export function formatEquipmentBudgetGuidanceCopy(
+  budget: EquipmentBudgetSummary,
+): EquipmentBudgetGuidanceCopy {
   return {
     heading: `${formatEquipmentResourceWealth(budget.remaining)} remaining`,
     subheading: joinInlineMetadata([

@@ -177,6 +177,9 @@ describe('EquipmentInventoryManageDisclosureCard', () => {
     expect(screen.getByText('Common choices')).toBeInTheDocument()
     expect(screen.getByText('Purchased')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove one' })).toBeInTheDocument()
+    const spend = screen.getByText(/\d+ GP spent/)
+    expect(spend.previousElementSibling).toHaveTextContent('1')
+    expect(spend.textContent).not.toMatch(/·/)
   })
 
   itAxe('has no axe accessibility violations', async () => {

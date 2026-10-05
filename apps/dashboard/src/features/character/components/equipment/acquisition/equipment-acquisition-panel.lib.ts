@@ -73,6 +73,8 @@ export type EquipmentAcquisitionPanelViewModel = {
     showQuantity: boolean
     quantity: number
     maxQuantity: number
+    /** Locks the stepper when no additional copy can be committed. */
+    quantityDisabled: boolean
     previewLines: string[]
     primaryActionLabel: string
     commitQuantity: number
@@ -339,6 +341,7 @@ function buildBlockedNextAction(args: {
     showQuantity: false,
     quantity: args.requestedQuantity,
     maxQuantity: 1,
+    quantityDisabled: true,
     previewLines: [],
     primaryActionLabel: 'Add to inventory',
     commitQuantity: args.requestedQuantity,
@@ -349,6 +352,26 @@ function buildBlockedNextAction(args: {
   }
 }
 
+function resolveCommittableAdditionalQuantity(args: {
+  draft: CharacterBuilderDraft
+  context: ReturnType<typeof resolveEquipmentAcquisitionContext>
+  equipment: Equipment
+  structuralMax: number
+}): number {
+  if (args.structuralMax <= 0) return 0
+
+  const ceiling = resolveEquipmentAcquisitionActionState({
+    draft: args.draft,
+    context: args.context,
+    equipment: args.equipment,
+    workflowMode: 'magic_items',
+    requestedQuantity: args.structuralMax,
+  })
+
+  if (ceiling.kind !== 'magic_item_grant') return 0
+  return Math.min(args.structuralMax, ceiling.plan.fulfilledQuantity)
+}
+
 function buildGrantNextAction(args: {
   actionState: Extract<EquipmentAcquisitionActionState, { kind: 'magic_item_grant' }>
   equipment: Equipment
@@ -356,6 +379,7 @@ function buildGrantNextAction(args: {
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
   requestedQuantity: number
+  committableMax: number
   isPending?: boolean
   nextActionHeading?: string
 }): EquipmentAcquisitionPanelViewModel['nextAction'] {
@@ -366,12 +390,14 @@ function buildGrantNextAction(args: {
     context,
     catalogIndex,
     requestedQuantity,
+    committableMax,
     isPending,
     nextActionHeading,
   } = args
   const { plan, capabilities, quantityBounds } = actionState
   const maxAdditionalQuantity = quantityBounds.maxAdditionalQuantity
   const blocked = maxAdditionalQuantity === 0
+  const quantityDisabled = committableMax < 1
   const commitQuantity = plan.partialAction?.requestedQuantity ?? requestedQuantity
 
   const blockerNote =
@@ -386,7 +412,8 @@ function buildGrantNextAction(args: {
     quantityLabel: EQUIPMENT_ACQUISITION_QUANTITY_LABEL,
     showQuantity: maxAdditionalQuantity > 1,
     quantity: requestedQuantity,
-    maxQuantity: Math.max(1, maxAdditionalQuantity),
+    maxQuantity: quantityDisabled ? 1 : committableMax,
+    quantityDisabled,
     previewLines: buildNextActionPreviewLines({
       actionState,
       equipment,
@@ -449,6 +476,12 @@ export function buildEquipmentAcquisitionPanelViewModel(args: {
       context,
       catalogIndex,
       requestedQuantity,
+      committableMax: resolveCommittableAdditionalQuantity({
+        draft,
+        context: acquisitionContext,
+        equipment,
+        structuralMax: actionState.quantityBounds.maxAdditionalQuantity,
+      }),
       isPending,
       nextActionHeading,
     }),

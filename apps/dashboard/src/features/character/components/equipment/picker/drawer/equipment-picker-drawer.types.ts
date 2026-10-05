@@ -6,6 +6,7 @@ import type {
   EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
   EquipmentPickerSupportedKind,
+  MagicItemAllowance,
   MagicItemGrantProgress,
 } from '@rpg/contracts'
 
@@ -181,8 +182,10 @@ export type EquipmentPickerDrawerProps = {
   /** Available workflows; segmented control renders only when length is 2. */
   workflowModes?: readonly EquipmentPickerWorkflowMode[]
   onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
-  /** Magic-item grant allowances for rarity chip filtering in magic-items workflow. */
+  /** Grant progress for rarity chips. Paired with allowances for the magic-item summary. */
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+  /** Allowances paired with progress so slot badges keep exact vs up-to. */
+  magicItemAllowances?: readonly MagicItemAllowance[]
   /** Focused allowance id — scopes magic-item browse to one rarity slot. */
   focusedAllowanceId?: string
   onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void

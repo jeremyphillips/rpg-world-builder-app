@@ -195,6 +195,7 @@ export function EquipmentStepInteractive({
         workflowModes={step.pickerWorkflowModes}
         onWorkflowModeChange={step.setPickerWorkflowMode}
         magicItemGrantProgress={step.showMagicItemGrants ? step.acquisition.progress : undefined}
+        magicItemAllowances={step.showMagicItemGrants ? step.acquisition.allowances : undefined}
         focusedAllowanceId={step.focusedAllowanceId}
         onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
         isGoldShoppingPath={showShopping}

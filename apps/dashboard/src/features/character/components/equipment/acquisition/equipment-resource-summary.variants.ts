@@ -15,4 +15,9 @@ export const equipmentResourceSummarySectionDividerClasses = 'border-t border-bo
 
 export const equipmentResourceSummaryBadgeListClasses = 'flex flex-wrap gap-2 whitespace-normal'
 
-export const equipmentResourceSummarySlotCheckClasses = 'size-3 shrink-0 text-current'
+/** Locks the currency line to 14px on both card densities. */
+export const equipmentResourceSummaryDescriptionClasses = 'text-sm'
+
+/** Ready check on the idle disc — same muted pairing as neutral StatusIcon variants. */
+export const equipmentResourceSummarySlotStatusClasses =
+  'bg-status-icon-idle text-status-icon-neutral-foreground'

@@ -1,5 +1,5 @@
+import type { ReactNode } from 'react'
 import type { EquipmentMagicItemSlot } from '@rpg/contracts'
-import { Check } from 'lucide-react'
 
 import {
   Badge,
@@ -8,6 +8,7 @@ import {
   Heading,
   IconContainer,
   InlineMetadata,
+  StatusIcon,
   cn,
   contentCardRootVariants,
   resolveSurfaceClasses,
@@ -23,9 +24,10 @@ import {
 } from './equipment-acquisition-guidance.lib'
 import {
   equipmentResourceSummaryBadgeListClasses,
+  equipmentResourceSummaryDescriptionClasses,
   equipmentResourceSummaryRowVariants,
   equipmentResourceSummarySectionDividerClasses,
-  equipmentResourceSummarySlotCheckClasses,
+  equipmentResourceSummarySlotStatusClasses,
   equipmentResourceSummaryStackClasses,
 } from './equipment-resource-summary.variants'
 
@@ -60,6 +62,14 @@ function ResourceGlyph({ role, density }: { role: ResourceIconRole; density: Con
   )
 }
 
+function ResourceSummaryHeading({ children }: { children: ReactNode }) {
+  return (
+    <Heading variant="group" as="h3">
+      {children}
+    </Heading>
+  )
+}
+
 function EquipmentMagicItemSlotBadge({
   slot,
   density,
@@ -78,16 +88,22 @@ function EquipmentMagicItemSlotBadge({
       emphasis={slot.fulfilled ? 'subdued' : 'default'}
       aria-label={presentation.accessibleName}
     >
-      <InlineMetadata role="heading" density={metaDensity} wrap={false}>
-        <InlineMetadata.Item>{presentation.lead}</InlineMetadata.Item>
-        <InlineMetadata.Item>
-          {slot.fulfilled ? (
-            <Check className={equipmentResourceSummarySlotCheckClasses} aria-hidden />
-          ) : (
-            presentation.detail
-          )}
-        </InlineMetadata.Item>
-      </InlineMetadata>
+      {slot.fulfilled ? (
+        <>
+          {presentation.lead}
+          <StatusIcon
+            variant="ready"
+            size="sm"
+            tooltip={false}
+            className={equipmentResourceSummarySlotStatusClasses}
+          />
+        </>
+      ) : (
+        <InlineMetadata role="heading" density={metaDensity} wrap={false}>
+          <InlineMetadata.Item>{presentation.lead}</InlineMetadata.Item>
+          <InlineMetadata.Item>{presentation.detail}</InlineMetadata.Item>
+        </InlineMetadata>
+      )}
     </Badge>
   )
 }
@@ -117,12 +133,12 @@ export function EquipmentResourceSummary({
           <ContentCardBody
             density={density}
             media={<ResourceGlyph role="currency" density={density} />}
-            heading={
-              <Heading variant="subsection" as="h3">
-                {currency.heading}
-              </Heading>
+            heading={<ResourceSummaryHeading>{currency.heading}</ResourceSummaryHeading>}
+            subheading={
+              <span className={equipmentResourceSummaryDescriptionClasses}>
+                {currency.subheading}
+              </span>
             }
-            subheading={currency.subheading}
           />
         ) : null}
         {showMagic ? (
@@ -131,9 +147,9 @@ export function EquipmentResourceSummary({
               density={density}
               media={<ResourceGlyph role="magicItem" density={density} />}
               heading={
-                <Heading variant="subsection" as="h3">
+                <ResourceSummaryHeading>
                   {EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING}
-                </Heading>
+                </ResourceSummaryHeading>
               }
               metadata={
                 <div className={equipmentResourceSummaryBadgeListClasses}>

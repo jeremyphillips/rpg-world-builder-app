@@ -29,8 +29,9 @@ import {
   type EquipmentPickerItem,
   type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
-import { formatEquipmentBudgetGuidanceCopy } from '../../acquisition/equipment-acquisition-guidance.lib'
 import { EquipmentResourceSummary } from '../../acquisition/equipment-resource-summary'
+import { resolveEquipmentPickerHeaderResource } from './equipment-picker-header-resource.lib'
+import { equipmentPickerHeaderExtraStackClasses } from './equipment-picker-drawer.variants'
 import { EquipmentPickerItemDetails } from '../details/equipment-picker-item-details'
 import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclosure-row'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
@@ -131,6 +132,7 @@ export function EquipmentPickerDrawer({
   workflowModes = ['purchase'],
   onWorkflowModeChange,
   magicItemGrantProgress,
+  magicItemAllowances,
   focusedAllowanceId,
   onFocusedAllowanceIdChange,
   toolbarResetMode = 'reset_view',
@@ -162,7 +164,31 @@ export function EquipmentPickerDrawer({
     onCommitAdd,
   })
 
-  const showWorkflowSegment = workflowModes.length === 2
+  const headerResource = resolveEquipmentPickerHeaderResource({
+    workflowMode,
+    budget,
+    magicItemAllowances,
+    magicItemGrantProgress,
+  })
+  const resourceSummary =
+    headerResource?.kind === 'currency' ? (
+      <EquipmentResourceSummary density="compact" currency={headerResource.currency} />
+    ) : headerResource?.kind === 'magicItems' ? (
+      <EquipmentResourceSummary density="compact" slots={headerResource.slots} />
+    ) : null
+  const workflowSegment =
+    workflowModes.length === 2 && onWorkflowModeChange ? (
+      <SegmentedControl
+        value={workflowMode}
+        onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
+        options={workflowModes.map((mode) => ({
+          value: mode,
+          label: EQUIPMENT_PICKER_MODE_LABELS[mode],
+        }))}
+        aria-label={`${getContentTypeItemLabel('equipment')} picker workflow`}
+        fullWidth
+      />
+    ) : null
 
   const resolveRowVm = React.useCallback(
     (
@@ -191,22 +217,11 @@ export function EquipmentPickerDrawer({
       getSearchText={(item) => getEquipmentPickerSearchText(item)}
       hasStructuredFilters={picker.structuredFilterCount > 0}
       headerExtra={
-        showWorkflowSegment && onWorkflowModeChange ? (
-          <SegmentedControl
-            value={workflowMode}
-            onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
-            options={workflowModes.map((mode) => ({
-              value: mode,
-              label: EQUIPMENT_PICKER_MODE_LABELS[mode],
-            }))}
-            aria-label={`${getContentTypeItemLabel('equipment')} picker workflow`}
-            fullWidth
-          />
-        ) : picker.effectiveBudget ? (
-          <EquipmentResourceSummary
-            density="compact"
-            currency={formatEquipmentBudgetGuidanceCopy(picker.effectiveBudget)}
-          />
+        workflowSegment || resourceSummary ? (
+          <div className={equipmentPickerHeaderExtraStackClasses}>
+            {workflowSegment}
+            {resourceSummary}
+          </div>
         ) : undefined
       }
       transformVisibleItems={picker.transformVisibleItems}

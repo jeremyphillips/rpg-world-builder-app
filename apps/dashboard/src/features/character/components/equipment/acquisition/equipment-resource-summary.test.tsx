@@ -34,6 +34,12 @@ describe('EquipmentResourceSummary', () => {
     const badge = screen.getByLabelText('Common, complete')
     expect(badge).toHaveClass('text-muted-foreground', 'bg-semantic-neutral-soft')
     expect(badge.className).not.toContain('text-foreground-disabled')
+    expect(badge.querySelector('.rounded-full')).toHaveClass(
+      'bg-status-icon-idle',
+      'text-status-icon-neutral-foreground',
+    )
+    expect(badge).not.toHaveTextContent('·')
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toHaveClass('heading-style-group')
   })
 
   it('omits the trailing action in compact currency summaries', () => {
@@ -44,7 +50,10 @@ describe('EquipmentResourceSummary', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '40 GP remaining' })).toHaveClass(
+      'heading-style-group',
+    )
+    expect(screen.getByText('100 GP budget · 15 GP spent')).toHaveClass('text-sm')
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
