@@ -507,14 +507,14 @@ trailing
 for `group`). Kinds never choose their own alignment. `meta` renders as muted `text-sm`
 before the control inside that same cell. It does not add a second cell.
 
-| Kind        | Type contract                                   | Cell                             | Use                                                         |
-| ----------- | ----------------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
-| `action`    | `content: ReactElement`, optional `meta`        | `band`                           | Labeled commit — Add, Select, Edit, Release                 |
-| `utility`   | `content: ReactElement`, optional `meta`        | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit          |
-| `indicator` | `variant: 'chevron'`, optional `meta`           | `full`                           | Destination chevrons                                        |
-| `indicator` | `variant: 'quantity'`, optional `meta`          | `band`                           | Quiet qty labels aligned with the heading                   |
-| `indicator` | `variant: 'label'` (`label: string`)            | `band`                           | Value-only rows (for example `50 GP value`) with no control |
-| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)            |
+| Kind        | Type contract                                                                         | Cell                             | Use                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
+| `action`    | `content: ReactElement`, optional `meta`                                              | `band`                           | Labeled commit — Add, Select, Edit, Release                                                  |
+| `utility`   | `content: ReactElement`, optional `meta`                                              | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit                                           |
+| `indicator` | `variant: 'chevron'`, optional `meta`                                                 | `full`                           | Destination chevrons                                                                         |
+| `indicator` | `variant: 'quantity'`, `format` `compact` \| `label` \| `additional`, optional `meta` | `band`                           | `compact` is `×N` and `label` is `Qty N` (hidden at 1). `additional` is `+N`, including `+1` |
+| `indicator` | `variant: 'label'` (`label: string`)                                                  | `band`                           | Value-only rows (for example `50 GP value`) with no control                                  |
+| `group`     | `primary: ReactElement`, structured `secondary`                                       | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)                                             |
 
 `utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
 A 36px stepper in a compact row grows the row through the slack gutters; heading and

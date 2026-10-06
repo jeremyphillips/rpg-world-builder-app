@@ -23,6 +23,8 @@ export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
   allowZeroQuantity?: boolean
   detailLabelOverride?: string
+  /** Package and generic-grant quantity outside this purchase stepper. */
+  otherSourceQuantity?: number
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
@@ -85,6 +87,7 @@ function InventoryRowStepper({
   show,
   removeViaStepper,
   allowZeroQuantity = false,
+  otherSourceQuantity = 0,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: {
@@ -92,6 +95,7 @@ function InventoryRowStepper({
   show: boolean
   removeViaStepper: boolean
   allowZeroQuantity?: boolean
+  otherSourceQuantity?: number
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }) {
@@ -105,6 +109,7 @@ function InventoryRowStepper({
     <EquipmentInventoryQuantityControl
       row={row}
       allowZeroQuantity={allowZeroQuantity}
+      otherSourceQuantity={otherSourceQuantity}
       onSetPurchaseQuantity={onSetPurchaseQuantity}
       onRemove={removeThroughStepper && onRemoveItem ? () => onRemoveItem(removeTarget) : undefined}
       removeAriaLabel={removeThroughStepper ? row.removeLabel : undefined}
@@ -145,10 +150,17 @@ function InventoryRowStandaloneRemove({
 function resolveInventoryRowActions(args: {
   row: EquipmentInventoryRow
   allowZeroQuantity?: boolean
+  otherSourceQuantity?: number
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }) {
-  const { row, allowZeroQuantity = false, onRemoveItem, onSetPurchaseQuantity } = args
+  const {
+    row,
+    allowZeroQuantity = false,
+    otherSourceQuantity = 0,
+    onRemoveItem,
+    onSetPurchaseQuantity,
+  } = args
   const visibility = resolveInventoryRowActionVisibility(row, onRemoveItem)
   if (!hasInventoryRowActions(visibility)) return null
 
@@ -159,6 +171,7 @@ function resolveInventoryRowActions(args: {
         show={visibility.showStepper}
         removeViaStepper={visibility.removeViaStepper}
         allowZeroQuantity={allowZeroQuantity}
+        otherSourceQuantity={otherSourceQuantity}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
       />
@@ -199,6 +212,7 @@ export function EquipmentInventoryRowItem({
   display,
   allowZeroQuantity = false,
   detailLabelOverride,
+  otherSourceQuantity = 0,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
@@ -209,6 +223,7 @@ export function EquipmentInventoryRowItem({
     const actions = resolveInventoryRowActions({
       row,
       allowZeroQuantity,
+      otherSourceQuantity,
       onRemoveItem,
       onSetPurchaseQuantity,
     })
@@ -232,6 +247,7 @@ export function EquipmentInventoryRowItem({
     ? resolveInventoryRowActions({
         row: actionsRow,
         allowZeroQuantity,
+        otherSourceQuantity,
         onRemoveItem,
         onSetPurchaseQuantity,
       })

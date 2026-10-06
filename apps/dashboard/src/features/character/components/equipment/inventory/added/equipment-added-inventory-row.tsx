@@ -130,7 +130,7 @@ function ManagedInventoryRow({
         kind: 'indicator',
         variant: 'quantity',
         quantity: totalQuantity,
-        format: 'label',
+        format: entry.otherSourceQuantity > 0 ? 'additional' : 'label',
         meta: entry.provenanceLabel,
       }}
       collapsed={!isOpen}
@@ -183,6 +183,7 @@ export function EquipmentAddedInventoryRowItem({
       <EquipmentInventoryRowItem
         display={display}
         detailLabelOverride={entry.provenanceLabel}
+        otherSourceQuantity={entry.otherSourceQuantity}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
       />

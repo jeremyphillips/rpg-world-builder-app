@@ -19,18 +19,28 @@ type EntityAnatomyTrailingCellsProps = {
   trailing?: EntityAnatomyTrailing
 }
 
+function quantityIndicatorText(
+  quantity: number,
+  format: 'compact' | 'label' | 'additional',
+): string | null {
+  if (format === 'additional') return quantity >= 1 ? `+${quantity}` : null
+  if (quantity <= 1) return null
+  return format === 'label' ? `Qty ${quantity}` : `×${quantity}`
+}
+
 function EntityAnatomyTrailingQuantityLabel({
   quantity,
   format = 'compact',
 }: {
   quantity: number
-  format?: 'compact' | 'label'
+  format?: 'compact' | 'label' | 'additional'
 }) {
-  if (quantity <= 1) return null
+  const label = quantityIndicatorText(quantity, format)
+  if (!label) return null
 
   return (
     <Text as="span" variant="muted" className={entityAnatomyTrailingQuantityLabelVariants()}>
-      {format === 'label' ? `Qty ${quantity}` : `×${quantity}`}
+      {label}
     </Text>
   )
 }

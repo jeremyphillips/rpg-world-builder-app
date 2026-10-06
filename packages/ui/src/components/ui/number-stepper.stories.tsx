@@ -58,6 +58,11 @@ export const CompactBorderless: Story = {
   args: { size: 'sm', bordered: false },
 }
 
+/** Leading plus for a purchase stacked on another source. The input value stays numeric. */
+export const AdditionalQuantity: Story = {
+  args: { valuePrefix: '+' },
+}
+
 export const SingleDigit: Story = {
   args: { digits: 1, min: 1, max: 9 },
 }

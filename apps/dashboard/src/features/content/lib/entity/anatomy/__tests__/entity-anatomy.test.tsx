@@ -130,6 +130,13 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(screen.getByText('×3')).toHaveClass('text-sm')
   })
 
+  it('renders an additional quantity including one', () => {
+    renderAnatomy({
+      trailing: { kind: 'indicator', variant: 'quantity', quantity: 1, format: 'additional' },
+    })
+    expect(screen.getByText('+1')).toBeInTheDocument()
+  })
+
   it('splits group into a band primary and a meta secondary', () => {
     const { slot } = renderAnatomy({
       trailing: {

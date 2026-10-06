@@ -3,6 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   numberStepperButtonVariants,
   numberStepperRootVariants,
+  numberStepperPrefixedInputSlotWidthClasses,
+  numberStepperPrefixedValueSlotWidthPx,
+  numberStepperPrefixedWidthVariants,
+  numberStepperValuePrefixExtraPx,
   numberStepperValueSlotWidthPx,
   numberStepperWidthVariants,
   resolveNumberStepperSize,
@@ -22,6 +26,16 @@ describe('numberStepperWidthVariants', () => {
     )
     expect(numberStepperWidthVariants.lg[5]).toBe(
       `w-[calc(${numberStepperValueSlotWidthPx.lg[5]}px+4rem)]`,
+    )
+  })
+
+  it('widens the value slot when a plus prefix is shown', () => {
+    expect(numberStepperPrefixedValueSlotWidthPx.md[2]).toBe(
+      numberStepperValueSlotWidthPx.md[2] + numberStepperValuePrefixExtraPx,
+    )
+    expect(numberStepperPrefixedInputSlotWidthClasses.md[2]).toContain('w-[48px]')
+    expect(numberStepperPrefixedWidthVariants.md[2]).toBe(
+      `w-[calc(${numberStepperPrefixedValueSlotWidthPx.md[2]}px+4rem)]`,
     )
   })
 

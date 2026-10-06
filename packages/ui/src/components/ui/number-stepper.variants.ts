@@ -152,6 +152,83 @@ export const numberStepperWidthVariants = {
   lg: numberStepperWidthsForSize('lg', sideButtonWidthFourRem),
 } as const satisfies Record<NumberStepperSize, Record<1 | 2 | 3 | 4 | 5, string>>
 
+/** Extra border-box width so a leading `+` adornment does not clip the digits. */
+export const numberStepperValuePrefixExtraPx = 12
+
+export const numberStepperPrefixedValueSlotWidthPx = {
+  xs: { 1: 38, 2: 42, 3: 48, 4: 54, 5: 60 },
+  sm: { 1: 40, 2: 44, 3: 50, 4: 56, 5: 62 },
+  md: { 1: 42, 2: 48, 3: 54, 4: 60, 5: 66 },
+  lg: { 1: 44, 2: 52, 3: 58, 4: 64, 5: 70 },
+} as const satisfies Record<NumberStepperSize, Record<1 | 2 | 3 | 4 | 5, number>>
+
+/** Prefixed value-slot width. Literal classes so Tailwind can scan them. */
+export const numberStepperPrefixedInputSlotWidthClasses = {
+  xs: {
+    1: 'box-border w-[38px] min-w-[38px] max-w-[38px]',
+    2: 'box-border w-[42px] min-w-[42px] max-w-[42px]',
+    3: 'box-border w-[48px] min-w-[48px] max-w-[48px]',
+    4: 'box-border w-[54px] min-w-[54px] max-w-[54px]',
+    5: 'box-border w-[60px] min-w-[60px] max-w-[60px]',
+  },
+  sm: {
+    1: 'box-border w-[40px] min-w-[40px] max-w-[40px]',
+    2: 'box-border w-[44px] min-w-[44px] max-w-[44px]',
+    3: 'box-border w-[50px] min-w-[50px] max-w-[50px]',
+    4: 'box-border w-[56px] min-w-[56px] max-w-[56px]',
+    5: 'box-border w-[62px] min-w-[62px] max-w-[62px]',
+  },
+  md: {
+    1: 'box-border w-[42px] min-w-[42px] max-w-[42px]',
+    2: 'box-border w-[48px] min-w-[48px] max-w-[48px]',
+    3: 'box-border w-[54px] min-w-[54px] max-w-[54px]',
+    4: 'box-border w-[60px] min-w-[60px] max-w-[60px]',
+    5: 'box-border w-[66px] min-w-[66px] max-w-[66px]',
+  },
+  lg: {
+    1: 'box-border w-[44px] min-w-[44px] max-w-[44px]',
+    2: 'box-border w-[52px] min-w-[52px] max-w-[52px]',
+    3: 'box-border w-[58px] min-w-[58px] max-w-[58px]',
+    4: 'box-border w-[64px] min-w-[64px] max-w-[64px]',
+    5: 'box-border w-[70px] min-w-[70px] max-w-[70px]',
+  },
+} as const satisfies Record<NumberStepperSize, Record<1 | 2 | 3 | 4 | 5, string>>
+
+function numberStepperPrefixedWidthsForSize(size: NumberStepperSize, sideButtonsRem: string) {
+  const slots = numberStepperPrefixedValueSlotWidthPx[size]
+  return {
+    1: numberStepperRootWidth(slots[1], sideButtonsRem),
+    2: numberStepperRootWidth(slots[2], sideButtonsRem),
+    3: numberStepperRootWidth(slots[3], sideButtonsRem),
+    4: numberStepperRootWidth(slots[4], sideButtonsRem),
+    5: numberStepperRootWidth(slots[5], sideButtonsRem),
+  } as const
+}
+
+export const numberStepperPrefixedWidthVariants = {
+  xs: numberStepperPrefixedWidthsForSize('xs', sideButtonWidthThreeRem),
+  sm: numberStepperPrefixedWidthsForSize('sm', sideButtonWidthFourRem),
+  md: numberStepperPrefixedWidthsForSize('md', sideButtonWidthFourRem),
+  lg: numberStepperPrefixedWidthsForSize('lg', sideButtonWidthFourRem),
+} as const satisfies Record<NumberStepperSize, Record<1 | 2 | 3 | 4 | 5, string>>
+
+export function numberStepperRootWidthClass(
+  size: NumberStepperSize,
+  digits: NumberStepperDigits,
+  valuePrefix?: '+',
+): string {
+  const widths = valuePrefix ? numberStepperPrefixedWidthVariants : numberStepperWidthVariants
+  return widths[size][digits]
+}
+
+export const numberStepperValuePrefixVariants = cva('pointer-events-none shrink-0 tabular-nums')
+
+export const numberStepperPrefixedSlotVariants = cva('flex items-center justify-center')
+
+export const numberStepperPrefixedInputVariants = cva(
+  'min-w-0 flex-1 border-0 bg-transparent p-0 text-center text-inherit outline-none [appearance:textfield] focus-visible:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+)
+
 export type NumberStepperDigits = keyof (typeof numberStepperWidthVariants)['md']
 
 export type NumberStepperVariantProps = VariantProps<typeof numberStepperRootVariants>

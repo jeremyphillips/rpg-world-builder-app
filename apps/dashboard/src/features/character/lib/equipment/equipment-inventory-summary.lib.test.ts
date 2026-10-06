@@ -7,10 +7,12 @@ import {
   equipmentStepBardClassFixture,
   equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepDaggerFixture,
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
   equipmentStepRationsFixture,
+  equipmentStepSpearFixture,
   createEquipmentStepContextWithMagicItemGrantsFixture,
 } from './equipment-step.fixtures'
 import type { EquipmentInventoryRow } from './equipment-step.lib'
@@ -411,5 +413,155 @@ describe('equipment-inventory-summary.lib', () => {
     expect(viewModel?.layout).toBe('pending')
     expect(viewModel?.addedEquipment.flatMap((group) => group.entries)).toHaveLength(1)
     expect(viewModel?.addedEquipment[0]?.entries[0]?.equipmentName).toBe('Rations')
+    expect(viewModel?.addedEquipment[0]?.entries[0]?.otherSources).toEqual([])
+    expect(viewModel?.addedEquipment[0]?.entries[0]?.otherSourceQuantity).toBe(0)
+  })
+
+  it('records package overlap on an added dagger purchase', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepDaggerFixture.id,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        classPackage: {
+          state: 'selected' as const,
+          packageId: 'standard-equipment',
+          intent: 'explicit' as const,
+          overrides: { entryQuantities: { dagger: 2 } },
+        },
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const viewModel = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
+    const dagger = viewModel?.addedEquipment
+      .flatMap((group) => group.entries)
+      .find((entry) => entry.equipmentId === equipmentStepDaggerFixture.id)
+
+    expect(dagger?.provenanceLabel).toBe('Package ×2 · Purchased · 4 GP')
+    expect(dagger?.otherSourceQuantity).toBe(2)
+    expect(dagger?.otherSources).toEqual([{ kind: 'package', quantity: 2 }])
+    expect(dagger?.totalQuantity).toBe(2)
+  })
+
+  it('records an additional grant and omits an ensure grant the package covers', () => {
+    const additionalDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepRationsFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        grants: [
+          {
+            equipmentId: equipmentStepRationsFixture.id,
+            quantity: 1,
+            contribution: 'additional' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+    const additional = buildEquipmentInventoryViewModel(
+      additionalDraft,
+      equipmentStepCatalogIndexFixture,
+    )
+      ?.addedEquipment.flatMap((group) => group.entries)
+      .find((entry) => entry.equipmentId === equipmentStepRationsFixture.id)
+
+    expect(additional?.otherSources).toEqual([{ kind: 'grant', quantity: 1 }])
+    expect(additional?.provenanceLabel.startsWith('Grant ×1')).toBe(true)
+
+    const coveredDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepSpearFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        grants: [
+          {
+            equipmentId: equipmentStepSpearFixture.id,
+            quantity: 1,
+            contribution: 'ensure' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+    const covered = buildEquipmentInventoryViewModel(coveredDraft, equipmentStepCatalogIndexFixture)
+      ?.addedEquipment.flatMap((group) => group.entries)
+      .find((entry) => entry.equipmentId === equipmentStepSpearFixture.id)
+
+    expect(covered?.otherSources).toEqual([{ kind: 'package', quantity: 1 }])
+    expect(covered?.provenanceLabel.includes('Grant')).toBe(false)
+    expect(covered?.provenanceLabel.startsWith('Package ×1')).toBe(true)
+  })
+
+  it('produces no other sources on the gold path', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepDaggerFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        grants: [
+          {
+            equipmentId: equipmentStepDaggerFixture.id,
+            quantity: 1,
+            contribution: 'additional' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const dagger = buildEquipmentInventoryViewModel(draft, equipmentStepCatalogIndexFixture)
+      ?.addedEquipment.flatMap((group) => group.entries)
+      .find((entry) => entry.equipmentId === equipmentStepDaggerFixture.id)
+
+    expect(dagger?.otherSources).toEqual([])
+    expect(dagger?.otherSourceQuantity).toBe(0)
+    expect(dagger?.provenanceLabel.includes('Grant')).toBe(false)
+    expect(dagger?.provenanceLabel.includes('Package')).toBe(false)
   })
 })

@@ -22,7 +22,8 @@ export type EntityAnatomyTrailingIndicator =
       kind: 'indicator'
       variant: 'quantity'
       quantity: number
-      format?: 'compact' | 'label'
+      /** `compact` is `×N`, `label` is `Qty N` (both hidden at 1). `additional` is `+N`, including `+1`. */
+      format?: 'compact' | 'label' | 'additional'
       /** Muted text rendered before the quantity label in the same cell. */
       meta?: string
     }

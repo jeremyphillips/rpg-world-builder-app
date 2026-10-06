@@ -1,4 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { useState } from 'react'
+
+import { Text } from '@rpg/ui'
 
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
@@ -55,6 +58,39 @@ const meta = {
 
 export default meta
 type Story = StoryObj<typeof meta>
+
+export const AdditionalPurchase: Story = {
+  tags: ['storybook-test-runner-skip'],
+  args: {
+    display: { kind: 'single', row: editableStartingGoldRow },
+    detailLabelOverride: 'Package ×2 · Purchased · 4 GP',
+    otherSourceQuantity: 2,
+  },
+  render: function AdditionalPurchaseStory(args) {
+    const [quantity, setQuantity] = useState(2)
+    if (quantity < 1) {
+      return <Text variant="muted">Purchase removed. The package contribution stays.</Text>
+    }
+
+    const baseRow = args.display.kind === 'single' ? args.display.row : editableStartingGoldRow
+    return (
+      <EquipmentInventoryRowItem
+        {...args}
+        display={{
+          kind: 'single',
+          row: {
+            ...baseRow,
+            equipmentName: 'Dagger',
+            entry: { ...baseRow.entry, quantity },
+            removeLabel: 'Remove Dagger',
+          },
+        }}
+        onSetPurchaseQuantity={(_target, next) => setQuantity(next)}
+        onRemoveItem={() => setQuantity(0)}
+      />
+    )
+  },
+}
 
 export const EditableStartingGold: Story = {
   tags: ['storybook-test-runner-skip'],

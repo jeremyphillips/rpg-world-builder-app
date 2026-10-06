@@ -14,6 +14,7 @@ import {
   equipmentStepBardClassFixture,
   equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
+  equipmentStepDaggerFixture,
   equipmentStepContextFixture,
   equipmentStepLeatherArmorFixture,
   equipmentStepMonkClassFixture,
@@ -179,7 +180,7 @@ describe('EquipmentInventorySummary', () => {
     )
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
-    expect(screen.getByText('2 purchased for 1 GP')).toBeInTheDocument()
+    expect(screen.getByText('Purchased · 1 GP')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove all 2 Rations' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Decrease Rations quantity' })).toBeInTheDocument()
 
@@ -421,6 +422,40 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
     expect(container.querySelector('article.bg-card')).toBeInTheDocument()
+  })
+
+  it('counts only added purchases in the title badge when a package also provides the item', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['standard-equipment'],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepDaggerFixture.id,
+            quantity: 2,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    render(
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={equipmentStepCatalogIndexFixture}
+        {...inventoryManagementProps}
+      />,
+    )
+
+    const header = screen.getByRole('heading', { name: 'Added Equipment' }).parentElement
+    expect(header).toHaveTextContent('2')
+    expect(screen.queryByText('7')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

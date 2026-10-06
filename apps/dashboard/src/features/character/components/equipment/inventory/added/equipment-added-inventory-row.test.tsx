@@ -46,6 +46,8 @@ function entry(
     groupLabel: rows[0]!.groupLabel,
     totalQuantity: rows.reduce((sum, row) => sum + row.entry.quantity, 0),
     sources: [],
+    otherSources: [],
+    otherSourceQuantity: 0,
     provenanceLabel: '2 Common choices',
     advisoryStatusItems: [],
     rows,
@@ -162,6 +164,22 @@ describe('EquipmentAddedInventoryRowItem', () => {
     expect(screen.getByRole('button', { name: 'Expand Potion of Healing' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Release' })).not.toBeInTheDocument()
+  })
+
+  it('shows an additional quantity when other sources contribute to a managed row', () => {
+    render(
+      <EquipmentAddedInventoryRowItem
+        entry={entry([grantRow], {
+          otherSources: [{ kind: 'package', quantity: 2 }],
+          otherSourceQuantity: 2,
+          provenanceLabel: 'Package ×2 · 2 Common choices',
+        })}
+        {...defaultProps}
+      />,
+    )
+
+    expect(screen.getByText('+2')).toBeInTheDocument()
+    expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

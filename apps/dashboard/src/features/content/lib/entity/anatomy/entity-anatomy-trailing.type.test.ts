@@ -29,6 +29,12 @@ describe('entity item trailing closed API', () => {
     >()
   })
 
+  it('quantity indicator format includes additional', () => {
+    expectTypeOf<
+      Extract<EntityAnatomyTrailing, { kind: 'indicator'; variant: 'quantity' }>['format']
+    >().toEqualTypeOf<'compact' | 'label' | 'additional' | undefined>()
+  })
+
   it('label indicator carries a string label', () => {
     expectTypeOf<
       Extract<EntityAnatomyTrailing, { kind: 'indicator'; variant: 'label' }>['label']

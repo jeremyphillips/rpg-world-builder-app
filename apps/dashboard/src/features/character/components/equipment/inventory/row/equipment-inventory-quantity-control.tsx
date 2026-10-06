@@ -14,14 +14,21 @@ import { equipmentInventoryRowQuantityClasses } from '../equipment-inventory.var
 export type EquipmentInventoryQuantityControlProps = {
   row: EquipmentInventoryRow
   allowZeroQuantity?: boolean
+  otherSourceQuantity?: number
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
   onRemove?: () => void
   removeAriaLabel?: string
 }
 
+function inventoryQuantityAriaLabel(equipmentName: string, otherSourceQuantity: number): string {
+  if (otherSourceQuantity <= 0) return `${equipmentName} quantity`
+  return `Additional ${equipmentName} purchased, ${otherSourceQuantity} from other sources`
+}
+
 export function EquipmentInventoryQuantityControl({
   row,
   allowZeroQuantity = false,
+  otherSourceQuantity = 0,
   onSetPurchaseQuantity,
   onRemove,
   removeAriaLabel,
@@ -40,7 +47,8 @@ export function EquipmentInventoryQuantityControl({
   return (
     <div className={equipmentInventoryRowQuantityClasses}>
       <NumberStepper
-        aria-label={`${row.equipmentName} quantity`}
+        aria-label={inventoryQuantityAriaLabel(row.equipmentName, otherSourceQuantity)}
+        valuePrefix={otherSourceQuantity > 0 ? '+' : undefined}
         bordered={true}
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={minQuantity}

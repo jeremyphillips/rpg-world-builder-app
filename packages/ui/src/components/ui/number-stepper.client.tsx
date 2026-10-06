@@ -1,37 +1,97 @@
 'use client'
 
 import * as React from 'react'
-import { Minus, Plus } from 'lucide-react'
 
 import { useFieldControlSize } from '../../form/context/form-section.context'
 import { cn } from '../../lib/utils'
-import { ActionIcon } from './action-icon.client'
-import { buildStepOptions, normalizeInputValue, stepNumber } from './number-input.lib'
-import { useNumberInput } from './number-input.use.client'
 import {
-  resolveNumberStepperActions,
-  type NumberStepperMinAction,
-} from './number-stepper-min-action.lib'
+  NumberStepperDecreaseButton,
+  NumberStepperIncreaseButton,
+} from './number-stepper-controls.client'
+import type { NumberStepperMinAction } from './number-stepper-min-action.lib'
+import { useNumberStepperInteraction } from './number-stepper.use.client'
 import {
-  numberStepperButtonVariants,
-  numberStepperInputSlotWidthClasses,
-  numberStepperInputVariants,
   numberStepperRootVariants,
-  numberStepperWidthVariants,
+  numberStepperRootWidthClass,
   resolveNumberStepperSize,
   type NumberStepperDigits,
-  type NumberStepperSize,
   type NumberStepperVariantProps,
 } from './number-stepper.variants'
-import type { IconGlyphStep } from './icon-glyph.variants'
+import type { NumberInputFieldBinding } from './number-input.lib'
+import {
+  numberStepperInputSlotWidthClasses,
+  numberStepperInputVariants,
+  numberStepperPrefixedInputSlotWidthClasses,
+  numberStepperPrefixedInputVariants,
+  numberStepperPrefixedSlotVariants,
+  numberStepperValuePrefixVariants,
+  type NumberStepperSize,
+} from './number-stepper.variants'
 
-function resolveNumberStepperLeftIconStep(size: NumberStepperSize): IconGlyphStep {
-  if (size === 'xs' || size === 'sm') return 'sm'
-  return 'md'
+function NumberStepperValueSlot({
+  valuePrefix,
+  resolvedSize,
+  digits,
+  stepperLocked,
+  inputRef,
+  fieldBinding,
+  ariaLabel,
+  autoFocus,
+  onBlur,
+  onChange,
+}: {
+  valuePrefix?: '+'
+  resolvedSize: NumberStepperSize
+  digits: NumberStepperDigits
+  stepperLocked: boolean
+  inputRef: React.Ref<HTMLInputElement>
+  fieldBinding: NumberInputFieldBinding
+  ariaLabel: string
+  autoFocus?: boolean
+  onBlur?: React.FocusEventHandler<HTMLInputElement>
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+}) {
+  const inputProps = {
+    ...fieldBinding,
+    ref: inputRef,
+    type: 'number' as const,
+    inputMode: 'numeric' as const,
+    'aria-label': ariaLabel,
+    disabled: stepperLocked,
+    readOnly: stepperLocked,
+    tabIndex: stepperLocked ? (-1 as const) : undefined,
+    autoFocus: stepperLocked ? undefined : autoFocus,
+    onBlur,
+    onChange,
+  }
+
+  if (!valuePrefix) {
+    return (
+      <input
+        {...inputProps}
+        className={cn(
+          numberStepperInputVariants({ size: resolvedSize, locked: stepperLocked }),
+          numberStepperInputSlotWidthClasses[resolvedSize][digits],
+        )}
+      />
+    )
+  }
+
+  return (
+    <div
+      className={cn(
+        numberStepperInputVariants({ size: resolvedSize, locked: stepperLocked }),
+        numberStepperPrefixedInputSlotWidthClasses[resolvedSize][digits],
+        numberStepperPrefixedSlotVariants(),
+      )}
+    >
+      <span aria-hidden className={numberStepperValuePrefixVariants()}>
+        {valuePrefix}
+      </span>
+      <input {...inputProps} className={numberStepperPrefixedInputVariants()} />
+    </div>
+  )
 }
-
-const DECREASE_LABEL_PREFIX = 'Decrease'
-const INCREASE_LABEL_PREFIX = 'Increase'
 
 export type { NumberStepperMinAction }
 
@@ -44,6 +104,8 @@ export interface NumberStepperProps extends NumberStepperVariantProps {
   digits?: NumberStepperDigits
   disabled?: boolean
   minAction?: NumberStepperMinAction
+  /** Visual adornment inside the value slot. The input value stays the plain number. */
+  valuePrefix?: '+'
   className?: string
   'aria-label': string
   autoFocus?: boolean
@@ -61,6 +123,7 @@ export function NumberStepper({
   bordered = true,
   disabled = false,
   minAction,
+  valuePrefix,
   className,
   'aria-label': ariaLabel,
   autoFocus,
@@ -68,129 +131,56 @@ export function NumberStepper({
 }: NumberStepperProps) {
   const fieldSize = useFieldControlSize()
   const resolvedSize = resolveNumberStepperSize(size, fieldSize)
-  const stepOptions = React.useMemo(
-    () => buildStepOptions(step, min, max, min, max, false),
-    [max, min, step],
-  )
-  const numericValue = Number(normalizeInputValue(value))
-  const resolvedValue = Number.isFinite(numericValue) ? numericValue : min
-
-  const handleChange = React.useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const next = Number(event.target.value)
-      onChange(Number.isFinite(next) ? next : min)
-    },
-    [min, onChange],
-  )
-
-  const {
-    inputRef,
-    fieldBinding,
-    incrementDisabled,
-    onChange: handleInputChange,
-  } = useNumberInput({
-    disabled,
+  const interaction = useNumberStepperInteraction({
+    value,
+    onChange,
     min,
     max,
     step,
-    stepperMin: min,
-    stepperMax: max,
-    value,
-    onChange: handleChange,
-  })
-
-  const handleBump = React.useCallback(
-    (direction: 'up' | 'down') => {
-      if (disabled) return
-      const next = stepNumber(resolvedValue, direction, stepOptions)
-      onChange(next)
-    },
-    [disabled, onChange, resolvedValue, stepOptions],
-  )
-
-  const decreaseLabel = `${DECREASE_LABEL_PREFIX} ${ariaLabel}`
-  const increaseLabel = `${INCREASE_LABEL_PREFIX} ${ariaLabel}`
-
-  const minMode = minAction?.mode ?? 'disable'
-  const showRemoveAtMin = minMode === 'remove' && resolvedValue === min
-
-  const { canRemoveAtMin, leftDisabled, stepperLocked } = resolveNumberStepperActions({
-    minAction,
-    min,
-    max,
-    value: resolvedValue,
     disabled,
+    minAction,
+    ariaLabel,
   })
-
-  const leftAriaLabel =
-    showRemoveAtMin && minAction?.mode === 'remove' ? minAction.removeAriaLabel : decreaseLabel
-
-  const handleLeftClick = React.useCallback(() => {
-    if (canRemoveAtMin && minAction?.mode === 'remove') {
-      minAction.onRemove()
-      return
-    }
-    handleBump('down')
-  }, [canRemoveAtMin, handleBump, minAction])
-
-  const incrementButtonDisabled = disabled || incrementDisabled
 
   return (
     <div
       className={cn(
-        numberStepperRootVariants({ size: resolvedSize, bordered, locked: stepperLocked }),
-        numberStepperWidthVariants[resolvedSize][digits],
+        numberStepperRootVariants({
+          size: resolvedSize,
+          bordered,
+          locked: interaction.stepperLocked,
+        }),
+        numberStepperRootWidthClass(resolvedSize, digits, valuePrefix),
         className,
       )}
     >
-      <button
-        type="button"
-        tabIndex={-1}
-        disabled={leftDisabled}
-        aria-label={leftAriaLabel}
-        className={numberStepperButtonVariants({
-          size: resolvedSize,
-          minBoundary: showRemoveAtMin ? 'remove' : 'default',
-        })}
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={handleLeftClick}
-      >
-        {showRemoveAtMin ? (
-          <ActionIcon action="remove" step={resolveNumberStepperLeftIconStep(resolvedSize)} />
-        ) : (
-          <Minus aria-hidden />
-        )}
-      </button>
-
-      <input
-        {...fieldBinding}
-        ref={inputRef}
-        type="number"
-        inputMode="numeric"
-        aria-label={ariaLabel}
-        disabled={stepperLocked}
-        readOnly={stepperLocked}
-        tabIndex={stepperLocked ? -1 : undefined}
-        autoFocus={stepperLocked ? undefined : autoFocus}
-        onBlur={onBlur}
-        onChange={handleInputChange}
-        className={cn(
-          numberStepperInputVariants({ size: resolvedSize, locked: stepperLocked }),
-          numberStepperInputSlotWidthClasses[resolvedSize][digits],
-        )}
+      <NumberStepperDecreaseButton
+        resolvedSize={resolvedSize}
+        showRemoveAtMin={interaction.showRemoveAtMin}
+        leftDisabled={interaction.leftDisabled}
+        leftAriaLabel={interaction.leftAriaLabel}
+        onClick={interaction.handleLeftClick}
       />
 
-      <button
-        type="button"
-        tabIndex={-1}
-        disabled={incrementButtonDisabled}
-        aria-label={increaseLabel}
-        className={numberStepperButtonVariants({ size: resolvedSize, minBoundary: 'default' })}
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={() => handleBump('up')}
-      >
-        <Plus aria-hidden />
-      </button>
+      <NumberStepperValueSlot
+        valuePrefix={valuePrefix}
+        resolvedSize={resolvedSize}
+        digits={digits}
+        stepperLocked={interaction.stepperLocked}
+        inputRef={interaction.inputRef}
+        fieldBinding={interaction.fieldBinding}
+        ariaLabel={ariaLabel}
+        autoFocus={autoFocus}
+        onBlur={onBlur}
+        onChange={interaction.handleInputChange}
+      />
+
+      <NumberStepperIncreaseButton
+        resolvedSize={resolvedSize}
+        disabled={interaction.incrementDisabled}
+        ariaLabel={interaction.increaseLabel}
+        onClick={() => interaction.handleBump('up')}
+      />
     </div>
   )
 }

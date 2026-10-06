@@ -36,6 +36,26 @@ describe('NumberStepper', () => {
     expect(screen.getByLabelText('Decrease Quantity')).not.toBeDisabled()
   })
 
+  it('renders a visual plus prefix while the input keeps the plain number', () => {
+    const { container } = render(
+      <NumberStepper
+        aria-label="Quantity"
+        value={2}
+        valuePrefix="+"
+        min={1}
+        max={20}
+        onChange={() => undefined}
+      />,
+    )
+
+    const input = screen.getByLabelText('Quantity')
+    expect(input).toHaveAttribute('type', 'number')
+    expect(input).toHaveValue(2)
+    expect(screen.getByText('+')).toBeInTheDocument()
+    expect(input).not.toHaveClass('w-[36px]')
+    expect(container.firstElementChild).toHaveClass('w-[calc(48px+4rem)]')
+  })
+
   it('renders the current value with foreground text in the digit slot', () => {
     render(<Harness initial={12} />)
     const input = screen.getByLabelText('Quantity')

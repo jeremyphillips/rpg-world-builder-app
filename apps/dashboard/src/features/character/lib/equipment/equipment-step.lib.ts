@@ -91,6 +91,18 @@ export const EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE =
 
 export const EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL = 'Pending purchase'
 
+export const EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL = 'Package'
+
+/**
+ * Generic `{ kind: 'grant' }` sources have no origin (species, background, feat,
+ * homebrew), so they render as `Grant ×N` until sources carry detailed provenance.
+ */
+export const EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL = 'Grant'
+
+export function formatEquipmentInventorySourceQuantity(label: string, quantity: number): string {
+  return `${label} ×${quantity}`
+}
+
 export const EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING = 'Choose a class to set your starting equipment'
 
 export const EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION =

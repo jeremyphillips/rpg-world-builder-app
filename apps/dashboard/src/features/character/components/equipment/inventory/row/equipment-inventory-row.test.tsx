@@ -176,6 +176,85 @@ describe('EquipmentInventoryRowItem', () => {
     expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(0)
   })
 
+  it('renders a plus prefix when another source already provides the item', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Dagger',
+            entry: { ...editableStackableRow.entry, quantity: 2 },
+          },
+        }}
+        otherSourceQuantity={2}
+        detailLabelOverride="Package ×2 · Purchased · 4 GP"
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('+')).toBeInTheDocument()
+    expect(
+      screen.getByRole('spinbutton', {
+        name: 'Additional Dagger purchased, 2 from other sources',
+      }),
+    ).toHaveValue(2)
+    expect(screen.getByText('Package ×2 · Purchased · 4 GP')).toBeInTheDocument()
+  })
+
+  it('renders a plain quantity when the purchase is the only source', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Amulet',
+            entry: { ...editableStackableRow.entry, quantity: 1 },
+            removeLabel: 'Remove Amulet',
+          },
+        }}
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('spinbutton', { name: 'Amulet quantity' })).toHaveValue(1)
+    expect(screen.queryByText('+')).not.toBeInTheDocument()
+  })
+
+  it('removes only the purchase when trash is used on a plus-one row', async () => {
+    const onRemoveItem = vi.fn()
+    const onSetPurchaseQuantity = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Dagger',
+            entry: { ...editableStackableRow.entry, quantity: 1 },
+            removeLabel: 'Remove Dagger',
+          },
+        }}
+        otherSourceQuantity={2}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onRemoveItem={onRemoveItem}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Remove Dagger' }))
+
+    expect(onRemoveItem).toHaveBeenCalledWith({
+      kind: 'purchase',
+      purchaseId: 'purchase-row-test-0',
+    })
+    expect(onSetPurchaseQuantity).not.toHaveBeenCalled()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentInventoryRowItem

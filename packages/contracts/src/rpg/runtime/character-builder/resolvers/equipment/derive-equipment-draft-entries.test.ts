@@ -15,6 +15,7 @@ import {
   deriveEquipmentDraftEntries,
   inventoryQuantityForEquipmentId,
   resolveEffectiveStartingEquipmentPackageItems,
+  resolveGenericEquipmentGrantQuantities,
   startingEquipmentPackageItemKey,
 } from './derive-equipment-draft-entries'
 
@@ -524,6 +525,69 @@ describe('deriveEquipmentDraftEntries', () => {
 
     expect(owned(1)).toBe(9)
     expect(owned(2)).toBe(10)
+  })
+
+  it('reports additional grant quantity and omits an ensure grant the package covers', () => {
+    const packedClass: ClassStored = {
+      ...storedDruid,
+      id: `${RULESET}:grant-delta-druid`,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  id: 'leather-armor',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+                  quantity: 1,
+                  equipped: true,
+                },
+              ],
+              wealth: { gp: 0 },
+            },
+          ],
+        },
+      },
+    }
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [packedClass],
+      spells: [],
+      equipment: [leatherArmor],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    function quantities(contribution: 'additional' | 'ensure', grantQuantity: number) {
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: packedClass.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(packedClass.id)]: ['standard-equipment'],
+        },
+        equipment: {
+          mode: 'package' as const,
+          purchases: [],
+          grants: [
+            {
+              equipmentId: leatherArmor.id,
+              quantity: grantQuantity,
+              contribution,
+            },
+          ],
+          editedSincePackageSelection: false,
+        },
+      }
+      return resolveGenericEquipmentGrantQuantities(draft, catalogIndex)
+    }
+
+    expect(quantities('additional', 1).get(leatherArmor.id)).toBe(1)
+    expect(quantities('ensure', 1).has(leatherArmor.id)).toBe(false)
   })
 
   it('omits a package entry at quantity 0 and keeps additional grants when declined', () => {

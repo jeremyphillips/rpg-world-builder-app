@@ -99,10 +99,25 @@ same trailing slot (`7 total · 5 included · 2 purchased`).
 | Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows         |
 | Package grant (any qty)                                        | Value label in the trailing cell; qty 2+ shows read-only `Qty N`; no remove |
 
+### Overlapping sources
+
+When an Added Equipment purchase is the same item as the Starting Package or a generic grant, the stepper still edits only that purchase.
+
+- A purchase that is the whole owned quantity renders as a plain number (`1`). When another source contributes, it renders `+N`.
+- Provenance lists other sources first, then Added parts: `Package ×2 · Grant ×1 · 1 Common choice · Purchased · 4 GP`.
+- On stepper rows the purchase part is always `Purchased · {total}`. Locked quantities keep `N purchased for {total}`.
+- Trash at the minimum removes only the purchase. Package and grant contributions stay.
+- The Added Equipment count counts Added contributions only. Magic-item choices (`1 Common choice`) are Added contributions, not other sources.
+- Gold-option and pending layouts do not attach package or grant other sources.
+
 ### Deferred
 
 The **Equipped** badge was removed from cart rows and should be reimplemented
 later. `entry.equipped` is still stored on the draft.
+
+Generic `{ kind: 'grant' }` sources have no origin (species, background, feat, or homebrew), so they render as `Grant ×N` until sources carry detailed provenance.
+
+An `ensure` grant that a purchase already satisfies contributes 0. Removing that purchase restores the grant in derived inventory, but grant-only items stay out of the cart.
 
 ### Pricing copy
 

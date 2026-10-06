@@ -465,18 +465,17 @@ function purchasesForContext(
   return appendPurchasesFromDraft(draft, context, catalogIndex, inventory)
 }
 
-/**
- * Composes package items (minus removals), magic-item grant selections, draft
- * purchases, and ensure-at-least grants into inventory rows with selection sources.
- */
-export function deriveEquipmentDraftEntries(
+type DeriveEquipmentDraftOptions = {
+  startingWealth?: StartingWealthRules
+  rulesetId?: SystemRulesetId
+  magicItemRequirement?: MagicItemAllowanceRequirement
+}
+
+/** Package, magic-item, and purchase channels, before generic grants. */
+function inventoryBeforeGenericGrants(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
-  options?: {
-    startingWealth?: StartingWealthRules
-    rulesetId?: SystemRulesetId
-    magicItemRequirement?: MagicItemAllowanceRequirement
-  },
+  options?: DeriveEquipmentDraftOptions,
 ): CharacterEquipment {
   const context = resolveEquipmentDraftContext(draft, catalogIndex)
   if (!context && !draft.class.classId) return EMPTY_CHARACTER_EQUIPMENT
@@ -495,9 +494,60 @@ export function deriveEquipmentDraftEntries(
           options?.magicItemRequirement ?? 'exact',
         )
 
+  return purchasesForContext(draft, context, catalogIndex, withMagic)
+}
+
+function equipmentIdsInInventory(inventory: CharacterEquipment): string[] {
+  const ids: string[] = []
+  const seen = new Set<string>()
+  for (const bucket of CHARACTER_EQUIPMENT_INVENTORY_BUCKETS) {
+    for (const entry of inventory[bucket]) {
+      if (seen.has(entry.equipmentId)) continue
+      seen.add(entry.equipmentId)
+      ids.push(entry.equipmentId)
+    }
+  }
+  return ids
+}
+
+/**
+ * Quantity the generic grant pass adds on top of package, magic-item, and
+ * purchase channels. `additional` contributes its full quantity. `ensure`
+ * contributes only the shortfall, so a covered grant is omitted. Magic-item
+ * choices are not included.
+ */
+export function resolveGenericEquipmentGrantQuantities(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentDraftOptions,
+): ReadonlyMap<string, number> {
+  const before = inventoryBeforeGenericGrants(draft, catalogIndex, options)
+  const after = appendGrantsFromDraft(draft, catalogIndex, before)
+  const quantities = new Map<string, number>()
+  const ids = new Set([...equipmentIdsInInventory(before), ...equipmentIdsInInventory(after)])
+
+  for (const equipmentId of ids) {
+    const added =
+      inventoryQuantityForEquipmentId(after, equipmentId) -
+      inventoryQuantityForEquipmentId(before, equipmentId)
+    if (added > 0) quantities.set(equipmentId, added)
+  }
+
+  return quantities
+}
+
+/**
+ * Composes package items (minus removals), magic-item grant selections, draft
+ * purchases, and ensure-at-least grants into inventory rows with selection sources.
+ */
+export function deriveEquipmentDraftEntries(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentDraftOptions,
+): CharacterEquipment {
   return appendGrantsFromDraft(
     draft,
     catalogIndex,
-    purchasesForContext(draft, context, catalogIndex, withMagic),
+    inventoryBeforeGenericGrants(draft, catalogIndex, options),
   )
 }
