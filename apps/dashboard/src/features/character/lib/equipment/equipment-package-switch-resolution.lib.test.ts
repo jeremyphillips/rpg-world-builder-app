@@ -4,7 +4,6 @@ import { indexCharacterBuildCatalog } from '@rpg/contracts'
 import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
-  resolveEquipmentNotProficientMessage,
   resolveStartingEquipmentFundingOptions,
 } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
@@ -12,7 +11,6 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import {
   equipmentStepBattleaxeFixture,
   equipmentStepCatalogIndexFixture,
-  equipmentStepContextFixture,
   equipmentStepMonkClassFixture,
 } from './equipment-step.fixtures'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
@@ -21,10 +19,12 @@ import { pickEquipment } from '@/test/fixtures/pick'
 import {
   PACKAGE_SWITCH_STAGED_REMOVAL_LABEL,
   buildPackageSwitchDraftPurchasedGroups,
+  buildPackageSwitchReconciliationDraft,
   mapBlockingReasonToMessage,
   packageSwitchDraftHasEdits,
   resolvePackageSwitchDescriptionParts,
   resolvePackageSwitchModalState,
+  resolvePackageSwitchSelectionFacts,
 } from './equipment-package-switch-resolution.lib'
 
 const rope = pickEquipment('rope')
@@ -89,14 +89,12 @@ describe('equipment-package-switch-resolution.lib', () => {
       evaluation,
       draftQuantitiesByPurchaseId: { 'purchase-rope': 0 },
       catalogIndex,
-      draft: goldDraft,
-      context: equipmentStepContextFixture,
-      choiceSets: [],
     })
 
     expect(groups).toHaveLength(1)
-    expect(groups[0]?.displays).toHaveLength(1)
-    const display = groups[0]?.displays[0]
+    expect(groups[0]?.items).toHaveLength(1)
+    expect(groups[0]?.items[0]?.status).toEqual([])
+    const display = groups[0]?.items[0]?.display
     expect(display?.kind).toBe('single')
     if (display?.kind !== 'single') return
 
@@ -106,8 +104,8 @@ describe('equipment-package-switch-resolution.lib', () => {
     expect(display.row.maxQuantity).toBe(62)
   })
 
-  it('stamps the shared proficiency warning onto a package-switch row', () => {
-    const draft = {
+  describe('reconciliation facts', () => {
+    const monkDraft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
       choiceSelections: {
@@ -127,35 +125,64 @@ describe('equipment-package-switch-resolution.lib', () => {
         editedSincePackageSelection: false,
       },
     }
-    const targetFunding = resolveStartingEquipmentFundingOptions({
-      draft,
-      catalogIndex: equipmentStepCatalogIndexFixture,
-    }).get('standard-equipment')!
-    const evaluation = evaluateEquipmentPackageSwitch({
-      draft,
-      catalogIndex: equipmentStepCatalogIndexFixture,
-      targetOptionId: 'standard-equipment',
-      targetFunding,
-    })!
 
-    const groups = buildPackageSwitchDraftPurchasedGroups({
-      evaluation,
-      draftQuantitiesByPurchaseId: { 'purchase-axe': 1 },
-      catalogIndex: equipmentStepCatalogIndexFixture,
-      draft,
-      context: equipmentStepContextFixture,
-      choiceSets: [],
+    it('builds the target draft without the trimmable purchases', () => {
+      const reconciliationDraft = buildPackageSwitchReconciliationDraft({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        targetOptionId: 'standard-equipment',
+        trimmablePurchaseIds: ['purchase-axe'],
+      })
+
+      expect(
+        reconciliationDraft?.choiceSelections?.[
+          startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)
+        ],
+      ).toEqual(['standard-equipment'])
+      expect(reconciliationDraft?.equipment?.purchases ?? []).toEqual([])
     })
-    const display = groups[0]?.displays[0]
-    expect(display?.kind).toBe('single')
-    if (display?.kind !== 'single') return
-    expect(display.row.advisoryStatusItems).toEqual([
-      {
-        kind: 'text',
-        variant: 'warning',
-        label: resolveEquipmentNotProficientMessage('weapon'),
-      },
-    ])
+
+    it('returns no draft for an unknown target option', () => {
+      expect(
+        buildPackageSwitchReconciliationDraft({
+          draft: monkDraft,
+          catalogIndex: equipmentStepCatalogIndexFixture,
+          targetOptionId: 'missing-option',
+          trimmablePurchaseIds: [],
+        }),
+      ).toBeUndefined()
+    })
+
+    it('resolves trim-row status in the reconciliation context', () => {
+      const targetFunding = resolveStartingEquipmentFundingOptions({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+      }).get('standard-equipment')!
+      const evaluation = evaluateEquipmentPackageSwitch({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        targetOptionId: 'standard-equipment',
+        targetFunding,
+      })!
+      const selectionFacts = resolvePackageSwitchSelectionFacts({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        choiceSets: [],
+        targetOptionId: 'standard-equipment',
+        trimmablePurchaseIds: evaluation.editableItems.map((item) => item.purchaseId),
+      })
+
+      const groups = buildPackageSwitchDraftPurchasedGroups({
+        evaluation,
+        draftQuantitiesByPurchaseId: { 'purchase-axe': 1 },
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        selectionFacts,
+      })
+
+      expect(groups[0]?.items[0]?.status).toEqual([
+        expect.objectContaining({ kind: 'badge', label: 'Not proficient', tone: 'warning' }),
+      ])
+    })
   })
 
   it('uses selection copy when no option was selected before the request', () => {

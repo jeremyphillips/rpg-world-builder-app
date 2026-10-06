@@ -46,26 +46,24 @@ export type BuildEquipmentPickerRecommendationContextArgs = {
   recommendationContext?: EquipmentRecommendationContext
 }
 
-export type EquipmentPickerRecommendationContext = {
+/** Resolved facts and recommendations for every catalog equipment row, keyed by content id. */
+export type EquipmentRecommendationIndex = ReturnType<typeof deriveEquipmentRecommendations>
+
+type EquipmentRecommendationDerivation = {
   proficiencies: ReturnType<typeof assembleCharacterProficiencies>
-  recommendations: ReturnType<typeof deriveEquipmentRecommendations>
+  recommendations: EquipmentRecommendationIndex
+}
+
+export type EquipmentPickerRecommendationContext = EquipmentRecommendationDerivation & {
   items: EquipmentPickerItem[]
   browseSortContext: EquipmentPickerBrowseSortContext
 }
 
-/** Surface-neutral proficiency + recommendation + picker item assembly. */
-export function buildEquipmentPickerRecommendationContext(
-  args: BuildEquipmentPickerRecommendationContextArgs,
-): EquipmentPickerRecommendationContext {
-  const {
-    equipment,
-    draft,
-    characterClass,
-    catalogIndex,
-    choiceSets = [],
-    budget,
-    recommendationContext,
-  } = args
+/** Proficiencies plus the whole-catalog recommendation index for one draft. */
+export function deriveEquipmentRecommendationIndex(
+  args: Omit<BuildEquipmentPickerRecommendationContextArgs, 'equipment' | 'budget'>,
+): EquipmentRecommendationDerivation {
+  const { draft, characterClass, catalogIndex, choiceSets = [], recommendationContext } = args
   const proficiencies = assembleCharacterProficiencies(
     draft,
     catalogIndex,
@@ -81,6 +79,15 @@ export function buildEquipmentPickerRecommendationContext(
     choiceSets,
     recommendationContext,
   })
+  return { proficiencies, recommendations }
+}
+
+/** Surface-neutral proficiency + recommendation + picker item assembly. */
+export function buildEquipmentPickerRecommendationContext(
+  args: BuildEquipmentPickerRecommendationContextArgs,
+): EquipmentPickerRecommendationContext {
+  const { equipment, budget } = args
+  const { proficiencies, recommendations } = deriveEquipmentRecommendationIndex(args)
   const items = resolveEquipmentPickerItems({
     equipment,
     proficiencies,

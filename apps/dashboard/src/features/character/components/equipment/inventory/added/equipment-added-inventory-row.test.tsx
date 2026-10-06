@@ -13,6 +13,7 @@ import {
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentAddedInventoryRowItem } from '../added/equipment-added-inventory-row'
 import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import { EMPTY_SELECTION_ROW_PRESENTATION } from '../../../../lib/selection-row-status'
 
 const grantRow: EquipmentInventoryRow = {
   group: 'magicItems',
@@ -49,7 +50,7 @@ function entry(
     otherSources: [],
     otherSourceQuantity: 0,
     provenanceLabel: '2 Common choices',
-    advisoryStatusItems: [],
+    selectionPresentation: EMPTY_SELECTION_ROW_PRESENTATION,
     rows,
     ...overrides,
   }
@@ -65,28 +66,35 @@ const defaultProps = {
 }
 
 describe('EquipmentAddedInventoryRowItem', () => {
-  it('shows one proficiency warning when several rows share an equipment id', () => {
-    const advisoryStatusItems = [
-      {
-        kind: 'text' as const,
-        variant: 'warning' as const,
-        label: 'Not proficient with this weapon',
-      },
-    ]
+  const notProficientStatus = [
+    { kind: 'badge' as const, label: 'Not proficient', tone: 'warning' as const },
+  ]
+
+  it('renders the parent-resolved status once on the managed path', () => {
     render(
       <EquipmentAddedInventoryRowItem
-        entry={entry(
-          [
-            { ...grantRow, advisoryStatusItems },
-            { ...grantRow, advisoryStatusItems },
-          ],
-          { advisoryStatusItems },
-        )}
+        entry={entry([grantRow, grantRow])}
+        status={notProficientStatus}
         {...defaultProps}
       />,
     )
 
-    expect(screen.getAllByText('Not proficient with this weapon')).toHaveLength(1)
+    expect(screen.getAllByText('Not proficient')).toHaveLength(1)
+  })
+
+  it('renders the parent-resolved status on the single release path', () => {
+    render(
+      <EquipmentAddedInventoryRowItem
+        entry={entry([{ ...grantRow, entry: { ...grantRow.entry, quantity: 1 } }], {
+          totalQuantity: 1,
+        })}
+        status={notProficientStatus}
+        {...defaultProps}
+      />,
+    )
+
+    expect(screen.getByText('Not proficient')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Release' })).toBeInTheDocument()
   })
 
   it('renders inline release for a single grant copy', async () => {

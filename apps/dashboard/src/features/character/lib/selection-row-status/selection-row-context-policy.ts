@@ -42,15 +42,8 @@ export const SELECTION_ROW_CONTEXT_POLICIES = {
       'recommendation_held',
     ],
   },
-  reconciliation: {
-    visible: [
-      'compatibility',
-      'requirement_open',
-      'requirement_held',
-      'recommendation',
-      'recommendation_held',
-    ],
-  },
+  /** Facts come from the target draft without the trimmable purchases; "held" means covered elsewhere. */
+  reconciliation: { visible: ['compatibility', 'requirement_open', 'recommendation'] },
 } as const satisfies Record<SelectionRowContext, SelectionRowContextPolicy>
 
 /** Internal — not exported from the barrel. Render through `resolveSelectionRowStatusItems`. */

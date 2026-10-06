@@ -15,6 +15,15 @@ import {
 import { EQUIPMENT_PACKAGE_CUSTOMIZE_UNAVAILABLE_REASON } from '../../../lib/equipment/equipment-step.lib'
 import { buildEquipmentInventoryViewModel } from '../../../lib/equipment/equipment-inventory-summary.lib'
 import {
+  selectionFactsDraft,
+  selectionFactsEquipment,
+  selectionFactsForDraft,
+  selectionFactsScenario,
+  selectionFactsUnpricedRobe,
+  selectionFactsWizardPouchPackageClass,
+} from '../../../lib/equipment/equipment-selection-facts.fixtures'
+import { EquipmentSelectionFactsProvider } from '../selection-facts/equipment-selection-facts-provider'
+import {
   EquipmentStartingPackageDisclosure,
   EquipmentStartingPackageGoldHeader,
   type EquipmentStartingPackageDisclosureProps,
@@ -130,4 +139,53 @@ export const CustomizeDisabled: Story = {
 export const GoldOption: Story = {
   args: disclosureArgs(),
   render: () => <EquipmentStartingPackageGoldHeader optionLabel="Starting Gold" />,
+}
+
+const wizardConversionScenario = selectionFactsScenario({
+  classes: [selectionFactsWizardPouchPackageClass],
+  equipment: Object.values({ ...selectionFactsEquipment, robe: selectionFactsUnpricedRobe }),
+})
+const wizardConversionDraft = selectionFactsDraft({
+  characterClass: selectionFactsWizardPouchPackageClass,
+  optionId: 'standard-equipment',
+})
+const wizardConversionFacts = selectionFactsForDraft(
+  wizardConversionScenario,
+  wizardConversionDraft,
+)
+
+function wizardConversionArgs(): EquipmentStartingPackageDisclosureProps {
+  const viewModel = buildEquipmentInventoryViewModel(
+    wizardConversionDraft,
+    wizardConversionScenario.catalogIndex,
+    undefined,
+    'included',
+    wizardConversionScenario.context,
+    wizardConversionFacts,
+  )
+  if (viewModel?.layout !== 'split' || viewModel.startingEquipment.kind !== 'package') {
+    throw new Error('Expected a starting package channel')
+  }
+  return disclosureArgs({
+    packageGroup: viewModel.startingEquipment.group,
+    draft: wizardConversionDraft,
+    catalogIndex: wizardConversionScenario.catalogIndex,
+    goldOptionFunding: resolveStartingEquipmentFundingOptions({
+      draft: wizardConversionDraft,
+      catalogIndex: wizardConversionScenario.catalogIndex,
+    }).get('starting-gold'),
+    conversionEditorOpen: true,
+    defaultExpanded: true,
+    selectedPackageItemKeys: new Set(),
+  })
+}
+
+/** Wizard conversion (edit_choice): requirement and recommendation guidance plus a conversion blocker. */
+export const CustomizeSelectionStatus: Story = {
+  args: wizardConversionArgs(),
+  render: (args) => (
+    <EquipmentSelectionFactsProvider facts={wizardConversionFacts}>
+      <EquipmentStartingPackageDisclosure {...args} />
+    </EquipmentSelectionFactsProvider>
+  ),
 }

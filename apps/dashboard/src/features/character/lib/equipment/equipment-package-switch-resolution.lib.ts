@@ -1,9 +1,11 @@
 import {
+  buildPackageSwitchSelectionPatch,
   copperToWealth,
   formatEquipmentInventoryPriceLine,
   formatWealth,
+  normalizeCharacterBuilderDraftPurchases,
+  startingEquipmentChoiceSetId,
   type CharacterBuildCatalogIndex,
-  type CharacterBuildContext,
   type CharacterBuilderDraft,
   type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
@@ -12,12 +14,21 @@ import {
 } from '@rpg/contracts'
 
 import {
+  EMPTY_SELECTION_ROW_PRESENTATION,
+  resolveSelectionRowStatusItems,
+} from '../selection-row-status'
+import {
   EQUIPMENT_INVENTORY_GROUP_LABELS,
   formatEquipmentInventoryRemoveLabel,
   type EquipmentInventoryRow,
 } from './equipment-step.lib'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
-import { enrichEquipmentInventoryRows } from './equipment-inventory-row-advisories.lib'
+import {
+  deriveEquipmentSelectionFacts,
+  EMPTY_EQUIPMENT_SELECTION_FACTS,
+  withEquipmentSelectionPresentation,
+  type EquipmentSelectionFacts,
+} from './equipment-selection-facts.lib'
 
 export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Adjust purchases before switching'
 
@@ -166,13 +177,68 @@ function inventoryGroupForEquipment(
   return 'gear'
 }
 
+/**
+ * The draft after switching to the target option, without the trimmable purchases: what the
+ * character keeps regardless of the trim. Trim rows are evaluated against it, so a purchase
+ * the target package already covers reads as held rather than as filling a requirement.
+ */
+export function buildPackageSwitchReconciliationDraft(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  targetOptionId: string
+  trimmablePurchaseIds: readonly string[]
+  nestedSelections?: CharacterBuilderDraft['choiceSelections']
+}): CharacterBuilderDraft | undefined {
+  const classId = args.draft.class.classId
+  if (!classId) return undefined
+  const targetOption = args.catalogIndex.classes
+    .get(classId)
+    ?.characterCreation?.startingEquipment?.options.find(
+      (option) => option.id === args.targetOptionId,
+    )
+  if (!targetOption) return undefined
+
+  const trimmable = new Set(args.trimmablePurchaseIds)
+  const purchases = normalizeCharacterBuilderDraftPurchases(args.draft).equipment?.purchases ?? []
+  return {
+    ...args.draft,
+    ...buildPackageSwitchSelectionPatch({
+      draft: args.draft,
+      targetOption,
+      targetOptionShape: targetOption,
+      choiceSetId: startingEquipmentChoiceSetId(classId),
+      nestedSelections: args.nestedSelections ?? {},
+      purchases: purchases.filter((purchase) => !purchase.id || !trimmable.has(purchase.id)),
+    }),
+  }
+}
+
+/** Equipment facts for trim rows, resolved once per target option against the reconciliation draft. */
+export function resolvePackageSwitchSelectionFacts(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  choiceSets: readonly ChoiceSet[]
+  rulesetId?: string
+  targetOptionId: string
+  trimmablePurchaseIds: readonly string[]
+  nestedSelections?: CharacterBuilderDraft['choiceSelections']
+}): EquipmentSelectionFacts {
+  const reconciliationDraft = buildPackageSwitchReconciliationDraft(args)
+  if (!reconciliationDraft) return { ...EMPTY_EQUIPMENT_SELECTION_FACTS, rulesetId: args.rulesetId }
+  return deriveEquipmentSelectionFacts({
+    draft: reconciliationDraft,
+    catalogIndex: args.catalogIndex,
+    choiceSets: args.choiceSets,
+    rulesetId: args.rulesetId,
+  })
+}
+
 export function buildPackageSwitchDraftPurchasedGroups(args: {
   evaluation: EquipmentPackageSwitchEvaluation
   draftQuantitiesByPurchaseId: Record<string, number>
   catalogIndex: CharacterBuildCatalogIndex
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  choiceSets: readonly ChoiceSet[]
+  /** From {@link resolvePackageSwitchSelectionFacts}. */
+  selectionFacts?: EquipmentSelectionFacts
 }): PurchasedCategoryGroup[] {
   const built = args.evaluation.editableItems.flatMap((item) => {
     const equipment = args.catalogIndex.equipment.get(item.equipmentId)
@@ -217,27 +283,26 @@ export function buildPackageSwitchDraftPurchasedGroups(args: {
       stagedRemoval,
     }
 
-    return [{ kind: 'single' as const, row }]
+    return [row]
   })
 
-  const enrichedRows = enrichEquipmentInventoryRows({
-    rows: built.map((display) => display.row),
-    draft: args.draft,
-    context: args.context,
-    choiceSets: args.choiceSets,
-  })
-  const displays = built.map((display, index) => ({
-    ...display,
-    row: enrichedRows[index] ?? display.row,
-  }))
+  if (built.length === 0) return []
 
-  if (displays.length === 0) return []
-
+  const rows = withEquipmentSelectionPresentation(
+    built,
+    args.selectionFacts ?? EMPTY_EQUIPMENT_SELECTION_FACTS,
+  )
   return [
     {
       group: 'gear',
       groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS.gear,
-      displays,
+      items: rows.map((row) => ({
+        display: { kind: 'single' as const, row },
+        status: resolveSelectionRowStatusItems(
+          row.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
+          { context: 'reconciliation' },
+        ),
+      })),
     },
   ]
 }

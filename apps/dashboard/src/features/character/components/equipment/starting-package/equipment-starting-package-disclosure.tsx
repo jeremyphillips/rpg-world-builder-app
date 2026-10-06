@@ -30,6 +30,10 @@ import {
   type EquipmentInventoryRow,
   type StartingPackageInventoryGroup,
 } from '../../../lib/equipment/equipment-step.lib'
+import {
+  EMPTY_SELECTION_ROW_PRESENTATION,
+  resolveSelectionRowStatusItems,
+} from '../../../lib/selection-row-status'
 import { EquipmentInventoryRowItem } from '../inventory/row/equipment-inventory-row'
 import {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
@@ -103,7 +107,13 @@ function EquipmentStartingPackageInventory({
                     : row.equipmentName
                 }
               >
-                <EquipmentInventoryRowItem display={{ kind: 'single', row }} />
+                <EquipmentInventoryRowItem
+                  display={{ kind: 'single', row }}
+                  status={resolveSelectionRowStatusItems(
+                    row.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
+                    { context: 'review' },
+                  )}
+                />
               </li>
             ))}
           </ul>

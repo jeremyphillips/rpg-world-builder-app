@@ -376,6 +376,43 @@ describe('EquipmentStep', () => {
     )
   })
 
+  it('renders an item added from the picker in Added Equipment', async () => {
+    const user = userEvent.setup()
+    const initialDraft: CharacterBuilderDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepBardClassFixture.id, level: 1 },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepBardClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
+    }
+
+    function StatefulStep() {
+      const [draft, setDraft] = useState(initialDraft)
+      return (
+        <EquipmentStep
+          context={context}
+          draft={draft}
+          resolvedChoiceSets={resolveAvailableChoices(draft, context)}
+          validationIssues={[]}
+          onDraftChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
+          onNavigateToStep={vi.fn()}
+        />
+      )
+    }
+    render(<StatefulStep />)
+
+    await user.click(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }))
+    const leatherArmorRow = screen
+      .getAllByRole('listitem')
+      .find((row) => within(row).queryByText(equipmentStepLeatherArmorFixture.name))!
+    await user.click(within(leatherArmorRow).getByRole('button', { name: 'Add' }))
+    await user.keyboard('{Escape}')
+
+    expect(screen.getByText('Added Equipment')).toBeInTheDocument()
+    expect(screen.getByText(equipmentStepLeatherArmorFixture.name)).toBeInTheDocument()
+  })
+
   it('commits multi-quantity stackable purchases from the picker body', async () => {
     const user = userEvent.setup()
     const rationsId = equipmentStepRationsFixture.id

@@ -88,9 +88,9 @@ const EXPECTED_VISIBILITY: Record<SelectionRowContext, Record<SelectionSignalCat
     compatibility: true,
     capacity: false,
     requirement_open: true,
-    requirement_held: true,
+    requirement_held: false,
     recommendation: true,
-    recommendation_held: true,
+    recommendation_held: false,
     source: false,
   },
 }
@@ -189,13 +189,11 @@ describe('context behavior', () => {
     ])
   })
 
-  it('reconciliation shows compatibility and guidance with no availability', () => {
+  it('reconciliation shows compatibility and open guidance with no availability', () => {
     expect(visibleLabels('reconciliation')).toEqual([
       'Not proficient',
       'Required by class',
-      'Satisfies focus requirement',
       'Recommended by class',
-      'Recommended by species',
     ])
   })
 })

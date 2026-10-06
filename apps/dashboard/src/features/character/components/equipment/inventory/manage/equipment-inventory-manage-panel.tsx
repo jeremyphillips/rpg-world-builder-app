@@ -13,7 +13,7 @@ import {
   standardStartingWealthTableId,
 } from '@rpg/contracts'
 
-import { DisclosureEntityCard } from '@/features/content'
+import { DisclosureEntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import { type EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import type { EquipmentOwnedSourceAction } from '../../acquisition/equipment-acquisition-panel.lib'
@@ -93,6 +93,8 @@ export function EquipmentInventoryManagePanelBody({
 
 export type EquipmentInventoryManageDisclosureCardProps = EquipmentInventoryManagePanelBodyProps & {
   equipmentName: string
+  /** Resolved by the parent section with its selection-row context. */
+  status?: readonly EntitySummaryStatusItem[]
   provenanceLabel?: string
   itemId: string
   collapsed?: boolean
@@ -102,6 +104,7 @@ export type EquipmentInventoryManageDisclosureCardProps = EquipmentInventoryMana
 
 export function EquipmentInventoryManageDisclosureCard({
   equipmentName,
+  status,
   provenanceLabel,
   itemId,
   collapsed,
@@ -115,9 +118,7 @@ export function EquipmentInventoryManageDisclosureCard({
     <DisclosureEntityCard
       itemId={itemId}
       toolbarAriaLabel={equipmentName}
-      entity={buildEquipmentInventoryRowEntity({
-        equipmentName,
-      })}
+      entity={buildEquipmentInventoryRowEntity({ equipmentName, status })}
       trailing={
         provenanceLabel
           ? { kind: 'indicator', variant: 'label', label: provenanceLabel }

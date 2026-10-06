@@ -20,6 +20,14 @@ import {
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
+import {
+  selectionFactsDraft,
+  selectionFactsFighterClass,
+  selectionFactsForDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+} from '../../../../lib/equipment/equipment-selection-facts.fixtures'
+import { EquipmentSelectionFactsProvider } from '../../selection-facts/equipment-selection-facts-provider'
 import { EquipmentInventorySummary } from './equipment-inventory-summary'
 
 const monkToolChoiceSetId = buildChoiceSetId(
@@ -419,4 +427,47 @@ export const PackageWithInvalidItem: Story = {
     draft: monkStandardDraft(),
     catalogIndex: packageOnlyClassCatalog,
   },
+}
+
+const selectionScenario = selectionFactsScenario()
+
+function SelectionStatusStory({ draft }: { draft: ReturnType<typeof selectionFactsDraft> }) {
+  return (
+    <EquipmentSelectionFactsProvider facts={selectionFactsForDraft(selectionScenario, draft)}>
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={selectionScenario.catalogIndex}
+        {...inventoryManagementArgs}
+        context={selectionScenario.context}
+      />
+    </EquipmentSelectionFactsProvider>
+  )
+}
+
+/** STR 8 Wizard cart: owned rows show compatibility only. */
+export const OwnedCompatibilityStatus: Story = {
+  render: () => (
+    <SelectionStatusStory
+      draft={selectionFactsDraft({
+        optionId: 'starting-gold',
+        purchases: [
+          selectionFactsPurchase('plate-armor'),
+          selectionFactsPurchase('greataxe'),
+          selectionFactsPurchase('dagger'),
+        ],
+      })}
+    />
+  ),
+}
+
+/** STR 8 Fighter package: expand the Starting Package to see the review-context armor badge. */
+export const PackageReviewStatus: Story = {
+  render: () => (
+    <SelectionStatusStory
+      draft={selectionFactsDraft({
+        characterClass: selectionFactsFighterClass,
+        optionId: 'heavy-armor',
+      })}
+    />
+  ),
 }

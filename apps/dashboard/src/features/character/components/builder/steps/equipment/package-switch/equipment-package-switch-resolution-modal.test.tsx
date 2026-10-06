@@ -1,8 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraft } from '@rpg/contracts'
+import {
+  createEmptyCharacterBuilderDraft,
+  resolveAvailableChoices,
+  type CharacterBuilderDraft,
+  type ClassStored,
+} from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
   resolveStartingEquipmentFundingOptions,
@@ -14,6 +19,13 @@ import { storedDruidClassStored } from '@/test/fixtures/factories/additional/cla
 import { pickEquipment } from '@/test/fixtures/pick'
 
 import { equipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
+import {
+  selectionFactsDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+  selectionFactsWizardClass,
+  selectionFactsWizardWithoutSpellbookClass,
+} from '../../../../../lib/equipment/equipment-selection-facts.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 import { equipmentPackageSwitchResolutionModalInventoryScrollClasses } from './equipment-package-switch-resolution-modal.variants'
 
@@ -55,6 +67,70 @@ const goldDraft = {
 function targetFundingFor(draft: CharacterBuilderDraft, targetOptionId: string) {
   return resolveStartingEquipmentFundingOptions({ draft, catalogIndex }).get(targetOptionId)!
 }
+
+describe('EquipmentPackageSwitchResolutionModal reconciliation status', () => {
+  function renderWizardTrim(characterClass: ClassStored) {
+    const scenario = selectionFactsScenario({ classes: [characterClass] })
+    const draft = selectionFactsDraft({
+      characterClass,
+      optionId: 'starting-gold',
+      purchases: [
+        selectionFactsPurchase('greatsword'),
+        selectionFactsPurchase('component-pouch'),
+        selectionFactsPurchase('spellbook'),
+      ],
+    })
+    const targetFunding = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex: scenario.catalogIndex,
+    }).get('standard-equipment')!
+    const switchEvaluation = evaluateEquipmentPackageSwitch({
+      draft,
+      catalogIndex: scenario.catalogIndex,
+      targetOptionId: 'standard-equipment',
+      targetFunding,
+    })!
+
+    render(
+      <EquipmentPackageSwitchResolutionModal
+        open
+        catalogIndex={scenario.catalogIndex}
+        draft={draft}
+        context={scenario.context}
+        choiceSets={resolveAvailableChoices(draft, scenario.context)}
+        evaluation={switchEvaluation}
+        draftQuantitiesByPurchaseId={Object.fromEntries(
+          switchEvaluation.editableItems.map((item) => [item.purchaseId, item.committedQuantity]),
+        )}
+        onOpenChange={vi.fn()}
+        onDraftQuantityChange={vi.fn()}
+        onConfirm={vi.fn()}
+      />,
+    )
+  }
+
+  function rowFor(name: string) {
+    const row = screen.getByText(name).closest('li')
+    if (!row) throw new Error(`No row for ${name}`)
+    return within(row)
+  }
+
+  it('shows compatibility and open guidance without per-item affordability', () => {
+    renderWizardTrim(selectionFactsWizardWithoutSpellbookClass)
+
+    expect(rowFor('Greatsword').getByText('Not proficient')).toBeInTheDocument()
+    expect(rowFor('Component Pouch').getByText('Recommended by class')).toBeInTheDocument()
+    expect(rowFor('Spellbook').getByText('Required by class')).toBeInTheDocument()
+    expect(screen.queryByText('Cannot afford')).not.toBeInTheDocument()
+  })
+
+  it('drops the spellbook requirement when the target package supplies one', () => {
+    renderWizardTrim(selectionFactsWizardClass)
+
+    expect(rowFor('Spellbook').queryByText('Required by class')).not.toBeInTheDocument()
+    expect(rowFor('Greatsword').getByText('Not proficient')).toBeInTheDocument()
+  })
+})
 
 describe('EquipmentPackageSwitchResolutionModal', () => {
   const evaluation = evaluateEquipmentPackageSwitch({

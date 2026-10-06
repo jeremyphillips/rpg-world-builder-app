@@ -4,7 +4,6 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
-  ChoiceSet,
   ClassOptionPolicy,
   EquipmentBudgetSummary,
   ResolvedStartingEquipmentFunding,
@@ -35,6 +34,7 @@ import {
   equipmentInventorySectionClasses,
   equipmentInventorySectionHeaderClasses,
 } from '../equipment-inventory.variants'
+import { useEquipmentSelectionFacts } from '../../../../hooks/use-equipment-selection-facts'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
@@ -43,7 +43,6 @@ export type EquipmentInventorySummaryProps = {
   budget?: EquipmentBudgetSummary
   goldOptionFunding?: ResolvedStartingEquipmentFunding
   classOptionPolicy?: ClassOptionPolicy
-  resolvedChoiceSets?: readonly ChoiceSet[]
   conversionEditorOpen?: boolean
   selectedPackageItemKeys?: ReadonlySet<string>
   conversionCommitStatusMessage?: string
@@ -181,7 +180,6 @@ export function EquipmentInventorySummary({
   budget,
   goldOptionFunding,
   classOptionPolicy = 'included',
-  resolvedChoiceSets = [],
   conversionEditorOpen = false,
   selectedPackageItemKeys = new Set(),
   conversionCommitStatusMessage,
@@ -197,6 +195,7 @@ export function EquipmentInventorySummary({
   onCommitConversion,
   emptyMessage = EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
 }: EquipmentInventorySummaryProps) {
+  const selectionFacts = useEquipmentSelectionFacts()
   const viewModel = useMemo(
     () =>
       buildEquipmentInventoryViewModel(
@@ -205,9 +204,9 @@ export function EquipmentInventorySummary({
         budget,
         classOptionPolicy,
         context,
-        resolvedChoiceSets,
+        selectionFacts,
       ),
-    [budget, catalogIndex, classOptionPolicy, context, draft, resolvedChoiceSets],
+    [budget, catalogIndex, classOptionPolicy, context, draft, selectionFacts],
   )
 
   if (!viewModel) {

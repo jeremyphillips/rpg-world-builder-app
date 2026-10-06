@@ -13,7 +13,6 @@ import {
   type CharacterBuilderDraft,
   type CharacterEquipment,
   type CharacterWealthGrant,
-  type ChoiceSet,
   type ClassOptionPolicy,
   type EquipmentBudgetSummary,
   type EquipmentSourceAllocation,
@@ -21,7 +20,14 @@ import {
 
 import type { EntitySummaryStatusItem } from '@/features/content'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { enrichEquipmentInventoryRows } from './equipment-inventory-row-advisories.lib'
+import {
+  EMPTY_SELECTION_ROW_PRESENTATION,
+  type SelectionRowPresentation,
+} from '../selection-row-status'
+import {
+  withEquipmentSelectionPresentation,
+  type EquipmentSelectionFacts,
+} from './equipment-selection-facts.lib'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
@@ -187,10 +193,15 @@ export function equipmentInventoryDisplayItemKey(item: EquipmentInventoryDisplay
   return `${item.group}-${item.equipmentId}-combined-${item.rows.map((row) => equipmentInventoryRowKey(row)).join('|')}`
 }
 
+type PurchasedInventoryItem = {
+  display: EquipmentInventoryDisplayItem
+  status: readonly EntitySummaryStatusItem[]
+}
+
 export type PurchasedCategoryGroup = {
   group: keyof CharacterEquipment
   groupLabel: string
-  displays: EquipmentInventoryDisplayItem[]
+  items: PurchasedInventoryItem[]
 }
 
 export type AddedEquipmentOtherSource = {
@@ -210,7 +221,7 @@ export type AddedEquipmentEntryViewModel = {
   sources: EquipmentSourceAllocation[]
   provenanceLabel: string
   rows: EquipmentInventoryRow[]
-  advisoryStatusItems: readonly EntitySummaryStatusItem[]
+  selectionPresentation: SelectionRowPresentation
 }
 
 export type AddedEquipmentCategoryGroup = {
@@ -422,7 +433,7 @@ function aggregateAddedEquipmentRows(
           otherSources,
         ),
         rows: entryRows,
-        advisoryStatusItems: first.advisoryStatusItems ?? [],
+        selectionPresentation: first.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
       },
     ]
   })
@@ -540,7 +551,7 @@ function listBuilderInventoryRows(args: {
   catalogIndex: CharacterBuildCatalogIndex
   budget?: EquipmentBudgetSummary
   context?: CharacterBuildContext
-  choiceSets: readonly ChoiceSet[]
+  selectionFacts?: EquipmentSelectionFacts
 }): EquipmentInventoryRow[] {
   const rows = listEquipmentInventoryRowsFromDraft(
     args.draft,
@@ -548,13 +559,7 @@ function listBuilderInventoryRows(args: {
     args.budget,
     args.context,
   )
-  if (!args.context) return rows
-  return enrichEquipmentInventoryRows({
-    rows,
-    draft: args.draft,
-    context: args.context,
-    choiceSets: args.choiceSets,
-  })
+  return args.selectionFacts ? withEquipmentSelectionPresentation(rows, args.selectionFacts) : rows
 }
 
 function buildSplitInventoryViewModel(args: {
@@ -563,13 +568,13 @@ function buildSplitInventoryViewModel(args: {
   budget?: EquipmentBudgetSummary
   classOptionPolicy: ClassOptionPolicy
   context?: CharacterBuildContext
-  choiceSets: readonly ChoiceSet[]
+  selectionFacts?: EquipmentSelectionFacts
 }): EquipmentInventoryViewModel | undefined {
-  const { draft, catalogIndex, budget, classOptionPolicy, context, choiceSets } = args
+  const { draft, catalogIndex, budget, classOptionPolicy, context, selectionFacts } = args
   const selected = resolveSelectedStartingOption(draft, catalogIndex)
   if (!selected) return undefined
 
-  const allRows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, choiceSets })
+  const allRows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, selectionFacts })
   const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
   const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
 
@@ -602,14 +607,20 @@ export function buildEquipmentInventoryViewModel(
   budget?: EquipmentBudgetSummary,
   classOptionPolicy: ClassOptionPolicy = 'included',
   context?: CharacterBuildContext,
-  choiceSets: readonly ChoiceSet[] = [],
+  selectionFacts?: EquipmentSelectionFacts,
 ): EquipmentInventoryViewModel | undefined {
   switch (resolveStartingEquipmentResolution(draft, catalogIndex)) {
     case 'notApplicable':
     case 'unresolvedEmpty':
       return undefined
     case 'unresolvedWithPurchases': {
-      const rows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, choiceSets })
+      const rows = listBuilderInventoryRows({
+        draft,
+        catalogIndex,
+        budget,
+        context,
+        selectionFacts,
+      })
       return {
         layout: 'pending',
         addedEquipment: groupAddedEquipmentByCategory(
@@ -624,7 +635,7 @@ export function buildEquipmentInventoryViewModel(
         budget,
         classOptionPolicy,
         context,
-        choiceSets,
+        selectionFacts,
       })
   }
 }

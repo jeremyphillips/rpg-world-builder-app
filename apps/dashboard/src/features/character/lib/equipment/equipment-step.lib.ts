@@ -1,5 +1,3 @@
-import type { EntitySummaryStatusItem } from '@/features/content'
-
 import {
   buildChoiceSetId,
   deriveEquipmentBudgetSummary,
@@ -59,7 +57,11 @@ import {
 } from '@rpg/contracts'
 
 import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
-import { buildEquipmentPickerRecommendationContext } from './equipment-picker-recommendation-context.lib'
+import {
+  buildEquipmentPickerRecommendationContext,
+  type EquipmentRecommendationIndex,
+} from './equipment-picker-recommendation-context.lib'
+import type { SelectionRowPresentation } from '../selection-row-status'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
@@ -293,8 +295,8 @@ export type EquipmentInventoryRow = {
   quantityTarget?: EquipmentInventoryQuantityTarget
   /** Package-switch modal: row is staged at quantity zero but still visible. */
   stagedRemoval?: boolean
-  /** Warning lines from the shared advisory index. Builder view models always set this. */
-  advisoryStatusItems?: readonly EntitySummaryStatusItem[]
+  /** Every selection signal for this item; parent sections render it with their row context. */
+  selectionPresentation?: SelectionRowPresentation
 }
 
 export function formatEquipmentInventoryRemoveLabel(name: string, quantity: number): string {
@@ -650,6 +652,8 @@ export function resolveEquipmentStepBudget(
 export type EquipmentStepPickerItemsResult = {
   items: EquipmentPickerItem[]
   browseSortContext: EquipmentPickerBrowseSortContext
+  /** Whole-catalog facts behind the picker rows; owned surfaces read the same derivation. */
+  resolvedById: EquipmentRecommendationIndex
 }
 
 export function resolveEquipmentStepPickerItems(args: {
@@ -680,6 +684,7 @@ export function resolveEquipmentStepPickerItems(args: {
   return {
     items: enrichEquipmentPickerItemsWithSearchDocument(recommendation.items),
     browseSortContext: recommendation.browseSortContext,
+    resolvedById: recommendation.recommendations,
   }
 }
 

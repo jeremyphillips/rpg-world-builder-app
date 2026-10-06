@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useMemo, useState } from 'react'
 
 import type { EquipmentPackageSwitchBlockingReason } from '@rpg/contracts'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, resolveAvailableChoices } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
   resolveStartingEquipmentFundingOptions,
@@ -14,6 +14,12 @@ import { storedDruidClassStored } from '@/test/fixtures/factories/additional/cla
 import { pickEquipment } from '@/test/fixtures/pick'
 
 import { createEquipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
+import {
+  selectionFactsDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+  selectionFactsWizardWithoutSpellbookClass,
+} from '../../../../../lib/equipment/equipment-selection-facts.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 
 const rope = pickEquipment('rope')
@@ -181,4 +187,60 @@ export const CommitError: Story = {
     initialQuantities: { 'purchase-rope': 50 },
     commitErrorReason: { kind: 'draftOverBudget', amountOverBudgetCp: 4700 },
   },
+}
+
+const wizardTrimScenario = selectionFactsScenario({
+  classes: [selectionFactsWizardWithoutSpellbookClass],
+})
+const wizardTrimDraft = selectionFactsDraft({
+  characterClass: selectionFactsWizardWithoutSpellbookClass,
+  optionId: 'starting-gold',
+  purchases: [
+    selectionFactsPurchase('greatsword'),
+    selectionFactsPurchase('component-pouch'),
+    selectionFactsPurchase('spellbook'),
+  ],
+})
+const wizardTrimChoiceSets = resolveAvailableChoices(wizardTrimDraft, wizardTrimScenario.context)
+
+function WizardReconciliationStory() {
+  const [open, setOpen] = useState(true)
+  const [draftQuantities, setDraftQuantities] = useState<Record<string, number>>({})
+  const { catalogIndex: wizardCatalogIndex, context } = wizardTrimScenario
+  const evaluation = useMemo(
+    () =>
+      evaluateEquipmentPackageSwitch({
+        draft: wizardTrimDraft,
+        catalogIndex: wizardCatalogIndex,
+        targetOptionId: 'standard-equipment',
+        targetFunding: resolveStartingEquipmentFundingOptions({
+          draft: wizardTrimDraft,
+          catalogIndex: wizardCatalogIndex,
+        }).get('standard-equipment')!,
+        draftQuantitiesByPurchaseId: draftQuantities,
+      })!,
+    [draftQuantities, wizardCatalogIndex],
+  )
+
+  return (
+    <EquipmentPackageSwitchResolutionModal
+      open={open}
+      catalogIndex={wizardCatalogIndex}
+      draft={wizardTrimDraft}
+      context={context}
+      choiceSets={wizardTrimChoiceSets}
+      evaluation={evaluation}
+      draftQuantitiesByPurchaseId={draftQuantities}
+      onOpenChange={setOpen}
+      onDraftQuantityChange={(purchaseId, quantity) => {
+        setDraftQuantities((current) => ({ ...current, [purchaseId]: quantity }))
+      }}
+      onConfirm={() => setOpen(false)}
+    />
+  )
+}
+
+/** STR 8 Wizard switching to a package without a spellbook (reconciliation context). */
+export const ReconciliationStatus: Story = {
+  render: () => <WizardReconciliationStory />,
 }

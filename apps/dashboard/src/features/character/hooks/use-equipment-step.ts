@@ -45,6 +45,10 @@ import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selection
 import { resolveEquipmentStepSurface } from '../lib/equipment/resolve-equipment-step-surface.lib'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/picker/details/equipment-picker-character-preview.lib'
 import { resolvePackageSwitchCommitErrorFromIssues } from '../lib/equipment/equipment-package-switch-resolution.lib'
+import {
+  EMPTY_EQUIPMENT_SELECTION_FACTS,
+  type EquipmentSelectionFacts,
+} from '../lib/equipment/equipment-selection-facts.lib'
 import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer'
 import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections'
@@ -229,6 +233,7 @@ export function useEquipmentStep(args: {
       return {
         items: [] as EquipmentPickerItem[],
         browseSortContext: { preferMartialWeaponBrowseOrder: false as const },
+        resolvedById: EMPTY_EQUIPMENT_SELECTION_FACTS.resolvedById,
       }
     }
 
@@ -242,6 +247,10 @@ export function useEquipmentStep(args: {
     })
   }, [budget, catalogIndex, characterClass, context, draft, resolvedChoiceSets])
   const pickerItems = pickerItemResult.items
+  const selectionFacts = useMemo<EquipmentSelectionFacts>(
+    () => ({ resolvedById: pickerItemResult.resolvedById, rulesetId: context.rulesetId }),
+    [context.rulesetId, pickerItemResult.resolvedById],
+  )
   const pickerBrowseSortContext = useMemo(
     () => ({
       ...pickerItemResult.browseSortContext,
@@ -678,6 +687,7 @@ export function useEquipmentStep(args: {
     fundingState,
     pickerItems: magicItemWorkflow.filteredPickerItems,
     allPickerItems: pickerItems,
+    selectionFacts,
     pickerBrowseSortContext,
     characterPreviewContext,
     ownedPurchaseQuantities,

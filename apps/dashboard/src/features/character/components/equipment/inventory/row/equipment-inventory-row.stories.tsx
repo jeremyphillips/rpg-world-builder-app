@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { Text } from '@rpg/ui'
 
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
-import { buildAdvisoryStatusItems } from '../../../../lib/build-advisories/build-advisory-presentation.lib'
+import {
+  resolveSelectionRowStatusItems,
+  selectionWarning,
+} from '../../../../lib/selection-row-status'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 
 const editableStartingGoldRow: EquipmentInventoryRow = {
@@ -135,7 +138,7 @@ export const CombinedSourceBreakdown: Story = {
   },
 }
 
-export const AbilityScoreRequirementAdvisory: Story = {
+export const CompatibilityStatus: Story = {
   tags: ['storybook-test-runner-skip'],
   args: {
     display: {
@@ -152,33 +155,17 @@ export const AbilityScoreRequirementAdvisory: Story = {
         equipmentName: 'Plate Armor',
         sourceLabel: 'Included with Standard Equipment',
         removeLabel: 'Remove Plate Armor',
-        advisoryStatusItems: buildAdvisoryStatusItems([
-          {
-            code: 'equipment_ability_score_requirement_unmet',
-            subject: {
-              kind: 'equipment',
-              equipmentId: 'srd-cc-5.2.1:plate-armor',
-              label: 'Plate Armor',
-              unmet: [{ ability: 'str', required: 15, actual: 12 }],
-            },
-          },
-        ]),
       },
     },
-  },
-}
-
-export const HighQuantity: Story = {
-  tags: ['storybook-test-runner-skip'],
-  args: {
-    display: {
-      kind: 'single',
-      row: {
-        ...editableStartingGoldRow,
-        entry: { ...editableStartingGoldRow.entry, quantity: 12 },
-        priceLineLabel: '5 SP each · 6 GP total',
-        removeLabel: 'Remove all 12 Rations',
+    status: resolveSelectionRowStatusItems(
+      {
+        status: [
+          selectionWarning('not_proficient', 'Not proficient'),
+          selectionWarning('ability_score_requirement', 'Requires STR 15', { subject: 'str' }),
+        ],
+        guidance: [],
       },
-    },
+      { context: 'owned' },
+    ),
   },
 }

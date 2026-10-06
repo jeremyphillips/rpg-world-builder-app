@@ -27,22 +27,19 @@ const editableStackableRow: EquipmentInventoryRow = {
 }
 
 describe('EquipmentInventoryRowItem', () => {
-  it('renders a build advisory from the row without an advisory provider', () => {
+  it('renders the parent-resolved status as one metadata line', () => {
     render(
       <EquipmentInventoryRowItem
-        display={{
-          kind: 'single',
-          row: {
-            ...editableStackableRow,
-            advisoryStatusItems: [
-              { kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' },
-            ],
-          },
-        }}
+        display={{ kind: 'single', row: editableStackableRow }}
+        status={[
+          { kind: 'badge', label: 'Not proficient', tone: 'warning' },
+          { kind: 'badge', label: 'Requires STR 15', tone: 'warning' },
+        ]}
       />,
     )
 
-    expect(screen.getByText('Not proficient with this weapon')).toBeInTheDocument()
+    expect(screen.getByText('Not proficient')).toBeInTheDocument()
+    expect(screen.getByText('Requires STR 15')).toBeInTheDocument()
   })
 
   it('renders stepper and remove inline with the title for editable stackables', async () => {

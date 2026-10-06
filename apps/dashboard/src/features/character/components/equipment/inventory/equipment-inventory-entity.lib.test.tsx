@@ -24,17 +24,23 @@ const rationsRow: EquipmentInventoryRow = {
 }
 
 describe('buildEquipmentInventoryRowEntity', () => {
-  it('maps the name and advisory status without an Equipped badge', () => {
-    const entity = buildEquipmentInventoryRowEntity({
-      equipmentName: 'Rations',
-      extraStatus: [{ kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' }],
-    })
+  it('maps the name and selection status as one metadata line without an Equipped badge', () => {
+    const status = [
+      { kind: 'badge', label: 'Not proficient', tone: 'warning', appearance: 'soft' },
+    ] as const
+    const entity = buildEquipmentInventoryRowEntity({ equipmentName: 'Rations', status })
 
     expect(entity.heading).toBe('Rations')
     expect(entity.description).toBeUndefined()
-    expect(entity.status).toEqual([
-      { kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' },
-    ])
+    expect(entity.status).toEqual(status)
+    expect(entity.statusComposition).toBe('metadata')
+  })
+
+  it('omits the status lane when there is no status', () => {
+    const entity = buildEquipmentInventoryRowEntity({ equipmentName: 'Rations', status: [] })
+
+    expect(entity.status).toBeUndefined()
+    expect(entity.statusComposition).toBeUndefined()
   })
 
   it('marks staged removal in the heading', () => {

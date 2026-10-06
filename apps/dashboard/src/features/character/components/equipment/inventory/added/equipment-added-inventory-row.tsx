@@ -6,7 +6,11 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { ContentEntityCard, DisclosureEntityCard } from '@/features/content'
+import {
+  ContentEntityCard,
+  DisclosureEntityCard,
+  type EntitySummaryStatusItem,
+} from '@/features/content'
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   type EquipmentInventoryQuantityTarget,
@@ -28,6 +32,8 @@ import {
 
 export type EquipmentAddedInventoryRowItemProps = {
   entry: AddedEquipmentEntryViewModel
+  /** Resolved by the parent section with its selection-row context. */
+  status?: readonly EntitySummaryStatusItem[]
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
@@ -43,9 +49,11 @@ export type EquipmentAddedInventoryRowItemProps = {
 
 function GrantOnlySingleReleaseRow({
   entry,
+  status,
   onReleaseGrant,
 }: {
   entry: AddedEquipmentEntryViewModel
+  status?: readonly EntitySummaryStatusItem[]
   onReleaseGrant: EquipmentAddedInventoryRowItemProps['onReleaseGrant']
 }) {
   const row = entry.rows.find((candidate) => candidate.removeTarget?.kind === 'magicItemGrant')
@@ -57,7 +65,7 @@ function GrantOnlySingleReleaseRow({
     <ContentEntityCard
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
-        extraStatus: entry.advisoryStatusItems,
+        status,
       })}
       trailing={{
         kind: 'action',
@@ -83,6 +91,7 @@ function GrantOnlySingleReleaseRow({
 
 function ManagedInventoryRow({
   entry,
+  status,
   totalQuantity,
   draft,
   context,
@@ -95,6 +104,7 @@ function ManagedInventoryRow({
   onOpenChange,
 }: {
   entry: AddedEquipmentEntryViewModel
+  status?: readonly EntitySummaryStatusItem[]
   totalQuantity: number
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
@@ -124,7 +134,7 @@ function ManagedInventoryRow({
       toolbarAriaLabel={entry.equipmentName}
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
-        extraStatus: entry.advisoryStatusItems,
+        status,
       })}
       trailing={{
         kind: 'indicator',
@@ -154,6 +164,7 @@ function ManagedInventoryRow({
 
 export function EquipmentAddedInventoryRowItem({
   entry,
+  status,
   draft,
   context,
   catalogIndex,
@@ -171,7 +182,9 @@ export function EquipmentAddedInventoryRowItem({
 
   if (!usesInlineManagement({ sourceKinds, grantedQuantity: grantQty })) {
     if (sourceKinds.length === 1 && sourceKinds[0] === 'magicItemGrant' && grantQty === 1) {
-      return <GrantOnlySingleReleaseRow entry={entry} onReleaseGrant={onReleaseGrant} />
+      return (
+        <GrantOnlySingleReleaseRow entry={entry} status={status} onReleaseGrant={onReleaseGrant} />
+      )
     }
 
     const display = groupEquipmentInventoryRowsForDisplay(entry.rows, {
@@ -182,6 +195,7 @@ export function EquipmentAddedInventoryRowItem({
     return (
       <EquipmentInventoryRowItem
         display={display}
+        status={status}
         detailLabelOverride={entry.provenanceLabel}
         otherSourceQuantity={entry.otherSourceQuantity}
         onRemoveItem={onRemoveItem}
@@ -193,6 +207,7 @@ export function EquipmentAddedInventoryRowItem({
   return (
     <ManagedInventoryRow
       entry={entry}
+      status={status}
       totalQuantity={entry.totalQuantity}
       draft={draft}
       context={context}

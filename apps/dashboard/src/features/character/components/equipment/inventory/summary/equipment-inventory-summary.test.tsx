@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -24,6 +24,14 @@ import {
   EQUIPMENT_STARTING_PACKAGE_TITLE,
   EQUIPMENT_STEP_BROWSE_LABEL,
 } from '../../../../lib/equipment/equipment-step.lib'
+import {
+  selectionFactsDraft,
+  selectionFactsFighterClass,
+  selectionFactsForDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+} from '../../../../lib/equipment/equipment-selection-facts.fixtures'
+import { EquipmentSelectionFactsProvider } from '../../selection-facts/equipment-selection-facts-provider'
 import { EquipmentInventorySummary } from './equipment-inventory-summary'
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
@@ -515,5 +523,69 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText(/^Pending purchase/)).toBeInTheDocument()
     expect(screen.queryByText(/Purchased/)).not.toBeInTheDocument()
     expect(screen.queryByText(EQUIPMENT_STARTING_PACKAGE_TITLE)).not.toBeInTheDocument()
+  })
+})
+
+describe('EquipmentInventorySummary selection-row status', () => {
+  const scenario = selectionFactsScenario()
+
+  function renderSummary(draft: ReturnType<typeof selectionFactsDraft>) {
+    return render(
+      <EquipmentSelectionFactsProvider facts={selectionFactsForDraft(scenario, draft)}>
+        <EquipmentInventorySummary
+          draft={draft}
+          catalogIndex={scenario.catalogIndex}
+          {...inventoryManagementProps}
+          context={scenario.context}
+        />
+      </EquipmentSelectionFactsProvider>,
+    )
+  }
+
+  function rowFor(name: string) {
+    const row = screen.getByText(name).closest('li')
+    if (!row) throw new Error(`No row for ${name}`)
+    return within(row)
+  }
+
+  it('shows only compatibility on Added Equipment rows (owned)', () => {
+    renderSummary(
+      selectionFactsDraft({
+        optionId: 'starting-gold',
+        purchases: [
+          selectionFactsPurchase('plate-armor'),
+          selectionFactsPurchase('greataxe'),
+          selectionFactsPurchase('dagger'),
+        ],
+      }),
+    )
+
+    const plate = rowFor('Plate Armor')
+    expect(plate.getByText('Not proficient')).toBeInTheDocument()
+    expect(plate.getByText('Requires STR 15')).toBeInTheDocument()
+    expect(rowFor('Greataxe').getByText('Not proficient')).toBeInTheDocument()
+    expect(rowFor('Greataxe').queryByText(/Requires/)).not.toBeInTheDocument()
+
+    const dagger = rowFor('Dagger')
+    expect(dagger.queryByText('Recommended by class')).not.toBeInTheDocument()
+    expect(dagger.queryByText('Not proficient')).not.toBeInTheDocument()
+    expect(dagger.getByText(/^Purchased/)).toBeInTheDocument()
+
+    expect(screen.queryByText('Cannot afford')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Recommended by/)).not.toBeInTheDocument()
+  })
+
+  it('flags incompatible package armor in the expanded Starting Package (review)', async () => {
+    const user = userEvent.setup()
+    renderSummary(
+      selectionFactsDraft({ characterClass: selectionFactsFighterClass, optionId: 'heavy-armor' }),
+    )
+
+    await user.click(screen.getByRole('button', { name: /^Starting Package/ }))
+
+    expect(rowFor('Chain Mail').getByText('Requires STR 13')).toBeInTheDocument()
+    expect(rowFor('Greatsword').queryByText(/Not proficient|Requires/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Included in package/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Recommended by/)).not.toBeInTheDocument()
   })
 })

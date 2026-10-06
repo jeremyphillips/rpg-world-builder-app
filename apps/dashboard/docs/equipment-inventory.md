@@ -174,15 +174,13 @@ Remaining after purchase                        …
 
 ## Proficiency and ability-score warnings
 
-Full Builder and Quick NPC share the equipment advisories (`equipment_not_proficient` and `equipment_ability_score_requirement_unmet`), the equipment-id index, and `buildAdvisoryStatusItems`. Each experience projects those facts onto its own rows.
+Full Builder and Quick NPC share the equipment advisories (`equipment_not_proficient` and `equipment_ability_score_requirement_unmet`) and the equipment-id index. Advisories are the final-loadout channel: Review, the create dialog, and finalize read them as aggregate lists.
 
 The ability-score advisory fires for owned or purchased equipment whose `abilityScoreRequirements` exceed the draft's known scores (`Plate Armor — Requires STR 15; character has STR 12.`). Like proficiency, it is non-blocking: create asks for confirmation.
 
-Owned and selected equipment renders the advisory as a warning. Picker rows show the short compatibility badges (`Not proficient`, `Requires STR 15`) through the selection-row pipeline ([picker chrome](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy)). Review and create confirmation stay aggregate advisory lists.
+Builder rows do not render advisories. Picker, inventory, Starting Package, conversion, and trim rows show the short compatibility badges (`Not proficient`, `Requires STR 15`) from context-filtered row facts through the selection-row pipeline ([picker chrome](./character-builder-picker-chrome.md#builder-equipment-surfaces)). Inventory view-model rows carry `selectionPresentation`, and each parent section resolves `status` with its context, so rows never resolve proficiency while rendering. A parity test keeps row compatibility and advisories in step. Quick NPC rows still use `buildAdvisoryStatusItems` until Gate C.
 
-Planned follow-up: inventory and trim rows will take their warnings from context-filtered row facts instead of `advisoryStatusItems` (see the remaining migration in the picker chrome doc). Advisories remain the final-loadout channel for Review, the create dialog, and finalize.
-
-Builder inventory and package-switch cards read `advisoryStatusItems` from the view model. They do not resolve proficiency while rendering. Pending explicit purchases can produce an advisory before a starting option funds them; they stay out of resolved inventory.
+Pending explicit purchases can produce an advisory before a starting option funds them; they stay out of resolved inventory. Equipment `grants` (ensure-at-least materialization) also raise advisories but render no row of their own.
 
 ## Package switch resolution
 
@@ -241,6 +239,7 @@ conflict resolution, not a new customization signal).
 | Step wiring                   | `hooks/use-equipment-step.ts`                                                                   |
 | Package-switch modal          | `components/builder/steps/equipment/package-switch/equipment-package-switch-resolution-modal.*` |
 | Package-switch resolution lib | `lib/equipment/equipment-package-switch-resolution.lib.ts`                                      |
+| Row selection facts           | `lib/equipment/equipment-selection-facts.lib.ts`                                                |
 | Conversion contracts          | `packages/contracts/.../starting-package-conversion.ts`                                         |
 | Package-switch contracts      | `packages/contracts/.../equipment-package-switch.ts`                                            |
 

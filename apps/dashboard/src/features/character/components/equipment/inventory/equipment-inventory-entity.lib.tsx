@@ -42,30 +42,29 @@ export function resolveInventoryRowTrailingMeta(
 export function buildEquipmentInventoryRowEntity(args: {
   equipmentName: string
   stagedRemoval?: boolean
-  /** Advisory warnings and other status lines under the name. */
-  extraStatus?: readonly EntitySummaryStatusItem[]
+  /** Selection status resolved by the parent section with its row context. */
+  status?: readonly EntitySummaryStatusItem[]
 }): EntitySummaryModel {
-  return {
-    heading: resolveInventoryHeading(args.equipmentName, args.stagedRemoval),
-    status: args.extraStatus && args.extraStatus.length > 0 ? [...args.extraStatus] : undefined,
-  }
+  const heading = resolveInventoryHeading(args.equipmentName, args.stagedRemoval)
+  if (!args.status?.length) return { heading }
+  return { heading, status: args.status, statusComposition: 'metadata' }
 }
 
 export function buildEquipmentInventoryDisplayEntity(
   display: EquipmentInventoryDisplayItem,
-  extraStatus?: readonly EntitySummaryStatusItem[],
+  status?: readonly EntitySummaryStatusItem[],
 ): EntitySummaryModel {
   if (display.kind === 'single') {
     const { row } = display
     return buildEquipmentInventoryRowEntity({
       equipmentName: row.equipmentName,
       stagedRemoval: row.stagedRemoval,
-      extraStatus,
+      status,
     })
   }
 
   return buildEquipmentInventoryRowEntity({
     equipmentName: display.equipmentName,
-    extraStatus,
+    status,
   })
 }

@@ -21,6 +21,8 @@ import {
 
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
+  /** Resolved by the parent section with its selection-row context. */
+  status?: readonly EntitySummaryStatusItem[]
   allowZeroQuantity?: boolean
   detailLabelOverride?: string
   /** Package and generic-grant quantity outside this purchase stepper. */
@@ -185,14 +187,6 @@ function resolveInventoryRowActions(args: {
   )
 }
 
-function advisoryStatusForDisplay(
-  display: EquipmentInventoryDisplayItem,
-): readonly EntitySummaryStatusItem[] {
-  if (display.kind === 'single') return display.row.advisoryStatusItems ?? []
-  const withStatus = display.rows.find((row) => (row.advisoryStatusItems?.length ?? 0) > 0)
-  return withStatus?.advisoryStatusItems ?? display.rows[0]?.advisoryStatusItems ?? []
-}
-
 function resolveInventoryRowTrailing(args: {
   display: EquipmentInventoryDisplayItem
   detailLabelOverride?: string
@@ -210,13 +204,14 @@ function resolveInventoryRowTrailing(args: {
 
 export function EquipmentInventoryRowItem({
   display,
+  status,
   allowZeroQuantity = false,
   detailLabelOverride,
   otherSourceQuantity = 0,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
-  const entity = buildEquipmentInventoryDisplayEntity(display, advisoryStatusForDisplay(display))
+  const entity = buildEquipmentInventoryDisplayEntity(display, status)
 
   if (display.kind === 'single') {
     const { row } = display

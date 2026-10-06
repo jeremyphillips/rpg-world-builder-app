@@ -14,8 +14,11 @@ import {
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { Button, Checkbox, Eyebrow, Text } from '@rpg/ui'
 
-import { ContentEntityCard, type EntitySummaryStatusItem } from '@/features/content'
+import { ContentEntityCard } from '@/features/content'
+import { useEquipmentSelectionFacts } from '../../../hooks/use-equipment-selection-facts'
+import { resolveEquipmentConversionItemPresentation } from '../../../lib/equipment/equipment-selection-facts.lib'
 import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
+import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { buildEquipmentInventoryRowEntity } from '../inventory/equipment-inventory-entity.lib'
 import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory.variants'
 import {
@@ -106,6 +109,7 @@ export function EquipmentPackageConversionEditor({
   const fallbackId = useId()
   const resolvedEditorId = editorId ?? fallbackId
   const descriptionRef = useRef<HTMLDivElement>(null)
+  const selectionFacts = useEquipmentSelectionFacts()
 
   const preview = buildStartingPackageConversionPreview({
     draft,
@@ -156,10 +160,14 @@ export function EquipmentPackageConversionEditor({
                   const disabled = item.status === 'blocked'
                   const checked = selectedPackageItemKeys.has(item.packageItemKey)
                   const valueLabel = formatConversionItemValueLabel(item)
-                  const status: EntitySummaryStatusItem[] | undefined =
-                    disabled && item.blockingIssue
-                      ? [{ kind: 'text', variant: 'warning', label: item.blockingIssue }]
-                      : undefined
+                  const status = resolveSelectionRowStatusItems(
+                    resolveEquipmentConversionItemPresentation({
+                      item,
+                      equipment: catalogIndex.equipment.get(item.equipmentId),
+                      facts: selectionFacts,
+                    }),
+                    { context: 'edit_choice' },
+                  )
                   const title =
                     item.grantQuantity > 1
                       ? `${item.grantQuantity} × ${item.equipmentName}`
@@ -171,7 +179,7 @@ export function EquipmentPackageConversionEditor({
                         entity={buildEquipmentInventoryRowEntity({
                           equipmentName: title,
                           stagedRemoval: !checked,
-                          extraStatus: status,
+                          status,
                         })}
                         leading={
                           <Checkbox

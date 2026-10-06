@@ -18,6 +18,7 @@ import {
 import {
   buildPackageSwitchDraftPurchasedGroups,
   resolvePackageSwitchModalState,
+  resolvePackageSwitchSelectionFacts,
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import { EquipmentPackageSwitchResolutionModalBody } from './equipment-package-switch-resolution-modal-body'
 import { EquipmentPackageSwitchResolutionModalFooter } from './equipment-package-switch-resolution-modal-footer'
@@ -30,6 +31,7 @@ export type EquipmentPackageSwitchResolutionModalProps = {
   context: CharacterBuildContext
   choiceSets: readonly ChoiceSet[]
   evaluation: EquipmentPackageSwitchEvaluation
+  nestedSelections?: CharacterBuilderDraft['choiceSelections']
   draftQuantitiesByPurchaseId: Record<string, number>
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
@@ -47,6 +49,7 @@ export function EquipmentPackageSwitchResolutionModal({
   context,
   choiceSets,
   evaluation,
+  nestedSelections,
   draftQuantitiesByPurchaseId,
   commitErrorReason,
   staleNotice = false,
@@ -62,17 +65,41 @@ export function EquipmentPackageSwitchResolutionModal({
     return active instanceof HTMLElement ? active : null
   })
 
+  const { targetOptionId } = evaluation
+  // Quantity edits re-evaluate the switch; key the derivation on the trimmable set instead.
+  const trimmablePurchaseIdsKey = JSON.stringify(
+    evaluation.editableItems.map((item) => item.purchaseId),
+  )
+  const selectionFacts = useMemo(
+    () =>
+      resolvePackageSwitchSelectionFacts({
+        draft,
+        catalogIndex,
+        choiceSets,
+        rulesetId: context.rulesetId,
+        targetOptionId,
+        trimmablePurchaseIds: JSON.parse(trimmablePurchaseIdsKey) as string[],
+        nestedSelections,
+      }),
+    [
+      catalogIndex,
+      choiceSets,
+      context.rulesetId,
+      draft,
+      nestedSelections,
+      targetOptionId,
+      trimmablePurchaseIdsKey,
+    ],
+  )
   const purchasedGroups = useMemo(
     () =>
       buildPackageSwitchDraftPurchasedGroups({
         evaluation,
         draftQuantitiesByPurchaseId,
         catalogIndex,
-        draft,
-        context,
-        choiceSets,
+        selectionFacts,
       }),
-    [catalogIndex, choiceSets, context, draft, draftQuantitiesByPurchaseId, evaluation],
+    [catalogIndex, draftQuantitiesByPurchaseId, evaluation, selectionFacts],
   )
   const modalState = resolvePackageSwitchModalState({
     evaluation,

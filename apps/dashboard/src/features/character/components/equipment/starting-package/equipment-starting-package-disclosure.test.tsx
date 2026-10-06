@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -22,6 +22,15 @@ import {
   EQUIPMENT_STARTING_PACKAGE_TITLE,
 } from '../../../lib/equipment/equipment-step.lib'
 import { buildEquipmentInventoryViewModel } from '../../../lib/equipment/equipment-inventory-summary.lib'
+import {
+  selectionFactsDraft,
+  selectionFactsEquipment,
+  selectionFactsForDraft,
+  selectionFactsScenario,
+  selectionFactsUnpricedRobe,
+  selectionFactsWizardPouchPackageClass,
+} from '../../../lib/equipment/equipment-selection-facts.fixtures'
+import { EquipmentSelectionFactsProvider } from '../selection-facts/equipment-selection-facts-provider'
 import {
   EquipmentStartingPackageDisclosure,
   EquipmentStartingPackageGoldHeader,
@@ -207,6 +216,69 @@ describe('EquipmentStartingPackageDisclosure', () => {
     expect(
       screen.getByRole('menuitem', { name: EQUIPMENT_PACKAGE_CHANGE_OPTION_MENU_LABEL }),
     ).toBeInTheDocument()
+  })
+})
+
+describe('EquipmentStartingPackageDisclosure conversion editor status', () => {
+  it('shows edit_choice guidance and conversion blockers per package item', () => {
+    const scenario = selectionFactsScenario({
+      classes: [selectionFactsWizardPouchPackageClass],
+      equipment: Object.values({ ...selectionFactsEquipment, robe: selectionFactsUnpricedRobe }),
+    })
+    const draft = selectionFactsDraft({
+      characterClass: selectionFactsWizardPouchPackageClass,
+      optionId: 'standard-equipment',
+    })
+    const facts = selectionFactsForDraft(scenario, draft)
+    const viewModel = buildEquipmentInventoryViewModel(
+      draft,
+      scenario.catalogIndex,
+      undefined,
+      'included',
+      scenario.context,
+      facts,
+    )
+    if (viewModel?.layout !== 'split' || viewModel.startingEquipment.kind !== 'package') {
+      throw new Error('Expected a starting package channel')
+    }
+    const goldOptionFunding = resolveStartingEquipmentFundingOptions({
+      draft,
+      catalogIndex: scenario.catalogIndex,
+    }).get('starting-gold')
+
+    render(
+      <EquipmentSelectionFactsProvider facts={facts}>
+        <EquipmentStartingPackageDisclosure
+          packageGroup={viewModel.startingEquipment.group}
+          draft={draft}
+          catalogIndex={scenario.catalogIndex}
+          goldOptionFunding={goldOptionFunding}
+          conversionEditorOpen
+          selectedPackageItemKeys={new Set()}
+          onCustomize={vi.fn()}
+          onChangeEquipmentOption={vi.fn()}
+          onSelectedPackageItemKeysChange={vi.fn()}
+          onCancelConversion={vi.fn()}
+          onCommitConversion={vi.fn()}
+        />
+      </EquipmentSelectionFactsProvider>,
+    )
+
+    function itemRow(name: string) {
+      const row = screen.getByRole('checkbox', { name }).closest('li')
+      if (!row) throw new Error(`No row for ${name}`)
+      return within(row)
+    }
+
+    expect(itemRow('Spellbook').getByText('Required by class')).toBeInTheDocument()
+    expect(itemRow('Component Pouch').getByText('Recommended by class')).toBeInTheDocument()
+    expect(
+      itemRow('Robe').getByText(
+        'This item has no market price and cannot be purchased with starting gold.',
+      ),
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Cannot afford')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Included in package/)).not.toBeInTheDocument()
   })
 })
 

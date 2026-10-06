@@ -108,19 +108,23 @@ tables. Domain resolvers never pick a category or a context.
 
 ### Context matrix
 
-| Context          | Equipment surfaces                                                            | Availability | Affordability | Compatibility | Req. (open) | Req. (held) | Recommendation | Rec. (owned) | Source |
-| ---------------- | ----------------------------------------------------------------------------- | ------------ | ------------- | ------------- | ----------- | ----------- | -------------- | ------------ | ------ |
-| `picker`         | Picker drawer                                                                 | yes          | yes           | yes           | yes         | no          | yes            | no           | yes    |
-| `owned`          | Added Equipment cart (Gate B)                                                 | no           | no            | yes           | no          | no          | no             | no           | no     |
-| `review`         | Starting Package expanded view (Gate B); Quick NPC weapon requirement preview | no           | no            | yes           | no          | no          | no             | no           | no     |
-| `edit_choice`    | Package conversion editor (Gate B); Quick NPC package customization (Gate C)  | yes          | no            | yes           | yes         | yes         | yes            | yes          | no     |
-| `reconciliation` | Package-switch trim modal (Gate B)                                            | no           | no            | yes           | yes         | yes         | yes            | yes          | no     |
+| Context          | Equipment surfaces                                                   | Availability | Affordability | Compatibility | Req. (open) | Req. (held) | Recommendation | Rec. (owned) | Source |
+| ---------------- | -------------------------------------------------------------------- | ------------ | ------------- | ------------- | ----------- | ----------- | -------------- | ------------ | ------ |
+| `picker`         | Picker drawer                                                        | yes          | yes           | yes           | yes         | no          | yes            | no           | yes    |
+| `owned`          | Added Equipment cart                                                 | no           | no            | yes           | no          | no          | no             | no           | no     |
+| `review`         | Starting Package expanded view; Quick NPC weapon requirement preview | no           | no            | yes           | no          | no          | no             | no           | no     |
+| `edit_choice`    | Package conversion editor; Quick NPC package customization (Gate C)  | yes          | no            | yes           | yes         | yes         | yes            | yes          | no     |
+| `reconciliation` | Package-switch trim modal                                            | no           | no            | yes           | yes         | no          | yes            | no           | no     |
 
 `picker` hides held requirements and owned recommendations, because that guidance has already
-done its job. `edit_choice` and `reconciliation` show them, because they explain why to keep an
-item. `reconciliation` evaluates facts against the **target (post-switch) draft**; every other
-context uses the current step draft. The draft is a domain-resolver input, and the policy never
-sees it.
+done its job. `edit_choice` shows them, because they explain why to keep a package item.
+
+`reconciliation` evaluates facts against the **target (post-switch) draft without the trimmable
+purchases**: what the character keeps no matter how the trim goes. Against that basis an open
+requirement or unowned recommendation on a purchase is a reason to keep it, while "held" means the
+target package already covers the item, so the policy hides held guidance there. A purchased
+Spellbook reads `Required by class` only when the target package lacks one. Every other context
+uses the current step draft. The draft is a domain-resolver input, and the policy never sees it.
 
 `selection-row-context-policy.test.ts` asserts this matrix cell by cell.
 
@@ -159,14 +163,30 @@ outside `selection-row-status/`, and any hand-built selection status items.
 **Stays local (not this lane):** ability eyebrows, class and species RadioCards, Quick NPC
 role/class/species group eyebrows, choice-row `Stale`, and Quick NPC equipment option-row clauses.
 
+### Builder equipment surfaces
+
+One recommendation derivation per draft feeds the picker and every owned surface.
+`resolveEquipmentStepPickerItems` returns it as `resolvedById`, and `useEquipmentStep` exposes it as
+`selectionFacts` (`EquipmentSelectionFacts`, `lib/equipment/equipment-selection-facts.lib.ts`).
+The equipment step mounts `EquipmentSelectionFactsProvider`; **sections** read
+`useEquipmentSelectionFacts()`, rows never do.
+
+- Inventory rows carry `selectionPresentation` (facts only, no acquisition input) from
+  `withEquipmentSelectionPresentation`. `lookupResolvedEquipment` tolerates slug ids.
+- Rows (`EquipmentInventoryRowItem`, every `EquipmentAddedInventoryRowItem` path, and
+  `EquipmentInventoryManageDisclosureCard`) take a ready `status` prop. The parent resolves it:
+  - `EquipmentAddedInventorySection`: `owned`.
+  - `EquipmentStartingPackageInventory`: `review`.
+  - `EquipmentPackageConversionEditor`: `edit_choice`, via
+    `resolveEquipmentConversionItemPresentation` (`blockingIssue` → `conversion_blocked` blocker).
+  - Package-switch trim modal: `reconciliation`. The modal derives facts once per target option
+    with `resolvePackageSwitchSelectionFacts`, and `buildPackageSwitchDraftPurchasedGroups` hands
+    each item to `EquipmentPurchasedInventorySection` with its status resolved.
+- `equipment-selection-row-presentation.parity.test.ts` guards drift: owned weapons and armor show
+  a compatibility entry if and only if a matching build advisory exists.
+
 ### Remaining migration
 
-- **Gate B (builder owned surfaces):** `resolveEquipmentStepPickerItems` exposes `resolvedById`.
-  Inventory rows carry `selectionPresentation` in place of `advisoryStatusItems`, and parent
-  sections resolve status with their context: Added cart (`owned`, all row paths), Starting
-  Package inventory (`review`), package conversion editor (`edit_choice`, `blockingIssue` →
-  `conversion_blocked`), and the trim modal (`reconciliation`, target-draft facts).
-  `advisoryStatusForDisplay` is deleted.
 - **Gate C (spells, languages, Quick NPC):** the spell and proficiency drawers move to `picker`
   (recommendation and capacity notices). Quick NPC package customization moves to `edit_choice`
   and selected additional rows to `owned`. `recommendationStatusItems` and

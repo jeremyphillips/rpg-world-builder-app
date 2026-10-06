@@ -11,6 +11,7 @@ import { showsBuilderStepReviewMessage } from '../../../../lib/builder/builder-s
 import { EquipmentAcquisitionGuidance } from '../../../equipment/acquisition/equipment-acquisition-guidance'
 import { EquipmentPackageSwitchResolutionModal } from './package-switch/equipment-package-switch-resolution-modal'
 import { EquipmentPickerDrawer } from '../../../equipment/picker/drawer/equipment-picker-drawer'
+import { EquipmentSelectionFactsProvider } from '../../../equipment/selection-facts/equipment-selection-facts-provider'
 import { StartingEquipmentOptionSection } from '../../../equipment/starting-package/starting-equipment-option-section'
 import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {
@@ -133,7 +134,7 @@ export function EquipmentStepInteractive({
   })
 
   return (
-    <>
+    <EquipmentSelectionFactsProvider facts={step.selectionFacts}>
       <div className="space-y-8">
         {showsBuilderStepReviewMessage(readiness) ? (
           <BuilderStepReadinessPanel state={readiness} />
@@ -160,7 +161,6 @@ export function EquipmentStepInteractive({
           budget={budget}
           goldOptionFunding={step.goldOptionFunding}
           classOptionPolicy={step.classOptionPolicy}
-          resolvedChoiceSets={step.resolvedChoiceSets}
           conversionEditorOpen={step.conversionEditorOpen}
           selectedPackageItemKeys={step.selectedPackageItemKeys}
           conversionCommitStatusMessage={step.conversionCommitStatusMessage}
@@ -236,6 +236,7 @@ export function EquipmentStepInteractive({
           context={step.context}
           choiceSets={step.resolvedChoiceSets}
           evaluation={packageSwitchEvaluation}
+          nestedSelections={pendingPackageSwitch.nestedSelections}
           draftQuantitiesByPurchaseId={pendingPackageSwitch.draftQuantitiesByPurchaseId}
           commitErrorReason={pendingPackageSwitch.commitErrorReason}
           staleNotice={pendingPackageSwitch.staleNotice}
@@ -248,6 +249,6 @@ export function EquipmentStepInteractive({
           onConfirm={handleCommitPackageSwitch}
         />
       ) : null}
-    </>
+    </EquipmentSelectionFactsProvider>
   )
 }
