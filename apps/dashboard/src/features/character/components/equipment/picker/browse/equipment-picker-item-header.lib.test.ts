@@ -270,4 +270,49 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       action: { kind: 'manage_only' },
     })
   })
+
+  it('keeps add enabled for owned affordable purchases', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: false,
+        availability: { status: 'available' },
+      },
+      ownedQuantity: 1,
+    })
+
+    expect(presentation.action).toEqual({ kind: 'add', disabled: false })
+  })
+
+  it('keeps add disabled for owned and unowned unaffordable purchases', () => {
+    const row = buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture)
+    const rowActionVm = {
+      kind: 'purchase' as const,
+      disabled: true,
+      availability: { status: 'unaffordable' as const, shortfallCp: 100 },
+    }
+
+    expect(
+      resolveEquipmentPickerItemPresentation({
+        equipment: equipmentStepPotionOfHealingFixture,
+        row,
+        workflowMode: 'purchase',
+        rowActionVm,
+        ownedQuantity: 1,
+      }).action,
+    ).toEqual({ kind: 'add', disabled: true })
+
+    expect(
+      resolveEquipmentPickerItemPresentation({
+        equipment: equipmentStepPotionOfHealingFixture,
+        row,
+        workflowMode: 'purchase',
+        rowActionVm,
+        ownedQuantity: 0,
+      }).action,
+    ).toEqual({ kind: 'add', disabled: true })
+  })
 })

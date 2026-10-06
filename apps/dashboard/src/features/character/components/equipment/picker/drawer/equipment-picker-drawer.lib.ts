@@ -498,11 +498,14 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
       })
       return {
         ...(row.priceLabel ? { secondary: { kind: 'price', label: row.priceLabel } } : {}),
-        action: action.disabled
-          ? ownedQuantity > 0
-            ? { kind: 'manage_only' }
-            : { kind: 'add', disabled: true }
-          : { kind: 'add', disabled: false },
+        action:
+          action.reason === 'unaffordable'
+            ? { kind: 'add', disabled: true }
+            : action.disabled
+              ? ownedQuantity > 0
+                ? { kind: 'manage_only' }
+                : { kind: 'add', disabled: true }
+              : { kind: 'add', disabled: false },
       }
     }
 

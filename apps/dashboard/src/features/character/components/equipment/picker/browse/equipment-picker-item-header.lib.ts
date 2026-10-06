@@ -16,6 +16,14 @@ import {
   EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
 } from '../drawer/equipment-picker-drawer.types'
 
+/**
+ * Header action for an equipment picker row.
+ *
+ * - `add` — additional acquisition is supported. `disabled: true` means it is
+ *   temporarily not permitted.
+ * - `manage_only` — additional acquisition is not an available operation.
+ *   Existing ownership may still be shown or managed.
+ */
 export type EquipmentPickerAction =
   | { kind: 'add'; disabled: boolean }
   | { kind: 'manage_only' }
@@ -141,7 +149,7 @@ function resolvePurchasePresentation(args: {
         : {
             statusItems: [blockerStatusItem(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
           }),
-      action: args.ownedQuantity > 0 ? { kind: 'manage_only' } : action,
+      action,
     }
   }
 

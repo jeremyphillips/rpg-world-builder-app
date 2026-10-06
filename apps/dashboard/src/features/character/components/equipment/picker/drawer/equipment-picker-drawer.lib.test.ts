@@ -23,6 +23,7 @@ import {
   hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerDrawerItemHeaderPresentation,
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
@@ -113,6 +114,26 @@ describe('equipment-picker-drawer.lib', () => {
     )
 
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+  })
+
+  it('keeps disabled add on owned and unowned unaffordable purchase fallbacks', () => {
+    const unaffordable = equipmentPickerDefaultPathItemsFixture[1]!
+
+    expect(
+      resolveEquipmentPickerDrawerItemHeaderPresentation({
+        item: unaffordable,
+        workflowMode: 'purchase',
+        ownedQuantity: 1,
+      }).action,
+    ).toEqual({ kind: 'add', disabled: true })
+
+    expect(
+      resolveEquipmentPickerDrawerItemHeaderPresentation({
+        item: unaffordable,
+        workflowMode: 'purchase',
+        ownedQuantity: 0,
+      }).action,
+    ).toEqual({ kind: 'add', disabled: true })
   })
 
   it('keeps remaining-unaffordable rows visible but disables purchase', () => {
