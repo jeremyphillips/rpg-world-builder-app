@@ -6,11 +6,16 @@ import type { EquipmentInventoryDisplayItem } from '../../../lib/equipment/equip
 import { resolveCombinedInventoryDetailLineLabel } from '../../../lib/equipment/equipment-inventory-summary.lib'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+function nonemptyLabel(label?: string): string | undefined {
+  if (!label) return undefined
+  return label
+}
+
 function resolveDetailLineLabel(row: EquipmentInventoryRow): string | undefined {
-  if (row.stagedRemoval) return row.sourceLabel
-  if (row.priceLineLabel) return row.priceLineLabel
-  if (row.bundleLabel) return joinInlineMetadata([row.sourceLabel, row.bundleLabel])
-  return row.sourceLabel
+  if (row.stagedRemoval) return nonemptyLabel(row.sourceLabel)
+  if (row.priceLineLabel) return nonemptyLabel(row.priceLineLabel)
+  if (row.bundleLabel) return nonemptyLabel(joinInlineMetadata([row.sourceLabel, row.bundleLabel]))
+  return nonemptyLabel(row.sourceLabel)
 }
 
 function resolveInventoryHeading(equipmentName: string, stagedRemoval = false): ReactNode {
@@ -23,60 +28,44 @@ function resolveInventoryHeading(equipmentName: string, stagedRemoval = false): 
   )
 }
 
-function resolveInventoryDescription(detailLabel?: string): string | undefined {
-  if (!detailLabel) return undefined
-  return detailLabel
-}
-
-function resolveRowStatus(
-  equipped: boolean,
-  extraStatus: readonly EntitySummaryStatusItem[] = [],
-): EntitySummaryStatusItem[] | undefined {
-  const status: EntitySummaryStatusItem[] = equipped
-    ? [{ kind: 'badge', label: 'Equipped', appearance: 'soft', tone: 'success' }]
-    : []
-  status.push(...extraStatus)
-  return status.length > 0 ? status : undefined
+/** Provenance or price copy for the trailing cell (`meta` or `indicator: label`). */
+export function resolveInventoryRowTrailingMeta(
+  display: EquipmentInventoryDisplayItem,
+  override?: string,
+): string | undefined {
+  const overrideLabel = nonemptyLabel(override)
+  if (overrideLabel) return overrideLabel
+  if (display.kind === 'single') return resolveDetailLineLabel(display.row)
+  return nonemptyLabel(resolveCombinedInventoryDetailLineLabel(display))
 }
 
 export function buildEquipmentInventoryRowEntity(args: {
   equipmentName: string
-  detailLabel?: string
-  equipped?: boolean
   stagedRemoval?: boolean
-  /** Appended after the Equipped badge (e.g. build advisory warnings). */
+  /** Advisory warnings and other status lines under the name. */
   extraStatus?: readonly EntitySummaryStatusItem[]
 }): EntitySummaryModel {
   return {
     heading: resolveInventoryHeading(args.equipmentName, args.stagedRemoval),
-    description: resolveInventoryDescription(args.detailLabel),
-    status: resolveRowStatus(Boolean(args.equipped), args.extraStatus),
+    status: args.extraStatus && args.extraStatus.length > 0 ? [...args.extraStatus] : undefined,
   }
 }
 
 export function buildEquipmentInventoryDisplayEntity(
   display: EquipmentInventoryDisplayItem,
-  detailLabelOverride?: string,
   extraStatus?: readonly EntitySummaryStatusItem[],
 ): EntitySummaryModel {
   if (display.kind === 'single') {
     const { row } = display
     return buildEquipmentInventoryRowEntity({
       equipmentName: row.equipmentName,
-      detailLabel: detailLabelOverride ?? resolveDetailLineLabel(row),
-      equipped: Boolean(row.entry.equipped),
       stagedRemoval: row.stagedRemoval,
       extraStatus,
     })
   }
 
-  const equipped = display.rows.some((row) => row.entry.equipped)
-  const detailLabel = detailLabelOverride ?? resolveCombinedInventoryDetailLineLabel(display)
-
   return buildEquipmentInventoryRowEntity({
     equipmentName: display.equipmentName,
-    detailLabel,
-    equipped,
     extraStatus,
   })
 }

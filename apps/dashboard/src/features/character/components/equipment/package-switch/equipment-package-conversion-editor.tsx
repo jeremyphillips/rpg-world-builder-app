@@ -8,18 +8,22 @@ import {
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type ResolvedStartingEquipmentFunding,
+  type StartingPackageConversionItem,
   type StartingPackageConversionPreview,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-import { Button, CheckboxField, Heading, Text } from '@rpg/ui'
+import { Button, Checkbox, Eyebrow, Text } from '@rpg/ui'
 
+import { ContentEntityCard, type EntitySummaryStatusItem } from '@/features/content'
+import type { StartingPackageInventoryGroup } from '../../../lib/equipment/equipment-step.lib'
+import { buildEquipmentInventoryRowEntity } from '../inventory/equipment-inventory-entity.lib'
+import { equipmentInventoryRowListClasses } from '../inventory/equipment-inventory.variants'
 import {
+  equipmentPackageConversionBudgetClasses,
+  equipmentPackageConversionCategoryClasses,
   equipmentPackageConversionEditorActionsClasses,
   equipmentPackageConversionEditorBodyClasses,
   equipmentPackageConversionEditorClasses,
-  equipmentPackageConversionEditorEmbeddedClasses,
-  equipmentPackageConversionEditorHeaderClasses,
-  equipmentPackageConversionEditorHeadingClasses,
   equipmentPackageConversionEditorDescriptionClasses,
   equipmentPackageConversionEditorListClasses,
   equipmentPackageConversionStatusClasses,
@@ -29,11 +33,11 @@ export type EquipmentPackageConversionEditorProps = {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   departingOptionId: string
+  packageGroup: StartingPackageInventoryGroup
   targetFunding: ResolvedStartingEquipmentFunding
   selectedPackageItemKeys: ReadonlySet<string>
   editorId?: string
   commitStatusMessage?: string
-  embedded?: boolean
   onSelectedPackageItemKeysChange: (keys: ReadonlySet<string>) => void
   onCancel: () => void
   onCommit: (preview: StartingPackageConversionPreview) => void
@@ -49,22 +53,59 @@ function formatConversionBudgetLine(preview: StartingPackageConversionPreview): 
   return joinInlineMetadata([`${remaining} remaining`, `${starting} starting`, `${spent} spent`])
 }
 
+function formatConversionItemValueLabel(item: StartingPackageConversionItem): string | undefined {
+  if (item.pricing.status !== 'priced') return undefined
+  const totalCp = item.pricing.unitCostCp * item.purchaseQuantity
+  if (totalCp <= 0) return undefined
+  return `${formatWealth(copperToWealth(totalCp))} value`
+}
+
+function groupConversionItems(
+  items: readonly StartingPackageConversionItem[],
+  packageGroup: StartingPackageInventoryGroup,
+): Array<{ groupLabel: string; items: StartingPackageConversionItem[] }> {
+  const byKey = new Map(items.map((item) => [item.packageItemKey, item]))
+  const used = new Set<string>()
+
+  const groups = packageGroup.categoryGroups
+    .map((category) => {
+      const grouped = category.rows.flatMap((row) => {
+        const key =
+          row.removeTarget?.kind === 'package' ? row.removeTarget.packageItemKey : undefined
+        if (!key) return []
+        const item = byKey.get(key)
+        if (!item) return []
+        used.add(key)
+        return [item]
+      })
+      return { groupLabel: category.groupLabel, items: grouped }
+    })
+    .filter((group) => group.items.length > 0)
+
+  const unmatched = items.filter((item) => !used.has(item.packageItemKey))
+  if (unmatched.length > 0) {
+    groups.push({ groupLabel: 'Equipment', items: unmatched })
+  }
+
+  return groups
+}
+
 export function EquipmentPackageConversionEditor({
   draft,
   catalogIndex,
   departingOptionId,
+  packageGroup,
   targetFunding,
   selectedPackageItemKeys,
   editorId,
   commitStatusMessage,
-  embedded = false,
   onSelectedPackageItemKeysChange,
   onCancel,
   onCommit,
 }: EquipmentPackageConversionEditorProps) {
   const fallbackId = useId()
   const resolvedEditorId = editorId ?? fallbackId
-  const headingRef = useRef<HTMLDivElement>(null)
+  const descriptionRef = useRef<HTMLDivElement>(null)
 
   const preview = buildStartingPackageConversionPreview({
     draft,
@@ -75,13 +116,14 @@ export function EquipmentPackageConversionEditor({
   })
 
   useEffect(() => {
-    headingRef.current?.focus()
-    headingRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
+    descriptionRef.current?.focus()
+    descriptionRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
   }, [])
 
   if (!preview) return null
 
   const canCommit = canConvertStartingPackageToGold({ preview, selectedPackageItemKeys })
+  const groups = groupConversionItems(preview.items, packageGroup)
 
   const toggleItem = (packageItemKey: string, checked: boolean) => {
     const next = new Set(selectedPackageItemKeys)
@@ -94,55 +136,68 @@ export function EquipmentPackageConversionEditor({
   }
 
   return (
-    <section
-      id={resolvedEditorId}
-      className={
-        embedded
-          ? equipmentPackageConversionEditorEmbeddedClasses
-          : equipmentPackageConversionEditorClasses
-      }
-      aria-labelledby={`${resolvedEditorId}-heading`}
-    >
-      <header className={equipmentPackageConversionEditorHeaderClasses}>
-        <div ref={headingRef} tabIndex={-1} className="outline-none">
-          <Heading
-            variant="subsection"
-            as="h4"
-            id={`${resolvedEditorId}-heading`}
-            className={equipmentPackageConversionEditorHeadingClasses}
-          >
-            Customize {preview.goldOptionLabel}
-          </Heading>
-        </div>
+    <section id={resolvedEditorId} className={equipmentPackageConversionEditorClasses}>
+      <div ref={descriptionRef} tabIndex={-1} className="outline-none">
         <Text as="p" className={equipmentPackageConversionEditorDescriptionClasses}>
           Choose which package items to keep as starting-gold purchases.
         </Text>
-      </header>
+      </div>
 
       <div className={equipmentPackageConversionEditorBodyClasses}>
-        <Text as="p">{formatConversionBudgetLine(preview)}</Text>
-        <ul className={equipmentPackageConversionEditorListClasses}>
-          {preview.items.map((item) => {
-            const itemId = `${resolvedEditorId}-${item.packageItemKey}`
-            const disabled = item.status === 'blocked'
-            const checked = selectedPackageItemKeys.has(item.packageItemKey)
+        <Text as="p" className={equipmentPackageConversionBudgetClasses}>
+          {formatConversionBudgetLine(preview)}
+        </Text>
+        <div className={equipmentPackageConversionEditorListClasses}>
+          {groups.map((group) => (
+            <div key={group.groupLabel} className={equipmentPackageConversionCategoryClasses}>
+              <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
+              <ul className={equipmentInventoryRowListClasses}>
+                {group.items.map((item) => {
+                  const disabled = item.status === 'blocked'
+                  const checked = selectedPackageItemKeys.has(item.packageItemKey)
+                  const valueLabel = formatConversionItemValueLabel(item)
+                  const status: EntitySummaryStatusItem[] | undefined =
+                    disabled && item.blockingIssue
+                      ? [{ kind: 'text', variant: 'warning', label: item.blockingIssue }]
+                      : undefined
+                  const title =
+                    item.grantQuantity > 1
+                      ? `${item.grantQuantity} × ${item.equipmentName}`
+                      : item.equipmentName
 
-            return (
-              <li key={item.packageItemKey}>
-                <CheckboxField
-                  id={itemId}
-                  checked={checked}
-                  disabled={disabled}
-                  label={`${item.grantQuantity} × ${item.equipmentName}`}
-                  hint={disabled ? item.blockingIssue : undefined}
-                  onCheckedChange={(nextChecked) =>
-                    toggleItem(item.packageItemKey, nextChecked === true)
-                  }
-                />
-              </li>
-            )
-          })}
-        </ul>
+                  return (
+                    <li key={item.packageItemKey}>
+                      <ContentEntityCard
+                        entity={buildEquipmentInventoryRowEntity({
+                          equipmentName: title,
+                          stagedRemoval: !checked,
+                          extraStatus: status,
+                        })}
+                        leading={
+                          <Checkbox
+                            checked={checked}
+                            disabled={disabled}
+                            aria-label={title}
+                            onCheckedChange={(nextChecked) =>
+                              toggleItem(item.packageItemKey, nextChecked === true)
+                            }
+                          />
+                        }
+                        trailing={
+                          valueLabel
+                            ? { kind: 'indicator', variant: 'label', label: valueLabel }
+                            : undefined
+                        }
+                        density="compact"
+                        disabled={disabled}
+                      />
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
       </div>
 
       {commitStatusMessage ? (

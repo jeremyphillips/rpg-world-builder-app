@@ -102,6 +102,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
       />,
     )
 
+    expect(screen.getByText('1 Common choice')).toBeInTheDocument()
     const releaseButton = screen.getByRole('button', { name: 'Release' })
     expect(releaseButton).toHaveClass('h-control-action-compact')
     expect(releaseButton).not.toHaveClass('bg-secondary')
@@ -118,6 +119,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
 
     render(<EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />)
 
+    expect(screen.getByText('2 Common choices')).toBeInTheDocument()
     expect(screen.getByText('Qty 2')).toBeInTheDocument()
     const trigger = screen.getByRole('button', { name: 'Expand Potion of Healing' })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')

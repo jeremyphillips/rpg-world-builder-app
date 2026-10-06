@@ -11,6 +11,7 @@ import {
   entityAnatomyTrailingActionVariants,
   entityAnatomyTrailingGroupSecondaryVariants,
   entityAnatomyTrailingIndicatorVariants,
+  entityAnatomyTrailingMetaVariants,
   entityAnatomyTrailingQuantityLabelVariants,
 } from './entity-anatomy-trailing.variants'
 
@@ -52,21 +53,49 @@ function EntityAnatomyTrailingSecondaryView({
   }
 }
 
+function EntityAnatomyTrailingMeta({ meta }: { meta?: string }) {
+  if (!meta) return null
+
+  return (
+    <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants()}>
+      {meta}
+    </Text>
+  )
+}
+
 function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTrailing }) {
   switch (trailing.kind) {
     case 'action':
     case 'utility':
-      return <div className={entityAnatomyTrailingActionVariants()}>{trailing.content}</div>
+      return (
+        <div className={entityAnatomyTrailingActionVariants()}>
+          <EntityAnatomyTrailingMeta meta={trailing.meta} />
+          {trailing.content}
+        </div>
+      )
     case 'indicator':
       return (
         <div className={entityAnatomyTrailingIndicatorVariants()}>
-          {trailing.variant === 'chevron' ? (
-            <ChevronRight aria-hidden className="size-4 shrink-0" />
+          {trailing.variant === 'label' ? (
+            <Text
+              as="span"
+              variant="muted"
+              className={entityAnatomyTrailingQuantityLabelVariants()}
+            >
+              {trailing.label}
+            </Text>
           ) : (
-            <EntityAnatomyTrailingQuantityLabel
-              quantity={trailing.quantity}
-              format={trailing.format}
-            />
+            <>
+              <EntityAnatomyTrailingMeta meta={trailing.meta} />
+              {trailing.variant === 'chevron' ? (
+                <ChevronRight aria-hidden className="size-4 shrink-0" />
+              ) : (
+                <EntityAnatomyTrailingQuantityLabel
+                  quantity={trailing.quantity}
+                  format={trailing.format}
+                />
+              )}
+            </>
           )}
         </div>
       )

@@ -19,10 +19,9 @@ import {
   equipmentStepMonkClassFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import {
-  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT,
+  EQUIPMENT_STARTING_PACKAGE_TITLE,
   EQUIPMENT_STEP_BROWSE_LABEL,
-  formatEquipmentGoldOptionStartingDescription,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentInventorySummary } from './equipment-inventory-summary'
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
@@ -36,7 +35,7 @@ const inventoryManagementProps = {
 }
 
 describe('EquipmentInventorySummary', () => {
-  it('renders package rows with name and value pricing', async () => {
+  it('renders package rows with name and value pricing after expanding the package', async () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -55,6 +54,7 @@ describe('EquipmentInventorySummary', () => {
       },
     }
 
+    const user = userEvent.setup()
     render(
       <EquipmentInventorySummary
         draft={draft}
@@ -63,13 +63,15 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
+    await user.click(screen.getByRole('button', { name: /^Starting Package/ }))
+
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(screen.getByText('Lute')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove from package' })).not.toBeInTheDocument()
     expect(screen.getByText('Added Equipment')).toBeInTheDocument()
   })
 
-  it('keeps package gear visible after a purchase on the package path', () => {
+  it('keeps package gear visible after a purchase on the package path', async () => {
     const catalogIndex = {
       ...equipmentStepCatalogIndexFixture,
       equipment: new Map([
@@ -104,6 +106,9 @@ describe('EquipmentInventorySummary', () => {
         {...inventoryManagementProps}
       />,
     )
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: /^Starting Package/ }))
 
     expect(screen.getByText('Spear')).toBeInTheDocument()
     expect(screen.getByText('Battleaxe')).toBeInTheDocument()
@@ -175,7 +180,8 @@ describe('EquipmentInventorySummary', () => {
 
     expect(screen.getByText('Rations')).toBeInTheDocument()
     expect(screen.getByText('2 purchased for 1 GP')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove all 2 Rations' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Decrease Rations quantity' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
 
@@ -308,7 +314,7 @@ describe('EquipmentInventorySummary', () => {
     )
   })
 
-  it('renders the gold-option panel copy with outline-only chrome', () => {
+  it('renders the gold-option header inside the inventory panel', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -331,20 +337,16 @@ describe('EquipmentInventorySummary', () => {
     )
 
     expect(
-      screen.getByRole('heading', { name: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE }),
-    ).toHaveClass('heading-style-group')
-    expect(
-      screen.getByText(formatEquipmentGoldOptionStartingDescription(false)),
+      screen.getByRole('heading', { name: EQUIPMENT_STARTING_PACKAGE_TITLE }),
     ).toBeInTheDocument()
-
-    const startingColumn = screen
-      .getByRole('heading', { name: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE })
-      .closest('section')
-    expect(startingColumn?.querySelector('.border-border')).toBeInTheDocument()
-    expect(startingColumn?.querySelector('.bg-sunken')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT)),
+    ).toBeInTheDocument()
+    expect(screen.getByText(/Starting Gold/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Starting Package/ })).not.toBeInTheDocument()
   })
 
-  it('reserves the toolbar row on the added column for package-path alignment', () => {
+  it('renders added equipment and a collapsed starting package in one panel', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -371,9 +373,12 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    const addedColumn = screen.getByRole('heading', { name: 'Added Equipment' }).closest('section')
-    expect(addedColumn?.querySelector('[aria-hidden="true"]')).toBeInTheDocument()
-    expect(container.querySelector('article.bg-card')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Added Equipment' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Starting Package/ })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
+    expect(container.querySelector('.rounded-lg.border')).toBeInTheDocument()
   })
 
   it('renders a title badge and outline panel when added inventory has entries', () => {
@@ -474,6 +479,6 @@ describe('EquipmentInventorySummary', () => {
     expect(screen.getByText('Leather Armor')).toBeInTheDocument()
     expect(screen.getByText(/^Pending purchase/)).toBeInTheDocument()
     expect(screen.queryByText(/Purchased/)).not.toBeInTheDocument()
-    expect(screen.queryByText(EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL)).not.toBeInTheDocument()
+    expect(screen.queryByText(EQUIPMENT_STARTING_PACKAGE_TITLE)).not.toBeInTheDocument()
   })
 })

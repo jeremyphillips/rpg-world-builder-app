@@ -231,15 +231,13 @@ describe('equipment-inventory-summary.lib', () => {
       layout: 'split',
       startingEquipment: {
         kind: 'gold_option',
-        message: 'No package gear in this option',
-        description:
-          'This character is using the gold option, so all equipment is added through purchases.',
+        optionLabel: 'Starting Gold',
       },
       addedEquipment: [],
     })
   })
 
-  it('appends the magic-item clause to gold-option copy when grants are available', () => {
+  it('keeps the gold-option channel when magic item grants are available', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -263,9 +261,7 @@ describe('equipment-inventory-summary.lib', () => {
 
     expect(viewModel?.layout === 'split' && viewModel.startingEquipment).toEqual({
       kind: 'gold_option',
-      message: 'No package gear in this option',
-      description:
-        'This character is using the gold option, so all equipment is added through purchases or magic item choices.',
+      optionLabel: 'Starting Gold',
     })
   })
 

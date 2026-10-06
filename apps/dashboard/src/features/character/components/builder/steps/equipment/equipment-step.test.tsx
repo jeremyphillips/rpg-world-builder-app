@@ -34,7 +34,7 @@ import {
   EQUIPMENT_STEP_BROWSE_LABEL,
   EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION,
   EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING,
-  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
+  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT,
   EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
 import {
@@ -492,9 +492,7 @@ describe('EquipmentStep', () => {
 
     renderEquipmentStep(draft)
 
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Starting Package/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
     expect(screen.getAllByText(/19 GP/).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
@@ -503,10 +501,13 @@ describe('EquipmentStep', () => {
     expect(screen.getByRole('dialog', { name: 'Choose equipment' })).toBeInTheDocument()
 
     await user.keyboard('{Escape}')
+    await user.click(screen.getByRole('button', { name: /^Starting Package/ }))
     await user.click(screen.getByRole('button', { name: EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL }))
 
-    expect(screen.getByRole('heading', { name: /Customize Starting Gold/i })).toBeInTheDocument()
-    expect(document.querySelector('.bg-card')).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose which package items to keep as starting-gold purchases.'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Use starting gold' })).toBeInTheDocument()
   })
 
   it('shows the gold-option empty state in inventory while guidance handles shopping', () => {
@@ -525,7 +526,9 @@ describe('EquipmentStep', () => {
 
     renderEquipmentStep(draft)
 
-    expect(screen.getByText(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE)).toBeInTheDocument()
+    expect(
+      screen.getByText(new RegExp(EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT)),
+    ).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /\d[\d,]* GP remaining/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL })).toBeInTheDocument()
   })

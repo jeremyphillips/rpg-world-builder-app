@@ -57,11 +57,11 @@ function GrantOnlySingleReleaseRow({
     <ContentEntityCard
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
-        detailLabel: entry.provenanceLabel,
         extraStatus: entry.advisoryStatusItems,
       })}
       trailing={{
         kind: 'action',
+        meta: entry.provenanceLabel,
         content: (
           <EquipmentInventorySourceActionButton
             onClick={() =>
@@ -124,7 +124,6 @@ function ManagedInventoryRow({
       toolbarAriaLabel={entry.equipmentName}
       entity={buildEquipmentInventoryRowEntity({
         equipmentName: entry.equipmentName,
-        detailLabel: entry.provenanceLabel,
         extraStatus: entry.advisoryStatusItems,
       })}
       trailing={{
@@ -132,6 +131,7 @@ function ManagedInventoryRow({
         variant: 'quantity',
         quantity: totalQuantity,
         format: 'label',
+        meta: entry.provenanceLabel,
       }}
       collapsed={!isOpen}
       onToggleCollapse={handleToggleCollapse}

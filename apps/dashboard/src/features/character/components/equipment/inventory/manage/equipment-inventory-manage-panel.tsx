@@ -117,8 +117,12 @@ export function EquipmentInventoryManageDisclosureCard({
       toolbarAriaLabel={equipmentName}
       entity={buildEquipmentInventoryRowEntity({
         equipmentName,
-        detailLabel: provenanceLabel,
       })}
+      trailing={
+        provenanceLabel
+          ? { kind: 'indicator', variant: 'label', label: provenanceLabel }
+          : undefined
+      }
       collapsed={collapsed}
       onToggleCollapse={onToggleCollapse}
       defaultCollapsed={defaultCollapsed}

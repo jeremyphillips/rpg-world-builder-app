@@ -6,8 +6,6 @@ import {
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
-  resolveMagicItemAcquisitionState,
-  resolveMagicItemGrantRequirement,
   resolveStartingEquipmentResolution,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
@@ -25,11 +23,8 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { enrichEquipmentInventoryRows } from './equipment-inventory-row-advisories.lib'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
-  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
   EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL,
-  formatEquipmentGoldOptionStartingDescription,
   listEquipmentInventoryRowsFromDraft,
-  shouldShowMagicItemGrants,
   type EquipmentInventoryRow,
   type PackageCustomizeAffordance,
   type StartingPackageCategoryGroup,
@@ -214,7 +209,7 @@ export type AddedEquipmentCategoryGroup = {
 
 export type EquipmentInventoryStartingChannel =
   | { kind: 'package'; group: StartingPackageInventoryGroup }
-  | { kind: 'gold_option'; message: string; description: string }
+  | { kind: 'gold_option'; optionLabel: string }
 
 export type EquipmentInventoryViewModel =
   | {
@@ -444,26 +439,10 @@ function buildStartingPackageGroup(args: {
   }
 }
 
-function buildGoldOptionChannel(args: {
-  draft: CharacterBuilderDraft
-  catalogIndex: CharacterBuildCatalogIndex
-  context?: CharacterBuildContext
-}): EquipmentInventoryStartingChannel {
-  const { draft, catalogIndex, context } = args
-  const showMagicItemGrants = context
-    ? shouldShowMagicItemGrants(
-        resolveMagicItemAcquisitionState({
-          draft,
-          context,
-          catalogIndex,
-          requirement: resolveMagicItemGrantRequirement(context.characterKind),
-        }),
-      )
-    : false
+function buildGoldOptionChannel(optionLabel: string): EquipmentInventoryStartingChannel {
   return {
     kind: 'gold_option',
-    message: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-    description: formatEquipmentGoldOptionStartingDescription(showMagicItemGrants),
+    optionLabel,
   }
 }
 
@@ -525,7 +504,7 @@ function buildSplitInventoryViewModel(args: {
   const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
 
   const startingEquipment: EquipmentInventoryStartingChannel = isStartingGoldOption(selected.option)
-    ? buildGoldOptionChannel({ draft, catalogIndex, context })
+    ? buildGoldOptionChannel(selected.option.label)
     : {
         kind: 'package',
         group: buildStartingPackageGroup({ ...selected, packageRows, classOptionPolicy }),

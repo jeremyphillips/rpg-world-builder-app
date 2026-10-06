@@ -6,6 +6,8 @@ export const equipmentPackageSwitchResolutionModalBodyClasses =
 export const equipmentPackageSwitchResolutionModalInventoryScrollClasses =
   'max-h-72 min-w-0 overflow-y-auto overflow-x-hidden pe-3'
 
+export const equipmentPackageSwitchResolutionModalInventorySectionClasses = 'space-y-3'
+
 export const equipmentPackageSwitchResolutionBudgetSummaryClasses =
   'rounded-lg border border-border bg-surface-muted px-4 py-3'
 

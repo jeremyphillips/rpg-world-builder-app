@@ -9,7 +9,7 @@ EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
 `EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single leading utility,
-semantic trailing (`action` | `utility` | `indicator` | `group`), and density.
+semantic trailing (`action` | `utility` | `indicator` | `group`, with optional inline `meta`), and density.
 
 Vertical alignment is owned by the shared row-track grid in `@rpg/ui`
 (`RowAnatomy` — band / meta / status tracks with slack gutters). Entity anatomy places
@@ -494,24 +494,27 @@ free-form `ReactNode` slots:
 
 ```text
 trailing
-├── action      → ReactElement labeled commit control
-├── utility     → ReactElement ghost icon utility or utility cluster
-├── indicator   → chevron | quantity variants
+├── action      → ReactElement labeled commit control, optional meta string
+├── utility     → ReactElement ghost icon utility or utility cluster, optional meta string
+├── indicator   → chevron | quantity | label
+│                 chevron and quantity accept an optional meta string
 └── group
     ├── primary   → ReactElement control composition
     └── secondary → price | quantity | grantPreview metadata variants
 ```
 
 `resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell (two
-for `group`). Kinds never choose their own alignment.
+for `group`). Kinds never choose their own alignment. `meta` renders as muted `text-sm`
+before the control inside that same cell. It does not add a second cell.
 
-| Kind        | Type contract                                   | Cell                             | Use                                                |
-| ----------- | ----------------------------------------------- | -------------------------------- | -------------------------------------------------- |
-| `action`    | `content: ReactElement`                         | `band`                           | Labeled commit — Add, Select, Edit                 |
-| `utility`   | `content: ReactElement`                         | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit |
-| `indicator` | `variant: 'chevron'`                            | `full`                           | Destination chevrons                               |
-| `indicator` | `variant: 'quantity'`                           | `band`                           | Quiet qty labels aligned with the heading          |
-| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)   |
+| Kind        | Type contract                                   | Cell                             | Use                                                         |
+| ----------- | ----------------------------------------------- | -------------------------------- | ----------------------------------------------------------- |
+| `action`    | `content: ReactElement`, optional `meta`        | `band`                           | Labeled commit — Add, Select, Edit, Release                 |
+| `utility`   | `content: ReactElement`, optional `meta`        | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit          |
+| `indicator` | `variant: 'chevron'`, optional `meta`           | `full`                           | Destination chevrons                                        |
+| `indicator` | `variant: 'quantity'`, optional `meta`          | `band`                           | Quiet qty labels aligned with the heading                   |
+| `indicator` | `variant: 'label'` (`label: string`)            | `band`                           | Value-only rows (for example `50 GP value`) with no control |
+| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)            |
 
 `utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
 A 36px stepper in a compact row grows the row through the slack gutters; heading and

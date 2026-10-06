@@ -14,6 +14,28 @@ const CASES: ReadonlyArray<[string, EntityAnatomyTrailing, string, string | unde
   ['utility', { kind: 'utility', content }, 'full', undefined, true],
   ['chevron', { kind: 'indicator', variant: 'chevron' }, 'full', undefined, true],
   ['quantity', { kind: 'indicator', variant: 'quantity', quantity: 2 }, 'band', undefined, false],
+  [
+    'quantity + meta',
+    { kind: 'indicator', variant: 'quantity', quantity: 2, meta: '2 Common choices' },
+    'band',
+    undefined,
+    false,
+  ],
+  [
+    'label',
+    { kind: 'indicator', variant: 'label', label: '50 GP value' },
+    'band',
+    undefined,
+    false,
+  ],
+  ['action + meta', { kind: 'action', content, meta: '1 Common choice' }, 'band', undefined, false],
+  [
+    'utility + meta',
+    { kind: 'utility', content, meta: 'Purchased · 5 GP' },
+    'full',
+    undefined,
+    true,
+  ],
   ['group', { kind: 'group', primary: content }, 'band', undefined, false],
   [
     'group + secondary',

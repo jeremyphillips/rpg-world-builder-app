@@ -1,12 +1,12 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../../../../lib/equipment/equipment-step.lib'
 
-import { EquipmentInventoryColumn } from '../../../../equipment/inventory/column/equipment-inventory-column'
+import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '../../../../equipment/inventory/equipment-inventory.variants'
 import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section'
 import {
   PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,
@@ -16,6 +16,7 @@ import {
   equipmentPackageSwitchResolutionAlertClasses,
   equipmentPackageSwitchResolutionBlockedBodyClasses,
   equipmentPackageSwitchResolutionModalInventoryScrollClasses,
+  equipmentPackageSwitchResolutionModalInventorySectionClasses,
   equipmentPackageSwitchResolutionSafetyNoteClasses,
 } from './equipment-package-switch-resolution-modal.variants'
 import { PackageSwitchBudgetSummary } from './equipment-package-switch-resolution-modal-summary'
@@ -66,7 +67,10 @@ export function EquipmentPackageSwitchResolutionModalBody({
           />
 
           <div className={equipmentPackageSwitchResolutionModalInventoryScrollClasses}>
-            <EquipmentInventoryColumn title={PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}>
+            <section className={equipmentPackageSwitchResolutionModalInventorySectionClasses}>
+              <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
+                {PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}
+              </Heading>
               <EquipmentPurchasedInventorySection
                 purchased={purchasedGroups}
                 showGroupHeadings={false}
@@ -74,7 +78,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
                 onSetPurchaseQuantity={onSetPurchaseQuantity}
                 onRemoveItem={onRemoveItem}
               />
-            </EquipmentInventoryColumn>
+            </section>
           </div>
 
           <Text as="p" className={equipmentPackageSwitchResolutionSafetyNoteClasses}>

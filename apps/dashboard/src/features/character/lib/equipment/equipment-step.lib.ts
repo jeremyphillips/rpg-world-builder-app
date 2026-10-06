@@ -118,26 +118,18 @@ export function resolveEquipmentInventoryEmptyMessage(args: {
 
 export const EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL = 'Starting Equipment'
 
+/** Cart disclosure title. Distinct from the Quick NPC section label above. */
+export const EQUIPMENT_STARTING_PACKAGE_TITLE = 'Starting Package'
+
 export const EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL = 'Added Equipment'
 
 export const EQUIPMENT_PURCHASED_INVENTORY_SECTION_LABEL = 'Purchased Equipment'
 
-export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE = 'No package gear in this option'
+export const EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT = 'No package gear'
 
-export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE =
-  'This character is using the gold option, so all equipment is added through purchases'
-
-export const EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX =
-  ' or magic item choices.'
-
-export function formatEquipmentGoldOptionStartingDescription(
-  includeMagicItemChoices: boolean,
-): string {
-  if (includeMagicItemChoices) {
-    return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_MAGIC_ITEM_SUFFIX}`
-  }
-
-  return `${EQUIPMENT_GOLD_OPTION_STARTING_DESCRIPTION_BASE}.`
+/** Distinct package rows in a starting package, not total quantity. */
+export function formatEquipmentPackageItemCount(count: number): string {
+  return `${count} ${count === 1 ? 'item' : 'items'}`
 }
 
 export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
@@ -198,7 +190,9 @@ export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 
-export const EQUIPMENT_PACKAGE_CHANGE_OPTION_LABEL = 'Change option'
+export const EQUIPMENT_PACKAGE_CUSTOMIZE_MENU_LABEL = 'Customize package'
+
+export const EQUIPMENT_PACKAGE_CHANGE_OPTION_MENU_LABEL = 'Change package option'
 
 export const EQUIPMENT_SELECTED_PACKAGE_EYEBROW = 'Selected package'
 

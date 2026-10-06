@@ -88,6 +88,30 @@ const TRAILING_CASES: readonly TrailingCase[] = [
     build: () => ({ kind: 'indicator', variant: 'quantity', quantity: 3 }),
   },
   {
+    id: 'indicator-label',
+    build: () => ({ kind: 'indicator', variant: 'label', label: '50 GP value' }),
+  },
+  {
+    id: 'utility-meta',
+    build: (label) => ({
+      kind: 'utility',
+      meta: 'Purchased · 5 GP',
+      content: <RemoveUtility label={label} />,
+    }),
+  },
+  {
+    id: 'action-meta',
+    build: () => ({
+      kind: 'action',
+      meta: '1 Common choice',
+      content: (
+        <button type="button" className="text-sm text-link">
+          Release
+        </button>
+      ),
+    }),
+  },
+  {
     id: 'group',
     build: () => ({
       kind: 'group',
