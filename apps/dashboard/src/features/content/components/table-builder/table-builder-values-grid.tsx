@@ -1,6 +1,6 @@
 import type { TableBuilderColumnDraft } from '../../lib/table-builder/table-builder-draft'
 import { ProgressionTierSeparatorGridBand } from '../tables/progression-tier-separator'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import { shouldRenderValuesTierSeparator } from '../../lib/table-builder/table-builder-tier-separator.lib'
 import { tableBuilderGroupEmptyClasses } from './table-builder.variants'
 import {

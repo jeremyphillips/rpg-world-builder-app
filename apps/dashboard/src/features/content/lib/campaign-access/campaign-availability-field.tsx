@@ -30,11 +30,11 @@ import {
   updateContentCampaignAccess,
 } from './campaign-access-api'
 import { CampaignAccessBlockedDialog } from './campaign-access-blocked-dialog'
+import { CampaignAccessAvailabilityProvider } from './campaign-access-form-context'
 import {
-  CampaignAccessAvailabilityProvider,
   useCampaignAccessParticipantUpdater,
   type CampaignAccessSaveResult,
-} from './campaign-access-form-context'
+} from './campaign-access-form-state'
 import { buildCampaignAccessFields } from './campaign-access-form-fields'
 import { formatCampaignAccessParticipantOptionLabel } from './campaign-access-labels'
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'

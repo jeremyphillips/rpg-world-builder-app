@@ -1,21 +1,8 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import type { OrganizationPractice } from '@rpg/contracts'
 
 import type { OrganizationFormPresentation } from '../../lib/organization-form-presentation.lib'
-
-type OrganizationAuthoringContextValue = {
-  presentation: OrganizationFormPresentation
-  hasEnteredProfileSetup: boolean
-  enterProfileSetup: () => void
-  editFamiliarTypeOpen: boolean
-  openEditFamiliarType: () => void
-  closeEditFamiliarType: () => void
-  practiceRecommendations: OrganizationPractice[]
-  setPracticeRecommendations: (ids: OrganizationPractice[]) => void
-  clearPracticeRecommendations: () => void
-}
-
-const OrganizationAuthoringContext = createContext<OrganizationAuthoringContextValue | null>(null)
+import { OrganizationAuthoringContext } from './use-organization-authoring-context'
 
 export function OrganizationAuthoringProvider({
   children,
@@ -70,14 +57,4 @@ export function OrganizationAuthoringProvider({
       {children}
     </OrganizationAuthoringContext.Provider>
   )
-}
-
-export function useOrganizationAuthoringContext(): OrganizationAuthoringContextValue {
-  const context = useContext(OrganizationAuthoringContext)
-  if (!context) {
-    throw new Error(
-      'useOrganizationAuthoringContext must be used within OrganizationAuthoringProvider',
-    )
-  }
-  return context
 }

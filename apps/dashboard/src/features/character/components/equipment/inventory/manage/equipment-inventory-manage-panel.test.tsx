@@ -27,10 +27,8 @@ import {
 } from '../../../../lib/equipment/equipment-selection-facts.fixtures'
 import { resolveHeldEquipmentSelectionPresentation } from '../../../../lib/equipment/equipment-selection-facts.lib'
 import { resolveSelectionRowStatusItems } from '../../../../lib/selection-row-status'
-import {
-  EquipmentInventoryManageDisclosureCard,
-  createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel'
+import { EquipmentInventoryManageDisclosureCard } from '../manage/equipment-inventory-manage-panel'
+import { createStorybookApplyMagicItemAcquisition } from '../manage/equipment-inventory-manage-panel-storybook'
 
 const rows: EquipmentInventoryRow[] = [
   {

@@ -7,10 +7,8 @@ import {
   equipmentStepContextFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
-import {
-  EquipmentInventoryManageDisclosureCard,
-  createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel'
+import { EquipmentInventoryManageDisclosureCard } from '../manage/equipment-inventory-manage-panel'
+import { createStorybookApplyMagicItemAcquisition } from '../manage/equipment-inventory-manage-panel-storybook'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import {
   resolveSelectionRowStatusItems,

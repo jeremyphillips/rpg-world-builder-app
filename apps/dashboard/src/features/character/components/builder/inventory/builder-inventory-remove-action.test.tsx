@@ -3,10 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import {
-  BuilderInventoryRemoveAction,
-  formatBuilderInventoryRemoveLabel,
-} from './builder-inventory-remove-action'
+import { BuilderInventoryRemoveAction } from './builder-inventory-remove-action'
+import { formatBuilderInventoryRemoveLabel } from './builder-inventory-remove-action.lib'
 
 describe('BuilderInventoryRemoveAction', () => {
   it('renders an icon remove action with a default aria label', async () => {

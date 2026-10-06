@@ -58,7 +58,7 @@ import {
   QUICK_NPC_CATEGORY_NO_PACKAGE_SUMMARY,
   readQuickNpcClassPackage,
 } from '../../lib/quick-npc/quick-npc-package-customization.lib'
-import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
+import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
 import { QuickNpcStartingChoiceCategorySummary } from './quick-npc-starting-choice-category-summary'
 import { QuickNpcRequirementsFields } from './quick-npc-requirements-fields'
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'

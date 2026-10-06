@@ -7,11 +7,6 @@ import type {
   Equipment,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import {
-  applyEquipmentStepAction,
-  resolveEquipmentAcquisitionBuilderContext,
-  standardStartingWealthTableId,
-} from '@rpg/contracts'
 
 import { DisclosureEntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import { type EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
@@ -132,35 +127,6 @@ export function EquipmentInventoryManageDisclosureCard({
       <EquipmentInventoryManagePanelBody equipment={equipment} rows={rows} {...bodyProps} />
     </DisclosureEntityCard>
   )
-}
-
-export function createStorybookApplyMagicItemAcquisition(args: {
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  onDraftChange?: (patch: Partial<CharacterBuilderDraft>) => void
-}) {
-  return ({
-    equipmentId,
-    requestedQuantity,
-  }: {
-    equipmentId: string
-    requestedQuantity: number
-  }) => {
-    const result = applyEquipmentStepAction({
-      draft: args.draft,
-      catalogIndex: args.catalogIndex,
-      acquisitionContext: resolveEquipmentAcquisitionBuilderContext({
-        context: args.context,
-        catalogIndex: args.catalogIndex,
-        startingWealthTableId: standardStartingWealthTableId(args.context.rulesetId),
-      }),
-      action: { kind: 'acquire_magic_item', equipmentId, requestedQuantity },
-    })
-    if (result.status !== 'applied') return false
-    args.onDraftChange?.(result.patch)
-    return true
-  }
 }
 
 export type EquipmentInventoryManageEntryProps = Omit<

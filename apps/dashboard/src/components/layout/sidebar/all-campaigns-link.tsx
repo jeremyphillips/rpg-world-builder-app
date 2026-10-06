@@ -4,7 +4,7 @@ import { sidebarNavItemVariants } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
-export const allCampaignsLinkClasses = sidebarNavItemVariants({
+const allCampaignsLinkClasses = sidebarNavItemVariants({
   active: false,
   tone: 'workspaceExit',
 })

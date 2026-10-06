@@ -1,17 +1,8 @@
 import type { ReactNode } from 'react'
-import { Button } from '@rpg/ui'
 
-import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary'
 import type { CampaignAvailabilityScope } from '@/lib/overview/campaign-availability-scope.lib'
 
-import {
-  CAMPAIGN_ACCESS_TABLE_HIDE_LABEL,
-  CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL,
-  CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL,
-  formatHideUnavailableAriaLabel,
-  formatShowAllCampaignAvailabilityAriaLabel,
-  formatShowUnavailableAriaLabel,
-} from './campaign-access-table-labels'
+import { AvailabilityCountSupplementActions } from './availability-count-supplement-actions'
 import {
   joinAvailabilityCountSummarySegments,
   resolveAvailabilityCountSummaryParts,
@@ -33,60 +24,6 @@ export type BuildAvailabilityCountSupplementOptions = {
   hiddenUnavailableCount?: number
   /** Overview Show-unavailable aria label copy. */
   pluralNoun?: string
-}
-
-function AvailabilityCountSupplementActions({
-  showUnavailable,
-  hiddenUnavailableCount,
-  unavailableCount,
-  onShow,
-  onHide,
-  actionVariant = 'master-detail',
-  pluralNoun,
-}: Pick<
-  BuildAvailabilityCountSupplementOptions,
-  'showUnavailable' | 'onShow' | 'onHide' | 'actionVariant' | 'pluralNoun'
-> & { hiddenUnavailableCount: number; unavailableCount: number }) {
-  if (showUnavailable) {
-    if (unavailableCount === 0) return null
-    return (
-      <>
-        <OverviewResultSummaryDotSeparator />
-        <Button
-          type="button"
-          variant="text"
-          size="sm"
-          aria-label={formatHideUnavailableAriaLabel()}
-          onClick={onHide}
-        >
-          {actionVariant === 'overview'
-            ? CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL
-            : CAMPAIGN_ACCESS_TABLE_HIDE_LABEL}
-        </Button>
-      </>
-    )
-  }
-
-  if (hiddenUnavailableCount === 0) return null
-
-  return (
-    <>
-      <OverviewResultSummaryDotSeparator />
-      <Button
-        type="button"
-        variant="text"
-        size="sm"
-        aria-label={
-          actionVariant === 'overview' && pluralNoun
-            ? formatShowUnavailableAriaLabel(pluralNoun)
-            : formatShowAllCampaignAvailabilityAriaLabel()
-        }
-        onClick={onShow}
-      >
-        {CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL}
-      </Button>
-    </>
-  )
 }
 
 /** Shared unavailable-count row with optional Show/Hide affordance. */

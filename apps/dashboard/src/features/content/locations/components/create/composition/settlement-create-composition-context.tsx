@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 
 import {
   EMPTY_SETTLEMENT_CREATE_COMPOSITION,
@@ -6,19 +6,11 @@ import {
   isSettlementCreateCompositionDirty,
   removeSettlementDistrictDraft,
   updateSettlementDistrictDraft,
-  type SettlementCreateComposition,
 } from '../../../lib/create/composition/location-settlement-create-composition.lib'
-
-type SettlementCreateCompositionContextValue = {
-  composition: SettlementCreateComposition
-  isDirty: boolean
-  addDistrict: () => void
-  updateDistrict: (districtId: string, name: string) => void
-  removeDistrict: (districtId: string) => void
-}
-
-const SettlementCreateCompositionContext =
-  createContext<SettlementCreateCompositionContextValue | null>(null)
+import {
+  SettlementCreateCompositionContext,
+  type SettlementCreateCompositionContextValue,
+} from './use-settlement-create-composition'
 
 export function SettlementCreateCompositionProvider({ children }: { children: ReactNode }) {
   const [composition, setComposition] = useState(EMPTY_SETTLEMENT_CREATE_COMPOSITION)
@@ -45,14 +37,4 @@ export function SettlementCreateCompositionProvider({ children }: { children: Re
       {children}
     </SettlementCreateCompositionContext.Provider>
   )
-}
-
-export function useSettlementCreateComposition(): SettlementCreateCompositionContextValue {
-  const context = useContext(SettlementCreateCompositionContext)
-  if (!context) {
-    throw new Error(
-      'useSettlementCreateComposition must be used within SettlementCreateCompositionProvider',
-    )
-  }
-  return context
 }

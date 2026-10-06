@@ -6,10 +6,8 @@ import { useFormContext } from 'react-hook-form'
 import { z } from 'zod'
 import { Form } from '@rpg/ui/form'
 
-import {
-  OrganizationAuthoringProvider,
-  useOrganizationAuthoringContext,
-} from '../authoring/organization-authoring-context'
+import { OrganizationAuthoringProvider } from '../authoring/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/use-organization-authoring-context'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
 import { buildOrganizationFormValueSyncs } from '../../../lib/forms/organization-form-projection'
 

@@ -35,7 +35,7 @@ import {
   type TableBuilderColumnDeleteIntent,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import { createGeneralTableBuilderColumnDraft } from '../../lib/table-builder/table-builder-general-draft'
 import {
   tableBuilderAddActionClasses,

@@ -1,28 +1,14 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import type { InPageNavSection } from '@/lib/in-page-nav/in-page-nav.types'
+
+import { ContentDetailNavContext } from './content-detail-nav-registration'
 
 type SectionRecord = {
   label: string
   order: number
   leaves: Map<string, { label: string; order: number }>
 }
-
-type ContentDetailNavContextValue = {
-  registerSection: (id: string, label: string) => () => void
-  registerLeaf: (sectionId: string, id: string, label: string) => () => void
-  sections: readonly InPageNavSection[]
-}
-
-const ContentDetailNavContext = createContext<ContentDetailNavContextValue | null>(null)
 
 function buildNavSections(store: Map<string, SectionRecord>): InPageNavSection[] {
   return [...store.entries()]
@@ -117,21 +103,4 @@ export function ContentDetailNavProvider({ children }: { children: ReactNode }) 
   return (
     <ContentDetailNavContext.Provider value={value}>{children}</ContentDetailNavContext.Provider>
   )
-}
-
-const noopUnregister = () => undefined
-
-const noopRegistration = {
-  registerSection: () => noopUnregister,
-  registerLeaf: () => noopUnregister,
-  sections: [] as const,
-}
-
-export function useContentDetailNavRegistration() {
-  return useContext(ContentDetailNavContext) ?? noopRegistration
-}
-
-/** Read merged nav sections without registering — safe outside provider (returns empty). */
-export function useContentDetailNavSections(): readonly InPageNavSection[] {
-  return useContext(ContentDetailNavContext)?.sections ?? []
 }

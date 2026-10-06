@@ -1,14 +1,10 @@
 import { ActionIcon, SemanticText, Text } from '@rpg/ui'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import {
-  detailOverflowDeleteAction,
-  type DetailOverflowAction,
-} from '../../../lib/detail/detail-overflow-menu'
-import {
-  detailOverflowActionsToRowMenuItems,
-  EntityRowList,
-} from '../../../lib/entity/row-list/entity-row-list'
+import { type DetailOverflowAction } from '../../../lib/detail/detail-overflow-menu'
+import { detailOverflowDeleteAction } from '../../../lib/detail/detail-overflow-actions'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import { detailOverflowActionsToRowMenuItems } from '../../../lib/entity/row-list/entity-row-list-menu-items'
 import type { OrganizationMemberRowVm } from '../../lib/members/build-organization-member-rows'
 import { buildOrganizationMemberLeadingMedia } from '../../lib/members/organization-member-leading-media.lib'
 import { ORGANIZATION_SECTION_LABELS } from '../../lib/organization-display'

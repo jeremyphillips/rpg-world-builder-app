@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef } from 'react'
 import { useFormState } from 'react-hook-form'
 import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
 
-import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
+import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/use-subclass-unsaved-edits'
 
 import { composeFormLeaveDirty } from './form-leave-dirty'
 import {
@@ -165,4 +165,3 @@ export function FormUnsavedChangesGuard({
 }
 
 export type { UnsavedChangesConfirmController } from './use-unsaved-changes-confirm'
-export { useUnsavedChangesConfirm } from './use-unsaved-changes-confirm'

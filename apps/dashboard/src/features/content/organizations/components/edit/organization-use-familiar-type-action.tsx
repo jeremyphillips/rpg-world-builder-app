@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { Button, INLINE_HEADER_ACTION_BUTTON_SIZE } from '@rpg/ui'
 
-import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/use-organization-authoring-context'
 import { ORGANIZATION_USE_FAMILIAR_TYPE_LABEL } from '../../lib/presets/organization-form-copy.lib'
 
 export function OrganizationUseFamiliarTypeAction() {

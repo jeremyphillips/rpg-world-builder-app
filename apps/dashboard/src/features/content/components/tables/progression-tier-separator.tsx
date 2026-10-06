@@ -1,5 +1,6 @@
 import { TableCell, TableRow } from '@rpg/ui'
 
+import { formatProgressionTierSeparatorLabel } from './progression-tier-separator.lib'
 import {
   progressionTierSeparatorGridBandClasses,
   progressionTierSeparatorLabelVariants,
@@ -11,15 +12,6 @@ export type ProgressionTierSeparatorProps = {
   suffixTierLabel?: boolean
   /** `preview` matches class progression; `values` is the subtle values-grid band. */
   variant: 'preview' | 'values'
-}
-
-export function formatProgressionTierSeparatorLabel(
-  tierName: string,
-  suffixTierLabel = true,
-): string {
-  const trimmed = tierName.trim()
-  if (trimmed === '') return ''
-  return suffixTierLabel ? `${trimmed} Tier` : trimmed
 }
 
 export type ProgressionTierSeparatorTableRowProps = {

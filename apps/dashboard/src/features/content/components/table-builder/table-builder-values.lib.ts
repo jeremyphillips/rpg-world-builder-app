@@ -7,7 +7,7 @@ import {
   type TableBuilderColumnDraft,
   type TableBuilderFormValues,
 } from '../../lib/table-builder/table-builder-draft'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import {
   TABLE_BUILDER_GENERAL_VALUES_HINT,
   TABLE_BUILDER_VALUES_HINT,

@@ -4,7 +4,7 @@ import { CONTENT_TABLE_KINDS, type ContentTable } from '@rpg/contracts'
 
 import { TableBuilderModal } from '../../../components/table-builder/table-builder-modal'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-import { useMasterDetailRowPrefix } from '../../../lib/master-detail/master-detail-row-prefix.context'
+import { useMasterDetailRowPrefix } from '../../../lib/master-detail/use-master-detail-row-prefix'
 import type { TableBuilderSavedTable } from '../../../lib/table-builder/table-builder-kind'
 import {
   buildFeatureTableAllowedLevels,

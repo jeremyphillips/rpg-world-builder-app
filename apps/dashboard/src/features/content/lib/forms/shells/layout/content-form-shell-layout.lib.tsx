@@ -14,7 +14,7 @@ import type { UnsavedChangesConfirmController } from '@/lib/form-unsaved-changes
 import type { CampaignAvailabilityPresentation } from '@/lib/campaign-availability/campaign-availability-form-fields'
 import { ManagedMediaField, resolveContentMediaFieldConfig } from '@/features/media'
 
-import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
 import { buildContentAvailabilitySlotItem } from '../../fields/content-availability-slot.lib'
 import {
   useContentSaveSession,

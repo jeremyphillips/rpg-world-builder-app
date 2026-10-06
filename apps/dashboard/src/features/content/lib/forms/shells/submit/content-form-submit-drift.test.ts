@@ -16,7 +16,7 @@ const contentCreateShellPath = fileURLToPath(
 )
 const contentFormSubmitPath = fileURLToPath(new URL('./content-form-submit.ts', import.meta.url))
 const previewValidationPath = fileURLToPath(
-  new URL('../../validation/content-form-publish-validation.client.tsx', import.meta.url),
+  new URL('../../validation/use-content-publish-validation.ts', import.meta.url),
 )
 const previewRailPath = fileURLToPath(
   new URL('../../preview/content-preview-rail.tsx', import.meta.url),

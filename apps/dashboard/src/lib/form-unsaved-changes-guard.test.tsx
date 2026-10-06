@@ -14,7 +14,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { z, type ZodType } from 'zod'
 import { Form, type FormItem } from '@rpg/ui/form'
 
-import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from './form-unsaved-changes-guard'
+import { FormUnsavedChangesGuard } from './form-unsaved-changes-guard'
+import { useUnsavedChangesConfirm } from './use-unsaved-changes-confirm'
 import { hasDirtyFields } from './form-dirty-state'
 import { renderWithDataRouter } from './test-router'
 

@@ -4,7 +4,7 @@ import {
   deriveCreateSetupFooterState,
   resolveCreateSetupFooterActions,
   type CreateSetupFooterAction,
-} from './create-setup-footer'
+} from './create-setup-footer.lib'
 import {
   resolveCreateSetupIsComplete,
   resolveCreateSetupPendingExplicitDecisions,

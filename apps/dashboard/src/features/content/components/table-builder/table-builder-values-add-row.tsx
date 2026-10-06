@@ -4,7 +4,7 @@ import {
   TABLE_BUILDER_ADD_ROW_LABEL,
   TABLE_BUILDER_ALL_LEVELS_USED_REASON,
 } from '../../lib/table-builder/table-builder-copy'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import {
   tableBuilderAddActionClasses,
   tableBuilderAddActionIconClasses,

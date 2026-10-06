@@ -12,7 +12,7 @@ import { buildAvailabilityCountSupplement } from '../../lib/campaign-access/avai
 import { NestedResourceMasterDetailEditor } from '../../components/master-detail/nested-resource-master-detail-editor'
 import { useMasterDetailAvailabilityFilter } from '../../lib/master-detail/use-master-detail-availability-filter'
 import { useClassSubclassesTabState, useSubclassTabSave } from '../hooks/use-class-subclasses-tab'
-import { useReportSubclassUnsavedEdits } from '../hooks/subclass-unsaved-edits-context'
+import { useReportSubclassUnsavedEdits } from '../hooks/use-subclass-unsaved-edits'
 import { useSubclassDeleteFlow } from '../hooks/use-subclass-delete-flow'
 import type { SubclassEditorState } from '../hooks/use-subclass-editor-state'
 import { buildSubclassMasterDetailListItem } from '../lib/subclasses/build-subclass-master-detail-list-item'

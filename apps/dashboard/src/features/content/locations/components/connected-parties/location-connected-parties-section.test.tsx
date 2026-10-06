@@ -7,11 +7,11 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { testRegionLocation } from '@/features/content/lib/fixtures/location-test-helpers'
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
+import { LocationConnectedPartiesSection } from './location-connected-parties-section'
 import {
-  LocationConnectedPartiesSection,
   LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
-} from './location-connected-parties-section'
-import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
+  LOCATION_PEOPLE_SECTION_SURFACE_COPY,
+} from '../../lib/connected-parties/location-connected-parties-section-copy'
 
 import type { LocationConnectedPartyRow } from '@rpg/contracts'
 

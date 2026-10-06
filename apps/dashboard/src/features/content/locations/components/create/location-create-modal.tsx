@@ -52,10 +52,8 @@ import {
 } from '../../lib/building-organizations/building-organization-create-drafts'
 import { LOCATION_CREATE_SETUP_CHANGE_LABEL } from '../../lib/create/setup/location-create-setup-chrome.lib'
 import { buildLocationCreateSetupSets } from '../../lib/create/setup/location-create-setup.lib'
-import {
-  LocationCreateModalSetupPanel,
-  useLocationCreateModalSetupSequence,
-} from './setup/location-create-modal-setup-panel'
+import { LocationCreateModalSetupPanel } from './setup/location-create-modal-setup-panel'
+import { useLocationCreateModalSetupSequence } from './setup/location-create-modal-setup-sequence'
 import {
   resolveLocationCreateAuthoringCapabilities,
   type LocationCreateAuthoringTabId,

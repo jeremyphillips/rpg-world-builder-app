@@ -12,7 +12,7 @@ import {
   organizationFormSchema,
 } from '../../../lib/forms/organization-form-projection'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
-import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/use-organization-authoring-context'
 import { OrganizationAuthoringFormShell } from './organization-authoring-form-shell'
 
 function OrganizationAuthoringFormBody({ ctx }: { ctx: ContentFormCtx }) {

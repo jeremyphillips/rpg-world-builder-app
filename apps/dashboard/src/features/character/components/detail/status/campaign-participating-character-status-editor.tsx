@@ -15,7 +15,6 @@ import type { FormItem } from '@rpg/ui/form'
 
 import {
   toCampaignParticipatingCharacterStatusEditorValues,
-  toCampaignParticipatingCharacterStatusPatch,
   type CampaignParticipatingCharacterStatusEditorValues,
 } from '../../../lib/campaign-participating-character-status.lib'
 
@@ -142,5 +141,3 @@ export function CampaignParticipatingCharacterStatusEditor({
     </Modal.Root>
   )
 }
-
-export { toCampaignParticipatingCharacterStatusPatch }

@@ -2,11 +2,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { CampaignAccessFormProvider } from './campaign-access-form-context'
 import {
-  CampaignAccessFormProvider,
   useCampaignAccessForm,
   useCampaignAccessParticipantUpdater,
-} from './campaign-access-form-context'
+} from './campaign-access-form-state'
 
 function ParticipantHarness({ isDirty, isPending }: { isDirty: boolean; isPending: boolean }) {
   const save = vi.fn(async () => ({ status: 'skipped' as const }))

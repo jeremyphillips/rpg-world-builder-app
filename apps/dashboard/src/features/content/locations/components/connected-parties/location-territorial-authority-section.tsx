@@ -9,10 +9,8 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/app/routes'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import {
-  detailOverflowActionsToRowMenuItems,
-  EntityRowList,
-} from '../../../lib/entity/row-list/entity-row-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import { detailOverflowActionsToRowMenuItems } from '../../../lib/entity/row-list/entity-row-list-menu-items'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -33,7 +31,7 @@ import {
   TERRITORIAL_AUTHORITY_SLOT_COPY,
 } from '../../lib/connected-parties/location-connection-surface-copy'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
-import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section'
+import type { LocationConnectedPartyEditTarget } from './location-connected-party-edit-target'
 import { TERRITORIAL_AUTHORITY_HEADING_ID } from '../../lib/connected-parties/location-connected-parties-section-layout'
 
 export { TERRITORIAL_AUTHORITY_SECTION_EMPTY } from '../../lib/connected-parties/location-connection-surface-copy'

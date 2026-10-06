@@ -10,7 +10,7 @@ beforeAll(() => {
 
 import { ContentDetailBody } from '../content-detail-body'
 import { ContentDetailSection, ContentDetailSectionItem } from '../content-detail-section'
-import { useContentDetailNavSections } from '../content-detail-nav-context'
+import { useContentDetailNavSections } from '../content-detail-nav-registration'
 
 function NavSectionsProbe() {
   const sections = useContentDetailNavSections()

@@ -8,7 +8,7 @@ import {
   fieldLabelVariants,
 } from '@rpg/ui'
 
-import { useSettlementCreateComposition } from './settlement-create-composition-context'
+import { useSettlementCreateComposition } from './use-settlement-create-composition'
 
 export const SETTLEMENT_STARTING_DISTRICTS_ADD_LABEL = 'Add district' as const
 

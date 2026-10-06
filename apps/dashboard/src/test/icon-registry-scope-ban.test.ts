@@ -13,6 +13,7 @@ const MIGRATED_ACTION_SCOPES = [
   'apps/dashboard/src/features/character/components/builder/inventory',
   'apps/dashboard/src/lib/campaign-availability/campaign-availability-change-affordance.tsx',
   'apps/dashboard/src/features/content/lib/entity/row-list/entity-row-list.tsx',
+  'apps/dashboard/src/features/content/lib/entity/row-list/entity-row-list-parts.tsx',
   'apps/dashboard/src/features/content/lib/detail/detail-overflow-menu.tsx',
   'apps/dashboard/src/features/content/components/table-builder',
   'apps/dashboard/src/features/content/components/master-detail',

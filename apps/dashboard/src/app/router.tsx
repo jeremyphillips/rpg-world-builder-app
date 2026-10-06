@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
-import { findBrowsableVocabularyCategory } from '@rpg/contracts'
+import { findBrowsableVocabularyCategory } from '@rpg/contracts/vocab'
 
 import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'

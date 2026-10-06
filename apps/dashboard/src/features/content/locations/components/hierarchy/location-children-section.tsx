@@ -17,10 +17,12 @@ import { DetailCollectionPanel } from '../../../lib/detail/collection/panel/deta
 import { DetailCollectionRowList } from '../../../lib/detail/collection/row-list/detail-collection-row-list'
 import {
   DetailOverflowMenu,
-  detailOverflowMoveAction,
-  detailOverflowViewAction,
   type DetailOverflowAction,
 } from '../../../lib/detail/detail-overflow-menu'
+import {
+  detailOverflowMoveAction,
+  detailOverflowViewAction,
+} from '../../../lib/detail/detail-overflow-actions'
 import type {
   LocationChildItem,
   LocationChildrenViewModel,

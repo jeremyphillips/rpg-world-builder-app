@@ -100,7 +100,7 @@ import {
   formatStartingChoiceItemCount,
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
-import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
+import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
 import {
   quickNpcPackageHeaderActionsClasses,

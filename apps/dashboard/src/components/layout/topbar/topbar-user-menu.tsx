@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-import { type SessionUser } from '@rpg/contracts'
+import { type SessionUser } from '@rpg/contracts/shared'
 import {
   DropdownMenu,
   DropdownMenuContent,

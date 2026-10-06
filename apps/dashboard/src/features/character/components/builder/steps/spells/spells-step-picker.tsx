@@ -92,5 +92,3 @@ export function SpellsStepPicker({
     />
   )
 }
-
-export { spellPickerModeForChoiceSet }

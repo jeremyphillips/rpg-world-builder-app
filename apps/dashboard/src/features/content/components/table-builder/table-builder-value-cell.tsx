@@ -26,7 +26,7 @@ import {
 } from '@rpg/ui'
 
 import { flattenFormTouchedPaths } from '../../lib/table-builder/table-builder-form-touched.lib'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import type {
   TableBuilderCellDraft,
   TableBuilderColumnDraft,

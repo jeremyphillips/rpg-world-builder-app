@@ -2,7 +2,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
-import { DetailOverflowMenu, detailOverflowDeleteAction } from '../detail-overflow-menu'
+import { detailOverflowDeleteAction } from '../detail-overflow-actions'
+import { DetailOverflowMenu } from '../detail-overflow-menu'
 
 describe('DetailOverflowMenu', () => {
   it('returns null when actions are empty', () => {

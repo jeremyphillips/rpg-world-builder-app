@@ -9,7 +9,7 @@ import { useIsSuperadmin } from '@/features/auth'
 
 import { DeleteUserDialog } from '../components/delete-user-dialog'
 import { AdminUserContextLine } from '../components/admin-user-tab-nav'
-import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
+import { useAdminUserRouteContext } from '../lib/use-admin-user-route-context'
 import { toAdminUserDeleteSubject } from '../lib/admin-user-delete-subject'
 import {
   formatAdminUserDetailJoined,

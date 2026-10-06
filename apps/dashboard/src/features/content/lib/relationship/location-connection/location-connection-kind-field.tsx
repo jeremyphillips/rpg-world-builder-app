@@ -1,7 +1,7 @@
-import type { RadioCardOption } from '@rpg/ui'
 import { Heading, RadioCardField, Text } from '@rpg/ui'
 
 import type { LocationConnectionKindOption } from './location-connection-kind-options'
+import { toLocationConnectionKindRadioOptions } from './location-connection-kind-radio-options'
 
 export type LocationConnectionKindFieldProps = {
   id: string
@@ -10,17 +10,6 @@ export type LocationConnectionKindFieldProps = {
   value: string | null
   onValueChange: (value: string) => void
   disabled?: boolean
-}
-
-export function toLocationConnectionKindRadioOptions(
-  options: readonly LocationConnectionKindOption[],
-): RadioCardOption[] {
-  return options.map((option) => ({
-    value: option.value,
-    label: option.label,
-    description: option.disabled ? option.disabledReason : option.description,
-    disabled: option.disabled,
-  }))
 }
 
 export function LocationConnectionKindField({
