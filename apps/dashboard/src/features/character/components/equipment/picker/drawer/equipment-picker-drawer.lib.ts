@@ -41,8 +41,6 @@ import {
 } from '../browse/equipment-picker-item-header.lib'
 import {
   EQUIPMENT_PICKER_KIND_ALL,
-  EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
-  EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
@@ -450,34 +448,6 @@ export function isEquipmentPickerItemDisabled(
   options?: EquipmentPickerAvailabilityOptions,
 ): boolean {
   return resolveEquipmentPickerPurchaseActionState(item, options).disabled
-}
-
-export function getEquipmentPickerDisabledNote(
-  item: EquipmentPickerItem,
-  budget?: EquipmentBudgetSummary,
-  options?: Pick<EquipmentPickerAvailabilityOptions, 'contentAvailable'>,
-): string | undefined {
-  const action = resolveEquipmentPickerPurchaseActionState(item, {
-    budget,
-    contentAvailable: options?.contentAvailable,
-  })
-
-  if (action.reason === 'blocked') {
-    return item.state.disabledReasons[0]
-  }
-
-  if (action.reason === 'not_purchasable') {
-    return item.state.purchaseAvailability.status === 'unavailableForPurchase' &&
-      item.state.purchaseAvailability.reason === 'unsupported_kind'
-      ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
-      : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
-  }
-
-  if (action.reason === 'unaffordable') {
-    return formatEquipmentUnaffordableReason(item, budget)
-  }
-
-  return undefined
 }
 
 export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {

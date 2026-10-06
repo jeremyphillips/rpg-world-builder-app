@@ -17,8 +17,8 @@ Live quantity and supply are projected with `projectEquipmentSelection`.
 profile, into ordered clauses (`requirement`, compatibility caution, `recommendation`,
 `supply`). It does not merge those models into one fact bag.
 
-- **Builder** maps the clauses onto the existing callout badge and keeps affordability,
-  package, and shopping-path state as picker overlays.
+- **Builder** picker rows do not use the clauses. They render one status line through
+  the selection-row pipeline below.
 - **Quick NPC** renders the same clauses inside `EquipmentOptionRow` (`IdentityRow` in
   the combobox option). Inline copy shows two clauses. The row title keeps the rest.
   The row shows the resolved owned quantity as `×N` on the heading line. That
@@ -43,6 +43,135 @@ profile, into ordered clauses (`requirement`, compatibility caution, `recommenda
 
 Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
 `EquipmentSupplySource`. A role grant is not a recommendation.
+
+## Selection row status, guidance, and context policy
+
+Builder selection rows show one metadata line (`EntitySummaryModel.statusComposition: 'metadata'`):
+blocker and warning badges first, then quieter guidance text, joined with `InlineMetadata`.
+
+```text
+Picker:  [Cannot afford] · Required by class · Included in package option
+Picker:  [Cannot afford] · [Not proficient] · [Requires STR 15]
+Review:  [Not proficient] · [Requires STR 15]
+```
+
+Module: `features/character/lib/selection-row-status/`. Equipment resolver:
+`lib/equipment/equipment-selection-row-presentation.lib.ts`.
+
+### Pipeline
+
+1. **Contracts facts.** `resolveEquipmentPresentationFacts` emits typed facts with a `discriminator`,
+   `sourceKind`, `requirementRole`, `owned`, and `ability`. Contracts own guidance and warning copy.
+2. **Domain resolver (semantics).** For example, `resolveEquipmentSelectionRowPresentation`
+   merges the facts (via `selectionPresentationFromFacts`) with domain blockers (affordability,
+   purchase, grant, conversion) into one `SelectionRowPresentation` per item. It knows nothing
+   about surfaces.
+3. **Policy table (visibility).** `SELECTION_ROW_CONTEXT_POLICIES` is a closed table of category
+   allow-lists, with no booleans and no per-surface conditionals.
+4. **Renderer (presentation).** `resolveSelectionRowStatusItems(presentation, { context, statusTooltip? })`
+   is the **only** exported way to turn a presentation into `EntitySummaryStatusItem[]`. `context`
+   is required. The renderer applies the policy, ranks, dedupes, and maps tone. There is no
+   policy-free export.
+
+Advisories (`CharacterBuildAdvisory`) run beside this pipeline, not through it. They come from the
+final owned loadout with no context input.
+
+### Visibility principle
+
+- **Compatibility warnings** describe the relationship between the character and the item, so they follow the item across owned, review, and edit contexts.
+- **Acquisition blockers** belong only to acquisition surfaces. A blocker on the edit action itself (for example, "cannot convert this item") belongs where that action is offered.
+- **Requirement and recommendation guidance** appears only where it helps the user make a choice.
+- **Source guidance** appears only where alternate acquisition information is useful and not already obvious from the containing surface.
+- **Row visibility never feeds advisories.** Advisories are derived from the final owned loadout with no context input, so hiding a warning on a surface cannot remove a build advisory.
+
+`title` and tooltips are supplemental only. The visible label must be enough to act on
+(`Recommended by class`, `Requires STR 15`). The named source and the actual score go in the
+`title`. No entry ever hides another entry; the context policy is the only filter.
+
+### Categories
+
+Constructors (`selectionBlocker`, `selectionWarning`, `selectionNotice`, `selectionRequirement`,
+`selectionRecommendation`, `selectionSource`) assign every entry's `category` from total lookup
+tables. Domain resolvers never pick a category or a context.
+
+| Category              | Entries                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| `availability`        | blocker: `unavailable`, `not_purchasable`, `acquisition_blocked`, `conversion_blocked` |
+| `affordability`       | blocker: `unaffordable`                                                                |
+| `compatibility`       | warning: `not_proficient`, `ability_score_requirement`                                 |
+| `capacity`            | notice: `selection_full`, `already_granted` (Gate C emitters)                          |
+| `requirement_open`    | requirement / requirement match, role `candidate`                                      |
+| `requirement_held`    | requirement / requirement match, role `satisfier`                                      |
+| `recommendation`      | recommendation, not owned                                                              |
+| `recommendation_held` | recommendation, owned                                                                  |
+| `source`              | `in_package`, `open_pool`, `alternative_package`                                       |
+
+### Context matrix
+
+| Context          | Equipment surfaces                                                            | Availability | Affordability | Compatibility | Req. (open) | Req. (held) | Recommendation | Rec. (owned) | Source |
+| ---------------- | ----------------------------------------------------------------------------- | ------------ | ------------- | ------------- | ----------- | ----------- | -------------- | ------------ | ------ |
+| `picker`         | Picker drawer                                                                 | yes          | yes           | yes           | yes         | no          | yes            | no           | yes    |
+| `owned`          | Added Equipment cart (Gate B)                                                 | no           | no            | yes           | no          | no          | no             | no           | no     |
+| `review`         | Starting Package expanded view (Gate B); Quick NPC weapon requirement preview | no           | no            | yes           | no          | no          | no             | no           | no     |
+| `edit_choice`    | Package conversion editor (Gate B); Quick NPC package customization (Gate C)  | yes          | no            | yes           | yes         | yes         | yes            | yes          | no     |
+| `reconciliation` | Package-switch trim modal (Gate B)                                            | no           | no            | yes           | yes         | yes         | yes            | yes          | no     |
+
+`picker` hides held requirements and owned recommendations, because that guidance has already
+done its job. `edit_choice` and `reconciliation` show them, because they explain why to keep an
+item. `reconciliation` evaluates facts against the **target (post-switch) draft**; every other
+context uses the current step draft. The draft is a domain-resolver input, and the policy never
+sees it.
+
+`selection-row-context-policy.test.ts` asserts this matrix cell by cell.
+
+### Rank and dedupe
+
+The comparator never falls back to input order:
+
+1. **Group:** status before guidance.
+2. **Kind:** `blocker`, `warning`, `notice`; then `requirement`, `requirement_match`, `recommendation`, `source`.
+3. **Reason:**
+   - Blockers: `unavailable`, `not_purchasable`, `acquisition_blocked`, `conversion_blocked`, `unaffordable` (structural first, budget last).
+   - Warnings: `not_proficient`, then `ability_score_requirement` in `ABILITY_IDS` order.
+   - Notices: `selection_full`, then `already_granted`.
+   - Requirement and recommendation: `sourceKind` in `compareSourcePriority` order.
+   - Source: `in_package`, `open_pool`, `alternative_package`.
+4. **Tie-break:** the semantic `key`, compared lexically.
+
+Entries are deduped by `key` (`warning:ability_score_requirement:str`,
+`guidance:recommendation:species`), never by label. The renderer owns tone: blockers are soft
+`destructive` badges and warnings soft `warning` badges, with no leading icon. Notices are muted
+text, and guidance uses the `guidance` text variant with `sourceLabels` as its `title`. Equipment
+blocker copy keeps its constants (`EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL`, …); the affordability
+amounts tooltip is passed in through the `statusTooltip` hook.
+
+### Registering a surface or context
+
+- **New surface:** pick an existing context and pass it to `resolveSelectionRowStatusItems`.
+- **New context:** add it to `SELECTION_ROW_CONTEXTS`. The `satisfies Record` constraint forces a
+  policy entry, and the matrix test forces an expectation row.
+- **Legitimate exception:** model it as a new context with a documented policy, never as label or
+  discriminator checks in a component.
+
+**PR checklist:** flag any `.status.filter` / `.guidance.filter` on a `SelectionRowPresentation`
+outside `selection-row-status/`, and any hand-built selection status items.
+
+**Stays local (not this lane):** ability eyebrows, class and species RadioCards, Quick NPC
+role/class/species group eyebrows, choice-row `Stale`, and Quick NPC equipment option-row clauses.
+
+### Remaining migration
+
+- **Gate B (builder owned surfaces):** `resolveEquipmentStepPickerItems` exposes `resolvedById`.
+  Inventory rows carry `selectionPresentation` in place of `advisoryStatusItems`, and parent
+  sections resolve status with their context: Added cart (`owned`, all row paths), Starting
+  Package inventory (`review`), package conversion editor (`edit_choice`, `blockingIssue` →
+  `conversion_blocked`), and the trim modal (`reconciliation`, target-draft facts).
+  `advisoryStatusForDisplay` is deleted.
+- **Gate C (spells, languages, Quick NPC):** the spell and proficiency drawers move to `picker`
+  (recommendation and capacity notices). Quick NPC package customization moves to `edit_choice`
+  and selected additional rows to `owned`. `recommendationStatusItems` and
+  `buildAdvisoryStatusItems` are deleted, and a "Status / guidance" row is added to the
+  commonality matrix.
 
 ## Architectural rule
 
@@ -98,7 +227,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### EquipmentPickerDrawer
 
-**May know:** equipment domain; browse workflow mode for **presentation** (filters/sorts/budget/callouts); row/detail composition; quantity UI; grant manage **callbacks**; documented pass-through of grant/acquisition context to details until acquisition VM is weaned off draft.
+**May know:** equipment domain; browse workflow mode for **presentation** (filters/sorts/budget/status line); row/detail composition; quantity UI; grant manage **callbacks**; documented pass-through of grant/acquisition context to details until acquisition VM is weaned off draft.
 
 **Must not know:** how a purchase is persisted; how a magic-item grant is applied; character-step mutation implementation; purchase-vs-grant routing on the add path (consumer maps `onCommitAdd`).
 

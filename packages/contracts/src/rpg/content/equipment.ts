@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 import { massSchema, speedRateSchema, weightSchema } from '../primitives/units'
 import { diceSchema } from '../primitives/dice'
-import { abilitySchema, abilityScoreSchema } from '../vocab/ability'
+import { abilitySchema } from '../vocab/ability'
+import { abilityScoreRequirementsSchema } from './lib/ability-score-requirements'
 import { armorCategorySchema } from '../vocab/armor/category'
 import { armorMaterialSchema } from '../vocab/armor/material'
 import { gearKindSchema } from '../vocab/equipment/gear-kind'
@@ -117,6 +118,8 @@ export {
   getEquipmentSpellcastingGearKind,
   type AdventuringGearEquipmentKindFields,
 } from './equipment/adventuring-gear-variant'
+
+export { getEquipmentAbilityScoreRequirements } from './equipment/equipment-ability-score-requirements'
 
 export {
   getSpellcastingGearKindEntry,
@@ -302,7 +305,7 @@ const armorEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({
   addDexModifier: z.boolean().optional(),
   maxDexBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
-  strengthRequirement: abilityScoreSchema.optional(),
+  abilityScoreRequirements: abilityScoreRequirementsSchema.optional(),
 })
 
 const adventuringGearEquipmentBodyDraftFields = equipmentBaseDraftSchema.extend({

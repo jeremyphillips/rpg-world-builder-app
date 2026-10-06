@@ -1,4 +1,5 @@
 import type { EquipmentRecommendationSpecificity } from '../../../content/equipment-recommendation'
+import type { UnmetAbilityScoreRequirement } from '../../../content/lib/ability-score-requirements'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 
 import type { RecommendationSourceRef } from './recommendation-source-ref'
@@ -101,6 +102,8 @@ export type EquipmentOptionSelection = {
 }
 
 export type OptionState = {
+  /** Present in the owned loadout (package, nested picks, grants, purchases). */
+  owned?: boolean
   selection?: EquipmentOptionSelection
   choice?: {
     choiceSetId?: string
@@ -112,6 +115,8 @@ export type OptionState = {
     proficient?: boolean
     proficiencySources?: readonly CharacterSelectionSource[]
     spellcastingFocusFor?: RecommendationSourceRef
+    /** Authored minimums the draft's known scores do not meet. Unknown scores are skipped. */
+    unmetAbilityScoreRequirements?: readonly UnmetAbilityScoreRequirement[]
   }
 }
 

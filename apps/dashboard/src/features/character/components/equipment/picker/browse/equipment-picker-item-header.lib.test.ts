@@ -21,7 +21,11 @@ import {
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import { resolveEquipmentAcquisitionContext } from '../../../../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import { resolveEquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
+import {
+  equipmentAcquisitionBlockerReason,
+  formatEquipmentPickerHeaderTrailingLabel,
+  resolveEquipmentPickerItemPresentation,
+} from './equipment-picker-item-header.lib'
 
 const RULESET = 'srd-cc-5.2.1' as const
 const TABLE_ID = standardStartingWealthTableId(RULESET)
@@ -220,7 +224,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      statusItems: [{ kind: 'badge', label: 'No Rare choices' }],
+      blockers: [{ kind: 'blocker', reason: 'acquisition_blocked', label: 'No Rare choices' }],
       action: { kind: 'none' },
     })
   })
@@ -266,7 +270,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation).toMatchObject({
-      statusItems: [{ kind: 'badge', label: 'One copy maximum' }],
+      blockers: [{ kind: 'blocker', reason: 'acquisition_blocked', label: 'One copy maximum' }],
       action: { kind: 'manage_only' },
     })
   })
@@ -314,5 +318,59 @@ describe('resolveEquipmentPickerItemPresentation', () => {
         ownedQuantity: 0,
       }).action,
     ).toEqual({ kind: 'add', disabled: true })
+  })
+})
+
+describe('equipment picker blocker mapping', () => {
+  it.each([
+    [{ code: 'no_matching_grant' as const }, 'acquisition_blocked', 'No Rare choices'],
+    [{ code: 'duplicate_not_allowed' as const }, 'acquisition_blocked', 'One copy maximum'],
+    [{ code: 'no_market_price' as const }, 'not_purchasable', 'Not for sale'],
+    [{ code: 'cannot_afford' as const, shortfallCp: 1 }, 'unaffordable', 'Cannot afford'],
+  ])('maps %o to its reason and keeps its copy', (blocker, reason, label) => {
+    expect(equipmentAcquisitionBlockerReason(blocker.code)).toBe(reason)
+    expect(formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity: 'rare' })).toBe(label)
+  })
+
+  it('maps purchase unavailability to unavailable or not purchasable', () => {
+    const row = buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture)
+    const blockersFor = (reason: 'unsupported_kind' | 'no_market_price') =>
+      resolveEquipmentPickerItemPresentation({
+        equipment: equipmentStepPotionOfHealingFixture,
+        row,
+        workflowMode: 'purchase',
+        rowActionVm: {
+          kind: 'purchase',
+          disabled: true,
+          availability: { status: 'unavailableForPurchase', reason },
+        },
+        ownedQuantity: 0,
+      }).blockers
+
+    expect(blockersFor('unsupported_kind')).toMatchObject([
+      { reason: 'unavailable', label: 'Unavailable here', category: 'availability' },
+    ])
+    expect(blockersFor('no_market_price')).toMatchObject([
+      { reason: 'not_purchasable', label: 'Not for sale', category: 'availability' },
+    ])
+  })
+
+  it('emits an unaffordable blocker only when no price label is shown', () => {
+    const unpriced = { ...equipmentStepPotionOfHealingFixture, cost: null }
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: unpriced,
+      row: buildEquipmentPickerRowViewModel(unpriced),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unaffordable', shortfallCp: 100 },
+      },
+      ownedQuantity: 0,
+    })
+
+    expect(presentation.blockers).toMatchObject([
+      { key: 'blocker:unaffordable', reason: 'unaffordable', category: 'affordability' },
+    ])
   })
 })

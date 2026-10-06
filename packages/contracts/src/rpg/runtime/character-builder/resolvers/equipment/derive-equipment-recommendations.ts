@@ -286,6 +286,62 @@ function applySpellcastingFocusContributions(args: {
   return matches.map((equipment) => equipment.id)
 }
 
+function attachResolvedPresentationToRecommendations(args: {
+  recommendations: Map<string, DerivedEquipmentRecommendation>
+  characterClass: CharacterClass
+  catalogIndex: CharacterBuildCatalogIndex
+  proficiencies: CharacterProficiencies
+  focusEligibleIds: readonly string[]
+  ownedIds: readonly string[]
+  draft: CharacterBuilderDraft | undefined
+}): ReadonlyMap<string, DerivedEquipmentRecommendation> {
+  const {
+    recommendations,
+    characterClass,
+    catalogIndex,
+    proficiencies,
+    focusEligibleIds,
+    ownedIds,
+    draft,
+  } = args
+  const evidenceById = new Map(
+    [...recommendations.entries()].map(([equipmentId, recommendation]) => [
+      equipmentId,
+      recommendation.evidence,
+    ]),
+  )
+  const facts = projectEquipmentCatalogFacts({
+    classId: characterClass.id,
+    equipment: catalogIndex.equipment,
+    evidenceById,
+    proficiencies,
+    focusEligibleIds,
+    ownedIds,
+    abilityScores: draft?.abilities?.scores,
+  })
+
+  const sourceName = equipmentRecommendationSourceName(catalogIndex)
+  for (const [equipmentId, recommendation] of recommendations) {
+    const resolved = facts.get(equipmentId)
+    if (!resolved) continue
+    recommendations.set(equipmentId, {
+      ...recommendation,
+      resolved: {
+        ...resolved,
+        presentation: resolveEquipmentPresentationFacts({
+          resolved,
+          equipment: catalogIndex.equipment.get(equipmentId),
+          sourceName,
+          authoredLabel: recommendation.label,
+          openPoolKind: openPoolKindFromEvidence(recommendation.evidence),
+        }),
+      },
+    })
+  }
+
+  return recommendations
+}
+
 /**
  * Tiered picker recommendations for every catalog equipment row.
  *
@@ -384,41 +440,15 @@ export function deriveEquipmentRecommendations(
     )
   }
 
-  const evidenceById = new Map(
-    [...recommendations.entries()].map(([equipmentId, recommendation]) => [
-      equipmentId,
-      recommendation.evidence,
-    ]),
-  )
-  const facts = projectEquipmentCatalogFacts({
-    classId: characterClass.id,
-    equipment: catalogIndex.equipment,
-    evidenceById,
+  return attachResolvedPresentationToRecommendations({
+    recommendations,
+    characterClass,
+    catalogIndex,
     proficiencies,
     focusEligibleIds,
     ownedIds,
+    draft,
   })
-
-  const sourceName = equipmentRecommendationSourceName(catalogIndex)
-  for (const [equipmentId, recommendation] of recommendations) {
-    const resolved = facts.get(equipmentId)
-    if (!resolved) continue
-    recommendations.set(equipmentId, {
-      ...recommendation,
-      resolved: {
-        ...resolved,
-        presentation: resolveEquipmentPresentationFacts({
-          resolved,
-          equipment: catalogIndex.equipment.get(equipmentId),
-          sourceName,
-          authoredLabel: recommendation.label,
-          openPoolKind: openPoolKindFromEvidence(recommendation.evidence),
-        }),
-      },
-    })
-  }
-
-  return recommendations
 }
 
 function applyContextEquipmentPreferences(args: {

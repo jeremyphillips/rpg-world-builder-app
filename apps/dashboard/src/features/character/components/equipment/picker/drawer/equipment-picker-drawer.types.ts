@@ -31,18 +31,6 @@ export type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-/** Sparse recommendation badges — most rows (including proficient gear) get none. */
-export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
-export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
-export const EQUIPMENT_PICKER_STANDARD_GEAR_LABEL = 'Standard gear'
-export const EQUIPMENT_PICKER_CLASS_TOOL_LABEL = 'Class tool'
-export const EQUIPMENT_PICKER_PROFICIENT_LABEL = 'Proficient'
-export const EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL = 'Proficiency available'
-export const EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL = 'Common for your class'
-/** @deprecated Use {@link EQUIPMENT_PICKER_PROFICIENT_LABEL} for badge display. */
-export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficiency'
-export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
-
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
@@ -59,53 +47,6 @@ export const EQUIPMENT_PICKER_ADD_PARTIAL_PREFIX = 'Add'
 
 export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
 export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
-
-export type EquipmentPickerCalloutIntent =
-  | 'info'
-  | 'recommended'
-  | 'compatible'
-  | 'warning'
-  | 'blocking'
-
-export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'
-
-export type EquipmentPickerCalloutFactKind =
-  | 'requirement'
-  | 'recommendation'
-  | 'compatibility'
-  | 'state'
-  | 'blocking'
-  | 'caution'
-  | 'guidance'
-
-export type EquipmentPickerCallout = {
-  label: string
-  intent: EquipmentPickerCalloutIntent
-  importance: EquipmentPickerCalloutImportance
-  /** Full explanation when the visible label truncates sources. */
-  title?: string
-  factKind?: EquipmentPickerCalloutFactKind
-  /** Sources already truncated for inline chrome. */
-  sourceInline?: string
-}
-
-export type EquipmentPickerCalloutContext = {
-  isGoldShoppingPath?: boolean
-  /**
-   * When set, only callouts whose semantic status is listed are eligible.
-   * Composition over rule-id filters — use to show proficiency warnings without
-   * Essential/Standard acquisition badges (e.g. Quick NPC Requirements).
-   */
-  visibleStatuses?: readonly EquipmentPickerCalloutSemanticStatus[]
-}
-
-export type EquipmentPickerCalloutSemanticStatus =
-  | 'not_proficient'
-  | 'essential'
-  | 'standard'
-  | 'blocking'
-  | 'compatibility'
-  | 'info'
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
@@ -191,7 +132,7 @@ export type EquipmentPickerDrawerProps = {
   onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void
   /** Mutually exclusive toolbar action — default resets full view including sort. */
   toolbarResetMode?: EquipmentPickerToolbarResetMode
-  /** When true, `availableInStartingOption` rows show the Standard gear badge. */
+  /** When true, rows in another starting package show `Included in package option`. */
   isGoldShoppingPath?: boolean
   resolveRowActionViewModel?: (args: {
     equipment: EquipmentPickerItem['equipment']

@@ -134,6 +134,27 @@ describe('QuickNpcAuthoringForm advisory gate', () => {
     expect(createNpcMock).not.toHaveBeenCalled()
   })
 
+  it('gates on an ability-score requirement advisory', async () => {
+    injected.advisories = [
+      {
+        code: 'equipment_ability_score_requirement_unmet',
+        subject: {
+          kind: 'equipment',
+          equipmentId: 'srd-cc-5.2.1:plate-armor',
+          label: 'Plate Armor',
+          unmet: [{ ability: 'str', required: 15, actual: 12 }],
+        },
+      },
+    ]
+    const user = userEvent.setup()
+    renderForm()
+    await fillAndCreate(user)
+    const dialog = await screen.findByRole('alertdialog')
+    expect(dialog.textContent).toContain('Requires STR 15; character has STR 12.')
+    await user.click(screen.getByRole('button', { name: 'Create NPC anyway' }))
+    await waitFor(() => expect(createNpcMock).toHaveBeenCalledTimes(1))
+  })
+
   it('creates when the user confirms Create NPC anyway', async () => {
     injected.advisories = [greatswordAdvisory]
     const user = userEvent.setup()

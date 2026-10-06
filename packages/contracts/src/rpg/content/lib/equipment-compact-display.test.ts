@@ -47,7 +47,7 @@ const plateArmor = {
   baseAc: 18,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 15,
+  abilityScoreRequirements: { str: 15 },
 } satisfies Equipment
 
 const holySymbolAmulet = {

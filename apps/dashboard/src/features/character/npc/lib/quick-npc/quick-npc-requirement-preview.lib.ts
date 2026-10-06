@@ -1,22 +1,19 @@
-import type { EquipmentPickerCallout } from '../../../components/equipment/picker/drawer/equipment-picker-drawer.types'
-import { getEquipmentPickerCallout } from '../../../components/equipment/picker/callouts/equipment-picker-callout.lib'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../../../components/equipment/picker/map-equipment-compact-summary-to-metadata-lines'
 import { mapSpellPickerCompactSummaryToMetadataLines } from '../../../components/spells/picker/map-spell-picker-compact-summary-to-metadata-lines'
-import { formatCatalogMetadataLines } from '@/features/content'
+import { formatCatalogMetadataLines, type EntitySummaryStatusItem } from '@/features/content'
+
+import { resolveEquipmentSelectionRowPresentation } from '../../../lib/equipment/equipment-selection-row-presentation.lib'
+import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 
 import type {
   QuickNpcSpellRequirementOption,
   QuickNpcWeaponRequirementOption,
 } from './quick-npc-requirement-options.lib'
 
-export const QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT = {
-  visibleStatuses: ['not_proficient'] as const,
-}
-
 export type WeaponRequirementPreviewProjection = {
   title: string
   description?: string
-  callout?: EquipmentPickerCallout
+  status?: readonly EntitySummaryStatusItem[]
 }
 
 export type SpellRequirementPreviewProjection = {
@@ -33,10 +30,19 @@ export function projectWeaponRequirementPreview(
     comparisonGroups: entry.row.comparisonGroups,
   })
 
+  const status = resolveSelectionRowStatusItems(
+    resolveEquipmentSelectionRowPresentation({
+      equipment: entry.pickerItem.equipment,
+      resolved: entry.pickerItem.state.resolved,
+      isProficient: entry.pickerItem.state.isProficient,
+    }),
+    { context: 'review' },
+  )
+
   return {
     title: entry.row.name,
     description: lines.length > 0 ? formatCatalogMetadataLines(lines) : undefined,
-    callout: getEquipmentPickerCallout(entry.pickerItem, QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT),
+    ...(status.length > 0 ? { status } : {}),
   }
 }
 

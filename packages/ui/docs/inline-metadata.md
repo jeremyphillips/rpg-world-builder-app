@@ -24,6 +24,15 @@ Host components own font size, weight, and line-height; `InlineMetadata` only se
 - Whole-line truncation, `title`, `aria-label`, tooltips, and API/search secondary text → `joinInlineMetadata`.
 - Per-item styling, badges, links, responsive visibility, or truncating title with fixed tail → `InlineMetadata` (use `Item truncate` where needed).
 
+### Mixed badge + text lines
+
+Dashboard entity status with `statusComposition: 'metadata'` mixes badges and text in one
+`<InlineMetadata role="supporting" wrap>` line (`[Cannot afford] · Required by class`). Each item
+is wrapped in `InlineMetadata.Item`. Text renders as an inline span, and badges keep their
+density sizing. Badge baseline alignment inside inline flow belongs in
+`inline-metadata.variants.ts`, not in consumers. Detail:
+[content-entity-card.md](../../../apps/dashboard/docs/content-entity-card.md#entitysummary-status-lane).
+
 ## Exemptions (not metadata separators)
 
 - Validation prose in spellcasting progression messages and class capacity progression.

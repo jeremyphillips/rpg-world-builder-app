@@ -15,7 +15,7 @@ import { formatStandardSelectionSourceLabel } from '../../../character/format-se
 import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
-  softRecommendationFact,
+  softRecommendationFacts,
   type OptionPresentationFacts,
   type OptionRecommendation,
 } from '../../recommendation'
@@ -145,7 +145,7 @@ function resolveProficiencyPickerItemState(
     recommendedLanguageIds,
     speciesId: draft.species.speciesId,
   })
-  const recommendationFact = softRecommendationFact({
+  const recommendationFacts = softRecommendationFacts({
     recommendation,
     sourceName: (source) =>
       source.kind === 'species' ? catalogIndex.species.get(source.id)?.name : undefined,
@@ -155,7 +155,7 @@ function resolveProficiencyPickerItemState(
     isAvailable: true,
     isRecommended: recommendation.strength === 'strong',
     recommendation,
-    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
+    ...(recommendationFacts.length > 0 ? { presentation: { facts: recommendationFacts } } : {}),
     isAlreadySelected,
     isAlreadyGranted,
     isSelectionFull,

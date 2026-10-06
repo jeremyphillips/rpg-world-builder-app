@@ -521,7 +521,7 @@ A 36px stepper in a compact row grows the row through the slack gutters; heading
 description stay on their tracks and the stepper centers on the full row.
 
 **Status and classification never use trailing.** Role labels (`Member`), availability
-(`Unavailable`), and callouts (`Spellcasting focus`) belong in `EntitySummary.status`.
+(`Unavailable`), and selection status (`Cannot afford`, `Required by class`) belong in `EntitySummary.status`.
 
 There is no parallel `action` + `endSlot` + feature-specific trailing sibling on entity
 surfaces. A destination chevron is an `indicator`, not an `action`. Whole-row navigation
@@ -555,9 +555,26 @@ EntitySummary parts            RowAnatomy cell
 | `inactive`        | Circle-slash inactive metadata (search unavailable rows)                      |
 | `validationError` | Master-detail validation indicator                                            |
 
-`text` items take `variant: 'muted' | 'warning'` — a plain visual tone only. Warning text renders as its own
+`text` items take `variant: 'muted' | 'warning' | 'guidance'` — a plain visual tone only. Warning text renders as its own
 status line under the description (e.g. a build advisory under `10 total · Fighter package ×8`); never concatenate
 it into the description. Domain mapping (e.g. build advisories → status items) stays in the consuming feature.
+
+`guidance` (`text-foreground`) reads at title ink, above the muted detail line. Use it for
+requirement, recommendation, and source guidance. Text items may carry an optional `title`, which is
+supplemental only: the label must stand on its own.
+
+### Status composition
+
+`EntitySummaryModel.statusComposition` picks the lane layout:
+
+| Composition         | Layout                                                                                                | Use when                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `cluster` (default) | Items wrap with a gap                                                                                 | Independent states (Member, Equipped) or a standalone warning line                        |
+| `metadata`          | One `InlineMetadata` line (`role="supporting"`, wrapping) with `·` between items; text renders inline | A single ordered sentence of badges then guidance (`[Cannot afford] · Required by class`) |
+
+Character builder selection rows always use `metadata` and get their items from
+`resolveSelectionRowStatusItems`. Do not build them by hand. See
+[character-builder-picker-chrome.md](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
 EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
 

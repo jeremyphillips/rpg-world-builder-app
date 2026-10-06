@@ -113,7 +113,11 @@ export function EntityAnatomy({
           cell={{ slot: 'status', column: 'content' }}
           data-entity-item-slot="status"
         >
-          <EntitySummaryStatus items={entity.status!} density={density} />
+          <EntitySummaryStatus
+            items={entity.status!}
+            density={density}
+            composition={entity.statusComposition}
+          />
         </RowAnatomyCell>
       ) : null}
       <EntityAnatomyTrailingCells trailing={trailing} />

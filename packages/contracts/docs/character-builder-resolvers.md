@@ -427,13 +427,41 @@ Equipment evidence carries an optional `source`. Proficiency compatibility evide
 has none. Picker rows keep that evidence on `state.evidence` and the split facts on
 `state.resolved`.
 
-`resolveEquipmentPresentationFacts` turns those facts into semantic copy: "Required by
-Wizard class", "Satisfies Wizard focus requirement", "Proficient" with "Granted by Rogue
-class", the equipment proficiency advisory sentence, "Recommended" plus source labels, and state labels such as
-"In your package". Each of those copies may carry a presentation discriminator
-(`required`, `satisfies`, `recommended`, `included`, `proficient`, `not-proficient`).
-The discriminator is a one-way label for adapters. It does not replace
-`OptionRequirement`, `OptionRecommendation`, `OptionState.selection`, or compatibility.
+`resolveEquipmentPresentationFacts` turns those facts into semantic copy. Copy is
+**kind-based**: "Required by class", "Recommended by species", "Matches focus
+requirement" (an open `anyOf` focus requirement), and "Satisfies focus requirement" (the
+item that satisfies it). The named source (`Wizard class`) goes in `sourceLabels`, which
+the dashboard renders as supplemental `title` text. Other copy:
+
+- "Proficient", with "Granted by Rogue class".
+- "Not proficient", with the long advisory sentence as `detail`.
+- "Requires STR 15", with "Requires STR 15; character has STR 12." as `detail`.
+- Source state: "In your package"; "Starting option" or "Proficiency available" for an open
+  pool; "Included in package option" for an alternative package.
+
+Each fact carries a presentation discriminator from `OPTION_PRESENTATION_DISCRIMINATORS`:
+
+- Requirements: `required`, `requirement-match`.
+- Recommendation and compatibility: `recommended`, `proficient`, `not-proficient`,
+  `ability-requirement-unmet`.
+- Source and focus: `in-package`, `open-pool`, `alternative-package`, `spellcasting-focus`.
+
+The discriminator is a one-way label for adapters, which branch on it and never on labels.
+It does not replace `OptionRequirement`, `OptionRecommendation`, `OptionState.selection`,
+or compatibility. Ranking reads `OptionRequirement.role`, never facts.
+
+Facts also carry data that surfaces may filter on. Contracts never suppress a fact for
+this:
+
+- `sourceKind`: the requirement owner or recommendation signal kind.
+- `requirementRole`: `candidate` or `satisfier`. An alternate whose requirement another
+  item already satisfies emits no fact.
+- `owned`: on recommendation facts, from `OptionState.owned`.
+- `ability`: on `ability-requirement-unmet` facts.
+
+Visibility per surface is the dashboard's context policy (see
+[character-builder-picker-chrome.md](../../../apps/dashboard/docs/character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy)).
+The old `ownedQuantity` / `included` path is gone.
 
 `projectEquipmentSelection` merges live quantity and supply onto `OptionState.selection`
 without changing recommendation strength or requirement roles. Supply sources use
@@ -444,7 +472,7 @@ decision (`grant`, `inventory`, blocked `acquisition`, or an idempotent classed-
 `requirement`). Row UI calls that policy instead of `isEquipmentStackable`.
 
 The dashboard owns badge tone, two-source inline truncation, and tooltips. Builder
-callouts and Quick NPC combobox rows both read
+picker rows map facts through the selection-row pipeline. Quick NPC combobox rows read
 `resolveEquipmentOptionRowPresentation`, then keep their own chrome. Supply phrases
 use selection-source formatting (`Guard role`, `Fighter starting equipment`). They
 are not recommendation copy.

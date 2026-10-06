@@ -1,20 +1,25 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Equipment } from '../../../content/equipment'
-import { resolveEquipmentNotProficientMessage } from '../messages/character-builder-advisory-messages'
-import { NEUTRAL_OPTION_RECOMMENDATION } from './recommendation-envelope'
+import {
+  resolveEquipmentNotProficientMessage,
+  resolveEquipmentNotProficientShortLabel,
+} from '../messages/character-builder-advisory-messages'
+import { NEUTRAL_OPTION_RECOMMENDATION, type OptionRequirement } from './recommendation-envelope'
 import {
   grantedByLabel,
-  includedQuantityLabel,
-  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
+  OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
+  OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
+  recommendedByLabel,
   requiredByLabel,
-  satisfiesFocusRequirementLabel,
+  softRecommendationFacts,
 } from './resolve-option-presentation-facts'
 import { resolveEquipmentPresentationFacts } from './resolve-equipment-presentation-facts'
 import type { ResolvedEquipmentOption } from '../resolvers/equipment/project-equipment-option-facts'
@@ -31,89 +36,87 @@ function resolved(overrides: Partial<ResolvedEquipmentOption> = {}): ResolvedEqu
   }
 }
 
+function requirement(
+  role: OptionRequirement['role'],
+  rule: OptionRequirement['rule'] = 'exact',
+  requirementId = 'wizard:required-gear',
+): OptionRequirement {
+  return { requirementId, owner: wizard, rule, optionSatisfies: true, role }
+}
+
+const focusState = { compatibility: { spellcastingFocusFor: wizard } }
+
 describe('resolveEquipmentPresentationFacts', () => {
   const sourceName = (source: { kind: string }) => {
     if (source.kind === 'class' && 'id' in source && source.id === 'wizard') return 'Wizard'
     if (source.kind === 'class' && 'id' in source && source.id === 'rogue') return 'Rogue'
     if (source.kind === 'role') return 'Guard'
+    if (source.kind === 'species') return 'Dwarf'
     return undefined
   }
 
-  it('names an unsatisfied requirement by its owner', () => {
-    const facts = resolveEquipmentPresentationFacts({
-      resolved: resolved({
-        requirements: [
-          {
-            requirementId: 'wizard:required-gear',
-            owner: wizard,
-            rule: 'exact',
-            optionSatisfies: true,
-            role: 'candidate',
-          },
-        ],
-      }),
-      sourceName,
-      authoredLabel: 'Spellbook',
-    })
+  it('labels an exact requirement by owner kind and keeps the named owner as source', () => {
+    for (const role of ['candidate', 'satisfier'] as const) {
+      const facts = resolveEquipmentPresentationFacts({
+        resolved: resolved({ requirements: [requirement(role)] }),
+        sourceName,
+        authoredLabel: 'Spellbook',
+      })
 
-    expect(facts.facts[0]).toMatchObject({
-      kind: 'requirement',
-      discriminator: 'required',
-      label: requiredByLabel('Wizard class'),
-    })
-    expect(facts.facts[0]?.label).toBe(requiredByLabel('Wizard class'))
-    expect(facts.facts.some((fact) => fact.label === 'Spellbook')).toBe(false)
+      expect(facts.facts[0]).toEqual({
+        kind: 'requirement',
+        discriminator: 'required',
+        label: requiredByLabel('class'),
+        sourceKind: 'class',
+        requirementRole: role,
+        sourceLabels: ['Wizard class'],
+      })
+      expect(facts.facts[0]?.label).toBe('Required by class')
+      expect(facts.facts.some((fact) => fact.label === 'Spellbook')).toBe(false)
+    }
   })
 
-  it('keeps an unsatisfied focus pool on the requirement, then drops other candidates', () => {
+  it('matches an open focus requirement, satisfies it once owned, and skips eligible alternates', () => {
     const candidate = resolveEquipmentPresentationFacts({
       resolved: resolved({
-        requirements: [
-          {
-            requirementId: 'wizard:spellcasting-focus',
-            owner: wizard,
-            rule: 'anyOf',
-            optionSatisfies: true,
-            role: 'candidate',
-          },
-        ],
-        state: { compatibility: { spellcastingFocusFor: wizard } },
+        requirements: [requirement('candidate', 'anyOf', 'wizard:spellcasting-focus')],
+        state: focusState,
       }),
       sourceName,
     })
-    expect(candidate.facts.map((fact) => fact.label)).toEqual([requiredByLabel('Wizard class')])
+    expect(candidate.facts).toEqual([
+      expect.objectContaining({
+        discriminator: 'requirement-match',
+        label: OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
+        requirementRole: 'candidate',
+        sourceKind: 'class',
+      }),
+    ])
 
     const satisfier = resolveEquipmentPresentationFacts({
       resolved: resolved({
-        requirements: [
-          {
-            requirementId: 'wizard:spellcasting-focus',
-            owner: wizard,
-            rule: 'anyOf',
-            optionSatisfies: true,
-            role: 'satisfier',
-          },
-        ],
-        state: { compatibility: { spellcastingFocusFor: wizard } },
+        requirements: [requirement('satisfier', 'anyOf', 'wizard:spellcasting-focus')],
+        state: { ...focusState, owned: true },
       }),
       sourceName,
-      ownedQuantity: 1,
     })
-    expect(satisfier.facts.map((fact) => fact.label)).toEqual([
-      satisfiesFocusRequirementLabel('Wizard'),
-      includedQuantityLabel(1),
+    expect(satisfier.facts).toEqual([
+      expect.objectContaining({
+        discriminator: 'requirement-match',
+        label: OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
+        requirementRole: 'satisfier',
+      }),
     ])
-    expect(satisfier.facts.map((fact) => fact.discriminator)).toEqual(['satisfies', 'included'])
 
-    const other = resolveEquipmentPresentationFacts({
+    const eligible = resolveEquipmentPresentationFacts({
       resolved: resolved({
-        state: { compatibility: { spellcastingFocusFor: wizard } },
+        requirements: [requirement('eligible', 'anyOf', 'wizard:spellcasting-focus')],
+        state: focusState,
       }),
       sourceName,
     })
-    expect(other.facts.map((fact) => fact.label)).toEqual([
-      OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
-    ])
+    expect(eligible.facts.map((fact) => fact.discriminator)).toEqual(['spellcasting-focus'])
+    expect(eligible.facts[0]?.label).toBe(OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL)
   })
 
   it('pairs proficiency with the granting class', () => {
@@ -136,7 +139,7 @@ describe('resolveEquipmentPresentationFacts', () => {
     })
   })
 
-  it('keeps every soft source and does not invent a recommendation from proficiency alone', () => {
+  it('emits one recommendation per source kind in priority order', () => {
     const recommended = resolveEquipmentPresentationFacts({
       resolved: resolved({
         recommendation: {
@@ -144,25 +147,35 @@ describe('resolveEquipmentPresentationFacts', () => {
           signals: [
             {
               strength: 'strong',
-              basis: 'preference',
-              specificity: 'exact',
-              source: { kind: 'role', id: 'guard' },
-            },
-            {
-              strength: 'strong',
               basis: 'authored',
               specificity: 'exact',
               source: wizard,
+            },
+            {
+              strength: 'strong',
+              basis: 'preference',
+              specificity: 'exact',
+              source: { kind: 'role', id: 'guard' },
             },
           ],
         },
       }),
       sourceName,
     })
-    expect(recommended.facts[0]).toMatchObject({
-      label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
-      sourceLabels: ['Guard role', 'Wizard class'],
-    })
+    expect(recommended.facts).toEqual([
+      expect.objectContaining({
+        label: recommendedByLabel('role'),
+        sourceKind: 'role',
+        sourceLabels: ['Guard role'],
+        owned: false,
+      }),
+      expect.objectContaining({
+        label: recommendedByLabel('class'),
+        sourceKind: 'class',
+        sourceLabels: ['Wizard class'],
+        owned: false,
+      }),
+    ])
 
     const proficientOnly = resolveEquipmentPresentationFacts({
       resolved: resolved({
@@ -172,7 +185,26 @@ describe('resolveEquipmentPresentationFacts', () => {
     expect(proficientOnly.facts).toEqual([])
   })
 
-  it('projects not-proficient without changing recommendation strength or copy', () => {
+  it('stamps owned recommendations instead of suppressing them', () => {
+    const facts = resolveEquipmentPresentationFacts({
+      resolved: resolved({
+        recommendation: {
+          strength: 'strong',
+          signals: [
+            { strength: 'strong', basis: 'inferred', specificity: 'exact', source: wizard },
+          ],
+        },
+        state: { owned: true },
+      }),
+      sourceName,
+    })
+
+    expect(facts.facts).toEqual([
+      expect.objectContaining({ discriminator: 'recommended', owned: true }),
+    ])
+  })
+
+  it('projects a short not-proficient label with the class sentence as detail', () => {
     const recommendation = {
       strength: 'strong' as const,
       signals: [
@@ -195,16 +227,54 @@ describe('resolveEquipmentPresentationFacts', () => {
     })
     expect(option.recommendation).toBe(recommendation)
     expect(facts.facts.find((fact) => fact.discriminator === 'recommended')).toMatchObject({
-      label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
+      label: recommendedByLabel('class'),
       sourceLabels: ['Wizard class'],
     })
-    expect(facts.facts.find((fact) => fact.discriminator === 'not-proficient')).toMatchObject({
+    expect(facts.facts.find((fact) => fact.discriminator === 'not-proficient')).toEqual({
       kind: 'compatibility',
-      label: resolveEquipmentNotProficientMessage('weapon'),
+      discriminator: 'not-proficient',
+      label: resolveEquipmentNotProficientShortLabel(),
+      detail: resolveEquipmentNotProficientMessage('weapon'),
+      sourceLabels: [],
     })
+    expect(resolveEquipmentNotProficientShortLabel()).toBe('Not proficient')
   })
 
-  it('labels affinity, package membership, and open pools as state or compatibility', () => {
+  it('emits one ability-requirement-unmet fact per unmet minimum', () => {
+    const facts = resolveEquipmentPresentationFacts({
+      resolved: resolved({
+        state: {
+          compatibility: {
+            unmetAbilityScoreRequirements: [
+              { ability: 'str', required: 15, actual: 8 },
+              { ability: 'dex', required: 13, actual: 10 },
+            ],
+          },
+        },
+      }),
+    })
+
+    expect(facts.facts).toEqual([
+      {
+        kind: 'compatibility',
+        discriminator: 'ability-requirement-unmet',
+        ability: 'str',
+        label: 'Requires STR 15',
+        detail: 'Requires STR 15; character has STR 8.',
+        sourceLabels: [],
+      },
+      {
+        kind: 'compatibility',
+        discriminator: 'ability-requirement-unmet',
+        ability: 'dex',
+        label: 'Requires DEX 13',
+        detail: 'Requires DEX 13; character has DEX 10.',
+        sourceLabels: [],
+      },
+    ])
+  })
+
+  it('labels affinity, package membership, open pools, and alternative packages', () => {
     expect(
       resolveEquipmentPresentationFacts({
         resolved: resolved({
@@ -232,8 +302,8 @@ describe('resolveEquipmentPresentationFacts', () => {
             choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
           },
         }),
-      }).facts.map((fact) => fact.label),
-    ).toEqual([OPTION_PRESENTATION_IN_PACKAGE_LABEL])
+      }).facts.map((fact) => [fact.discriminator, fact.label]),
+    ).toEqual([['in-package', OPTION_PRESENTATION_IN_PACKAGE_LABEL]])
 
     expect(
       resolveEquipmentPresentationFacts({
@@ -243,10 +313,88 @@ describe('resolveEquipmentPresentationFacts', () => {
           },
         }),
         openPoolKind: 'toolProficiency',
-      }).facts.map((fact) => fact.label),
+      }).facts.map((fact) => [fact.discriminator, fact.label]),
     ).toEqual([
-      OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
-      OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+      ['open-pool', OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL],
+      ['alternative-package', OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL],
     ])
+    expect(OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL).toBe('Included in package option')
+  })
+})
+
+describe('softRecommendationFacts', () => {
+  const sourceName = (source: { kind: string }) => {
+    if (source.kind === 'class') return 'Wizard'
+    if (source.kind === 'species') return 'Dwarf'
+    if (source.kind === 'role') return 'Guard'
+    return undefined
+  }
+
+  it('keeps class and species as separate facts in source priority order', () => {
+    const facts = softRecommendationFacts({
+      recommendation: {
+        strength: 'strong',
+        signals: [
+          {
+            strength: 'strong',
+            basis: 'affinity',
+            specificity: 'exact',
+            source: { kind: 'species', id: 'dwarf' },
+          },
+          { strength: 'strong', basis: 'authored', specificity: 'exact', source: wizard },
+        ],
+      },
+      sourceName,
+    })
+
+    expect(facts.map((fact) => [fact.label, fact.sourceKind, fact.sourceLabels])).toEqual([
+      ['Recommended by class', 'class', ['Wizard class']],
+      ['Recommended by species', 'species', ['Dwarf species']],
+    ])
+  })
+
+  it('orders role before class', () => {
+    const facts = softRecommendationFacts({
+      recommendation: {
+        strength: 'strong',
+        signals: [
+          { strength: 'strong', basis: 'authored', specificity: 'exact', source: wizard },
+          {
+            strength: 'strong',
+            basis: 'preference',
+            specificity: 'exact',
+            source: { kind: 'role', id: 'guard' },
+          },
+        ],
+      },
+      sourceName,
+    })
+
+    expect(facts.map((fact) => fact.label)).toEqual(['Recommended by role', 'Recommended by class'])
+  })
+
+  it('collapses sourceless signals into a single Recommended fact', () => {
+    const facts = softRecommendationFacts({
+      recommendation: {
+        strength: 'compatible',
+        signals: [
+          { strength: 'compatible', basis: 'inferred', specificity: 'broad_pool' },
+          { strength: 'compatible', basis: 'inferred', specificity: 'exact' },
+        ],
+      },
+    })
+
+    expect(facts).toEqual([
+      {
+        kind: 'recommendation',
+        discriminator: 'recommended',
+        label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
+        sourceLabels: [],
+      },
+    ])
+  })
+
+  it('emits nothing for neutral or discouraged recommendations', () => {
+    expect(softRecommendationFacts({ recommendation: NEUTRAL_OPTION_RECOMMENDATION })).toEqual([])
   })
 })

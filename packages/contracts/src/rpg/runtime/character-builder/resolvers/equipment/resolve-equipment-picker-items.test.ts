@@ -46,7 +46,7 @@ const chainMail = equipmentSchema.parse({
   baseAc: 16,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 13,
+  abilityScoreRequirements: { str: 13 },
 })
 
 const plateArmor = equipmentSchema.parse({
@@ -62,7 +62,7 @@ const plateArmor = equipmentSchema.parse({
   baseAc: 18,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 15,
+  abilityScoreRequirements: { str: 15 },
 })
 
 const storedFighter: ClassStored = {

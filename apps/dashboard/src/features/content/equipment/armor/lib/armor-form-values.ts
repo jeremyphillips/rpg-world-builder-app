@@ -1,4 +1,8 @@
-import { type CreateEquipmentInput, type ArmorEquipment } from '@rpg/contracts'
+import {
+  type AbilityScoreRequirements,
+  type ArmorEquipment,
+  type CreateEquipmentInput,
+} from '@rpg/contracts'
 
 import {
   equipmentInputBase,
@@ -16,6 +20,25 @@ function optionalArmorAc(values: EquipmentInputBuildCtx<'armor'>['values']): Par
   return values.baseAc !== undefined ? { baseAc: values.baseAc } : {}
 }
 
+/**
+ * Strength is switch-gated in the form; other abilities on the item pass through
+ * untouched. Returns `undefined` when no minimum remains.
+ */
+function abilityScoreRequirementsFromForm(
+  values: Pick<
+    ArmorEquipmentFormValues,
+    'abilityScoreRequirements' | 'hasMinimumStrengthRequirement'
+  >,
+): AbilityScoreRequirements | undefined {
+  const { str, ...otherAbilities } = values.abilityScoreRequirements ?? {}
+  const requirements: AbilityScoreRequirements = {}
+  for (const [ability, score] of Object.entries(otherAbilities)) {
+    if (score !== undefined) requirements[ability as keyof AbilityScoreRequirements] = score
+  }
+  if (values.hasMinimumStrengthRequirement === true && str !== undefined) requirements.str = str
+  return Object.keys(requirements).length > 0 ? requirements : undefined
+}
+
 export function armorFormValuesFromEntity(
   item: ArmorEquipment,
 ): Pick<
@@ -27,7 +50,8 @@ export function armorFormValuesFromEntity(
   | 'addDexModifier'
   | 'maxDexBonus'
   | 'stealthDisadvantage'
-  | 'strengthRequirement'
+  | 'abilityScoreRequirements'
+  | 'hasMinimumStrengthRequirement'
 > {
   return {
     armorCategory: item.category,
@@ -37,7 +61,8 @@ export function armorFormValuesFromEntity(
     addDexModifier: item.addDexModifier,
     maxDexBonus: item.maxDexBonus,
     stealthDisadvantage: item.stealthDisadvantage,
-    strengthRequirement: item.strengthRequirement,
+    abilityScoreRequirements: item.abilityScoreRequirements,
+    hasMinimumStrengthRequirement: item.abilityScoreRequirements?.str !== undefined,
   }
 }
 
@@ -49,6 +74,7 @@ export function buildArmorInput({
   validationIntent = 'publish',
 }: EquipmentInputBuildCtx<'armor'>): CreateEquipmentInput {
   const isDraft = validationIntent === 'draft'
+  const abilityScoreRequirements = abilityScoreRequirementsFromForm(values)
 
   return parseEquipmentCreateInput(
     {
@@ -70,9 +96,7 @@ export function buildArmorInput({
       ...(values.material && { material: values.material }),
       ...optionalArmorAc(values),
       ...(values.maxDexBonus !== undefined && { maxDexBonus: values.maxDexBonus }),
-      ...(values.strengthRequirement !== undefined && {
-        strengthRequirement: values.strengthRequirement,
-      }),
+      ...(abilityScoreRequirements && { abilityScoreRequirements }),
     },
     validationIntent,
   )

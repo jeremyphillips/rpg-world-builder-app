@@ -144,6 +144,14 @@ Rules:
 - Display prose comes from `formatRequirementExpression()` in `@rpg/contracts`
   — do not duplicate prerequisite strings on catalog records.
 
+**Equipment ability minimums are not expressions.** Armor stores a flat
+`abilityScoreRequirements` map (`{ str: 15 }`, an AND of minimums) in
+`rpg/content/lib/ability-score-requirements.ts`. `resolveUnmetAbilityScoreRequirements`
+compares that map to known scores, skipping any ability without a score. It is the comparator
+a future feat `abilityMinimum` evaluator can share. The map drives the picker warning
+(`Requires STR 15`) and the `equipment_ability_score_requirement_unmet` advisory. It replaces
+the old `strengthRequirement` field.
+
 **Example (Grappler):** `Level 4+` AND (`Strength 13+` OR `Dexterity 13+`):
 
 ```json

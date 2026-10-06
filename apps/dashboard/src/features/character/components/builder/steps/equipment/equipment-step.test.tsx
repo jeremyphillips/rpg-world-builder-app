@@ -8,6 +8,7 @@ import {
   buildChoiceSetId,
   createEmptyCharacterBuilderDraft,
   nestedStartingEquipmentChoiceSetId,
+  OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   resolveAvailableChoices,
   startingEquipmentChoiceSetId,
   type CharacterBuilderDraft,
@@ -37,10 +38,7 @@ import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT,
   EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
-import {
-  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL,
-} from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
+import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../../../equipment/picker/purchase/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step'
 
@@ -302,7 +300,7 @@ describe('EquipmentStep', () => {
       .find((row) => within(row).queryByText(equipmentStepLuteFixture.name))!
 
     expect(
-      within(luteRow).getByText(EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL),
+      within(luteRow).getByText(OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL),
     ).toBeInTheDocument()
     expect(within(luteRow).queryByText('Not proficient')).not.toBeInTheDocument()
   })

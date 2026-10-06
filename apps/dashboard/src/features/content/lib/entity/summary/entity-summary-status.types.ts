@@ -14,12 +14,24 @@ export type EntitySummaryStatusBadge = {
   tooltip?: ReactNode
 }
 
-/** Supporting status annotation — ritual/concentration markers, disabled notes, warnings. Not a generic third-line slot. */
+/**
+ * Supporting status annotation — ritual/concentration markers, disabled notes, warnings,
+ * selection guidance. Not a generic third-line slot.
+ */
 export type EntitySummaryStatusText = {
   kind: 'text'
   label: string
-  variant?: 'muted' | 'warning'
+  /** `guidance` reads at foreground ink, above muted detail (requirements, recommendations). */
+  variant?: 'muted' | 'warning' | 'guidance'
+  /** Supplemental only — the label must stand on its own. */
+  title?: string
 }
+
+/**
+ * Status lane layout. `cluster` wraps items with a gap; `metadata` joins them on one
+ * inline-metadata line with `·` separators (selection rows mixing badges and guidance).
+ */
+export type EntitySummaryStatusComposition = 'cluster' | 'metadata'
 
 /** Circle-slash inactive row metadata — matches InlineInactiveStatus presentation. */
 export type EntitySummaryStatusInactive = {

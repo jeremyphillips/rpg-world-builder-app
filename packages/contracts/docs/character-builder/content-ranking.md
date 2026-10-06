@@ -233,35 +233,29 @@ Row disabled notes and the budget header use the shared `EmphasisDetailLine`
 pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted
 secondary tail (`100 GP starting · 95 GP spent`, `40 GP remaining`).
 
-## Equipment picker badge precedence
+## Equipment picker row status
 
-`getEquipmentPickerBadge` in `equipment-picker-drawer.lib.ts` emits **one badge per
-row**. Copy is **reason-driven** — do not infer proficiency-state labels from
-equipment kind alone.
+Picker rows no longer pick a single badge. Every applicable signal renders on one
+ordered status line: blockers, then compatibility warnings, then requirement,
+recommendation, and source guidance. Rank tables, dedupe, and per-surface visibility
+are dashboard-owned. See
+[character-builder-picker-chrome.md](../../../../apps/dashboard/docs/character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
-`state.isProficient` remains factual (resolved proficiencies only). Badge copy
-interprets unresolved recommendation context; it does not redefine proficiency for
-preview or combat semantics.
+Contracts own the copy through `resolveEquipmentPresentationFacts`:
 
-### Single-badge order
+- **Requirements:** kind-based. "Required by class" for an exact need, "Matches focus
+  requirement" for an open focus `anyOf`, and "Satisfies focus requirement" for the
+  satisfier.
+- **Recommendations:** "Recommended by class", "Recommended by species", and so on.
+- **Source state:** an alternative starting package reads "Included in package option".
+  The builder shows it on the gold path only (`isGoldShoppingPath` on the drawer). An
+  open tool-proficiency pool reads "Proficiency available".
+- **Compatibility:** "Not proficient" and "Requires STR 15", each with a detail sentence.
 
-1. **Essential / class-required blockers** — authored `label`, `classRequired`,
-   `classToolNeed`, `spellcastingFocus`
-2. **Proficiency-state explanations** — `selectedToolProficiency` → **Proficient**;
-   `unresolvedToolProficiencyChoice` → **Proficiency available**;
-   `classToolCategory` → **Common for your class**
-3. **Starting-equipment / class recommendation source** — `startingEquipmentChoice` →
-   **Starting option**; `availableInStartingOption` → **Standard gear** on gold path
-   only (`isGoldShoppingPath` on the drawer)
-4. **Not proficient** — when `compatibility.proficient === false` and no higher-priority fact applies. The sentence comes from `resolveEquipmentNotProficientMessage`.
-
-Proficiency-state badges outrank ordinary recommendation-source badges (e.g. a Bard
-instrument with both `unresolvedToolProficiencyChoice` and `startingEquipmentChoice`
-shows **Proficiency available**). Essential blockers outrank generic proficiency copy.
-
-Ordinary weapon/armor category proficiency (`compatibility.proficient === true`
-without `selectedToolProficiency`) stays **badge-less**. Missing proficiency is a
-caution, not a recommendation tier.
+`state.isProficient` remains factual (resolved proficiencies only). Ordinary
+weapon or armor category proficiency adds nothing to the line. Missing proficiency and
+an unmet ability score are cautions, not recommendation tiers, and neither changes
+Best Match ranking.
 
 ## Starting-equipment contribution context
 

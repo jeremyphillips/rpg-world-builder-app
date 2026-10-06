@@ -13,7 +13,7 @@ import {
 import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
-  softRecommendationFact,
+  softRecommendationFacts,
   type OptionPresentationFacts,
   type OptionRecommendation,
 } from '../../recommendation'
@@ -69,7 +69,7 @@ function resolveSpellPickerItemState(
         ],
       }
     : NEUTRAL_OPTION_RECOMMENDATION
-  const recommendationFact = softRecommendationFact({
+  const recommendationFacts = softRecommendationFacts({
     recommendation,
     sourceName: (source) => (source.kind === 'class' ? classSource?.name : undefined),
   })
@@ -78,7 +78,7 @@ function resolveSpellPickerItemState(
     isAvailable: true,
     isRecommended: recommendation.strength === 'strong',
     recommendation,
-    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
+    ...(recommendationFacts.length > 0 ? { presentation: { facts: recommendationFacts } } : {}),
     isAlreadySelected,
     isSelectionFull,
     canSelect: !isAlreadySelected && !isSelectionFull,

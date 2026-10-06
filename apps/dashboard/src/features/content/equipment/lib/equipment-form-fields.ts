@@ -1,7 +1,5 @@
 import { z } from 'zod'
 import {
-  ABILITY_SCORE_MAX,
-  ABILITY_SCORE_MIN,
   EQUIPMENT_KINDS,
   EQUIPMENT_KIND_LABELS,
   abilitySchema,
@@ -33,6 +31,7 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
+import { armorAbilityScoreRequirementsFormFields } from '../armor/lib/armor-ability-score-requirements-form'
 import { economyFields } from '../../lib/forms/fields/content-economy-form-fields'
 import {
   managedContentMediaFormFields,
@@ -127,12 +126,7 @@ export const armorEquipmentFormSchema = physicalEquipmentBaseFormSchema.extend({
   addDexModifier: z.boolean().optional(),
   maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
-  strengthRequirement: z.coerce
-    .number()
-    .int()
-    .min(ABILITY_SCORE_MIN)
-    .max(ABILITY_SCORE_MAX)
-    .optional(),
+  ...armorAbilityScoreRequirementsFormFields,
 })
 
 /** Adventuring gear create/edit form schema — fields match `adventuringGearFormFieldGroup`. */
@@ -246,12 +240,7 @@ export const armorEquipmentDraftFormSchema = physicalEquipmentBaseDraftFormSchem
   addDexModifier: z.boolean().optional(),
   maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
-  strengthRequirement: z.coerce
-    .number()
-    .int()
-    .min(ABILITY_SCORE_MIN)
-    .max(ABILITY_SCORE_MAX)
-    .optional(),
+  ...armorAbilityScoreRequirementsFormFields,
 })
 
 /** Adventuring gear draft form schema. */
@@ -498,12 +487,7 @@ export const equipmentFormSchema = z
     addDexModifier: z.boolean().optional(),
     maxDexBonus: z.coerce.number().int().optional(),
     stealthDisadvantage: z.boolean().optional(),
-    strengthRequirement: z.coerce
-      .number()
-      .int()
-      .min(ABILITY_SCORE_MIN)
-      .max(ABILITY_SCORE_MAX)
-      .optional(),
+    ...armorAbilityScoreRequirementsFormFields,
   })
   .superRefine(refineEquipmentEconomyForm)
 
@@ -576,12 +560,7 @@ export const equipmentFormDraftSchema = z.object({
   addDexModifier: z.boolean().optional(),
   maxDexBonus: z.coerce.number().int().optional(),
   stealthDisadvantage: z.boolean().optional(),
-  strengthRequirement: z.coerce
-    .number()
-    .int()
-    .min(ABILITY_SCORE_MIN)
-    .max(ABILITY_SCORE_MAX)
-    .optional(),
+  ...armorAbilityScoreRequirementsFormFields,
 })
 
 function economyGroup(ctx?: ContentFormCtx): FormItem {

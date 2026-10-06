@@ -1,4 +1,7 @@
 import type { Equipment } from '../../../../content/equipment'
+import { getEquipmentAbilityScoreRequirements } from '../../../../content/equipment/equipment-ability-score-requirements'
+import { resolveUnmetAbilityScoreRequirements } from '../../../../content/lib/ability-score-requirements'
+import type { Ability } from '../../../../vocab/ability'
 import { equipmentIdMatchesReference } from '../../../creature/equipment-id-match'
 import type { CharacterProficiencies } from '../../../character/sheet/proficiencies'
 import type { CharacterSelectionSource } from '../../../character/sheet/selection-sources'
@@ -99,6 +102,8 @@ export function projectEquipmentCatalogFacts(args: {
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
   ownedIds: ReadonlySet<string>
+  /** Known draft scores. Unknown abilities are skipped by the requirement comparator. */
+  abilityScores?: Partial<Record<Ability, number>>
 }): Map<string, ResolvedEquipmentOption> {
   const owner = classRecommendationSource(args.classId)
   const requirements = buildRequirementDefinitions({
@@ -124,6 +129,8 @@ export function projectEquipmentCatalogFacts(args: {
         requirementStates,
         proficiencies: args.proficiencies,
         focusEligibleIds: args.focusEligibleIds,
+        owned: args.ownedIds.has(equipmentId),
+        abilityScores: args.abilityScores,
       }),
     )
   }
@@ -203,6 +210,8 @@ function projectOne(args: {
   requirementStates: readonly RequirementState[]
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
+  owned: boolean
+  abilityScores: Partial<Record<Ability, number>> | undefined
 }): ResolvedEquipmentOption {
   return {
     requirements: projectOptionRequirements(args),
@@ -271,8 +280,10 @@ function projectOptionState(args: {
   owner: RecommendationSourceRef
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
+  owned: boolean
+  abilityScores: Partial<Record<Ability, number>> | undefined
 }): OptionState {
-  const state: OptionState = {}
+  const state: OptionState = args.owned ? { owned: true } : {}
   const choice = projectChoiceState(args.evidence)
   if (choice) state.choice = choice
   const compatibility = projectCompatibilityState(args)
@@ -305,17 +316,28 @@ function projectCompatibilityState(args: {
   owner: RecommendationSourceRef
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
+  abilityScores: Partial<Record<Ability, number>> | undefined
 }): OptionState['compatibility'] | undefined {
   const proficiencySources = toolProficiencySources(args.equipment, args.proficiencies)
   const isFocus = args.focusEligibleIds.includes(args.equipment.id)
   const compatibility = projectEquipmentCompatibility(args.equipment, args.proficiencies)
-  if (compatibility.proficient === undefined && proficiencySources.length === 0 && !isFocus) {
+  const unmetAbilityScoreRequirements = resolveUnmetAbilityScoreRequirements(
+    getEquipmentAbilityScoreRequirements(args.equipment),
+    args.abilityScores,
+  )
+  if (
+    compatibility.proficient === undefined &&
+    proficiencySources.length === 0 &&
+    !isFocus &&
+    unmetAbilityScoreRequirements.length === 0
+  ) {
     return undefined
   }
   return {
     ...compatibility,
     ...(proficiencySources.length > 0 ? { proficiencySources } : {}),
     ...(isFocus ? { spellcastingFocusFor: args.owner } : {}),
+    ...(unmetAbilityScoreRequirements.length > 0 ? { unmetAbilityScoreRequirements } : {}),
   }
 }
 

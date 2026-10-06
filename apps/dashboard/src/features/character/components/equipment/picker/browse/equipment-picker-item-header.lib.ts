@@ -3,11 +3,15 @@ import { getMagicItemRarityLabel } from '@rpg/contracts'
 
 import type {
   EntityAnatomyTrailingSecondary,
-  EntitySummaryStatusItem,
   EquipmentPickerRowViewModel,
 } from '@/features/content'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+import {
+  selectionBlocker,
+  type SelectionBlockerReason,
+  type SelectionStatusEntry,
+} from '../../../../lib/selection-row-status'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import { formatGrantPreviewLine } from '../../acquisition/equipment-acquisition-panel.lib'
 import {
@@ -31,7 +35,8 @@ export type EquipmentPickerAction =
 
 export type EquipmentPickerItemPresentation = {
   secondary?: EntityAnatomyTrailingSecondary
-  statusItems?: readonly EntitySummaryStatusItem[]
+  /** Availability and affordability blockers; rendered with the row's selection presentation. */
+  blockers?: readonly SelectionStatusEntry[]
   action: EquipmentPickerAction
 }
 
@@ -42,14 +47,17 @@ type EquipmentAcquisitionBlocker = NonNullable<
   >['capabilities']['addBlockedReason']
 >
 
-function blockerStatusItem(label: string): EntitySummaryStatusItem {
-  return {
-    kind: 'badge',
-    label,
-    tone: 'destructive',
-    appearance: 'soft',
-    leadingIcon: 'warning',
-  }
+export const EQUIPMENT_ACQUISITION_BLOCKER_REASON = {
+  no_matching_grant: 'acquisition_blocked',
+  duplicate_not_allowed: 'acquisition_blocked',
+  no_market_price: 'not_purchasable',
+  cannot_afford: 'unaffordable',
+} as const satisfies Record<EquipmentAcquisitionBlocker['code'], SelectionBlockerReason>
+
+export function equipmentAcquisitionBlockerReason(
+  code: EquipmentAcquisitionBlocker['code'],
+): SelectionBlockerReason {
+  return EQUIPMENT_ACQUISITION_BLOCKER_REASON[code]
 }
 
 export function formatEquipmentPickerHeaderTrailingLabel(args: {
@@ -83,7 +91,7 @@ function resolveMagicItemGrantTrailing(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
   row: EquipmentPickerRowViewModel
   equipment: Equipment
-}): Pick<EquipmentPickerItemPresentation, 'secondary' | 'statusItems'> {
+}): Pick<EquipmentPickerItemPresentation, 'secondary' | 'blockers'> {
   const { plan, capabilities } = args.rowActionVm
   const grantQuantity = plan.grantAllocations.reduce(
     (sum, allocation) => sum + allocation.quantity,
@@ -108,8 +116,11 @@ function resolveMagicItemGrantTrailing(args: {
   const blocker = capabilities.addBlockedReason ?? plan.blockers[0]
   if (blocker) {
     return {
-      statusItems: [
-        blockerStatusItem(formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity })),
+      blockers: [
+        selectionBlocker(
+          equipmentAcquisitionBlockerReason(blocker.code),
+          formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity }),
+        ),
       ],
     }
   }
@@ -126,12 +137,10 @@ function resolvePurchasePresentation(args: {
 
   if (availability.status === 'unavailableForPurchase') {
     return {
-      statusItems: [
-        blockerStatusItem(
-          availability.reason === 'unsupported_kind'
-            ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
-            : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
-        ),
+      blockers: [
+        availability.reason === 'unsupported_kind'
+          ? selectionBlocker('unavailable', EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL)
+          : selectionBlocker('not_purchasable', EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL),
       ],
       action: { kind: 'none' },
     }
@@ -147,7 +156,7 @@ function resolvePurchasePresentation(args: {
       ...(priceLabel
         ? { secondary: { kind: 'price', label: priceLabel } }
         : {
-            statusItems: [blockerStatusItem(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
+            blockers: [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
           }),
       action,
     }

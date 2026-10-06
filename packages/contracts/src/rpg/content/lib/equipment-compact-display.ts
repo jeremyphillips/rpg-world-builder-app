@@ -2,9 +2,11 @@ import type { Equipment, EquipmentKind } from '../equipment'
 import {
   formatWeaponDamage,
   getArmorAcDisplay,
+  getEquipmentAbilityScoreRequirements,
   getEquipmentKindLabel,
   getEquipmentSpellcastingGearKind,
 } from '../equipment'
+import { formatAbilityScoreRequirementsRestriction } from './ability-score-requirements'
 import { getArmorCategorySummaryLabel } from '../../vocab/armor/category'
 import { getPhysicalDamageTypeLabel } from '../../vocab/damage/physical'
 import { getGearKindLabel } from '../../vocab/equipment/gear-kind'
@@ -139,9 +141,10 @@ function formatCompactMagicItemCategory(equipment: Equipment): string | undefine
 
 function formatCompactRestriction(equipment: Equipment): string | undefined {
   if (equipment.kind !== 'armor' || equipment.category === 'shields') return undefined
-  if (equipment.strengthRequirement !== undefined) {
-    return `Str ${equipment.strengthRequirement} required`
-  }
+  const abilityRestriction = formatAbilityScoreRequirementsRestriction(
+    getEquipmentAbilityScoreRequirements(equipment),
+  )
+  if (abilityRestriction) return abilityRestriction
   if (equipment.stealthDisadvantage) return 'Stealth disadvantage'
   return undefined
 }

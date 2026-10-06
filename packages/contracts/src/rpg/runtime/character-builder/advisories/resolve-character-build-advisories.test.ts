@@ -53,7 +53,12 @@ function weapon(slug: string, name: string, category: 'simple' | 'martial') {
   })
 }
 
-function armor(slug: string, name: string, category: 'heavy' | 'shields') {
+function armor(
+  slug: string,
+  name: string,
+  category: 'heavy' | 'shields',
+  extra: Record<string, unknown> = {},
+) {
   return equipment({
     slug,
     name,
@@ -62,6 +67,7 @@ function armor(slug: string, name: string, category: 'heavy' | 'shields') {
     ...(category === 'shields' ? { acBonus: 2 } : { baseAc: 16 }),
     addDexModifier: false,
     stealthDisadvantage: false,
+    ...extra,
   })
 }
 
@@ -70,6 +76,9 @@ const dagger = weapon('dagger', 'Dagger', 'simple')
 const axe = weapon('axe', 'Axe', 'martial')
 const chainMail = armor('chain-mail', 'Chain Mail', 'heavy')
 const shield = armor('shield', 'Shield', 'shields')
+const plateArmor = armor('plate-armor', 'Plate Armor', 'heavy', {
+  abilityScoreRequirements: { str: 15 },
+})
 const lute = luteTool
 
 const scholar: ClassStored = {
@@ -88,7 +97,7 @@ const context = createCharacterBuildContext({
   catalog: {
     ...builderTestCatalog,
     classes: [storedFighter, scholar],
-    equipment: [greatsword, dagger, axe, chainMail, shield, lute],
+    equipment: [greatsword, dagger, axe, chainMail, shield, plateArmor, lute],
   },
 })
 const catalogIndex = indexCharacterBuildCatalog(context.catalog)
@@ -138,10 +147,11 @@ describe('resolveCharacterBuildAdvisoriesForDraft', () => {
       draftWith(scholar.id, [chainMail.id, shield.id]),
       context,
     )
-    expect(advisories.map((advisory) => advisory.subject.equipmentClass)).toEqual([
-      'armor',
-      'shield',
-    ])
+    expect(
+      advisories.flatMap((advisory) =>
+        advisory.code === 'equipment_not_proficient' ? [advisory.subject.equipmentClass] : [],
+      ),
+    ).toEqual(['armor', 'shield'])
   })
 
   it('ignores tools', () => {
@@ -241,6 +251,102 @@ describe('resolveCharacterBuildAdvisoriesForDraft', () => {
   })
 })
 
+describe('equipment ability-score requirement advisories', () => {
+  function scoredDraft(
+    classId: string,
+    str: number | undefined,
+    equipment: Partial<NonNullable<CharacterBuilderDraft['equipment']>>,
+  ): CharacterBuilderDraft {
+    const base = draftWith(classId, [])
+    return {
+      ...base,
+      abilities: {
+        ...base.abilities,
+        scores: str === undefined ? { dex: 10 } : { str, dex: 10 },
+      },
+      equipment: { ...base.equipment!, ...equipment },
+    }
+  }
+
+  function requirementAdvisories(draft: CharacterBuilderDraft) {
+    return resolveCharacterBuildAdvisoriesForDraft(draft, context).filter(
+      (advisory) => advisory.code === 'equipment_ability_score_requirement_unmet',
+    )
+  }
+
+  it('flags package-owned armor the character is too weak for', () => {
+    expect(
+      requirementAdvisories(
+        scoredDraft(storedFighter.id, 12, {
+          grants: [{ equipmentId: plateArmor.id, quantity: 1 }],
+        }),
+      ),
+    ).toEqual([
+      {
+        code: 'equipment_ability_score_requirement_unmet',
+        subject: {
+          kind: 'equipment',
+          equipmentId: plateArmor.id,
+          label: 'Plate Armor',
+          unmet: [{ ability: 'str', required: 15, actual: 12 }],
+        },
+      },
+    ])
+  })
+
+  it('flags manually purchased armor', () => {
+    const draft = scoredDraft(storedFighter.id, 8, {
+      purchases: [
+        { equipmentId: plateArmor.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+      ],
+      classPackage: { state: 'unresolved' },
+    })
+
+    expect(requirementAdvisories(draft).map((advisory) => advisory.subject.equipmentId)).toEqual([
+      plateArmor.id,
+    ])
+  })
+
+  it('emits nothing for compatible armor or armor without requirements', () => {
+    expect(
+      requirementAdvisories(
+        scoredDraft(storedFighter.id, 15, {
+          grants: [{ equipmentId: plateArmor.id, quantity: 1 }],
+        }),
+      ),
+    ).toEqual([])
+    expect(
+      requirementAdvisories(
+        scoredDraft(storedFighter.id, 8, { grants: [{ equipmentId: chainMail.id, quantity: 1 }] }),
+      ),
+    ).toEqual([])
+  })
+
+  it('emits one advisory for quantity 2', () => {
+    expect(
+      requirementAdvisories(
+        scoredDraft(storedFighter.id, 8, { grants: [{ equipmentId: plateArmor.id, quantity: 2 }] }),
+      ),
+    ).toHaveLength(1)
+  })
+
+  it('clears after raising STR and skips unknown scores', () => {
+    const grants = [{ equipmentId: plateArmor.id, quantity: 1 }]
+    expect(requirementAdvisories(scoredDraft(storedFighter.id, 14, { grants }))).toHaveLength(1)
+    expect(requirementAdvisories(scoredDraft(storedFighter.id, 16, { grants }))).toEqual([])
+    expect(requirementAdvisories(scoredDraft(storedFighter.id, undefined, { grants }))).toEqual([])
+  })
+
+  it('orders after proficiency advisories for the same item', () => {
+    const codes = resolveCharacterBuildAdvisoriesForDraft(
+      scoredDraft(scholar.id, 8, { grants: [{ equipmentId: plateArmor.id, quantity: 1 }] }),
+      context,
+    ).map((advisory) => advisory.code)
+
+    expect(codes).toEqual(['equipment_not_proficient', 'equipment_ability_score_requirement_unmet'])
+  })
+})
+
 describe('resolveCharacterBuildAdvisories', () => {
   const loadout = resolveCharacterBuildLoadout(draftWith(scholar.id, []), context, [])
   if (!loadout.ok) throw new Error('expected loadout')
@@ -298,5 +404,19 @@ describe('resolveCharacterBuildAdvisoryMessage', () => {
         subject: { kind: 'equipment', equipmentId: 'x', label: 'X', equipmentClass },
       }),
     ).toBe(message)
+  })
+
+  it('formats unmet ability-score requirements as the detail sentence', () => {
+    expect(
+      resolveCharacterBuildAdvisoryMessage({
+        code: 'equipment_ability_score_requirement_unmet',
+        subject: {
+          kind: 'equipment',
+          equipmentId: 'x',
+          label: 'Plate Armor',
+          unmet: [{ ability: 'str', required: 15, actual: 12 }],
+        },
+      }),
+    ).toBe('Requires STR 15; character has STR 12.')
   })
 })

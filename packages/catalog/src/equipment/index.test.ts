@@ -178,10 +178,15 @@ describe('armor records in unified seed', () => {
     }
   })
 
-  it('plate has addDexModifier false and strengthRequirement 15', () => {
+  it('plate has addDexModifier false and requires STR 15', () => {
     const plate = getArmorBySlug(RULESET, 'plate-armor')
     expect(plate.addDexModifier).toBe(false)
-    expect(plate.strengthRequirement).toBe(15)
+    expect(plate.abilityScoreRequirements).toEqual({ str: 15 })
+  })
+
+  it('splint requires STR 15 and ring mail has no ability requirement', () => {
+    expect(getArmorBySlug(RULESET, 'splint').abilityScoreRequirements).toEqual({ str: 15 })
+    expect(getArmorBySlug(RULESET, 'ring-mail').abilityScoreRequirements).toBeUndefined()
   })
 
   it('leather has addDexModifier true and no maxDexBonus', () => {
@@ -194,8 +199,8 @@ describe('armor records in unified seed', () => {
     expect(getArmorBySlug(RULESET, 'chain-shirt').maxDexBonus).toBe(2)
   })
 
-  it('chain-mail has strengthRequirement 13', () => {
-    expect(getArmorBySlug(RULESET, 'chain-mail').strengthRequirement).toBe(13)
+  it('chain-mail requires STR 13', () => {
+    expect(getArmorBySlug(RULESET, 'chain-mail').abilityScoreRequirements).toEqual({ str: 13 })
   })
 
   it('heavy armor has stealthDisadvantage true', () => {

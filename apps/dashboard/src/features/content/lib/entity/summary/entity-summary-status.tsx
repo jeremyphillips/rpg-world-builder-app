@@ -28,9 +28,12 @@ function resolveStatusLeadingIcon(icon: 'check' | 'warning' | undefined) {
 export function EntitySummaryStatusItemView({
   item,
   density,
+  layout = 'block',
 }: {
   item: EntitySummaryStatusItem
   density: ContentCardDensity
+  /** `inline` renders text as a non-truncating span for the metadata composition. */
+  layout?: 'block' | 'inline'
 }) {
   switch (item.kind) {
     case 'badge': {
@@ -61,17 +64,22 @@ export function EntitySummaryStatusItemView({
         </TooltipProvider>
       )
     }
-    case 'text':
-      return (
-        <div
-          className={entitySummaryStatusVariants({
-            density,
-            tone: item.variant === 'warning' ? 'warning' : 'muted',
-          })}
-        >
+    case 'text': {
+      const className = entitySummaryStatusVariants({
+        density,
+        tone: item.variant ?? 'muted',
+        layout,
+      })
+      return layout === 'inline' ? (
+        <span className={className} title={item.title}>
+          {item.label}
+        </span>
+      ) : (
+        <div className={className} title={item.title}>
           {item.label}
         </div>
       )
+    }
     case 'inactive':
       return <InlineInactiveStatus label={item.label} />
     case 'validationError':

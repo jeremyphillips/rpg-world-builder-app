@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Text } from '@rpg/ui'
 
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
+import { buildAdvisoryStatusItems } from '../../../../lib/build-advisories/build-advisory-presentation.lib'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 
 const editableStartingGoldRow: EquipmentInventoryRow = {
@@ -130,6 +131,39 @@ export const CombinedSourceBreakdown: Story = {
           priceLineLabel: '1 GP each · 2 GP total',
         },
       ],
+    },
+  },
+}
+
+export const AbilityScoreRequirementAdvisory: Story = {
+  tags: ['storybook-test-runner-skip'],
+  args: {
+    display: {
+      kind: 'single',
+      row: {
+        ...lockedPackageGrantRow,
+        group: 'armor',
+        groupLabel: 'Armor',
+        entry: {
+          ...lockedPackageGrantRow.entry,
+          equipmentId: 'srd-cc-5.2.1:plate-armor',
+          quantity: 1,
+        },
+        equipmentName: 'Plate Armor',
+        sourceLabel: 'Included with Standard Equipment',
+        removeLabel: 'Remove Plate Armor',
+        advisoryStatusItems: buildAdvisoryStatusItems([
+          {
+            code: 'equipment_ability_score_requirement_unmet',
+            subject: {
+              kind: 'equipment',
+              equipmentId: 'srd-cc-5.2.1:plate-armor',
+              label: 'Plate Armor',
+              unmet: [{ ability: 'str', required: 15, actual: 12 }],
+            },
+          },
+        ]),
+      },
     },
   },
 }

@@ -3,10 +3,10 @@ import { describe, expect, it } from 'vitest'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
+  OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
   projectEquipmentSelection,
   requiredByLabel,
   resolveEquipmentNotProficientMessage,
-  satisfiesFocusRequirementLabel,
   type Equipment,
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
@@ -97,6 +97,9 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     expect(presentation.secondaryClauses[0]?.label).toBe(
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Guard role · Fighter class`,
     )
+    expect(
+      presentation.secondaryClauses.filter((clause) => clause.kind === 'recommendation'),
+    ).toHaveLength(1)
   })
 
   it('names a required item from the requirement owner', () => {
@@ -115,7 +118,8 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     )
     expect(presentation.secondaryClauses[0]).toMatchObject({
       kind: 'requirement',
-      label: requiredByLabel('Wizard class'),
+      label: requiredByLabel('class'),
+      title: 'Wizard class',
     })
   })
 
@@ -212,14 +216,39 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     )
     const inline = equipmentOptionInlineClauses(presentation).map((clause) => clause.label)
     expect(inline).toEqual([
-      satisfiesFocusRequirementLabel('Wizard'),
+      OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
       resolveEquipmentNotProficientMessage('weapon'),
     ])
     expect(presentation.secondaryTitle).toContain(
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Fighter class`,
     )
     expect(presentation.secondaryTitle).toContain('Guard role')
+    expect(presentation.secondaryTitle).toContain('Wizard class')
     expect(equipmentOptionAccessibleLabel(presentation)).toContain('Guard role')
+  })
+
+  it('shows an unmet ability requirement as a compatibility clause', () => {
+    const presentation = resolveEquipmentOptionRowPresentation({
+      identity: 'Plate Armor',
+      kindLabel: 'Armor',
+      equipment: { kind: 'armor', id: 'plate-armor', name: 'Plate Armor' } as Equipment,
+      resolved: resolved({
+        state: {
+          compatibility: {
+            proficient: true,
+            unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 12 }],
+          },
+        },
+      }),
+    })
+    expect(equipmentOptionInlineClauses(presentation)).toEqual([
+      expect.objectContaining({
+        kind: 'compatibility',
+        discriminator: 'ability-requirement-unmet',
+        badgeLabel: 'Requires STR 15',
+        label: 'Requires STR 15; character has STR 12.',
+      }),
+    ])
   })
 
   it('keeps recommendation and package supply when a role clause repeats the recommendation', () => {

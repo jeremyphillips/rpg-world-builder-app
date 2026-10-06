@@ -11,6 +11,7 @@ import { omitDuplicateDeniedFields } from './duplicate-content-policy'
 import { transformDuplicateSource } from './duplicate-content-transform'
 import { asResolvedContentSlug } from '../slug/resolve-unique-content-slug'
 import { classWriteConfig } from '../../classes/classes.config'
+import { equipmentWriteConfig } from '../../equipment/equipment.config'
 import { featWriteConfig } from '../../feats/feats.config'
 import { organizationWriteConfig } from '../../organizations/organizations.config'
 import { spellWriteConfig } from '../../spells/spells.config'
@@ -210,6 +211,36 @@ describe('transformDuplicateSource', () => {
     })
 
     expect(parsed).not.toHaveProperty('modeling')
+  })
+
+  it('keeps armor ability-score requirements on duplicate', () => {
+    const parsed = transformDuplicateSource({
+      source: {
+        id: 'armor-1',
+        slug: 'custom-plate',
+        rulesetId: 'srd-cc-5.2.1',
+        source: 'homebrew',
+        status: 'published',
+        campaignId: 'camp',
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+        kind: 'armor',
+        name: 'Custom Plate',
+        cost: { amount: 1500, currency: 'gp' },
+        weight: { value: 65, unit: 'lb' },
+        category: 'heavy',
+        baseAc: 18,
+        addDexModifier: false,
+        stealthDisadvantage: true,
+        abilityScoreRequirements: { str: 15 },
+      } as never,
+      requestedName: 'Custom Plate Copy',
+      destinationSlug: asResolvedContentSlug('custom-plate-copy'),
+      contentType: 'equipment',
+      writeConfig: equipmentWriteConfig,
+    })
+
+    expect(parsed.abilityScoreRequirements).toEqual({ str: 15 })
   })
 
   it('parses organization duplicate input with membership titles', () => {

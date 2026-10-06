@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
+import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
   EntitySummaryDescription,
@@ -17,9 +18,9 @@ describe('EntitySummaryHeading', () => {
 
     expect(name.className).not.toMatch(/\bflex-1\b/)
     expect(classification.className).toMatch(/\bshrink-0\b/)
-    expect(mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent).toContain(
-      '·',
-    )
+    expect(
+      mixedHeadingRow.querySelector('[data-inline-metadata-separator]')?.textContent,
+    ).toContain('·')
     expect(mixedHeadingRow).toHaveTextContent('Fire Bolt · Spell')
   })
 
@@ -56,9 +57,7 @@ describe('EntitySummaryHeading', () => {
   })
 
   it('selects typography by density only — no band or alignment wrappers', () => {
-    const { container } = render(
-      <EntitySummaryHeading density="compact" heading="Amulet" />,
-    )
+    const { container } = render(<EntitySummaryHeading density="compact" heading="Amulet" />)
 
     expect(container.querySelector('[class*="min-h-control-action-compact"]')).toBeNull()
     expect(container.querySelector('[data-entity-summary-band]')).toBeNull()
@@ -102,5 +101,88 @@ describe('EntitySummaryStatus', () => {
     )
 
     expect(screen.getByText('Equipped').className).toMatch(/text-sm-meta/)
+  })
+
+  it('defaults to the wrapped cluster without separators', () => {
+    const { container } = render(
+      <EntitySummaryStatus
+        density="compact"
+        items={[
+          { kind: 'badge', label: 'Cannot afford', tone: 'destructive' },
+          { kind: 'text', label: 'Required by class' },
+        ]}
+      />,
+    )
+
+    expect(container.querySelector('[data-entity-summary-status-row]')).not.toBeNull()
+    expect(container.querySelector('[data-inline-metadata-separator]')).toBeNull()
+    expect(screen.getByText('Required by class').tagName).toBe('DIV')
+  })
+
+  describe('metadata composition', () => {
+    const items = [
+      { kind: 'badge', label: 'Cannot afford', tone: 'destructive', appearance: 'soft' },
+      { kind: 'text', variant: 'guidance', label: 'Required by class', title: 'Wizard class' },
+      { kind: 'text', variant: 'guidance', label: 'Included in package option' },
+    ] as const
+
+    it('joins badges and guidance text with aria-hidden separators', () => {
+      const { container } = render(
+        <EntitySummaryStatus density="compact" composition="metadata" items={items} />,
+      )
+
+      const separators = container.querySelectorAll('[data-inline-metadata-separator]')
+      expect(separators).toHaveLength(2)
+      for (const separator of separators) {
+        expect(separator).toHaveAttribute('aria-hidden', 'true')
+      }
+      expect(container.querySelector('[data-entity-summary-status-row]')).toBeNull()
+    })
+
+    it('renders guidance text as an inline non-truncating span with its title', () => {
+      render(<EntitySummaryStatus density="compact" composition="metadata" items={items} />)
+
+      const guidance = screen.getByText('Required by class')
+      expect(guidance.tagName).toBe('SPAN')
+      expect(guidance).toHaveClass('text-foreground', 'text-xs')
+      expect(guidance).not.toHaveClass('truncate')
+      expect(guidance).toHaveAttribute('title', 'Wizard class')
+    })
+
+    it('renders a single item without a separator', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="comfortable"
+          composition="metadata"
+          items={[{ kind: 'badge', label: 'Not proficient', tone: 'warning' }]}
+        />,
+      )
+
+      expect(container.querySelector('[data-inline-metadata-separator]')).toBeNull()
+      expect(screen.getByText('Not proficient')).toBeInTheDocument()
+    })
+
+    it('keeps multiple badges on one line', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          items={[
+            { kind: 'badge', label: 'Cannot afford', tone: 'destructive' },
+            { kind: 'badge', label: 'Not proficient', tone: 'warning' },
+          ]}
+        />,
+      )
+
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+      expect(container.querySelector('button')).toBeNull()
+    })
+
+    itAxe('has no axe violations', async () => {
+      const { container } = render(
+        <EntitySummaryStatus density="compact" composition="metadata" items={items} />,
+      )
+      await expectNoAxeViolations(container)
+    })
   })
 })

@@ -172,11 +172,15 @@ Remaining after purchase                        …
 - Header rail still shows quick **Add another** for owned stackables; bulk
   quantity is chosen in the expanded body.
 
-## Proficiency warnings
+## Proficiency and ability-score warnings
 
-Full Builder and Quick NPC share `equipment_not_proficient`, the equipment-id index, and `buildAdvisoryStatusItems`. Each experience projects those facts onto its own rows.
+Full Builder and Quick NPC share the equipment advisories (`equipment_not_proficient` and `equipment_ability_score_requirement_unmet`), the equipment-id index, and `buildAdvisoryStatusItems`. Each experience projects those facts onto its own rows.
 
-Owned and selected equipment renders the advisory as a warning. Browse-only options use the same sentence as muted selection guidance. Review and create confirmation stay aggregate advisory lists.
+The ability-score advisory fires for owned or purchased equipment whose `abilityScoreRequirements` exceed the draft's known scores (`Plate Armor — Requires STR 15; character has STR 12.`). Like proficiency, it is non-blocking: create asks for confirmation.
+
+Owned and selected equipment renders the advisory as a warning. Picker rows show the short compatibility badges (`Not proficient`, `Requires STR 15`) through the selection-row pipeline ([picker chrome](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy)). Review and create confirmation stay aggregate advisory lists.
+
+Planned follow-up: inventory and trim rows will take their warnings from context-filtered row facts instead of `advisoryStatusItems` (see the remaining migration in the picker chrome doc). Advisories remain the final-loadout channel for Review, the create dialog, and finalize.
 
 Builder inventory and package-switch cards read `advisoryStatusItems` from the view model. They do not resolve proficiency while rendering. Pending explicit purchases can produce an advisory before a starting option funds them; they stay out of resolved inventory.
 

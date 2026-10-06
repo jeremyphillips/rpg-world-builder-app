@@ -24,6 +24,15 @@ const advisories: CharacterBuildAdvisory[] = [
       equipmentClass: 'weapon',
     },
   },
+  {
+    code: 'equipment_ability_score_requirement_unmet',
+    subject: {
+      kind: 'equipment',
+      equipmentId: 'srd-cc-5.2.1:plate-armor',
+      label: 'Plate Armor',
+      unmet: [{ ability: 'str', required: 15, actual: 12 }],
+    },
+  },
 ]
 
 const meta = {

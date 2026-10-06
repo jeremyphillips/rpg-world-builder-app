@@ -1,53 +1,65 @@
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 import type { Equipment } from '../../../content/equipment'
+import {
+  formatAbilityScoreRequirementLabel,
+  formatUnmetAbilityScoreRequirementsDetail,
+} from '../../../content/lib/ability-score-requirements'
 import { getNpcTemplateLabel, type NpcTemplateId } from '../../../vocab/npc/npc-template'
 
 import {
   equipmentAdvisoryClass,
   resolveEquipmentNotProficientMessage,
+  resolveEquipmentNotProficientShortLabel,
 } from '../messages/character-builder-advisory-messages'
 import type { ResolvedEquipmentOption } from '../resolvers/equipment/project-equipment-option-facts'
+import type { OptionRequirement } from './recommendation-envelope'
 import { formatRecommendationSourceLabel } from './format-recommendation-source-label'
 import type { RecommendationSourceRef } from './recommendation-source-ref'
 import {
   grantedByLabel,
-  includedQuantityLabel,
-  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+  OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
+  OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
   OPTION_PRESENTATION_STARTING_OPTION_LABEL,
   requiredByLabel,
-  satisfiesFocusRequirementLabel,
-  softRecommendationFact,
+  softRecommendationFacts,
   type OptionPresentationFact,
   type OptionPresentationFacts,
+  type OptionPresentationRequirementRole,
   type RecommendationSourceName,
 } from './resolve-option-presentation-facts'
 
 export type EquipmentOpenPoolKind = 'toolProficiency' | 'startingEquipment'
 
+/**
+ * Every fact the option supports. Satisfied requirements and owned recommendations stay
+ * as data (`requirementRole`, `owned`); surfaces decide what to show.
+ */
 export function resolveEquipmentPresentationFacts(args: {
   resolved: ResolvedEquipmentOption
   equipment?: Equipment
   sourceName?: RecommendationSourceName
   authoredLabel?: string
   openPoolKind?: EquipmentOpenPoolKind
-  ownedQuantity?: number
 }): OptionPresentationFacts {
   const facts: OptionPresentationFact[] = []
-  const requirement = primaryRequirementFact(args.resolved, args.sourceName)
-  if (requirement) facts.push(requirement)
+  const requirements = requirementFacts(args.resolved, args.sourceName)
+  facts.push(...requirements)
 
-  const recommendation = softRecommendationFact({
-    recommendation: args.resolved.recommendation,
-    sourceName: args.sourceName,
-    ...(requirement ? {} : { authoredLabel: args.authoredLabel }),
-  })
-  if (recommendation) facts.push(recommendation)
+  facts.push(
+    ...softRecommendationFacts({
+      recommendation: args.resolved.recommendation,
+      sourceName: args.sourceName,
+      owned: args.resolved.state.owned === true,
+      ...(requirements.length > 0 ? {} : { authoredLabel: args.authoredLabel }),
+    }),
+  )
 
-  const focus = spellcastingFocusFact(args.resolved, Boolean(requirement))
+  const focus = spellcastingFocusFact(args.resolved, requirements.length > 0)
   if (focus) facts.push(focus)
 
   const proficient = proficientFact(args.resolved, args.sourceName)
@@ -56,44 +68,62 @@ export function resolveEquipmentPresentationFacts(args: {
   const notProficient = notProficientFact(args.resolved, args.equipment)
   if (notProficient) facts.push(notProficient)
 
+  facts.push(...abilityRequirementUnmetFacts(args.resolved))
   facts.push(...stateFacts(args))
   return { facts }
 }
 
-function primaryRequirementFact(
+type EmittedRequirement = OptionRequirement & { role: OptionPresentationRequirementRole }
+
+function isEmittedRequirement(requirement: OptionRequirement): requirement is EmittedRequirement {
+  return requirement.role === 'candidate' || requirement.role === 'satisfier'
+}
+
+/** Exact rules first; `eligible` alternates emit nothing. One fact per discriminator, role, and owner kind. */
+function requirementFacts(
   resolved: ResolvedEquipmentOption,
   sourceName: RecommendationSourceName | undefined,
-): OptionPresentationFact | undefined {
-  const candidate =
-    resolved.requirements.find(
-      (requirement) => requirement.role === 'candidate' && requirement.rule === 'exact',
-    ) ?? resolved.requirements.find((requirement) => requirement.role === 'candidate')
-  if (candidate) {
-    return {
-      kind: 'requirement',
-      discriminator: 'required',
-      label: requiredByLabel(ownerLabel(candidate.owner, sourceName)),
-      sourceLabels: [ownerLabel(candidate.owner, sourceName)],
-    }
+): OptionPresentationFact[] {
+  const ordered = resolved.requirements
+    .filter(isEmittedRequirement)
+    .sort((left, right) => Number(left.rule !== 'exact') - Number(right.rule !== 'exact'))
+  const facts: OptionPresentationFact[] = []
+  for (const requirement of ordered) {
+    const fact = requirementFact(requirement, resolved, sourceName)
+    const duplicate = facts.some(
+      (existing) =>
+        existing.discriminator === fact.discriminator &&
+        existing.requirementRole === fact.requirementRole &&
+        existing.sourceKind === fact.sourceKind,
+    )
+    if (!duplicate) facts.push(fact)
   }
+  return facts
+}
 
-  const satisfier = resolved.requirements.find((requirement) => requirement.role === 'satisfier')
-  if (!satisfier) return undefined
-  const focusDefinition = resolved.state.compatibility?.spellcastingFocusFor
-  if (satisfier.rule === 'anyOf' && focusDefinition) {
+function requirementFact(
+  requirement: EmittedRequirement,
+  resolved: ResolvedEquipmentOption,
+  sourceName: RecommendationSourceName | undefined,
+): OptionPresentationFact {
+  const owner = requirement.owner
+  const base = {
+    kind: 'requirement' as const,
+    sourceKind: owner.kind,
+    requirementRole: requirement.role,
+    sourceLabels: [ownerLabel(owner, sourceName)],
+  }
+  if (requirement.rule === 'anyOf' && resolved.state.compatibility?.spellcastingFocusFor) {
     return {
-      kind: 'requirement',
-      discriminator: 'satisfies',
-      label: satisfiesFocusRequirementLabel(ownerName(satisfier.owner, sourceName)),
-      sourceLabels: [ownerLabel(satisfier.owner, sourceName)],
+      ...base,
+      discriminator: 'requirement-match',
+      label:
+        requirement.role === 'satisfier'
+          ? OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL
+          : OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
     }
   }
-  return {
-    kind: 'requirement',
-    discriminator: 'required',
-    label: requiredByLabel(ownerLabel(satisfier.owner, sourceName)),
-    sourceLabels: [ownerLabel(satisfier.owner, sourceName)],
-  }
+  return { ...base, discriminator: 'required', label: requiredByLabel(owner.kind) }
 }
 
 function spellcastingFocusFact(
@@ -103,6 +133,7 @@ function spellcastingFocusFact(
   if (hasRequirement || !resolved.state.compatibility?.spellcastingFocusFor) return undefined
   return {
     kind: 'compatibility',
+    discriminator: 'spellcasting-focus',
     label: OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
     sourceLabels: [],
   }
@@ -135,29 +166,35 @@ function notProficientFact(
   return {
     kind: 'compatibility',
     discriminator: 'not-proficient',
-    label: resolveEquipmentNotProficientMessage(equipmentClass),
+    label: resolveEquipmentNotProficientShortLabel(),
+    detail: resolveEquipmentNotProficientMessage(equipmentClass),
     sourceLabels: [],
   }
+}
+
+/** One fact per unmet minimum, in `ABILITY_IDS` order (the projection's order). */
+function abilityRequirementUnmetFacts(resolved: ResolvedEquipmentOption): OptionPresentationFact[] {
+  const unmet = resolved.state.compatibility?.unmetAbilityScoreRequirements ?? []
+  return unmet.map((entry) => ({
+    kind: 'compatibility',
+    discriminator: 'ability-requirement-unmet',
+    ability: entry.ability,
+    label: formatAbilityScoreRequirementLabel(entry),
+    detail: formatUnmetAbilityScoreRequirementsDetail([entry]),
+    sourceLabels: [],
+  }))
 }
 
 function stateFacts(args: {
   resolved: ResolvedEquipmentOption
   openPoolKind?: EquipmentOpenPoolKind
-  ownedQuantity?: number
 }): OptionPresentationFact[] {
   const facts: OptionPresentationFact[] = []
   const choice = args.resolved.state.choice
-  if (args.ownedQuantity !== undefined && args.ownedQuantity > 0) {
-    facts.push({
-      kind: 'state',
-      discriminator: 'included',
-      label: includedQuantityLabel(args.ownedQuantity),
-      sourceLabels: [],
-    })
-  }
   if (choice?.inSelectedPackage) {
     facts.push({
       kind: 'state',
+      discriminator: 'in-package',
       label: OPTION_PRESENTATION_IN_PACKAGE_LABEL,
       sourceLabels: [],
     })
@@ -165,6 +202,7 @@ function stateFacts(args: {
   if (choice?.inOpenPool) {
     facts.push({
       kind: 'state',
+      discriminator: 'open-pool',
       label:
         args.openPoolKind === 'toolProficiency'
           ? OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL
@@ -175,7 +213,8 @@ function stateFacts(args: {
   if (choice?.inAlternativePackage) {
     facts.push({
       kind: 'state',
-      label: OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
+      discriminator: 'alternative-package',
+      label: OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
       sourceLabels: [],
     })
   }
@@ -222,11 +261,4 @@ function ownerLabel(
   sourceName: RecommendationSourceName | undefined,
 ): string {
   return formatRecommendationSourceLabel(source, { name: sourceName?.(source) }) ?? 'Source'
-}
-
-function ownerName(
-  source: RecommendationSourceRef,
-  sourceName: RecommendationSourceName | undefined,
-): string {
-  return sourceName?.(source)?.trim() || ownerLabel(source, sourceName)
 }

@@ -17,7 +17,6 @@ import {
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
-  getEquipmentPickerDisabledNote,
   getEquipmentUnaffordableAmounts,
   hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
@@ -148,7 +147,7 @@ describe('equipment-picker-drawer.lib', () => {
       }),
     ).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
-    expect(getEquipmentPickerDisabledNote(chainMail, equipmentPickerBudgetFixture)).toBe(
+    expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
       '75 GP needed · 40 GP remaining',
     )
   })
@@ -178,20 +177,6 @@ describe('equipment-picker-drawer.lib', () => {
       }),
     ).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(startingUnaffordable)).toBe(true)
-  })
-
-  it('prefers structural disabled reasons over remaining-budget notes', () => {
-    const restricted: EquipmentPickerItem = {
-      ...equipmentPickerItemsFixture[1]!,
-      state: {
-        ...equipmentPickerItemsFixture[1]!.state,
-        disabledReasons: ['Already selected'],
-      },
-    }
-
-    expect(getEquipmentPickerDisabledNote(restricted, equipmentPickerBudgetFixture)).toBe(
-      'Already selected',
-    )
   })
 
   it('filters rows by selected kind', () => {
@@ -307,7 +292,6 @@ describe('equipment-picker-drawer.lib', () => {
 
     expect(filtered).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(unpricedMagicItem)).toBe(true)
-    expect(getEquipmentPickerDisabledNote(unpricedMagicItem)).toBe('Not for sale')
   })
 
   it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {

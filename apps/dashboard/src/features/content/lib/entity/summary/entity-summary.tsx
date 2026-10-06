@@ -3,16 +3,21 @@ import {
   ContentCardHeading,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
+  InlineMetadata,
   type ContentCardDensity,
   type IdentityRowSize,
 } from '@rpg/ui'
 
 import type { EntitySummaryModel } from './entity-summary.types'
-import type { EntitySummaryStatusItem } from './entity-summary-status.types'
+import type {
+  EntitySummaryStatusComposition,
+  EntitySummaryStatusItem,
+} from './entity-summary-status.types'
 import { EntitySummaryStatusItemView } from './entity-summary-status'
 import {
   entitySummaryHeadingEndValueVariants,
   entitySummaryHeadingRowVariants,
+  entitySummaryStatusMetadataVariants,
   entitySummaryStatusRowVariants,
 } from './entity-summary.variants'
 
@@ -58,7 +63,9 @@ export function EntitySummaryDescription({
   density: ContentCardDensity
 }) {
   return (
-    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>{children}</IdentityRowSupporting>
+    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>
+      {children}
+    </IdentityRowSupporting>
   )
 }
 
@@ -66,10 +73,29 @@ export function EntitySummaryDescription({
 export function EntitySummaryStatus({
   items,
   density,
+  composition = 'cluster',
 }: {
   items: readonly EntitySummaryStatusItem[]
   density: ContentCardDensity
+  composition?: EntitySummaryStatusComposition
 }) {
+  if (composition === 'metadata') {
+    return (
+      <InlineMetadata
+        role="supporting"
+        density={density}
+        wrap
+        className={entitySummaryStatusMetadataVariants({ density })}
+      >
+        {items.map((status, index) => (
+          <InlineMetadata.Item key={index}>
+            <EntitySummaryStatusItemView item={status} density={density} layout="inline" />
+          </InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
+    )
+  }
+
   return (
     <div className={entitySummaryStatusRowVariants()} data-entity-summary-status-row>
       {items.map((status, index) => (

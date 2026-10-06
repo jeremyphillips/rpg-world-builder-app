@@ -5,7 +5,7 @@ import {
   type CharacterBuildAdvisory,
 } from '@rpg/contracts'
 
-import type { EntitySummaryStatusItem } from '@/features/content'
+import type { EntitySummaryStatusText } from '@/features/content'
 
 export type BuildAdvisoryListItem = {
   key: string
@@ -16,6 +16,7 @@ export type BuildAdvisoryListItem = {
 function advisoryTitle(advisory: CharacterBuildAdvisory): string | undefined {
   switch (advisory.code) {
     case 'equipment_not_proficient':
+    case 'equipment_ability_score_requirement_unmet':
       return advisory.subject.label
   }
 }
@@ -23,6 +24,7 @@ function advisoryTitle(advisory: CharacterBuildAdvisory): string | undefined {
 function advisoryEquipmentId(advisory: CharacterBuildAdvisory): string | undefined {
   switch (advisory.code) {
     case 'equipment_not_proficient':
+    case 'equipment_ability_score_requirement_unmet':
       return advisory.subject.equipmentId
   }
 }
@@ -54,7 +56,7 @@ export function lookupBuildAdvisoriesForEquipment(
 
 export function buildAdvisoryStatusItems(
   advisories: readonly CharacterBuildAdvisory[],
-): EntitySummaryStatusItem[] {
+): EntitySummaryStatusText[] {
   return advisories.map((advisory) => ({
     kind: 'text',
     variant: 'warning',

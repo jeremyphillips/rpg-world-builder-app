@@ -49,7 +49,11 @@ export {
 } from './lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
 export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
-export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
+export type {
+  EntitySummaryStatusComposition,
+  EntitySummaryStatusItem,
+  EntitySummaryStatusText,
+} from './lib/entity/summary/entity-summary-status.types'
 export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,

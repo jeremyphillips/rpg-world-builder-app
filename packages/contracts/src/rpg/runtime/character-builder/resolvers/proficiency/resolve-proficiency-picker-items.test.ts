@@ -130,7 +130,10 @@ describe('resolveProficiencyPickerItems', () => {
         }),
       ],
     })
-    expect(dwarvish?.state.presentation?.facts[0]?.label).toBe('Recommended')
+    expect(dwarvish?.state.presentation?.facts[0]).toMatchObject({
+      label: 'Recommended by species',
+      sourceKind: 'species',
+    })
     expect(elvish?.state.isRecommended).toBe(false)
   })
 

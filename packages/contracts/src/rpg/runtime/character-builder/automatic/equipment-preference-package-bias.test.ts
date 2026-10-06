@@ -63,7 +63,7 @@ function armor(slug: string, category: 'light' | 'medium' | 'heavy' = 'heavy') {
     baseAc: 16,
     addDexModifier: category === 'light',
     stealthDisadvantage: category !== 'light',
-    strengthRequirement: category === 'heavy' ? 13 : undefined,
+    abilityScoreRequirements: category === 'heavy' ? { str: 13 } : undefined,
   })
 }
 

@@ -4,6 +4,7 @@ import type {
   EquipmentAdvisoryClass,
 } from '../../../character-builder/build-advisory'
 import type { Equipment } from '../../../content/equipment'
+import { formatUnmetAbilityScoreRequirementsDetail } from '../../../content/lib/ability-score-requirements'
 import { getArmorCategorySentenceForm } from '../../../vocab/armor/category'
 import { EQUIPMENT_KIND_ENTRIES } from '../../../vocab/equipment/kind'
 import { getTermLabelSingular, getTermSentenceForm } from '../../../vocab/types'
@@ -46,6 +47,11 @@ export const characterBuilderAdvisoryMessages = {
     'validation.characterBuilderAdvisory.notProficientShield',
     () => notProficientWith(notProficientEquipmentNoun('shield')),
   ),
+  /** Compact row label; the class sentence above stays the detail. */
+  notProficientShort: defineMessage(
+    'validation.characterBuilderAdvisory.notProficientShort',
+    () => 'Not proficient',
+  ),
 }
 
 const NOT_PROFICIENT_MESSAGES = {
@@ -67,9 +73,16 @@ export function resolveEquipmentNotProficientMessage(
   return formatFieldMessage(NOT_PROFICIENT_MESSAGES[equipmentClass]())
 }
 
+/** Compact row label for any equipment class; pair with the class sentence as detail. */
+export function resolveEquipmentNotProficientShortLabel(): string {
+  return formatFieldMessage(characterBuilderAdvisoryMessages.notProficientShort())
+}
+
 export function resolveCharacterBuildAdvisoryMessage(advisory: CharacterBuildAdvisory): string {
   switch (advisory.code) {
     case 'equipment_not_proficient':
       return resolveEquipmentNotProficientMessage(advisory.subject.equipmentClass)
+    case 'equipment_ability_score_requirement_unmet':
+      return formatUnmetAbilityScoreRequirementsDetail(advisory.subject.unmet)
   }
 }

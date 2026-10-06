@@ -19,9 +19,10 @@ export const entitySummaryHeadingEndValueVariants = cva(
 
 /**
  * Text status line. Density matches supporting copy; tone distinguishes muted
- * detail from warning advisories. The status cell owns the top offset.
+ * detail, selection guidance, and warning advisories. `inline` text flows inside the
+ * metadata composition and never truncates. The status cell owns the top offset.
  */
-export const entitySummaryStatusVariants = cva('truncate', {
+export const entitySummaryStatusVariants = cva('', {
   variants: {
     density: {
       compact: 'text-xs',
@@ -29,14 +30,33 @@ export const entitySummaryStatusVariants = cva('truncate', {
     },
     tone: {
       muted: 'text-muted-foreground',
+      guidance: 'text-foreground',
       warning: 'text-warning',
+    },
+    layout: {
+      block: 'truncate',
+      inline: '',
     },
   },
   defaultVariants: {
     density: 'comfortable',
     tone: 'muted',
+    layout: 'block',
   },
 })
 
 /** Status items wrap within the lane; the row-anatomy status cell owns the top offset. */
 export const entitySummaryStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
+
+/** Metadata composition root — one wrapping inline-metadata line sized by density. */
+export const entitySummaryStatusMetadataVariants = cva('block min-w-0', {
+  variants: {
+    density: {
+      compact: 'text-xs',
+      comfortable: 'text-sm',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})

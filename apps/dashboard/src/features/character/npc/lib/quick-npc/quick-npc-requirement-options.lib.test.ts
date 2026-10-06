@@ -10,16 +10,12 @@ import {
   equipmentStepBattleaxeFixture,
   equipmentStepDaggerFixture,
 } from '../../../lib/equipment/equipment-step.fixtures'
-import {
-  projectWeaponRequirementPreview,
-  QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT,
-} from './quick-npc-requirement-preview.lib'
+import { projectWeaponRequirementPreview } from './quick-npc-requirement-preview.lib'
 import {
   resolveQuickNpcRequirementValidIds,
   resolveQuickNpcWeaponRequirementOptions,
 } from './quick-npc-requirement-options.lib'
 import { quickNpcMemberSetupWithNoTitle } from './quick-npc-test-fixtures'
-import { getEquipmentPickerCallout } from '../../../components/equipment/picker/callouts/equipment-picker-callout.lib'
 
 const setup = quickNpcMemberSetupWithNoTitle({
   speciesId: 'species-1',
@@ -60,7 +56,7 @@ describe('quick-npc-requirement-options.lib', () => {
     expect(options.map((entry) => entry.option.value)).toEqual([equipmentStepDaggerFixture.id])
   })
 
-  it('keeps unaffordable campaign-available weapons selectable without purchase callouts', () => {
+  it('keeps unaffordable campaign-available weapons selectable without purchase status', () => {
     const context = createEquipmentStepContextFixture()
     const options = resolveQuickNpcWeaponRequirementOptions({ setup, context })
     const battleaxe = options.find(
@@ -81,13 +77,12 @@ describe('quick-npc-requirement-options.lib', () => {
       ...battleaxe!,
       pickerItem: unaffordableItem,
     })
-    const callout = getEquipmentPickerCallout(
-      unaffordableItem,
-      QUICK_NPC_REQUIREMENT_CALLOUT_CONTEXT,
-    )
+    const labels = (projection.status ?? []).map((item) => ('label' in item ? item.label : ''))
 
-    expect(callout?.label).not.toBe(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)
-    expect(projection.callout?.label).not.toBe(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)
+    expect(labels).not.toContain(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)
+    expect(projection.status ?? []).toEqual(
+      (projection.status ?? []).filter((item) => item.kind === 'badge' && item.tone === 'warning'),
+    )
   })
 
   it('derives sync valid ids from the same weapon option resolver', () => {

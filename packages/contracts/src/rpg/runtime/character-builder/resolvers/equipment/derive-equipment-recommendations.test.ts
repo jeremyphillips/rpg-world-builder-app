@@ -39,7 +39,7 @@ const chainMail = equipmentSchema.parse({
   baseAc: 16,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 13,
+  abilityScoreRequirements: { str: 13 },
 })
 
 const longsword = equipmentSchema.parse({
@@ -334,6 +334,61 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(longsword.id)?.tier).toBe('neutral')
     expect(recommendations.get(longsword.id)?.resolved?.state.compatibility?.proficient).toBe(false)
     expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
+  })
+
+  it('stamps owned state from the owned loadout', () => {
+    const { catalogIndex, proficiencies, draft } = buildContext(
+      storedFighter,
+      [chainMail, longsword, dagger],
+      {
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(storedFighter.id)]: ['heavy-armor'],
+        },
+      },
+    )
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedFighter,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets: [],
+    })
+
+    expect(recommendations.get(chainMail.id)?.resolved?.state.owned).toBe(true)
+    expect(recommendations.get(longsword.id)?.resolved?.state.owned).toBe(true)
+    expect(recommendations.get(dagger.id)?.resolved?.state.owned).toBeUndefined()
+  })
+
+  it('projects unmet ability-score requirements from known draft scores only', () => {
+    const scored = (str: number | undefined) => {
+      const { catalogIndex, proficiencies, draft } = buildContext(storedWizard, [chainMail], {
+        abilities: {
+          ...createEmptyCharacterBuilderDraft().abilities,
+          scores: str === undefined ? { dex: 10 } : { str, dex: 10 },
+        },
+      })
+      return deriveEquipmentRecommendations({
+        characterClass: storedWizard,
+        catalogIndex,
+        proficiencies,
+        draft,
+      }).get(chainMail.id)?.resolved
+    }
+
+    expect(scored(8)?.state.compatibility?.unmetAbilityScoreRequirements).toEqual([
+      { ability: 'str', required: 13, actual: 8 },
+    ])
+    expect(scored(8)?.presentation?.facts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          discriminator: 'ability-requirement-unmet',
+          label: 'Requires STR 13',
+        }),
+      ]),
+    )
+    expect(scored(13)?.state.compatibility?.unmetAbilityScoreRequirements).toBeUndefined()
+    expect(scored(undefined)?.state.compatibility?.unmetAbilityScoreRequirements).toBeUndefined()
   })
 
   it('folds fixed tool proficiency into proficient compatibility instead of an essential class tool need', () => {

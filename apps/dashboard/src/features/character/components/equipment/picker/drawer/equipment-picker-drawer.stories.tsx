@@ -6,6 +6,11 @@ import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
 import {
+  builderPathGoldBudgetFixture,
+  fighterGoldPathPickerItemsFixture,
+  wizardGoldPathPickerItemsFixture,
+} from './equipment-picker-builder-path.fixtures'
+import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
@@ -221,6 +226,58 @@ export const RecommendationFacts: Story = {
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
+  },
+}
+
+export const WizardGoldPath: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [
+      wizardGoldPathPickerItemsFixture.wand,
+      wizardGoldPathPickerItemsFixture['component-pouch'],
+      wizardGoldPathPickerItemsFixture.spellbook,
+      wizardGoldPathPickerItemsFixture.greataxe,
+      wizardGoldPathPickerItemsFixture.greatsword,
+      wizardGoldPathPickerItemsFixture.dagger,
+      wizardGoldPathPickerItemsFixture['plate-armor'],
+    ],
+    budget: builderPathGoldBudgetFixture,
+    filterOutUnaffordable: false,
+    isGoldShoppingPath: true,
+    onCommitAdd: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'STR 8 Wizard on the gold path: blockers, warnings, then requirement / recommendation / source guidance on one metadata line.',
+      },
+    },
+  },
+}
+
+export const AbilityScoreRequirements: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [
+      fighterGoldPathPickerItemsFixture['plate-armor'],
+      fighterGoldPathPickerItemsFixture.splint,
+      fighterGoldPathPickerItemsFixture['chain-mail'],
+    ],
+    budget: builderPathGoldBudgetFixture,
+    filterOutUnaffordable: false,
+    isGoldShoppingPath: true,
+    onCommitAdd: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'STR 12 Fighter: unmet armor ability-score requirements are soft warnings (badge title carries the detail).',
+      },
+    },
   },
 }
 

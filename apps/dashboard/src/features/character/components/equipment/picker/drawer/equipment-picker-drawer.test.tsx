@@ -26,7 +26,15 @@ import {
   EQUIPMENT_PICKER_SORT_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
-import { OPTION_PRESENTATION_IN_PACKAGE_LABEL } from '@rpg/contracts'
+import {
+  OPTION_PRESENTATION_IN_PACKAGE_LABEL,
+  OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
+  requiredByLabel,
+} from '@rpg/contracts'
+import {
+  builderPathGoldBudgetFixture,
+  wizardGoldPathPickerItemsFixture,
+} from './equipment-picker-builder-path.fixtures'
 import {
   EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
   EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
@@ -758,5 +766,59 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+})
+
+describe('EquipmentPickerDrawer selection-row status line', () => {
+  function renderWizardGoldPath() {
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[
+          wizardGoldPathPickerItemsFixture.spellbook,
+          wizardGoldPathPickerItemsFixture['plate-armor'],
+        ]}
+        budget={builderPathGoldBudgetFixture}
+        filterOutUnaffordable={false}
+        isGoldShoppingPath
+        onCommitAdd={vi.fn()}
+      />,
+    )
+    return screen.getByRole('list')
+  }
+
+  function rowFor(list: HTMLElement, name: string): HTMLElement {
+    const row = within(list).getByText(name).closest<HTMLElement>('[role="listitem"]')
+    if (!row) throw new Error(`missing row ${name}`)
+    return row
+  }
+
+  it('renders blockers before requirement and source guidance', () => {
+    const spellbook = rowFor(renderWizardGoldPath(), 'Spellbook')
+    const text = spellbook.textContent ?? ''
+
+    const order = [
+      EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+      requiredByLabel('class'),
+      OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
+    ].map((label) => text.indexOf(label))
+    expect(order.every((index) => index >= 0)).toBe(true)
+    expect(order).toEqual([...order].sort((a, b) => a - b))
+    expect(within(spellbook).getByText(requiredByLabel('class'))).toHaveAttribute(
+      'title',
+      'Wizard class',
+    )
+  })
+
+  it('shows compatibility warnings as badges with the requirement detail as title', () => {
+    const plate = rowFor(renderWizardGoldPath(), 'Plate Armor')
+
+    expect(within(plate).getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)).toBeInTheDocument()
+    expect(within(plate).getByText('Not proficient')).toBeInTheDocument()
+    expect(within(plate).getByText('Requires STR 15')).toHaveAttribute(
+      'title',
+      'Requires STR 15; character has STR 8.',
+    )
   })
 })
