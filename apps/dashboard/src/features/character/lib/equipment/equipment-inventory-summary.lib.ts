@@ -14,6 +14,7 @@ import {
   type CharacterEquipment,
   type CharacterWealthGrant,
   type ClassOptionPolicy,
+  type Equipment,
   type EquipmentBudgetSummary,
   type EquipmentSourceAllocation,
 } from '@rpg/contracts'
@@ -279,7 +280,8 @@ function rowToSourceAllocation(row: EquipmentInventoryRow): EquipmentSourceAlloc
 
 function formatGrantProvenancePart(label: string, quantity: number): string {
   const normalized = label.replace(/\s+choice$/i, '')
-  return `${quantity} ${normalized} choice${quantity === 1 ? '' : 's'}`
+  if (quantity <= 1) return `${normalized} choice`
+  return `${quantity} ${normalized} choices`
 }
 
 function purchaseRowUsesStepper(rows: readonly EquipmentInventoryRow[]): boolean {
@@ -291,27 +293,53 @@ function purchaseRowUsesStepper(rows: readonly EquipmentInventoryRow[]): boolean
   )
 }
 
-function formatPurchaseProvenancePart(
-  rows: readonly EquipmentInventoryRow[],
+function formatPendingPurchaseProvenancePart(
+  equipment: Equipment | undefined,
   quantity: number,
-  pending: boolean,
 ): string {
-  const equipment = rows.find((row) => row.equipment)?.equipment
-  if (pending) {
-    const totalLabel = equipment ? formatEquipmentPurchaseTotalPriceLabel(equipment, quantity) : ''
-    return totalLabel
-      ? joinInlineMetadata([EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL, totalLabel])
-      : EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
-  }
-  if (!equipment || quantity <= 0) {
-    return quantity === 1 ? '1 purchased' : `${quantity} purchased`
-  }
-
+  if (!equipment) return EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
   const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  return totalLabel
+    ? joinInlineMetadata([EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL, totalLabel])
+    : EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
+}
+
+function formatPricedPurchaseProvenancePart(args: {
+  rows: readonly EquipmentInventoryRow[]
+  equipment: Equipment
+  quantity: number
+  showPurchaseQuantity: boolean
+}): string {
+  const { rows, equipment, quantity, showPurchaseQuantity } = args
+  const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  if (showPurchaseQuantity && quantity > 1) {
+    return joinInlineMetadata([`Purchased ×${quantity}`, totalLabel])
+  }
   if (purchaseRowUsesStepper(rows) || quantity === 1) {
     return joinInlineMetadata(['Purchased', totalLabel])
   }
   return `${quantity} purchased for ${totalLabel}`
+}
+
+function formatPurchaseProvenancePart(
+  rows: readonly EquipmentInventoryRow[],
+  quantity: number,
+  pending: boolean,
+  /** Magic-item rows state purchase count in the line instead of a separate Qty chip. */
+  showPurchaseQuantity: boolean,
+): string {
+  const equipment = rows.find((row) => row.equipment)?.equipment
+  if (pending) return formatPendingPurchaseProvenancePart(equipment, quantity)
+  if (!equipment || quantity <= 0) {
+    return quantity === 1 ? '1 purchased' : `${quantity} purchased`
+  }
+
+  return formatPricedPurchaseProvenancePart({
+    rows,
+    equipment,
+    quantity,
+    showPurchaseQuantity,
+  })
 }
 
 function otherSourceProvenanceParts(otherSources: readonly AddedEquipmentOtherSource[]): string[] {
@@ -354,7 +382,9 @@ export function formatAddedEquipmentProvenanceLabel(
   }
 
   if (purchaseQuantity > 0) {
-    parts.push(formatPurchaseProvenancePart(purchaseRows, purchaseQuantity, pending))
+    parts.push(
+      formatPurchaseProvenancePart(purchaseRows, purchaseQuantity, pending, grantTotals.size > 0),
+    )
   }
 
   return joinInlineMetadata(parts)

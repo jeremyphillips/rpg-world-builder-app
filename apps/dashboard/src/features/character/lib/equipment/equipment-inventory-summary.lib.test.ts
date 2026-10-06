@@ -185,6 +185,18 @@ describe('equipment-inventory-summary.lib', () => {
     expect(formatAddedEquipmentProvenanceLabel([grant, purchased])).toBe(
       '2 Common choices · Purchased · 10 GP',
     )
+    expect(
+      formatAddedEquipmentProvenanceLabel([
+        { ...grant, entry: { ...grant.entry, quantity: 1 } },
+        { ...purchased, entry: { ...purchased.entry, quantity: 5 } },
+      ]),
+    ).toBe('Common choice · Purchased ×5 · 50 GP')
+    expect(
+      formatAddedEquipmentProvenanceLabel([{ ...grant, entry: { ...grant.entry, quantity: 1 } }]),
+    ).toBe('Common choice')
+    expect(
+      formatAddedEquipmentProvenanceLabel([{ ...grant, entry: { ...grant.entry, quantity: 3 } }]),
+    ).toBe('3 Common choices')
   })
 
   it('builds package and added equipment channels for monk standard equipment', () => {

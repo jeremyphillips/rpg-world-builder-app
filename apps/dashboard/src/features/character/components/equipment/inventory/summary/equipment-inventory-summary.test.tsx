@@ -269,7 +269,7 @@ describe('EquipmentInventorySummary', () => {
       sourceLabel: '2 included with Standard Equipment',
       isStackable: false,
       quantityMode: 'locked',
-      priceLineLabel: '2 GP value · 4 GP total value',
+      priceLineLabel: '2 GP each · Qty 2 · 4 GP total',
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
@@ -280,8 +280,8 @@ describe('EquipmentInventorySummary', () => {
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
     expect(screen.getByText('Dagger')).toBeInTheDocument()
-    expect(screen.getByText('2 GP value · 4 GP total value')).toBeInTheDocument()
-    expect(screen.getByText('Qty 2')).toBeInTheDocument()
+    expect(screen.getByText('2 GP each · Qty 2 · 4 GP total')).toBeInTheDocument()
+    expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Increase Quantity/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })

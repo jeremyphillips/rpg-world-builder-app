@@ -1,7 +1,10 @@
 import { cva } from 'class-variance-authority'
 
-/** Action, utility, and group-primary content — the RowAnatomy cell owns vertical placement. */
-export const entityAnatomyTrailingActionVariants = cva('flex shrink-0 gap-1')
+/**
+ * Action, utility, and group-primary content. The RowAnatomy cell places the cluster.
+ * This row centers meta copy with the control and keeps 10px between them.
+ */
+export const entityAnatomyTrailingActionVariants = cva('flex shrink-0 items-center gap-2.5')
 
 export const entityAnatomyTrailingIndicatorVariants = cva('flex shrink-0 text-muted-foreground')
 

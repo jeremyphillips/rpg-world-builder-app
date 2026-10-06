@@ -56,7 +56,9 @@ describe('EquipmentInventoryRowItem', () => {
 
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove all 2 Rations' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Decrease Rations quantity' })).toBeInTheDocument()
+    const decrease = screen.getByRole('button', { name: 'Decrease Rations quantity' })
+    expect(decrease).toBeInTheDocument()
+    expect(decrease.parentElement).toHaveClass('h-8')
     expect(screen.getByRole('button', { name: 'Increase Rations quantity' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
@@ -108,7 +110,7 @@ describe('EquipmentInventoryRowItem', () => {
       sourceLabel: '2 included with Standard Equipment',
       isStackable: false,
       quantityMode: 'locked',
-      priceLineLabel: '2 GP value · 4 GP total value',
+      priceLineLabel: '2 GP each · Qty 2 · 4 GP total',
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
@@ -118,7 +120,9 @@ describe('EquipmentInventoryRowItem', () => {
 
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
-    expect(screen.getByText('Qty 2')).toBeInTheDocument()
+    const priceLine = screen.getByText('2 GP each · Qty 2 · 4 GP total')
+    expect(priceLine).toHaveClass('text-sm')
+    expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 

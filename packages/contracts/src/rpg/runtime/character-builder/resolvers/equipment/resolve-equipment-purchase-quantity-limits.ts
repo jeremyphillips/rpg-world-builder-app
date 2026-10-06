@@ -160,7 +160,7 @@ function formatNonBundledInventoryPriceLine(args: {
 
   const total = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
   return useValueSuffix
-    ? joinInlineMetadata([`${unitPrice} value`, `${total} total value`])
+    ? joinInlineMetadata([`${unitPrice} each`, `Qty ${quantity}`, `${total} total`])
     : joinInlineMetadata([unitPrice, `${total} total`])
 }
 
@@ -168,7 +168,7 @@ function formatNonBundledInventoryPriceLine(args: {
 export function formatEquipmentInventoryPriceLine(args: {
   equipment: Equipment
   quantity: number
-  /** Package grants use a "value" suffix; starting-gold purchases do not. */
+  /** Package grants use "value" at qty 1 and "each · Qty · total" above that. */
   priceContext: 'package' | 'startingGold'
 }): string {
   const { equipment, quantity, priceContext } = args

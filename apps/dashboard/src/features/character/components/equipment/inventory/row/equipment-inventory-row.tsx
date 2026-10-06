@@ -69,7 +69,10 @@ function resolveInventoryRowActionVisibility(
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void,
 ): InventoryRowActionVisibility {
   const showStepper = row.quantityMode === 'editable' && row.quantityTarget !== undefined
-  const showQtyLabel = row.quantityMode === 'locked' && row.entry.quantity > 1
+  // Package multi-qty copy already includes `Qty N`; don't render a second label.
+  const quantityInPriceLine = row.priceLineLabel?.includes(`Qty ${row.entry.quantity}`) ?? false
+  const showQtyLabel =
+    row.quantityMode === 'locked' && row.entry.quantity > 1 && !quantityInPriceLine
   const showRemove = canRemovePurchaseRow(row, onRemoveItem)
 
   return {

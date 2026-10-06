@@ -256,7 +256,7 @@ describe('equipment purchase price labels', () => {
         quantity: 2,
         priceContext: 'package',
       }),
-    ).toBe('15 GP value · 30 GP total value')
+    ).toBe('15 GP each · Qty 2 · 30 GP total')
     expect(
       formatEquipmentInventoryPriceLine({
         equipment: rations,

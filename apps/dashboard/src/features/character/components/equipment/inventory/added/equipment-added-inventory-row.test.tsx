@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen, within } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -71,9 +71,20 @@ describe('EquipmentAddedInventoryRowItem', () => {
   ]
 
   it('renders the parent-resolved status once on the managed path', () => {
+    const purchaseRow: EquipmentInventoryRow = {
+      ...grantRow,
+      entry: { ...grantRow.entry, quantity: 1, sources: [{ kind: 'startingGold' }] },
+      sourceLabel: 'Purchased with starting gold',
+      quantityMode: 'editable',
+      removeTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+      quantityTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
+    }
+
     render(
       <EquipmentAddedInventoryRowItem
-        entry={entry([grantRow, grantRow])}
+        entry={entry([grantRow, purchaseRow], {
+          provenanceLabel: '2 Common choices · Purchased · 50 GP',
+        })}
         status={notProficientStatus}
         {...defaultProps}
       />,
@@ -104,7 +115,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
     render(
       <EquipmentAddedInventoryRowItem
         entry={entry([{ ...grantRow, entry: { ...grantRow.entry, quantity: 1 } }], {
-          provenanceLabel: '1 Common choice',
+          provenanceLabel: 'Common choice',
           totalQuantity: 1,
         })}
         {...defaultProps}
@@ -112,7 +123,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
       />,
     )
 
-    expect(screen.getByText('1 Common choice')).toBeInTheDocument()
+    expect(screen.getByText('Common choice')).toBeInTheDocument()
     const releaseButton = screen.getByRole('button', { name: 'Release' })
     expect(releaseButton).toHaveClass('h-control-action-compact')
     expect(releaseButton).not.toHaveClass('bg-secondary')
@@ -124,20 +135,26 @@ describe('EquipmentAddedInventoryRowItem', () => {
     })
   })
 
-  it('renders manage disclosure for multi-copy grant rows without purchase controls', async () => {
+  it('releases one copy from a multi-choice grant row', async () => {
     const user = userEvent.setup()
+    const onReleaseGrant = vi.fn()
 
-    render(<EquipmentAddedInventoryRowItem entry={entry([grantRow])} {...defaultProps} />)
+    render(
+      <EquipmentAddedInventoryRowItem
+        entry={entry([grantRow])}
+        {...defaultProps}
+        onReleaseGrant={onReleaseGrant}
+      />,
+    )
 
     expect(screen.getByText('2 Common choices')).toBeInTheDocument()
-    expect(screen.getByText('Qty 2')).toBeInTheDocument()
-    const trigger = screen.getByRole('button', { name: 'Expand Potion of Healing' })
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-
-    await user.click(trigger)
-    const ownedHeadingRow = screen.getByRole('heading', { name: 'Owned copies' }).parentElement
-    expect(within(ownedHeadingRow!).getByText('2')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
+    expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Release one' }))
+    expect(onReleaseGrant).toHaveBeenCalledWith({
+      allowanceId: 'allowance-common',
+      equipmentId: 'srd-cc-5.2.1:potion-of-healing',
+      quantity: 1,
+    })
   })
 
   it('renders manage without trash controls for mixed grant and purchase rows', () => {
@@ -168,7 +185,8 @@ describe('EquipmentAddedInventoryRowItem', () => {
       />,
     )
 
-    expect(screen.getByText('Qty 3')).toBeInTheDocument()
+    expect(screen.queryByText('Qty 3')).not.toBeInTheDocument()
+    expect(screen.getByText('2 Common choices · Purchased · 50 GP')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Expand Potion of Healing' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Release' })).not.toBeInTheDocument()

@@ -13,6 +13,7 @@ import {
 } from '@/features/content'
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
+  EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../../../lib/equipment/equipment-step.lib'
@@ -47,13 +48,15 @@ export type EquipmentAddedInventoryRowItemProps = {
   onOpenChange?: (open: boolean) => void
 }
 
-function GrantOnlySingleReleaseRow({
+function GrantOnlyReleaseRow({
   entry,
   status,
+  releaseLabel,
   onReleaseGrant,
 }: {
   entry: AddedEquipmentEntryViewModel
   status?: readonly EntitySummaryStatusItem[]
+  releaseLabel: string
   onReleaseGrant: EquipmentAddedInventoryRowItemProps['onReleaseGrant']
 }) {
   const row = entry.rows.find((candidate) => candidate.removeTarget?.kind === 'magicItemGrant')
@@ -80,7 +83,7 @@ function GrantOnlySingleReleaseRow({
               })
             }
           >
-            {EQUIPMENT_INVENTORY_RELEASE_LABEL}
+            {releaseLabel}
           </EquipmentInventorySourceActionButton>
         ),
       }}
@@ -136,13 +139,21 @@ function ManagedInventoryRow({
         equipmentName: entry.equipmentName,
         status,
       })}
-      trailing={{
-        kind: 'indicator',
-        variant: 'quantity',
-        quantity: totalQuantity,
-        format: entry.otherSourceQuantity > 0 ? 'additional' : 'label',
-        meta: entry.provenanceLabel,
-      }}
+      trailing={
+        entry.otherSourceQuantity > 0
+          ? {
+              kind: 'indicator',
+              variant: 'quantity',
+              quantity: totalQuantity,
+              format: 'additional',
+              meta: entry.provenanceLabel,
+            }
+          : {
+              kind: 'indicator',
+              variant: 'label',
+              label: entry.provenanceLabel,
+            }
+      }
       collapsed={!isOpen}
       onToggleCollapse={handleToggleCollapse}
       density="compact"
@@ -180,13 +191,25 @@ export function EquipmentAddedInventoryRowItem({
   const sourceKinds = resolveDistinctAcquisitionSourceKinds(entry.rows)
   const grantQty = grantedQuantity(entry.rows)
 
-  if (!usesInlineManagement({ sourceKinds, grantedQuantity: grantQty })) {
-    if (sourceKinds.length === 1 && sourceKinds[0] === 'magicItemGrant' && grantQty === 1) {
-      return (
-        <GrantOnlySingleReleaseRow entry={entry} status={status} onReleaseGrant={onReleaseGrant} />
-      )
-    }
+  if (
+    sourceKinds.length === 1 &&
+    sourceKinds[0] === 'magicItemGrant' &&
+    grantQty > 0 &&
+    entry.otherSourceQuantity === 0
+  ) {
+    return (
+      <GrantOnlyReleaseRow
+        entry={entry}
+        status={status}
+        releaseLabel={
+          grantQty > 1 ? EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL : EQUIPMENT_INVENTORY_RELEASE_LABEL
+        }
+        onReleaseGrant={onReleaseGrant}
+      />
+    )
+  }
 
+  if (!usesInlineManagement({ sourceKinds, grantedQuantity: grantQty })) {
     const display = groupEquipmentInventoryRowsForDisplay(entry.rows, {
       allowCombinedRows: true,
     })[0]

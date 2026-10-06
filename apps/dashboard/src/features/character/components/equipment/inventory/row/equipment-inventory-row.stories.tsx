@@ -47,6 +47,7 @@ const lockedPackageGrantRow: EquipmentInventoryRow = {
   sourceLabel: '2 included with Standard Equipment',
   isStackable: false,
   quantityMode: 'locked',
+  priceLineLabel: '2 GP each · Qty 2 · 4 GP total',
   removeLabel: 'Remove all 2 Dagger',
   removeTarget: { kind: 'package', packageItemKey: 'srd-cc-5.2.1:bard:standard-equipment:0' },
 }

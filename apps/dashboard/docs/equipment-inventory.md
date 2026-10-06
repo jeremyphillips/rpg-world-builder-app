@@ -35,11 +35,11 @@ count badge). When a starting option is selected, a divider sits under that
 section and the starting channel follows. Package-owned rows stay in the starting
 section; purchased and granted rows stay in Added Equipment.
 
-| Section              | When shown              | Row behavior                                                                                                                                                                     |
-| -------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Added Equipment**  | Always                  | Category eyebrows and compact row cards. Provenance and price sit in trailing `meta` beside quantity controls.                                                                   |
-| **Starting Package** | Package option selected | Collapsed disclosure. Header shows the distinct item count and option label, plus an overflow menu (Customize package, Change package option). Expanded view shows `N GP value`. |
-| **Starting Gold**    | Gold option selected    | Static header: `No package gear · {option label}`. No package rows.                                                                                                              |
+| Section              | When shown              | Row behavior                                                                                                                                                                                                                             |
+| -------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Added Equipment**  | Always                  | Category eyebrows and compact row cards. Provenance and price sit in trailing `meta` beside quantity controls.                                                                                                                           |
+| **Starting Package** | Package option selected | Collapsed disclosure. Header shows the distinct item count and option label, plus an overflow menu (Customize package, Change package option). Expanded rows show `N GP value`, or `N GP each · Qty N · total` when quantity is above 1. |
+| **Starting Gold**    | Gold option selected    | Static header: `No package gear · {option label}`. No package rows.                                                                                                                                                                      |
 
 **Browse equipment** stays on the step guidance, not on an inventory column heading.
 
@@ -86,28 +86,32 @@ Purchase and provenance copy sits in the trailing cell, before the controls:
 {advisory, when present}     {price or provenance}  {stepper}  [trash]
 ```
 
-Package rows with no controls use a value-only trailing label (`50 GP value`).
+Package rows with no controls use a value-only trailing label. Quantity 1 is
+`50 GP value`. Quantity 2+ is one 14px line: `2 GP each · Qty 2 · 4 GP total`.
 `priceLine` comes from `formatEquipmentInventoryPriceLine` in `@rpg/contracts`
 (via `buildInventoryRowPresentation`). Combined rows keep breakdown copy in that
 same trailing slot (`7 total · 5 included · 2 purchased`).
 
-| Purchase                                                       | Controls                                                                    |
-| -------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Stackable `startingGold` (`origin: picker`)                    | `NumberStepper` (trash at qty 1 removes row); price in trailing `meta`      |
-| Non-stackable `startingGold`                                   | qty locked at 1, full-row Remove                                            |
-| Converted non-stackable (`origin: packageConversion`, qty > 1) | qty locked at authored amount, full-row Remove                              |
-| Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows         |
-| Package grant (any qty)                                        | Value label in the trailing cell; qty 2+ shows read-only `Qty N`; no remove |
+| Purchase                                                       | Controls                                                                                                  |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Stackable `startingGold` (`origin: picker`)                    | `NumberStepper` (trash at qty 1 removes row); price in trailing `meta`                                    |
+| Non-stackable `startingGold`                                   | qty locked at 1, full-row Remove                                                                          |
+| Converted non-stackable (`origin: packageConversion`, qty > 1) | qty locked at authored amount, full-row Remove                                                            |
+| Legacy `manual`                                                | Locked, counts against budget; picker cannot create new manual rows                                       |
+| Package grant (any qty)                                        | Price label in the trailing cell (`N GP value`, or `N GP each · Qty N · total` when qty is 2+); no remove |
 
 ### Overlapping sources
 
 When an Added Equipment purchase is the same item as the Starting Package or a generic grant, the stepper still edits only that purchase.
 
 - A purchase that is the whole owned quantity renders as a plain number (`1`). When another source contributes, it renders `+N`.
-- Provenance lists other sources first, then Added parts: `Package ×2 · Grant ×1 · 1 Common choice · Purchased · 4 GP`.
+- Provenance lists other sources first, then Added parts: `Package ×2 · Grant ×1 · Common choice · Purchased · 4 GP`.
 - On stepper rows the purchase part is always `Purchased · {total}`. Locked quantities keep `N purchased for {total}`.
+- A magic-item choice shared with a purchase states the purchase count in that line (`Common choice · Purchased ×5 · 250 GP`) and does not add a separate `Qty` chip.
+- Choice copy is quantity-aware: one slot is `Common choice`; two or more are `2 Common choices`.
+- A grant-only magic item uses `Release` for one choice and `Release one` when more than one choice is held.
 - Trash at the minimum removes only the purchase. Package and grant contributions stay.
-- The Added Equipment count counts Added contributions only. Magic-item choices (`1 Common choice`) are Added contributions, not other sources.
+- The Added Equipment count counts Added contributions only. Magic-item choices (`Common choice`) are Added contributions, not other sources.
 - Gold-option and pending layouts do not attach package or grant other sources.
 
 ### Deferred
@@ -122,7 +126,8 @@ An `ensure` grant that a purchase already satisfies contributes 0. Removing that
 ### Pricing copy
 
 Contracts normalize multi-unit totals through copper so mixed denominations
-collapse correctly (e.g. `5 SP each · 1 GP total` for qty 2). Bundle and
+collapse correctly (e.g. `5 SP each · 1 GP total` for qty 2). Package grants
+with quantity above 1 use `2 GP each · Qty 2 · 4 GP total`. Bundle and
 non-stackable value lines follow the same resolver; see
 `formatEquipmentInventoryPriceLine` and
 `formatEquipmentPurchaseTotalPriceLabel`.
@@ -142,7 +147,7 @@ non-stackable value lines follow the same resolver; see
 
 Inventory and drawer purchase panels share `@rpg/ui` `NumberStepper`:
 
-- Omit `size` outside forms — defaults to **md (36px)**; `bordered={true}` in cart and drawer bodies
+- Added Equipment card steppers pass `size="sm"` (32px). Drawer purchase panels omit `size` and stay **md (36px)**. Both use `bordered={true}`.
 - `digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}` (2)
 
 ## Picker

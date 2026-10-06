@@ -50,6 +50,7 @@ export function EquipmentInventoryQuantityControl({
         aria-label={inventoryQuantityAriaLabel(row.equipmentName, otherSourceQuantity)}
         valuePrefix={otherSourceQuantity > 0 ? '+' : undefined}
         bordered={true}
+        size="sm"
         digits={EQUIPMENT_STEP_QUANTITY_INPUT_DIGITS}
         min={minQuantity}
         max={maxQuantity}

@@ -151,10 +151,11 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(slot('trailing-secondary')).toHaveTextContent('30 GP')
   })
 
-  it('does not add vertical alignment classes to trailing content', () => {
+  it('centers trailing meta with its control without offsetting the cell', () => {
     const { slot } = renderAnatomy({ trailing: SELECT_ACTION })
 
     const content = slot('trailing')?.firstElementChild as HTMLElement
-    expect(content.className).not.toMatch(/\bself-|\bitems-(start|center)\b|\bmt-/)
+    expect(content.className).toMatch(/\bitems-center\b/)
+    expect(content.className).not.toMatch(/\bself-|\bmt-/)
   })
 })
