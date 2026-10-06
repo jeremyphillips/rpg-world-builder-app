@@ -57,6 +57,7 @@ function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefine
 }
 
 /** Row-track entity anatomy — every part is a RowAnatomy cell; trailing kind selects its cell. */
+// fallow-ignore-next-line complexity
 export function EntityAnatomy({
   entity,
   headingHref,
@@ -66,7 +67,7 @@ export function EntityAnatomy({
   headingEndValue,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
-  const hasStatus = entity.status != null && entity.status.length > 0
+  const hasStatus = (entity.status?.length ?? 0) > 0 || (entity.provenance?.length ?? 0) > 0
   const band = resolveEntityAnatomyBand(entity.media)
 
   return (
@@ -114,7 +115,8 @@ export function EntityAnatomy({
           data-entity-item-slot="status"
         >
           <EntitySummaryStatus
-            items={entity.status!}
+            items={entity.status ?? []}
+            provenance={entity.provenance}
             density={density}
             composition={entity.statusComposition}
           />

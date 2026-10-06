@@ -5,7 +5,6 @@ import {
   formatWealth,
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
-  resolveGenericEquipmentGrantQuantities,
   resolveGoldStartingEquipmentAlternative,
   resolveStartingEquipmentResolution,
   type CharacterBuildCatalogIndex,
@@ -29,6 +28,12 @@ import {
   withEquipmentSelectionPresentation,
   type EquipmentSelectionFacts,
 } from './equipment-selection-facts.lib'
+import { formatMagicItemChoiceLabelFromSourceLabel } from './magic-item-choice-label.lib'
+import {
+  buildEquipmentPickerOwnershipIndex,
+  getEquipmentOwnership,
+  type EquipmentPickerOwnershipIndex,
+} from './equipment-ownership-index.lib'
 import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
   EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
@@ -279,9 +284,7 @@ function rowToSourceAllocation(row: EquipmentInventoryRow): EquipmentSourceAlloc
 }
 
 function formatGrantProvenancePart(label: string, quantity: number): string {
-  const normalized = label.replace(/\s+choice$/i, '')
-  if (quantity <= 1) return `${normalized} choice`
-  return `${quantity} ${normalized} choices`
+  return formatMagicItemChoiceLabelFromSourceLabel(label, quantity)
 }
 
 function purchaseRowUsesStepper(rows: readonly EquipmentInventoryRow[]): boolean {
@@ -392,30 +395,25 @@ export function formatAddedEquipmentProvenanceLabel(
 
 type AggregateAddedEquipmentOptions = {
   pending?: boolean
-  packageQuantities?: ReadonlyMap<string, number>
-  grantQuantities?: ReadonlyMap<string, number>
+  /** Ownership contributions for the draft. Absent on the gold path, which has no package. */
+  ownership?: EquipmentPickerOwnershipIndex
 }
 
-function packageQuantityByEquipmentId(
-  packageRows: readonly EquipmentInventoryRow[],
-): Map<string, number> {
-  const totals = new Map<string, number>()
-  for (const row of packageRows) {
-    const equipmentId = row.entry.equipmentId
-    totals.set(equipmentId, (totals.get(equipmentId) ?? 0) + row.entry.quantity)
-  }
-  return totals
-}
-
+/** Quantities owned outside the Added stepper, read straight from the contributions. */
 function otherSourcesForEquipment(
   equipmentId: string,
   options: AggregateAddedEquipmentOptions,
 ): AddedEquipmentOtherSource[] {
+  if (!options.ownership) return []
+
+  const ownership = getEquipmentOwnership(options.ownership, equipmentId)
   const sources: AddedEquipmentOtherSource[] = []
-  const packageQuantity = options.packageQuantities?.get(equipmentId) ?? 0
-  if (packageQuantity > 0) sources.push({ kind: 'package', quantity: packageQuantity })
-  const grantQuantity = options.grantQuantities?.get(equipmentId) ?? 0
-  if (grantQuantity > 0) sources.push({ kind: 'grant', quantity: grantQuantity })
+  if (ownership.packageQuantity > 0) {
+    sources.push({ kind: 'package', quantity: ownership.packageQuantity })
+  }
+  if (ownership.grantQuantity > 0) {
+    sources.push({ kind: 'grant', quantity: ownership.grantQuantity })
+  }
   return sources
 }
 
@@ -621,10 +619,9 @@ function buildSplitInventoryViewModel(args: {
     startingEquipment,
     addedEquipment: groupAddedEquipmentByCategory(
       aggregateAddedEquipmentRows(addedRows, {
-        packageQuantities: goldOption ? undefined : packageQuantityByEquipmentId(packageRows),
-        grantQuantities: goldOption
-          ? undefined
-          : resolveGenericEquipmentGrantQuantities(draft, catalogIndex),
+        ...(goldOption
+          ? {}
+          : { ownership: buildEquipmentPickerOwnershipIndex({ draft, catalogIndex }) }),
       }),
     ),
   }

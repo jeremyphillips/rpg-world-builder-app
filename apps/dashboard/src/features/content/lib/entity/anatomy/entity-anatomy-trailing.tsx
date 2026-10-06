@@ -110,7 +110,19 @@ function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTra
         </div>
       )
     case 'group':
-      return <div className={entityAnatomyTrailingActionVariants()}>{trailing.primary}</div>
+      return (
+        <div className={entityAnatomyTrailingActionVariants()}>
+          {trailing.secondary ? (
+            <span
+              className={entityAnatomyTrailingGroupSecondaryVariants()}
+              data-entity-item-slot="trailing-secondary"
+            >
+              <EntityAnatomyTrailingSecondaryView secondary={trailing.secondary} />
+            </span>
+          ) : null}
+          {trailing.primary}
+        </div>
+      )
     default: {
       const _exhaustive: never = trailing
       return _exhaustive
@@ -125,27 +137,14 @@ export function EntityAnatomyTrailingCells({ trailing }: EntityAnatomyTrailingCe
   }
 
   const cells = resolveEntityAnatomyTrailingCells(trailing)
-  const secondary = trailing.kind === 'group' ? trailing.secondary : undefined
 
   return (
-    <>
-      <RowAnatomyCell<EntityAnatomyColumn>
-        cell={cells.primary}
-        data-entity-item-slot="trailing"
-        data-entity-trailing-kind={trailing.kind}
-      >
-        <EntityAnatomyTrailingPrimary trailing={trailing} />
-      </RowAnatomyCell>
-      {cells.secondary && secondary ? (
-        <RowAnatomyCell<EntityAnatomyColumn>
-          cell={cells.secondary}
-          data-entity-item-slot="trailing-secondary"
-        >
-          <div className={entityAnatomyTrailingGroupSecondaryVariants()}>
-            <EntityAnatomyTrailingSecondaryView secondary={secondary} />
-          </div>
-        </RowAnatomyCell>
-      ) : null}
-    </>
+    <RowAnatomyCell<EntityAnatomyColumn>
+      cell={cells.primary}
+      data-entity-item-slot="trailing"
+      data-entity-trailing-kind={trailing.kind}
+    >
+      <EntityAnatomyTrailingPrimary trailing={trailing} />
+    </RowAnatomyCell>
   )
 }

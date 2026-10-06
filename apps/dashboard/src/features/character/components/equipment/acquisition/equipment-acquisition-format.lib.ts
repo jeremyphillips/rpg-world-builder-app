@@ -10,6 +10,8 @@ import {
   type MagicItemRarity,
 } from '@rpg/contracts'
 
+import { formatMagicItemChoiceLabel } from '../../../lib/equipment/magic-item-choice-label.lib'
+
 type PurchaseSpendSnapshot = {
   quantity: number
   unitCostCp?: number
@@ -48,8 +50,7 @@ export function resolveAllowanceRarity(args: {
 }
 
 export function formatGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity): string {
-  const rarityLabel = getMagicItemRarityLabel(rarity)
-  return grantQuantity === 1 ? `${rarityLabel} choice` : `${grantQuantity} ${rarityLabel} choices`
+  return formatMagicItemChoiceLabel(grantQuantity, rarity)
 }
 
 export function formatUsesGrantPreviewLine(grantQuantity: number, rarity: MagicItemRarity): string {

@@ -63,7 +63,7 @@ export function NumberStepperIncreaseButton({
       tabIndex={-1}
       disabled={disabled}
       aria-label={ariaLabel}
-      className={numberStepperButtonVariants({ size: resolvedSize, minBoundary: 'default' })}
+      className={numberStepperButtonVariants({ size: resolvedSize })}
       onMouseDown={(event) => event.preventDefault()}
       onClick={onClick}
     >

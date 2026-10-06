@@ -18,6 +18,7 @@ import {
   type EquipmentInventoryRow,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { formatAcquisitionBlockerNote } from '../../picker/equipment-picker-action.lib'
+import { formatMagicItemChoiceBucketLabel } from '../../../../lib/equipment/magic-item-choice-label.lib'
 import {
   formatUsesGrantPreviewLine,
   resolveAllowanceRarity,
@@ -117,8 +118,7 @@ export function resolveEquipmentInventoryRowManagementMode(
 }
 
 export function formatGrantManageSourceLabel(sourceLabel: string): string {
-  const rarity = sourceLabel.replace(/\s+choice$/i, '')
-  return `${rarity} choices`
+  return formatMagicItemChoiceBucketLabel(sourceLabel)
 }
 
 function resolvePurchaseUnitCostCp(args: {

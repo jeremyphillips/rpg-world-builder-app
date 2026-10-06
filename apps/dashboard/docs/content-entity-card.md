@@ -503,18 +503,18 @@ trailing
     └── secondary → price | quantity | grantPreview metadata variants
 ```
 
-`resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell (two
-for `group`). Kinds never choose their own alignment. `meta` renders as muted `text-sm`
-before the control inside that same cell. It does not add a second cell.
+`resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell. Kinds
+never choose their own alignment. `meta` renders as muted `text-sm` before the control
+inside that same cell. It does not add a second cell.
 
-| Kind        | Type contract                                                                         | Cell                             | Use                                                                                          |
-| ----------- | ------------------------------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------- |
-| `action`    | `content: ReactElement`, optional `meta`                                              | `band`                           | Labeled commit — Add, Select, Edit, Release                                                  |
-| `utility`   | `content: ReactElement`, optional `meta`                                              | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit                                           |
-| `indicator` | `variant: 'chevron'`, optional `meta`                                                 | `full`                           | Destination chevrons                                                                         |
-| `indicator` | `variant: 'quantity'`, `format` `compact` \| `label` \| `additional`, optional `meta` | `band`                           | `compact` is `×N` and `label` is `Qty N` (hidden at 1). `additional` is `+N`, including `+1` |
-| `indicator` | `variant: 'label'` (`label: string`)                                                  | `band`                           | Value-only rows (for example `50 GP value`) with no control                                  |
-| `group`     | `primary: ReactElement`, structured `secondary`                                       | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)                                             |
+| Kind        | Type contract                                                                         | Cell                                     | Use                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `action`    | `content: ReactElement`, optional `meta`                                              | `band`                                   | Labeled commit — Add, Select, Edit, Release                                                  |
+| `utility`   | `content: ReactElement`, optional `meta`                                              | `full` (row-centered)                    | Remove, overflow menu, quantity stepper, icon edit                                           |
+| `indicator` | `variant: 'chevron'`, optional `meta`                                                 | `full`                                   | Destination chevrons                                                                         |
+| `indicator` | `variant: 'quantity'`, `format` `compact` \| `label` \| `additional`, optional `meta` | `band`                                   | `compact` is `×N` and `label` is `Qty N` (hidden at 1). `additional` is `+N`, including `+1` |
+| `indicator` | `variant: 'label'` (`label: string`)                                                  | `band`                                   | Value-only rows (for example `50 GP value`) with no control                                  |
+| `group`     | `primary: ReactElement`, structured `secondary`                                       | `band` (secondary inline before primary) | Commerce stacks (price/grant preview + Add or quantity stepper)                              |
 
 `utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
 A 36px stepper in a compact row grows the row through the slack gutters; heading and
@@ -543,7 +543,8 @@ EntitySummary parts            RowAnatomy cell
 ├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
 ├── EntitySummaryDescription  → meta
 └── EntitySummaryStatus       → status (track offset owned by the cell, not the row)
-    └── EntitySummaryStatusItem[]
+    ├── EntitySummaryProvenanceItem[]   (provenance group, rendered first)
+    └── EntitySummaryStatusItem[]       (status group)
 ```
 
 `EntitySummaryModel.status` accepts structured `EntitySummaryStatusItem` values only:
@@ -562,6 +563,23 @@ it into the description. Domain mapping (e.g. build advisories → status items)
 `guidance` (`text-foreground`) reads at title ink, above the muted detail line. Use it for
 requirement, recommendation, and source guidance. Text items may carry an optional `title`, which is
 supplemental only: the label must stand on its own.
+
+### Provenance vs status
+
+`EntitySummaryModel.provenance` is a **separate slot** from `status`. Provenance says where an
+owned quantity came from and offers the inline affordance that gives it back; status says what
+the row's current state is.
+
+| Slot         | Items                                                                           | Interactive |
+| ------------ | ------------------------------------------------------------------------------- | ----------- |
+| `provenance` | `{ kind: 'text' }` source segments, `{ kind: 'action' }` release/remove buttons | Yes         |
+| `status`     | `EntitySummaryStatusItem` badges, text, inactive, validation errors             | No          |
+
+Both render into the same `InlineMetadata` line — provenance group first, then status —
+carrying `data-entity-summary-provenance` and `data-entity-summary-status`. Ownership
+segments never become status items: they carry no `SelectionSignalCategory` and do not pass
+through `resolveSelectionRowStatusItems`. Inline actions belong only to `provenance`; the
+status group must stay free of buttons.
 
 ### Status composition
 

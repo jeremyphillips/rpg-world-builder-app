@@ -437,6 +437,140 @@ function applySetPurchaseQuantityAction(args: {
   }
 }
 
+type IndexedPurchase = {
+  purchase: CharacterBuilderDraftEquipmentPurchase
+  index: number
+}
+
+/** Editable purchase rows for one equipment id, in draft order. */
+function listEditablePurchaseRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  budget?: EquipmentBudgetSummary
+}): IndexedPurchase[] {
+  const { draft, catalogIndex, equipmentId, budget } = args
+  const equipment = catalogIndex.equipment.get(equipmentId)
+  if (!equipment) return []
+
+  const rows: IndexedPurchase[] = []
+  const purchases = draft.equipment?.purchases ?? []
+
+  purchases.forEach((purchase, index) => {
+    if (purchase.equipmentId !== equipmentId) return
+    const limits = resolveEquipmentPurchaseQuantityLimits({
+      equipment,
+      sourceMode: purchase.sourceMode,
+      origin: purchase.sourceMode === 'startingGold' ? purchase.origin : undefined,
+      budget,
+      currentQuantity: purchase.quantity,
+      isPurchaseRow: true,
+    })
+    if (limits.editable) rows.push({ purchase, index })
+  })
+
+  return rows
+}
+
+function isPickerOriginPurchase(purchase: CharacterBuilderDraftEquipmentPurchase): boolean {
+  return purchase.sourceMode === 'startingGold' && purchase.origin === 'picker'
+}
+
+/** Picker-origin rows drain first, newest first within each group. */
+function purchaseDrainOrder(rows: readonly IndexedPurchase[]): IndexedPurchase[] {
+  return [...rows].sort((left, right) => {
+    const leftPicker = isPickerOriginPurchase(left.purchase) ? 0 : 1
+    const rightPicker = isPickerOriginPurchase(right.purchase) ? 0 : 1
+    if (leftPicker !== rightPicker) return leftPicker - rightPicker
+    return right.index - left.index
+  })
+}
+
+function drainEditablePurchases(args: {
+  purchases: readonly CharacterBuilderDraftEquipmentPurchase[]
+  rows: readonly IndexedPurchase[]
+  removeQuantity: number
+}): CharacterBuilderDraftEquipmentPurchase[] {
+  const nextQuantityByIndex = new Map<number, number>()
+  let remaining = args.removeQuantity
+
+  for (const row of purchaseDrainOrder(args.rows)) {
+    if (remaining <= 0) break
+    const taken = Math.min(remaining, row.purchase.quantity)
+    nextQuantityByIndex.set(row.index, row.purchase.quantity - taken)
+    remaining -= taken
+  }
+
+  return args.purchases.flatMap((entry, index) => {
+    const nextQuantity = nextQuantityByIndex.get(index)
+    if (nextQuantity === undefined) return [entry]
+    return nextQuantity > 0 ? [{ ...entry, quantity: nextQuantity }] : []
+  })
+}
+
+function applySetEquipmentPurchasedQuantityAction(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  equipmentId: string
+  quantity: number
+  budget?: EquipmentBudgetSummary
+  acquisitionContext?: EquipmentAcquisitionBuilderContext
+}): EquipmentStepActionResult {
+  const { draft, catalogIndex, equipmentId, quantity, budget, acquisitionContext } = args
+
+  if (!catalogIndex.equipment.has(equipmentId)) {
+    return {
+      status: 'invalid',
+      issues: [{ code: 'equipment_not_in_catalog', reference: { equipmentId } }],
+    }
+  }
+
+  if (!Number.isInteger(quantity) || quantity < 0) {
+    return {
+      status: 'invalid',
+      issues: [{ code: 'quantity_not_allowed', reference: { equipmentId } }],
+    }
+  }
+
+  const rows = listEditablePurchaseRows({ draft, catalogIndex, equipmentId, budget })
+  const aggregate = rows.reduce((sum, row) => sum + row.purchase.quantity, 0)
+  const delta = quantity - aggregate
+
+  if (delta > 0) {
+    return applyAddPurchaseAction({
+      draft,
+      catalogIndex,
+      equipmentId,
+      quantity: delta,
+      budget,
+      acquisitionContext,
+    })
+  }
+
+  const current = draft.equipment
+  if (!current) {
+    return { status: 'invalid', issues: [{ code: 'equipment_channel_missing' }] }
+  }
+
+  if (delta === 0) {
+    return { status: 'applied', patch: { equipment: current } }
+  }
+
+  return {
+    status: 'applied',
+    patch: {
+      equipment: {
+        ...current,
+        purchases: drainEditablePurchases({
+          purchases: current.purchases,
+          rows,
+          removeQuantity: -delta,
+        }),
+      },
+    },
+  }
+}
+
 function applyRemovePurchaseQuantityAction(args: {
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
@@ -515,6 +649,12 @@ function dispatchCoreEquipmentStepAction(
       return applySetPurchaseQuantityAction({
         ...args,
         purchaseId: action.purchaseId,
+        quantity: action.quantity,
+      })
+    case 'set_equipment_purchased_quantity':
+      return applySetEquipmentPurchasedQuantityAction({
+        ...args,
+        equipmentId: action.equipmentId,
         quantity: action.quantity,
       })
     case 'skip_starting_equipment':

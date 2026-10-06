@@ -58,10 +58,10 @@ lives in `components/picker/` (not here).
 
 | Subfolder                                                   | Responsibility                                                                                       |
 | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| _(root)_                                                    | `equipment-quantity-stepper` — purchase quantity control shared by inventory rows and picker headers |
 | `picker/drawer/`                                            | Equipment picker shell, types, fixtures, `useEquipmentPickerController`                              |
 | `picker/browse/`                                            | Filters, budget header, catalog result rows                                                          |
-| `picker/details/`                                           | Item detail panel + character preview                                                                |
-| `picker/purchase/`                                          | Picker purchase/grant UI (not step-level acquisition)                                                |
+| `picker/details/`                                           | Item detail panel, character preview, read-only ownership ledger                                     |
 | `picker/status/`                                            | Status-line chrome (unaffordable amounts tooltip); row status comes from `lib/selection-row-status/` |
 | `picker/map-equipment-compact-summary-to-metadata-lines.ts` | Equipment metadata mapper                                                                            |
 | `inventory/`                                                | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/`                    |

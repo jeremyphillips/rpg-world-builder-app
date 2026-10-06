@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import type { ClassStored } from '../../../../content/classes/class'
 import { equipmentSchema } from '../../../../content/equipment'
-import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
+import {
+  createEmptyCharacterBuilderDraft,
+  type CharacterBuilderDraft,
+  type CharacterBuilderDraftEquipmentPurchase,
+} from '../../draft/draft'
 import { indexCharacterBuildCatalog } from '../../context'
 import {
   createEquipmentPackageSwitchInventorySnapshot,
@@ -242,6 +246,117 @@ describe('applyEquipmentStepAction', () => {
     expect(result).toEqual({
       status: 'invalid',
       issues: [{ code: 'equipment_channel_missing' }],
+    })
+  })
+
+  describe('set_equipment_purchased_quantity', () => {
+    const goldBudget = {
+      starting: { cp: 0, sp: 0, gp: 50, pp: 0 },
+      spent: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      remaining: { cp: 0, sp: 0, gp: 50, pp: 0 },
+    }
+
+    function goldDraftWithPurchases(
+      purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
+    ): CharacterBuilderDraft {
+      const draft = goldDraftWithRope(1)
+      return { ...draft, equipment: { ...draft.equipment, purchases: [...purchases] } }
+    }
+
+    const pickerRope = {
+      id: 'picker-rope',
+      equipmentId: rope.id,
+      quantity: 1,
+      sourceMode: 'startingGold' as const,
+      origin: 'picker' as const,
+    }
+    const convertedRope = {
+      id: 'converted-rope',
+      equipmentId: rope.id,
+      quantity: 1,
+      sourceMode: 'startingGold' as const,
+      origin: 'packageConversion' as const,
+    }
+
+    function setAggregate(draft: CharacterBuilderDraft, quantity: number) {
+      return applyEquipmentStepAction({
+        draft,
+        catalogIndex: packageSwitchCatalogIndex(),
+        action: { kind: 'set_equipment_purchased_quantity', equipmentId: rope.id, quantity },
+        budget: goldBudget,
+      })
+    }
+
+    it('merges an increment into the canonical picker record', () => {
+      const result = setAggregate(goldDraftWithPurchases([pickerRope, convertedRope]), 3)
+
+      expect(result.status).toBe('applied')
+      if (result.status !== 'applied') return
+      expect(result.patch.equipment?.purchases).toEqual([
+        { ...pickerRope, quantity: 2 },
+        convertedRope,
+      ])
+    })
+
+    it('drains the picker record first on a decrement', () => {
+      const result = setAggregate(goldDraftWithPurchases([pickerRope, convertedRope]), 1)
+
+      expect(result.status).toBe('applied')
+      if (result.status !== 'applied') return
+      expect(result.patch.equipment?.purchases).toEqual([convertedRope])
+    })
+
+    it('removes every editable record at a target of 0', () => {
+      const result = setAggregate(goldDraftWithPurchases([pickerRope, convertedRope]), 0)
+
+      expect(result.status).toBe('applied')
+      if (result.status !== 'applied') return
+      expect(result.patch.equipment?.purchases).toEqual([])
+    })
+
+    it('leaves locked records untouched', () => {
+      const manualRope = {
+        id: 'manual-rope',
+        equipmentId: rope.id,
+        quantity: 2,
+        sourceMode: 'manual' as const,
+      }
+      const result = setAggregate(goldDraftWithPurchases([manualRope, pickerRope]), 0)
+
+      expect(result.status).toBe('applied')
+      if (result.status !== 'applied') return
+      expect(result.patch.equipment?.purchases).toEqual([manualRope])
+    })
+
+    it('rejects a target below the locked floor', () => {
+      expect(setAggregate(goldDraftWithPurchases([pickerRope]), -1)).toEqual({
+        status: 'invalid',
+        issues: [{ code: 'quantity_not_allowed', reference: { equipmentId: rope.id } }],
+      })
+    })
+
+    it('rejects an increment the budget cannot cover', () => {
+      const brokeBudget = {
+        starting: { cp: 0, sp: 0, gp: 1, pp: 0 },
+        spent: { cp: 0, sp: 0, gp: 1, pp: 0 },
+        remaining: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      }
+
+      const result = applyEquipmentStepAction({
+        draft: goldDraftWithPurchases([pickerRope]),
+        catalogIndex: packageSwitchCatalogIndex(),
+        action: {
+          kind: 'set_equipment_purchased_quantity',
+          equipmentId: rope.id,
+          quantity: 40,
+        },
+        budget: brokeBudget,
+      })
+
+      expect(result).toEqual({
+        status: 'invalid',
+        issues: [{ code: 'quantity_not_allowed', reference: { equipmentId: rope.id } }],
+      })
     })
   })
 

@@ -1,41 +1,37 @@
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details'
 import {
-  equipmentPickerArrowsFixture,
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
-  equipmentPickerRopeFixture,
 } from '../drawer/equipment-picker-drawer.fixtures'
-import {
-  EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
-} from '../purchase/equipment-picker-purchase.lib'
-import { equipmentPickerPurchaseInsetPanelClasses } from '../purchase/equipment-picker-purchase.variants'
+import { equipmentPickerInventorySummaryPanelClasses } from './equipment-picker-inventory-summary.variants'
 import { EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL } from './equipment-picker-character-preview.lib'
+import { EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL } from './equipment-picker-inventory-summary'
+import { EQUIPMENT_PICKER_INVENTORY_TOTAL_LABEL } from './equipment-picker-inventory-summary.lib'
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
+
+const ownedTwice = {
+  ...EMPTY_EQUIPMENT_OWNERSHIP,
+  packageQuantity: 1,
+  editablePurchased: { quantity: 1, spendCp: 1500 },
+  totalQuantity: 2,
+  acquiredQuantity: 1,
+}
 
 describe('EquipmentPickerItemDetails', () => {
   const longswordItem = equipmentPickerItemsFixture[0]!
 
-  it('renders metadata, character preview, and purchase sections in order', () => {
+  it('renders metadata and character preview without an acquisition surface', () => {
     render(
       <EquipmentPickerItemDetails
         equipment={longswordItem.equipment}
         itemState={longswordItem.state}
         budget={equipmentPickerBudgetFixture}
-        ownedQuantity={0}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
+        ownership={EMPTY_EQUIPMENT_OWNERSHIP}
         showCharacterPreview
         characterPreviewContext={{
           level: 1,
@@ -48,146 +44,45 @@ describe('EquipmentPickerItemDetails', () => {
     )
 
     const headings = screen.getAllByRole('heading', { level: 3 }).map((node) => node.textContent)
-    expect(headings).toEqual([
-      EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL,
-      EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
-    ])
+    expect(headings).toEqual([EQUIPMENT_PICKER_CHARACTER_PREVIEW_SECTION_LABEL])
 
     expect(screen.getByText(/Attack: \+5/)).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }),
-    ).toBeInTheDocument()
-    expect(screen.getByText(/Remaining after purchase/)).toBeInTheDocument()
-    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
+    expect(screen.queryByText(EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL)).toBeNull()
   })
 
-  it('styles the purchase section in a soft inset panel without a divider below quantity', () => {
+  it('omits the inventory summary when nothing is owned', () => {
     render(
       <EquipmentPickerItemDetails
         equipment={longswordItem.equipment}
         itemState={longswordItem.state}
         budget={equipmentPickerBudgetFixture}
-        ownedQuantity={0}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
+        ownership={EMPTY_EQUIPMENT_OWNERSHIP}
       />,
     )
 
-    const quantityRow = screen.getByText(EQUIPMENT_PICKER_PURCHASE_QUANTITY_LABEL).closest('div')
-    const purchasePanel = screen.getByRole('heading', {
-      name: EQUIPMENT_PICKER_PURCHASE_SECTION_LABEL,
+    expect(screen.queryByText(EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL)).toBeNull()
+  })
+
+  it('lists each ownership source and the total in a read-only panel', () => {
+    render(
+      <EquipmentPickerItemDetails
+        equipment={longswordItem.equipment}
+        itemState={longswordItem.state}
+        budget={equipmentPickerBudgetFixture}
+        ownership={ownedTwice}
+      />,
+    )
+
+    const panel = screen.getByRole('heading', {
+      name: EQUIPMENT_PICKER_INVENTORY_SUMMARY_LABEL,
     }).nextElementSibling
 
-    expect(quantityRow).not.toHaveClass('mb-4')
-    expect(purchasePanel).toHaveClass(equipmentPickerPurchaseInsetPanelClasses)
-    expect(quantityRow?.nextElementSibling?.textContent).toContain('Unit price')
-  })
-
-  it('shows owned stackable purchase controls while stack rules are permissive', () => {
-    render(
-      <EquipmentPickerItemDetails
-        equipment={longswordItem.equipment}
-        itemState={longswordItem.state}
-        budget={equipmentPickerBudgetFixture}
-        ownedQuantity={1}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
-        onRemoveFromInventory={vi.fn()}
-      />,
-    )
-
-    expect(screen.getByText(EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL)).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL }),
-    ).toBeInTheDocument()
-    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    ).toBeInTheDocument()
-  })
-
-  it('shows bundle copy for bundled adventuring gear purchases', () => {
-    const arrowsItem = {
-      equipment: equipmentPickerArrowsFixture,
-      searchDocument: {
-        id: equipmentPickerArrowsFixture.id,
-        fields: [{ key: 'combined', text: 'arrows ammunition', role: 'primary' as const }],
-      },
-      state: equipmentPickerItemsFixture[2]!.state,
-    }
-
-    render(
-      <EquipmentPickerItemDetails
-        equipment={arrowsItem.equipment}
-        itemState={arrowsItem.state}
-        budget={equipmentPickerBudgetFixture}
-        ownedQuantity={0}
-        addQuantity={2}
-        onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
-      />,
-    )
-
-    expect(screen.getByText('20 arrows per bundle')).toBeInTheDocument()
-  })
-
-  it('shows owned stackable purchase controls with remove actions', async () => {
-    const user = userEvent.setup()
-    const onCommit = vi.fn()
-    const onRemoveOneFromInventory = vi.fn()
-    const ropeItem = equipmentPickerItemsFixture[2]!
-
-    render(
-      <EquipmentPickerItemDetails
-        equipment={equipmentPickerRopeFixture}
-        itemState={ropeItem.state}
-        budget={equipmentPickerBudgetFixture}
-        ownedQuantity={2}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={onCommit}
-        onRemoveFromInventory={vi.fn()}
-        onRemoveOneFromInventory={onRemoveOneFromInventory}
-      />,
-    )
-
-    expect(screen.getByText(EQUIPMENT_PICKER_PURCHASE_INVENTORY_LABEL)).toBeInTheDocument()
-    expect(screen.getByText(/Quantity to add/)).toBeInTheDocument()
-    expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
-    ).toHaveClass('h-control-action-compact')
-
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_ADD_ANOTHER_LABEL }),
-    )
-    expect(onCommit).toHaveBeenCalledTimes(1)
-
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
-    )
-    expect(onRemoveOneFromInventory).toHaveBeenCalledTimes(1)
-  })
-
-  it('commits purchase from the body CTA', async () => {
-    const user = userEvent.setup()
-    const onCommit = vi.fn()
-
-    render(
-      <EquipmentPickerItemDetails
-        equipment={longswordItem.equipment}
-        itemState={longswordItem.state}
-        budget={equipmentPickerBudgetFixture}
-        ownedQuantity={0}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={onCommit}
-      />,
-    )
-
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
-    expect(onCommit).toHaveBeenCalledTimes(1)
+    expect(panel).toHaveClass(equipmentPickerInventorySummaryPanelClasses)
+    expect(screen.getByText('Package')).toBeInTheDocument()
+    expect(screen.getByText('×1 · 15 GP')).toBeInTheDocument()
+    expect(screen.getByText(EQUIPMENT_PICKER_INVENTORY_TOTAL_LABEL)).toBeInTheDocument()
+    expect(screen.getByText('×2')).toBeInTheDocument()
+    expect(panel!.querySelector('button')).toBeNull()
   })
 
   itAxe('has no axe accessibility violations', async () => {
@@ -196,10 +91,7 @@ describe('EquipmentPickerItemDetails', () => {
         equipment={longswordItem.equipment}
         itemState={longswordItem.state}
         budget={equipmentPickerBudgetFixture}
-        ownedQuantity={0}
-        addQuantity={1}
-        onAddQuantityChange={vi.fn()}
-        onCommit={vi.fn()}
+        ownership={ownedTwice}
       />,
     )
 

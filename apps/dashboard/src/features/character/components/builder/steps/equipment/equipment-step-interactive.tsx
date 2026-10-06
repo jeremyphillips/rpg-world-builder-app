@@ -89,7 +89,6 @@ export function EquipmentStepInteractive({
     budget,
     pickerBrowseSortContext,
     characterPreviewContext,
-    ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -102,8 +101,6 @@ export function EquipmentStepInteractive({
     setPickerOpen,
     handleAddItem,
     handleSetPurchaseQuantity,
-    handleRemoveFromInventory,
-    handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem,
   } = step
@@ -186,11 +183,10 @@ export function EquipmentStepInteractive({
         onOpenChange={setPickerOpen}
         items={step.pickerItems}
         browseSortContext={pickerBrowseSortContext}
-        budget={step.pickerWorkflowMode === 'purchase' ? budget : undefined}
+        budget={budget}
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
-        ownedPurchaseQuantities={ownedPurchaseQuantities}
-        ownedGrantQuantities={step.ownedGrantQuantities}
+        ownership={pickerAcquisition.ownership}
         workflowMode={step.pickerWorkflowMode}
         workflowModes={step.pickerWorkflowModes}
         onWorkflowModeChange={step.setPickerWorkflowMode}
@@ -200,14 +196,10 @@ export function EquipmentStepInteractive({
         onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
-        resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
-        grantAcquisitionContext={{ draft, context: step.context, catalogIndex }}
         onCommitAdd={pickerAcquisition.handleCommitAdd}
-        onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
-        onReleaseGrant={pickerAcquisition.handleReleaseGrant}
-        onRemovePurchase={pickerAcquisition.handleRemovePurchase}
-        onRemoveFromInventory={handleRemoveFromInventory}
-        onRemoveOneFromInventory={handleRemoveOneFromInventory}
+        onSetPurchasedQuantity={pickerAcquisition.handleSetPurchasedQuantity}
+        onReleaseChoice={pickerAcquisition.handleReleaseChoice}
+        onRemovePurchaseOne={pickerAcquisition.handleRemovePurchaseOne}
       />
 
       <ConfirmDialog

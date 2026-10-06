@@ -4,6 +4,7 @@ import {
   buildEquipmentPickerRowViewModel,
   CatalogEntityRow,
   CatalogMetadataRenderer,
+  type EntitySummaryProvenanceItem,
 } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit'
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
@@ -13,16 +14,20 @@ import {
   resolveSelectionRowStatusItems,
   type SelectionRowStatusTooltip,
 } from '../../../../lib/selection-row-status'
-import { EquipmentPickerCommerce } from './equipment-picker-commerce'
+import {
+  EQUIPMENT_PICKER_ADD_LABEL,
+  EquipmentPickerRowAcquisitionControl,
+} from './equipment-picker-row-acquisition-control'
 import { getEquipmentUnaffordableAmounts } from '../drawer/equipment-picker-drawer.lib'
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
 } from '../drawer/equipment-picker-drawer.types'
 import { EquipmentUnaffordableAffordanceTooltip } from '../status/equipment-unaffordable-affordance-tooltip'
-import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
-
-const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
+import type {
+  EquipmentPickerItemPresentation,
+  EquipmentPickerProvenanceSegment,
+} from './equipment-picker-item-header.lib'
 
 function affordabilityTooltip(
   item: EquipmentPickerItem,
@@ -38,23 +43,27 @@ function affordabilityTooltip(
 export type EquipmentPickerDisclosureRowProps = {
   rowArgs: CatalogPickerCollapsibleRowRenderArgs<EquipmentPickerItem>
   presentation: EquipmentPickerItemPresentation
-  ownedQuantity: number
   isGoldShoppingPath?: boolean
   budget?: EquipmentBudgetSummary
-  onCommit?: () => boolean
+  onCommitAdd?: () => boolean
+  onSetPurchasedQuantity?: (total: number) => void
+  onReleaseChoice?: (allowanceId: string) => void
+  onRemovePurchaseOne?: () => void
 }
 
 export function EquipmentPickerDisclosureRow({
   rowArgs,
   presentation,
-  ownedQuantity,
   isGoldShoppingPath = false,
   budget,
-  onCommit,
+  onCommitAdd,
+  onSetPurchasedQuantity,
+  onReleaseChoice,
+  onRemovePurchaseOne,
 }: EquipmentPickerDisclosureRowProps) {
   const { isPending, successQuantity, commitFailed, commitQuantity } =
     useEquipmentAcquisitionQuantityCommit({
-      commit: () => onCommit?.() ?? false,
+      commit: () => onCommitAdd?.() ?? false,
     })
 
   const item = rowArgs.item
@@ -70,32 +79,49 @@ export function EquipmentPickerDisclosureRow({
     }),
     { context: 'picker', statusTooltip: affordabilityTooltip(item, budget) },
   )
-  const addButtonLabel = resolveAcquisitionCommitButtonLabel({
-    isPending,
-    successQuantity,
-    primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
-  })
+
+  const toProvenanceItem = (
+    segment: EquipmentPickerProvenanceSegment,
+  ): EntitySummaryProvenanceItem => {
+    if (segment.kind === 'text') return { kind: 'text', label: segment.label }
+    return {
+      kind: 'action',
+      key: segment.key,
+      label: segment.label,
+      ariaLabel: segment.ariaLabel,
+      onAction: () => {
+        if (segment.target.kind === 'release_choice') onReleaseChoice?.(segment.target.allowanceId)
+        else onRemovePurchaseOne?.()
+      },
+    }
+  }
+
+  const provenance = presentation.provenance.map(toProvenanceItem)
 
   const trailing =
-    presentation.action.kind === 'add' ||
-    (presentation.action.kind === 'manage_only' && ownedQuantity > 0)
-      ? {
+    presentation.control.kind === 'none' && !presentation.priceSlot
+      ? undefined
+      : {
           kind: 'group' as const,
           primary: (
-            <EquipmentPickerCommerce
-              ownedQuantity={ownedQuantity}
-              showAdd={presentation.action.kind === 'add'}
-              disabled={presentation.action.kind === 'add' ? presentation.action.disabled : false}
-              buttonLabel={addButtonLabel}
+            <EquipmentPickerRowAcquisitionControl
+              control={presentation.control}
+              equipmentName={row.name}
+              addLabel={resolveAcquisitionCommitButtonLabel({
+                isPending,
+                successQuantity,
+                primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
+              })}
               isPending={isPending}
-              successQuantity={successQuantity}
               commitFailed={commitFailed}
               onAdd={() => commitQuantity(1)}
+              onSetPurchasedQuantity={(total) => onSetPurchasedQuantity?.(total)}
+              onRelease={(allowanceId) => onReleaseChoice?.(allowanceId)}
+              onRemovePurchase={() => onRemovePurchaseOne?.()}
             />
           ),
-          secondary: presentation.secondary,
+          ...(presentation.priceSlot ? { secondary: presentation.priceSlot } : {}),
         }
-      : undefined
 
   return (
     <CatalogEntityRow
@@ -118,7 +144,8 @@ export function EquipmentPickerDisclosureRow({
             })}
           />
         ),
-        status: status.length > 0 ? status : undefined,
+        ...(status.length > 0 ? { status } : {}),
+        ...(provenance.length > 0 ? { provenance } : {}),
         statusComposition: 'metadata',
       }}
       trailing={trailing}

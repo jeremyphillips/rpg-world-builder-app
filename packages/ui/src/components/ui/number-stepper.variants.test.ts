@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   numberStepperButtonVariants,
   numberStepperRootVariants,
+  numberStepperRootWidthClass,
   numberStepperPrefixedInputSlotWidthClasses,
   numberStepperPrefixedValueSlotWidthPx,
   numberStepperPrefixedWidthVariants,
@@ -53,6 +54,31 @@ describe('numberStepperWidthVariants', () => {
     expect(classes).toContain('disabled:text-input-disabled')
     expect(classes).toContain('disabled:[&_svg]:text-input-disabled')
     expect(classes).not.toContain('disabled:opacity-40')
+  })
+})
+
+describe('xs inline-row tier', () => {
+  it('keeps the button track flush with the root height', () => {
+    expect(numberStepperButtonVariants({ size: 'xs' })).toContain('size-6')
+    expect(numberStepperRootVariants({ size: 'xs' })).toContain('h-6')
+  })
+
+  it('bills the root width against a 3rem button track', () => {
+    expect(numberStepperRootWidthClass('xs', 1)).toBe(
+      `w-[calc(${numberStepperValueSlotWidthPx.xs[1]}px+3rem)]`,
+    )
+    expect(numberStepperRootWidthClass('xs', 1, '+')).toBe(
+      `w-[calc(${numberStepperPrefixedValueSlotWidthPx.xs[1]}px+3rem)]`,
+    )
+    expect(numberStepperRootWidthClass('sm', 1, '+')).toBe(
+      `w-[calc(${numberStepperPrefixedValueSlotWidthPx.sm[1]}px+4rem)]`,
+    )
+  })
+
+  it('carries the min-boundary remove treatment', () => {
+    const classes = numberStepperButtonVariants({ size: 'xs', minBoundary: 'remove' })
+    expect(classes).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(classes).toContain('hover:text-destructive')
   })
 })
 

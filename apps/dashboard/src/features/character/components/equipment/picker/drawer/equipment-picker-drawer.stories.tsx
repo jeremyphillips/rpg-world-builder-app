@@ -5,6 +5,7 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   builderPathGoldBudgetFixture,
   fighterGoldPathPickerItemsFixture,
@@ -147,8 +148,19 @@ export const OwnedStackable: Story = {
     onOpenChange: () => undefined,
     items: [equipmentPickerItemsFixture[2]!],
     budget: equipmentPickerBudgetFixture,
-    ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
+    ownership: new Map([
+      [
+        equipmentPickerRopeFixture.id,
+        {
+          ...EMPTY_EQUIPMENT_OWNERSHIP,
+          editablePurchased: { quantity: 2, spendCp: 200 },
+          totalQuantity: 2,
+          acquiredQuantity: 2,
+        },
+      ],
+    ]),
     onCommitAdd: () => undefined,
+    onSetPurchasedQuantity: () => undefined,
   },
   parameters: {
     docs: {

@@ -5,7 +5,10 @@ import {
   compareMagicItemBestMatch,
   formatMoney,
   isEquipmentPickerSupportedKind,
+  maxAffordableEquipmentQuantity,
   moneyToCopper,
+  resolveMagicItemAcquiredCopyCap,
+  EQUIPMENT_PURCHASE_QUANTITY_MAX,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
   type Money,
@@ -35,6 +38,7 @@ import {
   hasCatalogPickerResetViewCriteria,
 } from '../../../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
+import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   resolveEquipmentPickerItemPresentation,
   type EquipmentPickerItemPresentation,
@@ -450,43 +454,68 @@ export function isEquipmentPickerItemDisabled(
   return resolveEquipmentPickerPurchaseActionState(item, options).disabled
 }
 
+/** Aggregate ceiling for the purchase stepper: structural cap ∧ what the purse still covers. */
+export function resolveMaxPurchaseAggregate(args: {
+  equipment: EquipmentPickerItem['equipment']
+  ownership: EquipmentOwnership
+  budget?: EquipmentBudgetSummary
+}): number {
+  const purchased = args.ownership.editablePurchased.quantity
+  if (!canPurchaseEquipment(args.equipment)) return purchased
+
+  const structuralMax = EQUIPMENT_PURCHASE_QUANTITY_MAX - args.ownership.lockedPurchased.quantity
+  if (!args.budget) return Math.max(purchased, structuralMax)
+
+  return Math.min(
+    structuralMax,
+    maxAffordableEquipmentQuantity(args.equipment, args.budget, purchased),
+  )
+}
+
 export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   item: EquipmentPickerItem
   workflowMode: EquipmentPickerWorkflowMode
-  ownedQuantity?: number
+  ownership: EquipmentOwnership
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
 }): EquipmentPickerItemPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
-  const ownedQuantity = args.ownedQuantity ?? 0
+  const copyCap = resolveMagicItemAcquiredCopyCap({
+    equipment: args.item.equipment,
+    acquiredQuantity: args.ownership.acquiredQuantity,
+  })
 
-  if (!args.rowActionVm) {
-    if (args.workflowMode === 'purchase') {
-      const action = resolveEquipmentPickerPurchaseActionState(args.item, {
-        budget: args.budget,
-        contentAvailable: true,
-      })
-      return {
-        ...(row.priceLabel ? { secondary: { kind: 'price', label: row.priceLabel } } : {}),
-        action:
-          action.reason === 'unaffordable'
-            ? { kind: 'add', disabled: true }
-            : action.disabled
-              ? ownedQuantity > 0
-                ? { kind: 'manage_only' }
-                : { kind: 'add', disabled: true }
-              : { kind: 'add', disabled: false },
-      }
+  const rowActionVm =
+    args.rowActionVm ??
+    (args.workflowMode === 'purchase'
+      ? ({
+          kind: 'purchase',
+          disabled: resolveEquipmentPickerPurchaseActionState(args.item, {
+            budget: args.budget,
+            contentAvailable: true,
+          }).disabled,
+          availability: args.item.state.purchaseAvailability,
+        } satisfies EquipmentPickerRowActionViewModel)
+      : undefined)
+
+  if (!rowActionVm) {
+    return {
+      control: { kind: 'none' },
+      provenance: [],
     }
-
-    return { action: { kind: 'none' } }
   }
 
   return resolveEquipmentPickerItemPresentation({
     equipment: args.item.equipment,
     row,
     workflowMode: args.workflowMode,
-    rowActionVm: args.rowActionVm,
-    ownedQuantity,
+    rowActionVm,
+    ownership: args.ownership,
+    ...(copyCap ? { copyCap } : {}),
+    maxPurchaseQuantity: resolveMaxPurchaseAggregate({
+      equipment: args.item.equipment,
+      ownership: args.ownership,
+      ...(args.budget ? { budget: args.budget } : {}),
+    }),
   })
 }

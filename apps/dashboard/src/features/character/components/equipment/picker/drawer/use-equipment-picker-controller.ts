@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { useSanitizedFilterState } from '@rpg/ui/filters'
-import { isEquipmentPickerSupportedKind, isEquipmentStackable } from '@rpg/contracts'
+import { isEquipmentPickerSupportedKind } from '@rpg/contracts'
 
 import {
   filterAndSortEquipmentPickerItems,
@@ -25,19 +25,15 @@ import {
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
-import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 
 export type UseEquipmentPickerControllerArgs = Pick<
   EquipmentPickerDrawerProps,
-  | 'open'
   | 'items'
   | 'browseSortContext'
   | 'budget'
   | 'allowedKinds'
   | 'filterOutUnaffordable'
   | 'filterOutNonProficient'
-  | 'ownedPurchaseQuantities'
-  | 'ownedGrantQuantities'
   | 'workflowMode'
   | 'magicItemGrantProgress'
   | 'focusedAllowanceId'
@@ -47,15 +43,12 @@ export type UseEquipmentPickerControllerArgs = Pick<
 }
 
 export function useEquipmentPickerController({
-  open,
   items,
   browseSortContext,
   budget,
   allowedKinds,
   filterOutUnaffordable = false,
   filterOutNonProficient = false,
-  ownedPurchaseQuantities = {},
-  ownedGrantQuantities = {},
   workflowMode = 'purchase',
   magicItemGrantProgress,
   focusedAllowanceId,
@@ -89,16 +82,6 @@ export function useEquipmentPickerController({
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
-  const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
-  const [trackedOpen, setTrackedOpen] = React.useState(open)
-
-  if (open !== trackedOpen) {
-    setTrackedOpen(open)
-    if (!open) {
-      setAddQuantities({})
-    }
-  }
-
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&
@@ -222,43 +205,10 @@ export function useEquipmentPickerController({
     onFocusedAllowanceIdChange?.(undefined)
   }, [onFocusedAllowanceIdChange])
 
-  const resolveOwnedQuantity = React.useCallback(
-    (item: EquipmentPickerItem, workflow: EquipmentPickerWorkflowMode) =>
-      workflow === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
-        ? (ownedGrantQuantities[item.equipment.id] ?? 0)
-        : (ownedPurchaseQuantities[item.equipment.id] ?? 0),
-    [ownedGrantQuantities, ownedPurchaseQuantities],
-  )
-
-  const resetAddQuantityAfterCommit = React.useCallback((item: EquipmentPickerItem) => {
-    if (!isEquipmentStackable(item.equipment)) return
-    setAddQuantities((current) => ({ ...current, [item.equipment.id]: 1 }))
-  }, [])
-
   const handleHeaderCommit = React.useCallback(
-    (item: EquipmentPickerItem): boolean => {
-      const result = onCommitAdd(item, 1)
-      resetAddQuantityAfterCommit(item)
-      return result !== false
-    },
-    [onCommitAdd, resetAddQuantityAfterCommit],
+    (item: EquipmentPickerItem): boolean => onCommitAdd(item) !== false,
+    [onCommitAdd],
   )
-
-  const handleCommitAdd = React.useCallback(
-    (item: EquipmentPickerItem): boolean => {
-      const quantity = addQuantities[item.equipment.id] ?? 1
-      const applied = onCommitAdd(item, quantity) !== false
-      if (applied) {
-        resetAddQuantityAfterCommit(item)
-      }
-      return applied
-    },
-    [addQuantities, onCommitAdd, resetAddQuantityAfterCommit],
-  )
-
-  const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
-    setAddQuantities((current) => ({ ...current, [itemKey]: quantity }))
-  }, [])
 
   return {
     isMagicItemsWorkflow,
@@ -274,13 +224,9 @@ export function useEquipmentPickerController({
     showAffordableOnly,
     sortMode,
     setSortMode,
-    addQuantities,
     handleFilterStateChange,
     handleClearStructuredFilters,
     resetBrowseView,
-    resolveOwnedQuantity,
     handleHeaderCommit,
-    handleCommitAdd,
-    handleAddQuantityChange,
   }
 }

@@ -55,6 +55,11 @@ export type {
   EntitySummaryStatusText,
 } from './lib/entity/summary/entity-summary-status.types'
 export type {
+  EntitySummaryProvenanceAction,
+  EntitySummaryProvenanceItem,
+  EntitySummaryProvenanceText,
+} from './lib/entity/summary/entity-summary-provenance.types'
+export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
 } from './lib/entity/anatomy/entity-anatomy-trailing.types'

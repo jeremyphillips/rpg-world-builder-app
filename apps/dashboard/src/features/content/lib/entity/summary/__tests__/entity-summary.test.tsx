@@ -175,12 +175,80 @@ describe('EntitySummaryStatus', () => {
       )
 
       expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
-      expect(container.querySelector('button')).toBeNull()
+      expect(container.querySelector('[data-entity-summary-status] button')).toBeNull()
     })
 
     itAxe('has no axe violations', async () => {
       const { container } = render(
         <EntitySummaryStatus density="compact" composition="metadata" items={items} />,
+      )
+      await expectNoAxeViolations(container)
+    })
+  })
+
+  describe('provenance', () => {
+    const provenance = [
+      { kind: 'text', label: 'Package ×2' },
+      {
+        kind: 'action',
+        key: 'release:uncommon',
+        label: 'Release one',
+        ariaLabel: 'Release one Uncommon choice',
+        onAction: () => undefined,
+      },
+    ] as const
+
+    it('renders the provenance group before the status group on one line', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          provenance={provenance}
+          items={[{ kind: 'badge', label: 'Not proficient', tone: 'warning' }]}
+        />,
+      )
+
+      const segments = [...container.querySelectorAll('[data-entity-summary-provenance]')]
+      expect(segments.map((segment) => segment.textContent)).toEqual(['Package ×2', 'Release one'])
+      expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(2)
+      expect(
+        segments[0]!.compareDocumentPosition(
+          container.querySelector('[data-entity-summary-status]')!,
+        ) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
+
+    it('keeps inline actions out of the status group', () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          provenance={provenance}
+          items={[{ kind: 'badge', label: 'Not proficient', tone: 'warning' }]}
+        />,
+      )
+
+      expect(container.querySelector('[data-entity-summary-status] button')).toBeNull()
+      expect(container.querySelector('[data-entity-summary-provenance] button')).not.toBeNull()
+    })
+
+    it('uses the metadata line even when composition defaults to cluster', () => {
+      const { container } = render(
+        <EntitySummaryStatus density="compact" items={[]} provenance={provenance} />,
+      )
+
+      expect(container.querySelector('[data-entity-summary-status-row]')).toBeNull()
+      expect(screen.getByRole('button', { name: 'Release one Uncommon choice' })).toBeEnabled()
+    })
+
+    itAxe('has no axe violations', async () => {
+      const { container } = render(
+        <EntitySummaryStatus
+          density="compact"
+          composition="metadata"
+          provenance={provenance}
+          items={[{ kind: 'badge', label: 'Not proficient', tone: 'warning' }]}
+        />,
       )
       await expectNoAxeViolations(container)
     })

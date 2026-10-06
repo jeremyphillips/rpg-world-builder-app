@@ -58,6 +58,11 @@ export const CompactBorderless: Story = {
   args: { size: 'sm', bordered: false },
 }
 
+/** The `xs` track paired with the `+` adornment, as the picker header stepper renders it. */
+export const InlineRowAdditional: Story = {
+  args: { size: 'xs', valuePrefix: '+', digits: 1, min: 1, max: 9 },
+}
+
 /** Leading plus for a purchase stacked on another source. The input value stays numeric. */
 export const AdditionalQuantity: Story = {
   args: { valuePrefix: '+' },

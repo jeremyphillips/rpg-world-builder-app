@@ -137,7 +137,7 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(screen.getByText('+1')).toBeInTheDocument()
   })
 
-  it('splits group into a band primary and a meta secondary', () => {
+  it('renders the group secondary inline in the band cell, before the control', () => {
     const { slot } = renderAnatomy({
       trailing: {
         kind: 'group',
@@ -146,9 +146,11 @@ describe('EntityAnatomy trailing kind to cell', () => {
       },
     })
 
-    expect(cellOf(slot('trailing'))).toEqual({ slot: 'band', column: 'trailing' })
-    expect(cellOf(slot('trailing-secondary'))).toEqual({ slot: 'meta', column: 'trailing' })
-    expect(slot('trailing-secondary')).toHaveTextContent('30 GP')
+    const trailing = slot('trailing')
+    expect(cellOf(trailing)).toEqual({ slot: 'band', column: 'trailing' })
+    expect(trailing).toHaveTextContent('30 GP')
+    expect(slot('trailing-secondary')?.textContent).toBe('30 GP')
+    expect(trailing?.textContent).toBe('30 GPAdd')
   })
 
   it('centers trailing meta with its control without offsetting the cell', () => {

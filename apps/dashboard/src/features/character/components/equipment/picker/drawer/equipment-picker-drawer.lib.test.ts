@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { moneyToCopper, wealthToCopper } from '@rpg/contracts'
+
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
+
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
@@ -23,6 +27,7 @@ import {
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
+  resolveMaxPurchaseAggregate,
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
@@ -115,24 +120,40 @@ describe('equipment-picker-drawer.lib', () => {
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
   })
 
-  it('keeps disabled add on owned and unowned unaffordable purchase fallbacks', () => {
+  it('keeps disabled add on unaffordable purchase fallbacks', () => {
     const unaffordable = equipmentPickerDefaultPathItemsFixture[1]!
 
     expect(
       resolveEquipmentPickerDrawerItemHeaderPresentation({
         item: unaffordable,
         workflowMode: 'purchase',
-        ownedQuantity: 1,
-      }).action,
+        ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      }).control,
     ).toEqual({ kind: 'add', disabled: true })
+  })
+
+  it('pins the stepper ceiling to what the remaining purse covers', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+    const ownership = {
+      ...EMPTY_EQUIPMENT_OWNERSHIP,
+      editablePurchased: { quantity: 1, spendCp: 1500 },
+      totalQuantity: 1,
+      acquiredQuantity: 1,
+    }
 
     expect(
-      resolveEquipmentPickerDrawerItemHeaderPresentation({
-        item: unaffordable,
-        workflowMode: 'purchase',
-        ownedQuantity: 0,
-      }).action,
-    ).toEqual({ kind: 'add', disabled: true })
+      resolveMaxPurchaseAggregate({
+        equipment: longsword.equipment,
+        ownership,
+        budget: equipmentPickerBudgetFixture,
+      }),
+    ).toBe(
+      1 +
+        Math.floor(
+          wealthToCopper(equipmentPickerBudgetFixture.remaining) /
+            moneyToCopper(longsword.equipment.cost!),
+        ),
+    )
   })
 
   it('keeps remaining-unaffordable rows visible but disables purchase', () => {

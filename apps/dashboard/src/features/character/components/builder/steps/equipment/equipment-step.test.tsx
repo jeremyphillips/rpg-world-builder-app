@@ -39,7 +39,6 @@ import {
   EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
-import { EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL } from '../../../equipment/picker/purchase/equipment-picker-purchase.lib'
 import { EquipmentStep } from './equipment-step'
 
 const context = createStandaloneBuilderContextFixture({
@@ -413,7 +412,7 @@ describe('EquipmentStep', () => {
     expect(screen.getByText(equipmentStepLeatherArmorFixture.name)).toBeInTheDocument()
   })
 
-  it('commits multi-quantity stackable purchases from the picker body', async () => {
+  it('raises the purchased aggregate from the picker card header stepper', async () => {
     const user = userEvent.setup()
     const rationsId = equipmentStepRationsFixture.id
     const draft = {
@@ -437,14 +436,7 @@ describe('EquipmentStep', () => {
       .getAllByRole('listitem')
       .find((row) => within(row).queryByText(equipmentStepRationsFixture.name))!
 
-    await user.click(
-      within(rationsRow).getByRole('button', {
-        name: `Expand ${equipmentStepRationsFixture.name}`,
-      }),
-    )
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rations' }))
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rations' }))
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
+    await user.click(within(rationsRow).getByRole('button', { name: 'Add' }))
 
     expect(onDraftChange).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -452,7 +444,7 @@ describe('EquipmentStep', () => {
           purchases: [
             expect.objectContaining({
               equipmentId: rationsId,
-              quantity: 3,
+              quantity: 1,
               sourceMode: 'startingGold',
               origin: 'picker',
               id: expect.any(String),

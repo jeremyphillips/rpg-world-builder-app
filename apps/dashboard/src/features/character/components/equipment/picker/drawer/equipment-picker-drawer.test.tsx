@@ -36,10 +36,26 @@ import {
   wizardGoldPathPickerItemsFixture,
 } from './equipment-picker-builder-path.fixtures'
 import {
-  EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL,
-  EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL,
-} from '../purchase/equipment-picker-purchase.lib'
+  EMPTY_EQUIPMENT_OWNERSHIP,
+  type EquipmentPickerOwnershipIndex,
+} from '../../../../lib/equipment/equipment-ownership-index.lib'
+
+function ownershipWithPurchase(
+  equipmentId: string,
+  quantity: number,
+): EquipmentPickerOwnershipIndex {
+  return new Map([
+    [
+      equipmentId,
+      {
+        ...EMPTY_EQUIPMENT_OWNERSHIP,
+        editablePurchased: { quantity, spendCp: 0 },
+        totalQuantity: quantity,
+        acquiredQuantity: quantity,
+      },
+    ],
+  ])
+}
 
 beforeAll(() => {
   if (!HTMLElement.prototype.hasPointerCapture) {
@@ -452,7 +468,6 @@ describe('EquipmentPickerDrawer', () => {
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
         filterOutUnaffordable={false}
-        ownedPurchaseQuantities={{}}
         onCommitAdd={onCommitAdd}
       />,
     )
@@ -460,7 +475,7 @@ describe('EquipmentPickerDrawer', () => {
     const list = screen.getByRole('list')
     await user.click(within(list).getAllByRole('button', { name: 'Add' })[0]!)
 
-    expect(onCommitAdd).toHaveBeenCalledWith(cheapGear, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(cheapGear)
     expect(screen.getByText('Cheap Gear')).toBeInTheDocument()
   })
 
@@ -481,58 +496,12 @@ describe('EquipmentPickerDrawer', () => {
     const ropeRow = equipmentPickerItemsFixture[2]!
 
     await user.click(screen.getByRole('button', { name: 'Add' }))
-    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
+    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow)
   })
 
-  it('commits purchase quantity from the expanded body', async () => {
+  it('swaps Add for the aggregate stepper once the item is purchased', async () => {
     const user = userEvent.setup()
-    const onCommitAdd = vi.fn()
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={[equipmentPickerItemsFixture[2]!]}
-        budget={equipmentPickerBudgetFixture}
-        onCommitAdd={onCommitAdd}
-      />,
-    )
-
-    const ropeRow = equipmentPickerItemsFixture[2]!
-
-    await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
-
-    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
-  })
-
-  it('commits purchase quantity greater than one for stackable gear', async () => {
-    const user = userEvent.setup()
-    const onCommitAdd = vi.fn()
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={[equipmentPickerItemsFixture[2]!]}
-        budget={equipmentPickerBudgetFixture}
-        onCommitAdd={onCommitAdd}
-      />,
-    )
-
-    const ropeRow = equipmentPickerItemsFixture[2]!
-
-    await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rope' }))
-    await user.click(screen.getByRole('button', { name: 'Increase Quantity to add for Rope' }))
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_COMMIT_LABEL }))
-
-    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 3)
-  })
-
-  it('shows owned quantity badge and Add for owned stackables', async () => {
-    const user = userEvent.setup()
-    const onCommitAdd = vi.fn()
+    const onSetPurchasedQuantity = vi.fn()
     const ropeRow = equipmentPickerItemsFixture[2]!
 
     render(
@@ -541,49 +510,42 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[ropeRow]}
         budget={equipmentPickerBudgetFixture}
-        ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
-        onCommitAdd={onCommitAdd}
-      />,
-    )
-
-    const addButton = screen.getByRole('button', { name: 'Add' })
-    expect(addButton.parentElement).toHaveTextContent('2')
-    await user.click(addButton)
-    expect(onCommitAdd).toHaveBeenCalledWith(ropeRow, 1)
-  })
-
-  it('wires remove handlers from the expanded owned stackable body', async () => {
-    const user = userEvent.setup()
-    const onRemoveFromInventory = vi.fn()
-    const onRemoveOneFromInventory = vi.fn()
-    const ropeRow = equipmentPickerItemsFixture[2]!
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={[ropeRow]}
-        budget={equipmentPickerBudgetFixture}
-        ownedPurchaseQuantities={{ [ropeRow.equipment.id]: 2 }}
+        ownership={ownershipWithPurchase(ropeRow.equipment.id, 2)}
         onCommitAdd={vi.fn()}
-        onRemoveFromInventory={onRemoveFromInventory}
-        onRemoveOneFromInventory={onRemoveOneFromInventory}
+        onSetPurchasedQuantity={onSetPurchasedQuantity}
       />,
     )
 
-    await user.click(screen.getByRole('button', { name: 'Expand Rope' }))
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ONE_LABEL }),
-    )
-    await user.click(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_PURCHASE_REMOVE_ALL_LABEL }),
-    )
+    expect(screen.queryByRole('button', { name: 'Add' })).toBeNull()
+    const stepper = screen.getByRole('spinbutton', { name: 'Purchased quantity of Rope' })
+    expect(stepper).toHaveValue(2)
 
-    expect(onRemoveOneFromInventory).toHaveBeenCalledWith(ropeRow)
-    expect(onRemoveFromInventory).toHaveBeenCalledWith(ropeRow)
+    await user.click(screen.getByRole('button', { name: 'Increase Purchased quantity of Rope' }))
+    expect(onSetPurchasedQuantity).toHaveBeenCalledWith(ropeRow, 3)
   })
 
-  it('shows owned quantity badge and Add for owned items while stack rules are permissive', () => {
+  it('drops the aggregate to zero from the stepper remove affordance', async () => {
+    const user = userEvent.setup()
+    const onSetPurchasedQuantity = vi.fn()
+    const ropeRow = equipmentPickerItemsFixture[2]!
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={[ropeRow]}
+        budget={equipmentPickerBudgetFixture}
+        ownership={ownershipWithPurchase(ropeRow.equipment.id, 1)}
+        onCommitAdd={vi.fn()}
+        onSetPurchasedQuantity={onSetPurchasedQuantity}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Remove purchased Rope' }))
+    expect(onSetPurchasedQuantity).toHaveBeenCalledWith(ropeRow, 0)
+  })
+
+  it('lists owned provenance on the row instead of an owned-count badge', () => {
     const longsword = equipmentPickerItemsFixture[0]!
 
     render(
@@ -592,7 +554,14 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        ownedPurchaseQuantities={{ [longsword.equipment.id]: 1 }}
+        ownership={
+          new Map([
+            [
+              longsword.equipment.id,
+              { ...EMPTY_EQUIPMENT_OWNERSHIP, packageQuantity: 1, totalQuantity: 1 },
+            ],
+          ])
+        }
         onCommitAdd={vi.fn()}
       />,
     )
@@ -601,9 +570,9 @@ describe('EquipmentPickerDrawer', () => {
     const longswordRow = within(list)
       .getByText('Longsword')
       .closest('[role="listitem"]') as HTMLElement
-    const addButton = within(longswordRow).getByRole('button', { name: 'Add' })
-    expect(addButton.parentElement).toHaveTextContent('1')
-    expect(addButton).toBeInTheDocument()
+
+    expect(within(longswordRow).getByText('Package')).toBeInTheDocument()
+    expect(within(longswordRow).getByRole('button', { name: 'Add' })).toBeInTheDocument()
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {

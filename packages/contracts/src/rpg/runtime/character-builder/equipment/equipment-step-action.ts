@@ -17,6 +17,12 @@ export type EquipmentStepRemoveTarget =
 
 export type EquipmentStepAction =
   | { kind: 'set_purchase_quantity'; purchaseId: string; quantity: number }
+  /**
+   * Target aggregate across an item's editable purchase records. Increments merge
+   * through the purchase intent; decrements drain picker-origin records newest
+   * first. Locked records are never touched, so the floor is 0.
+   */
+  | { kind: 'set_equipment_purchased_quantity'; equipmentId: string; quantity: number }
   | { kind: 'skip_starting_equipment' }
   | {
       kind: 'select_package'

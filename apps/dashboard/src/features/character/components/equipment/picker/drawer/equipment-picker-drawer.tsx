@@ -34,6 +34,7 @@ import { resolveEquipmentPickerHeaderResource } from './equipment-picker-header-
 import { equipmentPickerHeaderExtraStackClasses } from './equipment-picker-drawer.variants'
 import { EquipmentPickerItemDetails } from '../details/equipment-picker-item-details'
 import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclosure-row'
+import { getEquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 
@@ -126,8 +127,7 @@ export function EquipmentPickerDrawer({
   filterOutNonProficient = false,
   showCharacterPreview = false,
   characterPreviewContext,
-  ownedPurchaseQuantities = {},
-  ownedGrantQuantities = {},
+  ownership,
   workflowMode = 'purchase',
   workflowModes = ['purchase'],
   onWorkflowModeChange,
@@ -138,25 +138,18 @@ export function EquipmentPickerDrawer({
   toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
   resolveRowActionViewModel,
-  resolveGrantManageSources,
-  grantAcquisitionContext,
   onCommitAdd,
-  onApplyMagicItemAcquisition,
-  onReleaseGrant,
-  onRemovePurchase,
-  onRemoveFromInventory,
-  onRemoveOneFromInventory,
+  onSetPurchasedQuantity,
+  onReleaseChoice,
+  onRemovePurchaseOne,
 }: EquipmentPickerDrawerProps) {
   const picker = useEquipmentPickerController({
-    open,
     items,
     browseSortContext,
     budget,
     allowedKinds,
     filterOutUnaffordable,
     filterOutNonProficient,
-    ownedPurchaseQuantities,
-    ownedGrantQuantities,
     workflowMode,
     magicItemGrantProgress,
     focusedAllowanceId,
@@ -280,73 +273,38 @@ export function EquipmentPickerDrawer({
       }}
       renderEntityRow={(rowArgs) => {
         const item = rowArgs.item
-        const rowActionVm = resolveRowVm(item, 1)
-        const ownedQuantity = picker.resolveOwnedQuantity(item, workflowMode)
+        const itemOwnership = getEquipmentOwnership(ownership, item.equipment.id)
         const presentation = resolveEquipmentPickerDrawerItemHeaderPresentation({
           item,
           workflowMode,
-          ownedQuantity,
-          rowActionVm,
+          ownership: itemOwnership,
+          rowActionVm: resolveRowVm(item, 1),
           budget: picker.effectiveBudget,
         })
-        const canQuickAdd = presentation.action.kind === 'add' && !presentation.action.disabled
 
         return (
           <EquipmentPickerDisclosureRow
             rowArgs={rowArgs}
             presentation={presentation}
-            ownedQuantity={ownedQuantity}
             isGoldShoppingPath={isGoldShoppingPath}
             budget={picker.effectiveBudget}
-            onCommit={canQuickAdd ? () => picker.handleHeaderCommit(item) : undefined}
+            onCommitAdd={() => picker.handleHeaderCommit(item)}
+            onSetPurchasedQuantity={(total) => onSetPurchasedQuantity?.(item, total)}
+            onReleaseChoice={(allowanceId) => onReleaseChoice?.(item, allowanceId)}
+            onRemovePurchaseOne={() => onRemovePurchaseOne?.(item)}
           />
         )
       }}
-      renderItemDetails={(item) => {
-        const addQuantity = picker.addQuantities[item.equipment.id] ?? 1
-        const rowActionVm = resolveRowVm(item, addQuantity)
-        const manageSources = resolveGrantManageSources?.(item.equipment.id) ?? {
-          grants: [],
-          purchases: [],
-        }
-        const ownedQuantity = picker.resolveOwnedQuantity(item, workflowMode)
-
-        return (
-          <EquipmentPickerItemDetails
-            equipment={item.equipment}
-            itemState={item.state}
-            budget={picker.effectiveBudget}
-            ownedQuantity={ownedQuantity}
-            addQuantity={addQuantity}
-            onAddQuantityChange={(quantity) =>
-              picker.handleAddQuantityChange(item.equipment.id, quantity)
-            }
-            onCommit={() => picker.handleCommitAdd(item)}
-            onRemoveFromInventory={
-              onRemoveFromInventory ? () => onRemoveFromInventory(item) : undefined
-            }
-            onRemoveOneFromInventory={
-              onRemoveOneFromInventory ? () => onRemoveOneFromInventory(item) : undefined
-            }
-            showCharacterPreview={showCharacterPreview}
-            characterPreviewContext={characterPreviewContext}
-            rowActionVm={rowActionVm}
-            manageSources={manageSources}
-            grantAcquisitionContext={grantAcquisitionContext}
-            onApplyMagicItemAcquisition={
-              onApplyMagicItemAcquisition
-                ? (requestedQuantity) =>
-                    onApplyMagicItemAcquisition({
-                      equipmentId: item.equipment.id,
-                      requestedQuantity,
-                    })
-                : undefined
-            }
-            onReleaseGrant={onReleaseGrant}
-            onRemovePurchase={onRemovePurchase}
-          />
-        )
-      }}
+      renderItemDetails={(item) => (
+        <EquipmentPickerItemDetails
+          equipment={item.equipment}
+          itemState={item.state}
+          budget={picker.effectiveBudget}
+          ownership={getEquipmentOwnership(ownership, item.equipment.id)}
+          showCharacterPreview={showCharacterPreview}
+          characterPreviewContext={characterPreviewContext}
+        />
+      )}
     />
   )
 }

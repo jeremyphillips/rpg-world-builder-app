@@ -10,21 +10,13 @@ import {
   resolveEquipmentPickerCharacterPreviewLines,
   type EquipmentPickerCharacterPreviewContext,
 } from './equipment-picker-character-preview.lib'
-import { EquipmentPickerAcquisitionPanel } from '../purchase/equipment-picker-acquisition-panel'
-import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import {
-  buildEquipmentPickerItemDetailsViewModels,
-  resolveEquipmentPickerItemDetailsDisabled,
-} from './equipment-picker-item-details.lib'
+import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import type {
   EquipmentBudgetSummary,
-  EquipmentPickerDrawerProps,
   EquipmentPickerItemState,
 } from '../drawer/equipment-picker-drawer.types'
-import {
-  EquipmentPickerCharacterPreviewSection,
-  type EquipmentPickerGrantManageSource,
-} from './equipment-picker-item-details-sections'
+import { EquipmentPickerCharacterPreviewSection } from './equipment-picker-item-details-sections'
+import { EquipmentPickerInventorySummary } from './equipment-picker-inventory-summary'
 import {
   equipmentPickerItemDetailsPurchaseSectionClasses,
   equipmentPickerItemDetailsSectionClasses,
@@ -34,41 +26,18 @@ export type EquipmentPickerItemDetailsProps = {
   equipment: Equipment
   itemState: EquipmentPickerItemState
   budget?: EquipmentBudgetSummary
-  ownedQuantity: number
-  addQuantity: number
-  onAddQuantityChange: (quantity: number) => void
-  onCommit: () => void
-  onRemoveFromInventory?: () => void
-  onRemoveOneFromInventory?: () => void
+  ownership: EquipmentOwnership
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
-  rowActionVm?: EquipmentPickerRowActionViewModel
-  manageSources?: EquipmentPickerGrantManageSource
-  grantAcquisitionContext?: EquipmentPickerDrawerProps['grantAcquisitionContext']
-  onApplyMagicItemAcquisition?: (requestedQuantity: number) => boolean
-  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
-  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
 }
 
-/** Expanded equipment picker body — metadata, optional character preview, and acquisition panel. */
+/** Expanded equipment picker body — metadata, optional character preview, ownership ledger. */
 export function EquipmentPickerItemDetails({
   equipment,
   itemState,
-  budget,
-  ownedQuantity,
-  addQuantity,
-  onAddQuantityChange,
-  onCommit,
-  onRemoveFromInventory,
-  onRemoveOneFromInventory,
+  ownership,
   showCharacterPreview = false,
   characterPreviewContext,
-  rowActionVm,
-  manageSources,
-  grantAcquisitionContext,
-  onApplyMagicItemAcquisition,
-  onReleaseGrant,
-  onRemovePurchase,
 }: EquipmentPickerItemDetailsProps) {
   const detailViewModel = buildEquipmentDetailViewModel(equipment)
   const previewContext =
@@ -80,14 +49,6 @@ export function EquipmentPickerItemDetails({
     resolveEquipmentPickerCharacterPreviewLines(equipment, previewContext, {
       isProficient: itemState.isProficient,
     })
-  const purchaseDisabled = resolveEquipmentPickerItemDetailsDisabled({ rowActionVm, itemState })
-  const { purchaseViewModel, grantViewModel } = buildEquipmentPickerItemDetailsViewModels({
-    equipment,
-    rowActionVm,
-    addQuantity,
-    budget,
-    ownedQuantity,
-  })
 
   return (
     <div className={equipmentPickerItemDetailsSectionClasses}>
@@ -106,27 +67,11 @@ export function EquipmentPickerItemDetails({
         />
       ) : null}
 
-      <div className={equipmentPickerItemDetailsPurchaseSectionClasses}>
-        <EquipmentPickerAcquisitionPanel
-          equipment={equipment}
-          rowActionVm={rowActionVm}
-          manageSources={manageSources}
-          grantAcquisitionContext={grantAcquisitionContext}
-          budget={budget}
-          purchaseViewModel={purchaseViewModel}
-          grantViewModel={grantViewModel}
-          ownedQuantity={ownedQuantity}
-          purchaseDisabled={purchaseDisabled}
-          addQuantity={addQuantity}
-          onAddQuantityChange={onAddQuantityChange}
-          onCommit={onCommit}
-          onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
-          onReleaseGrant={onReleaseGrant}
-          onRemovePurchase={onRemovePurchase}
-          onRemoveFromInventory={onRemoveFromInventory}
-          onRemoveOneFromInventory={onRemoveOneFromInventory}
-        />
-      </div>
+      {ownership.totalQuantity > 0 ? (
+        <div className={equipmentPickerItemDetailsPurchaseSectionClasses}>
+          <EquipmentPickerInventorySummary equipmentId={equipment.id} ownership={ownership} />
+        </div>
+      ) : null}
     </div>
   )
 }

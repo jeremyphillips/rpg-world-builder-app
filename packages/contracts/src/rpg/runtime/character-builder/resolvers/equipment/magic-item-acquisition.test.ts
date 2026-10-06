@@ -688,6 +688,7 @@ describe('magic item acquisition contracts', () => {
     expect(state).toEqual({
       kind: 'purchase',
       availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
+      magicItemAcquiredCopyCap: { max: 1, used: 0 },
     })
   })
 

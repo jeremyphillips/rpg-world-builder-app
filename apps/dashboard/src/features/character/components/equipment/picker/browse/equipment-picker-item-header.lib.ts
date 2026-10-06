@@ -1,5 +1,6 @@
-import type { Equipment, MagicItemRarity } from '@rpg/contracts'
-import { getMagicItemRarityLabel } from '@rpg/contracts'
+import type { Equipment, MagicItemAcquiredCopyCap, MagicItemRarity } from '@rpg/contracts'
+import { copperToDisplayWealth, formatWealth, getMagicItemRarityLabel } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type {
   EntityAnatomyTrailingSecondary,
@@ -8,36 +9,72 @@ import type {
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
+  EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
+  EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL,
+  EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
+  EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
+  formatEquipmentInventorySourceQuantity,
+} from '../../../../lib/equipment/equipment-step.lib'
+import {
+  formatMagicItemChoiceLabel,
+  formatMagicItemChoiceRarityPhrase,
+} from '../../../../lib/equipment/magic-item-choice-label.lib'
+import type {
+  EquipmentOwnership,
+  EquipmentOwnershipChoice,
+} from '../../../../lib/equipment/equipment-ownership-index.lib'
+import {
   selectionBlocker,
   type SelectionBlockerReason,
   type SelectionStatusEntry,
 } from '../../../../lib/selection-row-status'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import { formatGrantPreviewLine } from '../../acquisition/equipment-acquisition-panel.lib'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
   EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
 } from '../drawer/equipment-picker-drawer.types'
 
+export const EQUIPMENT_PICKER_PURCHASED_LABEL = 'Purchased'
+export const EQUIPMENT_PICKER_CONVERTED_LABEL = 'Converted'
+
 /**
- * Header action for an equipment picker row.
+ * The single acquisition affordance in the card header.
  *
- * - `add` — additional acquisition is supported. `disabled: true` means it is
- *   temporarily not permitted.
- * - `manage_only` — additional acquisition is not an available operation.
- *   Existing ownership may still be shown or managed.
+ * - `add` — one more copy through the workflow's channel.
+ * - `stepper` — owns the aggregate editable purchased quantity.
+ * - `release` / `remove` — the item is at its acquired-copy cap, so the header
+ *   acts on the one counted contribution instead of adding.
  */
-export type EquipmentPickerAction =
+export type EquipmentPickerHeaderControl =
   | { kind: 'add'; disabled: boolean }
-  | { kind: 'manage_only' }
+  | { kind: 'stepper'; value: number; max: number }
+  | { kind: 'release'; allowanceId: string }
+  | { kind: 'remove'; purchaseId: string }
   | { kind: 'none' }
 
+/** Provenance action target — the row binds the handler, the lib names the intent. */
+export type EquipmentPickerProvenanceTarget =
+  | { kind: 'release_choice'; allowanceId: string }
+  | { kind: 'remove_purchase_one' }
+
+export type EquipmentPickerProvenanceSegment =
+  | { kind: 'text'; label: string }
+  | {
+      kind: 'action'
+      key: string
+      label: string
+      ariaLabel: string
+      target: EquipmentPickerProvenanceTarget
+    }
+
 export type EquipmentPickerItemPresentation = {
-  secondary?: EntityAnatomyTrailingSecondary
+  /** Cost of the next copy — unit price, or the rarity choice in magic-items mode. */
+  priceSlot?: EntityAnatomyTrailingSecondary
   /** Availability and affordability blockers; rendered with the row's selection presentation. */
   blockers?: readonly SelectionStatusEntry[]
-  action: EquipmentPickerAction
+  control: EquipmentPickerHeaderControl
+  provenance: readonly EquipmentPickerProvenanceSegment[]
 }
 
 type EquipmentAcquisitionBlocker = NonNullable<
@@ -67,8 +104,6 @@ export function formatEquipmentPickerHeaderTrailingLabel(args: {
   switch (args.blocker.code) {
     case 'no_matching_grant':
       return args.rarity ? `No ${getMagicItemRarityLabel(args.rarity)} choices` : 'Unavailable'
-    case 'duplicate_not_allowed':
-      return 'One copy maximum'
     case 'no_market_price':
       return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
     case 'cannot_afford':
@@ -78,93 +113,245 @@ export function formatEquipmentPickerHeaderTrailingLabel(args: {
   }
 }
 
-function resolveHeaderAction(args: {
-  canAdd: boolean
-  ownedQuantity: number
-}): EquipmentPickerAction {
-  if (args.canAdd) return { kind: 'add', disabled: false }
-  if (args.ownedQuantity > 0) return { kind: 'manage_only' }
+/** The cap only drives the header when exactly one acquired copy fills it. */
+function isAtAcquiredCopyCap(copyCap: MagicItemAcquiredCopyCap | undefined): boolean {
+  return copyCap !== undefined && copyCap.max === 1 && copyCap.used === 1
+}
+
+function cappedControl(ownership: EquipmentOwnership): EquipmentPickerHeaderControl {
+  const choice = ownership.choices[0]
+  if (choice) return { kind: 'release', allowanceId: choice.allowanceId }
+
+  const purchase = ownership.contributions.find(
+    (contribution) => contribution.kind === 'purchase' && contribution.quantity > 0,
+  )
+  if (purchase?.kind === 'purchase') return { kind: 'remove', purchaseId: purchase.purchaseId }
+
   return { kind: 'none' }
 }
 
-function resolveMagicItemGrantTrailing(args: {
-  rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
-  row: EquipmentPickerRowViewModel
-  equipment: Equipment
-}): Pick<EquipmentPickerItemPresentation, 'secondary' | 'blockers'> {
-  const { plan, capabilities } = args.rowActionVm
-  const grantQuantity = plan.grantAllocations.reduce(
-    (sum, allocation) => sum + allocation.quantity,
-    0,
-  )
-  const purchaseQuantity = plan.purchaseQuantity
-  const rarity = args.equipment.kind === 'magic_item' ? args.equipment.rarity : undefined
+function choiceSegmentLabel(choice: EquipmentOwnershipChoice): string {
+  return formatMagicItemChoiceLabel(choice.quantity, choice.rarity, choice.requirement)
+}
 
-  if (grantQuantity > 0 && rarity) {
-    return {
-      secondary: {
-        kind: 'grantPreview',
-        label: formatGrantPreviewLine(grantQuantity, rarity),
-      },
-    }
+function releaseSegment(choice: EquipmentOwnershipChoice): EquipmentPickerProvenanceSegment {
+  return {
+    kind: 'action',
+    key: `release:${choice.allowanceId}`,
+    label: EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL,
+    ariaLabel: `${EQUIPMENT_INVENTORY_RELEASE_ONE_LABEL} ${formatMagicItemChoiceRarityPhrase(
+      choice.rarity,
+      choice.requirement,
+    )} choice`,
+    target: { kind: 'release_choice', allowanceId: choice.allowanceId },
+  }
+}
+
+function purchasedSegmentLabel(ownership: EquipmentOwnership): string {
+  const { quantity, spendCp } = ownership.editablePurchased
+  const base =
+    quantity > 1
+      ? `${EQUIPMENT_PICKER_PURCHASED_LABEL} ×${quantity}`
+      : EQUIPMENT_PICKER_PURCHASED_LABEL
+  if (spendCp <= 0) return base
+  return joinInlineMetadata([base, formatWealth(copperToDisplayWealth(spendCp))])
+}
+
+function appendPackageProvenance(
+  segments: EquipmentPickerProvenanceSegment[],
+  packageQuantity: number,
+): void {
+  if (packageQuantity <= 0) return
+  segments.push({
+    kind: 'text',
+    label:
+      packageQuantity === 1
+        ? EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL
+        : formatEquipmentInventorySourceQuantity(
+            EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL,
+            packageQuantity,
+          ),
+  })
+}
+
+function appendGrantProvenance(
+  segments: EquipmentPickerProvenanceSegment[],
+  grantQuantity: number,
+): void {
+  if (grantQuantity <= 0) return
+  segments.push({
+    kind: 'text',
+    label: formatEquipmentInventorySourceQuantity(
+      EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
+      grantQuantity,
+    ),
+  })
+}
+
+function appendChoiceProvenance(
+  segments: EquipmentPickerProvenanceSegment[],
+  choices: readonly EquipmentOwnershipChoice[],
+  control: EquipmentPickerHeaderControl,
+): void {
+  for (const choice of choices) {
+    segments.push({ kind: 'text', label: choiceSegmentLabel(choice) })
+    const headerOwnsThisChoice =
+      control.kind === 'release' && control.allowanceId === choice.allowanceId
+    if (!headerOwnsThisChoice) segments.push(releaseSegment(choice))
+  }
+}
+
+function appendLockedPurchasedProvenance(
+  segments: EquipmentPickerProvenanceSegment[],
+  lockedQuantity: number,
+): void {
+  if (lockedQuantity <= 0) return
+  segments.push({
+    kind: 'text',
+    label: formatEquipmentInventorySourceQuantity(EQUIPMENT_PICKER_CONVERTED_LABEL, lockedQuantity),
+  })
+}
+
+function appendEditablePurchasedProvenance(
+  segments: EquipmentPickerProvenanceSegment[],
+  ownership: EquipmentOwnership,
+  control: EquipmentPickerHeaderControl,
+  workflowMode: EquipmentPickerWorkflowMode,
+): void {
+  if (ownership.editablePurchased.quantity <= 0 || control.kind === 'stepper') return
+  segments.push({ kind: 'text', label: purchasedSegmentLabel(ownership) })
+  if (workflowMode !== 'magic_items' || control.kind === 'remove') return
+  segments.push({
+    kind: 'action',
+    key: 'remove-purchase-one',
+    label: EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
+    ariaLabel: `${EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL} purchased copy`,
+    target: { kind: 'remove_purchase_one' },
+  })
+}
+
+function resolveProvenance(args: {
+  ownership: EquipmentOwnership
+  control: EquipmentPickerHeaderControl
+  workflowMode: EquipmentPickerWorkflowMode
+}): EquipmentPickerProvenanceSegment[] {
+  const { ownership, control, workflowMode } = args
+  const segments: EquipmentPickerProvenanceSegment[] = []
+
+  appendPackageProvenance(segments, ownership.packageQuantity)
+  appendGrantProvenance(segments, ownership.grantQuantity)
+  appendChoiceProvenance(segments, ownership.choices, control)
+  appendLockedPurchasedProvenance(segments, ownership.lockedPurchased.quantity)
+  appendEditablePurchasedProvenance(segments, ownership, control, workflowMode)
+
+  return segments
+}
+
+function resolvePurchaseControl(args: {
+  rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }>
+  ownership: EquipmentOwnership
+  maxPurchaseQuantity: number
+}): EquipmentPickerHeaderControl {
+  const { rowActionVm, ownership, maxPurchaseQuantity } = args
+  const purchased = ownership.editablePurchased.quantity
+
+  if (purchased > 0) {
+    // A blocked row (unaffordable next copy) pins max at the current aggregate so
+    // the stepper can still decrement.
+    const ceiling = rowActionVm.disabled ? purchased : Math.max(maxPurchaseQuantity, purchased)
+    return { kind: 'stepper', value: purchased, max: ceiling }
   }
 
-  if (plan.fulfilledQuantity === 1 && grantQuantity === 0 && purchaseQuantity === 1) {
-    return args.row.priceLabel ? { secondary: { kind: 'price', label: args.row.priceLabel } } : {}
-  }
-
-  const blocker = capabilities.addBlockedReason ?? plan.blockers[0]
-  if (blocker) {
-    return {
-      blockers: [
-        selectionBlocker(
-          equipmentAcquisitionBlockerReason(blocker.code),
-          formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity }),
-        ),
-      ],
-    }
-  }
-
-  return {}
+  return { kind: 'add', disabled: rowActionVm.disabled }
 }
 
 function resolvePurchasePresentation(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }>
   row: EquipmentPickerRowViewModel
-  ownedQuantity: number
+  ownership: EquipmentOwnership
+  workflowMode: EquipmentPickerWorkflowMode
+  maxPurchaseQuantity: number
 }): EquipmentPickerItemPresentation {
-  const { availability, disabled } = args.rowActionVm
+  const { rowActionVm, row, ownership, workflowMode, maxPurchaseQuantity } = args
+  const { availability } = rowActionVm
 
   if (availability.status === 'unavailableForPurchase') {
+    const control: EquipmentPickerHeaderControl = { kind: 'none' }
     return {
       blockers: [
         availability.reason === 'unsupported_kind'
           ? selectionBlocker('unavailable', EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL)
           : selectionBlocker('not_purchasable', EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL),
       ],
-      action: { kind: 'none' },
+      control,
+      provenance: resolveProvenance({ ownership, control, workflowMode }),
     }
   }
 
-  const priceLabel = args.row.priceLabel || undefined
-  const action: EquipmentPickerAction = disabled
-    ? { kind: 'add', disabled: true }
-    : { kind: 'add', disabled: false }
+  const control = resolvePurchaseControl({ rowActionVm, ownership, maxPurchaseQuantity })
+  const priceLabel = row.priceLabel || undefined
+  const provenance = resolveProvenance({ ownership, control, workflowMode })
 
-  if (availability.status === 'unaffordable') {
+  if (availability.status === 'unaffordable' && !priceLabel) {
     return {
-      ...(priceLabel
-        ? { secondary: { kind: 'price', label: priceLabel } }
-        : {
-            blockers: [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
-          }),
-      action,
+      blockers: [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
+      control,
+      provenance,
     }
   }
 
   return {
-    ...(priceLabel ? { secondary: { kind: 'price', label: priceLabel } } : {}),
-    action: resolveHeaderAction({ canAdd: !disabled, ownedQuantity: args.ownedQuantity }),
+    ...(priceLabel ? { priceSlot: { kind: 'price' as const, label: priceLabel } } : {}),
+    control,
+    provenance,
+  }
+}
+
+/** Magic-items mode buys nothing: Add spends a choice, and runs out when choices do. */
+function resolveMagicItemPresentation(args: {
+  rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
+  equipment: Equipment
+  ownership: EquipmentOwnership
+  workflowMode: EquipmentPickerWorkflowMode
+}): EquipmentPickerItemPresentation {
+  const { rowActionVm, equipment, ownership, workflowMode } = args
+  const { plan, capabilities } = rowActionVm
+  const rarity = equipment.kind === 'magic_item' ? equipment.rarity : undefined
+  const grantQuantity = plan.grantAllocations.reduce(
+    (sum, allocation) => sum + allocation.quantity,
+    0,
+  )
+
+  if (capabilities.canAdd && grantQuantity > 0 && rarity) {
+    const control: EquipmentPickerHeaderControl = { kind: 'add', disabled: false }
+    return {
+      priceSlot: { kind: 'grantPreview', label: formatMagicItemChoiceLabel(grantQuantity, rarity) },
+      control,
+      provenance: resolveProvenance({ ownership, control, workflowMode }),
+    }
+  }
+
+  const control: EquipmentPickerHeaderControl = { kind: 'none' }
+  const provenance = resolveProvenance({ ownership, control, workflowMode })
+  const blocker = capabilities.addBlockedReason ?? plan.blockers[0]
+  const headerBlocker =
+    blocker && blocker.code !== 'duplicate_not_allowed'
+      ? blocker
+      : rarity
+        ? ({ code: 'no_matching_grant' } as const)
+        : undefined
+
+  if (!headerBlocker) return { control, provenance }
+
+  return {
+    blockers: [
+      selectionBlocker(
+        equipmentAcquisitionBlockerReason(headerBlocker.code),
+        formatEquipmentPickerHeaderTrailingLabel({ blocker: headerBlocker, rarity }),
+      ),
+    ],
+    control,
+    provenance,
   }
 }
 
@@ -173,25 +360,32 @@ export function resolveEquipmentPickerItemPresentation(args: {
   row: EquipmentPickerRowViewModel
   workflowMode: EquipmentPickerWorkflowMode
   rowActionVm: EquipmentPickerRowActionViewModel
-  ownedQuantity: number
+  ownership: EquipmentOwnership
+  copyCap?: MagicItemAcquiredCopyCap
+  /** Budget- and cap-limited aggregate ceiling for the purchase stepper. */
+  maxPurchaseQuantity?: number
 }): EquipmentPickerItemPresentation {
-  const { equipment, row, workflowMode, rowActionVm, ownedQuantity } = args
+  const { equipment, row, workflowMode, rowActionVm, ownership, copyCap } = args
+
+  if (isAtAcquiredCopyCap(copyCap)) {
+    const control = cappedControl(ownership)
+    return { control, provenance: resolveProvenance({ ownership, control, workflowMode }) }
+  }
 
   if (workflowMode === 'purchase' && rowActionVm.kind === 'purchase') {
-    return resolvePurchasePresentation({ rowActionVm, row, ownedQuantity })
+    return resolvePurchasePresentation({
+      rowActionVm,
+      row,
+      ownership,
+      workflowMode,
+      maxPurchaseQuantity: args.maxPurchaseQuantity ?? ownership.editablePurchased.quantity,
+    })
   }
 
   if (rowActionVm.kind !== 'magic_item_grant') {
-    return { action: { kind: 'none' } }
+    const control: EquipmentPickerHeaderControl = { kind: 'none' }
+    return { control, provenance: resolveProvenance({ ownership, control, workflowMode }) }
   }
 
-  const trailing = resolveMagicItemGrantTrailing({ rowActionVm, row, equipment })
-
-  return {
-    ...trailing,
-    action: resolveHeaderAction({
-      canAdd: rowActionVm.capabilities.canAdd,
-      ownedQuantity,
-    }),
-  }
+  return resolveMagicItemPresentation({ rowActionVm, equipment, ownership, workflowMode })
 }

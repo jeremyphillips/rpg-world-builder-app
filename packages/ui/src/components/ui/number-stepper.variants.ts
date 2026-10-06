@@ -217,8 +217,8 @@ export function numberStepperRootWidthClass(
   digits: NumberStepperDigits,
   valuePrefix?: '+',
 ): string {
-  const widths = valuePrefix ? numberStepperPrefixedWidthVariants : numberStepperWidthVariants
-  return widths[size][digits]
+  const table = valuePrefix ? numberStepperPrefixedWidthVariants : numberStepperWidthVariants
+  return table[size][digits]
 }
 
 export const numberStepperValuePrefixVariants = cva('pointer-events-none shrink-0 tabular-nums')

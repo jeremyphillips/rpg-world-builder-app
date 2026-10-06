@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentProps } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   applyEquipmentStepAction,
@@ -31,11 +31,9 @@ import {
 import {
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
-  readEquipmentPurchaseQuantity,
   readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
-  resolveStartingGoldPurchaseId,
   shouldShowEquipmentPurchaseWorkflow,
   resolveEquipmentStepFundingState,
   type EquipmentPickerWorkflowMode,
@@ -50,7 +48,6 @@ import {
   type EquipmentSelectionFacts,
 } from '../lib/equipment/equipment-selection-facts.lib'
 import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
-import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer'
 import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections'
 
 type PendingEquipmentSelection = {
@@ -76,21 +73,6 @@ function resolveGoldOptionFundingFromClass(
   if (!startingEquipment) return undefined
   const goldOption = startingEquipment.options.find(isStartingGoldOption)
   return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
-}
-
-function collectOwnedPurchaseQuantities(
-  draft: CharacterBuilderDraft,
-  showBudget: boolean,
-): Record<string, number> {
-  if (!showBudget) return {}
-
-  const quantities: Record<string, number> = {}
-  for (const purchase of draft.equipment?.purchases ?? []) {
-    if (purchase.sourceMode === 'startingGold') {
-      quantities[purchase.equipmentId] = purchase.quantity
-    }
-  }
-  return quantities
 }
 
 export function useEquipmentStep(args: {
@@ -282,11 +264,6 @@ export function useEquipmentStep(args: {
         : undefined,
     [budget, catalogIndex, context.characterCreationRules, context.rulesetId, draft, showBudget],
   )
-  const ownedPurchaseQuantities = useMemo(
-    () => collectOwnedPurchaseQuantities(draft, showBudget),
-    [showBudget, draft.equipment?.purchases],
-  )
-
   const applyEquipmentAction = (
     action: Parameters<typeof applyEquipmentStepAction>[0]['action'],
   ) => {
@@ -626,39 +603,6 @@ export function useEquipmentStep(args: {
     })
   }
 
-  const handleRemoveFromInventory: ComponentProps<
-    typeof EquipmentPickerDrawer
-  >['onRemoveFromInventory'] = (item) => {
-    const purchaseId = resolveStartingGoldPurchaseId(draft, item.equipment.id)
-    if (!purchaseId) return
-
-    applyEquipmentAction({
-      kind: 'remove_entry',
-      target: { kind: 'purchase', purchaseId },
-    })
-  }
-
-  const handleRemoveOneFromInventory: ComponentProps<
-    typeof EquipmentPickerDrawer
-  >['onRemoveOneFromInventory'] = (item) => {
-    const equipmentId = item.equipment.id
-    const purchaseId = resolveStartingGoldPurchaseId(draft, equipmentId)
-    if (!purchaseId) return
-
-    const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, 'startingGold')
-
-    if (currentQuantity <= 1) {
-      handleRemoveFromInventory(item)
-      return
-    }
-
-    applyEquipmentAction({
-      kind: 'set_purchase_quantity',
-      purchaseId,
-      quantity: currentQuantity - 1,
-    })
-  }
-
   return {
     catalogIndex,
     context,
@@ -690,8 +634,6 @@ export function useEquipmentStep(args: {
     selectionFacts,
     pickerBrowseSortContext,
     characterPreviewContext,
-    ownedPurchaseQuantities,
-    ownedGrantQuantities: magicItemWorkflow.ownedGrantQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -717,8 +659,6 @@ export function useEquipmentStep(args: {
     openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
-    handleRemoveFromInventory,
-    handleRemoveOneFromInventory,
     applySelection,
     skipStartingEquipment: () => applyEquipmentAction({ kind: 'skip_starting_equipment' }),
     onRemoveItem: (target: EquipmentStepRemoveTarget) =>

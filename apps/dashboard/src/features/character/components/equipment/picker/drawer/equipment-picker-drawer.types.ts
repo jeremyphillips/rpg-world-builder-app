@@ -1,7 +1,4 @@
 import type {
-  CharacterBuildCatalogIndex,
-  CharacterBuildContext,
-  CharacterBuilderDraft,
   EquipmentBudgetSummary,
   EquipmentPickerBrowseSortContext,
   EquipmentPickerItem,
@@ -11,9 +8,9 @@ import type {
 } from '@rpg/contracts'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+import type { EquipmentPickerOwnershipIndex } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import type { EquipmentPickerCharacterPreviewContext } from '../details/equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import type { EquipmentPickerGrantManageSource } from '../purchase/equipment-picker-grant.lib'
 import {
   CATALOG_PICKER_SORT_BEST_MATCH,
   CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
@@ -44,9 +41,6 @@ export const EQUIPMENT_PICKER_MODE_LABELS: Record<EquipmentPickerWorkflowMode, s
 }
 
 export const EQUIPMENT_PICKER_ADD_PARTIAL_PREFIX = 'Add'
-
-export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
-export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
@@ -114,10 +108,8 @@ export type EquipmentPickerDrawerProps = {
   filterOutNonProficient?: boolean
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
-  /** Purchased quantities for the active source mode, keyed by equipment id. */
-  ownedPurchaseQuantities?: Readonly<Record<string, number>>
-  /** Grant-selected quantities keyed by equipment id (magic-items workflow). */
-  ownedGrantQuantities?: Readonly<Record<string, number>>
+  /** Per-item ownership contributions — the only source the header reads. */
+  ownership?: EquipmentPickerOwnershipIndex
   /** Active browse workflow — purchase vs magic-item grants. */
   workflowMode?: EquipmentPickerWorkflowMode
   /** Available workflows; segmented control renders only when length is 2. */
@@ -139,20 +131,10 @@ export type EquipmentPickerDrawerProps = {
     workflowMode: EquipmentPickerWorkflowMode
     requestedQuantity: number
   }) => EquipmentPickerRowActionViewModel
-  resolveGrantManageSources?: (equipmentId: string) => EquipmentPickerGrantManageSource
-  /** Pass-through for grant/acquisition panel until Phase 3b weans shared acquisition UI off draft. */
-  grantAcquisitionContext?: {
-    draft: CharacterBuilderDraft
-    context: CharacterBuildContext
-    catalogIndex: CharacterBuildCatalogIndex
-  }
-  onCommitAdd: (item: EquipmentPickerItem, quantity: number) => boolean | void
-  onApplyMagicItemAcquisition?: (args: {
-    equipmentId: string
-    requestedQuantity: number
-  }) => boolean
-  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
-  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
-  onRemoveFromInventory?: (item: EquipmentPickerItem) => void
-  onRemoveOneFromInventory?: (item: EquipmentPickerItem) => void
+  /** Adds one copy through the active workflow's channel. */
+  onCommitAdd: (item: EquipmentPickerItem) => boolean | void
+  /** Sets the aggregate editable purchased quantity for an item. */
+  onSetPurchasedQuantity?: (item: EquipmentPickerItem, total: number) => void
+  onReleaseChoice?: (item: EquipmentPickerItem, allowanceId: string) => void
+  onRemovePurchaseOne?: (item: EquipmentPickerItem) => void
 }

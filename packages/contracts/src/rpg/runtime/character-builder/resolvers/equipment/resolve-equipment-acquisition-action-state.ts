@@ -6,7 +6,10 @@ import type {
   EquipmentAcquisitionBuilderContext,
 } from './equipment-acquisition-types'
 import { resolveEquipmentAcquisitionPlan } from './resolve-equipment-acquisition-plan'
-import { resolveEquipmentAcquisitionQuantityBounds } from './resolve-equipment-acquisition-quantity-bounds'
+import {
+  resolveEquipmentAcquisitionQuantityBounds,
+  resolveMagicItemAcquiredCopyCapForDraft,
+} from './resolve-equipment-acquisition-quantity-bounds'
 import { resolveEquipmentPickerRowCapabilities } from './resolve-equipment-picker-row-capabilities'
 import { resolveEquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 import { resolveMagicItemGrantEligibility } from './resolve-magic-item-grant-eligibility'
@@ -22,6 +25,7 @@ export function resolveEquipmentAcquisitionActionState(args: {
   focusedAllowanceId?: string
 }): EquipmentAcquisitionActionState {
   const { draft, context, equipment, workflowMode, requestedQuantity, focusedAllowanceId } = args
+  const magicItemAcquiredCopyCap = resolveMagicItemAcquiredCopyCapForDraft({ equipment, draft })
 
   if (workflowMode === 'purchase') {
     const budget = deriveEquipmentBudgetSummary(draft, context.catalogIndex, {
@@ -35,6 +39,7 @@ export function resolveEquipmentAcquisitionActionState(args: {
         budget,
         requestedQuantity,
       }),
+      ...(magicItemAcquiredCopyCap ? { magicItemAcquiredCopyCap } : {}),
     }
   }
 
@@ -65,5 +70,6 @@ export function resolveEquipmentAcquisitionActionState(args: {
     plan,
     capabilities,
     quantityBounds,
+    ...(magicItemAcquiredCopyCap ? { magicItemAcquiredCopyCap } : {}),
   }
 }

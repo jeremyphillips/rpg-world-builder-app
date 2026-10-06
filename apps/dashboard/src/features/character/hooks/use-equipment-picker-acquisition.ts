@@ -2,10 +2,8 @@ import { useCallback, useMemo } from 'react'
 
 import {
   applyEquipmentStepAction,
-  readMagicItemSelections,
   resolveEquipmentAcquisitionActionState,
   resolveEquipmentAcquisitionBuilderContext,
-  resolveEquipmentPurchaseId,
   standardStartingWealthTableId,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -16,6 +14,7 @@ import {
   resolveEquipmentAcquisitionContext,
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
+import { buildEquipmentPickerOwnershipIndex } from '../lib/equipment/equipment-ownership-index.lib'
 import { buildEquipmentPickerRowActionViewModel } from '../components/equipment/picker/equipment-picker-action.lib'
 import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
@@ -88,23 +87,20 @@ export function useEquipmentPickerAcquisition(args: {
     [budget, catalogIndex, context, draft, focusedAllowanceId],
   )
 
-  const resolveGrantManageSources = useCallback(
-    (equipmentId: string) => {
-      const grants = readMagicItemSelections(draft)
-        .filter((row) => row.equipmentId === equipmentId)
-        .map((row) => ({ allowanceId: row.allowanceId, quantity: row.quantity }))
-
-      const purchases = (draft.equipment?.purchases ?? [])
-        .map((row, index) => ({ row, index }))
-        .filter(({ row }) => row.equipmentId === equipmentId)
-        .map(({ row, index }) => ({
-          purchaseId: resolveEquipmentPurchaseId(draft.equipment?.purchases ?? [], index),
-          quantity: row.quantity,
-        }))
-
-      return { grants, purchases }
-    },
-    [draft],
+  const ownership = useMemo(
+    () =>
+      buildEquipmentPickerOwnershipIndex({
+        draft,
+        catalogIndex,
+        ...(budget ? { budget } : {}),
+        options: {
+          rulesetId: context.rulesetId,
+          ...(context.characterCreationRules?.startingWealth
+            ? { startingWealth: context.characterCreationRules.startingWealth }
+            : {}),
+        },
+      }),
+    [budget, catalogIndex, context, draft],
   )
 
   const handleApplyMagicItemAcquisition = useCallback(
@@ -163,33 +159,64 @@ export function useEquipmentPickerAcquisition(args: {
     [applyEquipmentAction],
   )
 
+  /** Aggregate target across the item's editable purchase records. */
+  const handleSetPurchasedQuantity = useCallback(
+    (item: EquipmentPickerItem, total: number) => {
+      applyEquipmentAction({
+        kind: 'set_equipment_purchased_quantity',
+        equipmentId: item.equipment.id,
+        quantity: total,
+      })
+    },
+    [applyEquipmentAction],
+  )
+
+  const handleReleaseChoice = useCallback(
+    (item: EquipmentPickerItem, allowanceId: string) => {
+      handleReleaseGrant({ allowanceId, equipmentId: item.equipment.id, quantity: 1 })
+    },
+    [handleReleaseGrant],
+  )
+
+  const handleRemovePurchaseOne = useCallback(
+    (item: EquipmentPickerItem) => {
+      const owned = ownership.get(item.equipment.id)?.editablePurchased.quantity ?? 0
+      if (owned <= 0) return
+      handleSetPurchasedQuantity(item, owned - 1)
+    },
+    [handleSetPurchasedQuantity, ownership],
+  )
+
   const handleCommitAdd = useCallback(
-    (item: EquipmentPickerItem, quantity: number): boolean | void => {
+    (item: EquipmentPickerItem): boolean | void => {
       if (workflowMode === 'magic_items') {
         return handleApplyMagicItemAcquisition({
           equipmentId: item.equipment.id,
-          requestedQuantity: quantity,
+          requestedQuantity: 1,
         })
       }
 
       if (showBudget) {
-        handleApplyPurchase({ equipmentId: item.equipment.id, requestedQuantity: quantity })
+        handleApplyPurchase({ equipmentId: item.equipment.id, requestedQuantity: 1 })
         return true
       }
 
-      onFallbackAdd?.(item, quantity)
+      onFallbackAdd?.(item, 1)
       return true
     },
     [handleApplyMagicItemAcquisition, handleApplyPurchase, onFallbackAdd, showBudget, workflowMode],
   )
 
   return {
+    ownership,
     resolveRowActionViewModel,
-    resolveGrantManageSources,
     handleApplyMagicItemAcquisition,
     handleApplyPurchase,
     handleReleaseGrant,
     handleRemovePurchase,
+    handleSetPurchasedQuantity,
+    handleReleaseChoice,
+    handleRemovePurchaseOne,
     handleCommitAdd,
   }
 }

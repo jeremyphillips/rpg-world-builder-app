@@ -9,6 +9,7 @@ import type {
   MagicItemGrantProgress,
 } from '../../equipment/magic-item-selection'
 import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
+import type { MagicItemAcquiredCopyCap } from './resolve-magic-item-duplicate-policy'
 
 // ---------------------------------------------------------------------------
 // Builder context for acquisition intents — re-derived on every command.
@@ -79,13 +80,18 @@ export type EquipmentPickerRowCapabilities = {
 }
 
 export type EquipmentAcquisitionActionState =
-  | { kind: 'purchase'; availability: EquipmentPurchaseAvailability }
+  | {
+      kind: 'purchase'
+      availability: EquipmentPurchaseAvailability
+      magicItemAcquiredCopyCap?: MagicItemAcquiredCopyCap
+    }
   | {
       kind: 'magic_item_grant'
       eligibility: MagicItemGrantEligibility
       plan: EquipmentAcquisitionPlan
       capabilities: EquipmentPickerRowCapabilities
       quantityBounds: EquipmentAcquisitionQuantityBounds
+      magicItemAcquiredCopyCap?: MagicItemAcquiredCopyCap
     }
 
 export type ApplyEquipmentIntentResult = {

@@ -14,6 +14,8 @@ import type {
   EntitySummaryStatusItem,
 } from './entity-summary-status.types'
 import { EntitySummaryStatusItemView } from './entity-summary-status'
+import { EntitySummaryProvenanceItemView } from './entity-summary-provenance'
+import type { EntitySummaryProvenanceItem } from './entity-summary-provenance.types'
 import {
   entitySummaryHeadingEndValueVariants,
   entitySummaryHeadingRowVariants,
@@ -69,17 +71,24 @@ export function EntitySummaryDescription({
   )
 }
 
-/** Status lane — placed in the host status cell; the cell owns the top offset. */
+/**
+ * Status lane — placed in the host status cell; the cell owns the top offset.
+ * `provenance` is a separate group rendered ahead of status on the same line.
+ */
 export function EntitySummaryStatus({
   items,
+  provenance,
   density,
   composition = 'cluster',
 }: {
   items: readonly EntitySummaryStatusItem[]
+  provenance?: readonly EntitySummaryProvenanceItem[]
   density: ContentCardDensity
   composition?: EntitySummaryStatusComposition
 }) {
-  if (composition === 'metadata') {
+  const provenanceItems = provenance ?? []
+
+  if (composition === 'metadata' || provenanceItems.length > 0) {
     return (
       <InlineMetadata
         role="supporting"
@@ -87,9 +96,18 @@ export function EntitySummaryStatus({
         wrap
         className={entitySummaryStatusMetadataVariants({ density })}
       >
+        {provenanceItems.map((item, index) => (
+          <InlineMetadata.Item key={`provenance-${index}`}>
+            <span data-entity-summary-provenance>
+              <EntitySummaryProvenanceItemView item={item} density={density} />
+            </span>
+          </InlineMetadata.Item>
+        ))}
         {items.map((status, index) => (
-          <InlineMetadata.Item key={index}>
-            <EntitySummaryStatusItemView item={status} density={density} layout="inline" />
+          <InlineMetadata.Item key={`status-${index}`}>
+            <span data-entity-summary-status>
+              <EntitySummaryStatusItemView item={status} density={density} layout="inline" />
+            </span>
           </InlineMetadata.Item>
         ))}
       </InlineMetadata>
