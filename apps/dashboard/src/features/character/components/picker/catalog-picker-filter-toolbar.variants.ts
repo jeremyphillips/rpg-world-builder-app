@@ -5,4 +5,5 @@ export const catalogPickerSortFilterClasses =
 
 export const catalogPickerSortLabelClasses = 'text-sm text-muted-foreground'
 
-export const catalogPickerToolbarResetButtonClasses = 'gap-1 text-xs [&_svg]:size-3'
+/** Idle reset row under a persistent Sort control. */
+export const catalogToolbarResetSlotReservedClasses = 'invisible'

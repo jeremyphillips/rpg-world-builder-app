@@ -23,7 +23,6 @@ import {
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
-  SPELL_PICKER_RESET_VIEW_LABEL,
   type SpellPickerDrawerProps,
 } from './spell-picker-drawer.types'
 import { SpellPickerItemDetails } from './spell-picker-item-details'
@@ -180,11 +179,7 @@ export function SpellPickerDrawer({
         }
 
         return (
-          <CatalogToolbarResetSlot
-            visible={showResetView}
-            label={SPELL_PICKER_RESET_VIEW_LABEL}
-            onClick={handleResetView}
-          />
+          <CatalogToolbarResetSlot visible={showResetView} includesSort onClick={handleResetView} />
         )
       }}
       filterRow={{

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationPickerDrawer } from './organization-picker-drawer'
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 
@@ -98,7 +99,7 @@ describe('OrganizationPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'circle')
-    await user.click(screen.getByRole('button', { name: 'Reset view' }))
+    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }))
 
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.getByText('Silver Circle')).toBeInTheDocument()

@@ -17,7 +17,6 @@ import {
   type CharacterDetailEquipmentFilterState,
 } from '../../../lib/detail/character-detail-equipment-filter-schema'
 import {
-  CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
@@ -37,7 +36,7 @@ import type { CharacterWealthViewModel } from '../../../lib/display/character-di
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
-import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -62,9 +61,7 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
       toolbarAriaLabel={toolbarLabel}
       entity={{
         heading: header.name,
-        description: (
-          <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />
-        ),
+        description: <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />,
         status:
           footerLabels.length > 0
             ? [{ kind: 'text', label: joinInlineMetadata(footerLabels), variant: 'muted' }]
@@ -202,9 +199,10 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                 : undefined
             }
             actions={
-              showResetView ? (
-                <CatalogToolbarResetAction
-                  label={CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL}
+              showSort || showResetView ? (
+                <CatalogToolbarResetSlot
+                  visible={showResetView}
+                  includesSort={showSort}
                   onClick={handleResetView}
                 />
               ) : undefined

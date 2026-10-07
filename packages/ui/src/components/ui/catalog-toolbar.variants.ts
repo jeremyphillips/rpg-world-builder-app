@@ -27,16 +27,22 @@ export const catalogToolbarTabRowVariants = cva(
   'flex items-center justify-between gap-4 border-b border-border',
 )
 
-export const catalogToolbarFilterRowVariants = cva(
-  'flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between',
+/**
+ * Utility band. `@min-[32rem]` is the wide row; below that the content-filter
+ * region and the view stack stack. 32rem sits above catalog-drawer content
+ * width (550px sheet minus section inset), so a narrow drawer does not use
+ * the viewport `sm:` row.
+ */
+export const catalogToolbarUtilityBandVariants = cva(
+  '@container flex flex-col gap-2 @min-[32rem]:flex-row @min-[32rem]:items-end @min-[32rem]:justify-between',
 )
 
-export const catalogToolbarFilterControlsVariants = cva(
-  'flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4',
-)
+/** Lower content filters. Omitted by the toolbar when this region is empty. */
+export const catalogToolbarUtilityContentVariants = cva('flex min-w-0 flex-wrap items-end gap-2')
 
-export const catalogToolbarFilterActionsVariants = cva(
-  'flex flex-col gap-2 sm:ml-auto sm:flex-row sm:items-center sm:gap-4',
+/** Sort over Reset. The stack stays at the end in both the row and the stacked band. */
+export const catalogToolbarViewControlsVariants = cva(
+  'ml-auto flex w-fit flex-col items-start gap-2',
 )
 
 export const catalogToolbarStandaloneActionsVariants = cva('flex justify-end')

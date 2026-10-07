@@ -22,7 +22,6 @@ import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-acti
 import {
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_MODE_LABELS,
-  EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
   type EquipmentPickerDrawerProps,
@@ -87,35 +86,14 @@ function EquipmentPickerToolbarActions({
       sortMode,
     })
 
-  const handleClearFilters = () => {
-    onClearStructuredFilters()
-  }
-
-  if (!showClearFilters && !showResetView) {
-    return (
-      <CatalogToolbarResetSlot
-        visible={false}
-        label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
-        onClick={() => undefined}
-      />
-    )
-  }
-
-  if (showClearFilters) {
-    return (
-      <CatalogToolbarResetSlot
-        visible
-        label={EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL}
-        onClick={handleClearFilters}
-      />
-    )
-  }
+  if (toolbarResetMode === 'none') return null
 
   return (
     <CatalogToolbarResetSlot
-      visible
-      label={EQUIPMENT_PICKER_RESET_VIEW_LABEL}
-      onClick={onResetView}
+      visible={showClearFilters || showResetView}
+      includesSort
+      label={showClearFilters ? EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL : undefined}
+      onClick={showClearFilters ? onClearStructuredFilters : onResetView}
     />
   )
 }

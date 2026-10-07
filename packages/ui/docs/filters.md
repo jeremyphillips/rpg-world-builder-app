@@ -369,8 +369,33 @@ type FilterCatalogLayoutConfig<TState> = {
 }
 ```
 
-`CatalogFilterControls` composes onto `CatalogToolbar` slots (`Primary`, `FilterRow`).
+`CatalogFilterControls` composes onto `CatalogToolbar` slots (`primaryControls`, `filterRow`).
 Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the schema.
+
+### Catalog toolbar bands
+
+Bands are placement. They do not change what counts as a content filter.
+
+| Role            | What it is                                                                                            | Slot                                       |
+| --------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Content filters | Schema fields such as Equipment kind, Rarity, Affordable now, Levels, School, and Casting & mechanics | `primaryControls` and `filterRow.controls` |
+| View controls   | Sort and Reset                                                                                        | `filterRow.actions` and `actions`          |
+
+School and Affordable now are content filters. They sit on the left of the utility band.
+
+```text
+Search
+Primary band     primaryControls — full width, fields wrap
+Utility band     @container / @min-[32rem], layout only
+  content        filterRow.controls — omitted when empty
+  view stack     column, end-aligned
+    Sort         filterRow.actions
+    Reset        actions
+```
+
+A wide utility band is one row (`justify-between`) with the view stack at the end. Below `32rem` the content region and the view stack stack, so Sort stays with Reset and does not sit between individual filters. `32rem` is just above catalog-drawer content width, so the band follows the drawer rather than the viewport.
+
+Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 
 ### Out of scope for catalog filters
 

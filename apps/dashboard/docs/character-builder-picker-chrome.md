@@ -271,21 +271,23 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ## Commonality matrix
 
-| Dimension                   | Equipment                         | Spells                   | Proficiencies         | Shared chrome                                                           |
-| --------------------------- | --------------------------------- | ------------------------ | --------------------- | ----------------------------------------------------------------------- |
-| Sheet shell                 | ✓                                 | ✓                        | ✓                     | `CatalogEntityPickerSheet` (`surface="background"`, `size="lg"`)        |
-| Search                      | Built-in sheet search             | Same                     | Same                  | `@rpg/ui`                                                               |
-| Structured filters          | Kind + affordable toggles         | School, level, mechanics | —                     | Equipment ↔ Spells pattern only                                         |
-| Sort                        | `CatalogSortControl`              | Wrapped sort control     | `CatalogSortControl`  | `CatalogSortControl` + sort mode constants                              |
-| Reset view / clear          | Dual-mode (clear vs reset)        | Reset slot               | Reset slot            | `catalog-picker-filter-state.lib.ts`, `CatalogToolbarResetSlot`         |
-| Empty state panel           | Sheet defaults                    | Custom message           | Custom message        | **`CatalogPickerResultsState`** (spells/proficiencies only)             |
-| Row add/remove              | Commerce / acquisition rail       | Selection actions        | Selection actions     | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`** (`@rpg/ui`) |
-| Row dimming / disabled note | Domain-specific (affordability)   | Shared resolver state    | Shared resolver state | **`picker/row/catalog-picker-row-state.lib.ts`**                        |
-| Empty-state kind/message    | —                                 | Choice-set driven        | Choice-set driven     | **`picker/results/catalog-picker-empty-state.lib.ts`**                  |
-| Recommendation tabs         | No                                | Yes                      | No                    | Spells only                                                             |
-| Workflow mode tabs          | Purchase / magic items            | Cantrips / prepared      | No                    | Equipment only                                                          |
-| Budget / price UI           | Yes                               | No                       | No                    | Equipment only                                                          |
-| Metadata renderer           | Content `CatalogMetadataRenderer` | Same                     | Same                  | Domain mappers under each `*/picker/`                                   |
+| Dimension                   | Equipment                                                               | Spells                    | Proficiencies                  | Shared chrome                                                                  |
+| --------------------------- | ----------------------------------------------------------------------- | ------------------------- | ------------------------------ | ------------------------------------------------------------------------------ |
+| Sheet shell                 | ✓                                                                       | ✓                         | ✓                              | `CatalogEntityPickerSheet` (`surface="background"`, `size="lg"`)               |
+| Search                      | Built-in sheet search                                                   | Same                      | Same                           | `@rpg/ui`                                                                      |
+| Structured filters          | Kind + affordable toggles                                               | School, level, mechanics  | —                              | Equipment ↔ Spells pattern only                                                |
+| Sort                        | `CatalogSortControl`                                                    | Wrapped sort control      | `CatalogSortControl`           | `CatalogSortControl` + sort mode constants                                     |
+| Reset / clear               | Dual-mode. Clear filters keeps its label. Reset row reserved under Sort | Reset slot on the tab row | Reset slot reserved under Sort | `hasCatalogPickerResetViewCriteria` (sort optional), `CatalogToolbarResetSlot` |
+| Empty state panel           | Sheet defaults                                                          | Custom message            | Custom message                 | **`CatalogPickerResultsState`** (spells/proficiencies only)                    |
+| Row add/remove              | Commerce / acquisition rail                                             | Selection actions         | Selection actions              | Spells ↔ Proficiencies: **`CatalogPickerSelectionActions`** (`@rpg/ui`)        |
+| Row dimming / disabled note | Domain-specific (affordability)                                         | Shared resolver state     | Shared resolver state          | **`picker/row/catalog-picker-row-state.lib.ts`**                               |
+| Empty-state kind/message    | —                                                                       | Choice-set driven         | Choice-set driven              | **`picker/results/catalog-picker-empty-state.lib.ts`**                         |
+| Recommendation tabs         | No                                                                      | Yes                       | No                             | Spells only                                                                    |
+| Workflow mode tabs          | Purchase / magic items                                                  | Cantrips / prepared       | No                             | Equipment only                                                                 |
+| Budget / price UI           | Yes                                                                     | No                        | No                             | Equipment only                                                                 |
+| Metadata renderer           | Content `CatalogMetadataRenderer`                                       | Same                      | Same                           | Domain mappers under each `*/picker/`                                          |
+
+Visible reset copy is `Reset`. The accessible name and `title` are `Reset search, filters, and sorting` when Sort is on the toolbar, and `Reset search and filters` when it is not. The reset row stays reserved (invisible, not focusable) only while Sort is persistent. Drawers without Sort mount Reset only while it is visible. Equipment `clear_filters` keeps `Clear filters` and does not use the reset accessible name. Spell recommendation tabs still park `actions` on the tab row.
 
 ## Contracts vs dashboard ownership
 
@@ -327,14 +329,14 @@ bucket for anything two files import. A module belongs here only when **all** of
 Subfolders: `sort/`, `selection/`, `row/`, `results/`. Filter toolbar seams stay at
 picker root.
 
-| Module                                      | Role                                                       |
-| ------------------------------------------- | ---------------------------------------------------------- |
-| `results/catalog-picker-results-state.tsx`  | Dashed empty-state `InsetPanel` (spells + proficiencies)   |
-| `results/catalog-picker-empty-state.lib.ts` | `no-options` / `selection-full` kind + message mapping     |
-| `row/catalog-picker-row-state.lib.ts`       | Dimmed row + first disabled-reason note                    |
-| `catalog-picker-filter-state.lib.ts` (root) | Clearable / reset-view criteria (equipment delegates here) |
-| `catalog-toolbar-reset-action.tsx` (root)   | Reset button + layout-stable slot                          |
-| `sort/catalog-sort-control.tsx`             | Sort `<Select>`                                            |
+| Module                                      | Role                                                                                                                                 |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `results/catalog-picker-results-state.tsx`  | Dashed empty-state `InsetPanel` (spells + proficiencies)                                                                             |
+| `results/catalog-picker-empty-state.lib.ts` | `no-options` / `selection-full` kind + message mapping                                                                               |
+| `row/catalog-picker-row-state.lib.ts`       | Dimmed row + first disabled-reason note                                                                                              |
+| `catalog-picker-filter-state.lib.ts` (root) | Clearable / reset-view criteria (equipment delegates here)                                                                           |
+| `catalog-toolbar-reset-action.tsx` (root)   | `Reset` button. Accessible name includes search, and sorting when Sort is present. The row is reserved only while Sort is persistent |
+| `sort/catalog-sort-control.tsx`             | Sort `<Select>`                                                                                                                      |
 
 **Promoted to `@rpg/ui`** (import from `@rpg/ui`, not `character/components/picker/`):
 

@@ -18,11 +18,11 @@ import {
   equipmentPickerSkilledHirelingFixture,
   pickerState,
 } from './equipment-picker-drawer.fixtures'
+import { CATALOG_TOOLBAR_RESET_WITH_SORT_NAME } from '../../../picker/catalog-toolbar-reset-action'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
-  EQUIPMENT_PICKER_RESET_VIEW_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -327,10 +327,10 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
 
     expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
+      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }))
+    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
     expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
@@ -341,7 +341,7 @@ describe('EquipmentPickerDrawer', () => {
       'Best match',
     )
     expect(
-      screen.queryByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL }),
+      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).not.toBeInTheDocument()
   })
 
@@ -393,9 +393,10 @@ describe('EquipmentPickerDrawer', () => {
 
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
 
-    const resetButton = screen.getByRole('button', { name: EQUIPMENT_PICKER_RESET_VIEW_LABEL })
-    expect(resetButton).toBeInTheDocument()
-    expect(resetButton).toHaveClass('[&_svg]:size-3')
+    const resetButton = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
+    expect(resetButton).toHaveTextContent('Reset')
+    expect(resetButton).toHaveClass('h-control-action-compact')
+    expect(resetButton.querySelector('svg')).toHaveClass('size-icon-glyph-xs')
   })
 
   it('shows the sort control with an accessible label', () => {

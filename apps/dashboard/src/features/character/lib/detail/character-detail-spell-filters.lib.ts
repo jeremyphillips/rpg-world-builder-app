@@ -10,7 +10,6 @@ import type { CharacterSheetSpellCard } from './character-sheet-catalog'
 export const CHARACTER_DETAIL_SPELL_LEVEL_ALL = '__all__' as const
 
 export const CHARACTER_DETAIL_SPELL_LEVEL_LABEL = 'Level'
-export const CHARACTER_DETAIL_SPELL_RESET_VIEW_LABEL = 'Reset view'
 export const CHARACTER_DETAIL_SPELL_SEARCH_PLACEHOLDER = 'Search spells'
 
 export type CharacterDetailSpellLevelFilter = typeof CHARACTER_DETAIL_SPELL_LEVEL_ALL | string

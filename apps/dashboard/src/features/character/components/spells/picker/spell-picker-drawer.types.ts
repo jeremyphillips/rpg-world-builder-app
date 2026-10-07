@@ -32,7 +32,6 @@ export const SPELL_PICKER_LEVELS_LABEL = 'Levels'
 export const SPELL_PICKER_SCHOOL_LABEL = 'School'
 export const SPELL_PICKER_SORT_LABEL = 'Sort'
 export const SPELL_PICKER_MECHANICS_LABEL = 'Casting & mechanics'
-export const SPELL_PICKER_RESET_VIEW_LABEL = 'Reset view'
 
 export const SPELL_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const SPELL_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC

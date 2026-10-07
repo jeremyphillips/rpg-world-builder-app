@@ -17,7 +17,6 @@ import {
   type CharacterDetailSpellFilterState,
 } from '../../../lib/detail/character-detail-spell-filter-schema'
 import {
-  CHARACTER_DETAIL_SPELL_RESET_VIEW_LABEL,
   CHARACTER_DETAIL_SPELL_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_SPELL_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_SPELL_VIEW_DEFAULTS,
@@ -29,7 +28,7 @@ import {
   type CharacterSheetSpellCard,
 } from '../../../lib/detail/character-sheet-catalog'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
-import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailSpellFilterControls } from './character-detail-spell-filter-controls'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -50,9 +49,7 @@ function SpellCatalogRow({ card }: { card: CharacterSheetSpellCard }) {
       toolbarAriaLabel={toolbarLabel}
       entity={{
         heading: header.name,
-        description: (
-          <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />
-        ),
+        description: <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />,
         status: [
           ...header.markers.map((marker) => ({
             kind: 'text' as const,
@@ -125,8 +122,6 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
   const showResetView = hasCatalogPickerResetViewCriteria({
     structuredFilterCount,
     searchQuery,
-    sortMode: 'default',
-    defaultSortMode: 'default',
   })
 
   const handleResetView = () => {
@@ -162,10 +157,7 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
         }
         actions={
           showResetView ? (
-            <CatalogToolbarResetAction
-              label={CHARACTER_DETAIL_SPELL_RESET_VIEW_LABEL}
-              onClick={handleResetView}
-            />
+            <CatalogToolbarResetSlot visible includesSort={false} onClick={handleResetView} />
           ) : undefined
         }
       />

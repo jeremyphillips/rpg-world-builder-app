@@ -12,6 +12,7 @@ import {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
 } from '@/features/content'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
@@ -26,7 +27,6 @@ import {
   ORGANIZATION_PICKER_ALL_DOMAINS,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
-  ORGANIZATION_PICKER_RESET_VIEW_LABEL,
   ORGANIZATION_PICKER_TITLE,
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
@@ -153,18 +153,20 @@ export function OrganizationPickerDrawer({
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
       actions={({ searchQuery, resetSearchQuery }) => {
-        const showReset =
-          searchQuery.length > 0 || domain !== ORGANIZATION_PICKER_VIEW_DEFAULTS.domain
-        const handleReset = () => {
-          setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
-          resetSearchQuery()
-        }
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: Number(domain !== ORGANIZATION_PICKER_VIEW_DEFAULTS.domain),
+          searchQuery,
+        })
+        if (!showReset) return null
 
         return (
           <CatalogToolbarResetSlot
-            visible={showReset}
-            label={ORGANIZATION_PICKER_RESET_VIEW_LABEL}
-            onClick={handleReset}
+            visible
+            includesSort={false}
+            onClick={() => {
+              setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
+              resetSearchQuery()
+            }}
           />
         )
       }}

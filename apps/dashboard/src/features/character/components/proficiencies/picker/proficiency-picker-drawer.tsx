@@ -29,7 +29,6 @@ import { ProficiencyPickerItemDetails } from './proficiency-picker-item-details'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
-  PROFICIENCY_PICKER_RESET_VIEW_LABEL,
   PROFICIENCY_PICKER_SORT_LABELS,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
@@ -37,41 +36,6 @@ import {
 } from './proficiency-picker-drawer.types'
 
 export type { ProficiencyPickerDrawerProps } from './proficiency-picker-drawer.types'
-
-function ProficiencyPickerToolbarReset({
-  sortMode,
-  searchQuery,
-  onResetView,
-}: {
-  sortMode: ProficiencyPickerSortMode
-  searchQuery: string
-  onResetView: () => void
-}) {
-  const showResetView = hasCatalogPickerResetViewCriteria({
-    structuredFilterCount: 0,
-    searchQuery,
-    sortMode,
-    defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
-  })
-
-  if (!showResetView) {
-    return (
-      <CatalogToolbarResetSlot
-        visible={false}
-        label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
-        onClick={() => undefined}
-      />
-    )
-  }
-
-  return (
-    <CatalogToolbarResetSlot
-      visible
-      label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
-      onClick={onResetView}
-    />
-  )
-}
 
 /** Proficiency catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function ProficiencyPickerDrawer({
@@ -122,20 +86,21 @@ export function ProficiencyPickerDrawer({
       emptyState={
         emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
-        const handleResetView = () => {
-          setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
-          resetSearchQuery()
-        }
-
-        return (
-          <ProficiencyPickerToolbarReset
-            sortMode={sortMode}
-            searchQuery={searchQuery}
-            onResetView={handleResetView}
-          />
-        )
-      }}
+      actions={({ searchQuery, resetSearchQuery }) => (
+        <CatalogToolbarResetSlot
+          visible={hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: 0,
+            searchQuery,
+            sortMode,
+            defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
+          })}
+          includesSort
+          onClick={() => {
+            setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
+            resetSearchQuery()
+          }}
+        />
+      )}
       filterRow={{
         actions: (
           <CatalogSortControl

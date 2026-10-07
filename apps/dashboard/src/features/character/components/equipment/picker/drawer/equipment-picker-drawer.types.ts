@@ -53,7 +53,6 @@ export const EQUIPMENT_PICKER_RARITY_LABEL = 'Rarity'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
 export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
-export const EQUIPMENT_PICKER_RESET_VIEW_LABEL = 'Reset view'
 
 export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
