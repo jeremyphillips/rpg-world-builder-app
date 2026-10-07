@@ -2,7 +2,6 @@ import {
   copperToWealth,
   formatInlineWealth,
   formatWealth,
-  getMagicItemRarityLabel,
   resolveEquipmentMagicItemSlots,
   type CoinWealth,
   type EquipmentBudgetSummary,
@@ -13,6 +12,7 @@ import {
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type { EquipmentStepFundingState } from '../../../lib/equipment/equipment-step.lib'
+import { formatMagicItemChoiceRarityPhrase } from '../../../lib/equipment/magic-item-choice-label.lib'
 
 export const EQUIPMENT_UNRESOLVED_FUNDING_HEADING = 'Starting funds not set'
 
@@ -52,8 +52,10 @@ export function formatEquipmentMagicItemSlotPresentation(slot: EquipmentMagicIte
   detail?: string
   accessibleName: string
 } {
-  const rarityLabel = getMagicItemRarityLabel(slot.rarity)
-  const lead = slot.rarityMode === 'maximum' ? `Up to ${rarityLabel}` : rarityLabel
+  const lead = formatMagicItemChoiceRarityPhrase(
+    slot.rarity,
+    slot.rarityMode === 'maximum' ? 'up_to' : 'exact',
+  )
 
   if (slot.fulfilled) {
     return { lead, accessibleName: `${lead}, complete` }

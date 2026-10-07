@@ -164,6 +164,15 @@ describe('formatEquipmentMagicItemSlotPresentation', () => {
     })
     expect(
       formatEquipmentMagicItemSlotPresentation(
+        slot({ rarity: 'common', rarityMode: 'maximum', quantity: 1, remaining: 1 }),
+      ),
+    ).toEqual({
+      lead: 'Common',
+      detail: '1 available',
+      accessibleName: 'Common · 1 available',
+    })
+    expect(
+      formatEquipmentMagicItemSlotPresentation(
         slot({ rarity: 'uncommon', rarityMode: 'maximum', quantity: 1, remaining: 1 }),
       ),
     ).toEqual({

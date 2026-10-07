@@ -87,7 +87,9 @@ describe('EquipmentResourceSummary', () => {
 
   it('shows one aggregated badge for duplicate rarity slots passed in', () => {
     render(<EquipmentResourceSummary density="comfortable" slots={[openCommon]} />)
-    expect(screen.getByLabelText('Common · 2 remaining')).toBeInTheDocument()
+    const badge = screen.getByLabelText('Common · 2 remaining')
+    expect(badge).toHaveTextContent('Common · 2 remaining')
+    expect(badge.querySelector('[data-inline-metadata-separator]')).toBeNull()
     expect(screen.getAllByLabelText(/Common/)).toHaveLength(1)
   })
 })

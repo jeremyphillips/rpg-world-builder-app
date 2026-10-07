@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { EquipmentMagicItemSlot } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import {
   Badge,
@@ -7,7 +8,6 @@ import {
   ContentCardBody,
   Heading,
   IconContainer,
-  InlineMetadata,
   StatusIcon,
   cn,
   contentCardRootVariants,
@@ -115,15 +115,8 @@ function ResourceSummaryRow({
   )
 }
 
-function EquipmentMagicItemSlotBadge({
-  slot,
-  density,
-}: {
-  slot: EquipmentMagicItemSlot
-  density: ContentCardDensity
-}) {
+function EquipmentMagicItemSlotBadge({ slot }: { slot: EquipmentMagicItemSlot }) {
   const presentation = formatEquipmentMagicItemSlotPresentation(slot)
-  const metaDensity = density === 'compact' ? 'compact' : 'comfortable'
 
   return (
     <Badge
@@ -144,10 +137,7 @@ function EquipmentMagicItemSlotBadge({
           />
         </>
       ) : (
-        <InlineMetadata role="heading" density={metaDensity} wrap={false}>
-          <InlineMetadata.Item>{presentation.lead}</InlineMetadata.Item>
-          <InlineMetadata.Item>{presentation.detail}</InlineMetadata.Item>
-        </InlineMetadata>
+        joinInlineMetadata([presentation.lead, presentation.detail])
       )}
     </Badge>
   )
@@ -199,7 +189,6 @@ export function EquipmentResourceSummary({
                 <EquipmentMagicItemSlotBadge
                   key={`${slot.rarityMode}:${slot.rarity}`}
                   slot={slot}
-                  density={density}
                 />
               ))}
               action={magicItemsAction}

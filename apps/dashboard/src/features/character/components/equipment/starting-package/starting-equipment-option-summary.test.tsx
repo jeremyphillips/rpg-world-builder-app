@@ -107,7 +107,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows muted base gold, a medium total, and a tier badge', () => {
+  it('shows muted base gold, a normal-weight total, and a tier badge', () => {
     render(
       <StartingEquipmentOptionSummaryCard
         summary={{
@@ -142,7 +142,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     )
 
     expect(screen.getByText('75 GP base')).toHaveClass('text-muted-foreground')
-    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-medium', 'text-foreground')
+    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-normal', 'text-foreground')
     expect(screen.getByText('Hero tier')).toBeInTheDocument()
     expect(screen.getByText('Shield proficiency is missing.')).toBeInTheDocument()
     expect(screen.queryByText('Hero tier adds 637 GP')).not.toBeInTheDocument()

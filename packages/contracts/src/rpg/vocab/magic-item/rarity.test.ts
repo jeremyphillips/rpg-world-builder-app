@@ -5,6 +5,7 @@ import {
   getMagicItemRarityLabel,
   getMagicItemRarityProseLabel,
   getMagicItemRaritySentenceForm,
+  isLowestMagicItemRarity,
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
   MAGIC_ITEM_RARITY_TERM,
@@ -41,6 +42,12 @@ describe('magic item rarity vocabulary', () => {
       expect(entry?.label).toBeTruthy()
       expect(entry?.description).toBeTruthy()
     }
+  })
+
+  it('treats the first declared rarity as the floor', () => {
+    expect(isLowestMagicItemRarity('common')).toBe(true)
+    expect(isLowestMagicItemRarity('uncommon')).toBe(false)
+    expect(isLowestMagicItemRarity('artifact')).toBe(false)
   })
 
   it('derives labels from the entry map', () => {

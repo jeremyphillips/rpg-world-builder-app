@@ -2,6 +2,7 @@ import {
   capitalizeFirst,
   getMagicItemRarityLabel,
   getMagicItemRarityProseLabel,
+  isLowestMagicItemRarity,
   MAGIC_ITEM_RARITIES,
   type MagicItemAllowanceRequirement,
   type MagicItemRarity,
@@ -46,7 +47,7 @@ export function formatMagicItemChoiceRarityPhrase(
   requirement: MagicItemAllowanceRequirement = 'exact',
 ): string {
   const rarityLabel = getMagicItemRarityLabel(rarity)
-  const isUpTo = requirement === 'up_to' && rarity !== MAGIC_ITEM_RARITIES[0]
+  const isUpTo = requirement === 'up_to' && !isLowestMagicItemRarity(rarity)
   return isUpTo ? `${MAGIC_ITEM_UP_TO_PREFIX} ${rarityLabel}` : rarityLabel
 }
 

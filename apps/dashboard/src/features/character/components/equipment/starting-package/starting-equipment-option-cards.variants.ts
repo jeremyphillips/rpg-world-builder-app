@@ -12,7 +12,7 @@ export const startingEquipmentTierContributionBaseVariants = cva(
   'font-normal text-muted-foreground',
 )
 
-export const startingEquipmentTierContributionTotalVariants = cva('font-medium text-foreground')
+export const startingEquipmentTierContributionTotalVariants = cva('font-normal text-foreground')
 
 export const startingEquipmentOptionReasonsClasses = 'space-y-1'
 

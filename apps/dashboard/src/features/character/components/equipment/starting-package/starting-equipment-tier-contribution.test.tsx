@@ -25,12 +25,12 @@ const funding = {
 } satisfies StartingEquipmentOptionSummary['funding']
 
 describe('StartingEquipmentTierContribution', () => {
-  it('renders muted base gold, a medium total, and a tier badge tooltip', async () => {
+  it('renders muted base gold, a normal-weight total, and a tier badge tooltip', async () => {
     const user = userEvent.setup()
     render(<StartingEquipmentTierContribution summary={{ funding }} />)
 
     expect(screen.getByText('75 GP base')).toHaveClass('font-normal', 'text-muted-foreground')
-    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-medium', 'text-foreground')
+    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-normal', 'text-foreground')
     expect(screen.getByText('75 GP base').closest('div')).toHaveClass('mt-1', 'text-xs')
     expect(screen.queryByText('+637 GP Hero tier')).not.toBeInTheDocument()
 

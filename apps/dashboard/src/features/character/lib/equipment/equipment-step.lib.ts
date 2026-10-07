@@ -214,7 +214,7 @@ export const EQUIPMENT_PACKAGE_CHANGE_OPTION_MENU_LABEL = 'Change package option
 
 export const EQUIPMENT_SELECTED_PACKAGE_EYEBROW = 'Selected package'
 
-export const EQUIPMENT_CHANGE_PACKAGE_LABEL = 'Change package'
+export const EQUIPMENT_CHANGE_PACKAGE_LABEL = 'Change'
 
 export const EQUIPMENT_PACKAGE_REMOVE_FROM_PACKAGE_LABEL = 'Remove from package'
 

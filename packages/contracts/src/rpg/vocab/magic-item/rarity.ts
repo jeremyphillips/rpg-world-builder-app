@@ -56,6 +56,11 @@ export type MagicItemRarity = keyof typeof MAGIC_ITEM_RARITY_ENTRIES
 
 export const MAGIC_ITEM_RARITIES = keysFromEntries(MAGIC_ITEM_RARITY_ENTRIES)
 
+/** Floor of the declared ladder. Nothing sits below it, so “up to” is meaningless. */
+export function isLowestMagicItemRarity(rarity: MagicItemRarity): boolean {
+  return rarity === MAGIC_ITEM_RARITIES[0]
+}
+
 export const magicItemRaritySchema = vocabEnumFromEntries(MAGIC_ITEM_RARITY_ENTRIES)
 
 /** Returns the reference entry for a magic item rarity, if known. */
