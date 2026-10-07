@@ -165,7 +165,7 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   with no directive.
 - Shared primitives live in `packages/ui` so both `dashboard` and `public` can
   consume them. Authoring detail → [packages/ui/README.md](packages/ui/README.md).
-- Inline metadata (` · ` between compact label segments): use
+- Inline metadata (`·` between compact label segments): use
   `joinInlineMetadata` (strings) or `InlineMetadata` (JSX) — see
   [packages/ui/docs/inline-metadata.md](packages/ui/docs/inline-metadata.md).
   Do not hand-roll middle-dot separators in production code.
@@ -245,4 +245,19 @@ unsure, ask. Recommend a new doc when substantial work has no existing home.
 
 ## Commits
 
-Use Conventional Commits (commitlint-enforced).
+Conventional Commits enforced by `commitlint` on commit-msg (see
+[`commitlint.config.js`](commitlint.config.js)).
+
+**Subject line only** unless the user asks for a body:
+
+`<type>(<scope>): <subject>`
+
+- **Whole header ≤ 100 characters** (`header-max-length`).
+- **No trailing period** on the subject (`subject-full-stop`).
+- **Subject:** lowercase; not Title Case, Sentence case, or ALL CAPS
+  (`subject-case`).
+- **Type:** lowercase (`feat`, `fix`, `chore`, …).
+- **Scope:** feature area when it fits (`character`, `ui`, `dashboard`, …);
+  omit only when truly cross-cutting.
+
+Example: `feat(character): disclose starting-tier grants and gold bonus formulas`

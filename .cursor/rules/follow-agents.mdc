@@ -5,6 +5,9 @@ alwaysApply: true
 
 Follow the conventions in [AGENTS.md](../../AGENTS.md).
 
+**Commits:** `type(scope): lowercase subject`, no trailing period, whole header
+≤ 100 characters — see AGENTS.md **Commits**.
+
 **Default agent work:** focused validation (narrow tests, targeted typecheck/lint,
 optional affected checks)—see AGENTS.md **Agent validation**. Pre-commit is fast;
 broad affected tests run at push via `gate:pre-push`. Finish without running hooks,
