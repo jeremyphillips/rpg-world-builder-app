@@ -42,7 +42,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80',
+          'bg-action-primary text-action-primary-foreground shadow-sm hover:bg-action-primary/90 active:bg-action-primary/80',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/80',
         warning:
@@ -51,7 +51,7 @@ export const buttonVariants = cva(
           'border-0 bg-transparent shadow-none rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         outline: `${outlineControlShellClasses} ${outlineControlExpandedClasses}`,
         secondary:
-          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/60',
+          'bg-action-secondary text-action-secondary-foreground shadow-sm hover:bg-action-secondary/80 active:bg-action-secondary/60',
         ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         text: textButtonTransparentClasses,
       },

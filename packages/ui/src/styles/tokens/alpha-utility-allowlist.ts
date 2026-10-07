@@ -5,14 +5,13 @@
  */
 export const ALLOWED_ALPHA_UTILITIES = new Set([
   // Solid control hover/active (Button)
-  'hover:bg-primary/90',
-  'active:bg-primary/90',
-  'active:bg-primary/80',
+  'hover:bg-action-primary/90',
+  'active:bg-action-primary/80',
   'hover:bg-destructive/90',
   'active:bg-destructive/90',
   'active:bg-destructive/80',
-  'hover:bg-secondary/80',
-  'active:bg-secondary/60',
+  'hover:bg-action-secondary/80',
+  'active:bg-action-secondary/60',
   'active:bg-accent/80',
   'hover:text-primary/90',
   'active:text-primary/80',

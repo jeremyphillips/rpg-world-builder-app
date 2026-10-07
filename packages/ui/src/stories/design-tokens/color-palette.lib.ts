@@ -60,10 +60,7 @@ export const PALETTE_ELEVATION_LADDER_TOKENS: ColorToken[] = PALETTE_ELEVATION_L
 )
 
 /** Orthogonal surface planes outside the elevation ladder. */
-export const PALETTE_ORTHOGONAL_SURFACE_TOKENS: ColorToken[] = [
-  'surface-secondary',
-  'surface-accent',
-].map((step) => ({
+export const PALETTE_ORTHOGONAL_SURFACE_TOKENS: ColorToken[] = ['surface-accent'].map((step) => ({
   name: step,
   cssVar: `--palette-${step}`,
   tailwind: '(palette only)',
@@ -82,7 +79,11 @@ function palettePrimitiveUsage(step: string): ColorTokenUsage {
 /** Canvas would hide ink-on-solid samples — show on the plane each role is authored for. */
 const PALETTE_TEXT_DEMO_SURFACES: Partial<Record<string, `--${string}`>> = {
   'fg-on-solid': '--palette-primary',
-  'fg-on-status': '--palette-warning',
+  'fg-on-status': '--palette-secondary',
+  'primary-foreground': '--palette-primary',
+  'secondary-foreground': '--palette-secondary',
+  'action-primary-foreground': '--palette-action-primary',
+  'action-secondary-foreground': '--palette-action-secondary',
 }
 
 function palettePrimitiveToken(step: string): ColorToken {
@@ -204,6 +205,34 @@ export const COLOR_TOKEN_GROUPS: ColorTokenGroup[] = [
         name: 'secondary-foreground',
         cssVar: '--secondary-foreground',
         tailwind: 'text-secondary-foreground',
+        usage: 'text',
+      },
+      {
+        name: 'action-primary',
+        cssVar: '--action-primary-bg',
+        tailwind: 'bg-action-primary',
+        usage: 'background',
+        foregroundVar: '--action-primary-fg',
+        foregroundTailwind: 'text-action-primary-foreground',
+      },
+      {
+        name: 'action-primary-foreground',
+        cssVar: '--action-primary-fg',
+        tailwind: 'text-action-primary-foreground',
+        usage: 'text',
+      },
+      {
+        name: 'action-secondary',
+        cssVar: '--action-secondary-bg',
+        tailwind: 'bg-action-secondary',
+        usage: 'background',
+        foregroundVar: '--action-secondary-fg',
+        foregroundTailwind: 'text-action-secondary-foreground',
+      },
+      {
+        name: 'action-secondary-foreground',
+        cssVar: '--action-secondary-fg',
+        tailwind: 'text-action-secondary-foreground',
         usage: 'text',
       },
       {

@@ -38,8 +38,8 @@
   --card-foreground: var(--foreground);
   --popover: var(--palette-surface-panel);
   --popover-foreground: var(--foreground);
-  --secondary: var(--palette-surface-secondary);
-  --secondary-foreground: var(--foreground);
+  --secondary: var(--palette-secondary);
+  --secondary-foreground: var(--palette-secondary-foreground);
   --surface-faint: var(--palette-surface-faint);
   --surface-lift: var(--palette-surface-lift);
   --surface-subtle: var(--palette-surface-subtle);
@@ -71,9 +71,14 @@
   /* Typography — theme-scoped weight roles (`eyebrow-style-*` composites) */
   --font-weight-eyebrow: var(--font-weight-medium);
 
-  /* Brand — primary actions, links, focus accents (`bg-primary`, `text-primary`, `ring-ring`, …) */
+  /* Brand accent — deep rust ink, rings, and selected marks. */
   --primary: var(--palette-primary);
-  --primary-foreground: var(--palette-fg-on-solid);
+  --primary-foreground: var(--palette-primary-foreground);
+  /* Solid button fills. Primary matches the accent; foreground is cream on the deep rust. */
+  --action-primary-bg: var(--palette-action-primary);
+  --action-primary-fg: var(--palette-action-primary-foreground);
+  --action-secondary-bg: var(--palette-action-secondary);
+  --action-secondary-fg: var(--palette-action-secondary-foreground);
 
   /* Status — alerts, badges, destructive form errors (`bg-destructive-subtle`, `border-info-muted`, …) */
   --destructive: var(--palette-destructive);

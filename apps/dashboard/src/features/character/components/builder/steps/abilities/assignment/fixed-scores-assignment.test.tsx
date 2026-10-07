@@ -214,11 +214,11 @@ describe('FixedScoresAssignment', () => {
     renderAssignment({ str: 15 })
 
     const poolToken = within(getScorePoolSection()).getByRole('button', { name: 'Score 14' })
-    expect(poolToken).toHaveClass('bg-secondary', 'border-border')
+    expect(poolToken).toHaveClass('bg-card', 'border-border')
 
     const assignedScore = screen.getByRole('button', { name: 'Strength score 15' })
     expect(assignedScore).toHaveClass('bg-transparent', 'px-0', 'w-fit', 'hover:px-4', 'hover:py-2')
-    expect(assignedScore).not.toHaveClass('bg-secondary')
+    expect(assignedScore).not.toHaveClass('bg-card')
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -26,7 +26,7 @@ describe('ScoreToken', () => {
     )
 
     const token = screen.getByRole('button', { name: 'Score 15' })
-    expect(token).toHaveClass('bg-secondary', 'border-border', 'cursor-grab')
+    expect(token).toHaveClass('bg-card', 'border-border', 'cursor-grab')
     expect(token).toHaveTextContent('15')
   })
 
@@ -45,7 +45,7 @@ describe('ScoreToken', () => {
 
     const token = screen.getByRole('button', { name: 'Dexterity score 14' })
     expect(token).toHaveClass('bg-transparent', 'px-0', 'w-fit', 'hover:px-4', 'hover:py-2')
-    expect(token).not.toHaveClass('bg-secondary', 'px-4')
+    expect(token).not.toHaveClass('bg-card', 'px-4')
     expect(token).toHaveClass('cursor-grab')
   })
 
@@ -80,7 +80,7 @@ describe('ScoreToken', () => {
 
     const token = screen.getByRole('button', { name: 'Dexterity score 14' })
     expect(token).toHaveClass('invisible', 'opacity-0')
-    expect(token).not.toHaveClass('bg-secondary')
+    expect(token).not.toHaveClass('bg-card')
   })
 
   it('applies token surface when dragging assigned score', () => {
@@ -98,7 +98,7 @@ describe('ScoreToken', () => {
     )
 
     const token = screen.getByRole('button', { name: 'Dexterity score 14' })
-    expect(token).toHaveClass('bg-secondary', 'border-border', 'opacity-40', 'px-4', 'py-2')
+    expect(token).toHaveClass('bg-card', 'border-border', 'opacity-40', 'px-4', 'py-2')
   })
 
   it('renders drag overlay with token surface and no button role', () => {
@@ -107,7 +107,7 @@ describe('ScoreToken', () => {
     )
 
     const token = container.querySelector('[aria-hidden="true"]')
-    expect(token).toHaveClass('bg-secondary', 'shadow-lg', 'pointer-events-none')
+    expect(token).toHaveClass('bg-card', 'shadow-lg', 'pointer-events-none')
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 

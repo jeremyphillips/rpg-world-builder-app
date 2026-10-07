@@ -28,6 +28,7 @@ const BANNED_ALPHA_PATTERNS: RegExp[] = [
   /\b(?:[\w-]+:)*border-(?:destructive|info|success|warning|neutral)-muted\/[\w-[\]%]+/g,
   /\b(?:[\w-]+:)*bg-(?:destructive|info|success|warning)\/[\w-[\]%]+/g,
   /\b(?:[\w-]+:)*bg-primary\/[\w-[\]%]+/g,
+  /\b(?:[\w-]+:)*bg-action-(?:primary|secondary)\/[\w-[\]%]+/g,
 ]
 
 function collectSourceFiles(dir: string, files: string[] = []): string[] {
