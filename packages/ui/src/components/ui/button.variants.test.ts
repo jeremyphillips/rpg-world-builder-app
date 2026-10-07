@@ -16,6 +16,7 @@ describe('buttonVariants matrix', () => {
     expect(defaultClasses).toContain('text-control-action-xs')
     expect(defaultClasses).toContain('h-control-action-xs')
     expect(defaultClasses).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(defaultClasses).not.toContain('[&_svg]:size-icon-glyph-lg')
 
     const compactClasses = classesFor({
       variant: 'ghost',
@@ -25,6 +26,14 @@ describe('buttonVariants matrix', () => {
     expect(compactClasses).toContain('text-control-action-xs')
     expect(compactClasses).toContain('h-control-action-compact')
     expect(compactClasses).toContain('px-2')
+    expect(compactClasses).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(compactClasses).not.toContain('[&_svg]:size-icon-glyph-lg')
+  })
+
+  it('applies default lg glyph to standard chrome sizes', () => {
+    const classes = classesFor({ variant: 'default', size: 'default', density: 'default' })
+    expect(classes).toContain('[&_svg]:size-icon-glyph-lg')
+    expect(classes).not.toContain('[&_svg]:size-icon-glyph-xs')
   })
 
   it('applies control-action-xs typography to text xs compact actions', () => {
@@ -58,6 +67,7 @@ describe('buttonVariants matrix', () => {
 
     expect(defaultClasses).toContain('size-control-action-compact')
     expect(defaultClasses).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(defaultClasses).not.toContain('[&_svg]:size-icon-glyph-lg')
     expect(defaultClasses).not.toContain('[&_svg]:size-icon-glyph-md')
 
     expect(compactClasses).toBe(defaultClasses)

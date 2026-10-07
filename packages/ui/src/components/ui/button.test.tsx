@@ -28,10 +28,10 @@ describe('Button', () => {
         Reset
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass(
-      'text-control-action-xs',
-      'h-control-action-xs',
-    )
+    const xsButton = screen.getByRole('button', { name: 'Reset' })
+    expect(xsButton).toHaveClass('text-control-action-xs', 'h-control-action-xs')
+    expect(xsButton).toHaveClass('[&_svg]:size-icon-glyph-xs')
+    expect(xsButton).not.toHaveClass('[&_svg]:size-icon-glyph-lg')
 
     rerender(
       <Button size="icon-xs" variant="ghost" aria-label="Remove">
