@@ -7,9 +7,10 @@ import {
   projectEquipmentSelection,
   requiredByLabel,
   resolveEquipmentNotProficientMessage,
-  type Equipment,
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
+
+import { makeEquipment } from '@/test/fixtures/factories'
 
 import {
   equipmentOptionAccessibleLabel,
@@ -19,7 +20,7 @@ import {
 } from './equipment-option-row-presentation.lib'
 
 const wizard = { kind: 'class' as const, id: 'wizard' }
-const longsword = { kind: 'weapon', id: 'longsword', name: 'Longsword' } as Equipment
+const longsword = makeEquipment({ kind: 'weapon', slug: 'longsword', name: 'Longsword' })
 const fighter = { kind: 'class' as const, id: 'fighter' }
 const sourceName = (source: { kind: string; id?: string }) => {
   if (source.kind === 'class' && source.id === 'wizard') return 'Wizard'
@@ -231,7 +232,7 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     const presentation = resolveEquipmentOptionRowPresentation({
       identity: 'Plate Armor',
       kindLabel: 'Armor',
-      equipment: { kind: 'armor', id: 'plate-armor', name: 'Plate Armor' } as Equipment,
+      equipment: makeEquipment({ kind: 'armor', slug: 'plate-armor', name: 'Plate Armor' }),
       resolved: resolved({
         state: {
           compatibility: {

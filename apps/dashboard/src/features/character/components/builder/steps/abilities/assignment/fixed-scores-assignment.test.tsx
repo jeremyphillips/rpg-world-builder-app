@@ -243,7 +243,7 @@ describe('FixedScoresAssignment', () => {
       }),
     ).toBeInTheDocument()
     expect(screen.getByText(/are useful for Fighters\./)).toBeInTheDocument()
-    expect(screen.getByText(/Suggested: 15 → Strength, 14 → Dexterity\./)).toBeInTheDocument()
+    expect(screen.getByText(/Suggested: 15 → Strength, 14 → Dexterity/)).toBeInTheDocument()
     expect(
       screen.getAllByText(
         formatFieldMessage(characterBuilderAbilityRecommendationMessages.badgePrimary()),

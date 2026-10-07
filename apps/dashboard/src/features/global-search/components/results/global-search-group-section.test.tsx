@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { renderWithProviders } from '@/test/render'
@@ -11,6 +11,16 @@ import { GlobalSearchGroupSection } from './global-search-group-section'
 
 function rowShell(link: HTMLElement): HTMLElement {
   return link
+}
+
+function groupSection(label: string, count: number) {
+  return screen.getByRole('region', {
+    name: new RegExp(`${label},\\s*${count}\\s+results`, 'i'),
+  })
+}
+
+function groupHeading(label: string, count: number) {
+  return within(groupSection(label, count)).getByRole('heading', { level: 2 })
 }
 
 function document(
@@ -59,7 +69,7 @@ describe('GlobalSearchGroupSection', () => {
     expect(screen.queryByRole('link', { name: /Show all/i })).not.toBeInTheDocument()
     expect(container.querySelector('section')).not.toHaveClass('pb-4')
     expect(container.querySelector('[class*="[&>*+*]:border-t"]')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: /Game terms · 2/i })).toBeInTheDocument()
+    expect(groupHeading('Game terms', 2)).toBeInTheDocument()
   })
 
   it('uses shared list-result heading and list chrome', () => {
@@ -72,7 +82,7 @@ describe('GlobalSearchGroupSection', () => {
     ]
 
     const { container } = renderSection(sections[0]!, 0, sections)
-    const heading = screen.getByRole('heading', { name: /Content · 1/i })
+    const heading = groupHeading('Content', 1)
     const list = container.querySelector('.bg-surface-lift')
     const row = rowShell(screen.getByRole('link', { name: 'Result 1, Spell' }))
 
@@ -118,7 +128,7 @@ describe('GlobalSearchGroupSection', () => {
     ]
 
     renderSection(sections[1]!, 1, sections)
-    const heading = screen.getByRole('heading', { name: /Content · 14/i })
+    const heading = groupHeading('Content', 14)
 
     expect(heading.className).toContain('border-t')
     expect(heading.className).toContain('border-border-subtle')
@@ -139,7 +149,7 @@ describe('GlobalSearchGroupSection', () => {
     ]
 
     renderSection(sections[1]!, 1, sections)
-    const heading = screen.getByRole('heading', { name: /Game terms · 1/i })
+    const heading = groupHeading('Game terms', 1)
 
     expect(heading.className).not.toContain('border-t')
   })

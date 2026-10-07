@@ -292,7 +292,7 @@ function attachResolvedPresentationToRecommendations(args: {
   catalogIndex: CharacterBuildCatalogIndex
   proficiencies: CharacterProficiencies
   focusEligibleIds: readonly string[]
-  ownedIds: readonly string[]
+  ownedIds: ReadonlySet<string>
   draft: CharacterBuilderDraft | undefined
 }): ReadonlyMap<string, DerivedEquipmentRecommendation> {
   const {

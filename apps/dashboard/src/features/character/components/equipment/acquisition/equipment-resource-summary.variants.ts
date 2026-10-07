@@ -11,6 +11,20 @@ export const equipmentResourceSummaryRowVariants = cva('flex gap-4', {
 
 export const equipmentResourceSummaryStackClasses = 'flex min-w-0 flex-1 flex-col'
 
+export const equipmentResourceSummaryResourceRowClasses = cva('flex min-w-0 gap-3', {
+  variants: {
+    density: {
+      compact: 'items-start',
+      comfortable: 'items-start',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
+export const equipmentResourceSummaryMetadataClasses = 'mt-1'
+
 export const equipmentResourceSummarySectionDividerClasses = 'border-t border-border pt-3'
 
 export const equipmentResourceSummaryBadgeListClasses = 'flex flex-wrap gap-2 whitespace-normal'

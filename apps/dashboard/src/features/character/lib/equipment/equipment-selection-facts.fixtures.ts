@@ -12,6 +12,7 @@ import {
   type StartingEquipmentOption,
 } from '@rpg/contracts'
 
+import { makeEquipment } from '@/test/fixtures/factories'
 import { makeCharacterBuildCatalog } from '@/test/fixtures/factories/additional/character-build-catalog'
 import { pickClass, pickEquipment } from '@/test/fixtures/pick'
 
@@ -46,10 +47,11 @@ export const selectionFactsEquipment = Object.fromEntries(
   EQUIPMENT_SLUGS.map((slug) => [slug, pickEquipment(slug)]),
 ) as Record<SelectionFactsEquipmentSlug, Equipment>
 
-const { cost: _robeCost, ...robeWithoutCost } = selectionFactsEquipment.robe
-
 /** Robe without a market price, so package conversion blocks it. */
-export const selectionFactsUnpricedRobe = robeWithoutCost as Equipment
+export const selectionFactsUnpricedRobe = makeEquipment({
+  ...selectionFactsEquipment.robe,
+  cost: null,
+})
 
 const STANDARD_EQUIPMENT_OPTION_ID = 'standard-equipment'
 

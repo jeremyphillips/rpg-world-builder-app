@@ -1,5 +1,9 @@
+import { join } from 'node:path'
+
 import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
+
+const DASHBOARD_ROOT = join(import.meta.dirname, '../..')
 
 // @ts-expect-error — JS eslint helper module (no .d.ts)
 import { inlineMetadataSeparatorRestrictions } from '@rpg/config/eslint/inline-metadata-separator-restrictions'
@@ -7,6 +11,7 @@ import { inlineMetadataSeparatorRestrictions } from '@rpg/config/eslint/inline-m
 describe('inline metadata ESLint guard (dashboard no-restricted-syntax merge)', () => {
   it('reports hand-rolled JSX metadata separators in a merged rule block', async () => {
     const eslint = new ESLint({
+      cwd: DASHBOARD_ROOT,
       overrideConfig: [
         {
           files: ['**/*.{ts,tsx}'],
@@ -35,6 +40,7 @@ describe('inline metadata ESLint guard (dashboard no-restricted-syntax merge)', 
 
   it('reports hand-rolled template metadata separators', async () => {
     const eslint = new ESLint({
+      cwd: DASHBOARD_ROOT,
       overrideConfig: [
         {
           files: ['**/*.{ts,tsx}'],

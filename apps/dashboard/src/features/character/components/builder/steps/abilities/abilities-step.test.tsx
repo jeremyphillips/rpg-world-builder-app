@@ -108,7 +108,7 @@ describe('AbilitiesStep', () => {
       ),
     ).toBeInTheDocument()
     expect(screen.getByText(/Strength is useful for Fighters\./)).toBeInTheDocument()
-    expect(screen.getByText(/Suggested: 15 → Strength\./)).toBeInTheDocument()
+    expect(screen.getByText(/Suggested: 15 → Strength/)).toBeInTheDocument()
   })
 
   it('surfaces step validation issues from the builder frame', () => {

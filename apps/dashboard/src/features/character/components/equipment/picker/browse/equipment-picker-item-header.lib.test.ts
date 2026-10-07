@@ -448,10 +448,17 @@ describe('equipment picker blocker mapping', () => {
   })
 
   it('replaces a not-for-sale badge with the filled-choice action in magic-items mode', () => {
-    const unpricedCommon = {
+    const unpricedCommon = equipmentSchema.parse({
       ...commonCharm,
       cost: null,
-    }
+    })
+    const unpricedUncommon = equipmentSchema.parse({
+      ...unpricedCommon,
+      id: `${RULESET}:pearl-of-power-uncommon`,
+      slug: 'pearl-of-power-uncommon',
+      name: 'Pearl of Power (uncommon)',
+      rarity: 'uncommon',
+    })
     const filled = (
       rarities: Array<'common' | 'uncommon'>,
     ): NonNullable<
@@ -504,8 +511,8 @@ describe('equipment picker blocker mapping', () => {
     })
 
     const uncommonPresentation = resolveEquipmentPickerItemPresentation({
-      equipment: { ...unpricedCommon, rarity: 'uncommon' },
-      row: buildEquipmentPickerRowViewModel({ ...unpricedCommon, rarity: 'uncommon' }),
+      equipment: unpricedUncommon,
+      row: buildEquipmentPickerRowViewModel(unpricedUncommon),
       workflowMode: 'magic_items',
       rowActionVm,
       ownership: EMPTY_EQUIPMENT_OWNERSHIP,

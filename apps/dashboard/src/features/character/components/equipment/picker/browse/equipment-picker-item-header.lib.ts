@@ -385,12 +385,15 @@ function resolveMagicItemBlockedPresentation(args: {
   const { rowActionVm, rarity, ownership, workflowMode, magicItemGrantProgress } = args
   const headerBlocker = resolveMagicItemHeaderBlocker({ rowActionVm, rarity })
 
-  if (
-    shouldShowMagicItemChoiceUnavailableAction({ rarity, headerBlocker, magicItemGrantProgress })
-  ) {
+  const magicItemChoiceUnavailable = {
+    rarity,
+    headerBlocker,
+    magicItemGrantProgress,
+  }
+  if (shouldShowMagicItemChoiceUnavailableAction(magicItemChoiceUnavailable)) {
     const control = resolveMagicItemChoiceUnavailableControl({
-      rarity,
-      magicItemGrantProgress,
+      rarity: magicItemChoiceUnavailable.rarity,
+      magicItemGrantProgress: magicItemChoiceUnavailable.magicItemGrantProgress,
     })
     return {
       control,
