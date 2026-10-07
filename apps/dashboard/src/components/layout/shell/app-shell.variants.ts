@@ -7,11 +7,20 @@
  */
 export const appShellHorizontalPaddingClasses = 'px-4 sm:px-6'
 
+/** Breadcrumb rail row height (matches `h-8` / 32px). */
+export const appBreadcrumbRailBlockSize = '2rem'
+
 /** Sticky topbar + breadcrumb block size — sticky rail offsets and layout tokens. */
-export const appStickyChromeBlockSize = 'calc(3rem + 2.5rem)'
+export const appStickyChromeBlockSize = `calc(3rem + ${appBreadcrumbRailBlockSize})`
+
+/**
+ * Fallback inside Tailwind `var(--app-sticky-chrome-block-size, …)` when the
+ * custom property is unset (no spaces — valid in arbitrary properties).
+ */
+export const appStickyChromeBlockSizeVarFallback = 'calc(3rem+2rem)'
 
 /** Named px fallback when `--app-sticky-chrome-block-size` is unavailable (document scroll spy). */
-export const appStickyChromeBlockSizeFallbackPx = 88
+export const appStickyChromeBlockSizeFallbackPx = 80
 
 /** Outer authenticated workspace frame — document scroll; no viewport lock. */
 export const appShellRootClasses = `flex min-h-dvh bg-background [--app-sticky-chrome-block-size:${appStickyChromeBlockSize}]`

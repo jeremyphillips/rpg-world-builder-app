@@ -2,6 +2,8 @@ import { cva } from 'class-variance-authority'
 
 import { cn, establishSurfaceCurrent } from '@rpg/ui'
 
+import { appStickyChromeBlockSizeVarFallback } from '@/components/layout/shell/app-shell.variants'
+
 /** Desktop in-page section rail column width (`lg:w-60` on the slot wrapper). */
 export const inPageSectionNavRailWidthClasses = 'w-60'
 
@@ -27,14 +29,13 @@ export const inPageSectionNavSectionListClasses = 'space-y-1'
 export const inPageSectionNavMobileSelectSlotClasses = 'lg:hidden'
 
 /** Desktop nav panel — sticky within the stretch column. */
-export const inPageSectionNavStickyClasses =
-  'lg:sticky lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))] lg:self-start'
+export const inPageSectionNavStickyClasses = `lg:sticky lg:top-[var(--app-sticky-chrome-block-size,${appStickyChromeBlockSizeVarFallback})] lg:self-start`
 
 export const inPageSectionNavPanelClasses = cn(
   'hidden lg:block',
   inPageSectionNavRailWidthClasses,
   inPageSectionNavStickyClasses,
-  'max-h-[calc(100vh-var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))-2rem)] overflow-y-auto',
+  `max-h-[calc(100vh-var(--app-sticky-chrome-block-size,${appStickyChromeBlockSizeVarFallback})-2rem)] overflow-y-auto`,
 )
 
 export const inPageSectionNavLeafListClasses = cva('ml-3.5 mt-1 space-y-0.5 border-l-2 pl-2', {
