@@ -14,7 +14,7 @@ export const entityAnatomyTrailingQuantityLabelVariants = cva('text-sm tabular-n
 /** Inline provenance or price sitting before a trailing control. */
 export const entityAnatomyTrailingMetaVariants = cva('shrink-0 text-sm text-muted-foreground')
 
-/** Price or rarity label sharing the band cell with the group control. */
+/** Price or rarity-choice label in the trailing band — `text-xs`, weight 500, foreground. */
 export const entityAnatomyTrailingGroupSecondaryVariants = cva(
-  'shrink-0 text-sm tabular-nums text-muted-foreground',
+  'shrink-0 text-xs font-body-emphasis tabular-nums text-foreground',
 )

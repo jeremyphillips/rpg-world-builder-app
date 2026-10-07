@@ -55,6 +55,7 @@ export function buildPackageRadioCardOption({
     label: summary.label,
     description: summary.description,
     summaryLines: startingEquipmentOptionFundingSummaryLines(summary),
+    embeddedSlotTone: proficiencyLinks.length > 0 ? 'plain' : 'divider',
     embeddedContent: hasNestedFields ? (
       <StartingEquipmentNestedFields
         summary={summary}

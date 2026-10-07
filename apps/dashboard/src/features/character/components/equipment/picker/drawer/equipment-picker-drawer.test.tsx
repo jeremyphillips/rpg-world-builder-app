@@ -708,6 +708,8 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Purchase' }).querySelector('svg')).not.toBeNull()
+    expect(screen.getByRole('button', { name: 'Magic items' }).querySelector('svg')).not.toBeNull()
 
     await user.click(screen.getByRole('button', { name: 'Magic items' }))
 

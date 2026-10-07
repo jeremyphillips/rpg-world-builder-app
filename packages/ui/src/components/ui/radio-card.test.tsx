@@ -164,7 +164,7 @@ describe('RadioCard', () => {
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
     const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-background')
+    expect(shell).toHaveClass('bg-surface-muted')
   })
 
   it('renders embedded content inside the selected card shell', () => {

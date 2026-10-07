@@ -1,12 +1,12 @@
 import { Heading, RichTextContent } from '@rpg/ui'
 
 import { RichTextWithTables } from '../../components/rich-text/rich-text-with-tables'
-
 import { ContentStaticBadge } from '../../lib/detail/metadata/content-link-badge'
 import {
   ContentStatList,
   type ContentStatRowSize,
 } from '../../lib/detail/metadata/content-stat-row'
+import { PICKER_DISCLOSURE_DESCRIPTION_SIZE } from '../../lib/detail/metadata/picker-disclosure-description'
 import { SPELL_DETAIL_SECTION_LABELS, type SpellDetailViewModel } from '../lib/spell-display'
 
 export type SpellDetailMetadataProps = {
@@ -36,11 +36,15 @@ export function SpellDetailMetadata({
           <RichTextWithTables
             html={viewModel.descriptionHtml}
             tables={viewModel.descriptionTables}
-            size="sm"
+            size={PICKER_DISCLOSURE_DESCRIPTION_SIZE}
             tone="muted"
           />
         ) : (
-          <RichTextContent html={viewModel.descriptionHtml} size="sm" tone="muted" />
+          <RichTextContent
+            html={viewModel.descriptionHtml}
+            size={PICKER_DISCLOSURE_DESCRIPTION_SIZE}
+            tone="muted"
+          />
         )
       ) : null}
 

@@ -6,12 +6,11 @@ import {
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
-import { ComboboxField, Text } from '@rpg/ui'
+import { ComboboxField, Eyebrow, Text } from '@rpg/ui'
 
 import { ChoiceSetField } from '../../builder/fields/choice-set-field'
 import {
   EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE,
-  EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION,
   EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL,
   EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE,
   areNestedPoolsResolved,
@@ -22,6 +21,8 @@ import {
   type StartingEquipmentNestedPool,
 } from '../../../lib/equipment/equipment-step.lib'
 import {
+  startingEquipmentIncludedToolGuidanceClasses,
+  startingEquipmentIncludedToolHeadingClasses,
   startingEquipmentOptionNestedFieldsClasses,
   startingEquipmentOptionReasonsClasses,
 } from './starting-equipment-option-cards.variants'
@@ -129,22 +130,24 @@ function IncludedToolField({
   }
 
   const selection = draft.choiceSelections[link.choiceSetId] ?? []
-  const selectedOption = choiceSet.options.find((entry) => entry.id === selection[0])
 
   return (
-    <div className="space-y-2">
-      <Text variant="small" className="font-medium">
+    <div>
+      <Eyebrow size="sm" className={startingEquipmentIncludedToolHeadingClasses}>
         {EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL}
-      </Text>
-      <ChoiceSetField
-        choiceSet={choiceSet}
-        value={selection}
-        onValueChange={(nextSelection) => onChoiceSelectionChange(link.choiceSetId, nextSelection)}
-      />
-      <Text variant="muted">{EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE}</Text>
-      {fieldState === 'resolved' && selectedOption ? (
-        <Text variant="muted">{EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION}</Text>
-      ) : null}
+      </Eyebrow>
+      <div className="space-y-2">
+        <ChoiceSetField
+          choiceSet={choiceSet}
+          value={selection}
+          onValueChange={(nextSelection) =>
+            onChoiceSelectionChange(link.choiceSetId, nextSelection)
+          }
+        />
+        <Text variant="muted" className={startingEquipmentIncludedToolGuidanceClasses}>
+          {EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE}
+        </Text>
+      </div>
     </div>
   )
 }

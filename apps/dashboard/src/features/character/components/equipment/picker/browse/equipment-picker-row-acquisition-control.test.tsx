@@ -6,6 +6,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_ADD_LABEL,
   EquipmentPickerRowAcquisitionControl,
@@ -41,6 +42,19 @@ describe('EquipmentPickerRowAcquisitionControl', () => {
     const { container } = renderControl({ kind: 'none' })
 
     expect(container).toBeEmptyDOMElement()
+  })
+
+  it('renders a disabled Not for sale action that does not commit', async () => {
+    const user = userEvent.setup()
+    const { onAdd } = renderControl({
+      kind: 'disabled',
+      label: EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
+    })
+
+    const button = screen.getByRole('button', { name: EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL })
+    expect(button).toBeDisabled()
+    await user.click(button)
+    expect(onAdd).not.toHaveBeenCalled()
   })
 
   it('commits one copy from Add', async () => {

@@ -164,6 +164,7 @@ export {
   type EquipmentPickerRowViewModel,
   EquipmentDetailMetadata,
 } from './equipment'
+export { PICKER_DISCLOSURE_DESCRIPTION_SIZE } from './lib/detail/metadata/picker-disclosure-description'
 export { EquipmentEdit } from './equipment/routes/equipment-edit'
 export {
   SkillProficienciesOverview,

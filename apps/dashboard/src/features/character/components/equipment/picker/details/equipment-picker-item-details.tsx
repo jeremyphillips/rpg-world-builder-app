@@ -4,6 +4,7 @@ import {
   buildEquipmentDetailViewModel,
   EQUIPMENT_STAT_LABELS,
   EquipmentDetailMetadata,
+  PICKER_DISCLOSURE_DESCRIPTION_SIZE,
 } from '@/features/content'
 
 import {
@@ -58,6 +59,7 @@ export function EquipmentPickerItemDetails({
         omitStatLabels={[EQUIPMENT_STAT_LABELS.kind, EQUIPMENT_STAT_LABELS.cost]}
         omitSectionTitle
         statRowSize="sm"
+        descriptionSize={PICKER_DISCLOSURE_DESCRIPTION_SIZE}
       />
 
       {previewLines ? (

@@ -232,10 +232,8 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       startingWealth: equipmentStepHeroMagicItemWealthFixture,
     })
 
-    expect(presentation).toMatchObject({
-      blockers: [{ kind: 'blocker', reason: 'acquisition_blocked', label: 'No Common choices' }],
-      control: { kind: 'none' },
-    })
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No Common choices' })
   })
 
   it('shows blocked trailing and no add for unowned blocked rows', () => {
@@ -261,10 +259,8 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       catalogIndex: rareCatalogIndex,
     })
 
-    expect(presentation).toMatchObject({
-      blockers: [{ kind: 'blocker', reason: 'acquisition_blocked', label: 'No Rare choices' }],
-      control: { kind: 'none' },
-    })
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No Rare choices' })
   })
 
   it('swaps add for release once the single acquired copy fills the cap', () => {
@@ -426,9 +422,24 @@ describe('equipment picker blocker mapping', () => {
     expect(blockersFor('unsupported_kind')).toMatchObject([
       { reason: 'unavailable', label: 'Unavailable here', category: 'availability' },
     ])
-    expect(blockersFor('no_market_price')).toMatchObject([
-      { reason: 'not_purchasable', label: 'Not for sale', category: 'availability' },
-    ])
+    expect(blockersFor('no_market_price')).toBeUndefined()
+  })
+
+  it('replaces the not-for-sale badge with a disabled action in purchase mode', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: rareAmulet,
+      row: buildEquipmentPickerRowViewModel(rareAmulet),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'Not for sale' })
   })
 
   it('emits an unaffordable blocker only when no price label is shown', () => {

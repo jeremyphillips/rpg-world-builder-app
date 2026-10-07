@@ -247,9 +247,7 @@ export function formatPackageInventoryRowTitle(name: string, quantity: number): 
 export const EQUIPMENT_INCLUDED_TOOL_SECTION_LABEL = 'Included tool'
 
 export const EQUIPMENT_INCLUDED_TOOL_RELATIONSHIP_GUIDANCE =
-  'This is the same selection used for your Tool Proficiency.'
-
-export const EQUIPMENT_INCLUDED_TOOL_RESOLVED_ANNOTATION = 'Selected for Tool Proficiencies'
+  'This choice also grants proficiency with the selected tool.'
 
 export const EQUIPMENT_INVALID_PROFICIENCY_LINK_MESSAGE =
   'The linked Tool Proficiency choice is unavailable. This class content must be corrected before the package can resolve.'

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_ADD_LABEL,
   EquipmentPickerRowAcquisitionControl,
@@ -28,6 +29,10 @@ export const Add: Story = {
 
 export const AddBlocked: Story = {
   args: { control: { kind: 'add', disabled: true } },
+}
+
+export const NotForSale: Story = {
+  args: { control: { kind: 'disabled', label: EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } },
 }
 
 export const AddFailed: Story = {

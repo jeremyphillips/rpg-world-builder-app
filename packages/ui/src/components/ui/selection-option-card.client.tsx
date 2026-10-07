@@ -50,7 +50,7 @@ export type SelectionOptionCardProps = {
    * `optionCardEmbeddedSlotVariants`.
    */
   embedded?: ReactNode
-  embeddedTone?: 'divider' | 'panel'
+  embeddedTone?: 'divider' | 'panel' | 'plain'
   className?: string
 }
 

@@ -292,6 +292,7 @@ describe('EquipmentStartingPackageGoldHeader', () => {
     expect(screen.getByText(/No package gear/)).toHaveTextContent(
       `${EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT} · Starting Gold`,
     )
+    expect(screen.getByText(/No package gear/)).toHaveClass('mt-2')
     expect(screen.queryByRole('button', { name: /^Starting Package/ })).not.toBeInTheDocument()
   })
 })

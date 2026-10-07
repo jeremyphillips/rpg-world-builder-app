@@ -9,6 +9,9 @@ export const equipmentStartingPackageHeaderActionsClasses = 'flex shrink-0 items
 
 export const equipmentStartingPackageSubtitleClasses = 'text-sm text-muted-foreground'
 
+/** Gold-path empty line — 8px below the Starting Package heading. */
+export const equipmentStartingPackageGoldSubtitleClasses = `${equipmentStartingPackageSubtitleClasses} mt-2`
+
 export const equipmentStartingPackageChevronVariants = cva('size-4 shrink-0 transition-transform', {
   variants: {
     open: {

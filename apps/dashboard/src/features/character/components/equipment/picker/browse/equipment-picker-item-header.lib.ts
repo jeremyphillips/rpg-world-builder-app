@@ -42,12 +42,14 @@ export const EQUIPMENT_PICKER_CONVERTED_LABEL = 'Converted'
  * The single acquisition affordance in the card header.
  *
  * - `add` — one more copy through the workflow's channel.
+ * - `disabled` — a labeled action that cannot commit (for example Not for sale).
  * - `stepper` — owns the aggregate editable purchased quantity.
  * - `release` / `remove` — the item is at its acquired-copy cap, so the header
  *   acts on the one counted contribution instead of adding.
  */
 export type EquipmentPickerHeaderControl =
   | { kind: 'add'; disabled: boolean }
+  | { kind: 'disabled'; label: string }
   | { kind: 'stepper'; value: number; max: number }
   | { kind: 'release'; allowanceId: string }
   | { kind: 'remove'; purchaseId: string }
@@ -276,13 +278,20 @@ function resolvePurchasePresentation(args: {
   const { availability } = rowActionVm
 
   if (availability.status === 'unavailableForPurchase') {
+    if (availability.reason === 'no_market_price') {
+      const control: EquipmentPickerHeaderControl = {
+        kind: 'disabled',
+        label: EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
+      }
+      return {
+        control,
+        provenance: resolveProvenance({ ownership, control, workflowMode }),
+      }
+    }
+
     const control: EquipmentPickerHeaderControl = { kind: 'none' }
     return {
-      blockers: [
-        availability.reason === 'unsupported_kind'
-          ? selectionBlocker('unavailable', EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL)
-          : selectionBlocker('not_purchasable', EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL),
-      ],
+      blockers: [selectionBlocker('unavailable', EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL)],
       control,
       provenance: resolveProvenance({ ownership, control, workflowMode }),
     }
@@ -307,25 +316,32 @@ function resolvePurchasePresentation(args: {
   }
 }
 
-/** Magic-items mode buys nothing: Add spends a choice, and runs out when choices do. */
-function resolveMagicItemPresentation(args: {
+function resolveMagicItemHeaderBlocker(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
-  equipment: Equipment
+  rarity: MagicItemRarity | undefined
+}): EquipmentAcquisitionBlocker | { code: 'no_matching_grant' } | undefined {
+  const blocker =
+    args.rowActionVm.capabilities.addBlockedReason ?? args.rowActionVm.plan.blockers[0]
+  if (blocker && blocker.code !== 'duplicate_not_allowed') return blocker
+  if (args.rarity) return { code: 'no_matching_grant' }
+  return undefined
+}
+
+function resolveMagicItemBlockedPresentation(args: {
+  rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
+  rarity: MagicItemRarity | undefined
   ownership: EquipmentOwnership
   workflowMode: EquipmentPickerWorkflowMode
 }): EquipmentPickerItemPresentation {
-  const { rowActionVm, equipment, ownership, workflowMode } = args
-  const { plan, capabilities } = rowActionVm
-  const rarity = equipment.kind === 'magic_item' ? equipment.rarity : undefined
-  const grantQuantity = plan.grantAllocations.reduce(
-    (sum, allocation) => sum + allocation.quantity,
-    0,
-  )
+  const { rowActionVm, rarity, ownership, workflowMode } = args
+  const headerBlocker = resolveMagicItemHeaderBlocker({ rowActionVm, rarity })
 
-  if (capabilities.canAdd && grantQuantity > 0 && rarity) {
-    const control: EquipmentPickerHeaderControl = { kind: 'add', disabled: false }
+  if (headerBlocker?.code === 'no_matching_grant') {
+    const control: EquipmentPickerHeaderControl = {
+      kind: 'disabled',
+      label: formatEquipmentPickerHeaderTrailingLabel({ blocker: headerBlocker, rarity }),
+    }
     return {
-      priceSlot: { kind: 'grantPreview', label: formatMagicItemChoiceLabel(grantQuantity, rarity) },
       control,
       provenance: resolveProvenance({ ownership, control, workflowMode }),
     }
@@ -333,14 +349,6 @@ function resolveMagicItemPresentation(args: {
 
   const control: EquipmentPickerHeaderControl = { kind: 'none' }
   const provenance = resolveProvenance({ ownership, control, workflowMode })
-  const blocker = capabilities.addBlockedReason ?? plan.blockers[0]
-  const headerBlocker =
-    blocker && blocker.code !== 'duplicate_not_allowed'
-      ? blocker
-      : rarity
-        ? ({ code: 'no_matching_grant' } as const)
-        : undefined
-
   if (!headerBlocker) return { control, provenance }
 
   return {
@@ -353,6 +361,37 @@ function resolveMagicItemPresentation(args: {
     control,
     provenance,
   }
+}
+
+/** Magic-items mode buys nothing: Add spends a choice, and runs out when choices do. */
+function resolveMagicItemPresentation(args: {
+  rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
+  equipment: Equipment
+  ownership: EquipmentOwnership
+  workflowMode: EquipmentPickerWorkflowMode
+}): EquipmentPickerItemPresentation {
+  const { rowActionVm, equipment, ownership, workflowMode } = args
+  const rarity = equipment.kind === 'magic_item' ? equipment.rarity : undefined
+  const grantQuantity = rowActionVm.plan.grantAllocations.reduce(
+    (sum, allocation) => sum + allocation.quantity,
+    0,
+  )
+
+  if (rowActionVm.capabilities.canAdd && grantQuantity > 0 && rarity) {
+    const control: EquipmentPickerHeaderControl = { kind: 'add', disabled: false }
+    return {
+      priceSlot: { kind: 'grantPreview', label: formatMagicItemChoiceLabel(grantQuantity, rarity) },
+      control,
+      provenance: resolveProvenance({ ownership, control, workflowMode }),
+    }
+  }
+
+  return resolveMagicItemBlockedPresentation({
+    rowActionVm,
+    rarity,
+    ownership,
+    workflowMode,
+  })
 }
 
 export function resolveEquipmentPickerItemPresentation(args: {

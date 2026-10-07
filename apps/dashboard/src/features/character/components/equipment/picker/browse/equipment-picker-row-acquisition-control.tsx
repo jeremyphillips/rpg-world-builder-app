@@ -40,6 +40,14 @@ export function EquipmentPickerRowAcquisitionControl({
 }: EquipmentPickerRowAcquisitionControlProps) {
   if (control.kind === 'none') return null
 
+  if (control.kind === 'disabled') {
+    return (
+      <CatalogPickerActionButton disabled onClick={() => undefined}>
+        {control.label}
+      </CatalogPickerActionButton>
+    )
+  }
+
   if (control.kind === 'release') {
     return (
       <CatalogPickerActionButton onClick={() => onRelease(control.allowanceId)}>

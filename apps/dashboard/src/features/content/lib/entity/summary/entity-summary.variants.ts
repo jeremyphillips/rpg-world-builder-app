@@ -49,8 +49,8 @@ export const entitySummaryStatusVariants = cva('', {
 /** Status items wrap within the lane; the row-anatomy status cell owns the top offset. */
 export const entitySummaryStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
 
-/** Provenance segment copy — muted detail that reads alongside status on the third line. */
-export const entitySummaryProvenanceTextVariants = cva('text-muted-foreground', {
+/** Provenance segment copy — foreground source labels on the third line, beside status. */
+export const entitySummaryProvenanceTextVariants = cva('text-foreground', {
   variants: {
     density: {
       compact: 'text-xs',

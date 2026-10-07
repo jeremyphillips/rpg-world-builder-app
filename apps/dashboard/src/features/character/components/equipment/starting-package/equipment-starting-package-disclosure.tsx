@@ -50,6 +50,7 @@ import {
   equipmentStartingPackageHeaderActionsClasses,
   equipmentStartingPackageHeaderClasses,
   equipmentStartingPackageHeaderCopyClasses,
+  equipmentStartingPackageGoldSubtitleClasses,
   equipmentStartingPackageSubtitleClasses,
 } from './equipment-starting-package.variants'
 
@@ -80,7 +81,7 @@ export function EquipmentStartingPackageGoldHeader({ optionLabel }: { optionLabe
         <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
           {EQUIPMENT_STARTING_PACKAGE_TITLE}
         </Heading>
-        <Text as="p" className={equipmentStartingPackageSubtitleClasses}>
+        <Text as="p" className={equipmentStartingPackageGoldSubtitleClasses}>
           {joinInlineMetadata([EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT, optionLabel])}
         </Text>
       </div>

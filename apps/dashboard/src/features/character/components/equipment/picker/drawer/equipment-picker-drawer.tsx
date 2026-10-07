@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { SegmentedControl } from '@rpg/ui'
+import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet, getContentTypeItemLabel } from '@/features/content'
 import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
@@ -37,6 +37,11 @@ import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclos
 import { getEquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+
+const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
+  purchase: 'currency',
+  magic_items: 'magicItem',
+} as const satisfies Record<EquipmentPickerWorkflowMode, ResourceIconRole>
 
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
@@ -174,10 +179,14 @@ export function EquipmentPickerDrawer({
       <SegmentedControl
         value={workflowMode}
         onValueChange={(value) => onWorkflowModeChange(value as EquipmentPickerWorkflowMode)}
-        options={workflowModes.map((mode) => ({
-          value: mode,
-          label: EQUIPMENT_PICKER_MODE_LABELS[mode],
-        }))}
+        options={workflowModes.map((mode) => {
+          const Icon = resourceIcon(EQUIPMENT_PICKER_MODE_ICON_ROLES[mode])
+          return {
+            value: mode,
+            label: EQUIPMENT_PICKER_MODE_LABELS[mode],
+            leadingIcon: <Icon />,
+          }
+        })}
         aria-label={`${getContentTypeItemLabel('equipment')} picker workflow`}
         fullWidth
       />

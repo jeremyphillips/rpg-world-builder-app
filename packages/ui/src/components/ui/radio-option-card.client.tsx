@@ -26,7 +26,7 @@ import {
   type RadioCardVisualControl,
 } from './radio-card.variants'
 
-export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel'
+export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel' | 'plain'
 
 export type RadioOptionCardSummaryBadge = {
   label: string
