@@ -16,6 +16,7 @@ describe('magic item choice labels', () => {
   it('prefixes up-to allowances and leaves exact ones bare', () => {
     expect(formatMagicItemChoiceRarityPhrase('uncommon')).toBe('Uncommon')
     expect(formatMagicItemChoiceRarityPhrase('uncommon', 'up_to')).toBe('Up to Uncommon')
+    expect(formatMagicItemChoiceRarityPhrase('common', 'up_to')).toBe('Common')
   })
 
   it('pluralizes past one copy', () => {

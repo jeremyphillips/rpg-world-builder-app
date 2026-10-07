@@ -15,13 +15,15 @@ const MAGIC_ITEM_UP_TO_PREFIX = 'Up to'
 /**
  * Rarity phrase for an allowance bucket. Two allowances of the same rarity are
  * distinguished by their requirement: an up-to slot reads `Up to Uncommon`.
+ * The lowest tier omits the prefix because nothing sits below it.
  */
 export function formatMagicItemChoiceRarityPhrase(
   rarity: MagicItemRarity,
   requirement: MagicItemAllowanceRequirement = 'exact',
 ): string {
   const rarityLabel = getMagicItemRarityLabel(rarity)
-  return requirement === 'up_to' ? `${MAGIC_ITEM_UP_TO_PREFIX} ${rarityLabel}` : rarityLabel
+  const isUpTo = requirement === 'up_to' && rarity !== MAGIC_ITEM_RARITIES[0]
+  return isUpTo ? `${MAGIC_ITEM_UP_TO_PREFIX} ${rarityLabel}` : rarityLabel
 }
 
 /** `Common choice` at one, `2 Common choices` above it. */
