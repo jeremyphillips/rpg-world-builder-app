@@ -1,4 +1,11 @@
-import { CatalogPickerActionButton, Text } from '@rpg/ui'
+import {
+  CatalogPickerActionButton,
+  Text,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@rpg/ui'
 
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
@@ -6,7 +13,10 @@ import {
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentQuantityStepper } from '../../equipment-quantity-stepper'
 import type { EquipmentPickerHeaderControl } from './equipment-picker-item-header.lib'
-import { equipmentPickerRowControlStatusVariants } from './equipment-picker-row-acquisition-control.variants'
+import {
+  equipmentPickerRowControlStatusVariants,
+  equipmentPickerRowControlTooltipTriggerVariants,
+} from './equipment-picker-row-acquisition-control.variants'
 
 export const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
 export const EQUIPMENT_PICKER_ADD_FAILED_LABEL = 'Could not add this item.'
@@ -41,10 +51,24 @@ export function EquipmentPickerRowAcquisitionControl({
   if (control.kind === 'none') return null
 
   if (control.kind === 'disabled') {
-    return (
+    const action = (
       <CatalogPickerActionButton disabled onClick={() => undefined}>
         {control.label}
       </CatalogPickerActionButton>
+    )
+    if (!control.tooltip) return action
+
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span tabIndex={0} className={equipmentPickerRowControlTooltipTriggerVariants()}>
+              {action}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{control.tooltip}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     )
   }
 

@@ -652,6 +652,12 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
+    const list = screen.getByRole('list')
+    expect(
+      within(list).getByText(equipmentPickerMagicItemsFixture[0]!.equipment.name),
+    ).toBeInTheDocument()
+    expect(within(list).queryByText('Magic Item')).not.toBeInTheDocument()
+
     expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: 'Common' })).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: 'Uncommon' })).toBeInTheDocument()

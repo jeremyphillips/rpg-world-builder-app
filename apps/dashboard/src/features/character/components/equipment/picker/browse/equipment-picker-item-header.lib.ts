@@ -1,5 +1,10 @@
-import type { Equipment, MagicItemAcquiredCopyCap, MagicItemRarity } from '@rpg/contracts'
-import { copperToDisplayWealth, formatWealth, getMagicItemRarityLabel } from '@rpg/contracts'
+import type {
+  Equipment,
+  MagicItemAcquiredCopyCap,
+  MagicItemGrantProgress,
+  MagicItemRarity,
+} from '@rpg/contracts'
+import { copperToDisplayWealth, formatWealth } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type {
@@ -18,6 +23,9 @@ import {
 import {
   formatMagicItemChoiceLabel,
   formatMagicItemChoiceRarityPhrase,
+  formatMagicItemChoicesAlreadyUsed,
+  formatNoMagicItemChoicesLabel,
+  listExhaustedMagicItemChoiceRarities,
 } from '../../../../lib/equipment/magic-item-choice-label.lib'
 import type {
   EquipmentOwnership,
@@ -42,14 +50,15 @@ export const EQUIPMENT_PICKER_CONVERTED_LABEL = 'Converted'
  * The single acquisition affordance in the card header.
  *
  * - `add` — one more copy through the workflow's channel.
- * - `disabled` — a labeled action that cannot commit (for example Not for sale).
+ * - `disabled` — a labeled action that cannot commit (for example Not for sale,
+ *   or no remaining magic-item choices). `tooltip` explains a filled choice.
  * - `stepper` — owns the aggregate editable purchased quantity.
  * - `release` / `remove` — the item is at its acquired-copy cap, so the header
  *   acts on the one counted contribution instead of adding.
  */
 export type EquipmentPickerHeaderControl =
   | { kind: 'add'; disabled: boolean }
-  | { kind: 'disabled'; label: string }
+  | { kind: 'disabled'; label: string; tooltip?: string }
   | { kind: 'stepper'; value: number; max: number }
   | { kind: 'release'; allowanceId: string }
   | { kind: 'remove'; purchaseId: string }
@@ -105,7 +114,7 @@ export function formatEquipmentPickerHeaderTrailingLabel(args: {
 }): string {
   switch (args.blocker.code) {
     case 'no_matching_grant':
-      return args.rarity ? `No ${getMagicItemRarityLabel(args.rarity)} choices` : 'Unavailable'
+      return args.rarity ? formatNoMagicItemChoicesLabel(args.rarity) : 'Unavailable'
     case 'no_market_price':
       return EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
     case 'cannot_afford':
@@ -327,20 +336,62 @@ function resolveMagicItemHeaderBlocker(args: {
   return undefined
 }
 
+function shouldShowMagicItemChoiceUnavailableAction(args: {
+  rarity: MagicItemRarity | undefined
+  headerBlocker: EquipmentAcquisitionBlocker | { code: 'no_matching_grant' } | undefined
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+}): args is {
+  rarity: MagicItemRarity
+  headerBlocker: EquipmentAcquisitionBlocker | { code: 'no_matching_grant' }
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+} {
+  const { rarity, headerBlocker, magicItemGrantProgress } = args
+  if (!rarity || !headerBlocker) return false
+  if (headerBlocker.code === 'no_matching_grant') return true
+
+  const exhausted = listExhaustedMagicItemChoiceRarities({
+    itemRarity: rarity,
+    progress: magicItemGrantProgress ?? [],
+  })
+  if (!exhausted.includes(rarity)) return false
+
+  return headerBlocker.code === 'no_market_price' || headerBlocker.code === 'cannot_afford'
+}
+
+function resolveMagicItemChoiceUnavailableControl(args: {
+  rarity: MagicItemRarity
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+}): EquipmentPickerHeaderControl {
+  const exhausted = listExhaustedMagicItemChoiceRarities({
+    itemRarity: args.rarity,
+    progress: args.magicItemGrantProgress ?? [],
+  })
+  const tooltip = exhausted.length > 0 ? formatMagicItemChoicesAlreadyUsed(exhausted) : undefined
+
+  return {
+    kind: 'disabled',
+    label: formatNoMagicItemChoicesLabel(args.rarity),
+    ...(tooltip ? { tooltip } : {}),
+  }
+}
+
 function resolveMagicItemBlockedPresentation(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'magic_item_grant' }>
   rarity: MagicItemRarity | undefined
   ownership: EquipmentOwnership
   workflowMode: EquipmentPickerWorkflowMode
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
 }): EquipmentPickerItemPresentation {
-  const { rowActionVm, rarity, ownership, workflowMode } = args
+  const { rowActionVm, rarity, ownership, workflowMode, magicItemGrantProgress } = args
   const headerBlocker = resolveMagicItemHeaderBlocker({ rowActionVm, rarity })
 
-  if (headerBlocker?.code === 'no_matching_grant') {
-    const control: EquipmentPickerHeaderControl = {
-      kind: 'disabled',
-      label: formatEquipmentPickerHeaderTrailingLabel({ blocker: headerBlocker, rarity }),
-    }
+  if (
+    shouldShowMagicItemChoiceUnavailableAction({ rarity, headerBlocker, magicItemGrantProgress })
+  ) {
+    const control = resolveMagicItemChoiceUnavailableControl({
+      rarity,
+      magicItemGrantProgress,
+    })
     return {
       control,
       provenance: resolveProvenance({ ownership, control, workflowMode }),
@@ -369,8 +420,9 @@ function resolveMagicItemPresentation(args: {
   equipment: Equipment
   ownership: EquipmentOwnership
   workflowMode: EquipmentPickerWorkflowMode
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
 }): EquipmentPickerItemPresentation {
-  const { rowActionVm, equipment, ownership, workflowMode } = args
+  const { rowActionVm, equipment, ownership, workflowMode, magicItemGrantProgress } = args
   const rarity = equipment.kind === 'magic_item' ? equipment.rarity : undefined
   const grantQuantity = rowActionVm.plan.grantAllocations.reduce(
     (sum, allocation) => sum + allocation.quantity,
@@ -391,6 +443,7 @@ function resolveMagicItemPresentation(args: {
     rarity,
     ownership,
     workflowMode,
+    magicItemGrantProgress,
   })
 }
 
@@ -403,6 +456,8 @@ export function resolveEquipmentPickerItemPresentation(args: {
   copyCap?: MagicItemAcquiredCopyCap
   /** Budget- and cap-limited aggregate ceiling for the purchase stepper. */
   maxPurchaseQuantity?: number
+  /** Filled choice buckets that the disabled action's tooltip can name. */
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
 }): EquipmentPickerItemPresentation {
   const { equipment, row, workflowMode, rowActionVm, ownership, copyCap } = args
 
@@ -426,5 +481,11 @@ export function resolveEquipmentPickerItemPresentation(args: {
     return { control, provenance: resolveProvenance({ ownership, control, workflowMode }) }
   }
 
-  return resolveMagicItemPresentation({ rowActionVm, equipment, ownership, workflowMode })
+  return resolveMagicItemPresentation({
+    rowActionVm,
+    equipment,
+    ownership,
+    workflowMode,
+    magicItemGrantProgress: args.magicItemGrantProgress,
+  })
 }

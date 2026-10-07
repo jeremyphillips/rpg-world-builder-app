@@ -44,6 +44,20 @@ describe('EquipmentPickerRowAcquisitionControl', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('explains filled choices from the disabled action', async () => {
+    const user = userEvent.setup()
+    renderControl({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common choices are already used.',
+    })
+
+    const button = screen.getByRole('button', { name: 'No common choices' })
+    expect(button).toBeDisabled()
+    await user.hover(button.parentElement ?? button)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Common choices are already used.')
+  })
+
   it('renders a disabled Not for sale action that does not commit', async () => {
     const user = userEvent.setup()
     const { onAdd } = renderControl({
@@ -104,6 +118,16 @@ describe('EquipmentPickerRowAcquisitionControl', () => {
     renderControl({ kind: 'add', disabled: false }, { commitFailed: true })
 
     expect(screen.getByRole('status')).toHaveTextContent('Could not add this item.')
+  })
+
+  itAxe('has no axe violations for a disabled choice action', async () => {
+    const { container } = renderControl({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common choices are already used.',
+    })
+
+    await expectNoAxeViolations(container)
   })
 
   itAxe('has no axe violations for the stepper state', async () => {

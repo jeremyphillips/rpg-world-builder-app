@@ -10,6 +10,7 @@ import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equ
 import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { resolveEquipmentSelectionRowPresentation } from '../../../../lib/equipment/equipment-selection-row-presentation.lib'
+import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
   resolveSelectionRowStatusItems,
   type SelectionRowStatusTooltip,
@@ -43,6 +44,7 @@ function affordabilityTooltip(
 export type EquipmentPickerDisclosureRowProps = {
   rowArgs: CatalogPickerCollapsibleRowRenderArgs<EquipmentPickerItem>
   presentation: EquipmentPickerItemPresentation
+  workflowMode?: EquipmentPickerWorkflowMode
   isGoldShoppingPath?: boolean
   budget?: EquipmentBudgetSummary
   onCommitAdd?: () => boolean
@@ -54,6 +56,7 @@ export type EquipmentPickerDisclosureRowProps = {
 export function EquipmentPickerDisclosureRow({
   rowArgs,
   presentation,
+  workflowMode = 'purchase',
   isGoldShoppingPath = false,
   budget,
   onCommitAdd,
@@ -134,7 +137,7 @@ export function EquipmentPickerDisclosureRow({
       details={rowArgs.details}
       entity={{
         heading: row.name,
-        classification: row.kindLabel,
+        ...(workflowMode === 'magic_items' ? {} : { classification: row.kindLabel }),
         description: (
           <CatalogMetadataRenderer
             density="compact"

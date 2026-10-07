@@ -11,6 +11,7 @@ import {
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
+  type MagicItemGrantProgress,
   type Money,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -478,6 +479,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   ownership: EquipmentOwnership
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
 }): EquipmentPickerItemPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
   const copyCap = resolveMagicItemAcquiredCopyCap({
@@ -517,5 +519,6 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
       ownership: args.ownership,
       ...(args.budget ? { budget: args.budget } : {}),
     }),
+    ...(args.magicItemGrantProgress ? { magicItemGrantProgress: args.magicItemGrantProgress } : {}),
   })
 }

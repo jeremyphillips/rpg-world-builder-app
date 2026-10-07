@@ -211,6 +211,8 @@ describe('EntitySummaryStatus', () => {
       const segments = [...container.querySelectorAll('[data-entity-summary-provenance]')]
       expect(segments.map((segment) => segment.textContent)).toEqual(['Package ×2', 'Release one'])
       expect(segments[0]?.firstElementChild).toHaveClass('text-foreground')
+      expect(segments[1]?.querySelector('button')).toHaveClass('text-action-standalone')
+      expect(segments[1]?.querySelector('button')).not.toHaveClass('text-action-inline')
       expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(2)
       expect(
         segments[0]!.compareDocumentPosition(

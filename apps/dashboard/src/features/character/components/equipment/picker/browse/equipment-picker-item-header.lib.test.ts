@@ -4,9 +4,13 @@ import {
   buildMagicItemAllowanceId,
   createEmptyCharacterBuilderDraft,
   equipmentSchema,
+  getBuilderSelectedStartingLevel,
   indexCharacterBuildCatalog,
   resolveEquipmentAcquisitionActionState,
   resolveMagicItemAcquiredCopyCap,
+  resolveMagicItemGrantAllowances,
+  resolveMagicItemGrantProgressList,
+  resolveStartingWealthTierForBuilder,
   standardStartingWealthTableId,
   startingEquipmentChoiceSetId,
   type CharacterBuilderDraft,
@@ -144,6 +148,19 @@ function presentationFor(args: {
     acquiredQuantity: ownership.acquiredQuantity,
   })
 
+  const startingLevel = getBuilderSelectedStartingLevel(args.draft)
+  const tier = resolveStartingWealthTierForBuilder(args.context.startingWealth, startingLevel)
+  const magicItemGrantProgress = tier
+    ? resolveMagicItemGrantProgressList({
+        allowances: resolveMagicItemGrantAllowances({
+          startingWealthTableId: args.context.startingWealthTableId,
+          tier,
+          requirement: args.context.magicItemRequirement,
+        }),
+        selections: args.draft.equipment?.magicItemSelections ?? [],
+      })
+    : []
+
   return resolveEquipmentPickerItemPresentation({
     equipment: args.equipment,
     row,
@@ -152,6 +169,7 @@ function presentationFor(args: {
     ownership,
     ...(copyCap ? { copyCap } : {}),
     maxPurchaseQuantity: ownership.editablePurchased.quantity + 1,
+    magicItemGrantProgress,
   })
 }
 
@@ -233,7 +251,11 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation.blockers).toBeUndefined()
-    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No Common choices' })
+    expect(presentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common choices are already used.',
+    })
   })
 
   it('shows blocked trailing and no add for unowned blocked rows', () => {
@@ -260,7 +282,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     })
 
     expect(presentation.blockers).toBeUndefined()
-    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No Rare choices' })
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No rare choices' })
   })
 
   it('swaps add for release once the single acquired copy fills the cap', () => {
@@ -395,7 +417,7 @@ describe('resolveEquipmentPickerItemPresentation', () => {
 
 describe('equipment picker blocker mapping', () => {
   it.each([
-    [{ code: 'no_matching_grant' as const }, 'acquisition_blocked', 'No Rare choices'],
+    [{ code: 'no_matching_grant' as const }, 'acquisition_blocked', 'No rare choices'],
     [{ code: 'duplicate_not_allowed' as const }, 'acquisition_blocked', 'Unavailable'],
     [{ code: 'no_market_price' as const }, 'not_purchasable', 'Not for sale'],
     [{ code: 'cannot_afford' as const, shortfallCp: 1 }, 'unaffordable', 'Cannot afford'],
@@ -423,6 +445,78 @@ describe('equipment picker blocker mapping', () => {
       { reason: 'unavailable', label: 'Unavailable here', category: 'availability' },
     ])
     expect(blockersFor('no_market_price')).toBeUndefined()
+  })
+
+  it('replaces a not-for-sale badge with the filled-choice action in magic-items mode', () => {
+    const unpricedCommon = {
+      ...commonCharm,
+      cost: null,
+    }
+    const filled = (
+      rarities: Array<'common' | 'uncommon'>,
+    ): NonNullable<
+      Parameters<typeof resolveEquipmentPickerItemPresentation>[0]['magicItemGrantProgress']
+    > =>
+      rarities.map((rarity) => ({
+        allowanceId: rarity,
+        rarity,
+        capacity: 1,
+        selected: 1,
+        remainingCapacity: 0,
+        isFilled: true,
+      }))
+    const rowActionVm = {
+      kind: 'magic_item_grant' as const,
+      disabled: true,
+      capabilities: {
+        canExpand: false,
+        canAdd: false,
+        canManage: false,
+        addBlockedReason: { code: 'no_market_price' as const },
+      },
+      maxAdditionalQuantity: 1,
+      plan: {
+        requestedQuantity: 1,
+        fulfilledQuantity: 0,
+        unfulfilledQuantity: 1,
+        grantAllocations: [],
+        purchaseQuantity: 0,
+        totalCostCp: 0,
+        canApplyRequestedQuantity: false,
+        blockers: [{ code: 'no_market_price' as const }],
+      },
+    }
+
+    const commonPresentation = resolveEquipmentPickerItemPresentation({
+      equipment: unpricedCommon,
+      row: buildEquipmentPickerRowViewModel(unpricedCommon),
+      workflowMode: 'magic_items',
+      rowActionVm,
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      magicItemGrantProgress: filled(['common', 'uncommon']),
+    })
+
+    expect(commonPresentation.blockers).toBeUndefined()
+    expect(commonPresentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common and uncommon choices are already used.',
+    })
+
+    const uncommonPresentation = resolveEquipmentPickerItemPresentation({
+      equipment: { ...unpricedCommon, rarity: 'uncommon' },
+      row: buildEquipmentPickerRowViewModel({ ...unpricedCommon, rarity: 'uncommon' }),
+      workflowMode: 'magic_items',
+      rowActionVm,
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      magicItemGrantProgress: filled(['common', 'uncommon']),
+    })
+
+    expect(uncommonPresentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No uncommon choices',
+      tooltip: 'Uncommon choices are already used.',
+    })
   })
 
   it('replaces the not-for-sale badge with a disabled action in purchase mode', () => {

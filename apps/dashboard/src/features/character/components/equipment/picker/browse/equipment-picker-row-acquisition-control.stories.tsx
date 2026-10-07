@@ -35,6 +35,16 @@ export const NotForSale: Story = {
   args: { control: { kind: 'disabled', label: EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } },
 }
 
+export const NoChoices: Story = {
+  args: {
+    control: {
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common choices are already used.',
+    },
+  },
+}
+
 export const AddFailed: Story = {
   args: { control: { kind: 'add', disabled: false }, commitFailed: true },
 }

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getMagicItemRarityEntry,
   getMagicItemRarityLabel,
+  getMagicItemRarityProseLabel,
   getMagicItemRaritySentenceForm,
   MAGIC_ITEM_RARITIES,
   MAGIC_ITEM_RARITY_ENTRIES,
@@ -46,6 +47,13 @@ describe('magic item rarity vocabulary', () => {
     for (const rarity of MAGIC_ITEM_RARITIES) {
       expect(getMagicItemRarityLabel(rarity)).toBe(MAGIC_ITEM_RARITY_ENTRIES[rarity].label)
     }
+  })
+
+  it('returns curated sentence-case rarity names', () => {
+    expect(getMagicItemRarityProseLabel('common')).toBe('common')
+    expect(getMagicItemRarityProseLabel('very_rare')).toBe('very rare')
+    expect(getMagicItemRarityProseLabel('legendary')).toBe('legendary')
+    expect(getMagicItemRarityLabel('very_rare')).toBe('Very Rare')
   })
 
   it('returns counted magic item rarity sentence forms', () => {

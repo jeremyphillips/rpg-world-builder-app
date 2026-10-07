@@ -62,10 +62,10 @@ export const entitySummaryProvenanceTextVariants = cva('text-foreground', {
   },
 })
 
-/** Inline release/remove action inside a provenance segment. */
+/** Inline release/remove action inside a provenance segment. Standalone text action: no resting underline. */
 export const entitySummaryProvenanceActionVariants = cva(
   cn(
-    textActionVariants({ context: 'inline' }),
+    textActionVariants({ context: 'standalone' }),
     'cursor-pointer rounded-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
     'disabled:pointer-events-none disabled:text-muted-foreground',
   ),

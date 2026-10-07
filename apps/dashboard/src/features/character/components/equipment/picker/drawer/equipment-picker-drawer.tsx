@@ -289,12 +289,14 @@ export function EquipmentPickerDrawer({
           ownership: itemOwnership,
           rowActionVm: resolveRowVm(item, 1),
           budget: picker.effectiveBudget,
+          magicItemGrantProgress,
         })
 
         return (
           <EquipmentPickerDisclosureRow
             rowArgs={rowArgs}
             presentation={presentation}
+            workflowMode={workflowMode}
             isGoldShoppingPath={isGoldShoppingPath}
             budget={picker.effectiveBudget}
             onCommitAdd={() => picker.handleHeaderCommit(item)}
