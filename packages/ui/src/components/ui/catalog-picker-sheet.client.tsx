@@ -5,8 +5,10 @@ import * as React from 'react'
 import { InsetPanel } from './inset-panel.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
-import { CatalogToolbar } from './catalog-toolbar.client'
-import { CatalogPickerAuxiliaryActionSlot } from './catalog-picker-auxiliary-action.client'
+import {
+  CatalogPickerSheetHeaderChrome,
+  CatalogPickerSheetScrollBody,
+} from './catalog-picker-sheet-chrome.client'
 import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
 import {
   resolveCatalogPickerSheetFilterRow,
@@ -15,17 +17,8 @@ import {
 } from './catalog-picker-sheet-toolbar.lib'
 import { useCatalogPickerSheetState } from './catalog-picker-sheet.use.client'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
-import {
-  catalogPickerSheetBodyVariants,
-  catalogPickerSheetLoadingVariants,
-  catalogPickerToolbarWithAuxiliaryActionVariants,
-} from './catalog-picker-sheet.variants'
-import { cn } from '../../lib/utils'
-import {
-  dialogPanelActionRowClasses,
-  dialogPanelScrollRegionTopInsetClasses,
-  dialogPanelSectionInsetXClasses,
-} from './dialog-panel.variants'
+import { catalogPickerSheetLoadingVariants } from './catalog-picker-sheet.variants'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 
 export type {
   CatalogPickerSheetProps,
@@ -281,6 +274,8 @@ export function CatalogPickerSheet<TItem>({
     [activeTabId, resetActiveTab, searchQuery, setSearchQuery],
   )
 
+  const showPickerChrome = bodyReplacement === undefined && pickerEnabled
+  const pinChromeInHeader = showPickerChrome || Boolean(headerBelowDescription)
   const renderedActions = resolveCatalogPickerSheetRenderedActions(actions, actionHelpers)
   const renderedFilterRow = resolveCatalogPickerSheetFilterRow(filterRow, actionHelpers)
   const toolbarTabs = resolveCatalogPickerSheetToolbarTabs({
@@ -300,48 +295,35 @@ export function CatalogPickerSheet<TItem>({
           headline={title}
           description={description}
           headlineClassName={headlineClassName}
+          className={pinChromeInHeader ? 'pb-0' : undefined}
         >
-          {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
-        </Sheet.Header>
-
-        {headerBelowDescription ? (
-          <div
-            className={cn(
-              dialogPanelSectionInsetXClasses,
-              dialogPanelScrollRegionTopInsetClasses,
-              'pb-4',
-            )}
-          >
-            {headerBelowDescription}
-          </div>
-        ) : null}
-
-        {bodyReplacement !== undefined ? (
-          <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyReplacement}</Sheet.Body>
-        ) : pickerEnabled ? (
-          <>
-            <CatalogToolbar
-              className={catalogPickerToolbarWithAuxiliaryActionVariants({
-                hasAuxiliaryAction: Boolean(auxiliaryAction),
-              })}
-              search={{
+          <CatalogPickerSheetHeaderChrome
+            pinChromeInHeader={pinChromeInHeader}
+            showPickerChrome={showPickerChrome}
+            headerExtra={headerExtra}
+            headerBelowDescription={headerBelowDescription}
+            auxiliaryAction={auxiliaryAction}
+            toolbarProps={{
+              search: {
                 query: searchQuery,
                 onQueryChange: setSearchQuery,
                 placeholder: searchPlaceholder,
                 ariaLabel: searchPlaceholder,
                 disabled: searchDisabled,
-              }}
-              tabs={toolbarTabs}
-              primaryControls={primaryControls}
-              filterRow={renderedFilterRow}
-              actions={renderedActions}
-            />
+              },
+              tabs: toolbarTabs,
+              primaryControls,
+              filterRow: renderedFilterRow,
+              actions: renderedActions,
+            }}
+          />
+        </Sheet.Header>
 
-            {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
-
-            <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyContent}</Sheet.Body>
-          </>
-        ) : null}
+        <CatalogPickerSheetScrollBody
+          bodyReplacement={bodyReplacement}
+          pickerEnabled={pickerEnabled}
+          bodyContent={bodyContent}
+        />
 
         {footer ? (
           <Sheet.Footer>

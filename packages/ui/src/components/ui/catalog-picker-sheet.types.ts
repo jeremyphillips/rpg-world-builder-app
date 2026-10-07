@@ -98,7 +98,7 @@ export type CatalogPickerSheetProps<TItem> = {
   recommendationsEnabled?: boolean
   /** Placement of recommendation tabs relative to search. Defaults to before-search. */
   recommendationTabsPosition?: CatalogToolbarTabs['position']
-  /** Content between header description and toolbar (e.g. segmented mode control). */
+  /** Pinned under the description, inside the header, above the toolbar (e.g. segmented mode control). */
   headerBelowDescription?: ReactNode
   /** Content below search and optional tabs (e.g. level chips). */
   primaryControls?: ReactNode

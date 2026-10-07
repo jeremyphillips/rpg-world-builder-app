@@ -386,14 +386,14 @@ School and Affordable now are content filters. They sit on the left of the utili
 ```text
 Search
 Primary band     primaryControls — full width, fields wrap
-Utility band     @container / @min-[32rem], layout only
+Utility band     @container, flex-wrap, layout only
   content        filterRow.controls — omitted when empty
   view stack     column, end-aligned
     Sort         filterRow.actions
     Reset        actions
 ```
 
-A wide utility band is one row (`justify-between`) with the view stack at the end. Below `32rem` the content region and the view stack stack, so Sort stays with Reset and does not sit between individual filters. `32rem` is just above catalog-drawer content width, so the band follows the drawer rather than the viewport.
+Content filters and the view stack share one line when they fit (`justify-between`, view stack at the end). When they do not, the view stack wraps as one unit, so Sort stays with Reset and does not sit between individual filters. The band follows its container width, not the viewport.
 
 Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 

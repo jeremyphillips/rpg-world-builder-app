@@ -163,7 +163,11 @@ describe('CatalogToolbar', () => {
     function expectContainerQueryBand() {
       const band = document.querySelector('[data-slot="catalog-toolbar-utility"]')
       expect(band).toHaveClass(...catalogToolbarUtilityBandVariants().split(' '))
+      expect(catalogToolbarUtilityBandVariants()).toContain('flex-wrap')
+      expect(catalogToolbarUtilityBandVariants()).not.toContain('flex-col')
       expect(band?.className).not.toMatch(/\bsm:/)
+      expect(catalogToolbarViewControlsVariants()).toContain('items-end')
+      expect(catalogToolbarViewControlsVariants()).toContain('gap-0.5')
       expect(catalogToolbarViewControlsVariants()).not.toMatch(/\bsm:/)
     }
 

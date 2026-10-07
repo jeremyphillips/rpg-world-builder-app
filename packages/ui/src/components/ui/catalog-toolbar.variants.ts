@@ -4,7 +4,7 @@ import { cn } from '../../lib/utils'
 import { dialogPanelSectionInsetXClasses } from './dialog-panel.variants'
 
 /** Catalog toolbar inset matches dialog-panel section inset (picker chrome, not a parallel SSOT). */
-export const catalogToolbarVariants = cva(cn('space-y-4 pb-4', dialogPanelSectionInsetXClasses))
+export const catalogToolbarVariants = cva(cn('space-y-4', dialogPanelSectionInsetXClasses))
 
 export const catalogToolbarSearchRowVariants = cva('relative')
 
@@ -28,21 +28,22 @@ export const catalogToolbarTabRowVariants = cva(
 )
 
 /**
- * Utility band. `@min-[32rem]` is the wide row; below that the content-filter
- * region and the view stack stack. 32rem sits above catalog-drawer content
- * width (550px sheet minus section inset), so a narrow drawer does not use
- * the viewport `sm:` row.
+ * Utility band. Content filters and the view stack share a line when they fit,
+ * and the view stack wraps as one unit when they do not. Width follows the
+ * container, not the viewport.
  */
 export const catalogToolbarUtilityBandVariants = cva(
-  '@container flex flex-col gap-2 @min-[32rem]:flex-row @min-[32rem]:items-end @min-[32rem]:justify-between',
+  '@container flex flex-wrap items-start justify-between gap-x-4 gap-y-2',
 )
 
 /** Lower content filters. Omitted by the toolbar when this region is empty. */
-export const catalogToolbarUtilityContentVariants = cva('flex min-w-0 flex-wrap items-end gap-2')
+export const catalogToolbarUtilityContentVariants = cva(
+  'flex w-fit max-w-full shrink-0 flex-wrap items-end gap-2',
+)
 
-/** Sort over Reset. The stack stays at the end in both the row and the stacked band. */
+/** Sort over Reset. The stack stays at the end of its line, and Reset aligns to its trailing edge. */
 export const catalogToolbarViewControlsVariants = cva(
-  'ml-auto flex w-fit flex-col items-start gap-2',
+  'ml-auto flex w-fit shrink-0 flex-col items-end gap-0.5',
 )
 
 export const catalogToolbarStandaloneActionsVariants = cva('flex justify-end')

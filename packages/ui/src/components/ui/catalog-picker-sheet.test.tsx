@@ -410,6 +410,12 @@ describe('CatalogPickerSheet', () => {
     rerender(<CatalogPickerSheet {...sheetProps(<p>Inline create flow</p>)} />)
     expect(screen.getByText('Inline create flow')).toBeInTheDocument()
     expect(screen.queryByRole('textbox', { name: 'Search catalog' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')).toHaveClass(
+      'pb-4',
+    )
+    expect(screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')).not.toHaveClass(
+      'pb-0',
+    )
     expect(screen.queryByText('Beta Item')).not.toBeInTheDocument()
 
     rerender(<CatalogPickerSheet {...sheetProps()} />)
@@ -463,7 +469,31 @@ describe('CatalogPickerSheet', () => {
     expect(screen.queryByRole('group')).not.toBeInTheDocument()
   })
 
-  it('does not reduce toolbar bottom padding when auxiliaryAction is absent', () => {
+  it('pins description chrome and the toolbar inside the header', () => {
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Catalog"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        renderItemHeader={(item) => <span>{item.name}</span>}
+        headerBelowDescription={<span>Mode</span>}
+      />,
+    )
+
+    const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
+    const mode = screen.getByText('Mode')
+    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+
+    expect(header).toContainElement(mode)
+    expect(header).toContainElement(search)
+    expect(mode.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(header).not.toContainElement(screen.getByText('Alpha Item'))
+  })
+
+  it('omits toolbar bottom padding when auxiliaryAction is absent', () => {
     render(
       <CatalogPickerSheet
         open
@@ -477,11 +507,14 @@ describe('CatalogPickerSheet', () => {
     )
 
     const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
-    expect(toolbar).toHaveClass('pb-4')
-    expect(toolbar).not.toHaveClass('pb-0')
+    const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
+    expect(header).toHaveClass('pb-0')
+    expect(header).toContainElement(toolbar)
+    expect(toolbar).toHaveClass('px-0')
+    expect(toolbar).not.toHaveClass('pb-4')
   })
 
-  it('reduces toolbar bottom padding when auxiliaryAction is present', () => {
+  it('keeps bottom padding on the auxiliary row when it follows the toolbar', () => {
     render(
       <CatalogPickerSheet
         open
@@ -500,8 +533,14 @@ describe('CatalogPickerSheet', () => {
     )
 
     const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
-    expect(toolbar).toHaveClass('pb-0')
+    const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
+    const action = screen.getByRole('button', { name: 'Create item' })
+    expect(header).toHaveClass('pb-0')
+    expect(header).toContainElement(action)
+    expect(toolbar).toHaveClass('px-0')
     expect(toolbar).not.toHaveClass('pb-4')
+    expect(action.parentElement).toHaveClass('pb-4')
+    expect(action.parentElement).not.toHaveClass('px-6')
   })
 
   it('renders auxiliaryAction after search and before results', () => {
