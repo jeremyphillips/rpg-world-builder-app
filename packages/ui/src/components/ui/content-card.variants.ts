@@ -47,6 +47,22 @@ export const contentCardIdentityColumnGapVariants = cva('', {
   },
 })
 
+/**
+ * Compact image→copy is 16px: the row `gap-2` (8px) plus this margin.
+ * Comfortable `gap-4` is already 16px, so it adds nothing. End-slot spacing stays the row gap.
+ */
+export const contentCardMediaEndGapVariants = cva('', {
+  variants: {
+    density: {
+      compact: 'me-2',
+      comfortable: '',
+    },
+  },
+  defaultVariants: {
+    density: 'comfortable',
+  },
+})
+
 export function resolveContentCardIdentityColumnGapClasses(
   density: ContentCardDensity = 'comfortable',
 ): string {

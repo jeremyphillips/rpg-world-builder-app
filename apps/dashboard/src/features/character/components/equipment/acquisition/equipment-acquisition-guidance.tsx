@@ -2,7 +2,8 @@ import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
 import { Heading, Text } from '@rpg/ui'
 
 import {
-  EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
+  EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL,
+  EQUIPMENT_MAGIC_ITEMS_MANAGE_LABEL,
   EQUIPMENT_STEP_BROWSE_LABEL,
   type EquipmentStepFundingState,
 } from '../../../lib/equipment/equipment-step.lib'
@@ -18,7 +19,10 @@ import {
   equipmentAcquisitionGuidanceGridClasses,
 } from './equipment-acquisition-guidance.variants'
 import { equipmentAcquisitionGuidanceCardDescriptionClasses } from './equipment-acquisition-panel.variants'
-import { EquipmentResourceSummary } from './equipment-resource-summary'
+import {
+  EquipmentResourceSummary,
+  type EquipmentResourceSummaryAction,
+} from './equipment-resource-summary'
 
 export type EquipmentAcquisitionGuidanceProps = {
   showPurchaseWorkflow: boolean
@@ -48,8 +52,18 @@ function EquipmentUnresolvedFundingCard({ pendingCostCp }: { pendingCostCp: numb
 
 const GUIDANCE_ACTION_LABELS: Record<EquipmentAcquisitionGuidanceAction, string> = {
   browse: EQUIPMENT_STEP_BROWSE_LABEL,
-  'choose-magic': EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL,
+  'browse-magic': EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL,
+  'manage-magic': EQUIPMENT_MAGIC_ITEMS_MANAGE_LABEL,
 }
+
+const GUIDANCE_ACTION_VARIANTS = {
+  browse: 'secondary',
+  'browse-magic': 'secondary',
+  'manage-magic': 'outline',
+} as const satisfies Record<
+  EquipmentAcquisitionGuidanceAction,
+  EquipmentResourceSummaryAction['variant']
+>
 
 function guidanceActionHandler(
   action: EquipmentAcquisitionGuidanceAction,
@@ -60,6 +74,21 @@ function guidanceActionHandler(
 ): () => void {
   if (action === 'browse') return handlers.onOpenPurchasePicker
   return handlers.onOpenMagicItemsPicker
+}
+
+function toResourceSummaryAction(
+  action: EquipmentAcquisitionGuidanceAction | undefined,
+  handlers: Pick<
+    EquipmentAcquisitionGuidanceProps,
+    'onOpenPurchasePicker' | 'onOpenMagicItemsPicker'
+  >,
+): EquipmentResourceSummaryAction | undefined {
+  if (!action) return undefined
+  return {
+    label: GUIDANCE_ACTION_LABELS[action],
+    variant: GUIDANCE_ACTION_VARIANTS[action],
+    onClick: guidanceActionHandler(action, handlers),
+  }
 }
 
 export function EquipmentAcquisitionGuidance({
@@ -80,15 +109,7 @@ export function EquipmentAcquisitionGuidance({
   })
   if (!view) return null
 
-  const action = view.action
-    ? {
-        label: GUIDANCE_ACTION_LABELS[view.action],
-        onClick: guidanceActionHandler(view.action, {
-          onOpenPurchasePicker,
-          onOpenMagicItemsPicker,
-        }),
-      }
-    : undefined
+  const handlers = { onOpenPurchasePicker, onOpenMagicItemsPicker }
 
   return (
     <section aria-label="Acquisition guidance" className={equipmentAcquisitionGuidanceGridClasses}>
@@ -100,7 +121,8 @@ export function EquipmentAcquisitionGuidance({
           density="comfortable"
           currency={view.currency}
           slots={view.slots}
-          action={action}
+          currencyAction={toResourceSummaryAction(view.currencyAction, handlers)}
+          magicItemsAction={toResourceSummaryAction(view.magicItemsAction, handlers)}
         />
       ) : null}
     </section>

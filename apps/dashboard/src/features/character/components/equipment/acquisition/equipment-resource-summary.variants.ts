@@ -1,21 +1,15 @@
 import { cva } from 'class-variance-authority'
 
-export const equipmentResourceSummaryRowVariants = cva('flex gap-4', {
-  variants: {
-    alignment: {
-      center: 'items-center',
-      start: 'items-start',
-    },
-  },
-})
+export const equipmentResourceSummaryStackClasses = 'flex min-w-0 w-full flex-col'
 
-export const equipmentResourceSummaryStackClasses = 'flex min-w-0 flex-1 flex-col'
+/** Lets the group heading wrap inside ContentCardBody's truncated heading slot. */
+export const equipmentResourceSummaryHeadingClasses = 'whitespace-normal'
 
-export const equipmentResourceSummaryResourceRowClasses = cva('flex min-w-0 gap-3', {
+export const equipmentResourceSummarySectionDividerVariants = cva('border-t border-border', {
   variants: {
     density: {
-      compact: 'items-start',
-      comfortable: 'items-start',
+      compact: 'mt-2 pt-2',
+      comfortable: 'mt-4 pt-4',
     },
   },
   defaultVariants: {
@@ -23,14 +17,15 @@ export const equipmentResourceSummaryResourceRowClasses = cva('flex min-w-0 gap-
   },
 })
 
-export const equipmentResourceSummaryMetadataClasses = 'mt-1'
+export const equipmentResourceSummaryBadgeListClasses =
+  'flex w-full min-w-0 flex-wrap gap-2 whitespace-normal'
 
-export const equipmentResourceSummarySectionDividerClasses = 'border-t border-border pt-3'
-
-export const equipmentResourceSummaryBadgeListClasses = 'flex flex-wrap gap-2 whitespace-normal'
-
-/** Locks the currency line to 14px on both card densities. */
-export const equipmentResourceSummaryDescriptionClasses = 'text-sm'
+/**
+ * Currency line stays 14px and wraps. Resets the truncated muted subheading slot
+ * so the copy keeps the resource-summary color.
+ */
+export const equipmentResourceSummaryDescriptionClasses =
+  'whitespace-normal text-sm text-foreground'
 
 /** Ready check on the idle disc — same muted pairing as neutral StatusIcon variants. */
 export const equipmentResourceSummarySlotStatusClasses =

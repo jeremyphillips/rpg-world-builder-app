@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 
 import type { StartingEquipmentOptionSummary } from '@rpg/contracts'
 import {
+  Badge,
   SelectionOptionCard,
   SelectionOptionCardHeaderAction,
   type SelectionOptionCardDensity,
@@ -10,8 +11,13 @@ import {
 import {
   EQUIPMENT_CHANGE_PACKAGE_LABEL,
   EQUIPMENT_SELECTED_PACKAGE_EYEBROW,
-  startingEquipmentOptionFundingSummaryLines,
+  formatStartingEquipmentTierContribution,
 } from '../../../lib/equipment/equipment-step.lib'
+
+import {
+  startingEquipmentTierContributionBaseVariants,
+  startingEquipmentTierContributionRowVariants,
+} from './starting-equipment-option-cards.variants'
 
 export type StartingEquipmentOptionSummaryCardProps = {
   summary: StartingEquipmentOptionSummary
@@ -47,6 +53,7 @@ export function StartingEquipmentOptionSummaryCard({
       onClick={onChangePackage}
     />
   ) : undefined
+  const tierContribution = formatStartingEquipmentTierContribution(summary)
 
   return (
     <SelectionOptionCard
@@ -57,7 +64,21 @@ export function StartingEquipmentOptionSummaryCard({
       label={summary.label}
       titleAdornment={titleAdornment}
       description={description ?? summary.description}
-      summaryLines={[...startingEquipmentOptionFundingSummaryLines(summary), ...advisoryLabels]}
+      summaryContent={
+        tierContribution ? (
+          <div className={startingEquipmentTierContributionRowVariants()}>
+            {tierContribution.baseLabel ? (
+              <span className={startingEquipmentTierContributionBaseVariants({ density })}>
+                {tierContribution.baseLabel}
+              </span>
+            ) : null}
+            <Badge appearance="soft" tone="neutral" size="md">
+              {tierContribution.badgeLabel}
+            </Badge>
+          </div>
+        ) : undefined
+      }
+      summaryLines={[...advisoryLabels]}
       embedded={embedded}
       {...(embeddedTone ? { embeddedTone } : {})}
     />

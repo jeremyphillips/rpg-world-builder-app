@@ -4,6 +4,7 @@ import type { EquipmentMagicItemSlot } from '@rpg/contracts'
 import {
   Badge,
   Button,
+  ContentCardBody,
   Heading,
   IconContainer,
   InlineMetadata,
@@ -24,10 +25,8 @@ import {
 import {
   equipmentResourceSummaryBadgeListClasses,
   equipmentResourceSummaryDescriptionClasses,
-  equipmentResourceSummaryMetadataClasses,
-  equipmentResourceSummaryResourceRowClasses,
-  equipmentResourceSummaryRowVariants,
-  equipmentResourceSummarySectionDividerClasses,
+  equipmentResourceSummaryHeadingClasses,
+  equipmentResourceSummarySectionDividerVariants,
   equipmentResourceSummarySlotStatusClasses,
   equipmentResourceSummaryStackClasses,
 } from './equipment-resource-summary.variants'
@@ -35,6 +34,7 @@ import {
 export type EquipmentResourceSummaryAction = {
   label: string
   onClick: () => void
+  variant: 'secondary' | 'outline'
 }
 
 export type EquipmentResourceSummaryProps = {
@@ -44,7 +44,8 @@ export type EquipmentResourceSummaryProps = {
     subheading: string
   }
   slots?: readonly EquipmentMagicItemSlot[]
-  action?: EquipmentResourceSummaryAction
+  currencyAction?: EquipmentResourceSummaryAction
+  magicItemsAction?: EquipmentResourceSummaryAction
 }
 
 const RESOURCE_ICON_SIZE: Record<ContentCardDensity, IconContainerSize> = {
@@ -65,9 +66,17 @@ function ResourceGlyph({ role, density }: { role: ResourceIconRole; density: Con
 
 function ResourceSummaryHeading({ children }: { children: ReactNode }) {
   return (
-    <Heading variant="group" as="h3">
+    <Heading variant="group" as="h3" className={equipmentResourceSummaryHeadingClasses}>
       {children}
     </Heading>
+  )
+}
+
+function ResourceSummaryAction({ action }: { action: EquipmentResourceSummaryAction }) {
+  return (
+    <Button type="button" variant={action.variant} size="sm" onClick={action.onClick}>
+      {action.label}
+    </Button>
   )
 }
 
@@ -77,28 +86,32 @@ function ResourceSummaryRow({
   heading,
   subheading,
   metadata,
+  action,
 }: {
   density: ContentCardDensity
   media: ReactNode
   heading: ReactNode
   subheading?: ReactNode
   metadata?: ReactNode
+  action?: EquipmentResourceSummaryAction
 }) {
   return (
-    <div className={equipmentResourceSummaryResourceRowClasses({ density })}>
-      <div className="shrink-0">{media}</div>
-      <div className="min-w-0 flex-1">
-        {heading}
-        {subheading ? (
+    <ContentCardBody
+      density={density}
+      media={media}
+      heading={heading}
+      subheading={
+        subheading ? (
           <div className={equipmentResourceSummaryDescriptionClasses}>{subheading}</div>
-        ) : null}
-        {metadata ? (
-          <div className={equipmentResourceSummaryMetadataClasses}>
-            <div className={equipmentResourceSummaryBadgeListClasses}>{metadata}</div>
-          </div>
-        ) : null}
-      </div>
-    </div>
+        ) : undefined
+      }
+      metadata={
+        metadata ? (
+          <div className={equipmentResourceSummaryBadgeListClasses}>{metadata}</div>
+        ) : undefined
+      }
+      endSlot={action ? <ResourceSummaryAction action={action} /> : undefined}
+    />
   )
 }
 
@@ -144,20 +157,18 @@ export function EquipmentResourceSummary({
   density,
   currency,
   slots,
-  action,
+  currencyAction,
+  magicItemsAction,
 }: EquipmentResourceSummaryProps) {
   const magicSlots = slots ?? []
   const showMagic = magicSlots.length > 0
   if (!currency && !showMagic) return null
-
-  const showBoth = Boolean(currency) && showMagic
 
   return (
     <article
       className={cn(
         contentCardRootVariants({ density, chrome: 'standalone' }),
         resolveSurfaceClasses({ emphasis: 'faint' }),
-        equipmentResourceSummaryRowVariants({ alignment: showBoth ? 'center' : 'start' }),
       )}
     >
       <div className={equipmentResourceSummaryStackClasses}>
@@ -167,10 +178,15 @@ export function EquipmentResourceSummary({
             media={<ResourceGlyph role="currency" density={density} />}
             heading={<ResourceSummaryHeading>{currency.heading}</ResourceSummaryHeading>}
             subheading={currency.subheading}
+            action={currencyAction}
           />
         ) : null}
         {showMagic ? (
-          <div className={currency ? equipmentResourceSummarySectionDividerClasses : undefined}>
+          <div
+            className={
+              currency ? equipmentResourceSummarySectionDividerVariants({ density }) : undefined
+            }
+          >
             <ResourceSummaryRow
               density={density}
               media={<ResourceGlyph role="magicItem" density={density} />}
@@ -186,15 +202,11 @@ export function EquipmentResourceSummary({
                   density={density}
                 />
               ))}
+              action={magicItemsAction}
             />
           </div>
         ) : null}
       </div>
-      {action ? (
-        <Button type="button" size="sm" onClick={action.onClick}>
-          {action.label}
-        </Button>
-      ) : null}
     </article>
   )
 }

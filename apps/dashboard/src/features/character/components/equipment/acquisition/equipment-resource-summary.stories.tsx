@@ -34,7 +34,12 @@ const meta = {
     density: 'comfortable',
     currency,
     slots,
-    action: { label: 'Browse equipment', onClick: () => undefined },
+    currencyAction: { label: 'Browse equipment', variant: 'secondary', onClick: () => undefined },
+    magicItemsAction: {
+      label: 'Browse magic items',
+      variant: 'secondary',
+      onClick: () => undefined,
+    },
   },
 } satisfies Meta<typeof EquipmentResourceSummary>
 
@@ -44,20 +49,25 @@ type Story = StoryObj<typeof meta>
 export const CurrencyAndMagicItems: Story = {}
 
 export const CurrencyOnly: Story = {
-  args: { slots: undefined },
+  args: { slots: undefined, magicItemsAction: undefined },
 }
 
 export const MagicItemsOnly: Story = {
   args: {
     currency: undefined,
-    action: { label: 'Choose magic items', onClick: () => undefined },
+    currencyAction: undefined,
   },
 }
 
 export const FulfilledSlots: Story = {
   args: {
     currency: undefined,
-    action: undefined,
+    currencyAction: undefined,
+    magicItemsAction: {
+      label: 'Manage magic items',
+      variant: 'outline',
+      onClick: () => undefined,
+    },
     slots: [
       {
         rarity: 'common',
@@ -74,7 +84,8 @@ export const CompactDrawer: Story = {
   args: {
     density: 'compact',
     slots: undefined,
-    action: undefined,
+    currencyAction: undefined,
+    magicItemsAction: undefined,
     currency: { heading: '40 GP remaining', subheading: '100 GP budget · 15 GP spent' },
   },
 }

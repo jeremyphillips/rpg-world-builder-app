@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { EquipmentMagicItemSlot } from '@rpg/contracts'
+import type {
+  EquipmentMagicItemSlot,
+  MagicItemAllowance,
+  MagicItemGrantProgress,
+} from '@rpg/contracts'
 
 import {
   formatEquipmentBudgetGuidanceCopy,
@@ -55,6 +59,80 @@ describe('resolveEquipmentAcquisitionGuidanceView', () => {
         magicItemProgress: [],
       }),
     ).toBeUndefined()
+  })
+
+  it('offers browse actions while magic-item choice capacity remains', () => {
+    const allowances: MagicItemAllowance[] = [
+      {
+        id: 'allowance-uncommon',
+        source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+        rarity: 'uncommon',
+        count: 1,
+        requirement: 'up_to',
+      },
+    ]
+    const progress: MagicItemGrantProgress[] = [
+      {
+        allowanceId: 'allowance-uncommon',
+        rarity: 'uncommon',
+        capacity: 1,
+        selected: 0,
+        remainingCapacity: 1,
+        isFilled: false,
+      },
+    ]
+
+    expect(
+      resolveEquipmentAcquisitionGuidanceView({
+        showPurchaseWorkflow: true,
+        fundingState: {
+          kind: 'funded',
+          budget: {
+            starting: { cp: 0, sp: 0, gp: 15, pp: 0 },
+            spent: { cp: 0, sp: 0, gp: 0, pp: 0 },
+            remaining: { cp: 0, sp: 0, gp: 15, pp: 0 },
+          },
+        },
+        showMagicItemGrants: true,
+        magicItemAllowances: allowances,
+        magicItemProgress: progress,
+      }),
+    ).toMatchObject({
+      currencyAction: 'browse',
+      magicItemsAction: 'browse-magic',
+    })
+  })
+
+  it('switches the magic-items action to manage when every slot is exhausted', () => {
+    const allowances: MagicItemAllowance[] = [
+      {
+        id: 'allowance-uncommon',
+        source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+        rarity: 'uncommon',
+        count: 1,
+        requirement: 'up_to',
+      },
+    ]
+    const progress: MagicItemGrantProgress[] = [
+      {
+        allowanceId: 'allowance-uncommon',
+        rarity: 'uncommon',
+        capacity: 1,
+        selected: 1,
+        remainingCapacity: 0,
+        isFilled: true,
+      },
+    ]
+
+    expect(
+      resolveEquipmentAcquisitionGuidanceView({
+        showPurchaseWorkflow: false,
+        fundingState: { kind: 'none' },
+        showMagicItemGrants: true,
+        magicItemAllowances: allowances,
+        magicItemProgress: progress,
+      })?.magicItemsAction,
+    ).toBe('manage-magic')
   })
 })
 

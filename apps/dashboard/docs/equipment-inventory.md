@@ -42,6 +42,8 @@ section; purchased and granted rows stay in Added Equipment.
 | **Starting Gold**    | Gold option selected    | Static header: `No package gear · {option label}`. No package rows.                                                                                                                                                                      |
 
 **Browse equipment** stays on the step guidance, not on an inventory column heading.
+When magic-item grants are available, that same panel offers **Browse magic items**,
+or **Manage magic items** once no choice capacity remains.
 
 ## Package customization
 

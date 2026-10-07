@@ -19,6 +19,7 @@ import {
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
+  formatWealthAsGold,
   formatInventorySourceSummary,
   getMagicItemRarityLabel,
   resolveEquipmentAcquisitionBuilderContext,
@@ -158,7 +159,9 @@ export const EQUIPMENT_INVENTORY_GROUP_LABELS = {
 
 export const EQUIPMENT_MAGIC_ITEMS_SECTION_LABEL = EQUIPMENT_INVENTORY_GROUP_LABELS.magicItems
 
-export const EQUIPMENT_MAGIC_ITEMS_CHOOSE_LABEL = 'Choose magic items'
+export const EQUIPMENT_MAGIC_ITEMS_BROWSE_LABEL = 'Browse magic items'
+
+export const EQUIPMENT_MAGIC_ITEMS_MANAGE_LABEL = 'Manage magic items'
 
 export const EQUIPMENT_MAGIC_ITEM_RELEASE_LABEL = 'Release choice'
 
@@ -268,6 +271,30 @@ export function startingEquipmentOptionFundingSummaryLines(
   if (summary.tierAdjustment) lines.push(summary.tierAdjustment.label)
   if (summary.totalStartingWealthLabel) lines.push(summary.totalStartingWealthLabel)
   return lines
+}
+
+export type StartingEquipmentTierContributionCopy = {
+  baseLabel?: string
+  badgeLabel: string
+}
+
+/** Selected-package funding row: muted base gold plus a tier-contribution badge. */
+export function formatStartingEquipmentTierContribution(
+  summary: Pick<StartingEquipmentOptionSummary, 'funding' | 'tierAdjustment'>,
+): StartingEquipmentTierContributionCopy | undefined {
+  const adjustment = summary.tierAdjustment
+  if (!adjustment) return undefined
+
+  const tierName = summary.funding.tierLabel?.trim() || 'Starting-wealth'
+  const baseLabel =
+    wealthToCopper(summary.funding.classOptionWealth) > 0
+      ? `${formatWealthAsGold(summary.funding.classOptionWealth)} base`
+      : undefined
+
+  return {
+    baseLabel,
+    badgeLabel: `+${adjustment.additionalWealthLabel} ${tierName} tier`,
+  }
 }
 
 export type EquipmentInventoryRemoveTarget = EquipmentStepRemoveTarget

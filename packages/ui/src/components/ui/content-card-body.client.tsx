@@ -9,6 +9,7 @@ import {
   contentCardBodyVariants,
   contentCardHeadingEndSlotVariants,
   contentCardHeadingRowVariants,
+  contentCardMediaEndGapVariants,
   contentCardMetadataVariants,
   contentCardSubheadingVariants,
   resolveContentCardBodyCrossAxis,
@@ -50,7 +51,9 @@ export function ContentCardBody({
 
   return (
     <div className={cn(contentCardBodyVariants({ density, crossAxis }), className)}>
-      {media ? <div className="shrink-0">{media}</div> : null}
+      {media ? (
+        <div className={cn('shrink-0', contentCardMediaEndGapVariants({ density }))}>{media}</div>
+      ) : null}
       <div className="min-w-0 flex-1">
         <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
           <div className="min-w-0 flex-1">

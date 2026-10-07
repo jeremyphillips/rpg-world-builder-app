@@ -51,13 +51,18 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.getByText('100 GP budget · 15 GP spent')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
     expect(screen.getByLabelText('Common · 1 remaining')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Choose magic items' })).not.toBeInTheDocument()
+
+    const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
+    const browseMagicItems = screen.getByRole('button', { name: 'Browse magic items' })
+    expect(browseEquipment).toHaveClass('bg-action-secondary')
+    expect(browseMagicItems).toHaveClass('bg-action-secondary')
 
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Browse equipment' }))
+    await user.click(browseEquipment)
+    await user.click(browseMagicItems)
 
     expect(onOpenPurchasePicker).toHaveBeenCalledTimes(1)
-    expect(onOpenMagicItemsPicker).not.toHaveBeenCalled()
+    expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
   it('renders a magic-only summary when purchase is unavailable', async () => {
@@ -79,7 +84,7 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.queryByRole('heading', { name: /GP remaining/ })).not.toBeInTheDocument()
 
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Choose magic items' }))
+    await user.click(screen.getByRole('button', { name: 'Browse magic items' }))
     expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
@@ -115,7 +120,7 @@ describe('EquipmentAcquisitionGuidance', () => {
 
     expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Choose magic items' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Browse magic items' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
   })
 
@@ -139,6 +144,38 @@ describe('EquipmentAcquisitionGuidance', () => {
     expect(screen.getByText('5 SP selected')).toBeInTheDocument()
     expect(screen.queryByText(/remaining/)).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+  })
+
+  it('switches the magic-items action to manage when no choice capacity remains', async () => {
+    const onOpenMagicItemsPicker = vi.fn()
+
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
+        magicItemProgress={[
+          {
+            ...magicItemProgress[0]!,
+            selected: 2,
+            remainingCapacity: 0,
+            isFilled: true,
+          },
+        ]}
+        onOpenMagicItemsPicker={onOpenMagicItemsPicker}
+      />,
+    )
+
+    const manage = screen.getByRole('button', { name: 'Manage magic items' })
+    expect(manage).toHaveClass('border-interactive-outline')
+    expect(screen.queryByRole('button', { name: 'Browse magic items' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Browse equipment' })).toBeInTheDocument()
+
+    const user = userEvent.setup()
+    await user.click(manage)
+    expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
   itAxe('has no axe accessibility violations', async () => {

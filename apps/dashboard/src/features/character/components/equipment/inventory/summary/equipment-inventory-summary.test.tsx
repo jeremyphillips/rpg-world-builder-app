@@ -124,7 +124,8 @@ describe('EquipmentInventorySummary', () => {
     expect(
       screen.queryByRole('button', { name: EQUIPMENT_STEP_BROWSE_LABEL }),
     ).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Choose magic items' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Browse magic items' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Manage magic items' })).not.toBeInTheDocument()
   })
 
   it('renders editable starting-gold stackable rows with quantity controls', async () => {

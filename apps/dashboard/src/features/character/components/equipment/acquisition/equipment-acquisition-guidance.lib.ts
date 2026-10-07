@@ -78,7 +78,7 @@ export function resolveFundingGuidanceCard(
   return undefined
 }
 
-export type EquipmentAcquisitionGuidanceAction = 'browse' | 'choose-magic'
+export type EquipmentAcquisitionGuidanceAction = 'browse' | 'browse-magic' | 'manage-magic'
 
 export type EquipmentAcquisitionGuidanceView = {
   unresolvedPendingCostCp?: number
@@ -87,7 +87,8 @@ export type EquipmentAcquisitionGuidanceView = {
     subheading: string
   }
   slots?: readonly EquipmentMagicItemSlot[]
-  action?: EquipmentAcquisitionGuidanceAction
+  currencyAction?: Extract<EquipmentAcquisitionGuidanceAction, 'browse'>
+  magicItemsAction?: Extract<EquipmentAcquisitionGuidanceAction, 'browse-magic' | 'manage-magic'>
 }
 
 type EquipmentAcquisitionGuidanceViewInput = {
@@ -122,13 +123,12 @@ function resolveGuidanceUnresolvedCost(
   return fundingCard.pendingCostCp
 }
 
-function resolveGuidanceAction(
-  hasCurrency: boolean,
-  hasMagic: boolean,
-): EquipmentAcquisitionGuidanceAction | undefined {
-  if (hasCurrency) return 'browse'
-  if (hasMagic) return 'choose-magic'
-  return undefined
+function resolveMagicItemsAction(
+  slots: readonly EquipmentMagicItemSlot[],
+): EquipmentAcquisitionGuidanceView['magicItemsAction'] {
+  if (slots.length === 0) return undefined
+  const hasChoiceCapacity = slots.some((slot) => slot.remaining > 0)
+  return hasChoiceCapacity ? 'browse-magic' : 'manage-magic'
 }
 
 function hasGuidanceContent(view: {
@@ -155,6 +155,7 @@ export function resolveEquipmentAcquisitionGuidanceView(
     unresolvedPendingCostCp,
     currency,
     slots: hasMagic ? slots : undefined,
-    action: resolveGuidanceAction(Boolean(currency), hasMagic),
+    currencyAction: currency ? 'browse' : undefined,
+    magicItemsAction: resolveMagicItemsAction(slots),
   }
 }

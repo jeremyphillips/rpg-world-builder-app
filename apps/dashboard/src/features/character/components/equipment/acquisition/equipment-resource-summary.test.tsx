@@ -57,6 +57,34 @@ describe('EquipmentResourceSummary', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('gives each resource section its own action and space between them', () => {
+    const { container } = render(
+      <EquipmentResourceSummary
+        density="comfortable"
+        currency={{ heading: '15 GP remaining', subheading: '15 GP budget · 0 GP spent' }}
+        slots={[openCommon]}
+        currencyAction={{
+          label: 'Browse equipment',
+          variant: 'secondary',
+          onClick: () => undefined,
+        }}
+        magicItemsAction={{
+          label: 'Browse magic items',
+          variant: 'secondary',
+          onClick: () => undefined,
+        }}
+      />,
+    )
+
+    const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
+    expect(browseEquipment).toHaveClass('bg-action-secondary')
+    expect(browseEquipment.parentElement).toHaveClass('shrink-0', 'self-center')
+    expect(screen.getByRole('button', { name: 'Browse magic items' })).toHaveClass(
+      'bg-action-secondary',
+    )
+    expect(container.querySelector('.border-t')).toHaveClass('mt-4', 'pt-4', 'border-border')
+  })
+
   it('shows one aggregated badge for duplicate rarity slots passed in', () => {
     render(<EquipmentResourceSummary density="comfortable" slots={[openCommon]} />)
     expect(screen.getByLabelText('Common · 2 remaining')).toBeInTheDocument()

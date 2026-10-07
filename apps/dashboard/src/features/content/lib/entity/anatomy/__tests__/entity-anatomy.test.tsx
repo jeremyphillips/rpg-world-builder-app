@@ -98,6 +98,8 @@ describe('EntityAnatomy row tracks', () => {
 
     const rail = slot('leading')?.querySelector('.flex.shrink-0.items-center.gap-0')
     expect(rail).toHaveClass('pe-[calc(var(--spacing)*2)]')
+    expect(anatomy.className).toContain('[&>[data-row-anatomy-column=media]]:me-4')
+    expect(anatomy.className).not.toContain('[&>[data-row-anatomy-column=media]]:me-2')
     expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:ms-2')
     expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:justify-self-end')
   })
