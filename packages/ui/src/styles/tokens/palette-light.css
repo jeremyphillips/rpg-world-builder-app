@@ -2,7 +2,7 @@
  * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, warm panel (card/popover), formula-derived washes, field lift from canvas.
+ * Motif: cream canvas, warm panel (card), lift plane (popover and fields), formula-derived washes.
  */
 :root {
   --palette-neutral-hue: 82;

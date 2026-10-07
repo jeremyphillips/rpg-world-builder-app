@@ -60,15 +60,15 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 / `--border-*` roles remain for `var()` probes; do not bridge them through `@theme inline`
 `--color-*` aliases.
 
-| Role        | Utility                 | Meaning                                                             |
-| ----------- | ----------------------- | ------------------------------------------------------------------- |
-| Base        | `bg-background`         | Page canvas                                                         |
-| Panel       | `bg-card`, `bg-popover` | Warm elevated panels / overlays                                     |
-| Subtle wash | `bg-surface-subtle`     | Barely visible grouping; primary filter chrome, utility bar         |
-| Faint wash  | `bg-surface-faint`      | Lightest panel wash                                                 |
-| Muted wash  | `bg-surface-muted`      | Standard secondary panel / chrome                                   |
-| Strong wash | `bg-surface-strong`     | Dense neutral chrome (not brand/selected meaning)                   |
-| Sunken      | `bg-sunken`             | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
+| Role        | Utility             | Meaning                                                             |
+| ----------- | ------------------- | ------------------------------------------------------------------- |
+| Base        | `bg-background`     | Page canvas                                                         |
+| Panel       | `bg-card`           | Warm elevated panels                                                |
+| Subtle wash | `bg-surface-subtle` | Barely visible grouping; primary filter chrome, utility bar         |
+| Faint wash  | `bg-surface-faint`  | Lightest panel wash                                                 |
+| Muted wash  | `bg-surface-muted`  | Standard secondary panel / chrome                                   |
+| Strong wash | `bg-surface-strong` | Dense neutral chrome (not brand/selected meaning)                   |
+| Sunken      | `bg-sunken`         | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
 
 `shadow-surface-raised` and `shadow-surface-sunken` are Layer 2 recipes (`--surface-raised-shadow`,
 `--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
@@ -79,7 +79,7 @@ Empty-state wells (`EmptyPanel`, dashed `InsetPanel` gates) standardize on sunke
 | Secondary | `bg-secondary` | Aliases the secondary action fill |
 | Primary action | `bg-action-primary` | Solid primary button. Deep rust in light; the same hue, lifted, in dark |
 | Secondary action | `bg-action-secondary` | Solid secondary button. Warm gold in light; a slightly deeper gold in dark |
-| Lift plane | `bg-surface-lift` | Canvas lifted toward white (light) or panel (dark) — searchable list panels and field fills |
+| Lift plane | `bg-surface-lift`, `bg-popover` | Canvas lifted toward white (light) or panel (dark) — overlays, searchable list panels, and field fills |
 | Field | `bg-input`, `border-input` | Editable control chrome — aliases the lift plane |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.

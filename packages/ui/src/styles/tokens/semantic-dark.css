@@ -30,7 +30,7 @@
   --background: var(--palette-surface-base);
   --card: var(--palette-surface-panel);
   --card-foreground: var(--foreground);
-  --popover: var(--palette-surface-panel);
+  --popover: var(--palette-surface-lift);
   --popover-foreground: var(--foreground);
   --secondary: var(--palette-secondary);
   --secondary-foreground: var(--palette-secondary-foreground);

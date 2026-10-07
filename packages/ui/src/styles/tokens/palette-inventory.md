@@ -48,16 +48,16 @@ Exact allowlist for intentional solid-control / backdrop opacity:
 
 ## Elevation surfaces
 
-| Token                      | Layer 2 mapping                                | Job                                                                                             |
-| -------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `--palette-surface-base`   | `--background`                                 | Canvas / page                                                                                   |
-| `--palette-surface-subtle` | `--surface-subtle`                             | Derived wash — barely visible grouping                                                          |
-| `--palette-surface-muted`  | `--surface-muted`, `--muted`                   | Derived wash — standard secondary panel                                                         |
-| `--palette-surface-strong` | `--surface-strong`                             | Derived wash — dense neutral chrome                                                             |
-| `--palette-surface-panel`  | `--card`, `--popover`                          | Authored warm elevated panels / overlays                                                        |
-| `--palette-surface-lift`   | `--palette-field-bg` (alias), `--surface-lift` | Derived lift plane — canvas lifted toward white (light) or panel (dark); list panels and fields |
-| `--palette-surface-sunken` | `--sunken`                                     | Recessed / inset fills (derived or thin-authored)                                               |
-| `--palette-surface-accent` | `--accent`                                     | Aliases `neutral-contrast` in light; hover chrome in dark                                       |
+| Token                      | Layer 2 mapping                                             | Job                                                                                                        |
+| -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `--palette-surface-base`   | `--background`                                              | Canvas / page                                                                                              |
+| `--palette-surface-subtle` | `--surface-subtle`                                          | Derived wash — barely visible grouping                                                                     |
+| `--palette-surface-muted`  | `--surface-muted`, `--muted`                                | Derived wash — standard secondary panel                                                                    |
+| `--palette-surface-strong` | `--surface-strong`                                          | Derived wash — dense neutral chrome                                                                        |
+| `--palette-surface-panel`  | `--card`                                                    | Authored warm elevated panels                                                                              |
+| `--palette-surface-lift`   | `--popover`, `--palette-field-bg` (alias), `--surface-lift` | Derived lift plane — canvas lifted toward white (light) or panel (dark); overlays, list panels, and fields |
+| `--palette-surface-sunken` | `--sunken`                                                  | Recessed / inset fills (derived or thin-authored)                                                          |
+| `--palette-surface-accent` | `--accent`                                                  | Aliases `neutral-contrast` in light; hover chrome in dark                                                  |
 
 `--secondary` aliases the secondary action fill. It is not a neutral page or section surface.
 Solid buttons use `--action-primary-*` and `--action-secondary-*`.
