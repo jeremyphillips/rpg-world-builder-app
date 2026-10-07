@@ -417,13 +417,26 @@ or behavior.
 - `useFilterChrome()` — strict hook for schema-owned components; defaults to compact
   outside a provider.
 - `useOptionalFilterChrome()` — optional hook for general primitives (e.g.
-  `CatalogFilterChips`); returns `undefined` outside filter chrome.
+  `CatalogFilterChips` chip size); returns `undefined` outside filter chrome.
 - Field `layout` and `width` control per-field structure; section `density` controls
-  typography and control sizing via `resolveFilterFieldPresentation`.
-- `FilterFieldRenderer` is the sole presentation owner on the schema-rendered path.
-  Leaves receive resolved `presentation` props — they do not call `useFilterChrome()`.
+  control sizing via `resolveFilterFieldPresentation`.
+- `FilterFieldRenderer` resolves control presentation on the schema-rendered path.
+  Schemas pass `label` and layout intent. They do not pass caption classes.
 - `resolveFilterFieldWidthClasses` is separate from density — width is layout
   allocation only.
+
+**Filter captions are not form field labels.** Form labels identify an authored
+input (`font-field-label`, foreground, required/help chrome). Filter captions
+identify toolbar chrome: muted text, sized by filter density (`compact` →
+`text-xs`, `comfortable` → `text-sm`). `FilterFieldCaption` is the only caption
+renderer for select chrome, `CatalogFilterChips`, and catalog sort. It reads
+`filterFieldLabelVariants` from filter chrome (or an explicit `density` prop).
+`as="span"` is a group caption (`aria-labelledby` on chips; visible text inside
+`role="group"` on inline selects and sort). `as="label"` with `htmlFor` is the
+stacked-select association. Boolean checkbox text stays an inline control label
+and still uses `presentation.labelClassName` plus interaction classes — that
+path is not a caption. `presentation.labelClassName` is not a schema
+customization point.
 
 ### Active chips in feature pages
 

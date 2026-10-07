@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
 import {
   createBooleanFilter,
   createChipsFilter,
@@ -125,7 +124,10 @@ function RendererHarness({
 describe('FilterFieldRenderer chrome', () => {
   it('uses compact label sizing by default for stacked select', () => {
     render(<RendererHarness fieldId="status" />)
-    expect(screen.getByText('Status')).toHaveClass('text-xs')
+    const caption = screen.getByText('Status')
+    expect(caption.tagName).toBe('LABEL')
+    expect(caption).toHaveAttribute('for', 'test-status')
+    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
   })
 
   it('applies comfortable density override to select labels', () => {
@@ -144,7 +146,7 @@ describe('FilterFieldRenderer chrome', () => {
 
   it('renders catalog chips with compact label sizing under default chrome', () => {
     render(<RendererHarness fieldId="levels" />)
-    expect(screen.getByText('Levels')).toHaveClass('text-xs')
+    expect(screen.getByText('Levels')).toHaveClass('text-xs', 'text-muted-foreground')
   })
 })
 
@@ -189,73 +191,5 @@ describe('FilterFieldRenderer behavior', () => {
     await user.click(screen.getByRole('combobox', { name: 'No-all status' }))
     expect(screen.queryByText('All No-all status')).not.toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Draft' })).toBeInTheDocument()
-  })
-})
-
-describe('CatalogFilterChips standalone fallback', () => {
-  it('defaults to md label sizing without provider', () => {
-    render(
-      <CatalogFilterChips
-        id="standalone"
-        label="School"
-        selectionMode="single-required"
-        value="all"
-        options={[{ value: 'all', label: 'All' }]}
-        onValueChange={() => {}}
-      />,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-sm')
-  })
-
-  it('prefers explicit labelClassName over presentation and context', () => {
-    render(
-      <FilterChromeProvider density="compact">
-        <CatalogFilterChips
-          id="explicit"
-          label="School"
-          labelClassName="text-lg"
-          presentation={{
-            type: 'chips',
-            labelClassName: 'text-xs',
-            groupClassName: '',
-            controlBandClassName: 'flex items-start min-h-0 h-auto',
-            alignmentAnchorClassName: '',
-            chipSize: 'sm',
-            shellClassName: 'gap-1',
-          }}
-          selectionMode="single-required"
-          value="all"
-          options={[{ value: 'all', label: 'All' }]}
-          onValueChange={() => {}}
-        />
-      </FilterChromeProvider>,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-lg')
-  })
-
-  it('uses presentation labelClassName when explicit labelClassName is omitted', () => {
-    render(
-      <CatalogFilterChips
-        id="presentation"
-        label="School"
-        presentation={{
-          type: 'chips',
-          labelClassName: 'text-xs text-muted-foreground',
-          groupClassName: '',
-          controlBandClassName: 'flex items-start min-h-0 h-auto',
-          alignmentAnchorClassName: '',
-          chipSize: 'sm',
-          shellClassName: 'gap-1',
-        }}
-        selectionMode="single-required"
-        value="all"
-        options={[{ value: 'all', label: 'All' }]}
-        onValueChange={() => {}}
-      />,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-xs')
   })
 })

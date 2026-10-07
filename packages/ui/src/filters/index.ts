@@ -90,6 +90,7 @@ export {
   type FilterAdvancedPanelProps,
 } from './filter-advanced-panel.client'
 export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-renderer.client'
+export { FilterFieldCaption, type FilterFieldCaptionProps } from './filter-field-caption.client'
 export { FilterFieldList } from './filter-fields.client'
 export { FilterInlineControl, type FilterInlineControlProps } from './filter-inline-control.client'
 export {

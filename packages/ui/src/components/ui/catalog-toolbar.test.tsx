@@ -4,11 +4,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogFilterControls } from '../../filters/catalog-filter-controls.client'
-import { useFilterChrome } from '../../filters/filter-chrome.context'
-import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
+import { FilterFieldCaption } from '../../filters/filter-field-caption.client'
 import { createEqualsFilter, createTextFilter } from '../../filters/filter-engine.helpers'
 import { createFilterSchema } from '../../filters/filter-schema.types'
-import { Text } from './text'
 import { CatalogToolbar } from './catalog-toolbar.client'
 
 type DemoRow = { name: string; status: string }
@@ -33,12 +31,7 @@ const densitySchema = createFilterSchema<DemoRow, DemoFilterState>([
 ])
 
 function TestSortControl() {
-  const presentation = resolveFilterChromePresentation(useFilterChrome())
-  return (
-    <Text as="span" className={presentation.labelClassName}>
-      Sort
-    </Text>
-  )
+  return <FilterFieldCaption>Sort</FilterFieldCaption>
 }
 
 describe('CatalogToolbar', () => {
