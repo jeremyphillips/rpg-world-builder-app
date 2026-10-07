@@ -1,7 +1,7 @@
 import {
   characterWealthFromGrant,
   formatEquipmentInventoryPriceLine,
-  formatEquipmentPurchaseTotalPriceLabel,
+  formatPurchaseLinePrice,
   formatWealth,
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
@@ -301,7 +301,7 @@ function formatPendingPurchaseProvenancePart(
   quantity: number,
 ): string {
   if (!equipment) return EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
-  const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  const totalLabel = formatPurchaseLinePrice(equipment, quantity)
   return totalLabel
     ? joinInlineMetadata([EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL, totalLabel])
     : EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
@@ -314,7 +314,7 @@ function formatPricedPurchaseProvenancePart(args: {
   showPurchaseQuantity: boolean
 }): string {
   const { rows, equipment, quantity, showPurchaseQuantity } = args
-  const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  const totalLabel = formatPurchaseLinePrice(equipment, quantity)
   if (showPurchaseQuantity && quantity > 1) {
     return joinInlineMetadata([`Purchased ×${quantity}`, totalLabel])
   }

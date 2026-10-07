@@ -132,7 +132,7 @@ collapse correctly (e.g. `5 SP each · 1 GP total` for qty 2). Package grants
 with quantity above 1 use `2 GP each · Qty 2 · 4 GP total`. Bundle and
 non-stackable value lines follow the same resolver; see
 `formatEquipmentInventoryPriceLine` and
-`formatEquipmentPurchaseTotalPriceLabel`.
+`formatPurchaseLinePrice`.
 
 ### Remove semantics
 

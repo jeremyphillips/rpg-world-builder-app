@@ -1,9 +1,7 @@
 import {
   formatMoney,
-  formatWealthAsGold,
+  formatPurchaseLinePrice,
   resolveEquipmentAcquisitionActionState,
-  copperToWealth,
-  formatEquipmentPurchaseTotalPriceLabel,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -28,7 +26,7 @@ import {
 import { formatAcquisitionBlockerNote } from '../picker/equipment-picker-action.lib'
 import {
   formatGrantPreviewLine,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseSpend,
   formatUsesGrantPreviewLine,
   resolveAllowanceRarity,
 } from './equipment-acquisition-format.lib'
@@ -37,7 +35,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 export {
   formatGrantPreviewLine,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseSpend,
   formatUsesGrantPreviewLine,
   resolveAllowanceRarity,
 } from './equipment-acquisition-format.lib'
@@ -89,11 +87,11 @@ export function sumOwnedInventoryQuantity(rows: readonly EquipmentInventoryRow[]
   return rows.reduce((sum, row) => sum + row.entry.quantity, 0)
 }
 
-export function formatOwnedPurchaseQuantityLabel(args: { quantity: number; unitCostCp?: number }): {
+export function formatPurchaseContributionLabel(args: { quantity: number; unitCostCp?: number }): {
   quantityLabel: string
   spendSuffix?: string
 } {
-  const spendSuffix = formatTotalPurchaseSpendFromSnapshots([
+  const spendSuffix = formatPurchaseSpend([
     { quantity: args.quantity, unitCostCp: args.unitCostCp },
   ])
 
@@ -146,24 +144,6 @@ function formatMixedAcquisitionPreviewLine(args: {
   return joinInlineMetadata([grantPart, purchasePart])
 }
 
-function resolvePurchaseTotalPriceLabel(args: {
-  purchaseQuantity: number
-  unitCostCp?: number
-  equipment: Equipment
-}): string | undefined {
-  if (args.purchaseQuantity <= 0) return undefined
-
-  if (args.unitCostCp !== undefined) {
-    return formatWealthAsGold(copperToWealth(args.unitCostCp * args.purchaseQuantity))
-  }
-
-  if (args.equipment.cost) {
-    return formatEquipmentPurchaseTotalPriceLabel(args.equipment, args.purchaseQuantity)
-  }
-
-  return undefined
-}
-
 function resolvePlanGrantContext(args: {
   plan: EquipmentAcquisitionPlan
   draft: CharacterBuilderDraft
@@ -195,11 +175,10 @@ function buildMixedPreviewLinesIfApplicable(args: {
     return undefined
   }
 
-  const totalPurchasePrice = resolvePurchaseTotalPriceLabel({
-    purchaseQuantity: args.plan.purchaseQuantity,
-    unitCostCp: args.plan.unitCostCp,
-    equipment: args.equipment,
-  })
+  const totalPurchasePrice =
+    args.plan.purchaseQuantity > 0
+      ? formatPurchaseLinePrice(args.equipment, args.plan.purchaseQuantity)
+      : undefined
 
   if (!totalPurchasePrice) return undefined
 
@@ -215,19 +194,11 @@ function buildMixedPreviewLinesIfApplicable(args: {
 
 function formatPurchasePreviewLine(args: {
   purchaseQuantity: number
-  unitCostCp?: number
   equipment: Equipment
 }): string | undefined {
-  if (args.purchaseQuantity <= 0) return undefined
+  if (args.purchaseQuantity <= 0 || !args.equipment.cost) return undefined
 
-  const unitLabel =
-    args.unitCostCp !== undefined
-      ? formatWealthAsGold(copperToWealth(args.unitCostCp))
-      : args.equipment.cost
-        ? formatMoney(args.equipment.cost)
-        : undefined
-
-  if (!unitLabel) return undefined
+  const unitLabel = formatMoney(args.equipment.cost)
 
   return args.purchaseQuantity === 1
     ? joinInlineMetadata(['Purchased', unitLabel])
@@ -266,7 +237,6 @@ function buildNextActionPreviewLines(args: {
 
   const purchaseLine = formatPurchasePreviewLine({
     purchaseQuantity: plan.purchaseQuantity,
-    unitCostCp: plan.unitCostCp,
     equipment,
   })
   if (purchaseLine) lines.push(purchaseLine)
@@ -297,7 +267,7 @@ function buildOwnedSourcesSection(
       },
     })),
     ...manageSources.purchases.map((purchase) => {
-      const { quantityLabel, spendSuffix } = formatOwnedPurchaseQuantityLabel({
+      const { quantityLabel, spendSuffix } = formatPurchaseContributionLabel({
         quantity: purchase.quantity,
         unitCostCp: purchase.unitCostCp,
       })

@@ -4,7 +4,7 @@ import { equipmentSchema } from '../../../../content/equipment'
 import {
   EQUIPMENT_PURCHASE_QUANTITY_MAX,
   formatEquipmentInventoryPriceLine,
-  formatEquipmentPurchaseTotalPriceLabel,
+  formatPurchaseLinePrice,
   formatEquipmentPurchaseUnitPriceLabel,
   formatEquipmentBundleLabel,
   resolveEquipmentAcquisitionMaxQuantity,
@@ -204,8 +204,8 @@ describe('resolveEquipmentPurchaseQuantityLimits', () => {
 describe('equipment purchase price labels', () => {
   it('formats unit and normalized total prices', () => {
     expect(formatEquipmentPurchaseUnitPriceLabel(longsword)).toBe('15 GP each')
-    expect(formatEquipmentPurchaseTotalPriceLabel(longsword, 2)).toBe('30 GP')
-    expect(formatEquipmentPurchaseTotalPriceLabel(rations, 2)).toBe('1 GP')
+    expect(formatPurchaseLinePrice(longsword, 2)).toBe('30 GP')
+    expect(formatPurchaseLinePrice(rations, 2)).toBe('1 GP')
   })
 
   it('returns empty price labels for unpriced equipment', () => {
@@ -218,7 +218,7 @@ describe('equipment purchase price labels', () => {
     })
 
     expect(formatEquipmentPurchaseUnitPriceLabel(unpriced)).toBe('')
-    expect(formatEquipmentPurchaseTotalPriceLabel(unpriced, 2)).toBe('')
+    expect(formatPurchaseLinePrice(unpriced, 2)).toBe('')
     expect(
       formatEquipmentInventoryPriceLine({
         equipment: unpriced,

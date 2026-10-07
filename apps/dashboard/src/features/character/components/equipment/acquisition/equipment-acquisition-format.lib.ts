@@ -1,6 +1,6 @@
 import {
   copperToWealth,
-  formatWealthAsGold,
+  formatInlineWealth,
   getMagicItemRarityLabel,
   resolveMagicItemAcquisitionState,
   resolveMagicItemGrantRequirement,
@@ -17,7 +17,7 @@ type PurchaseSpendSnapshot = {
   unitCostCp?: number
 }
 
-export function formatTotalPurchaseSpendFromSnapshots(
+export function formatPurchaseSpend(
   purchases: readonly PurchaseSpendSnapshot[],
 ): string | undefined {
   let totalCp = 0
@@ -30,7 +30,7 @@ export function formatTotalPurchaseSpendFromSnapshots(
   }
 
   if (!hasSnapshot || totalCp <= 0) return undefined
-  return `${formatWealthAsGold(copperToWealth(totalCp))} spent`
+  return `${formatInlineWealth(copperToWealth(totalCp))} spent`
 }
 
 export function resolveAllowanceRarity(args: {

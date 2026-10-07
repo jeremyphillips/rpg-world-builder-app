@@ -2,14 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatGrantPreviewLine,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseSpend,
   formatUsesGrantPreviewLine,
 } from './equipment-acquisition-format.lib'
 
 describe('equipment-acquisition-format.lib', () => {
   it('sums purchase spend from stored unit cost snapshots', () => {
     expect(
-      formatTotalPurchaseSpendFromSnapshots([
+      formatPurchaseSpend([
         { quantity: 15, unitCostCp: 5000 },
         { quantity: 1, unitCostCp: undefined },
       ]),

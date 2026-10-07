@@ -5,7 +5,6 @@ import type { EquipmentPool } from '../../../../content/lib/grants/equipment-gra
 import type { StartingEquipmentOption } from '../../../../content/starting-equipment'
 import {
   isProficiencyLinkedStartingEquipmentGrant,
-  isStartingGoldOption,
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,
   startingEquipmentGrantProficiencyChoiceId,
@@ -30,10 +29,7 @@ import {
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
 import {
   formatStartingEquipmentPackageDescription,
-  formatStartingEquipmentTierAdjustment,
-  formatStartingEquipmentTotalWealthLabel,
   formatStartingGoldOptionDescription,
-  type StartingEquipmentTierAdjustment,
 } from './format-starting-equipment-option-description'
 import { type ResolvedStartingEquipmentFunding } from './resolve-starting-equipment-funding'
 import { resolveProficiencyLinkedEquipmentGrant } from './resolve-proficiency-linked-equipment-grant'
@@ -91,8 +87,6 @@ export type StartingEquipmentOptionSummary = {
   missingItemSlugs: string[]
   unselectableReasons: readonly string[]
   isSelectable: boolean
-  tierAdjustment?: StartingEquipmentTierAdjustment
-  totalStartingWealthLabel?: string
   funding: ResolvedStartingEquipmentFunding
 }
 
@@ -382,17 +376,6 @@ function summarizeOption(
   const { orderedItems, itemsByGroup, missingItemSlugs, unselectableReasons } =
     summarizeOptionItems({ option, characterClass, catalogIndex, draft })
   const funding = context?.fundingByOptionId?.get(option.id) ?? baselineFundingForOption(option)
-  const goldOption = isStartingGoldOption(option)
-  const tierAdjustment = formatStartingEquipmentTierAdjustment({
-    tierLabel: funding.tierLabel,
-    tierAdditionalWealth: funding.tierAdditionalWealth,
-  })
-  const totalStartingWealthLabel = tierAdjustment
-    ? formatStartingEquipmentTotalWealthLabel({
-        totalStartingWealth: funding.totalStartingWealth,
-        isStartingGoldOption: goldOption,
-      })
-    : undefined
 
   return {
     optionId: option.id,
@@ -404,8 +387,6 @@ function summarizeOption(
     missingItemSlugs,
     unselectableReasons,
     isSelectable: unselectableReasons.length === 0,
-    tierAdjustment,
-    totalStartingWealthLabel,
     funding,
   }
 }

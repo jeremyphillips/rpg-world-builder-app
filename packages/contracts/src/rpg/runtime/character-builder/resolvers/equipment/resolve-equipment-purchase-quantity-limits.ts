@@ -2,12 +2,17 @@ import type { Equipment } from '../../../../content/equipment'
 import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
 import { isEquipmentStackable } from '../../../../content/equipment/stackable'
 import { formatMoney } from '../../../../primitives/money'
-import { copperToDisplayWealth, formatWealth } from '../../../../primitives/wealth'
+import { formatInlineWealth } from '../../../../primitives/wealth'
 import type {
   CharacterBuilderDraftEquipmentPurchase,
   CharacterBuilderDraftEquipmentPurchaseOrigin,
 } from '../../draft/draft'
-import { moneyToCopper, wealthToCopper, type EquipmentBudgetSummary } from './equipment-budget'
+import {
+  copperToWealth,
+  moneyToCopper,
+  wealthToCopper,
+  type EquipmentBudgetSummary,
+} from './equipment-budget'
 import { maxAffordablePurchaseQuantity } from './resolve-equipment-purchase-availability'
 import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 
@@ -101,14 +106,11 @@ function isBundledEquipment(equipment: Equipment): boolean {
   return equipment.kind === 'adventuring_gear' && equipment.bundleSize !== undefined
 }
 
-/** Normalizes a purchase total across denominations (e.g. 10 SP → 1 GP). */
-export function formatEquipmentPurchaseTotalPriceLabel(
-  equipment: Equipment,
-  quantity: number,
-): string {
+/** Catalog unit cost times quantity, as compact wealth (`1 GP 5 SP`). */
+export function formatPurchaseLinePrice(equipment: Equipment, quantity: number): string {
   if (!canPurchaseEquipment(equipment)) return ''
   const totalCopper = moneyToCopper(equipment.cost) * quantity
-  return formatWealth(copperToDisplayWealth(totalCopper))
+  return formatInlineWealth(copperToWealth(totalCopper))
 }
 
 export function formatEquipmentPurchaseUnitPriceLabel(equipment: Equipment): string {
@@ -132,7 +134,7 @@ function formatBundledInventoryPriceLine(
     return bundleLabel ? joinInlineMetadata([unitCopy, bundleLabel]) : unitCopy
   }
 
-  const parts = [unitCopy, `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`]
+  const parts = [unitCopy, `${formatPurchaseLinePrice(equipment, quantity)} total`]
   if (bundleLabel) parts.push(bundleLabel)
   return joinInlineMetadata(parts)
 }
@@ -150,7 +152,7 @@ function formatNonBundledInventoryPriceLine(args: {
     if (quantity <= 1) return unitPrice
     return joinInlineMetadata([
       `${unitPrice} each`,
-      `${formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)} total`,
+      `${formatPurchaseLinePrice(equipment, quantity)} total`,
     ])
   }
 
@@ -158,7 +160,7 @@ function formatNonBundledInventoryPriceLine(args: {
     return useValueSuffix ? `${unitPrice} value` : unitPrice
   }
 
-  const total = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
+  const total = formatPurchaseLinePrice(equipment, quantity)
   return useValueSuffix
     ? joinInlineMetadata([`${unitPrice} each`, `Qty ${quantity}`, `${total} total`])
     : joinInlineMetadata([unitPrice, `${total} total`])

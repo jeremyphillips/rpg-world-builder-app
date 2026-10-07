@@ -5,7 +5,6 @@ import {
   copperToWealth,
   formatInlineWealth,
   formatWealth,
-  formatWealthAsGold,
   moneyToCopper,
   subtractFromWealth,
   wealthToCopper,
@@ -32,12 +31,6 @@ describe('wealth primitives', () => {
   it('folds platinum into display denominations without showing PP', () => {
     expect(formatWealth({ cp: 0, sp: 0, gp: 0, pp: 2 })).toBe('20 GP')
     expect(copperToDisplayWealth(2500)).toEqual({ cp: 0, sp: 0, gp: 25, pp: 0 })
-  })
-
-  it('formats wealth as a single GP total', () => {
-    expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 90, pp: 0 })).toBe('90 GP')
-    expect(formatWealthAsGold({ cp: 50, sp: 0, gp: 0, pp: 0 })).toBe('0 GP')
-    expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 0, pp: 1 })).toBe('10 GP')
   })
 
   it('formats compact UI wealth with a space join', () => {

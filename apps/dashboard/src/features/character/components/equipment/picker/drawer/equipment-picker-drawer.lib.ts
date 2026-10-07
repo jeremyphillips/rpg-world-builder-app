@@ -3,6 +3,7 @@ import {
   compareEquipmentPickerItemsByRecommendation,
   fitsStartingEquipmentBudget,
   compareMagicItemBestMatch,
+  formatInlineWealth,
   formatMoney,
   isEquipmentPickerSupportedKind,
   maxAffordableEquipmentQuantity,
@@ -22,7 +23,6 @@ import { chainComparators, compareNumberDescending, type Comparator } from '@rpg
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
-import { formatEquipmentResourceWealth } from '../../acquisition/equipment-acquisition-guidance.lib'
 
 import { type EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
@@ -105,7 +105,7 @@ export function formatEquipmentUnaffordableReason(
   if (!amounts) return ''
 
   const need = formatMoney(amounts.required)
-  const have = formatEquipmentResourceWealth(amounts.remaining)
+  const have = formatInlineWealth(amounts.remaining)
   return joinInlineMetadata([`${need} needed`, `${have} remaining`])
 }
 

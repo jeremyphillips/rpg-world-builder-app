@@ -1,10 +1,8 @@
 import {
-  formatEquipmentPurchaseTotalPriceLabel,
-  formatWealthAsGold,
+  formatPurchaseLinePrice,
   resolveEquipmentAcquisitionActionState,
   resolveEquipmentPurchaseIndex,
   unitCostCpForEquipment,
-  copperToWealth,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
@@ -20,6 +18,7 @@ import {
 import { formatAcquisitionBlockerNote } from '../../picker/equipment-picker-action.lib'
 import { formatMagicItemChoiceBucketLabel } from '../../../../lib/equipment/magic-item-choice-label.lib'
 import {
+  formatPurchaseSpend,
   formatUsesGrantPreviewLine,
   resolveAllowanceRarity,
 } from '../../acquisition/equipment-acquisition-format.lib'
@@ -38,7 +37,10 @@ export type EquipmentInventoryManagePurchaseSource = {
   label: string
   quantity: number
   unitCostCp?: number
-  totalPriceLabel: string
+  /** Snapshot copper times quantity. Absent when the purchase has no stored cost. */
+  spendLabel?: string
+  /** Catalog price when the purchase has no snapshot. */
+  priceLabel?: string
 }
 
 export type EquipmentInventoryManageSources = {
@@ -70,7 +72,7 @@ export function resolveDistinctAcquisitionSourceKinds(
   return ACQUISITION_SOURCE_KIND_ORDER.filter((kind) => kinds.has(kind))
 }
 
-export { formatTotalPurchaseSpendFromSnapshots } from '../../acquisition/equipment-acquisition-format.lib'
+export { formatPurchaseSpend } from '../../acquisition/equipment-acquisition-format.lib'
 
 export function grantedQuantity(rows: readonly EquipmentInventoryRow[]): number {
   return rows.reduce((sum, row) => {
@@ -172,19 +174,22 @@ export function resolveEquipmentInventoryManageSources(
             })
           : undefined
 
-      const totalPriceLabel =
+      const spendLabel =
         unitCostCp !== undefined
-          ? formatWealthAsGold(copperToWealth(unitCostCp * row.entry.quantity))
-          : row.equipment
-            ? formatEquipmentPurchaseTotalPriceLabel(row.equipment, row.entry.quantity)
-            : ''
+          ? formatPurchaseSpend([{ quantity: row.entry.quantity, unitCostCp }])
+          : undefined
+      const priceLabel =
+        spendLabel === undefined && row.equipment
+          ? formatPurchaseLinePrice(row.equipment, row.entry.quantity) || undefined
+          : undefined
 
       purchases.push({
         purchaseId: row.removeTarget.purchaseId,
         label: 'Purchased',
         quantity: row.entry.quantity,
         unitCostCp,
-        totalPriceLabel,
+        spendLabel,
+        priceLabel,
       })
     }
   }
@@ -234,7 +239,7 @@ function formatMagicItemGrantAddAnotherPreview(args: {
   if (plan.purchaseQuantity > 0) {
     return {
       canAdd: plan.canApplyRequestedQuantity,
-      label: `Costs ${formatEquipmentPurchaseTotalPriceLabel(equipment, plan.purchaseQuantity)}`,
+      label: `Costs ${formatPurchaseLinePrice(equipment, plan.purchaseQuantity)}`,
     }
   }
 

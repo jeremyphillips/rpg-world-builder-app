@@ -1,9 +1,7 @@
 import {
   copperToWealth,
   formatInlineWealth,
-  formatWealth,
   resolveEquipmentMagicItemSlots,
-  type CoinWealth,
   type EquipmentBudgetSummary,
   type EquipmentMagicItemSlot,
   type MagicItemAllowance,
@@ -22,12 +20,7 @@ export const EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION =
 export const EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING = 'Magic items'
 
 export function formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp: number): string {
-  return `${formatWealth(copperToWealth(pendingCostCp))} selected`
-}
-
-/** Space-separated coin parts for the resource summary and cannot-afford remaining copy. */
-export function formatEquipmentResourceWealth(wealth: CoinWealth): string {
-  return formatInlineWealth(wealth)
+  return `${formatInlineWealth(copperToWealth(pendingCostCp))} selected`
 }
 
 export type EquipmentBudgetGuidanceCopy = {
@@ -39,10 +32,10 @@ export function formatEquipmentBudgetGuidanceCopy(
   budget: EquipmentBudgetSummary,
 ): EquipmentBudgetGuidanceCopy {
   return {
-    heading: `${formatEquipmentResourceWealth(budget.remaining)} remaining`,
+    heading: `${formatInlineWealth(budget.remaining)} remaining`,
     subheading: joinInlineMetadata([
-      `${formatEquipmentResourceWealth(budget.starting)} budget`,
-      `${formatEquipmentResourceWealth(budget.spent)} spent`,
+      `${formatInlineWealth(budget.starting)} budget`,
+      `${formatInlineWealth(budget.spent)} spent`,
     ]),
   }
 }

@@ -4,7 +4,7 @@ import { equipmentStepLeatherArmorFixture } from '../../../../lib/equipment/equi
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import {
   formatGrantManageSourceLabel,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseSpend,
   grantedQuantity,
   resolveDistinctAcquisitionSourceKinds,
   resolveEquipmentInventoryManageSources,
@@ -154,13 +154,13 @@ describe('equipment-inventory-manage.lib', () => {
     expect(sources.purchases[0]).toMatchObject({
       label: 'Purchased',
       quantity: 1,
-      totalPriceLabel: '10 GP',
+      priceLabel: '10 GP',
     })
   })
 
   it('sums purchase spend from stored unit cost snapshots', () => {
     expect(
-      formatTotalPurchaseSpendFromSnapshots([
+      formatPurchaseSpend([
         { quantity: 15, unitCostCp: 5000 },
         { quantity: 1, unitCostCp: undefined },
       ]),

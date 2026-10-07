@@ -42,11 +42,6 @@ function summary(
       totalStartingWealth: { cp: 0, sp: 0, gp: 652, pp: 0 },
       classOptionPolicy: 'included',
     },
-    tierAdjustment: {
-      label: 'Hero tier adds 637 GP',
-      additionalWealthLabel: '637 GP',
-    },
-    totalStartingWealthLabel: 'Total purchasing gold: 652 GP',
     ...overrides,
   }
 }
@@ -91,7 +86,6 @@ describe('starting equipment radio card tier summary', () => {
                 totalStartingWealth: { cp: 0, sp: 0, gp: 712, pp: 0 },
                 classOptionPolicy: 'included',
               },
-              totalStartingWealthLabel: 'Total: 712 GP',
             }),
           ),
         ]}
@@ -99,8 +93,10 @@ describe('starting equipment radio card tier summary', () => {
     )
 
     expect(screen.getByText('15 GP base')).toBeInTheDocument()
+    expect(screen.getByText('652 GP total')).toBeInTheDocument()
     expect(screen.getByText('75 GP base')).toBeInTheDocument()
-    expect(screen.getAllByText('+637 GP Hero tier')).toHaveLength(2)
+    expect(screen.getByText('712 GP total')).toBeInTheDocument()
+    expect(screen.queryByText('+637 GP Hero tier')).not.toBeInTheDocument()
     expect(screen.queryByText('Hero tier adds 637 GP')).not.toBeInTheDocument()
     expect(screen.queryByText('Total purchasing gold: 652 GP')).not.toBeInTheDocument()
     expect(screen.queryByText('Total: 712 GP')).not.toBeInTheDocument()

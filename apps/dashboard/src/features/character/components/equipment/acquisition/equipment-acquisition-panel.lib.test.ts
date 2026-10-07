@@ -5,8 +5,8 @@ import {
   formatAcquisitionCommitLabel,
   formatAcquisitionCommitSuccessAnnouncement,
   formatAcquisitionCommitSuccessButtonLabel,
-  formatOwnedPurchaseQuantityLabel,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseContributionLabel,
+  formatPurchaseSpend,
 } from './equipment-acquisition-panel.lib'
 import {
   createEquipmentStepContextWithMagicItemGrantsFixture,
@@ -77,7 +77,7 @@ describe('equipment-acquisition-panel.lib', () => {
 
   it('formats owned purchase quantity labels from snapshots', () => {
     expect(
-      formatOwnedPurchaseQuantityLabel({
+      formatPurchaseContributionLabel({
         quantity: 1,
         unitCostCp: 5000,
       }),
@@ -88,9 +88,7 @@ describe('equipment-acquisition-panel.lib', () => {
   })
 
   it('sums snapshot-based GP spent labels', () => {
-    expect(formatTotalPurchaseSpendFromSnapshots([{ quantity: 15, unitCostCp: 5000 }])).toBe(
-      '750 GP spent',
-    )
+    expect(formatPurchaseSpend([{ quantity: 15, unitCostCp: 5000 }])).toBe('750 GP spent')
   })
 
   it('formats commit success button and announcement labels', () => {

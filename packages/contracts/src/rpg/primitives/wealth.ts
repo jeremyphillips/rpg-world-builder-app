@@ -96,9 +96,3 @@ export function formatWealth(wealth: CoinWealth, options?: FormatWealthOptions):
 export function formatInlineWealth(wealth: CoinWealth): string {
   return formatWealth(wealth, { separator: ' ' })
 }
-
-/** Display-only: normalizes wealth to a single GP total (no PP/SP/CP parts). */
-export function formatWealthAsGold(wealth: CoinWealth): string {
-  const gp = Math.floor(wealthToCopper(wealth) / COPPER_PER.gp)
-  return `${formatGroupedNumber(gp)} GP`
-}

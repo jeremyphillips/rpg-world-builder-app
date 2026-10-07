@@ -4,7 +4,7 @@ import {
   buildStartingPackageConversionPreview,
   canConvertStartingPackageToGold,
   copperToWealth,
-  formatWealth,
+  formatInlineWealth,
   type CharacterBuildCatalogIndex,
   type CharacterBuilderDraft,
   type ResolvedStartingEquipmentFunding,
@@ -47,9 +47,9 @@ export type EquipmentPackageConversionEditorProps = {
 }
 
 function formatConversionBudgetLine(preview: StartingPackageConversionPreview): string {
-  const remaining = formatWealth(copperToWealth(preview.budget.remainingCp))
-  const starting = formatWealth(copperToWealth(preview.budget.startingCp))
-  const spent = formatWealth(
+  const remaining = formatInlineWealth(copperToWealth(preview.budget.remainingCp))
+  const starting = formatInlineWealth(copperToWealth(preview.budget.startingCp))
+  const spent = formatInlineWealth(
     copperToWealth(preview.budget.existingPurchaseCostCp + preview.budget.selectedConversionCostCp),
   )
 
@@ -60,7 +60,7 @@ function formatConversionItemValueLabel(item: StartingPackageConversionItem): st
   if (item.pricing.status !== 'priced') return undefined
   const totalCp = item.pricing.unitCostCp * item.purchaseQuantity
   if (totalCp <= 0) return undefined
-  return `${formatWealth(copperToWealth(totalCp))} value`
+  return `${formatInlineWealth(copperToWealth(totalCp))} value`
 }
 
 function groupConversionItems(
