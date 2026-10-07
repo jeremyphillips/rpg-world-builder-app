@@ -1,5 +1,6 @@
 import {
   copperToWealth,
+  formatInlineWealth,
   formatWealth,
   getMagicItemRarityLabel,
   resolveEquipmentMagicItemSlots,
@@ -18,8 +19,6 @@ export const EQUIPMENT_UNRESOLVED_FUNDING_HEADING = 'Starting funds not set'
 export const EQUIPMENT_UNRESOLVED_FUNDING_DESCRIPTION =
   'Choose a starting equipment option to determine your available funds.'
 
-export const EQUIPMENT_RESOURCE_WEALTH_SEPARATOR = ' '
-
 export const EQUIPMENT_MAGIC_ITEMS_RESOURCE_HEADING = 'Magic items'
 
 export function formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp: number): string {
@@ -28,7 +27,7 @@ export function formatEquipmentUnresolvedFundingSelectedLabel(pendingCostCp: num
 
 /** Space-separated coin parts for the resource summary and cannot-afford remaining copy. */
 export function formatEquipmentResourceWealth(wealth: CoinWealth): string {
-  return formatWealth(wealth, { separator: EQUIPMENT_RESOURCE_WEALTH_SEPARATOR })
+  return formatInlineWealth(wealth)
 }
 
 export type EquipmentBudgetGuidanceCopy = {

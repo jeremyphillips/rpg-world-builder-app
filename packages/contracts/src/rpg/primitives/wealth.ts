@@ -92,6 +92,11 @@ export function formatWealth(wealth: CoinWealth, options?: FormatWealthOptions):
   return parts.length > 0 ? parts.join(options?.separator ?? DEFAULT_WEALTH_SEPARATOR) : '0 GP'
 }
 
+/** Exact wealth with a space join for compact UI (`637 GP 5 SP`). */
+export function formatInlineWealth(wealth: CoinWealth): string {
+  return formatWealth(wealth, { separator: ' ' })
+}
+
 /** Display-only: normalizes wealth to a single GP total (no PP/SP/CP parts). */
 export function formatWealthAsGold(wealth: CoinWealth): string {
   const gp = Math.floor(wealthToCopper(wealth) / COPPER_PER.gp)

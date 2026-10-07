@@ -4,6 +4,7 @@ import { MAGIC_ITEM_RARITIES } from '@rpg/contracts'
 
 import {
   formatMagicItemChoiceBucketLabel,
+  formatMagicItemChoiceGrantValue,
   formatMagicItemChoiceLabel,
   formatMagicItemChoiceLabelFromSourceLabel,
   formatMagicItemChoiceRarityPhrase,
@@ -91,6 +92,29 @@ describe('magic item choice labels', () => {
         })),
       }),
     ).toEqual([...MAGIC_ITEM_RARITIES])
+  })
+
+  it('formats a compact grant value without title case', () => {
+    expect(formatMagicItemChoiceGrantValue([])).toBeUndefined()
+    expect(formatMagicItemChoiceGrantValue([{ rarity: 'common', quantity: 1 }])).toBe(
+      '1 common choice',
+    )
+    expect(formatMagicItemChoiceGrantValue([{ rarity: 'uncommon', quantity: 2 }])).toBe(
+      '2 uncommon choices',
+    )
+    expect(
+      formatMagicItemChoiceGrantValue([
+        { rarity: 'common', quantity: 1 },
+        { rarity: 'uncommon', quantity: 1 },
+      ]),
+    ).toBe('1 common · 1 uncommon')
+    expect(
+      formatMagicItemChoiceGrantValue([
+        { rarity: 'common', quantity: 2 },
+        { rarity: 'uncommon', quantity: 3 },
+        { rarity: 'rare', quantity: 1 },
+      ]),
+    ).toBe('2 common · 3 uncommon · 1 rare')
   })
 
   it('rebuilds a quantified label from an existing source label', () => {

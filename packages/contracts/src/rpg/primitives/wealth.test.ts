@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   copperToDisplayWealth,
   copperToWealth,
+  formatInlineWealth,
   formatWealth,
   formatWealthAsGold,
   moneyToCopper,
@@ -37,6 +38,12 @@ describe('wealth primitives', () => {
     expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 90, pp: 0 })).toBe('90 GP')
     expect(formatWealthAsGold({ cp: 50, sp: 0, gp: 0, pp: 0 })).toBe('0 GP')
     expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 0, pp: 1 })).toBe('10 GP')
+  })
+
+  it('formats compact UI wealth with a space join', () => {
+    expect(formatInlineWealth({ cp: 0, sp: 5, gp: 637, pp: 0 })).toBe('637 GP 5 SP')
+    expect(formatInlineWealth({ cp: 0, sp: 0, gp: 0, pp: 0 })).toBe('0 GP')
+    expect(formatInlineWealth({ cp: 0, sp: 0, gp: 15, pp: 0 })).toBe('15 GP')
   })
 
   it('joins denomination parts with the requested separator', () => {

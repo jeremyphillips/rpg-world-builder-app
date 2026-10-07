@@ -6,11 +6,35 @@ import {
   type MagicItemAllowanceRequirement,
   type MagicItemRarity,
 } from '@rpg/contracts'
-import { joinNaturalList } from '@rpg/contracts/primitives'
+import { joinInlineMetadata, joinNaturalList } from '@rpg/contracts/primitives'
 
 const MAGIC_ITEM_CHOICE_SINGULAR = 'choice'
 const MAGIC_ITEM_CHOICE_PLURAL = 'choices'
 const MAGIC_ITEM_UP_TO_PREFIX = 'Up to'
+
+type MagicItemChoiceGrant = {
+  rarity: MagicItemRarity
+  quantity: number
+}
+
+/**
+ * Right-hand grant value. One grant names `choice`; several grants list quantity and rarity.
+ */
+export function formatMagicItemChoiceGrantValue(
+  grants: readonly MagicItemChoiceGrant[],
+): string | undefined {
+  const [onlyGrant, ...rest] = grants
+  if (!onlyGrant) return undefined
+
+  if (rest.length === 0) {
+    const noun = onlyGrant.quantity === 1 ? MAGIC_ITEM_CHOICE_SINGULAR : MAGIC_ITEM_CHOICE_PLURAL
+    return `${onlyGrant.quantity} ${getMagicItemRarityProseLabel(onlyGrant.rarity)} ${noun}`
+  }
+
+  return joinInlineMetadata(
+    grants.map((grant) => `${grant.quantity} ${getMagicItemRarityProseLabel(grant.rarity)}`),
+  )
+}
 
 /**
  * Rarity phrase for an allowance bucket. Two allowances of the same rarity are

@@ -10,8 +10,8 @@ import type { RadioCardOption } from '@rpg/ui'
 import {
   listNestedPoolsForOption,
   listProficiencyLinksForOption,
-  startingEquipmentOptionFundingSummaryLines,
 } from '../../../lib/equipment/equipment-step.lib'
+import { StartingEquipmentTierContribution } from './starting-equipment-tier-contribution'
 import {
   StartingEquipmentNestedFields,
   StartingEquipmentUnselectableReasons,
@@ -54,7 +54,7 @@ export function buildPackageRadioCardOption({
     disabled: !summary.isSelectable,
     label: summary.label,
     description: summary.description,
-    summaryLines: startingEquipmentOptionFundingSummaryLines(summary),
+    summaryContent: <StartingEquipmentTierContribution summary={summary} />,
     embeddedSlotTone: proficiencyLinks.length > 0 ? 'plain' : 'divider',
     embeddedContent: hasNestedFields ? (
       <StartingEquipmentNestedFields
@@ -83,7 +83,7 @@ export function buildGoldRadioCardOption(summary: StartingEquipmentOptionSummary
     disabled: !summary.isSelectable,
     label: summary.label,
     description: summary.description,
-    summaryLines: startingEquipmentOptionFundingSummaryLines(summary),
+    summaryContent: <StartingEquipmentTierContribution summary={summary} />,
     footerContent:
       summary.unselectableReasons.length > 0 ? (
         <StartingEquipmentUnselectableReasons reasons={summary.unselectableReasons} />

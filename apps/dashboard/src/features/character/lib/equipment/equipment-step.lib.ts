@@ -19,7 +19,6 @@ import {
   startingEquipmentPackageItemKey,
   STEP_CHOICE_TYPES_BY_STEP,
   wealthToCopper,
-  formatWealthAsGold,
   formatInventorySourceSummary,
   getMagicItemRarityLabel,
   resolveEquipmentAcquisitionBuilderContext,
@@ -261,40 +260,6 @@ export const EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE =
 export function formatEquipmentReplacedStartingWealthTitle(tierLabel?: string): string {
   const label = tierLabel?.trim()
   return label ? `${label} starting wealth` : 'Starting wealth'
-}
-
-/** Compact secondary lines for option cards / selected summary (tier + total). */
-export function startingEquipmentOptionFundingSummaryLines(
-  summary: Pick<StartingEquipmentOptionSummary, 'tierAdjustment' | 'totalStartingWealthLabel'>,
-): string[] {
-  const lines: string[] = []
-  if (summary.tierAdjustment) lines.push(summary.tierAdjustment.label)
-  if (summary.totalStartingWealthLabel) lines.push(summary.totalStartingWealthLabel)
-  return lines
-}
-
-export type StartingEquipmentTierContributionCopy = {
-  baseLabel?: string
-  badgeLabel: string
-}
-
-/** Selected-package funding row: muted base gold plus a tier-contribution badge. */
-export function formatStartingEquipmentTierContribution(
-  summary: Pick<StartingEquipmentOptionSummary, 'funding' | 'tierAdjustment'>,
-): StartingEquipmentTierContributionCopy | undefined {
-  const adjustment = summary.tierAdjustment
-  if (!adjustment) return undefined
-
-  const tierName = summary.funding.tierLabel?.trim() || 'Starting-wealth'
-  const baseLabel =
-    wealthToCopper(summary.funding.classOptionWealth) > 0
-      ? `${formatWealthAsGold(summary.funding.classOptionWealth)} base`
-      : undefined
-
-  return {
-    baseLabel,
-    badgeLabel: `+${adjustment.additionalWealthLabel} ${tierName} tier`,
-  }
 }
 
 export type EquipmentInventoryRemoveTarget = EquipmentStepRemoveTarget

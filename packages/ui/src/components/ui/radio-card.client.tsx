@@ -65,6 +65,8 @@ export interface RadioCardOption {
   summaryItems?: string[]
   /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
   summaryLines?: string[]
+  /** Rich summary under the description, before string summary lines. */
+  summaryContent?: React.ReactNode
   /** Full-bleed image region above the card body. */
   media?: React.ReactNode
   /** Third-row neutral badge (e.g. spellcasting progression). */
@@ -154,6 +156,7 @@ function RadioCard({
             description={option.description}
             summaryItems={option.summaryItems}
             summaryLines={option.summaryLines}
+            summaryContent={option.summaryContent}
             density={density}
             variant={variant}
             controlPosition={controlPosition}

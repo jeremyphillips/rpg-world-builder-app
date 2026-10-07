@@ -1,28 +1,18 @@
-import { cva, type VariantProps } from 'class-variance-authority'
+import { cva } from 'class-variance-authority'
 
 /** Domain spacing inside RadioCard embedded/footer slots — chrome owned by `@rpg/ui`. */
 export const startingEquipmentOptionNestedFieldsClasses = 'space-y-4'
 
-/** Muted base gold plus the tier-contribution badge, under the package description. */
+/** 12px base and total wealth, 4px under the package description, badge after the total. */
 export const startingEquipmentTierContributionRowVariants = cva(
-  'mt-2 flex flex-wrap items-center gap-2',
+  'mt-1 flex flex-wrap items-center gap-1.5 text-xs',
 )
 
-export const startingEquipmentTierContributionBaseVariants = cva('text-muted-foreground', {
-  variants: {
-    density: {
-      default: 'text-sm',
-      compact: '',
-    },
-  },
-  defaultVariants: {
-    density: 'default',
-  },
-})
+export const startingEquipmentTierContributionBaseVariants = cva(
+  'font-normal text-muted-foreground',
+)
 
-export type StartingEquipmentTierContributionBaseVariantProps = VariantProps<
-  typeof startingEquipmentTierContributionBaseVariants
->
+export const startingEquipmentTierContributionTotalVariants = cva('font-medium text-foreground')
 
 export const startingEquipmentOptionReasonsClasses = 'space-y-1'
 

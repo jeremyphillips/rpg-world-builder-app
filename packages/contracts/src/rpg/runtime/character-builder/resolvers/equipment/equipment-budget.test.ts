@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
 import {
+  formatInlineWealth,
   formatWealth,
   moneyToCopper,
   subtractFromWealth,
@@ -13,8 +14,13 @@ import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { startingEquipmentChoiceSetId } from './resolve-starting-equipment-choice-sets'
 import { deriveEquipmentBudgetSummary, maxAffordableEquipmentQuantity } from './equipment-budget'
 import {
+  minimalStartingWealthSeed,
+  MINIMAL_TIER_C_ID,
+} from '../../../../../test/fixtures/starting-wealth-minimal'
+import {
   deriveEquipmentBudgetSummaryFromFunding,
   resolveStartingEquipmentFundingOptions,
+  resolveStartingEquipmentTierResources,
 } from './resolve-starting-equipment-funding'
 
 const RULESET = 'srd-cc-5.2.1' as const
@@ -136,6 +142,49 @@ describe('deriveEquipmentBudgetSummary', () => {
   })
 })
 
+describe('resolveStartingEquipmentTierResources', () => {
+  it('returns a zero bonus when the matched tier adds no gold', () => {
+    const resources = resolveStartingEquipmentTierResources({
+      startingWealth: minimalStartingWealthSeed,
+      startingLevel: 1,
+    })
+
+    expect(resources?.tier.label).toBe('Level 1')
+    expect(wealthToCopper(resources!.bonusWealth)).toBe(0)
+  })
+
+  it('keeps a magic-only tier when the bonus purse is empty', () => {
+    const resources = resolveStartingEquipmentTierResources({
+      startingWealth: minimalStartingWealthSeed,
+      startingLevel: 2,
+    })
+
+    expect(resources?.tier.magicItemGrants).toEqual([{ rarity: 'common', quantity: 1 }])
+    expect(wealthToCopper(resources!.bonusWealth)).toBe(0)
+  })
+
+  it('rounds a half-gold tier bonus to the nearest copper', () => {
+    const resources = resolveStartingEquipmentTierResources({
+      startingWealth: minimalStartingWealthSeed,
+      startingLevel: 7,
+    })
+
+    expect(resources?.tier.id).toBe(MINIMAL_TIER_C_ID)
+    expect(wealthToCopper(resources!.bonusWealth)).toBe(63_750)
+    expect(formatInlineWealth(resources!.bonusWealth)).toBe('637 GP 5 SP')
+  })
+
+  it('returns nothing when no tier matches', () => {
+    expect(
+      resolveStartingEquipmentTierResources({
+        startingWealth: minimalStartingWealthSeed,
+        startingLevel: 0,
+      }),
+    ).toBeUndefined()
+    expect(resolveStartingEquipmentTierResources({ startingLevel: 1 })).toBeUndefined()
+  })
+})
+
 describe('resolveStartingEquipmentFundingOptions', () => {
   it('includes tier bonus for wealth-only options', () => {
     const catalogIndex = indexCharacterBuildCatalog({
@@ -230,6 +279,7 @@ describe('resolveStartingEquipmentFundingOptions', () => {
 
     const gold = fundingByOptionId.get('starting-gold')!
     expect(gold.classOptionPolicy).toBe('replaced')
+    expect(gold.bonusGold?.baseGp).toBe(21_375)
     expect(gold.classOptionId).toBeUndefined()
     expect(wealthToCopper(gold.classOptionWealth)).toBe(0)
     expect(wealthToCopper(gold.totalStartingWealth)).toBe(2_137_500)

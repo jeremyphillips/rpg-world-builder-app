@@ -107,7 +107,7 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('shows muted base gold and a tier badge instead of the total line', () => {
+  it('shows muted base gold, a medium total, and a tier badge', () => {
     render(
       <StartingEquipmentOptionSummaryCard
         summary={{
@@ -121,9 +121,18 @@ describe('StartingEquipmentOptionSummaryCard', () => {
           funding: {
             ...summary.funding,
             classOptionWealth: { cp: 0, sp: 0, gp: 75, pp: 0 },
-            tierAdditionalWealth: { cp: 0, sp: 0, gp: 637, pp: 0 },
+            tierAdditionalWealth: { cp: 0, sp: 5, gp: 637, pp: 0 },
             tierLabel: 'Hero',
-            totalStartingWealth: { cp: 0, sp: 0, gp: 712, pp: 0 },
+            bonusGold: {
+              baseGp: 500,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 10 },
+                multiplier: 25,
+                currency: 'gp',
+              },
+            },
+            totalStartingWealth: { cp: 0, sp: 5, gp: 712, pp: 0 },
           },
         }}
         density="default"
@@ -132,10 +141,9 @@ describe('StartingEquipmentOptionSummaryCard', () => {
       />,
     )
 
-    const base = screen.getByText('75 GP base')
-    expect(base).toHaveClass('text-muted-foreground')
-    const badge = screen.getByText('+637 GP Hero tier')
-    expect(badge).toHaveClass('h-[31px]', 'text-sm-meta')
+    expect(screen.getByText('75 GP base')).toHaveClass('text-muted-foreground')
+    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-medium', 'text-foreground')
+    expect(screen.getByText('Hero tier')).toBeInTheDocument()
     expect(screen.getByText('Shield proficiency is missing.')).toBeInTheDocument()
     expect(screen.queryByText('Hero tier adds 637 GP')).not.toBeInTheDocument()
     expect(screen.queryByText('Total: 712 GP')).not.toBeInTheDocument()

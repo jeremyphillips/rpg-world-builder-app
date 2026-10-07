@@ -80,6 +80,7 @@ function GroupedRadioCardOptions({
                 description={option.description}
                 summaryItems={option.summaryItems}
                 summaryLines={option.summaryLines}
+                summaryContent={option.summaryContent}
                 titleAdornment={
                   <RadioOptionCardTitleAdornment
                     badge={option.badge}

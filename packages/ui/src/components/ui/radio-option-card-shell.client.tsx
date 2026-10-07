@@ -33,6 +33,7 @@ type RadioOptionCardShellAnatomyProps = {
   description?: string
   summaryItems?: string[]
   summaryLines?: string[]
+  summaryContent?: React.ReactNode
   titleClassName?: string
   summaryBadgeNode: React.ReactNode
   reserveSummaryBadgeRow: boolean

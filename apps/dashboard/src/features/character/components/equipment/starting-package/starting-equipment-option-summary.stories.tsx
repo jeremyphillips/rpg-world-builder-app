@@ -86,17 +86,21 @@ export const StartingGoldHeroTier: Story = {
     summary: {
       ...goldSummary,
       description: 'Take 75 GP instead of standard equipment.',
-      tierAdjustment: {
-        label: 'Hero tier adds 637 GP',
-        additionalWealthLabel: '637 GP',
-      },
-      totalStartingWealthLabel: 'Total: 712 GP',
       funding: {
         ...goldSummary.funding,
         classOptionWealth: { cp: 0, sp: 0, gp: 75, pp: 0 },
-        tierAdditionalWealth: { cp: 0, sp: 0, gp: 637, pp: 0 },
+        tierAdditionalWealth: { cp: 0, sp: 5, gp: 637, pp: 0 },
         tierLabel: 'Hero',
-        totalStartingWealth: { cp: 0, sp: 0, gp: 712, pp: 0 },
+        bonusGold: {
+          baseGp: 500,
+          formula: {
+            kind: 'dice',
+            dice: { count: 1, faces: 10 },
+            multiplier: 25,
+            currency: 'gp',
+          },
+        },
+        totalStartingWealth: { cp: 0, sp: 5, gp: 712, pp: 0 },
       },
     },
   },

@@ -110,6 +110,9 @@ describe('EquipmentStep', () => {
 
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING)).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION)).toBeInTheDocument()
+    expect(screen.getByText('Initiate tier')).toBeInTheDocument()
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
+    expect(screen.getByText('No benefits')).toBeInTheDocument()
 
     await user.click(
       screen.getByRole('button', { name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL }),
@@ -123,6 +126,8 @@ describe('EquipmentStep', () => {
 
     expect(screen.getByText('Standard Equipment')).toBeInTheDocument()
     expect(screen.getByText('Starting Gold')).toBeInTheDocument()
+    expect(screen.getByText('Initiate tier')).toBeInTheDocument()
+    expect(screen.getByText('Level 1')).toBeInTheDocument()
     expect(screen.getByText('Inventory')).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE)).toBeInTheDocument()
   })
