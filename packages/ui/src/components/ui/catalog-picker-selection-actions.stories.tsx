@@ -32,6 +32,16 @@ export const Remove: Story = {
 export const Pending: Story = {
   args: {
     phase: 'pending',
+    pendingLabel: 'Adding…',
+    onAdd: () => undefined,
+    onRemove: () => undefined,
+  },
+}
+
+export const AddFailed: Story = {
+  args: {
+    phase: 'add',
+    failed: true,
     onAdd: () => undefined,
     onRemove: () => undefined,
   },

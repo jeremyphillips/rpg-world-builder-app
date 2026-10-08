@@ -64,6 +64,8 @@ import {
 import type { SelectionRowPresentation } from '../selection-row-status'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+import { resolvePickerPendingLabel } from '../picker/picker-mutation-family'
+
 export const EQUIPMENT_STEP_NO_VALID_OPTIONS_MESSAGE =
   'No valid starting equipment options are currently available — this may be caused by missing catalog data.'
 
@@ -184,7 +186,10 @@ export const EQUIPMENT_INVENTORY_NEXT_COPY_LABEL = 'Next copy'
 
 export const EQUIPMENT_ACQUISITION_QUANTITY_LABEL = 'Quantity to add'
 
-export const EQUIPMENT_ACQUISITION_ADDING_LABEL = 'Adding…'
+export const EQUIPMENT_ACQUISITION_ADDING_LABEL = resolvePickerPendingLabel(
+  'genericSelection',
+  'acquire',
+)
 
 export const EQUIPMENT_ACQUISITION_BLOCKED_NOTE =
   'No additional copies can be added during character creation.'

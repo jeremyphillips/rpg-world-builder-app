@@ -1,7 +1,13 @@
 import * as React from 'react'
 
 import { resolveLocationClassificationDisplay, type Location } from '@rpg/contracts'
-import { Button, Eyebrow, Text } from '@rpg/ui'
+import {
+  Button,
+  CATALOG_PICKER_ADD_LABEL,
+  Eyebrow,
+  resolvePickerActionFailureStatus,
+  Text,
+} from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -15,6 +21,7 @@ import {
   resolveLocationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
+import { resolvePickerPendingLabel } from '../../../lib/picker/picker-mutation-family'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { DrawerShell } from '@/components/drawer'
@@ -44,10 +51,12 @@ export type LocationRelationshipAddDrawerProps = {
   }) => void | Promise<void>
 }
 
+const LOCATION_ROW_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
+
 function resolveSubmitError(error: unknown): string {
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : 'Could not add this location connection.'
+    : resolvePickerActionFailureStatus(CATALOG_PICKER_ADD_LABEL)
 }
 
 // Orchestrator: location picker → role selection → confirm for place/property edges.
@@ -219,6 +228,7 @@ export function LocationRelationshipAddDrawer({
                 }),
                 inlineAction: {
                   label: 'Add',
+                  pendingLabel: LOCATION_ROW_PENDING_LABEL,
                   onClick: () => {
                     void commitLocation(location.id)
                   },

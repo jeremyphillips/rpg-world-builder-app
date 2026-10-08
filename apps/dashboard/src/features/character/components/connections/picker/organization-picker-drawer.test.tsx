@@ -196,7 +196,7 @@ describe('OrganizationPickerDrawer', () => {
     await user.click(screen.getByRole('radio', { name: 'Member' }))
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')
+    expect(await screen.findByRole('status')).toHaveTextContent('Add failed')
     expect(onOpenChange).not.toHaveBeenCalledWith(false)
     expect(screen.getByRole('radio', { name: 'Member' })).toBeChecked()
   })

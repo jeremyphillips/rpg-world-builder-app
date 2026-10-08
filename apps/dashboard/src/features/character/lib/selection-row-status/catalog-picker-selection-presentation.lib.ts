@@ -1,4 +1,4 @@
-import { PICKER_DISABLED_REASON_SELECTION_FULL, type OptionPresentationFact } from '@rpg/contracts'
+import type { OptionPresentationFact } from '@rpg/contracts'
 
 import { selectionNotice } from './selection-row-entries.lib'
 import {
@@ -15,16 +15,14 @@ function catalogPickerCapacityNotices(disabledNote: string | undefined): Selecti
   if (disabledNote.startsWith(ALREADY_GRANTED_DISABLED_REASON_PREFIX)) {
     return [selectionNotice('already_granted', disabledNote)]
   }
-  if (disabledNote === PICKER_DISABLED_REASON_SELECTION_FULL) {
-    return [selectionNotice('selection_full', disabledNote)]
-  }
   return []
 }
 
 /**
- * Spell and proficiency picker rows: contracts facts plus a capacity notice from the
- * shared disabled-note string. `includeRecommendations` is a domain input — when false,
- * recommendation guidance is omitted before the context policy runs.
+ * Spell and proficiency picker rows: contracts facts plus an already-granted notice from
+ * the shared disabled-note string. Selection full stays on the disabled action tooltip.
+ * `includeRecommendations` is a domain input — when false, recommendation guidance is
+ * omitted before the context policy runs.
  */
 export function resolveCatalogPickerSelectionPresentation(args: {
   facts: readonly OptionPresentationFact[] | undefined

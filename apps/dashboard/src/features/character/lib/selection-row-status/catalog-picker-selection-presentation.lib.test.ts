@@ -13,20 +13,14 @@ const classRecommendation = {
 }
 
 describe('resolveCatalogPickerSelectionPresentation', () => {
-  it('turns selection-full and already-granted notes into capacity notices', () => {
+  it('keeps already-granted on the status line and leaves selection full off it', () => {
     expect(
       resolveCatalogPickerSelectionPresentation({
         facts: undefined,
         disabledNote: PICKER_DISABLED_REASON_SELECTION_FULL,
         includeRecommendations: true,
       }).status,
-    ).toEqual([
-      expect.objectContaining({
-        kind: 'notice',
-        reason: 'selection_full',
-        label: 'Selection full',
-      }),
-    ])
+    ).toEqual([])
 
     expect(
       resolveCatalogPickerSelectionPresentation({
@@ -53,7 +47,7 @@ describe('resolveCatalogPickerSelectionPresentation', () => {
     expect(resolveSelectionRowStatusItems(presentation, { context: 'picker' })).toEqual([])
   })
 
-  it('joins recommendation guidance and a capacity notice on the picker line', () => {
+  it('keeps recommendation guidance when selection full is not a row notice', () => {
     const items = resolveSelectionRowStatusItems(
       resolveCatalogPickerSelectionPresentation({
         facts: [classRecommendation],
@@ -63,7 +57,6 @@ describe('resolveCatalogPickerSelectionPresentation', () => {
       { context: 'picker' },
     )
     expect(items).toEqual([
-      { kind: 'text', variant: 'muted', label: 'Selection full' },
       {
         kind: 'text',
         variant: 'guidance',

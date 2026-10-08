@@ -116,7 +116,8 @@ describe('EquipmentPickerRowAcquisitionControl', () => {
   it('announces a failed add in a live region', () => {
     renderControl({ kind: 'add', disabled: false }, { commitFailed: true })
 
-    expect(screen.getByRole('status')).toHaveTextContent('Could not add this item.')
+    expect(screen.getByRole('button', { name: CATALOG_PICKER_ADD_LABEL })).toBeEnabled()
+    expect(screen.getByRole('status')).toHaveTextContent('Add failed')
   })
 
   itAxe('has no axe violations for a disabled choice action', async () => {

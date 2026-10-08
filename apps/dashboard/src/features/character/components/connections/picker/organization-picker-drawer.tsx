@@ -17,6 +17,10 @@ import {
   resolveOrganizationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
+import {
+  resolvePickerMutationCopy,
+  resolvePickerPendingLabel,
+} from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
@@ -39,7 +43,8 @@ import {
 
 export type { OrganizationPickerDrawerProps } from './organization-picker-drawer.types'
 
-const ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this organization membership.'
+const ORGANIZATION_ROW_LABEL = resolvePickerMutationCopy('genericSelection').acquire
+const ORGANIZATION_ROW_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
 
 export function OrganizationPickerDrawer({
   open,
@@ -51,6 +56,7 @@ export function OrganizationPickerDrawer({
   const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(undefined)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [failedOrganizationId, setFailedOrganizationId] = React.useState<string | null>(null)
 
   const organizationFilterSchema = React.useMemo(
     () =>
@@ -79,6 +85,7 @@ export function OrganizationPickerDrawer({
     setExpandedItemId(null)
     setSelectedTitle(undefined)
     setSubmitError(null)
+    setFailedOrganizationId(null)
     setPending(false)
   }, [organizationFilters.reset])
 
@@ -103,6 +110,7 @@ export function OrganizationPickerDrawer({
           : undefined,
       )
       setSubmitError(null)
+      setFailedOrganizationId(null)
     },
     [items],
   )
@@ -136,16 +144,13 @@ export function OrganizationPickerDrawer({
 
       setPending(true)
       setSubmitError(null)
+      setFailedOrganizationId(null)
       try {
         await onAdd(membership)
         resetMembershipConfig()
         onOpenChange(false)
-      } catch (error) {
-        const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE
-        setSubmitError(message)
+      } catch {
+        setFailedOrganizationId(organization.id)
         setPending(false)
       }
     },
@@ -226,7 +231,11 @@ export function OrganizationPickerDrawer({
               inlineAction: selected
                 ? undefined
                 : {
-                    label: 'Add',
+                    label: ORGANIZATION_ROW_LABEL,
+                    pendingLabel: ORGANIZATION_ROW_PENDING_LABEL,
+                    entityKey: organization.id,
+                    failed: failedOrganizationId === organization.id,
+                    loading: pending && expandedItemId === organization.id,
                     onClick: () => handleExpandedItemChange(organization.id),
                   },
             }}

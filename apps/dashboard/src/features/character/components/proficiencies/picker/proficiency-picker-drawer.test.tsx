@@ -70,8 +70,12 @@ describe('ProficiencyPickerDrawer', () => {
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
     expect(screen.getAllByText('Selected')).toHaveLength(2)
-    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
-    expect(screen.getByText('Selection full')).toBeInTheDocument()
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton).toBeDisabled()
+    expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
+    expect(addButton.parentElement).toHaveAccessibleName(
+      'Add, Selection full, Remove a selection before adding another.',
+    )
     expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()
   })
 

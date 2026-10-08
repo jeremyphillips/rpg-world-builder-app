@@ -17,6 +17,7 @@ export type CatalogPickerActionButtonProps = {
   onClick: () => void
   variant?: ButtonProps['variant']
   className?: string
+  tabIndex?: number
 }
 
 /** Shared picker header action chrome — outline, sm, compact density (not overridable). */
@@ -27,6 +28,7 @@ export function CatalogPickerActionButton({
   onClick,
   variant = 'outline',
   className,
+  tabIndex,
 }: CatalogPickerActionButtonProps) {
   const Icon = intent === 'remove' ? Minus : Plus
 
@@ -38,6 +40,7 @@ export function CatalogPickerActionButton({
       density="compact"
       className={className}
       disabled={disabled}
+      tabIndex={tabIndex}
       onClick={onClick}
     >
       {CATALOG_PICKER_ROW_ACTION_ICONS ? <Icon aria-hidden /> : null}

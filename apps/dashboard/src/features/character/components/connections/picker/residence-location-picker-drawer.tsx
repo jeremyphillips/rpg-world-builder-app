@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { catalogNounFromContentType, resolveLocationClassificationDisplay } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -15,6 +15,7 @@ import {
   resolveLocationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
+import { resolvePickerPendingLabel } from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
@@ -33,7 +34,7 @@ const RESIDENCE_PICKER_DESCRIPTION = `Choose a ${locationNoun.singular} where th
 const RESIDENCE_PICKER_NO_RESULTS_MESSAGE = `No ${locationNoun.plural} match this search.`
 const RESIDENCE_PICKER_NO_ITEMS_MESSAGE = 'No residence locations are available.'
 const RESIDENCE_PICKER_ADD_SUBMIT_LABEL = 'Add residence'
-const RESIDENCE_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this residence.'
+const RESIDENCE_PICKER_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
 
 export function ResidenceLocationPickerDrawer({
   open,
@@ -41,8 +42,8 @@ export function ResidenceLocationPickerDrawer({
   items,
   onAdd,
 }: ResidenceLocationPickerDrawerProps) {
-  const [pending, setPending] = React.useState(false)
-  const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [pendingId, setPendingId] = React.useState<string | null>(null)
+  const [failedId, setFailedId] = React.useState<string | null>(null)
   const locationFilterSchema = React.useMemo(
     () =>
       createLocationRelationshipFilterSchema({
@@ -67,14 +68,14 @@ export function ResidenceLocationPickerDrawer({
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
-      if (pending) return
+      if (pendingId) return
       if (!nextOpen) {
         locationFilters.reset()
-        setSubmitError(null)
+        setFailedId(null)
       }
       onOpenChange(nextOpen)
     },
-    [locationFilters.reset, onOpenChange, pending],
+    [locationFilters.reset, onOpenChange, pendingId],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -85,24 +86,20 @@ export function ResidenceLocationPickerDrawer({
 
   const commitResidence = React.useCallback(
     async (locationId: string) => {
-      if (pending) return
+      if (pendingId) return
 
-      setPending(true)
-      setSubmitError(null)
+      setPendingId(locationId)
+      setFailedId(null)
       try {
         await onAdd({ locationId })
         onOpenChange(false)
-      } catch (error) {
-        const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : RESIDENCE_PICKER_SUBMIT_FAILED_MESSAGE
-        setSubmitError(message)
+      } catch {
+        setFailedId(locationId)
       } finally {
-        setPending(false)
+        setPendingId(null)
       }
     },
-    [onAdd, onOpenChange, pending],
+    [onAdd, onOpenChange, pendingId],
   )
 
   return (
@@ -183,10 +180,13 @@ export function ResidenceLocationPickerDrawer({
                 ? undefined
                 : {
                     label: 'Add',
+                    pendingLabel: RESIDENCE_PICKER_PENDING_LABEL,
+                    entityKey: location.id,
+                    failed: failedId === location.id,
                     onClick: () => {
                       void commitResidence(location.id)
                     },
-                    loading: pending,
+                    loading: pendingId === location.id,
                   },
             }}
           />
@@ -196,23 +196,16 @@ export function ResidenceLocationPickerDrawer({
         if (selected) return null
 
         return (
-          <div className="flex flex-col gap-4">
-            {submitError ? (
-              <Text variant="destructive" role="alert">
-                {submitError}
-              </Text>
-            ) : null}
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                disabled={pending}
-                onClick={() => {
-                  void commitResidence(location.id)
-                }}
-              >
-                {RESIDENCE_PICKER_ADD_SUBMIT_LABEL}
-              </Button>
-            </div>
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              disabled={pendingId === location.id}
+              onClick={() => {
+                void commitResidence(location.id)
+              }}
+            >
+              {RESIDENCE_PICKER_ADD_SUBMIT_LABEL}
+            </Button>
           </div>
         )
       }}

@@ -1,7 +1,13 @@
 import * as React from 'react'
 
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
-import { Button, Eyebrow, Text } from '@rpg/ui'
+import {
+  Button,
+  CATALOG_PICKER_ADD_LABEL,
+  Eyebrow,
+  resolvePickerActionFailureStatus,
+  Text,
+} from '@rpg/ui'
 
 import { DrawerShell } from '@/components/drawer'
 
@@ -26,7 +32,7 @@ export type PersonRelationshipAddDrawerProps = {
 function resolveSubmitError(error: unknown): string {
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : 'Could not add this person connection.'
+    : resolvePickerActionFailureStatus(CATALOG_PICKER_ADD_LABEL)
 }
 
 // Orchestrator: picker → role selection → confirm for person draft edges.

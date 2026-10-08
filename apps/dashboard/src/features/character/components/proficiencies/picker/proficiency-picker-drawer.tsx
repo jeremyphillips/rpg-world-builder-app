@@ -1,6 +1,11 @@
 import * as React from 'react'
 
-import { catalogNounFromTerm, formatCatalogPickerCopy, PROFICIENCY_TERM } from '@rpg/contracts'
+import {
+  catalogNounFromTerm,
+  formatCatalogPickerCopy,
+  PICKER_DISABLED_REASON_SELECTION_FULL,
+  PROFICIENCY_TERM,
+} from '@rpg/contracts'
 import { CatalogPickerSelectionActions, resolveCatalogPickerRowActionPhase } from '@rpg/ui'
 
 import {
@@ -9,7 +14,11 @@ import {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 
-import { resolvePickerMutationCopy } from '../../../lib/picker/picker-mutation-family'
+import {
+  resolvePickerCapacityTooltip,
+  resolvePickerMutationCopy,
+  resolvePickerPendingLabel,
+} from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { resolveProficiencySelectionRowPresentation } from '../../../lib/proficiencies/proficiency-selection-row-presentation.lib'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
@@ -77,6 +86,9 @@ export function ProficiencyPickerDrawer({
   )
   const emptyStateMessage = resolveProficiencyPickerEmptyStateMessage(emptyStateKind)
   const genericSelection = resolvePickerMutationCopy('genericSelection')
+  const acquirePendingLabel = resolvePickerPendingLabel('genericSelection', 'acquire')
+  const releasePendingLabel = resolvePickerPendingLabel('genericSelection', 'release')
+  const capacityTooltip = resolvePickerCapacityTooltip('genericSelection')
   const isSkillChoiceSet = choiceSet.choiceType === 'skillProficiency'
 
   return (
@@ -161,6 +173,16 @@ export function ProficiencyPickerDrawer({
               canSelect={item.state.canSelect}
               addLabel={genericSelection.acquire}
               removeLabel={genericSelection.release}
+              pendingDirection={item.state.isAlreadySelected ? 'release' : 'acquire'}
+              pendingLabel={
+                item.state.isAlreadySelected ? releasePendingLabel : acquirePendingLabel
+              }
+              entityKey={item.optionId}
+              tooltip={
+                getProficiencyPickerDisabledNote(item) === PICKER_DISABLED_REASON_SELECTION_FULL
+                  ? capacityTooltip
+                  : undefined
+              }
               onAdd={() => onSelectOption(item.optionId)}
               onRemove={() => onRemoveOption(item.optionId)}
             />

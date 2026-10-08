@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 export const EQUIPMENT_ACQUISITION_COMMIT_SUCCESS_MS = 1000
 
@@ -33,8 +34,10 @@ export function useEquipmentAcquisitionCommitConfirmation(args: {
     (requestedQuantity: number) => {
       if (isPending) return false
 
-      setIsPending(true)
-      setCommitFailed(false)
+      flushSync(() => {
+        setIsPending(true)
+        setCommitFailed(false)
+      })
       try {
         const applied = commit(requestedQuantity)
         if (applied) {

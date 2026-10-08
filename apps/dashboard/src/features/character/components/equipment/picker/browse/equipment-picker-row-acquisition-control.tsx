@@ -1,24 +1,14 @@
-import {
-  CatalogPickerActionButton,
-  Text,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@rpg/ui'
+import { CatalogPickerRowAction } from '@rpg/ui'
 
 import {
   EQUIPMENT_INVENTORY_RELEASE_LABEL,
   EQUIPMENT_INVENTORY_REMOVE_LABEL,
 } from '../../../../lib/equipment/equipment-step.lib'
+import { resolvePickerPendingLabel } from '../../../../lib/picker/picker-mutation-family'
 import { EquipmentQuantityStepper } from '../../equipment-quantity-stepper'
 import type { EquipmentPickerHeaderControl } from './equipment-picker-item-header.lib'
-import {
-  equipmentPickerRowControlStatusVariants,
-  equipmentPickerRowControlTooltipTriggerVariants,
-} from './equipment-picker-row-acquisition-control.variants'
 
-export const EQUIPMENT_PICKER_ADD_FAILED_LABEL = 'Could not add this item.'
+const EQUIPMENT_ADD_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
 
 export type EquipmentPickerRowAcquisitionControlProps = {
   control: EquipmentPickerHeaderControl
@@ -50,43 +40,34 @@ export function EquipmentPickerRowAcquisitionControl({
   if (control.kind === 'none') return null
 
   if (control.kind === 'disabled') {
-    const action = (
-      <CatalogPickerActionButton intent="add" disabled onClick={() => undefined}>
-        {control.label}
-      </CatalogPickerActionButton>
-    )
-    if (!control.tooltip) return action
-
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span tabIndex={0} className={equipmentPickerRowControlTooltipTriggerVariants()}>
-              {action}
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>{control.tooltip}</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <CatalogPickerRowAction
+        intent="add"
+        actionLabel={control.label}
+        disabled
+        tooltip={control.tooltip ? { body: control.tooltip } : undefined}
+        onClick={() => undefined}
+      />
     )
   }
 
   if (control.kind === 'release') {
     return (
-      <CatalogPickerActionButton intent="remove" onClick={() => onRelease(control.allowanceId)}>
-        {EQUIPMENT_INVENTORY_RELEASE_LABEL}
-      </CatalogPickerActionButton>
+      <CatalogPickerRowAction
+        intent="remove"
+        actionLabel={EQUIPMENT_INVENTORY_RELEASE_LABEL}
+        onClick={() => onRelease(control.allowanceId)}
+      />
     )
   }
 
   if (control.kind === 'remove') {
     return (
-      <CatalogPickerActionButton
+      <CatalogPickerRowAction
         intent="remove"
+        actionLabel={EQUIPMENT_INVENTORY_REMOVE_LABEL}
         onClick={() => onRemovePurchase(control.purchaseId)}
-      >
-        {EQUIPMENT_INVENTORY_REMOVE_LABEL}
-      </CatalogPickerActionButton>
+      />
     )
   }
 
@@ -115,24 +96,14 @@ export function EquipmentPickerRowAcquisitionControl({
   }
 
   return (
-    <>
-      <CatalogPickerActionButton
-        intent="add"
-        disabled={control.disabled || isPending}
-        onClick={onAdd}
-      >
-        {addLabel}
-      </CatalogPickerActionButton>
-      {commitFailed ? (
-        <Text
-          as="span"
-          variant="destructive"
-          className={equipmentPickerRowControlStatusVariants()}
-          role="status"
-        >
-          {EQUIPMENT_PICKER_ADD_FAILED_LABEL}
-        </Text>
-      ) : null}
-    </>
+    <CatalogPickerRowAction
+      intent="add"
+      actionLabel={addLabel}
+      pending={isPending}
+      pendingLabel={EQUIPMENT_ADD_PENDING_LABEL}
+      disabled={control.disabled || isPending}
+      failed={commitFailed}
+      onClick={onAdd}
+    />
   )
 }

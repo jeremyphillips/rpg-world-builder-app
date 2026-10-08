@@ -1093,8 +1093,14 @@ export {
 } from './components/ui/catalog-picker-selection-actions.client'
 export {
   resolveCatalogPickerRowActionPhase,
+  resolvePickerActionFailureStatus,
   type CatalogPickerRowActionPhase,
 } from './components/ui/catalog-picker-row-action.lib'
+export {
+  CatalogPickerRowAction,
+  type CatalogPickerRowActionProps,
+  type CatalogPickerRowActionTooltip,
+} from './components/ui/catalog-picker-row-action.client'
 export { CatalogToolbar } from './components/ui/catalog-toolbar.client'
 export {
   CatalogFilterChips,

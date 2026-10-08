@@ -48,13 +48,26 @@ Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
 
 The trailing control and the selection-state line are related outputs, not one model.
 
-The mutation family owns words only. It is not a state machine, not a `GameTermEntry`, and not a `defineMessage` catalog. Generic Add / Remove stay in `@rpg/ui` (`CATALOG_PICKER_ADD_LABEL`, `CATALOG_PICKER_REMOVE_LABEL`). Domain triplets live in `features/character/lib/picker/picker-mutation-family.ts`:
+The mutation family owns words only. It is not a state machine, not a `GameTermEntry`, and not a `defineMessage` catalog. Generic Add / Remove stay in `@rpg/ui` (`CATALOG_PICKER_ADD_LABEL`, `CATALOG_PICKER_REMOVE_LABEL`). Domain triplets live in `features/character/lib/picker/picker-mutation-family.ts`. Progressive forms are stored lowercase; they are not an `-ing` transform.
 
-| Family             | Acquire | State    | Release   |
-| ------------------ | ------- | -------- | --------- |
-| `genericSelection` | Add     | Selected | Remove    |
-| `learnedSpell`     | Learn   | Learned  | Unlearn   |
-| `preparedSpell`    | Prepare | Prepared | Unprepare |
+| Family             | Acquire | Acquiring | State    | Release   | Releasing   |
+| ------------------ | ------- | --------- | -------- | --------- | ----------- |
+| `genericSelection` | Add     | adding    | Selected | Remove    | removing    |
+| `learnedSpell`     | Learn   | learning  | Learned  | Unlearn   | unlearning  |
+| `preparedSpell`    | Prepare | preparing | Prepared | Unprepare | unpreparing |
+
+`resolvePickerPendingLabel` capitalizes the progressive and appends `…` (`Learning…`, `Adding…`). `resolvePickerCapacityTooltip` uses the release imperative and the acquiring form (`Unlearn a spell before learning another.`). Spell nouns come from `getContentTypeSentenceForm('spells', 1)`. Generic selection, including cantrips, uses the family noun `selection`.
+
+### Mutation states
+
+| State               | UI                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| Expected inability  | Disabled action plus an explanatory tooltip. Selection full is this tooltip.           |
+| In-flight mutation  | Pending action from `resolvePickerPendingLabel` only.                                  |
+| Failed mutation     | The original action returns, with a compact failure under it (`Add failed`). No toast. |
+| Successful mutation | The next valid action, plus the persistent selection-state line.                       |
+
+The shared row action owns the tooltip wrapper and the failure line. It clears that line when the user retries, the mutation succeeds, the entity changes, or the available action changes. Callers report `failed`. They do not each reset the line. Person and location confirm steps may call `resolvePickerActionFailureStatus`. They do not use the row-action cluster.
 
 The caller chooses `acquire` or `release` from its own domain flag (`isAlreadySelected`, owned quantity, and so on). `resolveSpellPickerSelectionMode` maps prepared rows to `preparedSpell`, known and spellbook rows to `learnedSpell`, and cantrips to `genericSelection`. Cantrips stay generic because their acquisition lead is Choose; “to learn” is the purpose clause, and cantrips are not a learned-spell collection. Known repertoire rows use Learn / Learned / Unlearn with spellbook. Section copy for `limitedRepertoire` can still say Prepare, and the repertoire counter verb can still be `prepared`. That seam is section copy, not a second row verb. Forget is not a row verb.
 
@@ -205,9 +218,9 @@ The equipment step mounts `EquipmentSelectionFactsProvider`; **sections** read
 - `equipment-selection-row-presentation.parity.test.ts` guards drift: owned weapons and armor show
   a compatibility entry if and only if a matching build advisory exists.
 - Spell and proficiency drawers use `picker`. Recommendation guidance is a domain input
-  (`recommendationsEnabled` on spells; always on for proficiencies). Capacity notices
-  (`selection_full`, `already_granted`) come from the shared disabled-note string.
-  Ritual and concentration stay on the spell metadata line.
+  (`recommendationsEnabled` on spells; always on for proficiencies). `already_granted` still
+  comes from the shared disabled-note string. `selection_full` is not a row-status notice;
+  the disabled action tooltip carries it. Ritual and concentration stay on the spell metadata line.
 - Quick NPC package customization rows use `edit_choice`, and selected additional equipment
   rows use `owned`. Both read `deriveQuickNpcEquipmentSelectionFacts` from the prepared draft
   (package selections, retained items, generated scores). The summary card stays on advisories

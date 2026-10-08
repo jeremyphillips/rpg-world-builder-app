@@ -110,7 +110,7 @@ describe('SpellPickerDrawer', () => {
     expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
   })
 
-  it('shows recommendation guidance and a capacity notice on one metadata line', () => {
+  it('shows recommendation guidance and explains selection full on the disabled action', () => {
     const recommendedItem = {
       ...spellPickerOpenItemsFixture[0]!,
       state: {
@@ -170,10 +170,15 @@ describe('SpellPickerDrawer', () => {
       .getByText('Detect Magic')
       .closest('[data-picker-item-key]') as HTMLElement
     expect(within(blockedRow).getByText('Recommended by class')).toBeInTheDocument()
-    expect(within(blockedRow).getByText('Selection full')).toBeInTheDocument()
+    expect(within(blockedRow).queryByText('Selection full')).not.toBeInTheDocument()
+    const blockedAdd = within(blockedRow).getByRole('button', { name: 'Add' })
+    expect(blockedAdd).toBeDisabled()
+    expect(blockedAdd.parentElement).toHaveAccessibleName(
+      'Add, Selection full, Remove a selection before adding another.',
+    )
     const statusLine = blockedRow.querySelector('[data-entity-summary-status]')?.parentElement
       ?.parentElement
-    expect(statusLine?.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
+    expect(statusLine?.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(0)
   })
 
   it('disables Add when canSelect is false and keeps selected rows removable', () => {

@@ -2,7 +2,10 @@
 
 import type { ButtonProps } from './button.client'
 
-import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
+import {
+  CatalogPickerRowAction,
+  type CatalogPickerRowActionTooltip,
+} from './catalog-picker-row-action.client'
 import type { CatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
 
 export const CATALOG_PICKER_ADD_LABEL = 'Add'
@@ -16,7 +19,12 @@ export type CatalogPickerSelectionActionsProps = {
   addLabel?: string
   removeLabel?: string
   pendingLabel?: string
+  /** Which verb is in flight when `phase` is pending. */
+  pendingDirection?: 'acquire' | 'release'
   buttonVariant?: ButtonProps['variant']
+  failed?: boolean
+  entityKey?: string
+  tooltip?: CatalogPickerRowActionTooltip
 }
 
 export function CatalogPickerSelectionActions({
@@ -26,25 +34,30 @@ export function CatalogPickerSelectionActions({
   onRemove,
   addLabel = CATALOG_PICKER_ADD_LABEL,
   removeLabel = CATALOG_PICKER_REMOVE_LABEL,
-  pendingLabel = 'Adding…',
+  pendingLabel,
+  pendingDirection = 'acquire',
   buttonVariant,
+  failed = false,
+  entityKey,
+  tooltip,
 }: CatalogPickerSelectionActionsProps) {
-  if (phase === 'remove') {
-    return (
-      <CatalogPickerActionButton intent="remove" variant={buttonVariant} onClick={onRemove}>
-        {removeLabel}
-      </CatalogPickerActionButton>
-    )
-  }
+  const pending = phase === 'pending'
+  const releasing = phase === 'remove' || (pending && pendingDirection === 'release')
+  const actionLabel = releasing ? removeLabel : addLabel
+  const inactive = pending || (!releasing && !canSelect)
 
   return (
-    <CatalogPickerActionButton
-      intent="add"
+    <CatalogPickerRowAction
+      intent={releasing ? 'remove' : 'add'}
+      actionLabel={actionLabel}
+      pendingLabel={pendingLabel}
+      pending={pending}
+      disabled={inactive}
+      failed={failed}
+      entityKey={entityKey}
+      tooltip={inactive && !pending ? tooltip : undefined}
       variant={buttonVariant}
-      disabled={phase === 'pending' || !canSelect}
-      onClick={onAdd}
-    >
-      {phase === 'pending' ? pendingLabel : addLabel}
-    </CatalogPickerActionButton>
+      onClick={releasing ? onRemove : onAdd}
+    />
   )
 }

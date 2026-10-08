@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Button, Text } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -12,6 +12,7 @@ import {
   useRelationshipCatalogFilters,
 } from '@/features/content'
 
+import { resolvePickerPendingLabel } from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { formatContentReferenceLabel } from '../../../lib/display/format-content-reference-label'
 import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
@@ -28,7 +29,7 @@ import {
 
 export type { CharacterPickerDrawerProps } from './character-picker-drawer.types'
 
-const CHARACTER_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this character connection.'
+const CHARACTER_PICKER_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
 
 export function CharacterPickerDrawer({
   open,
@@ -39,8 +40,8 @@ export function CharacterPickerDrawer({
   onSelect,
   closeOnSelect = true,
 }: CharacterPickerDrawerProps) {
-  const [pending, setPending] = React.useState(false)
-  const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [pendingId, setPendingId] = React.useState<string | null>(null)
+  const [failedId, setFailedId] = React.useState<string | null>(null)
   const characterFilterSchema = React.useMemo(
     () =>
       createCharacterRelationshipFilterSchema({
@@ -72,38 +73,34 @@ export function CharacterPickerDrawer({
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
-      if (pending) return
+      if (pendingId) return
       if (!nextOpen) {
         characterFilters.reset()
-        setSubmitError(null)
+        setFailedId(null)
       }
       onOpenChange(nextOpen)
     },
-    [characterFilters.reset, onOpenChange, pending],
+    [characterFilters.reset, onOpenChange, pendingId],
   )
 
   const commitSelection = React.useCallback(
     async (characterId: string) => {
-      if (pending) return
+      if (pendingId) return
 
-      setPending(true)
-      setSubmitError(null)
+      setPendingId(characterId)
+      setFailedId(null)
       try {
         await onSelect(characterId)
         if (closeOnSelect) {
           onOpenChange(false)
         }
-      } catch (error) {
-        const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : CHARACTER_PICKER_SUBMIT_FAILED_MESSAGE
-        setSubmitError(message)
+      } catch {
+        setFailedId(characterId)
       } finally {
-        setPending(false)
+        setPendingId(null)
       }
     },
-    [onOpenChange, onSelect, pending],
+    [closeOnSelect, onOpenChange, onSelect, pendingId],
   )
 
   return (
@@ -192,10 +189,13 @@ export function CharacterPickerDrawer({
                   ? undefined
                   : {
                       label: 'Add',
+                      pendingLabel: CHARACTER_PICKER_PENDING_LABEL,
+                      entityKey: character.id,
+                      failed: failedId === character.id,
                       onClick: () => {
                         void commitSelection(character.id)
                       },
-                      loading: pending,
+                      loading: pendingId === character.id,
                     },
             }}
           />
@@ -205,23 +205,16 @@ export function CharacterPickerDrawer({
         if (selected || disabled) return null
 
         return (
-          <div className="flex flex-col gap-4">
-            {submitError ? (
-              <Text variant="destructive" role="alert">
-                {submitError}
-              </Text>
-            ) : null}
-            <div className="flex justify-end">
-              <Button
-                type="button"
-                disabled={pending}
-                onClick={() => {
-                  void commitSelection(character.id)
-                }}
-              >
-                Continue
-              </Button>
-            </div>
+          <div className="flex justify-end">
+            <Button
+              type="button"
+              disabled={pendingId === character.id}
+              onClick={() => {
+                void commitSelection(character.id)
+              }}
+            >
+              Continue
+            </Button>
           </div>
         )
       }}

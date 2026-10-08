@@ -1,5 +1,9 @@
-import { ContentCardMedia, contentCardMediaVariants, type ContentCardDensity } from '@rpg/ui'
-import { CatalogPickerActionButton } from '@rpg/ui'
+import {
+  CatalogPickerRowAction,
+  ContentCardMedia,
+  contentCardMediaVariants,
+  type ContentCardDensity,
+} from '@rpg/ui'
 
 import { ContentMediaImage, type ContentMediaImageFrame } from '@/features/media'
 
@@ -65,18 +69,20 @@ export function projectEntitySurfaceIdentityToSummaryModel(
 export function buildEntitySurfaceInlineActionTrailing(
   action: EntitySurfaceInlineAction,
 ): EntityAnatomyTrailing {
-  const disabled = action.disabled || action.loading
-
   return {
     kind: 'action',
     content: (
-      <CatalogPickerActionButton
+      <CatalogPickerRowAction
         intent={action.intent ?? 'add'}
-        disabled={disabled}
+        actionLabel={action.label}
+        pendingLabel={action.pendingLabel}
+        pending={action.loading}
+        disabled={action.disabled || action.loading}
+        failed={action.failed}
+        entityKey={action.entityKey}
+        tooltip={action.tooltip}
         onClick={action.onClick}
-      >
-        {action.loading ? `${action.label}…` : action.label}
-      </CatalogPickerActionButton>
+      />
     ),
   }
 }

@@ -1,4 +1,9 @@
-import { catalogNounFromContentType, getContentTypeTerm, vocabularyTermLabel } from '@rpg/contracts'
+import {
+  catalogNounFromContentType,
+  getContentTypeTerm,
+  PICKER_DISABLED_REASON_SELECTION_FULL,
+  vocabularyTermLabel,
+} from '@rpg/contracts'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -33,7 +38,12 @@ import {
   type SpellPickerDrawerProps,
 } from './spell-picker-drawer.types'
 import {
+  resolvePickerCapacityTooltip,
+  resolvePickerPendingLabel,
+} from '../../../lib/picker/picker-mutation-family'
+import {
   resolveSpellPickerAction,
+  resolveSpellPickerMutationFamily,
   resolveSpellPickerSelectionMode,
   resolveSpellPickerSelectionStateLine,
 } from './spell-picker-action.lib'
@@ -113,8 +123,12 @@ export function SpellPickerDrawer({
   const selectionComplete = activeSelectedIds.length >= selectionLimit && selectionLimit > 0
   const activeSpellLevel = resolveActiveSpellLevelSuffix(mode, browseState.selectedLevels)
   const selectionMode = resolveSpellPickerSelectionMode(activeChoiceSet)
+  const mutationFamily = resolveSpellPickerMutationFamily(selectionMode)
   const addLabel = resolveSpellPickerAction({ selectionMode, selected: false })
   const removeLabel = resolveSpellPickerAction({ selectionMode, selected: true })
+  const acquirePendingLabel = resolvePickerPendingLabel(mutationFamily, 'acquire')
+  const releasePendingLabel = resolvePickerPendingLabel(mutationFamily, 'release')
+  const capacityTooltip = resolvePickerCapacityTooltip(mutationFamily)
 
   const segmentedOptions = modes.map((entry) => {
     const choiceSet = choiceSetForSpellPickerMode(entry, cantripChoiceSet, spellChoiceSet)
@@ -258,6 +272,16 @@ export function SpellPickerDrawer({
               canSelect={item.state.canSelect}
               addLabel={addLabel}
               removeLabel={removeLabel}
+              pendingDirection={item.state.isAlreadySelected ? 'release' : 'acquire'}
+              pendingLabel={
+                item.state.isAlreadySelected ? releasePendingLabel : acquirePendingLabel
+              }
+              entityKey={item.spell.id}
+              tooltip={
+                getSpellPickerDisabledNote(item) === PICKER_DISABLED_REASON_SELECTION_FULL
+                  ? capacityTooltip
+                  : undefined
+              }
               onAdd={() => onSelectSpell(mode, item.spell.id)}
               onRemove={() => onRemoveSpell(mode, item.spell.id)}
             />
