@@ -1,4 +1,5 @@
 import { defineMessage } from '../../../../validation/define-message'
+import { getContentTypeCapitalizedSentenceLabel } from '../../../content/lib/content-type-terms'
 
 // ---------------------------------------------------------------------------
 // Character builder preview messages — advisory copy for the live preview
@@ -13,11 +14,11 @@ export const characterBuilderPreviewMessages = {
   ),
   speciesNotSelected: defineMessage(
     'validation.characterBuilderPreview.speciesNotSelected',
-    () => 'Species is not selected.',
+    () => `${getContentTypeCapitalizedSentenceLabel('species')} is not selected.`,
   ),
   classNotSelected: defineMessage(
     'validation.characterBuilderPreview.classNotSelected',
-    () => 'Class is not selected.',
+    () => `${getContentTypeCapitalizedSentenceLabel('classes')} is not selected.`,
   ),
   requiredChoicesIncomplete: defineMessage(
     'validation.characterBuilderPreview.requiredChoicesIncomplete',

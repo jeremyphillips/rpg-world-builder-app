@@ -16,6 +16,7 @@ import type {
   CharacterSelectionSourceKind,
 } from './sheet/selection-sources'
 import { getNpcTemplateLabel } from '../../vocab/npc/npc-template'
+import { getSpeciesHeritageLabel } from '../../vocab/species/heritage'
 import type { VocabularyTerm } from '../../vocab/types'
 import type { ChoiceSetOwnerKind, ChoiceSetProvenance } from '../character-builder/choice-set'
 import { joinInlineMetadata } from '../../primitives/inline-metadata'
@@ -201,7 +202,7 @@ function resolveHeritageOptionProvenance(
   const species = source.sourceId ? catalogIndex.species?.get(source.sourceId) : undefined
   const option = species && source.grantId ? findHeritageOption(species, source.grantId) : undefined
   const heritageName = species?.heritage?.name
-  const ownerLabel = heritageName ?? 'Heritage'
+  const ownerLabel = heritageName ?? getSpeciesHeritageLabel()
 
   return {
     sourceKind: 'heritageOption',
@@ -408,7 +409,7 @@ function formatCompactSingleSelectionSourceLabel(
   }
 
   if (source.kind === 'heritageOption') {
-    return 'Heritage'
+    return getSpeciesHeritageLabel()
   }
 
   const staticLabel = STATIC_SELECTION_SOURCE_LABELS[source.kind]
@@ -450,10 +451,7 @@ function formatGrantCardSingleLabel(
   catalogIndex: SelectionSourceLabelCatalogIndex,
 ): string {
   if (provenance.primaryLabel && provenance.parentContext) {
-    return joinInlineMetadata([
-      `Granted by ${provenance.primaryLabel}`,
-      provenance.parentContext,
-    ])
+    return joinInlineMetadata([`Granted by ${provenance.primaryLabel}`, provenance.parentContext])
   }
 
   if (provenance.primaryLabel) {

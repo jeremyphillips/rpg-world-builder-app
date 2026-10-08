@@ -6,6 +6,7 @@ import {
   type CharacterBuildPreview,
   type CharacterBuildContext,
   type ChoiceSet,
+  getContentTypeTerm,
 } from '@rpg/contracts'
 import type {
   CharacterBuilderStepId,
@@ -370,7 +371,10 @@ export function projectBuilderPreviewRail({
       name: getPreviewIdentityName(draft),
       statusLine: getPreviewLevelClassLine(draft, catalogIndex),
       facts: [
-        { label: 'Species', value: getPreviewSpeciesLine(draft, catalogIndex) },
+        {
+          label: getContentTypeTerm('species').label,
+          value: getPreviewSpeciesLine(draft, catalogIndex),
+        },
         { label: 'Alignment', value: getPreviewAlignmentLine(draft) },
       ],
     },

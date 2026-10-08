@@ -1,3 +1,7 @@
+import {
+  getContentTypeCapitalizedSentenceLabel,
+  getContentTypeSentenceForm,
+} from '../../rpg/content/lib/content-type-terms'
 import type { DndBeyondCharacterPayload } from '../dnd-beyond/dnd-beyond-character.schema'
 import type { CharacterImportCoverageEntry } from './character-import-result.schema'
 import type { CharacterImportExtraction } from './character-import-result.schema'
@@ -232,7 +236,7 @@ const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
     return {
       targetPath: 'species',
       state: 'mapped',
-      reason: 'Species was extracted from data.race and matched to the local catalog.',
+      reason: `${getContentTypeCapitalizedSentenceLabel('species')} was extracted from data.race and matched to the local catalog.`,
       sourcePaths: extraction.species.sourcePaths,
     }
   }
@@ -241,7 +245,7 @@ const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
     return {
       targetPath: 'species',
       state: 'unresolved-reference',
-      reason: 'Species was extracted from data.race but requires local catalog matching.',
+      reason: `${getContentTypeCapitalizedSentenceLabel('species')} was extracted from data.race but requires local catalog matching.`,
       sourcePaths: extraction.species.sourcePaths,
     }
   }
@@ -251,8 +255,8 @@ const buildSpeciesCoverage: CoverageBuilder = (extraction) => {
     state: extraction.species.status === 'missing-source' ? 'deferred' : 'unresolved-reference',
     reason:
       extraction.species.status === 'missing-source'
-        ? 'No species/race data was found in the source character.'
-        : 'Species/race data is present in the source but requires local catalog matching.',
+        ? `No ${getContentTypeSentenceForm('species')}/race data was found in the source character.`
+        : `${getContentTypeCapitalizedSentenceLabel('species')}/race data is present in the source but requires local catalog matching.`,
     sourcePaths: extraction.species.sourcePaths,
   }
 }

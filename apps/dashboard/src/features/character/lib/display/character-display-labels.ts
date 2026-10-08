@@ -1,4 +1,9 @@
-import { getContentTypeSentenceForm, getProficiencyDomainCompactLabel } from '@rpg/contracts'
+import {
+  getContentTypeSentenceForm,
+  getProficiencyDomainCompactLabel,
+  getSpeciesTraitEmptySectionMessage,
+  getSpeciesTraitSectionLabel,
+} from '@rpg/contracts'
 
 export const CHARACTER_STAT_LABELS = {
   armorClass: 'AC',
@@ -19,7 +24,7 @@ export const CHARACTER_SECTION_LABELS = {
   equipment: 'Equipment',
   wealth: 'Wealth',
   classFeatures: 'Class features',
-  speciesTraits: 'Species traits',
+  speciesTraits: getSpeciesTraitSectionLabel(),
   feats: 'Feats',
   connections: 'Connections',
   narrative: 'Narrative',
@@ -32,7 +37,7 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   spells: `No ${getContentTypeSentenceForm('spells', 2)} known.`,
   equipment: 'No equipment carried.',
   classFeatures: 'No class features at this level.',
-  speciesTraits: 'No species traits.',
+  speciesTraits: getSpeciesTraitEmptySectionMessage(),
   feats: 'No feats.',
   featuresAndTraits: 'No features, traits, or feats.',
   connections: 'No connections.',

@@ -77,6 +77,7 @@ import { ORGANIZATION_DOMAIN_TERM } from './organization/domain'
 import { ORGANIZATION_FORM_TERM } from './organization/form'
 import { NPC_TEMPLATE_TERM } from './npc/npc-template'
 import { NPC_WEALTH_TIER_TERM } from './npc/npc-wealth-tier'
+import { SPECIES_HERITAGE_TERM } from './species/heritage'
 
 /** Closed `rpg/vocab` modules — each `*_ENTRIES` map has a sibling `*_TERM`. */
 const RPG_VOCAB_CLOSED_TERMS = [
@@ -162,7 +163,10 @@ const CHARACTER_NARRATIVE_TERMS = [
 const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly VocabularyTerm[]
 
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
-const CONCEPT_ONLY_TERMS = [HIT_POINTS_TERM] as const satisfies readonly VocabularyTerm[]
+const CONCEPT_ONLY_TERMS = [
+  HIT_POINTS_TERM,
+  SPECIES_HERITAGE_TERM,
+] as const satisfies readonly VocabularyTerm[]
 
 const SPELL_RESOLUTION_TERMS = [
   SPELL_RESOLUTION_TARGET_KIND_TERM,
@@ -227,7 +231,7 @@ describe('primitives term coverage', () => {
 
 describe('concept-only term coverage', () => {
   it('defines vocab terms without *_ENTRIES maps', () => {
-    expect(CONCEPT_ONLY_TERMS).toHaveLength(1)
+    expect(CONCEPT_ONLY_TERMS).toHaveLength(2)
     for (const term of CONCEPT_ONLY_TERMS) {
       expectVocabularyTerm(term)
     }

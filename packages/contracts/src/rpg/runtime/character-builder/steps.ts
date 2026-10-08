@@ -1,4 +1,5 @@
 import { ABILITY_IDS } from '../../vocab/ability'
+import { getSpeciesHeritageSentenceForm } from '../../vocab/species/heritage'
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeSentenceForm,
@@ -83,7 +84,7 @@ const BUILDER_STEP_METADATA = {
   },
   species: {
     label: getContentTypeTerm('species').label,
-    description: `Choose your character's ${getContentTypeSentenceForm('species')} and heritage`,
+    description: `Choose your character's ${getContentTypeSentenceForm('species')} and ${getSpeciesHeritageSentenceForm(1)}`,
   },
   class: {
     label: getContentTypeTerm('classes').label,

@@ -36,6 +36,7 @@ import {
   type CreateOrganizationInput,
   type Organization,
   type OrganizationPractice,
+  getContentTypeTerm,
 } from '@rpg/contracts'
 import { toOptions, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
@@ -302,7 +303,7 @@ function buildOrganizationMemberAffinityFields(
     {
       type: 'chips',
       name: fieldPath(prefix, 'members.speciesAffinityIds'),
-      label: 'Species',
+      label: getContentTypeTerm('species').label,
       hint: {
         text: ORGANIZATION_MEMBER_SPECIES_AFFINITY_FIELD_HINT,
         position: 'below-control',
