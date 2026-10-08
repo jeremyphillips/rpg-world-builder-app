@@ -15,6 +15,8 @@ export type CharacterPickerDrawerProps = {
   onOpenChange: (open: boolean) => void
   title?: string
   items: readonly CharacterPickerItem[]
+  /** Catalog class names. Falls back to the reference-id label when omitted. */
+  resolveClassLabel?: (classId: string) => string
   onSelect: (characterId: string) => void | Promise<void>
   /** When false, the picker stays open until the parent closes it — for multi-step add flows. */
   closeOnSelect?: boolean

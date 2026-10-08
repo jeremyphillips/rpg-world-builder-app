@@ -4,24 +4,27 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, SelectField, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
   CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
+  createOrganizationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveOrganizationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
 } from '@/features/content'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
-  buildOrganizationPickerDomainOptions,
   filterAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
   getOrganizationPickerSearchText,
-  ORGANIZATION_PICKER_VIEW_DEFAULTS,
 } from './organization-picker-drawer.lib'
 import {
   ORGANIZATION_PICKER_ALL_DOMAINS,
@@ -31,9 +34,7 @@ import {
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
   type OrganizationPickerItem,
-  type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
-import { organizationPickerTypeControlClasses } from './organization-picker-drawer.variants'
 
 export type { OrganizationPickerDrawerProps } from './organization-picker-drawer.types'
 
@@ -45,21 +46,40 @@ export function OrganizationPickerDrawer({
   items,
   onAdd,
 }: OrganizationPickerDrawerProps) {
-  const [domain, setDomain] = React.useState<OrganizationPickerDomainFilter>(
-    ORGANIZATION_PICKER_VIEW_DEFAULTS.domain,
-  )
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(undefined)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
 
+  const organizationFilterSchema = React.useMemo(
+    () =>
+      createOrganizationRelationshipFilterSchema({
+        rows: items,
+        getDomain: (item) => item.organization.organizationDomain,
+      }),
+    [items],
+  )
+  const organizationFilterLayout = React.useMemo(
+    () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
+    [organizationFilterSchema],
+  )
+  const organizationFilters = useRelationshipCatalogFilters({
+    rows: items,
+    schema: organizationFilterSchema,
+  })
+  const showDomainFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    organizationFilterSchema,
+    organizationFilterLayout,
+  )
+
   const resetMembershipConfig = React.useCallback(() => {
-    setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
+    organizationFilters.reset()
     setExpandedItemId(null)
     setSelectedTitle(undefined)
     setSubmitError(null)
     setPending(false)
-  }, [])
+  }, [organizationFilters.reset])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -86,17 +106,13 @@ export function OrganizationPickerDrawer({
     [items],
   )
 
-  const domainOptions = React.useMemo(
-    () => buildOrganizationPickerDomainOptions(items.map(({ organization }) => organization)),
-    [items],
-  )
   const transformVisibleItems = React.useCallback(
     (visibleItems: readonly (typeof items)[number][], context: { searchQuery: string }) =>
       filterAndSortOrganizationPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
-        domain,
+        domain: ORGANIZATION_PICKER_ALL_DOMAINS,
       }),
-    [domain],
+    [],
   )
 
   const commitMembership = React.useCallback(
@@ -141,7 +157,7 @@ export function OrganizationPickerDrawer({
       onOpenChange={handleOpenChange}
       title={ORGANIZATION_PICKER_TITLE}
       description={formatOrganizationPickerDescription()}
-      items={items}
+      items={organizationFilters.filteredRows}
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
       getSearchText={({ organization }) => getOrganizationPickerSearchText(organization)}
@@ -149,12 +165,12 @@ export function OrganizationPickerDrawer({
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
-      hasStructuredFilters={domain !== ORGANIZATION_PICKER_ALL_DOMAINS}
+      hasStructuredFilters={organizationFilters.structuredFilterCount > 0}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
       actions={({ searchQuery, resetSearchQuery }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
-          structuredFilterCount: Number(domain !== ORGANIZATION_PICKER_VIEW_DEFAULTS.domain),
+          structuredFilterCount: organizationFilters.structuredFilterCount,
           searchQuery,
         })
         if (!showReset) return null
@@ -164,26 +180,29 @@ export function OrganizationPickerDrawer({
             visible
             includesSort={false}
             onClick={() => {
-              setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
+              organizationFilters.reset()
               resetSearchQuery()
             }}
           />
         )
       }}
-      filterRow={{
-        controls: (
-          <div className={organizationPickerTypeControlClasses}>
-            <SelectField
-              id="organization-picker-domain"
-              label="Domain"
-              labelPosition="inline"
-              value={domain}
-              options={domainOptions}
-              onValueChange={(value) => setDomain(value as OrganizationPickerDomainFilter)}
-            />
-          </div>
-        ),
-      }}
+      filterRow={
+        showDomainFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={organizationFilterSchema}
+                  layout={organizationFilterLayout}
+                  state={organizationFilters.state}
+                  data={items}
+                  idPrefix="organization-picker"
+                  onValueChange={organizationFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
       renderEntityRow={(args) => {
         const { organization, selected } = args.item
 

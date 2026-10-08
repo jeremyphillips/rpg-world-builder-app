@@ -6,10 +6,17 @@ import { Button, Eyebrow, Text } from '@rpg/ui'
 import {
   CatalogEntityPickerSheet,
   CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
   buildLocationContentDisplayImageInput,
   buildLocationEntityCardModelFromClassification,
+  createLocationRelationshipFilterSchema,
   getContentDisplayImage,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
 } from '@/features/content'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { DrawerShell } from '@/components/drawer'
 
 import type {
@@ -54,13 +61,35 @@ export function LocationRelationshipAddDrawer({
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: locations,
+        getKind: (location) => location.kind,
+      }),
+    [locations],
+  )
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: locations,
+    schema: locationFilterSchema,
+  })
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
 
   const resetSession = React.useCallback(() => {
+    locationFilters.reset()
     setSelectedLocationId(null)
     setSelectedRoleId(presetRole?.id ?? null)
     setPending(false)
     setSubmitError(null)
-  }, [presetRole?.id])
+  }, [locationFilters.reset, presetRole?.id])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -108,7 +137,10 @@ export function LocationRelationshipAddDrawer({
     [onAdd, onOpenChange, roleOptions],
   )
 
-  const pickerItems = locations.map((location) => ({ location, selected: false }))
+  const pickerItems = locationFilters.filteredRows.map((location) => ({
+    location,
+    selected: false,
+  }))
 
   return (
     <>
@@ -118,6 +150,42 @@ export function LocationRelationshipAddDrawer({
         title={title}
         description="Choose a location connected to this character."
         items={pickerItems}
+        hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+        filterRow={
+          showKindFilter
+            ? {
+                controls: (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={locationFilterSchema}
+                    layout={locationFilterLayout}
+                    state={locationFilters.state}
+                    data={locations}
+                    idPrefix="location-relationship-picker"
+                    onValueChange={locationFilters.setValue}
+                  />
+                ),
+              }
+            : undefined
+        }
+        actions={({ searchQuery, resetSearchQuery }) => {
+          const showReset = hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: locationFilters.structuredFilterCount,
+            searchQuery,
+          })
+          if (!showReset) return null
+
+          return (
+            <CatalogToolbarResetSlot
+              visible
+              includesSort={false}
+              onClick={() => {
+                locationFilters.reset()
+                resetSearchQuery()
+              }}
+            />
+          )
+        }}
         getItemKey={({ location }) => location.id}
         getItemToolbarLabel={({ location }) => location.name}
         getSearchText={({ location }) => location.name}

@@ -136,6 +136,7 @@ export function ConnectionsStepDrawers({
           if (!open) closeDrawer()
         }}
         characters={stepData.campaignCharacterOptions}
+        catalogIndex={stepData.catalogIndex}
         presetRole={activeDrawer?.section === 'people' ? activeDrawer.presetRole : undefined}
         onAdd={({ characterId, role }) => {
           const edge = createPersonDraftEdge(role, characterId)

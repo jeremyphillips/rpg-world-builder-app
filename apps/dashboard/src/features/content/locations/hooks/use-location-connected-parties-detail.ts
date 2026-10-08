@@ -15,7 +15,12 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
-import { useCampaignBuildContext, useCampaignNpcBuildContext, useNpcs } from '@/features/character'
+import {
+  createCharacterClassFilterLabelResolver,
+  useCampaignBuildContext,
+  useCampaignNpcBuildContext,
+  useNpcs,
+} from '@/features/character'
 
 import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import { buildLocationsById } from '../lib/location-display'
@@ -235,6 +240,10 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
   const { catalogIndex } = useCampaignBuildContext(campaignId)
+  const resolveClassLabel = React.useMemo(
+    () => createCharacterClassFilterLabelResolver(catalogIndex),
+    [catalogIndex],
+  )
   const {
     context: npcBuildContext,
     catalogIndex: npcCatalogIndex,
@@ -618,6 +627,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     rows,
     campaignId,
     locationsById,
+    resolveClassLabel,
     canManage,
     canWriteInverse,
     mutationError,

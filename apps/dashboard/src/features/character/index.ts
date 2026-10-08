@@ -166,7 +166,12 @@ export {
   type CharacterPickerOption,
 } from './lib/picker/character-picker-option.lib'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
-export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
+export {
+  createCharacterClassFilterLabelResolver,
+  formatContentReferenceLabel,
+} from './lib/display/format-content-reference-label'
+export { hasCatalogPickerResetViewCriteria } from './components/picker/catalog-picker-filter-state.lib'
+export { CatalogToolbarResetSlot } from './components/picker/catalog-toolbar-reset-action'
 export {
   SAMPLE_PC,
   makeCampaignNpcListItem,

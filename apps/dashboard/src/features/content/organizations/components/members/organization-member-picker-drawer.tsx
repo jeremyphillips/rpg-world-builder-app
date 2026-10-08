@@ -7,13 +7,24 @@ import {
 import { Button, Text } from '@rpg/ui'
 
 import {
-  buildCharacterEntityCardModel,
+  CatalogToolbarResetSlot,
   OrganizationMembershipTitleField,
+  buildCharacterEntityCardModel,
+  formatContentReferenceLabel,
+  hasCatalogPickerResetViewCriteria,
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
-import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
+  createCharacterRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveCharacterRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 
 import {
   buildConnectedPartyCharacterEntitySummary,
@@ -52,6 +63,7 @@ export type OrganizationMemberPickerDrawerProps = {
   onOpenChange: (open: boolean) => void
   organization: QuickNpcCreateFormOrganization
   candidates: readonly OrganizationMemberPickerCandidate[]
+  resolveClassLabel?: (classId: string) => string
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   quickNpc?: OrganizationMemberPickerQuickNpc
   onCreateNpc?: () => void
@@ -92,6 +104,7 @@ export function OrganizationMemberPickerDrawer({
   onOpenChange,
   organization,
   candidates,
+  resolveClassLabel = formatContentReferenceLabel,
   onAdd,
   quickNpc,
   onCreateNpc,
@@ -106,13 +119,42 @@ export function OrganizationMemberPickerDrawer({
   const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(soleTitleId)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const characterFilterSchema = React.useMemo(
+    () =>
+      createCharacterRelationshipFilterSchema({
+        rows: candidates,
+        getCharacterType: (candidate) => candidate.characterType,
+        getClassIds: (candidate) => candidate.classIds,
+        resolveClassLabel,
+      }),
+    [candidates, resolveClassLabel],
+  )
+  const characterFilterLayout = React.useMemo(
+    () => resolveCharacterRelationshipFilterLayout(characterFilterSchema),
+    [characterFilterSchema],
+  )
+  const characterFilters = useRelationshipCatalogFilters({
+    rows: candidates,
+    schema: characterFilterSchema,
+  })
+  const showTypeFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showClassFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
 
   const resetMembershipConfig = React.useCallback(() => {
+    characterFilters.reset()
     setExpandedItemId(null)
     setSelectedTitle(soleTitleId)
     setSubmitError(null)
     setPending(false)
-  }, [])
+  }, [characterFilters.reset, soleTitleId])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -214,7 +256,56 @@ export function OrganizationMemberPickerDrawer({
               }
           : undefined
       }
-      items={candidates}
+      items={characterFilters.filteredRows}
+      hasStructuredFilters={characterFilters.structuredFilterCount > 0}
+      primaryControls={
+        showTypeFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={characterFilterSchema}
+            layout={characterFilterLayout}
+            state={characterFilters.state}
+            data={candidates}
+            idPrefix="organization-member-picker"
+            onValueChange={characterFilters.setValue}
+          />
+        ) : undefined
+      }
+      filterRow={
+        showClassFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={characterFilterSchema}
+                  layout={characterFilterLayout}
+                  state={characterFilters.state}
+                  data={candidates}
+                  idPrefix="organization-member-picker"
+                  onValueChange={characterFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: characterFilters.structuredFilterCount,
+          searchQuery,
+        })
+        if (!showReset) return null
+
+        return (
+          <CatalogToolbarResetSlot
+            visible
+            includesSort={false}
+            onClick={() => {
+              characterFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={(candidate) => candidate.id}
       getItemToolbarLabel={(candidate) => candidate.name}
       getSearchText={buildConnectedPartyCharacterPickerSearchText}

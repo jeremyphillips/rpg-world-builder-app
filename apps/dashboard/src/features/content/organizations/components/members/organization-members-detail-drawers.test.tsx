@@ -107,6 +107,7 @@ function createDetail(
     handleConfirmRemoveMember: vi.fn(),
     memberSelectionPolicy: undefined,
     candidatesPending: false,
+    resolveClassLabel: (classId) => classId,
     ...overrides,
   }
 }

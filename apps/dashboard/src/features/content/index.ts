@@ -105,6 +105,24 @@ export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalo
 export { CatalogEntitySurfaceRow } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export type { CatalogEntitySurfaceRowProps } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
+export { RelationshipCatalogFilterBand } from './lib/entity/surfaces/catalog/relationship-filters/relationship-catalog-filter-band'
+export { relationshipCatalogFilterHasBand } from './lib/entity/surfaces/catalog/relationship-filters/relationship-filter-options.lib'
+export { useRelationshipCatalogFilters } from './lib/entity/surfaces/catalog/relationship-filters/use-relationship-catalog-filters'
+export {
+  createCharacterRelationshipFilterSchema,
+  resolveCharacterRelationshipFilterLayout,
+  type CharacterRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/character-relationship-filter-schema'
+export {
+  createOrganizationRelationshipFilterSchema,
+  resolveOrganizationRelationshipFilterLayout,
+  type OrganizationRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/organization-relationship-filter-schema'
+export {
+  createLocationRelationshipFilterSchema,
+  resolveLocationRelationshipFilterLayout,
+  type LocationRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/location-relationship-filter-schema'
 export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
 export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer'
 export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/entity-surface-content-card'

@@ -12,8 +12,18 @@ import {
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
+import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createOrganizationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveOrganizationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import {
   buildOrganizationEntityCardModel,
@@ -339,6 +349,28 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
     )
   }, [initialConnection, mode, organizations, showOrganizationPicker])
 
+  const organizationFilterSchema = React.useMemo(
+    () =>
+      createOrganizationRelationshipFilterSchema({
+        rows: replacementOrganizations,
+        getDomain: (organization) => organization.organizationDomain,
+      }),
+    [replacementOrganizations],
+  )
+  const organizationFilterLayout = React.useMemo(
+    () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
+    [organizationFilterSchema],
+  )
+  const organizationFilters = useRelationshipCatalogFilters({
+    rows: replacementOrganizations,
+    schema: organizationFilterSchema,
+  })
+  const showDomainFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    organizationFilterSchema,
+    organizationFilterLayout,
+  )
+
   const availabilityKinds = React.useMemo(() => {
     const kinds =
       mode === 'replaceOrganization' && initialConnection
@@ -466,7 +498,43 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
             </Button>
           ) : undefined
         }
-        items={showOrganizationPicker ? replacementOrganizations : []}
+        items={showOrganizationPicker ? organizationFilters.filteredRows : []}
+        hasStructuredFilters={organizationFilters.structuredFilterCount > 0}
+        filterRow={
+          showDomainFilter
+            ? {
+                controls: (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={organizationFilterSchema}
+                    layout={organizationFilterLayout}
+                    state={organizationFilters.state}
+                    data={replacementOrganizations}
+                    idPrefix="location-inverse-organization"
+                    onValueChange={organizationFilters.setValue}
+                  />
+                ),
+              }
+            : undefined
+        }
+        actions={({ searchQuery, resetSearchQuery }) => {
+          const showReset = hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: organizationFilters.structuredFilterCount,
+            searchQuery,
+          })
+          if (!showReset) return null
+
+          return (
+            <CatalogToolbarResetSlot
+              visible
+              includesSort={false}
+              onClick={() => {
+                organizationFilters.reset()
+                resetSearchQuery()
+              }}
+            />
+          )
+        }}
         getItemKey={(organization) => organization.id}
         getItemToolbarLabel={(organization) => organization.name}
         getSearchText={(organization) =>

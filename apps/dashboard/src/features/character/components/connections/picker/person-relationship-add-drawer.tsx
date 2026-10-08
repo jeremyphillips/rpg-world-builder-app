@@ -1,9 +1,11 @@
 import * as React from 'react'
 
+import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 import { Button, Eyebrow, Text } from '@rpg/ui'
 
 import { DrawerShell } from '@/components/drawer'
 
+import { createCharacterClassFilterLabelResolver } from '../../../lib/display/format-content-reference-label'
 import type { CharacterPickerOption } from '../../../lib/picker/character-picker-option.lib'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
@@ -16,6 +18,7 @@ export type PersonRelationshipAddDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   characters: readonly CharacterPickerOption[]
+  catalogIndex?: CharacterBuildCatalogIndex | null
   presetRole?: PersonConnectionRoleOption
   onAdd: (input: { characterId: string; role: PersonConnectionRoleOption }) => void | Promise<void>
 }
@@ -32,9 +35,14 @@ export function PersonRelationshipAddDrawer({
   open,
   onOpenChange,
   characters,
+  catalogIndex,
   presetRole,
   onAdd,
 }: PersonRelationshipAddDrawerProps) {
+  const resolveClassLabel = React.useMemo(
+    () => createCharacterClassFilterLabelResolver(catalogIndex),
+    [catalogIndex],
+  )
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(null)
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
@@ -94,6 +102,7 @@ export function PersonRelationshipAddDrawer({
         }}
         title={drawerTitle}
         items={pickerItems}
+        resolveClassLabel={resolveClassLabel}
         onSelect={(characterId) => {
           setSelectedCharacterId(characterId)
         }}

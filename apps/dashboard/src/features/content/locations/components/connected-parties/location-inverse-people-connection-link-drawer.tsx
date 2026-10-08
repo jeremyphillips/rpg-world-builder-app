@@ -19,9 +19,24 @@ import {
   Text,
 } from '@rpg/ui'
 
-import { buildCharacterEntityCardModel } from '@/features/character'
+import {
+  CatalogToolbarResetSlot,
+  buildCharacterEntityCardModel,
+  formatContentReferenceLabel,
+  hasCatalogPickerResetViewCriteria,
+} from '@/features/character'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createCharacterRelationshipFilterSchema,
+  createOrganizationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveCharacterRelationshipFilterLayout,
+  resolveOrganizationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import {
   buildOrganizationEntityCardModel,
@@ -89,6 +104,7 @@ export type LocationInversePeopleConnectionLinkDrawerProps = {
   campaignId: string
   organizations: readonly Organization[]
   characters: readonly LocationConnectedPartyCharacterOption[]
+  resolveClassLabel?: (classId: string) => string
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   canAddOrganization: boolean
   canAddCharacter: boolean
@@ -141,6 +157,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   campaignId,
   organizations,
   characters,
+  resolveClassLabel = formatContentReferenceLabel,
   connectedPartyRows,
   canAddOrganization,
   canAddCharacter,
@@ -149,6 +166,56 @@ function LocationInversePeopleConnectionLinkDrawerContent({
   onCharacterSubmit,
   quickNpc,
 }: LocationInversePeopleConnectionLinkDrawerProps) {
+  const characterFilterSchema = React.useMemo(
+    () =>
+      createCharacterRelationshipFilterSchema({
+        rows: characters,
+        getCharacterType: (character) => character.characterType,
+        getClassIds: (character) => character.classIds,
+        resolveClassLabel,
+      }),
+    [characters, resolveClassLabel],
+  )
+  const characterFilterLayout = React.useMemo(
+    () => resolveCharacterRelationshipFilterLayout(characterFilterSchema),
+    [characterFilterSchema],
+  )
+  const characterFilters = useRelationshipCatalogFilters({
+    rows: characters,
+    schema: characterFilterSchema,
+  })
+  const organizationFilterSchema = React.useMemo(
+    () =>
+      createOrganizationRelationshipFilterSchema({
+        rows: organizations,
+        getDomain: (organization) => organization.organizationDomain,
+      }),
+    [organizations],
+  )
+  const organizationFilterLayout = React.useMemo(
+    () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
+    [organizationFilterSchema],
+  )
+  const organizationFilters = useRelationshipCatalogFilters({
+    rows: organizations,
+    schema: organizationFilterSchema,
+  })
+  const showCharacterTypeFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showCharacterClassFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showOrganizationDomainFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    organizationFilterSchema,
+    organizationFilterLayout,
+  )
+
   const organizationIds = React.useMemo(
     () => organizations.map((organization) => organization.id),
     [organizations],
@@ -584,7 +651,43 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               </Button>
             ) : undefined
           }
-          items={showEntityPicker ? organizations : []}
+          items={showEntityPicker ? organizationFilters.filteredRows : []}
+          hasStructuredFilters={organizationFilters.structuredFilterCount > 0}
+          filterRow={
+            showOrganizationDomainFilter
+              ? {
+                  controls: (
+                    <RelationshipCatalogFilterBand
+                      band="filterRow"
+                      schema={organizationFilterSchema}
+                      layout={organizationFilterLayout}
+                      state={organizationFilters.state}
+                      data={organizations}
+                      idPrefix="location-inverse-people-organization"
+                      onValueChange={organizationFilters.setValue}
+                    />
+                  ),
+                }
+              : undefined
+          }
+          actions={({ searchQuery, resetSearchQuery }) => {
+            const showReset = hasCatalogPickerResetViewCriteria({
+              structuredFilterCount: organizationFilters.structuredFilterCount,
+              searchQuery,
+            })
+            if (!showReset) return null
+
+            return (
+              <CatalogToolbarResetSlot
+                visible
+                includesSort={false}
+                onClick={() => {
+                  organizationFilters.reset()
+                  resetSearchQuery()
+                }}
+              />
+            )
+          }}
           getItemKey={(organization) => organization.id}
           getItemToolbarLabel={(organization) => organization.name}
           getSearchText={(organization) =>
@@ -645,7 +748,56 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             </Button>
           ) : undefined
         }
-        items={showEntityPicker ? characters : []}
+        items={showEntityPicker ? characterFilters.filteredRows : []}
+        hasStructuredFilters={characterFilters.structuredFilterCount > 0}
+        primaryControls={
+          showCharacterTypeFilter ? (
+            <RelationshipCatalogFilterBand
+              band="primary"
+              schema={characterFilterSchema}
+              layout={characterFilterLayout}
+              state={characterFilters.state}
+              data={characters}
+              idPrefix="location-inverse-people-character"
+              onValueChange={characterFilters.setValue}
+            />
+          ) : undefined
+        }
+        filterRow={
+          showCharacterClassFilter
+            ? {
+                controls: (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={characterFilterSchema}
+                    layout={characterFilterLayout}
+                    state={characterFilters.state}
+                    data={characters}
+                    idPrefix="location-inverse-people-character"
+                    onValueChange={characterFilters.setValue}
+                  />
+                ),
+              }
+            : undefined
+        }
+        actions={({ searchQuery, resetSearchQuery }) => {
+          const showReset = hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: characterFilters.structuredFilterCount,
+            searchQuery,
+          })
+          if (!showReset) return null
+
+          return (
+            <CatalogToolbarResetSlot
+              visible
+              includesSort={false}
+              onClick={() => {
+                characterFilters.reset()
+                resetSearchQuery()
+              }}
+            />
+          )
+        }}
         getItemKey={(character) => character.id}
         getItemToolbarLabel={(character) => character.name}
         getSearchText={buildConnectedPartyCharacterPickerSearchText}

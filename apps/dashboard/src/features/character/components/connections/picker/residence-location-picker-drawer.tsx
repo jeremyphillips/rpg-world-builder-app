@@ -6,10 +6,17 @@ import { Button, Text } from '@rpg/ui'
 import {
   CatalogEntityPickerSheet,
   CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
   buildLocationContentDisplayImageInput,
   buildLocationEntityCardModelFromClassification,
+  createLocationRelationshipFilterSchema,
   getContentDisplayImage,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
 } from '@/features/content'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 
 import { filterAndSortResidencePickerItems } from './residence-location-picker-drawer.lib'
 import {
@@ -32,14 +39,38 @@ export function ResidenceLocationPickerDrawer({
 }: ResidenceLocationPickerDrawerProps) {
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: items,
+        getKind: (item) => item.location.kind,
+      }),
+    [items],
+  )
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: items,
+    schema: locationFilterSchema,
+  })
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       if (pending) return
-      if (!nextOpen) setSubmitError(null)
+      if (!nextOpen) {
+        locationFilters.reset()
+        setSubmitError(null)
+      }
       onOpenChange(nextOpen)
     },
-    [onOpenChange, pending],
+    [locationFilters.reset, onOpenChange, pending],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -76,7 +107,43 @@ export function ResidenceLocationPickerDrawer({
       onOpenChange={handleOpenChange}
       title={RESIDENCE_PICKER_TITLE}
       description={RESIDENCE_PICKER_DESCRIPTION}
-      items={items}
+      items={locationFilters.filteredRows}
+      hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+      filterRow={
+        showKindFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={locationFilterSchema}
+                  layout={locationFilterLayout}
+                  state={locationFilters.state}
+                  data={items}
+                  idPrefix="residence-location-picker"
+                  onValueChange={locationFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: locationFilters.structuredFilterCount,
+          searchQuery,
+        })
+        if (!showReset) return null
+
+        return (
+          <CatalogToolbarResetSlot
+            visible
+            includesSort={false}
+            onClick={() => {
+              locationFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={({ location }) => location.id}
       getItemToolbarLabel={({ location }) => location.name}
       getSearchText={({ location }) => location.name}

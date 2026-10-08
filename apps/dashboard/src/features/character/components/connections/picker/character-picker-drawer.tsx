@@ -2,9 +2,20 @@ import * as React from 'react'
 
 import { Button, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
+  createCharacterRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveCharacterRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 
+import { formatContentReferenceLabel } from '../../../lib/display/format-content-reference-label'
 import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   buildCharacterPickerOptionEntitySummary,
   buildCharacterPickerOptionSearchText,
@@ -25,19 +36,51 @@ export function CharacterPickerDrawer({
   onOpenChange,
   title = CHARACTER_PICKER_TITLE,
   items,
+  resolveClassLabel = formatContentReferenceLabel,
   onSelect,
   closeOnSelect = true,
 }: CharacterPickerDrawerProps) {
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const characterFilterSchema = React.useMemo(
+    () =>
+      createCharacterRelationshipFilterSchema({
+        rows: items,
+        getCharacterType: (item) => item.character.characterType,
+        getClassIds: (item) => item.character.classIds,
+        resolveClassLabel,
+      }),
+    [items, resolveClassLabel],
+  )
+  const characterFilterLayout = React.useMemo(
+    () => resolveCharacterRelationshipFilterLayout(characterFilterSchema),
+    [characterFilterSchema],
+  )
+  const characterFilters = useRelationshipCatalogFilters({
+    rows: items,
+    schema: characterFilterSchema,
+  })
+  const showTypeFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showClassFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
       if (pending) return
-      if (!nextOpen) setSubmitError(null)
+      if (!nextOpen) {
+        characterFilters.reset()
+        setSubmitError(null)
+      }
       onOpenChange(nextOpen)
     },
-    [onOpenChange, pending],
+    [characterFilters.reset, onOpenChange, pending],
   )
 
   const commitSelection = React.useCallback(
@@ -69,7 +112,56 @@ export function CharacterPickerDrawer({
       open={open}
       onOpenChange={handleOpenChange}
       title={title}
-      items={items}
+      items={characterFilters.filteredRows}
+      hasStructuredFilters={characterFilters.structuredFilterCount > 0}
+      primaryControls={
+        showTypeFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={characterFilterSchema}
+            layout={characterFilterLayout}
+            state={characterFilters.state}
+            data={items}
+            idPrefix="character-picker"
+            onValueChange={characterFilters.setValue}
+          />
+        ) : undefined
+      }
+      filterRow={
+        showClassFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={characterFilterSchema}
+                  layout={characterFilterLayout}
+                  state={characterFilters.state}
+                  data={items}
+                  idPrefix="character-picker"
+                  onValueChange={characterFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: characterFilters.structuredFilterCount,
+          searchQuery,
+        })
+        if (!showReset) return null
+
+        return (
+          <CatalogToolbarResetSlot
+            visible
+            includesSort={false}
+            onClick={() => {
+              characterFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={({ character }) => character.id}
       getItemToolbarLabel={({ character }) => character.name}
       getSearchText={({ character }) => buildCharacterPickerOptionSearchText(character)}

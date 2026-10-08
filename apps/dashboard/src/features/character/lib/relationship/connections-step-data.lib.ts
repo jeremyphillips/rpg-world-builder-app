@@ -57,6 +57,7 @@ export function buildConnectionsStepData(input: {
     eligiblePropertyLocations,
     allLocations,
     locationsQueryStatus,
+    catalogIndex,
     campaignCharacterOptions: [...charactersById.values()],
   }
 }

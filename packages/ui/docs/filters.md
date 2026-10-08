@@ -376,12 +376,12 @@ Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the 
 
 Bands are placement. They do not change what counts as a content filter.
 
-| Role            | What it is                                                                                            | Slot                                       |
-| --------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| Content filters | Schema fields such as Equipment kind, Rarity, Affordable now, Levels, School, and Casting & mechanics | `primaryControls` and `filterRow.controls` |
-| View controls   | Sort and Reset                                                                                        | `filterRow.actions` and `actions`          |
+| Role            | What it is                                                                                                                                                       | Slot                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Content filters | Schema fields such as Equipment kind, Rarity, Affordable now, Levels, School, Casting & mechanics, character Type, Class, organization Domain, and location Type | `primaryControls` and `filterRow.controls` |
+| View controls   | Sort and Reset                                                                                                                                                   | `filterRow.actions` and `actions`          |
 
-School and Affordable now are content filters. They sit on the left of the utility band.
+School, Affordable now, Class, organization Domain, and location Type are content filters. They sit on the left of the utility band. Character Type is a primary content filter. Relationship drawers have no Sort, so Reset uses the no-sort accessible name and mounts only while it is visible.
 
 ```text
 Search

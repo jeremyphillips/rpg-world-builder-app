@@ -3,7 +3,16 @@ import * as React from 'react'
 import type { Location } from '@rpg/contracts'
 import { Button, SegmentedControl, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createLocationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
@@ -215,6 +224,36 @@ function LocationParentReplacementDrawerContent({
     return candidateSummaries.filter((summary) => scopedCandidateIds.has(summary.id))
   }, [candidateSummaries, candidates, parentBrowseScope, showParentBrowseScopeControl])
 
+  const scopedLocations = React.useMemo(() => {
+    const visibleIds = new Set(pickerCandidates.map((summary) => summary.id))
+    return candidates.filter((location) => visibleIds.has(location.id))
+  }, [candidates, pickerCandidates])
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: scopedLocations,
+        getKind: (location) => location.kind,
+      }),
+    [scopedLocations],
+  )
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: scopedLocations,
+    schema: locationFilterSchema,
+  })
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
+  const filteredPickerCandidates = React.useMemo(() => {
+    const visibleIds = new Set(locationFilters.filteredRows.map((location) => location.id))
+    return pickerCandidates.filter((summary) => visibleIds.has(summary.id))
+  }, [locationFilters.filteredRows, pickerCandidates])
+
   const handleSubmit = async () => {
     if (!selectedParentId || contextMismatch) return
     await onSubmit(selectedParentId)
@@ -257,8 +296,46 @@ function LocationParentReplacementDrawerContent({
           onSubmit={() => void handleSubmit()}
         />
       }
-      hasStructuredFilters={showParentBrowseScopeControl && parentBrowseScope !== 'all'}
-      items={pickerEnabled ? pickerCandidates : []}
+      hasStructuredFilters={
+        (showParentBrowseScopeControl && parentBrowseScope !== 'all') ||
+        locationFilters.structuredFilterCount > 0
+      }
+      items={pickerEnabled ? filteredPickerCandidates : []}
+      filterRow={
+        showKindFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={locationFilterSchema}
+                  layout={locationFilterLayout}
+                  state={locationFilters.state}
+                  data={scopedLocations}
+                  idPrefix="location-parent-replacement"
+                  onValueChange={locationFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: locationFilters.structuredFilterCount,
+          searchQuery,
+        })
+        if (!showReset) return null
+
+        return (
+          <CatalogToolbarResetSlot
+            visible
+            includesSort={false}
+            onClick={() => {
+              locationFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={(summary) => summary.id}
       getItemToolbarLabel={(summary) => summary.name}
       getSearchText={buildLocationEntitySummarySearchText}

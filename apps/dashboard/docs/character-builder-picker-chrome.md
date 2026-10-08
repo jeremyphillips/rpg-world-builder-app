@@ -265,7 +265,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### OrganizationPickerDrawer
 
-**May know:** organization domain filter; membership title field; selected vs available; pending/error/close-on-success as add-flow interaction.
+**May know:** organization domain filter (shared relationship schema, utility band); membership title field; selected vs available; pending/error/close-on-success as add-flow interaction.
 
 **Must not know:** builder `draft.connections` vs sheet API vs org-roster consumers; character record shape.
 

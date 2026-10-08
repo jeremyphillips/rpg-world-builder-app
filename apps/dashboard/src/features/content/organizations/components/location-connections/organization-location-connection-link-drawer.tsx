@@ -17,7 +17,16 @@ import {
 } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import type { ContentCreateContext } from '@/lib/create-flow'
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createLocationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
 import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
@@ -543,6 +552,28 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
   }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
 
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: pickerLocations,
+        getKind: (location) => location.kind,
+      }),
+    [pickerLocations],
+  )
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: pickerLocations,
+    schema: locationFilterSchema,
+  })
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
+
   const pickerLocationSummaries = React.useMemo(() => {
     const summaries = new Map<string, LocationEntitySummaryVm>()
     for (const location of pickerLocations) {
@@ -760,9 +791,45 @@ function OrganizationLocationConnectionLinkDrawerContent({
           ) : undefined
         }
         hasStructuredFilters={
-          showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all'
+          (showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all') ||
+          locationFilters.structuredFilterCount > 0
         }
-        items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
+        items={showLocationPicker && !showMutationEmptyState ? locationFilters.filteredRows : []}
+        filterRow={
+          showKindFilter
+            ? {
+                controls: (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={locationFilterSchema}
+                    layout={locationFilterLayout}
+                    state={locationFilters.state}
+                    data={pickerLocations}
+                    idPrefix="organization-location-picker"
+                    onValueChange={locationFilters.setValue}
+                  />
+                ),
+              }
+            : undefined
+        }
+        actions={({ searchQuery, resetSearchQuery }) => {
+          const showReset = hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: locationFilters.structuredFilterCount,
+            searchQuery,
+          })
+          if (!showReset) return null
+
+          return (
+            <CatalogToolbarResetSlot
+              visible
+              includesSort={false}
+              onClick={() => {
+                locationFilters.reset()
+                resetSearchQuery()
+              }}
+            />
+          )
+        }}
         getItemKey={(location) => location.id}
         getItemToolbarLabel={(location) => location.name}
         getSearchText={(location) => {
