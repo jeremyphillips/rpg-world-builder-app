@@ -25,8 +25,7 @@ import type {
 } from '../../../lib/relationship/connection-role-catalog'
 import { LocationRelationshipRoleStep } from './location-relationship-role-step'
 import {
-  LOCATION_CATALOG_NO_ITEMS_MESSAGE,
-  LOCATION_CATALOG_NO_RESULTS_MESSAGE,
+  LOCATION_CATALOG_COPY,
   LOCATION_CATALOG_SEARCH_PLACEHOLDER,
 } from './residence-location-picker-drawer.types'
 
@@ -195,8 +194,8 @@ export function LocationRelationshipAddDrawer({
         getItemToolbarLabel={({ location }) => location.name}
         getSearchText={({ location }) => location.name}
         searchPlaceholder={LOCATION_CATALOG_SEARCH_PLACEHOLDER}
-        noResultsMessage={LOCATION_CATALOG_NO_RESULTS_MESSAGE}
-        noItemsMessage={LOCATION_CATALOG_NO_ITEMS_MESSAGE}
+        noResultsMessage={LOCATION_CATALOG_COPY.noResultsMessage}
+        noItemsMessage={LOCATION_CATALOG_COPY.noItemsMessage}
         renderEntityRow={(args) => {
           const { location } = args.item
           const classification = resolveLocationClassificationDisplay(location)

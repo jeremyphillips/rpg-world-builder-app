@@ -27,12 +27,10 @@ import {
   getOrganizationPickerSearchText,
 } from './organization-picker-drawer.lib'
 import {
-  ORGANIZATION_PICKER_ADD_SUBMIT_LABEL,
   ORGANIZATION_PICKER_ALL_DOMAINS,
+  ORGANIZATION_PICKER_COPY,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
-  ORGANIZATION_PICKER_SEARCH_PLACEHOLDER,
-  ORGANIZATION_PICKER_TITLE,
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
   type OrganizationPickerItem,
@@ -157,13 +155,13 @@ export function OrganizationPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
-      title={ORGANIZATION_PICKER_TITLE}
+      title={ORGANIZATION_PICKER_COPY.chooseTitle}
       description={formatOrganizationPickerDescription()}
       items={organizationFilters.filteredRows}
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
       getSearchText={({ organization }) => getOrganizationPickerSearchText(organization)}
-      searchPlaceholder={ORGANIZATION_PICKER_SEARCH_PLACEHOLDER}
+      searchPlaceholder={ORGANIZATION_PICKER_COPY.searchPlaceholder}
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
@@ -259,7 +257,7 @@ export function OrganizationPickerDrawer({
                   void commitMembership(organization)
                 }}
               >
-                {ORGANIZATION_PICKER_ADD_SUBMIT_LABEL}
+                {ORGANIZATION_PICKER_COPY.addLabel}
               </Button>
             </div>
           </div>

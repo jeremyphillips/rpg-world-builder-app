@@ -1,8 +1,7 @@
 import {
-  getContentTypeSentenceForm,
-  getContentTypeTerm,
+  catalogNounFromContentType,
+  formatCatalogPickerCopy,
   getSpellCollectionKindLabel,
-  vocabularyTermLabel,
   type ChoiceSet,
   type SpellPickerItem,
 } from '@rpg/contracts'
@@ -25,33 +24,22 @@ export const SPELL_PICKER_MODE_SPELLS = 'spells' as const
 
 export type SpellPickerMode = typeof SPELL_PICKER_MODE_CANTRIPS | typeof SPELL_PICKER_MODE_SPELLS
 
-const spellTerm = getContentTypeTerm('spells')
-const spellPlural = getContentTypeSentenceForm('spells', 2)
+const spellNoun = catalogNounFromContentType('spells')
+const spellCopy = formatCatalogPickerCopy(spellNoun)
 
-export const SPELL_PICKER_SPELL_PLURAL = spellPlural
 export const SPELL_PICKER_CANTRIPS_LABEL = getSpellCollectionKindLabel('cantrips')
-export const SPELL_PICKER_SPELLS_LABEL = vocabularyTermLabel(spellTerm, {
-  number: 'plural',
-  casing: 'title',
-})
-export const SPELL_PICKER_SEARCH_PLACEHOLDER = `Search ${spellPlural}`
-export const SPELL_PICKER_MODE_GROUP_LABEL = `${spellTerm.label} picker mode`
-export const SPELL_PICKER_SORT_GROUP_LABEL = `Sort ${spellPlural}`
-export const SPELL_PICKER_SORT_ORDER_LABEL = `${spellTerm.label} sort order`
-export const SPELL_PICKER_SCHOOL_TRIGGER_LABEL = `${spellTerm.label} school`
+export const SPELL_PICKER_SEARCH_PLACEHOLDER = spellCopy.searchPlaceholder
+export const SPELL_PICKER_SORT_GROUP_LABEL = spellCopy.sortGroupLabel
+export const SPELL_PICKER_SORT_ORDER_LABEL = spellCopy.sortOrderLabel
 
-export const SPELL_PICKER_NO_RESULTS_MESSAGE = `No ${spellPlural} match your search.`
-export const SPELL_PICKER_NO_OPTIONS_MESSAGE = `No ${spellPlural} are available for this choice.`
-export const SPELL_PICKER_SELECTION_FULL_MESSAGE = `You have selected the maximum number of ${spellPlural} for this choice.`
+export const SPELL_PICKER_NO_RESULTS_MESSAGE = spellCopy.noResultsMessage
+export const SPELL_PICKER_NO_OPTIONS_MESSAGE = spellCopy.noOptionsMessage
+export const SPELL_PICKER_SELECTION_FULL_MESSAGE = spellCopy.selectionFullMessage
 
 export const SPELL_PICKER_SCHOOL_ALL = '__all__' as const
 export const SPELL_PICKER_LEVELS_ALL = '__all__' as const
 
-export const SPELL_PICKER_LEVELS_LABEL = 'Levels'
-export const SPELL_PICKER_SCHOOL_LABEL = 'School'
-export const SPELL_PICKER_SORT_LABEL = 'Sort'
 export const SPELL_PICKER_MECHANICS_LABEL = 'Casting & mechanics'
-export const SPELL_PICKER_SCHOOL_FILTER_ARIA_LABEL = `Filter by ${SPELL_PICKER_SCHOOL_LABEL.toLowerCase()}`
 export const SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL = `${SPELL_PICKER_MECHANICS_LABEL} filters`
 
 export const SPELL_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
@@ -66,14 +54,6 @@ export type SpellPickerSortMode =
   | typeof SPELL_PICKER_SORT_NAME_DESC
   | typeof SPELL_PICKER_SORT_LEVEL_ASC
   | typeof SPELL_PICKER_SORT_LEVEL_DESC
-
-export const SPELL_PICKER_SORT_MODES = [
-  SPELL_PICKER_SORT_BEST_MATCH,
-  SPELL_PICKER_SORT_NAME_ASC,
-  SPELL_PICKER_SORT_NAME_DESC,
-  SPELL_PICKER_SORT_LEVEL_ASC,
-  SPELL_PICKER_SORT_LEVEL_DESC,
-] as const satisfies readonly SpellPickerSortMode[]
 
 export const SPELL_PICKER_SORT_LABELS: Record<SpellPickerSortMode, string> = {
   [SPELL_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,

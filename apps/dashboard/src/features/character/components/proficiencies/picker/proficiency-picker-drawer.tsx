@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import { catalogNounFromTerm, formatCatalogPickerCopy, PROFICIENCY_TERM } from '@rpg/contracts'
 import { CatalogPickerSelectionActions, resolveCatalogPickerRowActionPhase } from '@rpg/ui'
 
 import {
@@ -32,13 +33,16 @@ import {
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
   PROFICIENCY_PICKER_SORT_GROUP_LABEL,
   PROFICIENCY_PICKER_SORT_LABELS,
-  PROFICIENCY_PICKER_SORT_ORDER_LABEL,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
   type ProficiencyPickerSortMode,
 } from './proficiency-picker-drawer.types'
 
 export type { ProficiencyPickerDrawerProps } from './proficiency-picker-drawer.types'
+
+const PROFICIENCY_PICKER_SORT_ORDER_LABEL = formatCatalogPickerCopy(
+  catalogNounFromTerm(PROFICIENCY_TERM),
+).sortOrderLabel
 
 /** Proficiency catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function ProficiencyPickerDrawer({

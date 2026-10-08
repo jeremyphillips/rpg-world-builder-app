@@ -1,3 +1,4 @@
+import { catalogNounFromContentType, getContentTypeTerm, vocabularyTermLabel } from '@rpg/contracts'
 import {
   CatalogPickerSelectionActions,
   resolveCatalogPickerRowActionPhase,
@@ -26,10 +27,8 @@ import {
 import {
   SPELL_PICKER_CANTRIPS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_GROUP_LABEL,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
-  SPELL_PICKER_SPELLS_LABEL,
   SPELL_PICKER_SEARCH_PLACEHOLDER,
   type SpellPickerDrawerProps,
 } from './spell-picker-drawer.types'
@@ -48,6 +47,13 @@ import { SpellPickerSelectionSummary } from './spell-picker-selection-summary'
 import { useSpellPickerController } from './use-spell-picker-controller'
 
 export type { SpellPickerDrawerProps } from './spell-picker-drawer.types'
+
+const spellNoun = catalogNounFromContentType('spells')
+const SPELL_PICKER_SPELLS_LABEL = vocabularyTermLabel(getContentTypeTerm('spells'), {
+  number: 'plural',
+  casing: 'title',
+})
+const SPELL_PICKER_MODE_GROUP_LABEL = `${spellNoun.label} picker mode`
 
 export function SpellPickerDrawer({
   open,

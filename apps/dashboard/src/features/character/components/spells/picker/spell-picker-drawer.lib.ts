@@ -1,5 +1,7 @@
 import {
+  catalogNounFromContentType,
   formatChoiceSetDrawerHeading,
+  getSpellCollectionKindSentenceForm,
   compareSpellPickerItemsByRecommendation,
   formatSpellLevel,
   getCastingTimeUnitLabel,
@@ -26,14 +28,12 @@ import {
   isCatalogPickerRowDimmed,
 } from '../../picker/row/catalog-picker-row-state.lib'
 import {
-  SPELL_PICKER_CANTRIPS_LABEL,
   SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SCHOOL_ALL,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
-  SPELL_PICKER_SPELL_PLURAL,
   SPELL_PICKER_SORT_BEST_MATCH,
   SPELL_PICKER_SORT_LEVEL_ASC,
   SPELL_PICKER_SORT_LEVEL_DESC,
@@ -182,9 +182,9 @@ export function formatSpellPickerSelectionMetadata(
   activeSpellLevel?: number,
 ): string {
   if (mode === SPELL_PICKER_MODE_CANTRIPS) {
-    return `${characterClassName} ${SPELL_PICKER_CANTRIPS_LABEL.toLowerCase()}`
+    return `${characterClassName} ${getSpellCollectionKindSentenceForm('cantrips', 2)}`
   }
-  const base = `${characterClassName} ${SPELL_PICKER_SPELL_PLURAL}`
+  const base = `${characterClassName} ${catalogNounFromContentType('spells').plural}`
   if (activeSpellLevel === undefined) return base
   return joinInlineMetadata([base, `${formatSpellLevel(activeSpellLevel)} level`])
 }

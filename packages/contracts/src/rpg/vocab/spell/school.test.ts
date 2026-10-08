@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { SPELL_SCHOOL_SET_ID, getSpellSchoolLabel, spellSchoolIdSchema } from './school'
+import { getTermCompactLabel, getTermSentenceForm } from '../types'
+import {
+  SPELL_SCHOOL_SET_ID,
+  SPELL_SCHOOL_TERM,
+  getSpellSchoolLabel,
+  spellSchoolIdSchema,
+} from './school'
 
 describe('spellSchoolIdSchema', () => {
   it('accepts slug-shaped ids including campaign custom terms', () => {
@@ -17,6 +23,12 @@ describe('spellSchoolIdSchema', () => {
 describe('spell school vocabulary', () => {
   it('registers the spell school option set id', () => {
     expect(SPELL_SCHOOL_SET_ID).toBe('spell-schools')
+  })
+
+  it('keeps the compact chip label separate from the taxonomy name', () => {
+    expect(SPELL_SCHOOL_TERM.label).toBe('School of Magic')
+    expect(getTermCompactLabel(SPELL_SCHOOL_TERM)).toBe('School')
+    expect(getTermSentenceForm(SPELL_SCHOOL_TERM, 1)).toBe('school of magic')
   })
 
   it('returns title-cased slug labels', () => {

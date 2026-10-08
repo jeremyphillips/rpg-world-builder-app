@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { resolveLocationClassificationDisplay } from '@rpg/contracts'
+import { catalogNounFromContentType, resolveLocationClassificationDisplay } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
 import {
@@ -21,16 +21,17 @@ import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-acti
 import { filterAndSortResidencePickerItems } from './residence-location-picker-drawer.lib'
 import {
   LOCATION_CATALOG_SEARCH_PLACEHOLDER,
-  RESIDENCE_PICKER_ADD_SUBMIT_LABEL,
-  RESIDENCE_PICKER_DESCRIPTION,
-  RESIDENCE_PICKER_NO_ITEMS_MESSAGE,
-  RESIDENCE_PICKER_NO_RESULTS_MESSAGE,
-  RESIDENCE_PICKER_TITLE,
   type ResidenceLocationPickerDrawerProps,
 } from './residence-location-picker-drawer.types'
 
 export type { ResidenceLocationPickerDrawerProps } from './residence-location-picker-drawer.types'
 
+const locationNoun = catalogNounFromContentType('locations')
+const RESIDENCE_PICKER_TITLE = 'Choose residence'
+const RESIDENCE_PICKER_DESCRIPTION = `Choose a ${locationNoun.singular} where this character lives.`
+const RESIDENCE_PICKER_NO_RESULTS_MESSAGE = `No ${locationNoun.plural} match this search.`
+const RESIDENCE_PICKER_NO_ITEMS_MESSAGE = 'No residence locations are available.'
+const RESIDENCE_PICKER_ADD_SUBMIT_LABEL = 'Add residence'
 const RESIDENCE_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this residence.'
 
 export function ResidenceLocationPickerDrawer({

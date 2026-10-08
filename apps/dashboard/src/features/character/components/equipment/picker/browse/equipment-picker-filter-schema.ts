@@ -23,7 +23,6 @@ import {
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_RARITY_ALL,
-  EQUIPMENT_PICKER_RARITY_LABEL,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSupportedKind,
 } from '../drawer/equipment-picker-drawer.types'
@@ -145,7 +144,7 @@ export function createEquipmentPickerFilterSchema(
     fields.push(
       createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedRarity'>({
         id: 'selectedRarity',
-        label: EQUIPMENT_PICKER_RARITY_LABEL,
+        label: 'Rarity',
         selectionMode: 'single-required',
         defaultValue: EQUIPMENT_PICKER_RARITY_ALL,
         isValueConstraining: (value) => value !== EQUIPMENT_PICKER_RARITY_ALL,

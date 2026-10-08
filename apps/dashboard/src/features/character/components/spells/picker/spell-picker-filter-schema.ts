@@ -1,5 +1,10 @@
 import type { SpellPickerItem } from '@rpg/contracts'
-import { getSpellSchoolLabel } from '@rpg/contracts'
+import {
+  SPELL_SCHOOL_TERM,
+  getSpellSchoolLabel,
+  getTermCompactLabel,
+  getTermSentenceForm,
+} from '@rpg/contracts'
 
 import {
   applyFilterSchema,
@@ -30,15 +35,11 @@ import {
 } from './spell-picker-drawer.lib'
 import {
   SPELL_PICKER_LEVELS_ALL,
-  SPELL_PICKER_LEVELS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
   SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_SCHOOL_ALL,
-  SPELL_PICKER_SCHOOL_FILTER_ARIA_LABEL,
-  SPELL_PICKER_SCHOOL_LABEL,
-  SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
   type SpellPickerCastingTimeFilter,
   type SpellPickerMechanicsFilters,
   type SpellPickerMethodFilter,
@@ -134,7 +135,7 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createChipsFilter<SpellPickerItem, SpellPickerFilterState, 'selectedLevels'>({
         id: 'selectedLevels',
-        label: SPELL_PICKER_LEVELS_LABEL,
+        label: 'Levels',
         selectionMode: 'multiple',
         allValue: SPELL_PICKER_LEVELS_ALL,
         defaultValue: [],
@@ -163,12 +164,12 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createEqualsFilter<SpellPickerItem, SpellPickerFilterState, 'selectedSchool', string>({
         id: 'selectedSchool',
-        label: SPELL_PICKER_SCHOOL_LABEL,
+        label: getTermCompactLabel(SPELL_SCHOOL_TERM),
         defaultValue: SPELL_PICKER_SCHOOL_ALL,
         layout: 'inline',
         showAllOption: false,
-        ariaLabel: SPELL_PICKER_SCHOOL_FILTER_ARIA_LABEL,
-        triggerAriaLabel: SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
+        ariaLabel: `Filter by ${getTermSentenceForm(SPELL_SCHOOL_TERM, 1)}`,
+        triggerAriaLabel: getTermCompactLabel(SPELL_SCHOOL_TERM),
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
           ...[...new Set(args.items.map((item) => item.spell.school))]

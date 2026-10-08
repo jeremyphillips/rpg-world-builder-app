@@ -2,7 +2,7 @@ import {
   compareProficiencyPickerItemsByRecommendation,
   formatChoiceSetDrawerHeading,
   getLanguageProficiencySentenceForm,
-  getProficiencyDomainCompactLabel,
+  getProficiencyDomainCompactActionNoun,
   getProficiencyDomainSentenceForm,
   getTermSentenceForm,
   PROFICIENCY_TERM,
@@ -66,7 +66,7 @@ export function formatProficiencyPickerDrawerDescription(
 
 function proficiencyDomainSearchScope(domain: ProficiencyDomain): string {
   if (domain === 'skill') {
-    return getProficiencyDomainCompactLabel(domain).toLowerCase()
+    return getProficiencyDomainCompactActionNoun(domain, 2)
   }
   return getProficiencyDomainSentenceForm(domain, 2)
 }

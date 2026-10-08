@@ -21,10 +21,7 @@ import {
   buildCharacterPickerOptionSearchText,
 } from '../../../lib/picker/character-picker-option.lib'
 import {
-  CHARACTER_PICKER_NO_ITEMS_MESSAGE,
-  CHARACTER_PICKER_NO_RESULTS_MESSAGE,
   CHARACTER_PICKER_SEARCH_PLACEHOLDER,
-  CHARACTER_PICKER_TITLE,
   type CharacterPickerDrawerProps,
 } from './character-picker-drawer.types'
 
@@ -35,7 +32,7 @@ const CHARACTER_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this character con
 export function CharacterPickerDrawer({
   open,
   onOpenChange,
-  title = CHARACTER_PICKER_TITLE,
+  title = 'Add person',
   items,
   resolveClassLabel = formatContentReferenceLabel,
   onSelect,
@@ -167,8 +164,8 @@ export function CharacterPickerDrawer({
       getItemToolbarLabel={({ character }) => character.name}
       getSearchText={({ character }) => buildCharacterPickerOptionSearchText(character)}
       searchPlaceholder={CHARACTER_PICKER_SEARCH_PLACEHOLDER}
-      noResultsMessage={CHARACTER_PICKER_NO_RESULTS_MESSAGE}
-      noItemsMessage={CHARACTER_PICKER_NO_ITEMS_MESSAGE}
+      noResultsMessage="No characters match your search."
+      noItemsMessage="No campaign characters are available."
       renderEntityRow={(args) => {
         const { character, selected, disabled } = args.item
         const summary = buildCharacterPickerOptionEntitySummary(character)

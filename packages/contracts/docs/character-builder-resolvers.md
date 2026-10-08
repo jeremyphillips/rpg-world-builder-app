@@ -215,7 +215,8 @@ Section-level proficiency choice empty copy uses
 `characterBuilderProficiencyChoiceEmptyMessages` (base and `*Additional` variants) via
 `formatProficiencyChoiceEmptyMessage(choiceType, { additional? })` and
 `formatProficiencySectionEmptyMessage`. Builder choice drawer headings use
-`formatChoiceSetDrawerHeading(choiceType)`.
+`formatChoiceSetDrawerHeading(choiceType)`. Shared catalog picker chrome
+(search, sort, choose, add, empty states) uses `formatCatalogPickerCopy`.
 
 ### Dashboard rail mapping
 

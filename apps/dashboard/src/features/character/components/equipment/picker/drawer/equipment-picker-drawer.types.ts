@@ -1,6 +1,6 @@
 import {
-  getContentTypeSentenceForm,
-  getContentTypeTerm,
+  catalogNounFromContentType,
+  formatCatalogPickerCopy,
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
@@ -30,27 +30,17 @@ export type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-const equipmentTerm = getContentTypeTerm('equipment')
-const equipmentPlural = getContentTypeSentenceForm('equipment', 2)
+const equipmentNoun = catalogNounFromContentType('equipment')
+const equipmentCopy = formatCatalogPickerCopy(equipmentNoun)
 
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
 
-export const EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL = `${equipmentTerm.label} picker workflow`
-export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = `Sort ${equipmentPlural}`
-export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = `${equipmentTerm.label} sort order`
-export const EQUIPMENT_PICKER_DESCRIPTION = 'Search the catalog and add items to your loadout.'
+export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = equipmentCopy.sortGroupLabel
+export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = equipmentCopy.sortOrderLabel
 
-export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
-
-export const EQUIPMENT_PICKER_MODE_LABELS: Record<EquipmentPickerWorkflowMode, string> = {
-  purchase: 'Purchase',
-  magic_items: 'Magic items',
-}
-
-export const EQUIPMENT_PICKER_ADD_PARTIAL_PREFIX = 'Add'
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
@@ -59,7 +49,6 @@ export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 export const EQUIPMENT_PICKER_RARITY_ALL = '__all_rarities__' as const
 
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Equipment kind'
-export const EQUIPMENT_PICKER_RARITY_LABEL = 'Rarity'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
 

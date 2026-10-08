@@ -1,4 +1,5 @@
 import {
+  catalogNounFromContentType,
   getOrganizationDomainLabel,
   getOrganizationClassificationDiscoveryText,
   ORGANIZATION_DOMAIN_IDS,
@@ -8,7 +9,6 @@ import { normalizeSearchQuery } from '@rpg/ui'
 
 import {
   ORGANIZATION_PICKER_ALL_DOMAINS,
-  ORGANIZATION_PICKER_DESCRIPTION,
   type OrganizationPickerItem,
   type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
@@ -67,5 +67,6 @@ export function buildOrganizationPickerDomainOptions(
 }
 
 export function formatOrganizationPickerDescription(): string {
-  return ORGANIZATION_PICKER_DESCRIPTION
+  const organization = catalogNounFromContentType('organizations')
+  return `Choose an ${organization.singular} connected to this character.`
 }

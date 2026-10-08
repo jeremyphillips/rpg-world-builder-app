@@ -1,9 +1,9 @@
 import * as React from 'react'
 
+import { catalogNounFromContentType, formatChoiceSetDrawerHeading } from '@rpg/contracts'
 import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet } from '@/features/content'
-import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
@@ -20,13 +20,10 @@ import {
 } from '../browse/equipment-picker-filter-controls'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
-  EQUIPMENT_PICKER_DESCRIPTION,
-  EQUIPMENT_PICKER_MODE_LABELS,
   EQUIPMENT_PICKER_SORT_GROUP_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
   EQUIPMENT_PICKER_SORT_ORDER_LABEL,
-  EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerToolbarResetMode,
@@ -39,6 +36,14 @@ import { EquipmentPickerDisclosureRow } from '../browse/equipment-picker-disclos
 import { getEquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import { useEquipmentPickerController } from './use-equipment-picker-controller'
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+
+const equipmentNoun = catalogNounFromContentType('equipment')
+const EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL = `${equipmentNoun.label} picker workflow`
+const EQUIPMENT_PICKER_DESCRIPTION = 'Search the catalog and add items to your loadout.'
+const EQUIPMENT_PICKER_MODE_LABELS = {
+  purchase: 'Purchase',
+  magic_items: 'Magic items',
+} as const satisfies Record<EquipmentPickerWorkflowMode, string>
 
 const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
   purchase: 'currency',
