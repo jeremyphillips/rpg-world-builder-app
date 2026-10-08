@@ -27,9 +27,11 @@ import {
   getOrganizationPickerSearchText,
 } from './organization-picker-drawer.lib'
 import {
+  ORGANIZATION_PICKER_ADD_SUBMIT_LABEL,
   ORGANIZATION_PICKER_ALL_DOMAINS,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
+  ORGANIZATION_PICKER_SEARCH_PLACEHOLDER,
   ORGANIZATION_PICKER_TITLE,
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
@@ -161,7 +163,7 @@ export function OrganizationPickerDrawer({
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
       getSearchText={({ organization }) => getOrganizationPickerSearchText(organization)}
-      searchPlaceholder="Search organizations"
+      searchPlaceholder={ORGANIZATION_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
@@ -257,7 +259,7 @@ export function OrganizationPickerDrawer({
                   void commitMembership(organization)
                 }}
               >
-                Add organization
+                {ORGANIZATION_PICKER_ADD_SUBMIT_LABEL}
               </Button>
             </div>
           </div>

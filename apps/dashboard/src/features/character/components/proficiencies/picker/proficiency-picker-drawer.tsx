@@ -30,7 +30,9 @@ import { ProficiencyPickerItemDetails } from './proficiency-picker-item-details'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
+  PROFICIENCY_PICKER_SORT_GROUP_LABEL,
   PROFICIENCY_PICKER_SORT_LABELS,
+  PROFICIENCY_PICKER_SORT_ORDER_LABEL,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
   type ProficiencyPickerSortMode,
@@ -110,8 +112,8 @@ export function ProficiencyPickerDrawer({
               pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
             )}
             onValueChange={setSortMode}
-            triggerAriaLabel="Proficiency sort order"
-            ariaLabel="Sort proficiencies"
+            triggerAriaLabel={PROFICIENCY_PICKER_SORT_ORDER_LABEL}
+            ariaLabel={PROFICIENCY_PICKER_SORT_GROUP_LABEL}
           />
         ),
       }}

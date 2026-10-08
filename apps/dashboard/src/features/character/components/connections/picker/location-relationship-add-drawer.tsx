@@ -24,6 +24,11 @@ import type {
   PropertyConnectionRoleOption,
 } from '../../../lib/relationship/connection-role-catalog'
 import { LocationRelationshipRoleStep } from './location-relationship-role-step'
+import {
+  LOCATION_CATALOG_NO_ITEMS_MESSAGE,
+  LOCATION_CATALOG_NO_RESULTS_MESSAGE,
+  LOCATION_CATALOG_SEARCH_PLACEHOLDER,
+} from './residence-location-picker-drawer.types'
 
 type LocationRelationshipRoleOption = PlaceConnectionRoleOption | PropertyConnectionRoleOption
 
@@ -189,9 +194,9 @@ export function LocationRelationshipAddDrawer({
         getItemKey={({ location }) => location.id}
         getItemToolbarLabel={({ location }) => location.name}
         getSearchText={({ location }) => location.name}
-        searchPlaceholder="Search locations"
-        noResultsMessage="No locations match your search."
-        noItemsMessage="No locations are available."
+        searchPlaceholder={LOCATION_CATALOG_SEARCH_PLACEHOLDER}
+        noResultsMessage={LOCATION_CATALOG_NO_RESULTS_MESSAGE}
+        noItemsMessage={LOCATION_CATALOG_NO_ITEMS_MESSAGE}
         renderEntityRow={(args) => {
           const { location } = args.item
           const classification = resolveLocationClassificationDisplay(location)

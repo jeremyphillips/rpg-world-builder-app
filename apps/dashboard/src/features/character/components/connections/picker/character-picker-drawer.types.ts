@@ -1,6 +1,7 @@
 import type { CharacterPickerOption } from '../../../lib/picker/character-picker-option.lib'
 
 export const CHARACTER_PICKER_TITLE = 'Add person'
+export const CHARACTER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
 export const CHARACTER_PICKER_NO_RESULTS_MESSAGE = 'No characters match your search.'
 export const CHARACTER_PICKER_NO_ITEMS_MESSAGE = 'No campaign characters are available.'
 

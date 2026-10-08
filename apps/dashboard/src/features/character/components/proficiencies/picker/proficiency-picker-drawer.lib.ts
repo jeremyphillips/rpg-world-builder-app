@@ -1,8 +1,14 @@
-import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
-import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
 import {
   compareProficiencyPickerItemsByRecommendation,
+  formatChoiceSetDrawerHeading,
+  getLanguageProficiencySentenceForm,
   getProficiencyDomainCompactLabel,
+  getProficiencyDomainSentenceForm,
+  getTermSentenceForm,
+  PROFICIENCY_TERM,
+  type ChoiceSet,
+  type ProficiencyPickerItem,
+  type ProficiencyDomain,
 } from '@rpg/contracts'
 
 import { normalizeSearchQuery } from '@rpg/ui'
@@ -58,20 +64,27 @@ export function formatProficiencyPickerDrawerDescription(
   return `Selected ${selectedIds.length} of ${choiceSet.max}. Choose ${remaining} more.`
 }
 
+function proficiencyDomainSearchScope(domain: ProficiencyDomain): string {
+  if (domain === 'skill') {
+    return getProficiencyDomainCompactLabel(domain).toLowerCase()
+  }
+  return getProficiencyDomainSentenceForm(domain, 2)
+}
+
 export function formatProficiencyPickerSearchPlaceholder(choiceSet: ChoiceSet): string {
   switch (choiceSet.choiceType) {
     case 'skillProficiency':
-      return `Search ${getProficiencyDomainCompactLabel('skill').toLowerCase()}`
+      return `Search ${proficiencyDomainSearchScope('skill')}`
     case 'language':
-      return 'Search languages'
+      return `Search ${getLanguageProficiencySentenceForm(2)}`
     case 'toolProficiency':
-      return 'Search tools'
+      return `Search ${proficiencyDomainSearchScope('tool')}`
     case 'weaponProficiency':
-      return 'Search weapons'
+      return `Search ${proficiencyDomainSearchScope('weapon')}`
     case 'armorTraining':
-      return 'Search armor'
+      return `Search ${proficiencyDomainSearchScope('armor')}`
     default:
-      return 'Search proficiencies'
+      return `Search ${getTermSentenceForm(PROFICIENCY_TERM, 2)}`
   }
 }
 

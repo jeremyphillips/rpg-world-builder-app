@@ -24,6 +24,7 @@ import {
   SPELL_PICKER_NO_RESULTS_MESSAGE,
   SPELL_PICKER_SEARCH_PLACEHOLDER,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
   SPELL_PICKER_SORT_GROUP_LABEL,
   SPELL_PICKER_SORT_ORDER_LABEL,
 } from './spell-picker-drawer.types'
@@ -101,7 +102,9 @@ describe('SpellPickerDrawer', () => {
       cantripItems: spellPickerOpenItemsFixture,
     })
 
-    await user.click(screen.getByRole('button', { name: 'Casting and mechanics filters' }))
+    await user.click(
+      screen.getByRole('button', { name: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL }),
+    )
     await user.click(screen.getByRole('checkbox', { name: 'Ritual' }))
 
     expect(screen.getByRole('checkbox', { name: 'Ritual' })).toBeChecked()

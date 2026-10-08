@@ -33,7 +33,10 @@ import {
   SPELL_PICKER_LEVELS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_SPELLS,
+  SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
+  SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_SCHOOL_ALL,
+  SPELL_PICKER_SCHOOL_FILTER_ARIA_LABEL,
   SPELL_PICKER_SCHOOL_LABEL,
   SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
   type SpellPickerCastingTimeFilter,
@@ -164,7 +167,7 @@ export function createSpellPickerFilterSchema(
         defaultValue: SPELL_PICKER_SCHOOL_ALL,
         layout: 'inline',
         showAllOption: false,
-        ariaLabel: 'Filter by school',
+        ariaLabel: SPELL_PICKER_SCHOOL_FILTER_ARIA_LABEL,
         triggerAriaLabel: SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
@@ -193,10 +196,10 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createPopoverFilter<SpellPickerItem, SpellPickerFilterState, 'mechanicsFilters'>({
         id: 'mechanicsFilters',
-        label: 'Casting & mechanics',
+        label: SPELL_PICKER_MECHANICS_LABEL,
         defaultValue: DEFAULT_MECHANICS_FILTERS,
         triggerLabel: formatSpellPickerMechanicsTriggerLabel,
-        triggerAriaLabel: 'Casting and mechanics filters',
+        triggerAriaLabel: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
         groups: () =>
           [
             args.castingTimeOptions.length > 0

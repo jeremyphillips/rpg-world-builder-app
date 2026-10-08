@@ -19,6 +19,7 @@ import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
   PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE,
+  PROFICIENCY_PICKER_SORT_GROUP_LABEL,
 } from './proficiency-picker-drawer.types'
 
 describe('ProficiencyPickerDrawer', () => {
@@ -38,7 +39,9 @@ describe('ProficiencyPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('group', { name: 'Sort proficiencies' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('group', { name: PROFICIENCY_PICKER_SORT_GROUP_LABEL }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
     expect(screen.getAllByText('Dexterity').length).toBeGreaterThan(0)
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()

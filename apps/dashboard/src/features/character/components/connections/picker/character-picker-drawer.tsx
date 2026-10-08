@@ -23,6 +23,7 @@ import {
 import {
   CHARACTER_PICKER_NO_ITEMS_MESSAGE,
   CHARACTER_PICKER_NO_RESULTS_MESSAGE,
+  CHARACTER_PICKER_SEARCH_PLACEHOLDER,
   CHARACTER_PICKER_TITLE,
   type CharacterPickerDrawerProps,
 } from './character-picker-drawer.types'
@@ -165,7 +166,7 @@ export function CharacterPickerDrawer({
       getItemKey={({ character }) => character.id}
       getItemToolbarLabel={({ character }) => character.name}
       getSearchText={({ character }) => buildCharacterPickerOptionSearchText(character)}
-      searchPlaceholder="Search characters"
+      searchPlaceholder={CHARACTER_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={CHARACTER_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={CHARACTER_PICKER_NO_ITEMS_MESSAGE}
       renderEntityRow={(args) => {

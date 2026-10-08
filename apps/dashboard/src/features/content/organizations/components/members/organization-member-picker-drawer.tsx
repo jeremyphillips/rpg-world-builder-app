@@ -39,10 +39,11 @@ import {
   type OrganizationMemberSelectionPolicy,
 } from '../../lib/members/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../../lib/members/organization-members.constants'
+import { CHARACTER_PICKER_SEARCH_PLACEHOLDER } from '@/features/character'
 
 export const ORGANIZATION_MEMBER_PICKER_TITLE = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SUBMIT_LABEL = 'Add member'
-export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
+export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = CHARACTER_PICKER_SEARCH_PLACEHOLDER
 export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters match this search.'
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'

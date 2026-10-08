@@ -165,6 +165,11 @@ export {
   buildCharacterPickerOptionSearchText,
   type CharacterPickerOption,
 } from './lib/picker/character-picker-option.lib'
+export {
+  CHARACTER_PICKER_NO_ITEMS_MESSAGE,
+  CHARACTER_PICKER_NO_RESULTS_MESSAGE,
+  CHARACTER_PICKER_SEARCH_PLACEHOLDER,
+} from './components/connections/picker/character-picker-drawer.types'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
 export {
   createCharacterClassFilterLabelResolver,

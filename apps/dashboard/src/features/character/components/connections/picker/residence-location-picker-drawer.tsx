@@ -20,6 +20,8 @@ import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-acti
 
 import { filterAndSortResidencePickerItems } from './residence-location-picker-drawer.lib'
 import {
+  LOCATION_CATALOG_SEARCH_PLACEHOLDER,
+  RESIDENCE_PICKER_ADD_SUBMIT_LABEL,
   RESIDENCE_PICKER_DESCRIPTION,
   RESIDENCE_PICKER_NO_ITEMS_MESSAGE,
   RESIDENCE_PICKER_NO_RESULTS_MESSAGE,
@@ -147,7 +149,7 @@ export function ResidenceLocationPickerDrawer({
       getItemKey={({ location }) => location.id}
       getItemToolbarLabel={({ location }) => location.name}
       getSearchText={({ location }) => location.name}
-      searchPlaceholder="Search locations"
+      searchPlaceholder={LOCATION_CATALOG_SEARCH_PLACEHOLDER}
       noResultsMessage={RESIDENCE_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={RESIDENCE_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
@@ -204,7 +206,7 @@ export function ResidenceLocationPickerDrawer({
                   void commitResidence(location.id)
                 }}
               >
-                Add residence
+                {RESIDENCE_PICKER_ADD_SUBMIT_LABEL}
               </Button>
             </div>
           </div>
