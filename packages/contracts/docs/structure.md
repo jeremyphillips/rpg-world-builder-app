@@ -552,6 +552,12 @@ belongs in that registry.
 - `vocabularyTermFieldCopy(term, { multiple? })` — default form `{ label, placeholder }`
 - `getTermCompactLabel(entry)` — short identity; `getTermCollectionLabel(entry)` — set/category copy (sentence case)
 
+Call sites must not build a sentence by lowercasing a title or appending `s` to a label.
+Use `getTermSentenceForm` or `vocabularyTermLabel` with `casing: 'sentence'`.
+`vocab-copy-drift.test.ts` ratchets the remaining production call sites. A shared word
+such as “schools” is not a hit: a copy prop is flagged only when its entire value equals
+a mechanical derivative that is not already the curated sentence form.
+
 Do not use `compactLabel` for collection phrases. Dashboard hub/overview surfaces may
 title-case collection semantics for navigation; that presentation layer stays in apps,
 not in `collectionLabel`.

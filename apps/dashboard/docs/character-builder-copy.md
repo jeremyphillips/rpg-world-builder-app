@@ -109,7 +109,8 @@ headers and supporting copy provide enough context.
 
 The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()}`) is a
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of
-deriving manage copy from rules-facing `choiceSet.label`.
+deriving manage copy from rules-facing `choiceSet.label`. That call site is on the
+`vocab-copy-drift.test.ts` ratchet.
 
 ### Species / class step sheet actions
 
