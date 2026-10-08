@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import type { Spell } from '../../../../content/spell'
 import {
-  buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
   formatSpellConcentrationMarker,
   formatSpellPickerCastingTime,
@@ -36,25 +35,6 @@ const baseSpell = {
     verbal: true,
     somatic: true,
     material: { description: 'a tiny ball of bat guano' },
-  },
-} satisfies Spell
-
-const detectMagic = {
-  ...baseSpell,
-  id: 'srd-cc-5.2.1:detect-magic',
-  slug: 'detect-magic',
-  name: 'Detect Magic',
-  school: 'divination',
-  level: 1,
-  tags: { roles: ['detection'] },
-  castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: true },
-  range: { kind: 'self' },
-  duration: {
-    kind: 'timed',
-    value: 10,
-    unit: 'minute',
-    concentration: true,
-    upTo: true,
   },
 } satisfies Spell
 
@@ -137,41 +117,6 @@ describe('formatSpellRitualMarker', () => {
     expect(
       formatSpellRitualMarker({ normal: { value: 1, unit: 'action' }, canBeCastAsRitual: true }),
     ).toBe('Ritual')
-  })
-})
-
-describe('buildSpellPickerCompactSummary', () => {
-  it('builds casting summary and classification without tags', () => {
-    expect(buildSpellPickerCompactSummary(baseSpell)).toEqual({
-      castingSummary: ['Action', '150 ft', 'Instantaneous'],
-      classification: {
-        levelLabel: '3rd level',
-        descriptors: ['Evocation'],
-      },
-    })
-  })
-
-  it('includes delivery method in classification descriptors when present', () => {
-    expect(
-      buildSpellPickerCompactSummary({
-        ...baseSpell,
-        level: 0,
-        deliveryMethod: 'ranged-spell-attack',
-      }).classification.descriptors,
-    ).toEqual(['Evocation', 'Ranged attack'])
-  })
-
-  it('includes concentration phrasing in casting summary for detect magic', () => {
-    expect(buildSpellPickerCompactSummary(detectMagic).castingSummary).toContain(
-      'Concentration, up to 10 minutes',
-    )
-    expect(buildSpellPickerCompactSummary(detectMagic)).toEqual({
-      castingSummary: ['Action', 'Self', 'Concentration, up to 10 minutes'],
-      classification: {
-        levelLabel: '1st level',
-        descriptors: ['Divination'],
-      },
-    })
   })
 })
 

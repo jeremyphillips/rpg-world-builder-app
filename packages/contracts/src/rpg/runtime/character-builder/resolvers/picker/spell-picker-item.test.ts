@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Spell } from '../../../../content/spell'
-import { buildSpellPickerCompactSummary } from '../spellcasting/format-spell-picker-metadata'
+import { buildSpellPickerCompactSummary } from '../spellcasting/resolve-spell-picker-metadata'
 import type { SpellPickerItem } from '../spellcasting/resolve-spell-picker-items'
 import { NEUTRAL_OPTION_RECOMMENDATION } from '../../recommendation'
 import { compareSpellPickerItemsByRecommendation } from './spell-picker-item'

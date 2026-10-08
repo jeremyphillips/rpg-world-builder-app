@@ -79,15 +79,15 @@ Thin domain folders — `picker/` only. Builder step composition (sections, rows
 spell choice/summary cards) lives under `components/builder/steps/proficiencies/` and
 `components/builder/steps/spells/`.
 
-| Subfolder / file                                                                  | Responsibility                              |
-| --------------------------------------------------------------------------------- | ------------------------------------------- |
-| `spells/picker/spell-picker-drawer.*`                                             | Spell catalog drawer shell                  |
-| `spells/picker/use-spell-picker-controller.ts`                                    | Mode buckets, filter persist, derived lists |
-| `spells/picker/spell-picker-browse-mode.lib.ts`                                   | Per-mode browse bucket helpers              |
-| `spells/picker/spell-picker-selection-summary.tsx`                                | Spell-only selection count chrome           |
-| `spells/picker/map-spell-picker-compact-summary-to-metadata-lines.ts`             | Spell metadata mapper                       |
-| `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell            |
-| `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                       |
+| Subfolder / file                                                                  | Responsibility                                  |
+| --------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `spells/picker/spell-picker-drawer.*`                                             | Spell catalog drawer shell                      |
+| `spells/picker/use-spell-picker-controller.ts`                                    | Mode buckets, filter persist, derived lists     |
+| `spells/picker/spell-picker-browse-mode.lib.ts`                                   | Per-mode browse bucket helpers                  |
+| `spells/picker/spell-picker-selection-summary.tsx`                                | Spell-only selection count chrome               |
+| `spells/picker/map-spell-picker-compact-summary-to-metadata-lines.ts`             | Spell picker metadata mapper (one curated line) |
+| `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell                |
+| `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                           |
 
 ## Connections (builder + sheet)
 

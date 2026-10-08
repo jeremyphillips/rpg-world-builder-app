@@ -27,8 +27,11 @@ describe('resolveSpellPickerItems', () => {
 
     expect(items).toHaveLength(wizardCantrips.length)
     expect(items[0]?.spell.name).toBe('Arcane Bolt')
-    expect(items[0]?.compactSummary.classification.levelLabel).toBe('Cantrip')
-    expect(items[0]?.compactSummary.castingSummary).toContain('Instantaneous')
+    expect(items[0]?.compactSummary.groups).toEqual([
+      { kind: 'classification', levelLabel: 'Cantrip', schoolLabel: 'Evocation' },
+      { kind: 'castingTime', label: 'Action' },
+      { kind: 'range', label: 'Self' },
+    ])
     expect(items[0]?.searchText).toContain('Arcane Bolt')
     expect(items[0]?.state.canSelect).toBe(true)
   })

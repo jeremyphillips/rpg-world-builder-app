@@ -11,7 +11,6 @@ import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-r
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   choiceSetForSpellPickerMode,
-  collectSpellPickerMarkers,
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
@@ -210,7 +209,6 @@ export function SpellPickerDrawer({
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getSpellPickerDisabledNote(item)
-          const markers = collectSpellPickerMarkers(item.spell, item.compactSummary)
 
           return {
             heading: item.spell.name,
@@ -222,11 +220,6 @@ export function SpellPickerDrawer({
             ),
             status: [
               ...(recommendationsEnabled ? recommendationStatusItems(item.state.presentation) : []),
-              ...markers.map((marker) => ({
-                kind: 'text' as const,
-                label: marker,
-                variant: 'muted' as const,
-              })),
               ...(disabledNote
                 ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
                 : []),

@@ -1,4 +1,3 @@
-import { buildSpellPickerCompactSummary } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -6,7 +5,6 @@ import {
   spellPickerDetectMagicFixture,
 } from './spell-picker-drawer.fixtures'
 import {
-  collectSpellPickerMarkers,
   filterAndSortSpellPickerItems,
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
@@ -34,15 +32,6 @@ import {
 import { spellPickerOpenItemsFixture } from './spell-picker-drawer.fixtures'
 
 describe('spell-picker-drawer.lib', () => {
-  it('omits the concentration marker when casting summary already includes concentration phrasing', () => {
-    const compactSummary = buildSpellPickerCompactSummary(spellPickerDetectMagicFixture)
-
-    expect(compactSummary.castingSummary).toContain('Concentration, up to 10 minutes')
-    expect(collectSpellPickerMarkers(spellPickerDetectMagicFixture, compactSummary)).toEqual([
-      'Ritual',
-    ])
-  })
-
   it('formats drawer title and selection summary metadata', () => {
     expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_CANTRIPS)).toBe('Choose cantrip')
     expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe('Choose spells')

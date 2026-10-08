@@ -6,10 +6,8 @@ import {
   type PickerItemStateBase,
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
-import {
-  buildSpellPickerCompactSummary,
-  buildSpellPickerSearchText,
-} from './format-spell-picker-metadata'
+import { buildSpellPickerSearchText } from './format-spell-picker-metadata'
+import { buildSpellPickerCompactSummary } from './resolve-spell-picker-metadata'
 import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,

@@ -1,7 +1,5 @@
 import {
   formatChoiceSetDrawerHeading,
-  formatSpellConcentrationMarker,
-  formatSpellRitualMarker,
   compareSpellPickerItemsByRecommendation,
   formatSpellLevel,
   getCastingTimeUnitLabel,
@@ -9,7 +7,6 @@ import {
   type CastingTimeUnit,
   type ChoiceSet,
   type Spell,
-  type SpellPickerCompactSummary,
   type SpellPickerItem,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -108,10 +105,6 @@ const METHOD_FILTER_LABELS = {
   'ranged-spell-attack': 'Ranged spell attack',
   'melee-spell-attack': 'Melee spell attack',
 } as const
-
-function castingSummaryIncludesConcentration(castingSummary: readonly string[]): boolean {
-  return castingSummary.some((entry) => entry.includes('Concentration'))
-}
 
 function resolveCastingTimeFilter(spell: Spell): SpellPickerCastingTimeFilter | undefined {
   const { value, unit } = spell.castingTime.normal
@@ -247,20 +240,6 @@ export function itemsForSpellPickerMode(
   preparedItems: readonly SpellPickerItem[],
 ): readonly SpellPickerItem[] {
   return mode === SPELL_PICKER_MODE_CANTRIPS ? cantripItems : preparedItems
-}
-
-export function collectSpellPickerMarkers(
-  spell: Spell,
-  compactSummary: SpellPickerCompactSummary,
-): string[] {
-  const markers: string[] = []
-  const concentration = formatSpellConcentrationMarker(spell.duration)
-  if (concentration && !castingSummaryIncludesConcentration(compactSummary.castingSummary)) {
-    markers.push(concentration)
-  }
-  const ritual = formatSpellRitualMarker(spell.castingTime)
-  if (ritual) markers.push(ritual)
-  return markers
 }
 
 export function isSpellPickerRowDimmed(item: SpellPickerItem): boolean {

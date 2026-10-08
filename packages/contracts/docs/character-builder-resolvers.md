@@ -248,12 +248,22 @@ layout). Do not rebuild summaries from raw catalog entities in UI.
 | Domain    | Builder                               | Resolver field    | Contracts module                                                                 |
 | --------- | ------------------------------------- | ----------------- | -------------------------------------------------------------------------------- |
 | Equipment | `buildEquipmentCompactSummary`        | (view model)      | `content/lib/equipment-compact-display.ts` — `comparisonGroups`                  |
-| Spells    | `buildSpellPickerCompactSummary`      | `compactSummary`  | `resolvers/spellcasting/format-spell-picker-metadata.ts`                         |
+| Spells    | `resolveSpellPickerMetadata`          | `compactSummary`  | `resolvers/spellcasting/resolve-spell-picker-metadata.ts`                        |
 | Skills    | `buildSkillProficiencyCompactSummary` | `compactSummary?` | `content/lib/skill-proficiency-compact-display.ts` (skill proficiency rows only) |
 
-Spell `castingSummary` includes concentration phrasing when applicable; the spell
-drawer omits the redundant `Concentration` footer marker when that phrasing is
-present (ritual markers unchanged).
+Picker metadata is intentionally curated for decision value. It has a fixed
+semantic budget and must not become an exhaustive dump of entity attributes.
+
+Spell compact rows keep at most four groups (`MAX_SPELL_PICKER_METADATA_GROUPS`).
+Classification and casting time are required. Optional facts compete by inclusion
+priority (concentration, ritual, non-default range, timed duration, self range),
+then render in display order. Concentration duration is compact (`Concentration 10 min`);
+instantaneous duration is omitted. `buildSpellPickerCompactSummary` stores that
+result as `compactSummary.groups`. The same groups feed Quick NPC previews and
+global-search secondary text.
+
+Spell detail stats and character-sheet spell headers do not use this budget.
+Detail duration stays on `formatSpellDurationLabel`.
 
 ## Internal choice-source registry (`CHOICE_SOURCE_RESOLVERS`)
 
@@ -521,5 +531,5 @@ Nested pool ChoiceSets are still `starting-equipment:{optionId}:{itemIndex}`. A 
 | `buildEquipmentCompactSummary`        | `content/lib/equipment-compact-display.ts`                 | Equipment `comparisonGroups` + `kindLabel`. `standard` is the builder layout. `compact-row` emits one kind-specific fact and never uses weight. |
 | `projectEquipmentSelection`           | `resolvers/equipment/project-equipment-selection.ts`       | Live quantity, add-more, and supply sources on a resolved option.                                                                               |
 | `resolveEquipmentAdditionPolicy`      | `resolvers/equipment/resolve-equipment-addition-policy.ts` | `single` or `quantity` for grant, inventory, acquisition, and requirement context.                                                              |
-| `buildSpellPickerCompactSummary`      | `resolvers/spellcasting/format-spell-picker-metadata.ts`   | Spell picker `castingSummary` + `classification`.                                                                                               |
+| `resolveSpellPickerMetadata`          | `resolvers/spellcasting/resolve-spell-picker-metadata.ts`  | Curated spell picker groups. At most four. `buildSpellPickerCompactSummary` stores them on `compactSummary.groups`.                             |
 | `buildSkillProficiencyCompactSummary` | `content/lib/skill-proficiency-compact-display.ts`         | Skill proficiency ability label + catalog `exampleUses`.                                                                                        |

@@ -253,7 +253,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### SpellPickerDrawer
 
-**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Learn/Unlearn).
+**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; curated spell metadata; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Learn/Unlearn).
 
 **Must not know:** `draft.choiceSelections` shape; how the builder patches draft; campaign/sheet persistence.
 
@@ -289,6 +289,16 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 Visible reset copy is `Reset`. The accessible name and `title` are `Reset search, filters, and sorting` when Sort is on the toolbar, and `Reset search and filters` when it is not. The reset row stays reserved (invisible, not focusable) only while Sort is persistent. Drawers without Sort mount Reset only while it is visible. Equipment `clear_filters` keeps `Clear filters` and does not use the reset accessible name. Spell recommendation tabs still park `actions` on the tab row.
 
+## Picker metadata budget
+
+Picker metadata is intentionally curated for decision value. It has a fixed semantic budget and must not become an exhaustive dump of entity attributes.
+
+That rule is for compact picker and list rows that share a domain grammar: spell picker rows, Quick NPC spell previews, and global-search spell secondary text. Spell detail views and character-sheet spell details keep the full facts.
+
+Spell rows call `resolveSpellPickerMetadata` and keep at most four groups. Classification and casting time are required. Remaining slots go to the highest-value optional facts — concentration, ritual, non-default range, timed duration, then self range — and then render in a stable order: classification, ritual, casting time, range, concentration, duration. The dashboard mapper turns that result into one `CatalogMetadataLine`. Level is a strong part inside the classification item; school stays in the same item so they share one budget slot. Ritual and concentration stay inline metadata, not status markers.
+
+Equipment already curates through `comparisonGroups`. Do not measure rendered width or add groups because a row looks like it has room.
+
 ## Contracts vs dashboard ownership
 
 ### `@rpg/contracts` (domain affordances)
@@ -308,7 +318,7 @@ Row state for spells and proficiencies extends `PickerItemStateBase`
 - Filter schemas and filter control wiring (`*-picker-filter-schema.ts`, toolbar clients)
 - Client-side search scoring and sort orchestration (`*-picker-drawer.lib.ts`, `picker/sort/catalog-picker-sort.lib.ts`)
 - Domain controllers for equipment and spell browse lifecycle
-- Row chrome beyond selection actions (equipment acquisition panels, spell markers)
+- Row chrome beyond selection actions (equipment acquisition panels, recommendation and disabled-note status)
 - Metadata line mapping (domain `*/picker/map-*-to-metadata-lines.ts` → `CatalogMetadataLine`)
 - Draft mutations (step hooks)
 

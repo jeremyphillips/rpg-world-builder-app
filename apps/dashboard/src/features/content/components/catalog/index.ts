@@ -9,5 +9,7 @@ export type {
   CatalogMetadataBadgeSegment,
   CatalogMetadataLine,
   CatalogMetadataSegment,
+  CatalogMetadataTextEmphasis,
+  CatalogMetadataTextPart,
   CatalogMetadataTextSegment,
 } from './catalog-metadata.types'

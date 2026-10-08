@@ -2,7 +2,6 @@ import type { Spell } from '../../../../content/spell'
 import { formatSpellLevel } from '../../../../content/spell/levels'
 import type { SpellTags } from '../../../../vocab/spell/tags'
 import type { SpellCastingTime, SpellDuration } from '../../../../vocab/spell'
-import { getCompactSpellDeliveryMethodLabel } from '../../../../vocab/spell/delivery-method'
 import { getSpellSchoolLabel } from '../../../../vocab/spell/school'
 import {
   formatSpellCastingTimeLabel,
@@ -13,15 +12,6 @@ import {
 import { stripHtmlTags } from '../../../../../lib/strip-html-tags'
 
 export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
-
-export type SpellPickerCompactSummary = {
-  /** Casting time, range, and duration — ordered usage/mechanics facts for line 1. */
-  castingSummary: readonly string[]
-  classification: {
-    levelLabel: string
-    descriptors: readonly string[]
-  }
-}
 
 /** Returns "Cantrip" for level 0, otherwise an ordinal level label (e.g. "1st level"). */
 export function formatSpellPickerLevelLabel(level: number): string {
@@ -39,7 +29,7 @@ export function formatSpellPickerRange(range: Parameters<typeof formatSpellRange
   return formatSpellRangeLabel(range, 'picker')
 }
 
-/** Formats spell duration for picker rows (e.g. "Instantaneous"). */
+/** Full duration phrase shared with detail views (e.g. "Instantaneous", "Concentration, up to 10 minutes"). */
 export const formatSpellPickerDuration = formatSpellDurationLabel
 
 /** Formats spell components for picker detail (e.g. "V, S, M (fleece)"). */
@@ -64,29 +54,6 @@ function flattenSpellTags(tags: SpellTags | undefined): string[] {
     ...(tags.roles ?? []),
     ...(tags.functions ?? []),
   ]
-}
-
-function buildSpellPickerClassificationDescriptors(spell: Spell): string[] {
-  const descriptors = [getSpellSchoolLabel(spell.school)]
-  if (spell.deliveryMethod) {
-    descriptors.push(getCompactSpellDeliveryMethodLabel(spell.deliveryMethod))
-  }
-  return descriptors
-}
-
-/** Builds structured compact summary facts for spell picker rows. */
-export function buildSpellPickerCompactSummary(spell: Spell): SpellPickerCompactSummary {
-  return {
-    castingSummary: [
-      formatSpellPickerCastingTime(spell.castingTime),
-      formatSpellPickerRange(spell.range),
-      formatSpellPickerDuration(spell.duration),
-    ],
-    classification: {
-      levelLabel: formatSpellPickerLevelLabel(spell.level),
-      descriptors: buildSpellPickerClassificationDescriptors(spell),
-    },
-  }
 }
 
 /** Search text for spell picker ranking — name, school, level, tags, and plain description. */

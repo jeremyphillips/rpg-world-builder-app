@@ -1,28 +1,30 @@
-import type { SpellPickerCompactSummary } from '@rpg/contracts'
+import type { SpellPickerCompactSummary, SpellPickerMetadataGroup } from '@rpg/contracts'
 
-import type { CatalogMetadataLine } from '@/features/content'
+import type { CatalogMetadataLine, CatalogMetadataSegment } from '@/features/content'
+
+function mapSpellPickerMetadataGroup(group: SpellPickerMetadataGroup): CatalogMetadataSegment {
+  if (group.kind === 'classification') {
+    return {
+      type: 'text',
+      text: `${group.levelLabel} ${group.schoolLabel}`,
+      parts: [
+        { text: group.levelLabel, emphasis: 'strong' },
+        { text: group.schoolLabel, emphasis: 'default' },
+      ],
+    }
+  }
+
+  return { type: 'text', text: group.label }
+}
 
 export function mapSpellPickerCompactSummaryToMetadataLines(
   summary: SpellPickerCompactSummary,
 ): CatalogMetadataLine[] {
+  if (summary.groups.length === 0) return []
+
   return [
     {
-      segments: summary.castingSummary.map((text) => ({
-        type: 'text' as const,
-        text,
-      })),
-    },
-    {
-      segments: [
-        {
-          type: 'text' as const,
-          text: summary.classification.levelLabel,
-        },
-        ...summary.classification.descriptors.map((text) => ({
-          type: 'text' as const,
-          text,
-        })),
-      ],
+      segments: summary.groups.map((group) => mapSpellPickerMetadataGroup(group)),
     },
   ]
 }
