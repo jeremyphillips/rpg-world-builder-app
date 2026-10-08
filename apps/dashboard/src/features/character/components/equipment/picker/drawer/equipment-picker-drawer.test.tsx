@@ -25,7 +25,9 @@ import {
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_SORT_GROUP_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
+  EQUIPMENT_PICKER_SORT_ORDER_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
 import {
@@ -281,9 +283,9 @@ describe('EquipmentPickerDrawer', () => {
     expect(
       screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
-      'Best match',
-    )
+    expect(
+      screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }),
+    ).toHaveTextContent('Best match')
   })
 
   it('keeps category selected when the active chip is clicked again', async () => {
@@ -325,7 +327,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
     await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
-    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
 
     expect(
@@ -339,9 +341,9 @@ describe('EquipmentPickerDrawer', () => {
     expect(
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
-      'Best match',
-    )
+    expect(
+      screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }),
+    ).toHaveTextContent('Best match')
     expect(
       screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).not.toBeInTheDocument()
@@ -368,7 +370,7 @@ describe('EquipmentPickerDrawer', () => {
         .map((row) => row.textContent),
     ).toEqual(expect.arrayContaining([expect.stringContaining('Cheap Gear')]))
 
-    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }))
     await user.click(screen.getByRole('option', { name: 'Price: Low to high' }))
 
     const names = within(list)
@@ -412,8 +414,12 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('group', { name: 'Sort equipment' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('group', { name: EQUIPMENT_PICKER_SORT_GROUP_LABEL }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }),
+    ).toBeInTheDocument()
     expect(screen.getByText(EQUIPMENT_PICKER_SORT_LABEL)).toBeInTheDocument()
   })
 
@@ -431,7 +437,7 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    await user.click(screen.getByRole('combobox', { name: 'Equipment sort order' }))
+    await user.click(screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }))
     await user.click(screen.getByRole('option', { name: 'Name: Z–A' }))
 
     rerender(
@@ -456,7 +462,9 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent('Z–A')
+    expect(
+      screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }),
+    ).toHaveTextContent('Z–A')
   })
 
   it('keeps added rows visible after quick-add', async () => {

@@ -1,10 +1,12 @@
-import type {
-  EquipmentBudgetSummary,
-  EquipmentPickerBrowseSortContext,
-  EquipmentPickerItem,
-  EquipmentPickerSupportedKind,
-  MagicItemAllowance,
-  MagicItemGrantProgress,
+import {
+  getContentTypeSentenceForm,
+  getContentTypeTerm,
+  type EquipmentBudgetSummary,
+  type EquipmentPickerBrowseSortContext,
+  type EquipmentPickerItem,
+  type EquipmentPickerSupportedKind,
+  type MagicItemAllowance,
+  type MagicItemGrantProgress,
 } from '@rpg/contracts'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
@@ -28,9 +30,17 @@ export type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
+const equipmentTerm = getContentTypeTerm('equipment')
+const equipmentPlural = getContentTypeSentenceForm('equipment', 2)
+
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
+
+export const EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL = `${equipmentTerm.label} picker workflow`
+export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = `Sort ${equipmentPlural}`
+export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = `${equipmentTerm.label} sort order`
+export const EQUIPMENT_PICKER_DESCRIPTION = 'Search the catalog and add items to your loadout.'
 
 export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const

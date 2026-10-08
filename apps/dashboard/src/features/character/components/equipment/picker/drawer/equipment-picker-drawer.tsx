@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, getContentTypeItemLabel } from '@/features/content'
+import { CatalogEntityPickerSheet } from '@/features/content'
 import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
@@ -20,9 +20,13 @@ import {
 } from '../browse/equipment-picker-filter-controls'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
+  EQUIPMENT_PICKER_DESCRIPTION,
   EQUIPMENT_PICKER_MODE_LABELS,
+  EQUIPMENT_PICKER_SORT_GROUP_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
+  EQUIPMENT_PICKER_SORT_ORDER_LABEL,
+  EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerToolbarResetMode,
@@ -163,7 +167,7 @@ export function EquipmentPickerDrawer({
             leadingIcon: <Icon />,
           }
         })}
-        aria-label={`${getContentTypeItemLabel('equipment')} picker workflow`}
+        aria-label={EQUIPMENT_PICKER_WORKFLOW_GROUP_LABEL}
         fullWidth
       />
     ) : null
@@ -188,7 +192,7 @@ export function EquipmentPickerDrawer({
       open={open}
       onOpenChange={onOpenChange}
       title={formatChoiceSetDrawerHeading('equipment')}
-      description="Search the catalog and add items to your loadout."
+      description={EQUIPMENT_PICKER_DESCRIPTION}
       items={picker.filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
@@ -247,8 +251,8 @@ export function EquipmentPickerDrawer({
           <CatalogSortControl
             value={picker.sortMode}
             label={EQUIPMENT_PICKER_SORT_LABEL}
-            ariaLabel="Sort equipment"
-            triggerAriaLabel="Equipment sort order"
+            ariaLabel={EQUIPMENT_PICKER_SORT_GROUP_LABEL}
+            triggerAriaLabel={EQUIPMENT_PICKER_SORT_ORDER_LABEL}
             options={picker.effectiveSortModes.map((mode) =>
               pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
             )}
