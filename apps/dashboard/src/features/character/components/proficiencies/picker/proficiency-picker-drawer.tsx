@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { CatalogPickerSelectionActions } from '@rpg/ui'
+import { CatalogPickerSelectionActions, resolveCatalogPickerRowActionPhase } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -141,7 +141,9 @@ export function ProficiencyPickerDrawer({
           kind: 'action',
           content: (
             <CatalogPickerSelectionActions
-              selected={item.state.isAlreadySelected}
+              phase={resolveCatalogPickerRowActionPhase({
+                isSelected: item.state.isAlreadySelected,
+              })}
               canSelect={item.state.canSelect}
               onAdd={() => onSelectOption(item.optionId)}
               onRemove={() => onRemoveOption(item.optionId)}

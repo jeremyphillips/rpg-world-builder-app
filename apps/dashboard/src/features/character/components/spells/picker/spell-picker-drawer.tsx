@@ -1,4 +1,8 @@
-import { SegmentedControl, CatalogPickerSelectionActions } from '@rpg/ui'
+import {
+  CatalogPickerSelectionActions,
+  resolveCatalogPickerRowActionPhase,
+  SegmentedControl,
+} from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -233,7 +237,9 @@ export function SpellPickerDrawer({
           kind: 'action',
           content: (
             <CatalogPickerSelectionActions
-              selected={item.state.isAlreadySelected}
+              phase={resolveCatalogPickerRowActionPhase({
+                isSelected: item.state.isAlreadySelected,
+              })}
               canSelect={item.state.canSelect}
               addLabel={addLabel}
               removeLabel={removeLabel}
