@@ -93,7 +93,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
           id={controlId}
           aria-label={triggerAriaLabel}
           size={presentation.controlSize}
-          className="w-full"
+          className={layout === 'inline' ? 'w-auto' : 'w-full'}
         >
           <SelectValue placeholder={selectField.label} />
         </SelectTrigger>

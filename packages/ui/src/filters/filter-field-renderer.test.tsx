@@ -23,6 +23,7 @@ type TestFilterState = {
   levels?: number[]
   mechanics?: Record<string, string[]>
   noAllStatus?: 'draft' | 'published'
+  school?: string
 }
 
 const schema = createFilterSchema<DemoRow, TestFilterState>([
@@ -70,6 +71,15 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
       { value: 'published', label: 'Published' },
     ],
     getValue: (row) => row.status as 'draft' | 'published',
+  }),
+  createEqualsFilter<DemoRow, TestFilterState, 'school', string>({
+    id: 'school',
+    label: 'School',
+    layout: 'inline',
+    ariaLabel: 'Filter by school',
+    showAllOption: false,
+    options: [{ value: 'all', label: 'All' }],
+    getValue: () => 'all',
   }),
   createPopoverFilter<DemoRow, TestFilterState, 'mechanics'>({
     id: 'mechanics',
@@ -142,6 +152,15 @@ describe('FilterFieldRenderer chrome', () => {
       </FilterChromeProvider>,
     )
     expect(screen.getByText('Status')).toHaveClass('text-sm')
+  })
+
+  it('sizes inline selects to their content', () => {
+    render(<RendererHarness fieldId="school" />)
+
+    const group = screen.getByRole('group', { name: 'Filter by school' })
+    expect(group).toHaveClass('w-fit')
+    expect(group).not.toHaveClass('w-full')
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('w-auto')
   })
 
   it('renders catalog chips with compact label sizing under default chrome', () => {

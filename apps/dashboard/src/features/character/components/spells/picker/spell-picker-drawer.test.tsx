@@ -70,6 +70,27 @@ describe('SpellPickerDrawer', () => {
     expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
   })
 
+  it('omits the primary toolbar row when level chips are hidden', () => {
+    renderCantripDrawer()
+
+    expect(document.querySelector('[data-slot="catalog-toolbar-primary"]')).toBeNull()
+  })
+
+  it('filters rows when a casting and mechanics checkbox is selected', async () => {
+    const user = userEvent.setup()
+    renderCantripDrawer({
+      cantripSelectedIds: [],
+      cantripItems: spellPickerOpenItemsFixture,
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Casting and mechanics filters' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Ritual' }))
+
+    expect(screen.getByRole('checkbox', { name: 'Ritual' })).toBeChecked()
+    expect(screen.getByText('Detect Magic')).toBeInTheDocument()
+    expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
+  })
+
   it('shows a Recommended badge when recommendations are enabled', () => {
     const recommendedItem = {
       ...spellPickerOpenItemsFixture[0]!,

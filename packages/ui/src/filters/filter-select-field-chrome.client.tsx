@@ -34,12 +34,16 @@ export function FilterSelectFieldChrome({
     return (
       <div
         data-field-align=""
-        className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+        className={cn(
+          presentation.controlBandClassName,
+          presentation.groupClassName,
+          'w-fit shrink-0',
+        )}
         role="group"
         aria-label={groupLabel}
       >
         <FilterFieldCaption>{label}</FilterFieldCaption>
-        <div className={cn('min-w-0', widthClassName)}>{children}</div>
+        <div className={cn(widthClassName)}>{children}</div>
       </div>
     )
   }

@@ -151,11 +151,13 @@ export function SpellPickerDrawer({
       defaultTabId={browseState.activeTabId}
       transformVisibleItems={transformVisibleItems}
       primaryControls={
-        <SpellPickerPrimaryFilterControls
-          schemaArgs={schemaArgs}
-          filterState={filterState}
-          onFilterStateChange={persistFilterState}
-        />
+        schemaArgs.showLevelChips ? (
+          <SpellPickerPrimaryFilterControls
+            schemaArgs={schemaArgs}
+            filterState={filterState}
+            onFilterStateChange={persistFilterState}
+          />
+        ) : undefined
       }
       emptyState={
         emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined

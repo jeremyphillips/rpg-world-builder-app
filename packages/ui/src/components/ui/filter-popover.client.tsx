@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
+import { PopoverLayerPortal } from './layer-portal-container.client'
 import { Text } from './text'
 import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
@@ -75,7 +76,7 @@ export function FilterPopover({
           {triggerLabel}
         </Button>
       </PopoverPrimitive.Trigger>
-      <PopoverPrimitive.Portal>
+      <PopoverLayerPortal>
         <PopoverPrimitive.Content align="start" className={contentClassName}>
           <div className={gridClassName}>
             {groups.map((group, index) => (
@@ -118,7 +119,7 @@ export function FilterPopover({
             ))}
           </div>
         </PopoverPrimitive.Content>
-      </PopoverPrimitive.Portal>
+      </PopoverLayerPortal>
     </PopoverPrimitive.Root>
   )
 }
