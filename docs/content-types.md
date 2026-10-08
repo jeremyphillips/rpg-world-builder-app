@@ -473,6 +473,14 @@ Dashboard derives surface labels from key-based helpers in
 directly. Sidebar and router crumbs derive collection labels from the same
 helpers — do not hand-roll display strings.
 
+`content-type-copy-drift.test.ts` fails when a copy-bearing binding redefines an
+exact singular label, collection label, or singular or plural sentence form.
+Use `getContentTypeTerm`, `getTermCollectionLabel`, and `getContentTypeSentenceForm`.
+A word that is not the RPG content type needs a site-scoped exception with a
+reason in `content-type-copy-drift.baseline.json`; do not allow that literal
+globally. Normal runs only compare the checked-in baseline. Refresh it with
+`UPDATE_CONTENT_TYPE_COPY_BASELINE=1`, then review the diff before checking it in.
+
 Keep this registry centralized while its entries share ownership and dependencies.
 Split it into domain modules only when those conditions change or the file becomes
 hard to navigate; preserve the existing content barrel and aliases if it is split.

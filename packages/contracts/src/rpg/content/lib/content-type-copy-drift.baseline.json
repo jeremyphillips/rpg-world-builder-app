@@ -1,0 +1,142 @@
+{
+  "baseline": [
+    {
+      "file": "apps/dashboard/src/features/character/lib/relationship/character-relationship-vocabulary-config.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Organizations",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/character/npc/components/quick-npc/quick-npc-requirements-fields.tsx",
+      "nearestSymbol": "SpellRequirementsField",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Spells",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/character/npc/components/quick-npc/quick-npc-starting-choices.tsx",
+      "bindingKind": "const",
+      "bindingName": "QUICK_NPC_ADD_STARTING_CHOICE_SPELL_MENU_LABEL",
+      "literal": "Spell",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/lib/forms/grants/equipment/equipment-grant-form-fields.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Equipment",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/lib/forms/organization-form-projection.ts",
+      "nearestSymbol": "buildOrganizationMemberAffinityFields",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Classes",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/lib/relationship/drawer/relationship-drawer-field-labels.ts",
+      "bindingKind": "const",
+      "bindingName": "RELATIONSHIP_DRAWER_ORGANIZATION_FIELD_LABEL",
+      "literal": "Organization",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/locations/components/connected-parties/location-inverse-people-connection-link-drawer.tsx",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Organization",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/locations/components/create/location-create-modal.tsx",
+      "nearestSymbol": "buildBuildingShellTabs",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Organizations",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/locations/lib/building-organizations/building-organizations-create-tab.lib.ts",
+      "bindingKind": "const",
+      "bindingName": "BUILDING_ORGANIZATIONS_TAB_HEADING",
+      "literal": "Organizations",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/features/content/organizations/lib/organization-display.ts",
+      "bindingKind": "const",
+      "bindingName": "ORGANIZATION_DRAWER_CONTEXT_TYPE_LABEL",
+      "literal": "Organization",
+      "count": 1
+    },
+    {
+      "file": "apps/dashboard/src/stories/card-recipes/card-recipes.registry.tsx",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Class",
+      "count": 1
+    },
+    {
+      "file": "packages/contracts/src/name-generator/subject-kind.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Organization",
+      "count": 1
+    },
+    {
+      "file": "packages/contracts/src/rpg/content/tables/general-table-fixtures.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Species",
+      "count": 1
+    },
+    {
+      "file": "packages/contracts/src/rpg/runtime/character-builder/npc/resolve-npc-starting-choices.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Equipment",
+      "count": 1
+    },
+    {
+      "file": "packages/contracts/src/rpg/runtime/character-builder/npc/resolve-npc-starting-choices.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Spells",
+      "count": 1
+    },
+    {
+      "file": "packages/contracts/src/rpg/vocab/character-relationship/section.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Organizations",
+      "count": 1
+    },
+    {
+      "file": "packages/ui/src/components/ui/rich-text-link-picker.client.tsx",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Feats",
+      "count": 1
+    },
+    {
+      "file": "packages/ui/src/components/ui/rich-text-link-picker.client.tsx",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Spells",
+      "count": 1
+    }
+  ],
+  "exceptions": [
+    {
+      "file": "packages/contracts/src/rpg/vocab/proficiency.ts",
+      "bindingKind": "property",
+      "bindingName": "label",
+      "literal": "Skill Proficiency",
+      "reason": "Proficiency domain entry, not the catalog content type"
+    }
+  ]
+}
