@@ -54,7 +54,7 @@ export function ArrayItemIssueBadge({
         aria-label={`${issueCountLabel(issueCount)} in ${rowLabel}`}
         onClick={onPress}
       >
-        <AlertTriangle className="size-3.5" aria-hidden />
+        <AlertTriangle className="size-icon-inline" aria-hidden />
         <span className={compact ? 'tabular-nums' : undefined}>
           {compact ? issueCountCompactLabel(issueCount) : issueCountLabel(issueCount)}
         </span>
@@ -114,7 +114,7 @@ export function ArrayItemIssueSummary({
       className={cn(arrayItemIssueSummaryClasses({ placement }), className)}
       data-array-item-issue-summary
     >
-      <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+      <AlertTriangle className="size-icon-inline shrink-0" aria-hidden />
       <button type="button" onClick={onPrimaryPress}>
         {firstIssue.message}
       </button>
@@ -170,7 +170,7 @@ export function ArrayLegendIssueLink({
       aria-label={`Review ${label} in ${sectionLabel}`}
       onClick={onPress}
     >
-      <AlertTriangle className="size-3.5" aria-hidden />
+      <AlertTriangle className="size-icon-inline" aria-hidden />
       {label}
     </button>
   )

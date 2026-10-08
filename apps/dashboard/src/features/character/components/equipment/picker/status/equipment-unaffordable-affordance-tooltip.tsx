@@ -15,7 +15,7 @@ export function EquipmentUnaffordableAffordanceTooltip({
 
   return (
     <Text as="span" variant="warning" className="flex items-start gap-1.5 text-xs">
-      <CircleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+      <CircleAlert className="mt-0.5 size-icon-inline shrink-0" aria-hidden />
       <EmphasisDetailLine
         primary={`${need} needed`}
         primaryTone="warning"

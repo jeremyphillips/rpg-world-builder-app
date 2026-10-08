@@ -25,7 +25,7 @@ export const masterDetailEditorStatusRowClasses =
   'flex flex-wrap items-center gap-x-6 pt-0.5 text-xs'
 
 export const masterDetailEditorIssueSummaryClasses =
-  'inline-flex min-w-0 items-center gap-1 font-medium text-destructive-muted'
+  'inline-flex min-w-0 items-center gap-1 text-xs font-medium text-destructive-muted'
 
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 

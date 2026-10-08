@@ -27,9 +27,10 @@ describe('TicketMeta', () => {
       </MemoryRouter>,
     )
 
-    expect(
-      screen.getByRole('link', { name: `Open ${sampleTicket.key} full page` }),
-    ).toHaveAttribute('href', `/bench/tickets/${sampleTicket.id}`)
+    const link = screen.getByRole('link', { name: `Open ${sampleTicket.key} full page` })
+    expect(link).toHaveAttribute('href', `/bench/tickets/${sampleTicket.id}`)
+    expect(link.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(link.querySelector('svg')).not.toHaveClass('size-3.5')
   })
 
   itAxe('has no axe accessibility violations', async () => {

@@ -18,6 +18,8 @@ describe('array-item-issue', () => {
     const badge = screen.getByRole('button', { name: '2 issues in Hero' })
     expect(badge).toHaveClass('text-semantic-destructive-soft-foreground')
     expect(badge).toHaveTextContent('2 issues')
+    expect(badge.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(badge.querySelector('svg')).not.toHaveClass('size-3.5')
 
     rerender(<ArrayItemIssueBadge issueCount={2} rowLabel="Hero" prominence="aggregate" />)
     expect(screen.getByRole('button', { name: '2 issues in Hero' })).toHaveClass(
@@ -76,6 +78,8 @@ describe('array-item-issue', () => {
     })
     expect(link).toHaveTextContent('2 issues in 1 row')
     expect(link).toHaveClass('text-destructive-muted')
+    expect(link.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(link.querySelector('svg')).not.toHaveClass('size-3.5')
 
     await user.click(link)
     expect(onPress).toHaveBeenCalledOnce()

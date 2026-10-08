@@ -16,7 +16,7 @@ export function MasterDetailEditorIssueSummary({ count }: MasterDetailEditorIssu
 
   return (
     <span className={masterDetailEditorIssueSummaryClasses}>
-      <AlertTriangle className="size-3.5 shrink-0" aria-hidden />
+      <AlertTriangle className="size-icon-inline shrink-0" aria-hidden />
       {masterDetailEditorIssueCountLabel(count)}
     </span>
   )

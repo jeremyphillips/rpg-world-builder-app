@@ -85,7 +85,7 @@ export function EntitySummaryStatusItemView({
     case 'validationError':
       return (
         <span className="inline-flex items-center gap-1">
-          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
+          <AlertCircle className="size-icon-inline shrink-0 text-destructive" aria-hidden />
           <span className="sr-only">Has validation errors</span>
         </span>
       )

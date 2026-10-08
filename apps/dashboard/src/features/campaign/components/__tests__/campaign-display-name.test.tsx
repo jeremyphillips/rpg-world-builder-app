@@ -8,6 +8,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { CampaignDisplayName } from '../campaign-display-name'
 import { CampaignDisplayNameList } from '../campaign-display-name-list'
+import { campaignDisplayNameIconVariants } from '../campaign-display-name.variants'
 
 describe('CampaignDisplayName', () => {
   it('renders a linked topbar identity', () => {
@@ -52,6 +53,14 @@ describe('CampaignDisplayName', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+})
+
+describe('campaignDisplayNameIconVariants', () => {
+  it('sizes the inline muted mark from the text owner', () => {
+    const classes = campaignDisplayNameIconVariants({ surface: 'inlineMuted' })
+    expect(classes).toContain('size-icon-inline')
+    expect(classes).not.toContain('size-3.5')
   })
 })
 

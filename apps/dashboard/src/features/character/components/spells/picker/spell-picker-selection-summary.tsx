@@ -13,7 +13,7 @@ export type SpellPickerSelectionSummaryProps = {
 function SelectionCount({ complete, countText }: { complete: boolean; countText: string }) {
   return (
     <span className={complete ? 'inline-flex items-center gap-1 text-success' : undefined}>
-      {complete ? <Check aria-hidden className="size-3.5 shrink-0" /> : null}
+      {complete ? <Check aria-hidden className="size-icon-inline shrink-0" /> : null}
       <span>{countText}</span>
     </span>
   )

@@ -33,6 +33,8 @@ describe('ContentCampaignAvailabilityAction', () => {
       'text-semantic-warning',
     )
     expect(screen.getByText(CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT)).toBeInTheDocument()
+    expect(document.querySelector('svg')).toHaveClass('size-icon-inline')
+    expect(document.querySelector('svg')).not.toHaveClass('size-3.5')
   })
 
   it('calls onAvailableChange when the switch is toggled', async () => {

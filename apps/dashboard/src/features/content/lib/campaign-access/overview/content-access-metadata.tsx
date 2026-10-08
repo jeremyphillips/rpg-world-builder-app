@@ -33,7 +33,7 @@ function resolveManagerAccessMetadata(
   if (!campaignAccess.available) {
     const detail = resolveCampaignAccessDetail(campaignAccess)
     return {
-      icon: <CircleSlash aria-hidden className="size-3 shrink-0 text-semantic-warning" />,
+      icon: <CircleSlash aria-hidden className="size-icon-inline shrink-0 text-semantic-warning" />,
       primary: <span className="text-semantic-warning">Unavailable</span>,
       secondary: detail,
       tooltip: CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_TOOLTIP,
@@ -43,7 +43,7 @@ function resolveManagerAccessMetadata(
 
   if (campaignAccess.visibilityMode === 'dm_only') {
     return {
-      icon: <Lock aria-hidden className="size-3 shrink-0" />,
+      icon: <Lock aria-hidden className="size-icon-inline shrink-0" />,
       primary: resolveCampaignAccessDetail(campaignAccess),
       tooltip: CAMPAIGN_ACCESS_TABLE_DM_ONLY_TOOLTIP,
       tooltipLabel: 'About DM only access',
@@ -52,7 +52,7 @@ function resolveManagerAccessMetadata(
 
   if (campaignAccess.visibilityMode === 'specific_players') {
     return {
-      icon: <Users aria-hidden className="size-3 shrink-0" />,
+      icon: <Users aria-hidden className="size-icon-inline shrink-0" />,
       primary: formatSelectedPlayersCount(campaignAccess.participantIds.length),
       tooltip: CAMPAIGN_ACCESS_TABLE_SELECTED_PLAYERS_TOOLTIP,
       tooltipLabel: 'About selected player access',
@@ -77,7 +77,7 @@ function resolvePlayerAccessMetadata(
 
   if (playerVisibility.otherParticipantCount === 0) {
     return {
-      icon: <Users aria-hidden className="size-3 shrink-0" />,
+      icon: <Users aria-hidden className="size-icon-inline shrink-0" />,
       primary: PLAYER_VISIBLE_ONLY_TO_YOU_LABEL,
       tooltip: PLAYER_VISIBLE_ONLY_TO_YOU_TOOLTIP,
       tooltipLabel: 'About limited visibility',
@@ -85,7 +85,7 @@ function resolvePlayerAccessMetadata(
   }
 
   return {
-    icon: <Users aria-hidden className="size-3 shrink-0" />,
+    icon: <Users aria-hidden className="size-icon-inline shrink-0" />,
     primary: formatPlayerLimitedVisibilityLabel(playerVisibility.otherParticipantCount),
     tooltip: PLAYER_LIMITED_VISIBILITY_TOOLTIP,
     tooltipLabel: 'About limited visibility',
@@ -106,7 +106,7 @@ export function ContentAccessMetadata({
   }
 
   return (
-    <div className="ml-auto flex items-center gap-1 text-muted-foreground">
+    <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
       {content.icon}
       <span className="inline-flex items-center gap-1">
         <span>{content.primary}</span>
