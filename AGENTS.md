@@ -148,6 +148,19 @@ Closed vocabulary maps in `@rpg/contracts` use a two-layer pattern: `*_TERM`
 require a sibling `*_TERM` — see
 [packages/contracts/docs/structure.md](packages/contracts/docs/structure.md#reference-vocabulary-gametermentry).
 
+Catalog nouns such as `Species`, `Spells`, and `species` are already owned by
+`CONTENT_TYPE_TERMS`. In a copy binding (`label`, a `*Label` / `*Title` /
+`*Heading` / `*Placeholder` const, or a direct return from such a function),
+call `getContentTypeTerm`, `getTermCollectionLabel`, or `getContentTypeSentenceForm`.
+Do not introduce another string or local constant for that noun. The drift
+ratchet and site-scoped exceptions are in
+[docs/content-types.md](docs/content-types.md#catalog-content-type-terms-content_type_terms).
+
+Other closed vocabulary (a spell school, a creature type, a damage type) comes from
+that entry's `*_TERM` / `*_ENTRIES` map. Use `vocabularyTermLabel` or
+`getTermSentenceForm`. Do not copy the label, and do not route it through
+`CONTENT_TYPE_TERMS`.
+
 ## Storybook (dashboard)
 
 No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cursor/rules/storybook-router.mdc](.cursor/rules/storybook-router.mdc). Port **6007**; primitives → `@rpg/ui` Storybook (`:6006`).

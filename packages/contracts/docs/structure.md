@@ -611,7 +611,11 @@ Catalog collection chrome uses a separate registry in
 by `ContentTypeKey`. Each entry is a `VocabularyTerm` with `label`,
 `description`, and `sentence` forms. Exported aliases use the `*_CONTENT_TYPE_TERM`
 qualifier (e.g. `SPECIES_CONTENT_TYPE_TERM`) — not generic `SPECIES_TERM`, which
-would collide with field taxonomy.
+would collide with field taxonomy. Exact singular labels, collection labels, and
+sentence forms are ratcheted by
+[`content-type-copy-drift.test.ts`](../src/rpg/content/lib/content-type-copy-drift.test.ts);
+policy is in
+[content-types.md](../../../docs/content-types.md#catalog-content-type-terms-content_type_terms).
 
 `compactLabel` on content-type terms is reserved for semantically distinct
 abbreviations. Most types rely on `label` + `sentence.plural` + dashboard
