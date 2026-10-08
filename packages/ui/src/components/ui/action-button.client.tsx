@@ -6,6 +6,7 @@ import { cn } from '../../lib/utils'
 import { ACTION_ICONS, type ActionIconVerb } from './action-icons.map'
 import { Button, type ButtonProps } from './button.client'
 import { iconGlyphRootClasses, type IconGlyphStep } from './icon-glyph.variants'
+import { resolveButtonIconGlyphStep } from './resolve-button-icon-glyph-step'
 
 export type ActionButtonProps = Omit<ButtonProps, 'children'> & {
   action: ActionIconVerb
@@ -20,15 +21,26 @@ export type ActionButtonProps = Omit<ButtonProps, 'children'> & {
 export function ActionButton({
   action,
   children,
-  iconStep = 'lg',
+  iconStep: iconStepProp,
   className,
+  variant,
+  size,
+  density,
   ...buttonProps
 }: ActionButtonProps) {
   const Icon = ACTION_ICONS[action]
   const hasLabel = children != null && children !== ''
+  const iconStep = iconStepProp ?? resolveButtonIconGlyphStep(size, density, variant)
 
   return (
-    <Button type="button" className={className} {...(buttonProps as ButtonProps)}>
+    <Button
+      type="button"
+      className={className}
+      variant={variant}
+      size={size}
+      density={density}
+      {...(buttonProps as ButtonProps)}
+    >
       <Icon aria-hidden className={cn(iconGlyphRootClasses[iconStep], hasLabel && 'shrink-0')} />
       {hasLabel ? children : null}
     </Button>

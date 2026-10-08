@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { ArrowRight, Plus } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Button } from './button.client'
+import { Spinner } from './spinner'
 
 describe('Button', () => {
   it('renders its children as an accessible button', () => {
@@ -85,6 +87,33 @@ describe('Button', () => {
       'size-control-action-lg',
       '[&_svg]:size-icon-glyph-lg',
     )
+  })
+
+  it('applies tier gap for leading icon, trailing icon, and spinner compositions', () => {
+    const { rerender } = render(
+      <Button size="xs" variant="outline">
+        <Plus aria-hidden />
+        Reset
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass('gap-1')
+
+    rerender(
+      <Button size="sm" variant="outline">
+        Next
+        <ArrowRight aria-hidden />
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: 'Next' })).toHaveClass('gap-1.5')
+
+    rerender(
+      <Button size="default" variant="default" disabled>
+        <Spinner size="sm" />
+        <Plus aria-hidden />
+        Saving
+      </Button>,
+    )
+    expect(screen.getByRole('button', { name: /saving/i })).toHaveClass('gap-2')
   })
 
   it('attached variant fills a segment instead of using standalone button height', () => {

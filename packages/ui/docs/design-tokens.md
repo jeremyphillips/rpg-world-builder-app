@@ -261,18 +261,32 @@ Label type for the xs tier: `text-control-action-xs` (10px) — control lane onl
 **Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
 geometry (its own `xs`–`lg` ladder in `number-stepper.variants.ts`), spinner sizing.
 
+### Icon–label gap (labeled controls)
+
+Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts) — `CONTROL_ACTION_GAP_CLASSES`
+
+| Metrics tier | Utility   | px  |
+| ------------ | --------- | --- |
+| xs (dense)   | `gap-1`   | 4   |
+| sm           | `gap-1.5` | 6   |
+| md           | `gap-2`   | 8   |
+
+Labeled `Button` (and matching recipes) derive gap from the **same effective tier** as glyph and height — see `resolveControlActionMetricsTier()` in [`resolve-control-action-metrics-tier.ts`](../src/components/ui/resolve-control-action-metrics-tier.ts). Do not set `gap-*` on buttons unless the composition is intentionally exceptional.
+
 ### Named pairings
 
-| Recipe                                      | Hit       | Glyph |
-| ------------------------------------------- | --------- | ----- | --------------------------------------------- |
-| `controlActionCompactIconClasses`           | compact   | md    |
-| `controlActionCompactTextClasses`           | compact   | —     |
-| `controlActionCompactTextWithIconClasses`   | compact   | sm    |
-| `controlActionDefaultIconClasses`           | default   | lg    |
-| `controlActionLgIconClasses`                | lg        | lg    | Button `size="icon-lg"`                       |
-| `controlActionXsTextClasses`                | xs (28px) | xs    | Button `size="xs"`, default density           |
-| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | Button `size="xs"`, compact density           |
-| `controlActionXsIconClasses`                | compact   | xs    | Button `size="icon-xs"` (density-independent) |
+| Recipe                                      | Hit       | Glyph | Gap (tier)    |
+| ------------------------------------------- | --------- | ----- | ------------- |
+| `controlActionCompactIconClasses`           | compact   | md    | — (icon-only) |
+| `controlActionCompactTextClasses`           | compact   | —     | —             |
+| `controlActionCompactTextWithIconClasses`   | compact   | sm    | xs            |
+| `controlActionDefaultIconClasses`           | default   | lg    | — (icon-only) |
+| `controlActionLgIconClasses`                | lg        | lg    | — (icon-only) |
+| `controlActionXsTextClasses`                | xs (28px) | xs    | xs            |
+| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | xs            |
+| `controlActionXsIconClasses`                | compact   | xs    | — (icon-only) |
+| (inline in `button.variants`)               | sm (32px) | sm    | sm            |
+| (inline in `button.variants`)               | default   | lg    | md            |
 
 Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
 `control-action.variants.test.ts`.
