@@ -15,8 +15,8 @@ describe('CatalogToolbarResetSlot', () => {
     const button = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(button).toHaveTextContent(CATALOG_TOOLBAR_RESET_VISIBLE_LABEL)
     expect(button).toHaveAttribute('title', CATALOG_TOOLBAR_RESET_WITH_SORT_NAME)
-    expect(button).toHaveClass('h-control-action-compact')
-    expect(button.querySelector('svg')).toHaveClass('size-icon-glyph-xs')
+    expect(button).toHaveClass('h-8')
+    expect(button.querySelector('svg')).toHaveClass('size-icon-glyph-sm')
   })
 
   it('omits sorting from the accessible name when the toolbar has no sort', () => {

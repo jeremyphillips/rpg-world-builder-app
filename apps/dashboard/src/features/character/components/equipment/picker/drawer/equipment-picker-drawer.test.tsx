@@ -395,8 +395,8 @@ describe('EquipmentPickerDrawer', () => {
 
     const resetButton = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(resetButton).toHaveTextContent('Reset')
-    expect(resetButton).toHaveClass('h-control-action-compact')
-    expect(resetButton.querySelector('svg')).toHaveClass('size-icon-glyph-xs')
+    expect(resetButton).toHaveClass('h-8')
+    expect(resetButton.querySelector('svg')).toHaveClass('size-icon-glyph-sm')
   })
 
   it('shows the sort control with an accessible label', () => {

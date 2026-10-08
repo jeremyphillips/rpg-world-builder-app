@@ -31,9 +31,9 @@ export function CatalogToolbarResetAction({
     <ActionButton
       action="reset"
       variant="text"
-      size="xs"
-      density="compact"
-      iconStep="xs"
+      size="sm"
+      density="default"
+      iconStep="sm"
       aria-label={accessibleName}
       title={accessibleName}
       onClick={onClick}
