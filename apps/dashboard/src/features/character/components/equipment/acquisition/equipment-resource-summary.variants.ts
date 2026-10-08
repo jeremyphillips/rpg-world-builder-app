@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority'
 
 export const equipmentResourceSummaryStackClasses = 'flex min-w-0 w-full flex-col'
 
-/** Lets the group heading wrap inside ContentCardBody's truncated heading slot. */
+/** Lets the group heading wrap inside the resource-summary heading slot. */
 export const equipmentResourceSummaryHeadingClasses = 'whitespace-normal'
 
 export const equipmentResourceSummarySectionDividerVariants = cva('border-t border-border', {

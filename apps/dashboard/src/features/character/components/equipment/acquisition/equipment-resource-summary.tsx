@@ -5,12 +5,18 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   Badge,
   Button,
-  ContentCardBody,
   Heading,
   IconContainer,
   StatusIcon,
   cn,
+  contentCardBodyVariants,
+  contentCardHeadingRowVariants,
+  contentCardMediaEndGapVariants,
+  contentCardMetadataVariants,
   contentCardRootVariants,
+  contentCardSubheadingVariants,
+  resolveContentCardBodyCrossAxis,
+  resolveContentCardHeadingRowRhythm,
   resolveSurfaceClasses,
   resourceIcon,
   type ContentCardDensity,
@@ -95,23 +101,39 @@ function ResourceSummaryRow({
   metadata?: ReactNode
   action?: EquipmentResourceSummaryAction
 }) {
+  const hasSecondaryText = Boolean(subheading || metadata)
+  const crossAxis = resolveContentCardBodyCrossAxis(hasSecondaryText)
+  const headingRowRhythm = resolveContentCardHeadingRowRhythm({
+    hasSecondaryText,
+    hasHeadingEndSlot: false,
+  })
+
   return (
-    <ContentCardBody
-      density={density}
-      media={media}
-      heading={heading}
-      subheading={
-        subheading ? (
-          <div className={equipmentResourceSummaryDescriptionClasses}>{subheading}</div>
-        ) : undefined
-      }
-      metadata={
-        metadata ? (
-          <div className={equipmentResourceSummaryBadgeListClasses}>{metadata}</div>
-        ) : undefined
-      }
-      endSlot={action ? <ResourceSummaryAction action={action} /> : undefined}
-    />
+    <div className={contentCardBodyVariants({ density, crossAxis })}>
+      {media ? (
+        <div className={cn('shrink-0', contentCardMediaEndGapVariants({ density }))}>{media}</div>
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <div className={contentCardHeadingRowVariants({ rhythm: headingRowRhythm })}>
+          <div className="min-w-0 flex-1">{heading}</div>
+        </div>
+        {subheading ? (
+          <div className={contentCardSubheadingVariants({ density })}>
+            <div className={equipmentResourceSummaryDescriptionClasses}>{subheading}</div>
+          </div>
+        ) : null}
+        {metadata ? (
+          <div className={contentCardMetadataVariants({ density })}>
+            <div className={equipmentResourceSummaryBadgeListClasses}>{metadata}</div>
+          </div>
+        ) : null}
+      </div>
+      {action ? (
+        <div className="shrink-0 self-center">
+          <ResourceSummaryAction action={action} />
+        </div>
+      ) : null}
+    </div>
   )
 }
 

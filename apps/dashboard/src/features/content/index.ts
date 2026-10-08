@@ -33,6 +33,7 @@ export {
   formatCatalogMetadataLines,
   type CatalogCollapsibleListProps,
   type CatalogMetadataLine,
+  type CatalogMetadataSegment,
 } from './components/catalog'
 export {
   ContentEntityCard,

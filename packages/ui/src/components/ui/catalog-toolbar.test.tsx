@@ -193,11 +193,14 @@ describe('CatalogToolbar', () => {
       expect(content).toHaveTextContent('Utility filters')
       expect(viewControls).toHaveTextContent('Sort')
       expect(viewControls).toContainElement(screen.getByRole('button', { name: 'Reset' }))
+      expect(primary).not.toBeNull()
+      expect(content).not.toBeNull()
+      expect(viewControls).not.toBeNull()
       expect(
-        primary?.compareDocumentPosition(content as Node) & Node.DOCUMENT_POSITION_FOLLOWING,
+        primary!.compareDocumentPosition(content!) & Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy()
       expect(
-        content?.compareDocumentPosition(viewControls as Node) & Node.DOCUMENT_POSITION_FOLLOWING,
+        content!.compareDocumentPosition(viewControls!) & Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy()
       expectContainerQueryBand()
     })

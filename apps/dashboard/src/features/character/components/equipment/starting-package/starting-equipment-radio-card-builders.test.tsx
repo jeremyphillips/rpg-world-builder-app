@@ -4,10 +4,11 @@ import { render, screen } from '@testing-library/react'
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuilderDraft,
-  CharacterClass,
   StartingEquipmentOptionSummary,
 } from '@rpg/contracts'
 import { RadioCard } from '@rpg/ui'
+
+import { makeCharacterClass } from '@/test/fixtures/factories/character-class'
 
 import {
   buildGoldRadioCardOption,
@@ -46,11 +47,10 @@ function summary(
   }
 }
 
-const characterClass = {
-  id: 'barbarian',
-  rulesetId: 'srd-cc-5.2.1',
-  characterCreation: { startingEquipment: { options: [] } },
-} as unknown as CharacterClass
+const characterClass = makeCharacterClass({
+  slug: 'barbarian',
+  characterCreation: { startingEquipment: { choose: 1, options: [] } },
+})
 
 describe('starting equipment radio card tier summary', () => {
   it('shows the shared tier row on package and gold options', () => {

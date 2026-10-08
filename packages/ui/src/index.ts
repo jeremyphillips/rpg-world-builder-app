@@ -781,17 +781,24 @@ export {
 } from './components/ui/content-display-fallback-icon.variants'
 export {
   contentCardRootVariants,
+  contentCardBodyVariants,
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
+  contentCardHeadingRowVariants,
+  contentCardMediaEndGapVariants,
   contentCardMediaVariants,
+  contentCardMetadataVariants,
+  contentCardSubheadingVariants,
   contentCardIdentityColumnGapVariants,
   supportingTextDensityVariants,
+  resolveContentCardBodyCrossAxis,
   resolveContentCardDensityInsetClasses,
   resolveContentCardIdentityColumnGapClasses,
   type ContentCardDensity,
   type ContentCardChrome,
   type ContentCardSurface,
 } from './components/ui/content-card.variants'
+export { resolveContentCardHeadingRowRhythm } from './components/ui/content-card.lib'
 export {
   NotificationBell,
   type NotificationBellProps,

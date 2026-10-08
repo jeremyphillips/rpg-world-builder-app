@@ -509,7 +509,7 @@ describe('CatalogPickerSheet', () => {
     const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
     expect(header).toHaveClass('pb-0')
-    expect(header).toContainElement(toolbar)
+    expect(header).toContainElement(toolbar as HTMLElement | null)
     expect(toolbar).toHaveClass('px-0')
     expect(toolbar).not.toHaveClass('pb-4')
   })

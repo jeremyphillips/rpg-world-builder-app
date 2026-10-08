@@ -1,3 +1,4 @@
+import type { TierBonusGold } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 
@@ -6,12 +7,12 @@ import { StartingGoldBonusTooltipBody } from './starting-gold-bonus-tooltip'
 const heroBonusGold = {
   baseGp: 500,
   formula: {
-    kind: 'dice' as const,
+    kind: 'dice',
     dice: { count: 1, faces: 10 },
     multiplier: 25,
-    currency: 'gp' as const,
+    currency: 'gp',
   },
-}
+} satisfies TierBonusGold
 
 describe('StartingGoldBonusTooltipBody', () => {
   it('pairs the bonus with a calculated-from sentence', () => {
