@@ -1,3 +1,4 @@
+import { getSpellDeliveryMethodLabel } from '../../../vocab/spell/delivery-method'
 import type { GameTermEntry, VocabularyTerm } from '../../../vocab/types'
 
 // ---------------------------------------------------------------------------
@@ -285,7 +286,15 @@ export function getSpellResolutionTargetKindLabel(kind: string): string {
   return SPELL_RESOLUTION_TARGET_KIND_ENTRIES[kind as SpellResolutionTargetKind]?.label ?? kind
 }
 
+const SPELL_RESOLUTION_ATTACK_TYPE_TO_DELIVERY = {
+  'melee-spell': 'melee-spell-attack',
+  'ranged-spell': 'ranged-spell-attack',
+} as const satisfies Record<SpellResolutionAttackType, string>
+
 export function getSpellResolutionAttackTypeLabel(attackType: string): string {
+  const deliveryId =
+    SPELL_RESOLUTION_ATTACK_TYPE_TO_DELIVERY[attackType as SpellResolutionAttackType]
+  if (deliveryId) return getSpellDeliveryMethodLabel(deliveryId)
   return (
     SPELL_RESOLUTION_ATTACK_TYPE_ENTRIES[attackType as SpellResolutionAttackType]?.label ??
     attackType

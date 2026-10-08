@@ -1,4 +1,4 @@
-import { formatSpellLevel } from '@rpg/contracts'
+import { formatSpellLevel, getContentTypeSentenceForm } from '@rpg/contracts'
 
 export type SpellLevelTabLayoutRow = {
   levels: number[]
@@ -61,10 +61,12 @@ export function formatSpellLevelTabLevelLabel(level: number): string {
   return `${formatSpellLevelTabOrdinal(level)} level`
 }
 
-export const SPELL_LEVEL_TABS_HEADING = 'Choose spells by level' as const
+const spellPlural = getContentTypeSentenceForm('spells', 2)
+
+export const SPELL_LEVEL_TABS_HEADING = `Choose ${spellPlural} by level` as const
 
 export const SPELL_LEVEL_TABS_SUBHEAD =
-  'Choose spells by level. Use the level tabs below to review progress.' as const
+  `Choose ${spellPlural} by level. Use the level tabs below to review progress.` as const
 
 export function formatSpellLevelTabsRangeHeading(minLevel: number, maxLevel: number): string {
   if (minLevel === maxLevel) {

@@ -1,3 +1,5 @@
+import { getSlotProgressionKindLabel } from '../../../vocab/spell/slot-progression-kind'
+
 import type { SpellcastingProgressionSeed } from './patch'
 import { indexSpellcastingProgressionRecords } from './patch'
 
@@ -6,7 +8,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
   slotProgressions: [
     {
       id: 'full-caster',
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       kind: 'leveled',
       extension: 'carryForward',
       rows: [
@@ -18,7 +20,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
     },
     {
       id: 'half-caster',
-      label: 'Half caster',
+      label: getSlotProgressionKindLabel('half-caster'),
       kind: 'leveled',
       extension: 'carryForward',
       rows: [
@@ -28,7 +30,7 @@ export const spellcastingProgressionTestSeed: SpellcastingProgressionSeed = {
     },
     {
       id: 'pact-magic',
-      label: 'Pact Magic',
+      label: getSlotProgressionKindLabel('pact-magic'),
       kind: 'pact',
       extension: 'carryForward',
       rows: [

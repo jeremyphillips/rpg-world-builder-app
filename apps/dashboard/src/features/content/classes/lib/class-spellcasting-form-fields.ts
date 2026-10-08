@@ -13,6 +13,8 @@ import {
   spellRecommendationSchema,
   spellcastingFocusGearKindSchema,
   spellcastingGearKindSchema,
+  getContentTypeSentenceForm,
+  getSpellCollectionKindLabel,
 } from '@rpg/contracts'
 import {
   defineDependentField,
@@ -181,7 +183,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          label: 'Cantrips',
+          label: getSpellCollectionKindLabel('cantrips'),
           visibility: visibleWhenSpellcasting(),
           fields: [
             {
@@ -194,7 +196,7 @@ export function spellcastingFields(ctx: ContentFormCtx): FormItem[] {
         },
         {
           kind: 'group',
-          label: 'Level 1+ spells',
+          label: `Level 1+ ${getContentTypeSentenceForm('spells', 2)}`,
           visibility: visibleWhenSpellcasting(),
           fields: [
             spellSelectionLearnedCollectionDependent(ctx),

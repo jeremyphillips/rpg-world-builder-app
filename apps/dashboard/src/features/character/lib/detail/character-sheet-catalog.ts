@@ -14,6 +14,7 @@ import {
   type Equipment,
   type Character,
   type Spell,
+  getCantripLevelLabel,
 } from '@rpg/contracts'
 
 import type { CatalogMetadataLine } from '@/features/content'
@@ -253,7 +254,7 @@ function collectSpellMarkers(spell: Spell): SpellMarker[] {
 }
 
 function mapSpellCompactSummaryToMetadataLines(spell: Spell): readonly CatalogMetadataLine[] {
-  const levelLabel = spell.level === 0 ? 'Cantrip' : `Level ${spell.level}`
+  const levelLabel = spell.level === 0 ? getCantripLevelLabel() : `Level ${spell.level}`
 
   return [
     {

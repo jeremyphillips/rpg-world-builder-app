@@ -30,7 +30,10 @@ import {
   type SpellMutationPolicy,
 } from '../../vocab/spell/spell-mutation-policy'
 import type { SpellChoiceSource } from '../../vocab/spell/spell-choice-source'
-import type { SpellCollectionKind } from '../../vocab/spell/spell-collection-kind'
+import {
+  getSpellCollectionKindLabel,
+  type SpellCollectionKind,
+} from '../../vocab/spell/spell-collection-kind'
 import type { ProgressionExtension } from '../../vocab/spell/progression-extension'
 
 // ---------------------------------------------------------------------------
@@ -83,7 +86,7 @@ function compileCantripProgression(
     source: { kind: 'classList' },
     destination: 'cantrips',
     mutation: IMMUTABLE_SPELL_MUTATION,
-    label: 'Cantrips',
+    label: getSpellCollectionKindLabel('cantrips'),
     curve: capacityCurve(progression.cantrips),
     showInTable: true,
   }

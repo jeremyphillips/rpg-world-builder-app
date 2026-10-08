@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatFieldMessage } from '@rpg/contracts'
+import { formatFieldMessage, getSlotProgressionKindLabel } from '@rpg/contracts'
 import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
 
 import {
@@ -41,7 +41,7 @@ describe('resolvePactSlotFixedColumns', () => {
 describe('validateLeveledSlotProgressionDraft', () => {
   it('accepts a canonical full-caster seed draft', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     })
@@ -51,7 +51,7 @@ describe('validateLeveledSlotProgressionDraft', () => {
 
   it('surfaces exact row and slot column copy for decreasing slot counts', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     })
@@ -123,7 +123,7 @@ describe('validatePactSlotProgressionDraft', () => {
 describe('mapLeveledSlotProgressionDraftToRows', () => {
   it('normalizes trailing zero slot columns on save mapping', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 3,
       seedRows: [{ level: 1, slots: [2] }],
     })

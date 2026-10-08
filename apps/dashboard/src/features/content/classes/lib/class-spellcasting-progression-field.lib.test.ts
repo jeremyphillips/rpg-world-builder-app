@@ -1,3 +1,4 @@
+import { getSpellCollectionKindLabel } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -18,7 +19,12 @@ describe('class-spellcasting-progression-field.lib', () => {
         kind: 'levelProgression',
         name: 'Spellcasting progression',
         columns: [
-          { key: cantripKey, label: 'Cantrips', valueType: 'number', format: 'plain' },
+          {
+            key: cantripKey,
+            label: getSpellCollectionKindLabel('cantrips'),
+            valueType: 'number',
+            format: 'plain',
+          },
           { key: preparedKey, label: 'Prepared Spells', valueType: 'number', format: 'plain' },
         ],
         rows: [

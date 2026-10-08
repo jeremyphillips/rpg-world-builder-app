@@ -1,5 +1,9 @@
-import { getContentTypeTerm } from '../../../../content/lib/content-type-terms'
+import {
+  getContentTypeCapitalizedSentenceLabel,
+  getContentTypeTerm,
+} from '../../../../content/lib/content-type-terms'
 import { getSpellCollectionKindLabel } from '../../../../vocab/spell/spell-collection-kind'
+import { vocabularyTermLabel } from '../../../../vocab/types'
 import { formatChoiceSetProvenanceParentContext } from '../../../character/format-selection-source-label'
 import type { ChoiceSet, ChoiceSetProvenance } from '../../choice-set'
 
@@ -33,8 +37,11 @@ function resolveSourceLine(provenance: ChoiceSetProvenance | undefined): string 
 }
 
 function genericHeadingForChoiceType(choiceType: ChoiceSet['choiceType']): string {
-  if (choiceType === 'cantrip') return getContentTypeTerm('spells').label
-  return getContentTypeTerm('spells').label
+  if (choiceType === 'cantrip') return getSpellCollectionKindLabel('cantrips')
+  return vocabularyTermLabel(getContentTypeTerm('spells'), {
+    number: 'plural',
+    casing: 'title',
+  })
 }
 
 function resolveHeading(choiceSet: Pick<ChoiceSet, 'choiceType' | 'label' | 'provenance'>): {
@@ -51,7 +58,11 @@ function resolveHeading(choiceSet: Pick<ChoiceSet, 'choiceType' | 'label' | 'pro
   }
   if (provenance?.ownerLabel) {
     return {
-      heading: `${provenance.ownerLabel} ${choiceSet.choiceType === 'cantrip' ? 'Cantrips' : 'Spells'}`,
+      heading: `${provenance.ownerLabel} ${
+        choiceSet.choiceType === 'cantrip'
+          ? getSpellCollectionKindLabel('cantrips')
+          : getContentTypeCapitalizedSentenceLabel('spells', { plural: true })
+      }`,
       headingSourceCoverage: 'owner',
     }
   }

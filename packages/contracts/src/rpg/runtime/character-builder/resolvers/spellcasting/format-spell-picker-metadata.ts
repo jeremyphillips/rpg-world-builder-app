@@ -9,9 +9,10 @@ import {
   formatSpellDurationLabel,
   formatSpellRangeLabel,
 } from '../../../../content/spell/format-spell-metadata-core'
+import { getCantripLevelLabel } from '../../../../vocab/spell/spell-collection-kind'
 import { stripHtmlTags } from '../../../../../lib/strip-html-tags'
 
-export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
+export const SPELL_PICKER_CANTrip_LEVEL_LABEL = getCantripLevelLabel()
 
 /** Returns "Cantrip" for level 0, otherwise an ordinal level label (e.g. "1st level"). */
 export function formatSpellPickerLevelLabel(level: number): string {

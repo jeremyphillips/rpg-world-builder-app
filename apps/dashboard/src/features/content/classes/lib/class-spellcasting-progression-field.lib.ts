@@ -2,6 +2,7 @@ import type { ClassSpellcastingProgression, ClassSpellSelection } from '@rpg/con
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   classCapacityProgressionValidationMessages,
+  getSpellCollectionKindLabel,
   resolveSpellSelectionColumnLabel,
 } from '@rpg/contracts'
 
@@ -48,7 +49,7 @@ export function resolveSpellcastingProgressionFixedColumns(input: {
   if (input.grantsCantrips) {
     columns.push({
       semanticKey: SPELLCASTING_CANTIPS_COLUMN_KEY,
-      label: 'Cantrips',
+      label: getSpellCollectionKindLabel('cantrips'),
       valueType: 'number',
       format: 'plain',
     })
@@ -100,7 +101,7 @@ function columnLabelForKey(
   key: SpellcastingProgressionColumnKey,
   spellSelectionModel: ClassSpellSelection['model'] | undefined,
 ): string {
-  if (key === SPELLCASTING_CANTIPS_COLUMN_KEY) return 'Cantrips'
+  if (key === SPELLCASTING_CANTIPS_COLUMN_KEY) return getSpellCollectionKindLabel('cantrips')
   return l1ColumnLabel(spellSelectionModel)
 }
 
@@ -317,8 +318,5 @@ export function formatClassSpellcastingProgressionMetadata(input: {
   const changeLevels = mergedRowsFromProgression(input.progression, columnKeys).length
   const columnLabel = columnCount === 1 ? 'column' : 'columns'
   const levelLabel = changeLevels === 1 ? 'change level' : 'change levels'
-  return joinInlineMetadata([
-    `${columnCount} ${columnLabel}`,
-    `${changeLevels} ${levelLabel}`,
-  ])
+  return joinInlineMetadata([`${columnCount} ${columnLabel}`, `${changeLevels} ${levelLabel}`])
 }

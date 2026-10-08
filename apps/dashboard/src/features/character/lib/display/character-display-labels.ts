@@ -1,4 +1,4 @@
-import { getProficiencyDomainCompactLabel } from '@rpg/contracts'
+import { getContentTypeSentenceForm, getProficiencyDomainCompactLabel } from '@rpg/contracts'
 
 export const CHARACTER_STAT_LABELS = {
   armorClass: 'AC',
@@ -29,7 +29,7 @@ export const CHARACTER_EMPTY_SECTION_TEXT = {
   actions: 'No weapon attacks to show.',
   savingThrows: 'No proficient saving throws.',
   proficiencies: 'No proficiencies recorded.',
-  spells: 'No spells known.',
+  spells: `No ${getContentTypeSentenceForm('spells', 2)} known.`,
   equipment: 'No equipment carried.',
   classFeatures: 'No class features at this level.',
   speciesTraits: 'No species traits.',

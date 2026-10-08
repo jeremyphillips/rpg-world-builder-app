@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
 import { useForm } from 'react-hook-form'
-import type { ProgressionTable } from '@rpg/contracts'
+import { getSlotProgressionKindLabel, type ProgressionTable } from '@rpg/contracts'
 
 import {
   buildLeveledSlotProgressionDraft,
@@ -110,7 +110,7 @@ export const WideLeveledSlotProgression: Story = {
     config: LEVELED_SLOT_CONFIG,
     mode: 'edit',
     initialDraft: buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     }),

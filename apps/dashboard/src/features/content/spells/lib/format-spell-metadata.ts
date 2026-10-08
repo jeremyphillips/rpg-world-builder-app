@@ -5,14 +5,15 @@ import {
   formatSpellDurationLabel,
   formatSpellLevel,
   formatSpellRangeLabel,
+  getCantripLevelLabel,
   spellRequiresConcentration,
 } from '@rpg/contracts'
 
-export const CANTRIP_LEVEL_LABEL = 'Cantrip'
+export const CANTRIP_LEVEL_LABEL = getCantripLevelLabel()
 
 /** Returns "Cantrip" for level 0, otherwise an ordinal level label. */
 export function formatSpellLevelLabel(level: number): string {
-  if (level === 0) return CANTRIP_LEVEL_LABEL
+  if (level === 0) return getCantripLevelLabel()
   return formatSpellLevel(level)
 }
 

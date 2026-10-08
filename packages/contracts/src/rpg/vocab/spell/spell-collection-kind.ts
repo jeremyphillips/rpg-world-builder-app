@@ -1,4 +1,6 @@
+import { resolveChoicePlaceholder, type FieldNoun } from '../../../form-copy/messages'
 import type { GameTermEntry, VocabularyTerm } from '../types'
+import { getTermSentenceForm, titleCaseLabel } from '../types'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 
 // ---------------------------------------------------------------------------
@@ -19,6 +21,10 @@ export const SPELL_COLLECTION_KIND_ENTRIES = {
   cantrips: {
     label: 'Cantrips',
     description: 'Known cantrip selections.',
+    sentence: {
+      singular: 'cantrip',
+      plural: 'cantrips',
+    },
   },
   repertoire: {
     label: 'Repertoire',
@@ -59,4 +65,29 @@ export function getSpellCollectionKindEntry(id: string): GameTermEntry | undefin
 
 export function getSpellCollectionKindLabel(id: string): string {
   return getSpellCollectionKindEntry(id)?.label ?? id
+}
+
+/** Counted noun phrase for cantrips and other collection kinds in generated prose. */
+export function getSpellCollectionKindSentenceForm(id: SpellCollectionKind, count = 1): string {
+  return getTermSentenceForm(SPELL_COLLECTION_KIND_ENTRIES[id], count)
+}
+
+/** Level-0 spell display label (title case). */
+export function getCantripLevelLabel(): string {
+  return titleCaseLabel(getSpellCollectionKindSentenceForm('cantrips', 1))
+}
+
+function spellCollectionKindFieldNoun(id: SpellCollectionKind): FieldNoun {
+  return {
+    singular: getSpellCollectionKindSentenceForm(id, 1),
+    plural: getSpellCollectionKindSentenceForm(id, 2),
+  }
+}
+
+/** Combobox placeholder for choosing from a spell collection (e.g. cantrips). */
+export function getSpellCollectionKindChoicePlaceholder(
+  id: SpellCollectionKind,
+  multiple = true,
+): string {
+  return resolveChoicePlaceholder(spellCollectionKindFieldNoun(id), multiple)
 }

@@ -116,7 +116,7 @@ function resolveClassCantripChoiceSet(
     sourceType: 'spellcasting',
     sourceId: profile.classId,
     choiceType: 'cantrip',
-    label: 'Cantrips',
+    label: getSpellCollectionKindLabel('cantrips'),
     min: quota,
     max: quota,
     options: spellOptionsFromClassList(
