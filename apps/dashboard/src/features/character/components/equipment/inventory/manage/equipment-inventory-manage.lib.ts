@@ -140,6 +140,66 @@ function resolvePurchaseUnitCostCp(args: {
   )
 }
 
+function resolvePurchaseManageLabels(
+  row: EquipmentInventoryRow,
+  unitCostCp: number | undefined,
+): { spendLabel?: string; priceLabel?: string } {
+  if (unitCostCp !== undefined) {
+    return { spendLabel: formatPurchaseSpend([{ quantity: row.entry.quantity, unitCostCp }]) }
+  }
+
+  if (!row.equipment) return {}
+
+  return { priceLabel: formatPurchaseLinePrice(row.equipment, row.entry.quantity) || undefined }
+}
+
+function collectGrantManageSource(
+  grants: Map<string, EquipmentInventoryManageGrantSource>,
+  row: EquipmentInventoryRow,
+): void {
+  if (row.removeTarget?.kind !== 'magicItemGrant') return
+
+  const existing = grants.get(row.removeTarget.allowanceId)
+  if (existing) {
+    existing.quantity += row.entry.quantity
+    return
+  }
+
+  grants.set(row.removeTarget.allowanceId, {
+    allowanceId: row.removeTarget.allowanceId,
+    equipmentId: row.removeTarget.equipmentId,
+    label: formatGrantManageSourceLabel(row.sourceLabel),
+    quantity: row.entry.quantity,
+  })
+}
+
+function collectPurchaseManageSource(
+  purchases: EquipmentInventoryManagePurchaseSource[],
+  row: EquipmentInventoryRow,
+  draft?: CharacterBuilderDraft,
+): void {
+  if (row.removeTarget?.kind !== 'purchase') return
+
+  const unitCostCp =
+    draft === undefined
+      ? undefined
+      : resolvePurchaseUnitCostCp({
+          purchaseId: row.removeTarget.purchaseId,
+          draft,
+          equipment: row.equipment,
+        })
+  const labels = resolvePurchaseManageLabels(row, unitCostCp)
+
+  purchases.push({
+    purchaseId: row.removeTarget.purchaseId,
+    label: 'Purchased',
+    quantity: row.entry.quantity,
+    unitCostCp,
+    spendLabel: labels.spendLabel,
+    priceLabel: labels.priceLabel,
+  })
+}
+
 export function resolveEquipmentInventoryManageSources(
   rows: readonly EquipmentInventoryRow[],
   draft?: CharacterBuilderDraft,
@@ -148,50 +208,8 @@ export function resolveEquipmentInventoryManageSources(
   const purchases: EquipmentInventoryManagePurchaseSource[] = []
 
   for (const row of rows) {
-    if (row.removeTarget?.kind === 'magicItemGrant') {
-      const existing = grants.get(row.removeTarget.allowanceId)
-      if (existing) {
-        existing.quantity += row.entry.quantity
-        continue
-      }
-
-      grants.set(row.removeTarget.allowanceId, {
-        allowanceId: row.removeTarget.allowanceId,
-        equipmentId: row.removeTarget.equipmentId,
-        label: formatGrantManageSourceLabel(row.sourceLabel),
-        quantity: row.entry.quantity,
-      })
-      continue
-    }
-
-    if (row.removeTarget?.kind === 'purchase') {
-      const unitCostCp =
-        draft !== undefined
-          ? resolvePurchaseUnitCostCp({
-              purchaseId: row.removeTarget.purchaseId,
-              draft,
-              equipment: row.equipment,
-            })
-          : undefined
-
-      const spendLabel =
-        unitCostCp !== undefined
-          ? formatPurchaseSpend([{ quantity: row.entry.quantity, unitCostCp }])
-          : undefined
-      const priceLabel =
-        spendLabel === undefined && row.equipment
-          ? formatPurchaseLinePrice(row.equipment, row.entry.quantity) || undefined
-          : undefined
-
-      purchases.push({
-        purchaseId: row.removeTarget.purchaseId,
-        label: 'Purchased',
-        quantity: row.entry.quantity,
-        unitCostCp,
-        spendLabel,
-        priceLabel,
-      })
-    }
+    collectGrantManageSource(grants, row)
+    collectPurchaseManageSource(purchases, row, draft)
   }
 
   return {
