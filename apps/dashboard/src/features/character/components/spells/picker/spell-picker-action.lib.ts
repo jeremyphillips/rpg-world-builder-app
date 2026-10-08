@@ -6,6 +6,7 @@ export const SPELL_PICKER_ACTION_PREPARE = 'Prepare'
 export const SPELL_PICKER_ACTION_UNPREPARE = 'Unprepare'
 export const SPELL_PICKER_ACTION_LEARN = 'Learn'
 export const SPELL_PICKER_ACTION_FORGET = 'Forget'
+export const SPELL_PICKER_ACTION_UNLEARN = 'Unlearn'
 
 export const SPELL_PICKER_SELECTION_PREPARED = 'prepared' as const
 export const SPELL_PICKER_SELECTION_KNOWN = 'known' as const
@@ -31,8 +32,8 @@ const SPELL_PICKER_ACTION_LABELS: Record<
     removeLabel: SPELL_PICKER_ACTION_FORGET,
   },
   [SPELL_PICKER_SELECTION_SPELLBOOK]: {
-    addLabel: SPELL_PICKER_ACTION_ADD,
-    removeLabel: SPELL_PICKER_ACTION_REMOVE,
+    addLabel: SPELL_PICKER_ACTION_LEARN,
+    removeLabel: SPELL_PICKER_ACTION_UNLEARN,
   },
   [SPELL_PICKER_SELECTION_CANTRIP]: {
     addLabel: SPELL_PICKER_ACTION_ADD,

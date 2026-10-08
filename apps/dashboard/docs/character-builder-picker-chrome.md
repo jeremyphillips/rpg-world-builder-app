@@ -253,7 +253,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### SpellPickerDrawer
 
-**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Add/Remove).
+**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Learn/Unlearn).
 
 **Must not know:** `draft.choiceSelections` shape; how the builder patches draft; campaign/sheet persistence.
 

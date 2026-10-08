@@ -9,6 +9,7 @@ import {
   SPELL_PICKER_ACTION_LEARN,
   SPELL_PICKER_ACTION_PREPARE,
   SPELL_PICKER_ACTION_REMOVE,
+  SPELL_PICKER_ACTION_UNLEARN,
   SPELL_PICKER_ACTION_UNPREPARE,
   SPELL_PICKER_SELECTION_CANTRIP,
   SPELL_PICKER_SELECTION_KNOWN,
@@ -84,16 +85,19 @@ describe('resolveSpellPickerAction', () => {
     ).toBe(SPELL_PICKER_ACTION_FORGET)
   })
 
-  it('uses Add and Remove for spellbook acquisition and cantrips', () => {
+  it('uses Learn and Unlearn for spellbook acquisition', () => {
     expect(
       resolveSpellPickerAction({
         selectionMode: SPELL_PICKER_SELECTION_SPELLBOOK,
         selected: false,
       }),
-    ).toBe(SPELL_PICKER_ACTION_ADD)
+    ).toBe(SPELL_PICKER_ACTION_LEARN)
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_SPELLBOOK, selected: true }),
-    ).toBe(SPELL_PICKER_ACTION_REMOVE)
+    ).toBe(SPELL_PICKER_ACTION_UNLEARN)
+  })
+
+  it('uses Add and Remove for cantrips', () => {
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_CANTRIP, selected: false }),
     ).toBe(SPELL_PICKER_ACTION_ADD)
