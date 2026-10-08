@@ -11,7 +11,7 @@ import {
   MAGIC_ITEM_RARITY_TERM,
   magicItemRaritySchema,
 } from './rarity'
-import { getTermSentenceForm } from '../types'
+import { getTermCompactLabel, getTermSentenceForm } from '../types'
 
 describe('magicItemRaritySchema', () => {
   it('matches MAGIC_ITEM_RARITIES', () => {
@@ -32,6 +32,7 @@ describe('magicItemRaritySchema', () => {
 describe('magic item rarity vocabulary', () => {
   it('defines the magic item rarity vocabulary term', () => {
     expect(MAGIC_ITEM_RARITY_TERM.label).toBe('Magic Item Rarity')
+    expect(getTermCompactLabel(MAGIC_ITEM_RARITY_TERM)).toBe('Rarity')
     expect(getTermSentenceForm(MAGIC_ITEM_RARITY_TERM, 1)).toBe('magic item rarity')
     expect(getTermSentenceForm(MAGIC_ITEM_RARITY_TERM, 2)).toBe('magic item rarities')
   })

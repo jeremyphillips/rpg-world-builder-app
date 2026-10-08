@@ -30,6 +30,7 @@ function magicItemRarityEntry(
 
 export const MAGIC_ITEM_RARITY_TERM = {
   label: 'Magic Item Rarity',
+  compactLabel: 'Rarity',
   description: 'A classification of a magic item’s relative power and availability.',
   sentence: {
     singular: 'magic item rarity',

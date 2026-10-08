@@ -1,6 +1,8 @@
 import {
+  MAGIC_ITEM_RARITY_TERM,
   getEquipmentKindCollectionLabel,
   getMagicItemRarityLabel,
+  getTermCompactLabel,
   type MagicItemGrantProgress,
 } from '@rpg/contracts'
 
@@ -144,7 +146,7 @@ export function createEquipmentPickerFilterSchema(
     fields.push(
       createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedRarity'>({
         id: 'selectedRarity',
-        label: 'Rarity',
+        label: getTermCompactLabel(MAGIC_ITEM_RARITY_TERM),
         selectionMode: 'single-required',
         defaultValue: EQUIPMENT_PICKER_RARITY_ALL,
         isValueConstraining: (value) => value !== EQUIPMENT_PICKER_RARITY_ALL,

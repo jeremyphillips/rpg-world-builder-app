@@ -1,10 +1,10 @@
 import {
   catalogNounFromContentType,
   formatChoiceSetDrawerHeading,
+  formatSpellCastingTimeLabel,
   getSpellCollectionKindSentenceForm,
   compareSpellPickerItemsByRecommendation,
   formatSpellLevel,
-  getCastingTimeUnitLabel,
   getSpellDeliveryMethodLabel,
   getSpellSchoolLabel,
   type CastingTimeUnit,
@@ -75,16 +75,6 @@ const CASTING_TIME_FILTER_SPECS: Record<
   '1-minute': { unit: 'minute', value: 1 },
   '10-minutes': { unit: 'minute', value: 10 },
   '1-hour': { unit: 'hour', value: 1 },
-}
-
-function formatSpellPickerCastingTimeFilterLabel(unit: CastingTimeUnit, value: number): string {
-  if (unit === 'action' || unit === 'bonus-action' || unit === 'reaction') {
-    return getCastingTimeUnitLabel(unit)
-  }
-
-  const unitLabel = getCastingTimeUnitLabel(unit).toLowerCase()
-  const pluralUnit = value === 1 ? unitLabel : `${unitLabel}s`
-  return `${value} ${pluralUnit}`
 }
 
 const CASTING_TIME_FILTER_MATCHERS: Record<
@@ -398,7 +388,14 @@ export function formatSpellPickerMechanicsTriggerLabel(activeCount: number): str
 
 export function getSpellPickerCastingTimeFilterLabel(filter: SpellPickerCastingTimeFilter): string {
   const spec = CASTING_TIME_FILTER_SPECS[filter]
-  return formatSpellPickerCastingTimeFilterLabel(spec.unit, spec.value)
+  return formatSpellCastingTimeLabel(
+    {
+      normal: { value: spec.value, unit: spec.unit },
+      canBeCastAsRitual: false,
+    },
+    'picker',
+    { includeTrigger: false },
+  )
 }
 
 export function getSpellPickerTraitFilterLabel(filter: SpellPickerTraitFilter): string {
