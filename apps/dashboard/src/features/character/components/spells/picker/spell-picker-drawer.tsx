@@ -20,13 +20,17 @@ import {
   formatSpellPickerSelectionCountText,
   formatSpellPickerSelectionMetadata,
   getSpellPickerDisabledNote,
-  resolveActivePreparedLevelSuffix,
+  resolveActiveSpellLevelSuffix,
   selectedIdsForSpellPickerMode,
 } from './spell-picker-drawer.lib'
 import {
+  SPELL_PICKER_CANTRIPS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_GROUP_LABEL,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
+  SPELL_PICKER_SPELLS_LABEL,
+  SPELL_PICKER_SEARCH_PLACEHOLDER,
   type SpellPickerDrawerProps,
 } from './spell-picker-drawer.types'
 import {
@@ -50,11 +54,11 @@ export function SpellPickerDrawer({
   onOpenChange,
   characterClassName,
   cantripChoiceSet,
-  preparedChoiceSet,
+  spellChoiceSet,
   cantripSelectedIds,
-  preparedSelectedIds,
+  spellSelectedIds,
   cantripItems,
-  preparedItems,
+  spellItems,
   initialMode,
   initialSpellLevel,
   recommendationsEnabled = false,
@@ -89,33 +93,36 @@ export function SpellPickerDrawer({
     recommendationsEnabled,
     displayVocabulary,
     cantripChoiceSet,
-    preparedChoiceSet,
+    spellChoiceSet,
     cantripSelectedIds,
-    preparedSelectedIds,
+    spellSelectedIds,
     cantripItems,
-    preparedItems,
+    spellItems,
   })
 
   const showSegmentedControl = modes.length > 1
 
   const selectionLimit = activeChoiceSet?.max ?? 0
   const selectionComplete = activeSelectedIds.length >= selectionLimit && selectionLimit > 0
-  const activePreparedLevel = resolveActivePreparedLevelSuffix(mode, browseState.selectedLevels)
+  const activeSpellLevel = resolveActiveSpellLevelSuffix(mode, browseState.selectedLevels)
   const selectionMode = resolveSpellPickerSelectionMode(activeChoiceSet)
   const addLabel = resolveSpellPickerAction({ selectionMode, selected: false })
   const removeLabel = resolveSpellPickerAction({ selectionMode, selected: true })
 
   const segmentedOptions = modes.map((entry) => {
-    const choiceSet = choiceSetForSpellPickerMode(entry, cantripChoiceSet, preparedChoiceSet)
+    const choiceSet = choiceSetForSpellPickerMode(entry, cantripChoiceSet, spellChoiceSet)
     const selectedCount = selectedIdsForSpellPickerMode(
       entry,
       cantripSelectedIds,
-      preparedSelectedIds,
+      spellSelectedIds,
     ).length
     const max = choiceSet?.max ?? 0
     return {
       value: entry,
-      label: entry === SPELL_PICKER_MODE_CANTRIPS ? 'Cantrips' : 'Prepared spells',
+      label:
+        entry === SPELL_PICKER_MODE_CANTRIPS
+          ? SPELL_PICKER_CANTRIPS_LABEL
+          : SPELL_PICKER_SPELLS_LABEL,
       metadata: `${selectedCount}/${max}`,
     }
   })
@@ -129,11 +136,7 @@ export function SpellPickerDrawer({
         <SpellPickerSelectionSummary
           complete={selectionComplete}
           countText={formatSpellPickerSelectionCountText(activeSelectedIds.length, selectionLimit)}
-          metadata={formatSpellPickerSelectionMetadata(
-            mode,
-            characterClassName,
-            activePreparedLevel,
-          )}
+          metadata={formatSpellPickerSelectionMetadata(mode, characterClassName, activeSpellLevel)}
         />
       }
       recommendationsEnabled={recommendationsEnabled}
@@ -141,7 +144,7 @@ export function SpellPickerDrawer({
       headerBelowDescription={
         showSegmentedControl ? (
           <SegmentedControl
-            aria-label="Spell picker mode"
+            aria-label={SPELL_PICKER_MODE_GROUP_LABEL}
             value={mode}
             options={segmentedOptions}
             onValueChange={handleModeChange}
@@ -153,7 +156,7 @@ export function SpellPickerDrawer({
       getItemKey={(item) => item.spell.id}
       getItemToolbarLabel={(item) => item.spell.name}
       getSearchText={(item) => item.searchText}
-      searchPlaceholder="Search spells"
+      searchPlaceholder={SPELL_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={SPELL_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={SPELL_PICKER_NO_OPTIONS_MESSAGE}
       hasStructuredFilters={structuredFilterCount > 0}

@@ -12,7 +12,7 @@ import {
   getSpellPickerCastingTimeFilterLabel,
   matchesSpellPickerMechanicsFilters,
   normalizeSpellPickerLevelSelection,
-  resolveActivePreparedLevelSuffix,
+  resolveActiveSpellLevelSuffix,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
   resolveSpellPickerLevelChipChange,
@@ -22,7 +22,7 @@ import {
 import {
   SPELL_PICKER_LEVELS_ALL,
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
   SPELL_PICKER_SORT_BEST_MATCH,
@@ -34,12 +34,12 @@ import { spellPickerOpenItemsFixture } from './spell-picker-drawer.fixtures'
 describe('spell-picker-drawer.lib', () => {
   it('formats drawer title and selection summary metadata', () => {
     expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_CANTRIPS)).toBe('Choose cantrip')
-    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe('Choose spells')
+    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_SPELLS)).toBe('Choose spells')
     expect(formatSpellPickerSelectionCountText(1, 3)).toBe('1 of 3 selected')
     expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_CANTRIPS, 'Wizard')).toBe(
       'Wizard cantrips',
     )
-    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_PREPARED_SPELLS, 'Wizard', 1)).toBe(
+    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_SPELLS, 'Wizard', 1)).toBe(
       'Wizard spells · 1st level',
     )
   })
@@ -118,9 +118,7 @@ describe('spell-picker-drawer.lib', () => {
   })
 
   it('appends prepared level suffix only for a single active level', () => {
-    expect(resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1])).toBe(1)
-    expect(
-      resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1, 2]),
-    ).toBeUndefined()
+    expect(resolveActiveSpellLevelSuffix(SPELL_PICKER_MODE_SPELLS, [1])).toBe(1)
+    expect(resolveActiveSpellLevelSuffix(SPELL_PICKER_MODE_SPELLS, [1, 2])).toBeUndefined()
   })
 })

@@ -11,18 +11,15 @@ import {
   spellPickerMageHandFixture,
   spellPickerOpenItemsFixture,
 } from './spell-picker-drawer.fixtures'
-import {
-  SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
-} from './spell-picker-drawer.types'
+import { SPELL_PICKER_MODE_CANTRIPS, SPELL_PICKER_MODE_SPELLS } from './spell-picker-drawer.types'
 
 const baseArgs = {
   characterClassName: 'Wizard',
   cantripChoiceSet: spellPickerCantripChoiceSetFixture,
   cantripSelectedIds: [] as string[],
-  preparedSelectedIds: [] as string[],
+  spellSelectedIds: [] as string[],
   cantripItems: spellPickerOpenItemsFixture,
-  preparedItems: [] as typeof spellPickerOpenItemsFixture,
+  spellItems: [] as typeof spellPickerOpenItemsFixture,
   onSelectSpell: () => undefined,
   onRemoveSpell: () => undefined,
 }
@@ -107,7 +104,7 @@ export const NoOptions: Story = {
   },
 }
 
-const preparedChoiceSet = {
+const spellChoiceSet = {
   ...spellPickerCantripChoiceSetFixture,
   id: 'spellcasting:srd-cc-5.2.1:cleric:prepared',
   choiceType: 'spell' as const,
@@ -119,17 +116,17 @@ export const Prepared: Story = {
     ...baseArgs,
     characterClassName: 'Cleric',
     cantripChoiceSet: undefined,
-    preparedChoiceSet,
+    spellChoiceSet,
     cantripItems: [],
-    preparedItems: spellPickerOpenItemsFixture,
+    spellItems: spellPickerOpenItemsFixture,
     open: true,
     onOpenChange: () => undefined,
-    initialMode: SPELL_PICKER_MODE_PREPARED_SPELLS,
+    initialMode: SPELL_PICKER_MODE_SPELLS,
   },
   render: function Render(args) {
     const [open, setOpen] = useState(true)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
-    const preparedItems = spellPickerOpenItemsFixture
+    const spellItems = spellPickerOpenItemsFixture
       .filter((item) => item.spell.level >= 1)
       .map((item) => ({
         ...item,
@@ -144,8 +141,8 @@ export const Prepared: Story = {
         {...args}
         open={open}
         onOpenChange={setOpen}
-        preparedItems={preparedItems}
-        preparedSelectedIds={selectedIds}
+        spellItems={spellItems}
+        spellSelectedIds={selectedIds}
         onSelectSpell={(_mode, spellId) => {
           setSelectedIds((current) => (current.includes(spellId) ? current : [...current, spellId]))
         }}

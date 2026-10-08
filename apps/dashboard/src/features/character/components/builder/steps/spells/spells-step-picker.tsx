@@ -11,14 +11,12 @@ import { withChoiceSetSelections } from '../../../../lib/choice-sets/choice-set-
 import { SpellPickerDrawer } from '../../../spells/picker/spell-picker-drawer'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   type SpellPickerMode,
 } from '../../../spells/picker/spell-picker-drawer.types'
 
 function spellPickerModeForChoiceSet(choiceSet: ChoiceSet): SpellPickerMode {
-  return choiceSet.choiceType === 'cantrip'
-    ? SPELL_PICKER_MODE_CANTRIPS
-    : SPELL_PICKER_MODE_PREPARED_SPELLS
+  return choiceSet.choiceType === 'cantrip' ? SPELL_PICKER_MODE_CANTRIPS : SPELL_PICKER_MODE_SPELLS
 }
 
 export type SpellsStepPickerProps = {
@@ -56,7 +54,7 @@ export function SpellsStepPicker({
     [items],
   )
   const cantripChoiceSet = mode === SPELL_PICKER_MODE_CANTRIPS ? choiceSet : undefined
-  const preparedChoiceSet = mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? choiceSet : undefined
+  const spellChoiceSet = mode === SPELL_PICKER_MODE_SPELLS ? choiceSet : undefined
 
   return (
     <SpellPickerDrawer
@@ -66,11 +64,11 @@ export function SpellsStepPicker({
       }}
       characterClassName={className}
       cantripChoiceSet={cantripChoiceSet}
-      preparedChoiceSet={preparedChoiceSet}
+      spellChoiceSet={spellChoiceSet}
       cantripSelectedIds={mode === SPELL_PICKER_MODE_CANTRIPS ? selectedIds : []}
-      preparedSelectedIds={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? selectedIds : []}
+      spellSelectedIds={mode === SPELL_PICKER_MODE_SPELLS ? selectedIds : []}
       cantripItems={mode === SPELL_PICKER_MODE_CANTRIPS ? items : []}
-      preparedItems={mode === SPELL_PICKER_MODE_PREPARED_SPELLS ? items : []}
+      spellItems={mode === SPELL_PICKER_MODE_SPELLS ? items : []}
       initialMode={mode}
       initialSpellLevel={initialSpellLevel}
       recommendationsEnabled={recommendationsEnabled}

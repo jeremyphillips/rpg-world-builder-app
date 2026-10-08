@@ -32,9 +32,10 @@ import {
   SPELL_PICKER_LEVELS_ALL,
   SPELL_PICKER_LEVELS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_SCHOOL_ALL,
   SPELL_PICKER_SCHOOL_LABEL,
+  SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
   type SpellPickerCastingTimeFilter,
   type SpellPickerMechanicsFilters,
   type SpellPickerMethodFilter,
@@ -164,7 +165,7 @@ export function createSpellPickerFilterSchema(
         layout: 'inline',
         showAllOption: false,
         ariaLabel: 'Filter by school',
-        triggerAriaLabel: 'Spell school',
+        triggerAriaLabel: SPELL_PICKER_SCHOOL_TRIGGER_LABEL,
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
           ...[...new Set(args.items.map((item) => item.spell.school))]
@@ -263,7 +264,7 @@ export function applySpellPickerFilterSchema(
   if (mode === SPELL_PICKER_MODE_CANTRIPS) {
     return filtered.filter((item) => item.spell.level === 0)
   }
-  if (mode === SPELL_PICKER_MODE_PREPARED_SPELLS) {
+  if (mode === SPELL_PICKER_MODE_SPELLS) {
     return filtered.filter((item) => item.spell.level >= 1)
   }
   return filtered

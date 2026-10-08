@@ -96,17 +96,17 @@ export const TwoSegments: Story = {
     fullWidth: true,
     options: [
       { value: 'cantrips', label: 'Cantrips', metadata: '1/3' },
-      { value: 'prepared-spells', label: 'Prepared spells', metadata: '3/4' },
+      { value: 'spells', label: 'Spells', metadata: '3/4' },
     ],
     onValueChange: () => undefined,
   },
   render: (args) => {
-    const [value, setValue] = useState<'cantrips' | 'prepared-spells'>('cantrips')
+    const [value, setValue] = useState<'cantrips' | 'spells'>('cantrips')
     return (
       <SegmentedControl
         {...args}
         value={value}
-        onValueChange={(next) => setValue(next as 'cantrips' | 'prepared-spells')}
+        onValueChange={(next) => setValue(next as 'cantrips' | 'spells')}
       />
     )
   },

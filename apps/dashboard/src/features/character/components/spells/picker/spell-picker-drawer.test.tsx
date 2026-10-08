@@ -19,10 +19,13 @@ import {
 } from './spell-picker-drawer.fixtures'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
+  SPELL_PICKER_SEARCH_PLACEHOLDER,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  SPELL_PICKER_SORT_GROUP_LABEL,
+  SPELL_PICKER_SORT_ORDER_LABEL,
 } from './spell-picker-drawer.types'
 
 const preparedSpellChoiceSet = {
@@ -43,9 +46,9 @@ function renderCantripDrawer(overrides: Partial<ComponentProps<typeof SpellPicke
       characterClassName="Wizard"
       cantripChoiceSet={spellPickerCantripChoiceSetFixture}
       cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
-      preparedSelectedIds={[]}
+      spellSelectedIds={[]}
       cantripItems={spellPickerOpenItemsFixture}
-      preparedItems={[]}
+      spellItems={[]}
       onSelectSpell={onSelectSpell}
       onRemoveSpell={onRemoveSpell}
       {...overrides}
@@ -65,13 +68,13 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Sort spells' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: SPELL_PICKER_SORT_GROUP_LABEL })).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
     expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
     expect(screen.getByText(/Wizard cantrips/)).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search spells' }), 'magic')
+    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'magic')
 
     expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
@@ -80,7 +83,9 @@ describe('SpellPickerDrawer', () => {
   it('shows compact A-Z label in the sort trigger', () => {
     renderCantripDrawer()
 
-    expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL })).toHaveTextContent(
+      'A–Z',
+    )
   })
 
   it('omits the primary toolbar row when level chips are hidden', () => {
@@ -190,12 +195,12 @@ describe('SpellPickerDrawer', () => {
         open
         onOpenChange={vi.fn()}
         characterClassName="Cleric"
-        preparedChoiceSet={preparedSpellChoiceSet}
+        spellChoiceSet={preparedSpellChoiceSet}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[]}
-        preparedItems={spellPickerOpenItemsFixture}
-        initialMode={SPELL_PICKER_MODE_PREPARED_SPELLS}
+        spellItems={spellPickerOpenItemsFixture}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
         onSelectSpell={onSelectSpell}
         onRemoveSpell={onRemoveSpell}
       />,
@@ -208,7 +213,7 @@ describe('SpellPickerDrawer', () => {
       within(cureWoundsRow).getByRole('button', { name: SPELL_PICKER_ACTION_PREPARE }),
     )
     expect(onSelectSpell).toHaveBeenCalledWith(
-      SPELL_PICKER_MODE_PREPARED_SPELLS,
+      SPELL_PICKER_MODE_SPELLS,
       spellPickerCureWoundsFixture.id,
     )
 
@@ -227,12 +232,12 @@ describe('SpellPickerDrawer', () => {
         open
         onOpenChange={vi.fn()}
         characterClassName="Cleric"
-        preparedChoiceSet={preparedSpellChoiceSet}
+        spellChoiceSet={preparedSpellChoiceSet}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[spellPickerCureWoundsFixture.id]}
+        spellSelectedIds={[spellPickerCureWoundsFixture.id]}
         cantripItems={[]}
-        preparedItems={[selectedCureWounds]}
-        initialMode={SPELL_PICKER_MODE_PREPARED_SPELLS}
+        spellItems={[selectedCureWounds]}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
         onSelectSpell={vi.fn()}
         onRemoveSpell={onRemoveSpell}
       />,
@@ -245,7 +250,7 @@ describe('SpellPickerDrawer', () => {
       within(selectedRow).getByRole('button', { name: SPELL_PICKER_ACTION_UNPREPARE }),
     )
     expect(onRemoveSpell).toHaveBeenCalledWith(
-      SPELL_PICKER_MODE_PREPARED_SPELLS,
+      SPELL_PICKER_MODE_SPELLS,
       spellPickerCureWoundsFixture.id,
     )
   })
@@ -291,9 +296,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -308,9 +313,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -325,15 +330,15 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={spellPickerOpenItemsFixture}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search spells' }), 'zzzz')
+    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'zzzz')
     expect(screen.getByText(SPELL_PICKER_NO_RESULTS_MESSAGE)).toBeInTheDocument()
   })
 
@@ -347,9 +352,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[spellPickerOpenItemsFixture[0]!]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -368,9 +373,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={spellPickerItemsFixture}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,

@@ -9,7 +9,7 @@ import {
 } from './spell-picker-filter-schema'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_SCHOOL_ALL,
   type SpellPickerCastingTimeFilter,
   type SpellPickerMethodFilter,
@@ -20,7 +20,7 @@ const preparedItems = [] as unknown as readonly SpellPickerItem[]
 describe('spell-picker-filter-schema', () => {
   it('keeps valid state unchanged when schema shape is stable', () => {
     const schema = createSpellPickerFilterSchema({
-      mode: SPELL_PICKER_MODE_PREPARED_SPELLS,
+      mode: SPELL_PICKER_MODE_SPELLS,
       items: preparedItems,
       showLevelChips: true,
       showSchoolFilter: true,
@@ -72,7 +72,7 @@ describe('spell-picker-filter-schema', () => {
 
   it('treats school sentinel values as non-constraining', () => {
     const schema = createSpellPickerFilterSchema({
-      mode: SPELL_PICKER_MODE_PREPARED_SPELLS,
+      mode: SPELL_PICKER_MODE_SPELLS,
       items: preparedItems,
       showLevelChips: false,
       showSchoolFilter: true,

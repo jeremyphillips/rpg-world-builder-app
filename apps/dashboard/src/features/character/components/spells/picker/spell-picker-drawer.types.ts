@@ -1,4 +1,11 @@
-import type { ChoiceSet, SpellPickerItem } from '@rpg/contracts'
+import {
+  getContentTypeSentenceForm,
+  getContentTypeTerm,
+  getSpellCollectionKindLabel,
+  vocabularyTermLabel,
+  type ChoiceSet,
+  type SpellPickerItem,
+} from '@rpg/contracts'
 
 import type { SpellDisplayVocabulary } from '@/features/content'
 
@@ -14,16 +21,28 @@ import {
 export type { ChoiceSet, SpellPickerItem, SpellPickerItemState } from '@rpg/contracts'
 
 export const SPELL_PICKER_MODE_CANTRIPS = 'cantrips' as const
-export const SPELL_PICKER_MODE_PREPARED_SPELLS = 'prepared-spells' as const
+export const SPELL_PICKER_MODE_SPELLS = 'spells' as const
 
-export type SpellPickerMode =
-  | typeof SPELL_PICKER_MODE_CANTRIPS
-  | typeof SPELL_PICKER_MODE_PREPARED_SPELLS
+export type SpellPickerMode = typeof SPELL_PICKER_MODE_CANTRIPS | typeof SPELL_PICKER_MODE_SPELLS
 
-export const SPELL_PICKER_NO_RESULTS_MESSAGE = 'No spells match your search.'
-export const SPELL_PICKER_NO_OPTIONS_MESSAGE = 'No spells are available for this choice.'
-export const SPELL_PICKER_SELECTION_FULL_MESSAGE =
-  'You have selected the maximum number of spells for this choice.'
+const spellTerm = getContentTypeTerm('spells')
+const spellPlural = getContentTypeSentenceForm('spells', 2)
+
+export const SPELL_PICKER_SPELL_PLURAL = spellPlural
+export const SPELL_PICKER_CANTRIPS_LABEL = getSpellCollectionKindLabel('cantrips')
+export const SPELL_PICKER_SPELLS_LABEL = vocabularyTermLabel(spellTerm, {
+  number: 'plural',
+  casing: 'title',
+})
+export const SPELL_PICKER_SEARCH_PLACEHOLDER = `Search ${spellPlural}`
+export const SPELL_PICKER_MODE_GROUP_LABEL = `${spellTerm.label} picker mode`
+export const SPELL_PICKER_SORT_GROUP_LABEL = `Sort ${spellPlural}`
+export const SPELL_PICKER_SORT_ORDER_LABEL = `${spellTerm.label} sort order`
+export const SPELL_PICKER_SCHOOL_TRIGGER_LABEL = `${spellTerm.label} school`
+
+export const SPELL_PICKER_NO_RESULTS_MESSAGE = `No ${spellPlural} match your search.`
+export const SPELL_PICKER_NO_OPTIONS_MESSAGE = `No ${spellPlural} are available for this choice.`
+export const SPELL_PICKER_SELECTION_FULL_MESSAGE = `You have selected the maximum number of ${spellPlural} for this choice.`
 
 export const SPELL_PICKER_SCHOOL_ALL = '__all__' as const
 export const SPELL_PICKER_LEVELS_ALL = '__all__' as const
@@ -96,11 +115,11 @@ export type SpellPickerDrawerProps = {
   onOpenChange: (open: boolean) => void
   characterClassName: string
   cantripChoiceSet?: ChoiceSet
-  preparedChoiceSet?: ChoiceSet
+  spellChoiceSet?: ChoiceSet
   cantripSelectedIds: string[]
-  preparedSelectedIds: string[]
+  spellSelectedIds: string[]
   cantripItems: readonly SpellPickerItem[]
-  preparedItems: readonly SpellPickerItem[]
+  spellItems: readonly SpellPickerItem[]
   initialMode?: SpellPickerMode
   /** Pre-filter prepared-spell browse to a single spell level when opened from a level tab. */
   initialSpellLevel?: number
