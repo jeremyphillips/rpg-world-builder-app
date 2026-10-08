@@ -2,7 +2,6 @@ import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
   fitsStartingEquipmentBudget,
-  compareMagicItemBestMatch,
   formatInlineWealth,
   formatMoney,
   isEquipmentPickerSupportedKind,
@@ -270,7 +269,6 @@ export function compareEquipmentBestMatch(
   options: {
     searchQuery: string
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
   const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
@@ -278,10 +276,6 @@ export function compareEquipmentBestMatch(
 
   if (hasQuery) {
     comparators.push((l, r) => compareNumberDescending(l.searchScore, r.searchScore))
-  }
-
-  if (options.workflowMode === 'magic_items') {
-    comparators.push((l, r) => compareMagicItemBestMatch(l.item, r.item))
   }
 
   comparators.push((l, r) =>
@@ -297,7 +291,6 @@ function compareEquipmentPickerItemsByBestMatch(
   options: {
     searchQuery: string
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
   return compareEquipmentBestMatch(left, right, options)
@@ -310,10 +303,9 @@ function compareEquipmentPickerScoredItems(
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
-  const { searchQuery, sortMode, browseSortContext, workflowMode } = options
+  const { searchQuery, sortMode, browseSortContext } = options
   const hasQuery = normalizeSearchQuery(searchQuery).text.length > 0
 
   switch (sortMode) {
@@ -321,7 +313,6 @@ function compareEquipmentPickerScoredItems(
       return compareEquipmentPickerItemsByBestMatch(left, right, {
         searchQuery,
         browseSortContext,
-        workflowMode,
       })
     case EQUIPMENT_PICKER_SORT_PRICE_ASC:
       return compareScoredItemsByPriceMode(left, right, 'asc', hasQuery, browseSortContext)
@@ -341,7 +332,6 @@ export function filterAndSortEquipmentPickerItems(
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): EquipmentPickerItem[] {
   const filtered = scoreAndFilterPickerItems(items, {

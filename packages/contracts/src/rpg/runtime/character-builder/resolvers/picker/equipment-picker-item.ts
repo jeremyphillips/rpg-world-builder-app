@@ -31,7 +31,7 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
   evidence?: readonly SourcedEquipmentRecommendationEvidence[]
   /** Split requirement, soft recommendation, and option-state facts. */
   resolved?: ResolvedEquipmentOption
-  /** Populated in magic-items workflow only — drives actionability best-match rank. */
+  /** Populated in magic-items workflow only. Row action chrome; browse order does not read it. */
   magicItemAction?: MagicItemActionState
 }
 
@@ -43,9 +43,10 @@ export type EquipmentPickerItem = {
 }
 
 /**
- * Best-match browse order from resolved equipment facts: active requirement and choice,
- * relevance, recommendation strength, specificity and source, then purchase actionability
- * and proficiency when the browse context enables them, then canonical kind and name.
+ * Best-match browse order from resolved equipment facts: requirement match,
+ * recommendation strength, specificity and source, then not-for-sale and proficiency
+ * when the browse context enables them, then canonical kind and name.
+ * Selection, remaining budget, and package choice do not reorder rows.
  */
 export function compareEquipmentPickerItemsByRecommendation(
   left: EquipmentPickerItem,

@@ -187,7 +187,6 @@ export function useEquipmentPickerController({
           rankPurchaseAvailability: workflowMode === 'purchase',
           rankCompatibility: browseSortContext?.rankCompatibility ?? true,
         },
-        workflowMode,
       }),
     [browseSortContext, sortMode, workflowMode],
   )

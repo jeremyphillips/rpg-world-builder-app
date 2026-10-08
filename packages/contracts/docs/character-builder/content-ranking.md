@@ -1,12 +1,9 @@
 # Character builder content ranking
 
-Browse and recommendation ordering for character-builder pickers. Resolver
-implementations live under `packages/contracts/src/rpg/runtime/character-builder/`;
-this document is the canonical description of rank semantics.
+Browse ordering for character-builder pickers. Each picker has its own comparator.
+Resolver implementations live under `packages/contracts/src/rpg/runtime/character-builder/`.
 
-## Canonical best-match pipeline
-
-Every character-builder picker follows the same documented stages:
+Shared stages before that comparator:
 
 ```
 visibility / workflow eligibility
@@ -15,16 +12,15 @@ visibility / workflow eligibility
   → sort mode switch
 ```
 
-### `best_match` compare order
+Spell and proficiency best match is recommended, then name
+(`compareRecommendedThenName`). Equipment best match is
+`compareIntentionalEquipmentRanking`. Connection drawers are separate and are
+not covered here.
 
-```text
-if (hasQuery) compare searchScore desc
-compare workflowDomainRank        // magic-item action rank, proficiency eligibility, …
-compare recommendationRank        // equipment tier/reason; proficiency isRecommended/canSelect
-compare name                      // deterministic fallback
-```
+Browse order ignores selection, remaining budget, and consumed grants. Those
+facts stay on the row as chrome and disabled actions.
 
-**Name sort modes** use name as the primary key, then search score (when a query is present), then domain/recommendation rank as tiebreaker. Recommendation rank is never the primary key for name sorts.
+**Name sort modes** use name as the primary key, then search score (when a query is present), then the domain comparator as a tiebreaker. The domain comparator is never the primary key for name sorts.
 
 Shared sort mode values (`best_match`, `name_asc`, `name_desc`) live in
 `catalog-picker-sort-modes.lib.ts`. Domain-specific modes (`price_*`, `level_*`) stay in each picker's `*.types.ts`.
@@ -45,61 +41,42 @@ domain rank comes from `compareSpellPickerItemsByRecommendation` in
 Recommended spell ids are resolved in
 [`resolve-spell-recommendations.ts`](../src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spell-recommendations.ts).
 
-### Magic-items workflow action rank
+### Magic-item action state
 
 Magic-item rows are enriched once per item with `magicItemAction` before the
-drawer receives them (`enrichEquipmentPickerItemsWithMagicItemAction`). The
-comparator reads only enriched state — never draft, context, or
-`focusedAllowanceId`.
+drawer receives them (`enrichEquipmentPickerItemsWithMagicItemAction`). That
+state drives the row action. Browse order does not read it, including grant
+availability and whether the focused allowance was consumed.
 
-| Rank | `reason`             | Condition                                                 |
-| ---- | -------------------- | --------------------------------------------------------- |
-| 0    | `grant_available`    | `eligibility.eligible` — open choice slot                 |
-| 1    | `manageable`         | Owned grant/purchase, can manage                          |
-| 2    | `no_matching_choice` | Visible but no slot (`rarity_mismatch`, `allowance_full`) |
-| 3    | `unavailable`        | `!canExpand`                                              |
+| `reason`             | Condition                                                 |
+| -------------------- | --------------------------------------------------------- |
+| `grant_available`    | `eligibility.eligible` — open choice slot                 |
+| `manageable`         | Owned grant/purchase, can manage                          |
+| `no_matching_choice` | Visible but no slot (`rarity_mismatch`, `allowance_full`) |
+| `unavailable`        | `!canExpand`                                              |
 
-Owned items outside a focused allowance rarity keep `reason: manageable` but
-sink with `outOfFocusedScope: true` (effective rank 2).
-
-Magic-items `best_match` order:
-
-```text
-if (hasQuery) searchScore desc
-→ magicItemAction.rank
-→ compareEquipmentPickerItemsByRecommendation
-→ name
-```
-
-Purchase workflow omits `magicItemAction` enrichment and uses recommendation
-rank only after search.
+Owned items outside a focused allowance rarity keep `reason: manageable` and
+set `outOfFocusedScope: true`.
 
 ### Comparator steps (recommendation / best-match tiebreaker)
 
 Resolved rows sort with `compareIntentionalEquipmentRanking` in
 [`equipment-ranking-policy.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-ranking-policy.ts).
-Requirements, soft recommendations, and option state are separate facts. Selection and
-choice state never change recommendation strength.
+Requirements, soft recommendations, and option state are separate facts. Selection,
+remaining budget, and package choice do not reorder rows.
 
-1. **Active requirement / active choice** — unsatisfied `candidate` requirements (`compareActiveRequirement`), then open-pool eligibility when `activeChoice` is `pool` or `package`. A satisfied pool keeps `optionSatisfies` on every eligible option; only the owned option is a `satisfier`, and the others stay `eligible` with no lift. Spellcasting focus is one any-of requirement owned by the class.
-2. **Context relevance** — only when `activeChoice` is not `none`. `allowance` does not reorder equipment recommendations; magic-item action rank handles that workflow. The general Add Equipment drawer passes `none`, so open pools and alternative packages do not lift rows there.
-3. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility, not a signal.
-4. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat), then `inAlternativePackage` as a tie-break. Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts).
-5. **Purchase actionability** — only when `rankPurchaseAvailability` is set (gold purchase lists). Order is `available`, then `unaffordable`, then `unavailableForPurchase`. A strong or required row still outranks a neutral purchasable row. Unaffected lists leave this fact unsorted.
-6. **Compatibility** — only when `rankCompatibility` is set (the default) and both rows have a defined `compatibility.proficient`. `true` before `false`. Rows that do not track proficiency stay ties on this axis.
-7. **Canonical fallback** — kind bucket, weapon category, then name.
+1. **Requirement match** — any requirement the row satisfies (`optionSatisfies`), exact before anyOf. `candidate`, `satisfier`, and `eligible` share that band. A `requirement` active choice limits the match to that requirement id. `activeRequirementIds`, when set, limits which ids count. Spellcasting focus is one any-of requirement owned by the class.
+2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility, not a signal.
+3. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat). Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts). Open-pool eligibility, context relevance, and alternative-package membership are not sort keys.
+4. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
+5. **Compatibility** — only when `rankCompatibility` is set (the default) and both rows have a defined `compatibility.proficient`. `true` before `false`. Rows that do not track proficiency stay ties on this axis.
+6. **Canonical fallback** — kind bucket, weapon category, then name.
 
 Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.
 
-### Recommendation reason ranks
+### Recommendation object versus browse order
 
-The legacy reason enum still feeds badges until presentation facts replace it. It is not the browse order for resolved rows.
-
-Lower historical ranks (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
-
-`classRequired` → `classToolNeed` → `selectedToolProficiency` → `spellcastingFocus` →
-`startingEquipment` → `unresolvedToolProficiencyChoice` → `startingEquipmentChoice` →
-`classToolCategory` → `availableInStartingOption` → `classSuggested`.
+`EQUIPMENT_RECOMMENDATION_REASONS` is evidence identity on the recommendation object. It is not a browse key. `EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE` and `EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE` collapse that object when several contributions merge. Picker browse does not read them. Browse specificity is `compareSpecificity`.
 
 Proficiency is not a recommendation reason. `compatibility.proficient` is `true`, `false`, or omitted when the item does not track proficiency.
 
@@ -141,8 +118,7 @@ implements the canonical pipeline. Domain rank comes from
 [`proficiency-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/proficiency-picker-item.ts):
 
 1. **Recommended** — `state.isRecommended` (`true` before `false`; languages only today)
-2. **Selectable** — `state.canSelect` (`true` before `false`)
-3. **Label** — `localeCompare` (base sensitivity)
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendedThenName`
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -158,8 +134,7 @@ canonical pipeline. Domain rank comes from `compareSpellPickerItemsByRecommendat
 in [`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/spell-picker-item.ts):
 
 1. **Recommended** — `state.isRecommended` (`true` before `false`)
-2. **Selectable** — `state.canSelect` (`true` before `false`)
-3. **Label** — `localeCompare` (base sensitivity)
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendedThenName`
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -183,7 +158,7 @@ Both modes use the shared Reset button. Action buttons show no counts.
 
 ## Picker purchase availability
 
-`resolveEquipmentPickerItems` stamps `purchaseAvailability` once from remaining budget and copies that same object onto `state.resolved`. Action, badges, and purchase-list sort all read it.
+`resolveEquipmentPickerItems` stamps `purchaseAvailability` once from remaining budget and copies that same object onto `state.resolved`. Actions and badges read every status. Purchase-list sort treats `unavailableForPurchase` as a late negative and does not rank `unaffordable`.
 
 | Status                   | Meaning                                                                                |
 | ------------------------ | -------------------------------------------------------------------------------------- |

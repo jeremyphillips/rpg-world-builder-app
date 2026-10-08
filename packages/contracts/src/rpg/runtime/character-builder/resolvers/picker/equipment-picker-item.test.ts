@@ -2,11 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { type Equipment } from '../../../../content/equipment'
 import { DEFAULT_SYSTEM_RULESET_ID } from '../../../../primitives/ruleset'
-import {
-  EQUIPMENT_RECOMMENDATION_REASON_RANK,
-  getBestEquipmentRecommendationReasonRank,
-  type EquipmentRecommendation,
-} from '../../../../content/equipment-recommendation'
+import { type EquipmentRecommendation } from '../../../../content/equipment-recommendation'
 import {
   compareEquipmentPickerItemsByRecommendation,
   type EquipmentPickerItem,
@@ -78,18 +74,6 @@ function makePickerItem(
     },
   }
 }
-
-describe('getBestEquipmentRecommendationReasonRank', () => {
-  it('returns the lowest rank among multiple reasons', () => {
-    expect(getBestEquipmentRecommendationReasonRank(['startingEquipment', 'classToolNeed'])).toBe(
-      EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed,
-    )
-  })
-
-  it('returns positive infinity when reasons are empty', () => {
-    expect(getBestEquipmentRecommendationReasonRank([])).toBe(Number.POSITIVE_INFINITY)
-  })
-})
 
 describe('getEquipmentRecommendationKindRank', () => {
   it('classifies kind buckets for browse ordering', () => {
@@ -398,7 +382,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     expect(compareEquipmentPickerItemsByRecommendation(reasoned, noReasons)).toBeLessThan(0)
   })
 
-  it('orders available rows ahead of unaffordable rows when purchase ranking is on', () => {
+  it('does not sink unaffordable rows when purchase ranking is on', () => {
     const affordable = makePickerItem(
       makeEquipment({
         id: 'test:staff',
@@ -425,8 +409,37 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
     const context = { preferMartialWeaponBrowseOrder: false, rankPurchaseAvailability: true }
 
     expect(
-      compareEquipmentPickerItemsByRecommendation(affordable, unaffordable, context),
+      compareEquipmentPickerItemsByRecommendation(unaffordable, affordable, context),
     ).toBeLessThan(0)
+  })
+
+  it('orders rows that are not for sale after purchasable rows', () => {
+    const forSale = makePickerItem(
+      makeEquipment({
+        id: 'test:zebra',
+        slug: 'zebra',
+        name: 'Zebra',
+        kind: 'adventuring_gear',
+        gearKind: 'general',
+      }),
+      { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+    )
+    const notForSale = makePickerItem(
+      makeEquipment({
+        id: 'test:alpha',
+        slug: 'alpha',
+        name: 'Alpha',
+        kind: 'adventuring_gear',
+        gearKind: 'general',
+      }),
+      { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+      { status: 'unavailableForPurchase', reason: 'no_market_price' },
+    )
+    const context = { preferMartialWeaponBrowseOrder: false, rankPurchaseAvailability: true }
+
+    expect(compareEquipmentPickerItemsByRecommendation(forSale, notForSale, context)).toBeLessThan(
+      0,
+    )
   })
 
   it('orders specificity before reason within the same tier', () => {

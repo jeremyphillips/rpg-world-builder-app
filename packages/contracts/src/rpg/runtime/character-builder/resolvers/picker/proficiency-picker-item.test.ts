@@ -49,26 +49,26 @@ describe('compareProficiencyPickerItemsByRecommendation', () => {
     expect(compareProficiencyPickerItemsByRecommendation(recommended, peer)).toBeLessThan(0)
   })
 
-  it('ranks selectable options above blocked peers at the same recommendation level', () => {
-    const selectable = makeProficiencyItem('Acrobatics', {
-      isRecommended: false,
-      canSelect: true,
-      isAlreadySelected: false,
-      isAlreadyGranted: false,
-      isSelectionFull: false,
-    })
-    const blocked = makeProficiencyItem('Arcana', {
+  it('does not sink a granted option below a later selectable peer', () => {
+    const granted = makeProficiencyItem('Alpha', {
       isRecommended: false,
       canSelect: false,
       isAlreadySelected: false,
       isAlreadyGranted: true,
       isSelectionFull: false,
     })
+    const selectable = makeProficiencyItem('Zebra', {
+      isRecommended: false,
+      canSelect: true,
+      isAlreadySelected: false,
+      isAlreadyGranted: false,
+      isSelectionFull: false,
+    })
 
-    expect(compareProficiencyPickerItemsByRecommendation(selectable, blocked)).toBeLessThan(0)
+    expect(compareProficiencyPickerItemsByRecommendation(granted, selectable)).toBeLessThan(0)
   })
 
-  it('falls back to label when recommendation and selectability match', () => {
+  it('falls back to label when recommendation matches', () => {
     const alpha = makeProficiencyItem('Alpha', {
       isRecommended: false,
       canSelect: true,

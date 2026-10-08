@@ -25,8 +25,11 @@ export const EQUIPMENT_RECOMMENDATION_TIERS = [
 
 export type EquipmentRecommendationTier = (typeof EQUIPMENT_RECOMMENDATION_TIERS)[number]
 
-/** Sort rank per tier — lower ranks list first in pickers. */
-export const EQUIPMENT_RECOMMENDATION_TIER_RANK = {
+/**
+ * Derivation precedence when several contributions merge onto one recommendation.
+ * Lower numbers win. Picker browse does not read this.
+ */
+export const EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE = {
   essential: 0,
   strong: 1,
   compatible: 2,
@@ -67,8 +70,11 @@ export const EQUIPMENT_RECOMMENDATION_SPECIFICITIES = [
 export type EquipmentRecommendationSpecificity =
   (typeof EQUIPMENT_RECOMMENDATION_SPECIFICITIES)[number]
 
-/** Sort rank per specificity — lower ranks list first within the same tier. */
-export const EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK = {
+/**
+ * Derivation precedence for the specificity stamped on a collapsed recommendation.
+ * Lower numbers win. Picker browse uses `compareSpecificity` instead.
+ */
+export const EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE = {
   exact: 0,
   narrow_pool: 1,
   broad_pool: 2,
@@ -97,51 +103,20 @@ export const NEUTRAL_EQUIPMENT_RECOMMENDATION: EquipmentRecommendation = {
 
 /** Recommended-tab membership is intentionally narrow: essential and strong only. */
 export function isRecommendedEquipmentTier(tier: EquipmentRecommendationTier): boolean {
-  return EQUIPMENT_RECOMMENDATION_TIER_RANK[tier] <= EQUIPMENT_RECOMMENDATION_TIER_RANK.strong
+  return (
+    EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE[tier] <=
+    EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.strong
+  )
 }
 
-/** Comparator over tiers — essential first, neutral last. */
-export function compareEquipmentRecommendationTiers(
-  left: EquipmentRecommendationTier,
-  right: EquipmentRecommendationTier,
-): number {
-  return EQUIPMENT_RECOMMENDATION_TIER_RANK[left] - EQUIPMENT_RECOMMENDATION_TIER_RANK[right]
-}
-
-/**
- * Browse-sort rank per reason — lower ranks list first within the same tier.
- * Intentionally differs from `EQUIPMENT_RECOMMENDATION_REASONS` array order:
- * needs (class-required, tools, foci) before nice-to-have (starting options, proficiency).
- */
-export const EQUIPMENT_RECOMMENDATION_REASON_RANK = {
-  classRequired: 0,
-  classToolNeed: 1,
-  selectedToolProficiency: 2,
-  spellcastingFocus: 3,
-  startingEquipment: 4,
-  unresolvedToolProficiencyChoice: 5,
-  startingEquipmentChoice: 6,
-  classToolCategory: 7,
-  availableInStartingOption: 8,
-  classSuggested: 9,
-} as const satisfies Record<EquipmentRecommendationReason, number>
-
-/** Best (lowest) reason rank for browse ordering; empty reasons sort after reasoned peers. */
-export function getBestEquipmentRecommendationReasonRank(
-  reasons: readonly EquipmentRecommendationReason[],
-): number {
-  if (reasons.length === 0) return Number.POSITIVE_INFINITY
-  return Math.min(...reasons.map((reason) => EQUIPMENT_RECOMMENDATION_REASON_RANK[reason]))
-}
-
-/** Comparator over specificity — exact first, broad pool last. */
+/** Derivation precedence — more specific evidence wins when a recommendation is collapsed. Not picker browse order. */
 export function compareEquipmentRecommendationSpecificity(
   left: EquipmentRecommendationSpecificity,
   right: EquipmentRecommendationSpecificity,
 ): number {
   return (
-    EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[left] -
-    EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[right]
+    EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE[left] -
+    EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE[right]
   )
 }
 
@@ -155,7 +130,7 @@ function bestSpecificityFromEvidence(
   }, 'broad_pool')
 }
 
-/** Best (most specific) specificity for browse ordering within the same tier. */
+/** Most specific evidence on a collapsed recommendation. Not picker browse order. */
 export function getBestEquipmentRecommendationSpecificity(
   input: EquipmentRecommendation | readonly EquipmentRecommendationEvidence[],
 ): EquipmentRecommendationSpecificity {

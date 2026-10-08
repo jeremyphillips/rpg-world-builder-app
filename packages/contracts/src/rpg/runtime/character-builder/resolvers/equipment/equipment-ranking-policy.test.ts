@@ -11,7 +11,7 @@ import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { compareIntentionalEquipmentRanking } from './equipment-ranking-policy'
 
 describe('equipment ranking primitives', () => {
-  it('ranks unsatisfied exact requirements ahead of any-of candidates', () => {
+  it('ranks exact requirement matches ahead of any-of matches', () => {
     expect(
       compareActiveRequirement(
         [
@@ -36,21 +36,22 @@ describe('equipment ranking primitives', () => {
     ).toBeLessThan(0)
   })
 
-  it('does not treat a satisfied focus candidate as an active requirement', () => {
+  it('ranks a satisfied requirement the same as an unsatisfied one', () => {
+    const exact = {
+      requirementId: 'spellbook',
+      owner: { kind: 'class' as const, id: 'wizard' },
+      rule: 'exact' as const,
+      optionSatisfies: true as const,
+    }
     expect(
       compareActiveRequirement(
-        [
-          {
-            requirementId: 'focus',
-            owner: { kind: 'class', id: 'wizard' },
-            rule: 'anyOf',
-            optionSatisfies: true,
-            role: 'satisfier',
-          },
-        ],
-        [],
+        [{ ...exact, role: 'candidate' }],
+        [{ ...exact, role: 'satisfier' }],
       ),
     ).toBe(0)
+    expect(
+      compareActiveRequirement([{ ...exact, role: 'satisfier', rule: 'anyOf' }], []),
+    ).toBeLessThan(0)
   })
 
   it('keeps context relevance inactive for the general drawer', () => {
@@ -160,6 +161,50 @@ describe('compareIntentionalEquipmentRanking', () => {
     })
 
     expect(compareIntentionalEquipmentRanking(required, neutral, context)).toBeLessThan(0)
+  })
+
+  it('does not lift an alternative package or an open pool ahead of name order', () => {
+    const context = {
+      preferMartialWeaponBrowseOrder: false,
+      activeChoice: { kind: 'pool' as const, choiceSetId: 'fighter:weapons' },
+    }
+    const later = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {
+        choice: {
+          choiceSetId: 'fighter:weapons',
+          inOpenPool: true,
+          inSelectedPackage: false,
+          inAlternativePackage: true,
+        },
+      },
+    })
+    const earlier = item('Bedroll', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+    })
+
+    expect(compareIntentionalEquipmentRanking(later, earlier, context)).toBeGreaterThan(0)
+  })
+
+  it('does not sink an unaffordable row ahead of name order', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankPurchaseAvailability: true }
+    const later = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'available' },
+    })
+    const earlier = item('Bedroll', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+    })
+
+    expect(compareIntentionalEquipmentRanking(later, earlier, context)).toBeGreaterThan(0)
   })
 
   it('compares proficiency only when both rows define it', () => {

@@ -1,16 +1,14 @@
 import type { SpellPickerItem } from '../spellcasting/resolve-spell-picker-items'
+import { compareRecommendedThenName } from './compare-recommended-then-name'
 
 export function compareSpellPickerItemsByRecommendation(
   left: SpellPickerItem,
   right: SpellPickerItem,
 ): number {
-  if (left.state.isRecommended !== right.state.isRecommended) {
-    return left.state.isRecommended ? -1 : 1
-  }
-
-  if (left.state.canSelect !== right.state.canSelect) {
-    return left.state.canSelect ? -1 : 1
-  }
-
-  return left.spell.name.localeCompare(right.spell.name, undefined, { sensitivity: 'base' })
+  return compareRecommendedThenName(
+    left.state.isRecommended,
+    right.state.isRecommended,
+    left.spell.name,
+    right.spell.name,
+  )
 }

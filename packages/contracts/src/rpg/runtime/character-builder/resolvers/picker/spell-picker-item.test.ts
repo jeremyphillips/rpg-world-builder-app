@@ -68,4 +68,21 @@ describe('compareSpellPickerItemsByRecommendation', () => {
 
     expect(compareSpellPickerItemsByRecommendation(recommended, peer)).toBeLessThan(0)
   })
+
+  it('does not sink a selected spell below a later selectable peer', () => {
+    const selected = makeSpellItem('Alpha', {
+      isRecommended: false,
+      canSelect: false,
+      isAlreadySelected: true,
+      isSelectionFull: false,
+    })
+    const selectable = makeSpellItem('Zebra', {
+      isRecommended: false,
+      canSelect: true,
+      isAlreadySelected: false,
+      isSelectionFull: false,
+    })
+
+    expect(compareSpellPickerItemsByRecommendation(selected, selectable)).toBeLessThan(0)
+  })
 })

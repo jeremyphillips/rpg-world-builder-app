@@ -360,6 +360,10 @@ Row state for spells and proficiencies extends `PickerItemStateBase`
 dashboard libs. When browse logic encodes domain policy, promote it to contracts
 only if a non-dashboard consumer appears.
 
+Browse order ignores selection, remaining budget, and grant consumption. Those
+facts stay on the row as chrome and disabled actions. Rank semantics live in
+[`content-ranking.md`](../../../packages/contracts/docs/character-builder/content-ranking.md).
+
 ## Shared picker modules (`components/picker/`)
 
 `components/picker/` is a **shared character picker chrome/composition layer**, not a

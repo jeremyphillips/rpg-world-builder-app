@@ -86,7 +86,7 @@ describe('proficiency-picker-drawer.lib', () => {
     expect(getProficiencyPickerDisabledNote(item)).toBeUndefined()
   })
 
-  it('sorts best_match by recommendation and selectability instead of name only', () => {
+  it('sorts best_match by recommendation instead of name only', () => {
     const selectable: ProficiencyPickerItem = {
       optionId: 'alpha',
       label: 'Alpha',

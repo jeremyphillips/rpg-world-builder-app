@@ -439,7 +439,7 @@ describe('equipment-picker-drawer.lib', () => {
     ).toEqual(['Bead of Force', 'Longsword', 'Rope'])
   })
 
-  it('lets search beat magic-item action rank for blocked rows in magic-items workflow', () => {
+  it('keeps a magic-item name match when the row is blocked', () => {
     const bead: EquipmentPickerItem = {
       equipment: {
         ...equipmentPickerPotionFixture,
@@ -484,18 +484,19 @@ describe('equipment-picker-drawer.lib', () => {
       filterAndSortEquipmentPickerItems([otherMagic, bead], {
         searchQuery: 'bead',
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
       }).map((item) => item.equipment.name),
     ).toEqual(['Bead of Force'])
   })
 
-  it('orders magic-items workflow by action rank before recommendation', () => {
+  it('does not reorder magic items by action rank', () => {
     const grantAvailable: EquipmentPickerItem = {
-      equipment: equipmentPickerPotionFixture,
-      searchDocument: pickerSearchDocument(
-        equipmentPickerPotionFixture.id,
-        'potion of healing magic item',
-      ),
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:zebra-relic',
+        slug: 'zebra-relic',
+        name: 'Zebra Relic',
+      },
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:zebra-relic', 'zebra relic magic item'),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -506,36 +507,31 @@ describe('equipment-picker-drawer.lib', () => {
         magicItemAction: { rank: 0, reason: 'grant_available' },
       }),
     }
-    const unavailableStrong: EquipmentPickerItem = {
+    const unavailable: EquipmentPickerItem = {
       equipment: {
         ...equipmentPickerPotionFixture,
-        id: 'srd-cc-5.2.1:strong-relic',
-        slug: 'strong-relic',
-        name: 'Strong Relic',
+        id: 'srd-cc-5.2.1:alpha-relic',
+        slug: 'alpha-relic',
+        name: 'Alpha Relic',
       },
-      searchDocument: pickerSearchDocument('srd-cc-5.2.1:strong-relic', 'strong relic magic item'),
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:alpha-relic', 'alpha relic magic item'),
       state: pickerState({
         isAvailable: true,
-        isRecommended: true,
+        isRecommended: false,
         isProficient: true,
         isWithinRemainingBudget: true,
-        recommendation: {
-          tier: 'strong',
-          reasons: ['startingEquipment'],
-          specificity: 'exact',
-        },
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         disabledReasons: [],
         magicItemAction: { rank: 3, reason: 'unavailable' },
       }),
     }
 
     expect(
-      filterAndSortEquipmentPickerItems([unavailableStrong, grantAvailable], {
+      filterAndSortEquipmentPickerItems([grantAvailable, unavailable], {
         searchQuery: '',
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
       }).map((item) => item.equipment.name),
-    ).toEqual(['Potion of Healing', 'Strong Relic'])
+    ).toEqual(['Alpha Relic', 'Zebra Relic'])
   })
 
   it('matches recommendation order for empty-query best_match', () => {
