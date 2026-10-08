@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { mapSpellPickerCompactSummaryToMetadataLines } from './map-spell-picker-compact-summary-to-metadata-lines'
 
 describe('mapSpellPickerCompactSummaryToMetadataLines', () => {
-  it('maps curated groups onto one line and emphasizes the level inside classification', () => {
+  it('maps curated groups onto one metadata line, including ritual and concentration', () => {
     expect(
       mapSpellPickerCompactSummaryToMetadataLines({
         groups: [

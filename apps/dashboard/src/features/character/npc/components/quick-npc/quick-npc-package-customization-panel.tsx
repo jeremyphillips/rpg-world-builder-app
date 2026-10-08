@@ -10,6 +10,8 @@ import {
   SelectionOptionCardEmbeddedPanelRowStatus,
 } from '@rpg/ui'
 
+import { EntitySummaryStatus } from '@/features/content'
+
 import {
   QUICK_NPC_ALL_REMOVED_WITHOUT_WEALTH_NOTE,
   QUICK_NPC_CANCEL_LABEL,
@@ -31,7 +33,6 @@ import {
   type QuickNpcPackageCustomizationRow,
 } from '../../lib/quick-npc/quick-npc-package-customization.lib'
 import {
-  quickNpcPackageAdvisoryClasses,
   quickNpcPackageCustomizationFooterActionsClasses,
   quickNpcPackageCustomizationFooterClasses,
   quickNpcPackageCustomizationLockClasses,
@@ -84,9 +85,13 @@ export function QuickNpcPackageCustomizationPanel({
           const removed = row.retainedQuantity === 0
           return (
             <SelectionOptionCardEmbeddedPanelRow key={row.entryId} label={row.label}>
-              {row.advisoryLabel && !removed ? (
+              {row.status && row.status.length > 0 ? (
                 <SelectionOptionCardEmbeddedPanelRowStatus>
-                  <span className={quickNpcPackageAdvisoryClasses}>{row.advisoryLabel}</span>
+                  <EntitySummaryStatus
+                    items={row.status}
+                    density="compact"
+                    composition="metadata"
+                  />
                 </SelectionOptionCardEmbeddedPanelRowStatus>
               ) : null}
               {removed ? (

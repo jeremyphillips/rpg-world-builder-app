@@ -5,7 +5,8 @@ import {
   createCatalogEntityRowRenderer,
   CatalogMetadataRenderer,
 } from '@/features/content'
-import { recommendationStatusItems } from '../../../lib/recommendation/format-inline-recommendation-sources'
+import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
+import { resolveSpellSelectionRowPresentation } from '../../../lib/spells/spell-selection-row-presentation.lib'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
@@ -208,7 +209,14 @@ export function SpellPickerDrawer({
       }}
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
-          const disabledNote = getSpellPickerDisabledNote(item)
+          const status = resolveSelectionRowStatusItems(
+            resolveSpellSelectionRowPresentation({
+              facts: item.state.presentation?.facts,
+              recommendationsEnabled,
+              disabledNote: getSpellPickerDisabledNote(item),
+            }),
+            { context: 'picker' },
+          )
 
           return {
             heading: item.spell.name,
@@ -218,12 +226,7 @@ export function SpellPickerDrawer({
                 lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ),
-            status: [
-              ...(recommendationsEnabled ? recommendationStatusItems(item.state.presentation) : []),
-              ...(disabledNote
-                ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
-                : []),
-            ],
+            ...(status.length > 0 ? { status, statusComposition: 'metadata' as const } : {}),
           }
         },
         buildTrailing: (item) => ({

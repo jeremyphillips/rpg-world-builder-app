@@ -48,6 +48,7 @@ export {
   type EntityDisclosureArrayItemShellProps,
 } from './lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
 export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
+export { EntitySummaryStatus } from './lib/entity/summary/entity-summary'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
 export type {
   EntitySummaryStatusComposition,

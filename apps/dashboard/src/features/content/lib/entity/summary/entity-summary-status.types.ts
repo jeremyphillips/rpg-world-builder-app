@@ -15,8 +15,8 @@ export type EntitySummaryStatusBadge = {
 }
 
 /**
- * Supporting status annotation — ritual/concentration markers, disabled notes, warnings,
- * selection guidance. Not a generic third-line slot.
+ * Supporting status annotation — capacity notices, warnings, selection guidance.
+ * Ritual and concentration stay on the spell metadata line. Not a generic third-line slot.
  */
 export type EntitySummaryStatusText = {
   kind: 'text'

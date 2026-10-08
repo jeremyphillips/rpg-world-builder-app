@@ -67,6 +67,37 @@ export const SelectionFull: Story = {
   },
 }
 
+export const Recommended: Story = {
+  args: {
+    ...baseArgs,
+    open: true,
+    onOpenChange: () => undefined,
+    recommendationsEnabled: true,
+    cantripItems: spellPickerOpenItemsFixture.map((item, index) =>
+      index === 0
+        ? {
+            ...item,
+            state: {
+              ...item.state,
+              isRecommended: true,
+              presentation: {
+                facts: [
+                  {
+                    kind: 'recommendation' as const,
+                    discriminator: 'recommended' as const,
+                    label: 'Recommended by class',
+                    sourceKind: 'class' as const,
+                    sourceLabels: ['Wizard class'],
+                  },
+                ],
+              },
+            },
+          }
+        : item,
+    ),
+  },
+}
+
 export const NoOptions: Story = {
   args: {
     ...baseArgs,

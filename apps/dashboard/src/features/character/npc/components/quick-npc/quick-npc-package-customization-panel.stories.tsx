@@ -2,6 +2,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
 
+const selectionStatus = [
+  {
+    kind: 'badge' as const,
+    label: 'Not proficient',
+    tone: 'warning' as const,
+    appearance: 'soft' as const,
+  },
+  { kind: 'text' as const, variant: 'guidance' as const, label: 'Required by class' },
+]
+
 const rows = [
   {
     entryId: 'chain-mail',
@@ -9,6 +19,7 @@ const rows = [
     packageQuantity: 1,
     retainedQuantity: 1,
     kind: 'singleton' as const,
+    status: selectionStatus,
   },
   {
     entryId: 'javelin',
@@ -23,6 +34,7 @@ const rows = [
     packageQuantity: 1,
     retainedQuantity: 0,
     kind: 'singleton' as const,
+    status: selectionStatus,
   },
 ]
 

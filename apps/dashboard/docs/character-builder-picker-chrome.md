@@ -99,7 +99,7 @@ tables. Domain resolvers never pick a category or a context.
 | `availability`        | blocker: `unavailable`, `not_purchasable`, `acquisition_blocked`, `conversion_blocked` |
 | `affordability`       | blocker: `unaffordable`                                                                |
 | `compatibility`       | warning: `not_proficient`, `ability_score_requirement`                                 |
-| `capacity`            | notice: `selection_full`, `already_granted` (Gate C emitters)                          |
+| `capacity`            | notice: `selection_full`, `already_granted`                                            |
 | `requirement_open`    | requirement / requirement match, role `candidate`                                      |
 | `requirement_held`    | requirement / requirement match, role `satisfier`                                      |
 | `recommendation`      | recommendation, not owned                                                              |
@@ -108,12 +108,12 @@ tables. Domain resolvers never pick a category or a context.
 
 ### Context matrix
 
-| Context          | Equipment surfaces                                                   | Availability | Affordability | Compatibility | Req. (open) | Req. (held) | Recommendation | Rec. (owned) | Source |
+| Context          | Surfaces                                                             | Availability | Affordability | Compatibility | Req. (open) | Req. (held) | Recommendation | Rec. (owned) | Source |
 | ---------------- | -------------------------------------------------------------------- | ------------ | ------------- | ------------- | ----------- | ----------- | -------------- | ------------ | ------ |
-| `picker`         | Picker drawer                                                        | yes          | yes           | yes           | yes         | no          | yes            | no           | yes    |
-| `owned`          | Added Equipment cart                                                 | no           | no            | yes           | no          | no          | no             | no           | no     |
+| `picker`         | Equipment, spell, and proficiency picker drawers                     | yes          | yes           | yes           | yes         | no          | yes            | no           | yes    |
+| `owned`          | Added Equipment cart; Quick NPC selected additional equipment        | no           | no            | yes           | no          | no          | no             | no           | no     |
 | `review`         | Starting Package expanded view; Quick NPC weapon requirement preview | no           | no            | yes           | no          | no          | no             | no           | no     |
-| `edit_choice`    | Package conversion editor; Quick NPC package customization (Gate C)  | yes          | no            | yes           | yes         | yes         | yes            | yes          | no     |
+| `edit_choice`    | Package conversion editor; Quick NPC package customization           | yes          | no            | yes           | yes         | yes         | yes            | yes          | no     |
 | `reconciliation` | Package-switch trim modal                                            | no           | no            | yes           | yes         | no          | yes            | no           | no     |
 
 `picker` hides held requirements and owned recommendations, because that guidance has already
@@ -184,14 +184,14 @@ The equipment step mounts `EquipmentSelectionFactsProvider`; **sections** read
     each item to `EquipmentPurchasedInventorySection` with its status resolved.
 - `equipment-selection-row-presentation.parity.test.ts` guards drift: owned weapons and armor show
   a compatibility entry if and only if a matching build advisory exists.
-
-### Remaining migration
-
-- **Gate C (spells, languages, Quick NPC):** the spell and proficiency drawers move to `picker`
-  (recommendation and capacity notices). Quick NPC package customization moves to `edit_choice`
-  and selected additional rows to `owned`. `recommendationStatusItems` and
-  `buildAdvisoryStatusItems` are deleted, and a "Status / guidance" row is added to the
-  commonality matrix.
+- Spell and proficiency drawers use `picker`. Recommendation guidance is a domain input
+  (`recommendationsEnabled` on spells; always on for proficiencies). Capacity notices
+  (`selection_full`, `already_granted`) come from the shared disabled-note string.
+  Ritual and concentration stay on the spell metadata line.
+- Quick NPC package customization rows use `edit_choice`, and selected additional equipment
+  rows use `owned`. Both read `deriveQuickNpcEquipmentSelectionFacts` from the prepared draft
+  (package selections, retained items, generated scores). The summary card stays on advisories
+  via `formatBuildAdvisoryLabel`.
 
 ## Architectural rule
 
@@ -286,6 +286,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 | Workflow mode tabs          | Purchase / magic items                                                  | Cantrips / prepared       | No                             | Equipment only                                                                 |
 | Budget / price UI           | Yes                                                                     | No                        | No                             | Equipment only                                                                 |
 | Metadata renderer           | Content `CatalogMetadataRenderer`                                       | Same                      | Same                           | Domain mappers under each `*/picker/`                                          |
+| Status / guidance           | `picker`, plus owned, review, edit, and reconciliation on builder rows  | `picker`                  | `picker`                       | `resolveSelectionRowStatusItems` and the context policy                        |
 
 Visible reset copy is `Reset`. The accessible name and `title` are `Reset search, filters, and sorting` when Sort is on the toolbar, and `Reset search and filters` when it is not. The reset row stays reserved (invisible, not focusable) only while Sort is persistent. Drawers without Sort mount Reset only while it is visible. Equipment `clear_filters` keeps `Clear filters` and does not use the reset accessible name. Spell recommendation tabs still park `actions` on the tab row.
 

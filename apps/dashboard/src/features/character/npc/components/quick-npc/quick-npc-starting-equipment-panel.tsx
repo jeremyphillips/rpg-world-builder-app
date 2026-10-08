@@ -48,10 +48,10 @@ import {
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
 import { useQuickNpcPreparedBuildValue } from '../../hooks/use-quick-npc-prepared-build'
 import {
-  buildAdvisoryStatusItems,
-  indexBuildAdvisoriesByEquipmentId,
-  lookupBuildAdvisoriesForEquipment,
-} from '../../../lib/build-advisories/build-advisory-presentation.lib'
+  deriveQuickNpcEquipmentSelectionFacts,
+  quickNpcPackageAdvisoryLabels,
+  resolveQuickNpcEquipmentRowStatus,
+} from '../../lib/quick-npc/quick-npc-equipment-row-status.lib'
 import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
 
 import {
@@ -213,9 +213,18 @@ function QuickNpcStartingEquipmentPackageSection({
     (summary) => summary.optionId === selectedOption?.id,
   )
   const prepared = useQuickNpcPreparedBuildValue()
-  const advisoryIndex = React.useMemo(
-    () => indexBuildAdvisoriesByEquipmentId(prepared?.advisories ?? []),
-    [prepared],
+  const catalogIndex = React.useMemo(
+    () => indexCharacterBuildCatalog(buildContext.catalog),
+    [buildContext.catalog],
+  )
+  const selectionFacts = React.useMemo(
+    () =>
+      deriveQuickNpcEquipmentSelectionFacts({
+        prepared,
+        catalogIndex,
+        rulesetId: buildContext.rulesetId,
+      }),
+    [prepared, catalogIndex, buildContext.rulesetId],
   )
   const rows = (
     selectedOption && selectedSummary
@@ -226,11 +235,19 @@ function QuickNpcStartingEquipmentPackageSection({
         })
       : []
   ).map((row) => {
-    if (!row.equipmentId || row.retainedQuantity <= 0) return row
-    const advisoryLabel = buildAdvisoryStatusItems(
-      lookupBuildAdvisoriesForEquipment(advisoryIndex, row.equipmentId, buildContext.rulesetId),
-    )[0]?.label
-    return advisoryLabel ? { ...row, advisoryLabel } : row
+    if (!row.equipmentId) return row
+    const status = resolveQuickNpcEquipmentRowStatus({
+      facts: selectionFacts,
+      catalogIndex,
+      equipmentId: row.equipmentId,
+      context: 'edit_choice',
+    })
+    return status.length > 0 ? { ...row, status } : row
+  })
+  const advisoryLabels = quickNpcPackageAdvisoryLabels({
+    rows,
+    advisories: prepared?.advisories ?? [],
+    rulesetId: buildContext.rulesetId,
   })
   const description =
     selectedOption && selectedSummary
@@ -384,7 +401,7 @@ function QuickNpcStartingEquipmentPackageSection({
             setIsPackageChooserExpanded(true)
           }}
           description={description}
-          advisoryLabels={rows.flatMap((row) => (row.advisoryLabel ? [row.advisoryLabel] : []))}
+          advisoryLabels={advisoryLabels}
           titleAdornment={
             customized && !disclosureOpen ? (
               <Badge tone="neutral" size="sm" appearance="soft" aria-hidden className="shrink-0">
@@ -641,18 +658,15 @@ function toAdditionalEquipmentComboboxOptions(
 
 function AdditionalEquipmentSelectedList({
   rows,
-  rulesetId,
+  catalogIndex,
+  selectionFacts,
   onRemove,
 }: {
   rows: ReturnType<typeof listSelectedQuickNpcAdditionalEquipment>
-  rulesetId: string
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
+  selectionFacts: ReturnType<typeof deriveQuickNpcEquipmentSelectionFacts>
   onRemove: (equipmentId: string) => void
 }) {
-  const prepared = useQuickNpcPreparedBuildValue()
-  const advisoryIndex = React.useMemo(
-    () => indexBuildAdvisoriesByEquipmentId(prepared?.advisories ?? []),
-    [prepared],
-  )
   if (rows.length === 0) return null
   return (
     <ul className={quickNpcStartingChoiceSelectedListClasses}>
@@ -667,9 +681,12 @@ function AdditionalEquipmentSelectedList({
               </span>
             </span>
           ) : undefined
-        const status = buildAdvisoryStatusItems(
-          lookupBuildAdvisoriesForEquipment(advisoryIndex, equipmentId, rulesetId),
-        )
+        const status = resolveQuickNpcEquipmentRowStatus({
+          facts: selectionFacts,
+          catalogIndex,
+          equipmentId,
+          context: 'owned',
+        })
         return (
           <li key={equipmentId}>
             <QuickNpcStartingChoiceSelectedRow
@@ -756,6 +773,16 @@ function QuickNpcAdditionalEquipmentSection({
     () => indexCharacterBuildCatalog(buildContext.catalog),
     [buildContext.catalog],
   )
+  const prepared = useQuickNpcPreparedBuildValue()
+  const selectionFacts = React.useMemo(
+    () =>
+      deriveQuickNpcEquipmentSelectionFacts({
+        prepared,
+        catalogIndex,
+        rulesetId: buildContext.rulesetId,
+      }),
+    [prepared, catalogIndex, buildContext.rulesetId],
+  )
   const sourceName = React.useMemo(
     () => equipmentRecommendationSourceName(catalogIndex),
     [catalogIndex],
@@ -826,7 +853,8 @@ function QuickNpcAdditionalEquipmentSection({
       />
       <AdditionalEquipmentSelectedList
         rows={selectedAdditional}
-        rulesetId={buildContext.rulesetId}
+        catalogIndex={catalogIndex}
+        selectionFacts={selectionFacts}
         onRemove={removeAdditionalEquipment}
       />
       <div

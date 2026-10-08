@@ -104,7 +104,7 @@ describe('SpellPickerDrawer', () => {
     expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
   })
 
-  it('shows a Recommended badge when recommendations are enabled', () => {
+  it('shows recommendation guidance and a capacity notice on one metadata line', () => {
     const recommendedItem = {
       ...spellPickerOpenItemsFixture[0]!,
       state: {
@@ -125,24 +125,49 @@ describe('SpellPickerDrawer', () => {
           facts: [
             {
               kind: 'recommendation' as const,
-              label: 'Recommended',
+              discriminator: 'recommended' as const,
+              label: 'Recommended by class',
+              sourceKind: 'class' as const,
               sourceLabels: ['Wizard class'],
             },
           ],
         },
       },
     }
+    const blockedItem = {
+      ...spellPickerOpenItemsFixture[1]!,
+      state: {
+        ...spellPickerOpenItemsFixture[1]!.state,
+        canSelect: false,
+        isSelectionFull: true,
+        disabledReasons: ['Selection full'],
+        presentation: recommendedItem.state.presentation,
+      },
+    }
 
     renderCantripDrawer({
       recommendationsEnabled: true,
       cantripSelectedIds: [],
-      cantripItems: [recommendedItem, ...spellPickerOpenItemsFixture.slice(1)],
+      cantripItems: [recommendedItem, blockedItem],
     })
 
     const mageHandRow = screen
       .getByText('Mage Hand')
       .closest('[data-picker-item-key]') as HTMLElement
-    expect(within(mageHandRow).getByText('Recommended')).toBeInTheDocument()
+    const guidance = within(mageHandRow).getByText('Recommended by class')
+    expect(guidance.tagName).toBe('SPAN')
+    expect(guidance).toHaveClass('text-foreground')
+    expect(guidance).toHaveAttribute('title', 'Wizard class')
+    expect(within(mageHandRow).queryByText('Selection full')).not.toBeInTheDocument()
+
+    const blockedRow = screen
+      .getByText('Detect Magic')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(blockedRow).getByText('Recommended by class')).toBeInTheDocument()
+    expect(within(blockedRow).getByText('Selection full')).toBeInTheDocument()
+    const statusLine = blockedRow.querySelector('[data-entity-summary-status]')?.parentElement
+      ?.parentElement
+    expect(statusLine?.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
   })
 
   it('disables Add when canSelect is false and keeps selected rows removable', () => {

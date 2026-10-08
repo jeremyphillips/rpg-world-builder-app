@@ -26,6 +26,7 @@ import {
 } from '@rpg/contracts'
 
 import { countStartingEquipmentRadioOptions } from '@/features/character/lib/equipment/equipment-step.lib'
+import type { EntitySummaryStatusItem } from '@/features/content'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 
@@ -62,8 +63,8 @@ export type QuickNpcPackageCustomizationRow = {
   retainedQuantity: number
   kind: 'singleton' | 'stack'
   equipmentId?: string
-  /** Warning sentence from the shared advisory index. Owned rows only. */
-  advisoryLabel?: string
+  /** Context-filtered selection status. Shown whether or not the row is retained. */
+  status?: readonly EntitySummaryStatusItem[]
 }
 
 export function quickNpcUsePackageLabel(packageLabel: string): string {

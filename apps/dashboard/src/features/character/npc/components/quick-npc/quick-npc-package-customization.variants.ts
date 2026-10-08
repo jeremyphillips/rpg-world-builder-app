@@ -1,7 +1,5 @@
 export const quickNpcPackageCustomizationNoteClasses = 'text-xs text-muted-foreground'
 
-export const quickNpcPackageAdvisoryClasses = 'text-warning'
-
 export const quickNpcPackageCustomizationFooterClasses =
   'flex flex-wrap items-center justify-between gap-2'
 

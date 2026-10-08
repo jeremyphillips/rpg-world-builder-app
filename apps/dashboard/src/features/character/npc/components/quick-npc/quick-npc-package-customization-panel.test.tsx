@@ -22,18 +22,24 @@ const rows = [
 ]
 
 describe('QuickNpcPackageCustomizationPanel', () => {
-  it('shows a shared advisory sentence on a retained package row', () => {
+  it('shows selection status on a package row, including after it is removed', () => {
+    const status = [
+      {
+        kind: 'badge' as const,
+        label: 'Not proficient',
+        tone: 'warning' as const,
+        appearance: 'soft' as const,
+      },
+      { kind: 'text' as const, variant: 'guidance' as const, label: 'Required by class' },
+    ]
     render(
       <QuickNpcPackageCustomizationPanel
         packageLabel="Heavy Armor"
         rows={[
-          {
-            ...rows[0]!,
-            advisoryLabel: 'Not proficient with this armor',
-          },
-          rows[1]!,
+          { ...rows[0]!, status },
+          { ...rows[1]!, retainedQuantity: 0, status },
         ]}
-        draftQuantities={{}}
+        draftQuantities={{ javelin: 0 }}
         submittedQuantities={{}}
         showLockMessage={false}
         onChangeQuantity={vi.fn()}
@@ -45,7 +51,9 @@ describe('QuickNpcPackageCustomizationPanel', () => {
       />,
     )
 
-    expect(screen.getByText('Not proficient with this armor')).toBeTruthy()
+    expect(screen.getAllByText('Not proficient')).toHaveLength(2)
+    expect(screen.getAllByText('Required by class')).toHaveLength(2)
+    expect(screen.getByText('Removed')).toBeInTheDocument()
   })
 
   it('disables save until a quantity changes and restores a removed singleton', async () => {

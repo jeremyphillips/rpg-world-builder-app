@@ -8,7 +8,8 @@ import {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 
-import { recommendationStatusItems } from '../../../lib/recommendation/format-inline-recommendation-sources'
+import { resolveProficiencySelectionRowPresentation } from '../../../lib/proficiencies/proficiency-selection-row-presentation.lib'
+import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
@@ -117,12 +118,13 @@ export function ProficiencyPickerDrawer({
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getProficiencyPickerDisabledNote(item)
-          const status = [
-            ...recommendationStatusItems(item.state.presentation),
-            ...(disabledNote
-              ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
-              : []),
-          ]
+          const status = resolveSelectionRowStatusItems(
+            resolveProficiencySelectionRowPresentation({
+              facts: item.state.presentation?.facts,
+              disabledNote,
+            }),
+            { context: 'picker' },
+          )
 
           return {
             heading: item.label,
@@ -132,7 +134,7 @@ export function ProficiencyPickerDrawer({
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,
-            status: status.length > 0 ? status : undefined,
+            ...(status.length > 0 ? { status, statusComposition: 'metadata' as const } : {}),
           }
         },
         buildTrailing: (item) => ({

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { CharacterBuildAdvisory } from '@rpg/contracts'
 
 import {
-  buildAdvisoryStatusItems,
+  formatBuildAdvisoryLabel,
   indexBuildAdvisoriesByEquipmentId,
   lookupBuildAdvisoriesForEquipment,
   presentBuildAdvisoryList,
@@ -43,10 +43,8 @@ describe('build advisory presentation', () => {
     expect(lookupBuildAdvisoriesForEquipment(index, 'srd-cc-5.2.1:dagger')).toEqual([])
   })
 
-  it('maps advisories to warning status items with derived messages', () => {
-    expect(buildAdvisoryStatusItems([advisories[1]!])).toEqual([
-      { kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' },
-    ])
+  it('formats the player-facing advisory sentence', () => {
+    expect(formatBuildAdvisoryLabel(advisories[1]!)).toBe('Not proficient with this weapon')
   })
 
   it('indexes and presents ability-score requirement advisories', () => {
