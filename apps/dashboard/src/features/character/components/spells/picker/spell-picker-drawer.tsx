@@ -25,6 +25,10 @@ import {
   SPELL_PICKER_NO_RESULTS_MESSAGE,
   type SpellPickerDrawerProps,
 } from './spell-picker-drawer.types'
+import {
+  resolveSpellPickerAction,
+  resolveSpellPickerSelectionMode,
+} from './spell-picker-action.lib'
 import { SpellPickerItemDetails } from './spell-picker-item-details'
 import {
   SpellPickerFilterRowControls,
@@ -93,6 +97,9 @@ export function SpellPickerDrawer({
   const selectionLimit = activeChoiceSet?.max ?? 0
   const selectionComplete = activeSelectedIds.length >= selectionLimit && selectionLimit > 0
   const activePreparedLevel = resolveActivePreparedLevelSuffix(mode, browseState.selectedLevels)
+  const selectionMode = resolveSpellPickerSelectionMode(activeChoiceSet)
+  const addLabel = resolveSpellPickerAction({ selectionMode, selected: false })
+  const removeLabel = resolveSpellPickerAction({ selectionMode, selected: true })
 
   const segmentedOptions = modes.map((entry) => {
     const choiceSet = choiceSetForSpellPickerMode(entry, cantripChoiceSet, preparedChoiceSet)
@@ -232,6 +239,8 @@ export function SpellPickerDrawer({
             <CatalogPickerSelectionActions
               selected={item.state.isAlreadySelected}
               canSelect={item.state.canSelect}
+              addLabel={addLabel}
+              removeLabel={removeLabel}
               onAdd={() => onSelectSpell(mode, item.spell.id)}
               onRemove={() => onRemoveSpell(mode, item.spell.id)}
             />

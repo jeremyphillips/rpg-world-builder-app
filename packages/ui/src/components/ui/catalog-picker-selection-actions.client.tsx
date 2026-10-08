@@ -8,6 +8,7 @@ import type { CatalogPickerRowActionPhase } from './catalog-picker-row-action.li
 import { resolveCatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
 
 const CATALOG_PICKER_ADDED_LABEL = '✓ Added'
+const CATALOG_PICKER_REMOVE_LABEL = 'Remove'
 
 export type CatalogPickerSelectionActionsProps = {
   /** Explicit phase — takes precedence over legacy `selected` / pending / success flags. */
@@ -20,6 +21,7 @@ export type CatalogPickerSelectionActionsProps = {
   onAdd: () => void
   onRemove: () => void
   addLabel?: string
+  removeLabel?: string
   successLabel?: string
   pendingLabel?: string
   buttonVariant?: ButtonProps['variant']
@@ -46,6 +48,7 @@ export function CatalogPickerSelectionActions({
   onAdd,
   onRemove,
   addLabel = 'Add',
+  removeLabel = CATALOG_PICKER_REMOVE_LABEL,
   successLabel = CATALOG_PICKER_ADDED_LABEL,
   pendingLabel = 'Adding…',
   buttonVariant,
@@ -59,11 +62,12 @@ export function CatalogPickerSelectionActions({
           {successLabel}
         </Text>
       ) : resolvedPhase === 'remove' ? (
-        <CatalogPickerActionButton variant={buttonVariant} onClick={onRemove}>
-          Remove
+        <CatalogPickerActionButton intent="remove" variant={buttonVariant} onClick={onRemove}>
+          {removeLabel}
         </CatalogPickerActionButton>
       ) : (
         <CatalogPickerActionButton
+          intent="add"
           variant={buttonVariant}
           disabled={resolvedPhase === 'pending' || !canSelect}
           onClick={onAdd}

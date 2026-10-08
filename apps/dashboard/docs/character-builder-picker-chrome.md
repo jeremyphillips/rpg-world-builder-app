@@ -253,7 +253,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### SpellPickerDrawer
 
-**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome.
+**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; spell metadata/markers; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Add/Remove).
 
 **Must not know:** `draft.choiceSelections` shape; how the builder patches draft; campaign/sheet persistence.
 
@@ -340,10 +340,11 @@ picker root.
 
 **Promoted to `@rpg/ui`** (import from `@rpg/ui`, not `character/components/picker/`):
 
-| Module                                 | Role                                                  |
-| -------------------------------------- | ----------------------------------------------------- |
-| `catalog-picker-selection-actions.tsx` | Add / Remove row action phases                        |
-| `catalog-picker-row-action.lib.ts`     | Phase resolver (`resolveCatalogPickerRowActionPhase`) |
+| Module                                    | Role                                                                            |
+| ----------------------------------------- | ------------------------------------------------------------------------------- |
+| `catalog-picker-action-button.client.tsx` | Row verb button. `CATALOG_PICKER_ROW_ACTION_ICONS` toggles the plus/minus glyph |
+| `catalog-picker-selection-actions.tsx`    | Add / Remove row action phases                                                  |
+| `catalog-picker-row-action.lib.ts`        | Phase resolver (`resolveCatalogPickerRowActionPhase`)                           |
 
 **Not in `picker/` (domain-owned):**
 

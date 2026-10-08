@@ -69,7 +69,11 @@ export function buildEntitySurfaceInlineActionTrailing(
   return {
     kind: 'action',
     content: (
-      <CatalogPickerActionButton disabled={disabled} onClick={action.onClick}>
+      <CatalogPickerActionButton
+        intent={action.intent ?? 'add'}
+        disabled={disabled}
+        onClick={action.onClick}
+      >
         {action.loading ? `${action.label}…` : action.label}
       </CatalogPickerActionButton>
     ),
@@ -85,6 +89,7 @@ export function buildCatalogToggleSelectInlineAction(input: {
 }): EntitySurfaceInlineAction {
   return {
     label: input.isSelected ? 'Remove' : (input.selectLabel ?? 'Select'),
+    intent: input.isSelected ? 'remove' : 'add',
     onClick: input.isSelected ? input.onDeselect : input.onSelect,
     disabled: !input.isSelected && input.canSelect === false,
   }

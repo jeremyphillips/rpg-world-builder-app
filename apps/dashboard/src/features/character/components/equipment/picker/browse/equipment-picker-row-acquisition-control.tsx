@@ -52,7 +52,7 @@ export function EquipmentPickerRowAcquisitionControl({
 
   if (control.kind === 'disabled') {
     const action = (
-      <CatalogPickerActionButton disabled onClick={() => undefined}>
+      <CatalogPickerActionButton intent="add" disabled onClick={() => undefined}>
         {control.label}
       </CatalogPickerActionButton>
     )
@@ -74,7 +74,7 @@ export function EquipmentPickerRowAcquisitionControl({
 
   if (control.kind === 'release') {
     return (
-      <CatalogPickerActionButton onClick={() => onRelease(control.allowanceId)}>
+      <CatalogPickerActionButton intent="remove" onClick={() => onRelease(control.allowanceId)}>
         {EQUIPMENT_INVENTORY_RELEASE_LABEL}
       </CatalogPickerActionButton>
     )
@@ -82,7 +82,10 @@ export function EquipmentPickerRowAcquisitionControl({
 
   if (control.kind === 'remove') {
     return (
-      <CatalogPickerActionButton onClick={() => onRemovePurchase(control.purchaseId)}>
+      <CatalogPickerActionButton
+        intent="remove"
+        onClick={() => onRemovePurchase(control.purchaseId)}
+      >
         {EQUIPMENT_INVENTORY_REMOVE_LABEL}
       </CatalogPickerActionButton>
     )
@@ -114,7 +117,11 @@ export function EquipmentPickerRowAcquisitionControl({
 
   return (
     <>
-      <CatalogPickerActionButton disabled={control.disabled || isPending} onClick={onAdd}>
+      <CatalogPickerActionButton
+        intent="add"
+        disabled={control.disabled || isPending}
+        onClick={onAdd}
+      >
         {addLabel}
       </CatalogPickerActionButton>
       {commitFailed ? (

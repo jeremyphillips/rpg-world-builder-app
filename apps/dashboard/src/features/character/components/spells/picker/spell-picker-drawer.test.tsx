@@ -4,9 +4,14 @@ import type { ComponentProps } from 'react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import {
+  SPELL_PICKER_ACTION_PREPARE,
+  SPELL_PICKER_ACTION_UNPREPARE,
+} from './spell-picker-action.lib'
 import { SpellPickerDrawer } from './spell-picker-drawer'
 import {
   spellPickerCantripChoiceSetFixture,
+  spellPickerCureWoundsFixture,
   spellPickerDetectMagicFixture,
   spellPickerItemsFixture,
   spellPickerMageHandFixture,
@@ -14,10 +19,18 @@ import {
 } from './spell-picker-drawer.fixtures'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_PREPARED_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
 } from './spell-picker-drawer.types'
+
+const preparedSpellChoiceSet = {
+  ...spellPickerCantripChoiceSetFixture,
+  id: 'spellcasting:srd-cc-5.2.1:cleric:prepared',
+  choiceType: 'spell' as const,
+  label: 'Prepared spells',
+}
 
 function renderCantripDrawer(overrides: Partial<ComponentProps<typeof SpellPickerDrawer>> = {}) {
   const onSelectSpell = vi.fn()
@@ -140,6 +153,76 @@ describe('SpellPickerDrawer', () => {
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
     expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+  })
+
+  it('labels prepared rows Prepare and selected rows Unprepare', async () => {
+    const user = userEvent.setup()
+    const onSelectSpell = vi.fn()
+    const onRemoveSpell = vi.fn()
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Cleric"
+        preparedChoiceSet={preparedSpellChoiceSet}
+        cantripSelectedIds={[]}
+        preparedSelectedIds={[]}
+        cantripItems={[]}
+        preparedItems={spellPickerOpenItemsFixture}
+        initialMode={SPELL_PICKER_MODE_PREPARED_SPELLS}
+        onSelectSpell={onSelectSpell}
+        onRemoveSpell={onRemoveSpell}
+      />,
+    )
+
+    const cureWoundsRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    await user.click(
+      within(cureWoundsRow).getByRole('button', { name: SPELL_PICKER_ACTION_PREPARE }),
+    )
+    expect(onSelectSpell).toHaveBeenCalledWith(
+      SPELL_PICKER_MODE_PREPARED_SPELLS,
+      spellPickerCureWoundsFixture.id,
+    )
+
+    cleanup()
+
+    const selectedCureWounds = {
+      ...spellPickerOpenItemsFixture[2]!,
+      state: {
+        ...spellPickerOpenItemsFixture[2]!.state,
+        isAlreadySelected: true,
+      },
+    }
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Cleric"
+        preparedChoiceSet={preparedSpellChoiceSet}
+        cantripSelectedIds={[]}
+        preparedSelectedIds={[spellPickerCureWoundsFixture.id]}
+        cantripItems={[]}
+        preparedItems={[selectedCureWounds]}
+        initialMode={SPELL_PICKER_MODE_PREPARED_SPELLS}
+        onSelectSpell={vi.fn()}
+        onRemoveSpell={onRemoveSpell}
+      />,
+    )
+
+    const selectedRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    await user.click(
+      within(selectedRow).getByRole('button', { name: SPELL_PICKER_ACTION_UNPREPARE }),
+    )
+    expect(onRemoveSpell).toHaveBeenCalledWith(
+      SPELL_PICKER_MODE_PREPARED_SPELLS,
+      spellPickerCureWoundsFixture.id,
+    )
   })
 
   it('calls onSelectSpell and onRemoveSpell from row actions', async () => {

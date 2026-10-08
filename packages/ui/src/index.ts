@@ -1073,8 +1073,10 @@ export {
   type CatalogToolbarTabs,
 } from './components/ui/catalog-picker-sheet.client'
 export {
+  CATALOG_PICKER_ROW_ACTION_ICONS,
   CatalogPickerActionButton,
   type CatalogPickerActionButtonProps,
+  type CatalogPickerRowActionIntent,
 } from './components/ui/catalog-picker-action-button.client'
 export {
   CatalogPickerSelectionActions,

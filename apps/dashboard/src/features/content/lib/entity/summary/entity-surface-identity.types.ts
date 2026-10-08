@@ -1,4 +1,5 @@
 import type { ContentDisplayFallback, ContentDisplayImage } from '@rpg/contracts'
+import type { CatalogPickerRowActionIntent } from '@rpg/ui'
 
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 
@@ -15,6 +16,8 @@ export type EntitySurfaceIdentity = {
 export type EntitySurfaceInlineAction = {
   label: string
   onClick: () => void
+  /** Defaults to add (plus). Remove renders minus. */
+  intent?: CatalogPickerRowActionIntent
   disabled?: boolean
   loading?: boolean
 }
