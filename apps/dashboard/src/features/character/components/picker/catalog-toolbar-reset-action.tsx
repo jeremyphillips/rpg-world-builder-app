@@ -21,6 +21,17 @@ export type CatalogToolbarResetActionProps = {
   tabIndex?: number
 }
 
+/**
+ * Drawer reset chrome. Variant, size, density, and the reset glyph are fixed
+ * here so callers cannot restyle the control.
+ */
+const CATALOG_TOOLBAR_RESET_CHROME = {
+  action: 'reset',
+  variant: 'text',
+  size: 'sm',
+  density: 'compact',
+} as const
+
 export function CatalogToolbarResetAction({
   label,
   accessibleName,
@@ -29,11 +40,10 @@ export function CatalogToolbarResetAction({
 }: CatalogToolbarResetActionProps) {
   return (
     <ActionButton
-      action="reset"
-      variant="text"
-      size="sm"
-      density="default"
-      iconStep="sm"
+      action={CATALOG_TOOLBAR_RESET_CHROME.action}
+      variant={CATALOG_TOOLBAR_RESET_CHROME.variant}
+      size={CATALOG_TOOLBAR_RESET_CHROME.size}
+      density={CATALOG_TOOLBAR_RESET_CHROME.density}
       aria-label={accessibleName}
       title={accessibleName}
       onClick={onClick}
@@ -50,8 +60,8 @@ export type CatalogToolbarResetSlotProps = {
   /** Persistent Sort is on this toolbar. Reserves the reset row while idle. */
   includesSort: boolean
   /**
-   * Caller-supplied visible label and accessible name.
-   * Equipment clear-filters is the only override; it does not use the reset name.
+   * Replaces the visible label and the accessible name. Defaults to `Reset`
+   * with the sort-aware accessible name.
    */
   label?: string
 }

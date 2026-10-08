@@ -18,11 +18,13 @@ import {
   equipmentPickerSkilledHirelingFixture,
   pickerState,
 } from './equipment-picker-drawer.fixtures'
-import { CATALOG_TOOLBAR_RESET_WITH_SORT_NAME } from '../../../picker/catalog-toolbar-reset-action'
+import {
+  CATALOG_TOOLBAR_RESET_VISIBLE_LABEL,
+  CATALOG_TOOLBAR_RESET_WITH_SORT_NAME,
+} from '../../../picker/catalog-toolbar-reset-action'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
-  EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -263,13 +265,13 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
 
     expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
-    ).toHaveTextContent(EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL)
+      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
+    ).toHaveTextContent(CATALOG_TOOLBAR_RESET_VISIBLE_LABEL)
     expect(
-      screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }).textContent,
+      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }).textContent,
     ).not.toMatch(/\(\d+\)/)
 
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }))
+    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }))
 
     expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
     expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
@@ -277,7 +279,7 @@ describe('EquipmentPickerDrawer', () => {
       screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
     ).not.toBeChecked()
     expect(
-      screen.queryByRole('button', { name: EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL }),
+      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).not.toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Equipment sort order' })).toHaveTextContent(
       'Best match',
@@ -395,7 +397,7 @@ describe('EquipmentPickerDrawer', () => {
 
     const resetButton = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(resetButton).toHaveTextContent('Reset')
-    expect(resetButton).toHaveClass('h-8')
+    expect(resetButton).toHaveClass('h-6')
     expect(resetButton.querySelector('svg')).toHaveClass('size-icon-glyph-sm')
   })
 

@@ -15,7 +15,7 @@ describe('CatalogToolbarResetSlot', () => {
     const button = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(button).toHaveTextContent(CATALOG_TOOLBAR_RESET_VISIBLE_LABEL)
     expect(button).toHaveAttribute('title', CATALOG_TOOLBAR_RESET_WITH_SORT_NAME)
-    expect(button).toHaveClass('h-8')
+    expect(button).toHaveClass('h-6')
     expect(button.querySelector('svg')).toHaveClass('size-icon-glyph-sm')
   })
 
@@ -49,11 +49,11 @@ describe('CatalogToolbarResetSlot', () => {
   })
 
   it('uses a caller label without the reset accessible name', () => {
-    render(<CatalogToolbarResetSlot visible includesSort label="Clear filters" onClick={vi.fn()} />)
+    render(<CatalogToolbarResetSlot visible includesSort label="Start over" onClick={vi.fn()} />)
 
-    const button = screen.getByRole('button', { name: 'Clear filters' })
-    expect(button).toHaveTextContent('Clear filters')
-    expect(button).toHaveAttribute('title', 'Clear filters')
+    const button = screen.getByRole('button', { name: 'Start over' })
+    expect(button).toHaveTextContent('Start over')
+    expect(button).toHaveAttribute('title', 'Start over')
     expect(
       screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
     ).not.toBeInTheDocument()

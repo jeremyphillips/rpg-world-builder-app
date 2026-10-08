@@ -20,7 +20,6 @@ import {
 } from '../browse/equipment-picker-filter-controls'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
-  EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL,
   EQUIPMENT_PICKER_MODE_LABELS,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
@@ -92,7 +91,6 @@ function EquipmentPickerToolbarActions({
     <CatalogToolbarResetSlot
       visible={showClearFilters || showResetView}
       includesSort
-      label={showClearFilters ? EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL : undefined}
       onClick={showClearFilters ? onClearStructuredFilters : onResetView}
     />
   )

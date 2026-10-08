@@ -179,7 +179,7 @@ production default `reset_view`):
 | **Clear filters** | search, category, Affordable now       | sort      |
 | **Reset view**    | search, category, Affordable now, sort | —         |
 
-Action buttons show no counts.
+Both modes use the shared Reset button. Action buttons show no counts.
 
 ## Picker purchase availability
 
