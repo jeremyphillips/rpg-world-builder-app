@@ -12,6 +12,11 @@ import type {
   EquipmentPickerRowViewModel,
 } from '@/features/content'
 
+import type {
+  PickerSelectionProvenance,
+  PickerSelectionState,
+} from '../../../../lib/picker/picker-selection-state'
+
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
   EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
@@ -85,7 +90,15 @@ export type EquipmentPickerItemPresentation = {
   /** Availability and affordability blockers; rendered with the row's selection presentation. */
   blockers?: readonly SelectionStatusEntry[]
   control: EquipmentPickerHeaderControl
+  /** Release and remove actions. Text ownership lives on `selectionState`. */
   provenance: readonly EquipmentPickerProvenanceSegment[]
+  /** Null when nothing is owned, including while Add is showing. */
+  selectionState: PickerSelectionState | null
+}
+
+type EquipmentOwnershipLines = {
+  selectionProvenance: PickerSelectionProvenance[]
+  provenance: EquipmentPickerProvenanceSegment[]
 }
 
 type EquipmentAcquisitionBlocker = NonNullable<
@@ -158,23 +171,21 @@ function releaseSegment(choice: EquipmentOwnershipChoice): EquipmentPickerProven
   }
 }
 
-function purchasedSegmentLabel(ownership: EquipmentOwnership): string {
+function purchasedSegmentLabel(ownership: EquipmentOwnership, omitQuantity: boolean): string {
   const { quantity, spendCp } = ownership.editablePurchased
   const base =
-    quantity > 1
-      ? `${EQUIPMENT_PICKER_PURCHASED_LABEL} ×${quantity}`
-      : EQUIPMENT_PICKER_PURCHASED_LABEL
+    omitQuantity || quantity <= 1
+      ? EQUIPMENT_PICKER_PURCHASED_LABEL
+      : `${EQUIPMENT_PICKER_PURCHASED_LABEL} ×${quantity}`
   if (spendCp <= 0) return base
   return joinInlineMetadata([base, formatWealth(copperToDisplayWealth(spendCp))])
 }
 
-function appendPackageProvenance(
-  segments: EquipmentPickerProvenanceSegment[],
-  packageQuantity: number,
-): void {
+function appendPackageProvenance(lines: EquipmentOwnershipLines, packageQuantity: number): void {
   if (packageQuantity <= 0) return
-  segments.push({
-    kind: 'text',
+  lines.selectionProvenance.push({
+    kind: 'package',
+    quantity: packageQuantity,
     label:
       packageQuantity === 1
         ? EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL
@@ -185,13 +196,11 @@ function appendPackageProvenance(
   })
 }
 
-function appendGrantProvenance(
-  segments: EquipmentPickerProvenanceSegment[],
-  grantQuantity: number,
-): void {
+function appendGrantProvenance(lines: EquipmentOwnershipLines, grantQuantity: number): void {
   if (grantQuantity <= 0) return
-  segments.push({
-    kind: 'text',
+  lines.selectionProvenance.push({
+    kind: 'grant',
+    quantity: grantQuantity,
     label: formatEquipmentInventorySourceQuantity(
       EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
       grantQuantity,
@@ -200,39 +209,49 @@ function appendGrantProvenance(
 }
 
 function appendChoiceProvenance(
-  segments: EquipmentPickerProvenanceSegment[],
+  lines: EquipmentOwnershipLines,
   choices: readonly EquipmentOwnershipChoice[],
   control: EquipmentPickerHeaderControl,
 ): void {
   for (const choice of choices) {
-    segments.push({ kind: 'text', label: choiceSegmentLabel(choice) })
+    lines.selectionProvenance.push({
+      kind: 'choice',
+      quantity: choice.quantity,
+      label: choiceSegmentLabel(choice),
+    })
     const headerOwnsThisChoice =
       control.kind === 'release' && control.allowanceId === choice.allowanceId
-    if (!headerOwnsThisChoice) segments.push(releaseSegment(choice))
+    if (!headerOwnsThisChoice) lines.provenance.push(releaseSegment(choice))
   }
 }
 
 function appendLockedPurchasedProvenance(
-  segments: EquipmentPickerProvenanceSegment[],
+  lines: EquipmentOwnershipLines,
   lockedQuantity: number,
 ): void {
   if (lockedQuantity <= 0) return
-  segments.push({
-    kind: 'text',
+  lines.selectionProvenance.push({
+    kind: 'purchase',
+    quantity: lockedQuantity,
     label: formatEquipmentInventorySourceQuantity(EQUIPMENT_PICKER_CONVERTED_LABEL, lockedQuantity),
   })
 }
 
 function appendEditablePurchasedProvenance(
-  segments: EquipmentPickerProvenanceSegment[],
+  lines: EquipmentOwnershipLines,
   ownership: EquipmentOwnership,
   control: EquipmentPickerHeaderControl,
   workflowMode: EquipmentPickerWorkflowMode,
 ): void {
-  if (ownership.editablePurchased.quantity <= 0 || control.kind === 'stepper') return
-  segments.push({ kind: 'text', label: purchasedSegmentLabel(ownership) })
-  if (workflowMode !== 'magic_items' || control.kind === 'remove') return
-  segments.push({
+  if (ownership.editablePurchased.quantity <= 0) return
+  const omitQuantity = control.kind === 'stepper'
+  lines.selectionProvenance.push({
+    kind: 'purchase',
+    quantity: ownership.editablePurchased.quantity,
+    label: purchasedSegmentLabel(ownership, omitQuantity),
+  })
+  if (omitQuantity || workflowMode !== 'magic_items' || control.kind === 'remove') return
+  lines.provenance.push({
     kind: 'action',
     key: 'remove-purchase-one',
     label: EQUIPMENT_INVENTORY_REMOVE_ONE_PURCHASE_LABEL,
@@ -241,21 +260,27 @@ function appendEditablePurchasedProvenance(
   })
 }
 
-function resolveProvenance(args: {
+function resolveOwnershipLines(args: {
   ownership: EquipmentOwnership
   control: EquipmentPickerHeaderControl
   workflowMode: EquipmentPickerWorkflowMode
-}): EquipmentPickerProvenanceSegment[] {
+}): Pick<EquipmentPickerItemPresentation, 'provenance' | 'selectionState'> {
   const { ownership, control, workflowMode } = args
-  const segments: EquipmentPickerProvenanceSegment[] = []
+  const lines: EquipmentOwnershipLines = { selectionProvenance: [], provenance: [] }
 
-  appendPackageProvenance(segments, ownership.packageQuantity)
-  appendGrantProvenance(segments, ownership.grantQuantity)
-  appendChoiceProvenance(segments, ownership.choices, control)
-  appendLockedPurchasedProvenance(segments, ownership.lockedPurchased.quantity)
-  appendEditablePurchasedProvenance(segments, ownership, control, workflowMode)
+  appendPackageProvenance(lines, ownership.packageQuantity)
+  appendGrantProvenance(lines, ownership.grantQuantity)
+  appendChoiceProvenance(lines, ownership.choices, control)
+  appendLockedPurchasedProvenance(lines, ownership.lockedPurchased.quantity)
+  appendEditablePurchasedProvenance(lines, ownership, control, workflowMode)
 
-  return segments
+  return {
+    provenance: lines.provenance,
+    selectionState:
+      lines.selectionProvenance.length > 0
+        ? { kind: 'owned', provenance: lines.selectionProvenance }
+        : null,
+  }
 }
 
 function resolvePurchaseControl(args: {
@@ -294,7 +319,7 @@ function resolvePurchasePresentation(args: {
       }
       return {
         control,
-        provenance: resolveProvenance({ ownership, control, workflowMode }),
+        ...resolveOwnershipLines({ ownership, control, workflowMode }),
       }
     }
 
@@ -302,26 +327,26 @@ function resolvePurchasePresentation(args: {
     return {
       blockers: [selectionBlocker('unavailable', EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL)],
       control,
-      provenance: resolveProvenance({ ownership, control, workflowMode }),
+      ...resolveOwnershipLines({ ownership, control, workflowMode }),
     }
   }
 
   const control = resolvePurchaseControl({ rowActionVm, ownership, maxPurchaseQuantity })
   const priceLabel = row.priceLabel || undefined
-  const provenance = resolveProvenance({ ownership, control, workflowMode })
+  const ownershipLines = resolveOwnershipLines({ ownership, control, workflowMode })
 
   if (availability.status === 'unaffordable' && !priceLabel) {
     return {
       blockers: [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
       control,
-      provenance,
+      ...ownershipLines,
     }
   }
 
   return {
     ...(priceLabel ? { priceSlot: { kind: 'price' as const, label: priceLabel } } : {}),
     control,
-    provenance,
+    ...ownershipLines,
   }
 }
 
@@ -397,13 +422,13 @@ function resolveMagicItemBlockedPresentation(args: {
     })
     return {
       control,
-      provenance: resolveProvenance({ ownership, control, workflowMode }),
+      ...resolveOwnershipLines({ ownership, control, workflowMode }),
     }
   }
 
   const control: EquipmentPickerHeaderControl = { kind: 'none' }
-  const provenance = resolveProvenance({ ownership, control, workflowMode })
-  if (!headerBlocker) return { control, provenance }
+  const ownershipLines = resolveOwnershipLines({ ownership, control, workflowMode })
+  if (!headerBlocker) return { control, ...ownershipLines }
 
   return {
     blockers: [
@@ -413,7 +438,7 @@ function resolveMagicItemBlockedPresentation(args: {
       ),
     ],
     control,
-    provenance,
+    ...ownershipLines,
   }
 }
 
@@ -437,7 +462,7 @@ function resolveMagicItemPresentation(args: {
     return {
       priceSlot: { kind: 'grantPreview', label: formatMagicItemChoiceLabel(grantQuantity, rarity) },
       control,
-      provenance: resolveProvenance({ ownership, control, workflowMode }),
+      ...resolveOwnershipLines({ ownership, control, workflowMode }),
     }
   }
 
@@ -466,7 +491,7 @@ export function resolveEquipmentPickerItemPresentation(args: {
 
   if (isAtAcquiredCopyCap(copyCap)) {
     const control = cappedControl(ownership)
-    return { control, provenance: resolveProvenance({ ownership, control, workflowMode }) }
+    return { control, ...resolveOwnershipLines({ ownership, control, workflowMode }) }
   }
 
   if (workflowMode === 'purchase' && rowActionVm.kind === 'purchase') {
@@ -481,7 +506,7 @@ export function resolveEquipmentPickerItemPresentation(args: {
 
   if (rowActionVm.kind !== 'magic_item_grant') {
     const control: EquipmentPickerHeaderControl = { kind: 'none' }
-    return { control, provenance: resolveProvenance({ ownership, control, workflowMode }) }
+    return { control, ...resolveOwnershipLines({ ownership, control, workflowMode }) }
   }
 
   return resolveMagicItemPresentation({

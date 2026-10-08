@@ -1,12 +1,13 @@
 import { CLASS_SPELLCASTING_CHOICE_SUFFIXES, type ChoiceSet } from '@rpg/contracts'
 
-export const SPELL_PICKER_ACTION_ADD = 'Add'
-export const SPELL_PICKER_ACTION_REMOVE = 'Remove'
-export const SPELL_PICKER_ACTION_PREPARE = 'Prepare'
-export const SPELL_PICKER_ACTION_UNPREPARE = 'Unprepare'
-export const SPELL_PICKER_ACTION_LEARN = 'Learn'
-export const SPELL_PICKER_ACTION_FORGET = 'Forget'
-export const SPELL_PICKER_ACTION_UNLEARN = 'Unlearn'
+import {
+  resolvePickerMutationCopy,
+  type PickerMutationFamilyId,
+} from '../../../lib/picker/picker-mutation-family'
+import {
+  resolvePickerSelectionStateLine,
+  type PickerSelectionStateKind,
+} from '../../../lib/picker/picker-selection-state'
 
 export const SPELL_PICKER_SELECTION_PREPARED = 'prepared' as const
 export const SPELL_PICKER_SELECTION_KNOWN = 'known' as const
@@ -19,27 +20,18 @@ export type SpellPickerSelectionMode =
   | typeof SPELL_PICKER_SELECTION_SPELLBOOK
   | typeof SPELL_PICKER_SELECTION_CANTRIP
 
-const SPELL_PICKER_ACTION_LABELS: Record<
-  SpellPickerSelectionMode,
-  { addLabel: string; removeLabel: string }
-> = {
-  [SPELL_PICKER_SELECTION_PREPARED]: {
-    addLabel: SPELL_PICKER_ACTION_PREPARE,
-    removeLabel: SPELL_PICKER_ACTION_UNPREPARE,
-  },
-  [SPELL_PICKER_SELECTION_KNOWN]: {
-    addLabel: SPELL_PICKER_ACTION_LEARN,
-    removeLabel: SPELL_PICKER_ACTION_FORGET,
-  },
-  [SPELL_PICKER_SELECTION_SPELLBOOK]: {
-    addLabel: SPELL_PICKER_ACTION_LEARN,
-    removeLabel: SPELL_PICKER_ACTION_UNLEARN,
-  },
-  [SPELL_PICKER_SELECTION_CANTRIP]: {
-    addLabel: SPELL_PICKER_ACTION_ADD,
-    removeLabel: SPELL_PICKER_ACTION_REMOVE,
-  },
-}
+const SPELL_PICKER_MUTATION_FAMILY = {
+  [SPELL_PICKER_SELECTION_PREPARED]: 'preparedSpell',
+  [SPELL_PICKER_SELECTION_KNOWN]: 'learnedSpell',
+  [SPELL_PICKER_SELECTION_SPELLBOOK]: 'learnedSpell',
+  [SPELL_PICKER_SELECTION_CANTRIP]: 'genericSelection',
+} as const satisfies Record<SpellPickerSelectionMode, PickerMutationFamilyId>
+
+const SPELL_PICKER_SELECTION_KIND = {
+  genericSelection: 'selected',
+  learnedSpell: 'learned',
+  preparedSpell: 'prepared',
+} as const satisfies Record<PickerMutationFamilyId, Exclude<PickerSelectionStateKind, 'owned'>>
 
 function choiceSetSuffix(choiceSetId: string): string | undefined {
   const parts = choiceSetId.split(':')
@@ -68,11 +60,30 @@ export function resolveSpellPickerSelectionMode(
   return SPELL_PICKER_SELECTION_PREPARED
 }
 
-/** Visible row verb for the current selection context. */
+/** Prepared, known, and spellbook map onto a mutation family. Cantrips stay generic. */
+export function resolveSpellPickerMutationFamily(
+  selectionMode: SpellPickerSelectionMode,
+): PickerMutationFamilyId {
+  return SPELL_PICKER_MUTATION_FAMILY[selectionMode]
+}
+
+export function resolveSpellPickerSelectionStateKind(
+  selectionMode: SpellPickerSelectionMode,
+): Exclude<PickerSelectionStateKind, 'owned'> {
+  return SPELL_PICKER_SELECTION_KIND[resolveSpellPickerMutationFamily(selectionMode)]
+}
+
+/** Visible row verb for the current selection context. The caller supplies `selected`. */
 export function resolveSpellPickerAction(args: {
   selectionMode: SpellPickerSelectionMode
   selected: boolean
 }): string {
-  const labels = SPELL_PICKER_ACTION_LABELS[args.selectionMode]
-  return args.selected ? labels.removeLabel : labels.addLabel
+  const copy = resolvePickerMutationCopy(resolveSpellPickerMutationFamily(args.selectionMode))
+  return args.selected ? copy.release : copy.acquire
+}
+
+export function resolveSpellPickerSelectionStateLine(selectionMode: SpellPickerSelectionMode) {
+  return resolvePickerSelectionStateLine({
+    kind: resolveSpellPickerSelectionStateKind(selectionMode),
+  })
 }

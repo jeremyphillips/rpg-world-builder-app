@@ -1,10 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import { CATALOG_PICKER_ADD_LABEL } from '@rpg/ui'
 
 import { EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } from '../drawer/equipment-picker-drawer.types'
-import {
-  EQUIPMENT_PICKER_ADD_LABEL,
-  EquipmentPickerRowAcquisitionControl,
-} from './equipment-picker-row-acquisition-control'
+import { EquipmentPickerRowAcquisitionControl } from './equipment-picker-row-acquisition-control'
 
 const meta = {
   title: 'Character Builder/EquipmentPickerRowAcquisitionControl',
@@ -12,7 +10,7 @@ const meta = {
   parameters: { layout: 'centered' },
   args: {
     equipmentName: 'Rope',
-    addLabel: EQUIPMENT_PICKER_ADD_LABEL,
+    addLabel: CATALOG_PICKER_ADD_LABEL,
     onAdd: () => undefined,
     onSetPurchasedQuantity: () => undefined,
     onRelease: () => undefined,

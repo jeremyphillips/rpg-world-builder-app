@@ -1,13 +1,11 @@
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '@rpg/contracts'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
-import {
-  SPELL_PICKER_ACTION_PREPARE,
-  SPELL_PICKER_ACTION_UNPREPARE,
-} from './spell-picker-action.lib'
+import { resolvePickerMutationCopy } from '../../../lib/picker/picker-mutation-family'
 import { SpellPickerDrawer } from './spell-picker-drawer'
 import {
   spellPickerCantripChoiceSetFixture,
@@ -185,6 +183,7 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
+    expect(screen.getAllByText('Selected')).toHaveLength(2)
     expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
   })
 
@@ -209,12 +208,12 @@ describe('SpellPickerDrawer', () => {
       />,
     )
 
+    const prepared = resolvePickerMutationCopy('preparedSpell')
     const cureWoundsRow = screen
       .getByText('Cure Wounds')
       .closest('[data-picker-item-key]') as HTMLElement
-    await user.click(
-      within(cureWoundsRow).getByRole('button', { name: SPELL_PICKER_ACTION_PREPARE }),
-    )
+    expect(within(cureWoundsRow).queryByText(prepared.state)).not.toBeInTheDocument()
+    await user.click(within(cureWoundsRow).getByRole('button', { name: prepared.acquire }))
     expect(onSelectSpell).toHaveBeenCalledWith(
       SPELL_PICKER_MODE_SPELLS,
       spellPickerCureWoundsFixture.id,
@@ -249,13 +248,48 @@ describe('SpellPickerDrawer', () => {
     const selectedRow = screen
       .getByText('Cure Wounds')
       .closest('[data-picker-item-key]') as HTMLElement
-    await user.click(
-      within(selectedRow).getByRole('button', { name: SPELL_PICKER_ACTION_UNPREPARE }),
-    )
+    expect(within(selectedRow).getByText(prepared.state)).toBeInTheDocument()
+    await user.click(within(selectedRow).getByRole('button', { name: prepared.release }))
     expect(onRemoveSpell).toHaveBeenCalledWith(
       SPELL_PICKER_MODE_SPELLS,
       spellPickerCureWoundsFixture.id,
     )
+  })
+
+  it('labels a learned spell Unlearn and shows Learned', () => {
+    const learned = resolvePickerMutationCopy('learnedSpell')
+    const selectedCureWounds = {
+      ...spellPickerOpenItemsFixture[2]!,
+      state: {
+        ...spellPickerOpenItemsFixture[2]!.state,
+        isAlreadySelected: true,
+      },
+    }
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Bard"
+        spellChoiceSet={{
+          ...preparedSpellChoiceSet,
+          id: `spellcasting:srd-cc-5.2.1:bard:${CLASS_SPELLCASTING_CHOICE_SUFFIXES.repertoire}`,
+        }}
+        cantripSelectedIds={[]}
+        spellSelectedIds={[spellPickerCureWoundsFixture.id]}
+        cantripItems={[]}
+        spellItems={[selectedCureWounds]}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
+        onSelectSpell={vi.fn()}
+        onRemoveSpell={vi.fn()}
+      />,
+    )
+
+    const selectedRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(selectedRow).getByText(learned.state)).toBeInTheDocument()
+    expect(within(selectedRow).getByRole('button', { name: learned.release })).toBeInTheDocument()
   })
 
   it('calls onSelectSpell and onRemoveSpell from row actions', async () => {

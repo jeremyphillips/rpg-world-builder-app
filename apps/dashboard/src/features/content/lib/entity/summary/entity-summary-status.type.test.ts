@@ -1,5 +1,6 @@
 import { describe, expectTypeOf, it } from 'vitest'
 
+import type { PickerSelectionStateLineModel } from './picker-selection-state-line.types'
 import type { EntitySummaryModel } from './entity-summary.types'
 import type {
   EntitySummaryStatusComposition,
@@ -32,6 +33,15 @@ describe('entity summary status closed API', () => {
       EntitySummaryStatusComposition | undefined
     >()
     expectTypeOf<EntitySummaryStatusComposition>().toEqualTypeOf<'cluster' | 'metadata'>()
+  })
+
+  it('stores resolved selection-state copy, not a semantic kind', () => {
+    const line = { label: 'Owned', provenance: ['Package'] } as const
+
+    expectTypeOf(line).toMatchTypeOf<PickerSelectionStateLineModel>()
+    expectTypeOf<EntitySummaryModel['selectionState']>().toEqualTypeOf<
+      PickerSelectionStateLineModel | undefined
+    >()
   })
 
   it('rejects plain string status entries at compile time', () => {

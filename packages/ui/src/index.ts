@@ -1086,6 +1086,8 @@ export {
   type CatalogPickerRowActionIntent,
 } from './components/ui/catalog-picker-action-button.client'
 export {
+  CATALOG_PICKER_ADD_LABEL,
+  CATALOG_PICKER_REMOVE_LABEL,
   CatalogPickerSelectionActions,
   type CatalogPickerSelectionActionsProps,
 } from './components/ui/catalog-picker-selection-actions.client'

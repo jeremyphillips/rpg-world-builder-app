@@ -148,6 +148,7 @@ export type {
   EntitySurfaceIdentity,
   EntitySurfaceInlineAction,
 } from './lib/entity/summary/entity-surface-identity.types'
+export type { PickerSelectionStateLineModel } from './lib/entity/summary/picker-selection-state-line.types'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,

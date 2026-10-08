@@ -12,6 +12,7 @@ import {
   useRelationshipCatalogFilters,
 } from '@/features/content'
 
+import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { formatContentReferenceLabel } from '../../../lib/display/format-content-reference-label'
 import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
@@ -182,7 +183,9 @@ export function CharacterPickerDrawer({
             surface={{
               identity: buildCharacterEntityCardModel(summary, {
                 includeCharacterTypeInMetadata: true,
-                status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+                ...(selected
+                  ? { selectionState: resolvePickerSelectionStateLine({ kind: 'selected' }) }
+                  : {}),
               }),
               inlineAction:
                 selected || disabled

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import type { EntitySummaryProvenanceItem } from './entity-summary-provenance.types'
+import type { PickerSelectionStateLineModel } from './picker-selection-state-line.types'
 import type {
   EntitySummaryStatusComposition,
   EntitySummaryStatusItem,
@@ -12,6 +13,8 @@ export type EntitySummaryModel = {
   classification?: ReactNode
   description?: ReactNode
   status?: readonly EntitySummaryStatusItem[]
+  /** Resolved selection-state copy, stacked above status. Not a semantic kind. */
+  selectionState?: PickerSelectionStateLineModel
   /** Ownership segments rendered ahead of status on the same line. Never status items. */
   provenance?: readonly EntitySummaryProvenanceItem[]
   /** Defaults to `cluster`. */

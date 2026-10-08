@@ -68,6 +68,26 @@ describe('EntityAnatomy row tracks', () => {
     expect(slot('content')).not.toHaveTextContent('Holy symbol')
   })
 
+  it('stacks the selection-state line above status in the status cell', () => {
+    const { slot } = renderAnatomy({
+      entity: {
+        heading: 'Dagger',
+        selectionState: { label: 'Owned', provenance: ['Package'] },
+        status: [{ kind: 'badge', label: 'Not proficient', tone: 'warning' }],
+        statusComposition: 'metadata',
+      },
+    })
+
+    const status = slot('status')
+    const owned = screen.getByText('Owned')
+    const warning = screen.getByText('Not proficient')
+
+    expect(status).toContainElement(owned)
+    expect(status).toContainElement(warning)
+    expect(owned.compareDocumentPosition(warning) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(owned).toHaveClass('font-body-emphasis')
+  })
+
   it('omits empty meta and status cells', () => {
     const { slot } = renderAnatomy({ entity: { heading: 'Grey Coast' } })
 

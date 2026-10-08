@@ -328,7 +328,11 @@ describe('resolveEquipmentPickerItemPresentation', () => {
 
     expect(presentation.blockers).toBeUndefined()
     expect(presentation.control).toEqual({ kind: 'release', allowanceId })
-    expect(presentation.provenance).toEqual([{ kind: 'text', label: 'Rare choice' }])
+    expect(presentation.provenance).toEqual([])
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'choice', label: 'Rare choice', quantity: 1 }],
+    })
   })
 
   it('swaps add for the aggregate stepper once an editable purchase exists', () => {
@@ -347,6 +351,10 @@ describe('resolveEquipmentPickerItemPresentation', () => {
 
     expect(presentation.control).toEqual({ kind: 'stepper', value: 2, max: 5 })
     expect(presentation.provenance).toEqual([])
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'purchase', label: 'Purchased · 10 GP', quantity: 2 }],
+    })
   })
 
   it('pins the stepper ceiling at the current aggregate when the next copy is blocked', () => {
@@ -400,10 +408,15 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       },
     })
 
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [
+        { kind: 'package', label: 'Package ×2', quantity: 2 },
+        { kind: 'purchase', label: 'Converted ×1', quantity: 1 },
+        { kind: 'purchase', label: 'Purchased · 50 GP', quantity: 1 },
+      ],
+    })
     expect(presentation.provenance).toEqual([
-      { kind: 'text', label: 'Package ×2' },
-      { kind: 'text', label: 'Converted ×1' },
-      { kind: 'text', label: 'Purchased · 50 GP' },
       {
         kind: 'action',
         key: 'remove-purchase-one',

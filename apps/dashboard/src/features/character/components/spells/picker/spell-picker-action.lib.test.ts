@@ -1,16 +1,13 @@
 import { CLASS_SPELLCASTING_CHOICE_SUFFIXES, type ChoiceSet } from '@rpg/contracts'
+import { CATALOG_PICKER_ADD_LABEL, CATALOG_PICKER_REMOVE_LABEL } from '@rpg/ui'
 import { describe, expect, it } from 'vitest'
 
+import { resolvePickerMutationCopy } from '../../../lib/picker/picker-mutation-family'
 import {
   resolveSpellPickerAction,
+  resolveSpellPickerMutationFamily,
   resolveSpellPickerSelectionMode,
-  SPELL_PICKER_ACTION_ADD,
-  SPELL_PICKER_ACTION_FORGET,
-  SPELL_PICKER_ACTION_LEARN,
-  SPELL_PICKER_ACTION_PREPARE,
-  SPELL_PICKER_ACTION_REMOVE,
-  SPELL_PICKER_ACTION_UNLEARN,
-  SPELL_PICKER_ACTION_UNPREPARE,
+  resolveSpellPickerSelectionStateLine,
   SPELL_PICKER_SELECTION_CANTRIP,
   SPELL_PICKER_SELECTION_KNOWN,
   SPELL_PICKER_SELECTION_PREPARED,
@@ -66,43 +63,65 @@ describe('resolveSpellPickerSelectionMode', () => {
   })
 })
 
+describe('resolveSpellPickerMutationFamily', () => {
+  it('maps cantrips to generic selection and spellbook to learned spells', () => {
+    expect(resolveSpellPickerMutationFamily(SPELL_PICKER_SELECTION_CANTRIP)).toBe(
+      'genericSelection',
+    )
+    expect(resolveSpellPickerMutationFamily(SPELL_PICKER_SELECTION_SPELLBOOK)).toBe('learnedSpell')
+    expect(resolveSpellPickerMutationFamily(SPELL_PICKER_SELECTION_KNOWN)).toBe('learnedSpell')
+    expect(resolveSpellPickerMutationFamily(SPELL_PICKER_SELECTION_PREPARED)).toBe('preparedSpell')
+  })
+})
+
 describe('resolveSpellPickerAction', () => {
   it('uses Prepare and Unprepare for prepared spells', () => {
+    const prepared = resolvePickerMutationCopy('preparedSpell')
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_PREPARED, selected: false }),
-    ).toBe(SPELL_PICKER_ACTION_PREPARE)
+    ).toBe(prepared.acquire)
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_PREPARED, selected: true }),
-    ).toBe(SPELL_PICKER_ACTION_UNPREPARE)
+    ).toBe(prepared.release)
   })
 
-  it('uses Learn and Forget for known spells', () => {
+  it('uses Learn and Unlearn for known and spellbook spells', () => {
+    const learned = resolvePickerMutationCopy('learnedSpell')
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_KNOWN, selected: false }),
-    ).toBe(SPELL_PICKER_ACTION_LEARN)
+    ).toBe(learned.acquire)
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_KNOWN, selected: true }),
-    ).toBe(SPELL_PICKER_ACTION_FORGET)
-  })
-
-  it('uses Learn and Unlearn for spellbook acquisition', () => {
+    ).toBe(learned.release)
     expect(
       resolveSpellPickerAction({
         selectionMode: SPELL_PICKER_SELECTION_SPELLBOOK,
-        selected: false,
+        selected: true,
       }),
-    ).toBe(SPELL_PICKER_ACTION_LEARN)
-    expect(
-      resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_SPELLBOOK, selected: true }),
-    ).toBe(SPELL_PICKER_ACTION_UNLEARN)
+    ).toBe(learned.release)
+    expect(learned.release).toBe('Unlearn')
   })
 
   it('uses Add and Remove for cantrips', () => {
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_CANTRIP, selected: false }),
-    ).toBe(SPELL_PICKER_ACTION_ADD)
+    ).toBe(CATALOG_PICKER_ADD_LABEL)
     expect(
       resolveSpellPickerAction({ selectionMode: SPELL_PICKER_SELECTION_CANTRIP, selected: true }),
-    ).toBe(SPELL_PICKER_ACTION_REMOVE)
+    ).toBe(CATALOG_PICKER_REMOVE_LABEL)
+  })
+})
+
+describe('resolveSpellPickerSelectionStateLine', () => {
+  it('uses the family state word for the active mode', () => {
+    expect(resolveSpellPickerSelectionStateLine(SPELL_PICKER_SELECTION_PREPARED)).toEqual({
+      label: 'Prepared',
+    })
+    expect(resolveSpellPickerSelectionStateLine(SPELL_PICKER_SELECTION_KNOWN)).toEqual({
+      label: 'Learned',
+    })
+    expect(resolveSpellPickerSelectionStateLine(SPELL_PICKER_SELECTION_CANTRIP)).toEqual({
+      label: 'Selected',
+    })
   })
 })

@@ -542,10 +542,14 @@ but must not grow solely to push classification away from the name. `EntitySumma
 EntitySummary parts            RowAnatomy cell
 ├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
 ├── EntitySummaryDescription  → meta
-└── EntitySummaryStatus       → status (track offset owned by the cell, not the row)
-    ├── EntitySummaryProvenanceItem[]   (provenance group, rendered first)
-    └── EntitySummaryStatusItem[]       (status group)
+└── status cell                → status (track offset owned by the cell, not the row)
+    ├── PickerSelectionStateLine        (resolved copy, stacked above status)
+    └── EntitySummaryStatus
+        ├── EntitySummaryProvenanceItem[]   (provenance group, rendered first)
+        └── EntitySummaryStatusItem[]       (status group)
 ```
+
+`EntitySummaryModel.selectionState` stores the resolved line (`label` plus optional provenance strings), not a semantic kind. The picker resolver owns that mapping. The line is a check icon and an emphasized state word, then muted provenance joined with `InlineMetadata`. It is not a badge and not a `SelectionSignalCategory`. Picker ownership text (`Package`, `Purchased`, `Common choice`) belongs on this line so the status line does not repeat it. Warnings stay on the status line. Release and remove actions stay on `provenance`.
 
 `EntitySummaryModel.status` accepts structured `EntitySummaryStatusItem` values only:
 

@@ -19,6 +19,7 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildOrganizationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
+import type { PickerSelectionStateLineModel } from '../../lib/entity/summary/picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
@@ -83,7 +84,11 @@ export function buildOrganizationEntitySummaryVm(
 
 export function buildOrganizationEntityCardModel(
   vm: OrganizationEntitySummaryVm,
-  options: { metadata?: string; status?: readonly EntitySummaryStatusItem[] } = {},
+  options: {
+    metadata?: string
+    status?: readonly EntitySummaryStatusItem[]
+    selectionState?: PickerSelectionStateLineModel
+  } = {},
 ): EntitySurfaceIdentity {
   return {
     heading: vm.name,
@@ -95,6 +100,7 @@ export function buildOrganizationEntityCardModel(
         : {}
       : {}),
     ...(options.status && options.status.length > 0 ? { status: options.status } : {}),
+    ...(options.selectionState ? { selectionState: options.selectionState } : {}),
     ...(vm.displayImage ? { displayImage: vm.displayImage } : {}),
   }
 }
@@ -173,9 +179,7 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Functions',
-              value: joinInlineMetadata(
-                organization.functions.map(getOrganizationFunctionLabel),
-              ),
+              value: joinInlineMetadata(organization.functions.map(getOrganizationFunctionLabel)),
             },
           ]
         : []),
@@ -183,9 +187,7 @@ export function buildOrganizationDetailViewModel(
         ? [
             {
               label: 'Practices',
-              value: joinInlineMetadata(
-                organization.practices.map(getOrganizationPracticeLabel),
-              ),
+              value: joinInlineMetadata(organization.practices.map(getOrganizationPracticeLabel)),
             },
           ]
         : []),

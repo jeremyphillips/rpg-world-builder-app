@@ -18,7 +18,6 @@ import {
   equipmentPickerRowControlTooltipTriggerVariants,
 } from './equipment-picker-row-acquisition-control.variants'
 
-export const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
 export const EQUIPMENT_PICKER_ADD_FAILED_LABEL = 'Could not add this item.'
 
 export type EquipmentPickerRowAcquisitionControlProps = {

@@ -37,14 +37,6 @@ export const Pending: Story = {
   },
 }
 
-export const Success: Story = {
-  args: {
-    phase: 'success',
-    onAdd: () => undefined,
-    onRemove: () => undefined,
-  },
-}
-
 export const Interactive: Story = {
   args: {
     phase: 'add',
@@ -52,7 +44,7 @@ export const Interactive: Story = {
     onRemove: () => undefined,
   },
   render: (args) => {
-    const [phase, setPhase] = useState<'add' | 'remove' | 'pending' | 'success'>('add')
+    const [phase, setPhase] = useState<'add' | 'remove' | 'pending'>('add')
 
     return (
       <CatalogPickerSelectionActions
@@ -60,7 +52,7 @@ export const Interactive: Story = {
         phase={phase}
         onAdd={() => {
           setPhase('pending')
-          window.setTimeout(() => setPhase('success'), 600)
+          window.setTimeout(() => setPhase('remove'), 600)
         }}
         onRemove={() => setPhase('add')}
       />

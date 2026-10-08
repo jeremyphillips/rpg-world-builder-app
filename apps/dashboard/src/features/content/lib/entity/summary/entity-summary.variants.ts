@@ -49,6 +49,9 @@ export const entitySummaryStatusVariants = cva('', {
 /** Status items wrap within the lane; the row-anatomy status cell owns the top offset. */
 export const entitySummaryStatusRowVariants = cva('flex min-w-0 flex-wrap gap-x-2 gap-y-1')
 
+/** Selection-state line stacked above status and provenance actions inside the status cell. */
+export const entitySummaryStatusLaneVariants = cva('flex min-w-0 flex-col gap-1')
+
 /** Provenance segment copy — foreground source labels on the third line, beside status. */
 export const entitySummaryProvenanceTextVariants = cva('text-foreground', {
   variants: {

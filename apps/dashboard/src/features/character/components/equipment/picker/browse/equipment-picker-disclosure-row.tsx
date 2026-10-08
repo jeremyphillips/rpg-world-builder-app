@@ -7,7 +7,8 @@ import {
   type EntitySummaryProvenanceItem,
 } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit'
-import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
+import { resolvePickerMutationCopy } from '../../../../lib/picker/picker-mutation-family'
+import { resolvePickerSelectionStateLine } from '../../../../lib/picker/picker-selection-state'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
 import { resolveEquipmentSelectionRowPresentation } from '../../../../lib/equipment/equipment-selection-row-presentation.lib'
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
@@ -15,10 +16,7 @@ import {
   resolveSelectionRowStatusItems,
   type SelectionRowStatusTooltip,
 } from '../../../../lib/selection-row-status'
-import {
-  EQUIPMENT_PICKER_ADD_LABEL,
-  EquipmentPickerRowAcquisitionControl,
-} from './equipment-picker-row-acquisition-control'
+import { EquipmentPickerRowAcquisitionControl } from './equipment-picker-row-acquisition-control'
 import { getEquipmentUnaffordableAmounts } from '../drawer/equipment-picker-drawer.lib'
 import type {
   EquipmentBudgetSummary,
@@ -64,10 +62,9 @@ export function EquipmentPickerDisclosureRow({
   onReleaseChoice,
   onRemovePurchaseOne,
 }: EquipmentPickerDisclosureRowProps) {
-  const { isPending, successQuantity, commitFailed, commitQuantity } =
-    useEquipmentAcquisitionQuantityCommit({
-      commit: () => onCommitAdd?.() ?? false,
-    })
+  const { isPending, commitFailed, commitQuantity } = useEquipmentAcquisitionQuantityCommit({
+    commit: () => onCommitAdd?.() ?? false,
+  })
 
   const item = rowArgs.item
   const row = buildEquipmentPickerRowViewModel(item.equipment)
@@ -100,6 +97,7 @@ export function EquipmentPickerDisclosureRow({
   }
 
   const provenance = presentation.provenance.map(toProvenanceItem)
+  const selectionState = resolvePickerSelectionStateLine(presentation.selectionState)
 
   const trailing =
     presentation.control.kind === 'none' && !presentation.priceSlot
@@ -110,11 +108,7 @@ export function EquipmentPickerDisclosureRow({
             <EquipmentPickerRowAcquisitionControl
               control={presentation.control}
               equipmentName={row.name}
-              addLabel={resolveAcquisitionCommitButtonLabel({
-                isPending,
-                successQuantity,
-                primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
-              })}
+              addLabel={resolvePickerMutationCopy('genericSelection').acquire}
               isPending={isPending}
               commitFailed={commitFailed}
               onAdd={() => commitQuantity(1)}
@@ -147,6 +141,7 @@ export function EquipmentPickerDisclosureRow({
             })}
           />
         ),
+        ...(selectionState ? { selectionState } : {}),
         ...(status.length > 0 ? { status } : {}),
         ...(provenance.length > 0 ? { provenance } : {}),
         statusComposition: 'metadata',

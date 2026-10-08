@@ -44,6 +44,26 @@ profile, into ordered clauses (`requirement`, compatibility caution, `recommenda
 Recommendation copy cites `RecommendationSourceRef`. Supply copy cites
 `EquipmentSupplySource`. A role grant is not a recommendation.
 
+## Picker row vocabulary and selection state
+
+The trailing control and the selection-state line are related outputs, not one model.
+
+The mutation family owns words only. It is not a state machine, not a `GameTermEntry`, and not a `defineMessage` catalog. Generic Add / Remove stay in `@rpg/ui` (`CATALOG_PICKER_ADD_LABEL`, `CATALOG_PICKER_REMOVE_LABEL`). Domain triplets live in `features/character/lib/picker/picker-mutation-family.ts`:
+
+| Family             | Acquire | State    | Release   |
+| ------------------ | ------- | -------- | --------- |
+| `genericSelection` | Add     | Selected | Remove    |
+| `learnedSpell`     | Learn   | Learned  | Unlearn   |
+| `preparedSpell`    | Prepare | Prepared | Unprepare |
+
+The caller chooses `acquire` or `release` from its own domain flag (`isAlreadySelected`, owned quantity, and so on). `resolveSpellPickerSelectionMode` maps prepared rows to `preparedSpell`, known and spellbook rows to `learnedSpell`, and cantrips to `genericSelection`. Cantrips stay generic because their acquisition lead is Choose; “to learn” is the purpose clause, and cantrips are not a learned-spell collection. Known repertoire rows use Learn / Learned / Unlearn with spellbook. Section copy for `limitedRepertoire` can still say Prepare, and the repertoire counter verb can still be `prepared`. That seam is section copy, not a second row verb. Forget is not a row verb.
+
+`owned` is a selection-state label in the same picker module, not a family member. Equipment reads generic Add and does not read that family’s state word. Package, grant, choice, converted, or purchased quantity resolves to `✓ Owned · …`. A purchase stepper keeps `Purchased` (and wealth when spend is non-zero) and omits `×N`, because the stepper already shows the count. Zero ownership renders no line, even while Add is showing. The row does not flash Added. The acquisition panel’s “Added N to inventory” announcement is a different surface.
+
+Connection pickers (character, organization, residence) show `✓ Selected` from the line resolver’s `selected` kind. That is a surface word. Those rows do not join `genericSelection` to choose actions: Add stays the local control and disappears once the entity is linked. There is no Remove on that surface.
+
+`PickerSelectionStateLine` renders the resolved line model above status. Provenance actions (`Release one`, `Remove one`) stay on `entity.provenance`. Warnings stay on the status line.
+
 ## Selection row status, guidance, and context policy
 
 Builder selection rows show one metadata line (`EntitySummaryModel.statusComposition: 'metadata'`):
@@ -207,7 +227,7 @@ CatalogEntityPickerSheet     → catalog row host (content)
 
 Three commit layers — do not collapse them:
 
-- **UI commit mechanics** — quantity field value, reset-after-add, pending/success flash
+- **UI commit mechanics** — quantity field value, reset-after-add, pending button. Picker rows do not flash Added; the Owned or Selected line is the persistent result. The acquisition panel may still announce “Added N to inventory.”
 - **Domain rules** — affordability, stackable max, eligibility (contracts / domain libs)
 - **Application mutation** — purchase intent vs magic-item grant, draft patches, REST membership create
 
@@ -253,7 +273,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 ### SpellPickerDrawer
 
-**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; curated spell metadata; selection-full empty states; spell-only selection summary chrome. Row verbs follow the active choice-set id suffix (Prepare/Unprepare, Learn/Forget, or Learn/Unlearn).
+**May know:** cantrip vs prepared as a **choice-set browse mode**; per-mode filter/sort buckets; curated spell metadata; selection-full empty states; spell-only selection summary chrome. Row verbs come from the mutation family for the active choice-set suffix: Prepare / Prepared / Unprepare, Learn / Learned / Unlearn, or Add / Selected / Remove for cantrips.
 
 **Must not know:** `draft.choiceSelections` shape; how the builder patches draft; campaign/sheet persistence.
 

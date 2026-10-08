@@ -35,6 +35,7 @@ import {
 import {
   resolveSpellPickerAction,
   resolveSpellPickerSelectionMode,
+  resolveSpellPickerSelectionStateLine,
 } from './spell-picker-action.lib'
 import { SpellPickerItemDetails } from './spell-picker-item-details'
 import {
@@ -231,6 +232,10 @@ export function SpellPickerDrawer({
             { context: 'picker' },
           )
 
+          const selectionState = item.state.isAlreadySelected
+            ? resolveSpellPickerSelectionStateLine(selectionMode)
+            : undefined
+
           return {
             heading: item.spell.name,
             description: (
@@ -239,6 +244,7 @@ export function SpellPickerDrawer({
                 lines={mapSpellPickerCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ),
+            ...(selectionState ? { selectionState } : {}),
             ...(status.length > 0 ? { status, statusComposition: 'metadata' as const } : {}),
           }
         },

@@ -15,6 +15,7 @@ import {
   resolveLocationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
+import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 
@@ -171,7 +172,9 @@ export function ResidenceLocationPickerDrawer({
               identity: buildLocationEntityCardModelFromClassification({
                 name: location.name,
                 classificationText: classification.text,
-                status: selected ? [{ kind: 'badge', label: 'Added', tone: 'success' }] : undefined,
+                ...(selected
+                  ? { selectionState: resolvePickerSelectionStateLine({ kind: 'selected' }) }
+                  : {}),
                 displayImage: getContentDisplayImage(
                   buildLocationContentDisplayImageInput(location, 'compact'),
                 ),

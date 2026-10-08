@@ -17,6 +17,8 @@ import {
   EntitySummaryStatus,
 } from '../summary/entity-summary'
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
+import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
+import { PickerSelectionStateLine } from '../summary/picker-selection-state-line'
 import { resolveEntityAnatomyBand } from './entity-anatomy-band.lib'
 import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
 
@@ -67,7 +69,10 @@ export function EntityAnatomy({
   headingEndValue,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
-  const hasStatus = (entity.status?.length ?? 0) > 0 || (entity.provenance?.length ?? 0) > 0
+  const hasStatusItems = (entity.status?.length ?? 0) > 0
+  const hasProvenance = (entity.provenance?.length ?? 0) > 0
+  const hasSelectionState = entity.selectionState != null
+  const hasStatusCell = hasStatusItems || hasProvenance || hasSelectionState
   const band = resolveEntityAnatomyBand(entity.media)
 
   return (
@@ -109,17 +114,24 @@ export function EntityAnatomy({
           </EntitySummaryDescription>
         </RowAnatomyCell>
       ) : null}
-      {hasStatus ? (
+      {hasStatusCell ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'status', column: 'content' }}
           data-entity-item-slot="status"
         >
-          <EntitySummaryStatus
-            items={entity.status ?? []}
-            provenance={entity.provenance}
-            density={density}
-            composition={entity.statusComposition}
-          />
+          <div className={entitySummaryStatusLaneVariants()}>
+            {entity.selectionState ? (
+              <PickerSelectionStateLine model={entity.selectionState} density={density} />
+            ) : null}
+            {hasStatusItems || hasProvenance ? (
+              <EntitySummaryStatus
+                items={entity.status ?? []}
+                provenance={entity.provenance}
+                density={density}
+                composition={entity.statusComposition}
+              />
+            ) : null}
+          </div>
         </RowAnatomyCell>
       ) : null}
       <EntityAnatomyTrailingCells trailing={trailing} />

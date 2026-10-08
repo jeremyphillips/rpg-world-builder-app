@@ -86,7 +86,7 @@ describe('OrganizationPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('Added')).toBeInTheDocument()
+    expect(screen.getByText('Selected')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'government')

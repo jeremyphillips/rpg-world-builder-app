@@ -488,6 +488,8 @@ describe('EquipmentPickerDrawer', () => {
 
     expect(onCommitAdd).toHaveBeenCalledWith(cheapGear)
     expect(screen.getByText('Cheap Gear')).toBeInTheDocument()
+    expect(within(list).getAllByRole('button', { name: 'Add' }).length).toBeGreaterThan(0)
+    expect(screen.queryByText(/Added/)).not.toBeInTheDocument()
   })
 
   it('quick-adds quantity 1 from the header rail', async () => {
@@ -582,8 +584,10 @@ describe('EquipmentPickerDrawer', () => {
       .getByText('Longsword')
       .closest('[role="listitem"]') as HTMLElement
 
-    expect(within(longswordRow).getByText('Package')).toBeInTheDocument()
+    expect(within(longswordRow).getByText('Owned')).toBeInTheDocument()
+    expect(within(longswordRow).getAllByText('Package')).toHaveLength(1)
     expect(within(longswordRow).getByRole('button', { name: 'Add' })).toBeInTheDocument()
+    expect(within(longswordRow).queryByText(/Added/)).not.toBeInTheDocument()
   })
 
   it('excludes vehicle and service rows from search results and category filter', () => {

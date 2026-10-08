@@ -9,6 +9,8 @@ import {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 
+import { resolvePickerMutationCopy } from '../../../lib/picker/picker-mutation-family'
+import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { resolveProficiencySelectionRowPresentation } from '../../../lib/proficiencies/proficiency-selection-row-presentation.lib'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
@@ -74,6 +76,7 @@ export function ProficiencyPickerDrawer({
     selectedIds,
   )
   const emptyStateMessage = resolveProficiencyPickerEmptyStateMessage(emptyStateKind)
+  const genericSelection = resolvePickerMutationCopy('genericSelection')
   const isSkillChoiceSet = choiceSet.choiceType === 'skillProficiency'
 
   return (
@@ -132,6 +135,10 @@ export function ProficiencyPickerDrawer({
             { context: 'picker' },
           )
 
+          const selectionState = item.state.isAlreadySelected
+            ? resolvePickerSelectionStateLine({ kind: 'selected' })
+            : undefined
+
           return {
             heading: item.label,
             description: item.compactSummary ? (
@@ -140,6 +147,7 @@ export function ProficiencyPickerDrawer({
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,
+            ...(selectionState ? { selectionState } : {}),
             ...(status.length > 0 ? { status, statusComposition: 'metadata' as const } : {}),
           }
         },
@@ -151,6 +159,8 @@ export function ProficiencyPickerDrawer({
                 isSelected: item.state.isAlreadySelected,
               })}
               canSelect={item.state.canSelect}
+              addLabel={genericSelection.acquire}
+              removeLabel={genericSelection.release}
               onAdd={() => onSelectOption(item.optionId)}
               onRemove={() => onRemoveOption(item.optionId)}
             />

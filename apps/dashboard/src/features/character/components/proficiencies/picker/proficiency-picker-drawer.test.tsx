@@ -69,6 +69,7 @@ describe('ProficiencyPickerDrawer', () => {
     )
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
+    expect(screen.getAllByText('Selected')).toHaveLength(2)
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
     expect(screen.getByText('Selection full')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()

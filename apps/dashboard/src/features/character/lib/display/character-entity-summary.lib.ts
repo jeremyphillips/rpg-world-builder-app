@@ -7,7 +7,11 @@ import type {
 } from '@rpg/contracts'
 import { resolveContentDisplayFallback } from '@rpg/contracts'
 
-import type { EntitySurfaceIdentity, EntitySummaryStatusItem } from '@/features/content'
+import type {
+  EntitySurfaceIdentity,
+  EntitySummaryStatusItem,
+  PickerSelectionStateLineModel,
+} from '@/features/content'
 import {
   formatCharacterSummary,
   formatCharacterSummarySegments,
@@ -131,6 +135,7 @@ export type BuildCharacterEntityCardModelOptions = {
   /** When set, replaces the default metadata line from the VM. */
   metadata?: string
   status?: readonly EntitySummaryStatusItem[]
+  selectionState?: PickerSelectionStateLineModel
   displayImage?: ContentDisplayImage
 }
 
@@ -167,6 +172,10 @@ export function buildCharacterEntityCardModel(
 
   if (options.status && options.status.length > 0) {
     identity.status = options.status
+  }
+
+  if (options.selectionState) {
+    identity.selectionState = options.selectionState
   }
 
   return identity

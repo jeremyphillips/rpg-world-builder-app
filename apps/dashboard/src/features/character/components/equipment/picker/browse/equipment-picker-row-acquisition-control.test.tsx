@@ -3,14 +3,13 @@
  */
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { CATALOG_PICKER_ADD_LABEL } from '@rpg/ui'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL } from '../drawer/equipment-picker-drawer.types'
-import {
-  EQUIPMENT_PICKER_ADD_LABEL,
-  EquipmentPickerRowAcquisitionControl,
-} from './equipment-picker-row-acquisition-control'
+
+import { EquipmentPickerRowAcquisitionControl } from './equipment-picker-row-acquisition-control'
 import type { EquipmentPickerHeaderControl } from './equipment-picker-item-header.lib'
 
 function renderControl(
@@ -28,7 +27,7 @@ function renderControl(
     <EquipmentPickerRowAcquisitionControl
       control={control}
       equipmentName="Rope"
-      addLabel={EQUIPMENT_PICKER_ADD_LABEL}
+      addLabel={CATALOG_PICKER_ADD_LABEL}
       {...handlers}
       {...overrides}
     />,
@@ -75,7 +74,7 @@ describe('EquipmentPickerRowAcquisitionControl', () => {
     const user = userEvent.setup()
     const { onAdd } = renderControl({ kind: 'add', disabled: false })
 
-    await user.click(screen.getByRole('button', { name: EQUIPMENT_PICKER_ADD_LABEL }))
+    await user.click(screen.getByRole('button', { name: CATALOG_PICKER_ADD_LABEL }))
     expect(onAdd).toHaveBeenCalledTimes(1)
   })
 

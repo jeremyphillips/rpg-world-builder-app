@@ -50,7 +50,7 @@ export function projectEntitySurfaceIdentityToSummaryModel(
   identity: EntitySurfaceIdentity,
   density: ContentCardDensity = 'compact',
 ): EntitySummaryModel {
-  const { heading, metadata, classification, status } = identity
+  const { heading, metadata, classification, status, selectionState } = identity
 
   return {
     heading,
@@ -58,6 +58,7 @@ export function projectEntitySurfaceIdentityToSummaryModel(
     ...(classification ? { classification } : {}),
     ...(metadata ? { description: metadata } : {}),
     ...(status && status.length > 0 ? { status } : {}),
+    ...(selectionState ? { selectionState } : {}),
   }
 }
 
