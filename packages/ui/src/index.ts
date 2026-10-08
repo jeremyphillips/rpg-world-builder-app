@@ -226,6 +226,10 @@ export {
 export { type MetadataListSize } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
 export {
+  inlineIconFlexSlotClasses,
+  inlineIconTextClasses,
+} from './components/ui/icon-glyph.variants'
+export {
   ACTION_ICONS,
   ACTION_ICON_VERBS,
   type ActionIconVerb,

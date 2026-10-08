@@ -43,6 +43,17 @@ export const DescendantUtilities: Story = {
   ),
 }
 
+export const NestedInlineInheritance: Story = {
+  render: () => (
+    <div className="text-base">
+      Base <Check aria-hidden className="size-icon-inline" />
+      <span className="text-xs">
+        Small <Check aria-hidden className="size-icon-inline" />
+      </span>
+    </div>
+  ),
+}
+
 export const DecorativeXsPolicy: Story = {
   render: () => (
     <p className="flex items-center gap-1 text-xs text-muted-foreground">

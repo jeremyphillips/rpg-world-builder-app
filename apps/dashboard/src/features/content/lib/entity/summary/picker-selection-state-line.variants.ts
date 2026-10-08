@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority'
+import { cn, inlineIconTextClasses } from '@rpg/ui'
 
 /** Selection-state line. Density matches supporting copy; the status cell owns the offset. */
 export const pickerSelectionStateLineVariants = cva('min-w-0', {
@@ -13,9 +14,10 @@ export const pickerSelectionStateLineVariants = cva('min-w-0', {
   },
 })
 
-/** State word. Provenance stays on the muted inline-metadata item at regular weight. */
-export const pickerSelectionStateWordVariants = cva(
-  'inline-flex items-center gap-1 text-foreground font-body-emphasis',
-)
+/**
+ * State word stays in inline flow so its baseline matches provenance.
+ * The icon aligns to the x-height and does not become the line's baseline.
+ */
+export const pickerSelectionStateWordVariants = cva('text-foreground font-body-emphasis')
 
-export const pickerSelectionStateIconVariants = cva('size-3.5 shrink-0')
+export const pickerSelectionStateIconVariants = cva(cn('me-1', inlineIconTextClasses))

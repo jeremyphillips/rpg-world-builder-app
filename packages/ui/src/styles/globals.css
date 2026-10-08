@@ -437,6 +437,33 @@
   height: var(--icon-glyph-xl);
 }
 
+@utility size-icon-inline {
+  width: var(--icon-inline, var(--icon-glyph-md));
+  height: var(--icon-inline, var(--icon-glyph-md));
+}
+
+/*
+ * Inline icon owners. Sidecar only — do not restate font-size or line-height.
+ * text-lg and larger are not owners.
+ */
+@layer utilities {
+  .text-xs {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-sm {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-md {
+    --icon-inline: var(--icon-glyph-md);
+  }
+
+  .text-base {
+    --icon-inline: var(--icon-glyph-md);
+  }
+}
+
 @utility size-status-icon-slash-sm {
   width: var(--status-icon-slash-sm);
   height: var(--status-icon-slash-sm);
@@ -525,6 +552,7 @@
  * (TipTap / CMS output) matches light/dark automatically via CSS variables.
  */
 @utility prose {
+  --icon-inline: var(--icon-glyph-md);
   --tw-prose-body: var(--color-foreground);
   --tw-prose-headings: var(--color-foreground);
   --tw-prose-lead: color-mix(
@@ -605,12 +633,14 @@
 .prose.prose-sm {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
+  --icon-inline: var(--icon-glyph-sm);
 }
 
 /* Secondary body — catalog + form md richtext (`text-md`, 15px). */
 .prose.prose-md {
   font-size: var(--text-md);
   line-height: var(--text-md--line-height);
+  --icon-inline: var(--icon-glyph-md);
 }
 
 /* Heading composite utilities — bundle role tokens; variants map 1:1. */
@@ -837,6 +867,7 @@
   }
 
   body {
+    --icon-inline: var(--icon-glyph-md);
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);

@@ -52,3 +52,9 @@ export function chipLeadingIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
 export function badgeIconGlyphClasses(size: 'sm' | 'md' | 'lg'): string {
   return cn('inline-flex shrink-0 leading-none', compactLabelIconGlyphClasses(size))
 }
+
+/** Icon in inline flow. Size comes from the nearest typography owner's --icon-inline. */
+export const inlineIconTextClasses = 'inline-block shrink-0 align-middle size-icon-inline'
+
+/** Flex status slot. Direct SVG child reads the same inherited step. */
+export const inlineIconFlexSlotClasses = 'shrink-0 leading-none [&>svg]:size-icon-inline'

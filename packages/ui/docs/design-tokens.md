@@ -291,7 +291,25 @@ Labeled `Button` (and matching recipes) derive gap from the **same effective tie
 Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
 `control-action.variants.test.ts`.
 
-Storybook: **Design tokens → Icon glyph** and **Control action**.
+### Inline icons
+
+Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` (or `inlineIconTextClasses` / `inlineIconFlexSlotClasses`) and do not name a text size or a glyph step. The utility falls back to `--icon-glyph-md` when no owner is present.
+
+| Owner                      | Glyph |
+| -------------------------- | ----- |
+| `body` (default)           | md    |
+| `.text-xs`, `.text-sm`     | sm    |
+| `.text-md`, `.text-base`   | md    |
+| `prose`, `.prose.prose-md` | md    |
+| `.prose.prose-sm`          | sm    |
+
+`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons stay on `compactLabelIconGlyphClasses`.
+
+Button glyphs stay on `resolveButtonIconGlyphStep`. Do not route them through `size-icon-inline`. Their step follows hit target and density, not the label's font size.
+
+Centered decorative stacks (a large glyph above a heading and description, including `size-icon-glyph-xl`) are not this pairing.
+
+Storybook: **Design tokens → Icon glyph** (including nested `text-base` / `text-xs`) and **Control action**.
 
 Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
 `size-*` in component implementations is forbidden (grandfather list until Phase 6 inline cleanup).
