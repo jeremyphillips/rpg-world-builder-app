@@ -3,6 +3,11 @@ import { describe, expect, it } from 'vitest'
 import type { Spell } from '../../../../content/spell'
 import {
   buildSpellPickerSearchText,
+  getSpellSearchDescription,
+  getSpellSearchLevelLabels,
+  getSpellSearchName,
+  getSpellSearchSchoolLabel,
+  getSpellSearchTags,
   formatSpellConcentrationMarker,
   formatSpellPickerCastingTime,
   formatSpellPickerComponents,
@@ -123,10 +128,25 @@ describe('formatSpellRitualMarker', () => {
 describe('buildSpellPickerSearchText', () => {
   it('includes name, school, level labels, tags, and plain description text', () => {
     const searchText = buildSpellPickerSearchText(baseSpell)
-    expect(searchText).toContain('Fireball')
-    expect(searchText).toContain('Evocation')
-    expect(searchText).toContain('damage')
-    expect(searchText).toContain('bright streak flashes')
+    expect(searchText).toBe(
+      'Fireball Evocation 3rd 3rd level damage A bright streak flashes from your pointing finger.',
+    )
     expect(searchText).not.toContain('<p>')
+  })
+
+  it('joins the field helpers without changing the combined text', () => {
+    const tags = getSpellSearchTags(baseSpell)
+    expect(buildSpellPickerSearchText(baseSpell)).toBe(
+      [
+        getSpellSearchName(baseSpell),
+        getSpellSearchSchoolLabel(baseSpell),
+        ...getSpellSearchLevelLabels(baseSpell),
+        tags.join(' ') || undefined,
+        getSpellSearchDescription(baseSpell) || undefined,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    )
+    expect(getSpellSearchLevelLabels({ ...baseSpell, level: 0 })).toEqual(['Cantrip', 'Cantrip'])
   })
 })

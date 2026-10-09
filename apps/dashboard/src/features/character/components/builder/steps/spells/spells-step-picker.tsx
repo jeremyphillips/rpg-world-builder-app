@@ -8,6 +8,7 @@ import {
 } from '@rpg/contracts'
 
 import { withChoiceSetSelections } from '../../../../lib/choice-sets/choice-set-selections'
+import { enrichSpellPickerItems } from '../../../../lib/spells/spell-picker-search.lib'
 import { SpellPickerDrawer } from '../../../spells/picker/spell-picker-drawer'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
@@ -41,11 +42,13 @@ export function SpellsStepPicker({
   const mode = spellPickerModeForChoiceSet(choiceSet)
   const items = useMemo(
     () =>
-      resolveSpellPickerItems({
-        draft,
-        context,
-        choiceSetId: choiceSet.id,
-      }),
+      enrichSpellPickerItems(
+        resolveSpellPickerItems({
+          draft,
+          context,
+          choiceSetId: choiceSet.id,
+        }),
+      ),
     [choiceSet.id, context, draft],
   )
   const selectedIds = draft.choiceSelections[choiceSet.id] ?? []

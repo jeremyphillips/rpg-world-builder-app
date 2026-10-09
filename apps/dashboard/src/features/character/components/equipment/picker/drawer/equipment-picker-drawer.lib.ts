@@ -165,7 +165,7 @@ function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
 
 function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
   const document = item.searchDocument ?? assembleEquipmentPickerSearchDocument(item.equipment)
-  return matchSearchDocumentQuery(document, searchQuery).score ?? 0
+  return matchSearchDocumentQuery(document, searchQuery, { profile: 'forgiving' }).score ?? 0
 }
 
 function filterEquipmentPickerItemsBySearch(

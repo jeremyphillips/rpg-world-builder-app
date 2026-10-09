@@ -19,6 +19,8 @@ import {
   resolveValidSpellPickerSort,
   toggleSpellPickerLevelSelection,
 } from './spell-picker-drawer.lib'
+import type { SearchDocument } from '@rpg/search'
+
 import {
   SPELL_PICKER_LEVELS_ALL,
   SPELL_PICKER_MODE_CANTRIPS,
@@ -29,6 +31,23 @@ import {
   SPELL_PICKER_SORT_LEVEL_ASC,
   SPELL_PICKER_SORT_NAME_ASC,
 } from './spell-picker-drawer.types'
+
+function spellSearchDocument(
+  id: string,
+  name: string,
+  keyword: string,
+  description: string,
+): SearchDocument {
+  return {
+    id,
+    fields: [
+      { key: 'name', text: name, role: 'primary' },
+      { key: 'tag:0', text: keyword, role: 'keyword' },
+      { key: 'description', text: description, role: 'secondary' },
+      { key: 'combined', text: `${name} ${keyword} ${description}`, role: 'secondary' },
+    ],
+  }
+}
 import { spellPickerOpenItemsFixture } from './spell-picker-drawer.fixtures'
 
 describe('spell-picker-drawer.lib', () => {
@@ -73,6 +92,69 @@ describe('spell-picker-drawer.lib', () => {
         sortMode: SPELL_PICKER_SORT_BEST_MATCH,
       }).map((item) => item.spell.name),
     ).toEqual(['Mage Hand', 'Detect Magic'])
+  })
+
+  it('ranks a literal name hit above a keyword hit in best match', () => {
+    const nameHit = {
+      ...spellPickerOpenItemsFixture[0]!,
+      spell: { ...spellPickerOpenItemsFixture[0]!.spell, name: 'Glassember' },
+      searchDocument: spellSearchDocument('name-hit', 'Glassember', 'healing', 'A quiet light'),
+    }
+    const keywordHit = {
+      ...spellPickerOpenItemsFixture[1]!,
+      spell: { ...spellPickerOpenItemsFixture[1]!.spell, name: 'Plain Ward' },
+      searchDocument: spellSearchDocument(
+        'keyword-hit',
+        'Plain Ward',
+        'glassember',
+        'A quiet light',
+      ),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([keywordHit, nameHit], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.spell.name),
+    ).toEqual(['Glassember', 'Plain Ward'])
+  })
+
+  it('uses search score only as a tie-break after name and level', () => {
+    const earlyName = {
+      ...spellPickerOpenItemsFixture[0]!,
+      spell: { ...spellPickerOpenItemsFixture[0]!.spell, name: 'Alpha Ward', level: 1 },
+      searchDocument: spellSearchDocument('alpha', 'Alpha Ward', 'ember', 'quiet'),
+    }
+    const laterName = {
+      ...spellPickerOpenItemsFixture[1]!,
+      spell: { ...spellPickerOpenItemsFixture[1]!.spell, name: 'Zebra Ward', level: 1 },
+      searchDocument: spellSearchDocument('zebra', 'Glassember', 'healing', 'quiet'),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([laterName, earlyName], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.spell.name),
+    ).toEqual(['Alpha Ward', 'Zebra Ward'])
+
+    const lowScore = {
+      ...earlyName,
+      spell: { ...earlyName.spell, name: 'Low Score', level: 1 },
+      searchDocument: spellSearchDocument('low', 'Plain Ward', 'glassember', 'quiet'),
+    }
+    const highScore = {
+      ...laterName,
+      spell: { ...laterName.spell, name: 'High Score', level: 1 },
+      searchDocument: spellSearchDocument('high', 'Glassember', 'healing', 'quiet'),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([lowScore, highScore], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_LEVEL_ASC,
+      }).map((item) => item.spell.name),
+    ).toEqual(['High Score', 'Low Score'])
   })
 
   it('resets invalid sort modes after mode changes', () => {

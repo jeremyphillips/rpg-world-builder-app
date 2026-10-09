@@ -1,22 +1,41 @@
 import {
   buildEquipmentPickerSearchText,
+  getEquipmentSearchDescription,
+  getEquipmentSearchKindLabel,
+  getEquipmentSearchName,
   type Equipment,
   type EquipmentPickerItem,
 } from '@rpg/contracts'
-import type { SearchDocument } from '@rpg/search'
+import type { SearchDocument, SearchField } from '@rpg/search'
 
-/** Assembles a parity-preserving equipment picker search document from contracts field helpers. */
+/**
+ * Assembles an equipment picker search document.
+ * Name is primary, kind and each tag are keywords, and description is secondary.
+ * The slug stays inside `combined` only — it is an identifier, not a keyword.
+ */
 export function assembleEquipmentPickerSearchDocument(equipment: Equipment): SearchDocument {
-  return {
-    id: equipment.id,
-    fields: [
-      {
-        key: 'combined',
-        text: buildEquipmentPickerSearchText(equipment),
-        role: 'primary',
-      },
-    ],
+  const description = getEquipmentSearchDescription(equipment)
+  const fields: SearchField[] = [
+    { key: 'name', text: getEquipmentSearchName(equipment), role: 'primary' },
+    { key: 'kind', text: getEquipmentSearchKindLabel(equipment), role: 'keyword' },
+    ...(equipment.tags ?? []).map((tag, index) => ({
+      key: `tag:${index}`,
+      text: tag,
+      role: 'keyword' as const,
+    })),
+  ]
+
+  if (description) {
+    fields.push({ key: 'description', text: description, role: 'secondary' })
   }
+
+  fields.push({
+    key: 'combined',
+    text: buildEquipmentPickerSearchText(equipment),
+    role: 'secondary',
+  })
+
+  return { id: equipment.id, fields }
 }
 
 /** Attaches assembled search documents to resolver rows for dashboard picker surfaces. */

@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { getOrganizationClassificationDiscoveryText } from './classification-discovery'
+import {
+  getOrganizationClassificationDiscoveryTerms,
+  getOrganizationClassificationDiscoveryText,
+} from './classification-discovery'
 import { getOrganizationDomainDiscoveryTerms } from './domain'
 import { getOrganizationFormDiscoveryTerms } from './form'
 import { getOrganizationFunctionDiscoveryTerms } from './function'
@@ -16,13 +19,14 @@ describe('getOrganizationClassificationDiscoveryText', () => {
     }
 
     expect(getOrganizationClassificationDiscoveryText(input)).toBe(
-      [
-        ...getOrganizationDomainDiscoveryTerms(input.organizationDomain),
-        ...getOrganizationFormDiscoveryTerms(input.organizationForm),
-        ...getOrganizationFunctionDiscoveryTerms('finance'),
-        ...getOrganizationPracticeDiscoveryTerms('banking'),
-      ].join(' '),
+      getOrganizationClassificationDiscoveryTerms(input).join(' '),
     )
+    expect(getOrganizationClassificationDiscoveryTerms(input)).toEqual([
+      ...getOrganizationDomainDiscoveryTerms(input.organizationDomain),
+      ...getOrganizationFormDiscoveryTerms(input.organizationForm),
+      ...getOrganizationFunctionDiscoveryTerms('finance'),
+      ...getOrganizationPracticeDiscoveryTerms('banking'),
+    ])
   })
 
   it('omits form and classification axes when unset or empty', () => {

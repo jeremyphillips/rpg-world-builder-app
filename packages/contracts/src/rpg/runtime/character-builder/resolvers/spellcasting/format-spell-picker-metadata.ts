@@ -57,19 +57,46 @@ function flattenSpellTags(tags: SpellTags | undefined): string[] {
   ]
 }
 
-/** Search text for spell picker ranking — name, school, level, tags, and plain description. */
-export function buildSpellPickerSearchText(spell: Spell): string {
+/** Primary picker label for spell search documents. */
+export function getSpellSearchName(spell: Spell): string {
+  return spell.name
+}
+
+/** Human-readable school label for spell search documents. */
+export function getSpellSearchSchoolLabel(spell: Spell): string {
+  return getSpellSchoolLabel(spell.school)
+}
+
+/**
+ * Level phrases for spell search documents.
+ * Returns both the short ordinal (`3rd`, or `Cantrip` at level 0) and the picker label (`3rd level`).
+ */
+export function getSpellSearchLevelLabels(spell: Spell): string[] {
   const levelLabel =
     spell.level === 0 ? SPELL_PICKER_CANTrip_LEVEL_LABEL : formatSpellLevel(spell.level)
-  const tagText = flattenSpellTags(spell.tags).join(' ')
+  return [levelLabel, formatSpellPickerLevelLabel(spell.level)]
+}
+
+/** Structured tag ids for spell search documents, one value per entry. */
+export function getSpellSearchTags(spell: Spell): string[] {
+  return flattenSpellTags(spell.tags)
+}
+
+/** Plain-text description for spell search documents. */
+export function getSpellSearchDescription(spell: Spell): string {
+  return stripHtmlTags(spell.description ?? '')
+}
+
+/** Search text for spell picker ranking — name, school, level, tags, and plain description. */
+export function buildSpellPickerSearchText(spell: Spell): string {
+  const tagText = getSpellSearchTags(spell).join(' ')
 
   return [
-    spell.name,
-    getSpellSchoolLabel(spell.school),
-    levelLabel,
-    formatSpellPickerLevelLabel(spell.level),
+    getSpellSearchName(spell),
+    getSpellSearchSchoolLabel(spell),
+    ...getSpellSearchLevelLabels(spell),
     tagText || undefined,
-    stripHtmlTags(spell.description ?? ''),
+    getSpellSearchDescription(spell) || undefined,
   ]
     .filter(Boolean)
     .join(' ')

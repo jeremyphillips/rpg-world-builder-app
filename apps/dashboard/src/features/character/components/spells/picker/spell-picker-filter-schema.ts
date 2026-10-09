@@ -258,13 +258,13 @@ export function extractSpellPickerFilterState(
   }
 }
 
-export function applySpellPickerFilterSchema(
+export function applySpellPickerFilterSchema<T extends SpellPickerItem>(
   schema: FilterSchema<SpellPickerItem, SpellPickerFilterState>,
   state: SpellPickerFilterState,
-  items: readonly SpellPickerItem[],
+  items: readonly T[],
   mode: SpellPickerMode,
-): SpellPickerItem[] {
-  const filtered = applyFilterSchema(schema, state, [...items])
+): T[] {
+  const filtered = applyFilterSchema(schema, state, [...items]) as T[]
   if (mode === SPELL_PICKER_MODE_CANTRIPS) {
     return filtered.filter((item) => item.spell.level === 0)
   }

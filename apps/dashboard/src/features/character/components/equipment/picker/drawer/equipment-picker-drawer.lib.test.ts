@@ -641,6 +641,70 @@ describe('equipment-picker-drawer.lib', () => {
     expect(desc.map((item) => item.equipment.name)).toEqual(['Rope', 'Priceless Rope'])
   })
 
+  it('ranks a literal name hit above a keyword hit and uses search score after price', () => {
+    const base = equipmentPickerItemsFixture[2]!
+    const nameHit: EquipmentPickerItem = {
+      ...base,
+      equipment: {
+        ...base.equipment,
+        id: 'name-hit',
+        slug: 'glassember-rope',
+        name: 'Glassember Rope',
+      },
+      searchDocument: {
+        id: 'name-hit',
+        fields: [
+          { key: 'name', text: 'Glassember Rope', role: 'primary' },
+          { key: 'tag:0', text: 'hemp', role: 'keyword' },
+          { key: 'description', text: 'coil', role: 'secondary' },
+          { key: 'combined', text: 'Glassember Rope hemp coil', role: 'secondary' },
+        ],
+      },
+    }
+    const keywordHit: EquipmentPickerItem = {
+      ...base,
+      equipment: { ...base.equipment, id: 'keyword-hit', slug: 'plain-rope', name: 'Plain Rope' },
+      searchDocument: {
+        id: 'keyword-hit',
+        fields: [
+          { key: 'name', text: 'Plain Rope', role: 'primary' },
+          { key: 'tag:0', text: 'glassember', role: 'keyword' },
+          { key: 'description', text: 'coil', role: 'secondary' },
+          { key: 'combined', text: 'Plain Rope glassember coil', role: 'secondary' },
+        ],
+      },
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([keywordHit, nameHit], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Glassember Rope', 'Plain Rope'])
+
+    const sameCostLowScore: EquipmentPickerItem = {
+      ...keywordHit,
+      equipment: { ...keywordHit.equipment, id: 'alpha-gear', name: 'Alpha Gear' },
+    }
+    const sameCostHighScore: EquipmentPickerItem = {
+      ...nameHit,
+      equipment: { ...nameHit.equipment, id: 'zebra-gear', name: 'Zebra Gear' },
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([sameCostLowScore, sameCostHighScore], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Zebra Gear', 'Alpha Gear'])
+    expect(
+      filterAndSortEquipmentPickerItems([sameCostHighScore, sameCostLowScore], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Alpha Gear', 'Zebra Gear'])
+  })
+
   it('excludes search score-zero rows and lets price sort beat relevance with a query', () => {
     const longsword = equipmentPickerItemsFixture[0]!
     const chainMail = equipmentPickerItemsFixture[1]!

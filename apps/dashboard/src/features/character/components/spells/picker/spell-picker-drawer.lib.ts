@@ -47,6 +47,7 @@ import {
   type SpellPickerMethodFilter,
   type SpellPickerMode,
   type SpellPickerSchoolFilter,
+  type SpellPickerRow,
   type SpellPickerSortMode,
   type SpellPickerTraitFilter,
   SPELL_PICKER_LEVELS_ALL,
@@ -223,11 +224,11 @@ export function selectedIdsForSpellPickerMode(
   return mode === SPELL_PICKER_MODE_CANTRIPS ? [...cantripSelectedIds] : [...spellSelectedIds]
 }
 
-export function itemsForSpellPickerMode(
+export function itemsForSpellPickerMode<T extends SpellPickerItem>(
   mode: SpellPickerMode,
-  cantripItems: readonly SpellPickerItem[],
-  spellItems: readonly SpellPickerItem[],
-): readonly SpellPickerItem[] {
+  cantripItems: readonly T[],
+  spellItems: readonly T[],
+): readonly T[] {
   return mode === SPELL_PICKER_MODE_CANTRIPS ? cantripItems : spellItems
 }
 
@@ -441,19 +442,12 @@ export function matchesSpellPickerMechanicsFilters(
 }
 
 type SpellPickerScoredItem = {
-  item: SpellPickerItem
+  item: SpellPickerRow
   searchScore: number
 }
 
-function scoreSpellPickerItem(item: SpellPickerItem, searchQuery: string): number {
-  return scoreSearchDocument(
-    {
-      id: item.spell.id,
-      fields: [{ key: 'combined', text: item.searchText, role: 'primary' }],
-    },
-    searchQuery,
-    { profile: 'forgiving' },
-  )
+function scoreSpellPickerItem(item: SpellPickerRow, searchQuery: string): number {
+  return scoreSearchDocument(item.searchDocument, searchQuery, { profile: 'forgiving' })
 }
 
 function compareSpellPickerScoredItems(
@@ -526,12 +520,12 @@ export function filterSpellPickerItems(
 }
 
 export function filterAndSortSpellPickerItems(
-  items: readonly SpellPickerItem[],
+  items: readonly SpellPickerRow[],
   options: {
     searchQuery: string
     sortMode: SpellPickerSortMode
   },
-): SpellPickerItem[] {
+): SpellPickerRow[] {
   const filtered = scoreAndFilterPickerItems(items, {
     searchQuery: options.searchQuery,
     scoreItem: scoreSpellPickerItem,

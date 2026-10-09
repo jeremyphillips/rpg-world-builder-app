@@ -14,8 +14,31 @@ visibility / workflow eligibility
 
 Spell and proficiency best match is recommended, then name
 (`compareRecommendedThenName`). Equipment best match is
-`compareIntentionalEquipmentRanking`. Connection drawers are separate and are
-not covered here.
+`compareIntentionalEquipmentRanking`. Organization and residence drawers rank by
+search score, then name, while a query is present.
+
+## Shared search score
+
+Picker search uses `@rpg/search` with the forgiving profile. The document score
+is the best single field. Field roles:
+
+| Surface       | Primary | Keyword                            | Secondary                                 |
+| ------------- | ------- | ---------------------------------- | ----------------------------------------- |
+| Spells        | name    | school, each level label, each tag | description, combined                     |
+| Equipment     | name    | kind, each tag                     | description, combined (includes the slug) |
+| Proficiencies | label   | —                                  | —                                         |
+| Organizations | name    | each classification discovery term | combined                                  |
+| Residences    | name    | each classification part           | combined                                  |
+
+`combined` is the previous joined search text. It is a secondary fallback for
+phrases that span fields. Identifiers such as the equipment slug stay in that
+fallback and are not keywords. One keyword field is one structured value, so a
+tag or discovery term can match at exact or prefix quality.
+
+Dashboard spell rows are `SpellPickerRow`: a `SpellPickerItem` plus a required
+`searchDocument` assembled by `enrichSpellPickerItems`. Organization and
+residence drawers score with `scoreAndFilterPickerItems` and sort by search
+score, then name. An empty query keeps name order.
 
 Browse order ignores selection, remaining budget, and consumed grants. Those
 facts stay on the row as chrome and disabled actions.
@@ -101,8 +124,8 @@ pools, starting-equipment pools, fulfillment-aware gold elevation). Proficiency 
 **Empty-query best match (purchase):** recommendation comparator only — no search-score step.
 
 **Search inclusion:** when the query is non-empty, rows with `@rpg/search`
-match score ≤ 0 on the assembled equipment picker `SearchDocument` (primary
-combined field) are excluded before sort.
+match score ≤ 0 on the assembled equipment picker `SearchDocument` (forgiving
+profile; name, kind, tags, description, and combined) are excluded before sort.
 
 **Unknown cost:** rows without a known `equipment.cost` are not treated as zero
 or expensive. In price sorts, priced rows come first in both directions;

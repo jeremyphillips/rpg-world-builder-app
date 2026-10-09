@@ -337,11 +337,11 @@ Equipment already curates through `comparisonGroups`. Do not measure rendered wi
 
 ### `@rpg/contracts` (domain affordances)
 
-| Domain        | Resolver                                                  | Provides                                                                                                                |
-| ------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Equipment     | `resolveEquipmentPickerItems` + dashboard search assembly | Rows, affordability, recommendations, `searchDocument`; purchase action via `resolveEquipmentPickerPurchaseActionState` |
-| Spells        | `resolveSpellPickerItems`                                 | Rows, selection state, `compactSummary`, `searchText`                                                                   |
-| Proficiencies | `resolveProficiencyPickerItems`                           | Rows, grants overlap, selection state, optional `compactSummary`                                                        |
+| Domain        | Resolver                                                               | Provides                                                                                                                |
+| ------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Equipment     | `resolveEquipmentPickerItems` + dashboard search assembly              | Rows, affordability, recommendations, `searchDocument`; purchase action via `resolveEquipmentPickerPurchaseActionState` |
+| Spells        | `resolveSpellPickerItems` + dashboard `SpellPickerRow` search assembly | Rows, selection state, `compactSummary`, `searchText`; `searchDocument` from `enrichSpellPickerItems`                   |
+| Proficiencies | `resolveProficiencyPickerItems`                                        | Rows, grants overlap, selection state, optional `compactSummary`                                                        |
 
 Row state for spells and proficiencies extends `PickerItemStateBase`
 (`resolvers/picker/picker-item-state.ts`): `canSelect`, `isAlreadySelected`,

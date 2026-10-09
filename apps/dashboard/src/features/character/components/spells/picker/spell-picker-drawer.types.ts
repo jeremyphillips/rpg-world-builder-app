@@ -5,6 +5,7 @@ import {
   type ChoiceSet,
   type SpellPickerItem,
 } from '@rpg/contracts'
+import type { SearchDocument } from '@rpg/search'
 
 import type { SpellDisplayVocabulary } from '@/features/content'
 
@@ -18,6 +19,9 @@ import {
 } from '../../picker/sort/catalog-picker-sort-modes.lib'
 
 export type { ChoiceSet, SpellPickerItem, SpellPickerItemState } from '@rpg/contracts'
+
+/** Resolver row plus the dashboard-assembled search document. The document is required. */
+export type SpellPickerRow = SpellPickerItem & { searchDocument: SearchDocument }
 
 export const SPELL_PICKER_MODE_CANTRIPS = 'cantrips' as const
 export const SPELL_PICKER_MODE_SPELLS = 'spells' as const
@@ -100,8 +104,8 @@ export type SpellPickerDrawerProps = {
   spellChoiceSet?: ChoiceSet
   cantripSelectedIds: string[]
   spellSelectedIds: string[]
-  cantripItems: readonly SpellPickerItem[]
-  spellItems: readonly SpellPickerItem[]
+  cantripItems: readonly SpellPickerRow[]
+  spellItems: readonly SpellPickerRow[]
   initialMode?: SpellPickerMode
   /** Pre-filter prepared-spell browse to a single spell level when opened from a level tab. */
   initialSpellLevel?: number
