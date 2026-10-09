@@ -144,7 +144,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
     }
 
     return (
-      <div className={searchBarRootVariants()}>
+      <div className={cn(searchBarRootVariants(), className)}>
         <Search
           className={searchBarLeadingIconVariants({
             appearance: 'field',
@@ -165,10 +165,7 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
           size={resolvedSize}
           disabled={disabled}
           autoComplete="off"
-          className={cn(
-            searchBarFieldInputVariants({ size: resolvedSize, clearable: showClear }),
-            className,
-          )}
+          className={searchBarFieldInputVariants({ size: resolvedSize, clearable: showClear })}
           {...inputProps}
         />
         {clearControl}

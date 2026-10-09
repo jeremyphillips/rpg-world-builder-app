@@ -5,9 +5,15 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { comboboxSearchInputVariants } from './combobox-field.variants'
-import { fieldClearAffordanceInsetVariants } from './field-clear-affordance.variants'
+
 export const searchBarRootVariants = cva('relative w-full min-w-0')
+
+/**
+ * Chromeless inner search input — host row (combobox panel, list toolbar) owns border/height.
+ */
+export const searchBarEmbeddedChromeInputVariants = cva(
+  'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
+)
 
 /** Embedded hosts supply outer row padding; SearchBar is flex + min-w-0 flex-1 only. */
 export const searchBarEmbeddedRootVariants = cva('flex min-w-0 flex-1 items-center gap-2')
@@ -80,7 +86,7 @@ export const searchBarFieldInputVariants = cva('', {
   },
 })
 
-export const searchBarEmbeddedInputVariants = cva(comboboxSearchInputVariants(), {
+export const searchBarEmbeddedInputVariants = cva(searchBarEmbeddedChromeInputVariants(), {
   variants: {
     size: {
       sm: '',
@@ -102,5 +108,3 @@ export const searchBarEmbeddedInputVariants = cva(comboboxSearchInputVariants(),
     clearable: false,
   },
 })
-
-export { fieldClearAffordanceInsetVariants as searchBarClearInsetVariants }

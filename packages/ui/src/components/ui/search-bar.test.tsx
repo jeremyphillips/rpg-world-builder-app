@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -102,6 +102,38 @@ describe('SearchBar', () => {
 
     const input = screen.getByRole('searchbox', { name: SEARCH_ARIA })
     expect(input.className).toContain(searchBarControlHeightClass('md'))
+  })
+
+  it('applies className to the field appearance root shell', () => {
+    const { container } = render(
+      <SearchBar
+        id="organization-search"
+        value=""
+        onValueChange={vi.fn()}
+        ariaLabel={SEARCH_ARIA}
+        className="max-w-md"
+      />,
+    )
+
+    expect(container.firstElementChild).toHaveClass('max-w-md', 'relative', 'w-full')
+  })
+
+  it('forwards onValueChange while an IME composition is active', () => {
+    const onValueChange = vi.fn()
+    render(
+      <SearchBar
+        id="embedded-search"
+        appearance="embedded"
+        value=""
+        onValueChange={onValueChange}
+        ariaLabel="Search choices"
+      />,
+    )
+
+    const input = screen.getByRole('searchbox', { name: 'Search choices' })
+    fireEvent.compositionStart(input)
+    fireEvent.change(input, { target: { value: 'あ' } })
+    expect(onValueChange).toHaveBeenCalledWith('あ')
   })
 
   it('renders embedded appearance with chromeless input classes', () => {

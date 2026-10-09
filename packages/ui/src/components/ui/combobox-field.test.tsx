@@ -293,6 +293,26 @@ describe('ComboboxField', () => {
     expect(screen.queryByRole('option', { name: 'Dart' })).not.toBeInTheDocument()
   })
 
+  it('closes the panel when Escape is pressed in the search field', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    const search = screen.getByRole('searchbox', { name: 'Search Specific weapons' })
+    await user.type(search, 'long')
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('listbox', { name: 'Specific weapons' })).not.toBeInTheDocument()
+  })
+
   it('clears panel search and keeps focus in the search input', async () => {
     const user = userEvent.setup()
     render(
