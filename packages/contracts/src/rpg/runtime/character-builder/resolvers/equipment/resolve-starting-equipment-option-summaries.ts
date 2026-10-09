@@ -26,6 +26,7 @@ import {
   inventoryBucketForEquipmentKind,
   type CharacterWealth,
 } from '../../../character/sheet/equipment-inventory'
+import { findClassToolProficiencyChoice } from '../class/find-class-tool-proficiency-choice'
 import { equipmentPoolSummaryLabel } from './equipment-pool-choice-options'
 import {
   formatStartingEquipmentPackageDescription,
@@ -179,9 +180,7 @@ function summarizeProficiencyLinkedGrantItem(
   reasons: string[]
 } {
   const choiceId = startingEquipmentGrantProficiencyChoiceId(grant)!
-  const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
-    (entry) => entry.id === choiceId,
-  )
+  const choice = findClassToolProficiencyChoice(characterClass, choiceId)
   const choiceLabel = choice?.label?.trim() || choiceId
 
   if (!choice) {

@@ -21,6 +21,7 @@ import {
 import { toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { findClassToolProficiencyChoice } from '../class/find-class-tool-proficiency-choice'
 import {
   nestedStartingEquipmentChoiceSetId,
   readSelectedStartingEquipmentOptionId,
@@ -83,9 +84,7 @@ function recordStartingItemCandidate(
   }
 
   if (isProficiencyLinkedStartingEquipmentGrant(item)) {
-    const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
-      (entry) => entry.id === item.target.choiceId,
-    )
+    const choice = findClassToolProficiencyChoice(characterClass, item.target.choiceId)
     if (!choice?.pool) return
     recordPoolSpecificity(specificityById, equipment, rulesetId, {
       kind: 'tool_proficiency_pool',
