@@ -6,11 +6,12 @@ organizations link to locations through subject-owned
 
 ## Where to look
 
-| Topic                                                     | Doc                                                                                   |
-| --------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Storage model, projection registry, mutation ownership    | [`docs/cross-content-relationships.md`](../../../docs/cross-content-relationships.md) |
-| Dashboard UI patterns (forward vs inverse, drawers, copy) | [`cross-content-relationship-ui.md`](./cross-content-relationship-ui.md)              |
-| Organization forward + inverse location connections       | [`organization-location-connections.md`](./organization-location-connections.md)      |
+| Topic                                                     | Doc                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Storage model, projection registry, mutation ownership    | [`docs/cross-content-relationships.md`](../../../docs/cross-content-relationships.md)            |
+| Dashboard UI patterns (forward vs inverse, drawers, copy) | [`cross-content-relationship-ui.md`](./cross-content-relationship-ui.md)                         |
+| Connection picker order and search                        | [`cross-content-relationship-ui.md`](./cross-content-relationship-ui.md#picker-order-and-search) |
+| Organization forward + inverse location connections       | [`organization-location-connections.md`](./organization-location-connections.md)                 |
 
 ## Dashboard authoring (v1)
 

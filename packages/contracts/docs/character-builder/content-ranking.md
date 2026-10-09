@@ -37,9 +37,12 @@ fallback and are not keywords. One keyword field is one structured value, so a
 tag or discovery term can match at exact or prefix quality.
 
 Dashboard spell rows are `SpellPickerRow`: a `SpellPickerItem` plus a required
-`searchDocument` assembled by `enrichSpellPickerItems`. Organization and
-residence drawers score with `scoreAndFilterPickerItems` and sort by search
-score, then name. An empty query keeps name order.
+`searchDocument` assembled by `enrichSpellPickerItems`. Equipment rows are
+`EquipmentPickerRow`, assembled by `enrichEquipmentPickerItemsWithSearchDocument`.
+Organization and residence drawers score with `scoreAndFilterPickerItems` and
+sort by search score, then name. An empty query keeps name order. Connection-drawer
+browse order is documented in
+[cross-content-relationship-ui.md](../../../../apps/dashboard/docs/cross-content-relationship-ui.md#picker-order-and-search).
 
 Browse order ignores selection, remaining budget, and consumed grants. Those
 facts stay on the row as chrome and disabled actions.
