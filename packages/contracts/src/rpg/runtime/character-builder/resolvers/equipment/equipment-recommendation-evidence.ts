@@ -19,7 +19,6 @@ export function classRecommendationSource(classId: string): RecommendationSource
 }
 
 const UNSOURCED_EQUIPMENT_REASONS = new Set<EquipmentRecommendationEvidence['reason']>([
-  'classToolNeed',
   'selectedToolProficiency',
   'unresolvedToolProficiencyChoice',
 ])

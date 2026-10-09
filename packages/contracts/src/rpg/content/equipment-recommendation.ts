@@ -41,8 +41,6 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
   'classRequired',
   /** Authored strong rule match. */
   'classSuggested',
-  /** Fixed class tool grant (Rogue thieves' tools). */
-  'classToolNeed',
   /** Player-selected tool proficiency from a ChoiceSet. */
   'selectedToolProficiency',
   /** Gear matching the class's usable spellcasting focus kinds. */

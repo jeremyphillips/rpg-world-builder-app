@@ -565,7 +565,6 @@ describe('deriveEquipmentRecommendations', () => {
       proficiencies,
     })
 
-    expect(recommendations.get(thievesTools.id)?.reasons).not.toContain('classToolNeed')
     expect(recommendations.get(thievesTools.id)?.resolved?.state.compatibility).toMatchObject({
       proficient: true,
     })

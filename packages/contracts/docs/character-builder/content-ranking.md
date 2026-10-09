@@ -105,7 +105,7 @@ Rows without `resolved` facts sort as a neutral recommendation. There is no tier
 
 Proficiency is not a recommendation reason. `compatibility.proficient` is `true`, `false`, or omitted when the item does not track proficiency. `selectedToolProficiency` is evidence for the Recommended tab, not a browse signal.
 
-`classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
+A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
 
 Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by class", "Matches focus requirement", "Included in package option", "Recommended by class"). The dashboard orders guidance as requirement, requirement match, package option, then recommendation. Open-pool source guidance stays after recommendations. A selected package does not add package row guidance; ownership provenance shows **Package**. The dashboard maps facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
 

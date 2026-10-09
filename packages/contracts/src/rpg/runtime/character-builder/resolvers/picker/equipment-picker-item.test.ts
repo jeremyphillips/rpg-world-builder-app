@@ -227,7 +227,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         toolCategory: 'thieves',
         utilizes: [],
       }),
-      { tier: 'essential', reasons: ['classToolNeed'] },
+      { tier: 'essential', reasons: ['classRequired'] },
     )
     const weapon = makePickerItem(
       makeEquipment({
@@ -337,7 +337,7 @@ describe('compareEquipmentPickerItemsByRecommendation', () => {
         toolCategory: 'thieves',
         utilizes: [],
       }),
-      { tier: 'essential', reasons: ['classToolNeed'] },
+      { tier: 'essential', reasons: ['classRequired'] },
     )
     const startingWeapon = makePickerItem(
       makeEquipment({
