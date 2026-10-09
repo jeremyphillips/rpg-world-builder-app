@@ -12,8 +12,9 @@ visibility / workflow eligibility
   → sort mode switch
 ```
 
-Spell and proficiency best match is recommended, then name
-(`compareRecommendedThenName`). Equipment best match is
+Spell and proficiency best match is recommendation strength, then name
+(`compareRecommendationThenName`): strong, compatible, neutral, discouraged.
+`isRecommended` stays `strength === 'strong'` and is not the browse key. Equipment best match is
 `compareIntentionalEquipmentRanking`. Organization and residence drawers rank by
 search score, then name, while a query is present.
 
@@ -142,8 +143,10 @@ implements the canonical pipeline. Domain rank comes from
 `compareProficiencyPickerItemsByRecommendation` in
 [`proficiency-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/proficiency-picker-item.ts):
 
-1. **Recommended** — `state.isRecommended` (`true` before `false`; languages only today)
-2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendedThenName`
+1. **Recommendation strength** — `compareStrength` on `state.recommendation` (`strong`, `compatible`, `neutral`, `discouraged`). `isRecommended` stays `strength === 'strong'`.
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendationThenName`
+
+Skill rows governed by an ability tied for the character's highest modifier are `compatible` with reason `abilityFit`, and only when that modifier is greater than 0. Ties are included. Unset scores emit no signal. The score source is `draft.abilities.scores`. This raises skills likely to have the character's strongest baseline checks. It does not mark the skills a player should choose. The signal is ranking-only: no badge, no `detail`, and no generic **Recommended** line. The row already shows the governing ability. Languages can be `strong` from species affinity. Tools, weapons, and armor stay neutral.
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -158,8 +161,10 @@ Empty-query best match uses domain rank only — not name-only fallback.
 canonical pipeline. Domain rank comes from `compareSpellPickerItemsByRecommendation`
 in [`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/spell-picker-item.ts):
 
-1. **Recommended** — `state.isRecommended` (`true` before `false`)
-2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendedThenName`
+1. **Recommendation strength** — `compareStrength` on `state.recommendation` (`strong`, `compatible`, `neutral`, `discouraged`). `isRecommended` stays `strength === 'strong'`.
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendationThenName`
+
+Authored class recommendations are `strong`. Spell browse does not emit `compatible`.
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -180,6 +185,15 @@ production default `reset_view`):
 | **Reset view**    | search, category, Affordable now, sort | —         |
 
 Both modes use the shared Reset button. Action buttons show no counts.
+
+## Considered and not ranked
+
+These were checked for spell and proficiency browse and dropped until the stated data exists:
+
+- **Spell `compatible` from recommendations authored for another class level.** Only the Bard authors recommendations, and the only mismatch that can separate rows is class level. _Revisit when_ several classes author recommendations across class levels.
+- **Specificity and source as spell or proficiency tie-breaks.** Each picker emits one specificity and one source today. _Revisit when_ a picker emits two same-strength signals that differ in specificity or source.
+- **Tool, weapon, and armor affinity.** No content produces a suggested-proficiency field, and class pools are membership only. _Revisit when_ content gains structured suggested-proficiency fields.
+- **Heritage language affinity.** Heritage affinity is the heritage's granted languages, which are already disabled rows. Using it would replace species affinity recommendations that already work.
 
 ## Picker purchase availability
 

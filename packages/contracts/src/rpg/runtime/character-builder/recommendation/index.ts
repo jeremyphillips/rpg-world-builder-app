@@ -47,9 +47,11 @@ export type {
   OptionRecommendation,
   OptionRequirement,
   OptionState,
+  ProficiencyRecommendationReason,
   RecommendationSignal,
   RecommendationSignalBasis,
   RecommendationSignalDetail,
+  RecommendationSignalReason,
   RecommendationSpecificity,
   RecommendationStrength,
   RequirementDefinition,
@@ -58,8 +60,10 @@ export type {
   RequirementState,
 } from './recommendation-envelope'
 export {
+  ABILITY_FIT_RECOMMENDATION_REASON,
   NEUTRAL_OPTION_RECOMMENDATION,
   OPTION_CONTEXT_RELEVANCE,
+  PROFICIENCY_RECOMMENDATION_REASONS,
   OPTION_CONTEXT_RELEVANCE_RANK,
   RECOMMENDATION_SIGNAL_BASES,
   RECOMMENDATION_STRENGTH_RANK,

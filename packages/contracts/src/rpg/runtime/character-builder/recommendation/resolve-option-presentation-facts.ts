@@ -1,6 +1,10 @@
 import { isStartingEquipmentRecommendationReason } from '../../../content/equipment-recommendation'
 import type { Ability } from '../../../vocab/ability'
-import type { OptionRecommendation, RecommendationSignal } from './recommendation-envelope'
+import {
+  ABILITY_FIT_RECOMMENDATION_REASON,
+  type OptionRecommendation,
+  type RecommendationSignal,
+} from './recommendation-envelope'
 import { compareSourcePriority } from './recommendation-comparators'
 import {
   formatRecommendationSourceKindWord,
@@ -144,9 +148,15 @@ function softRecommendationLabel(args: {
     : OPTION_PRESENTATION_RECOMMENDED_LABEL
 }
 
+function isOmittedFromRecommendationFacts(reason: RecommendationSignal['reason']): boolean {
+  if (reason === ABILITY_FIT_RECOMMENDATION_REASON) return true
+  return isStartingEquipmentRecommendationReason(reason)
+}
+
 /**
  * One fact per distinct signal source kind (ordered by source priority) so no source is
  * dropped. Source-less signals collapse into a single `Recommended` fact.
+ * Ability-fit signals are ranking evidence only and are omitted before that fallback.
  */
 export function softRecommendationFacts(args: {
   recommendation: OptionRecommendation
@@ -161,7 +171,7 @@ export function softRecommendationFacts(args: {
     return []
   }
   const signals = recommendation.signals.filter(
-    (signal) => !isStartingEquipmentRecommendationReason(signal.reason),
+    (signal) => !isOmittedFromRecommendationFacts(signal.reason),
   )
   return groupSignalsBySourceKind(signals).map((group) => ({
     kind: 'recommendation',

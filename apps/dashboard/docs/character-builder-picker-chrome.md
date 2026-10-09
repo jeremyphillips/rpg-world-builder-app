@@ -218,7 +218,9 @@ The equipment step mounts `EquipmentSelectionFactsProvider`; **sections** read
 - `equipment-selection-row-presentation.parity.test.ts` guards drift: owned weapons and armor show
   a compatibility entry if and only if a matching build advisory exists.
 - Spell and proficiency drawers use `picker`. Recommendation guidance is a domain input
-  (`recommendationsEnabled` on spells; always on for proficiencies). `already_granted` still
+  (`recommendationsEnabled` on spells; always on for proficiencies). Ability-fit skill ranking
+  (`reason: 'abilityFit'`) is ordering evidence only. It must not render recommendation guidance,
+  including the generic Recommended line. `already_granted` still
   comes from the shared disabled-note string. `selection_full` is not a row-status notice;
   the disabled action tooltip carries it. Ritual and concentration stay on the spell metadata line.
 - Quick NPC package customization rows use `edit_choice`, and selected additional equipment

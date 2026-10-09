@@ -19,6 +19,7 @@ import {
   isProficiencyPickerRowDimmed,
   resolveProficiencyPickerEmptyStateKind,
   resolveProficiencyPickerEmptyStateMessage,
+  PROFICIENCY_PICKER_VIEW_DEFAULTS,
 } from './proficiency-picker-drawer.lib'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
@@ -161,4 +162,77 @@ describe('proficiency-picker-drawer.lib', () => {
       }).map((item) => item.label),
     ).toEqual(['Alpha', 'Zulu'])
   })
+
+  it('sorts a compatible-only set under the default Best match mode', () => {
+    const neutral = proficiencyRow('Alpha', 'neutral')
+    const compatible = proficiencyRow('Zulu', 'compatible')
+
+    expect(
+      filterAndSortProficiencyPickerItems([neutral, compatible], {
+        searchQuery: '',
+        sortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
+      }).map((item) => item.label),
+    ).toEqual(['Zulu', 'Alpha'])
+    expect(compatible.state.isRecommended).toBe(false)
+    expect(neutral.state.isRecommended).toBe(false)
+  })
+
+  it('uses name as the primary key and compatible strength only as a tie-break', () => {
+    const compatible = proficiencyRow('Alpha', 'compatible')
+    const neutral = proficiencyRow('Alpha', 'neutral', 'alpha-neutral')
+    const laterCompatible = proficiencyRow('Zulu', 'compatible')
+
+    expect(
+      filterAndSortProficiencyPickerItems([laterCompatible, neutral, compatible], {
+        searchQuery: '',
+        sortMode: PROFICIENCY_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.optionId),
+    ).toEqual([compatible.optionId, neutral.optionId, laterCompatible.optionId])
+  })
+
+  it('lets a stronger search hit outrank ability fit', () => {
+    const compatible = proficiencyRow('Longbow', 'compatible')
+    const neutral = proficiencyRow('Bow', 'neutral')
+
+    expect(
+      filterAndSortProficiencyPickerItems([compatible, neutral], {
+        searchQuery: 'bow',
+        sortMode: PROFICIENCY_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.label),
+    ).toEqual(['Bow', 'Longbow'])
+  })
 })
+
+function proficiencyRow(
+  label: string,
+  strength: 'neutral' | 'compatible',
+  optionId = label.toLowerCase(),
+): ProficiencyPickerItem {
+  return {
+    optionId,
+    label,
+    state: {
+      isAvailable: true,
+      disabledReasons: [],
+      isRecommended: false,
+      recommendation:
+        strength === 'compatible'
+          ? {
+              strength: 'compatible',
+              signals: [
+                {
+                  strength: 'compatible',
+                  basis: 'inferred',
+                  specificity: 'exact',
+                  reason: 'abilityFit',
+                },
+              ],
+            }
+          : NEUTRAL_OPTION_RECOMMENDATION,
+      canSelect: true,
+      isAlreadySelected: false,
+      isAlreadyGranted: false,
+      isSelectionFull: false,
+    },
+  }
+}

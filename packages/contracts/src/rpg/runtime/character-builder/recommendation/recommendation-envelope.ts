@@ -7,6 +7,17 @@ import type { CharacterSelectionSource } from '../../character/sheet/selection-s
 
 import type { RecommendationSourceRef } from './recommendation-source-ref'
 
+/** Ranking-only proficiency provenance. Not an equipment reason and not a badge. */
+export const ABILITY_FIT_RECOMMENDATION_REASON = 'abilityFit' as const
+
+export const PROFICIENCY_RECOMMENDATION_REASONS = [ABILITY_FIT_RECOMMENDATION_REASON] as const
+
+export type ProficiencyRecommendationReason = (typeof PROFICIENCY_RECOMMENDATION_REASONS)[number]
+
+export type RecommendationSignalReason =
+  | EquipmentRecommendationReason
+  | ProficiencyRecommendationReason
+
 /** Soft only. A requirement is never a recommendation strength. */
 export const RECOMMENDATION_STRENGTHS = ['strong', 'compatible', 'neutral', 'discouraged'] as const
 
@@ -39,10 +50,11 @@ export type RecommendationSignal = {
   /**
    * Evidence reason that produced this recommendation signal.
    * Used for provenance and presentation policy. It does not determine rank directly.
+   * `abilityFit` is ranking evidence only and must not become recommendation guidance.
    * `startingEquipment` here means the strength originated from starting-equipment
    * evidence, not that the item is in the currently selected package.
    */
-  reason?: EquipmentRecommendationReason
+  reason?: RecommendationSignalReason
   detail?: RecommendationSignalDetail
 }
 

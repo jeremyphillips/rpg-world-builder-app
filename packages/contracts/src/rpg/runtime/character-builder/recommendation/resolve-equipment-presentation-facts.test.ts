@@ -373,6 +373,47 @@ describe('softRecommendationFacts', () => {
     expect(facts.map((fact) => fact.label)).toEqual(['Recommended by role', 'Recommended by class'])
   })
 
+  it('omits ability-fit signals and still badges other sourceless compatible signals', () => {
+    expect(
+      softRecommendationFacts({
+        recommendation: {
+          strength: 'compatible',
+          signals: [
+            {
+              strength: 'compatible',
+              basis: 'inferred',
+              specificity: 'exact',
+              reason: 'abilityFit',
+            },
+          ],
+        },
+      }),
+    ).toEqual([])
+
+    expect(
+      softRecommendationFacts({
+        recommendation: {
+          strength: 'compatible',
+          signals: [
+            {
+              strength: 'compatible',
+              basis: 'inferred',
+              specificity: 'exact',
+              reason: 'classSuggested',
+            },
+          ],
+        },
+      }),
+    ).toEqual([
+      {
+        kind: 'recommendation',
+        discriminator: 'recommended',
+        label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
+        sourceLabels: [],
+      },
+    ])
+  })
+
   it('collapses sourceless signals into a single Recommended fact', () => {
     const facts = softRecommendationFacts({
       recommendation: {
