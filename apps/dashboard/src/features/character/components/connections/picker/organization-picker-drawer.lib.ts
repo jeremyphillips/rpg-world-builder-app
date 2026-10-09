@@ -1,6 +1,6 @@
 import {
   catalogNounFromContentType,
-  getOrganizationClassificationDiscoveryTerms,
+  listOrganizationClassificationDiscoveryTerms,
   getOrganizationDomainLabel,
   getOrganizationClassificationDiscoveryText,
   ORGANIZATION_DOMAIN_IDS,
@@ -30,7 +30,7 @@ export function getOrganizationPickerSearchText(organization: Organization): str
 }
 
 function assembleOrganizationPickerSearchDocument(organization: Organization): SearchDocument {
-  const terms = getOrganizationClassificationDiscoveryTerms(organization)
+  const terms = listOrganizationClassificationDiscoveryTerms(organization)
   return {
     id: organization.id,
     fields: [

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  getOrganizationClassificationDiscoveryTerms,
+  listOrganizationClassificationDiscoveryTerms,
   getOrganizationClassificationDiscoveryText,
 } from './classification-discovery'
 import { getOrganizationDomainDiscoveryTerms } from './domain'
@@ -19,9 +19,9 @@ describe('getOrganizationClassificationDiscoveryText', () => {
     }
 
     expect(getOrganizationClassificationDiscoveryText(input)).toBe(
-      getOrganizationClassificationDiscoveryTerms(input).join(' '),
+      listOrganizationClassificationDiscoveryTerms(input).join(' '),
     )
-    expect(getOrganizationClassificationDiscoveryTerms(input)).toEqual([
+    expect(listOrganizationClassificationDiscoveryTerms(input)).toEqual([
       ...getOrganizationDomainDiscoveryTerms(input.organizationDomain),
       ...getOrganizationFormDiscoveryTerms(input.organizationForm),
       ...getOrganizationFunctionDiscoveryTerms('finance'),

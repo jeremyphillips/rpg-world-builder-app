@@ -2353,6 +2353,7 @@
     "listCompatibleProgressionReferences",
     "listCountedEquipmentPurchases",
     "listEquipmentMatchingPool",
+    "listOrganizationClassificationDiscoveryTerms",
     "listOrganizationPresetOwnedEditableDivergentFieldKeys",
     "listReachableSpellOptions",
     "listReachableStartingWeapons",

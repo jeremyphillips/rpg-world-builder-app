@@ -3,7 +3,7 @@ import { getOrganizationPracticeDiscoveryTerms, type OrganizationPractice } from
 import { getOrganizationDomainDiscoveryTerms, type OrganizationDomain } from './domain'
 import { getOrganizationFormDiscoveryTerms, type OrganizationForm } from './form'
 
-export function getOrganizationClassificationDiscoveryTerms(input: {
+export function listOrganizationClassificationDiscoveryTerms(input: {
   organizationDomain: OrganizationDomain
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]
@@ -23,5 +23,5 @@ export function getOrganizationClassificationDiscoveryText(input: {
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
 }): string {
-  return getOrganizationClassificationDiscoveryTerms(input).join(' ')
+  return listOrganizationClassificationDiscoveryTerms(input).join(' ')
 }
