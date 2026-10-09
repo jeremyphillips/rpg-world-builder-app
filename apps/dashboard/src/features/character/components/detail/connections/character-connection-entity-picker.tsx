@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { Input, Text } from '@rpg/ui'
+import { Input, rankLegacySearchItems, Text } from '@rpg/ui'
 import { CatalogEntitySurfaceRow, type EntitySurfaceConfig } from '@/features/content'
 
 export type ConnectionEntityPickerItem<TItem> = {
@@ -26,12 +26,19 @@ export function ConnectionEntityPicker<TItem>({
   onSelect,
 }: ConnectionEntityPickerProps<TItem>) {
   const [query, setQuery] = React.useState('')
-  const normalizedQuery = query.trim().toLowerCase()
 
-  const filteredItems = React.useMemo(() => {
-    if (!normalizedQuery) return items
-    return items.filter((entry) => entry.searchText.toLowerCase().includes(normalizedQuery))
-  }, [items, normalizedQuery])
+  const filteredItems = React.useMemo(
+    () =>
+      rankLegacySearchItems(
+        items.map((entry) => ({
+          entry,
+          fields: [{ text: entry.searchText, weight: 1, role: 'label' as const }],
+        })),
+        query,
+        'forgiving',
+      ).map((row) => row.entry),
+    [items, query],
+  )
 
   if (items.length === 0) {
     return <Text variant="muted">{noItemsMessage}</Text>

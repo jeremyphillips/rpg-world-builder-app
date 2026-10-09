@@ -349,6 +349,17 @@ export function buildLocationEntitySummarySearchText(vm: LocationEntitySummaryVm
   )
 }
 
+/** Search text for a location picker row: name, classification parts, and ancestor names. */
+export function buildLocationPickerSearchText(
+  location: Location,
+  context: {
+    locationsById: ReadonlyMap<string, Location>
+    campaignId: string
+  },
+): string {
+  return buildLocationEntitySummarySearchText(buildLocationEntitySummaryVm(location, context))
+}
+
 export function buildLocationChildren(
   locationId: string,
   locations: readonly Location[],

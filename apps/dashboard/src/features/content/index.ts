@@ -242,6 +242,7 @@ export { listLocations, useLocations, locationsQueryKey } from './locations'
 export {
   buildLocationEntityCardModel,
   buildLocationEntityCardModelFromClassification,
+  buildLocationPickerSearchText,
 } from './locations/lib/location-display'
 export {
   buildOrganizationEntityCardModel,

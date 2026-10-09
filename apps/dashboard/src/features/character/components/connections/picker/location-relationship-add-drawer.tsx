@@ -26,7 +26,10 @@ import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-f
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { DrawerShell } from '@/components/drawer'
 
-import { sortLocationConnectionPickerRows } from '../../../lib/connections/location-connection-picker-items.lib'
+import {
+  buildLocationConnectionPickerEntries,
+  type LocationConnectionPickerSearchContext,
+} from '../../../lib/connections/location-connection-picker-items.lib'
 import type {
   PlaceConnectionRoleOption,
   PropertyConnectionRoleOption,
@@ -44,6 +47,8 @@ export type LocationRelationshipAddDrawerProps = {
   onOpenChange: (open: boolean) => void
   title: string
   locations: readonly Location[]
+  /** Full catalog map so ancestry stays searchable when `locations` is a subset. */
+  locationSearchContext?: LocationConnectionPickerSearchContext
   roleOptions: readonly LocationRelationshipRoleOption[]
   presetRole?: LocationRelationshipRoleOption
   onAdd: (input: {
@@ -67,6 +72,7 @@ export function LocationRelationshipAddDrawer({
   onOpenChange,
   title,
   locations,
+  locationSearchContext,
   roleOptions,
   presetRole,
   onAdd,
@@ -75,9 +81,28 @@ export function LocationRelationshipAddDrawer({
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const searchLocationsById = locationSearchContext?.locationsById
+  const searchCampaignId = locationSearchContext?.campaignId ?? ''
+  const searchContext = React.useMemo<LocationConnectionPickerSearchContext>(() => {
+    if (searchLocationsById) {
+      return { locationsById: searchLocationsById, campaignId: searchCampaignId }
+    }
+    return {
+      locationsById: new Map(locations.map((location) => [location.id, location])),
+      campaignId: '',
+    }
+  }, [locations, searchCampaignId, searchLocationsById])
+  const pickerEntries = React.useMemo(
+    () => buildLocationConnectionPickerEntries(locations, searchContext),
+    [locations, searchContext],
+  )
   const sortedLocations = React.useMemo(
-    () => sortLocationConnectionPickerRows(locations),
-    [locations],
+    () => pickerEntries.map((entry) => entry.location),
+    [pickerEntries],
+  )
+  const searchTextById = React.useMemo(
+    () => new Map(pickerEntries.map((entry) => [entry.location.id, entry.searchText])),
+    [pickerEntries],
   )
   const locationFilterSchema = React.useMemo(
     () =>
@@ -206,7 +231,7 @@ export function LocationRelationshipAddDrawer({
         }}
         getItemKey={({ location }) => location.id}
         getItemToolbarLabel={({ location }) => location.name}
-        getSearchText={({ location }) => location.name}
+        getSearchText={({ location }) => searchTextById.get(location.id) ?? location.name}
         searchPlaceholder={LOCATION_CATALOG_SEARCH_PLACEHOLDER}
         noResultsMessage={LOCATION_CATALOG_COPY.noResultsMessage}
         noItemsMessage={LOCATION_CATALOG_COPY.noItemsMessage}

@@ -49,9 +49,9 @@ import {
 import { resolveRelationshipCandidateSet } from '../../../lib/relationship/core/relationship-candidate-set'
 import { RelationshipDrawerSubjectField } from '../../../lib/relationship/drawer/relationship-drawer-subject-field'
 import {
-  buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
   buildLocationEntityContextPresentation,
+  buildLocationPickerSearchText,
   type LocationEntitySummaryVm,
 } from '../../../locations/lib/location-display'
 
@@ -833,10 +833,9 @@ function OrganizationLocationConnectionLinkDrawerContent({
         }}
         getItemKey={(location) => location.id}
         getItemToolbarLabel={(location) => location.name}
-        getSearchText={(location) => {
-          const summary = pickerLocationSummaries.get(location.id)
-          return summary ? buildLocationEntitySummarySearchText(summary) : location.name
-        }}
+        getSearchText={(location) =>
+          buildLocationPickerSearchText(location, { locationsById, campaignId })
+        }
         renderEntityRow={createCatalogEntityRowRenderer({
           buildSurface: (location) => {
             const summary = pickerLocationSummaries.get(location.id)

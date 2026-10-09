@@ -30,7 +30,7 @@ import {
 import { resolveConnectionSheetEditCopy } from '../../../lib/relationship/connection-sheet-edit-copy.lib'
 import type { ConnectionSheetData } from '../../../lib/relationship/connection-sheet-data.lib'
 import type { ConnectionTopLevelSectionId } from '../../../lib/relationship/connection-section-catalog'
-import { sortLocationConnectionPickerRows } from '../../../lib/connections/location-connection-picker-items.lib'
+import { buildLocationConnectionPickerEntries } from '../../../lib/connections/location-connection-picker-items.lib'
 import {
   filterAndSortOrganizationPickerItems,
   getOrganizationPickerSearchText,
@@ -275,64 +275,66 @@ export function CharacterConnectionAddModal({
                         },
                       }))
                     : sectionId === 'places'
-                      ? sortLocationConnectionPickerRows(sheetData.allLocations).map(
-                          (location) => ({
-                            item: location.id,
-                            key: location.id,
-                            searchText: location.name,
-                            surface: {
-                              identity: buildLocationEntityCardModelFromClassification({
-                                name: location.name,
-                                classificationText:
-                                  resolveLocationClassificationDisplay(location).text,
-                                displayImage: getContentDisplayImage(
-                                  buildLocationContentDisplayImageInput(
-                                    {
-                                      media: location.media,
-                                      slug: location.slug,
-                                      source: location.source,
-                                      rulesetId: location.rulesetId,
-                                    },
-                                    'compact',
-                                  ),
+                      ? buildLocationConnectionPickerEntries(sheetData.allLocations, {
+                          locationsById: sheetData.locationsById,
+                          campaignId: sheetData.campaignId,
+                        }).map(({ location, searchText }) => ({
+                          item: location.id,
+                          key: location.id,
+                          searchText,
+                          surface: {
+                            identity: buildLocationEntityCardModelFromClassification({
+                              name: location.name,
+                              classificationText:
+                                resolveLocationClassificationDisplay(location).text,
+                              displayImage: getContentDisplayImage(
+                                buildLocationContentDisplayImageInput(
+                                  {
+                                    media: location.media,
+                                    slug: location.slug,
+                                    source: location.source,
+                                    rulesetId: location.rulesetId,
+                                  },
+                                  'compact',
                                 ),
-                              }),
-                              inlineAction: {
-                                label: 'Select',
-                                onClick: () => undefined,
-                              },
+                              ),
+                            }),
+                            inlineAction: {
+                              label: 'Select',
+                              onClick: () => undefined,
                             },
-                          }),
-                        )
-                      : sortLocationConnectionPickerRows(sheetData.eligiblePropertyLocations).map(
-                          (location) => ({
-                            item: location.id,
-                            key: location.id,
-                            searchText: location.name,
-                            surface: {
-                              identity: buildLocationEntityCardModelFromClassification({
-                                name: location.name,
-                                classificationText:
-                                  resolveLocationClassificationDisplay(location).text,
-                                displayImage: getContentDisplayImage(
-                                  buildLocationContentDisplayImageInput(
-                                    {
-                                      media: location.media,
-                                      slug: location.slug,
-                                      source: location.source,
-                                      rulesetId: location.rulesetId,
-                                    },
-                                    'compact',
-                                  ),
+                          },
+                        }))
+                      : buildLocationConnectionPickerEntries(sheetData.eligiblePropertyLocations, {
+                          locationsById: sheetData.locationsById,
+                          campaignId: sheetData.campaignId,
+                        }).map(({ location, searchText }) => ({
+                          item: location.id,
+                          key: location.id,
+                          searchText,
+                          surface: {
+                            identity: buildLocationEntityCardModelFromClassification({
+                              name: location.name,
+                              classificationText:
+                                resolveLocationClassificationDisplay(location).text,
+                              displayImage: getContentDisplayImage(
+                                buildLocationContentDisplayImageInput(
+                                  {
+                                    media: location.media,
+                                    slug: location.slug,
+                                    source: location.source,
+                                    rulesetId: location.rulesetId,
+                                  },
+                                  'compact',
                                 ),
-                              }),
-                              inlineAction: {
-                                label: 'Select',
-                                onClick: () => undefined,
-                              },
+                              ),
+                            }),
+                            inlineAction: {
+                              label: 'Select',
+                              onClick: () => undefined,
                             },
-                          }),
-                        )
+                          },
+                        }))
               }
               searchPlaceholder={
                 sectionId === 'people'

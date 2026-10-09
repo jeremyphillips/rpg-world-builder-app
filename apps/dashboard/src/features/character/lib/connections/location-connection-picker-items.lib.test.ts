@@ -1,8 +1,12 @@
+import { buildingClassificationSchema } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { makeLocation } from '@/test/fixtures/factories/location'
 
-import { sortLocationConnectionPickerRows } from './location-connection-picker-items.lib'
+import {
+  buildLocationConnectionPickerEntries,
+  sortLocationConnectionPickerRows,
+} from './location-connection-picker-items.lib'
 
 describe('sortLocationConnectionPickerRows', () => {
   it('sorts location relationship add rows and modal place and property rows by name, then id', () => {
@@ -35,5 +39,37 @@ describe('sortLocationConnectionPickerRows', () => {
       'loc-zeta',
     ])
     expect(input.map((location) => location.id)).toEqual(['loc-zeta', 'loc-amber-b', 'loc-amber-a'])
+  })
+
+  it('searches classification and ancestry for place and property rows', () => {
+    const city = makeLocation({
+      kind: 'settlement',
+      id: 'loc-city',
+      slug: 'port-city',
+      name: 'Port City',
+      settlementType: 'city',
+    })
+    const tavern = makeLocation({
+      kind: 'structure',
+      id: 'loc-tavern',
+      slug: 'yawning-portal',
+      name: 'Yawning Portal',
+      structureType: 'building',
+      classification: buildingClassificationSchema.parse({ facilityType: 'brewery' }),
+      parentLocationId: city.id,
+    })
+    const locationsById = new Map([
+      [city.id, city],
+      [tavern.id, tavern],
+    ])
+
+    const [entry] = buildLocationConnectionPickerEntries([tavern], {
+      locationsById,
+      campaignId: 'campaign-1',
+    })
+
+    expect(entry?.searchText).toContain('Yawning Portal')
+    expect(entry?.searchText).toContain('Brewery')
+    expect(entry?.searchText).toContain('Port City')
   })
 })
