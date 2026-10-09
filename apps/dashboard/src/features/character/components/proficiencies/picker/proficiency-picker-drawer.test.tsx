@@ -38,7 +38,7 @@ describe('ProficiencyPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Sort' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sort by, Best match' })).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
     expect(screen.getAllByText('Dexterity').length).toBeGreaterThan(0)
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()

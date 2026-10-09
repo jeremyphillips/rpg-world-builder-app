@@ -45,6 +45,12 @@ export const PROFICIENCY_PICKER_SORT_LABELS: Record<ProficiencyPickerSortMode, s
   [PROFICIENCY_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
 }
 
+export const PROFICIENCY_PICKER_SORT_TRIGGER_LABELS: Record<ProficiencyPickerSortMode, string> = {
+  [PROFICIENCY_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  [PROFICIENCY_PICKER_SORT_NAME_ASC]: 'A–Z',
+  [PROFICIENCY_PICKER_SORT_NAME_DESC]: 'Z–A',
+}
+
 export type ProficiencyPickerViewDefaults = {
   sortMode: ProficiencyPickerSortMode
 }

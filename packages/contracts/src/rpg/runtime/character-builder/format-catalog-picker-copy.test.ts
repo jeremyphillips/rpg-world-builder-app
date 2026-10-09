@@ -22,8 +22,6 @@ describe('formatCatalogPickerCopy', () => {
     expect(copy.chooseTitle).toBe('Choose organization')
     expect(copy.addLabel).toBe('Add organization')
     expect(copy.searchPlaceholder).toBe('Search organizations')
-    expect(copy.sortGroupLabel).toBe('Sort organizations')
-    expect(copy.sortOrderLabel).toBe('Organization sort order')
     expect(copy.noResultsMessage).toBe('No organizations match this view.')
     expect(copy.noItemsMessage).toBe('No organizations are available.')
     expect(copy.noOptionsMessage).toBe('No organizations are available for this choice.')
@@ -44,8 +42,6 @@ describe('formatCatalogPickerCopy', () => {
   it('builds proficiency chrome from a vocabulary term', () => {
     const copy = formatCatalogPickerCopy(catalogNounFromTerm(PROFICIENCY_TERM))
 
-    expect(copy.sortGroupLabel).toBe('Sort proficiencies')
-    expect(copy.sortOrderLabel).toBe('Proficiency sort order')
     expect(copy.noOptionsMessage).toBe('No proficiencies are available for this choice.')
     expect(copy.selectionFullMessage).toBe(
       'You have selected the maximum number of proficiencies for this choice.',

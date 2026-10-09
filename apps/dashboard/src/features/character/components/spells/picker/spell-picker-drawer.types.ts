@@ -65,6 +65,14 @@ export const SPELL_PICKER_SORT_LABELS: Record<SpellPickerSortMode, string> = {
   [SPELL_PICKER_SORT_LEVEL_DESC]: 'Level: high to low',
 }
 
+export const SPELL_PICKER_SORT_TRIGGER_LABELS: Record<SpellPickerSortMode, string> = {
+  [SPELL_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  [SPELL_PICKER_SORT_NAME_ASC]: 'A–Z',
+  [SPELL_PICKER_SORT_NAME_DESC]: 'Z–A',
+  [SPELL_PICKER_SORT_LEVEL_ASC]: 'Level: Low',
+  [SPELL_PICKER_SORT_LEVEL_DESC]: 'Level: High',
+}
+
 export type SpellPickerSchoolFilter = typeof SPELL_PICKER_SCHOOL_ALL | string
 
 export type SpellPickerCastingTimeFilter =

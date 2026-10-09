@@ -6,8 +6,8 @@ import { CatalogSortControl } from './catalog-sort-control'
 import { pickerSortOption } from './catalog-picker-sort-labels.lib'
 
 const nameSortOptions = [
-  pickerSortOption('name_asc', 'Name: A–Z'),
-  pickerSortOption('name_desc', 'Name: Z–A'),
+  pickerSortOption('name_asc', 'Name: A–Z', 'A–Z'),
+  pickerSortOption('name_desc', 'Name: Z–A', 'Z–A'),
 ] as const
 
 describe('CatalogSortControl', () => {
@@ -16,35 +16,26 @@ describe('CatalogSortControl', () => {
       <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Sort' })).toHaveTextContent('A–Z')
-    expect(screen.queryByRole('group')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveTextContent('A–Z')
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it('uses compact floating label type by default', () => {
+  it('uses compact button sizing by default', () => {
     render(
       <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(
-      screen
-        .getByRole('combobox', { name: 'Sort' })
-        .closest('[data-populated]')
-        ?.querySelector('[data-floating-label]'),
-    ).toHaveClass('text-xs')
+    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveClass('text-xs')
   })
 
-  it('uses comfortable resting type inside comfortable chrome', () => {
+  it('uses comfortable button sizing inside comfortable chrome', () => {
     render(
       <FilterChromeProvider density="comfortable">
         <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />
       </FilterChromeProvider>,
     )
 
-    const caption = screen
-      .getByRole('combobox', { name: 'Sort' })
-      .closest('[data-populated]')
-      ?.querySelector('[data-floating-label]')
-    expect(caption).toHaveClass('text-md')
-    expect(caption).not.toHaveClass('text-xs')
+    const trigger = screen.getByRole('button', { name: 'Sort by, A–Z' })
+    expect(trigger).not.toHaveClass('text-xs')
   })
 })

@@ -60,4 +60,4 @@ Text filters in this layout have no `Filter ${label}…` placeholder and no `ari
 
 When the all-value is selected, the trigger shows `All` (`FILTER_SELECT_ALL_TRIGGER_LABEL`). `allOptionLabel`, vocabulary resolvers, and menu items stay on the full label. Non-floating layouts are unchanged.
 
-Picker sort, spell school, relationship class, organization domain, and location type use this layout. Overview text filters and stacked overview selects do not, until the in-app evaluation says so.
+Picker filter selects (spell school, relationship class, organization domain, location type) use this layout. Catalog sort uses `SortMenu`, not floating labels. Overview text filters and stacked overview selects do not, until the in-app evaluation says so.

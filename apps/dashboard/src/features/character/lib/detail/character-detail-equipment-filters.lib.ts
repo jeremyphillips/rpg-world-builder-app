@@ -17,7 +17,7 @@ import type { CharacterSheetEquipmentCard } from './character-sheet-catalog'
 export const CHARACTER_DETAIL_EQUIPMENT_KIND_ALL = '__all__' as const
 
 export const CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL = 'Equipment kind'
-export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL = 'Sort'
+export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL = 'Sort by'
 export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER = 'Search equipment'
 
 export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC = 'name_asc' as const
@@ -42,6 +42,14 @@ export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS: Record<
 > = {
   [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC]: 'Name: A–Z',
   [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC]: 'Name: Z–A',
+}
+
+export const CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS: Record<
+  CharacterDetailEquipmentSortMode,
+  string
+> = {
+  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC]: 'A–Z',
+  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC]: 'Z–A',
 }
 
 export const CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS = {

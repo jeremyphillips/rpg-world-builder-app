@@ -402,7 +402,7 @@ A filter toolbar control may change width when its option set changes. It must n
 `FilterToolbarLabelSizer` stacks the live value with invisible, `aria-hidden` copies of every reserved label in one grid cell. The control is as wide as its widest label.
 
 - Selects reserve every option label plus the All label, through `SelectTrigger` `sizingLabels`.
-- Sort reserves every `resolvePickerSortTriggerLabel` output.
+- Sort reserves every option `triggerLabel` via `SortMenu` sizing ghosts.
 - Popovers reserve `triggerLabel(0)` and `triggerLabel(totalOptionCount)`.
 
 Width tokens stay caps (`max-w-*`). A label longer than the cap truncates, and the trigger `title` is the full label. Inline catalog selects with no token cap at `lg`. There is no per-control opt-out.

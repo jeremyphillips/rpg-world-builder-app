@@ -1,63 +1,46 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  withFloatingLabelSizingLabel,
-} from '@rpg/ui'
-import {
-  FilterFloatingField,
-  resolveFilterChromePresentation,
-  useFilterChrome,
-} from '@rpg/ui/filters'
+import { SortMenu, sortMenuFlatSections, type SortMenuSection } from '@rpg/ui'
+import { resolveFilterControlSize, useFilterChrome } from '@rpg/ui/filters'
 
-import {
-  resolvePickerSortTriggerLabel,
-  type CatalogPickerSortOption,
-} from './catalog-picker-sort-labels.lib'
+import type { CatalogPickerSortOption } from './catalog-picker-sort-labels.lib'
 
 export type { CatalogPickerSortOption } from './catalog-picker-sort-labels.lib'
 
 export type CatalogSortControlProps<TMode extends string = string> = {
+  /** Accessible context on the trigger; current selection is appended. Default `Sort by`. */
   label?: string
   value: TMode
   options: readonly CatalogPickerSortOption<TMode>[]
+  sections?: readonly SortMenuSection<TMode>[]
   onValueChange: (mode: TMode) => void
 }
 
 export function CatalogSortControl<TMode extends string = string>({
-  label = 'Sort',
+  label,
   value,
   options,
+  sections,
   onValueChange,
 }: CatalogSortControlProps<TMode>) {
-  const chrome = useFilterChrome()
-  const presentation = resolveFilterChromePresentation(chrome)
-  const selectedOption = options.find((option) => option.value === value)
-  const triggerLabel = selectedOption ? resolvePickerSortTriggerLabel(selectedOption) : undefined
-  const sizingLabels = withFloatingLabelSizingLabel(label, [
-    ...new Set(options.map((option) => resolvePickerSortTriggerLabel(option))),
-  ])
+  const { density } = useFilterChrome()
+  const controlSize = resolveFilterControlSize(density)
+  const menuSections =
+    sections ??
+    sortMenuFlatSections(
+      options.map((option) => ({
+        value: option.value,
+        label: option.label,
+        triggerLabel: option.triggerLabel,
+      })),
+    )
 
   return (
-    <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
-      <FilterFloatingField label={label} populated={value.length > 0} width="auto">
-        <SelectTrigger
-          size={presentation.controlSize}
-          title={triggerLabel}
-          sizingLabels={sizingLabels}
-        >
-          <SelectValue>{triggerLabel}</SelectValue>
-        </SelectTrigger>
-      </FilterFloatingField>
-      <SelectContent>
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <SortMenu
+      label={label}
+      value={value}
+      sections={menuSections}
+      onValueChange={onValueChange}
+      size={controlSize === 'sm' ? 'sm' : 'default'}
+      density={density === 'compact' ? 'compact' : 'default'}
+    />
   )
 }

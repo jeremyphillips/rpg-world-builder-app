@@ -12,8 +12,6 @@ export type CatalogNoun = {
 /** Generated catalog picker chrome. Descriptions and domain labels stay as overrides. */
 export type CatalogPickerCopy = {
   readonly searchPlaceholder: string
-  readonly sortGroupLabel: string
-  readonly sortOrderLabel: string
   readonly chooseTitle: string
   readonly addLabel: string
   readonly noResultsMessage: string
@@ -47,8 +45,6 @@ export function formatCatalogPickerCopy(
   const { label, singular, plural } = noun
   const copy: CatalogPickerCopy = {
     searchPlaceholder: `Search ${plural}`,
-    sortGroupLabel: `Sort ${plural}`,
-    sortOrderLabel: `${label} sort order`,
     chooseTitle: `Choose ${singular}`,
     addLabel: `Add ${singular}`,
     noResultsMessage: `No ${plural} match your search.`,

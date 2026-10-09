@@ -21,6 +21,7 @@ import {
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS,
   CHARACTER_DETAIL_EQUIPMENT_SORT_MODES,
   CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS,
   filterCharacterDetailEquipmentCards,
@@ -189,7 +190,11 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                         value={sortMode}
                         label={CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL}
                         options={CHARACTER_DETAIL_EQUIPMENT_SORT_MODES.map((mode) =>
-                          pickerSortOption(mode, CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode]),
+                          pickerSortOption(
+                            mode,
+                            CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode],
+                            CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS[mode],
+                          ),
                         )}
                         onValueChange={(value) =>
                           setSortMode(value as CharacterDetailEquipmentSortMode)

@@ -37,7 +37,7 @@ export function FilterSelectFieldChrome({
 
   if (layout === 'floating') {
     return (
-      <div data-field-align="" className={cn(presentation.groupClassName, 'w-fit shrink-0')}>
+      <div data-field-align="" className={presentation.groupClassName}>
         <FilterFloatingField
           id={controlId}
           label={label}

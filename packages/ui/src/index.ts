@@ -861,6 +861,15 @@ export {
   type ButtonDropdownProps,
 } from './components/ui/button-dropdown.client'
 export {
+  SortMenu,
+  SORT_MENU_DEFAULT_LABEL,
+  sortMenuFlatSections,
+  flattenSortMenuOptions,
+  type SortMenuOption,
+  type SortMenuProps,
+  type SortMenuSection,
+} from './components/ui/sort-menu.client'
+export {
   SplitButton,
   type SplitButtonMenuGroup,
   type SplitButtonMenuItem,

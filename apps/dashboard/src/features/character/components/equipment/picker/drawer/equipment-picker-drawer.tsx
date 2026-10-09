@@ -23,6 +23,7 @@ import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-acti
 import {
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
+  EQUIPMENT_PICKER_SORT_TRIGGER_LABELS,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -229,7 +230,11 @@ export function EquipmentPickerDrawer({
             value={picker.sortMode}
             label={EQUIPMENT_PICKER_SORT_LABEL}
             options={picker.effectiveSortModes.map((mode) =>
-              pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
+              pickerSortOption(
+                mode,
+                EQUIPMENT_PICKER_SORT_LABELS[mode],
+                EQUIPMENT_PICKER_SORT_TRIGGER_LABELS[mode],
+              ),
             )}
             onValueChange={(value) => picker.setSortMode(value as typeof picker.sortMode)}
           />

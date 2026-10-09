@@ -41,6 +41,7 @@ import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
   PROFICIENCY_PICKER_SORT_LABELS,
+  PROFICIENCY_PICKER_SORT_TRIGGER_LABELS,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
   type ProficiencyPickerSortMode,
@@ -124,7 +125,11 @@ export function ProficiencyPickerDrawer({
           <CatalogSortControl
             value={sortMode}
             options={PROFICIENCY_PICKER_SORT_MODES.map((mode) =>
-              pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
+              pickerSortOption(
+                mode,
+                PROFICIENCY_PICKER_SORT_LABELS[mode],
+                PROFICIENCY_PICKER_SORT_TRIGGER_LABELS[mode],
+              ),
             )}
             onValueChange={setSortMode}
           />
