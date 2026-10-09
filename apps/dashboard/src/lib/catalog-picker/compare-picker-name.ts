@@ -1,4 +1,4 @@
-const pickerNameCollator = new Intl.Collator(undefined, {
+export const pickerNameCollator = new Intl.Collator(undefined, {
   sensitivity: 'base',
   numeric: true,
 })
@@ -14,8 +14,7 @@ function hasStablePickerId(id: string | undefined): id is string {
 }
 
 /**
- * Picker baseline order: name, then stable id.
- * Base sensitivity and numeric collation match the other dashboard picker name collators.
+ * Picker baseline order: name, then stable id, using {@link pickerNameCollator}.
  * The id step is a hidden tie-break. When either row has no stable id, equal names compare
  * equal and duplicate-name order is intentionally unspecified.
  */

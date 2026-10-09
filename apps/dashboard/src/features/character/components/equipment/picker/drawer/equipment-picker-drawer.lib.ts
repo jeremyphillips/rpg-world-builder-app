@@ -19,6 +19,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending, type Comparator } from '@rpg/search/ranking'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
 import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
@@ -62,11 +63,6 @@ export const EQUIPMENT_PICKER_VIEW_DEFAULTS = {
   showAffordableOnly: false,
   sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
 } as const satisfies EquipmentPickerViewDefaults
-
-const equipmentNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 type EquipmentPickerScoredItem = {
   item: EquipmentPickerItem
@@ -254,7 +250,7 @@ function compareScoredItemsByNameMode(
   browseSortContext?: EquipmentPickerBrowseSortContext,
 ): number {
   const nameCmp = compareName(
-    equipmentNameCollator,
+    pickerNameCollator,
     left.item.equipment.name,
     right.item.equipment.name,
     direction,

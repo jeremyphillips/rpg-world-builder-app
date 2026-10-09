@@ -14,6 +14,8 @@ import {
 import { normalizeSearchQuery } from '@rpg/ui'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
+
 import {
   resolveCatalogPickerEmptyStateKind,
   resolveCatalogPickerEmptyStateMessage,
@@ -38,11 +40,6 @@ import {
 export const PROFICIENCY_PICKER_VIEW_DEFAULTS = {
   sortMode: PROFICIENCY_PICKER_SORT_BEST_MATCH,
 } as const satisfies ProficiencyPickerViewDefaults
-
-const proficiencyNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 type ProficiencyPickerScoredItem = {
   item: ProficiencyPickerItem
@@ -159,11 +156,11 @@ function compareProficiencyPickerScoredItems(
       return compareProficiencyPickerItemsByRecommendation(left.item, right.item)
     case PROFICIENCY_PICKER_SORT_NAME_ASC:
       return compareAfterPrimary(
-        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'asc'),
+        compareName(pickerNameCollator, left.item.label, right.item.label, 'asc'),
       )
     case PROFICIENCY_PICKER_SORT_NAME_DESC:
       return compareAfterPrimary(
-        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'desc'),
+        compareName(pickerNameCollator, left.item.label, right.item.label, 'desc'),
       )
   }
 }

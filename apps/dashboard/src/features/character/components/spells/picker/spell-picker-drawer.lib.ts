@@ -17,6 +17,8 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { scoreSearchDocument } from '@rpg/search'
 import { normalizeSearchQuery } from '@rpg/ui'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
+
 import { sanitizeModeBrowseState } from './spell-picker-browse-mode.lib'
 import {
   resolveCatalogPickerEmptyStateKind,
@@ -61,11 +63,6 @@ export const SPELL_PICKER_VIEW_DEFAULTS: SpellPickerBrowseState = {
   mechanicsFilters: { castingTimes: [], traits: [], methods: [] },
   sortMode: SPELL_PICKER_SORT_NAME_ASC,
 }
-
-const spellNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 const CASTING_TIME_FILTER_SPECS: Record<
   SpellPickerCastingTimeFilter,
@@ -475,11 +472,11 @@ function compareSpellPickerScoredItems(
       return compareSpellPickerItemsByRecommendation(left.item, right.item)
     case SPELL_PICKER_SORT_NAME_ASC:
       return compareAfterPrimary(
-        spellNameCollator.compare(left.item.spell.name, right.item.spell.name),
+        pickerNameCollator.compare(left.item.spell.name, right.item.spell.name),
       )
     case SPELL_PICKER_SORT_NAME_DESC:
       return compareAfterPrimary(
-        spellNameCollator.compare(right.item.spell.name, left.item.spell.name),
+        pickerNameCollator.compare(right.item.spell.name, left.item.spell.name),
       )
     case SPELL_PICKER_SORT_LEVEL_ASC:
       return compareAfterPrimary(left.item.spell.level - right.item.spell.level)
