@@ -13,7 +13,7 @@ import { pickClass, pickEquipment } from '@/test/fixtures/pick'
 import { createStandaloneBuilderContextFixture } from '../../../../lib/fixtures/character-builder-fixtures'
 import { buildEquipmentPickerRecommendationContext } from '../../../../lib/equipment/equipment-picker-recommendation-context.lib'
 import { equipmentPickerItemFixture } from './equipment-picker-drawer.fixtures'
-import type { EquipmentPickerItem } from './equipment-picker-drawer.types'
+import type { EquipmentPickerRow } from './equipment-picker-drawer.types'
 
 const UNAFFORDABLE = { status: 'unaffordable' as const, shortfallCp: 1 }
 
@@ -50,7 +50,7 @@ function goldPathPickerItems(args: {
   classSlug: 'wizard' | 'fighter'
   str: number
   unaffordable: readonly BuilderPathPickerSlug[]
-}): Record<BuilderPathPickerSlug, EquipmentPickerItem> {
+}): Record<BuilderPathPickerSlug, EquipmentPickerRow> {
   const characterClass = pickClass(args.classSlug)
   const equipment = PICKER_SLUGS.map((slug) => pickEquipment(slug))
   const context = createStandaloneBuilderContextFixture({
@@ -90,7 +90,7 @@ function goldPathPickerItems(args: {
         }),
       ]
     }),
-  ) as Record<BuilderPathPickerSlug, EquipmentPickerItem>
+  ) as Record<BuilderPathPickerSlug, EquipmentPickerRow>
 }
 
 /** STR 8 Wizard shopping with gold. */

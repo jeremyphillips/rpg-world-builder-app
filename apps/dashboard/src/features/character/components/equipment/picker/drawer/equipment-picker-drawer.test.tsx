@@ -28,7 +28,7 @@ import {
   EQUIPMENT_PICKER_SORT_GROUP_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_ORDER_LABEL,
-  type EquipmentPickerItem,
+  type EquipmentPickerRow,
 } from './equipment-picker-drawer.types'
 import {
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
@@ -124,7 +124,7 @@ describe('EquipmentPickerDrawer', () => {
   })
 
   it('shows starting-unaffordable rows by default with purchase disabled', () => {
-    const plateArmor: EquipmentPickerItem = {
+    const plateArmor: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,
@@ -157,7 +157,7 @@ describe('EquipmentPickerDrawer', () => {
   })
 
   it('hides starting-unaffordable rows when filterOutUnaffordable is enabled', () => {
-    const plateArmor: EquipmentPickerItem = {
+    const plateArmor: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,

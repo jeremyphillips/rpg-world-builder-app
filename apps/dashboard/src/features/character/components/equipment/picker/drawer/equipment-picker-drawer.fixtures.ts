@@ -11,7 +11,11 @@ import { pickEquipment } from '@/test/fixtures/pick'
 
 import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-import type { EquipmentBudgetSummary, EquipmentPickerItem } from './equipment-picker-drawer.types'
+import type {
+  EquipmentBudgetSummary,
+  EquipmentPickerItem,
+  EquipmentPickerRow,
+} from './equipment-picker-drawer.types'
 
 export const equipmentPickerLongswordFixture = pickEquipment('longsword')
 
@@ -103,7 +107,7 @@ export function equipmentPickerItemFixture(args: {
   equipment: Equipment
   state: Parameters<typeof pickerState>[0]
   searchText?: string
-}): EquipmentPickerItem {
+}): EquipmentPickerRow {
   return {
     equipment: args.equipment,
     searchDocument: args.searchText
@@ -116,7 +120,7 @@ export function equipmentPickerItemFixture(args: {
   }
 }
 
-export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
+export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerRow[] = [
   equipmentPickerItemFixture({
     equipment: equipmentPickerCheapGearFixture,
     searchText: 'cheap gear adventuring gear',
@@ -157,7 +161,7 @@ export const equipmentPickerDefaultPathItemsFixture: EquipmentPickerItem[] = [
   }),
 ]
 
-export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
+export const equipmentPickerItemsFixture: EquipmentPickerRow[] = [
   equipmentPickerItemFixture({
     equipment: equipmentPickerLongswordFixture,
     searchText: 'longsword martial melee',
@@ -206,7 +210,7 @@ export const equipmentPickerItemsFixture: EquipmentPickerItem[] = [
   }),
 ]
 
-export const equipmentPickerMagicItemsFixture: EquipmentPickerItem[] = [
+export const equipmentPickerMagicItemsFixture: EquipmentPickerRow[] = [
   equipmentPickerItemFixture({
     equipment: equipmentPickerPotionFixture,
     searchText: 'potion of healing magic item',

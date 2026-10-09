@@ -8,13 +8,13 @@ import {
   resolveEquipmentPickerFilterLayout,
   type EquipmentPickerFilterState,
 } from './equipment-picker-filter-schema'
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
+import type { EquipmentPickerRow } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_RARITY_ALL,
 } from '../drawer/equipment-picker-drawer.types'
 
-const items = [] as unknown as readonly EquipmentPickerItem[]
+const items = [] as unknown as readonly EquipmentPickerRow[]
 
 const magicItemGrantProgress = [
   {

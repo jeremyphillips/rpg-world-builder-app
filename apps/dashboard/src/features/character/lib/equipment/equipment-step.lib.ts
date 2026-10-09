@@ -48,7 +48,6 @@ import {
   type Equipment,
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
-  type EquipmentPickerItem,
   type EquipmentStepRemoveTarget,
   type StartingEquipmentOption,
   type StartingEquipmentOptionSummary,
@@ -57,7 +56,10 @@ import {
   type EffectiveStartingEquipmentPackageItem,
 } from '@rpg/contracts'
 
-import { enrichEquipmentPickerItemsWithSearchDocument } from './equipment-picker-search.lib'
+import {
+  enrichEquipmentPickerItemsWithSearchDocument,
+  type EquipmentPickerRow,
+} from './equipment-picker-search.lib'
 import {
   buildEquipmentPickerRecommendationContext,
   type EquipmentRecommendationIndex,
@@ -648,7 +650,7 @@ export function resolveEquipmentStepBudget(
  * independently reconstruct campaign wealth.
  */
 export type EquipmentStepPickerItemsResult = {
-  items: EquipmentPickerItem[]
+  items: EquipmentPickerRow[]
   browseSortContext: EquipmentPickerBrowseSortContext
   /** Whole-catalog facts behind the picker rows; owned surfaces read the same derivation. */
   resolvedById: EquipmentRecommendationIndex

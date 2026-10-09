@@ -47,7 +47,10 @@ import {
   EMPTY_EQUIPMENT_SELECTION_FACTS,
   type EquipmentSelectionFacts,
 } from '../lib/equipment/equipment-selection-facts.lib'
-import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
+import type {
+  EquipmentPickerItem,
+  EquipmentPickerRow,
+} from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections'
 
 type PendingEquipmentSelection = {
@@ -213,7 +216,7 @@ export function useEquipmentStep(args: {
   const pickerItemResult = useMemo(() => {
     if (!characterClass) {
       return {
-        items: [] as EquipmentPickerItem[],
+        items: [] as EquipmentPickerRow[],
         browseSortContext: { preferMartialWeaponBrowseOrder: false as const },
         resolvedById: EMPTY_EQUIPMENT_SELECTION_FACTS.resolvedById,
       }

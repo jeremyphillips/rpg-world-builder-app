@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 
 import type {
+  CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
-  EquipmentPickerItem,
 } from '@rpg/contracts'
 
 import {
@@ -17,13 +17,13 @@ import {
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { enrichEquipmentPickerItemsWithMagicItemAction } from '../lib/equipment/enrich-equipment-picker-magic-item-action.lib'
-import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
+import type { EquipmentPickerRow } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 
 export function useEquipmentMagicItemWorkflow(args: {
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
-  pickerItems: readonly EquipmentPickerItem[]
+  pickerItems: readonly EquipmentPickerRow[]
   pickerWorkflowMode: EquipmentPickerWorkflowMode
   showPurchaseWorkflow: boolean
   focusedAllowanceId?: string

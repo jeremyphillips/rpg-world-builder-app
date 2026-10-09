@@ -10,6 +10,7 @@ import {
 } from '@rpg/contracts'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+import type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 import type { EquipmentPickerOwnershipIndex } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import type { EquipmentPickerCharacterPreviewContext } from '../details/equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
@@ -29,6 +30,8 @@ export type {
   EquipmentPickerItemState,
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
+
+export type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 
 const equipmentNoun = catalogNounFromContentType('equipment')
 const equipmentCopy = formatCatalogPickerCopy(equipmentNoun)
@@ -97,7 +100,7 @@ export type EquipmentPickerViewDefaults = {
 export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  items: readonly EquipmentPickerItem[]
+  items: readonly EquipmentPickerRow[]
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
   allowedKinds?: readonly EquipmentPickerSupportedKind[]

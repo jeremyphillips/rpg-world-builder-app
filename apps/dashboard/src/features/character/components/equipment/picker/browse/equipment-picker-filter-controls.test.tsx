@@ -3,14 +3,14 @@ import { describe, expect, it, vi } from 'vitest'
 
 import {
   EQUIPMENT_PICKER_CATEGORY_LABEL,
-  type EquipmentPickerItem,
+  type EquipmentPickerRow,
 } from '../drawer/equipment-picker-drawer.types'
 import {
   EquipmentPickerFilterRowControls,
   EquipmentPickerPrimaryFilterControls,
 } from './equipment-picker-filter-controls'
 
-const items = [] as unknown as readonly EquipmentPickerItem[]
+const items = [] as unknown as readonly EquipmentPickerRow[]
 
 describe('EquipmentPickerFilterControls', () => {
   it('does not warn when the schema has no filter fields', () => {

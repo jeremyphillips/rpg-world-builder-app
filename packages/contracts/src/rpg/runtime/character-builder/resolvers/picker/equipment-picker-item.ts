@@ -1,5 +1,3 @@
-import type { SearchDocument } from '@rpg/search/types'
-
 import type { Equipment } from '../../../../content/equipment'
 import type { EquipmentRecommendation } from '../../../../content/equipment-recommendation'
 import type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
@@ -43,8 +41,6 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
 export type EquipmentPickerItem = {
   equipment: Equipment
   state: EquipmentPickerItemState
-  /** Populated by dashboard assembly before picker surfaces consume the row. */
-  searchDocument?: SearchDocument
 }
 
 /**

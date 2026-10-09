@@ -19,6 +19,7 @@ import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equi
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
+  EquipmentPickerRow,
 } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
@@ -68,7 +69,7 @@ export function resolveEquipmentPickerFilterLayout(
 
 export type CreateEquipmentPickerFilterSchemaArgs = {
   workflowMode: EquipmentPickerWorkflowMode
-  items: readonly EquipmentPickerItem[]
+  items: readonly EquipmentPickerRow[]
   kindOptions: readonly EquipmentPickerSupportedKind[]
   showCategoryFilter: boolean
   showRarityFilter: boolean

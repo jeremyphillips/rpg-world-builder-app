@@ -22,6 +22,7 @@ import {
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
+  type EquipmentPickerRow,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
@@ -176,7 +177,7 @@ export function useEquipmentPickerController({
   )
 
   const transformVisibleItems = React.useCallback(
-    (visibleItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
+    (visibleItems: readonly EquipmentPickerRow[], context: { searchQuery: string }) =>
       filterAndSortEquipmentPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
         sortMode,

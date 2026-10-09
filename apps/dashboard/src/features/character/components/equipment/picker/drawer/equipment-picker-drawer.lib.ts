@@ -22,8 +22,6 @@ import { chainComparators, compareNumberDescending, type Comparator } from '@rpg
 import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
 
-import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
-
 import { type EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
   resolveEquipmentPickerPurchaseActionState,
@@ -53,6 +51,7 @@ import {
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
+  type EquipmentPickerRow,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
   type EquipmentPickerViewDefaults,
@@ -65,7 +64,7 @@ export const EQUIPMENT_PICKER_VIEW_DEFAULTS = {
 } as const satisfies EquipmentPickerViewDefaults
 
 type EquipmentPickerScoredItem = {
-  item: EquipmentPickerItem
+  item: EquipmentPickerRow
   searchScore: number
 }
 
@@ -159,15 +158,16 @@ function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
   return canPurchaseEquipment(item.equipment)
 }
 
-function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
-  const document = item.searchDocument ?? assembleEquipmentPickerSearchDocument(item.equipment)
-  return matchSearchDocumentQuery(document, searchQuery, { profile: 'forgiving' }).score ?? 0
+function scoreEquipmentPickerItem(item: EquipmentPickerRow, searchQuery: string): number {
+  return (
+    matchSearchDocumentQuery(item.searchDocument, searchQuery, { profile: 'forgiving' }).score ?? 0
+  )
 }
 
-function filterEquipmentPickerItemsBySearch(
-  items: readonly EquipmentPickerItem[],
+function filterEquipmentPickerItemsBySearch<T extends EquipmentPickerRow>(
+  items: readonly T[],
   searchQuery: string,
-): EquipmentPickerItem[] {
+): T[] {
   const normalizedQuery = normalizeSearchQuery(searchQuery)
   if (normalizedQuery.text.length === 0) return [...items]
 
@@ -322,14 +322,14 @@ function compareEquipmentPickerScoredItems(
 }
 
 /** Score-once search inclusion and sort pipeline for tab-scoped equipment picker rows. */
-export function filterAndSortEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
+export function filterAndSortEquipmentPickerItems<T extends EquipmentPickerRow>(
+  items: readonly T[],
   options: {
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
   },
-): EquipmentPickerItem[] {
+): T[] {
   const filtered = scoreAndFilterPickerItems(items, {
     searchQuery: options.searchQuery,
     scoreItem: scoreEquipmentPickerItem,
@@ -356,8 +356,8 @@ type EquipmentPickerStructuredFilterOptions = {
   budget?: EquipmentBudgetSummary
 }
 
-function exceedsStartingPackageBudget(
-  item: EquipmentPickerItem,
+function exceedsStartingPackageBudget<T extends EquipmentPickerItem>(
+  item: T,
   options: Pick<EquipmentPickerStructuredFilterOptions, 'filterOutUnaffordable' | 'budget'>,
 ): boolean {
   if (!options.filterOutUnaffordable || !options.budget) return false
@@ -365,8 +365,8 @@ function exceedsStartingPackageBudget(
   return !fitsStartingEquipmentBudget(item.equipment, options.budget)
 }
 
-function equipmentPickerItemMatchesStructuredFilters(
-  item: EquipmentPickerItem,
+function equipmentPickerItemMatchesStructuredFilters<T extends EquipmentPickerItem>(
+  item: T,
   options: EquipmentPickerStructuredFilterOptions,
 ): boolean {
   if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
@@ -379,10 +379,10 @@ function equipmentPickerItemMatchesStructuredFilters(
   return true
 }
 
-export function filterEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
+export function filterEquipmentPickerItems<T extends EquipmentPickerItem>(
+  items: readonly T[],
   options: EquipmentPickerStructuredFilterOptions,
-): EquipmentPickerItem[] {
+): T[] {
   return items.filter((item) => equipmentPickerItemMatchesStructuredFilters(item, options))
 }
 
@@ -390,8 +390,8 @@ export function filterEquipmentPickerItems(
  * Rows hidden by Affordable now after search/category/starting-budget filters.
  * Informational only — not part of checkbox label or active-filter counts.
  */
-export function countEquipmentPickerAffordableHiddenImpact(
-  items: readonly EquipmentPickerItem[],
+export function countEquipmentPickerAffordableHiddenImpact<T extends EquipmentPickerRow>(
+  items: readonly T[],
   options: {
     searchQuery: string
     filterOutUnaffordable: boolean
@@ -425,10 +425,10 @@ export function countEquipmentPickerAffordableHiddenImpact(
 }
 
 /** Best-match order from resolved equipment facts. */
-export function sortEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
+export function sortEquipmentPickerItems<T extends EquipmentPickerItem>(
+  items: readonly T[],
   browseSortContext?: EquipmentPickerBrowseSortContext,
-): EquipmentPickerItem[] {
+): T[] {
   return [...items].sort((left, right) =>
     compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
   )

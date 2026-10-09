@@ -35,7 +35,7 @@ import {
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
-  type EquipmentPickerItem,
+  type EquipmentPickerRow,
 } from './equipment-picker-drawer.types'
 
 function pickerSearchDocument(id: string, text: string) {
@@ -55,7 +55,7 @@ describe('equipment-picker-drawer.lib', () => {
 
   it('sorts compatible proficient items above neutral peers in a unified list', () => {
     const neutralRope = equipmentPickerItemsFixture[2]!
-    const compatibleRope: EquipmentPickerItem = {
+    const compatibleRope: EquipmentPickerRow = {
       ...neutralRope,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -91,7 +91,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('filters starting-unaffordable and non-proficient rows', () => {
-    const startingUnaffordable: EquipmentPickerItem = {
+    const startingUnaffordable: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,
@@ -174,7 +174,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('shows starting-unaffordable rows with filter off but keeps purchase disabled', () => {
-    const startingUnaffordable: EquipmentPickerItem = {
+    const startingUnaffordable: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,
@@ -286,7 +286,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('keeps unpriced rows visible when filterOutUnaffordable is enabled', () => {
-    const unpricedMagicItem: EquipmentPickerItem = {
+    const unpricedMagicItem: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[0]!,
       equipment: {
         ...equipmentPickerItemsFixture[0]!.equipment,
@@ -396,7 +396,7 @@ describe('equipment-picker-drawer.lib', () => {
   it('keeps strong, neutral, and blocked magic rows in one unified best_match list', () => {
     const longsword = equipmentPickerItemsFixture[0]!
     const rope = equipmentPickerItemsFixture[2]!
-    const blockedMagic: EquipmentPickerItem = {
+    const blockedMagic: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:bead-of-force',
@@ -440,7 +440,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('keeps a magic-item name match when the row is blocked', () => {
-    const bead: EquipmentPickerItem = {
+    const bead: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:bead-of-force',
@@ -461,7 +461,7 @@ describe('equipment-picker-drawer.lib', () => {
         magicItemAction: { rank: 3, reason: 'unavailable' },
       }),
     }
-    const otherMagic: EquipmentPickerItem = {
+    const otherMagic: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:other-relic',
@@ -489,7 +489,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('does not reorder magic items by action rank', () => {
-    const grantAvailable: EquipmentPickerItem = {
+    const grantAvailable: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:zebra-relic',
@@ -507,7 +507,7 @@ describe('equipment-picker-drawer.lib', () => {
         magicItemAction: { rank: 0, reason: 'grant_available' },
       }),
     }
-    const unavailable: EquipmentPickerItem = {
+    const unavailable: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:alpha-relic',
@@ -550,7 +550,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('ranks stronger search matches above higher recommendation tiers', () => {
-    const essentialLongsword: EquipmentPickerItem = {
+    const essentialLongsword: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[0]!,
       searchDocument: pickerSearchDocument(
         equipmentPickerItemsFixture[0]!.equipment.id,
@@ -574,7 +574,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('sorts by price ascending with best-match tiebreaker for equal prices', () => {
-    const cheapRope: EquipmentPickerItem = {
+    const cheapRope: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -588,7 +588,7 @@ describe('equipment-picker-drawer.lib', () => {
         'cheap rope adventuring gear',
       ),
     }
-    const priceyRope: EquipmentPickerItem = {
+    const priceyRope: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -613,7 +613,7 @@ describe('equipment-picker-drawer.lib', () => {
 
   it('sorts priceless items after priced rows in both price directions', () => {
     const priced = equipmentPickerItemsFixture[2]!
-    const priceless: EquipmentPickerItem = {
+    const priceless: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -643,7 +643,7 @@ describe('equipment-picker-drawer.lib', () => {
 
   it('ranks a literal name hit above a keyword hit and uses search score after price', () => {
     const base = equipmentPickerItemsFixture[2]!
-    const nameHit: EquipmentPickerItem = {
+    const nameHit: EquipmentPickerRow = {
       ...base,
       equipment: {
         ...base.equipment,
@@ -661,7 +661,7 @@ describe('equipment-picker-drawer.lib', () => {
         ],
       },
     }
-    const keywordHit: EquipmentPickerItem = {
+    const keywordHit: EquipmentPickerRow = {
       ...base,
       equipment: { ...base.equipment, id: 'keyword-hit', slug: 'plain-rope', name: 'Plain Rope' },
       searchDocument: {
@@ -682,11 +682,11 @@ describe('equipment-picker-drawer.lib', () => {
       }).map((item) => item.equipment.name),
     ).toEqual(['Glassember Rope', 'Plain Rope'])
 
-    const sameCostLowScore: EquipmentPickerItem = {
+    const sameCostLowScore: EquipmentPickerRow = {
       ...keywordHit,
       equipment: { ...keywordHit.equipment, id: 'alpha-gear', name: 'Alpha Gear' },
     }
-    const sameCostHighScore: EquipmentPickerItem = {
+    const sameCostHighScore: EquipmentPickerRow = {
       ...nameHit,
       equipment: { ...nameHit.equipment, id: 'zebra-gear', name: 'Zebra Gear' },
     }
