@@ -2,16 +2,13 @@ import { resolveLocationClassificationDisplay, type Location } from '@rpg/contra
 import { scoreSearchDocument, type SearchDocument } from '@rpg/search'
 import { normalizeSearchQuery } from '@rpg/ui'
 
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
+
 import { getResidenceLocationSearchText } from '../../../lib/connections/residence-location-connection.lib'
 import {
   chainComparators,
   scoreAndFilterPickerItems,
 } from '../../picker/sort/catalog-picker-sort.lib'
-
-const locationNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 type ResidencePickerItem = { location: Location; selected: boolean }
 
@@ -51,12 +48,15 @@ export function filterAndSortResidencePickerItems(
     scoreItem: scoreResidencePickerItem,
   })
 
-  return [...scored]
-    .sort(
+  return scored
+    .toSorted(
       chainComparators(
         (left, right) => (hasQuery ? right.searchScore - left.searchScore : 0),
         (left, right) =>
-          locationNameCollator.compare(left.item.location.name, right.item.location.name),
+          comparePickerName(
+            { name: left.item.location.name, id: left.item.location.id },
+            { name: right.item.location.name, id: right.item.location.id },
+          ),
       ),
     )
     .map((row) => row.item)

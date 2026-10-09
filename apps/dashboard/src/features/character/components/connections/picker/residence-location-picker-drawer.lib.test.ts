@@ -68,6 +68,44 @@ describe('residence location picker library', () => {
     }
   })
 
+  it('breaks equal names and equal search scores on stable id', () => {
+    const amberB = makeLocation({
+      kind: 'structure',
+      id: 'loc-amber-b',
+      slug: 'amber-hall-b',
+      name: 'Amber Hall',
+      structureType: 'building',
+    })
+    const amberA = makeLocation({
+      kind: 'structure',
+      id: 'loc-amber-a',
+      slug: 'amber-hall-a',
+      name: 'Amber Hall',
+      structureType: 'building',
+    })
+    const zeta = makeLocation({
+      kind: 'structure',
+      id: 'loc-zeta',
+      slug: 'zeta-hall',
+      name: 'Zeta Hall',
+      structureType: 'building',
+    })
+    const rows = [
+      { location: zeta, selected: false },
+      { location: amberB, selected: false },
+      { location: amberA, selected: false },
+    ]
+
+    expect(
+      filterAndSortResidencePickerItems(rows, { searchQuery: '' }).map((row) => row.location.id),
+    ).toEqual(['loc-amber-a', 'loc-amber-b', 'loc-zeta'])
+    expect(
+      filterAndSortResidencePickerItems(rows, { searchQuery: 'amber' }).map(
+        (row) => row.location.id,
+      ),
+    ).toEqual(['loc-amber-a', 'loc-amber-b'])
+  })
+
   it('ranks a literal name hit above a classification-part hit', () => {
     expect(
       filterAndSortResidencePickerItems(items, { searchQuery: 'brewery' }).map(

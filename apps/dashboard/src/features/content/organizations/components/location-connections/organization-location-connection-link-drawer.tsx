@@ -16,6 +16,7 @@ import {
   Text,
 } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
 import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
 import {
@@ -546,10 +547,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
   )
 
   const pickerLocations = React.useMemo(() => {
-    if (!showTargetBrowseScopeControl) {
-      return eligibleLocations
-    }
-    return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
+    const rows = !showTargetBrowseScopeControl
+      ? eligibleLocations
+      : filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
+    return rows.toSorted(comparePickerName)
   }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
 
   const locationFilterSchema = React.useMemo(

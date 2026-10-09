@@ -26,6 +26,7 @@ import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-f
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { DrawerShell } from '@/components/drawer'
 
+import { sortLocationConnectionPickerRows } from '../../../lib/connections/location-connection-picker-items.lib'
 import type {
   PlaceConnectionRoleOption,
   PropertyConnectionRoleOption,
@@ -74,20 +75,24 @@ export function LocationRelationshipAddDrawer({
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const sortedLocations = React.useMemo(
+    () => sortLocationConnectionPickerRows(locations),
+    [locations],
+  )
   const locationFilterSchema = React.useMemo(
     () =>
       createLocationRelationshipFilterSchema({
-        rows: locations,
+        rows: sortedLocations,
         getKind: (location) => location.kind,
       }),
-    [locations],
+    [sortedLocations],
   )
   const locationFilterLayout = React.useMemo(
     () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
     [locationFilterSchema],
   )
   const locationFilters = useRelationshipCatalogFilters({
-    rows: locations,
+    rows: sortedLocations,
     schema: locationFilterSchema,
   })
   const showKindFilter = relationshipCatalogFilterHasBand(
@@ -173,7 +178,7 @@ export function LocationRelationshipAddDrawer({
                     schema={locationFilterSchema}
                     layout={locationFilterLayout}
                     state={locationFilters.state}
-                    data={locations}
+                    data={sortedLocations}
                     idPrefix="location-relationship-picker"
                     onValueChange={locationFilters.setValue}
                   />

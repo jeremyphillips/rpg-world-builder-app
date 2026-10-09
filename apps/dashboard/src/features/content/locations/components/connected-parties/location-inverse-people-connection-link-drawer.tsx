@@ -25,6 +25,7 @@ import {
   formatContentReferenceLabel,
   hasCatalogPickerResetViewCriteria,
 } from '@/features/character'
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import {
   CatalogEntityPickerSheet,
@@ -184,20 +185,24 @@ function LocationInversePeopleConnectionLinkDrawerContent({
     rows: characters,
     schema: characterFilterSchema,
   })
+  const sortedOrganizations = React.useMemo(
+    () => organizations.toSorted(comparePickerName),
+    [organizations],
+  )
   const organizationFilterSchema = React.useMemo(
     () =>
       createOrganizationRelationshipFilterSchema({
-        rows: organizations,
+        rows: sortedOrganizations,
         getDomain: (organization) => organization.organizationDomain,
       }),
-    [organizations],
+    [sortedOrganizations],
   )
   const organizationFilterLayout = React.useMemo(
     () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
     [organizationFilterSchema],
   )
   const organizationFilters = useRelationshipCatalogFilters({
-    rows: organizations,
+    rows: sortedOrganizations,
     schema: organizationFilterSchema,
   })
   const showCharacterTypeFilter = relationshipCatalogFilterHasBand(

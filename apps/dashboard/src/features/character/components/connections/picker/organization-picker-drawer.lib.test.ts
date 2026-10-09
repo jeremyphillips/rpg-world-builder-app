@@ -119,4 +119,45 @@ describe('organization picker library', () => {
       'Choose an organization connected to this character.',
     )
   })
+
+  it('breaks equal names and equal search scores on stable id', () => {
+    const amberB = makeOrganization({
+      id: 'organization-b',
+      slug: 'amber-b',
+      name: 'Amber Hall',
+      organizationDomain: 'government',
+    })
+    const amberA = makeOrganization({
+      id: 'organization-a',
+      slug: 'amber-a',
+      name: 'Amber Hall',
+      organizationDomain: 'government',
+    })
+    const zeta = makeOrganization({
+      id: 'organization-z',
+      slug: 'zeta-guild',
+      name: 'Zeta Guild',
+      organizationDomain: 'government',
+    })
+    const items = [zeta, amberB, amberA].map((organization) => ({
+      organization,
+      selected: false,
+    }))
+
+    expect(
+      filterAndSortOrganizationPickerItems(items, { searchQuery: '', domain: 'all' }).map(
+        ({ organization }) => organization.id,
+      ),
+    ).toEqual(['organization-a', 'organization-b', 'organization-z'])
+    expect(
+      filterAndSortOrganizationPickerItems(items, { searchQuery: 'amber', domain: 'all' }).map(
+        ({ organization }) => organization.id,
+      ),
+    ).toEqual(['organization-a', 'organization-b'])
+    expect(items.map(({ organization }) => organization.id)).toEqual([
+      'organization-z',
+      'organization-b',
+      'organization-a',
+    ])
+  })
 })

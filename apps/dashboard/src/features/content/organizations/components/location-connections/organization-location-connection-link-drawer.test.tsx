@@ -789,4 +789,48 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       screen.getByRole('button', { name: 'Add territorial authority', hidden: true }),
     ).toBeDisabled()
   })
+
+  it('lists locations by name, then id, including equal search scores', async () => {
+    const user = userEvent.setup()
+    const zeta = testBuildingLocation({ id: 'loc-zeta', name: 'Zeta Hall', slug: 'zeta-hall' })
+    const amberB = testBuildingLocation({
+      id: 'loc-amber-b',
+      name: 'Amber Hall',
+      slug: 'amber-hall-b',
+    })
+    const amberA = testBuildingLocation({
+      id: 'loc-amber-a',
+      name: 'Amber Hall',
+      slug: 'amber-hall-a',
+    })
+
+    renderWithProviders(
+      <OrganizationLocationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        organizationId="org-1"
+        {...withOrganizationLocationDrawerIndex([zeta, amberB, amberA])}
+        existingConnections={[]}
+        edgesByLocationId={{}}
+        occupancyLoaded
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Owner/i }))
+
+    expect(visiblePickerItemKeys()).toEqual(['loc-amber-a', 'loc-amber-b', 'loc-zeta'])
+
+    await user.type(screen.getByRole('textbox', { name: /Search/i }), 'amber')
+
+    expect(visiblePickerItemKeys()).toEqual(['loc-amber-a', 'loc-amber-b'])
+  })
 })
+
+function visiblePickerItemKeys(): string[] {
+  return [...document.querySelectorAll('[data-picker-item-key]')].map(
+    (node) => node.getAttribute('data-picker-item-key') ?? '',
+  )
+}

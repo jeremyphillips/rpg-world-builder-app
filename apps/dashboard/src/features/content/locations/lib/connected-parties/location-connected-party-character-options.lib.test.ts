@@ -43,4 +43,43 @@ describe('buildLocationConnectedPartyCharactersById', () => {
       speciesId: 'srd-cc-5.2.1:human',
     })
   })
+
+  it('orders duplicate names by stable id', () => {
+    const byId = buildLocationConnectedPartyCharactersById(
+      [
+        {
+          character: {
+            id: 'char-b',
+            name: 'Amber',
+            summary: '',
+            classIds: [],
+            campaign: { id: 'camp-1', name: 'Test Campaign' },
+          },
+        },
+        {
+          character: {
+            id: 'char-z',
+            name: 'Zeta',
+            summary: '',
+            classIds: [],
+            campaign: { id: 'camp-1', name: 'Test Campaign' },
+          },
+        },
+      ],
+      [
+        {
+          character: {
+            id: 'char-a',
+            name: 'Amber',
+            vital: { status: 'alive' },
+            species: { id: 'srd-cc-5.2.1:human' },
+            classes: [],
+          },
+        },
+      ],
+      null,
+    )
+
+    expect([...byId.keys()]).toEqual(['char-a', 'char-b', 'char-z'])
+  })
 })

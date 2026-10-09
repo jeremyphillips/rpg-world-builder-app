@@ -13,6 +13,7 @@ import {
 import { Button, Text } from '@rpg/ui'
 
 import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import {
@@ -340,11 +341,12 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
       return []
     }
 
+    const sortedOrganizations = organizations.toSorted(comparePickerName)
     if (mode !== 'replaceOrganization' || !initialConnection) {
-      return organizations
+      return sortedOrganizations
     }
 
-    return organizations.filter(
+    return sortedOrganizations.filter(
       (organization) => organization.id !== initialConnection.organizationId,
     )
   }, [initialConnection, mode, organizations, showOrganizationPicker])

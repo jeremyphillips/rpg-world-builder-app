@@ -5,6 +5,7 @@ import type {
 } from '@rpg/contracts'
 
 import { buildCharacterCardViewModel, type CharacterPickerOption } from '@/features/character'
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 
 export type { CharacterPickerOption }
 
@@ -34,7 +35,7 @@ export function buildLocationConnectedPartyCharactersById(
       classIds: character.classes.map((entry) => entry.classId),
       speciesId: character.species.id,
     })),
-  ].sort((left, right) => left.name.localeCompare(right.name))
+  ].toSorted(comparePickerName)
 
   return new Map(entries.map((entry) => [entry.id, entry]))
 }

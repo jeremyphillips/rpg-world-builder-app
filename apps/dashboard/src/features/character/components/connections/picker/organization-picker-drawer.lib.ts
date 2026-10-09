@@ -9,6 +9,8 @@ import {
 import { scoreSearchDocument, type SearchDocument } from '@rpg/search'
 import { normalizeSearchQuery } from '@rpg/ui'
 
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
+
 import {
   chainComparators,
   scoreAndFilterPickerItems,
@@ -18,11 +20,6 @@ import {
   type OrganizationPickerItem,
   type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
-
-const organizationNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 export const ORGANIZATION_PICKER_VIEW_DEFAULTS = {
   domain: ORGANIZATION_PICKER_ALL_DOMAINS,
@@ -85,14 +82,14 @@ export function filterAndSortOrganizationPickerItems(
     scoreItem: scoreOrganizationPickerItem,
   })
 
-  return [...scored]
-    .sort(
+  return scored
+    .toSorted(
       chainComparators(
         (left, right) => (hasQuery ? right.searchScore - left.searchScore : 0),
         (left, right) =>
-          organizationNameCollator.compare(
-            left.item.organization.name,
-            right.item.organization.name,
+          comparePickerName(
+            { name: left.item.organization.name, id: left.item.organization.id },
+            { name: right.item.organization.name, id: right.item.organization.id },
           ),
       ),
     )
