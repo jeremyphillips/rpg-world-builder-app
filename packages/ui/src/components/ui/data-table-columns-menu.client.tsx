@@ -19,11 +19,12 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { CSS } from '@dnd-kit/utilities'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Columns3, GripVertical, Lock, RotateCcw, Search } from 'lucide-react'
+import { ChevronDown, Columns3, GripVertical, Lock, RotateCcw } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { matchesPrimaryTextQuery } from '../../lib/search-document.lib'
 import { Button } from './button.client'
+import { SearchBar } from './search-bar.client'
 import { Checkbox } from './checkbox.client'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import {
@@ -179,15 +180,15 @@ function DataTableColumnsMenuPanel({
   return (
     <TooltipProvider>
       {searchable ? (
-        <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-          <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-          <input
-            type="search"
-            placeholder={labels.searchColumns}
+        <div className="border-b border-border px-3 py-2">
+          <SearchBar
+            appearance="embedded"
+            id="data-table-columns-search"
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-            aria-label={labels.searchColumns}
+            onValueChange={setSearch}
+            placeholder={labels.searchColumns}
+            ariaLabel={labels.searchColumns}
+            size="sm"
           />
         </div>
       ) : null}

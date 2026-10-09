@@ -139,6 +139,23 @@ Do not route operation failures through Zod/RHF just to display them. Use separa
 actions (Save, Create, Reset) when the operation affects the workflow broadly, not a single
 field value.
 
+### SearchBar (discovery / catalog search)
+
+Use [`SearchBar`](../src/components/ui/search-bar.client.tsx) for magnifier + optional clear —
+not a hand-wired `Input` + icon. **`ariaLabel` is required** (semantic name); `placeholder` is
+presentation-only. `appearance="field"` is the bordered control; `appearance="embedded"` is for
+popover toolbars (combobox panel, columns menu) where the **host** owns outer row padding and
+keyboard routing (`onKeyDown`).
+
+Clear uses [`FieldClearAffordanceButton`](../src/components/ui/field-clear-affordance.client.tsx)
+(`variant="inset"`) with focus restored to the input after clear. Control scale resolves via
+explicit `size`, then `FilterChromeProvider`, then `FormSectionProvider` —
+see [`useSearchBarControlSize`](../src/components/ui/use-search-bar-control-size.client.ts).
+Stories: `@rpg/ui` Storybook → Forms/SearchBar.
+
+Filter schemas opt in with `control: 'search'` on `createTextFilter` (default remains plain
+`Input`). Floating text filters cannot use `control: 'search'`.
+
 ## Field anatomy & the a11y contract
 
 Every field resolves to the same structure ([field.client.tsx](../src/components/ui/field.client.tsx)):

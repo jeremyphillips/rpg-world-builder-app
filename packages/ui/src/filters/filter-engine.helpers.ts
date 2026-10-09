@@ -62,7 +62,7 @@ function isTextValueConstraining(value: unknown): boolean {
   return value.trim().length > 0
 }
 
-type TextFilterConfig<
+type TextFilterConfigBase<
   TData,
   TState extends Record<string, unknown>,
   TId extends FilterFieldId<TState>,
@@ -70,7 +70,6 @@ type TextFilterConfig<
   id: TId
   label: string
   placeholder?: string
-  layout?: 'floating'
   placement?: FilterPlacement
   defaultValue?: TState[TId]
   visible?: (state: TState) => boolean
@@ -78,6 +77,20 @@ type TextFilterConfig<
   getSearchText: (row: TData) => string | readonly string[]
   url?: TextFilterFieldDef<TData, TState, TId>['url']
 }
+
+type TextFilterConfig<
+  TData,
+  TState extends Record<string, unknown>,
+  TId extends FilterFieldId<TState>,
+> =
+  | (TextFilterConfigBase<TData, TState, TId> & {
+      layout?: undefined
+      control?: TextFilterFieldDef<TData, TState, TId>['control']
+    })
+  | (TextFilterConfigBase<TData, TState, TId> & {
+      layout: 'floating'
+      control?: never
+    })
 
 export function createTextFilter<
   TData,
@@ -89,6 +102,7 @@ export function createTextFilter<
     id: config.id,
     label: config.label,
     placeholder: config.placeholder,
+    ...('control' in config && config.control ? { control: config.control } : {}),
     placement: config.placement,
     defaultValue: config.defaultValue,
     visible: config.visible,

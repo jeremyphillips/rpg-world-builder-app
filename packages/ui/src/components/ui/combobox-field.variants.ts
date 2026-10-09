@@ -7,6 +7,7 @@ import {
 } from './interactive-list.variants'
 import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
 import type { FieldSize } from './field.client'
+import { searchBarEmbeddedChromeInputVariants } from './search-bar.variants'
 
 /** Trigger placeholder / selected value type scale — matches single-line field controls. */
 export function comboboxTriggerValueTextClasses(size: FieldSize = 'md'): string {
@@ -44,10 +45,8 @@ export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-
   },
 })
 
-/** Inner search control — no standalone field chrome; the search row owns the input look. */
-export const comboboxSearchInputVariants = cva(
-  'min-w-0 flex-1 border-0 bg-transparent shadow-none rounded-none dark:bg-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50',
-)
+/** @deprecated Prefer {@link searchBarEmbeddedChromeInputVariants}. */
+export const comboboxSearchInputVariants = searchBarEmbeddedChromeInputVariants
 
 /** Dismissible-badge row shown below the trigger in multi-select mode. */
 export const comboboxSelectedItemsRowVariants = cva('flex flex-wrap gap-1.5 pt-2')

@@ -59,7 +59,7 @@ describe('ConnectionEntityPicker', () => {
       />,
     )
 
-    const search = screen.getByRole('textbox', { name: 'Search locations' })
+    const search = screen.getByRole('searchbox', { name: 'Search locations' })
 
     for (const query of queries) {
       await user.clear(search)
@@ -89,7 +89,7 @@ describe('ConnectionEntityPicker', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search locations' }), 'zzzz-absent')
+    await user.type(screen.getByRole('searchbox', { name: 'Search locations' }), 'zzzz-absent')
 
     expect(screen.getByText('No matches found.')).toBeInTheDocument()
     expect(screen.queryByText('Yawning Portal')).not.toBeInTheDocument()

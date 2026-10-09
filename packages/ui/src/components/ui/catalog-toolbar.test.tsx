@@ -68,7 +68,7 @@ describe('CatalogToolbar', () => {
     )
 
     const tablist = screen.getByRole('tablist')
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -86,7 +86,7 @@ describe('CatalogToolbar', () => {
     )
 
     const tablist = screen.getByRole('tablist')
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     expect(search.compareDocumentPosition(tablist) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -140,7 +140,7 @@ describe('CatalogToolbar', () => {
 
     render(<CatalogToolbar search={{ query: '', onQueryChange, placeholder: 'Search catalog' }} />)
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
     expect(onQueryChange).toHaveBeenCalled()
   })
 
@@ -280,7 +280,7 @@ describe('CatalogToolbar', () => {
       />,
     )
 
-    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveClass('h-8')
+    expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveClass('h-8')
     expect(screen.getByText('Status')).toHaveClass('text-xs')
     expect(screen.getByText('Sort')).toHaveClass('text-xs')
   })

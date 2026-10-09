@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Check, Search } from 'lucide-react'
+import { ChevronDown, Check } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
@@ -21,13 +21,13 @@ import type {
   ComboboxRenderOption,
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
+import { SearchBar } from './search-bar.client'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxTriggerValueTextClasses,
   comboboxSelectedItemsRowVariants,
   comboboxSelectedListVariants,
   comboboxContentVariants,
-  comboboxSearchInputVariants,
   comboboxSearchRowVariants,
   comboboxTriggerOpenVariants,
 } from './combobox-field.variants'
@@ -223,19 +223,18 @@ export function ComboboxSearchField({
     <InteractiveListToolbar
       search={
         <div className={comboboxSearchRowVariants({ size })}>
-          <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden />
-          <input
-            ref={searchInputRef}
+          <SearchBar
+            appearance="embedded"
             id={searchId}
-            type="search"
             value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
+            onValueChange={onQueryChange}
             onKeyDown={onSearchKeyDown}
             placeholder={`Search ${label.toLowerCase()}…`}
-            aria-label={`Search ${label}`}
+            ariaLabel={`Search ${label}`}
+            size={size}
+            inputRef={searchInputRef}
             aria-controls={listboxId}
             aria-activedescendant={activeOptionId}
-            className={comboboxSearchInputVariants()}
           />
         </div>
       }

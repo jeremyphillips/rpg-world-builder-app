@@ -44,7 +44,7 @@ describe('CatalogPickerSheet', () => {
 
       expect(document.body.textContent).not.toContain('Alpha Item')
       expect(document.body.querySelector('[aria-label="Loading"]')).toBeTruthy()
-      expect(screen.getByRole('textbox', { name: 'Search catalog' })).toBeInTheDocument()
+      expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toBeInTheDocument()
 
       await act(async () => {
         await Promise.resolve()
@@ -78,7 +78,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByText('Alpha Item')).toBeInTheDocument()
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
 
     expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
@@ -105,7 +105,7 @@ describe('CatalogPickerSheet', () => {
     )
 
     const tablist = screen.getByRole('tablist')
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     expect(tablist.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -154,7 +154,7 @@ describe('CatalogPickerSheet', () => {
     )
 
     const tablist = screen.getByRole('tablist')
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     expect(search.compareDocumentPosition(tablist) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
@@ -182,7 +182,7 @@ describe('CatalogPickerSheet', () => {
             <span>Query: {searchQuery}</span>
             <span>Tab: {activeTabId}</span>
             <button type="button" onClick={resetSearchQuery}>
-              Clear search
+              Reset search query
             </button>
             <button type="button" onClick={resetActiveTab}>
               Reset tab
@@ -192,7 +192,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
     expect(screen.getByText('Query: rope')).toBeInTheDocument()
 
     await user.click(screen.getByRole('tab', { name: /All/i }))
@@ -201,7 +201,7 @@ describe('CatalogPickerSheet', () => {
     await user.click(screen.getByRole('button', { name: 'Reset tab' }))
     expect(screen.getByText('Tab: featured')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+    await user.click(screen.getByRole('button', { name: 'Reset search query' }))
     expect(screen.getByText('Query:')).toBeInTheDocument()
   })
 
@@ -403,12 +403,12 @@ describe('CatalogPickerSheet', () => {
     }
 
     const { rerender } = render(<CatalogPickerSheet {...sheetProps()} />)
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'rope')
     expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
 
     rerender(<CatalogPickerSheet {...sheetProps(<p>Inline create flow</p>)} />)
     expect(screen.getByText('Inline create flow')).toBeInTheDocument()
-    expect(screen.queryByRole('textbox', { name: 'Search catalog' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox', { name: 'Search catalog' })).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')).toHaveClass(
       'pb-4',
     )
@@ -418,7 +418,7 @@ describe('CatalogPickerSheet', () => {
     expect(screen.queryByText('Beta Item')).not.toBeInTheDocument()
 
     rerender(<CatalogPickerSheet {...sheetProps()} />)
-    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('rope')
+    expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveValue('rope')
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
     expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
   })
@@ -484,7 +484,7 @@ describe('CatalogPickerSheet', () => {
 
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
     const mode = screen.getByText('Mode')
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
 
     expect(header).toContainElement(mode)
     expect(header).toContainElement(search)
@@ -505,7 +505,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
+    const toolbar = screen.getByRole('searchbox', { name: 'Search catalog' }).closest('.space-y-4')
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
     expect(header).toHaveClass('pb-2')
     expect(header).toContainElement(toolbar as HTMLElement | null)
@@ -531,7 +531,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const toolbar = screen.getByRole('textbox', { name: 'Search catalog' }).closest('.space-y-4')
+    const toolbar = screen.getByRole('searchbox', { name: 'Search catalog' }).closest('.space-y-4')
     const header = screen.getByRole('heading', { name: 'Catalog' }).closest('.border-b')
     const action = screen.getByRole('button', { name: 'Create item' })
     expect(header).toHaveClass('pb-2')
@@ -560,7 +560,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     const action = screen.getByRole('button', { name: 'Create item' })
     const result = screen.getByText('Alpha Item')
 
@@ -660,7 +660,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'zzz')
+    await user.type(screen.getByRole('searchbox', { name: 'Search catalog' }), 'zzz')
     expect(screen.getByRole('button', { name: 'Create item' })).toBeInTheDocument()
     expect(screen.getByText('No items match your search.')).toBeInTheDocument()
   })
@@ -737,7 +737,7 @@ describe('CatalogPickerSheet', () => {
       />,
     )
 
-    const search = screen.getByRole('textbox', { name: 'Search catalog' })
+    const search = screen.getByRole('searchbox', { name: 'Search catalog' })
     const action = screen.getByRole('button', { name: 'Create item' })
     const result = screen.getByText('Alpha Item')
     const footer = screen.getByRole('button', { name: 'Submit' })

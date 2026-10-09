@@ -1,36 +1,62 @@
 'use client'
 
 import * as React from 'react'
-import { Search, X } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { Button } from './button.client'
+import { FieldClearAffordanceButton } from './field-clear-affordance.client'
 import { Input, type InputProps } from './input.client'
 import type { FieldSize } from './field.client'
 import {
-  searchBarClearButtonVariants,
-  searchBarInputVariants,
+  searchBarEmbeddedInputVariants,
+  searchBarEmbeddedInputWrapVariants,
+  searchBarEmbeddedLeadingIconVariants,
+  searchBarEmbeddedRootVariants,
+  searchBarFieldInputVariants,
   searchBarLeadingIconVariants,
   searchBarRootVariants,
 } from './search-bar.variants'
+import { useSearchBarControlSize } from './use-search-bar-control-size.client'
+
+export type SearchBarAppearance = 'field' | 'embedded'
 
 export type SearchBarProps = Omit<
   InputProps,
-  'id' | 'type' | 'value' | 'defaultValue' | 'onChange'
+  'id' | 'type' | 'value' | 'defaultValue' | 'onChange' | 'size' | 'aria-label'
 > & {
   id: string
   value: string
   onValueChange: (value: string) => void
-  placeholder: string
-  /** Accessible name when no visible label is shown. Defaults to `placeholder`. */
-  ariaLabel?: string
+  /** Accessible name — not derived from placeholder. */
+  ariaLabel: string
+  /** Presentation-only hint. */
+  placeholder?: string
   clearLabel?: string
   size?: FieldSize
+  appearance?: SearchBarAppearance
+  /** Optional second ref (combobox panel search). */
+  inputRef?: React.RefObject<HTMLInputElement | null>
+  autoFocus?: boolean
+}
+
+function assignInputRef(
+  node: HTMLInputElement | null,
+  ref: React.ForwardedRef<HTMLInputElement>,
+  inputRef?: React.RefObject<HTMLInputElement | null>,
+) {
+  if (inputRef) {
+    inputRef.current = node
+  }
+  if (typeof ref === 'function') {
+    ref(node)
+  } else if (ref) {
+    ref.current = node
+  }
 }
 
 /**
- * Placeholder-only search affordance with a leading magnifying-glass icon and an
- * optional trailing clear control when the field has a value.
+ * Search affordance with leading icon and trailing clear when the field has a value.
+ * `appearance="field"` — bordered Input; `embedded` — chromeless input for popover toolbars.
  */
 export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
   (
@@ -41,47 +67,108 @@ export const SearchBar = React.forwardRef<HTMLInputElement, SearchBarProps>(
       placeholder,
       ariaLabel,
       clearLabel = 'Clear search',
-      size = 'md',
+      size: sizeProp,
+      appearance = 'field',
       disabled,
       className,
+      inputRef,
+      autoFocus = false,
+      onKeyDown,
       ...inputProps
     },
     ref,
   ) => {
+    const resolvedSize = useSearchBarControlSize(sizeProp)
+    const localInputRef = React.useRef<HTMLInputElement>(null)
     const showClear = value.length > 0 && !disabled
 
+    React.useEffect(() => {
+      if (!autoFocus) return
+      localInputRef.current?.focus()
+    }, [autoFocus])
+
+    const handleClear = React.useCallback(() => {
+      onValueChange('')
+      const node = localInputRef.current
+      if (node) {
+        queueMicrotask(() => node.focus())
+      }
+    }, [onValueChange])
+
+    const setRefs = React.useCallback(
+      (node: HTMLInputElement | null) => {
+        localInputRef.current = node
+        assignInputRef(node, ref, inputRef)
+      },
+      [inputRef, ref],
+    )
+
+    const clearControl = showClear ? (
+      <FieldClearAffordanceButton
+        variant="inset"
+        size={resolvedSize}
+        accessibleName={clearLabel}
+        onClear={handleClear}
+      />
+    ) : null
+
+    if (appearance === 'embedded') {
+      return (
+        <div className={cn(searchBarEmbeddedRootVariants(), className)}>
+          <Search
+            className={searchBarEmbeddedLeadingIconVariants({ disabled: Boolean(disabled) })}
+            aria-hidden
+          />
+          <div className={searchBarEmbeddedInputWrapVariants()}>
+            <input
+              ref={setRefs}
+              id={id}
+              type="search"
+              value={value}
+              onChange={(event) => onValueChange(event.target.value)}
+              onKeyDown={onKeyDown}
+              placeholder={placeholder}
+              aria-label={ariaLabel}
+              disabled={disabled}
+              autoComplete="off"
+              className={searchBarEmbeddedInputVariants({
+                size: resolvedSize,
+                clearable: showClear,
+              })}
+              {...inputProps}
+            />
+            {clearControl}
+          </div>
+        </div>
+      )
+    }
+
     return (
-      <div className={searchBarRootVariants()}>
+      <div className={cn(searchBarRootVariants(), className)}>
         <Search
-          className={searchBarLeadingIconVariants({ disabled: Boolean(disabled) })}
+          className={searchBarLeadingIconVariants({
+            appearance: 'field',
+            size: resolvedSize,
+            disabled: Boolean(disabled),
+          })}
           aria-hidden
         />
         <Input
-          ref={ref}
+          ref={setRefs}
           id={id}
           type="search"
           value={value}
           onChange={(event) => onValueChange(event.target.value)}
+          onKeyDown={onKeyDown}
           placeholder={placeholder}
-          aria-label={ariaLabel ?? placeholder}
-          size={size}
+          aria-label={ariaLabel}
+          size={resolvedSize}
           disabled={disabled}
-          className={cn(searchBarInputVariants({ clearable: showClear }), className)}
+          autoComplete="off"
+          className={searchBarFieldInputVariants({ size: resolvedSize, clearable: showClear })}
           {...inputProps}
         />
-        {showClear ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            density="compact"
-            className={searchBarClearButtonVariants()}
-            aria-label={clearLabel}
-            onClick={() => onValueChange('')}
-          >
-            <X aria-hidden />
-          </Button>
-        ) : null}
+        {clearControl}
       </div>
     )
   },

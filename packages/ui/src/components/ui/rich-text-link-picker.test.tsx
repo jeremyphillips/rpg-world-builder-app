@@ -47,7 +47,7 @@ describe('RichTextLinkPicker', () => {
 
     expect(screen.getByText('Insert link')).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Internal' })).toHaveAttribute('aria-selected', 'true')
-    expect(screen.getByRole('textbox', { name: 'Search internal content' })).toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: 'Search internal content' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Filter by content type' })).toHaveTextContent(
       'All types',

@@ -377,7 +377,16 @@ export {
   type FieldAnatomyRegionProps,
 } from './components/ui/field-anatomy-regions'
 export { TextField, type TextFieldProps } from './components/ui/text-field'
-export { SearchBar, type SearchBarProps } from './components/ui/search-bar.client'
+export {
+  SearchBar,
+  type SearchBarAppearance,
+  type SearchBarProps,
+} from './components/ui/search-bar.client'
+export {
+  resolveSearchBarControlSize,
+  searchBarControlHeightClass,
+  type ResolveSearchBarControlSizeOptions,
+} from './components/ui/search-bar-control-size.lib'
 export {
   TextSuggestionsField,
   type TextSuggestionsFieldProps,

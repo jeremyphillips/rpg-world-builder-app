@@ -1,25 +1,30 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import { FormSectionProvider } from '../../form/context/form-section.context'
+import { FilterChromeProvider } from '../../filters/filter-chrome.context'
 import { SearchBar } from './search-bar.client'
+import { searchBarControlHeightClass } from './search-bar-control-size.lib'
+
+const SEARCH_ARIA = 'Search organizations'
 
 describe('SearchBar', () => {
-  it('renders placeholder-only search without a visible label', () => {
+  it('uses ariaLabel for the accessible name, not placeholder', () => {
     render(
       <SearchBar
         id="organization-search"
         value=""
         onValueChange={vi.fn()}
-        placeholder="Search organizations…"
+        placeholder="Type to filter…"
+        ariaLabel={SEARCH_ARIA}
       />,
     )
 
-    expect(screen.getByRole('searchbox', { name: 'Search organizations…' })).toBeInTheDocument()
-    expect(screen.queryByText('Search organizations')).not.toBeInTheDocument()
+    expect(screen.getByRole('searchbox', { name: SEARCH_ARIA })).toBeInTheDocument()
   })
 
-  it('shows a clear control only when the field has a value', async () => {
+  it('shows inset clear with slot width classes when the field has a value', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
 
@@ -28,7 +33,7 @@ describe('SearchBar', () => {
         id="organization-search"
         value=""
         onValueChange={onValueChange}
-        placeholder="Search organizations…"
+        ariaLabel={SEARCH_ARIA}
       />,
     )
 
@@ -39,27 +44,112 @@ describe('SearchBar', () => {
         id="organization-search"
         value="guild"
         onValueChange={onValueChange}
-        placeholder="Search organizations…"
+        ariaLabel={SEARCH_ARIA}
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
+    const clear = screen.getByRole('button', { name: 'Clear search' })
+    expect(clear.className).toContain('w-8')
+    expect(clear.className).toContain('inset-y-0')
     expect(screen.getByRole('searchbox')).toHaveClass(
-      'pr-9',
+      'pr-8',
       '[&::-webkit-search-cancel-button]:appearance-none',
     )
-    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+    await user.click(clear)
     expect(onValueChange).toHaveBeenCalledWith('')
+  })
 
-    rerender(
+  it('restores focus to the search input after clear', async () => {
+    const user = userEvent.setup()
+
+    render(
       <SearchBar
         id="organization-search"
         value="guild"
-        onValueChange={onValueChange}
-        placeholder="Search organizations…"
+        onValueChange={vi.fn()}
+        ariaLabel={SEARCH_ARIA}
+      />,
+    )
+
+    const input = screen.getByRole('searchbox', { name: SEARCH_ARIA })
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+    await waitFor(() => {
+      expect(document.activeElement).toBe(input)
+    })
+  })
+
+  it('hides clear when disabled', () => {
+    render(
+      <SearchBar
+        id="organization-search"
+        value="guild"
+        onValueChange={vi.fn()}
+        ariaLabel={SEARCH_ARIA}
         disabled
       />,
     )
     expect(screen.queryByRole('button', { name: 'Clear search' })).not.toBeInTheDocument()
+  })
+
+  it('applies filter chrome size over form section (class contract)', () => {
+    render(
+      <FormSectionProvider density="compact">
+        <FilterChromeProvider density="comfortable">
+          <SearchBar id="density-search" value="" onValueChange={vi.fn()} ariaLabel={SEARCH_ARIA} />
+        </FilterChromeProvider>
+      </FormSectionProvider>,
+    )
+
+    const input = screen.getByRole('searchbox', { name: SEARCH_ARIA })
+    expect(input.className).toContain(searchBarControlHeightClass('md'))
+  })
+
+  it('applies className to the field appearance root shell', () => {
+    const { container } = render(
+      <SearchBar
+        id="organization-search"
+        value=""
+        onValueChange={vi.fn()}
+        ariaLabel={SEARCH_ARIA}
+        className="max-w-md"
+      />,
+    )
+
+    expect(container.firstElementChild).toHaveClass('max-w-md', 'relative', 'w-full')
+  })
+
+  it('forwards onValueChange while an IME composition is active', () => {
+    const onValueChange = vi.fn()
+    render(
+      <SearchBar
+        id="embedded-search"
+        appearance="embedded"
+        value=""
+        onValueChange={onValueChange}
+        ariaLabel="Search choices"
+      />,
+    )
+
+    const input = screen.getByRole('searchbox', { name: 'Search choices' })
+    fireEvent.compositionStart(input)
+    fireEvent.change(input, { target: { value: 'あ' } })
+    expect(onValueChange).toHaveBeenCalledWith('あ')
+  })
+
+  it('renders embedded appearance with chromeless input classes', () => {
+    render(
+      <SearchBar
+        id="embedded-search"
+        appearance="embedded"
+        value="q"
+        onValueChange={vi.fn()}
+        ariaLabel="Search choices"
+        placeholder="Search choices…"
+      />,
+    )
+
+    const input = screen.getByRole('searchbox', { name: 'Search choices' })
+    expect(input.className).toContain('border-0')
+    expect(input.className).toContain('bg-transparent')
   })
 })

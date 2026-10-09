@@ -242,6 +242,36 @@ describe('FilterFieldRenderer behavior', () => {
     expect(input).toHaveValue('')
   })
 
+  it('renders SearchBar when text filter control is search', () => {
+    const schema = createFilterSchema<{ name: string }, { name?: string }>([
+      createTextFilter<{ name: string }, { name?: string }, 'name'>({
+        id: 'name',
+        label: 'Name',
+        control: 'search',
+        placeholder: 'Search…',
+        getSearchText: (row) => row.name,
+      }),
+    ])
+    const field = schema.fields[0]!
+    render(
+      <FilterChromeProvider>
+        <FilterFieldRenderer
+          field={field}
+          controlId="name-search"
+          context={{
+            schema,
+            state: { name: 'rope' },
+            idPrefix: 'overview',
+            onValueChange: () => undefined,
+          }}
+        />
+      </FilterChromeProvider>,
+    )
+
+    expect(screen.getByRole('searchbox', { name: 'Name' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Clear search' })).toBeInTheDocument()
+  })
+
   it('omits the All option when showAllOption is false', async () => {
     const user = userEvent.setup()
     render(<RendererHarness fieldId="noAllStatus" initialState={{ noAllStatus: 'draft' }} />)

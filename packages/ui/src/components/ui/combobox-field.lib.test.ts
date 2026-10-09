@@ -65,6 +65,7 @@ describe('combobox-field.lib', () => {
 
   it('resolves search key actions', () => {
     expect(resolveSearchKeyAction('ArrowDown')).toBe('next')
+    expect(resolveSearchKeyAction('Escape')).toBe('close')
     expect(resolveSearchKeyAction('Tab')).toBeNull()
   })
 

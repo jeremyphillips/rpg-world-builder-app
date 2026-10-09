@@ -2,13 +2,14 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { Search, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
 import { Button } from './button.client'
 import { cn } from '../../lib/utils'
 import { portalPopoverSurfaceClasses } from './surface-current.lib'
 import { Checkbox } from './checkbox.client'
 import { Input } from './input.client'
+import { SearchBar } from './search-bar.client'
 import { InteractiveListEmpty, InteractiveList } from './interactive-list.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 import { InteractiveListToolbar } from './interactive-list-toolbar.client'
@@ -191,15 +192,15 @@ function RichTextLinkPickerForm({
           <div className="overflow-hidden rounded-md border border-border">
             <InteractiveListToolbar
               search={
-                <div className="relative flex h-8 w-full items-center">
-                  <Search className="pointer-events-none absolute left-0 size-3.5 text-muted-foreground" />
-                  <Input
+                <div className="flex h-8 w-full items-center">
+                  <SearchBar
+                    appearance="embedded"
+                    id="rich-text-link-internal-search"
                     value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
+                    onValueChange={setSearchQuery}
                     placeholder="Search content"
-                    aria-label="Search internal content"
+                    ariaLabel="Search internal content"
                     size="sm"
-                    className="border-0 bg-transparent pl-6 shadow-none"
                   />
                 </div>
               }

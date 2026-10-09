@@ -112,9 +112,8 @@ describe('ButtonDropdown', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Add grant' }))
-    expect(screen.getByRole('searchbox', { name: 'Search Add grant' }).parentElement).toHaveClass(
-      'h-9',
-    )
+    const search = screen.getByRole('searchbox', { name: 'Search Add grant' })
+    expect(search.closest('.h-9')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {
