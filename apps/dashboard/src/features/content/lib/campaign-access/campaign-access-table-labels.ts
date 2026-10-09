@@ -28,7 +28,6 @@ export const CAMPAIGN_ACCESS_TABLE_UNAVAILABLE_TOOLTIP =
 /** Hidden-count notice action labels. */
 export const CAMPAIGN_ACCESS_TABLE_SHOW_ALL_LABEL = 'Show'
 export const CAMPAIGN_ACCESS_TABLE_HIDE_LABEL = 'Hide'
-export const CAMPAIGN_ACCESS_TABLE_HIDE_UNAVAILABLE_LABEL = 'Hide unavailable'
 export const CAMPAIGN_ACCESS_TABLE_SHOW_UNAVAILABLE_LABEL = 'Show unavailable'
 
 export { formatAvailabilityCountSummary } from './availability-count-summary.lib'

@@ -156,7 +156,6 @@ function ClassSubclassesTabBody({
     scope,
     showUnavailable,
     hiddenUnavailableCount,
-    layout: 'stable',
     onShow: showUnavailableItems,
     onHide: hideUnavailableItems,
   })

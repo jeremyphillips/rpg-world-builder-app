@@ -8,7 +8,6 @@ import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
-  hasCatalogPickerNarrowingCriteria,
   resolveCatalogPickerResultSummary,
   OrganizationMembershipTitleField,
   buildCharacterEntityCardModel,
@@ -304,10 +303,6 @@ export function OrganizationMemberPickerDrawer({
             {...resolveCatalogPickerResultSummary({
               visible: visibleItemCount,
               total: characterFilters.sourceCount,
-              narrowing: hasCatalogPickerNarrowingCriteria({
-                structuredFilterCount: characterFilters.structuredFilterCount,
-                searchQuery,
-              }),
             })}
             onClick={() => {
               characterFilters.reset()

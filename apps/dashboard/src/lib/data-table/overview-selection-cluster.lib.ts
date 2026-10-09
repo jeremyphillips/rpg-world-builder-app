@@ -1,8 +1,3 @@
-/** Formats a simple filtered-row count for overview utility summaries. */
-export function formatOverviewResultLabel(resultCount: number): string {
-  return resultCount === 1 ? '1 result' : `${resultCount} results`
-}
-
 export type ResolvePageSelectionActionLabelInput = {
   isAllPageRowsSelected: boolean
   pageSelectableCount: number

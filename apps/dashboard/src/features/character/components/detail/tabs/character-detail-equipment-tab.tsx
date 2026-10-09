@@ -38,7 +38,6 @@ import {
 } from '../../../lib/detail/character-sheet-catalog'
 import type { CharacterWealthViewModel } from '../../../lib/display/character-display'
 import {
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '../../picker/catalog-picker-filter-state.lib'
@@ -207,21 +206,15 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                 : undefined
             }
             actions={
-              showSort || showResetView ? (
-                <CatalogToolbarResetSlot
-                  visible={showResetView}
-                  includesSort={showSort}
-                  {...resolveCatalogPickerResultSummary({
-                    visible: visibleCards.length,
-                    total: cards.length,
-                    narrowing: hasCatalogPickerNarrowingCriteria({
-                      structuredFilterCount,
-                      searchQuery,
-                    }),
-                  })}
-                  onClick={handleResetView}
-                />
-              ) : undefined
+              <CatalogToolbarResetSlot
+                visible={showResetView}
+                includesSort={showSort}
+                {...resolveCatalogPickerResultSummary({
+                  visible: visibleCards.length,
+                  total: cards.length,
+                })}
+                onClick={handleResetView}
+              />
             }
           />
           <CatalogCollapsibleList

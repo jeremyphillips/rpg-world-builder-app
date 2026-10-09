@@ -13,7 +13,6 @@ import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
 import {
   CatalogToolbarResetSlot,
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '@/features/character'
@@ -801,10 +800,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
               {...resolveCatalogPickerResultSummary({
                 visible: visibleItemCount,
                 total: locationFilters.sourceCount,
-                narrowing: hasCatalogPickerNarrowingCriteria({
-                  structuredFilterCount: locationFilters.structuredFilterCount,
-                  searchQuery,
-                }),
               })}
               onClick={() => {
                 locationFilters.reset()

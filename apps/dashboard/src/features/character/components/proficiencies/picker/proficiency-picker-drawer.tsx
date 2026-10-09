@@ -27,7 +27,6 @@ import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-r
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import {
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '../../picker/catalog-picker-filter-state.lib'
@@ -124,10 +123,6 @@ export function ProficiencyPickerDrawer({
           {...resolveCatalogPickerResultSummary({
             visible: visibleItemCount,
             total: items.length,
-            narrowing: hasCatalogPickerNarrowingCriteria({
-              structuredFilterCount: 0,
-              searchQuery,
-            }),
           })}
           onClick={() => {
             setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)

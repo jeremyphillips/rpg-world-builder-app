@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { resultCountSizerLabels } from '@/lib/data-table/format-result-count.lib'
+
 import {
   CATALOG_TOOLBAR_RESET_VISIBLE_LABEL,
   CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME,
@@ -61,22 +63,39 @@ describe('CatalogToolbarResetSlot', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('announces a reserved result count beside reset', () => {
+  it('announces the visible result count beside reset', () => {
     render(
       <CatalogToolbarResetSlot
         visible
         includesSort
-        summary="4 of 24"
-        summaryReserveLabel="24 of 24"
+        summaryVisibleCount={4}
+        summaryReserveLabels={resultCountSizerLabels(24)}
         onClick={vi.fn()}
       />,
     )
 
-    const summary = screen.getByText('4 of 24')
-    expect(summary.closest('[aria-live="polite"]')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('4 results')
     expect(document.querySelector('[data-filter-toolbar-sizer-label]')).toHaveTextContent(
-      '24 of 24',
+      '0 results',
     )
+    expect(document.querySelectorAll('[data-filter-toolbar-sizer-label]')).toHaveLength(25)
+  })
+
+  it('shows the count while reset stays hidden', () => {
+    render(
+      <CatalogToolbarResetSlot
+        visible={false}
+        includesSort={false}
+        summaryVisibleCount={87}
+        summaryReserveLabels={resultCountSizerLabels(87)}
+        onClick={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent('87 results')
+    expect(
+      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }),
+    ).not.toBeInTheDocument()
   })
 
   it('uses a caller label without the reset accessible name', () => {

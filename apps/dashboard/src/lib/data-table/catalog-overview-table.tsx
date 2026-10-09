@@ -28,7 +28,8 @@ import {
   type CatalogOverviewPageSize,
   type CatalogOverviewPreferences,
 } from './catalog-overview-preferences'
-import { formatCatalogResultCount } from './format-catalog-result-count.lib'
+import type { ResultSummarySupplement } from './overview-result-summary'
+import { ResultSummary } from './overview-result-summary'
 import {
   applyOverviewAdvancedOpenPreferences,
   applyOverviewColumnChangePreferences,
@@ -39,7 +40,6 @@ import {
   buildCatalogOverviewSelectionFrameProps,
   type CatalogOverviewSelectionConfig,
 } from './catalog-overview-selection'
-import { OverviewResultSummary } from './overview-result-summary'
 import { OverviewTableFrame } from './overview-table-frame'
 
 export type { CatalogOverviewSelectionConfig } from './catalog-overview-selection'
@@ -67,7 +67,7 @@ type CatalogOverviewTableCoreProps<T extends { id: string }> = {
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filters?: ReactNode
   selection?: CatalogOverviewSelectionConfig<T>
-  resultSupplement?: ReactNode
+  resultSupplement?: ResultSummarySupplement | null
 }
 
 type CatalogOverviewControlledFilterProps<T, TFilters extends Record<string, unknown>> = {
@@ -124,7 +124,7 @@ type CatalogOverviewTableBodyProps<T extends { id: string }> = {
   getCellClassName?: DataTableProps<T>['getCellClassName']
   filterRegion?: ReactNode
   selection?: CatalogOverviewSelectionConfig<T>
-  resultSupplement?: ReactNode
+  resultSupplement?: ResultSummarySupplement | null
 }
 
 const COLUMNS_ARIA_LABEL = 'Choose visible columns'
@@ -165,8 +165,6 @@ function CatalogOverviewTableBody<T extends { id: string }>({
     [tableKey],
   )
 
-  const resolvedResultCountLabel = resultCountLabel ?? formatCatalogResultCount(visibleRows.length)
-
   const tablePageSize: CatalogOverviewPageSize =
     preferences.pageSize ?? CATALOG_OVERVIEW_PREFERENCES_DEFAULTS.pageSize ?? 20
 
@@ -201,10 +199,10 @@ function CatalogOverviewTableBody<T extends { id: string }>({
       onColumnChange={handleColumnChange}
       filterRegion={filterRegion}
       resultSummary={
-        <OverviewResultSummary
-          resultCount={visibleRows.length}
-          resultLabel={resolvedResultCountLabel}
-          supplementalContent={resultSupplement}
+        <ResultSummary
+          visibleCount={visibleRows.length}
+          primaryLabel={resultCountLabel}
+          supplements={resultSupplement ? [resultSupplement] : undefined}
         />
       }
       leadingActions={selectionFrame.renderLeadingActions}

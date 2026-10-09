@@ -23,10 +23,7 @@ import {
 } from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
-import {
-  hasCatalogPickerNarrowingCriteria,
-  resolveCatalogPickerResultSummary,
-} from '../../picker/catalog-picker-filter-state.lib'
+import { resolveCatalogPickerResultSummary } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
@@ -191,10 +188,6 @@ export function OrganizationPickerDrawer({
             {...resolveCatalogPickerResultSummary({
               visible: visibleItemCount,
               total: organizationFilters.sourceCount,
-              narrowing: hasCatalogPickerNarrowingCriteria({
-                structuredFilterCount: organizationFilters.structuredFilterCount,
-                searchQuery,
-              }),
             })}
             onClick={() => {
               organizationFilters.reset()

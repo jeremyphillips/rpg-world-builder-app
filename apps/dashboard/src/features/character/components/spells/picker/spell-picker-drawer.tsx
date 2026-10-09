@@ -19,7 +19,6 @@ import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-statu
 import { resolveSpellSelectionRowPresentation } from '../../../lib/spells/spell-selection-row-presentation.lib'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import {
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '../../picker/catalog-picker-filter-state.lib'
@@ -233,7 +232,6 @@ export function SpellPickerDrawer({
             {...resolveCatalogPickerResultSummary({
               visible: visibleItemCount,
               total: activeItems.length,
-              narrowing: hasCatalogPickerNarrowingCriteria(criteria),
             })}
             onClick={handleResetView}
           />

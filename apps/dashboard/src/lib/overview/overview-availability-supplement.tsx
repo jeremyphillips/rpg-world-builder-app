@@ -1,8 +1,13 @@
 import type { CampaignAvailabilityFilter } from '@rpg/contracts'
 import type { FilterFieldId } from '@rpg/ui/filters'
 
-import { buildAvailabilityCountSupplement } from '@/features/content/lib/campaign-access/availability-count-supplement'
+import {
+  formatHideUnavailableAriaLabel,
+  formatShowAllCampaignAvailabilityAriaLabel,
+} from '@/features/content/lib/campaign-access/campaign-access-table-labels'
+import type { ResultSummarySupplement } from '@/lib/data-table/overview-result-summary'
 
+import { resolveAvailabilitySummarySupplement } from './availability-summary-supplement.lib'
 import type { CampaignAvailabilityScope } from './campaign-availability-scope.lib'
 
 /** Filter field id for the shared campaign availability equals filter. */
@@ -16,36 +21,39 @@ type FilterNoticeActions<TFilters> = {
   ) => void
 }
 
-/** Utility-row supplemental copy for filter-scoped hidden unavailable counts. */
+/** Visibility supplement for rows hidden or revealed by the availability filter. */
 export function buildOverviewAvailabilitySupplement<TFilters>({
   scope,
   campaignAvailability,
   campaignAvailabilityFilterId,
   actions,
 }: {
-  scope: CampaignAvailabilityScope
+  scope: Pick<CampaignAvailabilityScope, 'unavailableCount'>
   campaignAvailability: CampaignAvailabilityFilter
   campaignAvailabilityFilterId: FilterFieldId<TFilters>
   actions: FilterNoticeActions<TFilters>
-}) {
-  if (campaignAvailability === 'unavailable') return null
-
-  return buildAvailabilityCountSupplement({
-    scope,
-    showUnavailable: campaignAvailability === 'all',
-    layout: 'conditional',
-    actionVariant: 'overview',
-    onShow: () =>
-      actions.setFilterValue(
-        campaignAvailabilityFilterId,
-        'all' as TFilters[FilterFieldId<TFilters>],
-        { history: 'push' },
-      ),
-    onHide: () =>
-      actions.setFilterValue(
-        campaignAvailabilityFilterId,
-        'available' as TFilters[FilterFieldId<TFilters>],
-        { history: 'push' },
-      ),
+}): ResultSummarySupplement | null {
+  const resolved = resolveAvailabilitySummarySupplement({
+    mode: campaignAvailability,
+    unavailableCount: scope.unavailableCount,
   })
+  if (!resolved) return null
+
+  const showingUnavailable = resolved.actionLabel === 'Hide'
+
+  return {
+    label: resolved.label,
+    action: {
+      label: resolved.actionLabel,
+      accessibleName: showingUnavailable
+        ? formatHideUnavailableAriaLabel()
+        : formatShowAllCampaignAvailabilityAriaLabel(),
+      onClick: () =>
+        actions.setFilterValue(
+          campaignAvailabilityFilterId,
+          (showingUnavailable ? 'available' : 'all') as TFilters[FilterFieldId<TFilters>],
+          { history: 'push' },
+        ),
+    },
+  }
 }

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { resultCountSizerLabels } from '@/lib/data-table/format-result-count.lib'
+
 import {
   hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
@@ -27,36 +29,36 @@ describe('hasCatalogPickerResetViewCriteria', () => {
     ).toBe(true)
   })
 
-  it('shows a count only when search, filters, or tabs narrow the list', () => {
+  it('treats search, filters, and tabs as narrowing', () => {
     expect(
       hasCatalogPickerNarrowingCriteria({
         structuredFilterCount: 0,
         searchQuery: '',
       }),
     ).toBe(false)
-    expect(resolveCatalogPickerResultSummary({ visible: 4, total: 24, narrowing: false })).toEqual(
-      {},
-    )
     expect(
-      resolveCatalogPickerResultSummary({
-        visible: 4,
-        total: 24,
-        narrowing: hasCatalogPickerNarrowingCriteria({
-          structuredFilterCount: 1,
-          searchQuery: '',
-        }),
+      hasCatalogPickerNarrowingCriteria({
+        structuredFilterCount: 1,
+        searchQuery: '',
       }),
-    ).toEqual({ summary: '4 of 24', summaryReserveLabel: '24 of 24' })
+    ).toBe(true)
     expect(
-      resolveCatalogPickerResultSummary({
-        visible: 87,
-        total: 87,
-        narrowing: hasCatalogPickerNarrowingCriteria({
-          structuredFilterCount: 0,
-          searchQuery: 'rope',
-        }),
+      hasCatalogPickerNarrowingCriteria({
+        structuredFilterCount: 0,
+        searchQuery: 'rope',
       }),
-    ).toEqual({ summary: '87 of 87', summaryReserveLabel: '87 of 87' })
+    ).toBe(true)
+  })
+
+  it('always reports the visible count and reserves every count through the total', () => {
+    expect(resolveCatalogPickerResultSummary({ visible: 4, total: 24 })).toEqual({
+      summaryVisibleCount: 4,
+      summaryReserveLabels: resultCountSizerLabels(24),
+    })
+    expect(resolveCatalogPickerResultSummary({ visible: 87, total: 87 })).toEqual({
+      summaryVisibleCount: 87,
+      summaryReserveLabels: resultCountSizerLabels(87),
+    })
   })
 
   it('counts search and structured filters without sort', () => {

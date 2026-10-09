@@ -1,6 +1,8 @@
 import { ActionButton } from '@rpg/ui'
 import { FilterToolbarLabelSizer } from '@rpg/ui/filters'
 
+import { ResultSummary } from '@/lib/data-table/overview-result-summary'
+
 import {
   catalogPickerResultSummaryClasses,
   catalogToolbarResetRowClasses,
@@ -74,10 +76,60 @@ export type CatalogToolbarResetSlotProps = {
    * with the sort-aware accessible name.
    */
   label?: string
-  /** Visible count, for example `12 of 87`. Omit when nothing narrows the list. */
-  summary?: string
-  /** Widest summary label, usually `total of total`, so the count does not change width. */
-  summaryReserveLabel?: string
+  /** Visible count for the current list. Omit when this slot has no summary. */
+  summaryVisibleCount?: number
+  /** Every `formatResultCount` label from 0 through the eligible total. */
+  summaryReserveLabels?: readonly string[]
+}
+
+function CatalogToolbarResultCount({
+  visibleCount,
+  reserveLabels,
+}: {
+  visibleCount: number
+  reserveLabels: readonly string[]
+}) {
+  return (
+    <span className={catalogPickerResultSummaryClasses}>
+      <FilterToolbarLabelSizer labels={reserveLabels}>
+        <ResultSummary visibleCount={visibleCount} />
+      </FilterToolbarLabelSizer>
+    </span>
+  )
+}
+
+function CatalogToolbarResetControl({
+  visible,
+  label,
+  accessibleName,
+  onClick,
+}: {
+  visible: boolean
+  label: string
+  accessibleName: string
+  onClick: () => void
+}) {
+  return (
+    <div
+      className={visible ? undefined : catalogToolbarResetSlotReservedClasses}
+      aria-hidden={visible ? undefined : true}
+    >
+      <CatalogToolbarResetAction
+        label={label}
+        accessibleName={accessibleName}
+        onClick={onClick}
+        tabIndex={visible ? undefined : -1}
+      />
+    </div>
+  )
+}
+
+function shouldMountCatalogToolbarResetSlot(args: {
+  showSummary: boolean
+  visible: boolean
+  shouldReserve: boolean
+}): boolean {
+  return args.showSummary || args.visible || args.shouldReserve
 }
 
 /**
@@ -90,35 +142,29 @@ export function CatalogToolbarResetSlot({
   includesSort,
   reserve,
   label,
-  summary,
-  summaryReserveLabel,
+  summaryVisibleCount,
+  summaryReserveLabels,
 }: CatalogToolbarResetSlotProps) {
   const shouldReserve = reserve ?? includesSort
-  if (!visible && !shouldReserve) return null
-
-  const accessibleName = label ?? catalogToolbarResetAccessibleName(includesSort)
-  const visibleLabel = label ?? CATALOG_TOOLBAR_RESET_VISIBLE_LABEL
+  const showSummary = summaryVisibleCount !== undefined
+  if (!shouldMountCatalogToolbarResetSlot({ showSummary, visible, shouldReserve })) return null
 
   return (
     <div className={catalogToolbarResetRowClasses}>
-      {summary ? (
-        <span aria-live="polite" className={catalogPickerResultSummaryClasses}>
-          <FilterToolbarLabelSizer labels={[summaryReserveLabel ?? summary]}>
-            {summary}
-          </FilterToolbarLabelSizer>
-        </span>
-      ) : null}
-      <div
-        className={visible ? undefined : catalogToolbarResetSlotReservedClasses}
-        aria-hidden={visible ? undefined : true}
-      >
-        <CatalogToolbarResetAction
-          label={visibleLabel}
-          accessibleName={accessibleName}
-          onClick={onClick}
-          tabIndex={visible ? undefined : -1}
+      {showSummary ? (
+        <CatalogToolbarResultCount
+          visibleCount={summaryVisibleCount}
+          reserveLabels={summaryReserveLabels ?? []}
         />
-      </div>
+      ) : null}
+      {visible || shouldReserve ? (
+        <CatalogToolbarResetControl
+          visible={visible}
+          label={label ?? CATALOG_TOOLBAR_RESET_VISIBLE_LABEL}
+          accessibleName={label ?? catalogToolbarResetAccessibleName(includesSort)}
+          onClick={onClick}
+        />
+      ) : null}
     </div>
   )
 }

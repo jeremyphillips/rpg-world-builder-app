@@ -14,7 +14,6 @@ import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '@/features/character'
@@ -537,10 +536,6 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               {...resolveCatalogPickerResultSummary({
                 visible: visibleItemCount,
                 total: organizationFilters.sourceCount,
-                narrowing: hasCatalogPickerNarrowingCriteria({
-                  structuredFilterCount: organizationFilters.structuredFilterCount,
-                  searchQuery,
-                }),
               })}
               onClick={() => {
                 organizationFilters.reset()

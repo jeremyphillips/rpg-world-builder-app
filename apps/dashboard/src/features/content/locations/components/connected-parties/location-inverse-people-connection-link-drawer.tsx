@@ -21,7 +21,6 @@ import {
 
 import {
   CatalogToolbarResetSlot,
-  hasCatalogPickerNarrowingCriteria,
   resolveCatalogPickerResultSummary,
   buildCharacterEntityCardModel,
   formatContentReferenceLabel,
@@ -690,10 +689,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 {...resolveCatalogPickerResultSummary({
                   visible: visibleItemCount,
                   total: organizationFilters.sourceCount,
-                  narrowing: hasCatalogPickerNarrowingCriteria({
-                    structuredFilterCount: organizationFilters.structuredFilterCount,
-                    searchQuery,
-                  }),
                 })}
                 onClick={() => {
                   organizationFilters.reset()
@@ -807,10 +802,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               {...resolveCatalogPickerResultSummary({
                 visible: visibleItemCount,
                 total: characterFilters.sourceCount,
-                narrowing: hasCatalogPickerNarrowingCriteria({
-                  structuredFilterCount: characterFilters.structuredFilterCount,
-                  searchQuery,
-                }),
               })}
               onClick={() => {
                 characterFilters.reset()

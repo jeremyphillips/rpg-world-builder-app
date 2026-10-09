@@ -7,10 +7,7 @@ import { CatalogEntityPickerSheet } from '@/features/content'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
-import {
-  hasCatalogPickerNarrowingCriteria,
-  resolveCatalogPickerResultSummary,
-} from '../../../picker/catalog-picker-filter-state.lib'
+import { resolveCatalogPickerResultSummary } from '../../../picker/catalog-picker-filter-state.lib'
 import {
   getEquipmentPickerSearchText,
   hasEquipmentPickerResetViewCriteria,
@@ -62,7 +59,6 @@ function EquipmentPickerToolbarActions({
   workflowMode,
   visibleItemCount,
   eligibleItemCount,
-  structuredFilterCount,
   onResetView,
 }: {
   selectedKind: ReturnType<typeof useEquipmentPickerController>['selectedKind']
@@ -73,7 +69,6 @@ function EquipmentPickerToolbarActions({
   workflowMode: EquipmentPickerWorkflowMode
   visibleItemCount: number
   eligibleItemCount: number
-  structuredFilterCount: number
   onResetView: () => void
 }) {
   const showResetView = hasEquipmentPickerResetViewCriteria({
@@ -92,10 +87,6 @@ function EquipmentPickerToolbarActions({
       {...resolveCatalogPickerResultSummary({
         visible: visibleItemCount,
         total: eligibleItemCount,
-        narrowing: hasCatalogPickerNarrowingCriteria({
-          structuredFilterCount,
-          searchQuery,
-        }),
       })}
       onClick={onResetView}
     />
@@ -231,7 +222,6 @@ export function EquipmentPickerDrawer({
             workflowMode={workflowMode}
             visibleItemCount={visibleItemCount}
             eligibleItemCount={picker.eligibleItemCount}
-            structuredFilterCount={picker.structuredFilterCount}
             onResetView={handleResetView}
           />
         )

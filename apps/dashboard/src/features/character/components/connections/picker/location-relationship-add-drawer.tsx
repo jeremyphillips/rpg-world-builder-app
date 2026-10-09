@@ -23,10 +23,7 @@ import {
 } from '@/features/content'
 import { resolvePickerPendingLabel } from '../../../lib/picker/picker-mutation-family'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
-import {
-  hasCatalogPickerNarrowingCriteria,
-  resolveCatalogPickerResultSummary,
-} from '../../picker/catalog-picker-filter-state.lib'
+import { resolveCatalogPickerResultSummary } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { DrawerShell } from '@/components/drawer'
 
@@ -235,10 +232,6 @@ export function LocationRelationshipAddDrawer({
               {...resolveCatalogPickerResultSummary({
                 visible: visibleItemCount,
                 total: locationFilters.sourceCount,
-                narrowing: hasCatalogPickerNarrowingCriteria({
-                  structuredFilterCount: locationFilters.structuredFilterCount,
-                  searchQuery,
-                }),
               })}
               onClick={() => {
                 locationFilters.reset()

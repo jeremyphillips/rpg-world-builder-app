@@ -323,7 +323,7 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 | Metadata renderer           | Content `CatalogMetadataRenderer`                                      | Same                      | Same                           | Domain mappers under each `*/picker/`                                          |
 | Status / guidance           | `picker`, plus owned, review, edit, and reconciliation on builder rows | `picker`                  | `picker`                       | `resolveSelectionRowStatusItems` and the context policy                        |
 
-When search, a structured filter, or a non-default tab narrows the list, the reset row shows `visible of total` beside Reset. `total` is the eligible list for the current mode. Sort alone shows Reset with no count.
+The reset row always shows the visible count as `N results`. Reset stays beside it and appears only when search, a structured filter, a non-default tab, or a non-default sort is active. Sort alone shows Reset with the full eligible count. `FilterToolbarLabelSizer` reserves every count from `0` through that eligible total.
 
 Visible reset copy is `Reset`, with the reset icon. Chrome (text variant, `sm` size, compact density, glyph step) is fixed on `CatalogToolbarResetAction`. An optional `label` replaces the visible text and the accessible name. The default accessible name and `title` are `Reset search, filters, and sorting` when Sort is on the toolbar, and `Reset search and filters` when it is not. The reset row stays reserved (invisible, not focusable) whenever a utility band renders. Sort implies that reservation. Drawers without a utility band mount Reset only while it is visible. Spell recommendation tabs still park `actions` on the tab row.
 

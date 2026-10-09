@@ -5,7 +5,6 @@ import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '@/features/character'
@@ -303,10 +302,6 @@ function LocationParentReplacementDrawerContent({
             {...resolveCatalogPickerResultSummary({
               visible: visibleItemCount,
               total: locationFilters.sourceCount,
-              narrowing: hasCatalogPickerNarrowingCriteria({
-                structuredFilterCount: locationFilters.structuredFilterCount,
-                searchQuery,
-              }),
             })}
             onClick={() => {
               locationFilters.reset()

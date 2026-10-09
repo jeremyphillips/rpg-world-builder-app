@@ -411,7 +411,7 @@ The reset row stays reserved whenever a utility band renders, including bands th
 
 Dependent fields render at the end of their content group and only while their parent value is selected. `sanitizeState` drops them when the parent changes. A boolean that leaves not-applicable rows visible is labeled "Hide X".
 
-A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. When search, a structured filter, or a non-default tab narrows the list, the reset row shows `visible of total` in a polite live region. `total` is the eligible list for the current mode before that narrowing. `visible` is the count after tab, structured filters, and search. Sort does not change the count. The summary reserves `total of total` so the row width stays stable. A sort-only change shows Reset with no count. When narrowing still matches every row, the summary is `total of total`.
+A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. The reset row always shows the visible count as `N results` in a polite live region. `visible` is the count after tab, structured filters, and search. Sort does not change the count. Reset is separate toolbar chrome: it appears for narrowing criteria or a non-default sort, and a sort-only change still shows the full eligible count. `FilterToolbarLabelSizer` reserves every count from `0` through the eligible total so glyph width cannot change the row.
 
 Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 
@@ -538,7 +538,7 @@ Stacked selects always wire `label htmlFor` ↔ control `id`, including when `wi
       onResetAdditionalFilters={resetAdvanced}
     />
   }
-  resultSummary={<OverviewResultSummary resultCount={filteredRows.length} />}
+  resultSummary={<ResultSummary visibleCount={filteredRows.length} />}
   leadingActions={...}
   trailingActions={...}
 >
@@ -546,7 +546,8 @@ Stacked selects always wire `label htmlFor` ↔ control `id`, including when `wi
 </OverviewTableFrame>
 ```
 
-- Hidden-unavailable counts and Show/Hide actions live in `OverviewResultSummary.supplementalContent` (content overviews).
+- The result count is `ResultSummary`: always `N results` for the rows currently shown.
+- A visibility supplement is optional and domain-owned. Content overviews pass `resolveAvailabilitySummarySupplement`, which reads the unavailable count from rows matching the current search and other structured filters before the availability gate. Callers do not branch on mode. The line is `14 results · 1 unavailable · Show` while those rows are hidden, `15 results · 1 unavailable · Hide` while they are included, and `N results` when the count is zero or the mode is unavailable.
 - DataTable receives only filtered rows.
 - Advanced panel badge = `countModifiedFilters` (optionally scoped by `placement`).
 

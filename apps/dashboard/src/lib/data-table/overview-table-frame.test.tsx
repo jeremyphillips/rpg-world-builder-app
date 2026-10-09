@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
 
 import { OverviewTableFrame } from './overview-table-frame'
-import { OverviewResultSummary } from './overview-result-summary'
+import { ResultSummary } from './overview-result-summary'
 import type { ColumnDef } from '@rpg/ui'
 
 type Row = {
@@ -50,7 +50,7 @@ describe('OverviewTableFrame', () => {
       <OverviewTableFrame
         columns={COLUMNS}
         data={ROWS}
-        resultSummary={<OverviewResultSummary resultCount={2} />}
+        resultSummary={<ResultSummary visibleCount={2} />}
         trailingActions={(controls) => (
           <controls.ColumnVisibilityTrigger aria-label="Choose visible columns" showLabel />
         )}

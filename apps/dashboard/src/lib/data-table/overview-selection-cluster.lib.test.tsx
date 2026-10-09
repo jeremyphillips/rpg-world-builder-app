@@ -1,7 +1,6 @@
 /**
  * @vitest-environment jsdom
  */
-import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -40,14 +39,5 @@ describe('overview selection cluster helpers', () => {
     expect(shouldShowPageSelectionAction(0, false)).toBe(false)
     expect(shouldShowPageSelectionAction(3, false)).toBe(true)
     expect(shouldShowPageSelectionAction(0, true)).toBe(true)
-  })
-})
-
-describe('OverviewResultSummary', () => {
-  it('renders a polite result count', async () => {
-    const { OverviewResultSummary } = await import('./overview-result-summary')
-    const { container } = render(<OverviewResultSummary resultCount={10} />)
-    expect(screen.getByText('10 results')).toHaveAttribute('aria-live', 'polite')
-    expect(container.firstChild).toHaveClass('text-xs')
   })
 })

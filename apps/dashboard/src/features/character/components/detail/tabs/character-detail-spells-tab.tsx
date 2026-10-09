@@ -28,7 +28,6 @@ import {
   type CharacterSheetSpellCard,
 } from '../../../lib/detail/character-sheet-catalog'
 import {
-  hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
 } from '../../picker/catalog-picker-filter-state.lib'
@@ -160,21 +159,15 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
           ) : undefined
         }
         actions={
-          showResetView ? (
-            <CatalogToolbarResetSlot
-              visible
-              includesSort={false}
-              {...resolveCatalogPickerResultSummary({
-                visible: visibleCards.length,
-                total: cards.length,
-                narrowing: hasCatalogPickerNarrowingCriteria({
-                  structuredFilterCount,
-                  searchQuery,
-                }),
-              })}
-              onClick={handleResetView}
-            />
-          ) : undefined
+          <CatalogToolbarResetSlot
+            visible={showResetView}
+            includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleCards.length,
+              total: cards.length,
+            })}
+            onClick={handleResetView}
+          />
         }
       />
       <CatalogCollapsibleList

@@ -1,3 +1,5 @@
+import { resultCountSizerLabels } from '@/lib/data-table/format-result-count.lib'
+
 /** Total clearable criteria — structured filters + non-empty search. */
 export function countCatalogPickerClearableCriteria(args: {
   structuredFilterCount: number
@@ -45,18 +47,12 @@ export function hasCatalogPickerResetViewCriteria(args: {
   )
 }
 
-export function formatCatalogPickerResultSummary(visible: number, total: number): string {
-  return `${visible} of ${total}`
-}
-
-export function resolveCatalogPickerResultSummary(args: {
-  visible: number
-  total: number
-  narrowing: boolean
-}): { summary?: string; summaryReserveLabel?: string } {
-  if (!args.narrowing) return {}
+export function resolveCatalogPickerResultSummary(args: { visible: number; total: number }): {
+  summaryVisibleCount: number
+  summaryReserveLabels: readonly string[]
+} {
   return {
-    summary: formatCatalogPickerResultSummary(args.visible, args.total),
-    summaryReserveLabel: formatCatalogPickerResultSummary(args.total, args.total),
+    summaryVisibleCount: args.visible,
+    summaryReserveLabels: resultCountSizerLabels(args.total),
   }
 }
