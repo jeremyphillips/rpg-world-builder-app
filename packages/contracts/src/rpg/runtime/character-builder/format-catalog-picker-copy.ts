@@ -1,4 +1,5 @@
-import { getContentTypeTerm, type ContentTypeKey } from '../../content/lib/content-type-terms'
+import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
+import { getContentTypeTerm } from '../../content/lib/content-type-terms'
 import { getTermSentenceForm, type VocabularyTerm } from '../../vocab/types'
 
 /** Noun forms shared by catalog picker chrome templates. */

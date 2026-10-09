@@ -4,7 +4,7 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button, Text, resolvePickerActionFailureStatus } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -150,8 +150,13 @@ export function OrganizationPickerDrawer({
         await onAdd(membership)
         resetMembershipConfig()
         onOpenChange(false)
-      } catch {
+      } catch (error) {
         setFailedOrganizationId(organization.id)
+        setSubmitError(
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : resolvePickerActionFailureStatus(ORGANIZATION_ROW_LABEL),
+        )
         setPending(false)
       }
     },

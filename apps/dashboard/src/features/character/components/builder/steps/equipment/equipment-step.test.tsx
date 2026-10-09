@@ -38,7 +38,10 @@ import {
   EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE_SHORT,
   EQUIPMENT_INVENTORY_AWAITING_OPTION_MESSAGE,
 } from '../../../../lib/equipment/equipment-step.lib'
-import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL,
+} from '../../../equipment/picker/drawer/equipment-picker-drawer.types'
 import { EquipmentStep } from './equipment-step'
 
 const context = createStandaloneBuilderContextFixture({
@@ -336,7 +339,10 @@ describe('EquipmentStep', () => {
     expect(within(breastplateRow).queryByText(/400 GP needed/)).not.toBeInTheDocument()
     expect(within(breastplateRow).getByRole('button', { name: 'Add' })).toBeDisabled()
 
-    await user.hover(within(breastplateRow).getByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL))
+    const unaffordableBadge =
+      within(breastplateRow).queryByText(EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL) ??
+      within(breastplateRow).getByText(EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL)
+    await user.hover(unaffordableBadge)
     expect(await screen.findByRole('tooltip')).toHaveTextContent('400 GP needed')
     expect(screen.getByRole('tooltip')).toHaveTextContent('90 GP remaining')
   })

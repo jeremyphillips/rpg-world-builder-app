@@ -224,8 +224,9 @@ function naivePlural(lowered: string): string {
 
 /** Mechanical leftovers of a title. Curated sentence forms and compact labels are omitted. */
 function mechanicalTitleDerivatives(term: Pick<VocabularyTerm, 'label' | 'sentence'>): string[] {
-  const singular = getTermSentenceForm(term, 1)
-  const plural = getTermSentenceForm(term, 2)
+  const entry = { description: '', ...term }
+  const singular = getTermSentenceForm(entry, 1)
+  const plural = getTermSentenceForm(entry, 2)
   const lowered = term.label.toLowerCase()
   const candidates = [lowered, naivePlural(lowered)]
   return [...new Set(candidates)].filter(

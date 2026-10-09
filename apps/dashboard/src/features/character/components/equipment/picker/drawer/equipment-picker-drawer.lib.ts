@@ -418,6 +418,7 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
     return {
       control: { kind: 'none' },
       provenance: [],
+      selectionState: null,
     }
   }
 
