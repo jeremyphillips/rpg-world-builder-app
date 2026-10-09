@@ -240,6 +240,8 @@ The session is a host-only `httpOnly` cookie plus a readable CSRF token
 gates itself via `GET /api/auth/me`. Don't read the session cookie in client code
 or duplicate auth flows into the dashboard.
 
+For local browser verification, use the dev proxy, root `.env.local` (`DEV_AGENT_*`), and [docs/agent-browser.md](docs/agent-browser.md).
+
 ## Secrets / RSC boundary
 
 No secrets in client bundles. Respect the Next.js server/client boundary —
