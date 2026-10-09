@@ -70,14 +70,10 @@ export const EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER = [
   'armorFilters',
 ] as const satisfies readonly (keyof EquipmentPickerFilterState)[]
 
-/** @deprecated Use `resolveEquipmentPickerFilterLayout` for schema-aware layout slots. */
-export const EQUIPMENT_PICKER_FILTER_LAYOUT = {
-  primaryFieldIds: [...EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER],
-  filterRowFieldIds: [...EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER],
-} as const satisfies FilterCatalogLayoutConfig<EquipmentPickerFilterState>
-
-export function resolveEquipmentPickerFilterLayout(
-  schema: FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState>,
+export function resolveEquipmentPickerFilterLayout<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(
+  schema: FilterSchema<TItem, EquipmentPickerFilterState>,
 ): FilterCatalogLayoutConfig<EquipmentPickerFilterState> {
   const schemaFieldIds = new Set(schema.fields.map((field) => field.id))
 
@@ -100,8 +96,6 @@ export type CreateEquipmentPickerFilterSchemaArgs = {
   showAffordableFilter: boolean
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
   matchesMagicItemAllowance?: (row: EquipmentPickerItem, allowanceId: string) => boolean
-  filterOutUnaffordable: boolean
-  searchQuery: string
   budget?: EquipmentBudgetSummary
 }
 

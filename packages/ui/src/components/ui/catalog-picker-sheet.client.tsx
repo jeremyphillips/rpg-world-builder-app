@@ -22,6 +22,7 @@ import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 
 export type {
   CatalogPickerSheetProps,
+  CatalogPickerSearchStrategy,
   CatalogPickerSheetActionsHelpers,
   CatalogPickerTab,
   CatalogPickerRowLayout,

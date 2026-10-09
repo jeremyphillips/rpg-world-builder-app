@@ -3,7 +3,6 @@ import {
   formatCatalogPickerCopy,
   type CharacterOrganizationConnection,
   type Organization,
-  type OrganizationDomain,
 } from '@rpg/contracts'
 
 const organizationNoun = catalogNounFromContentType('organizations')
@@ -12,13 +11,8 @@ export const ORGANIZATION_PICKER_COPY = formatCatalogPickerCopy(organizationNoun
   noResultsMessage: `No ${organizationNoun.plural} match this view.`,
 })
 
-export const ORGANIZATION_PICKER_ALL_DOMAINS = 'all'
 export const ORGANIZATION_PICKER_NO_RESULTS_MESSAGE = ORGANIZATION_PICKER_COPY.noResultsMessage
 export const ORGANIZATION_PICKER_NO_ITEMS_MESSAGE = ORGANIZATION_PICKER_COPY.noItemsMessage
-
-export type OrganizationPickerDomainFilter =
-  | typeof ORGANIZATION_PICKER_ALL_DOMAINS
-  | OrganizationDomain
 
 export type OrganizationPickerItem = {
   organization: Organization

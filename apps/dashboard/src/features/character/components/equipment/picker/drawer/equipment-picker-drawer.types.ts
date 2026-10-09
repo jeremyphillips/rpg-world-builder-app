@@ -102,8 +102,6 @@ export type EquipmentPickerDrawerProps = {
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
   allowedKinds?: readonly EquipmentPickerSupportedKind[]
-  /** Hides rows whose cost exceeds the starting (package) budget. */
-  filterOutUnaffordable?: boolean
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
   /** Per-item ownership contributions — the only source the header reads. */

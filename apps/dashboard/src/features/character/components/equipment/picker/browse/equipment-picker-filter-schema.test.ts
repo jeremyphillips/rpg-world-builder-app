@@ -36,8 +36,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: true,
       showRarityFilter: false,
       showAffordableFilter: true,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     const state: EquipmentPickerFilterState = {
@@ -59,8 +57,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: true,
       showAffordableFilter: false,
       magicItemGrantProgress,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     const state: EquipmentPickerFilterState = {
@@ -84,8 +80,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: true,
       showRarityFilter: false,
       showAffordableFilter: false,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     const kindField = schema.fields.find((field) => field.id === 'selectedKind')
@@ -100,8 +94,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: true,
       showRarityFilter: false,
       showAffordableFilter: true,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(resolveEquipmentPickerFilterLayout(categorySchema)).toEqual({
@@ -117,8 +109,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: true,
       showAffordableFilter: false,
       magicItemGrantProgress,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(resolveEquipmentPickerFilterLayout(raritySchema)).toEqual({
@@ -133,8 +123,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: false,
       showRarityFilter: false,
       showAffordableFilter: false,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(resolveEquipmentPickerFilterLayout(emptySchema)).toEqual({
@@ -154,8 +142,6 @@ describe('equipment-picker-filter-schema', () => {
       magicItemGrantProgress,
       matchesMagicItemAllowance: (row, allowanceId) =>
         row.equipment.kind === 'magic_item' && allowanceId === row.equipment.rarity,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
     const rows = [
       { equipment: { kind: 'magic_item', rarity: 'common' } },
@@ -185,8 +171,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: false,
       showRarityFilter: false,
       showAffordableFilter: false,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(
@@ -218,8 +202,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: true,
       showRarityFilter: false,
       showAffordableFilter: false,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(
@@ -251,8 +233,6 @@ describe('equipment-picker-filter-schema', () => {
       showCategoryFilter: true,
       showRarityFilter: false,
       showAffordableFilter: false,
-      filterOutUnaffordable: false,
-      searchQuery: '',
     })
 
     expect(

@@ -415,6 +415,11 @@ so step-specific copy stays co-located with types.
 ## Browse state lifecycle
 
 Search for equipment/proficiency/org is **sheet-owned** (`CatalogPickerSheet` `useState`).
+Location browse search scores `assembleLocationPickerSearchDocument`: name is primary,
+classification parts are keywords, ancestor names are secondary, and the combined field
+equals `buildLocationPickerSearchText`. Equipment reset uses
+`hasCatalogPickerResetViewCriteria` with the schema `structuredFilterCount`, including
+hide-non-proficient while kind is still All. Rows above the starting budget stay visible.
 Equipment does not pass `initialSearchQuery`. Spells copy search into the active mode
 bucket and restore via `initialSearchQuery` + `toolbarStateKey`.
 

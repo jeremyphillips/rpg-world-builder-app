@@ -4,10 +4,9 @@ import { makeOrganization } from '@/test/fixtures/factories/organization'
 
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 import {
-  buildOrganizationPickerDomainOptions,
-  filterAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
   getOrganizationPickerSearchText,
+  scoreAndSortOrganizationPickerItems,
 } from './organization-picker-drawer.lib'
 
 function legacyIncludes(text: string, query: string): boolean {
@@ -22,36 +21,16 @@ describe('organization picker library', () => {
       'Occupational',
     )
     expect(
-      filterAndSortOrganizationPickerItems(organizationPickerItems, {
+      scoreAndSortOrganizationPickerItems(organizationPickerItems, {
         searchQuery: 'government',
-        domain: 'all',
       }).map(({ organization }) => organization.name),
     ).toEqual(['City Council'])
   })
 
-  it('filters by domain and sorts by name', () => {
-    expect(
-      filterAndSortOrganizationPickerItems(organizationPickerItems, {
-        searchQuery: '',
-        domain: 'occupational',
-      }).map(({ organization }) => organization.name),
-    ).toEqual(['Lantern Guild'])
-  })
-
-  it('keeps the domain filter when a query is present', () => {
-    expect(
-      filterAndSortOrganizationPickerItems(organizationPickerItems, {
-        searchQuery: 'lantern',
-        domain: 'government',
-      }),
-    ).toEqual([])
-  })
-
   it('keeps empty-query order by name', () => {
     expect(
-      filterAndSortOrganizationPickerItems([...organizationPickerItems].reverse(), {
+      scoreAndSortOrganizationPickerItems([...organizationPickerItems].reverse(), {
         searchQuery: '   ',
-        domain: 'all',
       }).map(({ organization }) => organization.name),
     ).toEqual(['City Council', 'Lantern Guild', 'Silver Circle'])
   })
@@ -78,7 +57,7 @@ describe('organization picker library', () => {
       for (const query of queries) {
         if (!legacyIncludes(text, query)) continue
         expect(
-          filterAndSortOrganizationPickerItems(items, { searchQuery: query, domain: 'all' }).some(
+          scoreAndSortOrganizationPickerItems(items, { searchQuery: query }).some(
             (row) => row.organization.id === item.organization.id,
           ),
           `${item.organization.name} / ${JSON.stringify(query)}`,
@@ -97,24 +76,14 @@ describe('organization picker library', () => {
     const keywordHit = organizationPickerItems[1]!
 
     expect(
-      filterAndSortOrganizationPickerItems(
+      scoreAndSortOrganizationPickerItems(
         [keywordHit, { organization: nameHit, selected: false }],
-        { searchQuery: 'government', domain: 'all' },
+        { searchQuery: 'government' },
       ).map(({ organization }) => organization.name),
     ).toEqual(['Government Hall', 'City Council'])
   })
 
-  it('builds only available domain options and formats the singular description', () => {
-    expect(
-      buildOrganizationPickerDomainOptions(
-        organizationPickerItems.map(({ organization }) => organization),
-      ),
-    ).toEqual([
-      { value: 'all', label: 'All domains' },
-      { value: 'government', label: 'Government' },
-      { value: 'occupational', label: 'Occupational' },
-      { value: 'academic', label: 'Academic' },
-    ])
+  it('formats the singular description', () => {
     expect(formatOrganizationPickerDescription()).toBe(
       'Choose an organization connected to this character.',
     )
@@ -145,12 +114,12 @@ describe('organization picker library', () => {
     }))
 
     expect(
-      filterAndSortOrganizationPickerItems(items, { searchQuery: '', domain: 'all' }).map(
+      scoreAndSortOrganizationPickerItems(items, { searchQuery: '' }).map(
         ({ organization }) => organization.id,
       ),
     ).toEqual(['organization-a', 'organization-b', 'organization-z'])
     expect(
-      filterAndSortOrganizationPickerItems(items, { searchQuery: 'amber', domain: 'all' }).map(
+      scoreAndSortOrganizationPickerItems(items, { searchQuery: 'amber' }).map(
         ({ organization }) => organization.id,
       ),
     ).toEqual(['organization-a', 'organization-b'])

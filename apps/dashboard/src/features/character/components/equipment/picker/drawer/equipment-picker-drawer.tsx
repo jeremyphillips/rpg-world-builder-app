@@ -7,10 +7,12 @@ import { CatalogEntityPickerSheet } from '@/features/content'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
-import { resolveCatalogPickerResultSummary } from '../../../picker/catalog-picker-filter-state.lib'
 import {
-  getEquipmentPickerSearchText,
-  hasEquipmentPickerResetViewCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../../picker/catalog-picker-filter-state.lib'
+import {
+  EQUIPMENT_PICKER_VIEW_DEFAULTS,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
 } from './equipment-picker-drawer.lib'
 import {
@@ -51,33 +53,25 @@ const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
 function EquipmentPickerToolbarActions({
-  selectedKind,
-  showAffordableOnly,
   sortMode,
+  structuredFilterCount,
   searchQuery,
-  focusedAllowanceId,
-  workflowMode,
   visibleItemCount,
   eligibleItemCount,
   onResetView,
 }: {
-  selectedKind: ReturnType<typeof useEquipmentPickerController>['selectedKind']
-  showAffordableOnly: boolean
   sortMode: ReturnType<typeof useEquipmentPickerController>['sortMode']
+  structuredFilterCount: number
   searchQuery: string
-  focusedAllowanceId?: string
-  workflowMode: EquipmentPickerWorkflowMode
   visibleItemCount: number
   eligibleItemCount: number
   onResetView: () => void
 }) {
-  const showResetView = hasEquipmentPickerResetViewCriteria({
-    selectedKind,
-    showAffordableOnly,
-    focusedAllowanceId,
-    workflowMode,
+  const showResetView = hasCatalogPickerResetViewCriteria({
+    structuredFilterCount,
     searchQuery,
     sortMode,
+    defaultSortMode: EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   })
 
   return (
@@ -101,7 +95,6 @@ export function EquipmentPickerDrawer({
   browseSortContext,
   budget,
   allowedKinds,
-  filterOutUnaffordable = false,
   showCharacterPreview = false,
   characterPreviewContext,
   ownership,
@@ -125,7 +118,6 @@ export function EquipmentPickerDrawer({
     browseSortContext,
     budget,
     allowedKinds,
-    filterOutUnaffordable,
     workflowMode,
     magicItemGrantProgress,
     focusedAllowanceId,
@@ -188,7 +180,6 @@ export function EquipmentPickerDrawer({
       items={picker.filteredItems}
       getItemKey={(item) => item.equipment.id}
       getItemToolbarLabel={(item) => item.equipment.name}
-      getSearchText={(item) => getEquipmentPickerSearchText(item)}
       hasStructuredFilters={picker.structuredFilterCount > 0}
       headerExtra={
         workflowSegment || resourceSummary ? (
@@ -201,8 +192,10 @@ export function EquipmentPickerDrawer({
       transformVisibleItems={picker.transformVisibleItems}
       primaryControls={
         <EquipmentPickerPrimaryFilterControls
-          schemaArgs={picker.schemaArgs}
+          schema={picker.filterSchema}
+          layout={picker.filterLayout}
           filterState={picker.filterState}
+          items={picker.schemaArgs.items}
           onFilterStateChange={picker.handleFilterStateChange}
         />
       }
@@ -214,12 +207,9 @@ export function EquipmentPickerDrawer({
 
         return (
           <EquipmentPickerToolbarActions
-            selectedKind={picker.selectedKind}
-            showAffordableOnly={picker.showAffordableOnly}
             sortMode={picker.sortMode}
+            structuredFilterCount={picker.structuredFilterCount}
             searchQuery={searchQuery}
-            focusedAllowanceId={focusedAllowanceId}
-            workflowMode={workflowMode}
             visibleItemCount={visibleItemCount}
             eligibleItemCount={picker.eligibleItemCount}
             onResetView={handleResetView}
@@ -227,10 +217,12 @@ export function EquipmentPickerDrawer({
         )
       }}
       filterRow={{
-        controls: ({ searchQuery }) => (
+        controls: (
           <EquipmentPickerFilterRowControls
-            schemaArgs={{ ...picker.schemaArgs, searchQuery }}
+            schema={picker.filterSchema}
+            layout={picker.filterLayout}
             filterState={picker.filterState}
+            items={picker.schemaArgs.items}
             onFilterStateChange={picker.handleFilterStateChange}
           />
         ),

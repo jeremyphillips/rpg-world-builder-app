@@ -15,12 +15,10 @@ import {
   pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
-  countEquipmentPickerStructuredFilters,
   filterAndSortEquipmentPickerItems,
-  filterEquipmentPickerItems,
+  filterEligibleEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
   getEquipmentUnaffordableAmounts,
-  hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
@@ -28,7 +26,6 @@ import {
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
-  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
@@ -87,7 +84,7 @@ describe('equipment-picker-drawer.lib', () => {
     expect(compatibleRope.state.isRecommended).toBe(false)
   })
 
-  it('filters starting-unaffordable and non-proficient rows', () => {
+  it('keeps rows above the starting-budget ceiling eligible', () => {
     const startingUnaffordable: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
@@ -104,16 +101,13 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    const filtered = filterEquipmentPickerItems(
-      [equipmentPickerItemsFixture[0]!, startingUnaffordable, equipmentPickerItemsFixture[2]!],
-      {
-        filterOutUnaffordable: true,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        budget: equipmentPickerBudgetFixture,
-      },
-    )
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+    expect(
+      filterEligibleEquipmentPickerItems([
+        equipmentPickerItemsFixture[0]!,
+        startingUnaffordable,
+        equipmentPickerItemsFixture[2]!,
+      ]).map((item) => item.equipment.name),
+    ).toEqual(['Longsword', 'Plate Armor', 'Rope'])
   })
 
   it('keeps disabled add on unaffordable purchase fallbacks', () => {
@@ -155,13 +149,7 @@ describe('equipment-picker-drawer.lib', () => {
   it('keeps remaining-unaffordable rows visible but disables purchase', () => {
     const chainMail = equipmentPickerItemsFixture[1]!
 
-    expect(
-      filterEquipmentPickerItems([chainMail], {
-        filterOutUnaffordable: true,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([chainMail])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
     expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
       '75 GP needed · 40 GP remaining',
@@ -185,22 +173,8 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    expect(
-      filterEquipmentPickerItems([startingUnaffordable], {
-        filterOutUnaffordable: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-      }),
-    ).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([startingUnaffordable])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(startingUnaffordable)).toBe(true)
-  })
-
-  it('filters rows by selected kind', () => {
-    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
-      filterOutUnaffordable: false,
-      selectedKind: 'weapon',
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword'])
   })
 
   it('formats unaffordable copy for disabled notes', () => {
@@ -269,15 +243,14 @@ describe('equipment-picker-drawer.lib', () => {
       'adventuring_gear',
     ])
 
-    const filtered = filterEquipmentPickerItems(items, {
-      filterOutUnaffordable: false,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])
+    expect(filterEligibleEquipmentPickerItems(items).map((item) => item.equipment.name)).toEqual([
+      'Longsword',
+      'Chain Mail',
+      'Rope',
+    ])
   })
 
-  it('keeps unpriced rows visible when filterOutUnaffordable is enabled', () => {
+  it('keeps unpriced magic items eligible', () => {
     const unpricedMagicItem: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[0]!,
       equipment: {
@@ -297,66 +270,8 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    const filtered = filterEquipmentPickerItems([unpricedMagicItem], {
-      filterOutUnaffordable: true,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-    })
-
-    expect(filtered).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([unpricedMagicItem])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(unpricedMagicItem)).toBe(true)
-  })
-
-  it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {
-    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
-      filterOutUnaffordable: false,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-      showAffordableOnly: true,
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
-  })
-
-  it('counts structured filters', () => {
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-      }),
-    ).toBe(0)
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-      }),
-    ).toBe(2)
-  })
-
-  it('counts magic-item rarity focus as a structured filter in magic-items workflow', () => {
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        workflowMode: 'magic_items',
-      }),
-    ).toBe(0)
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        workflowMode: 'magic_items',
-        focusedAllowanceId: 'startingWealthTier:hero:common',
-      }),
-    ).toBe(1)
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
-        focusedAllowanceId: 'startingWealthTier:hero:common',
-      }),
-    ).toBe(true)
   })
 
   it('returns domain amounts for remaining-budget failures', () => {
@@ -702,24 +617,5 @@ describe('equipment-picker-drawer.lib', () => {
       sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
     })
     expect(priceSorted.map((item) => item.equipment.name)).toEqual(['Longsword'])
-  })
-
-  it('detects reset-view criteria including sort drift', () => {
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
-      }),
-    ).toBe(true)
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-      }),
-    ).toBe(false)
   })
 })

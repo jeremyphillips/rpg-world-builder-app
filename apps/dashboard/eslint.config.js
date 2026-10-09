@@ -143,6 +143,28 @@ const dashboardSemanticStyleLayerGuards = {
   },
 }
 
+const dashboardPickerActionRowGuard = {
+  files: ['src/**/*drawer*.{ts,tsx}', 'src/**/*picker*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "JSXAttribute[name.name='className'][value.type='Literal'][value.value='flex justify-end']",
+        message:
+          'Ownership guard for copied picker action rows, not a general layout ban. Use dialogPanelActionRowClasses or the sheet/drawer footer slot.',
+      },
+      {
+        selector:
+          "JSXAttribute[name.name='className'][value.type='Literal'][value.value='flex justify-end gap-2']",
+        message:
+          'Ownership guard for copied picker action rows, not a general layout ban. Use dialogPanelActionRowClasses or the sheet/drawer footer slot.',
+      },
+    ],
+  },
+}
+
 const dashboardEntityCatalogPickerImportGuard = {
   files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
   ignores: [
@@ -422,6 +444,7 @@ export default [
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,
   dashboardEntityCatalogPickerImportGuard,
+  dashboardPickerActionRowGuard,
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,

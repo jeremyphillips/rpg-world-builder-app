@@ -103,7 +103,6 @@ export function ProficiencyPickerDrawer({
       items={items}
       getItemKey={(item) => item.optionId}
       getItemToolbarLabel={(item) => item.label}
-      getSearchText={(item) => item.label}
       searchPlaceholder={formatProficiencyPickerSearchPlaceholder(choiceSet)}
       noResultsMessage={PROFICIENCY_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE}

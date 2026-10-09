@@ -4,7 +4,7 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button, dialogPanelActionRowClasses, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
@@ -27,10 +27,7 @@ import {
   useRelationshipCatalogFilters,
 } from '@/features/content'
 
-import {
-  buildConnectedPartyCharacterEntitySummary,
-  buildConnectedPartyCharacterPickerSearchText,
-} from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
+import { buildConnectedPartyCharacterEntitySummary } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
@@ -313,7 +310,6 @@ export function OrganizationMemberPickerDrawer({
       }}
       getItemKey={(candidate) => candidate.id}
       getItemToolbarLabel={(candidate) => candidate.name}
-      getSearchText={buildConnectedPartyCharacterPickerSearchText}
       searchPlaceholder={ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
@@ -361,7 +357,7 @@ export function OrganizationMemberPickerDrawer({
                 {submitError}
               </Text>
             ) : null}
-            <div className="flex justify-end">
+            <div className={dialogPanelActionRowClasses}>
               <Button
                 type="button"
                 disabled={pending}

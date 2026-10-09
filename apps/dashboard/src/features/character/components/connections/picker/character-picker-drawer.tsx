@@ -1,7 +1,5 @@
 import * as React from 'react'
 
-import { Button } from '@rpg/ui'
-
 import {
   CatalogEntityPickerSheet,
   CatalogEntitySurfaceRow,
@@ -40,6 +38,9 @@ export function CharacterPickerDrawer({
   resolveClassLabel = formatContentReferenceLabel,
   onSelect,
   closeOnSelect = true,
+  rowActionLabel = 'Choose',
+  bodyReplacement,
+  footer,
 }: CharacterPickerDrawerProps) {
   const [pendingId, setPendingId] = React.useState<string | null>(null)
   const [failedId, setFailedId] = React.useState<string | null>(null)
@@ -192,7 +193,7 @@ export function CharacterPickerDrawer({
                 selected || disabled
                   ? undefined
                   : {
-                      label: 'Add',
+                      label: rowActionLabel,
                       pendingLabel: CHARACTER_PICKER_PENDING_LABEL,
                       entityKey: character.id,
                       failed: failedId === character.id,
@@ -205,23 +206,8 @@ export function CharacterPickerDrawer({
           />
         )
       }}
-      renderItemDetails={({ character, selected, disabled }) => {
-        if (selected || disabled) return null
-
-        return (
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              disabled={pendingId === character.id}
-              onClick={() => {
-                void commitSelection(character.id)
-              }}
-            >
-              Continue
-            </Button>
-          </div>
-        )
-      }}
+      bodyReplacement={bodyReplacement}
+      footer={footer}
     />
   )
 }

@@ -1,7 +1,6 @@
 import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
-  fitsStartingEquipmentBudget,
   formatInlineWealth,
   formatMoney,
   isEquipmentPickerSupportedKind,
@@ -31,7 +30,6 @@ import {
   compareName,
   scoreAndFilterPickerItems,
 } from '../../../picker/sort/catalog-picker-sort.lib'
-import { hasCatalogPickerResetViewCriteria } from '../../../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
@@ -48,7 +46,6 @@ import {
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
   type EquipmentPickerRow,
-  type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
   type EquipmentPickerViewDefaults,
 } from './equipment-picker-drawer.types'
@@ -97,39 +94,6 @@ export function formatEquipmentUnaffordableReason(
   const need = formatMoney(amounts.required)
   const have = formatInlineWealth(amounts.remaining)
   return joinInlineMetadata([`${need} needed`, `${have} remaining`])
-}
-
-/** Structured filters only — category, affordable toggle, or magic-item rarity. Excludes search. */
-export function countEquipmentPickerStructuredFilters(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): number {
-  if (args.workflowMode === 'magic_items') {
-    return args.focusedAllowanceId ? 1 : 0
-  }
-
-  let count = 0
-  if (args.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) count += 1
-  if (args.showAffordableOnly) count += 1
-  return count
-}
-
-export function hasEquipmentPickerResetViewCriteria(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  searchQuery: string
-  sortMode: EquipmentPickerSortMode
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): boolean {
-  return hasCatalogPickerResetViewCriteria({
-    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
-    searchQuery: args.searchQuery,
-    sortMode: args.sortMode,
-    defaultSortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-  })
 }
 
 function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
@@ -315,41 +279,11 @@ export {
   resolveEquipmentPickerAllowedKinds,
 } from '../../../../lib/equipment/equipment-kind-filter.lib'
 
-type EquipmentPickerStructuredFilterOptions = {
-  filterOutUnaffordable: boolean
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly?: boolean
-  /** Starting package purse. Required for `filterOutUnaffordable`; not a picker-row fact. */
-  budget?: EquipmentBudgetSummary
-}
-
-function exceedsStartingPackageBudget<T extends EquipmentPickerItem>(
-  item: T,
-  options: Pick<EquipmentPickerStructuredFilterOptions, 'filterOutUnaffordable' | 'budget'>,
-): boolean {
-  if (!options.filterOutUnaffordable || !options.budget) return false
-  if (!canPurchaseEquipment(item.equipment)) return false
-  return !fitsStartingEquipmentBudget(item.equipment, options.budget)
-}
-
-function equipmentPickerItemMatchesStructuredFilters<T extends EquipmentPickerItem>(
-  item: T,
-  options: EquipmentPickerStructuredFilterOptions,
-): boolean {
-  if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
-  if (exceedsStartingPackageBudget(item, options)) return false
-  if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
-  if (options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) {
-    return item.equipment.kind === options.selectedKind
-  }
-  return true
-}
-
-export function filterEquipmentPickerItems<T extends EquipmentPickerItem>(
+/** Drops kinds the equipment picker cannot browse. Budget and user filters stay elsewhere. */
+export function filterEligibleEquipmentPickerItems<T extends EquipmentPickerItem>(
   items: readonly T[],
-  options: EquipmentPickerStructuredFilterOptions,
 ): T[] {
-  return items.filter((item) => equipmentPickerItemMatchesStructuredFilters(item, options))
+  return items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind))
 }
 
 /** Best-match order from resolved equipment facts. */

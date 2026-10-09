@@ -10,7 +10,7 @@ beforeAll(() => {
   Element.prototype.scrollIntoView ??= () => undefined
 })
 
-import { CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME } from '../../picker/catalog-toolbar-reset-action'
+import { CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME } from '../../picker/catalog-toolbar-reset-action.lib'
 import { OrganizationPickerDrawer } from './organization-picker-drawer'
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 

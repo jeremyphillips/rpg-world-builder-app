@@ -244,6 +244,8 @@ export {
   buildLocationEntityCardModelFromClassification,
   buildLocationPickerSearchText,
 } from './locations/lib/location-display'
+export { assembleLocationPickerSearchDocument } from './locations/lib/location-picker-search.lib'
+export { RelationshipDrawerSubjectField } from './lib/relationship/drawer/relationship-drawer-subject-field'
 export {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,

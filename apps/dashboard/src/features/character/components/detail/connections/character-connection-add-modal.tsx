@@ -4,6 +4,7 @@ import {
   resolveLocationClassificationDisplay,
   resolveOrganizationMembershipMetadata,
 } from '@rpg/contracts'
+import { scoreSearchDocument } from '@rpg/search'
 import { Button, Modal, SelectField, Text } from '@rpg/ui'
 
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
@@ -13,11 +14,16 @@ import {
   buildCharacterPickerOptionSearchText,
 } from '../../../lib/picker/character-picker-option.lib'
 import {
+  assembleLocationPickerSearchDocument,
   buildLocationContentDisplayImageInput,
   buildLocationEntityCardModelFromClassification,
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
+  createOrganizationRelationshipFilterSchema,
   getContentDisplayImage,
+  RelationshipCatalogFilterBand,
+  resolveOrganizationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
 } from '@/features/content'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
@@ -32,8 +38,8 @@ import type { ConnectionSheetData } from '../../../lib/relationship/connection-s
 import type { ConnectionTopLevelSectionId } from '../../../lib/relationship/connection-section-catalog'
 import { buildLocationConnectionPickerEntries } from '../../../lib/connections/location-connection-picker-items.lib'
 import {
-  filterAndSortOrganizationPickerItems,
-  getOrganizationPickerSearchText,
+  scoreAndSortOrganizationPickerItems,
+  scoreOrganizationPickerItem,
 } from '../../connections/picker/organization-picker-drawer.lib'
 import {
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
@@ -205,6 +211,57 @@ export function CharacterConnectionAddModal({
     sheetData.organizationsById,
   ])
 
+  const organizationRows = React.useMemo(
+    () =>
+      sheetData.availableOrganizations.map((organization) => ({
+        organization,
+        selected: existingProjectionKinds.has(organization.id),
+      })),
+    [existingProjectionKinds, sheetData.availableOrganizations],
+  )
+  const organizationFilterSchema = React.useMemo(
+    () =>
+      createOrganizationRelationshipFilterSchema({
+        rows: organizationRows,
+        getDomain: (row) => row.organization.organizationDomain,
+      }),
+    [organizationRows],
+  )
+  const organizationFilterLayout = React.useMemo(
+    () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
+    [organizationFilterSchema],
+  )
+  const organizationFilters = useRelationshipCatalogFilters({
+    rows: organizationRows,
+    schema: organizationFilterSchema,
+  })
+  const locationSearchContext = React.useMemo(
+    () => ({
+      locationsById: sheetData.locationsById,
+      campaignId: sheetData.campaignId,
+    }),
+    [sheetData.campaignId, sheetData.locationsById],
+  )
+  const scoreOrganizationRow = React.useCallback(
+    (entry: { item: string }, searchQuery: string) => {
+      const row = organizationRows.find((candidate) => candidate.organization.id === entry.item)
+      return row ? scoreOrganizationPickerItem(row, searchQuery) : 0
+    },
+    [organizationRows],
+  )
+  const scoreLocationRow = React.useCallback(
+    (entry: { item: string }, searchQuery: string) => {
+      const location = sheetData.locationsById.get(entry.item)
+      if (!location) return 0
+      return scoreSearchDocument(
+        assembleLocationPickerSearchDocument(location, locationSearchContext),
+        searchQuery,
+        { profile: 'forgiving' },
+      )
+    },
+    [locationSearchContext, sheetData.locationsById],
+  )
+
   const handleEntitySelect = (entityId: string) => {
     setSelectedEntityId(entityId)
     if (sectionId === 'organizations') {
@@ -253,16 +310,12 @@ export function CharacterConnectionAddModal({
                       }
                     })
                   : sectionId === 'organizations'
-                    ? filterAndSortOrganizationPickerItems(
-                        sheetData.availableOrganizations.map((organization) => ({
-                          organization,
-                          selected: existingProjectionKinds.has(organization.id),
-                        })),
-                        { searchQuery: '', domain: 'all' },
-                      ).map(({ organization, selected }) => ({
+                    ? scoreAndSortOrganizationPickerItems(organizationFilters.filteredRows, {
+                        searchQuery: '',
+                      }).map(({ organization, selected }) => ({
                         item: organization.id,
                         key: organization.id,
-                        searchText: getOrganizationPickerSearchText(organization),
+                        searchText: organization.name,
                         surface: {
                           identity: buildOrganizationEntityCardModel(
                             buildOrganizationEntitySummaryVm(organization),
@@ -354,6 +407,26 @@ export function CharacterConnectionAddModal({
                   : 'No items are available.'
               }
               onSelect={handleEntitySelect}
+              scoreItem={
+                sectionId === 'organizations'
+                  ? scoreOrganizationRow
+                  : sectionId === 'places' || sectionId === 'property'
+                    ? scoreLocationRow
+                    : undefined
+              }
+              filterControls={
+                sectionId === 'organizations' ? (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={organizationFilterSchema}
+                    layout={organizationFilterLayout}
+                    state={organizationFilters.state}
+                    data={organizationRows}
+                    idPrefix="character-connection-organization"
+                    onValueChange={organizationFilters.setValue}
+                  />
+                ) : undefined
+              }
             />
           ) : null}
 

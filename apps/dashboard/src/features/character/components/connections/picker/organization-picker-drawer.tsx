@@ -4,7 +4,12 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, Text, resolvePickerActionFailureStatus } from '@rpg/ui'
+import {
+  Button,
+  dialogPanelActionRowClasses,
+  resolvePickerActionFailureStatus,
+  Text,
+} from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -28,12 +33,10 @@ import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-acti
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
-  filterAndSortOrganizationPickerItems,
+  scoreAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
-  getOrganizationPickerSearchText,
 } from './organization-picker-drawer.lib'
 import {
-  ORGANIZATION_PICKER_ALL_DOMAINS,
   ORGANIZATION_PICKER_COPY,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
@@ -118,9 +121,8 @@ export function OrganizationPickerDrawer({
 
   const transformVisibleItems = React.useCallback(
     (visibleItems: readonly (typeof items)[number][], context: { searchQuery: string }) =>
-      filterAndSortOrganizationPickerItems(visibleItems, {
+      scoreAndSortOrganizationPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
-        domain: ORGANIZATION_PICKER_ALL_DOMAINS,
       }),
     [],
   )
@@ -172,7 +174,6 @@ export function OrganizationPickerDrawer({
       items={organizationFilters.filteredRows}
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
-      getSearchText={({ organization }) => getOrganizationPickerSearchText(organization)}
       searchPlaceholder={ORGANIZATION_PICKER_COPY.searchPlaceholder}
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
@@ -266,7 +267,7 @@ export function OrganizationPickerDrawer({
                 {submitError}
               </Text>
             ) : null}
-            <div className="flex justify-end">
+            <div className={dialogPanelActionRowClasses}>
               <Button
                 type="button"
                 disabled={pending}

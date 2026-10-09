@@ -180,7 +180,6 @@ export function SpellPickerDrawer({
       items={filteredItems}
       getItemKey={(item) => item.spell.id}
       getItemToolbarLabel={(item) => item.spell.name}
-      getSearchText={(item) => item.searchText}
       searchPlaceholder={SPELL_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={SPELL_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={SPELL_PICKER_NO_OPTIONS_MESSAGE}

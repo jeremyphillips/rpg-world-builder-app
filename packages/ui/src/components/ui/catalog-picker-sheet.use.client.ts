@@ -61,7 +61,7 @@ export function useCatalogPickerSheetState<TItem>({
     if (transformVisibleItems) {
       return transformVisibleItems(tabFilteredItems, { searchQuery })
     }
-    return rankPickerItems(tabFilteredItems, searchQuery, getSearchText)
+    return rankPickerItems(tabFilteredItems, searchQuery, getSearchText ?? (() => ''))
   }, [getSearchText, searchQuery, tabFilteredItems, transformVisibleItems])
 
   const hasSearchOrFilters = searchQuery.trim().length > 0 || Boolean(hasStructuredFilters)

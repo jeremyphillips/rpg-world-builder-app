@@ -1073,6 +1073,7 @@ export {
 export {
   CatalogPickerSheet,
   type CatalogPickerSheetProps,
+  type CatalogPickerSearchStrategy,
   type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
   type CatalogPickerRowLayout,

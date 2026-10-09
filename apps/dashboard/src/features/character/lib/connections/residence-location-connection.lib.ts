@@ -1,5 +1,4 @@
 import {
-  resolveLocationClassificationDisplay,
   resolveLocationConnectionEligibility,
   type CharacterLocationConnection,
   type Location,
@@ -39,9 +38,4 @@ export function createResidenceLocationConnection(locationId: string): Character
     locationId,
     kind: RESIDENCE_CONNECTION_KIND,
   }
-}
-
-export function getResidenceLocationSearchText(location: Location): string {
-  const classification = resolveLocationClassificationDisplay(location)
-  return `${location.name} ${classification.text}`.trim()
 }

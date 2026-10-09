@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  createEquipmentPickerFilterSchema,
+  resolveEquipmentPickerFilterLayout,
+} from './equipment-picker-filter-schema'
+import {
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   type EquipmentPickerRow,
 } from '../drawer/equipment-picker-drawer.types'
@@ -12,40 +16,40 @@ import {
 
 const items = [] as unknown as readonly EquipmentPickerRow[]
 
+function controlsProps(flags: {
+  showCategoryFilter: boolean
+  showRarityFilter: boolean
+  showAffordableFilter: boolean
+}) {
+  const schema = createEquipmentPickerFilterSchema<EquipmentPickerRow>({
+    workflowMode: 'purchase',
+    items,
+    kindOptions: ['weapon'],
+    ...flags,
+  })
+
+  return {
+    schema,
+    layout: resolveEquipmentPickerFilterLayout(schema),
+    filterState: {},
+    items,
+    onFilterStateChange: () => undefined,
+  }
+}
+
 describe('EquipmentPickerFilterControls', () => {
   it('does not warn when the schema has no filter fields', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    const props = controlsProps({
+      showCategoryFilter: false,
+      showRarityFilter: false,
+      showAffordableFilter: false,
+    })
 
     const { container } = render(
       <>
-        <EquipmentPickerPrimaryFilterControls
-          schemaArgs={{
-            workflowMode: 'purchase',
-            items,
-            kindOptions: ['weapon'],
-            showCategoryFilter: false,
-            showRarityFilter: false,
-            showAffordableFilter: false,
-            filterOutUnaffordable: false,
-            searchQuery: '',
-          }}
-          filterState={{}}
-          onFilterStateChange={() => undefined}
-        />
-        <EquipmentPickerFilterRowControls
-          schemaArgs={{
-            workflowMode: 'purchase',
-            items,
-            kindOptions: ['weapon'],
-            showCategoryFilter: false,
-            showRarityFilter: false,
-            showAffordableFilter: false,
-            filterOutUnaffordable: false,
-            searchQuery: '',
-          }}
-          filterState={{}}
-          onFilterStateChange={() => undefined}
-        />
+        <EquipmentPickerPrimaryFilterControls {...props} />
+        <EquipmentPickerFilterRowControls {...props} />
       </>,
     )
 
@@ -58,18 +62,11 @@ describe('EquipmentPickerFilterControls', () => {
   it('renders only the active schema fields for purchase filters', () => {
     render(
       <EquipmentPickerPrimaryFilterControls
-        schemaArgs={{
-          workflowMode: 'purchase',
-          items,
-          kindOptions: ['weapon'],
+        {...controlsProps({
           showCategoryFilter: true,
           showRarityFilter: false,
           showAffordableFilter: false,
-          filterOutUnaffordable: false,
-          searchQuery: '',
-        }}
-        filterState={{}}
-        onFilterStateChange={() => undefined}
+        })}
       />,
     )
 

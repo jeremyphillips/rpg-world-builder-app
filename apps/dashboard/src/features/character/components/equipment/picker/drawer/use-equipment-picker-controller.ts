@@ -1,17 +1,17 @@
 import * as React from 'react'
 
 import { applyFilterSchema, useSanitizedFilterState } from '@rpg/ui/filters'
-import { isEquipmentPickerSupportedKind } from '@rpg/contracts'
 
 import {
   filterAndSortEquipmentPickerItems,
-  filterEquipmentPickerItems,
+  filterEligibleEquipmentPickerItems,
   resolveEquipmentKindFilterOptions,
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
 } from './equipment-picker-drawer.lib'
 import {
   countEquipmentPickerStructuredFilters,
   createEquipmentPickerFilterSchema,
+  resolveEquipmentPickerFilterLayout,
   toEquipmentPickerFilterState,
 } from '../browse/equipment-picker-filter-schema'
 import {
@@ -37,7 +37,6 @@ export type UseEquipmentPickerControllerArgs = Pick<
   | 'browseSortContext'
   | 'budget'
   | 'allowedKinds'
-  | 'filterOutUnaffordable'
   | 'workflowMode'
   | 'magicItemGrantProgress'
   | 'focusedAllowanceId'
@@ -52,7 +51,6 @@ export function useEquipmentPickerController({
   browseSortContext,
   budget,
   allowedKinds,
-  filterOutUnaffordable = false,
   workflowMode = 'purchase',
   magicItemGrantProgress,
   focusedAllowanceId,
@@ -69,10 +67,7 @@ export function useEquipmentPickerController({
       )
     : EQUIPMENT_PICKER_SORT_MODES
 
-  const supportedItems = React.useMemo(
-    () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
-    [items],
-  )
+  const supportedItems = React.useMemo(() => filterEligibleEquipmentPickerItems(items), [items])
   const kindOptions = React.useMemo(
     () => resolveEquipmentKindFilterOptions(supportedItems, allowedKinds),
     [allowedKinds, supportedItems],
@@ -127,14 +122,11 @@ export function useEquipmentPickerController({
       showRarityFilter,
       showAffordableFilter,
       magicItemGrantProgress,
-      filterOutUnaffordable,
-      searchQuery: '',
       budget: effectiveBudget,
       matchesMagicItemAllowance,
     }),
     [
       effectiveBudget,
-      filterOutUnaffordable,
       kindOptions,
       magicItemGrantProgress,
       matchesMagicItemAllowance,
@@ -149,6 +141,11 @@ export function useEquipmentPickerController({
   const filterSchema = React.useMemo(
     () => createEquipmentPickerFilterSchema<EquipmentPickerRow>(schemaArgs),
     [schemaArgs],
+  )
+
+  const filterLayout = React.useMemo(
+    () => resolveEquipmentPickerFilterLayout(filterSchema),
+    [filterSchema],
   )
 
   const structuredFilterCount = countEquipmentPickerStructuredFilters(filterSchema, filterState)
@@ -177,16 +174,7 @@ export function useEquipmentPickerController({
     onStateChange: handleFilterStateChange,
   })
 
-  const eligibleItems = React.useMemo(
-    () =>
-      filterEquipmentPickerItems(supportedItems, {
-        filterOutUnaffordable,
-        selectedKind: EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
-        showAffordableOnly: false,
-        budget: effectiveBudget,
-      }),
-    [effectiveBudget, filterOutUnaffordable, supportedItems],
-  )
+  const eligibleItems = supportedItems
 
   const filteredItems = React.useMemo(
     () => applyFilterSchema(filterSchema, filterState, eligibleItems),
@@ -231,6 +219,7 @@ export function useEquipmentPickerController({
     schemaArgs,
     filterState,
     filterSchema,
+    filterLayout,
     structuredFilterCount,
     filteredItems,
     eligibleItemCount: eligibleItems.length,

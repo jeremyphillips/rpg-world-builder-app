@@ -9,6 +9,7 @@ import { EquipmentPickerDrawer } from './equipment-picker-drawer'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
+  equipmentResolvedFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
   equipmentPickerMagicItemAllowancesFixture,
@@ -18,7 +19,7 @@ import {
   equipmentPickerSkilledHirelingFixture,
   pickerState,
 } from './equipment-picker-drawer.fixtures'
-import { CATALOG_TOOLBAR_RESET_WITH_SORT_NAME } from '../../../picker/catalog-toolbar-reset-action'
+import { CATALOG_TOOLBAR_RESET_WITH_SORT_NAME } from '../../../picker/catalog-toolbar-reset-action.lib'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
@@ -79,7 +80,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[equipmentPickerItemsFixture[1]!]}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -174,40 +174,6 @@ describe('EquipmentPickerDrawer', () => {
     expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
   })
 
-  it('hides starting-unaffordable rows when filterOutUnaffordable is enabled', () => {
-    const plateArmor: EquipmentPickerRow = {
-      ...equipmentPickerItemsFixture[1]!,
-      equipment: {
-        ...equipmentPickerItemsFixture[1]!.equipment,
-        id: 'srd-cc-5.2.1:plate-armor',
-        slug: 'plate-armor',
-        name: 'Plate Armor',
-        cost: { amount: 1500, currency: 'gp' },
-      },
-      state: {
-        ...equipmentPickerItemsFixture[1]!.state,
-        isWithinRemainingBudget: false,
-        isProficient: true,
-      },
-    }
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={[plateArmor, equipmentPickerItemsFixture[2]!]}
-        budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable
-        onCommitAdd={vi.fn()}
-      />,
-    )
-
-    const list = screen.getByRole('list')
-
-    expect(within(list).queryByText('Plate Armor')).not.toBeInTheDocument()
-    expect(within(list).getByText('Rope')).toBeInTheDocument()
-  })
-
   it('renders the Affordable now filter control when a budget is present', () => {
     render(
       <EquipmentPickerDrawer
@@ -215,7 +181,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -231,7 +196,6 @@ describe('EquipmentPickerDrawer', () => {
         open
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -250,7 +214,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -274,7 +237,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -296,7 +258,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -335,7 +296,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -358,6 +318,38 @@ describe('EquipmentPickerDrawer', () => {
     expect(names).toEqual(['Cheap Gear', 'Mid Gear', 'Expensive Gear'])
   })
 
+  it('shows reset when hide non-proficient is on and kind is still all', async () => {
+    const user = userEvent.setup()
+
+    const items = equipmentPickerItemsFixture.map((item) => ({
+      ...item,
+      state: {
+        ...item.state,
+        resolved: equipmentResolvedFixture({
+          state: {
+            compatibility: { proficient: item.state.isProficient },
+          },
+        }),
+      },
+    }))
+
+    render(
+      <EquipmentPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={items}
+        budget={equipmentPickerBudgetFixture}
+        onCommitAdd={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: 'Hide non-proficient' }))
+
+    expect(
+      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
+    ).toBeInTheDocument()
+  })
+
   it('renders reset view when browse criteria drift from defaults', async () => {
     const user = userEvent.setup()
 
@@ -367,7 +359,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -409,7 +400,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -423,7 +413,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -434,7 +423,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -455,7 +443,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerDefaultPathItemsFixture}
         budget={equipmentPickerLowRemainingBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={onCommitAdd}
       />,
     )
@@ -615,7 +602,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={[...equipmentPickerItemsFixture, ...unsupportedItems]}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -729,7 +715,6 @@ describe('EquipmentPickerDrawer', () => {
         onOpenChange={vi.fn()}
         items={equipmentPickerItemsFixture}
         budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
         onCommitAdd={vi.fn()}
       />,
     )
@@ -749,7 +734,6 @@ describe('EquipmentPickerDrawer selection-row status line', () => {
           wizardGoldPathPickerItemsFixture['plate-armor'],
         ]}
         budget={builderPathGoldBudgetFixture}
-        filterOutUnaffordable={false}
         isGoldShoppingPath
         onCommitAdd={vi.fn()}
       />,

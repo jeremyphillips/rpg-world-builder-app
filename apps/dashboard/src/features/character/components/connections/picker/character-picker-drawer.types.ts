@@ -18,4 +18,8 @@ export type CharacterPickerDrawerProps = {
   onSelect: (characterId: string) => void | Promise<void>
   /** When false, the picker stays open until the parent closes it — for multi-step add flows. */
   closeOnSelect?: boolean
+  /** Browse-row verb. Confirm Add stays on the parent footer. */
+  rowActionLabel?: string
+  bodyReplacement?: React.ReactNode
+  footer?: React.ReactNode
 }

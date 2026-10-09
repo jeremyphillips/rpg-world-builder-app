@@ -239,7 +239,6 @@ describe('CatalogPickerSheet', () => {
         title="Catalog"
         items={items}
         getItemKey={(item) => item.id}
-        getSearchText={(item) => item.searchText}
         renderItemHeader={(item) => <span>{item.name}</span>}
         transformVisibleItems={(visibleItems) => [...visibleItems].reverse()}
       />,

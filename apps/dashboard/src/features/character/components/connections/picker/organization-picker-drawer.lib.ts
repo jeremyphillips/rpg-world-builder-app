@@ -1,9 +1,7 @@
 import {
   catalogNounFromContentType,
   listOrganizationClassificationDiscoveryTerms,
-  getOrganizationDomainLabel,
   getOrganizationClassificationDiscoveryText,
-  ORGANIZATION_DOMAIN_IDS,
   type Organization,
 } from '@rpg/contracts'
 import { scoreSearchDocument, type SearchDocument } from '@rpg/search'
@@ -15,21 +13,18 @@ import {
   chainComparators,
   scoreAndFilterPickerItems,
 } from '../../picker/sort/catalog-picker-sort.lib'
-import {
-  ORGANIZATION_PICKER_ALL_DOMAINS,
-  type OrganizationPickerItem,
-  type OrganizationPickerDomainFilter,
-} from './organization-picker-drawer.types'
-
-export const ORGANIZATION_PICKER_VIEW_DEFAULTS = {
-  domain: ORGANIZATION_PICKER_ALL_DOMAINS,
-} as const
+import { type OrganizationPickerItem } from './organization-picker-drawer.types'
 
 export function getOrganizationPickerSearchText(organization: Organization): string {
-  return `${organization.name} ${getOrganizationClassificationDiscoveryText(organization)}`
+  const combined = assembleOrganizationPickerSearchDocument(organization).fields.find(
+    (field) => field.key === 'combined',
+  )
+  return combined?.text ?? organization.name
 }
 
-function assembleOrganizationPickerSearchDocument(organization: Organization): SearchDocument {
+export function assembleOrganizationPickerSearchDocument(
+  organization: Organization,
+): SearchDocument {
   const terms = listOrganizationClassificationDiscoveryTerms(organization)
   return {
     id: organization.id,
@@ -42,14 +37,17 @@ function assembleOrganizationPickerSearchDocument(organization: Organization): S
       })),
       {
         key: 'combined',
-        text: getOrganizationPickerSearchText(organization),
+        text: `${organization.name} ${getOrganizationClassificationDiscoveryText(organization)}`,
         role: 'secondary' as const,
       },
     ],
   }
 }
 
-function scoreOrganizationPickerItem(item: OrganizationPickerItem, searchQuery: string): number {
+export function scoreOrganizationPickerItem(
+  item: OrganizationPickerItem,
+  searchQuery: string,
+): number {
   return scoreSearchDocument(
     assembleOrganizationPickerSearchDocument(item.organization),
     searchQuery,
@@ -59,25 +57,15 @@ function scoreOrganizationPickerItem(item: OrganizationPickerItem, searchQuery: 
   )
 }
 
-export function filterAndSortOrganizationPickerItems(
+/** Search-score, then name. Domain filtering belongs to the relationship filter schema. */
+export function scoreAndSortOrganizationPickerItems(
   items: readonly OrganizationPickerItem[],
   options: {
     searchQuery: string
-    domain: OrganizationPickerDomainFilter
   },
 ): OrganizationPickerItem[] {
   const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
-  const domainFiltered = items.filter(({ organization }) => {
-    if (
-      options.domain !== ORGANIZATION_PICKER_ALL_DOMAINS &&
-      organization.organizationDomain !== options.domain
-    ) {
-      return false
-    }
-    return true
-  })
-
-  const scored = scoreAndFilterPickerItems(domainFiltered, {
+  const scored = scoreAndFilterPickerItems(items, {
     searchQuery: options.searchQuery,
     scoreItem: scoreOrganizationPickerItem,
   })
@@ -94,19 +82,6 @@ export function filterAndSortOrganizationPickerItems(
       ),
     )
     .map((row) => row.item)
-}
-
-export function buildOrganizationPickerDomainOptions(
-  organizations: readonly Organization[],
-): { value: OrganizationPickerDomainFilter; label: string }[] {
-  const availableKinds = new Set(organizations.map(({ organizationDomain }) => organizationDomain))
-  return [
-    { value: ORGANIZATION_PICKER_ALL_DOMAINS, label: 'All domains' },
-    ...ORGANIZATION_DOMAIN_IDS.filter((kind) => availableKinds.has(kind)).map((kind) => ({
-      value: kind,
-      label: getOrganizationDomainLabel(kind),
-    })),
-  ]
 }
 
 export function formatOrganizationPickerDescription(): string {

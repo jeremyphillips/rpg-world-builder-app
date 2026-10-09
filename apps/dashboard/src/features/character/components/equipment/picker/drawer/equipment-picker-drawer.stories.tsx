@@ -40,7 +40,6 @@ export const Default: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
   render: function Render(args) {
@@ -76,7 +75,6 @@ export const DefaultPathAffordableNow: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: true,
     onCommitAdd: () => undefined,
   },
 }
@@ -87,18 +85,6 @@ export const LowRemainingBudget: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: false,
-    onCommitAdd: () => undefined,
-  },
-}
-
-export const HideUnaffordable: Story = {
-  args: {
-    open: true,
-    onOpenChange: () => undefined,
-    items: equipmentPickerItemsFixture,
-    budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: true,
     onCommitAdd: () => undefined,
   },
 }
@@ -109,7 +95,6 @@ export const HideNonProficient: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
 }
@@ -120,7 +105,6 @@ export const CharacterPreview: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     showCharacterPreview: true,
     characterPreviewContext: {
       level: 1,
@@ -139,7 +123,6 @@ export const SortByPrice: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
 }
@@ -238,7 +221,6 @@ export const RecommendationFacts: Story = {
       },
     ],
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
 }
@@ -257,7 +239,6 @@ export const WizardGoldPath: Story = {
       wizardGoldPathPickerItemsFixture['plate-armor'],
     ],
     budget: builderPathGoldBudgetFixture,
-    filterOutUnaffordable: false,
     isGoldShoppingPath: true,
     onCommitAdd: () => undefined,
   },
@@ -281,7 +262,6 @@ export const AbilityScoreRequirements: Story = {
       fighterGoldPathPickerItemsFixture['chain-mail'],
     ],
     budget: builderPathGoldBudgetFixture,
-    filterOutUnaffordable: false,
     isGoldShoppingPath: true,
     onCommitAdd: () => undefined,
   },

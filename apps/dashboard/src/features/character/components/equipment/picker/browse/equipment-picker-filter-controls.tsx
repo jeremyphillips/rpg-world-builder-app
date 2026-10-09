@@ -1,27 +1,26 @@
-import { CatalogFilterControls, setFilterValue } from '@rpg/ui/filters'
-import { useMemo } from 'react'
-
 import {
-  createEquipmentPickerFilterSchema,
-  resolveEquipmentPickerFilterLayout,
-  type EquipmentPickerFilterState,
-} from './equipment-picker-filter-schema'
-import type { CreateEquipmentPickerFilterSchemaArgs } from './equipment-picker-filter-schema'
+  CatalogFilterControls,
+  setFilterValue,
+  type FilterCatalogLayoutConfig,
+  type FilterSchema,
+} from '@rpg/ui/filters'
+
+import type { EquipmentPickerFilterState } from './equipment-picker-filter-schema'
+import type { EquipmentPickerRow } from '../drawer/equipment-picker-drawer.types'
 
 type EquipmentPickerFilterControlsProps = {
-  schemaArgs: CreateEquipmentPickerFilterSchemaArgs
+  schema: FilterSchema<EquipmentPickerRow, EquipmentPickerFilterState>
+  layout: FilterCatalogLayoutConfig<EquipmentPickerFilterState>
   filterState: EquipmentPickerFilterState
+  items: readonly EquipmentPickerRow[]
   onFilterStateChange: (next: EquipmentPickerFilterState) => void
 }
 
 function useEquipmentPickerFilterControls({
-  schemaArgs,
+  schema,
   filterState,
   onFilterStateChange,
 }: EquipmentPickerFilterControlsProps) {
-  const schema = useMemo(() => createEquipmentPickerFilterSchema(schemaArgs), [schemaArgs])
-  const layout = useMemo(() => resolveEquipmentPickerFilterLayout(schema), [schema])
-
   const handleValueChange = (
     id: keyof EquipmentPickerFilterState,
     value: EquipmentPickerFilterState[keyof EquipmentPickerFilterState] | undefined,
@@ -29,22 +28,22 @@ function useEquipmentPickerFilterControls({
     onFilterStateChange(setFilterValue(schema, filterState, id, value))
   }
 
-  return { schema, layout, handleValueChange }
+  return { handleValueChange }
 }
 
 export function EquipmentPickerPrimaryFilterControls(props: EquipmentPickerFilterControlsProps) {
-  const { schema, layout, handleValueChange } = useEquipmentPickerFilterControls(props)
+  const { handleValueChange } = useEquipmentPickerFilterControls(props)
 
-  if ((layout.primaryFieldIds?.length ?? 0) === 0) {
+  if ((props.layout.primaryFieldIds?.length ?? 0) === 0) {
     return null
   }
 
   return (
     <CatalogFilterControls.Primary
-      schema={schema}
-      layout={layout}
+      schema={props.schema}
+      layout={props.layout}
       state={props.filterState}
-      data={props.schemaArgs.items}
+      data={props.items}
       idPrefix="equipment-picker"
       onValueChange={handleValueChange}
     />
@@ -52,18 +51,18 @@ export function EquipmentPickerPrimaryFilterControls(props: EquipmentPickerFilte
 }
 
 export function EquipmentPickerFilterRowControls(props: EquipmentPickerFilterControlsProps) {
-  const { schema, layout, handleValueChange } = useEquipmentPickerFilterControls(props)
+  const { handleValueChange } = useEquipmentPickerFilterControls(props)
 
-  if ((layout.filterRowFieldIds?.length ?? 0) === 0) {
+  if ((props.layout.filterRowFieldIds?.length ?? 0) === 0) {
     return null
   }
 
   return (
     <CatalogFilterControls.FilterRow
-      schema={schema}
-      layout={layout}
+      schema={props.schema}
+      layout={props.layout}
       state={props.filterState}
-      data={props.schemaArgs.items}
+      data={props.items}
       idPrefix="equipment-picker"
       onValueChange={handleValueChange}
     />
