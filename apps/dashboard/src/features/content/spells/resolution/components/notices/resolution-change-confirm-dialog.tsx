@@ -1,4 +1,4 @@
-import { ConfirmDialog } from '@rpg/ui'
+import { cn, ConfirmDialog, Text, textVariants } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
 import { planResolutionChange } from '@rpg/contracts'
@@ -13,18 +13,21 @@ import {
   useResolutionChangeSnapshot,
 } from '../../hooks/use-resolution-change-confirm'
 
-function ResolutionChangeConfirmDescription({ copy }: { copy: ResolutionChangeDialogCopy }) {
+function ResolutionChangeConfirmBody({ copy }: { copy: ResolutionChangeDialogCopy }) {
+  const bodyClass = textVariants({ variant: 'small' })
+
   return (
     <div className="space-y-3">
-      <p>{copy.intro}</p>
       {copy.consequences.length > 0 ? (
-        <ul className="list-disc space-y-1 ps-5">
+        <ul className={cn('list-disc space-y-1 ps-5', bodyClass)}>
           {copy.consequences.map((consequence) => (
             <li key={consequence}>{consequence}</li>
           ))}
         </ul>
       ) : null}
-      <p>{copy.footer}</p>
+      <Text variant="small" as="p">
+        {copy.footer}
+      </Text>
     </div>
   )
 }
@@ -54,12 +57,12 @@ export function ResolutionChangeConfirmDialog() {
         if (!open) controller.cancelPendingChange()
       }}
       headline={dialogCopy?.headline ?? 'Change resolution?'}
-      description={
-        dialogCopy ? <ResolutionChangeConfirmDescription copy={dialogCopy} /> : undefined
-      }
+      description={dialogCopy?.intro}
       confirmLabel="Change resolution"
       onConfirm={controller.confirmPendingChange}
       onCancel={controller.cancelPendingChange}
-    />
+    >
+      {dialogCopy ? <ResolutionChangeConfirmBody copy={dialogCopy} /> : null}
+    </ConfirmDialog>
   )
 }
