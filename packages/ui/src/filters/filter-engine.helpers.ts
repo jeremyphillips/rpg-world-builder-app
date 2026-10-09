@@ -113,7 +113,7 @@ type EqualsFilterConfig<
 > = {
   id: TId
   label: string
-  options: FilterOption<TValue>[]
+  options: SelectFilterFieldDef<TData, TState, TId>['options']
   getValue: (row: TData) => TValue
   placement?: FilterPlacement
   defaultValue?: TState[TId]

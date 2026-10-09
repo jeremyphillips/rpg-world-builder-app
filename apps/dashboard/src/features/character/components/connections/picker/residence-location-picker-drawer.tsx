@@ -64,6 +64,11 @@ export function ResidenceLocationPickerDrawer({
     rows: items,
     schema: locationFilterSchema,
   })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
   const showKindFilter = relationshipCatalogFilterHasBand(
     'filterRow',
     locationFilterSchema,
@@ -114,6 +119,19 @@ export function ResidenceLocationPickerDrawer({
       description={RESIDENCE_PICKER_DESCRIPTION}
       items={locationFilters.filteredRows}
       hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+      primaryControls={
+        showFamilyFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={locationFilterSchema}
+            layout={locationFilterLayout}
+            state={locationFilters.state}
+            data={items}
+            idPrefix="residence-location-picker"
+            onValueChange={locationFilters.setValue}
+          />
+        ) : undefined
+      }
       filterRow={
         showKindFilter
           ? {

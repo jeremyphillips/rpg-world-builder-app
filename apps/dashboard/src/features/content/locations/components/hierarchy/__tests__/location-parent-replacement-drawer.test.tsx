@@ -121,10 +121,10 @@ describe('LocationParentReplacementDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Sites' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Structures' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Settlements' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Sites' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Structures' })).toBeInTheDocument()
   })
 
   it('filters candidates by active browse scope', async () => {
@@ -144,7 +144,7 @@ describe('LocationParentReplacementDrawer', () => {
     expect(screen.getByText('Harbor Site')).toBeInTheDocument()
     expect(screen.getByText('Other Tavern')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Sites' }))
+    await user.click(screen.getByRole('radio', { name: 'Sites' }))
 
     expect(screen.getByText('Harbor Site')).toBeInTheDocument()
     expect(screen.queryByText('Other Tavern')).not.toBeInTheDocument()
@@ -168,10 +168,10 @@ describe('LocationParentReplacementDrawer', () => {
     await user.type(searchInput, 'Har')
     expect(searchInput).toHaveValue('Har')
 
-    await user.click(screen.getByRole('button', { name: 'Sites' }))
+    await user.click(screen.getByRole('radio', { name: 'Sites' }))
     expect(searchInput).toHaveValue('Har')
 
-    await user.click(screen.getByRole('button', { name: 'Structures' }))
+    await user.click(screen.getByRole('radio', { name: 'Structures' }))
     expect(searchInput).toHaveValue('Har')
   })
 

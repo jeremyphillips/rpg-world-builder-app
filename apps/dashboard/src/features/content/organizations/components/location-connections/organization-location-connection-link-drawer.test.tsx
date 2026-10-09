@@ -152,13 +152,10 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
         name: /Connection type|Relationship type|Authority type/i,
       }),
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Location type' })).toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Settlements' })).not.toBeInTheDocument()
     expect(
       screen.getByText('Choose a settlement or region for this area of operation.'),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
     expect(screen.getByText('Northern March')).toBeInTheDocument()
   })
 
@@ -188,13 +185,13 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(screen.getByText('Port City')).toBeInTheDocument()
     expect(screen.getByText('Harbor Ward')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Settlements' }))
+    await user.click(screen.getByRole('radio', { name: 'Settlements' }))
 
     expect(screen.queryByText('Northern March')).not.toBeInTheDocument()
     expect(screen.getByText('Port City')).toBeInTheDocument()
     expect(screen.getByText('Harbor Ward')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Regions' }))
+    await user.click(screen.getByRole('radio', { name: 'Regions' }))
 
     expect(screen.getByText('Northern March')).toBeInTheDocument()
     expect(screen.queryByText('Port City')).not.toBeInTheDocument()
@@ -229,10 +226,10 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     await user.type(searchInput, 'Port')
     expect(searchInput).toHaveValue('Port')
 
-    await user.click(screen.getByRole('button', { name: 'Settlements' }))
+    await user.click(screen.getByRole('radio', { name: 'Settlements' }))
     expect(searchInput).toHaveValue('Port')
 
-    await user.click(screen.getByRole('button', { name: 'Regions' }))
+    await user.click(screen.getByRole('radio', { name: 'Regions' }))
     expect(searchInput).toHaveValue('Port')
   })
 
@@ -252,9 +249,8 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'All' })).toBeEnabled()
-    expect(screen.getByRole('button', { name: 'Settlements' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Regions' })).toBeEnabled()
+    expect(screen.queryByRole('radio', { name: 'Settlements' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: 'Regions' })).not.toBeInTheDocument()
   })
 
   it('disables territorial singleton locations occupied by another organization', async () => {
@@ -671,9 +667,9 @@ describe('OrganizationLocationConnectionLinkDrawer', () => {
     expect(
       screen.getByText('Choose a settlement or region for this area of operation.'),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Settlements' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Regions' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Settlements' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'Regions' })).toBeInTheDocument()
 
     await user.click(
       within(screen.getByText('Port City').closest('[data-picker-item-key]')!).getByRole('button', {

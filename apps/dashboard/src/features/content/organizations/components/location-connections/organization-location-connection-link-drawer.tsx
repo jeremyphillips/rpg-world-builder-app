@@ -7,14 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import {
-  Button,
-  Heading,
-  SegmentedControl,
-  SelectionSummaryCard,
-  SelectionSummaryChangeAction,
-  Text,
-} from '@rpg/ui'
+import { Button, Heading, SelectionSummaryCard, SelectionSummaryChangeAction, Text } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
@@ -100,13 +93,7 @@ import {
   resolveOrganizationForwardTargetPresentation,
 } from '../../lib/location-connections/organization-location-connection-surface-copy'
 import { buildOrganizationDrawerEntityPresentation } from '../../lib/organization-display'
-import {
-  filterLocationsByTargetBrowseScope,
-  ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
-  resolveEffectiveTargetBrowseScope,
-  resolveTargetBrowseScopeOptions,
-  type OrganizationLocationTargetBrowseScope,
-} from '../../lib/location-connections/organization-location-target-browse-scope'
+import { resolveTargetBrowseScopeKindFamilies } from '../../lib/location-connections/organization-location-target-browse-scope'
 export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search.'
 export const ORGANIZATION_LOCATION_LINK_NO_ITEMS = 'No locations are available.'
 export const ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE =
@@ -219,8 +206,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ?? defaultAddKind ?? initialConnection?.kind ?? null,
   )
-  const [locationBrowseScope, setLocationBrowseScope] =
-    React.useState<OrganizationLocationTargetBrowseScope>('all')
   const [editingKind, setEditingKind] = React.useState(false)
 
   const excludeConnectionId =
@@ -531,40 +516,26 @@ function OrganizationLocationConnectionLinkDrawerContent({
       locationCandidates.isAuthoritativeDomainSet &&
       changeTargetScanLocations.length === 0)
 
-  const browseScopeOptions = React.useMemo(() => {
-    if (!targetPresentation.browseScopes?.length) {
-      return []
-    }
-    return resolveTargetBrowseScopeOptions(targetPresentation.browseScopes, eligibleLocations)
-  }, [eligibleLocations, targetPresentation.browseScopes])
-
-  const showTargetBrowseScopeControl =
-    browseScopeOptions.length > 0 && showLocationPicker && !showMutationEmptyState
-
-  const effectiveLocationBrowseScope = React.useMemo(
-    () =>
-      resolveEffectiveTargetBrowseScope(
-        locationBrowseScope,
-        browseScopeOptions,
-        showTargetBrowseScopeControl,
-      ),
-    [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl],
+  const pickerLocations = React.useMemo(
+    () => eligibleLocations.toSorted(comparePickerName),
+    [eligibleLocations],
   )
-
-  const pickerLocations = React.useMemo(() => {
-    const rows = !showTargetBrowseScopeControl
-      ? eligibleLocations
-      : filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
-    return rows.toSorted(comparePickerName)
-  }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
+  const kindFamilies = React.useMemo(
+    () =>
+      targetPresentation.browseScopes?.length
+        ? resolveTargetBrowseScopeKindFamilies(targetPresentation.browseScopes)
+        : undefined,
+    [targetPresentation.browseScopes],
+  )
 
   const locationFilterSchema = React.useMemo(
     () =>
       createLocationRelationshipFilterSchema({
         rows: pickerLocations,
         getKind: (location) => location.kind,
+        kindFamilies,
       }),
-    [pickerLocations],
+    [kindFamilies, pickerLocations],
   )
   const locationFilterLayout = React.useMemo(
     () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
@@ -574,6 +545,11 @@ function OrganizationLocationConnectionLinkDrawerContent({
     rows: pickerLocations,
     schema: locationFilterSchema,
   })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
   const showKindFilter = relationshipCatalogFilterHasBand(
     'filterRow',
     locationFilterSchema,
@@ -602,15 +578,18 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return resolveRelationshipPickerCreateIntents({
       target: 'location',
       selectedKind: activeKind,
-      activeBrowseScope: showTargetBrowseScopeControl ? effectiveLocationBrowseScope : undefined,
+      activeBrowseScope:
+        locationFilters.state.kindFamily === 'settlement' ||
+        locationFilters.state.kindFamily === 'region'
+          ? locationFilters.state.kindFamily
+          : undefined,
     })
   }, [
     activeKind,
-    effectiveLocationBrowseScope,
+    locationFilters.state.kindFamily,
     mode,
     showLocationPicker,
     showMutationEmptyState,
-    showTargetBrowseScopeControl,
   ])
 
   const nestedCreateContext = React.useMemo((): ContentCreateContext => {
@@ -723,17 +702,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 current={currentEndpoint}
                 showNewSection={showLocationPicker && !showMutationEmptyState}
                 newHelper={targetPresentation.targetHelp}
-              >
-                {showTargetBrowseScopeControl ? (
-                  <SegmentedControl
-                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                    value={locationBrowseScope}
-                    options={browseScopeOptions}
-                    onValueChange={setLocationBrowseScope}
-                    fullWidth
-                  />
-                ) : null}
-              </EntityReplacementSection>
+              />
             ) : null}
             {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
               <LocationConnectionKindField
@@ -755,15 +724,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
                   <Text variant="muted" className="text-sm">
                     {targetPresentation.targetHelp}
                   </Text>
-                ) : null}
-                {showTargetBrowseScopeControl ? (
-                  <SegmentedControl
-                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                    value={locationBrowseScope}
-                    options={browseScopeOptions}
-                    onValueChange={setLocationBrowseScope}
-                    fullWidth
-                  />
                 ) : null}
               </div>
             ) : null}
@@ -796,11 +756,21 @@ function OrganizationLocationConnectionLinkDrawerContent({
             </Button>
           ) : undefined
         }
-        hasStructuredFilters={
-          (showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all') ||
-          locationFilters.structuredFilterCount > 0
-        }
+        hasStructuredFilters={locationFilters.structuredFilterCount > 0}
         items={showLocationPicker && !showMutationEmptyState ? locationFilters.filteredRows : []}
+        primaryControls={
+          showFamilyFilter ? (
+            <RelationshipCatalogFilterBand
+              band="primary"
+              schema={locationFilterSchema}
+              layout={locationFilterLayout}
+              state={locationFilters.state}
+              data={pickerLocations}
+              idPrefix="organization-location-picker"
+              onValueChange={locationFilters.setValue}
+            />
+          ) : undefined
+        }
         filterRow={
           showKindFilter
             ? {

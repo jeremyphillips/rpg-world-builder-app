@@ -113,6 +113,11 @@ export function LocationRelationshipAddDrawer({
     rows: sortedLocations,
     schema: locationFilterSchema,
   })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
   const showKindFilter = relationshipCatalogFilterHasBand(
     'filterRow',
     locationFilterSchema,
@@ -187,6 +192,19 @@ export function LocationRelationshipAddDrawer({
         description="Choose a location connected to this character."
         items={pickerItems}
         hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+        primaryControls={
+          showFamilyFilter ? (
+            <RelationshipCatalogFilterBand
+              band="primary"
+              schema={locationFilterSchema}
+              layout={locationFilterLayout}
+              state={locationFilters.state}
+              data={sortedLocations}
+              idPrefix="location-relationship-add"
+              onValueChange={locationFilters.setValue}
+            />
+          ) : undefined
+        }
         filterRow={
           showKindFilter
             ? {

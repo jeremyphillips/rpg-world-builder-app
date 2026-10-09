@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import { Button, SegmentedControl, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
@@ -32,13 +32,6 @@ import {
   type LocationParentReplacementCurrentSnapshot,
   type LocationParentReplacementMode,
 } from '../../lib/hierarchy/location-parent-replacement'
-import {
-  filterLocationsByParentBrowseScope,
-  LOCATION_PARENT_BROWSE_SCOPE_LABEL,
-  resolveParentBrowseScopeOptions,
-  shouldShowParentBrowseScopes,
-  type LocationParentBrowseScope,
-} from '../../lib/hierarchy/location-parent-browse-scope'
 import {
   LOCATION_PARENT_REPLACEMENT_DRAWER,
   resolveLocationParentReplacementDrawerNewHelper,
@@ -135,19 +128,11 @@ function LocationParentReplacementDrawerHeader({
   surface,
   mode,
   currentParent,
-  showParentBrowseScopeControl,
-  browseScopeOptions,
-  parentBrowseScope,
-  onParentBrowseScopeChange,
 }: {
   subject: Location
   surface: LocationParentReplacementDrawerSurface
   mode: LocationParentReplacementMode
   currentParent: LocationParentReplacementCurrentSnapshot | null
-  showParentBrowseScopeControl: boolean
-  browseScopeOptions: ReturnType<typeof resolveParentBrowseScopeOptions>
-  parentBrowseScope: LocationParentBrowseScope
-  onParentBrowseScopeChange: (value: LocationParentBrowseScope) => void
 }) {
   return (
     <div className="space-y-4">
@@ -159,17 +144,7 @@ function LocationParentReplacementDrawerHeader({
           mode,
           subjectName: subject.name,
         })}
-      >
-        {showParentBrowseScopeControl ? (
-          <SegmentedControl
-            aria-label={LOCATION_PARENT_BROWSE_SCOPE_LABEL}
-            value={parentBrowseScope}
-            options={browseScopeOptions}
-            onValueChange={onParentBrowseScopeChange}
-            fullWidth
-          />
-        ) : null}
-      </EntityReplacementSection>
+      />
     </div>
   )
 }
@@ -192,7 +167,6 @@ function LocationParentReplacementDrawerContent({
   onSubmit,
 }: LocationParentReplacementDrawerProps) {
   const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null)
-  const [parentBrowseScope, setParentBrowseScope] = React.useState<LocationParentBrowseScope>('all')
 
   const campaignId = resolveParentReplacementCampaignId(subject, campaignLocations)
   const { mode, currentParent, candidates, candidateSummaries } = React.useMemo(
@@ -215,48 +189,27 @@ function LocationParentReplacementDrawerContent({
       selectedParentId,
     })
 
-  const browseScopeOptions = React.useMemo(
-    () => resolveParentBrowseScopeOptions(candidates),
-    [candidates],
-  )
-
-  const showParentBrowseScopeControl =
-    pickerEnabled && shouldShowParentBrowseScopes(browseScopeOptions)
-
-  const pickerCandidates = React.useMemo(() => {
-    if (!showParentBrowseScopeControl) {
-      return candidateSummaries
-    }
-
-    const scopedCandidateIds = new Set(
-      filterLocationsByParentBrowseScope(candidates, parentBrowseScope).map(
-        (location) => location.id,
-      ),
-    )
-
-    return candidateSummaries.filter((summary) => scopedCandidateIds.has(summary.id))
-  }, [candidateSummaries, candidates, parentBrowseScope, showParentBrowseScopeControl])
-
-  const scopedLocations = React.useMemo(() => {
-    const visibleIds = new Set(pickerCandidates.map((summary) => summary.id))
-    return candidates.filter((location) => visibleIds.has(location.id))
-  }, [candidates, pickerCandidates])
   const locationFilterSchema = React.useMemo(
     () =>
       createLocationRelationshipFilterSchema({
-        rows: scopedLocations,
+        rows: candidates,
         getKind: (location) => location.kind,
       }),
-    [scopedLocations],
+    [candidates],
   )
   const locationFilterLayout = React.useMemo(
     () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
     [locationFilterSchema],
   )
   const locationFilters = useRelationshipCatalogFilters({
-    rows: scopedLocations,
+    rows: candidates,
     schema: locationFilterSchema,
   })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
   const showKindFilter = relationshipCatalogFilterHasBand(
     'filterRow',
     locationFilterSchema,
@@ -264,8 +217,8 @@ function LocationParentReplacementDrawerContent({
   )
   const filteredPickerCandidates = React.useMemo(() => {
     const visibleIds = new Set(locationFilters.filteredRows.map((location) => location.id))
-    return pickerCandidates.filter((summary) => visibleIds.has(summary.id))
-  }, [locationFilters.filteredRows, pickerCandidates])
+    return candidateSummaries.filter((summary) => visibleIds.has(summary.id))
+  }, [candidateSummaries, locationFilters.filteredRows])
 
   const handleSubmit = async () => {
     if (!selectedParentId || contextMismatch) return
@@ -291,10 +244,6 @@ function LocationParentReplacementDrawerContent({
           surface={surface}
           mode={mode}
           currentParent={currentParent}
-          showParentBrowseScopeControl={showParentBrowseScopeControl}
-          browseScopeOptions={browseScopeOptions}
-          parentBrowseScope={parentBrowseScope}
-          onParentBrowseScopeChange={setParentBrowseScope}
         />
       }
       footer={
@@ -309,11 +258,21 @@ function LocationParentReplacementDrawerContent({
           onSubmit={() => void handleSubmit()}
         />
       }
-      hasStructuredFilters={
-        (showParentBrowseScopeControl && parentBrowseScope !== 'all') ||
-        locationFilters.structuredFilterCount > 0
-      }
+      hasStructuredFilters={locationFilters.structuredFilterCount > 0}
       items={pickerEnabled ? filteredPickerCandidates : []}
+      primaryControls={
+        showFamilyFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={locationFilterSchema}
+            layout={locationFilterLayout}
+            state={locationFilters.state}
+            data={candidates}
+            idPrefix="location-parent-replacement"
+            onValueChange={locationFilters.setValue}
+          />
+        ) : undefined
+      }
       filterRow={
         showKindFilter
           ? {
@@ -323,7 +282,7 @@ function LocationParentReplacementDrawerContent({
                   schema={locationFilterSchema}
                   layout={locationFilterLayout}
                   state={locationFilters.state}
-                  data={scopedLocations}
+                  data={candidates}
                   idPrefix="location-parent-replacement"
                   onValueChange={locationFilters.setValue}
                 />
