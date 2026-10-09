@@ -194,6 +194,7 @@ export function EquipmentStepInteractive({
         magicItemAllowances={step.showMagicItemGrants ? step.acquisition.allowances : undefined}
         focusedAllowanceId={step.focusedAllowanceId}
         onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
+        matchesMagicItemAllowance={step.matchesMagicItemAllowance}
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
         onCommitAdd={pickerAcquisition.handleCommitAdd}

@@ -17,6 +17,10 @@ import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-sele
 import { formatContentReferenceLabel } from '../../../lib/display/format-content-reference-label'
 import { buildCharacterEntityCardModel } from '../../../lib/display/character-entity-summary.lib'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   buildCharacterPickerOptionEntitySummary,
@@ -140,7 +144,7 @@ export function CharacterPickerDrawer({
             }
           : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
           structuredFilterCount: characterFilters.structuredFilterCount,
           searchQuery,
@@ -150,6 +154,14 @@ export function CharacterPickerDrawer({
             visible={showReset}
             reserve={showClassFilter}
             includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: characterFilters.sourceCount,
+              narrowing: hasCatalogPickerNarrowingCriteria({
+                structuredFilterCount: characterFilters.structuredFilterCount,
+                searchQuery,
+              }),
+            })}
             onClick={() => {
               characterFilters.reset()
               resetSearchQuery()

@@ -1,9 +1,10 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
+  EquipmentPickerItem,
 } from '@rpg/contracts'
 
 import {
@@ -62,7 +63,7 @@ export function useEquipmentMagicItemWorkflow(args: {
           context: args.context,
           catalogIndex: args.catalogIndex,
         }),
-        focusedAllowanceId: args.focusedAllowanceId,
+        focusedAllowanceId: undefined,
       }),
     )
 
@@ -90,8 +91,23 @@ export function useEquipmentMagicItemWorkflow(args: {
     return quantities
   }, [args.draft, args.pickerItems])
 
+  const matchesMagicItemAllowance = useCallback(
+    (item: EquipmentPickerItem, allowanceId: string) =>
+      isMagicItemPickerItemVisible({
+        equipment: item.equipment,
+        draft: args.draft,
+        context: resolveEquipmentAcquisitionContext({
+          context: args.context,
+          catalogIndex: args.catalogIndex,
+        }),
+        focusedAllowanceId: allowanceId,
+      }),
+    [args.catalogIndex, args.context, args.draft],
+  )
+
   return {
     acquisition,
+    matchesMagicItemAllowance,
     showMagicItemGrants,
     pickerWorkflowModes,
     magicItemProgressLabel,

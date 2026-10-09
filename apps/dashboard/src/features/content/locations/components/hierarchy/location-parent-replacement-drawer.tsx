@@ -3,7 +3,12 @@ import * as React from 'react'
 import type { Location } from '@rpg/contracts'
 import { Button, SegmentedControl, Text } from '@rpg/ui'
 
-import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import {
+  CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '@/features/character'
 import {
   CatalogEntityPickerSheet,
   RelationshipCatalogFilterBand,
@@ -326,7 +331,7 @@ function LocationParentReplacementDrawerContent({
             }
           : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
           structuredFilterCount: locationFilters.structuredFilterCount,
           searchQuery,
@@ -336,6 +341,14 @@ function LocationParentReplacementDrawerContent({
             visible={showReset}
             reserve={showKindFilter}
             includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: locationFilters.sourceCount,
+              narrowing: hasCatalogPickerNarrowingCriteria({
+                structuredFilterCount: locationFilters.structuredFilterCount,
+                searchQuery,
+              }),
+            })}
             onClick={() => {
               locationFilters.reset()
               resetSearchQuery()

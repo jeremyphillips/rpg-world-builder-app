@@ -142,16 +142,6 @@ function scoreEquipmentPickerItem(item: EquipmentPickerRow, searchQuery: string)
   )
 }
 
-function filterEquipmentPickerItemsBySearch<T extends EquipmentPickerRow>(
-  items: readonly T[],
-  searchQuery: string,
-): T[] {
-  const normalizedQuery = normalizeSearchQuery(searchQuery)
-  if (normalizedQuery.text.length === 0) return [...items]
-
-  return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
-}
-
 function compareEquipmentPickerItemsByPrice(
   left: EquipmentPickerItem,
   right: EquipmentPickerItem,
@@ -362,44 +352,6 @@ export function filterEquipmentPickerItems<T extends EquipmentPickerItem>(
   options: EquipmentPickerStructuredFilterOptions,
 ): T[] {
   return items.filter((item) => equipmentPickerItemMatchesStructuredFilters(item, options))
-}
-
-/**
- * Rows hidden by Affordable now after search/category/starting-budget filters.
- * Informational only — not part of checkbox label or active-filter counts.
- */
-export function countEquipmentPickerAffordableHiddenImpact<T extends EquipmentPickerRow>(
-  items: readonly T[],
-  options: {
-    searchQuery: string
-    filterOutUnaffordable: boolean
-    filterOutNonProficient: boolean
-    selectedKind: EquipmentPickerKindFilter
-    showAffordableOnly: boolean
-    budget?: EquipmentBudgetSummary
-  },
-): number {
-  if (!options.showAffordableOnly) return 0
-
-  const searchScoped = filterEquipmentPickerItemsBySearch(items, options.searchQuery)
-  const structuredFilterOptions = {
-    filterOutUnaffordable: options.filterOutUnaffordable,
-    filterOutNonProficient: options.filterOutNonProficient,
-    selectedKind: options.selectedKind,
-    budget: options.budget,
-  }
-
-  const beforeAffordable = filterEquipmentPickerItems(searchScoped, {
-    ...structuredFilterOptions,
-    showAffordableOnly: false,
-  })
-  const afterAffordable = filterEquipmentPickerItems(searchScoped, {
-    ...structuredFilterOptions,
-    showAffordableOnly: true,
-  })
-
-  const hiddenCount = beforeAffordable.length - afterAffordable.length
-  return hiddenCount > 0 ? hiddenCount : 0
 }
 
 /** Best-match order from resolved equipment facts. */

@@ -52,7 +52,6 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
   createBooleanFilter<DemoRow, TestFilterState, 'hiddenOnly'>({
     id: 'hiddenOnly',
     label: 'Hidden only',
-    hiddenCount: () => 3,
     getValue: () => false,
   }),
   createChipsFilter<DemoRow, TestFilterState, 'levels'>({
@@ -231,12 +230,6 @@ describe('FilterFieldRenderer behavior', () => {
     expect(trigger).toBeDisabled()
     expect(trigger).toHaveAttribute('aria-disabled', 'true')
     expect(trigger).toHaveTextContent('Mechanics (no options)')
-  })
-
-  it('shows hiddenCount suffix for checked boolean fields', () => {
-    render(<RendererHarness fieldId="hiddenOnly" initialState={{ hiddenOnly: true }} />)
-
-    expect(screen.getByText('3 hidden')).toBeInTheDocument()
   })
 
   it('clears text filters to undefined', async () => {

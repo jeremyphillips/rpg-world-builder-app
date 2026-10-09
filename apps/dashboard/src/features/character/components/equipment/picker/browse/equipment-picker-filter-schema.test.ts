@@ -1,7 +1,7 @@
-import type { MagicItemGrantProgress } from '@rpg/contracts'
+import type { EquipmentPickerItem, MagicItemGrantProgress } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
-import { sanitizeFilterState } from '@rpg/ui/filters'
+import { applyFilterSchema, sanitizeFilterState } from '@rpg/ui/filters'
 
 import {
   createEquipmentPickerFilterSchema,
@@ -147,5 +147,28 @@ describe('equipment-picker-filter-schema', () => {
       primaryFieldIds: [],
       filterRowFieldIds: [],
     })
+  })
+
+  it('counts a focused allowance against the whole workflow list', () => {
+    const schema = createEquipmentPickerFilterSchema({
+      workflowMode: 'magic_items',
+      items,
+      kindOptions: ['magic_item'],
+      showCategoryFilter: false,
+      showRarityFilter: true,
+      showAffordableFilter: false,
+      magicItemGrantProgress,
+      matchesMagicItemAllowance: (row, allowanceId) =>
+        row.equipment.kind === 'magic_item' && allowanceId === row.equipment.rarity,
+      filterOutUnaffordable: false,
+      filterOutNonProficient: false,
+      searchQuery: '',
+    })
+    const rows = [
+      { equipment: { kind: 'magic_item', rarity: 'common' } },
+      { equipment: { kind: 'magic_item', rarity: 'rare' } },
+    ] as EquipmentPickerItem[]
+
+    expect(applyFilterSchema(schema, { selectedRarity: 'common' }, rows)).toEqual([rows[0]])
   })
 })

@@ -8,6 +8,8 @@ import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
   OrganizationMembershipTitleField,
   buildCharacterEntityCardModel,
   formatContentReferenceLabel,
@@ -289,7 +291,7 @@ export function OrganizationMemberPickerDrawer({
             }
           : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
           structuredFilterCount: characterFilters.structuredFilterCount,
           searchQuery,
@@ -299,6 +301,14 @@ export function OrganizationMemberPickerDrawer({
             visible={showReset}
             reserve={showClassFilter}
             includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: characterFilters.sourceCount,
+              narrowing: hasCatalogPickerNarrowingCriteria({
+                structuredFilterCount: characterFilters.structuredFilterCount,
+                searchQuery,
+              }),
+            })}
             onClick={() => {
               characterFilters.reset()
               resetSearchQuery()

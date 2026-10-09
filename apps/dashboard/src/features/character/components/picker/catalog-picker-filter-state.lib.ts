@@ -10,6 +10,24 @@ export function hasCatalogPickerClearableCriteria(count: number): boolean {
   return count > 0
 }
 
+export function hasCatalogPickerNarrowingCriteria(args: {
+  structuredFilterCount: number
+  searchQuery: string
+  activeTabId?: string
+  defaultTabId?: string
+}): boolean {
+  if (args.searchQuery.trim().length > 0) return true
+  if (args.structuredFilterCount > 0) return true
+  if (
+    args.activeTabId !== undefined &&
+    args.defaultTabId !== undefined &&
+    args.activeTabId !== args.defaultTabId
+  ) {
+    return true
+  }
+  return false
+}
+
 export function hasCatalogPickerResetViewCriteria(args: {
   structuredFilterCount: number
   searchQuery: string
@@ -19,21 +37,26 @@ export function hasCatalogPickerResetViewCriteria(args: {
   activeTabId?: string
   defaultTabId?: string
 }): boolean {
-  if (args.searchQuery.trim().length > 0) return true
-  if (args.structuredFilterCount > 0) return true
-  if (
+  if (hasCatalogPickerNarrowingCriteria(args)) return true
+  return (
     args.sortMode !== undefined &&
     args.defaultSortMode !== undefined &&
     args.sortMode !== args.defaultSortMode
-  ) {
-    return true
+  )
+}
+
+export function formatCatalogPickerResultSummary(visible: number, total: number): string {
+  return `${visible} of ${total}`
+}
+
+export function resolveCatalogPickerResultSummary(args: {
+  visible: number
+  total: number
+  narrowing: boolean
+}): { summary?: string; summaryReserveLabel?: string } {
+  if (!args.narrowing) return {}
+  return {
+    summary: formatCatalogPickerResultSummary(args.visible, args.total),
+    summaryReserveLabel: formatCatalogPickerResultSummary(args.total, args.total),
   }
-  if (
-    args.activeTabId !== undefined &&
-    args.defaultTabId !== undefined &&
-    args.activeTabId !== args.defaultTabId
-  ) {
-    return true
-  }
-  return false
 }

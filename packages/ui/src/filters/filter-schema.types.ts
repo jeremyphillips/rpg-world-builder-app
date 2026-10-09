@@ -123,7 +123,6 @@ export type BooleanFilterFieldDef<
   TId extends FilterFieldId<TState>,
 > = BaseFilterFieldDef<TData, TState, TId> & {
   type: 'boolean'
-  hiddenCount?: (state: TState, ctx: FilterFieldOptionsContext<TData, TState>) => number | undefined
 }
 
 export type ChipsSelectionMode = 'multiple' | 'single-required'

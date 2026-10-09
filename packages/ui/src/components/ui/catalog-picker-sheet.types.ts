@@ -10,6 +10,8 @@ export type CatalogPickerTab = CatalogToolbarTab
 export type CatalogPickerSheetActionsHelpers = {
   searchQuery: string
   activeTabId: string
+  /** Rows after the tab, structured filters, and search, before sort. */
+  visibleItemCount: number
   resetSearchQuery: () => void
   resetActiveTab: () => void
 }

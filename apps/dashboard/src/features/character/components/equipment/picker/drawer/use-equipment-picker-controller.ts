@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { useSanitizedFilterState } from '@rpg/ui/filters'
+import { applyFilterSchema, useSanitizedFilterState } from '@rpg/ui/filters'
 import { isEquipmentPickerSupportedKind } from '@rpg/contracts'
 
 import {
@@ -39,6 +39,7 @@ export type UseEquipmentPickerControllerArgs = Pick<
   | 'magicItemGrantProgress'
   | 'focusedAllowanceId'
   | 'onFocusedAllowanceIdChange'
+  | 'matchesMagicItemAllowance'
 > & {
   onCommitAdd: EquipmentPickerDrawerProps['onCommitAdd']
 }
@@ -54,6 +55,7 @@ export function useEquipmentPickerController({
   magicItemGrantProgress,
   focusedAllowanceId,
   onFocusedAllowanceIdChange,
+  matchesMagicItemAllowance,
   onCommitAdd,
 }: UseEquipmentPickerControllerArgs) {
   const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
@@ -114,6 +116,7 @@ export function useEquipmentPickerController({
       filterOutNonProficient,
       searchQuery: '',
       budget: effectiveBudget,
+      matchesMagicItemAllowance,
     }),
     [
       filterOutNonProficient,
@@ -121,6 +124,7 @@ export function useEquipmentPickerController({
       filterOutUnaffordable,
       kindOptions,
       magicItemGrantProgress,
+      matchesMagicItemAllowance,
       showAffordableFilter,
       showCategoryFilter,
       showRarityFilter,
@@ -130,7 +134,7 @@ export function useEquipmentPickerController({
   )
 
   const filterSchema = React.useMemo(
-    () => createEquipmentPickerFilterSchema(schemaArgs),
+    () => createEquipmentPickerFilterSchema<EquipmentPickerRow>(schemaArgs),
     [schemaArgs],
   )
 
@@ -157,23 +161,21 @@ export function useEquipmentPickerController({
     onStateChange: handleFilterStateChange,
   })
 
-  const filteredItems = React.useMemo(
+  const eligibleItems = React.useMemo(
     () =>
       filterEquipmentPickerItems(supportedItems, {
         filterOutUnaffordable,
         filterOutNonProficient,
-        selectedKind,
-        showAffordableOnly,
+        selectedKind: EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
+        showAffordableOnly: false,
         budget: effectiveBudget,
       }),
-    [
-      effectiveBudget,
-      filterOutNonProficient,
-      filterOutUnaffordable,
-      showAffordableOnly,
-      supportedItems,
-      selectedKind,
-    ],
+    [effectiveBudget, filterOutNonProficient, filterOutUnaffordable, supportedItems],
+  )
+
+  const filteredItems = React.useMemo(
+    () => applyFilterSchema(filterSchema, filterState, eligibleItems),
+    [eligibleItems, filterSchema, filterState],
   )
 
   const transformVisibleItems = React.useCallback(
@@ -213,6 +215,7 @@ export function useEquipmentPickerController({
     filterSchema,
     structuredFilterCount,
     filteredItems,
+    eligibleItemCount: eligibleItems.length,
     transformVisibleItems,
     selectedKind,
     showAffordableOnly,

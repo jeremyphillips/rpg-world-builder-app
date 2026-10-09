@@ -61,6 +61,24 @@ describe('CatalogToolbarResetSlot', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('announces a reserved result count beside reset', () => {
+    render(
+      <CatalogToolbarResetSlot
+        visible
+        includesSort
+        summary="4 of 24"
+        summaryReserveLabel="24 of 24"
+        onClick={vi.fn()}
+      />,
+    )
+
+    const summary = screen.getByText('4 of 24')
+    expect(summary.closest('[aria-live="polite"]')).toBeInTheDocument()
+    expect(document.querySelector('[data-filter-toolbar-sizer-label]')).toHaveTextContent(
+      '24 of 24',
+    )
+  })
+
   it('uses a caller label without the reset accessible name', () => {
     render(<CatalogToolbarResetSlot visible includesSort label="Start over" onClick={vi.fn()} />)
 

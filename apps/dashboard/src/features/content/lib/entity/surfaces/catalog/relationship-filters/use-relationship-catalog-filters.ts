@@ -52,5 +52,6 @@ export function useRelationshipCatalogFilters<TData, TState extends Record<strin
     reset: filters.reset,
     structuredFilterCount,
     filteredRows,
+    sourceCount: rows.length,
   }
 }

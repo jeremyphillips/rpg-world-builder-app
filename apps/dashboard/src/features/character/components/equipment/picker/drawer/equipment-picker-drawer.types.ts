@@ -121,6 +121,8 @@ export type EquipmentPickerDrawerProps = {
   /** Focused allowance id — scopes magic-item browse to one rarity slot. */
   focusedAllowanceId?: string
   onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void
+  /** Full allowance predicate. Rarity comparison is the fallback when omitted. */
+  matchesMagicItemAllowance?: (item: EquipmentPickerItem, allowanceId: string) => boolean
   /** When true, rows in another starting package show `Included in package option`. */
   isGoldShoppingPath?: boolean
   resolveRowActionViewModel?: (args: {

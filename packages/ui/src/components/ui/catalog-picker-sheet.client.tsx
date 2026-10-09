@@ -268,10 +268,11 @@ export function CatalogPickerSheet<TItem>({
     () => ({
       searchQuery,
       activeTabId,
+      visibleItemCount: visibleItems.length,
       resetSearchQuery: () => setSearchQuery(''),
       resetActiveTab,
     }),
-    [activeTabId, resetActiveTab, searchQuery, setSearchQuery],
+    [activeTabId, resetActiveTab, searchQuery, setSearchQuery, visibleItems.length],
   )
 
   const showPickerChrome = bodyReplacement === undefined && pickerEnabled

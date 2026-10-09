@@ -173,7 +173,6 @@ type BooleanFilterConfig<
   defaultValue?: TState[TId]
   visible?: (state: TState) => boolean
   disabled?: (state: TState) => boolean
-  hiddenCount?: BooleanFilterFieldDef<TData, TState, TId>['hiddenCount']
   url?: BooleanFilterFieldDef<TData, TState, TId>['url']
   matches?: BooleanFilterFieldDef<TData, TState, TId>['matches']
 }
@@ -191,7 +190,6 @@ export function createBooleanFilter<
     defaultValue: config.defaultValue,
     visible: config.visible,
     disabled: config.disabled,
-    hiddenCount: config.hiddenCount,
     url: config.url,
     matches: config.matches ?? ((row, value) => config.getValue(row) === value),
   } satisfies FilterFieldDef<TData, TState>

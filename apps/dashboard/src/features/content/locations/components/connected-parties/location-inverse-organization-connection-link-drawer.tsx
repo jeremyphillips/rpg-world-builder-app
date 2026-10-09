@@ -12,7 +12,12 @@ import {
 } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import {
+  CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '@/features/character'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
@@ -519,7 +524,7 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               }
             : undefined
         }
-        actions={({ searchQuery, resetSearchQuery }) => {
+        actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
           const showReset = hasCatalogPickerResetViewCriteria({
             structuredFilterCount: organizationFilters.structuredFilterCount,
             searchQuery,
@@ -529,6 +534,14 @@ function LocationInverseOrganizationConnectionLinkDrawerContent({
               visible={showReset}
               reserve={showDomainFilter}
               includesSort={false}
+              {...resolveCatalogPickerResultSummary({
+                visible: visibleItemCount,
+                total: organizationFilters.sourceCount,
+                narrowing: hasCatalogPickerNarrowingCriteria({
+                  structuredFilterCount: organizationFilters.structuredFilterCount,
+                  searchQuery,
+                }),
+              })}
               onClick={() => {
                 organizationFilters.reset()
                 resetSearchQuery()

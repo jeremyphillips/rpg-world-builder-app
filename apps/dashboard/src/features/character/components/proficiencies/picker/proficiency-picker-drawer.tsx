@@ -22,11 +22,15 @@ import {
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { resolveProficiencySelectionRowPresentation } from '../../../lib/proficiencies/proficiency-selection-row-presentation.lib'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   filterAndSortProficiencyPickerItems,
@@ -108,7 +112,7 @@ export function ProficiencyPickerDrawer({
       emptyState={
         emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => (
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => (
         <CatalogToolbarResetSlot
           visible={hasCatalogPickerResetViewCriteria({
             structuredFilterCount: 0,
@@ -117,6 +121,14 @@ export function ProficiencyPickerDrawer({
             defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
           })}
           includesSort
+          {...resolveCatalogPickerResultSummary({
+            visible: visibleItemCount,
+            total: items.length,
+            narrowing: hasCatalogPickerNarrowingCriteria({
+              structuredFilterCount: 0,
+              searchQuery,
+            }),
+          })}
           onClick={() => {
             setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
             resetSearchQuery()

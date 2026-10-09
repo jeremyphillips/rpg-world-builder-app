@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button.client'
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
-import { Text } from '../components/ui/text'
 import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
 import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
@@ -249,7 +248,6 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   field,
   controlId,
   presentation,
-  optionsContext,
   disabled,
   state,
   onValueChange,
@@ -257,14 +255,12 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   field: BooleanFilterFieldDef<TData, TState, FilterFieldId<TState>>
   controlId: string
   presentation: Extract<FilterFieldPresentation, { type: 'boolean' }>
-  optionsContext: FilterFieldOptionsContext<TData, TState>
   disabled?: boolean
   state: TState
   onValueChange: FilterFieldRendererProps<TData, TState>['context']['onValueChange']
 }) {
   const booleanField = field
   const isChecked = state[booleanField.id] === true
-  const hiddenCount = booleanField.hiddenCount?.(state, optionsContext)
 
   return (
     <FilterInlineControl className={presentation.groupClassName}>
@@ -285,11 +281,6 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
       >
         {booleanField.label}
       </label>
-      {isChecked && hiddenCount !== undefined && hiddenCount > 0 ? (
-        <Text as="span" variant="muted" className="text-xs tabular-nums">
-          {hiddenCount} hidden
-        </Text>
-      ) : null}
     </FilterInlineControl>
   )
 }
@@ -367,7 +358,6 @@ export function FilterFieldRenderer<TData, TState extends Record<string, unknown
           field={field}
           controlId={controlId}
           presentation={presentation as Extract<FilterFieldPresentation, { type: 'boolean' }>}
-          optionsContext={optionsContext}
           disabled={disabled}
           state={context.state}
           onValueChange={context.onValueChange}

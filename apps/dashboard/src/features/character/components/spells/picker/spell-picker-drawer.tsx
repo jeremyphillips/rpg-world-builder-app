@@ -17,8 +17,12 @@ import {
 } from '@/features/content'
 import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { resolveSpellSelectionRowPresentation } from '../../../lib/spells/spell-selection-row-presentation.lib'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   choiceSetForSpellPickerMode,
@@ -84,6 +88,7 @@ export function SpellPickerDrawer({
   onRemoveSpell,
 }: SpellPickerDrawerProps) {
   const {
+    activeItems,
     activeChoiceSet,
     activeSelectedIds,
     browseState,
@@ -197,17 +202,23 @@ export function SpellPickerDrawer({
       emptyState={
         emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
-      actions={({ searchQuery, activeTabId, resetSearchQuery, resetActiveTab }) => {
+      actions={({
+        searchQuery,
+        activeTabId,
+        resetSearchQuery,
+        resetActiveTab,
+        visibleItemCount,
+      }) => {
         syncSheetState(searchQuery, activeTabId)
 
-        const showResetView = hasCatalogPickerResetViewCriteria({
+        const criteria = {
           structuredFilterCount,
           searchQuery,
           sortMode: browseState.sortMode,
           defaultSortMode: defaultBrowseState.sortMode,
           activeTabId,
           defaultTabId: defaultBrowseState.activeTabId,
-        })
+        }
 
         const handleResetView = () => {
           resetBrowseView(defaultBrowseState.activeTabId)
@@ -216,7 +227,16 @@ export function SpellPickerDrawer({
         }
 
         return (
-          <CatalogToolbarResetSlot visible={showResetView} includesSort onClick={handleResetView} />
+          <CatalogToolbarResetSlot
+            visible={hasCatalogPickerResetViewCriteria(criteria)}
+            includesSort
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: activeItems.length,
+              narrowing: hasCatalogPickerNarrowingCriteria(criteria),
+            })}
+            onClick={handleResetView}
+          />
         )
       }}
       filterRow={{

@@ -27,7 +27,11 @@ import {
   toSpellCatalogHeaderModel,
   type CharacterSheetSpellCard,
 } from '../../../lib/detail/character-sheet-catalog'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailSpellFilterControls } from './character-detail-spell-filter-controls'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -157,7 +161,19 @@ export function CharacterDetailSpellsTab({ cards }: CharacterDetailSpellsTabProp
         }
         actions={
           showResetView ? (
-            <CatalogToolbarResetSlot visible includesSort={false} onClick={handleResetView} />
+            <CatalogToolbarResetSlot
+              visible
+              includesSort={false}
+              {...resolveCatalogPickerResultSummary({
+                visible: visibleCards.length,
+                total: cards.length,
+                narrowing: hasCatalogPickerNarrowingCriteria({
+                  structuredFilterCount,
+                  searchQuery,
+                }),
+              })}
+              onClick={handleResetView}
+            />
           ) : undefined
         }
       />

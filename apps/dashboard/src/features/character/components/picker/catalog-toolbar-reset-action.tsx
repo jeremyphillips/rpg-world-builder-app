@@ -1,6 +1,11 @@
 import { ActionButton } from '@rpg/ui'
+import { FilterToolbarLabelSizer } from '@rpg/ui/filters'
 
-import { catalogToolbarResetSlotReservedClasses } from './catalog-picker-filter-toolbar.variants'
+import {
+  catalogPickerResultSummaryClasses,
+  catalogToolbarResetRowClasses,
+  catalogToolbarResetSlotReservedClasses,
+} from './catalog-picker-filter-toolbar.variants'
 
 export const CATALOG_TOOLBAR_RESET_VISIBLE_LABEL = 'Reset'
 
@@ -69,6 +74,10 @@ export type CatalogToolbarResetSlotProps = {
    * with the sort-aware accessible name.
    */
   label?: string
+  /** Visible count, for example `12 of 87`. Omit when nothing narrows the list. */
+  summary?: string
+  /** Widest summary label, usually `total of total`, so the count does not change width. */
+  summaryReserveLabel?: string
 }
 
 /**
@@ -81,6 +90,8 @@ export function CatalogToolbarResetSlot({
   includesSort,
   reserve,
   label,
+  summary,
+  summaryReserveLabel,
 }: CatalogToolbarResetSlotProps) {
   const shouldReserve = reserve ?? includesSort
   if (!visible && !shouldReserve) return null
@@ -89,16 +100,25 @@ export function CatalogToolbarResetSlot({
   const visibleLabel = label ?? CATALOG_TOOLBAR_RESET_VISIBLE_LABEL
 
   return (
-    <div
-      className={visible ? undefined : catalogToolbarResetSlotReservedClasses}
-      aria-hidden={visible ? undefined : true}
-    >
-      <CatalogToolbarResetAction
-        label={visibleLabel}
-        accessibleName={accessibleName}
-        onClick={onClick}
-        tabIndex={visible ? undefined : -1}
-      />
+    <div className={catalogToolbarResetRowClasses}>
+      {summary ? (
+        <span aria-live="polite" className={catalogPickerResultSummaryClasses}>
+          <FilterToolbarLabelSizer labels={[summaryReserveLabel ?? summary]}>
+            {summary}
+          </FilterToolbarLabelSizer>
+        </span>
+      ) : null}
+      <div
+        className={visible ? undefined : catalogToolbarResetSlotReservedClasses}
+        aria-hidden={visible ? undefined : true}
+      >
+        <CatalogToolbarResetAction
+          label={visibleLabel}
+          accessibleName={accessibleName}
+          onClick={onClick}
+          tabIndex={visible ? undefined : -1}
+        />
+      </div>
     </div>
   )
 }

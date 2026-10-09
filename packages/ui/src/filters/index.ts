@@ -57,6 +57,7 @@ export {
 } from './filter-engine.helpers'
 
 export { FILTER_DENSITY_DEFAULT, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
+export { FilterToolbarLabelSizer } from './filter-toolbar-label-sizer.client'
 export type { FilterBarOrientation } from './filter-bar.variants'
 export {
   getSchemaFieldsByPlacement,

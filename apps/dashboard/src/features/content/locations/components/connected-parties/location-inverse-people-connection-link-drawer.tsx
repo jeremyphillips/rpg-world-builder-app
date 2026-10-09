@@ -21,6 +21,8 @@ import {
 
 import {
   CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
   buildCharacterEntityCardModel,
   formatContentReferenceLabel,
   hasCatalogPickerResetViewCriteria,
@@ -675,7 +677,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 }
               : undefined
           }
-          actions={({ searchQuery, resetSearchQuery }) => {
+          actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
             const showReset = hasCatalogPickerResetViewCriteria({
               structuredFilterCount: organizationFilters.structuredFilterCount,
               searchQuery,
@@ -685,6 +687,14 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 visible={showReset}
                 reserve={showOrganizationDomainFilter}
                 includesSort={false}
+                {...resolveCatalogPickerResultSummary({
+                  visible: visibleItemCount,
+                  total: organizationFilters.sourceCount,
+                  narrowing: hasCatalogPickerNarrowingCriteria({
+                    structuredFilterCount: organizationFilters.structuredFilterCount,
+                    searchQuery,
+                  }),
+                })}
                 onClick={() => {
                   organizationFilters.reset()
                   resetSearchQuery()
@@ -784,7 +794,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               }
             : undefined
         }
-        actions={({ searchQuery, resetSearchQuery }) => {
+        actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
           const showReset = hasCatalogPickerResetViewCriteria({
             structuredFilterCount: characterFilters.structuredFilterCount,
             searchQuery,
@@ -794,6 +804,14 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               visible={showReset}
               reserve={showCharacterClassFilter}
               includesSort={false}
+              {...resolveCatalogPickerResultSummary({
+                visible: visibleItemCount,
+                total: characterFilters.sourceCount,
+                narrowing: hasCatalogPickerNarrowingCriteria({
+                  structuredFilterCount: characterFilters.structuredFilterCount,
+                  searchQuery,
+                }),
+              })}
               onClick={() => {
                 characterFilters.reset()
                 resetSearchQuery()

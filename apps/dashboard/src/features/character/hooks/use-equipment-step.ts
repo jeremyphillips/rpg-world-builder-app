@@ -633,6 +633,7 @@ export function useEquipmentStep(args: {
     budget,
     fundingState,
     pickerItems: magicItemWorkflow.filteredPickerItems,
+    matchesMagicItemAllowance: magicItemWorkflow.matchesMagicItemAllowance,
     allPickerItems: pickerItems,
     selectionFacts,
     pickerBrowseSortContext,

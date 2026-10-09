@@ -8,6 +8,10 @@ import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
 import {
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../../picker/catalog-picker-filter-state.lib'
+import {
   getEquipmentPickerSearchText,
   hasEquipmentPickerResetViewCriteria,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
@@ -56,6 +60,9 @@ function EquipmentPickerToolbarActions({
   searchQuery,
   focusedAllowanceId,
   workflowMode,
+  visibleItemCount,
+  eligibleItemCount,
+  structuredFilterCount,
   onResetView,
 }: {
   selectedKind: ReturnType<typeof useEquipmentPickerController>['selectedKind']
@@ -64,6 +71,9 @@ function EquipmentPickerToolbarActions({
   searchQuery: string
   focusedAllowanceId?: string
   workflowMode: EquipmentPickerWorkflowMode
+  visibleItemCount: number
+  eligibleItemCount: number
+  structuredFilterCount: number
   onResetView: () => void
 }) {
   const showResetView = hasEquipmentPickerResetViewCriteria({
@@ -75,7 +85,21 @@ function EquipmentPickerToolbarActions({
     sortMode,
   })
 
-  return <CatalogToolbarResetSlot visible={showResetView} includesSort onClick={onResetView} />
+  return (
+    <CatalogToolbarResetSlot
+      visible={showResetView}
+      includesSort
+      {...resolveCatalogPickerResultSummary({
+        visible: visibleItemCount,
+        total: eligibleItemCount,
+        narrowing: hasCatalogPickerNarrowingCriteria({
+          structuredFilterCount,
+          searchQuery,
+        }),
+      })}
+      onClick={onResetView}
+    />
+  )
 }
 
 /** Equipment catalog drawer — domain composition over `CatalogEntityPickerSheet`. */
@@ -98,6 +122,7 @@ export function EquipmentPickerDrawer({
   magicItemAllowances,
   focusedAllowanceId,
   onFocusedAllowanceIdChange,
+  matchesMagicItemAllowance,
   isGoldShoppingPath = false,
   resolveRowActionViewModel,
   onCommitAdd,
@@ -116,6 +141,7 @@ export function EquipmentPickerDrawer({
     magicItemGrantProgress,
     focusedAllowanceId,
     onFocusedAllowanceIdChange,
+    matchesMagicItemAllowance,
     onCommitAdd,
   })
 
@@ -191,7 +217,7 @@ export function EquipmentPickerDrawer({
           onFilterStateChange={picker.handleFilterStateChange}
         />
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const handleResetView = () => {
           picker.resetBrowseView()
           resetSearchQuery()
@@ -205,6 +231,9 @@ export function EquipmentPickerDrawer({
             searchQuery={searchQuery}
             focusedAllowanceId={focusedAllowanceId}
             workflowMode={workflowMode}
+            visibleItemCount={visibleItemCount}
+            eligibleItemCount={picker.eligibleItemCount}
+            structuredFilterCount={picker.structuredFilterCount}
             onResetView={handleResetView}
           />
         )

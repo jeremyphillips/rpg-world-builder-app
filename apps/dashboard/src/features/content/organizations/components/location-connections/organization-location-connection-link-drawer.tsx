@@ -18,7 +18,12 @@ import {
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
-import { CatalogToolbarResetSlot, hasCatalogPickerResetViewCriteria } from '@/features/character'
+import {
+  CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '@/features/character'
 import {
   CatalogEntityPickerSheet,
   RelationshipCatalogFilterBand,
@@ -813,7 +818,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
               }
             : undefined
         }
-        actions={({ searchQuery, resetSearchQuery }) => {
+        actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
           const showReset = hasCatalogPickerResetViewCriteria({
             structuredFilterCount: locationFilters.structuredFilterCount,
             searchQuery,
@@ -823,6 +828,14 @@ function OrganizationLocationConnectionLinkDrawerContent({
               visible={showReset}
               reserve={showKindFilter}
               includesSort={false}
+              {...resolveCatalogPickerResultSummary({
+                visible: visibleItemCount,
+                total: locationFilters.sourceCount,
+                narrowing: hasCatalogPickerNarrowingCriteria({
+                  structuredFilterCount: locationFilters.structuredFilterCount,
+                  searchQuery,
+                }),
+              })}
               onClick={() => {
                 locationFilters.reset()
                 resetSearchQuery()

@@ -10,6 +10,8 @@ import { Button, Text } from '@rpg/ui'
 
 import {
   CatalogToolbarResetSlot,
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
   buildCharacterEntityCardModel,
   formatContentReferenceLabel,
   hasCatalogPickerResetViewCriteria,
@@ -345,7 +347,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             }
           : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
           structuredFilterCount: characterFilters.structuredFilterCount,
           searchQuery,
@@ -355,6 +357,14 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
             visible={showReset}
             reserve={showClassFilter}
             includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: characterFilters.sourceCount,
+              narrowing: hasCatalogPickerNarrowingCriteria({
+                structuredFilterCount: characterFilters.structuredFilterCount,
+                searchQuery,
+              }),
+            })}
             onClick={() => {
               characterFilters.reset()
               resetSearchQuery()

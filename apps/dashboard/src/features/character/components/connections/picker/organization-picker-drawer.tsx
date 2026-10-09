@@ -23,6 +23,10 @@ import {
 } from '../../../lib/picker/picker-mutation-family'
 import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
 import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
@@ -174,7 +178,7 @@ export function OrganizationPickerDrawer({
       hasStructuredFilters={organizationFilters.structuredFilterCount > 0}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
-      actions={({ searchQuery, resetSearchQuery }) => {
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
         const showReset = hasCatalogPickerResetViewCriteria({
           structuredFilterCount: organizationFilters.structuredFilterCount,
           searchQuery,
@@ -184,6 +188,14 @@ export function OrganizationPickerDrawer({
             visible={showReset}
             reserve={showDomainFilter}
             includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: organizationFilters.sourceCount,
+              narrowing: hasCatalogPickerNarrowingCriteria({
+                structuredFilterCount: organizationFilters.structuredFilterCount,
+                searchQuery,
+              }),
+            })}
             onClick={() => {
               organizationFilters.reset()
               resetSearchQuery()

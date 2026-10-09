@@ -171,7 +171,11 @@ export {
   createCharacterClassFilterLabelResolver,
   formatContentReferenceLabel,
 } from './lib/display/format-content-reference-label'
-export { hasCatalogPickerResetViewCriteria } from './components/picker/catalog-picker-filter-state.lib'
+export {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from './components/picker/catalog-picker-filter-state.lib'
 export { CatalogToolbarResetSlot } from './components/picker/catalog-toolbar-reset-action'
 export {
   SAMPLE_PC,

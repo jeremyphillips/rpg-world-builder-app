@@ -409,6 +409,8 @@ Width tokens stay caps (`max-w-*`). A label longer than the cap truncates, and t
 
 The reset row stays reserved whenever a utility band renders, including bands that have no Sort. `CatalogToolbarResetSlot` `reserve` defaults to `includesSort`.
 
+A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. When search, a structured filter, or a non-default tab narrows the list, the reset row shows `visible of total` in a polite live region. `total` is the eligible list for the current mode before that narrowing. `visible` is the count after tab, structured filters, and search. Sort does not change the count. The summary reserves `total of total` so the row width stays stable. A sort-only change shows Reset with no count. When narrowing still matches every row, the summary is `total of total`.
+
 Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 
 ### Out of scope for catalog filters

@@ -15,7 +15,6 @@ import {
   pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
-  countEquipmentPickerAffordableHiddenImpact,
   countEquipmentPickerStructuredFilters,
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
@@ -729,42 +728,5 @@ describe('equipment-picker-drawer.lib', () => {
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
       }),
     ).toBe(false)
-  })
-
-  it('counts affordable hidden impact after search and structured filters', () => {
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: '',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: true,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(1)
-
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: 'cheap',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: true,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(0)
-  })
-
-  it('hides affordable impact count when the toggle is off or nothing is excluded', () => {
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: '',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(0)
   })
 })

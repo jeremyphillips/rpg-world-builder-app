@@ -37,7 +37,11 @@ import {
   type CharacterSheetEquipmentCard,
 } from '../../../lib/detail/character-sheet-catalog'
 import type { CharacterWealthViewModel } from '../../../lib/display/character-display'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
@@ -207,6 +211,14 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                 <CatalogToolbarResetSlot
                   visible={showResetView}
                   includesSort={showSort}
+                  {...resolveCatalogPickerResultSummary({
+                    visible: visibleCards.length,
+                    total: cards.length,
+                    narrowing: hasCatalogPickerNarrowingCriteria({
+                      structuredFilterCount,
+                      searchQuery,
+                    }),
+                  })}
                   onClick={handleResetView}
                 />
               ) : undefined

@@ -29,8 +29,6 @@ import {
   type EquipmentPickerKindFilter,
   type EquipmentPickerSupportedKind,
 } from '../drawer/equipment-picker-drawer.types'
-import { countEquipmentPickerAffordableHiddenImpact } from '../drawer/equipment-picker-drawer.lib'
-
 export type EquipmentPickerFilterState = {
   selectedKind?: EquipmentPickerKindFilter
   selectedRarity?: string
@@ -75,7 +73,7 @@ export type CreateEquipmentPickerFilterSchemaArgs = {
   showRarityFilter: boolean
   showAffordableFilter: boolean
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
-  affordableHiddenCount?: number
+  matchesMagicItemAllowance?: (row: EquipmentPickerItem, allowanceId: string) => boolean
   filterOutUnaffordable: boolean
   filterOutNonProficient: boolean
   searchQuery: string
@@ -138,14 +136,14 @@ function sanitizeEquipmentPickerFilterState(
   }
 }
 
-export function createEquipmentPickerFilterSchema(
-  args: CreateEquipmentPickerFilterSchemaArgs,
-): FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState> {
+export function createEquipmentPickerFilterSchema<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(args: CreateEquipmentPickerFilterSchemaArgs): FilterSchema<TItem, EquipmentPickerFilterState> {
   const fields = []
 
   if (args.showRarityFilter && args.magicItemGrantProgress) {
     fields.push(
-      createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedRarity'>({
+      createChipsFilter<TItem, EquipmentPickerFilterState, 'selectedRarity'>({
         id: 'selectedRarity',
         label: getTermCompactLabel(MAGIC_ITEM_RARITY_TERM),
         selectionMode: 'single-required',
@@ -158,12 +156,19 @@ export function createEquipmentPickerFilterSchema(
             label: getMagicItemRarityLabel(entry.rarity),
           })),
         ],
-        matches: () => true,
+        matches: (row, value) => {
+          if (typeof value !== 'string') return false
+          return (
+            args.matchesMagicItemAllowance?.(row, value) ??
+            (row.equipment.kind === 'magic_item' &&
+              row.equipment.rarity === value.split(':').at(-1))
+          )
+        },
       }),
     )
   } else if (args.showCategoryFilter) {
     fields.push(
-      createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedKind'>({
+      createChipsFilter<TItem, EquipmentPickerFilterState, 'selectedKind'>({
         id: 'selectedKind',
         label: EQUIPMENT_PICKER_CATEGORY_LABEL,
         selectionMode: 'single-required',
@@ -184,21 +189,10 @@ export function createEquipmentPickerFilterSchema(
 
   if (args.showAffordableFilter) {
     fields.push(
-      createBooleanFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'showAffordableOnly'>({
+      createBooleanFilter<TItem, EquipmentPickerFilterState, 'showAffordableOnly'>({
         id: 'showAffordableOnly',
         label: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
         placement: 'primary',
-        hiddenCount: (state) =>
-          state.showAffordableOnly
-            ? countEquipmentPickerAffordableHiddenImpact(args.items, {
-                searchQuery: args.searchQuery,
-                filterOutUnaffordable: args.filterOutUnaffordable,
-                filterOutNonProficient: args.filterOutNonProficient,
-                selectedKind: state.selectedKind ?? EQUIPMENT_PICKER_KIND_ALL,
-                showAffordableOnly: true,
-                budget: args.budget,
-              })
-            : undefined,
         getValue: (row) => row.state.isWithinRemainingBudget,
       }),
     )
@@ -209,8 +203,10 @@ export function createEquipmentPickerFilterSchema(
   })
 }
 
-export function countEquipmentPickerStructuredFilters(
-  schema: FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState>,
+export function countEquipmentPickerStructuredFilters<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(
+  schema: FilterSchema<TItem, EquipmentPickerFilterState>,
   state: EquipmentPickerFilterState,
 ): number {
   return countModifiedFilters(schema, state)
