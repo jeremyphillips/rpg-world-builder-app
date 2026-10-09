@@ -91,6 +91,9 @@ type BaseFilterFieldDef<
 
 export type SelectFilterLayout = 'stacked' | 'inline' | 'floating'
 
+/** Text filter presentation — `search` uses SearchBar; default `text` uses plain Input. */
+export type TextFilterControlRole = 'text' | 'search'
+
 type TextFilterFieldShared<
   TData,
   TState extends Record<string, unknown>,
@@ -99,6 +102,8 @@ type TextFilterFieldShared<
   type: 'text'
   /** Example text. In floating layout this is optional guidance, not the field name. */
   placeholder?: string
+  /** When `search`, renders SearchBar instead of a plain text input (non-floating only). */
+  control?: TextFilterControlRole
 }
 
 export type TextFilterFieldDef<

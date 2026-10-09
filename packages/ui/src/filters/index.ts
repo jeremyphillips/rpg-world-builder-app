@@ -26,6 +26,7 @@ export type {
   SelectFilterFieldDef,
   SelectFilterLayout,
   TextFilterFieldDef,
+  TextFilterControlRole,
 } from './filter-schema.types'
 
 export { createFilterSchema } from './filter-schema.types'

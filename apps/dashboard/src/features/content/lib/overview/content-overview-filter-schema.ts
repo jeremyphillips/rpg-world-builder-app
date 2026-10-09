@@ -35,6 +35,7 @@ export function createContentNameFilter<
     id: 'name',
     label: 'Name',
     placeholder: 'Search…',
+    control: 'search',
     url: { key: 'q' },
     getSearchText: (row: TData) => row.name,
   }) as unknown as FilterFieldDef<TData, TState>

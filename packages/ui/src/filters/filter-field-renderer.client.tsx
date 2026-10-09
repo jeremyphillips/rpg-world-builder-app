@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button.client'
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
+import { SearchBar } from '../components/ui/search-bar.client'
 import { FilterFloatingField } from './filter-floating-field.client'
 import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
@@ -75,6 +76,13 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
   const rawValue = state[textField.id]
   const textValue = typeof rawValue === 'string' ? rawValue : ''
 
+  const commitTextValue = (next: string) => {
+    onValueChange(
+      textField.id,
+      (next ? next : undefined) as TState[typeof textField.id] | undefined,
+    )
+  }
+
   if (textField.layout === 'floating') {
     return (
       <div
@@ -90,19 +98,31 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
         >
           <Input
             value={textValue}
-            onChange={(event) => {
-              onValueChange(
-                textField.id,
-                (event.target.value ? event.target.value : undefined) as
-                  | TState[typeof textField.id]
-                  | undefined,
-              )
-            }}
+            onChange={(event) => commitTextValue(event.target.value)}
             autoComplete="off"
             size={presentation.controlSize}
             disabled={disabled}
           />
         </FilterFloatingField>
+      </div>
+    )
+  }
+
+  if (textField.control === 'search') {
+    return (
+      <div
+        data-field-align=""
+        className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+      >
+        <SearchBar
+          id={controlId}
+          value={textValue}
+          onValueChange={commitTextValue}
+          placeholder={textField.placeholder ?? `Filter ${textField.label}…`}
+          ariaLabel={textField.label}
+          size={presentation.controlSize}
+          disabled={disabled}
+        />
       </div>
     )
   }
@@ -116,14 +136,7 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
         id={controlId}
         placeholder={textField.placeholder ?? `Filter ${textField.label}…`}
         value={textValue}
-        onChange={(event) => {
-          onValueChange(
-            textField.id,
-            (event.target.value ? event.target.value : undefined) as
-              | TState[typeof textField.id]
-              | undefined,
-          )
-        }}
+        onChange={(event) => commitTextValue(event.target.value)}
         aria-label={textField.label}
         size={presentation.controlSize}
         disabled={disabled}

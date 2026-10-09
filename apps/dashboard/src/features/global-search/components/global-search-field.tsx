@@ -1,7 +1,6 @@
-import { Search } from 'lucide-react'
 import * as React from 'react'
 
-import { Input, cn, type InputProps } from '@rpg/ui'
+import { SearchBar, cn, type InputProps } from '@rpg/ui'
 
 import { GLOBAL_SEARCH_COPY } from '../lib/global-search-copy'
 
@@ -34,49 +33,34 @@ export const GlobalSearchField = React.forwardRef<HTMLInputElement, GlobalSearch
     },
     ref,
   ) {
-    const inputRef = React.useRef<HTMLInputElement>(null)
-
-    React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
-
-    React.useEffect(() => {
-      if (!autoFocus) return
-      inputRef.current?.focus()
-    }, [autoFocus])
-
     return (
-      <div className={cn('relative flex items-center', className)}>
-        <Search
-          aria-hidden
-          className="pointer-events-none absolute left-3 size-4 text-muted-foreground"
-        />
-        <Input
-          ref={inputRef}
-          id={id}
-          type="search"
-          value={value}
-          onChange={(event) => onValueChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              event.preventDefault()
-              onSubmit?.()
-              return
-            }
-            if (event.key === 'Escape') {
-              event.preventDefault()
-              onRequestClose?.()
-            }
-          }}
-          placeholder={GLOBAL_SEARCH_COPY.searchFieldPlaceholder}
-          aria-label={GLOBAL_SEARCH_COPY.searchFieldLabel}
-          aria-controls={ariaControls}
-          aria-expanded={ariaExpanded}
-          className="pl-9"
-          size={size}
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-        />
-      </div>
+      <SearchBar
+        ref={ref}
+        id={id}
+        value={value}
+        onValueChange={onValueChange}
+        placeholder={GLOBAL_SEARCH_COPY.searchFieldPlaceholder}
+        ariaLabel={GLOBAL_SEARCH_COPY.searchFieldLabel}
+        size={size}
+        autoFocus={autoFocus}
+        className={cn(className)}
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck={false}
+        aria-controls={ariaControls}
+        aria-expanded={ariaExpanded}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault()
+            onSubmit?.()
+            return
+          }
+          if (event.key === 'Escape') {
+            event.preventDefault()
+            onRequestClose?.()
+          }
+        }}
+      />
     )
   },
 )

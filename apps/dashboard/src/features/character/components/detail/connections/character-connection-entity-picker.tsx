@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { isEmptySearchQuery, normalizeSearchQuery } from '@rpg/search'
-import { Input, rankLegacySearchItems, Text } from '@rpg/ui'
+import { SearchBar, rankLegacySearchItems, Text } from '@rpg/ui'
 
 import { scoreAndFilterPickerItems } from '../../picker/sort/catalog-picker-sort.lib'
 import { CatalogEntitySurfaceRow, type EntitySurfaceConfig } from '@/features/content'
@@ -59,11 +59,12 @@ export function ConnectionEntityPicker<TItem>({
 
   return (
     <div className="flex flex-col gap-3">
-      <Input
+      <SearchBar
+        id="connection-entity-picker-search"
         value={query}
-        onChange={(event) => setQuery(event.target.value)}
+        onValueChange={setQuery}
         placeholder={searchPlaceholder}
-        aria-label={searchPlaceholder}
+        ariaLabel={searchPlaceholder}
       />
       {filterControls}
       {filteredItems.length === 0 ? (

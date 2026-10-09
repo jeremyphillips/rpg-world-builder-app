@@ -293,6 +293,29 @@ describe('ComboboxField', () => {
     expect(screen.queryByRole('option', { name: 'Dart' })).not.toBeInTheDocument()
   })
 
+  it('clears panel search and keeps focus in the search input', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="weapons"
+        label="Specific weapons"
+        options={weaponOptions}
+        multiple
+        value={[]}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Specific weapons' }))
+    const search = screen.getByRole('searchbox', { name: 'Search Specific weapons' })
+    await user.type(search, 'long')
+    await user.click(screen.getByRole('button', { name: 'Clear search' }))
+
+    await waitFor(() => {
+      expect(search).toHaveFocus()
+    })
+    expect(search).toHaveValue('')
+  })
+
   it('adds a selection in multi mode', async () => {
     const onChange = vi.fn()
     const user = userEvent.setup()

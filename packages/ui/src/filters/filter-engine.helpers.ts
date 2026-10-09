@@ -71,6 +71,7 @@ type TextFilterConfig<
   label: string
   placeholder?: string
   layout?: 'floating'
+  control?: TextFilterFieldDef<TData, TState, TId>['control']
   placement?: FilterPlacement
   defaultValue?: TState[TId]
   visible?: (state: TState) => boolean
@@ -89,6 +90,7 @@ export function createTextFilter<
     id: config.id,
     label: config.label,
     placeholder: config.placeholder,
+    ...(config.control ? { control: config.control } : {}),
     placement: config.placement,
     defaultValue: config.defaultValue,
     visible: config.visible,

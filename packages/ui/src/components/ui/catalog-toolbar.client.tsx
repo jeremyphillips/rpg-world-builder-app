@@ -1,9 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Search } from 'lucide-react'
 
-import { Input } from './input.client'
+import { SearchBar } from './search-bar.client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs.client'
 import { Text } from './text'
 import type {
@@ -15,8 +14,6 @@ import type {
 import { cn } from '../../lib/utils'
 import { resolveCatalogToolbarLayout } from './catalog-toolbar.lib'
 import {
-  catalogToolbarSearchIconVariants,
-  catalogToolbarSearchRowVariants,
   catalogToolbarStandaloneActionsVariants,
   catalogToolbarTabRowVariants,
   catalogToolbarUtilityBandVariants,
@@ -28,6 +25,8 @@ import { FILTER_DENSITY_DEFAULT } from '../../filters/filter-bar.variants'
 import { FilterChromeProvider, useOptionalFilterChrome } from '../../filters/filter-chrome.context'
 import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
 import type { FilterDensity } from '../../filters/filter-schema.types'
+
+const CATALOG_TOOLBAR_SEARCH_ID = 'catalog-toolbar-search'
 
 function CatalogToolbarTabTrigger({ tab }: { tab: CatalogToolbarTab }) {
   const count = tab.count ?? 0
@@ -82,22 +81,18 @@ function CatalogToolbarSearchField({
   search: CatalogToolbarSearch
   controlSize: 'sm' | 'md'
 }) {
+  const ariaLabel = search.ariaLabel ?? search.placeholder ?? 'Search catalog'
+
   return (
-    <div className={catalogToolbarSearchRowVariants()}>
-      <Search
-        className={catalogToolbarSearchIconVariants({ disabled: search.disabled })}
-        aria-hidden
-      />
-      <Input
-        value={search.query}
-        onChange={(event) => search.onQueryChange(event.target.value)}
-        placeholder={search.placeholder}
-        aria-label={search.ariaLabel ?? search.placeholder}
-        className="pl-9"
-        size={controlSize}
-        disabled={search.disabled}
-      />
-    </div>
+    <SearchBar
+      id={CATALOG_TOOLBAR_SEARCH_ID}
+      value={search.query}
+      onValueChange={search.onQueryChange}
+      placeholder={search.placeholder}
+      ariaLabel={ariaLabel}
+      size={controlSize}
+      disabled={search.disabled}
+    />
   )
 }
 
