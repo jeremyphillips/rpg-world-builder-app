@@ -15,6 +15,10 @@ import {
   toEquipmentPickerFilterState,
 } from '../browse/equipment-picker-filter-schema'
 import {
+  EMPTY_ARMOR_DETAIL_FILTERS,
+  EMPTY_WEAPON_DETAIL_FILTERS,
+} from '../browse/equipment-picker-kind-detail-filters'
+import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
   EQUIPMENT_PICKER_SORT_MODES,
@@ -34,7 +38,6 @@ export type UseEquipmentPickerControllerArgs = Pick<
   | 'budget'
   | 'allowedKinds'
   | 'filterOutUnaffordable'
-  | 'filterOutNonProficient'
   | 'workflowMode'
   | 'magicItemGrantProgress'
   | 'focusedAllowanceId'
@@ -50,7 +53,6 @@ export function useEquipmentPickerController({
   budget,
   allowedKinds,
   filterOutUnaffordable = false,
-  filterOutNonProficient = false,
   workflowMode = 'purchase',
   magicItemGrantProgress,
   focusedAllowanceId,
@@ -82,6 +84,9 @@ export function useEquipmentPickerController({
   const [showAffordableOnly, setShowAffordableOnly] = React.useState<boolean>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
   )
+  const [hideNonProficient, setHideNonProficient] = React.useState(false)
+  const [weaponFilters, setWeaponFilters] = React.useState(EMPTY_WEAPON_DETAIL_FILTERS)
+  const [armorFilters, setArmorFilters] = React.useState(EMPTY_ARMOR_DETAIL_FILTERS)
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
@@ -99,8 +104,18 @@ export function useEquipmentPickerController({
         selectedKind,
         selectedRarity: selectedRarityFilter,
         showAffordableOnly,
+        hideNonProficient,
+        weaponFilters,
+        armorFilters,
       }),
-    [selectedKind, selectedRarityFilter, showAffordableOnly],
+    [
+      armorFilters,
+      hideNonProficient,
+      selectedKind,
+      selectedRarityFilter,
+      showAffordableOnly,
+      weaponFilters,
+    ],
   )
 
   const schemaArgs = React.useMemo(
@@ -113,13 +128,11 @@ export function useEquipmentPickerController({
       showAffordableFilter,
       magicItemGrantProgress,
       filterOutUnaffordable,
-      filterOutNonProficient,
       searchQuery: '',
       budget: effectiveBudget,
       matchesMagicItemAllowance,
     }),
     [
-      filterOutNonProficient,
       effectiveBudget,
       filterOutUnaffordable,
       kindOptions,
@@ -151,6 +164,9 @@ export function useEquipmentPickerController({
         )
       }
       setShowAffordableOnly(next.showAffordableOnly === true)
+      setHideNonProficient(next.hideNonProficient === true)
+      setWeaponFilters(next.weaponFilters ?? EMPTY_WEAPON_DETAIL_FILTERS)
+      setArmorFilters(next.armorFilters ?? EMPTY_ARMOR_DETAIL_FILTERS)
     },
     [onFocusedAllowanceIdChange],
   )
@@ -165,12 +181,11 @@ export function useEquipmentPickerController({
     () =>
       filterEquipmentPickerItems(supportedItems, {
         filterOutUnaffordable,
-        filterOutNonProficient,
         selectedKind: EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind,
         showAffordableOnly: false,
         budget: effectiveBudget,
       }),
-    [effectiveBudget, filterOutNonProficient, filterOutUnaffordable, supportedItems],
+    [effectiveBudget, filterOutUnaffordable, supportedItems],
   )
 
   const filteredItems = React.useMemo(
@@ -197,6 +212,9 @@ export function useEquipmentPickerController({
   const resetBrowseView = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
+    setHideNonProficient(false)
+    setWeaponFilters(EMPTY_WEAPON_DETAIL_FILTERS)
+    setArmorFilters(EMPTY_ARMOR_DETAIL_FILTERS)
     setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
     onFocusedAllowanceIdChange?.(undefined)
   }, [onFocusedAllowanceIdChange])

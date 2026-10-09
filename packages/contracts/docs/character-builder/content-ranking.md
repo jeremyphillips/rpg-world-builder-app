@@ -234,9 +234,9 @@ The equipment picker exposes two independent affordability controls:
 | **Affordable now** checkbox (`showAffordableOnly`) | `purchaseAvailability.status === 'available'`    | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
 Browse context (search, category, sort) is **preserved** across drawer
-close/reopen within a builder session. **Reset view** (default) resets the full view;
-**Clear filters** resets structured inclusion and search only.
-Context-key reset (character, equipment method, budget change) is a documented follow-up.
+close/reopen within a builder session. Reset restores search, filters, and sort.
+
+A filter that reads a rank key's fact, such as proficiency or unmet Strength, narrows rows. It does not reorder them. The rank key still orders the rows that remain when the filter is off.
 
 Row disabled notes and the budget header use the shared `EmphasisDetailLine`
 pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted

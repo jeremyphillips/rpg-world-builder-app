@@ -108,7 +108,6 @@ describe('equipment-picker-drawer.lib', () => {
       [equipmentPickerItemsFixture[0]!, startingUnaffordable, equipmentPickerItemsFixture[2]!],
       {
         filterOutUnaffordable: true,
-        filterOutNonProficient: true,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         budget: equipmentPickerBudgetFixture,
       },
@@ -159,7 +158,6 @@ describe('equipment-picker-drawer.lib', () => {
     expect(
       filterEquipmentPickerItems([chainMail], {
         filterOutUnaffordable: true,
-        filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
         budget: equipmentPickerBudgetFixture,
       }),
@@ -190,7 +188,6 @@ describe('equipment-picker-drawer.lib', () => {
     expect(
       filterEquipmentPickerItems([startingUnaffordable], {
         filterOutUnaffordable: false,
-        filterOutNonProficient: false,
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
       }),
     ).toHaveLength(1)
@@ -200,7 +197,6 @@ describe('equipment-picker-drawer.lib', () => {
   it('filters rows by selected kind', () => {
     const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       selectedKind: 'weapon',
     })
 
@@ -275,7 +271,6 @@ describe('equipment-picker-drawer.lib', () => {
 
     const filtered = filterEquipmentPickerItems(items, {
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       selectedKind: EQUIPMENT_PICKER_KIND_ALL,
     })
 
@@ -304,7 +299,6 @@ describe('equipment-picker-drawer.lib', () => {
 
     const filtered = filterEquipmentPickerItems([unpricedMagicItem], {
       filterOutUnaffordable: true,
-      filterOutNonProficient: false,
       selectedKind: EQUIPMENT_PICKER_KIND_ALL,
     })
 
@@ -315,7 +309,6 @@ describe('equipment-picker-drawer.lib', () => {
   it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {
     const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       selectedKind: EQUIPMENT_PICKER_KIND_ALL,
       showAffordableOnly: true,
     })

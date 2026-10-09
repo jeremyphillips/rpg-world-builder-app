@@ -110,7 +110,6 @@ export const HideNonProficient: Story = {
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
     filterOutUnaffordable: false,
-    filterOutNonProficient: true,
     onCommitAdd: () => undefined,
   },
 }

@@ -37,7 +37,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: false,
       showAffordableFilter: true,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -61,7 +60,6 @@ describe('equipment-picker-filter-schema', () => {
       showAffordableFilter: false,
       magicItemGrantProgress,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -87,7 +85,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: false,
       showAffordableFilter: false,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -104,7 +101,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: false,
       showAffordableFilter: true,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -122,7 +118,6 @@ describe('equipment-picker-filter-schema', () => {
       showAffordableFilter: false,
       magicItemGrantProgress,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -139,7 +134,6 @@ describe('equipment-picker-filter-schema', () => {
       showRarityFilter: false,
       showAffordableFilter: false,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
 
@@ -161,7 +155,6 @@ describe('equipment-picker-filter-schema', () => {
       matchesMagicItemAllowance: (row, allowanceId) =>
         row.equipment.kind === 'magic_item' && allowanceId === row.equipment.rarity,
       filterOutUnaffordable: false,
-      filterOutNonProficient: false,
       searchQuery: '',
     })
     const rows = [
@@ -170,5 +163,103 @@ describe('equipment-picker-filter-schema', () => {
     ] as EquipmentPickerItem[]
 
     expect(applyFilterSchema(schema, { selectedRarity: 'common' }, rows)).toEqual([rows[0]])
+  })
+
+  it('keeps not-applicable rows when hiding non-proficient equipment', () => {
+    const proficient = {
+      equipment: { kind: 'weapon', category: 'simple', mode: 'melee', properties: [] },
+      state: { resolved: { state: { compatibility: { proficient: true } } } },
+    } as unknown as EquipmentPickerItem
+    const notApplicable = {
+      equipment: { kind: 'gear' },
+      state: { resolved: { state: { compatibility: { proficient: undefined } } } },
+    } as unknown as EquipmentPickerItem
+    const untrained = {
+      equipment: { kind: 'weapon', category: 'martial', mode: 'melee', properties: ['heavy'] },
+      state: { resolved: { state: { compatibility: { proficient: false } } } },
+    } as unknown as EquipmentPickerItem
+    const schema = createEquipmentPickerFilterSchema({
+      workflowMode: 'purchase',
+      items: [proficient, notApplicable, untrained] as unknown as EquipmentPickerRow[],
+      kindOptions: ['weapon'],
+      showCategoryFilter: false,
+      showRarityFilter: false,
+      showAffordableFilter: false,
+      filterOutUnaffordable: false,
+      searchQuery: '',
+    })
+
+    expect(
+      applyFilterSchema(schema, { hideNonProficient: true }, [
+        proficient,
+        notApplicable,
+        untrained,
+      ]),
+    ).toEqual([proficient, notApplicable])
+  })
+
+  it('keeps armor with no strength requirement when hiding unmet strength', () => {
+    const unmet = {
+      equipment: { kind: 'armor', category: 'heavy', stealthDisadvantage: true },
+      state: {
+        resolved: {
+          state: { compatibility: { unmetAbilityScoreRequirements: [{ ability: 'str' }] } },
+        },
+      },
+    } as unknown as EquipmentPickerItem
+    const noRequirement = {
+      equipment: { kind: 'armor', category: 'light', stealthDisadvantage: false },
+      state: { resolved: { state: { compatibility: {} } } },
+    } as unknown as EquipmentPickerItem
+    const schema = createEquipmentPickerFilterSchema({
+      workflowMode: 'purchase',
+      items: [unmet, noRequirement] as unknown as EquipmentPickerRow[],
+      kindOptions: ['armor'],
+      showCategoryFilter: true,
+      showRarityFilter: false,
+      showAffordableFilter: false,
+      filterOutUnaffordable: false,
+      searchQuery: '',
+    })
+
+    expect(
+      applyFilterSchema(
+        schema,
+        {
+          selectedKind: 'armor',
+          armorFilters: { categories: [], stealth: [], strength: ['hide-unmet-strength'] },
+        },
+        [unmet, noRequirement],
+      ),
+    ).toEqual([noRequirement])
+  })
+
+  it('drops weapon filters when kind is no longer weapon', () => {
+    const schema = createEquipmentPickerFilterSchema({
+      workflowMode: 'purchase',
+      items: [
+        {
+          equipment: { kind: 'weapon', category: 'simple', mode: 'melee', properties: [] },
+          state: {},
+        } as unknown as EquipmentPickerItem,
+        {
+          equipment: { kind: 'armor', category: 'light', stealthDisadvantage: false },
+          state: {},
+        } as unknown as EquipmentPickerItem,
+      ] as unknown as EquipmentPickerRow[],
+      kindOptions: ['weapon', 'armor'],
+      showCategoryFilter: true,
+      showRarityFilter: false,
+      showAffordableFilter: false,
+      filterOutUnaffordable: false,
+      searchQuery: '',
+    })
+
+    expect(
+      sanitizeFilterState(schema, {
+        selectedKind: 'armor',
+        weaponFilters: { categories: ['martial'], modes: [], properties: [] },
+      }).weaponFilters,
+    ).toBeUndefined()
   })
 })

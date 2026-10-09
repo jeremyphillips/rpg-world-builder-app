@@ -317,7 +317,6 @@ export {
 
 type EquipmentPickerStructuredFilterOptions = {
   filterOutUnaffordable: boolean
-  filterOutNonProficient: boolean
   selectedKind: EquipmentPickerKindFilter
   showAffordableOnly?: boolean
   /** Starting package purse. Required for `filterOutUnaffordable`; not a picker-row fact. */
@@ -339,7 +338,6 @@ function equipmentPickerItemMatchesStructuredFilters<T extends EquipmentPickerIt
 ): boolean {
   if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
   if (exceedsStartingPackageBudget(item, options)) return false
-  if (options.filterOutNonProficient && !item.state.isProficient) return false
   if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
   if (options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) {
     return item.equipment.kind === options.selectedKind

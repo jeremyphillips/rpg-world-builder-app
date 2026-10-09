@@ -27,7 +27,6 @@ describe('EquipmentPickerFilterControls', () => {
             showRarityFilter: false,
             showAffordableFilter: false,
             filterOutUnaffordable: false,
-            filterOutNonProficient: false,
             searchQuery: '',
           }}
           filterState={{}}
@@ -42,7 +41,6 @@ describe('EquipmentPickerFilterControls', () => {
             showRarityFilter: false,
             showAffordableFilter: false,
             filterOutUnaffordable: false,
-            filterOutNonProficient: false,
             searchQuery: '',
           }}
           filterState={{}}
@@ -68,7 +66,6 @@ describe('EquipmentPickerFilterControls', () => {
           showRarityFilter: false,
           showAffordableFilter: false,
           filterOutUnaffordable: false,
-          filterOutNonProficient: false,
           searchQuery: '',
         }}
         filterState={{}}
