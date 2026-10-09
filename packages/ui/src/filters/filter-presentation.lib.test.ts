@@ -12,6 +12,7 @@ import {
   resolveFilterControlSize,
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
+  resolveFilterSelectWidthToken,
 } from './filter-presentation.lib'
 import type { FilterFieldDef } from './filter-schema.types'
 
@@ -135,6 +136,12 @@ describe('filter-presentation.lib', () => {
     expect(resolveFilterControlSize('comfortable')).toBe('md')
   })
 
+  it('caps floating selects at lg when no width token is set', () => {
+    expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'floating' })).toBe('lg')
+    expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'inline' })).toBe('lg')
+    expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'stacked' })).toBeUndefined()
+  })
+
   it('delegates band sizing to shared field presentation', () => {
     const textField = fieldAt(0)
     const presentation = resolveFilterFieldPresentation(textField, compactChrome)
@@ -147,6 +154,7 @@ describe('filter-presentation.lib', () => {
     expect(mapFilterLayoutToLabelLayout(fieldAt(1))).toBe('stacked')
     expect(mapFilterLayoutToLabelLayout(fieldAt(2))).toBe('inline')
     expect(mapFilterLayoutToLabelLayout(fieldAt(3))).toBe('inline')
+    expect(mapFilterLayoutToLabelLayout({ type: 'select', layout: 'floating' })).toBe('hidden')
   })
 
   it('uses content-sized band for chips', () => {

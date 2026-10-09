@@ -204,6 +204,8 @@
   --text-sm--line-height: 1.25rem; /* 20px */
   --text-md: 0.9375rem; /* 15px — secondary body (prose-md, Text small, …) */
   --text-md--line-height: 1.375rem; /* 22px */
+  /* Comfortable floating-label scale: caption --text-sm / resting --text-md. Fallback when typed calc() division is unavailable. */
+  --floating-label-scale-md: 0.9333333333;
   --text-base: 1rem; /* 16px */
   --text-base--line-height: 1.5rem; /* 24px */
   --text-lg: 1.125rem; /* 18px */

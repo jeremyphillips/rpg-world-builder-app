@@ -99,12 +99,10 @@ export function createCharacterRelationshipFilterSchema<TData>(
       createEqualsFilter<TData, CharacterRelationshipFilterState, 'classId', string>({
         id: 'classId',
         label: RELATIONSHIP_FILTER_CLASS_LABEL,
-        layout: 'inline',
+        layout: 'floating',
         width: 'lg',
         showAllOption: true,
         allOptionLabel: RELATIONSHIP_FILTER_ALL_LABEL,
-        ariaLabel: RELATIONSHIP_FILTER_CLASS_LABEL,
-        triggerAriaLabel: RELATIONSHIP_FILTER_CLASS_LABEL,
         options: classOptions.map((classId) => ({
           value: classId,
           label: args.resolveClassLabel(classId),

@@ -341,14 +341,26 @@ export {
 } from './components/ui/field-sizing.variants'
 export {
   Field,
+  FieldLabelAssociation,
+  useFieldRootContext,
   type FieldSize,
   type FieldRootProps,
   type FieldLabelProps,
+  type FieldLabelAssociationProps,
   type FieldControlProps,
   type FieldHintProps,
   type FieldErrorProps,
   fieldRowParticipationClasses,
 } from './components/ui/field.client'
+export {
+  FloatingLabelField,
+  type FloatingLabelFieldProps,
+} from './components/ui/floating-label-field.client'
+export { withFloatingLabelSizingLabel } from './components/ui/floating-label-field.lib'
+export {
+  fieldCaptionTypographyVariants,
+  type FieldCaptionSize,
+} from './components/ui/field-caption.variants'
 
 export {
   FieldLabelContent,
@@ -848,6 +860,15 @@ export {
   type ButtonDropdownItem,
   type ButtonDropdownProps,
 } from './components/ui/button-dropdown.client'
+export {
+  SortMenu,
+  SORT_MENU_DEFAULT_LABEL,
+  sortMenuFlatSections,
+  flattenSortMenuOptions,
+  type SortMenuOption,
+  type SortMenuProps,
+  type SortMenuSection,
+} from './components/ui/sort-menu.client'
 export {
   SplitButton,
   type SplitButtonMenuGroup,

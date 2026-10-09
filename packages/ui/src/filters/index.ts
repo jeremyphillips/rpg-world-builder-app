@@ -56,7 +56,11 @@ export {
   shallowArrayEqual,
 } from './filter-engine.helpers'
 
-export { FILTER_DENSITY_DEFAULT, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
+export {
+  FILTER_DENSITY_DEFAULT,
+  FILTER_SELECT_ALL_TRIGGER_LABEL,
+  FILTER_SELECT_ALL_VALUE,
+} from './filter-bar.variants'
 export { FilterToolbarLabelSizer } from './filter-toolbar-label-sizer.client'
 export type { FilterBarOrientation } from './filter-bar.variants'
 export {
@@ -95,6 +99,7 @@ export {
 } from './filter-advanced-panel.client'
 export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-renderer.client'
 export { FilterFieldCaption, type FilterFieldCaptionProps } from './filter-field-caption.client'
+export { FilterFloatingField } from './filter-floating-field.client'
 export { FilterFieldList } from './filter-fields.client'
 export { FilterInlineControl, type FilterInlineControlProps } from './filter-inline-control.client'
 export {

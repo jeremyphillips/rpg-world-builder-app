@@ -17,14 +17,11 @@ import {
   type CharacterDetailEquipmentFilterState,
 } from '../../../lib/detail/character-detail-equipment-filter-schema'
 import {
-  EQUIPMENT_PICKER_SORT_GROUP_LABEL,
-  EQUIPMENT_PICKER_SORT_ORDER_LABEL,
-} from '../../equipment/picker/drawer/equipment-picker-drawer.types'
-import {
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS,
   CHARACTER_DETAIL_EQUIPMENT_SORT_MODES,
   CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS,
   filterCharacterDetailEquipmentCards,
@@ -192,10 +189,12 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                       <CatalogSortControl
                         value={sortMode}
                         label={CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL}
-                        ariaLabel={EQUIPMENT_PICKER_SORT_GROUP_LABEL}
-                        triggerAriaLabel={EQUIPMENT_PICKER_SORT_ORDER_LABEL}
                         options={CHARACTER_DETAIL_EQUIPMENT_SORT_MODES.map((mode) =>
-                          pickerSortOption(mode, CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode]),
+                          pickerSortOption(
+                            mode,
+                            CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode],
+                            CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS[mode],
+                          ),
                         )}
                         onValueChange={(value) =>
                           setSortMode(value as CharacterDetailEquipmentSortMode)

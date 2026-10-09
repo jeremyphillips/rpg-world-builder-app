@@ -16,7 +16,6 @@ import {
   SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
   SPELL_PICKER_MODE_SPELLS,
-  SPELL_PICKER_SORT_ORDER_LABEL,
 } from './spell-picker-drawer.types'
 
 const baseArgs = {
@@ -69,14 +68,13 @@ export const Default: Story = {
       canvas.getByRole('combobox', { name: 'School' }).getBoundingClientRect().width,
     ).toBe(schoolWidth)
 
-    const sort = canvas.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL })
+    const sort = canvas.getByRole('button', { name: 'Sort by, A–Z' })
     const sortWidth = sort.getBoundingClientRect().width
     await expect(sortWidth).toBeGreaterThan(0)
     await userEvent.click(sort)
-    await userEvent.click(canvas.getByRole('option', { name: 'Level: high to low' }))
+    await userEvent.click(canvas.getByRole('menuitemradio', { name: 'Level: high to low' }))
     await expect(
-      canvas.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL }).getBoundingClientRect()
-        .width,
+      canvas.getByRole('button', { name: 'Sort by, Level: High' }).getBoundingClientRect().width,
     ).toBe(sortWidth)
 
     const mechanics = canvas.getByRole('button', {

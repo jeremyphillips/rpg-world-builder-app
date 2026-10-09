@@ -21,10 +21,9 @@ import {
 } from '../browse/equipment-picker-filter-controls'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
-  EQUIPMENT_PICKER_SORT_GROUP_LABEL,
   EQUIPMENT_PICKER_SORT_LABEL,
   EQUIPMENT_PICKER_SORT_LABELS,
-  EQUIPMENT_PICKER_SORT_ORDER_LABEL,
+  EQUIPMENT_PICKER_SORT_TRIGGER_LABELS,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -230,10 +229,12 @@ export function EquipmentPickerDrawer({
           <CatalogSortControl
             value={picker.sortMode}
             label={EQUIPMENT_PICKER_SORT_LABEL}
-            ariaLabel={EQUIPMENT_PICKER_SORT_GROUP_LABEL}
-            triggerAriaLabel={EQUIPMENT_PICKER_SORT_ORDER_LABEL}
             options={picker.effectiveSortModes.map((mode) =>
-              pickerSortOption(mode, EQUIPMENT_PICKER_SORT_LABELS[mode]),
+              pickerSortOption(
+                mode,
+                EQUIPMENT_PICKER_SORT_LABELS[mode],
+                EQUIPMENT_PICKER_SORT_TRIGGER_LABELS[mode],
+              ),
             )}
             onValueChange={(value) => picker.setSortMode(value as typeof picker.sortMode)}
           />

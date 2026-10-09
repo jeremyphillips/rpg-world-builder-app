@@ -6,41 +6,36 @@ import { CatalogSortControl } from './catalog-sort-control'
 import { pickerSortOption } from './catalog-picker-sort-labels.lib'
 
 const nameSortOptions = [
-  pickerSortOption('name_asc', 'Name: A–Z'),
-  pickerSortOption('name_desc', 'Name: Z–A'),
+  pickerSortOption('name_asc', 'Name: A–Z', 'A–Z'),
+  pickerSortOption('name_desc', 'Name: Z–A', 'Z–A'),
 ] as const
 
 describe('CatalogSortControl', () => {
   it('shows compact trigger labels for name sorts', () => {
     render(
-      <CatalogSortControl
-        value="name_asc"
-        options={nameSortOptions}
-        onValueChange={vi.fn()}
-        triggerAriaLabel="Spell sort order"
-      />,
+      <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveTextContent('A–Z')
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  it('uses compact filter caption classes by default', () => {
+  it('uses compact button sizing by default', () => {
     render(
       <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(screen.getByText('Sort')).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveClass('text-xs')
   })
 
-  it('uses comfortable filter caption classes inside comfortable chrome', () => {
+  it('uses comfortable button sizing inside comfortable chrome', () => {
     render(
       <FilterChromeProvider density="comfortable">
         <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />
       </FilterChromeProvider>,
     )
 
-    const caption = screen.getByText('Sort')
-    expect(caption).toHaveClass('text-sm', 'text-muted-foreground')
-    expect(caption).not.toHaveClass('text-xs')
+    const trigger = screen.getByRole('button', { name: 'Sort by, A–Z' })
+    expect(trigger).not.toHaveClass('text-xs')
   })
 })

@@ -6,7 +6,6 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
-import { EQUIPMENT_PICKER_SORT_ORDER_LABEL } from './equipment-picker-drawer.types'
 import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   builderPathGoldBudgetFixture,
@@ -56,15 +55,13 @@ export const Default: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement.ownerDocument.body)
-    const sort = canvas.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
+    const sort = canvas.getByRole('button', { name: 'Sort by, Best match' })
     const sortWidth = sort.getBoundingClientRect().width
     await expect(sortWidth).toBeGreaterThan(0)
     await userEvent.click(sort)
-    await userEvent.click(canvas.getByRole('option', { name: 'Price: High to low' }))
+    await userEvent.click(canvas.getByRole('menuitemradio', { name: 'Price: High to low' }))
     await expect(
-      canvas
-        .getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
-        .getBoundingClientRect().width,
+      canvas.getByRole('button', { name: 'Sort by, Price: High' }).getBoundingClientRect().width,
     ).toBe(sortWidth)
   },
 }

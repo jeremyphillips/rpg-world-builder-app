@@ -70,6 +70,7 @@ type TextFilterConfig<
   id: TId
   label: string
   placeholder?: string
+  layout?: 'floating'
   placement?: FilterPlacement
   defaultValue?: TState[TId]
   visible?: (state: TState) => boolean
@@ -93,6 +94,7 @@ export function createTextFilter<
     visible: config.visible,
     disabled: config.disabled,
     url: config.url,
+    ...(config.layout === 'floating' ? { layout: 'floating' as const } : {}),
     isValueConstraining: isTextValueConstraining,
     matches: (row, value) => {
       const query = normalizeTextFilterValue(typeof value === 'string' ? value : undefined)
@@ -119,10 +121,7 @@ type EqualsFilterConfig<
   defaultValue?: TState[TId]
   showAllOption?: boolean
   allOptionLabel?: string
-  layout?: SelectFilterFieldDef<TData, TState, TId>['layout']
   width?: SelectFilterFieldDef<TData, TState, TId>['width']
-  ariaLabel?: string
-  triggerAriaLabel?: string
   visible?: (state: TState) => boolean
   disabled?: (state: TState) => boolean
   isValueConstraining?: SelectFilterFieldDef<TData, TState, TId>['isValueConstraining']
@@ -130,7 +129,18 @@ type EqualsFilterConfig<
   url?: SelectFilterFieldDef<TData, TState, TId>['url']
   activeChip?: SelectFilterFieldDef<TData, TState, TId>['activeChip']
   matches?: SelectFilterFieldDef<TData, TState, TId>['matches']
-}
+} & (
+  | {
+      layout?: 'stacked' | 'inline'
+      ariaLabel?: string
+      triggerAriaLabel?: string
+    }
+  | {
+      layout: 'floating'
+      ariaLabel?: never
+      triggerAriaLabel?: never
+    }
+)
 
 export function createEqualsFilter<
   TData,
@@ -138,8 +148,8 @@ export function createEqualsFilter<
   TId extends FilterFieldId<TState>,
   TValue extends Extract<NonNullable<TState[TId]>, string>,
 >(config: EqualsFilterConfig<TData, TState, TId, TValue>): FilterFieldDef<TData, TState> {
-  return {
-    type: 'select',
+  const shared = {
+    type: 'select' as const,
     id: config.id,
     label: config.label,
     options: config.options,
@@ -147,10 +157,7 @@ export function createEqualsFilter<
     defaultValue: config.defaultValue,
     showAllOption: config.showAllOption,
     allOptionLabel: config.allOptionLabel,
-    layout: config.layout,
     width: config.width,
-    ariaLabel: config.ariaLabel,
-    triggerAriaLabel: config.triggerAriaLabel,
     visible: config.visible,
     disabled: config.disabled,
     isValueConstraining: config.isValueConstraining,
@@ -158,6 +165,17 @@ export function createEqualsFilter<
     url: config.url,
     activeChip: config.activeChip,
     matches: config.matches ?? ((row, value) => config.getValue(row) === value),
+  }
+
+  if (config.layout === 'floating') {
+    return { ...shared, layout: 'floating' } satisfies FilterFieldDef<TData, TState>
+  }
+
+  return {
+    ...shared,
+    layout: config.layout,
+    ariaLabel: config.ariaLabel,
+    triggerAriaLabel: config.triggerAriaLabel,
   } satisfies FilterFieldDef<TData, TState>
 }
 

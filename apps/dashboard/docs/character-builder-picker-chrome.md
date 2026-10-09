@@ -325,6 +325,8 @@ CatalogMetadataRenderer (content)   → metadata line rendering (canonical)
 
 The reset row always shows the visible count as `N results`. Reset stays beside it and appears only when search, a structured filter, a non-default tab, or a non-default sort is active. Sort alone shows Reset with the full eligible count. `FilterToolbarLabelSizer` reserves every count from `0` through that eligible total.
 
+`CatalogSortControl` wraps shared `@rpg/ui` `SortMenu` (ghost toolbar button + radio dropdown). The trigger shows a compact active label; the accessible name is `{label}, {selection}` (default label `Sort by`). Picker filter selects for spell school, relationship class, organization domain, and location type use filter `layout: 'floating'`. See [floating-label-fields.md](../../../packages/ui/docs/floating-label-fields.md).
+
 Visible reset copy is `Reset`, with the reset icon. Chrome (text variant, `sm` size, compact density, glyph step) is fixed on `CatalogToolbarResetAction`. An optional `label` replaces the visible text and the accessible name. The default accessible name and `title` are `Reset search, filters, and sorting` when Sort is on the toolbar, and `Reset search and filters` when it is not. The reset row stays reserved (invisible, not focusable) whenever a utility band renders. Sort implies that reservation. Drawers without a utility band mount Reset only while it is visible. Spell recommendation tabs still park `actions` on the tab row.
 
 ## Picker metadata budget

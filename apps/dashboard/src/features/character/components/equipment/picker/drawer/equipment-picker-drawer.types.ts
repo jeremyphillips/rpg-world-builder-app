@@ -1,6 +1,4 @@
 import {
-  catalogNounFromContentType,
-  formatCatalogPickerCopy,
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
@@ -33,16 +31,10 @@ export type {
 
 export type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-const equipmentNoun = catalogNounFromContentType('equipment')
-const equipmentCopy = formatCatalogPickerCopy(equipmentNoun)
-
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL = 'Exceeds starting budget'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
-
-export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = equipmentCopy.sortGroupLabel
-export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = equipmentCopy.sortOrderLabel
 
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
 
@@ -54,7 +46,7 @@ export const EQUIPMENT_PICKER_RARITY_ALL = '__all_rarities__' as const
 
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Equipment kind'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
-export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
+export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort by'
 
 export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
@@ -83,6 +75,14 @@ export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, strin
   [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High to low',
   [EQUIPMENT_PICKER_SORT_NAME_ASC]: CATALOG_PICKER_SORT_LABEL_NAME_ASC,
   [EQUIPMENT_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
+}
+
+export const EQUIPMENT_PICKER_SORT_TRIGGER_LABELS: Record<EquipmentPickerSortMode, string> = {
+  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  [EQUIPMENT_PICKER_SORT_PRICE_ASC]: 'Price: Low',
+  [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High',
+  [EQUIPMENT_PICKER_SORT_NAME_ASC]: 'A–Z',
+  [EQUIPMENT_PICKER_SORT_NAME_DESC]: 'Z–A',
 }
 
 export type EquipmentPickerKindFilter =
