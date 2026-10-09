@@ -7,19 +7,21 @@ import {
   type MagicItemGrantProgress,
 } from '@rpg/contracts'
 
+import {
+  CATALOG_SORT_MODE_BEST_MATCH,
+  CATALOG_SORT_MODE_DATE_ASC,
+  CATALOG_SORT_MODE_DATE_DESC,
+  CATALOG_SORT_MODE_NAME_ASC,
+  CATALOG_SORT_MODE_NAME_DESC,
+  CATALOG_SORT_MODE_PRICE_ASC,
+  CATALOG_SORT_MODE_PRICE_DESC,
+} from '@/lib/catalog-sort'
+
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 import type { EquipmentPickerOwnershipIndex } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import type { EquipmentPickerCharacterPreviewContext } from '../details/equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import {
-  CATALOG_PICKER_SORT_BEST_MATCH,
-  CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
-  CATALOG_PICKER_SORT_LABEL_NAME_ASC,
-  CATALOG_PICKER_SORT_LABEL_NAME_DESC,
-  CATALOG_PICKER_SORT_NAME_ASC,
-  CATALOG_PICKER_SORT_NAME_DESC,
-} from '../../../picker/sort/catalog-picker-sort-modes.lib'
 
 export type {
   EquipmentBudgetSummary,
@@ -48,11 +50,14 @@ export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Equipment kind'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort by'
 
-export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
-export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
-export const EQUIPMENT_PICKER_SORT_PRICE_DESC = 'price_desc' as const
-export const EQUIPMENT_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC
-export const EQUIPMENT_PICKER_SORT_NAME_DESC = CATALOG_PICKER_SORT_NAME_DESC
+/** Equipment-enabled sort modes — presentation copy lives in `@/lib/catalog-sort`. */
+export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_SORT_MODE_BEST_MATCH
+export const EQUIPMENT_PICKER_SORT_PRICE_ASC = CATALOG_SORT_MODE_PRICE_ASC
+export const EQUIPMENT_PICKER_SORT_PRICE_DESC = CATALOG_SORT_MODE_PRICE_DESC
+export const EQUIPMENT_PICKER_SORT_NAME_ASC = CATALOG_SORT_MODE_NAME_ASC
+export const EQUIPMENT_PICKER_SORT_NAME_DESC = CATALOG_SORT_MODE_NAME_DESC
+export const EQUIPMENT_PICKER_SORT_DATE_DESC = CATALOG_SORT_MODE_DATE_DESC
+export const EQUIPMENT_PICKER_SORT_DATE_ASC = CATALOG_SORT_MODE_DATE_ASC
 
 export type EquipmentPickerSortMode =
   | typeof EQUIPMENT_PICKER_SORT_BEST_MATCH
@@ -60,6 +65,8 @@ export type EquipmentPickerSortMode =
   | typeof EQUIPMENT_PICKER_SORT_PRICE_DESC
   | typeof EQUIPMENT_PICKER_SORT_NAME_ASC
   | typeof EQUIPMENT_PICKER_SORT_NAME_DESC
+  | typeof EQUIPMENT_PICKER_SORT_DATE_DESC
+  | typeof EQUIPMENT_PICKER_SORT_DATE_ASC
 
 export const EQUIPMENT_PICKER_SORT_MODES = [
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
@@ -67,23 +74,13 @@ export const EQUIPMENT_PICKER_SORT_MODES = [
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
+  EQUIPMENT_PICKER_SORT_DATE_DESC,
+  EQUIPMENT_PICKER_SORT_DATE_ASC,
 ] as const satisfies readonly EquipmentPickerSortMode[]
 
-export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, string> = {
-  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
-  [EQUIPMENT_PICKER_SORT_PRICE_ASC]: 'Price: Low to high',
-  [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High to low',
-  [EQUIPMENT_PICKER_SORT_NAME_ASC]: CATALOG_PICKER_SORT_LABEL_NAME_ASC,
-  [EQUIPMENT_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
-}
-
-export const EQUIPMENT_PICKER_SORT_TRIGGER_LABELS: Record<EquipmentPickerSortMode, string> = {
-  [EQUIPMENT_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
-  [EQUIPMENT_PICKER_SORT_PRICE_ASC]: 'Price: Low',
-  [EQUIPMENT_PICKER_SORT_PRICE_DESC]: 'Price: High',
-  [EQUIPMENT_PICKER_SORT_NAME_ASC]: 'A–Z',
-  [EQUIPMENT_PICKER_SORT_NAME_DESC]: 'Z–A',
-}
+/** Axes + presets for CatalogSortControl — order matches the equipment menu. */
+export const EQUIPMENT_PICKER_SORT_AXES = ['price', 'name', 'createdAt'] as const
+export const EQUIPMENT_PICKER_SORT_PRESETS = ['best_match'] as const
 
 export type EquipmentPickerKindFilter =
   | typeof EQUIPMENT_PICKER_KIND_ALL

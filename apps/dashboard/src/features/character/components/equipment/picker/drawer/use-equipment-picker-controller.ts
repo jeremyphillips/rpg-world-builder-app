@@ -21,15 +21,17 @@ import {
 import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
-  EQUIPMENT_PICKER_SORT_MODES,
-  EQUIPMENT_PICKER_SORT_PRICE_ASC,
-  EQUIPMENT_PICKER_SORT_PRICE_DESC,
+  EQUIPMENT_PICKER_SORT_BEST_MATCH,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
   type EquipmentPickerRow,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
+import {
+  normalizeEquipmentPickerSortMode,
+  resolveEquipmentPickerAvailableSortModes,
+} from './equipment-picker-sort-sections.lib'
 
 export type UseEquipmentPickerControllerArgs = Pick<
   EquipmentPickerDrawerProps,
@@ -60,12 +62,10 @@ export function useEquipmentPickerController({
 }: UseEquipmentPickerControllerArgs) {
   const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
   const effectiveBudget = isMagicItemsWorkflow ? undefined : budget
-  const effectiveSortModes = isMagicItemsWorkflow
-    ? EQUIPMENT_PICKER_SORT_MODES.filter(
-        (mode) =>
-          mode !== EQUIPMENT_PICKER_SORT_PRICE_ASC && mode !== EQUIPMENT_PICKER_SORT_PRICE_DESC,
-      )
-    : EQUIPMENT_PICKER_SORT_MODES
+  const effectiveSortModes = React.useMemo(
+    () => resolveEquipmentPickerAvailableSortModes(isMagicItemsWorkflow),
+    [isMagicItemsWorkflow],
+  )
 
   const supportedItems = React.useMemo(() => filterEligibleEquipmentPickerItems(items), [items])
   const kindOptions = React.useMemo(
@@ -85,6 +85,17 @@ export function useEquipmentPickerController({
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
+
+  React.useEffect(() => {
+    setSortMode((current) =>
+      normalizeEquipmentPickerSortMode(
+        current,
+        effectiveSortModes,
+        EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      ),
+    )
+  }, [effectiveSortModes])
+
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&

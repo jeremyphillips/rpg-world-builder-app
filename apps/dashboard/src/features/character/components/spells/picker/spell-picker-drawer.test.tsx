@@ -65,7 +65,7 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
     expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
@@ -80,7 +80,9 @@ describe('SpellPickerDrawer', () => {
   it('shows compact A-Z label in the sort trigger', () => {
     renderCantripDrawer()
 
-    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toHaveTextContent(
+      'Name: A–Z',
+    )
   })
 
   it('omits the primary toolbar row when level chips are hidden', () => {

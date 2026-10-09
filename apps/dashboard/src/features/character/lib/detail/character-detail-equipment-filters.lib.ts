@@ -6,6 +6,7 @@ import {
 import { applyFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
 import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
+import { CATALOG_SORT_MODE_NAME_ASC, CATALOG_SORT_MODE_NAME_DESC } from '@/lib/catalog-sort'
 
 import {
   CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS,
@@ -20,8 +21,8 @@ export const CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL = 'Equipment kind'
 export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL = 'Sort by'
 export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER = 'Search equipment'
 
-export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC = 'name_asc' as const
-export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC = 'name_desc' as const
+export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC = CATALOG_SORT_MODE_NAME_ASC
+export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC = CATALOG_SORT_MODE_NAME_DESC
 
 export type CharacterDetailEquipmentSortMode =
   | typeof CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC
@@ -36,21 +37,7 @@ export const CHARACTER_DETAIL_EQUIPMENT_SORT_MODES = [
   CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC,
 ] as const satisfies readonly CharacterDetailEquipmentSortMode[]
 
-export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS: Record<
-  CharacterDetailEquipmentSortMode,
-  string
-> = {
-  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC]: 'Name: A–Z',
-  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC]: 'Name: Z–A',
-}
-
-export const CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS: Record<
-  CharacterDetailEquipmentSortMode,
-  string
-> = {
-  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC]: 'A–Z',
-  [CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC]: 'Z–A',
-}
+export const CHARACTER_DETAIL_EQUIPMENT_SORT_AXES = ['name'] as const
 
 export const CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS = {
   selectedKind: CHARACTER_DETAIL_EQUIPMENT_KIND_ALL,

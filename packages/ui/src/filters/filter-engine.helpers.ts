@@ -193,6 +193,7 @@ type BooleanFilterConfig<
   disabled?: (state: TState) => boolean
   url?: BooleanFilterFieldDef<TData, TState, TId>['url']
   matches?: BooleanFilterFieldDef<TData, TState, TId>['matches']
+  shellVariant?: BooleanFilterFieldDef<TData, TState, TId>['shellVariant']
 }
 
 export function createBooleanFilter<
@@ -210,6 +211,7 @@ export function createBooleanFilter<
     disabled: config.disabled,
     url: config.url,
     matches: config.matches ?? ((row, value) => config.getValue(row) === value),
+    shellVariant: config.shellVariant,
   } satisfies FilterFieldDef<TData, TState>
 }
 

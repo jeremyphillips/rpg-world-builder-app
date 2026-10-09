@@ -3,10 +3,10 @@ import { CatalogFilterControls, setFilterValue } from '@rpg/ui/filters'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { useMemo } from 'react'
 
-import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import {
-  SPELL_PICKER_SORT_LABELS,
-  SPELL_PICKER_SORT_TRIGGER_LABELS,
+  SPELL_PICKER_SORT_AXES,
+  SPELL_PICKER_SORT_BEST_MATCH,
+  SPELL_PICKER_SORT_PRESETS,
   type SpellPickerSortMode,
 } from './spell-picker-drawer.types'
 import {
@@ -80,16 +80,14 @@ export function SpellPickerSortControl({
   validSortModes,
   onSortModeChange,
 }: SpellPickerSortControlProps) {
+  const includeBestMatch = validSortModes.includes(SPELL_PICKER_SORT_BEST_MATCH)
+
   return (
     <CatalogSortControl
       value={sortMode}
-      options={validSortModes.map((mode) =>
-        pickerSortOption(
-          mode,
-          SPELL_PICKER_SORT_LABELS[mode],
-          SPELL_PICKER_SORT_TRIGGER_LABELS[mode],
-        ),
-      )}
+      axes={SPELL_PICKER_SORT_AXES}
+      presets={includeBestMatch ? SPELL_PICKER_SORT_PRESETS : undefined}
+      availableValues={validSortModes}
       onValueChange={onSortModeChange}
     />
   )

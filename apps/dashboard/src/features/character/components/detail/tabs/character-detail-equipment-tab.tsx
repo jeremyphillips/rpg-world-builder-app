@@ -19,10 +19,8 @@ import {
 import {
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
+  CHARACTER_DETAIL_EQUIPMENT_SORT_AXES,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
-  CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS,
-  CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS,
-  CHARACTER_DETAIL_EQUIPMENT_SORT_MODES,
   CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS,
   filterCharacterDetailEquipmentCards,
   resolveCharacterDetailEquipmentKindOptions,
@@ -39,7 +37,6 @@ import {
   resolveCatalogPickerResultSummary,
 } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
-import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -189,13 +186,7 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                       <CatalogSortControl
                         value={sortMode}
                         label={CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL}
-                        options={CHARACTER_DETAIL_EQUIPMENT_SORT_MODES.map((mode) =>
-                          pickerSortOption(
-                            mode,
-                            CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode],
-                            CHARACTER_DETAIL_EQUIPMENT_SORT_TRIGGER_LABELS[mode],
-                          ),
-                        )}
+                        axes={CHARACTER_DETAIL_EQUIPMENT_SORT_AXES}
                         onValueChange={(value) =>
                           setSortMode(value as CharacterDetailEquipmentSortMode)
                         }

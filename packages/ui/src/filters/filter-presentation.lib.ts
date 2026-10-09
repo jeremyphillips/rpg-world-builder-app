@@ -47,6 +47,7 @@ export type FilterFieldPresentation =
     })
   | (FilterPresentationShared & {
       type: 'boolean'
+      shellVariant: 'outline' | 'ghost'
     })
   | (FilterPresentationShared & {
       type: 'chips'
@@ -61,6 +62,7 @@ export type FilterFieldPresentation =
 type FilterPresentationField = Pick<FilterFieldDef<unknown, Record<string, unknown>>, 'type'> & {
   layout?: 'stacked' | 'inline' | 'floating'
   width?: FilterFieldWidth
+  shellVariant?: 'outline' | 'ghost'
 }
 
 /**
@@ -172,6 +174,7 @@ export function resolveFilterFieldPresentation(
     return {
       type: 'boolean',
       ...shared,
+      shellVariant: field.shellVariant ?? 'outline',
     }
   }
 

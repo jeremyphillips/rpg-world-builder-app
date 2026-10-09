@@ -20,6 +20,7 @@ import {
   formatEquipmentUnaffordableReason,
   getEquipmentUnaffordableAmounts,
   isEquipmentPickerItemDisabled,
+  parseEquipmentPickerCreatedAtMs,
   resolveEquipmentKindFilterOptions,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
   resolveMaxPurchaseAggregate,
@@ -27,6 +28,8 @@ import {
 } from './equipment-picker-drawer.lib'
 import {
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_DATE_ASC,
+  EQUIPMENT_PICKER_SORT_DATE_DESC,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   type EquipmentPickerRow,
@@ -617,5 +620,96 @@ describe('equipment-picker-drawer.lib', () => {
       sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
     })
     expect(priceSorted.map((item) => item.equipment.name)).toEqual(['Longsword'])
+  })
+
+  it('parses createdAt safely and never returns NaN', () => {
+    expect(parseEquipmentPickerCreatedAtMs('2024-05-21T00:00:00.000Z')).toBe(
+      Date.parse('2024-05-21T00:00:00.000Z'),
+    )
+    expect(parseEquipmentPickerCreatedAtMs(undefined)).toBeNull()
+    expect(parseEquipmentPickerCreatedAtMs('')).toBeNull()
+    expect(parseEquipmentPickerCreatedAtMs('not-a-date')).toBeNull()
+  })
+
+  it('sorts by persisted createdAt with undated rows last and stable id ties', () => {
+    const older = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'test:older-rope',
+        slug: 'older-rope',
+        name: 'Older Rope',
+        createdAt: '2024-01-01T00:00:00.000Z',
+      },
+      searchDocument: pickerSearchDocument('test:older-rope', 'older rope'),
+    }
+    const newer = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'test:newer-rope',
+        slug: 'newer-rope',
+        name: 'Newer Rope',
+        createdAt: '2025-01-01T00:00:00.000Z',
+      },
+      searchDocument: pickerSearchDocument('test:newer-rope', 'newer rope'),
+    }
+    const undated = {
+      ...equipmentPickerItemsFixture[2]!,
+      equipment: {
+        ...equipmentPickerRopeFixture,
+        id: 'test:undated-rope',
+        slug: 'undated-rope',
+        name: 'Undated Rope',
+        createdAt: 'not-a-date',
+      },
+      searchDocument: pickerSearchDocument('test:undated-rope', 'undated rope'),
+    }
+
+    const newestFirst = filterAndSortEquipmentPickerItems([older, undated, newer], {
+      searchQuery: '',
+      sortMode: EQUIPMENT_PICKER_SORT_DATE_DESC,
+    })
+    expect(newestFirst.map((item) => item.equipment.id)).toEqual([
+      'test:newer-rope',
+      'test:older-rope',
+      'test:undated-rope',
+    ])
+
+    const oldestFirst = filterAndSortEquipmentPickerItems([newer, older, undated], {
+      searchQuery: '',
+      sortMode: EQUIPMENT_PICKER_SORT_DATE_ASC,
+    })
+    expect(oldestFirst.map((item) => item.equipment.id)).toEqual([
+      'test:older-rope',
+      'test:newer-rope',
+      'test:undated-rope',
+    ])
+
+    const sameStampA = {
+      ...older,
+      equipment: {
+        ...older.equipment,
+        id: 'test:tie-a',
+        name: 'Tie A',
+        createdAt: '2024-06-01T00:00:00.000Z',
+      },
+      searchDocument: pickerSearchDocument('test:tie-a', 'tie a'),
+    }
+    const sameStampB = {
+      ...older,
+      equipment: {
+        ...older.equipment,
+        id: 'test:tie-b',
+        name: 'Tie B',
+        createdAt: '2024-06-01T00:00:00.000Z',
+      },
+      searchDocument: pickerSearchDocument('test:tie-b', 'tie b'),
+    }
+    const tied = filterAndSortEquipmentPickerItems([sameStampB, sameStampA], {
+      searchQuery: '',
+      sortMode: EQUIPMENT_PICKER_SORT_DATE_DESC,
+    })
+    expect(tied.map((item) => item.equipment.id)).toEqual(['test:tie-a', 'test:tie-b'])
   })
 })

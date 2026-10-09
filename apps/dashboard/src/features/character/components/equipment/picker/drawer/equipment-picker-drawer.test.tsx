@@ -263,7 +263,7 @@ describe('EquipmentPickerDrawer', () => {
     await user.click(screen.getByRole('radio', { name: 'Weapons' }))
     await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
     await user.click(screen.getByRole('button', { name: 'Sort by, Best match' }))
-    await user.click(screen.getByRole('menuitemradio', { name: 'Price: Low to high' }))
+    await user.click(screen.getByRole('menuitemradio', { name: 'Low to high' }))
 
     expect(
       screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
@@ -305,7 +305,7 @@ describe('EquipmentPickerDrawer', () => {
     ).toEqual(expect.arrayContaining([expect.stringContaining('Cheap Gear')]))
 
     await user.click(screen.getByRole('button', { name: 'Sort by, Best match' }))
-    await user.click(screen.getByRole('menuitemradio', { name: 'Price: Low to high' }))
+    await user.click(screen.getByRole('menuitemradio', { name: 'Low to high' }))
 
     const names = within(list)
       .getAllByRole('listitem')
@@ -396,7 +396,7 @@ describe('EquipmentPickerDrawer', () => {
     )
 
     await user.click(screen.getByRole('button', { name: 'Sort by, Best match' }))
-    await user.click(screen.getByRole('menuitemradio', { name: 'Name: Z–A' }))
+    await user.click(screen.getByRole('menuitemradio', { name: 'Z–A' }))
 
     rerender(
       <EquipmentPickerDrawer
@@ -418,7 +418,9 @@ describe('EquipmentPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Sort by, Z–A' })).toHaveTextContent('Z–A')
+    expect(screen.getByRole('button', { name: 'Sort by, Name: Z–A' })).toHaveTextContent(
+      'Name: Z–A',
+    )
   })
 
   it('keeps added rows visible after quick-add', async () => {

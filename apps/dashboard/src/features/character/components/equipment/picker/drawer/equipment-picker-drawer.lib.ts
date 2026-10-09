@@ -39,6 +39,8 @@ import {
 import {
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_DATE_ASC,
+  EQUIPMENT_PICKER_SORT_DATE_DESC,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
@@ -143,6 +145,20 @@ function compareScoredItemsByRecommendationTiebreaker(
   return compareEquipmentPickerItemsByRecommendation(left.item, right.item, browseSortContext)
 }
 
+function compareScoredItemsByNameAsc(
+  left: EquipmentPickerScoredItem,
+  right: EquipmentPickerScoredItem,
+): number {
+  return compareName(pickerNameCollator, left.item.equipment.name, right.item.equipment.name, 'asc')
+}
+
+function compareScoredItemsByStableId(
+  left: EquipmentPickerScoredItem,
+  right: EquipmentPickerScoredItem,
+): number {
+  return left.item.equipment.id.localeCompare(right.item.equipment.id)
+}
+
 function compareScoredItemsAfterPrimary(
   left: EquipmentPickerScoredItem,
   right: EquipmentPickerScoredItem,
@@ -155,7 +171,35 @@ function compareScoredItemsAfterPrimary(
   return chainComparators<EquipmentPickerScoredItem>(
     (l, r) => compareScoredItemsBySearchScore(l, r, hasQuery),
     (l, r) => compareScoredItemsByRecommendationTiebreaker(l, r, browseSortContext),
+    compareScoredItemsByNameAsc,
+    compareScoredItemsByStableId,
   )(left, right)
+}
+
+/** Finite epoch ms from persisted `createdAt`, or null when missing/malformed (never NaN). */
+export function parseEquipmentPickerCreatedAtMs(createdAt: string | undefined): number | null {
+  if (createdAt == null || createdAt.length === 0) return null
+  const ms = Date.parse(createdAt)
+  return Number.isFinite(ms) ? ms : null
+}
+
+function compareEquipmentPickerItemsByCreatedAt(
+  left: EquipmentPickerItem,
+  right: EquipmentPickerItem,
+  direction: 'asc' | 'desc',
+): number {
+  const leftMs = parseEquipmentPickerCreatedAtMs(left.equipment.createdAt)
+  const rightMs = parseEquipmentPickerCreatedAtMs(right.equipment.createdAt)
+  const leftDated = leftMs != null
+  const rightDated = rightMs != null
+
+  if (leftDated !== rightDated) {
+    return leftDated ? -1 : 1
+  }
+  if (!leftDated || !rightDated) return 0
+
+  const diff = leftMs - rightMs
+  return direction === 'asc' ? diff : -diff
 }
 
 function compareScoredItemsByPriceMode(
@@ -189,6 +233,22 @@ function compareScoredItemsByNameMode(
   )
 
   return compareScoredItemsAfterPrimary(left, right, nameCmp, hasQuery, browseSortContext)
+}
+
+function compareScoredItemsByDateMode(
+  left: EquipmentPickerScoredItem,
+  right: EquipmentPickerScoredItem,
+  direction: 'asc' | 'desc',
+  hasQuery: boolean,
+  browseSortContext?: EquipmentPickerBrowseSortContext,
+): number {
+  return compareScoredItemsAfterPrimary(
+    left,
+    right,
+    compareEquipmentPickerItemsByCreatedAt(left.item, right.item, direction),
+    hasQuery,
+    browseSortContext,
+  )
 }
 
 export function compareEquipmentBestMatch(
@@ -250,6 +310,10 @@ function compareEquipmentPickerScoredItems(
       return compareScoredItemsByNameMode(left, right, 'asc', hasQuery, browseSortContext)
     case EQUIPMENT_PICKER_SORT_NAME_DESC:
       return compareScoredItemsByNameMode(left, right, 'desc', hasQuery, browseSortContext)
+    case EQUIPMENT_PICKER_SORT_DATE_ASC:
+      return compareScoredItemsByDateMode(left, right, 'asc', hasQuery, browseSortContext)
+    case EQUIPMENT_PICKER_SORT_DATE_DESC:
+      return compareScoredItemsByDateMode(left, right, 'desc', hasQuery, browseSortContext)
   }
 }
 

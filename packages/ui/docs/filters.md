@@ -444,7 +444,7 @@ Import from `@rpg/ui/filters`:
 - `ActiveFilterChips` — data-only chip summaries with central `onClear(fieldId)` / optional `onClearAll` (shown when 2+ chips)
 - `resolveActiveFilterChips(schema, state)` — derives chips from modified fields; boolean chips use natural copy (`Unread only`, not `Unread only: Yes`)
 - `FilterAdvancedPanel` — configurable header for `placement: 'advanced'` fields; overview shells pass field content only — `DataTableFilterRegion` owns trigger, panel id, reset, and collapse
-- `FilterInlineControl` — shared inline boolean shell (checkbox/switch) using outline row chrome to match adjacent selects and More filters
+- `FilterInlineControl` — shared inline boolean shell (native checkbox + label). Default `variant="outline"` matches More filters; opt in with field `shellVariant: 'ghost'` (or `FilterInlineControl` `variant="ghost"`) for toolbar surfaces. Appearance is orthogonal to filter density/size.
 - `DataTableFilterRegion` — primary field row, full-height **More filters** trigger rail, and region-owned additional-filters panel
 
 Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.

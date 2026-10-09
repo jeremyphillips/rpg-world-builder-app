@@ -296,7 +296,10 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   const isChecked = state[booleanField.id] === true
 
   return (
-    <FilterInlineControl className={presentation.groupClassName}>
+    <FilterInlineControl
+      className={presentation.groupClassName}
+      variant={presentation.shellVariant}
+    >
       <Checkbox
         id={controlId}
         checked={isChecked}

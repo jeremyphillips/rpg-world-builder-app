@@ -148,12 +148,17 @@ export type SelectFilterFieldDef<
       }
   )
 
+/** Boolean filter surface chrome — orthogonal to density/size. Default `outline`. */
+export type BooleanFilterShellVariant = 'outline' | 'ghost'
+
 export type BooleanFilterFieldDef<
   TData,
   TState extends Record<string, unknown>,
   TId extends FilterFieldId<TState>,
 > = BaseFilterFieldDef<TData, TState, TId> & {
   type: 'boolean'
+  /** Opt-in shell appearance for the inline checkbox control. Default `outline`. */
+  shellVariant?: BooleanFilterShellVariant
 }
 
 export type ChipsSelectionMode = 'multiple' | 'single-required'
