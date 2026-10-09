@@ -14,8 +14,8 @@ import {
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
+import { scoreSearchDocument } from '@rpg/search'
 import { normalizeSearchQuery } from '@rpg/ui'
-import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
 import { sanitizeModeBrowseState } from './spell-picker-browse-mode.lib'
 import {
@@ -27,6 +27,7 @@ import {
   getCatalogPickerDisabledNote,
   isCatalogPickerRowDimmed,
 } from '../../picker/row/catalog-picker-row-state.lib'
+import { scoreAndFilterPickerItems } from '../../picker/sort/catalog-picker-sort.lib'
 import {
   SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
@@ -445,10 +446,13 @@ type SpellPickerScoredItem = {
 }
 
 function scoreSpellPickerItem(item: SpellPickerItem, searchQuery: string): number {
-  return scoreLegacySearchItem(
-    { fields: [{ text: item.searchText, weight: 1, role: 'label' }] },
+  return scoreSearchDocument(
+    {
+      id: item.spell.id,
+      fields: [{ key: 'combined', text: item.searchText, role: 'primary' }],
+    },
     searchQuery,
-    'forgiving',
+    { profile: 'forgiving' },
   )
 }
 
@@ -528,12 +532,10 @@ export function filterAndSortSpellPickerItems(
     sortMode: SpellPickerSortMode
   },
 ): SpellPickerItem[] {
-  const normalizedQuery = normalizeSearchQuery(options.searchQuery)
-  const scored = items.map((item) => ({
-    item,
-    searchScore: scoreSpellPickerItem(item, options.searchQuery),
-  }))
-  const filtered = normalizedQuery ? scored.filter((row) => row.searchScore > 0) : scored
+  const filtered = scoreAndFilterPickerItems(items, {
+    searchQuery: options.searchQuery,
+    scoreItem: scoreSpellPickerItem,
+  })
 
   return [...filtered]
     .sort((left, right) => compareSpellPickerScoredItems(left, right, options))
