@@ -50,7 +50,8 @@ export type EquipmentPickerItem = {
 /**
  * Best-match browse order from resolved equipment facts: requirement match,
  * recommendation strength, specificity and source, then proficiency, the
- * starting-purse ceiling, and not-for-sale when the browse context enables it,
+ * starting-purse ceiling, unmet ability scores, and not-for-sale when the
+ * browse context enables it,
  * then canonical kind and name.
  * Selection, remaining budget, and package choice do not reorder rows.
  */

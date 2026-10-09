@@ -19,9 +19,10 @@ const NO_ACTIVE_CHOICE: ActiveChoiceContext = { kind: 'none' }
 
 /**
  * Best-match domain order for equipment picker rows.
- * Proficiency, the starting-purse ceiling, and not-for-sale are late keys.
+ * Proficiency, the starting-purse ceiling, unmet ability scores, and not-for-sale are late keys.
  * Proficiency is proficient, then untracked, then not proficient.
  * A price above every available starting purse sinks after proficiency.
+ * An unmet ability-score requirement sinks after that ceiling: the character can still use the item, with a penalty.
  * Not-for-sale applies only when the context asks.
  * They do not change recommendation strength.
  * Selection, remaining budget, grant consumption, and package choice do not reorder rows.
@@ -73,6 +74,7 @@ function compareResolvedEquipmentFacts(
       ),
       context.rankCompatibility ? compareProficiency(left, right) : 0,
       purchaseBudgetCeilingRank(left) - purchaseBudgetCeilingRank(right),
+      context.rankCompatibility ? compareAbilityScoreRequirements(left, right) : 0,
       context.rankPurchaseAvailability
         ? purchaseAvailabilityRank(left) - purchaseAvailabilityRank(right)
         : 0,
@@ -115,6 +117,19 @@ function proficiencyRank(proficient: boolean | undefined): number {
 
 function purchaseBudgetCeilingRank(resolved: ResolvedEquipmentOption): number {
   return resolved.exceedsPurchaseBudgetCeiling ? 1 : 0
+}
+
+/** Binary: any unmet ability-score requirement sorts after none. */
+function compareAbilityScoreRequirements(
+  left: ResolvedEquipmentOption,
+  right: ResolvedEquipmentOption,
+): number {
+  return abilityScoreRequirementRank(left) - abilityScoreRequirementRank(right)
+}
+
+function abilityScoreRequirementRank(resolved: ResolvedEquipmentOption): number {
+  const unmet = resolved.state.compatibility?.unmetAbilityScoreRequirements
+  return unmet && unmet.length > 0 ? 1 : 0
 }
 
 function purchaseAvailabilityRank(resolved: ResolvedEquipmentOption): number {

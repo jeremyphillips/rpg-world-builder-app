@@ -93,8 +93,9 @@ remaining budget, and package choice do not reorder rows.
 3. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat). Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts). Open-pool eligibility, context relevance, and alternative-package membership are not sort keys.
 4. **Compatibility** — only when `rankCompatibility` is set (the default). Proficient, then untracked (`compatibility.proficient` omitted), then not proficient. `unaffordable` does not add a further penalty: not proficient and unaffordable stays with not proficient.
 5. **Exceeds starting budget** — price above `purchaseBudgetCeiling`, the maximum `totalStartingWealth` across available packages. That total is class-option wealth plus the tier bonus. Spent gold and the selected package do not change it. A shortfall against the current purse stays **Cannot afford** and does not reorder. Unpriced rows do not exceed the ceiling.
-6. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
-7. **Canonical fallback** — kind bucket, weapon category, then name.
+6. **Unmet ability score** — only when `rankCompatibility` is set (the default). A row with any `unmetAbilityScoreRequirements` entry sorts after a row with none. The count does not matter. This sits after the budget ceiling because a package that cannot fund the item is a harder miss than an item the character can still use with a penalty.
+7. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
+8. **Canonical fallback** — kind bucket, weapon category, then name.
 
 Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.
 
@@ -253,8 +254,8 @@ Contracts own the copy through `resolveEquipmentPresentationFacts`:
 
 `state.isProficient` remains factual (resolved proficiencies only). Ordinary
 weapon or armor category proficiency adds nothing to the line. Missing proficiency and
-an unmet ability score are cautions, not recommendation tiers, and neither changes
-Best Match ranking.
+an unmet ability score are cautions, not recommendation tiers. Both change Best Match
+as late compatibility keys.
 
 ## Starting-equipment contribution context
 
