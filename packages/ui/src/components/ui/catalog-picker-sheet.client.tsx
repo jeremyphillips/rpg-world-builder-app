@@ -297,7 +297,7 @@ export function CatalogPickerSheet<TItem>({
           headline={title}
           description={description}
           headlineClassName={headlineClassName}
-          className={pinChromeInHeader ? 'pb-0' : undefined}
+          className={pinChromeInHeader ? 'pb-2' : undefined}
         >
           <CatalogPickerSheetHeaderChrome
             pinChromeInHeader={pinChromeInHeader}

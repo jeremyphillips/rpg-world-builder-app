@@ -399,7 +399,7 @@ Content filters and the view stack share one line when they fit (`justify-betwee
 
 A filter toolbar control may change width when its option set changes. It must not change width when its value changes.
 
-`FilterToolbarLabelSizer` stacks the live value with invisible, `aria-hidden` copies of every reserved label in one grid cell. The control is as wide as its widest label.
+`FilterToolbarLabelSizer` stacks the live value with invisible, `aria-hidden` sizing copies in one grid cell. The control is as wide as its widest reserved label. Sizing ghosts use `tabular-nums` so digit width stays stable.
 
 - Selects reserve every option label plus the All label, through `SelectTrigger` `sizingLabels`.
 - Sort reserves every option `triggerLabel` via `SortMenu` sizing ghosts.
@@ -411,7 +411,7 @@ The reset row stays reserved whenever a utility band renders, including bands th
 
 Dependent fields render at the end of their content group and only while their parent value is selected. `sanitizeState` drops them when the parent changes. A boolean that leaves not-applicable rows visible is labeled "Hide X".
 
-A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. The reset row always shows the visible count as `N results` in a polite live region. `visible` is the count after tab, structured filters, and search. Sort does not change the count. Reset is separate toolbar chrome: it appears for narrowing criteria or a non-default sort, and a sort-only change still shows the full eligible count. `FilterToolbarLabelSizer` reserves every count from `0` through the eligible total so glyph width cannot change the row.
+A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. The reset row always shows the visible count as `N results` in a polite live region. `visible` is the count after tab, structured filters, and search. Sort does not change the count. Reset is separate toolbar chrome: it appears for narrowing criteria or a non-default sort, and a sort-only change still shows the full eligible count. Result counts reserve at most two representative labels via `resultCountSizerLabels(total)` (singular `1 result` and plural at the eligible total, with grouped digits). Tabular numerals on ghosts and the live count keep width stable for every visible count from `0` through that total without O(N) DOM nodes.
 
 Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 

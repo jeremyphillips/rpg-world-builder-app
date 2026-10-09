@@ -66,10 +66,10 @@ export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescenda
 export const filterToolbarLabelSizerClasses = 'grid grid-cols-[minmax(0,max-content)] items-center'
 
 export const filterToolbarLabelSizerGhostClasses =
-  'invisible pointer-events-none col-start-1 row-start-1 whitespace-nowrap select-none'
+  'invisible pointer-events-none col-start-1 row-start-1 whitespace-nowrap select-none tabular-nums'
 
 export const filterToolbarLabelSizerLiveClasses =
-  'col-start-1 row-start-1 min-w-0 truncate text-left'
+  'col-start-1 row-start-1 min-w-0 truncate text-left tabular-nums'
 
 /**
  * Lets a width-token cap shrink a select below its widest ghost and ellipsize

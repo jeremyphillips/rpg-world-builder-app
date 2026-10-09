@@ -43,7 +43,7 @@ export const catalogToolbarUtilityContentVariants = cva(
 
 /** Sort over Reset. The stack stays at the end of its line, and Reset aligns to its trailing edge. */
 export const catalogToolbarViewControlsVariants = cva(
-  'ml-auto flex w-fit shrink-0 flex-col items-end gap-0.5',
+  'ml-auto flex w-fit shrink-0 flex-col items-end gap-2',
 )
 
 export const catalogToolbarStandaloneActionsVariants = cva('flex justify-end')
