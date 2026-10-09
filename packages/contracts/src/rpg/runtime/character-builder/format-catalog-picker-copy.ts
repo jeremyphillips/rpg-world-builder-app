@@ -42,7 +42,7 @@ export function formatCatalogPickerCopy(
   noun: CatalogNoun,
   overrides?: Partial<CatalogPickerCopy>,
 ): CatalogPickerCopy {
-  const { label, singular, plural } = noun
+  const { singular, plural } = noun
   const copy: CatalogPickerCopy = {
     searchPlaceholder: `Search ${plural}`,
     chooseTitle: `Choose ${singular}`,

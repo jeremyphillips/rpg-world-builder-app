@@ -59,6 +59,7 @@ export function CatalogSortControl<TMode extends string = string>(
   const { label, value, onValueChange } = props
   const { density } = useFilterChrome()
   const controlSize = resolveFilterControlSize(density)
+  const sortMenuSize = controlSize === 'sm' ? 'sm' : 'default'
 
   let menuSections: SortMenuSection<TMode>[]
   if ('axes' in props && props.axes != null) {
@@ -86,7 +87,8 @@ export function CatalogSortControl<TMode extends string = string>(
       value={value}
       sections={menuSections}
       onValueChange={onValueChange}
-      size={controlSize === 'sm' ? 'sm' : 'default'}
+      size={sortMenuSize}
+      density="default"
     />
   )
 }

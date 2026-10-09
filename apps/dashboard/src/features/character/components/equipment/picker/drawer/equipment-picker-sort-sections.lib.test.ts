@@ -2,46 +2,34 @@ import { describe, expect, it } from 'vitest'
 
 import {
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
-  EQUIPMENT_PICKER_SORT_DATE_ASC,
-  EQUIPMENT_PICKER_SORT_DATE_DESC,
-  EQUIPMENT_PICKER_SORT_MODES,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
-  EQUIPMENT_PICKER_SORT_NAME_DESC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
 } from './equipment-picker-drawer.types'
 import {
-  buildEquipmentPickerSortSections,
   normalizeEquipmentPickerSortMode,
+  resolveEquipmentPickerAvailableSortModes,
 } from './equipment-picker-sort-sections.lib'
 
 describe('equipment-picker-sort-sections.lib', () => {
-  it('delegates grouped sections to the catalog-sort registry', () => {
-    const sections = buildEquipmentPickerSortSections(EQUIPMENT_PICKER_SORT_MODES)
-
-    expect(
-      sections.map((section) => ('heading' in section ? section.heading : 'ungrouped')),
-    ).toEqual(['ungrouped', 'Price', 'Name', 'Date created'])
-    expect(sections[0]).toMatchObject({
-      type: 'ungrouped',
-      options: [{ value: EQUIPMENT_PICKER_SORT_BEST_MATCH, triggerLabel: 'Best match' }],
-    })
+  it('lists purchase workflow modes in menu order from the catalog-sort registry', () => {
+    expect(resolveEquipmentPickerAvailableSortModes(false)).toEqual([
+      EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      'price_asc',
+      'price_desc',
+      'name_asc',
+      'name_desc',
+      'date_desc',
+      'date_asc',
+    ])
   })
 
-  it('omits price group when price modes are unavailable', () => {
-    const sections = buildEquipmentPickerSortSections([
-      EQUIPMENT_PICKER_SORT_BEST_MATCH,
-      EQUIPMENT_PICKER_SORT_NAME_ASC,
-      EQUIPMENT_PICKER_SORT_NAME_DESC,
-      EQUIPMENT_PICKER_SORT_DATE_DESC,
-      EQUIPMENT_PICKER_SORT_DATE_ASC,
-    ])
+  it('omits price modes on magic-items workflow', () => {
+    const modes = resolveEquipmentPickerAvailableSortModes(true)
 
-    expect(
-      sections.some((section) => section.type === 'group' && section.heading === 'Price'),
-    ).toBe(false)
-    expect(
-      sections.some((section) => section.type === 'group' && section.heading === 'Date created'),
-    ).toBe(true)
+    expect(modes).not.toContain('price_asc')
+    expect(modes).not.toContain('price_desc')
+    expect(modes[0]).toBe(EQUIPMENT_PICKER_SORT_BEST_MATCH)
+    expect(modes.some((mode) => mode.startsWith('date_'))).toBe(true)
   })
 
   it('normalizes obsolete sort modes to best match', () => {

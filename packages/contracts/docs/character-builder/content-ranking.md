@@ -49,8 +49,9 @@ facts stay on the row as chrome and disabled actions.
 
 **Name sort modes** use name as the primary key, then search score (when a query is present), then the domain comparator as a tiebreaker. The domain comparator is never the primary key for name sorts.
 
-Shared sort mode values (`best_match`, `name_asc`, `name_desc`) live in
-`catalog-picker-sort-modes.lib.ts`. Domain-specific modes (`price_*`, `level_*`) stay in each picker's `*.types.ts`.
+Shared sort mode ids and presentation copy live in dashboard
+[`catalog-sort`](../../../../apps/dashboard/src/lib/catalog-sort/). Domain-specific re-exports
+(`price_*`, `level_*`, …) stay in each picker's `*.types.ts`.
 
 ## Equipment picker browse order
 

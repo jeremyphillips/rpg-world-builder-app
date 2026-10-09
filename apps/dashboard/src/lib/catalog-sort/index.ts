@@ -23,6 +23,17 @@ export {
   resolveCatalogSortSections,
   type ResolveCatalogSortSectionsArgs,
 } from './resolve-catalog-sort-sections'
+export {
+  CATALOG_PICKER_SORT_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
+  CATALOG_PICKER_SORT_LABEL_NAME_ASC,
+  CATALOG_PICKER_SORT_LABEL_NAME_DESC,
+  CATALOG_PICKER_SORT_NAME_ASC,
+  CATALOG_PICKER_SORT_NAME_DESC,
+  CATALOG_PICKER_SORT_TRIGGER_LABEL_BEST_MATCH,
+  CATALOG_PICKER_SORT_TRIGGER_LABEL_NAME_ASC,
+  CATALOG_PICKER_SORT_TRIGGER_LABEL_NAME_DESC,
+} from './catalog-sort-picker-labels'
 export type {
   CatalogSortAxisDef,
   CatalogSortAxisId,

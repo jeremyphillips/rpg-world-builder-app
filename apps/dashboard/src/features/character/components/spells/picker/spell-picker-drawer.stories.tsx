@@ -72,7 +72,7 @@ export const Default: Story = {
     const sortWidth = sort.getBoundingClientRect().width
     await expect(sortWidth).toBeGreaterThan(0)
     await userEvent.click(sort)
-    await userEvent.click(canvas.getByRole('menuitemradio', { name: 'Level: high to low' }))
+    await userEvent.click(canvas.getByRole('menuitemradio', { name: 'High to low' }))
     await expect(
       canvas.getByRole('button', { name: 'Sort by, Level: High' }).getBoundingClientRect().width,
     ).toBe(sortWidth)

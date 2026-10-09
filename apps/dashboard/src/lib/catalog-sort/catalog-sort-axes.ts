@@ -7,6 +7,7 @@ import type { CatalogSortAxisDef, CatalogSortAxisId } from './catalog-sort.types
 export const CATALOG_SORT_AXES = {
   name: {
     label: 'Name',
+    directionOrder: ['ascending', 'descending'],
     ascending: {
       value: 'name_asc',
       label: 'A–Z',
@@ -20,6 +21,7 @@ export const CATALOG_SORT_AXES = {
   },
   price: {
     label: 'Price',
+    directionOrder: ['ascending', 'descending'],
     ascending: {
       value: 'price_asc',
       label: 'Low to high',
@@ -48,6 +50,7 @@ export const CATALOG_SORT_AXES = {
   },
   level: {
     label: 'Level',
+    directionOrder: ['ascending', 'descending'],
     ascending: {
       value: 'level_asc',
       label: 'Low to high',

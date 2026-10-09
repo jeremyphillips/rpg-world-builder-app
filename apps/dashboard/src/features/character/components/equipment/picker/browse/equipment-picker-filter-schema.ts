@@ -216,7 +216,6 @@ export function createEquipmentPickerFilterSchema<
         id: 'showAffordableOnly',
         label: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
         placement: 'primary',
-        shellVariant: 'outline',
         getValue: (row) => row.state.isWithinRemainingBudget,
       }),
     )
@@ -228,7 +227,6 @@ export function createEquipmentPickerFilterSchema<
         id: 'hideNonProficient',
         label: EQUIPMENT_PICKER_HIDE_NON_PROFICIENT_LABEL,
         placement: 'primary',
-        shellVariant: 'outline',
         getValue: (row) => equipmentPickerKeepsNonProficientHidden(row),
       }),
     )

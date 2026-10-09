@@ -1,22 +1,33 @@
-import { resolveCatalogSortSections } from '@/lib/catalog-sort'
-import type { SortMenuSection } from '@rpg/ui'
+import { collectCatalogSortValues, resolveCatalogSortSections } from '@/lib/catalog-sort'
 
 import {
   EQUIPMENT_PICKER_SORT_AXES,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
+  EQUIPMENT_PICKER_SORT_MODES,
   EQUIPMENT_PICKER_SORT_PRESETS,
+  EQUIPMENT_PICKER_SORT_PRICE_ASC,
+  EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
 
-/** Grouped SortMenu sections for the equipment picker from the catalog-sort registry. */
-export function buildEquipmentPickerSortSections(
-  modes: readonly EquipmentPickerSortMode[],
-): SortMenuSection<EquipmentPickerSortMode>[] {
-  return resolveCatalogSortSections({
-    axes: EQUIPMENT_PICKER_SORT_AXES,
-    presets: EQUIPMENT_PICKER_SORT_PRESETS,
-    availableValues: modes,
-  }) as SortMenuSection<EquipmentPickerSortMode>[]
+/** Sort modes enabled for the current equipment workflow, in menu order. */
+export function resolveEquipmentPickerAvailableSortModes(
+  isMagicItemsWorkflow: boolean,
+): EquipmentPickerSortMode[] {
+  const availableValues = isMagicItemsWorkflow
+    ? EQUIPMENT_PICKER_SORT_MODES.filter(
+        (mode) =>
+          mode !== EQUIPMENT_PICKER_SORT_PRICE_ASC && mode !== EQUIPMENT_PICKER_SORT_PRICE_DESC,
+      )
+    : EQUIPMENT_PICKER_SORT_MODES
+
+  return collectCatalogSortValues(
+    resolveCatalogSortSections({
+      axes: EQUIPMENT_PICKER_SORT_AXES,
+      presets: EQUIPMENT_PICKER_SORT_PRESETS,
+      availableValues,
+    }),
+  ) as EquipmentPickerSortMode[]
 }
 
 /** When workflow removes modes (e.g. price on magic items), coerce to a valid value. */

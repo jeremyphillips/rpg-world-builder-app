@@ -106,7 +106,7 @@ function SortMenuSections<T extends string>({
   )
 }
 
-/** Toolbar sort disclosure — DropdownMenu radio groups on a compact ghost button. */
+/** Toolbar sort disclosure — DropdownMenu radio groups on a compact outline button. */
 export function SortMenu<T extends string>({
   value,
   sections,

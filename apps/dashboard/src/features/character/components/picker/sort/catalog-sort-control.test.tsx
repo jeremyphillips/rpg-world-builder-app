@@ -31,6 +31,19 @@ describe('CatalogSortControl', () => {
     expect(trigger).not.toHaveClass('text-xs')
   })
 
+  it('maps compact filter rhythm to sm size without compact button density', () => {
+    render(
+      <FilterChromeProvider density="compact">
+        <CatalogSortControl value="name_asc" axes={['name']} onValueChange={vi.fn()} />
+      </FilterChromeProvider>,
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Sort by, Name: A–Z' })
+    expect(trigger).toHaveClass('text-xs')
+    expect(trigger).toHaveClass('h-8')
+    expect(trigger).not.toHaveClass('py-0')
+  })
+
   it('includes best_match preset above axis groups', async () => {
     const user = (await import('@testing-library/user-event')).default.setup()
     render(
