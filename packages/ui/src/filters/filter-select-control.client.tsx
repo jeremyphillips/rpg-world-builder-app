@@ -8,17 +8,13 @@ import {
   SelectValue,
 } from '../components/ui/select.client'
 import { getEffectiveFilterValue } from './filter-engine'
-import {
-  normalizeFilterSelectChange,
-  resolveFilterSelectValue,
-  resolveSelectCurrentValue,
-  resolveSelectFieldOptions,
-} from './filter-bar.lib'
+import { normalizeFilterSelectChange, resolveSelectCurrentValue } from './filter-bar.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 import {
   FilterSelectFieldChrome,
   resolveFilterSelectFieldLayout,
 } from './filter-select-field-chrome.client'
+import { resolveFilterSelectControlView } from './filter-select-control.lib'
 import type { FilterFieldPresentation } from './filter-presentation.lib'
 import type {
   FilterFieldId,
@@ -55,15 +51,17 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
 }: FilterSelectControlProps<TData, TState>) {
   const rawValue = state[selectField.id]
   const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
-  const resolvedContext = optionsContext ?? { state }
-  const options = resolveSelectFieldOptions(selectField, resolvedContext)
-  const fieldWithOptions = { ...selectField, options }
-  const showAllOption = selectField.showAllOption ?? true
-  const triggerAriaLabel = selectField.triggerAriaLabel ?? selectField.label
-  const layout = resolveFilterSelectFieldLayout(selectField)
+  const view = resolveFilterSelectControlView({
+    field: selectField,
+    state,
+    optionsContext,
+    widthClassName,
+    effectiveValue,
+    layout: resolveFilterSelectFieldLayout(selectField),
+  })
 
   const handleValueChange = (nextValue: string) => {
-    const normalized = normalizeFilterSelectChange(fieldWithOptions, nextValue) as
+    const normalized = normalizeFilterSelectChange(view.fieldWithOptions, nextValue) as
       | TState[typeof selectField.id]
       | undefined
 
@@ -77,33 +75,31 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
 
   return (
     <FilterSelectFieldChrome
-      layout={layout}
+      layout={view.layout}
       presentation={presentation}
       controlId={controlId}
       label={selectField.label}
       ariaLabel={selectField.ariaLabel}
       widthClassName={widthClassName}
     >
-      <Select
-        value={resolveFilterSelectValue(fieldWithOptions, rawValue, effectiveValue)}
-        onValueChange={handleValueChange}
-        disabled={disabled}
-      >
+      <Select value={view.selectValue} onValueChange={handleValueChange} disabled={disabled}>
         <SelectTrigger
           id={controlId}
-          aria-label={triggerAriaLabel}
+          aria-label={view.triggerAriaLabel}
+          title={view.triggerTitle}
           size={presentation.controlSize}
-          className={layout === 'inline' ? 'w-auto' : 'w-full'}
+          sizingLabels={view.sizingLabels}
+          className={view.triggerClassName}
         >
           <SelectValue placeholder={selectField.label} />
         </SelectTrigger>
         <SelectContent>
-          {showAllOption ? (
+          {view.showAllOption ? (
             <SelectItem value={FILTER_SELECT_ALL_VALUE}>
               {selectField.allOptionLabel ?? `All ${selectField.label}`}
             </SelectItem>
           ) : null}
-          {options.map((option) => (
+          {view.options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

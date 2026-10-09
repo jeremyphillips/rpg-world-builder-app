@@ -27,6 +27,19 @@ describe('CatalogToolbarResetSlot', () => {
     expect(button).toHaveAttribute('title', CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME)
   })
 
+  it('reserves an idle row when a utility band has no sort', () => {
+    const { container } = render(
+      <CatalogToolbarResetSlot visible={false} reserve includesSort={false} onClick={vi.fn()} />,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }),
+    ).not.toBeInTheDocument()
+    const reserved = container.querySelector('.invisible')
+    expect(reserved).toHaveAttribute('aria-hidden', 'true')
+    expect(reserved?.querySelector('button')).toHaveAttribute('tabindex', '-1')
+  })
+
   it('reserves an idle row when sort is persistent', () => {
     const { container } = render(
       <CatalogToolbarResetSlot visible={false} includesSort onClick={vi.fn()} />,

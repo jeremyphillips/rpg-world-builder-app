@@ -46,6 +46,28 @@ export function isFilterFieldDisabled<TData, TState extends Record<string, unkno
   return field.disabled ? field.disabled(state) : false
 }
 
+/** Every label a select trigger must reserve, including the All option. */
+export function resolveFilterSelectSizerLabels(field: {
+  label: string
+  showAllOption?: boolean
+  allOptionLabel?: string
+  options: readonly { label: string }[]
+}): string[] {
+  const labels = field.options.map((option) => option.label)
+  if (field.showAllOption !== false) {
+    labels.unshift(field.allOptionLabel ?? `All ${field.label}`)
+  }
+  return [...new Set(labels)]
+}
+
+/** `triggerLabel(0)` and `triggerLabel(totalOptionCount)` — the popover's width extremes. */
+export function resolveFilterPopoverSizerLabels(
+  triggerLabel: (activeCount: number) => string,
+  totalOptionCount: number,
+): string[] {
+  return [...new Set([triggerLabel(0), triggerLabel(totalOptionCount)])]
+}
+
 export function resolveFilterSelectValue(
   field: SelectFieldLike,
   rawValue: unknown,

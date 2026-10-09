@@ -350,11 +350,10 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
           structuredFilterCount: characterFilters.structuredFilterCount,
           searchQuery,
         })
-        if (!showReset) return null
-
         return (
           <CatalogToolbarResetSlot
-            visible
+            visible={showReset}
+            reserve={showClassFilter}
             includesSort={false}
             onClick={() => {
               characterFilters.reset()

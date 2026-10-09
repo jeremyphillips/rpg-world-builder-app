@@ -8,12 +8,13 @@ import { Input } from '../components/ui/input.client'
 import { Text } from '../components/ui/text'
 import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
-import { isFilterFieldDisabled } from './filter-bar.lib'
+import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
 import { resolveChipsFieldOptions, resolvePopoverFieldGroups } from './filter-field-options.lib'
 import { FilterInlineControl } from './filter-inline-control.client'
 import {
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
+  resolveFilterSelectWidthToken,
   type FilterFieldPresentation,
 } from './filter-presentation.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
@@ -214,11 +215,13 @@ function FilterPopoverField<TData, TState extends Record<string, unknown>>({
   }
 
   const activeCount = countPopoverActiveFilters(recordValue)
+  const totalOptionCount = groups.reduce((count, group) => count + group.options.length, 0)
 
   return (
     <div className={presentation.groupClassName}>
       <FilterPopover
         triggerLabel={popoverField.triggerLabel(activeCount)}
+        sizingLabels={resolveFilterPopoverSizerLabels(popoverField.triggerLabel, totalOptionCount)}
         triggerAriaLabel={popoverField.triggerAriaLabel ?? popoverField.label}
         triggerSize={presentation.triggerSize}
         disabled={disabled}
@@ -298,9 +301,7 @@ export function FilterFieldRenderer<TData, TState extends Record<string, unknown
 }: FilterFieldRendererProps<TData, TState>) {
   const chrome = useFilterChrome()
   const presentation = resolveFilterFieldPresentation(field, chrome)
-  const widthClassName = resolveFilterFieldWidthClasses(
-    field.type === 'select' ? field.width : undefined,
-  )
+  const widthClassName = resolveFilterFieldWidthClasses(resolveFilterSelectWidthToken(field))
   const disabled = isFilterFieldDisabled(field, context.state, context.disabled)
   const optionsContext: FilterFieldOptionsContext<TData, TState> = {
     state: context.state,

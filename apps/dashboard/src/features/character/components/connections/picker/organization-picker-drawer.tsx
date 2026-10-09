@@ -179,11 +179,10 @@ export function OrganizationPickerDrawer({
           structuredFilterCount: organizationFilters.structuredFilterCount,
           searchQuery,
         })
-        if (!showReset) return null
-
         return (
           <CatalogToolbarResetSlot
-            visible
+            visible={showReset}
+            reserve={showDomainFilter}
             includesSort={false}
             onClick={() => {
               organizationFilters.reset()

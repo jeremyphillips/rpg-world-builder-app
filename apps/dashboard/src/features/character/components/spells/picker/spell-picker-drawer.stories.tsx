@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { Button } from '@rpg/ui'
 
@@ -11,7 +12,12 @@ import {
   spellPickerMageHandFixture,
   spellPickerOpenItemsFixture,
 } from './spell-picker-drawer.fixtures'
-import { SPELL_PICKER_MODE_CANTRIPS, SPELL_PICKER_MODE_SPELLS } from './spell-picker-drawer.types'
+import {
+  SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
+  SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_SPELLS,
+  SPELL_PICKER_SORT_ORDER_LABEL,
+} from './spell-picker-drawer.types'
 
 const baseArgs = {
   characterClassName: 'Wizard',
@@ -51,6 +57,40 @@ export const Default: Story = {
         <SpellPickerDrawer {...args} open={open} onOpenChange={setOpen} />
       </>
     )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+    const school = canvas.getByRole('combobox', { name: 'School' })
+    const schoolWidth = school.getBoundingClientRect().width
+    await expect(schoolWidth).toBeGreaterThan(0)
+    await userEvent.click(school)
+    await userEvent.click(canvas.getByRole('option', { name: 'Evocation' }))
+    await expect(
+      canvas.getByRole('combobox', { name: 'School' }).getBoundingClientRect().width,
+    ).toBe(schoolWidth)
+
+    const sort = canvas.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL })
+    const sortWidth = sort.getBoundingClientRect().width
+    await expect(sortWidth).toBeGreaterThan(0)
+    await userEvent.click(sort)
+    await userEvent.click(canvas.getByRole('option', { name: 'Level: high to low' }))
+    await expect(
+      canvas.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL }).getBoundingClientRect()
+        .width,
+    ).toBe(sortWidth)
+
+    const mechanics = canvas.getByRole('button', {
+      name: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
+    })
+    const mechanicsWidth = mechanics.getBoundingClientRect().width
+    await expect(mechanicsWidth).toBeGreaterThan(0)
+    await userEvent.click(mechanics)
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'Concentration' }))
+    await expect(
+      canvas
+        .getByRole('button', { name: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL })
+        .getBoundingClientRect().width,
+    ).toBe(mechanicsWidth)
   },
 }
 

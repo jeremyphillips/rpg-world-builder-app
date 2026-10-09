@@ -11,9 +11,11 @@ import {
   createTextFilter,
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
+import { SELECT_SIZING_LABEL_DATA_ATTR } from '../components/ui/select-trigger.lib'
 import { FilterChromeProvider } from './filter-chrome.context'
 import { FilterFieldRenderer } from './filter-field-renderer.client'
 import type { FilterRenderContext } from './filter-field-renderer.client'
+import { FILTER_TOOLBAR_SIZER_LABEL_ATTR } from './filter-toolbar-label-sizer.client'
 
 type DemoRow = { name: string; status: string }
 type TestFilterState = {
@@ -22,6 +24,7 @@ type TestFilterState = {
   hiddenOnly?: boolean
   levels?: number[]
   mechanics?: Record<string, string[]>
+  activeMechanics?: Record<string, string[]>
   noAllStatus?: 'draft' | 'published'
   school?: string
 }
@@ -86,6 +89,22 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
     label: 'Mechanics',
     triggerLabel: (count) => `Mechanics (${count})`,
     groups: () => [],
+    matches: () => true,
+  }),
+  createPopoverFilter<DemoRow, TestFilterState, 'activeMechanics'>({
+    id: 'activeMechanics',
+    label: 'Casting',
+    triggerLabel: (count) => (count === 0 ? 'Casting' : `Casting · ${count}`),
+    groups: () => [
+      {
+        id: 'traits',
+        label: 'Traits',
+        options: [
+          { value: 'concentration', label: 'Concentration' },
+          { value: 'ritual', label: 'Ritual' },
+        ],
+      },
+    ],
     matches: () => true,
   }),
 ])
@@ -161,6 +180,33 @@ describe('FilterFieldRenderer chrome', () => {
     expect(group).toHaveClass('w-fit')
     expect(group).not.toHaveClass('w-full')
     expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('w-auto')
+  })
+
+  it('reserves every select option label in the width sizer', () => {
+    render(<RendererHarness fieldId="status" />)
+
+    const trigger = screen.getByRole('combobox', { name: 'Status' })
+    const ghosts = [...trigger.querySelectorAll(`[${SELECT_SIZING_LABEL_DATA_ATTR}]`)].map(
+      (node) => node.textContent,
+    )
+    expect(ghosts).toEqual(['All statuses', 'Draft', 'Published'])
+    expect(trigger).toHaveAttribute('title', 'All statuses')
+  })
+
+  it('caps inline selects at lg when no width token is set', () => {
+    render(<RendererHarness fieldId="school" />)
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('max-w-48')
+  })
+
+  it('reserves the popover trigger extremes in the width sizer', () => {
+    render(<RendererHarness fieldId="activeMechanics" />)
+
+    const trigger = screen.getByRole('button', { name: 'Casting' })
+    const ghosts = [...trigger.querySelectorAll(`[${FILTER_TOOLBAR_SIZER_LABEL_ATTR}]`)].map(
+      (node) => node.textContent,
+    )
+    expect(ghosts).toEqual(['Casting', 'Casting · 2'])
+    expect(trigger).toHaveTextContent('Casting')
   })
 
   it('renders catalog chips with compact label sizing under default chrome', () => {

@@ -205,11 +205,10 @@ export function LocationRelationshipAddDrawer({
             structuredFilterCount: locationFilters.structuredFilterCount,
             searchQuery,
           })
-          if (!showReset) return null
-
           return (
             <CatalogToolbarResetSlot
-              visible
+              visible={showReset}
+              reserve={showKindFilter}
               includesSort={false}
               onClick={() => {
                 locationFilters.reset()

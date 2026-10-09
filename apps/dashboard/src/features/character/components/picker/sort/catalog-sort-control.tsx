@@ -41,8 +41,11 @@ export function CatalogSortControl<TMode extends string = string>({
       <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
         <SelectTrigger
           size={presentation.controlSize}
-          className="w-auto shrink-0 min-w-[4.5rem]"
           aria-label={triggerAriaLabel}
+          title={triggerLabel}
+          sizingLabels={[
+            ...new Set(options.map((option) => resolvePickerSortTriggerLabel(option))),
+          ]}
         >
           <SelectValue>{triggerLabel}</SelectValue>
         </SelectTrigger>

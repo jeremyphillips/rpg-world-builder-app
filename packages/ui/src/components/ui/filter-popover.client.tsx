@@ -3,6 +3,7 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover'
 import * as React from 'react'
 
+import { FilterToolbarLabelSizer } from '../../filters/filter-toolbar-label-sizer.client'
 import { Button } from './button.client'
 import { Checkbox } from './checkbox.client'
 import { PopoverLayerPortal } from './layer-portal-container.client'
@@ -20,6 +21,8 @@ export type FilterPopoverGroup = {
 
 export type FilterPopoverProps = {
   triggerLabel: string
+  /** Widest-label reserve. The live label stays `triggerLabel`. */
+  sizingLabels?: readonly string[]
   triggerAriaLabel: string
   groups: readonly FilterPopoverGroup[]
   triggerSize?: 'sm' | 'md'
@@ -36,6 +39,7 @@ function resolveFilterPopoverTriggerSize(triggerSize: 'sm' | 'md'): 'sm' | 'defa
 
 export function FilterPopover({
   triggerLabel,
+  sizingLabels,
   triggerAriaLabel,
   groups,
   triggerSize = 'sm',
@@ -70,10 +74,15 @@ export function FilterPopover({
           variant="outline"
           size={resolveFilterPopoverTriggerSize(triggerSize)}
           aria-label={triggerAriaLabel}
+          title={triggerLabel}
           disabled={disabled}
           aria-disabled={disabled || undefined}
         >
-          {triggerLabel}
+          {sizingLabels && sizingLabels.length > 0 ? (
+            <FilterToolbarLabelSizer labels={sizingLabels}>{triggerLabel}</FilterToolbarLabelSizer>
+          ) : (
+            triggerLabel
+          )}
         </Button>
       </PopoverPrimitive.Trigger>
       <PopoverLayerPortal>

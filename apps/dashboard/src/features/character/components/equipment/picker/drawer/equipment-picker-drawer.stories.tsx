@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
+import { EQUIPMENT_PICKER_SORT_ORDER_LABEL } from './equipment-picker-drawer.types'
 import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   builderPathGoldBudgetFixture,
@@ -52,6 +54,19 @@ export const Default: Story = {
         <EquipmentPickerDrawer {...args} open={open} onOpenChange={setOpen} />
       </>
     )
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+    const sort = canvas.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
+    const sortWidth = sort.getBoundingClientRect().width
+    await expect(sortWidth).toBeGreaterThan(0)
+    await userEvent.click(sort)
+    await userEvent.click(canvas.getByRole('option', { name: 'Price: High to low' }))
+    await expect(
+      canvas
+        .getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
+        .getBoundingClientRect().width,
+    ).toBe(sortWidth)
   },
 }
 

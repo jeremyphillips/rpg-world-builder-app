@@ -680,11 +680,10 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               structuredFilterCount: organizationFilters.structuredFilterCount,
               searchQuery,
             })
-            if (!showReset) return null
-
             return (
               <CatalogToolbarResetSlot
-                visible
+                visible={showReset}
+                reserve={showOrganizationDomainFilter}
                 includesSort={false}
                 onClick={() => {
                   organizationFilters.reset()
@@ -790,11 +789,10 @@ function LocationInversePeopleConnectionLinkDrawerContent({
             structuredFilterCount: characterFilters.structuredFilterCount,
             searchQuery,
           })
-          if (!showReset) return null
-
           return (
             <CatalogToolbarResetSlot
-              visible
+              visible={showReset}
+              reserve={showCharacterClassFilter}
               includesSort={false}
               onClick={() => {
                 characterFilters.reset()

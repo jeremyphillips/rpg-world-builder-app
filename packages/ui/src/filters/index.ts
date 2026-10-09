@@ -63,6 +63,8 @@ export {
   isFilterFieldDisabled,
   isFilterFieldVisible,
   normalizeFilterSelectChange,
+  resolveFilterPopoverSizerLabels,
+  resolveFilterSelectSizerLabels,
   resolveFilterSelectValue,
 } from './filter-bar.lib'
 export {
@@ -71,6 +73,7 @@ export {
   resolveFilterControlSize,
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
+  resolveFilterSelectWidthToken,
   type FilterChromePresentation,
   type FilterFieldPresentation,
 } from './filter-presentation.lib'

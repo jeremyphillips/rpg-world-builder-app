@@ -57,8 +57,13 @@ export function CatalogToolbarResetAction({
 export type CatalogToolbarResetSlotProps = {
   visible: boolean
   onClick: () => void
-  /** Persistent Sort is on this toolbar. Reserves the reset row while idle. */
+  /** Sort is on this toolbar. Chooses the default accessible name and reserves the row. */
   includesSort: boolean
+  /**
+   * Keep the reset row mounted while idle. Defaults to `includesSort`.
+   * Set when a utility band renders without Sort, so that band does not jump.
+   */
+  reserve?: boolean
   /**
    * Replaces the visible label and the accessible name. Defaults to `Reset`
    * with the sort-aware accessible name.
@@ -67,16 +72,18 @@ export type CatalogToolbarResetSlotProps = {
 }
 
 /**
- * Reserves the reset row while idle only when Sort is persistent, so Sort does not jump.
- * Without Sort, an idle slot renders nothing.
+ * Reserves the reset row while idle whenever a utility band renders, so Sort
+ * and content filters do not jump when Reset appears.
  */
 export function CatalogToolbarResetSlot({
   visible,
   onClick,
   includesSort,
+  reserve,
   label,
 }: CatalogToolbarResetSlotProps) {
-  if (!visible && !includesSort) return null
+  const shouldReserve = reserve ?? includesSort
+  if (!visible && !shouldReserve) return null
 
   const accessibleName = label ?? catalogToolbarResetAccessibleName(includesSort)
   const visibleLabel = label ?? CATALOG_TOOLBAR_RESET_VISIBLE_LABEL
