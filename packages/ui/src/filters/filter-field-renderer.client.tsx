@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button.client'
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
+import { FilterFloatingField } from './filter-floating-field.client'
 import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
 import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
@@ -73,6 +74,38 @@ function FilterTextField<TData, TState extends Record<string, unknown>>({
   const textField = field
   const rawValue = state[textField.id]
   const textValue = typeof rawValue === 'string' ? rawValue : ''
+
+  if (textField.layout === 'floating') {
+    return (
+      <div
+        data-field-align=""
+        className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+      >
+        <FilterFloatingField
+          id={controlId}
+          label={textField.label}
+          populated={textValue.length > 0}
+          placeholder={textField.placeholder}
+          disabled={disabled}
+        >
+          <Input
+            value={textValue}
+            onChange={(event) => {
+              onValueChange(
+                textField.id,
+                (event.target.value ? event.target.value : undefined) as
+                  | TState[typeof textField.id]
+                  | undefined,
+              )
+            }}
+            autoComplete="off"
+            size={presentation.controlSize}
+            disabled={disabled}
+          />
+        </FilterFloatingField>
+      </div>
+    )
+  }
 
   return (
     <div

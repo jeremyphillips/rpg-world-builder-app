@@ -59,14 +59,15 @@ export type FilterFieldPresentation =
     })
 
 type FilterPresentationField = Pick<FilterFieldDef<unknown, Record<string, unknown>>, 'type'> & {
-  layout?: 'stacked' | 'inline'
+  layout?: 'stacked' | 'inline' | 'floating'
   width?: FilterFieldWidth
 }
 
 /**
  * Maps filter field `layout` to shared {@link FieldLabelLayout}.
- * Schema API stays `stacked` | `inline` | default (omitted → hidden for non-selects;
+ * Schema API stays `stacked` | `inline` | `floating` | default (omitted → hidden for non-selects;
  * selects resolve via {@link resolveFilterSelectFieldLayout}).
+ * `floating` hides the separate caption — the composite owns the visible label.
  */
 export function mapFilterLayoutToLabelLayout(field: FilterPresentationField): FieldLabelLayout {
   if (field.type === 'boolean') return 'inline'
@@ -90,6 +91,9 @@ function resolveFilterGroupExtras(field: FilterPresentationField, density: Filte
     }
     if (layout === 'stacked') {
       return filterStackedFieldGroupVariants({ density })
+    }
+    if (layout === 'floating') {
+      return 'w-fit shrink-0'
     }
     const selectWidth = field.width === 'lg' || field.width === 'xl' ? 'selectLong' : 'select'
     return filterBarControlVariants({ type: selectWidth })
@@ -198,11 +202,11 @@ export function resolveFilterFieldWidthClasses(width?: FilterFieldWidth): string
  */
 export function resolveFilterSelectWidthToken(field: {
   type: string
-  layout?: 'stacked' | 'inline'
+  layout?: 'stacked' | 'inline' | 'floating'
   width?: FilterFieldWidth
 }): FilterFieldWidth | undefined {
   if (field.type !== 'select') return undefined
   if (field.width) return field.width
-  if (field.layout === 'inline') return 'lg'
+  if (field.layout === 'inline' || field.layout === 'floating') return 'lg'
   return undefined
 }

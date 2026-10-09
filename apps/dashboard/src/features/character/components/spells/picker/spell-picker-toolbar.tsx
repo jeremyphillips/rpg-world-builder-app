@@ -4,12 +4,7 @@ import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { useMemo } from 'react'
 
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
-import {
-  SPELL_PICKER_SORT_GROUP_LABEL,
-  SPELL_PICKER_SORT_LABELS,
-  SPELL_PICKER_SORT_ORDER_LABEL,
-  type SpellPickerSortMode,
-} from './spell-picker-drawer.types'
+import { SPELL_PICKER_SORT_LABELS, type SpellPickerSortMode } from './spell-picker-drawer.types'
 import {
   createSpellPickerFilterSchema,
   SPELL_PICKER_FILTER_LAYOUT,
@@ -85,8 +80,6 @@ export function SpellPickerSortControl({
     <CatalogSortControl
       value={sortMode}
       label="Sort"
-      ariaLabel={SPELL_PICKER_SORT_GROUP_LABEL}
-      triggerAriaLabel={SPELL_PICKER_SORT_ORDER_LABEL}
       options={validSortModes.map((mode) => pickerSortOption(mode, SPELL_PICKER_SORT_LABELS[mode]))}
       onValueChange={onSortModeChange}
     />

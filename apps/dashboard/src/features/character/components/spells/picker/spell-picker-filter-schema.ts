@@ -1,10 +1,5 @@
 import type { SpellPickerItem } from '@rpg/contracts'
-import {
-  SPELL_SCHOOL_TERM,
-  getSpellSchoolLabel,
-  getTermCompactLabel,
-  getTermSentenceForm,
-} from '@rpg/contracts'
+import { SPELL_SCHOOL_TERM, getSpellSchoolLabel, getTermCompactLabel } from '@rpg/contracts'
 
 import {
   applyFilterSchema,
@@ -166,10 +161,8 @@ export function createSpellPickerFilterSchema(
         id: 'selectedSchool',
         label: getTermCompactLabel(SPELL_SCHOOL_TERM),
         defaultValue: SPELL_PICKER_SCHOOL_ALL,
-        layout: 'inline',
+        layout: 'floating',
         showAllOption: false,
-        ariaLabel: `Filter by ${getTermSentenceForm(SPELL_SCHOOL_TERM, 1)}`,
-        triggerAriaLabel: getTermCompactLabel(SPELL_SCHOOL_TERM),
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
           ...[...new Set(args.items.map((item) => item.spell.school))]

@@ -13,34 +13,38 @@ const nameSortOptions = [
 describe('CatalogSortControl', () => {
   it('shows compact trigger labels for name sorts', () => {
     render(
-      <CatalogSortControl
-        value="name_asc"
-        options={nameSortOptions}
-        onValueChange={vi.fn()}
-        triggerAriaLabel="Spell sort order"
-      />,
+      <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('combobox', { name: 'Sort' })).toHaveTextContent('A–Z')
+    expect(screen.queryByRole('group')).not.toBeInTheDocument()
   })
 
-  it('uses compact filter caption classes by default', () => {
+  it('uses compact floating label type by default', () => {
     render(
       <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
     )
 
-    expect(screen.getByText('Sort')).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(
+      screen
+        .getByRole('combobox', { name: 'Sort' })
+        .closest('[data-populated]')
+        ?.querySelector('[data-floating-label]'),
+    ).toHaveClass('text-xs')
   })
 
-  it('uses comfortable filter caption classes inside comfortable chrome', () => {
+  it('uses comfortable resting type inside comfortable chrome', () => {
     render(
       <FilterChromeProvider density="comfortable">
         <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />
       </FilterChromeProvider>,
     )
 
-    const caption = screen.getByText('Sort')
-    expect(caption).toHaveClass('text-sm', 'text-muted-foreground')
+    const caption = screen
+      .getByRole('combobox', { name: 'Sort' })
+      .closest('[data-populated]')
+      ?.querySelector('[data-floating-label]')
+    expect(caption).toHaveClass('text-md')
     expect(caption).not.toHaveClass('text-xs')
   })
 })

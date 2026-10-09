@@ -33,8 +33,6 @@ const spellCopy = formatCatalogPickerCopy(spellNoun)
 
 export const SPELL_PICKER_CANTRIPS_LABEL = getSpellCollectionKindLabel('cantrips')
 export const SPELL_PICKER_SEARCH_PLACEHOLDER = spellCopy.searchPlaceholder
-export const SPELL_PICKER_SORT_GROUP_LABEL = spellCopy.sortGroupLabel
-export const SPELL_PICKER_SORT_ORDER_LABEL = spellCopy.sortOrderLabel
 
 export const SPELL_PICKER_NO_RESULTS_MESSAGE = spellCopy.noResultsMessage
 export const SPELL_PICKER_NO_OPTIONS_MESSAGE = spellCopy.noOptionsMessage

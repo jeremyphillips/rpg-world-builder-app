@@ -23,8 +23,6 @@ import {
   SPELL_PICKER_SEARCH_PLACEHOLDER,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
   SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
-  SPELL_PICKER_SORT_GROUP_LABEL,
-  SPELL_PICKER_SORT_ORDER_LABEL,
 } from './spell-picker-drawer.types'
 
 const preparedSpellChoiceSet = {
@@ -67,7 +65,7 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: SPELL_PICKER_SORT_GROUP_LABEL })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Sort' })).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
     expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
@@ -82,9 +80,7 @@ describe('SpellPickerDrawer', () => {
   it('shows compact A-Z label in the sort trigger', () => {
     renderCantripDrawer()
 
-    expect(screen.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL })).toHaveTextContent(
-      'A–Z',
-    )
+    expect(screen.getByRole('combobox', { name: 'Sort' })).toHaveTextContent('A–Z')
   })
 
   it('omits the primary toolbar row when level chips are hidden', () => {

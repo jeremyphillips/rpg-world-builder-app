@@ -50,12 +50,10 @@ export function createOrganizationRelationshipFilterSchema<TData>(
       createEqualsFilter<TData, OrganizationRelationshipFilterState, 'domain', string>({
         id: 'domain',
         label: RELATIONSHIP_FILTER_DOMAIN_LABEL,
-        layout: 'inline',
+        layout: 'floating',
         width: 'lg',
         showAllOption: true,
         allOptionLabel: RELATIONSHIP_FILTER_ALL_DOMAINS_LABEL,
-        ariaLabel: RELATIONSHIP_FILTER_DOMAIN_LABEL,
-        triggerAriaLabel: RELATIONSHIP_FILTER_DOMAIN_LABEL,
         options: domainOptions.map((domain) => ({
           value: domain,
           label: getOrganizationDomainLabel(domain),

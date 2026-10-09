@@ -11,6 +11,7 @@ import type { FieldControlVariantProps } from './field-control.variants'
 import type { FieldDigits } from './field-digit-metrics'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
+import { useFloatingLabelFieldState } from './floating-label-field.context'
 import {
   assertSelectCompactSizing,
   isSelectCompactTrigger,
@@ -69,6 +70,12 @@ const SelectTrigger = React.forwardRef<
     ref,
   ) => {
     assertSelectCompactSizing({ digits, sizingLabel, sizingLabels })
+    const insideFloatingLabel = useFloatingLabelFieldState()
+    if (insideFloatingLabel && (digits != null || grouped)) {
+      throw new Error(
+        'SelectTrigger: `digits` and `grouped` are not supported inside FloatingLabelField.',
+      )
+    }
 
     const size = sizeProp ?? 'md'
     const groupedStart = grouped && groupedPosition === 'start'

@@ -73,6 +73,51 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
     onValueChange(selectField.id, normalized)
   }
 
+  const menu = (
+    <SelectContent>
+      {view.showAllOption ? (
+        <SelectItem value={FILTER_SELECT_ALL_VALUE}>
+          {selectField.allOptionLabel ?? `All ${selectField.label}`}
+        </SelectItem>
+      ) : null}
+      {view.options.map((option) => (
+        <SelectItem key={option.value} value={option.value}>
+          {option.label}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  )
+
+  if (view.layout === 'floating') {
+    return (
+      <Select value={view.selectValue} onValueChange={handleValueChange} disabled={disabled}>
+        <FilterSelectFieldChrome
+          layout="floating"
+          presentation={presentation}
+          controlId={controlId}
+          label={selectField.label}
+          populated={view.selectValue.length > 0}
+          disabled={disabled}
+        >
+          <SelectTrigger
+            id={controlId}
+            title={view.triggerTitle}
+            size={presentation.controlSize}
+            sizingLabels={view.sizingLabels}
+            className={view.triggerClassName}
+          >
+            {view.triggerContent != null ? (
+              <SelectValue>{view.triggerContent}</SelectValue>
+            ) : (
+              <SelectValue />
+            )}
+          </SelectTrigger>
+        </FilterSelectFieldChrome>
+        {menu}
+      </Select>
+    )
+  }
+
   return (
     <FilterSelectFieldChrome
       layout={view.layout}
@@ -93,18 +138,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
         >
           <SelectValue placeholder={selectField.label} />
         </SelectTrigger>
-        <SelectContent>
-          {view.showAllOption ? (
-            <SelectItem value={FILTER_SELECT_ALL_VALUE}>
-              {selectField.allOptionLabel ?? `All ${selectField.label}`}
-            </SelectItem>
-          ) : null}
-          {view.options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
+        {menu}
       </Select>
     </FilterSelectFieldChrome>
   )

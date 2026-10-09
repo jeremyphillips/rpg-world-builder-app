@@ -3,7 +3,12 @@ import { useMemo, useState } from 'react'
 
 import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
 import { countModifiedFilters } from './filter-engine'
-import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
+import {
+  createBooleanFilter,
+  createChipsFilter,
+  createEqualsFilter,
+  createTextFilter,
+} from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
 import { FilterBar } from './filter-bar.client'
 import { FilterFieldList } from './filter-fields.client'
@@ -214,4 +219,57 @@ function ClassesLikePrimaryRowDemo() {
 /** Classes-like primary row: search + stacked select + boolean + More filters action. */
 export const ClassesLikePrimaryRow: Story = {
   render: () => <ClassesLikePrimaryRowDemo />,
+}
+
+type MixedState = {
+  affordable?: boolean
+  school?: string
+  levels?: string
+}
+
+const mixedToolbarSchema = createFilterSchema<{ name: string }, MixedState>([
+  createBooleanFilter<{ name: string }, MixedState, 'affordable'>({
+    id: 'affordable',
+    label: 'Affordable now',
+    placement: 'primary',
+    getValue: () => false,
+  }),
+  createChipsFilter<{ name: string }, MixedState, 'levels'>({
+    id: 'levels',
+    label: 'Level',
+    placement: 'primary',
+    selectionMode: 'single-required',
+    defaultValue: '__all__',
+    options: [
+      { value: '__all__', label: 'All' },
+      { value: '1', label: '1st' },
+    ],
+    matches: () => true,
+  }),
+  createEqualsFilter<{ name: string }, MixedState, 'school', string>({
+    id: 'school',
+    label: 'School',
+    placement: 'primary',
+    layout: 'floating',
+    allOptionLabel: 'All schools',
+    options: [
+      { value: 'evocation', label: 'Evocation' },
+      { value: 'abjuration', label: 'Abjuration' },
+    ],
+    getValue: () => 'evocation',
+  }),
+])
+
+function MixedFloatingToolbarDemo() {
+  const { state, setValue } = useFilterState(mixedToolbarSchema)
+  return (
+    <div className="max-w-3xl bg-background p-4">
+      <FilterBar schema={mixedToolbarSchema} state={state} onValueChange={setValue} />
+    </div>
+  )
+}
+
+/** Floating select beside a checkbox and chips. Controls align on their bottom edge. */
+export const MixedFloatingToolbar: Story = {
+  render: () => <MixedFloatingToolbarDemo />,
 }

@@ -1,6 +1,4 @@
 import {
-  catalogNounFromContentType,
-  formatCatalogPickerCopy,
   type EquipmentBudgetSummary,
   type EquipmentPickerBrowseSortContext,
   type EquipmentPickerItem,
@@ -33,16 +31,10 @@ export type {
 
 export type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-const equipmentNoun = catalogNounFromContentType('equipment')
-const equipmentCopy = formatCatalogPickerCopy(equipmentNoun)
-
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
 export const EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL = 'Exceeds starting budget'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
-
-export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = equipmentCopy.sortGroupLabel
-export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = equipmentCopy.sortOrderLabel
 
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
 

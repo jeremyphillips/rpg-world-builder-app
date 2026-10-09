@@ -1,11 +1,6 @@
 import * as React from 'react'
 
-import {
-  catalogNounFromTerm,
-  formatCatalogPickerCopy,
-  PICKER_DISABLED_REASON_SELECTION_FULL,
-  PROFICIENCY_TERM,
-} from '@rpg/contracts'
+import { PICKER_DISABLED_REASON_SELECTION_FULL } from '@rpg/contracts'
 import { CatalogPickerSelectionActions, resolveCatalogPickerRowActionPhase } from '@rpg/ui'
 
 import {
@@ -45,7 +40,6 @@ import { ProficiencyPickerItemDetails } from './proficiency-picker-item-details'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
-  PROFICIENCY_PICKER_SORT_GROUP_LABEL,
   PROFICIENCY_PICKER_SORT_LABELS,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
@@ -53,10 +47,6 @@ import {
 } from './proficiency-picker-drawer.types'
 
 export type { ProficiencyPickerDrawerProps } from './proficiency-picker-drawer.types'
-
-const PROFICIENCY_PICKER_SORT_ORDER_LABEL = formatCatalogPickerCopy(
-  catalogNounFromTerm(PROFICIENCY_TERM),
-).sortOrderLabel
 
 /** Proficiency catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function ProficiencyPickerDrawer({
@@ -137,8 +127,6 @@ export function ProficiencyPickerDrawer({
               pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
             )}
             onValueChange={setSortMode}
-            triggerAriaLabel={PROFICIENCY_PICKER_SORT_ORDER_LABEL}
-            ariaLabel={PROFICIENCY_PICKER_SORT_GROUP_LABEL}
           />
         ),
       }}

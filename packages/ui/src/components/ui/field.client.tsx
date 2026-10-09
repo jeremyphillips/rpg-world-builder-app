@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 
+import { useFloatingLabelFieldState } from './floating-label-field.context'
 import { useFieldAnatomyGridPlacement, useFieldRowParticipation } from './field-row-anatomy.context'
 import { cn } from '../../lib/utils'
 import type { FieldWidth } from './field-control.variants'
@@ -45,6 +46,11 @@ function useFieldContext(part: string): FieldContextValue {
     throw new Error(`${part} must be used within <Field.Root>`)
   }
   return context
+}
+
+/** Field root ids and message wiring. Used by composites that render inside `Field.Root`. */
+export function useFieldRootContext(part = 'useFieldRootContext'): FieldContextValue {
+  return useFieldContext(part)
 }
 
 export interface FieldRootProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -175,9 +181,7 @@ const FieldRoot = React.forwardRef<HTMLDivElement, FieldRootProps>(
 )
 FieldRoot.displayName = 'Field.Root'
 
-export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
-  /** Inline toggle first-line alignment — typography stays on `fieldLabelVariants`. */
-  placement?: FieldLabelPlacement
+export type FieldLabelAssociationProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
   /**
    * When false, render a non-associating heading (`<span>`) instead of `<label htmlFor>`.
    * Use for controls that are not labelable (e.g. dialog-trigger buttons) and wire
@@ -186,21 +190,50 @@ export type FieldLabelProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
   associate?: boolean
 }
 
-const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
-  ({ className, children, placement, associate = true, htmlFor, ...props }, ref) => {
-    const { controlId, size } = useFieldContext('Field.Label')
-    const classNames = cn(fieldLabelVariants({ size, placement }), className)
+/**
+ * Label association only: `<label htmlFor={controlId}>` from `Field.Root`.
+ * Stacked typography lives on `Field.Label`. Floating labels reuse this element
+ * with their own geometry classes.
+ */
+export const FieldLabelAssociation = React.forwardRef<HTMLLabelElement, FieldLabelAssociationProps>(
+  ({ className, children, associate = true, htmlFor, ...props }, ref) => {
+    const { controlId } = useFieldContext('Field.Label')
     if (!associate) {
       return (
-        <span ref={ref as React.Ref<HTMLSpanElement>} className={classNames} {...props}>
+        <span ref={ref as React.Ref<HTMLSpanElement>} className={className} {...props}>
           {children}
         </span>
       )
     }
     return (
-      <label ref={ref} htmlFor={htmlFor ?? controlId} className={classNames} {...props}>
+      <label ref={ref} htmlFor={htmlFor ?? controlId} className={className} {...props}>
         {children}
       </label>
+    )
+  },
+)
+FieldLabelAssociation.displayName = 'Field.LabelAssociation'
+
+export type FieldLabelProps = FieldLabelAssociationProps & {
+  /** Inline toggle first-line alignment — typography stays on `fieldLabelVariants`. */
+  placement?: FieldLabelPlacement
+}
+
+const FieldLabel = React.forwardRef<HTMLLabelElement, FieldLabelProps>(
+  ({ className, placement, ...props }, ref) => {
+    const insideFloatingLabel = useFloatingLabelFieldState()
+    const { size } = useFieldContext('Field.Label')
+    if (insideFloatingLabel) {
+      throw new Error(
+        'Field.Label cannot be rendered inside FloatingLabelField. The composite already labels the control.',
+      )
+    }
+    return (
+      <FieldLabelAssociation
+        ref={ref}
+        className={cn(fieldLabelVariants({ size, placement }), className)}
+        {...props}
+      />
     )
   },
 )

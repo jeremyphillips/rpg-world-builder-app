@@ -510,17 +510,27 @@ Filter bars share control-band + control-edge alignment with forms. Ownership li
 `@rpg/ui` field-layout modules — not under `filters/`. See
 [sizing-and-spacing.md](./forms/sizing-and-spacing.md#control-band--row-alignment-ssot).
 
-| Default               | Value                                                                                      |
-| --------------------- | ------------------------------------------------------------------------------------------ |
-| Density → size        | `compact` → `sm`, `comfortable` → `md` (`resolveFilterControlSize`)                        |
-| Primary bar alignment | `items-end` (control-edge) on `FilterBar`, field group, catalog controls, trailing actions |
-| Common primary labels | Hidden (text search, default select chrome)                                                |
-| Stacked labels        | Advanced panel selects and primary selects with `layout: 'stacked'` (e.g. Hit Die)         |
-| Booleans              | Checkbox + label inside a single-line control band — **not** switches                      |
+| Default               | Value                                                                                                               |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Density → size        | `compact` → `sm`, `comfortable` → `md` (`resolveFilterControlSize`)                                                 |
+| Primary bar alignment | `items-end` (control-edge) on `FilterBar`, field group, catalog controls, trailing actions                          |
+| Common primary labels | Hidden (text search, default select chrome)                                                                         |
+| Stacked labels        | Advanced panel selects and primary selects with `layout: 'stacked'` (e.g. Hit Die)                                  |
+| Floating labels       | Opt-in `layout: 'floating'` on selects and text fields. See [floating-label-fields.md](./floating-label-fields.md). |
+| Booleans              | Checkbox + label inside a single-line control band — **not** switches                                               |
 
 `resolveFilterFieldPresentation` delegates band/size to `resolveFieldPresentation` and
-maps filter `layout` (`default` → hidden, `stacked` → stacked, `inline` → inline).
-Stacked selects always wire `label htmlFor` ↔ control `id`, including when `width` is set.
+maps filter `layout` (`default` → hidden, `stacked` → stacked, `inline` → inline,
+`floating` → hidden). The floating composite owns the visible label, so the bar does
+not add a second caption. Stacked selects always wire `label htmlFor` ↔ control `id`,
+including when `width` is set.
+
+Floating text fields use the label as the accessible name. `placeholder` is optional
+guidance shown only while the field is focused and empty. There is no `Filter ${label}…`
+default and no `aria-label`. Floating selects cap at `lg` when no width token is set,
+the same default as inline selects. The label is an extra sizing ghost
+(`withFloatingLabelSizingLabel`); value changes do not change the width. A floating
+select on its all-value shows `All` in the trigger. Menu items keep `allOptionLabel`.
 
 ---
 

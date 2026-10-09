@@ -1,11 +1,17 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@rpg/ui'
 import {
-  FilterFieldCaption,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  withFloatingLabelSizingLabel,
+} from '@rpg/ui'
+import {
+  FilterFloatingField,
   resolveFilterChromePresentation,
   useFilterChrome,
 } from '@rpg/ui/filters'
 
-import { catalogPickerSortFilterClasses } from '../catalog-picker-filter-toolbar.variants'
 import {
   resolvePickerSortTriggerLabel,
   type CatalogPickerSortOption,
@@ -15,8 +21,6 @@ export type { CatalogPickerSortOption } from './catalog-picker-sort-labels.lib'
 
 export type CatalogSortControlProps<TMode extends string = string> = {
   label?: string
-  ariaLabel?: string
-  triggerAriaLabel?: string
   value: TMode
   options: readonly CatalogPickerSortOption<TMode>[]
   onValueChange: (mode: TMode) => void
@@ -24,8 +28,6 @@ export type CatalogSortControlProps<TMode extends string = string> = {
 
 export function CatalogSortControl<TMode extends string = string>({
   label = 'Sort',
-  ariaLabel = 'Sort items',
-  triggerAriaLabel = 'Sort order',
   value,
   options,
   onValueChange,
@@ -34,29 +36,28 @@ export function CatalogSortControl<TMode extends string = string>({
   const presentation = resolveFilterChromePresentation(chrome)
   const selectedOption = options.find((option) => option.value === value)
   const triggerLabel = selectedOption ? resolvePickerSortTriggerLabel(selectedOption) : undefined
+  const sizingLabels = withFloatingLabelSizingLabel(label, [
+    ...new Set(options.map((option) => resolvePickerSortTriggerLabel(option))),
+  ])
 
   return (
-    <div className={catalogPickerSortFilterClasses} role="group" aria-label={ariaLabel}>
-      <FilterFieldCaption>{label}</FilterFieldCaption>
-      <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
+    <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
+      <FilterFloatingField label={label} populated={value.length > 0} width="auto">
         <SelectTrigger
           size={presentation.controlSize}
-          aria-label={triggerAriaLabel}
           title={triggerLabel}
-          sizingLabels={[
-            ...new Set(options.map((option) => resolvePickerSortTriggerLabel(option))),
-          ]}
+          sizingLabels={sizingLabels}
         >
           <SelectValue>{triggerLabel}</SelectValue>
         </SelectTrigger>
-        <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+      </FilterFloatingField>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }

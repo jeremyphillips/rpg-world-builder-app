@@ -127,12 +127,10 @@ export function createLocationRelationshipFilterSchema<TData>(
       createEqualsFilter<TData, LocationRelationshipFilterState, 'kind', string>({
         id: 'kind',
         label: RELATIONSHIP_FILTER_TYPE_LABEL,
-        layout: 'inline',
+        layout: 'floating',
         width: 'lg',
         showAllOption: true,
         allOptionLabel: RELATIONSHIP_FILTER_ALL_LABEL,
-        ariaLabel: RELATIONSHIP_FILTER_TYPE_LABEL,
-        triggerAriaLabel: RELATIONSHIP_FILTER_TYPE_LABEL,
         options: (context) =>
           kindsForState(families, presentKinds, context.state).map((kind) => ({
             value: kind,

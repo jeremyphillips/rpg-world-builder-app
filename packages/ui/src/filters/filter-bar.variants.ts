@@ -3,9 +3,24 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../lib/utils'
 import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
 import { iconGlyphDescendantClasses } from '../components/ui/icon-glyph.variants'
+import { fieldCaptionTypographyVariants } from '../components/ui/field-caption.variants'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
+
+/** Trigger copy when a floating select is on its all-value. Menu items keep the full label. */
+export const FILTER_SELECT_ALL_TRIGGER_LABEL = 'All'
+
+const FILTER_CAPTION_SIZE = {
+  compact: 'sm',
+  comfortable: 'md',
+} as const satisfies Record<FilterDensity, 'sm' | 'md'>
+
+/** Filter caption classes. Density maps onto {@link fieldCaptionTypographyVariants}. */
+export function filterFieldLabelVariants(options?: { density?: FilterDensity | null }): string {
+  const density = options?.density ?? FILTER_DENSITY_DEFAULT
+  return fieldCaptionTypographyVariants({ size: FILTER_CAPTION_SIZE[density] })
+}
 
 export const FILTER_DENSITY_DEFAULT: FilterDensity = 'compact'
 
@@ -68,16 +83,6 @@ export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:
     density: {
       compact: 'gap-1 sm:gap-2',
       comfortable: 'gap-1 sm:gap-2',
-    },
-  },
-  defaultVariants: { density: FILTER_DENSITY_DEFAULT },
-})
-
-export const filterFieldLabelVariants = cva('text-muted-foreground', {
-  variants: {
-    density: {
-      compact: 'text-xs',
-      comfortable: 'text-sm',
     },
   },
   defaultVariants: { density: FILTER_DENSITY_DEFAULT },

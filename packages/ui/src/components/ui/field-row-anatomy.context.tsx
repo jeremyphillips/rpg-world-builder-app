@@ -14,9 +14,24 @@ export type FieldAnatomyGridPlacement = {
 
 const FieldAnatomyGridPlacementContext = React.createContext<FieldAnatomyGridPlacement | null>(null)
 
+/** Sets whether descendants participate in a schema anatomy-grid row. */
+export function FieldRowParticipationProvider({
+  participates,
+  children,
+}: {
+  participates: boolean
+  children: React.ReactNode
+}) {
+  return (
+    <FieldRowAnatomyContext.Provider value={participates}>
+      {children}
+    </FieldRowAnatomyContext.Provider>
+  )
+}
+
 /** Marks descendants as participants in a schema anatomy-grid row. */
 export function FieldRowAnatomyProvider({ children }: { children: React.ReactNode }) {
-  return <FieldRowAnatomyContext.Provider value={true}>{children}</FieldRowAnatomyContext.Provider>
+  return <FieldRowParticipationProvider participates>{children}</FieldRowParticipationProvider>
 }
 
 /** True when rendering inside a schema `kind: 'row'` anatomy grid. */

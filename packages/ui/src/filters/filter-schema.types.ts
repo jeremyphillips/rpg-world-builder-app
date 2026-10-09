@@ -89,18 +89,33 @@ type BaseFilterFieldDef<
   activeChip?: FilterActiveChipConfig<TData, TState>
 }
 
-export type SelectFilterLayout = 'stacked' | 'inline'
+export type SelectFilterLayout = 'stacked' | 'inline' | 'floating'
 
-export type TextFilterFieldDef<
+type TextFilterFieldShared<
   TData,
   TState extends Record<string, unknown>,
   TId extends FilterFieldId<TState>,
 > = BaseFilterFieldDef<TData, TState, TId> & {
   type: 'text'
+  /** Example text. In floating layout this is optional guidance, not the field name. */
   placeholder?: string
 }
 
-export type SelectFilterFieldDef<
+export type TextFilterFieldDef<
+  TData,
+  TState extends Record<string, unknown>,
+  TId extends FilterFieldId<TState>,
+> = TextFilterFieldShared<TData, TState, TId> &
+  (
+    | { layout?: undefined }
+    | {
+        layout: 'floating'
+        /** The visible label is the accessible name. */
+        ariaLabel?: never
+      }
+  )
+
+type SelectFilterFieldShared<
   TData,
   TState extends Record<string, unknown>,
   TId extends FilterFieldId<TState>,
@@ -111,11 +126,27 @@ export type SelectFilterFieldDef<
     | ((ctx: FilterFieldOptionsContext<TData, TState>) => FilterOption<string>[])
   showAllOption?: boolean
   allOptionLabel?: string
-  layout?: SelectFilterLayout
   width?: FilterFieldWidth
-  ariaLabel?: string
-  triggerAriaLabel?: string
 }
+
+export type SelectFilterFieldDef<
+  TData,
+  TState extends Record<string, unknown>,
+  TId extends FilterFieldId<TState>,
+> = SelectFilterFieldShared<TData, TState, TId> &
+  (
+    | {
+        layout?: 'stacked' | 'inline'
+        ariaLabel?: string
+        triggerAriaLabel?: string
+      }
+    | {
+        layout: 'floating'
+        /** The visible label is the accessible name. */
+        ariaLabel?: never
+        triggerAriaLabel?: never
+      }
+  )
 
 export type BooleanFilterFieldDef<
   TData,
