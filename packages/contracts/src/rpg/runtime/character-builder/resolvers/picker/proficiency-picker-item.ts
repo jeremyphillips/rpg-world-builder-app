@@ -1,13 +1,13 @@
 import type { ProficiencyPickerItem } from '../proficiency/resolve-proficiency-picker-items'
-import { compareRecommendedThenName } from './compare-recommended-then-name'
+import { compareRecommendationThenName } from './compare-recommendation-then-name'
 
 export function compareProficiencyPickerItemsByRecommendation(
   left: ProficiencyPickerItem,
   right: ProficiencyPickerItem,
 ): number {
-  return compareRecommendedThenName(
-    left.state.isRecommended,
-    right.state.isRecommended,
+  return compareRecommendationThenName(
+    left.state.recommendation,
+    right.state.recommendation,
     left.label,
     right.label,
   )

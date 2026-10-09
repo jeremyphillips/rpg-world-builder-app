@@ -82,6 +82,10 @@ describe('spell-picker-drawer.lib', () => {
       state: {
         ...spellPickerOpenItemsFixture[0]!.state,
         isRecommended: true,
+        recommendation: {
+          strength: 'strong' as const,
+          signals: [],
+        },
       },
     }
     const peer = spellPickerOpenItemsFixture[1]!
