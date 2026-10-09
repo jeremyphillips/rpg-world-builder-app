@@ -50,10 +50,10 @@ describe('hasCatalogPickerResetViewCriteria', () => {
     ).toBe(true)
   })
 
-  it('always reports the visible count and reserves every count through the total', () => {
+  it('always reports the visible count and representative sizer labels for the total', () => {
     expect(resolveCatalogPickerResultSummary({ visible: 4, total: 24 })).toEqual({
       summaryVisibleCount: 4,
-      summaryReserveLabels: resultCountSizerLabels(24),
+      summaryReserveLabels: resultCountSizerLabels(24), // ['1 result', '24 results']
     })
     expect(resolveCatalogPickerResultSummary({ visible: 87, total: 87 })).toEqual({
       summaryVisibleCount: 87,

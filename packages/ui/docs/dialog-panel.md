@@ -196,7 +196,7 @@ Section horizontal inset (`px-6`) has **exactly one owner** per scroll column. S
 
 **Pattern D:** `Modal.Body stableBody stableBodyClip` — clip shell without horizontal inset. Pinned chrome (summary card, tabs list) wraps with `dialogPanelSectionInsetXClasses`; child scrollports use `inset="section"` (setup, default scroll) or `inset="inner"` (tab panels below tabs). Prevents double `px-6` when managed Form `externalFooter` also uses section inset (`CreateModalShell`).
 
-**Catalog picker header chrome** (`headerExtra`, `headerBelowDescription`, toolbar, auxiliary action) is children of `Sheet.Header`. The header keeps `px-6` and passes `pb-0` when that chrome is present, so the header border and the results scroll shadow sit under the filters. The toolbar drops its own `px-6` and has no bottom padding; the reset strip is the inset above the border. An auxiliary row that follows the toolbar owns `pb-4`. Results stay in `Sheet.Body` with the section scrollport (`pt-5` below the border).
+**Catalog picker header chrome** (`headerExtra`, `headerBelowDescription`, toolbar, auxiliary action) is children of `Sheet.Header`. The header keeps `px-6` and passes `pb-2` when that chrome is present, so the header border and the results scroll shadow sit under the filters. The toolbar drops its own `px-6` and has no bottom padding; the reset strip is the inset above the border. An auxiliary row that follows the toolbar owns `pb-4`. Results stay in `Sheet.Body` with the section scrollport (`pt-5` below the border).
 
 `viewportClassName` may adjust layout and vertical inset, but must not supply horizontal padding or scroll-chrome classes owned by the selected `inset` preset.
 

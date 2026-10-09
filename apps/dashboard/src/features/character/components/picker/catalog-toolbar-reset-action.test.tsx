@@ -75,10 +75,11 @@ describe('CatalogToolbarResetSlot', () => {
     )
 
     expect(screen.getByRole('status')).toHaveTextContent('4 results')
-    expect(document.querySelector('[data-filter-toolbar-sizer-label]')).toHaveTextContent(
-      '0 results',
-    )
-    expect(document.querySelectorAll('[data-filter-toolbar-sizer-label]')).toHaveLength(25)
+    const ghosts = document.querySelectorAll('[data-filter-toolbar-sizer-label]')
+    expect(ghosts).toHaveLength(2)
+    expect(ghosts[0]).toHaveAttribute('aria-hidden', 'true')
+    expect(ghosts[1]).toHaveAttribute('aria-hidden', 'true')
+    expect(Array.from(ghosts).map((node) => node.textContent)).toEqual(['1 result', '24 results'])
   })
 
   it('shows the count while reset stays hidden', () => {

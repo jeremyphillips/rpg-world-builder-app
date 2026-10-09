@@ -70,7 +70,7 @@ export type CatalogToolbarResetSlotProps = {
   label?: string
   /** Visible count for the current list. Omit when this slot has no summary. */
   summaryVisibleCount?: number
-  /** Every `formatResultCount` label from 0 through the eligible total. */
+  /** Representative `resultCountSizerLabels` for the eligible total. */
   summaryReserveLabels?: readonly string[]
 }
 
