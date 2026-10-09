@@ -207,18 +207,48 @@ describe('compareIntentionalEquipmentRanking', () => {
     expect(compareIntentionalEquipmentRanking(later, earlier, context)).toBeGreaterThan(0)
   })
 
-  it('compares proficiency only when both rows define it', () => {
+  it('ranks proficient before untracked before not proficient', () => {
     const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
-    const proficient = weapon('Club', true)
-    const untracked = weapon('Axe', undefined)
-    const notProficient = weapon('Axe', false)
-    const untrackedLater = weapon('Club', undefined)
+    const proficient = weapon('Zebra', true)
+    const untracked = weapon('Alpha', undefined)
+    const notProficient = weapon('Alpha', false)
+    const untrackedLater = weapon('Zebra', undefined)
 
-    expect(compareIntentionalEquipmentRanking(proficient, untracked, context)).toBeGreaterThan(0)
-    expect(compareIntentionalEquipmentRanking(notProficient, untrackedLater, context)).toBeLessThan(
+    expect(compareIntentionalEquipmentRanking(proficient, untracked, context)).toBeLessThan(0)
+    expect(compareIntentionalEquipmentRanking(untrackedLater, notProficient, context)).toBeLessThan(
       0,
     )
     expect(compareIntentionalEquipmentRanking(proficient, notProficient, context)).toBeLessThan(0)
+  })
+
+  it('does not rank unaffordable below not proficient alone', () => {
+    const context = {
+      preferMartialWeaponBrowseOrder: false,
+      rankPurchaseAvailability: true,
+      rankCompatibility: true,
+    }
+    const unaffordable = item(
+      'Alpha',
+      {
+        recommendation: { strength: 'neutral', signals: [] },
+        requirements: [],
+        state: { compatibility: { proficient: false } },
+        purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      },
+      'weapon',
+    )
+    const affordable = item(
+      'Zebra',
+      {
+        recommendation: { strength: 'neutral', signals: [] },
+        requirements: [],
+        state: { compatibility: { proficient: false } },
+        purchaseAvailability: { status: 'available' },
+      },
+      'weapon',
+    )
+
+    expect(compareIntentionalEquipmentRanking(unaffordable, affordable, context)).toBeLessThan(0)
   })
 })
 

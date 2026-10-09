@@ -1,4 +1,5 @@
 import type { Equipment } from '../../../../content/equipment'
+import type { EquipmentRecommendationSpecificity } from '../../../../content/equipment-recommendation'
 import { getEquipmentAbilityScoreRequirements } from '../../../../content/equipment/equipment-ability-score-requirements'
 import { resolveUnmetAbilityScoreRequirements } from '../../../../content/lib/ability-score-requirements'
 import type { Ability } from '../../../../vocab/ability'
@@ -104,6 +105,11 @@ export function projectEquipmentCatalogFacts(args: {
   ownedIds: ReadonlySet<string>
   /** Known draft scores. Unknown abilities are skipped by the requirement comparator. */
   abilityScores?: Partial<Record<Ability, number>>
+  /**
+   * Draft-independent class starting-equipment relevance. Compatible signal only.
+   * Selected-package membership is not an input.
+   */
+  classStartingEquipmentSpecificity?: ReadonlyMap<string, EquipmentRecommendationSpecificity>
 }): Map<string, ResolvedEquipmentOption> {
   const owner = classRecommendationSource(args.classId)
   const requirements = buildRequirementDefinitions({
@@ -131,6 +137,7 @@ export function projectEquipmentCatalogFacts(args: {
         focusEligibleIds: args.focusEligibleIds,
         owned: args.ownedIds.has(equipmentId),
         abilityScores: args.abilityScores,
+        classStartingEquipmentSpecificity: args.classStartingEquipmentSpecificity?.get(equipmentId),
       }),
     )
   }
@@ -212,10 +219,17 @@ function projectOne(args: {
   focusEligibleIds: readonly string[]
   owned: boolean
   abilityScores: Partial<Record<Ability, number>> | undefined
+  classStartingEquipmentSpecificity: EquipmentRecommendationSpecificity | undefined
 }): ResolvedEquipmentOption {
   return {
     requirements: projectOptionRequirements(args),
-    recommendation: projectOptionRecommendation(args.evidence),
+    recommendation: projectOptionRecommendation({
+      evidence: args.evidence,
+      classStartingEquipment:
+        args.classStartingEquipmentSpecificity === undefined
+          ? undefined
+          : { specificity: args.classStartingEquipmentSpecificity, source: args.owner },
+    }),
     state: projectOptionState(args),
   }
 }
@@ -241,10 +255,21 @@ function projectOptionRequirements(args: {
   })
 }
 
-function projectOptionRecommendation(
-  evidence: readonly SourcedEquipmentRecommendationEvidence[],
-): OptionRecommendation {
-  const signals = evidence.flatMap((entry) => recommendationSignalFromEvidence(entry) ?? [])
+function projectOptionRecommendation(args: {
+  evidence: readonly SourcedEquipmentRecommendationEvidence[]
+  classStartingEquipment:
+    | { specificity: EquipmentRecommendationSpecificity; source: RecommendationSourceRef }
+    | undefined
+}): OptionRecommendation {
+  const signals = args.evidence.flatMap((entry) => recommendationSignalFromEvidence(entry) ?? [])
+  if (args.classStartingEquipment) {
+    signals.push({
+      strength: 'compatible',
+      basis: 'inferred',
+      specificity: args.classStartingEquipment.specificity,
+      source: args.classStartingEquipment.source,
+    })
+  }
   if (signals.length === 0) return NEUTRAL_OPTION_RECOMMENDATION
   return { strength: aggregateSignalStrength(signals), signals }
 }

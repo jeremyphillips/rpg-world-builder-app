@@ -66,10 +66,10 @@ Requirements, soft recommendations, and option state are separate facts. Selecti
 remaining budget, and package choice do not reorder rows.
 
 1. **Requirement match** — any requirement the row satisfies (`optionSatisfies`), exact before anyOf. `candidate`, `satisfier`, and `eligible` share that band. A `requirement` active choice limits the match to that requirement id. `activeRequirementIds`, when set, limits which ids count. Spellcasting focus is one any-of requirement owned by the class.
-2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility, not a signal.
+2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. A class starting-equipment candidate (any available option, grant or choice pool) is a `compatible` class signal. That set does not follow the selected package, fulfilled grants, or remaining budget. Proficiency is compatibility, not a signal.
 3. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat). Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts). Open-pool eligibility, context relevance, and alternative-package membership are not sort keys.
 4. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
-5. **Compatibility** — only when `rankCompatibility` is set (the default) and both rows have a defined `compatibility.proficient`. `true` before `false`. Rows that do not track proficiency stay ties on this axis.
+5. **Compatibility** — only when `rankCompatibility` is set (the default). Proficient, then untracked (`compatibility.proficient` omitted), then not proficient. `unaffordable` does not add a further penalty: not proficient and unaffordable stays with not proficient.
 6. **Canonical fallback** — kind bucket, weapon category, then name.
 
 Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.

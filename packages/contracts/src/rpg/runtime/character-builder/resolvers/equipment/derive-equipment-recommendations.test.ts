@@ -8,7 +8,13 @@ import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
 import { deriveEquipmentRecommendations } from './derive-equipment-recommendations'
 import { resolveEquipmentPickerItems } from './resolve-equipment-picker-items'
-import { compareEquipmentPickerItemsByRecommendation } from '../picker/equipment-picker-item'
+import {
+  compareEquipmentPickerItemsByRecommendation,
+  type EquipmentPickerItem,
+} from '../picker/equipment-picker-item'
+import { compareIntentionalEquipmentRanking } from './equipment-ranking-policy'
+import { listClassStartingEquipmentCandidateSpecificity } from './derive-starting-equipment-recommendation-contributions'
+import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 import {
   nestedStartingEquipmentChoiceSetId,
   startingEquipmentChoiceSetId,
@@ -282,6 +288,34 @@ function buildContext(
   return { catalogIndex, proficiencies, draft }
 }
 
+function weaponNamed(slug: string, name: string) {
+  return equipmentSchema.parse({
+    ...longsword,
+    id: `${RULESET}:${slug}`,
+    slug,
+    name,
+  })
+}
+
+function rankingItem(
+  equipment: EquipmentPickerItem['equipment'],
+  resolved: ResolvedEquipmentOption | undefined,
+): EquipmentPickerItem {
+  return {
+    equipment,
+    state: {
+      isAvailable: true,
+      isRecommended: false,
+      disabledReasons: [],
+      isProficient: resolved?.state.compatibility?.proficient ?? true,
+      isWithinRemainingBudget: true,
+      purchaseAvailability: { status: 'available' },
+      recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
+      resolved,
+    },
+  }
+}
+
 describe('deriveEquipmentRecommendations', () => {
   it('classifies fighter proficient gear as compatible without purchase recommendations for granted items', () => {
     const { catalogIndex, proficiencies, draft } = buildContext(
@@ -308,6 +342,94 @@ describe('deriveEquipmentRecommendations', () => {
     expect(recommendations.get(dagger.id)?.tier).toBe('neutral')
     expect(recommendations.get(dagger.id)?.resolved?.state.compatibility?.proficient).toBe(true)
     expect(recommendations.get(rope.id)).toMatchObject({ tier: 'neutral', reasons: [] })
+  })
+
+  it('ranks starting-equipment candidates from every package without following the selected one', () => {
+    const mace = weaponNamed('mace', 'Mace')
+    const warhammer = weaponNamed('warhammer', 'Warhammer')
+    const greatsword = weaponNamed('greatsword', 'Greatsword')
+    const cleric: ClassStored = {
+      ...storedFighter,
+      id: `${RULESET}:cleric`,
+      slug: 'cleric',
+      name: 'Cleric',
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'mace-pack',
+              label: 'Mace',
+              items: [
+                {
+                  id: 'mace',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'mace' },
+                  quantity: 1,
+                },
+              ],
+            },
+            {
+              id: 'warhammer-pack',
+              label: 'Warhammer',
+              items: [
+                {
+                  id: 'warhammer',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'warhammer' },
+                  quantity: 1,
+                },
+              ],
+            },
+          ],
+        },
+      },
+    }
+    const catalog = [mace, warhammer, greatsword]
+
+    const specificity = listClassStartingEquipmentCandidateSpecificity({
+      characterClass: cleric,
+      equipment: new Map(catalog.map((row) => [row.id, row])),
+    })
+    expect(specificity.get(mace.id)).toBe('exact')
+    expect(specificity.get(warhammer.id)).toBe('exact')
+    expect(specificity.has(greatsword.id)).toBe(false)
+
+    const orderFor = (optionId: string) => {
+      const { catalogIndex, proficiencies, draft } = buildContext(cleric, catalog, {
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(cleric.id)]: [optionId],
+        },
+      })
+      const recommendations = deriveEquipmentRecommendations({
+        characterClass: cleric,
+        catalogIndex,
+        proficiencies,
+        draft,
+        choiceSets: [],
+      })
+      expect(recommendations.get(mace.id)?.tier).toBe('neutral')
+      expect(recommendations.get(mace.id)?.resolved?.recommendation.strength).toBe('compatible')
+      expect(recommendations.get(warhammer.id)?.resolved?.recommendation.strength).toBe(
+        'compatible',
+      )
+      expect(recommendations.get(greatsword.id)?.resolved?.recommendation).toEqual({
+        strength: 'neutral',
+        signals: [],
+      })
+
+      return [mace, warhammer, greatsword]
+        .map((equipment) => rankingItem(equipment, recommendations.get(equipment.id)?.resolved))
+        .sort((left, right) =>
+          compareIntentionalEquipmentRanking(left, right, {
+            preferMartialWeaponBrowseOrder: false,
+          }),
+        )
+        .map((item) => item.equipment.slug)
+    }
+
+    expect(orderFor('mace-pack')).toEqual(['mace', 'warhammer', 'greatsword'])
+    expect(orderFor('warhammer-pack')).toEqual(['mace', 'warhammer', 'greatsword'])
   })
 
   it('does not turn missing proficiency into a not-recommended tier', () => {
@@ -503,7 +625,7 @@ describe('deriveEquipmentRecommendations', () => {
       .map((item) => item.equipment.name)
 
     expect(beforeOrder).toEqual(['Crystal', 'Wand', 'Dagger'])
-    expect(ownedOrder).toEqual(['Dagger', 'Crystal', 'Wand'])
+    expect(ownedOrder).toEqual(['Crystal', 'Wand', 'Dagger'])
   })
 
   it('demotes focus gear to strong while spellcasting is not yet active', () => {

@@ -1,4 +1,5 @@
 import type { CharacterClass } from '../../../../content/classes/class'
+import type { Equipment } from '../../../../content/equipment'
 import type {
   StartingEquipmentOption,
   StartingEquipmentItem,
@@ -12,7 +13,11 @@ import {
   availableStartingEquipmentOptions,
   findAvailableStartingEquipmentOption,
 } from '../../../../content/starting-equipment-availability'
-import type { EquipmentRecommendationTier } from '../../../../content/equipment-recommendation'
+import {
+  compareEquipmentRecommendationSpecificity,
+  type EquipmentRecommendationSpecificity,
+  type EquipmentRecommendationTier,
+} from '../../../../content/equipment-recommendation'
 import { toEquipmentContentId } from '../../../creature/equipment'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
@@ -25,6 +30,65 @@ import type {
   StartingEquipmentContributionContext,
 } from './equipment-recommendation-contribution'
 import { sourceForEquipmentReason } from './equipment-recommendation-evidence'
+import { expandRecommendationSelector } from './equipment-recommendation-selector'
+import { specificityForSelectorExpansion } from './equipment-recommendation-specificity'
+
+/**
+ * Class starting-equipment relevance for browse strength.
+ * Walks every available option. Direct grants are exact; choice pools use
+ * expansion specificity. The selected package, fulfilled grants, and gold
+ * path do not change the result.
+ */
+export function listClassStartingEquipmentCandidateSpecificity(args: {
+  characterClass: CharacterClass
+  equipment: ReadonlyMap<string, Equipment>
+}): Map<string, EquipmentRecommendationSpecificity> {
+  const specificityById = new Map<string, EquipmentRecommendationSpecificity>()
+  const startingEquipment = args.characterClass.characterCreation?.startingEquipment
+  if (!startingEquipment) return specificityById
+
+  const rulesetId = args.characterClass.rulesetId
+  for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
+    for (const item of option.items) {
+      if (item.kind === 'grant') {
+        if (isProficiencyLinkedStartingEquipmentGrant(item)) continue
+        const slug = startingEquipmentGrantEquipmentSlug(item)
+        if (!slug) continue
+        const equipmentId = toEquipmentContentId(rulesetId, slug)
+        if (!args.equipment.has(equipmentId)) continue
+        preferStartingEquipmentSpecificity(specificityById, equipmentId, 'exact')
+        continue
+      }
+
+      const selector = { kind: 'equipment_pool' as const, pool: item.pool }
+      const matches = expandRecommendationSelector({
+        selector,
+        equipment: args.equipment,
+        rulesetId,
+      })
+      const specificity = specificityForSelectorExpansion(selector, matches.length)
+      for (const match of matches) {
+        preferStartingEquipmentSpecificity(specificityById, match.id, specificity)
+      }
+    }
+  }
+
+  return specificityById
+}
+
+function preferStartingEquipmentSpecificity(
+  specificityById: Map<string, EquipmentRecommendationSpecificity>,
+  equipmentId: string,
+  specificity: EquipmentRecommendationSpecificity,
+): void {
+  const current = specificityById.get(equipmentId)
+  if (
+    current === undefined ||
+    compareEquipmentRecommendationSpecificity(specificity, current) < 0
+  ) {
+    specificityById.set(equipmentId, specificity)
+  }
+}
 
 function listFulfilledPackageEquipmentIds(args: {
   selectedOption: StartingEquipmentOption

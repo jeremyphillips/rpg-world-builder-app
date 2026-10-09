@@ -19,8 +19,9 @@ const NO_ACTIVE_CHOICE: ActiveChoiceContext = { kind: 'none' }
 
 /**
  * Best-match domain order for equipment picker rows.
- * Not-for-sale and proficiency are late keys, and only when the context asks
- * and the rows are comparable. They do not change recommendation strength.
+ * Not-for-sale and proficiency are late keys, and only when the context asks.
+ * Proficiency is proficient, then untracked, then not proficient.
+ * They do not change recommendation strength.
  * Selection, remaining budget, grant consumption, and package choice do not reorder rows.
  */
 export function compareIntentionalEquipmentRanking(
@@ -95,12 +96,18 @@ function activeRequirements(
   })
 }
 
+/** Proficient, then untracked, then not proficient. Affordability is not a rank. */
 function compareProficiency(left: ResolvedEquipmentOption, right: ResolvedEquipmentOption): number {
-  const leftProficient = left.state.compatibility?.proficient
-  const rightProficient = right.state.compatibility?.proficient
-  if (leftProficient === undefined || rightProficient === undefined) return 0
-  if (leftProficient === rightProficient) return 0
-  return leftProficient ? -1 : 1
+  return (
+    proficiencyRank(left.state.compatibility?.proficient) -
+    proficiencyRank(right.state.compatibility?.proficient)
+  )
+}
+
+function proficiencyRank(proficient: boolean | undefined): number {
+  if (proficient === true) return 0
+  if (proficient === undefined) return 1
+  return 2
 }
 
 function purchaseAvailabilityRank(resolved: ResolvedEquipmentOption): number {

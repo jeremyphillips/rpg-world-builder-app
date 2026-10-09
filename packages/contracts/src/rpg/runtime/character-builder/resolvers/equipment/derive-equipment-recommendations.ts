@@ -34,6 +34,7 @@ import {
   listSelectedStartingEquipmentGrantIds,
 } from './derive-equipment-recommendation-contributions'
 import { classRecommendationSource } from './equipment-recommendation-evidence'
+import { listClassStartingEquipmentCandidateSpecificity } from './derive-starting-equipment-recommendation-contributions'
 import {
   GLOBAL_RECOMMENDATION_SCOPE,
   resolveEquipmentPresentationFacts,
@@ -318,6 +319,10 @@ function attachResolvedPresentationToRecommendations(args: {
     focusEligibleIds,
     ownedIds,
     abilityScores: draft?.abilities?.scores,
+    classStartingEquipmentSpecificity: listClassStartingEquipmentCandidateSpecificity({
+      characterClass,
+      equipment: catalogIndex.equipment,
+    }),
   })
 
   const sourceName = equipmentRecommendationSourceName(catalogIndex)
