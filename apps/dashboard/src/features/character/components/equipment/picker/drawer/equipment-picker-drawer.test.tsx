@@ -28,8 +28,8 @@ import {
   type EquipmentPickerRow,
 } from './equipment-picker-drawer.types'
 import {
-  OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
+  OPTION_PRESENTATION_RECOMMENDED_LABEL,
   requiredByLabel,
 } from '@rpg/contracts'
 import {
@@ -103,11 +103,32 @@ describe('EquipmentPickerDrawer', () => {
   })
 
   it('shows recommendation badges in the unified list', () => {
+    const [longsword, ...rest] = equipmentPickerItemsFixture
+    const longswordWithRecommendation = {
+      ...longsword!,
+      state: {
+        ...longsword!.state,
+        resolved: {
+          ...longsword!.state.resolved!,
+          presentation: {
+            facts: [
+              {
+                kind: 'recommendation' as const,
+                discriminator: 'recommended' as const,
+                label: OPTION_PRESENTATION_RECOMMENDED_LABEL,
+                sourceLabels: ['Fighter class'],
+              },
+            ],
+          },
+        },
+      },
+    }
+
     render(
       <EquipmentPickerDrawer
         open
         onOpenChange={vi.fn()}
-        items={equipmentPickerItemsFixture}
+        items={[longswordWithRecommendation, ...rest]}
         budget={equipmentPickerBudgetFixture}
         onCommitAdd={vi.fn()}
       />,
@@ -116,7 +137,7 @@ describe('EquipmentPickerDrawer', () => {
     const list = screen.getByRole('list')
 
     expect(within(list).getByText('Longsword')).toBeInTheDocument()
-    expect(within(list).getByText(OPTION_PRESENTATION_IN_PACKAGE_LABEL)).toBeInTheDocument()
+    expect(within(list).getByText(OPTION_PRESENTATION_RECOMMENDED_LABEL)).toBeInTheDocument()
     expect(within(list).getByText('Rope')).toBeInTheDocument()
   })
 

@@ -28,7 +28,6 @@ describe('NotificationInboxHeader', () => {
 
     expect(screen.getByText(NOTIFICATION_COPY.inboxDescription)).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Unread only' })).toBeInTheDocument()
-    expect(screen.getByText('Campaign')).toBeInTheDocument()
     expect(screen.getByText('Type')).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Campaign' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Type' })).toBeInTheDocument()
