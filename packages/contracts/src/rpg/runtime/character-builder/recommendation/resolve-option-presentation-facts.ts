@@ -1,3 +1,4 @@
+import { isStartingEquipmentRecommendationReason } from '../../../content/equipment-recommendation'
 import type { Ability } from '../../../vocab/ability'
 import type { OptionRecommendation, RecommendationSignal } from './recommendation-envelope'
 import { compareSourcePriority } from './recommendation-comparators'
@@ -159,7 +160,10 @@ export function softRecommendationFacts(args: {
   if (recommendation.strength !== 'strong' && recommendation.strength !== 'compatible') {
     return []
   }
-  return groupSignalsBySourceKind(recommendation.signals).map((group) => ({
+  const signals = recommendation.signals.filter(
+    (signal) => !isStartingEquipmentRecommendationReason(signal.reason),
+  )
+  return groupSignalsBySourceKind(signals).map((group) => ({
     kind: 'recommendation',
     discriminator: 'recommended',
     label: softRecommendationLabel({ group, authoredLabel: args.authoredLabel }),

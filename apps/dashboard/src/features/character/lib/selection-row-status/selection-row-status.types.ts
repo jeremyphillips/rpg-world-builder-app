@@ -32,6 +32,7 @@ export type SelectionStatusReason = (typeof SELECTION_STATUS_REASONS)[number]
 export const SELECTION_GUIDANCE_KINDS = [
   'requirement',
   'requirement_match',
+  'package_option',
   'recommendation',
   'source',
 ] as const

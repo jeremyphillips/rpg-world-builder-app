@@ -390,6 +390,29 @@ describe('resolveEquipmentPickerItemPresentation', () => {
     expect(presentation.control).toEqual({ kind: 'add', disabled: true })
   })
 
+  it('shows a selected package contribution as owned provenance', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: false,
+        availability: { status: 'available' },
+      },
+      ownership: {
+        ...EMPTY_EQUIPMENT_OWNERSHIP,
+        packageQuantity: 1,
+        totalQuantity: 1,
+      },
+    })
+
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'package', label: 'Package', quantity: 1 }],
+    })
+  })
+
   it('lists package, converted, and purchased provenance ahead of the control', () => {
     const presentation = resolveEquipmentPickerItemPresentation({
       equipment: equipmentStepPotionOfHealingFixture,

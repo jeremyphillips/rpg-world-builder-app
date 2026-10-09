@@ -39,6 +39,11 @@ export type ResolvedEquipmentOption = {
   presentation?: OptionPresentationFacts
   /** Remaining-budget purchase fact. Stamped once when a picker row is resolved. */
   purchaseAvailability?: EquipmentPurchaseAvailability
+  /**
+   * Price is above every available starting purse, including the tier bonus.
+   * Current remaining budget does not set this.
+   */
+  exceedsPurchaseBudgetCeiling?: boolean
 }
 
 const CHOICE_REASONS = new Set([
@@ -268,6 +273,7 @@ function projectOptionRecommendation(args: {
       basis: 'inferred',
       specificity: args.classStartingEquipment.specificity,
       source: args.classStartingEquipment.source,
+      reason: 'startingEquipment',
     })
   }
   if (signals.length === 0) return NEUTRAL_OPTION_RECOMMENDATION
@@ -283,6 +289,7 @@ function recommendationSignalFromEvidence(
       strength: entry.tier === 'strong' || entry.tier === 'essential' ? 'strong' : 'compatible',
       basis: entry.basis ?? (entry.reason === 'classToolCategory' ? 'affinity' : 'inferred'),
       specificity: entry.specificity,
+      reason: entry.reason,
       ...(entry.source ? { source: entry.source } : {}),
       ...(entry.reason === 'classToolCategory'
         ? { detail: { kind: 'toolCategory' as const, toolCategory: 'tool' } }

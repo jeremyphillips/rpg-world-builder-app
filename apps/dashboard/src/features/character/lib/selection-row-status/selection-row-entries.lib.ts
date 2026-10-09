@@ -134,7 +134,7 @@ export function selectionSource(
   return {
     key: selectionEntryKey('guidance', 'source', reason),
     category: SELECTION_SOURCE_REASON_CATEGORY[reason],
-    kind: 'source',
+    kind: reason === 'alternative_package' ? 'package_option' : 'source',
     reason,
     label,
   }

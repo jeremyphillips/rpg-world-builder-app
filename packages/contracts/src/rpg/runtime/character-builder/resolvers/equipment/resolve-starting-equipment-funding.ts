@@ -166,6 +166,26 @@ export function resolveStartingEquipmentFundingOptions(args: {
   return result
 }
 
+/**
+ * Largest starting purse among currently available packages for this build.
+ * Each option total is class wealth plus the tier bonus. Spent purchases are
+ * not subtracted. Undefined when this build has no funding snapshots.
+ */
+export function resolvePurchaseBudgetCeilingCp(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  startingWealth?: StartingWealthRules
+}): number | undefined {
+  const fundingByOptionId = resolveStartingEquipmentFundingOptions(args)
+  if (fundingByOptionId.size === 0) return undefined
+
+  let ceilingCp = 0
+  for (const funding of fundingByOptionId.values()) {
+    ceilingCp = Math.max(ceilingCp, wealthToCopper(funding.totalStartingWealth))
+  }
+  return ceilingCp
+}
+
 /** Resolves funding for the draft's currently selected starting-equipment option. */
 export function resolveSelectedStartingEquipmentFunding(args: {
   draft: CharacterBuilderDraft

@@ -61,6 +61,19 @@ export const EQUIPMENT_RECOMMENDATION_REASONS = [
 
 export type EquipmentRecommendationReason = (typeof EQUIPMENT_RECOMMENDATION_REASONS)[number]
 
+/** Starting-equipment evidence. Ranking may use it; package-state presentation owns the copy. */
+const STARTING_EQUIPMENT_RECOMMENDATION_REASONS = new Set<EquipmentRecommendationReason>([
+  'startingEquipment',
+  'startingEquipmentChoice',
+  'availableInStartingOption',
+])
+
+export function isStartingEquipmentRecommendationReason(
+  reason: EquipmentRecommendationReason | undefined,
+): boolean {
+  return reason != null && STARTING_EQUIPMENT_RECOMMENDATION_REASONS.has(reason)
+}
+
 export const EQUIPMENT_RECOMMENDATION_SPECIFICITIES = [
   'exact',
   'narrow_pool',

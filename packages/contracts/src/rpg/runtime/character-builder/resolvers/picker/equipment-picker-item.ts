@@ -25,6 +25,11 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
   isWithinRemainingBudget: boolean
   /** Wealth-aware purchase gate for quantity=1. Remaining budget decides unaffordable. */
   purchaseAvailability: EquipmentPurchaseAvailability
+  /**
+   * Price is above the stable starting-purse ceiling. Omitted when no ceiling
+   * applies. Browse order reads this; remaining budget does not.
+   */
+  exceedsPurchaseBudgetCeiling?: boolean
   /** Tiered classification; `isRecommended` mirrors essential/strong recommendation tiers. */
   recommendation: EquipmentRecommendation
   /** Contributing evidence, including typed sources. Proficiency rows omit `source`. */
@@ -44,8 +49,9 @@ export type EquipmentPickerItem = {
 
 /**
  * Best-match browse order from resolved equipment facts: requirement match,
- * recommendation strength, specificity and source, then not-for-sale and proficiency
- * when the browse context enables them, then canonical kind and name.
+ * recommendation strength, specificity and source, then proficiency, the
+ * starting-purse ceiling, and not-for-sale when the browse context enables it,
+ * then canonical kind and name.
  * Selection, remaining budget, and package choice do not reorder rows.
  */
 export function compareEquipmentPickerItemsByRecommendation(

@@ -12,6 +12,7 @@ import { isEquipmentPickerSupportedKind } from '../picker/equipment-picker-suppo
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import { isEquipmentProficient } from './is-equipment-proficient'
 import { resolveEquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
+import { resolveEquipmentPurchasePricing } from './resolve-equipment-purchase-pricing'
 
 export type ResolveEquipmentPickerItemsArgs = {
   equipment: readonly Equipment[]
@@ -26,6 +27,8 @@ export type ResolveEquipmentPickerItemsArgs = {
       | undefined
   }
   budget?: EquipmentBudgetSummary
+  /** Max starting purse across available packages, in copper. Spent gold is already excluded. */
+  purchaseBudgetCeilingCp?: number
 }
 
 /** Annotates available equipment rows with orthogonal picker state for the drawer. */
@@ -34,6 +37,7 @@ export function resolveEquipmentPickerItems({
   proficiencies,
   recommendations,
   budget,
+  purchaseBudgetCeilingCp,
 }: ResolveEquipmentPickerItemsArgs): EquipmentPickerItem[] {
   return equipment
     .filter((row) => isEquipmentPickerSupportedKind(row.kind))
@@ -44,7 +48,13 @@ export function resolveEquipmentPickerItems({
         equipment: row,
         budget,
       })
-      const resolved = derived?.resolved ? { ...derived.resolved, purchaseAvailability } : undefined
+      const exceedsPurchaseBudgetCeiling = priceExceedsPurchaseBudgetCeiling(
+        row,
+        purchaseBudgetCeilingCp,
+      )
+      const resolved = derived?.resolved
+        ? { ...derived.resolved, purchaseAvailability, exceedsPurchaseBudgetCeiling }
+        : undefined
 
       return {
         equipment: row,
@@ -54,6 +64,7 @@ export function resolveEquipmentPickerItems({
           isProficient: isEquipmentProficient(row, proficiencies),
           isWithinRemainingBudget: purchaseAvailability.status === 'available',
           purchaseAvailability,
+          exceedsPurchaseBudgetCeiling,
           recommendation,
           evidence: derived?.evidence ?? [],
           ...(resolved ? { resolved } : {}),
@@ -61,4 +72,14 @@ export function resolveEquipmentPickerItems({
         },
       }
     })
+}
+
+function priceExceedsPurchaseBudgetCeiling(
+  equipment: Equipment,
+  purchaseBudgetCeilingCp: number | undefined,
+): boolean {
+  if (purchaseBudgetCeilingCp === undefined) return false
+  const pricing = resolveEquipmentPurchasePricing(equipment)
+  if (pricing.status !== 'priced') return false
+  return pricing.unitCostCp > purchaseBudgetCeilingCp
 }

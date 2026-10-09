@@ -165,4 +165,13 @@ describe('resolveEquipmentSelectionRowPresentation', () => {
       ),
     ).toEqual(['Cannot afford'])
   })
+
+  it('prefers Exceeds starting budget when the price is above the ceiling', () => {
+    const presentation = resolveEquipmentSelectionRowPresentation({
+      equipment: plateArmor,
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 1 },
+      exceedsPurchaseBudgetCeiling: true,
+    })
+    expect(presentation.status.map((entry) => entry.label)).toEqual(['Exceeds starting budget'])
+  })
 })

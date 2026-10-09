@@ -302,8 +302,8 @@ describe('resolveEquipmentPresentationFacts', () => {
             choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
           },
         }),
-      }).facts.map((fact) => [fact.discriminator, fact.label]),
-    ).toEqual([['in-package', OPTION_PRESENTATION_IN_PACKAGE_LABEL]])
+      }).facts,
+    ).toEqual([])
 
     expect(
       resolveEquipmentPresentationFacts({
@@ -396,5 +396,152 @@ describe('softRecommendationFacts', () => {
 
   it('emits nothing for neutral or discouraged recommendations', () => {
     expect(softRecommendationFacts({ recommendation: NEUTRAL_OPTION_RECOMMENDATION })).toEqual([])
+  })
+
+  it('drops starting-equipment reasons at every strength', () => {
+    expect(
+      softRecommendationFacts({
+        recommendation: {
+          strength: 'strong',
+          signals: [
+            {
+              strength: 'strong',
+              basis: 'inferred',
+              specificity: 'exact',
+              source: wizard,
+              reason: 'startingEquipment',
+            },
+            {
+              strength: 'compatible',
+              basis: 'inferred',
+              specificity: 'narrow_pool',
+              source: wizard,
+              reason: 'startingEquipmentChoice',
+            },
+            {
+              strength: 'compatible',
+              basis: 'inferred',
+              specificity: 'broad_pool',
+              source: wizard,
+              reason: 'availableInStartingOption',
+            },
+          ],
+        },
+        sourceName,
+      }),
+    ).toEqual([])
+  })
+})
+
+describe('starting-equipment presentation guidance', () => {
+  const sourceName = (source: { kind: string }) => (source.kind === 'class' ? 'Wizard' : undefined)
+  const packageChoice = {
+    inOpenPool: false,
+    inSelectedPackage: false,
+    inAlternativePackage: true,
+  } as const
+
+  function labels(option: ResolvedEquipmentOption): string[] {
+    return resolveEquipmentPresentationFacts({ resolved: option, sourceName }).facts.map(
+      (fact) => fact.label,
+    )
+  }
+
+  it('shows package guidance only for starting-equipment evidence', () => {
+    expect(
+      labels(
+        resolved({
+          recommendation: {
+            strength: 'compatible',
+            signals: [
+              {
+                strength: 'compatible',
+                basis: 'inferred',
+                specificity: 'exact',
+                source: wizard,
+                reason: 'startingEquipment',
+              },
+            ],
+          },
+          state: { choice: packageChoice },
+        }),
+      ),
+    ).toEqual([OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL])
+  })
+
+  it('shows Recommended by class for an independent class suggestion', () => {
+    expect(
+      labels(
+        resolved({
+          recommendation: {
+            strength: 'strong',
+            signals: [
+              {
+                strength: 'strong',
+                basis: 'authored',
+                specificity: 'exact',
+                source: wizard,
+                reason: 'classSuggested',
+              },
+            ],
+          },
+        }),
+      ),
+    ).toEqual(['Recommended by class'])
+  })
+
+  it('keeps package guidance and an independent class suggestion as separate facts', () => {
+    expect(
+      labels(
+        resolved({
+          recommendation: {
+            strength: 'strong',
+            signals: [
+              {
+                strength: 'strong',
+                basis: 'authored',
+                specificity: 'exact',
+                source: wizard,
+                reason: 'classSuggested',
+              },
+              {
+                strength: 'compatible',
+                basis: 'inferred',
+                specificity: 'exact',
+                source: wizard,
+                reason: 'startingEquipment',
+              },
+            ],
+          },
+          state: { choice: packageChoice },
+        }),
+      ),
+    ).toEqual(['Recommended by class', OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL])
+  })
+
+  it('emits no package row guidance when the selected package contributes the item', () => {
+    expect(
+      labels(
+        resolved({
+          recommendation: {
+            strength: 'compatible',
+            signals: [
+              {
+                strength: 'compatible',
+                basis: 'inferred',
+                specificity: 'exact',
+                source: wizard,
+                reason: 'startingEquipment',
+              },
+            ],
+          },
+          state: {
+            owned: true,
+            choice: { inOpenPool: false, inSelectedPackage: true, inAlternativePackage: false },
+          },
+        }),
+      ),
+    ).toEqual([])
+    expect(OPTION_PRESENTATION_IN_PACKAGE_LABEL).toBe('In your package')
   })
 })

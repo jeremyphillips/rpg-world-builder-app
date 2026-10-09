@@ -44,6 +44,7 @@ import {
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL,
   EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
   EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
 } from '../drawer/equipment-picker-drawer.types'
@@ -307,6 +308,7 @@ function resolvePurchasePresentation(args: {
   ownership: EquipmentOwnership
   workflowMode: EquipmentPickerWorkflowMode
   maxPurchaseQuantity: number
+  exceedsPurchaseBudgetCeiling?: boolean
 }): EquipmentPickerItemPresentation {
   const { rowActionVm, row, ownership, workflowMode, maxPurchaseQuantity } = args
   const { availability } = rowActionVm
@@ -337,7 +339,14 @@ function resolvePurchasePresentation(args: {
 
   if (availability.status === 'unaffordable' && !priceLabel) {
     return {
-      blockers: [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)],
+      blockers: [
+        selectionBlocker(
+          'unaffordable',
+          args.exceedsPurchaseBudgetCeiling
+            ? EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL
+            : EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+        ),
+      ],
       control,
       ...ownershipLines,
     }
@@ -486,6 +495,7 @@ export function resolveEquipmentPickerItemPresentation(args: {
   maxPurchaseQuantity?: number
   /** Filled choice buckets that the disabled action's tooltip can name. */
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+  exceedsPurchaseBudgetCeiling?: boolean
 }): EquipmentPickerItemPresentation {
   const { equipment, row, workflowMode, rowActionVm, ownership, copyCap } = args
 
@@ -501,6 +511,7 @@ export function resolveEquipmentPickerItemPresentation(args: {
       ownership,
       workflowMode,
       maxPurchaseQuantity: args.maxPurchaseQuantity ?? ownership.editablePurchased.quantity,
+      exceedsPurchaseBudgetCeiling: args.exceedsPurchaseBudgetCeiling,
     })
   }
 

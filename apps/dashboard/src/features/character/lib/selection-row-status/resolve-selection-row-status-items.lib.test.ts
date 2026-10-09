@@ -74,11 +74,11 @@ const EXPECTED_ORDER = [
   'Selection full',
   'Required by class',
   'Matches focus requirement',
+  'Included in package option',
   'Recommended by role',
   'Recommended by class',
   'Recommended by species',
   'In your package',
-  'Included in package option',
 ]
 
 describe('resolveSelectionRowStatusItems ordering', () => {
@@ -110,6 +110,25 @@ describe('resolveSelectionRowStatusItems ordering', () => {
       { context: 'picker' },
     )
     expect(items.map((item) => item.kind)).toEqual(['badge', 'text'])
+  })
+})
+
+describe('package-option guidance rank', () => {
+  it('places Included in package option before Recommended by class and leaves open pools after', () => {
+    expect(
+      labels({
+        status: [],
+        guidance: [
+          selectionRecommendation({
+            owned: false,
+            sourceKind: 'class',
+            label: 'Recommended by class',
+          }),
+          selectionSource('open_pool', 'Starting option'),
+          selectionSource('alternative_package', 'Included in package option'),
+        ],
+      }),
+    ).toEqual(['Included in package option', 'Recommended by class', 'Starting option'])
   })
 })
 

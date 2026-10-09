@@ -18,7 +18,6 @@ import type { RecommendationSourceRef } from './recommendation-source-ref'
 import {
   grantedByLabel,
   OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
-  OPTION_PRESENTATION_IN_PACKAGE_LABEL,
   OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
@@ -191,14 +190,7 @@ function stateFacts(args: {
 }): OptionPresentationFact[] {
   const facts: OptionPresentationFact[] = []
   const choice = args.resolved.state.choice
-  if (choice?.inSelectedPackage) {
-    facts.push({
-      kind: 'state',
-      discriminator: 'in-package',
-      label: OPTION_PRESENTATION_IN_PACKAGE_LABEL,
-      sourceLabels: [],
-    })
-  }
+  // Selected-package membership is ownership provenance, not row guidance.
   if (choice?.inOpenPool) {
     facts.push({
       kind: 'state',

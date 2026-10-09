@@ -1,4 +1,7 @@
-import type { EquipmentRecommendationSpecificity } from '../../../content/equipment-recommendation'
+import type {
+  EquipmentRecommendationReason,
+  EquipmentRecommendationSpecificity,
+} from '../../../content/equipment-recommendation'
 import type { UnmetAbilityScoreRequirement } from '../../../content/lib/ability-score-requirements'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 
@@ -33,6 +36,13 @@ export type RecommendationSignal = {
   /** Absent for source-less facts such as proficiency compatibility. */
   source?: RecommendationSourceRef
   specificity: RecommendationSpecificity
+  /**
+   * Evidence reason that produced this recommendation signal.
+   * Used for provenance and presentation policy. It does not determine rank directly.
+   * `startingEquipment` here means the strength originated from starting-equipment
+   * evidence, not that the item is in the currently selected package.
+   */
+  reason?: EquipmentRecommendationReason
   detail?: RecommendationSignalDetail
 }
 

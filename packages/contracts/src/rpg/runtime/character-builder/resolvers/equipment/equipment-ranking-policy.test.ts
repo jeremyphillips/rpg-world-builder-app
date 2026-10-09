@@ -250,6 +250,72 @@ describe('compareIntentionalEquipmentRanking', () => {
 
     expect(compareIntentionalEquipmentRanking(unaffordable, affordable, context)).toBeLessThan(0)
   })
+
+  it('sinks a row above the starting-purse ceiling after an otherwise equal row', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const withinCeiling = item('Zebra', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      exceedsPurchaseBudgetCeiling: false,
+    })
+    const aboveCeiling = item('Alpha', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      exceedsPurchaseBudgetCeiling: true,
+    })
+
+    expect(compareIntentionalEquipmentRanking(withinCeiling, aboveCeiling, context)).toBeLessThan(0)
+  })
+
+  it('keeps a strong row above the ceiling ahead of a neutral row inside it', () => {
+    const context = { preferMartialWeaponBrowseOrder: false }
+    const strong = item('Plate', {
+      recommendation: {
+        strength: 'strong',
+        signals: [
+          {
+            strength: 'strong',
+            basis: 'authored',
+            specificity: 'exact',
+            source: { kind: 'class', id: 'fighter' },
+          },
+        ],
+      },
+      requirements: [],
+      state: {},
+      exceedsPurchaseBudgetCeiling: true,
+    })
+    const neutral = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      exceedsPurchaseBudgetCeiling: false,
+    })
+
+    expect(compareIntentionalEquipmentRanking(strong, neutral, context)).toBeLessThan(0)
+  })
+
+  it('ranks proficiency ahead of the starting-purse ceiling', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const proficientAboveCeiling = weapon('Zebra', true)
+    proficientAboveCeiling.state.resolved = {
+      ...proficientAboveCeiling.state.resolved!,
+      exceedsPurchaseBudgetCeiling: true,
+    }
+    const notProficientWithinCeiling = weapon('Alpha', false)
+
+    expect(
+      compareIntentionalEquipmentRanking(
+        proficientAboveCeiling,
+        notProficientWithinCeiling,
+        context,
+      ),
+    ).toBeLessThan(0)
+  })
 })
 
 function weapon(name: string, proficient: boolean | undefined): EquipmentPickerItem {

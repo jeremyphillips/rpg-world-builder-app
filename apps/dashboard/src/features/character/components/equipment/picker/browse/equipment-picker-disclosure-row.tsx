@@ -73,6 +73,7 @@ export function EquipmentPickerDisclosureRow({
       equipment: item.equipment,
       resolved: item.state.resolved,
       purchaseAvailability: item.state.purchaseAvailability,
+      exceedsPurchaseBudgetCeiling: item.state.exceedsPurchaseBudgetCeiling,
       blockers: presentation.blockers,
       isGoldShoppingPath,
       isProficient: item.state.isProficient,

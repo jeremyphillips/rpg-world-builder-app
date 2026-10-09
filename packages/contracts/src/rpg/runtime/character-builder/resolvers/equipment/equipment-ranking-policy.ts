@@ -19,8 +19,10 @@ const NO_ACTIVE_CHOICE: ActiveChoiceContext = { kind: 'none' }
 
 /**
  * Best-match domain order for equipment picker rows.
- * Not-for-sale and proficiency are late keys, and only when the context asks.
+ * Proficiency, the starting-purse ceiling, and not-for-sale are late keys.
  * Proficiency is proficient, then untracked, then not proficient.
+ * A price above every available starting purse sinks after proficiency.
+ * Not-for-sale applies only when the context asks.
  * They do not change recommendation strength.
  * Selection, remaining budget, grant consumption, and package choice do not reorder rows.
  */
@@ -69,10 +71,11 @@ function compareResolvedEquipmentFacts(
         primarySourceKind(left.recommendation),
         primarySourceKind(right.recommendation),
       ),
+      context.rankCompatibility ? compareProficiency(left, right) : 0,
+      purchaseBudgetCeilingRank(left) - purchaseBudgetCeilingRank(right),
       context.rankPurchaseAvailability
         ? purchaseAvailabilityRank(left) - purchaseAvailabilityRank(right)
         : 0,
-      context.rankCompatibility ? compareProficiency(left, right) : 0,
     ]) ?? 0
   )
 }
@@ -108,6 +111,10 @@ function proficiencyRank(proficient: boolean | undefined): number {
   if (proficient === true) return 0
   if (proficient === undefined) return 1
   return 2
+}
+
+function purchaseBudgetCeilingRank(resolved: ResolvedEquipmentOption): number {
+  return resolved.exceedsPurchaseBudgetCeiling ? 1 : 0
 }
 
 function purchaseAvailabilityRank(resolved: ResolvedEquipmentOption): number {

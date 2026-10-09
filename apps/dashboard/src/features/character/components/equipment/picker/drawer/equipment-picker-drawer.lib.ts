@@ -510,5 +510,6 @@ export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
       ...(args.budget ? { budget: args.budget } : {}),
     }),
     ...(args.magicItemGrantProgress ? { magicItemGrantProgress: args.magicItemGrantProgress } : {}),
+    exceedsPurchaseBudgetCeiling: args.item.state.exceedsPurchaseBudgetCeiling,
   })
 }

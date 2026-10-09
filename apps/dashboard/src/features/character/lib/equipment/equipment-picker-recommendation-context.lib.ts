@@ -43,6 +43,8 @@ export type BuildEquipmentPickerRecommendationContextArgs = {
   catalogIndex: CharacterBuildCatalogIndex
   choiceSets?: readonly ChoiceSet[]
   budget?: EquipmentBudgetSummary
+  /** Max starting purse across available packages, in copper. */
+  purchaseBudgetCeilingCp?: number
   recommendationContext?: EquipmentRecommendationContext
 }
 
@@ -86,13 +88,14 @@ export function deriveEquipmentRecommendationIndex(
 export function buildEquipmentPickerRecommendationContext(
   args: BuildEquipmentPickerRecommendationContextArgs,
 ): EquipmentPickerRecommendationContext {
-  const { equipment, budget } = args
+  const { equipment, budget, purchaseBudgetCeilingCp } = args
   const { proficiencies, recommendations } = deriveEquipmentRecommendationIndex(args)
   const items = resolveEquipmentPickerItems({
     equipment,
     proficiencies,
     recommendations,
     budget,
+    purchaseBudgetCeilingCp,
   })
 
   return {

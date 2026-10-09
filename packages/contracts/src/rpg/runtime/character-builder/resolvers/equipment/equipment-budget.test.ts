@@ -19,6 +19,7 @@ import {
 } from '../../../../../test/fixtures/starting-wealth-minimal'
 import {
   deriveEquipmentBudgetSummaryFromFunding,
+  resolvePurchaseBudgetCeilingCp,
   resolveStartingEquipmentFundingOptions,
   resolveStartingEquipmentTierResources,
 } from './resolve-starting-equipment-funding'
@@ -337,6 +338,102 @@ describe('resolveStartingEquipmentFundingOptions', () => {
     expect(
       wealthToCopper(gold.totalStartingWealth) - wealthToCopper(standard.totalStartingWealth),
     ).toBe(wealthToCopper(gold.classOptionWealth) - wealthToCopper(standard.classOptionWealth))
+  })
+})
+
+describe('resolvePurchaseBudgetCeilingCp', () => {
+  const catalogIndex = indexCharacterBuildCatalog({
+    species: [],
+    classes: [storedDruid],
+    spells: [],
+    equipment: [rope],
+    skillProficiencies: [],
+    organizations: [],
+    languages: [],
+  })
+  const tierBonus = {
+    name: 'Tier bonus',
+    scope: { kind: 'standard' as const },
+    tiers: [
+      {
+        id: 'tier-5',
+        label: 'Level 5+',
+        minLevel: 1,
+        maxLevel: 20,
+        includeNormalStartingEquipment: true,
+        magicItemGrants: [],
+        bonusGold: {
+          baseGp: 500,
+          formula: {
+            kind: 'dice' as const,
+            dice: { count: 1, faces: 6 as const },
+            multiplier: 0,
+            currency: 'gp' as const,
+          },
+        },
+      },
+    ],
+  }
+
+  function draftSelecting(optionId: string) {
+    return {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedDruid.id)]: [optionId],
+      },
+    }
+  }
+
+  it('uses the richest class purse plus the tier bonus', () => {
+    const standard = resolvePurchaseBudgetCeilingCp({
+      draft: draftSelecting('standard-equipment'),
+      catalogIndex,
+      startingWealth: tierBonus,
+    })
+    const gold = resolvePurchaseBudgetCeilingCp({
+      draft: draftSelecting('starting-gold'),
+      catalogIndex,
+      startingWealth: tierBonus,
+    })
+
+    expect(standard).toBe(wealthToCopper({ cp: 0, sp: 0, gp: 550, pp: 0 }))
+    expect(gold).toBe(standard)
+  })
+
+  it('stays at the richer class purse when the tier bonus is absent', () => {
+    expect(
+      resolvePurchaseBudgetCeilingCp({
+        draft: draftSelecting('standard-equipment'),
+        catalogIndex,
+      }),
+    ).toBe(wealthToCopper({ cp: 0, sp: 0, gp: 50, pp: 0 }))
+  })
+
+  it('does not shrink when gold has been spent', () => {
+    const draft = {
+      ...draftSelecting('standard-equipment'),
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: rope.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    expect(
+      resolvePurchaseBudgetCeilingCp({
+        draft,
+        catalogIndex,
+        startingWealth: tierBonus,
+      }),
+    ).toBe(wealthToCopper({ cp: 0, sp: 0, gp: 550, pp: 0 }))
   })
 })
 

@@ -1,6 +1,7 @@
 import {
   buildChoiceSetId,
   deriveEquipmentBudgetSummary,
+  resolvePurchaseBudgetCeilingCp,
   equipmentPoolSummaryLabel,
   formatEquipmentBundleLabel,
   formatEquipmentInventoryPriceLine,
@@ -676,6 +677,11 @@ export function resolveEquipmentStepPickerItems(args: {
     catalogIndex,
     choiceSets,
     budget,
+    purchaseBudgetCeilingCp: resolvePurchaseBudgetCeilingCp({
+      draft,
+      catalogIndex,
+      startingWealth: context?.characterCreationRules.startingWealth,
+    }),
   })
 
   return {

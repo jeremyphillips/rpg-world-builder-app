@@ -7,7 +7,10 @@ import {
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
 
-import { EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL } from '../../components/equipment/picker/drawer/equipment-picker-drawer.types'
+import {
+  EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
+  EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL,
+} from '../../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import {
   mergeSelectionRowPresentations,
   selectionBlocker,
@@ -24,6 +27,8 @@ export type EquipmentSelectionRowPresentationArgs = {
   resolved?: ResolvedEquipmentOption
   /** Acquisition surfaces only — emits the affordability blocker. */
   purchaseAvailability?: EquipmentPurchaseAvailability
+  /** Structural miss against the max starting purse. Prefers that label over Cannot afford. */
+  exceedsPurchaseBudgetCeiling?: boolean
   /** Surface-supplied availability blockers (purchase, grant, conversion). */
   blockers?: readonly SelectionStatusEntry[]
   /** Alternate-package source guidance only exists while shopping with gold. */
@@ -34,7 +39,11 @@ export type EquipmentSelectionRowPresentationArgs = {
 
 function affordabilityBlockers(
   purchaseAvailability: EquipmentPurchaseAvailability | undefined,
+  exceedsPurchaseBudgetCeiling: boolean | undefined,
 ): SelectionStatusEntry[] {
+  if (exceedsPurchaseBudgetCeiling) {
+    return [selectionBlocker('unaffordable', EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL)]
+  }
   if (purchaseAvailability?.status !== 'unaffordable') return []
   return [selectionBlocker('unaffordable', EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL)]
 }
@@ -67,7 +76,7 @@ export function resolveEquipmentSelectionRowPresentation(
   return mergeSelectionRowPresentations(
     {
       status: [
-        ...affordabilityBlockers(args.purchaseAvailability),
+        ...affordabilityBlockers(args.purchaseAvailability, args.exceedsPurchaseBudgetCeiling),
         ...(args.blockers ?? []),
         ...proficiencyFallback(args),
       ],

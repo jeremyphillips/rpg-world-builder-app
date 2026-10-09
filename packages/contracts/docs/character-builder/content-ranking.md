@@ -66,11 +66,12 @@ Requirements, soft recommendations, and option state are separate facts. Selecti
 remaining budget, and package choice do not reorder rows.
 
 1. **Requirement match** — any requirement the row satisfies (`optionSatisfies`), exact before anyOf. `candidate`, `satisfier`, and `eligible` share that band. A `requirement` active choice limits the match to that requirement id. `activeRequirementIds`, when set, limits which ids count. Spellcasting focus is one any-of requirement owned by the class.
-2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. A class starting-equipment candidate (any available option, grant or choice pool) is a `compatible` class signal. That set does not follow the selected package, fulfilled grants, or remaining budget. Proficiency is compatibility, not a signal.
+2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. A class starting-equipment candidate (any available option, grant or choice pool) is a `compatible` class signal with reason `startingEquipment`. That set does not follow the selected package, fulfilled grants, or remaining budget. Starting-equipment membership may contribute recommendation strength for ranking, but its user-facing guidance is owned by package-state presentation. Only independent recommendation evidence produces **Recommended by class**. Proficiency is compatibility, not a signal.
 3. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat). Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts). Open-pool eligibility, context relevance, and alternative-package membership are not sort keys.
-4. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
-5. **Compatibility** — only when `rankCompatibility` is set (the default). Proficient, then untracked (`compatibility.proficient` omitted), then not proficient. `unaffordable` does not add a further penalty: not proficient and unaffordable stays with not proficient.
-6. **Canonical fallback** — kind bucket, weapon category, then name.
+4. **Compatibility** — only when `rankCompatibility` is set (the default). Proficient, then untracked (`compatibility.proficient` omitted), then not proficient. `unaffordable` does not add a further penalty: not proficient and unaffordable stays with not proficient.
+5. **Exceeds starting budget** — price above `purchaseBudgetCeiling`, the maximum `totalStartingWealth` across available packages. That total is class-option wealth plus the tier bonus. Spent gold and the selected package do not change it. A shortfall against the current purse stays **Cannot afford** and does not reorder. Unpriced rows do not exceed the ceiling.
+6. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
+7. **Canonical fallback** — kind bucket, weapon category, then name.
 
 Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.
 
@@ -82,7 +83,7 @@ Proficiency is not a recommendation reason. `compatibility.proficient` is `true`
 
 `classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
 
-Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by Wizard class", "Spellcasting focus", "In your package"). The dashboard maps those facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
+Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by class", "Matches focus requirement", "Included in package option", "Recommended by class"). The dashboard orders guidance as requirement, requirement match, package option, then recommendation. Open-pool source guidance stays after recommendations. A selected package does not add package row guidance; ownership provenance shows **Package**. The dashboard maps facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
 
 Canonical kind order is weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other. Weapon category is martial-first only when `preferMartialWeaponBrowseOrder` is set. Name uses `localeCompare` (base sensitivity).
 
