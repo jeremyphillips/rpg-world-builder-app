@@ -107,9 +107,11 @@ function StartingChoicesHarness({
   const form = useForm<QuickNpcAuthoringTabFormValues>({
     defaultValues: { ...quickNpcAuthoringTabDefaultValues, ...defaultValues },
   })
-  if (formRef) {
-    formRef.current = form
-  }
+  React.useLayoutEffect(() => {
+    if (formRef) {
+      formRef.current = form
+    }
+  }, [form, formRef])
 
   return (
     <FormProvider {...form}>

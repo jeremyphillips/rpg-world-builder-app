@@ -1,7 +1,7 @@
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeSentenceForm,
-} from '../../content/lib/content-type-terms'
+} from '../../primitives/content/content-type-terms'
 
 /** Section heading for species trait lists (sheet, builder, authoring). */
 export function getSpeciesTraitSectionLabel(): string {

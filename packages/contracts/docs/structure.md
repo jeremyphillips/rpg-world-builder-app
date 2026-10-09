@@ -607,7 +607,7 @@ and `resolveOrganizationNpcClassRecommendationIds` in
 ### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
 
 Catalog collection chrome uses a separate registry in
-[`content-type-terms.ts`](../src/rpg/content/lib/content-type-terms.ts), keyed
+[`content-type-terms.ts`](../src/rpg/primitives/content/content-type-terms.ts), keyed
 by `ContentTypeKey`. Each entry is a `VocabularyTerm` with `label`,
 `description`, and `sentence` forms. Exported aliases use the `*_CONTENT_TYPE_TERM`
 qualifier (e.g. `SPECIES_CONTENT_TYPE_TERM`) — not generic `SPECIES_TERM`, which

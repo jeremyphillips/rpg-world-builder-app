@@ -7,8 +7,8 @@ import {
   CATALOG_TOOLBAR_RESET_VISIBLE_LABEL,
   CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME,
   CATALOG_TOOLBAR_RESET_WITH_SORT_NAME,
-  CatalogToolbarResetSlot,
-} from './catalog-toolbar-reset-action'
+} from './catalog-toolbar-reset-action.lib'
+import { CatalogToolbarResetSlot } from './catalog-toolbar-reset-action'
 
 describe('CatalogToolbarResetSlot', () => {
   it('names a visible reset for search, filters, and sorting when sort is present', () => {

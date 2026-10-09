@@ -20,7 +20,7 @@ import type {
   RecognizedProficiency,
   RecognizedSpellPreview,
 } from './adapter/character-import-preview-types'
-import { getContentTypeCapitalizedSentenceLabel } from '../rpg/content/lib/content-type-terms'
+import { getContentTypeCapitalizedSentenceLabel } from '../rpg/primitives/content/content-type-terms'
 import { CharacterImportFinalizationError } from './character-import-finalization-error'
 
 const IMPORT_SELECTION_SOURCE: CharacterSelectionSource = { kind: 'manual' }

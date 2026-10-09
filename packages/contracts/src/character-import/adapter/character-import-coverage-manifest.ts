@@ -1,7 +1,7 @@
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeSentenceForm,
-} from '../../rpg/content/lib/content-type-terms'
+} from '../../rpg/primitives/content/content-type-terms'
 import type { DndBeyondCharacterPayload } from '../dnd-beyond/dnd-beyond-character.schema'
 import type { CharacterImportCoverageEntry } from './character-import-result.schema'
 import type { CharacterImportExtraction } from './character-import-result.schema'

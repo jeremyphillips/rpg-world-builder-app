@@ -1,6 +1,6 @@
 import { CircleSlash, Lock, Users } from 'lucide-react'
 import { type PlayerContentVisibility, type ResolvedContentCampaignAccess } from '@rpg/contracts'
-import { InfoTooltip } from '@rpg/ui'
+import { InlineMetadata, InfoTooltip } from '@rpg/ui'
 
 import { resolveCampaignAccessDetail } from '../campaign-access-summary'
 import {
@@ -109,13 +109,12 @@ export function ContentAccessMetadata({
     <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
       {content.icon}
       <span className="inline-flex items-center gap-1">
-        <span>{content.primary}</span>
-        {content.secondary ? (
-          <>
-            <span aria-hidden>·</span>
-            <span>{content.secondary}</span>
-          </>
-        ) : null}
+        <InlineMetadata role="supporting" density="compact" wrap={false}>
+          <InlineMetadata.Item>{content.primary}</InlineMetadata.Item>
+          {content.secondary ? (
+            <InlineMetadata.Item>{content.secondary}</InlineMetadata.Item>
+          ) : null}
+        </InlineMetadata>
         {content.tooltip ? (
           <InfoTooltip aria-label={content.tooltipLabel}>{content.tooltip}</InfoTooltip>
         ) : null}
