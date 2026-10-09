@@ -8,9 +8,7 @@ import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
 import {
-  countEquipmentPickerClearableCriteria,
   getEquipmentPickerSearchText,
-  hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   resolveEquipmentPickerDrawerItemHeaderPresentation,
 } from './equipment-picker-drawer.lib'
@@ -26,7 +24,6 @@ import {
   EQUIPMENT_PICKER_SORT_ORDER_LABEL,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
-  type EquipmentPickerToolbarResetMode,
 } from './equipment-picker-drawer.types'
 import { EquipmentResourceSummary } from '../../acquisition/equipment-resource-summary'
 import { resolveEquipmentPickerHeaderResource } from './equipment-picker-header-resource.lib'
@@ -53,56 +50,32 @@ const EQUIPMENT_PICKER_MODE_ICON_ROLES = {
 export type { EquipmentPickerDrawerProps } from './equipment-picker-drawer.types'
 
 function EquipmentPickerToolbarActions({
-  toolbarResetMode,
   selectedKind,
   showAffordableOnly,
   sortMode,
   searchQuery,
   focusedAllowanceId,
   workflowMode,
-  onClearStructuredFilters,
   onResetView,
 }: {
-  toolbarResetMode: EquipmentPickerToolbarResetMode
   selectedKind: ReturnType<typeof useEquipmentPickerController>['selectedKind']
   showAffordableOnly: boolean
   sortMode: ReturnType<typeof useEquipmentPickerController>['sortMode']
   searchQuery: string
   focusedAllowanceId?: string
   workflowMode: EquipmentPickerWorkflowMode
-  onClearStructuredFilters: () => void
   onResetView: () => void
 }) {
-  const structuredFilterArgs = {
+  const showResetView = hasEquipmentPickerResetViewCriteria({
     selectedKind,
     showAffordableOnly,
     focusedAllowanceId,
     workflowMode,
-  }
-  const clearableCriteriaCount = countEquipmentPickerClearableCriteria({
-    ...structuredFilterArgs,
     searchQuery,
+    sortMode,
   })
-  const showClearFilters =
-    toolbarResetMode === 'clear_filters' &&
-    hasEquipmentPickerClearableCriteria(clearableCriteriaCount)
-  const showResetView =
-    toolbarResetMode === 'reset_view' &&
-    hasEquipmentPickerResetViewCriteria({
-      ...structuredFilterArgs,
-      searchQuery,
-      sortMode,
-    })
 
-  if (toolbarResetMode === 'none') return null
-
-  return (
-    <CatalogToolbarResetSlot
-      visible={showClearFilters || showResetView}
-      includesSort
-      onClick={showClearFilters ? onClearStructuredFilters : onResetView}
-    />
-  )
+  return <CatalogToolbarResetSlot visible={showResetView} includesSort onClick={onResetView} />
 }
 
 /** Equipment catalog drawer — domain composition over `CatalogEntityPickerSheet`. */
@@ -125,7 +98,6 @@ export function EquipmentPickerDrawer({
   magicItemAllowances,
   focusedAllowanceId,
   onFocusedAllowanceIdChange,
-  toolbarResetMode = 'reset_view',
   isGoldShoppingPath = false,
   resolveRowActionViewModel,
   onCommitAdd,
@@ -225,21 +197,14 @@ export function EquipmentPickerDrawer({
           resetSearchQuery()
         }
 
-        const handleClearFilters = () => {
-          resetSearchQuery()
-          picker.handleClearStructuredFilters()
-        }
-
         return (
           <EquipmentPickerToolbarActions
-            toolbarResetMode={toolbarResetMode}
             selectedKind={picker.selectedKind}
             showAffordableOnly={picker.showAffordableOnly}
             sortMode={picker.sortMode}
             searchQuery={searchQuery}
             focusedAllowanceId={focusedAllowanceId}
             workflowMode={workflowMode}
-            onClearStructuredFilters={handleClearFilters}
             onResetView={handleResetView}
           />
         )

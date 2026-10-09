@@ -31,11 +31,7 @@ import {
   compareName,
   scoreAndFilterPickerItems,
 } from '../../../picker/sort/catalog-picker-sort.lib'
-import {
-  countCatalogPickerClearableCriteria,
-  hasCatalogPickerClearableCriteria,
-  hasCatalogPickerResetViewCriteria,
-} from '../../../picker/catalog-picker-filter-state.lib'
+import { hasCatalogPickerResetViewCriteria } from '../../../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
@@ -118,24 +114,6 @@ export function countEquipmentPickerStructuredFilters(args: {
   if (args.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) count += 1
   if (args.showAffordableOnly) count += 1
   return count
-}
-
-/** Total clearable criteria — structured filters + non-empty search. */
-export function countEquipmentPickerClearableCriteria(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  searchQuery: string
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): number {
-  return countCatalogPickerClearableCriteria({
-    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
-    searchQuery: args.searchQuery,
-  })
-}
-
-export function hasEquipmentPickerClearableCriteria(count: number): boolean {
-  return hasCatalogPickerClearableCriteria(count)
 }
 
 export function hasEquipmentPickerResetViewCriteria(args: {

@@ -177,17 +177,9 @@ Authored class recommendations are `strong`. Spell browse does not emit `compati
 
 Empty-query best match uses domain rank only — not name-only fallback.
 
-### Clear filters vs Reset view
+### Reset
 
-Mutually exclusive toolbar actions (`toolbarResetMode` on `EquipmentPickerDrawer`;
-production default `reset_view`):
-
-| Action            | Resets                                 | Preserves |
-| ----------------- | -------------------------------------- | --------- |
-| **Clear filters** | search, category, Affordable now       | sort      |
-| **Reset view**    | search, category, Affordable now, sort | —         |
-
-Both modes use the shared Reset button. Action buttons show no counts.
+Equipment browse has one toolbar action, Reset. It restores search, category, Affordable now, and sort. Action buttons show no counts.
 
 ## Considered and not ranked
 

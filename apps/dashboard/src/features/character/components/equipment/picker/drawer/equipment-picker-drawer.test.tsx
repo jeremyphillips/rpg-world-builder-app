@@ -18,10 +18,7 @@ import {
   equipmentPickerSkilledHirelingFixture,
   pickerState,
 } from './equipment-picker-drawer.fixtures'
-import {
-  CATALOG_TOOLBAR_RESET_VISIBLE_LABEL,
-  CATALOG_TOOLBAR_RESET_WITH_SORT_NAME,
-} from '../../../picker/catalog-toolbar-reset-action'
+import { CATALOG_TOOLBAR_RESET_WITH_SORT_NAME } from '../../../picker/catalog-toolbar-reset-action'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
@@ -247,47 +244,6 @@ describe('EquipmentPickerDrawer', () => {
     expect(within(list).queryByText('Mid Gear')).not.toBeInTheDocument()
   })
 
-  it('clears search and category filters together with clear_filters mode', async () => {
-    const user = userEvent.setup()
-
-    render(
-      <EquipmentPickerDrawer
-        open
-        onOpenChange={vi.fn()}
-        items={equipmentPickerItemsFixture}
-        budget={equipmentPickerBudgetFixture}
-        filterOutUnaffordable={false}
-        toolbarResetMode="clear_filters"
-        onCommitAdd={vi.fn()}
-      />,
-    )
-
-    await user.type(screen.getByRole('textbox', { name: 'Search catalog' }), 'rope')
-    await user.click(screen.getByRole('radio', { name: 'Weapons' }))
-    await user.click(screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }))
-
-    expect(
-      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
-    ).toHaveTextContent(CATALOG_TOOLBAR_RESET_VISIBLE_LABEL)
-    expect(
-      screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }).textContent,
-    ).not.toMatch(/\(\d+\)/)
-
-    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }))
-
-    expect(screen.getByRole('textbox', { name: 'Search catalog' })).toHaveValue('')
-    expect(screen.getByRole('radio', { name: 'All' })).toHaveAttribute('aria-checked', 'true')
-    expect(
-      screen.getByRole('checkbox', { name: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL }),
-    ).not.toBeChecked()
-    expect(
-      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME }),
-    ).not.toBeInTheDocument()
-    expect(
-      screen.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL }),
-    ).toHaveTextContent('Best match')
-  })
-
   it('keeps category selected when the active chip is clicked again', async () => {
     const user = userEvent.setup()
 
@@ -310,7 +266,7 @@ describe('EquipmentPickerDrawer', () => {
     expect(weaponChip).toHaveAttribute('aria-checked', 'true')
   })
 
-  it('resets sort, search, and structured filters with reset_view mode', async () => {
+  it('resets sort, search, and structured filters', async () => {
     const user = userEvent.setup()
 
     render(

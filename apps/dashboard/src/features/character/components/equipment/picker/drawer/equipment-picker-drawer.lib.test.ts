@@ -16,13 +16,11 @@ import {
 } from './equipment-picker-drawer.fixtures'
 import {
   countEquipmentPickerAffordableHiddenImpact,
-  countEquipmentPickerClearableCriteria,
   countEquipmentPickerStructuredFilters,
   filterAndSortEquipmentPickerItems,
   filterEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
   getEquipmentUnaffordableAmounts,
-  hasEquipmentPickerClearableCriteria,
   hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
@@ -326,7 +324,7 @@ describe('equipment-picker-drawer.lib', () => {
     expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
   })
 
-  it('counts structured filters separately from clearable criteria', () => {
+  it('counts structured filters', () => {
     expect(
       countEquipmentPickerStructuredFilters({
         selectedKind: EQUIPMENT_PICKER_KIND_ALL,
@@ -339,15 +337,6 @@ describe('equipment-picker-drawer.lib', () => {
         showAffordableOnly: true,
       }),
     ).toBe(2)
-    expect(
-      countEquipmentPickerClearableCriteria({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        searchQuery: 'rope',
-      }),
-    ).toBe(3)
-    expect(hasEquipmentPickerClearableCriteria(0)).toBe(false)
-    expect(hasEquipmentPickerClearableCriteria(1)).toBe(true)
   })
 
   it('counts magic-item rarity focus as a structured filter in magic-items workflow', () => {

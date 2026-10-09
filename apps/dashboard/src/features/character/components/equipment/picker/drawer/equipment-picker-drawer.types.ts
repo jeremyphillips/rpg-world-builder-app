@@ -85,8 +85,6 @@ export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, strin
   [EQUIPMENT_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
 }
 
-export type EquipmentPickerToolbarResetMode = 'clear_filters' | 'reset_view' | 'none'
-
 export type EquipmentPickerKindFilter =
   | typeof EQUIPMENT_PICKER_KIND_ALL
   | EquipmentPickerSupportedKind
@@ -123,8 +121,6 @@ export type EquipmentPickerDrawerProps = {
   /** Focused allowance id — scopes magic-item browse to one rarity slot. */
   focusedAllowanceId?: string
   onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void
-  /** Mutually exclusive toolbar action — default resets full view including sort. */
-  toolbarResetMode?: EquipmentPickerToolbarResetMode
   /** When true, rows in another starting package show `Included in package option`. */
   isGoldShoppingPath?: boolean
   resolveRowActionViewModel?: (args: {

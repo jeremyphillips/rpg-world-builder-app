@@ -119,18 +119,6 @@ export const CharacterPreview: Story = {
   },
 }
 
-export const ClearFilters: Story = {
-  args: {
-    open: true,
-    onOpenChange: () => undefined,
-    items: equipmentPickerItemsFixture,
-    budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
-    toolbarResetMode: 'clear_filters',
-    onCommitAdd: () => undefined,
-  },
-}
-
 export const SortByPrice: Story = {
   args: {
     open: true,

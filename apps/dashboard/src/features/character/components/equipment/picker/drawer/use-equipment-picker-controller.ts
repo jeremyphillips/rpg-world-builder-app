@@ -192,12 +192,6 @@ export function useEquipmentPickerController({
     [browseSortContext, sortMode, workflowMode],
   )
 
-  const handleClearStructuredFilters = React.useCallback(() => {
-    setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
-    setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
-    onFocusedAllowanceIdChange?.(undefined)
-  }, [onFocusedAllowanceIdChange])
-
   const resetBrowseView = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
@@ -225,7 +219,6 @@ export function useEquipmentPickerController({
     sortMode,
     setSortMode,
     handleFilterStateChange,
-    handleClearStructuredFilters,
     resetBrowseView,
     handleHeaderCommit,
   }
