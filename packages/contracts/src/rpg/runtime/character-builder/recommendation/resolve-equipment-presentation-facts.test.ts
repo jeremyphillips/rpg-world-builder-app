@@ -398,6 +398,27 @@ describe('softRecommendationFacts', () => {
     expect(softRecommendationFacts({ recommendation: NEUTRAL_OPTION_RECOMMENDATION })).toEqual([])
   })
 
+  it('does not badge a monk linked-pool startingEquipment signal as recommended by class', () => {
+    const facts = resolveEquipmentPresentationFacts({
+      resolved: resolved({
+        recommendation: {
+          strength: 'compatible',
+          signals: [
+            {
+              strength: 'compatible',
+              basis: 'inferred',
+              specificity: 'narrow_pool',
+              source: { kind: 'class', id: 'monk' },
+              reason: 'startingEquipment',
+            },
+          ],
+        },
+      }),
+    })
+
+    expect(facts.facts.map((fact) => fact.label)).not.toContain('Recommended by class')
+  })
+
   it('drops starting-equipment reasons at every strength', () => {
     expect(
       softRecommendationFacts({

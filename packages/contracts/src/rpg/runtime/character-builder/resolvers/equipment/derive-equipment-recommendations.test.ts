@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { equipmentSchema } from '../../../../content/equipment'
 import type { ClassStored } from '../../../../content/classes/class'
 import { assembleCharacterProficiencies } from '../../assembly/assemble-proficiencies'
+import { resolveClassToolChoiceSets } from '../class/resolve-class-tool-choice-sets'
 import { buildChoiceSetId } from '../../choice-set'
 import { indexCharacterBuildCatalog } from '../../context'
 import { createEmptyCharacterBuilderDraft } from '../../draft/draft'
@@ -263,6 +264,48 @@ const storedWizard: ClassStored = {
       ],
     },
   },
+}
+
+function deriveWithClassToolChoiceSets(
+  characterClass: ClassStored,
+  equipment: Parameters<typeof buildContext>[1],
+  draftPatch?: Parameters<typeof buildContext>[2],
+) {
+  const built = buildContext(characterClass, equipment, draftPatch)
+  const choiceSets = resolveClassToolChoiceSets(built.draft, built.catalogIndex)
+  const proficiencies = assembleCharacterProficiencies(
+    built.draft,
+    built.catalogIndex,
+    choiceSets,
+    characterClass,
+  )
+  return {
+    ...built,
+    proficiencies,
+    recommendations: deriveEquipmentRecommendations({
+      characterClass,
+      catalogIndex: built.catalogIndex,
+      proficiencies,
+      draft: built.draft,
+      choiceSets,
+    }),
+  }
+}
+
+function startingEquipmentBrowseFact(
+  recommendations: ReturnType<typeof deriveEquipmentRecommendations>,
+  equipmentId: string,
+) {
+  const resolved = recommendations.get(equipmentId)?.resolved
+  const signal = resolved?.recommendation.signals.find(
+    (entry) => entry.reason === 'startingEquipment',
+  )
+  return {
+    strength: resolved?.recommendation.strength,
+    specificity: signal?.specificity,
+    source: signal?.source,
+    proficient: resolved?.state.compatibility?.proficient,
+  }
 }
 
 function buildContext(
@@ -841,6 +884,20 @@ const viol = equipmentSchema.parse({
   utilizes: [{ description: 'Play', dc: 10 }],
 })
 
+const diceSet = equipmentSchema.parse({
+  ...CONTENT_META,
+  id: `${RULESET}:dice-set`,
+  slug: 'dice-set',
+  name: 'Dice Set',
+  description: '',
+  cost: { amount: 1, currency: 'sp' },
+  weight: { value: 0, unit: 'lb' },
+  kind: 'tool',
+  toolCategory: 'gaming_set',
+  ability: 'wis',
+  utilizes: [{ description: 'Play', dc: 10 }],
+})
+
 const panFlute = equipmentSchema.parse({
   ...CONTENT_META,
   id: `${RULESET}:pan-flute`,
@@ -1000,6 +1057,150 @@ const bardToolChoiceSetId = buildChoiceSetId('class', storedBard.id, 'class-tool
 const monkToolChoiceSetId = buildChoiceSetId('class', storedMonk.id, 'class-tools')
 
 describe('deriveEquipmentRecommendations proficiency inference', () => {
+  it('marks the chosen monk tool proficient after class-tools is answered', () => {
+    const { catalogIndex, draft } = buildContext(storedMonk, bardInstruments, {
+      choiceSelections: {
+        [monkToolChoiceSetId]: [lute.id],
+      },
+    })
+    const choiceSets = resolveClassToolChoiceSets(draft, catalogIndex)
+    const proficiencies = assembleCharacterProficiencies(
+      draft,
+      catalogIndex,
+      choiceSets,
+      storedMonk,
+    )
+
+    const recommendations = deriveEquipmentRecommendations({
+      characterClass: storedMonk,
+      catalogIndex,
+      proficiencies,
+      draft,
+      choiceSets,
+    })
+
+    expect(recommendations.get(lute.id)?.resolved?.state.compatibility?.proficient).toBe(true)
+    expect(recommendations.get(flute.id)?.resolved?.state.compatibility?.proficient).toBe(false)
+  })
+
+  it('counts the monk linked tool pool as starting-equipment candidates', () => {
+    const equipment = [...bardInstruments, diceSet]
+    const { recommendations } = deriveWithClassToolChoiceSets(storedMonk, equipment)
+
+    for (const instrument of bardInstruments) {
+      expect(startingEquipmentBrowseFact(recommendations, instrument.id)).toMatchObject({
+        strength: 'compatible',
+        specificity: 'narrow_pool',
+        source: { kind: 'class', id: storedMonk.id },
+      })
+    }
+    expect(startingEquipmentBrowseFact(recommendations, diceSet.id).strength).toBe('neutral')
+    expect(startingEquipmentBrowseFact(recommendations, diceSet.id).specificity).toBeUndefined()
+  })
+
+  it('answering class-tools changes proficiency only', () => {
+    const equipment = [...bardInstruments, diceSet]
+    const unanswered = deriveWithClassToolChoiceSets(storedMonk, equipment)
+    const answeredWithLute = deriveWithClassToolChoiceSets(storedMonk, equipment, {
+      choiceSelections: { [monkToolChoiceSetId]: [lute.id] },
+    })
+    const answeredWithFlute = deriveWithClassToolChoiceSets(storedMonk, equipment, {
+      choiceSelections: { [monkToolChoiceSetId]: [flute.id] },
+    })
+
+    for (const instrument of bardInstruments) {
+      const baseline = startingEquipmentBrowseFact(unanswered.recommendations, instrument.id)
+      const luteAnswer = startingEquipmentBrowseFact(
+        answeredWithLute.recommendations,
+        instrument.id,
+      )
+      const fluteAnswer = startingEquipmentBrowseFact(
+        answeredWithFlute.recommendations,
+        instrument.id,
+      )
+      expect(luteAnswer).toMatchObject({
+        strength: baseline.strength,
+        specificity: baseline.specificity,
+        source: baseline.source,
+      })
+      expect(fluteAnswer).toMatchObject({
+        strength: baseline.strength,
+        specificity: baseline.specificity,
+        source: baseline.source,
+      })
+      expect(luteAnswer.proficient).toBe(instrument.id === lute.id)
+      expect(fluteAnswer.proficient).toBe(instrument.id === flute.id)
+    }
+  })
+
+  it('keeps monk linked-pool candidates when the package switches to starting gold', () => {
+    const equipment = [...bardInstruments]
+    const standard = deriveWithClassToolChoiceSets(storedMonk, equipment, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedMonk.id)]: ['standard-equipment'],
+      },
+    })
+    const gold = deriveWithClassToolChoiceSets(storedMonk, equipment, {
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(storedMonk.id)]: ['starting-gold'],
+      },
+      equipment: { mode: 'gold', purchases: [], editedSincePackageSelection: false },
+    })
+
+    expect(startingEquipmentBrowseFact(gold.recommendations, lute.id)).toEqual(
+      startingEquipmentBrowseFact(standard.recommendations, lute.id),
+    )
+  })
+
+  it('ranks the chosen monk tool, then the linked pool, ahead of neutral proficient weapons', () => {
+    const equipment = [...bardInstruments, diceSet, dagger]
+    const { recommendations } = deriveWithClassToolChoiceSets(storedMonk, equipment, {
+      choiceSelections: { [monkToolChoiceSetId]: [lute.id] },
+    })
+    const ordered = [dagger, diceSet, flute, lute]
+      .map((row) => rankingItem(row, recommendations.get(row.id)?.resolved))
+      .sort((left, right) => compareIntentionalEquipmentRanking(left, right))
+      .map((row) => row.equipment.name)
+
+    expect(ordered).toEqual(['Lute', 'Flute', 'Dagger', 'Dice Set'])
+  })
+
+  it('does not badge monk linked-pool tools as recommended by class', () => {
+    const { recommendations } = deriveWithClassToolChoiceSets(storedMonk, bardInstruments)
+    const labels =
+      recommendations.get(lute.id)?.resolved?.presentation?.facts.map((fact) => fact.label) ?? []
+
+    expect(labels).not.toContain('Recommended by class')
+  })
+
+  it('keeps bard instrument candidates on the equipment choice pool', () => {
+    const { catalogIndex } = buildContext(storedBard, bardCatalogEquipment)
+    const specificity = listClassStartingEquipmentCandidateSpecificity({
+      characterClass: storedBard,
+      equipment: catalogIndex.equipment,
+    })
+
+    expect(specificity.get(leatherArmor.id)).toBe('exact')
+    expect(specificity.get(dagger.id)).toBe('exact')
+    for (const instrument of bardInstruments) {
+      expect(specificity.get(instrument.id)).toBe('narrow_pool')
+    }
+  })
+
+  it('sorts the three chosen bard instruments ahead of the rest of the pool', () => {
+    const { recommendations } = deriveWithClassToolChoiceSets(storedBard, bardCatalogEquipment, {
+      choiceSelections: {
+        [bardToolChoiceSetId]: [lute.id, flute.id, drum.id],
+      },
+    })
+    const ordered = bardInstruments
+      .map((row) => rankingItem(row, recommendations.get(row.id)?.resolved))
+      .sort((left, right) => compareIntentionalEquipmentRanking(left, right))
+      .map((row) => row.equipment.id)
+
+    expect(ordered.slice(0, 3).sort()).toEqual([drum.id, flute.id, lute.id].sort())
+  })
+
   it('recommends all musical instruments before bard proficiency selection', () => {
     const { catalogIndex, proficiencies, draft } = buildContext(storedBard, bardCatalogEquipment)
 

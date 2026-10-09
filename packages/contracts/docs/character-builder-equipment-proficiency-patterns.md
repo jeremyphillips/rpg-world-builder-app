@@ -67,6 +67,8 @@ for their tool proficiency.
 **Runtime:** `resolveProficiencyLinkedEquipmentGrant` reads the proficiency ChoiceSet
 answer directly. Never infer from `assembleCharacterProficiencies()` or merged rows.
 
+**Browse relevance:** The linked tool pool is a class starting-equipment candidate, the same way a choice pool is. Answering `class-tools` changes proficiency only. It does not change the pool's strength, specificity, or source.
+
 **ChoiceSet id:** `class:{classId}:{choiceId}` (e.g. `class:srd-cc-5.2.1:monk:class-tools`).
 
 **Builder UX:** When the linked package is selected, the equipment step may render the

@@ -30,14 +30,18 @@ import type {
   StartingEquipmentContributionContext,
 } from './equipment-recommendation-contribution'
 import { sourceForEquipmentReason } from './equipment-recommendation-evidence'
-import { expandRecommendationSelector } from './equipment-recommendation-selector'
+import {
+  expandRecommendationSelector,
+  type EquipmentRecommendationSelector,
+} from './equipment-recommendation-selector'
 import { specificityForSelectorExpansion } from './equipment-recommendation-specificity'
 
 /**
  * Class starting-equipment relevance for browse strength.
- * Walks every available option. Direct grants are exact; choice pools use
- * expansion specificity. The selected package, fulfilled grants, and gold
- * path do not change the result.
+ * Walks every available option. Direct grants are exact. Choice pools and
+ * proficiency-linked grants use the expansion specificity of their pool.
+ * The selected package, fulfilled grants, the gold path, and proficiency
+ * answers do not change the result.
  */
 export function listClassStartingEquipmentCandidateSpecificity(args: {
   characterClass: CharacterClass
@@ -50,30 +54,64 @@ export function listClassStartingEquipmentCandidateSpecificity(args: {
   const rulesetId = args.characterClass.rulesetId
   for (const option of availableStartingEquipmentOptions(startingEquipment.options)) {
     for (const item of option.items) {
-      if (item.kind === 'grant') {
-        if (isProficiencyLinkedStartingEquipmentGrant(item)) continue
-        const slug = startingEquipmentGrantEquipmentSlug(item)
-        if (!slug) continue
-        const equipmentId = toEquipmentContentId(rulesetId, slug)
-        if (!args.equipment.has(equipmentId)) continue
-        preferStartingEquipmentSpecificity(specificityById, equipmentId, 'exact')
-        continue
-      }
-
-      const selector = { kind: 'equipment_pool' as const, pool: item.pool }
-      const matches = expandRecommendationSelector({
-        selector,
-        equipment: args.equipment,
+      recordStartingItemCandidate(
+        specificityById,
+        args.characterClass,
+        args.equipment,
         rulesetId,
-      })
-      const specificity = specificityForSelectorExpansion(selector, matches.length)
-      for (const match of matches) {
-        preferStartingEquipmentSpecificity(specificityById, match.id, specificity)
-      }
+        item,
+      )
     }
   }
 
   return specificityById
+}
+
+function recordStartingItemCandidate(
+  specificityById: Map<string, EquipmentRecommendationSpecificity>,
+  characterClass: CharacterClass,
+  equipment: ReadonlyMap<string, Equipment>,
+  rulesetId: string,
+  item: StartingEquipmentItem,
+): void {
+  if (item.kind !== 'grant') {
+    recordPoolSpecificity(specificityById, equipment, rulesetId, {
+      kind: 'equipment_pool',
+      pool: item.pool,
+    })
+    return
+  }
+
+  if (isProficiencyLinkedStartingEquipmentGrant(item)) {
+    const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
+      (entry) => entry.id === item.target.choiceId,
+    )
+    if (!choice?.pool) return
+    recordPoolSpecificity(specificityById, equipment, rulesetId, {
+      kind: 'tool_proficiency_pool',
+      pool: choice.pool,
+    })
+    return
+  }
+
+  const slug = startingEquipmentGrantEquipmentSlug(item)
+  if (!slug) return
+  const equipmentId = toEquipmentContentId(rulesetId, slug)
+  if (!equipment.has(equipmentId)) return
+  preferStartingEquipmentSpecificity(specificityById, equipmentId, 'exact')
+}
+
+function recordPoolSpecificity(
+  specificityById: Map<string, EquipmentRecommendationSpecificity>,
+  equipment: ReadonlyMap<string, Equipment>,
+  rulesetId: string,
+  selector: EquipmentRecommendationSelector,
+): void {
+  const matches = expandRecommendationSelector({ selector, equipment, rulesetId })
+  const specificity = specificityForSelectorExpansion(selector, matches.length)
+  for (const match of matches) {
+    preferStartingEquipmentSpecificity(specificityById, match.id, specificity)
+  }
 }
 
 function preferStartingEquipmentSpecificity(
