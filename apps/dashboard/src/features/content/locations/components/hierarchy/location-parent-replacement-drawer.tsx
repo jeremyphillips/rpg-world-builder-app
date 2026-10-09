@@ -18,7 +18,7 @@ import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfa
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import {
   buildLocationEntityCardModel,
-  buildLocationPickerSearchText,
+  buildLocationEntitySummarySearchText,
 } from '../../lib/location-display'
 import {
   buildLocationParentReplacementContext,
@@ -176,16 +176,6 @@ function resolveParentReplacementCampaignId(
   return subject.campaignId ?? campaignLocations[0]?.campaignId ?? ''
 }
 
-function parentReplacementPickerSearchText(
-  summary: { id: string; name: string },
-  locationsById: ReadonlyMap<string, Location>,
-  campaignId: string,
-): string {
-  const location = locationsById.get(summary.id)
-  if (!location) return summary.name
-  return buildLocationPickerSearchText(location, { locationsById, campaignId })
-}
-
 function LocationParentReplacementDrawerContent({
   open,
   onOpenChange,
@@ -200,7 +190,7 @@ function LocationParentReplacementDrawerContent({
   const [parentBrowseScope, setParentBrowseScope] = React.useState<LocationParentBrowseScope>('all')
 
   const campaignId = resolveParentReplacementCampaignId(subject, campaignLocations)
-  const { mode, currentParent, candidates, candidateSummaries, locationsById } = React.useMemo(
+  const { mode, currentParent, candidates, candidateSummaries } = React.useMemo(
     () =>
       buildLocationParentReplacementContext({
         subject,
@@ -356,9 +346,7 @@ function LocationParentReplacementDrawerContent({
       }}
       getItemKey={(summary) => summary.id}
       getItemToolbarLabel={(summary) => summary.name}
-      getSearchText={(summary) =>
-        parentReplacementPickerSearchText(summary, locationsById, campaignId)
-      }
+      getSearchText={buildLocationEntitySummarySearchText}
       renderEntityRow={createCatalogEntityRowRenderer({
         buildSurface: (summary) => ({
           identity: buildLocationEntityCardModel(summary),

@@ -51,7 +51,7 @@ import { RelationshipDrawerSubjectField } from '../../../lib/relationship/drawer
 import {
   buildLocationEntitySummaryVm,
   buildLocationEntityContextPresentation,
-  buildLocationPickerSearchText,
+  buildLocationEntitySummarySearchText,
   type LocationEntitySummaryVm,
 } from '../../../locations/lib/location-display'
 
@@ -833,9 +833,10 @@ function OrganizationLocationConnectionLinkDrawerContent({
         }}
         getItemKey={(location) => location.id}
         getItemToolbarLabel={(location) => location.name}
-        getSearchText={(location) =>
-          buildLocationPickerSearchText(location, { locationsById, campaignId })
-        }
+        getSearchText={(location) => {
+          const summary = pickerLocationSummaries.get(location.id)
+          return summary ? buildLocationEntitySummarySearchText(summary) : location.name
+        }}
         renderEntityRow={createCatalogEntityRowRenderer({
           buildSurface: (location) => {
             const summary = pickerLocationSummaries.get(location.id)

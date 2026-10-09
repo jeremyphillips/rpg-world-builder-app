@@ -48,7 +48,7 @@ export type LocationRelationshipAddDrawerProps = {
   title: string
   locations: readonly Location[]
   /** Full catalog map so ancestry stays searchable when `locations` is a subset. */
-  locationSearchContext?: LocationConnectionPickerSearchContext
+  locationSearchContext: LocationConnectionPickerSearchContext
   roleOptions: readonly LocationRelationshipRoleOption[]
   presetRole?: LocationRelationshipRoleOption
   onAdd: (input: {
@@ -81,20 +81,9 @@ export function LocationRelationshipAddDrawer({
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
-  const searchLocationsById = locationSearchContext?.locationsById
-  const searchCampaignId = locationSearchContext?.campaignId ?? ''
-  const searchContext = React.useMemo<LocationConnectionPickerSearchContext>(() => {
-    if (searchLocationsById) {
-      return { locationsById: searchLocationsById, campaignId: searchCampaignId }
-    }
-    return {
-      locationsById: new Map(locations.map((location) => [location.id, location])),
-      campaignId: '',
-    }
-  }, [locations, searchCampaignId, searchLocationsById])
   const pickerEntries = React.useMemo(
-    () => buildLocationConnectionPickerEntries(locations, searchContext),
-    [locations, searchContext],
+    () => buildLocationConnectionPickerEntries(locations, locationSearchContext),
+    [locations, locationSearchContext],
   )
   const sortedLocations = React.useMemo(
     () => pickerEntries.map((entry) => entry.location),

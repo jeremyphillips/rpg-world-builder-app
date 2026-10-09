@@ -209,7 +209,5 @@ export function buildLocationParentReplacementContext(input: {
       locationsById,
       campaignId: input.campaignId,
     }),
-    locationsById,
-    campaignId: input.campaignId,
   }
 }
