@@ -21,6 +21,9 @@ sequenceDiagram
   else unauthenticated (401)
     A-->>D: 401
     D->>P: window.location.assign("/login")
+  else API down or 5xx
+    A-->>D: network error or 5xx
+    D-->>U: stay on the page and offer retry
   end
 ```
 
@@ -40,11 +43,12 @@ sequenceDiagram
   `data?.user` at call sites.
 - **`hooks/use-logout.ts`** — `useLogout()` mutation; on success redirects to
   `CROSS_APP_PATHS.login`.
-- **`components/auth-guard.tsx`** — layout route element. Loading → spinner
-  text; error → redirect to `/login`; success → `<Outlet />`.
+- **`components/auth-guard.tsx`** — layout route element. Loading → spinner;
+  401 → redirect to `/login`; network error or 5xx → stay on the page with
+  retry; success → `<Outlet />`.
 
 Cross-app paths (`/login`, `/app/`, etc.) are defined in `CROSS_APP_PATHS` from
-`@rpg/contracts` — import those instead of string literals.
+`@rpg/contracts/shared` — import those instead of string literals.
 
 ## Why a hard redirect (not a React Router navigation)
 

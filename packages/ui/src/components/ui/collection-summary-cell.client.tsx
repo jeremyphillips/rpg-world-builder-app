@@ -77,7 +77,7 @@ export function CollectionSummaryCell({
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <button
             type="button"
             aria-label={ariaLabel}

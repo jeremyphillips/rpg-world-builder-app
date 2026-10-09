@@ -1,9 +1,7 @@
 import type { ReactNode, RefObject } from 'react'
 
-import {
-  DetailOverflowMenu,
-  detailOverflowDeleteAction,
-} from '../../lib/detail/detail-overflow-menu'
+import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
+import { detailOverflowDeleteAction } from '../../lib/detail/detail-overflow-actions'
 import {
   joinMasterDetailItemMeta,
   type MasterDetailItemMeta,

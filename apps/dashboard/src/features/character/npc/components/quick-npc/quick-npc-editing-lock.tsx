@@ -1,12 +1,9 @@
 import * as React from 'react'
 
-type QuickNpcEditingLockContextValue = {
-  isLocked: boolean
-  requestFocus: () => void
-  register: (handlers: { requestFocus: () => void } | null) => void
-}
-
-const QuickNpcEditingLockContext = React.createContext<QuickNpcEditingLockContextValue | null>(null)
+import {
+  QuickNpcEditingLockContext,
+  type QuickNpcEditingLockContextValue,
+} from './use-quick-npc-editing-lock'
 
 export function QuickNpcEditingLockProvider({ children }: { children: React.ReactNode }) {
   const focusRef = React.useRef<(() => void) | null>(null)
@@ -21,7 +18,7 @@ export function QuickNpcEditingLockProvider({ children }: { children: React.Reac
     focusRef.current?.()
   }, [])
 
-  const value = React.useMemo(
+  const value = React.useMemo<QuickNpcEditingLockContextValue>(
     () => ({ isLocked, requestFocus, register }),
     [isLocked, register, requestFocus],
   )
@@ -31,16 +28,4 @@ export function QuickNpcEditingLockProvider({ children }: { children: React.Reac
       {children}
     </QuickNpcEditingLockContext.Provider>
   )
-}
-
-export function useQuickNpcEditingLock(): QuickNpcEditingLockContextValue {
-  const value = React.useContext(QuickNpcEditingLockContext)
-  if (!value) {
-    return {
-      isLocked: false,
-      requestFocus: () => undefined,
-      register: () => undefined,
-    }
-  }
-  return value
 }

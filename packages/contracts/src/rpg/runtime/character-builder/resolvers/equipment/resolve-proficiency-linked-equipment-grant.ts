@@ -4,6 +4,7 @@ import type { ToolProficiencyChoice } from '../../../../content/lib/grants/profi
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { findClassToolProficiencyChoice } from '../class/find-class-tool-proficiency-choice'
 import { resolveToolPoolChoiceOptions } from '../proficiency/resolve-tool-pool-choice-options'
 import type { CreatureProficiencyPoolOption } from '../../../creature/proficiencies'
 
@@ -37,9 +38,7 @@ export function resolveClassToolProficiencyChoice(
   choiceId: string,
   catalogIndex: CharacterBuildCatalogIndex,
 ): { choice: ToolProficiencyChoice; options: CreatureProficiencyPoolOption[] } | undefined {
-  const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
-    (entry) => entry.id === choiceId,
-  )
+  const choice = findClassToolProficiencyChoice(characterClass, choiceId)
   if (!choice?.pool) return undefined
 
   const options = resolveToolPoolChoiceOptions(

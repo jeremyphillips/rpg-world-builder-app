@@ -1,29 +1,46 @@
 import {
   characterWealthFromGrant,
   formatEquipmentInventoryPriceLine,
-  formatEquipmentPurchaseTotalPriceLabel,
+  formatPurchaseLinePrice,
   formatWealth,
   isStartingGoldOption,
   readSelectedStartingEquipmentOptionId,
   resolveGoldStartingEquipmentAlternative,
-  resolveMagicItemAcquisitionState,
+  resolveStartingEquipmentResolution,
   type CharacterBuildCatalogIndex,
   type CharacterBuildContext,
   type CharacterBuilderDraft,
   type CharacterEquipment,
   type CharacterWealthGrant,
   type ClassOptionPolicy,
+  type Equipment,
   type EquipmentBudgetSummary,
   type EquipmentSourceAllocation,
 } from '@rpg/contracts'
 
+import type { EntitySummaryStatusItem } from '@/features/content'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
+  EMPTY_SELECTION_ROW_PRESENTATION,
+  type SelectionRowPresentation,
+} from '../selection-row-status'
+import {
+  withEquipmentSelectionPresentation,
+  type EquipmentSelectionFacts,
+} from './equipment-selection-facts.lib'
+import { formatMagicItemChoiceLabelFromSourceLabel } from './magic-item-choice-label.lib'
+import {
+  buildEquipmentPickerOwnershipIndex,
+  getEquipmentOwnership,
+  type EquipmentPickerOwnershipIndex,
+} from './equipment-ownership-index.lib'
+import {
   EQUIPMENT_CLASS_OPTIONS_REPLACED_MESSAGE,
-  EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-  formatEquipmentGoldOptionStartingDescription,
+  EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL,
+  EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL,
+  EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL,
+  formatEquipmentInventorySourceQuantity,
   listEquipmentInventoryRowsFromDraft,
-  shouldShowMagicItemGrants,
   type EquipmentInventoryRow,
   type PackageCustomizeAffordance,
   type StartingPackageCategoryGroup,
@@ -182,10 +199,20 @@ export function equipmentInventoryDisplayItemKey(item: EquipmentInventoryDisplay
   return `${item.group}-${item.equipmentId}-combined-${item.rows.map((row) => equipmentInventoryRowKey(row)).join('|')}`
 }
 
+type PurchasedInventoryItem = {
+  display: EquipmentInventoryDisplayItem
+  status: readonly EntitySummaryStatusItem[]
+}
+
 export type PurchasedCategoryGroup = {
   group: keyof CharacterEquipment
   groupLabel: string
-  displays: EquipmentInventoryDisplayItem[]
+  items: PurchasedInventoryItem[]
+}
+
+export type AddedEquipmentOtherSource = {
+  kind: 'package' | 'grant'
+  quantity: number
 }
 
 export type AddedEquipmentEntryViewModel = {
@@ -194,9 +221,13 @@ export type AddedEquipmentEntryViewModel = {
   group: keyof CharacterEquipment
   groupLabel: string
   totalQuantity: number
+  /** Package and generic-grant quantities that sit outside the Added stepper. */
+  otherSources: AddedEquipmentOtherSource[]
+  otherSourceQuantity: number
   sources: EquipmentSourceAllocation[]
   provenanceLabel: string
   rows: EquipmentInventoryRow[]
+  selectionPresentation: SelectionRowPresentation
 }
 
 export type AddedEquipmentCategoryGroup = {
@@ -205,12 +236,18 @@ export type AddedEquipmentCategoryGroup = {
   entries: AddedEquipmentEntryViewModel[]
 }
 
-export type EquipmentInventoryViewModel = {
-  startingEquipment:
-    | { kind: 'package'; group: StartingPackageInventoryGroup }
-    | { kind: 'gold_option'; message: string; description: string }
-  addedEquipment: AddedEquipmentCategoryGroup[]
-}
+export type EquipmentInventoryStartingChannel =
+  | { kind: 'package'; group: StartingPackageInventoryGroup }
+  | { kind: 'gold_option'; optionLabel: string }
+
+export type EquipmentInventoryViewModel =
+  | {
+      layout: 'split'
+      startingEquipment: EquipmentInventoryStartingChannel
+      addedEquipment: AddedEquipmentCategoryGroup[]
+    }
+  /** Retained purchases with no starting option selected: Added Equipment only. */
+  | { layout: 'pending'; addedEquipment: AddedEquipmentCategoryGroup[] }
 
 function magicItemGrantSourceAllocation(
   row: EquipmentInventoryRow,
@@ -247,26 +284,83 @@ function rowToSourceAllocation(row: EquipmentInventoryRow): EquipmentSourceAlloc
 }
 
 function formatGrantProvenancePart(label: string, quantity: number): string {
-  const normalized = label.replace(/\s+choice$/i, '')
-  return `${quantity} ${normalized} choice${quantity === 1 ? '' : 's'}`
+  return formatMagicItemChoiceLabelFromSourceLabel(label, quantity)
+}
+
+function purchaseRowUsesStepper(rows: readonly EquipmentInventoryRow[]): boolean {
+  return rows.some(
+    (row) =>
+      row.removeTarget?.kind === 'purchase' &&
+      row.quantityMode === 'editable' &&
+      row.quantityTarget !== undefined,
+  )
+}
+
+function formatPendingPurchaseProvenancePart(
+  equipment: Equipment | undefined,
+  quantity: number,
+): string {
+  if (!equipment) return EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
+  const totalLabel = formatPurchaseLinePrice(equipment, quantity)
+  return totalLabel
+    ? joinInlineMetadata([EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL, totalLabel])
+    : EQUIPMENT_PENDING_PURCHASE_SOURCE_LABEL
+}
+
+function formatPricedPurchaseProvenancePart(args: {
+  rows: readonly EquipmentInventoryRow[]
+  equipment: Equipment
+  quantity: number
+  showPurchaseQuantity: boolean
+}): string {
+  const { rows, equipment, quantity, showPurchaseQuantity } = args
+  const totalLabel = formatPurchaseLinePrice(equipment, quantity)
+  if (showPurchaseQuantity && quantity > 1) {
+    return joinInlineMetadata([`Purchased ×${quantity}`, totalLabel])
+  }
+  if (purchaseRowUsesStepper(rows) || quantity === 1) {
+    return joinInlineMetadata(['Purchased', totalLabel])
+  }
+  return `${quantity} purchased for ${totalLabel}`
 }
 
 function formatPurchaseProvenancePart(
   rows: readonly EquipmentInventoryRow[],
   quantity: number,
+  pending: boolean,
+  /** Magic-item rows state purchase count in the line instead of a separate Qty chip. */
+  showPurchaseQuantity: boolean,
 ): string {
   const equipment = rows.find((row) => row.equipment)?.equipment
+  if (pending) return formatPendingPurchaseProvenancePart(equipment, quantity)
   if (!equipment || quantity <= 0) {
     return quantity === 1 ? '1 purchased' : `${quantity} purchased`
   }
 
-  const totalLabel = formatEquipmentPurchaseTotalPriceLabel(equipment, quantity)
-  return quantity === 1 ? joinInlineMetadata(['Purchased', totalLabel]) : `${quantity} purchased for ${totalLabel}`
+  return formatPricedPurchaseProvenancePart({
+    rows,
+    equipment,
+    quantity,
+    showPurchaseQuantity,
+  })
+}
+
+function otherSourceProvenanceParts(otherSources: readonly AddedEquipmentOtherSource[]): string[] {
+  return otherSources.flatMap((source) => {
+    if (source.quantity <= 0) return []
+    const label =
+      source.kind === 'package'
+        ? EQUIPMENT_INVENTORY_PACKAGE_SOURCE_LABEL
+        : EQUIPMENT_INVENTORY_GRANT_SOURCE_LABEL
+    return [formatEquipmentInventorySourceQuantity(label, source.quantity)]
+  })
 }
 
 /** Formats aggregated added-equipment provenance for inventory subtitles. */
 export function formatAddedEquipmentProvenanceLabel(
   rows: readonly EquipmentInventoryRow[],
+  pending = false,
+  otherSources: readonly AddedEquipmentOtherSource[] = [],
 ): string {
   const grantTotals = new Map<string, number>()
   const purchaseRows: EquipmentInventoryRow[] = []
@@ -284,21 +378,48 @@ export function formatAddedEquipmentProvenanceLabel(
     }
   }
 
-  const parts: string[] = []
+  const parts = otherSourceProvenanceParts(otherSources)
 
   for (const [label, quantity] of grantTotals) {
     parts.push(formatGrantProvenancePart(label, quantity))
   }
 
   if (purchaseQuantity > 0) {
-    parts.push(formatPurchaseProvenancePart(purchaseRows, purchaseQuantity))
+    parts.push(
+      formatPurchaseProvenancePart(purchaseRows, purchaseQuantity, pending, grantTotals.size > 0),
+    )
   }
 
   return joinInlineMetadata(parts)
 }
 
+type AggregateAddedEquipmentOptions = {
+  pending?: boolean
+  /** Ownership contributions for the draft. Absent on the gold path, which has no package. */
+  ownership?: EquipmentPickerOwnershipIndex
+}
+
+/** Quantities owned outside the Added stepper, read straight from the contributions. */
+function otherSourcesForEquipment(
+  equipmentId: string,
+  options: AggregateAddedEquipmentOptions,
+): AddedEquipmentOtherSource[] {
+  if (!options.ownership) return []
+
+  const ownership = getEquipmentOwnership(options.ownership, equipmentId)
+  const sources: AddedEquipmentOtherSource[] = []
+  if (ownership.packageQuantity > 0) {
+    sources.push({ kind: 'package', quantity: ownership.packageQuantity })
+  }
+  if (ownership.grantQuantity > 0) {
+    sources.push({ kind: 'grant', quantity: ownership.grantQuantity })
+  }
+  return sources
+}
+
 function aggregateAddedEquipmentRows(
   rows: readonly EquipmentInventoryRow[],
+  options: AggregateAddedEquipmentOptions = {},
 ): AddedEquipmentEntryViewModel[] {
   const byEquipmentId = new Map<string, EquipmentInventoryRow[]>()
   const order: string[] = []
@@ -318,6 +439,7 @@ function aggregateAddedEquipmentRows(
     if (!first) return []
 
     const totalQuantity = entryRows.reduce((sum, row) => sum + row.entry.quantity, 0)
+    const otherSources = otherSourcesForEquipment(equipmentId, options)
     const sources = entryRows.flatMap((row) => {
       const allocation = rowToSourceAllocation(row)
       return allocation ? [allocation] : []
@@ -330,9 +452,16 @@ function aggregateAddedEquipmentRows(
         group: first.group,
         groupLabel: first.groupLabel,
         totalQuantity,
+        otherSources,
+        otherSourceQuantity: otherSources.reduce((sum, source) => sum + source.quantity, 0),
         sources,
-        provenanceLabel: formatAddedEquipmentProvenanceLabel(entryRows),
+        provenanceLabel: formatAddedEquipmentProvenanceLabel(
+          entryRows,
+          options.pending ?? false,
+          otherSources,
+        ),
         rows: entryRows,
+        selectionPresentation: first.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
       },
     ]
   })
@@ -419,6 +548,85 @@ function buildStartingPackageGroup(args: {
   }
 }
 
+function buildGoldOptionChannel(optionLabel: string): EquipmentInventoryStartingChannel {
+  return {
+    kind: 'gold_option',
+    optionLabel,
+  }
+}
+
+function resolveSelectedStartingOption(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+):
+  | {
+      selectedOptionId: string
+      option: ClassStartingEquipmentOption
+      startingEquipment: ClassStartingEquipment
+    }
+  | undefined {
+  const classId = draft.class.classId
+  if (!classId) return undefined
+  const startingEquipment = catalogIndex.classes.get(classId)?.characterCreation?.startingEquipment
+  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
+  const option = startingEquipment?.options.find((entry) => entry.id === selectedOptionId)
+  if (!startingEquipment || !selectedOptionId || !option) return undefined
+  return { selectedOptionId, option, startingEquipment }
+}
+
+function listBuilderInventoryRows(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  context?: CharacterBuildContext
+  selectionFacts?: EquipmentSelectionFacts
+}): EquipmentInventoryRow[] {
+  const rows = listEquipmentInventoryRowsFromDraft(
+    args.draft,
+    args.catalogIndex,
+    args.budget,
+    args.context,
+  )
+  return args.selectionFacts ? withEquipmentSelectionPresentation(rows, args.selectionFacts) : rows
+}
+
+function buildSplitInventoryViewModel(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  classOptionPolicy: ClassOptionPolicy
+  context?: CharacterBuildContext
+  selectionFacts?: EquipmentSelectionFacts
+}): EquipmentInventoryViewModel | undefined {
+  const { draft, catalogIndex, budget, classOptionPolicy, context, selectionFacts } = args
+  const selected = resolveSelectedStartingOption(draft, catalogIndex)
+  if (!selected) return undefined
+
+  const allRows = listBuilderInventoryRows({ draft, catalogIndex, budget, context, selectionFacts })
+  const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
+  const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
+
+  const goldOption = isStartingGoldOption(selected.option)
+  const startingEquipment: EquipmentInventoryStartingChannel = goldOption
+    ? buildGoldOptionChannel(selected.option.label)
+    : {
+        kind: 'package',
+        group: buildStartingPackageGroup({ ...selected, packageRows, classOptionPolicy }),
+      }
+
+  return {
+    layout: 'split',
+    startingEquipment,
+    addedEquipment: groupAddedEquipmentByCategory(
+      aggregateAddedEquipmentRows(addedRows, {
+        ...(goldOption
+          ? {}
+          : { ownership: buildEquipmentPickerOwnershipIndex({ draft, catalogIndex }) }),
+      }),
+    ),
+  }
+}
+
 /** Builds stable two-channel inventory view model for the equipment step. */
 export function buildEquipmentInventoryViewModel(
   draft: CharacterBuilderDraft,
@@ -426,47 +634,35 @@ export function buildEquipmentInventoryViewModel(
   budget?: EquipmentBudgetSummary,
   classOptionPolicy: ClassOptionPolicy = 'included',
   context?: CharacterBuildContext,
+  selectionFacts?: EquipmentSelectionFacts,
 ): EquipmentInventoryViewModel | undefined {
-  const classId = draft.class.classId
-  if (!classId) return undefined
-
-  const characterClass = catalogIndex.classes.get(classId)
-  const startingEquipment = characterClass?.characterCreation?.startingEquipment
-  const selectedOptionId = readSelectedStartingEquipmentOptionId(draft, classId)
-  if (!characterClass || !startingEquipment || !selectedOptionId) return undefined
-
-  const option = startingEquipment.options.find((entry) => entry.id === selectedOptionId)
-  if (!option) return undefined
-
-  const allRows = listEquipmentInventoryRowsFromDraft(draft, catalogIndex, budget, context)
-  const packageRows = allRows.filter((row) => row.removeTarget?.kind === 'package')
-  const addedRows = allRows.filter((row) => row.removeTarget?.kind !== 'package')
-
-  const startingEquipmentChannel = isStartingGoldOption(option)
-    ? {
-        kind: 'gold_option' as const,
-        message: EQUIPMENT_GOLD_OPTION_STARTING_MESSAGE,
-        description: formatEquipmentGoldOptionStartingDescription(
-          context
-            ? shouldShowMagicItemGrants(
-                resolveMagicItemAcquisitionState({ draft, context, catalogIndex }),
-              )
-            : false,
+  switch (resolveStartingEquipmentResolution(draft, catalogIndex)) {
+    case 'notApplicable':
+    case 'unresolvedEmpty':
+      return undefined
+    case 'unresolvedWithPurchases': {
+      const rows = listBuilderInventoryRows({
+        draft,
+        catalogIndex,
+        budget,
+        context,
+        selectionFacts,
+      })
+      return {
+        layout: 'pending',
+        addedEquipment: groupAddedEquipmentByCategory(
+          aggregateAddedEquipmentRows(rows, { pending: true }),
         ),
       }
-    : {
-        kind: 'package' as const,
-        group: buildStartingPackageGroup({
-          selectedOptionId,
-          option,
-          packageRows,
-          classOptionPolicy,
-          startingEquipment,
-        }),
-      }
-
-  return {
-    startingEquipment: startingEquipmentChannel,
-    addedEquipment: groupAddedEquipmentByCategory(aggregateAddedEquipmentRows(addedRows)),
+    }
+    case 'selected':
+      return buildSplitInventoryViewModel({
+        draft,
+        catalogIndex,
+        budget,
+        classOptionPolicy,
+        context,
+        selectionFacts,
+      })
   }
 }

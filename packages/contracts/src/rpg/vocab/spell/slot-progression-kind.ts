@@ -48,3 +48,7 @@ export function getSlotProgressionKindEntry(id: string): GameTermEntry | undefin
   if (!isSlotProgressionKindId(id)) return undefined
   return SLOT_PROGRESSION_KIND_ENTRIES[id]
 }
+
+export function getSlotProgressionKindLabel(id: string): string {
+  return getSlotProgressionKindEntry(id)?.label ?? id
+}

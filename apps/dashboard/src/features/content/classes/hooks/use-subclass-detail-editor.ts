@@ -4,7 +4,7 @@ import { makeResolver } from '@rpg/ui/form'
 import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contracts'
 import { DEFAULT_CONTENT_CAMPAIGN_ACCESS } from '@rpg/contracts'
 
-import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-state'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   buildSubclassFields,

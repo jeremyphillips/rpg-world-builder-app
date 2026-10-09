@@ -26,7 +26,7 @@ import {
   type RadioCardVisualControl,
 } from './radio-card.variants'
 
-export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel'
+export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel' | 'plain'
 
 export type RadioOptionCardSummaryBadge = {
   label: string
@@ -40,6 +40,7 @@ export type RadioOptionCardProps = React.ComponentPropsWithoutRef<
   description?: string
   summaryItems?: string[]
   summaryLines?: string[]
+  summaryContent?: React.ReactNode
   density?: SelectionOptionCardDensity
   variant?: RadioCardVariant
   /** Merged onto the option title label. */
@@ -114,6 +115,7 @@ export const RadioOptionCard = React.forwardRef<
       description,
       summaryItems,
       summaryLines,
+      summaryContent,
       density = 'default',
       variant = 'card',
       titleClassName,
@@ -157,6 +159,7 @@ export const RadioOptionCard = React.forwardRef<
       description,
       summaryItems,
       summaryLines,
+      summaryContent,
       titleClassName,
       summaryBadgeNode,
       reserveSummaryBadgeRow,
@@ -190,6 +193,7 @@ export const RadioOptionCard = React.forwardRef<
             description={description}
             summaryItems={summaryItems}
             summaryLines={summaryLines}
+            summaryContent={summaryContent}
             titleClassName={titleClassName}
             controlPosition={effectiveControlPosition}
             summaryBadge={summaryBadgeNode}
@@ -240,7 +244,7 @@ export function RadioOptionCardDetailsAction({
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <Button
             type="button"
             variant="text"

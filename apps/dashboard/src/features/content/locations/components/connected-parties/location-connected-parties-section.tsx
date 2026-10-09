@@ -18,48 +18,9 @@ import {
   resolveLocationConnectedPartiesSectionHeadingId,
   usesFieldGroupHeader,
 } from '../../lib/connected-parties/location-connected-parties-section-layout'
+import type { LocationConnectedPartyEditTarget } from './location-connected-party-edit-target'
 
-export { buildPeopleKindSlots } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'
 export type { PeopleKindSlot } from '../../lib/connected-parties/location-connected-parties-people-kind-slots'
-
-export {
-  LOCATION_CONNECTED_PARTIES_EMPTY_TEXT,
-  LOCATION_CONNECTED_PARTIES_SECTION_HELPERS,
-  LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
-} from '../../lib/connected-parties/location-connected-parties-section-copy'
-
-export type LocationConnectedPartyEditTarget =
-  | {
-      relationshipId: string
-      subjectType: 'organization'
-      subjectId: string
-      kind: OrganizationLocationConnectionKind
-    }
-  | {
-      relationshipId: string
-      subjectType: 'character'
-      subjectId: string
-      kind: CharacterLocationConnectionKind
-    }
-
-/** Builds the typed edit target for a connected-party row, preserving the subject branch. */
-export function toLocationConnectedPartyEditTarget(
-  row: LocationConnectedPartyRow,
-): LocationConnectedPartyEditTarget {
-  return row.subjectType === 'organization'
-    ? {
-        relationshipId: row.relationshipId,
-        subjectType: 'organization',
-        subjectId: row.subject.id,
-        kind: row.kind,
-      }
-    : {
-        relationshipId: row.relationshipId,
-        subjectType: 'character',
-        subjectId: row.subject.id,
-        kind: row.kind,
-      }
-}
 
 export type LocationConnectedPartiesSectionProps = {
   campaignId: string

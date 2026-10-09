@@ -1,11 +1,15 @@
 import type { StartingWealthTier } from '../../../../campaign/rules/starting-wealth'
-import type { MagicItemAllowance } from '../../equipment/magic-item-selection'
-import { buildMagicItemAllowanceId } from '../../equipment/magic-item-selection'
+import {
+  buildMagicItemAllowanceId,
+  type MagicItemAllowance,
+  type MagicItemAllowanceRequirement,
+} from '../../equipment/magic-item-selection'
 
 /** Resolves tier magic-item grants into globally stable allowance rows. */
 export function resolveMagicItemGrantAllowances(args: {
   startingWealthTableId: string
   tier: StartingWealthTier
+  requirement: MagicItemAllowanceRequirement
 }): MagicItemAllowance[] {
   const { startingWealthTableId, tier } = args
 
@@ -22,6 +26,6 @@ export function resolveMagicItemGrantAllowances(args: {
     },
     rarity: grant.rarity,
     count: grant.quantity,
-    requirement: 'exact',
+    requirement: args.requirement,
   }))
 }

@@ -1,4 +1,5 @@
 import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
+import { getSpellCollectionKindSentenceForm } from '../../vocab/spell/spell-collection-kind'
 import { getLanguageProficiencySentenceForm } from '../../vocab/language'
 import { getProficiencyDomainSentenceForm } from '../../vocab/proficiency'
 import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
@@ -18,9 +19,9 @@ export function formatChoiceSetDrawerHeading(choiceType: ChoiceSet['choiceType']
     case 'language':
       return `Choose ${getLanguageProficiencySentenceForm(1)}`
     case 'cantrip':
-      return 'Choose cantrip'
+      return `Choose ${getSpellCollectionKindSentenceForm('cantrips', 1)}`
     case 'spell':
-      return 'Choose spell'
+      return `Choose ${getContentTypeSentenceForm('spells', 2)}`
     case 'equipment':
       return `Choose ${getContentTypeSentenceForm('equipment', 1)}`
     case 'feat':

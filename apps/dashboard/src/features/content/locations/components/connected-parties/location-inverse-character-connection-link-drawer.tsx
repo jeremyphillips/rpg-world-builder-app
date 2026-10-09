@@ -8,7 +8,13 @@ import type {
 import { resolveLocationConnectionEligibility } from '@rpg/contracts'
 import { Button, Text } from '@rpg/ui'
 
-import { buildCharacterEntityCardModel } from '@/features/character'
+import {
+  CatalogToolbarResetSlot,
+  resolveCatalogPickerResultSummary,
+  buildCharacterEntityCardModel,
+  formatContentReferenceLabel,
+  hasCatalogPickerResetViewCriteria,
+} from '@/features/character'
 
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import {
@@ -17,7 +23,15 @@ import {
   LOCATION_INVERSE_CHARACTER_CHANGE_KIND_TITLE,
   characterInverseSubjectHasAvailableKind,
 } from '../../../lib/relationship/location-connection/location-connection-drawer-intent'
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCharacterRelationshipFilterSchema,
+  createCatalogEntityRowRenderer,
+  relationshipCatalogFilterHasBand,
+  resolveCharacterRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
@@ -60,6 +74,7 @@ export type LocationInverseCharacterConnectionLinkDrawerProps = {
   locationsById: ReadonlyMap<string, Location>
   campaignId: string
   characters: readonly LocationConnectedPartyCharacterOption[]
+  resolveClassLabel?: (classId: string) => string
   connectedPartyRows: readonly LocationConnectedPartyRow[]
   initialConnection?: {
     relationshipId: string
@@ -90,6 +105,7 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   locationsById,
   campaignId,
   characters,
+  resolveClassLabel = formatContentReferenceLabel,
   connectedPartyRows,
   initialConnection,
   isSubmitting = false,
@@ -102,6 +118,35 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
   )
   const [selectedKind, setSelectedKind] = React.useState<CharacterLocationConnectionKind | null>(
     resolvedAddKind ?? initialConnection?.kind ?? null,
+  )
+
+  const characterFilterSchema = React.useMemo(
+    () =>
+      createCharacterRelationshipFilterSchema({
+        rows: characters,
+        getCharacterType: (character) => character.characterType,
+        getClassIds: (character) => character.classIds,
+        resolveClassLabel,
+      }),
+    [characters, resolveClassLabel],
+  )
+  const characterFilterLayout = React.useMemo(
+    () => resolveCharacterRelationshipFilterLayout(characterFilterSchema),
+    [characterFilterSchema],
+  )
+  const characterFilters = useRelationshipCatalogFilters({
+    rows: characters,
+    schema: characterFilterSchema,
+  })
+  const showTypeFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showClassFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    characterFilterSchema,
+    characterFilterLayout,
   )
 
   const characterRows = React.useMemo(
@@ -269,7 +314,59 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
           </Button>
         ) : undefined
       }
-      items={showCharacterPicker ? characters : []}
+      items={showCharacterPicker ? characterFilters.filteredRows : []}
+      hasStructuredFilters={characterFilters.structuredFilterCount > 0}
+      primaryControls={
+        showTypeFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={characterFilterSchema}
+            layout={characterFilterLayout}
+            state={characterFilters.state}
+            data={characters}
+            idPrefix="location-inverse-character"
+            onValueChange={characterFilters.setValue}
+          />
+        ) : undefined
+      }
+      filterRow={
+        showClassFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={characterFilterSchema}
+                  layout={characterFilterLayout}
+                  state={characterFilters.state}
+                  data={characters}
+                  idPrefix="location-inverse-character"
+                  onValueChange={characterFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: characterFilters.structuredFilterCount,
+          searchQuery,
+        })
+        return (
+          <CatalogToolbarResetSlot
+            visible={showReset}
+            reserve={showClassFilter}
+            includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: characterFilters.sourceCount,
+            })}
+            onClick={() => {
+              characterFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={buildConnectedPartyCharacterPickerSearchText}

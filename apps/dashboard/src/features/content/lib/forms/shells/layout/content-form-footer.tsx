@@ -7,11 +7,11 @@ import { FormFooterActions, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import {
   FormUnsavedChangesGuard,
-  useUnsavedChangesConfirm,
   type UnsavedChangesConfirmController,
 } from '@/lib/form-unsaved-changes-guard'
+import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
-import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/subclass-unsaved-edits-context'
+import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/use-subclass-unsaved-edits'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
 import { useContentFormActionState } from './use-content-form-action-state'

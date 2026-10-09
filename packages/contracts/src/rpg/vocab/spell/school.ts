@@ -10,6 +10,7 @@ import { vocabularyOptionIdSchema, type VocabularyOptionSetId } from '../vocabul
 
 export const SPELL_SCHOOL_TERM = {
   label: 'School of Magic',
+  compactLabel: 'School',
   description: 'The magical tradition a spell belongs to.',
   sentence: {
     singular: 'school of magic',

@@ -25,6 +25,18 @@ describe('EmphasisDetailLine', () => {
     expect(screen.queryByText('·')).not.toBeInTheDocument()
   })
 
+  it('applies warning tone to primary when primaryTone is warning', () => {
+    render(
+      <EmphasisDetailLine
+        primary="75 GP needed"
+        primaryTone="warning"
+        secondary="40 GP remaining"
+      />,
+    )
+
+    expect(screen.getByText('75 GP needed')).toHaveClass('text-warning')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EmphasisDetailLine

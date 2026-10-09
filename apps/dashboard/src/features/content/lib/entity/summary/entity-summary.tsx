@@ -3,16 +3,23 @@ import {
   ContentCardHeading,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
+  InlineMetadata,
   type ContentCardDensity,
   type IdentityRowSize,
 } from '@rpg/ui'
 
 import type { EntitySummaryModel } from './entity-summary.types'
-import type { EntitySummaryStatusItem } from './entity-summary-status.types'
+import type {
+  EntitySummaryStatusComposition,
+  EntitySummaryStatusItem,
+} from './entity-summary-status.types'
 import { EntitySummaryStatusItemView } from './entity-summary-status'
+import { EntitySummaryProvenanceItemView } from './entity-summary-provenance'
+import type { EntitySummaryProvenanceItem } from './entity-summary-provenance.types'
 import {
   entitySummaryHeadingEndValueVariants,
   entitySummaryHeadingRowVariants,
+  entitySummaryStatusMetadataVariants,
   entitySummaryStatusRowVariants,
 } from './entity-summary.variants'
 
@@ -58,18 +65,55 @@ export function EntitySummaryDescription({
   density: ContentCardDensity
 }) {
   return (
-    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>{children}</IdentityRowSupporting>
+    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>
+      {children}
+    </IdentityRowSupporting>
   )
 }
 
-/** Status lane — placed in the host status cell; the cell owns the top offset. */
+/**
+ * Status lane — placed in the host status cell; the cell owns the top offset.
+ * `provenance` is a separate group rendered ahead of status on the same line.
+ */
 export function EntitySummaryStatus({
   items,
+  provenance,
   density,
+  composition = 'cluster',
 }: {
   items: readonly EntitySummaryStatusItem[]
+  provenance?: readonly EntitySummaryProvenanceItem[]
   density: ContentCardDensity
+  composition?: EntitySummaryStatusComposition
 }) {
+  const provenanceItems = provenance ?? []
+
+  if (composition === 'metadata' || provenanceItems.length > 0) {
+    return (
+      <InlineMetadata
+        role="supporting"
+        density={density}
+        wrap
+        className={entitySummaryStatusMetadataVariants({ density })}
+      >
+        {provenanceItems.map((item, index) => (
+          <InlineMetadata.Item key={`provenance-${index}`}>
+            <span data-entity-summary-provenance>
+              <EntitySummaryProvenanceItemView item={item} density={density} />
+            </span>
+          </InlineMetadata.Item>
+        ))}
+        {items.map((status, index) => (
+          <InlineMetadata.Item key={`status-${index}`}>
+            <span data-entity-summary-status>
+              <EntitySummaryStatusItemView item={status} density={density} layout="inline" />
+            </span>
+          </InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
+    )
+  }
+
   return (
     <div className={entitySummaryStatusRowVariants()} data-entity-summary-status-row>
       {items.map((status, index) => (

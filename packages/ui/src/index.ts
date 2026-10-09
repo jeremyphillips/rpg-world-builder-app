@@ -218,12 +218,28 @@ export {
   ChoiceSelectionCounter,
   type ChoiceSelectionCounterProps,
 } from './components/ui/choice-selection-counter.client'
+export {
+  MetadataList,
+  type MetadataListItem,
+  type MetadataListProps,
+} from './components/ui/metadata-list'
+export { type MetadataListSize } from './components/ui/metadata-list.variants'
 export { ActionIcon, type ActionIconProps } from './components/ui/action-icon.client'
+export {
+  inlineIconFlexSlotClasses,
+  inlineIconTextClasses,
+} from './components/ui/icon-glyph.variants'
 export {
   ACTION_ICONS,
   ACTION_ICON_VERBS,
   type ActionIconVerb,
 } from './components/ui/action-icons.map'
+export {
+  RESOURCE_ICONS,
+  RESOURCE_ICON_ROLES,
+  resourceIcon,
+  type ResourceIconRole,
+} from './components/ui/resource-icons.map'
 export { type AppIcon } from './components/ui/app-icon.types'
 export { buttonVariants } from './components/ui/button.variants'
 export { Link, type LinkProps } from './components/ui/link'
@@ -272,6 +288,7 @@ export {
 export {
   NumberStepper,
   type NumberStepperDigits,
+  type NumberStepperMinAction,
   type NumberStepperProps,
 } from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
@@ -768,17 +785,24 @@ export {
 } from './components/ui/content-display-fallback-icon.variants'
 export {
   contentCardRootVariants,
+  contentCardBodyVariants,
   contentCardDensityInsetVariants,
   contentCardHeadingLinkVariants,
+  contentCardHeadingRowVariants,
+  contentCardMediaEndGapVariants,
   contentCardMediaVariants,
+  contentCardMetadataVariants,
+  contentCardSubheadingVariants,
   contentCardIdentityColumnGapVariants,
   supportingTextDensityVariants,
+  resolveContentCardBodyCrossAxis,
   resolveContentCardDensityInsetClasses,
   resolveContentCardIdentityColumnGapClasses,
   type ContentCardDensity,
   type ContentCardChrome,
   type ContentCardSurface,
 } from './components/ui/content-card.variants'
+export { resolveContentCardHeadingRowRhythm } from './components/ui/content-card.lib'
 export {
   NotificationBell,
   type NotificationBellProps,
@@ -837,6 +861,7 @@ export {
   TooltipProvider,
   InfoTooltip,
   type InfoTooltipProps,
+  type TooltipTriggerProps,
 } from './components/ui/tooltip.client'
 
 export {
@@ -1048,6 +1073,7 @@ export {
 export {
   CatalogPickerSheet,
   type CatalogPickerSheetProps,
+  type CatalogPickerSearchStrategy,
   type CatalogPickerSheetActionsHelpers,
   type CatalogPickerTab,
   type CatalogPickerRowLayout,
@@ -1059,17 +1085,27 @@ export {
   type CatalogToolbarTabs,
 } from './components/ui/catalog-picker-sheet.client'
 export {
+  CATALOG_PICKER_ROW_ACTION_ICONS,
   CatalogPickerActionButton,
   type CatalogPickerActionButtonProps,
+  type CatalogPickerRowActionIntent,
 } from './components/ui/catalog-picker-action-button.client'
 export {
+  CATALOG_PICKER_ADD_LABEL,
+  CATALOG_PICKER_REMOVE_LABEL,
   CatalogPickerSelectionActions,
   type CatalogPickerSelectionActionsProps,
 } from './components/ui/catalog-picker-selection-actions.client'
 export {
   resolveCatalogPickerRowActionPhase,
+  resolvePickerActionFailureStatus,
   type CatalogPickerRowActionPhase,
 } from './components/ui/catalog-picker-row-action.lib'
+export {
+  CatalogPickerRowAction,
+  type CatalogPickerRowActionProps,
+  type CatalogPickerRowActionTooltip,
+} from './components/ui/catalog-picker-row-action.client'
 export { CatalogToolbar } from './components/ui/catalog-toolbar.client'
 export {
   CatalogFilterChips,

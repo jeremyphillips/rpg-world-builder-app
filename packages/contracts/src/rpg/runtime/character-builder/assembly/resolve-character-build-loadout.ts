@@ -8,6 +8,7 @@ import {
   type CharacterBuildContext,
 } from '../context'
 import type { CharacterBuilderDraft } from '../draft/draft'
+import { resolveMagicItemGrantRequirement } from '../character-kind-policy'
 import {
   isBuilderLevelZeroClassless,
   isClassProgressionApplicable,
@@ -96,6 +97,7 @@ export function resolveCharacterBuildLoadout(
     : assembleStartingEquipment(effectiveDraft, catalogIndex, {
         startingWealth: context.characterCreationRules.startingWealth,
         rulesetId: context.rulesetId,
+        magicItemRequirement: resolveMagicItemGrantRequirement(context.characterKind),
       })
 
   return {

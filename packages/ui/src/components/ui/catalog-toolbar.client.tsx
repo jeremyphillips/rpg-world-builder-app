@@ -15,14 +15,14 @@ import type {
 import { cn } from '../../lib/utils'
 import { resolveCatalogToolbarLayout } from './catalog-toolbar.lib'
 import {
-  catalogToolbarFilterActionsVariants,
-  catalogToolbarFilterControlsVariants,
-  catalogToolbarFilterRowVariants,
   catalogToolbarSearchIconVariants,
   catalogToolbarSearchRowVariants,
   catalogToolbarStandaloneActionsVariants,
   catalogToolbarTabRowVariants,
+  catalogToolbarUtilityBandVariants,
+  catalogToolbarUtilityContentVariants,
   catalogToolbarVariants,
+  catalogToolbarViewControlsVariants,
 } from './catalog-toolbar.variants'
 import { FILTER_DENSITY_DEFAULT } from '../../filters/filter-bar.variants'
 import { FilterChromeProvider, useOptionalFilterChrome } from '../../filters/filter-chrome.context'
@@ -101,24 +101,35 @@ function CatalogToolbarSearchField({
   )
 }
 
-function CatalogToolbarFilterRow({
+function CatalogToolbarUtilityBand({
   filterRow,
   trailingActions,
 }: {
   filterRow: NonNullable<CatalogToolbarProps['filterRow']>
   trailingActions?: ReactNode
 }) {
+  const viewControls =
+    filterRow.actions || trailingActions ? (
+      <div
+        className={catalogToolbarViewControlsVariants()}
+        data-slot="catalog-toolbar-view-controls"
+      >
+        {filterRow.actions}
+        {trailingActions}
+      </div>
+    ) : null
+
   return (
-    <div className={catalogToolbarFilterRowVariants()}>
+    <div className={catalogToolbarUtilityBandVariants()} data-slot="catalog-toolbar-utility">
       {filterRow.controls ? (
-        <div className={catalogToolbarFilterControlsVariants()}>{filterRow.controls}</div>
-      ) : null}
-      {filterRow.actions || trailingActions ? (
-        <div className={catalogToolbarFilterActionsVariants()}>
-          {filterRow.actions}
-          {trailingActions}
+        <div
+          className={catalogToolbarUtilityContentVariants()}
+          data-slot="catalog-toolbar-utility-content"
+        >
+          {filterRow.controls}
         </div>
       ) : null}
+      {viewControls}
     </div>
   )
 }
@@ -149,9 +160,9 @@ function CatalogToolbarLayoutContent({
       {layout.tabsBeforeSearch ? tabRow : null}
       {search ? <CatalogToolbarSearchField search={search} controlSize={controlSize} /> : null}
       {layout.tabsAfterSearch ? tabRow : null}
-      {primaryControls ? <div>{primaryControls}</div> : null}
+      {primaryControls ? <div data-slot="catalog-toolbar-primary">{primaryControls}</div> : null}
       {layout.showFilterRow && filterRow ? (
-        <CatalogToolbarFilterRow filterRow={filterRow} trailingActions={layout.trailingActions} />
+        <CatalogToolbarUtilityBand filterRow={filterRow} trailingActions={layout.trailingActions} />
       ) : layout.trailingActions ? (
         <CatalogToolbarStandaloneActions actions={layout.trailingActions} />
       ) : null}

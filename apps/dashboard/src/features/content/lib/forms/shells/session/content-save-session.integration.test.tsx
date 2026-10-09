@@ -5,11 +5,11 @@ import { z } from 'zod'
 import type { UseFormReturn } from 'react-hook-form'
 import { Form } from '@rpg/ui/form'
 
+import { CampaignAccessFormProvider } from '../../../campaign-access/campaign-access-form-context'
 import {
-  CampaignAccessFormProvider,
   useCampaignAccessParticipantUpdater,
   type CampaignAccessSaveResult,
-} from '../../../campaign-access/campaign-access-form-context'
+} from '../../../campaign-access/campaign-access-form-state'
 import { notifyCoordinatedContentSaveSuccess } from '@/lib/notify'
 import { useContentSaveSession } from './use-content-save-session'
 

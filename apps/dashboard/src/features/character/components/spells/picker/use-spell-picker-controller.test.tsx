@@ -19,9 +19,9 @@ describe('useSpellPickerController', () => {
           open: props.open,
           cantripChoiceSet: spellPickerCantripChoiceSetFixture,
           cantripSelectedIds: [],
-          preparedSelectedIds: [],
+          spellSelectedIds: [],
           cantripItems: spellPickerOpenItemsFixture,
-          preparedItems: [],
+          spellItems: [],
         }),
       { initialProps: { open: true } },
     )
@@ -52,9 +52,9 @@ describe('useSpellPickerController', () => {
           recommendationsEnabled: props.recommendationsEnabled,
           cantripChoiceSet: spellPickerCantripChoiceSetFixture,
           cantripSelectedIds: [],
-          preparedSelectedIds: [],
+          spellSelectedIds: [],
           cantripItems: spellPickerOpenItemsFixture,
-          preparedItems: [],
+          spellItems: [],
         }),
       { initialProps: { recommendationsEnabled: false } },
     )

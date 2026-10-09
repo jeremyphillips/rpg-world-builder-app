@@ -63,6 +63,8 @@ export type SelectionOptionCardAnatomyProps = {
   description?: string
   summaryItems?: string[]
   summaryLines?: string[]
+  /** Rich summary under the description, before string summary lines. */
+  summaryContent?: ReactNode
   embedded?: ReactNode
   footer?: ReactNode
   /** Merged onto the option title label. */
@@ -104,12 +106,14 @@ function SelectionOptionCardSecondaryContent({
   description,
   summaryText,
   summaryLines,
+  summaryContent,
   density = 'default',
   clampDescription = false,
 }: {
   description?: string
   summaryText?: string
   summaryLines?: string[]
+  summaryContent?: ReactNode
   density?: SelectionOptionCardDensity
   clampDescription?: boolean
 }) {
@@ -128,6 +132,7 @@ function SelectionOptionCardSecondaryContent({
       {summaryText ? (
         <span className={optionCardSummaryVariants({ density })}>{summaryText}</span>
       ) : null}
+      {summaryContent}
       {summaryLines && summaryLines.length > 0 ? (
         <SelectionOptionCardSummaryLines summaryLines={summaryLines} density={density} />
       ) : null}
@@ -176,6 +181,7 @@ function SelectionOptionCardPrimaryCopy({
   description,
   summaryText,
   summaryLines,
+  summaryContent,
   clampDescription,
   copyWidth,
   summaryBadge,
@@ -187,6 +193,7 @@ function SelectionOptionCardPrimaryCopy({
   description?: string
   summaryText?: string
   summaryLines?: string[]
+  summaryContent?: ReactNode
   clampDescription: boolean
   copyWidth: SelectionOptionCardCopyWidth
   summaryBadge?: ReactNode
@@ -216,6 +223,7 @@ function SelectionOptionCardPrimaryCopy({
             description={description}
             summaryText={summaryText}
             summaryLines={summaryLines}
+            summaryContent={summaryContent}
             density={density}
             clampDescription={clampDescription}
           />
@@ -238,6 +246,7 @@ export function SelectionOptionCardAnatomy({
   description,
   summaryItems,
   summaryLines,
+  summaryContent,
   embedded,
   footer,
   titleClassName,
@@ -250,9 +259,7 @@ export function SelectionOptionCardAnatomy({
   leadingMedia,
 }: SelectionOptionCardAnatomyProps) {
   const summaryText =
-    summaryItems && summaryItems.length > 0
-      ? joinInlineMetadata(summaryItems)
-      : undefined
+    summaryItems && summaryItems.length > 0 ? joinInlineMetadata(summaryItems) : undefined
   const titleRow = (
     <SelectionOptionCardTitleRow
       label={label}
@@ -272,6 +279,7 @@ export function SelectionOptionCardAnatomy({
       description={description}
       summaryText={summaryText}
       summaryLines={summaryLines}
+      summaryContent={summaryContent}
       clampDescription={clampDescription}
       copyWidth={copyWidth}
       summaryBadge={summaryBadge}

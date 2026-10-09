@@ -1,11 +1,21 @@
-import type { Spell, SpellRecommendation } from '@rpg/contracts'
+import {
+  getContentTypeSentenceForm,
+  getSpellCollectionKindLabel,
+  getSpellCollectionKindSentenceForm,
+  type Spell,
+  type SpellRecommendation,
+} from '@rpg/contracts'
 
 import { toContentFieldOption } from '../../lib/form-options/content-field-option.lib'
 
 export const SPELLCASTING_RECOMMENDATION_TARGET_LABELS = {
-  cantrips: 'Cantrips',
-  level1Plus: 'Level 1 spells',
+  cantrips: getSpellCollectionKindLabel('cantrips'),
+  level1Plus: `Level 1 ${getContentTypeSentenceForm('spells', 2)}`,
 } as const
+
+export const SPELLCASTING_RECOMMENDATION_CANTRIPS_PLACEHOLDER = `Choose ${getSpellCollectionKindSentenceForm('cantrips', 2)}`
+
+export const SPELLCASTING_RECOMMENDATION_LEVEL1_PLACEHOLDER = `Choose level 1 ${getContentTypeSentenceForm('spells', 2)}`
 
 export function spellOptionsForRecommendationTarget(
   spells: readonly Spell[] | undefined,

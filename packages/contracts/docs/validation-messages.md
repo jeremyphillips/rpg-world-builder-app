@@ -165,8 +165,10 @@ copy for species heritage and future subclass steps. Ids use
 
 `CharacterBuildValidationIssue` always **blocks** (step submit, final submit, finalize).
 `CharacterBuildAdvisory` (`rpg/character-builder/build-advisory.ts`) is a **non-blocking**
-consequence of a valid build — e.g. `equipment_not_proficient` for owned weapons, armor, or
-shields the assembled proficiencies do not cover. Create is still allowed after the user
+consequence of a valid build. Examples: `equipment_not_proficient` for owned weapons, armor,
+or shields the assembled proficiencies do not cover, and
+`equipment_ability_score_requirement_unmet` for owned equipment whose
+`abilityScoreRequirements` exceed the draft's known scores. Create is still allowed after the user
 confirms "Create character anyway" / "Create NPC anyway"
 (`getCharacterBuildCreateWithWarningsMessages(characterKind)`).
 
@@ -174,9 +176,20 @@ confirms "Create character anyway" / "Create NPC anyway"
   prose, severity, or key).
 - **Copy:** derived at render time by `resolveCharacterBuildAdvisoryMessage` from
   `characterBuilderAdvisoryMessages` (`validation.characterBuilderAdvisory.*`).
-- **Source of facts:** `resolveCharacterBuildAdvisoriesForDraft` evaluates the same
-  `resolveCharacterBuildLoadout` result finalize persists; it returns `[]` when the loadout
-  cannot resolve a class, so incomplete builds never produce false positives.
+  `resolveEquipmentNotProficientMessage` is the only player-facing proficiency sentence.
+  Owned cards use it as a warning. Selection rows show the short
+  `resolveEquipmentNotProficientShortLabel` badge ("Not proficient") and keep the sentence
+  as supplemental `title` detail. The ability-score advisory message is the detail grammar
+  from `formatUnmetAbilityScoreRequirementsDetail`: "Requires STR 15; character has STR 12."
+  Multiple unmet minimums are joined in `ABILITY_IDS` order. The selection-row badge label is
+  the short "Requires STR 15".
+- **Source of facts:** `resolveCharacterBuildAdvisoriesForDraft` evaluates the loadout
+  finalize persists. Proficiency subjects also include pending explicit purchases (picker or
+  manual) that are still on the draft because no starting option has funded them. Those
+  purchases stay out of resolved inventory. The resolver returns `[]` when the loadout
+  cannot resolve a class, so incomplete builds never produce false positives. Both equipment
+  rules share that owned-subject projection (`projectEquipmentAdvisorySubjectIds`). The
+  ability rule skips abilities with no score yet.
 - **Dedupe / order:** deduped by `characterBuildAdvisoryKey`, ordered by
   `CHARACTER_BUILD_ADVISORY_CODE_ORDER`, then a per-code comparator.
 - **Adding a code:** add a union member, a message case, a key case, an entry in

@@ -14,14 +14,11 @@ import { outcomeApplicationsFieldPath } from '../../lib/form/resolution-outcome-
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { resolutionFormToSelectionContext } from '../../lib/selection/resolution-selection-context.lib'
+import { outcomeApplicationsIdPrefix } from './outcome-applications-id-prefix'
 import { SpellResolutionOutcomeApplicationRow } from './spell-resolution-outcome-application-row'
 
 export type SpellResolutionOutcomeApplicationsListProps = {
   outcomeIndex: number
-}
-
-export function outcomeApplicationsIdPrefix(outcomeIndex: number): string {
-  return `resolution-outcome-${outcomeIndex}-applications`
 }
 
 /** Custom field-array list for outcome effect applications with navigation parity. */

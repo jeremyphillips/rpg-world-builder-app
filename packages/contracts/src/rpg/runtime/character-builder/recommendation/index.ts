@@ -10,6 +10,7 @@ export {
 } from './recommendation-scope'
 
 export {
+  formatRecommendationSourceKindWord,
   formatRecommendationSourceLabel,
   RECOMMENDATION_SOURCE_LABEL_DENSITIES,
 } from './format-recommendation-source-label'
@@ -46,9 +47,11 @@ export type {
   OptionRecommendation,
   OptionRequirement,
   OptionState,
+  ProficiencyRecommendationReason,
   RecommendationSignal,
   RecommendationSignalBasis,
   RecommendationSignalDetail,
+  RecommendationSignalReason,
   RecommendationSpecificity,
   RecommendationStrength,
   RequirementDefinition,
@@ -57,8 +60,10 @@ export type {
   RequirementState,
 } from './recommendation-envelope'
 export {
+  ABILITY_FIT_RECOMMENDATION_REASON,
   NEUTRAL_OPTION_RECOMMENDATION,
   OPTION_CONTEXT_RELEVANCE,
+  PROFICIENCY_RECOMMENDATION_REASONS,
   OPTION_CONTEXT_RELEVANCE_RANK,
   RECOMMENDATION_SIGNAL_BASES,
   RECOMMENDATION_STRENGTH_RANK,
@@ -79,28 +84,29 @@ export { resolveOptionContextRelevance } from './option-context-relevance'
 
 export {
   grantedByLabel,
-  includedQuantityLabel,
-  OPTION_PRESENTATION_AVAILABLE_IN_STARTING_OPTION_LABEL,
   OPTION_PRESENTATION_COMMON_FOR_CLASS_LABEL,
   OPTION_PRESENTATION_DISCRIMINATORS,
   OPTION_PRESENTATION_FACT_KINDS,
+  OPTION_PRESENTATION_INCLUDED_IN_PACKAGE_OPTION_LABEL,
   OPTION_PRESENTATION_IN_PACKAGE_LABEL,
-  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+  OPTION_PRESENTATION_MATCHES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_PROFICIENCY_AVAILABLE_LABEL,
   OPTION_PRESENTATION_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
+  OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
   OPTION_PRESENTATION_SPELLCASTING_FOCUS_LABEL,
   OPTION_PRESENTATION_STARTING_OPTION_LABEL,
   recommendationSourceLabels,
+  recommendedByLabel,
   requiredByLabel,
-  satisfiesFocusRequirementLabel,
-  softRecommendationFact,
+  softRecommendationFacts,
 } from './resolve-option-presentation-facts'
 export type {
   OptionPresentationDiscriminator,
   OptionPresentationFact,
   OptionPresentationFactKind,
   OptionPresentationFacts,
+  OptionPresentationRequirementRole,
   RecommendationSourceName,
 } from './resolve-option-presentation-facts'
 

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 
 import { EquipmentPickerItemDetails } from './equipment-picker-item-details'
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerItemsFixture,
@@ -25,10 +26,7 @@ export const WeaponExpanded: Story = {
     equipment: longswordItem.equipment,
     itemState: longswordItem.state,
     budget: equipmentPickerBudgetFixture,
-    ownedQuantity: 0,
-    addQuantity: 1,
-    onAddQuantityChange: () => undefined,
-    onCommit: () => undefined,
+    ownership: EMPTY_EQUIPMENT_OWNERSHIP,
     showCharacterPreview: true,
     characterPreviewContext: {
       level: 1,
@@ -40,27 +38,28 @@ export const WeaponExpanded: Story = {
   },
 }
 
-export const Owned: Story = {
+export const OwnedFromPackage: Story = {
   args: {
     ...WeaponExpanded.args,
-    ownedQuantity: 1,
+    ownership: { ...EMPTY_EQUIPMENT_OWNERSHIP, packageQuantity: 1, totalQuantity: 1 },
     showCharacterPreview: false,
     characterPreviewContext: undefined,
-    onRemoveFromInventory: () => undefined,
   },
 }
 
-export const OwnedStackable: Story = {
+export const OwnedFromSeveralSources: Story = {
   args: {
     equipment: equipmentPickerRopeFixture,
     itemState: equipmentPickerItemsFixture[2]!.state,
     budget: equipmentPickerBudgetFixture,
-    ownedQuantity: 2,
-    addQuantity: 1,
-    onAddQuantityChange: () => undefined,
-    onCommit: () => undefined,
-    onRemoveFromInventory: () => undefined,
-    onRemoveOneFromInventory: () => undefined,
+    ownership: {
+      ...EMPTY_EQUIPMENT_OWNERSHIP,
+      packageQuantity: 1,
+      lockedPurchased: { quantity: 1, spendCp: 100 },
+      editablePurchased: { quantity: 2, spendCp: 200 },
+      totalQuantity: 4,
+      acquiredQuantity: 3,
+    },
     showCharacterPreview: false,
   },
 }

@@ -9,6 +9,8 @@ import {
 } from '@rpg/contracts'
 import type { QueryClient } from '@tanstack/react-query'
 
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
+
 import { updateContent } from '../../../lib/list/content-client'
 import { invalidateLocationHierarchyQueries } from './invalidate-location-hierarchy-queries'
 
@@ -125,7 +127,7 @@ export function buildEligibleLocationParentReplacementCandidates(input: {
         }).length === 0
       )
     })
-    .sort((left, right) => left.name.localeCompare(right.name))
+    .toSorted(comparePickerName)
 }
 
 export function buildLocationParentReplacementCandidateSummaries(input: {

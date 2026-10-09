@@ -32,13 +32,13 @@ export function compareActiveRequirement(
   left: readonly OptionRequirement[],
   right: readonly OptionRequirement[],
 ): number {
-  return requirementCandidateRank(left) - requirementCandidateRank(right)
+  return requirementMatchRank(left) - requirementMatchRank(right)
 }
 
-function requirementCandidateRank(requirements: readonly OptionRequirement[]): number {
-  const candidates = requirements.filter((requirement) => requirement.role === 'candidate')
-  if (candidates.some((requirement) => requirement.rule === 'exact')) return 0
-  if (candidates.some((requirement) => requirement.rule === 'anyOf')) return 1
+function requirementMatchRank(requirements: readonly OptionRequirement[]): number {
+  const matches = requirements.filter((requirement) => requirement.optionSatisfies)
+  if (matches.some((requirement) => requirement.rule === 'exact')) return 0
+  if (matches.some((requirement) => requirement.rule === 'anyOf')) return 1
   return 2
 }
 

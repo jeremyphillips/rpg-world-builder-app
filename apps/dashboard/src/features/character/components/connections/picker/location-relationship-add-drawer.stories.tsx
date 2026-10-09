@@ -12,6 +12,10 @@ const meta = {
     open: true,
     title: 'Add place',
     locations: [harborfordSettlement],
+    locationSearchContext: {
+      locationsById: new Map([[harborfordSettlement.id, harborfordSettlement]]),
+      campaignId: harborfordSettlement.campaignId ?? '',
+    },
     roleOptions: PLACE_CONNECTION_ROLE_OPTIONS,
     onOpenChange: () => undefined,
     onAdd: () => undefined,

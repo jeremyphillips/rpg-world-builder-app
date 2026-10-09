@@ -34,7 +34,7 @@ import { type QuickNpcEquipmentSeedContext } from '../../lib/quick-npc/quick-npc
 import { resolveQuickNpcSetupChangeAuthoringState } from '../../lib/quick-npc/quick-npc-class-change.lib'
 import { pruneQuickNpcStartingChoiceOverrides } from '../../lib/quick-npc/quick-npc-starting-choices.lib'
 import { readQuickNpcClassPackage } from '../../lib/quick-npc/quick-npc-package-customization.lib'
-import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
+import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
 import {
   QUICK_NPC_BUILD_EXTERNAL_DECISION_ID,
   QUICK_NPC_SETUP_CHANGE_LABEL,

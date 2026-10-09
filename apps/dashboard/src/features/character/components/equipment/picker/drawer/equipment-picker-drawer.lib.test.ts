@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { moneyToCopper, wealthToCopper } from '@rpg/contracts'
+
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
+
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
@@ -11,26 +15,21 @@ import {
   pickerState,
 } from './equipment-picker-drawer.fixtures'
 import {
-  countEquipmentPickerAffordableHiddenImpact,
-  countEquipmentPickerClearableCriteria,
-  countEquipmentPickerStructuredFilters,
   filterAndSortEquipmentPickerItems,
-  filterEquipmentPickerItems,
+  filterEligibleEquipmentPickerItems,
   formatEquipmentUnaffordableReason,
-  getEquipmentPickerDisabledNote,
   getEquipmentUnaffordableAmounts,
-  hasEquipmentPickerClearableCriteria,
-  hasEquipmentPickerResetViewCriteria,
   isEquipmentPickerItemDisabled,
   resolveEquipmentKindFilterOptions,
+  resolveEquipmentPickerDrawerItemHeaderPresentation,
+  resolveMaxPurchaseAggregate,
   sortEquipmentPickerItems,
 } from './equipment-picker-drawer.lib'
 import {
-  EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
-  type EquipmentPickerItem,
+  type EquipmentPickerRow,
 } from './equipment-picker-drawer.types'
 
 function pickerSearchDocument(id: string, text: string) {
@@ -50,7 +49,7 @@ describe('equipment-picker-drawer.lib', () => {
 
   it('sorts compatible proficient items above neutral peers in a unified list', () => {
     const neutralRope = equipmentPickerItemsFixture[2]!
-    const compatibleRope: EquipmentPickerItem = {
+    const compatibleRope: EquipmentPickerRow = {
       ...neutralRope,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -85,8 +84,8 @@ describe('equipment-picker-drawer.lib', () => {
     expect(compatibleRope.state.isRecommended).toBe(false)
   })
 
-  it('filters starting-unaffordable and non-proficient rows', () => {
-    const startingUnaffordable: EquipmentPickerItem = {
+  it('keeps rows above the starting-budget ceiling eligible', () => {
+    const startingUnaffordable: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,
@@ -102,38 +101,63 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    const filtered = filterEquipmentPickerItems(
-      [equipmentPickerItemsFixture[0]!, startingUnaffordable, equipmentPickerItemsFixture[2]!],
-      {
-        filterOutUnaffordable: true,
-        filterOutNonProficient: true,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        budget: equipmentPickerBudgetFixture,
-      },
-    )
+    expect(
+      filterEligibleEquipmentPickerItems([
+        equipmentPickerItemsFixture[0]!,
+        startingUnaffordable,
+        equipmentPickerItemsFixture[2]!,
+      ]).map((item) => item.equipment.name),
+    ).toEqual(['Longsword', 'Plate Armor', 'Rope'])
+  })
 
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
+  it('keeps disabled add on unaffordable purchase fallbacks', () => {
+    const unaffordable = equipmentPickerDefaultPathItemsFixture[1]!
+
+    expect(
+      resolveEquipmentPickerDrawerItemHeaderPresentation({
+        item: unaffordable,
+        workflowMode: 'purchase',
+        ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      }).control,
+    ).toEqual({ kind: 'add', disabled: true })
+  })
+
+  it('pins the stepper ceiling to what the remaining purse covers', () => {
+    const longsword = equipmentPickerItemsFixture[0]!
+    const ownership = {
+      ...EMPTY_EQUIPMENT_OWNERSHIP,
+      editablePurchased: { quantity: 1, spendCp: 1500 },
+      totalQuantity: 1,
+      acquiredQuantity: 1,
+    }
+
+    expect(
+      resolveMaxPurchaseAggregate({
+        equipment: longsword.equipment,
+        ownership,
+        budget: equipmentPickerBudgetFixture,
+      }),
+    ).toBe(
+      1 +
+        Math.floor(
+          wealthToCopper(equipmentPickerBudgetFixture.remaining) /
+            moneyToCopper(longsword.equipment.cost!),
+        ),
+    )
   })
 
   it('keeps remaining-unaffordable rows visible but disables purchase', () => {
     const chainMail = equipmentPickerItemsFixture[1]!
 
-    expect(
-      filterEquipmentPickerItems([chainMail], {
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([chainMail])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(chainMail)).toBe(true)
-    expect(getEquipmentPickerDisabledNote(chainMail, equipmentPickerBudgetFixture)).toBe(
+    expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
       '75 GP needed · 40 GP remaining',
     )
   })
 
   it('shows starting-unaffordable rows with filter off but keeps purchase disabled', () => {
-    const startingUnaffordable: EquipmentPickerItem = {
+    const startingUnaffordable: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[1]!,
       equipment: {
         ...equipmentPickerItemsFixture[1]!.equipment,
@@ -149,38 +173,8 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    expect(
-      filterEquipmentPickerItems([startingUnaffordable], {
-        filterOutUnaffordable: false,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-      }),
-    ).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([startingUnaffordable])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(startingUnaffordable)).toBe(true)
-  })
-
-  it('prefers structural disabled reasons over remaining-budget notes', () => {
-    const restricted: EquipmentPickerItem = {
-      ...equipmentPickerItemsFixture[1]!,
-      state: {
-        ...equipmentPickerItemsFixture[1]!.state,
-        disabledReasons: ['Already selected'],
-      },
-    }
-
-    expect(getEquipmentPickerDisabledNote(restricted, equipmentPickerBudgetFixture)).toBe(
-      'Already selected',
-    )
-  })
-
-  it('filters rows by selected kind', () => {
-    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
-      filterOutUnaffordable: false,
-      filterOutNonProficient: false,
-      selectedKind: 'weapon',
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword'])
   })
 
   it('formats unaffordable copy for disabled notes', () => {
@@ -188,6 +182,16 @@ describe('equipment-picker-drawer.lib', () => {
     expect(formatEquipmentUnaffordableReason(chainMail, equipmentPickerBudgetFixture)).toBe(
       '75 GP needed · 40 GP remaining',
     )
+  })
+
+  it('keeps silver and copper in the unaffordable remaining half', () => {
+    const chainMail = equipmentPickerItemsFixture[1]!
+    expect(
+      formatEquipmentUnaffordableReason(chainMail, {
+        ...equipmentPickerBudgetFixture,
+        remaining: { cp: 0, sp: 6, gp: 74, pp: 0 },
+      }),
+    ).toBe('75 GP needed · 74 GP 6 SP remaining')
   })
 
   it('excludes vehicle and service kinds from category filter and results', () => {
@@ -239,17 +243,15 @@ describe('equipment-picker-drawer.lib', () => {
       'adventuring_gear',
     ])
 
-    const filtered = filterEquipmentPickerItems(items, {
-      filterOutUnaffordable: false,
-      filterOutNonProficient: false,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Chain Mail', 'Rope'])
+    expect(filterEligibleEquipmentPickerItems(items).map((item) => item.equipment.name)).toEqual([
+      'Longsword',
+      'Chain Mail',
+      'Rope',
+    ])
   })
 
-  it('keeps unpriced rows visible when filterOutUnaffordable is enabled', () => {
-    const unpricedMagicItem: EquipmentPickerItem = {
+  it('keeps unpriced magic items eligible', () => {
+    const unpricedMagicItem: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[0]!,
       equipment: {
         ...equipmentPickerItemsFixture[0]!.equipment,
@@ -268,78 +270,8 @@ describe('equipment-picker-drawer.lib', () => {
       },
     }
 
-    const filtered = filterEquipmentPickerItems([unpricedMagicItem], {
-      filterOutUnaffordable: true,
-      filterOutNonProficient: false,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-    })
-
-    expect(filtered).toHaveLength(1)
+    expect(filterEligibleEquipmentPickerItems([unpricedMagicItem])).toHaveLength(1)
     expect(isEquipmentPickerItemDisabled(unpricedMagicItem)).toBe(true)
-    expect(getEquipmentPickerDisabledNote(unpricedMagicItem)).toBe('Not for sale')
-  })
-
-  it('filters remaining-unaffordable rows when showAffordableOnly is on', () => {
-    const filtered = filterEquipmentPickerItems(equipmentPickerItemsFixture, {
-      filterOutUnaffordable: false,
-      filterOutNonProficient: false,
-      selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-      showAffordableOnly: true,
-    })
-
-    expect(filtered.map((item) => item.equipment.name)).toEqual(['Longsword', 'Rope'])
-  })
-
-  it('counts structured filters separately from clearable criteria', () => {
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-      }),
-    ).toBe(0)
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-      }),
-    ).toBe(2)
-    expect(
-      countEquipmentPickerClearableCriteria({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        searchQuery: 'rope',
-      }),
-    ).toBe(3)
-    expect(hasEquipmentPickerClearableCriteria(0)).toBe(false)
-    expect(hasEquipmentPickerClearableCriteria(1)).toBe(true)
-  })
-
-  it('counts magic-item rarity focus as a structured filter in magic-items workflow', () => {
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        workflowMode: 'magic_items',
-      }),
-    ).toBe(0)
-    expect(
-      countEquipmentPickerStructuredFilters({
-        selectedKind: 'weapon',
-        showAffordableOnly: true,
-        workflowMode: 'magic_items',
-        focusedAllowanceId: 'startingWealthTier:hero:common',
-      }),
-    ).toBe(1)
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
-        focusedAllowanceId: 'startingWealthTier:hero:common',
-      }),
-    ).toBe(true)
   })
 
   it('returns domain amounts for remaining-budget failures', () => {
@@ -360,7 +292,7 @@ describe('equipment-picker-drawer.lib', () => {
   it('keeps strong, neutral, and blocked magic rows in one unified best_match list', () => {
     const longsword = equipmentPickerItemsFixture[0]!
     const rope = equipmentPickerItemsFixture[2]!
-    const blockedMagic: EquipmentPickerItem = {
+    const blockedMagic: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:bead-of-force',
@@ -403,8 +335,8 @@ describe('equipment-picker-drawer.lib', () => {
     ).toEqual(['Bead of Force', 'Longsword', 'Rope'])
   })
 
-  it('lets search beat magic-item action rank for blocked rows in magic-items workflow', () => {
-    const bead: EquipmentPickerItem = {
+  it('keeps a magic-item name match when the row is blocked', () => {
+    const bead: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:bead-of-force',
@@ -425,7 +357,7 @@ describe('equipment-picker-drawer.lib', () => {
         magicItemAction: { rank: 3, reason: 'unavailable' },
       }),
     }
-    const otherMagic: EquipmentPickerItem = {
+    const otherMagic: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
         id: 'srd-cc-5.2.1:other-relic',
@@ -448,18 +380,19 @@ describe('equipment-picker-drawer.lib', () => {
       filterAndSortEquipmentPickerItems([otherMagic, bead], {
         searchQuery: 'bead',
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
       }).map((item) => item.equipment.name),
     ).toEqual(['Bead of Force'])
   })
 
-  it('orders magic-items workflow by action rank before recommendation', () => {
-    const grantAvailable: EquipmentPickerItem = {
-      equipment: equipmentPickerPotionFixture,
-      searchDocument: pickerSearchDocument(
-        equipmentPickerPotionFixture.id,
-        'potion of healing magic item',
-      ),
+  it('does not reorder magic items by action rank', () => {
+    const grantAvailable: EquipmentPickerRow = {
+      equipment: {
+        ...equipmentPickerPotionFixture,
+        id: 'srd-cc-5.2.1:zebra-relic',
+        slug: 'zebra-relic',
+        name: 'Zebra Relic',
+      },
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:zebra-relic', 'zebra relic magic item'),
       state: pickerState({
         isAvailable: true,
         isRecommended: false,
@@ -470,36 +403,31 @@ describe('equipment-picker-drawer.lib', () => {
         magicItemAction: { rank: 0, reason: 'grant_available' },
       }),
     }
-    const unavailableStrong: EquipmentPickerItem = {
+    const unavailable: EquipmentPickerRow = {
       equipment: {
         ...equipmentPickerPotionFixture,
-        id: 'srd-cc-5.2.1:strong-relic',
-        slug: 'strong-relic',
-        name: 'Strong Relic',
+        id: 'srd-cc-5.2.1:alpha-relic',
+        slug: 'alpha-relic',
+        name: 'Alpha Relic',
       },
-      searchDocument: pickerSearchDocument('srd-cc-5.2.1:strong-relic', 'strong relic magic item'),
+      searchDocument: pickerSearchDocument('srd-cc-5.2.1:alpha-relic', 'alpha relic magic item'),
       state: pickerState({
         isAvailable: true,
-        isRecommended: true,
+        isRecommended: false,
         isProficient: true,
         isWithinRemainingBudget: true,
-        recommendation: {
-          tier: 'strong',
-          reasons: ['startingEquipment'],
-          specificity: 'exact',
-        },
+        recommendation: { tier: 'neutral', reasons: [], specificity: 'broad_pool' },
         disabledReasons: [],
         magicItemAction: { rank: 3, reason: 'unavailable' },
       }),
     }
 
     expect(
-      filterAndSortEquipmentPickerItems([unavailableStrong, grantAvailable], {
+      filterAndSortEquipmentPickerItems([grantAvailable, unavailable], {
         searchQuery: '',
         sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-        workflowMode: 'magic_items',
       }).map((item) => item.equipment.name),
-    ).toEqual(['Potion of Healing', 'Strong Relic'])
+    ).toEqual(['Alpha Relic', 'Zebra Relic'])
   })
 
   it('matches recommendation order for empty-query best_match', () => {
@@ -518,7 +446,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('ranks stronger search matches above higher recommendation tiers', () => {
-    const essentialLongsword: EquipmentPickerItem = {
+    const essentialLongsword: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[0]!,
       searchDocument: pickerSearchDocument(
         equipmentPickerItemsFixture[0]!.equipment.id,
@@ -542,7 +470,7 @@ describe('equipment-picker-drawer.lib', () => {
   })
 
   it('sorts by price ascending with best-match tiebreaker for equal prices', () => {
-    const cheapRope: EquipmentPickerItem = {
+    const cheapRope: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -556,7 +484,7 @@ describe('equipment-picker-drawer.lib', () => {
         'cheap rope adventuring gear',
       ),
     }
-    const priceyRope: EquipmentPickerItem = {
+    const priceyRope: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -581,7 +509,7 @@ describe('equipment-picker-drawer.lib', () => {
 
   it('sorts priceless items after priced rows in both price directions', () => {
     const priced = equipmentPickerItemsFixture[2]!
-    const priceless: EquipmentPickerItem = {
+    const priceless: EquipmentPickerRow = {
       ...equipmentPickerItemsFixture[2]!,
       equipment: {
         ...equipmentPickerRopeFixture,
@@ -609,6 +537,70 @@ describe('equipment-picker-drawer.lib', () => {
     expect(desc.map((item) => item.equipment.name)).toEqual(['Rope', 'Priceless Rope'])
   })
 
+  it('ranks a literal name hit above a keyword hit and uses search score after price', () => {
+    const base = equipmentPickerItemsFixture[2]!
+    const nameHit: EquipmentPickerRow = {
+      ...base,
+      equipment: {
+        ...base.equipment,
+        id: 'name-hit',
+        slug: 'glassember-rope',
+        name: 'Glassember Rope',
+      },
+      searchDocument: {
+        id: 'name-hit',
+        fields: [
+          { key: 'name', text: 'Glassember Rope', role: 'primary' },
+          { key: 'tag:0', text: 'hemp', role: 'keyword' },
+          { key: 'description', text: 'coil', role: 'secondary' },
+          { key: 'combined', text: 'Glassember Rope hemp coil', role: 'secondary' },
+        ],
+      },
+    }
+    const keywordHit: EquipmentPickerRow = {
+      ...base,
+      equipment: { ...base.equipment, id: 'keyword-hit', slug: 'plain-rope', name: 'Plain Rope' },
+      searchDocument: {
+        id: 'keyword-hit',
+        fields: [
+          { key: 'name', text: 'Plain Rope', role: 'primary' },
+          { key: 'tag:0', text: 'glassember', role: 'keyword' },
+          { key: 'description', text: 'coil', role: 'secondary' },
+          { key: 'combined', text: 'Plain Rope glassember coil', role: 'secondary' },
+        ],
+      },
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([keywordHit, nameHit], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Glassember Rope', 'Plain Rope'])
+
+    const sameCostLowScore: EquipmentPickerRow = {
+      ...keywordHit,
+      equipment: { ...keywordHit.equipment, id: 'alpha-gear', name: 'Alpha Gear' },
+    }
+    const sameCostHighScore: EquipmentPickerRow = {
+      ...nameHit,
+      equipment: { ...nameHit.equipment, id: 'zebra-gear', name: 'Zebra Gear' },
+    }
+
+    expect(
+      filterAndSortEquipmentPickerItems([sameCostLowScore, sameCostHighScore], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Zebra Gear', 'Alpha Gear'])
+    expect(
+      filterAndSortEquipmentPickerItems([sameCostHighScore, sameCostLowScore], {
+        searchQuery: 'ember',
+        sortMode: EQUIPMENT_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.equipment.name),
+    ).toEqual(['Alpha Gear', 'Zebra Gear'])
+  })
+
   it('excludes search score-zero rows and lets price sort beat relevance with a query', () => {
     const longsword = equipmentPickerItemsFixture[0]!
     const chainMail = equipmentPickerItemsFixture[1]!
@@ -625,61 +617,5 @@ describe('equipment-picker-drawer.lib', () => {
       sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
     })
     expect(priceSorted.map((item) => item.equipment.name)).toEqual(['Longsword'])
-  })
-
-  it('detects reset-view criteria including sort drift', () => {
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_PRICE_ASC,
-      }),
-    ).toBe(true)
-    expect(
-      hasEquipmentPickerResetViewCriteria({
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        searchQuery: '',
-        sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-      }),
-    ).toBe(false)
-  })
-
-  it('counts affordable hidden impact after search and structured filters', () => {
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: '',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: true,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(1)
-
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: 'cheap',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: true,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(0)
-  })
-
-  it('hides affordable impact count when the toggle is off or nothing is excluded', () => {
-    expect(
-      countEquipmentPickerAffordableHiddenImpact(equipmentPickerDefaultPathItemsFixture, {
-        searchQuery: '',
-        filterOutUnaffordable: true,
-        filterOutNonProficient: false,
-        selectedKind: EQUIPMENT_PICKER_KIND_ALL,
-        showAffordableOnly: false,
-        budget: equipmentPickerBudgetFixture,
-      }),
-    ).toBe(0)
   })
 })

@@ -15,6 +15,7 @@ import {
   deriveEquipmentDraftEntries,
   inventoryQuantityForEquipmentId,
   resolveEffectiveStartingEquipmentPackageItems,
+  resolveGenericEquipmentGrantQuantities,
   startingEquipmentPackageItemKey,
 } from './derive-equipment-draft-entries'
 
@@ -159,6 +160,30 @@ describe('startingEquipmentPackageItemKey', () => {
 })
 
 describe('deriveEquipmentDraftEntries', () => {
+  it('leaves unresolved picker purchases out of resolved inventory', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: shield.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+        classPackage: { state: 'unresolved' as const },
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
+    expect(equipment.armor.map((entry) => entry.equipmentId)).not.toContain(shield.id)
+    expect(equipment.weapons.map((entry) => entry.equipmentId)).not.toContain(shield.id)
+  })
+
   it('includes package grants with classStartingEquipment sources', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
@@ -261,6 +286,7 @@ describe('deriveEquipmentDraftEntries', () => {
     const context = resolveEquipmentAcquisitionBuilderContext({
       context: {
         rulesetId: RULESET,
+        characterKind: 'pc',
         characterCreationRules: { startingWealth },
         catalog: { equipment: [leatherArmor, shield, rope] },
       },
@@ -278,7 +304,12 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(result.applied).toBe(true)
     expect(result.draft.equipment?.mode).toBe('package')
     expect(result.draft.equipment?.purchases).toEqual([
-      expect.objectContaining({ equipmentId: rope.id, quantity: 1, sourceMode: 'startingGold' }),
+      expect.objectContaining({
+        equipmentId: rope.id,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      }),
     ])
 
     const equipment = deriveEquipmentDraftEntries(result.draft, catalogIndex)
@@ -496,6 +527,69 @@ describe('deriveEquipmentDraftEntries', () => {
     expect(owned(2)).toBe(10)
   })
 
+  it('reports additional grant quantity and omits an ensure grant the package covers', () => {
+    const packedClass: ClassStored = {
+      ...storedDruid,
+      id: `${RULESET}:grant-delta-druid`,
+      characterCreation: {
+        startingEquipment: {
+          choose: 1,
+          options: [
+            {
+              id: 'standard-equipment',
+              label: 'Standard Equipment',
+              items: [
+                {
+                  id: 'leather-armor',
+                  kind: 'grant',
+                  target: { source: 'equipment', equipmentSlug: 'leather-armor' },
+                  quantity: 1,
+                  equipped: true,
+                },
+              ],
+              wealth: { gp: 0 },
+            },
+          ],
+        },
+      },
+    }
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [packedClass],
+      spells: [],
+      equipment: [leatherArmor],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    function quantities(contribution: 'additional' | 'ensure', grantQuantity: number) {
+      const draft = {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: packedClass.id, level: 1 as const },
+        choiceSelections: {
+          [startingEquipmentChoiceSetId(packedClass.id)]: ['standard-equipment'],
+        },
+        equipment: {
+          mode: 'package' as const,
+          purchases: [],
+          grants: [
+            {
+              equipmentId: leatherArmor.id,
+              quantity: grantQuantity,
+              contribution,
+            },
+          ],
+          editedSincePackageSelection: false,
+        },
+      }
+      return resolveGenericEquipmentGrantQuantities(draft, catalogIndex)
+    }
+
+    expect(quantities('additional', 1).get(leatherArmor.id)).toBe(1)
+    expect(quantities('ensure', 1).has(leatherArmor.id)).toBe(false)
+  })
+
   it('omits a package entry at quantity 0 and keeps additional grants when declined', () => {
     const catalogIndex = makeCatalogIndex()
     const selected = {
@@ -533,6 +627,29 @@ describe('deriveEquipmentDraftEntries', () => {
     )
     expect(inventoryQuantityForEquipmentId(declined, leatherArmor.id)).toBe(0)
     expect(inventoryQuantityForEquipmentId(declined, rope.id)).toBe(2)
+  })
+
+  it('does not assemble purchases while the starting equipment option is unresolved', () => {
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: storedDruid.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: leatherArmor.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const equipment = deriveEquipmentDraftEntries(draft, makeCatalogIndex())
+
+    expect(inventoryQuantityForEquipmentId(equipment, leatherArmor.id)).toBe(0)
   })
 })
 

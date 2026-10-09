@@ -1,28 +1,30 @@
 import { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
-import { Spinner, Text } from '@rpg/ui'
+import { CROSS_APP_PATHS, isApiError } from '@rpg/contracts/shared'
+import { Button, Spinner, Text } from '@rpg/ui'
 
 import { RealtimeProvider } from '@/features/realtime'
-import { LOGIN_PATH } from '../api/auth-client'
 import { useSession } from '../hooks/use-session'
 
 function FullScreenCenter({ children }: { children: React.ReactNode }) {
-  return <div className="flex min-h-dvh items-center justify-center">{children}</div>
+  return <div className="flex min-h-dvh flex-col items-center justify-center gap-3">{children}</div>
 }
 
 /**
- * Gates the authenticated app. Calls `GET /api/auth/me`; on a 401 (or any
- * session error) it redirects to the public app's `/login` (same origin).
+ * Gates the authenticated app. Calls `GET /api/auth/me`. A 401 redirects to
+ * the public app's `/login`. A network error or 5xx stays on this page so an
+ * API restart does not look like a logout.
  */
 export function AuthGuard() {
-  const { data: session, isPending, isError } = useSession()
+  const { data: session, isPending, isError, error, refetch } = useSession()
   const user = session?.user
+  const unauthenticated = isError && isApiError(error) && error.status === 401
 
   useEffect(() => {
-    if (isError) {
-      window.location.assign(LOGIN_PATH)
+    if (unauthenticated) {
+      window.location.assign(CROSS_APP_PATHS.login)
     }
-  }, [isError])
+  }, [unauthenticated])
 
   if (isPending) {
     return (
@@ -32,11 +34,21 @@ export function AuthGuard() {
     )
   }
 
-  if (isError || !user) {
-    // Redirect is in-flight; render nothing meaningful in the meantime.
+  if (unauthenticated || (!user && !isError)) {
     return (
       <FullScreenCenter>
         <Text variant="small">Redirecting to login…</Text>
+      </FullScreenCenter>
+    )
+  }
+
+  if (!user) {
+    return (
+      <FullScreenCenter>
+        <Text variant="small">Could not reach the server.</Text>
+        <Button type="button" variant="outline" onClick={() => void refetch()}>
+          Retry
+        </Button>
       </FullScreenCenter>
     )
   }

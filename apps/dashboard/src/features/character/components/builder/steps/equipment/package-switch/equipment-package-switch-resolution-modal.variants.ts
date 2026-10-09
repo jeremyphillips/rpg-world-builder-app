@@ -1,22 +1,23 @@
 import { cva } from 'class-variance-authority'
 
-/** Modal title — inherit shared dialogTitle; keep outline reset only. */
-export const equipmentPackageSwitchResolutionModalHeadlineClasses = 'outline-none'
-
 export const equipmentPackageSwitchResolutionModalBodyClasses =
   'flex min-h-0 min-w-0 flex-col gap-4'
 
 export const equipmentPackageSwitchResolutionModalInventoryScrollClasses =
   'max-h-72 min-w-0 overflow-y-auto overflow-x-hidden pe-3'
 
+export const equipmentPackageSwitchResolutionModalInventorySectionClasses = 'space-y-3'
+
 export const equipmentPackageSwitchResolutionBudgetSummaryClasses =
-  'rounded-lg border border-border bg-surface-muted p-4'
+  'rounded-lg border border-border bg-surface-muted px-4 py-3'
 
 export const equipmentPackageSwitchResolutionBudgetSummaryTitleClasses =
   'mb-3 text-sm font-medium text-foreground'
 
 export const equipmentPackageSwitchResolutionBudgetRowClasses =
   'flex items-start justify-between gap-4 text-sm'
+
+export const equipmentPackageSwitchResolutionBudgetStatusRowClasses = 'border-t border-border pt-2'
 
 export const equipmentPackageSwitchResolutionBudgetLabelClasses = 'text-muted-foreground'
 
@@ -39,7 +40,7 @@ export const equipmentPackageSwitchResolutionBudgetStatusVariants = cva(
   },
 )
 
-export const equipmentPackageSwitchResolutionSafetyNoteClasses = 'text-sm text-muted-foreground'
+export const equipmentPackageSwitchResolutionSafetyNoteClasses = 'text-xs text-muted-foreground'
 
 export const equipmentPackageSwitchResolutionAlertClasses = 'text-sm text-destructive'
 

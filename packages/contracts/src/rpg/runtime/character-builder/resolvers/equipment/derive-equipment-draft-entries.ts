@@ -13,7 +13,9 @@ import type { CharacterBuildCatalogIndex } from '../../context'
 import type {
   CharacterBuilderDraft,
   CharacterBuilderDraftEquipmentPurchase,
+  NormalizedCharacterBuilderDraftEquipmentPurchase,
 } from '../../draft/draft'
+import { normalizeEquipmentPurchase } from '../../equipment/equipment-purchase'
 import {
   resolveStartingEquipmentOption,
   type ResolvedStartingEquipmentItem,
@@ -34,6 +36,8 @@ import {
 } from '../../../../campaign/rules/starting-wealth'
 import { getBuilderSelectedStartingLevel } from '../../progression/builder-level'
 import type { SystemRulesetId } from '../../../../primitives/ruleset'
+import type { MagicItemRarity } from '../../../../vocab/magic-item/rarity'
+import type { MagicItemAllowanceRequirement } from '../../equipment/magic-item-selection'
 
 function grantSelectionSource(): CharacterSelectionSource[] {
   return [{ kind: 'grant' }]
@@ -268,27 +272,42 @@ function appendPurchasesFromDraft(
   return result
 }
 
-function appendMagicItemGrantsFromDraft(
-  draft: CharacterBuilderDraft,
-  catalogIndex: CharacterBuildCatalogIndex,
-  startingWealth: StartingWealthRules | undefined,
-  rulesetId: string,
-  inventory: CharacterEquipment,
-): CharacterEquipment {
+/** A magic-item selection the derivation actually counts (allowance and catalog entry resolve). */
+export type AppliedMagicItemGrantSelection = {
+  allowanceId: string
+  equipmentId: string
+  quantity: number
+  rarity: MagicItemRarity
+  requirement: MagicItemAllowanceRequirement
+  allowanceSourceId: string
+  equipment: Equipment
+}
+
+function listAppliedMagicItemSelections(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  startingWealth: StartingWealthRules | undefined
+  rulesetId: string
+  requirement: MagicItemAllowanceRequirement
+}): AppliedMagicItemGrantSelection[] {
+  const { draft, catalogIndex, startingWealth, rulesetId, requirement } = args
   const selections = readMagicItemSelections(draft)
-  if (selections.length === 0) return inventory
+  if (selections.length === 0) return []
 
   const startingLevel = getBuilderSelectedStartingLevel(draft)
   const tier = startingWealth
     ? resolveStartingWealthTierForBuilder(startingWealth, startingLevel)
     : undefined
-  if (!tier) return inventory
+  if (!tier) return []
 
   const startingWealthTableId = standardStartingWealthTableId(rulesetId as SystemRulesetId)
-  const allowances = resolveMagicItemGrantAllowances({ startingWealthTableId, tier })
+  const allowances = resolveMagicItemGrantAllowances({
+    startingWealthTableId,
+    tier,
+    requirement,
+  })
   const allowanceById = new Map(allowances.map((entry) => [entry.id, entry]))
-
-  let result = inventory
+  const applied: AppliedMagicItemGrantSelection[] = []
 
   for (const selection of selections) {
     const allowance = allowanceById.get(selection.allowanceId)
@@ -297,22 +316,51 @@ function appendMagicItemGrantsFromDraft(
     const equipment = catalogIndex.equipment.get(selection.equipmentId)
     if (!equipment) continue
 
+    applied.push({
+      allowanceId: selection.allowanceId,
+      equipmentId: selection.equipmentId,
+      quantity: selection.quantity,
+      rarity: allowance.rarity,
+      requirement: allowance.requirement,
+      allowanceSourceId: allowance.source.sourceId,
+      equipment,
+    })
+  }
+
+  return applied
+}
+
+function appendMagicItemGrantsFromDraft(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  startingWealth: StartingWealthRules | undefined,
+  rulesetId: string,
+  inventory: CharacterEquipment,
+  requirement: MagicItemAllowanceRequirement,
+): CharacterEquipment {
+  const applied = listAppliedMagicItemSelections({
+    draft,
+    catalogIndex,
+    startingWealth,
+    rulesetId,
+    requirement,
+  })
+
+  return applied.reduce((result, selection) => {
     const sources: CharacterSelectionSource[] = [
       {
         kind: 'startingWealthTier',
-        sourceId: allowance.source.sourceId,
+        sourceId: selection.allowanceSourceId,
         grantId: selection.allowanceId,
       },
     ]
 
-    result = appendEquipmentEntry(result, equipment, {
+    return appendEquipmentEntry(result, selection.equipment, {
       equipmentId: selection.equipmentId,
       quantity: selection.quantity,
       sources,
     })
-  }
-
-  return result
+  }, inventory)
 }
 
 /** Stable key for a package slot: `${classId}:${optionId}:${itemIndex}`. */
@@ -459,14 +507,17 @@ function purchasesForContext(
   return appendPurchasesFromDraft(draft, context, catalogIndex, inventory)
 }
 
-/**
- * Composes package items (minus removals), magic-item grant selections, draft
- * purchases, and ensure-at-least grants into inventory rows with selection sources.
- */
-export function deriveEquipmentDraftEntries(
+type DeriveEquipmentDraftOptions = {
+  startingWealth?: StartingWealthRules
+  rulesetId?: SystemRulesetId
+  magicItemRequirement?: MagicItemAllowanceRequirement
+}
+
+/** Package, magic-item, and purchase channels, before generic grants. */
+function inventoryBeforeGenericGrants(
   draft: CharacterBuilderDraft,
   catalogIndex: CharacterBuildCatalogIndex,
-  options?: { startingWealth?: StartingWealthRules; rulesetId?: SystemRulesetId },
+  options?: DeriveEquipmentDraftOptions,
 ): CharacterEquipment {
   const context = resolveEquipmentDraftContext(draft, catalogIndex)
   if (!context && !draft.class.classId) return EMPTY_CHARACTER_EQUIPMENT
@@ -482,11 +533,115 @@ export function deriveEquipmentDraftEntries(
           options?.startingWealth,
           rulesetId,
           withPackage,
+          options?.magicItemRequirement ?? 'exact',
         )
 
+  return purchasesForContext(draft, context, catalogIndex, withMagic)
+}
+
+function equipmentIdsInInventory(inventory: CharacterEquipment): string[] {
+  const ids: string[] = []
+  const seen = new Set<string>()
+  for (const bucket of CHARACTER_EQUIPMENT_INVENTORY_BUCKETS) {
+    for (const entry of inventory[bucket]) {
+      if (seen.has(entry.equipmentId)) continue
+      seen.add(entry.equipmentId)
+      ids.push(entry.equipmentId)
+    }
+  }
+  return ids
+}
+
+/**
+ * Quantity the generic grant pass adds on top of package, magic-item, and
+ * purchase channels. `additional` contributes its full quantity. `ensure`
+ * contributes only the shortfall, so a covered grant is omitted. Magic-item
+ * choices are not included.
+ */
+export function resolveGenericEquipmentGrantQuantities(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentDraftOptions,
+): ReadonlyMap<string, number> {
+  const before = inventoryBeforeGenericGrants(draft, catalogIndex, options)
+  const after = appendGrantsFromDraft(draft, catalogIndex, before)
+  const quantities = new Map<string, number>()
+  const ids = new Set([...equipmentIdsInInventory(before), ...equipmentIdsInInventory(after)])
+
+  for (const equipmentId of ids) {
+    const added =
+      inventoryQuantityForEquipmentId(after, equipmentId) -
+      inventoryQuantityForEquipmentId(before, equipmentId)
+    if (added > 0) quantities.set(equipmentId, added)
+  }
+
+  return quantities
+}
+
+function quantitiesByEquipmentId(inventory: CharacterEquipment): Map<string, number> {
+  const quantities = new Map<string, number>()
+  for (const equipmentId of equipmentIdsInInventory(inventory)) {
+    quantities.set(equipmentId, inventoryQuantityForEquipmentId(inventory, equipmentId))
+  }
+  return quantities
+}
+
+/** Package-channel quantity per equipment id, with entry-quantity overrides applied. */
+export function resolvePackageEquipmentQuantities(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): ReadonlyMap<string, number> {
+  const context = resolveEquipmentDraftContext(draft, catalogIndex)
+  return quantitiesByEquipmentId(packageRowsForContext(draft, context, catalogIndex))
+}
+
+/** Magic-item selections the derivation counts — allowance and catalog entry both resolve. */
+export function listAppliedMagicItemGrantSelections(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentDraftOptions,
+): readonly AppliedMagicItemGrantSelection[] {
+  const context = resolveEquipmentDraftContext(draft, catalogIndex)
+  if (!context && !draft.class.classId) return []
+
+  const rulesetId = rulesetIdForDraft(draft, context, catalogIndex, options)
+  if (rulesetId === undefined) return []
+
+  return listAppliedMagicItemSelections({
+    draft,
+    catalogIndex,
+    startingWealth: options?.startingWealth,
+    rulesetId,
+    requirement: options?.magicItemRequirement ?? 'exact',
+  })
+}
+
+/** Purchase rows the derivation counts — a starting option is selected and the item exists. */
+export function listCountedEquipmentPurchases(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+): readonly NormalizedCharacterBuilderDraftEquipmentPurchase[] {
+  const context = resolveEquipmentDraftContext(draft, catalogIndex)
+  if (!context) return []
+
+  const purchases = draft.equipment?.purchases ?? []
+  return purchases
+    .map((_, index) => normalizeEquipmentPurchase(purchases, index))
+    .filter((purchase) => catalogIndex.equipment.has(purchase.equipmentId))
+}
+
+/**
+ * Composes package items (minus removals), magic-item grant selections, draft
+ * purchases, and ensure-at-least grants into inventory rows with selection sources.
+ */
+export function deriveEquipmentDraftEntries(
+  draft: CharacterBuilderDraft,
+  catalogIndex: CharacterBuildCatalogIndex,
+  options?: DeriveEquipmentDraftOptions,
+): CharacterEquipment {
   return appendGrantsFromDraft(
     draft,
     catalogIndex,
-    purchasesForContext(draft, context, catalogIndex, withMagic),
+    inventoryBeforeGenericGrants(draft, catalogIndex, options),
   )
 }

@@ -59,6 +59,7 @@ export function OrganizationMembersDetailDrawers({
         }}
         organization={editableOrganization}
         candidates={detail.candidates}
+        resolveClassLabel={detail.resolveClassLabel}
         candidatesLoading={detail.candidatesPending}
         onAdd={detail.handleAddMember}
         memberSelectionPolicy={detail.memberSelectionPolicy}

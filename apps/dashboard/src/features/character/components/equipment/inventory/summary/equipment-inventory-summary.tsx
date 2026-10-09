@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import type {
   CharacterBuildCatalogIndex,
@@ -9,22 +9,32 @@ import type {
   ResolvedStartingEquipmentFunding,
   StartingPackageConversionPreview,
 } from '@rpg/contracts'
-import { Heading, Text } from '@rpg/ui'
+import { Badge, Heading, Text } from '@rpg/ui'
 
 import {
+  EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL,
   EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
-  EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL,
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../../../lib/equipment/equipment-step.lib'
-import { EquipmentAddedInventoryColumn } from '../added/equipment-added-inventory-column'
-import { EquipmentInventoryColumn } from '../column/equipment-inventory-column'
-import { EquipmentStartingPackageSection } from '../../starting-package/equipment-starting-package-section'
-import { buildEquipmentInventoryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import { EquipmentAddedInventorySection } from '../added/equipment-added-inventory-section'
 import {
-  equipmentGoldOptionPanelClasses,
-  equipmentInventorySummaryGridClasses,
+  EquipmentStartingPackageDisclosure,
+  EquipmentStartingPackageGoldHeader,
+} from '../../starting-package/equipment-starting-package-disclosure'
+import {
+  buildEquipmentInventoryViewModel,
+  type AddedEquipmentCategoryGroup,
+  type EquipmentInventoryStartingChannel,
+} from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import {
+  EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
+  equipmentInventoryPanelClasses,
+  equipmentInventoryPanelDividerClasses,
+  equipmentInventorySectionClasses,
+  equipmentInventorySectionHeaderClasses,
 } from '../equipment-inventory.variants'
+import { useEquipmentSelectionFacts } from '../../../../hooks/use-equipment-selection-facts'
 
 export type EquipmentInventorySummaryProps = {
   draft: CharacterBuilderDraft
@@ -53,7 +63,7 @@ export type EquipmentInventorySummaryProps = {
 }
 
 function EquipmentInventoryStartingSection({
-  viewModel,
+  startingEquipment,
   draft,
   catalogIndex,
   goldOptionFunding,
@@ -66,7 +76,7 @@ function EquipmentInventoryStartingSection({
   onCancelConversion,
   onCommitConversion,
 }: {
-  viewModel: NonNullable<ReturnType<typeof buildEquipmentInventoryViewModel>>
+  startingEquipment: EquipmentInventoryStartingChannel
   draft: CharacterBuilderDraft
   catalogIndex: CharacterBuildCatalogIndex
   goldOptionFunding?: ResolvedStartingEquipmentFunding
@@ -79,10 +89,10 @@ function EquipmentInventoryStartingSection({
   onCancelConversion?: () => void
   onCommitConversion?: (preview: StartingPackageConversionPreview) => void
 }) {
-  if (viewModel.startingEquipment.kind === 'package') {
+  if (startingEquipment.kind === 'package') {
     return (
-      <EquipmentStartingPackageSection
-        packageGroup={viewModel.startingEquipment.group}
+      <EquipmentStartingPackageDisclosure
+        packageGroup={startingEquipment.group}
         draft={draft}
         catalogIndex={catalogIndex}
         goldOptionFunding={goldOptionFunding}
@@ -98,17 +108,68 @@ function EquipmentInventoryStartingSection({
     )
   }
 
+  return <EquipmentStartingPackageGoldHeader optionLabel={startingEquipment.optionLabel} />
+}
+
+function EquipmentAddedInventoryBlock({
+  addedEquipment,
+  draft,
+  context,
+  catalogIndex,
+  budget,
+  onRemoveItem,
+  onSetPurchaseQuantity,
+  onReleaseGrant,
+  onRemovePurchase,
+  onApplyMagicItemAcquisition,
+}: {
+  addedEquipment: AddedEquipmentCategoryGroup[]
+  draft: CharacterBuilderDraft
+  context: CharacterBuildContext
+  catalogIndex: CharacterBuildCatalogIndex
+  budget?: EquipmentBudgetSummary
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
+  onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+  onReleaseGrant: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
+  onRemovePurchase: (args: { purchaseId: string; quantity: number }) => void
+  onApplyMagicItemAcquisition: (args: { equipmentId: string; requestedQuantity: number }) => boolean
+}) {
+  const [openEquipmentId, setOpenEquipmentId] = useState<string | null>(null)
+  const addedInventoryCount = useMemo(
+    () =>
+      addedEquipment
+        .flatMap((group) => group.entries)
+        .reduce((sum, entry) => sum + entry.totalQuantity, 0),
+    [addedEquipment],
+  )
+
   return (
-    <EquipmentInventoryColumn title={EQUIPMENT_STARTING_PACKAGE_SECTION_LABEL}>
-      <div className={equipmentGoldOptionPanelClasses}>
-        <Heading variant="group" as="h4">
-          {viewModel.startingEquipment.message}
+    <section className={equipmentInventorySectionClasses}>
+      <div className={equipmentInventorySectionHeaderClasses}>
+        <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
+          {EQUIPMENT_ADDED_INVENTORY_SECTION_LABEL}
         </Heading>
-        <Text as="p" className="text-sm text-muted-foreground">
-          {viewModel.startingEquipment.description}
-        </Text>
+        {addedInventoryCount > 0 ? (
+          <Badge appearance="soft" tone="neutral" size="sm">
+            {addedInventoryCount}
+          </Badge>
+        ) : null}
       </div>
-    </EquipmentInventoryColumn>
+      <EquipmentAddedInventorySection
+        addedEquipment={addedEquipment}
+        draft={draft}
+        context={context}
+        catalogIndex={catalogIndex}
+        budget={budget}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onReleaseGrant={onReleaseGrant}
+        onRemovePurchase={onRemovePurchase}
+        onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+        openEquipmentId={openEquipmentId}
+        onOpenEquipmentChange={setOpenEquipmentId}
+      />
+    </section>
   )
 }
 
@@ -134,9 +195,18 @@ export function EquipmentInventorySummary({
   onCommitConversion,
   emptyMessage = EQUIPMENT_INVENTORY_EMPTY_MESSAGE,
 }: EquipmentInventorySummaryProps) {
+  const selectionFacts = useEquipmentSelectionFacts()
   const viewModel = useMemo(
-    () => buildEquipmentInventoryViewModel(draft, catalogIndex, budget, classOptionPolicy, context),
-    [budget, catalogIndex, classOptionPolicy, context, draft],
+    () =>
+      buildEquipmentInventoryViewModel(
+        draft,
+        catalogIndex,
+        budget,
+        classOptionPolicy,
+        context,
+        selectionFacts,
+      ),
+    [budget, catalogIndex, classOptionPolicy, context, draft, selectionFacts],
   )
 
   if (!viewModel) {
@@ -144,35 +214,38 @@ export function EquipmentInventorySummary({
   }
 
   return (
-    <div className={equipmentInventorySummaryGridClasses}>
-      <EquipmentInventoryStartingSection
-        viewModel={viewModel}
-        draft={draft}
-        catalogIndex={catalogIndex}
-        goldOptionFunding={goldOptionFunding}
-        conversionEditorOpen={conversionEditorOpen}
-        selectedPackageItemKeys={selectedPackageItemKeys}
-        conversionCommitStatusMessage={conversionCommitStatusMessage}
-        onCustomizePackage={onCustomizePackage}
-        onChangeEquipmentOption={onChangeEquipmentOption}
-        onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
-        onCancelConversion={onCancelConversion}
-        onCommitConversion={onCommitConversion}
-      />
-
-      <EquipmentAddedInventoryColumn
+    <div className={equipmentInventoryPanelClasses}>
+      <EquipmentAddedInventoryBlock
         addedEquipment={viewModel.addedEquipment}
         draft={draft}
         context={context}
         catalogIndex={catalogIndex}
         budget={budget}
-        reserveToolbarRow={viewModel.startingEquipment.kind === 'package'}
         onRemoveItem={onRemoveItem}
         onSetPurchaseQuantity={onSetPurchaseQuantity}
         onReleaseGrant={onReleaseGrant ?? (() => undefined)}
         onRemovePurchase={onRemovePurchase ?? (() => undefined)}
         onApplyMagicItemAcquisition={onApplyMagicItemAcquisition ?? (() => false)}
       />
+      {viewModel.layout === 'split' ? (
+        <>
+          <div className={equipmentInventoryPanelDividerClasses} role="separator" />
+          <EquipmentInventoryStartingSection
+            startingEquipment={viewModel.startingEquipment}
+            draft={draft}
+            catalogIndex={catalogIndex}
+            goldOptionFunding={goldOptionFunding}
+            conversionEditorOpen={conversionEditorOpen}
+            selectedPackageItemKeys={selectedPackageItemKeys}
+            conversionCommitStatusMessage={conversionCommitStatusMessage}
+            onCustomizePackage={onCustomizePackage}
+            onChangeEquipmentOption={onChangeEquipmentOption}
+            onSelectedPackageItemKeysChange={onSelectedPackageItemKeysChange}
+            onCancelConversion={onCancelConversion}
+            onCommitConversion={onCommitConversion}
+          />
+        </>
+      ) : null}
     </div>
   )
 }

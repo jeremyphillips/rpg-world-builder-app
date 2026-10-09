@@ -245,6 +245,18 @@ describe('resolveAutomaticNpcBuild', () => {
     const context: CharacterBuildContext = {
       ...spellcastingTestContext,
       characterKind: 'npc',
+      characterCreationRules: {
+        ...spellcastingTestContext.characterCreationRules,
+        startingWealth: {
+          ...spellcastingTestContext.characterCreationRules.startingWealth,
+          tiers: spellcastingTestContext.characterCreationRules.startingWealth.tiers.map(
+            (tier) => ({
+              ...tier,
+              magicItemGrants: [{ rarity: 'common' as const, quantity: 1 }],
+            }),
+          ),
+        },
+      },
     }
     const seed = fighterSeed({
       speciesId: `${RULESET}:fixture-dwarf`,
@@ -254,6 +266,8 @@ describe('resolveAutomaticNpcBuild', () => {
 
     expect(result.ok).toBe(true)
     if (!result.ok) return
+
+    expect(result.draft.equipment?.magicItemSelections ?? []).toEqual([])
 
     // Alphabetical first-eligible; the level-3 spell is not selectable at level 1.
     expect(

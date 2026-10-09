@@ -1,4 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
+import {
+  getContentTypeTerm,
+  getSpellCollectionKindLabel,
+  vocabularyTermLabel,
+} from '@rpg/contracts'
 import { BookOpen, Flag, ListChecks, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 
@@ -95,18 +100,29 @@ export const TwoSegments: Story = {
     value: 'cantrips',
     fullWidth: true,
     options: [
-      { value: 'cantrips', label: 'Cantrips', metadata: '1/3' },
-      { value: 'prepared-spells', label: 'Prepared spells', metadata: '3/4' },
+      {
+        value: 'cantrips',
+        label: getSpellCollectionKindLabel('cantrips'),
+        metadata: '1/3',
+      },
+      {
+        value: 'spells',
+        label: vocabularyTermLabel(getContentTypeTerm('spells'), {
+          number: 'plural',
+          casing: 'title',
+        }),
+        metadata: '3/4',
+      },
     ],
     onValueChange: () => undefined,
   },
   render: (args) => {
-    const [value, setValue] = useState<'cantrips' | 'prepared-spells'>('cantrips')
+    const [value, setValue] = useState<'cantrips' | 'spells'>('cantrips')
     return (
       <SegmentedControl
         {...args}
         value={value}
-        onValueChange={(next) => setValue(next as 'cantrips' | 'prepared-spells')}
+        onValueChange={(next) => setValue(next as 'cantrips' | 'spells')}
       />
     )
   },

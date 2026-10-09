@@ -5,9 +5,10 @@ import type { ZodType } from 'zod'
 import { Form, type FormDensity, type FormItem, type FormValueSync } from '@rpg/ui/form'
 
 import { useCreateFlowFormDensity } from '@/lib/create-flow'
-import { FormUnsavedChangesGuard, useUnsavedChangesConfirm } from '@/lib/form-unsaved-changes-guard'
+import { FormUnsavedChangesGuard } from '@/lib/form-unsaved-changes-guard'
+import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
-import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
 
 export type ContentFormHostFormProps<TFormValues extends FieldValues> = {
   schema: ZodType<TFormValues>

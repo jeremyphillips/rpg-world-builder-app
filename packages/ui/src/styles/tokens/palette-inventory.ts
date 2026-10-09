@@ -14,7 +14,6 @@ export const PALETTE_SURFACE_ELEVATION_STEPS = [
   'surface-panel',
   'surface-lift',
   'surface-sunken',
-  'surface-secondary',
   'surface-accent',
 ] as const
 
@@ -50,7 +49,17 @@ export const PALETTE_CHROME_STEPS = [
   'drop-target-overlay-invalid-fg',
 ] as const
 
-export const PALETTE_BRAND_STEPS = ['primary', 'primary-foreground', 'on-solid'] as const
+export const PALETTE_BRAND_STEPS = [
+  'primary',
+  'primary-foreground',
+  'secondary',
+  'secondary-foreground',
+  'action-primary',
+  'action-primary-foreground',
+  'action-secondary',
+  'action-secondary-foreground',
+  'on-solid',
+] as const
 
 export const PALETTE_STATUS_STEPS = [
   'destructive',

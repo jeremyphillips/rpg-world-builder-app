@@ -40,6 +40,7 @@ function resolveScopedAllowances(args: {
   const allowances = resolveMagicItemGrantAllowances({
     startingWealthTableId: args.context.startingWealthTableId,
     tier,
+    requirement: args.context.magicItemRequirement,
   })
 
   if (args.focusedAllowanceId) {

@@ -38,8 +38,8 @@ describe('XpThresholdsField', () => {
       />,
     )
 
-    expect(screen.getByText('30 levels ·')).toHaveClass('text-muted-foreground')
-    expect(screen.getByText('10 thresholds derived')).toHaveClass('text-semantic-warning')
+    expect(screen.getByText('30 levels')).toHaveClass('text-muted-foreground')
+    expect(screen.getByText(/10 thresholds derived/)).toHaveClass('text-semantic-warning')
   })
 
   it('keeps non-derived summary muted', () => {

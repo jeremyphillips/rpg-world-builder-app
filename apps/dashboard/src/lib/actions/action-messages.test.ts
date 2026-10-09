@@ -1,3 +1,4 @@
+import { getCharacterTypeBulkActionDescriptor } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -115,7 +116,8 @@ describe('action messages', () => {
     expect(formatActionPartialSuccess(1, 2, 1, 'entries', 'entry')).toBe(
       'Updated 1 entry. 2 entries blocked. 1 entry failed.',
     )
-    expect(formatActionMixedResult(2, 1, 1, 'NPCs', 'NPC')).toBe(
+    const npcNouns = getCharacterTypeBulkActionDescriptor('npc')
+    expect(formatActionMixedResult(2, 1, 1, npcNouns.nounPlural, npcNouns.nounSingular)).toBe(
       'Updated 2 NPCs. 1 NPC failed. 1 NPC unchanged.',
     )
   })

@@ -8,7 +8,7 @@ import {
 } from '@rpg/contracts'
 import { ComboboxField, ConfirmDialog } from '@rpg/ui'
 
-import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/use-organization-authoring-context'
 import {
   ORGANIZATION_FAMILIAR_TYPE_HINT,
   ORGANIZATION_FAMILIAR_TYPE_LEGEND,

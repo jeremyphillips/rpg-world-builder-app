@@ -11,7 +11,7 @@ import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { compareIntentionalEquipmentRanking } from './equipment-ranking-policy'
 
 describe('equipment ranking primitives', () => {
-  it('ranks unsatisfied exact requirements ahead of any-of candidates', () => {
+  it('ranks exact requirement matches ahead of any-of matches', () => {
     expect(
       compareActiveRequirement(
         [
@@ -36,21 +36,22 @@ describe('equipment ranking primitives', () => {
     ).toBeLessThan(0)
   })
 
-  it('does not treat a satisfied focus candidate as an active requirement', () => {
+  it('ranks a satisfied requirement the same as an unsatisfied one', () => {
+    const exact = {
+      requirementId: 'spellbook',
+      owner: { kind: 'class' as const, id: 'wizard' },
+      rule: 'exact' as const,
+      optionSatisfies: true as const,
+    }
     expect(
       compareActiveRequirement(
-        [
-          {
-            requirementId: 'focus',
-            owner: { kind: 'class', id: 'wizard' },
-            rule: 'anyOf',
-            optionSatisfies: true,
-            role: 'satisfier',
-          },
-        ],
-        [],
+        [{ ...exact, role: 'candidate' }],
+        [{ ...exact, role: 'satisfier' }],
       ),
     ).toBe(0)
+    expect(
+      compareActiveRequirement([{ ...exact, role: 'satisfier', rule: 'anyOf' }], []),
+    ).toBeLessThan(0)
   })
 
   it('keeps context relevance inactive for the general drawer', () => {
@@ -162,20 +163,288 @@ describe('compareIntentionalEquipmentRanking', () => {
     expect(compareIntentionalEquipmentRanking(required, neutral, context)).toBeLessThan(0)
   })
 
-  it('compares proficiency only when both rows define it', () => {
-    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
-    const proficient = weapon('Club', true)
-    const untracked = weapon('Axe', undefined)
-    const notProficient = weapon('Axe', false)
-    const untrackedLater = weapon('Club', undefined)
+  it('does not lift an alternative package or an open pool ahead of name order', () => {
+    const context = {
+      preferMartialWeaponBrowseOrder: false,
+      activeChoice: { kind: 'pool' as const, choiceSetId: 'fighter:weapons' },
+    }
+    const later = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {
+        choice: {
+          choiceSetId: 'fighter:weapons',
+          inOpenPool: true,
+          inSelectedPackage: false,
+          inAlternativePackage: true,
+        },
+      },
+    })
+    const earlier = item('Bedroll', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+    })
 
-    expect(compareIntentionalEquipmentRanking(proficient, untracked, context)).toBeGreaterThan(0)
-    expect(compareIntentionalEquipmentRanking(notProficient, untrackedLater, context)).toBeLessThan(
+    expect(compareIntentionalEquipmentRanking(later, earlier, context)).toBeGreaterThan(0)
+  })
+
+  it('does not sink an unaffordable row ahead of name order', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankPurchaseAvailability: true }
+    const later = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'available' },
+    })
+    const earlier = item('Bedroll', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+    })
+
+    expect(compareIntentionalEquipmentRanking(later, earlier, context)).toBeGreaterThan(0)
+  })
+
+  it('ranks proficient before untracked before not proficient', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const proficient = weapon('Zebra', true)
+    const untracked = weapon('Alpha', undefined)
+    const notProficient = weapon('Alpha', false)
+    const untrackedLater = weapon('Zebra', undefined)
+
+    expect(compareIntentionalEquipmentRanking(proficient, untracked, context)).toBeLessThan(0)
+    expect(compareIntentionalEquipmentRanking(untrackedLater, notProficient, context)).toBeLessThan(
       0,
     )
     expect(compareIntentionalEquipmentRanking(proficient, notProficient, context)).toBeLessThan(0)
   })
+
+  it('does not rank unaffordable below not proficient alone', () => {
+    const context = {
+      preferMartialWeaponBrowseOrder: false,
+      rankPurchaseAvailability: true,
+      rankCompatibility: true,
+    }
+    const unaffordable = item(
+      'Alpha',
+      {
+        recommendation: { strength: 'neutral', signals: [] },
+        requirements: [],
+        state: { compatibility: { proficient: false } },
+        purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      },
+      'weapon',
+    )
+    const affordable = item(
+      'Zebra',
+      {
+        recommendation: { strength: 'neutral', signals: [] },
+        requirements: [],
+        state: { compatibility: { proficient: false } },
+        purchaseAvailability: { status: 'available' },
+      },
+      'weapon',
+    )
+
+    expect(compareIntentionalEquipmentRanking(unaffordable, affordable, context)).toBeLessThan(0)
+  })
+
+  it('sinks a row above the starting-purse ceiling after an otherwise equal row', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const withinCeiling = item('Zebra', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      exceedsPurchaseBudgetCeiling: false,
+    })
+    const aboveCeiling = item('Alpha', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      purchaseAvailability: { status: 'unaffordable', shortfallCp: 10 },
+      exceedsPurchaseBudgetCeiling: true,
+    })
+
+    expect(compareIntentionalEquipmentRanking(withinCeiling, aboveCeiling, context)).toBeLessThan(0)
+  })
+
+  it('keeps a strong row above the ceiling ahead of a neutral row inside it', () => {
+    const context = { preferMartialWeaponBrowseOrder: false }
+    const strong = item('Plate', {
+      recommendation: {
+        strength: 'strong',
+        signals: [
+          {
+            strength: 'strong',
+            basis: 'authored',
+            specificity: 'exact',
+            source: { kind: 'class', id: 'fighter' },
+          },
+        ],
+      },
+      requirements: [],
+      state: {},
+      exceedsPurchaseBudgetCeiling: true,
+    })
+    const neutral = item('Rope', {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: {},
+      exceedsPurchaseBudgetCeiling: false,
+    })
+
+    expect(compareIntentionalEquipmentRanking(strong, neutral, context)).toBeLessThan(0)
+  })
+
+  it('ranks proficiency ahead of the starting-purse ceiling', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const proficientAboveCeiling = weapon('Zebra', true)
+    proficientAboveCeiling.state.resolved = {
+      ...proficientAboveCeiling.state.resolved!,
+      exceedsPurchaseBudgetCeiling: true,
+    }
+    const notProficientWithinCeiling = weapon('Alpha', false)
+
+    expect(
+      compareIntentionalEquipmentRanking(
+        proficientAboveCeiling,
+        notProficientWithinCeiling,
+        context,
+      ),
+    ).toBeLessThan(0)
+  })
+
+  it('sorts armor the character can wear without a penalty before armor with an unmet requirement', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const met = armor('Zebra', { proficient: true })
+    const absent = armor('Yarn', { proficient: true })
+    const unmet = armor('Alpha', {
+      proficient: true,
+      unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+    })
+
+    expect(compareIntentionalEquipmentRanking(met, unmet, context)).toBeLessThan(0)
+    expect(compareIntentionalEquipmentRanking(absent, unmet, context)).toBeLessThan(0)
+  })
+
+  it('ranks proficiency ahead of an unmet ability requirement', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const proficientUnmet = armor('Zebra', {
+      proficient: true,
+      unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+    })
+    const notProficientMet = armor('Alpha', { proficient: false })
+
+    expect(
+      compareIntentionalEquipmentRanking(proficientUnmet, notProficientMet, context),
+    ).toBeLessThan(0)
+  })
+
+  it('a structural budget miss sinks below a usable ability penalty', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const unmetWithinCeiling = armor('Alpha', {
+      proficient: true,
+      unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+    })
+    const metAboveCeiling = armor('Zebra', { proficient: true })
+    metAboveCeiling.state.resolved = {
+      ...metAboveCeiling.state.resolved!,
+      exceedsPurchaseBudgetCeiling: true,
+    }
+
+    expect(
+      compareIntentionalEquipmentRanking(unmetWithinCeiling, metAboveCeiling, context),
+    ).toBeLessThan(0)
+  })
+
+  it('keeps a strong unmet row ahead of a neutral row with no ability penalty', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const strong = item(
+      'Plate',
+      {
+        recommendation: {
+          strength: 'strong',
+          signals: [
+            {
+              strength: 'strong',
+              basis: 'authored',
+              specificity: 'exact',
+              source: { kind: 'class', id: 'fighter' },
+            },
+          ],
+        },
+        requirements: [],
+        state: {
+          compatibility: {
+            proficient: true,
+            unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+          },
+        },
+      },
+      'armor',
+    )
+    const neutral = armor('Rope', { proficient: true })
+
+    expect(compareIntentionalEquipmentRanking(strong, neutral, context)).toBeLessThan(0)
+  })
+
+  it('does not penalize rows when no ability scores are set', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const earlier = armor('Alpha', { proficient: true })
+    const later = armor('Zebra', { proficient: true })
+
+    expect(compareIntentionalEquipmentRanking(earlier, later, context)).toBeLessThan(0)
+  })
+
+  it('does not rank unmet ability scores when compatibility ranking is off', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: false }
+    const unmet = armor('Alpha', {
+      unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+    })
+    const met = armor('Zebra')
+
+    expect(compareIntentionalEquipmentRanking(unmet, met, context)).toBeLessThan(0)
+  })
+
+  it('sinks unmet armor below a later kind bucket that has no ability penalty', () => {
+    const context = { preferMartialWeaponBrowseOrder: false, rankCompatibility: true }
+    const unmetArmor = armor('Alpha', {
+      proficient: true,
+      unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 8 }],
+    })
+    const tool = item(
+      'Zebra',
+      {
+        recommendation: { strength: 'neutral', signals: [] },
+        requirements: [],
+        state: { compatibility: { proficient: true } },
+      },
+      'tool',
+    )
+
+    expect(compareIntentionalEquipmentRanking(tool, unmetArmor, context)).toBeLessThan(0)
+  })
 })
+
+function armor(
+  name: string,
+  compatibility: NonNullable<
+    NonNullable<EquipmentPickerItem['state']['resolved']>['state']['compatibility']
+  > = {},
+): EquipmentPickerItem {
+  return item(
+    name,
+    {
+      recommendation: { strength: 'neutral', signals: [] },
+      requirements: [],
+      state: { compatibility },
+    },
+    'armor',
+  )
+}
 
 function weapon(name: string, proficient: boolean | undefined): EquipmentPickerItem {
   return item(

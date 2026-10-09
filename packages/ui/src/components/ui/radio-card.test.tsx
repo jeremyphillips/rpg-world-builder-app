@@ -116,6 +116,24 @@ describe('RadioCard', () => {
     expect(screen.getByText('L3: Faerie Fire spell')).toBeInTheDocument()
   })
 
+  it('renders rich summary content under the description', () => {
+    render(
+      <RadioCard
+        aria-label="Starting equipment options"
+        options={[
+          {
+            label: 'Starting Gold',
+            value: 'starting-gold',
+            description: 'Take 75 GP instead of standard equipment.',
+            summaryContent: <span>75 GP base</span>,
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText('75 GP base')).toBeInTheDocument()
+  })
+
   it('renders an inline title badge when provided', () => {
     render(
       <RadioCard
@@ -164,7 +182,7 @@ describe('RadioCard', () => {
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
     const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-background')
+    expect(shell).toHaveClass('bg-surface-muted')
   })
 
   it('renders embedded content inside the selected card shell', () => {

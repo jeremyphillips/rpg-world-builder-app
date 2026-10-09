@@ -1,4 +1,4 @@
-import { formatProgressionTierSeparatorLabel } from '../../components/tables/progression-tier-separator'
+import { formatProgressionTierSeparatorLabel } from '../../components/tables/progression-tier-separator.lib'
 import {
   isTableGridDataRow,
   type TableGridPresentationRow,

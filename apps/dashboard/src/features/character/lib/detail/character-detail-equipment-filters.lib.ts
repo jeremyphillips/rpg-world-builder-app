@@ -5,6 +5,8 @@ import {
 } from '@rpg/contracts'
 import { applyFilterSchema, type FilterSchema } from '@rpg/ui/filters'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
+
 import {
   CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS,
   matchesCharacterDetailCatalogSearchQuery,
@@ -16,7 +18,6 @@ export const CHARACTER_DETAIL_EQUIPMENT_KIND_ALL = '__all__' as const
 
 export const CHARACTER_DETAIL_EQUIPMENT_CATEGORY_LABEL = 'Equipment kind'
 export const CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL = 'Sort'
-export const CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL = 'Reset view'
 export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER = 'Search equipment'
 
 export const CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_ASC = 'name_asc' as const
@@ -50,11 +51,6 @@ export const CHARACTER_DETAIL_EQUIPMENT_VIEW_DEFAULTS = {
 } as const
 
 export const CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS = CHARACTER_DETAIL_CATALOG_SEARCH_MIN_ITEMS
-
-const equipmentNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
 
 export function resolveCharacterDetailEquipmentKindOptions(
   cards: readonly CharacterSheetEquipmentCard[],
@@ -93,6 +89,6 @@ export function sortCharacterDetailEquipmentCards(
   const direction = sortMode === CHARACTER_DETAIL_EQUIPMENT_SORT_NAME_DESC ? -1 : 1
 
   return [...cards].sort(
-    (left, right) => direction * equipmentNameCollator.compare(left.displayName, right.displayName),
+    (left, right) => direction * pickerNameCollator.compare(left.displayName, right.displayName),
   )
 }

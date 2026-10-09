@@ -2,7 +2,7 @@ import {
   getSpellAtomicEffectKindLabel,
   type SpellAtomicEffectKind,
 } from '../../../vocab/spell/atomic-effect-kind'
-import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 import type { RollValue } from '../../../primitives/mechanics/roll'
 import type { SpellResolutionTargetKind } from '../resolution/vocab'
 

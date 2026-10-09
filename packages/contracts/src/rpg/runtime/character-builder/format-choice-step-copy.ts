@@ -1,3 +1,4 @@
+import { getContentTypeSentenceForm } from '../../content/lib/content-type-terms'
 import { joinNaturalList } from '../../primitives/prose'
 import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
 import type { ChoiceSet } from './choice-set'
@@ -231,7 +232,7 @@ export function formatChoiceCategorySubhead(
   if (choiceSets.length === 0) return ''
 
   if (subheadStyle === 'spell') {
-    return 'Choose spells from the options below.'
+    return `Choose ${getContentTypeSentenceForm('spells', 2)} from the options below.`
   }
 
   if (hasFixedGrantsInCategory) {
@@ -253,7 +254,7 @@ export function formatChoiceSectionEmptyMessage(
         additional: hasFixedGrantsInCategory,
       })
     }
-    return 'No spells chosen yet.'
+    return formatSpellChoiceEmptyMessage('spell')
   }
 
   if (choiceType) {

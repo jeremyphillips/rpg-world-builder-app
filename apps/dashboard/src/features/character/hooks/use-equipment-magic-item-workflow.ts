@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import type {
+  CharacterBuildCatalogIndex,
   CharacterBuildContext,
   CharacterBuilderDraft,
   EquipmentPickerItem,
@@ -17,13 +18,13 @@ import {
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { enrichEquipmentPickerItemsWithMagicItemAction } from '../lib/equipment/enrich-equipment-picker-magic-item-action.lib'
-import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
+import type { EquipmentPickerRow } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 
 export function useEquipmentMagicItemWorkflow(args: {
   draft: CharacterBuilderDraft
   context: CharacterBuildContext
   catalogIndex: CharacterBuildCatalogIndex
-  pickerItems: readonly EquipmentPickerItem[]
+  pickerItems: readonly EquipmentPickerRow[]
   pickerWorkflowMode: EquipmentPickerWorkflowMode
   showPurchaseWorkflow: boolean
   focusedAllowanceId?: string
@@ -62,7 +63,7 @@ export function useEquipmentMagicItemWorkflow(args: {
           context: args.context,
           catalogIndex: args.catalogIndex,
         }),
-        focusedAllowanceId: args.focusedAllowanceId,
+        focusedAllowanceId: undefined,
       }),
     )
 
@@ -90,8 +91,23 @@ export function useEquipmentMagicItemWorkflow(args: {
     return quantities
   }, [args.draft, args.pickerItems])
 
+  const matchesMagicItemAllowance = useCallback(
+    (item: EquipmentPickerItem, allowanceId: string) =>
+      isMagicItemPickerItemVisible({
+        equipment: item.equipment,
+        draft: args.draft,
+        context: resolveEquipmentAcquisitionContext({
+          context: args.context,
+          catalogIndex: args.catalogIndex,
+        }),
+        focusedAllowanceId: allowanceId,
+      }),
+    [args.catalogIndex, args.context, args.draft],
+  )
+
   return {
     acquisition,
+    matchesMagicItemAllowance,
     showMagicItemGrants,
     pickerWorkflowModes,
     magicItemProgressLabel,

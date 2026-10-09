@@ -19,9 +19,16 @@ import {
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import {
-  EquipmentInventoryManageDisclosureCard,
-  createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel'
+  selectionFactsDraft,
+  selectionFactsEquipment,
+  selectionFactsForDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+} from '../../../../lib/equipment/equipment-selection-facts.fixtures'
+import { resolveHeldEquipmentSelectionPresentation } from '../../../../lib/equipment/equipment-selection-facts.lib'
+import { resolveSelectionRowStatusItems } from '../../../../lib/selection-row-status'
+import { EquipmentInventoryManageDisclosureCard } from '../manage/equipment-inventory-manage-panel'
+import { createStorybookApplyMagicItemAcquisition } from '../manage/equipment-inventory-manage-panel-storybook'
 
 const rows: EquipmentInventoryRow[] = [
   {
@@ -177,6 +184,41 @@ describe('EquipmentInventoryManageDisclosureCard', () => {
     expect(screen.getByText('Common choices')).toBeInTheDocument()
     expect(screen.getByText('Purchased')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove one' })).toBeInTheDocument()
+    const spend = screen.getByText(/\d+ GP spent/)
+    expect(spend.previousElementSibling).toHaveTextContent('1')
+    expect(spend.textContent).not.toMatch(/·/)
+  })
+
+  it('renders the parent-resolved owned status in the card header', () => {
+    const scenario = selectionFactsScenario()
+    const draft = selectionFactsDraft({
+      optionId: 'starting-gold',
+      purchases: [selectionFactsPurchase('plate-armor')],
+    })
+    const plate = selectionFactsEquipment['plate-armor']
+    const status = resolveSelectionRowStatusItems(
+      resolveHeldEquipmentSelectionPresentation(selectionFactsForDraft(scenario, draft), plate),
+      { context: 'owned' },
+    )
+
+    render(
+      <EquipmentInventoryManageDisclosureCard
+        itemId="plate-armor"
+        equipmentName="Plate Armor"
+        status={status}
+        equipment={plate}
+        rows={[]}
+        draft={draft}
+        context={scenario.context}
+        catalogIndex={scenario.catalogIndex}
+        onReleaseGrant={vi.fn()}
+        onRemovePurchase={vi.fn()}
+        onApplyMagicItemAcquisition={vi.fn(() => true)}
+      />,
+    )
+
+    expect(screen.getByText('Not proficient')).toBeInTheDocument()
+    expect(screen.getByText('Requires STR 15')).toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {

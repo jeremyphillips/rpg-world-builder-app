@@ -1,6 +1,8 @@
 import {
+  MAGIC_ITEM_RARITY_TERM,
   getEquipmentKindCollectionLabel,
   getMagicItemRarityLabel,
+  getTermCompactLabel,
   type MagicItemGrantProgress,
 } from '@rpg/contracts'
 
@@ -9,30 +11,51 @@ import {
   createBooleanFilter,
   createChipsFilter,
   createFilterSchema,
+  createPopoverFilter,
   type FilterCatalogLayoutConfig,
   type FilterSchema,
 } from '@rpg/ui/filters'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+import {
+  armorDetailFilterGroups,
+  armorDetailFiltersActive,
+  countWeaponDetailFilters,
+  EMPTY_ARMOR_DETAIL_FILTERS,
+  EMPTY_WEAPON_DETAIL_FILTERS,
+  equipmentPickerKeepsNonProficientHidden,
+  EQUIPMENT_PICKER_ARMOR_FILTER_LABEL,
+  EQUIPMENT_PICKER_HIDE_NON_PROFICIENT_LABEL,
+  EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
+  formatEquipmentDetailFilterTriggerLabel,
+  matchesArmorDetailFilters,
+  matchesWeaponDetailFilters,
+  shouldShowHideNonProficientFilter,
+  weaponDetailFilterGroups,
+  weaponDetailFiltersActive,
+  type EquipmentArmorDetailFilters,
+  type EquipmentWeaponDetailFilters,
+} from './equipment-picker-kind-detail-filters'
 import type {
   EquipmentBudgetSummary,
   EquipmentPickerItem,
+  EquipmentPickerRow,
 } from '../drawer/equipment-picker-drawer.types'
 import {
   EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
   EQUIPMENT_PICKER_CATEGORY_LABEL,
   EQUIPMENT_PICKER_KIND_ALL,
   EQUIPMENT_PICKER_RARITY_ALL,
-  EQUIPMENT_PICKER_RARITY_LABEL,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSupportedKind,
 } from '../drawer/equipment-picker-drawer.types'
-import { countEquipmentPickerAffordableHiddenImpact } from '../drawer/equipment-picker-drawer.lib'
-
 export type EquipmentPickerFilterState = {
   selectedKind?: EquipmentPickerKindFilter
   selectedRarity?: string
   showAffordableOnly?: boolean
+  hideNonProficient?: boolean
+  weaponFilters?: EquipmentWeaponDetailFilters
+  armorFilters?: EquipmentArmorDetailFilters
 }
 
 export const EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER = [
@@ -42,16 +65,15 @@ export const EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER = [
 
 export const EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER = [
   'showAffordableOnly',
+  'hideNonProficient',
+  'weaponFilters',
+  'armorFilters',
 ] as const satisfies readonly (keyof EquipmentPickerFilterState)[]
 
-/** @deprecated Use `resolveEquipmentPickerFilterLayout` for schema-aware layout slots. */
-export const EQUIPMENT_PICKER_FILTER_LAYOUT = {
-  primaryFieldIds: [...EQUIPMENT_PICKER_PRIMARY_FILTER_FIELD_ORDER],
-  filterRowFieldIds: [...EQUIPMENT_PICKER_FILTER_ROW_FIELD_ORDER],
-} as const satisfies FilterCatalogLayoutConfig<EquipmentPickerFilterState>
-
-export function resolveEquipmentPickerFilterLayout(
-  schema: FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState>,
+export function resolveEquipmentPickerFilterLayout<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(
+  schema: FilterSchema<TItem, EquipmentPickerFilterState>,
 ): FilterCatalogLayoutConfig<EquipmentPickerFilterState> {
   const schemaFieldIds = new Set(schema.fields.map((field) => field.id))
 
@@ -67,16 +89,13 @@ export function resolveEquipmentPickerFilterLayout(
 
 export type CreateEquipmentPickerFilterSchemaArgs = {
   workflowMode: EquipmentPickerWorkflowMode
-  items: readonly EquipmentPickerItem[]
+  items: readonly EquipmentPickerRow[]
   kindOptions: readonly EquipmentPickerSupportedKind[]
   showCategoryFilter: boolean
   showRarityFilter: boolean
   showAffordableFilter: boolean
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
-  affordableHiddenCount?: number
-  filterOutUnaffordable: boolean
-  filterOutNonProficient: boolean
-  searchQuery: string
+  matchesMagicItemAllowance?: (row: EquipmentPickerItem, allowanceId: string) => boolean
   budget?: EquipmentBudgetSummary
 }
 
@@ -129,23 +148,27 @@ function sanitizeEquipmentPickerFilterState(
   args: CreateEquipmentPickerFilterSchemaArgs,
   state: EquipmentPickerFilterState,
 ): Partial<EquipmentPickerFilterState> {
-  return {
+  const patch: Partial<EquipmentPickerFilterState> = {
     ...sanitizeEquipmentPickerKindSelection(args, state),
     ...sanitizeEquipmentPickerRaritySelection(args, state),
     ...sanitizeEquipmentPickerAffordableSelection(args, state),
   }
+  const selectedKind = patch.selectedKind ?? state.selectedKind
+  if (selectedKind !== 'weapon' && state.weaponFilters) patch.weaponFilters = undefined
+  if (selectedKind !== 'armor' && state.armorFilters) patch.armorFilters = undefined
+  return patch
 }
 
-export function createEquipmentPickerFilterSchema(
-  args: CreateEquipmentPickerFilterSchemaArgs,
-): FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState> {
+export function createEquipmentPickerFilterSchema<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(args: CreateEquipmentPickerFilterSchemaArgs): FilterSchema<TItem, EquipmentPickerFilterState> {
   const fields = []
 
   if (args.showRarityFilter && args.magicItemGrantProgress) {
     fields.push(
-      createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedRarity'>({
+      createChipsFilter<TItem, EquipmentPickerFilterState, 'selectedRarity'>({
         id: 'selectedRarity',
-        label: EQUIPMENT_PICKER_RARITY_LABEL,
+        label: getTermCompactLabel(MAGIC_ITEM_RARITY_TERM),
         selectionMode: 'single-required',
         defaultValue: EQUIPMENT_PICKER_RARITY_ALL,
         isValueConstraining: (value) => value !== EQUIPMENT_PICKER_RARITY_ALL,
@@ -156,12 +179,19 @@ export function createEquipmentPickerFilterSchema(
             label: getMagicItemRarityLabel(entry.rarity),
           })),
         ],
-        matches: () => true,
+        matches: (row, value) => {
+          if (typeof value !== 'string') return false
+          return (
+            args.matchesMagicItemAllowance?.(row, value) ??
+            (row.equipment.kind === 'magic_item' &&
+              row.equipment.rarity === value.split(':').at(-1))
+          )
+        },
       }),
     )
   } else if (args.showCategoryFilter) {
     fields.push(
-      createChipsFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'selectedKind'>({
+      createChipsFilter<TItem, EquipmentPickerFilterState, 'selectedKind'>({
         id: 'selectedKind',
         label: EQUIPMENT_PICKER_CATEGORY_LABEL,
         selectionMode: 'single-required',
@@ -182,22 +212,82 @@ export function createEquipmentPickerFilterSchema(
 
   if (args.showAffordableFilter) {
     fields.push(
-      createBooleanFilter<EquipmentPickerItem, EquipmentPickerFilterState, 'showAffordableOnly'>({
+      createBooleanFilter<TItem, EquipmentPickerFilterState, 'showAffordableOnly'>({
         id: 'showAffordableOnly',
         label: EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL,
         placement: 'primary',
-        hiddenCount: (state) =>
-          state.showAffordableOnly
-            ? countEquipmentPickerAffordableHiddenImpact(args.items, {
-                searchQuery: args.searchQuery,
-                filterOutUnaffordable: args.filterOutUnaffordable,
-                filterOutNonProficient: args.filterOutNonProficient,
-                selectedKind: state.selectedKind ?? EQUIPMENT_PICKER_KIND_ALL,
-                showAffordableOnly: true,
-                budget: args.budget,
-              })
-            : undefined,
         getValue: (row) => row.state.isWithinRemainingBudget,
+      }),
+    )
+  }
+
+  if (shouldShowHideNonProficientFilter(args.items)) {
+    fields.push(
+      createBooleanFilter<TItem, EquipmentPickerFilterState, 'hideNonProficient'>({
+        id: 'hideNonProficient',
+        label: EQUIPMENT_PICKER_HIDE_NON_PROFICIENT_LABEL,
+        placement: 'primary',
+        getValue: (row) => equipmentPickerKeepsNonProficientHidden(row),
+      }),
+    )
+  }
+
+  const weaponGroups = weaponDetailFilterGroups(args.items)
+  if (weaponGroups.length > 0) {
+    fields.push(
+      createPopoverFilter<TItem, EquipmentPickerFilterState, 'weaponFilters'>({
+        id: 'weaponFilters',
+        label: EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
+        defaultValue: EMPTY_WEAPON_DETAIL_FILTERS,
+        visible: (state) => state.selectedKind === 'weapon',
+        triggerLabel: (activeCount) =>
+          formatEquipmentDetailFilterTriggerLabel(
+            EQUIPMENT_PICKER_WEAPON_FILTER_LABEL,
+            activeCount,
+          ),
+        groups: weaponGroups,
+        isValueConstraining: (value) =>
+          weaponDetailFiltersActive(
+            (value as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+          ),
+        isValueEqual: (left, right) =>
+          countWeaponDetailFilters(
+            (left as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+          ) ===
+            countWeaponDetailFilters(
+              (right as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+            ) &&
+          JSON.stringify(left ?? EMPTY_WEAPON_DETAIL_FILTERS) ===
+            JSON.stringify(right ?? EMPTY_WEAPON_DETAIL_FILTERS),
+        matches: (row, value) =>
+          matchesWeaponDetailFilters(
+            row,
+            (value as EquipmentWeaponDetailFilters | undefined) ?? EMPTY_WEAPON_DETAIL_FILTERS,
+          ),
+      }),
+    )
+  }
+
+  const armorGroups = armorDetailFilterGroups(args.items)
+  if (armorGroups.length > 0) {
+    fields.push(
+      createPopoverFilter<TItem, EquipmentPickerFilterState, 'armorFilters'>({
+        id: 'armorFilters',
+        label: EQUIPMENT_PICKER_ARMOR_FILTER_LABEL,
+        defaultValue: EMPTY_ARMOR_DETAIL_FILTERS,
+        visible: (state) => state.selectedKind === 'armor',
+        triggerLabel: (activeCount) =>
+          formatEquipmentDetailFilterTriggerLabel(EQUIPMENT_PICKER_ARMOR_FILTER_LABEL, activeCount),
+        groups: armorGroups,
+        isValueConstraining: (value) =>
+          armorDetailFiltersActive(
+            (value as EquipmentArmorDetailFilters | undefined) ?? EMPTY_ARMOR_DETAIL_FILTERS,
+          ),
+        matches: (row, value) =>
+          matchesArmorDetailFilters(
+            row,
+            (value as EquipmentArmorDetailFilters | undefined) ?? EMPTY_ARMOR_DETAIL_FILTERS,
+          ),
       }),
     )
   }
@@ -207,8 +297,10 @@ export function createEquipmentPickerFilterSchema(
   })
 }
 
-export function countEquipmentPickerStructuredFilters(
-  schema: FilterSchema<EquipmentPickerItem, EquipmentPickerFilterState>,
+export function countEquipmentPickerStructuredFilters<
+  TItem extends EquipmentPickerItem = EquipmentPickerItem,
+>(
+  schema: FilterSchema<TItem, EquipmentPickerFilterState>,
   state: EquipmentPickerFilterState,
 ): number {
   return countModifiedFilters(schema, state)
@@ -218,10 +310,16 @@ export function toEquipmentPickerFilterState(args: {
   selectedKind: EquipmentPickerKindFilter
   selectedRarity: string
   showAffordableOnly: boolean
+  hideNonProficient?: boolean
+  weaponFilters?: EquipmentWeaponDetailFilters
+  armorFilters?: EquipmentArmorDetailFilters
 }): EquipmentPickerFilterState {
   return {
     selectedKind: args.selectedKind,
     selectedRarity: args.selectedRarity,
     showAffordableOnly: args.showAffordableOnly || undefined,
+    hideNonProficient: args.hideNonProficient || undefined,
+    weaponFilters: args.weaponFilters,
+    armorFilters: args.armorFilters,
   }
 }

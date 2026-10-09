@@ -3,7 +3,6 @@ import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase
 import {
   copperToWealth,
   formatWealth,
-  formatWealthAsGold,
   moneyToCopper,
   subtractFromWealth,
   wealthToCopper,
@@ -29,14 +28,7 @@ export type EquipmentBudgetSummary = {
   remaining: CoinWealth
 }
 
-export {
-  copperToWealth,
-  formatWealth,
-  formatWealthAsGold,
-  moneyToCopper,
-  subtractFromWealth,
-  wealthToCopper,
-}
+export { copperToWealth, formatWealth, moneyToCopper, subtractFromWealth, wealthToCopper }
 
 /**
  * Package-setup filter only. True when the item has a market price within the starting purse.

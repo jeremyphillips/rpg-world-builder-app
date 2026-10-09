@@ -12,10 +12,13 @@ import {
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
 import { formatStandardSelectionSourceLabel } from '../../../character/format-selection-source-label'
+import type { Ability } from '../../../../vocab/ability'
 import { deriveRecommendedLanguageIds } from './derive-recommended-language-ids'
+import { deriveStrongestAbilities } from './derive-strongest-abilities'
 import {
+  ABILITY_FIT_RECOMMENDATION_REASON,
   NEUTRAL_OPTION_RECOMMENDATION,
-  softRecommendationFact,
+  softRecommendationFacts,
   type OptionPresentationFacts,
   type OptionRecommendation,
 } from '../../recommendation'
@@ -63,6 +66,41 @@ function languageRecommendation(args: {
       },
     ],
   }
+}
+
+function abilityFitRecommendation(
+  skillAbility: Ability | undefined,
+  strongestAbilities: ReadonlySet<Ability>,
+): OptionRecommendation {
+  if (!skillAbility || !strongestAbilities.has(skillAbility)) return NEUTRAL_OPTION_RECOMMENDATION
+  return {
+    strength: 'compatible',
+    signals: [
+      {
+        strength: 'compatible',
+        basis: 'inferred',
+        specificity: 'exact',
+        reason: ABILITY_FIT_RECOMMENDATION_REASON,
+      },
+    ],
+  }
+}
+
+function resolveRowRecommendation(args: {
+  choiceType: ChoiceSet['choiceType']
+  optionId: string
+  recommendedLanguageIds: ReadonlySet<string>
+  speciesId: string | undefined
+  skillAbility: Ability | undefined
+  strongestAbilities: ReadonlySet<Ability>
+}): OptionRecommendation {
+  if (args.choiceType === 'language') {
+    return languageRecommendation(args)
+  }
+  if (args.choiceType === 'skillProficiency') {
+    return abilityFitRecommendation(args.skillAbility, args.strongestAbilities)
+  }
+  return NEUTRAL_OPTION_RECOMMENDATION
 }
 
 function resolveSkillSlug(optionId: string, catalogIndex: CharacterBuildCatalogIndex): string {
@@ -126,6 +164,8 @@ function resolveProficiencyPickerItemState(
   catalogIndex: CharacterBuildCatalogIndex,
   recommendedLanguageIds: ReadonlySet<string>,
   draft: CharacterBuilderDraft,
+  skillAbility: Ability | undefined,
+  strongestAbilities: ReadonlySet<Ability>,
 ): ProficiencyPickerItemState {
   const isAlreadySelected = selectedIds.includes(optionId)
   const isSelectionFull = selectedIds.length >= choiceSet.max
@@ -139,13 +179,15 @@ function resolveProficiencyPickerItemState(
     disabledReasons.push(PICKER_DISABLED_REASON_SELECTION_FULL)
   }
 
-  const recommendation = languageRecommendation({
+  const recommendation = resolveRowRecommendation({
     choiceType: choiceSet.choiceType,
     optionId,
     recommendedLanguageIds,
     speciesId: draft.species.speciesId,
+    skillAbility,
+    strongestAbilities,
   })
-  const recommendationFact = softRecommendationFact({
+  const recommendationFacts = softRecommendationFacts({
     recommendation,
     sourceName: (source) =>
       source.kind === 'species' ? catalogIndex.species.get(source.id)?.name : undefined,
@@ -155,7 +197,7 @@ function resolveProficiencyPickerItemState(
     isAvailable: true,
     isRecommended: recommendation.strength === 'strong',
     recommendation,
-    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
+    ...(recommendationFacts.length > 0 ? { presentation: { facts: recommendationFacts } } : {}),
     isAlreadySelected,
     isAlreadyGranted,
     isSelectionFull,
@@ -186,6 +228,10 @@ export function resolveProficiencyPickerItems({
           choiceSetOptionIds: choiceSet.options.map((option) => option.id),
         })
       : new Set<string>()
+  const strongestAbilities =
+    choiceSet.choiceType === 'skillProficiency'
+      ? deriveStrongestAbilities(draft.abilities.scores)
+      : new Set<Ability>()
 
   return choiceSet.options.map((option) => {
     const skillRow =
@@ -204,6 +250,8 @@ export function resolveProficiencyPickerItems({
         catalogIndex,
         recommendedLanguageIds,
         draft,
+        skillRow?.ability,
+        strongestAbilities,
       ),
       ...(skillRow ? { compactSummary: buildSkillProficiencyCompactSummary(skillRow) } : {}),
     }

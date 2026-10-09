@@ -175,12 +175,12 @@ Do **not** combine `digits` with mixed-length enum labels — use full-width siz
 `resolveNumberStepperSizeFromFieldSize`. Form density never maps to **`xs`** — compact forms
 inherit **`sm` (32px)**; comfortable default is **`md` (36px)**.
 
-| Stepper `size` | Root height | Side buttons | Typical use                                      |
-| -------------- | ----------- | ------------ | ------------------------------------------------ |
-| `xs`           | 24px `h-6`  | `size-6`     | Dense embedded panels — **explicit opt-in only** |
-| `sm`           | 32px `h-8`  | `size-8`     | Compact form fields (field `sm`)                 |
-| `md`           | 36px `h-9`  | `size-8`     | Comfortable fields / default outside forms       |
-| `lg`           | 40px `h-10` | `size-9`     | Large form fields (field `lg`)                   |
+| Stepper `size` | Root height | Side buttons | Typical use                                                              |
+| -------------- | ----------- | ------------ | ------------------------------------------------------------------------ |
+| `xs`           | 24px `h-6`  | `size-6`     | Dense embedded panels and inline row controls — **explicit opt-in only** |
+| `sm`           | 32px `h-8`  | `size-8`     | Compact form fields (field `sm`)                                         |
+| `md`           | 36px `h-9`  | `size-8`     | Comfortable fields / default outside forms                               |
+| `lg`           | 40px `h-10` | `size-9`     | Large form fields (field `lg`)                                           |
 
 Width formulas in `numberStepperWidthVariants` use **3rem** side columns for `xs` and **4rem**
 for `sm` / `md` / `lg`. See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).

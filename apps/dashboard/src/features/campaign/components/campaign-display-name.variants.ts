@@ -49,7 +49,7 @@ export const campaignDisplayNameIconVariants = cva('shrink-0', {
       topbar: 'size-4 text-foreground-subtle',
       card: 'size-4 text-muted-foreground',
       row: 'size-4 text-muted-foreground',
-      inlineMuted: 'size-3.5 text-muted-foreground',
+      inlineMuted: 'size-icon-inline text-muted-foreground',
       switcherTrigger: 'size-4 text-muted-foreground',
       menuItem: 'size-4 text-muted-foreground',
       page: 'size-5 text-muted-foreground',

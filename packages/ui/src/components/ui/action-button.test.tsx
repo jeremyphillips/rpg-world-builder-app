@@ -21,6 +21,18 @@ describe('ActionButton', () => {
     expect(screen.getByRole('button', { name: 'Edit entry' })).toBeInTheDocument()
   })
 
+  it('sizes the glyph for dense text xs actions', () => {
+    const { container } = render(
+      <ActionButton action="reset" variant="text" size="xs" density="compact">
+        Reset
+      </ActionButton>,
+    )
+
+    const svg = container.querySelector('svg')
+    expect(svg).toHaveClass('size-icon-glyph-xs')
+    expect(svg).not.toHaveClass('size-icon-glyph-lg')
+  })
+
   it('allows type="submit" to override the default button type', () => {
     render(
       <ActionButton action="add" type="submit">

@@ -11,6 +11,10 @@ import type { CharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuildEngineOptions } from '../engine-options'
 import type { CharacterBuildAdvisoryFacts } from './character-build-advisory-facts'
 import {
+  compareEquipmentAbilityScoreRequirementAdvisories,
+  resolveEquipmentAbilityScoreRequirementAdvisories,
+} from './resolve-equipment-ability-score-requirement-advisories'
+import {
   compareEquipmentProficiencyAdvisories,
   resolveEquipmentProficiencyAdvisories,
 } from './resolve-equipment-proficiency-advisories'
@@ -26,6 +30,10 @@ const ADVISORY_RULES: { [C in CharacterBuildAdvisoryCode]: AdvisoryRule<C> } = {
   equipment_not_proficient: {
     resolve: resolveEquipmentProficiencyAdvisories,
     compare: compareEquipmentProficiencyAdvisories,
+  },
+  equipment_ability_score_requirement_unmet: {
+    resolve: resolveEquipmentAbilityScoreRequirementAdvisories,
+    compare: compareEquipmentAbilityScoreRequirementAdvisories,
   },
 }
 

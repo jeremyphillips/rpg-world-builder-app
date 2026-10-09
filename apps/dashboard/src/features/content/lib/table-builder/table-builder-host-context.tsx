@@ -1,14 +1,7 @@
-import { createContext, useContext, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 import type { TableBuilderHostConfig } from './table-builder-host-config'
-
-const DEFAULT_TABLE_BUILDER_HOST_CONFIG = {
-  allowedKinds: ['levelProgression'],
-} as const satisfies TableBuilderHostConfig
-
-const TableBuilderHostConfigContext = createContext<TableBuilderHostConfig>(
-  DEFAULT_TABLE_BUILDER_HOST_CONFIG,
-)
+import { TableBuilderHostConfigContext } from './use-table-builder-host-config'
 
 export function TableBuilderHostConfigProvider({
   config,
@@ -22,8 +15,4 @@ export function TableBuilderHostConfigProvider({
       {children}
     </TableBuilderHostConfigContext.Provider>
   )
-}
-
-export function useTableBuilderHostConfig(): TableBuilderHostConfig {
-  return useContext(TableBuilderHostConfigContext)
 }

@@ -8,7 +8,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "concurrently -n proxy,apps -c blue,green \"pnpm dev:proxy\" \"turbo run dev\"",
+    "dev": "concurrently -k -n proxy,apps -c blue,green \"pnpm dev:proxy\" \"turbo run dev\"",
     "dev:proxy": "node tools/proxy/dev-proxy.mjs",
     "build": "turbo run build --filter='!@rpg/bench'",
     "build:bench": "turbo run build --filter='@rpg/bench'",

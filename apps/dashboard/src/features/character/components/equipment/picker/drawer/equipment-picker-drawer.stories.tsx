@@ -1,15 +1,24 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
+import { expect, userEvent, within } from 'storybook/test'
 
 import { DEFAULT_ARMOR_CLASS_BASE } from '@rpg/contracts'
 import { Button } from '@rpg/ui'
 
 import { EquipmentPickerDrawer } from './equipment-picker-drawer'
+import { EQUIPMENT_PICKER_SORT_ORDER_LABEL } from './equipment-picker-drawer.types'
+import { EMPTY_EQUIPMENT_OWNERSHIP } from '../../../../lib/equipment/equipment-ownership-index.lib'
+import {
+  builderPathGoldBudgetFixture,
+  fighterGoldPathPickerItemsFixture,
+  wizardGoldPathPickerItemsFixture,
+} from './equipment-picker-builder-path.fixtures'
 import {
   equipmentPickerBudgetFixture,
   equipmentPickerDefaultPathItemsFixture,
   equipmentPickerItemsFixture,
   equipmentPickerLowRemainingBudgetFixture,
+  equipmentPickerMagicItemAllowancesFixture,
   equipmentPickerMagicItemProgressFixture,
   equipmentPickerMagicItemsFixture,
   equipmentPickerRopeFixture,
@@ -31,7 +40,6 @@ export const Default: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
   render: function Render(args) {
@@ -46,6 +54,19 @@ export const Default: Story = {
       </>
     )
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement.ownerDocument.body)
+    const sort = canvas.getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
+    const sortWidth = sort.getBoundingClientRect().width
+    await expect(sortWidth).toBeGreaterThan(0)
+    await userEvent.click(sort)
+    await userEvent.click(canvas.getByRole('option', { name: 'Price: High to low' }))
+    await expect(
+      canvas
+        .getByRole('combobox', { name: EQUIPMENT_PICKER_SORT_ORDER_LABEL })
+        .getBoundingClientRect().width,
+    ).toBe(sortWidth)
+  },
 }
 
 export const DefaultPathAffordableNow: Story = {
@@ -54,7 +75,6 @@ export const DefaultPathAffordableNow: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: true,
     onCommitAdd: () => undefined,
   },
 }
@@ -65,18 +85,6 @@ export const LowRemainingBudget: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: false,
-    onCommitAdd: () => undefined,
-  },
-}
-
-export const HideUnaffordable: Story = {
-  args: {
-    open: true,
-    onOpenChange: () => undefined,
-    items: equipmentPickerItemsFixture,
-    budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: true,
     onCommitAdd: () => undefined,
   },
 }
@@ -87,8 +95,6 @@ export const HideNonProficient: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
-    filterOutNonProficient: true,
     onCommitAdd: () => undefined,
   },
 }
@@ -99,7 +105,6 @@ export const CharacterPreview: Story = {
     onOpenChange: () => undefined,
     items: equipmentPickerItemsFixture,
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     showCharacterPreview: true,
     characterPreviewContext: {
       level: 1,
@@ -112,25 +117,12 @@ export const CharacterPreview: Story = {
   },
 }
 
-export const ClearFilters: Story = {
-  args: {
-    open: true,
-    onOpenChange: () => undefined,
-    items: equipmentPickerItemsFixture,
-    budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
-    toolbarResetMode: 'clear_filters',
-    onCommitAdd: () => undefined,
-  },
-}
-
 export const SortByPrice: Story = {
   args: {
     open: true,
     onOpenChange: () => undefined,
     items: equipmentPickerDefaultPathItemsFixture,
     budget: equipmentPickerLowRemainingBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
   },
 }
@@ -141,8 +133,19 @@ export const OwnedStackable: Story = {
     onOpenChange: () => undefined,
     items: [equipmentPickerItemsFixture[2]!],
     budget: equipmentPickerBudgetFixture,
-    ownedPurchaseQuantities: { [equipmentPickerRopeFixture.id]: 2 },
+    ownership: new Map([
+      [
+        equipmentPickerRopeFixture.id,
+        {
+          ...EMPTY_EQUIPMENT_OWNERSHIP,
+          editablePurchased: { quantity: 2, spendCp: 200 },
+          totalQuantity: 2,
+          acquiredQuantity: 2,
+        },
+      ],
+    ]),
     onCommitAdd: () => undefined,
+    onSetPurchasedQuantity: () => undefined,
   },
   parameters: {
     docs: {
@@ -218,8 +221,57 @@ export const RecommendationFacts: Story = {
       },
     ],
     budget: equipmentPickerBudgetFixture,
-    filterOutUnaffordable: false,
     onCommitAdd: () => undefined,
+  },
+}
+
+export const WizardGoldPath: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [
+      wizardGoldPathPickerItemsFixture.wand,
+      wizardGoldPathPickerItemsFixture['component-pouch'],
+      wizardGoldPathPickerItemsFixture.spellbook,
+      wizardGoldPathPickerItemsFixture.greataxe,
+      wizardGoldPathPickerItemsFixture.greatsword,
+      wizardGoldPathPickerItemsFixture.dagger,
+      wizardGoldPathPickerItemsFixture['plate-armor'],
+    ],
+    budget: builderPathGoldBudgetFixture,
+    isGoldShoppingPath: true,
+    onCommitAdd: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'STR 8 Wizard on the gold path: blockers, warnings, then requirement / recommendation / source guidance on one metadata line.',
+      },
+    },
+  },
+}
+
+export const AbilityScoreRequirements: Story = {
+  args: {
+    open: true,
+    onOpenChange: () => undefined,
+    items: [
+      fighterGoldPathPickerItemsFixture['plate-armor'],
+      fighterGoldPathPickerItemsFixture.splint,
+      fighterGoldPathPickerItemsFixture['chain-mail'],
+    ],
+    budget: builderPathGoldBudgetFixture,
+    isGoldShoppingPath: true,
+    onCommitAdd: () => undefined,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'STR 12 Fighter: unmet armor ability-score requirements are soft warnings (badge title carries the detail).',
+      },
+    },
   },
 }
 
@@ -230,6 +282,7 @@ export const MagicItemsWorkflow: Story = {
     items: equipmentPickerMagicItemsFixture,
     workflowMode: 'magic_items',
     workflowModes: ['purchase', 'magic_items'],
+    magicItemAllowances: equipmentPickerMagicItemAllowancesFixture,
     magicItemGrantProgress: equipmentPickerMagicItemProgressFixture,
     onWorkflowModeChange: () => undefined,
     onFocusedAllowanceIdChange: () => undefined,

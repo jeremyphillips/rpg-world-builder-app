@@ -6,6 +6,7 @@ import {
   type CharacterBuildPreview,
   type CharacterBuildContext,
   type ChoiceSet,
+  getContentTypeTerm,
 } from '@rpg/contracts'
 import type {
   CharacterBuilderStepId,
@@ -27,6 +28,7 @@ import {
 } from './builder-preview-rail-copy'
 import {
   CHARACTER_BUILDER_PREVIEW_SECTIONS,
+  EQUIPMENT_PREVIEW_PENDING_STATUS,
   getBuilderDraftNarrative,
   type CharacterBuilderPreviewSectionId,
 } from './character-builder-preview-panel.lib'
@@ -216,6 +218,16 @@ function resolveEquipmentPresentation(
     }
   }
 
+  if (preview.startingEquipmentPending) {
+    return {
+      id: 'equipment',
+      label: PREVIEW_SECTION_LABELS.equipment,
+      marker: 'incomplete',
+      status: EQUIPMENT_PREVIEW_PENDING_STATUS,
+      expandable: true,
+    }
+  }
+
   if (preview.equipmentSummary.length > 0) {
     return {
       id: 'equipment',
@@ -359,7 +371,10 @@ export function projectBuilderPreviewRail({
       name: getPreviewIdentityName(draft),
       statusLine: getPreviewLevelClassLine(draft, catalogIndex),
       facts: [
-        { label: 'Species', value: getPreviewSpeciesLine(draft, catalogIndex) },
+        {
+          label: getContentTypeTerm('species').label,
+          value: getPreviewSpeciesLine(draft, catalogIndex),
+        },
         { label: 'Alignment', value: getPreviewAlignmentLine(draft) },
       ],
     },

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { equipmentSchema } from '../../../content/equipment'
 import { indexCharacterBuildCatalog } from '../context'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuilderDraft } from '../draft/draft'
@@ -166,5 +167,72 @@ describe('buildCharacterPreview', () => {
     )
 
     expect(preview.warnings.some((warning) => warning.includes('Unarmored Defense'))).toBe(true)
+  })
+
+  it('marks retained purchases as pending without listing them while starting equipment is unresolved', () => {
+    const rope = equipmentSchema.parse({
+      rulesetId: RULESET_ID,
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      id: 'srd-cc-5.2.1:rope',
+      slug: 'rope',
+      name: 'Rope',
+      description: '',
+      cost: { amount: 1, currency: 'gp' },
+      weight: { value: 5, unit: 'lb' },
+      kind: 'adventuring_gear',
+      gearKind: 'consumable',
+    })
+
+    const preview = buildCharacterPreview(
+      {
+        ...createEmptyCharacterBuilderDraft(),
+        class: { classId: 'srd-cc-5.2.1:fighter', level: 1 },
+        equipment: {
+          mode: 'package',
+          purchases: [
+            {
+              equipmentId: rope.id,
+              quantity: 1,
+              sourceMode: 'startingGold',
+              origin: 'picker',
+            },
+          ],
+          editedSincePackageSelection: false,
+        },
+      },
+      indexCharacterBuildCatalog({
+        ...builderTestCatalog,
+        classes: builderTestCatalog.classes.map((characterClass) =>
+          characterClass.id === 'srd-cc-5.2.1:fighter'
+            ? {
+                ...characterClass,
+                characterCreation: {
+                  startingEquipment: {
+                    choose: 1,
+                    options: [
+                      {
+                        id: 'starting-gold',
+                        label: 'Starting Gold',
+                        items: [],
+                        wealth: { gp: 50 },
+                      },
+                    ],
+                  },
+                },
+              }
+            : characterClass,
+        ),
+        equipment: [rope],
+      }),
+      builderTestRules,
+      RULESET_ID,
+    )
+
+    expect(preview.equipmentSummary).toEqual([])
+    expect(preview.startingEquipmentPending).toBe(true)
   })
 })

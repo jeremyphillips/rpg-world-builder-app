@@ -5,7 +5,7 @@ import type { TabbedFormTab } from '@rpg/ui/form'
 import {
   useContentPublishValidation,
   type ContentPublishValidation,
-} from '../validation/content-form-publish-validation.client'
+} from '../validation/use-content-publish-validation'
 
 export type ContentPublishReadiness = Pick<
   ContentPublishValidation,

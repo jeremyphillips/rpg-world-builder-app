@@ -93,6 +93,12 @@ Drawer **headings** stay stable and resolve from `formatChoiceSetDrawerHeading(c
 in `@rpg/contracts` (e.g. `Choose skill proficiency`, `Choose cantrip`, `Choose equipment`).
 They do not flip to Add/Edit when a choice set is full.
 
+Shared catalog chrome (search, sort, choose, add, empty states) comes from
+`formatCatalogPickerCopy(catalogNounFromContentType(...) | catalogNounFromTerm(...))`.
+Pass `overrides` only when the sentence is not a noun template — descriptions,
+articles, and empty-state verbs such as “match this view.” Choice-set headings stay on
+`formatChoiceSetDrawerHeading`.
+
 Inline step actions and drawer **triggers** use `CHOICE_SET_DRAWER_LABELS` in
 `lib/choice-sets/selection-counter.lib.ts` — Add vs Edit (proficiencies/languages) or Add vs
 Manage (spells). Proficiency and language grants use `BUILDER_GRANT_EDIT_ACTION_LABEL` (`Edit`)
@@ -103,7 +109,8 @@ headers and supporting copy provide enough context.
 
 The `drawerLabelsForChoiceSet` fallback (`Manage ${choiceSet.label.toLowerCase()}`) is a
 **legacy escape hatch only**. Add explicit map entries for new choice types instead of
-deriving manage copy from rules-facing `choiceSet.label`.
+deriving manage copy from rules-facing `choiceSet.label`. That call site is on the
+`vocab-copy-drift.test.ts` ratchet.
 
 ### Species / class step sheet actions
 

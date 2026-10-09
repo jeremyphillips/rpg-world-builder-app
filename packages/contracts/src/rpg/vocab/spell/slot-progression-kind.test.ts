@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getSlotProgressionKindEntry,
+  getSlotProgressionKindLabel,
   isSlotProgressionKindId,
   SLOT_PROGRESSION_KIND_ENTRIES,
 } from './slot-progression-kind'
@@ -22,6 +23,6 @@ describe('slot-progression-kind', () => {
   })
 
   it('uses Pact Magic capitalization', () => {
-    expect(SLOT_PROGRESSION_KIND_ENTRIES['pact-magic'].label).toBe('Pact Magic')
+    expect(getSlotProgressionKindLabel('pact-magic')).toBe('Pact Magic')
   })
 })

@@ -3,27 +3,30 @@ import { describe, expect, it } from 'vitest'
 import { mapSpellPickerCompactSummaryToMetadataLines } from './map-spell-picker-compact-summary-to-metadata-lines'
 
 describe('mapSpellPickerCompactSummaryToMetadataLines', () => {
-  it('maps casting summary and classification as muted text metadata', () => {
+  it('maps curated groups onto one metadata line, including ritual and concentration', () => {
     expect(
       mapSpellPickerCompactSummaryToMetadataLines({
-        castingSummary: ['Action', 'Self', 'Concentration, up to 10 minutes'],
-        classification: {
-          levelLabel: '1st level',
-          descriptors: ['Divination'],
-        },
+        groups: [
+          { kind: 'classification', levelLabel: '1st-level', schoolLabel: 'Divination' },
+          { kind: 'ritual', label: 'Ritual' },
+          { kind: 'castingTime', label: 'Action' },
+          { kind: 'concentration', label: 'Concentration 10 min' },
+        ],
       }),
     ).toEqual([
       {
         segments: [
+          {
+            type: 'text',
+            text: '1st-level Divination',
+            parts: [
+              { text: '1st-level', emphasis: 'strong' },
+              { text: 'Divination', emphasis: 'default' },
+            ],
+          },
+          { type: 'text', text: 'Ritual' },
           { type: 'text', text: 'Action' },
-          { type: 'text', text: 'Self' },
-          { type: 'text', text: 'Concentration, up to 10 minutes' },
-        ],
-      },
-      {
-        segments: [
-          { type: 'text', text: '1st level' },
-          { type: 'text', text: 'Divination' },
+          { type: 'text', text: 'Concentration 10 min' },
         ],
       },
     ])

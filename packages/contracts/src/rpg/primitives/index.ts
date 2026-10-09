@@ -10,7 +10,12 @@ export * from './area-geometry'
 export * from './wealth'
 export * from './character-wealth-grant'
 export * from './prose'
-export * from './inline-metadata'
+export {
+  INLINE_METADATA_SEPARATOR,
+  formatInlineMetadataTail,
+  joinInlineMetadata,
+  type InlineMetadataPart,
+} from './inline-metadata'
 export * from './ruleset'
 export * from './same-string-set'
 export * from './format-slug'
@@ -19,6 +24,7 @@ export * from './authored-content'
 export * from './proficiency'
 export * from './versioned-template'
 export * from './content/content-type-keys'
+export * from './content/content-type-terms'
 export * from './usage/catalog-usage-reference'
 export * from './usage/catalog-entity-usage-blocker'
 export * from './usage/character-usage-reference'

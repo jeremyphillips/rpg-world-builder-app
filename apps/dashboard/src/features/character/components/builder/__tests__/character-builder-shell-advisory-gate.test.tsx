@@ -59,6 +59,16 @@ const greatswordAdvisory: CharacterBuildAdvisory = {
   },
 }
 
+const plateArmorAdvisory: CharacterBuildAdvisory = {
+  code: 'equipment_ability_score_requirement_unmet',
+  subject: {
+    kind: 'equipment',
+    equipmentId: 'srd-cc-5.2.1:plate-armor',
+    label: 'Plate Armor',
+    unmet: [{ ability: 'str', required: 15, actual: 12 }],
+  },
+}
+
 function installSessionStorageMock(): void {
   const storage = new Map<string, string>()
   vi.stubGlobal('sessionStorage', {
@@ -125,6 +135,17 @@ describe('CharacterBuilderShell create advisory gate', () => {
   it('finalizes after Create character anyway', async () => {
     gate.advisories = [greatswordAdvisory]
     await renderAtReview(createStandaloneBuilderContextFixture())
+    await userEvent.click(screen.getByRole('button', { name: 'Create character' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Create character anyway' }))
+    await waitFor(() => expect(finalizeMock).toHaveBeenCalledTimes(1))
+  })
+
+  it('gates on an ability-score requirement advisory', async () => {
+    gate.advisories = [plateArmorAdvisory]
+    await renderAtReview(createStandaloneBuilderContextFixture())
+    expect(
+      screen.getByText('Plate Armor — Requires STR 15; character has STR 12.'),
+    ).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Create character' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Create character anyway' }))
     await waitFor(() => expect(finalizeMock).toHaveBeenCalledTimes(1))

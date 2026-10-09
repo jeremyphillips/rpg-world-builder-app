@@ -8,6 +8,7 @@ import {
   defaultMulticlassingRules,
   defaultSubclassingRules,
   type StartingWealthTier,
+  getSlotProgressionKindLabel,
 } from '@rpg/contracts'
 
 import { useIntegrationDb } from '../../../test/setup/integration-db'
@@ -127,7 +128,7 @@ describe('updateCharacterCreationPatch', () => {
           slotProgressions: [
             {
               id: 'full-caster',
-              label: 'Full caster',
+              label: getSlotProgressionKindLabel('full-caster'),
               kind: 'leveled',
               extension: 'carryForward',
               rows: [{ level: 1, slots: [3] }],

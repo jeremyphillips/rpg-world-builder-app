@@ -1,6 +1,9 @@
 import * as React from 'react'
 
-import { Input, Text } from '@rpg/ui'
+import { isEmptySearchQuery, normalizeSearchQuery } from '@rpg/search'
+import { Input, rankLegacySearchItems, Text } from '@rpg/ui'
+
+import { scoreAndFilterPickerItems } from '../../picker/sort/catalog-picker-sort.lib'
 import { CatalogEntitySurfaceRow, type EntitySurfaceConfig } from '@/features/content'
 
 export type ConnectionEntityPickerItem<TItem> = {
@@ -16,6 +19,9 @@ export type ConnectionEntityPickerProps<TItem> = {
   noResultsMessage: string
   noItemsMessage: string
   onSelect: (item: TItem) => void
+  /** When set, this picker scores each row instead of ranking the flat search text. */
+  scoreItem?: (item: ConnectionEntityPickerItem<TItem>, searchQuery: string) => number
+  filterControls?: React.ReactNode
 }
 
 export function ConnectionEntityPicker<TItem>({
@@ -24,14 +30,28 @@ export function ConnectionEntityPicker<TItem>({
   noResultsMessage,
   noItemsMessage,
   onSelect,
+  scoreItem,
+  filterControls,
 }: ConnectionEntityPickerProps<TItem>) {
   const [query, setQuery] = React.useState('')
-  const normalizedQuery = query.trim().toLowerCase()
 
   const filteredItems = React.useMemo(() => {
-    if (!normalizedQuery) return items
-    return items.filter((entry) => entry.searchText.toLowerCase().includes(normalizedQuery))
-  }, [items, normalizedQuery])
+    if (!scoreItem) {
+      return rankLegacySearchItems(
+        items.map((entry) => ({
+          entry,
+          fields: [{ text: entry.searchText, weight: 1, role: 'label' as const }],
+        })),
+        query,
+        'forgiving',
+      ).map((row) => row.entry)
+    }
+
+    const hasQuery = !isEmptySearchQuery(normalizeSearchQuery(query))
+    return scoreAndFilterPickerItems(items, { searchQuery: query, scoreItem })
+      .toSorted((left, right) => (hasQuery ? right.searchScore - left.searchScore : 0))
+      .map((row) => row.item)
+  }, [items, query, scoreItem])
 
   if (items.length === 0) {
     return <Text variant="muted">{noItemsMessage}</Text>
@@ -45,6 +65,7 @@ export function ConnectionEntityPicker<TItem>({
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
       />
+      {filterControls}
       {filteredItems.length === 0 ? (
         <Text variant="muted">{noResultsMessage}</Text>
       ) : (

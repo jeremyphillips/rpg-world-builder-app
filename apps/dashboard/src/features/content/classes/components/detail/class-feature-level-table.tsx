@@ -3,10 +3,8 @@ import type { ContentTable } from '@rpg/contracts'
 
 import { ContentTableView } from '../../../components/tables/content-table-view'
 import { contentDetailNavItemId } from '../../../lib/detail/page/content-detail-nav-anchor-id'
-import {
-  contentDetailSectionPanelContentHeadingClasses,
-  useContentDetailSectionNavLeaf,
-} from '../../../lib/detail/page/content-detail-section'
+import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
+import { useContentDetailSectionNavLeaf } from '../../../lib/detail/page/use-content-detail-section-nav-leaf'
 import type { ClassFeatureDetailItem } from '../../lib/class-display'
 
 import {

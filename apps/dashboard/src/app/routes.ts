@@ -2,7 +2,7 @@ import { ADMIN_ROUTES } from './admin-routes'
 import { CONTENT_ROUTES } from './content-routes'
 import { GAME_TERMS_ROUTES } from './game-terms-routes'
 import { HOMEBREW_ROUTES } from './homebrew-routes'
-import type { GlobalSearchUrlGroup } from '@rpg/contracts'
+import type { GlobalSearchUrlGroup } from '@rpg/contracts/rpg/campaign'
 
 export const ROUTES = {
   home: '/',

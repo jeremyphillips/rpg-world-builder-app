@@ -70,7 +70,7 @@ export function MessageComposer({
       </div>
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
+          <TooltipTrigger interactive asChild>
             <Button
               type="submit"
               size="icon"

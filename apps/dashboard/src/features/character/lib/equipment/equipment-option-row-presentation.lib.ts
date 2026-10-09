@@ -4,6 +4,7 @@ import {
   resolveEquipmentPresentationFacts,
   type EquipmentSupplySource,
   type OptionPresentationFact,
+  type Equipment,
   type RecommendationSourceName,
   type ResolvedEquipmentOption,
   type SelectionSourceLabelCatalogIndex,
@@ -60,16 +61,26 @@ export type EquipmentOptionRowPresentation = {
   disabled: boolean
 }
 
-const INLINE_CLAUSE_DISCRIMINATORS = new Set([
+const INLINE_CLAUSE_DISCRIMINATORS = new Set<OptionPresentationFact['discriminator']>([
   'required',
-  'satisfies',
+  'requirement-match',
   'not-proficient',
+  'ability-requirement-unmet',
   'recommended',
 ])
 
+function isRequirementDiscriminator(discriminator: OptionPresentationFact['discriminator']) {
+  return discriminator === 'required' || discriminator === 'requirement-match'
+}
+
 function clauseRank(clause: EquipmentOptionSecondaryClause): number {
-  if (clause.discriminator === 'required' || clause.discriminator === 'satisfies') return 0
-  if (clause.discriminator === 'not-proficient') return 1
+  if (isRequirementDiscriminator(clause.discriminator)) return 0
+  if (
+    clause.discriminator === 'not-proficient' ||
+    clause.discriminator === 'ability-requirement-unmet'
+  ) {
+    return 1
+  }
   if (clause.discriminator === 'recommended') return 2
   if (clause.kind === 'supply') return 3
   if (clause.discriminator === 'proficient') return 4
@@ -77,25 +88,34 @@ function clauseRank(clause: EquipmentOptionSecondaryClause): number {
 }
 
 function requirementClause(fact: OptionPresentationFact): EquipmentOptionSecondaryClause {
+  const title = fact.sourceLabels.join(', ')
   return {
     kind: 'requirement',
     label: fact.label,
     badgeLabel: fact.label,
     sourceLabels: fact.sourceLabels,
     ...(fact.discriminator ? { discriminator: fact.discriminator } : {}),
+    ...(title ? { title } : {}),
   }
 }
 
-function recommendationClause(fact: OptionPresentationFact): EquipmentOptionSecondaryClause {
-  const sources = formatInlineRecommendationSources(fact.sourceLabels)
+/** One clause for every per-kind recommendation fact, keeping the named inline sentence. */
+function recommendationClause(
+  facts: readonly OptionPresentationFact[],
+): EquipmentOptionSecondaryClause | undefined {
+  const [first] = facts
+  if (!first) return undefined
+  const sourceLabels = [...new Set(facts.flatMap((fact) => fact.sourceLabels))]
+  const sources = formatInlineRecommendationSources(sourceLabels)
+  const badgeLabel = facts.length === 1 ? first.label : OPTION_PRESENTATION_RECOMMENDED_LABEL
   const label = sources.inline
     ? `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by ${sources.inline}`
-    : fact.label
+    : badgeLabel
   return {
     kind: 'recommendation',
     label,
-    badgeLabel: fact.label,
-    sourceLabels: fact.sourceLabels,
+    badgeLabel,
+    sourceLabels,
     discriminator: 'recommended',
     ...(sources.title ? { title: sources.title } : {}),
   }
@@ -164,13 +184,7 @@ function trailingState(
 }
 
 function clauseFromFact(fact: OptionPresentationFact): EquipmentOptionSecondaryClause | undefined {
-  if (fact.discriminator === 'required' || fact.discriminator === 'satisfies') {
-    return requirementClause(fact)
-  }
-  if (fact.discriminator === 'recommended') return recommendationClause(fact)
-  if (fact.discriminator === 'proficient' || fact.discriminator === 'not-proficient') {
-    return compatibilityClause(fact)
-  }
+  if (isRequirementDiscriminator(fact.discriminator)) return requirementClause(fact)
   if (fact.kind === 'compatibility' && fact.label) return compatibilityClause(fact)
   return undefined
 }
@@ -186,6 +200,10 @@ function buildEquipmentOptionSecondaryClauses(args: {
     const clause = clauseFromFact(fact)
     return clause ? [clause] : []
   })
+  const recommendation = recommendationClause(
+    args.facts.filter((fact) => fact.discriminator === 'recommended'),
+  )
+  if (recommendation) secondaryClauses.push(recommendation)
   const supply = args.supplyClauses
     ? visibleSupplyClauses(args.supplyClauses, args.resolved).map((clause) =>
         supplyClauseFromLabel(clause.label),
@@ -219,6 +237,7 @@ export function resolveEquipmentOptionRowPresentation(args: {
   kindLabel: string
   metadata?: readonly string[]
   resolved: ResolvedEquipmentOption
+  equipment?: Equipment
   sourceName?: RecommendationSourceName
   supplyCatalog?: SelectionSourceLabelCatalogIndex
   /**
@@ -229,6 +248,7 @@ export function resolveEquipmentOptionRowPresentation(args: {
 }): EquipmentOptionRowPresentation {
   const facts = resolveEquipmentPresentationFacts({
     resolved: args.resolved,
+    ...(args.equipment ? { equipment: args.equipment } : {}),
     ...(args.sourceName ? { sourceName: args.sourceName } : {}),
   })
   const secondaryClauses = buildEquipmentOptionSecondaryClauses({

@@ -1,12 +1,15 @@
-import type { StartingWealthRules } from '../../../../campaign/rules/starting-wealth'
+import {
+  resolveStartingWealthTierForBuilder,
+  type StartingWealthRules,
+  type StartingWealthTier,
+} from '../../../../campaign/rules/starting-wealth'
 import { canPurchaseEquipment } from '../../../../content/equipment/can-purchase-equipment'
-import { resolveStartingWealthTierForBuilder } from '../../../../campaign/rules/starting-wealth'
 import {
   isStartingGoldOption,
   type StartingEquipmentOption,
 } from '../../../../content/starting-equipment'
 import { availableStartingEquipmentOptions } from '../../../../content/starting-equipment-availability'
-import { averageTierBonusGold } from '../../../../primitives/currency-formula'
+import { averageTierBonusGold, type TierBonusGold } from '../../../../primitives/currency-formula'
 import {
   copperToWealth,
   moneyToCopper,
@@ -35,6 +38,8 @@ export type ResolvedStartingEquipmentFunding = {
   totalStartingWealth: CharacterWealth
   classOptionPolicy: ClassOptionPolicy
   tierLabel?: string
+  /** Authored tier formula. Absent when no tier matched. */
+  bonusGold?: TierBonusGold | null
 }
 
 const EMPTY_WEALTH: CharacterWealth = { cp: 0, sp: 0, gp: 0, pp: 0 }
@@ -47,35 +52,53 @@ type ResolvedTierFunding = {
   tierAdditionalWealth: CharacterWealth
   classOptionPolicy: ClassOptionPolicy
   tierLabel?: string
+  bonusGold?: TierBonusGold | null
+}
+
+export type ResolvedStartingEquipmentTierResources = {
+  tier: StartingWealthTier
+  bonusWealth: CharacterWealth
+}
+
+/** Nearest copper. Whole-copper discreteness, not a gold floor. */
+function tierBonusGoldToWealth(bonus: TierBonusGold | null | undefined): CharacterWealth {
+  if (!bonus) return EMPTY_WEALTH
+  return copperToWealth(Math.round(averageTierBonusGold(bonus) * 100))
+}
+
+/**
+ * Tier for the selected starting level, plus its bonus purse.
+ * A zero bonus is still returned so Initiate and magic-only tiers stay visible.
+ */
+export function resolveStartingEquipmentTierResources(args: {
+  startingWealth?: StartingWealthRules
+  startingLevel: number
+}): ResolvedStartingEquipmentTierResources | undefined {
+  if (!args.startingWealth) return undefined
+
+  const tier = resolveStartingWealthTierForBuilder(args.startingWealth, args.startingLevel)
+  if (!tier) return undefined
+
+  return {
+    tier,
+    bonusWealth: tierBonusGoldToWealth(tier.bonusGold),
+  }
 }
 
 function resolveTierFunding(
   startingWealth: StartingWealthRules | undefined,
   startingLevel: number,
 ): ResolvedTierFunding {
-  if (!startingWealth) {
+  const resources = resolveStartingEquipmentTierResources({ startingWealth, startingLevel })
+  if (!resources) {
     return { tierAdditionalWealth: EMPTY_WEALTH, classOptionPolicy: 'included' }
-  }
-
-  const tier = resolveStartingWealthTierForBuilder(startingWealth, startingLevel)
-  if (!tier) {
-    return { tierAdditionalWealth: EMPTY_WEALTH, classOptionPolicy: 'included' }
-  }
-
-  const classOptionPolicy: ClassOptionPolicy = tier.includeNormalStartingEquipment
-    ? 'included'
-    : 'replaced'
-
-  let tierBonusCp = 0
-  if (tier.bonusGold) {
-    const bonusGp = Math.floor(averageTierBonusGold(tier.bonusGold))
-    tierBonusCp = bonusGp * 100
   }
 
   return {
-    tierAdditionalWealth: copperToWealth(tierBonusCp),
-    classOptionPolicy,
-    tierLabel: tier.label,
+    tierAdditionalWealth: resources.bonusWealth,
+    classOptionPolicy: resources.tier.includeNormalStartingEquipment ? 'included' : 'replaced',
+    tierLabel: resources.tier.label,
+    bonusGold: resources.tier.bonusGold,
   }
 }
 
@@ -115,6 +138,7 @@ function resolveFundingForOption(
     totalStartingWealth: addWealth(classOptionWealth, tier.tierAdditionalWealth),
     classOptionPolicy: tier.classOptionPolicy,
     tierLabel: tier.tierLabel,
+    bonusGold: tier.bonusGold,
   }
 }
 
@@ -142,6 +166,26 @@ export function resolveStartingEquipmentFundingOptions(args: {
   return result
 }
 
+/**
+ * Largest starting purse among currently available packages for this build.
+ * Each option total is class wealth plus the tier bonus. Spent purchases are
+ * not subtracted. Undefined when this build has no funding snapshots.
+ */
+export function resolvePurchaseBudgetCeilingCp(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  startingWealth?: StartingWealthRules
+}): number | undefined {
+  const fundingByOptionId = resolveStartingEquipmentFundingOptions(args)
+  if (fundingByOptionId.size === 0) return undefined
+
+  let ceilingCp = 0
+  for (const funding of fundingByOptionId.values()) {
+    ceilingCp = Math.max(ceilingCp, wealthToCopper(funding.totalStartingWealth))
+  }
+  return ceilingCp
+}
+
 /** Resolves funding for the draft's currently selected starting-equipment option. */
 export function resolveSelectedStartingEquipmentFunding(args: {
   draft: CharacterBuilderDraft
@@ -157,7 +201,7 @@ export function resolveSelectedStartingEquipmentFunding(args: {
   return resolveStartingEquipmentFundingOptions(args).get(selectedOptionId)
 }
 
-function sumPurchaseCostCp(
+export function sumPurchaseCostCp(
   purchases: readonly CharacterBuilderDraftEquipmentPurchase[],
   catalogIndex: CharacterBuildCatalogIndex,
 ): number {
@@ -200,5 +244,6 @@ export function resolveTierOnlyStartingEquipmentFunding(args: {
     totalStartingWealth: tier.tierAdditionalWealth,
     classOptionPolicy: tier.classOptionPolicy,
     tierLabel: tier.tierLabel,
+    bonusGold: tier.bonusGold,
   }
 }

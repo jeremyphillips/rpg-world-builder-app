@@ -33,8 +33,8 @@
  * Theme palette: role-named Layer 1 roles (`surface-*`, `field-*`, `fg-*`,
  * brand, chrome, status) with theme-local oklch in `palette-*.css`. Warmth anchor
  * `--palette-neutral-hue` feeds color-mix recipes (sidebar, overlay). Light
- * motif: cream canvas, near-white raised panels, deep-red primary; dark: warm
- * neutral planes with distinct raised/muted/sunken hierarchy and gold primary.
+ * motif: cream canvas, near-white raised panels. Action fills keep one hue
+ * per role: deep rust and warm gold in light; lifted rust and deeper gold in dark.
  *
  * Alpha policy: public semantic surface tokens resolve to final usable colors.
  * Avoid stacking opacity utilities on tokens that already contain alpha unless
@@ -65,6 +65,10 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-action-primary: var(--action-primary-bg);
+  --color-action-primary-foreground: var(--action-primary-fg);
+  --color-action-secondary: var(--action-secondary-bg);
+  --color-action-secondary-foreground: var(--action-secondary-fg);
   --color-muted: var(--muted);
   --color-sunken: var(--sunken);
   --color-surface-faint: var(--surface-faint);
@@ -433,6 +437,33 @@
   height: var(--icon-glyph-xl);
 }
 
+@utility size-icon-inline {
+  width: var(--icon-inline, var(--icon-glyph-md));
+  height: var(--icon-inline, var(--icon-glyph-md));
+}
+
+/*
+ * Inline icon owners. Sidecar only — do not restate font-size or line-height.
+ * text-lg and larger are not owners.
+ */
+@layer utilities {
+  .text-xs {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-sm {
+    --icon-inline: var(--icon-glyph-sm);
+  }
+
+  .text-md {
+    --icon-inline: var(--icon-glyph-md);
+  }
+
+  .text-base {
+    --icon-inline: var(--icon-glyph-md);
+  }
+}
+
 @utility size-status-icon-slash-sm {
   width: var(--status-icon-slash-sm);
   height: var(--status-icon-slash-sm);
@@ -521,6 +552,7 @@
  * (TipTap / CMS output) matches light/dark automatically via CSS variables.
  */
 @utility prose {
+  --icon-inline: var(--icon-glyph-md);
   --tw-prose-body: var(--color-foreground);
   --tw-prose-headings: var(--color-foreground);
   --tw-prose-lead: color-mix(
@@ -601,12 +633,14 @@
 .prose.prose-sm {
   font-size: var(--text-sm);
   line-height: var(--text-sm--line-height);
+  --icon-inline: var(--icon-glyph-sm);
 }
 
 /* Secondary body — catalog + form md richtext (`text-md`, 15px). */
 .prose.prose-md {
   font-size: var(--text-md);
   line-height: var(--text-md--line-height);
+  --icon-inline: var(--icon-glyph-md);
 }
 
 /* Heading composite utilities — bundle role tokens; variants map 1:1. */
@@ -833,6 +867,7 @@
   }
 
   body {
+    --icon-inline: var(--icon-glyph-md);
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);

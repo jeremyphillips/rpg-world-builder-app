@@ -3,7 +3,7 @@ import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-iss
 
 import { armorCategorySchema } from '../../vocab/armor/category'
 import { armorMaterialSchema } from '../../vocab/armor/material'
-import { abilityScoreSchema } from '../../vocab/ability'
+import { abilityScoreRequirementsSchema } from '../lib/ability-score-requirements'
 import type { EquipmentBaseFields } from './base'
 import { equipmentVariantValidationMessages } from './equipment-variant-messages'
 
@@ -39,8 +39,11 @@ export const armorEquipmentKindFields = {
   /** Medium armor caps the Dex bonus at +2; absent for light and shields. */
   maxDexBonus: z.number().int().optional(),
   stealthDisadvantage: z.boolean(),
-  /** Minimum Strength score required to wear without speed penalty (heavy armor). */
-  strengthRequirement: abilityScoreSchema.optional(),
+  /**
+   * Minimum ability scores to wear without penalty (AND of minimums). Read through
+   * `getEquipmentAbilityScoreRequirements`, never by indexing an ability directly.
+   */
+  abilityScoreRequirements: abilityScoreRequirementsSchema.optional(),
 } as const
 
 export const armorEquipmentKindSchema = z.object(armorEquipmentKindFields)

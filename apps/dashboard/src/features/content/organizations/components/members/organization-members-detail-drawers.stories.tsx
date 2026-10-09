@@ -64,6 +64,7 @@ function createDetail(
     handleConfirmRemoveMember: async () => undefined,
     memberSelectionPolicy: undefined,
     candidatesPending: false,
+    resolveClassLabel: (classId) => classId,
     ...overrides,
   }
 }

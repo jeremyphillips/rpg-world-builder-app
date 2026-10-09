@@ -9,26 +9,27 @@ Folder layout and the feature-boundary rule are documented in
 
 ## Key files
 
-| Area               | Path                                                               |
-| ------------------ | ------------------------------------------------------------------ |
-| List route         | `routes/characters-overview.tsx`                                   |
-| Create route       | `routes/character-create.tsx` (concentration mode)                 |
-| Detail route       | `routes/character-detail.tsx`                                      |
-| Detail content     | `components/detail/character-detail-content.tsx`                   |
-| Detail lib         | `lib/detail/` — sheet catalog cards, tab filters, route error copy |
-| API clients        | `api/character-client.ts`, `api/ruleset-content-client.ts`         |
-| Build context      | `hooks/use-build-context.ts`                                       |
-| Character queries  | `hooks/use-character.ts`, `hooks/use-characters.ts`                |
-| Create mutation    | `hooks/use-create-character.ts`                                    |
-| Draft store        | `store/character-builder-store.ts`                                 |
-| Draft merge/touch  | `lib/draft/`                                                       |
-| Builder shell      | `lib/builder/` — navigation, validation UX, finalize               |
-| Builder preview    | `lib/builder-preview/` — review/right-panel projection             |
-| Step view models   | `lib/equipment/`, `lib/spells/`, `lib/proficiencies/`              |
-| Choice-set wiring  | `lib/choice-sets/`                                                 |
-| Character display  | `lib/display/` — list/detail view models                           |
-| Step hooks         | `hooks/use-equipment-step.ts`, `hooks/use-proficiencies-step.ts`   |
-| Restore affordance | `components/builder/chrome/character-builder-draft-restore.tsx`    |
+| Area                 | Path                                                                                                                                                                                                 |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| List route           | `routes/characters-overview.tsx`                                                                                                                                                                     |
+| Create route         | `routes/character-create.tsx` (concentration mode)                                                                                                                                                   |
+| Detail route         | `routes/character-detail.tsx`                                                                                                                                                                        |
+| Detail content       | `components/detail/character-detail-content.tsx`                                                                                                                                                     |
+| Detail lib           | `lib/detail/` — sheet catalog cards, tab filters, route error copy                                                                                                                                   |
+| API clients          | `api/character-client.ts`, `api/ruleset-content-client.ts`                                                                                                                                           |
+| Build context        | `hooks/use-build-context.ts`                                                                                                                                                                         |
+| Character queries    | `hooks/use-character.ts`, `hooks/use-characters.ts`                                                                                                                                                  |
+| Create mutation      | `hooks/use-create-character.ts`                                                                                                                                                                      |
+| Draft store          | `store/character-builder-store.ts`                                                                                                                                                                   |
+| Draft merge/touch    | `lib/draft/`                                                                                                                                                                                         |
+| Builder shell        | `lib/builder/` — navigation, validation UX, finalize                                                                                                                                                 |
+| Builder preview      | `lib/builder-preview/` — review/right-panel projection                                                                                                                                               |
+| Step view models     | `lib/equipment/`, `lib/spells/`, `lib/proficiencies/`                                                                                                                                                |
+| Selection row status | `lib/selection-row-status/` — status/guidance entries, context policy, renderer ([picker chrome](../../../docs/character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy)) |
+| Choice-set wiring    | `lib/choice-sets/`                                                                                                                                                                                   |
+| Character display    | `lib/display/` — list/detail view models                                                                                                                                                             |
+| Step hooks           | `hooks/use-equipment-step.ts`, `hooks/use-proficiencies-step.ts`                                                                                                                                     |
+| Restore affordance   | `components/builder/chrome/character-builder-draft-restore.tsx`                                                                                                                                      |
 
 ## `components/detail/` layout
 
@@ -55,18 +56,18 @@ acquisition panel, and starting package. Builder-only package-switch modal lives
 under `components/builder/steps/equipment/package-switch/`. Shared catalog chrome
 lives in `components/picker/` (not here).
 
-| Subfolder                                                   | Responsibility                                                                               |
-| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| `picker/drawer/`                                            | Equipment picker shell, types, fixtures, `useEquipmentPickerController`                      |
-| `picker/browse/`                                            | Filters, budget header, catalog result rows                                                  |
-| `picker/details/`                                           | Item detail panel + character preview                                                        |
-| `picker/purchase/`                                          | Picker purchase/grant UI (not step-level acquisition)                                        |
-| `picker/callouts/`                                          | Picker callout logic + presentation                                                          |
-| `picker/map-equipment-compact-summary-to-metadata-lines.ts` | Equipment metadata mapper                                                                    |
-| `inventory/`                                                | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/`            |
-| `acquisition/`                                              | Step acquisition panel, guidance, commit labels, `useEquipmentAcquisitionCommitConfirmation` |
-| `starting-package/`                                         | Starting-equipment option cards, package card, toolbar                                       |
-| `package-switch/`                                           | **Temporary stub** — conversion editor only (starting-package follow-up)                     |
+| Subfolder                                                   | Responsibility                                                                                       |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| _(root)_                                                    | `equipment-quantity-stepper` — purchase quantity control shared by inventory rows and picker headers |
+| `picker/drawer/`                                            | Equipment picker shell, types, fixtures, `useEquipmentPickerController`                              |
+| `picker/browse/`                                            | Filters, budget header, catalog result rows                                                          |
+| `picker/details/`                                           | Item detail panel, character preview, read-only ownership ledger                                     |
+| `picker/status/`                                            | Status-line chrome (unaffordable amounts tooltip); row status comes from `lib/selection-row-status/` |
+| `picker/map-equipment-compact-summary-to-metadata-lines.ts` | Equipment metadata mapper                                                                            |
+| `inventory/`                                                | Step inventory — `summary/`, `row/`, `column/`, `purchased/`, `added/`, `manage/`                    |
+| `acquisition/`                                              | Step acquisition panel, guidance, commit labels, `useEquipmentAcquisitionCommitConfirmation`         |
+| `starting-package/`                                         | Starting-equipment option cards, package card, toolbar                                               |
+| `package-switch/`                                           | **Temporary stub** — conversion editor only (starting-package follow-up)                             |
 
 Inventory layout VM: `lib/equipment/equipment-inventory-summary.lib.ts`. Package-switch
 resolution state: `lib/equipment/equipment-package-switch-resolution.lib.ts` (pure logic,
@@ -78,15 +79,15 @@ Thin domain folders — `picker/` only. Builder step composition (sections, rows
 spell choice/summary cards) lives under `components/builder/steps/proficiencies/` and
 `components/builder/steps/spells/`.
 
-| Subfolder / file                                                                  | Responsibility                              |
-| --------------------------------------------------------------------------------- | ------------------------------------------- |
-| `spells/picker/spell-picker-drawer.*`                                             | Spell catalog drawer shell                  |
-| `spells/picker/use-spell-picker-controller.ts`                                    | Mode buckets, filter persist, derived lists |
-| `spells/picker/spell-picker-browse-mode.lib.ts`                                   | Per-mode browse bucket helpers              |
-| `spells/picker/spell-picker-selection-summary.tsx`                                | Spell-only selection count chrome           |
-| `spells/picker/map-spell-picker-compact-summary-to-metadata-lines.ts`             | Spell metadata mapper                       |
-| `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell            |
-| `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                       |
+| Subfolder / file                                                                  | Responsibility                                  |
+| --------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `spells/picker/spell-picker-drawer.*`                                             | Spell catalog drawer shell                      |
+| `spells/picker/use-spell-picker-controller.ts`                                    | Mode buckets, filter persist, derived lists     |
+| `spells/picker/spell-picker-browse-mode.lib.ts`                                   | Per-mode browse bucket helpers                  |
+| `spells/picker/spell-picker-selection-summary.tsx`                                | Spell-only selection count chrome               |
+| `spells/picker/map-spell-picker-compact-summary-to-metadata-lines.ts`             | Spell picker metadata mapper (one curated line) |
+| `proficiencies/picker/proficiency-picker-drawer.*`                                | Proficiency catalog drawer shell                |
+| `proficiencies/picker/map-skill-proficiency-compact-summary-to-metadata-lines.ts` | Skill metadata mapper                           |
 
 ## Connections (builder + sheet)
 

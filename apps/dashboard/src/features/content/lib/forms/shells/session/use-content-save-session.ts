@@ -4,7 +4,7 @@ import { useSchemaFormSubmit } from '@rpg/ui/form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
-import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../../campaign-access/campaign-access-form-state'
 import {
   runCoordinatedContentSave,
   type CoordinatedSaveSavedEvent,

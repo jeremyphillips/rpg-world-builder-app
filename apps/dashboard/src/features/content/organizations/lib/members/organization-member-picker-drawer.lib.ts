@@ -9,6 +9,8 @@ import { normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending } from '@rpg/search/ranking'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
+
 import {
   buildCharacterPickerOptionSearchText,
   compareName,
@@ -34,11 +36,6 @@ export type OrganizationMemberPickerCommit = {
 export const ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL = 'Member'
 export const ORGANIZATION_MEMBER_PICKER_RECOMMENDED_LABEL = 'Recommended'
 
-const organizationMemberNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
-
 export type OrganizationMemberSelectionPolicy = {
   classAffinityIds: readonly string[]
   speciesAffinityIds: readonly string[]
@@ -62,10 +59,7 @@ export function formatOrganizationMemberPickerStatusBadgeLabel(membershipTitle?:
     return ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL
   }
 
-  return joinInlineMetadata([
-    ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL,
-    membershipTitle,
-  ])
+  return joinInlineMetadata([ORGANIZATION_MEMBER_PICKER_ALREADY_MEMBER_LABEL, membershipTitle])
 }
 
 function resolveOrganizationMemberPickerSelectionPolicy(
@@ -166,7 +160,7 @@ function compareOrganizationMemberPickerScoredCandidates(
       return l.isRecommended ? -1 : 1
     },
     (l, r) => compareOrganizationMemberPickerCharacterType(l.item, r.item),
-    (l, r) => compareName(organizationMemberNameCollator, l.item.name, r.item.name, 'asc'),
+    (l, r) => compareName(pickerNameCollator, l.item.name, r.item.name, 'asc'),
   )(left, right)
 }
 

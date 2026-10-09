@@ -9,6 +9,7 @@ import {
   testSettlementLocation,
 } from '@/features/content/lib/fixtures/location-test-helpers'
 import { makeLocation } from '@/test/fixtures/factories/location'
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 import { STORY_CAMPAIGN_ID } from '@/test/fixtures/constants'
 
 import { buildLocationsById } from '../../lib/location-display'
@@ -363,4 +364,54 @@ describe('LocationInverseOrganizationConnectionLinkDrawer nested create', () => 
       screen.getByRole('button', { name: 'Add headquarters organization', hidden: true }),
     ).toBeDisabled()
   })
+
+  it('lists organizations by name, then id, including equal search scores', async () => {
+    const user = userEvent.setup()
+    const location = testSettlementLocation()
+    const zebra = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-z',
+      slug: 'zebra',
+      name: 'Zebra Guild',
+    })
+    const amberB = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-b',
+      slug: 'amber-b',
+      name: 'Amber Guild',
+    })
+    const amberA = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-a',
+      slug: 'amber-a',
+      name: 'Amber Guild',
+    })
+
+    renderWithProviders(
+      <LocationInverseOrganizationConnectionLinkDrawer
+        open
+        onOpenChange={vi.fn()}
+        mode="add"
+        intent="site"
+        addKind="headquarters"
+        location={location}
+        {...drawerContextFor(location)}
+        organizations={[zebra, amberB, amberA]}
+        connectedPartyRows={[]}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b', 'organization-z'])
+
+    await user.type(screen.getByRole('textbox', { name: 'Search organizations…' }), 'amber')
+
+    expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b'])
+  })
 })
+
+function visiblePickerItemKeys(): string[] {
+  return [...document.querySelectorAll('[data-picker-item-key]')].map(
+    (node) => node.getAttribute('data-picker-item-key') ?? '',
+  )
+}

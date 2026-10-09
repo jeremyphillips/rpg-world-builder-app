@@ -8,6 +8,7 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   getContentTypeCapitalizedSentenceLabel,
   getContentTypeTerm,
+  getSpeciesHeritageLabel,
   primaryBlockingIssue,
 } from '@rpg/contracts'
 
@@ -16,7 +17,7 @@ const NON_CATALOG_CONTENT_REFERENCE_TYPE_LABELS = {
   proficiencies: 'Proficiencies',
   tools: 'Tools',
   languages: 'Languages',
-  heritage: 'Heritage',
+  heritage: getSpeciesHeritageLabel(),
 } as const satisfies Partial<Record<CharacterCampaignContentReferenceType, string>>
 
 function contentReferenceTypeLabel(type: CharacterCampaignContentReferenceType): string {

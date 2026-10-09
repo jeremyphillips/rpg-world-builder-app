@@ -1,7 +1,22 @@
-import type { EquipmentRecommendationSpecificity } from '../../../content/equipment-recommendation'
+import type {
+  EquipmentRecommendationReason,
+  EquipmentRecommendationSpecificity,
+} from '../../../content/equipment-recommendation'
+import type { UnmetAbilityScoreRequirement } from '../../../content/lib/ability-score-requirements'
 import type { CharacterSelectionSource } from '../../character/sheet/selection-sources'
 
 import type { RecommendationSourceRef } from './recommendation-source-ref'
+
+/** Ranking-only proficiency provenance. Not an equipment reason and not a badge. */
+export const ABILITY_FIT_RECOMMENDATION_REASON = 'abilityFit' as const
+
+export const PROFICIENCY_RECOMMENDATION_REASONS = [ABILITY_FIT_RECOMMENDATION_REASON] as const
+
+export type ProficiencyRecommendationReason = (typeof PROFICIENCY_RECOMMENDATION_REASONS)[number]
+
+export type RecommendationSignalReason =
+  | EquipmentRecommendationReason
+  | ProficiencyRecommendationReason
 
 /** Soft only. A requirement is never a recommendation strength. */
 export const RECOMMENDATION_STRENGTHS = ['strong', 'compatible', 'neutral', 'discouraged'] as const
@@ -32,6 +47,14 @@ export type RecommendationSignal = {
   /** Absent for source-less facts such as proficiency compatibility. */
   source?: RecommendationSourceRef
   specificity: RecommendationSpecificity
+  /**
+   * Evidence reason that produced this recommendation signal.
+   * Used for provenance and presentation policy. It does not determine rank directly.
+   * `abilityFit` is ranking evidence only and must not become recommendation guidance.
+   * `startingEquipment` here means the strength originated from starting-equipment
+   * evidence, not that the item is in the currently selected package.
+   */
+  reason?: RecommendationSignalReason
   detail?: RecommendationSignalDetail
 }
 
@@ -101,6 +124,8 @@ export type EquipmentOptionSelection = {
 }
 
 export type OptionState = {
+  /** Present in the owned loadout (package, nested picks, grants, purchases). */
+  owned?: boolean
   selection?: EquipmentOptionSelection
   choice?: {
     choiceSetId?: string
@@ -112,6 +137,8 @@ export type OptionState = {
     proficient?: boolean
     proficiencySources?: readonly CharacterSelectionSource[]
     spellcastingFocusFor?: RecommendationSourceRef
+    /** Authored minimums the draft's known scores do not meet. Unknown scores are skipped. */
+    unmetAbilityScoreRequirements?: readonly UnmetAbilityScoreRequirement[]
   }
 }
 

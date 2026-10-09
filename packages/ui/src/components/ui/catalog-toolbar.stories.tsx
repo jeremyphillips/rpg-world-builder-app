@@ -34,7 +34,7 @@ export const WithSearchAndTabs: Story = {
         }}
         actions={
           <Button type="button" variant="ghost" size="sm">
-            Reset view
+            Reset
           </Button>
         }
       />
@@ -69,7 +69,7 @@ export const FiltersWithoutTabs: Story = {
         }}
         actions={
           <Button type="button" variant="ghost" size="sm">
-            Reset view
+            Reset
           </Button>
         }
       />

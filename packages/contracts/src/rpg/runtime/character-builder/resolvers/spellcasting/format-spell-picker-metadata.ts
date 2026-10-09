@@ -2,7 +2,6 @@ import type { Spell } from '../../../../content/spell'
 import { formatSpellLevel } from '../../../../content/spell/levels'
 import type { SpellTags } from '../../../../vocab/spell/tags'
 import type { SpellCastingTime, SpellDuration } from '../../../../vocab/spell'
-import { getCompactSpellDeliveryMethodLabel } from '../../../../vocab/spell/delivery-method'
 import { getSpellSchoolLabel } from '../../../../vocab/spell/school'
 import {
   formatSpellCastingTimeLabel,
@@ -10,18 +9,10 @@ import {
   formatSpellDurationLabel,
   formatSpellRangeLabel,
 } from '../../../../content/spell/format-spell-metadata-core'
+import { getCantripLevelLabel } from '../../../../vocab/spell/spell-collection-kind'
 import { stripHtmlTags } from '../../../../../lib/strip-html-tags'
 
-export const SPELL_PICKER_CANTrip_LEVEL_LABEL = 'Cantrip'
-
-export type SpellPickerCompactSummary = {
-  /** Casting time, range, and duration — ordered usage/mechanics facts for line 1. */
-  castingSummary: readonly string[]
-  classification: {
-    levelLabel: string
-    descriptors: readonly string[]
-  }
-}
+export const SPELL_PICKER_CANTrip_LEVEL_LABEL = getCantripLevelLabel()
 
 /** Returns "Cantrip" for level 0, otherwise an ordinal level label (e.g. "1st level"). */
 export function formatSpellPickerLevelLabel(level: number): string {
@@ -39,7 +30,7 @@ export function formatSpellPickerRange(range: Parameters<typeof formatSpellRange
   return formatSpellRangeLabel(range, 'picker')
 }
 
-/** Formats spell duration for picker rows (e.g. "Instantaneous"). */
+/** Full duration phrase shared with detail views (e.g. "Instantaneous", "Concentration, up to 10 minutes"). */
 export const formatSpellPickerDuration = formatSpellDurationLabel
 
 /** Formats spell components for picker detail (e.g. "V, S, M (fleece)"). */
@@ -66,42 +57,46 @@ function flattenSpellTags(tags: SpellTags | undefined): string[] {
   ]
 }
 
-function buildSpellPickerClassificationDescriptors(spell: Spell): string[] {
-  const descriptors = [getSpellSchoolLabel(spell.school)]
-  if (spell.deliveryMethod) {
-    descriptors.push(getCompactSpellDeliveryMethodLabel(spell.deliveryMethod))
-  }
-  return descriptors
+/** Primary picker label for spell search documents. */
+export function getSpellSearchName(spell: Spell): string {
+  return spell.name
 }
 
-/** Builds structured compact summary facts for spell picker rows. */
-export function buildSpellPickerCompactSummary(spell: Spell): SpellPickerCompactSummary {
-  return {
-    castingSummary: [
-      formatSpellPickerCastingTime(spell.castingTime),
-      formatSpellPickerRange(spell.range),
-      formatSpellPickerDuration(spell.duration),
-    ],
-    classification: {
-      levelLabel: formatSpellPickerLevelLabel(spell.level),
-      descriptors: buildSpellPickerClassificationDescriptors(spell),
-    },
-  }
+/** Human-readable school label for spell search documents. */
+export function getSpellSearchSchoolLabel(spell: Spell): string {
+  return getSpellSchoolLabel(spell.school)
+}
+
+/**
+ * Level phrases for spell search documents.
+ * Returns both the short ordinal (`3rd`, or `Cantrip` at level 0) and the picker label (`3rd level`).
+ */
+export function getSpellSearchLevelLabels(spell: Spell): string[] {
+  const levelLabel =
+    spell.level === 0 ? SPELL_PICKER_CANTrip_LEVEL_LABEL : formatSpellLevel(spell.level)
+  return [levelLabel, formatSpellPickerLevelLabel(spell.level)]
+}
+
+/** Structured tag ids for spell search documents, one value per entry. */
+export function getSpellSearchTags(spell: Spell): string[] {
+  return flattenSpellTags(spell.tags)
+}
+
+/** Plain-text description for spell search documents. */
+export function getSpellSearchDescription(spell: Spell): string {
+  return stripHtmlTags(spell.description ?? '')
 }
 
 /** Search text for spell picker ranking — name, school, level, tags, and plain description. */
 export function buildSpellPickerSearchText(spell: Spell): string {
-  const levelLabel =
-    spell.level === 0 ? SPELL_PICKER_CANTrip_LEVEL_LABEL : formatSpellLevel(spell.level)
-  const tagText = flattenSpellTags(spell.tags).join(' ')
+  const tagText = getSpellSearchTags(spell).join(' ')
 
   return [
-    spell.name,
-    getSpellSchoolLabel(spell.school),
-    levelLabel,
-    formatSpellPickerLevelLabel(spell.level),
+    getSpellSearchName(spell),
+    getSpellSearchSchoolLabel(spell),
+    ...getSpellSearchLevelLabels(spell),
     tagText || undefined,
-    stripHtmlTags(spell.description ?? ''),
+    getSpellSearchDescription(spell) || undefined,
   ]
     .filter(Boolean)
     .join(' ')

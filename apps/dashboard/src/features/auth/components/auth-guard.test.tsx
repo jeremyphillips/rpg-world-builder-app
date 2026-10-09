@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { ReactNode } from 'react'
 import { screen, waitFor } from '@testing-library/react'
 import { Route, Routes } from 'react-router-dom'
+import { ApiError } from '@rpg/contracts/shared'
 
 vi.mock('../api/auth-client')
 vi.mock('@/features/realtime', () => ({
@@ -47,8 +48,8 @@ describe('AuthGuard', () => {
     })
   })
 
-  it('redirects to /login when the session check fails (401)', async () => {
-    fetchSession.mockRejectedValueOnce(new Error('unauthorized'))
+  it('redirects to /login when the session check returns 401', async () => {
+    fetchSession.mockRejectedValueOnce(new ApiError(401, 'unauthorized', 'unauthorized'))
 
     renderGuard()
 
@@ -56,6 +57,25 @@ describe('AuthGuard', () => {
       expect(assign).toHaveBeenCalledWith('/login')
     })
     expect(screen.queryByText('protected content')).not.toBeInTheDocument()
+  })
+
+  it('stays on the page when the session check cannot reach the API', async () => {
+    fetchSession.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+
+    renderGuard()
+
+    expect(await screen.findByRole('button', { name: 'Retry' })).toBeInTheDocument()
+    expect(assign).not.toHaveBeenCalled()
+    expect(screen.queryByText('protected content')).not.toBeInTheDocument()
+  })
+
+  it('stays on the page when the session check returns a server error', async () => {
+    fetchSession.mockRejectedValueOnce(new ApiError(503, 'unavailable', 'unavailable'))
+
+    renderGuard()
+
+    expect(await screen.findByRole('button', { name: 'Retry' })).toBeInTheDocument()
+    expect(assign).not.toHaveBeenCalled()
   })
 
   it('renders the protected content for an authenticated session', async () => {

@@ -1,4 +1,11 @@
-import type { CharacterBuildCatalogIndex, ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
+import {
+  catalogNounFromTerm,
+  formatCatalogPickerCopy,
+  PROFICIENCY_TERM,
+  type CharacterBuildCatalogIndex,
+  type ChoiceSet,
+  type ProficiencyPickerItem,
+} from '@rpg/contracts'
 
 import {
   CATALOG_PICKER_SORT_BEST_MATCH,
@@ -11,13 +18,13 @@ import {
 
 export type { ChoiceSet, ProficiencyPickerItem, ProficiencyPickerItemState } from '@rpg/contracts'
 
-export const PROFICIENCY_PICKER_NO_RESULTS_MESSAGE = 'No proficiencies match your search.'
-export const PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE =
-  'No proficiencies are available for this choice.'
-export const PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE =
-  'You have selected the maximum number of proficiencies for this choice.'
+const proficiencyCopy = formatCatalogPickerCopy(catalogNounFromTerm(PROFICIENCY_TERM))
 
-export const PROFICIENCY_PICKER_RESET_VIEW_LABEL = 'Reset view'
+export const PROFICIENCY_PICKER_NO_RESULTS_MESSAGE = proficiencyCopy.noResultsMessage
+export const PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE = proficiencyCopy.noOptionsMessage
+export const PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE = proficiencyCopy.selectionFullMessage
+
+export const PROFICIENCY_PICKER_SORT_GROUP_LABEL = proficiencyCopy.sortGroupLabel
 
 export const PROFICIENCY_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const PROFICIENCY_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC

@@ -21,7 +21,7 @@ import {
   LOCATION_CONNECTED_PARTIES_SECTION_LABELS,
 } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import type { LocationConnectedPartyCharacterOption } from '../../lib/connected-parties/location-connected-party-character-options.lib'
-import type { LocationConnectedPartyEditTarget } from './location-connected-parties-section'
+import type { LocationConnectedPartyEditTarget } from './location-connected-party-edit-target'
 
 type LocationConnectedPartiesSectionBodyProps = {
   campaignId: string

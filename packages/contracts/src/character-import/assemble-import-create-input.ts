@@ -20,6 +20,7 @@ import type {
   RecognizedProficiency,
   RecognizedSpellPreview,
 } from './adapter/character-import-preview-types'
+import { getContentTypeCapitalizedSentenceLabel } from '../rpg/primitives/content/content-type-terms'
 import { CharacterImportFinalizationError } from './character-import-finalization-error'
 
 const IMPORT_SELECTION_SOURCE: CharacterSelectionSource = { kind: 'manual' }
@@ -91,7 +92,7 @@ function assembleImportedSpecies(
     throw new CharacterImportFinalizationError([
       issue(
         'import_species_unmapped',
-        'Species must match the local catalog before import can be saved.',
+        `${getContentTypeCapitalizedSentenceLabel('species')} must match the local catalog before import can be saved.`,
         'species.id',
       ),
     ])

@@ -46,7 +46,7 @@ const chainMail = equipmentSchema.parse({
   baseAc: 16,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 13,
+  abilityScoreRequirements: { str: 13 },
 })
 
 const plateArmor = equipmentSchema.parse({
@@ -62,7 +62,7 @@ const plateArmor = equipmentSchema.parse({
   baseAc: 18,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 15,
+  abilityScoreRequirements: { str: 15 },
 })
 
 const storedFighter: ClassStored = {
@@ -170,6 +170,43 @@ describe('resolveEquipmentPickerItems', () => {
 
     expect(item!.state.purchaseAvailability.status).toBe('unaffordable')
     expect(item!.state.isWithinRemainingBudget).toBe(false)
+  })
+
+  it('marks only prices above the starting-purse ceiling', () => {
+    const budget = {
+      starting: { cp: 0, sp: 0, gp: 7, pp: 0 },
+      spent: { cp: 0, sp: 0, gp: 0, pp: 0 },
+      remaining: { cp: 0, sp: 0, gp: 7, pp: 0 },
+    }
+    const ceilingCp = wealthToCopper({ cp: 0, sp: 0, gp: 110, pp: 0 })
+    const [within, above, unpriced] = resolveEquipmentPickerItems({
+      equipment: [
+        chainMail,
+        plateArmor,
+        equipmentSchema.parse({
+          ...CONTENT_META,
+          id: `${RULESET}:amulet`,
+          slug: 'amulet',
+          name: 'Amulet',
+          description: '',
+          cost: null,
+          kind: 'magic_item',
+          rarity: 'rare',
+          magicItemCategory: 'wondrous_item',
+        }),
+      ],
+      proficiencies: emptyProficiencies,
+      recommendations,
+      budget,
+      purchaseBudgetCeilingCp: ceilingCp,
+    })
+
+    expect(within!.state.purchaseAvailability.status).toBe('unaffordable')
+    expect(within!.state.exceedsPurchaseBudgetCeiling).toBe(false)
+    expect(above!.state.purchaseAvailability.status).toBe('unaffordable')
+    expect(above!.state.exceedsPurchaseBudgetCeiling).toBe(true)
+    expect(unpriced!.state.purchaseAvailability.status).toBe('unavailableForPurchase')
+    expect(unpriced!.state.exceedsPurchaseBudgetCeiling).toBe(false)
   })
 
   it('marks unavailable equipment as outside the remaining budget', () => {

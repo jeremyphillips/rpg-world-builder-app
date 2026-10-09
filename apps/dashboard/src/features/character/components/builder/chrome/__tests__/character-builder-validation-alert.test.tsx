@@ -1,24 +1,10 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { characterBuilderValidationMessages, formatFieldMessage } from '@rpg/contracts'
 
 import { CharacterBuilderValidationAlert } from '../character-builder-validation-alert'
-
-import type * as ResolveValidationIssuePresentation from '../../../../lib/builder/resolve-validation-issue-presentation.lib'
-
-vi.mock('../../../../lib/builder/resolve-validation-issue-presentation.lib', async () => {
-  const actual = await vi.importActual<typeof ResolveValidationIssuePresentation>(
-    '../../../../lib/builder/resolve-validation-issue-presentation.lib',
-  )
-
-  return {
-    ...actual,
-    shouldInlineValidationTechnicalDetails: () => false,
-  }
-})
 
 describe('CharacterBuilderValidationAlert', () => {
   it('renders nothing when there are no issues', () => {
@@ -26,9 +12,7 @@ describe('CharacterBuilderValidationAlert', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('shows the user-facing message and step context without inline path by default', async () => {
-    const user = userEvent.setup()
-
+  it('shows only the user-facing message', () => {
     render(
       <CharacterBuilderValidationAlert
         issues={[
@@ -45,11 +29,10 @@ describe('CharacterBuilderValidationAlert', () => {
 
     const alert = screen.getByRole('alert')
     expect(alert).toHaveTextContent('Spell access is required.')
-    expect(alert).toHaveTextContent('Spells')
+    expect(alert).not.toHaveTextContent('Spells')
     expect(alert).not.toHaveTextContent('spells.0.access')
-
-    await user.click(screen.getByRole('button', { name: 'Technical details' }))
-    expect(alert).toHaveTextContent('spells.0.access · invalid_type')
+    expect(alert).not.toHaveTextContent('invalid_type')
+    expect(screen.queryByRole('button', { name: 'Technical details' })).not.toBeInTheDocument()
   })
 
   it('lists validation issues in an alert', () => {

@@ -20,6 +20,7 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildLocationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
 import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
+import type { PickerSelectionStateLineModel } from '../../lib/entity/summary/picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
 import type { DrawerEntityPresentation } from '../../lib/entity/surfaces/drawer/drawer-entity.types'
 
@@ -288,6 +289,7 @@ export function buildLocationEntityCardModelFromClassification(
     classificationText: string
     metadata?: string
     status?: readonly EntitySummaryStatusItem[]
+    selectionState?: PickerSelectionStateLineModel
   },
 ): EntitySurfaceIdentity {
   return {
@@ -296,6 +298,7 @@ export function buildLocationEntityCardModelFromClassification(
     classification: input.classificationText,
     ...(input.metadata ? { metadata: input.metadata } : {}),
     ...(input.status && input.status.length > 0 ? { status: input.status } : {}),
+    ...(input.selectionState ? { selectionState: input.selectionState } : {}),
     ...(input.displayImage ? { displayImage: input.displayImage } : {}),
   }
 }
@@ -344,6 +347,17 @@ export function buildLocationEntitySummarySearchText(vm: LocationEntitySummaryVm
   return [vm.name, ...vm.classification.parts, ...vm.ancestry.items.map((item) => item.name)].join(
     ' ',
   )
+}
+
+/** Search text for a location picker row: name, classification parts, and ancestor names. */
+export function buildLocationPickerSearchText(
+  location: Location,
+  context: {
+    locationsById: ReadonlyMap<string, Location>
+    campaignId: string
+  },
+): string {
+  return buildLocationEntitySummarySearchText(buildLocationEntitySummaryVm(location, context))
 }
 
 export function buildLocationChildren(

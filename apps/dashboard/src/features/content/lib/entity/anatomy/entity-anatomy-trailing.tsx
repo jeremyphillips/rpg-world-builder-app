@@ -11,10 +11,21 @@ import {
   entityAnatomyTrailingActionVariants,
   entityAnatomyTrailingGroupSecondaryVariants,
   entityAnatomyTrailingIndicatorVariants,
+  entityAnatomyTrailingMetaVariants,
+  entityAnatomyTrailingQuantityLabelVariants,
 } from './entity-anatomy-trailing.variants'
 
 type EntityAnatomyTrailingCellsProps = {
   trailing?: EntityAnatomyTrailing
+}
+
+function quantityIndicatorText(
+  quantity: number,
+  format: 'compact' | 'label' | 'additional',
+): string | null {
+  if (format === 'additional') return quantity >= 1 ? `+${quantity}` : null
+  if (quantity <= 1) return null
+  return format === 'label' ? `Qty ${quantity}` : `×${quantity}`
 }
 
 function EntityAnatomyTrailingQuantityLabel({
@@ -22,13 +33,14 @@ function EntityAnatomyTrailingQuantityLabel({
   format = 'compact',
 }: {
   quantity: number
-  format?: 'compact' | 'label'
+  format?: 'compact' | 'label' | 'additional'
 }) {
-  if (quantity <= 1) return null
+  const label = quantityIndicatorText(quantity, format)
+  if (!label) return null
 
   return (
-    <Text as="span" variant="muted">
-      {format === 'label' ? `Qty ${quantity}` : `×${quantity}`}
+    <Text as="span" variant="muted" className={entityAnatomyTrailingQuantityLabelVariants()}>
+      {label}
     </Text>
   )
 }
@@ -51,26 +63,66 @@ function EntityAnatomyTrailingSecondaryView({
   }
 }
 
+function EntityAnatomyTrailingMeta({ meta }: { meta?: string }) {
+  if (!meta) return null
+
+  return (
+    <Text as="span" variant="muted" className={entityAnatomyTrailingMetaVariants()}>
+      {meta}
+    </Text>
+  )
+}
+
 function EntityAnatomyTrailingPrimary({ trailing }: { trailing: EntityAnatomyTrailing }) {
   switch (trailing.kind) {
     case 'action':
     case 'utility':
-      return <div className={entityAnatomyTrailingActionVariants()}>{trailing.content}</div>
+      return (
+        <div className={entityAnatomyTrailingActionVariants()}>
+          <EntityAnatomyTrailingMeta meta={trailing.meta} />
+          {trailing.content}
+        </div>
+      )
     case 'indicator':
       return (
         <div className={entityAnatomyTrailingIndicatorVariants()}>
-          {trailing.variant === 'chevron' ? (
-            <ChevronRight aria-hidden className="size-4 shrink-0" />
+          {trailing.variant === 'label' ? (
+            <Text
+              as="span"
+              variant="muted"
+              className={entityAnatomyTrailingQuantityLabelVariants()}
+            >
+              {trailing.label}
+            </Text>
           ) : (
-            <EntityAnatomyTrailingQuantityLabel
-              quantity={trailing.quantity}
-              format={trailing.format}
-            />
+            <>
+              <EntityAnatomyTrailingMeta meta={trailing.meta} />
+              {trailing.variant === 'chevron' ? (
+                <ChevronRight aria-hidden className="size-4 shrink-0" />
+              ) : (
+                <EntityAnatomyTrailingQuantityLabel
+                  quantity={trailing.quantity}
+                  format={trailing.format}
+                />
+              )}
+            </>
           )}
         </div>
       )
     case 'group':
-      return <div className={entityAnatomyTrailingActionVariants()}>{trailing.primary}</div>
+      return (
+        <div className={entityAnatomyTrailingActionVariants()}>
+          {trailing.secondary ? (
+            <span
+              className={entityAnatomyTrailingGroupSecondaryVariants()}
+              data-entity-item-slot="trailing-secondary"
+            >
+              <EntityAnatomyTrailingSecondaryView secondary={trailing.secondary} />
+            </span>
+          ) : null}
+          {trailing.primary}
+        </div>
+      )
     default: {
       const _exhaustive: never = trailing
       return _exhaustive
@@ -85,27 +137,14 @@ export function EntityAnatomyTrailingCells({ trailing }: EntityAnatomyTrailingCe
   }
 
   const cells = resolveEntityAnatomyTrailingCells(trailing)
-  const secondary = trailing.kind === 'group' ? trailing.secondary : undefined
 
   return (
-    <>
-      <RowAnatomyCell<EntityAnatomyColumn>
-        cell={cells.primary}
-        data-entity-item-slot="trailing"
-        data-entity-trailing-kind={trailing.kind}
-      >
-        <EntityAnatomyTrailingPrimary trailing={trailing} />
-      </RowAnatomyCell>
-      {cells.secondary && secondary ? (
-        <RowAnatomyCell<EntityAnatomyColumn>
-          cell={cells.secondary}
-          data-entity-item-slot="trailing-secondary"
-        >
-          <div className={entityAnatomyTrailingGroupSecondaryVariants()}>
-            <EntityAnatomyTrailingSecondaryView secondary={secondary} />
-          </div>
-        </RowAnatomyCell>
-      ) : null}
-    </>
+    <RowAnatomyCell<EntityAnatomyColumn>
+      cell={cells.primary}
+      data-entity-item-slot="trailing"
+      data-entity-trailing-kind={trailing.kind}
+    >
+      <EntityAnatomyTrailingPrimary trailing={trailing} />
+    </RowAnatomyCell>
   )
 }

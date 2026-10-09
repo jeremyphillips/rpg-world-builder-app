@@ -34,7 +34,7 @@ export function MessageThreadSharedCampaigns({
         {/* TODO: convert overflow to Popover when an interactive campaign list component is available. */}
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger interactive asChild>
               <Button
                 type="button"
                 variant="text"

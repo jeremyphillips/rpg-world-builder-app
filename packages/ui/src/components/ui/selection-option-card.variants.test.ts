@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   optionCardBodyVariants,
   optionCardCompactBodyInsetClasses,
+  optionCardEmbeddedContentInsetClasses,
   optionCardCompactSecondaryTypographyClasses,
   optionCardSecondaryCopyStackVariants,
   optionCardSummaryBadgeRowVariants,
@@ -40,20 +41,27 @@ describe('optionCard selected chrome parity', () => {
 })
 
 describe('optionCard surface establishment', () => {
-  it('establishes the surface-subtle plane on radio card variant and outer shell', () => {
+  it('establishes the muted plane on radio cards and keeps hover on surface-subtle', () => {
+    expect(radioCardVariants({ variant: 'card' })).toContain('bg-surface-muted')
+    expect(radioCardVariants({ variant: 'card' })).toContain(
+      '[--surface-current:var(--surface-muted)]',
+    )
     expect(radioCardVariants({ variant: 'card' })).toContain(
       '[--surface-current:var(--surface-subtle)]',
     )
+    expect(radioCardShellVariants()).toContain('bg-surface-muted')
+    expect(radioCardShellVariants()).toContain('[--surface-current:var(--surface-muted)]')
     expect(radioCardShellVariants()).toContain('[--surface-current:var(--surface-subtle)]')
+    expect(radioCardShellVariants({ selected: true })).toContain('bg-surface-strong')
   })
 
-  it('establishes background independently on embedded slots', () => {
-    const panel = optionCardEmbeddedSlotVariants({ tone: 'panel' })
-    const divider = optionCardEmbeddedSlotVariants({ tone: 'divider' })
-    expect(panel).toContain('[--surface-current:var(--background)]')
-    expect(panel).toContain('bg-background')
-    expect(divider).toContain('[--surface-current:var(--background)]')
-    expect(divider).toContain('bg-background')
+  it('does not paint a separate fill on embedded slots', () => {
+    for (const tone of ['panel', 'divider', 'plain'] as const) {
+      const classes = optionCardEmbeddedSlotVariants({ tone })
+      expect(classes).not.toContain('bg-background')
+      expect(classes).not.toContain('bg-surface-muted')
+      expect(classes).toContain('border-t')
+    }
   })
 
   it('uses compact option padding with control and density-owned typography', () => {
@@ -72,6 +80,23 @@ describe('optionCard surface establishment', () => {
     expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain('-mx-4')
     expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).toContain(
       'rounded-b-card',
+    )
+    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'compact' })).not.toContain(
+      optionCardEmbeddedContentInsetClasses.compact,
+    )
+  })
+
+  it('insets in-flow embedded slots to the title column', () => {
+    expect(optionCardEmbeddedContentInsetClasses.default).toBe('pl-[calc(1.25rem+1rem)]')
+    expect(optionCardEmbeddedContentInsetClasses.compact).toBe('pl-[calc(1rem+0.75rem)]')
+    expect(optionCardEmbeddedSlotVariants({ tone: 'plain', density: 'default' })).toContain(
+      optionCardEmbeddedContentInsetClasses.default,
+    )
+    expect(optionCardEmbeddedSlotVariants({ tone: 'divider', density: 'compact' })).toContain(
+      optionCardEmbeddedContentInsetClasses.compact,
+    )
+    expect(optionCardEmbeddedSlotVariants({ tone: 'panel', density: 'default' })).not.toContain(
+      optionCardEmbeddedContentInsetClasses.default,
     )
   })
 

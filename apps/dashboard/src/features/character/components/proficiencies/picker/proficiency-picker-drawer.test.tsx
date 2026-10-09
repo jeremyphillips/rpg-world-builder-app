@@ -19,6 +19,7 @@ import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
   PROFICIENCY_PICKER_SELECTION_FULL_MESSAGE,
+  PROFICIENCY_PICKER_SORT_GROUP_LABEL,
 } from './proficiency-picker-drawer.types'
 
 describe('ProficiencyPickerDrawer', () => {
@@ -38,7 +39,9 @@ describe('ProficiencyPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByRole('group', { name: 'Sort proficiencies' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('group', { name: PROFICIENCY_PICKER_SORT_GROUP_LABEL }),
+    ).toBeInTheDocument()
     expect(screen.getByText('Stealth')).toBeInTheDocument()
     expect(screen.getAllByText('Dexterity').length).toBeGreaterThan(0)
     expect(screen.getByText('Acrobatics')).toBeInTheDocument()
@@ -66,8 +69,13 @@ describe('ProficiencyPickerDrawer', () => {
     )
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
-    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
-    expect(screen.getByText('Selection full')).toBeInTheDocument()
+    expect(screen.getAllByText('Selected')).toHaveLength(2)
+    const addButton = screen.getByRole('button', { name: 'Add' })
+    expect(addButton).toBeDisabled()
+    expect(screen.queryByText('Selection full')).not.toBeInTheDocument()
+    expect(addButton.parentElement).toHaveAccessibleName(
+      'Add, Selection full, Remove a selection before adding another.',
+    )
     expect(screen.getByRole('heading', { name: 'Choose skill proficiency' })).toBeInTheDocument()
   })
 
@@ -156,7 +164,7 @@ describe('ProficiencyPickerDrawer', () => {
     expect(screen.queryByRole('button', { name: /^Expand / })).not.toBeInTheDocument()
   })
 
-  it('shows a Recommended badge for recommended language rows', () => {
+  it('shows species recommendation guidance instead of a badge', () => {
     const recommendedItem = {
       ...proficiencyPickerLanguageItemsFixture[0]!,
       state: {
@@ -177,7 +185,9 @@ describe('ProficiencyPickerDrawer', () => {
           facts: [
             {
               kind: 'recommendation' as const,
-              label: 'Recommended',
+              discriminator: 'recommended' as const,
+              label: 'Recommended by species',
+              sourceKind: 'species' as const,
               sourceLabels: ['Dwarf species'],
             },
           ],
@@ -201,7 +211,10 @@ describe('ProficiencyPickerDrawer', () => {
     const recommendedRow = screen
       .getByText(recommendedItem.label)
       .closest('[data-picker-item-key]') as HTMLElement
-    expect(within(recommendedRow).getByText('Recommended')).toBeInTheDocument()
+    const guidance = within(recommendedRow).getByText('Recommended by species')
+    expect(guidance.tagName).toBe('SPAN')
+    expect(guidance).toHaveClass('text-foreground')
+    expect(guidance).toHaveAttribute('title', 'Dwarf species')
   })
 
   it('shows distinct empty states for no options, no search results, and selection full', async () => {

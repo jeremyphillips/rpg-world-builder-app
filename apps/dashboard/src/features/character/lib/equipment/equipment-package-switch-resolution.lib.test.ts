@@ -8,15 +8,23 @@ import {
 } from '@rpg/contracts'
 import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 
+import {
+  equipmentStepBattleaxeFixture,
+  equipmentStepCatalogIndexFixture,
+  equipmentStepMonkClassFixture,
+} from './equipment-step.fixtures'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
 import {
   PACKAGE_SWITCH_STAGED_REMOVAL_LABEL,
   buildPackageSwitchDraftPurchasedGroups,
+  buildPackageSwitchReconciliationDraft,
   mapBlockingReasonToMessage,
   packageSwitchDraftHasEdits,
-  resolvePackageSwitchDescription,
+  resolvePackageSwitchDescriptionParts,
+  resolvePackageSwitchModalState,
+  resolvePackageSwitchSelectionFacts,
 } from './equipment-package-switch-resolution.lib'
 
 const rope = pickEquipment('rope')
@@ -66,7 +74,7 @@ describe('equipment-package-switch-resolution.lib', () => {
         kind: 'draftOverBudget',
         amountOverBudgetCp: 400,
       }),
-    ).toBe('Remove 4 GP more to continue.')
+    ).toBe('Remove 4 GP to continue.')
   })
 
   it('builds draft purchased groups with staged removal rows at quantity zero', () => {
@@ -84,8 +92,9 @@ describe('equipment-package-switch-resolution.lib', () => {
     })
 
     expect(groups).toHaveLength(1)
-    expect(groups[0]?.displays).toHaveLength(1)
-    const display = groups[0]?.displays[0]
+    expect(groups[0]?.items).toHaveLength(1)
+    expect(groups[0]?.items[0]?.status).toEqual([])
+    const display = groups[0]?.items[0]?.display
     expect(display?.kind).toBe('single')
     if (display?.kind !== 'single') return
 
@@ -93,6 +102,105 @@ describe('equipment-package-switch-resolution.lib', () => {
     expect(display.row.stagedRemoval).toBe(true)
     expect(display.row.sourceLabel).toBe(PACKAGE_SWITCH_STAGED_REMOVAL_LABEL)
     expect(display.row.maxQuantity).toBe(62)
+  })
+
+  describe('reconciliation facts', () => {
+    const monkDraft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            id: 'purchase-axe',
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    it('builds the target draft without the trimmable purchases', () => {
+      const reconciliationDraft = buildPackageSwitchReconciliationDraft({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        targetOptionId: 'standard-equipment',
+        trimmablePurchaseIds: ['purchase-axe'],
+      })
+
+      expect(
+        reconciliationDraft?.choiceSelections?.[
+          startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)
+        ],
+      ).toEqual(['standard-equipment'])
+      expect(reconciliationDraft?.equipment?.purchases ?? []).toEqual([])
+    })
+
+    it('returns no draft for an unknown target option', () => {
+      expect(
+        buildPackageSwitchReconciliationDraft({
+          draft: monkDraft,
+          catalogIndex: equipmentStepCatalogIndexFixture,
+          targetOptionId: 'missing-option',
+          trimmablePurchaseIds: [],
+        }),
+      ).toBeUndefined()
+    })
+
+    it('resolves trim-row status in the reconciliation context', () => {
+      const targetFunding = resolveStartingEquipmentFundingOptions({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+      }).get('standard-equipment')!
+      const evaluation = evaluateEquipmentPackageSwitch({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        targetOptionId: 'standard-equipment',
+        targetFunding,
+      })!
+      const selectionFacts = resolvePackageSwitchSelectionFacts({
+        draft: monkDraft,
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        choiceSets: [],
+        targetOptionId: 'standard-equipment',
+        trimmablePurchaseIds: evaluation.editableItems.map((item) => item.purchaseId),
+      })
+
+      const groups = buildPackageSwitchDraftPurchasedGroups({
+        evaluation,
+        draftQuantitiesByPurchaseId: { 'purchase-axe': 1 },
+        catalogIndex: equipmentStepCatalogIndexFixture,
+        selectionFacts,
+      })
+
+      expect(groups[0]?.items[0]?.status).toEqual([
+        expect.objectContaining({ kind: 'badge', label: 'Not proficient', tone: 'warning' }),
+      ])
+    })
+  })
+
+  it('uses selection copy when no option was selected before the request', () => {
+    const evaluation = evaluateEquipmentPackageSwitch({
+      draft: goldDraft,
+      catalogIndex,
+      targetOptionId: 'standard-equipment',
+      targetFunding: targetFundingFor('standard-equipment'),
+    })!
+
+    expect(resolvePackageSwitchModalState({ evaluation, isInitialSelection: true })).toMatchObject({
+      title: 'Adjust purchases for this option',
+      confirmLabel: 'Choose option',
+    })
+    expect(resolvePackageSwitchModalState({ evaluation })).toMatchObject({
+      title: 'Adjust purchases before switching',
+      confirmLabel: 'Switch package',
+    })
   })
 
   it('detects draft edits against committed quantities', () => {
@@ -123,9 +231,9 @@ describe('equipment-package-switch-resolution.lib', () => {
       targetFunding: targetFundingFor('standard-equipment'),
     })!
 
-    expect(resolvePackageSwitchDescription(evaluation)).toContain('Standard Equipment allows')
-    expect(resolvePackageSwitchDescription(evaluation)).toContain(
-      'Your inventory will not change until you confirm.',
-    )
+    expect(resolvePackageSwitchDescriptionParts(evaluation)).toEqual({
+      lead: expect.stringMatching(/^Standard Equipment provides .+ for purchases\.$/),
+      detail: 'Reduce your current purchases to fit this amount.',
+    })
   })
 })

@@ -1,13 +1,6 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 
-type ContentPreviewUiContextValue = {
-  sheetOpen: boolean
-  setSheetOpen: (open: boolean) => void
-  playerOpen: boolean
-  setPlayerOpen: (open: boolean) => void
-}
-
-const ContentPreviewUiContext = createContext<ContentPreviewUiContextValue | null>(null)
+import { ContentPreviewUiContext } from './use-content-preview-ui'
 
 export function ContentPreviewUiProvider({ children }: { children: ReactNode }) {
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -20,16 +13,4 @@ export function ContentPreviewUiProvider({ children }: { children: ReactNode }) 
   return (
     <ContentPreviewUiContext.Provider value={value}>{children}</ContentPreviewUiContext.Provider>
   )
-}
-
-export function useContentPreviewUi(): ContentPreviewUiContextValue {
-  const value = useContext(ContentPreviewUiContext)
-  if (!value) {
-    throw new Error('useContentPreviewUi must be used within ContentPreviewUiProvider')
-  }
-  return value
-}
-
-export function useOptionalContentPreviewUi(): ContentPreviewUiContextValue | null {
-  return useContext(ContentPreviewUiContext)
 }

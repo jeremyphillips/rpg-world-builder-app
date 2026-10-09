@@ -7,10 +7,8 @@ import {
   ContentLinkBadge,
   ContentStaticBadge,
 } from '../../../lib/detail/metadata/content-link-badge'
-import {
-  ContentDetailSection,
-  contentDetailSectionPanelContentHeadingClasses,
-} from '../../../lib/detail/page/content-detail-section'
+import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
+import { contentDetailSectionPanelContentHeadingClasses } from '../../../lib/detail/page/content-detail-section.variants'
 import {
   CLASS_DISPLAY_NONE,
   CLASS_PROFICIENCY_GROUP_LABELS,

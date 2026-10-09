@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { createCharacterInputSchema } from '../../character/create-input'
+import { equipmentSchema } from '../../../content/equipment'
+import { resolveCharacterBuildAdvisoriesForDraft } from '../advisories/resolve-character-build-advisories'
 import { createEmptyCharacterBuilderDraft } from '../draft/draft'
 import type { CharacterBuilderDraft } from '../draft/draft'
 import {
@@ -429,6 +431,86 @@ describe('finalizePcCharacterBuild', () => {
         ],
       },
     ])
+  })
+
+  it('finalizes with an unmet ability-score requirement advisory present', () => {
+    const plateArmor = equipmentSchema.parse({
+      id: 'srd-cc-5.2.1:plate-armor',
+      slug: 'plate-armor',
+      rulesetId: 'srd-cc-5.2.1',
+      source: 'system',
+      status: 'published',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Plate Armor',
+      description: '',
+      cost: { amount: 1, currency: 'gp' },
+      weight: { value: 65, unit: 'lb' },
+      kind: 'armor',
+      category: 'heavy',
+      baseAc: 18,
+      addDexModifier: false,
+      stealthDisadvantage: true,
+      abilityScoreRequirements: { str: 15 },
+    })
+    const fighter = {
+      ...builderTestContext.catalog.classes[0]!,
+      characterCreation: {
+        proficiencies: {
+          skills: { choices: [{ id: 'class-skills', choose: 1, from: ['athletics'] }] },
+        },
+        startingEquipment: {
+          choose: 1,
+          options: [{ id: 'pack-a', label: 'Pack A', items: [], wealth: { gp: 10 } }],
+        },
+      },
+    }
+    const context = {
+      ...builderTestContext,
+      catalog: {
+        ...builderTestContext.catalog,
+        classes: [fighter],
+        equipment: [...builderTestContext.catalog.equipment, plateArmor],
+      },
+    }
+    const resolvedChoiceSets = [
+      {
+        id: 'class:srd-cc-5.2.1:fighter:starting-equipment',
+        sourceType: 'class' as const,
+        sourceId: 'srd-cc-5.2.1:fighter',
+        choiceType: 'equipment' as const,
+        label: 'Choose Starting Equipment',
+        min: 1,
+        max: 1,
+        options: [{ id: 'pack-a', label: 'Pack A' }],
+        required: true,
+      },
+    ]
+    const draft = makeCompleteDraft({
+      class: { classId: fighter.id, level: 1 },
+      abilities: {
+        method: 'standard-array',
+        scores: { str: 8, dex: 14, con: 13, int: 12, wis: 10, cha: 15 },
+      },
+      choiceSelections: { 'class:srd-cc-5.2.1:fighter:starting-equipment': ['pack-a'] },
+      equipment: {
+        mode: 'package',
+        purchases: [
+          { equipmentId: plateArmor.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+        ],
+        editedSincePackageSelection: true,
+      },
+    })
+
+    expect(
+      resolveCharacterBuildAdvisoriesForDraft(draft, context, { resolvedChoiceSets }).map(
+        (advisory) => advisory.code,
+      ),
+    ).toContain('equipment_ability_score_requirement_unmet')
+
+    const input = finalizePcCharacterBuild(draft, context, { resolvedChoiceSets })
+    expect(input.equipment.armor.map((entry) => entry.equipmentId)).toEqual([plateArmor.id])
   })
 
   it('assembles class spellcasting with classSpellcasting provenance', () => {

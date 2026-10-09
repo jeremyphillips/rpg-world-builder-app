@@ -1,12 +1,20 @@
-import { formatChoiceSetDrawerHeading } from '@rpg/contracts'
-import type { ChoiceSet, ProficiencyPickerItem } from '@rpg/contracts'
 import {
   compareProficiencyPickerItemsByRecommendation,
-  getProficiencyDomainCompactLabel,
+  formatChoiceSetDrawerHeading,
+  getLanguageProficiencySentenceForm,
+  getProficiencyDomainCompactActionNoun,
+  getProficiencyDomainSentenceForm,
+  getTermSentenceForm,
+  PROFICIENCY_TERM,
+  type ChoiceSet,
+  type ProficiencyPickerItem,
+  type ProficiencyDomain,
 } from '@rpg/contracts'
 
 import { normalizeSearchQuery } from '@rpg/ui'
 import { scoreLegacySearchItem } from '@rpg/ui/lib/search-document'
+
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
 
 import {
   resolveCatalogPickerEmptyStateKind,
@@ -33,11 +41,6 @@ export const PROFICIENCY_PICKER_VIEW_DEFAULTS = {
   sortMode: PROFICIENCY_PICKER_SORT_BEST_MATCH,
 } as const satisfies ProficiencyPickerViewDefaults
 
-const proficiencyNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
-
 type ProficiencyPickerScoredItem = {
   item: ProficiencyPickerItem
   searchScore: number
@@ -58,20 +61,27 @@ export function formatProficiencyPickerDrawerDescription(
   return `Selected ${selectedIds.length} of ${choiceSet.max}. Choose ${remaining} more.`
 }
 
+function proficiencyDomainSearchScope(domain: ProficiencyDomain): string {
+  if (domain === 'skill') {
+    return getProficiencyDomainCompactActionNoun(domain, 2)
+  }
+  return getProficiencyDomainSentenceForm(domain, 2)
+}
+
 export function formatProficiencyPickerSearchPlaceholder(choiceSet: ChoiceSet): string {
   switch (choiceSet.choiceType) {
     case 'skillProficiency':
-      return `Search ${getProficiencyDomainCompactLabel('skill').toLowerCase()}`
+      return `Search ${proficiencyDomainSearchScope('skill')}`
     case 'language':
-      return 'Search languages'
+      return `Search ${getLanguageProficiencySentenceForm(2)}`
     case 'toolProficiency':
-      return 'Search tools'
+      return `Search ${proficiencyDomainSearchScope('tool')}`
     case 'weaponProficiency':
-      return 'Search weapons'
+      return `Search ${proficiencyDomainSearchScope('weapon')}`
     case 'armorTraining':
-      return 'Search armor'
+      return `Search ${proficiencyDomainSearchScope('armor')}`
     default:
-      return 'Search proficiencies'
+      return `Search ${getTermSentenceForm(PROFICIENCY_TERM, 2)}`
   }
 }
 
@@ -146,11 +156,11 @@ function compareProficiencyPickerScoredItems(
       return compareProficiencyPickerItemsByRecommendation(left.item, right.item)
     case PROFICIENCY_PICKER_SORT_NAME_ASC:
       return compareAfterPrimary(
-        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'asc'),
+        compareName(pickerNameCollator, left.item.label, right.item.label, 'asc'),
       )
     case PROFICIENCY_PICKER_SORT_NAME_DESC:
       return compareAfterPrimary(
-        compareName(proficiencyNameCollator, left.item.label, right.item.label, 'desc'),
+        compareName(pickerNameCollator, left.item.label, right.item.label, 'desc'),
       )
   }
 }

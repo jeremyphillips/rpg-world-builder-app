@@ -150,3 +150,76 @@ export const WarningStatusText: Story = {
     </div>
   ),
 }
+
+const METADATA_STATUS_ROWS = [
+  {
+    id: 'badge-and-text',
+    heading: 'Spellbook',
+    status: [
+      { kind: 'badge', label: 'Cannot afford', tone: 'destructive', appearance: 'soft' },
+      { kind: 'text', variant: 'guidance', label: 'Required by class', title: 'Wizard class' },
+      { kind: 'text', variant: 'guidance', label: 'Included in package option' },
+    ],
+  },
+  {
+    id: 'two-badges',
+    heading: 'Greataxe',
+    status: [
+      { kind: 'badge', label: 'Cannot afford', tone: 'destructive', appearance: 'soft' },
+      { kind: 'badge', label: 'Not proficient', tone: 'warning', appearance: 'soft' },
+    ],
+  },
+  {
+    id: 'text-only',
+    heading: 'Dagger',
+    status: [
+      { kind: 'text', variant: 'guidance', label: 'Recommended by class', title: 'Wizard class' },
+      { kind: 'text', variant: 'guidance', label: 'Included in package option' },
+    ],
+  },
+] as const
+
+/** Selection rows join severity badges and guidance text on one metadata line. */
+export const MetadataStatusComposition: Story = {
+  render: () => (
+    <div className="flex max-w-xl flex-col gap-2">
+      {METADATA_STATUS_ROWS.map((row) => (
+        <CatalogEntityRow
+          key={row.id}
+          toolbarLabel={row.heading}
+          domIds={{ ...domIds, itemId: `metadata-${row.id}` }}
+          entity={{
+            heading: row.heading,
+            classification: 'Equipment',
+            status: row.status,
+            statusComposition: 'metadata',
+          }}
+          trailing={{ kind: 'action', content: <Button type="button">Add</Button> }}
+        />
+      ))}
+    </div>
+  ),
+}
+
+/** Narrow width — the metadata line wraps between items, not inside badges. */
+export const MetadataStatusNarrowWrap: Story = {
+  render: () => (
+    <div className="w-64">
+      <CatalogEntityRow
+        toolbarLabel="Plate Armor"
+        domIds={{ ...domIds, itemId: 'metadata-narrow' }}
+        entity={{
+          heading: 'Plate Armor',
+          classification: 'Heavy armor',
+          status: [
+            { kind: 'badge', label: 'Cannot afford', tone: 'destructive', appearance: 'soft' },
+            { kind: 'badge', label: 'Not proficient', tone: 'warning', appearance: 'soft' },
+            { kind: 'badge', label: 'Requires STR 15', tone: 'warning', appearance: 'soft' },
+            { kind: 'text', variant: 'guidance', label: 'Included in package option' },
+          ],
+          statusComposition: 'metadata',
+        }}
+      />
+    </div>
+  ),
+}

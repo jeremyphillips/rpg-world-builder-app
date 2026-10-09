@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate, Outlet, RouterProvider } from 'react-router-dom'
-import { findBrowsableVocabularyCategory } from '@rpg/contracts'
+import { findBrowsableVocabularyCategory } from '@rpg/contracts/vocab'
 
 import { AdminRouteGuard } from '@/features/admin'
 import { AuthGuard } from '@/features/auth'
@@ -10,6 +10,7 @@ import {
   EQUIPMENT_FAMILY_PATHS,
   getEquipmentFamilyLabel,
 } from '@/features/content/equipment/lib/shared/equipment-family-paths'
+import { getCharacterTypeNavLabel } from '@/features/character/lib/display/character-type-labels'
 import { getContentTypeCollectionLabel } from '@/features/content/lib/content-type-labels'
 import {
   AccountSettingsRoute,
@@ -289,7 +290,7 @@ const router = createBrowserRouter(
                   element: <Outlet />,
                   handle: {
                     crumb: (params, data) => ({
-                      label: 'NPCs',
+                      label: getCharacterTypeNavLabel('npc'),
                       href: collectionCrumbHref(
                         ROUTES.campaign.npcs.list(params.campaignId!),
                         data,

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import {
   isBuilderStepBlockedNoClass,
   isBuilderStepReadinessMessageOnly,
@@ -10,11 +12,12 @@ import { BuilderStepFrame } from '../shared/builder-step-frame'
 import { BuilderStepChooseClassPrompt } from '../shared/builder-step-choose-class-prompt'
 import { BuilderStepReadinessPanel } from '../shared/builder-step-readiness-panel'
 import { EquipmentStepInteractive } from './equipment-step-interactive'
+import { EquipmentStepTierSummary } from './equipment-step-tier-summary'
 import type { EquipmentStepProps } from './equipment-step.types'
 import { type useEquipmentStep } from '../../../../hooks/use-equipment-step'
 
 export function EquipmentStepView({
-  context: _context,
+  context,
   draft,
   resolvedChoiceSets: _resolvedChoiceSets,
   validationIssues,
@@ -24,40 +27,41 @@ export function EquipmentStepView({
 }: EquipmentStepProps & { step: ReturnType<typeof useEquipmentStep> }) {
   const { classId, characterClass, readiness } = step
 
+  let body: ReactNode
   if (isBuilderStepBlockedNoClass(readiness, draft)) {
-    return (
-      <BuilderStepFrame stepId="equipment" validationIssues={validationIssues}>
-        <BuilderStepChooseClassPrompt
-          heading={EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING}
-          description={EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION}
-          onNavigateToStep={onNavigateToStep}
-        />
-      </BuilderStepFrame>
+    body = (
+      <BuilderStepChooseClassPrompt
+        heading={EQUIPMENT_CHOOSE_CLASS_PROMPT_HEADING}
+        description={EQUIPMENT_CHOOSE_CLASS_PROMPT_DESCRIPTION}
+        onNavigateToStep={onNavigateToStep}
+      />
     )
-  }
-
-  if (
+  } else if (
     isBuilderStepReadinessMessageOnly(readiness, {
       equipmentSkipped: draft.equipment?.skipped === true,
     })
   ) {
-    return (
-      <BuilderStepFrame stepId="equipment" validationIssues={validationIssues}>
-        <BuilderStepReadinessPanel state={readiness} />
-      </BuilderStepFrame>
-    )
-  }
-
-  if (!classId || !characterClass) return null
-
-  return (
-    <BuilderStepFrame stepId="equipment" validationIssues={validationIssues}>
+    body = <BuilderStepReadinessPanel state={readiness} />
+  } else if (!classId || !characterClass) {
+    return null
+  } else {
+    body = (
       <EquipmentStepInteractive
         draft={draft}
         onDraftChange={onDraftChange}
         step={step}
         readiness={readiness}
       />
+    )
+  }
+
+  return (
+    <BuilderStepFrame stepId="equipment" validationIssues={validationIssues}>
+      <EquipmentStepTierSummary
+        startingWealth={context.characterCreationRules.startingWealth}
+        startingLevel={draft.class.level}
+      />
+      {body}
     </BuilderStepFrame>
   )
 }

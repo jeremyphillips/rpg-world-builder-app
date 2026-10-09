@@ -3,16 +3,25 @@ import { getOrganizationPracticeDiscoveryTerms, type OrganizationPractice } from
 import { getOrganizationDomainDiscoveryTerms, type OrganizationDomain } from './domain'
 import { getOrganizationFormDiscoveryTerms, type OrganizationForm } from './form'
 
+export function listOrganizationClassificationDiscoveryTerms(input: {
+  organizationDomain: OrganizationDomain
+  organizationForm?: OrganizationForm
+  functions?: readonly OrganizationFunction[]
+  practices?: readonly OrganizationPractice[]
+}): string[] {
+  return [
+    ...getOrganizationDomainDiscoveryTerms(input.organizationDomain),
+    ...(input.organizationForm ? getOrganizationFormDiscoveryTerms(input.organizationForm) : []),
+    ...(input.functions ?? []).flatMap(getOrganizationFunctionDiscoveryTerms),
+    ...(input.practices ?? []).flatMap(getOrganizationPracticeDiscoveryTerms),
+  ]
+}
+
 export function getOrganizationClassificationDiscoveryText(input: {
   organizationDomain: OrganizationDomain
   organizationForm?: OrganizationForm
   functions?: readonly OrganizationFunction[]
   practices?: readonly OrganizationPractice[]
 }): string {
-  return [
-    ...getOrganizationDomainDiscoveryTerms(input.organizationDomain),
-    ...(input.organizationForm ? getOrganizationFormDiscoveryTerms(input.organizationForm) : []),
-    ...(input.functions ?? []).flatMap(getOrganizationFunctionDiscoveryTerms),
-    ...(input.practices ?? []).flatMap(getOrganizationPracticeDiscoveryTerms),
-  ].join(' ')
+  return listOrganizationClassificationDiscoveryTerms(input).join(' ')
 }

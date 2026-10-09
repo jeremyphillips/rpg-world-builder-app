@@ -31,11 +31,8 @@ export {
   type AddPendingWorkflowProps,
 } from './add-pending-workflow'
 export { resolveAddPendingMode } from './add-pending-workflow.lib'
-export {
-  CREATE_FLOW_FORM_DENSITY,
-  CreateFlowFormDensityRoot,
-  useCreateFlowFormDensity,
-} from './create-flow-form-density'
+export { CREATE_FLOW_FORM_DENSITY, useCreateFlowFormDensity } from './use-create-flow-form-density'
+export { CreateFlowFormDensityRoot } from './create-flow-form-density'
 export {
   createTabDiscoveryBodyClasses,
   createTabDiscoveryControlsClasses,

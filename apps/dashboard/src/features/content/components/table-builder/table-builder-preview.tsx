@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useWatch } from 'react-hook-form'
 import { FormSectionHeader } from '@rpg/ui/form'
 
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import { TableGrid } from '../tables/table-grid'
 import { isTableGridDataRow, type TableGridPresentation } from '../tables/table-grid-presentation'
 import {

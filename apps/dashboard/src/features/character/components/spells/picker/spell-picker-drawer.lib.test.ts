@@ -1,4 +1,3 @@
-import { buildSpellPickerCompactSummary } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -6,7 +5,6 @@ import {
   spellPickerDetectMagicFixture,
 } from './spell-picker-drawer.fixtures'
 import {
-  collectSpellPickerMarkers,
   filterAndSortSpellPickerItems,
   formatSpellPickerDrawerTitle,
   formatSpellPickerSelectionCountText,
@@ -14,43 +12,53 @@ import {
   getSpellPickerCastingTimeFilterLabel,
   matchesSpellPickerMechanicsFilters,
   normalizeSpellPickerLevelSelection,
-  resolveActivePreparedLevelSuffix,
+  resolveActiveSpellLevelSuffix,
   resolveSpellPickerEmptyStateKind,
   resolveSpellPickerEmptyStateMessage,
   resolveSpellPickerLevelChipChange,
   resolveValidSpellPickerSort,
   toggleSpellPickerLevelSelection,
 } from './spell-picker-drawer.lib'
+import type { SearchDocument } from '@rpg/search'
+
 import {
   SPELL_PICKER_LEVELS_ALL,
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
   SPELL_PICKER_SORT_BEST_MATCH,
   SPELL_PICKER_SORT_LEVEL_ASC,
   SPELL_PICKER_SORT_NAME_ASC,
 } from './spell-picker-drawer.types'
+
+function spellSearchDocument(
+  id: string,
+  name: string,
+  keyword: string,
+  description: string,
+): SearchDocument {
+  return {
+    id,
+    fields: [
+      { key: 'name', text: name, role: 'primary' },
+      { key: 'tag:0', text: keyword, role: 'keyword' },
+      { key: 'description', text: description, role: 'secondary' },
+      { key: 'combined', text: `${name} ${keyword} ${description}`, role: 'secondary' },
+    ],
+  }
+}
 import { spellPickerOpenItemsFixture } from './spell-picker-drawer.fixtures'
 
 describe('spell-picker-drawer.lib', () => {
-  it('omits the concentration marker when casting summary already includes concentration phrasing', () => {
-    const compactSummary = buildSpellPickerCompactSummary(spellPickerDetectMagicFixture)
-
-    expect(compactSummary.castingSummary).toContain('Concentration, up to 10 minutes')
-    expect(collectSpellPickerMarkers(spellPickerDetectMagicFixture, compactSummary)).toEqual([
-      'Ritual',
-    ])
-  })
-
   it('formats drawer title and selection summary metadata', () => {
     expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_CANTRIPS)).toBe('Choose cantrip')
-    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_PREPARED_SPELLS)).toBe('Choose spell')
+    expect(formatSpellPickerDrawerTitle(SPELL_PICKER_MODE_SPELLS)).toBe('Choose spells')
     expect(formatSpellPickerSelectionCountText(1, 3)).toBe('1 of 3 selected')
     expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_CANTRIPS, 'Wizard')).toBe(
       'Wizard cantrips',
     )
-    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_PREPARED_SPELLS, 'Wizard', 1)).toBe(
+    expect(formatSpellPickerSelectionMetadata(SPELL_PICKER_MODE_SPELLS, 'Wizard', 1)).toBe(
       'Wizard spells · 1st level',
     )
   })
@@ -74,6 +82,10 @@ describe('spell-picker-drawer.lib', () => {
       state: {
         ...spellPickerOpenItemsFixture[0]!.state,
         isRecommended: true,
+        recommendation: {
+          strength: 'strong' as const,
+          signals: [],
+        },
       },
     }
     const peer = spellPickerOpenItemsFixture[1]!
@@ -84,6 +96,69 @@ describe('spell-picker-drawer.lib', () => {
         sortMode: SPELL_PICKER_SORT_BEST_MATCH,
       }).map((item) => item.spell.name),
     ).toEqual(['Mage Hand', 'Detect Magic'])
+  })
+
+  it('ranks a literal name hit above a keyword hit in best match', () => {
+    const nameHit = {
+      ...spellPickerOpenItemsFixture[0]!,
+      spell: { ...spellPickerOpenItemsFixture[0]!.spell, name: 'Glassember' },
+      searchDocument: spellSearchDocument('name-hit', 'Glassember', 'healing', 'A quiet light'),
+    }
+    const keywordHit = {
+      ...spellPickerOpenItemsFixture[1]!,
+      spell: { ...spellPickerOpenItemsFixture[1]!.spell, name: 'Plain Ward' },
+      searchDocument: spellSearchDocument(
+        'keyword-hit',
+        'Plain Ward',
+        'glassember',
+        'A quiet light',
+      ),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([keywordHit, nameHit], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_BEST_MATCH,
+      }).map((item) => item.spell.name),
+    ).toEqual(['Glassember', 'Plain Ward'])
+  })
+
+  it('uses search score only as a tie-break after name and level', () => {
+    const earlyName = {
+      ...spellPickerOpenItemsFixture[0]!,
+      spell: { ...spellPickerOpenItemsFixture[0]!.spell, name: 'Alpha Ward', level: 1 },
+      searchDocument: spellSearchDocument('alpha', 'Alpha Ward', 'ember', 'quiet'),
+    }
+    const laterName = {
+      ...spellPickerOpenItemsFixture[1]!,
+      spell: { ...spellPickerOpenItemsFixture[1]!.spell, name: 'Zebra Ward', level: 1 },
+      searchDocument: spellSearchDocument('zebra', 'Glassember', 'healing', 'quiet'),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([laterName, earlyName], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_NAME_ASC,
+      }).map((item) => item.spell.name),
+    ).toEqual(['Alpha Ward', 'Zebra Ward'])
+
+    const lowScore = {
+      ...earlyName,
+      spell: { ...earlyName.spell, name: 'Low Score', level: 1 },
+      searchDocument: spellSearchDocument('low', 'Plain Ward', 'glassember', 'quiet'),
+    }
+    const highScore = {
+      ...laterName,
+      spell: { ...laterName.spell, name: 'High Score', level: 1 },
+      searchDocument: spellSearchDocument('high', 'Glassember', 'healing', 'quiet'),
+    }
+
+    expect(
+      filterAndSortSpellPickerItems([lowScore, highScore], {
+        searchQuery: 'ember',
+        sortMode: SPELL_PICKER_SORT_LEVEL_ASC,
+      }).map((item) => item.spell.name),
+    ).toEqual(['High Score', 'Low Score'])
   })
 
   it('resets invalid sort modes after mode changes', () => {
@@ -129,9 +204,7 @@ describe('spell-picker-drawer.lib', () => {
   })
 
   it('appends prepared level suffix only for a single active level', () => {
-    expect(resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1])).toBe(1)
-    expect(
-      resolveActivePreparedLevelSuffix(SPELL_PICKER_MODE_PREPARED_SPELLS, [1, 2]),
-    ).toBeUndefined()
+    expect(resolveActiveSpellLevelSuffix(SPELL_PICKER_MODE_SPELLS, [1])).toBe(1)
+    expect(resolveActiveSpellLevelSuffix(SPELL_PICKER_MODE_SPELLS, [1, 2])).toBeUndefined()
   })
 })

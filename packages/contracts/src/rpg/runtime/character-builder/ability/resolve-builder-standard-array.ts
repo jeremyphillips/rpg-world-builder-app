@@ -1,4 +1,5 @@
 import type { StandardArray } from '../../../primitives/standard-array'
+import { allowsLevelZeroForKind } from '../character-kind-policy'
 import type { CharacterBuildContext } from '../context'
 
 // ---------------------------------------------------------------------------
@@ -11,8 +12,10 @@ import type { CharacterBuildContext } from '../context'
 export function usesLevelZeroStandardArray(context: CharacterBuildContext, level: number): boolean {
   return (
     level === 0 &&
-    context.characterKind === 'npc' &&
-    context.characterCreationRules.levelZeroNpcs.enabled
+    allowsLevelZeroForKind(
+      context.characterKind,
+      context.characterCreationRules.levelZeroNpcs.enabled,
+    )
   )
 }
 

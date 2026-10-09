@@ -4,12 +4,14 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogFilterControls } from '../../filters/catalog-filter-controls.client'
-import { useFilterChrome } from '../../filters/filter-chrome.context'
-import { resolveFilterChromePresentation } from '../../filters/filter-presentation.lib'
+import { FilterFieldCaption } from '../../filters/filter-field-caption.client'
 import { createEqualsFilter, createTextFilter } from '../../filters/filter-engine.helpers'
 import { createFilterSchema } from '../../filters/filter-schema.types'
-import { Text } from './text'
 import { CatalogToolbar } from './catalog-toolbar.client'
+import {
+  catalogToolbarUtilityBandVariants,
+  catalogToolbarViewControlsVariants,
+} from './catalog-toolbar.variants'
 
 type DemoRow = { name: string; status: string }
 type DemoFilterState = { search?: string; status?: string }
@@ -33,12 +35,7 @@ const densitySchema = createFilterSchema<DemoRow, DemoFilterState>([
 ])
 
 function TestSortControl() {
-  const presentation = resolveFilterChromePresentation(useFilterChrome())
-  return (
-    <Text as="span" className={presentation.labelClassName}>
-      Sort
-    </Text>
-  )
+  return <FilterFieldCaption>Sort</FilterFieldCaption>
 }
 
 describe('CatalogToolbar', () => {
@@ -122,12 +119,13 @@ describe('CatalogToolbar', () => {
       />,
     )
 
-    const controls = screen.getByText('Controls')
-    const sort = screen.getByText('Sort')
-    const resetButton = screen.getByRole('button', { name: 'Reset view' })
-
-    expect(controls.parentElement?.parentElement).toContainElement(sort)
-    expect(sort.parentElement).toContainElement(resetButton)
+    const utility = screen.getByText('Controls').closest('[data-slot="catalog-toolbar-utility"]')
+    const viewControls = screen
+      .getByText('Sort')
+      .closest('[data-slot="catalog-toolbar-view-controls"]')
+    expect(utility).toContainElement(screen.getByText('Sort'))
+    expect(viewControls).toContainElement(screen.getByRole('button', { name: 'Reset view' }))
+    expect(viewControls).not.toContainElement(screen.getByText('Controls'))
   })
 
   it('renders a standalone actions row when only actions are provided', () => {
@@ -159,6 +157,109 @@ describe('CatalogToolbar', () => {
     )
 
     await expectNoAxeViolations(container)
+  })
+
+  describe('utility band layout', () => {
+    function expectContainerQueryBand() {
+      const band = document.querySelector('[data-slot="catalog-toolbar-utility"]')
+      expect(band).toHaveClass(...catalogToolbarUtilityBandVariants().split(' '))
+      expect(catalogToolbarUtilityBandVariants()).toContain('flex-wrap')
+      expect(catalogToolbarUtilityBandVariants()).not.toContain('flex-col')
+      expect(band?.className).not.toMatch(/\bsm:/)
+      expect(catalogToolbarViewControlsVariants()).toContain('items-end')
+      expect(catalogToolbarViewControlsVariants()).toContain('gap-0.5')
+      expect(catalogToolbarViewControlsVariants()).not.toMatch(/\bsm:/)
+    }
+
+    it('keeps primary filters, utility filters, and a sort/reset stack inside a narrow parent', () => {
+      const { container } = render(
+        <div style={{ width: 240 }}>
+          <CatalogToolbar
+            primaryControls={<span>Primary</span>}
+            filterRow={{
+              controls: <span>Utility filters</span>,
+              actions: <span>Sort</span>,
+            }}
+            actions={<button type="button">Reset</button>}
+          />
+        </div>,
+      )
+
+      const primary = container.querySelector('[data-slot="catalog-toolbar-primary"]')
+      const content = container.querySelector('[data-slot="catalog-toolbar-utility-content"]')
+      const viewControls = container.querySelector('[data-slot="catalog-toolbar-view-controls"]')
+
+      expect(primary).toHaveTextContent('Primary')
+      expect(content).toHaveTextContent('Utility filters')
+      expect(viewControls).toHaveTextContent('Sort')
+      expect(viewControls).toContainElement(screen.getByRole('button', { name: 'Reset' }))
+      expect(primary).not.toBeNull()
+      expect(content).not.toBeNull()
+      expect(viewControls).not.toBeNull()
+      expect(
+        primary!.compareDocumentPosition(content!) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+      expect(
+        content!.compareDocumentPosition(viewControls!) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+      expectContainerQueryBand()
+    })
+
+    it('omits the utility content region when only primary filters and sort are present', () => {
+      const { container } = render(
+        <div style={{ width: 240 }}>
+          <CatalogToolbar
+            primaryControls={<span>Primary</span>}
+            filterRow={{ actions: <span>Sort</span> }}
+          />
+        </div>,
+      )
+
+      expect(container.querySelector('[data-slot="catalog-toolbar-primary"]')).toHaveTextContent(
+        'Primary',
+      )
+      expect(container.querySelector('[data-slot="catalog-toolbar-utility-content"]')).toBeNull()
+      expect(
+        container.querySelector('[data-slot="catalog-toolbar-view-controls"]'),
+      ).toHaveTextContent('Sort')
+      expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
+      expectContainerQueryBand()
+    })
+
+    it('mounts reset beside utility filters only when the caller provides it', () => {
+      const { rerender, container } = render(
+        <CatalogToolbar
+          filterRow={{ controls: <span>Utility filters</span> }}
+          actions={<button type="button">Reset</button>}
+        />,
+      )
+
+      expect(
+        container.querySelector('[data-slot="catalog-toolbar-utility-content"]'),
+      ).toHaveTextContent('Utility filters')
+      expect(
+        container.querySelector('[data-slot="catalog-toolbar-view-controls"]'),
+      ).toContainElement(screen.getByRole('button', { name: 'Reset' }))
+      expect(screen.queryByText('Sort')).not.toBeInTheDocument()
+
+      rerender(<CatalogToolbar filterRow={{ controls: <span>Utility filters</span> }} />)
+
+      expect(
+        container.querySelector('[data-slot="catalog-toolbar-utility-content"]'),
+      ).toHaveTextContent('Utility filters')
+      expect(container.querySelector('[data-slot="catalog-toolbar-view-controls"]')).toBeNull()
+    })
+
+    it('renders sort alone when there are no utility filters and no reset', () => {
+      const { container } = render(<CatalogToolbar filterRow={{ actions: <span>Sort</span> }} />)
+
+      expect(container.querySelector('[data-slot="catalog-toolbar-utility-content"]')).toBeNull()
+      expect(container.querySelector('[data-slot="catalog-toolbar-primary"]')).toBeNull()
+      expect(
+        container.querySelector('[data-slot="catalog-toolbar-view-controls"]'),
+      ).toHaveTextContent('Sort')
+      expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    })
   })
 
   it('applies compact density to search, filters, and sort under default toolbar', () => {

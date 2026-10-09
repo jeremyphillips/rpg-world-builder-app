@@ -48,12 +48,17 @@ const purchasedGroups: PurchasedCategoryGroup[] = [
   {
     group: 'gear',
     groupLabel: 'Gear',
-    displays: [{ kind: 'single', row: stackableRow }],
+    items: [{ display: { kind: 'single', row: stackableRow }, status: [] }],
   },
   {
     group: 'weapons',
     groupLabel: 'Weapons',
-    displays: [{ kind: 'single', row: stagedRow }],
+    items: [
+      {
+        display: { kind: 'single', row: stagedRow },
+        status: [{ kind: 'badge', label: 'Not proficient', tone: 'warning' }],
+      },
+    ],
   },
 ]
 
@@ -68,8 +73,9 @@ function PurchasedInventorySectionDemo(args: {
 
   const groups: PurchasedCategoryGroup[] = purchasedGroups.map((group) => ({
     ...group,
-    displays: group.displays.map((display) => {
-      if (display.kind !== 'single') return display
+    items: group.items.map((item) => {
+      const { display } = item
+      if (display.kind !== 'single') return item
 
       const purchaseId = display.row.quantityTarget?.purchaseId
       const quantity = purchaseId
@@ -77,12 +83,15 @@ function PurchasedInventorySectionDemo(args: {
         : display.row.entry.quantity
 
       return {
-        kind: 'single' as const,
-        row: {
-          ...display.row,
-          entry: { ...display.row.entry, quantity },
-          stagedRemoval: quantity === 0,
-          sourceLabel: quantity === 0 ? 'Staged for removal' : display.row.sourceLabel,
+        ...item,
+        display: {
+          kind: 'single' as const,
+          row: {
+            ...display.row,
+            entry: { ...display.row.entry, quantity },
+            stagedRemoval: quantity === 0,
+            sourceLabel: quantity === 0 ? 'Staged for removal' : display.row.sourceLabel,
+          },
         },
       }
     }),

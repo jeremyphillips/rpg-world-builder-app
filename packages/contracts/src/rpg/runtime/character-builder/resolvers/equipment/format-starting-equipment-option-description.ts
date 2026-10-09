@@ -1,11 +1,11 @@
 import type { CharacterWealthGrant } from '../../../../content/lib/grants/wealth-grant'
+import { joinInlineMetadata } from '../../../../primitives/inline-metadata'
 import { joinNaturalList } from '../../../../primitives/prose'
-import { formatWealth, formatWealthAsGold, wealthToCopper } from '../../../../primitives/wealth'
+import { formatWealth } from '../../../../primitives/wealth'
 import {
   characterWealthFromGrant,
   type CharacterWealth,
 } from '../../../character/sheet/equipment-inventory'
-import { joinInlineMetadata } from '../../../../primitives/inline-metadata.js'
 import type { StartingEquipmentOptionSummaryItem } from './resolve-starting-equipment-option-summaries'
 
 /** Compact package stats for authoring previews — item count plus formatted baseline wealth. */
@@ -85,36 +85,5 @@ export function formatStartingGoldOptionDescription(args: {
   standardPackageLabel?: string
 }): string {
   const label = args.standardPackageLabel ?? DEFAULT_STANDARD_EQUIPMENT_LABEL
-  return `Take ${formatWealthAsGold(args.wealth)} instead of ${label}.`
-}
-
-export type StartingEquipmentTierAdjustment = {
-  label: string
-  additionalWealthLabel: string
-}
-
-/** Compact tier-add line for option cards (selection-independent funding metadata). */
-export function formatStartingEquipmentTierAdjustment(args: {
-  tierLabel?: string
-  tierAdditionalWealth: CharacterWealth
-}): StartingEquipmentTierAdjustment | undefined {
-  if (wealthToCopper(args.tierAdditionalWealth) <= 0) return undefined
-
-  const additionalWealthLabel = formatWealthAsGold(args.tierAdditionalWealth)
-  const tierName = args.tierLabel?.trim() || 'Starting-wealth'
-  return {
-    label: `${tierName} tier adds ${additionalWealthLabel}`,
-    additionalWealthLabel,
-  }
-}
-
-/** Total purchasing allowance line shown under tier adjustment. */
-export function formatStartingEquipmentTotalWealthLabel(args: {
-  totalStartingWealth: CharacterWealth
-  isStartingGoldOption: boolean
-}): string | undefined {
-  if (wealthToCopper(args.totalStartingWealth) <= 0) return undefined
-
-  const total = formatWealthAsGold(args.totalStartingWealth)
-  return args.isStartingGoldOption ? `Total: ${total}` : `Total purchasing gold: ${total}`
+  return `Take ${formatWealth(args.wealth)} instead of ${label}.`
 }

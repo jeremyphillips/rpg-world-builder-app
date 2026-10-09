@@ -7,13 +7,8 @@ import type {
   Equipment,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import {
-  applyEquipmentStepAction,
-  resolveEquipmentAcquisitionBuilderContext,
-  standardStartingWealthTableId,
-} from '@rpg/contracts'
 
-import { DisclosureEntityCard } from '@/features/content'
+import { DisclosureEntityCard, type EntitySummaryStatusItem } from '@/features/content'
 import { type EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import type { AddedEquipmentEntryViewModel } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import type { EquipmentOwnedSourceAction } from '../../acquisition/equipment-acquisition-panel.lib'
@@ -93,6 +88,8 @@ export function EquipmentInventoryManagePanelBody({
 
 export type EquipmentInventoryManageDisclosureCardProps = EquipmentInventoryManagePanelBodyProps & {
   equipmentName: string
+  /** Resolved by the parent section with its selection-row context. */
+  status?: readonly EntitySummaryStatusItem[]
   provenanceLabel?: string
   itemId: string
   collapsed?: boolean
@@ -102,6 +99,7 @@ export type EquipmentInventoryManageDisclosureCardProps = EquipmentInventoryMana
 
 export function EquipmentInventoryManageDisclosureCard({
   equipmentName,
+  status,
   provenanceLabel,
   itemId,
   collapsed,
@@ -115,10 +113,12 @@ export function EquipmentInventoryManageDisclosureCard({
     <DisclosureEntityCard
       itemId={itemId}
       toolbarAriaLabel={equipmentName}
-      entity={buildEquipmentInventoryRowEntity({
-        equipmentName,
-        detailLabel: provenanceLabel,
-      })}
+      entity={buildEquipmentInventoryRowEntity({ equipmentName, status })}
+      trailing={
+        provenanceLabel
+          ? { kind: 'indicator', variant: 'label', label: provenanceLabel }
+          : undefined
+      }
       collapsed={collapsed}
       onToggleCollapse={onToggleCollapse}
       defaultCollapsed={defaultCollapsed}
@@ -127,35 +127,6 @@ export function EquipmentInventoryManageDisclosureCard({
       <EquipmentInventoryManagePanelBody equipment={equipment} rows={rows} {...bodyProps} />
     </DisclosureEntityCard>
   )
-}
-
-export function createStorybookApplyMagicItemAcquisition(args: {
-  draft: CharacterBuilderDraft
-  context: CharacterBuildContext
-  catalogIndex: CharacterBuildCatalogIndex
-  onDraftChange?: (patch: Partial<CharacterBuilderDraft>) => void
-}) {
-  return ({
-    equipmentId,
-    requestedQuantity,
-  }: {
-    equipmentId: string
-    requestedQuantity: number
-  }) => {
-    const result = applyEquipmentStepAction({
-      draft: args.draft,
-      catalogIndex: args.catalogIndex,
-      acquisitionContext: resolveEquipmentAcquisitionBuilderContext({
-        context: args.context,
-        catalogIndex: args.catalogIndex,
-        startingWealthTableId: standardStartingWealthTableId(args.context.rulesetId),
-      }),
-      action: { kind: 'acquire_magic_item', equipmentId, requestedQuantity },
-    })
-    if (result.status !== 'applied') return false
-    args.onDraftChange?.(result.patch)
-    return true
-  }
 }
 
 export type EquipmentInventoryManageEntryProps = Omit<

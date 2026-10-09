@@ -10,6 +10,11 @@ export type CatalogPickerTab = CatalogToolbarTab
 export type CatalogPickerSheetActionsHelpers = {
   searchQuery: string
   activeTabId: string
+  /**
+   * Rows after tab scoping, structured filters, and the visible-item pipeline.
+   * Post-search and post-transform. Not a pre-sort or pre-search count.
+   */
+  visibleItemCount: number
   resetSearchQuery: () => void
   resetActiveTab: () => void
 }
@@ -76,6 +81,23 @@ export type CatalogPickerAuxiliaryAction =
       message: string
     }
 
+/**
+ * Either the sheet owns search ranking, or the domain transform owns the whole
+ * visible-item pipeline (search inclusion and sort). Do not pass both.
+ */
+export type CatalogPickerSearchStrategy<TItem> =
+  | {
+      getSearchText: (item: TItem) => string
+      transformVisibleItems?: never
+    }
+  | {
+      transformVisibleItems: (
+        items: readonly TItem[],
+        context: { searchQuery: string },
+      ) => readonly TItem[]
+      getSearchText?: never
+    }
+
 export type CatalogPickerSheetProps<TItem> = {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -85,7 +107,6 @@ export type CatalogPickerSheetProps<TItem> = {
   headlineClassName?: string
   items: readonly TItem[]
   getItemKey: (item: TItem) => string
-  getSearchText: (item: TItem) => string
   renderItemSummary?: (item: TItem) => ReactNode
   renderItemActions?: (item: TItem) => ReactNode
   renderItemDetails?: (item: TItem) => ReactNode
@@ -98,7 +119,7 @@ export type CatalogPickerSheetProps<TItem> = {
   recommendationsEnabled?: boolean
   /** Placement of recommendation tabs relative to search. Defaults to before-search. */
   recommendationTabsPosition?: CatalogToolbarTabs['position']
-  /** Content between header description and toolbar (e.g. segmented mode control). */
+  /** Pinned under the description, inside the header, above the toolbar (e.g. segmented mode control). */
   headerBelowDescription?: ReactNode
   /** Content below search and optional tabs (e.g. level chips). */
   primaryControls?: ReactNode
@@ -111,10 +132,6 @@ export type CatalogPickerSheetProps<TItem> = {
   initialSearchQuery?: string
   /** When this value changes, sheet search/tab state resets to defaults. */
   toolbarStateKey?: string
-  transformVisibleItems?: (
-    items: readonly TItem[],
-    context: { searchQuery: string },
-  ) => readonly TItem[]
   /** Domain-structured filters (category, affordability, etc.) — excludes search and tabs. */
   hasStructuredFilters?: boolean
   /** When set with `onExpandedItemChange`, only that row is expanded (exclusive). */
@@ -164,4 +181,5 @@ export type CatalogPickerSheetProps<TItem> = {
   rowBodyClassName?: string
   /** Optional class merged onto each collapsible row shell (`role="group"`). */
   rowShellClassName?: string
-} & CatalogPickerSheetRowRenderProps<TItem>
+} & CatalogPickerSheetRowRenderProps<TItem> &
+  CatalogPickerSearchStrategy<TItem>

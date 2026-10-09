@@ -5,7 +5,7 @@ import { getErrorMessage } from '@rpg/contracts'
 import { notifyPublishSuccess } from '@/lib/notify'
 import type { AnyContentFormDef } from '../forms/registry/content-form-registry'
 import { usePublishContent } from '../list/use-content-mutations'
-import { useContentEditPublishRequest } from '../forms/shells/edit/content-edit-publish-context'
+import { useContentEditPublishRequest } from '../forms/shells/edit/use-content-edit-publish-request'
 
 type UseContentPublishFlowOptions = {
   def: Pick<AnyContentFormDef, 'routeKey' | 'queryKey' | 'invalidateQueryKeys'>

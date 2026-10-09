@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/layout/page/page-header'
 import { PageShell } from '@/components/layout/page/page-shell'
 import { PrimaryFilterBarRegion } from '@/lib/data-table/primary-filter-bar-region'
 
-import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
+import { useAdminUserRouteContext } from '../lib/use-admin-user-route-context'
 import { useAdminUserCharacters } from '../hooks/use-admin-user-characters'
 import {
   adminUserCharactersFilterSchema,

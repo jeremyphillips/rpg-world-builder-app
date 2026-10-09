@@ -1,6 +1,7 @@
 import {
   SPECIES_CLASS_POLICY_MODES_REQUIRING_IDS,
   SPECIES_CONTENT_TYPE_TERM,
+  getSpeciesHeritageLabel,
   type ContentMedia,
   type Species,
 } from '@rpg/contracts'
@@ -58,7 +59,7 @@ export const SPECIES_PREVIEW_FACT_LABELS = {
   senses: SPECIES_STAT_LABELS.senses,
   languageAffinities: SPECIES_STAT_LABELS.languageAffinities,
   traits: 'Traits',
-  heritage: 'Heritage',
+  heritage: getSpeciesHeritageLabel(),
   heritageOptions: 'Options',
   multiclassPolicy: 'Multiclass policy',
   classPolicyMode: 'Class policy',

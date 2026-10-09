@@ -10,7 +10,7 @@ import { establishSurfaceCurrent } from './surface-current.lib'
  */
 export const sheetContentVariants = cva(
   cn(
-    'fixed z-50 flex flex-col overflow-hidden shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500 data-[state=open]:animate-in data-[state=closed]:animate-out',
+    'fixed z-50 flex flex-col overflow-hidden shadow-lg data-[state=closed]:duration-150 data-[state=open]:duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out',
   ),
   {
     variants: {

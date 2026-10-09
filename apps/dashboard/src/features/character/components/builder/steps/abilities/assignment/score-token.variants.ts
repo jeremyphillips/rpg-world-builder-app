@@ -1,13 +1,13 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const scoreTokenSurfaceTokenClasses =
-  'rounded-md border border-border bg-secondary shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'rounded-md border border-border bg-card shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 const scoreTokenInteractiveClasses = 'cursor-grab touch-none active:cursor-grabbing'
 
 /** Token chrome on hover/focus — padding only while interactive affordance is visible. */
 const scoreTokenAssignedPlainInteractiveClasses =
-  'hover:rounded-md hover:border hover:border-border hover:bg-secondary hover:px-4 hover:py-2 hover:shadow-sm focus-visible:rounded-md focus-visible:border focus-visible:border-border focus-visible:bg-secondary focus-visible:px-4 focus-visible:py-2 focus-visible:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+  'hover:rounded-md hover:border hover:border-border hover:bg-card hover:px-4 hover:py-2 hover:shadow-sm focus-visible:rounded-md focus-visible:border focus-visible:border-border focus-visible:bg-card focus-visible:px-4 focus-visible:py-2 focus-visible:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
 
 export const scoreTokenVariants = cva(
   'inline-flex shrink-0 items-center justify-center tabular-nums transition-colors',

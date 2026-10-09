@@ -1,4 +1,6 @@
+import { getContentTypeSentenceForm } from '../../../../content/lib/content-type-terms'
 import { formatSpellLevel } from '../../../../content/spell/levels'
+import { getSpellCollectionKindLabel } from '../../../../vocab/spell/spell-collection-kind'
 import type {
   BuilderChoiceAggregateCount,
   BuilderChoiceBlock,
@@ -38,7 +40,8 @@ import type { SpellInteractiveSection } from './resolve-spell-step-model'
 import { lookupSpellInCatalogIndex } from './lookup-spell-in-catalog-index'
 
 export const SPELLS_STALE_REASON = 'This spell is no longer available.' as const
-export const SPELL_LEVEL_SLICE_EMPTY_MESSAGE = 'No spells are currently available.' as const
+export const SPELL_LEVEL_SLICE_EMPTY_MESSAGE =
+  `No ${getContentTypeSentenceForm('spells', 2)} are currently available.` as const
 
 function spellLevelForOption(
   optionId: string,
@@ -310,7 +313,7 @@ export function buildCantripsSection(
   return {
     id: 'cantrips',
     kind: 'cantrips',
-    heading: 'Cantrips',
+    heading: getSpellCollectionKindLabel('cantrips'),
     subhead: resolveCantripSubhead(
       subheadLines,
       singleSetSupportingCopy,

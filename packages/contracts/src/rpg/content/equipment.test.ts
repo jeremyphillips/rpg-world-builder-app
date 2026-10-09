@@ -126,7 +126,7 @@ const PLATE_STORED = systemRecord('plate-armor', {
   baseAc: 18,
   addDexModifier: false,
   stealthDisadvantage: true,
-  strengthRequirement: 15,
+  abilityScoreRequirements: { str: 15 },
 })
 
 const SHIELD_WOOD_STORED = systemRecord('shield-wood', {
@@ -326,7 +326,9 @@ describe('armor equipment variant', () => {
   it('parses light, medium, heavy armor and shields', () => {
     expect(equipmentSchema.parse(LEATHER_STORED)).toMatchObject({ baseAc: 11 })
     expect(equipmentSchema.parse(HALF_PLATE_STORED)).toMatchObject({ maxDexBonus: 2 })
-    expect(equipmentSchema.parse(PLATE_STORED)).toMatchObject({ strengthRequirement: 15 })
+    expect(equipmentSchema.parse(PLATE_STORED)).toMatchObject({
+      abilityScoreRequirements: { str: 15 },
+    })
     const shield = equipmentSchema.parse(SHIELD_WOOD_STORED)
     expect(shield.kind).toBe('armor')
     if (shield.kind === 'armor') {

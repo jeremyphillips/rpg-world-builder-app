@@ -15,6 +15,7 @@ import {
 } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentAddedInventoryRowItem } from '../added/equipment-added-inventory-row'
 import type { AddedEquipmentCategoryGroup } from '../../../../lib/equipment/equipment-inventory-summary.lib'
+import { resolveSelectionRowStatusItems } from '../../../../lib/selection-row-status'
 import {
   equipmentInventoryRowListClasses,
   equipmentPurchasedInventoryCategoryClasses,
@@ -74,6 +75,9 @@ export function EquipmentAddedInventorySection({
         <li key={entry.equipmentId}>
           <EquipmentAddedInventoryRowItem
             entry={entry}
+            status={resolveSelectionRowStatusItems(entry.selectionPresentation, {
+              context: 'owned',
+            })}
             draft={draft}
             context={context}
             catalogIndex={catalogIndex}

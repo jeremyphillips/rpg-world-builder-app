@@ -24,7 +24,7 @@ import {
 } from '@rpg/ui/form'
 import type { ContentDisplayFallback } from '@rpg/contracts'
 
-import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../campaign-access/campaign-access-form-state'
 import { resolveCampaignAccessSummary } from '../../campaign-access/campaign-access-summary'
 import type { AnyContentFormDef, ContentFormCtx } from '../registry/content-form-registry'
 import { resolveContentPublishSchema } from '../shells/edit/content-edit-load'
@@ -49,7 +49,7 @@ import {
   resolveContentPreviewSectionPresentation,
 } from './content-preview-section-state'
 import { contentPreviewCompactTriggerClasses } from './content-preview-rail.variants'
-import { useContentPreviewUi } from './content-preview-ui-context'
+import { useContentPreviewUi } from './use-content-preview-ui'
 import { useContentPublishReadiness } from './use-content-publish-readiness'
 import type { ContentPreviewIdentity, ContentPreviewSection } from './content-form-preview.types'
 

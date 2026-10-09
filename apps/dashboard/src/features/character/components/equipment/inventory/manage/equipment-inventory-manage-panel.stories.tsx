@@ -7,11 +7,13 @@ import {
   equipmentStepContextFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
-import {
-  EquipmentInventoryManageDisclosureCard,
-  createStorybookApplyMagicItemAcquisition,
-} from '../manage/equipment-inventory-manage-panel'
+import { EquipmentInventoryManageDisclosureCard } from '../manage/equipment-inventory-manage-panel'
+import { createStorybookApplyMagicItemAcquisition } from '../manage/equipment-inventory-manage-panel-storybook'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
+import {
+  resolveSelectionRowStatusItems,
+  selectionWarning,
+} from '../../../../lib/selection-row-status'
 
 const rows: EquipmentInventoryRow[] = [
   {
@@ -88,5 +90,14 @@ export const MixedSource: Story = {
         quantityTarget: { kind: 'purchase', purchaseId: 'purchase-1' },
       },
     ],
+  },
+}
+
+export const WithOwnedStatus: Story = {
+  args: {
+    status: resolveSelectionRowStatusItems(
+      { status: [selectionWarning('not_proficient', 'Not proficient')], guidance: [] },
+      { context: 'owned' },
+    ),
   },
 }

@@ -1,8 +1,16 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations } from '@rpg/ui/test-utils'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+beforeAll(() => {
+  Element.prototype.hasPointerCapture ??= () => false
+  Element.prototype.setPointerCapture ??= () => undefined
+  Element.prototype.releasePointerCapture ??= () => undefined
+  Element.prototype.scrollIntoView ??= () => undefined
+})
+
+import { CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME } from '../../picker/catalog-toolbar-reset-action.lib'
 import { OrganizationPickerDrawer } from './organization-picker-drawer'
 import { organizationPickerItems } from './organization-picker-drawer.fixtures'
 
@@ -78,7 +86,7 @@ describe('OrganizationPickerDrawer', () => {
       />,
     )
 
-    expect(screen.getByText('Added')).toBeInTheDocument()
+    expect(screen.getByText('Selected')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'government')
@@ -98,7 +106,7 @@ describe('OrganizationPickerDrawer', () => {
     )
 
     await user.type(screen.getByRole('textbox', { name: 'Search organizations' }), 'circle')
-    await user.click(screen.getByRole('button', { name: 'Reset view' }))
+    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }))
 
     expect(screen.getByText('City Council')).toBeInTheDocument()
     expect(screen.getByText('Silver Circle')).toBeInTheDocument()
@@ -188,8 +196,38 @@ describe('OrganizationPickerDrawer', () => {
     await user.click(screen.getByRole('radio', { name: 'Member' }))
     await user.click(screen.getByRole('button', { name: 'Add organization' }))
 
+    expect(onAdd).toHaveBeenCalled()
     expect(await screen.findByRole('alert')).toHaveTextContent('Membership failed')
     expect(onOpenChange).not.toHaveBeenCalledWith(false)
     expect(screen.getByRole('radio', { name: 'Member' })).toBeChecked()
+  })
+
+  it('filters by domain and resets search and filters together', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <OrganizationPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        items={organizationPickerItems}
+        onAdd={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('combobox', { name: 'Domain' })).toBeInTheDocument()
+    await user.click(screen.getByRole('combobox', { name: 'Domain' }))
+    await user.click(screen.getByRole('option', { name: 'Government' }))
+
+    expect(screen.getByText('City Council')).toBeInTheDocument()
+    expect(screen.queryByText('Lantern Guild')).not.toBeInTheDocument()
+    expect(screen.queryByText('Silver Circle')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }))
+
+    expect(screen.getByText('Lantern Guild')).toBeInTheDocument()
+    expect(screen.getByText('Silver Circle')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: CATALOG_TOOLBAR_RESET_WITHOUT_SORT_NAME }),
+    ).not.toBeInTheDocument()
   })
 })

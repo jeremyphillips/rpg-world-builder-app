@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
@@ -19,14 +20,23 @@ vi.mock('./character-picker-drawer', () => ({
   CharacterPickerDrawer: ({
     open,
     onSelect,
+    bodyReplacement,
+    footer,
   }: {
     open: boolean
     onSelect: (characterId: string) => void
+    bodyReplacement?: React.ReactNode
+    footer?: React.ReactNode
   }) =>
     open ? (
-      <button type="button" onClick={() => onSelect('char-1')}>
-        Pick Darius Vale
-      </button>
+      <div>
+        {bodyReplacement ?? (
+          <button type="button" onClick={() => onSelect('char-1')}>
+            Pick Darius Vale
+          </button>
+        )}
+        {footer}
+      </div>
     ) : null,
 }))
 

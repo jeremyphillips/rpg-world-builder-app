@@ -1,26 +1,18 @@
-import type { Equipment } from '../../../content/equipment'
-import type {
-  CharacterBuildAdvisoryOfCode,
-  EquipmentAdvisoryClass,
-} from '../../../character-builder/build-advisory'
+import type { CharacterBuildAdvisoryOfCode } from '../../../character-builder/build-advisory'
+import { equipmentAdvisoryClass } from '../messages/character-builder-advisory-messages'
 import { isEquipmentProficient } from '../resolvers/equipment/is-equipment-proficient'
 import type { CharacterBuildAdvisoryFacts } from './character-build-advisory-facts'
+import { projectEquipmentAdvisorySubjectIds } from './project-equipment-advisory-subjects'
 
 type EquipmentNotProficientAdvisory = CharacterBuildAdvisoryOfCode<'equipment_not_proficient'>
-
-function equipmentAdvisoryClass(equipment: Equipment): EquipmentAdvisoryClass | undefined {
-  if (equipment.kind === 'weapon') return 'weapon'
-  if (equipment.kind === 'armor') return equipment.category === 'shields' ? 'shield' : 'armor'
-  return undefined
-}
 
 /** Owned weapons, armor, and shields the assembled proficiencies do not cover. */
 export function resolveEquipmentProficiencyAdvisories(
   facts: CharacterBuildAdvisoryFacts,
 ): EquipmentNotProficientAdvisory[] {
   const advisories: EquipmentNotProficientAdvisory[] = []
-  for (const entry of [...facts.equipment.weapons, ...facts.equipment.armor]) {
-    const equipment = facts.catalogIndex.equipment.get(entry.equipmentId)
+  for (const equipmentId of projectEquipmentAdvisorySubjectIds(facts)) {
+    const equipment = facts.catalogIndex.equipment.get(equipmentId)
     if (!equipment) continue
     const equipmentClass = equipmentAdvisoryClass(equipment)
     if (!equipmentClass || isEquipmentProficient(equipment, facts.proficiencies)) continue

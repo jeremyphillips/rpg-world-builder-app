@@ -1,9 +1,22 @@
 import * as React from 'react'
 
 import type { Location } from '@rpg/contracts'
-import { Button, SegmentedControl, Text } from '@rpg/ui'
+import { Button, Text } from '@rpg/ui'
 
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogToolbarResetSlot,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '@/features/character'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createLocationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
@@ -18,13 +31,6 @@ import {
   type LocationParentReplacementCurrentSnapshot,
   type LocationParentReplacementMode,
 } from '../../lib/hierarchy/location-parent-replacement'
-import {
-  filterLocationsByParentBrowseScope,
-  LOCATION_PARENT_BROWSE_SCOPE_LABEL,
-  resolveParentBrowseScopeOptions,
-  shouldShowParentBrowseScopes,
-  type LocationParentBrowseScope,
-} from '../../lib/hierarchy/location-parent-browse-scope'
 import {
   LOCATION_PARENT_REPLACEMENT_DRAWER,
   resolveLocationParentReplacementDrawerNewHelper,
@@ -121,19 +127,11 @@ function LocationParentReplacementDrawerHeader({
   surface,
   mode,
   currentParent,
-  showParentBrowseScopeControl,
-  browseScopeOptions,
-  parentBrowseScope,
-  onParentBrowseScopeChange,
 }: {
   subject: Location
   surface: LocationParentReplacementDrawerSurface
   mode: LocationParentReplacementMode
   currentParent: LocationParentReplacementCurrentSnapshot | null
-  showParentBrowseScopeControl: boolean
-  browseScopeOptions: ReturnType<typeof resolveParentBrowseScopeOptions>
-  parentBrowseScope: LocationParentBrowseScope
-  onParentBrowseScopeChange: (value: LocationParentBrowseScope) => void
 }) {
   return (
     <div className="space-y-4">
@@ -145,19 +143,16 @@ function LocationParentReplacementDrawerHeader({
           mode,
           subjectName: subject.name,
         })}
-      >
-        {showParentBrowseScopeControl ? (
-          <SegmentedControl
-            aria-label={LOCATION_PARENT_BROWSE_SCOPE_LABEL}
-            value={parentBrowseScope}
-            options={browseScopeOptions}
-            onValueChange={onParentBrowseScopeChange}
-            fullWidth
-          />
-        ) : null}
-      </EntityReplacementSection>
+      />
     </div>
   )
+}
+
+function resolveParentReplacementCampaignId(
+  subject: Location,
+  campaignLocations: readonly Location[],
+): string {
+  return subject.campaignId ?? campaignLocations[0]?.campaignId ?? ''
 }
 
 function LocationParentReplacementDrawerContent({
@@ -171,16 +166,16 @@ function LocationParentReplacementDrawerContent({
   onSubmit,
 }: LocationParentReplacementDrawerProps) {
   const [selectedParentId, setSelectedParentId] = React.useState<string | null>(null)
-  const [parentBrowseScope, setParentBrowseScope] = React.useState<LocationParentBrowseScope>('all')
 
+  const campaignId = resolveParentReplacementCampaignId(subject, campaignLocations)
   const { mode, currentParent, candidates, candidateSummaries } = React.useMemo(
     () =>
       buildLocationParentReplacementContext({
         subject,
         campaignLocations,
-        campaignId: subject.campaignId ?? campaignLocations[0]?.campaignId ?? '',
+        campaignId,
       }),
-    [campaignLocations, subject],
+    [campaignId, campaignLocations, subject],
   )
 
   const contextMismatch = resolveContextMismatch({ subject, expectedParentLocationId })
@@ -193,27 +188,36 @@ function LocationParentReplacementDrawerContent({
       selectedParentId,
     })
 
-  const browseScopeOptions = React.useMemo(
-    () => resolveParentBrowseScopeOptions(candidates),
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: candidates,
+        getKind: (location) => location.kind,
+      }),
     [candidates],
   )
-
-  const showParentBrowseScopeControl =
-    pickerEnabled && shouldShowParentBrowseScopes(browseScopeOptions)
-
-  const pickerCandidates = React.useMemo(() => {
-    if (!showParentBrowseScopeControl) {
-      return candidateSummaries
-    }
-
-    const scopedCandidateIds = new Set(
-      filterLocationsByParentBrowseScope(candidates, parentBrowseScope).map(
-        (location) => location.id,
-      ),
-    )
-
-    return candidateSummaries.filter((summary) => scopedCandidateIds.has(summary.id))
-  }, [candidateSummaries, candidates, parentBrowseScope, showParentBrowseScopeControl])
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: candidates,
+    schema: locationFilterSchema,
+  })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
+  const filteredPickerCandidates = React.useMemo(() => {
+    const visibleIds = new Set(locationFilters.filteredRows.map((location) => location.id))
+    return candidateSummaries.filter((summary) => visibleIds.has(summary.id))
+  }, [candidateSummaries, locationFilters.filteredRows])
 
   const handleSubmit = async () => {
     if (!selectedParentId || contextMismatch) return
@@ -239,10 +243,6 @@ function LocationParentReplacementDrawerContent({
           surface={surface}
           mode={mode}
           currentParent={currentParent}
-          showParentBrowseScopeControl={showParentBrowseScopeControl}
-          browseScopeOptions={browseScopeOptions}
-          parentBrowseScope={parentBrowseScope}
-          onParentBrowseScopeChange={setParentBrowseScope}
         />
       }
       footer={
@@ -257,8 +257,59 @@ function LocationParentReplacementDrawerContent({
           onSubmit={() => void handleSubmit()}
         />
       }
-      hasStructuredFilters={showParentBrowseScopeControl && parentBrowseScope !== 'all'}
-      items={pickerEnabled ? pickerCandidates : []}
+      hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+      items={pickerEnabled ? filteredPickerCandidates : []}
+      primaryControls={
+        showFamilyFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={locationFilterSchema}
+            layout={locationFilterLayout}
+            state={locationFilters.state}
+            data={candidates}
+            idPrefix="location-parent-replacement"
+            onValueChange={locationFilters.setValue}
+          />
+        ) : undefined
+      }
+      filterRow={
+        showKindFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={locationFilterSchema}
+                  layout={locationFilterLayout}
+                  state={locationFilters.state}
+                  data={candidates}
+                  idPrefix="location-parent-replacement"
+                  onValueChange={locationFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: locationFilters.structuredFilterCount,
+          searchQuery,
+        })
+        return (
+          <CatalogToolbarResetSlot
+            visible={showReset}
+            reserve={showKindFilter}
+            includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: locationFilters.sourceCount,
+            })}
+            onClick={() => {
+              locationFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={(summary) => summary.id}
       getItemToolbarLabel={(summary) => summary.name}
       getSearchText={buildLocationEntitySummarySearchText}

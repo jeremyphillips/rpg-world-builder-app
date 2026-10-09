@@ -27,15 +27,15 @@ function isMagicItemOutOfFocusedScope(args: {
   return resolveEquipmentOwnedQuantity({ equipmentId: equipment.id, draft }) > 0
 }
 
-export function enrichEquipmentPickerItemsWithMagicItemAction(
-  items: readonly EquipmentPickerItem[],
+export function enrichEquipmentPickerItemsWithMagicItemAction<T extends EquipmentPickerItem>(
+  items: readonly T[],
   args: {
     draft: CharacterBuilderDraft
     context: CharacterBuildContext
     catalogIndex: CharacterBuildCatalogIndex
     focusedAllowanceId?: string
   },
-): EquipmentPickerItem[] {
+): T[] {
   const acquisitionContext = resolveEquipmentAcquisitionContext({
     context: args.context,
     catalogIndex: args.catalogIndex,

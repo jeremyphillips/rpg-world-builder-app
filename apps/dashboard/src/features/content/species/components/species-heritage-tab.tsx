@@ -4,10 +4,8 @@ import { Button, Text } from '@rpg/ui'
 import { FormItems } from '@rpg/ui/form'
 
 import { FormEmbeddedMasterDetailEditor } from '../../components/master-detail/form-embedded-master-detail-editor'
-import {
-  DetailOverflowMenu,
-  detailOverflowDeleteAction,
-} from '../../lib/detail/detail-overflow-menu'
+import { DetailOverflowMenu } from '../../lib/detail/detail-overflow-menu'
+import { detailOverflowDeleteAction } from '../../lib/detail/detail-overflow-actions'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { isEmbeddedRowSystemLocked } from '../../lib/master-detail/is-embedded-row-system-locked'
 import { useMasterDetailArray } from '../../lib/master-detail/use-master-detail-array'
@@ -29,7 +27,7 @@ import {
   traitItemTitle,
   type TraitRowForm,
 } from '../lib/species-trait-form-fields'
-import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-state'
 import { resolveSpeciesParentCampaignAccess } from '../lib/resolve-species-parent-campaign-access'
 import { heritageOptionItemDefaultValues } from '../lib/species-trait-form-values'
 import {

@@ -19,11 +19,13 @@ export type EmphasisDetailLineProps<T extends React.ElementType = 'span'> = {
   primary: React.ReactNode
   /** Muted tail — supporting context */
   secondary?: React.ReactNode
+  /** Primary emphasis color — `warning` for unaffordable / shortfall copy */
+  primaryTone?: 'default' | 'warning'
   /** `secondary` on neutral surfaces; `disabled` inside tinted parents */
   secondaryTone?: Extract<ContentTone, 'secondary' | 'disabled'>
 } & Omit<
   React.ComponentPropsWithoutRef<T>,
-  'as' | 'className' | 'prefix' | 'primary' | 'secondary' | 'secondaryTone'
+  'as' | 'className' | 'prefix' | 'primary' | 'secondary' | 'primaryTone' | 'secondaryTone'
 >
 
 export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
@@ -32,6 +34,7 @@ export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
   prefix,
   primary,
   secondary,
+  primaryTone = 'default',
   secondaryTone = 'secondary',
   ...props
 }: EmphasisDetailLineProps<T>) {
@@ -43,14 +46,20 @@ export function EmphasisDetailLine<T extends React.ElementType = 'span'>({
       {secondary ? (
         <InlineMetadata role="supporting" density="comfortable" wrap={false}>
           <InlineMetadata.Item>
-            <strong className={emphasisDetailLinePrimaryVariants()}>{primary}</strong>
+            <strong className={emphasisDetailLinePrimaryVariants({ tone: primaryTone })}>
+              {primary}
+            </strong>
           </InlineMetadata.Item>
-          <InlineMetadata.Item className={emphasisDetailLineSecondaryVariants({ tone: secondaryTone })}>
+          <InlineMetadata.Item
+            className={emphasisDetailLineSecondaryVariants({ tone: secondaryTone })}
+          >
             {secondary}
           </InlineMetadata.Item>
         </InlineMetadata>
       ) : (
-        <strong className={emphasisDetailLinePrimaryVariants()}>{primary}</strong>
+        <strong className={emphasisDetailLinePrimaryVariants({ tone: primaryTone })}>
+          {primary}
+        </strong>
       )}
     </Comp>
   )

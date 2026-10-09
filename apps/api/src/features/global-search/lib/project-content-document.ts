@@ -20,6 +20,7 @@ import {
   buildSkillProficiencyCompactSummary,
   buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
+  formatSpellPickerMetadataGroupLabel,
   equipmentKindToFamilyPath,
   getContentTypeTerm,
   getCreatureSizeLabel,
@@ -84,7 +85,8 @@ function buildClassTarget(characterClass: CharacterClass): GlobalSearchTarget {
 
 function buildSpellSecondary(spell: Spell): string {
   const summary = buildSpellPickerCompactSummary(spell)
-  return joinCompactSegments(summary.classification.levelLabel, ...summary.castingSummary) ?? ''
+  const labels = summary.groups.map((group) => formatSpellPickerMetadataGroupLabel(group))
+  return joinCompactSegments(...labels) ?? ''
 }
 
 function buildSpellFields(spell: Spell): GlobalSearchField[] {

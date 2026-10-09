@@ -49,7 +49,7 @@
     "baseAc": 16,
     "addDexModifier": false,
     "stealthDisadvantage": true,
-    "strengthRequirement": 13
+    "abilityScoreRequirements": { "str": 13 }
   },
   {
     "id": "srd-cc-5.2.1:chain-shirt",
@@ -203,7 +203,7 @@
     "baseAc": 18,
     "addDexModifier": false,
     "stealthDisadvantage": true,
-    "strengthRequirement": 15
+    "abilityScoreRequirements": { "str": 15 }
   },
   {
     "id": "srd-cc-5.2.1:ring-mail",
@@ -330,7 +330,7 @@
     "baseAc": 17,
     "addDexModifier": false,
     "stealthDisadvantage": true,
-    "strengthRequirement": 15
+    "abilityScoreRequirements": { "str": 15 }
   },
   {
     "id": "srd-cc-5.2.1:studded-leather",

@@ -17,8 +17,8 @@ import {
 } from './selection-option-card.variants'
 
 const radioCardCardBase = cn(
-  `group relative flex h-full w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
-  establishSurfaceCurrent('background'),
+  `group relative flex h-full w-full cursor-pointer flex-col ${cardRadiusClasses} ${cardBorderClasses} bg-surface-muted text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors hover:border-primary hover:bg-surface-subtle hover:[--surface-current:var(--surface-subtle)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-surface-strong data-[state=checked]:[--surface-current:var(--surface-strong)] data-[state=checked]:ring-1 data-[state=checked]:ring-primary/20 aria-invalid:border-destructive`,
+  establishSurfaceCurrent('surface-muted'),
 )
 
 const radioCardRowBase = cn(
@@ -81,8 +81,8 @@ export const radioCardShellSelectedChromeClasses =
 /** Outer shell when a details action sits beside the radio item (avoids nested interactives). */
 export const radioCardShellVariants = cva(
   cn(
-    `relative flex h-full flex-col overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-background text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
-    establishSurfaceCurrent('background'),
+    `relative flex h-full flex-col overflow-hidden ${cardRadiusClasses} ${cardBorderClasses} bg-surface-muted text-left text-card-foreground ${fieldSurfaceRaisedShadowClasses} transition-colors has-[:focus-visible]:outline-none has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background`,
+    establishSurfaceCurrent('surface-muted'),
   ),
   {
     variants: {

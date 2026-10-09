@@ -2,21 +2,18 @@ import { describe, expect, it } from 'vitest'
 
 import {
   compareEquipmentRecommendationSpecificity,
-  compareEquipmentRecommendationTiers,
-  EQUIPMENT_RECOMMENDATION_REASON_RANK,
-  EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK,
-  EQUIPMENT_RECOMMENDATION_TIER_RANK,
+  EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE,
+  EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE,
   EQUIPMENT_RECOMMENDATION_TIERS,
   equipmentRecommendationRuleSchema,
-  getBestEquipmentRecommendationReasonRank,
   getBestEquipmentRecommendationSpecificity,
   isRecommendedEquipmentTier,
 } from './equipment-recommendation'
 
 describe('equipment recommendation tiers', () => {
-  it('assigns a unique rank to every tier', () => {
+  it('assigns a unique derivation precedence to every tier', () => {
     const ranks = EQUIPMENT_RECOMMENDATION_TIERS.map(
-      (tier) => EQUIPMENT_RECOMMENDATION_TIER_RANK[tier],
+      (tier) => EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE[tier],
     )
     expect(new Set(ranks).size).toBe(EQUIPMENT_RECOMMENDATION_TIERS.length)
   })
@@ -28,47 +25,26 @@ describe('equipment recommendation tiers', () => {
     expect(isRecommendedEquipmentTier('neutral')).toBe(false)
   })
 
-  it('orders tiers essential-first and neutral-last', () => {
-    expect(compareEquipmentRecommendationTiers('essential', 'strong')).toBeLessThan(0)
-    expect(compareEquipmentRecommendationTiers('neutral', 'compatible')).toBeGreaterThan(0)
-    expect(compareEquipmentRecommendationTiers('compatible', 'compatible')).toBe(0)
+  it('prefers essential over strong over compatible over neutral when collapsing evidence', () => {
+    expect(EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.essential).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.strong,
+    )
+    expect(EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.strong).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.compatible,
+    )
+    expect(EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.compatible).toBeLessThan(
+      EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE.neutral,
+    )
   })
 })
 
-describe('equipment recommendation reason ranks', () => {
-  it('assigns a unique rank to every reason', () => {
-    const ranks = Object.values(EQUIPMENT_RECOMMENDATION_REASON_RANK)
+describe('equipment recommendation specificity precedence', () => {
+  it('assigns a unique derivation precedence to every specificity', () => {
+    const ranks = Object.values(EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE)
     expect(new Set(ranks).size).toBe(ranks.length)
   })
 
-  it('ranks needs before nice-to-have reasons', () => {
-    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.classRequired).toBeLessThan(
-      EQUIPMENT_RECOMMENDATION_REASON_RANK.startingEquipment,
-    )
-    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed).toBeLessThan(
-      EQUIPMENT_RECOMMENDATION_REASON_RANK.startingEquipment,
-    )
-    expect(EQUIPMENT_RECOMMENDATION_REASON_RANK.spellcastingFocus).toBeLessThan(
-      EQUIPMENT_RECOMMENDATION_REASON_RANK.classSuggested,
-    )
-  })
-
-  it('returns positive infinity when reasons are empty', () => {
-    expect(getBestEquipmentRecommendationReasonRank(['classRequired'])).toBe(0)
-    expect(getBestEquipmentRecommendationReasonRank(['classSuggested', 'classToolNeed'])).toBe(
-      EQUIPMENT_RECOMMENDATION_REASON_RANK.classToolNeed,
-    )
-    expect(getBestEquipmentRecommendationReasonRank([])).toBe(Number.POSITIVE_INFINITY)
-  })
-})
-
-describe('equipment recommendation specificity ranks', () => {
-  it('assigns a unique rank to every specificity', () => {
-    const ranks = Object.values(EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK)
-    expect(new Set(ranks).size).toBe(ranks.length)
-  })
-
-  it('orders exact before narrow_pool before broad_pool', () => {
+  it('prefers exact over narrow_pool over broad_pool when collapsing evidence', () => {
     expect(compareEquipmentRecommendationSpecificity('exact', 'narrow_pool')).toBeLessThan(0)
     expect(compareEquipmentRecommendationSpecificity('narrow_pool', 'broad_pool')).toBeLessThan(0)
     expect(compareEquipmentRecommendationSpecificity('broad_pool', 'exact')).toBeGreaterThan(0)

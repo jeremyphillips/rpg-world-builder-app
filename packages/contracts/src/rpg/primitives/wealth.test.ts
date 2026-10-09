@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import {
   copperToDisplayWealth,
   copperToWealth,
+  formatInlineWealth,
   formatWealth,
-  formatWealthAsGold,
   moneyToCopper,
   subtractFromWealth,
   wealthToCopper,
@@ -33,9 +33,18 @@ describe('wealth primitives', () => {
     expect(copperToDisplayWealth(2500)).toEqual({ cp: 0, sp: 0, gp: 25, pp: 0 })
   })
 
-  it('formats wealth as a single GP total', () => {
-    expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 90, pp: 0 })).toBe('90 GP')
-    expect(formatWealthAsGold({ cp: 50, sp: 0, gp: 0, pp: 0 })).toBe('0 GP')
-    expect(formatWealthAsGold({ cp: 0, sp: 0, gp: 0, pp: 1 })).toBe('10 GP')
+  it('formats compact UI wealth with a space join', () => {
+    expect(formatInlineWealth({ cp: 0, sp: 5, gp: 637, pp: 0 })).toBe('637 GP 5 SP')
+    expect(formatInlineWealth({ cp: 0, sp: 0, gp: 0, pp: 0 })).toBe('0 GP')
+    expect(formatInlineWealth({ cp: 0, sp: 0, gp: 15, pp: 0 })).toBe('15 GP')
+  })
+
+  it('joins denomination parts with the requested separator', () => {
+    expect(formatWealth({ cp: 0, sp: 6, gp: 74, pp: 0 }, { separator: ' ' })).toBe('74 GP 6 SP')
+    expect(formatWealth({ cp: 6, sp: 5, gp: 74, pp: 0 }, { separator: ' ' })).toBe(
+      '74 GP 5 SP 6 CP',
+    )
+    expect(formatWealth({ cp: 0, sp: 0, gp: 0, pp: 0 }, { separator: ' ' })).toBe('0 GP')
+    expect(formatWealth({ cp: 3, sp: 5, gp: 5, pp: 0 })).toBe('5 GP, 5 SP, 3 CP')
   })
 })

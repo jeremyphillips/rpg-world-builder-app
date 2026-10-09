@@ -1,71 +1,90 @@
 import {
-  getOrganizationDomainLabel,
+  catalogNounFromContentType,
+  listOrganizationClassificationDiscoveryTerms,
   getOrganizationClassificationDiscoveryText,
-  ORGANIZATION_DOMAIN_IDS,
   type Organization,
 } from '@rpg/contracts'
+import { scoreSearchDocument, type SearchDocument } from '@rpg/search'
 import { normalizeSearchQuery } from '@rpg/ui'
 
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
+
 import {
-  ORGANIZATION_PICKER_ALL_DOMAINS,
-  ORGANIZATION_PICKER_DESCRIPTION,
-  type OrganizationPickerItem,
-  type OrganizationPickerDomainFilter,
-} from './organization-picker-drawer.types'
-
-const organizationNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
-
-export const ORGANIZATION_PICKER_VIEW_DEFAULTS = {
-  domain: ORGANIZATION_PICKER_ALL_DOMAINS,
-} as const
+  chainComparators,
+  scoreAndFilterPickerItems,
+} from '../../picker/sort/catalog-picker-sort.lib'
+import { type OrganizationPickerItem } from './organization-picker-drawer.types'
 
 export function getOrganizationPickerSearchText(organization: Organization): string {
-  return `${organization.name} ${getOrganizationClassificationDiscoveryText(organization)}`
+  const combined = assembleOrganizationPickerSearchDocument(organization).fields.find(
+    (field) => field.key === 'combined',
+  )
+  return combined?.text ?? organization.name
 }
 
-export function filterAndSortOrganizationPickerItems(
+export function assembleOrganizationPickerSearchDocument(
+  organization: Organization,
+): SearchDocument {
+  const terms = listOrganizationClassificationDiscoveryTerms(organization)
+  return {
+    id: organization.id,
+    fields: [
+      { key: 'name', text: organization.name, role: 'primary' },
+      ...terms.map((term, index) => ({
+        key: `term:${index}`,
+        text: term,
+        role: 'keyword' as const,
+      })),
+      {
+        key: 'combined',
+        text: `${organization.name} ${getOrganizationClassificationDiscoveryText(organization)}`,
+        role: 'secondary' as const,
+      },
+    ],
+  }
+}
+
+export function scoreOrganizationPickerItem(
+  item: OrganizationPickerItem,
+  searchQuery: string,
+): number {
+  return scoreSearchDocument(
+    assembleOrganizationPickerSearchDocument(item.organization),
+    searchQuery,
+    {
+      profile: 'forgiving',
+    },
+  )
+}
+
+/** Search-score, then name. Domain filtering belongs to the relationship filter schema. */
+export function scoreAndSortOrganizationPickerItems(
   items: readonly OrganizationPickerItem[],
   options: {
     searchQuery: string
-    domain: OrganizationPickerDomainFilter
   },
 ): OrganizationPickerItem[] {
-  const query = normalizeSearchQuery(options.searchQuery)
+  const hasQuery = normalizeSearchQuery(options.searchQuery).length > 0
+  const scored = scoreAndFilterPickerItems(items, {
+    searchQuery: options.searchQuery,
+    scoreItem: scoreOrganizationPickerItem,
+  })
 
-  return items
-    .filter(({ organization }) => {
-      if (
-        options.domain !== ORGANIZATION_PICKER_ALL_DOMAINS &&
-        organization.organizationDomain !== options.domain
-      ) {
-        return false
-      }
-      return (
-        query.length === 0 ||
-        normalizeSearchQuery(getOrganizationPickerSearchText(organization)).includes(query)
-      )
-    })
-    .sort((left, right) =>
-      organizationNameCollator.compare(left.organization.name, right.organization.name),
+  return scored
+    .toSorted(
+      chainComparators(
+        (left, right) => (hasQuery ? right.searchScore - left.searchScore : 0),
+        (left, right) =>
+          comparePickerName(
+            { name: left.item.organization.name, id: left.item.organization.id },
+            { name: right.item.organization.name, id: right.item.organization.id },
+          ),
+      ),
     )
-}
-
-export function buildOrganizationPickerDomainOptions(
-  organizations: readonly Organization[],
-): { value: OrganizationPickerDomainFilter; label: string }[] {
-  const availableKinds = new Set(organizations.map(({ organizationDomain }) => organizationDomain))
-  return [
-    { value: ORGANIZATION_PICKER_ALL_DOMAINS, label: 'All domains' },
-    ...ORGANIZATION_DOMAIN_IDS.filter((kind) => availableKinds.has(kind)).map((kind) => ({
-      value: kind,
-      label: getOrganizationDomainLabel(kind),
-    })),
-  ]
+    .map((row) => row.item)
 }
 
 export function formatOrganizationPickerDescription(): string {
-  return ORGANIZATION_PICKER_DESCRIPTION
+  const organization = catalogNounFromContentType('organizations')
+  return `Choose an ${organization.singular} connected to this character.`
 }

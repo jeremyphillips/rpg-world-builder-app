@@ -121,14 +121,38 @@ describe('token contrast smoke checks', () => {
     }
   })
 
-  it('keeps primary foreground readable on primary (light + dark)', () => {
-    const lightFg = oklchLightness(resolvePaletteVar(lightCss, '--palette-fg-on-solid') ?? '')
-    const lightBg = oklchLightness(readPaletteVar(lightCss, '--palette-primary') ?? '')
-    expect(contrastRatio(lightFg!, lightBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
+  it('keeps primary and secondary foregrounds readable on their fills (light + dark)', () => {
+    for (const css of [lightCss, darkCss]) {
+      const primaryFg = oklchLightness(resolvePaletteVar(css, '--palette-primary-foreground') ?? '')
+      const primaryBg = oklchLightness(readPaletteVar(css, '--palette-primary') ?? '')
+      expect(contrastRatio(primaryFg!, primaryBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
 
-    const darkFg = oklchLightness(readPaletteVar(darkCss, '--palette-primary-foreground') ?? '')
-    const darkBg = oklchLightness(readPaletteVar(darkCss, '--palette-primary') ?? '')
-    expect(contrastRatio(darkFg!, darkBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
+      const secondaryFg = oklchLightness(
+        resolvePaletteVar(css, '--palette-secondary-foreground') ?? '',
+      )
+      const secondaryBg = oklchLightness(readPaletteVar(css, '--palette-secondary') ?? '')
+      expect(contrastRatio(secondaryFg!, secondaryBg!)).toBeGreaterThanOrEqual(MIN_SOLID_CONTRAST)
+
+      const actionPrimaryFg = oklchLightness(
+        resolvePaletteVar(css, '--palette-action-primary-foreground') ?? '',
+      )
+      const actionPrimaryBg = oklchLightness(
+        resolvePaletteVar(css, '--palette-action-primary') ?? '',
+      )
+      expect(contrastRatio(actionPrimaryFg!, actionPrimaryBg!)).toBeGreaterThanOrEqual(
+        MIN_SOLID_CONTRAST,
+      )
+    }
+  })
+
+  it('lifts dark action fills and quiets dark secondary gold', () => {
+    const lightPrimary = oklchLightness(readPaletteVar(lightCss, '--palette-primary') ?? '')!
+    const darkPrimary = oklchLightness(readPaletteVar(darkCss, '--palette-primary') ?? '')!
+    expect(darkPrimary).toBeGreaterThan(lightPrimary)
+
+    const lightSecondary = oklchLightness(readPaletteVar(lightCss, '--palette-secondary') ?? '')!
+    const darkSecondary = oklchLightness(readPaletteVar(darkCss, '--palette-secondary') ?? '')!
+    expect(darkSecondary).toBeLessThan(lightSecondary)
   })
 
   it('keeps interactive outline border distinct from border-subtle in both semantic themes', () => {

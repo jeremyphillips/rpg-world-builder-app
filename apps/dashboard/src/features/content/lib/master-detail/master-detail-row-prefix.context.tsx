@@ -1,6 +1,4 @@
-import { createContext, useContext } from 'react'
-
-const MasterDetailRowPrefixContext = createContext<string | undefined>(undefined)
+import { MasterDetailRowPrefixContext } from './use-master-detail-row-prefix'
 
 export function MasterDetailRowPrefixProvider({
   value,
@@ -14,13 +12,4 @@ export function MasterDetailRowPrefixProvider({
       {children}
     </MasterDetailRowPrefixContext.Provider>
   )
-}
-
-/** RHF prefix for the selected master-detail row, e.g. `features.2`. */
-export function useMasterDetailRowPrefix(): string {
-  const prefix = useContext(MasterDetailRowPrefixContext)
-  if (!prefix) {
-    throw new Error('useMasterDetailRowPrefix must be used within MasterDetailRowPrefixProvider')
-  }
-  return prefix
 }

@@ -253,7 +253,7 @@ export function DataTableColumnsMenu({
   const labels = { ...DEFAULT_LABELS, ...labelsProp }
 
   const trigger = (
-    <Button variant="outline" size="sm" className="gap-1.5" aria-label={labels.chooseColumns}>
+    <Button variant="outline" size="sm" aria-label={labels.chooseColumns}>
       <Columns3 className="size-3.5" aria-hidden />
       <ChevronDown className="size-3.5 opacity-60" aria-hidden />
     </Button>

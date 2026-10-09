@@ -1,6 +1,9 @@
-import { Heading, RichTextContent } from '@rpg/ui'
+import { Heading, RichTextContent, type RichTextContentVariantProps } from '@rpg/ui'
 
-import { ContentStatRow, type ContentStatRowSize } from '../../lib/detail/metadata/content-stat-row'
+import {
+  ContentStatList,
+  type ContentStatRowSize,
+} from '../../lib/detail/metadata/content-stat-row'
 import { type EquipmentDetailViewModel } from '../lib/equipment-display'
 
 export type EquipmentDetailMetadataProps = {
@@ -12,6 +15,8 @@ export type EquipmentDetailMetadataProps = {
   sectionId?: string
   /** Stat row density — picker collapsible bodies use `sm` (14px). */
   statRowSize?: ContentStatRowSize
+  /** Description under the stat rows. Picker panels pass `PICKER_DISCLOSURE_DESCRIPTION_SIZE`. */
+  descriptionSize?: NonNullable<RichTextContentVariantProps['size']>
 }
 
 /** Kind-specific metadata block for equipment detail surfaces and picker collapsible bodies. */
@@ -21,6 +26,7 @@ export function EquipmentDetailMetadata({
   omitSectionTitle = false,
   sectionId = 'equipment-detail-metadata',
   statRowSize = 'default',
+  descriptionSize = 'md',
 }: EquipmentDetailMetadataProps) {
   const omitted = new Set(omitStatLabels)
   const statRows = viewModel.statRows.filter((row) => !omitted.has(row.label))
@@ -38,24 +44,10 @@ export function EquipmentDetailMetadata({
         </Heading>
       ) : null}
 
-      {statRows.length > 0 ? (
-        <div className="space-y-1">
-          {statRows.map((row) => (
-            <ContentStatRow
-              key={row.label}
-              size={statRowSize}
-              label={row.label}
-              value={row.value}
-              info={row.info}
-              infoPlacement={row.infoPlacement}
-              infoAriaLabel={row.infoAriaLabel}
-            />
-          ))}
-        </div>
-      ) : null}
+      {statRows.length > 0 ? <ContentStatList rows={statRows} size={statRowSize} /> : null}
 
       {viewModel.description ? (
-        <RichTextContent html={viewModel.description} size="md" tone="muted" />
+        <RichTextContent html={viewModel.description} size={descriptionSize} tone="muted" />
       ) : null}
     </section>
   )

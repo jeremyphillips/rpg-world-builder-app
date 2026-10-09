@@ -6,14 +6,12 @@ import {
   type PickerItemStateBase,
 } from '../picker/picker-item-state'
 import { resolveAvailableChoices } from '../registry/resolve-choices'
-import {
-  buildSpellPickerCompactSummary,
-  buildSpellPickerSearchText,
-} from './format-spell-picker-metadata'
+import { buildSpellPickerSearchText } from './format-spell-picker-metadata'
+import { buildSpellPickerCompactSummary } from './resolve-spell-picker-metadata'
 import { resolveRecommendedSpellIdsForChoiceSet } from './resolve-spell-recommendations'
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
-  softRecommendationFact,
+  softRecommendationFacts,
   type OptionPresentationFacts,
   type OptionRecommendation,
 } from '../../recommendation'
@@ -69,7 +67,7 @@ function resolveSpellPickerItemState(
         ],
       }
     : NEUTRAL_OPTION_RECOMMENDATION
-  const recommendationFact = softRecommendationFact({
+  const recommendationFacts = softRecommendationFacts({
     recommendation,
     sourceName: (source) => (source.kind === 'class' ? classSource?.name : undefined),
   })
@@ -78,7 +76,7 @@ function resolveSpellPickerItemState(
     isAvailable: true,
     isRecommended: recommendation.strength === 'strong',
     recommendation,
-    ...(recommendationFact ? { presentation: { facts: [recommendationFact] } } : {}),
+    ...(recommendationFacts.length > 0 ? { presentation: { facts: recommendationFacts } } : {}),
     isAlreadySelected,
     isSelectionFull,
     canSelect: !isAlreadySelected && !isSelectionFull,

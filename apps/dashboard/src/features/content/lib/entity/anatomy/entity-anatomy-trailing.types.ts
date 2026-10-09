@@ -4,17 +4,30 @@ import type { ReactElement } from 'react'
 export type EntityAnatomyTrailingAction = {
   kind: 'action'
   content: ReactElement
+  /** Muted text rendered before the control in the same cell. */
+  meta?: string
 }
 
 /** Ghost icon utility or utility cluster (remove, overflow, stepper) — centers on the row. */
 export type EntityAnatomyTrailingUtility = {
   kind: 'utility'
   content: ReactElement
+  /** Muted text rendered before the control in the same cell. */
+  meta?: string
 }
 
 export type EntityAnatomyTrailingIndicator =
-  | { kind: 'indicator'; variant: 'chevron' }
-  | { kind: 'indicator'; variant: 'quantity'; quantity: number; format?: 'compact' | 'label' }
+  | { kind: 'indicator'; variant: 'chevron'; meta?: string }
+  | {
+      kind: 'indicator'
+      variant: 'quantity'
+      quantity: number
+      /** `compact` is `×N`, `label` is `Qty N` (both hidden at 1). `additional` is `+N`, including `+1`. */
+      format?: 'compact' | 'label' | 'additional'
+      /** Muted text rendered before the quantity label in the same cell. */
+      meta?: string
+    }
+  | { kind: 'indicator'; variant: 'label'; label: string }
 
 export type EntityAnatomyTrailingSecondary =
   | { kind: 'price'; label: string }

@@ -13,6 +13,7 @@ import {
   hitDieSchema,
   levelZeroProficiencyBonusSchema,
   type NpcWealthTierId,
+  getSpeciesTraitSectionLabel,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
@@ -187,7 +188,7 @@ export function levelZeroNpcsFields({
               {
                 type: 'switch',
                 name: 'levelZeroRetainSpeciesTraits',
-                label: 'Species traits',
+                label: getSpeciesTraitSectionLabel(),
                 hint: 'Grant traits from the NPC species.',
                 defaultValue: true,
                 separator: 'subtle',

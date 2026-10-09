@@ -107,6 +107,43 @@ describe('StartingEquipmentOptionSummaryCard', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('shows muted base gold, a normal-weight total, and a tier badge', () => {
+    render(
+      <StartingEquipmentOptionSummaryCard
+        summary={{
+          ...summary,
+          description: 'Take 75 GP instead of standard equipment.',
+          funding: {
+            ...summary.funding,
+            classOptionWealth: { cp: 0, sp: 0, gp: 75, pp: 0 },
+            tierAdditionalWealth: { cp: 0, sp: 5, gp: 637, pp: 0 },
+            tierLabel: 'Hero',
+            bonusGold: {
+              baseGp: 500,
+              formula: {
+                kind: 'dice',
+                dice: { count: 1, faces: 10 },
+                multiplier: 25,
+                currency: 'gp',
+              },
+            },
+            totalStartingWealth: { cp: 0, sp: 5, gp: 712, pp: 0 },
+          },
+        }}
+        density="default"
+        onChangePackage={vi.fn()}
+        advisoryLabels={['Shield proficiency is missing.']}
+      />,
+    )
+
+    expect(screen.getByText('75 GP base')).toHaveClass('text-muted-foreground')
+    expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-normal', 'text-foreground')
+    expect(screen.getByText('Hero tier')).toBeInTheDocument()
+    expect(screen.getByText('Shield proficiency is missing.')).toBeInTheDocument()
+    expect(screen.queryByText('Hero tier adds 637 GP')).not.toBeInTheDocument()
+    expect(screen.queryByText('Total: 712 GP')).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <StartingEquipmentOptionSummaryCard

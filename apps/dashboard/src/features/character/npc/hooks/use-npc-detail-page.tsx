@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
-import { type SystemRulesetId } from '@rpg/contracts'
+import { getCharacterTypeLabel, type SystemRulesetId } from '@rpg/contracts'
 import { resolveCampaignXpProgressionForRules } from '@/lib/campaign-xp-progression.lib'
 
 import { useCanManageCampaign } from '@/features/campaign'
@@ -51,7 +51,7 @@ export function useNpcDetailPage() {
   const deleteFlow = useNpcDeleteFlow({
     campaignId,
     npcId,
-    entityName: viewModel?.identity.name ?? 'NPC',
+    entityName: viewModel?.identity.name ?? getCharacterTypeLabel('npc'),
   })
 
   const isPending =

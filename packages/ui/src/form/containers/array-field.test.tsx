@@ -448,7 +448,7 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add trait' })
-    expect(addButton).toHaveClass('bg-secondary')
+    expect(addButton).toHaveClass('bg-action-secondary')
     expect(addButton).not.toHaveClass('border-interactive-outline')
   })
 
@@ -492,7 +492,7 @@ describe('ArrayFieldRenderer', () => {
     )
 
     const addButton = screen.getByRole('button', { name: 'Add grant' })
-    expect(addButton).toHaveClass('bg-primary')
+    expect(addButton).toHaveClass('bg-action-primary')
     expect(addButton).not.toHaveClass('border-interactive-outline')
 
     await user.click(addButton)

@@ -1,14 +1,16 @@
 import {
   canPurchaseEquipment,
   compareEquipmentPickerItemsByRecommendation,
-  fitsStartingEquipmentBudget,
-  compareMagicItemBestMatch,
+  formatInlineWealth,
   formatMoney,
-  formatWealthAsGold,
   isEquipmentPickerSupportedKind,
+  maxAffordableEquipmentQuantity,
   moneyToCopper,
+  resolveMagicItemAcquiredCopyCap,
+  EQUIPMENT_PURCHASE_QUANTITY_MAX,
   type CharacterWealth,
   type EquipmentPickerBrowseSortContext,
+  type MagicItemGrantProgress,
   type Money,
 } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
@@ -16,9 +18,8 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import { matchSearchDocumentQuery, normalizeSearchQuery } from '@rpg/search'
 import { chainComparators, compareNumberDescending, type Comparator } from '@rpg/search/ranking'
 
+import { pickerNameCollator } from '@/lib/catalog-picker/compare-picker-name'
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
-
-import { assembleEquipmentPickerSearchDocument } from '../../../../lib/equipment/equipment-picker-search.lib'
 
 import { type EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
@@ -29,20 +30,14 @@ import {
   compareName,
   scoreAndFilterPickerItems,
 } from '../../../picker/sort/catalog-picker-sort.lib'
-import {
-  countCatalogPickerClearableCriteria,
-  hasCatalogPickerClearableCriteria,
-  hasCatalogPickerResetViewCriteria,
-} from '../../../picker/catalog-picker-filter-state.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
+import type { EquipmentOwnership } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import {
   resolveEquipmentPickerItemPresentation,
   type EquipmentPickerItemPresentation,
 } from '../browse/equipment-picker-item-header.lib'
 import {
   EQUIPMENT_PICKER_KIND_ALL,
-  EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL,
-  EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_NAME_ASC,
   EQUIPMENT_PICKER_SORT_NAME_DESC,
@@ -50,7 +45,7 @@ import {
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentBudgetSummary,
   type EquipmentPickerItem,
-  type EquipmentPickerKindFilter,
+  type EquipmentPickerRow,
   type EquipmentPickerSortMode,
   type EquipmentPickerViewDefaults,
 } from './equipment-picker-drawer.types'
@@ -61,13 +56,8 @@ export const EQUIPMENT_PICKER_VIEW_DEFAULTS = {
   sortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
 } as const satisfies EquipmentPickerViewDefaults
 
-const equipmentNameCollator = new Intl.Collator(undefined, {
-  sensitivity: 'base',
-  numeric: true,
-})
-
 type EquipmentPickerScoredItem = {
-  item: EquipmentPickerItem
+  item: EquipmentPickerRow
   searchScore: number
 }
 
@@ -102,78 +92,18 @@ export function formatEquipmentUnaffordableReason(
   if (!amounts) return ''
 
   const need = formatMoney(amounts.required)
-  const have = formatWealthAsGold(amounts.remaining)
+  const have = formatInlineWealth(amounts.remaining)
   return joinInlineMetadata([`${need} needed`, `${have} remaining`])
-}
-
-/** Structured filters only — category, affordable toggle, or magic-item rarity. Excludes search. */
-export function countEquipmentPickerStructuredFilters(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): number {
-  if (args.workflowMode === 'magic_items') {
-    return args.focusedAllowanceId ? 1 : 0
-  }
-
-  let count = 0
-  if (args.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) count += 1
-  if (args.showAffordableOnly) count += 1
-  return count
-}
-
-/** Total clearable criteria — structured filters + non-empty search. */
-export function countEquipmentPickerClearableCriteria(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  searchQuery: string
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): number {
-  return countCatalogPickerClearableCriteria({
-    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
-    searchQuery: args.searchQuery,
-  })
-}
-
-export function hasEquipmentPickerClearableCriteria(count: number): boolean {
-  return hasCatalogPickerClearableCriteria(count)
-}
-
-export function hasEquipmentPickerResetViewCriteria(args: {
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly: boolean
-  searchQuery: string
-  sortMode: EquipmentPickerSortMode
-  focusedAllowanceId?: string
-  workflowMode?: EquipmentPickerWorkflowMode
-}): boolean {
-  return hasCatalogPickerResetViewCriteria({
-    structuredFilterCount: countEquipmentPickerStructuredFilters(args),
-    searchQuery: args.searchQuery,
-    sortMode: args.sortMode,
-    defaultSortMode: EQUIPMENT_PICKER_SORT_BEST_MATCH,
-  })
 }
 
 function isEquipmentPickerItemPriced(item: EquipmentPickerItem): boolean {
   return canPurchaseEquipment(item.equipment)
 }
 
-function scoreEquipmentPickerItem(item: EquipmentPickerItem, searchQuery: string): number {
-  const document = item.searchDocument ?? assembleEquipmentPickerSearchDocument(item.equipment)
-  return matchSearchDocumentQuery(document, searchQuery).score ?? 0
-}
-
-function filterEquipmentPickerItemsBySearch(
-  items: readonly EquipmentPickerItem[],
-  searchQuery: string,
-): EquipmentPickerItem[] {
-  const normalizedQuery = normalizeSearchQuery(searchQuery)
-  if (normalizedQuery.text.length === 0) return [...items]
-
-  return items.filter((item) => scoreEquipmentPickerItem(item, searchQuery) > 0)
+function scoreEquipmentPickerItem(item: EquipmentPickerRow, searchQuery: string): number {
+  return (
+    matchSearchDocumentQuery(item.searchDocument, searchQuery, { profile: 'forgiving' }).score ?? 0
+  )
 }
 
 function compareEquipmentPickerItemsByPrice(
@@ -252,7 +182,7 @@ function compareScoredItemsByNameMode(
   browseSortContext?: EquipmentPickerBrowseSortContext,
 ): number {
   const nameCmp = compareName(
-    equipmentNameCollator,
+    pickerNameCollator,
     left.item.equipment.name,
     right.item.equipment.name,
     direction,
@@ -267,7 +197,6 @@ export function compareEquipmentBestMatch(
   options: {
     searchQuery: string
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
   const hasQuery = normalizeSearchQuery(options.searchQuery).text.length > 0
@@ -275,10 +204,6 @@ export function compareEquipmentBestMatch(
 
   if (hasQuery) {
     comparators.push((l, r) => compareNumberDescending(l.searchScore, r.searchScore))
-  }
-
-  if (options.workflowMode === 'magic_items') {
-    comparators.push((l, r) => compareMagicItemBestMatch(l.item, r.item))
   }
 
   comparators.push((l, r) =>
@@ -294,7 +219,6 @@ function compareEquipmentPickerItemsByBestMatch(
   options: {
     searchQuery: string
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
   return compareEquipmentBestMatch(left, right, options)
@@ -307,10 +231,9 @@ function compareEquipmentPickerScoredItems(
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
 ): number {
-  const { searchQuery, sortMode, browseSortContext, workflowMode } = options
+  const { searchQuery, sortMode, browseSortContext } = options
   const hasQuery = normalizeSearchQuery(searchQuery).text.length > 0
 
   switch (sortMode) {
@@ -318,7 +241,6 @@ function compareEquipmentPickerScoredItems(
       return compareEquipmentPickerItemsByBestMatch(left, right, {
         searchQuery,
         browseSortContext,
-        workflowMode,
       })
     case EQUIPMENT_PICKER_SORT_PRICE_ASC:
       return compareScoredItemsByPriceMode(left, right, 'asc', hasQuery, browseSortContext)
@@ -332,15 +254,14 @@ function compareEquipmentPickerScoredItems(
 }
 
 /** Score-once search inclusion and sort pipeline for tab-scoped equipment picker rows. */
-export function filterAndSortEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
+export function filterAndSortEquipmentPickerItems<T extends EquipmentPickerRow>(
+  items: readonly T[],
   options: {
     searchQuery: string
     sortMode: EquipmentPickerSortMode
     browseSortContext?: EquipmentPickerBrowseSortContext
-    workflowMode?: EquipmentPickerWorkflowMode
   },
-): EquipmentPickerItem[] {
+): T[] {
   const filtered = scoreAndFilterPickerItems(items, {
     searchQuery: options.searchQuery,
     scoreItem: scoreEquipmentPickerItem,
@@ -358,88 +279,18 @@ export {
   resolveEquipmentPickerAllowedKinds,
 } from '../../../../lib/equipment/equipment-kind-filter.lib'
 
-type EquipmentPickerStructuredFilterOptions = {
-  filterOutUnaffordable: boolean
-  filterOutNonProficient: boolean
-  selectedKind: EquipmentPickerKindFilter
-  showAffordableOnly?: boolean
-  /** Starting package purse. Required for `filterOutUnaffordable`; not a picker-row fact. */
-  budget?: EquipmentBudgetSummary
-}
-
-function exceedsStartingPackageBudget(
-  item: EquipmentPickerItem,
-  options: Pick<EquipmentPickerStructuredFilterOptions, 'filterOutUnaffordable' | 'budget'>,
-): boolean {
-  if (!options.filterOutUnaffordable || !options.budget) return false
-  if (!canPurchaseEquipment(item.equipment)) return false
-  return !fitsStartingEquipmentBudget(item.equipment, options.budget)
-}
-
-function equipmentPickerItemMatchesStructuredFilters(
-  item: EquipmentPickerItem,
-  options: EquipmentPickerStructuredFilterOptions,
-): boolean {
-  if (!isEquipmentPickerSupportedKind(item.equipment.kind)) return false
-  if (exceedsStartingPackageBudget(item, options)) return false
-  if (options.filterOutNonProficient && !item.state.isProficient) return false
-  if (options.showAffordableOnly && !item.state.isWithinRemainingBudget) return false
-  if (options.selectedKind !== EQUIPMENT_PICKER_KIND_ALL) {
-    return item.equipment.kind === options.selectedKind
-  }
-  return true
-}
-
-export function filterEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
-  options: EquipmentPickerStructuredFilterOptions,
-): EquipmentPickerItem[] {
-  return items.filter((item) => equipmentPickerItemMatchesStructuredFilters(item, options))
-}
-
-/**
- * Rows hidden by Affordable now after search/category/starting-budget filters.
- * Informational only — not part of checkbox label or active-filter counts.
- */
-export function countEquipmentPickerAffordableHiddenImpact(
-  items: readonly EquipmentPickerItem[],
-  options: {
-    searchQuery: string
-    filterOutUnaffordable: boolean
-    filterOutNonProficient: boolean
-    selectedKind: EquipmentPickerKindFilter
-    showAffordableOnly: boolean
-    budget?: EquipmentBudgetSummary
-  },
-): number {
-  if (!options.showAffordableOnly) return 0
-
-  const searchScoped = filterEquipmentPickerItemsBySearch(items, options.searchQuery)
-  const structuredFilterOptions = {
-    filterOutUnaffordable: options.filterOutUnaffordable,
-    filterOutNonProficient: options.filterOutNonProficient,
-    selectedKind: options.selectedKind,
-    budget: options.budget,
-  }
-
-  const beforeAffordable = filterEquipmentPickerItems(searchScoped, {
-    ...structuredFilterOptions,
-    showAffordableOnly: false,
-  })
-  const afterAffordable = filterEquipmentPickerItems(searchScoped, {
-    ...structuredFilterOptions,
-    showAffordableOnly: true,
-  })
-
-  const hiddenCount = beforeAffordable.length - afterAffordable.length
-  return hiddenCount > 0 ? hiddenCount : 0
+/** Drops kinds the equipment picker cannot browse. Budget and user filters stay elsewhere. */
+export function filterEligibleEquipmentPickerItems<T extends EquipmentPickerItem>(
+  items: readonly T[],
+): T[] {
+  return items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind))
 }
 
 /** Best-match order from resolved equipment facts. */
-export function sortEquipmentPickerItems(
-  items: readonly EquipmentPickerItem[],
+export function sortEquipmentPickerItems<T extends EquipmentPickerItem>(
+  items: readonly T[],
   browseSortContext?: EquipmentPickerBrowseSortContext,
-): EquipmentPickerItem[] {
+): T[] {
   return [...items].sort((left, right) =>
     compareEquipmentPickerItemsByRecommendation(left, right, browseSortContext),
   )
@@ -452,68 +303,72 @@ export function isEquipmentPickerItemDisabled(
   return resolveEquipmentPickerPurchaseActionState(item, options).disabled
 }
 
-export function getEquipmentPickerDisabledNote(
-  item: EquipmentPickerItem,
-  budget?: EquipmentBudgetSummary,
-  options?: Pick<EquipmentPickerAvailabilityOptions, 'contentAvailable'>,
-): string | undefined {
-  const action = resolveEquipmentPickerPurchaseActionState(item, {
-    budget,
-    contentAvailable: options?.contentAvailable,
-  })
+/** Aggregate ceiling for the purchase stepper: structural cap ∧ what the purse still covers. */
+export function resolveMaxPurchaseAggregate(args: {
+  equipment: EquipmentPickerItem['equipment']
+  ownership: EquipmentOwnership
+  budget?: EquipmentBudgetSummary
+}): number {
+  const purchased = args.ownership.editablePurchased.quantity
+  if (!canPurchaseEquipment(args.equipment)) return purchased
 
-  if (action.reason === 'blocked') {
-    return item.state.disabledReasons[0]
-  }
+  const structuralMax = EQUIPMENT_PURCHASE_QUANTITY_MAX - args.ownership.lockedPurchased.quantity
+  if (!args.budget) return Math.max(purchased, structuralMax)
 
-  if (action.reason === 'not_purchasable') {
-    return item.state.purchaseAvailability.status === 'unavailableForPurchase' &&
-      item.state.purchaseAvailability.reason === 'unsupported_kind'
-      ? EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL
-      : EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL
-  }
-
-  if (action.reason === 'unaffordable') {
-    return formatEquipmentUnaffordableReason(item, budget)
-  }
-
-  return undefined
+  return Math.min(
+    structuralMax,
+    maxAffordableEquipmentQuantity(args.equipment, args.budget, purchased),
+  )
 }
 
 export function resolveEquipmentPickerDrawerItemHeaderPresentation(args: {
   item: EquipmentPickerItem
   workflowMode: EquipmentPickerWorkflowMode
-  ownedQuantity?: number
+  ownership: EquipmentOwnership
   rowActionVm?: EquipmentPickerRowActionViewModel
   budget?: EquipmentBudgetSummary
+  magicItemGrantProgress?: readonly MagicItemGrantProgress[]
 }): EquipmentPickerItemPresentation {
   const row = buildEquipmentPickerRowViewModel(args.item.equipment)
-  const ownedQuantity = args.ownedQuantity ?? 0
+  const copyCap = resolveMagicItemAcquiredCopyCap({
+    equipment: args.item.equipment,
+    acquiredQuantity: args.ownership.acquiredQuantity,
+  })
 
-  if (!args.rowActionVm) {
-    if (args.workflowMode === 'purchase') {
-      const action = resolveEquipmentPickerPurchaseActionState(args.item, {
-        budget: args.budget,
-        contentAvailable: true,
-      })
-      return {
-        ...(row.priceLabel ? { secondary: { kind: 'price', label: row.priceLabel } } : {}),
-        action: action.disabled
-          ? ownedQuantity > 0
-            ? { kind: 'manage_only' }
-            : { kind: 'add', disabled: true }
-          : { kind: 'add', disabled: false },
-      }
+  const rowActionVm =
+    args.rowActionVm ??
+    (args.workflowMode === 'purchase'
+      ? ({
+          kind: 'purchase',
+          disabled: resolveEquipmentPickerPurchaseActionState(args.item, {
+            budget: args.budget,
+            contentAvailable: true,
+          }).disabled,
+          availability: args.item.state.purchaseAvailability,
+        } satisfies EquipmentPickerRowActionViewModel)
+      : undefined)
+
+  if (!rowActionVm) {
+    return {
+      control: { kind: 'none' },
+      provenance: [],
+      selectionState: null,
     }
-
-    return { action: { kind: 'none' } }
   }
 
   return resolveEquipmentPickerItemPresentation({
     equipment: args.item.equipment,
     row,
     workflowMode: args.workflowMode,
-    rowActionVm: args.rowActionVm,
-    ownedQuantity,
+    rowActionVm,
+    ownership: args.ownership,
+    ...(copyCap ? { copyCap } : {}),
+    maxPurchaseQuantity: resolveMaxPurchaseAggregate({
+      equipment: args.item.equipment,
+      ownership: args.ownership,
+      ...(args.budget ? { budget: args.budget } : {}),
+    }),
+    ...(args.magicItemGrantProgress ? { magicItemGrantProgress: args.magicItemGrantProgress } : {}),
+    exceedsPurchaseBudgetCeiling: args.item.state.exceedsPurchaseBudgetCeiling,
   })
 }

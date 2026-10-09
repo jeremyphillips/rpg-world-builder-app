@@ -1,5 +1,6 @@
 import { defineMessage } from '../../../../validation/define-message'
 import { getContentTypeSentenceForm } from '../../../content/lib/content-type-terms'
+import { getSpellCollectionKindSentenceForm } from '../../../vocab/spell/spell-collection-kind'
 import { getProficiencyDomainCompactLabel } from '../../../vocab/proficiency'
 import {
   formatProficienciesChooseClassPromptDescription,
@@ -295,22 +296,22 @@ export const characterBuilderProficiencyChoiceEmptyMessages = {
 export const characterBuilderSpellChoiceEmptyMessages = {
   cantrip: defineMessage(
     'validation.characterBuilder.spellChoiceEmpty.cantrip',
-    () => 'No cantrips chosen yet.',
+    () => `No ${getSpellCollectionKindSentenceForm('cantrips', 2)} chosen yet.`,
   ),
   cantripAdditional: defineMessage(
     'validation.characterBuilder.spellChoiceEmpty.cantripAdditional',
-    () => 'No additional cantrips chosen yet.',
+    () => `No additional ${getSpellCollectionKindSentenceForm('cantrips', 2)} chosen yet.`,
   ),
   spell: defineMessage(
     'validation.characterBuilder.spellChoiceEmpty.spell',
-    () => 'No spells chosen yet.',
+    () => `No ${getContentTypeSentenceForm('spells', 2)} chosen yet.`,
   ),
   spellAdditional: defineMessage(
     'validation.characterBuilder.spellChoiceEmpty.spellAdditional',
-    () => 'No additional spells chosen yet.',
+    () => `No additional ${getContentTypeSentenceForm('spells', 2)} chosen yet.`,
   ),
   fallback: defineMessage(
     'validation.characterBuilder.spellChoiceEmpty.fallback',
-    () => 'No spells chosen yet.',
+    () => `No ${getContentTypeSentenceForm('spells', 2)} chosen yet.`,
   ),
 }

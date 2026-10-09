@@ -5,8 +5,10 @@ import * as React from 'react'
 import { InsetPanel } from './inset-panel.client'
 import { Sheet } from './sheet.client'
 import { Spinner } from './spinner'
-import { CatalogToolbar } from './catalog-toolbar.client'
-import { CatalogPickerAuxiliaryActionSlot } from './catalog-picker-auxiliary-action.client'
+import {
+  CatalogPickerSheetHeaderChrome,
+  CatalogPickerSheetScrollBody,
+} from './catalog-picker-sheet-chrome.client'
 import { CatalogPickerSheetResults } from './catalog-picker-sheet-rows.client'
 import {
   resolveCatalogPickerSheetFilterRow,
@@ -15,20 +17,12 @@ import {
 } from './catalog-picker-sheet-toolbar.lib'
 import { useCatalogPickerSheetState } from './catalog-picker-sheet.use.client'
 import type { CatalogPickerSheetProps } from './catalog-picker-sheet.types'
-import {
-  catalogPickerSheetBodyVariants,
-  catalogPickerSheetLoadingVariants,
-  catalogPickerToolbarWithAuxiliaryActionVariants,
-} from './catalog-picker-sheet.variants'
-import { cn } from '../../lib/utils'
-import {
-  dialogPanelActionRowClasses,
-  dialogPanelScrollRegionTopInsetClasses,
-  dialogPanelSectionInsetXClasses,
-} from './dialog-panel.variants'
+import { catalogPickerSheetLoadingVariants } from './catalog-picker-sheet.variants'
+import { dialogPanelActionRowClasses } from './dialog-panel.variants'
 
 export type {
   CatalogPickerSheetProps,
+  CatalogPickerSearchStrategy,
   CatalogPickerSheetActionsHelpers,
   CatalogPickerTab,
   CatalogPickerRowLayout,
@@ -47,6 +41,29 @@ const DEFAULT_NO_RESULTS_MESSAGE = 'No items match your search.'
 const DEFAULT_NO_SCOPED_ITEMS_MESSAGE = 'No items match this view.'
 const DEFAULT_NO_ITEMS_MESSAGE = 'No items are available.'
 
+/** Matches sheet close `duration-150` so a reopen still defers after the exit slide. */
+const CATALOG_PICKER_RESULTS_RESET_DELAY_MS = 150
+
+function useCatalogPickerResultsReady(open: boolean): boolean {
+  const [ready, setReady] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!open) {
+      const resetTimer = window.setTimeout(() => {
+        setReady(false)
+      }, CATALOG_PICKER_RESULTS_RESET_DELAY_MS)
+      return () => window.clearTimeout(resetTimer)
+    }
+
+    React.startTransition(() => {
+      setReady(true)
+    })
+    return undefined
+  }, [open])
+
+  return ready
+}
+
 function resolveEmptyMessage({
   hasSearchOrFilters,
   isScopedView,
@@ -63,6 +80,54 @@ function resolveEmptyMessage({
   if (hasSearchOrFilters) return noResultsMessage
   if (isScopedView) return noScopedItemsMessage
   return noItemsMessage
+}
+
+function shouldDeferCatalogPickerResults({
+  open,
+  pickerEnabled,
+  hasBodyReplacement,
+  loading,
+  hasVisibleItems,
+  resultsReady,
+}: {
+  open: boolean
+  pickerEnabled: boolean
+  hasBodyReplacement: boolean
+  loading: boolean
+  hasVisibleItems: boolean
+  resultsReady: boolean
+}): boolean {
+  return (
+    open && pickerEnabled && !hasBodyReplacement && !loading && hasVisibleItems && !resultsReady
+  )
+}
+
+function resolveCatalogPickerSheetBodyContent({
+  loading,
+  deferResults,
+  isEmpty,
+  emptyState,
+  emptyMessage,
+  results,
+}: {
+  loading: boolean
+  deferResults: boolean
+  isEmpty: boolean
+  emptyState?: React.ReactNode
+  emptyMessage: string
+  results: React.ReactNode
+}): React.ReactNode {
+  if (loading || deferResults) {
+    return (
+      <div className={catalogPickerSheetLoadingVariants()}>
+        <Spinner size="lg" />
+      </div>
+    )
+  }
+  if (isEmpty) {
+    return <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
+  }
+  return results
 }
 
 function CatalogPickerSheetEmpty({
@@ -134,6 +199,7 @@ export function CatalogPickerSheet<TItem>({
   expandedItemId,
   onExpandedItemChange,
 }: CatalogPickerSheetProps<TItem>) {
+  const resultsReady = useCatalogPickerResultsReady(open)
   const {
     searchQuery,
     setSearchQuery,
@@ -181,26 +247,37 @@ export function CatalogPickerSheet<TItem>({
     onExpandedItemChange,
   } as CatalogPickerSheetProps<TItem>
 
-  const bodyContent = loading ? (
-    <div className={catalogPickerSheetLoadingVariants()}>
-      <Spinner size="lg" />
-    </div>
-  ) : visibleItems.length === 0 ? (
-    <CatalogPickerSheetEmpty emptyState={emptyState} message={emptyMessage} />
-  ) : (
-    <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
-  )
+  const bodyContent = resolveCatalogPickerSheetBodyContent({
+    loading,
+    deferResults: shouldDeferCatalogPickerResults({
+      open,
+      pickerEnabled,
+      hasBodyReplacement: bodyReplacement !== undefined,
+      loading,
+      hasVisibleItems: visibleItems.length > 0,
+      resultsReady,
+    }),
+    isEmpty: visibleItems.length === 0,
+    emptyState,
+    emptyMessage,
+    results: (
+      <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
+    ),
+  })
 
   const actionHelpers = React.useMemo(
     () => ({
       searchQuery,
       activeTabId,
+      visibleItemCount: visibleItems.length,
       resetSearchQuery: () => setSearchQuery(''),
       resetActiveTab,
     }),
-    [activeTabId, resetActiveTab, searchQuery, setSearchQuery],
+    [activeTabId, resetActiveTab, searchQuery, setSearchQuery, visibleItems.length],
   )
 
+  const showPickerChrome = bodyReplacement === undefined && pickerEnabled
+  const pinChromeInHeader = showPickerChrome || Boolean(headerBelowDescription)
   const renderedActions = resolveCatalogPickerSheetRenderedActions(actions, actionHelpers)
   const renderedFilterRow = resolveCatalogPickerSheetFilterRow(filterRow, actionHelpers)
   const toolbarTabs = resolveCatalogPickerSheetToolbarTabs({
@@ -220,48 +297,35 @@ export function CatalogPickerSheet<TItem>({
           headline={title}
           description={description}
           headlineClassName={headlineClassName}
+          className={pinChromeInHeader ? 'pb-0' : undefined}
         >
-          {headerExtra ? <div className="mt-4">{headerExtra}</div> : null}
-        </Sheet.Header>
-
-        {headerBelowDescription ? (
-          <div
-            className={cn(
-              dialogPanelSectionInsetXClasses,
-              dialogPanelScrollRegionTopInsetClasses,
-              'pb-4',
-            )}
-          >
-            {headerBelowDescription}
-          </div>
-        ) : null}
-
-        {bodyReplacement !== undefined ? (
-          <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyReplacement}</Sheet.Body>
-        ) : pickerEnabled ? (
-          <>
-            <CatalogToolbar
-              className={catalogPickerToolbarWithAuxiliaryActionVariants({
-                hasAuxiliaryAction: Boolean(auxiliaryAction),
-              })}
-              search={{
+          <CatalogPickerSheetHeaderChrome
+            pinChromeInHeader={pinChromeInHeader}
+            showPickerChrome={showPickerChrome}
+            headerExtra={headerExtra}
+            headerBelowDescription={headerBelowDescription}
+            auxiliaryAction={auxiliaryAction}
+            toolbarProps={{
+              search: {
                 query: searchQuery,
                 onQueryChange: setSearchQuery,
                 placeholder: searchPlaceholder,
                 ariaLabel: searchPlaceholder,
                 disabled: searchDisabled,
-              }}
-              tabs={toolbarTabs}
-              primaryControls={primaryControls}
-              filterRow={renderedFilterRow}
-              actions={renderedActions}
-            />
+              },
+              tabs: toolbarTabs,
+              primaryControls,
+              filterRow: renderedFilterRow,
+              actions: renderedActions,
+            }}
+          />
+        </Sheet.Header>
 
-            {auxiliaryAction ? <CatalogPickerAuxiliaryActionSlot action={auxiliaryAction} /> : null}
-
-            <Sheet.Body className={catalogPickerSheetBodyVariants()}>{bodyContent}</Sheet.Body>
-          </>
-        ) : null}
+        <CatalogPickerSheetScrollBody
+          bodyReplacement={bodyReplacement}
+          pickerEnabled={pickerEnabled}
+          bodyContent={bodyContent}
+        />
 
         {footer ? (
           <Sheet.Footer>

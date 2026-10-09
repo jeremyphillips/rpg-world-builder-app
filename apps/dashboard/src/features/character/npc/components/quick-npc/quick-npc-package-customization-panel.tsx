@@ -10,6 +10,8 @@ import {
   SelectionOptionCardEmbeddedPanelRowStatus,
 } from '@rpg/ui'
 
+import { EntitySummaryStatus } from '@/features/content'
+
 import {
   QUICK_NPC_ALL_REMOVED_WITHOUT_WEALTH_NOTE,
   QUICK_NPC_CANCEL_LABEL,
@@ -83,6 +85,15 @@ export function QuickNpcPackageCustomizationPanel({
           const removed = row.retainedQuantity === 0
           return (
             <SelectionOptionCardEmbeddedPanelRow key={row.entryId} label={row.label}>
+              {row.status && row.status.length > 0 ? (
+                <SelectionOptionCardEmbeddedPanelRowStatus>
+                  <EntitySummaryStatus
+                    items={row.status}
+                    density="compact"
+                    composition="metadata"
+                  />
+                </SelectionOptionCardEmbeddedPanelRowStatus>
+              ) : null}
               {removed ? (
                 <SelectionOptionCardEmbeddedPanelRowStatus>
                   {QUICK_NPC_REMOVED_LABEL}
@@ -90,27 +101,20 @@ export function QuickNpcPackageCustomizationPanel({
               ) : row.kind === 'stack' ? (
                 <NumberStepper
                   size="xs"
-                  min={0}
+                  min={1}
                   max={row.packageQuantity}
                   value={row.retainedQuantity}
                   aria-label={quickNpcQuantityAriaLabel(row.label, packageLabel)}
+                  minAction={{
+                    mode: 'remove',
+                    removeAriaLabel: quickNpcRemoveAriaLabel(row.label, packageLabel),
+                    onRemove: () => onRemove(row.entryId, row.packageQuantity),
+                  }}
                   onChange={(quantity) =>
                     onChangeQuantity(row.entryId, row.packageQuantity, quantity)
                   }
                 />
-              ) : null}
-              {removed ? (
-                <Button
-                  type="button"
-                  variant="text"
-                  size="xs"
-                  density="compact"
-                  aria-label={quickNpcRestoreAriaLabel(row.label)}
-                  onClick={() => onRestore(row.entryId)}
-                >
-                  {QUICK_NPC_RESTORE_LABEL}
-                </Button>
-              ) : (
+              ) : removed ? null : (
                 <Button
                   type="button"
                   variant="text"
@@ -122,6 +126,18 @@ export function QuickNpcPackageCustomizationPanel({
                   {QUICK_NPC_REMOVE_LABEL}
                 </Button>
               )}
+              {removed ? (
+                <Button
+                  type="button"
+                  variant="text"
+                  size="xs"
+                  density="compact"
+                  aria-label={quickNpcRestoreAriaLabel(row.label)}
+                  onClick={() => onRestore(row.entryId)}
+                >
+                  {QUICK_NPC_RESTORE_LABEL}
+                </Button>
+              ) : null}
             </SelectionOptionCardEmbeddedPanelRow>
           )
         })}

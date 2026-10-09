@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import {
+  CONTROL_ACTION_GAP_CLASSES,
   controlActionCompactIconClasses,
   controlActionDefaultIconClasses,
   controlActionLgIconClasses,
@@ -26,6 +27,9 @@ const chromeButtonVariants: Array<
 
 const textButtonTransparentClasses = 'bg-transparent hover:bg-transparent active:bg-transparent'
 
+/** Default labeled-button icon scale — applied per size recipe, not on the CVA base (xs/sm/md tiers override). */
+const defaultLabeledButtonIconGlyphClasses = iconGlyphDescendantClasses.lg
+
 /**
  * Button class variants. Kept in a non-client module so server components (e.g.
  * styling a Next.js `<Link>`) can call `buttonVariants()` without pulling in the
@@ -34,15 +38,14 @@ const textButtonTransparentClasses = 'bg-transparent hover:bg-transparent active
 export const buttonVariants = cva(
   // `cursor-pointer` is explicit because Tailwind v4 preflight resets buttons to `cursor: default`.
   cn(
-    'inline-flex cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-body-emphasis transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+    'inline-flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md text-sm font-body-emphasis transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
     interactiveFocusVariants({ context: 'standalone' }),
-    iconGlyphDescendantClasses.lg,
   ),
   {
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/80',
+          'bg-action-primary text-action-primary-foreground shadow-sm hover:bg-action-primary/90 active:bg-action-primary/80',
         destructive:
           'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive/80',
         warning:
@@ -51,7 +54,7 @@ export const buttonVariants = cva(
           'border-0 bg-transparent shadow-none rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         outline: `${outlineControlShellClasses} ${outlineControlExpandedClasses}`,
         secondary:
-          'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 active:bg-secondary/60',
+          'bg-action-secondary text-action-secondary-foreground shadow-sm hover:bg-action-secondary/80 active:bg-action-secondary/60',
         ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
         text: textButtonTransparentClasses,
       },
@@ -74,7 +77,11 @@ export const buttonVariants = cva(
         variant: chromeButtonVariants,
         size: 'default',
         density: 'default',
-        class: 'h-9 px-4 py-2',
+        class: cn(
+          'h-9 px-4 py-2',
+          CONTROL_ACTION_GAP_CLASSES.md,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
       },
       {
         variant: chromeButtonVariants,
@@ -92,22 +99,34 @@ export const buttonVariants = cva(
         variant: chromeButtonVariants,
         size: 'sm',
         density: 'default',
-        class: 'h-8 rounded-md px-3',
+        class: cn(
+          'h-8 rounded-md px-3',
+          CONTROL_ACTION_GAP_CLASSES.sm,
+          iconGlyphDescendantClasses.sm,
+        ),
       },
       {
         variant: chromeButtonVariants,
         size: 'lg',
         density: 'default',
-        class: 'h-10 rounded-md px-6',
+        class: cn(
+          'h-10 rounded-md px-6',
+          CONTROL_ACTION_GAP_CLASSES.md,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
       },
       { size: 'icon', density: 'default', class: controlActionDefaultIconClasses },
       { size: 'icon-xs', class: controlActionXsIconClasses },
-      { size: 'icon-lg', density: 'default', class: controlActionLgIconClasses },
+      { size: 'icon-lg', class: controlActionLgIconClasses },
       {
         variant: chromeButtonVariants,
         size: 'default',
         density: 'compact',
-        class: 'h-8 px-3 py-1',
+        class: cn(
+          'h-8 px-3 py-1',
+          CONTROL_ACTION_GAP_CLASSES.sm,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
       },
       {
         variant: chromeButtonVariants,
@@ -119,7 +138,11 @@ export const buttonVariants = cva(
         variant: chromeButtonVariants,
         size: 'lg',
         density: 'compact',
-        class: 'h-9 px-5 py-1.5',
+        class: cn(
+          'h-9 px-5 py-1.5',
+          CONTROL_ACTION_GAP_CLASSES.md,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
       },
       {
         size: 'icon',
@@ -128,25 +151,81 @@ export const buttonVariants = cva(
       },
       {
         variant: 'text',
+        size: 'default',
+        density: 'default',
+        class: cn(
+          'h-8 px-0 w-fit',
+          CONTROL_ACTION_GAP_CLASSES.md,
+          textButtonTransparentClasses,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
+      },
+      {
+        variant: 'text',
+        size: 'default',
+        density: 'compact',
+        class: cn(
+          'h-6 px-0 w-fit',
+          CONTROL_ACTION_GAP_CLASSES.xs,
+          textButtonTransparentClasses,
+          iconGlyphDescendantClasses.sm,
+        ),
+      },
+      {
+        variant: 'text',
+        size: 'sm',
+        density: 'default',
+        class: cn(
+          'h-8 px-0 w-fit',
+          CONTROL_ACTION_GAP_CLASSES.sm,
+          textButtonTransparentClasses,
+          iconGlyphDescendantClasses.sm,
+        ),
+      },
+      {
+        variant: 'text',
+        size: 'sm',
+        density: 'compact',
+        class: cn(
+          'h-6 px-0 w-fit',
+          CONTROL_ACTION_GAP_CLASSES.xs,
+          textButtonTransparentClasses,
+          iconGlyphDescendantClasses.sm,
+        ),
+      },
+      {
+        variant: 'text',
         size: 'xs',
         density: 'default',
-        class: 'text-sm',
+        class: cn(
+          'h-8 px-0 w-fit text-sm',
+          CONTROL_ACTION_GAP_CLASSES.sm,
+          textButtonTransparentClasses,
+          iconGlyphDescendantClasses.sm,
+        ),
       },
       {
         variant: 'text',
         size: 'xs',
         density: 'compact',
-        class: cn('w-fit', controlActionXsCompactTextOnlyClasses, textButtonTransparentClasses),
+        class: cn(
+          'w-fit',
+          controlActionXsCompactTextOnlyClasses,
+          CONTROL_ACTION_GAP_CLASSES.xs,
+          textButtonTransparentClasses,
+          iconGlyphDescendantClasses.xs,
+        ),
       },
       {
         variant: 'text',
+        size: 'lg',
         density: 'default',
-        class: cn('h-8 px-0 w-fit', textButtonTransparentClasses),
-      },
-      {
-        variant: 'text',
-        density: 'compact',
-        class: cn('h-6 px-0 w-fit', textButtonTransparentClasses),
+        class: cn(
+          'h-8 px-0 w-fit',
+          CONTROL_ACTION_GAP_CLASSES.md,
+          textButtonTransparentClasses,
+          defaultLabeledButtonIconGlyphClasses,
+        ),
       },
       {
         variant: 'attached',
@@ -155,6 +234,8 @@ export const buttonVariants = cva(
           'h-full min-h-0 w-full py-0',
           fieldGroupedControlActionPaddingClasses.sm,
           fieldGroupedSegmentEndClasses,
+          CONTROL_ACTION_GAP_CLASSES.sm,
+          iconGlyphDescendantClasses.sm,
         ),
       },
       {
@@ -164,6 +245,8 @@ export const buttonVariants = cva(
           'h-full min-h-0 w-full py-0 text-xs',
           fieldGroupedControlActionPaddingClasses.sm,
           fieldGroupedSegmentEndClasses,
+          CONTROL_ACTION_GAP_CLASSES.xs,
+          iconGlyphDescendantClasses.xs,
         ),
       },
       {
@@ -173,6 +256,8 @@ export const buttonVariants = cva(
           'h-full min-h-0 w-full py-0',
           fieldGroupedControlActionPaddingClasses.md,
           fieldGroupedSegmentEndClasses,
+          CONTROL_ACTION_GAP_CLASSES.md,
+          defaultLabeledButtonIconGlyphClasses,
         ),
       },
       {
@@ -182,6 +267,8 @@ export const buttonVariants = cva(
           'h-full min-h-0 w-full py-0',
           fieldGroupedControlActionPaddingClasses.lg,
           fieldGroupedSegmentEndClasses,
+          CONTROL_ACTION_GAP_CLASSES.md,
+          defaultLabeledButtonIconGlyphClasses,
         ),
       },
     ],

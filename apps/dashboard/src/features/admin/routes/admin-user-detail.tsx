@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ActionIcon, Badge, buttonVariants, Heading, RowActionsMenu, Text } from '@rpg/ui'
 import { PLATFORM_ROLE_ENTRIES } from '@rpg/contracts'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import { ROUTES } from '@/app/routes'
 import { PageShell } from '@/components/layout/page/page-shell'
@@ -9,7 +10,7 @@ import { useIsSuperadmin } from '@/features/auth'
 
 import { DeleteUserDialog } from '../components/delete-user-dialog'
 import { AdminUserContextLine } from '../components/admin-user-tab-nav'
-import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
+import { useAdminUserRouteContext } from '../lib/use-admin-user-route-context'
 import { toAdminUserDeleteSubject } from '../lib/admin-user-delete-subject'
 import {
   formatAdminUserDetailJoined,
@@ -133,8 +134,10 @@ export function AdminUserDetail() {
           <div>
             <dt className="text-xs text-muted-foreground">Characters</dt>
             <dd className="text-sm font-medium">
-              {user.characterCount} character{user.characterCount === 1 ? '' : 's'} ·{' '}
-              {user.controlledCharacterCount} controlled in campaigns
+              {joinInlineMetadata([
+                `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
+                `${user.controlledCharacterCount} controlled in campaigns`,
+              ])}
             </dd>
             <Link
               to={ROUTES.admin.user.characters(user.id)}

@@ -1,4 +1,5 @@
 import type { ProgressionExtension } from '../../../vocab/spell/progression-extension'
+import { getSlotProgressionKindLabel } from '../../../vocab/spell/slot-progression-kind'
 
 import { expandSlotCountsForDisplay, normalizeSlotCounts } from './lookup'
 import type { LeveledSlotRow, PactSlotRow, SlotProgression } from './slot-progression'
@@ -160,7 +161,7 @@ export function resolveDisplaySlotRowAtLevel(
 
 /** Feature-table label derived from slot progression kind. */
 export function spellcastingFeatureLabelForSlotProgression(progression: SlotProgression): string {
-  return progression.kind === 'pact' ? 'Pact Magic' : 'Spellcasting'
+  return progression.kind === 'pact' ? getSlotProgressionKindLabel('pact-magic') : 'Spellcasting'
 }
 
 export type { ProgressionExtension }

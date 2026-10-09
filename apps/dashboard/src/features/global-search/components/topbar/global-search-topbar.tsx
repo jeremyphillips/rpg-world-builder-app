@@ -11,7 +11,7 @@ import { resolveGlobalSearchHref } from '../../lib/resolve-global-search-href'
 import { GlobalSearchField } from '../global-search-field'
 import { GlobalSearchPreviewPanel } from './global-search-preview-panel'
 import { GlobalSearchTrigger } from './global-search-trigger'
-import { useGlobalSearchContext } from '../global-search-provider'
+import { useGlobalSearchContext } from '../global-search-context'
 import {
   globalSearchTopbarInputWrapClasses,
   globalSearchTopbarPreviewClasses,

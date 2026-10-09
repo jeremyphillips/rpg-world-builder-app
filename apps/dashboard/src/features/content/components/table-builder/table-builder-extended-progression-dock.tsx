@@ -2,7 +2,7 @@ import { useId, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { Button, InlineMetadata, InsetPanel, NumberInput, Text } from '@rpg/ui'
 
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import type { TableBuilderFormValues } from '../../lib/table-builder/table-builder-draft'
 import { tableBuilderAuthoringPaneClasses } from './table-builder.variants'
 import {

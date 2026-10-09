@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ComponentProps } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import {
   applyEquipmentStepAction,
@@ -31,13 +31,11 @@ import {
 import {
   choiceSetsForEquipmentStep,
   findStartingEquipmentChoiceSet,
-  readEquipmentPurchaseQuantity,
   readSelectedStartingEquipmentOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
-  resolvePurchaseSourceMode,
-  resolveStartingGoldPurchaseId,
   shouldShowEquipmentPurchaseWorkflow,
+  resolveEquipmentStepFundingState,
   type EquipmentPickerWorkflowMode,
 } from '../lib/equipment/equipment-step.lib'
 import { useEquipmentMagicItemWorkflow } from './use-equipment-magic-item-workflow'
@@ -45,8 +43,14 @@ import { withChoiceSetSelections } from '../lib/choice-sets/choice-set-selection
 import { resolveEquipmentStepSurface } from '../lib/equipment/resolve-equipment-step-surface.lib'
 import { resolveEquipmentPickerCharacterPreviewContext } from '../components/equipment/picker/details/equipment-picker-character-preview.lib'
 import { resolvePackageSwitchCommitErrorFromIssues } from '../lib/equipment/equipment-package-switch-resolution.lib'
-import type { EquipmentPickerItem } from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
-import type { EquipmentPickerDrawer } from '../components/equipment/picker/drawer/equipment-picker-drawer'
+import {
+  EMPTY_EQUIPMENT_SELECTION_FACTS,
+  type EquipmentSelectionFacts,
+} from '../lib/equipment/equipment-selection-facts.lib'
+import type {
+  EquipmentPickerItem,
+  EquipmentPickerRow,
+} from '../components/equipment/picker/drawer/equipment-picker-drawer.types'
 import type { EquipmentStepInventorySectionProps } from '../components/builder/steps/equipment/equipment-step-sections'
 
 type PendingEquipmentSelection = {
@@ -61,6 +65,7 @@ export type PendingEquipmentPackageSwitch = {
   committedInventorySnapshot: EquipmentPackageSwitchInventorySnapshot
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+  isInitialSelection: boolean
 }
 
 function resolveGoldOptionFundingFromClass(
@@ -71,21 +76,6 @@ function resolveGoldOptionFundingFromClass(
   if (!startingEquipment) return undefined
   const goldOption = startingEquipment.options.find(isStartingGoldOption)
   return goldOption ? fundingByOptionId.get(goldOption.id) : undefined
-}
-
-function collectOwnedPurchaseQuantities(
-  draft: CharacterBuilderDraft,
-  activePurchaseSourceMode: ReturnType<typeof resolvePurchaseSourceMode> | undefined,
-): Record<string, number> {
-  if (!activePurchaseSourceMode) return {}
-
-  const quantities: Record<string, number> = {}
-  for (const purchase of draft.equipment?.purchases ?? []) {
-    if (purchase.sourceMode === activePurchaseSourceMode) {
-      quantities[purchase.equipmentId] = purchase.quantity
-    }
-  }
-  return quantities
 }
 
 export function useEquipmentStep(args: {
@@ -219,27 +209,42 @@ export function useEquipmentStep(args: {
     targetOptionId: string,
   ): ResolvedStartingEquipmentFunding | undefined => fundingByOptionId.get(targetOptionId)
   const showPurchaseWorkflow = shouldShowEquipmentPurchaseWorkflow(draft, selectedOptionId, budget)
-  const { items: pickerItems, browseSortContext: pickerBrowseSortContext } = useMemo(() => {
-    const resolved = characterClass
-      ? resolveEquipmentStepPickerItems({
-          draft,
-          characterClass,
-          catalogIndex,
-          choiceSets: resolvedChoiceSets,
-          budget,
-          context,
-        })
-      : { items: [], browseSortContext: { preferMartialWeaponBrowseOrder: false as const } }
-    return {
-      items: resolved.items,
-      browseSortContext: {
-        ...resolved.browseSortContext,
-        activeChoice: focusedAllowanceId
-          ? { kind: 'allowance' as const, allowanceId: focusedAllowanceId }
-          : { kind: 'none' as const },
-      },
+  const fundingState = useMemo(
+    () => resolveEquipmentStepFundingState({ draft, catalogIndex, budget }),
+    [budget, catalogIndex, draft],
+  )
+  const pickerItemResult = useMemo(() => {
+    if (!characterClass) {
+      return {
+        items: [] as EquipmentPickerRow[],
+        browseSortContext: { preferMartialWeaponBrowseOrder: false as const },
+        resolvedById: EMPTY_EQUIPMENT_SELECTION_FACTS.resolvedById,
+      }
     }
-  }, [budget, catalogIndex, characterClass, context, draft, focusedAllowanceId, resolvedChoiceSets])
+
+    return resolveEquipmentStepPickerItems({
+      draft,
+      characterClass,
+      catalogIndex,
+      choiceSets: resolvedChoiceSets,
+      budget,
+      context,
+    })
+  }, [budget, catalogIndex, characterClass, context, draft, resolvedChoiceSets])
+  const pickerItems = pickerItemResult.items
+  const selectionFacts = useMemo<EquipmentSelectionFacts>(
+    () => ({ resolvedById: pickerItemResult.resolvedById, rulesetId: context.rulesetId }),
+    [context.rulesetId, pickerItemResult.resolvedById],
+  )
+  const pickerBrowseSortContext = useMemo(
+    () => ({
+      ...pickerItemResult.browseSortContext,
+      activeChoice: focusedAllowanceId
+        ? { kind: 'allowance' as const, allowanceId: focusedAllowanceId }
+        : { kind: 'none' as const },
+    }),
+    [focusedAllowanceId, pickerItemResult.browseSortContext],
+  )
   const magicItemWorkflow = useEquipmentMagicItemWorkflow({
     draft,
     context,
@@ -262,12 +267,6 @@ export function useEquipmentStep(args: {
         : undefined,
     [budget, catalogIndex, context.characterCreationRules, context.rulesetId, draft, showBudget],
   )
-  const activePurchaseSourceMode = showBudget ? resolvePurchaseSourceMode() : undefined
-  const ownedPurchaseQuantities = useMemo(
-    () => collectOwnedPurchaseQuantities(draft, activePurchaseSourceMode),
-    [activePurchaseSourceMode, draft.equipment?.purchases],
-  )
-
   const applyEquipmentAction = (
     action: Parameters<typeof applyEquipmentStepAction>[0]['action'],
   ) => {
@@ -303,6 +302,7 @@ export function useEquipmentStep(args: {
       nestedSelections,
       draftQuantitiesByPurchaseId: initPackageSwitchDraftQuantities(evaluation),
       committedInventorySnapshot: createEquipmentPackageSwitchInventorySnapshot(draft),
+      isInitialSelection: selectedOptionId === undefined,
     })
   }
 
@@ -591,7 +591,6 @@ export function useEquipmentStep(args: {
     applyEquipmentAction({
       kind: 'add_purchase',
       equipmentId: item.equipment.id,
-      sourceMode: resolvePurchaseSourceMode(),
       quantity,
     })
   }
@@ -604,40 +603,6 @@ export function useEquipmentStep(args: {
       kind: 'set_purchase_quantity',
       purchaseId: target.purchaseId,
       quantity,
-    })
-  }
-
-  const handleRemoveFromInventory: ComponentProps<
-    typeof EquipmentPickerDrawer
-  >['onRemoveFromInventory'] = (item) => {
-    const purchaseId = resolveStartingGoldPurchaseId(draft, item.equipment.id)
-    if (!purchaseId) return
-
-    applyEquipmentAction({
-      kind: 'remove_entry',
-      target: { kind: 'purchase', purchaseId },
-    })
-  }
-
-  const handleRemoveOneFromInventory: ComponentProps<
-    typeof EquipmentPickerDrawer
-  >['onRemoveOneFromInventory'] = (item) => {
-    const equipmentId = item.equipment.id
-    const purchaseId = resolveStartingGoldPurchaseId(draft, equipmentId)
-    if (!purchaseId) return
-
-    const sourceMode = resolvePurchaseSourceMode()
-    const currentQuantity = readEquipmentPurchaseQuantity(draft, equipmentId, sourceMode)
-
-    if (currentQuantity <= 1) {
-      handleRemoveFromInventory(item)
-      return
-    }
-
-    applyEquipmentAction({
-      kind: 'set_purchase_quantity',
-      purchaseId,
-      quantity: currentQuantity - 1,
     })
   }
 
@@ -666,12 +631,13 @@ export function useEquipmentStep(args: {
     focusedAllowanceId,
     setFocusedAllowanceId,
     budget,
+    fundingState,
     pickerItems: magicItemWorkflow.filteredPickerItems,
+    matchesMagicItemAllowance: magicItemWorkflow.matchesMagicItemAllowance,
     allPickerItems: pickerItems,
+    selectionFacts,
     pickerBrowseSortContext,
     characterPreviewContext,
-    ownedPurchaseQuantities,
-    ownedGrantQuantities: magicItemWorkflow.ownedGrantQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -697,8 +663,6 @@ export function useEquipmentStep(args: {
     openPicker,
     handleAddItem,
     handleSetPurchaseQuantity,
-    handleRemoveFromInventory,
-    handleRemoveOneFromInventory,
     applySelection,
     skipStartingEquipment: () => applyEquipmentAction({ kind: 'skip_starting_equipment' }),
     onRemoveItem: (target: EquipmentStepRemoveTarget) =>

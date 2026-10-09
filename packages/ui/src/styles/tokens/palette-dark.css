@@ -2,7 +2,8 @@
  * Layer 1 — dark theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — mirrors palette-light.css names exactly.
  *
- * Warm neutral dark — parchment-adjacent hue, low-chroma surfaces, gold primary.
+ * Warm neutral dark — parchment-adjacent hue, low-chroma surfaces.
+ * Action fills keep the light-theme hues: a lifted rust and a slightly deeper gold.
  */
 .dark {
   --palette-neutral-hue: 80;
@@ -14,7 +15,6 @@
   --palette-fg-default: oklch(0.985 0.006 82);
   --palette-fg-on-solid: oklch(0.985 0 0);
   --palette-fg-on-status: oklch(0.141 0.004 var(--palette-neutral-hue));
-  --palette-surface-secondary: oklch(0.194 0.005 var(--palette-neutral-hue));
   --palette-surface-accent: oklch(0.32 0.006 var(--palette-neutral-hue));
 
   /* Derived surfaces — editable plane lifted from canvas toward panel */
@@ -123,8 +123,14 @@
   --palette-switch-track-hover: oklch(0.985 0.006 82 / 28%);
   --palette-switch-track-disabled: oklch(0.985 0.006 82 / 10%);
 
-  --palette-primary: oklch(0.78 0.13 75);
-  --palette-primary-foreground: oklch(0.141 0.004 var(--palette-neutral-hue));
+  --palette-primary: oklch(0.68 0.16 36.6);
+  --palette-primary-foreground: var(--palette-fg-on-status);
+  --palette-secondary: oklch(0.66 0.085 75);
+  --palette-secondary-foreground: var(--palette-fg-on-status);
+  --palette-action-primary: var(--palette-primary);
+  --palette-action-primary-foreground: var(--palette-fg-on-status);
+  --palette-action-secondary: var(--palette-secondary);
+  --palette-action-secondary-foreground: var(--palette-fg-on-status);
   --palette-on-solid: var(--palette-fg-on-solid);
 
   --palette-destructive: oklch(0.704 0.191 22.216);

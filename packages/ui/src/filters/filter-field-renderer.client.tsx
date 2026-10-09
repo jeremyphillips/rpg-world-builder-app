@@ -5,15 +5,15 @@ import { Button } from '../components/ui/button.client'
 import { Checkbox } from '../components/ui/checkbox.client'
 import { FilterPopover } from '../components/ui/filter-popover.client'
 import { Input } from '../components/ui/input.client'
-import { Text } from '../components/ui/text'
 import { cn } from '../lib/utils'
 import { useFilterChrome } from './filter-chrome.context'
-import { isFilterFieldDisabled } from './filter-bar.lib'
+import { isFilterFieldDisabled, resolveFilterPopoverSizerLabels } from './filter-bar.lib'
 import { resolveChipsFieldOptions, resolvePopoverFieldGroups } from './filter-field-options.lib'
 import { FilterInlineControl } from './filter-inline-control.client'
 import {
   resolveFilterFieldPresentation,
   resolveFilterFieldWidthClasses,
+  resolveFilterSelectWidthToken,
   type FilterFieldPresentation,
 } from './filter-presentation.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
@@ -214,11 +214,13 @@ function FilterPopoverField<TData, TState extends Record<string, unknown>>({
   }
 
   const activeCount = countPopoverActiveFilters(recordValue)
+  const totalOptionCount = groups.reduce((count, group) => count + group.options.length, 0)
 
   return (
     <div className={presentation.groupClassName}>
       <FilterPopover
         triggerLabel={popoverField.triggerLabel(activeCount)}
+        sizingLabels={resolveFilterPopoverSizerLabels(popoverField.triggerLabel, totalOptionCount)}
         triggerAriaLabel={popoverField.triggerAriaLabel ?? popoverField.label}
         triggerSize={presentation.triggerSize}
         disabled={disabled}
@@ -246,7 +248,6 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   field,
   controlId,
   presentation,
-  optionsContext,
   disabled,
   state,
   onValueChange,
@@ -254,14 +255,12 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
   field: BooleanFilterFieldDef<TData, TState, FilterFieldId<TState>>
   controlId: string
   presentation: Extract<FilterFieldPresentation, { type: 'boolean' }>
-  optionsContext: FilterFieldOptionsContext<TData, TState>
   disabled?: boolean
   state: TState
   onValueChange: FilterFieldRendererProps<TData, TState>['context']['onValueChange']
 }) {
   const booleanField = field
   const isChecked = state[booleanField.id] === true
-  const hiddenCount = booleanField.hiddenCount?.(state, optionsContext)
 
   return (
     <FilterInlineControl className={presentation.groupClassName}>
@@ -282,11 +281,6 @@ function FilterBooleanField<TData, TState extends Record<string, unknown>>({
       >
         {booleanField.label}
       </label>
-      {isChecked && hiddenCount !== undefined && hiddenCount > 0 ? (
-        <Text as="span" variant="muted" className="text-xs tabular-nums">
-          {hiddenCount} hidden
-        </Text>
-      ) : null}
     </FilterInlineControl>
   )
 }
@@ -298,9 +292,7 @@ export function FilterFieldRenderer<TData, TState extends Record<string, unknown
 }: FilterFieldRendererProps<TData, TState>) {
   const chrome = useFilterChrome()
   const presentation = resolveFilterFieldPresentation(field, chrome)
-  const widthClassName = resolveFilterFieldWidthClasses(
-    field.type === 'select' ? field.width : undefined,
-  )
+  const widthClassName = resolveFilterFieldWidthClasses(resolveFilterSelectWidthToken(field))
   const disabled = isFilterFieldDisabled(field, context.state, context.disabled)
   const optionsContext: FilterFieldOptionsContext<TData, TState> = {
     state: context.state,
@@ -366,7 +358,6 @@ export function FilterFieldRenderer<TData, TState extends Record<string, unknown
           field={field}
           controlId={controlId}
           presentation={presentation as Extract<FilterFieldPresentation, { type: 'boolean' }>}
-          optionsContext={optionsContext}
           disabled={disabled}
           state={context.state}
           onValueChange={context.onValueChange}

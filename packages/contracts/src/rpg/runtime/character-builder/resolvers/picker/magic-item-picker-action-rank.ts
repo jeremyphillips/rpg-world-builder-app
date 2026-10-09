@@ -70,6 +70,7 @@ export function getMagicItemPickerActionRank(args: {
   return { rank: 2, reason: 'no_matching_choice' }
 }
 
+/** Action-state order. Equipment browse sort does not call this. */
 export function compareMagicItemBestMatch(
   left: EquipmentPickerItem,
   right: EquipmentPickerItem,

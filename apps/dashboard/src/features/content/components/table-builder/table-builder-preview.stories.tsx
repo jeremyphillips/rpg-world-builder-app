@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
+import { getSlotProgressionKindLabel } from '@rpg/contracts'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import {
@@ -77,7 +78,7 @@ export const EmptyDraft: Story = {
 export const WideLeveledSlotProgression: Story = {
   args: {
     values: buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     }),
@@ -88,7 +89,7 @@ export const WideLeveledSlotProgression: Story = {
 export const ExtendedLeveledSlotProgression: Story = {
   args: {
     values: buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 22,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
       extendedTierName: 'Epic Destiny',

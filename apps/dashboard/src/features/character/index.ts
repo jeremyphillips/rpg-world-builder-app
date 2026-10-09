@@ -165,8 +165,18 @@ export {
   buildCharacterPickerOptionSearchText,
   type CharacterPickerOption,
 } from './lib/picker/character-picker-option.lib'
+export { CHARACTER_PICKER_SEARCH_PLACEHOLDER } from './components/connections/picker/character-picker-drawer.types'
 export { CHARACTER_CONTROLLER_DISPLAY } from './lib/display/character-display-labels'
-export { formatContentReferenceLabel } from './lib/display/format-content-reference-label'
+export {
+  createCharacterClassFilterLabelResolver,
+  formatContentReferenceLabel,
+} from './lib/display/format-content-reference-label'
+export {
+  hasCatalogPickerNarrowingCriteria,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from './components/picker/catalog-picker-filter-state.lib'
+export { CatalogToolbarResetSlot } from './components/picker/catalog-toolbar-reset-action'
 export {
   SAMPLE_PC,
   makeCampaignNpcListItem,

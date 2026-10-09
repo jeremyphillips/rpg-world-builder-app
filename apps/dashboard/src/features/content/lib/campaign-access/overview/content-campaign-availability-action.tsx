@@ -23,7 +23,7 @@ function AvailabilityStatusIndicator({ available }: { available: boolean }) {
     return <span aria-hidden className="size-2 shrink-0 rounded-full bg-semantic-success" />
   }
 
-  return <CircleSlash aria-hidden className="size-3.5 shrink-0 text-semantic-warning" />
+  return <CircleSlash aria-hidden className="size-icon-inline shrink-0 text-semantic-warning" />
 }
 
 function availabilitySwitchLabel(available: boolean): string {
@@ -57,7 +57,7 @@ export function ContentCampaignAvailabilityAction({
 
       <div className="mt-2 flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 text-xs">
             <AvailabilityStatusIndicator available={available} />
             <span
               className={

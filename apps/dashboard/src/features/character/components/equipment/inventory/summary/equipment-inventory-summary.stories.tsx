@@ -20,6 +20,14 @@ import {
   equipmentStepMonkClassFixture,
   equipmentStepPotionOfHealingFixture,
 } from '../../../../lib/equipment/equipment-step.fixtures'
+import {
+  selectionFactsDraft,
+  selectionFactsFighterClass,
+  selectionFactsForDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+} from '../../../../lib/equipment/equipment-selection-facts.fixtures'
+import { EquipmentSelectionFactsProvider } from '../../selection-facts/equipment-selection-facts-provider'
 import { EquipmentInventorySummary } from './equipment-inventory-summary'
 
 const monkToolChoiceSetId = buildChoiceSetId(
@@ -33,7 +41,7 @@ function monkStandardDraft(extra?: {
     equipmentId: string
     quantity: number
     sourceMode: 'startingGold'
-    origin?: 'picker'
+    origin: 'picker'
   }>
   magicItemSelections?: Array<{
     allowanceId: string
@@ -111,6 +119,29 @@ export const StandardPackageWithPurchases: Story = {
         },
       ],
     }),
+    catalogIndex: cartCatalogIndex,
+  },
+}
+
+export const PendingRetainedPurchases: Story = {
+  args: {
+    draft: {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [
+          {
+            equipmentId: equipmentStepBattleaxeFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        classPackage: { state: 'unresolved' as const },
+        editedSincePackageSelection: false,
+      },
+    },
     catalogIndex: cartCatalogIndex,
   },
 }
@@ -396,4 +427,47 @@ export const PackageWithInvalidItem: Story = {
     draft: monkStandardDraft(),
     catalogIndex: packageOnlyClassCatalog,
   },
+}
+
+const selectionScenario = selectionFactsScenario()
+
+function SelectionStatusStory({ draft }: { draft: ReturnType<typeof selectionFactsDraft> }) {
+  return (
+    <EquipmentSelectionFactsProvider facts={selectionFactsForDraft(selectionScenario, draft)}>
+      <EquipmentInventorySummary
+        draft={draft}
+        catalogIndex={selectionScenario.catalogIndex}
+        {...inventoryManagementArgs}
+        context={selectionScenario.context}
+      />
+    </EquipmentSelectionFactsProvider>
+  )
+}
+
+/** STR 8 Wizard cart: owned rows show compatibility only. */
+export const OwnedCompatibilityStatus: Story = {
+  render: () => (
+    <SelectionStatusStory
+      draft={selectionFactsDraft({
+        optionId: 'starting-gold',
+        purchases: [
+          selectionFactsPurchase('plate-armor'),
+          selectionFactsPurchase('greataxe'),
+          selectionFactsPurchase('dagger'),
+        ],
+      })}
+    />
+  ),
+}
+
+/** STR 8 Fighter package: expand the Starting Package to see the review-context armor badge. */
+export const PackageReviewStatus: Story = {
+  render: () => (
+    <SelectionStatusStory
+      draft={selectionFactsDraft({
+        characterClass: selectionFactsFighterClass,
+        optionId: 'heavy-armor',
+      })}
+    />
+  ),
 }

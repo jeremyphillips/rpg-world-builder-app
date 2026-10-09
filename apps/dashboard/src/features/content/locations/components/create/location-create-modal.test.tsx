@@ -137,6 +137,9 @@ vi.mock('../../../organizations', () => ({
 
 vi.mock('../../../organizations/components/authoring/organization-authoring-context', () => ({
   OrganizationAuthoringProvider: ({ children }: { children: ReactNode }) => children,
+}))
+
+vi.mock('../../../organizations/components/authoring/use-organization-authoring-context', () => ({
   useOrganizationAuthoringContext: () => ({
     practiceRecommendations: [],
     setPracticeRecommendations: vi.fn(),

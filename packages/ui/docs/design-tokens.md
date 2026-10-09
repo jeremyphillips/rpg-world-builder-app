@@ -60,15 +60,15 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 / `--border-*` roles remain for `var()` probes; do not bridge them through `@theme inline`
 `--color-*` aliases.
 
-| Role        | Utility                 | Meaning                                                             |
-| ----------- | ----------------------- | ------------------------------------------------------------------- |
-| Base        | `bg-background`         | Page canvas                                                         |
-| Panel       | `bg-card`, `bg-popover` | Warm elevated panels / overlays                                     |
-| Subtle wash | `bg-surface-subtle`     | Barely visible grouping; primary filter chrome, utility bar         |
-| Faint wash  | `bg-surface-faint`      | Lightest panel wash                                                 |
-| Muted wash  | `bg-surface-muted`      | Standard secondary panel / chrome                                   |
-| Strong wash | `bg-surface-strong`     | Dense neutral chrome (not brand/selected meaning)                   |
-| Sunken      | `bg-sunken`             | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
+| Role        | Utility             | Meaning                                                             |
+| ----------- | ------------------- | ------------------------------------------------------------------- |
+| Base        | `bg-background`     | Page canvas                                                         |
+| Panel       | `bg-card`           | Warm elevated panels                                                |
+| Subtle wash | `bg-surface-subtle` | Barely visible grouping; primary filter chrome, utility bar         |
+| Faint wash  | `bg-surface-faint`  | Lightest panel wash                                                 |
+| Muted wash  | `bg-surface-muted`  | Standard secondary panel / chrome                                   |
+| Strong wash | `bg-surface-strong` | Dense neutral chrome (not brand/selected meaning)                   |
+| Sunken      | `bg-sunken`         | Recessed / inset fill — pair with `shadow-surface-sunken` for wells |
 
 `shadow-surface-raised` and `shadow-surface-sunken` are Layer 2 recipes (`--surface-raised-shadow`,
 `--surface-sunken-shadow`) — raised panels use the former; `InsetPanel` defaults to `surface="sunken"`
@@ -76,8 +76,10 @@ etc.) are custom `@utility` definitions in `surface-relative-chrome.utilities.cs
 
 Empty-state wells (`EmptyPanel`, dashed `InsetPanel` gates) standardize on sunken — see
 [empty-state-containers.md](./empty-state-containers.md).
-| Secondary | `bg-secondary` | Alternate **interactive** surface (e.g. Button `secondary`) |
-| Lift plane | `bg-surface-lift` | Canvas lifted toward white (light) or panel (dark) — searchable list panels and field fills |
+| Secondary | `bg-secondary` | Aliases the secondary action fill |
+| Primary action | `bg-action-primary` | Solid primary button. Deep rust in light; the same hue, lifted, in dark |
+| Secondary action | `bg-action-secondary` | Solid secondary button. Warm gold in light; a slightly deeper gold in dark |
+| Lift plane | `bg-surface-lift`, `bg-popover` | Canvas lifted toward white (light) or panel (dark) — overlays, searchable list panels, and field fills |
 | Field | `bg-input`, `border-input` | Editable control chrome — aliases the lift plane |
 
 `bg-muted` aliases `bg-surface-muted` for shadcn compatibility — prefer `bg-surface-*` in new code.
@@ -259,23 +261,55 @@ Label type for the xs tier: `text-control-action-xs` (10px) — control lane onl
 **Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
 geometry (its own `xs`–`lg` ladder in `number-stepper.variants.ts`), spinner sizing.
 
+### Icon–label gap (labeled controls)
+
+Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts) — `CONTROL_ACTION_GAP_CLASSES`
+
+| Metrics tier | Utility   | px  |
+| ------------ | --------- | --- |
+| xs (dense)   | `gap-1`   | 4   |
+| sm           | `gap-1.5` | 6   |
+| md           | `gap-2`   | 8   |
+
+Labeled `Button` (and matching recipes) derive gap from the **same effective tier** as glyph and height — see `resolveControlActionMetricsTier()` in [`resolve-control-action-metrics-tier.ts`](../src/components/ui/resolve-control-action-metrics-tier.ts). Do not set `gap-*` on buttons unless the composition is intentionally exceptional.
+
 ### Named pairings
 
-| Recipe                                      | Hit       | Glyph |
-| ------------------------------------------- | --------- | ----- | --------------------------------------------- |
-| `controlActionCompactIconClasses`           | compact   | md    |
-| `controlActionCompactTextClasses`           | compact   | —     |
-| `controlActionCompactTextWithIconClasses`   | compact   | sm    |
-| `controlActionDefaultIconClasses`           | default   | lg    |
-| `controlActionLgIconClasses`                | lg        | lg    | Button `size="icon-lg"`                       |
-| `controlActionXsTextClasses`                | xs (28px) | xs    | Button `size="xs"`, default density           |
-| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | Button `size="xs"`, compact density           |
-| `controlActionXsIconClasses`                | compact   | xs    | Button `size="icon-xs"` (density-independent) |
+| Recipe                                      | Hit       | Glyph | Gap (tier)    |
+| ------------------------------------------- | --------- | ----- | ------------- |
+| `controlActionCompactIconClasses`           | compact   | md    | — (icon-only) |
+| `controlActionCompactTextClasses`           | compact   | —     | —             |
+| `controlActionCompactTextWithIconClasses`   | compact   | sm    | xs            |
+| `controlActionDefaultIconClasses`           | default   | lg    | — (icon-only) |
+| `controlActionLgIconClasses`                | lg        | lg    | — (icon-only) |
+| `controlActionXsTextClasses`                | xs (28px) | xs    | xs            |
+| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | xs            |
+| `controlActionXsIconClasses`                | compact   | xs    | — (icon-only) |
+| (inline in `button.variants`)               | sm (32px) | sm    | sm            |
+| (inline in `button.variants`)               | default   | lg    | md            |
 
 Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
 `control-action.variants.test.ts`.
 
-Storybook: **Design tokens → Icon glyph** and **Control action**.
+### Inline icons
+
+Inline icons inherit their glyph step from the nearest typography owner. Consumers use `size-icon-inline` (or `inlineIconTextClasses` / `inlineIconFlexSlotClasses`) and do not name a text size or a glyph step. The utility falls back to `--icon-glyph-md` when no owner is present.
+
+| Owner                      | Glyph |
+| -------------------------- | ----- |
+| `body` (default)           | md    |
+| `.text-xs`, `.text-sm`     | sm    |
+| `.text-md`, `.text-base`   | md    |
+| `prose`, `.prose.prose-md` | md    |
+| `.prose.prose-sm`          | sm    |
+
+`text-lg` and larger, heading utilities, eyebrow type, and compact-label type are not owners. An inline icon inside them inherits the nearest ancestor that is an owner, often `body`. Badge and chip leading icons stay on `compactLabelIconGlyphClasses`.
+
+Button glyphs stay on `resolveButtonIconGlyphStep`. Do not route them through `size-icon-inline`. Their step follows hit target and density, not the label's font size.
+
+Centered decorative stacks (a large glyph above a heading and description, including `size-icon-glyph-xl`) are not this pairing.
+
+Storybook: **Design tokens → Icon glyph** (including nested `text-base` / `text-xs`) and **Control action**.
 
 Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
 `size-*` in component implementations is forbidden (grandfather list until Phase 6 inline cleanup).

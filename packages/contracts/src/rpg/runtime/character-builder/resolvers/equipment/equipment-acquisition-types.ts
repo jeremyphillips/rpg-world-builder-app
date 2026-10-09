@@ -5,9 +5,11 @@ import type { CharacterBuilderDraft } from '../../draft/draft'
 import type { EquipmentBudgetSummary } from './equipment-budget'
 import type {
   MagicItemAllowance,
+  MagicItemAllowanceRequirement,
   MagicItemGrantProgress,
 } from '../../equipment/magic-item-selection'
 import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
+import type { MagicItemAcquiredCopyCap } from './resolve-magic-item-duplicate-policy'
 
 // ---------------------------------------------------------------------------
 // Builder context for acquisition intents — re-derived on every command.
@@ -18,6 +20,8 @@ export type EquipmentAcquisitionBuilderContext = {
   rulesetId: SystemRulesetId
   startingWealthTableId: string
   startingWealth: StartingWealthRules
+  /** Resolved from character kind before this context is built. */
+  magicItemRequirement: MagicItemAllowanceRequirement
 }
 
 // ---------------------------------------------------------------------------
@@ -76,13 +80,18 @@ export type EquipmentPickerRowCapabilities = {
 }
 
 export type EquipmentAcquisitionActionState =
-  | { kind: 'purchase'; availability: EquipmentPurchaseAvailability }
+  | {
+      kind: 'purchase'
+      availability: EquipmentPurchaseAvailability
+      magicItemAcquiredCopyCap?: MagicItemAcquiredCopyCap
+    }
   | {
       kind: 'magic_item_grant'
       eligibility: MagicItemGrantEligibility
       plan: EquipmentAcquisitionPlan
       capabilities: EquipmentPickerRowCapabilities
       quantityBounds: EquipmentAcquisitionQuantityBounds
+      magicItemAcquiredCopyCap?: MagicItemAcquiredCopyCap
     }
 
 export type ApplyEquipmentIntentResult = {

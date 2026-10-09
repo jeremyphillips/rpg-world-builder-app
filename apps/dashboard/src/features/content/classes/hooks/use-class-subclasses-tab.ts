@@ -5,7 +5,7 @@ import type { ContentCampaignAccessPatch, ResolvedSubclass } from '@rpg/contract
 import { getErrorMessage } from '@rpg/contracts'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
-import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-context'
+import { useCampaignAccessForm } from '../../lib/campaign-access/campaign-access-form-state'
 import { useCreateSubclass, useUpdateSubclass } from './use-subclass-mutations'
 import type { FeatureRowForm } from '../lib/class-feature-form-fields'
 import { isSubclassChoiceFeatureRow } from '../lib/class-subclass-choice-features'

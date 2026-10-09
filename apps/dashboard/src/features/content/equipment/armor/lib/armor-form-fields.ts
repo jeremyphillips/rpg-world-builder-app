@@ -5,10 +5,17 @@ import {
   ARMOR_CATEGORY_ENTRIES,
   ARMOR_MATERIALS,
   ARMOR_MATERIAL_ENTRIES,
+  getAbilityCompactLabel,
+  getAbilityLabel,
+  type Ability,
 } from '@rpg/contracts'
 import { toOptions, type FieldVisibility, type FormItem } from '@rpg/ui/form'
 
 import { labelsFromEntries } from '../../lib/equipment-form-field-helpers'
+import {
+  ARMOR_ABILITY_SCORE_REQUIREMENTS_FIELD,
+  ARMOR_MINIMUM_STRENGTH_REQUIREMENT_SWITCH,
+} from './armor-ability-score-requirements-form'
 
 const armorCategoryOptions = toOptions(ARMOR_CATEGORIES, labelsFromEntries(ARMOR_CATEGORY_ENTRIES))
 
@@ -32,13 +39,6 @@ function visibleWhenArmorDexCap(): FieldVisibility {
   return {
     dependsOn: ['armorCategory', 'addDexModifier'],
     visibleWhen: (v) => v.armorCategory === 'medium' && v.addDexModifier === true,
-  }
-}
-
-function visibleWhenArmorHeavy(): FieldVisibility {
-  return {
-    dependsOn: ['armorCategory'],
-    visibleWhen: (v) => v.armorCategory === 'heavy',
   }
 }
 
@@ -114,17 +114,44 @@ export function armorFormFieldGroup(): FormItem {
           },
         ],
       },
-      {
-        type: 'number',
-        name: 'strengthRequirement',
-        label: 'Strength requirement',
-        min: ABILITY_SCORE_MIN,
-        max: ABILITY_SCORE_MAX,
-        digits: 2,
-        width: 'auto',
-        hint: 'Minimum Strength to avoid speed penalty (heavy armor)',
-        visibility: visibleWhenArmorHeavy(),
-      },
+      minimumAbilityScoreRequirementField({
+        ability: 'str',
+        switchName: ARMOR_MINIMUM_STRENGTH_REQUIREMENT_SWITCH,
+      }),
     ],
+  }
+}
+
+/**
+ * Switch-gated minimum score for one ability. The switch is form-only state; the stored
+ * shape is the generic `abilityScoreRequirements` map. Only Strength is authored today.
+ */
+function minimumAbilityScoreRequirementField(args: {
+  ability: Ability
+  switchName: string
+}): FormItem {
+  const { ability, switchName } = args
+  return {
+    kind: 'dependent',
+    controller: {
+      type: 'switch',
+      name: switchName,
+      label: `Minimum ${getAbilityLabel(ability)} requirement`,
+      defaultValue: false,
+    },
+    dependents: {
+      fields: [
+        {
+          type: 'number',
+          name: `${ARMOR_ABILITY_SCORE_REQUIREMENTS_FIELD}.${ability}`,
+          label: `Minimum ${getAbilityCompactLabel(ability)} score`,
+          min: ABILITY_SCORE_MIN,
+          max: ABILITY_SCORE_MAX,
+          digits: 2,
+          width: 'auto',
+          required: true,
+        },
+      ],
+    },
   }
 }

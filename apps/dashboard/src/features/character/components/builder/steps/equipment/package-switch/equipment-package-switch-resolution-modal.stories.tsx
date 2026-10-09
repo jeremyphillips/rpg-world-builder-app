@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useMemo, useState } from 'react'
 
 import type { EquipmentPackageSwitchBlockingReason } from '@rpg/contracts'
-import { createEmptyCharacterBuilderDraft } from '@rpg/contracts'
+import { createEmptyCharacterBuilderDraft, resolveAvailableChoices } from '@rpg/contracts'
 import {
   evaluateEquipmentPackageSwitch,
   resolveStartingEquipmentFundingOptions,
@@ -13,6 +13,13 @@ import { startingEquipmentChoiceSetId } from '@rpg/contracts'
 import { storedDruidClassStored } from '@/test/fixtures/factories/additional/class-stored'
 import { pickEquipment } from '@/test/fixtures/pick'
 
+import { createEquipmentStepContextFixture } from '../../../../../lib/equipment/equipment-step.fixtures'
+import {
+  selectionFactsDraft,
+  selectionFactsPurchase,
+  selectionFactsScenario,
+  selectionFactsWizardWithoutSpellbookClass,
+} from '../../../../../lib/equipment/equipment-selection-facts.fixtures'
 import { EquipmentPackageSwitchResolutionModal } from './equipment-package-switch-resolution-modal'
 
 const rope = pickEquipment('rope')
@@ -20,7 +27,7 @@ const silverNeedle = pickEquipment('silver-needle')
 const dagger = pickEquipment('dagger')
 const storedDruid = storedDruidClassStored
 
-const catalogIndex = indexCharacterBuildCatalog({
+const storyCatalog = {
   species: [],
   classes: [storedDruid],
   spells: [],
@@ -28,7 +35,9 @@ const catalogIndex = indexCharacterBuildCatalog({
   skillProficiencies: [],
   organizations: [],
   languages: [],
-})
+}
+const catalogIndex = indexCharacterBuildCatalog(storyCatalog)
+const storyContext = createEquipmentStepContextFixture({ catalog: storyCatalog })
 
 function buildGoldDraft(
   purchases: Array<{
@@ -46,13 +55,16 @@ function buildGoldDraft(
     },
     equipment: {
       mode: 'gold' as const,
-      purchases: purchases.map((purchase) => ({
-        id: purchase.id,
-        equipmentId: purchase.equipmentId,
-        quantity: purchase.quantity,
-        sourceMode: purchase.sourceMode ?? ('startingGold' as const),
-        origin: 'picker' as const,
-      })),
+      purchases: purchases.map((purchase) => {
+        const row = {
+          id: purchase.id,
+          equipmentId: purchase.equipmentId,
+          quantity: purchase.quantity,
+        }
+        return purchase.sourceMode === 'manual'
+          ? { ...row, sourceMode: 'manual' as const }
+          : { ...row, sourceMode: 'startingGold' as const, origin: 'picker' as const }
+      }),
       editedSincePackageSelection: false,
     },
   }
@@ -62,6 +74,7 @@ type PackageSwitchResolutionModalStoryArgs = {
   initialQuantities: Record<string, number>
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
+  isInitialSelection?: boolean
   purchases: Array<{
     id: string
     equipmentId: string
@@ -74,6 +87,7 @@ function PackageSwitchResolutionModalStory({
   initialQuantities,
   commitErrorReason,
   staleNotice = false,
+  isInitialSelection = false,
   purchases,
 }: PackageSwitchResolutionModalStoryArgs) {
   const [open, setOpen] = useState(true)
@@ -98,10 +112,14 @@ function PackageSwitchResolutionModalStory({
     <EquipmentPackageSwitchResolutionModal
       open={open}
       catalogIndex={catalogIndex}
+      draft={draft}
+      context={storyContext}
+      choiceSets={[]}
       evaluation={evaluation}
       draftQuantitiesByPurchaseId={draftQuantities}
       commitErrorReason={commitErrorReason}
       staleNotice={staleNotice}
+      isInitialSelection={isInitialSelection}
       onOpenChange={setOpen}
       onDraftQuantityChange={(purchaseId, quantity) => {
         setDraftQuantities((current) => ({ ...current, [purchaseId]: quantity }))
@@ -125,6 +143,12 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const OverBudget: Story = {}
+
+export const InitialSelectionAfterClassChange: Story = {
+  args: {
+    isInitialSelection: true,
+  },
+}
 
 export const StagedRemoval: Story = {
   args: {
@@ -163,4 +187,60 @@ export const CommitError: Story = {
     initialQuantities: { 'purchase-rope': 50 },
     commitErrorReason: { kind: 'draftOverBudget', amountOverBudgetCp: 4700 },
   },
+}
+
+const wizardTrimScenario = selectionFactsScenario({
+  classes: [selectionFactsWizardWithoutSpellbookClass],
+})
+const wizardTrimDraft = selectionFactsDraft({
+  characterClass: selectionFactsWizardWithoutSpellbookClass,
+  optionId: 'starting-gold',
+  purchases: [
+    selectionFactsPurchase('greatsword'),
+    selectionFactsPurchase('component-pouch'),
+    selectionFactsPurchase('spellbook'),
+  ],
+})
+const wizardTrimChoiceSets = resolveAvailableChoices(wizardTrimDraft, wizardTrimScenario.context)
+
+function WizardReconciliationStory() {
+  const [open, setOpen] = useState(true)
+  const [draftQuantities, setDraftQuantities] = useState<Record<string, number>>({})
+  const { catalogIndex: wizardCatalogIndex, context } = wizardTrimScenario
+  const evaluation = useMemo(
+    () =>
+      evaluateEquipmentPackageSwitch({
+        draft: wizardTrimDraft,
+        catalogIndex: wizardCatalogIndex,
+        targetOptionId: 'standard-equipment',
+        targetFunding: resolveStartingEquipmentFundingOptions({
+          draft: wizardTrimDraft,
+          catalogIndex: wizardCatalogIndex,
+        }).get('standard-equipment')!,
+        draftQuantitiesByPurchaseId: draftQuantities,
+      })!,
+    [draftQuantities, wizardCatalogIndex],
+  )
+
+  return (
+    <EquipmentPackageSwitchResolutionModal
+      open={open}
+      catalogIndex={wizardCatalogIndex}
+      draft={wizardTrimDraft}
+      context={context}
+      choiceSets={wizardTrimChoiceSets}
+      evaluation={evaluation}
+      draftQuantitiesByPurchaseId={draftQuantities}
+      onOpenChange={setOpen}
+      onDraftQuantityChange={(purchaseId, quantity) => {
+        setDraftQuantities((current) => ({ ...current, [purchaseId]: quantity }))
+      }}
+      onConfirm={() => setOpen(false)}
+    />
+  )
+}
+
+/** STR 8 Wizard switching to a package without a spellbook (reconciliation context). */
+export const ReconciliationStatus: Story = {
+  render: () => <WizardReconciliationStory />,
 }

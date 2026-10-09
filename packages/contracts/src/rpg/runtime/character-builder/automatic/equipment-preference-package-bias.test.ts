@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { createEmptyCharacterBuilderDraft } from '../draft/draft'
+
 import { equipmentSchema } from '../../../content/equipment'
 import type { ClassStored } from '../../../content/classes/class'
 import { createCharacterBuildContext, dwarfSpecies, athleticsSkill } from '../test-fixtures'
@@ -61,7 +63,7 @@ function armor(slug: string, category: 'light' | 'medium' | 'heavy' = 'heavy') {
     baseAc: 16,
     addDexModifier: category === 'light',
     stealthDisadvantage: category !== 'light',
-    strengthRequirement: category === 'heavy' ? 13 : undefined,
+    abilityScoreRequirements: category === 'heavy' ? { str: 13 } : undefined,
   })
 }
 
@@ -502,6 +504,76 @@ describe('equipment preference package bias', () => {
     expect(unmatchedAttribution.suggestedBy[unmatchedChoiceSetId]?.scholar ?? []).toEqual([])
   })
 
+  it('retains an explicit picker cart row across class change', () => {
+    const classes = [packageFighter, packageWizard]
+    const context = packageContext(classes)
+    const ropeId = `${RULESET}:rope`
+    const drafted = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: packageFighter.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(packageFighter.id)]: ['heavy-armor'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            equipmentId: ropeId,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
+        editedSincePackageSelection: true,
+      },
+    }
+
+    const changed = applySelectedClassChange({
+      draft: drafted,
+      nextClassId: packageWizard.id,
+      context,
+    })
+
+    expect(
+      changed.choiceSelections[startingEquipmentChoiceSetId(packageFighter.id)],
+    ).toBeUndefined()
+    expect(changed.equipment?.purchases).toEqual([
+      { equipmentId: ropeId, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+    ])
+    expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
+  })
+
+  it('drops the selected package without copying it into purchases on class change', () => {
+    const classes = [packageFighter, packageWizard]
+    const context = packageContext(classes)
+    const fighterPackageId = startingEquipmentChoiceSetId(packageFighter.id)
+    const nestedPoolId = nestedStartingEquipmentChoiceSetId(packageFighter.id, 'heavy-armor', 0)
+    const drafted = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: packageFighter.id, level: 1 as const },
+      choiceSelections: {
+        [fighterPackageId]: ['heavy-armor'],
+        [nestedPoolId]: [`${RULESET}:javelin`],
+      },
+      equipment: {
+        mode: 'package' as const,
+        purchases: [],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const changed = applySelectedClassChange({
+      draft: drafted,
+      nextClassId: packageWizard.id,
+      context,
+    })
+
+    expect(changed.equipment?.purchases).toEqual([])
+    expect(changed.choiceSelections[fighterPackageId]).toBeUndefined()
+    expect(changed.choiceSelections[nestedPoolId]).toBeUndefined()
+    expect(changed.equipment?.classPackage).toEqual({ state: 'unresolved' })
+  })
+
   it('clears a fighter package on a wizard class change and re-resolves fighter from scratch', () => {
     const classes = [packageFighter, packageWizard]
     const context = packageContext(classes)
@@ -530,6 +602,7 @@ describe('equipment preference package bias', () => {
             equipmentId: `${RULESET}:greatsword`,
             quantity: 1,
             sourceMode: 'startingGold' as const,
+            origin: 'packageConversion' as const,
           },
         ],
         editedSincePackageSelection: true,

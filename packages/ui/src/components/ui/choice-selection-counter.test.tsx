@@ -28,6 +28,29 @@ describe('ChoiceSelectionCounter', () => {
     expect(container.querySelector('.size-4.rounded-full')).toBeTruthy()
   })
 
+  it('does not treat a zero effective quota as complete', () => {
+    const { container } = render(
+      <ChoiceSelectionCounter
+        selectedCount={0}
+        max={4}
+        verb="prepared"
+        effectiveRequiredCount={0}
+      />,
+    )
+
+    expect(screen.getByText('0 / 4 prepared')).toBeInTheDocument()
+    expect(container.querySelector('svg')).toBeNull()
+  })
+
+  it('shows a success check when a limited pool is fully selected', () => {
+    const { container } = render(
+      <ChoiceSelectionCounter selectedCount={1} max={2} effectiveRequiredCount={1} />,
+    )
+
+    expect(screen.getByText('1 / 2 chosen')).toBeInTheDocument()
+    expect(container.querySelector('svg')).toBeTruthy()
+  })
+
   it('supports compact sm sizing', () => {
     const { container } = render(<ChoiceSelectionCounter selectedCount={2} max={2} size="sm" />)
 

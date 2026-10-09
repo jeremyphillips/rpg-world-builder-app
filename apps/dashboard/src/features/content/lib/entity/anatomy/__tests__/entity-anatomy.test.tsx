@@ -68,6 +68,26 @@ describe('EntityAnatomy row tracks', () => {
     expect(slot('content')).not.toHaveTextContent('Holy symbol')
   })
 
+  it('stacks the selection-state line above status in the status cell', () => {
+    const { slot } = renderAnatomy({
+      entity: {
+        heading: 'Dagger',
+        selectionState: { label: 'Owned', provenance: ['Package'] },
+        status: [{ kind: 'badge', label: 'Not proficient', tone: 'warning' }],
+        statusComposition: 'metadata',
+      },
+    })
+
+    const status = slot('status')
+    const owned = screen.getByText('Owned')
+    const warning = screen.getByText('Not proficient')
+
+    expect(status).toContainElement(owned)
+    expect(status).toContainElement(warning)
+    expect(owned.compareDocumentPosition(warning) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(owned).toHaveClass('font-body-emphasis')
+  })
+
   it('omits empty meta and status cells', () => {
     const { slot } = renderAnatomy({ entity: { heading: 'Grey Coast' } })
 
@@ -98,6 +118,8 @@ describe('EntityAnatomy row tracks', () => {
 
     const rail = slot('leading')?.querySelector('.flex.shrink-0.items-center.gap-0')
     expect(rail).toHaveClass('pe-[calc(var(--spacing)*2)]')
+    expect(anatomy.className).toContain('[&>[data-row-anatomy-column=media]]:me-4')
+    expect(anatomy.className).not.toContain('[&>[data-row-anatomy-column=media]]:me-2')
     expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:ms-2')
     expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:justify-self-end')
   })
@@ -127,9 +149,17 @@ describe('EntityAnatomy trailing kind to cell', () => {
       trailing: { kind: 'indicator', variant: 'quantity', quantity: 3 },
     })
     expect(cellOf(quantity.slot('trailing')).slot).toBe('band')
+    expect(screen.getByText('×3')).toHaveClass('text-sm')
   })
 
-  it('splits group into a band primary and a meta secondary', () => {
+  it('renders an additional quantity including one', () => {
+    renderAnatomy({
+      trailing: { kind: 'indicator', variant: 'quantity', quantity: 1, format: 'additional' },
+    })
+    expect(screen.getByText('+1')).toBeInTheDocument()
+  })
+
+  it('renders the group secondary inline in the band cell, before the control', () => {
     const { slot } = renderAnatomy({
       trailing: {
         kind: 'group',
@@ -138,15 +168,24 @@ describe('EntityAnatomy trailing kind to cell', () => {
       },
     })
 
-    expect(cellOf(slot('trailing'))).toEqual({ slot: 'band', column: 'trailing' })
-    expect(cellOf(slot('trailing-secondary'))).toEqual({ slot: 'meta', column: 'trailing' })
-    expect(slot('trailing-secondary')).toHaveTextContent('30 GP')
+    const trailing = slot('trailing')
+    expect(cellOf(trailing)).toEqual({ slot: 'band', column: 'trailing' })
+    expect(trailing).toHaveTextContent('30 GP')
+    expect(slot('trailing-secondary')?.textContent).toBe('30 GP')
+    expect(slot('trailing-secondary')).toHaveClass(
+      'text-xs',
+      'font-body-emphasis',
+      'text-foreground',
+    )
+    expect(slot('trailing-secondary')).not.toHaveClass('text-muted-foreground')
+    expect(trailing?.textContent).toBe('30 GPAdd')
   })
 
-  it('does not add vertical alignment classes to trailing content', () => {
+  it('centers trailing meta with its control without offsetting the cell', () => {
     const { slot } = renderAnatomy({ trailing: SELECT_ACTION })
 
     const content = slot('trailing')?.firstElementChild as HTMLElement
-    expect(content.className).not.toMatch(/\bself-|\bitems-(start|center)\b|\bmt-/)
+    expect(content.className).toMatch(/\bitems-center\b/)
+    expect(content.className).not.toMatch(/\bself-|\bmt-/)
   })
 })

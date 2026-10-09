@@ -3,10 +3,20 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
-import type { MagicItemGrantProgress } from '@rpg/contracts'
+import type { MagicItemAllowance, MagicItemGrantProgress } from '@rpg/contracts'
 
 import { equipmentPickerBudgetFixture } from '../picker/drawer/equipment-picker-drawer.fixtures'
 import { EquipmentAcquisitionGuidance } from './equipment-acquisition-guidance'
+
+const magicItemAllowances: MagicItemAllowance[] = [
+  {
+    id: 'allowance-common',
+    source: { kind: 'startingWealthTier', sourceId: 'table', tierId: 'hero' },
+    rarity: 'common',
+    count: 2,
+    requirement: 'exact',
+  },
+]
 
 const magicItemProgress: MagicItemGrantProgress[] = [
   {
@@ -20,16 +30,17 @@ const magicItemProgress: MagicItemGrantProgress[] = [
 ]
 
 describe('EquipmentAcquisitionGuidance', () => {
-  it('renders purchase and magic-item guidance cards when both workflows are available', async () => {
+  it('renders currency and magic-item resources in one summary when both workflows are available', async () => {
     const onOpenPurchasePicker = vi.fn()
     const onOpenMagicItemsPicker = vi.fn()
 
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={onOpenPurchasePicker}
         showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
         magicItemProgress={magicItemProgress}
         onOpenMagicItemsPicker={onOpenMagicItemsPicker}
       />,
@@ -37,56 +48,144 @@ describe('EquipmentAcquisitionGuidance', () => {
 
     expect(screen.getByRole('region', { name: 'Acquisition guidance' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.getByText('100 GP starting · 15 GP spent')).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Magic item choices' })).toBeInTheDocument()
-    expect(screen.getByText('1/2 Common')).toBeInTheDocument()
+    expect(screen.getByText('100 GP budget · 15 GP spent')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Common · 1 remaining')).toBeInTheDocument()
+
+    const browseEquipment = screen.getByRole('button', { name: 'Browse equipment' })
+    const browseMagicItems = screen.getByRole('button', { name: 'Browse magic items' })
+    expect(browseEquipment).toHaveClass('bg-action-secondary')
+    expect(browseMagicItems).toHaveClass('bg-action-secondary')
 
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: 'Browse equipment' }))
-    await user.click(screen.getByRole('button', { name: 'Choose magic items' }))
+    await user.click(browseEquipment)
+    await user.click(browseMagicItems)
 
     expect(onOpenPurchasePicker).toHaveBeenCalledTimes(1)
     expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
-  it('renders a single full-width magic-item card when purchase is unavailable', () => {
+  it('renders a magic-only summary when purchase is unavailable', async () => {
+    const onOpenMagicItemsPicker = vi.fn()
+
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow={false}
+        fundingState={{ kind: 'none' }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
         magicItemProgress={magicItemProgress}
-        onOpenMagicItemsPicker={vi.fn()}
+        onOpenMagicItemsPicker={onOpenMagicItemsPicker}
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Magic item choices' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /GP remaining/ })).not.toBeInTheDocument()
+
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: 'Browse magic items' }))
+    expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
-  it('renders a single full-width purchase card when magic items are unavailable', () => {
+  it('renders a currency summary when magic items are unavailable', () => {
     render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants={false}
+        magicItemAllowances={[]}
         magicItemProgress={[]}
         onOpenMagicItemsPicker={vi.fn()}
       />,
     )
 
     expect(screen.getByRole('heading', { name: '40 GP remaining' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Magic item choices' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Magic items' })).not.toBeInTheDocument()
+  })
+
+  it('stacks unresolved funding with a magic-only summary', () => {
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow={false}
+        fundingState={{ kind: 'unresolved', pendingCostCp: 50 }}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
+        magicItemProgress={magicItemProgress}
+        onOpenMagicItemsPicker={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Magic items' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Browse magic items' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+  })
+
+  it('renders the unresolved funding card without remaining copy or Browse', () => {
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow={false}
+        fundingState={{ kind: 'unresolved', pendingCostCp: 50 }}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants={false}
+        magicItemAllowances={[]}
+        magicItemProgress={[]}
+        onOpenMagicItemsPicker={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Starting funds not set' })).toBeInTheDocument()
+    expect(
+      screen.getByText('Choose a starting equipment option to determine your available funds.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('5 SP selected')).toBeInTheDocument()
+    expect(screen.queryByText(/remaining/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Browse equipment' })).not.toBeInTheDocument()
+  })
+
+  it('switches the magic-items action to manage when no choice capacity remains', async () => {
+    const onOpenMagicItemsPicker = vi.fn()
+
+    render(
+      <EquipmentAcquisitionGuidance
+        showPurchaseWorkflow
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
+        onOpenPurchasePicker={vi.fn()}
+        showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
+        magicItemProgress={[
+          {
+            ...magicItemProgress[0]!,
+            selected: 2,
+            remainingCapacity: 0,
+            isFilled: true,
+          },
+        ]}
+        onOpenMagicItemsPicker={onOpenMagicItemsPicker}
+      />,
+    )
+
+    const manage = screen.getByRole('button', { name: 'Manage magic items' })
+    expect(manage).toHaveClass('border-interactive-outline')
+    expect(screen.queryByRole('button', { name: 'Browse magic items' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Browse equipment' })).toBeInTheDocument()
+
+    const user = userEvent.setup()
+    await user.click(manage)
+    expect(onOpenMagicItemsPicker).toHaveBeenCalledTimes(1)
   })
 
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <EquipmentAcquisitionGuidance
         showPurchaseWorkflow
-        budget={equipmentPickerBudgetFixture}
+        fundingState={{ kind: 'funded', budget: equipmentPickerBudgetFixture }}
         onOpenPurchasePicker={vi.fn()}
         showMagicItemGrants
+        magicItemAllowances={magicItemAllowances}
         magicItemProgress={magicItemProgress}
         onOpenMagicItemsPicker={vi.fn()}
       />,

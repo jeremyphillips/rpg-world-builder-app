@@ -1,6 +1,12 @@
 import * as React from 'react'
 
-import { CatalogPickerSelectionActions } from '@rpg/ui'
+import {
+  catalogNounFromTerm,
+  formatCatalogPickerCopy,
+  PICKER_DISABLED_REASON_SELECTION_FULL,
+  PROFICIENCY_TERM,
+} from '@rpg/contracts'
+import { CatalogPickerSelectionActions, resolveCatalogPickerRowActionPhase } from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
@@ -8,12 +14,22 @@ import {
   createCatalogEntityRowRenderer,
 } from '@/features/content'
 
-import { recommendationStatusItems } from '../../../lib/recommendation/format-inline-recommendation-sources'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  resolvePickerCapacityTooltip,
+  resolvePickerMutationCopy,
+  resolvePickerPendingLabel,
+} from '../../../lib/picker/picker-mutation-family'
+import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
+import { resolveProficiencySelectionRowPresentation } from '../../../lib/proficiencies/proficiency-selection-row-presentation.lib'
+import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-status'
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
+import {
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import {
   filterAndSortProficiencyPickerItems,
@@ -29,7 +45,7 @@ import { ProficiencyPickerItemDetails } from './proficiency-picker-item-details'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
-  PROFICIENCY_PICKER_RESET_VIEW_LABEL,
+  PROFICIENCY_PICKER_SORT_GROUP_LABEL,
   PROFICIENCY_PICKER_SORT_LABELS,
   PROFICIENCY_PICKER_SORT_MODES,
   type ProficiencyPickerDrawerProps,
@@ -38,40 +54,9 @@ import {
 
 export type { ProficiencyPickerDrawerProps } from './proficiency-picker-drawer.types'
 
-function ProficiencyPickerToolbarReset({
-  sortMode,
-  searchQuery,
-  onResetView,
-}: {
-  sortMode: ProficiencyPickerSortMode
-  searchQuery: string
-  onResetView: () => void
-}) {
-  const showResetView = hasCatalogPickerResetViewCriteria({
-    structuredFilterCount: 0,
-    searchQuery,
-    sortMode,
-    defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
-  })
-
-  if (!showResetView) {
-    return (
-      <CatalogToolbarResetSlot
-        visible={false}
-        label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
-        onClick={() => undefined}
-      />
-    )
-  }
-
-  return (
-    <CatalogToolbarResetSlot
-      visible
-      label={PROFICIENCY_PICKER_RESET_VIEW_LABEL}
-      onClick={onResetView}
-    />
-  )
-}
+const PROFICIENCY_PICKER_SORT_ORDER_LABEL = formatCatalogPickerCopy(
+  catalogNounFromTerm(PROFICIENCY_TERM),
+).sortOrderLabel
 
 /** Proficiency catalog drawer — thin wrapper over `CatalogEntityPickerSheet`. */
 export function ProficiencyPickerDrawer({
@@ -103,6 +88,10 @@ export function ProficiencyPickerDrawer({
     selectedIds,
   )
   const emptyStateMessage = resolveProficiencyPickerEmptyStateMessage(emptyStateKind)
+  const genericSelection = resolvePickerMutationCopy('genericSelection')
+  const acquirePendingLabel = resolvePickerPendingLabel('genericSelection', 'acquire')
+  const releasePendingLabel = resolvePickerPendingLabel('genericSelection', 'release')
+  const capacityTooltip = resolvePickerCapacityTooltip('genericSelection')
   const isSkillChoiceSet = choiceSet.choiceType === 'skillProficiency'
 
   return (
@@ -114,7 +103,6 @@ export function ProficiencyPickerDrawer({
       items={items}
       getItemKey={(item) => item.optionId}
       getItemToolbarLabel={(item) => item.label}
-      getSearchText={(item) => item.label}
       searchPlaceholder={formatProficiencyPickerSearchPlaceholder(choiceSet)}
       noResultsMessage={PROFICIENCY_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE}
@@ -122,20 +110,25 @@ export function ProficiencyPickerDrawer({
       emptyState={
         emptyStateMessage ? <CatalogPickerResultsState message={emptyStateMessage} /> : undefined
       }
-      actions={({ searchQuery, resetSearchQuery }) => {
-        const handleResetView = () => {
-          setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
-          resetSearchQuery()
-        }
-
-        return (
-          <ProficiencyPickerToolbarReset
-            sortMode={sortMode}
-            searchQuery={searchQuery}
-            onResetView={handleResetView}
-          />
-        )
-      }}
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => (
+        <CatalogToolbarResetSlot
+          visible={hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: 0,
+            searchQuery,
+            sortMode,
+            defaultSortMode: PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode,
+          })}
+          includesSort
+          {...resolveCatalogPickerResultSummary({
+            visible: visibleItemCount,
+            total: items.length,
+          })}
+          onClick={() => {
+            setSortMode(PROFICIENCY_PICKER_VIEW_DEFAULTS.sortMode)
+            resetSearchQuery()
+          }}
+        />
+      )}
       filterRow={{
         actions: (
           <CatalogSortControl
@@ -144,20 +137,25 @@ export function ProficiencyPickerDrawer({
               pickerSortOption(mode, PROFICIENCY_PICKER_SORT_LABELS[mode]),
             )}
             onValueChange={setSortMode}
-            triggerAriaLabel="Proficiency sort order"
-            ariaLabel="Sort proficiencies"
+            triggerAriaLabel={PROFICIENCY_PICKER_SORT_ORDER_LABEL}
+            ariaLabel={PROFICIENCY_PICKER_SORT_GROUP_LABEL}
           />
         ),
       }}
       renderEntityRow={createCatalogEntityRowRenderer({
         buildEntity: (item) => {
           const disabledNote = getProficiencyPickerDisabledNote(item)
-          const status = [
-            ...recommendationStatusItems(item.state.presentation),
-            ...(disabledNote
-              ? [{ kind: 'text' as const, label: disabledNote, variant: 'muted' as const }]
-              : []),
-          ]
+          const status = resolveSelectionRowStatusItems(
+            resolveProficiencySelectionRowPresentation({
+              facts: item.state.presentation?.facts,
+              disabledNote,
+            }),
+            { context: 'picker' },
+          )
+
+          const selectionState = item.state.isAlreadySelected
+            ? resolvePickerSelectionStateLine({ kind: 'selected' })
+            : undefined
 
           return {
             heading: item.label,
@@ -167,15 +165,30 @@ export function ProficiencyPickerDrawer({
                 lines={mapSkillProficiencyCompactSummaryToMetadataLines(item.compactSummary)}
               />
             ) : undefined,
-            status: status.length > 0 ? status : undefined,
+            ...(selectionState ? { selectionState } : {}),
+            ...(status.length > 0 ? { status, statusComposition: 'metadata' as const } : {}),
           }
         },
         buildTrailing: (item) => ({
           kind: 'action',
           content: (
             <CatalogPickerSelectionActions
-              selected={item.state.isAlreadySelected}
+              phase={resolveCatalogPickerRowActionPhase({
+                isSelected: item.state.isAlreadySelected,
+              })}
               canSelect={item.state.canSelect}
+              addLabel={genericSelection.acquire}
+              removeLabel={genericSelection.release}
+              pendingDirection={item.state.isAlreadySelected ? 'release' : 'acquire'}
+              pendingLabel={
+                item.state.isAlreadySelected ? releasePendingLabel : acquirePendingLabel
+              }
+              entityKey={item.optionId}
+              tooltip={
+                getProficiencyPickerDisabledNote(item) === PICKER_DISABLED_REASON_SELECTION_FULL
+                  ? capacityTooltip
+                  : undefined
+              }
               onAdd={() => onSelectOption(item.optionId)}
               onRemove={() => onRemoveOption(item.optionId)}
             />

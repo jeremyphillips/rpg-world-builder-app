@@ -1,18 +1,19 @@
-import type {
-  CharacterBuildCatalogIndex,
-  CharacterBuildContext,
-  CharacterBuilderDraft,
-  EquipmentBudgetSummary,
-  EquipmentPickerBrowseSortContext,
-  EquipmentPickerItem,
-  EquipmentPickerSupportedKind,
-  MagicItemGrantProgress,
+import {
+  catalogNounFromContentType,
+  formatCatalogPickerCopy,
+  type EquipmentBudgetSummary,
+  type EquipmentPickerBrowseSortContext,
+  type EquipmentPickerItem,
+  type EquipmentPickerSupportedKind,
+  type MagicItemAllowance,
+  type MagicItemGrantProgress,
 } from '@rpg/contracts'
 
 import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+import type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
+import type { EquipmentPickerOwnershipIndex } from '../../../../lib/equipment/equipment-ownership-index.lib'
 import type { EquipmentPickerCharacterPreviewContext } from '../details/equipment-picker-character-preview.lib'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import type { EquipmentPickerGrantManageSource } from '../purchase/equipment-picker-grant.lib'
 import {
   CATALOG_PICKER_SORT_BEST_MATCH,
   CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
@@ -30,82 +31,20 @@ export type {
   EquipmentPickerSupportedKind,
 } from '@rpg/contracts'
 
-export const EQUIPMENT_PICKER_NOT_PROFICIENT_LABEL = 'Not proficient'
+export type { EquipmentPickerRow } from '../../../../lib/equipment/equipment-picker-search.lib'
 
-/** Sparse recommendation badges — most rows (including proficient gear) get none. */
-export const EQUIPMENT_PICKER_ESSENTIAL_LABEL = 'Essential'
-export const EQUIPMENT_PICKER_STARTING_OPTION_LABEL = 'Starting option'
-export const EQUIPMENT_PICKER_STANDARD_GEAR_LABEL = 'Standard gear'
-export const EQUIPMENT_PICKER_CLASS_TOOL_LABEL = 'Class tool'
-export const EQUIPMENT_PICKER_PROFICIENT_LABEL = 'Proficient'
-export const EQUIPMENT_PICKER_PROFICIENCY_AVAILABLE_LABEL = 'Proficiency available'
-export const EQUIPMENT_PICKER_COMMON_FOR_CLASS_LABEL = 'Common for your class'
-/** @deprecated Use {@link EQUIPMENT_PICKER_PROFICIENT_LABEL} for badge display. */
-export const EQUIPMENT_PICKER_MATCHES_PROFICIENCY_LABEL = 'Matches your proficiency'
-export const EQUIPMENT_PICKER_SPELLCASTING_FOCUS_LABEL = 'Spellcasting focus'
+const equipmentNoun = catalogNounFromContentType('equipment')
+const equipmentCopy = formatCatalogPickerCopy(equipmentNoun)
 
 export const EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL = 'Cannot afford'
+export const EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL = 'Exceeds starting budget'
 export const EQUIPMENT_PICKER_NOT_PURCHASABLE_LABEL = 'Not for sale'
 export const EQUIPMENT_PICKER_UNAVAILABLE_HERE_LABEL = 'Unavailable here'
 
-export const EQUIPMENT_PICKER_MODE_PURCHASE = 'purchase' as const
+export const EQUIPMENT_PICKER_SORT_GROUP_LABEL = equipmentCopy.sortGroupLabel
+export const EQUIPMENT_PICKER_SORT_ORDER_LABEL = equipmentCopy.sortOrderLabel
+
 export const EQUIPMENT_PICKER_MODE_MAGIC_ITEMS = 'magic_items' as const
-
-export const EQUIPMENT_PICKER_MODE_LABELS: Record<EquipmentPickerWorkflowMode, string> = {
-  purchase: 'Purchase',
-  magic_items: 'Magic items',
-}
-
-export const EQUIPMENT_PICKER_ADD_PARTIAL_PREFIX = 'Add'
-
-export const EQUIPMENT_PICKER_ADDED_LABEL = 'Added'
-export const EQUIPMENT_PICKER_OWNED_QUANTITY_LABEL_PREFIX = 'Owned:'
-
-export type EquipmentPickerCalloutIntent =
-  | 'info'
-  | 'recommended'
-  | 'compatible'
-  | 'warning'
-  | 'blocking'
-
-export type EquipmentPickerCalloutImportance = 'low' | 'medium' | 'high'
-
-export type EquipmentPickerCalloutFactKind =
-  | 'requirement'
-  | 'recommendation'
-  | 'compatibility'
-  | 'state'
-  | 'blocking'
-  | 'caution'
-
-export type EquipmentPickerCallout = {
-  label: string
-  intent: EquipmentPickerCalloutIntent
-  importance: EquipmentPickerCalloutImportance
-  /** Full explanation when the visible label truncates sources. */
-  title?: string
-  factKind?: EquipmentPickerCalloutFactKind
-  /** Sources already truncated for inline chrome. */
-  sourceInline?: string
-}
-
-export type EquipmentPickerCalloutContext = {
-  isGoldShoppingPath?: boolean
-  /**
-   * When set, only callouts whose semantic status is listed are eligible.
-   * Composition over rule-id filters — use to show proficiency warnings without
-   * Essential/Standard acquisition badges (e.g. Quick NPC Requirements).
-   */
-  visibleStatuses?: readonly EquipmentPickerCalloutSemanticStatus[]
-}
-
-export type EquipmentPickerCalloutSemanticStatus =
-  | 'not_proficient'
-  | 'essential'
-  | 'standard'
-  | 'blocking'
-  | 'compatibility'
-  | 'info'
 
 /** Sentinel for “all kinds” in the category filter (Radix Select rejects `''`). */
 export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
@@ -114,11 +53,8 @@ export const EQUIPMENT_PICKER_KIND_ALL = '__all__' as const
 export const EQUIPMENT_PICKER_RARITY_ALL = '__all_rarities__' as const
 
 export const EQUIPMENT_PICKER_CATEGORY_LABEL = 'Equipment kind'
-export const EQUIPMENT_PICKER_RARITY_LABEL = 'Rarity'
 export const EQUIPMENT_PICKER_AFFORDABLE_NOW_LABEL = 'Affordable now'
 export const EQUIPMENT_PICKER_SORT_LABEL = 'Sort'
-export const EQUIPMENT_PICKER_CLEAR_FILTERS_LABEL = 'Clear filters'
-export const EQUIPMENT_PICKER_RESET_VIEW_LABEL = 'Reset view'
 
 export const EQUIPMENT_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const EQUIPMENT_PICKER_SORT_PRICE_ASC = 'price_asc' as const
@@ -149,8 +85,6 @@ export const EQUIPMENT_PICKER_SORT_LABELS: Record<EquipmentPickerSortMode, strin
   [EQUIPMENT_PICKER_SORT_NAME_DESC]: CATALOG_PICKER_SORT_LABEL_NAME_DESC,
 }
 
-export type EquipmentPickerToolbarResetMode = 'clear_filters' | 'reset_view' | 'none'
-
 export type EquipmentPickerKindFilter =
   | typeof EQUIPMENT_PICKER_KIND_ALL
   | EquipmentPickerSupportedKind
@@ -164,52 +98,39 @@ export type EquipmentPickerViewDefaults = {
 export type EquipmentPickerDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  items: readonly EquipmentPickerItem[]
+  items: readonly EquipmentPickerRow[]
   browseSortContext?: EquipmentPickerBrowseSortContext
   budget?: EquipmentBudgetSummary
   allowedKinds?: readonly EquipmentPickerSupportedKind[]
-  /** Hides rows whose cost exceeds the starting (package) budget. */
-  filterOutUnaffordable?: boolean
-  filterOutNonProficient?: boolean
   showCharacterPreview?: boolean
   characterPreviewContext?: EquipmentPickerCharacterPreviewContext
-  /** Purchased quantities for the active source mode, keyed by equipment id. */
-  ownedPurchaseQuantities?: Readonly<Record<string, number>>
-  /** Grant-selected quantities keyed by equipment id (magic-items workflow). */
-  ownedGrantQuantities?: Readonly<Record<string, number>>
+  /** Per-item ownership contributions — the only source the header reads. */
+  ownership?: EquipmentPickerOwnershipIndex
   /** Active browse workflow — purchase vs magic-item grants. */
   workflowMode?: EquipmentPickerWorkflowMode
   /** Available workflows; segmented control renders only when length is 2. */
   workflowModes?: readonly EquipmentPickerWorkflowMode[]
   onWorkflowModeChange?: (mode: EquipmentPickerWorkflowMode) => void
-  /** Magic-item grant allowances for rarity chip filtering in magic-items workflow. */
+  /** Grant progress for rarity chips. Paired with allowances for the magic-item summary. */
   magicItemGrantProgress?: readonly MagicItemGrantProgress[]
+  /** Allowances paired with progress so slot badges keep exact vs up-to. */
+  magicItemAllowances?: readonly MagicItemAllowance[]
   /** Focused allowance id — scopes magic-item browse to one rarity slot. */
   focusedAllowanceId?: string
   onFocusedAllowanceIdChange?: (allowanceId: string | undefined) => void
-  /** Mutually exclusive toolbar action — default resets full view including sort. */
-  toolbarResetMode?: EquipmentPickerToolbarResetMode
-  /** When true, `availableInStartingOption` rows show the Standard gear badge. */
+  /** Full allowance predicate. Rarity comparison is the fallback when omitted. */
+  matchesMagicItemAllowance?: (item: EquipmentPickerItem, allowanceId: string) => boolean
+  /** When true, rows in another starting package show `Included in package option`. */
   isGoldShoppingPath?: boolean
   resolveRowActionViewModel?: (args: {
     equipment: EquipmentPickerItem['equipment']
     workflowMode: EquipmentPickerWorkflowMode
     requestedQuantity: number
   }) => EquipmentPickerRowActionViewModel
-  resolveGrantManageSources?: (equipmentId: string) => EquipmentPickerGrantManageSource
-  /** Pass-through for grant/acquisition panel until Phase 3b weans shared acquisition UI off draft. */
-  grantAcquisitionContext?: {
-    draft: CharacterBuilderDraft
-    context: CharacterBuildContext
-    catalogIndex: CharacterBuildCatalogIndex
-  }
-  onCommitAdd: (item: EquipmentPickerItem, quantity: number) => boolean | void
-  onApplyMagicItemAcquisition?: (args: {
-    equipmentId: string
-    requestedQuantity: number
-  }) => boolean
-  onReleaseGrant?: (args: { allowanceId: string; equipmentId: string; quantity: number }) => void
-  onRemovePurchase?: (args: { purchaseId: string; quantity: number }) => void
-  onRemoveFromInventory?: (item: EquipmentPickerItem) => void
-  onRemoveOneFromInventory?: (item: EquipmentPickerItem) => void
+  /** Adds one copy through the active workflow's channel. */
+  onCommitAdd: (item: EquipmentPickerItem) => boolean | void
+  /** Sets the aggregate editable purchased quantity for an item. */
+  onSetPurchasedQuantity?: (item: EquipmentPickerItem, total: number) => void
+  onReleaseChoice?: (item: EquipmentPickerItem, allowanceId: string) => void
+  onRemovePurchaseOne?: (item: EquipmentPickerItem) => void
 }

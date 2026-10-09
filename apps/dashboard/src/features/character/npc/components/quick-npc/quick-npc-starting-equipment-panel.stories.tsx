@@ -17,6 +17,10 @@ import {
   quickNpcStandaloneSetupValues,
 } from '../../lib/quick-npc/quick-npc-test-fixtures'
 import { QuickNpcStartingEquipmentPanel } from './quick-npc-starting-equipment-panel'
+import {
+  QuickNpcPreparedBuildProvider,
+  QuickNpcPreparedBuildSync,
+} from './quick-npc-prepared-build-context'
 
 const buildContext = createCampaignNpcBuilderContextFixture({ catalog: populatedBuilderCatalog })
 
@@ -30,10 +34,11 @@ function EquipmentPanelStory() {
   const form = useForm<QuickNpcAuthoringTabFormValues>({
     defaultValues: quickNpcAuthoringTabDefaultValues,
   })
+  const createContext = quickNpcStandaloneCreateContext()
   const choices = resolveQuickNpcStartingChoices({
     setup,
     context: buildContext,
-    createContext: quickNpcStandaloneCreateContext(),
+    createContext,
   })
   const additionalOptions = resolveQuickNpcAdditionalEquipmentOptions({
     setup,
@@ -41,14 +46,22 @@ function EquipmentPanelStory() {
   })
 
   return (
-    <FormProvider {...form}>
-      <QuickNpcStartingEquipmentPanel
-        setup={setup}
-        choices={choices}
-        buildContext={buildContext}
-        additionalOptions={additionalOptions}
-      />
-    </FormProvider>
+    <QuickNpcPreparedBuildProvider>
+      <FormProvider {...form}>
+        <QuickNpcPreparedBuildSync
+          form={form}
+          setup={setup}
+          buildContext={buildContext}
+          createContext={createContext}
+        />
+        <QuickNpcStartingEquipmentPanel
+          setup={setup}
+          choices={choices}
+          buildContext={buildContext}
+          additionalOptions={additionalOptions}
+        />
+      </FormProvider>
+    </QuickNpcPreparedBuildProvider>
   )
 }
 

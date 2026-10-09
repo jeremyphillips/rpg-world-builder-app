@@ -1,6 +1,6 @@
 import { ActionIcon, Button, InlineInactiveStatus } from '@rpg/ui'
 
-import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary'
+import { OverviewResultSummaryDotSeparator } from '@/lib/data-table/overview-result-summary-dot-separator'
 import { CAMPAIGN_ACCESS_CHANGE_LABEL } from '../../lib/campaign-access/campaign-access-labels'
 import type { MasterDetailAvailabilityPresentation } from '../../lib/master-detail/master-detail-availability.types'
 import {

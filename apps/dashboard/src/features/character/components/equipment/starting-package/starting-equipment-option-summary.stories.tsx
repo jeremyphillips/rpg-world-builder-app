@@ -81,6 +81,31 @@ type Story = StoryObj<typeof meta>
 
 export const StartingGold: Story = {}
 
+export const StartingGoldHeroTier: Story = {
+  args: {
+    summary: {
+      ...goldSummary,
+      description: 'Take 75 GP instead of standard equipment.',
+      funding: {
+        ...goldSummary.funding,
+        classOptionWealth: { cp: 0, sp: 0, gp: 75, pp: 0 },
+        tierAdditionalWealth: { cp: 0, sp: 5, gp: 637, pp: 0 },
+        tierLabel: 'Hero',
+        bonusGold: {
+          baseGp: 500,
+          formula: {
+            kind: 'dice',
+            dice: { count: 1, faces: 10 },
+            multiplier: 25,
+            currency: 'gp',
+          },
+        },
+        totalStartingWealth: { cp: 0, sp: 5, gp: 712, pp: 0 },
+      },
+    },
+  },
+}
+
 export const HeavyArmorPackage: Story = {
   args: {
     summary: heavyArmorSummary,

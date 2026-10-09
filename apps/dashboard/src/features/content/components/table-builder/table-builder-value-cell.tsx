@@ -26,7 +26,7 @@ import {
 } from '@rpg/ui'
 
 import { flattenFormTouchedPaths } from '../../lib/table-builder/table-builder-form-touched.lib'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import type {
   TableBuilderCellDraft,
   TableBuilderColumnDraft,
@@ -72,12 +72,7 @@ function DerivedBadge() {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Badge
-            appearance="soft"
-            tone="info"
-            size="sm"
-            leadingIcon={<Info className="size-3" aria-hidden />}
-          >
+          <Badge appearance="soft" tone="info" size="sm" leadingIcon={<Info aria-hidden />}>
             Derived
           </Badge>
         </TooltipTrigger>

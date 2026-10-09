@@ -8,6 +8,8 @@ import type { ClassFormValues } from '../lib/class-form-fields'
 import {
   readRecommendationSpellIds,
   spellOptionsForRecommendationTarget,
+  SPELLCASTING_RECOMMENDATION_CANTRIPS_PLACEHOLDER,
+  SPELLCASTING_RECOMMENDATION_LEVEL1_PLACEHOLDER,
   SPELLCASTING_RECOMMENDATION_TARGET_LABELS,
   upsertRecommendationSpellIds,
 } from '../lib/class-spellcasting-recommendations-field.lib'
@@ -63,7 +65,7 @@ export function ClassSpellcastingRecommendationsField({
         value={cantripIds}
         onChange={(next) => writeTarget('cantrips', Array.isArray(next) ? next : [])}
         multiple
-        placeholder="Choose cantrips"
+        placeholder={SPELLCASTING_RECOMMENDATION_CANTRIPS_PLACEHOLDER}
       />
       <ComboboxField
         id="class-spellcasting-recommended-level-1"
@@ -73,7 +75,7 @@ export function ClassSpellcastingRecommendationsField({
         value={level1Ids}
         onChange={(next) => writeTarget('level1Plus', Array.isArray(next) ? next : [])}
         multiple
-        placeholder="Choose level 1 spells"
+        placeholder={SPELLCASTING_RECOMMENDATION_LEVEL1_PLACEHOLDER}
       />
     </div>
   )

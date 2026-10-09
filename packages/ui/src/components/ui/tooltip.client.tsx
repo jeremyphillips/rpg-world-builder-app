@@ -5,13 +5,31 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { Info } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
-import { portalPopoverSurfaceClasses } from './surface-current.lib'
+import { establishSurfaceCurrent } from './surface-current.lib'
+import { tooltipTriggerCursorVariants } from './tooltip-trigger.variants'
 
 const TooltipProvider = TooltipPrimitive.Provider
 
 const Tooltip = TooltipPrimitive.Root
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+export type TooltipTriggerProps = React.ComponentPropsWithoutRef<
+  typeof TooltipPrimitive.Trigger
+> & {
+  /** Real control (button/link). Default false = passive info trigger. */
+  interactive?: boolean
+}
+
+const TooltipTrigger = React.forwardRef<
+  React.ComponentRef<typeof TooltipPrimitive.Trigger>,
+  TooltipTriggerProps
+>(({ className, interactive = false, ...props }, ref) => (
+  <TooltipPrimitive.Trigger
+    ref={ref}
+    className={cn(tooltipTriggerCursorVariants({ interactive }), className)}
+    {...props}
+  />
+))
+TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName
 
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,
@@ -22,8 +40,8 @@ const TooltipContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 max-w-xs rounded-md border border-border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md data-[state=delayed-open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=delayed-open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=delayed-open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
-        portalPopoverSurfaceClasses,
+        'z-50 max-w-xs rounded-md border border-border bg-surface-lift px-3 py-1.5 text-sm text-foreground shadow-md data-[state=delayed-open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=delayed-open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=delayed-open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+        establishSurfaceCurrent('surface-lift'),
         className,
       )}
       {...props}
@@ -53,7 +71,7 @@ export function InfoTooltip({ 'aria-label': ariaLabel, children, className }: In
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <button
             type="button"
             aria-label={ariaLabel}

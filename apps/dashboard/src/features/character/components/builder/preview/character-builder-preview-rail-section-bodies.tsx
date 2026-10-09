@@ -234,7 +234,7 @@ export function CharacterBuilderPreviewEquipmentBody({
         </ul>
       ) : (
         <CharacterBuilderPreviewSubsectionHint>
-          {resolveEquipmentPreviewEmptyHint(hasCharacterClass)}
+          {resolveEquipmentPreviewEmptyHint(hasCharacterClass, preview.startingEquipmentPending)}
         </CharacterBuilderPreviewSubsectionHint>
       )}
     </CharacterBuilderPreviewSectionContent>

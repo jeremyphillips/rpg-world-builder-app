@@ -1,11 +1,9 @@
 import type { Equipment } from '../../../../content/equipment'
 import {
   compareActiveRequirement,
-  compareContextRelevance,
   compareSourcePriority,
   compareSpecificity,
   compareStrength,
-  resolveOptionContextRelevance,
   type ActiveChoiceContext,
   type OptionRecommendation,
   type RecommendationSourceKind,
@@ -16,20 +14,18 @@ import { getEquipmentRecommendationKindRank } from '../picker/equipment-picker-i
 import { getEquipmentWeaponCategoryBrowseRank } from '../picker/equipment-picker-item-weapon-category-rank'
 import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 import { bestSignalSpecificity } from './project-equipment-option-facts'
-import type { EquipmentPurchaseAvailability } from './resolve-equipment-purchase-availability'
 
 const NO_ACTIVE_CHOICE: ActiveChoiceContext = { kind: 'none' }
 
-const PURCHASE_AVAILABILITY_RANK: Record<EquipmentPurchaseAvailability['status'], number> = {
-  available: 0,
-  unaffordable: 1,
-  unavailableForPurchase: 2,
-}
-
 /**
  * Best-match domain order for equipment picker rows.
- * Purchase actionability and proficiency are late keys, and only when the context asks
- * and the rows are comparable. They do not change recommendation strength.
+ * Proficiency, the starting-purse ceiling, unmet ability scores, and not-for-sale are late keys.
+ * Proficiency is proficient, then untracked, then not proficient.
+ * A price above every available starting purse sinks after proficiency.
+ * An unmet ability-score requirement sinks after that ceiling: the character can still use the item, with a penalty.
+ * Not-for-sale applies only when the context asks.
+ * They do not change recommendation strength.
+ * Selection, remaining budget, grant consumption, and package choice do not reorder rows.
  */
 export function compareIntentionalEquipmentRanking(
   left: EquipmentPickerItem,
@@ -67,8 +63,6 @@ function compareResolvedEquipmentFacts(
         activeRequirements(left, context),
         activeRequirements(right, context),
       ),
-      eligibilityRank(left, context.activeChoice) - eligibilityRank(right, context.activeChoice),
-      compareContextRelevanceForOptions(left, right, context.activeChoice),
       compareStrength(left.recommendation, right.recommendation),
       compareSpecificity(
         bestSignalSpecificity(left.recommendation) ?? 'broad_pool',
@@ -78,11 +72,12 @@ function compareResolvedEquipmentFacts(
         primarySourceKind(left.recommendation),
         primarySourceKind(right.recommendation),
       ),
-      alternativePackageRank(left) - alternativePackageRank(right),
+      context.rankCompatibility ? compareProficiency(left, right) : 0,
+      purchaseBudgetCeilingRank(left) - purchaseBudgetCeilingRank(right),
+      context.rankCompatibility ? compareAbilityScoreRequirements(left, right) : 0,
       context.rankPurchaseAvailability
         ? purchaseAvailabilityRank(left) - purchaseAvailabilityRank(right)
         : 0,
-      context.rankCompatibility ? compareProficiency(left, right) : 0,
     ]) ?? 0
   )
 }
@@ -95,7 +90,7 @@ function activeRequirements(
   },
 ) {
   return resolved.requirements.filter((requirement) => {
-    if (requirement.role !== 'candidate') return false
+    if (!requirement.optionSatisfies) return false
     if (context.activeChoice.kind === 'requirement') {
       return requirement.requirementId === context.activeChoice.requirementId
     }
@@ -106,17 +101,39 @@ function activeRequirements(
   })
 }
 
+/** Proficient, then untracked, then not proficient. Affordability is not a rank. */
 function compareProficiency(left: ResolvedEquipmentOption, right: ResolvedEquipmentOption): number {
-  const leftProficient = left.state.compatibility?.proficient
-  const rightProficient = right.state.compatibility?.proficient
-  if (leftProficient === undefined || rightProficient === undefined) return 0
-  if (leftProficient === rightProficient) return 0
-  return leftProficient ? -1 : 1
+  return (
+    proficiencyRank(left.state.compatibility?.proficient) -
+    proficiencyRank(right.state.compatibility?.proficient)
+  )
+}
+
+function proficiencyRank(proficient: boolean | undefined): number {
+  if (proficient === true) return 0
+  if (proficient === undefined) return 1
+  return 2
+}
+
+function purchaseBudgetCeilingRank(resolved: ResolvedEquipmentOption): number {
+  return resolved.exceedsPurchaseBudgetCeiling ? 1 : 0
+}
+
+/** Binary: any unmet ability-score requirement sorts after none. */
+function compareAbilityScoreRequirements(
+  left: ResolvedEquipmentOption,
+  right: ResolvedEquipmentOption,
+): number {
+  return abilityScoreRequirementRank(left) - abilityScoreRequirementRank(right)
+}
+
+function abilityScoreRequirementRank(resolved: ResolvedEquipmentOption): number {
+  const unmet = resolved.state.compatibility?.unmetAbilityScoreRequirements
+  return unmet && unmet.length > 0 ? 1 : 0
 }
 
 function purchaseAvailabilityRank(resolved: ResolvedEquipmentOption): number {
-  const status = resolved.purchaseAvailability?.status ?? 'available'
-  return PURCHASE_AVAILABILITY_RANK[status]
+  return resolved.purchaseAvailability?.status === 'unavailableForPurchase' ? 1 : 0
 }
 
 function resolvedFacts(item: EquipmentPickerItem): ResolvedEquipmentOption {
@@ -134,47 +151,11 @@ function resolvedFacts(item: EquipmentPickerItem): ResolvedEquipmentOption {
   }
 }
 
-function compareContextRelevanceForOptions(
-  left: ResolvedEquipmentOption,
-  right: ResolvedEquipmentOption,
-  activeChoice: ActiveChoiceContext,
-): number {
-  if (activeChoice.kind === 'none') return 0
-  return compareContextRelevance(
-    resolveOptionContextRelevance({
-      state: left.state,
-      requirements: left.requirements,
-      activeChoice,
-    }),
-    resolveOptionContextRelevance({
-      state: right.state,
-      requirements: right.requirements,
-      activeChoice,
-    }),
-  )
-}
-
 function firstNonZero(values: readonly number[]): number | undefined {
   for (const value of values) {
     if (value !== 0) return value
   }
   return undefined
-}
-
-function eligibilityRank(
-  resolved: ResolvedEquipmentOption,
-  activeChoice: ActiveChoiceContext,
-): number {
-  return isEligibleForActiveChoice(resolved, activeChoice) ? 0 : 1
-}
-
-function isEligibleForActiveChoice(
-  resolved: ResolvedEquipmentOption,
-  activeChoice: ActiveChoiceContext,
-): boolean {
-  if (activeChoice.kind !== 'pool' && activeChoice.kind !== 'package') return false
-  const choice = resolved.state.choice
-  return Boolean(choice?.inOpenPool && choice.choiceSetId === activeChoice.choiceSetId)
 }
 
 function primarySourceKind(
@@ -188,10 +169,6 @@ function primarySourceKind(
     return compareSourcePriority(left.source?.kind, right.source?.kind)
   })
   return ranked[0]?.source?.kind
-}
-
-function alternativePackageRank(resolved: ResolvedEquipmentOption): number {
-  return resolved.state.choice?.inAlternativePackage ? 0 : 1
 }
 
 export function compareEquipmentCanonical(

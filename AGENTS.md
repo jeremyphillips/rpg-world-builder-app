@@ -148,6 +148,19 @@ Closed vocabulary maps in `@rpg/contracts` use a two-layer pattern: `*_TERM`
 require a sibling `*_TERM` — see
 [packages/contracts/docs/structure.md](packages/contracts/docs/structure.md#reference-vocabulary-gametermentry).
 
+Catalog nouns such as `Species`, `Spells`, and `species` are already owned by
+`CONTENT_TYPE_TERMS`. In a copy binding (`label`, a `*Label` / `*Title` /
+`*Heading` / `*Placeholder` const, or a direct return from such a function),
+call `getContentTypeTerm`, `getTermCollectionLabel`, or `getContentTypeSentenceForm`.
+Do not introduce another string or local constant for that noun. The drift
+ratchet and site-scoped exceptions are in
+[docs/content-types.md](docs/content-types.md#catalog-content-type-terms-content_type_terms).
+
+Other closed vocabulary (a spell school, a creature type, a damage type) comes from
+that entry's `*_TERM` / `*_ENTRIES` map. Use `vocabularyTermLabel` or
+`getTermSentenceForm`. Do not copy the label, and do not route it through
+`CONTENT_TYPE_TERMS`.
+
 ## Storybook (dashboard)
 
 No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cursor/rules/storybook-router.mdc](.cursor/rules/storybook-router.mdc). Port **6007**; primitives → `@rpg/ui` Storybook (`:6006`).
@@ -165,7 +178,7 @@ No nested routers in `*.stories.tsx` (preview provides `MemoryRouter`) — [.cur
   with no directive.
 - Shared primitives live in `packages/ui` so both `dashboard` and `public` can
   consume them. Authoring detail → [packages/ui/README.md](packages/ui/README.md).
-- Inline metadata (` · ` between compact label segments): use
+- Inline metadata (`·` between compact label segments): use
   `joinInlineMetadata` (strings) or `InlineMetadata` (JSX) — see
   [packages/ui/docs/inline-metadata.md](packages/ui/docs/inline-metadata.md).
   Do not hand-roll middle-dot separators in production code.
@@ -227,6 +240,8 @@ The session is a host-only `httpOnly` cookie plus a readable CSRF token
 gates itself via `GET /api/auth/me`. Don't read the session cookie in client code
 or duplicate auth flows into the dashboard.
 
+For local browser verification, use the dev proxy, root `.env.local` (`DEV_AGENT_*`), and [docs/agent-browser.md](docs/agent-browser.md).
+
 ## Secrets / RSC boundary
 
 No secrets in client bundles. Respect the Next.js server/client boundary —
@@ -245,4 +260,19 @@ unsure, ask. Recommend a new doc when substantial work has no existing home.
 
 ## Commits
 
-Use Conventional Commits (commitlint-enforced).
+Conventional Commits enforced by `commitlint` on commit-msg (see
+[`commitlint.config.js`](commitlint.config.js)).
+
+**Subject line only** unless the user asks for a body:
+
+`<type>(<scope>): <subject>`
+
+- **Whole header ≤ 100 characters** (`header-max-length`).
+- **No trailing period** on the subject (`subject-full-stop`).
+- **Subject:** lowercase; not Title Case, Sentence case, or ALL CAPS
+  (`subject-case`).
+- **Type:** lowercase (`feat`, `fix`, `chore`, …).
+- **Scope:** feature area when it fits (`character`, `ui`, `dashboard`, …);
+  omit only when truly cross-cutting.
+
+Example: `feat(character): disclose starting-tier grants and gold bonus formulas`

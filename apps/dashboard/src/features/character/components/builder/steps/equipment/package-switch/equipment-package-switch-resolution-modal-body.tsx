@@ -1,21 +1,22 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Heading, Text } from '@rpg/ui'
 
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
 } from '../../../../../lib/equipment/equipment-step.lib'
 
-import { EquipmentInventoryColumn } from '../../../../equipment/inventory/column/equipment-inventory-column'
+import { EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT } from '../../../../equipment/inventory/equipment-inventory.variants'
 import { EquipmentPurchasedInventorySection } from '../../../../equipment/inventory/purchased/equipment-purchased-inventory-section'
 import {
+  PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE,
   type buildPackageSwitchDraftPurchasedGroups,
-  PACKAGE_SWITCH_SAFETY_NOTE,
 } from '../../../../../lib/equipment/equipment-package-switch-resolution.lib'
 import {
   equipmentPackageSwitchResolutionAlertClasses,
   equipmentPackageSwitchResolutionBlockedBodyClasses,
   equipmentPackageSwitchResolutionModalInventoryScrollClasses,
+  equipmentPackageSwitchResolutionModalInventorySectionClasses,
   equipmentPackageSwitchResolutionSafetyNoteClasses,
 } from './equipment-package-switch-resolution-modal.variants'
 import { PackageSwitchBudgetSummary } from './equipment-package-switch-resolution-modal-summary'
@@ -25,6 +26,7 @@ export type EquipmentPackageSwitchResolutionModalBodyProps = {
   draftQuantitiesByPurchaseId: Record<string, number>
   purchasedGroups: ReturnType<typeof buildPackageSwitchDraftPurchasedGroups>
   isBlocked: boolean
+  safetyNote: string
   staleMessage?: string
   inlineError?: string
   onSetPurchaseQuantity: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
@@ -35,6 +37,7 @@ export function EquipmentPackageSwitchResolutionModalBody({
   evaluation,
   draftQuantitiesByPurchaseId,
   isBlocked,
+  safetyNote,
   purchasedGroups,
   staleMessage,
   inlineError,
@@ -64,7 +67,10 @@ export function EquipmentPackageSwitchResolutionModalBody({
           />
 
           <div className={equipmentPackageSwitchResolutionModalInventoryScrollClasses}>
-            <EquipmentInventoryColumn title="Purchased with starting gold">
+            <section className={equipmentPackageSwitchResolutionModalInventorySectionClasses}>
+              <Heading variant={EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT} as="h3">
+                {PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE}
+              </Heading>
               <EquipmentPurchasedInventorySection
                 purchased={purchasedGroups}
                 showGroupHeadings={false}
@@ -72,11 +78,11 @@ export function EquipmentPackageSwitchResolutionModalBody({
                 onSetPurchaseQuantity={onSetPurchaseQuantity}
                 onRemoveItem={onRemoveItem}
               />
-            </EquipmentInventoryColumn>
+            </section>
           </div>
 
           <Text as="p" className={equipmentPackageSwitchResolutionSafetyNoteClasses}>
-            {PACKAGE_SWITCH_SAFETY_NOTE}
+            {safetyNote}
           </Text>
         </>
       )}

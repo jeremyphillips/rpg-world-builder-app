@@ -191,3 +191,18 @@ export function resolveFilterFieldWidthClasses(width?: FilterFieldWidth): string
   if (!width) return undefined
   return cn(fieldWidthVariants({ width }))
 }
+
+/**
+ * Width token for a select. Explicit tokens win. Inline catalog selects with
+ * no token cap at `lg`. Stacked overview selects keep their own token.
+ */
+export function resolveFilterSelectWidthToken(field: {
+  type: string
+  layout?: 'stacked' | 'inline'
+  width?: FilterFieldWidth
+}): FilterFieldWidth | undefined {
+  if (field.type !== 'select') return undefined
+  if (field.width) return field.width
+  if (field.layout === 'inline') return 'lg'
+  return undefined
+}

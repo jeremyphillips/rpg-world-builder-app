@@ -31,7 +31,7 @@ export const Compound: StoryObj = {
   render: () => (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger interactive asChild>
           <Button variant="outline">Hover me</Button>
         </TooltipTrigger>
         <TooltipContent>Tooltips open on hover and keyboard focus.</TooltipContent>

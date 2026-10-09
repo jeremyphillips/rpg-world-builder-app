@@ -369,8 +369,51 @@ type FilterCatalogLayoutConfig<TState> = {
 }
 ```
 
-`CatalogFilterControls` composes onto `CatalogToolbar` slots (`Primary`, `FilterRow`).
+`CatalogFilterControls` composes onto `CatalogToolbar` slots (`primaryControls`, `filterRow`).
 Sort, tabs, mode/workflow segmentation, and search scoring stay **outside** the schema.
+
+### Catalog toolbar bands
+
+Bands are placement. They do not change what counts as a content filter.
+
+| Role            | What it is                                                                                                                                                       | Slot                                       |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| Content filters | Schema fields such as Equipment kind, Rarity, Affordable now, Levels, School, Casting & mechanics, character Type, Class, organization Domain, and location Type | `primaryControls` and `filterRow.controls` |
+| View controls   | Sort and Reset                                                                                                                                                   | `filterRow.actions` and `actions`          |
+
+School, Affordable now, Class, organization Domain, and location Type are content filters. They sit on the left of the utility band. Character Type is a primary content filter. Relationship drawers have no Sort, so Reset uses the no-sort accessible name and mounts only while it is visible.
+
+```text
+Search
+Primary band     primaryControls — full width, fields wrap
+Utility band     @container, flex-wrap, layout only
+  content        filterRow.controls — omitted when empty
+  view stack     column, end-aligned
+    Sort         filterRow.actions
+    Reset        actions
+```
+
+Content filters and the view stack share one line when they fit (`justify-between`, view stack at the end). When they do not, the view stack wraps as one unit, so Sort stays with Reset and does not sit between individual filters. The band follows its container width, not the viewport.
+
+### Stable widths
+
+A filter toolbar control may change width when its option set changes. It must not change width when its value changes.
+
+`FilterToolbarLabelSizer` stacks the live value with invisible, `aria-hidden` copies of every reserved label in one grid cell. The control is as wide as its widest label.
+
+- Selects reserve every option label plus the All label, through `SelectTrigger` `sizingLabels`.
+- Sort reserves every `resolvePickerSortTriggerLabel` output.
+- Popovers reserve `triggerLabel(0)` and `triggerLabel(totalOptionCount)`.
+
+Width tokens stay caps (`max-w-*`). A label longer than the cap truncates, and the trigger `title` is the full label. Inline catalog selects with no token cap at `lg`. There is no per-control opt-out.
+
+The reset row stays reserved whenever a utility band renders, including bands that have no Sort. `CatalogToolbarResetSlot` `reserve` defaults to `includesSort`.
+
+Dependent fields render at the end of their content group and only while their parent value is selected. `sanitizeState` drops them when the parent changes. A boolean that leaves not-applicable rows visible is labeled "Hide X".
+
+A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. The reset row always shows the visible count as `N results` in a polite live region. `visible` is the count after tab, structured filters, and search. Sort does not change the count. Reset is separate toolbar chrome: it appears for narrowing criteria or a non-default sort, and a sort-only change still shows the full eligible count. `FilterToolbarLabelSizer` reserves every count from `0` through the eligible total so glyph width cannot change the row.
+
+Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
 
 ### Out of scope for catalog filters
 
@@ -417,13 +460,26 @@ or behavior.
 - `useFilterChrome()` — strict hook for schema-owned components; defaults to compact
   outside a provider.
 - `useOptionalFilterChrome()` — optional hook for general primitives (e.g.
-  `CatalogFilterChips`); returns `undefined` outside filter chrome.
+  `CatalogFilterChips` chip size); returns `undefined` outside filter chrome.
 - Field `layout` and `width` control per-field structure; section `density` controls
-  typography and control sizing via `resolveFilterFieldPresentation`.
-- `FilterFieldRenderer` is the sole presentation owner on the schema-rendered path.
-  Leaves receive resolved `presentation` props — they do not call `useFilterChrome()`.
+  control sizing via `resolveFilterFieldPresentation`.
+- `FilterFieldRenderer` resolves control presentation on the schema-rendered path.
+  Schemas pass `label` and layout intent. They do not pass caption classes.
 - `resolveFilterFieldWidthClasses` is separate from density — width is layout
   allocation only.
+
+**Filter captions are not form field labels.** Form labels identify an authored
+input (`font-field-label`, foreground, required/help chrome). Filter captions
+identify toolbar chrome: muted text, sized by filter density (`compact` →
+`text-xs`, `comfortable` → `text-sm`). `FilterFieldCaption` is the only caption
+renderer for select chrome, `CatalogFilterChips`, and catalog sort. It reads
+`filterFieldLabelVariants` from filter chrome (or an explicit `density` prop).
+`as="span"` is a group caption (`aria-labelledby` on chips; visible text inside
+`role="group"` on inline selects and sort). `as="label"` with `htmlFor` is the
+stacked-select association. Boolean checkbox text stays an inline control label
+and still uses `presentation.labelClassName` plus interaction classes — that
+path is not a caption. `presentation.labelClassName` is not a schema
+customization point.
 
 ### Active chips in feature pages
 
@@ -482,7 +538,7 @@ Stacked selects always wire `label htmlFor` ↔ control `id`, including when `wi
       onResetAdditionalFilters={resetAdvanced}
     />
   }
-  resultSummary={<OverviewResultSummary resultCount={filteredRows.length} />}
+  resultSummary={<ResultSummary visibleCount={filteredRows.length} />}
   leadingActions={...}
   trailingActions={...}
 >
@@ -490,7 +546,8 @@ Stacked selects always wire `label htmlFor` ↔ control `id`, including when `wi
 </OverviewTableFrame>
 ```
 
-- Hidden-unavailable counts and Show/Hide actions live in `OverviewResultSummary.supplementalContent` (content overviews).
+- The result count is `ResultSummary`: always `N results` for the rows currently shown.
+- A visibility supplement is optional and domain-owned. Content overviews pass `resolveAvailabilitySummarySupplement`, which reads the unavailable count from rows matching the current search and other structured filters before the availability gate. Callers do not branch on mode. The line is `14 results · 1 unavailable · Show` while those rows are hidden, `15 results · 1 unavailable · Hide` while they are included, and `N results` when the count is zero or the mode is unavailable.
 - DataTable receives only filtered rows.
 - Advanced panel badge = `countModifiedFilters` (optionally scoped by `placement`).
 

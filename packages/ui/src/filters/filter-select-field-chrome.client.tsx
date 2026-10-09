@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 
 import { cn } from '../lib/utils'
+import { FilterFieldCaption } from './filter-field-caption.client'
 import type { FilterFieldPresentation } from './filter-presentation.lib'
 import type { FilterFieldWidth } from './filter-schema.types'
 
@@ -33,12 +34,16 @@ export function FilterSelectFieldChrome({
     return (
       <div
         data-field-align=""
-        className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+        className={cn(
+          presentation.controlBandClassName,
+          presentation.groupClassName,
+          'w-fit shrink-0',
+        )}
         role="group"
         aria-label={groupLabel}
       >
-        <span className={presentation.labelClassName}>{label}</span>
-        <div className={cn('min-w-0', widthClassName)}>{children}</div>
+        <FilterFieldCaption>{label}</FilterFieldCaption>
+        <div className={cn(widthClassName)}>{children}</div>
       </div>
     )
   }
@@ -52,9 +57,9 @@ export function FilterSelectFieldChrome({
         aria-label={groupLabel}
       >
         {/* Stacked selects always wire label ↔ control, including when `width` is set. */}
-        <label htmlFor={controlId} className={presentation.labelClassName}>
+        <FilterFieldCaption as="label" htmlFor={controlId}>
           {label}
-        </label>
+        </FilterFieldCaption>
         <div className={cn(presentation.controlBandClassName, 'min-w-0', widthClassName)}>
           {children}
         </div>

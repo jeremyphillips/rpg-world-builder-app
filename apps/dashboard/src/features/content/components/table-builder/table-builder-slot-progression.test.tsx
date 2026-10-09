@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 import { loadSpellcastingProgressionSeed } from '@rpg/catalog/spellcasting-progressions'
+import { getSlotProgressionKindLabel } from '@rpg/contracts'
 
 import {
   buildLeveledSlotProgressionDraft,
@@ -46,7 +47,7 @@ function SlotProgressionHarness({
 describe('TableBuilder slot progression (wide fixed columns)', () => {
   it('renders sticky level headers and cells in the values grid', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     })
@@ -76,7 +77,7 @@ describe('TableBuilder slot progression (wide fixed columns)', () => {
 
   it('renders the tier separator band after the standard max with nine slot columns', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 22,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
       extendedTierName: 'Epic Destiny',
@@ -105,7 +106,7 @@ describe('TableBuilder slot progression (wide fixed columns)', () => {
 
   it('renders a sticky level column in the embedded preview table', () => {
     const draft = buildLeveledSlotProgressionDraft({
-      label: 'Full caster',
+      label: getSlotProgressionKindLabel('full-caster'),
       effectiveMaxLevel: 20,
       seedRows: FULL_CASTER.kind === 'leveled' ? FULL_CASTER.rows : [],
     })

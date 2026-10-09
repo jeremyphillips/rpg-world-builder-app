@@ -37,7 +37,7 @@ import { useContentWriteMutation } from '../../../lib/list/use-content-mutations
 import { ContentFormOptionsGate } from '../../../lib/forms/shells/layout/content-form-shell-layout'
 import { OrganizationAuthoringFormShell } from './organization-authoring-form-shell'
 import { OrganizationAuthoringPresetBridge } from './organization-authoring-preset-bridge'
-import { useOrganizationAuthoringContext } from '../authoring/organization-authoring-context'
+import { useOrganizationAuthoringContext } from '../authoring/use-organization-authoring-context'
 import { organizationFormDef } from '../../lib/organization-form-def'
 import '../../lib/organization-form-def'
 import type { OrganizationFormValues } from '../../../lib/forms/organization-form-projection'

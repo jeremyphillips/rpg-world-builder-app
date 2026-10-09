@@ -16,11 +16,11 @@ const spellOptionSets: QuickNpcRequirementOptionSets = {
     {
       option: { value: 'srd-cc-5.2.1:fire-bolt', label: 'Fire Bolt' },
       compactSummary: {
-        castingSummary: ['Action', '120 ft', 'Instantaneous'],
-        classification: {
-          levelLabel: 'Cantrip',
-          descriptors: ['Evocation'],
-        },
+        groups: [
+          { kind: 'classification', levelLabel: 'Cantrip', schoolLabel: 'Evocation' },
+          { kind: 'castingTime', label: 'Action' },
+          { kind: 'range', label: '120 ft' },
+        ],
       },
     },
   ],

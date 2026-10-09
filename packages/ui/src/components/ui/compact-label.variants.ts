@@ -3,7 +3,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import {
   compactLabelAppearanceToneClasses,
+  compactLabelEmphasisClasses,
   type CompactLabelAppearance,
+  type CompactLabelEmphasis,
   type CompactLabelSize,
   type CompactLabelTone,
 } from './compact-label.lib'
@@ -18,6 +20,7 @@ export type CompactLabelVariantProps = {
   size?: CompactLabelSize
   appearance?: CompactLabelAppearance
   tone?: CompactLabelTone
+  emphasis?: CompactLabelEmphasis
   filled?: boolean
   selected?: boolean
   interactive?: boolean
@@ -110,6 +113,7 @@ export function resolveCompactLabelClassName({
   size = 'md',
   appearance = 'outline',
   tone = 'neutral',
+  emphasis = 'default',
   filled,
   selected = false,
   interactive = false,
@@ -131,6 +135,7 @@ export function resolveCompactLabelClassName({
     }),
     compactLabelIconSizeClasses[size],
     appearanceClasses,
+    compactLabelEmphasisClasses(emphasis),
     removable && !selected ? 'border-border bg-semantic-neutral-subtle text-foreground' : null,
     className,
   )

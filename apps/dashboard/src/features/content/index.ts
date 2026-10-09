@@ -33,6 +33,7 @@ export {
   formatCatalogMetadataLines,
   type CatalogCollapsibleListProps,
   type CatalogMetadataLine,
+  type CatalogMetadataSegment,
 } from './components/catalog'
 export {
   ContentEntityCard,
@@ -48,8 +49,18 @@ export {
   type EntityDisclosureArrayItemShellProps,
 } from './lib/entity/surfaces/cards/disclosure/entity-disclosure-array-item-shell'
 export { projectArrayItemEntitySummary } from './lib/entity/surfaces/cards/disclosure/array-item-entity-summary.lib'
+export { EntitySummaryStatus } from './lib/entity/summary/entity-summary'
 export type { EntitySummaryModel } from './lib/entity/summary/entity-summary.types'
-export type { EntitySummaryStatusItem } from './lib/entity/summary/entity-summary-status.types'
+export type {
+  EntitySummaryStatusComposition,
+  EntitySummaryStatusItem,
+  EntitySummaryStatusText,
+} from './lib/entity/summary/entity-summary-status.types'
+export type {
+  EntitySummaryProvenanceAction,
+  EntitySummaryProvenanceItem,
+  EntitySummaryProvenanceText,
+} from './lib/entity/summary/entity-summary-provenance.types'
 export type {
   EntityAnatomyTrailing,
   EntityAnatomyTrailingSecondary,
@@ -87,7 +98,7 @@ export type {
 } from './lib/detail/page/content-detail-section'
 export { contentDetailNavItemId } from './lib/detail/page/content-detail-nav-anchor-id'
 export { detailCollectionRecordSeparatorVariants } from './lib/detail/collection/detail-collection-chrome.variants'
-export type { DetailOverflowAction } from './lib/detail/detail-overflow-menu'
+export { DetailOverflowMenu, type DetailOverflowAction } from './lib/detail/detail-overflow-menu'
 export { DetailEntityRowActions } from './lib/detail/row/entity/detail-entity-row-actions'
 export { buildLocationConnectedPartyCharactersById } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
 export type { CharacterPickerOption } from './locations/lib/connected-parties/location-connected-party-character-options.lib'
@@ -96,6 +107,24 @@ export type { CatalogEntityRowProps } from './lib/entity/surfaces/catalog/catalo
 export { CatalogEntitySurfaceRow } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export type { CatalogEntitySurfaceRowProps } from './lib/entity/surfaces/catalog/catalog-entity-surface-row'
 export { CatalogEntityPickerSheet } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
+export { RelationshipCatalogFilterBand } from './lib/entity/surfaces/catalog/relationship-filters/relationship-catalog-filter-band'
+export { relationshipCatalogFilterHasBand } from './lib/entity/surfaces/catalog/relationship-filters/relationship-filter-options.lib'
+export { useRelationshipCatalogFilters } from './lib/entity/surfaces/catalog/relationship-filters/use-relationship-catalog-filters'
+export {
+  createCharacterRelationshipFilterSchema,
+  resolveCharacterRelationshipFilterLayout,
+  type CharacterRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/character-relationship-filter-schema'
+export {
+  createOrganizationRelationshipFilterSchema,
+  resolveOrganizationRelationshipFilterLayout,
+  type OrganizationRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/organization-relationship-filter-schema'
+export {
+  createLocationRelationshipFilterSchema,
+  resolveLocationRelationshipFilterLayout,
+  type LocationRelationshipFilterState,
+} from './lib/entity/surfaces/catalog/relationship-filters/location-relationship-filter-schema'
 export type { CatalogEntityPickerSheetProps } from './lib/entity/surfaces/catalog/catalog-entity-picker-sheet'
 export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/catalog-entity-row-renderer'
 export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
@@ -119,6 +148,7 @@ export type {
   EntitySurfaceIdentity,
   EntitySurfaceInlineAction,
 } from './lib/entity/summary/entity-surface-identity.types'
+export type { PickerSelectionStateLineModel } from './lib/entity/summary/picker-selection-state-line.types'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
   CAMPAIGN_ACCESS_TABLE_FILTER_AVAILABLE,
@@ -155,6 +185,7 @@ export {
   type EquipmentPickerRowViewModel,
   EquipmentDetailMetadata,
 } from './equipment'
+export { PICKER_DISCLOSURE_DESCRIPTION_SIZE } from './lib/detail/metadata/picker-disclosure-description'
 export { EquipmentEdit } from './equipment/routes/equipment-edit'
 export {
   SkillProficienciesOverview,
@@ -211,7 +242,10 @@ export { listLocations, useLocations, locationsQueryKey } from './locations'
 export {
   buildLocationEntityCardModel,
   buildLocationEntityCardModelFromClassification,
+  buildLocationPickerSearchText,
 } from './locations/lib/location-display'
+export { assembleLocationPickerSearchDocument } from './locations/lib/location-picker-search.lib'
+export { RelationshipDrawerSubjectField } from './lib/relationship/drawer/relationship-drawer-subject-field'
 export {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,

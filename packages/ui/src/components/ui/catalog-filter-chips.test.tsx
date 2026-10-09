@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { FilterChromeProvider } from '../../filters/filter-chrome.context'
 import { CatalogFilterChips } from './catalog-filter-chips.client'
 
 const options = [
@@ -114,8 +115,57 @@ describe('CatalogFilterChips', () => {
       />,
     )
 
-    expect(screen.getByText('Category')).toHaveAttribute('id', 'category-label')
+    const caption = screen.getByText('Category')
+    expect(caption).toHaveAttribute('id', 'category-label')
+    expect(caption.tagName).toBe('SPAN')
+    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
     expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
+  })
+
+  it('uses comfortable caption classes inside comfortable chrome', () => {
+    render(
+      <FilterChromeProvider density="comfortable">
+        <CatalogFilterChips
+          id="category"
+          label="Category"
+          selectionMode="single-required"
+          options={options}
+          value="all"
+          onValueChange={vi.fn()}
+        />
+      </FilterChromeProvider>,
+    )
+
+    const caption = screen.getByText('Category')
+    expect(caption).toHaveClass('text-sm', 'text-muted-foreground')
+    expect(caption).not.toHaveClass('text-xs')
+  })
+
+  it('ignores presentation label classes and follows filter chrome', () => {
+    render(
+      <CatalogFilterChips
+        id="category"
+        label="Category"
+        presentation={{
+          type: 'chips',
+          labelClassName: 'text-lg',
+          groupClassName: '',
+          controlBandClassName: 'flex items-start min-h-0 h-auto',
+          alignmentAnchorClassName: '',
+          chipSize: 'sm',
+          shellClassName: 'gap-1',
+        }}
+        selectionMode="single-required"
+        options={options}
+        value="all"
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    const caption = screen.getByText('Category')
+    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(caption).not.toHaveClass('text-lg')
+    expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('text-xs-meta')
   })
 
   itAxe('has no axe accessibility violations', async () => {

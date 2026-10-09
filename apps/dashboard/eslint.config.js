@@ -143,6 +143,28 @@ const dashboardSemanticStyleLayerGuards = {
   },
 }
 
+const dashboardPickerActionRowGuard = {
+  files: ['src/**/*drawer*.{ts,tsx}', 'src/**/*picker*.{ts,tsx}'],
+  ignores: ['**/*.{test,integration.test,stories}.{ts,tsx}'],
+  rules: {
+    'no-restricted-syntax': [
+      'error',
+      {
+        selector:
+          "JSXAttribute[name.name='className'][value.type='Literal'][value.value='flex justify-end']",
+        message:
+          'Ownership guard for copied picker action rows, not a general layout ban. Use dialogPanelActionRowClasses or the sheet/drawer footer slot.',
+      },
+      {
+        selector:
+          "JSXAttribute[name.name='className'][value.type='Literal'][value.value='flex justify-end gap-2']",
+        message:
+          'Ownership guard for copied picker action rows, not a general layout ban. Use dialogPanelActionRowClasses or the sheet/drawer footer slot.',
+      },
+    ],
+  },
+}
+
 const dashboardEntityCatalogPickerImportGuard = {
   files: ['src/features/**/*picker*.{ts,tsx}', 'src/features/**/*drawer*.{ts,tsx}'],
   ignores: [
@@ -345,6 +367,75 @@ const dashboardCharacterBuilderPlayActorGuard = {
   },
 }
 
+const dashboardFastRefreshGuard = {
+  files: ['src/**/*.tsx'],
+  ignores: ['**/*.stories.tsx', '**/*.{test,integration.test}.tsx', 'src/stories/**'],
+  rules: {
+    'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
+  },
+}
+
+const dashboardShellContractsImportGuard = {
+  files: ['src/app/**/*.{ts,tsx}', 'src/components/layout/**/*.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            message:
+              'Import @rpg/contracts/vocab, /shared, /runtime, /content, or another subpath. A root import invalidates this module on every contracts save.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
+const dashboardAuthApiContractsImportGuard = {
+  files: ['src/features/auth/api/**/*.{ts,tsx}'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/contracts',
+            message:
+              'Import @rpg/contracts/vocab, /shared, /runtime, /content, or another subpath. A root import invalidates this module on every contracts save.',
+          },
+          {
+            name: '@rpg/ui',
+            importNames: ['ContentCardHeading'],
+            message:
+              'Entity identity must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardHeading is internal to the entity surface.',
+          },
+          {
+            name: '@rpg/ui',
+            importNames: ['ContentCardBody'],
+            message:
+              'Entity presentation must compose EntityAnatomyHost, ContentEntityCard, or DisclosureEntityCard. ContentCardBody is internal to the entity surface.',
+          },
+          {
+            name: '@rpg/ui',
+            importNames: ['Sheet'],
+            message:
+              'Use DrawerShell (or CatalogPickerSheet / BuilderOptionDetailsSheet). Raw Sheet chrome is reserved for DrawerShell. See apps/dashboard/docs/drawer-shell.md.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['**/control-action.variants', '@rpg/ui/**/control-action*'],
+            message:
+              'Use Button, iconGhostControlVariants, or shared primitives — not internal control-action geometry.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 export default [
   ...react,
   ...storybook.configs['flat/recommended'],
@@ -353,10 +444,14 @@ export default [
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,
   dashboardEntityCatalogPickerImportGuard,
+  dashboardPickerActionRowGuard,
   dashboardSemanticStyleLayerGuards,
   dashboardDragHandleGuard,
   dashboardFormFieldGuards,
   dashboardContentPickerPolicyGuards,
   dashboardContentCharacterPickerChromeGuard,
   dashboardCharacterBuilderPlayActorGuard,
+  dashboardFastRefreshGuard,
+  dashboardShellContractsImportGuard,
+  dashboardAuthApiContractsImportGuard,
 ]

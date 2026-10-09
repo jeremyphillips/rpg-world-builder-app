@@ -3,7 +3,8 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import { ContentPreviewCompactTrigger } from './content-preview-rail'
-import { ContentPreviewUiProvider, useContentPreviewUi } from './content-preview-ui-context'
+import { ContentPreviewUiProvider } from './content-preview-ui-context'
+import { useContentPreviewUi } from './use-content-preview-ui'
 
 function SheetOpenProbe() {
   const { sheetOpen } = useContentPreviewUi()

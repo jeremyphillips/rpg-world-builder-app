@@ -3,7 +3,7 @@ import type { EntitySummaryModel } from './entity-summary.types'
 
 export type EntitySummaryProjectionInput = {
   heading: EntitySummaryModel['heading']
-  /** Inline classification after the heading — may include a leading ` · ` separator. */
+  /** Inline classification segments after the heading (separator-free; chrome adds dots). */
   classification?: EntitySummaryModel['classification']
   description?: EntitySummaryModel['description']
   status?: EntitySummaryStatusItem | readonly EntitySummaryStatusItem[]

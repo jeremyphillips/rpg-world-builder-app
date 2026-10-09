@@ -31,8 +31,9 @@ describe('controlAction variants', () => {
     expect(controlActionCompactIconClasses).not.toContain('size-icon-glyph-xs')
   })
 
-  it('pairs compact text+icon with sm glyph', () => {
+  it('pairs compact text+icon with xs gap and sm glyph', () => {
     expect(controlActionCompactTextWithIconClasses).toContain('h-control-action-compact')
+    expect(controlActionCompactTextWithIconClasses).toContain('gap-1')
     expect(controlActionCompactTextWithIconClasses).toContain('[&_svg]:size-icon-glyph-sm')
   })
 
@@ -49,6 +50,7 @@ describe('controlAction variants', () => {
   it('locks xs text control to 28px height and 10px type', () => {
     expect(controlActionXsTextClasses).toContain('h-control-action-xs')
     expect(controlActionXsTextClasses).toContain('text-control-action-xs')
+    expect(controlActionXsTextClasses).toContain('gap-1')
     expect(controlActionXsTextClasses).toContain('[&_svg]:size-icon-glyph-xs')
   })
 

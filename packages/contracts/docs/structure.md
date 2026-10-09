@@ -552,6 +552,12 @@ belongs in that registry.
 - `vocabularyTermFieldCopy(term, { multiple? })` — default form `{ label, placeholder }`
 - `getTermCompactLabel(entry)` — short identity; `getTermCollectionLabel(entry)` — set/category copy (sentence case)
 
+Call sites must not build a sentence by lowercasing a title or appending `s` to a label.
+Use `getTermSentenceForm` or `vocabularyTermLabel` with `casing: 'sentence'`.
+`vocab-copy-drift.test.ts` ratchets the remaining production call sites. A shared word
+such as “schools” is not a hit: a copy prop is flagged only when its entire value equals
+a mechanical derivative that is not already the curated sentence form.
+
 Do not use `compactLabel` for collection phrases. Dashboard hub/overview surfaces may
 title-case collection semantics for navigation; that presentation layer stays in apps,
 not in `collectionLabel`.
@@ -601,11 +607,15 @@ and `resolveOrganizationNpcClassRecommendationIds` in
 ### Catalog content-type terms (`CONTENT_TYPE_TERMS`)
 
 Catalog collection chrome uses a separate registry in
-[`content-type-terms.ts`](../src/rpg/content/lib/content-type-terms.ts), keyed
+[`content-type-terms.ts`](../src/rpg/primitives/content/content-type-terms.ts), keyed
 by `ContentTypeKey`. Each entry is a `VocabularyTerm` with `label`,
 `description`, and `sentence` forms. Exported aliases use the `*_CONTENT_TYPE_TERM`
 qualifier (e.g. `SPECIES_CONTENT_TYPE_TERM`) — not generic `SPECIES_TERM`, which
-would collide with field taxonomy.
+would collide with field taxonomy. Exact singular labels, collection labels, and
+sentence forms are ratcheted by
+[`content-type-copy-drift.test.ts`](../src/rpg/content/lib/content-type-copy-drift.test.ts);
+policy is in
+[content-types.md](../../../docs/content-types.md#catalog-content-type-terms-content_type_terms).
 
 `compactLabel` on content-type terms is reserved for semantically distinct
 abbreviations. Most types rely on `label` + `sentence.plural` + dashboard

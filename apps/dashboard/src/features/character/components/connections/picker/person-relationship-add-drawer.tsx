@@ -1,9 +1,11 @@
 import * as React from 'react'
 
-import { Button, Eyebrow, Text } from '@rpg/ui'
+import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
+import { Button, CATALOG_PICKER_ADD_LABEL, resolvePickerActionFailureStatus, Text } from '@rpg/ui'
 
-import { DrawerShell } from '@/components/drawer'
+import { RelationshipDrawerSubjectField } from '@/features/content'
 
+import { createCharacterClassFilterLabelResolver } from '../../../lib/display/format-content-reference-label'
 import type { CharacterPickerOption } from '../../../lib/picker/character-picker-option.lib'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
@@ -16,6 +18,7 @@ export type PersonRelationshipAddDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   characters: readonly CharacterPickerOption[]
+  catalogIndex?: CharacterBuildCatalogIndex | null
   presetRole?: PersonConnectionRoleOption
   onAdd: (input: { characterId: string; role: PersonConnectionRoleOption }) => void | Promise<void>
 }
@@ -23,7 +26,7 @@ export type PersonRelationshipAddDrawerProps = {
 function resolveSubmitError(error: unknown): string {
   return error instanceof Error && error.message.trim().length > 0
     ? error.message
-    : 'Could not add this person connection.'
+    : resolvePickerActionFailureStatus(CATALOG_PICKER_ADD_LABEL)
 }
 
 // Orchestrator: picker → role selection → confirm for person draft edges.
@@ -32,9 +35,14 @@ export function PersonRelationshipAddDrawer({
   open,
   onOpenChange,
   characters,
+  catalogIndex,
   presetRole,
   onAdd,
 }: PersonRelationshipAddDrawerProps) {
+  const resolveClassLabel = React.useMemo(
+    () => createCharacterClassFilterLabelResolver(catalogIndex),
+    [catalogIndex],
+  )
   const [selectedCharacterId, setSelectedCharacterId] = React.useState<string | null>(null)
   const [selectedRoleId, setSelectedRoleId] = React.useState<string | null>(presetRole?.id ?? null)
   const [pending, setPending] = React.useState(false)
@@ -60,7 +68,14 @@ export function PersonRelationshipAddDrawer({
   const selectedRole = PERSON_CONNECTION_ROLE_OPTIONS.find((role) => role.id === selectedRoleId)
   const showRoleStep = Boolean(selectedCharacterId) && !presetRole
   const showConfirmStep = Boolean(selectedCharacterId) && Boolean(presetRole ?? selectedRole)
+  const showFollowUp = showRoleStep || showConfirmStep
   const drawerTitle = presetRole?.shortcutLabel ?? 'Add person'
+
+  const returnToBrowse = React.useCallback(() => {
+    setSelectedCharacterId(null)
+    setSelectedRoleId(presetRole?.id ?? null)
+    setSubmitError(null)
+  }, [presetRole?.id])
 
   const commitAdd = React.useCallback(async () => {
     const role = presetRole ?? selectedRole
@@ -85,54 +100,47 @@ export function PersonRelationshipAddDrawer({
   }))
 
   return (
-    <>
-      <CharacterPickerDrawer
-        open={open && !showRoleStep && !showConfirmStep}
-        closeOnSelect={false}
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen && !selectedCharacterId) handleOpenChange(false)
-        }}
-        title={drawerTitle}
-        items={pickerItems}
-        onSelect={(characterId) => {
-          setSelectedCharacterId(characterId)
-        }}
-      />
-      <DrawerShell
-        open={open && (showRoleStep || showConfirmStep)}
-        onOpenChange={handleOpenChange}
-        title={drawerTitle}
-      >
-        <div className="flex flex-col gap-6">
-          {selectedCharacter ? (
-            <div className="space-y-1">
-              <Eyebrow size="sm">Person</Eyebrow>
-              <Text>{selectedCharacter.name}</Text>
-            </div>
-          ) : null}
-
-          {presetRole ? (
-            <div className="space-y-1">
-              <Eyebrow size="sm">Relationship</Eyebrow>
-              <Text>{presetRole.label}</Text>
-            </div>
-          ) : null}
-
-          {showRoleStep && selectedCharacter ? (
-            <PersonRelationshipRoleStep
-              characterName={selectedCharacter.name}
-              selectedRoleId={selectedRoleId}
-              onSelectedRoleIdChange={setSelectedRoleId}
-            />
-          ) : null}
-
-          {submitError ? (
-            <Text variant="destructive" role="alert">
-              {submitError}
-            </Text>
-          ) : null}
-
-          <div className="flex justify-end gap-2">
+    <CharacterPickerDrawer
+      open={open}
+      closeOnSelect={false}
+      onOpenChange={handleOpenChange}
+      title={drawerTitle}
+      items={pickerItems}
+      resolveClassLabel={resolveClassLabel}
+      rowActionLabel="Choose"
+      onSelect={(characterId) => {
+        setSelectedCharacterId(characterId)
+      }}
+      bodyReplacement={
+        showFollowUp ? (
+          <div className="flex flex-col gap-6">
+            {selectedCharacter ? (
+              <RelationshipDrawerSubjectField label="Person" value={selectedCharacter.name} />
+            ) : null}
+            {presetRole ? (
+              <RelationshipDrawerSubjectField label="Relationship" value={presetRole.label} />
+            ) : null}
+            {showRoleStep && selectedCharacter ? (
+              <PersonRelationshipRoleStep
+                characterName={selectedCharacter.name}
+                selectedRoleId={selectedRoleId}
+                onSelectedRoleIdChange={setSelectedRoleId}
+              />
+            ) : null}
+            {submitError ? (
+              <Text variant="destructive" role="alert">
+                {submitError}
+              </Text>
+            ) : null}
+          </div>
+        ) : undefined
+      }
+      footer={
+        showFollowUp ? (
+          <>
+            <Button type="button" variant="outline" disabled={pending} onClick={returnToBrowse}>
+              Back
+            </Button>
             <Button
               type="button"
               variant="outline"
@@ -150,9 +158,9 @@ export function PersonRelationshipAddDrawer({
             >
               Add
             </Button>
-          </div>
-        </div>
-      </DrawerShell>
-    </>
+          </>
+        ) : undefined
+      }
+    />
   )
 }

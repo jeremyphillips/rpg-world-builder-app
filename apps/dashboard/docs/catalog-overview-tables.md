@@ -65,7 +65,7 @@ Page **index** is never persisted in preferences — only page **size**.
 `CatalogOverviewTable` composes `OverviewTableFrame` with:
 
 - `DataTableFilterRegion` when `filterSchema` is provided (primary `FilterBar` + optional additional panel)
-- `OverviewResultSummary` on utility bar row 1
+- `ResultSummary` on utility bar row 1
 - Column visibility on utility bar row 2
 - Column visibility/order prefs (`catalog-overview-preferences.ts`)
 

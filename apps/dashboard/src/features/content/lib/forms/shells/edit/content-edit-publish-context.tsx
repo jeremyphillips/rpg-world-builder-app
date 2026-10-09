@@ -1,13 +1,6 @@
-import { createContext, useContext, useMemo, useRef, useCallback, type ReactNode } from 'react'
+import { useCallback, useMemo, useRef, type ReactNode } from 'react'
 
-type PublishRequest = () => void | Promise<void>
-
-type ContentEditPublishContextValue = {
-  requestPublish: () => void
-  setPublishRequest: (handler: PublishRequest | null) => void
-}
-
-const ContentEditPublishContext = createContext<ContentEditPublishContextValue | null>(null)
+import { ContentEditPublishContext, type PublishRequest } from './use-content-edit-publish-request'
 
 export function ContentEditPublishProvider({ children }: { children: ReactNode }) {
   const publishRequestRef = useRef<PublishRequest | null>(null)
@@ -33,8 +26,4 @@ export function ContentEditPublishProvider({ children }: { children: ReactNode }
       {children}
     </ContentEditPublishContext.Provider>
   )
-}
-
-export function useContentEditPublishRequest(): ContentEditPublishContextValue | null {
-  return useContext(ContentEditPublishContext)
 }

@@ -1,12 +1,15 @@
+import { CLASS_SPELLCASTING_CHOICE_SUFFIXES } from '@rpg/contracts'
 import { cleanup, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
+import { resolvePickerMutationCopy } from '../../../lib/picker/picker-mutation-family'
 import { SpellPickerDrawer } from './spell-picker-drawer'
 import {
   spellPickerCantripChoiceSetFixture,
+  spellPickerCureWoundsFixture,
   spellPickerDetectMagicFixture,
   spellPickerItemsFixture,
   spellPickerMageHandFixture,
@@ -14,10 +17,22 @@ import {
 } from './spell-picker-drawer.fixtures'
 import {
   SPELL_PICKER_MODE_CANTRIPS,
+  SPELL_PICKER_MODE_SPELLS,
   SPELL_PICKER_NO_OPTIONS_MESSAGE,
   SPELL_PICKER_NO_RESULTS_MESSAGE,
+  SPELL_PICKER_SEARCH_PLACEHOLDER,
   SPELL_PICKER_SELECTION_FULL_MESSAGE,
+  SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
+  SPELL_PICKER_SORT_GROUP_LABEL,
+  SPELL_PICKER_SORT_ORDER_LABEL,
 } from './spell-picker-drawer.types'
+
+const preparedSpellChoiceSet = {
+  ...spellPickerCantripChoiceSetFixture,
+  id: 'spellcasting:srd-cc-5.2.1:cleric:prepared',
+  choiceType: 'spell' as const,
+  label: 'Prepared spells',
+}
 
 function renderCantripDrawer(overrides: Partial<ComponentProps<typeof SpellPickerDrawer>> = {}) {
   const onSelectSpell = vi.fn()
@@ -30,9 +45,9 @@ function renderCantripDrawer(overrides: Partial<ComponentProps<typeof SpellPicke
       characterClassName="Wizard"
       cantripChoiceSet={spellPickerCantripChoiceSetFixture}
       cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
-      preparedSelectedIds={[]}
+      spellSelectedIds={[]}
       cantripItems={spellPickerOpenItemsFixture}
-      preparedItems={[]}
+      spellItems={[]}
       onSelectSpell={onSelectSpell}
       onRemoveSpell={onRemoveSpell}
       {...overrides}
@@ -52,13 +67,13 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument()
-    expect(screen.getByRole('group', { name: 'Sort spells' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: SPELL_PICKER_SORT_GROUP_LABEL })).toBeInTheDocument()
     expect(screen.getByText('Mage Hand')).toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
     expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
     expect(screen.getByText(/Wizard cantrips/)).toBeInTheDocument()
 
-    await user.type(screen.getByRole('textbox', { name: 'Search spells' }), 'magic')
+    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'magic')
 
     expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
     expect(screen.getByText('Detect Magic')).toBeInTheDocument()
@@ -67,10 +82,35 @@ describe('SpellPickerDrawer', () => {
   it('shows compact A-Z label in the sort trigger', () => {
     renderCantripDrawer()
 
-    expect(screen.getByRole('combobox', { name: 'Spell sort order' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('combobox', { name: SPELL_PICKER_SORT_ORDER_LABEL })).toHaveTextContent(
+      'A–Z',
+    )
   })
 
-  it('shows a Recommended badge when recommendations are enabled', () => {
+  it('omits the primary toolbar row when level chips are hidden', () => {
+    renderCantripDrawer()
+
+    expect(document.querySelector('[data-slot="catalog-toolbar-primary"]')).toBeNull()
+  })
+
+  it('filters rows when a casting and mechanics checkbox is selected', async () => {
+    const user = userEvent.setup()
+    renderCantripDrawer({
+      cantripSelectedIds: [],
+      cantripItems: spellPickerOpenItemsFixture,
+    })
+
+    await user.click(
+      screen.getByRole('button', { name: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL }),
+    )
+    await user.click(screen.getByRole('checkbox', { name: 'Ritual' }))
+
+    expect(screen.getByRole('checkbox', { name: 'Ritual' })).toBeChecked()
+    expect(screen.getByText('Detect Magic')).toBeInTheDocument()
+    expect(screen.queryByText('Mage Hand')).not.toBeInTheDocument()
+  })
+
+  it('shows recommendation guidance and explains selection full on the disabled action', () => {
     const recommendedItem = {
       ...spellPickerOpenItemsFixture[0]!,
       state: {
@@ -91,24 +131,54 @@ describe('SpellPickerDrawer', () => {
           facts: [
             {
               kind: 'recommendation' as const,
-              label: 'Recommended',
+              discriminator: 'recommended' as const,
+              label: 'Recommended by class',
+              sourceKind: 'class' as const,
               sourceLabels: ['Wizard class'],
             },
           ],
         },
       },
     }
+    const blockedItem = {
+      ...spellPickerOpenItemsFixture[1]!,
+      state: {
+        ...spellPickerOpenItemsFixture[1]!.state,
+        canSelect: false,
+        isSelectionFull: true,
+        disabledReasons: ['Selection full'],
+        presentation: recommendedItem.state.presentation,
+      },
+    }
 
     renderCantripDrawer({
       recommendationsEnabled: true,
       cantripSelectedIds: [],
-      cantripItems: [recommendedItem, ...spellPickerOpenItemsFixture.slice(1)],
+      cantripItems: [recommendedItem, blockedItem],
     })
 
     const mageHandRow = screen
       .getByText('Mage Hand')
       .closest('[data-picker-item-key]') as HTMLElement
-    expect(within(mageHandRow).getByText('Recommended')).toBeInTheDocument()
+    const guidance = within(mageHandRow).getByText('Recommended by class')
+    expect(guidance.tagName).toBe('SPAN')
+    expect(guidance).toHaveClass('text-foreground')
+    expect(guidance).toHaveAttribute('title', 'Wizard class')
+    expect(within(mageHandRow).queryByText('Selection full')).not.toBeInTheDocument()
+
+    const blockedRow = screen
+      .getByText('Detect Magic')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(blockedRow).getByText('Recommended by class')).toBeInTheDocument()
+    expect(within(blockedRow).queryByText('Selection full')).not.toBeInTheDocument()
+    const blockedAdd = within(blockedRow).getByRole('button', { name: 'Add' })
+    expect(blockedAdd).toBeDisabled()
+    expect(blockedAdd.parentElement).toHaveAccessibleName(
+      'Add, Selection full, Remove a selection before adding another.',
+    )
+    const statusLine = blockedRow.querySelector('[data-entity-summary-status]')?.parentElement
+      ?.parentElement
+    expect(statusLine?.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(0)
   })
 
   it('disables Add when canSelect is false and keeps selected rows removable', () => {
@@ -118,7 +188,113 @@ describe('SpellPickerDrawer', () => {
     })
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(2)
+    expect(screen.getAllByText('Selected')).toHaveLength(2)
     expect(screen.queryByRole('button', { name: 'Add' })).not.toBeInTheDocument()
+  })
+
+  it('labels prepared rows Prepare and selected rows Unprepare', async () => {
+    const user = userEvent.setup()
+    const onSelectSpell = vi.fn()
+    const onRemoveSpell = vi.fn()
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Cleric"
+        spellChoiceSet={preparedSpellChoiceSet}
+        cantripSelectedIds={[]}
+        spellSelectedIds={[]}
+        cantripItems={[]}
+        spellItems={spellPickerOpenItemsFixture}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
+        onSelectSpell={onSelectSpell}
+        onRemoveSpell={onRemoveSpell}
+      />,
+    )
+
+    const prepared = resolvePickerMutationCopy('preparedSpell')
+    const cureWoundsRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(cureWoundsRow).queryByText(prepared.state)).not.toBeInTheDocument()
+    await user.click(within(cureWoundsRow).getByRole('button', { name: prepared.acquire }))
+    expect(onSelectSpell).toHaveBeenCalledWith(
+      SPELL_PICKER_MODE_SPELLS,
+      spellPickerCureWoundsFixture.id,
+    )
+
+    cleanup()
+
+    const selectedCureWounds = {
+      ...spellPickerOpenItemsFixture[2]!,
+      state: {
+        ...spellPickerOpenItemsFixture[2]!.state,
+        isAlreadySelected: true,
+      },
+    }
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Cleric"
+        spellChoiceSet={preparedSpellChoiceSet}
+        cantripSelectedIds={[]}
+        spellSelectedIds={[spellPickerCureWoundsFixture.id]}
+        cantripItems={[]}
+        spellItems={[selectedCureWounds]}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
+        onSelectSpell={vi.fn()}
+        onRemoveSpell={onRemoveSpell}
+      />,
+    )
+
+    const selectedRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(selectedRow).getByText(prepared.state)).toBeInTheDocument()
+    await user.click(within(selectedRow).getByRole('button', { name: prepared.release }))
+    expect(onRemoveSpell).toHaveBeenCalledWith(
+      SPELL_PICKER_MODE_SPELLS,
+      spellPickerCureWoundsFixture.id,
+    )
+  })
+
+  it('labels a learned spell Unlearn and shows Learned', () => {
+    const learned = resolvePickerMutationCopy('learnedSpell')
+    const selectedCureWounds = {
+      ...spellPickerOpenItemsFixture[2]!,
+      state: {
+        ...spellPickerOpenItemsFixture[2]!.state,
+        isAlreadySelected: true,
+      },
+    }
+
+    render(
+      <SpellPickerDrawer
+        open
+        onOpenChange={vi.fn()}
+        characterClassName="Bard"
+        spellChoiceSet={{
+          ...preparedSpellChoiceSet,
+          id: `spellcasting:srd-cc-5.2.1:bard:${CLASS_SPELLCASTING_CHOICE_SUFFIXES.repertoire}`,
+        }}
+        cantripSelectedIds={[]}
+        spellSelectedIds={[spellPickerCureWoundsFixture.id]}
+        cantripItems={[]}
+        spellItems={[selectedCureWounds]}
+        initialMode={SPELL_PICKER_MODE_SPELLS}
+        onSelectSpell={vi.fn()}
+        onRemoveSpell={vi.fn()}
+      />,
+    )
+
+    const selectedRow = screen
+      .getByText('Cure Wounds')
+      .closest('[data-picker-item-key]') as HTMLElement
+    expect(within(selectedRow).getByText(learned.state)).toBeInTheDocument()
+    expect(within(selectedRow).getByRole('button', { name: learned.release })).toBeInTheDocument()
   })
 
   it('calls onSelectSpell and onRemoveSpell from row actions', async () => {
@@ -162,9 +338,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -179,9 +355,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id, spellPickerDetectMagicFixture.id]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -196,15 +372,15 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={spellPickerOpenItemsFixture}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
     )
 
-    await user.type(screen.getByRole('textbox', { name: 'Search spells' }), 'zzzz')
+    await user.type(screen.getByRole('textbox', { name: SPELL_PICKER_SEARCH_PLACEHOLDER }), 'zzzz')
     expect(screen.getByText(SPELL_PICKER_NO_RESULTS_MESSAGE)).toBeInTheDocument()
   })
 
@@ -218,9 +394,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={[spellPickerOpenItemsFixture[0]!]}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,
@@ -239,9 +415,9 @@ describe('SpellPickerDrawer', () => {
         characterClassName="Wizard"
         cantripChoiceSet={spellPickerCantripChoiceSetFixture}
         cantripSelectedIds={[spellPickerMageHandFixture.id]}
-        preparedSelectedIds={[]}
+        spellSelectedIds={[]}
         cantripItems={spellPickerItemsFixture}
-        preparedItems={[]}
+        spellItems={[]}
         onSelectSpell={vi.fn()}
         onRemoveSpell={vi.fn()}
       />,

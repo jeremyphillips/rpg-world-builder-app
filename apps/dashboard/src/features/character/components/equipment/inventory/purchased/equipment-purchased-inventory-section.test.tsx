@@ -52,12 +52,17 @@ const purchasedWithHeadings: PurchasedCategoryGroup[] = [
   {
     group: 'gear',
     groupLabel: 'Gear',
-    displays: [{ kind: 'single', row: stackableRow }],
+    items: [{ display: { kind: 'single', row: stackableRow }, status: [] }],
   },
   {
     group: 'weapons',
     groupLabel: 'Weapons',
-    displays: [{ kind: 'single', row: weaponRow }],
+    items: [
+      {
+        display: { kind: 'single', row: weaponRow },
+        status: [{ kind: 'badge', label: 'Not proficient', tone: 'warning' }],
+      },
+    ],
   },
 ]
 
@@ -78,6 +83,12 @@ describe('EquipmentPurchasedInventorySection', () => {
     expect(screen.getByText('Weapons')).toBeInTheDocument()
     expect(screen.getByText('Rations')).toBeInTheDocument()
     expect(screen.getByText('Dagger')).toBeInTheDocument()
+  })
+
+  it('renders each item with its resolved status', () => {
+    render(<EquipmentPurchasedInventorySection purchased={purchasedWithHeadings} />)
+
+    expect(screen.getAllByText('Not proficient')).toHaveLength(1)
   })
 
   it('renders a flat list without headings when showGroupHeadings is false', () => {
@@ -112,7 +123,7 @@ describe('EquipmentPurchasedInventorySection', () => {
           {
             group: 'gear',
             groupLabel: 'Gear',
-            displays: [{ kind: 'single', row: stagedRow }],
+            items: [{ display: { kind: 'single', row: stagedRow }, status: [] }],
           },
         ]}
         showGroupHeadings={false}

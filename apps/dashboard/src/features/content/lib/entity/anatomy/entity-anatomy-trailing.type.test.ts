@@ -22,6 +22,25 @@ describe('entity item trailing closed API', () => {
     expectTypeOf<IndicatorKeys>().not.toEqualTypeOf<'content'>()
   })
 
+  it('action and utility accept an optional meta string', () => {
+    expectTypeOf<EntityAnatomyTrailingAction['meta']>().toEqualTypeOf<string | undefined>()
+    expectTypeOf<Extract<EntityAnatomyTrailing, { kind: 'utility' }>['meta']>().toEqualTypeOf<
+      string | undefined
+    >()
+  })
+
+  it('quantity indicator format includes additional', () => {
+    expectTypeOf<
+      Extract<EntityAnatomyTrailing, { kind: 'indicator'; variant: 'quantity' }>['format']
+    >().toEqualTypeOf<'compact' | 'label' | 'additional' | undefined>()
+  })
+
+  it('label indicator carries a string label', () => {
+    expectTypeOf<
+      Extract<EntityAnatomyTrailing, { kind: 'indicator'; variant: 'label' }>['label']
+    >().toEqualTypeOf<string>()
+  })
+
   it('group secondary accepts only closed metadata variants', () => {
     expectTypeOf<Extract<EntityAnatomyTrailing, { kind: 'group' }>['secondary']>().toEqualTypeOf<
       | { kind: 'price'; label: string }

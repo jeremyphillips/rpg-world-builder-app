@@ -1,14 +1,6 @@
 import * as React from 'react'
 
-type RealtimeContextValue = {
-  isConnected: boolean
-  setActiveConversationId: (conversationId: string | null) => void
-}
-
-const RealtimeContext = React.createContext<RealtimeContextValue>({
-  isConnected: false,
-  setActiveConversationId: () => undefined,
-})
+import { RealtimeContext, type RealtimeContextValue } from './use-realtime-status'
 
 export function RealtimeContextProvider({
   isConnected,
@@ -16,7 +8,7 @@ export function RealtimeContextProvider({
   children,
 }: {
   isConnected: boolean
-  setActiveConversationId: (conversationId: string | null) => void
+  setActiveConversationId: RealtimeContextValue['setActiveConversationId']
   children: React.ReactNode
 }) {
   const value = React.useMemo(
@@ -24,8 +16,4 @@ export function RealtimeContextProvider({
     [isConnected, setActiveConversationId],
   )
   return <RealtimeContext.Provider value={value}>{children}</RealtimeContext.Provider>
-}
-
-export function useRealtimeStatus(): RealtimeContextValue {
-  return React.useContext(RealtimeContext)
 }

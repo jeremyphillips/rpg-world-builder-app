@@ -28,13 +28,24 @@ const proxy = httpProxy.createProxyServer({
   xfwd: true,
 })
 
+function logUpstreamError(err, context) {
+  console.warn(`[dev-proxy] ${context}: ${err.message}`)
+}
+
 proxy.on('error', (err, _req, res) => {
   if (res && 'writeHead' in res && !res.headersSent) {
     res.writeHead(502, { 'content-type': 'text/plain' })
     res.end(`[dev-proxy] upstream error: ${err.message}`)
-  } else if (res && 'destroy' in res) {
-    res.destroy(err)
+    return
   }
+  if (res && 'destroy' in res) {
+    if ('writable' in res && res.writable) {
+      res.on('error', () => {})
+    }
+    res.destroy()
+    return
+  }
+  logUpstreamError(err, 'upstream')
 })
 
 function resolveTarget(url = '/') {
@@ -61,7 +72,19 @@ const server = http.createServer((req, res) => {
 })
 
 server.on('upgrade', (req, socket, head) => {
-  proxy.ws(req, socket, head, { target: resolveTarget(req.url) })
+  // Vite HMR reconnects as soon as :8080 is up; if the dashboard is still
+  // booting, http-proxy can emit an unhandled socket `error` and exit the process.
+  socket.on('error', () => {
+    socket.destroy()
+  })
+
+  proxy.ws(req, socket, head, { target: resolveTarget(req.url) }, (err) => {
+    if (!err) return
+    logUpstreamError(err, `ws ${req.url ?? ''}`.trim())
+    if (!socket.destroyed) {
+      socket.destroy()
+    }
+  })
 })
 
 server.listen(PROXY_PORT, () => {

@@ -28,7 +28,7 @@ import {
   selectedIdsForSpellPickerMode,
 } from './spell-picker-drawer.lib'
 import {
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
   type SpellPickerBrowseState,
   type SpellPickerDrawerProps,
   type SpellPickerMode,
@@ -42,11 +42,11 @@ export type UseSpellPickerControllerArgs = Pick<
   | 'recommendationsEnabled'
   | 'displayVocabulary'
   | 'cantripChoiceSet'
-  | 'preparedChoiceSet'
+  | 'spellChoiceSet'
   | 'cantripSelectedIds'
-  | 'preparedSelectedIds'
+  | 'spellSelectedIds'
   | 'cantripItems'
-  | 'preparedItems'
+  | 'spellItems'
 >
 
 export function useSpellPickerController({
@@ -56,15 +56,15 @@ export function useSpellPickerController({
   recommendationsEnabled = false,
   displayVocabulary,
   cantripChoiceSet,
-  preparedChoiceSet,
+  spellChoiceSet,
   cantripSelectedIds,
-  preparedSelectedIds,
+  spellSelectedIds,
   cantripItems,
-  preparedItems,
+  spellItems,
 }: UseSpellPickerControllerArgs) {
   const modes = React.useMemo(
-    () => resolveSpellPickerModes({ cantripChoiceSet, preparedChoiceSet }),
-    [cantripChoiceSet, preparedChoiceSet],
+    () => resolveSpellPickerModes({ cantripChoiceSet, spellChoiceSet }),
+    [cantripChoiceSet, spellChoiceSet],
   )
 
   const [mode, setMode] = React.useState<SpellPickerMode>(() =>
@@ -120,21 +120,20 @@ export function useSpellPickerController({
     setTrackedOpenBrowseSyncKey('closed')
   }
 
-  const activeChoiceSet = choiceSetForSpellPickerMode(mode, cantripChoiceSet, preparedChoiceSet)
+  const activeChoiceSet = choiceSetForSpellPickerMode(mode, cantripChoiceSet, spellChoiceSet)
   const activeSelectedIds = selectedIdsForSpellPickerMode(
     mode,
     cantripSelectedIds,
-    preparedSelectedIds,
+    spellSelectedIds,
   )
-  const activeItems = itemsForSpellPickerMode(mode, cantripItems, preparedItems)
+  const activeItems = itemsForSpellPickerMode(mode, cantripItems, spellItems)
 
   const filterOptions = React.useMemo(
     () => resolveSpellPickerFilterOptions(activeItems),
     [activeItems],
   )
 
-  const showLevelChips =
-    mode === SPELL_PICKER_MODE_PREPARED_SPELLS && filterOptions.levelOptions.length > 1
+  const showLevelChips = mode === SPELL_PICKER_MODE_SPELLS && filterOptions.levelOptions.length > 1
   const showSchoolFilter = filterOptions.schoolOptions.length > 1
 
   const schemaArgs = React.useMemo(

@@ -1,5 +1,9 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Text } from '@rpg/ui'
-import { resolveFilterChromePresentation, useFilterChrome } from '@rpg/ui/filters'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@rpg/ui'
+import {
+  FilterFieldCaption,
+  resolveFilterChromePresentation,
+  useFilterChrome,
+} from '@rpg/ui/filters'
 
 import { catalogPickerSortFilterClasses } from '../catalog-picker-filter-toolbar.variants'
 import {
@@ -33,14 +37,15 @@ export function CatalogSortControl<TMode extends string = string>({
 
   return (
     <div className={catalogPickerSortFilterClasses} role="group" aria-label={ariaLabel}>
-      <Text as="span" className={presentation.labelClassName}>
-        {label}
-      </Text>
+      <FilterFieldCaption>{label}</FilterFieldCaption>
       <Select value={value} onValueChange={(next) => onValueChange(next as TMode)}>
         <SelectTrigger
           size={presentation.controlSize}
-          className="w-auto shrink-0 min-w-[4.5rem]"
           aria-label={triggerAriaLabel}
+          title={triggerLabel}
+          sizingLabels={[
+            ...new Set(options.map((option) => resolvePickerSortTriggerLabel(option))),
+          ]}
         >
           <SelectValue>{triggerLabel}</SelectValue>
         </SelectTrigger>

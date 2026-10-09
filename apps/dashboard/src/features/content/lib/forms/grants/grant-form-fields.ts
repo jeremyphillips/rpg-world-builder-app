@@ -22,6 +22,7 @@ import {
   type UsageFrequency,
   isArmorEquipment,
   isWeaponEquipment,
+  getSpellGrantAvailabilityLabel,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import {
@@ -554,7 +555,7 @@ export function grantItemFields<T extends string>(
         {
           type: 'checkbox',
           name: 'spellAvailability',
-          label: 'Always prepared',
+          label: getSpellGrantAvailabilityLabel('always_prepared'),
           visibility: visibleFor('spells'),
         },
         {

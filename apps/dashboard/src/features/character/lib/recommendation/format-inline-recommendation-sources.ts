@@ -1,25 +1,4 @@
-import type { OptionPresentationFacts } from '@rpg/contracts'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
-
-import type { EntitySummaryStatusItem } from '@/features/content'
-
-export function recommendationStatusItems(
-  presentation: OptionPresentationFacts | undefined,
-): EntitySummaryStatusItem[] {
-  const fact = presentation?.facts.find((entry) => entry.kind === 'recommendation')
-  if (!fact) return []
-  const sources = formatInlineRecommendationSources(fact.sourceLabels)
-  const title = sources.title ?? (sources.inline || undefined)
-  return [
-    {
-      kind: 'badge',
-      label: fact.label,
-      appearance: 'outline',
-      tone: 'info',
-      ...(title ? { title } : {}),
-    },
-  ]
-}
 
 /** Up to two sources inline. Three or more keep the first source and a +N count. */
 export function formatInlineRecommendationSources(labels: readonly string[]): {

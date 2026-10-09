@@ -4,11 +4,17 @@ import {
   buildMagicItemAllowanceId,
   createEmptyCharacterBuilderDraft,
   equipmentSchema,
+  getBuilderSelectedStartingLevel,
   indexCharacterBuildCatalog,
   resolveEquipmentAcquisitionActionState,
+  resolveMagicItemAcquiredCopyCap,
+  resolveMagicItemGrantAllowances,
+  resolveMagicItemGrantProgressList,
+  resolveStartingWealthTierForBuilder,
   standardStartingWealthTableId,
   startingEquipmentChoiceSetId,
   type CharacterBuilderDraft,
+  type StartingWealthRules,
 } from '@rpg/contracts'
 
 import { buildEquipmentPickerRowViewModel } from '@/features/content'
@@ -21,7 +27,16 @@ import {
 } from '../../../../lib/equipment/equipment-step.fixtures'
 import { resolveEquipmentAcquisitionContext } from '../../../../lib/equipment/equipment-step.lib'
 import { buildEquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
-import { resolveEquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
+import {
+  buildEquipmentPickerOwnershipIndex,
+  EMPTY_EQUIPMENT_OWNERSHIP,
+  getEquipmentOwnership,
+} from '../../../../lib/equipment/equipment-ownership-index.lib'
+import {
+  equipmentAcquisitionBlockerReason,
+  formatEquipmentPickerHeaderTrailingLabel,
+  resolveEquipmentPickerItemPresentation,
+} from './equipment-picker-item-header.lib'
 
 const RULESET = 'srd-cc-5.2.1' as const
 const TABLE_ID = standardStartingWealthTableId(RULESET)
@@ -108,7 +123,8 @@ function presentationFor(args: {
   workflowMode: 'purchase' | 'magic_items'
   draft: CharacterBuilderDraft
   context: ReturnType<typeof resolveEquipmentAcquisitionContext>
-  ownedQuantity?: number
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
+  startingWealth?: StartingWealthRules
 }) {
   const actionState = resolveEquipmentAcquisitionActionState({
     draft: args.draft,
@@ -119,14 +135,51 @@ function presentationFor(args: {
   })
   const rowActionVm = buildEquipmentPickerRowActionViewModel(actionState)
   const row = buildEquipmentPickerRowViewModel(args.equipment)
+  const ownership = getEquipmentOwnership(
+    buildEquipmentPickerOwnershipIndex({
+      draft: args.draft,
+      catalogIndex: args.catalogIndex,
+      options: args.startingWealth ? { startingWealth: args.startingWealth } : {},
+    }),
+    args.equipment.id,
+  )
+  const copyCap = resolveMagicItemAcquiredCopyCap({
+    equipment: args.equipment,
+    acquiredQuantity: ownership.acquiredQuantity,
+  })
+
+  const startingLevel = getBuilderSelectedStartingLevel(args.draft)
+  const tier = resolveStartingWealthTierForBuilder(args.context.startingWealth, startingLevel)
+  const magicItemGrantProgress = tier
+    ? resolveMagicItemGrantProgressList({
+        allowances: resolveMagicItemGrantAllowances({
+          startingWealthTableId: args.context.startingWealthTableId,
+          tier,
+          requirement: args.context.magicItemRequirement,
+        }),
+        selections: args.draft.equipment?.magicItemSelections ?? [],
+      })
+    : []
 
   return resolveEquipmentPickerItemPresentation({
     equipment: args.equipment,
     row,
     workflowMode: args.workflowMode,
     rowActionVm,
-    ownedQuantity: args.ownedQuantity ?? 0,
+    ownership,
+    ...(copyCap ? { copyCap } : {}),
+    maxPurchaseQuantity: ownership.editablePurchased.quantity + 1,
+    magicItemGrantProgress,
   })
+}
+
+function purchaseOwnership(editable: { quantity: number; spendCp: number }) {
+  return {
+    ...EMPTY_EQUIPMENT_OWNERSHIP,
+    editablePurchased: editable,
+    totalQuantity: editable.quantity,
+    acquiredQuantity: editable.quantity,
+  }
 }
 
 describe('resolveEquipmentPickerItemPresentation', () => {
@@ -147,11 +200,13 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       workflowMode: 'purchase',
       draft: draftWithGoldOption(),
       context,
+      catalogIndex,
     })
 
     expect(presentation).toMatchObject({
-      secondary: { kind: 'price', label: '50 GP' },
-      action: { kind: 'add', disabled: false },
+      priceSlot: { kind: 'price', label: '50 GP' },
+      control: { kind: 'add', disabled: false },
+      provenance: [],
     })
   })
 
@@ -161,15 +216,17 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       workflowMode: 'magic_items',
       draft: draftWithGoldOption(),
       context,
+      catalogIndex,
+      startingWealth: equipmentStepHeroMagicItemWealthFixture,
     })
 
     expect(presentation).toMatchObject({
-      secondary: { kind: 'grantPreview', label: 'Common choice' },
-      action: { kind: 'add', disabled: false },
+      priceSlot: { kind: 'grantPreview', label: 'Common choice' },
+      control: { kind: 'add', disabled: false },
     })
   })
 
-  it('shows price and add when grant is exhausted but fully purchasable', () => {
+  it('blocks add in magic-items mode once the matching choices are spent', () => {
     const allowanceId = buildMagicItemAllowanceId({
       startingWealthTableId: TABLE_ID,
       tierId: 'hero',
@@ -189,11 +246,15 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       workflowMode: 'magic_items',
       draft,
       context,
+      catalogIndex,
+      startingWealth: equipmentStepHeroMagicItemWealthFixture,
     })
 
-    expect(presentation).toMatchObject({
-      secondary: { kind: 'price', label: '50 GP' },
-      action: { kind: 'add', disabled: false },
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common choices are already used.',
     })
   })
 
@@ -217,15 +278,14 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       workflowMode: 'magic_items',
       draft: draftWithGoldOption(),
       context: rareContext,
+      catalogIndex: rareCatalogIndex,
     })
 
-    expect(presentation).toMatchObject({
-      statusItems: [{ kind: 'badge', label: 'No Rare choices' }],
-      action: { kind: 'none' },
-    })
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'No rare choices' })
   })
 
-  it('shows owned badge actions without add when owned and blocked', () => {
+  it('swaps add for release once the single acquired copy fills the cap', () => {
     const rareCatalogIndex = indexCharacterBuildCatalog({
       species: [],
       classes: [equipmentStepMonkClassFixture],
@@ -262,12 +322,279 @@ describe('resolveEquipmentPickerItemPresentation', () => {
       workflowMode: 'magic_items',
       draft,
       context: rareContext,
-      ownedQuantity: 1,
+      catalogIndex: rareCatalogIndex,
+      startingWealth: rareWealth,
     })
 
-    expect(presentation).toMatchObject({
-      statusItems: [{ kind: 'badge', label: 'One copy maximum' }],
-      action: { kind: 'manage_only' },
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'release', allowanceId })
+    expect(presentation.provenance).toEqual([])
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'choice', label: 'Rare choice', quantity: 1 }],
     })
+  })
+
+  it('swaps add for the aggregate stepper once an editable purchase exists', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: false,
+        availability: { status: 'available' },
+      },
+      ownership: purchaseOwnership({ quantity: 2, spendCp: 1000 }),
+      maxPurchaseQuantity: 5,
+    })
+
+    expect(presentation.control).toEqual({ kind: 'stepper', value: 2, max: 5 })
+    expect(presentation.provenance).toEqual([])
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'purchase', label: 'Purchased · 10 GP', quantity: 2 }],
+    })
+  })
+
+  it('pins the stepper ceiling at the current aggregate when the next copy is blocked', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unaffordable', shortfallCp: 100 },
+      },
+      ownership: purchaseOwnership({ quantity: 2, spendCp: 1000 }),
+      maxPurchaseQuantity: 5,
+    })
+
+    expect(presentation.control).toEqual({ kind: 'stepper', value: 2, max: 2 })
+  })
+
+  it('keeps add disabled for unaffordable rows with nothing purchased yet', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unaffordable', shortfallCp: 100 },
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.control).toEqual({ kind: 'add', disabled: true })
+  })
+
+  it('shows a selected package contribution as owned provenance', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: false,
+        availability: { status: 'available' },
+      },
+      ownership: {
+        ...EMPTY_EQUIPMENT_OWNERSHIP,
+        packageQuantity: 1,
+        totalQuantity: 1,
+      },
+    })
+
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [{ kind: 'package', label: 'Package', quantity: 1 }],
+    })
+  })
+
+  it('lists package, converted, and purchased provenance ahead of the control', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: equipmentStepPotionOfHealingFixture,
+      row: buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture),
+      workflowMode: 'magic_items',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'available' },
+      },
+      ownership: {
+        ...purchaseOwnership({ quantity: 1, spendCp: 5000 }),
+        packageQuantity: 2,
+        lockedPurchased: { quantity: 1, spendCp: 0 },
+        totalQuantity: 4,
+      },
+    })
+
+    expect(presentation.selectionState).toEqual({
+      kind: 'owned',
+      provenance: [
+        { kind: 'package', label: 'Package ×2', quantity: 2 },
+        { kind: 'purchase', label: 'Converted ×1', quantity: 1 },
+        { kind: 'purchase', label: 'Purchased · 50 GP', quantity: 1 },
+      ],
+    })
+    expect(presentation.provenance).toEqual([
+      {
+        kind: 'action',
+        key: 'remove-purchase-one',
+        label: 'Remove one',
+        ariaLabel: 'Remove one purchased copy',
+        target: { kind: 'remove_purchase_one' },
+      },
+    ])
+  })
+})
+
+describe('equipment picker blocker mapping', () => {
+  it.each([
+    [{ code: 'no_matching_grant' as const }, 'acquisition_blocked', 'No rare choices'],
+    [{ code: 'duplicate_not_allowed' as const }, 'acquisition_blocked', 'Unavailable'],
+    [{ code: 'no_market_price' as const }, 'not_purchasable', 'Not for sale'],
+    [{ code: 'cannot_afford' as const, shortfallCp: 1 }, 'unaffordable', 'Cannot afford'],
+  ])('maps %o to its reason and keeps its copy', (blocker, reason, label) => {
+    expect(equipmentAcquisitionBlockerReason(blocker.code)).toBe(reason)
+    expect(formatEquipmentPickerHeaderTrailingLabel({ blocker, rarity: 'rare' })).toBe(label)
+  })
+
+  it('maps purchase unavailability to unavailable or not purchasable', () => {
+    const row = buildEquipmentPickerRowViewModel(equipmentStepPotionOfHealingFixture)
+    const blockersFor = (reason: 'unsupported_kind' | 'no_market_price') =>
+      resolveEquipmentPickerItemPresentation({
+        equipment: equipmentStepPotionOfHealingFixture,
+        row,
+        workflowMode: 'purchase',
+        rowActionVm: {
+          kind: 'purchase',
+          disabled: true,
+          availability: { status: 'unavailableForPurchase', reason },
+        },
+        ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      }).blockers
+
+    expect(blockersFor('unsupported_kind')).toMatchObject([
+      { reason: 'unavailable', label: 'Unavailable here', category: 'availability' },
+    ])
+    expect(blockersFor('no_market_price')).toBeUndefined()
+  })
+
+  it('replaces a not-for-sale badge with the filled-choice action in magic-items mode', () => {
+    const unpricedCommon = equipmentSchema.parse({
+      ...commonCharm,
+      cost: null,
+    })
+    const unpricedUncommon = equipmentSchema.parse({
+      ...unpricedCommon,
+      id: `${RULESET}:pearl-of-power-uncommon`,
+      slug: 'pearl-of-power-uncommon',
+      name: 'Pearl of Power (uncommon)',
+      rarity: 'uncommon',
+    })
+    const filled = (
+      rarities: Array<'common' | 'uncommon'>,
+    ): NonNullable<
+      Parameters<typeof resolveEquipmentPickerItemPresentation>[0]['magicItemGrantProgress']
+    > =>
+      rarities.map((rarity) => ({
+        allowanceId: rarity,
+        rarity,
+        capacity: 1,
+        selected: 1,
+        remainingCapacity: 0,
+        isFilled: true,
+      }))
+    const rowActionVm = {
+      kind: 'magic_item_grant' as const,
+      disabled: true,
+      capabilities: {
+        canExpand: false,
+        canAdd: false,
+        canManage: false,
+        addBlockedReason: { code: 'no_market_price' as const },
+      },
+      maxAdditionalQuantity: 1,
+      plan: {
+        requestedQuantity: 1,
+        fulfilledQuantity: 0,
+        unfulfilledQuantity: 1,
+        grantAllocations: [],
+        purchaseQuantity: 0,
+        totalCostCp: 0,
+        canApplyRequestedQuantity: false,
+        blockers: [{ code: 'no_market_price' as const }],
+      },
+    }
+
+    const commonPresentation = resolveEquipmentPickerItemPresentation({
+      equipment: unpricedCommon,
+      row: buildEquipmentPickerRowViewModel(unpricedCommon),
+      workflowMode: 'magic_items',
+      rowActionVm,
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      magicItemGrantProgress: filled(['common', 'uncommon']),
+    })
+
+    expect(commonPresentation.blockers).toBeUndefined()
+    expect(commonPresentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No common choices',
+      tooltip: 'Common and uncommon choices are already used.',
+    })
+
+    const uncommonPresentation = resolveEquipmentPickerItemPresentation({
+      equipment: unpricedUncommon,
+      row: buildEquipmentPickerRowViewModel(unpricedUncommon),
+      workflowMode: 'magic_items',
+      rowActionVm,
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+      magicItemGrantProgress: filled(['common', 'uncommon']),
+    })
+
+    expect(uncommonPresentation.control).toEqual({
+      kind: 'disabled',
+      label: 'No uncommon choices',
+      tooltip: 'Uncommon choices are already used.',
+    })
+  })
+
+  it('replaces the not-for-sale badge with a disabled action in purchase mode', () => {
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: rareAmulet,
+      row: buildEquipmentPickerRowViewModel(rareAmulet),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.blockers).toBeUndefined()
+    expect(presentation.control).toEqual({ kind: 'disabled', label: 'Not for sale' })
+  })
+
+  it('emits an unaffordable blocker only when no price label is shown', () => {
+    const unpriced = { ...equipmentStepPotionOfHealingFixture, cost: null }
+    const presentation = resolveEquipmentPickerItemPresentation({
+      equipment: unpriced,
+      row: buildEquipmentPickerRowViewModel(unpriced),
+      workflowMode: 'purchase',
+      rowActionVm: {
+        kind: 'purchase',
+        disabled: true,
+        availability: { status: 'unaffordable', shortfallCp: 100 },
+      },
+      ownership: EMPTY_EQUIPMENT_OWNERSHIP,
+    })
+
+    expect(presentation.blockers).toMatchObject([
+      { key: 'blocker:unaffordable', reason: 'unaffordable', category: 'affordability' },
+    ])
   })
 })

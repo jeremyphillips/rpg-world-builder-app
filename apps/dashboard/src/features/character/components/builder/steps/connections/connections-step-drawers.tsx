@@ -136,6 +136,7 @@ export function ConnectionsStepDrawers({
           if (!open) closeDrawer()
         }}
         characters={stepData.campaignCharacterOptions}
+        catalogIndex={stepData.catalogIndex}
         presetRole={activeDrawer?.section === 'people' ? activeDrawer.presetRole : undefined}
         onAdd={({ characterId, role }) => {
           const edge = createPersonDraftEdge(role, characterId)
@@ -181,6 +182,10 @@ export function ConnectionsStepDrawers({
             ? stepData.eligibleResidenceLocations
             : stepData.allLocations
         }
+        locationSearchContext={{
+          locationsById: stepData.locationsById,
+          campaignId: stepData.campaignId ?? '',
+        }}
         roleOptions={PLACE_CONNECTION_ROLE_OPTIONS}
         presetRole={activeDrawer?.section === 'places' ? activeDrawer.presetRole : undefined}
         onAdd={({ locationId, role }) => {
@@ -200,6 +205,10 @@ export function ConnectionsStepDrawers({
             : 'Add property'
         }
         locations={stepData.eligiblePropertyLocations}
+        locationSearchContext={{
+          locationsById: stepData.locationsById,
+          campaignId: stepData.campaignId ?? '',
+        }}
         roleOptions={PROPERTY_CONNECTION_ROLE_OPTIONS}
         presetRole={activeDrawer?.section === 'property' ? activeDrawer.presetRole : undefined}
         onAdd={({ locationId, role }) => {

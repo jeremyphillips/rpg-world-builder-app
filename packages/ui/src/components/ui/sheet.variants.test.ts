@@ -29,6 +29,15 @@ describe('sheetContentVariants', () => {
     )
   })
 
+  it('slides with the enter animation only', () => {
+    const classes = sheetContentVariants()
+    expect(classes).toContain('data-[state=open]:duration-200')
+    expect(classes).toContain('data-[state=closed]:duration-150')
+    expect(classes).toContain('data-[state=open]:animate-in')
+    expect(classes).not.toContain('transition')
+    expect(classes).not.toContain('duration-500')
+  })
+
   it('supports surface-lift for application drawers', () => {
     expect(sheetContentVariants({ surface: 'surface-lift' })).toContain('bg-surface-lift')
     expect(sheetContentVariants({ surface: 'surface-lift' })).toContain(

@@ -10,10 +10,7 @@ import {
 } from '../lib/labels'
 
 import { VocabularyRowActions } from '../components/vocabulary-row-actions'
-
-const VOCABULARY_BULK_SELECTION_LIMIT = 50
-
-export { VOCABULARY_BULK_SELECTION_LIMIT }
+import { VOCABULARY_BULK_SELECTION_LIMIT } from './vocabulary-bulk-selection-limit'
 
 type VocabularyBulkSelectionConfigInput = {
   canManage: boolean

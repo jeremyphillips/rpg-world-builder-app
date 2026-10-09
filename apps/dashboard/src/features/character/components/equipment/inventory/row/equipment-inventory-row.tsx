@@ -1,15 +1,19 @@
 import { ActionIcon, Text, iconGhostControlVariants } from '@rpg/ui'
 
-import { ContentEntityCard } from '@/features/content'
+import { ContentEntityCard, type EntityAnatomyTrailing } from '@/features/content'
 import {
   type EquipmentInventoryQuantityTarget,
   type EquipmentInventoryRemoveTarget,
   type EquipmentInventoryRow,
 } from '../../../../lib/equipment/equipment-step.lib'
 import { type EquipmentInventoryDisplayItem } from '../../../../lib/equipment/equipment-inventory-summary.lib'
-import { buildEquipmentInventoryDisplayEntity } from '../equipment-inventory-entity.lib'
+import type { EntitySummaryStatusItem } from '@/features/content'
+
+import {
+  buildEquipmentInventoryDisplayEntity,
+  resolveInventoryRowTrailingMeta,
+} from '../equipment-inventory-entity.lib'
 import { EquipmentInventoryQuantityControl } from './equipment-inventory-quantity-control'
-import { useEquipmentAdvisoryStatus } from '../../../../hooks/use-character-build-advisories-context'
 import {
   equipmentInventoryRowActionsClasses,
   equipmentInventoryRowQtyLabelClasses,
@@ -17,8 +21,12 @@ import {
 
 export type EquipmentInventoryRowProps = {
   display: EquipmentInventoryDisplayItem
+  /** Resolved by the parent section with its selection-row context. */
+  status?: readonly EntitySummaryStatusItem[]
   allowZeroQuantity?: boolean
   detailLabelOverride?: string
+  /** Package and generic-grant quantity outside this purchase stepper. */
+  otherSourceQuantity?: number
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }
@@ -49,74 +57,179 @@ function InventoryRemoveIconButton({
   )
 }
 
-function InventoryRowActions({
+type InventoryRowActionVisibility = {
+  showStepper: boolean
+  showQtyLabel: boolean
+  showRemove: boolean
+  removeViaStepper: boolean
+}
+
+function resolveInventoryRowActionVisibility(
+  row: EquipmentInventoryRow,
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void,
+): InventoryRowActionVisibility {
+  const showStepper = row.quantityMode === 'editable' && row.quantityTarget !== undefined
+  // Package multi-qty copy already includes `Qty N`; don't render a second label.
+  const quantityInPriceLine = row.priceLineLabel?.includes(`Qty ${row.entry.quantity}`) ?? false
+  const showQtyLabel =
+    row.quantityMode === 'locked' && row.entry.quantity > 1 && !quantityInPriceLine
+  const showRemove = canRemovePurchaseRow(row, onRemoveItem)
+
+  return {
+    showStepper,
+    showQtyLabel,
+    showRemove,
+    removeViaStepper: showStepper && showRemove,
+  }
+}
+
+function hasInventoryRowActions(visibility: InventoryRowActionVisibility): boolean {
+  return visibility.showStepper || visibility.showQtyLabel || visibility.showRemove
+}
+
+function InventoryRowStepper({
   row,
+  show,
+  removeViaStepper,
   allowZeroQuantity = false,
+  otherSourceQuantity = 0,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: {
   row: EquipmentInventoryRow
+  show: boolean
+  removeViaStepper: boolean
   allowZeroQuantity?: boolean
+  otherSourceQuantity?: number
   onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
   onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
 }) {
-  const showStepper = row.quantityMode === 'editable' && row.quantityTarget !== undefined
-  const showQtyLabel = row.quantityMode === 'locked' && row.entry.quantity > 1
-  const showRemove = canRemovePurchaseRow(row, onRemoveItem)
+  if (!show) return null
 
-  if (!showStepper && !showQtyLabel && !showRemove) return null
+  const removeTarget = row.removeTarget
+  const removeThroughStepper =
+    removeViaStepper && onRemoveItem !== undefined && removeTarget?.kind === 'purchase'
+
+  return (
+    <EquipmentInventoryQuantityControl
+      row={row}
+      allowZeroQuantity={allowZeroQuantity}
+      otherSourceQuantity={otherSourceQuantity}
+      onSetPurchaseQuantity={onSetPurchaseQuantity}
+      onRemove={removeThroughStepper && onRemoveItem ? () => onRemoveItem(removeTarget) : undefined}
+      removeAriaLabel={removeThroughStepper ? row.removeLabel : undefined}
+    />
+  )
+}
+
+function InventoryRowQuantityLabel({ row, show }: { row: EquipmentInventoryRow; show: boolean }) {
+  if (!show) return null
+
+  return (
+    <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
+      Qty {row.entry.quantity}
+    </Text>
+  )
+}
+
+function InventoryRowStandaloneRemove({
+  row,
+  show,
+  onRemoveItem,
+}: {
+  row: EquipmentInventoryRow
+  show: boolean
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
+}) {
+  const removeTarget = row.removeTarget
+  if (!show || onRemoveItem === undefined || removeTarget?.kind !== 'purchase') return null
+
+  return (
+    <InventoryRemoveIconButton
+      removeLabel={row.removeLabel}
+      onRemove={() => onRemoveItem(removeTarget)}
+    />
+  )
+}
+
+function resolveInventoryRowActions(args: {
+  row: EquipmentInventoryRow
+  allowZeroQuantity?: boolean
+  otherSourceQuantity?: number
+  onRemoveItem?: (target: EquipmentInventoryRemoveTarget) => void
+  onSetPurchaseQuantity?: (target: EquipmentInventoryQuantityTarget, quantity: number) => void
+}) {
+  const {
+    row,
+    allowZeroQuantity = false,
+    otherSourceQuantity = 0,
+    onRemoveItem,
+    onSetPurchaseQuantity,
+  } = args
+  const visibility = resolveInventoryRowActionVisibility(row, onRemoveItem)
+  if (!hasInventoryRowActions(visibility)) return null
 
   return (
     <div className={equipmentInventoryRowActionsClasses}>
-      {showStepper ? (
-        <EquipmentInventoryQuantityControl
-          row={row}
-          allowZeroQuantity={allowZeroQuantity}
-          onSetPurchaseQuantity={onSetPurchaseQuantity}
-        />
-      ) : null}
-      {showQtyLabel ? (
-        <Text as="span" className={equipmentInventoryRowQtyLabelClasses}>
-          Qty {row.entry.quantity}
-        </Text>
-      ) : null}
-      {showRemove ? (
-        <InventoryRemoveIconButton
-          removeLabel={row.removeLabel}
-          onRemove={() => onRemoveItem!(row.removeTarget)}
-        />
-      ) : null}
+      <InventoryRowStepper
+        row={row}
+        show={visibility.showStepper}
+        removeViaStepper={visibility.removeViaStepper}
+        allowZeroQuantity={allowZeroQuantity}
+        otherSourceQuantity={otherSourceQuantity}
+        onRemoveItem={onRemoveItem}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+      />
+      <InventoryRowQuantityLabel row={row} show={visibility.showQtyLabel} />
+      <InventoryRowStandaloneRemove
+        row={row}
+        show={visibility.showRemove && !visibility.removeViaStepper}
+        onRemoveItem={onRemoveItem}
+      />
     </div>
   )
 }
 
+function resolveInventoryRowTrailing(args: {
+  display: EquipmentInventoryDisplayItem
+  detailLabelOverride?: string
+  actions: ReturnType<typeof resolveInventoryRowActions>
+}): EntityAnatomyTrailing | undefined {
+  const meta = resolveInventoryRowTrailingMeta(args.display, args.detailLabelOverride)
+  if (args.actions) {
+    return { kind: 'utility', content: args.actions, meta }
+  }
+  if (meta) {
+    return { kind: 'indicator', variant: 'label', label: meta }
+  }
+  return undefined
+}
+
 export function EquipmentInventoryRowItem({
   display,
+  status,
   allowZeroQuantity = false,
   detailLabelOverride,
+  otherSourceQuantity = 0,
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentInventoryRowProps) {
-  const advisoryStatus = useEquipmentAdvisoryStatus(
-    display.kind === 'single' ? display.row.entry.equipmentId : display.equipmentId,
-  )
-  const entity = buildEquipmentInventoryDisplayEntity(display, detailLabelOverride, advisoryStatus)
+  const entity = buildEquipmentInventoryDisplayEntity(display, status)
 
   if (display.kind === 'single') {
     const { row } = display
-    const actions = (
-      <InventoryRowActions
-        row={row}
-        allowZeroQuantity={allowZeroQuantity}
-        onRemoveItem={onRemoveItem}
-        onSetPurchaseQuantity={onSetPurchaseQuantity}
-      />
-    )
+    const actions = resolveInventoryRowActions({
+      row,
+      allowZeroQuantity,
+      otherSourceQuantity,
+      onRemoveItem,
+      onSetPurchaseQuantity,
+    })
 
     return (
       <ContentEntityCard
         entity={entity}
-        trailing={{ kind: 'utility', content: actions }}
+        trailing={resolveInventoryRowTrailing({ display, detailLabelOverride, actions })}
         density="compact"
         disabled={row.stagedRemoval}
       />
@@ -128,25 +241,20 @@ export function EquipmentInventoryRowItem({
   )
   const removablePurchaseRow = display.rows.find((row) => canRemovePurchaseRow(row, onRemoveItem))
   const actionsRow = editableRow ?? removablePurchaseRow
+  const actions = actionsRow
+    ? resolveInventoryRowActions({
+        row: actionsRow,
+        allowZeroQuantity,
+        otherSourceQuantity,
+        onRemoveItem,
+        onSetPurchaseQuantity,
+      })
+    : null
 
   return (
     <ContentEntityCard
       entity={entity}
-      trailing={
-        actionsRow
-          ? {
-              kind: 'utility',
-              content: (
-                <InventoryRowActions
-                  row={actionsRow}
-                  allowZeroQuantity={allowZeroQuantity}
-                  onRemoveItem={onRemoveItem}
-                  onSetPurchaseQuantity={onSetPurchaseQuantity}
-                />
-              ),
-            }
-          : undefined
-      }
+      trailing={resolveInventoryRowTrailing({ display, detailLabelOverride, actions })}
       density="compact"
     />
   )

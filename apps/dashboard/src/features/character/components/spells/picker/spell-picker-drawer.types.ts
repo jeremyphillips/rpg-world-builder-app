@@ -1,4 +1,11 @@
-import type { ChoiceSet, SpellPickerItem } from '@rpg/contracts'
+import {
+  catalogNounFromContentType,
+  formatCatalogPickerCopy,
+  getSpellCollectionKindLabel,
+  type ChoiceSet,
+  type SpellPickerItem,
+} from '@rpg/contracts'
+import type { SearchDocument } from '@rpg/search'
 
 import type { SpellDisplayVocabulary } from '@/features/content'
 
@@ -13,26 +20,31 @@ import {
 
 export type { ChoiceSet, SpellPickerItem, SpellPickerItemState } from '@rpg/contracts'
 
+/** Resolver row plus the dashboard-assembled search document. The document is required. */
+export type SpellPickerRow = SpellPickerItem & { searchDocument: SearchDocument }
+
 export const SPELL_PICKER_MODE_CANTRIPS = 'cantrips' as const
-export const SPELL_PICKER_MODE_PREPARED_SPELLS = 'prepared-spells' as const
+export const SPELL_PICKER_MODE_SPELLS = 'spells' as const
 
-export type SpellPickerMode =
-  | typeof SPELL_PICKER_MODE_CANTRIPS
-  | typeof SPELL_PICKER_MODE_PREPARED_SPELLS
+export type SpellPickerMode = typeof SPELL_PICKER_MODE_CANTRIPS | typeof SPELL_PICKER_MODE_SPELLS
 
-export const SPELL_PICKER_NO_RESULTS_MESSAGE = 'No spells match your search.'
-export const SPELL_PICKER_NO_OPTIONS_MESSAGE = 'No spells are available for this choice.'
-export const SPELL_PICKER_SELECTION_FULL_MESSAGE =
-  'You have selected the maximum number of spells for this choice.'
+const spellNoun = catalogNounFromContentType('spells')
+const spellCopy = formatCatalogPickerCopy(spellNoun)
+
+export const SPELL_PICKER_CANTRIPS_LABEL = getSpellCollectionKindLabel('cantrips')
+export const SPELL_PICKER_SEARCH_PLACEHOLDER = spellCopy.searchPlaceholder
+export const SPELL_PICKER_SORT_GROUP_LABEL = spellCopy.sortGroupLabel
+export const SPELL_PICKER_SORT_ORDER_LABEL = spellCopy.sortOrderLabel
+
+export const SPELL_PICKER_NO_RESULTS_MESSAGE = spellCopy.noResultsMessage
+export const SPELL_PICKER_NO_OPTIONS_MESSAGE = spellCopy.noOptionsMessage
+export const SPELL_PICKER_SELECTION_FULL_MESSAGE = spellCopy.selectionFullMessage
 
 export const SPELL_PICKER_SCHOOL_ALL = '__all__' as const
 export const SPELL_PICKER_LEVELS_ALL = '__all__' as const
 
-export const SPELL_PICKER_LEVELS_LABEL = 'Levels'
-export const SPELL_PICKER_SCHOOL_LABEL = 'School'
-export const SPELL_PICKER_SORT_LABEL = 'Sort'
 export const SPELL_PICKER_MECHANICS_LABEL = 'Casting & mechanics'
-export const SPELL_PICKER_RESET_VIEW_LABEL = 'Reset view'
+export const SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL = `${SPELL_PICKER_MECHANICS_LABEL} filters`
 
 export const SPELL_PICKER_SORT_BEST_MATCH = CATALOG_PICKER_SORT_BEST_MATCH
 export const SPELL_PICKER_SORT_NAME_ASC = CATALOG_PICKER_SORT_NAME_ASC
@@ -46,14 +58,6 @@ export type SpellPickerSortMode =
   | typeof SPELL_PICKER_SORT_NAME_DESC
   | typeof SPELL_PICKER_SORT_LEVEL_ASC
   | typeof SPELL_PICKER_SORT_LEVEL_DESC
-
-export const SPELL_PICKER_SORT_MODES = [
-  SPELL_PICKER_SORT_BEST_MATCH,
-  SPELL_PICKER_SORT_NAME_ASC,
-  SPELL_PICKER_SORT_NAME_DESC,
-  SPELL_PICKER_SORT_LEVEL_ASC,
-  SPELL_PICKER_SORT_LEVEL_DESC,
-] as const satisfies readonly SpellPickerSortMode[]
 
 export const SPELL_PICKER_SORT_LABELS: Record<SpellPickerSortMode, string> = {
   [SPELL_PICKER_SORT_BEST_MATCH]: CATALOG_PICKER_SORT_LABEL_BEST_MATCH,
@@ -97,11 +101,11 @@ export type SpellPickerDrawerProps = {
   onOpenChange: (open: boolean) => void
   characterClassName: string
   cantripChoiceSet?: ChoiceSet
-  preparedChoiceSet?: ChoiceSet
+  spellChoiceSet?: ChoiceSet
   cantripSelectedIds: string[]
-  preparedSelectedIds: string[]
-  cantripItems: readonly SpellPickerItem[]
-  preparedItems: readonly SpellPickerItem[]
+  spellSelectedIds: string[]
+  cantripItems: readonly SpellPickerRow[]
+  spellItems: readonly SpellPickerRow[]
   initialMode?: SpellPickerMode
   /** Pre-filter prepared-spell browse to a single spell level when opened from a level tab. */
   initialSpellLevel?: number

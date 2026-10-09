@@ -71,6 +71,33 @@ function contrastRatio(l1: number, l2: number): number {
   return (lighter + 0.05) / (darker + 0.05)
 }
 
+/** Approximate `--palette-surface-lift` lightness. Light mixes toward white; dark mixes toward panel. */
+function liftPlaneLightness(paletteCss: string): number | undefined {
+  const lift = extractRoleValue(paletteCss, '--palette-surface-lift') ?? ''
+  const base = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-base') ?? '')
+  if (base === undefined) return undefined
+
+  const towardWhite = lift.match(
+    /color-mix\(in oklch,\s*var\(--palette-surface-base\)\s*([\d.]+)%,\s*white\)/,
+  )
+  if (towardWhite) {
+    const weight = Number(towardWhite[1]) / 100
+    return base * weight + (1 - weight)
+  }
+
+  const towardPanel = lift.match(
+    /var\(--palette-surface-base\)\s*([\d.]+)%[\s\S]*var\(--palette-surface-panel\)/,
+  )
+  if (towardPanel) {
+    const panel = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-panel') ?? '')
+    if (panel === undefined) return undefined
+    const weight = Number(towardPanel[1]) / 100
+    return base * weight + panel * (1 - weight)
+  }
+
+  return oklchLightness(lift)
+}
+
 describe('surface-relative chrome formulas', () => {
   const { light, dark } = readThemeCss()
 
@@ -211,14 +238,17 @@ describe('surface-relative chrome formulas', () => {
       [paletteDark, semanticDark, 'dark'],
     ] as const) {
       const fg = oklchLightness(extractRoleValue(paletteCss, '--palette-fg-default') ?? '')
-      const panel = oklchLightness(extractRoleValue(paletteCss, '--palette-surface-panel') ?? '')
+      const popover = liftPlaneLightness(paletteCss)
       const mixWeight = extractRoleValue(semanticCss, '--mix-border-subtle') ?? '14%'
 
+      expect(extractRoleValue(semanticCss, '--popover'), `${theme} popover`).toBe(
+        'var(--palette-surface-lift)',
+      )
       expect(fg, `${theme} fg L`).toBeDefined()
-      expect(panel, `${theme} panel L`).toBeDefined()
+      expect(popover, `${theme} popover L`).toBeDefined()
 
       const blended =
-        (fg! * parseFloat(mixWeight)) / 100 + (panel! * (100 - parseFloat(mixWeight))) / 100
+        (fg! * parseFloat(mixWeight)) / 100 + (popover! * (100 - parseFloat(mixWeight))) / 100
       expect(contrastRatio(fg!, blended)).toBeGreaterThanOrEqual(MIN_BORDER_CONTRAST)
     }
   })

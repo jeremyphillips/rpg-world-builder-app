@@ -24,6 +24,11 @@ import {
 
 const { model, models, Schema } = mongoose
 
+const abilityScoreRequirementsSchema = new Schema(
+  Object.fromEntries(ABILITY_IDS.map((ability) => [ability, { type: Number }])),
+  { _id: false },
+)
+
 const homebrewEquipmentSchema = new Schema(
   {
     ...homebrewContentIdentityFields,
@@ -49,7 +54,7 @@ const homebrewEquipmentSchema = new Schema(
     addDexModifier: { type: Boolean },
     maxDexBonus: { type: Number },
     stealthDisadvantage: { type: Boolean },
-    strengthRequirement: { type: Number },
+    abilityScoreRequirements: { type: abilityScoreRequirementsSchema, default: undefined },
     // adventuring gear
     gearKind: { type: String, enum: [...GEAR_KINDS] },
     spellcastingGearKind: { type: String, enum: [...SPELLCASTING_GEAR_KINDS] },

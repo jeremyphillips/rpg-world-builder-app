@@ -7,17 +7,24 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import {
-  Button,
-  Heading,
-  SegmentedControl,
-  SelectionSummaryCard,
-  SelectionSummaryChangeAction,
-  Text,
-} from '@rpg/ui'
+import { Button, Heading, SelectionSummaryCard, SelectionSummaryChangeAction, Text } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
+import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
-import { CatalogEntityPickerSheet, createCatalogEntityRowRenderer } from '@/features/content'
+import {
+  CatalogToolbarResetSlot,
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '@/features/character'
+import {
+  CatalogEntityPickerSheet,
+  RelationshipCatalogFilterBand,
+  createCatalogEntityRowRenderer,
+  createLocationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveLocationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
 import { getContentDisplayImage } from '@/features/content/lib/detail/page/content-display-image'
 import { buildLocationContentDisplayImageInput } from '@/features/content/lib/detail/page/content-display-image-input'
 import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
@@ -39,9 +46,9 @@ import {
 import { resolveRelationshipCandidateSet } from '../../../lib/relationship/core/relationship-candidate-set'
 import { RelationshipDrawerSubjectField } from '../../../lib/relationship/drawer/relationship-drawer-subject-field'
 import {
-  buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
   buildLocationEntityContextPresentation,
+  buildLocationEntitySummarySearchText,
   type LocationEntitySummaryVm,
 } from '../../../locations/lib/location-display'
 
@@ -85,13 +92,7 @@ import {
   resolveOrganizationForwardTargetPresentation,
 } from '../../lib/location-connections/organization-location-connection-surface-copy'
 import { buildOrganizationDrawerEntityPresentation } from '../../lib/organization-display'
-import {
-  filterLocationsByTargetBrowseScope,
-  ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL,
-  resolveEffectiveTargetBrowseScope,
-  resolveTargetBrowseScopeOptions,
-  type OrganizationLocationTargetBrowseScope,
-} from '../../lib/location-connections/organization-location-target-browse-scope'
+import { resolveTargetBrowseScopeKindFamilies } from '../../lib/location-connections/organization-location-target-browse-scope'
 export const ORGANIZATION_LOCATION_LINK_NO_RESULTS = 'No matches for this search.'
 export const ORGANIZATION_LOCATION_LINK_NO_ITEMS = 'No locations are available.'
 export const ORGANIZATION_LOCATION_LINK_CHOOSE_KIND_MESSAGE =
@@ -204,8 +205,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
   const [selectedKind, setSelectedKind] = React.useState<OrganizationLocationConnectionKind | null>(
     resolvedAddKind ?? defaultAddKind ?? initialConnection?.kind ?? null,
   )
-  const [locationBrowseScope, setLocationBrowseScope] =
-    React.useState<OrganizationLocationTargetBrowseScope>('all')
   const [editingKind, setEditingKind] = React.useState(false)
 
   const excludeConnectionId =
@@ -516,32 +515,45 @@ function OrganizationLocationConnectionLinkDrawerContent({
       locationCandidates.isAuthoritativeDomainSet &&
       changeTargetScanLocations.length === 0)
 
-  const browseScopeOptions = React.useMemo(() => {
-    if (!targetPresentation.browseScopes?.length) {
-      return []
-    }
-    return resolveTargetBrowseScopeOptions(targetPresentation.browseScopes, eligibleLocations)
-  }, [eligibleLocations, targetPresentation.browseScopes])
-
-  const showTargetBrowseScopeControl =
-    browseScopeOptions.length > 0 && showLocationPicker && !showMutationEmptyState
-
-  const effectiveLocationBrowseScope = React.useMemo(
+  const pickerLocations = React.useMemo(
+    () => eligibleLocations.toSorted(comparePickerName),
+    [eligibleLocations],
+  )
+  const kindFamilies = React.useMemo(
     () =>
-      resolveEffectiveTargetBrowseScope(
-        locationBrowseScope,
-        browseScopeOptions,
-        showTargetBrowseScopeControl,
-      ),
-    [browseScopeOptions, locationBrowseScope, showTargetBrowseScopeControl],
+      targetPresentation.browseScopes?.length
+        ? resolveTargetBrowseScopeKindFamilies(targetPresentation.browseScopes)
+        : undefined,
+    [targetPresentation.browseScopes],
   )
 
-  const pickerLocations = React.useMemo(() => {
-    if (!showTargetBrowseScopeControl) {
-      return eligibleLocations
-    }
-    return filterLocationsByTargetBrowseScope(eligibleLocations, effectiveLocationBrowseScope)
-  }, [effectiveLocationBrowseScope, eligibleLocations, showTargetBrowseScopeControl])
+  const locationFilterSchema = React.useMemo(
+    () =>
+      createLocationRelationshipFilterSchema({
+        rows: pickerLocations,
+        getKind: (location) => location.kind,
+        kindFamilies,
+      }),
+    [kindFamilies, pickerLocations],
+  )
+  const locationFilterLayout = React.useMemo(
+    () => resolveLocationRelationshipFilterLayout(locationFilterSchema),
+    [locationFilterSchema],
+  )
+  const locationFilters = useRelationshipCatalogFilters({
+    rows: pickerLocations,
+    schema: locationFilterSchema,
+  })
+  const showFamilyFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
+  const showKindFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    locationFilterSchema,
+    locationFilterLayout,
+  )
 
   const pickerLocationSummaries = React.useMemo(() => {
     const summaries = new Map<string, LocationEntitySummaryVm>()
@@ -565,15 +577,18 @@ function OrganizationLocationConnectionLinkDrawerContent({
     return resolveRelationshipPickerCreateIntents({
       target: 'location',
       selectedKind: activeKind,
-      activeBrowseScope: showTargetBrowseScopeControl ? effectiveLocationBrowseScope : undefined,
+      activeBrowseScope:
+        locationFilters.state.kindFamily === 'settlement' ||
+        locationFilters.state.kindFamily === 'region'
+          ? locationFilters.state.kindFamily
+          : undefined,
     })
   }, [
     activeKind,
-    effectiveLocationBrowseScope,
+    locationFilters.state.kindFamily,
     mode,
     showLocationPicker,
     showMutationEmptyState,
-    showTargetBrowseScopeControl,
   ])
 
   const nestedCreateContext = React.useMemo((): ContentCreateContext => {
@@ -686,17 +701,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 current={currentEndpoint}
                 showNewSection={showLocationPicker && !showMutationEmptyState}
                 newHelper={targetPresentation.targetHelp}
-              >
-                {showTargetBrowseScopeControl ? (
-                  <SegmentedControl
-                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                    value={locationBrowseScope}
-                    options={browseScopeOptions}
-                    onValueChange={setLocationBrowseScope}
-                    fullWidth
-                  />
-                ) : null}
-              </EntityReplacementSection>
+              />
             ) : null}
             {mode === 'changeKind' && lockedLocation && changeKindPickerOptions.length > 0 ? (
               <LocationConnectionKindField
@@ -718,15 +723,6 @@ function OrganizationLocationConnectionLinkDrawerContent({
                   <Text variant="muted" className="text-sm">
                     {targetPresentation.targetHelp}
                   </Text>
-                ) : null}
-                {showTargetBrowseScopeControl ? (
-                  <SegmentedControl
-                    aria-label={ORGANIZATION_LOCATION_TARGET_BROWSE_SCOPE_LABEL}
-                    value={locationBrowseScope}
-                    options={browseScopeOptions}
-                    onValueChange={setLocationBrowseScope}
-                    fullWidth
-                  />
                 ) : null}
               </div>
             ) : null}
@@ -759,10 +755,59 @@ function OrganizationLocationConnectionLinkDrawerContent({
             </Button>
           ) : undefined
         }
-        hasStructuredFilters={
-          showTargetBrowseScopeControl && effectiveLocationBrowseScope !== 'all'
+        hasStructuredFilters={locationFilters.structuredFilterCount > 0}
+        items={showLocationPicker && !showMutationEmptyState ? locationFilters.filteredRows : []}
+        primaryControls={
+          showFamilyFilter ? (
+            <RelationshipCatalogFilterBand
+              band="primary"
+              schema={locationFilterSchema}
+              layout={locationFilterLayout}
+              state={locationFilters.state}
+              data={pickerLocations}
+              idPrefix="organization-location-picker"
+              onValueChange={locationFilters.setValue}
+            />
+          ) : undefined
         }
-        items={showLocationPicker && !showMutationEmptyState ? pickerLocations : []}
+        filterRow={
+          showKindFilter
+            ? {
+                controls: (
+                  <RelationshipCatalogFilterBand
+                    band="filterRow"
+                    schema={locationFilterSchema}
+                    layout={locationFilterLayout}
+                    state={locationFilters.state}
+                    data={pickerLocations}
+                    idPrefix="organization-location-picker"
+                    onValueChange={locationFilters.setValue}
+                  />
+                ),
+              }
+            : undefined
+        }
+        actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
+          const showReset = hasCatalogPickerResetViewCriteria({
+            structuredFilterCount: locationFilters.structuredFilterCount,
+            searchQuery,
+          })
+          return (
+            <CatalogToolbarResetSlot
+              visible={showReset}
+              reserve={showKindFilter}
+              includesSort={false}
+              {...resolveCatalogPickerResultSummary({
+                visible: visibleItemCount,
+                total: locationFilters.sourceCount,
+              })}
+              onClick={() => {
+                locationFilters.reset()
+                resetSearchQuery()
+              }}
+            />
+          )
+        }}
         getItemKey={(location) => location.id}
         getItemToolbarLabel={(location) => location.name}
         getSearchText={(location) => {

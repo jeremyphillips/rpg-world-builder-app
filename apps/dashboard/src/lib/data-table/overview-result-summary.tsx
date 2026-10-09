@@ -1,45 +1,66 @@
-import type { ReactNode } from 'react'
+import { Button, InlineMetadata } from '@rpg/ui'
 
-import { formatOverviewResultLabel } from './overview-selection-cluster.lib'
-import {
-  overviewResultSummaryDotVariants,
-  overviewResultSummaryVariants,
-} from './overview-result-summary.variants'
+import { formatResultCount } from './format-result-count.lib'
+import { overviewResultSummaryVariants } from './overview-result-summary.variants'
 
-export type OverviewResultSummaryProps = {
-  resultCount: number
-  resultLabel?: string
-  supplementalContent?: ReactNode
+export type ResultSummarySupplement = {
+  label: string
+  action?: {
+    label: string
+    accessibleName?: string
+    onClick: () => void
+  }
 }
 
-/** Middle-dot separator before Show/Hide actions in supplemental disclosure rows. */
-export function OverviewResultSummaryDotSeparator() {
-  return (
-    <span aria-hidden className={overviewResultSummaryDotVariants()}>
-      ·
-    </span>
-  )
+export type ResultSummaryModel = {
+  visibleCount: number
+  supplements?: readonly ResultSummarySupplement[]
 }
 
-/** Shared overview result count with optional supplemental disclosure content. */
-export function OverviewResultSummary({
-  resultCount,
-  resultLabel,
-  supplementalContent,
-}: OverviewResultSummaryProps) {
-  const label = resultLabel ?? formatOverviewResultLabel(resultCount)
+export type ResultSummaryProps = ResultSummaryModel & {
+  /** Admin tables that name a different noun. Not a visibility supplement. */
+  primaryLabel?: string
+}
+
+/** Shared result count with optional domain visibility supplements. */
+export function ResultSummary({ visibleCount, primaryLabel, supplements }: ResultSummaryProps) {
+  const countLabel = primaryLabel ?? formatResultCount(visibleCount)
+  const supplementItems = (supplements ?? []).flatMap((supplement, index) => {
+    const labelItem = (
+      <InlineMetadata.Item key={`label-${index}`}>{supplement.label}</InlineMetadata.Item>
+    )
+    if (!supplement.action) return [labelItem]
+
+    const { label, accessibleName, onClick } = supplement.action
+    return [
+      labelItem,
+      <InlineMetadata.Item key={`action-${index}`}>
+        <Button
+          type="button"
+          variant="text"
+          size="sm"
+          aria-label={accessibleName ?? label}
+          onClick={onClick}
+        >
+          {label}
+        </Button>
+      </InlineMetadata.Item>,
+    ]
+  })
 
   return (
-    <div className={overviewResultSummaryVariants()}>
-      <span role="status" aria-live="polite" aria-atomic="true" className="tabular-nums">
-        {label}
-      </span>
-      {supplementalContent ? (
-        <>
-          <OverviewResultSummaryDotSeparator />
-          {supplementalContent}
-        </>
-      ) : null}
+    <div
+      className={overviewResultSummaryVariants()}
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <InlineMetadata role="supporting" density="compact">
+        <InlineMetadata.Item key="count">
+          <span className="tabular-nums">{countLabel}</span>
+        </InlineMetadata.Item>
+        {supplementItems}
+      </InlineMetadata>
     </div>
   )
 }

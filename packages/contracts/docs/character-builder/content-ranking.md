@@ -1,12 +1,9 @@
 # Character builder content ranking
 
-Browse and recommendation ordering for character-builder pickers. Resolver
-implementations live under `packages/contracts/src/rpg/runtime/character-builder/`;
-this document is the canonical description of rank semantics.
+Browse ordering for character-builder pickers. Each picker has its own comparator.
+Resolver implementations live under `packages/contracts/src/rpg/runtime/character-builder/`.
 
-## Canonical best-match pipeline
-
-Every character-builder picker follows the same documented stages:
+Shared stages before that comparator:
 
 ```
 visibility / workflow eligibility
@@ -15,16 +12,42 @@ visibility / workflow eligibility
   → sort mode switch
 ```
 
-### `best_match` compare order
+Spell and proficiency best match is recommendation strength, then name
+(`compareRecommendationThenName`): strong, compatible, neutral, discouraged.
+`isRecommended` stays `strength === 'strong'` and is not the browse key. Equipment best match is
+`compareIntentionalEquipmentRanking`. Organization and residence drawers rank by
+search score, then name, while a query is present.
 
-```text
-if (hasQuery) compare searchScore desc
-compare workflowDomainRank        // magic-item action rank, proficiency eligibility, …
-compare recommendationRank        // equipment tier/reason; proficiency isRecommended/canSelect
-compare name                      // deterministic fallback
-```
+## Shared search score
 
-**Name sort modes** use name as the primary key, then search score (when a query is present), then domain/recommendation rank as tiebreaker. Recommendation rank is never the primary key for name sorts.
+Picker search uses `@rpg/search` with the forgiving profile. The document score
+is the best single field. Field roles:
+
+| Surface       | Primary | Keyword                            | Secondary                                 |
+| ------------- | ------- | ---------------------------------- | ----------------------------------------- |
+| Spells        | name    | school, each level label, each tag | description, combined                     |
+| Equipment     | name    | kind, each tag                     | description, combined (includes the slug) |
+| Proficiencies | label   | —                                  | —                                         |
+| Organizations | name    | each classification discovery term | combined                                  |
+| Residences    | name    | each classification part           | combined                                  |
+
+`combined` is the previous joined search text. It is a secondary fallback for
+phrases that span fields. Identifiers such as the equipment slug stay in that
+fallback and are not keywords. One keyword field is one structured value, so a
+tag or discovery term can match at exact or prefix quality.
+
+Dashboard spell rows are `SpellPickerRow`: a `SpellPickerItem` plus a required
+`searchDocument` assembled by `enrichSpellPickerItems`. Equipment rows are
+`EquipmentPickerRow`, assembled by `enrichEquipmentPickerItemsWithSearchDocument`.
+Organization and residence drawers score with `scoreAndFilterPickerItems` and
+sort by search score, then name. An empty query keeps name order. Connection-drawer
+browse order is documented in
+[cross-content-relationship-ui.md](../../../../apps/dashboard/docs/cross-content-relationship-ui.md#picker-order-and-search).
+
+Browse order ignores selection, remaining budget, and consumed grants. Those
+facts stay on the row as chrome and disabled actions.
+
+**Name sort modes** use name as the primary key, then search score (when a query is present), then the domain comparator as a tiebreaker. The domain comparator is never the primary key for name sorts.
 
 Shared sort mode values (`best_match`, `name_asc`, `name_desc`) live in
 `catalog-picker-sort-modes.lib.ts`. Domain-specific modes (`price_*`, `level_*`) stay in each picker's `*.types.ts`.
@@ -45,67 +68,50 @@ domain rank comes from `compareSpellPickerItemsByRecommendation` in
 Recommended spell ids are resolved in
 [`resolve-spell-recommendations.ts`](../src/rpg/runtime/character-builder/resolvers/spellcasting/resolve-spell-recommendations.ts).
 
-### Magic-items workflow action rank
+### Magic-item action state
 
 Magic-item rows are enriched once per item with `magicItemAction` before the
-drawer receives them (`enrichEquipmentPickerItemsWithMagicItemAction`). The
-comparator reads only enriched state — never draft, context, or
-`focusedAllowanceId`.
+drawer receives them (`enrichEquipmentPickerItemsWithMagicItemAction`). That
+state drives the row action. Browse order does not read it, including grant
+availability and whether the focused allowance was consumed.
 
-| Rank | `reason`             | Condition                                                 |
-| ---- | -------------------- | --------------------------------------------------------- |
-| 0    | `grant_available`    | `eligibility.eligible` — open choice slot                 |
-| 1    | `manageable`         | Owned grant/purchase, can manage                          |
-| 2    | `no_matching_choice` | Visible but no slot (`rarity_mismatch`, `allowance_full`) |
-| 3    | `unavailable`        | `!canExpand`                                              |
+| `reason`             | Condition                                                 |
+| -------------------- | --------------------------------------------------------- |
+| `grant_available`    | `eligibility.eligible` — open choice slot                 |
+| `manageable`         | Owned grant/purchase, can manage                          |
+| `no_matching_choice` | Visible but no slot (`rarity_mismatch`, `allowance_full`) |
+| `unavailable`        | `!canExpand`                                              |
 
-Owned items outside a focused allowance rarity keep `reason: manageable` but
-sink with `outOfFocusedScope: true` (effective rank 2).
-
-Magic-items `best_match` order:
-
-```text
-if (hasQuery) searchScore desc
-→ magicItemAction.rank
-→ compareEquipmentPickerItemsByRecommendation
-→ name
-```
-
-Purchase workflow omits `magicItemAction` enrichment and uses recommendation
-rank only after search.
+Owned items outside a focused allowance rarity keep `reason: manageable` and
+set `outOfFocusedScope: true`.
 
 ### Comparator steps (recommendation / best-match tiebreaker)
 
 Resolved rows sort with `compareIntentionalEquipmentRanking` in
 [`equipment-ranking-policy.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-ranking-policy.ts).
-Requirements, soft recommendations, and option state are separate facts. Selection and
-choice state never change recommendation strength.
+Requirements, soft recommendations, and option state are separate facts. Selection,
+remaining budget, and package choice do not reorder rows.
 
-1. **Active requirement / active choice** — unsatisfied `candidate` requirements (`compareActiveRequirement`), then open-pool eligibility when `activeChoice` is `pool` or `package`. A satisfied pool keeps `optionSatisfies` on every eligible option; only the owned option is a `satisfier`, and the others stay `eligible` with no lift. Spellcasting focus is one any-of requirement owned by the class.
-2. **Context relevance** — only when `activeChoice` is not `none`. `allowance` does not reorder equipment recommendations; magic-item action rank handles that workflow. The general Add Equipment drawer passes `none`, so open pools and alternative packages do not lift rows there.
-3. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. Proficiency is compatibility, not a signal.
-4. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat), then `inAlternativePackage` as a tie-break. Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts).
-5. **Purchase actionability** — only when `rankPurchaseAvailability` is set (gold purchase lists). Order is `available`, then `unaffordable`, then `unavailableForPurchase`. A strong or required row still outranks a neutral purchasable row. Unaffected lists leave this fact unsorted.
-6. **Compatibility** — only when `rankCompatibility` is set (the default) and both rows have a defined `compatibility.proficient`. `true` before `false`. Rows that do not track proficiency stay ties on this axis.
-7. **Canonical fallback** — kind bucket, weapon category, then name.
+1. **Requirement match** — any requirement the row satisfies (`optionSatisfies`), exact before anyOf. `candidate`, `satisfier`, and `eligible` share that band. A `requirement` active choice limits the match to that requirement id. `activeRequirementIds`, when set, limits which ids count. Spellcasting focus is one any-of requirement owned by the class.
+2. **Recommendation strength** — strongest signal only (`strong` → `compatible` → `neutral` → `discouraged`). Source count does not promote strength. A class starting-equipment candidate (any available option, a direct grant, a choice pool, or a proficiency-linked grant expanded through its linked tool pool) is a `compatible` class signal with reason `startingEquipment`. That set does not follow the selected package, fulfilled grants, remaining budget, or the proficiency answer. Starting-equipment membership may contribute recommendation strength for ranking, but its user-facing guidance is owned by package-state presentation. Only independent recommendation evidence produces **Recommended by class**. Proficiency is compatibility, not a signal.
+3. **Specificity / source policy** — exact → narrow_pool → broad_pool, then source priority (user, title, role, class, subclass, organization, species, origin, feat). Pool expansion thresholds stay in [`equipment-recommendation-specificity.ts`](../src/rpg/runtime/character-builder/resolvers/equipment/equipment-recommendation-specificity.ts). Open-pool eligibility, context relevance, and alternative-package membership are not sort keys.
+4. **Compatibility** — only when `rankCompatibility` is set (the default). Proficient, then untracked (`compatibility.proficient` omitted), then not proficient. `unaffordable` does not add a further penalty: not proficient and unaffordable stays with not proficient.
+5. **Exceeds starting budget** — price above `purchaseBudgetCeiling`, the maximum `totalStartingWealth` across available packages. That total is class-option wealth plus the tier bonus. Spent gold and the selected package do not change it. A shortfall against the current purse stays **Cannot afford** and does not reorder. Unpriced rows do not exceed the ceiling.
+6. **Unmet ability score** — only when `rankCompatibility` is set (the default). A row with any `unmetAbilityScoreRequirements` entry sorts after a row with none. The count does not matter. This sits after the budget ceiling because a package that cannot fund the item is a harder miss than an item the character can still use with a penalty.
+7. **Not for sale** — only when `rankPurchaseAvailability` is set (gold purchase lists). `unavailableForPurchase` sorts after every other purchase status. `unaffordable` does not reorder. A strong or required row still outranks a neutral purchasable row. Other lists leave this fact unsorted.
+8. **Canonical fallback** — kind bucket, weapon category, then name.
 
 Rows without `resolved` facts sort as a neutral recommendation. There is no tier/reason fallback.
 
-### Recommendation reason ranks
+### Recommendation object versus browse order
 
-The legacy reason enum still feeds badges until presentation facts replace it. It is not the browse order for resolved rows.
+`EQUIPMENT_RECOMMENDATION_REASONS` is evidence identity on the recommendation object. It is not a browse key. `EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE` and `EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE` collapse that object when several contributions merge. Picker browse does not read them. Browse specificity is `compareSpecificity`.
 
-Lower historical ranks (`EQUIPMENT_RECOMMENDATION_REASON_RANK`):
+Proficiency is not a recommendation reason. `compatibility.proficient` is `true`, `false`, or omitted when the item does not track proficiency. `selectedToolProficiency` is evidence for the Recommended tab, not a browse signal.
 
-`classRequired` → `classToolNeed` → `selectedToolProficiency` → `spellcastingFocus` →
-`startingEquipment` → `unresolvedToolProficiencyChoice` → `startingEquipmentChoice` →
-`classToolCategory` → `availableInStartingOption` → `classSuggested`.
+A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
 
-Proficiency is not a recommendation reason. `compatibility.proficient` is `true`, `false`, or omitted when the item does not track proficiency.
-
-`classToolNeed` is no longer emitted. A fixed class tool proficiency is `compatibility.proficient` plus `proficiencySources`, and the picker badge is **Proficient**.
-
-Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by Wizard class", "Spellcasting focus", "In your package"). The dashboard maps those facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
+Browse badges read `resolved.presentation` from `resolveEquipmentPresentationFacts`. Contracts own the phrases ("Required by class", "Matches focus requirement", "Included in package option", "Recommended by class"). The dashboard orders guidance as requirement, requirement match, package option, then recommendation. Open-pool source guidance stays after recommendations. A selected package does not add package row guidance; ownership provenance shows **Package**. The dashboard maps facts to tone, keeps one badge, shows up to two sources inline, and puts the full list in the badge title.
 
 Canonical kind order is weapon → shield → armor → tool → spellcastingGear → gear → ammunition → other. Weapon category is martial-first only when `preferMartialWeaponBrowseOrder` is set. Name uses `localeCompare` (base sensitivity).
 
@@ -123,8 +129,8 @@ pools, starting-equipment pools, fulfillment-aware gold elevation). Proficiency 
 **Empty-query best match (purchase):** recommendation comparator only — no search-score step.
 
 **Search inclusion:** when the query is non-empty, rows with `@rpg/search`
-match score ≤ 0 on the assembled equipment picker `SearchDocument` (primary
-combined field) are excluded before sort.
+match score ≤ 0 on the assembled equipment picker `SearchDocument` (forgiving
+profile; name, kind, tags, description, and combined) are excluded before sort.
 
 **Unknown cost:** rows without a known `equipment.cost` are not treated as zero
 or expensive. In price sorts, priced rows come first in both directions;
@@ -140,9 +146,10 @@ implements the canonical pipeline. Domain rank comes from
 `compareProficiencyPickerItemsByRecommendation` in
 [`proficiency-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/proficiency-picker-item.ts):
 
-1. **Recommended** — `state.isRecommended` (`true` before `false`; languages only today)
-2. **Selectable** — `state.canSelect` (`true` before `false`)
-3. **Label** — `localeCompare` (base sensitivity)
+1. **Recommendation strength** — `compareStrength` on `state.recommendation` (`strong`, `compatible`, `neutral`, `discouraged`). `isRecommended` stays `strength === 'strong'`.
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendationThenName`
+
+Skill rows governed by an ability tied for the character's highest modifier are `compatible` with reason `abilityFit`, and only when that modifier is greater than 0. Ties are included. Unset scores emit no signal. The score source is `draft.abilities.scores`. This raises skills likely to have the character's strongest baseline checks. It does not mark the skills a player should choose. The signal is ranking-only: no badge, no `detail`, and no generic **Recommended** line. The row already shows the governing ability. Languages can be `strong` from species affinity. Tools, weapons, and armor stay neutral.
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -157,9 +164,10 @@ Empty-query best match uses domain rank only — not name-only fallback.
 canonical pipeline. Domain rank comes from `compareSpellPickerItemsByRecommendation`
 in [`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picker/spell-picker-item.ts):
 
-1. **Recommended** — `state.isRecommended` (`true` before `false`)
-2. **Selectable** — `state.canSelect` (`true` before `false`)
-3. **Label** — `localeCompare` (base sensitivity)
+1. **Recommendation strength** — `compareStrength` on `state.recommendation` (`strong`, `compatible`, `neutral`, `discouraged`). `isRecommended` stays `strength === 'strong'`.
+2. **Label** — `localeCompare` (base sensitivity) via `compareRecommendationThenName`
+
+Authored class recommendations are `strong`. Spell browse does not emit `compatible`.
 
 | Mode         | Primary         | Tiebreaker 1 (query only) | Tiebreaker 2      |
 | ------------ | --------------- | ------------------------- | ----------------- |
@@ -169,21 +177,22 @@ in [`spell-picker-item.ts`](../src/rpg/runtime/character-builder/resolvers/picke
 
 Empty-query best match uses domain rank only — not name-only fallback.
 
-### Clear filters vs Reset view
+### Reset
 
-Mutually exclusive toolbar actions (`toolbarResetMode` on `EquipmentPickerDrawer`;
-production default `reset_view`):
+Equipment browse has one toolbar action, Reset. It restores search, category, Affordable now, and sort. Action buttons show no counts.
 
-| Action            | Resets                                 | Preserves |
-| ----------------- | -------------------------------------- | --------- |
-| **Clear filters** | search, category, Affordable now       | sort      |
-| **Reset view**    | search, category, Affordable now, sort | —         |
+## Considered and not ranked
 
-Action buttons show no counts.
+These were checked for spell and proficiency browse and dropped until the stated data exists:
+
+- **Spell `compatible` from recommendations authored for another class level.** Only the Bard authors recommendations, and the only mismatch that can separate rows is class level. _Revisit when_ several classes author recommendations across class levels.
+- **Specificity and source as spell or proficiency tie-breaks.** Each picker emits one specificity and one source today. _Revisit when_ a picker emits two same-strength signals that differ in specificity or source.
+- **Tool, weapon, and armor affinity.** No content produces a suggested-proficiency field, and class pools are membership only. _Revisit when_ content gains structured suggested-proficiency fields.
+- **Heritage language affinity.** Heritage affinity is the heritage's granted languages, which are already disabled rows. Using it would replace species affinity recommendations that already work.
 
 ## Picker purchase availability
 
-`resolveEquipmentPickerItems` stamps `purchaseAvailability` once from remaining budget and copies that same object onto `state.resolved`. Action, badges, and purchase-list sort all read it.
+`resolveEquipmentPickerItems` stamps `purchaseAvailability` once from remaining budget and copies that same object onto `state.resolved`. Actions and badges read every status. Purchase-list sort treats `unavailableForPurchase` as a late negative and does not rank `unaffordable`.
 
 | Status                   | Meaning                                                                                |
 | ------------------------ | -------------------------------------------------------------------------------------- |
@@ -225,43 +234,37 @@ The equipment picker exposes two independent affordability controls:
 | **Affordable now** checkbox (`showAffordableOnly`) | `purchaseAvailability.status === 'available'`    | `false` | Disabled in the equipment picker drawer for now; when enabled, user opt-in hides rows the character cannot purchase with remaining budget. Shown only when a budget is present. |
 
 Browse context (search, category, sort) is **preserved** across drawer
-close/reopen within a builder session. **Reset view** (default) resets the full view;
-**Clear filters** resets structured inclusion and search only.
-Context-key reset (character, equipment method, budget change) is a documented follow-up.
+close/reopen within a builder session. Reset restores search, filters, and sort.
+
+A filter that reads a rank key's fact, such as proficiency or unmet Strength, narrows rows. It does not reorder them. The rank key still orders the rows that remain when the filter is off.
 
 Row disabled notes and the budget header use the shared `EmphasisDetailLine`
 pattern: foreground primary stat (`5 GP remaining`, `75 GP needed`) plus a muted
 secondary tail (`100 GP starting · 95 GP spent`, `40 GP remaining`).
 
-## Equipment picker badge precedence
+## Equipment picker row status
 
-`getEquipmentPickerBadge` in `equipment-picker-drawer.lib.ts` emits **one badge per
-row**. Copy is **reason-driven** — do not infer proficiency-state labels from
-equipment kind alone.
+Picker rows no longer pick a single badge. Every applicable signal renders on one
+ordered status line: blockers, then compatibility warnings, then requirement,
+recommendation, and source guidance. Rank tables, dedupe, and per-surface visibility
+are dashboard-owned. See
+[character-builder-picker-chrome.md](../../../../apps/dashboard/docs/character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
-`state.isProficient` remains factual (resolved proficiencies only). Badge copy
-interprets unresolved recommendation context; it does not redefine proficiency for
-preview or combat semantics.
+Contracts own the copy through `resolveEquipmentPresentationFacts`:
 
-### Single-badge order
+- **Requirements:** kind-based. "Required by class" for an exact need, "Matches focus
+  requirement" for an open focus `anyOf`, and "Satisfies focus requirement" for the
+  satisfier.
+- **Recommendations:** "Recommended by class", "Recommended by species", and so on.
+- **Source state:** an alternative starting package reads "Included in package option".
+  The builder shows it on the gold path only (`isGoldShoppingPath` on the drawer). An
+  open tool-proficiency pool reads "Proficiency available".
+- **Compatibility:** "Not proficient" and "Requires STR 15", each with a detail sentence.
 
-1. **Essential / class-required blockers** — authored `label`, `classRequired`,
-   `classToolNeed`, `spellcastingFocus`
-2. **Proficiency-state explanations** — `selectedToolProficiency` → **Proficient**;
-   `unresolvedToolProficiencyChoice` → **Proficiency available**;
-   `classToolCategory` → **Common for your class**
-3. **Starting-equipment / class recommendation source** — `startingEquipmentChoice` →
-   **Starting option**; `availableInStartingOption` → **Standard gear** on gold path
-   only (`isGoldShoppingPath` on the drawer)
-4. **Not proficient** — when `compatibility.proficient === false` and no higher-priority fact applies
-
-Proficiency-state badges outrank ordinary recommendation-source badges (e.g. a Bard
-instrument with both `unresolvedToolProficiencyChoice` and `startingEquipmentChoice`
-shows **Proficiency available**). Essential blockers outrank generic proficiency copy.
-
-Ordinary weapon/armor category proficiency (`compatibility.proficient === true`
-without `selectedToolProficiency`) stays **badge-less**. Missing proficiency is a
-caution, not a recommendation tier.
+`state.isProficient` remains factual (resolved proficiencies only). Ordinary
+weapon or armor category proficiency adds nothing to the line. Missing proficiency and
+an unmet ability score are cautions, not recommendation tiers. Both change Best Match
+as late compatibility keys.
 
 ## Starting-equipment contribution context
 

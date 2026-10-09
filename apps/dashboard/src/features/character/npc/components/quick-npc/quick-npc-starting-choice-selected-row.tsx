@@ -15,7 +15,7 @@ export type QuickNpcStartingChoiceSelectedRowProps = {
   suggestionHint?: string
   suggestionTitle?: string
   alsoGrantedHint?: string
-  /** Separate status lines under the description (e.g. build advisories). */
+  /** Selection-row status for this owned item (compatibility badges). */
   status?: EntitySummaryStatusItem[]
   onRemove: () => void
 }
@@ -40,7 +40,7 @@ export function QuickNpcStartingChoiceSelectedRow({
             {description}
           </Text>
         ) : undefined,
-        ...(status?.length ? { status } : {}),
+        ...(status?.length ? { status, statusComposition: 'metadata' as const } : {}),
       }}
       trailing={{
         kind: 'utility',

@@ -1,76 +1,63 @@
 'use client'
 
 import type { ButtonProps } from './button.client'
-import { Text } from './text'
 
-import { CatalogPickerActionButton } from './catalog-picker-action-button.client'
+import {
+  CatalogPickerRowAction,
+  type CatalogPickerRowActionTooltip,
+} from './catalog-picker-row-action.client'
 import type { CatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
-import { resolveCatalogPickerRowActionPhase } from './catalog-picker-row-action.lib'
 
-const CATALOG_PICKER_ADDED_LABEL = '✓ Added'
+export const CATALOG_PICKER_ADD_LABEL = 'Add'
+export const CATALOG_PICKER_REMOVE_LABEL = 'Remove'
 
 export type CatalogPickerSelectionActionsProps = {
-  /** Explicit phase — takes precedence over legacy `selected` / pending / success flags. */
-  phase?: CatalogPickerRowActionPhase
-  /** @deprecated Prefer `phase`. */
-  selected?: boolean
-  isPending?: boolean
-  isSuccess?: boolean
+  phase: CatalogPickerRowActionPhase
   canSelect?: boolean
   onAdd: () => void
   onRemove: () => void
   addLabel?: string
-  successLabel?: string
+  removeLabel?: string
   pendingLabel?: string
+  /** Which verb is in flight when `phase` is pending. */
+  pendingDirection?: 'acquire' | 'release'
   buttonVariant?: ButtonProps['variant']
-}
-
-function resolveSelectionPhase(
-  props: Pick<CatalogPickerSelectionActionsProps, 'phase' | 'selected' | 'isPending' | 'isSuccess'>,
-): CatalogPickerRowActionPhase {
-  if (props.phase) return props.phase
-
-  return resolveCatalogPickerRowActionPhase({
-    isPending: props.isPending,
-    isSuccess: props.isSuccess,
-    isSelected: props.selected,
-  })
+  failed?: boolean
+  entityKey?: string
+  tooltip?: CatalogPickerRowActionTooltip
 }
 
 export function CatalogPickerSelectionActions({
   phase,
-  selected = false,
-  isPending = false,
-  isSuccess = false,
   canSelect = true,
   onAdd,
   onRemove,
-  addLabel = 'Add',
-  successLabel = CATALOG_PICKER_ADDED_LABEL,
-  pendingLabel = 'Adding…',
+  addLabel = CATALOG_PICKER_ADD_LABEL,
+  removeLabel = CATALOG_PICKER_REMOVE_LABEL,
+  pendingLabel,
+  pendingDirection = 'acquire',
   buttonVariant,
+  failed = false,
+  entityKey,
+  tooltip,
 }: CatalogPickerSelectionActionsProps) {
-  const resolvedPhase = resolveSelectionPhase({ phase, selected, isPending, isSuccess })
+  const pending = phase === 'pending'
+  const releasing = phase === 'remove' || (pending && pendingDirection === 'release')
+  const actionLabel = releasing ? removeLabel : addLabel
+  const inactive = pending || (!releasing && !canSelect)
 
   return (
-    <>
-      {resolvedPhase === 'success' ? (
-        <Text as="span" className="text-sm font-body-emphasis text-success" role="status">
-          {successLabel}
-        </Text>
-      ) : resolvedPhase === 'remove' ? (
-        <CatalogPickerActionButton variant={buttonVariant} onClick={onRemove}>
-          Remove
-        </CatalogPickerActionButton>
-      ) : (
-        <CatalogPickerActionButton
-          variant={buttonVariant}
-          disabled={resolvedPhase === 'pending' || !canSelect}
-          onClick={onAdd}
-        >
-          {resolvedPhase === 'pending' ? pendingLabel : addLabel}
-        </CatalogPickerActionButton>
-      )}
-    </>
+    <CatalogPickerRowAction
+      intent={releasing ? 'remove' : 'add'}
+      actionLabel={actionLabel}
+      pendingLabel={pendingLabel}
+      pending={pending}
+      disabled={inactive}
+      failed={failed}
+      entityKey={entityKey}
+      tooltip={inactive && !pending ? tooltip : undefined}
+      variant={buttonVariant}
+      onClick={releasing ? onRemove : onAdd}
+    />
   )
 }

@@ -90,7 +90,7 @@ describe('TableBuilder XP thresholds', () => {
     await user.click(screen.getByRole('button', { name: 'Set extended progression' }))
 
     expect(screen.getByText('Extended progression')).toBeInTheDocument()
-    expect(screen.getByText(/· Levels 21–25/)).toBeInTheDocument()
+    expect(screen.getByText(/Levels 21–25/)).toBeInTheDocument()
     expect(screen.getByLabelText('XP increase per level')).toHaveValue('50,000')
   })
 

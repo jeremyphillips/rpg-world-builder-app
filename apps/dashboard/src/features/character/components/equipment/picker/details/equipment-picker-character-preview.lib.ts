@@ -9,8 +9,8 @@ import {
   resolveArmorClassIfEquipped,
   resolveEquippedArmorFromInventory,
   resolveWeaponAttackAbilityModifier,
+  formatInlineWealth,
   subtractFromWealth,
-  formatWealthAsGold,
   weaponAttackBonus,
   type Ability,
   type ArmorClassBase,
@@ -117,7 +117,7 @@ function resolveBudgetPreviewLine(
   if (!context.budget || !canPurchaseEquipment(equipment)) return undefined
 
   const remaining = subtractFromWealth(context.budget.remaining, equipment.cost)
-  return `${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: ${formatWealthAsGold(remaining)}`
+  return `${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: ${formatInlineWealth(remaining)}`
 }
 
 export function resolveEquipmentPickerCharacterPreviewLines(

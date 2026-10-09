@@ -23,8 +23,8 @@ import { VOCABULARY_OVERVIEW_FILTER_SCHEMA } from '../lib/vocabulary/vocabulary-
 import {
   buildVocabularyBulkSelectionConfig,
   createVocabularyRowActionsRenderer,
-  VOCABULARY_BULK_SELECTION_LIMIT,
 } from './use-vocabulary-overview-page.lib'
+import { VOCABULARY_BULK_SELECTION_LIMIT } from './vocabulary-bulk-selection-limit'
 
 export type UseVocabularyOverviewPageOptions = {
   campaignId: string

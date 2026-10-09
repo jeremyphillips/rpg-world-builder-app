@@ -68,7 +68,7 @@ describe('detail collection grammar guard', () => {
     const source = readFileSync(
       join(
         REPO_ROOT,
-        'apps/dashboard/src/features/content/lib/entity/row-list/entity-row-list.tsx',
+        'apps/dashboard/src/features/content/lib/entity/row-list/entity-row-list-parts.tsx',
       ),
       'utf8',
     )

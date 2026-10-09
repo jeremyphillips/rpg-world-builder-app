@@ -1,19 +1,18 @@
-import type {
-  CharacterOrganizationConnection,
-  Organization,
-  OrganizationDomain,
+import {
+  catalogNounFromContentType,
+  formatCatalogPickerCopy,
+  type CharacterOrganizationConnection,
+  type Organization,
 } from '@rpg/contracts'
 
-export const ORGANIZATION_PICKER_ALL_DOMAINS = 'all'
-export const ORGANIZATION_PICKER_RESET_VIEW_LABEL = 'Reset view'
-export const ORGANIZATION_PICKER_NO_RESULTS_MESSAGE = 'No organizations match this view.'
-export const ORGANIZATION_PICKER_NO_ITEMS_MESSAGE = 'No organizations are available.'
-export const ORGANIZATION_PICKER_TITLE = 'Choose organization'
-export const ORGANIZATION_PICKER_DESCRIPTION = 'Choose an organization connected to this character.'
+const organizationNoun = catalogNounFromContentType('organizations')
 
-export type OrganizationPickerDomainFilter =
-  | typeof ORGANIZATION_PICKER_ALL_DOMAINS
-  | OrganizationDomain
+export const ORGANIZATION_PICKER_COPY = formatCatalogPickerCopy(organizationNoun, {
+  noResultsMessage: `No ${organizationNoun.plural} match this view.`,
+})
+
+export const ORGANIZATION_PICKER_NO_RESULTS_MESSAGE = ORGANIZATION_PICKER_COPY.noResultsMessage
+export const ORGANIZATION_PICKER_NO_ITEMS_MESSAGE = ORGANIZATION_PICKER_COPY.noItemsMessage
 
 export type OrganizationPickerItem = {
   organization: Organization

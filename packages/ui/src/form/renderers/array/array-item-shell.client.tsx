@@ -4,6 +4,7 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils'
 import { ActionIcon } from '../../../components/ui/action-icon.client'
 import { CollapsibleListItemShell } from '../../../components/ui/collapsible-list-item/collapsible-list-item-shell.client'
+import { resolveCollapsibleListItemHeaderActionsPlacement } from '../../../components/ui/collapsible-list-item/collapsible-list-item-root.lib'
 import { resolveArrayItemShellSurface } from '../../config/array/resolve-array-item-shell-surface.lib'
 import { useFormSectionContext } from '../../context/form-section.context'
 import {
@@ -163,6 +164,7 @@ export function ArrayItemShell({
       collapsible={collapsible}
       dragging={dragging}
       layout={layout}
+      headerActionsPlacement={resolveCollapsibleListItemHeaderActionsPlacement(layout)}
       surface={resolveArrayItemShellSurface({
         explicit: arrayItemSurface,
         collapsible: collapsible ?? false,

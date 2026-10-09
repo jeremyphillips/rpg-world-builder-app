@@ -13,6 +13,7 @@ import {
   buildLocationEntityContextPresentation,
   buildLocationEntitySummarySearchText,
   buildLocationEntitySummaryVm,
+  buildLocationPickerSearchText,
   buildLocationLocatedInSegments,
   buildLocationsById,
   formatLocatedInSupportingText,
@@ -161,6 +162,12 @@ describe('buildLocationEntitySummaryVm', () => {
     expect(buildLocationEntitySummarySearchText(summary)).toBe(
       'Yawning Portal Building Brewery Aldermere Greyshore Harborford Dock Ward',
     )
+    expect(
+      buildLocationPickerSearchText(YAWNING_PORTAL, {
+        locationsById: byId,
+        campaignId: CAMPAIGN_ID,
+      }),
+    ).toBe('Yawning Portal Building Brewery Aldermere Greyshore Harborford Dock Ward')
   })
 })
 

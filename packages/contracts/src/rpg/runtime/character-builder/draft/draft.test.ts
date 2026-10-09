@@ -114,6 +114,17 @@ describe('characterBuilderDraftSchema', () => {
     })
   })
 
+  it('rejects a startingGold purchase without origin', () => {
+    const result = characterBuilderDraftSchema.safeParse({
+      ...createEmptyCharacterBuilderDraft(),
+      equipment: {
+        mode: 'gold',
+        purchases: [{ equipmentId: 'srd-cc-5.2.1:rope', quantity: 1, sourceMode: 'startingGold' }],
+      },
+    })
+    expect(result.success).toBe(false)
+  })
+
   it('normalizes legacy purchases on persisted rehydrate', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),

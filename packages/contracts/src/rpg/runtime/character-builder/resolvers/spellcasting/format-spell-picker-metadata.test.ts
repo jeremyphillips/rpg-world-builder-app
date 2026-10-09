@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import type { Spell } from '../../../../content/spell'
 import {
-  buildSpellPickerCompactSummary,
   buildSpellPickerSearchText,
+  getSpellSearchDescription,
+  getSpellSearchLevelLabels,
+  getSpellSearchName,
+  getSpellSearchSchoolLabel,
+  getSpellSearchTags,
   formatSpellConcentrationMarker,
   formatSpellPickerCastingTime,
   formatSpellPickerComponents,
@@ -36,25 +40,6 @@ const baseSpell = {
     verbal: true,
     somatic: true,
     material: { description: 'a tiny ball of bat guano' },
-  },
-} satisfies Spell
-
-const detectMagic = {
-  ...baseSpell,
-  id: 'srd-cc-5.2.1:detect-magic',
-  slug: 'detect-magic',
-  name: 'Detect Magic',
-  school: 'divination',
-  level: 1,
-  tags: { roles: ['detection'] },
-  castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: true },
-  range: { kind: 'self' },
-  duration: {
-    kind: 'timed',
-    value: 10,
-    unit: 'minute',
-    concentration: true,
-    upTo: true,
   },
 } satisfies Spell
 
@@ -140,48 +125,28 @@ describe('formatSpellRitualMarker', () => {
   })
 })
 
-describe('buildSpellPickerCompactSummary', () => {
-  it('builds casting summary and classification without tags', () => {
-    expect(buildSpellPickerCompactSummary(baseSpell)).toEqual({
-      castingSummary: ['Action', '150 ft', 'Instantaneous'],
-      classification: {
-        levelLabel: '3rd level',
-        descriptors: ['Evocation'],
-      },
-    })
-  })
-
-  it('includes delivery method in classification descriptors when present', () => {
-    expect(
-      buildSpellPickerCompactSummary({
-        ...baseSpell,
-        level: 0,
-        deliveryMethod: 'ranged-spell-attack',
-      }).classification.descriptors,
-    ).toEqual(['Evocation', 'Ranged attack'])
-  })
-
-  it('includes concentration phrasing in casting summary for detect magic', () => {
-    expect(buildSpellPickerCompactSummary(detectMagic).castingSummary).toContain(
-      'Concentration, up to 10 minutes',
-    )
-    expect(buildSpellPickerCompactSummary(detectMagic)).toEqual({
-      castingSummary: ['Action', 'Self', 'Concentration, up to 10 minutes'],
-      classification: {
-        levelLabel: '1st level',
-        descriptors: ['Divination'],
-      },
-    })
-  })
-})
-
 describe('buildSpellPickerSearchText', () => {
   it('includes name, school, level labels, tags, and plain description text', () => {
     const searchText = buildSpellPickerSearchText(baseSpell)
-    expect(searchText).toContain('Fireball')
-    expect(searchText).toContain('Evocation')
-    expect(searchText).toContain('damage')
-    expect(searchText).toContain('bright streak flashes')
+    expect(searchText).toBe(
+      'Fireball Evocation 3rd 3rd level damage A bright streak flashes from your pointing finger.',
+    )
     expect(searchText).not.toContain('<p>')
+  })
+
+  it('joins the field helpers without changing the combined text', () => {
+    const tags = getSpellSearchTags(baseSpell)
+    expect(buildSpellPickerSearchText(baseSpell)).toBe(
+      [
+        getSpellSearchName(baseSpell),
+        getSpellSearchSchoolLabel(baseSpell),
+        ...getSpellSearchLevelLabels(baseSpell),
+        tags.join(' ') || undefined,
+        getSpellSearchDescription(baseSpell) || undefined,
+      ]
+        .filter(Boolean)
+        .join(' '),
+    )
+    expect(getSpellSearchLevelLabels({ ...baseSpell, level: 0 })).toEqual(['Cantrip', 'Cantrip'])
   })
 })

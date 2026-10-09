@@ -7,6 +7,7 @@ import {
 import { buildChoiceSetId } from '../../choice-set'
 import type { CharacterBuildCatalogIndex } from '../../context'
 import type { CharacterBuilderDraft } from '../../draft/draft'
+import { findClassToolProficiencyChoice } from '../class/find-class-tool-proficiency-choice'
 import {
   PROFICIENCY_LINKED_GRANT_MISSING_CHOICE_MESSAGE,
   resolveClassToolProficiencyChoice,
@@ -35,9 +36,7 @@ function proficiencyLinkSource(classId: string, choiceId: string): ProficiencyLi
 }
 
 function choiceLabel(characterClass: CharacterClass, choiceId: string): string {
-  const choice = (characterClass.characterCreation?.proficiencies?.tools?.choices ?? []).find(
-    (entry) => entry.id === choiceId,
-  )
+  const choice = findClassToolProficiencyChoice(characterClass, choiceId)
   return choice?.label?.trim() || choiceId
 }
 

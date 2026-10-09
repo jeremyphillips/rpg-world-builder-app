@@ -1,12 +1,28 @@
 import {
   DEFAULT_SYSTEM_RULESET_ID,
   buildSpellPickerCompactSummary,
+  buildSpellPickerSearchText,
   NEUTRAL_OPTION_RECOMMENDATION,
   type ChoiceSet,
-  type SpellPickerItem,
+  type Spell,
+  type SpellPickerItemState,
 } from '@rpg/contracts'
 
 import { makeSpell } from '@/test/fixtures/factories/spell'
+
+import { assembleSpellPickerSearchDocument } from '../../../lib/spells/spell-picker-search.lib'
+
+import type { SpellPickerRow } from './spell-picker-drawer.types'
+
+function spellPickerRow(spell: Spell, state: SpellPickerItemState): SpellPickerRow {
+  return {
+    spell,
+    searchText: buildSpellPickerSearchText(spell),
+    compactSummary: buildSpellPickerCompactSummary(spell),
+    state,
+    searchDocument: assembleSpellPickerSearchDocument(spell),
+  }
+}
 
 export const spellPickerCureWoundsFixture = makeSpell({
   slug: 'cure-wounds',
@@ -78,52 +94,37 @@ export const spellPickerCantripChoiceSetFixture = {
   required: true,
 } as ChoiceSet
 
-export const spellPickerItemsFixture: SpellPickerItem[] = [
-  {
-    spell: spellPickerMageHandFixture,
-    searchText: 'Mage Hand conjuration cantrip spectral floating hand',
-    compactSummary: buildSpellPickerCompactSummary(spellPickerMageHandFixture),
-    state: {
-      isAvailable: true,
-      isRecommended: false,
-      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
-      isAlreadySelected: true,
-      isSelectionFull: true,
-      canSelect: false,
-      disabledReasons: [],
-    },
-  },
-  {
-    spell: spellPickerDetectMagicFixture,
-    searchText: 'Detect Magic divination ritual concentration detection',
-    compactSummary: buildSpellPickerCompactSummary(spellPickerDetectMagicFixture),
-    state: {
-      isAvailable: true,
-      isRecommended: false,
-      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
-      isAlreadySelected: true,
-      isSelectionFull: true,
-      canSelect: false,
-      disabledReasons: [],
-    },
-  },
-  {
-    spell: spellPickerCureWoundsFixture,
-    searchText: 'Cure Wounds evocation healing touch',
-    compactSummary: buildSpellPickerCompactSummary(spellPickerCureWoundsFixture),
-    state: {
-      isAvailable: true,
-      isRecommended: false,
-      recommendation: NEUTRAL_OPTION_RECOMMENDATION,
-      isAlreadySelected: false,
-      isSelectionFull: true,
-      canSelect: false,
-      disabledReasons: ['Selection full'],
-    },
-  },
+export const spellPickerItemsFixture: SpellPickerRow[] = [
+  spellPickerRow(spellPickerMageHandFixture, {
+    isAvailable: true,
+    isRecommended: false,
+    recommendation: NEUTRAL_OPTION_RECOMMENDATION,
+    isAlreadySelected: true,
+    isSelectionFull: true,
+    canSelect: false,
+    disabledReasons: [],
+  }),
+  spellPickerRow(spellPickerDetectMagicFixture, {
+    isAvailable: true,
+    isRecommended: false,
+    recommendation: NEUTRAL_OPTION_RECOMMENDATION,
+    isAlreadySelected: true,
+    isSelectionFull: true,
+    canSelect: false,
+    disabledReasons: [],
+  }),
+  spellPickerRow(spellPickerCureWoundsFixture, {
+    isAvailable: true,
+    isRecommended: false,
+    recommendation: NEUTRAL_OPTION_RECOMMENDATION,
+    isAlreadySelected: false,
+    isSelectionFull: true,
+    canSelect: false,
+    disabledReasons: ['Selection full'],
+  }),
 ]
 
-export const spellPickerOpenItemsFixture: SpellPickerItem[] = [
+export const spellPickerOpenItemsFixture: SpellPickerRow[] = [
   {
     ...spellPickerItemsFixture[0]!,
     state: {

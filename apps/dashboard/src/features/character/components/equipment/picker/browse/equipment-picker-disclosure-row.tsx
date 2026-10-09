@@ -4,72 +4,122 @@ import {
   buildEquipmentPickerRowViewModel,
   CatalogEntityRow,
   CatalogMetadataRenderer,
+  type EntitySummaryProvenanceItem,
 } from '@/features/content'
 import { useEquipmentAcquisitionQuantityCommit } from '../../../../hooks/use-equipment-acquisition-quantity-commit'
-import { resolveAcquisitionCommitButtonLabel } from '../../acquisition/equipment-acquisition-commit-labels.lib'
+import { resolvePickerMutationCopy } from '../../../../lib/picker/picker-mutation-family'
+import { resolvePickerSelectionStateLine } from '../../../../lib/picker/picker-selection-state'
 import { mapEquipmentCompactSummaryToMetadataLines } from '../map-equipment-compact-summary-to-metadata-lines'
-import { EquipmentPickerCommerce } from './equipment-picker-commerce'
-import { buildEquipmentPickerEntityStatus } from '../callouts/equipment-picker-callout-presentation.lib'
+import { resolveEquipmentSelectionRowPresentation } from '../../../../lib/equipment/equipment-selection-row-presentation.lib'
+import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 import {
-  getEquipmentPickerCallout,
-  getEquipmentPickerSecondaryLabels,
-} from '../callouts/equipment-picker-callout.lib'
-import type { EquipmentPickerItem } from '../drawer/equipment-picker-drawer.types'
-import type { EquipmentPickerItemPresentation } from './equipment-picker-item-header.lib'
+  resolveSelectionRowStatusItems,
+  type SelectionRowStatusTooltip,
+} from '../../../../lib/selection-row-status'
+import { EquipmentPickerRowAcquisitionControl } from './equipment-picker-row-acquisition-control'
+import { getEquipmentUnaffordableAmounts } from '../drawer/equipment-picker-drawer.lib'
+import type {
+  EquipmentBudgetSummary,
+  EquipmentPickerItem,
+} from '../drawer/equipment-picker-drawer.types'
+import { EquipmentUnaffordableAffordanceTooltip } from '../status/equipment-unaffordable-affordance-tooltip'
+import type {
+  EquipmentPickerItemPresentation,
+  EquipmentPickerProvenanceSegment,
+} from './equipment-picker-item-header.lib'
 
-const EQUIPMENT_PICKER_ADD_LABEL = 'Add'
+function affordabilityTooltip(
+  item: EquipmentPickerItem,
+  budget: EquipmentBudgetSummary | undefined,
+): SelectionRowStatusTooltip {
+  return (entry) => {
+    if (entry.reason !== 'unaffordable') return undefined
+    const amounts = getEquipmentUnaffordableAmounts(item, budget)
+    return amounts ? <EquipmentUnaffordableAffordanceTooltip amounts={amounts} /> : undefined
+  }
+}
 
 export type EquipmentPickerDisclosureRowProps = {
   rowArgs: CatalogPickerCollapsibleRowRenderArgs<EquipmentPickerItem>
   presentation: EquipmentPickerItemPresentation
-  ownedQuantity: number
+  workflowMode?: EquipmentPickerWorkflowMode
   isGoldShoppingPath?: boolean
-  onCommit?: () => boolean
+  budget?: EquipmentBudgetSummary
+  onCommitAdd?: () => boolean
+  onSetPurchasedQuantity?: (total: number) => void
+  onReleaseChoice?: (allowanceId: string) => void
+  onRemovePurchaseOne?: () => void
 }
 
 export function EquipmentPickerDisclosureRow({
   rowArgs,
   presentation,
-  ownedQuantity,
+  workflowMode = 'purchase',
   isGoldShoppingPath = false,
-  onCommit,
+  budget,
+  onCommitAdd,
+  onSetPurchasedQuantity,
+  onReleaseChoice,
+  onRemovePurchaseOne,
 }: EquipmentPickerDisclosureRowProps) {
-  const { isPending, successQuantity, commitFailed, commitQuantity } =
-    useEquipmentAcquisitionQuantityCommit({
-      commit: () => onCommit?.() ?? false,
-    })
+  const { isPending, commitFailed, commitQuantity } = useEquipmentAcquisitionQuantityCommit({
+    commit: () => onCommitAdd?.() ?? false,
+  })
 
   const item = rowArgs.item
   const row = buildEquipmentPickerRowViewModel(item.equipment)
-  const calloutContext = { isGoldShoppingPath }
-  const callout = getEquipmentPickerCallout(item, calloutContext)
-  const secondaryLabels = getEquipmentPickerSecondaryLabels(item, calloutContext)
-  const addButtonLabel = resolveAcquisitionCommitButtonLabel({
-    isPending,
-    successQuantity,
-    primaryActionLabel: EQUIPMENT_PICKER_ADD_LABEL,
-  })
+  const status = resolveSelectionRowStatusItems(
+    resolveEquipmentSelectionRowPresentation({
+      equipment: item.equipment,
+      resolved: item.state.resolved,
+      purchaseAvailability: item.state.purchaseAvailability,
+      exceedsPurchaseBudgetCeiling: item.state.exceedsPurchaseBudgetCeiling,
+      blockers: presentation.blockers,
+      isGoldShoppingPath,
+      isProficient: item.state.isProficient,
+    }),
+    { context: 'picker', statusTooltip: affordabilityTooltip(item, budget) },
+  )
+
+  const toProvenanceItem = (
+    segment: EquipmentPickerProvenanceSegment,
+  ): EntitySummaryProvenanceItem => {
+    if (segment.kind === 'text') return { kind: 'text', label: segment.label }
+    return {
+      kind: 'action',
+      key: segment.key,
+      label: segment.label,
+      ariaLabel: segment.ariaLabel,
+      onAction: () => {
+        if (segment.target.kind === 'release_choice') onReleaseChoice?.(segment.target.allowanceId)
+        else onRemovePurchaseOne?.()
+      },
+    }
+  }
+
+  const provenance = presentation.provenance.map(toProvenanceItem)
+  const selectionState = resolvePickerSelectionStateLine(presentation.selectionState)
 
   const trailing =
-    presentation.action.kind === 'add' ||
-    (presentation.action.kind === 'manage_only' && ownedQuantity > 0)
-      ? {
+    presentation.control.kind === 'none' && !presentation.priceSlot
+      ? undefined
+      : {
           kind: 'group' as const,
           primary: (
-            <EquipmentPickerCommerce
-              ownedQuantity={ownedQuantity}
-              showAdd={presentation.action.kind === 'add'}
-              disabled={presentation.action.kind === 'add' ? presentation.action.disabled : false}
-              buttonLabel={addButtonLabel}
+            <EquipmentPickerRowAcquisitionControl
+              control={presentation.control}
+              equipmentName={row.name}
+              addLabel={resolvePickerMutationCopy('genericSelection').acquire}
               isPending={isPending}
-              successQuantity={successQuantity}
               commitFailed={commitFailed}
               onAdd={() => commitQuantity(1)}
+              onSetPurchasedQuantity={(total) => onSetPurchasedQuantity?.(total)}
+              onRelease={(allowanceId) => onReleaseChoice?.(allowanceId)}
+              onRemovePurchase={() => onRemovePurchaseOne?.()}
             />
           ),
-          secondary: presentation.secondary,
+          ...(presentation.priceSlot ? { secondary: presentation.priceSlot } : {}),
         }
-      : undefined
 
   return (
     <CatalogEntityRow
@@ -82,7 +132,7 @@ export function EquipmentPickerDisclosureRow({
       details={rowArgs.details}
       entity={{
         heading: row.name,
-        classification: row.kindLabel,
+        ...(workflowMode === 'magic_items' ? {} : { classification: row.kindLabel }),
         description: (
           <CatalogMetadataRenderer
             density="compact"
@@ -92,11 +142,10 @@ export function EquipmentPickerDisclosureRow({
             })}
           />
         ),
-        status: buildEquipmentPickerEntityStatus({
-          callout,
-          secondaryLabels,
-          statusItems: presentation.statusItems,
-        }),
+        ...(selectionState ? { selectionState } : {}),
+        ...(status.length > 0 ? { status } : {}),
+        ...(provenance.length > 0 ? { provenance } : {}),
+        statusComposition: 'metadata',
       }}
       trailing={trailing}
     />

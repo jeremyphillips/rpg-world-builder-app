@@ -1,4 +1,5 @@
 import type { StartingWealthRules } from '../../../campaign/rules/starting-wealth'
+import type { MagicItemAllowanceRequirement } from '../equipment/magic-item-selection'
 import type { SystemRulesetId } from '../../../primitives/ruleset'
 import type { Equipment } from '../../../content/equipment'
 import type { EquipmentChoiceGrant } from '../../../content/lib/grants/equipment-grant'
@@ -286,6 +287,7 @@ function assembleFromDraftEquipment(
     equipment: deriveEquipmentDraftEntries(draft, catalogIndex, {
       startingWealth: options?.startingWealth,
       rulesetId,
+      magicItemRequirement: options?.magicItemRequirement,
     }),
     wealth: budget?.remaining ?? characterWealthFromGrant(undefined),
   }
@@ -328,6 +330,8 @@ export type AssembleStartingEquipmentOptions = {
   startingWealth?: StartingWealthRules
   /** Canonical ruleset id from build context — prefer threading over catalog inference. */
   rulesetId?: SystemRulesetId
+  /** Kind policy for magic-item allowances. Omitted paths keep exact provenance lookup. */
+  magicItemRequirement?: MagicItemAllowanceRequirement
 }
 
 /** Assembles finalized equipment and wealth from draft equipment decisions. */

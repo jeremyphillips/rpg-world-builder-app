@@ -15,7 +15,7 @@ import {
   applyValidationIssuesToForm,
   validateContentPublishValues,
 } from '../../validation/content-publish-validation.lib'
-import { useContentEditPublishRequest } from './content-edit-publish-context'
+import { useContentEditPublishRequest } from './use-content-edit-publish-request'
 
 type ContentEditPublishBridgeProps = {
   publishSchema: ZodType<FieldValues>

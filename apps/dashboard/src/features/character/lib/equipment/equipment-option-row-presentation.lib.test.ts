@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import {
   NEUTRAL_OPTION_RECOMMENDATION,
-  OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
   OPTION_PRESENTATION_RECOMMENDED_LABEL,
+  OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
   projectEquipmentSelection,
   requiredByLabel,
-  satisfiesFocusRequirementLabel,
+  resolveEquipmentNotProficientMessage,
   type ResolvedEquipmentOption,
 } from '@rpg/contracts'
+
+import { makeEquipment } from '@/test/fixtures/factories'
 
 import {
   equipmentOptionAccessibleLabel,
@@ -18,6 +20,7 @@ import {
 } from './equipment-option-row-presentation.lib'
 
 const wizard = { kind: 'class' as const, id: 'wizard' }
+const longsword = makeEquipment({ kind: 'weapon', slug: 'longsword', name: 'Longsword' })
 const fighter = { kind: 'class' as const, id: 'fighter' }
 const sourceName = (source: { kind: string; id?: string }) => {
   if (source.kind === 'class' && source.id === 'wizard') return 'Wizard'
@@ -38,6 +41,7 @@ function resolved(overrides: Partial<ResolvedEquipmentOption> = {}): ResolvedEqu
 function present(option: ResolvedEquipmentOption, metadata: readonly string[] = ['1d8 Slashing']) {
   return resolveEquipmentOptionRowPresentation({
     identity: 'Longsword',
+    equipment: longsword,
     kindLabel: 'Weapon',
     metadata,
     resolved: option,
@@ -94,6 +98,9 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     expect(presentation.secondaryClauses[0]?.label).toBe(
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Guard role · Fighter class`,
     )
+    expect(
+      presentation.secondaryClauses.filter((clause) => clause.kind === 'recommendation'),
+    ).toHaveLength(1)
   })
 
   it('names a required item from the requirement owner', () => {
@@ -112,7 +119,8 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     )
     expect(presentation.secondaryClauses[0]).toMatchObject({
       kind: 'requirement',
-      label: requiredByLabel('Wizard class'),
+      label: requiredByLabel('class'),
+      title: 'Wizard class',
     })
   })
 
@@ -209,14 +217,39 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     )
     const inline = equipmentOptionInlineClauses(presentation).map((clause) => clause.label)
     expect(inline).toEqual([
-      satisfiesFocusRequirementLabel('Wizard'),
-      OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+      OPTION_PRESENTATION_SATISFIES_FOCUS_REQUIREMENT_LABEL,
+      resolveEquipmentNotProficientMessage('weapon'),
     ])
     expect(presentation.secondaryTitle).toContain(
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Fighter class`,
     )
     expect(presentation.secondaryTitle).toContain('Guard role')
+    expect(presentation.secondaryTitle).toContain('Wizard class')
     expect(equipmentOptionAccessibleLabel(presentation)).toContain('Guard role')
+  })
+
+  it('shows an unmet ability requirement as a compatibility clause', () => {
+    const presentation = resolveEquipmentOptionRowPresentation({
+      identity: 'Plate Armor',
+      kindLabel: 'Armor',
+      equipment: makeEquipment({ kind: 'armor', slug: 'plate-armor', name: 'Plate Armor' }),
+      resolved: resolved({
+        state: {
+          compatibility: {
+            proficient: true,
+            unmetAbilityScoreRequirements: [{ ability: 'str', required: 15, actual: 12 }],
+          },
+        },
+      }),
+    })
+    expect(equipmentOptionInlineClauses(presentation)).toEqual([
+      expect.objectContaining({
+        kind: 'compatibility',
+        discriminator: 'ability-requirement-unmet',
+        badgeLabel: 'Requires STR 15',
+        label: 'Requires STR 15; character has STR 12.',
+      }),
+    ])
   })
 
   it('keeps recommendation and package supply when a role clause repeats the recommendation', () => {
@@ -282,7 +315,7 @@ describe('resolveEquipmentOptionRowPresentation', () => {
     const presentation = present(option)
     expect(option.recommendation).toBe(recommendation)
     expect(equipmentOptionInlineClauses(presentation).map((clause) => clause.label)).toEqual([
-      OPTION_PRESENTATION_NOT_PROFICIENT_LABEL,
+      resolveEquipmentNotProficientMessage('weapon'),
       `${OPTION_PRESENTATION_RECOMMENDED_LABEL} by Fighter class`,
     ])
   })

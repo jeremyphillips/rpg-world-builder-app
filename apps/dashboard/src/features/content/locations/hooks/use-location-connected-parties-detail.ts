@@ -15,7 +15,12 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useCanManageCampaign, useCampaignCharacters } from '@/features/campaign'
-import { useCampaignBuildContext, useCampaignNpcBuildContext, useNpcs } from '@/features/character'
+import {
+  createCharacterClassFilterLabelResolver,
+  useCampaignBuildContext,
+  useCampaignNpcBuildContext,
+  useNpcs,
+} from '@/features/character'
 
 import { filterReferenceableCatalogRows } from '../../lib/form-options/content-reference-catalog.lib'
 import { buildLocationsById } from '../lib/location-display'
@@ -45,8 +50,8 @@ import {
 } from '../../lib/relationship/location-connection/location-connection-drawer-intent'
 import { toLocationConnectionEligibilityInput } from '../../lib/relationship/location-connection/location-connection-eligibility-input'
 import { peopleSectionHasAvailableTarget } from '../lib/connected-parties/location-people-section-kind-options.lib'
-import type { LocationConnectedPartyEditTarget } from '../components/connected-parties/location-connected-parties-section'
-import { buildPeopleKindSlots } from '../components/connected-parties/location-connected-parties-section'
+import type { LocationConnectedPartyEditTarget } from '../components/connected-parties/location-connected-party-edit-target'
+import { buildPeopleKindSlots } from '../lib/connected-parties/location-connected-parties-people-kind-slots'
 import { buildLocationConnectedPartyCharactersById } from '../lib/connected-parties/location-connected-party-character-options.lib'
 import { resolveLocationInverseCurrentOrganizationEndpoint } from '../../lib/relationship/location-connection/location-inverse-current-organization-endpoint'
 import { useLocationConnectedParties } from './use-location-connected-parties'
@@ -235,6 +240,10 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
   const campaignCharactersQuery = useCampaignCharacters(campaignId)
   const npcsQuery = useNpcs(campaignId)
   const { catalogIndex } = useCampaignBuildContext(campaignId)
+  const resolveClassLabel = React.useMemo(
+    () => createCharacterClassFilterLabelResolver(catalogIndex),
+    [catalogIndex],
+  )
   const {
     context: npcBuildContext,
     catalogIndex: npcCatalogIndex,
@@ -618,6 +627,7 @@ export function useLocationConnectedPartiesDetail(campaignId: string, location: 
     rows,
     campaignId,
     locationsById,
+    resolveClassLabel,
     canManage,
     canWriteInverse,
     mutationError,

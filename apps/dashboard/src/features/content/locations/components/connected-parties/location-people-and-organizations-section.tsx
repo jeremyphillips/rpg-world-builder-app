@@ -7,10 +7,8 @@ import {
 } from '@/features/character'
 
 import { ContentDetailSection } from '../../../lib/detail/page/content-detail-section'
-import {
-  detailOverflowActionsToRowMenuItems,
-  EntityRowList,
-} from '../../../lib/entity/row-list/entity-row-list'
+import { EntityRowList } from '../../../lib/entity/row-list/entity-row-list'
+import { detailOverflowActionsToRowMenuItems } from '../../../lib/entity/row-list/entity-row-list-menu-items'
 import {
   isRelationshipMutationActionVisible,
   resolveRelationshipAlternatives,
@@ -36,7 +34,7 @@ import { resolveLocationConnectedPartySubjectHref } from '../../lib/connected-pa
 import {
   toLocationConnectedPartyEditTarget,
   type LocationConnectedPartyEditTarget,
-} from './location-connected-parties-section'
+} from './location-connected-party-edit-target'
 
 const PEOPLE_AND_ORGANIZATIONS_GROUP_PRESENTATION =
   resolveLocationConnectedPartyRelationshipPresentation('people_and_organizations')

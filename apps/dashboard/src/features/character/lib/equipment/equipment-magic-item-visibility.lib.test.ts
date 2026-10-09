@@ -96,7 +96,9 @@ function acquisitionContext(equipment: (typeof rareAmulet)[]) {
   return resolveEquipmentAcquisitionContext({
     context: {
       rulesetId: RULESET,
+      characterKind: 'pc',
       characterCreationRules: { startingWealth },
+      catalog: { equipment },
     } as Parameters<typeof resolveEquipmentAcquisitionContext>[0]['context'],
     catalogIndex,
   })

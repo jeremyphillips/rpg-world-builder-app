@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { CharacterBuildAdvisory } from '@rpg/contracts'
 
 import {
-  buildAdvisoryStatusItems,
+  formatBuildAdvisoryLabel,
   indexBuildAdvisoriesByEquipmentId,
   lookupBuildAdvisoriesForEquipment,
   presentBuildAdvisoryList,
@@ -20,6 +20,16 @@ function notProficient(
   }
 }
 
+const plateTooHeavy: CharacterBuildAdvisory = {
+  code: 'equipment_ability_score_requirement_unmet',
+  subject: {
+    kind: 'equipment',
+    equipmentId: 'srd-cc-5.2.1:plate-armor',
+    label: 'Plate Armor',
+    unmet: [{ ability: 'str', required: 15, actual: 12 }],
+  },
+}
+
 const advisories = [
   notProficient('chain-mail', 'Chain Mail', 'armor'),
   notProficient('greatsword', 'Greatsword', 'weapon'),
@@ -33,9 +43,21 @@ describe('build advisory presentation', () => {
     expect(lookupBuildAdvisoriesForEquipment(index, 'srd-cc-5.2.1:dagger')).toEqual([])
   })
 
-  it('maps advisories to warning status items with derived messages', () => {
-    expect(buildAdvisoryStatusItems([advisories[1]!])).toEqual([
-      { kind: 'text', variant: 'warning', label: 'Not proficient with this weapon' },
+  it('formats the player-facing advisory sentence', () => {
+    expect(formatBuildAdvisoryLabel(advisories[1]!)).toBe('Not proficient with this weapon')
+  })
+
+  it('indexes and presents ability-score requirement advisories', () => {
+    const index = indexBuildAdvisoriesByEquipmentId([plateTooHeavy])
+    expect(lookupBuildAdvisoriesForEquipment(index, 'plate-armor', 'srd-cc-5.2.1')).toEqual([
+      plateTooHeavy,
+    ])
+    expect(presentBuildAdvisoryList([plateTooHeavy])).toEqual([
+      {
+        key: 'equipment_ability_score_requirement_unmet:equipment:srd-cc-5.2.1:plate-armor',
+        title: 'Plate Armor',
+        message: 'Requires STR 15; character has STR 12.',
+      },
     ])
   })
 

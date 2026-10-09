@@ -30,7 +30,6 @@ import {
   listProficiencyLinksForOption,
   resolveEquipmentStepBudget,
   resolveEquipmentStepPickerItems,
-  resolvePurchaseSourceMode,
   shouldShowEquipmentFallback,
   shouldShowEquipmentBudget,
   shouldShowEquipmentShopping,
@@ -338,11 +337,7 @@ describe('equipment-step.lib', () => {
     expect(shouldShowEquipmentBudget(packageDraft, undefined)).toBe(false)
   })
 
-  it('resolves purchase source mode to starting gold only', () => {
-    expect(resolvePurchaseSourceMode()).toBe('startingGold')
-  })
-
-  it('does not create manual purchases from the picker path', () => {
+  it('creates only starting-gold picker purchases from the picker path', () => {
     const draft = {
       ...createEmptyCharacterBuilderDraft(),
       class: { classId: equipmentStepBardClassFixture.id, level: 1 as const },
@@ -363,10 +358,15 @@ describe('equipment-step.lib', () => {
         action: {
           kind: 'add_purchase',
           equipmentId: equipmentStepLeatherArmorFixture.id,
-          sourceMode: 'manual',
         },
+      })?.equipment?.purchases,
+    ).toEqual([
+      expect.objectContaining({
+        equipmentId: equipmentStepLeatherArmorFixture.id,
+        sourceMode: 'startingGold',
+        origin: 'picker',
       }),
-    ).toBeUndefined()
+    ])
   })
 
   it('does not write removedPackageItemKeys when removing package rows from inventory', () => {
@@ -517,7 +517,6 @@ describe('equipment-step.lib', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: 'srd-cc-5.2.1:leather-armor',
-        sourceMode: resolvePurchaseSourceMode(),
       },
     })
 
@@ -537,7 +536,6 @@ describe('equipment-step.lib', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: 'srd-cc-5.2.1:leather-armor',
-        sourceMode: resolvePurchaseSourceMode(),
       },
     })
 
@@ -546,6 +544,7 @@ describe('equipment-step.lib', () => {
         equipmentId: 'srd-cc-5.2.1:leather-armor',
         quantity: 2,
         sourceMode: 'startingGold',
+        origin: 'picker',
       }),
     ])
 
@@ -718,7 +717,6 @@ describe('equipment-step.lib', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: rationsId,
-        sourceMode: 'startingGold',
         quantity: 2,
       },
     })
@@ -1027,7 +1025,6 @@ describe('equipment purchase quantity regressions', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: rationsId,
-        sourceMode: 'startingGold',
         quantity: 2,
       },
     })
@@ -1053,7 +1050,6 @@ describe('equipment purchase quantity regressions', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: equipmentStepLeatherArmorFixture.id,
-        sourceMode: 'startingGold',
       },
     })
     expect(armorPatch?.equipment?.purchases).toHaveLength(1)
@@ -1064,7 +1060,6 @@ describe('equipment purchase quantity regressions', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: equipmentStepLeatherArmorFixture.id,
-        sourceMode: 'startingGold',
       },
     })
     expect(duplicateArmor?.equipment?.purchases).toEqual([
@@ -1072,6 +1067,7 @@ describe('equipment purchase quantity regressions', () => {
         equipmentId: equipmentStepLeatherArmorFixture.id,
         quantity: 2,
         sourceMode: 'startingGold',
+        origin: 'picker',
       }),
     ])
   })

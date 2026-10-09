@@ -27,6 +27,13 @@ const CANONICAL_KIND_WORD: Record<Exclude<RecommendationSourceKind, 'user' | 'or
   organization: getContentTypeSentenceForm('organizations'),
 }
 
+/** Lowercase kind word for kind-based copy ("Required by class", "Recommended by species"). */
+export function formatRecommendationSourceKindWord(kind: RecommendationSourceKind): string {
+  if (kind === 'user') return 'you'
+  if (kind === 'origin') return 'origin'
+  return CANONICAL_KIND_WORD[kind]
+}
+
 function canonicalLabel(kind: RecommendationSourceKind, name: string | undefined): string {
   if (kind === 'user') return 'You'
   if (kind === 'origin') return name ? `${name} origin` : 'Origin'

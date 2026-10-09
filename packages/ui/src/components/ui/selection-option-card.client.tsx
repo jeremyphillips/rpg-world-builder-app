@@ -45,12 +45,14 @@ export type SelectionOptionCardProps = {
   titleAdornment?: ReactNode
   description?: string
   summaryLines?: string[]
+  /** Rich summary under the description, in normal flow (not the equal-height badge row). */
+  summaryContent?: ReactNode
   /**
    * Nested region below the description. The card owns the chrome via
    * `optionCardEmbeddedSlotVariants`.
    */
   embedded?: ReactNode
-  embeddedTone?: 'divider' | 'panel'
+  embeddedTone?: 'divider' | 'panel' | 'plain'
   className?: string
 }
 
@@ -134,6 +136,7 @@ export function SelectionOptionCard({
   titleAdornment,
   description,
   summaryLines,
+  summaryContent,
   embedded,
   embeddedTone = 'divider',
   className,
@@ -163,6 +166,7 @@ export function SelectionOptionCard({
           titleAdornment={titleAdornment}
           description={description}
           summaryLines={summaryLines}
+          summaryContent={summaryContent}
           embedded={
             embedded ? (
               <div className={optionCardEmbeddedSlotVariants({ density, tone: embeddedTone })}>

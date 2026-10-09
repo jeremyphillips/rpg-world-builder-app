@@ -44,6 +44,25 @@ export const filterBarControlVariants = cva('', {
 
 export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescendantClasses.sm)
 
+/**
+ * Widest-label sizer. Ghost copies and the live value share one grid cell so
+ * the control stays as wide as its longest label.
+ */
+export const filterToolbarLabelSizerClasses = 'grid grid-cols-[minmax(0,max-content)] items-center'
+
+export const filterToolbarLabelSizerGhostClasses =
+  'invisible pointer-events-none col-start-1 row-start-1 whitespace-nowrap select-none'
+
+export const filterToolbarLabelSizerLiveClasses =
+  'col-start-1 row-start-1 min-w-0 truncate text-left'
+
+/**
+ * Lets a width-token cap shrink a select below its widest ghost and ellipsize
+ * the live value. The token stays a max width; it does not set a fixed width.
+ */
+export const filterToolbarCappedSelectClasses =
+  'overflow-hidden [&_[data-select-value-slot]]:max-w-full [&_[data-select-value-slot]]:min-w-0 [&_[data-select-value-slot]]:shrink [&_[data-select-value-slot]]:overflow-hidden [&_[data-select-value-slot]]:grid-cols-[minmax(0,max-content)]'
+
 export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
   variants: {
     density: {

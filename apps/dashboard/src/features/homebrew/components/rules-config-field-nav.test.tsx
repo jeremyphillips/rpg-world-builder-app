@@ -38,7 +38,7 @@ describe('RulesConfigFieldNav', () => {
     expect(rail.parentElement).not.toHaveClass('lg:sticky')
     expect(rail).toHaveClass(
       'lg:sticky',
-      'lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2.5rem))]',
+      'lg:top-[var(--app-sticky-chrome-block-size,calc(3rem+2rem))]',
       'lg:self-start',
     )
     expect(rail).toHaveClass('bg-surface-faint', 'rounded-lg')

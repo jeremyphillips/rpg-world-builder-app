@@ -68,6 +68,15 @@ boundary here.
 Every component gets co-located `*.stories.tsx` (CSF3); logic-bearing or
 interactive components also get `*.test.tsx`.
 
+A dashboard `.tsx` file that exports a component exports only components.
+Hooks and helpers belong in a sibling `.ts` file. Fast Refresh cannot update
+a module that also exports a function, and that failure reloads the page.
+`src/app`, `src/components/layout`, and `src/features/auth/api` do not
+value-import the `@rpg/contracts` root. Use the subpath that owns the symbol
+(`@rpg/contracts/vocab`, `/shared`, `/runtime`, `/content`, and the other
+entries in `@rpg/contracts` `package.json`). A root import invalidates that
+module on every contracts save.
+
 > **`@rpg/ui` and `apps/public`** retain `<name>.client.tsx` + `'use client'` for
 > interactive modules. Do not add `.client` or `'use client'` to new dashboard modules.
 

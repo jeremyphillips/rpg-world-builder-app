@@ -1,19 +1,23 @@
 import * as React from 'react'
 
-import { useSanitizedFilterState } from '@rpg/ui/filters'
-import { isEquipmentPickerSupportedKind, isEquipmentStackable } from '@rpg/contracts'
+import { applyFilterSchema, useSanitizedFilterState } from '@rpg/ui/filters'
 
 import {
   filterAndSortEquipmentPickerItems,
-  filterEquipmentPickerItems,
+  filterEligibleEquipmentPickerItems,
   resolveEquipmentKindFilterOptions,
   EQUIPMENT_PICKER_VIEW_DEFAULTS,
 } from './equipment-picker-drawer.lib'
 import {
   countEquipmentPickerStructuredFilters,
   createEquipmentPickerFilterSchema,
+  resolveEquipmentPickerFilterLayout,
   toEquipmentPickerFilterState,
 } from '../browse/equipment-picker-filter-schema'
+import {
+  EMPTY_ARMOR_DETAIL_FILTERS,
+  EMPTY_WEAPON_DETAIL_FILTERS,
+} from '../browse/equipment-picker-kind-detail-filters'
 import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
@@ -22,44 +26,36 @@ import {
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
+  type EquipmentPickerRow,
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
-import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
 
 export type UseEquipmentPickerControllerArgs = Pick<
   EquipmentPickerDrawerProps,
-  | 'open'
   | 'items'
   | 'browseSortContext'
   | 'budget'
   | 'allowedKinds'
-  | 'filterOutUnaffordable'
-  | 'filterOutNonProficient'
-  | 'ownedPurchaseQuantities'
-  | 'ownedGrantQuantities'
   | 'workflowMode'
   | 'magicItemGrantProgress'
   | 'focusedAllowanceId'
   | 'onFocusedAllowanceIdChange'
+  | 'matchesMagicItemAllowance'
 > & {
   onCommitAdd: EquipmentPickerDrawerProps['onCommitAdd']
 }
 
 export function useEquipmentPickerController({
-  open,
   items,
   browseSortContext,
   budget,
   allowedKinds,
-  filterOutUnaffordable = false,
-  filterOutNonProficient = false,
-  ownedPurchaseQuantities = {},
-  ownedGrantQuantities = {},
   workflowMode = 'purchase',
   magicItemGrantProgress,
   focusedAllowanceId,
   onFocusedAllowanceIdChange,
+  matchesMagicItemAllowance,
   onCommitAdd,
 }: UseEquipmentPickerControllerArgs) {
   const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
@@ -71,10 +67,7 @@ export function useEquipmentPickerController({
       )
     : EQUIPMENT_PICKER_SORT_MODES
 
-  const supportedItems = React.useMemo(
-    () => items.filter((item) => isEquipmentPickerSupportedKind(item.equipment.kind)),
-    [items],
-  )
+  const supportedItems = React.useMemo(() => filterEligibleEquipmentPickerItems(items), [items])
   const kindOptions = React.useMemo(
     () => resolveEquipmentKindFilterOptions(supportedItems, allowedKinds),
     [allowedKinds, supportedItems],
@@ -86,19 +79,12 @@ export function useEquipmentPickerController({
   const [showAffordableOnly, setShowAffordableOnly] = React.useState<boolean>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly,
   )
+  const [hideNonProficient, setHideNonProficient] = React.useState(false)
+  const [weaponFilters, setWeaponFilters] = React.useState(EMPTY_WEAPON_DETAIL_FILTERS)
+  const [armorFilters, setArmorFilters] = React.useState(EMPTY_ARMOR_DETAIL_FILTERS)
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
-  const [addQuantities, setAddQuantities] = React.useState<Record<string, number>>({})
-  const [trackedOpen, setTrackedOpen] = React.useState(open)
-
-  if (open !== trackedOpen) {
-    setTrackedOpen(open)
-    if (!open) {
-      setAddQuantities({})
-    }
-  }
-
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&
@@ -113,8 +99,18 @@ export function useEquipmentPickerController({
         selectedKind,
         selectedRarity: selectedRarityFilter,
         showAffordableOnly,
+        hideNonProficient,
+        weaponFilters,
+        armorFilters,
       }),
-    [selectedKind, selectedRarityFilter, showAffordableOnly],
+    [
+      armorFilters,
+      hideNonProficient,
+      selectedKind,
+      selectedRarityFilter,
+      showAffordableOnly,
+      weaponFilters,
+    ],
   )
 
   const schemaArgs = React.useMemo(
@@ -126,17 +122,14 @@ export function useEquipmentPickerController({
       showRarityFilter,
       showAffordableFilter,
       magicItemGrantProgress,
-      filterOutUnaffordable,
-      filterOutNonProficient,
-      searchQuery: '',
       budget: effectiveBudget,
+      matchesMagicItemAllowance,
     }),
     [
-      filterOutNonProficient,
       effectiveBudget,
-      filterOutUnaffordable,
       kindOptions,
       magicItemGrantProgress,
+      matchesMagicItemAllowance,
       showAffordableFilter,
       showCategoryFilter,
       showRarityFilter,
@@ -146,8 +139,13 @@ export function useEquipmentPickerController({
   )
 
   const filterSchema = React.useMemo(
-    () => createEquipmentPickerFilterSchema(schemaArgs),
+    () => createEquipmentPickerFilterSchema<EquipmentPickerRow>(schemaArgs),
     [schemaArgs],
+  )
+
+  const filterLayout = React.useMemo(
+    () => resolveEquipmentPickerFilterLayout(filterSchema),
+    [filterSchema],
   )
 
   const structuredFilterCount = countEquipmentPickerStructuredFilters(filterSchema, filterState)
@@ -163,6 +161,9 @@ export function useEquipmentPickerController({
         )
       }
       setShowAffordableOnly(next.showAffordableOnly === true)
+      setHideNonProficient(next.hideNonProficient === true)
+      setWeaponFilters(next.weaponFilters ?? EMPTY_WEAPON_DETAIL_FILTERS)
+      setArmorFilters(next.armorFilters ?? EMPTY_ARMOR_DETAIL_FILTERS)
     },
     [onFocusedAllowanceIdChange],
   )
@@ -173,27 +174,15 @@ export function useEquipmentPickerController({
     onStateChange: handleFilterStateChange,
   })
 
+  const eligibleItems = supportedItems
+
   const filteredItems = React.useMemo(
-    () =>
-      filterEquipmentPickerItems(supportedItems, {
-        filterOutUnaffordable,
-        filterOutNonProficient,
-        selectedKind,
-        showAffordableOnly,
-        budget: effectiveBudget,
-      }),
-    [
-      effectiveBudget,
-      filterOutNonProficient,
-      filterOutUnaffordable,
-      showAffordableOnly,
-      supportedItems,
-      selectedKind,
-    ],
+    () => applyFilterSchema(filterSchema, filterState, eligibleItems),
+    [eligibleItems, filterSchema, filterState],
   )
 
   const transformVisibleItems = React.useCallback(
-    (visibleItems: readonly EquipmentPickerItem[], context: { searchQuery: string }) =>
+    (visibleItems: readonly EquipmentPickerRow[], context: { searchQuery: string }) =>
       filterAndSortEquipmentPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
         sortMode,
@@ -204,61 +193,24 @@ export function useEquipmentPickerController({
           rankPurchaseAvailability: workflowMode === 'purchase',
           rankCompatibility: browseSortContext?.rankCompatibility ?? true,
         },
-        workflowMode,
       }),
     [browseSortContext, sortMode, workflowMode],
   )
 
-  const handleClearStructuredFilters = React.useCallback(() => {
-    setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
-    setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
-    onFocusedAllowanceIdChange?.(undefined)
-  }, [onFocusedAllowanceIdChange])
-
   const resetBrowseView = React.useCallback(() => {
     setSelectedKind(EQUIPMENT_PICKER_VIEW_DEFAULTS.selectedKind)
     setShowAffordableOnly(EQUIPMENT_PICKER_VIEW_DEFAULTS.showAffordableOnly)
+    setHideNonProficient(false)
+    setWeaponFilters(EMPTY_WEAPON_DETAIL_FILTERS)
+    setArmorFilters(EMPTY_ARMOR_DETAIL_FILTERS)
     setSortMode(EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode)
     onFocusedAllowanceIdChange?.(undefined)
   }, [onFocusedAllowanceIdChange])
 
-  const resolveOwnedQuantity = React.useCallback(
-    (item: EquipmentPickerItem, workflow: EquipmentPickerWorkflowMode) =>
-      workflow === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
-        ? (ownedGrantQuantities[item.equipment.id] ?? 0)
-        : (ownedPurchaseQuantities[item.equipment.id] ?? 0),
-    [ownedGrantQuantities, ownedPurchaseQuantities],
-  )
-
-  const resetAddQuantityAfterCommit = React.useCallback((item: EquipmentPickerItem) => {
-    if (!isEquipmentStackable(item.equipment)) return
-    setAddQuantities((current) => ({ ...current, [item.equipment.id]: 1 }))
-  }, [])
-
   const handleHeaderCommit = React.useCallback(
-    (item: EquipmentPickerItem): boolean => {
-      const result = onCommitAdd(item, 1)
-      resetAddQuantityAfterCommit(item)
-      return result !== false
-    },
-    [onCommitAdd, resetAddQuantityAfterCommit],
+    (item: EquipmentPickerItem): boolean => onCommitAdd(item) !== false,
+    [onCommitAdd],
   )
-
-  const handleCommitAdd = React.useCallback(
-    (item: EquipmentPickerItem): boolean => {
-      const quantity = addQuantities[item.equipment.id] ?? 1
-      const applied = onCommitAdd(item, quantity) !== false
-      if (applied) {
-        resetAddQuantityAfterCommit(item)
-      }
-      return applied
-    },
-    [addQuantities, onCommitAdd, resetAddQuantityAfterCommit],
-  )
-
-  const handleAddQuantityChange = React.useCallback((itemKey: string, quantity: number) => {
-    setAddQuantities((current) => ({ ...current, [itemKey]: quantity }))
-  }, [])
 
   return {
     isMagicItemsWorkflow,
@@ -267,20 +219,17 @@ export function useEquipmentPickerController({
     schemaArgs,
     filterState,
     filterSchema,
+    filterLayout,
     structuredFilterCount,
     filteredItems,
+    eligibleItemCount: eligibleItems.length,
     transformVisibleItems,
     selectedKind,
     showAffordableOnly,
     sortMode,
     setSortMode,
-    addQuantities,
     handleFilterStateChange,
-    handleClearStructuredFilters,
     resetBrowseView,
-    resolveOwnedQuantity,
     handleHeaderCommit,
-    handleCommitAdd,
-    handleAddQuantityChange,
   }
 }

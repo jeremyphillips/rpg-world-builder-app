@@ -9,6 +9,7 @@ import { YAWNING_PORTAL, LOCATIONS_LIST } from '../../fixtures'
 import { buildLocationsById } from '../../lib/location-display'
 import { STORY_CAMPAIGN_ID } from '../../../lib/fixtures/constants'
 import { CITY_COUNCIL } from '../../../organizations/fixtures'
+import { makeOrganization } from '@/test/fixtures/factories/organization'
 import { PEOPLE_SECTION_KIND_FULLY_LINKED_REASON } from '../../lib/connected-parties/location-people-section-kind-options.lib'
 import { LOCATION_PEOPLE_SECTION_SURFACE_COPY } from '../../lib/connected-parties/location-connected-parties-section-copy'
 import { LocationInversePeopleConnectionLinkDrawer } from './location-inverse-people-connection-link-drawer'
@@ -509,4 +510,57 @@ describe('LocationInversePeopleConnectionLinkDrawer', () => {
     )
     expect(createCharacterLocationConnectionMock).not.toHaveBeenCalled()
   })
+
+  it('lists organization rows by name, then id, including equal search scores', async () => {
+    const user = userEvent.setup()
+    const zebra = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-z',
+      slug: 'zebra',
+      name: 'Zebra Guild',
+    })
+    const amberB = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-b',
+      slug: 'amber-b',
+      name: 'Amber Guild',
+    })
+    const amberA = makeOrganization({
+      ...CITY_COUNCIL,
+      id: 'organization-a',
+      slug: 'amber-a',
+      name: 'Amber Guild',
+    })
+
+    renderWithProviders(
+      <LocationInversePeopleConnectionLinkDrawer
+        open
+        onOpenChange={() => undefined}
+        kindSlots={kindSlots}
+        location={location}
+        {...inverseDrawerContextProps}
+        organizations={[zebra, amberB, amberA]}
+        characters={sampleCharacters}
+        connectedPartyRows={[]}
+        canAddOrganization
+        canAddCharacter
+        onOrganizationSubmit={vi.fn()}
+        onCharacterSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Headquarters/i }))
+
+    expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b', 'organization-z'])
+
+    await user.type(screen.getByRole('textbox', { name: 'Search organizations…' }), 'amber')
+
+    expect(visiblePickerItemKeys()).toEqual(['organization-a', 'organization-b'])
+  })
 })
+
+function visiblePickerItemKeys(): string[] {
+  return [...document.querySelectorAll('[data-picker-item-key]')].map(
+    (node) => node.getAttribute('data-picker-item-key') ?? '',
+  )
+}

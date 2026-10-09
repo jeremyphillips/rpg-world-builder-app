@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Spell } from '../../../../content/spell'
-import { buildSpellPickerCompactSummary } from '../spellcasting/format-spell-picker-metadata'
+import { buildSpellPickerCompactSummary } from '../spellcasting/resolve-spell-picker-metadata'
 import type { SpellPickerItem } from '../spellcasting/resolve-spell-picker-items'
-import { NEUTRAL_OPTION_RECOMMENDATION } from '../../recommendation'
+import { NEUTRAL_OPTION_RECOMMENDATION, type OptionRecommendation } from '../../recommendation'
 import { compareSpellPickerItemsByRecommendation } from './spell-picker-item'
 
 function makeSpellItem(
@@ -12,6 +12,7 @@ function makeSpellItem(
     SpellPickerItem['state'],
     'isRecommended' | 'canSelect' | 'isAlreadySelected' | 'isSelectionFull'
   >,
+  recommendation?: OptionRecommendation,
 ): SpellPickerItem {
   const slug = name.toLowerCase().replace(/\s+/g, '-')
   const spell = {
@@ -43,9 +44,9 @@ function makeSpellItem(
       isAlreadySelected: state.isAlreadySelected,
       isSelectionFull: state.isSelectionFull,
       isRecommended: state.isRecommended,
-      recommendation: state.isRecommended
-        ? { strength: 'strong', signals: [] }
-        : NEUTRAL_OPTION_RECOMMENDATION,
+      recommendation:
+        recommendation ??
+        (state.isRecommended ? { strength: 'strong', signals: [] } : NEUTRAL_OPTION_RECOMMENDATION),
       canSelect: state.canSelect,
     },
   }
@@ -67,5 +68,44 @@ describe('compareSpellPickerItemsByRecommendation', () => {
     })
 
     expect(compareSpellPickerItemsByRecommendation(recommended, peer)).toBeLessThan(0)
+  })
+
+  it('does not sink a selected spell below a later selectable peer', () => {
+    const selected = makeSpellItem('Alpha', {
+      isRecommended: false,
+      canSelect: false,
+      isAlreadySelected: true,
+      isSelectionFull: false,
+    })
+    const selectable = makeSpellItem('Zebra', {
+      isRecommended: false,
+      canSelect: true,
+      isAlreadySelected: false,
+      isSelectionFull: false,
+    })
+
+    expect(compareSpellPickerItemsByRecommendation(selected, selectable)).toBeLessThan(0)
+  })
+
+  it('ranks compatible after strong and before neutral', () => {
+    const selectable = {
+      canSelect: true,
+      isAlreadySelected: false,
+      isSelectionFull: false,
+    }
+    const strong = makeSpellItem('Alpha', { ...selectable, isRecommended: true })
+    const compatible = makeSpellItem(
+      'Mike',
+      { ...selectable, isRecommended: false },
+      {
+        strength: 'compatible',
+        signals: [{ strength: 'compatible', basis: 'inferred', specificity: 'exact' }],
+      },
+    )
+    const neutral = makeSpellItem('Zulu', { ...selectable, isRecommended: false })
+
+    expect(compareSpellPickerItemsByRecommendation(strong, compatible)).toBeLessThan(0)
+    expect(compareSpellPickerItemsByRecommendation(compatible, neutral)).toBeLessThan(0)
+    expect(compatible.state.isRecommended).toBe(false)
   })
 })

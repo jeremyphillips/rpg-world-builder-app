@@ -277,7 +277,6 @@ describe('resolveStartingEquipmentOptionSummaries descriptions', () => {
 
     const gold = summaries.find((summary) => summary.optionId === 'starting-gold')!
     expect(gold.description).toBe(`Take 155 GP instead of ${DEFAULT_STANDARD_EQUIPMENT_LABEL}.`)
-    expect(gold.tierAdjustment?.label).toBe('Legend tier adds 600 GP')
-    expect(gold.totalStartingWealthLabel).toBe('Total: 755 GP')
+    expect(gold.funding.totalStartingWealth).toEqual({ cp: 0, sp: 0, gp: 755, pp: 0 })
   })
 })

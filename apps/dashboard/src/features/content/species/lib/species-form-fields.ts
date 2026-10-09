@@ -11,6 +11,8 @@ import {
   getVocabularyTermLabel,
   slugSchema,
   type CreatureTypeId,
+  getSpeciesHeritageLabel,
+  getSpeciesHeritageOptionsLabel,
 } from '@rpg/contracts'
 import { type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
@@ -201,14 +203,14 @@ export function buildSpeciesTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     },
     {
       id: 'heritage',
-      label: 'Heritage',
+      label: getSpeciesHeritageLabel(),
       fields: [],
       errorPaths: ['heritage'],
       resolverFields: [
         ...prefixFormItems(heritageScalarFields(ctx), 'heritage'),
         embeddedArrayResolverField(
           'heritage.options',
-          'Heritage options',
+          getSpeciesHeritageOptionsLabel(),
           heritageOptionItemFields(ctx),
         ),
       ],

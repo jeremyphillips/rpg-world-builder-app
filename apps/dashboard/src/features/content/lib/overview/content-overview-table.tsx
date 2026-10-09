@@ -11,7 +11,10 @@ import {
   overviewUnavailableNameCellClassName,
   overviewUnavailableRowClassName,
 } from '@/lib/overview/overview-unavailable-chrome'
-import { OverviewResultSummary } from '@/lib/data-table/overview-result-summary'
+import {
+  ResultSummary,
+  type ResultSummarySupplement,
+} from '@/lib/data-table/overview-result-summary'
 import { OverviewSelectionCluster } from '@/lib/data-table/overview-selection-cluster'
 import { OverviewTableFrame } from '@/lib/data-table/overview-table-frame'
 import type { OverviewBulkAction } from '@/lib/overview/overview-bulk-actions-menu'
@@ -54,7 +57,7 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   contentTypeKey: ContentTypeKey
   itemLabel: string
   campaignAvailability: CampaignAvailabilityFilter
-  resultSupplement?: ReactNode
+  resultSupplement?: ResultSummarySupplement | null
   selectionMode: boolean
   rowSelection: Record<string, boolean>
   selectionLimit: number
@@ -235,7 +238,10 @@ const ContentOverviewDataTable = memo(function ContentOverviewDataTable<
       getRowClassName={getRowClassName}
       getCellClassName={getCellClassName}
       resultSummary={
-        <OverviewResultSummary resultCount={data.length} supplementalContent={resultSupplement} />
+        <ResultSummary
+          visibleCount={data.length}
+          supplements={resultSupplement ? [resultSupplement] : undefined}
+        />
       }
       leadingActions={canManage ? renderLeadingActions : undefined}
       trailingActions={renderTrailingActions}

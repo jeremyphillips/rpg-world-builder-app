@@ -101,6 +101,7 @@ function buildMagicItemContext() {
   const context = resolveEquipmentAcquisitionBuilderContext({
     context: {
       rulesetId: RULESET,
+      characterKind: 'pc',
       characterCreationRules: { startingWealth },
       catalog: { equipment: [commonPotion] },
     },
@@ -131,10 +132,6 @@ function makeMagicPickerItem(
 ): EquipmentPickerItem {
   return {
     equipment,
-    searchDocument: {
-      id: equipment.id,
-      fields: [{ key: 'combined', text: equipment.name.toLowerCase(), role: 'primary' }],
-    },
     state: {
       isAvailable: true,
       isRecommended: false,

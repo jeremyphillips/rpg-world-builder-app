@@ -5,8 +5,6 @@ import {
   type CharacterBuildAdvisory,
 } from '@rpg/contracts'
 
-import type { EntitySummaryStatusItem } from '@/features/content'
-
 export type BuildAdvisoryListItem = {
   key: string
   title?: string
@@ -16,6 +14,7 @@ export type BuildAdvisoryListItem = {
 function advisoryTitle(advisory: CharacterBuildAdvisory): string | undefined {
   switch (advisory.code) {
     case 'equipment_not_proficient':
+    case 'equipment_ability_score_requirement_unmet':
       return advisory.subject.label
   }
 }
@@ -23,6 +22,7 @@ function advisoryTitle(advisory: CharacterBuildAdvisory): string | undefined {
 function advisoryEquipmentId(advisory: CharacterBuildAdvisory): string | undefined {
   switch (advisory.code) {
     case 'equipment_not_proficient':
+    case 'equipment_ability_score_requirement_unmet':
       return advisory.subject.equipmentId
   }
 }
@@ -52,14 +52,9 @@ export function lookupBuildAdvisoriesForEquipment(
   return index.get(toEquipmentContentId(rulesetId, equipmentId)) ?? []
 }
 
-export function buildAdvisoryStatusItems(
-  advisories: readonly CharacterBuildAdvisory[],
-): EntitySummaryStatusItem[] {
-  return advisories.map((advisory) => ({
-    kind: 'text',
-    variant: 'warning',
-    label: resolveCharacterBuildAdvisoryMessage(advisory),
-  }))
+/** Player-facing advisory sentence. Summary cards use this; rows use selection status. */
+export function formatBuildAdvisoryLabel(advisory: CharacterBuildAdvisory): string {
+  return resolveCharacterBuildAdvisoryMessage(advisory)
 }
 
 /** Ordered title/message pairs for alerts and the create confirmation. */

@@ -1,5 +1,3 @@
-import type { SearchDocument } from '@rpg/search/types'
-
 import type { Equipment } from '../../../../content/equipment'
 import type { EquipmentRecommendation } from '../../../../content/equipment-recommendation'
 import type { EquipmentPickerBrowseSortContext } from './equipment-picker-browse-sort-context'
@@ -25,27 +23,33 @@ export type EquipmentPickerItemState = PickerItemStateBase & {
   isWithinRemainingBudget: boolean
   /** Wealth-aware purchase gate for quantity=1. Remaining budget decides unaffordable. */
   purchaseAvailability: EquipmentPurchaseAvailability
+  /**
+   * Price is above the stable starting-purse ceiling. Omitted when no ceiling
+   * applies. Browse order reads this; remaining budget does not.
+   */
+  exceedsPurchaseBudgetCeiling?: boolean
   /** Tiered classification; `isRecommended` mirrors essential/strong recommendation tiers. */
   recommendation: EquipmentRecommendation
   /** Contributing evidence, including typed sources. Proficiency rows omit `source`. */
   evidence?: readonly SourcedEquipmentRecommendationEvidence[]
   /** Split requirement, soft recommendation, and option-state facts. */
   resolved?: ResolvedEquipmentOption
-  /** Populated in magic-items workflow only — drives actionability best-match rank. */
+  /** Populated in magic-items workflow only. Row action chrome; browse order does not read it. */
   magicItemAction?: MagicItemActionState
 }
 
 export type EquipmentPickerItem = {
   equipment: Equipment
   state: EquipmentPickerItemState
-  /** Populated by dashboard assembly before picker surfaces consume the row. */
-  searchDocument?: SearchDocument
 }
 
 /**
- * Best-match browse order from resolved equipment facts: active requirement and choice,
- * relevance, recommendation strength, specificity and source, then purchase actionability
- * and proficiency when the browse context enables them, then canonical kind and name.
+ * Best-match browse order from resolved equipment facts: requirement match,
+ * recommendation strength, specificity and source, then proficiency, the
+ * starting-purse ceiling, unmet ability scores, and not-for-sale when the
+ * browse context enables it,
+ * then canonical kind and name.
+ * Selection, remaining budget, and package choice do not reorder rows.
  */
 export function compareEquipmentPickerItemsByRecommendation(
   left: EquipmentPickerItem,

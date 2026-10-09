@@ -3,8 +3,10 @@ import { isEquipmentStackable } from '../../../content/equipment/stackable'
 import type {
   CharacterBuilderDraft,
   CharacterBuilderDraftEquipmentPurchaseOrigin,
+  ManualEquipmentPurchase,
   NormalizedCharacterBuilderDraftEquipmentPurchase,
   PersistedCharacterBuilderDraftEquipmentPurchase,
+  StartingGoldEquipmentPurchase,
 } from '../draft/draft'
 
 export function createEquipmentPurchaseId(): string {
@@ -98,31 +100,15 @@ export function normalizeEquipmentPurchase(
   index: number,
 ): NormalizedCharacterBuilderDraftEquipmentPurchase {
   const purchase = purchases[index]!
-  const origin = purchase.origin ?? 'picker'
-
-  if (purchase.id && purchase.origin !== undefined) {
-    if (purchase.origin === origin) {
-      return purchase as NormalizedCharacterBuilderDraftEquipmentPurchase
-    }
-    return { ...purchase, id: purchase.id, origin }
-  }
-
-  if (purchase.id) {
-    return { ...purchase, id: purchase.id, origin }
-  }
-
-  return {
-    ...purchase,
-    id: deterministicLegacyPurchaseIdForRow(purchases, index),
-    origin,
-  }
+  if (purchase.id) return purchase as NormalizedCharacterBuilderDraftEquipmentPurchase
+  return { ...purchase, id: deterministicLegacyPurchaseIdForRow(purchases, index) }
 }
 
 export function draftEquipmentPurchasesNeedNormalization(
   purchases: readonly PersistedCharacterBuilderDraftEquipmentPurchase[] | undefined,
 ): boolean {
   if (!purchases?.length) return false
-  return purchases.some((purchase) => !purchase.id || purchase.origin === undefined)
+  return purchases.some((purchase) => !purchase.id)
 }
 
 export function normalizeCharacterBuilderDraftPurchases(
@@ -161,13 +147,25 @@ function normalizedEquippedForMerge(
   return purchase.equipped ?? false
 }
 
+type PurchaseProvenance =
+  | Pick<StartingGoldEquipmentPurchase, 'sourceMode' | 'origin'>
+  | Pick<ManualEquipmentPurchase, 'sourceMode'>
+
+function purchaseOrigin(
+  purchase: PurchaseProvenance,
+): CharacterBuilderDraftEquipmentPurchaseOrigin | undefined {
+  return purchase.sourceMode === 'startingGold' && 'origin' in purchase
+    ? purchase.origin
+    : undefined
+}
+
 function haveEquivalentSourceMode(
-  existing: PersistedCharacterBuilderDraftEquipmentPurchase,
-  incoming: Pick<PersistedCharacterBuilderDraftEquipmentPurchase, 'sourceMode' | 'origin'>,
+  existing: PurchaseProvenance,
+  incoming: PurchaseProvenance,
 ): boolean {
   return (
     existing.sourceMode === incoming.sourceMode &&
-    (existing.origin ?? 'picker') === (incoming.origin ?? 'picker')
+    purchaseOrigin(existing) === purchaseOrigin(incoming)
   )
 }
 
@@ -195,10 +193,8 @@ function haveEquivalentEquippedState(
 
 export function canMergeEquipmentPurchases(args: {
   existing: NormalizedCharacterBuilderDraftEquipmentPurchase
-  incoming: Pick<
-    NormalizedCharacterBuilderDraftEquipmentPurchase,
-    'equipmentId' | 'sourceMode' | 'origin' | 'equipped' | 'modifiers'
-  >
+  incoming: PurchaseProvenance &
+    Pick<NormalizedCharacterBuilderDraftEquipmentPurchase, 'equipmentId' | 'equipped' | 'modifiers'>
   equipment: Equipment
 }): boolean {
   const { existing, incoming, equipment } = args
@@ -244,10 +240,7 @@ export function resolveEquipmentPurchaseIndex(
 
 export function mergeCompatiblePurchasedEntries(args: {
   purchases: NormalizedCharacterBuilderDraftEquipmentPurchase[]
-  incoming: Omit<NormalizedCharacterBuilderDraftEquipmentPurchase, 'id' | 'quantity'> & {
-    quantity: number
-    origin: CharacterBuilderDraftEquipmentPurchaseOrigin
-  }
+  incoming: Omit<StartingGoldEquipmentPurchase, 'id'>
   equipment: Equipment
   createId?: () => string
 }): NormalizedCharacterBuilderDraftEquipmentPurchase[] {

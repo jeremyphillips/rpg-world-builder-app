@@ -11,13 +11,13 @@ import {
 } from '@rpg/contracts'
 import { declineClassPackage, selectClassPackage, type ClassPackageChoice } from '@rpg/contracts'
 import {
+  Badge,
   Button,
   ComboboxField,
   ComboboxFilterSelect,
   ConfirmDialog,
   RowActionsMenu,
   SelectionOptionCardHeaderAction,
-  SelectionOptionCardTitleMeta,
   type ComboboxFieldOption,
   type RowActionMenuItem,
 } from '@rpg/ui'
@@ -48,10 +48,10 @@ import {
 import { QuickNpcStartingChoiceSelectedRow } from './quick-npc-starting-choice-selected-row'
 import { useQuickNpcPreparedBuildValue } from '../../hooks/use-quick-npc-prepared-build'
 import {
-  buildAdvisoryStatusItems,
-  indexBuildAdvisoriesByEquipmentId,
-  lookupBuildAdvisoriesForEquipment,
-} from '../../../lib/build-advisories/build-advisory-presentation.lib'
+  deriveQuickNpcEquipmentSelectionFacts,
+  quickNpcPackageAdvisoryLabels,
+  resolveQuickNpcEquipmentRowStatus,
+} from '../../lib/quick-npc/quick-npc-equipment-row-status.lib'
 import { QuickNpcStartingChoiceSubsectionHeader } from './quick-npc-starting-choice-subsection-header'
 
 import {
@@ -100,7 +100,7 @@ import {
   formatStartingChoiceItemCount,
   resolveQuickNpcStartingEquipmentPackageContext,
 } from '../../lib/quick-npc/quick-npc-starting-equipment.lib'
-import { useQuickNpcEditingLock } from './quick-npc-editing-lock'
+import { useQuickNpcEditingLock } from './use-quick-npc-editing-lock'
 import { QuickNpcPackageCustomizationPanel } from './quick-npc-package-customization-panel'
 import {
   quickNpcPackageHeaderActionsClasses,
@@ -212,7 +212,21 @@ function QuickNpcStartingEquipmentPackageSection({
   const selectedSummary = packageContext.summaries.find(
     (summary) => summary.optionId === selectedOption?.id,
   )
-  const rows =
+  const prepared = useQuickNpcPreparedBuildValue()
+  const catalogIndex = React.useMemo(
+    () => indexCharacterBuildCatalog(buildContext.catalog),
+    [buildContext.catalog],
+  )
+  const selectionFacts = React.useMemo(
+    () =>
+      deriveQuickNpcEquipmentSelectionFacts({
+        prepared,
+        catalogIndex,
+        rulesetId: buildContext.rulesetId,
+      }),
+    [prepared, catalogIndex, buildContext.rulesetId],
+  )
+  const rows = (
     selectedOption && selectedSummary
       ? buildQuickNpcPackageCustomizationRows({
           option: selectedOption,
@@ -220,6 +234,21 @@ function QuickNpcStartingEquipmentPackageSection({
           entryQuantities: disclosureOpen ? draftQuantities : submittedQuantities,
         })
       : []
+  ).map((row) => {
+    if (!row.equipmentId) return row
+    const status = resolveQuickNpcEquipmentRowStatus({
+      facts: selectionFacts,
+      catalogIndex,
+      equipmentId: row.equipmentId,
+      context: 'edit_choice',
+    })
+    return status.length > 0 ? { ...row, status } : row
+  })
+  const advisoryLabels = quickNpcPackageAdvisoryLabels({
+    rows,
+    advisories: prepared?.advisories ?? [],
+    rulesetId: buildContext.rulesetId,
+  })
   const description =
     selectedOption && selectedSummary
       ? formatQuickNpcEffectivePackageDescription({
@@ -372,11 +401,12 @@ function QuickNpcStartingEquipmentPackageSection({
             setIsPackageChooserExpanded(true)
           }}
           description={description}
+          advisoryLabels={advisoryLabels}
           titleAdornment={
             customized && !disclosureOpen ? (
-              <SelectionOptionCardTitleMeta>
+              <Badge tone="neutral" size="sm" appearance="soft" aria-hidden className="shrink-0">
                 {QUICK_NPC_PACKAGE_CUSTOMIZED_LABEL}
-              </SelectionOptionCardTitleMeta>
+              </Badge>
             ) : undefined
           }
           headerEndSlot={
@@ -628,18 +658,15 @@ function toAdditionalEquipmentComboboxOptions(
 
 function AdditionalEquipmentSelectedList({
   rows,
-  rulesetId,
+  catalogIndex,
+  selectionFacts,
   onRemove,
 }: {
   rows: ReturnType<typeof listSelectedQuickNpcAdditionalEquipment>
-  rulesetId: string
+  catalogIndex: ReturnType<typeof indexCharacterBuildCatalog>
+  selectionFacts: ReturnType<typeof deriveQuickNpcEquipmentSelectionFacts>
   onRemove: (equipmentId: string) => void
 }) {
-  const prepared = useQuickNpcPreparedBuildValue()
-  const advisoryIndex = React.useMemo(
-    () => indexBuildAdvisoriesByEquipmentId(prepared?.advisories ?? []),
-    [prepared],
-  )
   if (rows.length === 0) return null
   return (
     <ul className={quickNpcStartingChoiceSelectedListClasses}>
@@ -654,9 +681,12 @@ function AdditionalEquipmentSelectedList({
               </span>
             </span>
           ) : undefined
-        const status = buildAdvisoryStatusItems(
-          lookupBuildAdvisoriesForEquipment(advisoryIndex, equipmentId, rulesetId),
-        )
+        const status = resolveQuickNpcEquipmentRowStatus({
+          facts: selectionFacts,
+          catalogIndex,
+          equipmentId,
+          context: 'owned',
+        })
         return (
           <li key={equipmentId}>
             <QuickNpcStartingChoiceSelectedRow
@@ -743,6 +773,16 @@ function QuickNpcAdditionalEquipmentSection({
     () => indexCharacterBuildCatalog(buildContext.catalog),
     [buildContext.catalog],
   )
+  const prepared = useQuickNpcPreparedBuildValue()
+  const selectionFacts = React.useMemo(
+    () =>
+      deriveQuickNpcEquipmentSelectionFacts({
+        prepared,
+        catalogIndex,
+        rulesetId: buildContext.rulesetId,
+      }),
+    [prepared, catalogIndex, buildContext.rulesetId],
+  )
   const sourceName = React.useMemo(
     () => equipmentRecommendationSourceName(catalogIndex),
     [catalogIndex],
@@ -813,7 +853,8 @@ function QuickNpcAdditionalEquipmentSection({
       />
       <AdditionalEquipmentSelectedList
         rows={selectedAdditional}
-        rulesetId={buildContext.rulesetId}
+        catalogIndex={catalogIndex}
+        selectionFacts={selectionFacts}
         onRemove={removeAdditionalEquipment}
       />
       <div

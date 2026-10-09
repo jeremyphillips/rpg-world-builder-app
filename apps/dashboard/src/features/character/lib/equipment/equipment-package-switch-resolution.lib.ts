@@ -1,26 +1,40 @@
 import {
+  buildPackageSwitchSelectionPatch,
   copperToWealth,
   formatEquipmentInventoryPriceLine,
   formatWealth,
+  normalizeCharacterBuilderDraftPurchases,
+  startingEquipmentChoiceSetId,
   type CharacterBuildCatalogIndex,
+  type CharacterBuilderDraft,
+  type ChoiceSet,
   type EquipmentPackageSwitchBlockingReason,
   type EquipmentPackageSwitchEvaluation,
   type EquipmentStepActionIssue,
 } from '@rpg/contracts'
 
 import {
+  EMPTY_SELECTION_ROW_PRESENTATION,
+  resolveSelectionRowStatusItems,
+} from '../selection-row-status'
+import {
   EQUIPMENT_INVENTORY_GROUP_LABELS,
   formatEquipmentInventoryRemoveLabel,
   type EquipmentInventoryRow,
 } from './equipment-step.lib'
 import type { PurchasedCategoryGroup } from './equipment-inventory-summary.lib'
+import {
+  deriveEquipmentSelectionFacts,
+  EMPTY_EQUIPMENT_SELECTION_FACTS,
+  withEquipmentSelectionPresentation,
+  type EquipmentSelectionFacts,
+} from './equipment-selection-facts.lib'
 
-export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Resolve purchases before switching'
+export const PACKAGE_SWITCH_RESOLUTION_TITLE = 'Adjust purchases before switching'
 
 export const PACKAGE_SWITCH_BLOCKED_TITLE = 'Cannot switch packages'
 
-export const PACKAGE_SWITCH_SAFETY_NOTE =
-  'Changes are only applied when you select "Switch package."'
+export const PACKAGE_SWITCH_SAFETY_NOTE = 'Changes apply only when you switch packages.'
 
 export const PACKAGE_SWITCH_STAGED_REMOVAL_LABEL = 'Staged for removal'
 
@@ -29,7 +43,19 @@ export const PACKAGE_SWITCH_STALE_INVENTORY_MESSAGE =
 
 export const PACKAGE_SWITCH_CONFIRM_LABEL = 'Switch package'
 
+export const PACKAGE_SELECTION_RESOLUTION_TITLE = 'Adjust purchases for this option'
+
+export const PACKAGE_SELECTION_CONFIRM_LABEL = 'Choose option'
+
+export const PACKAGE_SELECTION_SAFETY_NOTE = 'Changes apply only when you choose this option.'
+
 export const PACKAGE_SWITCH_CANCEL_LABEL = 'Cancel'
+
+export const PACKAGE_SWITCH_BUDGET_CURRENT_PURCHASES_LABEL = 'Current purchases'
+
+export const PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL = 'Available with this option'
+
+export const PACKAGE_SWITCH_MODAL_CURRENT_PURCHASES_TITLE = 'Current purchases'
 
 export function formatPackageSwitchWealth(costCp: number): string {
   return formatWealth(copperToWealth(costCp))
@@ -47,7 +73,7 @@ export function mapBlockingReasonToMessage(
     case 'staleCommittedInventory':
       return PACKAGE_SWITCH_STALE_INVENTORY_MESSAGE
     case 'draftOverBudget':
-      return `Remove ${formatPackageSwitchWealth(reason.amountOverBudgetCp)} more to continue.`
+      return `Remove ${formatPackageSwitchWealth(reason.amountOverBudgetCp)} to continue.`
     case 'invalidDraftQuantity':
       return 'One or more item quantities are invalid. Review your changes and try again.'
     case 'missingTargetOption':
@@ -102,13 +128,15 @@ export function resolvePackageSwitchCommitErrorFromIssues(
   return undefined
 }
 
-export function resolvePackageSwitchDescription(
+export function resolvePackageSwitchDescriptionParts(
   evaluation: EquipmentPackageSwitchEvaluation,
-): string {
+): { lead: string; detail: string } {
   const allowance = formatPackageSwitchWealth(evaluation.budget.targetAllowanceCp)
-  const initialOverage = formatPackageSwitchWealth(evaluation.budget.initialAmountOverBudgetCp)
 
-  return `${evaluation.targetOptionLabel} allows ${allowance} of purchased items. Reduce your current purchases by ${initialOverage} to switch packages. Your inventory will not change until you confirm.`
+  return {
+    lead: `${evaluation.targetOptionLabel} provides ${allowance} for purchases.`,
+    detail: 'Reduce your current purchases to fit this amount.',
+  }
 }
 
 export function resolvePackageSwitchBudgetStatusLabel(
@@ -149,12 +177,70 @@ function inventoryGroupForEquipment(
   return 'gear'
 }
 
+/**
+ * The draft after switching to the target option, without the trimmable purchases: what the
+ * character keeps regardless of the trim. Trim rows are evaluated against it, so a purchase
+ * the target package already covers reads as held rather than as filling a requirement.
+ */
+export function buildPackageSwitchReconciliationDraft(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  targetOptionId: string
+  trimmablePurchaseIds: readonly string[]
+  nestedSelections?: CharacterBuilderDraft['choiceSelections']
+}): CharacterBuilderDraft | undefined {
+  const classId = args.draft.class.classId
+  if (!classId) return undefined
+  const targetOption = args.catalogIndex.classes
+    .get(classId)
+    ?.characterCreation?.startingEquipment?.options.find(
+      (option) => option.id === args.targetOptionId,
+    )
+  if (!targetOption) return undefined
+
+  const trimmable = new Set(args.trimmablePurchaseIds)
+  const purchases = normalizeCharacterBuilderDraftPurchases(args.draft).equipment?.purchases ?? []
+  return {
+    ...args.draft,
+    ...buildPackageSwitchSelectionPatch({
+      draft: args.draft,
+      targetOption,
+      targetOptionShape: targetOption,
+      choiceSetId: startingEquipmentChoiceSetId(classId),
+      nestedSelections: args.nestedSelections ?? {},
+      purchases: purchases.filter((purchase) => !purchase.id || !trimmable.has(purchase.id)),
+    }),
+  }
+}
+
+/** Equipment facts for trim rows, resolved once per target option against the reconciliation draft. */
+export function resolvePackageSwitchSelectionFacts(args: {
+  draft: CharacterBuilderDraft
+  catalogIndex: CharacterBuildCatalogIndex
+  choiceSets: readonly ChoiceSet[]
+  rulesetId?: string
+  targetOptionId: string
+  trimmablePurchaseIds: readonly string[]
+  nestedSelections?: CharacterBuilderDraft['choiceSelections']
+}): EquipmentSelectionFacts {
+  const reconciliationDraft = buildPackageSwitchReconciliationDraft(args)
+  if (!reconciliationDraft) return { ...EMPTY_EQUIPMENT_SELECTION_FACTS, rulesetId: args.rulesetId }
+  return deriveEquipmentSelectionFacts({
+    draft: reconciliationDraft,
+    catalogIndex: args.catalogIndex,
+    choiceSets: args.choiceSets,
+    rulesetId: args.rulesetId,
+  })
+}
+
 export function buildPackageSwitchDraftPurchasedGroups(args: {
   evaluation: EquipmentPackageSwitchEvaluation
   draftQuantitiesByPurchaseId: Record<string, number>
   catalogIndex: CharacterBuildCatalogIndex
+  /** From {@link resolvePackageSwitchSelectionFacts}. */
+  selectionFacts?: EquipmentSelectionFacts
 }): PurchasedCategoryGroup[] {
-  const displays = args.evaluation.editableItems.flatMap((item) => {
+  const built = args.evaluation.editableItems.flatMap((item) => {
     const equipment = args.catalogIndex.equipment.get(item.equipmentId)
     if (!equipment) return []
 
@@ -197,16 +283,26 @@ export function buildPackageSwitchDraftPurchasedGroups(args: {
       stagedRemoval,
     }
 
-    return [{ kind: 'single' as const, row }]
+    return [row]
   })
 
-  if (displays.length === 0) return []
+  if (built.length === 0) return []
 
+  const rows = withEquipmentSelectionPresentation(
+    built,
+    args.selectionFacts ?? EMPTY_EQUIPMENT_SELECTION_FACTS,
+  )
   return [
     {
       group: 'gear',
       groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS.gear,
-      displays,
+      items: rows.map((row) => ({
+        display: { kind: 'single' as const, row },
+        status: resolveSelectionRowStatusItems(
+          row.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
+          { context: 'reconciliation' },
+        ),
+      })),
     },
   ]
 }
@@ -255,7 +351,7 @@ function resolvePackageSwitchModalDescription(
   isBlocked: boolean,
 ): string | undefined {
   if (!isBlocked) {
-    return resolvePackageSwitchDescription(evaluation)
+    return undefined
   }
 
   if (!evaluation.blockingReason) {
@@ -288,8 +384,10 @@ export function resolvePackageSwitchModalState(args: {
   commitErrorReason?: EquipmentPackageSwitchBlockingReason
   staleNotice?: boolean
   isCommitting?: boolean
+  /** No starting option was selected before this request (e.g. after a class change). */
+  isInitialSelection?: boolean
 }) {
-  const { evaluation } = args
+  const { evaluation, isInitialSelection = false } = args
   const isBlocked = evaluation.status === 'blocked'
   const confirmDisabled = !evaluation.budget.isDraftValid || Boolean(args.isCommitting)
 
@@ -300,8 +398,17 @@ export function resolvePackageSwitchModalState(args: {
       evaluation.targetOptionLabel,
     ),
     staleMessage: resolvePackageSwitchStaleMessage(args.staleNotice, args.commitErrorReason),
-    title: isBlocked ? PACKAGE_SWITCH_BLOCKED_TITLE : PACKAGE_SWITCH_RESOLUTION_TITLE,
+    title: isBlocked
+      ? PACKAGE_SWITCH_BLOCKED_TITLE
+      : isInitialSelection
+        ? PACKAGE_SELECTION_RESOLUTION_TITLE
+        : PACKAGE_SWITCH_RESOLUTION_TITLE,
+    confirmLabel: isInitialSelection
+      ? PACKAGE_SELECTION_CONFIRM_LABEL
+      : PACKAGE_SWITCH_CONFIRM_LABEL,
+    safetyNote: isInitialSelection ? PACKAGE_SELECTION_SAFETY_NOTE : PACKAGE_SWITCH_SAFETY_NOTE,
     description: resolvePackageSwitchModalDescription(evaluation, isBlocked),
+    descriptionParts: !isBlocked ? resolvePackageSwitchDescriptionParts(evaluation) : undefined,
     confirmDisabled,
     helperMessage: resolvePackageSwitchHelperMessage(evaluation, confirmDisabled, isBlocked),
   }

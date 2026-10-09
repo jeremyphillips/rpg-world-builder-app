@@ -6,7 +6,6 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { equipmentStepBardClassFixture } from '../../../../lib/equipment/equipment-step.fixtures'
 import type { EquipmentInventoryRow } from '../../../../lib/equipment/equipment-step.lib'
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
-import { CharacterBuildAdvisoriesProvider } from '../../../build-advisories/character-build-advisories-provider'
 
 const editableStackableRow: EquipmentInventoryRow = {
   group: 'gear',
@@ -28,26 +27,19 @@ const editableStackableRow: EquipmentInventoryRow = {
 }
 
 describe('EquipmentInventoryRowItem', () => {
-  it('renders a build advisory as a warning status line', () => {
+  it('renders the parent-resolved status as one metadata line', () => {
     render(
-      <CharacterBuildAdvisoriesProvider
-        advisories={[
-          {
-            code: 'equipment_not_proficient',
-            subject: {
-              kind: 'equipment',
-              equipmentId: editableStackableRow.entry.equipmentId,
-              label: 'Rations',
-              equipmentClass: 'weapon',
-            },
-          },
+      <EquipmentInventoryRowItem
+        display={{ kind: 'single', row: editableStackableRow }}
+        status={[
+          { kind: 'badge', label: 'Not proficient', tone: 'warning' },
+          { kind: 'badge', label: 'Requires STR 15', tone: 'warning' },
         ]}
-      >
-        <EquipmentInventoryRowItem display={{ kind: 'single', row: editableStackableRow }} />
-      </CharacterBuildAdvisoriesProvider>,
+      />,
     )
 
-    expect(screen.getByText('Not proficient with this weapon')).toBeInTheDocument()
+    expect(screen.getByText('Not proficient')).toBeInTheDocument()
+    expect(screen.getByText('Requires STR 15')).toBeInTheDocument()
   })
 
   it('renders stepper and remove inline with the title for editable stackables', async () => {
@@ -63,7 +55,10 @@ describe('EquipmentInventoryRowItem', () => {
     )
 
     expect(screen.getByText('5 SP each · 1 GP total')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove all 2 Rations' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Remove all 2 Rations' })).not.toBeInTheDocument()
+    const decrease = screen.getByRole('button', { name: 'Decrease Rations quantity' })
+    expect(decrease).toBeInTheDocument()
+    expect(decrease.parentElement).toHaveClass('h-8')
     expect(screen.getByRole('button', { name: 'Increase Rations quantity' })).toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: 'Increase Rations quantity' }))
@@ -115,7 +110,7 @@ describe('EquipmentInventoryRowItem', () => {
       sourceLabel: '2 included with Standard Equipment',
       isStackable: false,
       quantityMode: 'locked',
-      priceLineLabel: '2 GP value · 4 GP total value',
+      priceLineLabel: '2 GP each · Qty 2 · 4 GP total',
       removeLabel: 'Remove all 2 Dagger',
       removeTarget: {
         kind: 'package',
@@ -125,7 +120,9 @@ describe('EquipmentInventoryRowItem', () => {
 
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
-    expect(screen.getByText('Qty 2')).toBeInTheDocument()
+    const priceLine = screen.getByText('2 GP each · Qty 2 · 4 GP total')
+    expect(priceLine).toHaveClass('text-sm')
+    expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })
 
@@ -178,6 +175,85 @@ describe('EquipmentInventoryRowItem', () => {
     expect(screen.getByText('Rations')).toBeInTheDocument()
     expect(screen.getByText('Staged for removal')).toBeInTheDocument()
     expect(screen.getByRole('spinbutton', { name: 'Rations quantity' })).toHaveValue(0)
+  })
+
+  it('renders a plus prefix when another source already provides the item', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Dagger',
+            entry: { ...editableStackableRow.entry, quantity: 2 },
+          },
+        }}
+        otherSourceQuantity={2}
+        detailLabelOverride="Package ×2 · Purchased · 4 GP"
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByText('+')).toBeInTheDocument()
+    expect(
+      screen.getByRole('spinbutton', {
+        name: 'Additional Dagger purchased, 2 from other sources',
+      }),
+    ).toHaveValue(2)
+    expect(screen.getByText('Package ×2 · Purchased · 4 GP')).toBeInTheDocument()
+  })
+
+  it('renders a plain quantity when the purchase is the only source', () => {
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Amulet',
+            entry: { ...editableStackableRow.entry, quantity: 1 },
+            removeLabel: 'Remove Amulet',
+          },
+        }}
+        onSetPurchaseQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('spinbutton', { name: 'Amulet quantity' })).toHaveValue(1)
+    expect(screen.queryByText('+')).not.toBeInTheDocument()
+  })
+
+  it('removes only the purchase when trash is used on a plus-one row', async () => {
+    const onRemoveItem = vi.fn()
+    const onSetPurchaseQuantity = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <EquipmentInventoryRowItem
+        display={{
+          kind: 'single',
+          row: {
+            ...editableStackableRow,
+            equipmentName: 'Dagger',
+            entry: { ...editableStackableRow.entry, quantity: 1 },
+            removeLabel: 'Remove Dagger',
+          },
+        }}
+        otherSourceQuantity={2}
+        onSetPurchaseQuantity={onSetPurchaseQuantity}
+        onRemoveItem={onRemoveItem}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Remove Dagger' }))
+
+    expect(onRemoveItem).toHaveBeenCalledWith({
+      kind: 'purchase',
+      purchaseId: 'purchase-row-test-0',
+    })
+    expect(onSetPurchaseQuantity).not.toHaveBeenCalled()
   })
 
   itAxe('has no axe accessibility violations', async () => {

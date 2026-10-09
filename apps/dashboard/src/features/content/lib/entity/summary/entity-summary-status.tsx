@@ -1,7 +1,16 @@
 import { Check, TriangleAlert } from 'lucide-react'
 import { AlertCircle } from 'lucide-react'
 
-import { Badge, InlineInactiveStatus, Text, type BadgeSize, type ContentCardDensity } from '@rpg/ui'
+import {
+  Badge,
+  InlineInactiveStatus,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  type BadgeSize,
+  type ContentCardDensity,
+} from '@rpg/ui'
 
 import type { EntitySummaryStatusItem } from './entity-summary-status.types'
 import { entitySummaryStatusVariants } from './entity-summary.variants'
@@ -19,35 +28,64 @@ function resolveStatusLeadingIcon(icon: 'check' | 'warning' | undefined) {
 export function EntitySummaryStatusItemView({
   item,
   density,
+  layout = 'block',
 }: {
   item: EntitySummaryStatusItem
   density: ContentCardDensity
+  /** `inline` renders text as a non-truncating span for the metadata composition. */
+  layout?: 'block' | 'inline'
 }) {
   switch (item.kind) {
-    case 'badge':
-      return (
+    case 'badge': {
+      const badge = (
         <Badge
           appearance={item.appearance}
           tone={item.tone}
           size={resolveStatusBadgeSize(density)}
           leadingIcon={resolveStatusLeadingIcon(item.leadingIcon)}
-          title={item.title}
+          title={item.tooltip ? undefined : item.title}
         >
           {item.label}
         </Badge>
       )
-    case 'text':
+
+      if (!item.tooltip) {
+        return badge
+      }
+
       return (
-        <div className={entitySummaryStatusVariants({ density })}>
-          <Text variant={item.variant}>{item.label}</Text>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex">{badge}</span>
+            </TooltipTrigger>
+            <TooltipContent>{item.tooltip}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )
+    }
+    case 'text': {
+      const className = entitySummaryStatusVariants({
+        density,
+        tone: item.variant ?? 'muted',
+        layout,
+      })
+      return layout === 'inline' ? (
+        <span className={className} title={item.title}>
+          {item.label}
+        </span>
+      ) : (
+        <div className={className} title={item.title}>
+          {item.label}
         </div>
       )
+    }
     case 'inactive':
       return <InlineInactiveStatus label={item.label} />
     case 'validationError':
       return (
         <span className="inline-flex items-center gap-1">
-          <AlertCircle className="size-3.5 shrink-0 text-destructive" aria-hidden />
+          <AlertCircle className="size-icon-inline shrink-0 text-destructive" aria-hidden />
           <span className="sr-only">Has validation errors</span>
         </span>
       )

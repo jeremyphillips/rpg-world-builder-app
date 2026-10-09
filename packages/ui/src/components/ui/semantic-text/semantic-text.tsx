@@ -6,7 +6,7 @@ import {
   type SemanticTextEmphasis,
   type SemanticTextTone,
 } from './semantic-text.variants'
-import { iconGlyphDirectChildClasses } from '../icon-glyph.variants'
+import { inlineIconFlexSlotClasses } from '../icon-glyph.variants'
 
 export type { SemanticTextEmphasis, SemanticTextTone } from './semantic-text.variants'
 export { semanticTextVariants } from './semantic-text.variants'
@@ -14,7 +14,7 @@ export { semanticTextVariants } from './semantic-text.variants'
 export type SemanticTextProps = {
   tone?: SemanticTextTone
   emphasis?: SemanticTextEmphasis
-  /** Caller supplies the icon node; layout and sizing are standardized via descendant SVG classes. */
+  /** Caller supplies the icon node. The slot inherits its step from this text owner. */
   icon?: React.ReactNode
   children: React.ReactNode
   className?: string
@@ -31,10 +31,7 @@ export function SemanticText({ tone, emphasis, icon, children, className }: Sema
       )}
     >
       {icon ? (
-        <span
-          aria-hidden="true"
-          className={cn('shrink-0 leading-none', iconGlyphDirectChildClasses.sm)}
-        >
+        <span aria-hidden="true" className={inlineIconFlexSlotClasses}>
           {icon}
         </span>
       ) : null}

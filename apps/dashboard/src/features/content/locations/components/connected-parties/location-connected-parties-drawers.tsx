@@ -73,6 +73,7 @@ function LocationConnectedCharacterDrawer({
       locationsById={detail.locationsById}
       campaignId={detail.campaignId}
       characters={detail.characterOptions}
+      resolveClassLabel={detail.resolveClassLabel}
       connectedPartyRows={detail.rows}
       initialConnection={drawerState?.mode === 'changeKind' ? drawerState.connection : undefined}
       isSubmitting={detail.isMutationPending}
@@ -99,6 +100,7 @@ function LocationConnectedPeopleDrawer({ location, detail }: LocationConnectedPa
       campaignId={detail.campaignId}
       organizations={detail.organizations}
       characters={detail.characterOptions}
+      resolveClassLabel={detail.resolveClassLabel}
       connectedPartyRows={detail.rows}
       canAddOrganization={detail.canAddOrganizationInverse}
       canAddCharacter={detail.canAddCharacter}

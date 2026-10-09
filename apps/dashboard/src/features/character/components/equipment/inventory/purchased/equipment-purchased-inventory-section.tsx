@@ -17,6 +17,7 @@ import {
 } from '../equipment-inventory.variants'
 
 export type EquipmentPurchasedInventorySectionProps = {
+  /** Items carry status already resolved for the trim modal's `reconciliation` context. */
   purchased: PurchasedCategoryGroup[]
   showGroupHeadings?: boolean
   allowZeroQuantity?: boolean
@@ -31,7 +32,7 @@ export function EquipmentPurchasedInventorySection({
   onRemoveItem,
   onSetPurchaseQuantity,
 }: EquipmentPurchasedInventorySectionProps) {
-  const hasPurchases = purchased.some((group) => group.displays.length > 0)
+  const hasPurchases = purchased.some((group) => group.items.length > 0)
 
   if (!hasPurchases) {
     return (
@@ -43,12 +44,13 @@ export function EquipmentPurchasedInventorySection({
     )
   }
 
-  const renderRowList = (displays: PurchasedCategoryGroup['displays']) => (
+  const renderRowList = (items: PurchasedCategoryGroup['items']) => (
     <ul className={equipmentInventoryRowListClasses}>
-      {displays.map((display) => (
+      {items.map(({ display, status }) => (
         <li key={equipmentInventoryDisplayItemKey(display)}>
           <EquipmentInventoryRowItem
             display={display}
+            status={status}
             allowZeroQuantity={allowZeroQuantity}
             onRemoveItem={onRemoveItem}
             onSetPurchaseQuantity={onSetPurchaseQuantity}
@@ -59,10 +61,10 @@ export function EquipmentPurchasedInventorySection({
   )
 
   if (!showGroupHeadings) {
-    const flatDisplays = purchased.flatMap((group) => group.displays)
+    const flatItems = purchased.flatMap((group) => group.items)
     return (
       <div className={equipmentPurchasedInventoryCategoryListClasses}>
-        {renderRowList(flatDisplays)}
+        {renderRowList(flatItems)}
       </div>
     )
   }
@@ -70,10 +72,10 @@ export function EquipmentPurchasedInventorySection({
   return (
     <div className={equipmentPurchasedInventoryCategoryListClasses}>
       {purchased.map((group) =>
-        group.displays.length === 0 ? null : (
+        group.items.length === 0 ? null : (
           <section key={group.groupLabel} className={equipmentPurchasedInventoryCategoryClasses}>
             <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
-            {renderRowList(group.displays)}
+            {renderRowList(group.items)}
           </section>
         ),
       )}

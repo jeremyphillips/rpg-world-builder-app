@@ -26,6 +26,7 @@ import {
 } from '@rpg/contracts'
 
 import { countStartingEquipmentRadioOptions } from '@/features/character/lib/equipment/equipment-step.lib'
+import type { EntitySummaryStatusItem } from '@/features/content'
 
 import type { QuickNpcSetupValues } from './quick-npc-form-fields'
 
@@ -61,6 +62,9 @@ export type QuickNpcPackageCustomizationRow = {
   packageQuantity: number
   retainedQuantity: number
   kind: 'singleton' | 'stack'
+  equipmentId?: string
+  /** Context-filtered selection status. Shown whether or not the row is retained. */
+  status?: readonly EntitySummaryStatusItem[]
 }
 
 export function quickNpcUsePackageLabel(packageLabel: string): string {
@@ -176,6 +180,14 @@ export function resolveQuickNpcEffectiveClassPackage(args: {
   return selectClassPackage(packageId, 'automatic')
 }
 
+function itemEquipmentId(item: StartingEquipmentOptionSummaryItem): string | undefined {
+  if (item.kind === 'grant') return item.equipmentId
+  if (item.kind === 'proficiency_linked_grant' && item.status === 'resolved') {
+    return item.resolvedEquipment?.id
+  }
+  return undefined
+}
+
 function itemLabel(item: StartingEquipmentOptionSummaryItem, fallback: string): string {
   if (item.kind === 'grant') return item.equipment?.name ?? item.equipmentSlug
   if (item.kind === 'choice') return item.poolLabel || fallback
@@ -192,6 +204,7 @@ export function buildQuickNpcPackageCustomizationRows(args: {
     const summary = args.orderedItems[index]
     if (!summary) return []
     const packageQuantity = item.kind === 'grant' ? (item.quantity ?? 1) : 1
+    const equipmentId = itemEquipmentId(summary)
     return [
       {
         entryId: item.id,
@@ -203,6 +216,7 @@ export function buildQuickNpcPackageCustomizationRows(args: {
           args.entryQuantities,
         ),
         kind: packageQuantity > 1 ? 'stack' : 'singleton',
+        ...(equipmentId ? { equipmentId } : {}),
       },
     ]
   })

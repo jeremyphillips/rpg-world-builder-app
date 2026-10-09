@@ -1,5 +1,10 @@
 import type { SpellPickerItem } from '@rpg/contracts'
-import { getSpellSchoolLabel } from '@rpg/contracts'
+import {
+  SPELL_SCHOOL_TERM,
+  getSpellSchoolLabel,
+  getTermCompactLabel,
+  getTermSentenceForm,
+} from '@rpg/contracts'
 
 import {
   applyFilterSchema,
@@ -30,11 +35,11 @@ import {
 } from './spell-picker-drawer.lib'
 import {
   SPELL_PICKER_LEVELS_ALL,
-  SPELL_PICKER_LEVELS_LABEL,
   SPELL_PICKER_MODE_CANTRIPS,
-  SPELL_PICKER_MODE_PREPARED_SPELLS,
+  SPELL_PICKER_MODE_SPELLS,
+  SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
+  SPELL_PICKER_MECHANICS_LABEL,
   SPELL_PICKER_SCHOOL_ALL,
-  SPELL_PICKER_SCHOOL_LABEL,
   type SpellPickerCastingTimeFilter,
   type SpellPickerMechanicsFilters,
   type SpellPickerMethodFilter,
@@ -130,7 +135,7 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createChipsFilter<SpellPickerItem, SpellPickerFilterState, 'selectedLevels'>({
         id: 'selectedLevels',
-        label: SPELL_PICKER_LEVELS_LABEL,
+        label: 'Levels',
         selectionMode: 'multiple',
         allValue: SPELL_PICKER_LEVELS_ALL,
         defaultValue: [],
@@ -159,12 +164,12 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createEqualsFilter<SpellPickerItem, SpellPickerFilterState, 'selectedSchool', string>({
         id: 'selectedSchool',
-        label: SPELL_PICKER_SCHOOL_LABEL,
+        label: getTermCompactLabel(SPELL_SCHOOL_TERM),
         defaultValue: SPELL_PICKER_SCHOOL_ALL,
         layout: 'inline',
         showAllOption: false,
-        ariaLabel: 'Filter by school',
-        triggerAriaLabel: 'Spell school',
+        ariaLabel: `Filter by ${getTermSentenceForm(SPELL_SCHOOL_TERM, 1)}`,
+        triggerAriaLabel: getTermCompactLabel(SPELL_SCHOOL_TERM),
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },
           ...[...new Set(args.items.map((item) => item.spell.school))]
@@ -192,10 +197,10 @@ export function createSpellPickerFilterSchema(
     fields.push(
       createPopoverFilter<SpellPickerItem, SpellPickerFilterState, 'mechanicsFilters'>({
         id: 'mechanicsFilters',
-        label: 'Casting & mechanics',
+        label: SPELL_PICKER_MECHANICS_LABEL,
         defaultValue: DEFAULT_MECHANICS_FILTERS,
         triggerLabel: formatSpellPickerMechanicsTriggerLabel,
-        triggerAriaLabel: 'Casting and mechanics filters',
+        triggerAriaLabel: SPELL_PICKER_MECHANICS_FILTER_TRIGGER_ARIA_LABEL,
         groups: () =>
           [
             args.castingTimeOptions.length > 0
@@ -253,17 +258,17 @@ export function extractSpellPickerFilterState(
   }
 }
 
-export function applySpellPickerFilterSchema(
+export function applySpellPickerFilterSchema<T extends SpellPickerItem>(
   schema: FilterSchema<SpellPickerItem, SpellPickerFilterState>,
   state: SpellPickerFilterState,
-  items: readonly SpellPickerItem[],
+  items: readonly T[],
   mode: SpellPickerMode,
-): SpellPickerItem[] {
-  const filtered = applyFilterSchema(schema, state, [...items])
+): T[] {
+  const filtered = applyFilterSchema(schema, state, [...items]) as T[]
   if (mode === SPELL_PICKER_MODE_CANTRIPS) {
     return filtered.filter((item) => item.spell.level === 0)
   }
-  if (mode === SPELL_PICKER_MODE_PREPARED_SPELLS) {
+  if (mode === SPELL_PICKER_MODE_SPELLS) {
     return filtered.filter((item) => item.spell.level >= 1)
   }
   return filtered

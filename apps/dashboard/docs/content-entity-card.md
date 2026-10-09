@@ -9,7 +9,7 @@ EntitySummaryModel → EntitySummary parts → EntityAnatomy (RowAnatomy cells) 
 `EntitySummaryModel` contains identity content only: `heading`, optional
 `classification`, `description`, `status`, and `media`. It never carries navigation.
 `EntityAnatomyHost` adds optional heading navigation (`headingHref`), a single leading utility,
-semantic trailing (`action` | `utility` | `indicator` | `group`), and density.
+semantic trailing (`action` | `utility` | `indicator` | `group`, with optional inline `meta`), and density.
 
 Vertical alignment is owned by the shared row-track grid in `@rpg/ui`
 (`RowAnatomy` — band / meta / status tracks with slack gutters). Entity anatomy places
@@ -494,31 +494,34 @@ free-form `ReactNode` slots:
 
 ```text
 trailing
-├── action      → ReactElement labeled commit control
-├── utility     → ReactElement ghost icon utility or utility cluster
-├── indicator   → chevron | quantity variants
+├── action      → ReactElement labeled commit control, optional meta string
+├── utility     → ReactElement ghost icon utility or utility cluster, optional meta string
+├── indicator   → chevron | quantity | label
+│                 chevron and quantity accept an optional meta string
 └── group
     ├── primary   → ReactElement control composition
     └── secondary → price | quantity | grantPreview metadata variants
 ```
 
-`resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell (two
-for `group`). Kinds never choose their own alignment.
+`resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell. Kinds
+never choose their own alignment. `meta` renders as muted `text-sm` before the control
+inside that same cell. It does not add a second cell.
 
-| Kind        | Type contract                                   | Cell                             | Use                                                |
-| ----------- | ----------------------------------------------- | -------------------------------- | -------------------------------------------------- |
-| `action`    | `content: ReactElement`                         | `band`                           | Labeled commit — Add, Select, Edit                 |
-| `utility`   | `content: ReactElement`                         | `full` (row-centered)            | Remove, overflow menu, quantity stepper, icon edit |
-| `indicator` | `variant: 'chevron'`                            | `full`                           | Destination chevrons                               |
-| `indicator` | `variant: 'quantity'`                           | `band`                           | Quiet qty labels aligned with the heading          |
-| `group`     | `primary: ReactElement`, structured `secondary` | primary `band`, secondary `meta` | Commerce stacks (qty + Add, price/grant preview)   |
+| Kind        | Type contract                                                                         | Cell                                     | Use                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `action`    | `content: ReactElement`, optional `meta`                                              | `band`                                   | Labeled commit — Add, Select, Edit, Release                                                  |
+| `utility`   | `content: ReactElement`, optional `meta`                                              | `full` (row-centered)                    | Remove, overflow menu, quantity stepper, icon edit                                           |
+| `indicator` | `variant: 'chevron'`, optional `meta`                                                 | `full`                                   | Destination chevrons                                                                         |
+| `indicator` | `variant: 'quantity'`, `format` `compact` \| `label` \| `additional`, optional `meta` | `band`                                   | `compact` is `×N` and `label` is `Qty N` (hidden at 1). `additional` is `+N`, including `+1` |
+| `indicator` | `variant: 'label'` (`label: string`)                                                  | `band`                                   | Value-only rows (for example `50 GP value`) with no control                                  |
+| `group`     | `primary: ReactElement`, structured `secondary`                                       | `band` (secondary inline before primary) | Commerce stacks (price/grant preview + Add or quantity stepper)                              |
 
 `utility` also tightens the surface end edge (see [Edge geometry contract](#edge-geometry-contract)).
 A 36px stepper in a compact row grows the row through the slack gutters; heading and
 description stay on their tracks and the stepper centers on the full row.
 
 **Status and classification never use trailing.** Role labels (`Member`), availability
-(`Unavailable`), and callouts (`Spellcasting focus`) belong in `EntitySummary.status`.
+(`Unavailable`), and selection status (`Cannot afford`, `Required by class`) belong in `EntitySummary.status`.
 
 There is no parallel `action` + `endSlot` + feature-specific trailing sibling on entity
 surfaces. A destination chevron is an `indicator`, not an `action`. Whole-row navigation
@@ -539,9 +542,14 @@ but must not grow solely to push classification away from the name. `EntitySumma
 EntitySummary parts            RowAnatomy cell
 ├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
 ├── EntitySummaryDescription  → meta
-└── EntitySummaryStatus       → status (track offset owned by the cell, not the row)
-    └── EntitySummaryStatusItem[]
+└── status cell                → status (track offset owned by the cell, not the row)
+    ├── PickerSelectionStateLine        (resolved copy, stacked above status)
+    └── EntitySummaryStatus
+        ├── EntitySummaryProvenanceItem[]   (provenance group, rendered first)
+        └── EntitySummaryStatusItem[]       (status group)
 ```
+
+`EntitySummaryModel.selectionState` stores the resolved line (`label` plus optional provenance strings), not a semantic kind. The picker resolver owns that mapping. The line is a check icon and an emphasized state word, then muted provenance joined with `InlineMetadata`. It is not a badge and not a `SelectionSignalCategory`. Picker ownership text (`Package`, `Purchased`, `Common choice`) belongs on this line so the status line does not repeat it. Warnings stay on the status line. Release and remove actions stay on `provenance`.
 
 `EntitySummaryModel.status` accepts structured `EntitySummaryStatusItem` values only:
 
@@ -552,9 +560,43 @@ EntitySummary parts            RowAnatomy cell
 | `inactive`        | Circle-slash inactive metadata (search unavailable rows)                      |
 | `validationError` | Master-detail validation indicator                                            |
 
-`text` items take `variant: 'muted' | 'warning'` — a plain visual tone only. Warning text renders as its own
+`text` items take `variant: 'muted' | 'warning' | 'guidance'` — a plain visual tone only. Warning text renders as its own
 status line under the description (e.g. a build advisory under `10 total · Fighter package ×8`); never concatenate
 it into the description. Domain mapping (e.g. build advisories → status items) stays in the consuming feature.
+
+`guidance` (`text-foreground`) reads at title ink, above the muted detail line. Use it for
+requirement, recommendation, and source guidance. Text items may carry an optional `title`, which is
+supplemental only: the label must stand on its own.
+
+### Provenance vs status
+
+`EntitySummaryModel.provenance` is a **separate slot** from `status`. Provenance says where an
+owned quantity came from and offers the inline affordance that gives it back; status says what
+the row's current state is.
+
+| Slot         | Items                                                                           | Interactive |
+| ------------ | ------------------------------------------------------------------------------- | ----------- |
+| `provenance` | `{ kind: 'text' }` source segments, `{ kind: 'action' }` release/remove buttons | Yes         |
+| `status`     | `EntitySummaryStatusItem` badges, text, inactive, validation errors             | No          |
+
+Both render into the same `InlineMetadata` line — provenance group first, then status —
+carrying `data-entity-summary-provenance` and `data-entity-summary-status`. Ownership
+segments never become status items: they carry no `SelectionSignalCategory` and do not pass
+through `resolveSelectionRowStatusItems`. Inline actions belong only to `provenance`; the
+status group must stay free of buttons.
+
+### Status composition
+
+`EntitySummaryModel.statusComposition` picks the lane layout:
+
+| Composition         | Layout                                                                                                | Use when                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `cluster` (default) | Items wrap with a gap                                                                                 | Independent states (Member, Equipped) or a standalone warning line                        |
+| `metadata`          | One `InlineMetadata` line (`role="supporting"`, wrapping) with `·` between items; text renders inline | A single ordered sentence of badges then guidance (`[Cannot afford] · Required by class`) |
+
+Character builder selection rows always use `metadata` and get their items from
+`resolveSelectionRowStatusItems`. Do not build them by hand. See
+[character-builder-picker-chrome.md](./character-builder-picker-chrome.md#selection-row-status-guidance-and-context-policy).
 
 EntitySummary owns badge presentation. Badge size follows density: **compact → `sm`**, **comfortable → `md`**. Consumers must not pass hand-built `<Badge size="…">` or local `mt-1` around entity status.
 

@@ -91,7 +91,7 @@ describe('combobox and catalog-picker baselines', () => {
   })
 })
 
-describe('equipment picker baseline (pre-migration)', () => {
+describe('single label document baseline', () => {
   it('matches monolithic label searchText scoring', () => {
     const document = uiLabelDocument('longsword martial melee weapon')
 

@@ -1,3 +1,4 @@
+import { getSlotProgressionKindEntry, getSlotProgressionKindLabel } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { CLASS_SECTION_LABELS, CLASS_STAT_LABELS } from '@/features/content'
@@ -75,9 +76,8 @@ describe('builder-class-option-display.lib', () => {
     const wizard = pickClass('wizard')
 
     expect(resolveClassCardSummaryBadge(wizard, spellcastingProgression)).toEqual({
-      label: 'Full caster',
-      tooltip:
-        'Gains spell slots at the standard spellcasting progression, eventually reaching 9th-level spell slots.',
+      label: getSlotProgressionKindLabel('full-caster'),
+      tooltip: getSlotProgressionKindEntry('full-caster')!.description,
     })
   })
 

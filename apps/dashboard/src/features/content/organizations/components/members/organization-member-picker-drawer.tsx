@@ -4,21 +4,30 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, Text } from '@rpg/ui'
+import { Button, dialogPanelActionRowClasses, Text } from '@rpg/ui'
 
 import {
-  buildCharacterEntityCardModel,
+  CatalogToolbarResetSlot,
+  resolveCatalogPickerResultSummary,
   OrganizationMembershipTitleField,
+  buildCharacterEntityCardModel,
+  formatContentReferenceLabel,
+  hasCatalogPickerResetViewCriteria,
   titleFromMembershipRadioValue,
   type QuickNpcCreateFormOrganization,
 } from '@/features/character'
 
-import { CatalogEntityPickerSheet, CatalogEntitySurfaceRow } from '@/features/content'
-
 import {
-  buildConnectedPartyCharacterEntitySummary,
-  buildConnectedPartyCharacterPickerSearchText,
-} from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
+  CatalogEntityPickerSheet,
+  CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
+  createCharacterRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveCharacterRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
+} from '@/features/content'
+
+import { buildConnectedPartyCharacterEntitySummary } from '../../../locations/lib/connected-parties/location-connected-party-character-options.lib'
 import {
   filterAndSortOrganizationMemberPickerCandidates,
   formatOrganizationMemberPickerStatusBadgeLabel,
@@ -28,10 +37,11 @@ import {
   type OrganizationMemberSelectionPolicy,
 } from '../../lib/members/organization-member-picker-drawer.lib'
 import { ORGANIZATION_MEMBER_ADD_FAILED } from '../../lib/members/organization-members.constants'
+import { CHARACTER_PICKER_SEARCH_PLACEHOLDER } from '@/features/character'
 
 export const ORGANIZATION_MEMBER_PICKER_TITLE = 'Add member'
 export const ORGANIZATION_MEMBER_PICKER_SUBMIT_LABEL = 'Add member'
-export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = 'Search characters'
+export const ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER = CHARACTER_PICKER_SEARCH_PLACEHOLDER
 export const ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE = 'No characters match this search.'
 export const ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE = 'No characters are available.'
 export const ORGANIZATION_MEMBER_PICKER_CREATE_NPC_LABEL = 'Create new NPC'
@@ -52,6 +62,7 @@ export type OrganizationMemberPickerDrawerProps = {
   onOpenChange: (open: boolean) => void
   organization: QuickNpcCreateFormOrganization
   candidates: readonly OrganizationMemberPickerCandidate[]
+  resolveClassLabel?: (classId: string) => string
   onAdd: (commit: OrganizationMemberPickerCommit) => Promise<void>
   quickNpc?: OrganizationMemberPickerQuickNpc
   onCreateNpc?: () => void
@@ -92,6 +103,7 @@ export function OrganizationMemberPickerDrawer({
   onOpenChange,
   organization,
   candidates,
+  resolveClassLabel = formatContentReferenceLabel,
   onAdd,
   quickNpc,
   onCreateNpc,
@@ -106,13 +118,42 @@ export function OrganizationMemberPickerDrawer({
   const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(soleTitleId)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const characterFilterSchema = React.useMemo(
+    () =>
+      createCharacterRelationshipFilterSchema({
+        rows: candidates,
+        getCharacterType: (candidate) => candidate.characterType,
+        getClassIds: (candidate) => candidate.classIds,
+        resolveClassLabel,
+      }),
+    [candidates, resolveClassLabel],
+  )
+  const characterFilterLayout = React.useMemo(
+    () => resolveCharacterRelationshipFilterLayout(characterFilterSchema),
+    [characterFilterSchema],
+  )
+  const characterFilters = useRelationshipCatalogFilters({
+    rows: candidates,
+    schema: characterFilterSchema,
+  })
+  const showTypeFilter = relationshipCatalogFilterHasBand(
+    'primary',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
+  const showClassFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    characterFilterSchema,
+    characterFilterLayout,
+  )
 
   const resetMembershipConfig = React.useCallback(() => {
+    characterFilters.reset()
     setExpandedItemId(null)
     setSelectedTitle(soleTitleId)
     setSubmitError(null)
     setPending(false)
-  }, [])
+  }, [characterFilters.reset, soleTitleId])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -214,10 +255,61 @@ export function OrganizationMemberPickerDrawer({
               }
           : undefined
       }
-      items={candidates}
+      items={characterFilters.filteredRows}
+      hasStructuredFilters={characterFilters.structuredFilterCount > 0}
+      primaryControls={
+        showTypeFilter ? (
+          <RelationshipCatalogFilterBand
+            band="primary"
+            schema={characterFilterSchema}
+            layout={characterFilterLayout}
+            state={characterFilters.state}
+            data={candidates}
+            idPrefix="organization-member-picker"
+            onValueChange={characterFilters.setValue}
+          />
+        ) : undefined
+      }
+      filterRow={
+        showClassFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={characterFilterSchema}
+                  layout={characterFilterLayout}
+                  state={characterFilters.state}
+                  data={candidates}
+                  idPrefix="organization-member-picker"
+                  onValueChange={characterFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: characterFilters.structuredFilterCount,
+          searchQuery,
+        })
+        return (
+          <CatalogToolbarResetSlot
+            visible={showReset}
+            reserve={showClassFilter}
+            includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: characterFilters.sourceCount,
+            })}
+            onClick={() => {
+              characterFilters.reset()
+              resetSearchQuery()
+            }}
+          />
+        )
+      }}
       getItemKey={(candidate) => candidate.id}
       getItemToolbarLabel={(candidate) => candidate.name}
-      getSearchText={buildConnectedPartyCharacterPickerSearchText}
       searchPlaceholder={ORGANIZATION_MEMBER_PICKER_SEARCH_PLACEHOLDER}
       noResultsMessage={ORGANIZATION_MEMBER_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_MEMBER_PICKER_NO_ITEMS_MESSAGE}
@@ -265,7 +357,7 @@ export function OrganizationMemberPickerDrawer({
                 {submitError}
               </Text>
             ) : null}
-            <div className="flex justify-end">
+            <div className={dialogPanelActionRowClasses}>
               <Button
                 type="button"
                 disabled={pending}

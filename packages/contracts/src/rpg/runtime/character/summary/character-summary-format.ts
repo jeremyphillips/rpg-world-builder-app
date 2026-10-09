@@ -1,4 +1,4 @@
-import { joinInlineMetadata } from '../../../primitives/inline-metadata.js'
+import { joinInlineMetadata } from '../../../primitives/inline-metadata'
 
 export type CharacterSummaryParts = {
   species?: {

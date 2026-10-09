@@ -1,4 +1,4 @@
-import { APP_NAME } from '@rpg/contracts'
+import { APP_NAME } from '@rpg/contracts/shared'
 import { Heading } from '@rpg/ui'
 
 import { SidebarNav } from './sidebar-nav'

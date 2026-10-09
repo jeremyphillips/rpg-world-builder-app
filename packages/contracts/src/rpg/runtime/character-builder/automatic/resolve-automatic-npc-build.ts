@@ -1,3 +1,4 @@
+import { resolveMagicItemGrantRequirement } from '../character-kind-policy'
 import { isClassProgressionApplicable } from '../progression/character-level-policy'
 import { deriveDeterministicAbilityAssignment } from '../ability/ability-score-recommendations'
 import { resolveAbilityGenerationMethod } from '../ability/ability-generation'
@@ -280,7 +281,12 @@ function completeMagicItemGrantSelections(
   context: CharacterBuildContext,
 ): MagicItemGrantCompletion {
   const catalogIndex = indexCharacterBuildCatalog(context.catalog)
-  const state = resolveMagicItemAcquisitionState({ draft, context, catalogIndex })
+  const state = resolveMagicItemAcquisitionState({
+    draft,
+    context,
+    catalogIndex,
+    requirement: resolveMagicItemGrantRequirement(context.characterKind),
+  })
   if (state.allowances.length === 0) return { ok: true, draft }
 
   let selections: MagicItemGrantSelection[] = readMagicItemSelections(draft)

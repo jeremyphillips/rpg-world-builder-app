@@ -1,6 +1,6 @@
 import {
-  EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK,
-  EQUIPMENT_RECOMMENDATION_TIER_RANK,
+  EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE,
+  EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE,
   EQUIPMENT_RECOMMENDATION_TIERS,
   getBestEquipmentRecommendationSpecificity,
   type EquipmentRecommendation,
@@ -94,8 +94,8 @@ export function addRecommendationContribution(
   const scope = scopeForContribution(options)
   if (!recommendationScopeApplies(scope, options.selectedClassId)) return
 
-  const rank = EQUIPMENT_RECOMMENDATION_TIER_RANK[tier]
-  const specificityRank = EQUIPMENT_RECOMMENDATION_SPECIFICITY_RANK[specificity]
+  const rank = EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE[tier]
+  const specificityRank = EQUIPMENT_RECOMMENDATION_SPECIFICITY_PRECEDENCE[specificity]
   const existing = accumulators.get(equipmentId)
   const nextEvidence: SourcedEquipmentRecommendationEvidence = {
     reason,
@@ -136,7 +136,7 @@ export function toEquipmentRecommendation(
   accumulator: RecommendationAccumulator,
 ): DerivedEquipmentRecommendation {
   const tier = EQUIPMENT_RECOMMENDATION_TIERS.find(
-    (candidate) => EQUIPMENT_RECOMMENDATION_TIER_RANK[candidate] === accumulator.minRank,
+    (candidate) => EQUIPMENT_RECOMMENDATION_TIER_PRECEDENCE[candidate] === accumulator.minRank,
   )!
   return {
     tier,

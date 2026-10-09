@@ -12,7 +12,7 @@ import {
   tableBuilderSectionErrorClasses,
 } from './table-builder.variants'
 import { tableBuilderValuesStickyPaddingClasses } from './table-builder-values.variants'
-import { useTableBuilderHostConfig } from '../../lib/table-builder/table-builder-host-context'
+import { useTableBuilderHostConfig } from '../../lib/table-builder/use-table-builder-host-config'
 import { TableBuilderValuesGrid } from './table-builder-values-grid'
 import {
   resolveTableBuilderValuesHint,

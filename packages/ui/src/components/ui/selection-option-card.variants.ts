@@ -232,43 +232,72 @@ export const optionCardCompactPaddingRightClasses = 'pr-4'
  */
 export const optionCardCompactBodyInsetClasses = 'pl-[calc(0.75rem+1rem+0.75rem)]'
 
+/**
+ * Left inset for in-flow embedded slots (`divider`, `plain`).
+ * The slot is already inside shell padding, so this is radio control width + column gap:
+ * default `size-5` + `gap-4`, compact `size-4` + `gap-3`
+ * (`radioCardControlVariants` card + `selectionOptionCardAnatomyRootVariants`).
+ * Panel tone breaks out to the card edge and must not use these.
+ */
+export const optionCardEmbeddedContentInsetClasses = {
+  default: 'pl-[calc(1.25rem+1rem)]',
+  compact: 'pl-[calc(1rem+0.75rem)]',
+} as const
+
 /** Panel horizontal padding: body-column inset left, shell padding right. */
 export const optionCardCompactPanelPaddingClasses = `${optionCardCompactBodyInsetClasses} ${optionCardCompactPaddingRightClasses}`
 
 /** Slot below the primary card row when a selected option reveals nested content. */
-export const optionCardEmbeddedSlotVariants = cva(
-  cn('bg-background', establishSurfaceCurrent('background')),
-  {
-    variants: {
-      tone: {
-        divider: 'border-t border-border',
-        panel: 'border-t border-border',
-      },
-      density: {
-        default: '',
-        compact: '',
-      },
+export const optionCardEmbeddedSlotVariants = cva('', {
+  variants: {
+    tone: {
+      divider: 'border-t border-border',
+      panel: 'border-t border-border',
+      /** No fill — nested copy sits on the card surface. */
+      plain: 'border-t border-border',
     },
-    compoundVariants: [
-      { tone: 'divider', density: 'default', class: 'mt-4 pt-4' },
-      { tone: 'divider', density: 'compact', class: 'mt-2 pt-2' },
-      {
-        tone: 'panel',
-        density: 'default',
-        class: '-mx-4 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
-      },
-      {
-        tone: 'panel',
-        density: 'compact',
-        class: '-mx-4 -mb-2 mt-2 rounded-b-card',
-      },
-    ],
-    defaultVariants: {
-      tone: 'divider',
-      density: 'default',
+    density: {
+      default: '',
+      compact: '',
     },
   },
-)
+  compoundVariants: [
+    {
+      tone: 'divider',
+      density: 'default',
+      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.default),
+    },
+    {
+      tone: 'divider',
+      density: 'compact',
+      class: cn('mt-2 pt-2', optionCardEmbeddedContentInsetClasses.compact),
+    },
+    {
+      tone: 'plain',
+      density: 'default',
+      class: cn('mt-4 pt-4', optionCardEmbeddedContentInsetClasses.default),
+    },
+    {
+      tone: 'plain',
+      density: 'compact',
+      class: cn('mt-2 pt-2', optionCardEmbeddedContentInsetClasses.compact),
+    },
+    {
+      tone: 'panel',
+      density: 'default',
+      class: '-mx-4 -mb-3 mt-4 rounded-b-card pb-3 pt-4',
+    },
+    {
+      tone: 'panel',
+      density: 'compact',
+      class: '-mx-4 -mb-2 mt-2 rounded-b-card',
+    },
+  ],
+  defaultVariants: {
+    tone: 'divider',
+    density: 'default',
+  },
+})
 
 /** Always-visible region below the primary shell row (e.g. validation reasons). */
 export const optionCardFooterSlotVariants = cva('min-w-0', {

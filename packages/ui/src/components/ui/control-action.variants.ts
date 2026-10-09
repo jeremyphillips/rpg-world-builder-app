@@ -1,6 +1,15 @@
 import { cn } from '../../lib/utils'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
+/** Icon–label flex gap for labeled control-action tiers (standard Tailwind spacing). */
+export const CONTROL_ACTION_GAP_CLASSES = {
+  xs: 'gap-1',
+  sm: 'gap-1.5',
+  md: 'gap-2',
+} as const
+
+export type ControlActionMetricsTier = keyof typeof CONTROL_ACTION_GAP_CLASSES
+
 /** Compact inline action height — 24px (`--control-action-compact-height`) */
 export const controlActionCompactHeightClasses = 'h-control-action-compact'
 
@@ -28,6 +37,7 @@ export const controlActionCompactTextClasses = controlActionCompactHeightClasses
 /** Compact text+icon action — compact height + sm glyph */
 export const controlActionCompactTextWithIconClasses = cn(
   controlActionCompactHeightClasses,
+  CONTROL_ACTION_GAP_CLASSES.xs,
   iconGlyphDescendantClasses.sm,
 )
 
@@ -46,6 +56,7 @@ export const controlActionLgIconClasses = cn(
 /** Dense labeled control — 28px height + 10px type; pairs with Button `size="xs"` default density. */
 export const controlActionXsTextClasses = cn(
   'h-control-action-xs px-2.5 text-control-action-xs',
+  CONTROL_ACTION_GAP_CLASSES.xs,
   iconGlyphDescendantClasses.xs,
 )
 
@@ -53,6 +64,7 @@ export const controlActionXsTextClasses = cn(
 export const controlActionXsCompactTextWithIconClasses = cn(
   controlActionCompactHeightClasses,
   'px-2 py-0 text-control-action-xs',
+  CONTROL_ACTION_GAP_CLASSES.xs,
   iconGlyphDescendantClasses.xs,
 )
 

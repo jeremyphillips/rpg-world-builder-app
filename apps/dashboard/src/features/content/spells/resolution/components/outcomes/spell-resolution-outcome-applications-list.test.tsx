@@ -19,7 +19,7 @@ import {
 } from '../../lib/form/resolution-outcome-applications-form-fields'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { SpellResolutionOutcomeApplicationsList } from './spell-resolution-outcome-applications-list'
-import { outcomeApplicationsIdPrefix } from './spell-resolution-outcome-applications-list'
+import { outcomeApplicationsIdPrefix } from './outcome-applications-id-prefix'
 
 function InvalidSubmitHarness({ defaultResolution }: { defaultResolution: ResolutionFormValues }) {
   const form = useForm({

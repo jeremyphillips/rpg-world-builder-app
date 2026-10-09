@@ -7,7 +7,7 @@ import {
   CONTENT_DETAIL_SECTION_NAV_EYEBROW,
   CONTENT_DETAIL_SECTION_NAV_LABEL,
 } from './content-detail-nav.constants'
-import { useContentDetailNavSections } from './content-detail-nav-context'
+import { useContentDetailNavSections } from './content-detail-nav-registration'
 
 export function ContentDetailSectionNav() {
   const sections = useContentDetailNavSections()

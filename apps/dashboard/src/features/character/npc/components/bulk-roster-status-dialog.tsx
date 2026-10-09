@@ -8,7 +8,6 @@ import {
   buildActionDialogNotify,
   deriveActionApplySummary,
   finalizeActionDialogCloseWithOutcomes,
-  NPC_ROSTER_STATUS_ACTION,
   useActionLifecycle,
   type ActionApplySummary,
   type ActionLifecycleCloseEvent,
@@ -25,6 +24,8 @@ import {
   toBulkRosterStatusFormValues,
 } from '../lib/bulk/resolve-bulk-roster-status-preview'
 import { useBulkRosterStatusAction } from '../hooks/use-bulk-roster-status-action'
+import { formatCharacterTypeSelectedCountPhrase } from '../../lib/display/character-type-labels'
+import { NPC_ROSTER_BULK_DESCRIPTOR } from '../lib/npc-roster-action.lib'
 
 export type BulkRosterStatusDialogProps = {
   open: boolean
@@ -129,7 +130,7 @@ export function BulkRosterStatusDialog({
       phase={lifecycle.phase}
       pending={lifecycle.pending}
       headline="Edit roster status"
-      description={`Apply roster status changes to ${selectedRows.length} selected NPC${selectedRows.length === 1 ? '' : 's'}.`}
+      description={`Apply roster status changes to ${formatCharacterTypeSelectedCountPhrase('npc', selectedRows.length)}.`}
       configureSlot={
         <FormProvider {...form}>
           <FormFieldStack fields={fields} idPrefix={formId} density="compact" />
@@ -143,7 +144,7 @@ export function BulkRosterStatusDialog({
       localError={lifecycle.localError}
       resolutionRows={lifecycle.resolutionRows}
       confirmedCount={lifecycle.confirmedCount}
-      resolveNoun={NPC_ROSTER_STATUS_ACTION.nounPlural.toLowerCase()}
+      resolveNoun={NPC_ROSTER_BULK_DESCRIPTOR.nounPlural.toLowerCase()}
       onConfigureApply={handleConfigureApply}
       configureApplyDisabled={!preview.hasChanges || preview.wouldChangeCount === 0}
       onRetryFailed={() => void lifecycle.retryFailed()}

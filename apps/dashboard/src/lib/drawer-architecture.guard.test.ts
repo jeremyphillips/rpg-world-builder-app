@@ -28,6 +28,22 @@ const PRODUCTION_DRAWER_SURFACES: readonly { label: string; path: string }[] = [
     path: 'apps/dashboard/src/features/character/components/connections/picker/organization-picker-drawer.tsx',
   },
   {
+    label: 'CharacterPickerDrawer',
+    path: 'apps/dashboard/src/features/character/components/connections/picker/character-picker-drawer.tsx',
+  },
+  {
+    label: 'PersonRelationshipAddDrawer',
+    path: 'apps/dashboard/src/features/character/components/connections/picker/person-relationship-add-drawer.tsx',
+  },
+  {
+    label: 'LocationRelationshipAddDrawer',
+    path: 'apps/dashboard/src/features/character/components/connections/picker/location-relationship-add-drawer.tsx',
+  },
+  {
+    label: 'ConnectionsStepDrawers',
+    path: 'apps/dashboard/src/features/character/components/builder/steps/connections/connections-step-drawers.tsx',
+  },
+  {
     label: 'OrganizationMemberPickerDrawer',
     path: 'apps/dashboard/src/features/content/organizations/components/members/organization-member-picker-drawer.tsx',
   },
@@ -86,6 +102,22 @@ const PRODUCTION_DRAWER_SURFACES: readonly { label: string; path: string }[] = [
   {
     label: 'BuilderOptionDetailsSheet',
     path: 'packages/ui/src/components/ui/builder-option-details-sheet.client.tsx',
+  },
+]
+
+/** Internal fragments that match the drawer filename walk but are not product surfaces. */
+const DRAWER_INVENTORY_ALLOWLIST: readonly { path: string; reason: string }[] = [
+  {
+    path: 'apps/dashboard/src/features/content/lib/relationship/drawer/relationship-drawer-subject-field.tsx',
+    reason: 'Labeled subject fragment rendered inside a drawer, not a surface.',
+  },
+  {
+    path: 'apps/dashboard/src/features/content/lib/entity/surfaces/drawer/drawer-entity-block.tsx',
+    reason: 'Entity block rendered inside drawer bodies, not a surface.',
+  },
+  {
+    path: 'apps/dashboard/src/features/content/lib/relationship/drawer/drawer-context.tsx',
+    reason: 'Drawer context provider, not a surface.',
   },
 ]
 
@@ -149,6 +181,24 @@ describe('drawer architecture guard', () => {
           pattern,
         )
       }
+    }
+  })
+
+  it('classifies every production drawer file', () => {
+    const dashboardSrc = join(DASHBOARD_ROOT, 'src')
+    const registered = new Set(PRODUCTION_DRAWER_SURFACES.map((surface) => surface.path))
+    const allowed = new Set(DRAWER_INVENTORY_ALLOWLIST.map((entry) => entry.path))
+
+    for (const path of walkSourceFiles(dashboardSrc)) {
+      const fileName = path.split('/').pop() ?? ''
+      if (!fileName.endsWith('.tsx') || !fileName.includes('drawer')) continue
+
+      const relativePath = relative(REPO_ROOT, path)
+      if (registered.has(relativePath) || allowed.has(relativePath)) continue
+
+      expect.fail(
+        `Unclassified production drawer:\n${relativePath}\n\nAdd it to PRODUCTION_DRAWER_SURFACES or the documented internal/exception allowlist.`,
+      )
     }
   })
 

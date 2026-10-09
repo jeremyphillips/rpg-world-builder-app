@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { CatalogFilterChips } from '../components/ui/catalog-filter-chips.client'
 import {
   createBooleanFilter,
   createChipsFilter,
@@ -12,9 +11,11 @@ import {
   createTextFilter,
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
+import { SELECT_SIZING_LABEL_DATA_ATTR } from '../components/ui/select-trigger.lib'
 import { FilterChromeProvider } from './filter-chrome.context'
 import { FilterFieldRenderer } from './filter-field-renderer.client'
 import type { FilterRenderContext } from './filter-field-renderer.client'
+import { FILTER_TOOLBAR_SIZER_LABEL_ATTR } from './filter-toolbar-label-sizer.client'
 
 type DemoRow = { name: string; status: string }
 type TestFilterState = {
@@ -23,7 +24,9 @@ type TestFilterState = {
   hiddenOnly?: boolean
   levels?: number[]
   mechanics?: Record<string, string[]>
+  activeMechanics?: Record<string, string[]>
   noAllStatus?: 'draft' | 'published'
+  school?: string
 }
 
 const schema = createFilterSchema<DemoRow, TestFilterState>([
@@ -49,7 +52,6 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
   createBooleanFilter<DemoRow, TestFilterState, 'hiddenOnly'>({
     id: 'hiddenOnly',
     label: 'Hidden only',
-    hiddenCount: () => 3,
     getValue: () => false,
   }),
   createChipsFilter<DemoRow, TestFilterState, 'levels'>({
@@ -72,11 +74,36 @@ const schema = createFilterSchema<DemoRow, TestFilterState>([
     ],
     getValue: (row) => row.status as 'draft' | 'published',
   }),
+  createEqualsFilter<DemoRow, TestFilterState, 'school', string>({
+    id: 'school',
+    label: 'School',
+    layout: 'inline',
+    ariaLabel: 'Filter by school',
+    showAllOption: false,
+    options: [{ value: 'all', label: 'All' }],
+    getValue: () => 'all',
+  }),
   createPopoverFilter<DemoRow, TestFilterState, 'mechanics'>({
     id: 'mechanics',
     label: 'Mechanics',
     triggerLabel: (count) => `Mechanics (${count})`,
     groups: () => [],
+    matches: () => true,
+  }),
+  createPopoverFilter<DemoRow, TestFilterState, 'activeMechanics'>({
+    id: 'activeMechanics',
+    label: 'Casting',
+    triggerLabel: (count) => (count === 0 ? 'Casting' : `Casting · ${count}`),
+    groups: () => [
+      {
+        id: 'traits',
+        label: 'Traits',
+        options: [
+          { value: 'concentration', label: 'Concentration' },
+          { value: 'ritual', label: 'Ritual' },
+        ],
+      },
+    ],
     matches: () => true,
   }),
 ])
@@ -125,7 +152,10 @@ function RendererHarness({
 describe('FilterFieldRenderer chrome', () => {
   it('uses compact label sizing by default for stacked select', () => {
     render(<RendererHarness fieldId="status" />)
-    expect(screen.getByText('Status')).toHaveClass('text-xs')
+    const caption = screen.getByText('Status')
+    expect(caption.tagName).toBe('LABEL')
+    expect(caption).toHaveAttribute('for', 'test-status')
+    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
   })
 
   it('applies comfortable density override to select labels', () => {
@@ -142,9 +172,45 @@ describe('FilterFieldRenderer chrome', () => {
     expect(screen.getByText('Status')).toHaveClass('text-sm')
   })
 
+  it('sizes inline selects to their content', () => {
+    render(<RendererHarness fieldId="school" />)
+
+    const group = screen.getByRole('group', { name: 'Filter by school' })
+    expect(group).toHaveClass('w-fit')
+    expect(group).not.toHaveClass('w-full')
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('w-auto')
+  })
+
+  it('reserves every select option label in the width sizer', () => {
+    render(<RendererHarness fieldId="status" />)
+
+    const trigger = screen.getByRole('combobox', { name: 'Status' })
+    const ghosts = [...trigger.querySelectorAll(`[${SELECT_SIZING_LABEL_DATA_ATTR}]`)].map(
+      (node) => node.textContent,
+    )
+    expect(ghosts).toEqual(['All statuses', 'Draft', 'Published'])
+    expect(trigger).toHaveAttribute('title', 'All statuses')
+  })
+
+  it('caps inline selects at lg when no width token is set', () => {
+    render(<RendererHarness fieldId="school" />)
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('max-w-48')
+  })
+
+  it('reserves the popover trigger extremes in the width sizer', () => {
+    render(<RendererHarness fieldId="activeMechanics" />)
+
+    const trigger = screen.getByRole('button', { name: 'Casting' })
+    const ghosts = [...trigger.querySelectorAll(`[${FILTER_TOOLBAR_SIZER_LABEL_ATTR}]`)].map(
+      (node) => node.textContent,
+    )
+    expect(ghosts).toEqual(['Casting', 'Casting · 2'])
+    expect(trigger).toHaveTextContent('Casting')
+  })
+
   it('renders catalog chips with compact label sizing under default chrome', () => {
     render(<RendererHarness fieldId="levels" />)
-    expect(screen.getByText('Levels')).toHaveClass('text-xs')
+    expect(screen.getByText('Levels')).toHaveClass('text-xs', 'text-muted-foreground')
   })
 })
 
@@ -166,12 +232,6 @@ describe('FilterFieldRenderer behavior', () => {
     expect(trigger).toHaveTextContent('Mechanics (no options)')
   })
 
-  it('shows hiddenCount suffix for checked boolean fields', () => {
-    render(<RendererHarness fieldId="hiddenOnly" initialState={{ hiddenOnly: true }} />)
-
-    expect(screen.getByText('3 hidden')).toBeInTheDocument()
-  })
-
   it('clears text filters to undefined', async () => {
     const user = userEvent.setup()
     render(<RendererHarness fieldId="search" initialState={{ search: 'fire' }} />)
@@ -189,73 +249,5 @@ describe('FilterFieldRenderer behavior', () => {
     await user.click(screen.getByRole('combobox', { name: 'No-all status' }))
     expect(screen.queryByText('All No-all status')).not.toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Draft' })).toBeInTheDocument()
-  })
-})
-
-describe('CatalogFilterChips standalone fallback', () => {
-  it('defaults to md label sizing without provider', () => {
-    render(
-      <CatalogFilterChips
-        id="standalone"
-        label="School"
-        selectionMode="single-required"
-        value="all"
-        options={[{ value: 'all', label: 'All' }]}
-        onValueChange={() => {}}
-      />,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-sm')
-  })
-
-  it('prefers explicit labelClassName over presentation and context', () => {
-    render(
-      <FilterChromeProvider density="compact">
-        <CatalogFilterChips
-          id="explicit"
-          label="School"
-          labelClassName="text-lg"
-          presentation={{
-            type: 'chips',
-            labelClassName: 'text-xs',
-            groupClassName: '',
-            controlBandClassName: 'flex items-start min-h-0 h-auto',
-            alignmentAnchorClassName: '',
-            chipSize: 'sm',
-            shellClassName: 'gap-1',
-          }}
-          selectionMode="single-required"
-          value="all"
-          options={[{ value: 'all', label: 'All' }]}
-          onValueChange={() => {}}
-        />
-      </FilterChromeProvider>,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-lg')
-  })
-
-  it('uses presentation labelClassName when explicit labelClassName is omitted', () => {
-    render(
-      <CatalogFilterChips
-        id="presentation"
-        label="School"
-        presentation={{
-          type: 'chips',
-          labelClassName: 'text-xs text-muted-foreground',
-          groupClassName: '',
-          controlBandClassName: 'flex items-start min-h-0 h-auto',
-          alignmentAnchorClassName: '',
-          chipSize: 'sm',
-          shellClassName: 'gap-1',
-        }}
-        selectionMode="single-required"
-        value="all"
-        options={[{ value: 'all', label: 'All' }]}
-        onValueChange={() => {}}
-      />,
-    )
-
-    expect(screen.getByText('School')).toHaveClass('text-xs')
   })
 })

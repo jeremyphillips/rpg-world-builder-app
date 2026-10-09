@@ -331,7 +331,6 @@ function FormEmbeddedMasterDetailEditorBody({
         scope,
         showUnavailable,
         hiddenUnavailableCount,
-        layout: 'stable',
         onShow: showUnavailableItems,
         onHide: hideUnavailableItems,
       })

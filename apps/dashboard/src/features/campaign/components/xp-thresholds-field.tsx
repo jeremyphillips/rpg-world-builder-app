@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { resolveXpThresholdsSummary, type SystemRulesetId } from '@rpg/contracts'
 import { Table2 } from 'lucide-react'
-import { ActionButton, IconContainer, SemanticText, Text } from '@rpg/ui'
+import { ActionButton, IconContainer, InlineMetadata, SemanticText, Text } from '@rpg/ui'
 
 import { TableBuilderModal, type TableBuilderFormValues } from '@/lib/table-builder'
 
@@ -123,14 +123,19 @@ export function XpThresholdsField() {
             <div className={xpThresholdsFieldTitleClasses}>Experience thresholds</div>
             <div className={xpThresholdsFieldMetadataClasses}>
               {summary.status === 'derived' ? (
-                <>
-                  <Text variant="muted" as="span">
-                    {summary.levelCount} levels ·{' '}
-                  </Text>
-                  <SemanticText tone="warning">
-                    {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'} derived
-                  </SemanticText>
-                </>
+                <InlineMetadata role="supporting" density="compact" wrap={false}>
+                  <InlineMetadata.Item>
+                    <Text variant="muted" as="span">
+                      {summary.levelCount} levels
+                    </Text>
+                  </InlineMetadata.Item>
+                  <InlineMetadata.Item>
+                    <SemanticText tone="warning">
+                      {summary.derivedCount} threshold{summary.derivedCount === 1 ? '' : 's'}{' '}
+                      derived
+                    </SemanticText>
+                  </InlineMetadata.Item>
+                </InlineMetadata>
               ) : (
                 <Text variant="muted" as="span">
                   {summary.label}

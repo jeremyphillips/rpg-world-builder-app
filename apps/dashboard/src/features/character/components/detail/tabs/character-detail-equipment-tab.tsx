@@ -17,7 +17,10 @@ import {
   type CharacterDetailEquipmentFilterState,
 } from '../../../lib/detail/character-detail-equipment-filter-schema'
 import {
-  CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL,
+  EQUIPMENT_PICKER_SORT_GROUP_LABEL,
+  EQUIPMENT_PICKER_SORT_ORDER_LABEL,
+} from '../../equipment/picker/drawer/equipment-picker-drawer.types'
+import {
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_MIN_ITEMS,
   CHARACTER_DETAIL_EQUIPMENT_SEARCH_PLACEHOLDER,
   CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL,
@@ -34,10 +37,13 @@ import {
   type CharacterSheetEquipmentCard,
 } from '../../../lib/detail/character-sheet-catalog'
 import type { CharacterWealthViewModel } from '../../../lib/display/character-display'
-import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import {
+  hasCatalogPickerResetViewCriteria,
+  resolveCatalogPickerResultSummary,
+} from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
 import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
-import { CatalogToolbarResetAction } from '../../picker/catalog-toolbar-reset-action'
+import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { CharacterDetailEquipmentFilterControls } from './character-detail-equipment-filter-controls'
 import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
@@ -62,9 +68,7 @@ function EquipmentCatalogRow({ card }: { card: CharacterSheetEquipmentCard }) {
       toolbarAriaLabel={toolbarLabel}
       entity={{
         heading: header.name,
-        description: (
-          <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />
-        ),
+        description: <CatalogMetadataRenderer density="compact" lines={header.metadataLines} />,
         status:
           footerLabels.length > 0
             ? [{ kind: 'text', label: joinInlineMetadata(footerLabels), variant: 'muted' }]
@@ -188,8 +192,8 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                       <CatalogSortControl
                         value={sortMode}
                         label={CHARACTER_DETAIL_EQUIPMENT_SORT_LABEL}
-                        ariaLabel="Sort equipment"
-                        triggerAriaLabel="Equipment sort order"
+                        ariaLabel={EQUIPMENT_PICKER_SORT_GROUP_LABEL}
+                        triggerAriaLabel={EQUIPMENT_PICKER_SORT_ORDER_LABEL}
                         options={CHARACTER_DETAIL_EQUIPMENT_SORT_MODES.map((mode) =>
                           pickerSortOption(mode, CHARACTER_DETAIL_EQUIPMENT_SORT_LABELS[mode]),
                         )}
@@ -202,12 +206,15 @@ export function CharacterDetailEquipmentTab({ cards, wealth }: CharacterDetailEq
                 : undefined
             }
             actions={
-              showResetView ? (
-                <CatalogToolbarResetAction
-                  label={CHARACTER_DETAIL_EQUIPMENT_RESET_VIEW_LABEL}
-                  onClick={handleResetView}
-                />
-              ) : undefined
+              <CatalogToolbarResetSlot
+                visible={showResetView}
+                includesSort={showSort}
+                {...resolveCatalogPickerResultSummary({
+                  visible: visibleCards.length,
+                  total: cards.length,
+                })}
+                onClick={handleResetView}
+              />
             }
           />
           <CatalogCollapsibleList

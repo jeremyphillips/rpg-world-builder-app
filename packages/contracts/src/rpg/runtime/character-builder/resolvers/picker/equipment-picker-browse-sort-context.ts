@@ -4,16 +4,16 @@ import type { ActiveChoiceContext } from '../../recommendation'
 export type EquipmentPickerBrowseSortContext = {
   preferMartialWeaponBrowseOrder: boolean
   /**
-   * What the user is resolving. Omitted and `{ kind: 'none' }` are the general
-   * Add Equipment drawer: open pools and alternative packages do not lift rows.
+   * What the user is resolving. A `requirement` choice limits which requirement
+   * ids lift rows. Pool, package, and allowance choices do not reorder rows.
    */
   activeChoice?: ActiveChoiceContext
   /**
-   * Unsatisfied requirements that should lift matching candidates.
-   * Omitted treats every still-unsatisfied candidate requirement as active.
+   * Requirement ids that lift matching options. Omitted treats every requirement
+   * the row satisfies as active. Role does not matter.
    */
   activeRequirementIds?: ReadonlySet<string>
-  /** Gold-purchase lists rank `purchaseAvailability`. Other flows leave that fact unsorted. */
+  /** Gold-purchase lists rank rows that are not for sale. Remaining budget does not reorder. */
   rankPurchaseAvailability?: boolean
   /** When true, defined proficiency values order comparable rows. Omitted defaults to true. */
   rankCompatibility?: boolean

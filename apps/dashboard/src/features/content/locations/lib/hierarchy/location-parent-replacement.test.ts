@@ -215,6 +215,40 @@ describe('buildEligibleLocationParentReplacementCandidates', () => {
     expect(candidates.map((location) => location.id)).toEqual([HARBORFORD.id])
     expect(candidates.some((location) => location.id === park.id)).toBe(false)
   })
+
+  it('breaks duplicate parent names on stable id without mutating the catalog', () => {
+    const planeB = makeLocation({
+      kind: 'plane',
+      id: 'plane-b',
+      slug: 'plane-b',
+      name: 'Material Plane',
+    })
+    const planeA = makeLocation({
+      kind: 'plane',
+      id: 'plane-a',
+      slug: 'plane-a',
+      name: 'Material Plane',
+    })
+    const parentlessWorld = makeLocation({
+      kind: 'world',
+      id: 'world-1',
+      slug: 'world',
+      name: 'Aldermere',
+    })
+    const campaignLocations = [planeB, parentlessWorld, planeA]
+
+    const candidates = buildEligibleLocationParentReplacementCandidates({
+      subject: parentlessWorld,
+      campaignLocations,
+    })
+
+    expect(candidates.map((location) => location.id)).toEqual(['plane-a', 'plane-b'])
+    expect(campaignLocations.map((location) => location.id)).toEqual([
+      'plane-b',
+      'world-1',
+      'plane-a',
+    ])
+  })
 })
 
 describe('hasLocationParentReplacementContextMismatch', () => {

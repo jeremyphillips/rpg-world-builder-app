@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Link } from 'react-router-dom'
-import { Button, cn, buttonVariants } from '@rpg/ui'
+import { Button } from '@rpg/ui'
 
 import { PageChromeActionsProvider } from '@/components/layout/page-chrome/page-chrome-actions-provider'
+import { pageChromeOutlineActionClasses } from '@/components/layout/page-chrome/page-chrome-action.variants'
 import { useSetPageChromeActions } from '@/components/layout/page-chrome/use-set-page-chrome-actions'
 import { withDashboardProviders } from '../../../../.storybook/decorators'
 
@@ -11,10 +12,7 @@ import { detailPageHeaderClasses } from './detail-page-header.variants'
 
 function RegisteredEditAction() {
   useSetPageChromeActions(
-    <Link
-      to="/campaigns/demo/classes/fighter/edit"
-      className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
-    >
+    <Link to="/campaigns/demo/classes/fighter/edit" className={pageChromeOutlineActionClasses}>
       Edit
     </Link>,
   )
@@ -56,7 +54,7 @@ export const ChromeShell: Story = {
         Breadcrumb slot (route-driven)
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" density="compact">
           Edit
         </Button>
       </div>

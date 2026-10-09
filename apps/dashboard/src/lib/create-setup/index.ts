@@ -5,15 +5,14 @@ export {
   type CreateSetupShellProps,
 } from './create-setup-panel'
 
+export { CreateSetupFooter, type CreateSetupFooterProps } from './create-setup-footer'
 export {
-  CreateSetupFooter,
   deriveCreateSetupFooterState,
   resolveCreateSetupFooterActions,
   type CreateSetupFooterAction,
   type CreateSetupFooterActionVisibility,
-  type CreateSetupFooterProps,
   type CreateSetupFooterState,
-} from './create-setup-footer'
+} from './create-setup-footer.lib'
 
 export {
   CREATE_SETUP_DEFAULT_CHANGE_LABEL,

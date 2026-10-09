@@ -4,7 +4,7 @@ import { cn, InlineMetadata, Text } from '@rpg/ui'
 
 import { ROUTES } from '@/app/routes'
 
-import { useAdminUserRouteContext } from '../lib/admin-user-route-context'
+import { useAdminUserRouteContext } from '../lib/use-admin-user-route-context'
 
 function tabLinkClass(isActive: boolean) {
   return cn(

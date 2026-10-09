@@ -1,7 +1,9 @@
 import type { EquipmentPackageSwitchEvaluation } from '@rpg/contracts'
-import { Text } from '@rpg/ui'
+import { Text, cn } from '@rpg/ui'
 
 import {
+  PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL,
+  PACKAGE_SWITCH_BUDGET_CURRENT_PURCHASES_LABEL,
   formatPackageSwitchWealth,
   packageSwitchDraftHasEdits,
   resolvePackageSwitchBudgetStatusLabel,
@@ -9,6 +11,7 @@ import {
 import {
   equipmentPackageSwitchResolutionBudgetLabelClasses,
   equipmentPackageSwitchResolutionBudgetRowClasses,
+  equipmentPackageSwitchResolutionBudgetStatusRowClasses,
   equipmentPackageSwitchResolutionBudgetStatusVariants,
   equipmentPackageSwitchResolutionBudgetSummaryClasses,
   equipmentPackageSwitchResolutionBudgetSummaryTitleClasses,
@@ -19,13 +22,15 @@ function BudgetSummaryRow({
   label,
   value,
   valueClassName,
+  className,
 }: {
   label: string
   value: string
   valueClassName?: string
+  className?: string
 }) {
   return (
-    <div className={equipmentPackageSwitchResolutionBudgetRowClasses}>
+    <div className={cn(equipmentPackageSwitchResolutionBudgetRowClasses, className)}>
       <Text as="span" className={equipmentPackageSwitchResolutionBudgetLabelClasses}>
         {label}
       </Text>
@@ -66,13 +71,13 @@ export function PackageSwitchBudgetSummary({
       </Text>
       <div className="space-y-2">
         <BudgetSummaryRow
-          label={hasDraftEdits ? 'Draft purchased total' : 'Current purchased total'}
+          label={PACKAGE_SWITCH_BUDGET_CURRENT_PURCHASES_LABEL}
           value={formatPackageSwitchWealth(
             hasDraftEdits ? budget.draftTotalCostCp : budget.totalRetainedCostCp,
           )}
         />
         <BudgetSummaryRow
-          label="Allowed after switch"
+          label={PACKAGE_SWITCH_BUDGET_AVAILABLE_LABEL}
           value={formatPackageSwitchWealth(budget.targetAllowanceCp)}
         />
         {budget.nonEditableRetainedCostCp > 0 ? (
@@ -87,6 +92,7 @@ export function PackageSwitchBudgetSummary({
           valueClassName={equipmentPackageSwitchResolutionBudgetStatusVariants({
             tone: status.tone,
           })}
+          className={equipmentPackageSwitchResolutionBudgetStatusRowClasses}
         />
       </div>
     </section>

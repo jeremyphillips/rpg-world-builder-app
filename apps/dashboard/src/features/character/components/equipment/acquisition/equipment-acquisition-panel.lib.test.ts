@@ -5,8 +5,8 @@ import {
   formatAcquisitionCommitLabel,
   formatAcquisitionCommitSuccessAnnouncement,
   formatAcquisitionCommitSuccessButtonLabel,
-  formatOwnedPurchaseQuantityLabel,
-  formatTotalPurchaseSpendFromSnapshots,
+  formatPurchaseContributionLabel,
+  formatPurchaseSpend,
 } from './equipment-acquisition-panel.lib'
 import {
   createEquipmentStepContextWithMagicItemGrantsFixture,
@@ -77,7 +77,7 @@ describe('equipment-acquisition-panel.lib', () => {
 
   it('formats owned purchase quantity labels from snapshots', () => {
     expect(
-      formatOwnedPurchaseQuantityLabel({
+      formatPurchaseContributionLabel({
         quantity: 1,
         unitCostCp: 5000,
       }),
@@ -88,9 +88,7 @@ describe('equipment-acquisition-panel.lib', () => {
   })
 
   it('sums snapshot-based GP spent labels', () => {
-    expect(formatTotalPurchaseSpendFromSnapshots([{ quantity: 15, unitCostCp: 5000 }])).toBe(
-      '750 GP spent',
-    )
+    expect(formatPurchaseSpend([{ quantity: 15, unitCostCp: 5000 }])).toBe('750 GP spent')
   })
 
   it('formats commit success button and announcement labels', () => {
@@ -158,5 +156,58 @@ describe('equipment-acquisition-panel.lib', () => {
     })
 
     expect(mixedViewModel.nextAction.previewLines).toEqual(['Common choice · 1 copy for 50 GP'])
+    expect(mixedViewModel.nextAction.quantityDisabled).toBe(false)
+    expect(mixedViewModel.nextAction.maxQuantity).toBeGreaterThan(0)
+    expect(mixedViewModel.nextAction.maxQuantity).toBeLessThan(99)
+  })
+
+  it('disables the quantity stepper when no additional copy can be committed', () => {
+    const allowanceId = buildMagicItemAllowanceId({
+      startingWealthTableId: standardStartingWealthTableId('srd-cc-5.2.1'),
+      tierId: 'hero',
+      rarity: 'common',
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: equipmentStepMonkClassFixture.id, level: 1 as const },
+      choiceSelections: {
+        [startingEquipmentChoiceSetId(equipmentStepMonkClassFixture.id)]: ['starting-gold'],
+      },
+      equipment: {
+        mode: 'gold' as const,
+        purchases: [
+          {
+            id: 'spent-gold',
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+            unitCostCp: 9_999_999,
+          },
+        ],
+        magicItemSelections: [
+          {
+            allowanceId,
+            equipmentId: equipmentStepPotionOfHealingFixture.id,
+            quantity: 10,
+          },
+        ],
+        editedSincePackageSelection: false,
+      },
+    }
+
+    const viewModel = buildEquipmentAcquisitionPanelViewModel({
+      draft,
+      context: createEquipmentStepContextWithMagicItemGrantsFixture(),
+      catalogIndex: equipmentStepCatalogIndexFixture,
+      equipment: equipmentStepPotionOfHealingFixture,
+      rows: [],
+      requestedQuantity: 1,
+    })
+
+    expect(viewModel.nextAction.showQuantity).toBe(true)
+    expect(viewModel.nextAction.quantityDisabled).toBe(true)
+    expect(viewModel.nextAction.disabled).toBe(true)
+    expect(viewModel.nextAction.maxQuantity).toBe(1)
   })
 })

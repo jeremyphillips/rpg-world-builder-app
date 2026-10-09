@@ -1,31 +1,14 @@
-export const equipmentInventorySummaryClasses = 'space-y-6'
+/** One bordered inventory card. Section inset is owned by the equipment feature. */
+export const equipmentInventoryPanelClasses = 'overflow-hidden rounded-lg border border-border'
 
-export const equipmentInventorySummaryGridClasses =
-  'grid grid-cols-1 gap-6 xl:grid-cols-2 xl:items-start'
+export const equipmentInventorySectionClasses = 'space-y-3 px-4 py-4'
 
-export const equipmentInventoryColumnClasses = 'flex min-w-0 flex-col space-y-3'
+export const equipmentInventorySectionHeaderClasses = 'flex flex-wrap items-center gap-2'
 
-export const equipmentInventoryColumnHeaderClasses = 'space-y-1'
+export const equipmentInventoryPanelDividerClasses = 'border-t border-border'
 
-export const equipmentInventoryColumnTitleRowClasses =
-  'flex flex-wrap items-center justify-between gap-2'
-
-/** Inventory column title — 19px (`heading-style-subsection`). */
-export const EQUIPMENT_INVENTORY_COLUMN_TITLE_VARIANT = 'subsection' as const
-
-/** Matches toolbar row height so purchased column boxes align in the two-column grid. */
-export const equipmentInventoryColumnToolbarClasses = 'flex min-h-5 flex-wrap items-center gap-x-1'
-
-export const equipmentInventoryColumnToolbarSpacerClasses = 'min-h-5'
-
-export const equipmentGoldOptionPanelClasses =
-  'space-y-2 rounded-lg border border-border px-4 py-12 text-center'
-
-export const equipmentInventoryColumnToolbarSeparatorClasses = 'text-muted-foreground'
-
-export const equipmentInventorySummaryGroupClasses = 'space-y-1'
-
-export const equipmentInventorySummaryListClasses = ''
+/** Inventory section title — 19px (`heading-style-subsection`). */
+export const EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT = 'subsection' as const
 
 export const equipmentPurchasedInventoryCategoryListClasses =
   'divide-y divide-border overflow-visible'
@@ -39,4 +22,5 @@ export const equipmentInventoryRowQuantityClasses = 'flex items-center gap-1.5'
 
 export const equipmentInventoryRowActionsClasses = 'flex shrink-0 items-center'
 
-export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-xs tabular-nums text-foreground'
+/** Read-only quantity — 14px, matching the trailing price label. */
+export const equipmentInventoryRowQtyLabelClasses = 'shrink-0 text-sm tabular-nums text-foreground'

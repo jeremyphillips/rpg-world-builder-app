@@ -3,10 +3,10 @@ import type {
   BuilderFactSummaryRow,
   GrantedProficiencySummaryRow,
 } from '@rpg/contracts'
-import { cn, Heading, IconContainer } from '@rpg/ui'
+import { joinInlineMetadata } from '@rpg/contracts/primitives'
+import { Heading, IconContainer } from '@rpg/ui'
 import type { LucideIcon } from 'lucide-react'
 
-import { joinInlineMetadata } from '@rpg/contracts/primitives'
 import {
   builderFactSummaryCategoryLabelClasses,
   builderFactSummaryClasses,
@@ -26,10 +26,6 @@ import {
   builderFactSummarySimpleRowClasses,
   builderFactSummarySimpleValueClasses,
   builderFactSummarySubheadClasses,
-  builderFactSummarySourceGroupClasses,
-  builderFactSummarySourceGroupsClasses,
-  builderFactSummarySourceLabelClasses,
-  builderFactSummaryStackedSourceGroupClasses,
   builderFactSummaryValueLabelsClasses,
 } from './builder-fact-summary.variants'
 
@@ -46,8 +42,6 @@ export type BuilderFactSummaryGrantedProps = {
   subhead?: string
   grantedRows: readonly GrantedProficiencySummaryRow[]
   showSourceColumn: true
-  sourceWidthStyle?: React.CSSProperties
-  measureSlot?: React.ReactNode
   categoryIcons: Record<GrantedProficiencySummaryRow['kind'], LucideIcon>
 }
 
@@ -145,23 +139,28 @@ function SimpleFactSummary({ heading, subhead, rows, rowIcons }: BuilderFactSumm
   )
 }
 
+function grantedRowDisplay(row: GrantedProficiencySummaryRow): {
+  value?: string
+  unsetText?: string
+} {
+  const valueLabels = row.sourceGroups.flatMap((group) => group.valueLabels)
+  if (valueLabels.length > 0) {
+    return { value: joinInlineMetadata(valueLabels) }
+  }
+
+  return { unsetText: row.sourceGroups.find((group) => group.unsetText)?.unsetText }
+}
+
 function GrantedFactSummary({
   heading,
   subhead,
   grantedRows,
-  sourceWidthStyle,
-  measureSlot,
   categoryIcons,
 }: BuilderFactSummaryGrantedProps) {
   if (grantedRows.length === 0) return null
 
   return (
-    <section
-      aria-labelledby="builder-fact-summary-heading"
-      className={builderFactSummaryClasses}
-      style={sourceWidthStyle}
-    >
-      {measureSlot}
+    <section aria-labelledby="builder-fact-summary-heading" className={builderFactSummaryClasses}>
       <div className={builderFactSummaryHeaderClasses}>
         <Heading variant="subsection" as="h3" id="builder-fact-summary-heading">
           {heading}
@@ -174,7 +173,7 @@ function GrantedFactSummary({
       <div className={builderFactSummaryGrantedRowsClasses}>
         {grantedRows.map((row, index) => {
           const Icon = categoryIcons[row.kind]
-          const hasMultipleSourceGroups = row.sourceGroups.length > 1
+          const display = grantedRowDisplay(row)
 
           return (
             <div key={row.kind}>
@@ -183,31 +182,12 @@ function GrantedFactSummary({
                   <Icon aria-hidden />
                 </IconContainer>
                 <p className={builderFactSummaryCategoryLabelClasses}>{row.label}</p>
-                <div className={builderFactSummarySourceGroupsClasses}>
-                  {row.sourceGroups.map((sourceGroup) => (
-                    <div
-                      key={`${row.kind}:${sourceGroup.sourceLabel}`}
-                      className={cn(
-                        builderFactSummarySourceGroupClasses,
-                        hasMultipleSourceGroups && builderFactSummaryStackedSourceGroupClasses,
-                      )}
-                    >
-                      <FactSummaryValue
-                        value={
-                          sourceGroup.valueLabels.length > 0
-                            ? joinInlineMetadata(sourceGroup.valueLabels)
-                            : undefined
-                        }
-                        unsetText={sourceGroup.unsetText}
-                        setValueClassName={builderFactSummaryValueLabelsClasses}
-                        unsetValueClassName={builderFactSummaryUnsetValueClasses}
-                      />
-                      <p className={builderFactSummarySourceLabelClasses}>
-                        {sourceGroup.sourceLabel}
-                      </p>
-                    </div>
-                  ))}
-                </div>
+                <FactSummaryValue
+                  value={display.value}
+                  unsetText={display.unsetText}
+                  setValueClassName={builderFactSummaryValueLabelsClasses}
+                  unsetValueClassName={builderFactSummaryUnsetValueClasses}
+                />
               </div>
               {index < grantedRows.length - 1 ? (
                 <div

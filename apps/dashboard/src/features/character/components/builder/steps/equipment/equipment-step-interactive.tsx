@@ -11,6 +11,7 @@ import { showsBuilderStepReviewMessage } from '../../../../lib/builder/builder-s
 import { EquipmentAcquisitionGuidance } from '../../../equipment/acquisition/equipment-acquisition-guidance'
 import { EquipmentPackageSwitchResolutionModal } from './package-switch/equipment-package-switch-resolution-modal'
 import { EquipmentPickerDrawer } from '../../../equipment/picker/drawer/equipment-picker-drawer'
+import { EquipmentSelectionFactsProvider } from '../../../equipment/selection-facts/equipment-selection-facts-provider'
 import { StartingEquipmentOptionSection } from '../../../equipment/starting-package/starting-equipment-option-section'
 import { equipmentStepSwitchConfirmHeadlineClasses } from './equipment-step-interactive.variants'
 import {
@@ -88,7 +89,6 @@ export function EquipmentStepInteractive({
     budget,
     pickerBrowseSortContext,
     characterPreviewContext,
-    ownedPurchaseQuantities,
     pendingSelection,
     setPendingSelection,
     pendingPackageSwitch,
@@ -101,8 +101,6 @@ export function EquipmentStepInteractive({
     setPickerOpen,
     handleAddItem,
     handleSetPurchaseQuantity,
-    handleRemoveFromInventory,
-    handleRemoveOneFromInventory,
     applySelection,
     onRemoveItem,
   } = step
@@ -120,9 +118,9 @@ export function EquipmentStepInteractive({
   })
 
   const showAcquisitionGuidance =
-    selectedOptionId !== undefined &&
     !showFallback &&
-    (step.showPurchaseWorkflow || step.showMagicItemGrants)
+    (step.fundingState.kind === 'unresolved' ||
+      (selectedOptionId !== undefined && (step.showPurchaseWorkflow || step.showMagicItemGrants)))
 
   const inventoryEmptyMessage = resolveEquipmentInventoryEmptyMessage({
     classOptionsReplaced: step.classOptionsReplaced,
@@ -133,7 +131,7 @@ export function EquipmentStepInteractive({
   })
 
   return (
-    <>
+    <EquipmentSelectionFactsProvider facts={step.selectionFacts}>
       <div className="space-y-8">
         {showsBuilderStepReviewMessage(readiness) ? (
           <BuilderStepReadinessPanel state={readiness} />
@@ -144,9 +142,10 @@ export function EquipmentStepInteractive({
         {showAcquisitionGuidance ? (
           <EquipmentAcquisitionGuidance
             showPurchaseWorkflow={step.showPurchaseWorkflow}
-            budget={budget}
+            fundingState={step.fundingState}
             onOpenPurchasePicker={() => step.openPicker('purchase')}
             showMagicItemGrants={step.showMagicItemGrants}
+            magicItemAllowances={step.acquisition.allowances}
             magicItemProgress={step.acquisition.progress}
             onOpenMagicItemsPicker={() => step.openPicker('magic_items')}
           />
@@ -184,27 +183,24 @@ export function EquipmentStepInteractive({
         onOpenChange={setPickerOpen}
         items={step.pickerItems}
         browseSortContext={pickerBrowseSortContext}
-        budget={step.pickerWorkflowMode === 'purchase' ? budget : undefined}
+        budget={budget}
         showCharacterPreview
         characterPreviewContext={characterPreviewContext}
-        ownedPurchaseQuantities={ownedPurchaseQuantities}
-        ownedGrantQuantities={step.ownedGrantQuantities}
+        ownership={pickerAcquisition.ownership}
         workflowMode={step.pickerWorkflowMode}
         workflowModes={step.pickerWorkflowModes}
         onWorkflowModeChange={step.setPickerWorkflowMode}
         magicItemGrantProgress={step.showMagicItemGrants ? step.acquisition.progress : undefined}
+        magicItemAllowances={step.showMagicItemGrants ? step.acquisition.allowances : undefined}
         focusedAllowanceId={step.focusedAllowanceId}
         onFocusedAllowanceIdChange={step.setFocusedAllowanceId}
+        matchesMagicItemAllowance={step.matchesMagicItemAllowance}
         isGoldShoppingPath={showShopping}
         resolveRowActionViewModel={pickerAcquisition.resolveRowActionViewModel}
-        resolveGrantManageSources={pickerAcquisition.resolveGrantManageSources}
-        grantAcquisitionContext={{ draft, context: step.context, catalogIndex }}
         onCommitAdd={pickerAcquisition.handleCommitAdd}
-        onApplyMagicItemAcquisition={pickerAcquisition.handleApplyMagicItemAcquisition}
-        onReleaseGrant={pickerAcquisition.handleReleaseGrant}
-        onRemovePurchase={pickerAcquisition.handleRemovePurchase}
-        onRemoveFromInventory={handleRemoveFromInventory}
-        onRemoveOneFromInventory={handleRemoveOneFromInventory}
+        onSetPurchasedQuantity={pickerAcquisition.handleSetPurchasedQuantity}
+        onReleaseChoice={pickerAcquisition.handleReleaseChoice}
+        onRemovePurchaseOne={pickerAcquisition.handleRemovePurchaseOne}
       />
 
       <ConfirmDialog
@@ -229,11 +225,16 @@ export function EquipmentStepInteractive({
         <EquipmentPackageSwitchResolutionModal
           open
           catalogIndex={catalogIndex}
+          draft={draft}
+          context={step.context}
+          choiceSets={step.resolvedChoiceSets}
           evaluation={packageSwitchEvaluation}
+          nestedSelections={pendingPackageSwitch.nestedSelections}
           draftQuantitiesByPurchaseId={pendingPackageSwitch.draftQuantitiesByPurchaseId}
           commitErrorReason={pendingPackageSwitch.commitErrorReason}
           staleNotice={pendingPackageSwitch.staleNotice}
           isCommitting={isPackageSwitchCommitting}
+          isInitialSelection={pendingPackageSwitch.isInitialSelection}
           onOpenChange={(open) => {
             if (!open) dismissPackageSwitch()
           }}
@@ -241,6 +242,6 @@ export function EquipmentStepInteractive({
           onConfirm={handleCommitPackageSwitch}
         />
       ) : null}
-    </>
+    </EquipmentSelectionFactsProvider>
   )
 }

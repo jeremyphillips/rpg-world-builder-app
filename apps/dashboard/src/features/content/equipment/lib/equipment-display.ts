@@ -57,7 +57,7 @@ export type EquipmentDetailViewModel = {
 
 const NO_MARKET_PRICE_LABEL = 'No market price'
 
-function formatEquipmentCostDisplay(cost: Equipment['cost']): string {
+function formatEquipmentCostOrUnavailableLabel(cost: Equipment['cost']): string {
   return formatEquipmentCostLabel(cost) ?? NO_MARKET_PRICE_LABEL
 }
 
@@ -78,7 +78,7 @@ function buildEquipmentStatRows(
   rows.push({
     id: EQUIPMENT_STAT_ROW_IDS.cost,
     label: EQUIPMENT_STAT_LABELS.cost,
-    value: formatEquipmentCostDisplay(equipment.cost),
+    value: formatEquipmentCostOrUnavailableLabel(equipment.cost),
   })
 
   rows.push(...getEquipmentKindStatRows(equipment))

@@ -138,6 +138,7 @@ function builderContext(catalogIndex: ReturnType<typeof indexCharacterBuildCatal
   return resolveEquipmentAcquisitionBuilderContext({
     context: {
       rulesetId: RULESET,
+      characterKind: 'pc',
       characterCreationRules: { startingWealth },
       catalog: { equipment: [commonPotion, rareAmulet, rope] },
     },
@@ -182,9 +183,11 @@ describe('magic item acquisition contracts', () => {
     const allowances = resolveMagicItemGrantAllowances({
       startingWealthTableId: TABLE_ID,
       tier: startingWealth.tiers[0]!,
+      requirement: 'exact',
     })
 
     expect(allowances).toHaveLength(1)
+    expect(allowances[0]!.requirement).toBe('exact')
     expect(allowances[0]!.id).toBe(
       buildMagicItemAllowanceId({
         startingWealthTableId: TABLE_ID,
@@ -192,6 +195,60 @@ describe('magic item acquisition contracts', () => {
         rarity: 'common',
       }),
     )
+  })
+
+  it('copies the requirement argument onto allowances', () => {
+    const tier = startingWealth.tiers[0]!
+    const exact = resolveMagicItemGrantAllowances({
+      startingWealthTableId: TABLE_ID,
+      tier,
+      requirement: 'exact',
+    })
+    const upTo = resolveMagicItemGrantAllowances({
+      startingWealthTableId: TABLE_ID,
+      tier,
+      requirement: 'up_to',
+    })
+
+    expect(exact[0]!.requirement).toBe('exact')
+    expect(upTo[0]!.requirement).toBe('up_to')
+    expect(exact[0]!.id).toBe(upTo[0]!.id)
+  })
+
+  it('stores PC and NPC magic-item requirements from kind policy', () => {
+    const catalogIndex = indexCharacterBuildCatalog({
+      species: [],
+      classes: [fighterClass],
+      spells: [],
+      equipment: [commonPotion],
+      skillProficiencies: [],
+      organizations: [],
+      languages: [],
+    })
+
+    const pc = resolveEquipmentAcquisitionBuilderContext({
+      context: {
+        rulesetId: RULESET,
+        characterKind: 'pc',
+        characterCreationRules: { startingWealth },
+        catalog: { equipment: [commonPotion] },
+      },
+      catalogIndex,
+      startingWealthTableId: TABLE_ID,
+    })
+    const npc = resolveEquipmentAcquisitionBuilderContext({
+      context: {
+        rulesetId: RULESET,
+        characterKind: 'npc',
+        characterCreationRules: { startingWealth },
+        catalog: { equipment: [commonPotion] },
+      },
+      catalogIndex,
+      startingWealthTableId: TABLE_ID,
+    })
+
+    expect(pc.magicItemRequirement).toBe('exact')
+    expect(npc.magicItemRequirement).toBe('up_to')
   })
 
   it('treats null-cost equipment as unavailable, not unaffordable', () => {
@@ -258,7 +315,12 @@ describe('magic item acquisition contracts', () => {
       equipment: {
         ...draftWithGoldOption().equipment!,
         purchases: [
-          { equipmentId: commonPotion.id, quantity: 1, sourceMode: 'startingGold' as const },
+          {
+            equipmentId: commonPotion.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
         ],
       },
     }
@@ -418,6 +480,7 @@ describe('magic item acquisition contracts', () => {
       allowances: resolveMagicItemGrantAllowances({
         startingWealthTableId: TABLE_ID,
         tier: startingWealth.tiers[0]!,
+        requirement: 'exact',
       }),
       catalogEquipment: new Map([
         [commonPotion.id, commonPotion],
@@ -490,6 +553,7 @@ describe('magic item acquisition contracts', () => {
     const allowances = resolveMagicItemGrantAllowances({
       startingWealthTableId: TABLE_ID,
       tier: startingWealth.tiers[0]!,
+      requirement: 'exact',
     })
 
     const readiness = resolveMagicItemGrantReadiness({
@@ -575,6 +639,7 @@ describe('magic item acquisition contracts', () => {
     const context = resolveEquipmentAcquisitionBuilderContext({
       context: {
         rulesetId: RULESET,
+        characterKind: 'pc',
         characterCreationRules: { startingWealth: rareWealth },
         catalog: { equipment: [rareAmulet] },
       },
@@ -623,6 +688,7 @@ describe('magic item acquisition contracts', () => {
     expect(state).toEqual({
       kind: 'purchase',
       availability: { status: 'unavailableForPurchase', reason: 'no_market_price' },
+      magicItemAcquiredCopyCap: { max: 1, used: 0 },
     })
   })
 
@@ -658,7 +724,14 @@ describe('magic item acquisition contracts', () => {
       ...draftWithGoldOption(),
       equipment: {
         ...draftWithGoldOption().equipment!,
-        purchases: [{ equipmentId: goldSink.id, quantity: 1, sourceMode: 'startingGold' as const }],
+        purchases: [
+          {
+            equipmentId: goldSink.id,
+            quantity: 1,
+            sourceMode: 'startingGold' as const,
+            origin: 'picker' as const,
+          },
+        ],
         magicItemSelections: [],
       },
     }
@@ -701,6 +774,7 @@ describe('magic item acquisition contracts', () => {
     const context = resolveEquipmentAcquisitionBuilderContext({
       context: {
         rulesetId: RULESET,
+        characterKind: 'pc',
         characterCreationRules: { startingWealth: rareWealth },
         catalog: { equipment: [rareAmulet] },
       },

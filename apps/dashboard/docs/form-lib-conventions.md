@@ -207,6 +207,16 @@ and `numeric-select-form-schema.lib.ts` (differential sweep in
 `content-form-validation.test.ts`). UI stays string-emitting — see
 [`packages/ui/docs/forms.md`](../../../packages/ui/docs/forms.md).
 
+**Form-only switches over a generic stored map (armor ability minimums):** armor
+stores `abilityScoreRequirements` (`{ str: 15 }`). The form shows a
+`Minimum Strength requirement` switch (`hasMinimumStrengthRequirement`, never persisted) as a
+`dependent` controller over the `abilityScoreRequirements.str` number field. Both come from
+`minimumAbilityScoreRequirementField({ ability, switchName })` in `armor-form-fields.ts`, and the
+schema fields are shared from `armor-ability-score-requirements-form.ts`.
+`armor-form-values.ts` derives the switch from the stored map on load. On submit it drops
+`str` when the switch is off and omits the map when it is empty. To author another ability,
+add another switch and field pair from the same helper. No schema change is needed.
+
 **Draft vs publish presentation (content forms with preview):** Save draft uses the
 generic FormUi `hasAttemptedSubmit` for persist-unsafe field errors only. Publish
 uses content-form `hasAttemptedPublish` plus live publish-schema issues for tab

@@ -151,7 +151,7 @@ describe('equipment package conversion integration', () => {
     const daggerRow = rows.find((row) => row.entry.equipmentId === equipmentStepDaggerFixture.id)
     const torchRow = rows.find((row) => row.entry.equipmentId === torchFixture.id)
 
-    expect(viewModel.startingEquipment.kind).toBe('gold_option')
+    expect(viewModel.layout === 'split' && viewModel.startingEquipment.kind).toBe('gold_option')
     expect(daggerRow?.entry.quantity).toBe(5)
     expect(daggerRow?.quantityMode).toBe('editable')
     expect(daggerRow?.removeTarget).toEqual(
@@ -201,7 +201,6 @@ describe('equipment package conversion integration', () => {
       action: {
         kind: 'add_purchase',
         equipmentId: equipmentStepDaggerFixture.id,
-        sourceMode: 'startingGold',
       },
     })
     if (addMoreDaggers.status === 'applied') {

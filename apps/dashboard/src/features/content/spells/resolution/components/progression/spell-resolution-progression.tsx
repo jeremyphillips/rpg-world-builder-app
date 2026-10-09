@@ -26,10 +26,7 @@ import {
   type ProgressionPresetId,
 } from '../../lib/form/resolution-progression-presets.lib'
 import type { ProgressionTrackFormItem } from '../../lib/form/resolution-progression-form-schema'
-import {
-  deriveProgressionBasis,
-  progressionFromForm,
-} from '../../lib/form/resolution-progression-values'
+import { deriveProgressionBasis } from '../../lib/form/resolution-progression-values'
 import { RESOLUTION_SECTION_LABELS } from '../../lib/form/resolution-form-labels'
 import type { ResolutionFormValues } from '../../lib/form/resolution-form-schema'
 import { resolutionToStored, RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
@@ -337,10 +334,4 @@ export function SpellResolutionProgression() {
       )}
     </div>
   )
-}
-
-export function readStoredProgressionFromForm(
-  resolutionForm: ResolutionFormValues | undefined,
-): ReturnType<typeof progressionFromForm> {
-  return progressionFromForm(resolutionForm?.progressionBasis, resolutionForm?.progressionTracks)
 }

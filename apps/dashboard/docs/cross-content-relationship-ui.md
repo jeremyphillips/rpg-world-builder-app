@@ -44,13 +44,13 @@ Compact list presentation — no card border/background on relationship rows. Ro
 
 Detail and relationship rows compose **`EntityAnatomyHost`** (via `DetailEntityRow` or embedded `EntityAnatomy`) using the shared **`EntitySummaryModel`** vocabulary:
 
-| Row / drawer prop  | Entity summary field          | Notes                                                                                   |
-| ------------------ | ----------------------------- | --------------------------------------------------------------------------------------- |
-| `heading`          | `heading`                     | Entity name                                                                             |
+| Row / drawer prop  | Entity summary field          | Notes                                                                                    |
+| ------------------ | ----------------------------- | ---------------------------------------------------------------------------------------- |
+| `heading`          | `heading`                     | Entity name                                                                              |
 | `classification`   | `classification`              | Inline muted kind/context after the title (separator-free; `InlineMetadata` renders `·`) |
-| `headingAccessory` | (composed into inline suffix) | Membership titles, roles, and other compact qualifiers — distinct from `classification` |
-| `description`      | `description`                 | Second-line disambiguation (e.g. Located in …)                                          |
-| `status`           | `status`                      | Trailing metadata such as availability badges                                           |
+| `headingAccessory` | (composed into inline suffix) | Membership titles, roles, and other compact qualifiers — distinct from `classification`  |
+| `description`      | `description`                 | Second-line disambiguation (e.g. Located in …)                                           |
+| `status`           | `status`                      | Trailing metadata such as availability badges                                            |
 
 `EntityRowList.Row` maps these props onto `DetailEntityRow` / `EntitySummaryModel`. Navigation (`headingHref`) stays on the surface, not the model.
 
@@ -310,6 +310,16 @@ Structural impossibility (e.g. single-kind families with no registry alternates)
 | `SelectionSummaryCard`                                       | Completed decision row within sequenced Add drawers and create-modal setup                                         |
 | Embedded `ContentEntityCard` + selection actions             | Entity picker rows in drawers                                                                                      |
 
+### Picker order and search
+
+Browse order is name, then stable id, through `comparePickerName`. The id is a hidden tie-break, not a Best match key.
+
+Location rows search name, classification, and ancestors. Rows with a precomputed summary use `buildLocationEntitySummarySearchText`. Other rows use `buildLocationPickerSearchText`, which needs the full location map.
+
+`ConnectionEntityPicker` uses the forgiving search engine. Its inclusion is a superset of the old substring match.
+
+Kind and depth ranking stays parked until a workflow shows that name, search, and filters routinely fail.
+
 When a per-kind add action resolves intent before open, **do not** show a kind picker in the drawer.
 
 When a **family-level** add action must choose among semantically meaningful kinds, sequenced Add drawers use **`LocationConnectionKindField`** for the active kind decision and **`SelectionSummaryCard`** for the completed kind row. While the user reopens kind (Change), hide downstream controls (subject type, entity picker, search) **and** the persistence footer — do not disable them. Kind change clears only downstream selections that are ineligible under the new kind; preserve still-valid subject type and entity selections.
@@ -558,7 +568,7 @@ Organization forward target pickers use optional `targetPresentation` config and
 
 **Browse scope rule (organization forward):** configured scopes remain visible for semantic stability. A scope is disabled when the post-eligibility candidate set contains zero locations for that scope. Scope availability is never derived from the active search query. Browse scopes organize display only — they never substitute for `@rpg/contracts` eligibility.
 
-**Browse scope rule (location parent replacement):** parent drawer scopes are derived from the **eligible candidate universe** only — `All` plus one segment per browse family present in candidates. Do not render families with zero candidates as disabled stubs. Hide segmentation entirely when ≤1 family is present. Search text is preserved on scope change. Location kind families live in neutral [`location-kind-browse-families.ts`](../src/features/content/locations/lib/location-kind-browse-families.ts) (authoring type select + parent browse scope filtering).
+**Location kind family:** `createLocationRelationshipFilterSchema` renders Location type chips for the browse families present on the current rows. The field is hidden when only one family is present. Type is the dependent select: its options narrow to the chosen family, and `sanitizeState` drops a type outside that family. Organization location drawers pass `targetPresentation.browseScopes` as the family list (Settlements and Regions). This field replaces the parent-replacement and org-location browse-scope segmented controls, so Reset and the result summary include the scope. Location kind families live in [`location-kind-browse-families.ts`](../src/features/content/locations/lib/location-kind-browse-families.ts).
 
 Use **direction-aware resolvers** in feature copy modules (for example [`location-connection-surface-copy.ts`](../src/features/content/locations/lib/connected-parties/location-connection-surface-copy.ts) for location inverse and [`organization-location-connection-surface-copy.ts`](../src/features/content/organizations/lib/location-connections/organization-location-connection-surface-copy.ts) for organization forward). Do not reuse one empty/add label for Location inverse and Organization forward.
 
@@ -590,7 +600,7 @@ Location parent/child editing is **not** a typed-edge relationship. Contained lo
 
 **Authority invariant:** breadcrumb ancestry is presentation only. Drawers resolve **Current parent** and submit targets from the subject’s persisted `parentLocationId` (looked up in the campaign locations list). Move must not treat the open parent detail id as Current when it disagrees with that field — refresh/block instead.
 
-**Parent replacement chrome:** `EntityReplacementSection` with `entityLabel="Parent"` renders **Current parent** / **New parent** labels. Task-oriented helper copy varies by surface (Move / Change / Set). Candidate browse scopes filter the eligible set before search — eligibility always runs first.
+**Parent replacement chrome:** `EntityReplacementSection` with `entityLabel="Parent"` renders **Current parent** / **New parent** labels. Task-oriented helper copy varies by surface (Move / Change / Set). Kind family and Type filter the eligible set — eligibility always runs first.
 
 **Shared Current→New chrome** lives in [`entity/surfaces/drawer/replacement/`](../src/features/content/lib/entity/surfaces/drawer/replacement/) (`EntityReplacementSection`, current field, replacement labels). Compact drawer entity identity uses [`DrawerEntityBlock`](../src/features/content/lib/entity/surfaces/drawer/drawer-entity-block.tsx). Relationship drawers (org forward change-target, location inverse replace-organization) **consume** those layers. Hierarchy must **not** depend on relationship-owned Current/New modules. Eligibility, cycle prevention, and candidates stay domain-owned (`validateLocationParentAssignment` + location-feature helpers). After parent mutation, invalidate/refetch the campaign locations list — do not hand-patch ancestry/children projections.
 

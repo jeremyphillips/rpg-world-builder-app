@@ -25,6 +25,7 @@ export const BudgetHeader: Story = {
 export const WarningNote: Story = {
   args: {
     primary: '75 GP needed',
+    primaryTone: 'warning',
     secondary: '40 GP remaining',
     secondaryTone: 'disabled',
   },

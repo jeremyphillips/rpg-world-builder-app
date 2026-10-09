@@ -13,6 +13,7 @@ import {
   invalidateCharacterRelationshipQueries,
   listCharacterRelationships,
   updateCharacterRelationship,
+  createCharacterClassFilterLabelResolver,
   useCampaignNpcBuildContext,
   useNpcs,
   type CharacterRelationshipSubjectKind,
@@ -319,6 +320,10 @@ export function useOrganizationMembersDetail(
     }),
     [campaignId, npcBuildContext, npcBuildContextIsError, npcBuildContextUnavailable],
   )
+  const resolveClassLabel = React.useMemo(
+    () => createCharacterClassFilterLabelResolver(catalogIndex),
+    [catalogIndex],
+  )
 
   return {
     canManage,
@@ -327,6 +332,7 @@ export function useOrganizationMembersDetail(
     membersQuery,
     candidates,
     candidatesPending,
+    resolveClassLabel,
     drawerState,
     editingRow,
     removingRow: drawerState?.mode === 'remove' ? drawerState.row : null,

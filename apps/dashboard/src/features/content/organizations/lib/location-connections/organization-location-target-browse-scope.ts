@@ -67,6 +67,18 @@ export function resolveEffectiveTargetBrowseScope(
 }
 
 /** Configured scopes stay visible; disable scopes with zero post-eligibility candidates. */
+export function resolveTargetBrowseScopeKindFamilies(
+  scopes: readonly OrganizationLocationTargetBrowseScope[],
+): { id: string; label: string; matchesKind: (kind: string) => boolean }[] {
+  return scopes
+    .filter((scope) => scope !== 'all')
+    .map((scope) => ({
+      id: scope,
+      label: BROWSE_SCOPE_LABELS[scope],
+      matchesKind: (kind: string) => locationMatchesTargetBrowseScope({ kind } as Location, scope),
+    }))
+}
+
 export function resolveTargetBrowseScopeOptions(
   scopes: readonly OrganizationLocationTargetBrowseScope[],
   eligibleLocations: readonly Location[],

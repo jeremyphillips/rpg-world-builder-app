@@ -34,6 +34,16 @@ Projectors in `@rpg/contracts` expose **field helpers** (for example
 `getEquipmentSearchName`). Surfaces assemble documents locally unless multiple
 apps share the exact same picker intent.
 
+Picker documents follow one shape:
+
+- `name` (or the row label) is `primary`.
+- Each structured, user-facing value gets its own `keyword` field: one school, one tag, one classification term. A joined keyword field would score every value as a substring.
+- `description`, when the surface has one, is `secondary`.
+- `combined` is `secondary`. It is the joined text the surface used to match, and it only matters when no higher field matched. Phrases that span fields stay findable there.
+- Implementation identifiers (slugs, ids) are not keywords unless users are expected to type them. They stay findable through `combined`.
+
+Role order holds when match quality is comparable: a literal primary hit outranks a literal keyword hit, which outranks a secondary hit. Folding is per document. Across rows, a folded primary substring (65) can rank below a literal keyword exact match (70).
+
 ## Normalization (B1 baseline)
 
 - Query is trimmed and lower-cased.
@@ -116,7 +126,6 @@ Equipment `best_match` composition:
 
 ```text
 if (hasQuery) searchScore desc
-→ magicItemAction.rank (magic-items workflow only)
 → compareEquipmentPickerItemsByRecommendation
 ```
 
@@ -183,16 +192,16 @@ is enforced in dashboard Phase 2, not by the snapshot endpoint.
 
 ## Compatibility characterization
 
-When migrating a surface, verify for representative queries:
-
-- same candidate inclusion,
-- same relevance tier/score,
-- same `best_match` order (empty and non-empty queries),
-- label-faithful explicit sorts,
-- equal-score ties follow label / surface source-order rules.
+When a surface changes field roles on purpose, inclusion must not shrink.
+For representative rows and queries, every row the previous matcher returned
+still matches. Spell and equipment pickers compare against the old one-field
+combined document. Organization and residence pickers compare against
+`trim().toLowerCase().includes(query)` on the old search text. Scores and
+best-match order are allowed to change. Explicit sorts stay label-faithful,
+and search score is only a tie-break after that primary key.
 
 See `apps/dashboard/src/features/character/lib/equipment/equipment-picker-search.lib.test.ts`
-for equipment picker gate parity against legacy `@rpg/ui` label scoring.
+and `apps/dashboard/src/features/character/lib/spells/spell-picker-search.lib.test.ts`.
 
 See `packages/ui/src/components/ui/option-query.lib.test.ts` for ComboboxField
 inclusion parity against legacy `scoreItem`.

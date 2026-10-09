@@ -2,7 +2,7 @@
  * Layer 1 — light theme palette roles (oklch SSOT).
  * Inventory: tokens/palette-inventory.md — every name must exist in palette-dark.css.
  *
- * Motif: cream canvas, warm panel (card/popover), formula-derived washes, field lift from canvas.
+ * Motif: cream canvas, warm panel (card), lift plane (popover and fields), formula-derived washes.
  */
 :root {
   --palette-neutral-hue: 82;
@@ -17,7 +17,6 @@
   /* Derived or aliased surfaces — keep semantic names, single source of truth */
   --palette-surface-lift: color-mix(in oklch, var(--palette-surface-base) 50%, white);
   --palette-fg-on-solid: var(--palette-surface-base);
-  --palette-surface-secondary: var(--palette-surface-panel);
   --palette-surface-accent: var(--palette-neutral-contrast);
 
   /* Derived wash ladder */
@@ -46,6 +45,12 @@
 
   --palette-primary: oklch(0.386 0.13 36.6);
   --palette-primary-foreground: var(--palette-fg-on-solid);
+  --palette-secondary: oklch(0.78 0.09 75);
+  --palette-secondary-foreground: var(--palette-fg-on-status);
+  --palette-action-primary: var(--palette-primary);
+  --palette-action-primary-foreground: var(--palette-fg-on-solid);
+  --palette-action-secondary: var(--palette-secondary);
+  --palette-action-secondary-foreground: var(--palette-fg-on-status);
   --palette-on-solid: var(--palette-fg-on-solid);
 
   --palette-sidebar-surface: color-mix(in oklch, var(--palette-primary) 6%, oklch(0.9 0.048 88));

@@ -14,6 +14,7 @@ describe('SkillProficiencyDetailMetadata', () => {
 
     expect(screen.getByText(/^Governing Ability$/)).toBeInTheDocument()
     expect(screen.getByText('Dexterity')).toBeInTheDocument()
+    expect(screen.getByText(/covers /)).toHaveClass('text-sm')
   })
 
   itAxe('has no axe accessibility violations', async () => {

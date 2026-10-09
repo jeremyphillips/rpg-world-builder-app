@@ -4,40 +4,51 @@ import {
   resolveOrganizationMembershipMetadata,
   resolveSoleOrganizationMembershipTitleId,
 } from '@rpg/contracts'
-import { Button, SelectField, Text } from '@rpg/ui'
+import {
+  Button,
+  dialogPanelActionRowClasses,
+  resolvePickerActionFailureStatus,
+  Text,
+} from '@rpg/ui'
 
 import {
   CatalogEntityPickerSheet,
   CatalogEntitySurfaceRow,
+  RelationshipCatalogFilterBand,
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
+  createOrganizationRelationshipFilterSchema,
+  relationshipCatalogFilterHasBand,
+  resolveOrganizationRelationshipFilterLayout,
+  useRelationshipCatalogFilters,
 } from '@/features/content'
+import {
+  resolvePickerMutationCopy,
+  resolvePickerPendingLabel,
+} from '../../../lib/picker/picker-mutation-family'
+import { resolvePickerSelectionStateLine } from '../../../lib/picker/picker-selection-state'
+import { hasCatalogPickerResetViewCriteria } from '../../picker/catalog-picker-filter-state.lib'
+import { resolveCatalogPickerResultSummary } from '../../picker/catalog-picker-filter-state.lib'
 import { CatalogToolbarResetSlot } from '../../picker/catalog-toolbar-reset-action'
 import { OrganizationMembershipTitleField } from '../organization-membership-title-field'
 import { titleFromMembershipRadioValue } from '../../../lib/organization-membership/organization-membership-title.lib'
 import {
-  buildOrganizationPickerDomainOptions,
-  filterAndSortOrganizationPickerItems,
+  scoreAndSortOrganizationPickerItems,
   formatOrganizationPickerDescription,
-  getOrganizationPickerSearchText,
-  ORGANIZATION_PICKER_VIEW_DEFAULTS,
 } from './organization-picker-drawer.lib'
 import {
-  ORGANIZATION_PICKER_ALL_DOMAINS,
+  ORGANIZATION_PICKER_COPY,
   ORGANIZATION_PICKER_NO_ITEMS_MESSAGE,
   ORGANIZATION_PICKER_NO_RESULTS_MESSAGE,
-  ORGANIZATION_PICKER_RESET_VIEW_LABEL,
-  ORGANIZATION_PICKER_TITLE,
   type OrganizationMembershipSelection,
   type OrganizationPickerDrawerProps,
   type OrganizationPickerItem,
-  type OrganizationPickerDomainFilter,
 } from './organization-picker-drawer.types'
-import { organizationPickerTypeControlClasses } from './organization-picker-drawer.variants'
 
 export type { OrganizationPickerDrawerProps } from './organization-picker-drawer.types'
 
-const ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE = 'Could not add this organization membership.'
+const ORGANIZATION_ROW_LABEL = resolvePickerMutationCopy('genericSelection').acquire
+const ORGANIZATION_ROW_PENDING_LABEL = resolvePickerPendingLabel('genericSelection', 'acquire')
 
 export function OrganizationPickerDrawer({
   open,
@@ -45,21 +56,42 @@ export function OrganizationPickerDrawer({
   items,
   onAdd,
 }: OrganizationPickerDrawerProps) {
-  const [domain, setDomain] = React.useState<OrganizationPickerDomainFilter>(
-    ORGANIZATION_PICKER_VIEW_DEFAULTS.domain,
-  )
   const [expandedItemId, setExpandedItemId] = React.useState<string | null>(null)
   const [selectedTitle, setSelectedTitle] = React.useState<string | undefined>(undefined)
   const [pending, setPending] = React.useState(false)
   const [submitError, setSubmitError] = React.useState<string | null>(null)
+  const [failedOrganizationId, setFailedOrganizationId] = React.useState<string | null>(null)
+
+  const organizationFilterSchema = React.useMemo(
+    () =>
+      createOrganizationRelationshipFilterSchema({
+        rows: items,
+        getDomain: (item) => item.organization.organizationDomain,
+      }),
+    [items],
+  )
+  const organizationFilterLayout = React.useMemo(
+    () => resolveOrganizationRelationshipFilterLayout(organizationFilterSchema),
+    [organizationFilterSchema],
+  )
+  const organizationFilters = useRelationshipCatalogFilters({
+    rows: items,
+    schema: organizationFilterSchema,
+  })
+  const showDomainFilter = relationshipCatalogFilterHasBand(
+    'filterRow',
+    organizationFilterSchema,
+    organizationFilterLayout,
+  )
 
   const resetMembershipConfig = React.useCallback(() => {
-    setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
+    organizationFilters.reset()
     setExpandedItemId(null)
     setSelectedTitle(undefined)
     setSubmitError(null)
+    setFailedOrganizationId(null)
     setPending(false)
-  }, [])
+  }, [organizationFilters.reset])
 
   const handleOpenChange = React.useCallback(
     (nextOpen: boolean) => {
@@ -82,21 +114,17 @@ export function OrganizationPickerDrawer({
           : undefined,
       )
       setSubmitError(null)
+      setFailedOrganizationId(null)
     },
     [items],
   )
 
-  const domainOptions = React.useMemo(
-    () => buildOrganizationPickerDomainOptions(items.map(({ organization }) => organization)),
-    [items],
-  )
   const transformVisibleItems = React.useCallback(
     (visibleItems: readonly (typeof items)[number][], context: { searchQuery: string }) =>
-      filterAndSortOrganizationPickerItems(visibleItems, {
+      scoreAndSortOrganizationPickerItems(visibleItems, {
         searchQuery: context.searchQuery,
-        domain,
       }),
-    [domain],
+    [],
   )
 
   const commitMembership = React.useCallback(
@@ -119,16 +147,18 @@ export function OrganizationPickerDrawer({
 
       setPending(true)
       setSubmitError(null)
+      setFailedOrganizationId(null)
       try {
         await onAdd(membership)
         resetMembershipConfig()
         onOpenChange(false)
       } catch (error) {
-        const message =
+        setFailedOrganizationId(organization.id)
+        setSubmitError(
           error instanceof Error && error.message.trim().length > 0
             ? error.message
-            : ORGANIZATION_PICKER_SUBMIT_FAILED_MESSAGE
-        setSubmitError(message)
+            : resolvePickerActionFailureStatus(ORGANIZATION_ROW_LABEL),
+        )
         setPending(false)
       }
     },
@@ -139,49 +169,56 @@ export function OrganizationPickerDrawer({
     <CatalogEntityPickerSheet
       open={open}
       onOpenChange={handleOpenChange}
-      title={ORGANIZATION_PICKER_TITLE}
+      title={ORGANIZATION_PICKER_COPY.chooseTitle}
       description={formatOrganizationPickerDescription()}
-      items={items}
+      items={organizationFilters.filteredRows}
       getItemKey={({ organization }) => organization.id}
       getItemToolbarLabel={({ organization }) => organization.name}
-      getSearchText={({ organization }) => getOrganizationPickerSearchText(organization)}
-      searchPlaceholder="Search organizations"
+      searchPlaceholder={ORGANIZATION_PICKER_COPY.searchPlaceholder}
       noResultsMessage={ORGANIZATION_PICKER_NO_RESULTS_MESSAGE}
       noItemsMessage={ORGANIZATION_PICKER_NO_ITEMS_MESSAGE}
       transformVisibleItems={transformVisibleItems}
-      hasStructuredFilters={domain !== ORGANIZATION_PICKER_ALL_DOMAINS}
+      hasStructuredFilters={organizationFilters.structuredFilterCount > 0}
       expandedItemId={expandedItemId}
       onExpandedItemChange={handleExpandedItemChange}
-      actions={({ searchQuery, resetSearchQuery }) => {
-        const showReset =
-          searchQuery.length > 0 || domain !== ORGANIZATION_PICKER_VIEW_DEFAULTS.domain
-        const handleReset = () => {
-          setDomain(ORGANIZATION_PICKER_VIEW_DEFAULTS.domain)
-          resetSearchQuery()
-        }
-
+      actions={({ searchQuery, resetSearchQuery, visibleItemCount }) => {
+        const showReset = hasCatalogPickerResetViewCriteria({
+          structuredFilterCount: organizationFilters.structuredFilterCount,
+          searchQuery,
+        })
         return (
           <CatalogToolbarResetSlot
             visible={showReset}
-            label={ORGANIZATION_PICKER_RESET_VIEW_LABEL}
-            onClick={handleReset}
+            reserve={showDomainFilter}
+            includesSort={false}
+            {...resolveCatalogPickerResultSummary({
+              visible: visibleItemCount,
+              total: organizationFilters.sourceCount,
+            })}
+            onClick={() => {
+              organizationFilters.reset()
+              resetSearchQuery()
+            }}
           />
         )
       }}
-      filterRow={{
-        controls: (
-          <div className={organizationPickerTypeControlClasses}>
-            <SelectField
-              id="organization-picker-domain"
-              label="Domain"
-              labelPosition="inline"
-              value={domain}
-              options={domainOptions}
-              onValueChange={(value) => setDomain(value as OrganizationPickerDomainFilter)}
-            />
-          </div>
-        ),
-      }}
+      filterRow={
+        showDomainFilter
+          ? {
+              controls: (
+                <RelationshipCatalogFilterBand
+                  band="filterRow"
+                  schema={organizationFilterSchema}
+                  layout={organizationFilterLayout}
+                  state={organizationFilters.state}
+                  data={items}
+                  idPrefix="organization-picker"
+                  onValueChange={organizationFilters.setValue}
+                />
+              ),
+            }
+          : undefined
+      }
       renderEntityRow={(args) => {
         const { organization, selected } = args.item
 
@@ -197,16 +234,18 @@ export function OrganizationPickerDrawer({
             surface={{
               identity: buildOrganizationEntityCardModel(
                 buildOrganizationEntitySummaryVm(organization),
-                {
-                  status: selected
-                    ? [{ kind: 'badge', label: 'Added', tone: 'success' }]
-                    : undefined,
-                },
+                selected
+                  ? { selectionState: resolvePickerSelectionStateLine({ kind: 'selected' }) }
+                  : {},
               ),
               inlineAction: selected
                 ? undefined
                 : {
-                    label: 'Add',
+                    label: ORGANIZATION_ROW_LABEL,
+                    pendingLabel: ORGANIZATION_ROW_PENDING_LABEL,
+                    entityKey: organization.id,
+                    failed: failedOrganizationId === organization.id,
+                    loading: pending && expandedItemId === organization.id,
                     onClick: () => handleExpandedItemChange(organization.id),
                   },
             }}
@@ -228,7 +267,7 @@ export function OrganizationPickerDrawer({
                 {submitError}
               </Text>
             ) : null}
-            <div className="flex justify-end">
+            <div className={dialogPanelActionRowClasses}>
               <Button
                 type="button"
                 disabled={pending}
@@ -236,7 +275,7 @@ export function OrganizationPickerDrawer({
                   void commitMembership(organization)
                 }}
               >
-                Add organization
+                {ORGANIZATION_PICKER_COPY.addLabel}
               </Button>
             </div>
           </div>

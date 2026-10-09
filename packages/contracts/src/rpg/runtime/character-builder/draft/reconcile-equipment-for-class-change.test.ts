@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../../../content/equipment'
 import { createCharacterBuildContext } from '../test-fixtures'
-import { reconcileEquipmentForClassChange } from './apply-selected-class-change'
-import type { CharacterBuilderDraftEquipment } from './draft'
+import {
+  applySelectedClassChange,
+  reconcileEquipmentForClassChange,
+} from './apply-selected-class-change'
+import { createEmptyCharacterBuilderDraft, type CharacterBuilderDraftEquipment } from './draft'
 
 const RULESET = 'srd-cc-5.2.1' as const
 
@@ -60,7 +63,12 @@ function equipment(
       { equipmentId: longsword.id, quantity: 1, sourceMode: 'manual' },
       { equipmentId: `${RULESET}:missing`, quantity: 1, sourceMode: 'manual' },
       { equipmentId: coach.id, quantity: 1, sourceMode: 'manual' },
-      { equipmentId: `${RULESET}:greatsword`, quantity: 1, sourceMode: 'startingGold' },
+      {
+        equipmentId: `${RULESET}:greatsword`,
+        quantity: 1,
+        sourceMode: 'startingGold',
+        origin: 'picker',
+      },
     ],
     grants: [{ equipmentId: longsword.id, quantity: 1, contribution: 'additional' }],
     classPackage: {
@@ -104,5 +112,94 @@ describe('reconcileEquipmentForClassChange', () => {
     })
 
     expect(next).toBe(current)
+  })
+
+  it('keeps picker rows unchanged and drops package-conversion rows', () => {
+    const pickerRow = {
+      id: 'picker-longsword',
+      equipmentId: longsword.id,
+      quantity: 1,
+      sourceMode: 'startingGold' as const,
+      origin: 'picker' as const,
+      unitCostCp: 1500,
+    }
+    const next = reconcileEquipmentForClassChange({
+      equipment: equipment({
+        purchases: [
+          pickerRow,
+          {
+            equipmentId: longsword.id,
+            quantity: 2,
+            sourceMode: 'startingGold',
+            origin: 'packageConversion',
+          },
+        ],
+      }),
+      previous: { classId: `${RULESET}:fighter`, level: 1 },
+      next: { classId: `${RULESET}:wizard`, level: 1 },
+      context,
+    })
+
+    expect(next?.purchases).toEqual([pickerRow])
+    expect(next?.purchases[0]).toBe(pickerRow)
+  })
+
+  it('drops purchases whose equipment is no longer playable picker content', () => {
+    const next = reconcileEquipmentForClassChange({
+      equipment: equipment({
+        purchases: [
+          { equipmentId: coach.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+          { equipmentId: `${RULESET}:missing`, quantity: 1, sourceMode: 'manual' },
+        ],
+      }),
+      previous: { classId: `${RULESET}:fighter`, level: 1 },
+      next: { classId: `${RULESET}:wizard`, level: 1 },
+      context,
+    })
+
+    expect(next?.purchases).toEqual([])
+  })
+})
+
+describe('applySelectedClassChange', () => {
+  it('leaves purchase retention entirely to reconcileEquipmentForClassChange', () => {
+    const current = equipment({
+      purchases: [
+        { equipmentId: longsword.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+        {
+          equipmentId: longsword.id,
+          quantity: 1,
+          sourceMode: 'startingGold',
+          origin: 'packageConversion',
+        },
+        { equipmentId: coach.id, quantity: 1, sourceMode: 'manual' },
+      ],
+    })
+    const draft = {
+      ...createEmptyCharacterBuilderDraft(),
+      class: { classId: `${RULESET}:fighter`, level: 1 as const },
+      choiceSelections: {
+        [`class:${RULESET}:fighter:starting-equipment`]: ['heavy-armor'],
+        [`class:${RULESET}:fighter:starting-equipment:heavy-armor:0`]: [longsword.id],
+      },
+      equipment: current,
+    }
+
+    const changed = applySelectedClassChange({
+      draft,
+      nextClassId: `${RULESET}:wizard`,
+      context,
+    })
+    const reconciled = reconcileEquipmentForClassChange({
+      equipment: current,
+      previous: { classId: `${RULESET}:fighter`, level: 1 },
+      next: { classId: `${RULESET}:wizard`, level: 1 },
+      context,
+    })
+
+    expect(changed.equipment?.purchases).toEqual(reconciled?.purchases)
+    expect(changed.equipment?.purchases).toEqual([
+      { equipmentId: longsword.id, quantity: 1, sourceMode: 'startingGold', origin: 'picker' },
+    ])
   })
 })

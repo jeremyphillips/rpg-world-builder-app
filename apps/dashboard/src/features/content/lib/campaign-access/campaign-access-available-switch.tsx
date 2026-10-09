@@ -4,7 +4,7 @@ import type { ContentCampaignAccessPatch } from '@rpg/contracts'
 import { SwitchField } from '@rpg/ui'
 import { useFieldControlSize } from '@rpg/ui/form'
 
-import { useCampaignAccessAvailabilityContext } from './campaign-access-form-context'
+import { useCampaignAccessAvailabilityContext } from './campaign-access-form-state'
 
 export type CampaignAccessAvailableSwitchProps = {
   label: string

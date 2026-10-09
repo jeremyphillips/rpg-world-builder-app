@@ -46,7 +46,7 @@ export function UsageReferenceRow({ reference, campaignId }: UsageReferenceRowPr
       className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
     >
       <span>{reference.label}</span>
-      <ExternalLink aria-hidden className="size-3.5 shrink-0" />
+      <ExternalLink aria-hidden className="size-icon-inline shrink-0" />
       <span className="sr-only">Opens in new tab</span>
     </Link>
   )

@@ -1,17 +1,16 @@
-import { createContext, useContext, useLayoutEffect, type ReactNode } from 'react'
+import { useContext, useLayoutEffect, type ReactNode } from 'react'
 import { Heading } from '@rpg/ui'
 
 import { DetailCollectionPanel } from '../collection/panel/detail-collection-panel'
 import type { DetailCollectionPanelProps } from '../collection/panel/detail-collection-panel'
 
-import { useContentDetailNavRegistration } from './content-detail-nav-context'
+import { useContentDetailNavRegistration } from './content-detail-nav-registration'
 import {
   contentDetailSectionItemStackClasses,
   contentDetailSectionPanelContentHeadingClasses,
   contentDetailSectionProseBodyClasses,
 } from './content-detail-section.variants'
-
-const ContentDetailSectionScopeContext = createContext<string | null>(null)
+import { ContentDetailSectionScopeContext } from './use-content-detail-section-nav-leaf'
 
 export type ContentDetailSectionBodyLayout = 'prose' | 'list' | 'flush'
 
@@ -60,21 +59,6 @@ export function ContentDetailSection({
   )
 }
 
-/** Registers an in-page nav leaf under the current section (no visible chrome). */
-export function useContentDetailSectionNavLeaf(id: string, label: string) {
-  const sectionId = useContext(ContentDetailSectionScopeContext)
-  const { registerLeaf } = useContentDetailNavRegistration()
-
-  useLayoutEffect(() => {
-    if (!sectionId) return undefined
-    return registerLeaf(sectionId, id, label)
-  }, [id, label, registerLeaf, sectionId])
-
-  if (!sectionId) {
-    throw new Error('useContentDetailSectionNavLeaf must be used inside ContentDetailSection')
-  }
-}
-
 export type ContentDetailSectionItemProps = {
   id: string
   /** Visible subsection heading and default nav leaf label. */
@@ -119,6 +103,3 @@ export function ContentDetailSectionItem({
     </div>
   )
 }
-
-/** Panel content heading styles for custom in-panel titles (e.g. class feature rows). */
-export { contentDetailSectionPanelContentHeadingClasses }
