@@ -21,6 +21,7 @@ import {
 import {
   EQUIPMENT_PICKER_MODE_MAGIC_ITEMS,
   EQUIPMENT_PICKER_RARITY_ALL,
+  EQUIPMENT_PICKER_SORT_BEST_MATCH,
   EQUIPMENT_PICKER_SORT_MODES,
   EQUIPMENT_PICKER_SORT_PRICE_ASC,
   EQUIPMENT_PICKER_SORT_PRICE_DESC,
@@ -30,6 +31,7 @@ import {
   type EquipmentPickerKindFilter,
   type EquipmentPickerSortMode,
 } from './equipment-picker-drawer.types'
+import { normalizeEquipmentPickerSortMode } from './equipment-picker-sort-sections.lib'
 
 export type UseEquipmentPickerControllerArgs = Pick<
   EquipmentPickerDrawerProps,
@@ -85,6 +87,17 @@ export function useEquipmentPickerController({
   const [sortMode, setSortMode] = React.useState<EquipmentPickerSortMode>(
     EQUIPMENT_PICKER_VIEW_DEFAULTS.sortMode,
   )
+
+  React.useEffect(() => {
+    setSortMode((current) =>
+      normalizeEquipmentPickerSortMode(
+        current,
+        effectiveSortModes,
+        EQUIPMENT_PICKER_SORT_BEST_MATCH,
+      ),
+    )
+  }, [effectiveSortModes])
+
   const showRarityFilter =
     isMagicItemsWorkflow &&
     magicItemGrantProgress !== undefined &&

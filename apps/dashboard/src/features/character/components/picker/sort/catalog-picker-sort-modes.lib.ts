@@ -1,7 +1,12 @@
-/** Cross-picker sort mode values — domain-specific modes stay in each picker's types file. */
-export const CATALOG_PICKER_SORT_BEST_MATCH = 'best_match' as const
-export const CATALOG_PICKER_SORT_NAME_ASC = 'name_asc' as const
-export const CATALOG_PICKER_SORT_NAME_DESC = 'name_desc' as const
+/**
+ * @deprecated Prefer `@/lib/catalog-sort` mode ids and the axis/preset registry.
+ * Re-exports kept for existing picker type aliases.
+ */
+export {
+  CATALOG_SORT_MODE_BEST_MATCH as CATALOG_PICKER_SORT_BEST_MATCH,
+  CATALOG_SORT_MODE_NAME_ASC as CATALOG_PICKER_SORT_NAME_ASC,
+  CATALOG_SORT_MODE_NAME_DESC as CATALOG_PICKER_SORT_NAME_DESC,
+} from '@/lib/catalog-sort'
 
 export const CATALOG_PICKER_SORT_LABEL_BEST_MATCH = 'Best match'
 export const CATALOG_PICKER_SORT_LABEL_NAME_ASC = 'Name: A–Z'

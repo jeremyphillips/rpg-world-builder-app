@@ -46,10 +46,19 @@ Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` re
 | Disabled controls                         | `not-allowed` or `pointer-events-none`        |
 | Static rows (no activation)               | `default` (e.g. preview rail static sections) |
 
+### Ghost visual state (`ghostControlVisualStateClasses`)
+
+Shared **fill/hover/active/open** classes for toolbar ghost chrome (`Button variant="ghost"`,
+`FilterInlineControl variant="ghost"`, `SortMenu` trigger). Geometry and focus rings stay on
+each control. Do not confuse with Select **sizing ghosts** (invisible width-reserve spans) or
+Badge `appearance`.
+
 ### `iconGhostControlVariants({ hover, layout })`
 
 Compact (24px) icon-only ghost controls. Composes internal control-action geometry with
 embedded focus. List-row removes use this primitive — features must not size removes locally.
+`hover: 'accent'` keeps `control-hover` (dense row chrome), not the toolbar accent fill from
+`ghostControlVisualStateClasses`.
 
 ### `interactiveRowVariants({ interaction, state, hoverFamily, selected, … })`
 

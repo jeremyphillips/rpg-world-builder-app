@@ -17,6 +17,10 @@ import { fieldGroupedControlActionPaddingClasses } from './field-sizing.variants
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import {
+  ghostControlExpandedClasses,
+  ghostControlVisualStateClasses,
+} from './ghost-control.variants'
+import {
   outlineControlExpandedClasses,
   outlineControlShellClasses,
 } from './outline-control.variants'
@@ -55,7 +59,7 @@ export const buttonVariants = cva(
         outline: `${outlineControlShellClasses} ${outlineControlExpandedClasses}`,
         secondary:
           'bg-action-secondary text-action-secondary-foreground shadow-sm hover:bg-action-secondary/80 active:bg-action-secondary/60',
-        ghost: 'hover:bg-accent hover:text-accent-foreground active:bg-accent/80',
+        ghost: `${ghostControlVisualStateClasses} ${ghostControlExpandedClasses}`,
         text: textButtonTransparentClasses,
       },
       size: {

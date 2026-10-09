@@ -5,7 +5,6 @@ import { resourceIcon, SegmentedControl, type ResourceIconRole } from '@rpg/ui'
 
 import { CatalogEntityPickerSheet } from '@/features/content'
 import { CatalogSortControl } from '../../../picker/sort/catalog-sort-control'
-import { pickerSortOption } from '../../../picker/sort/catalog-picker-sort-labels.lib'
 import { CatalogToolbarResetSlot } from '../../../picker/catalog-toolbar-reset-action'
 import {
   hasCatalogPickerResetViewCriteria,
@@ -21,9 +20,9 @@ import {
 } from '../browse/equipment-picker-filter-controls'
 import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
 import {
+  EQUIPMENT_PICKER_SORT_AXES,
   EQUIPMENT_PICKER_SORT_LABEL,
-  EQUIPMENT_PICKER_SORT_LABELS,
-  EQUIPMENT_PICKER_SORT_TRIGGER_LABELS,
+  EQUIPMENT_PICKER_SORT_PRESETS,
   type EquipmentPickerDrawerProps,
   type EquipmentPickerItem,
 } from './equipment-picker-drawer.types'
@@ -229,13 +228,9 @@ export function EquipmentPickerDrawer({
           <CatalogSortControl
             value={picker.sortMode}
             label={EQUIPMENT_PICKER_SORT_LABEL}
-            options={picker.effectiveSortModes.map((mode) =>
-              pickerSortOption(
-                mode,
-                EQUIPMENT_PICKER_SORT_LABELS[mode],
-                EQUIPMENT_PICKER_SORT_TRIGGER_LABELS[mode],
-              ),
-            )}
+            axes={EQUIPMENT_PICKER_SORT_AXES}
+            presets={EQUIPMENT_PICKER_SORT_PRESETS}
+            availableValues={picker.effectiveSortModes}
             onValueChange={(value) => picker.setSortMode(value as typeof picker.sortMode)}
           />
         ),

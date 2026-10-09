@@ -68,7 +68,7 @@ export const Default: Story = {
       canvas.getByRole('combobox', { name: 'School' }).getBoundingClientRect().width,
     ).toBe(schoolWidth)
 
-    const sort = canvas.getByRole('button', { name: 'Sort by, A–Z' })
+    const sort = canvas.getByRole('button', { name: 'Sort by, Name: A–Z' })
     const sortWidth = sort.getBoundingClientRect().width
     await expect(sortWidth).toBeGreaterThan(0)
     await userEvent.click(sort)

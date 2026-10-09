@@ -3,39 +3,47 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogSortControl } from './catalog-sort-control'
-import { pickerSortOption } from './catalog-picker-sort-labels.lib'
-
-const nameSortOptions = [
-  pickerSortOption('name_asc', 'Name: A–Z', 'A–Z'),
-  pickerSortOption('name_desc', 'Name: Z–A', 'Z–A'),
-] as const
 
 describe('CatalogSortControl', () => {
-  it('shows compact trigger labels for name sorts', () => {
-    render(
-      <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
-    )
+  it('resolves Greenfield trigger labels from axes', () => {
+    render(<CatalogSortControl value="name_asc" axes={['name']} onValueChange={vi.fn()} />)
 
-    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveTextContent('A–Z')
+    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toHaveTextContent(
+      'Name: A–Z',
+    )
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
   it('uses compact button sizing by default', () => {
-    render(
-      <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />,
-    )
+    render(<CatalogSortControl value="name_asc" axes={['name']} onValueChange={vi.fn()} />)
 
-    expect(screen.getByRole('button', { name: 'Sort by, A–Z' })).toHaveClass('text-xs')
+    expect(screen.getByRole('button', { name: 'Sort by, Name: A–Z' })).toHaveClass('text-xs')
   })
 
   it('uses comfortable button sizing inside comfortable chrome', () => {
     render(
       <FilterChromeProvider density="comfortable">
-        <CatalogSortControl value="name_asc" options={nameSortOptions} onValueChange={vi.fn()} />
+        <CatalogSortControl value="name_asc" axes={['name']} onValueChange={vi.fn()} />
       </FilterChromeProvider>,
     )
 
-    const trigger = screen.getByRole('button', { name: 'Sort by, A–Z' })
+    const trigger = screen.getByRole('button', { name: 'Sort by, Name: A–Z' })
     expect(trigger).not.toHaveClass('text-xs')
+  })
+
+  it('includes best_match preset above axis groups', async () => {
+    const user = (await import('@testing-library/user-event')).default.setup()
+    render(
+      <CatalogSortControl
+        value="best_match"
+        axes={['name']}
+        presets={['best_match']}
+        onValueChange={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Sort by, Best match' }))
+    expect(screen.getByRole('menuitemradio', { name: 'Best match' })).toBeInTheDocument()
+    expect(screen.getByText('Name')).toBeInTheDocument()
   })
 })

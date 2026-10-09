@@ -20,7 +20,6 @@ import { resolveSelectionRowStatusItems } from '../../../lib/selection-row-statu
 import { mapSkillProficiencyCompactSummaryToMetadataLines } from './map-skill-proficiency-compact-summary-to-metadata-lines'
 import { CatalogPickerResultsState } from '../../picker/results/catalog-picker-results-state'
 import { CatalogSortControl } from '../../picker/sort/catalog-sort-control'
-import { pickerSortOption } from '../../picker/sort/catalog-picker-sort-labels.lib'
 import {
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,
@@ -40,9 +39,8 @@ import { ProficiencyPickerItemDetails } from './proficiency-picker-item-details'
 import {
   PROFICIENCY_PICKER_NO_OPTIONS_MESSAGE,
   PROFICIENCY_PICKER_NO_RESULTS_MESSAGE,
-  PROFICIENCY_PICKER_SORT_LABELS,
-  PROFICIENCY_PICKER_SORT_TRIGGER_LABELS,
-  PROFICIENCY_PICKER_SORT_MODES,
+  PROFICIENCY_PICKER_SORT_AXES,
+  PROFICIENCY_PICKER_SORT_PRESETS,
   type ProficiencyPickerDrawerProps,
   type ProficiencyPickerSortMode,
 } from './proficiency-picker-drawer.types'
@@ -124,13 +122,8 @@ export function ProficiencyPickerDrawer({
         actions: (
           <CatalogSortControl
             value={sortMode}
-            options={PROFICIENCY_PICKER_SORT_MODES.map((mode) =>
-              pickerSortOption(
-                mode,
-                PROFICIENCY_PICKER_SORT_LABELS[mode],
-                PROFICIENCY_PICKER_SORT_TRIGGER_LABELS[mode],
-              ),
-            )}
+            axes={PROFICIENCY_PICKER_SORT_AXES}
+            presets={PROFICIENCY_PICKER_SORT_PRESETS}
             onValueChange={setSortMode}
           />
         ),

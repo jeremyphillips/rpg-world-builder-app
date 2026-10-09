@@ -112,9 +112,9 @@ export function SortMenu<T extends string>({
   sections,
   onValueChange,
   label = SORT_MENU_DEFAULT_LABEL,
-  variant = 'ghost',
+  variant = 'outline',
   size = 'sm',
-  density = 'compact',
+  density = 'default',
   disabled,
   className,
 }: SortMenuProps<T>) {

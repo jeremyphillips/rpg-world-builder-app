@@ -20,6 +20,29 @@ describe('FilterInlineControl', () => {
     expect(screen.getByLabelText('Has Spellcasting')).toBeInTheDocument()
   })
 
+  it('defaults to outline shell chrome', () => {
+    const { container } = render(
+      <FilterInlineControl>
+        <Checkbox id="outline-shell" />
+        <label htmlFor="outline-shell">Outline</label>
+      </FilterInlineControl>,
+    )
+
+    expect(container.firstElementChild).toHaveClass('border-interactive-outline')
+  })
+
+  it('applies ghost shell chrome when variant is ghost', () => {
+    const { container } = render(
+      <FilterInlineControl variant="ghost">
+        <Checkbox id="ghost-shell" />
+        <label htmlFor="ghost-shell">Ghost</label>
+      </FilterInlineControl>,
+    )
+
+    expect(container.firstElementChild).toHaveClass('hover:bg-accent')
+    expect(container.firstElementChild).not.toHaveClass('border-interactive-outline')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(
       <FilterInlineControl>

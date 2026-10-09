@@ -1,5 +1,6 @@
 export type {
   BooleanFilterFieldDef,
+  BooleanFilterShellVariant,
   ChipsFilterFieldDef,
   ChipsSelectionMode,
   FilterCatalogLayoutConfig,
