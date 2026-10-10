@@ -364,7 +364,7 @@ describe('EquipmentPickerDrawer', () => {
 
     const resetButton = screen.getByRole('button', { name: CATALOG_TOOLBAR_RESET_WITH_SORT_NAME })
     expect(resetButton).toHaveTextContent('Reset')
-    expect(resetButton).toHaveClass('h-6')
+    expect(resetButton).toHaveClass('ui-button__text--sm-compact')
     expect(resetButton.querySelector('svg')).toHaveClass('size-icon-glyph-sm')
   })
 
