@@ -20,7 +20,7 @@ export const badgeLayoutVariants = cva('', {
   variants: {
     layout: {
       label: '',
-      counter: 'min-w-5 justify-center px-1 tabular-nums leading-none',
+      counter: 'ui-compact-label--counter',
     },
   },
   defaultVariants: {

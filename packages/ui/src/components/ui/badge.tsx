@@ -55,7 +55,7 @@ function Badge({
     tone,
     emphasis,
     filled: appearance === 'soft' || appearance === 'strong',
-    className: cn('border-[1.5px]', badgeLayoutVariants({ layout }), className),
+    className: cn(badgeLayoutVariants({ layout }), className),
   })
 
   if (asChild) {

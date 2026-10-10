@@ -146,6 +146,8 @@ const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive
 
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
 
+const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
+
 const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
 
 const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
@@ -493,6 +495,21 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         modifierPrefix: `ui-inset-panel--${name}`,
         requiredProperties: ['text-align'] as const,
       })),
+    ],
+  },
+  {
+    filePath: compactLabelCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-compact-label--${name}`,
+        requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
+      })),
+      ...(['outline', 'soft', 'strong'] as const).flatMap((appearance) =>
+        (['neutral', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+          modifierPrefix: `ui-compact-label--${appearance}-${tone}`,
+          requiredProperties: ['background-color', 'color', 'border-color', 'font-weight'] as const,
+        })),
+      ),
     ],
   },
 ]

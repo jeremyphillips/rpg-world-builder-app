@@ -109,6 +109,30 @@ export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = [
   'ui-choice-control--indicator-lg',
 ] as const
 
+export const UI_COMPACT_LABEL_SIZE_CLASSES = [
+  'ui-compact-label--sm',
+  'ui-compact-label--md',
+  'ui-compact-label--lg',
+] as const
+
+export const UI_COMPACT_LABEL_APPEARANCE_CLASSES = [
+  'ui-compact-label--outline-neutral',
+  'ui-compact-label--outline-info',
+  'ui-compact-label--outline-success',
+  'ui-compact-label--outline-warning',
+  'ui-compact-label--outline-destructive',
+  'ui-compact-label--soft-neutral',
+  'ui-compact-label--soft-info',
+  'ui-compact-label--soft-success',
+  'ui-compact-label--soft-warning',
+  'ui-compact-label--soft-destructive',
+  'ui-compact-label--strong-neutral',
+  'ui-compact-label--strong-info',
+  'ui-compact-label--strong-success',
+  'ui-compact-label--strong-warning',
+  'ui-compact-label--strong-destructive',
+] as const
+
 export const UI_CARD_INTERACTION_CLASSES = ['ui-card--static', 'ui-card--interactive'] as const
 
 export const UI_INSET_PANEL_SIZE_CLASSES = [

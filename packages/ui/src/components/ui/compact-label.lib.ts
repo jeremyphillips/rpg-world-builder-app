@@ -15,7 +15,7 @@ export type CompactLabelEmphasis = (typeof COMPACT_LABEL_EMPHASES)[number]
 export function compactLabelEmphasisClasses(
   emphasis: CompactLabelEmphasis = 'default',
 ): string | null {
-  return emphasis === 'subdued' ? 'text-muted-foreground' : null
+  return emphasis === 'subdued' ? 'ui-compact-label--subdued' : null
 }
 
 /** Appearance × tone surface classes for Badge (not selected-control chip state). */

@@ -33,9 +33,9 @@ export const COMPACT_LABEL_SM_HEIGHT_CLASS = 'h-[22px]'
 export const COMPACT_LABEL_SM_MIN_HEIGHT_CLASS = 'min-h-[22px]'
 
 const compactLabelRemovablePaddingClasses: Record<CompactLabelSize, string> = {
-  sm: 'pr-0.5',
-  md: 'pr-0.5',
-  lg: 'pr-1',
+  sm: 'ui-compact-label--removable-sm',
+  md: 'ui-compact-label--removable-md',
+  lg: 'ui-compact-label--removable-lg',
 }
 
 const compactLabelIconSizeClasses: Record<CompactLabelSize, string> = {
@@ -45,68 +45,63 @@ const compactLabelIconSizeClasses: Record<CompactLabelSize, string> = {
 }
 
 /** Internal CVA — not exported from `@rpg/ui`. */
-export const compactLabelVariants = cva(
-  'inline-flex max-w-full items-center gap-1 rounded-full border border-transparent',
-  {
-    variants: {
-      size: {
-        sm: cn(COMPACT_LABEL_SM_HEIGHT_CLASS, 'px-2 text-xs-meta'),
-        md: 'h-[31px] px-3 text-sm-meta',
-        lg: 'h-[41px] px-4 text-md',
-      },
-      filled: {
-        true: 'font-medium',
-        false: 'font-medium', // was 'font-light'
-      },
-      selected: {
-        true: 'border-selected-control-border bg-selected-control text-selected-control-foreground',
-        false: '',
-      },
-      interactive: {
-        true: cn(
-          'cursor-pointer transition-colors',
-          'hover:bg-control-hover',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-          'disabled:pointer-events-none disabled:opacity-50',
-        ),
-        false: '',
-      },
-      removable: {
-        true: '',
-        false: '',
-      },
+export const compactLabelVariants = cva('ui-compact-label', {
+  variants: {
+    size: {
+      sm: 'ui-compact-label--sm',
+      md: 'ui-compact-label--md',
+      lg: 'ui-compact-label--lg',
     },
-    compoundVariants: [
-      {
-        selected: false,
-        interactive: true,
-        className: 'border-border bg-background text-foreground',
-      },
-      {
-        removable: true,
-        size: 'sm',
-        className: compactLabelRemovablePaddingClasses.sm,
-      },
-      {
-        removable: true,
-        size: 'md',
-        className: compactLabelRemovablePaddingClasses.md,
-      },
-      {
-        removable: true,
-        size: 'lg',
-        className: compactLabelRemovablePaddingClasses.lg,
-      },
-    ],
-    defaultVariants: {
-      size: 'md',
-      filled: false,
-      selected: false,
-      interactive: false,
-      removable: false,
+    filled: {
+      true: '',
+      false: '',
+    },
+    selected: {
+      true: 'ui-compact-label--selected',
+      false: '',
+    },
+    interactive: {
+      true: cn(
+        'ui-compact-label--interactive ui-focus-ring',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+      ),
+      false: '',
+    },
+    removable: {
+      true: '',
+      false: '',
     },
   },
-)
+  compoundVariants: [
+    {
+      selected: false,
+      interactive: true,
+      className: 'border-border bg-background text-foreground',
+    },
+    {
+      removable: true,
+      size: 'sm',
+      className: compactLabelRemovablePaddingClasses.sm,
+    },
+    {
+      removable: true,
+      size: 'md',
+      className: compactLabelRemovablePaddingClasses.md,
+    },
+    {
+      removable: true,
+      size: 'lg',
+      className: compactLabelRemovablePaddingClasses.lg,
+    },
+  ],
+  defaultVariants: {
+    size: 'md',
+    filled: false,
+    selected: false,
+    interactive: false,
+    removable: false,
+  },
+})
 
 export function resolveCompactLabelClassName({
   size = 'md',
@@ -135,7 +130,7 @@ export function resolveCompactLabelClassName({
     compactLabelIconSizeClasses[size],
     appearanceClasses,
     compactLabelEmphasisClasses(emphasis),
-    removable && !selected ? 'border-border bg-semantic-neutral-subtle text-foreground' : null,
+    removable && !selected ? 'ui-compact-label--soft-neutral' : null,
     className,
   )
 }
@@ -144,10 +139,8 @@ export type CompactLabelVariants = VariantProps<typeof compactLabelVariants>
 
 export const chipRemoveButtonVariants = cva(
   cn(
-    'inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full text-muted-foreground',
-    'hover:bg-control-hover hover:text-foreground',
+    'ui-compact-label__remove ui-focus-ring',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-    'disabled:pointer-events-none disabled:opacity-50',
   ),
   {
     variants: {

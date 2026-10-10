@@ -7,7 +7,7 @@ import { COMPACT_LABEL_TONES } from './compact-label.lib'
 const meta = {
   title: 'Components/Badge',
   component: Badge,
-  parameters: { layout: 'centered' },
+  parameters: { layout: 'centered', semanticClasses: true },
   args: {
     children: 'Label',
     size: 'md',

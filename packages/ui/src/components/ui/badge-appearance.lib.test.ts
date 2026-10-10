@@ -19,20 +19,18 @@ describe('badgeAppearanceToneClasses', () => {
   })
 
   it('uses token-owned soft destructive foreground', () => {
-    const classes = badgeAppearanceToneClasses('soft', 'destructive').split(/\s+/)
-    expect(classes).toContain('text-semantic-destructive-soft-foreground')
-    expect(classes).not.toContain('text-semantic-destructive')
+    expect(badgeAppearanceToneClasses('soft', 'destructive')).toBe(
+      'ui-compact-label--soft-destructive',
+    )
   })
 
   it('uses token-owned outline foreground without dark-mode classes', () => {
     const classes = badgeAppearanceToneClasses('outline', 'info')
-    expect(classes).toContain('text-semantic-info-outline-foreground')
+    expect(classes).toBe('ui-compact-label--outline-info')
     expect(classes).not.toMatch(/\bdark:/)
   })
 
   it('uses separate strong background and border roles', () => {
-    const classes = badgeAppearanceToneClasses('strong', 'info').split(/\s+/)
-    expect(classes).toContain('bg-semantic-info-strong')
-    expect(classes).toContain('border-semantic-info-border')
+    expect(badgeAppearanceToneClasses('strong', 'info')).toBe('ui-compact-label--strong-info')
   })
 })

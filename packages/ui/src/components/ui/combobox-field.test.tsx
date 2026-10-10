@@ -197,8 +197,8 @@ describe('ComboboxField', () => {
       />,
     )
 
-    const chip = screen.getByText('Dagger').closest('span.inline-flex')
-    expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
+    const chip = screen.getByText('Dagger').closest('.ui-compact-label')
+    expect(chip).toHaveClass('ui-compact-label--sm')
     expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass(
       'ui-compact-control--icon-compact-sm',
     )
@@ -214,7 +214,7 @@ describe('ComboboxField', () => {
 
     expect(trigger).toHaveClass('invisible')
     expect(search).toHaveClass('dark:bg-transparent')
-    expect(search.closest('[class*="bg-input"]')).not.toBeNull()
+    expect(search.closest('.ui-interactive-list__toolbar')).not.toBeNull()
   })
 
   it('omits the search row when enableSearch is false', async () => {
@@ -502,7 +502,9 @@ describe('ComboboxField', () => {
     const trigger = screen.getByRole('combobox', { name: 'Archetype' })
     const controlShell = trigger.closest('.w-full.min-w-0')
 
-    expect(screen.getByLabelText('Archetype').closest('.grow-\\[8\\]')).toHaveClass('max-w-2/3')
+    expect(
+      screen.getByLabelText('Archetype').closest('.ui-field-control--width-2\\/3'),
+    ).not.toBeNull()
     expect(controlShell).not.toBeNull()
     expect(controlShell).toContainElement(trigger)
   })

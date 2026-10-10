@@ -62,6 +62,10 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-empty-panel` owns the compact sunken well (radius, padding, italic muted type, sunken shadow).
 
+## Compact label
+
+`ui-compact-label` is the Badge and Chip shell. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--selected`, `--interactive`, and `--subdued` are states. Chip dismiss is `__remove`. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+
 ## When CVA vs CSS
 
 - **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.

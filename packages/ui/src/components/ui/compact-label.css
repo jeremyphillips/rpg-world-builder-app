@@ -1,0 +1,250 @@
+/*
+ * Compact label (Badge and Chip). Appearance × tone modifiers share one property list.
+ * Source order: block → size → appearance → state → remove.
+ */
+@layer components {
+  .ui-compact-label {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    border-radius: calc(infinity * 1px);
+    border-style: solid;
+    border-width: 1.5px;
+    border-color: var(--ui-compact-label-border, transparent);
+    background-color: var(--ui-compact-label-bg, transparent);
+    color: var(--ui-compact-label-fg, inherit);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .ui-compact-label--sm {
+    height: 22px;
+    padding-inline: calc(var(--spacing) * 2);
+    font-size: var(--text-compact-label-sm);
+    line-height: var(--text-compact-label-sm--line-height);
+  }
+
+  .ui-compact-label--md {
+    height: 31px;
+    padding-inline: calc(var(--spacing) * 3);
+    font-size: var(--text-compact-label-md);
+    line-height: var(--text-compact-label-md--line-height);
+  }
+
+  .ui-compact-label--lg {
+    height: 41px;
+    padding-inline: calc(var(--spacing) * 4);
+    font-size: var(--text-compact-label-lg);
+    line-height: var(--text-compact-label-lg--line-height);
+  }
+
+  .ui-compact-label--removable-sm,
+  .ui-compact-label--removable-md {
+    padding-inline-end: calc(var(--spacing) * 0.5);
+  }
+
+  .ui-compact-label--removable-lg {
+    padding-inline-end: calc(var(--spacing) * 1);
+  }
+
+  .ui-compact-label--outline-neutral {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: transparent;
+    --ui-compact-label-fg: var(--color-semantic-neutral-outline-foreground);
+    --ui-compact-label-border: var(--color-semantic-neutral-border);
+  }
+
+  .ui-compact-label--outline-info {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: transparent;
+    --ui-compact-label-fg: var(--color-semantic-info-outline-foreground);
+    --ui-compact-label-border: var(--color-semantic-info-border);
+  }
+
+  .ui-compact-label--outline-success {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: transparent;
+    --ui-compact-label-fg: var(--color-semantic-success-outline-foreground);
+    --ui-compact-label-border: var(--color-semantic-success-border);
+  }
+
+  .ui-compact-label--outline-warning {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: transparent;
+    --ui-compact-label-fg: var(--color-semantic-warning-outline-foreground);
+    --ui-compact-label-border: var(--color-semantic-warning-border);
+  }
+
+  .ui-compact-label--outline-destructive {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: transparent;
+    --ui-compact-label-fg: var(--color-semantic-destructive-outline-foreground);
+    --ui-compact-label-border: var(--color-semantic-destructive-border);
+  }
+
+  .ui-compact-label--soft-neutral {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-neutral-soft);
+    --ui-compact-label-fg: var(--color-semantic-neutral-soft-foreground);
+    --ui-compact-label-border: var(--color-semantic-neutral-border);
+  }
+
+  .ui-compact-label--soft-info {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-info-soft);
+    --ui-compact-label-fg: var(--color-semantic-info-soft-foreground);
+    --ui-compact-label-border: var(--color-semantic-info-border);
+  }
+
+  .ui-compact-label--soft-success {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-success-soft);
+    --ui-compact-label-fg: var(--color-semantic-success-soft-foreground);
+    --ui-compact-label-border: var(--color-semantic-success-border);
+  }
+
+  .ui-compact-label--soft-warning {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-warning-soft);
+    --ui-compact-label-fg: var(--color-semantic-warning-soft-foreground);
+    --ui-compact-label-border: var(--color-semantic-warning-border);
+  }
+
+  .ui-compact-label--soft-destructive {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-destructive-soft);
+    --ui-compact-label-fg: var(--color-semantic-destructive-soft-foreground);
+    --ui-compact-label-border: var(--color-semantic-destructive-border);
+  }
+
+  .ui-compact-label--strong-neutral {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-neutral-strong);
+    --ui-compact-label-fg: var(--color-semantic-neutral-strong-foreground);
+    --ui-compact-label-border: var(--color-semantic-neutral-border);
+  }
+
+  .ui-compact-label--strong-info {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-info-strong);
+    --ui-compact-label-fg: var(--color-semantic-info-strong-foreground);
+    --ui-compact-label-border: var(--color-semantic-info-border);
+  }
+
+  .ui-compact-label--strong-success {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-success-strong);
+    --ui-compact-label-fg: var(--color-semantic-success-strong-foreground);
+    --ui-compact-label-border: var(--color-semantic-success-border);
+  }
+
+  .ui-compact-label--strong-warning {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-warning-strong);
+    --ui-compact-label-fg: var(--color-semantic-warning-strong-foreground);
+    --ui-compact-label-border: var(--color-semantic-warning-border);
+  }
+
+  .ui-compact-label--strong-destructive {
+    background-color: var(--ui-compact-label-bg);
+    color: var(--ui-compact-label-fg);
+    border-color: var(--ui-compact-label-border);
+    font-weight: var(--font-weight-medium);
+    --ui-compact-label-bg: var(--color-semantic-destructive-strong);
+    --ui-compact-label-fg: var(--color-semantic-destructive-strong-foreground);
+    --ui-compact-label-border: var(--color-semantic-destructive-border);
+  }
+
+  .ui-compact-label--subdued {
+    color: var(--muted-foreground);
+  }
+
+  .ui-compact-label--selected {
+    border-color: var(--color-selected-control-border);
+    background-color: var(--color-selected-control);
+    color: var(--color-selected-control-foreground);
+  }
+
+  .ui-compact-label--interactive {
+    cursor: pointer;
+  }
+
+  .ui-compact-label--interactive:hover {
+    background-color: var(--color-control-hover);
+  }
+
+  .ui-compact-label--interactive:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .ui-compact-label--counter {
+    min-width: calc(var(--spacing) * 5);
+    justify-content: center;
+    padding-inline: calc(var(--spacing) * 1);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  .ui-compact-label__remove {
+    display: inline-flex;
+    flex-shrink: 0;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(infinity * 1px);
+    color: var(--muted-foreground);
+  }
+
+  .ui-compact-label__remove:hover {
+    background-color: var(--color-control-hover);
+    color: var(--foreground);
+  }
+
+  .ui-compact-label__remove:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
