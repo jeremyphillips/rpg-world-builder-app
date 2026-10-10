@@ -64,7 +64,7 @@ Page **index** is never persisted in preferences — only page **size**.
 
 `CatalogOverviewTable` composes `OverviewTableFrame` with:
 
-- `DataTableFilterRegion` when `filterSchema` is provided (primary `FilterBar` + optional additional panel)
+- `DataTableFilterRegion` when `filterSchema` is provided — one subtle panel, primary `FilterBar`, and an **Additional filters** disclosure when advanced fields exist. `{N} active` counts advanced fields that differ from their defaults. **Clear filters** resets primary and advanced together. Open/closed state is `advancedOpen` in overview preferences only.
 - `ResultSummary` on utility bar row 1
 - Column visibility on utility bar row 2
 - Column visibility/order prefs (`catalog-overview-preferences.ts`)

@@ -50,7 +50,6 @@ export function createOrganizationRelationshipFilterSchema<TData>(
       createEqualsFilter<TData, OrganizationRelationshipFilterState, 'domain', string>({
         id: 'domain',
         label: RELATIONSHIP_FILTER_DOMAIN_LABEL,
-        layout: 'floating',
         width: 'lg',
         showAllOption: true,
         allOptionLabel: RELATIONSHIP_FILTER_ALL_DOMAINS_LABEL,

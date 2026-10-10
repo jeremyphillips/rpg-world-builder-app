@@ -14,6 +14,7 @@ function ReadChrome() {
   return (
     <div>
       <span data-testid="density">{chrome.density}</span>
+      <span data-testid="presentation">{chrome.selectPresentation}</span>
       <span data-testid="label" className={presentation.labelClassName} />
       <span data-testid="control">{presentation.controlSize}</span>
     </div>
@@ -29,6 +30,7 @@ describe('FilterChromeProvider', () => {
   it('defaults to compact density outside a provider', () => {
     render(<ReadChrome />)
     expect(screen.getByTestId('density')).toHaveTextContent('compact')
+    expect(screen.getByTestId('presentation')).toHaveTextContent('per-field')
     expect(screen.getByTestId('label')).toHaveClass('text-xs')
     expect(screen.getByTestId('control')).toHaveTextContent('sm')
   })
@@ -54,6 +56,19 @@ describe('FilterChromeProvider', () => {
       </FilterChromeProvider>,
     )
 
+    expect(screen.getByTestId('density')).toHaveTextContent('comfortable')
+  })
+
+  it('inherits floating select presentation unless a child overrides it', () => {
+    render(
+      <FilterChromeProvider selectPresentation="floating">
+        <FilterChromeProvider density="comfortable">
+          <ReadChrome />
+        </FilterChromeProvider>
+      </FilterChromeProvider>,
+    )
+
+    expect(screen.getByTestId('presentation')).toHaveTextContent('floating')
     expect(screen.getByTestId('density')).toHaveTextContent('comfortable')
   })
 

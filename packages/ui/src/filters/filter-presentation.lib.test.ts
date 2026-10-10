@@ -140,6 +140,10 @@ describe('filter-presentation.lib', () => {
     expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'floating' })).toBe('lg')
     expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'inline' })).toBe('lg')
     expect(resolveFilterSelectWidthToken({ type: 'select', layout: 'stacked' })).toBeUndefined()
+    expect(
+      resolveFilterSelectWidthToken({ type: 'select' }, { selectPresentation: 'floating' }),
+    ).toBe('lg')
+    expect(resolveFilterSelectWidthToken({ type: 'select' })).toBeUndefined()
   })
 
   it('delegates band sizing to shared field presentation', () => {
@@ -155,6 +159,16 @@ describe('filter-presentation.lib', () => {
     expect(mapFilterLayoutToLabelLayout(fieldAt(2))).toBe('inline')
     expect(mapFilterLayoutToLabelLayout(fieldAt(3))).toBe('inline')
     expect(mapFilterLayoutToLabelLayout({ type: 'select', layout: 'floating' })).toBe('hidden')
+    expect(
+      mapFilterLayoutToLabelLayout({ type: 'select' }, { selectPresentation: 'floating' }),
+    ).toBe('hidden')
+    expect(mapFilterLayoutToLabelLayout({ type: 'select' })).toBe('stacked')
+    expect(
+      mapFilterLayoutToLabelLayout(
+        { type: 'select', layout: 'stacked' },
+        { selectPresentation: 'floating' },
+      ),
+    ).toBe('stacked')
   })
 
   it('uses content-sized band for chips', () => {

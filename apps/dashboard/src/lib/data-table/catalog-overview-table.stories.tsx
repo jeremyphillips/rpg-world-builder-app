@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import type { ColumnDef } from '@rpg/ui'
 import { SortableHeader } from '@rpg/ui'
-import { createEqualsFilter } from '@rpg/ui/filters'
+import { createEqualsFilter, createFilterSchema, createTextFilter } from '@rpg/ui/filters'
 
 import { CatalogOverviewTable } from './catalog-overview-table'
 
@@ -78,6 +78,54 @@ export const WithFilters: Story = {
       data={ROSTER}
       filterSchema={rosterFilterSchema}
       caption="Catalog overview with FilterBar chrome"
+    />
+  ),
+}
+
+type RosterAdvancedState = {
+  name?: string
+  role?: string
+  source?: string
+}
+
+const rosterAdvancedSchema = createFilterSchema<RosterRow, RosterAdvancedState>([
+  createTextFilter<RosterRow, RosterAdvancedState, 'name'>({
+    id: 'name',
+    label: 'Name',
+    placeholder: 'Search roster…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<RosterRow, RosterAdvancedState, 'role', string>({
+    id: 'role',
+    label: 'Role',
+    width: 'md',
+    options: [
+      { label: 'Guard', value: 'guard' },
+      { label: 'Merchant', value: 'merchant' },
+    ],
+    getValue: (row) => row.role,
+  }),
+  createEqualsFilter<RosterRow, RosterAdvancedState, 'source', string>({
+    id: 'source',
+    label: 'Source',
+    placement: 'advanced',
+    width: 'md',
+    options: [
+      { label: 'System', value: 'system' },
+      { label: 'Homebrew', value: 'homebrew' },
+    ],
+    getValue: () => 'system',
+  }),
+])
+
+export const WithAdditionalFilters: Story = {
+  render: () => (
+    <CatalogOverviewTable
+      tableKey="story-roster-additional"
+      columns={COLUMNS}
+      data={ROSTER}
+      filterSchema={rosterAdvancedSchema}
+      caption="Catalog overview with additional filters"
     />
   ),
 }

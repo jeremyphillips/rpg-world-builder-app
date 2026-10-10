@@ -40,7 +40,6 @@ export function buildVocabularyOverviewFilterSchema(): FilterSchema<
         id: 'source',
         label: 'Source',
         placement: 'advanced',
-        layout: 'stacked',
         width: 'md',
         options: (Object.keys(VOCABULARY_SOURCE_BADGE) as VocabularyOptionSource[]).map(
           (value) => ({

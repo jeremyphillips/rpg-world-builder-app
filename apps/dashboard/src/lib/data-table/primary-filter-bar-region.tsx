@@ -76,6 +76,7 @@ export function PrimaryFilterPanel<T, TFilters extends Record<string, unknown>>(
     <FilterChromeProvider>
       <div className="flex flex-col gap-2">
         <DataTableFilterRegion
+          selectPresentation="per-field"
           primaryFilters={
             <FilterBar
               schema={filterSchema}

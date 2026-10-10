@@ -38,7 +38,6 @@ const demoSchema = createFilterSchema<DemoRow, DemoFilterState>([
     id: 'status',
     label: 'Status',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
@@ -91,7 +90,6 @@ function FilterSystemDemo({
         additionalFiltersOpen={advancedOpen}
         onAdditionalFiltersOpenChange={setAdvancedOpen}
         activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
         disabled={disabled}
       />
       <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
@@ -148,7 +146,6 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
   createEqualsFilter<DemoRow, ClassesLikeState, 'hitDie', string>({
     id: 'hitDie',
     label: 'Hit Die',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: '6', label: 'd6' },
@@ -168,7 +165,6 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
     id: 'status',
     label: 'Status',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
@@ -210,15 +206,182 @@ function ClassesLikePrimaryRowDemo() {
         additionalFiltersOpen={advancedOpen}
         onAdditionalFiltersOpenChange={setAdvancedOpen}
         activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
       />
     </div>
   )
 }
 
-/** Classes-like primary row: search + stacked select + boolean + More filters action. */
+/** Classes-like primary row. Omitted select layout floats inside the catalog region. */
 export const ClassesLikePrimaryRow: Story = {
   render: () => <ClassesLikePrimaryRowDemo />,
+}
+
+type DenseState = {
+  search?: string
+  hitDie?: string
+  ability?: string
+  feature?: string
+  spellcasting?: boolean
+  source?: string
+  status?: string
+  availability?: string
+  modeling?: string
+}
+
+const denseSchema = createFilterSchema<DemoRow, DenseState>([
+  createTextFilter<DemoRow, DenseState, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search classes…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    width: 'md',
+    options: [
+      { value: '6', label: 'd6' },
+      { value: '8', label: 'd8' },
+    ],
+    getValue: () => '8',
+  }),
+  createBooleanFilter<DemoRow, DenseState, 'spellcasting'>({
+    id: 'spellcasting',
+    label: 'Has spellcasting',
+    placement: 'primary',
+    getValue: () => false,
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'ability', string>({
+    id: 'ability',
+    label: 'Primary Ability',
+    width: 'lg',
+    options: [{ value: 'str', label: 'Strength' }],
+    getValue: () => 'str',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'feature', string>({
+    id: 'feature',
+    label: 'Features',
+    width: 'md',
+    options: [{ value: 'rage', label: 'Rage' }],
+    getValue: () => 'rage',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'source', string>({
+    id: 'source',
+    label: 'Source',
+    placement: 'advanced',
+    width: 'md',
+    defaultValue: 'system',
+    options: [
+      { value: 'system', label: 'System' },
+      { value: 'homebrew', label: 'Homebrew' },
+    ],
+    getValue: () => 'system',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'status', string>({
+    id: 'status',
+    label: 'Status',
+    placement: 'advanced',
+    width: 'md',
+    options: [{ value: 'published', label: 'Published' }],
+    getValue: () => 'published',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'availability', string>({
+    id: 'availability',
+    label: 'Campaign availability',
+    placement: 'advanced',
+    width: 'lg',
+    defaultValue: 'available',
+    options: [
+      { value: 'available', label: 'Available' },
+      { value: 'unavailable', label: 'Unavailable' },
+    ],
+    getValue: () => 'available',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'modeling', string>({
+    id: 'modeling',
+    label: 'Modeling',
+    placement: 'advanced',
+    width: 'md',
+    options: [{ value: 'draft', label: 'Draft' }],
+    getValue: () => 'draft',
+  }),
+])
+
+function DenseFiltersDemo() {
+  const { state, setValue, reset } = useFilterState(denseSchema, {
+    initialValues: { source: 'homebrew', status: 'published', modeling: 'draft' },
+  })
+  const [advancedOpen, setAdvancedOpen] = useState(true)
+  const advancedFields = useMemo(() => getSchemaFieldsByPlacement(denseSchema, 'advanced'), [])
+
+  return (
+    <div className="max-w-5xl">
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar schema={denseSchema} state={state} onValueChange={setValue} onReset={reset} />
+        }
+        additionalFilterFields={
+          <FilterFieldList
+            schema={denseSchema}
+            fields={advancedFields}
+            state={state}
+            idPrefix="filters-advanced"
+            onValueChange={setValue}
+          />
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={setAdvancedOpen}
+        activeAdditionalFilterCount={countModifiedFilters(denseSchema, state, 'advanced')}
+      />
+    </div>
+  )
+}
+
+/** Many primary fields plus four advanced fields in one panel. */
+export const DenseFilters: Story = {
+  render: () => <DenseFiltersDemo />,
+}
+
+const minimalSchema = createFilterSchema<DemoRow, { search?: string; hitDie?: string }>([
+  createTextFilter<DemoRow, { search?: string; hitDie?: string }, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search classes…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, { search?: string; hitDie?: string }, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    width: 'md',
+    options: [{ value: '8', label: 'd8' }],
+    getValue: () => '8',
+  }),
+])
+
+function MinimalPrimaryRowDemo() {
+  const { state, setValue, reset } = useFilterState(minimalSchema)
+
+  return (
+    <div className="max-w-3xl">
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={minimalSchema}
+            state={state}
+            onValueChange={setValue}
+            onReset={reset}
+          />
+        }
+        additionalFiltersOpen={false}
+        onAdditionalFiltersOpenChange={() => undefined}
+      />
+    </div>
+  )
+}
+
+/** Search and one select. No disclosure when the schema has no advanced fields. */
+export const MinimalPrimaryRow: Story = {
+  render: () => <MinimalPrimaryRowDemo />,
 }
 
 type MixedState = {

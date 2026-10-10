@@ -57,7 +57,6 @@ export function adminUsersFilterSchema(): FilterSchema<AdminUserListItem, AdminU
       id: 'activity',
       label: 'Activity',
       placement: 'advanced',
-      layout: 'stacked',
       width: 'md',
       options: [...ACTIVITY_OPTIONS],
       getValue: () => 'all',

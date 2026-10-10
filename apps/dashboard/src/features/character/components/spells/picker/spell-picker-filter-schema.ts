@@ -161,7 +161,6 @@ export function createSpellPickerFilterSchema(
         id: 'selectedSchool',
         label: getTermCompactLabel(SPELL_SCHOOL_TERM),
         defaultValue: SPELL_PICKER_SCHOOL_ALL,
-        layout: 'floating',
         showAllOption: false,
         options: [
           { value: SPELL_PICKER_SCHOOL_ALL, label: 'All' },

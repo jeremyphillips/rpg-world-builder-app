@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../components/ui/select.client'
+import { useFilterChrome } from './filter-chrome.context'
 import { getEffectiveFilterValue } from './filter-engine'
 import { normalizeFilterSelectChange, resolveSelectCurrentValue } from './filter-bar.lib'
 import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
@@ -49,6 +50,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
   disabled,
   onValueChange,
 }: FilterSelectControlProps<TData, TState>) {
+  const chrome = useFilterChrome()
   const rawValue = state[selectField.id]
   const effectiveValue = getEffectiveFilterValue(schema, state, selectField.id)
   const view = resolveFilterSelectControlView({
@@ -57,7 +59,9 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
     optionsContext,
     widthClassName,
     effectiveValue,
-    layout: resolveFilterSelectFieldLayout(selectField),
+    layout: resolveFilterSelectFieldLayout(selectField, {
+      selectPresentation: chrome.selectPresentation,
+    }),
   })
 
   const handleValueChange = (nextValue: string) => {

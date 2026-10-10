@@ -2,7 +2,7 @@
 
 `FloatingLabelField` is one composite in `packages/ui/src/components/ui/`. Consumers pass a label, a size, a `populated` flag, and exactly one control. They do not coordinate label motion, masks, or offsets.
 
-Filter toolbars opt in with `layout: 'floating'` on a select or text field. `FilterFloatingField` only maps filter density to `size`. Forms and builder fields stay on stacked labels until that rollout is evaluated.
+Catalog regions (`DataTableFilterRegion`, picker `CatalogFilterControls` / `CatalogToolbar`, relationship filter bands) set `selectPresentation: 'floating'`, so an omitted select `layout` renders as floating. Pass explicit `layout: 'floating'` only outside those regions, or when a field must stay floating even if the surrounding chrome is `per-field`. `layout: 'stacked'` or `layout: 'inline'` still overrides the region. `FilterFloatingField` only maps filter density to `size`. Forms, messages, and notifications stay on per-field chrome.
 
 ## What it is for
 
@@ -60,4 +60,4 @@ Text filters in this layout have no `Filter ${label}…` placeholder and no `ari
 
 When the all-value is selected, the trigger shows `All` (`FILTER_SELECT_ALL_TRIGGER_LABEL`). `allOptionLabel`, vocabulary resolvers, and menu items stay on the full label. Non-floating layouts are unchanged.
 
-Picker filter selects (spell school, relationship class, organization domain, location type) use this layout. Catalog sort uses `SortMenu`, not floating labels. Overview text filters and stacked overview selects do not, until the in-app evaluation says so.
+Picker and overview selects inside a floating catalog region use this layout without copying `layout: 'floating'` onto the schema. Explicit `layout` is the escape hatch. Catalog sort uses `SortMenu`, not floating labels. Search stays a search field. Messages and notifications keep per-field select chrome.

@@ -10,7 +10,6 @@ import {
 import {
   applyFilterSchema,
   countModifiedFilters,
-  createInitialFilterState,
   FilterBar,
   FilterChromeProvider,
   FilterFieldList,
@@ -245,15 +244,8 @@ export function CatalogOverviewFilterChrome<T, TFilters extends Record<string, u
   )
   const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
 
-  const handleResetAdvancedFilters = useCallback(() => {
-    const defaults = createInitialFilterState(filterSchema)
-    for (const field of advancedFields) {
-      onFilterChange(field.id, defaults[field.id])
-    }
-  }, [advancedFields, filterSchema, onFilterChange])
-
   return (
-    <FilterChromeProvider>
+    <FilterChromeProvider selectPresentation="floating">
       <DataTableFilterRegion
         primaryFilters={
           <FilterBar
@@ -277,7 +269,6 @@ export function CatalogOverviewFilterChrome<T, TFilters extends Record<string, u
         additionalFiltersOpen={advancedOpen}
         onAdditionalFiltersOpenChange={onAdvancedOpenChange}
         activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={handleResetAdvancedFilters}
       />
     </FilterChromeProvider>
   )

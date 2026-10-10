@@ -49,7 +49,6 @@ export function createContentSourceFilter<
     id: 'source',
     label: 'Source',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: (Object.keys(CONTENT_SOURCE_BADGE) as ContentSource[]).map((value) => ({
       value,
@@ -67,7 +66,6 @@ export function createContentStatusFilter<
     id: 'status',
     label: 'Status',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: (Object.keys(CONTENT_STATUS_BADGE) as ContentStatus[]).map((value) => ({
       value,

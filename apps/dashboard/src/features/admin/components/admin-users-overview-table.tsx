@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, DataTableFilterRegion, Text } from '@rpg/ui'
 import {
   countModifiedFilters,
-  createInitialFilterState,
   FilterBar,
   FilterChromeProvider,
   FilterFieldList,
@@ -54,13 +53,6 @@ export function AdminUsersOverviewTable() {
   )
   const advancedModifiedCount = countModifiedFilters(filterSchema, query.filters, 'advanced')
 
-  const handleResetAdvancedFilters = useCallback(() => {
-    const defaults = createInitialFilterState(filterSchema)
-    for (const field of advancedFields) {
-      actions.setFilterValue(field.id, defaults[field.id])
-    }
-  }, [actions, advancedFields, filterSchema])
-
   const filterRegion = (
     <FilterChromeProvider>
       <DataTableFilterRegion
@@ -86,7 +78,6 @@ export function AdminUsersOverviewTable() {
         additionalFiltersOpen={advancedOpen}
         onAdditionalFiltersOpenChange={setAdvancedOpen}
         activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={handleResetAdvancedFilters}
       />
     </FilterChromeProvider>
   )

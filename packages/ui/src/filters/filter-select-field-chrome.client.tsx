@@ -5,6 +5,7 @@ import { cn } from '../lib/utils'
 import { FilterFieldCaption } from './filter-field-caption.client'
 import { FilterFloatingField } from './filter-floating-field.client'
 import type { FilterFieldPresentation } from './filter-presentation.lib'
+import type { FilterSelectPresentation } from './filter-chrome.context'
 import type { FilterFieldWidth } from './filter-schema.types'
 
 export type FilterSelectFieldLayout = 'inline' | 'stacked' | 'default' | 'floating'
@@ -99,18 +100,21 @@ export function FilterSelectFieldChrome({
 }
 
 /**
- * Resolves select chrome layout. `width` never forces a layout — stacked keeps
- * visible label association regardless of width token.
+ * Resolves select chrome layout.
+ * Explicit `field.layout` wins, then the region `selectPresentation`, then stacked.
+ * `width` never forces a layout — stacked keeps visible label association regardless of width token.
  */
-export function resolveFilterSelectFieldLayout(field: {
-  layout?: 'stacked' | 'inline' | 'floating'
-  width?: FilterFieldWidth
-}): FilterSelectFieldLayout {
-  // `width` is accepted for call-site clarity but must not change layout/a11y.
+export function resolveFilterSelectFieldLayout(
+  field: {
+    layout?: 'stacked' | 'inline' | 'floating'
+    width?: FilterFieldWidth
+  },
+  options?: { selectPresentation?: FilterSelectPresentation },
+): FilterSelectFieldLayout {
   void field.width
-  if (field.layout === 'floating') return 'floating'
-  const layout = field.layout ?? 'stacked'
-  if (layout === 'inline') return 'inline'
-  if (layout === 'stacked') return 'stacked'
-  return 'default'
+  if (field.layout === 'floating' || field.layout === 'inline' || field.layout === 'stacked') {
+    return field.layout
+  }
+  if (options?.selectPresentation === 'floating') return 'floating'
+  return 'stacked'
 }

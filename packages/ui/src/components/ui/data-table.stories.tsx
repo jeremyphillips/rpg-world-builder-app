@@ -228,7 +228,6 @@ const classFilterSchema = createFilterSchema<CharacterClass, ClassFilterState>([
     id: 'source',
     label: 'Source',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { label: 'System', value: 'system' },
@@ -283,7 +282,6 @@ function ClassDataTableWithFilters() {
         additionalFiltersOpen={advancedOpen}
         onAdditionalFiltersOpenChange={setAdvancedOpen}
         activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
       />
       <DataTable columns={BASE_COLUMNS} data={filteredRows} defaultPageSize={10} />
     </div>

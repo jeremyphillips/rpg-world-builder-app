@@ -207,10 +207,13 @@ type ContentOverviewPreferences = {
 
 Key shape: `rpg:overview:v2:classes`, `rpg:overview:v2:spells`, …
 
-**Advanced panel openness is per overview type.** Remember the user’s explicit
-open/closed preference. Do **not** force the panel open when advanced filters are
-modified or when the URL activates advanced fields — show a modified-filter count
-while collapsed.
+**Additional-filters disclosure is per overview type.** Remember the user’s explicit
+open/closed preference in `advancedOpen`. Toggling it writes that preference only —
+not filter state and not the URL. Do **not** force the section open when advanced
+filters are modified or when the URL activates advanced fields. Show `{N} active`
+on the disclosure while collapsed. `N` counts advanced fields whose effective value
+differs from `defaultValue` (`countModifiedFilters(..., 'advanced')`). A resting
+default such as campaign availability **Available** is not counted.
 
 ### Never automatically persisted
 
@@ -413,7 +416,7 @@ Dependent fields render at the end of their content group and only while their p
 
 A picker has one Reset and no Clear filters. Every row-narrowing control belongs in the filter schema. Mode and workflow switches stay outside it. The reset row always shows the visible count as `N results` in a polite live region. `visible` is the count after tab, structured filters, and search. Sort does not change the count. Reset is separate toolbar chrome: it appears for narrowing criteria or a non-default sort, and a sort-only change still shows the full eligible count. Result counts reserve at most two representative labels via `resultCountSizerLabels(total)` (singular `1 result` and plural at the eligible total, with grouped digits). Tabular numerals on ghosts and the live count keep width stable for every visible count from `0` through that total without O(N) DOM nodes.
 
-Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, a More filters panel, and chip clear. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter density.
+Overview `FilterBar` inside `DataTableFilterRegion` is a separate product: URL state, one filter panel with an **Additional filters** disclosure, and **Clear filters** for the whole schema. Drawer reset restores search, filters, and sort. Shared pieces are the schema, `FilterFieldRenderer`, and filter chrome (`density`, `selectPresentation`).
 
 ### Out of scope for catalog filters
 
@@ -444,19 +447,27 @@ Import from `@rpg/ui/filters`:
 - `ActiveFilterChips` — data-only chip summaries with central `onClear(fieldId)` / optional `onClearAll` (shown when 2+ chips)
 - `resolveActiveFilterChips(schema, state)` — derives chips from modified fields; boolean chips use natural copy (`Unread only`, not `Unread only: Yes`)
 - `FilterAdvancedPanel` — configurable header for `placement: 'advanced'` fields; overview shells pass field content only — `DataTableFilterRegion` owns trigger, panel id, reset, and collapse
-- `FilterInlineControl` — shared inline boolean shell (native checkbox + label). Default `variant="outline"` matches More filters; opt in with field `shellVariant: 'ghost'` (or `FilterInlineControl` `variant="ghost"`) for toolbar surfaces. Appearance is orthogonal to filter density/size.
-- `DataTableFilterRegion` — primary field row, full-height **More filters** trigger rail, and region-owned additional-filters panel
+- `FilterInlineControl` — shared inline boolean shell (native checkbox + label). Default `variant="outline"`; opt in with field `shellVariant: 'ghost'` (or `FilterInlineControl` `variant="ghost"`) for toolbar surfaces. Appearance is orthogonal to filter density/size.
+- `DataTableFilterRegion` — one `bg-surface-subtle` panel. Primary fields wrap with `items-end` and `gap-3`. When advanced fields exist, a full-width **Additional filters** disclosure sits under a divider, with a neutral `{N} active` badge when `N > 0` (including while collapsed). Expanding renders the additional fields with the same wrap rules. There is no nested muted panel and no advanced-only Reset. **Clear filters** resets the whole schema. No disclosure and no divider when `additionalFilterFields` is absent.
 
 Select fields use an internal `__all__` sentinel for “show all”; it never leaves the renderer.
 
 ### Filter chrome
 
-**Filter chrome** is inherited section-level presentation configuration (density, and
-potentially rhythm/control treatment later). It does not include filter values, schema,
-or behavior.
+**Filter chrome** is inherited section-level presentation configuration (density and
+select presentation). It does not include filter values, schema, or behavior.
 
 - `FilterChromeProvider` wraps filter sections. Omitted `density` inherits the parent
   provider; explicit `density` overrides.
+- `selectPresentation` is `per-field` outside catalog regions (omitted select `layout`
+  stays stacked) or `floating` inside them. Resolution order for selects:
+  explicit `field.layout` → region `selectPresentation` → stacked.
+  Catalog boundaries set `floating`: `DataTableFilterRegion` (default),
+  `CatalogOverviewFilterChrome`, `CatalogFilterControls`, `CatalogToolbar`, and
+  relationship catalog filter bands. Messages and notifications pass
+  `selectPresentation="per-field"` on `DataTableFilterRegion`. Do not copy
+  `layout: 'floating'` onto every catalog select once the region default applies.
+  Explicit `layout: 'stacked' | 'inline' | 'floating'` still wins.
 - `useFilterChrome()` — strict hook for schema-owned components; defaults to compact
   outside a provider.
 - `useOptionalFilterChrome()` — optional hook for general primitives (e.g.
@@ -510,20 +521,21 @@ Filter bars share control-band + control-edge alignment with forms. Ownership li
 `@rpg/ui` field-layout modules — not under `filters/`. See
 [sizing-and-spacing.md](./forms/sizing-and-spacing.md#control-band--row-alignment-ssot).
 
-| Default               | Value                                                                                                               |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Density → size        | `compact` → `sm`, `comfortable` → `md` (`resolveFilterControlSize`)                                                 |
-| Primary bar alignment | `items-end` (control-edge) on `FilterBar`, field group, catalog controls, trailing actions                          |
-| Common primary labels | Hidden (text search, default select chrome)                                                                         |
-| Stacked labels        | Advanced panel selects and primary selects with `layout: 'stacked'` (e.g. Hit Die)                                  |
-| Floating labels       | Opt-in `layout: 'floating'` on selects and text fields. See [floating-label-fields.md](./floating-label-fields.md). |
-| Booleans              | Checkbox + label inside a single-line control band — **not** switches                                               |
+| Default               | Value                                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Density → size        | `compact` → `sm`, `comfortable` → `md` (`resolveFilterControlSize`)                                                                               |
+| Primary bar alignment | `items-end` (control-edge) on `FilterBar`, field group, catalog controls, trailing actions                                                        |
+| Common primary labels | Hidden for search. Select captions follow layout resolution                                                                                       |
+| Stacked labels        | Explicit `layout: 'stacked'`, or omitted layout outside a floating catalog region                                                                 |
+| Floating labels       | Catalog regions (`selectPresentation: 'floating'`) and explicit `layout: 'floating'`. See [floating-label-fields.md](./floating-label-fields.md). |
+| Booleans              | Checkbox + label inside a single-line control band — **not** switches                                                                             |
 
 `resolveFilterFieldPresentation` delegates band/size to `resolveFieldPresentation` and
-maps filter `layout` (`default` → hidden, `stacked` → stacked, `inline` → inline,
-`floating` → hidden). The floating composite owns the visible label, so the bar does
-not add a second caption. Stacked selects always wire `label htmlFor` ↔ control `id`,
-including when `width` is set.
+maps the resolved select layout (`stacked` → stacked, `inline` → inline, `floating` →
+hidden). Region `selectPresentation: 'floating'` supplies floating when `layout` is
+omitted. The floating composite owns the visible label, so the bar does not add a
+second caption. Stacked selects always wire `label htmlFor` ↔ control `id`, including
+when `width` is set.
 
 Floating text fields use the label as the accessible name. `placeholder` is optional
 guidance shown only while the field is focused and empty. There is no `Filter ${label}…`
@@ -545,7 +557,6 @@ select on its all-value shows `All` in the trigger. Menu items keep `allOptionLa
       additionalFiltersOpen={advancedOpen}
       onAdditionalFiltersOpenChange={setAdvancedOpen}
       activeAdditionalFilterCount={advancedModifiedCount}
-      onResetAdditionalFilters={resetAdvanced}
     />
   }
   resultSummary={<ResultSummary visibleCount={filteredRows.length} />}
