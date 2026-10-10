@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
-import { countModifiedFilters } from './filter-engine'
+import { DataTableFilterChrome } from '../components/ui/data-table-filter-chrome.client'
 import {
   createBooleanFilter,
   createChipsFilter,
@@ -11,8 +10,6 @@ import {
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
 import { FilterBar } from './filter-bar.client'
-import { FilterFieldList } from './filter-fields.client'
-import { getSchemaFieldsByPlacement } from './filter-bar.lib'
 import { useFilterState } from './use-filter-state.client'
 
 type DemoRow = {
@@ -38,7 +35,6 @@ const demoSchema = createFilterSchema<DemoRow, DemoFilterState>([
     id: 'status',
     label: 'Status',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
@@ -63,36 +59,17 @@ function FilterSystemDemo({
 }) {
   const { state, setValue, reset } = useFilterState(demoSchema, { initialValues })
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const advancedFields = useMemo(() => getSchemaFieldsByPlacement(demoSchema, 'advanced'), [])
-  const advancedModifiedCount = countModifiedFilters(demoSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={demoSchema}
-            state={state}
-            disabled={disabled}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={demoSchema}
-            fields={advancedFields}
-            state={state}
-            disabled={disabled}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
+      <DataTableFilterChrome
+        filterSchema={demoSchema}
+        state={state}
         disabled={disabled}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
       <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
         {JSON.stringify(state, null, 2)}
@@ -148,7 +125,6 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
   createEqualsFilter<DemoRow, ClassesLikeState, 'hitDie', string>({
     id: 'hitDie',
     label: 'Hit Die',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: '6', label: 'd6' },
@@ -168,7 +144,6 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
     id: 'status',
     label: 'Status',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { value: 'draft', label: 'Draft' },
@@ -181,44 +156,178 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
 function ClassesLikePrimaryRowDemo() {
   const { state, setValue, reset } = useFilterState(classesLikeSchema)
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const advancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(classesLikeSchema, 'advanced'),
-    [],
-  )
-  const advancedModifiedCount = countModifiedFilters(classesLikeSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={classesLikeSchema}
-            state={state}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={classesLikeSchema}
-            fields={advancedFields}
-            state={state}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
+      <DataTableFilterChrome
+        filterSchema={classesLikeSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
     </div>
   )
 }
 
-/** Classes-like primary row: search + stacked select + boolean + More filters action. */
+/** Classes-like primary row. Omitted select layout floats inside the catalog region. */
 export const ClassesLikePrimaryRow: Story = {
   render: () => <ClassesLikePrimaryRowDemo />,
+}
+
+type DenseState = {
+  search?: string
+  hitDie?: string
+  ability?: string
+  feature?: string
+  spellcasting?: boolean
+  source?: string
+  status?: string
+  availability?: string
+  modeling?: string
+}
+
+const denseSchema = createFilterSchema<DemoRow, DenseState>([
+  createTextFilter<DemoRow, DenseState, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search classes…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    width: 'md',
+    options: [
+      { value: '6', label: 'd6' },
+      { value: '8', label: 'd8' },
+    ],
+    getValue: () => '8',
+  }),
+  createBooleanFilter<DemoRow, DenseState, 'spellcasting'>({
+    id: 'spellcasting',
+    label: 'Has spellcasting',
+    placement: 'primary',
+    getValue: () => false,
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'ability', string>({
+    id: 'ability',
+    label: 'Primary Ability',
+    width: 'lg',
+    options: [{ value: 'str', label: 'Strength' }],
+    getValue: () => 'str',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'feature', string>({
+    id: 'feature',
+    label: 'Features',
+    width: 'md',
+    options: [{ value: 'rage', label: 'Rage' }],
+    getValue: () => 'rage',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'source', string>({
+    id: 'source',
+    label: 'Source',
+    placement: 'advanced',
+    width: 'md',
+    defaultValue: 'system',
+    options: [
+      { value: 'system', label: 'System' },
+      { value: 'homebrew', label: 'Homebrew' },
+    ],
+    getValue: () => 'system',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'status', string>({
+    id: 'status',
+    label: 'Status',
+    placement: 'advanced',
+    width: 'md',
+    options: [{ value: 'published', label: 'Published' }],
+    getValue: () => 'published',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'availability', string>({
+    id: 'availability',
+    label: 'Campaign availability',
+    placement: 'advanced',
+    width: 'lg',
+    defaultValue: 'available',
+    options: [
+      { value: 'available', label: 'Available' },
+      { value: 'unavailable', label: 'Unavailable' },
+    ],
+    getValue: () => 'available',
+  }),
+  createEqualsFilter<DemoRow, DenseState, 'modeling', string>({
+    id: 'modeling',
+    label: 'Modeling',
+    placement: 'advanced',
+    width: 'md',
+    options: [{ value: 'draft', label: 'Draft' }],
+    getValue: () => 'draft',
+  }),
+])
+
+function DenseFiltersDemo() {
+  const { state, setValue, reset } = useFilterState(denseSchema, {
+    initialValues: { source: 'homebrew', status: 'published', modeling: 'draft' },
+  })
+  const [advancedOpen, setAdvancedOpen] = useState(true)
+
+  return (
+    <div className="max-w-5xl">
+      <DataTableFilterChrome
+        filterSchema={denseSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
+      />
+    </div>
+  )
+}
+
+/** Many primary fields plus four advanced fields in one panel. */
+export const DenseFilters: Story = {
+  render: () => <DenseFiltersDemo />,
+}
+
+const minimalSchema = createFilterSchema<DemoRow, { search?: string; hitDie?: string }>([
+  createTextFilter<DemoRow, { search?: string; hitDie?: string }, 'search'>({
+    id: 'search',
+    label: 'Search',
+    placeholder: 'Search classes…',
+    getSearchText: (row) => row.name,
+  }),
+  createEqualsFilter<DemoRow, { search?: string; hitDie?: string }, 'hitDie', string>({
+    id: 'hitDie',
+    label: 'Hit Die',
+    width: 'md',
+    options: [{ value: '8', label: 'd8' }],
+    getValue: () => '8',
+  }),
+])
+
+function MinimalPrimaryRowDemo() {
+  const { state, setValue, reset } = useFilterState(minimalSchema)
+
+  return (
+    <div className="max-w-3xl">
+      <DataTableFilterChrome
+        filterSchema={minimalSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={false}
+        onAdvancedFiltersOpenChange={() => undefined}
+      />
+    </div>
+  )
+}
+
+/** Search and one select. No disclosure when the schema has no advanced fields. */
+export const MinimalPrimaryRow: Story = {
+  render: () => <MinimalPrimaryRowDemo />,
 }
 
 type MixedState = {

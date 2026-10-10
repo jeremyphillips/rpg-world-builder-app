@@ -341,7 +341,9 @@ export function FilterFieldRenderer<TData, TState extends Record<string, unknown
 }: FilterFieldRendererProps<TData, TState>) {
   const chrome = useFilterChrome()
   const presentation = resolveFilterFieldPresentation(field, chrome)
-  const widthClassName = resolveFilterFieldWidthClasses(resolveFilterSelectWidthToken(field))
+  const widthClassName = resolveFilterFieldWidthClasses(
+    resolveFilterSelectWidthToken(field, { selectPresentation: chrome.selectPresentation }),
+  )
   const disabled = isFilterFieldDisabled(field, context.state, context.disabled)
   const optionsContext: FilterFieldOptionsContext<TData, TState> = {
     state: context.state,

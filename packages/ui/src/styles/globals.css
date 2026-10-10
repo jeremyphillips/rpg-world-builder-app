@@ -204,8 +204,6 @@
   --text-sm--line-height: 1.25rem; /* 20px */
   --text-md: 0.9375rem; /* 15px — secondary body (prose-md, Text small, …) */
   --text-md--line-height: 1.375rem; /* 22px */
-  /* Comfortable floating-label scale: caption --text-sm / resting --text-md. Fallback when typed calc() division is unavailable. */
-  --floating-label-scale-md: 0.9333333333;
   --text-base: 1rem; /* 16px */
   --text-base--line-height: 1.5rem; /* 24px */
   --text-lg: 1.125rem; /* 18px */
@@ -288,6 +286,14 @@
   --text-2xs-meta: 0.5625rem; /* 9px */
   --text-xs-meta: 0.6875rem; /* 11px */
   --text-sm-meta: 0.8125rem; /* 13px */
+
+  /* Floated label sizes — derived from resting control type; compact floor is --text-xs-meta. */
+  --field-floating-label-reduction: 0.125rem; /* 2px @ 16px root */
+  --field-floating-label-sm: max(
+    var(--text-xs-meta),
+    calc(var(--text-xs) - var(--field-floating-label-reduction))
+  );
+  --field-floating-label-md: calc(var(--text-md) - var(--field-floating-label-reduction));
 
   --text-eyebrow-xs: var(--text-2xs-meta);
   --text-eyebrow-sm: var(--text-xs-meta);

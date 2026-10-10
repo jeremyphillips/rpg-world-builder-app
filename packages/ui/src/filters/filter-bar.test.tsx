@@ -8,8 +8,10 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
+import { FilterChromeProvider } from './filter-chrome.context'
 import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
-import { setFilterValue } from './filter-engine'
+import { resetFilterState, setFilterValue } from './filter-engine'
+import { useFilterState } from './use-filter-state.client'
 import { createFilterSchema } from './filter-schema.types'
 import { FilterBar } from './filter-bar.client'
 import { FilterFieldList } from './filter-fields.client'
@@ -89,11 +91,9 @@ const mixedPrimarySchema = createFilterSchema<DemoRow, MixedPrimaryState>([
 function FilterSystemHarness({
   initialState = {},
   onReset = vi.fn(),
-  onResetAdvanced = vi.fn(),
 }: {
   initialState?: TestFilterState
   onReset?: () => void
-  onResetAdvanced?: () => void
 }) {
   const [state, setState] = useState<TestFilterState>(initialState)
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -101,38 +101,37 @@ function FilterSystemHarness({
   const advancedModifiedCount = countModifiedFilters(schema, state, 'advanced')
 
   return (
-    <DataTableFilterRegion
-      primaryFilters={
-        <FilterBar
-          schema={schema}
-          state={state}
-          onValueChange={(id, value) => {
-            setState((current) => setFilterValue(schema, current, id, value))
-          }}
-          onReset={() => {
-            setState({})
-            onReset()
-          }}
-        />
-      }
-      additionalFilterFields={
-        <FilterFieldList
-          schema={schema}
-          fields={advancedFields}
-          state={state}
-          idPrefix="filters-advanced"
-          onValueChange={(id, value) => {
-            setState((current) => setFilterValue(schema, current, id, value))
-          }}
-        />
-      }
-      additionalFiltersOpen={advancedOpen}
-      onAdditionalFiltersOpenChange={setAdvancedOpen}
-      activeAdditionalFilterCount={advancedModifiedCount}
-      onResetAdditionalFilters={() => {
-        onResetAdvanced()
-      }}
-    />
+    <FilterChromeProvider density="compact" selectPresentation="floating">
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={schema}
+            state={state}
+            onValueChange={(id, value) => {
+              setState((current) => setFilterValue(schema, current, id, value))
+            }}
+            onReset={() => {
+              setState(resetFilterState(schema))
+              onReset()
+            }}
+          />
+        }
+        additionalFilterFields={
+          <FilterFieldList
+            schema={schema}
+            fields={advancedFields}
+            state={state}
+            idPrefix="filters-advanced"
+            onValueChange={(id, value) => {
+              setState((current) => setFilterValue(schema, current, id, value))
+            }}
+          />
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={setAdvancedOpen}
+        activeAdditionalFilterCount={advancedModifiedCount}
+      />
+    </FilterChromeProvider>
   )
 }
 
@@ -145,32 +144,77 @@ describe('FilterBar', () => {
     expect(screen.getByLabelText('Search')).toBeInTheDocument()
     expect(screen.queryByLabelText('Hidden only')).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: /More filters/i }))
+    await user.click(screen.getByRole('button', { name: /Additional filters/i }))
     expect(screen.getByText('Status')).toHaveClass('text-xs')
     expect(screen.getByLabelText('Hidden only')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /reset additional filters/i }),
+    ).not.toBeInTheDocument()
   })
 
-  it('shows reset additional filters when advanced filters are modified', async () => {
-    const user = userEvent.setup()
-    const onResetAdvanced = vi.fn()
+  it('keeps the advanced active badge while the disclosure is collapsed', () => {
+    render(<FilterSystemHarness initialState={{ hiddenOnly: true }} />)
 
-    render(
-      <FilterSystemHarness initialState={{ hiddenOnly: true }} onResetAdvanced={onResetAdvanced} />,
+    expect(screen.getByRole('button', { name: /Additional filters/i })).toHaveAttribute(
+      'aria-expanded',
+      'false',
     )
+    expect(screen.getByText('1 active')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Hidden only')).not.toBeInTheDocument()
+  })
 
-    await user.click(screen.getByRole('button', { name: /More filters/i }))
-    await user.click(screen.getByRole('button', { name: 'Reset additional filters' }))
-    expect(onResetAdvanced).toHaveBeenCalled()
+  it('does not change filter values when the disclosure toggles', async () => {
+    const user = userEvent.setup()
+    render(<FilterSystemHarness initialState={{ search: 'fire', hiddenOnly: true }} />)
+
+    expect(screen.getByLabelText('Search')).toHaveValue('fire')
+    await user.click(screen.getByRole('button', { name: /Additional filters/i }))
+    expect(screen.getByLabelText('Search')).toHaveValue('fire')
+    expect(screen.getByText('1 active')).toBeInTheDocument()
   })
 
   it('shows clear filters when primary filters are modified', () => {
     render(<FilterSystemHarness initialState={{ search: 'fire' }} />)
     expect(screen.getByRole('button', { name: 'Clear filters' })).toBeInTheDocument()
   })
-  it('shows an advanced modified count badge when collapsed', () => {
-    render(<FilterSystemHarness initialState={{ hiddenOnly: true }} />)
+  it('clears primary and advanced fields from Clear filters', async () => {
+    const user = userEvent.setup()
 
-    expect(screen.getByText('1')).toBeInTheDocument()
+    function ResetHarness() {
+      const { state, setValue, reset } = useFilterState(schema, {
+        initialValues: { search: 'spell', status: 'draft', hiddenOnly: true },
+      })
+      const [advancedOpen, setAdvancedOpen] = useState(true)
+      const advancedFields = schema.fields.filter((field) => field.placement === 'advanced')
+
+      return (
+        <FilterChromeProvider density="compact" selectPresentation="floating">
+          <DataTableFilterRegion
+            primaryFilters={
+              <FilterBar schema={schema} state={state} onValueChange={setValue} onReset={reset} />
+            }
+            additionalFilterFields={
+              <FilterFieldList
+                schema={schema}
+                fields={advancedFields}
+                state={state}
+                idPrefix="filters-advanced"
+                onValueChange={setValue}
+              />
+            }
+            additionalFiltersOpen={advancedOpen}
+            onAdditionalFiltersOpenChange={setAdvancedOpen}
+            activeAdditionalFilterCount={countModifiedFilters(schema, state, 'advanced')}
+          />
+        </FilterChromeProvider>
+      )
+    }
+
+    render(<ResetHarness />)
+    expect(screen.getByLabelText('Search')).toHaveValue('spell')
+    await user.click(screen.getByRole('button', { name: 'Clear filters' }))
+    expect(screen.getByLabelText('Search')).toHaveValue('')
+    expect(screen.queryByText(/active/i)).not.toBeInTheDocument()
   })
 
   it('calls onReset from the toolbar button', () => {
@@ -213,14 +257,16 @@ describe('FilterBar', () => {
 
   it('uses outline chrome on boolean shells to match row select and action controls', () => {
     render(
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
-        }
-        additionalFilterFields={<input aria-label="Advanced field" />}
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
-      />,
+      <FilterChromeProvider density="compact" selectPresentation="floating">
+        <DataTableFilterRegion
+          primaryFilters={
+            <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
+          }
+          additionalFilterFields={<input aria-label="Advanced field" />}
+          additionalFiltersOpen={false}
+          onAdditionalFiltersOpenChange={() => undefined}
+        />
+      </FilterChromeProvider>,
     )
 
     const combobox = screen.getByRole('combobox', { name: 'Hit Die' })

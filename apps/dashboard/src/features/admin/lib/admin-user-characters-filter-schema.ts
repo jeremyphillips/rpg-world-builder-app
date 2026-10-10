@@ -26,6 +26,7 @@ export function adminUserCharactersFilterSchema(): FilterSchema<
       id: 'q',
       label: 'Search',
       placeholder: 'Search characters…',
+      control: 'search',
       url: { key: 'q' },
       getSearchText: (row) => `${row.character.name} ${row.character.summary}`,
     }),

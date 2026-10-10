@@ -127,7 +127,6 @@ export function createLocationRelationshipFilterSchema<TData>(
       createEqualsFilter<TData, LocationRelationshipFilterState, 'kind', string>({
         id: 'kind',
         label: RELATIONSHIP_FILTER_TYPE_LABEL,
-        layout: 'floating',
         width: 'lg',
         showAllOption: true,
         allOptionLabel: RELATIONSHIP_FILTER_ALL_LABEL,

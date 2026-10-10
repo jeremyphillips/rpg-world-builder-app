@@ -71,12 +71,18 @@ export const filterToolbarLabelSizerGhostClasses =
 export const filterToolbarLabelSizerLiveClasses =
   'col-start-1 row-start-1 min-w-0 truncate text-left tabular-nums'
 
+/** Ellipsis and shrink for the value slot when a width cap is active. */
+export const filterToolbarCappedSelectValueSlotClasses =
+  '[&_[data-select-value-slot]]:max-w-full [&_[data-select-value-slot]]:min-w-0 [&_[data-select-value-slot]]:shrink [&_[data-select-value-slot]]:overflow-hidden [&_[data-select-value-slot]]:grid-cols-[minmax(0,max-content)]'
+
 /**
  * Lets a width-token cap shrink a select below its widest ghost and ellipsize
  * the live value. The token stays a max width; it does not set a fixed width.
  */
-export const filterToolbarCappedSelectClasses =
-  'overflow-hidden [&_[data-select-value-slot]]:max-w-full [&_[data-select-value-slot]]:min-w-0 [&_[data-select-value-slot]]:shrink [&_[data-select-value-slot]]:overflow-hidden [&_[data-select-value-slot]]:grid-cols-[minmax(0,max-content)]'
+export const filterToolbarCappedSelectClasses = cn(
+  'overflow-hidden',
+  filterToolbarCappedSelectValueSlotClasses,
+)
 
 export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
   variants: {

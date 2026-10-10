@@ -28,6 +28,7 @@ export function buildVocabularyOverviewFilterSchema(): FilterSchema<
         id: 'name',
         label: 'Name',
         placeholder: 'Search…',
+        control: 'search',
         url: { key: 'q' },
         getSearchText: (row) => row.label,
       }),
@@ -40,7 +41,6 @@ export function buildVocabularyOverviewFilterSchema(): FilterSchema<
         id: 'source',
         label: 'Source',
         placement: 'advanced',
-        layout: 'stacked',
         width: 'md',
         options: (Object.keys(VOCABULARY_SOURCE_BADGE) as VocabularyOptionSource[]).map(
           (value) => ({

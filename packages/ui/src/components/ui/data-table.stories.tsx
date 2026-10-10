@@ -17,14 +17,10 @@ import {
   createEqualsFilter,
   createTextFilter,
   createFilterSchema,
-  FilterBar,
-  FilterFieldList,
   applyFilterSchema,
-  countModifiedFilters,
-  getSchemaFieldsByPlacement,
   useFilterState,
 } from '../../filters'
-import { DataTableFilterRegion } from './data-table-filter-region.client'
+import { DataTableFilterChrome } from './data-table-filter-chrome.client'
 
 // ---------------------------------------------------------------------------
 // Shared fixture data + types
@@ -228,7 +224,6 @@ const classFilterSchema = createFilterSchema<CharacterClass, ClassFilterState>([
     id: 'source',
     label: 'Source',
     placement: 'advanced',
-    layout: 'stacked',
     width: 'md',
     options: [
       { label: 'System', value: 'system' },
@@ -250,11 +245,6 @@ function ClassDataTable(props: DataTableProps<CharacterClass>) {
 function ClassDataTableWithFilters() {
   const { state, setValue, reset } = useFilterState(classFilterSchema)
   const [advancedOpen, setAdvancedOpen] = React.useState(false)
-  const advancedFields = React.useMemo(
-    () => getSchemaFieldsByPlacement(classFilterSchema, 'advanced'),
-    [],
-  )
-  const advancedModifiedCount = countModifiedFilters(classFilterSchema, state, 'advanced')
   const filteredRows = React.useMemo(
     () => applyFilterSchema(classFilterSchema, state, CLASSES),
     [state],
@@ -262,28 +252,13 @@ function ClassDataTableWithFilters() {
 
   return (
     <div className="flex flex-col gap-3">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={classFilterSchema}
-            state={state}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={classFilterSchema}
-            fields={advancedFields}
-            state={state}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
-        onResetAdditionalFilters={reset}
+      <DataTableFilterChrome
+        filterSchema={classFilterSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
       <DataTable columns={BASE_COLUMNS} data={filteredRows} defaultPageSize={10} />
     </div>

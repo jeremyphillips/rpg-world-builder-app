@@ -207,6 +207,40 @@ describe('filter-engine', () => {
       expect(countModifiedFilters(schema, state)).toBe(2)
     })
 
+    it('ignores an advanced field that is still on its default', () => {
+      const availabilitySchema = createFilterSchema<Row, TestFilterState>([
+        createEqualsFilter<
+          Row,
+          TestFilterState,
+          'campaignAvailability',
+          'available' | 'unavailable' | 'all'
+        >({
+          id: 'campaignAvailability',
+          label: 'Availability',
+          placement: 'advanced',
+          defaultValue: 'available',
+          options: [
+            { value: 'available', label: 'Available' },
+            { value: 'unavailable', label: 'Unavailable' },
+            { value: 'all', label: 'All' },
+          ],
+          getValue: () => 'available',
+        }),
+      ])
+
+      expect(
+        countModifiedFilters(availabilitySchema, { campaignAvailability: 'available' }, 'advanced'),
+      ).toBe(0)
+      expect(countModifiedFilters(availabilitySchema, {}, 'advanced')).toBe(0)
+      expect(
+        countModifiedFilters(
+          availabilitySchema,
+          { campaignAvailability: 'unavailable' },
+          'advanced',
+        ),
+      ).toBe(1)
+    })
+
     it('scopes counts by placement', () => {
       const state = {
         search: 'fire',

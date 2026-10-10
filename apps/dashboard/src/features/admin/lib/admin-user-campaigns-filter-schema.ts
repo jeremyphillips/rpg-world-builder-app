@@ -28,6 +28,7 @@ export function adminUserCampaignsFilterSchema(): FilterSchema<
       id: 'q',
       label: 'Search',
       placeholder: 'Search campaigns…',
+      control: 'search',
       url: { key: 'q' },
       getSearchText: (row) => row.campaign.name,
     }),

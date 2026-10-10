@@ -2,7 +2,7 @@
 
 `FloatingLabelField` is one composite in `packages/ui/src/components/ui/`. Consumers pass a label, a size, a `populated` flag, and exactly one control. They do not coordinate label motion, masks, or offsets.
 
-Filter toolbars opt in with `layout: 'floating'` on a select or text field. `FilterFloatingField` only maps filter density to `size`. Forms and builder fields stay on stacked labels until that rollout is evaluated.
+Catalog regions (`DataTableFilterRegion`, picker `CatalogFilterControls` / `CatalogToolbar`, relationship filter bands) set `selectPresentation: 'floating'`, so an omitted select `layout` renders as floating. Pass explicit `layout: 'floating'` only outside those regions, or when a field must stay floating even if the surrounding chrome is `per-field`. `layout: 'stacked'` or `layout: 'inline'` still overrides the region. `FilterFloatingField` only maps filter density to `size`. Forms, messages, and notifications stay on per-field chrome.
 
 ## What it is for
 
@@ -25,12 +25,13 @@ Browser autofill is visual only. `:autofill` forces the floated treatment so tex
 
 ## Geometry
 
-- Compact (`sm`) is `h-8`. The resting label is `text-xs`. The floated label stays `text-xs` and moves to the caption colour.
-- Comfortable (`md`) is `h-9`. The resting label is `text-md`. Floating scales it toward caption `text-sm` (`--text-sm / --text-md`). Font-size is not animated.
+- Compact (`sm`) is `h-8`. Resting label is `text-xs` (12px). Floated label is `--field-floating-label-sm`: `max(--text-xs-meta, --text-xs - 2px)` (11px floor).
+- Comfortable (`md`) is `h-9`. Resting label is `text-md` (15px). Floated label is `--field-floating-label-md` (`--text-md - 2px`, 13px). Weight stays `font-normal` (400) in both densities.
+- Font-size, translate, and colour share `--floating-label-move` (~150ms). There is no `scale()` step.
 - The floated label hangs outside the shell. The shell height is the control height, so toolbar rows align the control with neighboring inline controls.
-- The label is `pointer-events-none` and stops before the caret column.
-- The mask is a `--surface-current` / `--field-control-bg` gradient on the label. Disabled, readonly, and invalid controls switch the lower half to the matching field fill. Forced colours use a solid `Canvas` background because they drop background images.
-- Focus rings stay on the control (`fieldInputFocusClasses`). The mask is the only interruption. Half the floated label must cover the ring offset plus the ring width.
+- The label is `pointer-events-none`. While resting it stops before the caret column (`end-8`); when floated it may use the full control width between the value insets.
+- The border notch is a `--surface-current` chip on the label (`::before`, 4px horizontal pad) with a bottom fade (`mask-image` 50% → transparent) so the lower half blends into the control. Host surfaces must establish `--surface-current` (filter panels, forms, modals). Forced colours use solid `Canvas` on the label because masks are dropped.
+- Focus rings stay on the control (`fieldInputFocusClasses`). Half the floated label must cover the ring offset plus the ring width.
 
 Reduced motion sets both the duration and the delay to 0. The global reduced-motion rule shortens durations and leaves delays, so it is not enough on its own.
 
@@ -48,7 +49,11 @@ The composite resets anatomy-row participation so it does not join a parent thre
 
 ## Width
 
-The composite does not measure width. Select and combobox width stays on `SelectLikeValueSlot` ghosts. `withFloatingLabelSizingLabel(label, sizingLabels)` appends the label as one more ghost at control typography. Changing the value does not change the width.
+The composite does not measure width. Select and combobox width stays on `SelectLikeValueSlot` ghosts. `withFloatingLabelSizingLabel(label, sizingLabels)` appends the label as one more ghost at control typography so unconstrained controls grow to fit the label.
+
+A schema `width` token is a **max width on the whole control**. When capped, the floated label ellipsizes inside that box; the value slot still ellipsizes via `filterToolbarCappedSelectValueSlotClasses`. Floating selects omit shell `overflow-hidden` so the notch is not clipped.
+
+Filter rows wrap (`flex-wrap`); a field that does not fit moves to the next row instead of overlapping neighbors.
 
 Floating selects use the same default `lg` cap as inline selects when no width token is set.
 
@@ -60,4 +65,4 @@ Text filters in this layout have no `Filter ${label}…` placeholder and no `ari
 
 When the all-value is selected, the trigger shows `All` (`FILTER_SELECT_ALL_TRIGGER_LABEL`). `allOptionLabel`, vocabulary resolvers, and menu items stay on the full label. Non-floating layouts are unchanged.
 
-Picker filter selects (spell school, relationship class, organization domain, location type) use this layout. Catalog sort uses `SortMenu`, not floating labels. Overview text filters and stacked overview selects do not, until the in-app evaluation says so.
+Picker and overview selects inside a floating catalog region use this layout without copying `layout: 'floating'` onto the schema. Explicit `layout` is the escape hatch. Catalog sort uses `SortMenu`, not floating labels. Search stays a search field. Messages and notifications keep per-field select chrome.

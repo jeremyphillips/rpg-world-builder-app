@@ -66,11 +66,15 @@ function CatalogFilterControlsGroup<TData, TState extends Record<string, unknown
     </div>
   )
 
-  if (parentChrome && density === undefined) {
+  if (parentChrome?.selectPresentation === 'floating' && density === undefined) {
     return content
   }
 
-  return <FilterChromeProvider density={resolvedDensity}>{content}</FilterChromeProvider>
+  return (
+    <FilterChromeProvider density={resolvedDensity} selectPresentation="floating">
+      {content}
+    </FilterChromeProvider>
+  )
 }
 
 export function CatalogFilterControls<TData, TState extends Record<string, unknown>>(

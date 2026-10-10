@@ -1,4 +1,4 @@
-import { DataTableFilterRegion } from '@rpg/ui'
+import { DataTableFilterChrome, DataTableFilterRegion } from '@rpg/ui'
 import {
   ActiveFilterChips,
   FilterBar,
@@ -29,21 +29,15 @@ export function PrimaryFilterBarRegion<T, TFilters extends Record<string, unknow
   resetLabel,
 }: PrimaryFilterBarRegionProps<T, TFilters>) {
   return (
-    <FilterChromeProvider>
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={filterSchema}
-            state={filterState}
-            onValueChange={onValueChange}
-            onReset={onReset}
-            resetLabel={resetLabel}
-          />
-        }
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
-      />
-    </FilterChromeProvider>
+    <DataTableFilterChrome
+      filterSchema={filterSchema}
+      state={filterState}
+      onValueChange={onValueChange}
+      onReset={onReset}
+      resetLabel={resetLabel}
+      advancedOpen={false}
+      onAdvancedFiltersOpenChange={() => undefined}
+    />
   )
 }
 

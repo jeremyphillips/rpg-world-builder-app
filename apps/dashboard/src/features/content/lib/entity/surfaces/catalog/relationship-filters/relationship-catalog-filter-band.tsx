@@ -1,5 +1,6 @@
 import {
   CatalogFilterControls,
+  FilterChromeProvider,
   type FilterCatalogLayoutConfig,
   type FilterFieldId,
   type FilterSchema,
@@ -35,13 +36,15 @@ export function RelationshipCatalogFilterBand<TData, TState extends Record<strin
     band === 'primary' ? CatalogFilterControls.Primary : CatalogFilterControls.FilterRow
 
   return (
-    <Controls
-      schema={schema}
-      layout={layout}
-      state={state}
-      data={data}
-      idPrefix={idPrefix}
-      onValueChange={onValueChange}
-    />
+    <FilterChromeProvider selectPresentation="floating">
+      <Controls
+        schema={schema}
+        layout={layout}
+        state={state}
+        data={data}
+        idPrefix={idPrefix}
+        onValueChange={onValueChange}
+      />
+    </FilterChromeProvider>
   )
 }

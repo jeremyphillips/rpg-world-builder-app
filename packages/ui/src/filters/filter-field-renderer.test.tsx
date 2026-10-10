@@ -354,4 +354,65 @@ describe('floating filter layout', () => {
     await user.click(trigger)
     expect(screen.getByRole('option', { name: 'All domains' })).toBeInTheDocument()
   })
+
+  it('renders an omitted select layout as floating inside a floating region', () => {
+    const schema = createFilterSchema<{ domain: string }, { domain?: string }>([
+      createEqualsFilter<{ domain: string }, { domain?: string }, 'domain', string>({
+        id: 'domain',
+        label: 'Domain',
+        allOptionLabel: 'All domains',
+        options: [{ value: 'arcane', label: 'Arcane' }],
+        getValue: (row) => row.domain,
+      }),
+    ])
+    const field = schema.fields[0]!
+    render(
+      <FilterChromeProvider selectPresentation="floating">
+        <FilterFieldRenderer
+          field={field}
+          controlId="region-domain"
+          context={{
+            schema,
+            state: {},
+            idPrefix: 'region',
+            onValueChange: () => undefined,
+          }}
+        />
+      </FilterChromeProvider>,
+    )
+
+    expect(screen.getByRole('combobox', { name: 'Domain' })).toHaveTextContent('All')
+    expect(screen.queryByRole('group', { name: 'Domain' })).not.toBeInTheDocument()
+  })
+
+  it('keeps an explicit stacked layout inside a floating region', () => {
+    const schema = createFilterSchema<{ domain: string }, { domain?: string }>([
+      createEqualsFilter<{ domain: string }, { domain?: string }, 'domain', string>({
+        id: 'domain',
+        label: 'Domain',
+        layout: 'stacked',
+        options: [{ value: 'arcane', label: 'Arcane' }],
+        getValue: (row) => row.domain,
+      }),
+    ])
+    const field = schema.fields[0]!
+    render(
+      <FilterChromeProvider selectPresentation="floating">
+        <FilterFieldRenderer
+          field={field}
+          controlId="stacked-domain"
+          context={{
+            schema,
+            state: {},
+            idPrefix: 'region',
+            onValueChange: () => undefined,
+          }}
+        />
+      </FilterChromeProvider>,
+    )
+
+    const label = screen.getByText('Domain')
+    expect(label.tagName).toBe('LABEL')
+    expect(screen.getByRole('combobox', { name: 'Domain' })).toHaveAttribute('id', 'stacked-domain')
+  })
 })

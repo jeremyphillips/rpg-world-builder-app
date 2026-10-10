@@ -1,68 +1,43 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { filterBarVariants } from '../../filters/filter-bar.variants'
+import { interactiveFocusVariants } from './interactive-focus.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 
-/** Filter region layout — primary panel row and optional additional panel row. */
-export const dataTableFilterRegionVariants = cva('grid w-full gap-y-3')
-
-/** Primary filter panel shell — subtle background wrapping fields and optional trigger. */
-export const dataTableFilterRegionPrimaryVariants = cva(
+/** Single filter panel — primary row, disclosure, and additional row share one shell. */
+export const dataTableFilterRegionVariants = cva(
   cn(
-    'min-w-0 rounded-md border border-border bg-surface-subtle p-3',
+    'flex w-full min-w-0 flex-col gap-3 rounded-md border border-border bg-surface-subtle p-3',
     establishSurfaceCurrent('surface-subtle'),
   ),
 )
 
-/** Inner layout — grid pins More filters top-right; flex-only when no trigger. */
-export const dataTableFilterRegionPrimaryInnerVariants = cva('min-w-0', {
+/** Primary field row. Divider only when an additional-filters disclosure is present. */
+export const dataTableFilterRegionPrimaryRowVariants = cva('min-w-0', {
   variants: {
-    hasTrigger: {
-      true: 'grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-3 max-sm:grid-cols-1',
-      false: 'flex flex-wrap items-end gap-3',
+    divided: {
+      true: 'border-b border-border pb-3',
+      false: '',
     },
   },
   defaultVariants: {
-    hasTrigger: false,
+    divided: false,
   },
 })
 
-/** Primary filter field group — wraps inside the left grid column. */
-export const dataTableFilterRegionPrimaryFieldsVariants = cva(
-  'flex min-w-0 flex-wrap items-end gap-3',
+/** Full-width disclosure row under the primary fields. */
+export const dataTableFilterRegionDisclosureRowVariants = cva('flex min-w-0')
+
+/** Inline disclosure trigger — chevron, label, optional active badge. */
+export const dataTableFilterRegionDisclosureVariants = cva(
+  cn(
+    'inline-flex w-fit items-center gap-1.5 rounded-md text-sm font-medium text-foreground',
+    'hover:text-foreground/80',
+    'disabled:pointer-events-none disabled:opacity-50',
+    interactiveFocusVariants({ context: 'embedded' }),
+  ),
 )
 
-/** More filters trigger — top-right column, aligned with the first control row. */
-export const dataTableFilterRegionTriggerWrapVariants = cva('shrink-0 max-sm:justify-self-end')
-
-/** Stacked label + control band — mirrors primary stacked filter field anatomy. */
-export const dataTableFilterRegionRailStackVariants = cva('flex flex-col max-sm:gap-0', {
-  variants: {
-    density: {
-      compact: 'gap-0.5',
-      comfortable: 'gap-1',
-    },
-  },
-  defaultVariants: {
-    density: 'compact',
-  },
-})
-
-/** Invisible label row reserving space above the More filters control band. */
-export const dataTableFilterRegionLabelSpacerVariants = cva('invisible block max-sm:hidden', {
-  variants: {
-    density: {
-      compact: 'text-xs',
-      comfortable: 'text-sm',
-    },
-  },
-  defaultVariants: {
-    density: 'compact',
-  },
-})
-
-/** Additional filters panel row below the primary panel. */
-export const dataTableFilterRegionPanelRowVariants = cva('min-w-0')
-
-/** More filters trigger button. */
-export const dataTableFilterRegionTriggerVariants = cva('gap-1.5')
+/** Additional fields use the same wrap contract as the primary filter bar. */
+export const dataTableFilterRegionAdditionalRowVariants = filterBarVariants

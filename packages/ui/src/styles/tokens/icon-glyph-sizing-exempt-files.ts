@@ -10,7 +10,6 @@ export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
   'packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item-toolbar.client.tsx',
   'packages/ui/src/components/ui/combobox-field-parts.client.tsx',
   'packages/ui/src/components/ui/data-table-columns-menu.client.tsx',
-  'packages/ui/src/components/ui/data-table-filter-region.client.tsx',
   'packages/ui/src/components/ui/data-table.client.tsx',
   'packages/ui/src/components/ui/dialog-parts.client.tsx',
   'packages/ui/src/components/ui/file-dropzone.client.tsx',

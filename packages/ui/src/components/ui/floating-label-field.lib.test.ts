@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest'
 
 import { fieldCaptionTypographyVariants } from './field-caption.variants'
 import { fieldGroupedValueSlotStartPaddingClasses } from './field-sizing.variants'
-import { FLOATING_LABEL_COMFORTABLE_SCALE_RATIO } from './floating-label-field.lib'
 import { withFloatingLabelSizingLabel } from './floating-label-field.lib'
 import { floatingLabelLayerVariants } from './floating-label-field.variants'
 
@@ -30,13 +29,23 @@ describe('floating-label-field.lib', () => {
     ])
   })
 
-  it('keeps the comfortable scale token aligned with the type scale', () => {
+  it('derives floated label sizes from the type scale with an 11px compact floor', () => {
     const css = readFileSync(stylesDir, 'utf8')
-    const ratio = readTokenRem(css, '--text-sm') / readTokenRem(css, '--text-md')
-    const declared = css.match(/--floating-label-scale-md:\s*([0-9.]+)/)
-    expect(declared?.[1]).toBeTruthy()
-    expect(Number(declared?.[1])).toBeCloseTo(ratio, 6)
-    expect(FLOATING_LABEL_COMFORTABLE_SCALE_RATIO).toBeCloseTo(ratio, 6)
+    expect(css).toContain('--field-floating-label-reduction')
+    expect(css).toContain('--field-floating-label-sm')
+    expect(css).toContain('--field-floating-label-md')
+    expect(css).not.toContain('--floating-label-scale-md')
+
+    const xs = readTokenRem(css, '--text-xs')
+    const xsMeta = readTokenRem(css, '--text-xs-meta')
+    const md = readTokenRem(css, '--text-md')
+    const reduction = readTokenRem(css, '--field-floating-label-reduction')
+
+    const expectedSm = Math.max(xsMeta, xs - reduction)
+    const expectedMd = md - reduction
+
+    expect(expectedSm).toBeCloseTo(xsMeta, 6)
+    expect(expectedMd).toBeCloseTo(0.8125, 6) /* 13px */
   })
 
   it('uses caption typography without importing filters', () => {

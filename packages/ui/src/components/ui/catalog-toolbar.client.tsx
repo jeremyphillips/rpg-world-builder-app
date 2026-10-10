@@ -182,7 +182,7 @@ export function CatalogToolbar({
     layout.hasTabs && tabs ? <CatalogToolbarTabRow tabs={tabs} actions={actions} /> : null
 
   return (
-    <FilterChromeProvider density={resolvedDensity}>
+    <FilterChromeProvider density={resolvedDensity} selectPresentation="floating">
       <CatalogToolbarLayoutContent
         className={className}
         layout={layout}

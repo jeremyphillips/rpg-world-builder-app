@@ -7,6 +7,14 @@ import { Input } from './input.client'
 const meta = {
   title: 'Components/DataTableFilterRegion',
   component: DataTableFilterRegion,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'Low-level layout primitive (panel shell, disclosure, additional row). Datatable surfaces should compose `DataTableFilterChrome` instead. Wrap field renderers in `FilterChromeProvider` when exercising selects in isolation.',
+      },
+    },
+  },
 } satisfies Meta<typeof DataTableFilterRegion>
 
 export default meta

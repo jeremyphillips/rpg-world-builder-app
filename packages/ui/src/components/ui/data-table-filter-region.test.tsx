@@ -10,83 +10,78 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { DataTableFilterRegion } from './data-table-filter-region.client'
 
 describe('DataTableFilterRegion', () => {
-  it('omits the trigger rail when additional filters are absent', () => {
-    render(
+  it('omits the disclosure when additional filters are absent', () => {
+    const { container } = render(
       <DataTableFilterRegion
-        primaryFilters={<input aria-label="Search" />}
+        primaryFilters={<input aria-label="Search" data-testid="primary-field" />}
         additionalFiltersOpen={false}
         onAdditionalFiltersOpenChange={() => undefined}
       />,
     )
 
-    expect(screen.queryByRole('button', { name: /more filters/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /additional filters/i })).not.toBeInTheDocument()
+    const panel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
+    expect(panel?.querySelector('.border-b')).toBeNull()
+    expect(container.querySelector('.bg-surface-muted')).toBeNull()
   })
 
-  it('scopes field-control fills on primary and additional panel shells', () => {
-    const { container } = render(
-      <DataTableFilterRegion
-        primaryFilters={<input aria-label="Search" data-testid="primary-field" />}
-        additionalFilterFields={<input aria-label="Advanced field" data-testid="advanced-field" />}
-        additionalFiltersOpen
-        onAdditionalFiltersOpenChange={() => undefined}
-      />,
-    )
-
-    const primaryPanel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
-    expect(primaryPanel).toBeTruthy()
-
-    const advancedField = screen.getByTestId('advanced-field')
-    const advancedPanel = advancedField.closest('.bg-surface-muted')
-    expect(advancedPanel).toHaveClass('[--field-control-bg:var(--field-control-bg-on-muted)]')
-
-    expect(container.querySelector('.contents')).toBeNull()
-    expect(screen.getByRole('button', { name: /more filters/i })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-    expect(screen.getByRole('button', { name: /more filters/i })).toHaveClass(
-      'aria-expanded:border-border',
-    )
-  })
-
-  it('toggles the additional filters panel', async () => {
+  it('keeps additional fields in the same panel and shows the active badge while collapsed', async () => {
     const user = userEvent.setup()
 
     function Harness() {
       const [open, setOpen] = useState(false)
       return (
         <DataTableFilterRegion
-          primaryFilters={<input aria-label="Search" />}
-          additionalFilterFields={<input aria-label="Advanced field" />}
+          primaryFilters={<input aria-label="Search" data-testid="primary-field" />}
+          additionalFilterFields={
+            <input aria-label="Advanced field" data-testid="advanced-field" />
+          }
           additionalFiltersOpen={open}
           onAdditionalFiltersOpenChange={setOpen}
-          activeAdditionalFilterCount={2}
+          activeAdditionalFilterCount={3}
         />
       )
     }
 
-    render(<Harness />)
+    const { container } = render(<Harness />)
 
-    await user.click(screen.getByRole('button', { name: /Show more filters, 2 active/i }))
-    expect(screen.getByText('Additional filters')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Collapse' })).toHaveClass('h-control-action-compact')
+    const disclosure = screen.getByRole('button', { name: /additional filters/i })
+    expect(disclosure).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.getByText('3 active')).toBeInTheDocument()
+    expect(screen.queryByTestId('advanced-field')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Reset' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Collapse' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /more filters/i })).not.toBeInTheDocument()
+
+    const panel = screen.getByTestId('primary-field').closest('.bg-surface-subtle')
+    expect(panel?.querySelector('.border-b')).toBeTruthy()
+
+    await user.click(disclosure)
+
+    const advancedField = screen.getByTestId('advanced-field')
+    expect(advancedField.closest('.bg-surface-subtle')).toBe(panel)
+    expect(advancedField.closest('.bg-surface-muted')).toBeNull()
+    expect(screen.getByRole('button', { name: /additional filters/i })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByText('3 active')).toBeInTheDocument()
+    expect(container.querySelector('.contents')).toBeNull()
   })
 
-  it('reserves stacked label height for the More filters rail', () => {
+  it('hides the active badge when no advanced fields differ from their defaults', () => {
     render(
       <DataTableFilterRegion
         primaryFilters={<input aria-label="Search" />}
         additionalFilterFields={<input aria-label="Advanced field" />}
         additionalFiltersOpen={false}
         onAdditionalFiltersOpenChange={() => undefined}
+        activeAdditionalFilterCount={0}
       />,
     )
 
-    const trigger = screen.getByRole('button', { name: /more filters/i })
-    const spacer = trigger.parentElement?.previousElementSibling
-
-    expect(spacer).toHaveClass('invisible', 'text-xs')
-    expect(spacer).not.toHaveClass('leading-none')
+    expect(screen.getByRole('button', { name: 'Additional filters' })).toBeInTheDocument()
+    expect(screen.queryByText(/active/i)).not.toBeInTheDocument()
   })
 
   itAxe('has no axe accessibility violations', async () => {
@@ -96,6 +91,7 @@ describe('DataTableFilterRegion', () => {
         additionalFilterFields={<input aria-label="Advanced field" />}
         additionalFiltersOpen
         onAdditionalFiltersOpenChange={() => undefined}
+        activeAdditionalFilterCount={1}
       />,
     )
 

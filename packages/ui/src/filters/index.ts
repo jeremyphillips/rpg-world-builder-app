@@ -90,6 +90,7 @@ export {
   useFilterChrome,
   useOptionalFilterChrome,
   type FilterChromeContextValue,
+  type FilterSelectPresentation,
 } from './filter-chrome.context'
 export { FilterBar, type FilterBarProps } from './filter-bar.client'
 export { ActiveFilterChips, type ActiveFilterChipsProps } from './active-filter-chips.client'
@@ -122,3 +123,7 @@ export {
   serializeFilterSearchParams,
 } from './filter-persistence'
 export { stableSerializeFilterState } from './filter-state-serialization'
+export {
+  prepareDatatableFilterSchemaForRender,
+  validateDatatableFilterSchema,
+} from './validate-datatable-filter-schema'

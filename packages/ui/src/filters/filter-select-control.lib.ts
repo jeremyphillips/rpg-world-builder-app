@@ -9,6 +9,7 @@ import {
   FILTER_SELECT_ALL_TRIGGER_LABEL,
   FILTER_SELECT_ALL_VALUE,
   filterToolbarCappedSelectClasses,
+  filterToolbarCappedSelectValueSlotClasses,
 } from './filter-bar.variants'
 import type { FilterSelectFieldLayout } from './filter-select-field-chrome.client'
 import type {
@@ -73,10 +74,17 @@ export function resolveFilterSelectTriggerClassName(
   layout: FilterSelectFieldLayout,
   widthClassName?: string,
 ): string {
+  const cappedSelectClasses =
+    widthClassName === undefined
+      ? undefined
+      : layout === 'floating'
+        ? filterToolbarCappedSelectValueSlotClasses
+        : filterToolbarCappedSelectClasses
+
   return cn(
     layout === 'inline' || layout === 'floating' ? undefined : 'w-full',
     widthClassName,
-    widthClassName ? filterToolbarCappedSelectClasses : undefined,
+    cappedSelectClasses,
   )
 }
 

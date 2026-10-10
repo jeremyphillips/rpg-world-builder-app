@@ -44,6 +44,7 @@ function createLocationNameFilter(): FilterFieldDef<LocationRow, LocationsOvervi
     id: 'name',
     label: 'Name',
     placeholder: 'Search…',
+    control: 'search',
     url: { key: 'q' },
     getSearchText: (row) => getLocationOverviewSearchText(row),
   })

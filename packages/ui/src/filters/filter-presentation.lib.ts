@@ -2,7 +2,7 @@ import { fieldWidthVariants } from '../components/ui/field-control.variants'
 import type { FieldLabelLayout } from '../components/ui/field-row-presentation.lib'
 import { resolveFieldPresentation } from '../components/ui/field-row-presentation.lib'
 import { cn } from '../lib/utils'
-import type { FilterChromeContextValue } from './filter-chrome.context'
+import type { FilterChromeContextValue, FilterSelectPresentation } from './filter-chrome.context'
 import {
   filterBarControlVariants,
   filterFieldLabelVariants,
@@ -71,10 +71,13 @@ type FilterPresentationField = Pick<FilterFieldDef<unknown, Record<string, unkno
  * selects resolve via {@link resolveFilterSelectFieldLayout}).
  * `floating` hides the separate caption — the composite owns the visible label.
  */
-export function mapFilterLayoutToLabelLayout(field: FilterPresentationField): FieldLabelLayout {
+export function mapFilterLayoutToLabelLayout(
+  field: FilterPresentationField,
+  options?: { selectPresentation?: FilterSelectPresentation },
+): FieldLabelLayout {
   if (field.type === 'boolean') return 'inline'
   if (field.type === 'select') {
-    const layout = resolveFilterSelectFieldLayout(field)
+    const layout = resolveFilterSelectFieldLayout(field, options)
     if (layout === 'inline') return 'inline'
     if (layout === 'stacked') return 'stacked'
     return 'hidden'
@@ -85,9 +88,13 @@ export function mapFilterLayoutToLabelLayout(field: FilterPresentationField): Fi
   return 'hidden'
 }
 
-function resolveFilterGroupExtras(field: FilterPresentationField, density: FilterDensity): string {
+function resolveFilterGroupExtras(
+  field: FilterPresentationField,
+  density: FilterDensity,
+  options?: { selectPresentation?: FilterSelectPresentation },
+): string {
   if (field.type === 'select') {
-    const layout = resolveFilterSelectFieldLayout(field)
+    const layout = resolveFilterSelectFieldLayout(field, options)
     if (layout === 'inline') {
       return filterInlineFieldGroupVariants({ density })
     }
@@ -133,8 +140,9 @@ export function resolveFilterFieldPresentation(
   chrome: FilterChromeContextValue,
 ): FilterFieldPresentation {
   const { density } = chrome
+  const selectPresentation = chrome.selectPresentation
   const controlSize = resolveFilterControlSize(density)
-  const labelLayout = mapFilterLayoutToLabelLayout(field)
+  const labelLayout = mapFilterLayoutToLabelLayout(field, { selectPresentation })
   const controlBand =
     field.type === 'chips' || field.type === 'popover' ? 'content-sized' : 'single-line'
 
@@ -146,7 +154,7 @@ export function resolveFilterFieldPresentation(
 
   const labelClassName = filterFieldLabelVariants({ density })
   // Filter density variants own group layout; shared presentation owns band + anchor.
-  const groupClassName = resolveFilterGroupExtras(field, density)
+  const groupClassName = resolveFilterGroupExtras(field, density, { selectPresentation })
   const shared: FilterPresentationShared = {
     labelClassName,
     groupClassName,
@@ -203,13 +211,17 @@ export function resolveFilterFieldWidthClasses(width?: FilterFieldWidth): string
  * Width token for a select. Explicit tokens win. Inline catalog selects with
  * no token cap at `lg`. Stacked overview selects keep their own token.
  */
-export function resolveFilterSelectWidthToken(field: {
-  type: string
-  layout?: 'stacked' | 'inline' | 'floating'
-  width?: FilterFieldWidth
-}): FilterFieldWidth | undefined {
+export function resolveFilterSelectWidthToken(
+  field: {
+    type: string
+    layout?: 'stacked' | 'inline' | 'floating'
+    width?: FilterFieldWidth
+  },
+  options?: { selectPresentation?: FilterSelectPresentation },
+): FilterFieldWidth | undefined {
   if (field.type !== 'select') return undefined
   if (field.width) return field.width
-  if (field.layout === 'inline' || field.layout === 'floating') return 'lg'
+  const layout = resolveFilterSelectFieldLayout(field, options)
+  if (layout === 'inline' || layout === 'floating') return 'lg'
   return undefined
 }
