@@ -1,0 +1,190 @@
+/*
+ * Compact control geometry — shared hit targets for dense chrome (not Button/field shells).
+ * Source order: base block → icon/text recipes → gap tiers → host-specific row/menu/segment modifiers.
+ */
+@layer components {
+  .ui-compact-control svg {
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  /* --- Icon hit targets --- */
+
+  .ui-compact-control--icon-compact {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+  }
+
+  .ui-compact-control--icon-compact svg {
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+
+  .ui-compact-control--icon-compact-sm {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+  }
+
+  .ui-compact-control--icon-compact-sm svg {
+    width: var(--icon-glyph-sm);
+    height: var(--icon-glyph-sm);
+  }
+
+  .ui-compact-control--icon-xs {
+    width: var(--control-action-compact-height);
+    height: var(--control-action-compact-height);
+  }
+
+  .ui-compact-control--icon-xs svg {
+    width: var(--icon-glyph-xs);
+    height: var(--icon-glyph-xs);
+  }
+
+  .ui-compact-control--icon-default {
+    width: var(--control-action-default-height);
+    height: var(--control-action-default-height);
+  }
+
+  .ui-compact-control--icon-default svg {
+    width: var(--icon-glyph-lg);
+    height: var(--icon-glyph-lg);
+  }
+
+  .ui-compact-control--icon-lg {
+    width: var(--control-action-lg-height);
+    height: var(--control-action-lg-height);
+  }
+
+  .ui-compact-control--icon-lg svg {
+    width: var(--icon-glyph-lg);
+    height: var(--icon-glyph-lg);
+  }
+
+  /* --- Text / labeled micro-actions --- */
+
+  .ui-compact-control--text-compact {
+    height: var(--control-action-compact-height);
+  }
+
+  .ui-compact-control--text-with-icon-compact {
+    height: var(--control-action-compact-height);
+    gap: var(--control-gap-xs);
+  }
+
+  .ui-compact-control--text-with-icon-compact svg {
+    width: var(--icon-glyph-sm);
+    height: var(--icon-glyph-sm);
+  }
+
+  .ui-compact-control--min-height-compact {
+    min-height: var(--control-action-compact-height);
+  }
+
+  /* --- Gap tiers (labeled inline actions) --- */
+
+  .ui-compact-control--gap-xs {
+    gap: var(--control-gap-xs);
+  }
+
+  .ui-compact-control--gap-sm {
+    gap: var(--control-gap-sm);
+  }
+
+  .ui-compact-control--gap-md {
+    gap: var(--control-gap-md);
+  }
+
+  /* --- Segmented control --- */
+
+  .ui-compact-control--segment-sm {
+    height: var(--control-action-compact-height);
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: 0;
+    gap: var(--control-gap-xs);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  /* --- Tabs (pill variant trigger) --- */
+
+  .ui-compact-control--tabs-pill {
+    height: var(--control-height-xs);
+    padding-inline: calc(var(--spacing) * 3);
+  }
+
+  /* --- Dropdown / choice menu items --- */
+
+  .ui-compact-control--menu-item-sm {
+    padding-block: calc(var(--spacing) * 1);
+  }
+
+  .ui-compact-control--menu-item-md {
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-compact-control--menu-item-lg {
+    padding-block: calc(var(--spacing) * 2.5);
+  }
+
+  /* --- Interactive list row main hit area --- */
+
+  .ui-compact-control--list-row-sm {
+    gap: var(--control-gap-xs);
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-compact-control--list-row-md {
+    gap: var(--control-gap-sm);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-compact-control--list-row-lg {
+    gap: var(--control-gap-sm);
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  /* --- Number stepper buttons --- */
+
+  .ui-compact-control--stepper-button-xs {
+    width: calc(var(--spacing) * 6);
+    height: calc(var(--spacing) * 6);
+  }
+
+  .ui-compact-control--stepper-button-xs svg {
+    width: var(--icon-glyph-xs);
+    height: var(--icon-glyph-xs);
+  }
+
+  .ui-compact-control--stepper-button-sm {
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+  }
+
+  .ui-compact-control--stepper-button-sm svg {
+    width: var(--icon-glyph-sm);
+    height: var(--icon-glyph-sm);
+  }
+
+  .ui-compact-control--stepper-button-md {
+    width: calc(var(--spacing) * 8);
+    height: calc(var(--spacing) * 8);
+  }
+
+  .ui-compact-control--stepper-button-md svg {
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+
+  .ui-compact-control--stepper-button-lg {
+    width: calc(var(--spacing) * 9);
+    height: calc(var(--spacing) * 9);
+  }
+
+  .ui-compact-control--stepper-button-lg svg {
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+}

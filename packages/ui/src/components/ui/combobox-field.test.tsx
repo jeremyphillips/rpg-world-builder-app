@@ -200,7 +200,7 @@ describe('ComboboxField', () => {
     const chip = screen.getByText('Dagger').closest('span.inline-flex')
     expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
     expect(screen.getByRole('button', { name: 'Remove Dagger' })).toHaveClass(
-      'size-control-action-compact',
+      'ui-compact-control--icon-compact-sm',
     )
   })
 

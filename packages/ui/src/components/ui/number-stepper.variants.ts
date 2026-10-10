@@ -1,9 +1,9 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { resolveCompactControlStepperButtonClasses } from './compact-control.styles'
 import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldControlSizeClasses } from './field-sizing.variants'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export type NumberStepperSize = 'xs' | 'sm' | 'md' | 'lg'
 
@@ -41,10 +41,10 @@ export const numberStepperButtonVariants = cva(
   {
     variants: {
       size: {
-        xs: cn('size-6', iconGlyphDescendantClasses.xs),
-        sm: cn('size-8', iconGlyphDescendantClasses.sm),
-        md: cn('size-8', iconGlyphDescendantClasses.md),
-        lg: cn('size-9', iconGlyphDescendantClasses.md),
+        xs: resolveCompactControlStepperButtonClasses('xs'),
+        sm: resolveCompactControlStepperButtonClasses('sm'),
+        md: resolveCompactControlStepperButtonClasses('md'),
+        lg: resolveCompactControlStepperButtonClasses('lg'),
       },
       minBoundary: {
         default: 'hover:text-primary active:text-primary',

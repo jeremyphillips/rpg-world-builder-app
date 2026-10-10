@@ -41,10 +41,18 @@ describe('numberStepperWidthVariants', () => {
   })
 
   it('pairs stepper buttons with tier-appropriate hit targets', () => {
-    expect(numberStepperButtonVariants({ size: 'xs' })).toContain('size-6')
-    expect(numberStepperButtonVariants({ size: 'sm' })).toContain('size-8')
-    expect(numberStepperButtonVariants({ size: 'md' })).toContain('[&_svg]:size-icon-glyph-md')
-    expect(numberStepperButtonVariants({ size: 'lg' })).toContain('size-9')
+    expect(numberStepperButtonVariants({ size: 'xs' })).toContain(
+      'ui-compact-control--stepper-button-xs',
+    )
+    expect(numberStepperButtonVariants({ size: 'sm' })).toContain(
+      'ui-compact-control--stepper-button-sm',
+    )
+    expect(numberStepperButtonVariants({ size: 'md' })).toContain(
+      'ui-compact-control--stepper-button-md',
+    )
+    expect(numberStepperButtonVariants({ size: 'lg' })).toContain(
+      'ui-compact-control--stepper-button-lg',
+    )
   })
 
   it('uses background hover and sunken disabled treatment on stepper buttons', () => {
@@ -59,7 +67,9 @@ describe('numberStepperWidthVariants', () => {
 
 describe('xs inline-row tier', () => {
   it('keeps the button track flush with the root height', () => {
-    expect(numberStepperButtonVariants({ size: 'xs' })).toContain('size-6')
+    expect(numberStepperButtonVariants({ size: 'xs' })).toContain(
+      'ui-compact-control--stepper-button-xs',
+    )
     expect(numberStepperRootVariants({ size: 'xs' })).toContain('h-6')
   })
 
@@ -77,7 +87,7 @@ describe('xs inline-row tier', () => {
 
   it('carries the min-boundary remove treatment', () => {
     const classes = numberStepperButtonVariants({ size: 'xs', minBoundary: 'remove' })
-    expect(classes).toContain('[&_svg]:size-icon-glyph-xs')
+    expect(classes).toContain('ui-compact-control--stepper-button-xs')
     expect(classes).toContain('hover:text-destructive')
   })
 })

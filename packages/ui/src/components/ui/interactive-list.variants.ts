@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { resolveCompactControlListRowClasses } from './compact-control.styles'
 import {
   menuChoiceRowItemResetClasses,
   selectableRowHighlightFillClasses,
@@ -150,9 +151,9 @@ export const interactiveListRowMainVariants = cva(
   {
     variants: {
       size: {
-        sm: 'gap-1 px-2 py-2',
-        md: 'gap-2 px-3 py-2',
-        lg: 'gap-2 px-4 py-2',
+        sm: resolveCompactControlListRowClasses('sm'),
+        md: resolveCompactControlListRowClasses('md'),
+        lg: resolveCompactControlListRowClasses('lg'),
       },
       interactive: {
         true: 'cursor-pointer',

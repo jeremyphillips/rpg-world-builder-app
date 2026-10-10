@@ -10,11 +10,10 @@ import {
   type CompactLabelTone,
 } from './compact-label.lib'
 import {
-  controlActionCompactIconClasses,
-  controlActionCompactSizeClasses,
-  controlActionDefaultIconClasses,
-} from './control-action.variants'
-import { compactLabelIconGlyphClasses, iconGlyphDescendantClasses } from './icon-glyph.variants'
+  resolveCompactControlIconCompactSmClasses,
+  resolveCompactControlRecipeClasses,
+} from './compact-control.styles'
+import { compactLabelIconGlyphClasses } from './icon-glyph.variants'
 
 export type CompactLabelVariantProps = {
   size?: CompactLabelSize
@@ -153,9 +152,9 @@ export const chipRemoveButtonVariants = cva(
   {
     variants: {
       size: {
-        sm: cn(controlActionCompactSizeClasses, iconGlyphDescendantClasses.sm),
-        md: controlActionCompactIconClasses,
-        lg: controlActionDefaultIconClasses,
+        sm: resolveCompactControlIconCompactSmClasses(),
+        md: resolveCompactControlRecipeClasses('icon-compact'),
+        lg: resolveCompactControlRecipeClasses('icon-default'),
       },
     },
     defaultVariants: {

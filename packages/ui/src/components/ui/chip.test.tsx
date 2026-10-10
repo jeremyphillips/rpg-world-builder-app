@@ -53,7 +53,7 @@ describe('Chip', () => {
     const chip = screen.getByText('Tag').closest('span.inline-flex')
     expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
     expect(screen.getByRole('button', { name: 'Remove Tag' })).toHaveClass(
-      'size-control-action-compact',
+      'ui-compact-control--icon-compact-sm',
     )
   })
 

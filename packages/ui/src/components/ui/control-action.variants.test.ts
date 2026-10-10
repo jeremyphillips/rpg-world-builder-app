@@ -1,53 +1,34 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  controlActionCompactHeightClasses,
-  controlActionCompactIconClasses,
-  controlActionCompactSizeClasses,
-  controlActionCompactTextClasses,
-  controlActionCompactTextWithIconClasses,
-  controlActionDefaultIconClasses,
-  controlActionDefaultSizeClasses,
-  controlActionLgIconClasses,
-  controlActionLgSizeClasses,
-  controlActionXsIconClasses,
-} from './control-action.variants'
+import { resolveControlActionGapClass } from './compact-control.styles'
+import { resolveControlActionMetricsTier } from './control-action.variants'
 
-describe('controlAction variants', () => {
-  it('maps compact height and size to control-action tokens', () => {
-    expect(controlActionCompactHeightClasses).toBe('h-control-action-compact')
-    expect(controlActionCompactSizeClasses).toBe('size-control-action-compact')
-    expect(controlActionCompactTextClasses).toBe('h-control-action-compact')
-    expect(controlActionDefaultSizeClasses).toBe('size-control-action-default')
-    expect(controlActionLgSizeClasses).toBe('size-control-action-lg')
+describe('resolveControlActionMetricsTier', () => {
+  it('maps xs chrome and sm compact chrome to the xs gap tier', () => {
+    expect(resolveControlActionMetricsTier('xs', 'default', 'outline')).toBe('xs')
+    expect(resolveControlActionMetricsTier('sm', 'compact', 'outline')).toBe('xs')
   })
 
-  it('locks compact icon pairing to 24px hit target and md (14px) glyph', () => {
-    expect(controlActionCompactIconClasses).toContain('size-control-action-compact')
-    expect(controlActionCompactIconClasses).toContain('[&_svg]:size-icon-glyph-md')
-    expect(controlActionCompactIconClasses).not.toContain('size-icon-glyph-sm')
-    expect(controlActionCompactIconClasses).not.toContain('size-icon-glyph-xs')
+  it('maps sm default and default compact chrome to the sm gap tier', () => {
+    expect(resolveControlActionMetricsTier('sm', 'default', 'outline')).toBe('sm')
+    expect(resolveControlActionMetricsTier('default', 'compact', 'outline')).toBe('sm')
   })
 
-  it('pairs compact text+icon with xs gap and sm glyph', () => {
-    expect(controlActionCompactTextWithIconClasses).toContain('h-control-action-compact')
-    expect(controlActionCompactTextWithIconClasses).toContain('gap-1')
-    expect(controlActionCompactTextWithIconClasses).toContain('[&_svg]:size-icon-glyph-sm')
+  it('maps default and lg chrome to the md gap tier', () => {
+    expect(resolveControlActionMetricsTier('default', 'default', 'default')).toBe('md')
+    expect(resolveControlActionMetricsTier('lg', 'compact', 'outline')).toBe('md')
   })
 
-  it('pairs default icon control with lg glyph', () => {
-    expect(controlActionDefaultIconClasses).toContain('size-control-action-default')
-    expect(controlActionDefaultIconClasses).toContain('[&_svg]:size-icon-glyph-lg')
+  it('maps text compact lanes to xs and text sm default to sm', () => {
+    expect(resolveControlActionMetricsTier('xs', 'compact', 'text')).toBe('xs')
+    expect(resolveControlActionMetricsTier('xs', 'default', 'text')).toBe('sm')
+    expect(resolveControlActionMetricsTier('sm', 'compact', 'text')).toBe('xs')
+    expect(resolveControlActionMetricsTier('sm', 'default', 'text')).toBe('sm')
   })
 
-  it('pairs large icon control with 40px hit target and lg glyph', () => {
-    expect(controlActionLgIconClasses).toContain('size-control-action-lg')
-    expect(controlActionLgIconClasses).toContain('[&_svg]:size-icon-glyph-lg')
-  })
-
-  it('locks xs icon control to 24px hit target and xs glyph', () => {
-    expect(controlActionXsIconClasses).toContain('size-control-action-compact')
-    expect(controlActionXsIconClasses).toContain('[&_svg]:size-icon-glyph-xs')
-    expect(controlActionXsIconClasses).not.toContain('[&_svg]:size-icon-glyph-md')
+  it('exposes semantic gap modifiers per tier', () => {
+    expect(resolveControlActionGapClass('xs')).toBe('ui-compact-control--gap-xs')
+    expect(resolveControlActionGapClass('sm')).toBe('ui-compact-control--gap-sm')
+    expect(resolveControlActionGapClass('md')).toBe('ui-compact-control--gap-md')
   })
 })

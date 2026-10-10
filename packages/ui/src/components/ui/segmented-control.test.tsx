@@ -148,7 +148,7 @@ describe('SegmentedControl', () => {
     )
 
     const segment = screen.getByRole('button', { name: 'Primary' })
-    expect(segment).toHaveClass('h-control-action-compact', 'text-xs', 'px-2')
+    expect(segment).toHaveClass('ui-compact-control--segment-sm')
   })
 
   it('forwards trailing content and button props onto the segment', () => {

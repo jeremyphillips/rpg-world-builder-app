@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { controlActionCompactIconClasses } from './control-action.variants'
+import { resolveCompactControlRecipeClasses } from './compact-control.styles'
 import { interactiveFocusVariants, interactivePointerClasses } from './interactive-focus.variants'
 
 /**
@@ -12,7 +12,7 @@ export const iconGhostControlVariants = cva(
   cn(
     'inline-flex shrink-0 items-center justify-center rounded-sm p-0 text-muted-foreground',
     interactivePointerClasses,
-    controlActionCompactIconClasses,
+    resolveCompactControlRecipeClasses('icon-compact'),
     interactiveFocusVariants({ context: 'embedded' }),
   ),
   {
