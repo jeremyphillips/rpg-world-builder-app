@@ -2,6 +2,19 @@
 
 `FloatingLabelField` is one composite in `packages/ui/src/components/ui/`. Consumers pass a label, a size, a `populated` flag, and exactly one control. They do not coordinate label motion, masks, or offsets.
 
+## Semantic CSS
+
+Float presentation lives in [`floating-label-field.css`](../src/components/ui/floating-label-field.css) (not duplicated `group/float` utilities in CVA):
+
+| Class                            | Role                                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------------- |
+| `ui-floating-label-field`        | Shell; `data-populated`; size modifiers `--sm` / `--md` set `--floating-label-control-h` |
+| `ui-floating-label-field__layer` | Absolute label geometry                                                                  |
+| `ui-floating-label-field__label` | Association element; notch `::before`                                                    |
+| `ui-floating-label-field__text`  | Ellipsis at rest; full width when floated (still ellipsizes inside layer)                |
+
+The float condition is one CSS `:is(:focus-within, [data-populated='true'], …)` block — no React `data-floating`. See [semantic-control-css.md](./semantic-control-css.md).
+
 Catalog regions (`DataTableFilterRegion`, picker `CatalogFilterControls` / `CatalogToolbar`, relationship filter bands) set `selectPresentation: 'floating'`, so an omitted select `layout` renders as floating. Pass explicit `layout: 'floating'` only outside those regions, or when a field must stay floating even if the surrounding chrome is `per-field`. `layout: 'stacked'` or `layout: 'inline'` still overrides the region. `FilterFloatingField` only maps filter density to `size`. Forms, messages, and notifications stay on per-field chrome.
 
 ## What it is for

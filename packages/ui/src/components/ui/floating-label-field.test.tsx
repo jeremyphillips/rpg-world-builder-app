@@ -41,7 +41,7 @@ describe('FloatingLabelField', () => {
     const input = screen.getByRole('textbox', { name: 'School' })
     expect(input).not.toHaveAttribute('aria-label')
     expect(input.closest('[data-populated]')).toHaveAttribute('data-populated', 'false')
-    expect(input.closest('[data-populated]')?.className).toContain('placeholder:opacity-0')
+    expect(input.closest('[data-populated]')?.className).toContain('ui-floating-label-field')
   })
 
   it('names a select trigger from the visible label', () => {

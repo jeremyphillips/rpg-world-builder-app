@@ -9,6 +9,7 @@
 @import './field-row-anatomy.utilities.css';
 @import './text-action.utilities.css';
 @import './ui-focus-ring.css';
+@import '../components/ui/floating-label-field.css';
 
 @plugin '@tailwindcss/typography';
 
