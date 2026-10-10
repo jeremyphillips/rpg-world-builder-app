@@ -146,6 +146,8 @@ const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive
 
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
 
+const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
+
 const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
 
 const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
@@ -494,6 +496,15 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...(['align-start', 'align-center'] as const).map((name) => ({
         modifierPrefix: `ui-inset-panel--${name}`,
         requiredProperties: ['text-align'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: popoverContentCssPath,
+    dimensions: [
+      ...(['menu', 'popover', 'tooltip', 'filter'] as const).map((tone) => ({
+        modifierPrefix: `ui-popover-content--${tone}`,
+        requiredProperties: ['background-color', 'padding'] as const,
       })),
     ],
   },
