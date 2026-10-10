@@ -1,5 +1,4 @@
-import { CircleSlash } from 'lucide-react'
-import { Switch, Text } from '@rpg/ui'
+import { InlineInactiveStatus, StatusDot, Switch, Text } from '@rpg/ui'
 
 import {
   CAMPAIGN_ACCESS_AVAILABLE_LABEL,
@@ -16,14 +15,6 @@ export type ContentCampaignAvailabilityActionProps = {
   onAvailableChange: (available: boolean) => void
   pending?: boolean
   sectionLegend?: string
-}
-
-function AvailabilityStatusIndicator({ available }: { available: boolean }) {
-  if (available) {
-    return <span aria-hidden className="size-2 shrink-0 rounded-full bg-semantic-success" />
-  }
-
-  return <CircleSlash aria-hidden className="size-icon-inline shrink-0 text-semantic-warning" />
 }
 
 function availabilitySwitchLabel(available: boolean): string {
@@ -57,17 +48,14 @@ export function ContentCampaignAvailabilityAction({
 
       <div className="mt-2 flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex items-center gap-1.5 text-xs">
-            <AvailabilityStatusIndicator available={available} />
-            <span
-              className={
-                available
-                  ? 'text-xs font-medium text-foreground'
-                  : 'text-xs font-medium text-semantic-warning'
-              }
-            >
-              {statusLabel}
-            </span>
+          <div className="text-xs">
+            {available ? (
+              <span className="inline-flex font-medium text-foreground">
+                <StatusDot tone="success" size="sm" label={statusLabel} />
+              </span>
+            ) : (
+              <InlineInactiveStatus label={statusLabel} />
+            )}
           </div>
           <Text as="p" variant="muted" className="text-xs leading-snug">
             {helperCopy}

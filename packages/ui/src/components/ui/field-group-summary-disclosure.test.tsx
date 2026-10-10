@@ -188,10 +188,10 @@ describe('FieldGroup inline disclosure', () => {
     expect(chromeShell).not.toHaveClass('bg-warning-subtle')
 
     const unavailableLabel = screen.getByText('Unavailable')
-    expect(unavailableLabel).toHaveClass('text-semantic-warning')
+    expect(unavailableLabel.closest('.text-semantic-warning')).toBeTruthy()
 
     const secondary = screen.getByText('Hidden from discovery and selection in this campaign.')
-    expect(secondary).toHaveClass('text-muted-foreground')
+    expect(secondary).toHaveClass('text-style-caption')
     expect(secondary).not.toHaveClass('text-semantic-warning')
 
     expect(screen.getByText('DM only')).toBeInTheDocument()
@@ -257,7 +257,7 @@ describe('FieldGroup inline disclosure', () => {
   it('uses compact field label scale for summary chrome when size is sm', () => {
     render(<CompactSummaryDisclosureHarness />)
 
-    expect(screen.getByText('Campaign availability')).toHaveClass('text-xs')
-    expect(screen.getByText('Available')).toHaveClass('text-xs')
+    expect(screen.getByText('Campaign availability')).toHaveClass('text-style-field-label-sm')
+    expect(screen.getByText('Available').closest('.text-xs')).toBeTruthy()
   })
 })

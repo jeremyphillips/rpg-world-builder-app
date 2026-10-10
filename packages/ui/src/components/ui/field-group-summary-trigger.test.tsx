@@ -27,6 +27,10 @@ describe('FieldGroupSummaryTrigger', () => {
     const dot = container.querySelector('[aria-hidden="true"].size-2.rounded-full')
     expect(dot).toBeInTheDocument()
     expect(dot).toHaveClass('bg-semantic-success')
+    expect(
+      screen.getByText('Available').closest('.inline-flex.items-center.gap-1\\.5'),
+    ).toBeTruthy()
+    expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
   })
 
   it('uses pointer cursor because Tailwind v4 resets button cursor to default', () => {
@@ -113,8 +117,8 @@ describe('FieldGroupSummaryTrigger', () => {
       />,
     )
 
-    expect(screen.getByText('Available')).toHaveClass('text-xs')
-    expect(screen.getByText('All players')).toHaveClass('text-xs')
+    expect(screen.getByText('Available').closest('.text-xs')).toBeTruthy()
+    expect(screen.getByText('All players').closest('.text-xs')).toBeTruthy()
     expect(screen.getByText('Change')).toHaveClass('text-xs')
   })
 

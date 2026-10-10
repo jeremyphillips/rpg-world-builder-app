@@ -24,6 +24,14 @@ Host components own font size, weight, and line-height; `InlineMetadata` only se
 - Whole-line truncation, `title`, `aria-label`, tooltips, and API/search secondary text → `joinInlineMetadata`.
 - Per-item styling, badges, links, responsive visibility, or truncating title with fixed tail → `InlineMetadata` (use `Item truncate` where needed).
 
+### Status dot + label in metadata rows
+
+When a leading indicator and its status word belong together (hero campaign meta, field-group
+summary `indicator: 'dot'`), render **`StatusDot` with `label`** inside a **single**
+`InlineMetadata.Item`. Inter-segment `·` separators come from `InlineMetadata` only — do not split
+the dot and label into separate items. Plain text segments and optional `detail` tail items stay
+separate. Field-group unavailable rows pair the inactive slash and label in one item the same way.
+
 ### Mixed badge + text lines
 
 Dashboard entity status with `statusComposition: 'metadata'` mixes badges and text in one

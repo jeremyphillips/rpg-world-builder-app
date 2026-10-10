@@ -5,7 +5,7 @@ import { statusDotVariants, type StatusDotVariantProps } from './status-dot.vari
 
 export interface StatusDotProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'>, StatusDotVariantProps {
-  /** When set, the dot is exposed to assistive tech instead of being decorative. */
+  /** Visible copy beside the dot. The dot stays decorative (`aria-hidden`); assistive tech uses this text. */
   label?: string
 }
 

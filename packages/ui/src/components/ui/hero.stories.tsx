@@ -48,7 +48,10 @@ type HeroMetaSegment =
   | { kind: 'text'; text: string }
   | { kind: 'status'; text: string; tone: 'success' | 'sunken' }
 
-/** Mirrors dashboard CampaignMetaLine (InlineMetadata + StatusDot label). */
+/**
+ * Story-only stand-in for dashboard `CampaignMetaLine` (`apps/dashboard/.../campaign-meta-line.tsx`).
+ * Keep segment rules in sync with that component — `@rpg/ui` cannot import the dashboard feature.
+ */
 function HeroCampaignMetaLine({ segments }: { segments: readonly HeroMetaSegment[] }) {
   return (
     <Text variant="muted" className={heroMetaClasses} as="span">
