@@ -28,6 +28,7 @@ export function buildVocabularyOverviewFilterSchema(): FilterSchema<
         id: 'name',
         label: 'Name',
         placeholder: 'Search…',
+        control: 'search',
         url: { key: 'q' },
         getSearchText: (row) => row.label,
       }),

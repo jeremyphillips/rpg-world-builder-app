@@ -39,6 +39,7 @@ export function adminUsersFilterSchema(): FilterSchema<AdminUserListItem, AdminU
       id: 'q',
       label: 'Search',
       placeholder: 'Search users…',
+      control: 'search',
       url: { key: 'q' },
       getSearchText: (row) => `${row.displayName} ${row.email}`,
     }),

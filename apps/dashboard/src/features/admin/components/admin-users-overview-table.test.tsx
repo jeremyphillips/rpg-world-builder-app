@@ -93,7 +93,7 @@ describe('AdminUsersOverviewTable', () => {
   it('hydrates filter state from the URL on load', () => {
     renderAdminTable('/?q=ada&access=admin&activity=inactive')
 
-    expect(screen.getByLabelText('Search')).toHaveValue('ada')
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveValue('ada')
     expect(screen.getByRole('combobox', { name: 'Access' })).toBeInTheDocument()
   })
 
@@ -101,7 +101,7 @@ describe('AdminUsersOverviewTable', () => {
     const user = userEvent.setup()
     const { getSearch } = renderAdminTable('/')
 
-    await user.type(screen.getByLabelText('Search'), 'grace')
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'grace')
 
     await waitFor(
       () => {
@@ -115,7 +115,7 @@ describe('AdminUsersOverviewTable', () => {
     const user = userEvent.setup()
     const { getSearch } = renderAdminTable('/?page=3')
 
-    await user.type(screen.getByLabelText('Search'), 'x')
+    await user.type(screen.getByRole('searchbox', { name: 'Search' }), 'x')
 
     await waitFor(
       () => {
@@ -136,7 +136,7 @@ describe('AdminUsersOverviewTable', () => {
     await user.click(screen.getByRole('button', { name: 'Clear filters' }))
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Search')).toHaveValue('')
+      expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveValue('')
       expect(getSearch()).not.toContain('q=')
       expect(getSearch()).not.toContain('activity=')
     })
@@ -159,7 +159,7 @@ describe('AdminUsersOverviewTable', () => {
     const { getSearch } = renderAdminTable('/?sort=-displayName&q=ada')
 
     expect(getSearch()).toContain('sort=-displayName')
-    expect(screen.getByLabelText('Search')).toHaveValue('ada')
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toHaveValue('ada')
   })
 
   it('persists column visibility preferences for the admin table key', async () => {

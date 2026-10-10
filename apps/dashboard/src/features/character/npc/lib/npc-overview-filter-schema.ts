@@ -61,6 +61,7 @@ export function npcOverviewFilterSchema(
       id: 'name',
       label: NPC_OVERVIEW_LABELS.name,
       placeholder: 'Search…',
+      control: 'search',
       url: { key: 'q' },
       getSearchText: (row) => row.character.name,
     }),
