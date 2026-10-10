@@ -66,6 +66,10 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-compact-label` is the Badge and Chip shell. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--selected`, `--interactive`, and `--subdued` are states. Chip dismiss is `__remove`. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
 
+## Alert
+
+`ui-alert--{default|info|success|warning|destructive}` owns fill, border, and foreground. `ui-alert--{comfortable|compact}` owns gap and padding. `__title--{comfortable|compact}` owns the title type. `__description` owns the supporting copy.
+
 ## Text roles
 
 `text-style-*` utilities are the Text role ladder and the field label, legend, hint, and error maps. They are `@utility` composites, same as `heading-style-*`, and they share a twMerge group. SemanticText is not a Text role: it owns inline status tone, emphasis, and an optional icon.

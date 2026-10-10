@@ -146,6 +146,8 @@ const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive
 
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
 
+const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
+
 const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
 
 const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
@@ -496,6 +498,33 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...(['align-start', 'align-center'] as const).map((name) => ({
         modifierPrefix: `ui-inset-panel--${name}`,
         requiredProperties: ['text-align'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: alertCssPath,
+    dimensions: [
+      ...(['default', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-alert--${tone}`,
+        requiredProperties: ['border-color', 'background-color', 'color'] as const,
+      })),
+      {
+        modifierPrefix: 'ui-alert--comfortable',
+        requiredProperties: ['gap', 'padding'] as const,
+      },
+      {
+        modifierPrefix: 'ui-alert--compact',
+        requiredProperties: ['gap', 'padding-inline', 'padding-block'] as const,
+      },
+      ...(['comfortable', 'compact'] as const).map((density) => ({
+        modifierPrefix: `ui-alert__title--${density}`,
+        requiredProperties: [
+          'font-size',
+          'line-height',
+          'font-weight',
+          'letter-spacing',
+          'color',
+        ] as const,
       })),
     ],
   },

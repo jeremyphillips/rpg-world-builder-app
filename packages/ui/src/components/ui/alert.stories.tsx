@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import { Alert } from './alert'
-import { ALERT_DENSITIES, ALERT_VARIANTS } from './alert.variants'
+import { ALERT_CLASS_SPECS, ALERT_DENSITIES, ALERT_VARIANTS } from './alert.variants'
 
 const meta = {
   title: 'Primitives/Alert',
   component: Alert,
+  parameters: { semanticClasses: true },
   args: {
     title: 'Subclass choices are disabled',
     description:
@@ -65,6 +67,26 @@ export const AllVariants: Story = {
         />
       ))}
     </div>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  render: () => (
+    <ClassReferenceTable
+      rows={ALERT_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <div data-semantic-class-target className={spec.className}>
+            {spec.useCase}
+          </div>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }
 

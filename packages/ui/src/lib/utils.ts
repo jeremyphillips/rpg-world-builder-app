@@ -15,6 +15,8 @@ import {
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   UI_COMPACT_LABEL_APPEARANCE_CLASSES,
   UI_COMPACT_LABEL_SIZE_CLASSES,
+  UI_ALERT_APPEARANCE_CLASSES,
+  UI_ALERT_DENSITY_CLASSES,
   UI_CARD_INTERACTION_CLASSES,
   UI_INSET_PANEL_SIZE_CLASSES,
   UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES,
@@ -112,6 +114,8 @@ type TypographyClassGroupIds =
   | 'ui-compact-control-size'
   | 'ui-compact-label-size'
   | 'ui-compact-label-appearance'
+  | 'ui-alert-appearance'
+  | 'ui-alert-density'
   | 'ui-card-interaction'
   | 'ui-inset-panel-size'
   | 'ui-interactive-row-hover'
@@ -194,6 +198,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
       'ui-compact-label-size': [...UI_COMPACT_LABEL_SIZE_CLASSES],
       'ui-compact-label-appearance': [...UI_COMPACT_LABEL_APPEARANCE_CLASSES],
+      'ui-alert-appearance': [...UI_ALERT_APPEARANCE_CLASSES],
+      'ui-alert-density': [...UI_ALERT_DENSITY_CLASSES],
       'ui-card-interaction': [...UI_CARD_INTERACTION_CLASSES],
       'ui-inset-panel-size': [...UI_INSET_PANEL_SIZE_CLASSES],
       'ui-interactive-row-hover': [...UI_INTERACTIVE_ROW_HOVER_CLASSES],
@@ -222,6 +228,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-compact-control-size': ['ui-compact-control-size'],
       'ui-compact-label-size': ['ui-compact-label-size'],
       'ui-compact-label-appearance': ['ui-compact-label-appearance'],
+      'ui-alert-appearance': ['ui-alert-appearance'],
+      'ui-alert-density': ['ui-alert-density'],
       'ui-card-interaction': ['ui-card-interaction'],
       'ui-inset-panel-size': ['ui-inset-panel-size'],
       'ui-interactive-row-hover': ['ui-interactive-row-hover'],

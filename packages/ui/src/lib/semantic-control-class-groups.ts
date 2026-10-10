@@ -135,6 +135,16 @@ export const UI_COMPACT_LABEL_APPEARANCE_CLASSES = [
 
 export const UI_CARD_INTERACTION_CLASSES = ['ui-card--static', 'ui-card--interactive'] as const
 
+export const UI_ALERT_APPEARANCE_CLASSES = [
+  'ui-alert--default',
+  'ui-alert--info',
+  'ui-alert--success',
+  'ui-alert--warning',
+  'ui-alert--destructive',
+] as const
+
+export const UI_ALERT_DENSITY_CLASSES = ['ui-alert--comfortable', 'ui-alert--compact'] as const
+
 export const UI_INSET_PANEL_SIZE_CLASSES = [
   'ui-inset-panel--sm',
   'ui-inset-panel--md',

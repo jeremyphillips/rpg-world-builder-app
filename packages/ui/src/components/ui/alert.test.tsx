@@ -18,7 +18,7 @@ describe('Alert', () => {
     const alert = screen.getByRole('alert')
     expect(alert).toHaveTextContent('Subclass choices are disabled')
     expect(alert).toHaveTextContent('Enable subclasses to prompt players.')
-    expect(alert).toHaveClass('border-warning-muted', 'bg-warning-subtle')
+    expect(alert).toHaveClass('ui-alert--warning')
   })
 
   it('renders optional actions', () => {
@@ -35,25 +35,21 @@ describe('Alert', () => {
   it.each(ALERT_VARIANTS)('applies the %s variant classes', (variant) => {
     render(<Alert variant={variant} title="Status" />)
     const alert = screen.getByRole('alert')
-    if (variant === 'default') {
-      expect(alert).toHaveClass('border-border', 'bg-surface-muted')
-      expect(alert).toHaveClass('[--surface-current:var(--surface-muted)]')
-      return
-    }
-    expect(alert).toHaveClass(`border-${variant}-muted`, `bg-${variant}-subtle`)
+    expect(alert).toHaveClass(`ui-alert--${variant}`)
   })
 
   it('applies comfortable density by default', () => {
     render(<Alert title="Status" />)
-    expect(screen.getByRole('alert')).toHaveClass('p-4')
-    expect(screen.getByText('Status')).toHaveClass('heading-style-alert')
+    expect(screen.getByRole('alert')).toHaveClass('ui-alert--comfortable')
+    expect(screen.getByText('Status')).toHaveClass('ui-alert__title--comfortable')
   })
 
   it('applies compact density padding and title sizing', () => {
     render(<Alert density="compact" title="Status" description="Details" />)
     const alert = screen.getByRole('alert')
-    expect(alert).toHaveClass('px-3', 'py-2.5')
-    expect(screen.getByText('Status')).toHaveClass('text-sm', 'font-body-emphasis')
+    expect(alert).toHaveClass('ui-alert--compact')
+    expect(screen.getByText('Status')).toHaveClass('ui-alert__title--compact')
+    expect(screen.getByText('Details')).toHaveClass('ui-alert__description')
   })
 
   it('uses an 8px gap between title and description', () => {
