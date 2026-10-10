@@ -24,6 +24,7 @@ import {
   fieldGroupSummaryTriggerTypographyClasses,
 } from './field-group-summary-trigger.variants'
 import { InlineMetadata } from './inline-metadata'
+import { StatusDot } from './status-dot'
 import { Text } from './text'
 
 export type FieldGroupSummaryTriggerProps = Omit<
@@ -92,10 +93,7 @@ function FieldGroupSummaryStatusRow({
     >
       {status.indicator === 'dot' ? (
         <InlineMetadata.Item>
-          <span
-            aria-hidden
-            className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot', tone })}
-          />
+          <StatusDot tone="success" size="sm" />
         </InlineMetadata.Item>
       ) : null}
       {status.indicator === 'inactive' ? (

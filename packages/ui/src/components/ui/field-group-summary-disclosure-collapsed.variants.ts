@@ -33,7 +33,6 @@ export const fieldGroupSummaryStatusLabelVariants = cva('font-medium', {
 export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
   variants: {
     indicator: {
-      dot: 'size-1.5 rounded-full bg-semantic-success',
       inactive: iconGlyphRootClasses.md,
     },
     tone: {
@@ -47,6 +46,7 @@ export const fieldGroupSummaryStatusIndicatorVariants = cva('shrink-0', {
     { indicator: 'inactive', tone: 'warning', class: 'text-semantic-warning' },
   ],
   defaultVariants: {
+    indicator: 'inactive',
     tone: 'neutral',
   },
 })

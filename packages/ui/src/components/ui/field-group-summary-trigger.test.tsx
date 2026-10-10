@@ -8,6 +8,27 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { FieldGroupSummaryTrigger } from './field-group-summary-trigger.client'
 
 describe('FieldGroupSummaryTrigger', () => {
+  it('renders structured status dots with StatusDot sm sizing', () => {
+    const { container } = render(
+      <FieldGroupSummaryTrigger
+        size="md"
+        summary={{
+          status: { label: 'Available', tone: 'success', indicator: 'dot' },
+          detail: 'All players',
+        }}
+        openLabel="Change"
+        unsavedSuffix=" · Unsaved"
+        showDirtySuffix={false}
+        disabled={false}
+        onOpen={() => undefined}
+      />,
+    )
+
+    const dot = container.querySelector('[aria-hidden="true"].size-2.rounded-full')
+    expect(dot).toBeInTheDocument()
+    expect(dot).toHaveClass('bg-semantic-success')
+  })
+
   it('uses pointer cursor because Tailwind v4 resets button cursor to default', () => {
     render(
       <FieldGroupSummaryTrigger
