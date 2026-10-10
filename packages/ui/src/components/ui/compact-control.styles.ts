@@ -168,14 +168,3 @@ export function resolveCompactControlStepperButtonClasses(
 export function resolveCompactControlIconCompactSmClasses(): string {
   return `${UI_COMPACT_CONTROL_BLOCK_CLASS} ${UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS}`
 }
-
-export const UI_COMPACT_CONTROL_SIZE_MODIFIER_CLASSES = [
-  ...Object.values(COMPACT_CONTROL_RECIPE_CLASS),
-  UI_COMPACT_CONTROL_ICON_COMPACT_SM_CLASS,
-  ...Object.values(COMPACT_CONTROL_SEGMENT_CLASS),
-  ...Object.values(COMPACT_CONTROL_TABS_TRIGGER_CLASS),
-  ...Object.values(COMPACT_CONTROL_MENU_ITEM_CLASS),
-  ...Object.values(COMPACT_CONTROL_LIST_ROW_CLASS),
-  ...Object.values(COMPACT_CONTROL_STEPPER_BUTTON_CLASS),
-  ...Object.values(COMPACT_CONTROL_GAP_CLASS),
-] as const

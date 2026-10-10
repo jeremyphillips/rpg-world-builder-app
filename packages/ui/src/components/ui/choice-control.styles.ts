@@ -75,11 +75,3 @@ export function resolveChoiceControlKindClass(kind: ChoiceControlKind): string {
 export function resolveChoiceControlIndicatorSizeClass(size: ChoiceControlIndicatorSize): string {
   return CHOICE_CONTROL_INDICATOR_SIZE_CLASS[size]
 }
-
-export const UI_CHOICE_CONTROL_KIND_MODIFIER_CLASSES = Object.values(
-  CHOICE_CONTROL_KIND_CLASS,
-) as readonly string[]
-
-export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = Object.values(
-  CHOICE_CONTROL_INDICATOR_SIZE_CLASS,
-) as readonly string[]

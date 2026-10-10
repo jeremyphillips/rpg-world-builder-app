@@ -114,10 +114,10 @@ export const UI_FILTER_INLINE_SHELL_CLASS = 'ui-field-control--filter-inline' as
 export const UI_SEARCH_BAR_CLASS = 'ui-search-bar' as const
 export const UI_SEARCH_BAR_EMBEDDED_HOST_CLASS = 'ui-search-bar--embedded-host' as const
 export const UI_SEARCH_BAR_EMBEDDED_INPUT_WRAP_CLASS = 'ui-search-bar__embedded-wrap' as const
-export const UI_SEARCH_BAR_LEADING_ICON_CLASS = 'ui-search-bar__leading-icon' as const
+const UI_SEARCH_BAR_LEADING_ICON_CLASS = 'ui-search-bar__leading-icon' as const
 export const UI_SEARCH_BAR_EMBEDDED_LEADING_ICON_CLASS = 'ui-search-bar__embedded-icon' as const
-export const UI_SEARCH_BAR_FIELD_INPUT_CLASS = 'ui-search-bar__field-input' as const
-export const UI_SEARCH_BAR_EMBEDDED_INPUT_CLASS = 'ui-search-bar__embedded-input' as const
+const UI_SEARCH_BAR_FIELD_INPUT_CLASS = 'ui-search-bar__field-input' as const
+const UI_SEARCH_BAR_EMBEDDED_INPUT_CLASS = 'ui-search-bar__embedded-input' as const
 
 const FIELD_CONTROL_SIZE_CLASS: Record<FieldControlSizeKey, string> = {
   sm: 'ui-field-control--sm',
@@ -152,10 +152,6 @@ export function resolveFieldControlMultilineSizeClass(size: FieldControlSizeKey 
 
 export function resolveFieldControlDigitsSizeClass(size: FieldControlSizeKey = 'md'): string {
   return FIELD_CONTROL_DIGITS_SIZE_CLASS[size]
-}
-
-export function resolveFieldControlTriggerClasses(size: FieldControlSizeKey = 'md'): string {
-  return `${UI_FIELD_CONTROL_BLOCK_CLASS} ${UI_FIELD_CONTROL_TRIGGER_CLASS} ${resolveFieldControlSizeClass(size)}`
 }
 
 export function resolveFilterInlineAppearanceClass(

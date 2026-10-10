@@ -10,12 +10,6 @@ export const UI_FIELD_GROUP_INTRINSIC_LAYOUT_CLASS = 'ui-field-group--intrinsic'
 
 export const UI_FIELD_GROUP_FLOW_COL_LAYOUT_CLASS = 'ui-field-group--flow-col' as const
 
-/** @deprecated Prefer {@link UI_FIELD_GROUP_BLOCK_CLASS}. */
-export const UI_FIELD_CONTROL_GROUPED_SHELL_CLASS = UI_FIELD_GROUP_BLOCK_CLASS
-
-/** @deprecated Prefer {@link UI_FIELD_GROUP_INVALID_CLASS}. */
-export const UI_FIELD_CONTROL_GROUPED_SHELL_INVALID_CLASS = UI_FIELD_GROUP_INVALID_CLASS
-
 export type FieldGroupSizeSpec = {
   size: FieldGroupSizeKey
   className: string
@@ -54,38 +48,29 @@ export function resolveFieldGroupSizeClass(size: FieldGroupSizeKey = 'md'): stri
   return FIELD_GROUP_SIZE_CLASS[size]
 }
 
-export function resolveFieldGroupLayoutClass(
-  layout: 'stretch' | 'intrinsic' | 'flow-col' = 'intrinsic',
-): string {
-  if (layout === 'stretch') return UI_FIELD_GROUP_STRETCH_LAYOUT_CLASS
-  if (layout === 'flow-col') return UI_FIELD_GROUP_FLOW_COL_LAYOUT_CLASS
-  return UI_FIELD_GROUP_INTRINSIC_LAYOUT_CLASS
-}
-
 export const UI_FIELD_GROUP_DIVIDER_PRIMARY_CLASS = 'ui-field-group__divider--primary' as const
 
 export const UI_FIELD_GROUP_DIVIDER_SUBTLE_CLASS = 'ui-field-group__divider--subtle' as const
 
-export const UI_FIELD_GROUP_SEGMENT_CLASS = 'ui-field-group__segment' as const
+const UI_FIELD_GROUP_SEGMENT_CLASS = 'ui-field-group__segment' as const
 
 export const UI_FIELD_GROUP_SEGMENT_START_CLASS = 'ui-field-group__segment--start' as const
 
 export const UI_FIELD_GROUP_SEGMENT_END_CLASS = 'ui-field-group__segment--end' as const
 
-export const UI_FIELD_GROUP_SEGMENT_SURFACE_FAINT_CLASS =
-  'ui-field-group__segment--surface-faint' as const
+const UI_FIELD_GROUP_SEGMENT_SURFACE_FAINT_CLASS = 'ui-field-group__segment--surface-faint' as const
 
 export const UI_FIELD_GROUP_SEGMENT_RESET_CLASS = 'ui-field-group__segment-reset' as const
 
 export const UI_FIELD_GROUP_INPUT_COLUMN_CLASS = 'ui-field-group__input-column' as const
 
-export const UI_FIELD_GROUP_ACTION_SEGMENT_CLASS = 'ui-field-group__action-segment' as const
+const UI_FIELD_GROUP_ACTION_SEGMENT_CLASS = 'ui-field-group__action-segment' as const
 
-export const UI_FIELD_GROUP_INPUT_SEGMENT_CLASS = 'ui-field-group__input-segment' as const
+const UI_FIELD_GROUP_INPUT_SEGMENT_CLASS = 'ui-field-group__input-segment' as const
 
 export const UI_FIELD_GROUP_CARET_SLOT_CLASS = 'ui-field-group__caret-slot' as const
 
-export const UI_FIELD_GROUP_CARET_SLOT_GROUPED_START_CLASS =
+const UI_FIELD_GROUP_CARET_SLOT_GROUPED_START_CLASS =
   'ui-field-group__caret-slot--grouped-start' as const
 
 export const UI_FIELD_GROUP_VALUE_SLOT_START_CLASS = 'ui-field-group__value-slot--start' as const
@@ -105,12 +90,6 @@ export const UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_CLASS =
 
 export const UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_SLOT_CLASS =
   'ui-field-group__value-slot--standalone-slot' as const
-
-export function resolveFieldGroupDividerClass(strength: 'primary' | 'subtle' = 'primary'): string {
-  return strength === 'subtle'
-    ? UI_FIELD_GROUP_DIVIDER_SUBTLE_CLASS
-    : UI_FIELD_GROUP_DIVIDER_PRIMARY_CLASS
-}
 
 export function resolveFieldGroupCaretSlotClass(options: { groupedStart?: boolean } = {}): string {
   return options.groupedStart

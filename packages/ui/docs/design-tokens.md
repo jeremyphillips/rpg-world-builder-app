@@ -223,6 +223,8 @@ Token tests in `packages/ui/src/styles/tokens/`:
 - Field-control role completeness
 - Contrast smoke checks on key pairs
 - Alpha utility ban (`alpha-utility-ban.test.ts`)
+- Semantic control CSS completeness (`semantic-control-css-completeness.test.ts`)
+- Migrated control variant geometry ban (`semantic-control-variants-geometry-ban.test.ts`)
 
 `field-input-chrome.variants.test.ts` guards approved utility tokens for field shells.
 
@@ -247,49 +249,48 @@ Use `iconGlyphRootClasses` on root Lucide nodes; `iconGlyphDescendantClasses` /
 
 ### Hit-target scale (control chrome)
 
-Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts)
+Migrated **Button**, **field**, **choice**, **field-group**, **floating-label**, and **compact**
+controls own height, padding, gap, and in-control type in co-located semantic CSS
+(`button.css`, `field-control.css`, `field-group.css`, `choice-control.css`,
+`floating-label-field.css`, `compact-control.css`). CVA modules emit `ui-*` modifiers only —
+ratcheted by `semantic-control-variants-geometry-ban.test.ts` (no raw `h-*`, `px-*`,
+`text-xs|sm|md|base`, or `[&_svg]:size-*` in migrated `*.variants.ts`).
 
-| Step    | px  | Utility                       | Role                                                          |
-| ------- | --- | ----------------------------- | ------------------------------------------------------------- |
-| xs      | 28  | `h-control-action-xs`         | Dense labeled buttons (`Button` `size="xs"`, default density) |
-| compact | 24  | `size-control-action-compact` | Row actions, collapsible chrome, `icon-xs`                    |
-| default | 36  | `size-control-action-default` | Default icon buttons                                          |
-| lg      | 40  | `size-control-action-lg`      | Large icon buttons                                            |
+Layer 2 utilities remain for **non-migrated** dense chrome (for example number-stepper side
+buttons) and legacy Tailwind compositions:
+
+| Step    | px  | Utility                       | Role                          |
+| ------- | --- | ----------------------------- | ----------------------------- |
+| xs      | 28  | `h-control-action-xs`         | Residual Tailwind hit targets |
+| compact | 24  | `size-control-action-compact` | Residual compact squares      |
+| default | 36  | `size-control-action-default` | Residual default icon targets |
+| lg      | 40  | `size-control-action-lg`      | Residual large icon targets   |
 
 Label type for the xs tier: `text-control-action-xs` (10px) — control lane only, not general body type.
 
-**Not on this ladder:** field control bands (`field-sizing.variants.ts`), number-stepper
-geometry (its own `xs`–`lg` ladder in `number-stepper.variants.ts`), spinner sizing.
+**Not on semantic CSS yet:** `tabs` / `segmented-control` default segments (line tabs still
+use Tailwind geometry), field control bands (`field-control-band.variants.ts`), number-stepper
+geometry (`number-stepper.variants.ts`), spinner sizing.
 
 ### Icon–label gap (labeled controls)
 
-Module: [`control-action.variants.ts`](../src/components/ui/control-action.variants.ts) — `CONTROL_ACTION_GAP_CLASSES`
+Gap tiers for labeled buttons map to compact-control modifiers
+(`ui-compact-control--gap-xs|sm|md`) via `resolveControlActionGapClass()` in
+[`compact-control.styles.ts`](../src/components/ui/compact-control.styles.ts).
 
-| Metrics tier | Utility   | px  |
-| ------------ | --------- | --- |
-| xs (dense)   | `gap-1`   | 4   |
-| sm           | `gap-1.5` | 6   |
-| md           | `gap-2`   | 8   |
+| Metrics tier | Modifier                     | px  |
+| ------------ | ---------------------------- | --- |
+| xs (dense)   | `ui-compact-control--gap-xs` | 4   |
+| sm           | `ui-compact-control--gap-sm` | 6   |
+| md           | `ui-compact-control--gap-md` | 8   |
 
-Labeled `Button` (and matching recipes) derive gap from the **same effective tier** as glyph and height — see `resolveControlActionMetricsTier()` in [`resolve-control-action-metrics-tier.ts`](../src/components/ui/resolve-control-action-metrics-tier.ts). Do not set `gap-*` on buttons unless the composition is intentionally exceptional.
+Labeled `Button` derives gap from the **same effective tier** as glyph and height — see
+`resolveControlActionMetricsTier()` in
+[`control-action.variants.ts`](../src/components/ui/control-action.variants.ts). Do not set
+raw `gap-*` on migrated buttons.
 
-### Named pairings
-
-| Recipe                                      | Hit       | Glyph | Gap (tier)    |
-| ------------------------------------------- | --------- | ----- | ------------- |
-| `controlActionCompactIconClasses`           | compact   | md    | — (icon-only) |
-| `controlActionCompactTextClasses`           | compact   | —     | —             |
-| `controlActionCompactTextWithIconClasses`   | compact   | sm    | xs            |
-| `controlActionDefaultIconClasses`           | default   | lg    | — (icon-only) |
-| `controlActionLgIconClasses`                | lg        | lg    | — (icon-only) |
-| `controlActionXsTextClasses`                | xs (28px) | xs    | xs            |
-| `controlActionXsCompactTextWithIconClasses` | compact   | xs    | xs            |
-| `controlActionXsIconClasses`                | compact   | xs    | — (icon-only) |
-| (inline in `button.variants`)               | sm (32px) | sm    | sm            |
-| (inline in `button.variants`)               | default   | lg    | md            |
-
-Compact icon pairing (24px + 14px md glyph) is locked — regression-tested in
-`control-action.variants.test.ts`.
+Compact icon pairing (24px hit + 14px md glyph) lives in `compact-control.css` and is
+regression-tested in `control-action.variants.test.ts` and `icon-ghost-control.variants.test.ts`.
 
 ### Inline icons
 
@@ -312,7 +313,8 @@ Centered decorative stacks (a large glyph above a heading and description, inclu
 Storybook: **Design tokens → Icon glyph** (including nested `text-base` / `text-xs`) and **Control action**.
 
 Enforcement: `icon-glyph-sizing-ban.test.ts` — raw `[&_svg]:size-*` / inline Lucide
-`size-*` in component implementations is forbidden (grandfather list until Phase 6 inline cleanup).
+`size-*` in component implementations is forbidden (grandfather list in
+`icon-glyph-sizing-exempt-files.ts` shrinks as inline Lucide migrates to icon-glyph utilities).
 
 ### StatusIcon exceptions
 

@@ -11,15 +11,3 @@ export const choiceControlIndicatorShellClasses = UI_CHOICE_CONTROL_BLOCK_CLASS
 export const choiceControlIndicatorFocusClasses = interactiveFocusVariants({
   context: 'standalone',
 })
-
-/** @deprecated Checked border is defined in choice-control.css. */
-export const choiceControlIndicatorCheckedBorderClasses = ''
-
-/** @deprecated Group-checked border is defined in choice-control.css. */
-export const choiceControlIndicatorGroupCheckedBorderClasses = ''
-
-/** @deprecated Invalid border is defined in choice-control.css. */
-export const choiceControlIndicatorInvalidClasses = ''
-
-/** @deprecated Disabled chrome is defined in choice-control.css. */
-export const choiceControlIndicatorDisabledClasses = ''

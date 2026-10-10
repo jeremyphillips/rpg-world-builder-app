@@ -44,7 +44,7 @@ Browser autofill is visual only. `:autofill` forces the floated treatment so tex
 - The floated label hangs outside the shell. The shell height is the control height, so toolbar rows align the control with neighboring inline controls.
 - The label is `pointer-events-none`. While resting it stops before the caret column (`end-8`); when floated it may use the full control width between the value insets.
 - The border notch is a `--surface-current` chip on the label (`::before`, 4px horizontal pad) with a bottom fade (`mask-image` 50% → transparent) so the lower half blends into the control. Host surfaces must establish `--surface-current` (filter panels, forms, modals). Forced colours use solid `Canvas` on the label because masks are dropped.
-- Focus rings stay on the control (`fieldInputFocusClasses`). Half the floated label must cover the ring offset plus the ring width.
+- Focus rings stay on the field control shell (`ui-field-control` in `field-control.css`). Half the floated label must cover the ring offset plus the ring width.
 
 Reduced motion sets both the duration and the delay to 0. The global reduced-motion rule shortens durations and leaves delays, so it is not enough on its own.
 

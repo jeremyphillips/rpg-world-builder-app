@@ -29,6 +29,16 @@
     --floating-label-layer-end-floated: calc(var(--spacing) * 3);
   }
 
+  .ui-floating-label-field--sm .ui-floating-label-field__label {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-floating-label-field--md .ui-floating-label-field__label {
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+  }
+
   .ui-floating-label-field__layer {
     pointer-events: none;
     position: absolute;

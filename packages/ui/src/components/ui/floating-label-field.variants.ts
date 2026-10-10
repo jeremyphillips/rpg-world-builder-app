@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { fieldSizeTypographyClasses } from './field-sizing.variants'
 import {
   FLOATING_LABEL_BLOCK_CLASS,
   FLOATING_LABEL_LABEL_CLASS,
@@ -39,8 +38,8 @@ export const floatingLabelLayerVariants = cva(FLOATING_LABEL_LAYER_CLASS, {
 export const floatingLabelTextVariants = cva(cn(FLOATING_LABEL_LABEL_CLASS, 'rtl:origin-right'), {
   variants: {
     size: {
-      sm: fieldSizeTypographyClasses.sm,
-      md: fieldSizeTypographyClasses.md,
+      sm: '',
+      md: '',
     },
   },
   defaultVariants: {
