@@ -127,3 +127,15 @@ export function resolveFieldGroupSegmentShellClasses(
     .filter(Boolean)
     .join(' ')
 }
+
+/** twMerge group — field group size modifiers. */
+export const UI_FIELD_GROUP_SIZE_CLASSES = FIELD_GROUP_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+/** twMerge group — field group layout modifiers. */
+export const UI_FIELD_GROUP_LAYOUT_CLASSES = [
+  UI_FIELD_GROUP_STRETCH_LAYOUT_CLASS,
+  UI_FIELD_GROUP_INTRINSIC_LAYOUT_CLASS,
+  UI_FIELD_GROUP_FLOW_COL_LAYOUT_CLASS,
+] as const

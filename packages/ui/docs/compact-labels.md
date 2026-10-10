@@ -48,6 +48,10 @@ Theme tokens own light/dark differences for each role (`--semantic-info-outline-
 `--semantic-info-soft-bg`, `--semantic-info-strong-bg`, …). Badge maps tone × appearance to
 one stable utility class per role — no `dark:` policy in component recipes.
 
+**Neutral borders** use the same surface-relative `color-mix` as `border-semantic-neutral-border`,
+declared in `compact-label.css` on the label (not via `@theme`) so `--surface-current` from card,
+popover, and other establishing shells resolves at use time.
+
 ## Badge anatomy
 
 ```text
@@ -56,7 +60,7 @@ Badge (<span> by default)
 └── label          — children text
 ```
 
-Badge owns: fixed height per size, horizontal padding, typography, border width, radius,
+Badge owns: fixed height per size, horizontal padding, typography, a 1px border, radius,
 icon size, icon/text gap, vertical centering.
 
 Consumers own: label, tone, appearance, optional semantic icon choice. Do not add layout or

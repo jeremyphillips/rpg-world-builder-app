@@ -19,7 +19,7 @@ describe('PickerSelectionStateLine', () => {
     expect(icon).toHaveAttribute('aria-hidden', 'true')
     expect(icon).toHaveClass('inline-block', 'align-middle', 'size-icon-inline')
     expect(icon).not.toHaveClass('size-3.5')
-    expect(word.closest('[data-picker-selection-state]')).toHaveClass('text-xs')
+    expect(word.closest('[data-picker-selection-state]')).toHaveClass('text-style-caption')
 
     const provenance = screen.getByText('Package ×2')
     expect(provenance).not.toHaveClass('font-body-emphasis')

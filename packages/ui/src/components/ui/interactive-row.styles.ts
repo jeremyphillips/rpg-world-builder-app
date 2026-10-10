@@ -45,6 +45,17 @@ export type InteractiveRowClassSpec = {
   useCase: string
 }
 
+/** twMerge group — row hover modifiers. */
+export const UI_INTERACTIVE_ROW_HOVER_CLASSES = Object.values(
+  UI_INTERACTIVE_ROW_HOVER_CLASS,
+) as readonly string[]
+
+/** twMerge group — row selection fill modifiers. */
+export const UI_INTERACTIVE_ROW_SELECTED_CLASSES = [
+  ...Object.values(UI_INTERACTIVE_ROW_SELECTED_CLASS),
+  UI_INTERACTIVE_ROW_FILL_SURFACE_CLASS,
+] as readonly string[]
+
 export const INTERACTIVE_ROW_CLASS_SPECS: readonly InteractiveRowClassSpec[] = [
   {
     key: 'hover-selectable',

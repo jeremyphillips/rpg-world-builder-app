@@ -29,15 +29,16 @@ export function isSpellcastingGrantingFeatureRow(
   return isClassSpellcastingGrantingFeature(feature)
 }
 
-export function findSpellcastingGrantingFeatureIndex(rows: FeatureRowForm[]): number {
-  return rows.findIndex((row) => isSpellcastingGrantingFeatureRow(row))
+export function findSpellcastingGrantingFeatureIndex(rows: FeatureRowForm[] | undefined): number {
+  return (rows ?? []).findIndex((row) => isSpellcastingGrantingFeatureRow(row))
 }
 
 export function resolveSpellcastingGrantingFeatureRow(
-  rows: FeatureRowForm[],
+  rows: FeatureRowForm[] | undefined,
 ): FeatureRowForm | undefined {
   const index = findSpellcastingGrantingFeatureIndex(rows)
-  return index === -1 ? undefined : rows[index]
+  const list = rows ?? []
+  return index === -1 ? undefined : list[index]
 }
 
 // fallow-ignore-next-line complexity
@@ -65,7 +66,7 @@ export function reconcileSpellcastingOnEnable(values: ClassFormValues): Partial<
     ? usesPactMagicFromSlotProgression(existingConfig.slotProgressionId)
     : existingFeature?.id === 'pact-magic'
 
-  const nextFeatures = [...values.features]
+  const nextFeatures = [...(values.features ?? [])]
   if (!existingFeature) {
     nextFeatures.push(
       featureToFormRow(
@@ -93,11 +94,12 @@ export function reconcileSpellcastingOnEnable(values: ClassFormValues): Partial<
 export function removeSpellcastingFromFormValues(
   values: ClassFormValues,
 ): Partial<ClassFormValues> {
-  const featureIndex = findSpellcastingGrantingFeatureIndex(values.features)
+  const existingFeatures = values.features ?? []
+  const featureIndex = findSpellcastingGrantingFeatureIndex(existingFeatures)
   const nextFeatures =
     featureIndex === -1
-      ? values.features
-      : values.features.filter((_, index) => index !== featureIndex)
+      ? existingFeatures
+      : existingFeatures.filter((_, index) => index !== featureIndex)
 
   return {
     hasSpellcasting: false,
@@ -115,11 +117,12 @@ export function removeSpellcastingFromFormValues(
 }
 
 export function spellcastingFeatureSummaryFromRows(
-  rows: FeatureRowForm[],
+  rows: FeatureRowForm[] | undefined,
 ): { name: string; level: number; index: number } | undefined {
-  const index = findSpellcastingGrantingFeatureIndex(rows)
+  const list = rows ?? []
+  const index = findSpellcastingGrantingFeatureIndex(list)
   if (index === -1) return undefined
-  const row = rows[index]!
+  const row = list[index]!
   const level = typeof row.level === 'number' ? row.level : Number(row.level)
   if (!Number.isFinite(level)) return undefined
   return {

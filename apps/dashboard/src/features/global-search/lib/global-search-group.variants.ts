@@ -23,5 +23,5 @@ const groupActionLinkBase =
 
 /** Per-group overflow action when a section is truncated. */
 export const globalSearchGroupShowAllLinkVariants = cva(
-  `${groupActionLinkBase} mt-1 items-center py-1.5 text-xs font-body-emphasis`,
+  `${groupActionLinkBase} mt-1 items-center py-1.5 text-style-label`,
 )

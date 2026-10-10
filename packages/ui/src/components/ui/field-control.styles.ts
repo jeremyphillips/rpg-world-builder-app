@@ -224,3 +224,20 @@ export function resolveSearchBarEmbeddedInputClass(
   const clearable = options.clearable ? ' ui-search-bar__embedded-input--clearable' : ''
   return `${UI_SEARCH_BAR_EMBEDDED_INPUT_CLASS} ui-search-bar__embedded-input--${size}${clearable}`
 }
+
+/** twMerge groups — derived from field control size specs. */
+export const UI_FIELD_CONTROL_SIZE_CLASSES = FIELD_CONTROL_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+export const UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES = FIELD_CONTROL_MULTILINE_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+export const UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES = FIELD_CONTROL_DIGITS_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+export const UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES = FILTER_INLINE_APPEARANCE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]

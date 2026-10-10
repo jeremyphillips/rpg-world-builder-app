@@ -5,7 +5,7 @@ import { cn, inlineIconTextClasses } from '@rpg/ui'
 export const pickerSelectionStateLineVariants = cva('min-w-0', {
   variants: {
     density: {
-      compact: 'text-xs',
+      compact: 'text-style-caption',
       comfortable: 'text-sm',
     },
   },

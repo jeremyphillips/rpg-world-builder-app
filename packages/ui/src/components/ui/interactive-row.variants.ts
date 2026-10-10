@@ -38,7 +38,6 @@ export const menuChoiceRowItemResetClasses = cn(
   UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
   'rounded-none shadow-none outline-none',
   'focus:bg-transparent focus:text-foreground',
-  'data-[highlighted]:focus:bg-row-hover',
 )
 
 /**

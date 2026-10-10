@@ -16,7 +16,7 @@ export const tableBuilderValuesGridClasses = 'min-w-fit'
 /** Authoring header row — matches {@link tableHeaderRowClasses} from `@rpg/ui`. */
 export const tableBuilderValuesHeaderRowClasses = cn(
   tableHeaderRowClasses,
-  'grid items-center gap-2 px-2.5 py-2 text-xs font-medium text-muted-foreground',
+  'grid items-center gap-2 px-2.5 py-2 text-style-label text-muted-foreground',
 )
 
 export const tableBuilderValuesHeaderCellClasses = 'truncate'
@@ -32,7 +32,7 @@ export const tableBuilderValuesRowClasses = 'grid items-center gap-2 px-2.5 py-1
 
 export const tableBuilderValuesCellClasses = 'min-w-0 space-y-1'
 
-export const tableBuilderValuesCellErrorClasses = 'text-xs text-destructive'
+export const tableBuilderValuesCellErrorClasses = 'text-style-field-error'
 
 export const tableBuilderValuesRowBlockedHintClasses = 'col-span-full text-style-caption -mt-0.5'
 

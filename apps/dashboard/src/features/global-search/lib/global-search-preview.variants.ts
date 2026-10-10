@@ -14,5 +14,5 @@ const previewActionLinkBase =
 
 /** Pinned global footer action in the preview dropdown. */
 export const globalSearchPreviewFooterLinkVariants = cva(
-  `${previewActionLinkBase} items-center justify-center py-1.5 text-xs font-body-emphasis`,
+  `${previewActionLinkBase} items-center justify-center py-1.5 text-style-label`,
 )

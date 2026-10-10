@@ -117,7 +117,11 @@ describe('Button', () => {
       </Button>,
     )
     const button = screen.getByRole('button', { name: 'Generate' })
-    expect(button).toHaveClass('ui-button--attached', 'ui-button--attached-md', 'rounded-r-md')
+    expect(button).toHaveClass(
+      'ui-button--attached',
+      'ui-button--attached-md',
+      'ui-field-group__segment--end',
+    )
     expect(button).not.toHaveClass('ui-button--md')
   })
 

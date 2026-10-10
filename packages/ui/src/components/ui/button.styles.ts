@@ -215,3 +215,20 @@ export const BUTTON_VARIANT_TO_APPEARANCE: Record<
   outline: 'ui-button--outline',
   ghost: 'ui-button--ghost',
 }
+
+/** twMerge group — derived from {@link BUTTON_APPEARANCE_SPECS}. */
+export const UI_BUTTON_APPEARANCE_CLASSES = BUTTON_APPEARANCE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+/** twMerge group — labeled, icon, text, and attached block modifiers. */
+export const UI_BUTTON_SIZE_CLASSES = [
+  ...BUTTON_SIZE_SPECS.map((spec) => spec.className),
+  UI_BUTTON_TEXT_SIZE_CLASS,
+  UI_BUTTON_ATTACHED_SIZE_CLASS,
+] as readonly string[]
+
+/** twMerge group — text button geometry modifiers. */
+export const UI_BUTTON_TEXT_GEOMETRY_CLASSES = Object.values(TEXT_BUTTON_SIZE_CLASS).flatMap(
+  (byDensity) => Object.values(byDensity),
+) as readonly string[]

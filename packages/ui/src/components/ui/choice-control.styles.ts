@@ -75,3 +75,12 @@ export function resolveChoiceControlKindClass(kind: ChoiceControlKind): string {
 export function resolveChoiceControlIndicatorSizeClass(size: ChoiceControlIndicatorSize): string {
   return CHOICE_CONTROL_INDICATOR_SIZE_CLASS[size]
 }
+
+/** twMerge groups — derived from choice control specs. */
+export const UI_CHOICE_CONTROL_KIND_CLASSES = CHOICE_CONTROL_KIND_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]
+
+export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = CHOICE_CONTROL_INDICATOR_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]

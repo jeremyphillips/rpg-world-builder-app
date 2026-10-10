@@ -80,7 +80,7 @@ export function ContentCampaignAvailabilityAction({
           onCheckedChange={onAvailableChange}
           aria-label={`${statusLabel} in this campaign`}
           onClick={(event) => event.stopPropagation()}
-          className="mt-0.5 h-4 w-7 shrink-0 [&>[data-state]]:size-3 [&>[data-state=checked]]:translate-x-3"
+          className="mt-0.5 shrink-0"
         />
       </div>
     </div>

@@ -4,6 +4,11 @@ export const COMPACT_LABEL_TONES = ['neutral', 'info', 'success', 'warning', 'de
 
 export const COMPACT_LABEL_SIZES = ['sm', 'md', 'lg'] as const
 
+/** twMerge group — compact label size modifiers. */
+export const UI_COMPACT_LABEL_SIZE_CLASSES = COMPACT_LABEL_SIZES.map(
+  (size) => `ui-compact-label--${size}` as const,
+) as readonly string[]
+
 export const COMPACT_LABEL_EMPHASES = ['default', 'subdued'] as const
 
 export type CompactLabelTone = (typeof COMPACT_LABEL_TONES)[number]

@@ -17,7 +17,7 @@ export const quickNpcStartingChoiceRowHeaderClasses =
 export const quickNpcStartingChoiceRowEyebrowSlotClasses = 'col-start-1 shrink-0'
 
 export const quickNpcStartingChoiceRowSummarySlotClasses =
-  'col-start-2 min-w-0 truncate text-xs text-foreground'
+  'col-start-2 min-w-0 truncate text-style-label'
 
 /** Status dot + caret — column 3 so rows without summary text stay end-aligned. */
 export const quickNpcStartingChoiceRowActionsClasses =

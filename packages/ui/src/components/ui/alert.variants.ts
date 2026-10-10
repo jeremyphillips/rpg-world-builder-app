@@ -8,6 +8,16 @@ export const ALERT_DENSITIES = ['comfortable', 'compact'] as const
 
 export type AlertDensity = (typeof ALERT_DENSITIES)[number]
 
+/** twMerge group — alert appearance modifiers. */
+export const UI_ALERT_APPEARANCE_CLASSES = ALERT_VARIANTS.map(
+  (variant) => `ui-alert--${variant}` as const,
+) as readonly string[]
+
+/** twMerge group — alert density modifiers. */
+export const UI_ALERT_DENSITY_CLASSES = ALERT_DENSITIES.map(
+  (density) => `ui-alert--${density}` as const,
+) as readonly string[]
+
 export const alertVariants = cva('ui-alert', {
   variants: {
     variant: {

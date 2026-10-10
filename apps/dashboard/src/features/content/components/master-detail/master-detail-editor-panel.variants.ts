@@ -22,10 +22,10 @@ export const masterDetailEditorMetaClasses = 'truncate text-style-caption'
 
 /** Availability and selected-row issue summary share one header row (~24px gap). */
 export const masterDetailEditorStatusRowClasses =
-  'flex flex-wrap items-center gap-x-6 pt-0.5 text-xs'
+  'flex flex-wrap items-center gap-x-6 pt-0.5 text-style-caption'
 
 export const masterDetailEditorIssueSummaryClasses =
-  'inline-flex min-w-0 items-center gap-1 text-xs font-medium text-destructive-muted'
+  'inline-flex min-w-0 items-center gap-1 text-style-label text-destructive-muted'
 
 export const masterDetailEditorBodyClasses = 'px-4 py-4'
 

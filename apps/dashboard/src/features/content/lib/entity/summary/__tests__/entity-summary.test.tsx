@@ -73,7 +73,11 @@ describe('EntitySummaryDescription', () => {
       </>,
     )
 
-    expect(screen.getByText('Compact copy')).toHaveClass('text-xs', 'truncate')
+    expect(screen.getByText('Compact copy')).toHaveClass(
+      'text-xs',
+      'text-muted-foreground',
+      'truncate',
+    )
     expect(screen.getByText('Comfortable copy')).toHaveClass('text-sm', 'truncate')
   })
 })
@@ -89,7 +93,7 @@ describe('EntitySummaryStatus', () => {
 
     const statusRow = container.querySelector('[data-entity-summary-status-row]')
     expect(statusRow).not.toHaveClass('mt-1')
-    expect(screen.getByText('Spellcasting focus').className).toMatch(/text-xs-meta/)
+    expect(screen.getByText('Spellcasting focus')).toHaveClass('ui-compact-label--sm')
   })
 
   it('renders comfortable status badges at md density', () => {
@@ -100,7 +104,7 @@ describe('EntitySummaryStatus', () => {
       />,
     )
 
-    expect(screen.getByText('Equipped').className).toMatch(/text-sm-meta/)
+    expect(screen.getByText('Equipped')).toHaveClass('ui-compact-label--md')
   })
 
   it('defaults to the wrapped cluster without separators', () => {
@@ -144,7 +148,7 @@ describe('EntitySummaryStatus', () => {
 
       const guidance = screen.getByText('Required by class')
       expect(guidance.tagName).toBe('SPAN')
-      expect(guidance).toHaveClass('text-foreground', 'text-xs')
+      expect(guidance).toHaveClass('text-style-caption', 'text-foreground')
       expect(guidance).not.toHaveClass('truncate')
       expect(guidance).toHaveAttribute('title', 'Wizard class')
     })

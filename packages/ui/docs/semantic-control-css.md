@@ -64,7 +64,7 @@ For each migrated primitive, verify in Storybook DevTools:
 
 ## Compact label
 
-`ui-compact-label` is the Badge and Chip shell. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--selected`, `--interactive`, and `--subdued` are states. Chip dismiss is `__remove`. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
+`ui-compact-label` is the Badge and Chip shell. The block border is 1px. `--{sm,md,lg}` set height and type. `--{outline|soft|strong}-{tone}` set `--ui-compact-label-bg`, `--ui-compact-label-fg`, and `--ui-compact-label-border` with the same longhand list. `--selected`, `--interactive`, and `--subdued` are states. Chip dismiss is `__remove`. twMerge groups: `ui-compact-label-size`, `ui-compact-label-appearance`.
 
 ## Alert
 

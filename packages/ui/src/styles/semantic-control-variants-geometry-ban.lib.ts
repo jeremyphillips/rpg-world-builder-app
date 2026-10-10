@@ -3,18 +3,27 @@
  * Variants map intent to `ui-*` modifiers only (no raw Tailwind height/padding/type/svg sizing).
  */
 export const MIGRATED_SEMANTIC_CONTROL_VARIANT_FILES = [
+  'packages/ui/src/components/ui/alert.variants.ts',
+  'packages/ui/src/components/ui/badge.variants.ts',
   'packages/ui/src/components/ui/button.variants.ts',
-  'packages/ui/src/components/ui/field-control.variants.ts',
-  'packages/ui/src/components/ui/field-input-chrome.variants.ts',
-  'packages/ui/src/components/ui/grouped-segment.variants.ts',
-  'packages/ui/src/components/ui/joined-pair-field.variants.ts',
-  'packages/ui/src/components/ui/input-action-group.variants.ts',
+  'packages/ui/src/components/ui/card.variants.ts',
   'packages/ui/src/components/ui/choice-control.variants.ts',
   'packages/ui/src/components/ui/choice-control-chrome.variants.ts',
-  'packages/ui/src/components/ui/floating-label-field.variants.ts',
-  'packages/ui/src/components/ui/icon-ghost-control.variants.ts',
+  'packages/ui/src/components/ui/compact-label.variants.ts',
   'packages/ui/src/components/ui/drag-handle.variants.ts',
   'packages/ui/src/components/ui/dropdown-menu-choice.variants.ts',
+  'packages/ui/src/components/ui/empty-panel.variants.ts',
+  'packages/ui/src/components/ui/field-control.variants.ts',
+  'packages/ui/src/components/ui/field-input-chrome.variants.ts',
+  'packages/ui/src/components/ui/floating-label-field.variants.ts',
+  'packages/ui/src/components/ui/grouped-segment.variants.ts',
+  'packages/ui/src/components/ui/icon-ghost-control.variants.ts',
+  'packages/ui/src/components/ui/input-action-group.variants.ts',
+  'packages/ui/src/components/ui/inset-panel.variants.ts',
+  'packages/ui/src/components/ui/interactive-list.variants.ts',
+  'packages/ui/src/components/ui/interactive-row.variants.ts',
+  'packages/ui/src/components/ui/joined-pair-field.variants.ts',
+  'packages/ui/src/components/ui/popover-content.variants.ts',
 ] as const
 
 /** Raw geometry utilities forbidden in migrated variant modules. */

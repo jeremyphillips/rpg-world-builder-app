@@ -14,7 +14,7 @@ export const equipmentStepTierSummaryPanelVariants = cva(
   ),
 )
 
-/** 14px trigger. The benefit count overrides this with text-xs. */
+/** 14px trigger. The benefit count overrides this with text-style-caption. */
 export const equipmentStepTierSummaryTriggerVariants = cva(
   cn(
     'flex w-full min-w-0 items-center gap-3 text-left text-sm',
@@ -39,7 +39,7 @@ export const equipmentStepTierSummaryCaretVariants = cva(
 
 /** 12px rows, 8px between them. Color lives on the columns. */
 export const equipmentStepTierSummaryBodyVariants = cva(
-  'mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-xs',
+  'mt-1 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 text-style-caption',
 )
 
 export const equipmentStepTierSummaryValueVariants = cva(

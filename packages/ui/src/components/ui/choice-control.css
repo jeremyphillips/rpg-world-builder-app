@@ -79,12 +79,14 @@
 
   .ui-choice-control--switch {
     display: inline-flex;
+    flex-shrink: 0;
     align-items: center;
     width: var(--control-choice-switch-width);
     height: var(--control-choice-switch-height);
     border-width: 2px;
     border-color: transparent;
     border-radius: 9999px;
+    box-shadow: none;
   }
 
   .ui-choice-control--switch[data-state='checked'] {
@@ -108,6 +110,7 @@
   .ui-choice-control__thumb {
     pointer-events: none;
     display: block;
+    flex-shrink: 0;
     width: var(--control-choice-indicator-size-sm);
     height: var(--control-choice-indicator-size-sm);
     border-radius: 9999px;

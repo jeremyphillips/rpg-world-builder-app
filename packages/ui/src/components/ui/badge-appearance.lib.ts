@@ -32,3 +32,8 @@ export const BADGE_APPEARANCE_TONE_CLASSES = {
 export function badgeAppearanceToneClasses(appearance: BadgeAppearance, tone: BadgeTone): string {
   return BADGE_APPEARANCE_TONE_CLASSES[appearance][tone]
 }
+
+/** twMerge group — compact label appearance × tone modifiers. */
+export const UI_COMPACT_LABEL_APPEARANCE_CLASSES = Object.values(
+  BADGE_APPEARANCE_TONE_CLASSES,
+).flatMap((byTone) => Object.values(byTone)) as readonly string[]

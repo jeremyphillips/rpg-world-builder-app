@@ -7,5 +7,5 @@ export const spellbookAcquisitionModalColumnClasses = 'flex min-w-0 flex-col gap
 /** 12px between section header hint and card options. */
 export const spellbookAcquisitionModalGainModeColumnClasses = 'flex min-w-0 flex-col gap-3'
 
-/** Field-label hint uses caption (`text-xs`) by default; left rail spec is `text-sm`. */
+/** Field-label hint uses `text-style-caption` by default; left rail spec is `text-style-supporting`. */
 export const spellbookAcquisitionModalGainModeHeaderClasses = '[&_p]:!text-sm'

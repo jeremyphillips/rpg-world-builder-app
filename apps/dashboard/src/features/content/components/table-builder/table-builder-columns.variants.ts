@@ -28,4 +28,4 @@ export const tableBuilderColumnTypeIconClasses = 'size-3.5 shrink-0 text-muted-f
 
 export const tableBuilderColumnLeadingSlotClasses = 'flex h-8 items-center'
 
-export const tableBuilderColumnErrorClasses = 'text-xs text-destructive'
+export const tableBuilderColumnErrorClasses = 'text-style-field-error'

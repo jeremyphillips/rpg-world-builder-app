@@ -174,4 +174,9 @@
     background-color: transparent;
     color: var(--foreground);
   }
+
+  .ui-interactive-row--menu-reset[data-highlighted]:focus {
+    background-color: var(--row-hover-bg);
+    color: var(--foreground);
+  }
 }

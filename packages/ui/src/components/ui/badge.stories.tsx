@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { Badge } from './badge'
 import { BADGE_APPEARANCES } from './badge-appearance.lib'
 import { COMPACT_LABEL_TONES } from './compact-label.lib'
+import { establishSurfaceCurrent } from './surface-current.lib'
 
 const meta = {
   title: 'Components/Badge',
@@ -24,6 +25,40 @@ export const SoftInformative: Story = {
 export const NeutralSoft: Story = {
   name: 'Neutral soft',
   args: { appearance: 'soft', tone: 'neutral', children: 'Homebrew' },
+}
+
+/** Neutral borders should mix toward each shell’s `--surface-current`, not the page root only. */
+export const NeutralSoftNestedSurfaces: Story = {
+  name: 'Neutral soft / nested surfaces',
+  parameters: { layout: 'padded', semanticClasses: true },
+  render: () => (
+    <div className="flex flex-col gap-6">
+      <section className="space-y-2">
+        <h3 className="text-style-label">Page background</h3>
+        <div className={`rounded-lg bg-background p-4 ${establishSurfaceCurrent('background')}`}>
+          <Badge appearance="soft" tone="neutral">
+            Homebrew
+          </Badge>
+        </div>
+      </section>
+      <section className="space-y-2">
+        <h3 className="text-style-label">Card</h3>
+        <div className="ui-card p-4">
+          <Badge appearance="soft" tone="neutral">
+            Homebrew
+          </Badge>
+        </div>
+      </section>
+      <section className="space-y-2">
+        <h3 className="text-style-label">Popover plane</h3>
+        <div className="ui-popover-content ui-popover-content--popover w-fit p-4">
+          <Badge appearance="soft" tone="neutral">
+            Homebrew
+          </Badge>
+        </div>
+      </section>
+    </div>
+  ),
 }
 
 export const SubduedEmphasis: Story = {

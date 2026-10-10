@@ -29,3 +29,8 @@ export const FLOATING_LABEL_SIZE_SPECS: readonly FloatingLabelSizeSpec[] = [
     useCase: 'Default comfortable fields',
   },
 ]
+
+/** twMerge group — floating label size modifiers. */
+export const UI_FLOATING_LABEL_SIZE_CLASSES = FLOATING_LABEL_SIZE_SPECS.map(
+  (spec) => spec.className,
+) as readonly string[]

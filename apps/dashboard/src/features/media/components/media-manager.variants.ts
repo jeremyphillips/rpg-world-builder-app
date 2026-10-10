@@ -79,7 +79,7 @@ export const mediaManagerStyles = {
   muted: cva('text-style-supporting'),
   footerHint: cva('text-style-caption'),
   metadata: cva(
-    'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-xs',
+    'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-style-caption',
   ),
   metadataLabel: cva('text-muted-foreground'),
   metadataValue: cva('m-0 min-w-0'),
