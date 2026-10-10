@@ -109,6 +109,14 @@ export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = [
   'ui-choice-control--indicator-lg',
 ] as const
 
+export const UI_CARD_INTERACTION_CLASSES = ['ui-card--static', 'ui-card--interactive'] as const
+
+export const UI_INSET_PANEL_SIZE_CLASSES = [
+  'ui-inset-panel--sm',
+  'ui-inset-panel--md',
+  'ui-inset-panel--lg',
+] as const
+
 export const UI_INTERACTIVE_ROW_HOVER_CLASSES = [
   'ui-interactive-row--hover-none',
   'ui-interactive-row--hover-selectable',

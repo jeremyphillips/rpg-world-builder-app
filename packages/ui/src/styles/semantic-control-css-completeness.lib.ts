@@ -146,6 +146,10 @@ const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive
 
 const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
 
+const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
+
+const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -458,6 +462,36 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-interactive-list__panel--${name}`,
         requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: cardCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-card--static',
+        requiredProperties: ['transition-property'],
+      },
+      {
+        modifierPrefix: 'ui-card--interactive',
+        requiredProperties: ['transition-property'],
+      },
+    ],
+  },
+  {
+    filePath: insetPanelCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['border-radius', 'padding'] as const,
+      })),
+      ...(['solid', 'dashed'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['border-style'] as const,
+      })),
+      ...(['align-start', 'align-center'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['text-align'] as const,
       })),
     ],
   },

@@ -54,6 +54,14 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-interactive-list` owns the list surface and adjacent-sibling borders. `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
 
+## Card, inset panel, and empty panel
+
+`ui-card` owns radius, border, fill, raised shadow, and `--surface-current`. `--static` and `--interactive` set hover through one `:hover` rule. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive. `shadow-md` is not used; the card reads `--shadow-surface-raised`.
+
+`ui-inset-panel--{sm,md,lg}` owns radius and padding. Border style and alignment are separate modifiers. Surface wash still comes from the visual-vocabulary resolver.
+
+`ui-empty-panel` owns the compact sunken well (radius, padding, italic muted type, sunken shadow).
+
 ## When CVA vs CSS
 
 - **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.

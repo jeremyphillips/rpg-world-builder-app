@@ -300,6 +300,7 @@ export {
   CardDescription,
   CardContent,
 } from './components/ui/card'
+export { cardSurfaceClasses, cardSurfaceVariants } from './components/ui/card.variants'
 
 export {
   fieldControlTriggerCursorClasses,

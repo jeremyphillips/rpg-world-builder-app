@@ -22,9 +22,9 @@ export type InsetPanelAlign = (typeof INSET_PANEL_ALIGNS)[number]
 export const DEFAULT_INSET_PANEL_SURFACE: SurfaceConfig = { elevation: 'sunken' }
 
 const insetPanelSizeClasses = {
-  sm: 'rounded-md p-3',
-  md: 'rounded-md p-4',
-  lg: 'rounded-lg p-8',
+  sm: 'ui-inset-panel--sm',
+  md: 'ui-inset-panel--md',
+  lg: 'ui-inset-panel--lg',
 } satisfies Record<InsetPanelSize, string>
 
 /** Default `Text` variant for each inset panel size. */
@@ -57,16 +57,16 @@ export function resolveInsetPanelSurfaceClasses(surface?: SurfaceConfig): string
   return resolveSurfaceClasses(surface)
 }
 
-export const insetPanelVariants = cva('min-w-0 border border-border', {
+export const insetPanelVariants = cva('ui-inset-panel', {
   variants: {
     borderStyle: {
-      solid: '',
-      dashed: 'border-dashed',
+      solid: 'ui-inset-panel--solid',
+      dashed: 'ui-inset-panel--dashed',
     },
     size: insetPanelSizeClasses,
     align: {
-      start: '',
-      center: 'text-center',
+      start: 'ui-inset-panel--align-start',
+      center: 'ui-inset-panel--align-center',
     },
   },
   defaultVariants: {
