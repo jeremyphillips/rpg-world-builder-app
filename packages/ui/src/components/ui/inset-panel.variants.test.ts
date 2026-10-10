@@ -43,18 +43,18 @@ describe('insetPanelVariants', () => {
   })
 
   it('exposes shared empty and gate presets', () => {
-    expect(insetPanelEmptyStateVariants()).toContain('border-dashed')
+    expect(insetPanelEmptyStateVariants()).toContain('ui-inset-panel--dashed')
     expect(insetPanelEmptyStateVariants()).toContain('bg-sunken')
     expect(insetPanelEmptyStateVariants()).toContain('shadow-surface-sunken')
     expect(insetPanelGateVariants()).toContain('bg-sunken')
     expect(insetPanelGateVariants()).toContain('shadow-surface-sunken')
-    expect(insetPanelEmptyStateClasses).toContain('border-dashed')
+    expect(insetPanelEmptyStateClasses).toContain('ui-inset-panel--dashed')
     expect(insetPanelEmptyStateClasses).toContain('bg-sunken')
     expect(insetPanelGateClasses).toContain('bg-sunken')
     expect(insetPanelGateClasses).toContain('shadow-surface-sunken')
   })
 
   it('keeps layout variants separate from surface config', () => {
-    expect(insetPanelVariants({ size: 'md' })).toContain('rounded-md')
+    expect(insetPanelVariants({ size: 'md' })).toContain('ui-inset-panel--md')
   })
 })

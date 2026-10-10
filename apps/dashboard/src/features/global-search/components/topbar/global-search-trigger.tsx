@@ -42,7 +42,7 @@ export const GlobalSearchTrigger = React.forwardRef<HTMLButtonElement, GlobalSea
       >
         <Search aria-hidden className="size-5" />
         <span className="hidden text-sm md:inline">{GLOBAL_SEARCH_COPY.triggerLabel}</span>
-        <span className="hidden text-xs text-muted-foreground md:inline">
+        <span className="hidden text-style-caption md:inline">
           {GLOBAL_SEARCH_COPY.triggerShortcutHint}
         </span>
       </Button>

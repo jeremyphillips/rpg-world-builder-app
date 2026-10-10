@@ -18,7 +18,7 @@ export function CampaignCharacterStatusSummary({
   const vitalPresentation = resolveCharacterVitalStatusPresentation(vital.status)
 
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-style-supporting">
       <Text as="span" variant="muted">
         Roster: {rosterPresentation.label}
       </Text>

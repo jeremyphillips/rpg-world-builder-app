@@ -16,7 +16,7 @@ export const tableBuilderValuesGridClasses = 'min-w-fit'
 /** Authoring header row — matches {@link tableHeaderRowClasses} from `@rpg/ui`. */
 export const tableBuilderValuesHeaderRowClasses = cn(
   tableHeaderRowClasses,
-  'grid items-center gap-2 px-2.5 py-2 text-xs font-medium text-muted-foreground',
+  'grid items-center gap-2 px-2.5 py-2 text-style-label text-muted-foreground',
 )
 
 export const tableBuilderValuesHeaderCellClasses = 'truncate'
@@ -32,16 +32,15 @@ export const tableBuilderValuesRowClasses = 'grid items-center gap-2 px-2.5 py-1
 
 export const tableBuilderValuesCellClasses = 'min-w-0 space-y-1'
 
-export const tableBuilderValuesCellErrorClasses = 'text-xs text-destructive'
+export const tableBuilderValuesCellErrorClasses = 'text-style-field-error'
 
-export const tableBuilderValuesRowBlockedHintClasses =
-  'col-span-full text-xs text-muted-foreground -mt-0.5'
+export const tableBuilderValuesRowBlockedHintClasses = 'col-span-full text-style-caption -mt-0.5'
 
 export const tableBuilderValuesDiceCellClasses = 'flex min-w-0 items-center gap-1'
 
 export const tableBuilderValuesDiceCountClasses = 'w-12'
 
-export const tableBuilderValuesDiceJoinerClasses = 'text-xs text-muted-foreground'
+export const tableBuilderValuesDiceJoinerClasses = 'text-style-caption'
 
 export const tableBuilderValuesActionCellClasses = 'flex justify-end'
 
@@ -73,7 +72,7 @@ export const tableBuilderAuthoringDockPanelClasses = 'space-y-1.5'
 
 export const tableBuilderAuthoringDockWellClasses = 'w-full'
 
-export const tableBuilderAuthoringDockTriggerClasses = 'text-sm font-medium'
+export const tableBuilderAuthoringDockTriggerClasses = 'text-style-label'
 
 export const tableBuilderAuthoringDockHeadingClasses = 'mb-1.5 text-base'
 
@@ -81,13 +80,13 @@ export const tableBuilderAuthoringDockHeadingTitleClasses = 'font-semibold text-
 
 export const tableBuilderAuthoringDockHeadingMetaClasses = 'font-normal text-muted-foreground'
 
-export const tableBuilderAuthoringDockFootnoteTextClasses = 'mb-0 text-xs text-muted-foreground'
+export const tableBuilderAuthoringDockFootnoteTextClasses = 'mb-0 text-style-caption'
 
 export const tableBuilderAuthoringDockInputRowClasses =
   'flex flex-wrap items-center gap-x-2 gap-y-1'
 
 export const tableBuilderAuthoringDockInputLabelClasses =
-  'shrink-0 text-sm font-medium text-foreground'
+  'shrink-0 text-style-label text-foreground'
 
 export const tableBuilderAuthoringDockIncrementInputClasses = 'w-24'
 
@@ -101,7 +100,7 @@ export const tableBuilderAuthoringDockLayoutClasses =
 /** Reserves the preview column track so dock chrome aligns with the values grid. */
 export const tableBuilderAuthoringDockPreviewSpacerClasses = 'hidden min-w-0 lg:block'
 
-export const tableBuilderValuesLevelLabelClasses = 'text-sm text-muted-foreground tabular-nums'
+export const tableBuilderValuesLevelLabelClasses = 'text-style-supporting tabular-nums'
 
 export const tableBuilderDerivedInputShellClasses = cn(
   'grid w-full min-w-0 items-center grid-cols-[1fr_1px_auto]',

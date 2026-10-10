@@ -3,9 +3,18 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { Checkbox } from './checkbox.client'
 
 describe('Checkbox', () => {
+  it('emits semantic choice-control classes', () => {
+    render(<Checkbox aria-label="Accept terms" />)
+    expect(screen.getByLabelText('Accept terms')).toHaveClass(
+      UI_CHOICE_CONTROL_BLOCK_CLASS,
+      'ui-choice-control--checkbox',
+    )
+  })
+
   it('toggles checked state on click', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()

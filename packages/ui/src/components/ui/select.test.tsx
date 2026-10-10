@@ -129,15 +129,22 @@ describe('Select', () => {
     renderDigitSelect()
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('px-0', 'py-0', 'w-auto', 'inline-flex')
-    expect(trigger).not.toHaveClass('px-3', 'pe-2.5')
+    expect(trigger).toHaveClass(
+      'ui-field-control',
+      'ui-field-control--trigger',
+      'ui-field-control--md',
+    )
 
     const slot = valueSlot(trigger)
-    expect(slot).toHaveClass('ps-3', 'pe-1', 'min-w-[calc(2*1ch)]', 'tabular-nums')
+    expect(slot).toHaveClass(
+      'ui-field-group__value-slot--standalone-slot',
+      'min-w-[calc(2*1ch)]',
+      'tabular-nums',
+    )
     expect(slot).toHaveTextContent('8')
 
     const caret = caretSlot(trigger)
-    expect(caret).toHaveClass('w-8', 'self-stretch')
+    expect(caret).toHaveClass('ui-field-group__caret-slot')
     expect(caret?.querySelector('svg')).toHaveClass('size-icon-glyph-lg')
   })
 
@@ -145,18 +152,21 @@ describe('Select', () => {
     renderDigitSelect({ grouped: true, groupedPosition: 'start', value: '30', digits: 2 })
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('w-auto')
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit')
 
     const caret = caretSlot(trigger)
-    expect(caret).toHaveClass('w-8', 'pe-1')
+    expect(caret).toHaveClass(
+      'ui-field-group__caret-slot',
+      'ui-field-group__caret-slot--grouped-start',
+    )
   })
 
   it('omits grouped start caret inset on end segments', () => {
     renderDigitSelect({ grouped: true, groupedPosition: 'end', value: '30', digits: 2 })
 
     const caret = caretSlot(screen.getByLabelText('Faces'))
-    expect(caret).toHaveClass('w-8')
-    expect(caret).not.toHaveClass('pe-1')
+    expect(caret).toHaveClass('ui-field-group__caret-slot')
+    expect(caret).not.toHaveClass('ui-field-group__caret-slot--grouped-start')
   })
 
   it('keeps trigger width and caret slot position stable between 1- and 2-digit values', () => {
@@ -225,7 +235,7 @@ describe('Select', () => {
     const nextTrigger = screen.getByLabelText('Currency')
     expect(sizingGhost(nextTrigger)).toHaveTextContent('Platinum')
     expect(caretSlot(nextTrigger)?.className).toBe(caretClasses)
-    expect(caretSlot(nextTrigger)).toHaveClass('w-8')
+    expect(caretSlot(nextTrigger)).toHaveClass('ui-field-group__caret-slot')
   })
 
   it('rejects digits and sizingLabel together', () => {
@@ -324,9 +334,9 @@ describe('Select', () => {
     renderSizingLabelSelect({ grouped: true, groupedPosition: 'end', sizingLabel: 'GP' })
 
     const trigger = screen.getByLabelText('Currency')
-    expect(trigger).toHaveClass('w-auto', 'p-0')
-    expect(valueSlot(trigger)).toHaveClass('grid', 'ps-2')
-    expect(caretSlot(trigger)).toHaveClass('w-8')
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit', 'ui-field-group__segment--end')
+    expect(valueSlot(trigger)).toHaveClass('grid', 'ui-field-group__value-slot--end-slot')
+    expect(caretSlot(trigger)).toHaveClass('ui-field-group__caret-slot')
     expect(trigger).toHaveTextContent('GP')
   })
 

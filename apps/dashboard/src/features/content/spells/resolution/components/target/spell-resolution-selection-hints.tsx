@@ -6,7 +6,7 @@ import { RESOLUTION_FIELD_NAME } from '../../lib/form/resolution-form-values'
 import { SPELL_AREA_GEOMETRY_NONE } from '../../../lib/spell-form-labels'
 
 function SelectionHint({ children }: { children: string }) {
-  return <p className="text-sm text-muted-foreground">{children}</p>
+  return <p className="text-style-supporting">{children}</p>
 }
 
 /** Mode-specific static copy for the Selection panel. */

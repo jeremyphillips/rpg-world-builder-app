@@ -55,7 +55,7 @@ describe('ContentDetailLayout', () => {
     const chrome = screen.getByTestId('page-chrome-actions')
     const editLink = chrome.querySelector('a[href="/campaigns/c1/classes/f1/edit"]')
     expect(editLink).toHaveTextContent('Edit')
-    expect(editLink).toHaveClass('h-control-action-compact')
+    expect(editLink).toHaveClass('ui-button--sm-compact')
   })
 
   it('hides Edit when the user cannot manage the campaign', () => {

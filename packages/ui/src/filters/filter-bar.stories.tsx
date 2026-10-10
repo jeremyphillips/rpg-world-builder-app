@@ -71,7 +71,7 @@ function FilterSystemDemo({
         advancedOpen={advancedOpen}
         onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
-      <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
+      <pre className="rounded-md border border-border bg-sunken p-3 text-style-caption">
         {JSON.stringify(state, null, 2)}
       </pre>
     </div>

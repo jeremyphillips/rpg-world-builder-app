@@ -5,7 +5,7 @@ export const startingEquipmentOptionNestedFieldsClasses = 'space-y-4'
 
 /** 12px base and total wealth, 4px under the package description, badge after the total. */
 export const startingEquipmentTierContributionRowVariants = cva(
-  'mt-1 flex flex-wrap items-center gap-1.5 text-xs',
+  'mt-1 flex flex-wrap items-center gap-1.5 text-style-caption',
 )
 
 export const startingEquipmentTierContributionBaseVariants = cva(
@@ -19,4 +19,4 @@ export const startingEquipmentOptionReasonsClasses = 'space-y-1'
 /** 11px eyebrow (`eyebrow-style-sm`) with a 2px gap before the tool control. */
 export const startingEquipmentIncludedToolHeadingClasses = 'mb-0.5'
 
-export const startingEquipmentIncludedToolGuidanceClasses = 'text-xs'
+export const startingEquipmentIncludedToolGuidanceClasses = 'text-style-caption'

@@ -43,4 +43,4 @@ export const detailCollectionPanelBodyVariants = cva('', {
 })
 
 /** Panel header helper line — 14px muted copy below the title. */
-export const detailCollectionPanelHeaderHelperClasses = 'text-sm text-muted-foreground'
+export const detailCollectionPanelHeaderHelperClasses = 'text-style-supporting'

@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react'
-
 import { Heading } from '../components/ui/heading'
+import { CatalogTable, type CatalogColumn } from './semantic-classes/catalog-table'
 import { HEADING_CHROME_SPECS, HEADING_DOC_LADDER_SPECS } from '../components/ui/heading.styles'
 import type { HeadingStyleSpec } from '../components/ui/heading.styles'
 import { Eyebrow } from '../components/ui/eyebrow'
@@ -12,44 +11,6 @@ function headingSampleAs(level: HeadingStyleSpec['level']): 'h1' | 'h2' | 'h3' |
     return level
   }
   return 'p'
-}
-
-type CatalogColumn<Row> = {
-  header: string
-  cell: (row: Row) => ReactNode
-}
-
-function CatalogTable<Row extends { key: string }>({
-  columns,
-  rows,
-}: {
-  columns: CatalogColumn<Row>[]
-  rows: Row[]
-}) {
-  return (
-    <table className="w-full border-collapse text-sm">
-      <thead>
-        <tr className="border-b text-left">
-          {columns.map((column) => (
-            <th key={column.header} scope="col" className="py-2 pr-4 font-medium last:pr-0">
-              {column.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row) => (
-          <tr key={row.key} className="border-b align-top">
-            {columns.map((column) => (
-              <td key={column.header} className="py-3 pr-4 last:pr-0">
-                {column.cell(row)}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )
 }
 
 const HEADING_COLUMNS: CatalogColumn<HeadingStyleSpec & { key: string }>[] = [

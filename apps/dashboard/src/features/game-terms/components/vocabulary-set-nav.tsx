@@ -14,7 +14,7 @@ type VocabularySetNavProps = {
 
 function navLinkClass(isActive: boolean) {
   return cn(
-    'block rounded-md px-3 py-2 text-sm font-medium transition-colors',
+    'block rounded-md px-3 py-2 text-style-label transition-colors',
     isActive
       ? 'bg-accent text-accent-foreground'
       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',

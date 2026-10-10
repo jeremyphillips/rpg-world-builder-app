@@ -12,7 +12,7 @@ export const equipmentPackageSwitchResolutionBudgetSummaryClasses =
   'rounded-lg border border-border bg-surface-muted px-4 py-3'
 
 export const equipmentPackageSwitchResolutionBudgetSummaryTitleClasses =
-  'mb-3 text-sm font-medium text-foreground'
+  'mb-3 text-style-label text-foreground'
 
 export const equipmentPackageSwitchResolutionBudgetRowClasses =
   'flex items-start justify-between gap-4 text-sm'
@@ -40,7 +40,7 @@ export const equipmentPackageSwitchResolutionBudgetStatusVariants = cva(
   },
 )
 
-export const equipmentPackageSwitchResolutionSafetyNoteClasses = 'text-xs text-muted-foreground'
+export const equipmentPackageSwitchResolutionSafetyNoteClasses = 'text-style-caption'
 
 export const equipmentPackageSwitchResolutionAlertClasses = 'text-sm text-destructive'
 
@@ -48,7 +48,6 @@ export const equipmentPackageSwitchResolutionFooterClasses = 'flex flex-col item
 
 export const equipmentPackageSwitchResolutionFooterActionsClasses = 'flex items-center gap-2'
 
-export const equipmentPackageSwitchResolutionHelperClasses = 'text-sm text-muted-foreground'
+export const equipmentPackageSwitchResolutionHelperClasses = 'text-style-supporting'
 
-export const equipmentPackageSwitchResolutionBlockedBodyClasses =
-  'space-y-3 text-sm text-muted-foreground'
+export const equipmentPackageSwitchResolutionBlockedBodyClasses = 'space-y-3 text-style-supporting'

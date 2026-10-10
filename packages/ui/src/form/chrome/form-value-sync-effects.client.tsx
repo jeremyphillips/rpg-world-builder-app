@@ -24,6 +24,19 @@ function buildValuesMap(dependsOn: readonly string[], watched: unknown): Record<
   return values
 }
 
+/** Unregistered fields (`shouldUnregister`) read as undefined — fall back to mount defaults for sync patches. */
+function resolveFormValuesForSync(form: UseFormReturn): Record<string, unknown> {
+  const current = form.getValues() as Record<string, unknown>
+  const defaults = (form.formState.defaultValues ?? {}) as Record<string, unknown>
+  const merged = { ...defaults, ...current }
+  for (const key of Object.keys(defaults)) {
+    if (current[key] === undefined) {
+      merged[key] = defaults[key]
+    }
+  }
+  return merged
+}
+
 export interface FormValueSyncEffectsProps {
   valueSyncs: FormValueSync[]
 }
@@ -61,7 +74,7 @@ export function FormValueSyncEffects({ valueSyncs }: FormValueSyncEffectsProps) 
 
     if (changedKeys.length === 0) return
 
-    const formValues = form.getValues() as Record<string, unknown>
+    let formValues = resolveFormValuesForSync(form)
     for (const sync of valueSyncs) {
       if (!sync.dependsOn.some((name) => changedKeys.includes(name))) continue
       const patch = sync.apply(formValues, changedKeys)
@@ -69,6 +82,7 @@ export function FormValueSyncEffects({ valueSyncs }: FormValueSyncEffectsProps) 
       for (const [key, value] of Object.entries(patch)) {
         applyValueSyncPatchEntry(form, key, value)
       }
+      formValues = resolveFormValuesForSync(form)
     }
   }, [allDeps, form, valueSyncs, watched])
 

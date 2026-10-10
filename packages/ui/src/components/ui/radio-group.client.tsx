@@ -6,12 +6,9 @@ import { Circle } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import {
-  choiceControlIndicatorCheckedBorderClasses,
-  choiceControlIndicatorDisabledClasses,
-  choiceControlIndicatorFocusClasses,
-  choiceControlIndicatorInvalidClasses,
-  choiceControlIndicatorShellClasses,
-} from './choice-control-chrome.variants'
+  UI_CHOICE_CONTROL_MARK_CLASS,
+  radioGroupItemControlClasses,
+} from './choice-control.variants'
 
 const RadioGroup = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Root>,
@@ -27,19 +24,11 @@ const RadioGroupItem = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <RadioGroupPrimitive.Item
     ref={ref}
-    className={cn(
-      'aspect-square size-4 shrink-0 rounded-full text-primary',
-      choiceControlIndicatorShellClasses,
-      choiceControlIndicatorFocusClasses,
-      choiceControlIndicatorCheckedBorderClasses,
-      choiceControlIndicatorDisabledClasses,
-      choiceControlIndicatorInvalidClasses,
-      className,
-    )}
+    className={cn(radioGroupItemControlClasses(), className)}
     {...props}
   >
-    <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-      <Circle className="size-2.5 fill-primary text-primary" />
+    <RadioGroupPrimitive.Indicator className={UI_CHOICE_CONTROL_MARK_CLASS}>
+      <Circle aria-hidden />
     </RadioGroupPrimitive.Indicator>
   </RadioGroupPrimitive.Item>
 ))

@@ -6,7 +6,7 @@ export const xpThresholdsFieldLayoutClasses = cn('flex items-start gap-3')
 
 export const xpThresholdsFieldCopyClasses = cn('min-w-0 flex-1 space-y-1')
 
-export const xpThresholdsFieldTitleClasses = cn('text-sm font-medium text-foreground')
+export const xpThresholdsFieldTitleClasses = cn('text-style-label text-foreground')
 
 export const xpThresholdsFieldMetadataClasses = cn('text-sm')
 

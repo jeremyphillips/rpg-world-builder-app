@@ -40,7 +40,7 @@ describe('FieldGroup', () => {
     )
     expect(screen.getByRole('group', { name: /Character basics/ })).toBeInTheDocument()
     expect(screen.getByText('Character basics').closest('legend')).toHaveClass(
-      'text-field-group-legend',
+      'text-style-field-legend',
     )
   })
 
@@ -53,7 +53,7 @@ describe('FieldGroup', () => {
     expect(screen.getByText('Shown on your sheet.')).toBeInTheDocument()
     const fieldset = screen.getByRole('group', { name: /Character basics/ })
     const legend = screen.getByText('Character basics').closest('legend')
-    expect(legend).toHaveClass('text-field-group-legend', 'w-full')
+    expect(legend).toHaveClass('text-style-field-legend', 'w-full')
     expect(legend?.firstElementChild).toHaveClass('flex', 'flex-col', 'gap-2')
     expect(legend?.firstElementChild).not.toHaveClass('mb-5')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-5')
@@ -108,11 +108,11 @@ describe('FieldGroup', () => {
 
     const fieldset = screen.getByRole('group', { name: /Basics/ })
     const legend = screen.getByText('Basics').closest('legend')
-    expect(legend).toHaveClass('text-md', 'font-heading')
+    expect(legend).toHaveClass('text-style-field-legend-compact')
     expect(legend?.firstElementChild).toHaveClass('gap-1')
     expect(legend?.firstElementChild).not.toHaveClass('mb-3')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-3')
-    expect(screen.getByText('Help copy.')).toHaveClass('text-xs')
+    expect(screen.getByText('Help copy.')).toHaveClass('text-style-field-hint-compact')
 
     const stack = fieldStack(fieldset)
     expect(stack).toHaveClass('flex', 'flex-col', 'gap-4')
@@ -124,7 +124,7 @@ describe('FieldGroup', () => {
         <TextField id="damage-dice" label="Dice" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-field-subgroup-legend')
+    expect(screen.getByText('Damage').closest('legend')).toHaveClass('text-style-field-legend-sub')
   })
 
   it('applies array body gap outside array legend typography', () => {
@@ -134,7 +134,7 @@ describe('FieldGroup', () => {
       </FieldGroup>,
     )
     const fieldset = screen.getByRole('group', { name: /Grants/ })
-    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-md', 'font-field-label')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Grants').closest('legend')).not.toHaveClass('mb-1.5')
     expect(bodyRelationshipWrapper(fieldset)).toHaveClass('mt-1.5')
   })
@@ -145,7 +145,7 @@ describe('FieldGroup', () => {
         <TextField id="grant-type" label="Grant type" />
       </FieldGroup>,
     )
-    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-xs', 'font-field-label')
+    expect(screen.getByText('Grants').closest('legend')).toHaveClass('text-style-field-label-sm')
   })
 
   it('does not apply body gap when the group has no legend', () => {
@@ -230,11 +230,11 @@ describe('FieldGroup', () => {
 
     const fieldset = screen.getByRole('group', { name: /Optional details/ })
     const legend = screen.getByText('Optional details').closest('legend')
-    expect(legend).toHaveClass('text-md', 'font-heading')
+    expect(legend).toHaveClass('text-style-field-legend-compact')
     expect(legend?.firstElementChild?.querySelector('.flex.flex-col.gap-1')).toBeTruthy()
     const trigger = screen.getByRole('button', { name: /Optional details/i })
     expect(trigger).toHaveClass('py-0')
-    expect(trigger).not.toHaveClass('text-field-group-legend')
+    expect(trigger).not.toHaveClass('text-style-field-legend')
     expect(bodyRelationshipWrapper(fieldset)).toBeNull()
     const content = fieldset.querySelector('[data-state]')
     expect(content?.className).not.toMatch(/\bpt-|\bpb-/)

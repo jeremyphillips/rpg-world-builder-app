@@ -6,6 +6,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { Button } from './button.client'
 import { Spinner } from './spinner'
+import { UI_BUTTON_TEXT_SIZE_CLASS } from './button.styles'
 
 describe('Button', () => {
   it('renders its children as an accessible button', () => {
@@ -13,15 +14,15 @@ describe('Button', () => {
     expect(screen.getByRole('button', { name: 'Save world' })).toBeInTheDocument()
   })
 
-  it('applies the variant and size classes', () => {
+  it('applies semantic appearance and size classes', () => {
     render(
       <Button variant="destructive" size="sm">
         Delete
       </Button>,
     )
     const button = screen.getByRole('button', { name: 'Delete' })
-    expect(button).toHaveClass('bg-destructive')
-    expect(button).toHaveClass('h-8')
+    expect(button).toHaveClass('ui-button--destructive')
+    expect(button).toHaveClass('ui-button--sm')
   })
 
   it('applies xs size classes for chrome and icon-xs', () => {
@@ -31,42 +32,37 @@ describe('Button', () => {
       </Button>,
     )
     const xsButton = screen.getByRole('button', { name: 'Reset' })
-    expect(xsButton).toHaveClass('text-control-action-xs', 'h-control-action-xs')
-    expect(xsButton).toHaveClass('[&_svg]:size-icon-glyph-xs')
-    expect(xsButton).not.toHaveClass('[&_svg]:size-icon-glyph-lg')
+    expect(xsButton).toHaveClass('ui-button--xs', 'ui-button--outline')
 
     rerender(
       <Button size="icon-xs" variant="ghost" aria-label="Remove">
         <span aria-hidden>×</span>
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Remove' })).toHaveClass(
-      'size-control-action-compact',
-      '[&_svg]:size-icon-glyph-xs',
-    )
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveClass('ui-button--icon-xs')
   })
 
-  it('applies compact density heights for each size', () => {
+  it('applies compact density size modifiers', () => {
     const { rerender } = render(
       <Button size="sm" density="compact">
         Compact
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-control-action-compact')
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--sm-compact')
 
     rerender(
       <Button size="default" density="compact">
         Compact
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-8')
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--md-compact')
 
     rerender(
       <Button size="lg" density="compact">
         Compact
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('h-9')
+    expect(screen.getByRole('button', { name: 'Compact' })).toHaveClass('ui-button--lg-compact')
 
     rerender(
       <Button size="icon" density="compact" aria-label="Icon action">
@@ -74,8 +70,7 @@ describe('Button', () => {
       </Button>,
     )
     expect(screen.getByRole('button', { name: 'Icon action' })).toHaveClass(
-      'size-control-action-compact',
-      '[&_svg]:size-icon-glyph-md',
+      'ui-button--icon-compact',
     )
 
     rerender(
@@ -84,8 +79,7 @@ describe('Button', () => {
       </Button>,
     )
     expect(screen.getByRole('button', { name: 'Large icon action' })).toHaveClass(
-      'size-control-action-lg',
-      '[&_svg]:size-icon-glyph-lg',
+      'ui-button--icon-lg',
     )
   })
 
@@ -96,7 +90,7 @@ describe('Button', () => {
         Reset
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass('gap-1')
+    expect(screen.getByRole('button', { name: 'Reset' })).toHaveClass('ui-button--xs')
 
     rerender(
       <Button size="sm" variant="outline">
@@ -104,7 +98,7 @@ describe('Button', () => {
         <ArrowRight aria-hidden />
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Next' })).toHaveClass('gap-1.5')
+    expect(screen.getByRole('button', { name: 'Next' })).toHaveClass('ui-button--sm')
 
     rerender(
       <Button size="default" variant="default" disabled>
@@ -113,7 +107,7 @@ describe('Button', () => {
         Saving
       </Button>,
     )
-    expect(screen.getByRole('button', { name: /saving/i })).toHaveClass('gap-2')
+    expect(screen.getByRole('button', { name: /saving/i })).toHaveClass('ui-button--md')
   })
 
   it('attached variant fills a segment instead of using standalone button height', () => {
@@ -123,17 +117,20 @@ describe('Button', () => {
       </Button>,
     )
     const button = screen.getByRole('button', { name: 'Generate' })
-    expect(button).toHaveClass('h-full', 'w-full', 'rounded-r-md')
-    expect(button).not.toHaveClass('h-9')
+    expect(button).toHaveClass(
+      'ui-button--attached',
+      'ui-button--attached-md',
+      'ui-field-group__segment--end',
+    )
+    expect(button).not.toHaveClass('ui-button--md')
   })
 
-  it('applies outline button chrome from token recipes', () => {
+  it('applies outline button appearance from semantic CSS', () => {
     render(<Button variant="outline">Cancel</Button>)
     const button = screen.getByRole('button', { name: 'Cancel' })
-    expect(button).toHaveClass('border-interactive-outline')
-    expect(button).toHaveClass('hover:bg-interactive-outline-hover')
+    expect(button).toHaveClass('ui-button--outline')
+    expect(button).not.toHaveClass('border-interactive-outline')
     expect(button).not.toHaveClass('shadow-sm')
-    expect(button).not.toHaveClass('border-input')
   })
 
   it('applies expanded outline treatment when aria-expanded is true', () => {
@@ -143,25 +140,27 @@ describe('Button', () => {
       </Button>,
     )
     const button = screen.getByRole('button', { name: 'More filters' })
-    expect(button).toHaveClass('aria-expanded:border-border')
-    expect(button).toHaveClass('aria-expanded:bg-interactive-outline-active')
+    expect(button).toHaveClass('ui-button--outline')
+    expect(button).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('applies text variant geometry and standalone neutral recipe', () => {
     render(<Button variant="text">Add relationship</Button>)
     const button = screen.getByRole('button', { name: 'Add relationship' })
-    expect(button).toHaveClass('h-8', 'px-0', 'w-fit')
+    expect(button).toHaveClass(UI_BUTTON_TEXT_SIZE_CLASS, 'ui-button__text--default')
     expect(button).toHaveClass('text-action-standalone', 'text-foreground')
-    expect(button).not.toHaveClass('h-9', 'text-primary')
+    expect(button).not.toHaveClass('ui-button--primary')
   })
 
-  it('applies compact text variant height', () => {
+  it('applies compact text variant geometry', () => {
     render(
       <Button variant="text" density="compact">
         Compact text
       </Button>,
     )
-    expect(screen.getByRole('button', { name: 'Compact text' })).toHaveClass('h-6', 'px-0')
+    expect(screen.getByRole('button', { name: 'Compact text' })).toHaveClass(
+      'ui-button__text--default-compact',
+    )
   })
 
   it('applies accent tone on text variant when requested', () => {

@@ -1,11 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ArrowRight, Plus, Trash2 } from 'lucide-react'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { semanticClassSelectArgType } from '../../stories/semantic-classes/semantic-class-arg-types.lib'
 import { Button } from './button.client'
+import { buttonVariants, type ButtonVariantProps } from './button.variants'
+import { BUTTON_APPEARANCE_SPECS, BUTTON_SIZE_SPECS, UI_BUTTON_BLOCK_CLASS } from './button.styles'
 
 const meta = {
   title: 'Primitives/Button',
   component: Button,
+  parameters: {
+    semanticClasses: true,
+    docs: {
+      description: {
+        component: `${UI_BUTTON_BLOCK_CLASS} owns labeled, icon, text, and attached geometry in CSS. Appearances use semantic modifiers; compact density maps to \`--compact\` size modifiers.`,
+      },
+    },
+  },
   args: {
     children: 'Button',
   },
@@ -13,10 +25,27 @@ const meta = {
     variant: {
       control: 'select',
       options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'text'],
+      ...semanticClassSelectArgType(
+        BUTTON_APPEARANCE_SPECS.map((spec) => ({
+          value: spec.appearance === 'primary' ? 'default' : spec.appearance,
+          className: spec.className,
+        })),
+        'variant',
+      ),
     },
     size: {
       control: 'select',
       options: ['default', 'xs', 'sm', 'lg', 'icon', 'icon-xs', 'icon-lg'],
+      ...semanticClassSelectArgType(
+        BUTTON_SIZE_SPECS.map((spec) => ({
+          value:
+            spec.size === 'default' && spec.density === 'default'
+              ? 'default'
+              : `${spec.size}${spec.density === 'compact' ? ' compact' : ''}`,
+          className: spec.className,
+        })),
+        'size',
+      ),
     },
     density: {
       control: 'select',
@@ -108,25 +137,25 @@ export const ExtraSmallDensityComparison: Story = {
   render: () => (
     <div className="flex flex-wrap items-end gap-4">
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">xs default (28px)</span>
+        <span className="text-style-caption">xs default (28px)</span>
         <Button size="xs" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">xs compact (24px)</span>
+        <span className="text-style-caption">xs compact (24px)</span>
         <Button size="xs" density="compact" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">sm (32px)</span>
+        <span className="text-style-caption">sm (32px)</span>
         <Button size="sm" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">sm compact (24px)</span>
+        <span className="text-style-caption">sm compact (24px)</span>
         <Button size="sm" density="compact" variant="outline">
           Reset
         </Button>
@@ -165,4 +194,34 @@ export const IconLarge: Story = {
 
 export const Disabled: Story = {
   args: { disabled: true },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={BUTTON_SIZE_SPECS.map((spec) => ({
+        key: `${spec.size}-${spec.density}`,
+        sample: (
+          <Button
+            variant="outline"
+            size={spec.size as NonNullable<ButtonVariantProps['size']>}
+            density={spec.density}
+            data-semantic-class-target
+          >
+            {spec.size}
+          </Button>
+        ),
+        propsLabel: `size="${spec.size}" density="${spec.density}"`,
+        className: buttonVariants({
+          variant: 'outline',
+          size: spec.size as NonNullable<ButtonVariantProps['size']>,
+          density: spec.density,
+        }),
+        keyValues: `control height: ${spec.controlHeight}`,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

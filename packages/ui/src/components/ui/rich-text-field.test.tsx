@@ -22,7 +22,7 @@ describe('RichTextField', () => {
 
   it('applies field size to the label and matching prose scale', () => {
     render(<RichTextField id="bio" label="Biography" size="sm" />)
-    expect(screen.getByText('Biography').closest('label')).toHaveClass('text-xs')
+    expect(screen.getByText('Biography').closest('label')).toHaveClass('text-style-field-label-sm')
     expect(screen.getByRole('textbox', { name: 'Biography' })).toHaveClass('prose-sm')
   })
 

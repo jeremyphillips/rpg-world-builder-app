@@ -491,7 +491,7 @@ function QuickNpcStartingEquipmentPackageSection({
       {effective.state === 'declined' && !isPackageChooserExpanded ? (
         <div className={quickNpcPackageNoPackageClasses}>
           <p className="text-sm font-body-emphasis">{QUICK_NPC_NO_STARTING_PACKAGE_HEADING}</p>
-          <p className="text-xs text-muted-foreground">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
+          <p className="text-style-caption">{QUICK_NPC_NO_STARTING_PACKAGE_BODY}</p>
           <Button
             type="button"
             size="xs"

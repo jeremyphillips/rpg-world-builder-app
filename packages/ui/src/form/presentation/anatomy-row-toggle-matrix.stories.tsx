@@ -91,7 +91,7 @@ function ToggleControlTopProbe({ revision }: { revision: string }) {
     readout.selectTop === readout.checkboxTop
 
   return (
-    <div className="flex flex-col gap-1 font-mono text-xs text-muted-foreground">
+    <div className="flex flex-col gap-1 font-mono text-style-caption">
       <span>
         select control top: {readout.selectTop ?? '—'}px · checkbox control top:{' '}
         {readout.checkboxTop ?? '—'}px
@@ -136,7 +136,7 @@ function ToggleMatrixHarness() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-style-supporting">
         Grant spellcasting row shape on the anatomy grid — stacked select beside inline checkbox.
         Step through hint and error growth; sibling control bands must not drift.
       </p>
@@ -227,7 +227,7 @@ function SelectChipsControlTopProbe() {
     readout.selectTop != null && readout.chipsTop != null && readout.selectTop === readout.chipsTop
 
   return (
-    <div className="flex flex-col gap-1 font-mono text-xs text-muted-foreground">
+    <div className="flex flex-col gap-1 font-mono text-style-caption">
       <span>
         select control top: {readout.selectTop ?? '—'}px · chips control top:{' '}
         {readout.chipsTop ?? '—'}px
@@ -273,7 +273,7 @@ function SelectChipsMatrixHarness() {
 
   return (
     <div className="flex max-w-3xl flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-style-supporting">
         Spell basics row shape — stacked select beside single-select chips on the anatomy grid.
       </p>
       <SelectChipsControlTopProbe />

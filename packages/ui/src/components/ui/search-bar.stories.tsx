@@ -3,12 +3,28 @@ import { useState } from 'react'
 
 import { FormSectionProvider } from '../../form/context/form-section.context'
 import { FilterChromeProvider } from '../../filters/filter-chrome.context'
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { comboboxSearchRowVariants } from './combobox-field.variants'
+import { fieldControlVariants } from './field-control.variants'
+import {
+  FIELD_CONTROL_SIZE_SPECS,
+  UI_SEARCH_BAR_CLASS,
+  resolveSearchBarFieldInputClass,
+} from './field-control.styles'
+import { searchBarRootVariants } from './search-bar.variants'
 import { SearchBar } from './search-bar.client'
 
 const meta = {
   title: 'Forms/SearchBar',
   component: SearchBar,
+  parameters: {
+    semanticClasses: true,
+    docs: {
+      description: {
+        component: `${UI_SEARCH_BAR_CLASS} parts and field input inset classes live in field-control.css.`,
+      },
+    },
+  },
   args: {
     id: 'entity-search',
     placeholder: 'Search organizations…',
@@ -105,4 +121,31 @@ export const EmbeddedInHostRow: Story = {
     placeholder: 'Search choices…',
     value: 'arc',
   },
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={FIELD_CONTROL_SIZE_SPECS.map((spec) => ({
+        key: spec.size,
+        sample: (
+          <SearchBar
+            id={`search-${spec.size}`}
+            size={spec.size}
+            ariaLabel="Search demo"
+            placeholder="Search…"
+            value=""
+            onValueChange={() => undefined}
+            data-semantic-class-target
+          />
+        ),
+        propsLabel: `size="${spec.size}"`,
+        className: `${searchBarRootVariants()} ${fieldControlVariants({ size: spec.size })} ${resolveSearchBarFieldInputClass(spec.size)}`,
+        keyValues: `control height: ${spec.controlHeight}`,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }

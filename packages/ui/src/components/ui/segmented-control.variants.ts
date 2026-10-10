@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { controlActionCompactTextClasses } from './control-action.variants'
+import { resolveCompactControlSegmentClasses } from './compact-control.styles'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 
 export type SegmentedControlSize = NonNullable<
@@ -37,7 +37,7 @@ export const segmentedControlSegmentVariants = cva(
       },
       size: {
         default: 'gap-1.5 px-3 py-1.5 text-sm',
-        sm: cn(controlActionCompactTextClasses, 'gap-1 px-2 py-0 text-xs'),
+        sm: resolveCompactControlSegmentClasses('sm'),
       },
     },
     defaultVariants: {

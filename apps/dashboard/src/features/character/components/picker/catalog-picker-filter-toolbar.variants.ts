@@ -5,4 +5,4 @@ export const catalogToolbarResetSlotReservedClasses = 'invisible'
 
 export const catalogToolbarResetRowClasses = 'flex items-center justify-end gap-2'
 
-export const catalogPickerResultSummaryClasses = `text-xs ${RESULT_COUNT_TABULAR_CLASSES} text-muted-foreground`
+export const catalogPickerResultSummaryClasses = `text-style-caption ${RESULT_COUNT_TABULAR_CLASSES}`

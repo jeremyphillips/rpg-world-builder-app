@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { cardSurfaceClasses } from './card.variants'
-import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
+import { cardSurfaceClasses, cardSurfaceVariants } from './card.variants'
 
-describe('cardSurfaceClasses', () => {
-  it('includes card fill, warm border, and raised surface shadow', () => {
-    expect(cardSurfaceClasses).toContain('bg-card')
-    expect(cardSurfaceClasses).toContain('border-card-border')
-    expect(cardSurfaceClasses).toContain('rounded-card')
-    expect(cardSurfaceClasses).toContain(fieldSurfaceRaisedShadowClasses)
+describe('cardSurfaceVariants', () => {
+  it('emits the card block for the default surface', () => {
+    expect(cardSurfaceClasses).toContain('ui-card')
+    expect(cardSurfaceClasses).toContain('ui-card--static')
+    expect(cardSurfaceClasses).not.toContain('ui-card--interactive')
+  })
+
+  it('emits an interactive modifier for navigation cards', () => {
+    expect(cardSurfaceVariants({ interactive: true })).toContain('ui-card--interactive')
+    expect(cardSurfaceVariants({ interactive: true })).not.toContain('ui-card--static')
   })
 })

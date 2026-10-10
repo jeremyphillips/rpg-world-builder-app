@@ -155,12 +155,12 @@ describe('FilterFieldRenderer chrome', () => {
     const caption = screen.getByText('Status')
     expect(caption.tagName).toBe('LABEL')
     expect(caption).toHaveAttribute('for', 'test-status')
-    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(caption).toHaveClass('text-style-caption')
   })
 
   it('applies comfortable density override to select labels', () => {
     render(<RendererHarness fieldId="status" density="comfortable" />)
-    expect(screen.getByText('Status')).toHaveClass('text-sm')
+    expect(screen.getByText('Status')).toHaveClass('text-style-supporting')
   })
 
   it('inherits nested provider density when child omits override', () => {
@@ -169,7 +169,7 @@ describe('FilterFieldRenderer chrome', () => {
         <RendererHarness fieldId="status" />
       </FilterChromeProvider>,
     )
-    expect(screen.getByText('Status')).toHaveClass('text-sm')
+    expect(screen.getByText('Status')).toHaveClass('text-style-supporting')
   })
 
   it('sizes inline selects to their content', () => {
@@ -178,7 +178,9 @@ describe('FilterFieldRenderer chrome', () => {
     const group = screen.getByRole('group', { name: 'Filter by school' })
     expect(group).toHaveClass('w-fit')
     expect(group).not.toHaveClass('w-full')
-    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('w-auto')
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass(
+      'ui-field-control--trigger-fit',
+    )
   })
 
   it('reserves every select option label in the width sizer', () => {
@@ -194,7 +196,11 @@ describe('FilterFieldRenderer chrome', () => {
 
   it('caps inline selects at lg when no width token is set', () => {
     render(<RendererHarness fieldId="school" />)
-    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('max-w-48')
+    const group = screen.getByRole('group', { name: 'Filter by school' })
+    expect(group.querySelector('[class*="ui-field-control--width-lg"]')).toBeTruthy()
+    expect(screen.getByRole('combobox', { name: 'School' })).not.toHaveClass(
+      'ui-field-control--width-lg',
+    )
   })
 
   it('reserves the popover trigger extremes in the width sizer', () => {
@@ -210,7 +216,7 @@ describe('FilterFieldRenderer chrome', () => {
 
   it('renders catalog chips with compact label sizing under default chrome', () => {
     render(<RendererHarness fieldId="levels" />)
-    expect(screen.getByText('Levels')).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(screen.getByText('Levels')).toHaveClass('text-style-caption')
   })
 })
 

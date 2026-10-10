@@ -178,7 +178,7 @@ function CollapsibleListItemRecipe() {
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
       header={
-        <Text as="span" className="truncate text-sm font-medium">
+        <Text as="span" className="truncate text-style-label">
           Battle Axe
         </Text>
       }

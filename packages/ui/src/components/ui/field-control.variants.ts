@@ -1,18 +1,27 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { fieldControlSizeClasses, fieldTextareaSizeClasses } from './field-sizing.variants'
 import {
-  fieldInputAutofillClasses,
-  fieldInputDisabledClasses,
-  fieldInputFocusClasses,
-  fieldInputInvalidAriaClasses,
-  fieldInputPlaceholderClasses,
-  fieldInputReadonlyClasses,
-  fieldInputShellClasses,
-} from './field-input-chrome.variants'
+  UI_FIELD_CONTROL_BLOCK_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_CLASS,
+  resolveFieldControlMultilineSizeClass,
+  resolveFieldControlSizeClass,
+  resolveFieldControlWidthClass,
+} from './field-control.styles'
 
 /** Popover/select/combobox triggers — pointer, not text caret. */
 export const fieldControlTriggerCursorClasses = 'cursor-pointer'
+
+const fieldControlSizeClasses = {
+  sm: resolveFieldControlSizeClass('sm'),
+  md: resolveFieldControlSizeClass('md'),
+  lg: resolveFieldControlSizeClass('lg'),
+} as const
+
+const fieldTextareaSizeClasses = {
+  sm: resolveFieldControlMultilineSizeClass('sm'),
+  md: resolveFieldControlMultilineSizeClass('md'),
+  lg: resolveFieldControlMultilineSizeClass('lg'),
+} as const
 
 /**
  * Look shared by every text-like field control: border, background, focus ring,
@@ -21,21 +30,7 @@ export const fieldControlTriggerCursorClasses = 'cursor-pointer'
  * prop, so any control — even a hand-written one — picks it up for free once
  * `aria-invalid` is set.
  */
-const fieldControlBase = [
-  'flex w-full',
-  fieldInputShellClasses,
-  fieldInputPlaceholderClasses,
-  fieldInputFocusClasses,
-  fieldInputInvalidAriaClasses,
-  fieldInputDisabledClasses,
-  fieldInputReadonlyClasses,
-  fieldInputAutofillClasses,
-].join(' ')
-
-/**
- * Single-line controls (Input, the Select trigger): a fixed height per size.
- */
-export const fieldControlVariants = cva(fieldControlBase, {
+export const fieldControlVariants = cva(UI_FIELD_CONTROL_BLOCK_CLASS, {
   variants: {
     size: fieldControlSizeClasses,
   },
@@ -50,7 +45,7 @@ export type FieldControlVariantProps = VariantProps<typeof fieldControlVariants>
  * Multi-line controls (Textarea, JSON editor): the same look, but a minimum
  * height that grows with content instead of a fixed height.
  */
-export const textareaVariants = cva(fieldControlBase, {
+export const textareaVariants = cva(UI_FIELD_CONTROL_BLOCK_CLASS, {
   variants: {
     size: fieldTextareaSizeClasses,
   },
@@ -60,6 +55,15 @@ export const textareaVariants = cva(fieldControlBase, {
 })
 
 export type TextareaVariantProps = VariantProps<typeof textareaVariants>
+
+/** Standalone select/combobox trigger shell — zero padding; slots own inset. */
+export function fieldControlTriggerVariants({
+  size = 'md',
+}: {
+  size?: keyof typeof fieldControlSizeClasses
+} = {}): string {
+  return `${UI_FIELD_CONTROL_BLOCK_CLASS} ${UI_FIELD_CONTROL_TRIGGER_CLASS} ${resolveFieldControlSizeClass(size)} ${fieldControlTriggerCursorClasses}`
+}
 
 /** Closed vocabulary for field wrapper width tokens — see `BaseFieldConfig.width` JSDoc. */
 export const FIELD_WIDTHS = [
@@ -100,18 +104,18 @@ export type FieldWidth = (typeof FIELD_WIDTHS)[number]
  * `max-w-*` still caps width but `grow` follows the parent flex direction.
  */
 const fieldWidthClasses = {
-  xs: 'max-w-16 flex-none in-data-[field-row]:w-16',
-  sm: 'max-w-24 flex-none in-data-[field-row]:w-24',
-  md: 'max-w-36 flex-none in-data-[field-row]:w-36',
-  lg: 'max-w-48 flex-none in-data-[field-row]:w-48',
-  xl: 'max-w-64 flex-none in-data-[field-row]:w-64',
-  auto: 'w-fit flex-none',
-  full: 'w-full flex-1',
-  '1/2': 'min-w-0 max-w-1/2 basis-0 grow-[6]',
-  '1/3': 'min-w-0 max-w-1/3 basis-0 grow-[4]',
-  '2/3': 'min-w-0 max-w-2/3 basis-0 grow-[8]',
-  '1/4': 'min-w-0 max-w-1/4 basis-0 grow-[3]',
-  '3/4': 'min-w-0 max-w-3/4 basis-0 grow-[9]',
+  xs: resolveFieldControlWidthClass('xs'),
+  sm: resolveFieldControlWidthClass('sm'),
+  md: resolveFieldControlWidthClass('md'),
+  lg: resolveFieldControlWidthClass('lg'),
+  xl: resolveFieldControlWidthClass('xl'),
+  auto: resolveFieldControlWidthClass('auto'),
+  full: resolveFieldControlWidthClass('full'),
+  '1/2': resolveFieldControlWidthClass('1/2'),
+  '1/3': resolveFieldControlWidthClass('1/3'),
+  '2/3': resolveFieldControlWidthClass('2/3'),
+  '1/4': resolveFieldControlWidthClass('1/4'),
+  '3/4': resolveFieldControlWidthClass('3/4'),
 } satisfies Record<FieldWidth, string>
 
 export const fieldWidthVariants = cva('', {

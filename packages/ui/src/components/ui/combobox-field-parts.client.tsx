@@ -8,6 +8,7 @@ import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
 import { Field, type FieldSize } from './field.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
+import { UI_FIELD_CONTROL_TRIGGER_FILL_CLASS } from './field-control.styles'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
 import {
   fieldSizeToChipSize,
@@ -84,8 +85,8 @@ export const ComboboxTrigger = React.forwardRef<HTMLButtonElement, ComboboxTrigg
                 grouped,
                 groupedPosition: grouped ? 'start' : 'end',
               }),
-              grouped ? 'min-w-0 w-full' : 'w-full',
-              'shrink-0 items-stretch gap-0 text-left',
+              UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
+              'items-stretch',
               open && hideWhenOpen && comboboxTriggerOpenVariants(),
             )}
           >

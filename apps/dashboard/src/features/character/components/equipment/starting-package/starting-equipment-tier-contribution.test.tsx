@@ -31,7 +31,7 @@ describe('StartingEquipmentTierContribution', () => {
 
     expect(screen.getByText('75 GP base')).toHaveClass('font-normal', 'text-muted-foreground')
     expect(screen.getByText('712 GP 5 SP total')).toHaveClass('font-normal', 'text-foreground')
-    expect(screen.getByText('75 GP base').closest('div')).toHaveClass('mt-1', 'text-xs')
+    expect(screen.getByText('75 GP base').closest('div')).toHaveClass('mt-1', 'text-style-caption')
     expect(screen.queryByText('+637 GP Hero tier')).not.toBeInTheDocument()
 
     await user.hover(screen.getByText('Hero tier'))
@@ -45,7 +45,7 @@ describe('StartingEquipmentTierContribution', () => {
     expect(summary).toHaveClass('text-foreground')
     const formula = within(tooltip).getByText(/Calculated from/)
     expect(formula).toHaveTextContent('Calculated from 500 GP + 1d10 × 25 GP')
-    expect(formula).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(formula).toHaveClass('text-style-caption')
   })
 
   it('renders a zero class amount beside the tier total', () => {

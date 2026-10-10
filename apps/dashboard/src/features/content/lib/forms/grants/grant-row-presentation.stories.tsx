@@ -91,7 +91,7 @@ function GrantRowPresentationDemo({ values }: { values: Record<string, unknown> 
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
     >
-      <p className="text-sm text-muted-foreground">Grant body fields render here when expanded.</p>
+      <p className="text-style-supporting">Grant body fields render here when expanded.</p>
     </DisclosureEntityCard>
   )
 }

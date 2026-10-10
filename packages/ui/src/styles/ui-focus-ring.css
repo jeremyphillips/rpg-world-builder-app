@@ -1,0 +1,14 @@
+/*
+ * Focus ring — semantic replacement for focus-visible:ring-* utilities.
+ * Tokens mirror Tailwind ring-2 + ring-offset-2 on --background.
+ */
+@layer components {
+  .ui-focus-ring:focus-visible {
+    outline: none;
+    box-shadow: var(--ui-focus-ring-standalone);
+  }
+
+  .ui-focus-ring--embedded:focus-visible {
+    box-shadow: var(--ui-focus-ring-embedded);
+  }
+}

@@ -83,7 +83,7 @@ export interface RequirementEditorProps {
 
 /** Flat field stack keeps sentence operands on one baseline inside the inline row. */
 const SENTENCE_FIELD_STACK = 'space-y-0'
-const SENTENCE_OPERATOR_CLASS = 'text-sm text-muted-foreground'
+const SENTENCE_OPERATOR_CLASS = 'text-style-supporting'
 
 function useRequirementFieldValidation(fieldPath: string, fieldStateMessage?: string) {
   const { errors } = useFormState()

@@ -104,6 +104,10 @@ band track, meta/status tops sit on their tracks, `full` cells center on the gri
 box, `stretch` cells fill it, and slack gutters are even. Stories using it:
 `UI/RowAnatomy`, `Content/Entity/Alignment matrix`, and `Recipes/Cards and Rows`.
 
+Row **action** hit targets (grip, remove, trailing icon ghosts) use compact semantic control
+geometry (`iconGhostControlVariants` → `compact-control.css`) — not ad-hoc `size-*` or `h-*`
+recipes in feature variants.
+
 ## Compatibility classification
 
 Classification of the non-entity row primitives against the row-track contract. Rule: a

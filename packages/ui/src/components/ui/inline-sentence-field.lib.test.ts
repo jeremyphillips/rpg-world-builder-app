@@ -15,7 +15,7 @@ describe('inlineSentenceSelectTriggerWidthClasses', () => {
 
   it('maps intrinsic width tokens to explicit inline widths', () => {
     expect(inlineSentenceSelectTriggerWidthClasses('lg')).toContain('w-48')
-    expect(inlineSentenceSelectTriggerWidthClasses('lg')).toContain('max-w-48')
+    expect(inlineSentenceSelectTriggerWidthClasses('lg')).toContain('ui-field-control--width-lg')
     expect(inlineSentenceSelectTriggerWidthClasses('xl')).toContain('w-64')
   })
 })

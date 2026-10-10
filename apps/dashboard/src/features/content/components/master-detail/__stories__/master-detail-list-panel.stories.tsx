@@ -97,13 +97,13 @@ export const WithStickyFormFooter: Story = {
         <FormStickyScrollBody>
           <div className="p-6">
             <div
-              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-sm text-muted-foreground`}
+              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-style-supporting`}
             >
               Dummy section tabs
             </div>
             <MasterDetailGrid>
               <MasterDetailListPanel {...args} />
-              <div className="self-start rounded-lg border border-border-subtle px-4 py-3 text-sm text-muted-foreground md:col-span-2">
+              <div className="self-start rounded-lg border border-border-subtle px-4 py-3 text-style-supporting md:col-span-2">
                 Detail column stays content-sized beside the bounded list rail.
               </div>
             </MasterDetailGrid>

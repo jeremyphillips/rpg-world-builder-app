@@ -266,7 +266,7 @@ describe('ChipsField', () => {
         size="sm"
       />,
     )
-    expect(screen.getByRole('alert')).toHaveClass('text-xs')
+    expect(screen.getByRole('alert')).toHaveClass('text-style-field-error')
   })
 
   it('renders hint when no error', () => {
@@ -311,8 +311,9 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-sm-meta')
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-3')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
+      'ui-compact-label--md',
+    )
   })
 
   it('applies sm pill classes when chipSize is sm', () => {
@@ -326,8 +327,9 @@ describe('ChipsField', () => {
         chipSize="sm"
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-xs-meta')
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('px-2')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
+      'ui-compact-label--sm',
+    )
   })
 
   it('derives chipSize from field size when chipSize is omitted', () => {
@@ -341,7 +343,9 @@ describe('ChipsField', () => {
         size="lg"
       />,
     )
-    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass('text-md')
+    expect(screen.getByRole('checkbox', { name: 'Dungeon Crawl' })).toHaveClass(
+      'ui-compact-label--lg',
+    )
   })
 
   it('uses md label type scale on the inner label line by default', () => {
@@ -354,7 +358,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-md')
+    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-style-field-label-md')
   })
 
   it('keeps below-label hint visible when invalid', () => {

@@ -1,4 +1,4 @@
-export const characterBuilderPreviewSectionHintClasses = 'text-xs text-muted-foreground'
+export const characterBuilderPreviewSectionHintClasses = 'text-style-caption'
 
 /** Bordered subsection group — padding applies only here. */
 export const characterBuilderPreviewSubsectionsGroupClasses =
@@ -6,6 +6,6 @@ export const characterBuilderPreviewSubsectionsGroupClasses =
 
 export const characterBuilderPreviewSubsectionClasses = 'flex flex-col gap-1'
 
-export const characterBuilderPreviewSubsectionTitleClasses = 'text-sm font-medium text-foreground'
+export const characterBuilderPreviewSubsectionTitleClasses = 'text-style-label text-foreground'
 
-export const characterBuilderPreviewSubsectionHintClasses = 'text-xs text-muted-foreground'
+export const characterBuilderPreviewSubsectionHintClasses = 'text-style-caption'

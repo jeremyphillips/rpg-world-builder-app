@@ -90,24 +90,22 @@ export function AdminUserDetail() {
         </Heading>
         <dl className="grid gap-3 sm:grid-cols-2">
           <div>
-            <dt className="text-xs text-muted-foreground">Access</dt>
-            <dd className="text-sm font-medium">
-              {PLATFORM_ROLE_ENTRIES[user.platformRole].label}
-            </dd>
+            <dt className="text-style-caption">Access</dt>
+            <dd className="text-style-label">{PLATFORM_ROLE_ENTRIES[user.platformRole].label}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Joined</dt>
-            <dd className="text-sm font-medium">{formatAdminUserDetailJoined(user.createdAt)}</dd>
+            <dt className="text-style-caption">Joined</dt>
+            <dd className="text-style-label">{formatAdminUserDetailJoined(user.createdAt)}</dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Last signed in</dt>
-            <dd className="text-sm font-medium">
+            <dt className="text-style-caption">Last signed in</dt>
+            <dd className="text-style-label">
               {formatAdminUserDetailTimestamp(user.lastSignedInAt)}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Last active</dt>
-            <dd className="text-sm font-medium">
+            <dt className="text-style-caption">Last active</dt>
+            <dd className="text-style-label">
               {formatAdminUserDetailLastActive(user.lastActiveAt)}
             </dd>
           </div>
@@ -120,8 +118,8 @@ export function AdminUserDetail() {
         </Heading>
         <dl className="space-y-3">
           <div>
-            <dt className="text-xs text-muted-foreground">Campaigns</dt>
-            <dd className="text-sm font-medium">
+            <dt className="text-style-caption">Campaigns</dt>
+            <dd className="text-style-label">
               {formatAdminUserCampaignCounts(user.campaignCounts)}
             </dd>
             <Link
@@ -132,8 +130,8 @@ export function AdminUserDetail() {
             </Link>
           </div>
           <div>
-            <dt className="text-xs text-muted-foreground">Characters</dt>
-            <dd className="text-sm font-medium">
+            <dt className="text-style-caption">Characters</dt>
+            <dd className="text-style-label">
               {joinInlineMetadata([
                 `${user.characterCount} character${user.characterCount === 1 ? '' : 's'}`,
                 `${user.controlledCharacterCount} controlled in campaigns`,
@@ -148,8 +146,8 @@ export function AdminUserDetail() {
           </div>
           {showInvites ? (
             <div>
-              <dt className="text-xs text-muted-foreground">Invitations</dt>
-              <dd className="space-y-1 text-sm font-medium">
+              <dt className="text-style-caption">Invitations</dt>
+              <dd className="space-y-1 text-style-label">
                 {user.pendingInviteCount > 0 ? (
                   <span>Pending: {user.pendingInviteCount}</span>
                 ) : null}

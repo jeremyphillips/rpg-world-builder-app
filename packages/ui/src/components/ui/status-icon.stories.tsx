@@ -76,21 +76,21 @@ export const SizeParity: Story = {
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
         <StatusIcon variant="ready" size="md" tooltip={false} />
-        <span className="text-sm text-muted-foreground">
+        <span className="text-style-supporting">
           Former default / old <code className="text-foreground">sm</code> (16px) →{' '}
           <code className="text-foreground">md</code>
         </span>
       </div>
       <div className="flex items-center gap-4">
         <StatusIcon variant="ready" size="lg" tooltip={false} />
-        <span className="text-sm text-muted-foreground">
+        <span className="text-style-supporting">
           Old <code className="text-foreground">md</code> (20px) →{' '}
           <code className="text-foreground">lg</code>
         </span>
       </div>
       <div className="flex items-center gap-4">
         <StatusIcon variant="ready" size="sm" tooltip={false} />
-        <span className="text-sm text-muted-foreground">
+        <span className="text-style-supporting">
           New compact <code className="text-foreground">sm</code> (12px)
         </span>
       </div>

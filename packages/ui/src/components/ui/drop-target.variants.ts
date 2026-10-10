@@ -84,9 +84,9 @@ export const dropTargetTitleVariants = cva('font-semibold', {
   },
 })
 
-export const dropTargetDescriptionVariants = cva('text-sm text-muted-foreground')
+export const dropTargetDescriptionVariants = cva('text-style-supporting')
 
-export const dropTargetRequirementsVariants = cva('text-xs text-muted-foreground')
+export const dropTargetRequirementsVariants = cva('text-style-caption')
 
 export const dropTargetActionsVariants = cva('flex flex-col items-center gap-2')
 

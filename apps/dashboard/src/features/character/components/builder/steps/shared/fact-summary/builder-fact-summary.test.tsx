@@ -28,7 +28,7 @@ describe('BuilderFactSummary', () => {
       'Your class determines your spellcasting ability and how these values are calculated.',
     )
     expect(description).toBeInTheDocument()
-    expect(description).toHaveClass('text-sm')
+    expect(description).toHaveClass('text-style-supporting')
     expect(screen.getByText('Spellcasting ability')).toBeInTheDocument()
 
     const value = screen.getByText('Intelligence')

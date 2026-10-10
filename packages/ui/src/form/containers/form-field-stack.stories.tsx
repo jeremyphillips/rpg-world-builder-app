@@ -41,7 +41,7 @@ function DetachedFormModalDemo() {
         <Modal.Body>
           <FormProvider {...form}>
             <FormFieldStack fields={fields} idPrefix={formId}>
-              <p className="mt-6 text-sm text-muted-foreground">
+              <p className="mt-6 text-style-supporting">
                 Preview or helper copy can sit in the children slot.
               </p>
             </FormFieldStack>

@@ -57,7 +57,7 @@ function PreviewProficiencySubsectionContent({
 }) {
   return (
     <div className="space-y-1">
-      {resolvedText ? <p className="text-sm text-muted-foreground">{resolvedText}</p> : null}
+      {resolvedText ? <p className="text-style-supporting">{resolvedText}</p> : null}
       {emptyHint ? (
         <CharacterBuilderPreviewSubsectionHint>{emptyHint}</CharacterBuilderPreviewSubsectionHint>
       ) : null}
@@ -146,8 +146,8 @@ export function CharacterBuilderPreviewAbilitiesBody({
           const entry = preview.abilityScores[ability]
           return (
             <div key={ability} className="rounded-md border border-border px-2 py-1.5">
-              <dt className="text-xs text-muted-foreground">{ability.toUpperCase()}</dt>
-              <dd className="text-sm font-medium">
+              <dt className="text-style-caption">{ability.toUpperCase()}</dt>
+              <dd className="text-style-label">
                 {formatPreviewAbilityCell(entry?.score, entry?.modifier)}
               </dd>
             </div>
@@ -262,7 +262,7 @@ export function CharacterBuilderPreviewSpellsBody({
   return (
     <CharacterBuilderPreviewSectionContent>
       {subsection.resolvedText ? (
-        <p className="text-sm text-muted-foreground">{subsection.resolvedText}</p>
+        <p className="text-style-supporting">{subsection.resolvedText}</p>
       ) : subsection.emptyHint ? (
         <CharacterBuilderPreviewSubsectionHint>
           {subsection.emptyHint}

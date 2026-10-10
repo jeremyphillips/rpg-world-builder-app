@@ -62,28 +62,27 @@ export function masterDetailListRowClasses(options: {
 export const masterDetailListRowContentClasses =
   'flex min-w-0 flex-1 flex-col items-start gap-0.5 text-left'
 
-export const masterDetailListRowEyebrowClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+export const masterDetailListRowEyebrowClasses = 'min-w-0 truncate text-style-caption'
 
-export const masterDetailListRowTitleClasses =
-  'min-w-0 truncate text-sm font-medium text-foreground'
+export const masterDetailListRowTitleClasses = 'min-w-0 truncate text-style-label text-foreground'
 
-export const masterDetailListRowSourceClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+export const masterDetailListRowSourceClasses = 'min-w-0 truncate text-style-caption'
 
 export const masterDetailListRowMetadataClasses = 'flex min-w-0 items-center'
 
 export const masterDetailListRowEndClasses = 'flex shrink-0 self-center text-muted-foreground'
 
 /** @deprecated List rows render structured meta; detail identity still joins for subtitles. */
-export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-xs text-muted-foreground'
+export const masterDetailListRowMetaClasses = 'min-w-0 truncate text-style-caption'
 
 export const masterDetailListRowAvailabilityClasses = 'min-w-0'
 
-export const masterDetailListEmptyClasses = 'px-3 py-4 text-sm text-muted-foreground'
+export const masterDetailListEmptyClasses = 'px-3 py-4 text-style-supporting'
 
 /** Stable availability count row below the list header. */
 export function masterDetailListCountSupplementClasses(options: { hasCopy: boolean }): string {
   return cn(
-    'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-xs text-muted-foreground',
+    'flex shrink-0 items-center gap-2 border-b px-3 py-1.5 text-style-caption',
     masterDetailRailBorderClasses,
     options.hasCopy ? 'justify-between' : 'justify-end',
   )

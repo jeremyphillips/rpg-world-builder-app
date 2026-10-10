@@ -41,15 +41,12 @@ export function Alert({
       {hasCopy ? (
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           {title ? (
-            <p className={alertTitleVariants({ variant, density })} data-slot="alert-title">
+            <p className={alertTitleVariants({ density })} data-slot="alert-title">
               {title}
             </p>
           ) : null}
           {description ? (
-            <p
-              className={alertDescriptionVariants({ variant, density })}
-              data-slot="alert-description"
-            >
+            <p className={alertDescriptionVariants()} data-slot="alert-description">
               {description}
             </p>
           ) : null}

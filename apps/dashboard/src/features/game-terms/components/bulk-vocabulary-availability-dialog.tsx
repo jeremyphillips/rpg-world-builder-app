@@ -185,7 +185,7 @@ export function BulkVocabularyAvailabilityDialog({
         </FormProvider>
       }
       summarySlot={
-        <p className="text-sm text-muted-foreground">
+        <p className="text-style-supporting">
           {previewCount} {previewCount === 1 ? 'entry' : 'entries'} will change.
         </p>
       }

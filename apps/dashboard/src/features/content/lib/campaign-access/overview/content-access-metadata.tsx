@@ -106,7 +106,7 @@ export function ContentAccessMetadata({
   }
 
   return (
-    <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+    <div className="ml-auto flex items-center gap-1 text-style-caption">
       {content.icon}
       <span className="inline-flex items-center gap-1">
         <InlineMetadata role="supporting" density="compact" wrap={false}>

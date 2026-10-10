@@ -6,9 +6,8 @@ describe('iconGhostControlVariants', () => {
   it('composes compact geometry with embedded focus', () => {
     const classes = iconGhostControlVariants({ hover: 'text', layout: 'flex' })
 
-    expect(classes).toContain('size-control-action-compact')
-    expect(classes).toContain('focus-visible:ring-2')
-    expect(classes).not.toContain('focus-visible:ring-offset-2')
+    expect(classes).toContain('ui-compact-control--icon-compact')
+    expect(classes).toContain('ui-focus-ring--embedded')
     expect(classes).toContain('hover:text-foreground')
     expect(classes).toContain('cursor-pointer')
   })

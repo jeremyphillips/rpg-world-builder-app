@@ -53,9 +53,17 @@ Shared **fill/hover/active/open** classes for toolbar ghost chrome (`Button vari
 each control. Do not confuse with Select **sizing ghosts** (invisible width-reserve spans) or
 Badge `appearance`.
 
+### Semantic control CSS (buttons, fields, compact chrome)
+
+Migrated controls emit BEM-style `ui-*` modifiers from `*.variants.ts` / `*.styles.ts`; height,
+padding, gap, and indicator geometry live in co-located `*.css` (`button.css`, `field-control.css`,
+`field-group.css`, `choice-control.css`, `floating-label-field.css`, `compact-control.css`).
+`semantic-control-variants-geometry-ban.test.ts` blocks raw `h-*`, `px-*`, `text-xs|sm|md|base`,
+and `[&_svg]:size-*` from returning to those CVA modules.
+
 ### `iconGhostControlVariants({ hover, layout })`
 
-Compact (24px) icon-only ghost controls. Composes internal control-action geometry with
+Compact (24px) icon-only ghost controls. Composes `ui-compact-control--icon-compact` geometry with
 embedded focus. List-row removes use this primitive — features must not size removes locally.
 `hover: 'accent'` keeps `control-hover` (dense row chrome), not the toolbar accent fill from
 `ghostControlVisualStateClasses`.
@@ -141,8 +149,10 @@ Allowlisted host accents: `character-builder-shell.variants.ts` (F9 navigation r
 
 ## Follow-up status
 
-Normalization pass **F1/F2/F6/F7/F8/F10 complete.** Open investigations: **F4** (whole-surface
-drag contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.
+Normalization pass **F1/F2/F6/F7/F8/F10 complete.** Semantic control CSS migration **Phase 7**
+added variant geometry ratchets, fallow-driven dead export cleanup on control `*.styles.ts`, and
+shrunk the icon-glyph sizing grandfather list. Open investigations: **F4** (whole-surface drag
+contract), **F5** (unavailable entity presentation), **F3** per-surface audits as products evolve.
 
 Entity/card ownership at Layer 2–3 (anatomy, surfaces, hosts) →
 [dashboard entity presentation contract](../../../apps/dashboard/docs/content-entity-card.md).

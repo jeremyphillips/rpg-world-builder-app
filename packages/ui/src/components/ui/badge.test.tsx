@@ -21,14 +21,7 @@ describe('Badge', () => {
       </Badge>,
     )
     const el = screen.getByText('Stale')
-    expect(el).toHaveClass(
-      'text-semantic-warning-outline-foreground',
-      'border-semantic-warning-border',
-      'border-[1.5px]',
-      'font-medium',
-      'h-[22px]',
-    )
-    expect(el).toHaveClass('text-xs-meta', 'rounded-full')
+    expect(el).toHaveClass('ui-compact-label--outline-warning', 'ui-compact-label--sm')
   })
 
   it('uses token-owned soft destructive foreground', () => {
@@ -37,11 +30,7 @@ describe('Badge', () => {
         Error
       </Badge>,
     )
-    expect(screen.getByText('Error')).toHaveClass(
-      'font-medium',
-      'bg-semantic-destructive-soft',
-      'text-semantic-destructive-soft-foreground',
-    )
+    expect(screen.getByText('Error')).toHaveClass('ui-compact-label--soft-destructive')
   })
 
   it('uses strong appearance fill roles', () => {
@@ -50,10 +39,7 @@ describe('Badge', () => {
         Essential
       </Badge>,
     )
-    expect(screen.getByText('Essential')).toHaveClass(
-      'bg-semantic-info-strong',
-      'text-semantic-info-strong-foreground',
-    )
+    expect(screen.getByText('Essential')).toHaveClass('ui-compact-label--strong-info')
   })
 
   it('mutes subdued emphasis without a disabled well', () => {
@@ -63,12 +49,8 @@ describe('Badge', () => {
       </Badge>,
     )
     const el = screen.getByText('Complete')
-    expect(el).toHaveClass(
-      'text-muted-foreground',
-      'bg-semantic-neutral-soft',
-      'border-semantic-neutral-border',
-    )
-    expect(el).not.toHaveClass('text-semantic-neutral-soft-foreground')
+    expect(el).toHaveClass('ui-compact-label--subdued', 'ui-compact-label--soft-neutral')
+    expect(el).not.toHaveClass('ui-compact-label--strong-neutral')
     expect(el.className).not.toContain('text-foreground-disabled')
     expect(el).not.toHaveAttribute('aria-disabled')
   })
@@ -79,13 +61,7 @@ describe('Badge', () => {
         2
       </Badge>,
     )
-    expect(screen.getByText('2')).toHaveClass(
-      'min-w-5',
-      'justify-center',
-      'px-1',
-      'tabular-nums',
-      'leading-none',
-    )
+    expect(screen.getByText('2')).toHaveClass('ui-compact-label--counter', 'ui-compact-label--sm')
   })
 
   it('has no accessibility violations', async () => {

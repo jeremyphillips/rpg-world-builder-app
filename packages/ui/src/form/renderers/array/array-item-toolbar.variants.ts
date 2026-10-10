@@ -69,8 +69,7 @@ export const arrayItemHeaderShellClasses = 'flex min-w-0 flex-col gap-0'
 export const arrayItemHeaderContentClasses = 'flex min-w-0 items-center'
 
 /** Detailed item header title cluster. */
-export const arrayItemHeaderTitleClasses =
-  'min-w-0 flex-1 truncate text-sm font-medium leading-snug'
+export const arrayItemHeaderTitleClasses = 'min-w-0 flex-1 truncate text-style-label leading-snug'
 
 /** Middle-dot separator between primary and fallback labels. */
 export const arrayItemHeaderDividerClasses = 'mx-1.5 text-muted-foreground'

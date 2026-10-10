@@ -23,7 +23,7 @@ export const RootUtilities: Story = {
       {ICON_GLYPH_STEPS.map((step) => (
         <div key={step} className="flex flex-col items-center gap-2">
           <Check aria-hidden className={iconGlyphRootClasses[step]} />
-          <span className="text-xs text-muted-foreground">{step}</span>
+          <span className="text-style-caption">{step}</span>
         </div>
       ))}
     </div>
@@ -36,7 +36,7 @@ export const DescendantUtilities: Story = {
       {ICON_GLYPH_STEPS.map((step) => (
         <div key={step} className={iconGlyphDescendantClasses[step]}>
           <Info aria-hidden />
-          <span className="ml-2 text-xs text-muted-foreground">{step}</span>
+          <span className="ml-2 text-style-caption">{step}</span>
         </div>
       ))}
     </div>
@@ -56,7 +56,7 @@ export const NestedInlineInheritance: Story = {
 
 export const DecorativeXsPolicy: Story = {
   render: () => (
-    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+    <p className="flex items-center gap-1 text-style-caption">
       <span className={iconGlyphDescendantClasses.xs}>
         <TriangleAlert aria-hidden />
       </span>

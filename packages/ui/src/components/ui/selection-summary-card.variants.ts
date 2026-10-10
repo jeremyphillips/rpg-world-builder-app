@@ -15,7 +15,7 @@ export const selectionSummaryCardRowGroupClasses =
 
 export const selectionSummaryCardRowGroupDividerClasses = 'border-t border-border-subtle pt-0.5'
 
-export const selectionSummaryCardRowLabelVariants = cva('text-sm text-muted-foreground')
+export const selectionSummaryCardRowLabelVariants = cva('text-style-supporting')
 
 export const selectionSummaryCardRowValueCellClasses = 'min-w-0'
 
@@ -29,8 +29,6 @@ export const selectionSummaryCardRowValueButtonClasses =
 export const selectionSummaryCardRowActionColumnClasses =
   'flex min-h-control-action-compact shrink-0 items-center justify-end'
 
-export const selectionSummaryCardRowHelperVariants = cva(
-  'col-start-2 text-sm text-muted-foreground',
-)
+export const selectionSummaryCardRowHelperVariants = cva('col-start-2 text-style-supporting')
 
 export const selectionSummaryCardChangeActionClasses = 'shrink-0'

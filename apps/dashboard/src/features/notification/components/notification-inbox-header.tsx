@@ -37,7 +37,7 @@ export function NotificationInboxHeader({
 }: NotificationInboxHeaderProps) {
   return (
     <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">{NOTIFICATION_COPY.inboxDescription}</p>
+      <p className="text-style-supporting">{NOTIFICATION_COPY.inboxDescription}</p>
 
       {invalidScopeNotice?.show ? (
         <Alert

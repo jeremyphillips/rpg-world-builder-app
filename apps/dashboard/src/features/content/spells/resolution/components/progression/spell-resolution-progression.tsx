@@ -130,7 +130,7 @@ function ProgressionTrackCard({
     <article className="rounded-md border border-border bg-background p-4 space-y-3">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <Heading as="h4" variant="subsection" className="text-sm font-medium">
+          <Heading as="h4" variant="subsection" className="text-style-label">
             {heading}
           </Heading>
           <Text variant="muted" className="text-sm">

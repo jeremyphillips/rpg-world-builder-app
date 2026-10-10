@@ -1,81 +1,54 @@
-import { cn } from '../../lib/utils'
-import { iconGlyphDescendantClasses } from './icon-glyph.variants'
+export type ControlActionMetricsTier = 'xs' | 'sm' | 'md'
 
-/** Icon–label flex gap for labeled control-action tiers (standard Tailwind spacing). */
-export const CONTROL_ACTION_GAP_CLASSES = {
-  xs: 'gap-1',
-  sm: 'gap-1.5',
-  md: 'gap-2',
-} as const
+type LabeledButtonSize = 'default' | 'xs' | 'sm' | 'lg'
+type LabeledButtonDensity = 'default' | 'compact'
+type LabeledButtonVariant =
+  | 'default'
+  | 'destructive'
+  | 'warning'
+  | 'outline'
+  | 'secondary'
+  | 'ghost'
+  | 'text'
+  | 'attached'
 
-export type ControlActionMetricsTier = keyof typeof CONTROL_ACTION_GAP_CLASSES
+function resolveTextMetricsTier(
+  size: LabeledButtonSize,
+  density: LabeledButtonDensity,
+): ControlActionMetricsTier {
+  if (size === 'xs' && density === 'compact') return 'xs'
+  if (size === 'xs') return 'sm'
+  if (density === 'compact') return 'xs'
+  if (size === 'sm') return 'sm'
+  return 'md'
+}
 
-/** Compact inline action height — 24px (`--control-action-compact-height`) */
-export const controlActionCompactHeightClasses = 'h-control-action-compact'
+function resolveAttachedMetricsTier(size: LabeledButtonSize): ControlActionMetricsTier {
+  if (size === 'sm') return 'sm'
+  if (size === 'xs') return 'xs'
+  return 'md'
+}
 
-/** Compact inline action square hit target — 24px */
-export const controlActionCompactSizeClasses = 'size-control-action-compact'
-
-/** Default icon-button square hit target — 36px */
-export const controlActionDefaultSizeClasses = 'size-control-action-default'
-
-/** Large icon-button square hit target — 40px */
-export const controlActionLgSizeClasses = 'size-control-action-lg'
+function resolveChromeMetricsTier(
+  size: LabeledButtonSize,
+  density: LabeledButtonDensity,
+): ControlActionMetricsTier {
+  if (size === 'lg') return 'md'
+  if (size === 'sm') return density === 'compact' ? 'xs' : 'sm'
+  return density === 'compact' ? 'sm' : 'md'
+}
 
 /**
- * Compact icon control — locked pairing: 24px hit target + md (14px) glyph.
- * Use for ContentCard icon actions, collapsible chrome, chip remove md, Button icon+compact.
+ * Effective control-action tier for labeled actions (glyph + gap + height recipes).
+ * Icon-only button sizes are omitted — flex gap has no effect with a single child.
  */
-export const controlActionCompactIconClasses = cn(
-  controlActionCompactSizeClasses,
-  iconGlyphDescendantClasses.md,
-)
-
-/** Compact text action — height only, no glyph sizing */
-export const controlActionCompactTextClasses = controlActionCompactHeightClasses
-
-/** Compact text+icon action — compact height + sm glyph */
-export const controlActionCompactTextWithIconClasses = cn(
-  controlActionCompactHeightClasses,
-  CONTROL_ACTION_GAP_CLASSES.xs,
-  iconGlyphDescendantClasses.sm,
-)
-
-/** Default icon-button — 36px hit target + lg (16px) glyph */
-export const controlActionDefaultIconClasses = cn(
-  controlActionDefaultSizeClasses,
-  iconGlyphDescendantClasses.lg,
-)
-
-/** Large icon-button — 40px hit target + lg (16px) glyph; pairs with Button `size="icon-lg"`. */
-export const controlActionLgIconClasses = cn(
-  controlActionLgSizeClasses,
-  iconGlyphDescendantClasses.lg,
-)
-
-/** Dense labeled control — 28px height + 10px type; pairs with Button `size="xs"` default density. */
-export const controlActionXsTextClasses = cn(
-  'h-control-action-xs px-2.5 text-control-action-xs',
-  CONTROL_ACTION_GAP_CLASSES.xs,
-  iconGlyphDescendantClasses.xs,
-)
-
-/** Dense labeled control — 24px height + 10px type + xs glyph; Button `size="xs"` compact density. */
-export const controlActionXsCompactTextWithIconClasses = cn(
-  controlActionCompactHeightClasses,
-  'px-2 py-0 text-control-action-xs',
-  CONTROL_ACTION_GAP_CLASSES.xs,
-  iconGlyphDescendantClasses.xs,
-)
-
-/** Text-only compact xs control — 24px height + 10px type; Button `variant="text"` `size="xs"` compact. */
-export const controlActionXsCompactTextOnlyClasses = cn(
-  controlActionCompactHeightClasses,
-  'px-0 text-control-action-xs',
-)
-
-/** Smallest icon control — 24px hit target + xs (10px) glyph; Button `size="icon-xs"` (density-independent). */
-export const controlActionXsIconClasses = cn(
-  controlActionCompactSizeClasses,
-  iconGlyphDescendantClasses.xs,
-)
+export function resolveControlActionMetricsTier(
+  size: LabeledButtonSize = 'default',
+  density: LabeledButtonDensity = 'default',
+  variant: LabeledButtonVariant = 'default',
+): ControlActionMetricsTier {
+  if (variant === 'text') return resolveTextMetricsTier(size, density)
+  if (size === 'xs') return 'xs'
+  if (variant === 'attached') return resolveAttachedMetricsTier(size)
+  return resolveChromeMetricsTier(size, density)
+}

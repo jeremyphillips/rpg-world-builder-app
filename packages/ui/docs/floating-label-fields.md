@@ -2,6 +2,19 @@
 
 `FloatingLabelField` is one composite in `packages/ui/src/components/ui/`. Consumers pass a label, a size, a `populated` flag, and exactly one control. They do not coordinate label motion, masks, or offsets.
 
+## Semantic CSS
+
+Float presentation lives in [`floating-label-field.css`](../src/components/ui/floating-label-field.css) (not duplicated `group/float` utilities in CVA):
+
+| Class                            | Role                                                                                     |
+| -------------------------------- | ---------------------------------------------------------------------------------------- |
+| `ui-floating-label-field`        | Shell; `data-populated`; size modifiers `--sm` / `--md` set `--floating-label-control-h` |
+| `ui-floating-label-field__layer` | Absolute label geometry                                                                  |
+| `ui-floating-label-field__label` | Association element; notch `::before`                                                    |
+| `ui-floating-label-field__text`  | Ellipsis at rest; full width when floated (still ellipsizes inside layer)                |
+
+The float condition is one CSS `:is(:focus-within, [data-populated='true'], …)` block — no React `data-floating`. See [semantic-control-css.md](./semantic-control-css.md).
+
 Catalog regions (`DataTableFilterRegion`, picker `CatalogFilterControls` / `CatalogToolbar`, relationship filter bands) set `selectPresentation: 'floating'`, so an omitted select `layout` renders as floating. Pass explicit `layout: 'floating'` only outside those regions, or when a field must stay floating even if the surrounding chrome is `per-field`. `layout: 'stacked'` or `layout: 'inline'` still overrides the region. `FilterFloatingField` only maps filter density to `size`. Forms, messages, and notifications stay on per-field chrome.
 
 ## What it is for
@@ -31,7 +44,7 @@ Browser autofill is visual only. `:autofill` forces the floated treatment so tex
 - The floated label hangs outside the shell. The shell height is the control height, so toolbar rows align the control with neighboring inline controls.
 - The label is `pointer-events-none`. While resting it stops before the caret column (`end-8`); when floated it may use the full control width between the value insets.
 - The border notch is a `--surface-current` chip on the label (`::before`, 4px horizontal pad) with a bottom fade (`mask-image` 50% → transparent) so the lower half blends into the control. Host surfaces must establish `--surface-current` (filter panels, forms, modals). Forced colours use solid `Canvas` on the label because masks are dropped.
-- Focus rings stay on the control (`fieldInputFocusClasses`). Half the floated label must cover the ring offset plus the ring width.
+- Focus rings stay on the field control shell (`ui-field-control` in `field-control.css`). Half the floated label must cover the ring offset plus the ring width.
 
 Reduced motion sets both the duration and the delay to 0. The global reduced-motion rule shortens durations and leaves delays, so it is not enough on its own.
 
@@ -51,7 +64,7 @@ The composite resets anatomy-row participation so it does not join a parent thre
 
 The composite does not measure width. Select and combobox width stays on `SelectLikeValueSlot` ghosts. `withFloatingLabelSizingLabel(label, sizingLabels)` appends the label as one more ghost at control typography so unconstrained controls grow to fit the label.
 
-A schema `width` token is a **max width on the whole control**. When capped, the floated label ellipsizes inside that box; the value slot still ellipsizes via `filterToolbarCappedSelectValueSlotClasses`. Floating selects omit shell `overflow-hidden` so the notch is not clipped.
+A schema `width` token is a **max width on the whole control** (`ui-field-control--width-*` on `Field.Root` / filter chrome wrapper — one owner per composition). When capped, the floated label ellipsizes inside that box; the selected value ellipsizes via universal `[data-select-value-slot]` rules on `.ui-field-control--trigger`. Floating selects omit shell `overflow-hidden` so the notch is not clipped.
 
 Filter rows wrap (`flex-wrap`); a field that does not fit moves to the next row instead of overlapping neighbors.
 

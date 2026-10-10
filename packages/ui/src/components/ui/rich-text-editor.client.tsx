@@ -4,11 +4,7 @@ import * as React from 'react'
 import { EditorContent, useEditor } from '@tiptap/react'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldInputFocusWithinClasses,
-  fieldInputInvalidClasses,
-  fieldInputShellClasses,
-} from './field-input-chrome.variants'
+import { fieldInputInvalidClasses, fieldGroupedShellClasses } from './field-input-chrome.variants'
 import { createRichTextEditorExtensions } from './rich-text-editor-extensions'
 import { richTextEditorProseClasses } from './rich-text-content.variants'
 import type { FieldSize } from './field.client'
@@ -172,8 +168,7 @@ export function RichTextEditor({
       ref={rootRef}
       className={cn(
         'relative w-full min-w-0',
-        fieldInputShellClasses,
-        fieldInputFocusWithinClasses,
+        fieldGroupedShellClasses,
         ariaInvalid && fieldInputInvalidClasses,
         disabled && 'cursor-not-allowed opacity-50',
         className,

@@ -7,7 +7,7 @@ import {
   fieldClearAffordanceGroupedClasses,
   fieldClearAffordanceInsetVariants,
 } from './field-clear-affordance.variants'
-import { selectCaretSlotWidthClasses } from './select-compact-trigger.variants'
+import { UI_FIELD_GROUP_CARET_SLOT_CLASS } from './field-group.styles'
 
 describe('FieldClearAffordanceButton', () => {
   it('applies grouped segment shell classes by default', () => {
@@ -16,7 +16,7 @@ describe('FieldClearAffordanceButton', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Clear selection' })
-    expect(button.className).toContain(selectCaretSlotWidthClasses.md)
+    expect(button.className).toContain(UI_FIELD_GROUP_CARET_SLOT_CLASS)
     expect(button.className).toEqual(fieldClearAffordanceGroupedClasses('md'))
   })
 
@@ -32,7 +32,7 @@ describe('FieldClearAffordanceButton', () => {
 
     const button = screen.getByRole('button', { name: 'Clear search' })
     expect(button.className).toContain('inset-y-0')
-    expect(button.className).toContain(selectCaretSlotWidthClasses.sm)
+    expect(button.className).toContain(UI_FIELD_GROUP_CARET_SLOT_CLASS)
     expect(button.className).toEqual(fieldClearAffordanceInsetVariants({ size: 'sm' }))
   })
 

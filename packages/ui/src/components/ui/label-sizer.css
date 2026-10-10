@@ -1,0 +1,28 @@
+@layer components {
+  .ui-label-sizer {
+    display: grid;
+    grid-template-columns: minmax(0, max-content);
+    align-items: center;
+  }
+
+  .ui-label-sizer__ghost {
+    visibility: hidden;
+    pointer-events: none;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    white-space: nowrap;
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ui-label-sizer__live {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: start;
+    font-variant-numeric: tabular-nums;
+  }
+}

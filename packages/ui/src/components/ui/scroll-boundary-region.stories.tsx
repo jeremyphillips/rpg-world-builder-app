@@ -18,7 +18,7 @@ function ScrollBoundaryRegionDemo() {
     <div className="flex w-[21rem] flex-col rounded-lg border border-border-subtle bg-field-container [--surface-current:var(--field-container)]">
       <div className="border-b border-border-subtle px-4 py-4">
         <p className="heading-style-card">Header</p>
-        <p className="text-sm text-muted-foreground">Fixed section above the scroll boundary.</p>
+        <p className="text-style-supporting">Fixed section above the scroll boundary.</p>
       </div>
       <ScrollBoundaryRegion className="max-h-48">
         <div className="space-y-3 px-4 py-4">

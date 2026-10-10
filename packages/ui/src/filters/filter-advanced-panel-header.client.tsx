@@ -52,7 +52,7 @@ export function FilterAdvancedPanelHeader({
             {heading}
           </HeadingElement>
         ) : null}
-        {description ? <p className="mt-1 text-xs text-muted-foreground">{description}</p> : null}
+        {description ? <p className="mt-1 text-style-caption">{description}</p> : null}
       </div>
       <div className="flex shrink-0 items-center gap-1">
         {showReset && onReset ? (

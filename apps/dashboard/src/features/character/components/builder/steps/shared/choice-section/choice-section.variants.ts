@@ -15,7 +15,7 @@ export const choiceSectionHeaderActionClasses = 'col-start-2 row-start-1 shrink-
 
 export const choiceSectionHeadingRowClasses = 'flex flex-wrap items-baseline gap-x-3 gap-y-1'
 
-export const choiceSectionSubheadClasses = 'text-sm text-muted-foreground'
+export const choiceSectionSubheadClasses = 'text-style-supporting'
 
 export const choiceSectionIdentityLineClasses = 'text-foreground'
 

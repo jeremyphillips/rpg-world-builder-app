@@ -26,8 +26,8 @@ export const choiceSelectionCounterVariants = cva('inline-flex items-center', {
 export const choiceSelectionCounterIncompleteLabelVariants = cva('', {
   variants: {
     size: {
-      sm: 'text-xs text-muted-foreground',
-      md: 'text-sm text-muted-foreground',
+      sm: 'text-style-caption',
+      md: 'text-style-supporting',
     },
   },
   defaultVariants: {

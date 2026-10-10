@@ -40,8 +40,14 @@ function collectSourceFiles(dir: string, files: string[] = []): string[] {
       collectSourceFiles(fullPath, files)
       continue
     }
-    if (!SCAN_EXTENSIONS.has(entry.slice(entry.lastIndexOf('.')))) continue
-    if (!entry.endsWith('.variants.ts') && !entry.endsWith('.tsx') && !entry.endsWith('.ts')) {
+    const ext = entry.slice(entry.lastIndexOf('.'))
+    if (!SCAN_EXTENSIONS.has(ext) && ext !== '.css') continue
+    if (
+      ext !== '.css' &&
+      !entry.endsWith('.variants.ts') &&
+      !entry.endsWith('.tsx') &&
+      !entry.endsWith('.ts')
+    ) {
       continue
     }
     files.push(fullPath)

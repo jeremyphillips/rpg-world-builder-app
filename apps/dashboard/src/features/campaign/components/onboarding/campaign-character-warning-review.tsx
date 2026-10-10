@@ -33,15 +33,15 @@ export function CampaignCharacterWarningReview({
         {WARNING_REVIEW_HEADING}
       </Heading>
     ) : (
-      <Text variant={isDestructive ? 'destructive' : 'small'} className="text-sm font-medium">
+      <Text variant={isDestructive ? 'destructive' : 'small'} className="text-style-label">
         {WARNING_REVIEW_HEADING}
       </Text>
     )
 
-  const categoryHeadingClassName = isDestructive ? 'text-sm font-medium' : 'font-medium'
+  const categoryHeadingClassName = isDestructive ? 'text-style-label' : 'font-medium'
   const listClassName = isDestructive
     ? 'list-disc pl-5 text-sm text-destructive'
-    : 'list-disc pl-5 text-sm text-muted-foreground'
+    : 'list-disc pl-5 text-style-supporting'
 
   const content = (
     <>

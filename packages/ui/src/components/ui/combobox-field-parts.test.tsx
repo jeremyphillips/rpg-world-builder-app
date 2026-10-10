@@ -17,7 +17,7 @@ function renderComboboxTrigger(props: ComponentProps<typeof ComboboxTrigger>) {
 }
 
 describe('ComboboxTrigger', () => {
-  it('uses px-0 py-0 shell with ValueSlot and CaretSlot anatomy', () => {
+  it('uses semantic trigger shell with ValueSlot and CaretSlot anatomy', () => {
     renderComboboxTrigger({
       listboxId: 'weapon-listbox',
       open: false,
@@ -27,7 +27,7 @@ describe('ComboboxTrigger', () => {
     })
 
     const trigger = screen.getByRole('combobox')
-    expect(trigger).toHaveClass('px-0', 'py-0')
+    expect(trigger).toHaveClass('ui-field-control--trigger', 'ui-field-control--trigger-fill')
     expect(trigger.querySelector('[data-select-value-slot]')).toBeInTheDocument()
     expect(trigger.querySelector('[data-select-caret-slot]')).toBeInTheDocument()
   })

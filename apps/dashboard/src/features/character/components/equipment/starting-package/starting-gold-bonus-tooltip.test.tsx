@@ -32,6 +32,6 @@ describe('StartingGoldBonusTooltipBody', () => {
     const sentence = screen.getByText(/Calculated from/)
     expect(sentence.tagName).toBe('P')
     expect(sentence).toHaveTextContent('Calculated from 500 GP + 1d10 × 25 GP')
-    expect(sentence).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(sentence).toHaveClass('text-style-caption')
   })
 })

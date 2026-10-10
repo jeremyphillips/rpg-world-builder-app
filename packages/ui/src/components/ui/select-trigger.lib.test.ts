@@ -4,6 +4,7 @@ import {
   assertSelectCompactSizing,
   isSelectCompactTrigger,
   resolveSelectSizingGhostLabels,
+  resolveSelectTriggerFlowClass,
 } from './select-trigger.lib'
 
 describe('assertSelectCompactSizing', () => {
@@ -53,6 +54,26 @@ describe('isSelectCompactTrigger', () => {
 
   it('returns false for prose triggers', () => {
     expect(isSelectCompactTrigger({})).toBe(false)
+  })
+})
+
+describe('resolveSelectTriggerFlowClass', () => {
+  it('maps compact triggers to fit flow', () => {
+    expect(resolveSelectTriggerFlowClass({ compact: true, grouped: false })).toBe(
+      'ui-field-control--trigger-fit',
+    )
+  })
+
+  it('maps grouped segments to segment flow', () => {
+    expect(resolveSelectTriggerFlowClass({ compact: false, grouped: true })).toBe(
+      'ui-field-control--trigger-segment',
+    )
+  })
+
+  it('maps default prose triggers to fill flow', () => {
+    expect(resolveSelectTriggerFlowClass({ compact: false, grouped: false })).toBe(
+      'ui-field-control--trigger-fill',
+    )
   })
 })
 

@@ -1,12 +1,11 @@
 /**
- * Component implementation files grandfathered until inline Lucide migration (Phase 6).
- * Remove paths as raw `size-*` icon sizing is replaced with icon-glyph SSOT utilities.
+ * Component implementation files grandfathered until inline Lucide migration completes.
+ * Remove paths as raw `size-*` / `[&_svg]:size-*` icon sizing moves to icon-glyph SSOT utilities.
+ * Phase 7: drop entries that no longer violate `icon-glyph-sizing-ban.test.ts`.
  */
 export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
-  'packages/ui/src/components/ui/accordion.client.tsx',
   'packages/ui/src/components/ui/breadcrumb.client.tsx',
   'packages/ui/src/components/ui/button-dropdown.client.tsx',
-  'packages/ui/src/components/ui/checkbox.client.tsx',
   'packages/ui/src/components/ui/collapsible-list-item/collapsible-list-item-toolbar.client.tsx',
   'packages/ui/src/components/ui/combobox-field-parts.client.tsx',
   'packages/ui/src/components/ui/data-table-columns-menu.client.tsx',
@@ -16,18 +15,15 @@ export const ICON_GLYPH_SIZING_EXEMPT_FILES = new Set([
   'packages/ui/src/components/ui/input-select-field.client.tsx',
   'packages/ui/src/components/ui/notification-bell.client.tsx',
   'packages/ui/src/components/ui/notification-preview-item.client.tsx',
-  'packages/ui/src/components/ui/radio-group.client.tsx',
   'packages/ui/src/components/ui/rich-text-editor-toolbar.client.tsx',
   'packages/ui/src/components/ui/rich-text-link-picker.client.tsx',
   'packages/ui/src/components/ui/select.client.tsx',
   'packages/ui/src/components/ui/theme-switch.client.tsx',
   'packages/ui/src/components/ui/toast-managed.client.tsx',
-  'packages/ui/src/components/ui/toast-provider.client.tsx',
   'packages/ui/src/components/ui/toast.client.tsx',
   'packages/ui/src/components/ui/tooltip.client.tsx',
   'packages/ui/src/components/ui/user-menu-trigger.client.tsx',
   'packages/ui/src/components/ui/wizard.client.tsx',
   'packages/ui/src/filters/filter-bar.client.tsx',
-  'packages/ui/src/form/renderers/array/array-item-issue.client.tsx',
   'packages/ui/src/form/shells/tabbed-form-error-summary.client.tsx',
 ])

@@ -1,16 +1,15 @@
 import { withFloatingLabelSizingLabel } from '../components/ui/floating-label-field.lib'
+import {
+  UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_FIT_CLASS,
+} from '../components/ui/field-control.styles'
 import { cn } from '../lib/utils'
 import {
   resolveFilterSelectSizerLabels,
   resolveFilterSelectValue,
   resolveSelectFieldOptions,
 } from './filter-bar.lib'
-import {
-  FILTER_SELECT_ALL_TRIGGER_LABEL,
-  FILTER_SELECT_ALL_VALUE,
-  filterToolbarCappedSelectClasses,
-  filterToolbarCappedSelectValueSlotClasses,
-} from './filter-bar.variants'
+import { FILTER_SELECT_ALL_TRIGGER_LABEL, FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 import type { FilterSelectFieldLayout } from './filter-select-field-chrome.client'
 import type {
   FilterFieldId,
@@ -70,22 +69,13 @@ export function resolveFilterSelectTriggerTitle(args: {
   )
 }
 
-export function resolveFilterSelectTriggerClassName(
-  layout: FilterSelectFieldLayout,
-  widthClassName?: string,
-): string {
-  const cappedSelectClasses =
-    widthClassName === undefined
-      ? undefined
-      : layout === 'floating'
-        ? filterToolbarCappedSelectValueSlotClasses
-        : filterToolbarCappedSelectClasses
+/** Flow modifier only — width lives on the chrome width owner, not the trigger. */
+export function resolveFilterSelectTriggerClassName(layout: FilterSelectFieldLayout): string {
+  if (layout === 'inline' || layout === 'floating') {
+    return UI_FIELD_CONTROL_TRIGGER_FIT_CLASS
+  }
 
-  return cn(
-    layout === 'inline' || layout === 'floating' ? undefined : 'w-full',
-    widthClassName,
-    cappedSelectClasses,
-  )
+  return UI_FIELD_CONTROL_TRIGGER_FILL_CLASS
 }
 
 export function resolveFilterSelectControlView<
@@ -138,6 +128,6 @@ export function resolveFilterSelectControlView<
       fallbackLabel: field.label,
       options,
     }),
-    triggerClassName: resolveFilterSelectTriggerClassName(args.layout, args.widthClassName),
+    triggerClassName: cn(resolveFilterSelectTriggerClassName(args.layout)),
   }
 }

@@ -2,12 +2,12 @@ import { cva } from 'class-variance-authority'
 import { cn } from '@rpg/ui'
 
 export const masterDetailAvailabilityHeaderLineClasses =
-  'flex flex-wrap items-center gap-x-1 text-xs'
+  'flex flex-wrap items-center gap-x-1 text-style-caption'
 
 export const masterDetailAvailabilityHeaderStatusClasses = 'min-w-0 flex items-center gap-1.5'
 
 export const masterDetailAvailabilityAvailableStatusClasses = cn(
-  'inline-flex min-w-0 items-center gap-1.5 text-xs font-medium text-foreground',
+  'inline-flex min-w-0 items-center gap-1 text-style-label',
 )
 
 export const masterDetailAvailabilityAvailableDotClasses = cva('size-1.5 shrink-0 rounded-full', {

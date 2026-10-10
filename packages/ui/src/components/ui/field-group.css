@@ -1,0 +1,257 @@
+/*
+ * Field group — composite shells (JoinedPair, InputSelect, InputActionGroup, DiceFormula).
+ * Source order: block → layout → sizes → dividers → segments → value slots → caret → aliases.
+ */
+@layer components {
+  .ui-field-group,
+  .ui-field-control-shell--grouped {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    border-radius: calc(var(--radius) - 2px);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--field-control-border);
+    background-color: var(--field-control-bg);
+    color: var(--field-control-fg);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-field-group:hover:not(:has(:disabled)),
+  .ui-field-control-shell--grouped:hover:not(:has(:disabled)) {
+    border-color: var(--field-control-border-hover);
+  }
+
+  .ui-field-group:focus-within,
+  .ui-field-control-shell--grouped:focus-within {
+    outline: none;
+    border-color: var(--field-control-border-focus);
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--ring);
+  }
+
+  .ui-field-group--invalid,
+  .ui-field-control-shell--grouped-invalid {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-field-group--invalid:focus-within,
+  .ui-field-control-shell--grouped-invalid:focus-within {
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--field-control-border-invalid);
+  }
+
+  /* --- Layout --- */
+
+  .ui-field-group--stretch {
+    width: 100%;
+    grid-template-columns: 1fr 1px auto;
+  }
+
+  .ui-field-group--intrinsic {
+    width: fit-content;
+    min-width: max-content;
+    max-width: 100%;
+    grid-template-columns: auto minmax(1px, 1px) auto;
+  }
+
+  .ui-field-group--flow-col {
+    width: fit-content;
+    min-width: max-content;
+    max-width: 100%;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+  }
+
+  /* --- Size modifiers (shell + inherited slot tokens) --- */
+
+  .ui-field-group--sm {
+    --ui-field-group-height: var(--control-height-sm);
+    --ui-field-group-padding-block: calc(var(--spacing) * 1);
+    --ui-field-group-font-size: var(--text-xs);
+    --ui-field-group-line-height: var(--text-xs--line-height);
+    --ui-field-slot-ps-start: var(--field-padding-sm);
+    --ui-field-slot-ps-start-compact: calc(var(--spacing) * 1.5);
+    --ui-field-slot-ps-middle: calc(var(--spacing) * 1.5);
+    --ui-field-slot-pe-middle: calc(var(--spacing) * 1.5);
+    --ui-field-slot-ps-end: calc(var(--spacing) * 1.5);
+    --ui-field-slot-pe-end-content: calc(var(--spacing) * 2);
+    --ui-field-slot-pe-end-slot: calc(var(--spacing) * 1);
+    --ui-field-slot-pe-before-trailing: calc(var(--spacing) * 1);
+    --ui-field-action-px: var(--field-padding-sm);
+    --ui-field-caret-width: calc(var(--spacing) * 8);
+  }
+
+  .ui-field-group--md {
+    --ui-field-group-height: var(--control-height-md);
+    --ui-field-group-padding-block: calc(var(--spacing) * 1.5);
+    --ui-field-group-font-size: var(--text-md);
+    --ui-field-group-line-height: var(--text-md--line-height);
+    --ui-field-slot-ps-start: var(--field-padding-md);
+    --ui-field-slot-ps-start-compact: calc(var(--spacing) * 2);
+    --ui-field-slot-ps-middle: calc(var(--spacing) * 2);
+    --ui-field-slot-pe-middle: calc(var(--spacing) * 2);
+    --ui-field-slot-ps-end: calc(var(--spacing) * 2);
+    --ui-field-slot-pe-end-content: calc(var(--spacing) * 2.5);
+    --ui-field-slot-pe-end-slot: calc(var(--spacing) * 1);
+    --ui-field-slot-pe-before-trailing: calc(var(--spacing) * 1);
+    --ui-field-action-px: var(--field-padding-md);
+    --ui-field-caret-width: calc(var(--spacing) * 8);
+  }
+
+  .ui-field-group--lg {
+    --ui-field-group-height: var(--control-height-xl);
+    --ui-field-group-padding-block: calc(var(--spacing) * 2);
+    --ui-field-group-font-size: var(--text-base);
+    --ui-field-group-line-height: var(--text-base--line-height);
+    --ui-field-slot-ps-start: var(--field-padding-lg);
+    --ui-field-slot-ps-start-compact: calc(var(--spacing) * 2.5);
+    --ui-field-slot-ps-middle: calc(var(--spacing) * 2.5);
+    --ui-field-slot-pe-middle: calc(var(--spacing) * 2.5);
+    --ui-field-slot-ps-end: calc(var(--spacing) * 2.5);
+    --ui-field-slot-pe-end-content: calc(var(--spacing) * 3);
+    --ui-field-slot-pe-end-slot: calc(var(--spacing) * 1);
+    --ui-field-slot-pe-before-trailing: calc(var(--spacing) * 1);
+    --ui-field-action-px: calc(var(--spacing) * 3.5);
+    --ui-field-caret-width: calc(var(--spacing) * 9);
+  }
+
+  /* --- Dividers --- */
+
+  .ui-field-group__divider {
+    position: relative;
+    z-index: 1;
+    width: 1px;
+    min-width: 1px;
+    flex-shrink: 0;
+    align-self: stretch;
+  }
+
+  .ui-field-group__divider--primary {
+    background-color: var(--border);
+  }
+
+  .ui-field-group__divider--subtle {
+    background-color: var(--border-subtle);
+  }
+
+  /* --- Segment shells --- */
+
+  .ui-field-group__segment-reset {
+    border-width: 0;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .ui-field-group__segment-reset:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .ui-field-group__segment {
+    display: inline-flex;
+    height: var(--ui-field-group-height);
+    flex-shrink: 0;
+    align-items: stretch;
+    padding: 0;
+    font-size: var(--ui-field-group-font-size);
+    line-height: var(--ui-field-group-line-height);
+  }
+
+  .ui-field-group__segment--start {
+    border-top-left-radius: calc(var(--radius) - 2px);
+    border-bottom-left-radius: calc(var(--radius) - 2px);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .ui-field-group__segment--end {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: calc(var(--radius) - 2px);
+    border-bottom-right-radius: calc(var(--radius) - 2px);
+  }
+
+  .ui-field-group__segment--surface-faint {
+    background-color: var(--surface-faint);
+  }
+
+  .ui-field-group__input-column {
+    min-width: 0;
+    overflow: hidden;
+    border-top-left-radius: calc(var(--radius) - 2px);
+    border-bottom-left-radius: calc(var(--radius) - 2px);
+  }
+
+  .ui-field-group__action-segment {
+    height: var(--ui-field-group-height);
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-field-group__input-segment {
+    min-width: 0;
+    height: var(--ui-field-group-height);
+    padding-block: var(--ui-field-group-padding-block);
+    padding-inline-start: var(--ui-field-slot-ps-start);
+    font-size: var(--ui-field-group-font-size);
+    line-height: var(--ui-field-group-line-height);
+  }
+
+  /* --- Value-slot padding (reads size tokens from ancestor or co-located size modifier) --- */
+
+  .ui-field-group__value-slot--start {
+    padding-inline-start: var(--ui-field-slot-ps-start);
+  }
+
+  .ui-field-group__value-slot--start-compact {
+    padding-inline-start: var(--ui-field-slot-ps-start-compact);
+  }
+
+  .ui-field-group__value-slot--middle {
+    padding-inline-start: var(--ui-field-slot-ps-middle);
+    padding-inline-end: var(--ui-field-slot-pe-middle);
+  }
+
+  .ui-field-group__value-slot--end {
+    padding-inline-start: var(--ui-field-slot-ps-end);
+    padding-inline-end: var(--ui-field-slot-pe-end-content);
+  }
+
+  .ui-field-group__value-slot--end-slot {
+    padding-inline-start: var(--ui-field-slot-ps-end);
+    padding-inline-end: var(--ui-field-slot-pe-end-slot);
+  }
+
+  .ui-field-group__value-slot--standalone {
+    padding-inline-start: var(--ui-field-slot-ps-start);
+  }
+
+  .ui-field-group__value-slot--standalone-slot {
+    padding-inline-start: var(--ui-field-slot-ps-start);
+    padding-inline-end: var(--ui-field-slot-pe-before-trailing);
+  }
+
+  /* --- Select caret column --- */
+
+  .ui-field-group__caret-slot {
+    pointer-events: none;
+    display: flex;
+    width: var(--ui-field-caret-width);
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    line-height: 1;
+    color: var(--muted-foreground);
+  }
+
+  .ui-field-group__caret-slot--grouped-start {
+    padding-inline-end: var(--ui-field-slot-pe-before-trailing);
+  }
+}

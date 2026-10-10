@@ -27,7 +27,7 @@ describe('Chip', () => {
     )
     const button = screen.getByRole('checkbox', { name: 'Selected' })
     expect(button).toHaveAttribute('aria-checked', 'true')
-    expect(button).toHaveClass('bg-selected-control', 'font-medium')
+    expect(button).toHaveClass('ui-compact-label--selected')
     expect(button.querySelector('svg')).toBeInTheDocument()
   })
 
@@ -50,10 +50,11 @@ describe('Chip', () => {
         Tag
       </Chip>,
     )
-    const chip = screen.getByText('Tag').closest('span.inline-flex')
-    expect(chip).toHaveClass('text-xs-meta', 'h-[22px]')
+    const chip = screen.getByText('Tag').closest('.ui-compact-label')
+    expect(chip).toHaveClass('ui-compact-label--sm', 'ui-compact-label--removable-sm')
     expect(screen.getByRole('button', { name: 'Remove Tag' })).toHaveClass(
-      'size-control-action-compact',
+      'ui-compact-label__remove',
+      'ui-compact-control--icon-compact-sm',
     )
   })
 

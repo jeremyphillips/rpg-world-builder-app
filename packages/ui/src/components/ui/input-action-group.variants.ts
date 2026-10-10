@@ -7,12 +7,17 @@ import {
   fieldGroupedShellStretchLayoutClasses,
   fieldInputInvalidClasses,
 } from './field-input-chrome.variants'
-import { fieldGroupedControlHeightClasses } from './field-sizing.variants'
+import { resolveFieldGroupActionSegmentClasses } from './field-group.styles'
 
 export const inputActionGroupVariants = cva(
   cn(fieldGroupedShellClasses, fieldGroupedShellStretchLayoutClasses),
   {
     variants: {
+      size: {
+        sm: '',
+        md: '',
+        lg: '',
+      },
       invalid: {
         true: fieldInputInvalidClasses,
         false: '',
@@ -22,7 +27,13 @@ export const inputActionGroupVariants = cva(
         false: '',
       },
     },
+    compoundVariants: [
+      { size: 'sm', class: 'ui-field-group--sm' },
+      { size: 'md', class: 'ui-field-group--md' },
+      { size: 'lg', class: 'ui-field-group--lg' },
+    ],
     defaultVariants: {
+      size: 'md',
       invalid: false,
       disabled: false,
     },
@@ -38,9 +49,9 @@ export const inputActionGroupDividerVariants = cva(fieldGroupedDividerClasses)
 export const inputActionGroupActionSegmentVariants = cva('shrink-0 overflow-hidden', {
   variants: {
     size: {
-      sm: fieldGroupedControlHeightClasses.sm,
-      md: fieldGroupedControlHeightClasses.md,
-      lg: fieldGroupedControlHeightClasses.lg,
+      sm: resolveFieldGroupActionSegmentClasses('sm'),
+      md: resolveFieldGroupActionSegmentClasses('md'),
+      lg: resolveFieldGroupActionSegmentClasses('lg'),
     },
   },
   defaultVariants: {

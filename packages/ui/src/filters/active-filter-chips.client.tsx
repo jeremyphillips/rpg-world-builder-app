@@ -49,7 +49,7 @@ export function ActiveFilterChips({
       {showClearAll ? (
         <button
           type="button"
-          className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+          className="text-style-caption underline-offset-2 hover:text-foreground hover:underline"
           disabled={disabled}
           onClick={onClearAll}
         >

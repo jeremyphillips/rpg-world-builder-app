@@ -83,7 +83,7 @@ function WidthReadout({
   }, [containerRef, fieldIdsKey, revision])
 
   return (
-    <p className="font-mono text-xs text-muted-foreground">
+    <p className="font-mono text-style-caption">
       widths: {widths.length ? widths.map((width) => `${width}px`).join(' · ') : '—'}
     </p>
   )
@@ -114,8 +114,8 @@ function ParityPair({
   return (
     <section className="flex flex-col gap-3 rounded-md border border-border p-4">
       <header className="flex flex-col gap-1">
-        <h3 className="text-sm font-medium text-foreground">{title}</h3>
-        <p className="font-mono text-xs text-muted-foreground">
+        <h3 className="text-style-label text-foreground">{title}</h3>
+        <p className="font-mono text-style-caption">
           tokens: [{widths.join(', ')}] · strategy: {resolved.strategy} · tracks:{' '}
           {resolved.gridTemplateColumns}
         </p>
@@ -168,7 +168,7 @@ function ParityMatrix() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-style-supporting">
         Compare measured field widths. Flex and anatomy-grid rows should match within a pixel or two
         at each container width. Phantom filler tracks are not used.
       </p>

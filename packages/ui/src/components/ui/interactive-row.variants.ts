@@ -1,36 +1,43 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import { interactivePointerClasses } from './interactive-focus.variants'
+import {
+  UI_INTERACTIVE_ROW_BLOCK_CLASS,
+  UI_INTERACTIVE_ROW_DATA_CLASS,
+  UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS,
+  UI_INTERACTIVE_ROW_HIT_CLASS,
+  UI_INTERACTIVE_ROW_HOVER_CLASS,
+  UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS,
+  UI_INTERACTIVE_ROW_MENU_RAIL_CLASS,
+  UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
+  UI_INTERACTIVE_ROW_RAIL_CLASS,
+  UI_INTERACTIVE_ROW_SELECTED_CLASS,
+  UI_INTERACTIVE_ROW_STATE_CLASS,
+} from './interactive-row.styles'
 
-/**
- * Selectable/navigable list row interaction family — neutral `--row-hover-bg` fill.
- * Host semantics (link, option, menuitem) stay on the adapter; compose these for wash/rail only.
- */
-export const selectableRowPointerHoverClasses = 'hover:bg-row-hover'
+/** Pointer hover for selectable rows. Hosts compose this; the wash lives in interactive-row.css. */
+export const selectableRowPointerHoverClasses = cn(
+  UI_INTERACTIVE_ROW_BLOCK_CLASS,
+  UI_INTERACTIVE_ROW_HOVER_CLASS.selectable,
+)
 
-export const selectableRowHighlightFillClasses = 'bg-row-hover'
+export const selectableRowHighlightFillClasses = UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS
 
-export const selectableRowMenuHighlightFillClasses =
-  'data-[highlighted]:bg-row-hover data-[highlighted]:text-foreground'
+export const selectableRowMenuHighlightFillClasses = UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS
 
 /** Accent rail for keyboard/list highlight — independent of row-hover fill. */
-export const selectableRowHighlightRailClasses = cn(
-  'before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:content-[""]',
-  'before:bg-accent',
-)
+export const selectableRowHighlightRailClasses = UI_INTERACTIVE_ROW_RAIL_CLASS
 
-export const selectableRowMenuHighlightRailClasses = cn(
-  'before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-transparent before:content-[""]',
-  'data-[highlighted]:before:bg-accent',
-)
+export const selectableRowMenuHighlightRailClasses = UI_INTERACTIVE_ROW_MENU_RAIL_CLASS
 
-/** Resets generic DropdownMenuItem control styling before selectable-row chrome. */
+/**
+ * Clears generic menu-item chrome before selectable-row highlight.
+ * Focus and hover utilities stay so they win over DropdownMenuItem via `cn()`.
+ */
 export const menuChoiceRowItemResetClasses = cn(
+  UI_INTERACTIVE_ROW_MENU_RESET_CLASS,
   'rounded-none shadow-none outline-none',
   'focus:bg-transparent focus:text-foreground',
-  'hover:bg-transparent',
-  'data-[highlighted]:focus:bg-row-hover',
 )
 
 /**
@@ -39,16 +46,16 @@ export const menuChoiceRowItemResetClasses = cn(
  *
  * Sortable drag opacity belongs on `dragSurfaceVariants`, not here.
  */
-export const interactiveRowVariants = cva('transition-colors', {
+export const interactiveRowVariants = cva(UI_INTERACTIVE_ROW_BLOCK_CLASS, {
   variants: {
     interaction: {
       static: '',
       hoverable: '',
     },
     state: {
-      default: '',
-      inactive: 'border-dashed border-border-subtle',
-      disabled: 'pointer-events-none opacity-50',
+      default: UI_INTERACTIVE_ROW_STATE_CLASS.default,
+      inactive: UI_INTERACTIVE_ROW_STATE_CLASS.inactive,
+      disabled: UI_INTERACTIVE_ROW_STATE_CLASS.disabled,
     },
     hoverFamily: {
       none: '',
@@ -56,22 +63,22 @@ export const interactiveRowVariants = cva('transition-colors', {
       navigation: '',
     },
     selected: {
-      none: '',
-      bordered: 'border-row-selected-border bg-row-selected',
-      fill: 'bg-row-selected',
+      none: UI_INTERACTIVE_ROW_SELECTED_CLASS.none,
+      bordered: UI_INTERACTIVE_ROW_SELECTED_CLASS.bordered,
+      fill: UI_INTERACTIVE_ROW_SELECTED_CLASS.fill,
     },
     selectedHover: {
       none: '',
-      row: 'hover:bg-row-selected',
+      row: '',
     },
     selectedData: {
-      none: '',
-      selected: 'data-[state=selected]:bg-row-selected',
-      checked: 'data-[state=checked]:bg-row-selected',
+      none: UI_INTERACTIVE_ROW_DATA_CLASS.none,
+      selected: UI_INTERACTIVE_ROW_DATA_CLASS.selected,
+      checked: UI_INTERACTIVE_ROW_DATA_CLASS.checked,
     },
     hitTarget: {
-      none: '',
-      pointer: interactivePointerClasses,
+      none: UI_INTERACTIVE_ROW_HIT_CLASS.none,
+      pointer: UI_INTERACTIVE_ROW_HIT_CLASS.pointer,
     },
   },
   compoundVariants: [
@@ -79,18 +86,23 @@ export const interactiveRowVariants = cva('transition-colors', {
       interaction: 'hoverable',
       hoverFamily: 'selectable',
       selected: 'none',
-      class: 'hover:bg-row-hover',
+      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selectable,
     },
     {
       interaction: 'hoverable',
       hoverFamily: 'navigation',
       selected: 'none',
-      class: 'hover:bg-muted',
+      class: UI_INTERACTIVE_ROW_HOVER_CLASS.navigation,
     },
     {
       selected: 'bordered',
       selectedHover: 'row',
-      class: 'hover:bg-row-selected',
+      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
+    },
+    {
+      selected: 'fill',
+      selectedHover: 'row',
+      class: UI_INTERACTIVE_ROW_HOVER_CLASS.selected,
     },
   ],
   defaultVariants: {

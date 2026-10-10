@@ -57,7 +57,7 @@ export function SpellResolutionPreview() {
       <div className="space-y-4">
         {sections.map((section) => (
           <div key={section.heading} className="space-y-1">
-            <Heading as="h4" variant="subsection" className="text-sm font-medium">
+            <Heading as="h4" variant="subsection" className="text-style-label">
               {section.heading}
             </Heading>
             <ul className="list-inside list-disc space-y-1 text-sm">

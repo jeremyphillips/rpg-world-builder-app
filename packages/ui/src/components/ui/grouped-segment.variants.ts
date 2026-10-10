@@ -1,22 +1,17 @@
 import { cn } from '../../lib/utils'
+import type { FieldSizeToken } from './field-sizing.variants'
 import {
-  fieldGroupedControlHeightClasses,
-  fieldGroupedValueSlotBeforeTrailingSlotPaddingClasses,
-  fieldGroupedValueSlotEndContentPaddingClasses,
-  fieldGroupedValueSlotEndTrailingSlotPaddingClasses,
-  fieldGroupedValueSlotMiddlePaddingClasses,
-  fieldGroupedValueSlotStartCompactPaddingClasses,
-  fieldGroupedValueSlotStartPaddingClasses,
-  fieldSizeTypographyClasses,
-  type FieldSizeToken,
-} from './field-sizing.variants'
-import {
-  fieldGroupedEndSegmentSurfaceClasses,
-  fieldGroupedSegmentEndClasses,
-  fieldGroupedSegmentResetClasses,
-  fieldGroupedSegmentStartClasses,
-  groupedDividerVariants,
-} from './field-input-chrome.variants'
+  resolveFieldGroupSegmentShellClasses,
+  resolveFieldGroupSizeClass,
+  UI_FIELD_GROUP_VALUE_SLOT_END_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_END_SLOT_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_MIDDLE_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_SLOT_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_START_CLASS,
+  UI_FIELD_GROUP_VALUE_SLOT_START_COMPACT_CLASS,
+} from './field-group.styles'
+import { groupedDividerVariants } from './field-input-chrome.variants'
 import type { FieldSize } from './field.client'
 
 export type GroupedSegmentPosition = 'start' | 'middle' | 'end'
@@ -58,27 +53,34 @@ export function resolveGroupedValueSlotPadding(
   options: { trailing?: GroupedValueSlotTrailing; inset?: GroupedValueSlotInset } = {},
 ): string {
   const trailing = options.trailing ?? 'content'
+  const sizeClass = resolveFieldGroupSizeClass(size)
 
   if (position === 'standalone') {
-    return trailing === 'slot'
-      ? cn(
-          fieldGroupedValueSlotStartPaddingClasses[size],
-          fieldGroupedValueSlotBeforeTrailingSlotPaddingClasses[size],
-        )
-      : fieldGroupedValueSlotStartPaddingClasses[size]
+    return cn(
+      sizeClass,
+      trailing === 'slot'
+        ? UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_SLOT_CLASS
+        : UI_FIELD_GROUP_VALUE_SLOT_STANDALONE_CLASS,
+    )
   }
 
   switch (position) {
     case 'start':
-      return options.inset === 'compact'
-        ? fieldGroupedValueSlotStartCompactPaddingClasses[size]
-        : fieldGroupedValueSlotStartPaddingClasses[size]
+      return cn(
+        sizeClass,
+        options.inset === 'compact'
+          ? UI_FIELD_GROUP_VALUE_SLOT_START_COMPACT_CLASS
+          : UI_FIELD_GROUP_VALUE_SLOT_START_CLASS,
+      )
     case 'middle':
-      return fieldGroupedValueSlotMiddlePaddingClasses[size]
+      return cn(sizeClass, UI_FIELD_GROUP_VALUE_SLOT_MIDDLE_CLASS)
     case 'end':
-      return trailing === 'slot'
-        ? fieldGroupedValueSlotEndTrailingSlotPaddingClasses[size]
-        : fieldGroupedValueSlotEndContentPaddingClasses[size]
+      return cn(
+        sizeClass,
+        trailing === 'slot'
+          ? UI_FIELD_GROUP_VALUE_SLOT_END_SLOT_CLASS
+          : UI_FIELD_GROUP_VALUE_SLOT_END_CLASS,
+      )
   }
 }
 
@@ -98,20 +100,10 @@ export function groupedSegmentShellClasses(
     surface: GroupedSegmentSurface
   },
 ): string {
-  const cornerClasses =
-    options.position === 'start'
-      ? cn(fieldGroupedSegmentResetClasses, fieldGroupedSegmentStartClasses)
-      : options.position === 'end'
-        ? cn(fieldGroupedSegmentResetClasses, fieldGroupedSegmentEndClasses)
-        : fieldGroupedSegmentResetClasses
-
-  return cn(
-    fieldGroupedControlHeightClasses[size],
-    fieldSizeTypographyClasses[size],
-    cornerClasses,
-    options.surface === 'faint' && fieldGroupedEndSegmentSurfaceClasses,
-    'inline-flex shrink-0 items-stretch p-0',
-  )
+  return resolveFieldGroupSegmentShellClasses(size, {
+    position: options.position,
+    surfaceFaint: options.surface === 'faint',
+  })
 }
 
 export { groupedDividerVariants }

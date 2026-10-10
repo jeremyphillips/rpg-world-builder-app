@@ -225,7 +225,7 @@ describe('ContentCard', () => {
     const viewLink = screen.getByRole('link', { name: 'View' })
     expect(viewLink).toHaveClass('text-sm')
     expect(viewLink).toHaveClass('pr-0')
-    expect(viewLink).toHaveClass('h-control-action-compact')
+    expect(viewLink).toHaveClass('ui-compact-control--text-compact')
     expect(viewLink).not.toHaveClass('hover:underline')
   })
 
@@ -244,8 +244,7 @@ describe('ContentCard', () => {
     )
 
     expect(screen.getByRole('link', { name: 'Open Harbor District' })).toHaveClass(
-      'size-control-action-compact',
-      '[&_svg]:size-icon-glyph-md',
+      'ui-compact-control--icon-compact',
     )
   })
 

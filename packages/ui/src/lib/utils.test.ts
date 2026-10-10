@@ -39,6 +39,12 @@ describe('cn', () => {
     expect(cn('font-meta', 'font-data-name')).toBe('font-data-name')
   })
 
+  it('replaces sibling text-style composites and the stacks they absorb', () => {
+    expect(cn('text-style-small', 'text-style-caption')).toBe('text-style-caption')
+    expect(cn('text-style-caption', 'text-style-caption')).toBe('text-style-caption')
+    expect(cn('text-style-label', 'text-style-label')).toBe('text-style-label')
+  })
+
   it('replaces sibling heading-style composites', () => {
     expect(cn('heading-style-page', 'heading-style-section')).toBe('heading-style-section')
   })

@@ -19,7 +19,7 @@ import {
 const FORBIDDEN_HOVER_TOKENS = ['control-hover', 'hover:bg-accent', 'focus:bg-accent'] as const
 
 function assertSelectableRowRecipe(className: string) {
-  expect(className).toContain('row-hover')
+  expect(className).toMatch(/ui-interactive-row--(hover-selectable|highlight|menu-highlight)/)
   for (const token of FORBIDDEN_HOVER_TOKENS) {
     expect(className).not.toContain(token)
   }
@@ -58,7 +58,7 @@ describe('selectable row interaction recipe (hosts)', () => {
   it('InteractiveListRow uses row-hover when highlighted (combobox/search listbox path)', () => {
     const { container } = render(<InteractiveListRow name="Fireball" highlighted />)
     assertSelectableRowRecipe(container.firstElementChild?.className ?? '')
-    expect(container.firstElementChild).toHaveClass('bg-row-hover')
+    expect(container.firstElementChild).toHaveClass('ui-interactive-row--highlight')
   })
 
   it('ComboboxOptionRow shell uses row-hover when highlighted', () => {
@@ -90,9 +90,10 @@ describe('selectable row interaction recipe (hosts)', () => {
 
     const item = screen.getByRole('menuitem', { name: /Choice/i })
     assertSelectableRowRecipe(item.className)
-    expect(item.className).toContain('data-[highlighted]:bg-row-hover')
-    expect(item.className).toContain('px-3')
-    expect(item.className).toContain('py-2')
+    expect(item.className).toContain('ui-interactive-row--menu-highlight')
+    expect(item.className).toContain('ui-interactive-list__main--md')
+    expect(item.className).not.toContain('px-2')
+    expect(item.className).not.toContain('py-1.5')
   })
 
   it('search-style link row composes InteractiveListRow hover recipe', () => {

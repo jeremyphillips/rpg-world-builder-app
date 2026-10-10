@@ -23,9 +23,11 @@ describe('CharacterBuilderPreviewSectionContent', () => {
       </CharacterBuilderPreviewSectionContent>,
     )
 
-    expect(screen.getByText('Choose a class to see class proficiencies.')).toHaveClass('text-xs')
+    expect(screen.getByText('Choose a class to see class proficiencies.')).toHaveClass(
+      'text-style-caption',
+    )
     expect(screen.getByText('Skills')).toBeInTheDocument()
-    expect(screen.getByText('No skills chosen yet.')).toHaveClass('text-xs')
+    expect(screen.getByText('No skills chosen yet.')).toHaveClass('text-style-caption')
   })
 
   itAxe('has no axe accessibility violations', async () => {

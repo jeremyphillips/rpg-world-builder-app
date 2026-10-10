@@ -18,7 +18,7 @@ describe('EquipmentStepTierSummary', () => {
     expect(tierName).toHaveClass('font-medium', 'text-foreground')
     expect(tierName.parentElement?.parentElement).toHaveClass('text-sm')
     expect(screen.getByText('Level 1')).toHaveClass('font-normal', 'text-muted-foreground')
-    expect(screen.getByText('No benefits')).toHaveClass('text-xs')
+    expect(screen.getByText('No benefits')).toHaveClass('text-style-caption')
     expect(tierName.closest('.bg-surface-faint')).toBeNull()
     expect(screen.queryByRole('button', { name: /Initiate tier/ })).not.toBeInTheDocument()
     expect(screen.queryByText('No additional starting resources')).not.toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('EquipmentStepTierSummary', () => {
     const user = userEvent.setup()
     render(<EquipmentStepTierSummary startingWealth={startingWealth} startingLevel={2} />)
 
-    expect(screen.getByText('1 benefit')).toHaveClass('text-xs')
+    expect(screen.getByText('1 benefit')).toHaveClass('text-style-caption')
     expect(screen.queryByText('1 common choice')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Adventurer tier/ }))
@@ -47,7 +47,7 @@ describe('EquipmentStepTierSummary', () => {
     expect(screen.getByText('Hero tier')).toHaveClass('font-medium', 'text-foreground')
     expect(screen.getByText('Levels 5–10')).toHaveClass('font-normal', 'text-muted-foreground')
     expect(trigger.closest('.bg-surface-faint')).toBeNull()
-    expect(screen.getByText('2 benefits')).toHaveClass('text-xs')
+    expect(screen.getByText('2 benefits')).toHaveClass('text-style-caption')
     expect(screen.queryByText('+637 GP 5 SP')).not.toBeInTheDocument()
 
     await user.click(trigger)
@@ -66,7 +66,7 @@ describe('EquipmentStepTierSummary', () => {
     expect(tooltip).not.toHaveTextContent('+637 GP 5 SP')
     expect(tooltip).toHaveTextContent('Calculated from 500 GP + 1d10 × 25 GP')
     const formula = within(tooltip).getByText(/Calculated from/)
-    expect(formula).not.toHaveClass('text-xs')
+    expect(formula).not.toHaveClass('text-style-caption')
     expect(formula).not.toHaveClass('text-muted-foreground')
   })
 

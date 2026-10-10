@@ -11,7 +11,7 @@ export const emptyStateWellSurfaceClasses = cn(
 )
 
 /** Passive single-message copy in compact wells (`EmptyPanel`). */
-export const emptyStateWellPassiveMessageClasses = 'text-xs text-muted-foreground italic'
+export const emptyStateWellPassiveMessageClasses = 'text-style-caption italic'
 
 /**
  * Italic emphasis for passive copy that scales with inset panel size
@@ -23,7 +23,7 @@ export const emptyStateWellPassiveMessageEmphasisClasses = 'italic'
 export const emptyStateWellBodyClasses = emptyStateWellPassiveMessageClasses
 
 /** Instructional or explanatory copy under a structured title — roman. */
-export const emptyStateWellSupportingClasses = 'text-sm text-muted-foreground'
+export const emptyStateWellSupportingClasses = 'text-style-supporting'
 
 /** Larger supporting copy for master-detail placeholders. */
 export const emptyStateWellSupportingLgClasses = 'text-base text-muted-foreground'

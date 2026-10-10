@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/card'
 import { Heading } from '../../components/ui/heading'
 import { Text } from '../../components/ui/text'
 import { cardSurfaceClasses } from '../../components/ui/card.variants'
-import { choiceControlIndicatorShellClasses } from '../../components/ui/choice-control-chrome.variants'
+import { radioCardDecorativeControlClasses } from '../../components/ui/choice-control.variants'
 import { resolveSurfaceClasses } from '../../components/ui/surface.variants'
 import { establishSurfaceCurrent } from '../../components/ui/surface-current.lib'
 import {
@@ -96,7 +96,7 @@ const INTERACTION_SAMPLES = [
   },
   {
     label: 'choice-control ring',
-    className: cn('size-5 rounded-full', choiceControlIndicatorShellClasses),
+    className: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
   },
 ] as const
 
@@ -202,12 +202,12 @@ function SurfaceChromeMatrix() {
               Decorative avatar inherits card plane
             </Heading>
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+              <div className="flex size-10 items-center justify-center rounded-full bg-muted text-style-label">
                 AV
               </div>
               <div className="space-y-1">
-                <p className="text-sm font-medium text-foreground">Nearby label</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-style-label text-foreground">Nearby label</p>
+                <p className="text-style-supporting">
                   Muted copy stays on card plane — avatar fill does not rebind.
                 </p>
               </div>
@@ -230,7 +230,7 @@ function SurfaceChromeMatrix() {
               text.
             </Text>
             <div className="rounded-md border border-border-subtle p-3">
-              <p className="text-sm text-muted-foreground">Muted option label</p>
+              <p className="text-style-supporting">Muted option label</p>
               <p className="text-sm text-foreground-subtle">Subtle helper copy</p>
             </div>
           </div>

@@ -33,9 +33,7 @@ describe('emptyStateWell variants', () => {
   })
 
   it('keeps empty panel and inset presets aligned with the well contract', () => {
-    expect(emptyPanelVariants()).toContain('bg-sunken')
-    expect(emptyPanelVariants()).toContain('text-muted-foreground')
-    expect(emptyPanelVariants()).toContain('italic')
+    expect(emptyPanelVariants()).toContain('ui-empty-panel')
     expect(insetPanelEmptyStateClasses).toContain('bg-sunken')
   })
 })

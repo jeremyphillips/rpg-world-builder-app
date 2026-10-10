@@ -26,7 +26,7 @@ export const entitySummaryHeadingEndValueVariants = cva(
 export const entitySummaryStatusVariants = cva('', {
   variants: {
     density: {
-      compact: 'text-xs',
+      compact: 'text-style-caption',
       comfortable: 'text-sm',
     },
     tone: {
@@ -56,7 +56,7 @@ export const entitySummaryStatusLaneVariants = cva('flex min-w-0 flex-col gap-1'
 export const entitySummaryProvenanceTextVariants = cva('text-foreground', {
   variants: {
     density: {
-      compact: 'text-xs',
+      compact: 'text-style-caption',
       comfortable: 'text-sm',
     },
   },
@@ -75,7 +75,7 @@ export const entitySummaryProvenanceActionVariants = cva(
   {
     variants: {
       density: {
-        compact: 'text-xs',
+        compact: 'text-style-caption',
         comfortable: 'text-sm',
       },
     },
@@ -89,7 +89,7 @@ export const entitySummaryProvenanceActionVariants = cva(
 export const entitySummaryStatusMetadataVariants = cva('block min-w-0', {
   variants: {
     density: {
-      compact: 'text-xs',
+      compact: 'text-style-caption',
       comfortable: 'text-sm',
     },
   },

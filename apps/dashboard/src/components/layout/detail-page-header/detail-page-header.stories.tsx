@@ -50,9 +50,7 @@ export const ActionsOnly: Story = {
 export const ChromeShell: Story = {
   render: () => (
     <div className={detailPageHeaderClasses}>
-      <div className="min-w-0 flex-1 text-sm text-muted-foreground">
-        Breadcrumb slot (route-driven)
-      </div>
+      <div className="min-w-0 flex-1 text-style-supporting">Breadcrumb slot (route-driven)</div>
       <div className="flex shrink-0 items-center gap-2">
         <Button variant="outline" size="sm" density="compact">
           Edit

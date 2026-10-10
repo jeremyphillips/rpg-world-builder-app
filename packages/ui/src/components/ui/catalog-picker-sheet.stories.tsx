@@ -68,7 +68,7 @@ export const Default: Story = {
       { id: 'catalog', label: 'All' },
     ],
     renderItemHeader: (item) => (
-      <span className="truncate text-sm font-medium">{item.name} · Gear</span>
+      <span className="truncate text-style-label">{item.name} · Gear</span>
     ),
     renderItemActions: (item) => (
       <div className="flex items-center gap-2">
@@ -80,7 +80,7 @@ export const Default: Story = {
         </Button>
       </div>
     ),
-    renderItemDetails: (item) => <p className="text-sm text-muted-foreground">{item.details}</p>,
+    renderItemDetails: (item) => <p className="text-style-supporting">{item.details}</p>,
   },
   render: function Render(args) {
     const [open, setOpen] = useState(args.open)

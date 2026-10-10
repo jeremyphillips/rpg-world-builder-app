@@ -33,12 +33,7 @@ function GlobalSearchPreviewStatus({
 }: GlobalSearchPreviewStatusProps) {
   if (isPending) {
     return (
-      <p
-        className={cn(
-          'py-3 text-center text-sm text-muted-foreground',
-          globalSearchPreviewInsetClasses,
-        )}
-      >
+      <p className={cn('py-3 text-center text-style-supporting', globalSearchPreviewInsetClasses)}>
         {GLOBAL_SEARCH_COPY.loadingCatalog}
       </p>
     )
@@ -47,7 +42,7 @@ function GlobalSearchPreviewStatus({
   if (isError) {
     return (
       <div className={cn('space-y-3 py-3 text-center', globalSearchPreviewInsetClasses)}>
-        <p className="text-sm text-muted-foreground" role="alert">
+        <p className="text-style-supporting" role="alert">
           {GLOBAL_SEARCH_COPY.catalogLoadError}
         </p>
         <button

@@ -1,12 +1,20 @@
 /**
  * Shared field sizing tokens.
  *
- * Keep these as literal Tailwind class maps so the scanner emits every size.
- * Component-specific variants should compose these maps instead of repeating
- * the sm/md/lg height, padding, and type-scale tuples.
+ * Grouped composite geometry lives in field-group.css — use field-group.styles resolvers.
+ * Component-specific variants should compose these maps instead of repeating tuples.
  */
-import { cn } from '../../lib/utils'
 import type { ButtonVariantProps } from './button.variants'
+import {
+  resolveFieldControlDigitsSizeClass,
+  resolveFieldControlMultilineSizeClass,
+  resolveFieldControlSizeClass,
+} from './field-control.styles'
+import {
+  resolveFieldGroupActionSegmentClasses,
+  resolveFieldGroupInputSegmentClasses,
+  resolveFieldGroupSizeClass,
+} from './field-group.styles'
 import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import type { InteractiveListSize } from './interactive-list.variants'
@@ -21,133 +29,30 @@ export const fieldSizeTypographyClasses = {
 } as const satisfies Record<FieldSizeToken, string>
 
 export const fieldControlSizeClasses = {
-  sm: 'h-8 px-2.5 py-1 text-xs',
-  md: 'h-9 px-3 py-1.5 text-md',
-  lg: 'h-11 px-4 py-2 text-base',
+  sm: resolveFieldControlSizeClass('sm'),
+  md: resolveFieldControlSizeClass('md'),
+  lg: resolveFieldControlSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Grouped segment outer height — no padding or typography. */
+/** @deprecated Prefer {@link resolveFieldGroupActionSegmentClasses}. */
 export const fieldGroupedControlHeightClasses = {
-  sm: 'h-8',
-  md: 'h-9',
-  lg: 'h-11',
+  sm: resolveFieldGroupActionSegmentClasses('sm'),
+  md: resolveFieldGroupActionSegmentClasses('md'),
+  lg: resolveFieldGroupActionSegmentClasses('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
-/** Grouped segment height and vertical padding — no typography. */
-export const fieldGroupedControlGeometryClasses = {
-  sm: cn(fieldGroupedControlHeightClasses.sm, 'py-1'),
-  md: cn(fieldGroupedControlHeightClasses.md, 'py-1.5'),
-  lg: cn(fieldGroupedControlHeightClasses.lg, 'py-2'),
-} as const satisfies Record<FieldSizeToken, string>
-
-/** Positional value-slot padding — outer-start content inset (`GroupedValueSlot position="start"`). */
-export const fieldGroupedValueSlotStartPaddingClasses = {
-  sm: 'ps-2.5',
-  md: 'ps-3',
-  lg: 'ps-4',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** Compact outer-start inset for static prefix glyphs (`×`, …) — not editable value cells. */
-export const fieldGroupedValueSlotStartCompactPaddingClasses = {
-  sm: 'ps-1.5',
-  md: 'ps-2',
-  lg: 'ps-2.5',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** Positional value-slot padding — middle segment content. */
-export const fieldGroupedValueSlotMiddlePaddingClasses = {
-  sm: 'ps-1.5 pe-1.5',
-  md: 'ps-2 pe-2',
-  lg: 'ps-2.5 pe-2.5',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** End value-slot padding when trailing content owns both edges (labels, static segments). */
-export const fieldGroupedValueSlotEndContentPaddingClasses = {
-  sm: 'ps-1.5 pe-2',
-  md: 'ps-2 pe-2.5',
-  lg: 'ps-2.5 pe-3',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** End value-slot padding when a sibling trailing slot follows (select, searchable unit). */
-export const fieldGroupedValueSlotEndTrailingSlotPaddingClasses = {
-  sm: 'ps-1.5 pe-1',
-  md: 'ps-2 pe-1',
-  lg: 'ps-2.5 pe-1',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** Trailing buffer on standalone value cells before a sibling trailing slot. */
-export const fieldGroupedValueSlotBeforeTrailingSlotPaddingClasses = {
-  sm: 'pe-1',
-  md: 'pe-1',
-  lg: 'pe-1',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** @deprecated Prefer `fieldGroupedValueSlotEndContentPaddingClasses`. */
-export const fieldGroupedValueSlotEndPaddingClasses = fieldGroupedValueSlotEndContentPaddingClasses
-
-/** @deprecated Prefer `fieldGroupedValueSlotStartPaddingClasses`. */
-export const fieldGroupedControlStartContentPaddingClasses =
-  fieldGroupedValueSlotStartPaddingClasses
-
-/** @deprecated Prefer `fieldGroupedValueSlotStartPaddingClasses`. */
-export const fieldGroupedControlStartPaddingClasses = fieldGroupedValueSlotStartPaddingClasses
-
-/** @deprecated Prefer `fieldGroupedValueSlotEndPaddingClasses` (leading `ps-*` only). */
-export const fieldGroupedControlEndContentPaddingClasses = {
-  sm: 'ps-1.5',
-  md: 'ps-2',
-  lg: 'ps-2.5',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** @deprecated Prefer `fieldGroupedValueSlotEndPaddingClasses` (trailing `pe-*` only). */
-export const fieldGroupedLabelValueSlotPaddingClasses = {
-  sm: 'pe-2',
-  md: 'pe-2.5',
-  lg: 'pe-3',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** @deprecated Caret column owns trailing inset — not part of value-slot padding. */
-export const fieldGroupedValueSlotBeforeCaretPaddingClasses = {
-  sm: 'pe-1',
-  md: 'pe-1',
-  lg: 'pe-1',
-} as const satisfies Record<FieldSizeToken, string>
-
-/** Horizontal padding for grouped trailing action segments. */
-export const fieldGroupedControlActionPaddingClasses = {
-  sm: 'px-2.5',
-  md: 'px-3',
-  lg: 'px-3.5',
-} as const satisfies Record<FieldSizeToken, string>
-
-/**
- * Size classes for one segment inside a grouped control when the segment element
- * owns field typography (input/select value cells). Uses `pl-*` instead of `px-*`
- * so consumers can reserve their own trailing affordance.
- */
+/** @deprecated Prefer {@link resolveFieldGroupInputSegmentClasses}. */
 export const fieldGroupedControlSizeClasses = {
-  sm: cn(
-    fieldGroupedControlGeometryClasses.sm,
-    fieldGroupedControlStartPaddingClasses.sm,
-    fieldSizeTypographyClasses.sm,
-  ),
-  md: cn(
-    fieldGroupedControlGeometryClasses.md,
-    fieldGroupedControlStartPaddingClasses.md,
-    fieldSizeTypographyClasses.md,
-  ),
-  lg: cn(
-    fieldGroupedControlGeometryClasses.lg,
-    fieldGroupedControlStartPaddingClasses.lg,
-    fieldSizeTypographyClasses.lg,
-  ),
+  sm: resolveFieldGroupInputSegmentClasses('sm'),
+  md: resolveFieldGroupInputSegmentClasses('md'),
+  lg: resolveFieldGroupInputSegmentClasses('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Multi-line controls (Textarea, JSON editor): min-height + padding + type scale. */
 export const fieldTextareaSizeClasses = {
-  sm: 'min-h-16 px-2.5 py-1.5 text-xs',
-  md: 'min-h-20 px-3 py-2 text-md',
-  lg: 'min-h-28 px-4 py-3 text-base',
+  sm: resolveFieldControlMultilineSizeClass('sm'),
+  md: resolveFieldControlMultilineSizeClass('md'),
+  lg: resolveFieldControlMultilineSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Trailing reserve for digit controls with a stepper/caret column (logical). */
@@ -159,9 +64,9 @@ export const fieldDigitTrailingPaddingClasses = {
 
 /** Start + trailing padding for digit-sized controls (logical). */
 export const fieldDigitSizeClasses = {
-  sm: 'ps-2.5 pe-6',
-  md: 'ps-3 pe-6',
-  lg: 'ps-4 pe-8',
+  sm: resolveFieldControlDigitsSizeClass('sm'),
+  md: resolveFieldControlDigitsSizeClass('md'),
+  lg: resolveFieldControlDigitsSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Width of the trailing stepper/caret column on digit-sized controls. */
@@ -272,3 +177,8 @@ export const fieldDigitTrailingIconClasses = {
   md: iconGlyphDescendantClasses.xs,
   lg: iconGlyphDescendantClasses.md,
 } as const satisfies Record<FieldSizeToken, string>
+
+/** Resolves grouped shell size modifier for composite roots. */
+export function resolveFieldGroupedShellSizeClass(size: FieldSizeToken = 'md'): string {
+  return resolveFieldGroupSizeClass(size)
+}

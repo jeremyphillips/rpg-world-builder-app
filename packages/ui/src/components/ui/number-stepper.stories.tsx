@@ -85,7 +85,7 @@ export const RemoveAtMin: Story = {
   render: (args) => {
     const [value, setValue] = React.useState(2)
     if (value < 1) {
-      return <p className="text-sm text-muted-foreground">Row removed.</p>
+      return <p className="text-style-supporting">Row removed.</p>
     }
     return (
       <NumberStepper

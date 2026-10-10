@@ -1,0 +1,48 @@
+/*
+ * Card shell. Part padding lives here. Interactive hover is one modifier.
+ * Source order: block → interactive → parts.
+ */
+@layer components {
+  .ui-card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--card-border);
+    background-color: var(--card);
+    color: var(--card-foreground);
+    box-shadow: var(--shadow-surface-raised);
+    --surface-current: var(--card);
+  }
+
+  .ui-card--static,
+  .ui-card--interactive {
+    transition-property: background-color, border-color, color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-card--static:hover {
+    background-color: var(--card);
+  }
+
+  .ui-card--interactive:hover {
+    background-color: var(--row-hover-bg);
+  }
+
+  .ui-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1.5);
+    padding: calc(var(--spacing) * 6);
+  }
+
+  .ui-card__content {
+    padding: calc(var(--spacing) * 6);
+    padding-top: 0;
+  }
+
+  .ui-card__footer {
+    display: flex;
+    align-items: center;
+    padding: calc(var(--spacing) * 6);
+    padding-top: 0;
+  }
+}

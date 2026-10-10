@@ -6,9 +6,9 @@ import {
 } from './interactive-list.variants'
 
 describe('interactiveListVariants row separators', () => {
-  it('uses adjacent-sibling top borders with border-border-faint', () => {
-    expect(interactiveListRowSeparatorClasses).toBe('[&>*+*]:border-t [&>*+*]:border-border-faint')
-    expect(interactiveListVariants()).toContain(interactiveListRowSeparatorClasses)
+  it('uses the list block, whose CSS draws adjacent-sibling borders', () => {
+    expect(interactiveListRowSeparatorClasses).toBe('ui-interactive-list')
+    expect(interactiveListVariants()).toContain('ui-interactive-list')
   })
 
   it('does not use divide utilities on the list shell', () => {

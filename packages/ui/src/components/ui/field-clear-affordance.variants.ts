@@ -3,17 +3,16 @@ import { cva } from 'class-variance-authority'
 import { cn } from '../../lib/utils'
 import { ghostControlVisualStateClasses } from './ghost-control.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
-import {
-  groupedEndLabelSegmentShellClasses,
-  selectCaretSlotWidthClasses,
-} from './select-compact-trigger.variants'
+import { resolveFieldGroupCaretSlotClass, resolveFieldGroupSizeClass } from './field-group.styles'
+import { groupedEndLabelSegmentShellClasses } from './select-compact-trigger.variants'
 import type { FieldSize } from './field.client'
 
 /** Grouped trigger segment — full height × caret column (select/combobox clear). */
 export function fieldClearAffordanceGroupedClasses(size: FieldSize): string {
   return cn(
     groupedEndLabelSegmentShellClasses(size),
-    selectCaretSlotWidthClasses[size],
+    resolveFieldGroupSizeClass(size),
+    resolveFieldGroupCaretSlotClass(),
     'inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground hover:text-foreground',
     interactiveFocusVariants({ context: 'embedded' }),
   )
@@ -21,7 +20,7 @@ export function fieldClearAffordanceGroupedClasses(size: FieldSize): string {
 
 /**
  * Inset clear inside a single-line field (SearchBar trailing slot).
- * Hit target: full control height × {@link selectCaretSlotWidthClasses}.
+ * Hit target: full control height × field-group caret column width.
  */
 export const fieldClearAffordanceInsetVariants = cva(
   cn(
@@ -32,9 +31,9 @@ export const fieldClearAffordanceInsetVariants = cva(
   {
     variants: {
       size: {
-        sm: selectCaretSlotWidthClasses.sm,
-        md: selectCaretSlotWidthClasses.md,
-        lg: selectCaretSlotWidthClasses.lg,
+        sm: cn(resolveFieldGroupSizeClass('sm'), resolveFieldGroupCaretSlotClass()),
+        md: cn(resolveFieldGroupSizeClass('md'), resolveFieldGroupCaretSlotClass()),
+        lg: cn(resolveFieldGroupSizeClass('lg'), resolveFieldGroupCaretSlotClass()),
       },
     },
     defaultVariants: {

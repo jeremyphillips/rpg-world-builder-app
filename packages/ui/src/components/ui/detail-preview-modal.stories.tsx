@@ -16,6 +16,6 @@ export const Default: Story = {
     open: true,
     headline: 'Preview fighter',
     onOpenChange: () => undefined,
-    children: <p className="text-sm text-muted-foreground">Caller-owned preview body.</p>,
+    children: <p className="text-style-supporting">Caller-owned preview body.</p>,
   },
 }

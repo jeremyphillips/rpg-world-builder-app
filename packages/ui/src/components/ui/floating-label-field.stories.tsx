@@ -8,18 +8,31 @@ import { Input } from './input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-slots.client'
 import { selectTriggerShellClasses } from './select-compact-trigger.variants'
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
+import { semanticClassSelectArgType } from '../../stories/semantic-classes/semantic-class-arg-types.lib'
 import type { FloatingLabelFieldSize } from './floating-label-field.variants'
+import {
+  FLOATING_LABEL_BLOCK_CLASS,
+  FLOATING_LABEL_SIZE_SPECS,
+} from './floating-label-field.styles'
+import { floatingLabelShellVariants } from './floating-label-field.variants'
 
 const meta = {
   title: 'Primitives/FloatingLabelField',
   component: FloatingLabelField,
   parameters: {
+    semanticClasses: true,
     docs: {
       description: {
-        component:
-          'Floating label composite. Reduced motion zeroes label and placeholder delay together so copy never overlaps. Forced colours replace the mask with a solid Canvas background.',
+        component: `${FLOATING_LABEL_BLOCK_CLASS} owns float state in CSS (\`__layer\`, \`__label\`, \`__text\`). Reduced motion zeroes label and placeholder delay together. Forced colours replace the mask with solid Canvas.`,
       },
     },
+  },
+  argTypes: {
+    size: semanticClassSelectArgType(
+      FLOATING_LABEL_SIZE_SPECS.map((spec) => ({ value: spec.size, className: spec.className })),
+      'size',
+    ),
   },
 } satisfies Meta<typeof FloatingLabelField>
 
@@ -130,12 +143,12 @@ function Pair({
   return (
     <div className="flex flex-wrap items-end gap-6 bg-background p-6">
       <div className="flex flex-col gap-2">
-        <span className="text-xs text-muted-foreground">Compact</span>
+        <span className="text-style-caption">Compact</span>
         {children('sm')}
       </div>
       {size === 'md' ? null : (
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-muted-foreground">Comfortable</span>
+          <span className="text-style-caption">Comfortable</span>
           {children('md')}
         </div>
       )}
@@ -340,6 +353,32 @@ function assertFocusRingClearance(label: HTMLElement, floatedSizeToken: string) 
   const ringOffset = 2
   const ringWidth = 2
   expect(half).toBeGreaterThanOrEqual(ringOffset + ringWidth)
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={FLOATING_LABEL_SIZE_SPECS.map((spec) => ({
+        key: spec.size,
+        sample: (
+          <FloatingLabelField label="School" size={spec.size} populated={false}>
+            <Input
+              value=""
+              size={spec.size}
+              onChange={() => undefined}
+              data-semantic-class-target
+            />
+          </FloatingLabelField>
+        ),
+        propsLabel: `size="${spec.size}"`,
+        className: floatingLabelShellVariants({ size: spec.size }),
+        keyValues: `control height: ${spec.controlHeight}; floated: ${spec.floatedLabelSize}`,
+        useCase: spec.useCase,
+      }))}
+    />
+  ),
 }
 
 export const FocusRing: Story = {

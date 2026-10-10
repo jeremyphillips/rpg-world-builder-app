@@ -125,7 +125,7 @@ describe('EquipmentAddedInventoryRowItem', () => {
 
     expect(screen.getByText('Common choice')).toBeInTheDocument()
     const releaseButton = screen.getByRole('button', { name: 'Release' })
-    expect(releaseButton).toHaveClass('h-control-action-compact')
+    expect(releaseButton).toHaveClass('ui-button--sm-compact')
     expect(releaseButton).not.toHaveClass('bg-secondary')
     await user.click(releaseButton)
     expect(onReleaseGrant).toHaveBeenCalledWith({

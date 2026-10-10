@@ -91,7 +91,7 @@ export function ResolutionEffectReferenceTitle({
   return (
     <span
       id={id}
-      className={cn('block min-w-0 truncate text-sm font-medium leading-none', className)}
+      className={cn('block min-w-0 truncate text-style-label leading-none', className)}
       title={plainText}
       aria-label={ariaLabel}
     >

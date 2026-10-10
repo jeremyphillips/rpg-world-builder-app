@@ -5,7 +5,7 @@ import {
   fieldBorderLadderToneClasses,
   type FieldBorderLadderTone,
 } from './field-border-ladder.variants'
-import { fieldSizeTypographyClasses, type FieldSizeToken } from './field-sizing.variants'
+import { type FieldSizeToken } from './field-sizing.variants'
 
 /**
  * Form layout spacing — single source of truth.
@@ -158,11 +158,9 @@ export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
 export const fieldChipWrapGapClasses = 'gap-2'
-export const fieldGroupDescriptionTypographyClasses =
-  'font-normal leading-normal text-muted-foreground'
+export const fieldGroupDescriptionTypographyClasses = 'text-style-field-hint'
 /** Compact group legend description — 12px caption scale. */
-export const fieldGroupDescriptionCompactTypographyClasses =
-  'text-xs font-normal leading-normal text-muted-foreground'
+export const fieldGroupDescriptionCompactTypographyClasses = 'text-style-field-hint-compact'
 /** Group/subgroup hint copy — legend→body spacing lives on FieldGroup body wrapper. */
 export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
@@ -187,18 +185,19 @@ export const fieldGroupLegendSpacingClasses = 'mb-5'
 /** Subgroup legend header bottom margin (16px). */
 export const fieldSubgroupLegendSpacingClasses = 'mb-4'
 /** Shared legend typography — field groups and array section legends. */
-export const fieldGroupLegendTypographyClasses =
-  'text-field-group-legend font-heading leading-none text-foreground'
+export const fieldGroupLegendTypographyClasses = 'text-style-field-legend'
 /** Nested subgroup legend typography — smaller scale for groups inside another group. */
-export const fieldSubgroupLegendTypographyClasses =
-  'text-field-subgroup-legend font-heading leading-none text-foreground'
+export const fieldSubgroupLegendTypographyClasses = 'text-style-field-legend-sub'
 /** Compact section/subgroup legend typography — 15px heading scale. */
-export const fieldGroupLegendCompactTypographyClasses =
-  'text-md font-heading leading-none text-foreground'
+export const fieldGroupLegendCompactTypographyClasses = 'text-style-field-legend-compact'
 /** Repeatable array section legend — matches leaf field label typography. */
-export const fieldLabelTypographyVariants = cva('font-field-label leading-none text-foreground', {
+export const fieldLabelTypographyVariants = cva('', {
   variants: {
-    size: fieldSizeTypographyClasses,
+    size: {
+      sm: 'text-style-field-label-sm',
+      md: 'text-style-field-label-md',
+      lg: 'text-style-field-label-lg',
+    },
   },
   defaultVariants: {
     size: 'md',
@@ -227,11 +226,9 @@ export function resolveArrayLegendClassName(size: FieldSizeToken = 'md'): string
 /** @deprecated Use {@link resolveArrayLegendClassName} — retained for class drift tests. */
 export const fieldArrayLegendSpacingClasses = 'mb-1.5'
 /** @deprecated Use {@link fieldLabelTypographyVariants}. */
-export const fieldArrayLegendTypographyClasses =
-  'text-md font-field-label leading-none text-foreground'
+export const fieldArrayLegendTypographyClasses = 'text-style-field-label-md'
 /** @deprecated Use {@link fieldLabelTypographyVariants}. */
-export const fieldArrayLegendSmTypographyClasses =
-  'text-xs font-field-label leading-none text-foreground'
+export const fieldArrayLegendSmTypographyClasses = 'text-style-field-label-sm'
 /**
  * @deprecated Prefer {@link formSectionHeaderActionLayoutClasses} from form presentation.
  * Retained for class drift tests only.
@@ -471,38 +468,39 @@ export type FieldHintPosition = 'below-label' | 'below-control'
 /** Label and control arrangement for standard field wrappers. */
 export type FieldLabelPosition = 'above' | 'settings'
 
-export const fieldLabelVariants = cva(
-  ['flex w-fit self-start items-center gap-1.5 font-field-label leading-none'],
-  {
-    variants: {
-      size: fieldSizeTypographyClasses,
-      /** First-line min-height for inline toggles — keeps `font-field-label` typography. */
-      placement: {
-        default: '',
-        inlineSwitch: 'min-h-5',
-        inlineCheckbox: 'min-h-4',
-      },
+export const fieldLabelVariants = cva(['flex w-fit self-start items-center gap-1.5'], {
+  variants: {
+    size: {
+      sm: 'text-style-field-label-sm',
+      md: 'text-style-field-label-md',
+      lg: 'text-style-field-label-lg',
     },
-    compoundVariants: [
-      { placement: 'default', size: 'sm', class: 'min-h-4' },
-      { placement: 'default', size: 'md', class: 'min-h-[1.375rem]' },
-      { placement: 'default', size: 'lg', class: 'min-h-[1.375rem]' },
-    ],
-    defaultVariants: {
-      size: 'md',
-      placement: 'default',
+    /** First-line min-height for inline toggles — type stays on the size utility. */
+    placement: {
+      default: '',
+      inlineSwitch: 'min-h-5',
+      inlineCheckbox: 'min-h-4',
     },
   },
-)
+  compoundVariants: [
+    { placement: 'default', size: 'sm', class: 'min-h-4' },
+    { placement: 'default', size: 'md', class: 'min-h-[1.375rem]' },
+    { placement: 'default', size: 'lg', class: 'min-h-[1.375rem]' },
+  ],
+  defaultVariants: {
+    size: 'md',
+    placement: 'default',
+  },
+})
 
 export type FieldLabelPlacement = NonNullable<VariantProps<typeof fieldLabelVariants>['placement']>
 
 export const fieldErrorTextVariants = cva('', {
   variants: {
     size: {
-      sm: 'text-xs',
-      md: 'text-xs',
-      lg: 'text-xs',
+      sm: 'text-style-field-error',
+      md: 'text-style-field-error',
+      lg: 'text-style-field-error',
     },
   },
   defaultVariants: {

@@ -23,5 +23,5 @@ export const mediaCropStyles = {
   preview: cva('relative size-20 overflow-hidden bg-sunken', {
     variants: { circle: { true: 'rounded-full', false: 'rounded-md' } },
   }),
-  label: cva('text-xs text-muted-foreground'),
+  label: cva('text-style-caption'),
 }

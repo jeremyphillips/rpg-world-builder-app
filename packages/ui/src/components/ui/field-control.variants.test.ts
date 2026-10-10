@@ -1,28 +1,58 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldWidthVariants, resolveFieldWidthClassName } from './field-control.variants'
+import {
+  UI_FIELD_CONTROL_BLOCK_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_CLASS,
+  resolveFieldControlMultilineSizeClass,
+  resolveFieldControlSizeClass,
+} from './field-control.styles'
+import {
+  fieldControlTriggerVariants,
+  fieldControlVariants,
+  fieldWidthVariants,
+  resolveFieldWidthClassName,
+  textareaVariants,
+} from './field-control.variants'
 
-describe('fieldWidthVariants', () => {
-  it('adds explicit row widths for intrinsic xs–xl tokens', () => {
-    expect(fieldWidthVariants({ width: 'xs' })).toContain('in-data-[field-row]:w-16')
-    expect(fieldWidthVariants({ width: 'sm' })).toContain('in-data-[field-row]:w-24')
-    expect(fieldWidthVariants({ width: 'md' })).toContain('in-data-[field-row]:w-36')
-    expect(fieldWidthVariants({ width: 'lg' })).toContain('in-data-[field-row]:w-48')
-    expect(fieldWidthVariants({ width: 'xl' })).toContain('in-data-[field-row]:w-64')
+describe('fieldControlVariants', () => {
+  it('maps md to ui-field-control block and size modifier', () => {
+    const classes = fieldControlVariants({ size: 'md' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(resolveFieldControlSizeClass('md'))
   })
 
-  it('leaves auto and proportional tokens unchanged', () => {
-    expect(fieldWidthVariants({ width: 'auto' })).toBe('w-fit flex-none')
-    expect(fieldWidthVariants({ width: 'full' })).toBe('w-full flex-1')
-    expect(fieldWidthVariants({ width: '1/2' })).not.toContain('in-data-[field-row]')
+  it('maps textarea md to multiline modifier', () => {
+    const classes = textareaVariants({ size: 'md' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(resolveFieldControlMultilineSizeClass('md'))
+  })
+
+  it('maps trigger shell to trigger modifier and size', () => {
+    const classes = fieldControlTriggerVariants({ size: 'sm' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(UI_FIELD_CONTROL_TRIGGER_CLASS)
+    expect(classes).toContain(resolveFieldControlSizeClass('sm'))
+  })
+})
+
+describe('fieldWidthVariants', () => {
+  it('maps intrinsic and proportional tokens to semantic width modifiers', () => {
+    expect(fieldWidthVariants({ width: 'xs' })).toBe('ui-field-control--width-xs')
+    expect(fieldWidthVariants({ width: 'sm' })).toBe('ui-field-control--width-sm')
+    expect(fieldWidthVariants({ width: 'md' })).toBe('ui-field-control--width-md')
+    expect(fieldWidthVariants({ width: 'lg' })).toBe('ui-field-control--width-lg')
+    expect(fieldWidthVariants({ width: 'xl' })).toBe('ui-field-control--width-xl')
+    expect(fieldWidthVariants({ width: 'auto' })).toBe('ui-field-control--width-auto')
+    expect(fieldWidthVariants({ width: 'full' })).toBe('ui-field-control--width-full')
+    expect(fieldWidthVariants({ width: '1/2' })).toBe('ui-field-control--width-1/2')
   })
 })
 
 describe('resolveFieldWidthClassName', () => {
   it('keeps flex fraction caps when not participating in an anatomy grid', () => {
-    expect(resolveFieldWidthClassName('1/2')).toContain('max-w-1/2')
-    expect(resolveFieldWidthClassName('1/3')).toContain('max-w-1/3')
-    expect(resolveFieldWidthClassName('full')).toBe('w-full flex-1')
+    expect(resolveFieldWidthClassName('1/2')).toBe('ui-field-control--width-1/2')
+    expect(resolveFieldWidthClassName('1/3')).toBe('ui-field-control--width-1/3')
+    expect(resolveFieldWidthClassName('full')).toBe('ui-field-control--width-full')
   })
 
   it('drops fraction max-width when participating so the grid track owns sizing', () => {

@@ -43,9 +43,9 @@ export const toastModalViewportVariants = cva([
   'absolute inset-x-0 bottom-20 z-toast mx-auto flex w-[min(calc(100%-2rem),26.25rem)] flex-col gap-2 px-4 outline-none',
 ])
 
-export const toastTitleVariants = cva('text-sm font-medium text-foreground')
+export const toastTitleVariants = cva('text-style-label text-foreground')
 
-export const toastDescriptionVariants = cva('text-sm text-muted-foreground')
+export const toastDescriptionVariants = cva('text-style-supporting')
 
 export const toastActionsVariants = cva('flex shrink-0 items-center gap-2')
 

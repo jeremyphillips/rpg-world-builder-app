@@ -21,7 +21,7 @@ export function EquipmentPickerCharacterPreviewSection({
       <ul className="space-y-1" role="list">
         {previewLines.map((line) => (
           <li key={line}>
-            <span className="text-sm text-muted-foreground">{line}</span>
+            <span className="text-style-supporting">{line}</span>
           </li>
         ))}
       </ul>

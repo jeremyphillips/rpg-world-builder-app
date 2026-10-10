@@ -10,7 +10,7 @@ describe('FilterFieldCaption', () => {
 
     const caption = screen.getByText('Equipment kind')
     expect(caption.tagName).toBe('SPAN')
-    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(caption).toHaveClass('text-style-caption')
   })
 
   it('renders a label associated with its control', () => {
@@ -34,8 +34,8 @@ describe('FilterFieldCaption', () => {
 
     const caption = screen.getByText('Equipment kind')
     expect(caption).toHaveAttribute('id', 'kind-label')
-    expect(caption).toHaveClass('text-sm', 'text-muted-foreground')
-    expect(caption).not.toHaveClass('text-xs')
+    expect(caption).toHaveClass('text-style-supporting')
+    expect(caption).not.toHaveClass('text-style-caption')
   })
 
   it('lets an explicit density override inherited chrome', () => {
@@ -45,6 +45,6 @@ describe('FilterFieldCaption', () => {
       </FilterChromeProvider>,
     )
 
-    expect(screen.getByText('Equipment kind')).toHaveClass('text-sm')
+    expect(screen.getByText('Equipment kind')).toHaveClass('text-style-supporting')
   })
 })

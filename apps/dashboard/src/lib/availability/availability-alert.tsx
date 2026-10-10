@@ -76,7 +76,7 @@ export function AvailabilityAlert({
       title={multipleReasonsTitle}
       actions={<AvailabilityAlertActions availability={availability} context={context} />}
     >
-      <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+      <ul className="list-disc space-y-2 pl-5 text-style-supporting">
         {reasons.map((reason) => {
           const definition = getAvailabilityReasonDefinition(reason.code)
           return (

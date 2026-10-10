@@ -95,13 +95,17 @@ describe('CampaignAvailabilityField', () => {
     )
 
     expect(screen.getByText('Campaign availability').closest('span,legend,h3')).toHaveClass(
-      'text-xs',
+      'text-style-field-label-sm',
     )
 
     await expandInlineAvailability(user)
 
-    expect(screen.getByText('Available in this campaign').closest('label')).toHaveClass('text-xs')
-    expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass('text-xs')
+    expect(screen.getByText('Available in this campaign').closest('label')).toHaveClass(
+      'text-style-field-label-sm',
+    )
+    expect(screen.getByRole('combobox', { name: 'Player access' })).toHaveClass(
+      'ui-field-control--sm',
+    )
   })
 
   it('shows the participant picker inset behind a rail when specific players is selected', async () => {

@@ -18,7 +18,7 @@ describe('NewCampaignLink', () => {
 
     const link = screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel })
     expect(link).toHaveAttribute('href', '/campaigns/new')
-    expect(link).toHaveClass('h-8')
+    expect(link).toHaveClass('ui-button--sm')
     expect(link).not.toHaveClass('border-interactive-outline')
 
     rerender(
@@ -29,6 +29,6 @@ describe('NewCampaignLink', () => {
 
     expect(
       screen.getByRole('link', { name: CAMPAIGNS_OVERVIEW_COPY.newCampaignLabel }),
-    ).toHaveClass('border-interactive-outline')
+    ).toHaveClass('ui-button--outline')
   })
 })

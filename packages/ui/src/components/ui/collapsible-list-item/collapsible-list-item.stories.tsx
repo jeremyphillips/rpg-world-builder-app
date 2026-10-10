@@ -13,7 +13,7 @@ const defaultArgs = {
   collapsed: true,
   onToggleCollapse: () => undefined,
   header: (
-    <Text as="span" className="truncate text-sm font-medium">
+    <Text as="span" className="truncate text-style-label">
       Battle Axe · Weapon
     </Text>
   ),
@@ -47,7 +47,7 @@ function CollapsibleListItemDemo({
       collapsed={collapsed}
       onToggleCollapse={() => setCollapsed((current) => !current)}
       header={
-        <Text as="span" className="truncate text-sm font-medium">
+        <Text as="span" className="truncate text-style-label">
           Battle Axe · Weapon
         </Text>
       }
@@ -62,7 +62,7 @@ function CollapsibleListItemDemo({
         </div>
       }
       body={
-        <div className="space-y-3 text-sm text-muted-foreground">
+        <div className="space-y-3 text-style-supporting">
           <div>
             <p className="font-medium text-foreground">Weapon details</p>
             <p>Category: Martial weapon</p>
@@ -118,11 +118,11 @@ export const CompoundApi: Story = {
       }
     >
       <CollapsibleListItem.Toolbar
-        header={<span className="text-sm font-medium">Compound header</span>}
-        summary={<span className="text-xs text-muted-foreground">Optional summary</span>}
+        header={<span className="text-style-label">Compound header</span>}
+        summary={<span className="text-style-caption">Optional summary</span>}
       />
       <CollapsibleListItem.Body>
-        <p className="text-sm text-muted-foreground">Compound body slot</p>
+        <p className="text-style-supporting">Compound body slot</p>
       </CollapsibleListItem.Body>
     </CollapsibleListItem.Root>
   ),

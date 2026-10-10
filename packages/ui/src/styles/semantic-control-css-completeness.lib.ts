@@ -1,0 +1,555 @@
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { semanticCustomPropertyPrefix, type SemanticClassPrefix } from './semantic-class-prefix'
+
+/** Modifier dimensions registered for the completeness guard (extended per migration phase). */
+export type SemanticControlCssDimension = {
+  /** BEM modifier prefix, e.g. `ui-button--` */
+  modifierPrefix: string
+  /** Declarations every modifier in this dimension must define (same keys). */
+  requiredProperties: readonly string[]
+}
+
+export type SemanticControlCssRegistryEntry = {
+  filePath: string
+  /**
+   * Class prefix without the trailing hyphen. Custom properties
+   * `--${classPrefix}-*` may differ across modifiers in one dimension.
+   * @default 'ui'
+   */
+  classPrefix?: SemanticClassPrefix
+  dimensions: SemanticControlCssDimension[]
+}
+
+type ParsedRule = {
+  selector: string
+  properties: Set<string>
+}
+
+function parseCssRules(css: string): ParsedRule[] {
+  const stripped = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const rules: ParsedRule[] = []
+  const blockRe = /([^{]+)\{([^}]*)\}/g
+
+  for (const match of stripped.matchAll(blockRe)) {
+    const selector = match[1]!.trim()
+    const body = match[2]!
+    const properties = new Set<string>()
+    for (const decl of body.split(';')) {
+      const prop = decl.trim().split(':')[0]?.trim()
+      if (prop) properties.add(prop)
+    }
+    rules.push({ selector, properties })
+  }
+
+  return rules
+}
+
+function normalizeSelectorToken(token: string): string {
+  return token.replace(/\\(.)/g, '$1')
+}
+
+function selectorTargetsModifier(selector: string, className: string): boolean {
+  const normalizedClass = normalizeSelectorToken(className)
+  return selector.split(',').some((part) => {
+    const trimmed = normalizeSelectorToken(part.trim())
+    if (trimmed === normalizedClass) return true
+    if (trimmed.startsWith(`${normalizedClass}:`)) return true
+    if (trimmed.startsWith(`${normalizedClass}[`)) return true
+    return false
+  })
+}
+
+function modifiersForDimension(rules: ParsedRule[], modifierPrefix: string) {
+  const className = modifierPrefix.startsWith('.') ? modifierPrefix : `.${modifierPrefix}`
+  return rules.filter(
+    (rule) =>
+      selectorTargetsModifier(rule.selector, className) &&
+      rule.selector.split(',').some((part) => part.trim() === className),
+  )
+}
+
+function compareModifierPropertySets(
+  modifiers: ParsedRule[],
+  filePath: string,
+  classPrefix: SemanticClassPrefix,
+): string[] {
+  if (modifiers.length < 2) return []
+
+  const failures: string[] = []
+  const reference = modifiers[0]!
+  const customPropertyPrefix = semanticCustomPropertyPrefix(classPrefix)
+
+  for (const rule of modifiers.slice(1)) {
+    for (const prop of reference.properties) {
+      if (!rule.properties.has(prop) && !prop.startsWith(customPropertyPrefix)) {
+        failures.push(
+          `${filePath}: ${rule.selector} missing \`${prop}\` (see ${reference.selector})`,
+        )
+      }
+    }
+  }
+
+  return failures
+}
+
+function missingRequiredProperties(
+  modifiers: ParsedRule[],
+  required: readonly string[],
+  filePath: string,
+): string[] {
+  const failures: string[] = []
+  const requiredSet = new Set(required)
+
+  for (const rule of modifiers) {
+    for (const prop of requiredSet) {
+      if (!rule.properties.has(prop)) {
+        failures.push(`${filePath}: ${rule.selector} missing required \`${prop}\``)
+      }
+    }
+  }
+
+  return failures
+}
+
+export function validateSemanticControlCssCompleteness(
+  entry: SemanticControlCssRegistryEntry,
+): string[] {
+  const rules = parseCssRules(readFileSync(entry.filePath, 'utf8'))
+
+  const classPrefix = entry.classPrefix ?? 'ui'
+
+  return entry.dimensions.flatMap((dimension) => {
+    const modifiers = modifiersForDimension(rules, dimension.modifierPrefix)
+    return [
+      ...missingRequiredProperties(modifiers, dimension.requiredProperties, entry.filePath),
+      ...compareModifierPropertySets(modifiers, entry.filePath, classPrefix),
+    ]
+  })
+}
+
+const stylesDir = path.dirname(fileURLToPath(import.meta.url))
+
+const buttonCssPath = path.join(stylesDir, '../components/ui/button.css')
+
+const fieldControlCssPath = path.join(stylesDir, '../components/ui/field-control.css')
+
+const compactControlCssPath = path.join(stylesDir, '../components/ui/compact-control.css')
+
+const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css')
+
+const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
+
+const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
+
+const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
+
+const alertCssPath = path.join(stylesDir, '../components/ui/alert.css')
+
+const popoverContentCssPath = path.join(stylesDir, '../components/ui/popover-content.css')
+
+const compactLabelCssPath = path.join(stylesDir, '../components/ui/compact-label.css')
+
+const cardCssPath = path.join(stylesDir, '../components/ui/card.css')
+
+const insetPanelCssPath = path.join(stylesDir, '../components/ui/inset-panel.css')
+
+const BUTTON_APPEARANCE_MODIFIERS = [
+  'primary',
+  'destructive',
+  'warning',
+  'secondary',
+  'outline',
+  'ghost',
+] as const
+
+const BUTTON_LABELED_SIZE_MODIFIERS = [
+  'xs',
+  'xs-compact',
+  'sm',
+  'sm-compact',
+  'md',
+  'md-compact',
+  'lg',
+  'lg-compact',
+] as const
+
+const BUTTON_ICON_SIZE_MODIFIERS = ['icon-xs', 'icon-compact', 'icon-md', 'icon-lg'] as const
+
+const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
+const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const
+const BUTTON_ICON_SIZE_REQUIRED = ['width', 'height'] as const
+
+const FIELD_CONTROL_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_CONTROL_MULTILINE_MODIFIERS = ['multiline-sm', 'multiline-md', 'multiline-lg'] as const
+const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-sm', 'digits-md', 'digits-lg'] as const
+const FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS = ['filter-outline', 'filter-ghost'] as const
+
+const FIELD_CONTROL_SIZE_REQUIRED = [
+  'height',
+  'padding-inline',
+  'padding-block',
+  'font-size',
+  'line-height',
+] as const
+
+const FIELD_CONTROL_MULTILINE_REQUIRED = [
+  'min-height',
+  'padding-inline',
+  'padding-block',
+  'font-size',
+  'line-height',
+] as const
+
+const FIELD_CONTROL_DIGITS_REQUIRED = ['padding-inline-start', 'padding-inline-end'] as const
+
+const FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED = ['background-color', 'border-color'] as const
+
+const FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS = [
+  'trigger-fill',
+  'trigger-fit',
+  'trigger-segment',
+] as const
+
+const FIELD_CONTROL_TRIGGER_FLOW_REQUIRED = ['width', 'flex-shrink'] as const
+
+const FIELD_CONTROL_WIDTH_INTRINSIC_MODIFIERS = [
+  'width-xs',
+  'width-sm',
+  'width-md',
+  'width-lg',
+  'width-xl',
+] as const
+
+const FIELD_CONTROL_WIDTH_INTRINSIC_REQUIRED = ['max-width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_AUTO_REQUIRED = ['width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_FULL_REQUIRED = ['width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_FRACTION_MODIFIERS = [
+  'width-1/2',
+  'width-1/3',
+  'width-2/3',
+  'width-1/4',
+  'width-3/4',
+] as const
+
+const FIELD_CONTROL_WIDTH_FRACTION_REQUIRED = [
+  'min-width',
+  'max-width',
+  'flex-basis',
+  'flex-grow',
+] as const
+
+const COMPACT_CONTROL_ICON_MODIFIERS = [
+  'icon-compact',
+  'icon-compact-sm',
+  'icon-xs',
+  'icon-default',
+  'icon-lg',
+] as const
+
+const COMPACT_CONTROL_STEPPER_MODIFIERS = [
+  'stepper-button-xs',
+  'stepper-button-sm',
+  'stepper-button-md',
+  'stepper-button-lg',
+] as const
+
+const COMPACT_CONTROL_ICON_REQUIRED = ['width', 'height'] as const
+
+const COMPACT_CONTROL_STEPPER_REQUIRED = ['width', 'height'] as const
+
+const FIELD_GROUP_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+
+const FIELD_GROUP_SIZE_REQUIRED = [
+  '--ui-field-group-height',
+  '--ui-field-slot-ps-start',
+  '--ui-field-slot-pe-end-content',
+  '--ui-field-action-px',
+  '--ui-field-caret-width',
+] as const
+
+const CHOICE_CONTROL_KIND_MODIFIERS = ['checkbox', 'radio'] as const
+
+const CHOICE_CONTROL_SWITCH_MODIFIERS = ['switch'] as const
+
+const CHOICE_CONTROL_INDICATOR_MODIFIERS = ['indicator-sm', 'indicator-lg'] as const
+
+const CHOICE_CONTROL_KIND_REQUIRED = ['width', 'height', 'border-radius'] as const
+
+const CHOICE_CONTROL_SWITCH_REQUIRED = ['width', 'height', 'border-radius'] as const
+
+const CHOICE_CONTROL_INDICATOR_REQUIRED = ['width', 'height'] as const
+
+const INTERACTIVE_ROW_HOVER_MODIFIERS = [
+  'hover-none',
+  'hover-selectable',
+  'hover-navigation',
+  'hover-selected',
+  'hover-surface',
+] as const
+
+const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
+  'selected-none',
+  'selected-fill',
+  'selected-bordered',
+  'fill-surface',
+] as const
+
+const INTERACTIVE_ROW_STATE_MODIFIERS = [
+  'state-default',
+  'state-inactive',
+  'state-disabled',
+] as const
+
+const INTERACTIVE_ROW_DATA_MODIFIERS = ['data-none', 'data-selected', 'data-checked'] as const
+
+const INTERACTIVE_ROW_HIT_MODIFIERS = ['hit-none', 'hit-pointer'] as const
+
+const INTERACTIVE_LIST_ROW_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+
+const INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS = ['match', 'fit'] as const
+
+const INTERACTIVE_ROW_HOVER_REQUIRED = ['--ui-row-bg-hover'] as const
+
+const INTERACTIVE_ROW_SELECTED_REQUIRED = ['--ui-row-bg', '--ui-row-border'] as const
+
+const INTERACTIVE_ROW_STATE_REQUIRED = [
+  'opacity',
+  'pointer-events',
+  '--ui-row-border-style',
+  '--ui-row-state-border',
+] as const
+
+const INTERACTIVE_ROW_DATA_REQUIRED = [
+  '--ui-row-bg-data-selected',
+  '--ui-row-bg-data-checked',
+] as const
+
+const INTERACTIVE_ROW_HIT_REQUIRED = ['cursor'] as const
+
+const INTERACTIVE_LIST_ROW_SIZE_REQUIRED = ['gap', 'padding-inline', 'padding-block'] as const
+
+const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
+
+/** Registry populated as component CSS ships (Button, field-control, …). */
+export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
+  {
+    filePath: buttonCssPath,
+    dimensions: [
+      ...BUTTON_APPEARANCE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_APPEARANCE_REQUIRED,
+      })),
+      ...BUTTON_LABELED_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_LABELED_SIZE_REQUIRED,
+      })),
+      ...BUTTON_ICON_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_ICON_SIZE_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: fieldControlCssPath,
+    dimensions: [
+      ...FIELD_CONTROL_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_SIZE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_MULTILINE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_MULTILINE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_DIGITS_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_DIGITS_REQUIRED,
+      })),
+      ...FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_TRIGGER_FLOW_REQUIRED,
+      })),
+      ...FIELD_CONTROL_WIDTH_INTRINSIC_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_WIDTH_INTRINSIC_REQUIRED,
+      })),
+      {
+        modifierPrefix: 'ui-field-control--width-auto',
+        requiredProperties: FIELD_CONTROL_WIDTH_AUTO_REQUIRED,
+      },
+      {
+        modifierPrefix: 'ui-field-control--width-full',
+        requiredProperties: FIELD_CONTROL_WIDTH_FULL_REQUIRED,
+      },
+      ...FIELD_CONTROL_WIDTH_FRACTION_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_WIDTH_FRACTION_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: compactControlCssPath,
+    dimensions: [
+      ...COMPACT_CONTROL_ICON_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-compact-control--${name}`,
+        requiredProperties: COMPACT_CONTROL_ICON_REQUIRED,
+      })),
+      ...COMPACT_CONTROL_STEPPER_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-compact-control--${name}`,
+        requiredProperties: COMPACT_CONTROL_STEPPER_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: fieldGroupCssPath,
+    dimensions: FIELD_GROUP_SIZE_MODIFIERS.map((name) => ({
+      modifierPrefix: `ui-field-group--${name}`,
+      requiredProperties: FIELD_GROUP_SIZE_REQUIRED,
+    })),
+  },
+  {
+    filePath: choiceControlCssPath,
+    dimensions: [
+      ...CHOICE_CONTROL_KIND_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_KIND_REQUIRED,
+      })),
+      ...CHOICE_CONTROL_SWITCH_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_SWITCH_REQUIRED,
+      })),
+      ...CHOICE_CONTROL_INDICATOR_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_INDICATOR_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: interactiveRowCssPath,
+    dimensions: [
+      ...INTERACTIVE_ROW_HOVER_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_HOVER_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_SELECTED_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_SELECTED_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_STATE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_STATE_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_DATA_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_DATA_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_HIT_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_HIT_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: interactiveListCssPath,
+    dimensions: [
+      ...INTERACTIVE_LIST_ROW_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-list__main--${name}`,
+        requiredProperties: INTERACTIVE_LIST_ROW_SIZE_REQUIRED,
+      })),
+      ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-list__panel--${name}`,
+        requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: cardCssPath,
+    dimensions: [
+      {
+        modifierPrefix: 'ui-card--static',
+        requiredProperties: ['transition-property'],
+      },
+      {
+        modifierPrefix: 'ui-card--interactive',
+        requiredProperties: ['transition-property'],
+      },
+    ],
+  },
+  {
+    filePath: insetPanelCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['border-radius', 'padding'] as const,
+      })),
+      ...(['solid', 'dashed'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['border-style'] as const,
+      })),
+      ...(['align-start', 'align-center'] as const).map((name) => ({
+        modifierPrefix: `ui-inset-panel--${name}`,
+        requiredProperties: ['text-align'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: alertCssPath,
+    dimensions: [
+      ...(['default', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+        modifierPrefix: `ui-alert--${tone}`,
+        requiredProperties: ['border-color', 'background-color', 'color'] as const,
+      })),
+      {
+        modifierPrefix: 'ui-alert--comfortable',
+        requiredProperties: ['gap', 'padding'] as const,
+      },
+      {
+        modifierPrefix: 'ui-alert--compact',
+        requiredProperties: ['gap', 'padding-inline', 'padding-block'] as const,
+      },
+      ...(['comfortable', 'compact'] as const).map((density) => ({
+        modifierPrefix: `ui-alert__title--${density}`,
+        requiredProperties: [
+          'font-size',
+          'line-height',
+          'font-weight',
+          'letter-spacing',
+          'color',
+        ] as const,
+      })),
+    ],
+  },
+  {
+    filePath: popoverContentCssPath,
+    dimensions: [
+      ...(['menu', 'popover', 'tooltip', 'filter'] as const).map((tone) => ({
+        modifierPrefix: `ui-popover-content--${tone}`,
+        requiredProperties: ['background-color', 'padding'] as const,
+      })),
+    ],
+  },
+  {
+    filePath: compactLabelCssPath,
+    dimensions: [
+      ...(['sm', 'md', 'lg'] as const).map((name) => ({
+        modifierPrefix: `ui-compact-label--${name}`,
+        requiredProperties: ['height', 'padding-inline', 'font-size', 'line-height'] as const,
+      })),
+      ...(['outline', 'soft', 'strong'] as const).flatMap((appearance) =>
+        (['neutral', 'info', 'success', 'warning', 'destructive'] as const).map((tone) => ({
+          modifierPrefix: `ui-compact-label--${appearance}-${tone}`,
+          requiredProperties: ['background-color', 'color', 'border-color', 'font-weight'] as const,
+        })),
+      ),
+    ],
+  },
+]

@@ -300,6 +300,7 @@ export {
   CardDescription,
   CardContent,
 } from './components/ui/card'
+export { cardSurfaceClasses, cardSurfaceVariants } from './components/ui/card.variants'
 
 export {
   fieldControlTriggerCursorClasses,
@@ -318,11 +319,8 @@ export {
   fieldDigitTrailingColumnClasses,
   fieldDigitTrailingIconClasses,
   fieldDigitTrailingPaddingClasses,
-  fieldGroupedControlActionPaddingClasses,
-  fieldGroupedControlGeometryClasses,
   fieldGroupedControlHeightClasses,
   fieldGroupedControlSizeClasses,
-  fieldGroupedControlStartPaddingClasses,
   buttonTextSizeToComboboxFieldSize,
   COMBOBOX_SEARCH_FIELD_SIZE_FOR_ICON_BUTTON,
   resolveComboboxSearchFieldSizeForButtonSize,

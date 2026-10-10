@@ -1,0 +1,194 @@
+/*
+ * Floating label — float state is CSS-derived (no React data-floating).
+ * Source order: base shell → size modifiers → float presentation.
+ */
+@layer components {
+  .ui-floating-label-field {
+    position: relative;
+    min-width: 0;
+    overflow: visible;
+    --floating-label-move: 150ms;
+    --floating-label-placeholder-fade: 100ms;
+    --floating-label-mask-pad: 0.25rem;
+  }
+
+  .ui-floating-label-field > button,
+  .ui-floating-label-field > input {
+    vertical-align: top;
+  }
+
+  .ui-floating-label-field--sm {
+    --floating-label-control-h: calc(var(--spacing) * 8);
+    --field-floating-label-size: var(--field-floating-label-sm);
+    --floating-label-layer-end-floated: calc(var(--spacing) * 2.5);
+  }
+
+  .ui-floating-label-field--md {
+    --floating-label-control-h: calc(var(--spacing) * 9);
+    --field-floating-label-size: var(--field-floating-label-md);
+    --floating-label-layer-end-floated: calc(var(--spacing) * 3);
+  }
+
+  .ui-floating-label-field--sm .ui-floating-label-field__label {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-floating-label-field--md .ui-floating-label-field__label {
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+  }
+
+  .ui-floating-label-field__layer {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    height: var(--floating-label-control-h);
+    align-items: center;
+    overflow: visible;
+  }
+
+  .ui-floating-label-field--sm .ui-floating-label-field__layer {
+    inset-inline-start: calc(var(--spacing) * 2.5);
+    inset-inline-end: calc(var(--spacing) * 8);
+  }
+
+  .ui-floating-label-field--md .ui-floating-label-field__layer {
+    inset-inline-start: calc(var(--spacing) * 3);
+    inset-inline-end: calc(var(--spacing) * 8);
+  }
+
+  .ui-floating-label-field:is(
+      :focus-within,
+      [data-populated='true'],
+      :has([aria-expanded='true']),
+      :has(:autofill),
+      :has(:-webkit-autofill)
+    )
+    .ui-floating-label-field__layer {
+    inset-inline-end: var(--floating-label-layer-end-floated);
+  }
+
+  .ui-floating-label-field__label {
+    pointer-events: none;
+    position: relative;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    min-width: 0;
+    font-weight: 400;
+    transform-origin: left center;
+    color: var(--field-control-placeholder);
+    transition:
+      translate var(--floating-label-move) ease-out var(--floating-label-placeholder-fade),
+      font-size var(--floating-label-move) ease-out var(--floating-label-placeholder-fade),
+      color var(--floating-label-move) ease-out var(--floating-label-placeholder-fade);
+  }
+
+  .ui-floating-label-field__label::before {
+    position: absolute;
+    inset: -1px calc(-1 * var(--floating-label-mask-pad));
+    z-index: -1;
+    border-radius: calc(var(--radius) - 2px);
+    opacity: 0;
+    background: var(--surface-current);
+    transition: opacity var(--floating-label-move) ease-out var(--floating-label-placeholder-fade);
+    content: '';
+    mask-image: linear-gradient(to bottom, black 50%, transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent);
+  }
+
+  .ui-floating-label-field__text {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-floating-label-field:is(
+      :focus-within,
+      [data-populated='true'],
+      :has([aria-expanded='true']),
+      :has(:autofill),
+      :has(:-webkit-autofill)
+    )
+    .ui-floating-label-field__label {
+    translate: 0 calc(var(--floating-label-control-h) / -2);
+    font-size: var(--field-floating-label-size);
+    color: var(--muted-foreground);
+    transition-delay: 0ms;
+  }
+
+  .ui-floating-label-field:is(
+      :focus-within,
+      [data-populated='true'],
+      :has([aria-expanded='true']),
+      :has(:autofill),
+      :has(:-webkit-autofill)
+    )
+    .ui-floating-label-field__label::before {
+    opacity: 1;
+    transition-delay: 0ms;
+  }
+
+  .ui-floating-label-field:has([aria-invalid='true']) .ui-floating-label-field__label {
+    color: var(--destructive);
+  }
+
+  .ui-floating-label-field:has(:disabled) .ui-floating-label-field__label {
+    color: var(--field-control-fg-disabled);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ui-floating-label-field__label,
+    .ui-floating-label-field__label::before {
+      transition-duration: 0ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .ui-floating-label-field__label::before {
+      background: none;
+    }
+
+    .ui-floating-label-field:is(
+        :focus-within,
+        [data-populated='true'],
+        :has([aria-expanded='true']),
+        :has(:autofill),
+        :has(:-webkit-autofill)
+      )
+      .ui-floating-label-field__label {
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
+
+  /* Placeholder sequencing — hidden until the label has floated */
+  .ui-floating-label-field input::placeholder,
+  .ui-floating-label-field [data-placeholder] {
+    opacity: 0;
+    transition: opacity var(--floating-label-placeholder-fade) ease-out;
+  }
+
+  .ui-floating-label-field:focus-within[data-populated='false'] input::placeholder,
+  .ui-floating-label-field:focus-within[data-populated='false'] [data-placeholder],
+  .ui-floating-label-field:has([aria-expanded='true'])[data-populated='false'] input::placeholder,
+  .ui-floating-label-field:has([aria-expanded='true'])[data-populated='false'] [data-placeholder] {
+    opacity: 1;
+    transition-delay: var(--floating-label-move);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ui-floating-label-field input::placeholder,
+    .ui-floating-label-field [data-placeholder] {
+      transition-delay: 0ms !important;
+      transition-duration: 0ms !important;
+    }
+  }
+}

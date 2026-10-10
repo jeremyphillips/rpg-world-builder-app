@@ -7,7 +7,7 @@ import {
 } from '@/lib/usage-references/usage-reference-list.lib'
 
 /** Shared chrome for blocker reference summaries in bulk resolution rows. */
-export const actionBlockerReferenceSummaryClasses = 'text-xs text-muted-foreground' as const
+export const actionBlockerReferenceSummaryClasses = 'text-style-caption' as const
 
 /** Bulleted lists nested under bulk resolution rows. */
 export const actionBlockerReferenceRowListClasses = usageReferenceRowListClasses

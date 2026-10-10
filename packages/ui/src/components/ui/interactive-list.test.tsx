@@ -27,17 +27,20 @@ describe('InteractiveListRow', () => {
       <InteractiveListRow name="Fireball" highlighted selected={false} />,
     )
 
-    expect(container.firstChild).toHaveClass('bg-row-hover', 'before:bg-accent')
+    expect(container.firstChild).toHaveClass(
+      'ui-interactive-row--highlight',
+      'ui-interactive-row--rail',
+    )
 
     rerender(<InteractiveListRow name="Fireball" highlighted={false} selected />)
-    expect(container.firstChild).toHaveClass('bg-surface-subtle')
-    expect(container.firstChild).not.toHaveClass('before:bg-accent')
+    expect(container.firstChild).toHaveClass('ui-interactive-row--fill-surface')
+    expect(container.firstChild).not.toHaveClass('ui-interactive-row--rail')
   })
 
   it('applies InteractiveListSize padding on the main hit area', () => {
     const { container } = render(<InteractiveListRow name="Fireball" size="lg" />)
 
-    expect(container.querySelector('.px-4')).toBeInTheDocument()
+    expect(container.querySelector('.ui-interactive-list__main--lg')).toBeInTheDocument()
   })
 
   it('injects identity into an asChild interactive root', async () => {
@@ -128,10 +131,7 @@ describe('InteractiveList', () => {
       </InteractiveList>,
     )
 
-    expect(screen.getByTestId('row-list')).toHaveClass(
-      '[&>*+*]:border-t',
-      '[&>*+*]:border-border-faint',
-    )
+    expect(screen.getByTestId('row-list')).toHaveClass('ui-interactive-list')
   })
 
   it('leaves only direct row children inside the list (headings belong outside)', () => {
@@ -188,7 +188,7 @@ describe('InteractiveListViewport', () => {
       </InteractiveListViewport>,
     )
 
-    expect(screen.getByTestId('viewport')).toHaveClass('overflow-y-auto')
+    expect(screen.getByTestId('viewport')).toHaveClass('ui-interactive-list__viewport')
   })
 })
 

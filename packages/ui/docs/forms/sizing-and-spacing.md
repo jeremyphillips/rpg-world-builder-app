@@ -67,12 +67,16 @@ Do not sprinkle ad-hoc `space-y-*` on field wrappers in apps — adjust shared t
 
 ## Sizing maps
 
-Control height, padding, and type scale come from `field-sizing.variants.ts` (`sm | md | lg`).
+Single-line control **height, padding, and in-control type** come from
+`field-control.css` via `resolveFieldControlSizeClass()` (re-exported through
+`field-sizing.variants.ts` as `fieldControlSizeClasses`). Grouped composite segment geometry
+uses `field-group.css` via `field-group.styles` resolvers. Label type scale for standard
+stacked fields remains in `fieldSizeTypographyClasses` (`sm | md | lg`).
 
 | Map                                | Use                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `fieldSizeTypographyClasses`       | Label + control type scale                                                                       |
-| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …)                                                      |
+| `fieldSizeTypographyClasses`       | Label + non-floating control type scale (stacked fields)                                         |
+| `fieldControlSizeClasses`          | Single-line controls (`Input`, `Select`, …) — semantic `ui-field-control--*` modifiers           |
 | `fieldGroupedControlSizeClasses`   | One segment in grouped shells (`InputSelectField`, `InputUnitField`, `DiceFormulaField`, …)      |
 | `fieldTextareaSizeClasses`         | Multi-line controls                                                                              |
 | `fieldDigitSizeClasses`            | Digit-width control padding                                                                      |
@@ -87,9 +91,12 @@ Labels and controls share `fieldSizeTypographyClasses`. At 16px root:
 
 | `size` | Type scale  | px  | Control height | Use                                 |
 | ------ | ----------- | --- | -------------- | ----------------------------------- |
-| `sm`   | `text-xs`   | 12  | `h-8` (32px)   | Dense toolbars, array/slot defaults |
-| `md`   | `text-md`   | 15  | `h-9` (36px)   | Default — most forms                |
-| `lg`   | `text-base` | 16  | `h-11` (44px)  | Prominent single-field forms        |
+| `sm`   | `text-xs`   | 12  | 32px           | Dense toolbars, array/slot defaults |
+| `md`   | `text-md`   | 15  | 36px           | Default — most forms                |
+| `lg`   | `text-base` | 16  | 44px           | Prominent single-field forms        |
+
+Heights are defined on `.ui-field-control--sm|md|lg` in `field-control.css`, not via Tailwind
+`h-*` in field CVA modules.
 
 ### `width` — sizing within a container
 

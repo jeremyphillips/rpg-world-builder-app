@@ -25,7 +25,7 @@ export function UsageBlockedList({ blockers, campaignId }: UsageBlockedListProps
               <li key={blocker.usage.id}>
                 <Link
                   to={resolveContentUsageReferenceHref(blocker.usage)}
-                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  className="text-style-label text-primary underline-offset-4 hover:underline"
                 >
                   {blocker.usage.label}
                 </Link>
@@ -43,7 +43,7 @@ export function UsageBlockedList({ blockers, campaignId }: UsageBlockedListProps
                 {campaignId ? (
                   <Link
                     to={resolveContentBlockerHref(campaignId, blocker)}
-                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                    className="text-style-label text-primary underline-offset-4 hover:underline"
                   >
                     {blocker.label}
                   </Link>

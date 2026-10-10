@@ -1,6 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import { resolveCompactControlMenuItemClasses } from './compact-control.styles'
 import {
   interactiveListMenuHostClasses,
   interactiveListPanelVariants,
@@ -20,9 +21,9 @@ export const interactiveListChoiceMenuContentClasses = cn(
 export const dropdownMenuChoiceItemVariants = cva('h-auto items-start', {
   variants: {
     size: {
-      sm: 'py-1',
-      md: 'py-2',
-      lg: 'py-2.5',
+      sm: resolveCompactControlMenuItemClasses('sm'),
+      md: resolveCompactControlMenuItemClasses('md'),
+      lg: resolveCompactControlMenuItemClasses('lg'),
     },
   },
   defaultVariants: {

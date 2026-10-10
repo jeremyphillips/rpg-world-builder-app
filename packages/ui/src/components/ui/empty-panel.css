@@ -1,0 +1,16 @@
+/* Compact recessed well for a single passive empty message. */
+@layer components {
+  .ui-empty-panel {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: var(--sunken);
+    color: var(--muted-foreground);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2.5);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-style: italic;
+    box-shadow: var(--shadow-surface-sunken);
+    --surface-current: var(--sunken);
+  }
+}
