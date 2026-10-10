@@ -27,7 +27,7 @@ function RulesConfigLink({ campaignId }: { campaignId: string }) {
   return (
     <Link
       to={campaignSettingHref(campaignId, 'characterCreation.multiclassing.enabled')}
-      className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+      className="text-style-label text-primary underline-offset-4 hover:underline"
     >
       Campaign Rules → Multiclassing
     </Link>

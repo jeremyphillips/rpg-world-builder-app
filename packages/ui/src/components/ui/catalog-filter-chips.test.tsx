@@ -116,7 +116,7 @@ describe('CatalogFilterChips', () => {
     const caption = screen.getByText('Category')
     expect(caption).toHaveAttribute('id', 'category-label')
     expect(caption.tagName).toBe('SPAN')
-    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(caption).toHaveClass('text-style-caption')
     expect(screen.getByRole('radio', { name: 'All' })).toBeInTheDocument()
   })
 
@@ -135,8 +135,8 @@ describe('CatalogFilterChips', () => {
     )
 
     const caption = screen.getByText('Category')
-    expect(caption).toHaveClass('text-sm', 'text-muted-foreground')
-    expect(caption).not.toHaveClass('text-xs')
+    expect(caption).toHaveClass('text-style-supporting')
+    expect(caption).not.toHaveClass('text-style-caption')
   })
 
   it('ignores presentation label classes and follows filter chrome', () => {
@@ -161,7 +161,7 @@ describe('CatalogFilterChips', () => {
     )
 
     const caption = screen.getByText('Category')
-    expect(caption).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(caption).toHaveClass('text-style-caption')
     expect(caption).not.toHaveClass('text-lg')
     expect(screen.getByRole('radio', { name: 'All' })).toHaveClass('ui-compact-label--sm')
   })

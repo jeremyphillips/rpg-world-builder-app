@@ -106,7 +106,7 @@ export const WithStickyFormFooter: Story = {
         <FormStickyScrollBody>
           <div className="p-6">
             <div
-              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-sm text-muted-foreground`}
+              className={`${formStickyTabsClasses} mb-4 flex h-[var(--rpg-form-sticky-tabs-block-size,3rem)] items-center rounded-md border border-border px-3 text-style-supporting`}
             >
               Dummy section tabs
             </div>

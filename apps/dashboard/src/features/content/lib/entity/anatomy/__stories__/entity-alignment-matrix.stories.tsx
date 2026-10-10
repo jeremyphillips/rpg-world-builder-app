@@ -169,7 +169,7 @@ function MatrixCard({
       onToggleCollapse={() => setCollapsed((current) => !current)}
       dragHandleProps={leading === 'grip-caret' ? mockDragHandleProps : undefined}
     >
-      <p className="text-sm text-muted-foreground">Disclosed body.</p>
+      <p className="text-style-supporting">Disclosed body.</p>
     </DisclosureEntityCard>
   )
 }
@@ -277,7 +277,7 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((current) => !current)}
         >
-          <p className="text-sm text-muted-foreground">Disclosed body.</p>
+          <p className="text-style-supporting">Disclosed body.</p>
         </DisclosureEntityCard>
       </div>
     </div>

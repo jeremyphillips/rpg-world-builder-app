@@ -32,7 +32,7 @@ export const dataTableFilterRegionDisclosureRowVariants = cva('flex min-w-0')
 /** Inline disclosure trigger — chevron, label, optional active badge. */
 export const dataTableFilterRegionDisclosureVariants = cva(
   cn(
-    'inline-flex w-fit items-center gap-1.5 rounded-md text-sm font-medium text-foreground',
+    'inline-flex w-fit items-center gap-1.5 rounded-md text-style-label text-foreground',
     'hover:text-foreground/80',
     'disabled:pointer-events-none disabled:opacity-50',
     interactiveFocusVariants({ context: 'embedded' }),

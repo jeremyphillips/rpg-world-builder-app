@@ -57,19 +57,19 @@ export const quickNpcStartingChoiceHeadingClasses = 'text-base font-body-emphasi
 export const quickNpcStartingChoiceHeadingRowClasses =
   'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1'
 
-export const quickNpcStartingChoiceSubsectionDescriptionClasses = 'text-xs text-muted-foreground'
+export const quickNpcStartingChoiceSubsectionDescriptionClasses = 'text-style-caption'
 
-export const quickNpcStartingChoiceProvenanceClasses = 'text-sm text-muted-foreground'
+export const quickNpcStartingChoiceProvenanceClasses = 'text-style-supporting'
 
-export const quickNpcStartingChoiceAllowanceHintClasses = 'text-xs text-muted-foreground'
+export const quickNpcStartingChoiceAllowanceHintClasses = 'text-style-caption'
 
 export const quickNpcStartingChoiceIdentityStackClasses = 'flex min-w-0 flex-col gap-y-0.5'
 
 export const quickNpcStartingChoiceStatusRowClasses =
   'flex flex-wrap items-center justify-between gap-x-2 gap-y-1'
 
-export const quickNpcStartingChoiceEmptyClasses = 'text-sm text-muted-foreground'
+export const quickNpcStartingChoiceEmptyClasses = 'text-style-supporting'
 
 export const quickNpcStartingChoiceAddFooterClasses = 'col-span-3 flex justify-center px-3 py-2'
 
-export const quickNpcStartingChoiceSuggestionHintClasses = 'text-xs text-muted-foreground'
+export const quickNpcStartingChoiceSuggestionHintClasses = 'text-style-caption'

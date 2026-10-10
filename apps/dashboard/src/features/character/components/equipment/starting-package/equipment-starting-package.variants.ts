@@ -7,7 +7,7 @@ export const equipmentStartingPackageHeaderCopyClasses = 'min-w-0 flex-1 text-le
 
 export const equipmentStartingPackageHeaderActionsClasses = 'flex shrink-0 items-center gap-1'
 
-export const equipmentStartingPackageSubtitleClasses = 'text-sm text-muted-foreground'
+export const equipmentStartingPackageSubtitleClasses = 'text-style-supporting'
 
 /** Gold-path empty line — 8px below the Starting Package heading. */
 export const equipmentStartingPackageGoldSubtitleClasses = `${equipmentStartingPackageSubtitleClasses} mt-2`
@@ -29,21 +29,19 @@ export const equipmentStartingPackageBodyClasses = 'border-t border-border'
 export const equipmentStartingPackageCategoryClasses = 'space-y-1 px-4 py-3 first:pt-4 last:pb-4'
 
 export const equipmentStartingPackageFooterClasses =
-  'border-t border-border px-4 py-3 text-sm text-muted-foreground'
+  'border-t border-border px-4 py-3 text-style-supporting'
 
 export const equipmentStartingPackageCustomizeFooterClasses = 'flex justify-end px-4 py-3'
 
-export const equipmentStartingPackageCustomizeReasonClasses =
-  'px-4 py-3 text-sm text-muted-foreground'
+export const equipmentStartingPackageCustomizeReasonClasses = 'px-4 py-3 text-style-supporting'
 
 export const equipmentPackageConversionEditorClasses = 'flex flex-col'
 
-export const equipmentPackageConversionEditorDescriptionClasses =
-  'px-4 pt-4 text-sm text-muted-foreground'
+export const equipmentPackageConversionEditorDescriptionClasses = 'px-4 pt-4 text-style-supporting'
 
 export const equipmentPackageConversionEditorBodyClasses = 'space-y-4 px-4 py-4'
 
-export const equipmentPackageConversionBudgetClasses = 'text-xs text-muted-foreground'
+export const equipmentPackageConversionBudgetClasses = 'text-style-caption'
 
 export const equipmentPackageConversionEditorListClasses = 'space-y-3'
 

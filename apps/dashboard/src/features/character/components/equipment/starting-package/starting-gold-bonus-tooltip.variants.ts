@@ -17,7 +17,7 @@ export const startingGoldBonusFormulaVariants = cva('', {
     tone: {
       /** Disclosure tooltip inherits the tooltip's text-sm foreground. */
       inherit: '',
-      muted: 'text-xs text-muted-foreground',
+      muted: 'text-style-caption',
     },
   },
   defaultVariants: {

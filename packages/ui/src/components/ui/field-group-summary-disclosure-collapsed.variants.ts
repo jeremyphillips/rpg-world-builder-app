@@ -15,7 +15,7 @@ export const fieldGroupSummaryStatusLineClasses = 'flex min-w-0 items-center gap
 export const fieldGroupSummaryStatusDetailSeparatorClasses = 'text-muted-foreground'
 
 /** Explanatory line below the status row. */
-export const fieldGroupSummaryStatusSecondaryClasses = 'mt-1 text-xs text-muted-foreground'
+export const fieldGroupSummaryStatusSecondaryClasses = 'mt-1 text-style-caption'
 
 export const fieldGroupSummaryStatusLabelVariants = cva('font-medium', {
   variants: {

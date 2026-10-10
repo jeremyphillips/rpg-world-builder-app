@@ -51,7 +51,7 @@ export const dataTableAdvancedInnerVariants = cva('grid gap-3 p-4', {
 
 /** Pagination row — spaced between count label and page controls. */
 export const dataTablePaginationVariants = cva(
-  'flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground',
+  'flex flex-wrap items-center justify-between gap-2 text-style-supporting',
 )
 
 /** Table container — elevated card plane on the page canvas. */
@@ -98,7 +98,7 @@ export const dataTableRowUnavailableRailVariants = cva(
 
 /** Toolbar notice row below primary filters — hidden counts, filter actions. */
 export const dataTableFilterNoticeVariants = cva(
-  'flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground',
+  'flex flex-wrap items-center gap-x-2 gap-y-1 text-style-caption',
 )
 
 /** Header cell — group context for sort icon hover/focus affordance. */
@@ -199,21 +199,21 @@ export const dataTableColumnDragHandleVariants = cva(
 export const dataTableEmptyStateVariants = cva('h-24 text-center text-muted-foreground')
 
 /** Empty column panel search result. */
-export const dataTableEmptyPanelVariants = cva('px-3 py-2 text-sm text-muted-foreground')
+export const dataTableEmptyPanelVariants = cva('px-3 py-2 text-style-supporting')
 
 /** Locked (always-visible) column row in the panel. */
 export const dataTableLockedColumnVariants = cva(
-  'flex cursor-default items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground',
+  'flex cursor-default items-center gap-2 px-2 py-1.5 text-style-supporting',
 )
 
 /** Reset column order control in the panel footer. */
 export const dataTableResetColumnVariants = cva(
-  'flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+  'flex w-full items-center gap-2 rounded px-2 py-1.5 text-style-supporting hover:bg-accent hover:text-accent-foreground',
 )
 
 /** Active filter chip dismiss control in the toolbar. */
 export const dataTableFilterChipVariants = cva(
-  'inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground',
+  'inline-flex items-center gap-1 text-style-caption hover:text-foreground',
 )
 
 /** Accessible caption below the table — supplementary source / scope note. */

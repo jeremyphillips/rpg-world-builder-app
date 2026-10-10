@@ -174,7 +174,7 @@ function MovementChromeProbeReadout({ revision }: { revision: string }) {
   }, [revision])
 
   return (
-    <div className="flex flex-col gap-1 font-mono text-xs text-muted-foreground">
+    <div className="flex flex-col gap-1 font-mono text-style-caption">
       <span>
         mode control top: {readout.controlTop ?? '—'}px · grip Δ: {readout.gripDelta ?? '—'}px ·
         actions Δ: {readout.actionsDelta ?? '—'}px
@@ -196,7 +196,7 @@ export function MovementChromeStabilityHarness() {
 
   return (
     <div className="flex max-w-2xl flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-style-supporting">
         Species movement shape: hidden item header, mode + speed inline row, drag handle and remove
         on the shared anatomy grid. Step through validation growth — grip and delete should stay
         anchored to the control track.

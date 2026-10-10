@@ -267,7 +267,7 @@ describe('QuickNpcBuildCard', () => {
     expect(screen.getByText('CLASS')).toBeInTheDocument()
     expect(screen.getByText(QUICK_NPC_BUILD_CLASS_NOT_APPLICABLE_LABEL)).toBeInTheDocument()
     const helper = screen.getByText(QUICK_NPC_BUILD_CLASS_LEVEL_ZERO_HELPER)
-    expect(helper).toHaveClass('text-sm')
+    expect(helper).toHaveClass('text-style-supporting')
     expect(
       screen.queryByRole('button', { name: QUICK_NPC_BUILD_CHANGE_CLASS_LABEL }),
     ).not.toBeInTheDocument()

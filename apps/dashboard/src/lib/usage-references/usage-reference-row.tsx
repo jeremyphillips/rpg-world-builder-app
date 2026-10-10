@@ -43,7 +43,7 @@ export function UsageReferenceRow({ reference, campaignId }: UsageReferenceRowPr
       to={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 hover:underline"
+      className="inline-flex items-center gap-1.5 text-style-label text-primary underline-offset-4 hover:underline"
     >
       <span>{reference.label}</span>
       <ExternalLink aria-hidden className="size-icon-inline shrink-0" />

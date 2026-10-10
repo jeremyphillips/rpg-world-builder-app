@@ -30,8 +30,7 @@ describe('SetupAttributeRow', () => {
     )
 
     const helper = screen.getByText('Suggested by Lieutenant.')
-    expect(helper).toHaveClass('text-sm')
-    expect(helper).toHaveClass('text-muted-foreground')
+    expect(helper).toHaveClass('text-style-supporting')
   })
 
   it('can show helper while the editor is open', () => {

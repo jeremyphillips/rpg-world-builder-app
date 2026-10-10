@@ -291,7 +291,7 @@ function RichTextLinkPickerForm({
             required
           />
 
-          <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <label className="inline-flex items-center gap-2 text-style-caption">
             <Checkbox
               checked={internalOpenInNewWindow}
               onCheckedChange={(checked) => setInternalOpenInNewWindow(Boolean(checked))}
@@ -318,7 +318,7 @@ function RichTextLinkPickerForm({
             size="sm"
             required
           />
-          <label className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <label className="inline-flex items-center gap-2 text-style-caption">
             <Checkbox
               checked={externalOpenInNewWindow}
               onCheckedChange={(checked) => setExternalOpenInNewWindow(Boolean(checked))}

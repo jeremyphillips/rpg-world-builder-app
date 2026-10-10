@@ -111,14 +111,12 @@ describe('resolveArrayLegendScale', () => {
 
 describe('field group legend helpers', () => {
   it('applies sm array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('sm')).toContain('text-xs')
-    expect(resolveArrayLegendClassName('sm')).toContain('font-field-label')
+    expect(resolveArrayLegendClassName('sm')).toContain('text-style-field-label-sm')
     expect(resolveArrayLegendClassName('sm')).toContain('mb-1')
   })
 
   it('applies md array legend typography via resolveArrayLegendClassName', () => {
-    expect(resolveArrayLegendClassName('md')).toContain('text-md')
-    expect(resolveArrayLegendClassName('md')).toContain('font-field-label')
+    expect(resolveArrayLegendClassName('md')).toContain('text-style-field-label-md')
     expect(resolveArrayLegendClassName('md')).toContain('mb-1.5')
   })
 
@@ -149,18 +147,17 @@ describe('field group legend helpers', () => {
   it('composes legend class names with header margin', () => {
     expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain('mb-5')
     expect(resolveFieldGroupLegendClassName({ size: 'section' })).toContain(
-      'text-field-group-legend',
+      'text-style-field-legend',
     )
     expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain('mb-4')
     expect(resolveFieldGroupLegendClassName({ size: 'subsection' })).toContain(
-      'text-field-subgroup-legend',
+      'text-style-field-legend-sub',
     )
     const arrayLegendClassName = resolveFieldGroupLegendClassName({
       size: 'array',
       fieldSize: 'md',
     })
-    expect(arrayLegendClassName).toContain('text-md')
-    expect(arrayLegendClassName).toContain('font-field-label')
+    expect(arrayLegendClassName).toContain('text-style-field-label-md')
     expect(arrayLegendClassName).toContain('mb-1.5')
   })
 })

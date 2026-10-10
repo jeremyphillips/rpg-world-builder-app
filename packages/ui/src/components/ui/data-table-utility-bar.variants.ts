@@ -9,7 +9,7 @@ export const dataTableUtilityBarVariants = cva('flex flex-col')
 /** Row 1 — result context summary. */
 export const dataTableUtilityBarSummaryRowVariants = cva(
   cn(
-    'flex items-center bg-surface-subtle px-3 pt-2.5 pb-1.5 text-sm text-muted-foreground',
+    'flex items-center bg-surface-subtle px-3 pt-2.5 pb-1.5 text-style-supporting',
     establishSurfaceCurrent('surface-subtle'),
   ),
 )

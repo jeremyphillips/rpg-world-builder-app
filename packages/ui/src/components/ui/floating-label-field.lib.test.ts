@@ -72,8 +72,8 @@ describe('floating-label-field.lib', () => {
   })
 
   it('uses caption typography without importing filters', () => {
-    expect(fieldCaptionTypographyVariants({ size: 'sm' })).toBe('text-muted-foreground text-xs')
-    expect(fieldCaptionTypographyVariants({ size: 'md' })).toBe('text-muted-foreground text-sm')
+    expect(fieldCaptionTypographyVariants({ size: 'sm' })).toBe('text-style-caption')
+    expect(fieldCaptionTypographyVariants({ size: 'md' })).toBe('text-style-supporting')
   })
 
   it('lines the resting label up with the value inset', () => {

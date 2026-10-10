@@ -8,14 +8,16 @@ import { SwitchField } from './switch-field'
 describe('SwitchField', () => {
   it('applies field size to the label', () => {
     render(<SwitchField id="notify" label="Email reminders" size="sm" />)
-    expect(screen.getByText('Email reminders').closest('label')).toHaveClass('text-xs')
+    expect(screen.getByText('Email reminders').closest('label')).toHaveClass(
+      'text-style-field-label-sm',
+    )
   })
 
   it('keeps inline label typography on fieldLabelVariants', () => {
     render(<SwitchField id="notify" label="Email reminders" />)
     const label = screen.getByText('Email reminders').closest('label')
     expect(label).not.toBeNull()
-    expect(label).toHaveClass('font-field-label')
+    expect(label).toHaveClass('text-style-field-label-md')
     expect(label).toHaveClass('min-h-5')
     expect(label).toHaveClass('w-fit', 'self-start')
     expect(label).not.toHaveClass('font-normal')

@@ -266,7 +266,7 @@ describe('ChipsField', () => {
         size="sm"
       />,
     )
-    expect(screen.getByRole('alert')).toHaveClass('text-xs')
+    expect(screen.getByRole('alert')).toHaveClass('text-style-field-error')
   })
 
   it('renders hint when no error', () => {
@@ -358,7 +358,7 @@ describe('ChipsField', () => {
         value={[]}
       />,
     )
-    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-md')
+    expect(screen.getByText('Play Style').closest('div')).toHaveClass('text-style-field-label-md')
   })
 
   it('keeps below-label hint visible when invalid', () => {

@@ -42,7 +42,7 @@ export function PageLoadState({
         {errorBackLink ? (
           <Link
             to={errorBackLink.href}
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-style-supporting underline-offset-4 hover:underline"
           >
             Back to {errorBackLink.label}
           </Link>

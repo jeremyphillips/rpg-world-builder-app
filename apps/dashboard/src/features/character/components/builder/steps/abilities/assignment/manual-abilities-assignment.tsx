@@ -132,7 +132,7 @@ export function ManualAbilitiesAssignment({
   return (
     <div className={fixedScoresAssignmentRootClasses}>
       <div className={fixedScoresAssignmentIntroClasses}>
-        <Text as="h3" id={introId} variant="body" className="text-sm font-medium">
+        <Text as="h3" id={introId} variant="body" className="text-style-label">
           {methodHeading}
         </Text>
       </div>

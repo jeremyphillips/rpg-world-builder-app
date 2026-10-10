@@ -295,7 +295,6 @@ export function FieldErrorText({
   return (
     <Text
       id={id}
-      variant="destructive"
       role="alert"
       aria-live="polite"
       className={cn(fieldErrorTextVariants({ size }), className)}

@@ -6,17 +6,17 @@ export const textSecondaryBodyClasses = 'text-md'
 export const textVariants = cva('', {
   variants: {
     variant: {
-      body: 'text-foreground',
-      muted: 'text-muted-foreground',
-      small: `${textSecondaryBodyClasses} text-muted-foreground`,
-      caption: 'text-xs text-muted-foreground',
-      emphasis: `${textSecondaryBodyClasses} font-body-emphasis`,
-      option: `${textSecondaryBodyClasses} font-body leading-none`,
-      lead: 'text-lg text-muted-foreground',
-      info: `${textSecondaryBodyClasses} text-info`,
-      success: `${textSecondaryBodyClasses} text-success`,
-      warning: `${textSecondaryBodyClasses} text-warning`,
-      destructive: `${textSecondaryBodyClasses} text-destructive`,
+      body: 'text-style-body',
+      muted: 'text-style-muted',
+      small: 'text-style-small',
+      caption: 'text-style-caption',
+      emphasis: 'text-style-emphasis',
+      option: 'text-style-option',
+      lead: 'text-style-lead',
+      info: 'text-style-info',
+      success: 'text-style-success',
+      warning: 'text-style-warning',
+      destructive: 'text-style-destructive',
     },
   },
   defaultVariants: {

@@ -91,7 +91,7 @@ describe('Accordion', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Section one' })).toHaveClass(
-      'text-field-group-legend',
+      'text-style-field-legend',
     )
   })
 

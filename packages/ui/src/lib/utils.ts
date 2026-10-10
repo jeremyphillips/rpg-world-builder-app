@@ -50,6 +50,31 @@ const EYEBROW_STYLE_UTILITIES = [
 
 const TEXT_ACTION_UTILITIES = ['text-action-inline', 'text-action-standalone'] as const
 
+const TEXT_STYLE_UTILITIES = [
+  'text-style-body',
+  'text-style-muted',
+  'text-style-small',
+  'text-style-caption',
+  'text-style-supporting',
+  'text-style-label',
+  'text-style-emphasis',
+  'text-style-option',
+  'text-style-lead',
+  'text-style-info',
+  'text-style-success',
+  'text-style-warning',
+  'text-style-destructive',
+  'text-style-field-label-sm',
+  'text-style-field-label-md',
+  'text-style-field-label-lg',
+  'text-style-field-legend',
+  'text-style-field-legend-sub',
+  'text-style-field-legend-compact',
+  'text-style-field-hint',
+  'text-style-field-hint-compact',
+  'text-style-field-error',
+] as const
+
 const EYEBROW_STYLE_CONFLICT_GROUPS = [
   'font-size',
   'font-weight',
@@ -70,6 +95,7 @@ const TYPOGRAPHY_CONFLICT_GROUPS = [
 type TypographyClassGroupIds =
   | 'heading-style'
   | 'eyebrow-style'
+  | 'text-style'
   | 'text-action'
   | 'ui-button-size'
   | 'ui-button-appearance'
@@ -153,6 +179,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
     classGroups: {
       'heading-style': [...HEADING_STYLE_UTILITIES],
       'eyebrow-style': [...EYEBROW_STYLE_UTILITIES],
+      'text-style': [...TEXT_STYLE_UTILITIES],
       'text-action': [...TEXT_ACTION_UTILITIES],
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
@@ -180,6 +207,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
       'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
+      'text-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
       'text-action': ['text-action'],
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
@@ -215,10 +243,10 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-choice-control-indicator-size': ['ui-choice-control-indicator-size'],
       'ui-field-group-size': ['ui-field-group-size'],
       'ui-field-group-layout': ['ui-field-group-layout'],
-      'font-size': ['heading-style', 'eyebrow-style'],
-      'font-weight': ['heading-style', 'eyebrow-style'],
+      'font-size': ['heading-style', 'eyebrow-style', 'text-style'],
+      'font-weight': ['heading-style', 'eyebrow-style', 'text-style'],
       tracking: ['heading-style', 'eyebrow-style'],
-      leading: ['heading-style'],
+      leading: ['heading-style', 'text-style'],
       'font-family': ['heading-style'],
       'text-transform': ['heading-style', 'eyebrow-style'],
     },

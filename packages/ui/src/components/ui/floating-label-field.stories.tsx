@@ -143,12 +143,12 @@ function Pair({
   return (
     <div className="flex flex-wrap items-end gap-6 bg-background p-6">
       <div className="flex flex-col gap-2">
-        <span className="text-xs text-muted-foreground">Compact</span>
+        <span className="text-style-caption">Compact</span>
         {children('sm')}
       </div>
       {size === 'md' ? null : (
         <div className="flex flex-col gap-2">
-          <span className="text-xs text-muted-foreground">Comfortable</span>
+          <span className="text-style-caption">Comfortable</span>
           {children('md')}
         </div>
       )}

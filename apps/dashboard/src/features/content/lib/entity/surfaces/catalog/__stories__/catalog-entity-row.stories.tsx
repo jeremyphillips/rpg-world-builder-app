@@ -39,7 +39,7 @@ export const FlatAndDisclosureRhythm: Story = {
           description: 'Druidic Focus · 4 lb',
         }}
         trailing={{ kind: 'action', content: <Button type="button">Add</Button> }}
-        details={<p className="text-sm text-muted-foreground">Spellcasting focus</p>}
+        details={<p className="text-style-supporting">Spellcasting focus</p>}
       />
     </div>
   ),
@@ -126,7 +126,7 @@ export const DisclosureToggle: Story = {
             description: 'Druidic Focus · 0 lb',
           }}
           trailing={{ kind: 'action', content: <Button type="button">Add</Button> }}
-          details={<p className="text-sm text-muted-foreground">Spellcasting focus</p>}
+          details={<p className="text-style-supporting">Spellcasting focus</p>}
         />
       </div>
     )

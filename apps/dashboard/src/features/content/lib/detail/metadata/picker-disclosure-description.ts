@@ -9,4 +9,4 @@ export const PICKER_DISCLOSURE_DESCRIPTION_SIZE = 'sm' as const satisfies NonNul
 >
 
 /** Plain-text description under picker disclosure metadata — same 14px size. */
-export const pickerDisclosureDescriptionTextClasses = 'text-sm text-muted-foreground'
+export const pickerDisclosureDescriptionTextClasses = 'text-style-supporting'

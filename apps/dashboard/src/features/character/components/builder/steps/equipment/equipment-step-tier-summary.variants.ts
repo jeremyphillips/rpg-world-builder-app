@@ -31,7 +31,7 @@ export const equipmentStepTierSummaryNameVariants = cva('font-medium text-foregr
 
 export const equipmentStepTierSummaryLevelVariants = cva('font-normal text-muted-foreground')
 
-export const equipmentStepTierSummaryCountVariants = cva('shrink-0 text-xs text-muted-foreground')
+export const equipmentStepTierSummaryCountVariants = cva('shrink-0 text-style-caption')
 
 export const equipmentStepTierSummaryCaretVariants = cva(
   'size-icon-glyph-sm shrink-0 text-muted-foreground transition-transform',

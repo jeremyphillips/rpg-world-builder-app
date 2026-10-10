@@ -76,8 +76,8 @@ export const mediaManagerStyles = {
   preview: cva('aspect-square w-full rounded-md bg-sunken object-contain'),
   heading: cva('text-lg font-semibold'),
   subheading: cva('text-sm font-semibold'),
-  muted: cva('text-sm text-muted-foreground'),
-  footerHint: cva('text-xs text-muted-foreground'),
+  muted: cva('text-style-supporting'),
+  footerHint: cva('text-style-caption'),
   metadata: cva(
     'grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-2 text-xs',
   ),

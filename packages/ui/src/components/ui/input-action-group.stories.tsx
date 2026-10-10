@@ -44,7 +44,7 @@ function AttachedActionExample({
 
   return (
     <div className="w-80">
-      <label className="mb-2 block text-sm font-medium" htmlFor={inputId}>
+      <label className="mb-2 block text-style-label" htmlFor={inputId}>
         {label}
       </label>
       <InputActionGroup size={size} disabled={disabled} invalid={invalid}>

@@ -137,25 +137,25 @@ export const ExtraSmallDensityComparison: Story = {
   render: () => (
     <div className="flex flex-wrap items-end gap-4">
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">xs default (28px)</span>
+        <span className="text-style-caption">xs default (28px)</span>
         <Button size="xs" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">xs compact (24px)</span>
+        <span className="text-style-caption">xs compact (24px)</span>
         <Button size="xs" density="compact" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">sm (32px)</span>
+        <span className="text-style-caption">sm (32px)</span>
         <Button size="sm" variant="outline">
           Reset
         </Button>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <span className="text-xs text-muted-foreground">sm compact (24px)</span>
+        <span className="text-style-caption">sm compact (24px)</span>
         <Button size="sm" density="compact" variant="outline">
           Reset
         </Button>

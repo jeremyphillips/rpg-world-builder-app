@@ -36,7 +36,7 @@ export const abilityScoreCardHeaderClasses = 'space-y-0.5'
 
 export const abilityScoreCardAbbrClasses = 'text-sm font-semibold'
 
-export const abilityScoreCardNameClasses = 'text-xs text-muted-foreground'
+export const abilityScoreCardNameClasses = 'text-style-caption'
 
 export const abilityScoreCardScoreAreaClasses = 'flex flex-col items-center gap-1'
 
@@ -47,7 +47,6 @@ export const abilityScoreCardScorePlaceholderOverlayClasses =
 
 export const abilityScoreCardChooseScoreSectionClasses = 'flex w-full justify-center'
 
-export const abilityScoreCardModifierClasses =
-  'text-sm font-medium tabular-nums text-muted-foreground'
+export const abilityScoreCardModifierClasses = 'text-style-label tabular-nums text-muted-foreground'
 
 export const abilityScoreCardChooseScoreClasses = 'font-normal'

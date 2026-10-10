@@ -98,8 +98,8 @@ export function ReviewStepSummary({ context, draft, preview }: ReviewStepSummary
 function ReviewRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border px-3 py-2">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
+      <dt className="text-style-caption">{label}</dt>
+      <dd className="text-style-label">{value}</dd>
     </div>
   )
 }
@@ -107,8 +107,8 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
 function ReviewStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-border px-2 py-1.5">
-      <dt className="text-xs text-muted-foreground">{label}</dt>
-      <dd className="text-sm font-medium">{value}</dd>
+      <dt className="text-style-caption">{label}</dt>
+      <dd className="text-style-label">{value}</dd>
     </div>
   )
 }

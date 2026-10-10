@@ -159,9 +159,9 @@ describe('ArrayFieldRenderer', () => {
     renderForm()
     expect(screen.getByRole('group', { name: /Traits/ })).toBeInTheDocument()
     const legend = screen.getByRole('group', { name: /Traits/ }).querySelector('legend')
-    expect(legend).toHaveClass('text-md', 'font-field-label')
+    expect(legend).toHaveClass('text-style-field-label-md')
     expect(legend).not.toHaveClass('text-field-array-legend')
-    expect(legend).not.toHaveClass('text-field-group-legend')
+    expect(legend).not.toHaveClass('text-style-field-legend')
     expect(screen.getByRole('group', { name: /Traits/ }).querySelector(':scope > div')).toHaveClass(
       'gap-3',
     )

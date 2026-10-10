@@ -9,10 +9,11 @@ export const cardRecipesGridClasses = 'grid grid-cols-1 gap-4 lg:grid-cols-2'
 export const cardRecipeTileClasses =
   'flex min-w-0 flex-col gap-3 rounded-md border border-border-faint p-4'
 
-export const cardRecipeTileHeaderClasses = 'flex min-w-0 flex-wrap items-center justify-between gap-2'
+export const cardRecipeTileHeaderClasses =
+  'flex min-w-0 flex-wrap items-center justify-between gap-2'
 
 export const cardRecipeTileMetaListClasses =
-  'grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs text-muted-foreground'
+  'grid grid-cols-[max-content_minmax(0,1fr)] gap-x-3 gap-y-1 text-style-caption'
 
 export const cardRecipeTileMetaTermClasses = 'font-medium text-foreground'
 

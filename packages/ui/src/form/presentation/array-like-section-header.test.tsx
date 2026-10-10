@@ -17,11 +17,10 @@ describe('ArrayLikeSectionHeader', () => {
     )
 
     const legend = container.querySelector('legend')
-    expect(legend).toHaveClass('font-field-label')
-    expect(legend).toHaveClass('text-md')
+    expect(legend).toHaveClass('text-style-field-label-md')
     expect(screen.getByText('Grants')).toBeInTheDocument()
     expect(screen.getByText('Add the mechanical effects this feature provides.')).toHaveClass(
-      'font-normal',
+      'text-style-field-hint',
     )
     expect(screen.getByRole('button', { name: 'Add grant' })).toBeInTheDocument()
   })
@@ -37,6 +36,6 @@ describe('ArrayLikeSectionHeader', () => {
     )
 
     expect(container.querySelector('legend')).toBeNull()
-    expect(screen.getByText('Tables').parentElement).toHaveClass('font-field-label')
+    expect(screen.getByText('Tables').parentElement).toHaveClass('text-style-field-label-md')
   })
 })

@@ -148,7 +148,7 @@ function OutcomeApplicationRowSummary({
   if (!statusDescription) return null
 
   return (
-    <p id={rowSummaryId} className="text-sm text-muted-foreground" aria-live="polite">
+    <p id={rowSummaryId} className="text-style-supporting" aria-live="polite">
       {statusDescription}
     </p>
   )
@@ -249,7 +249,7 @@ function OutcomeApplicationRowBody({
       showLeading
       leading={
         <ArrayItemLeadingChromeColumn>
-          <span className="text-sm text-muted-foreground">{RELATIONSHIP_MARKER}</span>
+          <span className="text-style-supporting">{RELATIONSHIP_MARKER}</span>
         </ArrayItemLeadingChromeColumn>
       }
       content={

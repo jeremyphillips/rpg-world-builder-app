@@ -137,7 +137,7 @@ export function BulkRosterStatusDialog({
         </FormProvider>
       }
       summarySlot={
-        <p className="text-sm text-muted-foreground">
+        <p className="text-style-supporting">
           {preview.wouldChangeCount} will change, {preview.unchangedCount} already match.
         </p>
       }

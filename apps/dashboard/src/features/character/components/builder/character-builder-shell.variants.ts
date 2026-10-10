@@ -136,6 +136,6 @@ export const characterBuilderPreviewAbilityGridClasses = 'grid grid-cols-2 gap-2
 
 export const characterBuilderPreviewStatClasses = 'rounded-md border border-border px-2 py-1.5'
 
-export const characterBuilderPreviewStatLabelClasses = 'text-xs text-muted-foreground'
+export const characterBuilderPreviewStatLabelClasses = 'text-style-caption'
 
-export const characterBuilderPreviewStatValueClasses = 'text-sm font-medium'
+export const characterBuilderPreviewStatValueClasses = 'text-style-label'

@@ -14,7 +14,7 @@ import {
 import { establishSurfaceCurrent } from '../ui/surface-current.lib'
 
 /** Shared 12px muted copy below the preview header and in section chrome. */
-export const previewRailCaptionTextClasses = 'text-xs text-muted-foreground'
+export const previewRailCaptionTextClasses = 'text-style-caption'
 
 export const previewRailSectionInsetVariants = cva('', {
   variants: {
@@ -97,7 +97,7 @@ export const previewRailFooterClasses = 'flex flex-col gap-4 py-4'
 
 export const previewRailIdentityContentClasses = 'min-w-0 flex-1'
 
-export const previewRailIdentitySubheadlineClasses = 'text-sm text-muted-foreground'
+export const previewRailIdentitySubheadlineClasses = 'text-style-supporting'
 
 export const previewRailDividerClasses = 'border-t border-border-subtle'
 
@@ -121,7 +121,7 @@ export const previewRailFactsGridClasses =
 
 export const previewRailFactsGridCompactClasses = 'gap-y-1.5'
 
-export const previewRailFactLabelClasses = 'text-sm text-muted-foreground'
+export const previewRailFactLabelClasses = 'text-style-supporting'
 
 export const previewRailFactValueClasses = 'text-sm text-foreground'
 

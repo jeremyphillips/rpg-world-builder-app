@@ -54,7 +54,7 @@ export const alertTitleVariants = cva('', {
   },
 })
 
-export const alertDescriptionVariants = cva('text-sm text-muted-foreground', {
+export const alertDescriptionVariants = cva('text-style-supporting', {
   variants: {
     variant: {
       default: '',

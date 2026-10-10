@@ -177,7 +177,7 @@ function ControlTopProbe({ fieldId, revision }: { fieldId: string; revision: str
   }, [fieldId, revision])
 
   return (
-    <span className="font-mono text-xs text-muted-foreground">
+    <span className="font-mono text-style-caption">
       {fieldId} control top: {top ?? '—'}px
     </span>
   )
@@ -201,7 +201,7 @@ function StabilitySequenceHarness() {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-muted-foreground">
+      <p className="text-style-supporting">
         Invariant: control top edges move only when the shared label track grows (step 5). Hints and
         errors must not move sibling controls.
       </p>

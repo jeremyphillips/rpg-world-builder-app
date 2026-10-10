@@ -74,7 +74,7 @@ function DisclosureEntityCardDemo({
           }
         }
       >
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-2 text-style-supporting">
           <p>Population overview and district notes belong in the disclosed body.</p>
           <p>Inner content aligns to the entity content column without consumer inset props.</p>
         </div>
@@ -144,7 +144,7 @@ export const BodyEndInsetInvariant: Story = {
           defaultCollapsed={false}
           trailing={entry.trailing}
         >
-          <p className="bg-surface-subtle text-sm text-muted-foreground">
+          <p className="bg-surface-subtle text-style-supporting">
             Domain content — right edge uses density inset only.
           </p>
         </DisclosureEntityCard>
@@ -169,7 +169,7 @@ export const PilotInventoryRow: Story = {
         defaultCollapsed={false}
         trailing={{ kind: 'utility', content: <GhostRemoveUtility label="Longsword" /> }}
       >
-        <dl className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+        <dl className="grid grid-cols-2 gap-2 text-style-supporting">
           <div>
             <dt className="font-medium text-foreground">Damage</dt>
             <dd>1d8 slashing</dd>

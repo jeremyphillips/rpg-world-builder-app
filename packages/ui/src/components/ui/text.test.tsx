@@ -19,17 +19,17 @@ describe('Text', () => {
     const alert = screen.getByRole('alert')
     expect(alert).toHaveTextContent('Error')
     expect(alert.tagName).toBe('SPAN')
-    expect(alert).toHaveClass('text-destructive')
+    expect(alert).toHaveClass('text-style-destructive')
   })
 
   it('applies variant classes', () => {
     render(<Text variant="small">Hint</Text>)
-    expect(screen.getByText('Hint')).toHaveClass('text-md', 'text-muted-foreground')
+    expect(screen.getByText('Hint')).toHaveClass('text-style-small')
   })
 
   it('applies status variant classes', () => {
     render(<Text variant="warning">Caution</Text>)
-    expect(screen.getByText('Caution')).toHaveClass('text-warning')
+    expect(screen.getByText('Caution')).toHaveClass('text-style-warning')
   })
 
   itAxe('has no axe accessibility violations', async () => {

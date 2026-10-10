@@ -14,7 +14,7 @@ export const proficiencyGrantedSummaryRowsClasses = 'space-y-0'
 export const proficiencyGrantedSummaryRowClasses =
   'grid grid-cols-[auto_minmax(6.75rem,8.25rem)_minmax(0,1fr)] items-center gap-x-4 gap-y-2'
 
-export const proficiencyGrantedSummaryCategoryLabelClasses = 'text-sm font-medium text-foreground'
+export const proficiencyGrantedSummaryCategoryLabelClasses = 'text-style-label text-foreground'
 
 export const proficiencyGrantedSummarySourceGroupsClasses = 'min-w-0'
 
@@ -26,6 +26,6 @@ export const proficiencyGrantedSummaryStackedSourceGroupClasses =
 
 export const proficiencyGrantedSummaryValueLabelsClasses = 'min-w-0 text-sm text-foreground'
 
-export const proficiencyGrantedSummarySourceLabelClasses = 'text-left text-xs text-muted-foreground'
+export const proficiencyGrantedSummarySourceLabelClasses = 'text-left text-style-caption'
 
 export const proficiencyGrantedSummaryRowDividerClasses = 'my-2 border-t border-border'

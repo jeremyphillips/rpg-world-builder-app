@@ -18,7 +18,7 @@ export const masterDetailEditorIdentityCopyClasses = 'min-w-0 space-y-0.5'
 
 export const masterDetailEditorTitleClasses = 'truncate text-lg font-medium text-foreground'
 
-export const masterDetailEditorMetaClasses = 'truncate text-xs text-muted-foreground'
+export const masterDetailEditorMetaClasses = 'truncate text-style-caption'
 
 /** Availability and selected-row issue summary share one header row (~24px gap). */
 export const masterDetailEditorStatusRowClasses =

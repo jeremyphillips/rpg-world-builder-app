@@ -13,7 +13,7 @@ import {
 export function MessagesMobileBackLink({ to, label }: { to: string; label: string }) {
   return (
     <div className={messagesWorkspaceMobileBackClasses}>
-      <Link to={to} className="text-sm text-muted-foreground hover:text-foreground">
+      <Link to={to} className="text-style-supporting hover:text-foreground">
         {label}
       </Link>
     </div>

@@ -29,7 +29,7 @@ export const Default: Story = {
           preset="catalog"
           collapsible
           header={<span className="font-medium capitalize">{item.id}</span>}
-          body={<p className="text-sm text-muted-foreground">Expanded details</p>}
+          body={<p className="text-style-supporting">Expanded details</p>}
         />
       )}
     />

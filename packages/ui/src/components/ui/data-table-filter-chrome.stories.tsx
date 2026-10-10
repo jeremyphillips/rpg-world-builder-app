@@ -72,8 +72,8 @@ function FilterChromeDemo({
         advancedOpen={advancedOpen}
         onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
-      <p className="text-xs text-muted-foreground">{modifiedCount} modified filter(s)</p>
-      <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
+      <p className="text-style-caption">{modifiedCount} modified filter(s)</p>
+      <pre className="rounded-md border border-border bg-sunken p-3 text-style-caption">
         {JSON.stringify(state, null, 2)}
       </pre>
     </div>

@@ -25,4 +25,4 @@ export const quickNpcBuildCardAttributeHeaderClasses =
 
 export const quickNpcBuildCardLevelEditorClasses = 'flex flex-wrap items-center gap-3'
 
-export const quickNpcBuildCardDescriptionVariants = cva('text-sm text-muted-foreground')
+export const quickNpcBuildCardDescriptionVariants = cva('text-style-supporting')

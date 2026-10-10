@@ -61,7 +61,7 @@ function EditorStory({
       onDelete={() => undefined}
       renderDetail={
         renderDetail ??
-        (({ rowId }) => <p className="text-sm text-muted-foreground">Detail body for {rowId}</p>)
+        (({ rowId }) => <p className="text-style-supporting">Detail body for {rowId}</p>)
       }
     />
   )
@@ -97,7 +97,7 @@ export const TallerDetailThanRail: Story = {
       renderDetail={() => (
         <div className="space-y-4">
           {Array.from({ length: 16 }, (_, index) => (
-            <p key={index} className="text-sm text-muted-foreground">
+            <p key={index} className="text-style-supporting">
               Detail paragraph {index + 1} with enough copy to exceed the short list rail height.
             </p>
           ))}

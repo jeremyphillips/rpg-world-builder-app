@@ -13,7 +13,7 @@ describe('ResultSummary', () => {
     const status = screen.getByRole('status')
     expect(status).toHaveTextContent('10 results')
     expect(status).toHaveAttribute('aria-live', 'polite')
-    expect(container.firstChild).toHaveClass('text-xs')
+    expect(container.firstChild).toHaveClass('text-style-caption')
   })
 
   it('uses a caller noun without a visibility supplement', () => {

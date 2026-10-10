@@ -15,7 +15,7 @@ export const campaignDisplayNameVariants = cva('inline-flex min-w-0 items-center
       topbar: 'cursor-pointer font-medium text-foreground-subtle hover:text-foreground',
       card: 'min-w-0',
       row: 'min-w-0',
-      inlineMuted: 'text-sm text-muted-foreground',
+      inlineMuted: 'text-style-supporting',
       switcherTrigger: 'text-sm font-semibold',
       menuItem: 'text-sm',
       page: 'heading-style-page',
@@ -66,7 +66,7 @@ export type CampaignDisplayNameVariantProps = VariantProps<typeof campaignDispla
 export const campaignDisplayNameListVariants = cva('inline-flex min-w-0 items-center gap-2', {
   variants: {
     surface: {
-      inlineMuted: 'text-sm text-muted-foreground',
+      inlineMuted: 'text-style-supporting',
     },
   },
   defaultVariants: {

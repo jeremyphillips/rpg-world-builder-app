@@ -49,7 +49,7 @@ function buildSummarySlot(input: {
   resolveTally?: string
 }): ReactNode {
   return (
-    <div className="space-y-1 text-sm text-muted-foreground">
+    <div className="space-y-1 text-style-supporting">
       {input.isResolvePhase && input.resolveTally ? (
         <p>{input.resolveTally}</p>
       ) : input.previewHasChanges ? (

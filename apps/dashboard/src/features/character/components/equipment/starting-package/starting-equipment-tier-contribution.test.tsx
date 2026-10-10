@@ -45,7 +45,7 @@ describe('StartingEquipmentTierContribution', () => {
     expect(summary).toHaveClass('text-foreground')
     const formula = within(tooltip).getByText(/Calculated from/)
     expect(formula).toHaveTextContent('Calculated from 500 GP + 1d10 × 25 GP')
-    expect(formula).toHaveClass('text-xs', 'text-muted-foreground')
+    expect(formula).toHaveClass('text-style-caption')
   })
 
   it('renders a zero class amount beside the tier total', () => {

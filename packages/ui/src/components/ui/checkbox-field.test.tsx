@@ -9,7 +9,9 @@ import { CheckboxField } from './checkbox-field'
 describe('CheckboxField', () => {
   it('applies field size to the label', () => {
     render(<CheckboxField id="homebrew" label="Allow homebrew" size="sm" />)
-    expect(screen.getByText('Allow homebrew').closest('label')).toHaveClass('text-xs')
+    expect(screen.getByText('Allow homebrew').closest('label')).toHaveClass(
+      'text-style-field-label-sm',
+    )
   })
 
   it('toggles via its associated label', async () => {

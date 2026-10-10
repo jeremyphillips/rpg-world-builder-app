@@ -3,7 +3,7 @@ import { cva } from 'class-variance-authority'
 export const wizardStepBubbleVariants = cva(
   [
     'flex size-8 shrink-0 items-center justify-center rounded-full',
-    'text-sm font-medium transition-colors duration-150',
+    'text-style-label transition-colors duration-150',
   ],
   {
     variants: {
@@ -18,7 +18,7 @@ export const wizardStepBubbleVariants = cva(
 )
 
 export const wizardStepLabelVariants = cva(
-  'hidden text-sm font-medium sm:block transition-colors duration-150',
+  'hidden text-style-label sm:block transition-colors duration-150',
   {
     variants: {
       state: {

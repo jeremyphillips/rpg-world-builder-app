@@ -118,7 +118,7 @@ function ColorSwatch({ token }: { token: ColorToken }) {
         style={{ backgroundColor: `var(${token.cssVar})` }}
       >
         {token.foregroundTailwind ? (
-          <span className={cn('text-sm font-medium', token.foregroundTailwind)}>Aa</span>
+          <span className={cn('text-style-label', token.foregroundTailwind)}>Aa</span>
         ) : null}
       </div>
     )
@@ -157,7 +157,7 @@ function ElevationLadderSection() {
             style={{ backgroundColor: `var(${token.cssVar})` }}
           >
             <span className="font-mono text-sm text-foreground">{token.name}</span>
-            <span className="font-mono text-xs text-muted-foreground">{token.cssVar}</span>
+            <span className="font-mono text-style-caption">{token.cssVar}</span>
           </div>
         ))}
       </div>
@@ -226,7 +226,7 @@ function SurfacePanel({ surface, children }: { surface: SurfaceBackground; child
         <Heading variant="subsection" as="h3" id={`surface-${surface.id}`}>
           On {surface.label}
         </Heading>
-        <p className="font-mono text-sm text-muted-foreground">{surface.cssVar}</p>
+        <p className="font-mono text-style-supporting">{surface.cssVar}</p>
       </div>
       <div
         className={cn(
@@ -283,7 +283,7 @@ function OnSurfaceSwatch({ token }: { token: ColorToken }) {
           }
         >
           <p
-            className={cn('truncate text-sm font-medium', token.tailwind)}
+            className={cn('truncate text-style-label', token.tailwind)}
             style={{ color: `var(${token.cssVar})` }}
           >
             {token.name}

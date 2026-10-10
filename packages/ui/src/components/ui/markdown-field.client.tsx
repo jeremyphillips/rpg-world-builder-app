@@ -43,7 +43,7 @@ export interface MarkdownFieldProps
 function MarkdownFieldPreview({ value }: { value: string }) {
   const trimmed = value.trim()
   if (trimmed === '') {
-    return <p className="text-sm text-muted-foreground">{MARKDOWN_PREVIEW_EMPTY}</p>
+    return <p className="text-style-supporting">{MARKDOWN_PREVIEW_EMPTY}</p>
   }
 
   if (looksLikeRichTextHtml(trimmed)) {

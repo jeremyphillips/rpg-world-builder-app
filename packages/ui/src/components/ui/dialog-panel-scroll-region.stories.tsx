@@ -17,7 +17,7 @@ function OverlayScrollDemo() {
     <div className="flex h-64 w-full max-w-md flex-col overflow-hidden rounded-lg border bg-background">
       <div className={dialogPanelHeaderClasses}>
         <h2 className="text-lg font-semibold">Overlay header</h2>
-        <p className="text-sm text-muted-foreground">Pinned above the scrollport.</p>
+        <p className="text-style-supporting">Pinned above the scrollport.</p>
       </div>
       <DialogPanelScrollRegion>
         {Array.from({ length: 16 }, (_, index) => (

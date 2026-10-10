@@ -48,7 +48,7 @@ export const InsidePanel: Story = {
           </button>
         }
       >
-        <p className="text-sm text-muted-foreground">No direct locations yet.</p>
+        <p className="text-style-supporting">No direct locations yet.</p>
       </DetailCollectionGroup>
     </DetailCollectionPanel>
   ),

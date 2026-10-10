@@ -36,7 +36,7 @@ function LocationCreateFormStory({
     <ContentFormOptionsGate campaignId={STORY_CAMPAIGN_ID}>
       {(optionsCtx) => (
         <div className="mx-auto max-w-lg rounded-lg border border-border bg-card shadow-sm">
-          <div className="border-b border-border px-4 py-3 text-sm font-medium">Create form</div>
+          <div className="border-b border-border px-4 py-3 text-style-label">Create form</div>
           <FormShellFooterScope>
             <LocationCreateForm
               fixedCreate={fixedCreate}

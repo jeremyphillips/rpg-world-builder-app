@@ -270,7 +270,7 @@ function ExpandedMediaFieldSummaryHeader({
       <div>
         <h3 className="font-medium">{label}</h3>
         {count ? (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-style-supporting">
             {count} of {maxItems} images
           </p>
         ) : null}
@@ -278,7 +278,7 @@ function ExpandedMediaFieldSummaryHeader({
       {canEdit ? (
         <button
           type="button"
-          className="text-sm font-medium underline-offset-4 hover:underline"
+          className="text-style-label underline-offset-4 hover:underline"
           onClick={() => onOpen(representative?.id)}
         >
           {count ? 'Manage' : 'Add images'}

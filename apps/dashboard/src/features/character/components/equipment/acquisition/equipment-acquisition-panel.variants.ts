@@ -22,12 +22,12 @@ export const equipmentAcquisitionPanelSourceQuantityClasses =
 export const equipmentAcquisitionPanelSourceQuantityWrapClasses =
   'flex min-w-0 flex-col items-end text-right'
 
-export const equipmentAcquisitionPanelSourceSpendSuffixClasses = 'text-sm text-muted-foreground'
+export const equipmentAcquisitionPanelSourceSpendSuffixClasses = 'text-style-supporting'
 
 export const equipmentAcquisitionPanelSourceActionsClasses = 'flex justify-end'
 
 export const equipmentAcquisitionPanelPurchaseFooterClasses =
-  'flex justify-end text-sm text-muted-foreground'
+  'flex justify-end text-style-supporting'
 
 export const equipmentAcquisitionPanelOwnedSectionClasses = 'space-y-3'
 
@@ -52,19 +52,18 @@ export const equipmentAcquisitionPanelQuantityRowDisclosureClasses =
 
 export const equipmentAcquisitionPanelQuantityLabelClasses = 'text-sm text-foreground'
 
-export const equipmentAcquisitionPanelPreviewLineClasses = 'text-sm text-muted-foreground'
+export const equipmentAcquisitionPanelPreviewLineClasses = 'text-style-supporting'
 
-export const equipmentAcquisitionPanelPreviewLineDisclosureClasses =
-  'mb-3 text-sm text-muted-foreground'
+export const equipmentAcquisitionPanelPreviewLineDisclosureClasses = 'mb-3 text-style-supporting'
 
 export const equipmentAcquisitionPanelCommitButtonClasses =
   'min-w-[13rem] justify-center tabular-nums'
 
-export const equipmentAcquisitionPanelBlockerClasses = 'text-sm text-muted-foreground'
+export const equipmentAcquisitionPanelBlockerClasses = 'text-style-supporting'
 
 export const equipmentInventoryDisclosureTriggerClasses = cn(
   'inline-flex shrink-0 cursor-pointer items-center gap-1 border-0 bg-transparent p-0 text-sm text-foreground underline-offset-4 hover:underline',
   interactiveFocusVariants({ context: 'standalone' }),
 )
 
-export const equipmentAcquisitionGuidanceCardDescriptionClasses = 'text-sm text-muted-foreground'
+export const equipmentAcquisitionGuidanceCardDescriptionClasses = 'text-style-supporting'

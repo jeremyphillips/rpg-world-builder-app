@@ -73,7 +73,7 @@ function SurfaceMatrix({ surface, size }: { surface: 'base' | 'subtle'; size: 's
     <div className="space-y-6">
       {BADGE_APPEARANCES.map((appearance) => (
         <section key={appearance}>
-          <h3 className="mb-2 text-sm font-medium capitalize">{appearance}</h3>
+          <h3 className="mb-2 text-style-label capitalize">{appearance}</h3>
           <div className={`flex flex-wrap gap-2 rounded-lg p-4 ${surfaceClass}`}>
             {COMPACT_LABEL_TONES.map((tone) => (
               <Badge key={`${appearance}-${tone}`} appearance={appearance} tone={tone} size={size}>

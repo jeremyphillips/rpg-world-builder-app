@@ -19,7 +19,7 @@ export const detailEntityRowVariants = cva('min-w-0 py-1', {
   },
 })
 
-export const detailEntityRowSubheadingVariants = cva('text-xs text-muted-foreground')
+export const detailEntityRowSubheadingVariants = cva('text-style-caption')
 
 export const detailEntityRowDisclosureItemVariants = cva('min-w-0')
 

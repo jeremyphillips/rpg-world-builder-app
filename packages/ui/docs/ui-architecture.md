@@ -97,6 +97,7 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 | Rows       | Identity row (media + title)      | `IdentityRow`                                     | Uses `IdentityFrame`; presentation only                                                            |
 | Typography | Headings / eyebrows               | `Heading` / `Eyebrow`                             | Single-class `@utility` composites                                                                 |
 | Typography | Body and supporting text          | `Text`                                            | Role composites (`text-style-*`)                                                                   |
+| Typography | Inline status tone                | `SemanticText`                                    | Tone, emphasis, and icon; not a Text role                                                          |
 | Typography | Links                             | `Link`                                            | Uses the `text-action-*` utilities                                                                 |
 
 A `variant="selection"` request routes to `SelectionOptionCard`, not `Card`, so Card does not become one giant generic component. Treat Card's information-and-navigation scope as a hypothesis that classification may revise. Record those revisions here when ownership actually changes.

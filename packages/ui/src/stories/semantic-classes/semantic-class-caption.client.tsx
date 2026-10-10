@@ -49,7 +49,7 @@ export function SemanticClassCaption({ targetRef, className }: SemanticClassCapt
       aria-live="polite"
       aria-atomic="true"
     >
-      <span className="font-mono text-xs text-muted-foreground">
+      <span className="font-mono text-style-caption">
         {semantic.length > 0 ? semantic.join(' ') : '(no semantic classes)'}
       </span>
       {utilities.length > 0 ? (

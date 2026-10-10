@@ -817,6 +817,139 @@
   text-transform: uppercase;
 }
 
+/* Text role composites — Text variants and field type maps resolve 1:1. */
+@utility text-style-body {
+  color: var(--foreground);
+}
+
+@utility text-style-muted {
+  color: var(--muted-foreground);
+}
+
+@utility text-style-small {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-caption {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-supporting {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-label {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: var(--font-weight-medium);
+}
+
+@utility text-style-emphasis {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  font-weight: var(--font-weight-body-emphasis);
+}
+
+@utility text-style-option {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-body);
+}
+
+@utility text-style-lead {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-info {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  color: var(--info);
+}
+
+@utility text-style-success {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  color: var(--success);
+}
+
+@utility text-style-warning {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  color: var(--warning);
+}
+
+@utility text-style-destructive {
+  font-size: var(--text-md);
+  line-height: var(--text-md--line-height);
+  color: var(--destructive);
+}
+
+@utility text-style-field-label-sm {
+  font-size: var(--text-xs);
+  line-height: 1;
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-label-md {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-label-lg {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  font-weight: var(--font-weight-field-label);
+}
+
+@utility text-style-field-legend {
+  font-size: var(--text-field-group-legend);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-legend-sub {
+  font-size: var(--text-field-subgroup-legend);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-legend-compact {
+  font-size: var(--text-md);
+  line-height: 1;
+  font-weight: var(--font-weight-heading);
+  color: var(--foreground);
+}
+
+@utility text-style-field-hint {
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-hint-compact {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-error {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  color: var(--destructive);
+}
+
 @keyframes accordion-down {
   from {
     height: 0;

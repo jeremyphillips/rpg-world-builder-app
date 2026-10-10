@@ -35,12 +35,12 @@ export const WithPanelAction: Story = {
       headingId="story-contained-locations-heading"
       helper="Locations directly within this location."
       action={
-        <button type="button" className="text-sm font-medium">
+        <button type="button" className="text-style-label">
           Add location
         </button>
       }
     >
-      <p className="px-4 py-2 text-sm text-muted-foreground">No contained locations yet.</p>
+      <p className="px-4 py-2 text-style-supporting">No contained locations yet.</p>
     </DetailCollectionPanel>
   ),
 }

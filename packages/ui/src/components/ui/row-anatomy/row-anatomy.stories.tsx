@@ -97,7 +97,7 @@ export const FullUtilityWithMetaAndStatus: Story = {
     <DemoHost>
       <Heading />
       <RowAnatomyCell cell={{ slot: 'meta', column: 'content' }}>
-        <div className="truncate text-xs text-muted-foreground">Martial weapon · 3 lb</div>
+        <div className="truncate text-style-caption">Martial weapon · 3 lb</div>
       </RowAnatomyCell>
       <RowAnatomyCell cell={{ slot: 'status', column: 'content' }}>
         <Badge size="sm">Proficient</Badge>
@@ -121,7 +121,7 @@ export const TrailingGroupMetaParity: Story = {
     <DemoHost>
       <Heading />
       <RowAnatomyCell cell={{ slot: 'meta', column: 'content' }}>
-        <div className="truncate text-xs text-muted-foreground">Martial weapon</div>
+        <div className="truncate text-style-caption">Martial weapon</div>
       </RowAnatomyCell>
       <RowAnatomyCell cell={{ slot: 'band', column: 'trailing' }}>
         {compactActionBox('Add')}
@@ -142,7 +142,7 @@ export const StretchTrailing: Story = {
     <DemoHost>
       <Heading />
       <RowAnatomyCell cell={{ slot: 'meta', column: 'content' }}>
-        <div className="truncate text-xs text-muted-foreground">Martial weapon · 3 lb</div>
+        <div className="truncate text-style-caption">Martial weapon · 3 lb</div>
       </RowAnatomyCell>
       <RowAnatomyCell cell={{ slot: 'stretch', column: 'trailing' }} data-testid="stretch">
         <div className="h-full w-10 rounded-sm bg-muted" aria-hidden />
@@ -165,7 +165,7 @@ export const MediaXsBand: Story = {
       </RowAnatomyCell>
       <Heading />
       <RowAnatomyCell cell={{ slot: 'meta', column: 'content' }}>
-        <div className="truncate text-xs text-muted-foreground">Martial weapon</div>
+        <div className="truncate text-style-caption">Martial weapon</div>
       </RowAnatomyCell>
       <RowAnatomyCell cell={{ slot: 'band', column: 'trailing' }}>
         {compactActionBox('Select')}

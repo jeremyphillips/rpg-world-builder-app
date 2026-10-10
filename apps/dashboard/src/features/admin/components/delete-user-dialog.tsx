@@ -131,7 +131,7 @@ export function DeleteUserDialog({ user, open, onOpenChange, onDeleted }: Delete
         ) : dependencyLines.length > 0 ? (
           <div className="space-y-3">
             <Text variant="muted">This will permanently delete {user.displayName} and remove:</Text>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+            <ul className="list-disc space-y-1 pl-5 text-style-supporting">
               {dependencyLines.map((line) => (
                 <li key={line}>{line}</li>
               ))}

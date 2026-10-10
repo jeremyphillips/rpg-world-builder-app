@@ -23,7 +23,7 @@ export const Default: Story = {
         <CardDescription>Start a new world for your party.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
-        <label htmlFor="campaign-name" className="text-sm font-medium">
+        <label htmlFor="campaign-name" className="text-style-label">
           Name
         </label>
         <Input id="campaign-name" placeholder="The Sunless Citadel" />

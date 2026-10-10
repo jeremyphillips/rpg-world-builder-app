@@ -20,7 +20,11 @@ export type SemanticTextProps = {
   className?: string
 }
 
-/** Inline semantic copy — always renders a `span`. */
+/**
+ * Inline status copy with a tone, emphasis, and optional icon.
+ * Stays separate from `Text`: Text owns the body role ladder (`text-style-*`);
+ * SemanticText owns semantic status color and does not take a Text role.
+ */
 export function SemanticText({ tone, emphasis, icon, children, className }: SemanticTextProps) {
   return (
     <span

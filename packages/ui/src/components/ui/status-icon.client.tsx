@@ -159,7 +159,7 @@ export function StatusIcon({
     return (
       <span className="inline-flex items-center gap-1.5">
         {icon}
-        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-style-caption">{label}</span>
       </span>
     )
   }

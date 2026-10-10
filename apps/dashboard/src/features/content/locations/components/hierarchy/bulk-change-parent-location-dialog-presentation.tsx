@@ -47,11 +47,11 @@ function buildSummarySlot(input: {
   resolveTally?: string
 }): React.ReactNode {
   if (input.isResolvePhase && input.resolveTally) {
-    return <p className="text-sm text-muted-foreground">{input.resolveTally}</p>
+    return <p className="text-style-supporting">{input.resolveTally}</p>
   }
 
   if (input.isConfigured) {
-    return <p className="text-sm text-muted-foreground">{input.configureSummary}</p>
+    return <p className="text-style-supporting">{input.configureSummary}</p>
   }
 
   return null

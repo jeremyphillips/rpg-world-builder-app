@@ -65,7 +65,7 @@ export const FiltersWithoutTabs: Story = {
           />
         }
         filterRow={{
-          actions: <span className="text-sm text-muted-foreground">Sort: Best match</span>,
+          actions: <span className="text-style-supporting">Sort: Best match</span>,
         }}
         actions={
           <Button type="button" variant="ghost" size="sm">
@@ -79,7 +79,7 @@ export const FiltersWithoutTabs: Story = {
 
 export const WithoutSearch: Story = {
   args: {
-    primaryControls: <span className="text-sm text-muted-foreground">Detail tab filters only</span>,
+    primaryControls: <span className="text-style-supporting">Detail tab filters only</span>,
     actions: (
       <Button type="button" variant="ghost" size="sm">
         Reset
