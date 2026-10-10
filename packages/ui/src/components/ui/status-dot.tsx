@@ -14,7 +14,7 @@ export function StatusDot({ className, tone, size, label, ...props }: StatusDotP
     return (
       <span className="inline-flex items-center gap-1.5">
         <span className={cn(statusDotVariants({ tone, size, className }))} aria-hidden {...props} />
-        <span className="text-style-caption">{label}</span>
+        <span>{label}</span>
       </span>
     )
   }

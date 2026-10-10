@@ -17,10 +17,7 @@ export function CampaignMetaLine({ meta, includeRecency, countsPending }: Campai
         {segments.map((segment, index) => (
           <InlineMetadata.Item key={`${segment.kind}-${index}`}>
             {segment.kind === 'status' ? (
-              <>
-                <StatusDot tone={meta.statusTone} />
-                {segment.text}
-              </>
+              <StatusDot tone={meta.statusTone} label={segment.text} />
             ) : (
               segment.text
             )}

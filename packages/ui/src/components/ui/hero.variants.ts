@@ -35,7 +35,8 @@ export const heroTitleShellClasses = 'min-w-0 flex-1'
 
 export const heroMetaStackClasses = 'flex flex-col gap-3'
 
-export const heroMetaClasses = 'inline-flex items-center gap-1.5 text-xs sm:text-sm'
+/** Hero meta line type scale — segment layout is owned by InlineMetadata / StatusDot. */
+export const heroMetaClasses = 'text-xs sm:text-sm'
 
 export const heroMarkShellVariants = cva(
   cn('relative shrink-0', heroMarkVisibilityClasses, heroMarkCopyGapClasses),
