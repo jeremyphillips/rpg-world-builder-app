@@ -485,10 +485,13 @@ actually touched — the same signal as `FormUnsavedChangesGuard`. After a succe
 always `form.reset(def.toFormValues(saved))` (not the pre-save client payload) so server
 normalization does not immediately re-dirty the form.
 
-Validation **display** stays progressive (`mode` default `onSubmit`) until the user submits or
-touches a field. Invalid Create/Save clicks run RHF validation, show progressive errors, and
-navigate/focus the first invalid field or tab. Optional `validateSilently` / `useSilentFormValidity`
-may drive secondary UI (e.g. "Ready to create") — not the primary submit gate.
+Validation **display** stays progressive (`mode` default `onSubmit`): standard fields show error
+text after touch/blur/change (per-field `trigger`) or after a failed Save/Publish expands the
+presentation session. **`useContentSaveSession`** calls **`resetValidationPresentation()`** after
+confirmed body save and on discard; preview-rail silent publish parse is unchanged. Invalid
+Create/Save clicks run RHF validation, show eligible errors, and navigate/focus the first invalid
+field or tab. Optional `validateSilently` / `useSilentFormValidity` may drive secondary UI (e.g.
+"Ready to create") — not the primary submit gate.
 
 **Quick NPC exception:** Quick NPC create stays on `useSubmitHandler` plus domain libs
 (`TabbedForm`, build-context projection, tabbed submit labels) — do not premature-standardize onto

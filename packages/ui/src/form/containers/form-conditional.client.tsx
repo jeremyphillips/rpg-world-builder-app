@@ -6,7 +6,9 @@ import { fieldSeparatorVariants, type FieldSeparator } from '../../components/ui
 import { resolveFormDensity } from '../form-density'
 import { useDependsOnValues } from '../config/form-depends-on.client'
 import type { FieldConfig, FieldVisibility } from '../field-config'
+import { resolveFieldConfigBoundNames } from '../field-config'
 import { useFormSectionContext } from '../context/form-section.context'
+import { useClearFieldErrorsOnHide } from '../hooks/use-clear-field-errors-on-hide.client'
 import { FieldRenderer } from '../renderers/field-renderer.client'
 
 /** Watches `dependsOn` fields and returns a map keyed by relative field names. */
@@ -60,7 +62,14 @@ interface FieldNodeProps {
  */
 export function ConditionalField({ config, idPrefix, namePrefix }: FieldNodeProps) {
   const values = useVisibilityValues(config.visibility!, namePrefix)
-  if (!config.visibility!.visibleWhen(values)) return null
+  const visible = config.visibility!.visibleWhen(values)
+  const boundNames = React.useMemo(() => {
+    return resolveFieldConfigBoundNames(config).map((name) =>
+      namePrefix ? `${namePrefix}.${name}` : name,
+    )
+  }, [config, namePrefix])
+  useClearFieldErrorsOnHide(visible, boundNames)
+  if (!visible) return null
   return (
     <FieldSeparatorWrapper separator={config.separator}>
       <FieldRenderer config={config} idPrefix={idPrefix} namePrefix={namePrefix} />

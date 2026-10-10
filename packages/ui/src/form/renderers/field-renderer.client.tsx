@@ -22,6 +22,7 @@ import type { FieldHintPosition } from '../../components/ui/field.variants'
 import type { FieldSize } from '../../components/ui/field.client'
 import { useFileFieldRemotePreview } from '../context/file-field-props.context'
 import { useFieldErrorPresentation } from '../context/array-item-presentation.context'
+import { resolveFieldConfigBoundNames } from '../field-config'
 import { resolveNestedFieldErrorMessage } from '../errors/resolve-field-error-message'
 import { DiceFormulaFieldRenderer } from './fields/dice-formula-field-renderer.client'
 import {
@@ -711,7 +712,7 @@ function StandardFieldRenderer({
   id,
   namePrefix,
 }: StandardFieldRendererProps) {
-  const { getFieldState } = useFormContext()
+  const { getFieldState, trigger } = useFormContext()
   const { field, fieldState } = useController({
     name: fullName,
     defaultValue: fieldDefaultValue(config),
@@ -719,6 +720,29 @@ function StandardFieldRenderer({
   const formState = useFormState({ name: fullName, exact: true })
   const { errors } = useFormState()
   const liveError = getFieldState(fullName, formState).error
+  const boundPaths = React.useMemo(
+    () =>
+      resolveFieldConfigBoundNames(renderConfig).map((name) =>
+        namePrefix ? `${namePrefix}.${name}` : name,
+      ),
+    [namePrefix, renderConfig],
+  )
+  const runFieldTrigger = React.useCallback(() => {
+    void trigger(boundPaths.length === 1 ? boundPaths[0]! : boundPaths, { shouldFocus: false })
+  }, [boundPaths, trigger])
+  const progressiveField = {
+    ...field,
+    onBlur: (event: Parameters<typeof field.onBlur>[0]) => {
+      field.onBlur(event)
+      runFieldTrigger()
+    },
+    onChange: (value: Parameters<typeof field.onChange>[0]) => {
+      field.onChange(value)
+      if (getFieldState(fullName, formState).isTouched) {
+        runFieldTrigger()
+      }
+    },
+  }
   const remotePreview = useFileFieldRemotePreview(resolveFieldConfigPrimaryName(config))
   const validation = useFieldErrorPresentation(
     liveError?.message ??
@@ -734,7 +758,7 @@ function StandardFieldRenderer({
       <OptionalDisclosureTextareaFieldRenderer
         config={renderConfig}
         disclosure={renderConfig.optionalDisclosure}
-        field={field}
+        field={progressiveField}
         id={id}
         hint={hint}
         hintPosition={hintPosition}
@@ -751,7 +775,7 @@ function StandardFieldRenderer({
   return render({
     config: renderConfig,
     controlSize,
-    field,
+    field: progressiveField,
     id,
     hint,
     hintPosition,

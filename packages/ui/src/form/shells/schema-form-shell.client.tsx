@@ -69,6 +69,7 @@ interface SchemaFormShellProps<TFieldValues extends FieldValues> {
   publishPresentationIssues?: FormIssue[]
   publishPresentationEnabled?: boolean
   validateSilently?: ValidateSilently
+  onResetValidationPresentation?: () => void
   onSubmit: (values: TFieldValues, form: UseFormReturn<TFieldValues>) => void
   /** Overrides default failed-submit navigation (expand keys + focus). */
   onInvalidSubmit?: (
@@ -222,6 +223,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
   publishPresentationIssues,
   publishPresentationEnabled,
   validateSilently,
+  onResetValidationPresentation,
   onSubmit,
   onInvalidSubmit,
   className,
@@ -248,6 +250,7 @@ export function SchemaFormShell<TFieldValues extends FieldValues>({
           publishPresentationIssues={publishPresentationIssues}
           publishPresentationEnabled={publishPresentationEnabled}
           validateSilently={validateSilently}
+          onResetValidationPresentation={onResetValidationPresentation}
         >
           <SchemaFormElement
             form={form}

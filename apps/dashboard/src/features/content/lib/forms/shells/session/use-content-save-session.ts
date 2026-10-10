@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useFormState, type FieldValues, type UseFormReturn } from 'react-hook-form'
-import { useSchemaFormSubmit } from '@rpg/ui/form'
+import { useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import { hasDirtyFields } from '@/lib/form-dirty-state'
 
@@ -43,6 +43,7 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
   const { dirtyFields, isSubmitting } = useFormState({ control: form.control })
   const bodyDirty = hasDirtyFields(dirtyFields)
   const schemaFormSubmit = useSchemaFormSubmit<TFieldValues>()
+  const { resetValidationPresentation } = useFormUiContext()
   const inFlightRef = useRef(false)
   const onSavedRef = useRef(onSaved)
 
@@ -61,7 +62,8 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
     if (campaignAccess.isDirty) {
       campaignAccess.reset()
     }
-  }, [bodyDirty, campaignAccess, form])
+    resetValidationPresentation()
+  }, [bodyDirty, campaignAccess, form, resetValidationPresentation])
 
   const save = useCallback(async () => {
     if (mode !== 'edit' || inFlightRef.current || anyPending) {
@@ -111,12 +113,23 @@ export function useContentSaveSession<TFieldValues extends FieldValues>({
       })
 
       if (result.status === 'saved') {
+        if (result.saved.bodySaved) {
+          resetValidationPresentation()
+        }
         onSavedRef.current?.(result.saved)
       }
     } finally {
       inFlightRef.current = false
     }
-  }, [anyPending, bodyDirty, campaignAccess, mode, onSubmit, schemaFormSubmit])
+  }, [
+    anyPending,
+    bodyDirty,
+    campaignAccess,
+    mode,
+    onSubmit,
+    resetValidationPresentation,
+    schemaFormSubmit,
+  ])
 
   if (mode === 'create') {
     return {

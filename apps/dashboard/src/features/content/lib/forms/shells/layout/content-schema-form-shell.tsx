@@ -151,6 +151,10 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   const markPublishAttempted = React.useCallback(() => {
     setHasAttemptedPublish(true)
   }, [])
+  const resetValidationPresentation = React.useCallback(() => {
+    setHasAttemptedPublish(false)
+    setPublishPresentationIssues([])
+  }, [])
   const handlePublishIssuesChange = React.useCallback(
     ({ issues }: { issues: readonly FormIssue[] }) => {
       setPublishPresentationIssues([...issues])
@@ -249,6 +253,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
               onMarkPublishAttempted={markPublishAttempted}
               publishPresentationIssues={publishPresentationIssues}
               publishPresentationEnabled={previewEnabled}
+              onResetValidationPresentation={resetValidationPresentation}
               aside={
                 previewEnabled ? (
                   <ContentPreviewRail

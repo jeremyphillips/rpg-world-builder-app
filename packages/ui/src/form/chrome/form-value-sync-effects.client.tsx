@@ -5,6 +5,10 @@ import { useFormContext, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import { getArrayFieldMutators } from '../context/array-field-mutators.registry'
 import type { FormValueSync } from '../field-config'
+import {
+  flattenPatchToLeafSetValues,
+  VALUE_SYNC_SET_VALUE_OPTIONS,
+} from './form-value-sync-patch.lib'
 
 function applyValueSyncPatchEntry(form: UseFormReturn, key: string, value: unknown): void {
   const mutators = getArrayFieldMutators(form.control, key)
@@ -12,7 +16,13 @@ function applyValueSyncPatchEntry(form: UseFormReturn, key: string, value: unkno
     mutators.replace(value as Record<string, unknown>[])
     return
   }
-  form.setValue(key, value, { shouldDirty: true, shouldValidate: true })
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    for (const entry of flattenPatchToLeafSetValues({ [key]: value })) {
+      form.setValue(entry.path, entry.value, VALUE_SYNC_SET_VALUE_OPTIONS)
+    }
+    return
+  }
+  form.setValue(key, value, VALUE_SYNC_SET_VALUE_OPTIONS)
 }
 
 function buildValuesMap(dependsOn: readonly string[], watched: unknown): Record<string, unknown> {
