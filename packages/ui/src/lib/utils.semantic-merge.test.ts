@@ -34,4 +34,20 @@ describe('cn semantic control groups', () => {
       'ui-choice-control--indicator-sm',
     )
   })
+
+  it('drops conflicting ui-field-control trigger flow modifiers', () => {
+    expect(cn('ui-field-control--trigger-fill', 'ui-field-control--trigger-fit')).toBe(
+      'ui-field-control--trigger-fit',
+    )
+  })
+
+  it('drops conflicting ui-field-control width modifiers', () => {
+    expect(cn('ui-field-control--width-md', 'ui-field-control--width-lg')).toBe(
+      'ui-field-control--width-lg',
+    )
+  })
+
+  it('lets consumer w-full override semantic width-full modifier', () => {
+    expect(cn('ui-field-control--width-full', 'w-auto')).toBe('ui-field-control--width-full w-auto')
+  })
 })

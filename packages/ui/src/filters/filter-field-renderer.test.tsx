@@ -178,7 +178,9 @@ describe('FilterFieldRenderer chrome', () => {
     const group = screen.getByRole('group', { name: 'Filter by school' })
     expect(group).toHaveClass('w-fit')
     expect(group).not.toHaveClass('w-full')
-    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('w-auto')
+    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass(
+      'ui-field-control--trigger-fit',
+    )
   })
 
   it('reserves every select option label in the width sizer', () => {
@@ -194,7 +196,11 @@ describe('FilterFieldRenderer chrome', () => {
 
   it('caps inline selects at lg when no width token is set', () => {
     render(<RendererHarness fieldId="school" />)
-    expect(screen.getByRole('combobox', { name: 'School' })).toHaveClass('max-w-48')
+    const group = screen.getByRole('group', { name: 'Filter by school' })
+    expect(group.querySelector('[class*="ui-field-control--width-lg"]')).toBeTruthy()
+    expect(screen.getByRole('combobox', { name: 'School' })).not.toHaveClass(
+      'ui-field-control--width-lg',
+    )
   })
 
   it('reserves the popover trigger extremes in the width sizer', () => {

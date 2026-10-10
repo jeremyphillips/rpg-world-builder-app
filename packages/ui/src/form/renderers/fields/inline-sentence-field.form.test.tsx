@@ -169,7 +169,7 @@ describe('InlineSentenceField form integration', () => {
     )
 
     const trigger = container.querySelector('#unlock-level-select')
-    expect(trigger).toHaveClass('w-48', 'max-w-48', 'shrink-0')
+    expect(trigger).toHaveClass('ui-field-control--width-lg', 'w-48', 'shrink-0')
   })
 
   it('submits count and trailing select values', async () => {

@@ -64,7 +64,7 @@ The composite resets anatomy-row participation so it does not join a parent thre
 
 The composite does not measure width. Select and combobox width stays on `SelectLikeValueSlot` ghosts. `withFloatingLabelSizingLabel(label, sizingLabels)` appends the label as one more ghost at control typography so unconstrained controls grow to fit the label.
 
-A schema `width` token is a **max width on the whole control**. When capped, the floated label ellipsizes inside that box; the value slot still ellipsizes via `filterToolbarCappedSelectValueSlotClasses`. Floating selects omit shell `overflow-hidden` so the notch is not clipped.
+A schema `width` token is a **max width on the whole control** (`ui-field-control--width-*` on `Field.Root` / filter chrome wrapper — one owner per composition). When capped, the floated label ellipsizes inside that box; the selected value ellipsizes via universal `[data-select-value-slot]` rules on `.ui-field-control--trigger`. Floating selects omit shell `overflow-hidden` so the notch is not clipped.
 
 Filter rows wrap (`flex-wrap`); a field that does not fit moves to the next row instead of overlapping neighbors.
 

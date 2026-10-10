@@ -34,6 +34,11 @@ For each migrated primitive, verify in Storybook DevTools:
 6. No Tailwind utility edits required for 1–3.
 7. Storybook `ClassReference` + live caption match DevTools; utility side of caption is empty (layout-only utilities documented).
 
+## Field control width and trigger flow
+
+- **`ui-field-control--width-*`** — exactly one width modifier per control composition (typically `Field.Root`, filter chrome wrapper, or standalone trigger when no outer owner exists). Fractions and intrinsic caps live in `field-control.css`; twMerge group `ui-field-control-width`.
+- **`ui-field-control--trigger-{fill|fit|segment}`** — mutually exclusive horizontal flow on select/combobox triggers only; twMerge group `ui-field-control-trigger-flow`. Width tokens do not belong on the trigger when an ancestor already owns `--width-*`.
+
 ## When CVA vs CSS
 
 - **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.

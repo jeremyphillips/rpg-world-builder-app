@@ -39,12 +39,17 @@ function parseCssRules(css: string): ParsedRule[] {
   return rules
 }
 
+function normalizeSelectorToken(token: string): string {
+  return token.replace(/\\(.)/g, '$1')
+}
+
 function selectorTargetsModifier(selector: string, className: string): boolean {
+  const normalizedClass = normalizeSelectorToken(className)
   return selector.split(',').some((part) => {
-    const trimmed = part.trim()
-    if (trimmed === className) return true
-    if (trimmed.startsWith(`${className}:`)) return true
-    if (trimmed.startsWith(`${className}[`)) return true
+    const trimmed = normalizeSelectorToken(part.trim())
+    if (trimmed === normalizedClass) return true
+    if (trimmed.startsWith(`${normalizedClass}:`)) return true
+    if (trimmed.startsWith(`${normalizedClass}[`)) return true
     return false
   })
 }
@@ -173,6 +178,43 @@ const FIELD_CONTROL_DIGITS_REQUIRED = ['padding-inline-start', 'padding-inline-e
 
 const FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED = ['background-color', 'border-color'] as const
 
+const FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS = [
+  'trigger-fill',
+  'trigger-fit',
+  'trigger-segment',
+] as const
+
+const FIELD_CONTROL_TRIGGER_FLOW_REQUIRED = ['width', 'flex-shrink'] as const
+
+const FIELD_CONTROL_WIDTH_INTRINSIC_MODIFIERS = [
+  'width-xs',
+  'width-sm',
+  'width-md',
+  'width-lg',
+  'width-xl',
+] as const
+
+const FIELD_CONTROL_WIDTH_INTRINSIC_REQUIRED = ['max-width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_AUTO_REQUIRED = ['width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_FULL_REQUIRED = ['width', 'flex'] as const
+
+const FIELD_CONTROL_WIDTH_FRACTION_MODIFIERS = [
+  'width-1/2',
+  'width-1/3',
+  'width-2/3',
+  'width-1/4',
+  'width-3/4',
+] as const
+
+const FIELD_CONTROL_WIDTH_FRACTION_REQUIRED = [
+  'min-width',
+  'max-width',
+  'flex-basis',
+  'flex-grow',
+] as const
+
 const COMPACT_CONTROL_ICON_MODIFIERS = [
   'icon-compact',
   'icon-compact-sm',
@@ -251,6 +293,26 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-field-control--${name}`,
         requiredProperties: FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_TRIGGER_FLOW_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_TRIGGER_FLOW_REQUIRED,
+      })),
+      ...FIELD_CONTROL_WIDTH_INTRINSIC_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_WIDTH_INTRINSIC_REQUIRED,
+      })),
+      {
+        modifierPrefix: 'ui-field-control--width-auto',
+        requiredProperties: FIELD_CONTROL_WIDTH_AUTO_REQUIRED,
+      },
+      {
+        modifierPrefix: 'ui-field-control--width-full',
+        requiredProperties: FIELD_CONTROL_WIDTH_FULL_REQUIRED,
+      },
+      ...FIELD_CONTROL_WIDTH_FRACTION_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_WIDTH_FRACTION_REQUIRED,
       })),
     ],
   },

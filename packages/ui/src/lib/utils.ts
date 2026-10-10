@@ -9,6 +9,8 @@ import {
   UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
+  UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES,
+  UI_FIELD_CONTROL_WIDTH_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
   UI_COMPACT_CONTROL_SIZE_CLASSES,
   UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES,
@@ -69,6 +71,8 @@ type TypographyClassGroupIds =
   | 'ui-field-control-multiline-size'
   | 'ui-field-control-digits-size'
   | 'ui-field-control-filter-appearance'
+  | 'ui-field-control-trigger-flow'
+  | 'ui-field-control-width'
   | 'ui-floating-label-size'
   | 'ui-field-group-size'
   | 'ui-field-group-layout'
@@ -143,6 +147,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-multiline-size': [...UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES],
       'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
       'ui-field-control-filter-appearance': [...UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES],
+      'ui-field-control-trigger-flow': [...UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES],
+      'ui-field-control-width': [...UI_FIELD_CONTROL_WIDTH_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
       'ui-choice-control-kind': [...UI_CHOICE_CONTROL_KIND_CLASSES],
@@ -161,6 +167,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-multiline-size': ['ui-field-control-multiline-size'],
       'ui-field-control-digits-size': ['ui-field-control-digits-size'],
       'ui-field-control-filter-appearance': ['ui-field-control-filter-appearance'],
+      'ui-field-control-trigger-flow': ['ui-field-control-trigger-flow'],
+      'ui-field-control-width': ['ui-field-control-width'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'ui-compact-control-size': ['ui-compact-control-size'],
       'ui-choice-control-kind': ['ui-choice-control-kind'],

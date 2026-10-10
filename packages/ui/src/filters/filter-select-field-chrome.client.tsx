@@ -6,6 +6,7 @@ import { FilterFieldCaption } from './filter-field-caption.client'
 import { FilterFloatingField } from './filter-floating-field.client'
 import type { FilterFieldPresentation } from './filter-presentation.lib'
 import type { FilterSelectPresentation } from './filter-chrome.context'
+import type { FieldWidth } from '../components/ui/field-control.variants'
 import type { FilterFieldWidth } from './filter-schema.types'
 
 export type FilterSelectFieldLayout = 'inline' | 'stacked' | 'default' | 'floating'
@@ -20,6 +21,8 @@ type FilterSelectFieldChromeProps = {
   populated?: boolean
   disabled?: boolean
   widthClassName?: string
+  /** Resolved width token for floating layout (`Field.Root` owner). */
+  fieldWidth?: FieldWidth
   children: ReactNode
 }
 
@@ -32,6 +35,7 @@ export function FilterSelectFieldChrome({
   populated = true,
   disabled,
   widthClassName,
+  fieldWidth,
   children,
 }: FilterSelectFieldChromeProps) {
   const groupLabel = ariaLabel ?? label
@@ -44,7 +48,7 @@ export function FilterSelectFieldChrome({
           label={label}
           populated={populated}
           disabled={disabled}
-          width="auto"
+          width={fieldWidth ?? 'lg'}
         >
           {children as ReactElement}
         </FilterFloatingField>
@@ -92,7 +96,12 @@ export function FilterSelectFieldChrome({
   return (
     <div
       data-field-align=""
-      className={cn(presentation.controlBandClassName, presentation.groupClassName)}
+      className={cn(
+        presentation.controlBandClassName,
+        presentation.groupClassName,
+        'min-w-0',
+        widthClassName,
+      )}
     >
       {children}
     </div>

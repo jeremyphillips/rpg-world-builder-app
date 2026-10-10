@@ -17,6 +17,7 @@ import {
 } from './filter-select-field-chrome.client'
 import { resolveFilterSelectControlView } from './filter-select-control.lib'
 import type { FilterFieldPresentation } from './filter-presentation.lib'
+import type { FieldWidth } from '../components/ui/field-control.variants'
 import type {
   FilterFieldId,
   FilterFieldOptionsContext,
@@ -32,6 +33,7 @@ type FilterSelectControlProps<TData, TState extends Record<string, unknown>> = {
   optionsContext?: FilterFieldOptionsContext<TData, TState>
   presentation: Extract<FilterFieldPresentation, { type: 'select' }>
   widthClassName?: string
+  fieldWidth?: FieldWidth
   disabled?: boolean
   onValueChange: (
     id: FilterFieldId<TState>,
@@ -47,6 +49,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
   optionsContext,
   presentation,
   widthClassName,
+  fieldWidth,
   disabled,
   onValueChange,
 }: FilterSelectControlProps<TData, TState>) {
@@ -102,6 +105,7 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
           label={selectField.label}
           populated={view.selectValue.length > 0}
           disabled={disabled}
+          fieldWidth={fieldWidth}
         >
           <SelectTrigger
             id={controlId}

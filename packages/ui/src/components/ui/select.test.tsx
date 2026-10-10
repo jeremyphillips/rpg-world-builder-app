@@ -152,7 +152,7 @@ describe('Select', () => {
     renderDigitSelect({ grouped: true, groupedPosition: 'start', value: '30', digits: 2 })
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('w-auto')
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit')
 
     const caret = caretSlot(trigger)
     expect(caret).toHaveClass(
@@ -334,7 +334,7 @@ describe('Select', () => {
     renderSizingLabelSelect({ grouped: true, groupedPosition: 'end', sizingLabel: 'GP' })
 
     const trigger = screen.getByLabelText('Currency')
-    expect(trigger).toHaveClass('w-auto', 'ui-field-group__segment--end')
+    expect(trigger).toHaveClass('ui-field-control--trigger-fit', 'ui-field-group__segment--end')
     expect(valueSlot(trigger)).toHaveClass('grid', 'ui-field-group__value-slot--end-slot')
     expect(caretSlot(trigger)).toHaveClass('ui-field-group__caret-slot')
     expect(trigger).toHaveTextContent('GP')

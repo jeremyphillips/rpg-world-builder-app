@@ -2,6 +2,51 @@ export const UI_FIELD_CONTROL_BLOCK_CLASS = 'ui-field-control' as const
 
 export const UI_FIELD_CONTROL_TRIGGER_CLASS = 'ui-field-control--trigger' as const
 
+export const UI_FIELD_CONTROL_TRIGGER_FILL_CLASS = 'ui-field-control--trigger-fill' as const
+export const UI_FIELD_CONTROL_TRIGGER_FIT_CLASS = 'ui-field-control--trigger-fit' as const
+export const UI_FIELD_CONTROL_TRIGGER_SEGMENT_CLASS = 'ui-field-control--trigger-segment' as const
+
+export const UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES = [
+  UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_FIT_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_SEGMENT_CLASS,
+] as const
+
+export type FieldControlWidthKey =
+  | 'xs'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'auto'
+  | 'full'
+  | '1/2'
+  | '1/3'
+  | '2/3'
+  | '1/4'
+  | '3/4'
+
+const FIELD_CONTROL_WIDTH_CLASS: Record<FieldControlWidthKey, string> = {
+  xs: 'ui-field-control--width-xs',
+  sm: 'ui-field-control--width-sm',
+  md: 'ui-field-control--width-md',
+  lg: 'ui-field-control--width-lg',
+  xl: 'ui-field-control--width-xl',
+  auto: 'ui-field-control--width-auto',
+  full: 'ui-field-control--width-full',
+  '1/2': 'ui-field-control--width-1/2',
+  '1/3': 'ui-field-control--width-1/3',
+  '2/3': 'ui-field-control--width-2/3',
+  '1/4': 'ui-field-control--width-1/4',
+  '3/4': 'ui-field-control--width-3/4',
+}
+
+export const UI_FIELD_CONTROL_WIDTH_CLASSES = Object.values(FIELD_CONTROL_WIDTH_CLASS)
+
+export function resolveFieldControlWidthClass(width: FieldControlWidthKey): string {
+  return FIELD_CONTROL_WIDTH_CLASS[width]
+}
+
 export type FieldControlSizeKey = 'sm' | 'md' | 'lg'
 
 export type FieldControlSizeSpec = {

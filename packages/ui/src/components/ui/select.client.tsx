@@ -16,6 +16,7 @@ import {
   assertSelectCompactSizing,
   isSelectCompactTrigger,
   resolveSelectSizingGhostLabels,
+  resolveSelectTriggerFlowClass,
   SELECT_CARET_SLOT_DATA_ATTR,
   SELECT_SIZING_LABEL_DATA_ATTR,
   SELECT_VALUE_SLOT_DATA_ATTR,
@@ -26,18 +27,6 @@ const SelectGroup = SelectPrimitive.Group
 const SelectValue = SelectPrimitive.Value
 
 export { SELECT_CARET_SLOT_DATA_ATTR, SELECT_SIZING_LABEL_DATA_ATTR, SELECT_VALUE_SLOT_DATA_ATTR }
-
-function selectTriggerWidthClasses(isCompact: boolean, grouped: boolean): string {
-  if (isCompact) {
-    return 'w-auto shrink-0'
-  }
-
-  if (grouped) {
-    return 'shrink-0'
-  }
-
-  return 'w-full'
-}
 
 const SelectTrigger = React.forwardRef<
   React.ComponentRef<typeof SelectPrimitive.Trigger>,
@@ -92,8 +81,7 @@ const SelectTrigger = React.forwardRef<
         ref={ref}
         className={cn(
           selectTriggerShellClasses(size, { grouped, groupedPosition }),
-          selectTriggerWidthClasses(compact, grouped),
-          'gap-0 text-left data-[placeholder]:text-muted-foreground',
+          resolveSelectTriggerFlowClass({ compact, grouped }),
           className,
         )}
         {...props}

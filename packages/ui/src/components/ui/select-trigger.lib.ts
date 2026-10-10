@@ -1,4 +1,9 @@
 import type { FieldDigits } from './field-digit-metrics'
+import {
+  UI_FIELD_CONTROL_TRIGGER_FILL_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_FIT_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_SEGMENT_CLASS,
+} from './field-control.styles'
 
 export const SELECT_VALUE_SLOT_DATA_ATTR = 'data-select-value-slot'
 export const SELECT_CARET_SLOT_DATA_ATTR = 'data-select-caret-slot'
@@ -34,6 +39,21 @@ export function assertSelectCompactSizing(props: SelectCompactSizingProps): void
 
 export function isSelectCompactTrigger(props: SelectCompactSizingProps): boolean {
   return props.digits != null || hasTextSizing(props)
+}
+
+export function resolveSelectTriggerFlowClass(options: {
+  compact: boolean
+  grouped: boolean
+}): string {
+  if (options.compact) {
+    return UI_FIELD_CONTROL_TRIGGER_FIT_CLASS
+  }
+
+  if (options.grouped) {
+    return UI_FIELD_CONTROL_TRIGGER_SEGMENT_CLASS
+  }
+
+  return UI_FIELD_CONTROL_TRIGGER_FILL_CLASS
 }
 
 export function resolveSelectSizingGhostLabels(props: SelectCompactSizingProps): string[] {

@@ -4,6 +4,11 @@ import { cn } from '../lib/utils'
 import { establishSurfaceCurrent } from '../components/ui/surface-current.lib'
 import { iconGlyphDescendantClasses } from '../components/ui/icon-glyph.variants'
 import { fieldCaptionTypographyVariants } from '../components/ui/field-caption.variants'
+import {
+  labelSizerBlockClasses,
+  labelSizerGhostClasses,
+  labelSizerLiveClasses,
+} from '../components/ui/label-sizer.styles'
 import type { FilterDensity } from './filter-schema.types'
 
 export const FILTER_SELECT_ALL_VALUE = '__all__'
@@ -59,30 +64,10 @@ export const filterBarControlVariants = cva('', {
 
 export const filterBarResetButtonClasses = cn('gap-1 text-xs', iconGlyphDescendantClasses.sm)
 
-/**
- * Widest-label sizer. Ghost copies and the live value share one grid cell so
- * the control stays as wide as its longest label.
- */
-export const filterToolbarLabelSizerClasses = 'grid grid-cols-[minmax(0,max-content)] items-center'
-
-export const filterToolbarLabelSizerGhostClasses =
-  'invisible pointer-events-none col-start-1 row-start-1 whitespace-nowrap select-none tabular-nums'
-
-export const filterToolbarLabelSizerLiveClasses =
-  'col-start-1 row-start-1 min-w-0 truncate text-left tabular-nums'
-
-/** Ellipsis and shrink for the value slot when a width cap is active. */
-export const filterToolbarCappedSelectValueSlotClasses =
-  '[&_[data-select-value-slot]]:max-w-full [&_[data-select-value-slot]]:min-w-0 [&_[data-select-value-slot]]:shrink [&_[data-select-value-slot]]:overflow-hidden [&_[data-select-value-slot]]:grid-cols-[minmax(0,max-content)]'
-
-/**
- * Lets a width-token cap shrink a select below its widest ghost and ellipsize
- * the live value. The token stays a max width; it does not set a fixed width.
- */
-export const filterToolbarCappedSelectClasses = cn(
-  'overflow-hidden',
-  filterToolbarCappedSelectValueSlotClasses,
-)
+/** Widest-label sizer — semantic classes in `label-sizer.css`. */
+export const filterToolbarLabelSizerClasses = labelSizerBlockClasses()
+export const filterToolbarLabelSizerGhostClasses = labelSizerGhostClasses()
+export const filterToolbarLabelSizerLiveClasses = labelSizerLiveClasses()
 
 export const filterInlineFieldGroupVariants = cva('flex flex-col sm:flex-row sm:items-center', {
   variants: {

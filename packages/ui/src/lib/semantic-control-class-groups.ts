@@ -60,6 +60,27 @@ export const UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES = [
   'ui-field-control--digits-lg',
 ] as const
 
+export const UI_FIELD_CONTROL_TRIGGER_FLOW_CLASSES = [
+  'ui-field-control--trigger-fill',
+  'ui-field-control--trigger-fit',
+  'ui-field-control--trigger-segment',
+] as const
+
+export const UI_FIELD_CONTROL_WIDTH_CLASSES = [
+  'ui-field-control--width-xs',
+  'ui-field-control--width-sm',
+  'ui-field-control--width-md',
+  'ui-field-control--width-lg',
+  'ui-field-control--width-xl',
+  'ui-field-control--width-auto',
+  'ui-field-control--width-full',
+  'ui-field-control--width-1/2',
+  'ui-field-control--width-1/3',
+  'ui-field-control--width-2/3',
+  'ui-field-control--width-1/4',
+  'ui-field-control--width-3/4',
+] as const
+
 export const UI_FLOATING_LABEL_SIZE_CLASSES = [
   'ui-floating-label-field--sm',
   'ui-floating-label-field--md',

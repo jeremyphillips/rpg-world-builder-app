@@ -127,9 +127,130 @@
     width: auto;
     flex-shrink: 0;
     align-items: stretch;
+    gap: 0;
     cursor: pointer;
     padding-inline: 0;
     padding-block: 0;
+    text-align: start;
+  }
+
+  .ui-field-control--trigger [data-placeholder] {
+    color: var(--muted-foreground);
+  }
+
+  .ui-field-control--trigger [data-select-value-slot] {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-field-control--trigger-fill {
+    width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+
+  .ui-field-control--trigger-fit {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  .ui-field-control--trigger-segment {
+    width: auto;
+    flex-shrink: 0;
+  }
+
+  /* --- Field wrapper width tokens (single owner per composition) --- */
+
+  .ui-field-control--width-xs {
+    max-width: 4rem;
+    flex: none;
+  }
+
+  .ui-field-control--width-sm {
+    max-width: 6rem;
+    flex: none;
+  }
+
+  .ui-field-control--width-md {
+    max-width: 9rem;
+    flex: none;
+  }
+
+  .ui-field-control--width-lg {
+    max-width: 12rem;
+    flex: none;
+  }
+
+  .ui-field-control--width-xl {
+    max-width: 16rem;
+    flex: none;
+  }
+
+  [data-field-row] .ui-field-control--width-xs {
+    width: 4rem;
+  }
+
+  [data-field-row] .ui-field-control--width-sm {
+    width: 6rem;
+  }
+
+  [data-field-row] .ui-field-control--width-md {
+    width: 9rem;
+  }
+
+  [data-field-row] .ui-field-control--width-lg {
+    width: 12rem;
+  }
+
+  [data-field-row] .ui-field-control--width-xl {
+    width: 16rem;
+  }
+
+  .ui-field-control--width-auto {
+    width: fit-content;
+    flex: none;
+  }
+
+  .ui-field-control--width-full {
+    width: 100%;
+    flex: 1 1 0%;
+  }
+
+  .ui-field-control--width-1\/2 {
+    min-width: 0;
+    max-width: 50%;
+    flex-basis: 0;
+    flex-grow: 6;
+  }
+
+  .ui-field-control--width-1\/3 {
+    min-width: 0;
+    max-width: 33.333333%;
+    flex-basis: 0;
+    flex-grow: 4;
+  }
+
+  .ui-field-control--width-2\/3 {
+    min-width: 0;
+    max-width: 66.666667%;
+    flex-basis: 0;
+    flex-grow: 8;
+  }
+
+  .ui-field-control--width-1\/4 {
+    min-width: 0;
+    max-width: 25%;
+    flex-basis: 0;
+    flex-grow: 3;
+  }
+
+  .ui-field-control--width-3\/4 {
+    min-width: 0;
+    max-width: 75%;
+    flex-basis: 0;
+    flex-grow: 9;
   }
 
   /* --- Digit trailing reserve --- */
