@@ -4,6 +4,7 @@ import { ROUTES } from '@/app/routes'
 import type { CampaignCharacterNavModel } from '@/features/campaign'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
+import { isGameLibrarySidebarContent } from './campaign-sidebar-content-section'
 import { buildCampaignSidebarSections } from './build-campaign-sidebar-sections'
 
 const campaignId = 'camp_1'
@@ -61,8 +62,8 @@ describe('buildCampaignSidebarSections', () => {
       .find((section) => section.id === 'gameLibrary')!
       .items.map((item) => item.label)
     const expectedGameLibraryLabels = [
-      ...VISIBLE_SIDEBAR_CONTENT.filter(
-        (entry) => entry.contentType !== 'organizations' && entry.contentType !== 'locations',
+      ...VISIBLE_SIDEBAR_CONTENT.filter((entry) =>
+        isGameLibrarySidebarContent(entry.contentType),
       ).map((entry) => entry.label),
       'Game Terms',
       'Homebrew',

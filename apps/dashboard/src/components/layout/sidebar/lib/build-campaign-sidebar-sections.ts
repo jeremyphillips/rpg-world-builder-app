@@ -4,6 +4,7 @@ import { isCampaignCharactersNavActive } from '@/features/campaign'
 import { getCharacterTypeNavLabel } from '@/features/character/lib/display/character-type-labels'
 import { findVisibleSidebarContent, VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew'
 
+import { isGameLibrarySidebarContent } from './campaign-sidebar-content-section'
 import { buildAdminSidebarItems } from './build-admin-sidebar-items'
 import { sidebarNavItem } from './sidebar-nav-icons'
 import {
@@ -12,8 +13,8 @@ import {
   type SidebarNavItem,
 } from './sidebar-nav-model'
 
-const GAME_LIBRARY_CONTENT = VISIBLE_SIDEBAR_CONTENT.filter(
-  (entry) => entry.contentType !== 'organizations' && entry.contentType !== 'locations',
+const GAME_LIBRARY_CONTENT = VISIBLE_SIDEBAR_CONTENT.filter((entry) =>
+  isGameLibrarySidebarContent(entry.contentType),
 )
 
 export type BuildCampaignSidebarSectionsInput = {

@@ -4,10 +4,7 @@ import { authoredContentBodySchema } from '../../../primitives/authored-content'
 import { contentMediaSchema } from '../../../primitives/media/content-media'
 import { formatUntitledContentName } from '../draft-authored-content'
 
-/**
- * Authored content body variant for media-enabled catalog domains.
- * Adds optional `ContentMedia`; not yet composed into live type schemas until cutover.
- */
+/** Authored content body variant for media-enabled catalog domains (optional `ContentMedia`). */
 export const mediaBearingAuthoredContentBodySchema = authoredContentBodySchema.extend({
   media: contentMediaSchema.optional(),
 })

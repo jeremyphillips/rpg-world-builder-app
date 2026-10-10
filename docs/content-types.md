@@ -348,7 +348,7 @@ packages/catalog/src/<type>/                 ← System seed JSON + loadSeed* ex
 tools/content-types/                         ← CONTENT_TYPE_INTEGRATION_MANIFEST (metadata-only drift index)
 apps/api/src/features/content/
   <type>/
-    <type>.config.ts               ← *Registration (read + write wiring; imports @rpg/catalog)
+    <type>.config.ts               ← *Registration (read + write wiring; imports @rpg/catalog when bundled)
     homebrew-<type>.model.ts       ← (when homebrew is needed) Mongoose schema
     <type>-patch.model.ts          ← (when patches are needed) Mongoose schema
   content-types.ts                 ← Single-line registry entry (*Registration)
@@ -421,7 +421,7 @@ export const <type>PatchSchema = contentPatchBaseSchema.extend({ patch: <type>Bo
 
 Rules:
 
-- Always extend `contentBodyBaseSchema` — never redefine `name`, `description`, `imageKey`.
+- Always extend `contentBodyBaseSchema` (or `mediaBearingAuthoredContentBodySchema` when opting into managed `ContentMedia`) — never redefine `name` or `description`.
   It is the catalog-facing alias of the neutral `authoredContentBodySchema`; world
   content and seed contracts use that primitive without adopting catalog ownership semantics.
 - `description` stores sanitized HTML; render catalog copy with `RichTextContent`.
@@ -455,7 +455,7 @@ file. See [packages/contracts/docs/structure.md](../packages/contracts/docs/stru
 
 Catalog **collection names** (sidebar, breadcrumbs, overview headings, create
 titles) are not field vocabulary. They live in
-`packages/contracts/src/rpg/content/lib/content-type-terms.ts` as
+`packages/contracts/src/rpg/primitives/content/content-type-terms.ts` as
 `CONTENT_TYPE_TERMS`, keyed by `ContentTypeKey`.
 
 Three display layers — do not conflate them:
@@ -1008,6 +1008,12 @@ do not hardcode the display string:
 },
 ```
 
+When the type appears in the campaign sidebar, add a row to
+`CAMPAIGN_SIDEBAR_CONTENT_SECTION` in
+`apps/dashboard/src/components/layout/sidebar/lib/campaign-sidebar-content-section.ts`
+(`game-library` vs `world`). The map is exhaustive over
+`HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS`.
+
 ---
 
 ## Naming conventions
@@ -1026,14 +1032,14 @@ do not hardcode the display string:
 
 ## Design decisions to make for each new type
 
-| Decision                         | Guidance                                                                                                                                                                                                                                                     |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                                                     |
-| **`imageKey`?**                  | Optional on `contentBodyBaseSchema` — include if the type has artwork; omit from seed if not applicable.                                                                                                                                                     |
-| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as optional `heritage` on the species body (`content/species.ts`).                            |
-| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                                                 |
-| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                                                        |
-| **Dual-ownership fields?**       | One authoritative owner per relationship; derive inverse views at read time. See [cross-content-relationships.md](./cross-content-relationships.md) and [Skill ↔ class association](#skill-class-association). Never mirror reciprocal arrays on both types. |
+| Decision                         | Guidance                                                                                                                                                                                                                                                                                            |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Mongoose models now or stub?** | Stub (`return []`) if no homebrew/patch UX exists yet. Models take ~1 hour to add later.                                                                                                                                                                                                            |
+| **Managed images?**              | Opt in via `CONTENT_TYPE_MEDIA_DOMAIN` + `mediaBearingAuthoredContentBodySchema`; dashboard/API follow `CONTENT_TYPE_MEDIA_ENABLED_KEYS`. Non-media types use identity fallback icons only — see [`apps/dashboard/docs/content-managed-media.md`](../apps/dashboard/docs/content-managed-media.md). |
+| **Nested resources?**            | Use a separate schema + `GET /<parent>/:id/<child>` if the child is too large to embed (e.g. subclasses). Otherwise embed — e.g. `species` lineages/ancestries as optional `heritage` on the species body (`content/species.ts`).                                                                   |
+| **Write endpoints?**             | Defer. Add `create*InputSchema` / `update*InputSchema` / `*PatchSchema` to contracts now (they cost nothing), wire API endpoints when authoring UX is built.                                                                                                                                        |
+| **Per-id GET?**                  | Not needed — detail pages resolve client-side from the full list query. Add only if list size makes this impractical.                                                                                                                                                                               |
+| **Dual-ownership fields?**       | One authoritative owner per relationship; derive inverse views at read time. See [cross-content-relationships.md](./cross-content-relationships.md) and [Skill ↔ class association](#skill-class-association). Never mirror reciprocal arrays on both types.                                        |
 
 ---
 

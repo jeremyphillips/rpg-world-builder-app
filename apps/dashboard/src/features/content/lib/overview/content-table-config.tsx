@@ -9,6 +9,7 @@ import {
   type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
   type ContentMedia,
+  isContentTypeMediaEnabled,
   type ContentTypeKey,
 } from '@rpg/contracts'
 import { dataTableColumnMeta, dataTableWidthMeta, SortableHeader } from '@rpg/ui'
@@ -50,7 +51,7 @@ export { readCampaignAccess as readContentRowCampaignAccess }
 export type ContentTableOptions<T> = {
   /** Content type used to resolve shared source-presentation policy. */
   contentType: ContentTypeKey
-  /** When false, omits the leading image column (spells, feats, skill-proficiencies). */
+  /** When false, omits the leading image column (non-media catalog types). */
   includeImageColumn?: boolean
   /** Optional resolver for crop-aware overview thumbnails and fallback icons. */
   resolveOverviewDisplay?: (row: T) => DashboardContentDisplayResult
@@ -108,7 +109,7 @@ export function buildContentColumns<T extends ContentBase>(
 ): ColumnDef<T>[] {
   const {
     contentType,
-    includeImageColumn = !['spells', 'feats', 'skill-proficiencies'].includes(contentType),
+    includeImageColumn = isContentTypeMediaEnabled(contentType),
     resolveOverviewDisplay,
     nameHref,
     editHref,

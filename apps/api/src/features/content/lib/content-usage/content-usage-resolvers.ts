@@ -4,11 +4,7 @@ import type {
   ContentOverviewUsageScope,
   ContentUsageSummaryLabels,
 } from '@rpg/contracts'
-import {
-  API_CONTENT_TYPE_KEYS,
-  contentEntryUsageSchema,
-  contentListUsageFieldsSchema,
-} from '@rpg/contracts'
+import { contentEntryUsageSchema, contentListUsageFieldsSchema } from '@rpg/contracts'
 
 import type { ContentBatchUsageEntryResult } from './build-content-batch-entry-result'
 import type {
@@ -17,6 +13,7 @@ import type {
   ContentBatchUsageResolver,
   ContentUsageSurfaceKey,
 } from './define-content-usage'
+import { CONTENT_USAGE_SURFACE_KEYS } from './define-content-usage'
 import {
   CONTENT_USAGE_REGISTRATIONS,
   getContentUsageRegistration,
@@ -77,16 +74,10 @@ export function resolveContentUsageLookupKey(
   return registration.lookupKey === 'slug' ? entity.slug : entity.id
 }
 
-/** Nested surfaces registered separately from {@link API_CONTENT_TYPE_KEYS}. */
-export const NESTED_CONTENT_USAGE_SURFACE_KEYS = [
-  'subclasses',
-] as const satisfies readonly ContentUsageSurfaceKey[]
-
 /** Expected usage registrations — derived from contracts/API type SSOT. */
-export const EXPECTED_CONTENT_USAGE_SURFACES = [
-  ...API_CONTENT_TYPE_KEYS,
-  ...NESTED_CONTENT_USAGE_SURFACE_KEYS,
-] as const satisfies readonly ContentUsageSurfaceKey[]
+export const EXPECTED_CONTENT_USAGE_SURFACES = CONTENT_USAGE_SURFACE_KEYS
+
+export { NESTED_CONTENT_USAGE_SURFACE_KEYS } from './define-content-usage'
 
 /** Asserts every catalog + nested surface has entry and batch usage registrations. */
 export function assertContentUsageRegistrationCoverage(): void {
