@@ -3,6 +3,33 @@ import { inlineMetadataSeparatorRestrictions } from '@rpg/config/eslint/inline-m
 import react from '@rpg/config/eslint/react'
 import storybook from 'eslint-plugin-storybook'
 
+const dashboardDatatableFilterRegionImportGuard = {
+  files: [
+    'src/lib/data-table/**/*.{ts,tsx}',
+    'src/features/**/components/*overview*table*.{ts,tsx}',
+    'src/features/admin/components/admin-users-overview-table.tsx',
+  ],
+  ignores: [
+    '**/*.{test,integration.test,stories}.{ts,tsx}',
+    'src/lib/data-table/primary-filter-bar-region.tsx',
+  ],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        paths: [
+          {
+            name: '@rpg/ui',
+            importNames: ['DataTableFilterRegion'],
+            message:
+              'Datatable table adapters compose DataTableFilterChrome only. PrimaryFilterPanel (primary-filter-bar-region.tsx) keeps DataTableFilterRegion for inbox/messages.',
+          },
+        ],
+      },
+    ],
+  },
+}
+
 const dashboardStorybookRouterRule = {
   files: ['**/*.stories.tsx'],
   rules: {
@@ -440,6 +467,7 @@ export default [
   ...react,
   ...storybook.configs['flat/recommended'],
   buildingArchetypeAppQuarantine,
+  dashboardDatatableFilterRegionImportGuard,
   dashboardStorybookRouterRule,
   dashboardEntitySurfaceImportGuard,
   dashboardSheetImportGuard,

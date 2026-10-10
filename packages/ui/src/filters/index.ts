@@ -123,3 +123,7 @@ export {
   serializeFilterSearchParams,
 } from './filter-persistence'
 export { stableSerializeFilterState } from './filter-state-serialization'
+export {
+  prepareDatatableFilterSchemaForRender,
+  validateDatatableFilterSchema,
+} from './validate-datatable-filter-schema'
