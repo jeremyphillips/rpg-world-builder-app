@@ -1,0 +1,387 @@
+/*
+ * Field control — single-line inputs, textareas, triggers, digits, SearchBar, FilterInline.
+ * Source order: block → grouped shell → sizes → multiline → trigger → digits → filter → search bar.
+ */
+@layer components {
+  .ui-field-control {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    border-radius: calc(var(--radius) - 2px);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--field-control-border);
+    background-color: var(--field-control-bg);
+    color: var(--field-control-fg);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-field-control:hover:not(:disabled):not([readonly]) {
+    border-color: var(--field-control-border-hover);
+  }
+
+  .ui-field-control:focus-visible {
+    outline: none;
+    border-color: var(--field-control-border-focus);
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--ring);
+  }
+
+  .ui-field-control[aria-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-field-control[aria-invalid='true']:focus-visible {
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--field-control-border-invalid);
+  }
+
+  .ui-field-control:disabled {
+    cursor: not-allowed;
+    background-color: var(--field-control-bg-disabled);
+    border-color: var(--field-control-border-disabled);
+    color: var(--field-control-fg-disabled);
+  }
+
+  .ui-field-control:disabled::placeholder {
+    color: var(--field-control-fg-disabled);
+  }
+
+  .ui-field-control[readonly] {
+    background-color: var(--field-control-bg-readonly);
+    border-color: var(--field-control-border-readonly);
+  }
+
+  .ui-field-control::placeholder {
+    color: var(--field-control-placeholder);
+  }
+
+  .ui-field-control:-webkit-autofill,
+  .ui-field-control:-webkit-autofill:hover,
+  .ui-field-control:-webkit-autofill:focus {
+    box-shadow: inset 0 0 0 1000px var(--field-control-bg);
+    -webkit-text-fill-color: var(--field-control-fg);
+  }
+
+  /* --- Grouped field shell (focus-within) --- */
+
+  .ui-field-control-shell--grouped {
+    display: grid;
+    align-items: center;
+    width: 100%;
+    border-radius: calc(var(--radius) - 2px);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--field-control-border);
+    background-color: var(--field-control-bg);
+    color: var(--field-control-fg);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-field-control-shell--grouped:hover:not(:has(:disabled)) {
+    border-color: var(--field-control-border-hover);
+  }
+
+  .ui-field-control-shell--grouped:focus-within {
+    outline: none;
+    border-color: var(--field-control-border-focus);
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--ring);
+  }
+
+  .ui-field-control-shell--grouped-invalid {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-field-control-shell--grouped-invalid:focus-within {
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--field-control-border-invalid);
+  }
+
+  /* --- Single-line sizes --- */
+
+  .ui-field-control--sm {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+    padding-block: calc(var(--spacing) * 1);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-field-control--md {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+    padding-block: calc(var(--spacing) * 1.5);
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+  }
+
+  .ui-field-control--lg {
+    height: var(--control-height-xl);
+    padding-inline: var(--field-padding-lg);
+    padding-block: calc(var(--spacing) * 2);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  /* --- Multiline sizes --- */
+
+  .ui-field-control--multiline-sm {
+    min-height: calc(var(--spacing) * 16);
+    padding-inline: var(--field-padding-sm);
+    padding-block: calc(var(--spacing) * 1.5);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-field-control--multiline-md {
+    min-height: calc(var(--spacing) * 20);
+    padding-inline: var(--field-padding-md);
+    padding-block: calc(var(--spacing) * 2);
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+  }
+
+  .ui-field-control--multiline-lg {
+    min-height: calc(var(--spacing) * 28);
+    padding-inline: var(--field-padding-lg);
+    padding-block: calc(var(--spacing) * 3);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+
+  /* --- Select / combobox trigger geometry --- */
+
+  .ui-field-control--trigger {
+    display: inline-flex;
+    width: auto;
+    flex-shrink: 0;
+    align-items: stretch;
+    cursor: pointer;
+    padding-inline: 0;
+    padding-block: 0;
+  }
+
+  /* --- Digit trailing reserve --- */
+
+  .ui-field-control--digits-sm {
+    padding-inline-start: var(--field-padding-sm);
+    padding-inline-end: calc(var(--spacing) * 6);
+  }
+
+  .ui-field-control--digits-md {
+    padding-inline-start: var(--field-padding-md);
+    padding-inline-end: calc(var(--spacing) * 6);
+  }
+
+  .ui-field-control--digits-lg {
+    padding-inline-start: var(--field-padding-lg);
+    padding-inline-end: calc(var(--spacing) * 8);
+  }
+
+  /* --- Filter inline boolean shell --- */
+
+  .ui-field-control--filter-inline {
+    display: inline-flex;
+    width: auto;
+    min-width: 0;
+    max-width: 14rem;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    border-radius: calc(var(--radius) - 2px);
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-field-control--filter-inline:focus-within {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--ring);
+  }
+
+  .ui-field-control--filter-inline:has(:disabled) {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .ui-field-control--filter-outline {
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--interactive-outline-border);
+    background-color: transparent;
+  }
+
+  .ui-field-control--filter-outline:hover {
+    background-color: var(--interactive-outline-hover-bg);
+  }
+
+  .ui-field-control--filter-outline:active {
+    background-color: var(--interactive-outline-active-bg);
+  }
+
+  .ui-field-control--filter-outline:has([data-state='checked']) {
+    border-color: var(--border);
+    background-color: var(--interactive-outline-active-bg);
+  }
+
+  .ui-field-control--filter-ghost {
+    border-width: 0;
+    border-color: transparent;
+    background-color: transparent;
+  }
+
+  .ui-field-control--filter-ghost:hover {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  .ui-field-control--filter-ghost:active {
+    background-color: color-mix(in oklch, var(--accent) 80%, transparent);
+  }
+
+  .ui-field-control--filter-ghost:has([data-state='checked']) {
+    background-color: var(--accent);
+    color: var(--accent-foreground);
+  }
+
+  /* --- SearchBar --- */
+
+  .ui-search-bar {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .ui-search-bar--embedded-host {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-search-bar__embedded-wrap {
+    position: relative;
+    min-width: 0;
+    flex: 1 1 0%;
+  }
+
+  .ui-search-bar__leading-icon {
+    pointer-events: none;
+    flex-shrink: 0;
+    color: var(--field-control-placeholder);
+  }
+
+  .ui-search-bar__leading-icon--field {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+  }
+
+  .ui-search-bar__leading-icon--sm {
+    inset-inline-start: calc(var(--spacing) * 2.5);
+    width: var(--icon-glyph-sm);
+    height: var(--icon-glyph-sm);
+  }
+
+  .ui-search-bar__leading-icon--md {
+    inset-inline-start: var(--field-padding-md);
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+
+  .ui-search-bar__leading-icon--lg {
+    inset-inline-start: var(--field-padding-md);
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+
+  .ui-search-bar__leading-icon--disabled {
+    color: var(--field-control-fg-disabled);
+  }
+
+  .ui-search-bar__embedded-icon {
+    pointer-events: none;
+    flex-shrink: 0;
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+    color: var(--muted-foreground);
+  }
+
+  .ui-search-bar__embedded-icon--disabled {
+    color: var(--field-control-fg-disabled);
+  }
+
+  .ui-search-bar__field-input--sm {
+    padding-inline-start: calc(var(--spacing) * 8);
+  }
+
+  .ui-search-bar__field-input--md {
+    padding-inline-start: calc(var(--spacing) * 9);
+  }
+
+  .ui-search-bar__field-input--lg {
+    padding-inline-start: calc(var(--spacing) * 10);
+  }
+
+  .ui-search-bar__field-input--clearable.ui-search-bar__field-input--sm,
+  .ui-search-bar__field-input--clearable.ui-search-bar__field-input--md {
+    padding-inline-end: calc(var(--spacing) * 8);
+  }
+
+  .ui-search-bar__field-input--clearable.ui-search-bar__field-input--lg {
+    padding-inline-end: calc(var(--spacing) * 9);
+  }
+
+  .ui-search-bar__field-input--clearable::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  .ui-search-bar__embedded-input {
+    min-width: 0;
+    flex: 1 1 0%;
+    border-width: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
+  .ui-search-bar__embedded-input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .ui-search-bar__embedded-input::placeholder {
+    color: var(--muted-foreground);
+  }
+
+  .ui-search-bar__embedded-input:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .ui-search-bar__embedded-input--clearable.ui-search-bar__embedded-input--sm,
+  .ui-search-bar__embedded-input--clearable.ui-search-bar__embedded-input--md {
+    padding-inline-end: calc(var(--spacing) * 8);
+  }
+
+  .ui-search-bar__embedded-input--clearable.ui-search-bar__embedded-input--lg {
+    padding-inline-end: calc(var(--spacing) * 9);
+  }
+
+  .ui-search-bar__embedded-input--clearable::-webkit-search-cancel-button {
+    appearance: none;
+  }
+}

@@ -14,7 +14,6 @@ import {
   fieldGroupSummaryStatusLabelVariants,
   fieldGroupSummaryStatusSecondaryClasses,
 } from './field-group-summary-disclosure-collapsed.variants'
-import { fieldInputDisabledClasses, fieldInputFocusClasses } from './field-input-chrome.variants'
 import {
   fieldGroupSummaryTriggerAffordanceClasses,
   fieldGroupSummaryTriggerBodyClasses,
@@ -155,12 +154,7 @@ export function FieldGroupSummaryTrigger({
       type="button"
       className={cn(
         chromeClasses
-          ? cn(
-              fieldGroupSummaryTriggerLayoutClasses,
-              fieldInputFocusClasses,
-              fieldInputDisabledClasses,
-              chromeClasses,
-            )
+          ? cn(fieldGroupSummaryTriggerLayoutClasses, chromeClasses)
           : fieldGroupSummaryTriggerShellClasses,
         fieldGroupSummaryTriggerSizeVariants({ size }),
         className,

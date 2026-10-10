@@ -1,6 +1,39 @@
 import { describe, expect, it } from 'vitest'
 
-import { fieldWidthVariants, resolveFieldWidthClassName } from './field-control.variants'
+import {
+  UI_FIELD_CONTROL_BLOCK_CLASS,
+  UI_FIELD_CONTROL_TRIGGER_CLASS,
+  resolveFieldControlMultilineSizeClass,
+  resolveFieldControlSizeClass,
+} from './field-control.styles'
+import {
+  fieldControlTriggerVariants,
+  fieldControlVariants,
+  fieldWidthVariants,
+  resolveFieldWidthClassName,
+  textareaVariants,
+} from './field-control.variants'
+
+describe('fieldControlVariants', () => {
+  it('maps md to ui-field-control block and size modifier', () => {
+    const classes = fieldControlVariants({ size: 'md' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(resolveFieldControlSizeClass('md'))
+  })
+
+  it('maps textarea md to multiline modifier', () => {
+    const classes = textareaVariants({ size: 'md' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(resolveFieldControlMultilineSizeClass('md'))
+  })
+
+  it('maps trigger shell to trigger modifier and size', () => {
+    const classes = fieldControlTriggerVariants({ size: 'sm' })
+    expect(classes).toContain(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(classes).toContain(UI_FIELD_CONTROL_TRIGGER_CLASS)
+    expect(classes).toContain(resolveFieldControlSizeClass('sm'))
+  })
+})
 
 describe('fieldWidthVariants', () => {
   it('adds explicit row widths for intrinsic xs–xl tokens', () => {

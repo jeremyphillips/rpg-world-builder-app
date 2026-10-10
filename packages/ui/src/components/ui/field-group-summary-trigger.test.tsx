@@ -45,9 +45,7 @@ describe('FieldGroupSummaryTrigger', () => {
       />,
     )
 
-    expect(screen.getByRole('button', { name: 'Available. All players' })).toHaveClass(
-      'disabled:cursor-not-allowed',
-    )
+    expect(screen.getByRole('button', { name: 'Available. All players' })).toBeDisabled()
   })
 
   it('is a single button and keeps Change as a non-focusable affordance', async () => {

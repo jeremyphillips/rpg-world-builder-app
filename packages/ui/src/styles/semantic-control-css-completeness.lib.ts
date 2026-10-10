@@ -110,10 +110,11 @@ export function validateSemanticControlCssCompleteness(
   })
 }
 
-const buttonCssPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '../components/ui/button.css',
-)
+const stylesDir = path.dirname(fileURLToPath(import.meta.url))
+
+const buttonCssPath = path.join(stylesDir, '../components/ui/button.css')
+
+const fieldControlCssPath = path.join(stylesDir, '../components/ui/field-control.css')
 
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
@@ -141,6 +142,31 @@ const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
 const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const
 const BUTTON_ICON_SIZE_REQUIRED = ['width', 'height'] as const
 
+const FIELD_CONTROL_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_CONTROL_MULTILINE_MODIFIERS = ['multiline-sm', 'multiline-md', 'multiline-lg'] as const
+const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-sm', 'digits-md', 'digits-lg'] as const
+const FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS = ['filter-outline', 'filter-ghost'] as const
+
+const FIELD_CONTROL_SIZE_REQUIRED = [
+  'height',
+  'padding-inline',
+  'padding-block',
+  'font-size',
+  'line-height',
+] as const
+
+const FIELD_CONTROL_MULTILINE_REQUIRED = [
+  'min-height',
+  'padding-inline',
+  'padding-block',
+  'font-size',
+  'line-height',
+] as const
+
+const FIELD_CONTROL_DIGITS_REQUIRED = ['padding-inline-start', 'padding-inline-end'] as const
+
+const FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED = ['background-color', 'border-color'] as const
+
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
   {
@@ -157,6 +183,27 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...BUTTON_ICON_SIZE_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-button--${name}`,
         requiredProperties: BUTTON_ICON_SIZE_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: fieldControlCssPath,
+    dimensions: [
+      ...FIELD_CONTROL_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_SIZE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_MULTILINE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_MULTILINE_REQUIRED,
+      })),
+      ...FIELD_CONTROL_DIGITS_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_DIGITS_REQUIRED,
+      })),
+      ...FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-field-control--${name}`,
+        requiredProperties: FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED,
       })),
     ],
   },

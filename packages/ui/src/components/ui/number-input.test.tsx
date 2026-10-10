@@ -70,8 +70,8 @@ describe('NumberInput', () => {
   it('uses symmetric control padding when hideSteppers is set without grouped chrome', () => {
     render(<NumberInput aria-label="Count" size="sm" hideSteppers defaultValue={3} />)
     const input = screen.getByLabelText('Count')
-    expect(input).toHaveClass('px-2.5')
-    expect(input).not.toHaveClass('pr-6')
+    expect(input).toHaveClass('ui-field-control--sm')
+    expect(input).not.toHaveClass('ui-field-control--digits-sm')
     expect(screen.queryByLabelText('Increment')).not.toBeInTheDocument()
   })
 

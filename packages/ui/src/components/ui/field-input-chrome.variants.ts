@@ -1,48 +1,43 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
+import {
+  UI_FIELD_CONTROL_BLOCK_CLASS,
+  UI_FIELD_CONTROL_GROUPED_SHELL_CLASS,
+  UI_FIELD_CONTROL_GROUPED_SHELL_INVALID_CLASS,
+} from './field-control.styles'
 
-/**
- * Shared chrome for text-like field controls and grouped field shells.
- * Border, fill, focus, invalid, readonly, and disabled treatments use
- * `--field-control-*` semantic roles via `border-input` / `bg-input` utilities.
- */
-export const fieldInputShellClasses =
-  'rounded-md border border-input bg-input shadow-sm transition-colors hover:border-input-hover'
+/** @deprecated Prefer {@link UI_FIELD_CONTROL_BLOCK_CLASS} — presentation lives in field-control.css. */
+export const fieldInputShellClasses = UI_FIELD_CONTROL_BLOCK_CLASS
 
-/** Single-control focus (Input, Textarea, native focus). */
-export const fieldInputFocusClasses =
-  'focus-visible:outline-none focus-visible:border-input-focus focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+/** @deprecated Field focus presentation lives on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputFocusClasses = ''
 
-/** Grouped-control focus (InputSelect, DiceFormula, RichText). */
-export const fieldInputFocusWithinClasses =
-  'focus-within:outline-none focus-within:border-input-focus focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background'
+/** @deprecated Grouped focus-within lives on {@link UI_FIELD_CONTROL_GROUPED_SHELL_CLASS} in CSS. */
+export const fieldInputFocusWithinClasses = ''
 
-/** Driven by `aria-invalid` on the control or shell. */
-export const fieldInputInvalidAriaClasses =
-  'aria-invalid:border-input-invalid aria-invalid:focus-visible:ring-input-invalid'
+/** @deprecated Invalid treatment lives on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputInvalidAriaClasses = ''
 
-/** For CVA `invalid` variant on group shells. */
-export const fieldInputInvalidClasses = 'border-input-invalid focus-within:ring-input-invalid'
+/** Grouped-control invalid shell — pairs with {@link UI_FIELD_CONTROL_GROUPED_SHELL_CLASS}. */
+export const fieldInputInvalidClasses = UI_FIELD_CONTROL_GROUPED_SHELL_INVALID_CLASS
 
-export const fieldInputDisabledClasses =
-  'disabled:cursor-not-allowed disabled:bg-input-disabled disabled:border-input-disabled disabled:text-input-disabled'
+/** @deprecated Disabled treatment lives on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputDisabledClasses = ''
 
-export const fieldInputReadonlyClasses =
-  '[readonly]:bg-input-readonly [readonly]:border-input-readonly'
+/** @deprecated Readonly treatment lives on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputReadonlyClasses = ''
 
-export const fieldInputPlaceholderClasses =
-  'placeholder:text-input-placeholder disabled:placeholder:text-input-disabled'
+/** @deprecated Placeholder colors live on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputPlaceholderClasses = ''
 
-/** Browser autofill often bypasses `bg-input` — pin fill to field-control bg. */
-export const fieldInputAutofillClasses =
-  '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_var(--field-control-bg)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--field-control-fg)]'
+/** @deprecated Autofill treatment lives on {@link UI_FIELD_CONTROL_BLOCK_CLASS} in CSS. */
+export const fieldInputAutofillClasses = ''
 
 /** Grouped field shell base — border, fill, and focus-within ring on the outer wrapper. */
 export const fieldGroupedShellClasses = cn(
   'grid items-center',
-  fieldInputShellClasses,
-  fieldInputFocusWithinClasses,
+  UI_FIELD_CONTROL_GROUPED_SHELL_CLASS,
 )
 
 /** Stretch layout: input grows, trailing segment stays intrinsic width. */

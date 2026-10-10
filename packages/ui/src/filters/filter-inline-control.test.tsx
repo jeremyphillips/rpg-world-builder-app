@@ -28,7 +28,7 @@ describe('FilterInlineControl', () => {
       </FilterInlineControl>,
     )
 
-    expect(container.firstElementChild).toHaveClass('border-interactive-outline')
+    expect(container.firstElementChild).toHaveClass('ui-field-control--filter-outline')
   })
 
   it('applies ghost shell chrome when variant is ghost', () => {
@@ -39,8 +39,8 @@ describe('FilterInlineControl', () => {
       </FilterInlineControl>,
     )
 
-    expect(container.firstElementChild).toHaveClass('hover:bg-accent')
-    expect(container.firstElementChild).not.toHaveClass('border-interactive-outline')
+    expect(container.firstElementChild).toHaveClass('ui-field-control--filter-ghost')
+    expect(container.firstElementChild).not.toHaveClass('ui-field-control--filter-outline')
   })
 
   itAxe('has no axe accessibility violations', async () => {

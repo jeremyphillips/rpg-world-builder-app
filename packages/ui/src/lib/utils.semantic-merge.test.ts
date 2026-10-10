@@ -10,4 +10,16 @@ describe('cn semantic control groups', () => {
   it('drops conflicting ui-button size modifiers', () => {
     expect(cn('ui-button--md', 'ui-button--sm')).toBe('ui-button--sm')
   })
+
+  it('keeps field trigger modifier alongside size', () => {
+    expect(cn('ui-field-control--md', 'ui-field-control--trigger')).toBe(
+      'ui-field-control--md ui-field-control--trigger',
+    )
+  })
+
+  it('keeps digit reserve modifier alongside size', () => {
+    expect(cn('ui-field-control--md', 'ui-field-control--digits-md')).toBe(
+      'ui-field-control--md ui-field-control--digits-md',
+    )
+  })
 })

@@ -71,7 +71,7 @@ describe('shell density parity', () => {
   it('Form defaults to comfortable density', () => {
     render(<Form schema={schema} fields={fields} onSubmit={() => undefined} />)
     expect(screen.getByLabelText('Name').closest('.gap-6')).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveClass('ui-field-control--md')
   })
 })
 
@@ -102,9 +102,11 @@ describe('nested group density', () => {
   it('applies compact density inside nested group and reverts for following siblings', () => {
     render(<Form schema={schema} fields={fields} onSubmit={() => undefined} />)
 
-    expect(screen.getByRole('textbox', { name: 'Outer field' })).toHaveClass('h-9')
-    expect(screen.getByRole('textbox', { name: 'Inner field' })).toHaveClass('h-8')
-    expect(screen.getByRole('textbox', { name: 'Outer sibling' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Outer field' })).toHaveClass('ui-field-control--md')
+    expect(screen.getByRole('textbox', { name: 'Inner field' })).toHaveClass('ui-field-control--sm')
+    expect(screen.getByRole('textbox', { name: 'Outer sibling' })).toHaveClass(
+      'ui-field-control--md',
+    )
   })
 })
 
@@ -129,8 +131,8 @@ describe('row inheritance', () => {
 
   it('inherits compact density through rows without introducing a density boundary', () => {
     render(<Form schema={schema} fields={fields} onSubmit={() => undefined} />)
-    expect(screen.getByRole('textbox', { name: 'Left' })).toHaveClass('h-8')
-    expect(screen.getByRole('textbox', { name: 'Right' })).toHaveClass('h-8')
+    expect(screen.getByRole('textbox', { name: 'Left' })).toHaveClass('ui-field-control--sm')
+    expect(screen.getByRole('textbox', { name: 'Right' })).toHaveClass('ui-field-control--sm')
   })
 })
 
@@ -167,7 +169,7 @@ describe('dependent density inheritance', () => {
 
     const dependent = container.querySelector('[data-field-dependent]')
     expect(dependent).toHaveClass(dependentSectionStackClasses)
-    expect(screen.getByRole('textbox', { name: 'Note' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Note' })).toHaveClass('ui-field-control--md')
   })
 })
 
@@ -187,8 +189,8 @@ describe('controlSizeOverride escape hatch', () => {
 
     render(<Form schema={schema} fields={fields} onSubmit={() => undefined} />)
 
-    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveClass('h-11')
-    expect(screen.getByRole('textbox', { name: 'Subtitle' })).toHaveClass('h-9')
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveClass('ui-field-control--lg')
+    expect(screen.getByRole('textbox', { name: 'Subtitle' })).toHaveClass('ui-field-control--md')
     expect(screen.getByLabelText('Subtitle').closest('.gap-6')).toBeInTheDocument()
   })
 })

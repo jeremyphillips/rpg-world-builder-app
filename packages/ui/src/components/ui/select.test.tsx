@@ -129,8 +129,11 @@ describe('Select', () => {
     renderDigitSelect()
 
     const trigger = screen.getByLabelText('Faces')
-    expect(trigger).toHaveClass('px-0', 'py-0', 'w-auto', 'inline-flex')
-    expect(trigger).not.toHaveClass('px-3', 'pe-2.5')
+    expect(trigger).toHaveClass(
+      'ui-field-control',
+      'ui-field-control--trigger',
+      'ui-field-control--md',
+    )
 
     const slot = valueSlot(trigger)
     expect(slot).toHaveClass('ps-3', 'pe-1', 'min-w-[calc(2*1ch)]', 'tabular-nums')

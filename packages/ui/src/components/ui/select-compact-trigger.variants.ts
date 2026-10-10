@@ -3,7 +3,10 @@ import type { FieldDigits } from './field-digit-metrics'
 import type { FieldSize } from './field-root.lib'
 import type { FieldSizeToken } from './field-sizing.variants'
 import { fieldSizeTypographyClasses } from './field-sizing.variants'
-import { fieldControlTriggerCursorClasses, fieldControlVariants } from './field-control.variants'
+import {
+  fieldControlTriggerCursorClasses,
+  fieldControlTriggerVariants,
+} from './field-control.variants'
 import {
   groupedSegmentShellClasses,
   resolveGroupedSegmentSurface,
@@ -78,11 +81,7 @@ export function selectTriggerShellClasses(
     )
   }
 
-  return cn(
-    fieldControlVariants({ size }),
-    fieldControlTriggerCursorClasses,
-    'inline-flex shrink-0 items-stretch px-0 py-0',
-  )
+  return cn(fieldControlTriggerVariants({ size }), 'items-stretch')
 }
 
 export function groupedValueSlotClasses(

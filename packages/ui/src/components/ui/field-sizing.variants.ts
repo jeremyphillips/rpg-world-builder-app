@@ -7,6 +7,11 @@
  */
 import { cn } from '../../lib/utils'
 import type { ButtonVariantProps } from './button.variants'
+import {
+  resolveFieldControlDigitsSizeClass,
+  resolveFieldControlMultilineSizeClass,
+  resolveFieldControlSizeClass,
+} from './field-control.styles'
 import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import type { InteractiveListSize } from './interactive-list.variants'
@@ -21,9 +26,9 @@ export const fieldSizeTypographyClasses = {
 } as const satisfies Record<FieldSizeToken, string>
 
 export const fieldControlSizeClasses = {
-  sm: 'h-8 px-2.5 py-1 text-xs',
-  md: 'h-9 px-3 py-1.5 text-md',
-  lg: 'h-11 px-4 py-2 text-base',
+  sm: resolveFieldControlSizeClass('sm'),
+  md: resolveFieldControlSizeClass('md'),
+  lg: resolveFieldControlSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Grouped segment outer height — no padding or typography. */
@@ -145,9 +150,9 @@ export const fieldGroupedControlSizeClasses = {
 
 /** Multi-line controls (Textarea, JSON editor): min-height + padding + type scale. */
 export const fieldTextareaSizeClasses = {
-  sm: 'min-h-16 px-2.5 py-1.5 text-xs',
-  md: 'min-h-20 px-3 py-2 text-md',
-  lg: 'min-h-28 px-4 py-3 text-base',
+  sm: resolveFieldControlMultilineSizeClass('sm'),
+  md: resolveFieldControlMultilineSizeClass('md'),
+  lg: resolveFieldControlMultilineSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Trailing reserve for digit controls with a stepper/caret column (logical). */
@@ -159,9 +164,9 @@ export const fieldDigitTrailingPaddingClasses = {
 
 /** Start + trailing padding for digit-sized controls (logical). */
 export const fieldDigitSizeClasses = {
-  sm: 'ps-2.5 pe-6',
-  md: 'ps-3 pe-6',
-  lg: 'ps-4 pe-8',
+  sm: resolveFieldControlDigitsSizeClass('sm'),
+  md: resolveFieldControlDigitsSizeClass('md'),
+  lg: resolveFieldControlDigitsSizeClass('lg'),
 } as const satisfies Record<FieldSizeToken, string>
 
 /** Width of the trailing stepper/caret column on digit-sized controls. */

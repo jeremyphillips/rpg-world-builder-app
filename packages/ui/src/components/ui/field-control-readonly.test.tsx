@@ -4,29 +4,21 @@ import { render, screen } from '@testing-library/react'
 import { Input } from './input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { Textarea } from './textarea.client'
-import { fieldInputReadonlyClasses } from './field-input-chrome.variants'
+import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
 
 describe('field control readonly chrome', () => {
-  it('uses attribute selector utilities, not CSS :read-only', () => {
-    expect(fieldInputReadonlyClasses).toContain('[readonly]:bg-input-readonly')
-    expect(fieldInputReadonlyClasses).toContain('[readonly]:border-input-readonly')
-    expect(fieldInputReadonlyClasses).not.toContain('read-only:')
-  })
-
-  it('applies readonly chrome recipe to input[readonly]', () => {
+  it('applies semantic field block to input[readonly]', () => {
     render(<Input readOnly defaultValue="Locked" aria-label="Name" />)
     const input = screen.getByLabelText('Name')
     expect(input).toHaveAttribute('readonly')
-    expect(input.className).toContain('[readonly]:bg-input-readonly')
-    expect(input.className).toContain('[readonly]:border-input-readonly')
+    expect(input).toHaveClass(UI_FIELD_CONTROL_BLOCK_CLASS)
   })
 
-  it('applies readonly chrome recipe to textarea[readonly]', () => {
+  it('applies semantic field block to textarea[readonly]', () => {
     render(<Textarea readOnly defaultValue="Locked" aria-label="Notes" />)
     const textarea = screen.getByLabelText('Notes')
     expect(textarea).toHaveAttribute('readonly')
-    expect(textarea.className).toContain('[readonly]:bg-input-readonly')
-    expect(textarea.className).toContain('[readonly]:border-input-readonly')
+    expect(textarea).toHaveClass(UI_FIELD_CONTROL_BLOCK_CLASS)
   })
 
   it('keeps default field chrome on non-editable SelectTrigger hosts', () => {
@@ -44,6 +36,7 @@ describe('field control readonly chrome', () => {
     const trigger = screen.getByLabelText('Alignment')
     expect(trigger.tagName).toBe('BUTTON')
     expect(trigger).not.toHaveAttribute('readonly')
-    expect(trigger).toHaveClass('bg-input', 'border-input')
+    expect(trigger).toHaveClass(UI_FIELD_CONTROL_BLOCK_CLASS)
+    expect(trigger).toHaveClass('ui-field-control--trigger')
   })
 })

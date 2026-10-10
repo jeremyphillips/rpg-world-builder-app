@@ -5,6 +5,9 @@ import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
   UI_BUTTON_TEXT_GEOMETRY_CLASSES,
+  UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
+  UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES,
+  UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
 } from './semantic-control-class-groups'
@@ -58,6 +61,9 @@ type TypographyClassGroupIds =
   | 'ui-button-appearance'
   | 'ui-button-text-geometry'
   | 'ui-field-control-size'
+  | 'ui-field-control-multiline-size'
+  | 'ui-field-control-digits-size'
+  | 'ui-field-control-filter-appearance'
   | 'ui-floating-label-size'
 
 /**
@@ -124,6 +130,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
       'ui-button-text-geometry': [...UI_BUTTON_TEXT_GEOMETRY_CLASSES],
       'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
+      'ui-field-control-multiline-size': [...UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES],
+      'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
+      'ui-field-control-filter-appearance': [...UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
     },
     conflictingClassGroups: {
@@ -134,6 +143,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-button-appearance': ['ui-button-appearance'],
       'ui-button-text-geometry': ['ui-button-text-geometry'],
       'ui-field-control-size': ['ui-field-control-size'],
+      'ui-field-control-multiline-size': ['ui-field-control-multiline-size'],
+      'ui-field-control-digits-size': ['ui-field-control-digits-size'],
+      'ui-field-control-filter-appearance': ['ui-field-control-filter-appearance'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'font-size': ['heading-style', 'eyebrow-style'],
       'font-weight': ['heading-style', 'eyebrow-style'],

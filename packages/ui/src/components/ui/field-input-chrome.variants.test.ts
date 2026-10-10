@@ -1,81 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
+import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
 import {
   fieldGroupedDividerClasses,
+  fieldGroupedShellClasses,
   fieldGroupedShellIntrinsicLayoutClasses,
-  fieldInputAutofillClasses,
-  fieldInputDisabledClasses,
-  fieldInputFocusClasses,
-  fieldInputFocusWithinClasses,
-  fieldInputInvalidAriaClasses,
   fieldInputInvalidClasses,
-  fieldInputPlaceholderClasses,
-  fieldInputReadonlyClasses,
   fieldInputShellClasses,
 } from './field-input-chrome.variants'
 
-const APPROVED_INPUT_CHROME_TOKENS = [
-  'rounded-md',
-  'border',
-  'border-input',
-  'bg-input',
-  'shadow-sm',
-  'transition-colors',
-  'hover:border-input-hover',
-  'focus-visible:outline-none',
-  'focus-visible:border-input-focus',
-  'focus-visible:ring-2',
-  'focus-visible:ring-ring',
-  'focus-visible:ring-offset-2',
-  'focus-visible:ring-offset-background',
-  'focus-within:outline-none',
-  'focus-within:border-input-focus',
-  'focus-within:ring-2',
-  'focus-within:ring-ring',
-  'focus-within:ring-offset-2',
-  'focus-within:ring-offset-background',
-  'aria-invalid:border-input-invalid',
-  'aria-invalid:focus-visible:ring-input-invalid',
-  'border-input-invalid',
-  'focus-within:ring-input-invalid',
-  'disabled:cursor-not-allowed',
-  'disabled:bg-input-disabled',
-  'disabled:border-input-disabled',
-  'disabled:text-input-disabled',
-  'placeholder:text-input-placeholder',
-  'disabled:placeholder:text-input-disabled',
-  '[readonly]:bg-input-readonly',
-  '[readonly]:border-input-readonly',
-  '[&:-webkit-autofill]:shadow-[inset_0_0_0_1000px_var(--field-control-bg)]',
-  '[&:-webkit-autofill]:[-webkit-text-fill-color:var(--field-control-fg)]',
-]
-
-function expectOnlyApprovedTokens(classes: string) {
-  const tokens = classes.split(/\s+/).filter(Boolean)
-  for (const token of tokens) {
-    expect(APPROVED_INPUT_CHROME_TOKENS).toContain(token)
-  }
-}
-
 describe('field-input-chrome.variants', () => {
-  it('uses approved input tokens for shell chrome', () => {
-    expectOnlyApprovedTokens(fieldInputShellClasses)
+  it('exports semantic block class for single-control shell', () => {
+    expect(fieldInputShellClasses).toBe(UI_FIELD_CONTROL_BLOCK_CLASS)
+  })
+
+  it('uses grouped semantic shell class for composite wrappers', () => {
+    expect(fieldGroupedShellClasses).toContain('ui-field-control-shell--grouped')
+    expect(fieldGroupedShellClasses).toContain('grid')
+  })
+
+  it('uses semantic invalid class for grouped shells', () => {
+    expect(fieldInputInvalidClasses).toBe('ui-field-control-shell--grouped-invalid')
   })
 
   it('hardens intrinsic grouped shell divider track against crush', () => {
     expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('minmax(1px,1px)')
     expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('min-w-max')
     expect(fieldGroupedDividerClasses).toContain('min-w-px')
-  })
-
-  it('uses approved input tokens for focus, invalid, disabled, readonly, and autofill', () => {
-    expectOnlyApprovedTokens(fieldInputFocusClasses)
-    expectOnlyApprovedTokens(fieldInputFocusWithinClasses)
-    expectOnlyApprovedTokens(fieldInputInvalidAriaClasses)
-    expectOnlyApprovedTokens(fieldInputInvalidClasses)
-    expectOnlyApprovedTokens(fieldInputDisabledClasses)
-    expectOnlyApprovedTokens(fieldInputPlaceholderClasses)
-    expectOnlyApprovedTokens(fieldInputReadonlyClasses)
-    expectOnlyApprovedTokens(fieldInputAutofillClasses)
   })
 })

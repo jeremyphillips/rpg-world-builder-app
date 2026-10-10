@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { fieldControlVariants } from './field-control.variants'
+import { resolveFieldControlDigitsSizeClass } from './field-control.styles'
 import { fieldDigitWidthVariants } from './field-digit-metrics'
 import {
   fieldDigitTrailingColumnClasses,
@@ -43,17 +44,17 @@ export const numberInputFieldVariants = cva(
       {
         grouped: false,
         size: 'sm',
-        class: cn(fieldControlVariants({ size: 'sm' }), fieldDigitTrailingPaddingClasses.sm),
+        class: cn(fieldControlVariants({ size: 'sm' }), resolveFieldControlDigitsSizeClass('sm')),
       },
       {
         grouped: false,
         size: 'md',
-        class: cn(fieldControlVariants({ size: 'md' }), fieldDigitTrailingPaddingClasses.md),
+        class: cn(fieldControlVariants({ size: 'md' }), resolveFieldControlDigitsSizeClass('md')),
       },
       {
         grouped: false,
         size: 'lg',
-        class: cn(fieldControlVariants({ size: 'lg' }), fieldDigitTrailingPaddingClasses.lg),
+        class: cn(fieldControlVariants({ size: 'lg' }), resolveFieldControlDigitsSizeClass('lg')),
       },
       {
         grouped: true,

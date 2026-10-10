@@ -26,12 +26,12 @@ describe('select-compact-trigger variants', () => {
     )
   })
 
-  it('uses height-only standalone select shells with px-0 py-0', () => {
+  it('uses semantic trigger shell for standalone selects', () => {
     expect(selectTriggerShellClasses('md', { grouped: false, groupedPosition: 'end' })).toContain(
-      'py-0',
+      'ui-field-control--trigger',
     )
     expect(selectTriggerShellClasses('md', { grouped: false, groupedPosition: 'end' })).toContain(
-      'px-0',
+      'ui-field-control--md',
     )
   })
 

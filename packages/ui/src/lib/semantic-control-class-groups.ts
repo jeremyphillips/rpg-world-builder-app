@@ -37,14 +37,24 @@ export const UI_BUTTON_TEXT_GEOMETRY_CLASSES = [
   'ui-button__text--lg-compact',
 ] as const
 
+export const UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES = [
+  'ui-field-control--filter-outline',
+  'ui-field-control--filter-ghost',
+] as const
+
 export const UI_FIELD_CONTROL_SIZE_CLASSES = [
   'ui-field-control--sm',
   'ui-field-control--md',
   'ui-field-control--lg',
+] as const
+
+export const UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES = [
   'ui-field-control--multiline-sm',
   'ui-field-control--multiline-md',
   'ui-field-control--multiline-lg',
-  'ui-field-control--trigger',
+] as const
+
+export const UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES = [
   'ui-field-control--digits-sm',
   'ui-field-control--digits-md',
   'ui-field-control--digits-lg',

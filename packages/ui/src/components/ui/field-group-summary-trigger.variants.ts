@@ -1,11 +1,7 @@
 import { cva } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
-import {
-  fieldInputDisabledClasses,
-  fieldInputFocusClasses,
-  fieldInputShellClasses,
-} from './field-input-chrome.variants'
+import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
 import { fieldControlSizeClasses } from './field-sizing.variants'
 
 /** Layout + focus for the shared summary trigger. Fill chrome is applied separately. */
@@ -19,9 +15,7 @@ export const fieldGroupSummaryTriggerTypographyClasses = 'text-xs'
 /** Faux-input shell for the shared summary trigger — matches filled field controls. */
 export const fieldGroupSummaryTriggerShellClasses = cn(
   fieldGroupSummaryTriggerLayoutClasses,
-  fieldInputShellClasses,
-  fieldInputFocusClasses,
-  fieldInputDisabledClasses,
+  UI_FIELD_CONTROL_BLOCK_CLASS,
 )
 
 export const fieldGroupSummaryTriggerSizeVariants = cva('', {
