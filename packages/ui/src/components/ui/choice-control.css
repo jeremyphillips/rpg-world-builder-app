@@ -1,0 +1,135 @@
+/*
+ * Choice control — checkbox, radio, switch track, and decorative radio-card indicators.
+ * Source order: block → shared states → kind modifiers → indicator sizes → thumb → marks.
+ */
+@layer components {
+  .ui-choice-control {
+    flex-shrink: 0;
+    cursor: pointer;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--choice-control-border);
+    color: var(--primary);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition-property: color, background-color, border-color, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-choice-control[data-state='checked'],
+  .group[data-state='checked'] .ui-choice-control {
+    border-color: var(--primary);
+  }
+
+  .ui-choice-control[aria-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-choice-control:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  /* --- Kind: checkbox --- */
+
+  .ui-choice-control--checkbox {
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+    border-radius: calc(var(--radius) - 4px);
+  }
+
+  .ui-choice-control--checkbox[data-state='checked'] {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  .ui-choice-control--checkbox .ui-choice-control__mark svg {
+    width: var(--icon-glyph-md);
+    height: var(--icon-glyph-md);
+  }
+
+  /* --- Kind: radio --- */
+
+  .ui-choice-control--radio {
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+    aspect-ratio: 1 / 1;
+    border-radius: 9999px;
+  }
+
+  .ui-choice-control--radio .ui-choice-control__mark svg {
+    width: 0.625rem;
+    height: 0.625rem;
+    fill: currentColor;
+  }
+
+  /* --- Indicator sizes (decorative radio on cards) --- */
+
+  .ui-choice-control--indicator-sm {
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+  }
+
+  .ui-choice-control--indicator-lg {
+    width: var(--control-choice-indicator-size-lg);
+    height: var(--control-choice-indicator-size-lg);
+  }
+
+  /* --- Kind: switch (track) --- */
+
+  .ui-choice-control--switch {
+    display: inline-flex;
+    align-items: center;
+    width: var(--control-choice-switch-width);
+    height: var(--control-choice-switch-height);
+    border-width: 2px;
+    border-color: transparent;
+    border-radius: 9999px;
+  }
+
+  .ui-choice-control--switch[data-state='checked'] {
+    background-color: var(--primary);
+  }
+
+  .ui-choice-control--switch[data-state='unchecked'] {
+    background-color: var(--switch-track);
+  }
+
+  .ui-choice-control--switch[data-state='unchecked']:hover:not(:disabled) {
+    background-color: var(--switch-track-hover);
+  }
+
+  .ui-choice-control--switch[data-state='unchecked']:disabled {
+    background-color: var(--switch-track-disabled);
+  }
+
+  /* --- Switch thumb --- */
+
+  .ui-choice-control__thumb {
+    pointer-events: none;
+    display: block;
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+    border-radius: 9999px;
+    background-color: var(--background);
+    box-shadow:
+      0 10px 15px -3px rgb(0 0 0 / 0.1),
+      0 4px 6px -4px rgb(0 0 0 / 0.1);
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ui-choice-control__thumb[data-state='checked'] {
+    transform: translateX(var(--control-choice-switch-thumb-travel));
+  }
+
+  .ui-choice-control__thumb[data-state='unchecked'] {
+    transform: translateX(0);
+  }
+
+  .ui-choice-control__mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: currentColor;
+  }
+}

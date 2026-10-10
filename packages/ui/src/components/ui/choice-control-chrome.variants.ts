@@ -1,23 +1,25 @@
+import { UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 
 /**
- * Shared chrome for radio/checkbox choice indicators on panel surfaces.
- * Uses `--choice-control-border` (mixed toward `--surface-current`), not field-input chrome.
+ * @deprecated Prefer {@link UI_CHOICE_CONTROL_BLOCK_CLASS} and kind modifiers in choice-control.css.
+ * Shell presentation (border, shadow, states) lives on `.ui-choice-control`.
  */
-export const choiceControlIndicatorShellClasses =
-  'border border-choice-control shadow-sm transition-colors'
+export const choiceControlIndicatorShellClasses = UI_CHOICE_CONTROL_BLOCK_CLASS
 
+/** Focus ring for standalone choice indicators. */
 export const choiceControlIndicatorFocusClasses = interactiveFocusVariants({
   context: 'standalone',
 })
 
-export const choiceControlIndicatorCheckedBorderClasses = 'data-[state=checked]:border-primary'
+/** @deprecated Checked border is defined in choice-control.css. */
+export const choiceControlIndicatorCheckedBorderClasses = ''
 
-/** Decorative indicator inside a Radix group item (RadioCard shell). */
-export const choiceControlIndicatorGroupCheckedBorderClasses =
-  'group-data-[state=checked]:border-primary'
+/** @deprecated Group-checked border is defined in choice-control.css. */
+export const choiceControlIndicatorGroupCheckedBorderClasses = ''
 
-export const choiceControlIndicatorInvalidClasses = 'aria-invalid:border-input-invalid'
+/** @deprecated Invalid border is defined in choice-control.css. */
+export const choiceControlIndicatorInvalidClasses = ''
 
-export const choiceControlIndicatorDisabledClasses =
-  'disabled:cursor-not-allowed disabled:opacity-50'
+/** @deprecated Disabled chrome is defined in choice-control.css. */
+export const choiceControlIndicatorDisabledClasses = ''

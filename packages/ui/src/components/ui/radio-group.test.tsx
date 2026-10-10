@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { RadioGroup, RadioGroupItem } from './radio-group.client'
 
 function renderGroup(props: Record<string, unknown> = {}) {
@@ -21,6 +22,14 @@ function renderGroup(props: Record<string, unknown> = {}) {
 }
 
 describe('RadioGroup', () => {
+  it('emits semantic choice-control classes on items', () => {
+    renderGroup()
+    expect(screen.getByRole('radio', { name: 'Easy' })).toHaveClass(
+      UI_CHOICE_CONTROL_BLOCK_CLASS,
+      'ui-choice-control--radio',
+    )
+  })
+
   it('selects an option on click', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()

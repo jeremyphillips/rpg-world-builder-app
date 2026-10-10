@@ -11,6 +11,8 @@ import {
   UI_FIELD_CONTROL_SIZE_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
   UI_COMPACT_CONTROL_SIZE_CLASSES,
+  UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES,
+  UI_CHOICE_CONTROL_KIND_CLASSES,
   UI_FIELD_GROUP_LAYOUT_CLASSES,
   UI_FIELD_GROUP_SIZE_CLASSES,
 } from './semantic-control-class-groups'
@@ -71,6 +73,8 @@ type TypographyClassGroupIds =
   | 'ui-field-group-size'
   | 'ui-field-group-layout'
   | 'ui-compact-control-size'
+  | 'ui-choice-control-kind'
+  | 'ui-choice-control-indicator-size'
 
 /**
  * Custom `text-*` font-size and `font-*` weight utilities from `@theme` in
@@ -141,6 +145,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-filter-appearance': [...UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
       'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
+      'ui-choice-control-kind': [...UI_CHOICE_CONTROL_KIND_CLASSES],
+      'ui-choice-control-indicator-size': [...UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES],
       'ui-field-group-size': [...UI_FIELD_GROUP_SIZE_CLASSES],
       'ui-field-group-layout': [...UI_FIELD_GROUP_LAYOUT_CLASSES],
     },
@@ -157,6 +163,8 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-filter-appearance': ['ui-field-control-filter-appearance'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'ui-compact-control-size': ['ui-compact-control-size'],
+      'ui-choice-control-kind': ['ui-choice-control-kind'],
+      'ui-choice-control-indicator-size': ['ui-choice-control-indicator-size'],
       'ui-field-group-size': ['ui-field-group-size'],
       'ui-field-group-layout': ['ui-field-group-layout'],
       'font-size': ['heading-style', 'eyebrow-style'],

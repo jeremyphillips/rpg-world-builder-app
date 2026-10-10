@@ -14,6 +14,7 @@
 @import '../components/ui/field-control.css';
 @import '../components/ui/field-group.css';
 @import '../components/ui/compact-control.css';
+@import '../components/ui/choice-control.css';
 
 @plugin '@tailwindcss/typography';
 
@@ -375,6 +376,11 @@
   --control-height-md: 2.25rem; /* 36px */
   --control-height-lg: 2.5rem; /* 40px — Button lg */
   --control-height-xl: 2.75rem; /* 44px — field lg */
+  --control-choice-indicator-size-sm: 1rem; /* 16px — checkbox, radio, switch thumb */
+  --control-choice-indicator-size-lg: 1.25rem; /* 20px — RadioCard default decoration */
+  --control-choice-switch-width: 2.25rem; /* 36px track */
+  --control-choice-switch-height: 1.25rem; /* 20px track */
+  --control-choice-switch-thumb-travel: 1rem;
   --control-gap-xs: calc(var(--spacing) * 1); /* 4px */
   --control-gap-sm: calc(var(--spacing) * 1.5); /* 6px */
   --control-gap-md: calc(var(--spacing) * 2); /* 8px */

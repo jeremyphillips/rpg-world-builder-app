@@ -22,4 +22,16 @@ describe('cn semantic control groups', () => {
       'ui-field-control--md ui-field-control--digits-md',
     )
   })
+
+  it('drops conflicting ui-choice-control kind modifiers', () => {
+    expect(cn('ui-choice-control--checkbox', 'ui-choice-control--radio')).toBe(
+      'ui-choice-control--radio',
+    )
+  })
+
+  it('drops conflicting ui-choice-control indicator size modifiers', () => {
+    expect(cn('ui-choice-control--indicator-lg', 'ui-choice-control--indicator-sm')).toBe(
+      'ui-choice-control--indicator-sm',
+    )
+  })
 })

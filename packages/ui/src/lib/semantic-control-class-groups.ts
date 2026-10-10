@@ -77,6 +77,17 @@ export const UI_FIELD_GROUP_LAYOUT_CLASSES = [
   'ui-field-group--flow-col',
 ] as const
 
+export const UI_CHOICE_CONTROL_KIND_CLASSES = [
+  'ui-choice-control--checkbox',
+  'ui-choice-control--radio',
+  'ui-choice-control--switch',
+] as const
+
+export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = [
+  'ui-choice-control--indicator-sm',
+  'ui-choice-control--indicator-lg',
+] as const
+
 export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
   'ui-compact-control--icon-compact',
   'ui-compact-control--icon-compact-sm',

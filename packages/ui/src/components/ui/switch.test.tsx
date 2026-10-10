@@ -3,9 +3,18 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { Switch } from './switch.client'
 
 describe('Switch', () => {
+  it('emits semantic choice-control classes', () => {
+    render(<Switch aria-label="Enable notifications" />)
+    expect(screen.getByRole('switch', { name: 'Enable notifications' })).toHaveClass(
+      UI_CHOICE_CONTROL_BLOCK_CLASS,
+      'ui-choice-control--switch',
+    )
+  })
+
   it('toggles on click', async () => {
     const user = userEvent.setup()
     const onCheckedChange = vi.fn()

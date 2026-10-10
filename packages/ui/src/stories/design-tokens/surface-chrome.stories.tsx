@@ -8,7 +8,7 @@ import { Card } from '../../components/ui/card'
 import { Heading } from '../../components/ui/heading'
 import { Text } from '../../components/ui/text'
 import { cardSurfaceClasses } from '../../components/ui/card.variants'
-import { choiceControlIndicatorShellClasses } from '../../components/ui/choice-control-chrome.variants'
+import { radioCardDecorativeControlClasses } from '../../components/ui/choice-control.variants'
 import { resolveSurfaceClasses } from '../../components/ui/surface.variants'
 import { establishSurfaceCurrent } from '../../components/ui/surface-current.lib'
 import {
@@ -96,7 +96,7 @@ const INTERACTION_SAMPLES = [
   },
   {
     label: 'choice-control ring',
-    className: cn('size-5 rounded-full', choiceControlIndicatorShellClasses),
+    className: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
   },
 ] as const
 

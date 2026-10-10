@@ -17,8 +17,10 @@ describe('radioCard surface establishment', () => {
     expect(radioCardVariants({ variant: 'card', density: 'default' })).not.toContain('pl-3')
   })
 
-  it('uses compact horizontal rhythm with 12px gap and 16px controls', () => {
-    expect(radioCardControlVariants({ variant: 'card', density: 'compact' })).toContain('size-4')
+  it('uses compact horizontal rhythm with semantic indicator-sm decoration', () => {
+    expect(radioCardControlVariants({ variant: 'card', density: 'compact' })).toContain(
+      'ui-choice-control--indicator-sm',
+    )
   })
 })
 

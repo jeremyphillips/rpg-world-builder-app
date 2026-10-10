@@ -5,9 +5,9 @@ import { interactiveFocusVariants } from './interactive-focus.variants'
 import { interactiveRowVariants } from './interactive-row.variants'
 import { cardBorderClasses, cardRadiusClasses } from './card.variants'
 import {
-  choiceControlIndicatorGroupCheckedBorderClasses,
-  choiceControlIndicatorShellClasses,
-} from './choice-control-chrome.variants'
+  radioCardDecorativeControlClasses,
+  resolveRadioCardIndicatorSize,
+} from './choice-control.variants'
 import { fieldSurfaceRaisedShadowClasses } from './field-surface.variants'
 import { establishSurfaceCurrent } from './surface-current.lib'
 import {
@@ -141,26 +141,46 @@ export const radioCardLeadingControlTitleLineVariants = cva(
 )
 
 /** Decorative radio circle shown inside the card, synced to the parent item state. */
-export const radioCardControlVariants = cva(
-  `${choiceControlIndicatorShellClasses} ${choiceControlIndicatorGroupCheckedBorderClasses} flex aspect-square shrink-0 items-center justify-center rounded-full text-primary`,
-  {
-    variants: {
-      variant: {
-        card: 'size-5',
-        row: 'size-4',
-      },
-      density: {
-        default: '',
-        compact: '',
-      },
+export const radioCardControlVariants = cva('', {
+  variants: {
+    variant: {
+      card: '',
+      row: '',
     },
-    compoundVariants: [{ variant: 'card', density: 'compact', class: 'size-4' }],
-    defaultVariants: {
-      variant: 'card',
-      density: 'default',
+    density: {
+      default: '',
+      compact: '',
     },
   },
-)
+  compoundVariants: [
+    {
+      variant: 'card',
+      density: 'default',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'lg' }),
+    },
+    {
+      variant: 'card',
+      density: 'compact',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
+    },
+    {
+      variant: 'row',
+      density: 'default',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
+    },
+    {
+      variant: 'row',
+      density: 'compact',
+      class: radioCardDecorativeControlClasses({ indicatorSize: 'sm' }),
+    },
+  ],
+  defaultVariants: {
+    variant: 'card',
+    density: 'default',
+  },
+})
+
+export { resolveRadioCardIndicatorSize }
 
 export const radioCardIndicatorVariants = cva(
   'opacity-0 transition-opacity group-data-[state=checked]:opacity-100',

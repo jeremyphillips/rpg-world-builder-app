@@ -120,6 +120,8 @@ const compactControlCssPath = path.join(stylesDir, '../components/ui/compact-con
 
 const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css')
 
+const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -200,6 +202,18 @@ const FIELD_GROUP_SIZE_REQUIRED = [
   '--ui-field-caret-width',
 ] as const
 
+const CHOICE_CONTROL_KIND_MODIFIERS = ['checkbox', 'radio'] as const
+
+const CHOICE_CONTROL_SWITCH_MODIFIERS = ['switch'] as const
+
+const CHOICE_CONTROL_INDICATOR_MODIFIERS = ['indicator-sm', 'indicator-lg'] as const
+
+const CHOICE_CONTROL_KIND_REQUIRED = ['width', 'height', 'border-radius'] as const
+
+const CHOICE_CONTROL_SWITCH_REQUIRED = ['width', 'height', 'border-radius'] as const
+
+const CHOICE_CONTROL_INDICATOR_REQUIRED = ['width', 'height'] as const
+
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
   {
@@ -259,5 +273,22 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       modifierPrefix: `ui-field-group--${name}`,
       requiredProperties: FIELD_GROUP_SIZE_REQUIRED,
     })),
+  },
+  {
+    filePath: choiceControlCssPath,
+    dimensions: [
+      ...CHOICE_CONTROL_KIND_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_KIND_REQUIRED,
+      })),
+      ...CHOICE_CONTROL_SWITCH_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_SWITCH_REQUIRED,
+      })),
+      ...CHOICE_CONTROL_INDICATOR_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-choice-control--${name}`,
+        requiredProperties: CHOICE_CONTROL_INDICATOR_REQUIRED,
+      })),
+    ],
   },
 ]
