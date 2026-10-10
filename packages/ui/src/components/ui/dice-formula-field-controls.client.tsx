@@ -229,7 +229,7 @@ function DiceFormulaCoreControls({
   onUpdate: (patch: DiceFormulaPatch) => void
 }) {
   return (
-    <div className={diceFormulaCoreGroupVariants({ invalid: hasError, disabled })}>
+    <div className={diceFormulaCoreGroupVariants({ size, invalid: hasError, disabled })}>
       <DiceFormulaCountControl
         id={countId}
         size={size}
@@ -493,7 +493,7 @@ function DiceFormulaModifierControls({
 
   return (
     <>
-      <div className={diceFormulaModifierGroupVariants({ invalid: hasError, disabled })}>
+      <div className={diceFormulaModifierGroupVariants({ size, invalid: hasError, disabled })}>
         <DiceFormulaOperatorSegment
           operatorId={operatorId}
           size={size}

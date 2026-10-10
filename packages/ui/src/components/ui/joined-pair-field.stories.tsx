@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { JoinedPair } from './joined-pair-field.client'
+import { FIELD_GROUP_SIZE_SPECS, UI_FIELD_GROUP_BLOCK_CLASS } from './field-group.styles'
 
 function SelectLabelSpeedStory() {
   const [feet, setFeet] = useState<number | undefined>(30)
@@ -97,7 +99,15 @@ function NumberSelectStory() {
 
 const meta = {
   title: 'UI/JoinedPair',
-  parameters: { layout: 'padded' },
+  parameters: {
+    layout: 'padded',
+    semanticClasses: true,
+    docs: {
+      description: {
+        component: `${UI_FIELD_GROUP_BLOCK_CLASS} owns composite shells; size modifiers set --ui-field-slot-* and --ui-field-action-px tokens.`,
+      },
+    },
+  },
 } satisfies Meta
 
 export default meta
@@ -113,4 +123,33 @@ export const SelectSelectSpeed: Story = {
 
 export const NumberSelectDistance: Story = {
   render: () => <NumberSelectStory />,
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={FIELD_GROUP_SIZE_SPECS.map((spec) => ({
+        key: spec.size,
+        sample: (
+          <JoinedPair.Root size={spec.size} aria-label={`${spec.size} joined pair`}>
+            <JoinedPair.TextStartOccupant
+              id={`joined-${spec.size}`}
+              ariaLabel="Value"
+              value=""
+              size={spec.size}
+              placeholder="Sample"
+              onValueChange={() => undefined}
+            />
+            <JoinedPair.Divider />
+            <JoinedPair.LabelOccupant text="unit" ariaLabel="Unit" size={spec.size} />
+          </JoinedPair.Root>
+        ),
+        propsLabel: `size="${spec.size}"`,
+        className: spec.className,
+        notes: spec.useCase,
+      }))}
+    />
+  ),
 }

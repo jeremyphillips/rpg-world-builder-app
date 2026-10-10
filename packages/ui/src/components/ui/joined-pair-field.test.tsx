@@ -30,13 +30,17 @@ describe('JoinedPair', () => {
       </JoinedPair.Root>,
     )
 
-    expect(screen.getByRole('group', { name: 'Speed' })).toHaveClass('min-w-max')
+    expect(screen.getByRole('group', { name: 'Speed' })).toHaveClass('ui-field-group--intrinsic')
     expect(screen.getByRole('group', { name: 'Speed' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox', { name: 'Speed unit' })).not.toBeInTheDocument()
     expect(screen.getByText('ft.')).toBeInTheDocument()
-    expect(screen.getByText('ft.')).toHaveClass('ps-2', 'pe-2.5')
-    expect(screen.getByText('ft.').closest('[aria-hidden]')).toHaveClass('bg-surface-faint')
+    expect(screen.getByText('ft.').closest(`[${SELECT_VALUE_SLOT_DATA_ATTR}]`)).toHaveClass(
+      'ui-field-group__value-slot--end',
+    )
+    expect(screen.getByText('ft.').closest('[aria-hidden]')).toHaveClass(
+      'ui-field-group__segment--surface-faint',
+    )
   })
 
   it('renders select + select with chevrons on both segments', () => {
@@ -67,7 +71,9 @@ describe('JoinedPair', () => {
 
     expect(screen.getByRole('combobox', { name: 'Speed value' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Speed unit' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Speed unit' })).toHaveClass('bg-surface-faint')
+    expect(screen.getByRole('combobox', { name: 'Speed unit' })).toHaveClass(
+      'ui-field-group__segment--surface-faint',
+    )
   })
 
   it('applies grouped digit width and visual slot on start segments', () => {
@@ -89,12 +95,16 @@ describe('JoinedPair', () => {
     )
 
     const trigger = screen.getByRole('combobox', { name: 'Speed value' })
-    expect(trigger).toHaveClass('w-auto', 'p-0')
+    expect(trigger).toHaveClass('w-auto')
+    expect(trigger).toHaveClass('ui-field-group__segment')
     expect(trigger.querySelector('[data-select-value-slot]')).toHaveClass('min-w-[calc(2*1ch)]')
-    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass('w-8', 'pe-1')
+    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass(
+      'ui-field-group__caret-slot',
+      'ui-field-group__caret-slot--grouped-start',
+    )
   })
 
-  it('applies grouped digit width on end segments without pr-1 inset', () => {
+  it('applies grouped digit width on end segments without grouped-start caret inset', () => {
     render(
       <JoinedPair.Root aria-label="Speed">
         <JoinedPair.SelectOccupant
@@ -122,10 +132,11 @@ describe('JoinedPair', () => {
     )
 
     const trigger = screen.getByRole('combobox', { name: 'Speed unit' })
-    expect(trigger).toHaveClass('w-auto', 'p-0')
+    expect(trigger).toHaveClass('w-auto')
+    expect(trigger).toHaveClass('ui-field-group__segment--end')
     const column = trigger.querySelector('[data-select-caret-slot]')
-    expect(column).toHaveClass('w-8')
-    expect(column).not.toHaveClass('pe-1')
+    expect(column).toHaveClass('ui-field-group__caret-slot')
+    expect(column).not.toHaveClass('ui-field-group__caret-slot--grouped-start')
   })
 
   it('supports sizingLabel on grouped end segments', () => {
@@ -159,7 +170,9 @@ describe('JoinedPair', () => {
     const trigger = screen.getByRole('combobox', { name: 'Currency' })
     expect(trigger).toHaveTextContent('GP')
     expect(trigger.querySelector('[data-select-sizing-label]')).toHaveTextContent('GP')
-    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass('w-8')
+    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass(
+      'ui-field-group__caret-slot',
+    )
   })
 
   it('renders sizingLabels ghosts on grouped end segments', () => {
@@ -215,7 +228,7 @@ describe('JoinedPair', () => {
     )
 
     const labelValueSlot = screen.getByText('ft.').closest(`[${SELECT_VALUE_SLOT_DATA_ATTR}]`)
-    expect(labelValueSlot).toHaveClass('ps-2')
+    expect(labelValueSlot).toHaveClass('ui-field-group__value-slot--end')
     expect(screen.queryByRole('combobox', { name: 'Speed unit' })).not.toBeInTheDocument()
     unmountLabelPair()
 
@@ -247,8 +260,12 @@ describe('JoinedPair', () => {
     )
 
     const trigger = screen.getByRole('combobox', { name: 'Currency' })
-    expect(trigger.querySelector(`[${SELECT_VALUE_SLOT_DATA_ATTR}]`)).toHaveClass('ps-2')
-    expect(trigger.querySelector(`[${SELECT_CARET_SLOT_DATA_ATTR}]`)).toHaveClass('w-8')
+    expect(trigger.querySelector(`[${SELECT_VALUE_SLOT_DATA_ATTR}]`)).toHaveClass(
+      'ui-field-group__value-slot--end-slot',
+    )
+    expect(trigger.querySelector(`[${SELECT_CARET_SLOT_DATA_ATTR}]`)).toHaveClass(
+      'ui-field-group__caret-slot',
+    )
   })
 
   it('invokes change handlers with numeric option values', () => {
@@ -277,7 +294,9 @@ describe('JoinedPair', () => {
     const trigger = screen.getByRole('combobox', { name: 'Speed value' })
     expect(trigger).toHaveTextContent('30')
     expect(trigger).not.toHaveClass('pr-3.5')
-    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass('self-stretch', 'pe-1')
+    expect(trigger.querySelector('[data-select-caret-slot]')).toHaveClass(
+      'ui-field-group__caret-slot--grouped-start',
+    )
     onValueChange(40)
     expect(onValueChange).toHaveBeenCalledWith(40)
   })

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { UI_FIELD_CONTROL_BLOCK_CLASS } from './field-control.styles'
+import { UI_FIELD_GROUP_BLOCK_CLASS, UI_FIELD_GROUP_INVALID_CLASS } from './field-group.styles'
 import {
   fieldGroupedDividerClasses,
   fieldGroupedShellClasses,
@@ -15,17 +16,16 @@ describe('field-input-chrome.variants', () => {
   })
 
   it('uses grouped semantic shell class for composite wrappers', () => {
-    expect(fieldGroupedShellClasses).toContain('ui-field-control-shell--grouped')
+    expect(fieldGroupedShellClasses).toContain(UI_FIELD_GROUP_BLOCK_CLASS)
     expect(fieldGroupedShellClasses).toContain('grid')
   })
 
   it('uses semantic invalid class for grouped shells', () => {
-    expect(fieldInputInvalidClasses).toBe('ui-field-control-shell--grouped-invalid')
+    expect(fieldInputInvalidClasses).toBe(UI_FIELD_GROUP_INVALID_CLASS)
   })
 
   it('hardens intrinsic grouped shell divider track against crush', () => {
-    expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('minmax(1px,1px)')
-    expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('min-w-max')
-    expect(fieldGroupedDividerClasses).toContain('min-w-px')
+    expect(fieldGroupedShellIntrinsicLayoutClasses).toContain('ui-field-group--intrinsic')
+    expect(fieldGroupedDividerClasses).toContain('ui-field-group__divider')
   })
 })

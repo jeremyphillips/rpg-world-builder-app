@@ -43,6 +43,7 @@ export interface JoinedPairRootProps extends JoinedPairGroupVariantProps {
 }
 
 function JoinedPairRoot({
+  size = 'md',
   layout = 'intrinsic',
   invalid = false,
   disabled = false,
@@ -56,7 +57,7 @@ function JoinedPairRoot({
       role="group"
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
-      className={cn(joinedPairGroupVariants({ layout, invalid, disabled }), className)}
+      className={cn(joinedPairGroupVariants({ size, layout, invalid, disabled }), className)}
     >
       {children}
     </div>

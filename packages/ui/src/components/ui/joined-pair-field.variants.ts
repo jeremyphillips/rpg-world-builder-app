@@ -4,17 +4,24 @@ import { cn } from '../../lib/utils'
 import {
   fieldGroupedInputColumnClasses,
   groupedDividerVariants,
-  fieldGroupedSegmentResetClasses,
-  fieldGroupedSegmentStartClasses,
   fieldGroupedShellClasses,
   fieldGroupedShellIntrinsicLayoutClasses,
   fieldGroupedShellStretchLayoutClasses,
   fieldInputInvalidClasses,
 } from './field-input-chrome.variants'
-import { fieldGroupedControlSizeClasses } from './field-sizing.variants'
+import {
+  resolveFieldGroupInputSegmentClasses,
+  UI_FIELD_GROUP_SEGMENT_RESET_CLASS,
+  UI_FIELD_GROUP_SEGMENT_START_CLASS,
+} from './field-group.styles'
 
 export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
   variants: {
+    size: {
+      sm: 'ui-field-group--sm',
+      md: 'ui-field-group--md',
+      lg: 'ui-field-group--lg',
+    },
     layout: {
       intrinsic: fieldGroupedShellIntrinsicLayoutClasses,
       stretch: fieldGroupedShellStretchLayoutClasses,
@@ -29,6 +36,7 @@ export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
     },
   },
   defaultVariants: {
+    size: 'md',
     layout: 'intrinsic',
     invalid: false,
     disabled: false,
@@ -36,25 +44,29 @@ export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
 })
 
 /** Grouped editable start segments (NumberInput / Input value cells). */
-export const joinedPairSegmentSizeVariants = fieldGroupedControlSizeClasses
+export const joinedPairSegmentSizeVariants = {
+  sm: resolveFieldGroupInputSegmentClasses('sm'),
+  md: resolveFieldGroupInputSegmentClasses('md'),
+  lg: resolveFieldGroupInputSegmentClasses('lg'),
+} as const
 
 export const joinedPairStartTextSegmentVariants = cva('min-w-0', {
   variants: {
     size: {
       sm: cn(
         joinedPairSegmentSizeVariants.sm,
-        fieldGroupedSegmentResetClasses,
-        fieldGroupedSegmentStartClasses,
+        UI_FIELD_GROUP_SEGMENT_RESET_CLASS,
+        UI_FIELD_GROUP_SEGMENT_START_CLASS,
       ),
       md: cn(
         joinedPairSegmentSizeVariants.md,
-        fieldGroupedSegmentResetClasses,
-        fieldGroupedSegmentStartClasses,
+        UI_FIELD_GROUP_SEGMENT_RESET_CLASS,
+        UI_FIELD_GROUP_SEGMENT_START_CLASS,
       ),
       lg: cn(
         joinedPairSegmentSizeVariants.lg,
-        fieldGroupedSegmentResetClasses,
-        fieldGroupedSegmentStartClasses,
+        UI_FIELD_GROUP_SEGMENT_RESET_CLASS,
+        UI_FIELD_GROUP_SEGMENT_START_CLASS,
       ),
     },
   },

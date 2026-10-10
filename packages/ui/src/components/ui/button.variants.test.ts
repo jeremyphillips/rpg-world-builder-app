@@ -6,10 +6,8 @@ import {
   TEXT_BUTTON_SIZE_CLASS,
   UI_BUTTON_TEXT_SIZE_CLASS,
 } from './button.styles'
-import {
-  controlActionGapClassesForTier,
-  resolveControlActionMetricsTier,
-} from './resolve-control-action-metrics-tier'
+import { resolveControlActionGapClass } from './compact-control.styles'
+import { resolveControlActionMetricsTier } from './control-action.variants'
 
 function classesFor(props: Parameters<typeof buttonVariants>[0]): string {
   return buttonVariants(props) ?? ''
@@ -61,7 +59,7 @@ describe('buttonVariants matrix', () => {
 
     for (const { props, tier } of cases) {
       expect(resolveControlActionMetricsTier(props.size, props.density, props.variant)).toBe(tier)
-      expect(controlActionGapClassesForTier(tier)).toBeTruthy()
+      expect(resolveControlActionGapClass(tier)).toBeTruthy()
     }
   })
 
@@ -101,14 +99,12 @@ describe('buttonVariants matrix', () => {
     expect(classes).toContain('ui-button__text--lg-compact')
   })
 
-  it('normalizes attached xs to attached-sm padding tier', () => {
+  it('normalizes attached xs to attached-sm size tier', () => {
     const attachedSm = classesFor({ variant: 'attached', size: 'sm' })
     const attachedXs = classesFor({ variant: 'attached', size: 'xs' })
 
     expect(attachedXs).toContain('ui-button--attached-xs')
     expect(attachedSm).toContain('ui-button--attached-sm')
-    expect(attachedXs).toContain('px-2.5')
-    expect(attachedSm).toContain('px-2.5')
     expect(attachedXs).toContain('ui-button--attached')
     expect(attachedXs).not.toContain('ui-button--xs')
   })

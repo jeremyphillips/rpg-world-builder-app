@@ -64,3 +64,41 @@ export const UI_FLOATING_LABEL_SIZE_CLASSES = [
   'ui-floating-label-field--sm',
   'ui-floating-label-field--md',
 ] as const
+
+export const UI_FIELD_GROUP_SIZE_CLASSES = [
+  'ui-field-group--sm',
+  'ui-field-group--md',
+  'ui-field-group--lg',
+] as const
+
+export const UI_FIELD_GROUP_LAYOUT_CLASSES = [
+  'ui-field-group--stretch',
+  'ui-field-group--intrinsic',
+  'ui-field-group--flow-col',
+] as const
+
+export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
+  'ui-compact-control--icon-compact',
+  'ui-compact-control--icon-compact-sm',
+  'ui-compact-control--icon-xs',
+  'ui-compact-control--icon-default',
+  'ui-compact-control--icon-lg',
+  'ui-compact-control--text-compact',
+  'ui-compact-control--text-with-icon-compact',
+  'ui-compact-control--min-height-compact',
+  'ui-compact-control--segment-sm',
+  'ui-compact-control--tabs-pill',
+  'ui-compact-control--menu-item-sm',
+  'ui-compact-control--menu-item-md',
+  'ui-compact-control--menu-item-lg',
+  'ui-compact-control--list-row-sm',
+  'ui-compact-control--list-row-md',
+  'ui-compact-control--list-row-lg',
+  'ui-compact-control--stepper-button-xs',
+  'ui-compact-control--stepper-button-sm',
+  'ui-compact-control--stepper-button-md',
+  'ui-compact-control--stepper-button-lg',
+  'ui-compact-control--gap-xs',
+  'ui-compact-control--gap-sm',
+  'ui-compact-control--gap-md',
+] as const

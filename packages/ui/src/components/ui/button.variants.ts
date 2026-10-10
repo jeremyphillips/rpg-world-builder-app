@@ -1,6 +1,5 @@
 import { cn } from '../../lib/utils'
 import { fieldGroupedSegmentEndClasses } from './field-input-chrome.variants'
-import { fieldGroupedControlActionPaddingClasses } from './field-sizing.variants'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 import {
   BUTTON_VARIANT_TO_APPEARANCE,
@@ -30,13 +29,6 @@ const ATTACHED_TIER_CLASS = {
   sm: 'ui-button--attached-sm',
   default: 'ui-button--attached-md',
   lg: 'ui-button--attached-lg',
-} as const satisfies Record<'default' | 'xs' | 'sm' | 'lg', string>
-
-const ATTACHED_PADDING_CLASS = {
-  xs: fieldGroupedControlActionPaddingClasses.sm,
-  sm: fieldGroupedControlActionPaddingClasses.sm,
-  default: fieldGroupedControlActionPaddingClasses.md,
-  lg: fieldGroupedControlActionPaddingClasses.lg,
 } as const satisfies Record<'default' | 'xs' | 'sm' | 'lg', string>
 
 function resolveAttachedSizeKey(size: ButtonSize): keyof typeof ATTACHED_TIER_CLASS {
@@ -75,7 +67,6 @@ function resolveButtonSizeClasses({
     return cn(
       UI_BUTTON_ATTACHED_SIZE_CLASS,
       ATTACHED_TIER_CLASS[attachedSize],
-      ATTACHED_PADDING_CLASS[attachedSize],
       fieldGroupedSegmentEndClasses,
     )
   }

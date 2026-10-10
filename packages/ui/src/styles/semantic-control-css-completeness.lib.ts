@@ -116,6 +116,10 @@ const buttonCssPath = path.join(stylesDir, '../components/ui/button.css')
 
 const fieldControlCssPath = path.join(stylesDir, '../components/ui/field-control.css')
 
+const compactControlCssPath = path.join(stylesDir, '../components/ui/compact-control.css')
+
+const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -167,6 +171,35 @@ const FIELD_CONTROL_DIGITS_REQUIRED = ['padding-inline-start', 'padding-inline-e
 
 const FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED = ['background-color', 'border-color'] as const
 
+const COMPACT_CONTROL_ICON_MODIFIERS = [
+  'icon-compact',
+  'icon-compact-sm',
+  'icon-xs',
+  'icon-default',
+  'icon-lg',
+] as const
+
+const COMPACT_CONTROL_STEPPER_MODIFIERS = [
+  'stepper-button-xs',
+  'stepper-button-sm',
+  'stepper-button-md',
+  'stepper-button-lg',
+] as const
+
+const COMPACT_CONTROL_ICON_REQUIRED = ['width', 'height'] as const
+
+const COMPACT_CONTROL_STEPPER_REQUIRED = ['width', 'height'] as const
+
+const FIELD_GROUP_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+
+const FIELD_GROUP_SIZE_REQUIRED = [
+  '--ui-field-group-height',
+  '--ui-field-slot-ps-start',
+  '--ui-field-slot-pe-end-content',
+  '--ui-field-action-px',
+  '--ui-field-caret-width',
+] as const
+
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
   {
@@ -206,5 +239,25 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
         requiredProperties: FIELD_CONTROL_FILTER_APPEARANCE_REQUIRED,
       })),
     ],
+  },
+  {
+    filePath: compactControlCssPath,
+    dimensions: [
+      ...COMPACT_CONTROL_ICON_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-compact-control--${name}`,
+        requiredProperties: COMPACT_CONTROL_ICON_REQUIRED,
+      })),
+      ...COMPACT_CONTROL_STEPPER_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-compact-control--${name}`,
+        requiredProperties: COMPACT_CONTROL_STEPPER_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: fieldGroupCssPath,
+    dimensions: FIELD_GROUP_SIZE_MODIFIERS.map((name) => ({
+      modifierPrefix: `ui-field-group--${name}`,
+      requiredProperties: FIELD_GROUP_SIZE_REQUIRED,
+    })),
   },
 ]

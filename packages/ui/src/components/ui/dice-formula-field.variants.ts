@@ -2,17 +2,23 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../lib/utils'
 import { fieldGroupedShellClasses, fieldInputInvalidClasses } from './field-input-chrome.variants'
+import { UI_FIELD_GROUP_FLOW_COL_LAYOUT_CLASS } from './field-group.styles'
 import { fieldInlineSentenceClasses } from './field.variants'
 
 /** Shared bordered shell for grouped dice segments (mirrors JoinedPair group). */
 const diceFormulaGroupShellClasses = cn(
   fieldGroupedShellClasses,
-  'w-fit min-w-max max-w-full grid-flow-col auto-cols-max',
+  UI_FIELD_GROUP_FLOW_COL_LAYOUT_CLASS,
 )
 
 /** Core cluster shell — count + d + faces. */
 export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
+    size: {
+      sm: 'ui-field-group--sm',
+      md: 'ui-field-group--md',
+      lg: 'ui-field-group--lg',
+    },
     invalid: {
       true: fieldInputInvalidClasses,
       false: '',
@@ -23,6 +29,7 @@ export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
     },
   },
   defaultVariants: {
+    size: 'md',
     invalid: false,
     disabled: false,
   },
@@ -31,6 +38,11 @@ export const diceFormulaCoreGroupVariants = cva(diceFormulaGroupShellClasses, {
 /** Modifier cluster shell — operator + amount. */
 export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses, {
   variants: {
+    size: {
+      sm: 'ui-field-group--sm',
+      md: 'ui-field-group--md',
+      lg: 'ui-field-group--lg',
+    },
     invalid: {
       true: fieldInputInvalidClasses,
       false: '',
@@ -41,6 +53,7 @@ export const diceFormulaModifierGroupVariants = cva(diceFormulaGroupShellClasses
     },
   },
   defaultVariants: {
+    size: 'md',
     invalid: false,
     disabled: false,
   },

@@ -8,17 +8,25 @@ import {
 } from './grouped-segment.variants'
 
 describe('grouped-segment variants', () => {
-  it('maps positional value-slot padding at md', () => {
-    expect(resolveGroupedValueSlotPadding('md', 'start')).toBe('ps-3')
-    expect(resolveGroupedValueSlotPadding('md', 'start', { inset: 'compact' })).toBe('ps-2')
-    expect(resolveGroupedValueSlotPadding('md', 'middle')).toBe('ps-2 pe-2')
-    expect(resolveGroupedValueSlotPadding('md', 'end')).toBe('ps-2 pe-2.5')
+  it('maps positional value-slot classes at md', () => {
+    expect(resolveGroupedValueSlotPadding('md', 'start')).toContain(
+      'ui-field-group__value-slot--start',
+    )
+    expect(resolveGroupedValueSlotPadding('md', 'start', { inset: 'compact' })).toContain(
+      'ui-field-group__value-slot--start-compact',
+    )
+    expect(resolveGroupedValueSlotPadding('md', 'middle')).toContain(
+      'ui-field-group__value-slot--middle',
+    )
+    expect(resolveGroupedValueSlotPadding('md', 'end')).toContain('ui-field-group__value-slot--end')
   })
 
   it('uses trailing-slot end padding when a sibling column follows', () => {
-    expect(resolveGroupedValueSlotPadding('md', 'end', { trailing: 'slot' })).toBe('ps-2 pe-1')
-    expect(resolveGroupedValueSlotPadding('md', 'standalone', { trailing: 'slot' })).toBe(
-      'ps-3 pe-1',
+    expect(resolveGroupedValueSlotPadding('md', 'end', { trailing: 'slot' })).toContain(
+      'ui-field-group__value-slot--end-slot',
+    )
+    expect(resolveGroupedValueSlotPadding('md', 'standalone', { trailing: 'slot' })).toContain(
+      'ui-field-group__value-slot--standalone-slot',
     )
   })
 
@@ -30,30 +38,34 @@ describe('grouped-segment variants', () => {
 
   it('does not infer surface from position — explicit surface only', () => {
     expect(groupedSegmentShellClasses('md', { position: 'end', surface: 'default' })).not.toContain(
-      'bg-surface-faint',
+      'ui-field-group__segment--surface-faint',
     )
     expect(groupedSegmentShellClasses('md', { position: 'middle', surface: 'faint' })).toContain(
-      'bg-surface-faint',
+      'ui-field-group__segment--surface-faint',
     )
   })
 
   it('applies corner radii only on outer positions', () => {
     expect(groupedSegmentShellClasses('md', { position: 'start', surface: 'default' })).toContain(
-      'rounded-l-md',
+      'ui-field-group__segment--start',
     )
     expect(groupedSegmentShellClasses('md', { position: 'end', surface: 'faint' })).toContain(
-      'rounded-r-md',
+      'ui-field-group__segment--end',
     )
     expect(
       groupedSegmentShellClasses('md', { position: 'middle', surface: 'faint' }),
-    ).not.toContain('rounded-l-md')
+    ).not.toContain('ui-field-group__segment--start')
     expect(
       groupedSegmentShellClasses('md', { position: 'middle', surface: 'faint' }),
-    ).not.toContain('rounded-r-md')
+    ).not.toContain('ui-field-group__segment--end')
   })
 
   it('exposes primary and subtle grouped divider strengths', () => {
-    expect(groupedDividerVariants({ strength: 'primary' })).toContain('bg-border')
-    expect(groupedDividerVariants({ strength: 'subtle' })).toContain('bg-border-subtle')
+    expect(groupedDividerVariants({ strength: 'primary' })).toContain(
+      'ui-field-group__divider--primary',
+    )
+    expect(groupedDividerVariants({ strength: 'subtle' })).toContain(
+      'ui-field-group__divider--subtle',
+    )
   })
 })

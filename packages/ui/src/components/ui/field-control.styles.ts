@@ -2,11 +2,6 @@ export const UI_FIELD_CONTROL_BLOCK_CLASS = 'ui-field-control' as const
 
 export const UI_FIELD_CONTROL_TRIGGER_CLASS = 'ui-field-control--trigger' as const
 
-export const UI_FIELD_CONTROL_GROUPED_SHELL_CLASS = 'ui-field-control-shell--grouped' as const
-
-export const UI_FIELD_CONTROL_GROUPED_SHELL_INVALID_CLASS =
-  'ui-field-control-shell--grouped-invalid' as const
-
 export type FieldControlSizeKey = 'sm' | 'md' | 'lg'
 
 export type FieldControlSizeSpec = {

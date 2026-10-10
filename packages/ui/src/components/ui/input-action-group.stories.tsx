@@ -1,15 +1,23 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import { Input } from './input.client'
 import { InputActionGroup } from './input-action-group.client'
 import type { FieldSize } from './field.client'
+import { FIELD_GROUP_SIZE_SPECS, UI_FIELD_GROUP_BLOCK_CLASS } from './field-group.styles'
 
 const meta = {
   title: 'Primitives/InputActionGroup',
   component: InputActionGroup,
   parameters: {
     layout: 'centered',
+    semanticClasses: true,
+    docs: {
+      description: {
+        component: `${UI_FIELD_GROUP_BLOCK_CLASS} stretch layout; attached buttons read --ui-field-action-px from the shell size modifier.`,
+      },
+    },
   },
 } satisfies Meta<typeof InputActionGroup>
 
@@ -76,4 +84,31 @@ export const States: Story = {
 
 export const NameGenerate: Story = {
   render: () => <AttachedActionExample size="md" />,
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={FIELD_GROUP_SIZE_SPECS.map((spec) => ({
+        key: spec.size,
+        sample: (
+          <div className="w-80">
+            <InputActionGroup size={spec.size}>
+              <Input grouped size={spec.size} aria-label="Sample" placeholder="Sample" />
+              <InputActionGroup.Action>
+                <Button type="button" variant="attached">
+                  Action
+                </Button>
+              </InputActionGroup.Action>
+            </InputActionGroup>
+          </div>
+        ),
+        propsLabel: `size="${spec.size}"`,
+        className: spec.className,
+        notes: spec.useCase,
+      }))}
+    />
+  ),
 }

@@ -10,6 +10,9 @@ import {
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
+  UI_COMPACT_CONTROL_SIZE_CLASSES,
+  UI_FIELD_GROUP_LAYOUT_CLASSES,
+  UI_FIELD_GROUP_SIZE_CLASSES,
 } from './semantic-control-class-groups'
 
 const HEADING_STYLE_UTILITIES = [
@@ -65,6 +68,9 @@ type TypographyClassGroupIds =
   | 'ui-field-control-digits-size'
   | 'ui-field-control-filter-appearance'
   | 'ui-floating-label-size'
+  | 'ui-field-group-size'
+  | 'ui-field-group-layout'
+  | 'ui-compact-control-size'
 
 /**
  * Custom `text-*` font-size and `font-*` weight utilities from `@theme` in
@@ -134,6 +140,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-digits-size': [...UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES],
       'ui-field-control-filter-appearance': [...UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
+      'ui-compact-control-size': [...UI_COMPACT_CONTROL_SIZE_CLASSES],
+      'ui-field-group-size': [...UI_FIELD_GROUP_SIZE_CLASSES],
+      'ui-field-group-layout': [...UI_FIELD_GROUP_LAYOUT_CLASSES],
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
@@ -147,6 +156,9 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'ui-field-control-digits-size': ['ui-field-control-digits-size'],
       'ui-field-control-filter-appearance': ['ui-field-control-filter-appearance'],
       'ui-floating-label-size': ['ui-floating-label-size'],
+      'ui-compact-control-size': ['ui-compact-control-size'],
+      'ui-field-group-size': ['ui-field-group-size'],
+      'ui-field-group-layout': ['ui-field-group-layout'],
       'font-size': ['heading-style', 'eyebrow-style'],
       'font-weight': ['heading-style', 'eyebrow-style'],
       tracking: ['heading-style', 'eyebrow-style'],

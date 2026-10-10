@@ -6,11 +6,8 @@ import { describe, expect, it, vi } from 'vitest'
 import { Button } from './button.client'
 import { Input } from './input.client'
 import { InputActionGroup } from './input-action-group.client'
+import { resolveFieldGroupActionSegmentClasses } from './field-group.styles'
 import { inputActionGroupActionSegmentVariants } from './input-action-group.variants'
-import {
-  fieldGroupedControlActionPaddingClasses,
-  fieldGroupedControlHeightClasses,
-} from './field-sizing.variants'
 
 const TYPOGRAPHY_PATTERN = /\b(text-|font-)/
 
@@ -117,7 +114,7 @@ describe('InputActionGroup', () => {
       )
 
       const segment = screen.getByRole('button', { name: 'Generate' }).parentElement
-      expect(segment?.className).toContain(fieldGroupedControlHeightClasses[size])
+      expect(segment?.className).toContain(resolveFieldGroupActionSegmentClasses(size))
       expect(segment?.className).not.toMatch(TYPOGRAPHY_PATTERN)
       unmount()
     }
@@ -136,9 +133,8 @@ describe('InputActionGroup', () => {
     )
 
     const button = screen.getByRole('button', { name: 'Generate' })
-    expect(button.className).toContain(fieldGroupedControlActionPaddingClasses.md)
-    expect(button.className).toContain('h-full')
-    expect(button.className).toContain('w-full')
+    expect(button.className).toContain('ui-button--attached-md')
+    expect(button.className).toContain('ui-button--attached')
     expect(button.className).not.toMatch(/\bh-9\b/)
   })
 
@@ -158,10 +154,9 @@ describe('InputActionGroup', () => {
       const button = screen.getByRole('button', { name: 'Generate' })
       const segment = button.parentElement
 
-      expect(button.className).toContain('h-full')
-      expect(button.className).toContain('w-full')
-      expect(button.className).toContain(fieldGroupedControlActionPaddingClasses[size])
-      expect(button.className).toContain('rounded-r-md')
+      expect(button.className).toContain('ui-button--attached')
+      expect(button.className).toContain(`ui-button--attached-${size === 'md' ? 'md' : size}`)
+      expect(button.className).toContain('ui-field-group__segment--end')
       expect(button.className).not.toMatch(/\bh-(8|9|10|11)\b/)
 
       expect(segment?.className).toBe(inputActionGroupActionSegmentVariants({ size }))
@@ -188,7 +183,7 @@ describe('InputActionGroup', () => {
 
     const button = screen.getByRole('button', { name: 'Generate' })
     expect(button.className).toContain('font-body-emphasis')
-    expect(button.className).toContain('text-sm')
+    expect(button.className).toContain('ui-button--attached-md')
     expect(button.className).not.toContain('text-md')
   })
 })

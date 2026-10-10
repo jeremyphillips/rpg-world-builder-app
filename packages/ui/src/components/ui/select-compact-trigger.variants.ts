@@ -7,6 +7,7 @@ import {
   fieldControlTriggerCursorClasses,
   fieldControlTriggerVariants,
 } from './field-control.variants'
+import { resolveFieldGroupCaretSlotClass, resolveFieldGroupSizeClass } from './field-group.styles'
 import {
   groupedSegmentShellClasses,
   resolveGroupedSegmentSurface,
@@ -18,11 +19,11 @@ import {
   type GroupedValueSlotTrailing,
 } from './grouped-segment.variants'
 
-/** Fixed caret column width — shared by compact and prose select triggers. */
+/** @deprecated Prefer {@link resolveFieldGroupCaretSlotClass} — caret width lives in field-group.css. */
 export const selectCaretSlotWidthClasses = {
-  sm: 'w-8',
-  md: 'w-8',
-  lg: 'w-9',
+  sm: resolveFieldGroupCaretSlotClass(),
+  md: resolveFieldGroupCaretSlotClass(),
+  lg: resolveFieldGroupCaretSlotClass(),
 } as const satisfies Record<FieldSizeToken, string>
 
 export const selectDigitValueMinWidthVariants = {
@@ -166,8 +167,7 @@ export function selectCaretSlotClasses(
   options: { groupedStart: boolean },
 ): string {
   return cn(
-    'pointer-events-none flex shrink-0 items-center justify-center self-stretch leading-none text-muted-foreground',
-    selectCaretSlotWidthClasses[size],
-    options.groupedStart && 'pe-1',
+    resolveFieldGroupSizeClass(size),
+    resolveFieldGroupCaretSlotClass({ groupedStart: options.groupedStart }),
   )
 }

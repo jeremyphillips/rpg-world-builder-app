@@ -26,9 +26,8 @@ describe('fieldDigitWidthVariants', () => {
 
   it('centralizes md control, grouped segment, and digit sizing classes', () => {
     expect(fieldControlSizeClasses.md).toBe('ui-field-control--md')
-    expect(fieldGroupedControlSizeClasses.md).toContain('h-9')
-    expect(fieldGroupedControlSizeClasses.md).toContain('ps-3')
-    expect(fieldGroupedControlSizeClasses.md).toContain('text-md')
+    expect(fieldGroupedControlSizeClasses.md).toContain('ui-field-group__input-segment')
+    expect(fieldGroupedControlSizeClasses.md).toContain('ui-field-group--md')
     expect(fieldDigitTrailingPaddingClasses.md).toBe('pe-6')
     expect(fieldDigitSizeClasses.md).toBe('ui-field-control--digits-md')
     expect(fieldDigitTrailingColumnClasses.md).toBe('w-5')

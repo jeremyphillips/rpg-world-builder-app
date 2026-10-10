@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 import { fieldCaptionTypographyVariants } from './field-caption.variants'
-import { fieldGroupedValueSlotStartPaddingClasses } from './field-sizing.variants'
+import { UI_FIELD_GROUP_VALUE_SLOT_START_CLASS } from './field-group.styles'
 import { withFloatingLabelSizingLabel } from './floating-label-field.lib'
 import { FLOATING_LABEL_LAYER_CLASS } from './floating-label-field.styles'
 import { floatingLabelLayerVariants } from './floating-label-field.variants'
@@ -13,6 +13,11 @@ import { floatingLabelLayerVariants } from './floating-label-field.variants'
 const floatingLabelCssPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   'floating-label-field.css',
+)
+
+const fieldGroupCssPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'field-group.css',
 )
 
 const stylesDir = path.resolve(
@@ -73,12 +78,14 @@ describe('floating-label-field.lib', () => {
 
   it('lines the resting label up with the value inset', () => {
     const css = readFileSync(floatingLabelCssPath, 'utf8')
+    const fieldGroupCss = readFileSync(fieldGroupCssPath, 'utf8')
     expect(floatingLabelLayerVariants({ size: 'sm' })).toBe(FLOATING_LABEL_LAYER_CLASS)
     expect(css).toContain('ui-floating-label-field--sm .ui-floating-label-field__layer')
     expect(css).toContain('calc(var(--spacing) * 2.5)')
-    expect(fieldGroupedValueSlotStartPaddingClasses.sm).toContain('ps-2.5')
+    expect(UI_FIELD_GROUP_VALUE_SLOT_START_CLASS).toBe('ui-field-group__value-slot--start')
     expect(css).toContain('ui-floating-label-field--md .ui-floating-label-field__layer')
     expect(css).toContain('calc(var(--spacing) * 3)')
-    expect(fieldGroupedValueSlotStartPaddingClasses.md).toContain('ps-3')
+    expect(fieldGroupCss).toContain('--ui-field-slot-ps-start')
+    expect(fieldGroupCss).toContain('var(--field-padding-md)')
   })
 })

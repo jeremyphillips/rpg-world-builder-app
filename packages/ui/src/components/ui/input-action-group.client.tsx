@@ -74,7 +74,7 @@ function InputActionGroupRoot({
     <InputActionGroupContext.Provider value={contextValue}>
       <div
         role="group"
-        className={cn(inputActionGroupVariants({ invalid, disabled }), className)}
+        className={cn(inputActionGroupVariants({ size, invalid, disabled }), className)}
         {...props}
       >
         <div className={fieldGroupedInputColumnClasses}>{inputChild}</div>
