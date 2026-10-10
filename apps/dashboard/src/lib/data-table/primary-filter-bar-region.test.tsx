@@ -6,7 +6,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { createBooleanFilter, createEqualsFilter, createFilterSchema } from '@rpg/ui/filters'
 
-import { PrimaryFilterPanel } from './primary-filter-bar-region'
+import { PrimaryFilterBarRegion, PrimaryFilterPanel } from './primary-filter-bar-region'
 
 type DemoRow = { id: string; status: string; hidden: boolean }
 type DemoState = { unread?: boolean; status?: 'draft' | 'published' }
@@ -30,6 +30,22 @@ const schema = createFilterSchema<DemoRow, DemoState>([
     showAllOption: true,
   }),
 ])
+
+describe('PrimaryFilterBarRegion', () => {
+  it('renders primary filters without an additional-filters disclosure', () => {
+    render(
+      <PrimaryFilterBarRegion
+        filterSchema={schema}
+        filterState={{ status: 'draft' }}
+        onValueChange={vi.fn()}
+        onReset={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('checkbox', { name: 'Unread only' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /additional filters/i })).not.toBeInTheDocument()
+  })
+})
 
 describe('PrimaryFilterPanel', () => {
   it('renders active chips and omits the FilterBar reset when chips are enabled', async () => {

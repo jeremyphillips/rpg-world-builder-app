@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import type { CampaignAvailabilityFilter } from '@rpg/contracts'
 import {
-  DataTableFilterRegion,
+  DataTableFilterChrome,
   type ColumnDef,
   type DataTableEmptyStateContext,
   type DataTableProps,
@@ -9,11 +9,6 @@ import {
 } from '@rpg/ui'
 import {
   applyFilterSchema,
-  countModifiedFilters,
-  FilterBar,
-  FilterChromeProvider,
-  FilterFieldList,
-  getSchemaFieldsByPlacement,
   useFilterState,
   type FilterFieldId,
   type FilterSchema,
@@ -238,39 +233,15 @@ export function CatalogOverviewFilterChrome<T, TFilters extends Record<string, u
   advancedOpen,
   onAdvancedOpenChange,
 }: CatalogOverviewFilterChromeProps<T, TFilters>) {
-  const advancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
-    [filterSchema],
-  )
-  const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
-
   return (
-    <FilterChromeProvider selectPresentation="floating" density="comfortable">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={filterSchema}
-            state={filterState}
-            onValueChange={onFilterChange}
-            onReset={onResetFilters}
-          />
-        }
-        additionalFilterFields={
-          advancedFields.length > 0 ? (
-            <FilterFieldList
-              schema={filterSchema}
-              fields={advancedFields}
-              state={filterState}
-              idPrefix="filters-advanced"
-              onValueChange={onFilterChange}
-            />
-          ) : undefined
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={onAdvancedOpenChange}
-        activeAdditionalFilterCount={advancedModifiedCount}
-      />
-    </FilterChromeProvider>
+    <DataTableFilterChrome
+      filterSchema={filterSchema}
+      state={filterState}
+      onValueChange={onFilterChange}
+      onReset={onResetFilters}
+      advancedOpen={advancedOpen}
+      onAdvancedFiltersOpenChange={onAdvancedOpenChange}
+    />
   )
 }
 

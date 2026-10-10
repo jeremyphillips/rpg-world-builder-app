@@ -1,12 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Button, DataTableFilterRegion, Text } from '@rpg/ui'
-import {
-  countModifiedFilters,
-  FilterBar,
-  FilterChromeProvider,
-  FilterFieldList,
-  getSchemaFieldsByPlacement,
-} from '@rpg/ui/filters'
+import { useMemo } from 'react'
+import { Button, Text } from '@rpg/ui'
 
 import { CatalogOverviewTable } from '@/lib/data-table/catalog-overview-table'
 import { useOverviewQueryState } from '@/lib/overview-query-state/use-overview-query-state'
@@ -46,42 +39,6 @@ export function AdminUsersOverviewTable() {
   const users = data?.users ?? []
   const pagination = data?.pagination
 
-  const [advancedOpen, setAdvancedOpen] = useState(false)
-  const advancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(filterSchema, 'advanced'),
-    [filterSchema],
-  )
-  const advancedModifiedCount = countModifiedFilters(filterSchema, query.filters, 'advanced')
-
-  const filterRegion = (
-    <FilterChromeProvider>
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={filterSchema}
-            state={query.filters}
-            onValueChange={actions.setFilterValue}
-            onReset={() => actions.resetFilters()}
-          />
-        }
-        additionalFilterFields={
-          advancedFields.length > 0 ? (
-            <FilterFieldList
-              schema={filterSchema}
-              fields={advancedFields}
-              state={query.filters}
-              idPrefix="admin-users-filters-advanced"
-              onValueChange={actions.setFilterValue}
-            />
-          ) : undefined
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
-      />
-    </FilterChromeProvider>
-  )
-
   if (isError) {
     return <Text variant="muted">Could not load users.</Text>
   }
@@ -93,7 +50,10 @@ export function AdminUsersOverviewTable() {
         columns={adminUsersColumns()}
         data={users}
         caption="Platform users"
-        filters={filterRegion}
+        filterSchema={filterSchema}
+        filterState={query.filters}
+        onFilterChange={actions.setFilterValue}
+        onResetFilters={actions.resetFilters}
         resultCountLabel={
           pagination ? `${pagination.total} user${pagination.total === 1 ? '' : 's'}` : undefined
         }
