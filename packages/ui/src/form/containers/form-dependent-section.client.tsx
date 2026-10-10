@@ -21,13 +21,16 @@ import {
   type FormSectionContextValue,
 } from '../context/form-section.context'
 import {
+  flattenFields,
   resolveDependentsVisibility,
+  resolveFieldConfigBoundNames,
   type DependentConfig,
   type FieldVisibility,
   type FormItem,
   type GroupFieldItem,
   type RowConfig,
 } from '../field-config'
+import { useClearFieldErrorsOnHide } from '../hooks/use-clear-field-errors-on-hide.client'
 import {
   buildFieldControlId,
   FieldNode,
@@ -164,7 +167,18 @@ function GatedDependentFieldsRegion({
   dependentsVisibility: FieldVisibility
 }) {
   const values = useVisibilityValues(dependentsVisibility, props.namePrefix)
-  if (!dependentsVisibility.visibleWhen(values)) return null
+  const visible = dependentsVisibility.visibleWhen(values)
+  const boundNames = React.useMemo(
+    () =>
+      flattenFields(props.dependents as Array<FormItem | RowConfig>).flatMap((field) =>
+        resolveFieldConfigBoundNames(field).map((name) =>
+          props.namePrefix ? `${props.namePrefix}.${name}` : name,
+        ),
+      ),
+    [props.dependents, props.namePrefix],
+  )
+  useClearFieldErrorsOnHide(visible, boundNames)
+  if (!visible) return null
   return <DependentFieldsRegionContent {...props} />
 }
 

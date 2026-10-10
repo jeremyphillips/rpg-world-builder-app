@@ -4,11 +4,25 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Form, type FormItem } from '../field-config'
+import { flattenPatchToLeafSetValues } from './form-value-sync-patch.lib'
 import { Form as FormShell } from '../shells/form.client'
 
 const schema = z.object({
   enabled: z.boolean(),
   items: z.array(z.object({ id: z.string() })).optional(),
+})
+
+describe('flattenPatchToLeafSetValues', () => {
+  it('writes nested objects as leaf paths', () => {
+    expect(
+      flattenPatchToLeafSetValues({
+        spellcasting: { slotProgressionId: 'full-caster', ability: 'int' },
+      }),
+    ).toEqual([
+      { path: 'spellcasting.slotProgressionId', value: 'full-caster' },
+      { path: 'spellcasting.ability', value: 'int' },
+    ])
+  })
 })
 
 describe('FormValueSyncEffects', () => {

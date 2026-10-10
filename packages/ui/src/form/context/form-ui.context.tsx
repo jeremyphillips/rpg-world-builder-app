@@ -34,6 +34,8 @@ export interface FormUiContextValue {
   validationSessionExpandKeys: ReadonlySet<ValidationSessionExpandKey>
   addValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
   removeValidationSessionExpandKeys: (keys: readonly ValidationSessionExpandKey[]) => void
+  /** Clears progressive submit/publish presentation flags after confirmed save or discard. */
+  resetValidationPresentation: () => void
   /**
    * Checks values with the same resolver used at submit without writing RHF errors.
    * Provided by `<Form>` / `<TabbedForm>`; absent outside schema-driven shells.
@@ -53,6 +55,7 @@ const defaultContext: FormUiContextValue = {
   validationSessionExpandKeys: new Set(),
   addValidationSessionExpandKeys: () => undefined,
   removeValidationSessionExpandKeys: () => undefined,
+  resetValidationPresentation: () => undefined,
 }
 
 export const FormUiContext = React.createContext<FormUiContextValue>(defaultContext)
@@ -74,6 +77,8 @@ export interface FormUiProviderProps {
   publishPresentationIssues?: FormIssue[]
   publishPresentationEnabled?: boolean
   validateSilently?: ValidateSilently
+  /** Parent-owned reset when submit/publish flags are controlled externally. */
+  onResetValidationPresentation?: () => void
   children: React.ReactNode
 }
 
@@ -89,6 +94,7 @@ export function FormUiProvider({
   publishPresentationIssues = [],
   publishPresentationEnabled = false,
   validateSilently,
+  onResetValidationPresentation,
   children,
 }: FormUiProviderProps) {
   const [localHasAttemptedSubmit, setLocalHasAttemptedSubmit] = React.useState(false)
@@ -140,6 +146,16 @@ export function FormUiProvider({
     [],
   )
 
+  const resetValidationPresentation = React.useCallback(() => {
+    setValidationSessionExpandKeys(new Set())
+    if (onResetValidationPresentation) {
+      onResetValidationPresentation()
+      return
+    }
+    setLocalHasAttemptedSubmit(false)
+    setLocalHasAttemptedPublish(false)
+  }, [onResetValidationPresentation])
+
   const value = React.useMemo(
     () => ({
       uiStateKey,
@@ -154,6 +170,7 @@ export function FormUiProvider({
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
+      resetValidationPresentation,
       validateSilently,
     }),
     [
@@ -169,6 +186,7 @@ export function FormUiProvider({
       validationSessionExpandKeys,
       addValidationSessionExpandKeys,
       removeValidationSessionExpandKeys,
+      resetValidationPresentation,
       validateSilently,
     ],
   )

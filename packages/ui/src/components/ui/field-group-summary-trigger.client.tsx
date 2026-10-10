@@ -4,7 +4,8 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '../../lib/utils'
 import { resolveChromeClasses } from './chrome.variants'
 import type { FieldSize } from './field.client'
-import type { FieldGroupSummary } from './field-group-disclosure.types'
+import type { FieldGroupSummary, FieldGroupSummaryStatusTone } from './field-group-disclosure.types'
+import type { StatusDotVariantProps } from './status-dot.variants'
 import {
   fieldGroupSummaryPrimaryVariants,
   fieldGroupSummaryStatusLineVariants,
@@ -24,6 +25,7 @@ import {
   fieldGroupSummaryTriggerTypographyClasses,
 } from './field-group-summary-trigger.variants'
 import { InlineMetadata } from './inline-metadata'
+import { StatusDot } from './status-dot'
 import { Text } from './text'
 
 export type FieldGroupSummaryTriggerProps = Omit<
@@ -66,6 +68,17 @@ export function buildSummaryAccessibleName(
   return parts.join('. ')
 }
 
+function resolveSummaryStatusDotTone(
+  tone: FieldGroupSummaryStatusTone,
+): NonNullable<StatusDotVariantProps['tone']> {
+  if (tone === 'success') return 'success'
+  if (tone === 'warning') return 'warning'
+  return 'neutral'
+}
+
+const fieldGroupSummaryStatusLabelItemClasses = (tone: FieldGroupSummaryStatusTone) =>
+  cn(fieldGroupSummaryStatusLabelVariants({ tone }), fieldGroupSummaryTriggerTypographyClasses)
+
 function FieldGroupSummaryStatusRow({
   summary,
   size,
@@ -91,29 +104,26 @@ function FieldGroupSummaryStatusRow({
       )}
     >
       {status.indicator === 'dot' ? (
-        <InlineMetadata.Item>
-          <span
-            aria-hidden
-            className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'dot', tone })}
-          />
+        <InlineMetadata.Item className={fieldGroupSummaryStatusLabelItemClasses(tone)}>
+          <StatusDot tone={resolveSummaryStatusDotTone(tone)} size="sm" label={status.label} />
         </InlineMetadata.Item>
       ) : null}
       {status.indicator === 'inactive' ? (
-        <InlineMetadata.Item>
-          <CircleSlash
-            aria-hidden
-            className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
-          />
+        <InlineMetadata.Item className={fieldGroupSummaryStatusLabelItemClasses(tone)}>
+          <span className="inline-flex items-center gap-1.5">
+            <CircleSlash
+              aria-hidden
+              className={fieldGroupSummaryStatusIndicatorVariants({ indicator: 'inactive', tone })}
+            />
+            <span>{status.label}</span>
+          </span>
         </InlineMetadata.Item>
       ) : null}
-      <InlineMetadata.Item
-        className={cn(
-          fieldGroupSummaryStatusLabelVariants({ tone }),
-          fieldGroupSummaryTriggerTypographyClasses,
-        )}
-      >
-        {status.label}
-      </InlineMetadata.Item>
+      {status.indicator == null ? (
+        <InlineMetadata.Item className={fieldGroupSummaryStatusLabelItemClasses(tone)}>
+          {status.label}
+        </InlineMetadata.Item>
+      ) : null}
       {summary.detail ? (
         <InlineMetadata.Item truncate>
           <Text

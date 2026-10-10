@@ -33,8 +33,17 @@ describe('ContentCampaignAvailabilityAction', () => {
       'text-semantic-warning',
     )
     expect(screen.getByText(CAMPAIGN_ACCESS_PLAYER_ACCESS_PRESERVED_HINT)).toBeInTheDocument()
-    expect(document.querySelector('svg')).toHaveClass('size-icon-inline')
-    expect(document.querySelector('svg')).not.toHaveClass('size-3.5')
+    expect(document.querySelector('[aria-hidden].lucide-circle-slash')).toBeInTheDocument()
+  })
+
+  it('renders available state with StatusDot sm sizing', () => {
+    const { container } = render(
+      <ContentCampaignAvailabilityAction available onAvailableChange={vi.fn()} />,
+    )
+
+    const dot = container.querySelector('[aria-hidden="true"].size-2.rounded-full')
+    expect(dot).toBeInTheDocument()
+    expect(dot).toHaveClass('bg-semantic-success')
   })
 
   it('calls onAvailableChange when the switch is toggled', async () => {

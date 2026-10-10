@@ -9,6 +9,12 @@ import { groupIssuesForItemPrefix } from '../errors/group-form-issues'
 import { prepareFormIssues } from '../errors/resolve-invalid-submit-navigation'
 import type { FormItem } from '../field-config'
 import { collectArraySections } from '../errors/resolve-field-order'
+import {
+  collectInactiveFieldPaths,
+  filterIssuesForPresentation,
+  isPresentationSessionExpanded,
+  shouldShowFieldErrorPresentation,
+} from '../errors/resolve-field-error-presentation.lib'
 
 function walkTouched(node: unknown, prefix: string, touchedPaths: string[]): void {
   if (node === true) {
@@ -53,28 +59,59 @@ export function useFormValidationPresentation(fieldsOverride?: FormItem[]) {
     fields: contextFields,
   } = useFormUiContext()
   const fields = fieldsOverride ?? contextFields
+  const formValues = useWatch() as Record<string, unknown>
   const { errors, touchedFields } = useFormState()
   const rhfIssues = React.useMemo(() => prepareFormIssues(errors, fields), [errors, fields])
-  const issues =
+  const rawIssues =
     publishPresentationEnabled && hasAttemptedPublish ? publishPresentationIssues : rhfIssues
+  const inactivePaths = React.useMemo(
+    () => collectInactiveFieldPaths(fields, formValues ?? {}),
+    [fields, formValues],
+  )
+  const issues = React.useMemo(
+    () => filterIssuesForPresentation(rawIssues, inactivePaths),
+    [rawIssues, inactivePaths],
+  )
   const touchedPaths = React.useMemo(() => flattenTouchedPaths(touchedFields), [touchedFields])
+
+  const sessionFlags = React.useMemo(
+    () => ({
+      validationPresentation,
+      hasAttemptedSubmit,
+      hasAttemptedPublish,
+      publishPresentationEnabled,
+    }),
+    [validationPresentation, hasAttemptedSubmit, hasAttemptedPublish, publishPresentationEnabled],
+  )
+
+  const sessionExpanded = isPresentationSessionExpanded(sessionFlags)
+
+  const shouldShowFieldError = React.useCallback(
+    (fieldPath: string | undefined) =>
+      shouldShowFieldErrorPresentation(fieldPath, sessionFlags, inactivePaths, touchedPaths),
+    [inactivePaths, sessionFlags, touchedPaths],
+  )
 
   const shouldShowRowIssues = React.useCallback(
     (itemPrefix: string, group: Pick<ArrayItemIssueGroup, 'totalCount'>) => {
       if (group.totalCount === 0) return false
-      if (validationPresentation === 'always') return true
-      if (hasAttemptedPublish || hasAttemptedSubmit) return true
+      if (sessionExpanded) return true
       return isItemPrefixTouched(itemPrefix, touchedPaths)
     },
-    [validationPresentation, hasAttemptedPublish, hasAttemptedSubmit, touchedPaths],
+    [sessionExpanded, touchedPaths],
   )
 
   return {
     fields,
     issues,
+    inactivePaths,
+    isPresentationSessionExpanded: sessionExpanded,
+    shouldShowFieldError,
     hasAttemptedSubmit,
     hasAttemptedPublish,
     publishPresentationEnabled,
+    validationPresentation,
+    touchedPaths,
     shouldShowRowIssues,
   }
 }

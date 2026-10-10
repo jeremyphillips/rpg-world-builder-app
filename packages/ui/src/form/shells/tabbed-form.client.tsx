@@ -116,6 +116,8 @@ export interface TabbedFormProps<TFieldValues extends FieldValues> {
   onMarkPublishAttempted?: () => void
   publishPresentationIssues?: FormIssue[]
   publishPresentationEnabled?: boolean
+  /** Clears parent-owned publish/submit presentation flags after save or discard. */
+  onResetValidationPresentation?: () => void
   /**
    * Optional right-column content rendered inside `FormProvider` (e.g. a preview
    * rail). Hidden below `xl`; the footer stays in the form column.
@@ -181,6 +183,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
   onMarkPublishAttempted,
   publishPresentationIssues,
   publishPresentationEnabled,
+  onResetValidationPresentation,
   aside,
   tabRowTrailing,
   onBeforeActiveTabChange,
@@ -354,6 +357,7 @@ export function TabbedForm<TFieldValues extends FieldValues>({
         onMarkPublishAttempted={onMarkPublishAttempted}
         publishPresentationIssues={publishPresentationIssues}
         publishPresentationEnabled={publishPresentationEnabled}
+        onResetValidationPresentation={onResetValidationPresentation}
         validateSilently={validateSilently as ValidateSilently}
         onInvalidSubmit={handleInvalidSubmit}
         onSubmit={onSubmit}

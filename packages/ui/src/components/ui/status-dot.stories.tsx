@@ -18,7 +18,13 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {}
 
+/** Labeled dots inherit typography from the host — wrap like production meta / summary rows. */
 export const WithLabel: Story = {
+  render: (args) => (
+    <p className="text-xs text-muted-foreground">
+      <StatusDot {...args} />
+    </p>
+  ),
   args: {
     label: 'Unread',
   },
@@ -44,6 +50,11 @@ export const Sizes: Story = {
 }
 
 export const Sunken: Story = {
+  render: (args) => (
+    <p className="text-xs sm:text-sm text-muted-foreground">
+      <StatusDot {...args} />
+    </p>
+  ),
   args: {
     tone: 'sunken',
     label: 'Draft',

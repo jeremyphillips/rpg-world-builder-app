@@ -61,3 +61,14 @@ export {
   type TabValidationState,
   type TabValidationTab,
 } from './resolve-tab-validation-state'
+export {
+  collectInactiveFieldPaths,
+  filterIssuesForPresentation,
+  isFieldPathEligibleForPresentation,
+  isInactivePathPrefix,
+  isPresentationSessionExpanded,
+  isPathTouched,
+  issueMatchesFieldPath,
+  shouldShowFieldErrorPresentation,
+  type PresentationSessionFlags,
+} from './resolve-field-error-presentation.lib'

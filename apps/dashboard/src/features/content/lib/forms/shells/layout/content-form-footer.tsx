@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
 import { Button } from '@rpg/ui'
-import { FormFooterActions, useSchemaFormSubmit } from '@rpg/ui/form'
+import { FormFooterActions, useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import {
   FormUnsavedChangesGuard,
@@ -109,6 +109,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   const subclassEdits = useSubclassUnsavedEditsBlocking()
   const isDirty = composeFormLeaveDirty({ dirtyFields, extraUnsavedEdits, subclassEdits })
   const discardGuard = useUnsavedChangesConfirm({ isDirty })
+  const { resetValidationPresentation } = useFormUiContext()
   const leavePending = mode === 'create' ? createPending : pending
 
   useEffect(() => {
@@ -141,6 +142,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
             return
           }
           form.reset()
+          resetValidationPresentation()
         }}
       >
         {DISCARD_CHANGES_LABEL}

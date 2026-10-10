@@ -121,13 +121,13 @@ Optional open/collapse and summary behavior. Composes with `chrome`.
 
 `resolveSummary` returns a `FieldGroupSummary`:
 
-| Field       | Use                                                                                                                                                       |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                    |
-| `secondary` | Muted explanatory line below the status row                                                                                                               |
-| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `success` \| `warning`), optional `indicator` (`dot` \| `inactive`)                        |
-| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from `status.label`                                          |
-| `chrome`    | Collapsed container treatment — e.g. `{ variant: 'accent', tone: 'warning', emphasis: 'faint' }` (`data-summary-chrome`); expanded state ignores `chrome` |
+| Field       | Use                                                                                                                                                                                                                         |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `primary`   | Plain-text fallback when `status` is omitted — existing `primary` + `secondary` layout                                                                                                                                      |
+| `secondary` | Muted explanatory line below the status row                                                                                                                                                                                 |
+| `status`    | Structured status row — `label`, optional `tone` (`neutral` \| `success` \| `warning`), optional `indicator` (`dot` \| `inactive`). `dot` renders via `StatusDot` + `label` in one metadata item; `tone` maps to dot color. |
+| `detail`    | Supporting detail on the status line (e.g. player access mode) — muted, middle-dot separated from the status segment                                                                                                        |
+| `chrome`    | Collapsed container treatment — e.g. `{ variant: 'accent', tone: 'warning', emphasis: 'faint' }` (`data-summary-chrome`); expanded state ignores `chrome`                                                                   |
 
 ```ts
 {
@@ -609,6 +609,26 @@ Custom rows must preserve navigation parity with schema-rendered arrays:
 - Set `data-array-item-prefix` on the row shell to the item RHF prefix
   (e.g. `resolution.outcomes.0.applications.1`).
 - Provide `ArrayFieldContext` when array-level `filterSelectOptions` applies.
+
+### Field validation presentation (progressive)
+
+Standard fields share one presentation policy via `resolvePresentedFieldError` /
+`useFieldErrorPresentation`:
+
+- Global RHF `mode` stays **`onSubmit`**; after a control is **touched**, field renderers run
+  **`trigger(fieldPath)`** on blur and on value change (Option A) so errors can appear before Save
+  without validating the whole form.
+- **Error text** and **`aria-invalid`** show only when the path is **eligible** (config visibility /
+  dependent gate — not “tab panel hidden”) and either the field is touched or the presentation
+  session expanded (failed Save/Publish, `validationPresentation: 'always'`, or publish overlay).
+- Inactive paths are filtered from tab badges and issue lists; `clearErrors` on hide is secondary
+  hygiene only.
+- **`valueSync`** patches use leaf `setValue` paths with `shouldValidate: false` /
+  `shouldTouch: false`.
+- Call **`resetValidationPresentation()`** from `useFormUiContext()` after confirmed save or discard;
+  content shells pass **`onResetValidationPresentation`** when publish flags are owned externally.
+
+Tab switching alone does not suppress eligible fields — inactive tabs still validate on Save.
 
 ### Array validation presentation
 

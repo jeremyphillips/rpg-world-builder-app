@@ -376,6 +376,11 @@ export {
   useDebouncedArrayItemValidationTrigger,
   useDebouncedArrayValidationTrigger,
 } from './hooks/use-form-validation-presentation.client'
+export { useProgressiveFieldValidationTrigger } from './hooks/use-progressive-field-validation-trigger.client'
+export {
+  flattenPatchToLeafSetValues,
+  VALUE_SYNC_SET_VALUE_OPTIONS,
+} from './chrome/form-value-sync-patch.lib'
 export {
   useSilentFormValidity,
   type UseSilentFormValidityOptions,

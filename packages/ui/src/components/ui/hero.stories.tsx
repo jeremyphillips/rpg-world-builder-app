@@ -11,6 +11,7 @@ import {
   heroMediaImageClasses,
   heroMetaClasses,
 } from './hero'
+import { InlineMetadata } from './inline-metadata'
 import { StatusDot } from './status-dot'
 import { Text } from './text'
 
@@ -43,6 +44,32 @@ const emblem = (
   </div>
 )
 
+type HeroMetaSegment =
+  | { kind: 'text'; text: string }
+  | { kind: 'status'; text: string; tone: 'success' | 'sunken' }
+
+/**
+ * Story-only stand-in for dashboard `CampaignMetaLine` (`apps/dashboard/.../campaign-meta-line.tsx`).
+ * Keep segment rules in sync with that component — `@rpg/ui` cannot import the dashboard feature.
+ */
+function HeroCampaignMetaLine({ segments }: { segments: readonly HeroMetaSegment[] }) {
+  return (
+    <Text variant="muted" className={heroMetaClasses} as="span">
+      <InlineMetadata role="supporting" density="comfortable" wrap>
+        {segments.map((segment, index) => (
+          <InlineMetadata.Item key={`${segment.kind}-${index}`}>
+            {segment.kind === 'status' ? (
+              <StatusDot tone={segment.tone} label={segment.text} />
+            ) : (
+              segment.text
+            )}
+          </InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
+    </Text>
+  )
+}
+
 export const WithMediaAndOverlapMark: Story = {
   render: () => (
     <Hero
@@ -60,10 +87,14 @@ export const WithMediaAndOverlapMark: Story = {
         </Button>
       }
       meta={
-        <Text variant="muted" className={heroMetaClasses}>
-          <StatusDot tone="success" />
-          Active · 4 players · 6 characters
-        </Text>
+        <HeroCampaignMetaLine
+          segments={[
+            { kind: 'text', text: 'GM' },
+            { kind: 'status', text: 'Active', tone: 'success' },
+            { kind: 'text', text: '4 players' },
+            { kind: 'text', text: '6 PCs' },
+          ]}
+        />
       }
       secondary={
         <div className="flex flex-wrap gap-1.5">
@@ -87,12 +118,7 @@ export const WithoutMedia: Story = {
           New Campaign
         </Heading>
       }
-      meta={
-        <Text variant="muted" className={heroMetaClasses}>
-          <StatusDot tone="sunken" />
-          Draft
-        </Text>
-      }
+      meta={<HeroCampaignMetaLine segments={[{ kind: 'status', text: 'Draft', tone: 'sunken' }]} />}
     />
   ),
 }
