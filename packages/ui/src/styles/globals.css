@@ -8,6 +8,7 @@
 @import './form-scroll-body.utilities.css';
 @import './field-row-anatomy.utilities.css';
 @import './text-action.utilities.css';
+@import './ui-focus-ring.css';
 
 @plugin '@tailwindcss/typography';
 
@@ -360,15 +361,35 @@
   --status-icon-slash-md: 0.5rem;
 
   /*
+   * Shared control geometry ladder — semantic CSS for buttons and fields.
+   * Button lg (40px) and field lg (44px) intentionally diverge at `--control-height-lg` vs `--control-height-xl`.
+   */
+  --control-height-compact: 1.5rem; /* 24px */
+  --control-height-xs: 1.75rem; /* 28px */
+  --control-height-sm: 2rem; /* 32px */
+  --control-height-md: 2.25rem; /* 36px */
+  --control-height-lg: 2.5rem; /* 40px — Button lg */
+  --control-height-xl: 2.75rem; /* 44px — field lg */
+  --control-gap-xs: calc(var(--spacing) * 1); /* 4px */
+  --control-gap-sm: calc(var(--spacing) * 1.5); /* 6px */
+  --control-gap-md: calc(var(--spacing) * 2); /* 8px */
+  --field-padding-sm: calc(var(--spacing) * 2.5); /* 10px */
+  --field-padding-md: calc(var(--spacing) * 3); /* 12px */
+  --field-padding-lg: calc(var(--spacing) * 4); /* 16px */
+
+  --ui-focus-ring-standalone: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+  --ui-focus-ring-embedded: 0 0 0 2px var(--ring);
+
+  /*
    * Control action hit targets — generic control chrome (icon buttons, row actions).
    * Field control bands remain in field-sizing; number-stepper aligns to field height.
    */
-  --control-action-xs-height: 1.75rem; /* 28px — dense labeled buttons (Button size xs) */
+  --control-action-xs-height: var(--control-height-xs);
   --text-control-action-xs: 0.625rem; /* 10px — compact control labels; not general body type */
   --text-control-action-xs--line-height: 0.875rem; /* 14px */
-  --control-action-compact-height: 1.5rem;
-  --control-action-default-height: 2.25rem;
-  --control-action-lg-height: 2.5rem;
+  --control-action-compact-height: var(--control-height-compact);
+  --control-action-default-height: var(--control-height-md);
+  --control-action-lg-height: var(--control-height-lg);
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;

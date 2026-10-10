@@ -1,6 +1,13 @@
 import { clsx, type ClassValue } from 'clsx'
 import { extendTailwindMerge } from 'tailwind-merge'
 
+import {
+  UI_BUTTON_APPEARANCE_CLASSES,
+  UI_BUTTON_SIZE_CLASSES,
+  UI_FIELD_CONTROL_SIZE_CLASSES,
+  UI_FLOATING_LABEL_SIZE_CLASSES,
+} from './semantic-control-class-groups'
+
 const HEADING_STYLE_UTILITIES = [
   'heading-style-display',
   'heading-style-page',
@@ -42,7 +49,14 @@ const TYPOGRAPHY_CONFLICT_GROUPS = [
   'text-transform',
 ] as const
 
-type TypographyClassGroupIds = 'heading-style' | 'eyebrow-style' | 'text-action'
+type TypographyClassGroupIds =
+  | 'heading-style'
+  | 'eyebrow-style'
+  | 'text-action'
+  | 'ui-button-size'
+  | 'ui-button-appearance'
+  | 'ui-field-control-size'
+  | 'ui-floating-label-size'
 
 /**
  * Custom `text-*` font-size and `font-*` weight utilities from `@theme` in
@@ -104,11 +118,19 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'heading-style': [...HEADING_STYLE_UTILITIES],
       'eyebrow-style': [...EYEBROW_STYLE_UTILITIES],
       'text-action': [...TEXT_ACTION_UTILITIES],
+      'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
+      'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
+      'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
+      'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
     },
     conflictingClassGroups: {
       'heading-style': [...TYPOGRAPHY_CONFLICT_GROUPS],
       'eyebrow-style': [...EYEBROW_STYLE_CONFLICT_GROUPS],
       'text-action': ['text-action'],
+      'ui-button-size': ['ui-button-size'],
+      'ui-button-appearance': ['ui-button-appearance'],
+      'ui-field-control-size': ['ui-field-control-size'],
+      'ui-floating-label-size': ['ui-floating-label-size'],
       'font-size': ['heading-style', 'eyebrow-style'],
       'font-weight': ['heading-style', 'eyebrow-style'],
       tracking: ['heading-style', 'eyebrow-style'],

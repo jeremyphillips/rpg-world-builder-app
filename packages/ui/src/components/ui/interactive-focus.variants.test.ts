@@ -3,21 +3,17 @@ import { describe, expect, it } from 'vitest'
 import { interactiveFocusVariants } from './interactive-focus.variants'
 
 describe('interactiveFocusVariants', () => {
-  it('applies full ring stack for standalone context', () => {
+  it('applies standalone focus ring classes', () => {
     const classes = interactiveFocusVariants({ context: 'standalone' })
 
-    expect(classes).toContain('focus-visible:outline-none')
-    expect(classes).toContain('focus-visible:ring-2')
-    expect(classes).toContain('focus-visible:ring-ring')
-    expect(classes).toContain('focus-visible:ring-offset-2')
-    expect(classes).toContain('focus-visible:ring-offset-background')
+    expect(classes).toContain('ui-focus-ring')
+    expect(classes).not.toContain('ui-focus-ring--embedded')
   })
 
-  it('omits ring offset for embedded context', () => {
+  it('applies embedded focus ring modifier', () => {
     const classes = interactiveFocusVariants({ context: 'embedded' })
 
-    expect(classes).toContain('focus-visible:ring-2')
-    expect(classes).not.toContain('focus-visible:ring-offset-2')
-    expect(classes).not.toContain('focus-visible:ring-offset-background')
+    expect(classes).toContain('ui-focus-ring')
+    expect(classes).toContain('ui-focus-ring--embedded')
   })
 })

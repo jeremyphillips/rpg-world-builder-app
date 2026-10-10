@@ -322,13 +322,17 @@ A primitive follows the CVA file layout (all under `src/components/ui/`):
 
 ```text
 index.ts            # barrel re-export
-<name>.variants.ts  # all CVA / Tailwind classes live here
+<name>.variants.ts  # CVA prop mapping (classes or semantic `ui-*` lookups)
+<name>.css          # optional — semantic control presentation (@layer components)
+<name>.styles.ts    # optional — ClassReference specs shared by CVA and Storybook
 <name>.tsx          # component (server) — or <name>.client.tsx if interactive
 <name>.stories.tsx  # CSF3 story (required for every component)
 <name>.types.ts     # optional shared types
 ```
 
-1. Put **all** Tailwind classes in `<name>.variants.ts` via `cva` — prefer named
+1. Migrated **buttons and form controls** emit semantic classes from co-located
+   `<name>.css`; see [semantic-control-css.md](docs/semantic-control-css.md). Other
+   primitives still put Tailwind in `<name>.variants.ts` via `cva` — prefer named
    CVA variants over long inline strings. Use design-token classes only; never
    hardcode color values or font sizes. The shadcn CLI can scaffold a starting
    point: `pnpm dlx shadcn@latest add <name>` (config lives in `components.json`).
