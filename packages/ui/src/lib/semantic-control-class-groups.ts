@@ -109,6 +109,27 @@ export const UI_CHOICE_CONTROL_INDICATOR_SIZE_CLASSES = [
   'ui-choice-control--indicator-lg',
 ] as const
 
+export const UI_INTERACTIVE_ROW_HOVER_CLASSES = [
+  'ui-interactive-row--hover-none',
+  'ui-interactive-row--hover-selectable',
+  'ui-interactive-row--hover-navigation',
+  'ui-interactive-row--hover-selected',
+  'ui-interactive-row--hover-surface',
+] as const
+
+export const UI_INTERACTIVE_ROW_SELECTED_CLASSES = [
+  'ui-interactive-row--selected-none',
+  'ui-interactive-row--selected-fill',
+  'ui-interactive-row--selected-bordered',
+  'ui-interactive-row--fill-surface',
+] as const
+
+export const UI_INTERACTIVE_LIST_ROW_SIZE_CLASSES = [
+  'ui-interactive-list__main--sm',
+  'ui-interactive-list__main--md',
+  'ui-interactive-list__main--lg',
+] as const
+
 export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
   'ui-compact-control--icon-compact',
   'ui-compact-control--icon-compact-sm',
@@ -123,9 +144,6 @@ export const UI_COMPACT_CONTROL_SIZE_CLASSES = [
   'ui-compact-control--menu-item-sm',
   'ui-compact-control--menu-item-md',
   'ui-compact-control--menu-item-lg',
-  'ui-compact-control--list-row-sm',
-  'ui-compact-control--list-row-md',
-  'ui-compact-control--list-row-lg',
   'ui-compact-control--stepper-button-xs',
   'ui-compact-control--stepper-button-sm',
   'ui-compact-control--stepper-button-md',

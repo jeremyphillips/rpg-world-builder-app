@@ -1,0 +1,177 @@
+/*
+ * Interactive row — hover, selection, and disabled state written once.
+ * Source order: base → hover modifiers → selected modifiers → state → data → highlight.
+ * Hover modifiers set only `--ui-row-bg-hover`. Selected modifiers set `--ui-row-bg` and `--ui-row-border`.
+ */
+@layer components {
+  .ui-interactive-row {
+    border-color: var(--ui-row-border, var(--ui-row-state-border, transparent));
+    border-style: var(--ui-row-border-style, solid);
+    background-color: var(--ui-row-bg, transparent);
+    transition-property: color, background-color, border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-interactive-row--hover-none:hover,
+  .ui-interactive-row--hover-selectable:hover,
+  .ui-interactive-row--hover-navigation:hover,
+  .ui-interactive-row--hover-selected:hover,
+  .ui-interactive-row--hover-surface:hover {
+    background-color: var(--ui-row-bg-hover);
+  }
+
+  /* --- Hover (mutually exclusive) --- */
+
+  .ui-interactive-row--hover-none {
+    --ui-row-bg-hover: var(--ui-row-bg, transparent);
+  }
+
+  .ui-interactive-row--hover-selectable {
+    --ui-row-bg-hover: var(--row-hover-bg);
+  }
+
+  .ui-interactive-row--hover-navigation {
+    --ui-row-bg-hover: var(--muted);
+  }
+
+  .ui-interactive-row--hover-selected {
+    --ui-row-bg-hover: var(--row-selected-bg);
+  }
+
+  .ui-interactive-row--hover-surface {
+    --ui-row-bg-hover: var(--surface-subtle);
+  }
+
+  /* --- Selected fill (mutually exclusive) --- */
+
+  .ui-interactive-row--selected-none {
+    --ui-row-bg: transparent;
+    --ui-row-border: var(--ui-row-state-border, transparent);
+  }
+
+  .ui-interactive-row--selected-fill {
+    --ui-row-bg: var(--row-selected-bg);
+    --ui-row-border: var(--ui-row-state-border, transparent);
+  }
+
+  .ui-interactive-row--selected-bordered {
+    --ui-row-bg: var(--row-selected-bg);
+    --ui-row-border: var(--row-selected-border);
+  }
+
+  .ui-interactive-row--fill-surface {
+    --ui-row-bg: var(--surface-subtle);
+    --ui-row-border: var(--ui-row-state-border, transparent);
+  }
+
+  /* --- State (mutually exclusive) --- */
+
+  .ui-interactive-row--state-default {
+    opacity: 1;
+    pointer-events: auto;
+    --ui-row-border-style: solid;
+    --ui-row-state-border: transparent;
+  }
+
+  .ui-interactive-row--state-inactive {
+    opacity: 1;
+    pointer-events: auto;
+    --ui-row-border-style: dashed;
+    --ui-row-state-border: var(--border-subtle);
+  }
+
+  .ui-interactive-row--state-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    --ui-row-border-style: solid;
+    --ui-row-state-border: transparent;
+  }
+
+  /* --- Data selection (mutually exclusive) --- */
+
+  .ui-interactive-row--data-none {
+    --ui-row-bg-data-selected: var(--ui-row-bg, transparent);
+    --ui-row-bg-data-checked: var(--ui-row-bg, transparent);
+  }
+
+  .ui-interactive-row--data-selected {
+    --ui-row-bg-data-selected: var(--row-selected-bg);
+    --ui-row-bg-data-checked: var(--ui-row-bg, transparent);
+  }
+
+  .ui-interactive-row--data-checked {
+    --ui-row-bg-data-selected: var(--ui-row-bg, transparent);
+    --ui-row-bg-data-checked: var(--row-selected-bg);
+  }
+
+  .ui-interactive-row[data-state='selected'] {
+    background-color: var(--ui-row-bg-data-selected, var(--ui-row-bg, transparent));
+  }
+
+  .ui-interactive-row[data-state='checked'] {
+    background-color: var(--ui-row-bg-data-checked, var(--ui-row-bg, transparent));
+  }
+
+  /* --- Hit target --- */
+
+  .ui-interactive-row--hit-none {
+    cursor: inherit;
+  }
+
+  .ui-interactive-row--hit-pointer {
+    cursor: pointer;
+  }
+
+  /* --- Highlight and menu rail --- */
+
+  .ui-interactive-row--highlight {
+    background-color: var(--row-hover-bg);
+  }
+
+  .ui-interactive-row--rail,
+  .ui-interactive-row--menu-rail {
+    position: relative;
+  }
+
+  .ui-interactive-row--rail::before,
+  .ui-interactive-row--menu-rail::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 2px;
+    background-color: var(--accent);
+  }
+
+  .ui-interactive-row--menu-rail::before {
+    background-color: transparent;
+  }
+
+  .ui-interactive-row--menu-rail[data-highlighted]::before {
+    background-color: var(--accent);
+  }
+
+  .ui-interactive-row--menu-highlight[data-highlighted],
+  .ui-interactive-row--menu-highlight[data-highlighted]:hover,
+  .ui-interactive-row--menu-highlight[data-highlighted]:focus {
+    background-color: var(--row-hover-bg);
+    color: var(--foreground);
+  }
+
+  .ui-interactive-row--menu-reset {
+    height: auto;
+    width: 100%;
+    border-width: 0;
+    border-radius: 0;
+    box-shadow: none;
+    outline: none;
+    color: inherit;
+  }
+
+  .ui-interactive-row--menu-reset:hover,
+  .ui-interactive-row--menu-reset:focus {
+    background-color: transparent;
+    color: var(--foreground);
+  }
+}

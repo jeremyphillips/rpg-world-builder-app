@@ -3,6 +3,16 @@ import { describe, expect, it } from 'vitest'
 import { cn } from './utils'
 
 describe('cn semantic control groups', () => {
+  it('prefers interactive list row size over menu item padding utilities', () => {
+    expect(cn('px-2 py-1.5', 'ui-interactive-list__main--md')).toBe('ui-interactive-list__main--md')
+  })
+
+  it('drops conflicting interactive row hover modifiers', () => {
+    expect(cn('ui-interactive-row--hover-selectable', 'ui-interactive-row--hover-surface')).toBe(
+      'ui-interactive-row--hover-surface',
+    )
+  })
+
   it('drops conflicting ui-button appearance modifiers', () => {
     expect(cn('ui-button--primary', 'ui-button--outline')).toBe('ui-button--outline')
   })

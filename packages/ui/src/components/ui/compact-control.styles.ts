@@ -17,8 +17,6 @@ export type CompactControlTabsTriggerKey = 'pill'
 
 export type CompactControlMenuItemSizeKey = 'sm' | 'md' | 'lg'
 
-export type CompactControlListRowSizeKey = 'sm' | 'md' | 'lg'
-
 export type CompactControlStepperButtonSizeKey = 'xs' | 'sm' | 'md' | 'lg'
 
 export type CompactControlRecipeSpec = {
@@ -111,12 +109,6 @@ const COMPACT_CONTROL_MENU_ITEM_CLASS: Record<CompactControlMenuItemSizeKey, str
   lg: 'ui-compact-control--menu-item-lg',
 }
 
-const COMPACT_CONTROL_LIST_ROW_CLASS: Record<CompactControlListRowSizeKey, string> = {
-  sm: 'ui-compact-control--list-row-sm',
-  md: 'ui-compact-control--list-row-md',
-  lg: 'ui-compact-control--list-row-lg',
-}
-
 const COMPACT_CONTROL_STEPPER_BUTTON_CLASS: Record<CompactControlStepperButtonSizeKey, string> = {
   xs: 'ui-compact-control--stepper-button-xs',
   sm: 'ui-compact-control--stepper-button-sm',
@@ -153,10 +145,6 @@ export function resolveCompactControlTabsTriggerClasses(
 
 export function resolveCompactControlMenuItemClasses(size: CompactControlMenuItemSizeKey): string {
   return COMPACT_CONTROL_MENU_ITEM_CLASS[size]
-}
-
-export function resolveCompactControlListRowClasses(size: CompactControlListRowSizeKey): string {
-  return COMPACT_CONTROL_LIST_ROW_CLASS[size]
 }
 
 export function resolveCompactControlStepperButtonClasses(

@@ -32,8 +32,9 @@ describe('MenuChoiceRow', () => {
     expect(screen.getByRole('menuitem', { name: /Add parent/i })).not.toHaveAttribute(
       'aria-selected',
     )
-    expect(screen.getByRole('menuitem', { name: /Add parent/i }).className).toContain('px-3')
-    expect(screen.getByRole('menuitem', { name: /Add parent/i }).className).toContain('py-2')
+    expect(screen.getByRole('menuitem', { name: /Add parent/i }).className).toContain(
+      'ui-interactive-list__main--md',
+    )
 
     await user.keyboard('{ArrowDown}')
     await user.keyboard('{Enter}')

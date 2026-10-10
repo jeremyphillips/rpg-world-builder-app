@@ -41,6 +41,19 @@ For each migrated primitive, verify in Storybook DevTools:
 - **`ui-field-control--width-*`** — exactly one width modifier per control composition (typically `Field.Root`, filter chrome wrapper, or standalone trigger when no outer owner exists). Fractions and intrinsic caps live in `field-control.css`; twMerge group `ui-field-control-width`.
 - **`ui-field-control--trigger-{fill|fit|segment}`** — mutually exclusive horizontal flow on select/combobox triggers only; twMerge group `ui-field-control-trigger-flow`. Width tokens do not belong on the trigger when an ancestor already owns `--width-*`.
 
+## Interactive row and list
+
+`ui-interactive-row` writes hover, data selection, and disabled treatment once. Modifiers only set `--ui-row-*`:
+
+| Dimension | Classes                                                                                           | Custom properties                                       |
+| --------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Hover     | `--hover-none`, `--hover-selectable`, `--hover-navigation`, `--hover-selected`, `--hover-surface` | `--ui-row-bg-hover`                                     |
+| Selected  | `--selected-none`, `--selected-fill`, `--selected-bordered`, `--fill-surface`                     | `--ui-row-bg`, `--ui-row-border`                        |
+| State     | `--state-default`, `--state-inactive`, `--state-disabled`                                         | `--ui-row-border-style`, `--ui-row-state-border`        |
+| Data      | `--data-none`, `--data-selected`, `--data-checked`                                                | `--ui-row-bg-data-selected`, `--ui-row-bg-data-checked` |
+
+`ui-interactive-list` owns the list surface and adjacent-sibling borders. `__panel`, `__toolbar`, `__main--{sm,md,lg}` own panel chrome, toolbar chrome, and row padding. `shadow-md` stays a utility on the panel. twMerge groups: `ui-interactive-row-hover`, `ui-interactive-row-selected`, `ui-interactive-list-row-size` (the size group also drops `px`/`py`/`p`).
+
 ## When CVA vs CSS
 
 - **CVA** — prop mapping, compound logic (Button size × density lookup), and non-visual layout utilities where documented.

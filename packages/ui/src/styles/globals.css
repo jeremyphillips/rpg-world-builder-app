@@ -16,6 +16,8 @@
 @import '../components/ui/field-group.css';
 @import '../components/ui/compact-control.css';
 @import '../components/ui/choice-control.css';
+@import '../components/ui/interactive-row.css';
+@import '../components/ui/interactive-list.css';
 
 @plugin '@tailwindcss/typography';
 

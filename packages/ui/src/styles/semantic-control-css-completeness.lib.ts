@@ -142,6 +142,10 @@ const fieldGroupCssPath = path.join(stylesDir, '../components/ui/field-group.css
 
 const choiceControlCssPath = path.join(stylesDir, '../components/ui/choice-control.css')
 
+const interactiveRowCssPath = path.join(stylesDir, '../components/ui/interactive-row.css')
+
+const interactiveListCssPath = path.join(stylesDir, '../components/ui/interactive-list.css')
+
 const BUTTON_APPEARANCE_MODIFIERS = [
   'primary',
   'destructive',
@@ -271,6 +275,57 @@ const CHOICE_CONTROL_SWITCH_REQUIRED = ['width', 'height', 'border-radius'] as c
 
 const CHOICE_CONTROL_INDICATOR_REQUIRED = ['width', 'height'] as const
 
+const INTERACTIVE_ROW_HOVER_MODIFIERS = [
+  'hover-none',
+  'hover-selectable',
+  'hover-navigation',
+  'hover-selected',
+  'hover-surface',
+] as const
+
+const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
+  'selected-none',
+  'selected-fill',
+  'selected-bordered',
+  'fill-surface',
+] as const
+
+const INTERACTIVE_ROW_STATE_MODIFIERS = [
+  'state-default',
+  'state-inactive',
+  'state-disabled',
+] as const
+
+const INTERACTIVE_ROW_DATA_MODIFIERS = ['data-none', 'data-selected', 'data-checked'] as const
+
+const INTERACTIVE_ROW_HIT_MODIFIERS = ['hit-none', 'hit-pointer'] as const
+
+const INTERACTIVE_LIST_ROW_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+
+const INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS = ['match', 'fit'] as const
+
+const INTERACTIVE_ROW_HOVER_REQUIRED = ['--ui-row-bg-hover'] as const
+
+const INTERACTIVE_ROW_SELECTED_REQUIRED = ['--ui-row-bg', '--ui-row-border'] as const
+
+const INTERACTIVE_ROW_STATE_REQUIRED = [
+  'opacity',
+  'pointer-events',
+  '--ui-row-border-style',
+  '--ui-row-state-border',
+] as const
+
+const INTERACTIVE_ROW_DATA_REQUIRED = [
+  '--ui-row-bg-data-selected',
+  '--ui-row-bg-data-checked',
+] as const
+
+const INTERACTIVE_ROW_HIT_REQUIRED = ['cursor'] as const
+
+const INTERACTIVE_LIST_ROW_SIZE_REQUIRED = ['gap', 'padding-inline', 'padding-block'] as const
+
+const INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED = ['width', 'min-width'] as const
+
 /** Registry populated as component CSS ships (Button, field-control, …). */
 export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
   {
@@ -365,6 +420,44 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
       ...CHOICE_CONTROL_INDICATOR_MODIFIERS.map((name) => ({
         modifierPrefix: `ui-choice-control--${name}`,
         requiredProperties: CHOICE_CONTROL_INDICATOR_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: interactiveRowCssPath,
+    dimensions: [
+      ...INTERACTIVE_ROW_HOVER_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_HOVER_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_SELECTED_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_SELECTED_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_STATE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_STATE_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_DATA_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_DATA_REQUIRED,
+      })),
+      ...INTERACTIVE_ROW_HIT_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-row--${name}`,
+        requiredProperties: INTERACTIVE_ROW_HIT_REQUIRED,
+      })),
+    ],
+  },
+  {
+    filePath: interactiveListCssPath,
+    dimensions: [
+      ...INTERACTIVE_LIST_ROW_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-list__main--${name}`,
+        requiredProperties: INTERACTIVE_LIST_ROW_SIZE_REQUIRED,
+      })),
+      ...INTERACTIVE_LIST_PANEL_WIDTH_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-interactive-list__panel--${name}`,
+        requiredProperties: INTERACTIVE_LIST_PANEL_WIDTH_REQUIRED,
       })),
     ],
   },

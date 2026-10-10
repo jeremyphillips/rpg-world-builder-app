@@ -126,26 +126,6 @@
     padding-block: calc(var(--spacing) * 2.5);
   }
 
-  /* --- Interactive list row main hit area --- */
-
-  .ui-compact-control--list-row-sm {
-    gap: var(--control-gap-xs);
-    padding-inline: calc(var(--spacing) * 2);
-    padding-block: calc(var(--spacing) * 2);
-  }
-
-  .ui-compact-control--list-row-md {
-    gap: var(--control-gap-sm);
-    padding-inline: calc(var(--spacing) * 3);
-    padding-block: calc(var(--spacing) * 2);
-  }
-
-  .ui-compact-control--list-row-lg {
-    gap: var(--control-gap-sm);
-    padding-inline: calc(var(--spacing) * 4);
-    padding-block: calc(var(--spacing) * 2);
-  }
-
   /* --- Number stepper buttons --- */
 
   .ui-compact-control--stepper-button-xs {

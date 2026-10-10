@@ -35,7 +35,7 @@ describe('SearchResultRow', () => {
 
     const link = screen.getByRole('link', { name: 'Fireball, Spell' })
     const shell = rowShell(link)
-    expect(shell.className).toContain('hover:bg-row-hover')
+    expect(shell.className).toContain('ui-interactive-row--hover-selectable')
     expect(shell.className).not.toContain('control-hover')
     expect(shell.className).not.toContain('bg-accent')
   })

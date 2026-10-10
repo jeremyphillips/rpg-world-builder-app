@@ -1,0 +1,134 @@
+/*
+ * Interactive list shell, panel, toolbar, and row geometry.
+ * Source order: list → panel width → toolbar → row size.
+ * Row sizes declare the same padding and gap list.
+ */
+@layer components {
+  .ui-interactive-list {
+    margin: 0;
+    list-style: none;
+    background-color: var(--surface-lift);
+    padding: 0;
+  }
+
+  .ui-interactive-list > * + * {
+    border-top: 1px solid var(--border-faint);
+  }
+
+  .ui-interactive-list__viewport {
+    max-height: calc(var(--spacing) * 60);
+    overflow-y: auto;
+  }
+
+  .ui-interactive-list__empty {
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 4);
+    text-align: center;
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    color: var(--muted-foreground);
+  }
+
+  .ui-interactive-list__heading {
+    border-bottom: 1px solid var(--border-subtle);
+    background-color: var(--surface-faint);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 1);
+  }
+
+  .ui-interactive-list__heading--first {
+    padding-top: calc(var(--spacing) * 2);
+  }
+
+  .ui-interactive-list__heading--follows-complete {
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .ui-interactive-list__panel {
+    z-index: 50;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background-color: var(--background);
+    padding: 0;
+    color: var(--foreground);
+    outline: none;
+    --surface-current: var(--background);
+  }
+
+  .ui-interactive-list__panel--match {
+    width: var(--radix-popover-trigger-width);
+    min-width: var(--radix-popover-trigger-width);
+  }
+
+  .ui-interactive-list__panel--fit {
+    width: max-content;
+    min-width: var(--popover-menu-min-width);
+  }
+
+  .ui-interactive-list__toolbar {
+    border-bottom: 1px solid var(--border);
+    background-color: var(--field-control-bg);
+    color: var(--field-control-fg);
+  }
+
+  .ui-interactive-list__toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    padding-inline: calc(var(--spacing) * 3);
+  }
+
+  .ui-interactive-list__toolbar-filter {
+    border-top: 1px solid var(--border);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-interactive-list__row {
+    position: relative;
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .ui-interactive-list__main {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 0%;
+    align-items: flex-start;
+    text-align: left;
+    outline: none;
+  }
+
+  .ui-interactive-list__main--interactive {
+    cursor: pointer;
+  }
+
+  .ui-interactive-list__main--sm {
+    gap: var(--control-gap-xs);
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-interactive-list__main--md {
+    gap: var(--control-gap-sm);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-interactive-list__main--lg {
+    gap: var(--control-gap-sm);
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .ui-interactive-list__trailing {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    align-self: stretch;
+    border-inline-start: 1px solid var(--border-faint);
+    padding-inline: calc(var(--spacing) * 2);
+  }
+}
