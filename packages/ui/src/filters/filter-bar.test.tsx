@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
+import { FilterChromeProvider } from './filter-chrome.context'
 import { createBooleanFilter, createEqualsFilter, createTextFilter } from './filter-engine.helpers'
 import { resetFilterState, setFilterValue } from './filter-engine'
 import { useFilterState } from './use-filter-state.client'
@@ -100,35 +101,37 @@ function FilterSystemHarness({
   const advancedModifiedCount = countModifiedFilters(schema, state, 'advanced')
 
   return (
-    <DataTableFilterRegion
-      primaryFilters={
-        <FilterBar
-          schema={schema}
-          state={state}
-          onValueChange={(id, value) => {
-            setState((current) => setFilterValue(schema, current, id, value))
-          }}
-          onReset={() => {
-            setState(resetFilterState(schema))
-            onReset()
-          }}
-        />
-      }
-      additionalFilterFields={
-        <FilterFieldList
-          schema={schema}
-          fields={advancedFields}
-          state={state}
-          idPrefix="filters-advanced"
-          onValueChange={(id, value) => {
-            setState((current) => setFilterValue(schema, current, id, value))
-          }}
-        />
-      }
-      additionalFiltersOpen={advancedOpen}
-      onAdditionalFiltersOpenChange={setAdvancedOpen}
-      activeAdditionalFilterCount={advancedModifiedCount}
-    />
+    <FilterChromeProvider density="compact" selectPresentation="floating">
+      <DataTableFilterRegion
+        primaryFilters={
+          <FilterBar
+            schema={schema}
+            state={state}
+            onValueChange={(id, value) => {
+              setState((current) => setFilterValue(schema, current, id, value))
+            }}
+            onReset={() => {
+              setState(resetFilterState(schema))
+              onReset()
+            }}
+          />
+        }
+        additionalFilterFields={
+          <FilterFieldList
+            schema={schema}
+            fields={advancedFields}
+            state={state}
+            idPrefix="filters-advanced"
+            onValueChange={(id, value) => {
+              setState((current) => setFilterValue(schema, current, id, value))
+            }}
+          />
+        }
+        additionalFiltersOpen={advancedOpen}
+        onAdditionalFiltersOpenChange={setAdvancedOpen}
+        activeAdditionalFilterCount={advancedModifiedCount}
+      />
+    </FilterChromeProvider>
   )
 }
 
@@ -185,23 +188,25 @@ describe('FilterBar', () => {
       const advancedFields = schema.fields.filter((field) => field.placement === 'advanced')
 
       return (
-        <DataTableFilterRegion
-          primaryFilters={
-            <FilterBar schema={schema} state={state} onValueChange={setValue} onReset={reset} />
-          }
-          additionalFilterFields={
-            <FilterFieldList
-              schema={schema}
-              fields={advancedFields}
-              state={state}
-              idPrefix="filters-advanced"
-              onValueChange={setValue}
-            />
-          }
-          additionalFiltersOpen={advancedOpen}
-          onAdditionalFiltersOpenChange={setAdvancedOpen}
-          activeAdditionalFilterCount={countModifiedFilters(schema, state, 'advanced')}
-        />
+        <FilterChromeProvider density="compact" selectPresentation="floating">
+          <DataTableFilterRegion
+            primaryFilters={
+              <FilterBar schema={schema} state={state} onValueChange={setValue} onReset={reset} />
+            }
+            additionalFilterFields={
+              <FilterFieldList
+                schema={schema}
+                fields={advancedFields}
+                state={state}
+                idPrefix="filters-advanced"
+                onValueChange={setValue}
+              />
+            }
+            additionalFiltersOpen={advancedOpen}
+            onAdditionalFiltersOpenChange={setAdvancedOpen}
+            activeAdditionalFilterCount={countModifiedFilters(schema, state, 'advanced')}
+          />
+        </FilterChromeProvider>
       )
     }
 
@@ -252,14 +257,16 @@ describe('FilterBar', () => {
 
   it('uses outline chrome on boolean shells to match row select and action controls', () => {
     render(
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
-        }
-        additionalFilterFields={<input aria-label="Advanced field" />}
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
-      />,
+      <FilterChromeProvider density="compact" selectPresentation="floating">
+        <DataTableFilterRegion
+          primaryFilters={
+            <FilterBar schema={mixedPrimarySchema} state={{}} onValueChange={() => undefined} />
+          }
+          additionalFilterFields={<input aria-label="Advanced field" />}
+          additionalFiltersOpen={false}
+          onAdditionalFiltersOpenChange={() => undefined}
+        />
+      </FilterChromeProvider>,
     )
 
     const combobox = screen.getByRole('combobox', { name: 'Hit Die' })

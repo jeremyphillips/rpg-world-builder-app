@@ -7,10 +7,6 @@ import { Badge } from './badge'
 import { iconGlyphRootClasses } from './icon-glyph.variants'
 import { cn } from '../../lib/utils'
 import {
-  FilterChromeProvider,
-  type FilterSelectPresentation,
-} from '../../filters/filter-chrome.context'
-import {
   dataTableFilterRegionAdditionalRowVariants,
   dataTableFilterRegionDisclosureRowVariants,
   dataTableFilterRegionDisclosureVariants,
@@ -33,11 +29,6 @@ export type DataTableFilterRegionProps = {
   additionalFiltersOpen: boolean
   onAdditionalFiltersOpenChange: (open: boolean) => void
   activeAdditionalFilterCount?: number
-  /**
-   * Select chrome for omitted `layout`. Catalog regions default to floating.
-   * Messages, notifications, and other per-field surfaces pass `per-field`.
-   */
-  selectPresentation?: FilterSelectPresentation
   labels?: DataTableFilterRegionLabels
   className?: string
   disabled?: boolean
@@ -53,7 +44,6 @@ export function DataTableFilterRegion({
   additionalFiltersOpen,
   onAdditionalFiltersOpenChange,
   activeAdditionalFilterCount = 0,
-  selectPresentation = 'floating',
   labels: labelsProp,
   className,
   disabled = false,
@@ -64,43 +54,41 @@ export function DataTableFilterRegion({
   const showActiveBadge = activeAdditionalFilterCount > 0
 
   return (
-    <FilterChromeProvider selectPresentation={selectPresentation}>
-      <div className={cn(dataTableFilterRegionVariants(), className)}>
-        <div className={dataTableFilterRegionPrimaryRowVariants({ divided: hasAdditionalFilters })}>
-          {primaryFilters}
-        </div>
-
-        {hasAdditionalFilters ? (
-          <div className={dataTableFilterRegionDisclosureRowVariants()}>
-            <button
-              type="button"
-              disabled={disabled}
-              aria-expanded={additionalFiltersOpen}
-              aria-controls={additionalFiltersOpen ? panelId : undefined}
-              className={dataTableFilterRegionDisclosureVariants()}
-              onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
-            >
-              {additionalFiltersOpen ? (
-                <ChevronDown className={iconGlyphRootClasses.sm} aria-hidden />
-              ) : (
-                <ChevronRight className={iconGlyphRootClasses.sm} aria-hidden />
-              )}
-              {labels.additionalFilters}
-              {showActiveBadge ? (
-                <Badge appearance="soft" tone="neutral" size="sm">
-                  {additionalFiltersBadgeLabel(activeAdditionalFilterCount)}
-                </Badge>
-              ) : null}
-            </button>
-          </div>
-        ) : null}
-
-        {hasAdditionalFilters && additionalFiltersOpen ? (
-          <div id={panelId} className={dataTableFilterRegionAdditionalRowVariants()}>
-            {additionalFilterFields}
-          </div>
-        ) : null}
+    <div className={cn(dataTableFilterRegionVariants(), className)}>
+      <div className={dataTableFilterRegionPrimaryRowVariants({ divided: hasAdditionalFilters })}>
+        {primaryFilters}
       </div>
-    </FilterChromeProvider>
+
+      {hasAdditionalFilters ? (
+        <div className={dataTableFilterRegionDisclosureRowVariants()}>
+          <button
+            type="button"
+            disabled={disabled}
+            aria-expanded={additionalFiltersOpen}
+            aria-controls={additionalFiltersOpen ? panelId : undefined}
+            className={dataTableFilterRegionDisclosureVariants()}
+            onClick={() => onAdditionalFiltersOpenChange(!additionalFiltersOpen)}
+          >
+            {additionalFiltersOpen ? (
+              <ChevronDown className={iconGlyphRootClasses.sm} aria-hidden />
+            ) : (
+              <ChevronRight className={iconGlyphRootClasses.sm} aria-hidden />
+            )}
+            {labels.additionalFilters}
+            {showActiveBadge ? (
+              <Badge appearance="soft" tone="neutral" size="sm">
+                {additionalFiltersBadgeLabel(activeAdditionalFilterCount)}
+              </Badge>
+            ) : null}
+          </button>
+        </div>
+      ) : null}
+
+      {hasAdditionalFilters && additionalFiltersOpen ? (
+        <div id={panelId} className={dataTableFilterRegionAdditionalRowVariants()}>
+          {additionalFilterFields}
+        </div>
+      ) : null}
+    </div>
   )
 }

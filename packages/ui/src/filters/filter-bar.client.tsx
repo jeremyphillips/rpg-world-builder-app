@@ -12,7 +12,12 @@ import {
   filterBarVariants,
   type FilterBarOrientation,
 } from './filter-bar.variants'
-import { FilterChromeProvider, useOptionalFilterChrome } from './filter-chrome.context'
+import {
+  FilterChromeProvider,
+  useFilterChrome,
+  useOptionalFilterChrome,
+} from './filter-chrome.context'
+import { resolveFilterChromePresentation } from './filter-presentation.lib'
 import { FilterFieldList } from './filter-fields.client'
 import type { FilterFieldId, FilterSchema } from './filter-schema.types'
 
@@ -45,6 +50,8 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
   orientation = 'horizontal',
 }: FilterBarProps<TData, TState>) {
   const parentChrome = useOptionalFilterChrome()
+  const chrome = useFilterChrome()
+  const { controlSize: resetButtonSize } = resolveFilterChromePresentation(chrome)
   const primaryFields = getSchemaFieldsByPlacement(schema, 'primary')
   const modifiedCount = countModifiedFilters(schema, state)
 
@@ -62,7 +69,7 @@ export function FilterBar<TData, TState extends Record<string, unknown>>({
         <Button
           type="button"
           variant="outline"
-          size="sm"
+          size={resetButtonSize}
           className={filterBarResetButtonClasses}
           disabled={disabled}
           onClick={onReset}

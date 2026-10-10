@@ -1357,6 +1357,10 @@ export {
   type DataTableColumnsMenuProps,
 } from './components/ui/data-table-columns-menu.client'
 export {
+  DataTableFilterChrome,
+  type DataTableFilterChromeProps,
+} from './components/ui/data-table-filter-chrome.client'
+export {
   DataTableFilterRegion,
   type DataTableFilterRegionLabels,
   type DataTableFilterRegionProps,

@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
-import { DataTableFilterRegion } from '../components/ui/data-table-filter-region.client'
-import { countModifiedFilters } from './filter-engine'
+import { DataTableFilterChrome } from '../components/ui/data-table-filter-chrome.client'
 import {
   createBooleanFilter,
   createChipsFilter,
@@ -11,8 +10,6 @@ import {
 } from './filter-engine.helpers'
 import { createFilterSchema } from './filter-schema.types'
 import { FilterBar } from './filter-bar.client'
-import { FilterFieldList } from './filter-fields.client'
-import { getSchemaFieldsByPlacement } from './filter-bar.lib'
 import { useFilterState } from './use-filter-state.client'
 
 type DemoRow = {
@@ -62,35 +59,17 @@ function FilterSystemDemo({
 }) {
   const { state, setValue, reset } = useFilterState(demoSchema, { initialValues })
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const advancedFields = useMemo(() => getSchemaFieldsByPlacement(demoSchema, 'advanced'), [])
-  const advancedModifiedCount = countModifiedFilters(demoSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={demoSchema}
-            state={state}
-            disabled={disabled}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={demoSchema}
-            fields={advancedFields}
-            state={state}
-            disabled={disabled}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
+      <DataTableFilterChrome
+        filterSchema={demoSchema}
+        state={state}
         disabled={disabled}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
       <pre className="rounded-md border border-border bg-sunken p-3 text-xs text-muted-foreground">
         {JSON.stringify(state, null, 2)}
@@ -177,35 +156,16 @@ const classesLikeSchema = createFilterSchema<DemoRow, ClassesLikeState>([
 function ClassesLikePrimaryRowDemo() {
   const { state, setValue, reset } = useFilterState(classesLikeSchema)
   const [advancedOpen, setAdvancedOpen] = useState(false)
-  const advancedFields = useMemo(
-    () => getSchemaFieldsByPlacement(classesLikeSchema, 'advanced'),
-    [],
-  )
-  const advancedModifiedCount = countModifiedFilters(classesLikeSchema, state, 'advanced')
 
   return (
     <div className="flex max-w-4xl flex-col gap-2">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={classesLikeSchema}
-            state={state}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={classesLikeSchema}
-            fields={advancedFields}
-            state={state}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={advancedModifiedCount}
+      <DataTableFilterChrome
+        filterSchema={classesLikeSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
     </div>
   )
@@ -312,26 +272,16 @@ function DenseFiltersDemo() {
     initialValues: { source: 'homebrew', status: 'published', modeling: 'draft' },
   })
   const [advancedOpen, setAdvancedOpen] = useState(true)
-  const advancedFields = useMemo(() => getSchemaFieldsByPlacement(denseSchema, 'advanced'), [])
 
   return (
     <div className="max-w-5xl">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar schema={denseSchema} state={state} onValueChange={setValue} onReset={reset} />
-        }
-        additionalFilterFields={
-          <FilterFieldList
-            schema={denseSchema}
-            fields={advancedFields}
-            state={state}
-            idPrefix="filters-advanced"
-            onValueChange={setValue}
-          />
-        }
-        additionalFiltersOpen={advancedOpen}
-        onAdditionalFiltersOpenChange={setAdvancedOpen}
-        activeAdditionalFilterCount={countModifiedFilters(denseSchema, state, 'advanced')}
+      <DataTableFilterChrome
+        filterSchema={denseSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={advancedOpen}
+        onAdvancedFiltersOpenChange={setAdvancedOpen}
       />
     </div>
   )
@@ -363,17 +313,13 @@ function MinimalPrimaryRowDemo() {
 
   return (
     <div className="max-w-3xl">
-      <DataTableFilterRegion
-        primaryFilters={
-          <FilterBar
-            schema={minimalSchema}
-            state={state}
-            onValueChange={setValue}
-            onReset={reset}
-          />
-        }
-        additionalFiltersOpen={false}
-        onAdditionalFiltersOpenChange={() => undefined}
+      <DataTableFilterChrome
+        filterSchema={minimalSchema}
+        state={state}
+        onValueChange={setValue}
+        onReset={reset}
+        advancedOpen={false}
+        onAdvancedFiltersOpenChange={() => undefined}
       />
     </div>
   )
