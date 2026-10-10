@@ -1,5 +1,6 @@
 import type { Decorator } from '@storybook/react-vite'
 import { createStorybookPreview } from '@rpg/config/storybook/preview-base'
+import { withSemanticClassCaption } from '@rpg/ui/storybook/semantic-class-caption'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 
@@ -18,7 +19,7 @@ const withMemoryRouter: Decorator = (Story) => (
 )
 
 export default createStorybookPreview({
-  decorators: [withMemoryRouter, withRowAnatomyOutline],
+  decorators: [withMemoryRouter, withRowAnatomyOutline, withSemanticClassCaption],
   globalTypes: rowAnatomyOutlineGlobalTypes,
   initialGlobals: rowAnatomyOutlineInitialGlobals,
 })

@@ -50,7 +50,7 @@ export function SemanticClassCaption({ targetRef, className }: SemanticClassCapt
       aria-atomic="true"
     >
       <span className="font-mono text-xs text-muted-foreground">
-        {semantic.length > 0 ? semantic.join(' ') : '(no ui-* classes)'}
+        {semantic.length > 0 ? semantic.join(' ') : '(no semantic classes)'}
       </span>
       {utilities.length > 0 ? (
         <span className="mt-0.5 block font-mono text-xs text-warning">

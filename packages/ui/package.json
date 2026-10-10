@@ -39,6 +39,10 @@
       "types": "./src/storybook/with-theme-context.tsx",
       "default": "./src/storybook/with-theme-context.tsx"
     },
+    "./storybook/semantic-class-caption": {
+      "types": "./src/stories/semantic-classes/with-semantic-class-caption.tsx",
+      "default": "./src/stories/semantic-classes/with-semantic-class-caption.tsx"
+    },
     "./storybook/row-anatomy-geometry": {
       "types": "./src/storybook/row-anatomy-geometry.ts",
       "default": "./src/storybook/row-anatomy-geometry.ts"

@@ -1,0 +1,91 @@
+# Semantic CSS migration
+
+Temporary tracker for inventory, classification, readiness, and status. Delete or archive this file when the migration ends. Permanent rules live in [ui-architecture.md](./ui-architecture.md). Class naming and the completeness guard live in [semantic-control-css.md](./semantic-control-css.md).
+
+## Two gates
+
+**Architecture readiness** must pass before semantic migration.
+
+- Clear visual ownership: the registry names the owner.
+- No unresolved duplicate implementation. Known duplicates are classified, though not necessarily migrated yet.
+- A stable public API, or an explicit migration plan for it.
+- Known consumer overrides, each with its intended behavior recorded. A legitimate feature-level override is allowed.
+
+A dedicated variants file, pre-existing stories and tests, and the removal of unrelated deprecated aliases are not prerequisites.
+
+**Migration completion** must pass before the work counts as finished.
+
+- Concise semantic DOM classes that pass the inspector acceptance check in [semantic-control-css.md](./semantic-control-css.md).
+- Storybook coverage: `.styles.ts` specs, a `ClassReference` story, and captions.
+- Tests and visual parity, using the completeness guard and the parity harness.
+- Size and appearance modifiers documented in the component doc or [semantic-control-css.md](./semantic-control-css.md).
+- No obsolete styling paths for the migrated responsibility, including deprecated aliases for that responsibility.
+
+## Priority rubric
+
+1. **Recurring UI drift eliminated.** Count how many hand-rolled duplicates and parallel implementations the migration absorbs or prevents.
+2. **Reuse fan-in.** How many surfaces inherit the change automatically.
+3. **Inspector noise.** String length, state selectors, and compound variants.
+
+Effort and risk only break ties.
+
+## Shared components
+
+| #   | Target                                                                     | Architecture readiness | Blockers / notes                                                                                                                                | Drift eliminated                                                           | Priority | Wave        |
+| --- | -------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------- | ----------- |
+| 1   | InteractiveRow / InteractiveList                                           | Ready                  | Pull list rows out of controls Phase 5                                                                                                          | High: menus, combobox, DataTable rows, entity selection, notification rows | 1        | W1          |
+| 2   | Card / InsetPanel ownership                                                | Not ready (ownership)  | Classify card-like shells; define Card vs InsetPanel vs SelectionOptionCard vs EntityCardFrame scope; Card part padding is inline in `card.tsx` | High: most hand-rolled feature surfaces                                    | 2        | W2          |
+| 3   | CompactLabel / Badge / Chip                                                | Ready                  | Pull chip remove out of controls Phase 5                                                                                                        | High: many Badge consumers and domain badge wrappers                       | 3        | W3          |
+| 4   | Popover / DropdownMenu / Tooltip content                                   | Not ready (no owner)   | Inline content classes in `.client.tsx`; duplicated popover surface and animate stacks                                                          | High: every overlay host                                                   | 4        | W4          |
+| 5   | Typography roles (Text, field label/legend/hint/error)                     | Not ready (API)        | `body`/`muted` are color-only; dashboard files hand-roll stacks                                                                                 | High in volume, low per site                                               | 5        | W5          |
+| 6   | Alert                                                                      | Ready                  | Feature warning boxes need classification                                                                                                       | Med                                                                        | 6        | W6          |
+| 7   | DialogPanel panel chrome (Modal, Sheet)                                    | Ready                  | Migrate panel chrome once; Radix animations stay utilities                                                                                      | Med                                                                        | 7        | Later       |
+| 8   | Option-card shell (SelectionOptionCard, RadioCard)                         | Not ready (API)        | Split the shared shell out of the large CVA file; may absorb selection-card duplicates found in W2                                              | Med–High                                                                   | 8        | After W2    |
+| 9   | IdentityFrame / IdentityRow, then EntityCardFrame, CEC, DEC                | Ready                  | `dash-` prefix tooling; depends on the W2 Card scope                                                                                            | Med                                                                        | 9        | After W2    |
+| 10  | Tabs                                                                       | Ready (one fork)       | `spell-level-tabs` fork; migration stays in controls Phase 5                                                                                    | Low–Med                                                                    | 10       | Controls P5 |
+| 11  | StatusIcon, Wizard, FilterBar / CatalogToolbar                             | Ready                  | None                                                                                                                                            | Low–Med                                                                    | 11       | Later       |
+| 12  | DataTable row and header bands                                             | Not ready (API)        | Many micro-CVAs; depends on W1                                                                                                                  | Med                                                                        | 12       | Later       |
+| 13  | FieldGroup chrome                                                          | Ready                  | Time with controls Phase 4                                                                                                                      | Low–Med                                                                    | 13       | Later       |
+| 14  | MetadataList                                                               | Ready                  | Adoption via the `dt`/`dd` classification                                                                                                       | Med (dashboard `dt`/`dd`)                                                  | 14       | Later       |
+| 15  | Sidebar, PreviewRail, master-detail panels                                 | Not ready (ownership)  | Ownership splits                                                                                                                                | Med                                                                        | 15       | Backlog     |
+| 16  | Avatar, Toast tone, AttentionFrame, SemanticText                           | Varies                 | Low leverage                                                                                                                                    | Low                                                                        | Optional | Backlog     |
+| —   | Heading, Eyebrow, text-action, prose, InlineMetadata, layout orchestrators | N/A                    | Already concise, or not styling owners                                                                                                          | —                                                                          | Skip     | —           |
+
+## Feature-local classification
+
+Classify every implementation before migrating it. Shared borders and rounding alone do not imply shared ownership.
+
+| Classification                      | Action                                                                                   |
+| ----------------------------------- | ---------------------------------------------------------------------------------------- |
+| Duplicate of an established pattern | Migrate to the shared component                                                          |
+| Variation of an established pattern | Extend the shared API when the variant criterion is met                                  |
+| Domain-specific composition         | Keep the component; use the shared component or its semantic styling primitive inside it |
+| Genuinely unique surface            | Keep the local implementation; note it as an intentional exception                       |
+| Obsolete implementation             | Delete                                                                                   |
+
+**Status lifecycle.** Each row moves through these statuses:
+
+- **discovered:** inventoried and grouped by likely pattern.
+- **classified:** examined and assigned one of the five classifications plus a reuse path.
+- **ready:** the target owner exists and passes architecture readiness.
+- **migrating:** work is in progress.
+- **complete:** the migration completion gate has passed, or the row was deleted or recorded as an exception.
+
+Classification is iterative. A row only needs deep classification when its group is next. Seed rows below are **discovered**. The classification column is a starting hypothesis.
+
+| Implementation                                                                                                                                                                                                                                                                                                                                                             | Likely pattern group   | Status     | Provisional classification                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ---------- | -------------------------------------------------------------- |
+| [`quick-npc-build-card.variants.ts`](../../../apps/dashboard/src/features/character/npc/components/quick-npc/quick-npc-build-card.variants.ts)                                                                                                                                                                                                                             | Selection or info card | discovered | Domain composition: keep, compose Card or option-card shell    |
+| [`builder-fact-summary.variants.ts`](../../../apps/dashboard/src/features/character/components/builder/steps/shared/fact-summary/builder-fact-summary.variants.ts)                                                                                                                                                                                                         | Information panel      | discovered | TBD: InsetPanel duplicate or domain composition                |
+| [`detail-collection-panel.variants.ts`](../../../apps/dashboard/src/features/content/lib/detail/collection/panel/detail-collection-panel.variants.ts)                                                                                                                                                                                                                      | Information panel      | discovered | TBD                                                            |
+| [`promotion-card.variants.ts`](../../../apps/dashboard/src/components/layout/promotion-card.variants.ts)                                                                                                                                                                                                                                                                   | Navigation card        | discovered | TBD: possibly a unique surface                                 |
+| [`media-manager.variants.ts`](../../../apps/dashboard/src/features/media/components/media-manager.variants.ts)                                                                                                                                                                                                                                                             | Domain layout          | discovered | Likely domain composition                                      |
+| [`global-search-surface.variants.ts`](../../../apps/dashboard/src/features/global-search/lib/global-search-surface.variants.ts)                                                                                                                                                                                                                                            | Overlay surface        | discovered | TBD: depends on the popover content owner                      |
+| [`character-builder-validation-alert.variants.ts`](../../../apps/dashboard/src/features/character/components/builder/chrome/character-builder-validation-alert.variants.ts)                                                                                                                                                                                                | Warning surface        | discovered | Variation: extend Alert                                        |
+| [`spell-level-tabs.variants.ts`](../../../apps/dashboard/src/features/character/components/builder/steps/spells/spell-level-tabs.variants.ts)                                                                                                                                                                                                                              | Tabs                   | discovered | Duplicate: migrate to Tabs                                     |
+| [`table-grid.tsx`](../../../apps/dashboard/src/features/content/components/tables/table-grid.tsx)                                                                                                                                                                                                                                                                          | Table                  | discovered | TBD: Table duplicate or table-builder domain surface           |
+| `dt`/`dd` in [`admin-user-detail.tsx`](../../../apps/dashboard/src/features/admin/routes/admin-user-detail.tsx), `review-step-summary.tsx`, preview rail section bodies                                                                                                                                                                                                    | Key/value metadata     | discovered | Duplicate: migrate to MetadataList                             |
+| Card consumers adding hover and layout ([`equipment-hub.tsx`](../../../apps/dashboard/src/features/content/equipment/routes/equipment-hub.tsx), [`character-list-card.tsx`](../../../apps/dashboard/src/features/character/components/character-list-card.tsx), [`homebrew-hub-card.tsx`](../../../apps/dashboard/src/features/homebrew/components/homebrew-hub-card.tsx)) | Navigation card        | discovered | Variation: possibly a Card `interactive` or navigation variant |
+| Notification menu row / preview item                                                                                                                                                                                                                                                                                                                                       | List row               | discovered | Variation: extend InteractiveRow                               |
+| `field-row-anatomy-prototype.variants.ts`                                                                                                                                                                                                                                                                                                                                  | Row anatomy            | discovered | Obsolete: delete                                               |
+| Remaining `rounded-* border` shells                                                                                                                                                                                                                                                                                                                                        | Mixed                  | discovered | Inventory and group with Card / InsetPanel                     |

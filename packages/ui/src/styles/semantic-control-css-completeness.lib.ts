@@ -2,6 +2,8 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { semanticCustomPropertyPrefix, type SemanticClassPrefix } from './semantic-class-prefix'
+
 /** Modifier dimensions registered for the completeness guard (extended per migration phase). */
 export type SemanticControlCssDimension = {
   /** BEM modifier prefix, e.g. `ui-button--` */
@@ -12,6 +14,12 @@ export type SemanticControlCssDimension = {
 
 export type SemanticControlCssRegistryEntry = {
   filePath: string
+  /**
+   * Class prefix without the trailing hyphen. Custom properties
+   * `--${classPrefix}-*` may differ across modifiers in one dimension.
+   * @default 'ui'
+   */
+  classPrefix?: SemanticClassPrefix
   dimensions: SemanticControlCssDimension[]
 }
 
@@ -63,15 +71,20 @@ function modifiersForDimension(rules: ParsedRule[], modifierPrefix: string) {
   )
 }
 
-function compareModifierPropertySets(modifiers: ParsedRule[], filePath: string): string[] {
+function compareModifierPropertySets(
+  modifiers: ParsedRule[],
+  filePath: string,
+  classPrefix: SemanticClassPrefix,
+): string[] {
   if (modifiers.length < 2) return []
 
   const failures: string[] = []
   const reference = modifiers[0]!
+  const customPropertyPrefix = semanticCustomPropertyPrefix(classPrefix)
 
   for (const rule of modifiers.slice(1)) {
     for (const prop of reference.properties) {
-      if (!rule.properties.has(prop) && !prop.startsWith('--ui-')) {
+      if (!rule.properties.has(prop) && !prop.startsWith(customPropertyPrefix)) {
         failures.push(
           `${filePath}: ${rule.selector} missing \`${prop}\` (see ${reference.selector})`,
         )
@@ -106,11 +119,13 @@ export function validateSemanticControlCssCompleteness(
 ): string[] {
   const rules = parseCssRules(readFileSync(entry.filePath, 'utf8'))
 
+  const classPrefix = entry.classPrefix ?? 'ui'
+
   return entry.dimensions.flatMap((dimension) => {
     const modifiers = modifiersForDimension(rules, dimension.modifierPrefix)
     return [
       ...missingRequiredProperties(modifiers, dimension.requiredProperties, entry.filePath),
-      ...compareModifierPropertySets(modifiers, entry.filePath),
+      ...compareModifierPropertySets(modifiers, entry.filePath, classPrefix),
     ]
   })
 }

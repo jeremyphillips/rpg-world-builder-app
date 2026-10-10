@@ -331,8 +331,9 @@ index.ts            # barrel re-export
 ```
 
 1. Migrated **buttons and form controls** emit semantic classes from co-located
-   `<name>.css`; see [semantic-control-css.md](docs/semantic-control-css.md). Other
-   primitives still put Tailwind in `<name>.variants.ts` via `cva` — prefer named
+   `<name>.css`; see [semantic-control-css.md](docs/semantic-control-css.md).
+   Ownership and when to add a class live in [ui-architecture.md](docs/ui-architecture.md).
+   Other primitives still put Tailwind in `<name>.variants.ts` via `cva` — prefer named
    CVA variants over long inline strings. Use design-token classes only; never
    hardcode color values or font sizes. The shadcn CLI can scaffold a starting
    point: `pnpm dlx shadcn@latest add <name>` (config lives in `components.json`).

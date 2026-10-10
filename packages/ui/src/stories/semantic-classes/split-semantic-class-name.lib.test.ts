@@ -14,4 +14,15 @@ describe('splitSemanticClassName', () => {
     expect(splitSemanticClassName(undefined)).toEqual({ semantic: [], utilities: [] })
     expect(splitSemanticClassName('   ')).toEqual({ semantic: [], utilities: [] })
   })
+
+  it('treats dash-* tokens as semantic and honors a custom prefix list', () => {
+    expect(splitSemanticClassName('dash-card dash-card--nav flex')).toEqual({
+      semantic: ['dash-card', 'dash-card--nav'],
+      utilities: ['flex'],
+    })
+    expect(splitSemanticClassName('ui-button dash-card', { prefixes: ['ui-'] })).toEqual({
+      semantic: ['ui-button'],
+      utilities: ['dash-card'],
+    })
+  })
 })

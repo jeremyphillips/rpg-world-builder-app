@@ -1,10 +1,18 @@
 ---
 description: UI primitive (CVA) file structure
-globs: packages/ui/src/**/*.{ts,tsx}
+globs: packages/ui/src/**/*.{ts,tsx}, apps/*/src/**/*.tsx, apps/*/src/**/*.variants.ts
 alwaysApply: false
 ---
 
 # UI primitives (CVA)
+
+When introducing or modifying reusable UI structure, presentation, or interaction, identify the canonical owner before creating new styling or components. Skip this for business-logic, data, or copy-only changes.
+
+1. Which existing primitive or composition owns this visual responsibility? Check the registry in [ui-architecture.md](../../packages/ui/docs/ui-architecture.md).
+2. Does the requested behavior need a new variant, a new composition, or a genuinely new primitive?
+3. Will the change introduce consumer-owned chrome that should belong to the primitive?
+4. Can the result be inspected and modified through semantic classes?
+5. Are there existing consumers that should receive the change automatically?
 
 A primitive follows this layout:
 
