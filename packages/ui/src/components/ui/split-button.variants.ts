@@ -2,10 +2,10 @@ import { cva } from 'class-variance-authority'
 
 import { iconGlyphRootClasses } from './icon-glyph.variants'
 
-export const splitButtonRootVariants = cva('inline-flex items-stretch')
+export const splitButtonRootVariants = cva('ui-split-button')
 
-export const splitButtonPrimaryVariants = cva('rounded-r-none border-r-0')
+export const splitButtonPrimaryVariants = cva('ui-split-button__primary')
 
-export const splitButtonChevronVariants = cva('rounded-l-none border-l border-border px-2')
+export const splitButtonChevronVariants = cva('ui-split-button__menu')
 
 export const splitButtonChevronIconClasses = `${iconGlyphRootClasses.sm} opacity-80`

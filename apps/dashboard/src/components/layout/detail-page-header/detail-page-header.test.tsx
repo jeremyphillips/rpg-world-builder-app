@@ -38,7 +38,7 @@ describe('DetailPageHeader', () => {
     renderHeaderWithActions()
 
     const edit = screen.getByRole('link', { name: 'Edit' })
-    expect(edit).toHaveClass('h-control-action-compact')
+    expect(edit).toHaveClass('ui-button--sm-compact')
     expect(screen.getByRole('toolbar', { name: 'Page actions' })).toContainElement(edit)
   })
 })

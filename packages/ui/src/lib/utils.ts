@@ -4,6 +4,7 @@ import { extendTailwindMerge } from 'tailwind-merge'
 import {
   UI_BUTTON_APPEARANCE_CLASSES,
   UI_BUTTON_SIZE_CLASSES,
+  UI_BUTTON_TEXT_GEOMETRY_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
   UI_FLOATING_LABEL_SIZE_CLASSES,
 } from './semantic-control-class-groups'
@@ -55,6 +56,7 @@ type TypographyClassGroupIds =
   | 'text-action'
   | 'ui-button-size'
   | 'ui-button-appearance'
+  | 'ui-button-text-geometry'
   | 'ui-field-control-size'
   | 'ui-floating-label-size'
 
@@ -120,6 +122,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'text-action': [...TEXT_ACTION_UTILITIES],
       'ui-button-size': [...UI_BUTTON_SIZE_CLASSES],
       'ui-button-appearance': [...UI_BUTTON_APPEARANCE_CLASSES],
+      'ui-button-text-geometry': [...UI_BUTTON_TEXT_GEOMETRY_CLASSES],
       'ui-field-control-size': [...UI_FIELD_CONTROL_SIZE_CLASSES],
       'ui-floating-label-size': [...UI_FLOATING_LABEL_SIZE_CLASSES],
     },
@@ -129,6 +132,7 @@ const twMerge = extendTailwindMerge<TypographyClassGroupIds>({
       'text-action': ['text-action'],
       'ui-button-size': ['ui-button-size'],
       'ui-button-appearance': ['ui-button-appearance'],
+      'ui-button-text-geometry': ['ui-button-text-geometry'],
       'ui-field-control-size': ['ui-field-control-size'],
       'ui-floating-label-size': ['ui-floating-label-size'],
       'font-size': ['heading-style', 'eyebrow-style'],

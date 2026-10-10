@@ -76,7 +76,7 @@ describe('EquipmentInventoryManageDisclosureCard', () => {
 
     await user.click(screen.getByRole('button', { name: 'Expand Potion of Healing' }))
     const releaseButton = screen.getByRole('button', { name: 'Release one' })
-    expect(releaseButton).toHaveClass('h-control-action-compact')
+    expect(releaseButton).toHaveClass('ui-button--sm-compact')
     await user.click(releaseButton)
 
     expect(onReleaseGrant).toHaveBeenCalledWith({

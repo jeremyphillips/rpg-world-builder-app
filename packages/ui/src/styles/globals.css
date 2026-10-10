@@ -10,6 +10,7 @@
 @import './text-action.utilities.css';
 @import './ui-focus-ring.css';
 @import '../components/ui/floating-label-field.css';
+@import '../components/ui/button.css';
 
 @plugin '@tailwindcss/typography';
 

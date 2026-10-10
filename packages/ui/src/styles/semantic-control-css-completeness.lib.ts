@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /** Modifier dimensions registered for the completeness guard (extended per migration phase). */
 export type SemanticControlCssDimension = {
@@ -37,9 +39,23 @@ function parseCssRules(css: string): ParsedRule[] {
   return rules
 }
 
+function selectorTargetsModifier(selector: string, className: string): boolean {
+  return selector.split(',').some((part) => {
+    const trimmed = part.trim()
+    if (trimmed === className) return true
+    if (trimmed.startsWith(`${className}:`)) return true
+    if (trimmed.startsWith(`${className}[`)) return true
+    return false
+  })
+}
+
 function modifiersForDimension(rules: ParsedRule[], modifierPrefix: string) {
-  const prefix = modifierPrefix.startsWith('.') ? modifierPrefix.slice(1) : modifierPrefix
-  return rules.filter((rule) => rule.selector.includes(prefix))
+  const className = modifierPrefix.startsWith('.') ? modifierPrefix : `.${modifierPrefix}`
+  return rules.filter(
+    (rule) =>
+      selectorTargetsModifier(rule.selector, className) &&
+      rule.selector.split(',').some((part) => part.trim() === className),
+  )
 }
 
 function compareModifierPropertySets(modifiers: ParsedRule[], filePath: string): string[] {
@@ -94,5 +110,54 @@ export function validateSemanticControlCssCompleteness(
   })
 }
 
+const buttonCssPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../components/ui/button.css',
+)
+
+const BUTTON_APPEARANCE_MODIFIERS = [
+  'primary',
+  'destructive',
+  'warning',
+  'secondary',
+  'outline',
+  'ghost',
+] as const
+
+const BUTTON_LABELED_SIZE_MODIFIERS = [
+  'xs',
+  'xs-compact',
+  'sm',
+  'sm-compact',
+  'md',
+  'md-compact',
+  'lg',
+  'lg-compact',
+] as const
+
+const BUTTON_ICON_SIZE_MODIFIERS = ['icon-xs', 'icon-compact', 'icon-md', 'icon-lg'] as const
+
+const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
+const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const
+const BUTTON_ICON_SIZE_REQUIRED = ['width', 'height'] as const
+
 /** Registry populated as component CSS ships (Button, field-control, …). */
-export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = []
+export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = [
+  {
+    filePath: buttonCssPath,
+    dimensions: [
+      ...BUTTON_APPEARANCE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_APPEARANCE_REQUIRED,
+      })),
+      ...BUTTON_LABELED_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_LABELED_SIZE_REQUIRED,
+      })),
+      ...BUTTON_ICON_SIZE_MODIFIERS.map((name) => ({
+        modifierPrefix: `ui-button--${name}`,
+        requiredProperties: BUTTON_ICON_SIZE_REQUIRED,
+      })),
+    ],
+  },
+]

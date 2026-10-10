@@ -26,6 +26,17 @@ export const UI_BUTTON_APPEARANCE_CLASSES = [
   'ui-button--ghost',
 ] as const
 
+export const UI_BUTTON_TEXT_GEOMETRY_CLASSES = [
+  'ui-button__text--default',
+  'ui-button__text--default-compact',
+  'ui-button__text--xs',
+  'ui-button__text--xs-compact',
+  'ui-button__text--sm',
+  'ui-button__text--sm-compact',
+  'ui-button__text--lg',
+  'ui-button__text--lg-compact',
+] as const
+
 export const UI_FIELD_CONTROL_SIZE_CLASSES = [
   'ui-field-control--sm',
   'ui-field-control--md',

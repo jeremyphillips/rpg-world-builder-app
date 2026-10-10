@@ -44,7 +44,12 @@ describe('BuilderStepChooseClassPrompt', () => {
     const action = screen.getByRole('button', {
       name: BUILDER_STEP_CHOOSE_CLASS_PROMPT_ACTION_LABEL,
     })
-    expect(action).toHaveClass('text-action-standalone', 'text-primary', 'h-8', 'px-0', 'w-fit')
+    expect(action).toHaveClass(
+      'text-action-standalone',
+      'text-primary',
+      'ui-button--text',
+      'ui-button__text--default',
+    )
 
     await user.click(action)
 
