@@ -47,7 +47,7 @@ const floatingLabelPlaceholderSequencing = cn(
 
 export const floatingLabelShellVariants = cva(
   cn(
-    'group/float relative min-w-0 [&>button]:align-top [&>input]:align-top',
+    'group/float relative min-w-0 overflow-visible [&>button]:align-top [&>input]:align-top',
     floatingLabelMotionVars,
     floatingLabelMaskStateVars,
     floatingLabelPlaceholderSequencing,
@@ -71,7 +71,7 @@ export const floatingLabelShellVariants = cva(
  * neighboring inline controls. Start inset matches the value padding.
  */
 export const floatingLabelLayerVariants = cva(
-  'pointer-events-none absolute top-0 z-10 flex h-[var(--floating-label-control-h)] items-center',
+  'pointer-events-none absolute top-0 z-10 flex h-[var(--floating-label-control-h)] items-center overflow-visible',
   {
     variants: {
       size: {
@@ -120,7 +120,7 @@ const floatingLabelFloatedMotion = cn(
 
 export const floatingLabelTextVariants = cva(
   cn(
-    'pointer-events-none relative block w-fit max-w-full min-w-0 font-normal leading-none',
+    'pointer-events-none relative block w-fit max-w-full min-w-0 font-normal',
     'origin-left rtl:origin-right',
     // Tailwind translates and scales via the translate/scale properties, not transform.
     'text-input-placeholder',
@@ -155,8 +155,12 @@ export const floatingLabelTextVariants = cva(
   },
 )
 
-/** Clips label text. The mask stays on the outer element so its padding cannot ellipsize the word. */
-export const floatingLabelTextClipClass = 'block truncate'
+/**
+ * Ellipsis long labels on the x-axis only. `truncate` clips descenders when the
+ * label is floated; overflow-y must stay visible for glyphs like “g”.
+ */
+export const floatingLabelTextClipClass =
+  'block min-w-0 max-w-full overflow-x-clip text-ellipsis whitespace-nowrap'
 
 export type FloatingLabelFieldSize = NonNullable<
   VariantProps<typeof floatingLabelShellVariants>['size']
