@@ -245,7 +245,7 @@ export function CatalogOverviewFilterChrome<T, TFilters extends Record<string, u
   const advancedModifiedCount = countModifiedFilters(filterSchema, filterState, 'advanced')
 
   return (
-    <FilterChromeProvider selectPresentation="floating">
+    <FilterChromeProvider selectPresentation="floating" density="comfortable">
       <DataTableFilterRegion
         primaryFilters={
           <FilterBar

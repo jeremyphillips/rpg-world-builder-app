@@ -329,13 +329,14 @@ export const EmptyFocused: Story = {
   },
 }
 
-function assertFocusRingClearance(label: HTMLElement) {
-  const shell = label.closest('[data-populated]')
-  if (!shell) throw new Error('Missing floating shell')
-  const fontSize = Number.parseFloat(getComputedStyle(label).fontSize)
-  const scale =
-    Number.parseFloat(getComputedStyle(shell).getPropertyValue('--floating-label-scale')) || 1
-  const half = (fontSize * scale) / 2
+function assertFocusRingClearance(label: HTMLElement, floatedSizeToken: string) {
+  const root = label.ownerDocument.documentElement
+  const token = getComputedStyle(root).getPropertyValue(floatedSizeToken).trim()
+  const remMatch = token.match(/^([\d.]+)rem$/)
+  const floatedSizePx = remMatch
+    ? Number(remMatch[1]) * 16
+    : Number.parseFloat(getComputedStyle(label).fontSize)
+  const half = floatedSizePx / 2
   const ringOffset = 2
   const ringWidth = 2
   expect(half).toBeGreaterThanOrEqual(ringOffset + ringWidth)
@@ -356,6 +357,7 @@ export const FocusRing: Story = {
   play: async ({ canvasElement }) => {
     const labels = [...canvasElement.querySelectorAll<HTMLElement>('[data-floating-label]')]
     expect(labels).toHaveLength(2)
-    for (const label of labels) assertFocusRingClearance(label)
+    assertFocusRingClearance(labels[0]!, '--field-floating-label-sm')
+    assertFocusRingClearance(labels[1]!, '--field-floating-label-md')
   },
 }
