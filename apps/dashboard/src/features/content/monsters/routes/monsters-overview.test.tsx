@@ -6,7 +6,6 @@ import { renderWithProviders } from '@/test/render'
 
 vi.mock('../hooks/use-monsters', () => ({
   useMonsters: vi.fn(() => ({ data: [], isPending: false, isError: false })),
-  useMonstersUsageMeta: vi.fn(() => ({ data: undefined })),
 }))
 
 vi.mock('../../lib/overview/content-overview-table', () => ({

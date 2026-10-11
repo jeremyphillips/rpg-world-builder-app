@@ -109,7 +109,7 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'monsters',
-    sources: [{ source: emptyContentUsageSource, entry: true, batch: true }],
+    sources: [{ source: emptyContentUsageSource, entry: true, batch: false }],
     summaryLabels: { singular: 'monster', plural: 'monsters' },
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'none' },

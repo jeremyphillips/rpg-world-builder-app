@@ -73,7 +73,7 @@ describe('defineContentUsage', () => {
     expect(batchResults.get('class-1')?.summaryReferences[0]?.id).toBe('char-2')
   })
 
-  it('requires at least one entry and one batch source', () => {
+  it('requires at least one entry source', () => {
     const source = mockSource(new Map())
 
     expect(() =>
@@ -84,15 +84,20 @@ describe('defineContentUsage', () => {
         viewerCharacterRelationship: { strategy: 'none' },
       }),
     ).toThrow(/entry source/)
+  })
 
-    expect(() =>
-      defineContentUsage({
-        contentType: 'classes',
-        sources: [{ source, entry: true, batch: false }],
-        summaryLabels: { singular: 'x', plural: 'xs' },
-        viewerCharacterRelationship: { strategy: 'none' },
-      }),
-    ).toThrow(/batch source/)
+  it('allows entry-only registrations without batch sources', async () => {
+    const source = mockSource(new Map())
+    const registration = defineContentUsage({
+      contentType: 'monsters',
+      sources: [{ source, entry: true, batch: false }],
+      summaryLabels: { singular: 'monster', plural: 'monsters' },
+      overviewUsageScope: 'characters',
+      viewerCharacterRelationship: { strategy: 'none' },
+    })
+
+    const batchResults = await registration.batchResolver({ campaignId: 'camp_1' }, ['monster-1'])
+    expect(batchResults.get('monster-1')?.count).toBe(0)
   })
 
   it('requires explicit non-complete overviewUsageScope when entry sources exceed batch', () => {

@@ -444,7 +444,8 @@ export function tryDeriveMonsterStatBlock(
       equipmentCatalog,
       skillCatalog,
     })
-  } catch {
+  } catch (error) {
+    console.error('deriveMonsterStatBlock failed', { monsterId: monster.id, error })
     return null
   }
 }

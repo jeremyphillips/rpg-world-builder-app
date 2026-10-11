@@ -1,12 +1,10 @@
 import {
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   formatEquipmentCostLabel,
   moneyToCp,
   type ContentOverviewUsageScope,
   type ContentStatus,
   type ContentUsageSummaryLabels,
   type EquipmentCost,
-  type ResolvedContentCampaignAccess,
   type WithCampaignAccess,
   type ContentMedia,
   isContentTypeMediaEnabled,
@@ -28,6 +26,7 @@ import { CONTENT_STATUS_BADGE } from './content-status-badge'
 import { ContentOverviewNameCell } from './content-overview-name-cell'
 import { shouldPresentContentSource } from '../content-type-presentation'
 import { buildContentUsedByColumn } from './content-used-by-column'
+import { resolveReadSurfaceCampaignAccess } from '../campaign-access/resolve-read-surface-campaign-access'
 
 /**
  * Minimum shape every content type shares. Used to constrain the generic
@@ -41,12 +40,6 @@ export type ContentBase = {
   status: ContentStatus
   media?: ContentMedia
 }
-
-function readCampaignAccess(row: ContentBase): ResolvedContentCampaignAccess {
-  return (row as WithCampaignAccess<ContentBase>).campaignAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
-}
-
-export { readCampaignAccess as readContentRowCampaignAccess }
 
 export type ContentTableOptions<T> = {
   /** Content type used to resolve shared source-presentation policy. */
@@ -144,7 +137,10 @@ export function buildContentColumns<T extends ContentBase>(
       <ContentOverviewNameCell
         name={row.getValue<string>('name')}
         status={row.original.status}
-        campaignAccess={readCampaignAccess(row.original)}
+        campaignAccess={resolveReadSurfaceCampaignAccess(
+          contentType,
+          (row.original as WithCampaignAccess<ContentBase>).campaignAccess,
+        )}
         nameHref={nameHref?.(row.original)}
         editHref={canManage ? editHref?.(row.original) : undefined}
         canManage={canManage}

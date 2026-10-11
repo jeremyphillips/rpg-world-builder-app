@@ -166,11 +166,7 @@ export function defineContentUsage(input: DefineContentUsageInput): ContentUsage
     )
   }
 
-  if (batchSources.length === 0) {
-    throw new Error(
-      `Content usage registration for "${input.contentType}" requires at least one batch source.`,
-    )
-  }
+  // Batch sources are optional for surfaces without overview Used By (e.g. monsters until encounters).
 
   validateViewerCharacterRelationship(input.contentType, input.viewerCharacterRelationship)
 

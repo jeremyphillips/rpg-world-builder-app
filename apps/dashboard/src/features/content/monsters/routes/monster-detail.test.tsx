@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
@@ -20,6 +20,9 @@ vi.mock('../../equipment/hooks/use-equipment', async (importOriginal) => {
     useEquipment: vi.fn(),
   }
 })
+vi.mock('../hooks/use-monsters', () => ({
+  useMonsters: vi.fn(),
+}))
 vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (importOriginal) => {
   const actual =
     await importOriginal<typeof import('../../skill-proficiencies/hooks/use-skill-proficiencies')>()
@@ -29,12 +32,15 @@ vi.mock('../../skill-proficiencies/hooks/use-skill-proficiencies', async (import
   }
 })
 
+import { formatContentNotFoundMessage } from '../../lib/content-type-labels'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
-import { MonsterDetailContent } from './monster-detail'
+import { useMonsters } from '../hooks/use-monsters'
+import { MonsterDetail, MonsterDetailContent } from './monster-detail'
 
 const useEquipmentMock = vi.mocked(useEquipment)
 const useSkillProficienciesMock = vi.mocked(useSkillProficiencies)
+const useMonstersMock = vi.mocked(useMonsters)
 
 describe('MonsterDetailContent read-only', () => {
   beforeEach(() => {
@@ -62,5 +68,25 @@ describe('MonsterDetailContent read-only', () => {
     expect(screen.getByRole('heading', { name: 'Kobold Warrior' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /^edit$/i })).not.toBeInTheDocument()
     expect(screen.getByText(/Pack Tactics/)).toBeInTheDocument()
+  })
+})
+
+describe('MonsterDetail list resolution', () => {
+  it('shows not found when the monster id is absent from the campaign list', () => {
+    useMonstersMock.mockReturnValue({
+      data: [],
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useMonsters>)
+
+    render(
+      <MemoryRouter initialEntries={['/campaigns/camp_1/monsters/srd-cc-5.2.1:kobold-warrior']}>
+        <Routes>
+          <Route path="/campaigns/:campaignId/monsters/:monsterId" element={<MonsterDetail />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('alert')).toHaveTextContent(formatContentNotFoundMessage('monsters'))
   })
 })
