@@ -151,7 +151,7 @@ describe('duplicate content routes', () => {
     expect(res.body.equipment.slug).toBe('dup-source-armor-copy')
   })
 
-  it('does not inherit campaign access overlay from the source feat', async () => {
+  it('does not inherit campaign access overlay from the source feat (duplicate uses feat type default all_players)', async () => {
     const { agent, csrfToken } = await registerOwner()
     const campaignId = await createTestCampaign(agent, csrfToken)
 
@@ -328,6 +328,18 @@ describe('duplicate content routes', () => {
     })
 
     expect(copyBlock.attacks).toEqual(sourceBlock.attacks)
+
+    const listRes = await agent
+      .get(`/api/campaigns/${campaignId}/content/monsters`)
+      .set(CSRF_HEADER, csrfToken)
+      .expect(200)
+
+    const listedCopy = listRes.body.monsters.find((row: { id: string }) => row.id === copy.id)
+    expect(listedCopy?.campaignAccess).toMatchObject({
+      available: true,
+      visibilityMode: 'dm_only',
+      effectiveAudience: 'dm_only',
+    })
   })
 
   it('rejects empty duplicate names', async () => {

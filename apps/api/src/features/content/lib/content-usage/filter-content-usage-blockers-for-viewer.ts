@@ -6,12 +6,11 @@ import {
   resolveDefaultContentCampaignAccess,
 } from '@rpg/contracts'
 
+import { loadValidCampaignParticipantIds } from '../campaign-access-participants.service'
 import {
   resolveContentUsagePurpose,
   type ContentUsageResolverContext,
 } from './content-usage-context'
-
-const VIEWER_FILTERED_CONTENT_TYPES = ['monsters'] as const
 
 function viewerFromContext(ctx: ContentUsageResolverContext) {
   if (!ctx.viewer) {
@@ -23,7 +22,7 @@ function viewerFromContext(ctx: ContentUsageResolverContext) {
   })
 }
 
-/** Hides DM-only catalog referrers (e.g. monsters) from player-facing usage reads. */
+/** Hides catalog referrers the viewer cannot see (e.g. DM-only monsters) from usage reads. */
 export async function filterContentUsageBlockersForViewer(
   ctx: ContentUsageResolverContext,
   blockers: readonly ContentUsageBlocker[],
@@ -34,8 +33,7 @@ export async function filterContentUsageBlockersForViewer(
 
   const contentBlockers = blockers.filter(
     (blocker): blocker is Extract<ContentUsageBlocker, { kind: 'content' }> =>
-      blocker.kind === 'content' &&
-      (VIEWER_FILTERED_CONTENT_TYPES as readonly string[]).includes(blocker.contentTypeKey),
+      blocker.kind === 'content',
   )
 
   if (contentBlockers.length === 0) {
@@ -43,6 +41,7 @@ export async function filterContentUsageBlockersForViewer(
   }
 
   const { loadCampaignAccessByTargetIds } = await import('../content-campaign-access.service')
+  const validParticipantIds = await loadValidCampaignParticipantIds(ctx.campaignId)
 
   const byType = new Map<string, string[]>()
   for (const blocker of contentBlockers) {
@@ -60,7 +59,7 @@ export async function filterContentUsageBlockersForViewer(
         `${contentTypeKey}:${id}`,
         accessById.get(id) ??
           resolveContentCampaignAccess(null, {
-            validParticipantIds: [],
+            validParticipantIds,
             defaultAccess: resolveDefaultContentCampaignAccess(targetType),
           }),
       )
@@ -73,13 +72,10 @@ export async function filterContentUsageBlockersForViewer(
     if (blocker.kind !== 'content') {
       return true
     }
-    if (!(VIEWER_FILTERED_CONTENT_TYPES as readonly string[]).includes(blocker.contentTypeKey)) {
-      return true
-    }
     const access =
       accessByContentId.get(`${blocker.contentTypeKey}:${blocker.id}`) ??
       resolveContentCampaignAccess(null, {
-        validParticipantIds: [],
+        validParticipantIds,
         defaultAccess: resolveDefaultContentCampaignAccess(
           blocker.contentTypeKey as ContentAccessTargetType,
         ),

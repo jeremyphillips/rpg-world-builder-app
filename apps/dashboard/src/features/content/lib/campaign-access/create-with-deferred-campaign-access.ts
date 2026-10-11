@@ -1,4 +1,4 @@
-import type { ContentCampaignAccessPatch } from '@rpg/contracts'
+import type { ContentAccessTargetType, ContentCampaignAccessPatch } from '@rpg/contracts'
 
 import { updateRouteContentCampaignAccess } from './campaign-access-api'
 import { isDefaultCampaignAccessPatch } from './campaign-access-state'
@@ -9,6 +9,7 @@ export type CreateWithDeferredCampaignAccessParams<TInput, TEntity extends { id:
   createInput: TInput
   mutateAsync: (input: TInput) => Promise<TEntity>
   pendingAccess: ContentCampaignAccessPatch | null
+  accessTargetType?: ContentAccessTargetType
 }
 
 export type CreateWithDeferredCampaignAccessResult<TEntity extends { id: string }> = {
@@ -23,13 +24,14 @@ export async function createWithDeferredCampaignAccess<TInput, TEntity extends {
   createInput,
   mutateAsync,
   pendingAccess,
+  accessTargetType,
 }: CreateWithDeferredCampaignAccessParams<TInput, TEntity>): Promise<
   CreateWithDeferredCampaignAccessResult<TEntity>
 > {
   const entity = await mutateAsync(createInput)
   let deferredAccessFailed = false
 
-  if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess)) {
+  if (pendingAccess && !isDefaultCampaignAccessPatch(pendingAccess, accessTargetType)) {
     try {
       await updateRouteContentCampaignAccess(campaignId, routeKey, entity.id, pendingAccess)
     } catch {

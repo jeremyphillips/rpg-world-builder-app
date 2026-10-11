@@ -168,7 +168,7 @@ export async function applyDeferredBuildingCampaignAccess(input: {
   buildingId: string
   pendingAccess: ContentCampaignAccessPatch | null
 }): Promise<boolean> {
-  if (!input.pendingAccess || isDefaultCampaignAccessPatch(input.pendingAccess)) {
+  if (!input.pendingAccess || isDefaultCampaignAccessPatch(input.pendingAccess, 'locations')) {
     return false
   }
 

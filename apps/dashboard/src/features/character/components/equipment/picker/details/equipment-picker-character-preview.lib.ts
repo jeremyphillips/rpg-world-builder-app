@@ -13,6 +13,7 @@ import {
   subtractFromWealth,
   weaponAttackBonus,
   type Ability,
+  type ArmorEquipment,
   type ArmorClassBase,
   type CharacterBuildCatalogIndex,
   type EquippedArmorPiece,

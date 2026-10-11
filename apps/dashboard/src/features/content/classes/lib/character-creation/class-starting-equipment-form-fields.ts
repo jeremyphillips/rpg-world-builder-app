@@ -68,10 +68,19 @@ const wealthGrantMoneyFormSchema = z.object({
   currency: z.enum(['cp', 'sp', 'gp', 'pp']).default('gp'),
 })
 
-export const startingEquipmentModifierFormSchema = z.object({
-  kind: z.literal('spellcasting_focus'),
-  spellcastingGearKind: spellcastingFocusGearKindSchema,
-})
+export const startingEquipmentModifierFormSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('spellcasting_focus'),
+    spellcastingGearKind: spellcastingFocusGearKindSchema,
+  }),
+  z.object({
+    kind: z.literal('armor_class'),
+    bonus: z.coerce
+      .number()
+      .int()
+      .refine((value) => value !== 0, { message: 'Bonus must be non-zero.' }),
+  }),
+])
 
 export type StartingEquipmentModifierForm = z.infer<typeof startingEquipmentModifierFormSchema>
 
@@ -242,8 +251,11 @@ export function startingEquipmentModifierFields(): FormItem[] {
           fallback: () => 'Modifier',
           primary: (values) => {
             const row = values as StartingEquipmentModifierForm | undefined
-            if (row?.spellcastingGearKind) {
+            if (row?.kind === 'spellcasting_focus') {
               return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
+            }
+            if (row?.kind === 'armor_class') {
+              return `AC ${row.bonus >= 0 ? '+' : ''}${row.bonus}`
             }
             return undefined
           },

@@ -8,7 +8,7 @@ import {
   type ContentUsageBlocker,
   type ResolvedContentCampaignAccess,
   contentCampaignAccessPatchSchema,
-  DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  resolveDefaultResolvedContentCampaignAccess,
 } from '@rpg/contracts'
 import { Text } from '@rpg/ui'
 import {
@@ -73,13 +73,14 @@ export function CampaignAvailabilityField({
   targetType,
   entityId,
   classId,
-  initialAccess = DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  initialAccess: initialAccessProp,
   onDraftChange,
   entityName,
   onPersistedChange,
   density,
   presentation = 'disclosure',
 }: CampaignAvailabilityFieldProps) {
+  const initialAccess = initialAccessProp ?? resolveDefaultResolvedContentCampaignAccess(targetType)
   const createFlowDensity = useCreateFlowFormDensity()
   const resolvedDensity = density ?? createFlowDensity ?? DEFAULT_FORM_DENSITY
   const capability = CONTENT_ACCESS_CAPABILITIES[targetType]
@@ -179,6 +180,7 @@ export function CampaignAvailabilityField({
     ? hasDirtyFields(dirtyFields)
     : !isDefaultCampaignAccessPatch(
         (watchedValues ?? form.getValues()) as ContentCampaignAccessPatch,
+        targetType,
       )
 
   const applyLocalChange = useCallback(

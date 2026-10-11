@@ -6,6 +6,7 @@ import { CONTENT_TYPE_KEYS } from '../../primitives/content/content-type-keys'
 import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
   type ContentCampaignAccess,
+  type ResolvedContentCampaignAccess,
 } from './campaign-access/campaign-access'
 
 export const CONTENT_ACCESS_TARGET_TYPES = [...CONTENT_TYPE_KEYS, 'subclasses'] as const
@@ -61,6 +62,20 @@ export function resolveDefaultContentCampaignAccess(
     available: true,
     visibilityMode: capability.defaultVisibilityMode,
     participantIds: [],
+  }
+}
+
+/** Default resolved campaign access for create previews and forms (no stored overlay). */
+export function resolveDefaultResolvedContentCampaignAccess(
+  targetType: ContentAccessTargetType,
+): ResolvedContentCampaignAccess {
+  const base = resolveDefaultContentCampaignAccess(targetType)
+  return {
+    available: base.available,
+    visibilityMode: base.visibilityMode,
+    participantIds: base.participantIds,
+    unavailableParticipantIds: [],
+    effectiveAudience: base.visibilityMode,
   }
 }
 

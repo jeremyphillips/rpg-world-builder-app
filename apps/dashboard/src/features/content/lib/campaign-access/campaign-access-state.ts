@@ -1,5 +1,7 @@
 import {
   DEFAULT_CONTENT_CAMPAIGN_ACCESS,
+  resolveDefaultContentCampaignAccess,
+  type ContentAccessTargetType,
   type ContentCampaignAccess,
   type ContentCampaignAccessPatch,
   type ResolvedContentCampaignAccess,
@@ -25,10 +27,16 @@ export function resolvedToCampaignAccessPatch(
   }
 }
 
-export function isDefaultCampaignAccessPatch(patch: ContentCampaignAccessPatch): boolean {
+export function isDefaultCampaignAccessPatch(
+  patch: ContentCampaignAccessPatch,
+  targetType?: ContentAccessTargetType,
+): boolean {
+  const baseline = targetType
+    ? resolveDefaultContentCampaignAccess(targetType)
+    : DEFAULT_CONTENT_CAMPAIGN_ACCESS
   return (
-    patch.available === DEFAULT_CONTENT_CAMPAIGN_ACCESS.available &&
-    patch.visibilityMode === DEFAULT_CONTENT_CAMPAIGN_ACCESS.visibilityMode &&
+    patch.available === baseline.available &&
+    patch.visibilityMode === baseline.visibilityMode &&
     patch.participantIds.length === 0
   )
 }

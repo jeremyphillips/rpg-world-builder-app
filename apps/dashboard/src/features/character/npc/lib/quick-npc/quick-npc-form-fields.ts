@@ -4,10 +4,10 @@ import { ClipboardList, ListTodo } from 'lucide-react'
 import { z } from 'zod'
 
 import {
-  ALIGNMENTS,
+  CHARACTER_ALIGNMENTS,
   CHARACTER_GENDERS,
   addCustomRefinementIssue,
-  alignmentSchema,
+  characterAlignmentSchema,
   characterBuilderValidationMessages,
   classPackageChoiceSchema,
   formatFieldMessage,
@@ -216,7 +216,7 @@ export function quickNpcAuthoringSchema(maxLevel: number, minLevel: number) {
     alignment: z
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
-      .pipe(alignmentSchema),
+      .pipe(characterAlignmentSchema),
     equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
@@ -240,7 +240,7 @@ export function quickNpcAuthoringTabSchema() {
     alignment: z
       .string()
       .min(1, formatFieldMessage(characterBuilderValidationMessages.alignmentRequired()))
-      .pipe(alignmentSchema),
+      .pipe(characterAlignmentSchema),
     equipmentSelections: z.array(quickNpcEquipmentSelectionSchema),
     requiredSpellIds: z.array(z.string()),
     startingChoiceOverrides: z.record(z.string(), z.array(z.string())),
@@ -321,8 +321,8 @@ export function buildQuickNpcContentOptions(
 }
 
 const ALIGNMENT_LABELS = Object.fromEntries(
-  ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
-) as Record<(typeof ALIGNMENTS)[number], string>
+  CHARACTER_ALIGNMENTS.map((alignment) => [alignment, getAlignmentLabel(alignment)]),
+) as Record<(typeof CHARACTER_ALIGNMENTS)[number], string>
 
 const GENDER_LABELS = Object.fromEntries(
   CHARACTER_GENDERS.map((gender) => [gender, getGenderLabel(gender)]),
@@ -371,7 +371,7 @@ export function buildQuickNpcDetailsFields(args: QuickNpcDetailsFieldsArgs = {})
           type: 'select',
           name: 'alignment',
           label: 'Alignment',
-          options: toOptions(ALIGNMENTS, ALIGNMENT_LABELS),
+          options: toOptions(CHARACTER_ALIGNMENTS, ALIGNMENT_LABELS),
           required: true,
           width: 'full',
         },

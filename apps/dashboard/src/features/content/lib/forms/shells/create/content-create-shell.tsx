@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import type {
+  ContentAccessTargetType,
   ContentCampaignAccessPatch,
   ContentTypeKey,
   ContentValidationIntent,
@@ -126,6 +127,7 @@ function ContentCreateFormBody({
       },
       mutateAsync: (input) => mutation.mutateAsync(input) as Promise<{ id: string }>,
       pendingAccess: campaignAccessDraftRef.current,
+      accessTargetType: contentTypeKey as ContentAccessTargetType,
     })
 
     if (deferredAccessFailed) {

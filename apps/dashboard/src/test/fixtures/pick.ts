@@ -12,6 +12,7 @@ import {
   isWeaponEquipment,
 } from '@rpg/contracts'
 import { getFeatBySlug } from '@rpg/catalog/feats'
+import { getMonsterBySlug } from '@rpg/catalog/monsters'
 import { getSkillProficiencyBySlug } from '@rpg/catalog/skill-proficiencies'
 import { getSpeciesBySlug } from '@rpg/catalog/species'
 import { getSpellBySlug } from '@rpg/catalog/spells'
@@ -76,4 +77,8 @@ export function pickSpell(slug: string) {
 
 export function pickFeat(slug: string) {
   return getFeatBySlug(STORY_RULESET_ID, slug)
+}
+
+export function pickMonster(slug: string) {
+  return getMonsterBySlug(STORY_RULESET_ID, slug)
 }

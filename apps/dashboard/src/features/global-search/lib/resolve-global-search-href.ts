@@ -13,6 +13,7 @@ const CONTENT_DETAIL_ROUTES = {
   'skill-proficiency': ROUTES.content.skillProficiencies.detail,
   organization: ROUTES.content.organizations.detail,
   location: ROUTES.content.locations.detail,
+  monster: ROUTES.content.monsters.detail,
 } as const satisfies Record<string, ContentDetailRoute>
 
 type ContentDetailTargetKind = keyof typeof CONTENT_DETAIL_ROUTES

@@ -91,12 +91,14 @@ export function attachCampaignAccessToRows<T extends { id: string }>(
   rows: readonly T[],
   accessByTargetId: ReadonlyMap<string, ResolvedContentCampaignAccess>,
   targetType: ContentAccessTargetType,
+  validParticipantIds: readonly string[],
 ): Array<T & { campaignAccess: ResolvedContentCampaignAccess }> {
   const defaultAccess = resolveDefaultContentCampaignAccess(targetType)
   return rows.map((row) => ({
     ...row,
     campaignAccess:
-      accessByTargetId.get(row.id) ?? resolveContentCampaignAccess(null, { defaultAccess }),
+      accessByTargetId.get(row.id) ??
+      resolveContentCampaignAccess(null, { defaultAccess, validParticipantIds }),
   }))
 }
 
@@ -105,12 +107,13 @@ export async function attachCampaignAccessForTargetType<T extends { id: string }
   targetType: ContentAccessTargetType,
   rows: readonly T[],
 ): Promise<Array<T & { campaignAccess: ResolvedContentCampaignAccess }>> {
+  const validParticipantIds = await loadValidCampaignParticipantIds(campaignId)
   const accessByTargetId = await loadCampaignAccessByTargetIds(
     campaignId,
     targetType,
     rows.map((row) => row.id),
   )
-  return attachCampaignAccessToRows(rows, accessByTargetId, targetType)
+  return attachCampaignAccessToRows(rows, accessByTargetId, targetType, validParticipantIds)
 }
 
 async function evaluateCampaignAccessOffBlockers<T extends WriteEntityBase>(
