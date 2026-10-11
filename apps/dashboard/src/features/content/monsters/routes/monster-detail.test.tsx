@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { PageChromeActionsProvider } from '@/components/layout/page-chrome/page-chrome-actions-provider'
+import { PageChromeActionsContext } from '@/components/layout/page-chrome/page-chrome-actions-context'
+import { useContext } from 'react'
+
 import { pickEquipment, pickMonster, pickSkillProficiency } from '@/test/fixtures/pick'
 
 vi.mock('@/components/layout/breadcrumb/use-breadcrumb-label', () => ({
@@ -42,7 +46,7 @@ const useEquipmentMock = vi.mocked(useEquipment)
 const useSkillProficienciesMock = vi.mocked(useSkillProficiencies)
 const useMonstersMock = vi.mocked(useMonsters)
 
-describe('MonsterDetailContent read-only', () => {
+describe('MonsterDetailContent authoring', () => {
   beforeEach(() => {
     useEquipmentMock.mockReturnValue({
       data: [pickEquipment('dagger')],
@@ -56,17 +60,28 @@ describe('MonsterDetailContent read-only', () => {
     } as ReturnType<typeof useSkillProficiencies>)
   })
 
-  it('renders derived stats without edit affordances for managers', () => {
+  it('renders derived stats and an edit affordance for managers', () => {
     const monster = pickMonster('kobold-warrior')
+
+    function Probe() {
+      const actions = useContext(PageChromeActionsContext)?.actions
+      return <div data-testid="page-chrome-actions">{actions}</div>
+    }
 
     render(
       <MemoryRouter>
-        <MonsterDetailContent monster={monster} campaignId="camp_1" monsterId={monster.id} />
+        <PageChromeActionsProvider>
+          <Probe />
+          <MonsterDetailContent monster={monster} campaignId="camp_1" monsterId={monster.id} />
+        </PageChromeActionsProvider>
       </MemoryRouter>,
     )
 
     expect(screen.getByRole('heading', { name: 'Kobold Warrior' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /^edit$/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^edit$/i })).toHaveAttribute(
+      'href',
+      `/campaigns/camp_1/monsters/${monster.id}/edit`,
+    )
     expect(screen.getByText(/Pack Tactics/)).toBeInTheDocument()
   })
 })
@@ -77,7 +92,7 @@ describe('MonsterDetail list resolution', () => {
       data: [],
       isPending: false,
       isError: false,
-    } as ReturnType<typeof useMonsters>)
+    } as unknown as ReturnType<typeof useMonsters>)
 
     render(
       <MemoryRouter initialEntries={['/campaigns/camp_1/monsters/srd-cc-5.2.1:kobold-warrior']}>

@@ -4,6 +4,8 @@ import {
   type ContentValidationIntent,
 } from '@rpg/contracts'
 
+import { monsterActionActiveKeys } from './monster-action-kind'
+
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
@@ -17,22 +19,6 @@ export type NormalizeMonsterFormOptions = {
   intent: ContentValidationIntent
   mode?: 'create' | 'update'
 }
-
-const WEAPON_KEYS = ['id', 'kind', 'name', 'equipmentEntryId', 'description', 'trigger'] as const
-const NATURAL_KEYS = [
-  'id',
-  'kind',
-  'name',
-  'mode',
-  'properties',
-  'reach',
-  'range',
-  'damage',
-  'damageType',
-  'description',
-  'trigger',
-] as const
-const SPECIAL_KEYS = ['id', 'kind', 'name', 'description', 'trigger'] as const
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -67,13 +53,6 @@ function pickKeys(
   return next
 }
 
-function keysForActionKind(kind: unknown): readonly string[] {
-  if (kind === 'weapon') return WEAPON_KEYS
-  if (kind === 'natural-weapon') return NATURAL_KEYS
-  if (kind === 'special') return SPECIAL_KEYS
-  return []
-}
-
 function normalizeAction(
   action: unknown,
   section: 'actions' | 'bonusActions' | 'reactions',
@@ -81,11 +60,9 @@ function normalizeAction(
   if (!isRecord(action)) return action
   const cleaned = omitEmptyStrings(action)
   if (!isRecord(cleaned)) return cleaned
-  const keys = keysForActionKind(cleaned.kind)
-  const active =
-    keys.length > 0
-      ? pickKeys(cleaned, section === 'reactions' ? keys : keys.filter((key) => key !== 'trigger'))
-      : cleaned
+  const keys =
+    typeof cleaned.kind === 'string' ? monsterActionActiveKeys(cleaned.kind, section) : []
+  const active = keys.length > 0 ? pickKeys(cleaned, keys) : cleaned
   const schema = section === 'reactions' ? monsterReactionDraftSchema : monsterActionDraftSchema
   const parsed = schema.safeParse(active)
   if (!parsed.success) return active

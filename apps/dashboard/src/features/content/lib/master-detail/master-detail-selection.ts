@@ -64,6 +64,35 @@ export function findFirstInvalidRowIndex(errors: FieldErrors, name: string): num
   return null
 }
 
+/**
+ * Next eligible index after `fromIndex`, then the previous eligible index.
+ * The index itself is not a candidate. Returns null when nothing qualifies.
+ */
+export function resolveAdjacentIndex(
+  length: number,
+  fromIndex: number,
+  isEligible: (index: number) => boolean = () => true,
+): number | null {
+  for (let index = fromIndex + 1; index < length; index += 1) {
+    if (isEligible(index)) return index
+  }
+  for (let index = fromIndex - 1; index >= 0; index -= 1) {
+    if (isEligible(index)) return index
+  }
+  return null
+}
+
+/** Id to select after removing `removedId`: next sibling, then previous. */
+export function resolveSelectionAfterRemoval(
+  ids: readonly string[],
+  removedId: string,
+): string | null {
+  const fromIndex = ids.indexOf(removedId)
+  if (fromIndex < 0) return null
+  const nextIndex = resolveAdjacentIndex(ids.length, fromIndex)
+  return nextIndex === null ? null : (ids[nextIndex] ?? null)
+}
+
 export function findIndexByFieldId(
   fields: ReadonlyArray<{ id: string }>,
   fieldId: string | null,

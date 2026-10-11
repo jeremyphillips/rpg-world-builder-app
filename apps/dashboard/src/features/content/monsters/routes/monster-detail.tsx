@@ -9,6 +9,7 @@ import {
 import { useSetBreadcrumbLabel } from '@/components/layout/breadcrumb/use-breadcrumb-label'
 import { buildSeedCreatureTypeVocabulary, getCreatureTypeLabel } from '@/features/vocabulary'
 import { useEquipment } from '../../equipment/hooks/use-equipment'
+import { contentEditHref } from '../../lib/detail/page/content-edit-href'
 import { ContentDetailResolver } from '../../lib/detail/page/content-detail-resolver'
 import {
   getContentDisplayImage,
@@ -86,6 +87,7 @@ export function MonsterDetailContent({
       displayFallback={resolveDashboardDetailDisplayFallback('monster')}
       imageName={monster.name}
       campaignId={campaignId}
+      editHref={contentEditHref('monsters', campaignId, monsterId)}
       viewModel={viewModel}
       descriptionHtml={monster.description}
       usageSection={

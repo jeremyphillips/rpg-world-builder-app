@@ -45,8 +45,6 @@ export const MONSTER_EQUIPMENT_CATALOG_ERROR = 'Equipment could not be loaded.'
 export const MONSTER_RETRY_LABEL = 'Retry'
 export const MONSTER_SKILL_LOADING = 'Loading skills…'
 export const MONSTER_SKILL_ERROR = 'Skills could not be loaded.'
-export const MONSTER_PRESERVED_COLLECTIONS_NOTE =
-  'These entries stay with the monster. Editing them is not available on this form yet.'
 export const MONSTER_BLANK_CHALLENGE_HINT =
   'Required to publish. Values that use proficiency bonus show "—" until set.'
 
@@ -78,6 +76,47 @@ export function monsterEquipmentSectionLabel(): string {
 
 export const MONSTER_TRAITS_HEADING = 'Traits'
 export const MONSTER_ACTIONS_HEADING = 'Actions'
+export const MONSTER_BONUS_ACTIONS_HEADING = 'Bonus actions'
+export const MONSTER_REACTIONS_HEADING = 'Reactions'
+export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
+export const MONSTER_SECTION_EMPTY = 'None'
+export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
+export const MONSTER_ADD_LABEL = 'Add'
+export const MONSTER_KIND_LABEL = 'Kind'
+export const MONSTER_ACTION_NAME_LABEL = 'Name'
+export const MONSTER_TRIGGER_LABEL = 'Trigger'
+export const MONSTER_MOVE_TO_LABEL = 'Move to'
+export const MONSTER_MOVE_UP_LABEL = 'Move up'
+export const MONSTER_MOVE_DOWN_LABEL = 'Move down'
+export const MONSTER_WEAPON_PRESET_HINT = 'Uses an equipped weapon'
+export const MONSTER_SPECIAL_PRESET_HINT = 'Prose-based action'
+export const MONSTER_KIND_SWITCH_KEEP = 'The name and description are kept.'
+
+export function monsterAddWeaponShortcut(): string {
+  return `Add a weapon to ${getContentTypeTerm('equipment').label}`
+}
+
+export function formatAddedEquipmentNotice(name: string): string {
+  return `${name} was added to ${getContentTypeTerm('equipment').label}.`
+}
+
+export function formatWeaponSwapNotice(name: string): string {
+  return `Now uses ${name}. Attack bonus, range, and damage come from ${name}.`
+}
+
+export function formatKindSwitchTitle(name: string, nextKindLabel: string): string {
+  return `Change ${name} to a ${nextKindLabel.toLowerCase()}?`
+}
+
+export function formatKindSwitchConfirm(nextKindLabel: string): string {
+  return `Change to ${nextKindLabel.toLowerCase()}`
+}
+
+export function formatDropTriggerBody(): string {
+  return 'Moving this reaction out of Reactions drops its trigger.'
+}
+
+export const MONSTER_DROP_TRIGGER_CONFIRM = 'Move and drop trigger'
 
 export function formatEquipmentQuantityLabel(quantity: number, equipped: boolean): string {
   if (equipped && quantity > 1) {

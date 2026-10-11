@@ -92,8 +92,8 @@ describe('CONTENT_TYPE_INTEGRATION_MANIFEST', () => {
       })),
     )
     expect(actual).toEqual(expected)
-    expect(contentTypeKeysWithDeferredAuthoring()).toEqual(['monsters'])
-    expect(contentTypeKeysWithFormDefinition()).not.toContain('monsters')
+    expect(contentTypeKeysWithDeferredAuthoring()).toEqual([])
+    expect(contentTypeKeysWithFormDefinition()).toContain('monsters')
   })
 
   it('rejects deferred authoring that also registers a form, and enabled authoring without one', () => {

@@ -30,6 +30,7 @@ type MonsterDetailBodyProps = {
   displayFallback?: ContentDisplayFallback
   imageName: string
   campaignId: string
+  editHref?: string
   viewModel: MonsterDetailViewModel
   descriptionHtml?: string
   usageSection?: ReactNode
@@ -179,6 +180,7 @@ export function MonsterDetailBody({
   displayFallback,
   imageName,
   campaignId,
+  editHref,
   viewModel,
   descriptionHtml,
   usageSection,
@@ -200,6 +202,7 @@ export function MonsterDetailBody({
       displayFallback={displayFallback}
       imageName={imageName}
       campaignId={campaignId}
+      editHref={editHref}
       statRows={statRows}
       metadata={
         viewModel.catalogState === 'pending' ? (

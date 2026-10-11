@@ -2,6 +2,7 @@ import type { CreateMonsterInput, Monster } from '@rpg/contracts'
 
 import {
   contentFormFields,
+  contentFormRegistry,
   type ContentFormDef,
 } from '../../lib/forms/registry/content-form-registry'
 import { managedMediaFormDefFields } from '../../lib/forms/registry/managed-media-form-def.lib'
@@ -17,9 +18,6 @@ import {
   type MonsterFormValues,
 } from './monster-form-values'
 
-/**
- * Private until go-live. Do not assign `contentFormRegistry`.
- */
 const monsterMediaFields = managedMediaFormDefFields('monsters') as {
   supportsManagedMedia: true
   mediaDomain: 'monster'
@@ -41,6 +39,7 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
   resolveSchema: resolveMonsterFormSchema,
   nameField,
   resolveCreateDefaultValues: resolveMonsterCreateDefaultValues,
+  createDefaultValues: resolveMonsterCreateDefaultValues(),
   buildTabs: buildMonsterTabs,
   buildFields: (ctx) => contentFormFields(monsterFormDef, ctx),
   toFormValues: monsterToFormValues,
@@ -53,3 +52,5 @@ export const monsterFormDef: ContentFormDef<Monster, MonsterFormValues, CreateMo
     buildSections: buildMonsterPreviewSections,
   },
 }
+
+contentFormRegistry['monsters'] = monsterFormDef

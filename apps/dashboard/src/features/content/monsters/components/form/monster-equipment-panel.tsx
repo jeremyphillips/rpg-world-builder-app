@@ -58,13 +58,11 @@ export function MonsterEquipmentPanel({
   const [notices, setNotices] = useState<Record<string, string>>({})
   const catalog = monsterEquipmentCatalog(ctx)
   const status = ctx.equipmentCatalogStatus ?? 'ready'
-  useReportContentFormWriteGate(
-    'strict',
-    resolveStrictCatalogWriteGateReason(status, {
-      loading: MONSTER_LOADING_EQUIPMENT,
-      error: MONSTER_EQUIPMENT_CATALOG_ERROR,
-    }),
-  )
+  const gateReason = resolveStrictCatalogWriteGateReason(status, {
+    loading: MONSTER_LOADING_EQUIPMENT,
+    error: MONSTER_EQUIPMENT_CATALOG_ERROR,
+  })
+  useReportContentFormWriteGate('strict', gateReason)
 
   if (!values) return null
   const derived = deriveMonsterFormDraft(values as MonsterFormValues, ctx)

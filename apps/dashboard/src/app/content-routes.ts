@@ -72,5 +72,8 @@ export const CONTENT_ROUTES = {
     overview: (campaignId: string) => `/campaigns/${campaignId}/monsters`,
     detail: (campaignId: string, monsterId: string) =>
       `/campaigns/${campaignId}/monsters/${monsterId}`,
+    edit: (campaignId: string, monsterId: string) =>
+      `/campaigns/${campaignId}/monsters/${monsterId}/edit`,
+    create: (campaignId: string) => `/campaigns/${campaignId}/monsters/new`,
   },
 } as const

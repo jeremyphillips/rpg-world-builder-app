@@ -2,8 +2,10 @@ import { useParams } from 'react-router-dom'
 import type { Monster, WithCampaignAccess } from '@rpg/contracts'
 import type { ColumnDef } from '@rpg/ui'
 
+import { ROUTES } from '@/app/routes'
 import {
   formatContentOverviewCaption,
+  formatContentCreateHeading,
   getContentTypeCollectionLabel,
 } from '@/features/content/lib/content-type-labels'
 import { ContentOverviewShell } from '../../lib/overview/content-overview-shell'
@@ -20,15 +22,17 @@ export function MonstersOverview() {
       campaignId={campaignId}
       isPending={isPending}
       isError={isError}
+      newHref={ROUTES.content.monsters.create(campaignId)}
+      newLabel={formatContentCreateHeading('monsters')}
     >
       <ContentOverviewTable<WithCampaignAccess<Monster>>
         contentTypeKey="monsters"
         campaignId={campaignId}
-        readOnly
         columns={monstersColumns(campaignId) as ColumnDef<WithCampaignAccess<Monster>, unknown>[]}
         filterSchema={monstersFilterSchema}
         data={monsters as WithCampaignAccess<Monster>[]}
         caption={formatContentOverviewCaption('monsters', 'Combat')}
+        getEditHref={(row) => ROUTES.content.monsters.edit(campaignId, row.id)}
       />
     </ContentOverviewShell>
   )

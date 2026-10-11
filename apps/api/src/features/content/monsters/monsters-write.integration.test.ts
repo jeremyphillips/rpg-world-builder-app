@@ -236,6 +236,67 @@ describe('monster write validation', () => {
     })
     expect(restored.experiencePointsOverride).toBe(0)
   })
+
+  it('publishes a weapon action that references unequipped equipment', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unequipped-weapon',
+        equipment: [
+          {
+            entryId: 'dagger',
+            equipmentId: 'srd-cc-5.2.1:dagger',
+            quantity: 1,
+            equipped: false,
+          },
+        ],
+      },
+      { status: 'draft' },
+    )
+    const published = await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
+    expect(published.status).toBe('published')
+  })
+
+  it('preserves untouched action rows on a system patch and a no-op resave', async () => {
+    const campaign = await makeTestCampaign()
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    const kobold = catalog.find((row) => row.slug === 'kobold-warrior' && row.source === 'system')
+    expect(kobold).toBeDefined()
+    if (!kobold) return
+
+    const actions = kobold.actions.map((action, index) =>
+      index === 0 ? { ...action, name: 'Renamed strike' } : action,
+    )
+    const patch = {
+      senses: kobold.senses,
+      equipment: kobold.equipment,
+      traits: kobold.traits,
+      actions,
+      bonusActions: kobold.bonusActions,
+      reactions: kobold.reactions,
+    }
+    const saved = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
+    expect(saved.actions[0]?.name).toBe('Renamed strike')
+    expect(saved.actions.slice(1)).toEqual(kobold.actions.slice(1))
+    expect(saved.bonusActions).toEqual(kobold.bonusActions)
+    expect(saved.reactions).toEqual(kobold.reactions)
+
+    const stored = await MonsterPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: kobold.id,
+    }).lean()
+    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, patch)
+    const again = await MonsterPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: kobold.id,
+    }).lean()
+    expect(again?.patch.actions).toEqual(stored?.patch.actions)
+    expect(again?.patch.bonusActions).toEqual(stored?.patch.bonusActions)
+    expect(again?.patch.reactions).toEqual(stored?.patch.reactions)
+  })
 })
 
 describe('promotion smoke', () => {

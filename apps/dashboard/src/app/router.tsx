@@ -50,7 +50,9 @@ import {
   FeatDetailRoute,
   FeatEditRoute,
   FeatsOverviewRoute,
+  MonsterCreateRoute,
   MonsterDetailRoute,
+  MonsterEditRoute,
   MonstersOverviewRoute,
   OrganizationCreateRoute,
   OrganizationDetailRoute,
@@ -415,8 +417,12 @@ const router = createBrowserRouter(
                   children: [
                     { index: true, element: <MonstersOverviewRoute /> },
                     {
+                      path: 'new',
+                      element: <MonsterCreateRoute />,
+                    },
+                    {
                       path: ':monsterId',
-                      element: <MonsterDetailRoute />,
+                      element: <Outlet />,
                       handle: {
                         crumb: (params, data) => ({
                           label: data.entityLabel ?? '…',
@@ -426,6 +432,14 @@ const router = createBrowserRouter(
                           ),
                         }),
                       } satisfies CrumbHandle,
+                      children: [
+                        { index: true, element: <MonsterDetailRoute /> },
+                        {
+                          path: 'edit',
+                          element: <MonsterEditRoute />,
+                          handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
+                        },
+                      ],
                     },
                   ],
                 },

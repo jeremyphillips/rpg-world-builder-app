@@ -5,6 +5,7 @@ import {
   filterMasterDetailItems,
   resolveMasterDetailPinnedRowId,
 } from './master-detail-availability-filter.lib'
+import { resolveAdjacentIndex } from './master-detail-selection'
 import type { MasterDetailAvailabilityPresentation } from './master-detail-availability.types'
 
 export type MasterDetailAvailabilityDerivedState<T extends MasterDetailAvailabilityPresentation> = {
@@ -51,15 +52,12 @@ export function resolveNextAvailableMasterDetailRowId(
   const selectedIndex = items.findIndex((item) => item.rowId === selectedRowId)
   if (selectedIndex === -1) return null
 
-  for (let index = selectedIndex + 1; index < items.length; index += 1) {
-    if (items[index]?.isAvailable) return items[index]!.rowId
-  }
-
-  for (let index = selectedIndex - 1; index >= 0; index -= 1) {
-    if (items[index]?.isAvailable) return items[index]!.rowId
-  }
-
-  return null
+  const nextIndex = resolveAdjacentIndex(
+    items.length,
+    selectedIndex,
+    (index) => items[index]?.isAvailable === true,
+  )
+  return nextIndex === null ? null : (items[nextIndex]?.rowId ?? null)
 }
 
 /**

@@ -55,6 +55,13 @@ const feyAncestry: Trait = {
   description: '',
   grants: [],
 }
+const keenSenses: Trait = {
+  id: 't3',
+  kind: 'custom',
+  name: 'Keen Senses',
+  description: '',
+  grants: [],
+}
 
 async function deleteViaOverflow(user: ReturnType<typeof userEvent.setup>, title: string) {
   await user.click(screen.getByRole('button', { name: new RegExp(`Actions for ${title}`, 'i') }))
@@ -127,6 +134,29 @@ describe('SpeciesTraitsTab', () => {
     expect(
       screen.getAllByTestId('trait-detail').some((element) => element.textContent === 'traits.1'),
     ).toBe(true)
+  })
+
+  it('selects the next trait when the selected middle trait is removed', async () => {
+    const user = userEvent.setup()
+    render(<TabShell traits={[darkvision, feyAncestry, keenSenses]} entitySource="homebrew" />)
+
+    await user.click(
+      within(screen.getByRole('navigation', { name: 'Traits' })).getByRole('button', {
+        name: /Fey Ancestry/i,
+      }),
+    )
+    await deleteViaOverflow(user, 'Fey Ancestry')
+    await user.click(screen.getByRole('button', { name: /^Delete$/ }))
+
+    await waitFor(() => {
+      expect(
+        screen.getAllByTestId('trait-detail').some((element) => element.textContent === 'traits.1'),
+      ).toBe(true)
+    })
+    const names = (
+      JSON.parse(screen.getByTestId('traits-values').textContent ?? '[]') as Trait[]
+    ).map((trait) => trait.name)
+    expect(names).toEqual(['Darkvision', 'Keen Senses'])
   })
 
   it('confirms deletion through the dialog and removes the row', async () => {

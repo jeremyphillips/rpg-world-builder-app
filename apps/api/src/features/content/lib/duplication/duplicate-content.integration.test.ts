@@ -309,6 +309,15 @@ describe('duplicate content routes', () => {
     expect(copy.actions.map((action: { id: string }) => action.id)).toEqual(
       skeleton!.actions.map((action) => action.id),
     )
+    expect(
+      copy.actions
+        .filter((action: { kind: string }) => action.kind === 'weapon')
+        .map((action: { equipmentEntryId?: string }) => action.equipmentEntryId),
+    ).toEqual(
+      skeleton!.actions
+        .filter((action) => action.kind === 'weapon')
+        .map((action) => action.equipmentEntryId),
+    )
     expect(monsterSchema.safeParse(copy).success).toBe(true)
 
     const equipmentCatalog = new Map(loadSeedEquipment('srd-cc-5.2.1').map((row) => [row.id, row]))

@@ -57,6 +57,7 @@ export const VISIBLE_SIDEBAR_CONTENT: readonly VisibleSidebarContentEntry[] = [
     contentType: 'monsters',
     label: getContentTypeCollectionLabel('monsters'),
     overview: ROUTES.content.monsters.overview,
+    create: ROUTES.content.monsters.create,
   },
   {
     contentType: 'organizations',

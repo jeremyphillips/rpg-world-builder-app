@@ -11,6 +11,7 @@ import {
   autoSelectFirstInvalid,
   findIndexByFieldId,
   resolveSelectedIndex,
+  resolveSelectionAfterRemoval,
   rowHasError,
 } from './master-detail-selection'
 
@@ -24,6 +25,10 @@ export interface UseMasterDetailArrayResult {
   select: (index: number) => void
   /** Appends a row built from `makeItemDefaults` and selects it by field id. */
   handleAdd: () => void
+  /** Appends a caller-built row and selects it by field id. */
+  appendRow: (row: Record<string, unknown>) => void
+  /** Removes a row without the delete dialog and selects the next sibling. */
+  removeAt: (index: number) => void
   /** Field id of the most recently appended row until consumed by the detail panel. */
   lastAddedFieldId: string | null
   clearLastAddedFieldId: () => void
@@ -137,18 +142,42 @@ export function useMasterDetailArray(
 
   const cancelRemove = useCallback(() => setDeleteIndex(null), [])
 
+  const selectFieldAfterRemoval = useCallback(
+    (index: number) => {
+      const removedFieldId = fields[index]?.id
+      const nextSelectedId = removedFieldId
+        ? resolveSelectionAfterRemoval(
+            fields.map((field) => field.id),
+            removedFieldId,
+          )
+        : null
+      remove(index)
+      setSelectedFieldId((current) => (current === removedFieldId ? nextSelectedId : current))
+    },
+    [fields, remove],
+  )
+
   const confirmRemove = useCallback(() => {
     if (deleteIndex === null) return
-    const removedFieldId = fields[deleteIndex]?.id
-    remove(deleteIndex)
-    setSelectedFieldId((current) => {
-      if (current !== removedFieldId) return current
-      if (fields.length <= 1) return null
-      if (deleteIndex > 0) return fields[deleteIndex - 1]?.id ?? null
-      return fields[1]?.id ?? null
-    })
+    selectFieldAfterRemoval(deleteIndex)
     setDeleteIndex(null)
-  }, [deleteIndex, fields, remove])
+  }, [deleteIndex, selectFieldAfterRemoval])
+
+  const appendRow = useCallback(
+    (row: Record<string, unknown>) => {
+      setPendingSelectIndex(fields.length)
+      append(row)
+    },
+    [append, fields.length],
+  )
+
+  const removeAt = useCallback(
+    (index: number) => {
+      if (index < 0 || index >= fields.length) return
+      selectFieldAfterRemoval(index)
+    },
+    [fields.length, selectFieldAfterRemoval],
+  )
 
   const move = useCallback(
     (from: number, to: number) => {
@@ -198,6 +227,8 @@ export function useMasterDetailArray(
     selectedIndex,
     select,
     handleAdd,
+    appendRow,
+    removeAt,
     lastAddedFieldId,
     clearLastAddedFieldId,
     deleteIndex,

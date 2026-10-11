@@ -4,7 +4,9 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   autoSelectFirstInvalid,
   findFirstInvalidRowIndex,
+  resolveAdjacentIndex,
   resolveSelectedIndex,
+  resolveSelectionAfterRemoval,
   rowHasError,
 } from './master-detail-selection'
 
@@ -67,6 +69,28 @@ describe('autoSelectFirstInvalid', () => {
     autoSelectFirstInvalid(errors, 'features', fields, selectFieldId)
 
     expect(selectFieldId).toHaveBeenCalledWith('field-b')
+  })
+})
+
+describe('resolveAdjacentIndex', () => {
+  it('prefers the next index, then the previous, and honors the predicate', () => {
+    expect(resolveAdjacentIndex(3, 1)).toBe(2)
+    expect(resolveAdjacentIndex(3, 2)).toBe(1)
+    expect(resolveAdjacentIndex(0, 0)).toBeNull()
+    expect(resolveAdjacentIndex(3, 0, () => false)).toBeNull()
+    expect(resolveAdjacentIndex(4, 1, (index) => index === 0 || index === 3)).toBe(3)
+  })
+})
+
+describe('resolveSelectionAfterRemoval', () => {
+  const ids = ['a', 'b', 'c']
+
+  it('selects the next sibling, then the previous, and null for the only row', () => {
+    expect(resolveSelectionAfterRemoval(ids, 'a')).toBe('b')
+    expect(resolveSelectionAfterRemoval(ids, 'b')).toBe('c')
+    expect(resolveSelectionAfterRemoval(ids, 'c')).toBe('b')
+    expect(resolveSelectionAfterRemoval(['only'], 'only')).toBeNull()
+    expect(resolveSelectionAfterRemoval(ids, 'missing')).toBeNull()
   })
 })
 

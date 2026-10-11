@@ -165,8 +165,8 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     dashboard: {
       folder: 'monsters',
       routeSection: 'monsters',
+      formDefinitionPath: 'apps/dashboard/src/features/content/monsters/lib/monster-form-def.ts',
       visibleInSidebar: true,
-      authoring: 'deferred',
     },
     capabilities: { required: true },
   },

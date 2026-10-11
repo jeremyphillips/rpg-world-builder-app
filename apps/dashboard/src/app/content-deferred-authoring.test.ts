@@ -6,16 +6,21 @@ import * as lazyRoutes from '@/app/lazy-routes'
 import { VISIBLE_SIDEBAR_CONTENT } from '@/features/homebrew/lib/hub/content-registry'
 
 describe('deferred content authoring', () => {
-  it('omits create and edit routes and lifecycle affordances', () => {
-    expect(contentTypeKeysWithDeferredAuthoring()).toEqual(['monsters'])
+  it('omits create and edit routes for every deferred type', () => {
+    expect(contentTypeKeysWithDeferredAuthoring()).toEqual([])
+    for (const key of contentTypeKeysWithDeferredAuthoring()) {
+      const section = CONTENT_ROUTES[key as keyof typeof CONTENT_ROUTES]
+      expect(section).not.toHaveProperty('create')
+      expect(section).not.toHaveProperty('edit')
+    }
+  })
 
-    const monsters = CONTENT_ROUTES.monsters
-    expect(monsters).not.toHaveProperty('create')
-    expect(monsters).not.toHaveProperty('edit')
-    expect(lazyRoutes).not.toHaveProperty('MonsterCreateRoute')
-    expect(lazyRoutes).not.toHaveProperty('MonsterEditRoute')
-
+  it('exposes monster create and edit affordances', () => {
+    expect(CONTENT_ROUTES.monsters).toHaveProperty('create')
+    expect(CONTENT_ROUTES.monsters).toHaveProperty('edit')
+    expect(lazyRoutes).toHaveProperty('MonsterCreateRoute')
+    expect(lazyRoutes).toHaveProperty('MonsterEditRoute')
     const hub = VISIBLE_SIDEBAR_CONTENT.find((entry) => entry.contentType === 'monsters')
-    expect(hub?.create).toBeUndefined()
+    expect(hub?.create).toBeTypeOf('function')
   })
 })

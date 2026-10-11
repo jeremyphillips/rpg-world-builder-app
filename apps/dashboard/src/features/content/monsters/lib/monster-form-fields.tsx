@@ -3,12 +3,10 @@ import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
-import {
-  MonsterActionsPassthrough,
-  MonsterTraitsPassthrough,
-} from '../components/form/monster-preserved-collections'
 import { MonsterCreatureDetailsPanel } from '../components/form/monster-creature-details-panel'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
+import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
+import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 
@@ -78,11 +76,11 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   ]
 
   const traits: FormItem[] = [
-    { kind: 'slot', name: 'traits', render: () => <MonsterTraitsPassthrough /> },
+    { kind: 'slot', name: 'traits', render: () => <MonsterTraitsEditor ctx={ctx} /> },
   ]
 
   const actions: FormItem[] = [
-    { kind: 'slot', name: 'actions', render: () => <MonsterActionsPassthrough /> },
+    { kind: 'slot', name: 'actions', render: () => <MonsterActionsEditor ctx={ctx} /> },
     ownedSlot('bonusActions'),
     ownedSlot('reactions'),
   ]
