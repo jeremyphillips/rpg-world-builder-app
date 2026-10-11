@@ -20,11 +20,11 @@ import { characterSelectionSourcesSchema } from './selection-sources'
 // Proficiencies
 // ---------------------------------------------------------------------------
 
-export const CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS = ['proficient', 'expertise'] as const
+import { PROFICIENCY_RANK_IDS, proficiencyRankSchema } from '../../../vocab/proficiency'
 
-export const characterSkillToolProficiencyRankSchema = z.enum(
-  CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS,
-)
+export const CHARACTER_SKILL_TOOL_PROFICIENCY_RANKS = PROFICIENCY_RANK_IDS
+
+export const characterSkillToolProficiencyRankSchema = proficiencyRankSchema
 
 export type CharacterSkillToolProficiencyRank = z.infer<
   typeof characterSkillToolProficiencyRankSchema

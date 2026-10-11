@@ -109,17 +109,17 @@ lookup when assembling derivation input from a persisted sheet — not draft sem
 
 ---
 
-### `runtime/monster/` (future)
+### `runtime/monster/`
 
-**Audience:** Monster / stat-block documents (not yet modeled).
+**Audience:** Monster catalog stat blocks (`content/monster.ts`).
 
-**Responsibilities:** Same _class_ of work as `runtime/character/` but for monster
-sheet shapes — e.g. `speaks`, `understands but cannot speak`, telepathy range.
+**Responsibilities:** Derive printed-style values from authored monster bodies — AC,
+HP, saves, skills, passive Perception, attack lines, XP, and initiative. Policy
+lives in [monster-stat-blocks.md](./monster-stat-blocks.md).
 
-**May import:** `runtime/creature/`
+**May import:** `runtime/creature/` (shared math only).
 
-**Must not import:** `runtime/character-builder/`, and generally not `runtime/character/`
-unless a shared neutral type is intentionally extracted upward.
+**Must not import:** `runtime/character-builder/` or `runtime/character/`.
 
 Do not fold monster-only behavior into `creature/` or `character/` preemptively.
 

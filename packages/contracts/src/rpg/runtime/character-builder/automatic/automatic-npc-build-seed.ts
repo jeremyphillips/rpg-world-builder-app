@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { builderLevelSchema } from '../../../primitives/level'
 import { abilitySchema, type Ability } from '../../../vocab/ability'
-import { alignmentSchema } from '../../../vocab/alignment'
+import { characterAlignmentSchema } from '../../../vocab/alignment'
 import { genderSchema } from '../../../vocab/character-gender'
 import { npcTemplateIdSchema } from '../../../vocab/npc/npc-template'
 import { characterBuilderValidationMessages } from '../messages/character-builder-messages'
@@ -28,7 +28,7 @@ export const automaticNpcBuildSeedSchema = z.object({
   classId: z.string().min(1).optional(),
   level: builderLevelSchema,
   /** Required — finalSubmit validation requires an alignment. */
-  alignment: alignmentSchema,
+  alignment: characterAlignmentSchema,
   /** Required — finalSubmit validation requires a gender. */
   gender: genderSchema,
   /** Selected NPC role. Omitted when the caller did not choose one. */

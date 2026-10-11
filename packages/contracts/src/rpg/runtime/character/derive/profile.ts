@@ -1,4 +1,4 @@
-import type { ArmorEquipment } from '../../../content/equipment'
+import type { EquippedArmorPiece } from '../../creature/armor-class'
 import { DEFAULT_ARMOR_CLASS_BASE } from '../../../campaign/patches/campaign-mechanics-patch'
 import type { CharacterClass } from '../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../content/classes/spellcasting/class-spellcasting-ownership'
@@ -42,7 +42,7 @@ export type CharacterDerivationInput = {
   proficiencies: CharacterProficiencies
   skillProficiencies: readonly SkillProficiency[]
   /** Equipped armor variants for equipment-based AC; omit for unarmored preview. */
-  equippedArmor?: readonly ArmorEquipment[]
+  equippedArmor?: readonly EquippedArmorPiece[]
   /** Resolved spellcasting progression config; required when deriving spell slots. */
   spellcastingProgression?: ResolvedSpellcastingProgressionConfig
 }

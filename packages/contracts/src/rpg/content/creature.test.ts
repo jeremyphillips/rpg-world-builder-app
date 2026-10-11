@@ -4,11 +4,11 @@ import { characterSchema } from '../runtime/character/sheet'
 import {
   creatureAbilityScoresSchema,
   creatureRuntimeHitPointsSchema,
-  creatureSavingThrowModifierEntrySchema,
   creatureSensesSchema,
-  creatureSkillModifierEntrySchema,
   creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
+  creatureSkillProficiencyEntrySchema,
+  creatureWeaponProficiencyTargetSchema,
 } from './creature'
 
 describe('creatureAbilityScoresSchema', () => {
@@ -91,17 +91,31 @@ describe('creature movement and senses', () => {
   })
 })
 
-describe('creature stat-block modifier entries', () => {
-  it('parses explicit skill and saving throw modifiers', () => {
-    expect(creatureSkillModifierEntrySchema.parse({ skill: 'perception', modifier: 7 })).toEqual({
+describe('creature proficiency entries', () => {
+  it('parses skill proficiency ranks and weapon targets', () => {
+    expect(
+      creatureSkillProficiencyEntrySchema.parse({ skill: 'perception', rank: 'expertise' }),
+    ).toEqual({
       skill: 'perception',
-      modifier: 7,
+      rank: 'expertise',
     })
 
-    expect(creatureSavingThrowModifierEntrySchema.parse({ ability: 'wis', modifier: 5 })).toEqual({
-      ability: 'wis',
-      modifier: 5,
+    expect(
+      creatureWeaponProficiencyTargetSchema.parse({
+        weaponId: 'srd-cc-5.2.1:dagger',
+      }),
+    ).toEqual({
+      weaponId: 'srd-cc-5.2.1:dagger',
     })
+  })
+
+  it('rejects weapon targets with both weaponId and weaponCategory', () => {
+    expect(
+      creatureWeaponProficiencyTargetSchema.safeParse({
+        weaponId: 'srd-cc-5.2.1:dagger',
+        weaponCategory: 'simple',
+      }).success,
+    ).toBe(false)
   })
 })
 

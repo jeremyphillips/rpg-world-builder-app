@@ -22,6 +22,7 @@ export const CONTENT_TYPE_PRESENTATION = {
   'skill-proficiencies': { source: 'badge-and-filter' },
   organizations: { source: 'suppressed' },
   locations: { source: 'suppressed' },
+  monsters: { source: 'badge-and-filter' },
 } as const satisfies Record<ContentTypeKey, ContentTypePresentationPolicy>
 
 export function getContentTypePresentation(

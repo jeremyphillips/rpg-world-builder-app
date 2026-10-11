@@ -220,6 +220,21 @@ of scope** — add an explicit opt-in flag only when that workflow ships.
 | List / direct URL for `specific_players` (not granted) | Hidden                                                | Visible         |
 | Saved reference after content became unavailable       | Resolve allowed via `canResolveSavedContentReference` | Resolve allowed |
 
+## Per-type campaign access defaults
+
+`CONTENT_ACCESS_CAPABILITIES` owns `defaultVisibilityMode` per catalog type. When no
+stored overlay exists, list/search reads resolve
+`resolveContentCampaignAccess(null, { defaultAccess: resolveDefaultContentCampaignAccess(type) })`.
+
+`monsters` defaults to `dm_only` so system and homebrew stat blocks stay manager-facing
+until explicitly shared. Bulk “reset to default” uses the same type-aware default.
+
+### Usage disclosure
+
+Informational usage reads (`viewer_display`) filter `kind: 'content'` blockers through
+`filterContentUsageBlockersForViewer` so players do not see DM-only monster names on
+equipment or skill usage surfaces. Authoritative delete guards keep full blockers.
+
 ## Related docs
 
 - Contracts: [`campaign-content-viewer.ts`](../../../packages/contracts/src/rpg/campaign/campaign-content-viewer.ts) (`ContentViewer`); [`content-viewer-character-relationships.ts`](../../../packages/contracts/src/rpg/content/lib/campaign-access/content-viewer-character-relationships.ts) (viewer↔character wire on content records)

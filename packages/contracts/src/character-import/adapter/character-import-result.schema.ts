@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { characterAbilityScoresSchema } from '../../rpg/runtime/character/sheet/core'
 import { coinWealthSchema } from '../../rpg/primitives/wealth'
-import { alignmentSchema } from '../../rpg/vocab/alignment'
+import { characterAlignmentSchema } from '../../rpg/vocab/alignment'
 import { genderSchema } from '../../rpg/vocab/character-gender'
 import { DND_BEYOND_PAYLOAD_VERSION } from '../dnd-beyond/dnd-beyond-version'
 import {
@@ -50,7 +50,7 @@ export const characterImportExtractionSchema = z.object({
   species: characterImportFieldResultSchema(recognizedSpeciesPreviewSchema),
   classes: characterImportFieldResultSchema(z.array(recognizedClassPreviewSchema)),
   abilityScores: characterImportFieldResultSchema(characterAbilityScoresSchema),
-  alignment: characterImportFieldResultSchema(alignmentSchema),
+  alignment: characterImportFieldResultSchema(characterAlignmentSchema),
   gender: characterImportFieldResultSchema(genderSchema),
   xp: characterImportFieldResultSchema(z.number().int().min(0)),
   narrative: characterImportFieldResultSchema(characterNarrativePreviewSchema),

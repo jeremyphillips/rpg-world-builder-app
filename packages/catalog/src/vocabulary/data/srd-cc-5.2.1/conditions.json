@@ -68,5 +68,10 @@
     "id": "unconscious",
     "label": "Unconscious",
     "description": "An unconscious creature is incapacitated, can't move or speak, and is unaware of its surroundings. It drops what it's holding and falls prone. Attack rolls against it have advantage; hits from 5 feet are critical hits."
+  },
+  {
+    "id": "exhaustion",
+    "label": "Exhaustion",
+    "description": "Exhaustion is measured in six levels. An exhausted creature suffers escalating penalties to ability checks, speed, attack rolls, and saving throws until the condition is removed."
   }
 ]

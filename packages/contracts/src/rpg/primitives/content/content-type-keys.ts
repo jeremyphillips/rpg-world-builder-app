@@ -14,6 +14,7 @@ export const CONTENT_TYPE_KEYS = [
   'skill-proficiencies',
   'organizations',
   'locations',
+  'monsters',
 ] as const
 
 export type ContentTypeKey = (typeof CONTENT_TYPE_KEYS)[number]
@@ -28,6 +29,7 @@ export const API_CONTENT_TYPE_KEYS = [
   'skill-proficiencies',
   'organizations',
   'locations',
+  'monsters',
 ] as const satisfies readonly ContentTypeKey[]
 
 export type ApiContentTypeKey = (typeof API_CONTENT_TYPE_KEYS)[number]

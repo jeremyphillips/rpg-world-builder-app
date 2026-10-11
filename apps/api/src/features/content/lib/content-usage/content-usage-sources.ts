@@ -24,6 +24,10 @@ import {
   indexOrganizationMemberSpeciesAffinityBlockersByContentId,
 } from './reference-sources/organizations'
 import { indexCampaignPrimaryWorldBlockersByContentId } from './reference-sources/campaign-settings'
+import {
+  indexMonsterEquipmentBlockersByContentId,
+  indexMonsterSkillProficiencyBlockersByContentId,
+} from './reference-sources/monsters'
 import type { ContentUsageSource } from './content-usage-source'
 
 function characterDescriptorSource(
@@ -90,4 +94,17 @@ export const characterRelationshipLocationSource: ContentUsageSource = {
 
 export const characterRelationshipCharacterSource: ContentUsageSource = {
   loadBlockerIndex: (ctx) => indexCharacterRelationshipCharacterBlockersByContentId(ctx),
+}
+
+export const monsterEquipmentSource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexMonsterEquipmentBlockersByContentId(ctx),
+}
+
+export const monsterSkillProficiencySource: ContentUsageSource = {
+  loadBlockerIndex: (ctx) => indexMonsterSkillProficiencyBlockersByContentId(ctx),
+}
+
+/** Placeholder until encounter surfaces reference monsters in usage reads. */
+export const emptyContentUsageSource: ContentUsageSource = {
+  loadBlockerIndex: async () => new Map(),
 }

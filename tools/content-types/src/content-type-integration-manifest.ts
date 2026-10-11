@@ -152,6 +152,13 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     },
     capabilities: { required: true },
   },
+  monsters: {
+    catalog: { bundledContent: 'bundled', packageName: '@rpg/catalog/monsters' },
+    api: {
+      registrationPath: 'apps/api/src/features/content/monsters/monsters.config.ts',
+    },
+    capabilities: { required: true },
+  },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>
 
 export type ContentTypeIntegrationManifest = typeof CONTENT_TYPE_INTEGRATION_MANIFEST

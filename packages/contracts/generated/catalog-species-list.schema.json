@@ -2038,6 +2038,26 @@
                   "spellcastingGearKind"
                 ],
                 "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "armor_class",
+                    "description": "armor_class"
+                  },
+                  "bonus": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": [
+                  "kind",
+                  "bonus"
+                ],
+                "additionalProperties": false
               }
             ]
           }

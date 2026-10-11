@@ -8,7 +8,11 @@ import type {
   ContentUsageBlocker,
   ResolvedContentCampaignAccess,
 } from '@rpg/contracts'
-import { contentCampaignAccessPatchSchema, resolveContentCampaignAccess } from '@rpg/contracts'
+import {
+  contentCampaignAccessPatchSchema,
+  resolveContentCampaignAccess,
+  resolveDefaultContentCampaignAccess,
+} from '@rpg/contracts'
 
 import { HttpError } from '../../../lib/http-error'
 import {
@@ -45,10 +49,14 @@ function assertParticipantIdsInRoster(
 
 async function resolveStoredCampaignAccess(
   campaignId: string,
+  targetType: ContentAccessTargetType,
   stored: ContentCampaignAccess | null,
 ): Promise<ResolvedContentCampaignAccess> {
   const validParticipantIds = await loadValidCampaignParticipantIds(campaignId)
-  return resolveContentCampaignAccess(stored, { validParticipantIds })
+  return resolveContentCampaignAccess(stored, {
+    validParticipantIds,
+    defaultAccess: resolveDefaultContentCampaignAccess(targetType),
+  })
 }
 
 export async function loadCampaignAccessByTargetIds(
@@ -71,7 +79,10 @@ export async function loadCampaignAccessByTargetIds(
   return new Map(
     targetIds.map((targetId) => [
       targetId,
-      resolveContentCampaignAccess(byTargetId.get(targetId) ?? null, { validParticipantIds }),
+      resolveContentCampaignAccess(byTargetId.get(targetId) ?? null, {
+        validParticipantIds,
+        defaultAccess: resolveDefaultContentCampaignAccess(targetType),
+      }),
     ]),
   )
 }
@@ -79,10 +90,13 @@ export async function loadCampaignAccessByTargetIds(
 export function attachCampaignAccessToRows<T extends { id: string }>(
   rows: readonly T[],
   accessByTargetId: ReadonlyMap<string, ResolvedContentCampaignAccess>,
+  targetType: ContentAccessTargetType,
 ): Array<T & { campaignAccess: ResolvedContentCampaignAccess }> {
+  const defaultAccess = resolveDefaultContentCampaignAccess(targetType)
   return rows.map((row) => ({
     ...row,
-    campaignAccess: accessByTargetId.get(row.id) ?? resolveContentCampaignAccess(null),
+    campaignAccess:
+      accessByTargetId.get(row.id) ?? resolveContentCampaignAccess(null, { defaultAccess }),
   }))
 }
 
@@ -96,7 +110,7 @@ export async function attachCampaignAccessForTargetType<T extends { id: string }
     targetType,
     rows.map((row) => row.id),
   )
-  return attachCampaignAccessToRows(rows, accessByTargetId)
+  return attachCampaignAccessToRows(rows, accessByTargetId, targetType)
 }
 
 async function evaluateCampaignAccessOffBlockers<T extends WriteEntityBase>(
@@ -224,7 +238,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
 
     return {
       status: 'updated',
-      campaignAccess: await resolveStoredCampaignAccess(campaignId, {
+      campaignAccess: await resolveStoredCampaignAccess(campaignId, targetType, {
         available: doc.available,
         visibilityMode: doc.visibilityMode,
         participantIds: doc.participantIds ?? [],
@@ -250,7 +264,7 @@ export async function updateContentCampaignAccess<T extends WriteEntityBase>(
 
   return {
     status: 'updated',
-    campaignAccess: await resolveStoredCampaignAccess(campaignId, {
+    campaignAccess: await resolveStoredCampaignAccess(campaignId, targetType, {
       available: doc.available,
       visibilityMode: doc.visibilityMode,
       participantIds: doc.participantIds ?? [],
@@ -273,5 +287,5 @@ export async function resolveContentCampaignAccessForEntity<T extends WriteEntit
 ): Promise<ResolvedContentCampaignAccess> {
   const targetType = config.campaignAccessTargetType ?? (config.typeName as ContentAccessTargetType)
   const stored = await loadStoredCampaignAccess(campaignId, targetType, entityId)
-  return resolveStoredCampaignAccess(campaignId, stored)
+  return resolveStoredCampaignAccess(campaignId, targetType, stored)
 }

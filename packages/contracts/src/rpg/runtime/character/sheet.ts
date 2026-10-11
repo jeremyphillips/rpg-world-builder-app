@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { contentMediaSchema } from '../../campaign/campaign-media.lib'
-import { alignmentSchema } from '../../vocab/alignment'
+import { characterAlignmentSchema } from '../../vocab/alignment'
 import { genderSchema } from '../../vocab/character-gender'
 import {
   characterAbilityScoresSchema,
@@ -33,7 +33,7 @@ const characterBaseFields = {
   media: contentMediaSchema.optional(),
   rulesetId: z.string().min(1),
   species: characterSpeciesSchema,
-  alignment: alignmentSchema,
+  alignment: characterAlignmentSchema,
   gender: genderSchema,
   xp: z.number().int().min(0).nullable(),
   abilityScores: characterAbilityScoresSchema,

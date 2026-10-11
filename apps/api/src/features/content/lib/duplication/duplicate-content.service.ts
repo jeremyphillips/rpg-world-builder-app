@@ -52,7 +52,10 @@ export async function duplicateContentEntity({
     writeConfig,
   })
 
-  const creationDefaults = resolveContentCreationDefaults({ mode: 'duplicate' })
+  const creationDefaults = resolveContentCreationDefaults({
+    mode: 'duplicate',
+    contentTypeKey: contentType,
+  })
 
   const entity = await createHomebrewContent(writeConfig, campaignId, createInput, {
     status: creationDefaults.status,

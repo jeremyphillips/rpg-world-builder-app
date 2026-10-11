@@ -28,6 +28,10 @@
       "types": "./src/feats/index.ts",
       "default": "./src/feats/index.ts"
     },
+    "./monsters": {
+      "types": "./src/monsters/index.ts",
+      "default": "./src/monsters/index.ts"
+    },
     "./xp-progressions": {
       "types": "./src/xp-progressions/index.ts",
       "default": "./src/xp-progressions/index.ts"

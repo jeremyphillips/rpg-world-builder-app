@@ -18,6 +18,9 @@ import {
   organizationMemberClassAffinitySource,
   organizationMemberSpeciesAffinitySource,
   campaignPrimaryWorldReferenceSource,
+  emptyContentUsageSource,
+  monsterEquipmentSource,
+  monsterSkillProficiencySource,
 } from './content-usage-sources'
 
 const CHARACTER_SUMMARY_LABELS = { singular: 'character', plural: 'characters' } as const
@@ -66,7 +69,10 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'equipment',
-    sources: [{ source: characterEquipmentSource, entry: true, batch: true }],
+    sources: [
+      { source: characterEquipmentSource, entry: true, batch: true },
+      { source: monsterEquipmentSource, entry: true, batch: false },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'owns' },
@@ -92,11 +98,21 @@ export const CONTENT_USAGE_REGISTRATIONS_LIST = [
   }),
   defineContentUsage({
     contentType: 'skill-proficiencies',
-    sources: [{ source: characterSkillProficiencySource, entry: true, batch: true }],
+    sources: [
+      { source: characterSkillProficiencySource, entry: true, batch: true },
+      { source: monsterSkillProficiencySource, entry: true, batch: false },
+    ],
     summaryLabels: CHARACTER_SUMMARY_LABELS,
     lookupKey: 'slug',
     overviewUsageScope: 'characters',
     viewerCharacterRelationship: { strategy: 'fixed', kind: 'has', hasNoun: 'proficiency' },
+  }),
+  defineContentUsage({
+    contentType: 'monsters',
+    sources: [{ source: emptyContentUsageSource, entry: true, batch: true }],
+    summaryLabels: { singular: 'monster', plural: 'monsters' },
+    overviewUsageScope: 'characters',
+    viewerCharacterRelationship: { strategy: 'none' },
   }),
 ] as const satisfies readonly ContentUsageRegistration[]
 

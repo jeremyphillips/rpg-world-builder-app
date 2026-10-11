@@ -64,18 +64,42 @@ export const ALIGNMENT_ENTRIES = {
     description:
       'Chaotic Evil creatures act with arbitrary violence, spurred by their hatred or bloodlust. A villain pursuing schemes of vengeance and havoc is probably Chaotic Evil.',
   },
+  unaligned: {
+    label: 'Unaligned',
+    description:
+      'Some creatures lack the sapience or moral agency to hold an alignment. Constructs, mindless undead, and similar beings are unaligned.',
+  },
 } as const satisfies Record<string, GameTermEntry>
 
 export type Alignment = keyof typeof ALIGNMENT_ENTRIES
 
 export const ALIGNMENTS = keysFromEntries(ALIGNMENT_ENTRIES)
 
+/** Playable character and NPC alignments — excludes {@link unaligned}. */
+export const CHARACTER_ALIGNMENT_ENTRIES = {
+  lg: ALIGNMENT_ENTRIES.lg,
+  ng: ALIGNMENT_ENTRIES.ng,
+  cg: ALIGNMENT_ENTRIES.cg,
+  ln: ALIGNMENT_ENTRIES.ln,
+  n: ALIGNMENT_ENTRIES.n,
+  cn: ALIGNMENT_ENTRIES.cn,
+  le: ALIGNMENT_ENTRIES.le,
+  ne: ALIGNMENT_ENTRIES.ne,
+  ce: ALIGNMENT_ENTRIES.ce,
+} as const satisfies Record<string, GameTermEntry>
+
+export type CharacterAlignment = keyof typeof CHARACTER_ALIGNMENT_ENTRIES
+
+export const CHARACTER_ALIGNMENTS = keysFromEntries(CHARACTER_ALIGNMENT_ENTRIES)
+
 export const alignmentSchema = vocabEnumFromEntries(ALIGNMENT_ENTRIES)
+
+export const characterAlignmentSchema = vocabEnumFromEntries(CHARACTER_ALIGNMENT_ENTRIES)
 
 /** Coerces blank select sentinels before enum validation (forms, persisted drafts). */
 export const optionalAlignmentSchema = z.preprocess(
   (value) => (typeof value === 'string' && value.length === 0 ? undefined : value),
-  alignmentSchema.optional(),
+  characterAlignmentSchema.optional(),
 )
 
 /** Returns the reference entry for an alignment id, if known. */

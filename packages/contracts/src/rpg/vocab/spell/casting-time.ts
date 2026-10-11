@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { ACTION_ECONOMY_ENTRIES } from '../action-economy'
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
 import type { GameTermEntry, VocabularyTerm } from '../types'
 
@@ -17,12 +18,7 @@ export const CASTING_TIME_UNIT_TERM = {
 } as const satisfies VocabularyTerm
 
 export const CASTING_TIME_UNIT_ENTRIES = {
-  action: { label: 'Action', description: 'Cast using an action on your turn.' },
-  'bonus-action': { label: 'Bonus action', description: 'Cast using a bonus action on your turn.' },
-  reaction: {
-    label: 'Reaction',
-    description: 'Cast in response to a trigger, using your reaction.',
-  },
+  ...ACTION_ECONOMY_ENTRIES,
   minute: { label: 'Minute', description: 'Casting takes one or more minutes.' },
   hour: { label: 'Hour', description: 'Casting takes one or more hours.' },
 } as const satisfies Record<string, GameTermEntry>

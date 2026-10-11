@@ -1,4 +1,4 @@
-import { keysFromEntries } from './enum-schema'
+import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { SKILL_PROFICIENCY_SENTENCE } from './proficiency-sentence'
 import {
   getTermCollectionLabel,
@@ -21,6 +21,32 @@ export const PROFICIENCY_TERM = {
     plural: 'proficiencies',
   },
 } as const satisfies VocabularyTerm
+
+export const PROFICIENCY_RANK_TERM = {
+  label: 'Proficiency Rank',
+  description: 'How deeply a creature is trained with a skill.',
+  sentence: {
+    singular: 'proficiency rank',
+    plural: 'proficiency ranks',
+  },
+} as const satisfies VocabularyTerm
+
+export const PROFICIENCY_RANK_ENTRIES = {
+  proficient: {
+    label: 'Proficient',
+    description: 'Adds the proficiency bonus to the governing ability modifier.',
+  },
+  expertise: {
+    label: 'Expertise',
+    description: 'Adds double the proficiency bonus to the governing ability modifier.',
+  },
+} as const satisfies Record<string, GameTermEntry>
+
+export type ProficiencyRank = keyof typeof PROFICIENCY_RANK_ENTRIES
+
+export const PROFICIENCY_RANK_IDS = keysFromEntries(PROFICIENCY_RANK_ENTRIES)
+
+export const proficiencyRankSchema = vocabEnumFromEntries(PROFICIENCY_RANK_ENTRIES)
 
 export const PROFICIENCY_DOMAIN_ENTRIES = {
   weapon: {

@@ -8,6 +8,7 @@ export const CONTENT_TYPE_MEDIA_DOMAIN = {
   equipment: 'equipment',
   locations: 'location',
   organizations: 'organization',
+  monsters: 'monster',
 } as const satisfies Partial<Record<ContentTypeKey, ContentMediaDomain>>
 
 export type ContentTypeMediaEnabledKey = keyof typeof CONTENT_TYPE_MEDIA_DOMAIN

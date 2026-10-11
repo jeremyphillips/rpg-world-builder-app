@@ -10,6 +10,7 @@ const SEARCH_TARGET_FALLBACK = {
   'skill-proficiency': 'skill-proficiency',
   organization: 'organization',
   location: 'location',
+  monster: 'monster',
   'game-term': 'game-term',
 } as const satisfies Record<
   Exclude<GlobalSearchTarget['kind'], 'character'>,

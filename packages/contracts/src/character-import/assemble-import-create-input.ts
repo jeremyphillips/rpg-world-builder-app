@@ -9,7 +9,7 @@ import {
 import type { CharacterProficiencies } from '../rpg/runtime/character/sheet/proficiencies'
 import type { CharacterSpellEntry } from '../rpg/runtime/character/sheet/spells'
 import type { CharacterSelectionSource } from '../rpg/runtime/character/sheet/selection-sources'
-import type { Alignment } from '../rpg/vocab/alignment'
+import type { CharacterAlignment } from '../rpg/vocab/alignment'
 import type { CharacterGender } from '../rpg/vocab/character-gender'
 import type { SystemRulesetId } from '../rpg/primitives/ruleset'
 import type { CharacterImportResult } from './adapter/character-import-result.schema'
@@ -35,7 +35,7 @@ export type CharacterImportFinalizeOptions = {
   rulesetId: SystemRulesetId
   catalogIndex: CharacterBuildCatalogIndex
   /** Used when the provider omits alignment (common for D&D Beyond). */
-  defaultAlignment?: Alignment
+  defaultAlignment?: CharacterAlignment
   /** Used when the provider omits gender (common for D&D Beyond). */
   defaultGender?: CharacterGender
 }
@@ -173,7 +173,7 @@ function assembleImportedSpells(spells: RecognizedSpellPreview[]): CharacterSpel
 function resolveImportedAlignment(
   extraction: CharacterImportResult['extraction'],
   options: CharacterImportFinalizeOptions,
-): Alignment {
+): CharacterAlignment {
   if (extraction.alignment.status === 'mapped' && extraction.alignment.value) {
     return extraction.alignment.value
   }

@@ -8,7 +8,7 @@ import { spellcastingFocusGearKindSchema } from '../../vocab/equipment/spellcast
 // authoring and resolved character inventory rows.
 // ---------------------------------------------------------------------------
 
-export const EQUIPMENT_MODIFIER_KINDS = ['spellcasting_focus'] as const
+export const EQUIPMENT_MODIFIER_KINDS = ['spellcasting_focus', 'armor_class'] as const
 
 export const equipmentModifierKindSchema = z.enum(EQUIPMENT_MODIFIER_KINDS)
 
@@ -29,8 +29,21 @@ export const spellcastingFocusModifierSchema = z
 
 export type SpellcastingFocusModifier = z.infer<typeof spellcastingFocusModifierSchema>
 
+export const armorClassEquipmentModifierSchema = z
+  .object({
+    kind: z.literal('armor_class'),
+    bonus: z
+      .number()
+      .int()
+      .refine((value) => value !== 0, { message: 'Bonus must be non-zero.' }),
+  })
+  .strict()
+
+export type ArmorClassEquipmentModifier = z.infer<typeof armorClassEquipmentModifierSchema>
+
 export const equipmentModifierSchema = z.discriminatedUnion('kind', [
   spellcastingFocusModifierSchema,
+  armorClassEquipmentModifierSchema,
 ])
 
 export type EquipmentModifier = z.infer<typeof equipmentModifierSchema>

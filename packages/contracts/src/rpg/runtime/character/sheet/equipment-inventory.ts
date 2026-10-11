@@ -1,27 +1,21 @@
 import { z } from 'zod'
 
 import { coinWealthSchema, type CoinWealth } from '../../../primitives/wealth'
-import type { ArmorEquipment, Equipment } from '../../../content/equipment'
+import type { Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
+import { equipmentInstanceSchema } from '../../../content/equipment/instance'
 import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
-import { equipmentModifierSchema } from '../../../content/equipment/modifier'
 import type { EquipmentKind } from '../../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../../creature/equipment'
+import { toEquippedArmorPiece, type EquippedArmorPiece } from '../../creature/armor-class'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------
 // Equipment, wealth, and feats
 // ---------------------------------------------------------------------------
 
-export const characterEquipmentEntrySchema = z.object({
-  /** Optional stable row id for duplicate or customized copies of the same item. */
-  entryId: z.string().min(1).optional(),
-  equipmentId: z.string().min(1),
-  quantity: z.number().int().min(1).default(1),
-  equipped: z.boolean().optional(),
+export const characterEquipmentEntrySchema = equipmentInstanceSchema.extend({
   attuned: z.boolean().optional(),
-  customName: z.string().min(1).optional(),
-  modifiers: z.array(equipmentModifierSchema).optional(),
   sources: characterSelectionSourcesSchema,
   notes: z.string().optional(),
 })
@@ -124,11 +118,11 @@ export function characterWealthFromGrant(grant: CharacterWealthGrant | undefined
 export function resolveEquippedArmorFromInventory(args: {
   equipment: CharacterEquipment
   catalog: CreatureEquipmentCatalog
-}): ArmorEquipment[] {
+}): EquippedArmorPiece[] {
   return args.equipment.armor.flatMap((entry) => {
     if (!entry.equipped) return []
     const item = args.catalog.get(entry.equipmentId)
-    return item && isArmorEquipment(item) ? [item] : []
+    return item && isArmorEquipment(item) ? [toEquippedArmorPiece(item, entry.modifiers)] : []
   })
 }
 

@@ -1,13 +1,16 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
-import { abilitySchema, abilityScoreSchema } from '../vocab/ability'
+import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
+import { proficiencyRankSchema } from '../vocab/proficiency'
+import { weaponCategorySchema } from '../vocab/weapon/category'
+import { equipmentInstanceSchema } from './equipment/instance'
 
 /**
  * Shared creature value objects for contracts that describe creatures.
@@ -82,33 +85,34 @@ export const creatureStatBlockHitPointsSchema = z.object({
 export type CreatureStatBlockHitPoints = z.infer<typeof creatureStatBlockHitPointsSchema>
 
 // ---------------------------------------------------------------------------
-// Stat-block modifiers
+// Proficiency entries (neutral — characters extend with sources / mastery)
 // ---------------------------------------------------------------------------
 
-/**
- * Explicit skill modifier for stat blocks.
- *
- * Monsters often publish final skill values that are better treated as authored
- * outputs than derived proficiency ranks.
- */
-export const creatureSkillModifierEntrySchema = z.object({
+export const creatureSkillProficiencyEntrySchema = z.object({
   skill: skillSchema,
-  modifier: z.number().int(),
+  rank: proficiencyRankSchema,
 })
 
-export type CreatureSkillModifierEntry = z.infer<typeof creatureSkillModifierEntrySchema>
+export type CreatureSkillProficiencyEntry = z.infer<typeof creatureSkillProficiencyEntrySchema>
 
-/**
- * Explicit saving throw modifier for stat blocks.
- *
- * Character saving throw proficiency can remain class/feature derived; monsters
- * can store the final stat-block modifier directly.
- */
-export const creatureSavingThrowModifierEntrySchema = z.object({
-  ability: abilitySchema,
-  modifier: z.number().int(),
-})
+export const creatureWeaponProficiencyTargetSchema = z
+  .object({
+    weaponId: z.string().min(1).optional(),
+    weaponCategory: weaponCategorySchema.optional(),
+  })
+  .superRefine((target, ctx) => {
+    const hasWeaponId = target.weaponId !== undefined
+    const hasCategory = target.weaponCategory !== undefined
+    if (hasWeaponId === hasCategory) {
+      addCustomRefinementIssue(
+        ctx,
+        'Provide exactly one of weaponId or weaponCategory.',
+        hasWeaponId ? ['weaponCategory'] : ['weaponId'],
+      )
+    }
+  })
 
-export type CreatureSavingThrowModifierEntry = z.infer<
-  typeof creatureSavingThrowModifierEntrySchema
->
+export type CreatureWeaponProficiencyTarget = z.infer<typeof creatureWeaponProficiencyTargetSchema>
+
+export { equipmentInstanceSchema }
+export type { EquipmentInstance } from './equipment/instance'

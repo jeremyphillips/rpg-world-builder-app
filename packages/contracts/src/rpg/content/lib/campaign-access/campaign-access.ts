@@ -91,16 +91,18 @@ export type ContentCampaignAccessUpdateResult = z.infer<
 export type ResolveContentCampaignAccessOptions = {
   /** Campaign-submitted PC ids still present in the roster — splits stale grants. */
   validParticipantIds?: readonly string[]
+  /** Type default when no stored overlay exists — resolved at read time. */
+  defaultAccess?: Pick<ContentCampaignAccess, 'available' | 'visibilityMode' | 'participantIds'>
 }
 
 export function resolveContentCampaignAccess(
   stored: Partial<ContentCampaignAccess> | null | undefined,
   options?: ResolveContentCampaignAccessOptions,
 ): ResolvedContentCampaignAccess {
-  const available = stored?.available ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.available
-  const visibilityMode = stored?.visibilityMode ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.visibilityMode
-  const storedParticipantIds =
-    stored?.participantIds ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS.participantIds
+  const fallback = options?.defaultAccess ?? DEFAULT_CONTENT_CAMPAIGN_ACCESS
+  const available = stored?.available ?? fallback.available
+  const visibilityMode = stored?.visibilityMode ?? fallback.visibilityMode
+  const storedParticipantIds = stored?.participantIds ?? fallback.participantIds
 
   let participantIds = storedParticipantIds
   let unavailableParticipantIds: string[] = []

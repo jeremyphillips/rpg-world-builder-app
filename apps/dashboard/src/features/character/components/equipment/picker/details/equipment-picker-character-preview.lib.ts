@@ -14,8 +14,8 @@ import {
   weaponAttackBonus,
   type Ability,
   type ArmorClassBase,
-  type ArmorEquipment,
   type CharacterBuildCatalogIndex,
+  type EquippedArmorPiece,
   type CharacterBuilderDraft,
   type Equipment,
   type ResolvedCharacterCreationRules,
@@ -35,7 +35,7 @@ export type EquipmentPickerCharacterPreviewContext = {
   level: number
   armorClassBase: ArmorClassBase
   abilityScores?: Partial<Record<Ability, number>>
-  equippedArmor?: readonly ArmorEquipment[]
+  equippedArmor?: readonly EquippedArmorPiece[]
   budget?: EquipmentBudgetSummary
 }
 

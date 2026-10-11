@@ -8,6 +8,7 @@ import type {
   GlobalSearchField,
   GlobalSearchTarget,
   Location,
+  Monster,
   Organization,
   ResolvedContentCampaignAccess,
   SkillProficiency,
@@ -22,6 +23,7 @@ import {
   buildSpellPickerSearchText,
   formatSpellPickerMetadataGroupLabel,
   equipmentKindToFamilyPath,
+  getChallengeRatingLabel,
   getContentTypeTerm,
   getCreatureSizeLabel,
   resolveLocationClassificationDisplay,
@@ -131,6 +133,28 @@ function buildFeatFields(feat: Feat): GlobalSearchField[] {
 
 function buildFeatTarget(feat: Feat): GlobalSearchTarget {
   return { kind: 'feat', id: feat.id }
+}
+
+function buildMonsterSecondary(monster: Monster): string {
+  return (
+    joinCompactSegments(
+      getCreatureSizeLabel(monster.size),
+      monster.creatureType,
+      getChallengeRatingLabel(monster.challengeRating),
+    ) ?? getChallengeRatingLabel(monster.challengeRating)
+  )
+}
+
+function buildMonsterFields(monster: Monster): GlobalSearchField[] {
+  return [
+    labelField(monster.name),
+    keywordField(monster.slug),
+    descriptionField(stripHtmlTags(monster.description ?? '')),
+  ]
+}
+
+function buildMonsterTarget(monster: Monster): GlobalSearchTarget {
+  return { kind: 'monster', id: monster.id }
 }
 
 function buildEquipmentSecondary(equipment: Equipment): string {
@@ -253,6 +277,11 @@ const CONTENT_PROJECTORS: {
     secondary: (entity) => buildLocationSecondary(entity as Location),
     fields: (entity) => buildLocationFields(entity as Location),
     target: (entity) => buildLocationTarget(entity as Location),
+  },
+  monsters: {
+    secondary: (entity) => buildMonsterSecondary(entity as Monster),
+    fields: (entity) => buildMonsterFields(entity as Monster),
+    target: (entity) => buildMonsterTarget(entity as Monster),
   },
 }
 

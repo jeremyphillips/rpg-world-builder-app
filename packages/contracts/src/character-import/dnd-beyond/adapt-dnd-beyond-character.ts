@@ -1,6 +1,6 @@
 // fallow-ignore-file complexity
 import type { CoinWealth } from '../../rpg/primitives/wealth'
-import type { Alignment } from '../../rpg/vocab/alignment'
+import type { CharacterAlignment } from '../../rpg/vocab/alignment'
 import type { CharacterGender } from '../../rpg/vocab/character-gender'
 import type { CharacterAbilityScores } from '../../rpg/runtime/character/sheet/core'
 import type { DndBeyondCharacterPayload, DndBeyondModifier } from './dnd-beyond-character.schema'
@@ -61,7 +61,7 @@ const DND_BEYOND_STAT_ID_TO_ABILITY = {
   6: 'cha',
 } as const satisfies Record<number, keyof CharacterAbilityScores>
 
-const DND_BEYOND_ALIGNMENT_ID_TO_LOCAL: Record<number, Alignment> = {
+const DND_BEYOND_ALIGNMENT_ID_TO_LOCAL: Record<number, CharacterAlignment> = {
   1: 'lg',
   2: 'ng',
   3: 'cg',
@@ -78,7 +78,7 @@ const DND_BEYOND_GENDER_NAME_TO_LOCAL: Record<string, CharacterGender> = {
   female: 'female',
 }
 
-const DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL: Record<string, Alignment> = {
+const DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL: Record<string, CharacterAlignment> = {
   'lawful good': 'lg',
   'neutral good': 'ng',
   'chaotic good': 'cg',
@@ -328,7 +328,7 @@ function extractAbilityScores(
   return mappedFieldResult(scores, sourcePaths)
 }
 
-function mapAlignmentName(value: string): Alignment | undefined {
+function mapAlignmentName(value: string): CharacterAlignment | undefined {
   return DND_BEYOND_ALIGNMENT_NAME_TO_LOCAL[value.trim().toLowerCase()]
 }
 
@@ -356,7 +356,7 @@ function extractGender(
 
 function extractAlignment(
   payload: DndBeyondCharacterPayload,
-): CharacterImportFieldResult<Alignment> {
+): CharacterImportFieldResult<CharacterAlignment> {
   const sourcePaths = ['data.alignmentId', 'data.alignment']
   const alignmentId = payload.alignmentId
 

@@ -1,5 +1,6 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
+import type { CreatureWeaponProficiencyTarget } from '../../content/creature'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type {
   ArmorTrainingPool,
@@ -36,6 +37,29 @@ function toolIdMatchesEquipment(
     equipment,
     rulesetId: equipment.rulesetId,
   })
+}
+
+function weaponIdMatchesEquipment(
+  weaponId: string,
+  equipment: Extract<Equipment, { kind: 'weapon' }>,
+): boolean {
+  return (
+    weaponId === equipment.id ||
+    weaponId === equipment.slug ||
+    toEquipmentContentId(equipment.rulesetId, weaponId) === equipment.id
+  )
+}
+
+/** Returns true when weapon proficiency targets cover a catalog weapon row. */
+export function isWeaponProficient(
+  weapon: Extract<Equipment, { kind: 'weapon' }>,
+  targets: readonly CreatureWeaponProficiencyTarget[],
+): boolean {
+  return targets.some(
+    (entry) =>
+      (entry.weaponId !== undefined && weaponIdMatchesEquipment(entry.weaponId, weapon)) ||
+      (entry.weaponCategory !== undefined && entry.weaponCategory === weapon.category),
+  )
 }
 
 /** Returns true when proficiency rows cover a catalog tool row. */

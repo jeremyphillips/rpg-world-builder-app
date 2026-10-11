@@ -4,6 +4,7 @@ import { makeCharacterClass } from './factories/character-class'
 import { makeEquipment } from './factories/equipment'
 import { makeFeat } from './factories/feat'
 import { makeLocation } from './factories/location'
+import { makeMonster } from './factories/monster'
 import { makeOrganization } from './factories/organization'
 import { makeSkillProficiency } from './factories/skill-proficiency'
 import { makeSpecies } from './factories/species'
@@ -19,4 +20,5 @@ export const CONTENT_TEST_FACTORY_REGISTRY = {
   'skill-proficiencies': makeSkillProficiency,
   organizations: makeOrganization,
   locations: makeLocation,
+  monsters: makeMonster,
 } as const satisfies Record<ContentTypeKey, (...args: never[]) => unknown>

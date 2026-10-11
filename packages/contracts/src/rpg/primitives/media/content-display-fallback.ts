@@ -16,6 +16,7 @@ export const CONTENT_DISPLAY_FALLBACKS = [
   'feat',
   'skill-proficiency',
   'game-term',
+  'monster',
   'generic',
 ] as const
 
@@ -50,6 +51,7 @@ const MEDIA_DOMAIN_COMPACT_FALLBACK: Record<ContentMediaDomain, ContentDisplayFa
   class: 'class',
   species: 'species',
   'game-term': 'game-term',
+  monster: 'monster',
 }
 
 function resolveMediaDomainFallback(
@@ -62,6 +64,10 @@ function resolveMediaDomainFallback(
 
   if (domain === 'class' || domain === 'species') {
     return 'generic'
+  }
+
+  if (domain === 'monster') {
+    return 'monster'
   }
 
   return MEDIA_DOMAIN_COMPACT_FALLBACK[domain]
@@ -94,6 +100,19 @@ function resolveContentDisplayFallbackSubjectForContentType(
 }
 
 /** Preview rail, catalog chrome — `surface: 'field'` matches detail/field fallback policy. */
+/** Semantic identity fallback for every catalog content type (never `generic`). */
+export const CONTENT_TYPE_IDENTITY_FALLBACK = {
+  classes: 'class',
+  spells: 'spell',
+  species: 'species',
+  feats: 'feat',
+  equipment: 'equipment',
+  'skill-proficiencies': 'skill-proficiency',
+  organizations: 'organization',
+  locations: 'location',
+  monsters: 'monster',
+} as const satisfies Record<ContentTypeKey, Exclude<ContentDisplayFallback, 'generic'>>
+
 export function resolveContentDisplayFallbackForContentType(
   contentType: ContentTypeKey,
   surface: ContentDisplayFallbackSurface = 'field',

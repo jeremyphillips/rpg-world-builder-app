@@ -10,6 +10,7 @@ import {
   MapPin,
   Medal,
   Sparkles,
+  Skull,
   Tags,
   UserRound,
 } from 'lucide-react'
@@ -30,5 +31,6 @@ export const CONTENT_DISPLAY_FALLBACK_ICONS: Record<ContentDisplayFallback, AppI
   feat: Medal,
   'skill-proficiency': ListChecks,
   'game-term': Tags,
+  monster: Skull,
   generic: Castle,
 }

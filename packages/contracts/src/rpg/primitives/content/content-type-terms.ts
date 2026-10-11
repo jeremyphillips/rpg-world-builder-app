@@ -64,6 +64,14 @@ export const CONTENT_TYPE_TERMS = {
       plural: 'locations',
     },
   },
+  monsters: {
+    label: 'Monster',
+    description: 'A creature stat block for encounters and reference.',
+    sentence: {
+      singular: 'monster',
+      plural: 'monsters',
+    },
+  },
 } as const satisfies Record<ContentTypeKey, VocabularyTerm>
 
 /** Returns the catalog content-type term for a collection key. */
@@ -93,6 +101,7 @@ export const EQUIPMENT_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.equipment
 export const SKILL_PROFICIENCY_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS['skill-proficiencies']
 export const ORGANIZATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.organizations
 export const LOCATION_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.locations
+export const MONSTER_CONTENT_TYPE_TERM = CONTENT_TYPE_TERMS.monsters
 
 /** Every `ContentTypeKey` has a registered term — drift guard for new catalog types. */
 export const CONTENT_TYPE_TERM_KEYS = CONTENT_TYPE_KEYS
