@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { UseFormReturn, FieldValues } from 'react-hook-form'
 import { useFormState } from 'react-hook-form'
-import { Button } from '@rpg/ui'
+import { Button, SemanticText } from '@rpg/ui'
 import { FormFooterActions, useFormUiContext, useSchemaFormSubmit } from '@rpg/ui/form'
 
 import {
@@ -14,6 +14,7 @@ import { composeFormLeaveDirty } from '@/lib/form-leave-dirty'
 import { useSubclassUnsavedEditsBlocking } from '@/features/content/classes/hooks/use-subclass-unsaved-edits'
 
 import { resolveContentFormFooterPresentation } from './content-form-footer.lib'
+import { useContentFormWriteGateReason } from './content-form-write-gate'
 import { useContentFormActionState } from './use-content-form-action-state'
 import type { ContentSaveActionState } from '../session/use-content-save-session'
 
@@ -103,7 +104,9 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
   onLeaveGuardReady,
 }: ContentFormFooterProps<TFieldValues>) {
   const fallbackActionState = useContentFormActionState({ mode, pending })
+  const writeGateReason = useContentFormWriteGateReason()
   const resolvedActionState = actionState ?? fallbackActionState
+  const submitDisabled = resolvedActionState.submitDisabled || writeGateReason !== null
   const createPending = pending || saveDraftPending
   const { dirtyFields } = useFormState({ control: form.control })
   const subclassEdits = useSubclassUnsavedEditsBlocking()
@@ -127,7 +130,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
       <ContentCreateFooterSecondary
         backHref={backHref}
         createPending={createPending}
-        submitDisabled={resolvedActionState.submitDisabled}
+        submitDisabled={submitDisabled}
         saveDraftPending={saveDraftPending}
         onSaveDraft={onSaveDraft}
       />
@@ -153,7 +156,7 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
     mode === 'edit' && actionState ? (
       <Button
         type="button"
-        disabled={resolvedActionState.submitDisabled || pending}
+        disabled={submitDisabled || pending}
         onClick={() => void actionState.save()}
       >
         {pending ? pendingLabel : submitLabel}
@@ -168,10 +171,11 @@ export function ContentFormFooter<TFieldValues extends FieldValues>({
         pending={leavePending}
         renderDialog={false}
       />
+      {writeGateReason ? <SemanticText tone="warning">{writeGateReason}</SemanticText> : null}
       <FormFooterActions
         secondary={secondary}
         pending={pending}
-        submitDisabled={resolvedActionState.submitDisabled}
+        submitDisabled={submitDisabled}
         secondaryDisabled={createPending}
         isSuccess={presentation.isSuccess}
         submitLabel={presentation.submitLabel}

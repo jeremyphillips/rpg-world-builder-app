@@ -3,8 +3,6 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { abilitySchema } from '../vocab/ability'
 import { challengeRatingSchema, CHALLENGE_RATING_MECHANICS } from '../vocab/challenge-rating'
-import { damageTypeIdSchema } from '../vocab/damage'
-import { effectConditionSchema } from '../vocab/effect-condition'
 import { languageIdSchema } from '../vocab/language'
 import {
   creatureAbilityScoresSchema,
@@ -14,9 +12,11 @@ import {
   creatureSizeRefSchema,
   creatureSkillProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
+  creatureDefensesSchema,
   creatureTypeRefSchema,
   creatureWeaponProficiencyTargetSchema,
   equipmentInstanceSchema,
+  refineCreatureDamageDefenses,
 } from './creature'
 import { customContentTraitSchema } from './lib/grants/grants'
 import { MONSTER_CONTENT_TYPE_TERM } from '../primitives/content/content-type-terms'
@@ -75,6 +75,12 @@ export const monsterTraitSchema = customContentTraitSchema
   .pick({ id: true, name: true })
   .extend({ description: z.string().min(1) })
 
+export const monsterTraitDraftSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1).optional(),
+  description: z.string().min(1).optional(),
+})
+
 export const monsterEquipmentEntrySchema = equipmentInstanceSchema
   .extend({ entryId: z.string().min(1) })
   .superRefine((entry, ctx) => atMostOneArmorClassModifier(entry.modifiers, ctx, ['modifiers']))
@@ -108,12 +114,7 @@ export const monsterBodyFields = {
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
     weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
   }),
-  defenses: z.object({
-    vulnerabilities: z.array(damageTypeIdSchema).default([]),
-    resistances: z.array(damageTypeIdSchema).default([]),
-    immunities: z.array(damageTypeIdSchema).default([]),
-    conditionImmunities: z.array(effectConditionSchema).default([]),
-  }),
+  defenses: creatureDefensesSchema,
   equipment: z.array(monsterEquipmentEntrySchema).default([]),
   traits: z.array(monsterTraitSchema).default([]),
   actions: z.array(monsterActionSchema).default([]),
@@ -141,6 +142,7 @@ export const monsterBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   actions: z.array(monsterActionDraftSchema).default([]),
   bonusActions: z.array(monsterActionDraftSchema).default([]),
   reactions: z.array(monsterReactionDraftSchema).default([]),
+  traits: z.array(monsterTraitDraftSchema).default([]),
 })
 
 export type MonsterBodyDraft = z.infer<typeof monsterBodyDraftSchema>
@@ -157,16 +159,78 @@ function collectActionIds(body: {
   ]
 }
 
+const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
+
+function refineUniqueIds(
+  ids: readonly string[],
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+  message: string,
+): void {
+  const seen = new Set<string>()
+  ids.forEach((id, index) => {
+    if (seen.has(id)) {
+      addCustomRefinementIssue(ctx, message, [...path, index, 'id'])
+    }
+    seen.add(id)
+  })
+}
+
+function refineWeaponEntryReferences(
+  body: {
+    equipment: readonly { entryId: string }[]
+    actions: readonly { kind: string; equipmentEntryId?: string }[]
+    bonusActions: readonly { kind: string; equipmentEntryId?: string }[]
+    reactions: readonly { kind: string; equipmentEntryId?: string }[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+  options: { requirePresent: boolean },
+): void {
+  const equipmentByEntryId = new Set(body.equipment.map((entry) => entry.entryId))
+  for (const section of MONSTER_ACTION_SECTIONS) {
+    for (const [index, action] of body[section].entries()) {
+      if (action.kind !== 'weapon') continue
+      const equipmentEntryId = action.equipmentEntryId
+      if (!equipmentEntryId) {
+        if (options.requirePresent) {
+          addCustomRefinementIssue(ctx, 'Weapon action must reference an equipment entry.', [
+            ...prefix,
+            section,
+            index,
+            'equipmentEntryId',
+          ])
+        }
+        continue
+      }
+      if (!equipmentByEntryId.has(equipmentEntryId)) {
+        addCustomRefinementIssue(ctx, 'Weapon action must reference an equipment entry.', [
+          ...prefix,
+          section,
+          index,
+          'equipmentEntryId',
+        ])
+      }
+    }
+  }
+}
+
 export function refineMonsterBody(
   body: MonsterBody,
   ctx: z.RefinementCtx,
   prefix: (string | number)[] = [],
 ): void {
-  const equipmentByEntryId = new Map(body.equipment.map((entry) => [entry.entryId, entry]))
-  const entryIds = body.equipment.map((e) => e.entryId)
+  const entryIds = body.equipment.map((entry) => entry.entryId)
   if (new Set(entryIds).size !== entryIds.length) {
     addCustomRefinementIssue(ctx, 'Equipment entry ids must be unique.', [...prefix, 'equipment'])
   }
+
+  refineUniqueIds(
+    body.traits.map((trait) => trait.id),
+    ctx,
+    [...prefix, 'traits'],
+    'Trait ids must be unique.',
+  )
 
   const actionIds = collectActionIds(body)
   if (new Set(actionIds).size !== actionIds.length) {
@@ -176,27 +240,14 @@ export function refineMonsterBody(
     ])
   }
 
-  for (const [index, action] of body.actions.entries()) {
-    refineMonsterActionShape(action, ctx, [...prefix, 'actions', index])
-    if (action.kind === 'weapon') {
-      if (!equipmentByEntryId.has(action.equipmentEntryId)) {
-        addCustomRefinementIssue(ctx, 'Weapon action must reference an equipment entry.', [
-          ...prefix,
-          'actions',
-          index,
-          'equipmentEntryId',
-        ])
-      }
+  for (const section of MONSTER_ACTION_SECTIONS) {
+    for (const [index, action] of body[section].entries()) {
+      refineMonsterActionShape(action, ctx, [...prefix, section, index])
     }
   }
 
-  for (const [index, action] of body.bonusActions.entries()) {
-    refineMonsterActionShape(action, ctx, [...prefix, 'bonusActions', index])
-  }
-
-  for (const [index, action] of body.reactions.entries()) {
-    refineMonsterActionShape(action, ctx, [...prefix, 'reactions', index])
-  }
+  refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
+  refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
 
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {
@@ -223,11 +274,57 @@ export const monsterSchema = publishStoredSchema(monsterBodySchema).superRefine(
   refineMonsterBody(monster as MonsterBody, ctx),
 ) as unknown as z.ZodType<Monster>
 
-export const monsterDraftStoredSchema = draftStoredSchema(monsterBodyDraftSchema)
+function refineMonsterDraftBody(
+  body: MonsterBodyDraft,
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const equipment = body.equipment ?? []
+  const entryIds = equipment.map((entry) => entry.entryId)
+  if (new Set(entryIds).size !== entryIds.length) {
+    addCustomRefinementIssue(ctx, 'Equipment entry ids must be unique.', [...prefix, 'equipment'])
+  }
+
+  refineUniqueIds(
+    (body.traits ?? []).map((trait) => trait.id),
+    ctx,
+    [...prefix, 'traits'],
+    'Trait ids must be unique.',
+  )
+
+  const actionIds = collectActionIds({
+    actions: body.actions ?? [],
+    bonusActions: body.bonusActions ?? [],
+    reactions: body.reactions ?? [],
+  })
+  if (new Set(actionIds).size !== actionIds.length) {
+    addCustomRefinementIssue(ctx, 'Action ids must be unique across all sections.', [
+      ...prefix,
+      'actions',
+    ])
+  }
+
+  refineWeaponEntryReferences(
+    {
+      equipment,
+      actions: body.actions ?? [],
+      bonusActions: body.bonusActions ?? [],
+      reactions: body.reactions ?? [],
+    },
+    ctx,
+    prefix,
+    { requirePresent: false },
+  )
+}
+
+export const monsterDraftStoredSchema = draftStoredSchema(monsterBodyDraftSchema).superRefine(
+  (monster, ctx) => refineMonsterDraftBody(monster as MonsterBodyDraft, ctx),
+)
 
 export type MonsterDraft = z.infer<typeof monsterDraftStoredSchema>
 
 const monsterPublishInputSchema = createPublishInputSchema(monsterBodySchema)
+const monsterDraftInputSchema = createDraftInputSchema(monsterBodyDraftSchema)
 
 export const createMonsterInputSchema = monsterPublishInputSchema.superRefine((input, ctx) =>
   refineMonsterBody(input as MonsterBody, ctx),
@@ -235,15 +332,33 @@ export const createMonsterInputSchema = monsterPublishInputSchema.superRefine((i
 
 export type CreateMonsterInput = z.infer<typeof createMonsterInputSchema>
 
-export const createMonsterDraftInputSchema = createDraftInputSchema(monsterBodyDraftSchema)
+export const createMonsterDraftInputSchema = monsterDraftInputSchema.superRefine((input, ctx) =>
+  refineMonsterDraftBody(input as MonsterBodyDraft, ctx),
+)
 
 export type CreateMonsterDraftInput = z.infer<typeof createMonsterDraftInputSchema>
 
-export const updateMonsterInputSchema = monsterPublishInputSchema.partial()
+export const updateMonsterInputSchema = monsterPublishInputSchema.partial().extend({
+  experiencePointsOverride: z.number().int().min(0).nullable().optional(),
+  hover: z.boolean().nullable().optional(),
+  description: z.string().nullable().optional(),
+})
 
 export type UpdateMonsterInput = z.infer<typeof updateMonsterInputSchema>
 
-export const updateMonsterDraftInputSchema = createMonsterDraftInputSchema.partial()
+export const updateMonsterDraftInputSchema = monsterDraftInputSchema
+  .partial()
+  .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
+
+export {
+  collectMonsterCatalogIssues,
+  MONSTER_CATALOG_ISSUE_CODE,
+} from './monster/monster-catalog-issues'
+export type {
+  MonsterCatalogIssueBody,
+  MonsterCatalogIssueCode,
+  MonsterCatalogs,
+} from './monster/monster-catalog-issues'
 
 export type UpdateMonsterDraftInput = z.infer<typeof updateMonsterDraftInputSchema>
 

@@ -3,6 +3,8 @@ import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 
 import { abilityScoreSchema } from '../vocab/ability'
 import { alignmentSchema } from '../vocab/alignment'
+import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
+import { effectConditionSchema } from '../vocab/effect-condition'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
 import { senseSchema } from '../vocab/sense'
@@ -113,6 +115,50 @@ export const creatureWeaponProficiencyTargetSchema = z
   })
 
 export type CreatureWeaponProficiencyTarget = z.infer<typeof creatureWeaponProficiencyTargetSchema>
+
+export const creatureDefensesSchema = z.object({
+  vulnerabilities: z.array(damageTypeIdSchema).default([]),
+  resistances: z.array(damageTypeIdSchema).default([]),
+  immunities: z.array(damageTypeIdSchema).default([]),
+  conditionImmunities: z.array(effectConditionSchema).default([]),
+})
+
+export type CreatureDefenses = z.infer<typeof creatureDefensesSchema>
+
+const DAMAGE_DEFENSE_LISTS = ['vulnerabilities', 'resistances', 'immunities'] as const
+
+const DAMAGE_DEFENSE_NOUN = {
+  vulnerabilities: 'vulnerability',
+  resistances: 'resistance',
+  immunities: 'immunity',
+} as const
+
+/** Publish guard: a damage type belongs to at most one damage-defense list. */
+export function refineCreatureDamageDefenses(
+  defenses: {
+    vulnerabilities?: readonly string[]
+    resistances?: readonly string[]
+    immunities?: readonly string[]
+  },
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[] = [],
+): void {
+  const seen = new Map<string, (typeof DAMAGE_DEFENSE_LISTS)[number]>()
+  for (const list of DAMAGE_DEFENSE_LISTS) {
+    for (const [index, damageType] of (defenses[list] ?? []).entries()) {
+      const prior = seen.get(damageType)
+      if (prior) {
+        addCustomRefinementIssue(
+          ctx,
+          `${getDamageTypeLabel(damageType)} is already a ${DAMAGE_DEFENSE_NOUN[prior]}.`,
+          [...prefix, list, index],
+        )
+      } else {
+        seen.set(damageType, list)
+      }
+    }
+  }
+}
 
 export { equipmentInstanceSchema }
 export type { EquipmentInstance } from './equipment/instance'

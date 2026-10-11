@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
-import { weaponDamageSchema, weaponRangeSchema } from '../equipment/weapon-variant'
+import {
+  weaponDamageDraftSchema,
+  weaponDamageSchema,
+  weaponRangeSchema,
+} from '../equipment/weapon-variant'
 import { damageTypeIdSchema } from '../../vocab/damage'
 import { weaponModeSchema, weaponPropertySchema } from '../../vocab/weapon'
 
@@ -72,7 +76,7 @@ function monsterActionDraftVariants<E extends z.ZodRawShape>(extension: E) {
       properties: z.array(weaponPropertySchema).optional(),
       reach: z.number().int().min(5).optional(),
       range: weaponRangeSchema.optional(),
-      damage: weaponDamageSchema.optional(),
+      damage: weaponDamageDraftSchema.optional(),
       damageType: damageTypeIdSchema.optional(),
       description: z.string().optional(),
       ...extension,

@@ -1,5 +1,16 @@
 import { createElement, type ReactNode } from 'react'
-import { BookOpen, Clock, Flag, Network, Scale, Sparkle, Target, Trees } from 'lucide-react'
+import {
+  BookOpen,
+  Clock,
+  Flag,
+  Gauge,
+  Network,
+  Scale,
+  Sparkle,
+  Swords,
+  Target,
+  Trees,
+} from 'lucide-react'
 import { contentIdentityIcon, type AppIcon } from '@rpg/ui'
 import type { TabbedFormTab } from '@rpg/ui/form'
 
@@ -16,6 +27,11 @@ export const CONTENT_FORM_TAB_ICONS = {
   casting: Clock,
   resolution: Target,
   tags: contentIdentityIcon('game-term'),
+  identity: contentIdentityIcon('monster'),
+  statistics: Gauge,
+  creatureDetails: contentIdentityIcon('species'),
+  equipment: contentIdentityIcon('equipment'),
+  actions: Swords,
 } as const satisfies Record<string, AppIcon>
 
 export type ContentFormTabIconId = keyof typeof CONTENT_FORM_TAB_ICONS

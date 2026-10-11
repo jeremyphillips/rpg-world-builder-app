@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
 
-import { diceSchema } from '../../primitives/dice'
+import { diceSchema, dieFaceSchema } from '../../primitives/dice'
 import {
   averageRollValue,
   formatRollValue,
@@ -59,6 +59,20 @@ export function formatWeaponRange(range: WeaponRange): string {
 
 /** Weapon damage uses the shared roll primitive. */
 export const weaponDamageSchema = rollSchema
+
+/**
+ * Draft weapon damage. Partial dice are kept; empty rolls are not rejected.
+ * Publish still uses {@link weaponDamageSchema}.
+ */
+export const weaponDamageDraftSchema = z.object({
+  dice: z
+    .object({
+      count: z.number().int().min(1).optional(),
+      faces: dieFaceSchema.optional(),
+    })
+    .optional(),
+  flat: z.number().int().optional(),
+})
 
 export type WeaponDamage = RollValue
 

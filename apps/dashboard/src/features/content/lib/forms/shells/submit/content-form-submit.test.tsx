@@ -45,7 +45,7 @@ const uiValue = {
   publishPresentationIssues: [],
   publishPresentationEnabled: false,
   removeValidationSessionExpandKeys: vi.fn(),
-} as FormUiContextValue
+} as unknown as FormUiContextValue
 
 function FormUiWrapper({ children }: { children: ReactNode }) {
   return <FormUiContext.Provider value={uiValue}>{children}</FormUiContext.Provider>

@@ -13,6 +13,7 @@ import {
 } from '@rpg/ui/form'
 
 import { CampaignAccessFormProvider } from '../../../campaign-access/campaign-access-form-context'
+import { ContentFormWriteGateProvider } from './content-form-write-gate'
 import { ContentEditPublishBridge } from '../edit/content-edit-publish-bridge'
 import type { ContentFormCampaignAccessProps } from './content-form-shell-layout.lib'
 import {
@@ -230,7 +231,7 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
   )
 
   return (
-    <>
+    <ContentFormWriteGateProvider>
       {tabbedFormTabs ? (
         <ContentPreviewUiProvider>
           <div className={isViewport ? contentViewportFormFillClasses : undefined}>
@@ -290,6 +291,6 @@ function ContentSchemaFormShellBody<TFormValues extends FieldValues>({
         </div>
       )}
       {submitConfirmDialog}
-    </>
+    </ContentFormWriteGateProvider>
   )
 }

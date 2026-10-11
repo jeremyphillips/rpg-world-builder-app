@@ -3,6 +3,7 @@ import type {
   ContentDemotionResult,
   ContentUsageBlocker,
 } from '@rpg/contracts'
+import { toApiValidationIssues } from '@rpg/contracts'
 import { ZodError } from 'zod'
 
 import { HttpError } from '../../../lib/http-error'
@@ -12,7 +13,7 @@ import {
   resolveAuthoritativeContentUsageBlockers,
 } from './content-usage/content-usage-resolvers'
 import type { ContentWriteConfig, WriteEntityBase } from './content-write-config'
-import { resolveContentEntityForWrite } from './content-write.service'
+import { resolveContentEntityForWrite, runValidateBeforeWrite } from './content-write.service'
 
 async function evaluateContentDemotionBlockers<T extends WriteEntityBase>(
   config: ContentWriteConfig<T>,
@@ -67,10 +68,7 @@ function assertPublishReady<T extends WriteEntityBase>(
         'validation_error',
         'Content is incomplete and cannot be published.',
         {
-          issues: err.issues.map((issue) => ({
-            path: issue.path.join('.'),
-            message: issue.message,
-          })),
+          issues: toApiValidationIssues(err.issues),
         },
       )
     }
@@ -84,13 +82,23 @@ export async function promoteContentToPublished<T extends WriteEntityBase>(
   campaignId: string,
   entityId: string,
 ): Promise<T> {
-  const { entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
+  const { campaign, entity } = await resolveContentEntityForWrite(config, campaignId, entityId)
 
   if (entity.source !== 'homebrew') {
     throw new HttpError(403, 'forbidden', 'System content is always published.')
   }
 
   assertPublishReady(config, entity)
+  await runValidateBeforeWrite(config, {
+    campaignId,
+    rulesetId: campaign.rulesetId,
+    mode: 'update',
+    validationIntent: 'publish',
+    input: {},
+    normalized: {},
+    existing: entity,
+    effectiveBody: entity as unknown as Record<string, unknown>,
+  })
 
   const updated = await config.homebrewModel
     .findOneAndUpdate(

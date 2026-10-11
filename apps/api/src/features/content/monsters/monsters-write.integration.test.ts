@@ -1,0 +1,277 @@
+import { describe, expect, it } from 'vitest'
+import { isApiValidationDetails } from '@rpg/contracts'
+
+import { makeTestCampaign } from '../../../test/fixtures/campaigns'
+import { minimalHomebrewMonsterInput } from '../../../test/fixtures/monsters'
+import { useIntegrationDb } from '../../../test/setup/integration-db'
+import { HttpError } from '../../../lib/http-error'
+import { resolveCatalogForCampaign } from '../content.service'
+import { promoteContentToPublished } from '../lib/content-status.service'
+import { createHomebrewContent, updateContentEntity } from '../lib/content-write.service'
+import { locationWriteConfig } from '../locations/locations.config'
+import { organizationWriteConfig } from '../organizations/organizations.config'
+import { speciesWriteConfig } from '../species/species.config'
+import { spellWriteConfig } from '../spells/spells.config'
+import { subclassWriteConfig } from '../subclasses/subclasses.config'
+import { ELDRITCH_BLAST_RESOLUTION } from '@rpg/contracts'
+import { MonsterPatchModel } from './monster-patch.model'
+import { monstersWriteConfig } from './monsters.config'
+import { monstersValidateBeforeWrite } from './monsters-write-hooks'
+
+useIntegrationDb()
+
+const FIGHTER_CLASS_ID = 'srd-cc-5.2.1:fighter'
+
+describe('monster write validation', () => {
+  it('promotes only when equipment Armor Class has equipped body armor', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'equipment-ac-draft',
+        armorClass: { kind: 'equipment' },
+        equipment: [],
+        actions: [],
+        proficiencies: { savingThrows: [], skills: [], weapons: [] },
+      },
+      { status: 'draft' },
+    )
+    expect(created.status).toBe('draft')
+
+    try {
+      await promoteContentToPublished(monstersWriteConfig, campaign.id, created.id)
+      throw new Error('expected promotion to fail')
+    } catch (error) {
+      expect(error).toBeInstanceOf(HttpError)
+      const httpError = error as HttpError
+      expect(httpError.status).toBe(400)
+      expect(httpError.code).toBe('validation_error')
+      expect(isApiValidationDetails(httpError.details)).toBe(true)
+      if (!isApiValidationDetails(httpError.details)) return
+      expect(httpError.details.issues).toEqual([
+        expect.objectContaining({ path: 'armorClass.kind', code: expect.any(String) }),
+      ])
+    }
+
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    expect(catalog.find((row) => row.id === created.id)?.status).toBe('draft')
+  })
+
+  it('returns 400 for unknown equipment, a non-weapon reaction, a bad modifier, and two body armors', async () => {
+    const campaign = await makeTestCampaign()
+    const chainId = 'srd-cc-5.2.1:chain-shirt'
+    const leatherId = 'srd-cc-5.2.1:leather-armor'
+    const daggerId = 'srd-cc-5.2.1:dagger'
+
+    const cases = [
+      {
+        equipment: [{ entryId: 'missing', equipmentId: 'missing-item', quantity: 1 }],
+        actions: [],
+        path: 'equipment.0.equipmentId',
+      },
+      {
+        equipment: [{ entryId: 'chain', equipmentId: chainId, quantity: 1, equipped: true }],
+        reactions: [{ id: 'parry', kind: 'weapon', equipmentEntryId: 'chain' }],
+        actions: [],
+        path: 'reactions.0.equipmentEntryId',
+      },
+      {
+        equipment: [
+          {
+            entryId: 'dagger',
+            equipmentId: daggerId,
+            quantity: 1,
+            modifiers: [{ kind: 'armor_class', bonus: 1 }],
+          },
+        ],
+        actions: [],
+        path: 'equipment.0.modifiers',
+      },
+      {
+        armorClass: { kind: 'natural', bonus: 1 },
+        equipment: [
+          { entryId: 'leather', equipmentId: leatherId, quantity: 1, equipped: true },
+          { entryId: 'chain', equipmentId: chainId, quantity: 1, equipped: true },
+        ],
+        actions: [],
+        path: 'equipment.1.equipped',
+      },
+    ] as const
+
+    for (const [index, entry] of cases.entries()) {
+      await expect(
+        createHomebrewContent(
+          monstersWriteConfig,
+          campaign.id,
+          {
+            ...minimalHomebrewMonsterInput,
+            slug: `invalid-monster-${index}`,
+            proficiencies: { savingThrows: [], skills: [], weapons: [] },
+            ...entry,
+          },
+          { status: 'draft' },
+        ),
+      ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
+    }
+  })
+
+  it('validates effectiveBody instead of merging existing and input', async () => {
+    const campaign = await makeTestCampaign()
+    await expect(
+      monstersValidateBeforeWrite({
+        campaignId: campaign.id,
+        rulesetId: campaign.rulesetId,
+        mode: 'update',
+        validationIntent: 'draft',
+        input: {
+          equipment: [{ entryId: 'missing', equipmentId: 'missing-item', quantity: 1 }],
+        },
+        normalized: {},
+        effectiveBody: {
+          armorClass: { kind: 'unarmored' },
+          equipment: [],
+          actions: [],
+          bonusActions: [],
+          reactions: [],
+        },
+      }),
+    ).resolves.toBeUndefined()
+  })
+
+  it('clears homebrew nulls and stores system-patch tombstones', async () => {
+    const campaign = await makeTestCampaign()
+    const created = await createHomebrewContent(monstersWriteConfig, campaign.id, {
+      ...minimalHomebrewMonsterInput,
+      slug: 'clear-me',
+      hover: true,
+      experiencePointsOverride: 0,
+    })
+
+    const cleared = await updateContentEntity(monstersWriteConfig, campaign.id, created.id, {
+      hover: null,
+      experiencePointsOverride: null,
+      challengeRating: '1/8',
+    })
+    expect(cleared.hover).toBeUndefined()
+    expect(cleared.experiencePointsOverride).toBeUndefined()
+
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    const kobold = catalog.find((row) => row.slug === 'kobold-warrior' && row.source === 'system')
+    expect(kobold).toBeDefined()
+    if (!kobold) return
+
+    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
+      challengeRating: '0',
+      experiencePointsOverride: 0,
+    })
+    await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
+      challengeRating: '1/8',
+      experiencePointsOverride: null,
+    })
+
+    const stored = await MonsterPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: kobold.id,
+    }).lean()
+    expect(stored?.patch.experiencePointsOverride).toBeNull()
+
+    const afterOmit = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
+      name: kobold.name,
+    })
+    expect(afterOmit.experiencePointsOverride).toBeUndefined()
+    const stillTombstoned = await MonsterPatchModel.findOne({
+      campaignId: campaign.id,
+      targetId: kobold.id,
+    }).lean()
+    expect(stillTombstoned?.patch.experiencePointsOverride).toBeNull()
+
+    const restored = await updateContentEntity(monstersWriteConfig, campaign.id, kobold.id, {
+      challengeRating: '0',
+      experiencePointsOverride: 0,
+    })
+    expect(restored.experiencePointsOverride).toBe(0)
+  })
+})
+
+describe('promotion smoke', () => {
+  it('promotes a valid draft of species, spells, subclasses, organizations, and locations', async () => {
+    const campaign = await makeTestCampaign()
+
+    const species = await createHomebrewContent(
+      speciesWriteConfig,
+      campaign.id,
+      {
+        slug: 'promo-folk',
+        name: 'Promo Folk',
+        creatureType: 'humanoid',
+        sizes: ['medium'],
+        movement: { walk: 30 },
+        traits: [],
+      },
+      { status: 'draft' },
+    )
+    expect(
+      (await promoteContentToPublished(speciesWriteConfig, campaign.id, species.id)).status,
+    ).toBe('published')
+
+    const spell = await createHomebrewContent(
+      spellWriteConfig,
+      campaign.id,
+      {
+        slug: 'promo-bolt',
+        name: 'Promo Bolt',
+        school: 'evocation',
+        level: 0,
+        classIds: ['wizard'],
+        castingTime: { normal: { value: 1, unit: 'action' }, canBeCastAsRitual: false },
+        range: { kind: 'distance', value: { value: 60, unit: 'ft' } },
+        duration: { kind: 'instantaneous' },
+        components: { verbal: true, somatic: true },
+        resolution: ELDRITCH_BLAST_RESOLUTION,
+      },
+      { status: 'draft' },
+    )
+    expect((await promoteContentToPublished(spellWriteConfig, campaign.id, spell.id)).status).toBe(
+      'published',
+    )
+
+    const subclass = await createHomebrewContent(
+      subclassWriteConfig,
+      campaign.id,
+      {
+        slug: 'promo-subclass',
+        name: 'Promo Subclass',
+        classId: FIGHTER_CLASS_ID,
+        tagline: 'A test subclass',
+        features: [{ kind: 'custom', id: 'feature-1', name: 'Test Feature', level: 3 }],
+      },
+      { status: 'draft' },
+    )
+    expect(
+      (await promoteContentToPublished(subclassWriteConfig, campaign.id, subclass.id)).status,
+    ).toBe('published')
+
+    const organization = await createHomebrewContent(
+      organizationWriteConfig,
+      campaign.id,
+      { slug: 'promo-order', name: 'Promo Order', organizationDomain: 'military' },
+      { status: 'draft' },
+    )
+    expect(
+      (await promoteContentToPublished(organizationWriteConfig, campaign.id, organization.id))
+        .status,
+    ).toBe('published')
+
+    const location = await createHomebrewContent(
+      locationWriteConfig,
+      campaign.id,
+      { slug: 'promo-world', kind: 'world', name: 'Promo World' },
+      { status: 'draft' },
+    )
+    expect(
+      (await promoteContentToPublished(locationWriteConfig, campaign.id, location.id)).status,
+    ).toBe('published')
+  })
+})

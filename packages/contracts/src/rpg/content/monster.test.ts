@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { createMonsterInputSchema, monsterActionSchema, monsterReactionSchema } from './monster'
+import {
+  createMonsterDraftInputSchema,
+  createMonsterInputSchema,
+  monsterActionDraftSchema,
+  monsterActionSchema,
+  monsterReactionSchema,
+} from './monster'
 
 describe('monsterActionSchema', () => {
   it('allows weapon actions without a name', () => {
@@ -89,5 +95,56 @@ describe('monsterBodySchema refinements', () => {
         experiencePointsOverride: 0,
       }).success,
     ).toBe(false)
+  })
+
+  it('rejects duplicate trait ids on publish and draft', () => {
+    const traits = [
+      { id: 'pack', name: 'Pack', description: '<p>A</p>' },
+      { id: 'pack', name: 'Pack again', description: '<p>B</p>' },
+    ]
+    expect(
+      createMonsterInputSchema.safeParse({ slug: 'dup-traits', ...baseBody, traits }).success,
+    ).toBe(false)
+    expect(
+      createMonsterDraftInputSchema.safeParse({ slug: 'dup-traits', ...baseBody, traits }).success,
+    ).toBe(false)
+  })
+
+  it('rejects overlapping damage defenses on publish and allows them on a draft', () => {
+    const defenses = {
+      vulnerabilities: [],
+      resistances: ['fire'],
+      immunities: ['fire', 'poison'],
+      conditionImmunities: ['poisoned'],
+    }
+    const published = createMonsterInputSchema.safeParse({
+      slug: 'overlap',
+      ...baseBody,
+      defenses,
+    })
+    expect(published.success).toBe(false)
+    if (!published.success) {
+      expect(
+        published.error.issues.some((issue) =>
+          issue.message.includes('Fire is already a resistance'),
+        ),
+      ).toBe(true)
+    }
+    expect(
+      createMonsterDraftInputSchema.safeParse({ slug: 'overlap', ...baseBody, defenses }).success,
+    ).toBe(true)
+  })
+})
+
+describe('monsterActionDraftSchema', () => {
+  it('keeps partial damage dice that publish rejects', () => {
+    const partial = {
+      id: 'claw',
+      kind: 'natural-weapon',
+      name: 'Claw',
+      damage: { dice: { count: 1 } },
+    }
+    expect(monsterActionDraftSchema.safeParse(partial).success).toBe(true)
+    expect(monsterActionSchema.safeParse(partial).success).toBe(false)
   })
 })

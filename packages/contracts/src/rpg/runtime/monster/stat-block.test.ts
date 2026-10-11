@@ -5,7 +5,7 @@ import { skillProficiencySchema } from '../../content/skill-proficiency'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import { resolveEquippedArmorFromInventory } from '../character/sheet/equipment-inventory'
 import { toEquippedArmorPiece, resolveEquippedArmorClass } from '../creature/armor-class'
-import { deriveMonsterStatBlock } from './stat-block'
+import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-block'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -176,7 +176,7 @@ describe('deriveMonsterStatBlock', () => {
     const block = deriveMonsterStatBlock({ monster: kobold, equipmentCatalog, skillCatalog })
     expect(block.ac).toBe(14)
     expect(block.hp).toBe(7)
-    expect(block.hpFormula).toBe('3d6 -1')
+    expect(block.hpFormula).toBe('3d6 -3')
     expect(block.initiativeModifier).toBe(2)
     expect(block.proficiencyBonus).toBe(2)
     expect(block.experiencePoints).toBe(25)
@@ -251,6 +251,7 @@ describe('modifiedArmorFixture parity', () => {
         ...kobold,
         armorClass: { kind: 'equipment' },
         equipment: [modifiedArmorFixture],
+        actions: [],
       },
       equipmentCatalog,
       skillCatalog,
@@ -277,6 +278,12 @@ describe('modifiedArmorFixture parity', () => {
     }).ac
 
     expect(monsterBlock.ac).toBe(14)
+    expect(monsterBlock.acBreakdown.bodyArmor).toMatchObject({
+      base: 13,
+      dex: 2,
+      adjustment: -1,
+    })
+    expect(monsterBlock.acBreakdown.shields).toEqual([])
     expect(characterAc).toBe(14)
     expect(
       resolveEquippedArmorClass({
@@ -294,5 +301,125 @@ describe('modifiedArmorFixture parity', () => {
         ],
       }),
     ).toBe(14)
+  })
+
+  it('counts a shield under natural armor as its own contribution', () => {
+    const shield = equipmentSchema.parse({
+      id: `${RULESET}:shield`,
+      slug: 'shield',
+      rulesetId: RULESET,
+      source: 'system',
+      campaignId: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Shield',
+      description: '',
+      cost: { amount: 10, currency: 'gp' },
+      weight: { value: 6, unit: 'lb' },
+      kind: 'armor',
+      category: 'shields',
+      material: 'metal',
+      acBonus: 2,
+      addDexModifier: false,
+      stealthDisadvantage: false,
+    })
+    const catalog = new Map(equipmentCatalog)
+    catalog.set(shield.id, shield)
+    const block = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        equipment: [
+          ...kobold.equipment,
+          {
+            entryId: 'shield',
+            equipmentId: shield.id,
+            quantity: 1,
+            equipped: true,
+            modifiers: [{ kind: 'armor_class', bonus: 1 }],
+          },
+        ],
+      },
+      equipmentCatalog: catalog,
+      skillCatalog,
+    })
+    expect(block.ac).toBe(17)
+    expect(block.acBreakdown.shields).toEqual([
+      { entryId: 'shield', label: 'Shield', acBonus: 2, adjustment: 1 },
+    ])
+    expect(block.acBreakdown.bodyArmor).toBeUndefined()
+  })
+})
+
+describe('deriveMonsterDraftStatBlock', () => {
+  it('resolves available values and reports missing, reference, and conflict reasons', () => {
+    const blankCr = deriveMonsterDraftStatBlock({
+      monster: { ...kobold, challengeRating: undefined },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(blankCr.ac.status).toBe('resolved')
+    expect(blankCr.hp.status).toBe('resolved')
+    expect(blankCr.initiative.status).toBe('resolved')
+    expect(blankCr.challenge).toEqual({ status: 'unavailable', reason: 'missing-input' })
+    expect(blankCr.passivePerception).toEqual({ status: 'unavailable', reason: 'missing-input' })
+    expect(blankCr.attacks[0]?.result).toEqual({ status: 'unavailable', reason: 'missing-input' })
+
+    const missingArmor = deriveMonsterDraftStatBlock({
+      monster: { ...kobold, armorClass: { kind: 'equipment' }, equipment: [] },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(missingArmor.ac).toEqual({ status: 'unavailable', reason: 'missing-reference' })
+
+    const conflict = deriveMonsterDraftStatBlock({
+      monster: {
+        ...kobold,
+        armorClass: { kind: 'equipment' },
+        equipment: [
+          {
+            entryId: 'a',
+            equipmentId: `${RULESET}:chain-shirt`,
+            quantity: 1,
+            equipped: true,
+          },
+          {
+            entryId: 'b',
+            equipmentId: `${RULESET}:chain-shirt`,
+            quantity: 1,
+            equipped: true,
+          },
+        ],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(conflict.ac).toEqual({ status: 'unavailable', reason: 'conflict' })
+  })
+
+  it('clamps a negative hit-dice average to 1 and keeps the formula', () => {
+    const block = deriveMonsterDraftStatBlock({
+      monster: {
+        ...kobold,
+        size: 'tiny',
+        abilityScores: { ...kobold.abilityScores, con: 4 },
+        hitPoints: { kind: 'hit-dice', count: 1 },
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(block.hp).toEqual({
+      status: 'resolved',
+      value: { hp: 1, formula: '1d4 -3', clampedToMinimum: true },
+    })
+  })
+
+  it('throws from the strict wrapper when an invariant is broken', () => {
+    expect(() =>
+      deriveMonsterStatBlock({
+        monster: { ...kobold, armorClass: { kind: 'equipment' }, equipment: [] },
+        equipmentCatalog,
+        skillCatalog,
+      }),
+    ).toThrow(/armorClass is unavailable/)
   })
 })

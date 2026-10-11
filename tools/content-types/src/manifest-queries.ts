@@ -15,6 +15,36 @@ export function integrationManifestEntries(): [
   ][]
 }
 
+export function contentTypeKeysWithDeferredAuthoring(): ContentTypeKey[] {
+  return integrationManifestEntries()
+    .filter(([, entry]) => entry.dashboard?.authoring === 'deferred')
+    .map(([key]) => key)
+    .sort()
+}
+
+export type FormParityDashboardEntry = {
+  key: ContentTypeKey
+  routeSection?: string
+  authoring?: 'deferred'
+  formDefinitionPath?: string
+}
+
+/** Route types minus deferred authoring, compared with registered form paths. */
+export function formDefinitionParity(entries: readonly FormParityDashboardEntry[]): {
+  expected: ContentTypeKey[]
+  actual: ContentTypeKey[]
+} {
+  const expected = entries
+    .filter((entry) => entry.routeSection && entry.authoring !== 'deferred')
+    .map((entry) => entry.key)
+    .sort()
+  const actual = entries
+    .filter((entry) => entry.formDefinitionPath)
+    .map((entry) => entry.key)
+    .sort()
+  return { expected, actual }
+}
+
 export function contentTypeKeysWithFormDefinition(): ContentTypeKey[] {
   return integrationManifestEntries()
     .filter(([, entry]) => entry.dashboard?.formDefinitionPath)

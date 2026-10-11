@@ -13,6 +13,17 @@ export type ApiValidationDetails = {
   issues: ApiValidationIssue[]
 }
 
+/** Maps Zod issues onto the API validation payload, including `code`. */
+export function toApiValidationIssues(
+  issues: readonly { path: readonly PropertyKey[]; message: string; code: string }[],
+): ApiValidationIssue[] {
+  return issues.map((issue) => ({
+    path: issue.path.map(String).join('.'),
+    message: issue.message,
+    code: issue.code,
+  }))
+}
+
 export function isApiValidationDetails(value: unknown): value is ApiValidationDetails {
   if (typeof value !== 'object' || value === null) return false
   const issues = (value as ApiValidationDetails).issues

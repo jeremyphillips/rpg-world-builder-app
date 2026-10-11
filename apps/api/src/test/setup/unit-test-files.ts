@@ -11,6 +11,7 @@ export const unitTestFiles = [
   'src/features/content/content-types.integration-manifest.test.ts',
   'src/features/content/lib/apply-content-keys.test.ts',
   'src/features/content/lib/assert-slug-available.test.ts',
+  'src/features/content/lib/content-system-patch-tombstone.test.ts',
   'src/features/content/lib/content-type-config.test.ts',
   'src/features/content/lib/content-usage/content-usage-registrations.test.ts',
   'src/features/content/lib/content-usage/content-usage-resolvers.test.ts',

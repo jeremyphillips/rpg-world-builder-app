@@ -4,6 +4,7 @@ import {
   formatSignedModifier,
   getAbilityCompactLabel,
   getChallengeRatingLabel,
+  getCreatureArmorClassKindLabel,
   getCreatureSizeLabel,
   getDamageTypeLabel,
   getEffectConditionLabel,
@@ -17,10 +18,16 @@ import {
   type SkillProficiency,
   deriveMonsterStatBlock,
   type DerivedMonsterAttackLine,
+  type DerivedFieldReason,
   type DerivedMonsterStatBlock,
+  type MonsterArmorClassBreakdown,
 } from '@rpg/contracts'
 
 import type { ContentStatRowData } from '../../lib/detail/metadata/content-stat-rows'
+
+import { MONSTER_HP_MINIMUM_NOTE } from './monster-form-labels'
+
+export { MONSTER_HP_MINIMUM_NOTE }
 
 export const MONSTER_UNRESOLVED_CATALOG_REFERENCE = 'Unresolved reference'
 
@@ -80,12 +87,90 @@ export type BuildMonsterDetailViewModelInput = {
   derived?: DerivedMonsterStatBlock | null
 }
 
+export function monsterUnavailableReasonCopy(
+  reason: DerivedFieldReason,
+  subject: 'generic' | 'challenge' | 'armor',
+): string {
+  if (reason === 'conflict') return 'Two body armors equipped'
+  if (reason === 'missing-reference' && subject === 'armor') return 'Choose armor in Equipment'
+  if (reason === 'missing-input' && subject === 'challenge')
+    return 'Set a challenge rating to calculate'
+  return 'Not set'
+}
+
+export function describeEquipmentArmorContribution(
+  entryId: string,
+  input: {
+    acKind: Monster['armorClass']['kind']
+    breakdown?: MonsterArmorClassBreakdown
+    role: 'body-armor' | 'shield' | 'other'
+  },
+): {
+  participation: 'current' | 'not-used' | 'none'
+  contributionLabel?: string
+  notUsedReason?: string
+} {
+  const { acKind, breakdown, role } = input
+  if (role === 'other') return { participation: 'none' }
+  const notUsedReason = `Not used for current Armor Class (AC source: ${getCreatureArmorClassKindLabel(acKind)})`
+  if (!breakdown) return { participation: 'not-used', notUsedReason }
+
+  if (role === 'shield')
+    return describeShieldContribution(entryId, acKind, breakdown, notUsedReason)
+  if (breakdown.bodyArmor?.entryId === entryId && acKind === 'equipment') {
+    return {
+      participation: 'current',
+      contributionLabel: bodyArmorContributionLabel(breakdown.bodyArmor),
+    }
+  }
+
+  return { participation: 'not-used', notUsedReason }
+}
+
+function describeShieldContribution(
+  entryId: string,
+  acKind: Monster['armorClass']['kind'],
+  breakdown: MonsterArmorClassBreakdown,
+  notUsedReason: string,
+): ReturnType<typeof describeEquipmentArmorContribution> {
+  const shield = breakdown.shields.find((entry) => entry.entryId === entryId)
+  if (acKind === 'fixed' || !shield) {
+    return {
+      participation: 'not-used',
+      contributionLabel: unusedShieldAdjustment(shield?.adjustment),
+      notUsedReason,
+    }
+  }
+  return { participation: 'current', contributionLabel: activeShieldLabel(shield) }
+}
+
+function unusedShieldAdjustment(adjustment: number | undefined): string | undefined {
+  if (!adjustment) return undefined
+  return `${adjustment > 0 ? '+' : ''}${adjustment} shield adjustment`
+}
+
+function activeShieldLabel(shield: MonsterArmorClassBreakdown['shields'][number]): string {
+  const bonus = shield.acBonus + shield.adjustment
+  if (shield.adjustment === 0) return `+${shield.acBonus} shield`
+  const signed = `${shield.adjustment > 0 ? '+' : ''}${shield.adjustment}`
+  return `+${bonus} AC (+${shield.acBonus} shield, ${signed} adjustment)`
+}
+
+function bodyArmorContributionLabel(
+  body: NonNullable<MonsterArmorClassBreakdown['bodyArmor']>,
+): string {
+  const adjustment =
+    body.adjustment === 0 ? '' : ` ${body.adjustment > 0 ? '+' : ''}${body.adjustment} adjustment`
+  const maxDex = body.maxDexBonus !== undefined ? ` (max ${body.maxDexBonus})` : ''
+  return `${body.label} ${body.base} + ${body.dex} DEX${maxDex}${adjustment}`
+}
+
 function formatAcSource(monster: Monster, equipmentById: Map<string, Equipment>): string {
   switch (monster.armorClass.kind) {
     case 'natural':
-      return 'natural armor'
     case 'fixed':
-      return 'fixed'
+    case 'unarmored':
+      return getCreatureArmorClassKindLabel(monster.armorClass.kind)
     case 'equipment': {
       const names = monster.equipment
         .filter((entry) => entry.equipped)
@@ -94,11 +179,8 @@ function formatAcSource(monster: Monster, equipmentById: Map<string, Equipment>)
           return entry.customName ?? item?.name
         })
         .filter(Boolean)
-      return names.length > 0 ? names.join(', ') : 'equipment'
+      return names.length > 0 ? names.join(', ') : getCreatureArmorClassKindLabel('equipment')
     }
-    case 'unarmored':
-    default:
-      return 'unarmored'
   }
 }
 
@@ -116,10 +198,13 @@ function formatAcStatRow(
 }
 
 function formatHpStatRow(derived: DerivedMonsterStatBlock): ContentStatRowData {
+  const formula = derived.hpClampedToMinimum
+    ? `${derived.hpFormula} ${MONSTER_HP_MINIMUM_NOTE}`
+    : derived.hpFormula
   return {
     id: 'hp',
     label: 'HP',
-    value: joinInlineMetadata([String(derived.hp), derived.hpFormula]) || String(derived.hp),
+    value: joinInlineMetadata([String(derived.hp), formula]) || String(derived.hp),
   }
 }
 

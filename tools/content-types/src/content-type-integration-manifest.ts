@@ -27,6 +27,11 @@ export type ContentTypeIntegrationManifestEntry = {
     routeSection?: string
     formDefinitionPath?: string
     visibleInSidebar?: boolean
+    /**
+     * Read surfaces exist, but create/edit registration is intentionally absent.
+     * A form definition while this is set is manifest drift.
+     */
+    authoring?: 'deferred'
   }
   capabilities: {
     /** When true, drift tests expect `CONTENT_TYPE_CAPABILITIES[key]`. */
@@ -161,6 +166,7 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
       folder: 'monsters',
       routeSection: 'monsters',
       visibleInSidebar: true,
+      authoring: 'deferred',
     },
     capabilities: { required: true },
   },

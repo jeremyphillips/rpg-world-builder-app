@@ -290,8 +290,21 @@ export function useContentFormOptions(campaignId: string | undefined): {
       conditionVocabulary: vocabulary.conditionVocabulary,
       weaponPropertyVocabulary: vocabulary.weaponPropertyVocabulary,
       options,
+      equipmentCatalogById: new Map((catalog.equipment ?? []).map((item) => [item.id, item])),
+      equipmentCatalogStatus: catalog.isError ? 'error' : catalog.isPending ? 'pending' : 'ready',
+      skillCatalogStatus: catalog.isError ? 'error' : catalog.isPending ? 'pending' : 'ready',
     }),
-    [campaignId, rulesetId, campaignRules, spellcastingProgression, vocabulary, options],
+    [
+      campaignId,
+      rulesetId,
+      campaignRules,
+      spellcastingProgression,
+      vocabulary,
+      options,
+      catalog.equipment,
+      catalog.isPending,
+      catalog.isError,
+    ],
   )
 
   return {

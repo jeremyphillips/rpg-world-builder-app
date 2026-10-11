@@ -4,16 +4,34 @@ function isPlainObject(value: unknown): value is PlainObject {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+export type StripNullDeepOptions = {
+  /** Top-level keys that keep an explicit null (system-patch tombstones). */
+  preserveTopLevelNullKeys?: readonly string[]
+}
+
 /** Removes null entries recursively so optional Zod fields are left absent. */
-export function stripNullDeep<T>(value: T): T {
+export function stripNullDeep<T>(value: T, options?: StripNullDeepOptions): T {
+  return stripNullDeepLevel(value, options, true)
+}
+
+function stripNullDeepLevel<T>(
+  value: T,
+  options: StripNullDeepOptions | undefined,
+  topLevel: boolean,
+): T {
   if (value === null) return undefined as T
-  if (Array.isArray(value)) return value.map(stripNullDeep) as T
+  if (Array.isArray(value))
+    return value.map((entry) => stripNullDeepLevel(entry, options, false)) as T
   if (!isPlainObject(value)) return value
 
+  const preserve = topLevel ? new Set(options?.preserveTopLevelNullKeys ?? []) : new Set<string>()
   const result: PlainObject = {}
   for (const [key, entry] of Object.entries(value)) {
-    if (entry === null) continue
-    const stripped = stripNullDeep(entry)
+    if (entry === null) {
+      if (preserve.has(key)) result[key] = null
+      continue
+    }
+    const stripped = stripNullDeepLevel(entry, options, false)
     if (stripped !== undefined) result[key] = stripped
   }
   return result as T

@@ -8,9 +8,11 @@ export {
   contentTypeKeysWithApiRegistration,
   contentTypeKeysWithCatalogPackage,
   contentTypeKeysWithoutBundledContent,
+  contentTypeKeysWithDeferredAuthoring,
   contentTypeKeysWithFormDefinition,
   contentTypeKeysWithRequiredCapabilities,
   contentTypeKeysWithRouteSection,
   contentTypeKeysWithVisibleInSidebar,
+  formDefinitionParity,
   integrationManifestEntries,
 } from './manifest-queries'

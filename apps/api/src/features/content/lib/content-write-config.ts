@@ -48,6 +48,11 @@ export interface ContentWriteContext {
   normalized: Record<string, unknown>
   /** Set on update after catalog lookup. */
   existing?: WriteEntityBase
+  /**
+   * Body that will be persisted. Hooks read this instead of re-merging input
+   * onto the existing record.
+   */
+  effectiveBody?: Record<string, unknown>
 }
 
 export interface ContentWriteAfterContext extends ContentWriteContext {
@@ -104,6 +109,13 @@ export interface ContentWriteConfig<T extends WriteEntityBase> {
   resolveDemoteBlockers?: (ctx: ContentDeleteContext) => Promise<ContentUsageBlocker[]>
   /** Whether character references block demotion. Defaults to true. */
   characterUsageBlocksDemotion?: boolean
+  /** Top-level replace keys for this type's patch merge. Falls back to the read config. */
+  patchReplaceKeys?: readonly string[]
+  /**
+   * Top-level keys stored as null tombstones on system patches. Types that omit
+   * this keep null-as-delete behavior.
+   */
+  patchTombstoneKeys?: readonly string[]
 }
 
 /** Selects the create/update input schema for a validation intent. */
