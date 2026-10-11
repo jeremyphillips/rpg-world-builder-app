@@ -13,6 +13,7 @@ export const CAMPAIGN_SIDEBAR_CONTENT_SECTION = {
   feats: 'game-library',
   equipment: 'game-library',
   'skill-proficiencies': 'game-library',
+  monsters: 'game-library',
   organizations: 'world',
   locations: 'world',
 } as const satisfies Record<HomebrewSummaryContentType, CampaignSidebarContentSection>

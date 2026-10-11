@@ -71,7 +71,7 @@ type ContentOverviewDataTableProps<T extends WithCampaignAccess<ContentBase> & {
   getRowCanSelect: (row: T) => boolean
   onEditCampaignAccess?: () => void
   additionalBulkActions?: readonly OverviewBulkAction[]
-  getEditHref: (row: T) => string
+  getEditHref?: (row: T) => string
   onColumnChange: (state: ColumnChangeState) => void
   caption?: string
   emptyState: ReactNode | ((context: { filteredRowCount: number }) => ReactNode)

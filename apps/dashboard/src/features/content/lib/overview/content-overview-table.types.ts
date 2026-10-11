@@ -42,6 +42,9 @@ export type ContentOverviewTableProps<
   filterSchema: FilterSchema<T, TFilters>
   data: T[]
   caption?: string
-  getEditHref: (row: T) => string
+  /** Omit on read-only overviews (Plan 2 monsters); requires {@link readOnly}. */
+  getEditHref?: (row: T) => string
+  /** Suppresses create/edit/duplicate/bulk affordances even for managers. */
+  readOnly?: boolean
   bulkExtensions?: ContentOverviewBulkExtension<T>[]
 }

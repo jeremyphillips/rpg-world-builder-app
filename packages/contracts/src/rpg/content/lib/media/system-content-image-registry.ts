@@ -34,6 +34,12 @@ const EMBLEM_SOURCE_DIMENSIONS: SourceDimensions = {
   height: 1254,
 }
 
+/** Shipped monster primary PNGs (SRD seed art). */
+const MONSTER_PRIMARY_SOURCE_DIMENSIONS: SourceDimensions = {
+  width: 1364,
+  height: 1023,
+}
+
 export const SYSTEM_CONTENT_IMAGE_PRESENTATION_TREATMENTS = [
   'default',
   'white-paper-knockout',
@@ -102,6 +108,8 @@ const SPELL_SCHOOL_EMBLEM_SLUGS = [
   'transmutation',
 ] as const
 
+const MONSTER_PRIMARY_SLUGS = ['kobold-warrior', 'skeleton'] as const
+
 const SYSTEM_IMAGE_SET_ID_SET = new Set<string>(SYSTEM_IMAGE_SET_IDS)
 
 const WHITE_PAPER_KNOCKOUT_PRESENTATION: SystemContentImagePresentation = {
@@ -122,11 +130,20 @@ export function buildSystemContentImagePath(input: {
   return `assets/system/${input.imageSetId}/${input.subject.key}/${input.assetRole}/${input.slug}.${input.extension}`
 }
 
-function buildPrimaryEntry(contentType: ContentTypeKey, slug: string): SystemContentImageEntry {
+type BuildPrimaryEntryOptions = {
+  extension?: SystemContentImageExtension
+  sourceDimensions?: SourceDimensions
+}
+
+function buildPrimaryEntry(
+  contentType: ContentTypeKey,
+  slug: string,
+  options: BuildPrimaryEntryOptions = {},
+): SystemContentImageEntry {
   const imageSetId = DEFAULT_SYSTEM_IMAGE_SET_ID
   const subject = contentTypeSubject(contentType)
   const assetRole = 'primary' as const
-  const extension = 'jpeg' as const
+  const extension = options.extension ?? 'jpeg'
   return {
     imageSetId,
     subject,
@@ -134,7 +151,7 @@ function buildPrimaryEntry(contentType: ContentTypeKey, slug: string): SystemCon
     slug,
     extension,
     path: buildSystemContentImagePath({ imageSetId, subject, assetRole, slug, extension }),
-    sourceDimensions: STANDARD_SOURCE_DIMENSIONS,
+    sourceDimensions: options.sourceDimensions ?? STANDARD_SOURCE_DIMENSIONS,
     presentation: WHITE_PAPER_KNOCKOUT_PRESENTATION,
   }
 }
@@ -159,6 +176,12 @@ function buildSpellSchoolEmblemEntry(slug: string): SystemContentImageEntry {
 const SYSTEM_CONTENT_IMAGE_ENTRIES: SystemContentImageEntry[] = [
   ...CLASS_PRIMARY_SLUGS.map((slug) => buildPrimaryEntry('classes', slug)),
   ...SPECIES_PRIMARY_SLUGS.map((slug) => buildPrimaryEntry('species', slug)),
+  ...MONSTER_PRIMARY_SLUGS.map((slug) =>
+    buildPrimaryEntry('monsters', slug, {
+      extension: 'png',
+      sourceDimensions: MONSTER_PRIMARY_SOURCE_DIMENSIONS,
+    }),
+  ),
   ...SPELL_SCHOOL_EMBLEM_SLUGS.map((slug) => buildSpellSchoolEmblemEntry(slug)),
 ]
 

@@ -50,6 +50,8 @@ import {
   FeatDetailRoute,
   FeatEditRoute,
   FeatsOverviewRoute,
+  MonsterDetailRoute,
+  MonstersOverviewRoute,
   OrganizationCreateRoute,
   OrganizationDetailRoute,
   OrganizationEditRoute,
@@ -395,6 +397,35 @@ const router = createBrowserRouter(
                           handle: { breadcrumbMode: 'edit' } satisfies BreadcrumbModeHandle,
                         },
                       ],
+                    },
+                  ],
+                },
+                {
+                  path: 'monsters',
+                  element: <Outlet />,
+                  handle: {
+                    crumb: (params, data) => ({
+                      label: getContentTypeCollectionLabel('monsters'),
+                      href: collectionCrumbHref(
+                        ROUTES.content.monsters.overview(params.campaignId!),
+                        data,
+                      ),
+                    }),
+                  } satisfies CrumbHandle,
+                  children: [
+                    { index: true, element: <MonstersOverviewRoute /> },
+                    {
+                      path: ':monsterId',
+                      element: <MonsterDetailRoute />,
+                      handle: {
+                        crumb: (params, data) => ({
+                          label: data.entityLabel ?? '…',
+                          href: entityDetailCrumbHref(
+                            ROUTES.content.monsters.detail(params.campaignId!, params.monsterId!),
+                            data,
+                          ),
+                        }),
+                      } satisfies CrumbHandle,
                     },
                   ],
                 },

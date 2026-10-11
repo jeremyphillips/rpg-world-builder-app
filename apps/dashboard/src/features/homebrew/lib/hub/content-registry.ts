@@ -54,6 +54,11 @@ export const VISIBLE_SIDEBAR_CONTENT: readonly VisibleSidebarContentEntry[] = [
     create: ROUTES.content.skillProficiencies.create,
   },
   {
+    contentType: 'monsters',
+    label: getContentTypeCollectionLabel('monsters'),
+    overview: ROUTES.content.monsters.overview,
+  },
+  {
     contentType: 'organizations',
     label: getContentTypeCollectionLabel('organizations'),
     overview: ROUTES.content.organizations.overview,

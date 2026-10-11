@@ -10,6 +10,7 @@ export const HOMEBREW_SUMMARY_CONTENT_TYPE_KEYS = [
   'feats',
   'equipment',
   'skill-proficiencies',
+  'monsters',
   'organizations',
   'locations',
 ] as const satisfies readonly ContentTypeKey[]

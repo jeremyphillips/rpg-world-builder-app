@@ -3,6 +3,7 @@ import type {
   ContentMedia,
   ContentSource,
   ContentTypeKey,
+  Monster,
   Species,
 } from '@rpg/contracts'
 
@@ -48,6 +49,22 @@ export function buildClassContentDisplayImageInput(
       slug: characterClass.slug,
       source: characterClass.source,
       rulesetId: characterClass.rulesetId,
+    },
+    surface,
+  )
+}
+
+export function buildMonsterContentDisplayImageInput(
+  monster: Monster,
+  surface: ResolveDashboardContentDisplayInput['surface'] = 'detail',
+): ResolveDashboardContentDisplayInput {
+  return buildContentDisplayImageInput(
+    'monsters',
+    {
+      media: monster.media,
+      slug: monster.slug,
+      source: monster.source,
+      rulesetId: monster.rulesetId,
     },
     surface,
   )

@@ -157,6 +157,11 @@ export const CONTENT_TYPE_INTEGRATION_MANIFEST = {
     api: {
       registrationPath: 'apps/api/src/features/content/monsters/monsters.config.ts',
     },
+    dashboard: {
+      folder: 'monsters',
+      routeSection: 'monsters',
+      visibleInSidebar: true,
+    },
     capabilities: { required: true },
   },
 } satisfies Record<ContentTypeKey, ContentTypeIntegrationManifestEntry>
