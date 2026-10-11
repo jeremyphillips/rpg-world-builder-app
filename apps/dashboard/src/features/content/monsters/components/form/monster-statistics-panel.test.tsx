@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -35,5 +36,34 @@ describe('MonsterStatisticsPanel', () => {
     await user.selectOptions(screen.getByLabelText('Challenge rating'), '0')
     expect(screen.getByLabelText('Awards 0 XP')).toBeTruthy()
     expect(screen.getByText(/XP 10/)).toBeTruthy()
+  })
+
+  it('shows a statistics validation message on the field that failed', async () => {
+    function HostWithError() {
+      const values = resolveMonsterCreateDefaultValues()
+      values.armorClass = { kind: 'natural', bonus: 2 }
+      const form = useForm<MonsterFormValues>({ defaultValues: values })
+      useEffect(() => {
+        form.setError('armorClass.bonus', {
+          type: 'server',
+          message: 'Enter a bonus of at least 1.',
+        })
+      }, [form])
+      return (
+        <FormProvider {...form}>
+          <MonsterStatisticsPanel
+            ctx={{
+              equipmentCatalogStatus: 'ready',
+              equipmentCatalogById: new Map(),
+              skillCatalogStatus: 'ready',
+            }}
+          />
+        </FormProvider>
+      )
+    }
+
+    render(<HostWithError />)
+    expect(await screen.findByText('Armor Class: Enter a bonus of at least 1.')).toBeTruthy()
+    expect(screen.getByLabelText('Natural armor bonus')).toHaveAttribute('aria-invalid', 'true')
   })
 })

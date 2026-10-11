@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { createContext, useContext, useState } from 'react'
+import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import {
   ABILITY_IDS,
   CHALLENGE_RATING_IDS,
@@ -18,7 +18,7 @@ import {
   type CreatureSize,
 } from '@rpg/contracts'
 import { Button, SegmentedControl, SemanticText } from '@rpg/ui'
-import { useTabbedFormChrome } from '@rpg/ui/form'
+import { flattenFormIssues, useFormValidationPresentation, useTabbedFormChrome } from '@rpg/ui/form'
 
 import { focusFormPath } from '../../../lib/forms/shells/submit/content-form-submit'
 import { useMonsterVariantStash } from '../../hooks/use-monster-variant-stash'
@@ -54,6 +54,12 @@ import { equipmentArmorRole, equipmentEntryBaseName } from '../../lib/monster-eq
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import { resolveMonsterFormViewForPath } from '../../lib/monster-form-view'
+import {
+  statisticsFieldIsInvalid,
+  statisticsIssueLabel,
+  statisticsIssuesForDisplay,
+  type StatisticsFieldIssue,
+} from '../../lib/monster-statistics-errors'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
@@ -62,6 +68,36 @@ const CHALLENGE_OPTIONS = [...CHALLENGE_RATING_IDS].sort(
 )
 
 const OPTIONAL_MOVEMENT = MOVEMENT_MODES.filter((mode) => mode !== 'walk')
+
+const StatisticsIssuesContext = createContext<readonly StatisticsFieldIssue[]>([])
+
+function useStatisticsIssues(): readonly StatisticsFieldIssue[] {
+  const { errors } = useFormState()
+  const presentation = useFormValidationPresentation()
+  const rhfIssues = flattenFormIssues(errors)
+  const source = presentation.isPresentationSessionExpanded
+    ? [...presentation.issues, ...rhfIssues]
+    : rhfIssues
+  return statisticsIssuesForDisplay(source)
+}
+
+function statisticsInvalid(path: string, issues: readonly StatisticsFieldIssue[]): boolean {
+  return statisticsFieldIsInvalid(issues, path)
+}
+
+function StatisticsIssueList() {
+  const issues = useContext(StatisticsIssuesContext)
+  if (issues.length === 0) return null
+  return (
+    <div>
+      {issues.map((issue) => (
+        <SemanticText key={issue.path} tone="destructive">
+          {`${statisticsIssueLabel(issue.path)}: ${issue.message}`}
+        </SemanticText>
+      ))}
+    </div>
+  )
+}
 
 export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
@@ -72,6 +108,7 @@ export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
   const armorClass = values?.armorClass
   const hitPoints = values?.hitPoints
   const [hitDiceDisplay, setHitDiceDisplay] = useState<string | null>(null)
+  const statisticsIssues = useStatisticsIssues()
 
   if (!values || !armorClass || !hitPoints) return null
 
@@ -91,29 +128,34 @@ export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
   const calculatedAc = derived?.ac.status === 'resolved' ? derived.ac.value.ac : undefined
 
   return (
-    <div className="flex flex-col gap-6">
-      <AbilityScoresSection values={values as MonsterFormValues} />
-      <ArmorClassSection
-        ctx={ctx}
-        values={values as MonsterFormValues}
-        armorClass={armorClass}
-        calculatedAc={calculatedAc}
-        derived={derived}
-        bodyArmorNames={equippedBodyArmor.map((row) => equipmentEntryBaseName(row.entry, catalog))}
-        onSwitch={switchArmorClass}
-        onGoToEquipment={goToEquipment}
-      />
-      <HitPointsSection
-        values={values as MonsterFormValues}
-        hitPoints={hitPoints}
-        derived={derived}
-        hitDiceDisplay={hitDiceDisplay}
-        setHitDiceDisplay={setHitDiceDisplay}
-        onSwitch={switchHitPoints}
-      />
-      <MovementSection values={values as MonsterFormValues} />
-      <ChallengeSection values={values as MonsterFormValues} />
-    </div>
+    <StatisticsIssuesContext.Provider value={statisticsIssues}>
+      <div className="flex flex-col gap-6">
+        <StatisticsIssueList />
+        <AbilityScoresSection values={values as MonsterFormValues} />
+        <ArmorClassSection
+          ctx={ctx}
+          values={values as MonsterFormValues}
+          armorClass={armorClass}
+          calculatedAc={calculatedAc}
+          derived={derived}
+          bodyArmorNames={equippedBodyArmor.map((row) =>
+            equipmentEntryBaseName(row.entry, catalog),
+          )}
+          onSwitch={switchArmorClass}
+          onGoToEquipment={goToEquipment}
+        />
+        <HitPointsSection
+          values={values as MonsterFormValues}
+          hitPoints={hitPoints}
+          derived={derived}
+          hitDiceDisplay={hitDiceDisplay}
+          setHitDiceDisplay={setHitDiceDisplay}
+          onSwitch={switchHitPoints}
+        />
+        <MovementSection values={values as MonsterFormValues} />
+        <ChallengeSection values={values as MonsterFormValues} />
+      </div>
+    </StatisticsIssuesContext.Provider>
   )
 }
 
@@ -138,13 +180,16 @@ function AbilityScoreField({
   values: MonsterFormValues
 }) {
   const form = useFormContext<MonsterFormValues>()
+  const issues = useContext(StatisticsIssuesContext)
   const score = values.abilityScores?.[ability] ?? 10
   const proficient = values.proficiencies?.savingThrows?.includes(ability) ?? false
+  const scorePath = `abilityScores.${ability}`
   return (
     <label>
       {getAbilityCompactLabel(ability)}
       <input
         aria-label={getAbilityCompactLabel(ability)}
+        aria-invalid={statisticsInvalid(scorePath, issues) || undefined}
         type="number"
         value={score}
         onChange={(event) => {
@@ -157,6 +202,7 @@ function AbilityScoreField({
       <input
         type="checkbox"
         aria-label={`${getAbilityCompactLabel(ability)} ${MONSTER_SAVE_LABEL}`}
+        aria-invalid={statisticsInvalid('proficiencies.savingThrows', issues) || undefined}
         checked={proficient}
         onChange={(event) => {
           const current = form.getValues('proficiencies.savingThrows') ?? []
@@ -230,12 +276,14 @@ function ArmorClassSection({
 
 function NaturalArmorBonus({ armorClass }: { armorClass: MonsterFormValues['armorClass'] }) {
   const form = useFormContext<MonsterFormValues>()
+  const issues = useContext(StatisticsIssuesContext)
   if (armorClass.kind !== 'natural') return null
   return (
     <label>
       {MONSTER_NATURAL_BONUS_LABEL}
       <input
         aria-label={MONSTER_NATURAL_BONUS_LABEL}
+        aria-invalid={statisticsInvalid('armorClass', issues) || undefined}
         type="number"
         min={1}
         value={armorClass.bonus ?? 1}
@@ -340,12 +388,14 @@ function HitDiceCountField({
   setHitDiceDisplay: (value: string | null) => void
 }) {
   const form = useFormContext<MonsterFormValues>()
+  const issues = useContext(StatisticsIssuesContext)
   const invalid = hitDiceDisplay !== null && !/^[1-9]\d*$/.test(hitDiceDisplay)
   return (
     <label>
       {MONSTER_HIT_DICE_LABEL}
       <input
         aria-label={MONSTER_HIT_DICE_LABEL}
+        aria-invalid={invalid || statisticsInvalid('hitPoints', issues) || undefined}
         type="number"
         value={hitDiceDisplay ?? String(hitPoints.count)}
         onChange={(event) => {
@@ -419,6 +469,7 @@ function FixedHitPointsFields({ hitPoints }: { hitPoints: MonsterFormValues['hit
 
 function MovementSection({ values }: { values: MonsterFormValues }) {
   const form = useFormContext<MonsterFormValues>()
+  const issues = useContext(StatisticsIssuesContext)
   return (
     <section>
       <h3>{MONSTER_MOVEMENT_HEADING}</h3>
@@ -426,6 +477,7 @@ function MovementSection({ values }: { values: MonsterFormValues }) {
         {MONSTER_WALK_LABEL}
         <input
           aria-label={MONSTER_WALK_LABEL}
+          aria-invalid={statisticsInvalid('movement', issues) || undefined}
           type="number"
           value={values.movement?.walk ?? 0}
           onChange={(event) =>
@@ -528,11 +580,13 @@ function HoverField({ values }: { values: MonsterFormValues }) {
 
 function ChallengeSection({ values }: { values: MonsterFormValues }) {
   const form = useFormContext<MonsterFormValues>()
+  const issues = useContext(StatisticsIssuesContext)
   return (
     <section>
       <h3>{MONSTER_CHALLENGE_HEADING}</h3>
       <select
         aria-label={MONSTER_CHALLENGE_HEADING}
+        aria-invalid={statisticsInvalid('challengeRating', issues) || undefined}
         value={values.challengeRating ?? ''}
         onChange={(event) => {
           const next = event.target.value
