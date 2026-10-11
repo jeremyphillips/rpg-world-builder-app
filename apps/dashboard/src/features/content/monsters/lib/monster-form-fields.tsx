@@ -1,13 +1,27 @@
-import { ALIGNMENT_ENTRIES, CREATURE_SIZE_ENTRIES, CREATURE_SIZES } from '@rpg/contracts'
+import {
+  ALIGNMENT_ENTRIES,
+  CHALLENGE_RATING_IDS,
+  CHALLENGE_RATING_MECHANICS,
+  CREATURE_SIZE_ENTRIES,
+  CREATURE_SIZES,
+  CREATURE_TYPE_TERM,
+  getChallengeRatingLabel,
+} from '@rpg/contracts'
 import { toOptions, type FormItem, type TabbedFormTab } from '@rpg/ui/form'
+
+import { vocabularySelectFieldForTerm } from '@/features/vocabulary'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
+import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
+import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-form-fields'
+import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
 import { MonsterCreatureDetailsPanel } from '../components/form/monster-creature-details-panel'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
 import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
+import { MONSTER_CHALLENGE_HEADING } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 
 const sizeOptions = toOptions(
@@ -21,6 +35,16 @@ const alignmentOptions = toOptions(
   Object.keys(ALIGNMENT_ENTRIES),
   Object.fromEntries(Object.entries(ALIGNMENT_ENTRIES).map(([id, entry]) => [id, entry.label])),
 )
+
+const challengeRatingOptions = [...CHALLENGE_RATING_IDS]
+  .sort(
+    (left, right) =>
+      CHALLENGE_RATING_MECHANICS[left].value - CHALLENGE_RATING_MECHANICS[right].value,
+  )
+  .map((id) => ({
+    value: id,
+    label: getChallengeRatingLabel(id),
+  }))
 
 function creatureTypeOptions(ctx: ContentFormCtx) {
   const vocabulary = ctx.creatureTypeVocabulary
@@ -37,25 +61,46 @@ function ownedSlot(name: string): FormItem {
 
 export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   const identity: FormItem[] = [
-    { type: 'textarea', name: 'description', label: 'Description' },
-    { type: 'select', name: 'size', label: 'Size', options: sizeOptions },
     {
-      type: 'select',
-      name: 'creatureType',
-      label: 'Creature type',
-      options: creatureTypeOptions(ctx),
+      kind: 'group',
+      legend: 'Identity',
+      density: 'comfortable',
+      fields: [
+        descriptionField(ctx),
+        { type: 'select', name: 'size', label: 'Size', options: sizeOptions },
+        vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
+          name: 'creatureType',
+          options: creatureTypeOptions(ctx),
+        }),
+        { type: 'select', name: 'alignment', label: 'Alignment', options: alignmentOptions },
+      ],
     },
-    { type: 'select', name: 'alignment', label: 'Alignment', options: alignmentOptions },
   ]
 
   const statistics: FormItem[] = [
     { kind: 'slot', name: 'abilityScores', render: () => <MonsterStatisticsPanel ctx={ctx} /> },
     ownedSlot('armorClass'),
     ownedSlot('hitPoints'),
-    ownedSlot('movement'),
-    ownedSlot('hover'),
-    ownedSlot('challengeRating'),
-    ownedSlot('experiencePointsOverride'),
+    movementWithHoverGroup(),
+    {
+      kind: 'group',
+      legend: MONSTER_CHALLENGE_HEADING,
+      fields: [
+        {
+          type: 'select',
+          name: 'challengeRating',
+          label: MONSTER_CHALLENGE_HEADING,
+          options: challengeRatingOptions,
+          clearable: true,
+        },
+        {
+          kind: 'slot',
+          name: 'challengeRating',
+          render: () => <MonsterChallengeRatingHint />,
+        },
+        ownedSlot('experiencePointsOverride'),
+      ],
+    },
     ownedSlot('proficiencies.savingThrows'),
   ]
 

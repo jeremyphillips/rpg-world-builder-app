@@ -4,19 +4,46 @@ import { z } from 'zod'
 import { MOVEMENT_MODES } from '@rpg/contracts'
 import type { ArrayConfig } from '@rpg/ui/form'
 
-import { speciesCreateDefaultValues } from './species-form-values'
+import { speciesCreateDefaultValues } from '../../../species/lib/species-form-values'
 import {
   movementArrayField,
   movementRowDraftFormSchema,
   movementRowFormSchema,
+  movementRowsIncludeFly,
   movementRowsToRecord,
   movementRowsToRecordForPreview,
-  refineSpeciesMovementRows,
-} from './species-movement-form-fields'
+  movementWithHoverGroup,
+  refineMovementRows,
+} from './content-movement-form-fields'
 
-describe('species movement form fields', () => {
+describe('content movement form fields', () => {
   it('seeds create forms with Walk 30', () => {
     expect(speciesCreateDefaultValues.movement).toEqual([{ mode: 'walk', feet: 30 }])
+  })
+
+  it('movementWithHoverGroup includes fly hover switch', () => {
+    const group = movementWithHoverGroup()
+    expect(group.kind).toBe('group')
+    if (group.kind !== 'group') return
+    const hasHoverSwitch = group.fields.some(
+      (field) =>
+        ('type' in field && field.type === 'switch' && field.name === 'hover') ||
+        (field.kind === 'group' &&
+          field.fields.some(
+            (nested) => 'type' in nested && nested.type === 'switch' && nested.name === 'hover',
+          )),
+    )
+    expect(hasHoverSwitch).toBe(true)
+  })
+
+  it('detects fly rows for hover visibility', () => {
+    expect(movementRowsIncludeFly([{ mode: 'walk', feet: 30 }])).toBe(false)
+    expect(
+      movementRowsIncludeFly([
+        { mode: 'walk', feet: 30 },
+        { mode: 'fly', feet: 60 },
+      ]),
+    ).toBe(true)
   })
 
   it('appends empty mode and speed rows', () => {
@@ -75,7 +102,7 @@ describe('species movement form fields', () => {
     ] as const
 
     const schema = z.array(movementRowDraftFormSchema).superRefine((values, ctx) => {
-      refineSpeciesMovementRows(values, ctx, [])
+      refineMovementRows(values, ctx, [])
     })
 
     const result = schema.safeParse([...rows])

@@ -81,6 +81,8 @@ export const speciesBodySchema = mediaBearingAuthoredContentBodySchema.extend({
   /** Allowed sizes; a single-element array is a fixed size, multiple is a choice. */
   sizes: z.array(creatureSizeSchema).min(1),
   movement: movementSpeedsSchema,
+  /** Only meaningful when `movement` includes fly speed. */
+  hover: z.boolean().optional(),
   /**
    * Recommended language ids. They order origin language picks and do not expand
    * selectable pools. On the classless level-0 chassis they are granted when
@@ -104,6 +106,7 @@ export const speciesBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   creatureType: creatureTypeSchema,
   sizes: z.array(creatureSizeSchema).default([]),
   movement: movementSpeedsDraftSchema,
+  hover: z.boolean().optional(),
   /** See {@link speciesBodySchema} `languageAffinities`. */
   languageAffinities: z.array(languageIdSchema).optional(),
   culture: speciesCultureConfigSchema.optional(),

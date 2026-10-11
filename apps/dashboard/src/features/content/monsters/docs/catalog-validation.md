@@ -33,3 +33,12 @@ blocked by transient catalog failures.
 
 Shared helper: `resolveStrictCatalogWriteGateReason` in
 `content-form-catalog-write-gate.lib.ts`.
+
+## Movement authoring
+
+Monster (and species) forms author movement as row arrays via
+`movementWithHoverGroup()` in
+[`content-movement-form-fields.ts`](../../lib/forms/fields/content-movement-form-fields.ts).
+`normalizeMonsterFormValues` and `resolveMonsterFormSchema` convert rows to the API
+`movement` record before save and Zod body validation. Fly hover uses the shared
+`hover` switch (visible only when a fly row is present).

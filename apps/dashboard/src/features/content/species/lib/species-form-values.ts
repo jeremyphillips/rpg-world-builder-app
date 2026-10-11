@@ -48,6 +48,7 @@ export function speciesToFormValues(entity: Species): SpeciesFormValues {
     creatureType: entity.creatureType,
     sizes: entity.sizes,
     movement: movementRecordToRows(entity.movement),
+    hover: entity.hover,
     languageAffinities: entity.languageAffinities ?? [],
     traits: entity.traits.map(traitToFormRow),
     heritage: entity.heritage ? heritageToFormRow(entity.heritage) : undefined,
@@ -122,16 +123,20 @@ function speciesWirePayload(
     validationIntent,
   )
 
+  const movement =
+    validationIntent === 'draft'
+      ? movementRowsToRecordForPreview(values.movement)
+      : movementRowsToRecord(values.movement)
+  const hasFly = typeof movement.fly === 'number'
+
   return {
     slug: slugForInputParse(values.name, ctx),
     name: values.name,
     description: values.description || undefined,
     creatureType: values.creatureType,
     sizes: values.sizes,
-    movement:
-      validationIntent === 'draft'
-        ? movementRowsToRecordForPreview(values.movement)
-        : movementRowsToRecord(values.movement),
+    movement,
+    ...(hasFly && values.hover !== undefined ? { hover: values.hover } : {}),
     ...optionalLanguageAffinities(values.languageAffinities),
     ...optionalCulture(culture),
     traits: traitsForInput(values, ctx, validationIntent),

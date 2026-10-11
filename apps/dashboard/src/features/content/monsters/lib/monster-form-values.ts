@@ -9,6 +9,10 @@ import type { FieldValues } from 'react-hook-form'
 
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import {
+  movementRecordToRows,
+  type MovementRowDraftFormValues,
+} from '../../lib/forms/fields/content-movement-form-fields'
+import {
   finalizeContentInput,
   slugForInputParse,
 } from '../../lib/forms/registry/content-form-key-helpers'
@@ -45,7 +49,7 @@ export type MonsterFormValues = FieldValues & {
     | { kind: 'fixed'; value?: number }
     | { kind: 'natural'; bonus?: number }
   hitPoints: Monster['hitPoints'] | { kind: 'fixed'; average?: number; formula?: string }
-  movement: Monster['movement']
+  movement: MovementRowDraftFormValues[]
   hover?: boolean
   senses: Monster['senses']
   languages: Monster['languages']
@@ -77,7 +81,7 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     abilityScores: { ...NEUTRAL_ABILITIES },
     armorClass: { kind: 'unarmored' },
     hitPoints: { kind: 'hit-dice', count: 1 },
-    movement: { walk: 30 },
+    movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
     languages: { entries: [] },
     proficiencies: { savingThrows: [], skills: [], weapons: [] },
@@ -105,7 +109,7 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     abilityScores: entity.abilityScores,
     armorClass: entity.armorClass,
     hitPoints: entity.hitPoints,
-    movement: entity.movement,
+    movement: movementRecordToRows(entity.movement),
     hover: entity.hover,
     senses: entity.senses ?? [],
     languages: entity.languages ?? { entries: [] },

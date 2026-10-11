@@ -2,19 +2,12 @@ import { createContext, useContext, useState } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import {
   ABILITY_IDS,
-  CHALLENGE_RATING_IDS,
-  CHALLENGE_RATING_MECHANICS,
   CREATURE_ARMOR_CLASS_KINDS,
   CREATURE_SIZE_HIT_DIE,
-  MOVEMENT_MODE_ENTRIES,
-  MOVEMENT_MODES,
   abilityModifier,
   formatSignedModifier,
   getAbilityCompactLabel,
-  getChallengeRatingLabel,
   getCreatureArmorClassKindLabel,
-  joinInlineMetadata,
-  type ChallengeRating,
   type CreatureSize,
 } from '@rpg/contracts'
 import { Button, SegmentedControl, SemanticText } from '@rpg/ui'
@@ -26,11 +19,6 @@ import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ABILITY_SCORES_HEADING,
   MONSTER_ARMOR_CLASS_HEADING,
-  MONSTER_AWARDS_ZERO_XP_HINT,
-  MONSTER_AWARDS_ZERO_XP_LABEL,
-  MONSTER_BLANK_CHALLENGE_HINT,
-  MONSTER_CHALLENGE_HEADING,
-  MONSTER_FEET_SUFFIX,
   MONSTER_FIXED_AC_HINT,
   MONSTER_FIXED_AC_LABEL,
   MONSTER_FIXED_AVERAGE_LABEL,
@@ -39,12 +27,9 @@ import {
   MONSTER_HIT_DICE_LABEL,
   MONSTER_HIT_DICE_MINIMUM_ERROR,
   MONSTER_HIT_POINTS_HEADING,
-  MONSTER_HOVER_LABEL,
   MONSTER_HP_MINIMUM_NOTE,
-  MONSTER_MOVEMENT_HEADING,
   MONSTER_NATURAL_BONUS_LABEL,
   MONSTER_SAVE_LABEL,
-  MONSTER_WALK_LABEL,
   monsterBodyArmorConflictMessage,
   monsterBodyArmorIgnoredMessage,
   monsterChooseBodyArmorMessage,
@@ -62,12 +47,6 @@ import {
 } from '../../lib/monster-statistics-errors'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
-
-const CHALLENGE_OPTIONS = [...CHALLENGE_RATING_IDS].sort(
-  (left, right) => CHALLENGE_RATING_MECHANICS[left].value - CHALLENGE_RATING_MECHANICS[right].value,
-)
-
-const OPTIONAL_MOVEMENT = MOVEMENT_MODES.filter((mode) => mode !== 'walk')
 
 const StatisticsIssuesContext = createContext<readonly StatisticsFieldIssue[]>([])
 
@@ -152,8 +131,6 @@ export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
           setHitDiceDisplay={setHitDiceDisplay}
           onSwitch={switchHitPoints}
         />
-        <MovementSection values={values as MonsterFormValues} />
-        <ChallengeSection values={values as MonsterFormValues} />
       </div>
     </StatisticsIssuesContext.Provider>
   )
@@ -467,156 +444,6 @@ function FixedHitPointsFields({ hitPoints }: { hitPoints: MonsterFormValues['hit
   )
 }
 
-function MovementSection({ values }: { values: MonsterFormValues }) {
-  const form = useFormContext<MonsterFormValues>()
-  const issues = useContext(StatisticsIssuesContext)
-  return (
-    <section>
-      <h3>{MONSTER_MOVEMENT_HEADING}</h3>
-      <label>
-        {MONSTER_WALK_LABEL}
-        <input
-          aria-label={MONSTER_WALK_LABEL}
-          aria-invalid={statisticsInvalid('movement', issues) || undefined}
-          type="number"
-          value={values.movement?.walk ?? 0}
-          onChange={(event) =>
-            form.setValue('movement.walk', Number(event.target.value), { shouldDirty: true })
-          }
-        />
-        <span>{MONSTER_FEET_SUFFIX}</span>
-      </label>
-      {OPTIONAL_MOVEMENT.map((mode) => (
-        <OptionalMovementField key={mode} mode={mode} speed={values.movement?.[mode]} />
-      ))}
-      <AddMovementSelect values={values} />
-      <HoverField values={values} />
-    </section>
-  )
-}
-
-function OptionalMovementField({
-  mode,
-  speed,
-}: {
-  mode: (typeof OPTIONAL_MOVEMENT)[number]
-  speed: number | undefined
-}) {
-  const form = useFormContext<MonsterFormValues>()
-  if (speed === undefined) return null
-  return (
-    <div>
-      <label>
-        {MOVEMENT_MODE_ENTRIES[mode].label}
-        <input
-          aria-label={MOVEMENT_MODE_ENTRIES[mode].label}
-          type="number"
-          value={speed}
-          onChange={(event) =>
-            form.setValue(`movement.${mode}`, Number(event.target.value), { shouldDirty: true })
-          }
-        />
-      </label>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => {
-          const movement = { ...form.getValues('movement') }
-          delete movement[mode]
-          form.setValue('movement', movement, { shouldDirty: true })
-          if (mode === 'fly') form.setValue('hover', undefined, { shouldDirty: true })
-        }}
-      >
-        Remove
-      </Button>
-    </div>
-  )
-}
-
-function AddMovementSelect({ values }: { values: MonsterFormValues }) {
-  const form = useFormContext<MonsterFormValues>()
-  return (
-    <label>
-      Add movement
-      <select
-        aria-label="Add movement"
-        value=""
-        onChange={(event) => {
-          const mode = event.target.value
-          if (!mode) return
-          form.setValue(
-            'movement',
-            { ...form.getValues('movement'), [mode]: 30 },
-            { shouldDirty: true },
-          )
-        }}
-      >
-        <option value="">Add movement</option>
-        {OPTIONAL_MOVEMENT.filter((mode) => values.movement?.[mode] === undefined).map((mode) => (
-          <option key={mode} value={mode}>
-            {MOVEMENT_MODE_ENTRIES[mode].label}
-          </option>
-        ))}
-      </select>
-    </label>
-  )
-}
-
-function HoverField({ values }: { values: MonsterFormValues }) {
-  const form = useFormContext<MonsterFormValues>()
-  if (values.movement?.fly === undefined) return null
-  return (
-    <label>
-      <input
-        type="checkbox"
-        aria-label={MONSTER_HOVER_LABEL}
-        checked={Boolean(values.hover)}
-        onChange={(event) => form.setValue('hover', event.target.checked, { shouldDirty: true })}
-      />
-      {MONSTER_HOVER_LABEL}
-    </label>
-  )
-}
-
-function ChallengeSection({ values }: { values: MonsterFormValues }) {
-  const form = useFormContext<MonsterFormValues>()
-  const issues = useContext(StatisticsIssuesContext)
-  return (
-    <section>
-      <h3>{MONSTER_CHALLENGE_HEADING}</h3>
-      <select
-        aria-label={MONSTER_CHALLENGE_HEADING}
-        aria-invalid={statisticsInvalid('challengeRating', issues) || undefined}
-        value={values.challengeRating ?? ''}
-        onChange={(event) => {
-          const next = event.target.value
-          form.setValue(
-            'challengeRating',
-            (next || undefined) as MonsterFormValues['challengeRating'],
-            { shouldDirty: true },
-          )
-          if (next !== '0')
-            form.setValue('experiencePointsOverride', undefined, { shouldDirty: true })
-        }}
-      >
-        <option value="">Select…</option>
-        {CHALLENGE_OPTIONS.map((id) => (
-          <option key={id} value={id}>
-            {getChallengeRatingLabel(id)}
-          </option>
-        ))}
-      </select>
-      <ChallengeHint
-        challengeRating={values.challengeRating as ChallengeRating | undefined}
-        awardsZeroXp={values.experiencePointsOverride === 0}
-        onAwardsZeroXpChange={(checked) =>
-          form.setValue('experiencePointsOverride', checked ? 0 : undefined, { shouldDirty: true })
-        }
-      />
-    </section>
-  )
-}
-
 function ArmorClassStatus({
   values,
   derived,
@@ -675,38 +502,5 @@ function HitPointStatus({ derived }: { derived: ReturnType<typeof deriveMonsterF
       HP {derived.hp.value.hp} = {derived.hp.value.formula}
       {note}
     </p>
-  )
-}
-
-function ChallengeHint({
-  challengeRating,
-  awardsZeroXp,
-  onAwardsZeroXpChange,
-}: {
-  challengeRating?: ChallengeRating
-  awardsZeroXp: boolean
-  onAwardsZeroXpChange: (checked: boolean) => void
-}) {
-  if (!challengeRating) return <p>{MONSTER_BLANK_CHALLENGE_HINT}</p>
-  const mechanics = CHALLENGE_RATING_MECHANICS[challengeRating]
-  const xp = challengeRating === '0' && awardsZeroXp ? 0 : mechanics.xp
-  return (
-    <div>
-      <p>
-        {joinInlineMetadata([`XP ${xp}`, `PB ${formatSignedModifier(mechanics.proficiencyBonus)}`])}
-      </p>
-      {challengeRating === '0' ? (
-        <label>
-          <input
-            type="checkbox"
-            aria-label={MONSTER_AWARDS_ZERO_XP_LABEL}
-            checked={awardsZeroXp}
-            onChange={(event) => onAwardsZeroXpChange(event.target.checked)}
-          />
-          {MONSTER_AWARDS_ZERO_XP_LABEL}
-          <span>{MONSTER_AWARDS_ZERO_XP_HINT}</span>
-        </label>
-      ) : null}
-    </div>
   )
 }

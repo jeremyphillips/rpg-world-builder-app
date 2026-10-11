@@ -1,5 +1,7 @@
 import { getContentTypeSentenceForm, getContentTypeTerm, joinInlineMetadata } from '@rpg/contracts'
 
+import { CREATURE_FLY_HOVER_LABEL } from '../../lib/forms/fields/content-movement-form-fields'
+
 /** Shown beside a clamped hit-point formula. Owned here and reused by the detail display. */
 export const MONSTER_HP_MINIMUM_NOTE = '(minimum 1)'
 
@@ -9,7 +11,7 @@ export const MONSTER_HIT_POINTS_HEADING = 'Hit points'
 export const MONSTER_MOVEMENT_HEADING = 'Movement'
 export const MONSTER_CHALLENGE_HEADING = 'Challenge rating'
 export const MONSTER_SAVE_LABEL = 'Save'
-export const MONSTER_HOVER_LABEL = 'Can hover'
+export const MONSTER_HOVER_LABEL = CREATURE_FLY_HOVER_LABEL
 export const MONSTER_AWARDS_ZERO_XP_LABEL = 'Awards 0 XP'
 export const MONSTER_AWARDS_ZERO_XP_HINT =
   'Some CR 0 creatures award no XP. When checked, XP shows as 0.'

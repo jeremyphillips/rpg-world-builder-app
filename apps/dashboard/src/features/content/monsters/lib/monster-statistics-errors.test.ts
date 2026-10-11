@@ -34,6 +34,6 @@ describe('statisticsFieldIsInvalid', () => {
 describe('statisticsIssueLabel', () => {
   it('names the ability and the section', () => {
     expect(statisticsIssueLabel('abilityScores.str')).toBe('STR')
-    expect(statisticsIssueLabel('challengeRating')).toBe('Challenge rating')
+    expect(statisticsIssueLabel('armorClass')).toBe('Armor Class')
   })
 })

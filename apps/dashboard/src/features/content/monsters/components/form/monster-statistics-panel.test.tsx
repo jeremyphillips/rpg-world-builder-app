@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
@@ -27,15 +26,11 @@ function Host({ values }: { values: MonsterFormValues }) {
 }
 
 describe('MonsterStatisticsPanel', () => {
-  it('shows the missing-armor state for equipment Armor Class and the CR 0 hint', async () => {
-    const user = userEvent.setup()
+  it('shows the missing-armor state for equipment Armor Class', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.armorClass = { kind: 'equipment' }
     render(<Host values={values} />)
     expect(screen.getByText(monsterChooseBodyArmorMessage())).toBeTruthy()
-    await user.selectOptions(screen.getByLabelText('Challenge rating'), '0')
-    expect(screen.getByLabelText('Awards 0 XP')).toBeTruthy()
-    expect(screen.getByText(/XP 10/)).toBeTruthy()
   })
 
   it('shows a statistics validation message on the field that failed', async () => {

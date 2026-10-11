@@ -6,6 +6,8 @@ import {
 
 import { monsterActionActiveKeys } from './monster-action-kind'
 
+import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
+
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
@@ -128,8 +130,7 @@ export function normalizeMonsterFormValues(
   values: MonsterFormValues,
   options: NormalizeMonsterFormOptions,
 ): Record<string, unknown> {
-  const movement = omitEmptyStrings(values.movement)
-  const movementRecord = isRecord(movement) ? movement : {}
+  const movementRecord = movementRowsToRecordForPreview(values.movement ?? [])
   const hasFly = typeof movementRecord.fly === 'number'
   const challengeRating = values.challengeRating
 

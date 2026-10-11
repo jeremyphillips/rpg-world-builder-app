@@ -3,29 +3,18 @@ import { ABILITY_IDS, getAbilityCompactLabel } from '@rpg/contracts'
 import {
   MONSTER_ABILITY_SCORES_HEADING,
   MONSTER_ARMOR_CLASS_HEADING,
-  MONSTER_CHALLENGE_HEADING,
   MONSTER_HIT_POINTS_HEADING,
-  MONSTER_HOVER_LABEL,
-  MONSTER_MOVEMENT_HEADING,
 } from './monster-form-labels'
 
 const SECTION_LABELS: Record<string, string> = {
   armorClass: MONSTER_ARMOR_CLASS_HEADING,
   hitPoints: MONSTER_HIT_POINTS_HEADING,
-  movement: MONSTER_MOVEMENT_HEADING,
-  hover: MONSTER_HOVER_LABEL,
-  challengeRating: MONSTER_CHALLENGE_HEADING,
-  experiencePointsOverride: 'Experience points',
 }
 
 const STATISTICS_ERROR_PREFIXES = [
   'abilityScores',
   'armorClass',
   'hitPoints',
-  'movement',
-  'hover',
-  'challengeRating',
-  'experiencePointsOverride',
   'proficiencies.savingThrows',
 ] as const
 

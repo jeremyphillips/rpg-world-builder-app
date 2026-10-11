@@ -6,8 +6,14 @@ import {
   monsterBodySchema,
   type ContentValidationIntent,
 } from '@rpg/contracts'
+import { z } from 'zod'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import {
+  movementRowsToRecordForPreview,
+  refineMovementRows,
+  type MovementRowDraftFormValues,
+} from '../../lib/forms/fields/content-movement-form-fields'
 
 function catalogLoadStatus(
   status: ContentFormCtx['equipmentCatalogStatus'],
@@ -24,15 +30,40 @@ function buildMonsterFormCatalogs(ctx: ContentFormCtx): MonsterCatalogs {
   }
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function adaptMonsterFormMovementForBodySchema(input: unknown): unknown {
+  if (!isRecord(input)) return input
+  const movement = input.movement
+  if (!Array.isArray(movement)) return input
+  return {
+    ...input,
+    movement: movementRowsToRecordForPreview(movement as MovementRowDraftFormValues[]),
+  }
+}
+
 /** Draft or publish body schema plus the shared catalog collector. */
 export function resolveMonsterFormSchema(
   ctx: ContentFormCtx,
   intent: ContentValidationIntent = 'publish',
 ) {
   const base = intent === 'draft' ? monsterBodyDraftSchema : monsterBodySchema
-  return base.superRefine((body, refinement) => {
-    for (const issue of collectMonsterCatalogIssues(body, buildMonsterFormCatalogs(ctx), intent)) {
-      addApiValidationIssueToRefinement(refinement, issue)
-    }
-  })
+  return z
+    .unknown()
+    .superRefine((input, refinementCtx) => {
+      if (!isRecord(input) || !Array.isArray(input.movement)) return
+      refineMovementRows(input.movement as MovementRowDraftFormValues[], refinementCtx)
+    })
+    .pipe(z.preprocess(adaptMonsterFormMovementForBodySchema, base))
+    .superRefine((body, refinement) => {
+      for (const issue of collectMonsterCatalogIssues(
+        body,
+        buildMonsterFormCatalogs(ctx),
+        intent,
+      )) {
+        addApiValidationIssueToRefinement(refinement, issue)
+      }
+    })
 }

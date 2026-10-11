@@ -54,10 +54,10 @@ import { heritageDraftFormSchema, heritageFormSchema } from './species-heritage-
 import { speciesCharacterCreationFormSchema } from './species-rules-form-fields'
 import { refineSpeciesCharacterCreationForm } from './species-rules-form-values'
 import {
-  movementArrayField,
   movementRowDraftFormSchema,
   movementRowFormSchema,
-  refineSpeciesMovementRows,
+  movementWithHoverGroup,
+  refineMovementRows,
 } from './species-movement-form-fields'
 import {
   heritageOptionItemFields,
@@ -96,6 +96,7 @@ export function createSpeciesFormSchema(
       creatureType: creatureTypeSchema,
       sizes: z.array(creatureSizeSchema).min(1),
       movement: z.array(movementRowFormSchema).min(1),
+      hover: z.boolean().optional(),
       languageAffinities: z.array(z.string()).optional(),
       traits: z.array(traitRowFormSchema),
       heritage: heritageFormSchema.optional(),
@@ -113,7 +114,7 @@ export function createSpeciesFormSchema(
           'creatureType',
         ])
       }
-      refineSpeciesMovementRows(values.movement, ctx)
+      refineMovementRows(values.movement, ctx)
       refineSpeciesCharacterCreationForm(values.characterCreation, formCtx, ctx)
       cultureFormSchemaRefinement(values, formCtx, (issue) => {
         addCustomRefinementIssue(ctx, issue.message, issue.path)
@@ -130,6 +131,7 @@ export function createSpeciesDraftFormSchema() {
       creatureType: creatureTypeSchema,
       sizes: z.array(creatureSizeSchema).default([]),
       movement: z.array(movementRowDraftFormSchema).default([]),
+      hover: z.boolean().optional(),
       languageAffinities: z.array(z.string()).optional(),
       traits: z.array(traitRowDraftFormSchema).default([]),
       heritage: heritageDraftFormSchema.optional(),
@@ -162,7 +164,7 @@ function attributesFields(ctx: ContentFormCtx): FormItem[] {
               options: getCharacterCreatureTypeFieldOptions(ctx),
               required: true,
             }),
-            movementArrayField(),
+            movementWithHoverGroup(),
             cultureFields(ctx),
           ],
         },
