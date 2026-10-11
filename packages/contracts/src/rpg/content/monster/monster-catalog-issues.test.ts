@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { equipmentSchema } from '../equipment'
+import { skillProficiencySchema } from '../skill-proficiency'
 import { collectMonsterCatalogIssues, MONSTER_CATALOG_ISSUE_CODE } from './monster-catalog-issues'
+import type { MonsterCatalogs } from './monster-catalog-issues'
 
 const RULESET = 'srd-cc-5.2.1'
 
@@ -49,7 +51,30 @@ const dagger = equipmentSchema.parse({
 
 const leather = armor('leather', 'Leather')
 const chain = armor('chain-shirt', 'Chain Shirt')
-const catalogs = { equipmentById: new Map([dagger, leather, chain].map((item) => [item.id, item])) }
+
+const athletics = skillProficiencySchema.parse({
+  id: `${RULESET}:athletics`,
+  slug: 'athletics',
+  rulesetId: RULESET,
+  source: 'system',
+  status: 'published',
+  campaignId: null,
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
+  name: 'Athletics',
+  ability: 'str',
+  examples: ['Climbing'],
+})
+
+function readyCatalogs(overrides: Partial<MonsterCatalogs> = {}): MonsterCatalogs {
+  return {
+    equipmentById: new Map([dagger, leather, chain].map((item) => [item.id, item])),
+    skillBySlug: new Map([[athletics.slug, athletics]]),
+    equipmentCatalog: 'ready',
+    skillCatalog: 'ready',
+    ...overrides,
+  }
+}
 
 describe('collectMonsterCatalogIssues', () => {
   it('blocks unknown equipment, non-weapon actions, and armor modifiers on every intent', () => {
@@ -67,7 +92,7 @@ describe('collectMonsterCatalogIssues', () => {
         ],
         reactions: [{ kind: 'weapon', equipmentEntryId: 'leather' }],
       },
-      catalogs,
+      readyCatalogs(),
       'draft',
     )
     expect(issues.map((issue) => issue.code)).toEqual([
@@ -93,7 +118,7 @@ describe('collectMonsterCatalogIssues', () => {
         ],
         actions: [{ kind: 'weapon', equipmentEntryId: 'dagger' }],
       },
-      catalogs,
+      readyCatalogs(),
       'draft',
     )
     expect(issues).toEqual([
@@ -106,8 +131,8 @@ describe('collectMonsterCatalogIssues', () => {
 
   it('requires equipped body armor only when publishing equipment Armor Class', () => {
     const body = { armorClass: { kind: 'equipment' }, equipment: [] }
-    expect(collectMonsterCatalogIssues(body, catalogs, 'draft')).toEqual([])
-    expect(collectMonsterCatalogIssues(body, catalogs, 'publish')).toEqual([
+    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')).toEqual([])
+    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'publish')).toEqual([
       expect.objectContaining({
         code: MONSTER_CATALOG_ISSUE_CODE.equipmentAcMissingBodyArmor,
         path: 'armorClass.kind',
@@ -122,8 +147,46 @@ describe('collectMonsterCatalogIssues', () => {
           armorClass: { kind: 'natural' },
           equipment: [{ entryId: 'leather', equipmentId: leather.id, equipped: true }],
         },
-        catalogs,
+        readyCatalogs(),
         'publish',
+      ),
+    ).toEqual([])
+  })
+
+  it('allows unresolved skills on draft and validates them on publish', () => {
+    const body = {
+      proficiencies: { skills: [{ skill: 'missing-skill', rank: 'proficient' as const }] },
+    }
+    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'draft')).toEqual([])
+    expect(collectMonsterCatalogIssues(body, readyCatalogs(), 'publish')).toEqual([
+      expect.objectContaining({
+        code: MONSTER_CATALOG_ISSUE_CODE.unknownSkill,
+        path: 'proficiencies.skills.0.skill',
+      }),
+    ])
+  })
+
+  it('blocks publish when the skill catalog is unavailable', () => {
+    expect(
+      collectMonsterCatalogIssues(
+        { proficiencies: { skills: [{ skill: 'athletics', rank: 'proficient' }] } },
+        readyCatalogs({ skillCatalog: 'unavailable' }),
+        'publish',
+      ),
+    ).toEqual([
+      expect.objectContaining({
+        code: MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
+        path: 'proficiencies.skills',
+      }),
+    ])
+  })
+
+  it('skips equipment row checks on draft when the equipment catalog is unavailable', () => {
+    expect(
+      collectMonsterCatalogIssues(
+        { equipment: [{ entryId: 'x', equipmentId: 'nope' }] },
+        readyCatalogs({ equipmentCatalog: 'unavailable' }),
+        'draft',
       ),
     ).toEqual([])
   })

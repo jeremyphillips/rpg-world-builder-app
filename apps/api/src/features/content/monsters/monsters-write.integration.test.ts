@@ -117,6 +117,49 @@ describe('monster write validation', () => {
     }
   })
 
+  it('allows draft saves with an unresolved skill and rejects publish', async () => {
+    const campaign = await makeTestCampaign()
+    const draft = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'draft-unknown-skill',
+        proficiencies: {
+          savingThrows: [],
+          skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    expect(draft.proficiencies.skills[0]?.skill).toBe('not-a-real-skill')
+
+    await expect(
+      createHomebrewContent(
+        monstersWriteConfig,
+        campaign.id,
+        {
+          ...minimalHomebrewMonsterInput,
+          slug: 'publish-unknown-skill',
+          proficiencies: {
+            savingThrows: [],
+            skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
+            weapons: [],
+          },
+        },
+        { status: 'published' },
+      ),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'validation_error',
+    })
+
+    await expect(
+      promoteContentToPublished(monstersWriteConfig, campaign.id, draft.id),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
+  })
+
   it('validates effectiveBody instead of merging existing and input', async () => {
     const campaign = await makeTestCampaign()
     await expect(

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import { contentFormRegistry } from '../lib/forms/registry/content-form-registry'
-import './lib/monster-form-def'
 import { buildMonsterInput, resolveMonsterCreateDefaultValues } from './lib/monster-form-values'
 
 describe('private monster form', () => {

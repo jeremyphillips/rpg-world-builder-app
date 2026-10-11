@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { ApiError } from './errors'
 import {
+  addApiValidationIssueToRefinement,
   getApiValidationIssues,
   INVALID_CURSOR_ISSUE_CODE,
   isApiValidationDetails,
@@ -25,6 +26,25 @@ describe('isApiValidationDetails', () => {
       false,
     )
     expect(isApiValidationDetails({ issues: [{ path: 'name', message: 'Required' }] })).toBe(false)
+  })
+})
+
+describe('addApiValidationIssueToRefinement', () => {
+  it('maps structured issues onto Zod paths with stable params.code', () => {
+    const issues: { path: PropertyKey[]; message: string; params?: { code?: string } }[] = []
+    addApiValidationIssueToRefinement(
+      {
+        addIssue: (issue) => {
+          issues.push(issue)
+        },
+      },
+      { path: 'equipment.0.equipmentId', message: 'Unknown equipment.', code: 'unknown_equipment' },
+    )
+    expect(issues[0]).toMatchObject({
+      message: 'Unknown equipment.',
+      path: ['equipment', 0, 'equipmentId'],
+      params: { code: 'unknown_equipment' },
+    })
   })
 })
 

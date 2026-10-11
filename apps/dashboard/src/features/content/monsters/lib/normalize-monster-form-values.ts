@@ -179,7 +179,6 @@ export function normalizeMonsterFormValues(
   }
 
   applyOptionalScalars(normalized, values, challengeRating, hasFly)
-  void options.intent
   if (options.mode === 'update' && options.baseline) {
     applyClearableNulls(normalized, options.baseline, hasFly)
   }

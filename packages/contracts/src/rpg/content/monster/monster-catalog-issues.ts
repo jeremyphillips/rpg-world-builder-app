@@ -2,6 +2,11 @@ import type { ApiValidationIssue } from '../../../shared/api-validation'
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { Equipment, EquipmentModifier } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
+import type { SkillProficiency } from '../skill-proficiency'
+import {
+  isContentCampaignEligible,
+  isContentReferenceable,
+} from '../../runtime/campaign/content-resolution-policy'
 
 export const MONSTER_CATALOG_ISSUE_CODE = {
   unknownEquipment: 'unknown_equipment',
@@ -9,10 +14,17 @@ export const MONSTER_CATALOG_ISSUE_CODE = {
   armorClassModifierNotArmor: 'armor_class_modifier_not_armor',
   multipleEquippedBodyArmor: 'multiple_equipped_body_armor',
   equipmentAcMissingBodyArmor: 'equipment_ac_missing_body_armor',
+  equipmentCatalogUnavailable: 'equipment_catalog_unavailable',
+  unknownSkill: 'unknown_skill',
+  skillNotReferenceable: 'skill_not_referenceable',
+  skillNotCampaignEligible: 'skill_not_campaign_eligible',
+  skillCatalogUnavailable: 'skill_catalog_unavailable',
 } as const
 
 export type MonsterCatalogIssueCode =
   (typeof MONSTER_CATALOG_ISSUE_CODE)[keyof typeof MONSTER_CATALOG_ISSUE_CODE]
+
+export type MonsterCatalogLoadStatus = 'ready' | 'unavailable'
 
 type CatalogEquipmentEntry = {
   entryId?: string
@@ -27,22 +39,36 @@ type CatalogAction = {
   equipmentEntryId?: string
 }
 
+type CatalogSkillEntry = {
+  skill?: string
+}
+
 export type MonsterCatalogIssueBody = {
   armorClass?: { kind?: string }
   equipment?: readonly CatalogEquipmentEntry[]
   actions?: readonly CatalogAction[]
   bonusActions?: readonly CatalogAction[]
   reactions?: readonly CatalogAction[]
+  proficiencies?: {
+    skills?: readonly CatalogSkillEntry[]
+  }
 }
 
 export type MonsterCatalogs = {
   equipmentById: ReadonlyMap<string, Equipment>
+  skillBySlug: ReadonlyMap<string, SkillProficiency>
+  equipmentCatalog?: MonsterCatalogLoadStatus
+  skillCatalog?: MonsterCatalogLoadStatus
 }
 
 const ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 
 function issue(path: string, message: string, code: MonsterCatalogIssueCode): ApiValidationIssue {
   return { path, message, code }
+}
+
+function catalogStatus(status: MonsterCatalogLoadStatus | undefined): MonsterCatalogLoadStatus {
+  return status ?? 'ready'
 }
 
 function isBodyArmor(item: Equipment): boolean {
@@ -139,6 +165,57 @@ function pushWeaponActionIssue(
   )
 }
 
+function collectSkillIssues(
+  body: MonsterCatalogIssueBody,
+  catalogs: MonsterCatalogs,
+  issues: ApiValidationIssue[],
+): void {
+  if (catalogStatus(catalogs.skillCatalog) === 'unavailable') {
+    issues.push(
+      issue(
+        'proficiencies.skills',
+        'Skills could not be loaded. Try again before publishing.',
+        MONSTER_CATALOG_ISSUE_CODE.skillCatalogUnavailable,
+      ),
+    )
+    return
+  }
+
+  for (const [index, row] of (body.proficiencies?.skills ?? []).entries()) {
+    if (!row.skill) continue
+    const skill = catalogs.skillBySlug.get(row.skill)
+    if (!skill) {
+      issues.push(
+        issue(
+          `proficiencies.skills.${index}.skill`,
+          'Unknown skill.',
+          MONSTER_CATALOG_ISSUE_CODE.unknownSkill,
+        ),
+      )
+      continue
+    }
+    if (!isContentReferenceable(skill)) {
+      issues.push(
+        issue(
+          `proficiencies.skills.${index}.skill`,
+          'Publish this skill before using it on a monster.',
+          MONSTER_CATALOG_ISSUE_CODE.skillNotReferenceable,
+        ),
+      )
+      continue
+    }
+    if (!isContentCampaignEligible(skill)) {
+      issues.push(
+        issue(
+          `proficiencies.skills.${index}.skill`,
+          'This skill is not available in this campaign.',
+          MONSTER_CATALOG_ISSUE_CODE.skillNotCampaignEligible,
+        ),
+      )
+    }
+  }
+}
+
 function itemLabel(entry: CatalogEquipmentEntry, item: Equipment | undefined): string {
   return entry.customName ?? item?.name ?? entry.equipmentId ?? 'item'
 }
@@ -155,15 +232,33 @@ export function collectMonsterCatalogIssues(
   const issues: ApiValidationIssue[] = []
   const equipment = body.equipment ?? []
   const equippedBodyArmor: { index: number; label: string }[] = []
+  const equipmentReady = catalogStatus(catalogs.equipmentCatalog) === 'ready'
 
-  equipment.forEach((entry, index) => {
-    collectEquipmentRowIssues(entry, index, catalogs, issues, equippedBodyArmor)
-  })
-  collectBodyArmorConflicts(equippedBodyArmor, issues)
-  collectWeaponActionIssues(body, equipment, catalogs, issues)
+  if (intent === 'publish' && !equipmentReady) {
+    issues.push(
+      issue(
+        'equipment',
+        'Equipment could not be loaded. Try again before publishing.',
+        MONSTER_CATALOG_ISSUE_CODE.equipmentCatalogUnavailable,
+      ),
+    )
+  }
+
+  if (equipmentReady) {
+    equipment.forEach((entry, index) => {
+      collectEquipmentRowIssues(entry, index, catalogs, issues, equippedBodyArmor)
+    })
+    collectBodyArmorConflicts(equippedBodyArmor, issues)
+    collectWeaponActionIssues(body, equipment, catalogs, issues)
+  }
+
+  if (intent === 'publish') {
+    collectSkillIssues(body, catalogs, issues)
+  }
 
   if (
     intent === 'publish' &&
+    equipmentReady &&
     body.armorClass?.kind === 'equipment' &&
     equippedBodyArmor.length !== 1
   ) {

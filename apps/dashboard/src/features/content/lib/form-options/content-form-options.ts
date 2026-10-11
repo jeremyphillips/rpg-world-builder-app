@@ -118,6 +118,8 @@ function useContentCatalogLists(campaignId: string | undefined) {
     locations: locationsQuery.data,
     isPending: isAnyPending(...queries),
     isError: isAnyError(...queries),
+    equipmentQuery,
+    skillsQuery,
   }
 }
 
@@ -291,8 +293,17 @@ export function useContentFormOptions(campaignId: string | undefined): {
       weaponPropertyVocabulary: vocabulary.weaponPropertyVocabulary,
       options,
       equipmentCatalogById: new Map((catalog.equipment ?? []).map((item) => [item.id, item])),
-      equipmentCatalogStatus: catalog.isError ? 'error' : catalog.isPending ? 'pending' : 'ready',
-      skillCatalogStatus: catalog.isError ? 'error' : catalog.isPending ? 'pending' : 'ready',
+      skillCatalogBySlug: new Map((catalog.skills ?? []).map((skill) => [skill.slug, skill])),
+      equipmentCatalogStatus: catalog.equipmentQuery.isError
+        ? 'error'
+        : catalog.equipmentQuery.isPending
+          ? 'pending'
+          : 'ready',
+      skillCatalogStatus: catalog.skillsQuery.isError
+        ? 'error'
+        : catalog.skillsQuery.isPending
+          ? 'pending'
+          : 'ready',
     }),
     [
       campaignId,
@@ -302,8 +313,11 @@ export function useContentFormOptions(campaignId: string | undefined): {
       vocabulary,
       options,
       catalog.equipment,
-      catalog.isPending,
-      catalog.isError,
+      catalog.skills,
+      catalog.equipmentQuery.isError,
+      catalog.equipmentQuery.isPending,
+      catalog.skillsQuery.isError,
+      catalog.skillsQuery.isPending,
     ],
   )
 

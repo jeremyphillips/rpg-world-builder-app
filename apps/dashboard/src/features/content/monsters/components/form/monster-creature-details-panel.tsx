@@ -9,6 +9,8 @@ import {
 import { Button, SegmentedControl, SemanticText } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
+import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ADD_LANGUAGE_LABEL,
@@ -33,6 +35,13 @@ const DAMAGE_LISTS = ['vulnerabilities', 'resistances', 'immunities'] as const
 
 export function MonsterCreatureDetailsPanel({ ctx }: { ctx: ContentFormCtx }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
+  useReportContentFormWriteGate(
+    'strict',
+    resolveStrictCatalogWriteGateReason(ctx.skillCatalogStatus, {
+      loading: MONSTER_SKILL_LOADING,
+      error: MONSTER_SKILL_ERROR,
+    }),
+  )
   if (!values?.proficiencies || !values.defenses || !values.languages) return null
 
   const skillsReady = ctx.skillCatalogStatus === 'ready'

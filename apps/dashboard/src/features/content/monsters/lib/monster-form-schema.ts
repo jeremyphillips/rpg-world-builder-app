@@ -1,15 +1,27 @@
 import {
+  addApiValidationIssueToRefinement,
   collectMonsterCatalogIssues,
+  type MonsterCatalogs,
   monsterBodyDraftSchema,
   monsterBodySchema,
   type ContentValidationIntent,
 } from '@rpg/contracts'
-import { z } from 'zod'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 
-function issuePath(path: string): Array<string | number> {
-  return path.split('.').map((segment) => (/^\d+$/.test(segment) ? Number(segment) : segment))
+function catalogLoadStatus(
+  status: ContentFormCtx['equipmentCatalogStatus'],
+): MonsterCatalogs['equipmentCatalog'] {
+  return status === 'ready' ? 'ready' : 'unavailable'
+}
+
+function buildMonsterFormCatalogs(ctx: ContentFormCtx): MonsterCatalogs {
+  return {
+    equipmentById: ctx.equipmentCatalogById ?? new Map(),
+    skillBySlug: ctx.skillCatalogBySlug ?? new Map(),
+    equipmentCatalog: catalogLoadStatus(ctx.equipmentCatalogStatus),
+    skillCatalog: catalogLoadStatus(ctx.skillCatalogStatus),
+  }
 }
 
 /** Draft or publish body schema plus the shared catalog collector. */
@@ -19,31 +31,8 @@ export function resolveMonsterFormSchema(
 ) {
   const base = intent === 'draft' ? monsterBodyDraftSchema : monsterBodySchema
   return base.superRefine((body, refinement) => {
-    if (ctx.equipmentCatalogStatus === 'ready' && ctx.equipmentCatalogById) {
-      for (const issue of collectMonsterCatalogIssues(
-        body,
-        { equipmentById: ctx.equipmentCatalogById },
-        intent,
-      )) {
-        refinement.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: issue.message,
-          path: issuePath(issue.path),
-        })
-      }
+    for (const issue of collectMonsterCatalogIssues(body, buildMonsterFormCatalogs(ctx), intent)) {
+      addApiValidationIssueToRefinement(refinement, issue)
     }
-
-    if (ctx.skillCatalogStatus !== 'ready') return
-    const knownSkills = new Set((ctx.options?.skills?.visible ?? []).map((skill) => skill.id))
-    const skills = body.proficiencies?.skills ?? []
-    skills.forEach((row, index) => {
-      if (!knownSkills.has(row.skill)) {
-        refinement.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Unknown skill.',
-          path: ['proficiencies', 'skills', index, 'skill'],
-        })
-      }
-    })
   })
 }

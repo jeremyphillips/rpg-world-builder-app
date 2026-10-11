@@ -4,6 +4,7 @@ import { joinInlineMetadata, type Equipment } from '@rpg/contracts'
 import { Button, ConfirmDialog, SemanticText } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
 import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import { deriveMonsterFormDraft, monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import { planEquipmentCatalogChange } from '../../lib/monster-equipment-catalog-change'
@@ -57,13 +58,13 @@ export function MonsterEquipmentPanel({
   const [notices, setNotices] = useState<Record<string, string>>({})
   const catalog = monsterEquipmentCatalog(ctx)
   const status = ctx.equipmentCatalogStatus ?? 'ready'
-  const gateReason =
-    status === 'pending'
-      ? MONSTER_LOADING_EQUIPMENT
-      : status === 'error'
-        ? MONSTER_EQUIPMENT_CATALOG_ERROR
-        : null
-  useReportContentFormWriteGate(gateReason)
+  useReportContentFormWriteGate(
+    'strict',
+    resolveStrictCatalogWriteGateReason(status, {
+      loading: MONSTER_LOADING_EQUIPMENT,
+      error: MONSTER_EQUIPMENT_CATALOG_ERROR,
+    }),
+  )
 
   if (!values) return null
   const derived = deriveMonsterFormDraft(values as MonsterFormValues, ctx)

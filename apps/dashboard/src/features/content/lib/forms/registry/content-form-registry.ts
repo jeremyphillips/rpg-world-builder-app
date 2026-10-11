@@ -9,6 +9,7 @@ import type {
   Equipment,
   EquipmentKind,
   OrganizationPractice,
+  SkillProficiency,
   WeaponCategory,
 } from '@rpg/contracts'
 import type { ResolvedCampaignRules, ResolvedSpellcastingProgressionConfig } from '@rpg/contracts'
@@ -71,9 +72,11 @@ export type ContentFormCtx = {
   options?: Partial<ContentFormOptionSets>
   /** Full effective equipment catalog for monster catalog rules and derived AC. */
   equipmentCatalogById?: ReadonlyMap<string, Equipment>
+  /** Effective skill proficiencies keyed by slug for monster catalog rules. */
+  skillCatalogBySlug?: ReadonlyMap<string, SkillProficiency>
   /** `ready` once `equipmentCatalogById` is the campaign's effective catalog. */
   equipmentCatalogStatus?: 'pending' | 'ready' | 'error'
-  /** Skill list query state. Loading does not block save. */
+  /** `ready` once `skillCatalogBySlug` is the campaign's effective catalog. */
   skillCatalogStatus?: 'pending' | 'ready' | 'error'
   /** Selected member class affinity ids for orphan chip union on edit load. */
   organizationMemberClassAffinitySeedIds?: readonly string[]
