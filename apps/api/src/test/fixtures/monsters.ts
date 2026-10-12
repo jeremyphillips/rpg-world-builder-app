@@ -10,12 +10,13 @@ export const minimalHomebrewMonsterInput = {
   armorClass: { kind: 'unarmored' },
   hitPoints: { kind: 'hit-dice', count: 1 },
   movement: { walk: 30 },
-  languages: { entries: [] },
+  communication: {},
   challengeRating: '0',
   proficiencies: {
     savingThrows: [],
     skills: [],
-    weapons: { categories: [], items: [DAGGER_ID] },
+    languages: [],
+    weapons: [{ weaponId: DAGGER_ID }],
   },
   defenses: {
     vulnerabilities: [],

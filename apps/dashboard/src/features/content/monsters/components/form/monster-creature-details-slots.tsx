@@ -174,7 +174,7 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
 export function MonsterTelepathyRangeField() {
   const form = useFormContext<MonsterFormValues>()
   const [stored, setStored] = useState<number | undefined>(() => {
-    const value = form.getValues('languages.telepathy')
+    const value = form.getValues('communication.telepathy')
     return typeof value === 'number' ? value : undefined
   })
 
@@ -182,12 +182,12 @@ export function MonsterTelepathyRangeField() {
     const subscription = form.watch((values, info) => {
       if (
         info.name != null &&
-        info.name !== 'languages.telepathy' &&
-        !info.name.startsWith('languages.')
+        info.name !== 'communication.telepathy' &&
+        !info.name.startsWith('communication.')
       ) {
         return
       }
-      const next = values.languages?.telepathy
+      const next = values.communication?.telepathy
       setStored(typeof next === 'number' ? next : undefined)
     })
     return () => subscription.unsubscribe()
@@ -216,7 +216,7 @@ export function MonsterTelepathyRangeField() {
           if (typeof next !== 'number') return
           const feet = feetFromTelepathyRange(readRangeAmount(next), unit)
           setStored(feet)
-          form.setValue('languages.telepathy', feet, { shouldDirty: true })
+          form.setValue('communication.telepathy', feet, { shouldDirty: true })
         },
       }}
       end={{
@@ -229,12 +229,12 @@ export function MonsterTelepathyRangeField() {
         onChange: (next) => {
           if (next === 'mile') {
             setStored(TELEPATHY_MILE_FEET)
-            form.setValue('languages.telepathy', TELEPATHY_MILE_FEET, { shouldDirty: true })
+            form.setValue('communication.telepathy', TELEPATHY_MILE_FEET, { shouldDirty: true })
             return
           }
           if (next === 'ft' && stored === TELEPATHY_MILE_FEET) {
             setStored(undefined)
-            form.setValue('languages.telepathy', undefined, { shouldDirty: true })
+            form.setValue('communication.telepathy', undefined, { shouldDirty: true })
           }
         },
       }}
@@ -261,7 +261,7 @@ export function MonsterTelepathyRangeField() {
 export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormCtx }) {
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const languageEntries = values?.languages?.entries ?? []
+  const languageEntries = values?.proficiencies?.languages ?? []
   const selected = useMemo(
     () => new Set(languageEntries.map((entry) => entry.language)),
     [languageEntries],
@@ -278,7 +278,7 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
   )
   const [addLanguageKey, setAddLanguageKey] = useState(0)
 
-  if (!values?.languages) return null
+  if (!values?.proficiencies) return null
 
   return (
     <div className="flex flex-col gap-2">
@@ -295,14 +295,18 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
           value=""
           onChange={(next) => {
             if (typeof next !== 'string' || !next) return
-            form.setValue('languages.entries', [{ language: next }, ...values.languages.entries], {
-              shouldDirty: true,
-            })
+            form.setValue(
+              'proficiencies.languages',
+              [{ language: next }, ...(values.proficiencies.languages ?? [])],
+              {
+                shouldDirty: true,
+              },
+            )
             setAddLanguageKey((key) => key + 1)
           }}
         />
       ) : null}
-      {values.languages.entries.map((entry, index) => {
+      {(values.proficiencies.languages ?? []).map((entry, index) => {
         const label = ctx.languageVocabulary?.labelById[entry.language] ?? entry.language
         const speaks = entry.speaks !== false
         return (
@@ -324,7 +328,7 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
                       selected={speaks}
                       onSelectedChange={(nextSpeaks) => {
                         if (!nextSpeaks) return
-                        form.setValue(`languages.entries.${index}.speaks`, undefined, {
+                        form.setValue(`proficiencies.languages.${index}.speaks`, undefined, {
                           shouldDirty: true,
                         })
                       }}
@@ -338,7 +342,7 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
                       selected={!speaks}
                       onSelectedChange={(nextUnderstands) => {
                         if (!nextUnderstands) return
-                        form.setValue(`languages.entries.${index}.speaks`, false, {
+                        form.setValue(`proficiencies.languages.${index}.speaks`, false, {
                           shouldDirty: true,
                         })
                       }}
@@ -350,8 +354,10 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
                     label={label}
                     onRemove={() =>
                       form.setValue(
-                        'languages.entries',
-                        values.languages.entries.filter((row) => row.language !== entry.language),
+                        'proficiencies.languages',
+                        (values.proficiencies.languages ?? []).filter(
+                          (row) => row.language !== entry.language,
+                        ),
                         { shouldDirty: true },
                       )
                     }

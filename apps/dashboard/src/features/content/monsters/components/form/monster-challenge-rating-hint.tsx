@@ -1,8 +1,7 @@
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   CHALLENGE_RATING_MECHANICS,
-  formatSignedModifier,
-  joinInlineMetadata,
+  formatMonsterChallengeMetadata,
   type ChallengeRating,
 } from '@rpg/contracts'
 
@@ -32,7 +31,10 @@ export function MonsterChallengeRatingHint() {
   return (
     <div>
       <p>
-        {joinInlineMetadata([`XP ${xp}`, `PB ${formatSignedModifier(mechanics.proficiencyBonus)}`])}
+        {formatMonsterChallengeMetadata({
+          experiencePoints: xp,
+          proficiencyBonus: mechanics.proficiencyBonus,
+        })}
       </p>
       {challengeRating === '0' ? (
         <label>

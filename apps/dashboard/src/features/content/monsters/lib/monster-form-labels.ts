@@ -3,12 +3,20 @@ import {
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
+  getAverageHitPointsLabel,
   getContentTypeSentenceForm,
+  getCreatureLanguageFluencyLabel,
+  getMonsterActionKindFieldLabel,
+  getMonsterReactionFieldLabel,
+  getMonsterTraitSectionLabel,
+  getNaturalArmorBonusFieldLabel,
   getProficiencyDomainCollectionLabel,
   getProficiencyGrantCompactAddLabel,
   HIT_POINTS_TERM,
   joinInlineMetadata,
   LANGUAGE_TERM,
+  PASSIVE_PERCEPTION_TERM,
+  SAVING_THROW_SHORT_LABEL,
   SENSE_TERM,
 } from '@rpg/contracts'
 
@@ -35,24 +43,24 @@ export const MONSTER_ABILITY_SCORES_HEADING = vocabularyFieldLabel(ABILITY_SCORE
 export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
-export const MONSTER_SAVE_LABEL = 'Save'
+export const MONSTER_SAVE_LABEL = SAVING_THROW_SHORT_LABEL
 export const MONSTER_AWARDS_ZERO_XP_LABEL = 'Awards 0 XP'
 export const MONSTER_AWARDS_ZERO_XP_HINT =
   'Some CR 0 creatures award no XP. When checked, XP shows as 0.'
-export const MONSTER_FIXED_AVERAGE_LABEL = 'Average HP'
+export const MONSTER_FIXED_AVERAGE_LABEL = getAverageHitPointsLabel()
 export const MONSTER_FIXED_FORMULA_LABEL = 'Formula'
 export const MONSTER_FIXED_FORMULA_HINT = 'Optional. Shown as written.'
-export const MONSTER_NATURAL_BONUS_LABEL = 'Natural armor bonus'
+export const MONSTER_NATURAL_BONUS_LABEL = getNaturalArmorBonusFieldLabel()
 export const MONSTER_FIXED_AC_LABEL = `${armorClassLabel} value`
 export const MONSTER_FIXED_AC_HINT = 'Ignores ability scores and equipment.'
 export const MONSTER_TELEPATHY_HINT = 'Leave empty for no telepathy'
-export const MONSTER_SPEAKS_LABEL = 'Speaks'
-export const MONSTER_UNDERSTANDS_ONLY_LABEL = 'Understands only'
+export const MONSTER_SPEAKS_LABEL = getCreatureLanguageFluencyLabel('speaks')
+export const MONSTER_UNDERSTANDS_ONLY_LABEL = getCreatureLanguageFluencyLabel('understands-only')
 export const MONSTER_ADD_SKILL_LABEL = getProficiencyGrantCompactAddLabel('skill')
 export const MONSTER_ADD_LANGUAGE_LABEL = `Add ${vocabularyFieldLabel(LANGUAGE_TERM)}`
 export const MONSTER_ADD_SENSE_LABEL = `Add ${vocabularyFieldLabel(SENSE_TERM)}`
 export const MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL = `Special ${vocabularyFieldLabel(SENSE_TERM)}`
-export const MONSTER_PASSIVE_PERCEPTION_LABEL = 'Passive Perception'
+export const MONSTER_PASSIVE_PERCEPTION_LABEL = vocabularyFieldLabel(PASSIVE_PERCEPTION_TERM)
 export const MONSTER_ADD_ITEM_LABEL = 'Add item'
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
@@ -95,7 +103,7 @@ export function monsterEquipmentSectionLabel(): string {
   return getContentTypeItemLabel('equipment')
 }
 
-export const MONSTER_TRAITS_HEADING = 'Traits'
+export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
 export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
@@ -103,9 +111,9 @@ export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
 export const MONSTER_SECTION_EMPTY = 'None'
 export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
 export const MONSTER_ADD_LABEL = 'Add'
-export const MONSTER_KIND_LABEL = 'Kind'
+export const MONSTER_KIND_LABEL = getMonsterActionKindFieldLabel()
 export const MONSTER_ACTION_NAME_LABEL = 'Name'
-export const MONSTER_TRIGGER_LABEL = 'Trigger'
+export const MONSTER_TRIGGER_LABEL = getMonsterReactionFieldLabel('trigger')
 export const MONSTER_MOVE_TO_LABEL = 'Move to'
 export const MONSTER_MOVE_UP_LABEL = 'Move up'
 export const MONSTER_MOVE_DOWN_LABEL = 'Move down'

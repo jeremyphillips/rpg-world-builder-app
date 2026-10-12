@@ -16,9 +16,9 @@ const DEFAULT_MONSTER = {
   hitPoints: { kind: 'hit-dice', count: 1 },
   movement: { walk: 30 },
   senses: [],
-  languages: { entries: [] },
+  communication: {},
   challengeRating: '0',
-  proficiencies: { savingThrows: [], skills: [], weapons: { categories: [], items: [] } },
+  proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
   defenses: {
     vulnerabilities: [],
     resistances: [],

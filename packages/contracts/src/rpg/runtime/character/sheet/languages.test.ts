@@ -36,6 +36,30 @@ describe('assembleLanguageProficiencyIds', () => {
 })
 
 describe('mergeLanguageProficiencyEntries', () => {
+  it('keeps speaking when one row is understands-only', () => {
+    expect(
+      mergeLanguageProficiencyEntries([
+        {
+          language: 'common',
+          sources: [{ kind: 'characterCreation', sourceId: 'ruleset', grantId: 'grants' }],
+        },
+        {
+          language: 'common',
+          speaks: false,
+          sources: [{ kind: 'characterCreation', sourceId: 'ruleset', grantId: 'choice' }],
+        },
+      ]),
+    ).toEqual([
+      {
+        language: 'common',
+        sources: [
+          { kind: 'characterCreation', sourceId: 'ruleset', grantId: 'grants' },
+          { kind: 'characterCreation', sourceId: 'ruleset', grantId: 'choice' },
+        ],
+      },
+    ])
+  })
+
   it('merges sources when the same language appears twice', () => {
     expect(
       mergeLanguageProficiencyEntries([

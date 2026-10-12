@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { addCustomRefinementIssue } from '../../lib/add-custom-refinement-issue'
 import { abilitySchema } from '../vocab/ability'
 import { challengeRatingSchema, CHALLENGE_RATING_MECHANICS } from '../vocab/challenge-rating'
-import { languageIdSchema } from '../vocab/language'
 import {
   creatureAbilityScoresSchema,
   creatureAlignmentSchema,
@@ -12,12 +11,15 @@ import {
   creatureSensesSchema,
   refineCreatureSenseRanges,
   refineCreatureTelepathyRange,
+  creatureCommunicationSchema,
+  EMPTY_CREATURE_COMMUNICATION,
   creatureSizeRefSchema,
   creatureSkillProficiencyEntrySchema,
+  creatureLanguageProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
   creatureDefensesSchema,
   creatureTypeRefSchema,
-  creatureWeaponProficienciesSchema,
+  creatureWeaponProficiencyTargetSchema,
   equipmentInstanceSchema,
   refineCreatureDamageDefenses,
 } from './creature'
@@ -98,23 +100,14 @@ export const monsterBodyFields = {
   movement: creatureMovementSchema,
   hover: z.boolean().optional(),
   senses: creatureSensesSchema,
-  languages: z.object({
-    entries: z
-      .array(
-        z.object({
-          language: languageIdSchema,
-          speaks: z.boolean().optional(),
-        }),
-      )
-      .default([]),
-    telepathy: z.number().int().min(0).optional(),
-  }),
+  communication: creatureCommunicationSchema.default(EMPTY_CREATURE_COMMUNICATION),
   challengeRating: challengeRatingSchema,
   experiencePointsOverride: z.number().int().min(0).optional(),
   proficiencies: z.object({
     savingThrows: z.array(abilitySchema).default([]),
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
-    weapons: creatureWeaponProficienciesSchema.default({ categories: [], items: [] }),
+    languages: z.array(creatureLanguageProficiencyEntrySchema).default([]),
+    weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
   }),
   defenses: creatureDefensesSchema,
   equipment: z.array(monsterEquipmentEntrySchema).default([]),
@@ -128,7 +121,7 @@ export const monsterBodySchema = mediaBearingAuthoredContentBodySchema.extend(mo
 
 export type MonsterBody = z.infer<typeof monsterBodySchema>
 
-export const monsterBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema(
+const monsterBodyDraftSchemaBase = mediaBearingDraftAuthoredContentBodySchema(
   MONSTER_CONTENT_TYPE_TERM.label,
 ).extend({
   ...monsterBodyFields,
@@ -147,6 +140,8 @@ export const monsterBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   traits: z.array(monsterTraitDraftSchema).default([]),
 })
 
+export const monsterBodyDraftSchema = monsterBodyDraftSchemaBase
+
 export type MonsterBodyDraft = z.infer<typeof monsterBodyDraftSchema>
 
 function collectActionIds(body: {
@@ -162,6 +157,55 @@ function collectActionIds(body: {
 }
 
 const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
+
+function refineMonsterProficiencies(
+  proficiencies: MonsterBody['proficiencies'],
+  ctx: z.RefinementCtx,
+  prefix: (string | number)[],
+): void {
+  const seenLanguages = new Set<string>()
+  proficiencies.languages.forEach((entry, index) => {
+    if (seenLanguages.has(entry.language)) {
+      addCustomRefinementIssue(ctx, 'Language ids must be unique.', [
+        ...prefix,
+        'proficiencies',
+        'languages',
+        index,
+        'language',
+      ])
+    }
+    seenLanguages.add(entry.language)
+  })
+
+  const seenWeaponIds = new Set<string>()
+  const seenWeaponCategories = new Set<string>()
+  proficiencies.weapons.forEach((target, index) => {
+    if (target.weaponId !== undefined) {
+      if (seenWeaponIds.has(target.weaponId)) {
+        addCustomRefinementIssue(ctx, 'Weapon proficiency targets must be unique.', [
+          ...prefix,
+          'proficiencies',
+          'weapons',
+          index,
+          'weaponId',
+        ])
+      }
+      seenWeaponIds.add(target.weaponId)
+    }
+    if (target.weaponCategory !== undefined) {
+      if (seenWeaponCategories.has(target.weaponCategory)) {
+        addCustomRefinementIssue(ctx, 'Weapon proficiency targets must be unique.', [
+          ...prefix,
+          'proficiencies',
+          'weapons',
+          index,
+          'weaponCategory',
+        ])
+      }
+      seenWeaponCategories.add(target.weaponCategory)
+    }
+  })
+}
 
 function refineUniqueIds(
   ids: readonly string[],
@@ -251,7 +295,12 @@ export function refineMonsterBody(
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
-  refineCreatureTelepathyRange(body.languages.telepathy, ctx, [...prefix, 'languages', 'telepathy'])
+  refineCreatureTelepathyRange(body.communication.telepathy, ctx, [
+    ...prefix,
+    'communication',
+    'telepathy',
+  ])
+  refineMonsterProficiencies(body.proficiencies, ctx, prefix)
 
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {
@@ -274,9 +323,11 @@ export function refineMonsterBody(
 /** Stored monster record — explicit meta + body (Zod superRefine omits output typing). */
 export type Monster = ContentMeta & MonsterBody
 
-export const monsterSchema = publishStoredSchema(monsterBodySchema).superRefine((monster, ctx) =>
+const monsterStoredSchema = publishStoredSchema(monsterBodySchema).superRefine((monster, ctx) =>
   refineMonsterBody(monster as MonsterBody, ctx),
-) as unknown as z.ZodType<Monster>
+)
+
+export const monsterSchema = monsterStoredSchema as unknown as z.ZodType<Monster>
 
 function refineMonsterDraftBody(
   body: MonsterBodyDraft,
@@ -321,9 +372,11 @@ function refineMonsterDraftBody(
   )
 }
 
-export const monsterDraftStoredSchema = draftStoredSchema(monsterBodyDraftSchema).superRefine(
+const monsterDraftStoredSchemaBase = draftStoredSchema(monsterBodyDraftSchema).superRefine(
   (monster, ctx) => refineMonsterDraftBody(monster as MonsterBodyDraft, ctx),
 )
+
+export const monsterDraftStoredSchema = monsterDraftStoredSchemaBase
 
 export type MonsterDraft = z.infer<typeof monsterDraftStoredSchema>
 
@@ -354,6 +407,10 @@ export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   .partial()
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 
+export {
+  LegacyMonsterDocumentConflictError,
+  normalizeLegacyMonsterDocument,
+} from './monster/normalize-legacy-document'
 export {
   collectMonsterCatalogIssues,
   MONSTER_CATALOG_ISSUE_CODE,

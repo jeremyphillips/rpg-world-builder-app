@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 import type { RefinementCtx, ZodIssue } from 'zod'
 
 import { characterSchema } from '../runtime/character/sheet'
+import { formatFieldMessage } from '../../validation/define-message'
 import {
   creatureAbilityScoresSchema,
   creatureRuntimeHitPointsSchema,
   creatureSensesDraftSchema,
   creatureSensesSchema,
-  formatTelepathyRange,
   refineCreatureTelepathyRange,
   TELEPATHY_MILE_FEET,
   refineCreatureSenseRanges,
@@ -18,13 +18,6 @@ import {
   creatureWeaponProficiencyTargetSchema,
   resolveDamageDefenseOptionState,
 } from './creature'
-
-describe('telepathy range', () => {
-  it('formats feet and one mile', () => {
-    expect(formatTelepathyRange(60)).toBe('60 ft.')
-    expect(formatTelepathyRange(TELEPATHY_MILE_FEET)).toBe('1 mile')
-  })
-})
 
 describe('creatureAbilityScoresSchema', () => {
   it('accepts monster-scale ability scores', () => {
@@ -154,20 +147,17 @@ describe('refineCreatureTelepathyRange', () => {
         issues.push(issue.message)
       },
     } as never
-    refineCreatureTelepathyRange(60, ctx, ['languages', 'telepathy'])
-    refineCreatureTelepathyRange(TELEPATHY_MILE_FEET, ctx, ['languages', 'telepathy'])
+    refineCreatureTelepathyRange(60, ctx, ['communication', 'telepathy'])
+    refineCreatureTelepathyRange(TELEPATHY_MILE_FEET, ctx, ['communication', 'telepathy'])
     expect(issues).toEqual([])
   })
 
   it('rejects a distance outside the telepathy presets', () => {
     const { issues, ctx } = refinementIssueCollector()
-    refineCreatureTelepathyRange(15, ctx, ['languages', 'telepathy'])
-    expect(issues).toEqual([
-      {
-        message: 'Choose a telepathy range.',
-        path: ['languages', 'telepathy'],
-      },
-    ])
+    refineCreatureTelepathyRange(15, ctx, ['communication', 'telepathy'])
+    expect(issues).toHaveLength(1)
+    expect(formatFieldMessage(issues[0]!.message)).toBe('Choose a telepathy range.')
+    expect(issues[0]!.path).toEqual(['communication', 'telepathy'])
   })
 })
 

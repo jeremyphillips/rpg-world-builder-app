@@ -11,7 +11,9 @@ import {
   getLanguageLabel,
   joinInlineMetadata,
   formatMovementDisplay,
-  formatTelepathyRange,
+  formatCreatureCommunication,
+  formatMonsterChallengeMetadata,
+  formatPassivePerceptionStatPhrase,
   type Equipment,
   type Monster,
   type MonsterAction,
@@ -221,12 +223,14 @@ function formatSpeedStatRow(monster: Monster): ContentStatRowData {
 
 function formatCrStatRow(monster: Monster, derived: DerivedMonsterStatBlock): ContentStatRowData {
   const crLabel = getChallengeRatingLabel(monster.challengeRating)
-  const xpPart = `XP ${derived.experiencePoints}`
-  const pbPart = `PB ${formatSignedModifier(derived.proficiencyBonus)}`
+  const rewardMetadata = formatMonsterChallengeMetadata({
+    experiencePoints: derived.experiencePoints,
+    proficiencyBonus: derived.proficiencyBonus,
+  })
   return {
     id: 'cr',
     label: 'CR',
-    value: joinInlineMetadata([crLabel, xpPart, pbPart]) || crLabel,
+    value: joinInlineMetadata([crLabel, rewardMetadata]) || crLabel,
   }
 }
 
@@ -328,32 +332,19 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
     sense.range != null ? `${sense.type} ${sense.range} ft.` : sense.type,
   )
   if (passivePerception != null) {
-    senseParts.push(`passive Perception ${passivePerception}`)
+    senseParts.push(formatPassivePerceptionStatPhrase(passivePerception))
   }
   return senseParts.join(', ')
 }
 
 function formatLanguageLines(monster: Monster): string | undefined {
-  const { entries, telepathy } = monster.languages
-  if (entries.length === 0 && telepathy == null) {
-    return undefined
-  }
-
-  const speaking = entries.filter((entry) => entry.speaks !== false)
-  const understandsOnly = entries.filter((entry) => entry.speaks === false)
-
-  const parts: string[] = []
-  if (speaking.length > 0) {
-    parts.push(speaking.map((entry) => getLanguageLabel(entry.language)).join(', '))
-  }
-  if (understandsOnly.length > 0) {
-    const labels = understandsOnly.map((entry) => getLanguageLabel(entry.language)).join(', ')
-    parts.push(`understands ${labels} but can't speak`)
-  }
-  if (telepathy != null) {
-    parts.push(`telepathy ${formatTelepathyRange(telepathy)}`)
-  }
-  return parts.join('; ')
+  return formatCreatureCommunication(
+    {
+      languages: monster.proficiencies.languages,
+      telepathy: monster.communication.telepathy,
+    },
+    { formatLanguageLabel: getLanguageLabel },
+  )
 }
 
 function formatDefenseLine(

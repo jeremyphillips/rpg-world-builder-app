@@ -12,9 +12,9 @@ const minimalMonsterBody = {
   hitPoints: { kind: 'hit-dice', count: 1 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision' }],
-  languages: { entries: [] },
+  communication: {},
   challengeRating: '1',
-  proficiencies: { savingThrows: [], skills: [], weapons: { categories: [], items: [] } },
+  proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
   defenses: {
     vulnerabilities: [],
     resistances: [],

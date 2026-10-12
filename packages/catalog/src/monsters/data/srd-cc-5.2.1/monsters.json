@@ -13,19 +13,37 @@
     "size": "small",
     "creatureType": "dragon",
     "alignment": "n",
-    "abilityScores": { "str": 7, "dex": 15, "con": 9, "int": 8, "wis": 7, "cha": 8 },
-    "armorClass": { "kind": "natural", "bonus": 2 },
-    "hitPoints": { "kind": "hit-dice", "count": 3 },
-    "movement": { "walk": 30 },
-    "senses": [{ "type": "darkvision", "range": 60 }],
-    "languages": {
-      "entries": [{ "language": "common" }, { "language": "draconic" }]
+    "abilityScores": {
+      "str": 7,
+      "dex": 15,
+      "con": 9,
+      "int": 8,
+      "wis": 7,
+      "cha": 8
     },
+    "armorClass": {
+      "kind": "natural",
+      "bonus": 2
+    },
+    "hitPoints": {
+      "kind": "hit-dice",
+      "count": 3
+    },
+    "movement": {
+      "walk": 30
+    },
+    "senses": [
+      {
+        "type": "darkvision",
+        "range": 60
+      }
+    ],
     "challengeRating": "1/8",
     "proficiencies": {
       "savingThrows": [],
       "skills": [],
-      "weapons": { "categories": [], "items": ["srd-cc-5.2.1:dagger"] }
+      "languages": [{ "language": "common" }, { "language": "draconic" }],
+      "weapons": [{ "weaponId": "srd-cc-5.2.1:dagger" }]
     },
     "defenses": {
       "vulnerabilities": [],
@@ -53,7 +71,13 @@
         "description": "<p>While in sunlight, the kobold has Disadvantage on ability checks and attack rolls.</p>"
       }
     ],
-    "actions": [{ "id": "dagger", "kind": "weapon", "equipmentEntryId": "dagger" }],
+    "actions": [
+      {
+        "id": "dagger",
+        "kind": "weapon",
+        "equipmentEntryId": "dagger"
+      }
+    ],
     "bonusActions": [],
     "reactions": []
   },
@@ -71,22 +95,40 @@
     "size": "medium",
     "creatureType": "undead",
     "alignment": "le",
-    "abilityScores": { "str": 10, "dex": 16, "con": 15, "int": 6, "wis": 8, "cha": 5 },
-    "armorClass": { "kind": "natural", "bonus": 1 },
-    "hitPoints": { "kind": "hit-dice", "count": 2 },
-    "movement": { "walk": 30 },
-    "senses": [{ "type": "darkvision", "range": 60 }],
-    "languages": {
-      "entries": [{ "language": "common", "speaks": false }]
+    "abilityScores": {
+      "str": 10,
+      "dex": 16,
+      "con": 15,
+      "int": 6,
+      "wis": 8,
+      "cha": 5
     },
+    "armorClass": {
+      "kind": "natural",
+      "bonus": 1
+    },
+    "hitPoints": {
+      "kind": "hit-dice",
+      "count": 2
+    },
+    "movement": {
+      "walk": 30
+    },
+    "senses": [
+      {
+        "type": "darkvision",
+        "range": 60
+      }
+    ],
     "challengeRating": "1/4",
     "proficiencies": {
       "savingThrows": [],
       "skills": [],
-      "weapons": {
-        "categories": [],
-        "items": ["srd-cc-5.2.1:shortbow", "srd-cc-5.2.1:shortsword"]
-      }
+      "languages": [{ "language": "common", "speaks": false }],
+      "weapons": [
+        { "weaponId": "srd-cc-5.2.1:shortbow" },
+        { "weaponId": "srd-cc-5.2.1:shortsword" }
+      ]
     },
     "defenses": {
       "vulnerabilities": ["bludgeoning"],
@@ -110,8 +152,16 @@
     ],
     "traits": [],
     "actions": [
-      { "id": "shortsword", "kind": "weapon", "equipmentEntryId": "shortsword" },
-      { "id": "shortbow", "kind": "weapon", "equipmentEntryId": "shortbow" }
+      {
+        "id": "shortsword",
+        "kind": "weapon",
+        "equipmentEntryId": "shortsword"
+      },
+      {
+        "id": "shortbow",
+        "kind": "weapon",
+        "equipmentEntryId": "shortbow"
+      }
     ],
     "bonusActions": [],
     "reactions": []

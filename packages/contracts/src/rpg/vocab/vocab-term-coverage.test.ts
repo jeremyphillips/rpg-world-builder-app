@@ -52,6 +52,11 @@ import { BUILDING_FORM_TERM } from './location/building/building-form'
 import { BUILDING_FUNCTION_FAMILY_TERM } from './location/building/building-function-family'
 import { EDITION_PRESET_TERM } from './mechanics/edition-preset'
 import { HIT_POINTS_TERM } from './mechanics/hit-points'
+import { EXPERIENCE_POINTS_TERM } from './mechanics/experience-points'
+import { PROFICIENCY_BONUS_TERM } from './mechanics/proficiency-bonus'
+import { PASSIVE_PERCEPTION_TERM } from './mechanics/passive-perception'
+import { TELEPATHY_TERM } from './mechanics/telepathy'
+import { SAVING_THROW_TERM } from './mechanics/saving-throw'
 import { MOVEMENT_MODE_TERM, MOVEMENT_OPERATION_TERM } from './movement-mode'
 import { PROFICIENCY_TERM } from './proficiency'
 import { SENSE_TERM } from './sense'
@@ -165,6 +170,11 @@ const PRIMITIVE_TERMS = [AREA_GEOMETRY_SHAPE_TERM] as const satisfies readonly V
 /** Taxonomies with `*_TERM` only — no `*_ENTRIES`, not in `VOCABULARY_OPTION_SET_TERMS`. */
 const CONCEPT_ONLY_TERMS = [
   HIT_POINTS_TERM,
+  EXPERIENCE_POINTS_TERM,
+  PROFICIENCY_BONUS_TERM,
+  PASSIVE_PERCEPTION_TERM,
+  TELEPATHY_TERM,
+  SAVING_THROW_TERM,
   SPECIES_HERITAGE_TERM,
 ] as const satisfies readonly VocabularyTerm[]
 
@@ -231,7 +241,7 @@ describe('primitives term coverage', () => {
 
 describe('concept-only term coverage', () => {
   it('defines vocab terms without *_ENTRIES maps', () => {
-    expect(CONCEPT_ONLY_TERMS).toHaveLength(2)
+    expect(CONCEPT_ONLY_TERMS).toHaveLength(7)
     for (const term of CONCEPT_ONLY_TERMS) {
       expectVocabularyTerm(term)
     }

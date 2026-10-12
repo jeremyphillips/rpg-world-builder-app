@@ -37,7 +37,8 @@ describe('monster write validation', () => {
         proficiencies: {
           savingThrows: [],
           skills: [],
-          weapons: { categories: [], items: [] },
+          languages: [],
+          weapons: [],
         },
       },
       { status: 'draft' },
@@ -115,7 +116,8 @@ describe('monster write validation', () => {
             proficiencies: {
               savingThrows: [],
               skills: [],
-              weapons: { categories: [], items: [] },
+              languages: [],
+              weapons: [],
             },
             ...entry,
           },
@@ -136,7 +138,8 @@ describe('monster write validation', () => {
         proficiencies: {
           savingThrows: [],
           skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
-          weapons: { categories: [], items: [] },
+          languages: [],
+          weapons: [],
         },
       },
       { status: 'draft' },
@@ -153,7 +156,8 @@ describe('monster write validation', () => {
           proficiencies: {
             savingThrows: [],
             skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
-            weapons: { categories: [], items: [] },
+            languages: [],
+            weapons: [],
           },
         },
         { status: 'published' },

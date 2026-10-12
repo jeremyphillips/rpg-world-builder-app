@@ -38,3 +38,8 @@ export const creatureArmorClassKindSchema = vocabEnumFromEntries(CREATURE_ARMOR_
 export function getCreatureArmorClassKindLabel(id: string): string {
   return CREATURE_ARMOR_CLASS_KIND_ENTRIES[id as CreatureArmorClassKind]?.label ?? id
 }
+
+/** Field label for natural armor bonus on monster authoring surfaces. */
+export function getNaturalArmorBonusFieldLabel(): string {
+  return `${CREATURE_ARMOR_CLASS_KIND_ENTRIES.natural.label} armor bonus`
+}

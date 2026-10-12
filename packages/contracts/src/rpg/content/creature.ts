@@ -37,16 +37,20 @@ export const creatureSensesSchema = z.array(senseSchema).default([])
 
 export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
 
-/** Stored feet for telepathy of 1 mile. Sense ranges never use this value. */
-export const TELEPATHY_MILE_FEET = 5280
-
-/** Display label for a stored telepathy range (`60 ft.`, `1 mile`). */
-export function formatTelepathyRange(feet: number): string {
-  if (feet === TELEPATHY_MILE_FEET) return '1 mile'
-  return `${feet} ft.`
-}
-
 const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
+
+export {
+  TELEPATHY_MILE_FEET,
+  creatureCommunicationSchema,
+  refineCreatureTelepathyRange,
+  EMPTY_CREATURE_COMMUNICATION,
+  type CreatureCommunication,
+} from './creature/communication'
+export {
+  creatureLanguageProficiencyEntrySchema,
+  type CreatureLanguageProficiencyEntry,
+} from './creature/proficiencies'
+export { formatTelepathyRange } from '../runtime/creature/communication'
 
 /** Publish validation — every sense row needs a range in feet. */
 export function refineCreatureSenseRanges(
@@ -67,17 +71,6 @@ export function refineCreatureSenseRanges(
       addCustomRefinementIssue(ctx, 'Choose a sense range in feet.', [...path, index, 'range'])
     }
   })
-}
-
-/** Publish validation — telepathy is a sense-range preset or one mile. */
-export function refineCreatureTelepathyRange(
-  telepathy: number | undefined,
-  ctx: z.RefinementCtx,
-  path: (string | number)[],
-): void {
-  if (telepathy === undefined) return
-  if (telepathy === TELEPATHY_MILE_FEET || SENSE_RANGE_PRESETS.includes(telepathy)) return
-  addCustomRefinementIssue(ctx, 'Choose a telepathy range.', path)
 }
 
 // ---------------------------------------------------------------------------

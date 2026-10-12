@@ -88,7 +88,7 @@ export const SenseRows: Story = {
 
 export const TelepathyRange: Story = {
   render: () => (
-    <FormHarness defaultValues={{ languages: { entries: [], telepathy: 5280 } }}>
+    <FormHarness defaultValues={{ communication: { telepathy: 5280 } }}>
       <MonsterTelepathyRangeField />
     </FormHarness>
   ),
@@ -98,7 +98,12 @@ export const LanguageRows: Story = {
   render: () => (
     <FormHarness
       defaultValues={{
-        languages: { entries: [{ language: 'common' }] },
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [{ language: 'common' }],
+          weapons: [],
+        },
       }}
     >
       <MonsterCreatureDetailsLanguagesSlot ctx={mockCtx} />

@@ -361,12 +361,13 @@ function invalidValueFor(routeKey: string): unknown {
         armorClass: { kind: 'unarmored' },
         hitPoints: { kind: 'hit-dice', count: 1 },
         movement: [{ mode: 'walk', feet: 30 }],
-        languages: { entries: [] },
+        communication: {},
         challengeRating: '0',
         proficiencies: {
           savingThrows: [],
           skills: [],
-          weapons: { categories: [], items: [] },
+          languages: [],
+          weapons: [],
         },
         defenses: {
           vulnerabilities: [],

@@ -1,4 +1,5 @@
 import {
+  creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
   monsterReactionDraftSchema,
   type ContentValidationIntent,
@@ -118,36 +119,49 @@ function dedupeSkillProficiencies(
   return next
 }
 
+function normalizeLanguageProficiencies(
+  languages: MonsterFormValues['proficiencies']['languages'],
+): MonsterFormValues['proficiencies']['languages'] {
+  const seen = new Set<string>()
+  const next: MonsterFormValues['proficiencies']['languages'] = []
+  for (const row of languages ?? []) {
+    if (seen.has(row.language)) continue
+    seen.add(row.language)
+    if (row.speaks === false) {
+      next.push({ language: row.language, speaks: false })
+    } else {
+      next.push({ language: row.language })
+    }
+  }
+  return next
+}
+
 function normalizeProficiencies(
   proficiencies: MonsterFormValues['proficiencies'],
   weaponProficiencyMode: MonsterFormValues['weaponProficiencyMode'],
 ): Record<string, unknown> {
   const coercedWeapons = coerceCreatureWeaponProficienciesForForm(proficiencies.weapons)
-  const weapons = normalizeWeaponProficiencyGrantSet({
+  const grantSet = normalizeWeaponProficiencyGrantSet({
     categories: coercedWeapons.categories,
     items: coercedWeapons.items,
     hasSpecificWeapons: weaponProficiencyMode === 'individual',
   })
+  const weapons = creatureWeaponProficiencyTargetsFromGrantSet(grantSet)
   return {
     ...proficiencies,
     skills: dedupeSkillProficiencies(proficiencies.skills ?? []),
+    languages: normalizeLanguageProficiencies(proficiencies.languages),
     weapons,
   }
 }
 
-function normalizeLanguages(languages: MonsterFormValues['languages']): Record<string, unknown> {
-  const cleaned = omitEmptyStrings(languages)
-  if (!isRecord(cleaned)) return { entries: [] }
-  const entries = Array.isArray(cleaned.entries) ? cleaned.entries : []
-  const nextEntries = entries.map((entry) => {
-    if (!isRecord(entry)) return entry
-    const row: Record<string, unknown> = { language: entry.language }
-    if (entry.speaks === false) row.speaks = false
-    return row
-  })
-  const next: Record<string, unknown> = { entries: nextEntries }
-  if (typeof cleaned.telepathy === 'number') next.telepathy = cleaned.telepathy
-  return next
+function normalizeCommunication(
+  communication: MonsterFormValues['communication'],
+): Record<string, unknown> {
+  const cleaned = omitEmptyStrings(communication)
+  if (!isRecord(cleaned)) return {}
+  if (typeof cleaned.telepathy === 'number') return { telepathy: cleaned.telepathy }
+  return {}
 }
 
 /**
@@ -173,7 +187,7 @@ export function normalizeMonsterFormValues(
     hitPoints: normalizeHitPoints(values.hitPoints),
     movement: movementRecord,
     senses: values.senses ?? [],
-    languages: normalizeLanguages(values.languages),
+    communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
       values.proficiencies,
       values.weaponProficiencyMode ?? 'categories',

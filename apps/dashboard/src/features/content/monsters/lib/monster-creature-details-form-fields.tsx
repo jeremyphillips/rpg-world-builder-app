@@ -2,9 +2,11 @@ import {
   CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES,
   EFFECT_CONDITION_IDS,
   getEffectConditionLabel,
+  TELEPATHY_TERM,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
 } from '@rpg/contracts'
+import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
@@ -118,6 +120,12 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
           render: () => <MonsterCreatureDetailsSkillsSlot ctx={ctx} />,
         },
         ...weaponProficiencyFields(ctx),
+        {
+          kind: 'slot',
+          name: 'proficiencies.languages',
+          heading: { label: 'Languages' },
+          render: () => <MonsterCreatureDetailsLanguagesSlot ctx={ctx} />,
+        },
       ],
     },
     {
@@ -136,26 +144,10 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
       legend: 'Communication',
       fields: [
         {
-          kind: 'group',
-          legend: 'Languages',
-          fields: [
-            {
-              kind: 'slot',
-              name: 'languages.entries',
-              render: () => <MonsterCreatureDetailsLanguagesSlot ctx={ctx} />,
-            },
-          ],
-        },
-        {
-          kind: 'group',
-          legend: 'Telepathy',
-          fields: [
-            {
-              kind: 'slot',
-              name: 'languages.telepathy',
-              render: () => <MonsterTelepathyRangeField />,
-            },
-          ],
+          kind: 'slot',
+          name: 'communication.telepathy',
+          heading: { label: vocabularyFieldLabel(TELEPATHY_TERM) },
+          render: () => <MonsterTelepathyRangeField />,
         },
       ],
     },

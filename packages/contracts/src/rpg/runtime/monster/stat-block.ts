@@ -14,7 +14,7 @@ import {
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { resolveCreatureInitiativeModifier } from '../creature/initiative'
-import { isWeaponProficientFromGrantSet } from '../creature/proficiencies'
+import { isWeaponProficient } from '../creature/proficiencies'
 import type { CreatureSkillCatalog } from '../creature/proficiencies'
 import { averageDiceRoll, type DieFace } from '../../primitives/dice'
 import {
@@ -368,7 +368,7 @@ function resolveCatalogWeaponAttackLine(args: {
 
   const attackBonusValue = weaponAttackBonus(
     abilityMod,
-    isWeaponProficientFromGrantSet(catalogItem, monster.proficiencies.weapons),
+    isWeaponProficient(catalogItem, monster.proficiencies.weapons),
     proficiencyBonus,
   )
 

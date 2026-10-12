@@ -24,7 +24,7 @@ const TAB_BY_PREFIX: Record<string, string> = {
   experiencePointsOverride: MONSTER_FORM_TAB.statistics,
   proficiencies: MONSTER_FORM_TAB.creatureDetails,
   senses: MONSTER_FORM_TAB.creatureDetails,
-  languages: MONSTER_FORM_TAB.creatureDetails,
+  communication: MONSTER_FORM_TAB.creatureDetails,
   defenses: MONSTER_FORM_TAB.creatureDetails,
   equipment: MONSTER_FORM_TAB.equipment,
   traits: MONSTER_FORM_TAB.traits,

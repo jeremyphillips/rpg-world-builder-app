@@ -111,12 +111,13 @@ const kobold = monsterSchema.parse({
   hitPoints: { kind: 'hit-dice', count: 3 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision', range: 60 }],
-  languages: { entries: [{ language: 'common' }, { language: 'draconic' }] },
+  communication: {},
   challengeRating: '1/8',
   proficiencies: {
     savingThrows: [],
     skills: [],
-    weapons: { categories: [], items: [`${RULESET}:dagger`] },
+    languages: [{ language: 'common' }, { language: 'draconic' }],
+    weapons: [{ weaponId: `${RULESET}:dagger` }],
   },
   defenses: {
     vulnerabilities: [],
@@ -149,15 +150,13 @@ const skeleton = monsterSchema.parse({
   hitPoints: { kind: 'hit-dice', count: 2 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision', range: 60 }],
-  languages: { entries: [{ language: 'common', speaks: false }] },
+  communication: {},
   challengeRating: '1/4',
   proficiencies: {
     savingThrows: [],
     skills: [],
-    weapons: {
-      categories: [],
-      items: [`${RULESET}:shortbow`, `${RULESET}:shortsword`],
-    },
+    languages: [{ language: 'common', speaks: false }],
+    weapons: [{ weaponId: `${RULESET}:shortbow` }, { weaponId: `${RULESET}:shortsword` }],
   },
   defenses: {
     vulnerabilities: ['bludgeoning'],

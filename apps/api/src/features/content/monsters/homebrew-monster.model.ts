@@ -19,6 +19,7 @@ const homebrewMonsterSchema = new Schema(
     movement: { type: Schema.Types.Mixed },
     hover: { type: Boolean },
     senses: { type: [Schema.Types.Mixed], default: [] },
+    communication: { type: Schema.Types.Mixed },
     languages: { type: Schema.Types.Mixed },
     challengeRating: { type: String },
     experiencePointsOverride: { type: Number },

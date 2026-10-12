@@ -70,7 +70,7 @@ export type MonsterFormValues = FieldValues & {
   movement: MovementRowDraftFormValues[]
   hover?: boolean
   senses: Array<{ type: Monster['senses'][number]['type']; range?: number }>
-  languages: Monster['languages']
+  communication: Monster['communication']
   challengeRating?: Monster['challengeRating']
   experiencePointsOverride?: number
   proficiencies: Monster['proficiencies']
@@ -109,10 +109,11 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
-    languages: { entries: [] },
+    communication: {},
     proficiencies: {
       savingThrows: [],
       skills: [],
+      languages: [],
       weapons: { ...EMPTY_CREATURE_WEAPON_PROFICIENCIES },
     },
     defenses: {
@@ -170,7 +171,7 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     movement: movementRecordToRows(entity.movement),
     hover: entity.hover,
     senses: entity.senses ?? [],
-    languages: entity.languages ?? { entries: [] },
+    communication: entity.communication ?? {},
     challengeRating: entity.challengeRating,
     experiencePointsOverride: entity.experiencePointsOverride,
     proficiencies: {

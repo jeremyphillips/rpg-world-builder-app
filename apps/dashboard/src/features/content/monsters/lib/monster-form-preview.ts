@@ -1,4 +1,4 @@
-import { formatSignedModifier, getContentTypeTerm } from '@rpg/contracts'
+import { formatMonsterChallengeMetadata, getContentTypeTerm } from '@rpg/contracts'
 import type { PreviewRailFact } from '@rpg/ui'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -50,7 +50,10 @@ function formatPreviewChallenge(
 ): string {
   if (!skillsReady || !values.challengeRating) return '—'
   if (derived?.challenge.status === 'resolved') {
-    return `XP ${derived.challenge.value.experiencePoints} PB ${formatSignedModifier(derived.challenge.value.proficiencyBonus)}`
+    return formatMonsterChallengeMetadata({
+      experiencePoints: derived.challenge.value.experiencePoints,
+      proficiencyBonus: derived.challenge.value.proficiencyBonus,
+    })
   }
   if (derived?.challenge.status === 'unavailable') {
     return monsterUnavailableReasonCopy(derived.challenge.reason, 'challenge')

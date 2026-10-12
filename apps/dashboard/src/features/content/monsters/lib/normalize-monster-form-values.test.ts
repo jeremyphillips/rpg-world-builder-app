@@ -48,13 +48,14 @@ describe('normalizeMonsterFormValues', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.challengeRating = '0'
     values.experiencePointsOverride = 0
-    values.languages = {
-      entries: [{ language: 'common', speaks: true }],
-      telepathy: undefined,
-    }
+    values.proficiencies.languages = [{ language: 'common' }]
+    values.communication = { telepathy: undefined }
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     expect(normalized.experiencePointsOverride).toBe(0)
-    expect(normalized.languages).toEqual({ entries: [{ language: 'common' }] })
+    expect(normalized.proficiencies).toMatchObject({
+      languages: [{ language: 'common' }],
+    })
+    expect(normalized.communication).toEqual({})
   })
 
   it('matches the preview serializer', () => {

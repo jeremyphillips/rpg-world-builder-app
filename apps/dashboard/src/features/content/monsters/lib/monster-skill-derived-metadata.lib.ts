@@ -1,5 +1,6 @@
 import {
   abilityModifier,
+  formatProficiencyBonus,
   formatSignedModifier,
   getAbilityCompactLabel,
   joinInlineMetadata,
@@ -24,5 +25,5 @@ export function monsterSkillDerivedMetadataLine(args: {
         ? args.proficiencyBonus
         : 0
   if (pbContribution === 0) return abilityPart
-  return joinInlineMetadata([abilityPart, `PB ${formatSignedModifier(pbContribution)}`])
+  return joinInlineMetadata([abilityPart, formatProficiencyBonus(pbContribution)])
 }

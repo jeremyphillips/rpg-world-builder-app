@@ -56,9 +56,9 @@ describe('monsterBodySchema refinements', () => {
     hitPoints: { kind: 'hit-dice', count: 1 },
     movement: { walk: 30 },
     senses: [],
-    languages: { entries: [] },
+    communication: {},
     challengeRating: '0',
-    proficiencies: { savingThrows: [], skills: [], weapons: { categories: [], items: [] } },
+    proficiencies: { savingThrows: [], skills: [], languages: [], weapons: [] },
     defenses: {
       vulnerabilities: [],
       resistances: [],
@@ -74,6 +74,16 @@ describe('monsterBodySchema refinements', () => {
         ...baseBody,
         actions: [{ id: 'shared', kind: 'special', name: 'A', description: 'a' }],
         reactions: [{ id: 'shared', kind: 'special', name: 'B', description: 'b', trigger: 't' }],
+      }).success,
+    ).toBe(false)
+  })
+
+  it('rejects legacy communication.languages on create input', () => {
+    expect(
+      createMonsterInputSchema.safeParse({
+        slug: 'legacy-languages',
+        ...baseBody,
+        communication: { languages: { entries: [{ language: 'common' }] } },
       }).success,
     ).toBe(false)
   })
