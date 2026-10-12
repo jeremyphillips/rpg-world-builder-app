@@ -11,6 +11,7 @@ import { cn } from '../../lib/utils'
 import { ChooseCountFieldShell } from './choose-count-field-shell.client'
 import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
 import type { FieldSize } from './field.client'
+import { fieldSizeToChipSize } from './field-sizing.variants'
 import { fieldHasValidationError } from './field-validation-props'
 import { FieldLabelContent } from './field-label-content'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
@@ -601,7 +602,7 @@ export function InlineSentenceField({
   const inAnatomyRow = useFieldRowParticipation()
   const fieldName = fieldNameProp ?? id
   const controlByName = useMemo(() => indexInlineSentenceControls(controls), [controls])
-  const resolvedChipSize = chipSize ?? below?.chipSize ?? size
+  const resolvedChipSize = chipSize ?? fieldSizeToChipSize[below?.chipSize ?? size]
   const sentenceClassName = inAnatomyRow
     ? fieldInlineSentenceRowClasses
     : fieldInlineSentenceClasses

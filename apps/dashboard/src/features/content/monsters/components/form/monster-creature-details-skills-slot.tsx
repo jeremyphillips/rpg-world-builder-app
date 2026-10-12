@@ -9,6 +9,7 @@ import {
 import { Badge, Chip, ChipGroup, ComboboxField, SemanticText } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
+import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
@@ -51,6 +52,63 @@ type SkillRowProps = {
   values: MonsterFormValues
 }
 
+function MonsterSkillProficiencyRowTrailing({
+  row,
+  index,
+  skillLabel,
+  modifierBadge,
+  values,
+}: {
+  row: SkillRowProps['row']
+  index: number
+  skillLabel: string
+  modifierBadge: string | undefined
+  values: MonsterFormValues
+}) {
+  const form = useFormContext<MonsterFormValues>()
+  const { chipSize, badgeSize } = useEntityCardUtilityControlSizes()
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {modifierBadge ? (
+        <Badge tone="neutral" appearance="soft" size={badgeSize}>
+          {modifierBadge}
+        </Badge>
+      ) : null}
+      <ChipGroup semanticRole="radiogroup" aria-label={`${skillLabel} rank`}>
+        {PROFICIENCY_RANK_IDS.map((rank) => (
+          <Chip
+            key={rank}
+            id={`monster-skill-${row.skill}-${rank}`}
+            mode="selectable"
+            size={chipSize}
+            selectionRole="radio"
+            selected={row.rank === rank}
+            onSelectedChange={(selectedRank) => {
+              if (!selectedRank) return
+              form.setValue(`proficiencies.skills.${index}.rank`, rank as ProficiencyRank, {
+                shouldDirty: true,
+              })
+            }}
+          >
+            {PROFICIENCY_RANK_ENTRIES[rank].label}
+          </Chip>
+        ))}
+      </ChipGroup>
+      <MonsterCreatureDetailsRemoveRowButton
+        label={skillLabel}
+        onRemove={() =>
+          form.setValue(
+            'proficiencies.skills',
+            values.proficiencies.skills.filter((entry) => entry.skill !== row.skill),
+            { shouldDirty: true },
+          )
+        }
+      />
+    </div>
+  )
+}
+
 function MonsterSkillProficiencyRow({
   row,
   index,
@@ -59,7 +117,6 @@ function MonsterSkillProficiencyRow({
   proficiencyBonus,
   values,
 }: SkillRowProps) {
-  const form = useFormContext<MonsterFormValues>()
   const skillLabel = skill?.name ?? row.skill
   const derivedRow =
     derived?.skills.status === 'resolved'
@@ -89,42 +146,13 @@ function MonsterSkillProficiencyRow({
       trailing={{
         kind: 'utility',
         content: (
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            {modifierBadge ? (
-              <Badge tone="neutral" appearance="soft">
-                {modifierBadge}
-              </Badge>
-            ) : null}
-            <ChipGroup semanticRole="radiogroup" aria-label={`${skillLabel} rank`}>
-              {PROFICIENCY_RANK_IDS.map((rank) => (
-                <Chip
-                  key={rank}
-                  id={`monster-skill-${row.skill}-${rank}`}
-                  mode="selectable"
-                  selectionRole="radio"
-                  selected={row.rank === rank}
-                  onSelectedChange={(selectedRank) => {
-                    if (!selectedRank) return
-                    form.setValue(`proficiencies.skills.${index}.rank`, rank as ProficiencyRank, {
-                      shouldDirty: true,
-                    })
-                  }}
-                >
-                  {PROFICIENCY_RANK_ENTRIES[rank].label}
-                </Chip>
-              ))}
-            </ChipGroup>
-            <MonsterCreatureDetailsRemoveRowButton
-              label={skillLabel}
-              onRemove={() =>
-                form.setValue(
-                  'proficiencies.skills',
-                  values.proficiencies.skills.filter((entry) => entry.skill !== row.skill),
-                  { shouldDirty: true },
-                )
-              }
-            />
-          </div>
+          <MonsterSkillProficiencyRowTrailing
+            row={row}
+            index={index}
+            skillLabel={skillLabel}
+            modifierBadge={modifierBadge}
+            values={values}
+          />
         ),
       }}
     />

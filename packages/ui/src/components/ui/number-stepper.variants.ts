@@ -233,10 +233,11 @@ export type NumberStepperDigits = keyof (typeof numberStepperWidthVariants)['md'
 
 export type NumberStepperVariantProps = VariantProps<typeof numberStepperRootVariants>
 
-/** Maps field control scale to stepper tier — never resolves to `xs`. */
+/** Maps field control scale to stepper tier. */
 export function resolveNumberStepperSizeFromFieldSize(
   fieldSize: FieldSizeToken,
 ): NumberStepperSize {
+  if (fieldSize === 'xs') return 'xs'
   if (fieldSize === 'sm') return 'sm'
   if (fieldSize === 'lg') return 'lg'
   return 'md'

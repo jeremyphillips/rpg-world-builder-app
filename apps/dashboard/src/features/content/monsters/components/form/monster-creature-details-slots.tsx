@@ -6,6 +6,7 @@ import { Chip, ChipGroup, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
 import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
 
+import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import {
   feetFromTelepathyRange,
@@ -41,6 +42,150 @@ function clearableAmountOptions(options: readonly { value: number; label: string
 function readRangeAmount(next: string | number | undefined): number | undefined {
   if (typeof next !== 'number' || next === CLEARED_RANGE) return undefined
   return next
+}
+
+function MonsterSenseRangeRowTrailing({
+  row,
+  index,
+  label,
+  values,
+}: {
+  row: MonsterFormValues['senses'][number]
+  index: number
+  label: string
+  values: MonsterFormValues
+}) {
+  const form = useFormContext<MonsterFormValues>()
+  const { fieldSize } = useEntityCardUtilityControlSizes()
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <JoinedPairFieldForm
+        id={`monster-sense-range-${row.type}`}
+        label={`${label} range`}
+        labelVisibility="srOnly"
+        width="auto"
+        size={fieldSize}
+        chrome={{ variant: 'none' }}
+        start={{
+          kind: 'select',
+          id: `monster-sense-range-${row.type}-amount`,
+          value: row.range,
+          options: clearableAmountOptions(senseRangeAmountOptions),
+          digits: 3,
+          placeholder: SENSE_RANGE_PLACEHOLDER,
+          ariaLabel: `${label} range value`,
+          onChange: (next) => {
+            form.setValue(`senses.${index}.range`, readRangeAmount(next), {
+              shouldDirty: true,
+            })
+          },
+        }}
+        end={{
+          kind: 'select',
+          id: `monster-sense-range-${row.type}-unit`,
+          value: SENSE_RANGE_UNIT,
+          options: senseRangeUnitOptions,
+          sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+          ariaLabel: `${label} range unit`,
+          onChange: () => undefined,
+        }}
+        startOccupant={{
+          kind: 'select',
+          name: 'amount',
+          options: clearableAmountOptions(senseRangeAmountOptions),
+          digits: 3,
+          placeholder: SENSE_RANGE_PLACEHOLDER,
+          ariaLabel: `${label} range value`,
+        }}
+        endOccupant={{
+          kind: 'select',
+          name: 'unit',
+          options: senseRangeUnitOptions,
+          defaultValue: SENSE_RANGE_UNIT,
+          sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+          ariaLabel: `${label} range unit`,
+        }}
+      />
+      <MonsterCreatureDetailsRemoveRowButton
+        label={label}
+        onRemove={() =>
+          form.setValue(
+            'senses',
+            (values.senses ?? []).filter((entry) => entry.type !== row.type),
+            { shouldDirty: true },
+          )
+        }
+      />
+    </div>
+  )
+}
+
+function MonsterLanguageFluencyRowTrailing({
+  entry,
+  index,
+  label,
+  speaks,
+  values,
+}: {
+  entry: MonsterFormValues['proficiencies']['languages'][number]
+  index: number
+  label: string
+  speaks: boolean
+  values: MonsterFormValues
+}) {
+  const form = useFormContext<MonsterFormValues>()
+  const { chipSize } = useEntityCardUtilityControlSizes()
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <ChipGroup
+        semanticRole="radiogroup"
+        aria-label={`${label}, ${speaks ? MONSTER_SPEAKS_LABEL : MONSTER_UNDERSTANDS_ONLY_LABEL}`}
+      >
+        <Chip
+          id={`monster-language-${entry.language}-speaks`}
+          mode="selectable"
+          size={chipSize}
+          selectionRole="radio"
+          selected={speaks}
+          onSelectedChange={(nextSpeaks) => {
+            if (!nextSpeaks) return
+            form.setValue(`proficiencies.languages.${index}.speaks`, undefined, {
+              shouldDirty: true,
+            })
+          }}
+        >
+          {MONSTER_SPEAKS_LABEL}
+        </Chip>
+        <Chip
+          id={`monster-language-${entry.language}-understands`}
+          mode="selectable"
+          size={chipSize}
+          selectionRole="radio"
+          selected={!speaks}
+          onSelectedChange={(nextUnderstands) => {
+            if (!nextUnderstands) return
+            form.setValue(`proficiencies.languages.${index}.speaks`, false, {
+              shouldDirty: true,
+            })
+          }}
+        >
+          {MONSTER_UNDERSTANDS_ONLY_LABEL}
+        </Chip>
+      </ChipGroup>
+      <MonsterCreatureDetailsRemoveRowButton
+        label={label}
+        onRemove={() =>
+          form.setValue(
+            'proficiencies.languages',
+            (values.proficiencies.languages ?? []).filter((row) => row.language !== entry.language),
+            { shouldDirty: true },
+          )
+        }
+      />
+    </div>
+  )
 }
 
 export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx }) {
@@ -104,64 +249,12 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
             trailing={{
               kind: 'utility',
               content: (
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                  <JoinedPairFieldForm
-                    id={`monster-sense-range-${row.type}`}
-                    label={`${label} range`}
-                    labelVisibility="srOnly"
-                    width="auto"
-                    chrome={{ variant: 'none' }}
-                    start={{
-                      kind: 'select',
-                      id: `monster-sense-range-${row.type}-amount`,
-                      value: row.range,
-                      options: clearableAmountOptions(senseRangeAmountOptions),
-                      digits: 3,
-                      placeholder: SENSE_RANGE_PLACEHOLDER,
-                      ariaLabel: `${label} range value`,
-                      onChange: (next) => {
-                        form.setValue(`senses.${index}.range`, readRangeAmount(next), {
-                          shouldDirty: true,
-                        })
-                      },
-                    }}
-                    end={{
-                      kind: 'select',
-                      id: `monster-sense-range-${row.type}-unit`,
-                      value: SENSE_RANGE_UNIT,
-                      options: senseRangeUnitOptions,
-                      sizingLabels: [SENSE_RANGE_UNIT_LABEL],
-                      ariaLabel: `${label} range unit`,
-                      onChange: () => undefined,
-                    }}
-                    startOccupant={{
-                      kind: 'select',
-                      name: 'amount',
-                      options: clearableAmountOptions(senseRangeAmountOptions),
-                      digits: 3,
-                      placeholder: SENSE_RANGE_PLACEHOLDER,
-                      ariaLabel: `${label} range value`,
-                    }}
-                    endOccupant={{
-                      kind: 'select',
-                      name: 'unit',
-                      options: senseRangeUnitOptions,
-                      defaultValue: SENSE_RANGE_UNIT,
-                      sizingLabels: [SENSE_RANGE_UNIT_LABEL],
-                      ariaLabel: `${label} range unit`,
-                    }}
-                  />
-                  <MonsterCreatureDetailsRemoveRowButton
-                    label={label}
-                    onRemove={() =>
-                      form.setValue(
-                        'senses',
-                        (values.senses ?? []).filter((entry) => entry.type !== row.type),
-                        { shouldDirty: true },
-                      )
-                    }
-                  />
-                </div>
+                <MonsterSenseRangeRowTrailing
+                  row={row}
+                  index={index}
+                  label={label}
+                  values={values}
+                />
               ),
             }}
           />
@@ -316,53 +409,13 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
             trailing={{
               kind: 'utility',
               content: (
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                  <ChipGroup
-                    semanticRole="radiogroup"
-                    aria-label={`${label}, ${speaks ? MONSTER_SPEAKS_LABEL : MONSTER_UNDERSTANDS_ONLY_LABEL}`}
-                  >
-                    <Chip
-                      id={`monster-language-${entry.language}-speaks`}
-                      mode="selectable"
-                      selectionRole="radio"
-                      selected={speaks}
-                      onSelectedChange={(nextSpeaks) => {
-                        if (!nextSpeaks) return
-                        form.setValue(`proficiencies.languages.${index}.speaks`, undefined, {
-                          shouldDirty: true,
-                        })
-                      }}
-                    >
-                      {MONSTER_SPEAKS_LABEL}
-                    </Chip>
-                    <Chip
-                      id={`monster-language-${entry.language}-understands`}
-                      mode="selectable"
-                      selectionRole="radio"
-                      selected={!speaks}
-                      onSelectedChange={(nextUnderstands) => {
-                        if (!nextUnderstands) return
-                        form.setValue(`proficiencies.languages.${index}.speaks`, false, {
-                          shouldDirty: true,
-                        })
-                      }}
-                    >
-                      {MONSTER_UNDERSTANDS_ONLY_LABEL}
-                    </Chip>
-                  </ChipGroup>
-                  <MonsterCreatureDetailsRemoveRowButton
-                    label={label}
-                    onRemove={() =>
-                      form.setValue(
-                        'proficiencies.languages',
-                        (values.proficiencies.languages ?? []).filter(
-                          (row) => row.language !== entry.language,
-                        ),
-                        { shouldDirty: true },
-                      )
-                    }
-                  />
-                </div>
+                <MonsterLanguageFluencyRowTrailing
+                  entry={entry}
+                  index={index}
+                  label={label}
+                  speaks={speaks}
+                  values={values}
+                />
               ),
             }}
           />

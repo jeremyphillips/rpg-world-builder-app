@@ -27,6 +27,7 @@ export const inputSelectDividerVariants = joinedPairDividerVariants
 export const inputSelectSearchableUnitShellWidthVariants = cva('', {
   variants: {
     size: {
+      xs: 'min-w-40 max-w-52',
       sm: 'min-w-44 max-w-56',
       md: 'min-w-44 max-w-60',
       lg: 'min-w-52 max-w-72',

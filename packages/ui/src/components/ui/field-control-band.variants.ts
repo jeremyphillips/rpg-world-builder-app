@@ -5,7 +5,7 @@
  * The control band sizes the control region; row subgrid aligns sibling regions.
  *
  * Reuses {@link FieldSizeToken} — do not introduce a parallel control-size vocabulary.
- * Heights match `fieldControlSizeClasses` (`sm` 32px / `md` 36px / `lg` 44px).
+ * Heights match `fieldControlSizeClasses` (`xs` 24px / `sm` 32px / `md` 36px / `lg` 44px).
  */
 import { cva, type VariantProps } from 'class-variance-authority'
 
@@ -19,6 +19,7 @@ export type FieldRowLayout = 'flow' | 'grid'
 export const fieldControlBandVariants = cva('flex w-full min-w-0 items-center', {
   variants: {
     size: {
+      xs: 'min-h-6',
       sm: 'min-h-8',
       md: 'min-h-9',
       lg: 'min-h-11',

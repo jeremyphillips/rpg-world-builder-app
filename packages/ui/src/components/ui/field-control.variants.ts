@@ -12,12 +12,14 @@ import {
 export const fieldControlTriggerCursorClasses = 'cursor-pointer'
 
 const fieldControlSizeClasses = {
+  xs: resolveFieldControlSizeClass('xs'),
   sm: resolveFieldControlSizeClass('sm'),
   md: resolveFieldControlSizeClass('md'),
   lg: resolveFieldControlSizeClass('lg'),
 } as const
 
 const fieldTextareaSizeClasses = {
+  xs: resolveFieldControlMultilineSizeClass('xs'),
   sm: resolveFieldControlMultilineSizeClass('sm'),
   md: resolveFieldControlMultilineSizeClass('md'),
   lg: resolveFieldControlMultilineSizeClass('lg'),

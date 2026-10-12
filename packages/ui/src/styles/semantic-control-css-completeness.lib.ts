@@ -182,9 +182,9 @@ const BUTTON_APPEARANCE_REQUIRED = ['background-color', 'color'] as const
 const BUTTON_LABELED_SIZE_REQUIRED = ['height', 'gap'] as const
 const BUTTON_ICON_SIZE_REQUIRED = ['width', 'height'] as const
 
-const FIELD_CONTROL_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_CONTROL_SIZE_MODIFIERS = ['xs', 'sm', 'md', 'lg'] as const
 const FIELD_CONTROL_MULTILINE_MODIFIERS = ['multiline-sm', 'multiline-md', 'multiline-lg'] as const
-const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-sm', 'digits-md', 'digits-lg'] as const
+const FIELD_CONTROL_DIGITS_MODIFIERS = ['digits-xs', 'digits-sm', 'digits-md', 'digits-lg'] as const
 const FIELD_CONTROL_FILTER_APPEARANCE_MODIFIERS = ['filter-outline', 'filter-ghost'] as const
 
 const FIELD_CONTROL_SIZE_REQUIRED = [
@@ -263,7 +263,7 @@ const COMPACT_CONTROL_ICON_REQUIRED = ['width', 'height'] as const
 
 const COMPACT_CONTROL_STEPPER_REQUIRED = ['width', 'height'] as const
 
-const FIELD_GROUP_SIZE_MODIFIERS = ['sm', 'md', 'lg'] as const
+const FIELD_GROUP_SIZE_MODIFIERS = ['xs', 'sm', 'md', 'lg'] as const
 
 const FIELD_GROUP_SIZE_REQUIRED = [
   '--ui-field-group-height',

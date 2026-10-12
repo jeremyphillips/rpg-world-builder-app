@@ -393,6 +393,7 @@
   --control-gap-xs: calc(var(--spacing) * 1); /* 4px */
   --control-gap-sm: calc(var(--spacing) * 1.5); /* 6px */
   --control-gap-md: calc(var(--spacing) * 2); /* 8px */
+  --field-padding-xs: calc(var(--spacing) * 2); /* 8px */
   --field-padding-sm: calc(var(--spacing) * 2.5); /* 10px */
   --field-padding-md: calc(var(--spacing) * 3); /* 12px */
   --field-padding-lg: calc(var(--spacing) * 4); /* 16px */

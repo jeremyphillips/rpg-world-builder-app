@@ -41,6 +41,12 @@ export {
   type ContentEntityCardProps,
 } from './lib/entity/surfaces/cards/content/content-entity-card'
 export {
+  EntityCardUtilityFieldSizeProvider,
+  resolveEntityCardUtilityFieldSize,
+  useEntityCardUtilityFieldSize,
+} from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.context'
+export { useEntityCardUtilityControlSizes } from './lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
+export {
   DisclosureEntityCard,
   type DisclosureEntityCardProps,
 } from './lib/entity/surfaces/cards/disclosure/disclosure-entity-card'

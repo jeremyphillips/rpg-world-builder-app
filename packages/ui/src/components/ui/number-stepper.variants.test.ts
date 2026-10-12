@@ -93,7 +93,8 @@ describe('xs inline-row tier', () => {
 })
 
 describe('resolveNumberStepperSizeFromFieldSize', () => {
-  it('maps field sm/md/lg to sm/md/lg stepper tiers', () => {
+  it('maps field xs/sm/md/lg to matching stepper tiers', () => {
+    expect(resolveNumberStepperSizeFromFieldSize('xs')).toBe('xs')
     expect(resolveNumberStepperSizeFromFieldSize('sm')).toBe('sm')
     expect(resolveNumberStepperSizeFromFieldSize('md')).toBe('md')
     expect(resolveNumberStepperSizeFromFieldSize('lg')).toBe('lg')

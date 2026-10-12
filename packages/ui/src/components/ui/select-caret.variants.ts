@@ -8,6 +8,7 @@ import type { FieldSizeToken } from './field-sizing.variants'
 
 /** Select caret glyph step per field size — inline and digit-column share this map. */
 const FIELD_SELECT_CARET_GLYPH: Record<FieldSizeToken, IconGlyphStep> = {
+  xs: 'xs',
   sm: 'sm',
   md: 'lg',
   lg: 'lg',

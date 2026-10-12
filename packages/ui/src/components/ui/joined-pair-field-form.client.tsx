@@ -149,6 +149,7 @@ export function JoinedPairFieldForm({
         control={
           <JoinedPair.Root
             layout="intrinsic"
+            size={size}
             invalid={hasError}
             disabled={disabled}
             aria-labelledby={labelId}

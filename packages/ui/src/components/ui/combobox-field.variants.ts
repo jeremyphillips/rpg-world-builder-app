@@ -16,6 +16,7 @@ export function comboboxTriggerValueTextClasses(size: FieldSize = 'md'): string 
 
 /** Negative `sideOffset` magnitude — matches field-control height so the panel overlaps the trigger. */
 export const COMBOBOX_TRIGGER_OVERLAP_OFFSET = {
+  xs: 24,
   sm: 32,
   md: 36,
   lg: 44,
@@ -35,6 +36,7 @@ export const comboboxContentVariants = (options?: { triggerWidth?: 'match' | 'fi
 export const comboboxSearchRowVariants = cva('flex w-full items-center gap-2 px-3', {
   variants: {
     size: {
+      xs: 'h-6 text-xs',
       sm: 'h-8 text-xs',
       md: 'h-9 text-md',
       lg: 'h-11 text-base',

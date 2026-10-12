@@ -70,6 +70,14 @@
 
   /* --- Single-line sizes --- */
 
+  .ui-field-control--xs {
+    height: var(--control-height-compact);
+    padding-inline: var(--field-padding-xs);
+    padding-block: 0;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
   .ui-field-control--sm {
     height: var(--control-height-sm);
     padding-inline: var(--field-padding-sm);
@@ -255,6 +263,11 @@
 
   /* --- Digit trailing reserve --- */
 
+  .ui-field-control--digits-xs {
+    padding-inline-start: var(--field-padding-xs);
+    padding-inline-end: calc(var(--spacing) * 5);
+  }
+
   .ui-field-control--digits-sm {
     padding-inline-start: var(--field-padding-sm);
     padding-inline-end: calc(var(--spacing) * 6);
@@ -371,6 +384,12 @@
     translate: 0 -50%;
   }
 
+  .ui-search-bar__leading-icon--xs {
+    inset-inline-start: var(--field-padding-xs);
+    width: var(--icon-glyph-xs);
+    height: var(--icon-glyph-xs);
+  }
+
   .ui-search-bar__leading-icon--sm {
     inset-inline-start: calc(var(--spacing) * 2.5);
     width: var(--icon-glyph-sm);
@@ -405,6 +424,10 @@
     color: var(--field-control-fg-disabled);
   }
 
+  .ui-search-bar__field-input--xs {
+    padding-inline-start: calc(var(--spacing) * 7);
+  }
+
   .ui-search-bar__field-input--sm {
     padding-inline-start: calc(var(--spacing) * 8);
   }
@@ -417,6 +440,7 @@
     padding-inline-start: calc(var(--spacing) * 10);
   }
 
+  .ui-search-bar__field-input--clearable.ui-search-bar__field-input--xs,
   .ui-search-bar__field-input--clearable.ui-search-bar__field-input--sm,
   .ui-search-bar__field-input--clearable.ui-search-bar__field-input--md {
     padding-inline-end: calc(var(--spacing) * 8);

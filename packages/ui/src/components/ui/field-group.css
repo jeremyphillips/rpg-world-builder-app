@@ -70,6 +70,23 @@
 
   /* --- Size modifiers (shell + inherited slot tokens) --- */
 
+  .ui-field-group--xs {
+    --ui-field-group-height: var(--control-height-compact);
+    --ui-field-group-padding-block: 0;
+    --ui-field-group-font-size: var(--text-xs);
+    --ui-field-group-line-height: var(--text-xs--line-height);
+    --ui-field-slot-ps-start: var(--field-padding-xs);
+    --ui-field-slot-ps-start-compact: calc(var(--spacing) * 1);
+    --ui-field-slot-ps-middle: calc(var(--spacing) * 1);
+    --ui-field-slot-pe-middle: calc(var(--spacing) * 1);
+    --ui-field-slot-ps-end: calc(var(--spacing) * 1);
+    --ui-field-slot-pe-end-content: calc(var(--spacing) * 1.5);
+    --ui-field-slot-pe-end-slot: calc(var(--spacing) * 0.5);
+    --ui-field-slot-pe-before-trailing: calc(var(--spacing) * 0.5);
+    --ui-field-action-px: var(--field-padding-xs);
+    --ui-field-caret-width: calc(var(--spacing) * 6);
+  }
+
   .ui-field-group--sm {
     --ui-field-group-height: var(--control-height-sm);
     --ui-field-group-padding-block: calc(var(--spacing) * 1);

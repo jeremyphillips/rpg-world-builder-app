@@ -2,14 +2,14 @@
 
 import { useFormState } from 'react-hook-form'
 
-import { FieldErrorText } from '../../../components/ui/field.client'
+import { FieldErrorText, type FieldSize } from '../../../components/ui/field.client'
 import { useFieldErrorPresentation } from '../../context/array-item-presentation.context'
 import { resolveNestedFieldErrorMessage } from '../../errors/resolve-field-error-message'
 
 export interface ArrayFieldContainerErrorProps {
   fullName: string
   errorId: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: FieldSize
 }
 
 /** Container-level array validation message — separate from the neutral empty-state panel. */

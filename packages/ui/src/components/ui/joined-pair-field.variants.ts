@@ -18,6 +18,7 @@ import {
 export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
   variants: {
     size: {
+      xs: 'ui-field-group--xs',
       sm: 'ui-field-group--sm',
       md: 'ui-field-group--md',
       lg: 'ui-field-group--lg',
@@ -45,6 +46,7 @@ export const joinedPairGroupVariants = cva(fieldGroupedShellClasses, {
 
 /** Grouped editable start segments (NumberInput / Input value cells). */
 export const joinedPairSegmentSizeVariants = {
+  xs: resolveFieldGroupInputSegmentClasses('xs'),
   sm: resolveFieldGroupInputSegmentClasses('sm'),
   md: resolveFieldGroupInputSegmentClasses('md'),
   lg: resolveFieldGroupInputSegmentClasses('lg'),
@@ -53,6 +55,11 @@ export const joinedPairSegmentSizeVariants = {
 export const joinedPairStartTextSegmentVariants = cva('min-w-0', {
   variants: {
     size: {
+      xs: cn(
+        joinedPairSegmentSizeVariants.xs,
+        UI_FIELD_GROUP_SEGMENT_RESET_CLASS,
+        UI_FIELD_GROUP_SEGMENT_START_CLASS,
+      ),
       sm: cn(
         joinedPairSegmentSizeVariants.sm,
         UI_FIELD_GROUP_SEGMENT_RESET_CLASS,

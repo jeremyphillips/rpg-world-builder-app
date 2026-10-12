@@ -39,6 +39,8 @@ Do not paint subdued labels with `text-foreground-disabled`, field-disabled well
 prop. Pass `emphasis="subdued"` for completed or exhausted labels.
 
 - **Selected chips** use **selected-control** tokens (`bg-selected-control`, …), not `tone="success"`.
+- **Selectable chip hover** — unselected chips use `--control-hover-bg`; selected chips mix toward
+  `--selected-control-foreground` so copy stays on the selected-control pair (never generic hover alone).
 - **Semantic soft badges** (`appearance="soft"`) are not the same surface as a selected chip.
 
 Shared tone names align with [`SemanticText`](./semantic-text.md) but render bordered pill

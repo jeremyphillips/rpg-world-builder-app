@@ -132,6 +132,7 @@ export const fieldChromePaddingMdClasses = 'p-3'
 export const fieldChromePaddingVariants = cva('', {
   variants: {
     size: {
+      xs: fieldChromePaddingSmClasses,
       sm: fieldChromePaddingSmClasses,
       md: fieldChromePaddingMdClasses,
       lg: fieldChromePaddingMdClasses,

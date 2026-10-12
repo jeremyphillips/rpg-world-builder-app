@@ -5,6 +5,7 @@ import * as React from 'react'
 import { resolveFieldAnatomyWidth, type FieldChrome } from './field-chrome.variants'
 import { FieldAnatomyRowShell } from './field-anatomy-row-shell.client'
 import { Field, type FieldSize } from './field.client'
+import { fieldSizeToChipSize } from './field-sizing.variants'
 import { useFieldRowParticipation } from './field-row-anatomy.context'
 import { FieldsetChromeAnatomy, FieldsetChromeFrame } from './fieldset-chrome-anatomy'
 import {
@@ -183,7 +184,7 @@ export function ChipsField({
   showSelectedCheckmark,
 }: ChipsFieldProps) {
   const inAnatomyRow = useFieldRowParticipation()
-  const resolvedChipSize = chipSize ?? size
+  const resolvedChipSize = chipSize ?? fieldSizeToChipSize[size]
   const resolvedHintPosition = inAnatomyRow ? 'below-control' : hintPosition
   const legendId = `${id}-legend`
   const hintId = `${id}-hint`

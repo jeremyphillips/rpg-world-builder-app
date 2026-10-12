@@ -19,16 +19,18 @@ import type { CompactLabelSize } from './compact-label.lib'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 import type { InteractiveListSize } from './interactive-list.variants'
 
-export type FieldSizeToken = 'sm' | 'md' | 'lg'
+export type FieldSizeToken = 'xs' | 'sm' | 'md' | 'lg'
 
 /** Shared type scale for labels and controls at each field size. */
 export const fieldSizeTypographyClasses = {
+  xs: 'text-xs',
   sm: 'text-xs',
   md: 'text-md',
   lg: 'text-base',
 } as const satisfies Record<FieldSizeToken, string>
 
 export const fieldControlSizeClasses = {
+  xs: resolveFieldControlSizeClass('xs'),
   sm: resolveFieldControlSizeClass('sm'),
   md: resolveFieldControlSizeClass('md'),
   lg: resolveFieldControlSizeClass('lg'),
@@ -36,6 +38,7 @@ export const fieldControlSizeClasses = {
 
 /** @deprecated Prefer {@link resolveFieldGroupActionSegmentClasses}. */
 export const fieldGroupedControlHeightClasses = {
+  xs: resolveFieldGroupActionSegmentClasses('xs'),
   sm: resolveFieldGroupActionSegmentClasses('sm'),
   md: resolveFieldGroupActionSegmentClasses('md'),
   lg: resolveFieldGroupActionSegmentClasses('lg'),
@@ -43,6 +46,7 @@ export const fieldGroupedControlHeightClasses = {
 
 /** @deprecated Prefer {@link resolveFieldGroupInputSegmentClasses}. */
 export const fieldGroupedControlSizeClasses = {
+  xs: resolveFieldGroupInputSegmentClasses('xs'),
   sm: resolveFieldGroupInputSegmentClasses('sm'),
   md: resolveFieldGroupInputSegmentClasses('md'),
   lg: resolveFieldGroupInputSegmentClasses('lg'),
@@ -50,6 +54,7 @@ export const fieldGroupedControlSizeClasses = {
 
 /** Multi-line controls (Textarea, JSON editor): min-height + padding + type scale. */
 export const fieldTextareaSizeClasses = {
+  xs: resolveFieldControlMultilineSizeClass('xs'),
   sm: resolveFieldControlMultilineSizeClass('sm'),
   md: resolveFieldControlMultilineSizeClass('md'),
   lg: resolveFieldControlMultilineSizeClass('lg'),
@@ -57,6 +62,7 @@ export const fieldTextareaSizeClasses = {
 
 /** Trailing reserve for digit controls with a stepper/caret column (logical). */
 export const fieldDigitTrailingPaddingClasses = {
+  xs: 'pe-5',
   sm: 'pe-6',
   md: 'pe-6',
   lg: 'pe-8',
@@ -64,6 +70,7 @@ export const fieldDigitTrailingPaddingClasses = {
 
 /** Start + trailing padding for digit-sized controls (logical). */
 export const fieldDigitSizeClasses = {
+  xs: resolveFieldControlDigitsSizeClass('xs'),
   sm: resolveFieldControlDigitsSizeClass('sm'),
   md: resolveFieldControlDigitsSizeClass('md'),
   lg: resolveFieldControlDigitsSizeClass('lg'),
@@ -71,6 +78,7 @@ export const fieldDigitSizeClasses = {
 
 /** Width of the trailing stepper/caret column on digit-sized controls. */
 export const fieldDigitTrailingColumnClasses = {
+  xs: 'w-5',
   sm: 'w-5',
   md: 'w-5',
   lg: 'w-7',
@@ -78,6 +86,7 @@ export const fieldDigitTrailingColumnClasses = {
 
 /** Maps field control size to badge size (`Badge` defines `sm` | `md` | `lg`). */
 export const fieldSizeToBadgeSize = {
+  xs: 'sm',
   sm: 'sm',
   md: 'md',
   lg: 'lg',
@@ -85,12 +94,14 @@ export const fieldSizeToBadgeSize = {
 
 /** Maps field control size to removable chip size (1:1 with control scale). */
 export const fieldSizeToChipSize = {
+  xs: 'sm',
   sm: 'sm',
   md: 'md',
   lg: 'lg',
 } as const satisfies Record<FieldSizeToken, CompactLabelSize>
 
 export const fieldSizeToAttachedButtonSize = {
+  xs: 'xs',
   sm: 'sm',
   md: 'default',
   lg: 'lg',
@@ -113,6 +124,7 @@ export const INLINE_HEADER_ACTION_BUTTON_SIZE = 'sm' as const satisfies NonNulla
  * add actions use the next visual step (`default` / md) above item field scale.
  */
 export const fieldSizeToArrayAddButtonSize = {
+  xs: 'default',
   sm: 'default',
   md: 'default',
   lg: 'lg',
@@ -160,6 +172,7 @@ export function resolveComboboxSearchFieldSizeForButtonSize(
 
 /** Combobox field band → interactive list row scale (not field typography). */
 export const fieldSizeToInteractiveListSize = {
+  xs: 'sm',
   sm: 'sm',
   md: 'md',
   lg: 'lg',
@@ -173,6 +186,7 @@ export function resolveInteractiveListSizeForFieldSize(
 
 /** Icon sizing that pairs with `fieldDigitTrailingColumnClasses`. sm≡xs for digit chrome. */
 export const fieldDigitTrailingIconClasses = {
+  xs: iconGlyphDescendantClasses.xs,
   sm: iconGlyphDescendantClasses.xs,
   md: iconGlyphDescendantClasses.xs,
   lg: iconGlyphDescendantClasses.md,

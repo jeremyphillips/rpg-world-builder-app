@@ -21,6 +21,7 @@ export const numberInputCompositeShellRootClasses =
 export const numberInputCompositeShellFieldClasses = 'rounded-l-md rounded-r-none'
 
 const groupedNumberInputFieldSizeClasses = {
+  xs: cn(fieldGroupedControlSizeClasses.xs, fieldDigitTrailingPaddingClasses.xs),
   sm: cn(fieldGroupedControlSizeClasses.sm, fieldDigitTrailingPaddingClasses.sm),
   md: cn(fieldGroupedControlSizeClasses.md, fieldDigitTrailingPaddingClasses.md),
   lg: cn(fieldGroupedControlSizeClasses.lg, fieldDigitTrailingPaddingClasses.lg),
@@ -31,6 +32,7 @@ export const numberInputFieldVariants = cva(
   {
     variants: {
       size: {
+        xs: '',
         sm: '',
         md: '',
         lg: '',
@@ -41,6 +43,11 @@ export const numberInputFieldVariants = cva(
       },
     },
     compoundVariants: [
+      {
+        grouped: false,
+        size: 'xs',
+        class: cn(fieldControlVariants({ size: 'xs' }), resolveFieldControlDigitsSizeClass('xs')),
+      },
       {
         grouped: false,
         size: 'sm',
@@ -55,6 +62,11 @@ export const numberInputFieldVariants = cva(
         grouped: false,
         size: 'lg',
         class: cn(fieldControlVariants({ size: 'lg' }), resolveFieldControlDigitsSizeClass('lg')),
+      },
+      {
+        grouped: true,
+        size: 'xs',
+        class: groupedNumberInputFieldSizeClasses.xs,
       },
       {
         grouped: true,
@@ -84,6 +96,7 @@ export const numberInputStepperVariants = cva(
   {
     variants: {
       size: {
+        xs: fieldDigitTrailingColumnClasses.xs,
         sm: fieldDigitTrailingColumnClasses.sm,
         md: fieldDigitTrailingColumnClasses.md,
         lg: fieldDigitTrailingColumnClasses.lg,
@@ -105,6 +118,7 @@ export const numberInputStepperButtonVariants = cva(
   {
     variants: {
       size: {
+        xs: fieldDigitTrailingIconClasses.xs,
         sm: fieldDigitTrailingIconClasses.sm,
         md: fieldDigitTrailingIconClasses.md,
         lg: fieldDigitTrailingIconClasses.lg,

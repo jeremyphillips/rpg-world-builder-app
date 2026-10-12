@@ -19,6 +19,13 @@ export const fieldDigitSizeVariants = fieldDigitSizeClasses
  * spacing scale during class detection or merge.
  */
 export const fieldDigitWidthVariants = {
+  xs: {
+    1: 'w-[calc(1*1ch+2.375rem)]',
+    2: 'w-[calc(2*1ch+2.375rem)]',
+    3: 'w-[calc(3*1ch+2.375rem)]',
+    4: 'w-[calc(4*1ch+2.375rem)]',
+    5: 'w-[calc(5*1ch+2.375rem)]',
+  },
   sm: {
     1: 'w-[calc(1*1ch+2.625rem)]',
     2: 'w-[calc(2*1ch+2.625rem)]',

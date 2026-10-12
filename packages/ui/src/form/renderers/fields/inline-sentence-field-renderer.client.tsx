@@ -4,6 +4,7 @@ import { useContext, useEffect, useMemo, useRef } from 'react'
 import { useController, useFormState, type UseControllerReturn } from 'react-hook-form'
 
 import { InlineSentenceField } from '../../../components/ui/inline-sentence-field.client'
+import { fieldSizeToChipSize } from '../../../components/ui/field-sizing.variants'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { assertAllowedJoinedPairComposition } from '../../../components/ui/joined-pair-field.lib'
 import {
@@ -541,7 +542,7 @@ export function InlineSentenceFieldRenderer({
       size={controlSize}
       width={config.width}
       labelVisibility={config.labelVisibility}
-      chipSize={config.chipSize}
+      chipSize={config.chipSize ? fieldSizeToChipSize[config.chipSize] : undefined}
     />
   )
 }

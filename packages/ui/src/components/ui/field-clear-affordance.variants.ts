@@ -31,6 +31,7 @@ export const fieldClearAffordanceInsetVariants = cva(
   {
     variants: {
       size: {
+        xs: cn(resolveFieldGroupSizeClass('xs'), resolveFieldGroupCaretSlotClass()),
         sm: cn(resolveFieldGroupSizeClass('sm'), resolveFieldGroupCaretSlotClass()),
         md: cn(resolveFieldGroupSizeClass('md'), resolveFieldGroupCaretSlotClass()),
         lg: cn(resolveFieldGroupSizeClass('lg'), resolveFieldGroupCaretSlotClass()),

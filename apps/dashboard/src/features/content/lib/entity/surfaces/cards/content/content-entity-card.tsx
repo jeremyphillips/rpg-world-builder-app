@@ -8,6 +8,10 @@ import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
 import { EntityCardContent } from './entity-card-content'
 import { EntityCardFrame } from './entity-card-frame'
+import {
+  EntityCardUtilityFieldSizeProvider,
+  resolveEntityCardUtilityFieldSize,
+} from './entity-card-utility-field-size.context'
 
 export type ContentEntityCardProps = {
   entity: EntitySummaryModel
@@ -32,6 +36,7 @@ export function ContentEntityCard({
   headingEndValue,
 }: ContentEntityCardProps) {
   const resolvedDensity = density ?? 'comfortable'
+  const utilityFieldSize = resolveEntityCardUtilityFieldSize(resolvedDensity)
 
   return (
     <EntityCardFrame
@@ -40,16 +45,18 @@ export function ContentEntityCard({
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount: leading ? 1 : 0, trailing })}
       surface="card"
     >
-      <EntityCardContent density={resolvedDensity}>
-        <EntityAnatomy
-          entity={entity}
-          headingHref={headingHref}
-          leadingUtilities={leading != null ? [leading] : undefined}
-          trailing={trailing}
-          density={resolvedDensity}
-          headingEndValue={headingEndValue}
-        />
-      </EntityCardContent>
+      <EntityCardUtilityFieldSizeProvider size={utilityFieldSize}>
+        <EntityCardContent density={resolvedDensity}>
+          <EntityAnatomy
+            entity={entity}
+            headingHref={headingHref}
+            leadingUtilities={leading != null ? [leading] : undefined}
+            trailing={trailing}
+            density={resolvedDensity}
+            headingEndValue={headingEndValue}
+          />
+        </EntityCardContent>
+      </EntityCardUtilityFieldSizeProvider>
     </EntityCardFrame>
   )
 }
