@@ -1,6 +1,10 @@
 import type { Equipment } from '../../content/equipment'
 import { isArmorEquipment } from '../../content/equipment'
-import type { CreatureWeaponProficiencyTarget } from '../../content/creature'
+import type {
+  CreatureWeaponProficiencies,
+  CreatureWeaponProficiencyTarget,
+} from '../../content/creature'
+import type { WeaponCategory } from '../../vocab/weapon/category'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import type {
   ArmorTrainingPool,
@@ -60,6 +64,42 @@ export function isWeaponProficient(
       (entry.weaponId !== undefined && weaponIdMatchesEquipment(entry.weaponId, weapon)) ||
       (entry.weaponCategory !== undefined && entry.weaponCategory === weapon.category),
   )
+}
+
+/** Expands a grant set to XOR target rows (categories first, then items; sorted within each bucket). */
+export function creatureWeaponProficiencyTargetsFromGrantSet(
+  grant: CreatureWeaponProficiencies,
+): CreatureWeaponProficiencyTarget[] {
+  const categories = [...grant.categories].sort() as WeaponCategory[]
+  const items = [...grant.items].sort()
+  return [
+    ...categories.map((weaponCategory) => ({ weaponCategory })),
+    ...items.map((weaponId) => ({ weaponId })),
+  ]
+}
+
+/** Folds target rows into a deduped grant set (sorted categories and items). */
+export function creatureWeaponProficiencyGrantSetFromTargets(
+  targets: readonly CreatureWeaponProficiencyTarget[],
+): CreatureWeaponProficiencies {
+  const categories = new Set<WeaponCategory>()
+  const items = new Set<string>()
+  for (const target of targets) {
+    if (target.weaponCategory !== undefined) categories.add(target.weaponCategory)
+    if (target.weaponId !== undefined) items.add(target.weaponId)
+  }
+  return {
+    categories: [...categories].sort(),
+    items: [...items].sort(),
+  }
+}
+
+/** Returns true when a monster/class weapon grant set covers a catalog weapon row. */
+export function isWeaponProficientFromGrantSet(
+  weapon: Extract<Equipment, { kind: 'weapon' }>,
+  grant: CreatureWeaponProficiencies,
+): boolean {
+  return isWeaponProficient(weapon, creatureWeaponProficiencyTargetsFromGrantSet(grant))
 }
 
 /** Returns true when proficiency rows cover a catalog tool row. */

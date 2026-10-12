@@ -58,7 +58,7 @@ describe('monsterBodySchema refinements', () => {
     senses: [],
     languages: { entries: [] },
     challengeRating: '0',
-    proficiencies: { savingThrows: [], skills: [], weapons: [] },
+    proficiencies: { savingThrows: [], skills: [], weapons: { categories: [], items: [] } },
     defenses: {
       vulnerabilities: [],
       resistances: [],

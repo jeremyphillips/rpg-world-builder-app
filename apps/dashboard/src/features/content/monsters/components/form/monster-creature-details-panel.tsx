@@ -189,9 +189,15 @@ function WeaponProficienciesSection({
         onChange={(event) => {
           const weaponId = event.target.value
           if (!weaponId) return
-          form.setValue('proficiencies.weapons', [...values.proficiencies.weapons, { weaponId }], {
-            shouldDirty: true,
-          })
+          const weapons = values.proficiencies.weapons ?? { categories: [], items: [] }
+          form.setValue(
+            'proficiencies.weapons',
+            {
+              categories: weapons.categories ?? [],
+              items: [...(weapons.items ?? []), weaponId],
+            },
+            { shouldDirty: true },
+          )
         }}
       >
         <option value="">{MONSTER_ADD_WEAPON_LABEL}</option>

@@ -21,6 +21,7 @@ import {
   type MonsterNormalizeBaseline,
 } from './normalize-monster-form-values'
 import {
+  EMPTY_CREATURE_WEAPON_PROFICIENCIES,
   createMonsterDraftInputSchema,
   createMonsterInputSchema,
   updateMonsterDraftInputSchema,
@@ -84,7 +85,11 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
     languages: { entries: [] },
-    proficiencies: { savingThrows: [], skills: [], weapons: [] },
+    proficiencies: {
+      savingThrows: [],
+      skills: [],
+      weapons: { ...EMPTY_CREATURE_WEAPON_PROFICIENCIES },
+    },
     defenses: {
       vulnerabilities: [],
       resistances: [],

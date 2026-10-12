@@ -113,7 +113,11 @@ const kobold = monsterSchema.parse({
   senses: [{ type: 'darkvision', range: 60 }],
   languages: { entries: [{ language: 'common' }, { language: 'draconic' }] },
   challengeRating: '1/8',
-  proficiencies: { savingThrows: [], skills: [], weapons: [{ weaponId: `${RULESET}:dagger` }] },
+  proficiencies: {
+    savingThrows: [],
+    skills: [],
+    weapons: { categories: [], items: [`${RULESET}:dagger`] },
+  },
   defenses: {
     vulnerabilities: [],
     resistances: [],
@@ -150,7 +154,10 @@ const skeleton = monsterSchema.parse({
   proficiencies: {
     savingThrows: [],
     skills: [],
-    weapons: [{ weaponId: `${RULESET}:shortsword` }, { weaponId: `${RULESET}:shortbow` }],
+    weapons: {
+      categories: [],
+      items: [`${RULESET}:shortbow`, `${RULESET}:shortsword`],
+    },
   },
   defenses: {
     vulnerabilities: ['bludgeoning'],

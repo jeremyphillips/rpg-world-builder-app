@@ -34,7 +34,11 @@ describe('monster write validation', () => {
         armorClass: { kind: 'equipment' },
         equipment: [],
         actions: [],
-        proficiencies: { savingThrows: [], skills: [], weapons: [] },
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          weapons: { categories: [], items: [] },
+        },
       },
       { status: 'draft' },
     )
@@ -108,7 +112,11 @@ describe('monster write validation', () => {
           {
             ...minimalHomebrewMonsterInput,
             slug: `invalid-monster-${index}`,
-            proficiencies: { savingThrows: [], skills: [], weapons: [] },
+            proficiencies: {
+              savingThrows: [],
+              skills: [],
+              weapons: { categories: [], items: [] },
+            },
             ...entry,
           },
           { status: 'draft' },
@@ -128,7 +136,7 @@ describe('monster write validation', () => {
         proficiencies: {
           savingThrows: [],
           skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
-          weapons: [],
+          weapons: { categories: [], items: [] },
         },
       },
       { status: 'draft' },
@@ -145,7 +153,7 @@ describe('monster write validation', () => {
           proficiencies: {
             savingThrows: [],
             skills: [{ skill: 'not-a-real-skill', rank: 'proficient' }],
-            weapons: [],
+            weapons: { categories: [], items: [] },
           },
         },
         { status: 'published' },

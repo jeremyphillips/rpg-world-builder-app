@@ -25,7 +25,7 @@
     "proficiencies": {
       "savingThrows": [],
       "skills": [],
-      "weapons": [{ "weaponId": "srd-cc-5.2.1:dagger" }]
+      "weapons": { "categories": [], "items": ["srd-cc-5.2.1:dagger"] }
     },
     "defenses": {
       "vulnerabilities": [],
@@ -84,10 +84,10 @@
     "proficiencies": {
       "savingThrows": [],
       "skills": [],
-      "weapons": [
-        { "weaponId": "srd-cc-5.2.1:shortsword" },
-        { "weaponId": "srd-cc-5.2.1:shortbow" }
-      ]
+      "weapons": {
+        "categories": [],
+        "items": ["srd-cc-5.2.1:shortbow", "srd-cc-5.2.1:shortsword"]
+      }
     },
     "defenses": {
       "vulnerabilities": ["bludgeoning"],

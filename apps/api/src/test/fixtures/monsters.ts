@@ -15,7 +15,7 @@ export const minimalHomebrewMonsterInput = {
   proficiencies: {
     savingThrows: [],
     skills: [],
-    weapons: [{ weaponId: DAGGER_ID }],
+    weapons: { categories: [], items: [DAGGER_ID] },
   },
   defenses: {
     vulnerabilities: [],

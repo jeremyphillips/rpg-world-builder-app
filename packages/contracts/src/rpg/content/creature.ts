@@ -11,6 +11,7 @@ import { senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
+import { weaponProficiencyGrantSetSchema } from '../primitives/proficiency/typed-proficiency-grant-set'
 import { weaponCategorySchema } from '../vocab/weapon/category'
 import { equipmentInstanceSchema } from './equipment/instance'
 
@@ -115,6 +116,16 @@ export const creatureWeaponProficiencyTargetSchema = z
   })
 
 export type CreatureWeaponProficiencyTarget = z.infer<typeof creatureWeaponProficiencyTargetSchema>
+
+/** Monster and class weapon proficiency buckets at rest (`categories` + `items`). */
+export const creatureWeaponProficienciesSchema = weaponProficiencyGrantSetSchema
+
+export type CreatureWeaponProficiencies = z.infer<typeof creatureWeaponProficienciesSchema>
+
+export const EMPTY_CREATURE_WEAPON_PROFICIENCIES: CreatureWeaponProficiencies = {
+  categories: [],
+  items: [],
+}
 
 export const creatureDefensesSchema = z.object({
   vulnerabilities: z.array(damageTypeIdSchema).default([]),

@@ -8,6 +8,7 @@ import {
   creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
   creatureSkillProficiencyEntrySchema,
+  creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetSchema,
 } from './creature'
 
@@ -116,6 +117,22 @@ describe('creature proficiency entries', () => {
         weaponCategory: 'simple',
       }).success,
     ).toBe(false)
+  })
+
+  it('parses monster weapon proficiency grant sets', () => {
+    expect(
+      creatureWeaponProficienciesSchema.parse({
+        categories: ['simple'],
+        items: ['srd-cc-5.2.1:dagger'],
+      }),
+    ).toEqual({
+      categories: ['simple'],
+      items: ['srd-cc-5.2.1:dagger'],
+    })
+    expect(creatureWeaponProficienciesSchema.parse({})).toEqual({
+      categories: [],
+      items: [],
+    })
   })
 })
 

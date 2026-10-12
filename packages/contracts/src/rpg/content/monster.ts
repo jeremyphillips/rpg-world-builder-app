@@ -14,7 +14,7 @@ import {
   creatureStatBlockHitPointsSchema,
   creatureDefensesSchema,
   creatureTypeRefSchema,
-  creatureWeaponProficiencyTargetSchema,
+  creatureWeaponProficienciesSchema,
   equipmentInstanceSchema,
   refineCreatureDamageDefenses,
 } from './creature'
@@ -112,7 +112,7 @@ export const monsterBodyFields = {
   proficiencies: z.object({
     savingThrows: z.array(abilitySchema).default([]),
     skills: z.array(creatureSkillProficiencyEntrySchema).default([]),
-    weapons: z.array(creatureWeaponProficiencyTargetSchema).default([]),
+    weapons: creatureWeaponProficienciesSchema.default({ categories: [], items: [] }),
   }),
   defenses: creatureDefensesSchema,
   equipment: z.array(monsterEquipmentEntrySchema).default([]),

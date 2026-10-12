@@ -1,6 +1,7 @@
 import {
+  EMPTY_CREATURE_WEAPON_PROFICIENCIES,
   isWeaponEquipment,
-  isWeaponProficient,
+  isWeaponProficientFromGrantSet,
   joinInlineMetadata,
   type Equipment,
 } from '@rpg/contracts'
@@ -61,7 +62,10 @@ export function collectMonsterFormAdvisories(
         })
       }
       if (item && isWeaponEquipment(item)) {
-        const proficient = isWeaponProficient(item, values.proficiencies?.weapons ?? [])
+        const proficient = isWeaponProficientFromGrantSet(
+          item,
+          values.proficiencies?.weapons ?? EMPTY_CREATURE_WEAPON_PROFICIENCIES,
+        )
         if (!proficient) {
           advisories.push({
             code: 'weapon-not-proficient',
