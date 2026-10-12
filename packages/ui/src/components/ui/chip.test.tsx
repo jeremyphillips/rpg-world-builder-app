@@ -16,7 +16,9 @@ describe('Chip', () => {
       'aria-checked',
       'false',
     )
-    expect(screen.getByRole('checkbox', { name: 'Option' })).toHaveClass('bg-background')
+    expect(screen.getByRole('checkbox', { name: 'Option' })).toHaveClass(
+      'ui-compact-label--interactive',
+    )
   })
 
   it('selectable selected renders check icon and aria-checked true', () => {

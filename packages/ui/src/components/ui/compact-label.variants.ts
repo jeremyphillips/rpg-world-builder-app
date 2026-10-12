@@ -74,11 +74,6 @@ export const compactLabelVariants = cva('ui-compact-label', {
   },
   compoundVariants: [
     {
-      selected: false,
-      interactive: true,
-      className: 'border-border bg-background text-foreground',
-    },
-    {
       removable: true,
       size: 'sm',
       className: compactLabelRemovablePaddingClasses.sm,
