@@ -118,7 +118,7 @@ export function createTextFilter<
       const parts = Array.isArray(searchText) ? searchText : [searchText]
       return parts.some((part) => matchesPrimaryTextQuery(part, query, 'forgiving'))
     },
-  } satisfies FilterFieldDef<TData, TState>
+  } as FilterFieldDef<TData, TState>
 }
 
 type EqualsFilterConfig<

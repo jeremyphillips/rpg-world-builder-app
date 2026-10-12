@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { MOVEMENT_MODES } from '@rpg/contracts'
-import type { ArrayConfig } from '@rpg/ui/form'
+import { isContainer, type ArrayConfig } from '@rpg/ui/form'
 
 import { speciesCreateDefaultValues } from '../../../species/lib/species-form-values'
 import {
@@ -23,12 +23,13 @@ describe('content movement form fields', () => {
 
   it('movementWithHoverGroup includes fly hover switch', () => {
     const group = movementWithHoverGroup()
-    expect(group.kind).toBe('group')
-    if (group.kind !== 'group') return
+    expect(isContainer(group) && group.kind === 'group').toBe(true)
+    if (!isContainer(group) || group.kind !== 'group') return
     const hasHoverSwitch = group.fields.some(
       (field) =>
         ('type' in field && field.type === 'switch' && field.name === 'hover') ||
-        (field.kind === 'group' &&
+        (isContainer(field) &&
+          field.kind === 'group' &&
           field.fields.some(
             (nested) => 'type' in nested && nested.type === 'switch' && nested.name === 'hover',
           )),

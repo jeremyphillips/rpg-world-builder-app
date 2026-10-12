@@ -5,6 +5,7 @@ const CATALOG_EXPORTS = [
   './classes',
   './equipment',
   './feats',
+  './monsters',
   './skill-proficiencies',
   './species',
   './spells',

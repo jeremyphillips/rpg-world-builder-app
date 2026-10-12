@@ -169,7 +169,7 @@ describe('collectMonsterCatalogIssues', () => {
   it('blocks publish when the skill catalog is unavailable', () => {
     expect(
       collectMonsterCatalogIssues(
-        { proficiencies: { skills: [{ skill: 'athletics', rank: 'proficient' }] } },
+        { proficiencies: { skills: [{ skill: 'athletics' }] } },
         readyCatalogs({ skillCatalog: 'unavailable' }),
         'publish',
       ),

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { CreatureWeaponProficiencies } from '../../content/creature'
 import type { Equipment } from '../../content/equipment'
 import type { SkillProficiency } from '../../content/skill-proficiency'
 import { equipmentSchema } from '../../content/equipment'
@@ -254,7 +255,7 @@ describe('creature weapon proficiency grant set helpers', () => {
     mastery: 'nick',
     damage: { dice: { count: 1, faces: 4 } },
     damageType: 'piercing',
-  })
+  }) as Extract<Equipment, { kind: 'weapon' }>
 
   it('expands grant sets to sorted category rows then sorted item rows', () => {
     expect(
@@ -285,7 +286,7 @@ describe('creature weapon proficiency grant set helpers', () => {
   })
 
   it('matches weapons from grant sets and target rows consistently', () => {
-    const grant = {
+    const grant: CreatureWeaponProficiencies = {
       categories: ['simple'],
       items: ['srd-cc-5.2.1:dagger'],
     }

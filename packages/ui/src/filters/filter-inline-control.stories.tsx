@@ -74,6 +74,9 @@ export const GhostShell: Story = {
 export const ClassReference: Story = {
   tags: ['control-parity'],
   parameters: { semanticClasses: true },
+  args: {
+    children: null,
+  },
   render: () => (
     <ClassReferenceTable
       rows={FILTER_INLINE_APPEARANCE_SPECS.map((spec) => ({

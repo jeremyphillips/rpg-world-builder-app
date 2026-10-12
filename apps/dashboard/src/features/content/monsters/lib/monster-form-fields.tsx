@@ -22,7 +22,7 @@ import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
 import { monsterHitPointsFields } from './monster-hit-points-form-fields'
-import { MONSTER_CHALLENGE_HEADING } from './monster-form-labels'
+import { MONSTER_CHALLENGE_HEADING, monsterEquipmentSectionLabel } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 
 const sizeOptions = toOptions(
@@ -125,7 +125,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     { id: MONSTER_FORM_TAB.identity, label: 'Identity', fields: identity },
     { id: MONSTER_FORM_TAB.statistics, label: 'Statistics', fields: statistics },
     { id: MONSTER_FORM_TAB.creatureDetails, label: 'Creature Details', fields: creatureDetails },
-    { id: MONSTER_FORM_TAB.equipment, label: 'Equipment', fields: equipment },
+    { id: MONSTER_FORM_TAB.equipment, label: monsterEquipmentSectionLabel(), fields: equipment },
     { id: MONSTER_FORM_TAB.traits, label: 'Traits', fields: traits },
     { id: MONSTER_FORM_TAB.actions, label: 'Actions', fields: actions },
   ].map(withContentFormTabIcon)

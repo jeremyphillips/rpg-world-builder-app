@@ -59,6 +59,10 @@ export const CATALOG_SCHEMA_MANIFEST = [
     fileMatch: ['packages/catalog/src/feats/data/**/feats.json'],
   },
   {
+    file: 'catalog-monster-list.schema.json',
+    fileMatch: ['packages/catalog/src/monsters/data/**/monsters.json'],
+  },
+  {
     file: 'catalog-skill-proficiency-list.schema.json',
     fileMatch: ['packages/catalog/src/skill-proficiencies/data/**/skill-proficiencies.json'],
   },

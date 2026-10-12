@@ -38,6 +38,12 @@
     },
     {
       "fileMatch": [
+        "packages/catalog/src/monsters/data/**/monsters.json"
+      ],
+      "url": "./packages/contracts/generated/catalog-monster-list.schema.json"
+    },
+    {
+      "fileMatch": [
         "packages/catalog/src/skill-proficiencies/data/**/skill-proficiencies.json"
       ],
       "url": "./packages/contracts/generated/catalog-skill-proficiency-list.schema.json"

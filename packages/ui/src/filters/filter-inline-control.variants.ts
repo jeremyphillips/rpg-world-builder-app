@@ -4,7 +4,6 @@ import { fieldControlSizeClasses } from '../components/ui/field-sizing.variants'
 import {
   FILTER_INLINE_APPEARANCE_SPECS,
   UI_FILTER_INLINE_SHELL_CLASS,
-  resolveFilterInlineAppearanceClass,
 } from '../components/ui/field-control.styles'
 
 const filterInlineAppearanceClass = Object.fromEntries(

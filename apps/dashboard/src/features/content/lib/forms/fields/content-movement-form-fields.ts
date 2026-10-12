@@ -11,7 +11,7 @@ import {
   type MovementSpeedFeet,
   type MovementSpeeds,
 } from '@rpg/contracts'
-import type { FieldVisibility, FormItem } from '@rpg/ui/form'
+import type { ArrayConfig, FieldVisibility, FormItem } from '@rpg/ui/form'
 import { disableOptionsUsedInSiblingRows } from '@rpg/ui/form'
 import { z } from 'zod'
 
@@ -81,7 +81,7 @@ const movementFeetOptions = MOVEMENT_SPEED_FEET.map((feet) => ({
 
 const ALL_MOVEMENT_MODES_ADDED_REASON = 'All movement modes have been added.'
 
-export function movementArrayField(): FormItem {
+export function movementArrayField(): ArrayConfig {
   return {
     kind: 'array',
     name: 'movement',
@@ -178,12 +178,12 @@ export function creatureFlyHoverSwitchField(): FormItem {
 }
 
 export function movementWithHoverGroup(): FormItem {
-  const movement = movementArrayField()
+  const { legend: _movementLegend, ...movementField } = movementArrayField()
   return {
     kind: 'group',
     legend: 'Movement',
     density: 'comfortable',
-    fields: [{ ...movement, legend: undefined }, creatureFlyHoverSwitchField()],
+    fields: [movementField, creatureFlyHoverSwitchField()],
   }
 }
 

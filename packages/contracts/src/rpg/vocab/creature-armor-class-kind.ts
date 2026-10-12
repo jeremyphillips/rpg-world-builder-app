@@ -20,7 +20,7 @@ export const CREATURE_ARMOR_CLASS_KIND_ENTRIES = {
     description: '10 plus Dexterity plus a natural armor bonus, plus shields.',
   },
   equipment: {
-    label: 'Equipment',
+    label: 'Armor',
     description: 'Calculated from equipped body armor and shields.',
   },
   fixed: {

@@ -1,6 +1,5 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '../../lib/utils'
 import { resolveCompactControlSegmentClasses } from './compact-control.styles'
 import { iconGlyphDescendantClasses } from './icon-glyph.variants'
 

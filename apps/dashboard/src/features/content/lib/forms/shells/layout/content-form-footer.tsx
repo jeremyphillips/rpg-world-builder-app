@@ -94,7 +94,7 @@ function ContentEditSaveButton({
 function ContentCreateFooterSecondary<TFieldValues extends FieldValues>({
   backHref,
   createPending,
-  submitDisabled,
+  submitDisabled: _submitDisabled,
   saveDraftDisabled,
   saveDraftPending,
   onSaveDraft,

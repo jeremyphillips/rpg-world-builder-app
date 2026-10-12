@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { RefinementCtx, ZodIssue } from 'zod'
 
 import { characterSchema } from '../runtime/character/sheet'
 import {
@@ -111,18 +112,20 @@ describe('creature movement and senses', () => {
   })
 })
 
+function refinementIssueCollector() {
+  const issues: { message: string; path: (string | number)[] }[] = []
+  const ctx = {
+    addIssue: (issue: ZodIssue) => {
+      issues.push({ message: issue.message, path: issue.path as (string | number)[] })
+    },
+  } as unknown as RefinementCtx
+  return { issues, ctx }
+}
+
 describe('refineCreatureSenseRanges', () => {
   it('requires range on publish refinement', () => {
-    const issues: { message: string; path: (string | number)[] }[] = []
-    refineCreatureSenseRanges(
-      [{ type: 'darkvision' }],
-      {
-        addIssue: (issue) => {
-          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
-        },
-      } as never,
-      ['senses'],
-    )
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureSenseRanges([{ type: 'darkvision' }], ctx, ['senses'])
     expect(issues).toEqual([
       {
         message: 'Enter a range in feet for each sense.',
@@ -132,16 +135,8 @@ describe('refineCreatureSenseRanges', () => {
   })
 
   it('rejects a mile value on a sense range', () => {
-    const issues: { message: string; path: (string | number)[] }[] = []
-    refineCreatureSenseRanges(
-      [{ type: 'darkvision', range: TELEPATHY_MILE_FEET }],
-      {
-        addIssue: (issue) => {
-          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
-        },
-      } as never,
-      ['senses'],
-    )
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureSenseRanges([{ type: 'darkvision', range: TELEPATHY_MILE_FEET }], ctx, ['senses'])
     expect(issues).toEqual([
       {
         message: 'Choose a sense range in feet.',
@@ -165,16 +160,8 @@ describe('refineCreatureTelepathyRange', () => {
   })
 
   it('rejects a distance outside the telepathy presets', () => {
-    const issues: { message: string; path: (string | number)[] }[] = []
-    refineCreatureTelepathyRange(
-      15,
-      {
-        addIssue: (issue) => {
-          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
-        },
-      } as never,
-      ['languages', 'telepathy'],
-    )
+    const { issues, ctx } = refinementIssueCollector()
+    refineCreatureTelepathyRange(15, ctx, ['languages', 'telepathy'])
     expect(issues).toEqual([
       {
         message: 'Choose a telepathy range.',

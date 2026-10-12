@@ -24,8 +24,8 @@ export function useProgressiveFieldValidationTrigger<TFieldValues extends FieldV
       isTouched: boolean,
     ): ControllerRenderProps<TFieldValues, TName> => ({
       ...field,
-      onBlur: (event) => {
-        field.onBlur(event)
+      onBlur: () => {
+        field.onBlur()
         queueMicrotask(() => {
           runTrigger()
         })

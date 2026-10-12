@@ -4,7 +4,7 @@ import {
   NARRATIVE_THEMES,
   type NarrativeSlot,
 } from '@rpg/contracts/character-narrative'
-import { ALIGNMENTS } from '@rpg/contracts'
+import { CHARACTER_ALIGNMENTS } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -94,7 +94,7 @@ describe('foundation narrative collection', () => {
     const inventory = buildFoundationInventory(foundationCollection)
 
     for (const slot of ALIGNMENT_SENSITIVE_SLOTS) {
-      for (const alignment of ALIGNMENTS) {
+      for (const alignment of CHARACTER_ALIGNMENTS) {
         expect(
           inventory.explicitAlignmentCoverage[slot][alignment],
           `${slot} × ${alignment}`,

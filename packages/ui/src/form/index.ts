@@ -322,7 +322,9 @@ export {
 export {
   DICE_FORMULA_TAIL_OPERATORS,
   DICE_FORMULA_OPERATORS,
+  resolveDiceFormulaValue,
   type DiceFormulaTailOperator,
+  type DiceFormulaValue,
 } from '../components/ui/dice-formula-field.lib'
 export type { FieldSize } from '../components/ui/field.client'
 export {

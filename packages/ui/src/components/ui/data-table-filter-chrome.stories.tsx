@@ -82,7 +82,6 @@ function FilterChromeDemo({
 
 const meta = {
   title: 'Components/DataTableFilterChrome',
-  component: DataTableFilterChrome,
   parameters: {
     layout: 'padded',
     docs: {
@@ -100,19 +99,10 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   render: () => <FilterChromeDemo />,
-  args: {
-    filterSchema: demoSchema,
-    state: {},
-    onValueChange: () => undefined,
-    onReset: () => undefined,
-    advancedOpen: false,
-    onAdvancedFiltersOpenChange: () => undefined,
-  },
 }
 
 export const WithActiveFilters: Story = {
   render: () => (
     <FilterChromeDemo initialValues={{ search: 'ember', status: 'draft', hiddenOnly: true }} />
   ),
-  args: Default.args,
 }

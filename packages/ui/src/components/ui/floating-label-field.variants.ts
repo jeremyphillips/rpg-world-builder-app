@@ -7,6 +7,7 @@ import {
   FLOATING_LABEL_LAYER_CLASS,
   FLOATING_LABEL_SIZE_SPECS,
   FLOATING_LABEL_TEXT_CLASS,
+  type FloatingLabelFieldSize,
 } from './floating-label-field.styles'
 
 const floatingLabelSizeClass: Record<FloatingLabelFieldSize, string> = {
@@ -50,7 +51,6 @@ export const floatingLabelTextVariants = cva(cn(FLOATING_LABEL_LABEL_CLASS, 'rtl
 export const floatingLabelTextClipClass = FLOATING_LABEL_TEXT_CLASS
 
 export type { FloatingLabelFieldSize } from './floating-label-field.styles'
-
 export type FloatingLabelFieldSizeProp = NonNullable<
   VariantProps<typeof floatingLabelShellVariants>['size']
 >

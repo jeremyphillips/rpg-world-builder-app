@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { RefinementCtx, ZodIssue } from 'zod'
 import { z } from 'zod'
 
 import { ApiError } from './errors'
@@ -31,13 +32,13 @@ describe('isApiValidationDetails', () => {
 
 describe('addApiValidationIssueToRefinement', () => {
   it('maps structured issues onto Zod paths with stable params.code', () => {
-    const issues: { path: PropertyKey[]; message: string; params?: { code?: string } }[] = []
+    const issues: ZodIssue[] = []
     addApiValidationIssueToRefinement(
       {
-        addIssue: (issue) => {
+        addIssue: (issue: ZodIssue) => {
           issues.push(issue)
         },
-      },
+      } as unknown as RefinementCtx,
       { path: 'equipment.0.equipmentId', message: 'Unknown equipment.', code: 'unknown_equipment' },
     )
     expect(issues[0]).toMatchObject({

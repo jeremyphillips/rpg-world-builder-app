@@ -9,7 +9,7 @@ type SemanticClassOptionSpec = {
  */
 export function semanticClassArgTypeDescription(
   specs: readonly SemanticClassOptionSpec[],
-  propLabel: string,
+  _propLabel: string,
 ): string {
   return specs.map((spec) => `${spec.value} → ${spec.className}`).join('; ')
 }

@@ -25,7 +25,7 @@ export const withSemanticClassCaption: Decorator = (Story, context) => {
           const marked =
             node.querySelector<HTMLElement>('[data-semantic-class-target]') ??
             node.querySelector<HTMLElement>('button, input, select, textarea, a[role="button"]')
-          targetRef.current = marked ?? node.firstElementChild
+          targetRef.current = (marked ?? node.firstElementChild) as HTMLElement | null
         }}
       >
         <Story />

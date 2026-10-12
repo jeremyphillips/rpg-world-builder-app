@@ -158,7 +158,6 @@ function buildBatchResolver(
 /** Registers discovery topology for one content surface and derives entry/batch resolvers. */
 export function defineContentUsage(input: DefineContentUsageInput): ContentUsageRegistration {
   const entrySources = input.sources.filter((registration) => registration.entry)
-  const batchSources = input.sources.filter((registration) => registration.batch)
 
   if (entrySources.length === 0) {
     throw new Error(

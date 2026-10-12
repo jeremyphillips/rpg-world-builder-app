@@ -49,7 +49,7 @@ function mockAdminUsersQuery() {
     fetchStatus: 'idle',
     error: null,
     refetch: vi.fn(),
-  } as ReturnType<typeof useAdminUsers>)
+  } as unknown as ReturnType<typeof useAdminUsers>)
 }
 
 function renderAdminTable(initialEntry = '/') {

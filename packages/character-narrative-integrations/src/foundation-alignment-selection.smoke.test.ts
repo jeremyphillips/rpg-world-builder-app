@@ -1,6 +1,6 @@
 import { generateNarrative } from '@rpg/character-narrative-core'
 import { loadNarrativeCollection } from '@rpg/character-narrative-data'
-import { ALIGNMENTS } from '@rpg/contracts'
+import { CHARACTER_ALIGNMENTS } from '@rpg/contracts'
 import type { NarrativeGenerationContext, NarrativeSlot } from '@rpg/contracts/character-narrative'
 import { describe, expect, it } from 'vitest'
 
@@ -31,7 +31,7 @@ describe('foundation alignment selection smoke', () => {
     const collection = await loadNarrativeCollection()
     const fragmentsById = new Map(collection.fragments.map((fragment) => [fragment.id, fragment]))
 
-    for (const alignment of ALIGNMENTS) {
+    for (const alignment of CHARACTER_ALIGNMENTS) {
       for (const slot of ALIGNMENT_SENSITIVE_SLOTS) {
         const explicitIds = new Set<string>()
 

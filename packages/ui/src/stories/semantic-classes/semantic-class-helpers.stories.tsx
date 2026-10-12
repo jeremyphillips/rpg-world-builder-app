@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import * as React from 'react'
 
-import { Button } from '../../components/ui/button'
+import { Button } from '../../components/ui/button.client'
 import { ClassReferenceTable, type ClassReferenceSpec } from './class-reference-table'
 import { SemanticClassCaption } from './semantic-class-caption.client'
 import { CatalogTable } from './catalog-table'

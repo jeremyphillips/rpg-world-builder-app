@@ -51,7 +51,6 @@ describe('normalizeMonsterFormValues', () => {
     values.languages = {
       entries: [{ language: 'common', speaks: true }],
       telepathy: undefined,
-      note: '',
     }
     const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
     expect(normalized.experiencePointsOverride).toBe(0)

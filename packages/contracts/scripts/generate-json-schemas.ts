@@ -16,6 +16,7 @@ import { featSchema } from '../src/rpg/content/feat.ts'
 import { grantGroupSchema } from '../src/rpg/content/lib/grants/grants.ts'
 import { skillProficiencySchema } from '../src/rpg/content/skill-proficiency.ts'
 import { spellSchema } from '../src/rpg/content/spell/body.ts'
+import { monsterSchema } from '../src/rpg/content/monster.ts'
 import { speciesSchema } from '../src/rpg/content/species.ts'
 import { xpProgressionSchema } from '../src/rpg/content/xp-progression.ts'
 import { startingWealthRulesSchema } from '../src/rpg/campaign/rules/starting-wealth.ts'
@@ -80,6 +81,10 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-feat-list.schema.json',
     schema: z.array(featSchema),
+  },
+  {
+    file: 'catalog-monster-list.schema.json',
+    schema: z.array(monsterSchema),
   },
   {
     file: 'catalog-skill-proficiency-list.schema.json',

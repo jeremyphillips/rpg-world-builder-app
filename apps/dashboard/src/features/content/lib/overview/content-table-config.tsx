@@ -139,7 +139,7 @@ export function buildContentColumns<T extends ContentBase>(
         status={row.original.status}
         campaignAccess={resolveReadSurfaceCampaignAccess(
           contentType,
-          (row.original as WithCampaignAccess<ContentBase>).campaignAccess,
+          (row.original as unknown as WithCampaignAccess<ContentBase>).campaignAccess,
         )}
         nameHref={nameHref?.(row.original)}
         editHref={canManage ? editHref?.(row.original) : undefined}

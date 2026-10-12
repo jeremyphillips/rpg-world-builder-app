@@ -40,6 +40,7 @@ const COPY_DERIVATION_BASELINE = [
   '1 apps/dashboard/src/features/content/locations/lib/building-organizations/building-organization-composition-presentation.lib.ts label-member',
   '1 apps/dashboard/src/features/content/locations/lib/connected-parties/location-connection-surface-copy.ts label-getter',
   '2 apps/dashboard/src/features/content/locations/lib/forms/location-classification-form-fields.ts label-identifier',
+  '2 apps/dashboard/src/features/content/monsters/lib/monster-form-labels.ts label-identifier',
   '4 apps/dashboard/src/features/game-terms/routes/vocabulary-overview-content.tsx label-identifier',
   '2 apps/dashboard/src/features/game-terms/routes/vocabulary-term-detail-content.tsx label-identifier',
   '2 apps/dashboard/src/features/media/lib/media-role-confirm.lib.ts label-identifier',
@@ -59,7 +60,6 @@ const COPY_DERIVATION_BASELINE = [
   '1 packages/contracts/src/rpg/vocab/types.ts label-identifier',
   '1 packages/contracts/src/rpg/vocab/weapon/compatibility.ts label-getter',
   '1 packages/ui/src/components/ui/combobox-field-parts.client.tsx label-identifier',
-  '2 packages/ui/src/components/ui/data-table-filter-region.client.tsx label-identifier',
   '1 packages/ui/src/filters/active-filter-chips.client.tsx label-member',
 ] as const
 

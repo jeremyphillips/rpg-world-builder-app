@@ -732,8 +732,8 @@ function StandardFieldRenderer({
   }, [boundPaths, trigger])
   const progressiveField = {
     ...field,
-    onBlur: (event: Parameters<typeof field.onBlur>[0]) => {
-      field.onBlur(event)
+    onBlur: () => {
+      field.onBlur()
       runFieldTrigger()
     },
     onChange: (value: Parameters<typeof field.onChange>[0]) => {

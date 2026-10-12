@@ -40,7 +40,6 @@ import {
   FILTER_INLINE_APPEARANCE_SPECS,
 } from '../components/ui/field-control.styles'
 import {
-  UI_FIELD_GROUP_LAYOUT_CLASSES,
   UI_FIELD_GROUP_SIZE_CLASSES,
   FIELD_GROUP_SIZE_SPECS,
 } from '../components/ui/field-group.styles'
