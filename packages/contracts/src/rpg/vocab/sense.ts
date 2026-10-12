@@ -28,10 +28,11 @@ export const senseIdSchema = vocabularyOptionIdSchema
 export type SenseId = z.infer<typeof senseIdSchema>
 
 /**
- * Preset sense ranges (in feet) shown as a select in authoring UIs. The
- * underlying schema stays numeric — these presets are a UI affordance only.
+ * Preset sense ranges (in feet) for grant and creature authoring. Ten-foot
+ * steps through 120. The stored range stays a number — these presets are the
+ * legal authoring choices.
  */
-export const SENSE_RANGES = [10, 30, 60, 90, 120] as const
+export const SENSE_RANGES = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120] as const
 export type StandardSenseRange = (typeof SENSE_RANGES)[number]
 
 /** A special sense and its range in feet (e.g. Darkvision 60 ft). */

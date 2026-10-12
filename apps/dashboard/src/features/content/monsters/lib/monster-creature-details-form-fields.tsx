@@ -10,7 +10,6 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
 import { referenceWeaponFieldOptions } from '../../lib/form-options/content-field-option.lib'
-import { SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS } from '../../lib/forms/fields/content-identity-form-fields'
 import { resolveContentWeaponGrantOptionLabel } from '../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -26,9 +25,10 @@ import {
   MonsterCreatureDetailsLanguagesSlot,
   MonsterCreatureDetailsSensesSlot,
   MonsterCreatureDetailsSkillsSlot,
+  MonsterTelepathyRangeField,
 } from '../components/form/monster-creature-details-slots'
 import { damageDefenseComboboxOptions } from './monster-damage-defense-form.lib'
-import { MONSTER_TELEPATHY_HINT } from './monster-form-labels'
+import { MONSTER_WEAPON_PROFICIENCIES_HEADING } from './monster-form-labels'
 import type { MonsterFormValues } from './monster-form-values'
 
 const weaponCategoryOptions = toOptions(
@@ -85,7 +85,7 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
       modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
       categoriesPath: 'proficiencies.weapons.categories',
       itemsPath: 'proficiencies.weapons.items',
-      label: 'Weapon proficiency mode',
+      label: MONSTER_WEAPON_PROFICIENCIES_HEADING,
       hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
       categoryOptions: weaponCategoryOptions,
       itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
@@ -94,7 +94,6 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
       categoriesHint: WEAPON_PROFICIENCIES_HINT,
       categoryMode: 'categories' satisfies WeaponProficiencyMode,
       specificMode: 'individual' satisfies WeaponProficiencyMode,
-      labelVisibility: 'srOnly',
       resolveOptionLabel: (value) =>
         resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
     }),
@@ -118,11 +117,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
           heading: { label: 'Skill Proficiencies' },
           render: () => <MonsterCreatureDetailsSkillsSlot ctx={ctx} />,
         },
-        {
-          kind: 'group',
-          legend: 'Weapon proficiencies',
-          fields: weaponProficiencyFields(ctx),
-        },
+        ...weaponProficiencyFields(ctx),
       ],
     },
     {
@@ -156,13 +151,9 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
           legend: 'Telepathy',
           fields: [
             {
-              type: 'inputUnit',
+              kind: 'slot',
               name: 'languages.telepathy',
-              label: 'Range',
-              unit: 'ft.',
-              min: 0,
-              valueDigits: SPELL_RANGE_DISTANCE_INLINE_COUNT_DIGITS,
-              hint: { text: MONSTER_TELEPATHY_HINT, position: 'below-control' },
+              render: () => <MonsterTelepathyRangeField />,
             },
           ],
         },

@@ -14,9 +14,12 @@ import { SelectLikeCaretSlot, SelectLikeValueSlot } from './select-like-trigger-
 import { useFloatingLabelFieldState } from './floating-label-field.context'
 import {
   assertSelectCompactSizing,
+  assertSelectTriggerNotInsideFloatingLabel,
   isSelectCompactTrigger,
   resolveSelectSizingGhostLabels,
   resolveSelectTriggerFlowClass,
+  resolveSelectValuePosition,
+  resolveSelectValueTrailing,
   SELECT_CARET_SLOT_DATA_ATTR,
   SELECT_SIZING_LABEL_DATA_ATTR,
   SELECT_VALUE_SLOT_DATA_ATTR,
@@ -42,6 +45,8 @@ const SelectTrigger = React.forwardRef<
       sizingLabel?: string
       /** Compact text sizing — all option labels as overlapping grid ghosts. Mutually exclusive with `digits` / `sizingLabel`. */
       sizingLabels?: readonly string[]
+      /** Omit the dropdown caret. Used when a unit select has a single option. */
+      hideCaret?: boolean
     }
 >(
   (
@@ -53,28 +58,21 @@ const SelectTrigger = React.forwardRef<
       digits,
       sizingLabel,
       sizingLabels,
+      hideCaret = false,
       children,
       ...props
     },
     ref,
   ) => {
     assertSelectCompactSizing({ digits, sizingLabel, sizingLabels })
-    const insideFloatingLabel = useFloatingLabelFieldState()
-    if (insideFloatingLabel && (digits != null || grouped)) {
-      throw new Error(
-        'SelectTrigger: `digits` and `grouped` are not supported inside FloatingLabelField.',
-      )
-    }
+    assertSelectTriggerNotInsideFloatingLabel(useFloatingLabelFieldState(), { digits, grouped })
 
     const size = sizeProp ?? 'md'
     const groupedStart = grouped && groupedPosition === 'start'
     const compact = isSelectCompactTrigger({ digits, sizingLabel, sizingLabels })
     const ghostLabels = resolveSelectSizingGhostLabels({ sizingLabel, sizingLabels })
-    const valuePosition = grouped ? (groupedPosition === 'end' ? 'end' : 'start') : 'standalone'
-    const valueTrailing =
-      valuePosition === 'end' || valuePosition === 'standalone'
-        ? ('slot' as const)
-        : ('content' as const)
+    const valuePosition = resolveSelectValuePosition(grouped, groupedPosition)
+    const valueTrailing = resolveSelectValueTrailing(hideCaret, valuePosition)
 
     return (
       <SelectPrimitive.Trigger
@@ -96,7 +94,7 @@ const SelectTrigger = React.forwardRef<
         >
           {children}
         </SelectLikeValueSlot>
-        <SelectLikeCaretSlot size={size} groupedStart={groupedStart} />
+        {hideCaret ? null : <SelectLikeCaretSlot size={size} groupedStart={groupedStart} />}
       </SelectPrimitive.Trigger>
     )
   },

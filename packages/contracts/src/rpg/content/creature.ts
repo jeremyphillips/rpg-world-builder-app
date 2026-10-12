@@ -7,7 +7,7 @@ import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
 import { effectConditionSchema } from '../vocab/effect-condition'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { senseDraftSchema, senseSchema } from '../vocab/sense'
+import { SENSE_RANGES, senseDraftSchema, senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
@@ -37,6 +37,17 @@ export const creatureSensesSchema = z.array(senseSchema).default([])
 
 export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
 
+/** Stored feet for telepathy of 1 mile. Sense ranges never use this value. */
+export const TELEPATHY_MILE_FEET = 5280
+
+/** Display label for a stored telepathy range (`60 ft.`, `1 mile`). */
+export function formatTelepathyRange(feet: number): string {
+  if (feet === TELEPATHY_MILE_FEET) return '1 mile'
+  return `${feet} ft.`
+}
+
+const SENSE_RANGE_PRESETS: readonly number[] = SENSE_RANGES
+
 /** Publish validation — every sense row needs a range in feet. */
 export function refineCreatureSenseRanges(
   senses: readonly { type: string; range?: number }[],
@@ -50,8 +61,23 @@ export function refineCreatureSenseRanges(
         index,
         'range',
       ])
+      return
+    }
+    if (!SENSE_RANGE_PRESETS.includes(sense.range)) {
+      addCustomRefinementIssue(ctx, 'Choose a sense range in feet.', [...path, index, 'range'])
     }
   })
+}
+
+/** Publish validation — telepathy is a sense-range preset or one mile. */
+export function refineCreatureTelepathyRange(
+  telepathy: number | undefined,
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  if (telepathy === undefined) return
+  if (telepathy === TELEPATHY_MILE_FEET || SENSE_RANGE_PRESETS.includes(telepathy)) return
+  addCustomRefinementIssue(ctx, 'Choose a telepathy range.', path)
 }
 
 // ---------------------------------------------------------------------------

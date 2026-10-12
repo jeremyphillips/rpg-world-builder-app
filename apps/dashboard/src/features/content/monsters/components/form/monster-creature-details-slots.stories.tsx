@@ -7,6 +7,7 @@ import { MonsterCreatureDetailsSkillsSlot } from './monster-creature-details-ski
 import {
   MonsterCreatureDetailsLanguagesSlot,
   MonsterCreatureDetailsSensesSlot,
+  MonsterTelepathyRangeField,
 } from './monster-creature-details-slots'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 
@@ -81,6 +82,14 @@ export const SenseRows: Story = {
   render: () => (
     <FormHarness defaultValues={{ senses: [{ type: 'darkvision', range: 60 }] }}>
       <MonsterCreatureDetailsSensesSlot ctx={mockCtx} />
+    </FormHarness>
+  ),
+}
+
+export const TelepathyRange: Story = {
+  render: () => (
+    <FormHarness defaultValues={{ languages: { entries: [], telepathy: 5280 } }}>
+      <MonsterTelepathyRangeField />
     </FormHarness>
   ),
 }

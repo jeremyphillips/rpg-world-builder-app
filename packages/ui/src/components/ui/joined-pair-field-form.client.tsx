@@ -131,6 +131,7 @@ export function JoinedPairFieldForm({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        labelVisibility={labelVisibility}
         wrapControl={false}
         chrome={chrome}
         size={size}

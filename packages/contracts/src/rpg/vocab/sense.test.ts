@@ -43,7 +43,7 @@ describe('sense vocabulary', () => {
   })
 
   it('exposes standard sense range presets for UI', () => {
-    expect(SENSE_RANGES).toEqual([10, 30, 60, 90, 120])
+    expect(SENSE_RANGES).toEqual([10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120])
   })
 
   it('returns title-cased slug labels', () => {

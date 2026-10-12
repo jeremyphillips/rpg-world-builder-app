@@ -1,25 +1,47 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { getSenseLabel, SENSE_SET_ID, type SenseId } from '@rpg/contracts'
-import { Chip, ChipGroup, ComboboxField } from '@rpg/ui'
+import { getSenseLabel, SENSE_SET_ID, TELEPATHY_MILE_FEET, type SenseId } from '@rpg/contracts'
+import { Chip, ChipGroup, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
 import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
 
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
-import { ContentSenseRangePresetSelect } from '../../../lib/forms/fields/content-sense-range-preset-select'
+import {
+  feetFromTelepathyRange,
+  SENSE_RANGE_PLACEHOLDER,
+  SENSE_RANGE_UNIT,
+  SENSE_RANGE_UNIT_LABEL,
+  senseRangeAmountOptions,
+  senseRangeUnitOptions,
+  telepathyRangeAmountOptions,
+  telepathyRangeFromFeet,
+  telepathyRangeUnitOptions,
+} from '../../../lib/forms/fields/content-sense-range-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   MONSTER_ADD_LANGUAGE_LABEL,
   MONSTER_ADD_SENSE_LABEL,
   MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL,
   MONSTER_SPEAKS_LABEL,
+  MONSTER_TELEPATHY_HINT,
   MONSTER_UNDERSTANDS_ONLY_LABEL,
 } from '../../lib/monster-form-labels'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
 
 export { MonsterCreatureDetailsSkillsSlot } from './monster-creature-details-skills-slot'
+
+const CLEARED_RANGE = -1
+
+function clearableAmountOptions(options: readonly { value: number; label: string }[]) {
+  return [{ value: CLEARED_RANGE, label: SENSE_RANGE_PLACEHOLDER }, ...options]
+}
+
+function readRangeAmount(next: string | number | undefined): number | undefined {
+  if (typeof next !== 'number' || next === CLEARED_RANGE) return undefined
+  return next
+}
 
 export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx }) {
   const form = useFormContext<MonsterFormValues>()
@@ -83,13 +105,51 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
               kind: 'utility',
               content: (
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                  <ContentSenseRangePresetSelect
+                  <JoinedPairFieldForm
                     id={`monster-sense-range-${row.type}`}
                     label={`${label} range`}
-                    value={row.range}
-                    onValueChange={(next) =>
-                      form.setValue(`senses.${index}.range`, next, { shouldDirty: true })
-                    }
+                    labelVisibility="srOnly"
+                    width="auto"
+                    chrome={{ variant: 'none' }}
+                    start={{
+                      kind: 'select',
+                      id: `monster-sense-range-${row.type}-amount`,
+                      value: row.range,
+                      options: clearableAmountOptions(senseRangeAmountOptions),
+                      digits: 3,
+                      placeholder: SENSE_RANGE_PLACEHOLDER,
+                      ariaLabel: `${label} range value`,
+                      onChange: (next) => {
+                        form.setValue(`senses.${index}.range`, readRangeAmount(next), {
+                          shouldDirty: true,
+                        })
+                      },
+                    }}
+                    end={{
+                      kind: 'select',
+                      id: `monster-sense-range-${row.type}-unit`,
+                      value: SENSE_RANGE_UNIT,
+                      options: senseRangeUnitOptions,
+                      sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+                      ariaLabel: `${label} range unit`,
+                      onChange: () => undefined,
+                    }}
+                    startOccupant={{
+                      kind: 'select',
+                      name: 'amount',
+                      options: clearableAmountOptions(senseRangeAmountOptions),
+                      digits: 3,
+                      placeholder: SENSE_RANGE_PLACEHOLDER,
+                      ariaLabel: `${label} range value`,
+                    }}
+                    endOccupant={{
+                      kind: 'select',
+                      name: 'unit',
+                      options: senseRangeUnitOptions,
+                      defaultValue: SENSE_RANGE_UNIT,
+                      sizingLabels: [SENSE_RANGE_UNIT_LABEL],
+                      ariaLabel: `${label} range unit`,
+                    }}
                   />
                   <MonsterCreatureDetailsRemoveRowButton
                     label={label}
@@ -108,6 +168,93 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
         )
       })}
     </div>
+  )
+}
+
+export function MonsterTelepathyRangeField() {
+  const form = useFormContext<MonsterFormValues>()
+  const [stored, setStored] = useState<number | undefined>(() => {
+    const value = form.getValues('languages.telepathy')
+    return typeof value === 'number' ? value : undefined
+  })
+
+  useEffect(() => {
+    const subscription = form.watch((values, info) => {
+      if (
+        info.name != null &&
+        info.name !== 'languages.telepathy' &&
+        !info.name.startsWith('languages.')
+      ) {
+        return
+      }
+      const next = values.languages?.telepathy
+      setStored(typeof next === 'number' ? next : undefined)
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
+
+  const { amount, unit } = telepathyRangeFromFeet(stored)
+  const amountOptions = clearableAmountOptions(telepathyRangeAmountOptions(unit))
+
+  return (
+    <JoinedPairFieldForm
+      id="monster-telepathy-range"
+      label="Range"
+      hint={MONSTER_TELEPATHY_HINT}
+      hintPosition="below-control"
+      width="auto"
+      chrome={{ variant: 'none' }}
+      start={{
+        kind: 'select',
+        id: 'monster-telepathy-range-amount',
+        value: amount,
+        options: amountOptions,
+        digits: 3,
+        placeholder: SENSE_RANGE_PLACEHOLDER,
+        ariaLabel: 'Range value',
+        onChange: (next) => {
+          if (typeof next !== 'number') return
+          const feet = feetFromTelepathyRange(readRangeAmount(next), unit)
+          setStored(feet)
+          form.setValue('languages.telepathy', feet, { shouldDirty: true })
+        },
+      }}
+      end={{
+        kind: 'select',
+        id: 'monster-telepathy-range-unit',
+        value: unit,
+        options: telepathyRangeUnitOptions,
+        sizingLabels: [SENSE_RANGE_UNIT_LABEL, 'mile'],
+        ariaLabel: 'Range unit',
+        onChange: (next) => {
+          if (next === 'mile') {
+            setStored(TELEPATHY_MILE_FEET)
+            form.setValue('languages.telepathy', TELEPATHY_MILE_FEET, { shouldDirty: true })
+            return
+          }
+          if (next === 'ft' && stored === TELEPATHY_MILE_FEET) {
+            setStored(undefined)
+            form.setValue('languages.telepathy', undefined, { shouldDirty: true })
+          }
+        },
+      }}
+      startOccupant={{
+        kind: 'select',
+        name: 'amount',
+        options: amountOptions,
+        digits: 3,
+        placeholder: SENSE_RANGE_PLACEHOLDER,
+        ariaLabel: 'Range value',
+      }}
+      endOccupant={{
+        kind: 'select',
+        name: 'unit',
+        options: telepathyRangeUnitOptions,
+        defaultValue: 'ft',
+        sizingLabels: [SENSE_RANGE_UNIT_LABEL, 'mile'],
+        ariaLabel: 'Range unit',
+      }}
+    />
   )
 }
 

@@ -11,6 +11,7 @@ import {
   getLanguageLabel,
   joinInlineMetadata,
   formatMovementDisplay,
+  formatTelepathyRange,
   type Equipment,
   type Monster,
   type MonsterAction,
@@ -350,7 +351,7 @@ function formatLanguageLines(monster: Monster): string | undefined {
     parts.push(`understands ${labels} but can't speak`)
   }
   if (telepathy != null) {
-    parts.push(`telepathy ${telepathy} ft.`)
+    parts.push(`telepathy ${formatTelepathyRange(telepathy)}`)
   }
   return parts.join('; ')
 }

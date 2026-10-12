@@ -1228,6 +1228,10 @@ export {
   type InputSelectFieldProps,
   type InputUnitFieldProps,
 } from './components/ui/input-select-field.client'
+export {
+  JoinedPairFieldForm,
+  type JoinedPairFieldFormProps,
+} from './components/ui/joined-pair-field-form.client'
 export type { InputSelectOption } from './components/ui/input-select-field.lib'
 
 export {

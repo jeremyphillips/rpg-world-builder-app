@@ -11,6 +11,7 @@ import {
   creatureSensesDraftSchema,
   creatureSensesSchema,
   refineCreatureSenseRanges,
+  refineCreatureTelepathyRange,
   creatureSizeRefSchema,
   creatureSkillProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
@@ -250,6 +251,7 @@ export function refineMonsterBody(
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
   refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
+  refineCreatureTelepathyRange(body.languages.telepathy, ctx, [...prefix, 'languages', 'telepathy'])
 
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {

@@ -6,7 +6,7 @@ import {
   type ProficiencyRank,
   type SkillProficiency,
 } from '@rpg/contracts'
-import { Badge, Chip, ChipGroup, ComboboxField, SemanticText, Text } from '@rpg/ui'
+import { Badge, Chip, ChipGroup, ComboboxField, SemanticText } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
@@ -35,9 +35,9 @@ function SkillCatalogStatusMessages({ status }: { status: ContentFormCtx['skillC
 
 function PassivePerceptionRow({ value }: { value: number }) {
   return (
-    <div className="flex items-center justify-between gap-2">
-      <Text variant="small">{MONSTER_PASSIVE_PERCEPTION_LABEL}</Text>
-      <Text variant="small">{value}</Text>
+    <div className="flex items-center justify-between gap-2 text-sm">
+      <span className="font-body-emphasis text-foreground">{MONSTER_PASSIVE_PERCEPTION_LABEL}</span>
+      <span className="font-body-emphasis text-foreground tabular-nums">{value}</span>
     </div>
   )
 }

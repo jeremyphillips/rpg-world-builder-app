@@ -31,9 +31,12 @@ export function JoinedPairFieldRenderer({ config, id, namePrefix }: JoinedPairFi
   const ids = resolveJoinedPairControlIds(id, config)
 
   const startController = useController({ name: startPath })
+  const endDefaultValue =
+    endPath !== undefined && config.end.kind === 'select' ? config.end.defaultValue : undefined
   const endController = useController({
     name: endPath ?? '__joinedPairUnusedEnd',
     disabled: endPath === undefined,
+    ...(endDefaultValue !== undefined ? { defaultValue: endDefaultValue } : {}),
   })
 
   const combinedError = resolveJoinedPairCombinedError(

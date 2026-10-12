@@ -6,6 +6,9 @@ import {
   creatureRuntimeHitPointsSchema,
   creatureSensesDraftSchema,
   creatureSensesSchema,
+  formatTelepathyRange,
+  refineCreatureTelepathyRange,
+  TELEPATHY_MILE_FEET,
   refineCreatureSenseRanges,
   creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
@@ -14,6 +17,13 @@ import {
   creatureWeaponProficiencyTargetSchema,
   resolveDamageDefenseOptionState,
 } from './creature'
+
+describe('telepathy range', () => {
+  it('formats feet and one mile', () => {
+    expect(formatTelepathyRange(60)).toBe('60 ft.')
+    expect(formatTelepathyRange(TELEPATHY_MILE_FEET)).toBe('1 mile')
+  })
+})
 
 describe('creatureAbilityScoresSchema', () => {
   it('accepts monster-scale ability scores', () => {
@@ -117,6 +127,58 @@ describe('refineCreatureSenseRanges', () => {
       {
         message: 'Enter a range in feet for each sense.',
         path: ['senses', 0, 'range'],
+      },
+    ])
+  })
+
+  it('rejects a mile value on a sense range', () => {
+    const issues: { message: string; path: (string | number)[] }[] = []
+    refineCreatureSenseRanges(
+      [{ type: 'darkvision', range: TELEPATHY_MILE_FEET }],
+      {
+        addIssue: (issue) => {
+          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
+        },
+      } as never,
+      ['senses'],
+    )
+    expect(issues).toEqual([
+      {
+        message: 'Choose a sense range in feet.',
+        path: ['senses', 0, 'range'],
+      },
+    ])
+  })
+})
+
+describe('refineCreatureTelepathyRange', () => {
+  it('accepts a feet preset and one mile', () => {
+    const issues: string[] = []
+    const ctx = {
+      addIssue: (issue: { message: string }) => {
+        issues.push(issue.message)
+      },
+    } as never
+    refineCreatureTelepathyRange(60, ctx, ['languages', 'telepathy'])
+    refineCreatureTelepathyRange(TELEPATHY_MILE_FEET, ctx, ['languages', 'telepathy'])
+    expect(issues).toEqual([])
+  })
+
+  it('rejects a distance outside the telepathy presets', () => {
+    const issues: { message: string; path: (string | number)[] }[] = []
+    refineCreatureTelepathyRange(
+      15,
+      {
+        addIssue: (issue) => {
+          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
+        },
+      } as never,
+      ['languages', 'telepathy'],
+    )
+    expect(issues).toEqual([
+      {
+        message: 'Choose a telepathy range.',
+        path: ['languages', 'telepathy'],
       },
     ])
   })
