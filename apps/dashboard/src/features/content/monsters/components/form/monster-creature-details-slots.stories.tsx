@@ -68,6 +68,7 @@ export const SkillRows: Story = {
         proficiencies: {
           skills: [{ skill: 'stealth', rank: 'proficient' }],
           savingThrows: [],
+          languages: [],
           weapons: { categories: [], items: [] },
         },
         challengeRating: '1',
@@ -102,7 +103,7 @@ export const LanguageRows: Story = {
           savingThrows: [],
           skills: [],
           languages: [{ language: 'common' }],
-          weapons: [],
+          weapons: { categories: [], items: [] },
         },
       }}
     >

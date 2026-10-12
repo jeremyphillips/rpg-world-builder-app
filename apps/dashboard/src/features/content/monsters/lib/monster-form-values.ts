@@ -1,6 +1,7 @@
 import type {
   ContentValidationIntent,
   CreateMonsterInput,
+  CreatureWeaponProficiencies,
   Monster,
   MonsterAction,
   MonsterReaction,
@@ -45,6 +46,11 @@ import {
   weaponProficiencyModeFromFormWeapons,
 } from './monster-weapon-proficiencies-form.lib'
 
+/** Form state uses a weapon grant set; save normalizes to persisted target rows. */
+export type MonsterFormProficiencies = Omit<Monster['proficiencies'], 'weapons'> & {
+  weapons: CreatureWeaponProficiencies
+}
+
 export type MonsterEquipmentFormEntry = {
   entryId: string
   equipmentId: string
@@ -73,7 +79,7 @@ export type MonsterFormValues = FieldValues & {
   communication: Monster['communication']
   challengeRating?: Monster['challengeRating']
   experiencePointsOverride?: number
-  proficiencies: Monster['proficiencies']
+  proficiencies: MonsterFormProficiencies
   defenses: Monster['defenses']
   equipment: MonsterEquipmentFormEntry[]
   traits: Monster['traits']

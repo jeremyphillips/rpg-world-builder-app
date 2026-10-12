@@ -5,7 +5,6 @@ import {
   monsterBodySchema,
   monsterDraftStoredSchema,
   monsterSchema,
-  normalizeLegacyMonsterDocument,
   updateMonsterDraftInputSchema,
   updateMonsterInputSchema,
   type Monster,
@@ -27,83 +26,35 @@ interface MonsterPatchRecord {
   patch: Record<string, unknown>
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function homebrewLeanDocumentToRaw(record: HomebrewMonsterRecord): Record<string, unknown> {
-  return {
-    ...(record.media !== undefined && { media: record.media }),
-    ...(record.description !== undefined && { description: record.description }),
-    size: record.size,
-    creatureType: record.creatureType,
-    alignment: record.alignment,
-    abilityScores: record.abilityScores,
-    armorClass: record.armorClass,
-    hitPoints: record.hitPoints,
-    movement: record.movement,
-    ...(record.hover !== undefined && { hover: record.hover }),
-    senses: record.senses,
-    languages: record.languages,
-    communication: record.communication,
-    challengeRating: record.challengeRating,
-    ...(record.experiencePointsOverride !== undefined && {
-      experiencePointsOverride: record.experiencePointsOverride,
-    }),
-    proficiencies: record.proficiencies,
-    defenses: record.defenses,
-    equipment: record.equipment,
-    traits: record.traits,
-    actions: record.actions,
-    bonusActions: record.bonusActions,
-    reactions: record.reactions,
-  }
-}
-
 function toHomebrewMonster(doc: HomebrewDoc): Monster {
   const record = doc as HomebrewMonsterRecord
-  const normalized = normalizeLegacyMonsterDocument(homebrewLeanDocumentToRaw(record))
-
   return {
     ...homebrewContentEnvelope(record),
     name: record.name,
-    ...(normalized.media !== undefined && { media: normalized.media as Monster['media'] }),
-    ...(normalized.description !== undefined && {
-      description: normalized.description as string,
+    ...(record.media !== undefined && { media: record.media }),
+    ...(record.description !== undefined && { description: record.description }),
+    size: record.size as Monster['size'],
+    creatureType: record.creatureType as string,
+    alignment: record.alignment as Monster['alignment'],
+    abilityScores: record.abilityScores as Monster['abilityScores'],
+    armorClass: record.armorClass as Monster['armorClass'],
+    hitPoints: record.hitPoints as Monster['hitPoints'],
+    movement: record.movement as Monster['movement'],
+    ...(record.hover !== undefined && { hover: record.hover }),
+    senses: (record.senses ?? []) as Monster['senses'],
+    communication: (record.communication ?? {}) as Monster['communication'],
+    challengeRating: record.challengeRating as Monster['challengeRating'],
+    ...(record.experiencePointsOverride !== undefined && {
+      experiencePointsOverride: record.experiencePointsOverride,
     }),
-    size: normalized.size as Monster['size'],
-    creatureType: normalized.creatureType as string,
-    alignment: normalized.alignment as Monster['alignment'],
-    abilityScores: normalized.abilityScores as Monster['abilityScores'],
-    armorClass: normalized.armorClass as Monster['armorClass'],
-    hitPoints: normalized.hitPoints as Monster['hitPoints'],
-    movement: normalized.movement as Monster['movement'],
-    ...(normalized.hover !== undefined && { hover: normalized.hover as boolean }),
-    senses: (normalized.senses ?? []) as Monster['senses'],
-    communication: (normalized.communication ?? {}) as Monster['communication'],
-    challengeRating: normalized.challengeRating as Monster['challengeRating'],
-    ...(normalized.experiencePointsOverride !== undefined && {
-      experiencePointsOverride: normalized.experiencePointsOverride as number,
-    }),
-    proficiencies: normalized.proficiencies as Monster['proficiencies'],
-    defenses: normalized.defenses as Monster['defenses'],
-    equipment: (normalized.equipment ?? []) as Monster['equipment'],
-    traits: (normalized.traits ?? []) as Monster['traits'],
-    actions: (normalized.actions ?? []) as Monster['actions'],
-    bonusActions: (normalized.bonusActions ?? []) as Monster['bonusActions'],
-    reactions: (normalized.reactions ?? []) as Monster['reactions'],
+    proficiencies: record.proficiencies as Monster['proficiencies'],
+    defenses: record.defenses as Monster['defenses'],
+    equipment: (record.equipment ?? []) as Monster['equipment'],
+    traits: (record.traits ?? []) as Monster['traits'],
+    actions: (record.actions ?? []) as Monster['actions'],
+    bonusActions: (record.bonusActions ?? []) as Monster['bonusActions'],
+    reactions: (record.reactions ?? []) as Monster['reactions'],
   } as Monster
-}
-
-function prepareHomebrewMonsterUpdate(
-  _doc: HomebrewDoc,
-  update: Record<string, unknown>,
-): Record<string, unknown> {
-  const proficiencies = update.proficiencies
-  if (isRecord(proficiencies) && Object.prototype.hasOwnProperty.call(proficiencies, 'languages')) {
-    return { ...update, languages: null }
-  }
-  return update
 }
 
 function bodyFromCreateInput(input: Record<string, unknown>): Record<string, unknown> {
@@ -152,7 +103,6 @@ export const monstersWriteConfig: ContentWriteConfig<Monster> = {
   homebrewModel: HomebrewMonsterModel,
   patchModel: MonsterPatchModel,
   toHomebrewEntity: toHomebrewMonster,
-  prepareHomebrewUpdate: prepareHomebrewMonsterUpdate,
   bodyFromCreateInput,
   validateBeforeWrite: monstersValidateBeforeWrite,
   patchReplaceKeys: [...MONSTER_PATCH_REPLACE_KEYS],

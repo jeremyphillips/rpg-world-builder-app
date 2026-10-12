@@ -408,10 +408,6 @@ export const updateMonsterDraftInputSchema = monsterDraftInputSchema
   .superRefine((input, ctx) => refineMonsterDraftBody(input as MonsterBodyDraft, ctx))
 
 export {
-  LegacyMonsterDocumentConflictError,
-  normalizeLegacyMonsterDocument,
-} from './monster/normalize-legacy-document'
-export {
   collectMonsterCatalogIssues,
   MONSTER_CATALOG_ISSUE_CODE,
 } from './monster/monster-catalog-issues'
