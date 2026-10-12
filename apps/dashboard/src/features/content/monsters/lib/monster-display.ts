@@ -333,8 +333,8 @@ function formatSenseLines(monster: Monster, passivePerception?: number): string 
 }
 
 function formatLanguageLines(monster: Monster): string | undefined {
-  const { entries, telepathy, note } = monster.languages
-  if (entries.length === 0 && telepathy == null && !note) {
+  const { entries, telepathy } = monster.languages
+  if (entries.length === 0 && telepathy == null) {
     return undefined
   }
 
@@ -352,10 +352,6 @@ function formatLanguageLines(monster: Monster): string | undefined {
   if (telepathy != null) {
     parts.push(`telepathy ${telepathy} ft.`)
   }
-  if (note) {
-    parts.push(note)
-  }
-
   return parts.join('; ')
 }
 

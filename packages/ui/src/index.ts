@@ -1222,6 +1222,13 @@ export {
   ComboboxFilterSelect,
   type ComboboxFilterSelectProps,
 } from './form/renderers/fields/combobox-filter-select.client'
+export {
+  InputSelectField,
+  InputUnitField,
+  type InputSelectFieldProps,
+  type InputUnitFieldProps,
+} from './components/ui/input-select-field.client'
+export type { InputSelectOption } from './components/ui/input-select-field.lib'
 
 export {
   EditableGrid,

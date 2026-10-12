@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
+import { normalizeWeaponProficiencyGrantSet } from './class-weapon-proficiency-helpers'
 
-describe('normalizeClassWeaponProficiencies', () => {
+describe('normalizeWeaponProficiencyGrantSet', () => {
   it('returns categories only when the toggle is off', () => {
     expect(
-      normalizeClassWeaponProficiencies({
+      normalizeWeaponProficiencyGrantSet({
         categories: ['simple', 'martial'],
         items: ['dagger'],
         hasSpecificWeapons: false,
@@ -15,7 +15,7 @@ describe('normalizeClassWeaponProficiencies', () => {
 
   it('returns named weapons only when the toggle is on', () => {
     expect(
-      normalizeClassWeaponProficiencies({
+      normalizeWeaponProficiencyGrantSet({
         categories: ['simple'],
         items: ['dagger', 'longsword'],
         hasSpecificWeapons: true,
@@ -25,7 +25,7 @@ describe('normalizeClassWeaponProficiencies', () => {
 
   it('returns empty categories when individual mode is on with no items selected', () => {
     expect(
-      normalizeClassWeaponProficiencies({
+      normalizeWeaponProficiencyGrantSet({
         categories: ['simple'],
         items: [],
         hasSpecificWeapons: true,

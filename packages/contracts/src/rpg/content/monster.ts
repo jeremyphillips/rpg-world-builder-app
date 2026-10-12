@@ -8,7 +8,9 @@ import {
   creatureAbilityScoresSchema,
   creatureAlignmentSchema,
   creatureMovementSchema,
+  creatureSensesDraftSchema,
   creatureSensesSchema,
+  refineCreatureSenseRanges,
   creatureSizeRefSchema,
   creatureSkillProficiencyEntrySchema,
   creatureStatBlockHitPointsSchema,
@@ -105,7 +107,6 @@ export const monsterBodyFields = {
       )
       .default([]),
     telepathy: z.number().int().min(0).optional(),
-    note: z.string().optional(),
   }),
   challengeRating: challengeRatingSchema,
   experiencePointsOverride: z.number().int().min(0).optional(),
@@ -137,7 +138,7 @@ export const monsterBodyDraftSchema = mediaBearingDraftAuthoredContentBodySchema
   armorClass: monsterArmorClassSchema.optional(),
   hitPoints: monsterHitPointsSchema.optional(),
   movement: creatureMovementSchema.optional(),
-  senses: creatureSensesSchema.optional(),
+  senses: creatureSensesDraftSchema.optional(),
   challengeRating: challengeRatingSchema.optional(),
   actions: z.array(monsterActionDraftSchema).default([]),
   bonusActions: z.array(monsterActionDraftSchema).default([]),
@@ -248,6 +249,7 @@ export function refineMonsterBody(
 
   refineWeaponEntryReferences(body, ctx, prefix, { requirePresent: true })
   refineCreatureDamageDefenses(body.defenses, ctx, [...prefix, 'defenses'])
+  refineCreatureSenseRanges(body.senses, ctx, [...prefix, 'senses'])
 
   const derivedXp = CHALLENGE_RATING_MECHANICS[body.challengeRating].xp
   if (body.experiencePointsOverride !== undefined) {

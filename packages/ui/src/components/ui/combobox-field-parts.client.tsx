@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Check } from 'lucide-react'
+import { ChevronDown, Check, Lock } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
@@ -23,6 +23,7 @@ import type {
   ComboboxRenderSelectedItem,
 } from './combobox-field.types'
 import { SearchBar } from './search-bar.client'
+import { selectOptionItemReasonVariants } from './select-option-item.variants'
 import {
   COMBOBOX_TRIGGER_OVERLAP_OFFSET,
   comboboxTriggerValueTextClasses,
@@ -132,6 +133,27 @@ function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean) {
   return <Check className="size-4 shrink-0" aria-hidden />
 }
 
+function comboboxDisabledReasonEndSlot(reason: string) {
+  return (
+    <span className="flex shrink-0 items-center gap-1.5">
+      <Lock className="size-3.5 shrink-0 opacity-60" aria-hidden />
+      <span className={selectOptionItemReasonVariants()}>{reason}</span>
+    </span>
+  )
+}
+
+function comboboxOptionEndSlot(
+  option: ComboboxFieldOption,
+  multiple: boolean,
+  isSelected: boolean,
+  isDisabled: boolean,
+) {
+  if (isDisabled && option.disabledReason) {
+    return comboboxDisabledReasonEndSlot(option.disabledReason)
+  }
+  return comboboxSelectionEndSlot(multiple, isSelected)
+}
+
 function ComboboxOptionItem({
   option,
   optionId,
@@ -145,7 +167,7 @@ function ComboboxOptionItem({
   onSelect,
 }: ComboboxOptionItemProps) {
   const rowSize = resolveInteractiveListSizeForFieldSize(size)
-  const selectionEndSlot = comboboxSelectionEndSlot(multiple, isSelected)
+  const selectionEndSlot = comboboxOptionEndSlot(option, multiple, isSelected, isDisabled)
 
   if (renderOption) {
     const optionContent = renderOption(option, {
@@ -187,7 +209,7 @@ function ComboboxOptionItem({
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
-      endSlot={selectionEndSlot}
+      endSlot={comboboxOptionEndSlot(option, multiple, isSelected, isDisabled)}
       onHighlight={onHighlight}
       onSelect={onSelect}
     />

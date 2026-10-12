@@ -77,8 +77,7 @@
     "movement": { "walk": 30 },
     "senses": [{ "type": "darkvision", "range": 60 }],
     "languages": {
-      "entries": [{ "language": "common", "speaks": false }],
-      "note": "plus one other language"
+      "entries": [{ "language": "common", "speaks": false }]
     },
     "challengeRating": "1/4",
     "proficiencies": {

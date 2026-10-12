@@ -217,6 +217,31 @@ describe('ComboboxField', () => {
     expect(search.closest('.ui-interactive-list__toolbar')).not.toBeNull()
   })
 
+  it('shows disabled reasons in the panel end slot', async () => {
+    const user = userEvent.setup()
+    render(
+      <ComboboxField
+        id="defenses"
+        label="Resistances"
+        options={[
+          {
+            value: 'fire',
+            label: 'Fire',
+            disabled: true,
+            disabledReason: 'Already in Vulnerabilities',
+          },
+          { value: 'cold', label: 'Cold' },
+        ]}
+        multiple
+        value={[]}
+        enableSearch={false}
+      />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Resistances' }))
+    expect(screen.getByText('Already in Vulnerabilities')).toBeInTheDocument()
+  })
+
   it('omits the search row when enableSearch is false', async () => {
     const user = userEvent.setup()
     render(

@@ -28,6 +28,7 @@ export function useComboboxControl({
   placeholder,
   enableSearch = true,
   resolveFilteredOptions,
+  resolveOptionLabel,
 }: ComboboxFieldControlProps) {
   const generatedId = React.useId()
   const [open, setOpen] = React.useState(false)
@@ -45,17 +46,17 @@ export function useComboboxControl({
     () =>
       resolveFilteredOptions
         ? resolveFilteredOptions(options, query, selected)
-        : filterOptions(options, query, selected),
-    [options, query, resolveFilteredOptions, selected],
+        : filterOptions(options, query, selected, resolveOptionLabel),
+    [options, query, resolveFilteredOptions, resolveOptionLabel, selected],
   )
   const highlightedIndex = clampHighlightedIndex(activeIndex, filteredOptions.length)
   const selectedOptions = React.useMemo(
-    () => selected.map((value) => resolveOption(value, options)),
-    [options, selected],
+    () => selected.map((value) => resolveOption(value, options, resolveOptionLabel)),
+    [options, resolveOptionLabel, selected],
   )
   const triggerLabel = React.useMemo(
-    () => resolveTriggerLabel(multiple, selected, placeholder, options),
-    [multiple, options, placeholder, selected],
+    () => resolveTriggerLabel(multiple, selected, placeholder, options, resolveOptionLabel),
+    [multiple, options, placeholder, resolveOptionLabel, selected],
   )
   const triggerText = loading ? placeholder : triggerLabel
   const activeOptionId = filteredOptions[highlightedIndex]

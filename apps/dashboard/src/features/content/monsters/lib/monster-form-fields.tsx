@@ -16,7 +16,7 @@ import { withContentFormTabIcon } from '../../lib/forms/content-form-tab-icons'
 import { descriptionField } from '../../lib/forms/fields/content-identity-form-fields'
 import { movementWithHoverGroup } from '../../lib/forms/fields/content-movement-form-fields'
 import { MonsterChallengeRatingHint } from '../components/form/monster-challenge-rating-hint'
-import { MonsterCreatureDetailsPanel } from '../components/form/monster-creature-details-panel'
+import { creatureDetailsFields } from './monster-creature-details-form-fields'
 import { MonsterEquipmentPanel } from '../components/form/monster-equipment-panel'
 import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
@@ -105,17 +105,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
     ownedSlot('proficiencies.savingThrows'),
   ]
 
-  const creatureDetails: FormItem[] = [
-    {
-      kind: 'slot',
-      name: 'proficiencies.skills',
-      render: () => <MonsterCreatureDetailsPanel ctx={ctx} />,
-    },
-    ownedSlot('proficiencies.weapons'),
-    ownedSlot('senses'),
-    ownedSlot('languages'),
-    ownedSlot('defenses'),
-  ]
+  const creatureDetails: FormItem[] = creatureDetailsFields(ctx)
 
   const equipment: FormItem[] = [
     { kind: 'slot', name: 'equipment', render: () => <MonsterEquipmentPanel ctx={ctx} /> },

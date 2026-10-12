@@ -6,6 +6,7 @@ import {
   getSenseLabel,
   getSenseSentenceForm,
   senseIdSchema,
+  senseDraftSchema,
   senseSchema,
 } from './sense'
 
@@ -27,6 +28,12 @@ describe('senseSchema', () => {
       type: 'darkvision',
       range: 60,
     })
+  })
+})
+
+describe('senseDraftSchema', () => {
+  it('allows missing range during authoring', () => {
+    expect(senseDraftSchema.parse({ type: 'darkvision' })).toEqual({ type: 'darkvision' })
   })
 })
 

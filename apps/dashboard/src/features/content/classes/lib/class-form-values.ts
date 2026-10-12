@@ -29,7 +29,7 @@ import {
 import { createAsiFeature } from './class-asi-features'
 import { createSubclassChoiceFeature } from './class-subclass-choice-features'
 import { featuresFromFormValues, featureToFormRow } from './class-feature-form-fields'
-import { normalizeClassWeaponProficiencies } from './class-weapon-proficiency-helpers'
+import { normalizeWeaponProficiencyGrantSet } from './class-weapon-proficiency-helpers'
 import {
   startingEquipmentEmptyFormValues,
   startingEquipmentFromFormValues,
@@ -71,7 +71,7 @@ export function proficienciesFromFormValues(
   hasSpecificWeapons: boolean,
 ): ClassProficiencies {
   const tools = normalizeClassToolProficiencies(proficiencies.tools)
-  const weapons = normalizeClassWeaponProficiencies({
+  const weapons = normalizeWeaponProficiencyGrantSet({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
     hasSpecificWeapons,

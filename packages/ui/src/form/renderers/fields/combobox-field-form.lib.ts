@@ -8,18 +8,22 @@ import {
 
 /** Maps form-layer options to combobox panel options. */
 export function toComboboxFieldOptions(options: FieldOption[]): ComboboxFieldOption[] {
-  return options.map(({ description, classification, filterCategory, ...option }) => ({
-    ...option,
-    ...(description !== undefined ? { metadata: description } : {}),
-    ...(classification !== undefined ? { classification } : {}),
-    ...(filterCategory !== undefined ? { filterCategory } : {}),
-  }))
+  return options.map(
+    ({ description, classification, filterCategory, disabledReason, ...option }) => ({
+      ...option,
+      ...(disabledReason !== undefined ? { disabledReason } : {}),
+      ...(description !== undefined ? { metadata: description } : {}),
+      ...(classification !== undefined ? { classification } : {}),
+      ...(filterCategory !== undefined ? { filterCategory } : {}),
+    }),
+  )
 }
 
 /** Maps combobox panel options back to form-layer options. */
 export function toFieldOptions(options: ComboboxFieldOption[]): FieldOption[] {
-  return options.map(({ metadata, classification, filterCategory, ...option }) => ({
+  return options.map(({ metadata, classification, filterCategory, disabledReason, ...option }) => ({
     ...option,
+    ...(disabledReason !== undefined ? { disabledReason } : {}),
     ...(metadata !== undefined ? { description: metadata } : {}),
     ...(classification !== undefined ? { classification } : {}),
     ...(filterCategory !== undefined ? { filterCategory } : {}),

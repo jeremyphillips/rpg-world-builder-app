@@ -101,7 +101,9 @@ export function resolveFieldRenderConfig(
   }
 
   const optionAvailability =
-    config.type === 'chips' || config.type === 'select' ? config.optionAvailability : undefined
+    config.type === 'chips' || config.type === 'select' || config.type === 'combobox'
+      ? config.optionAvailability
+      : undefined
 
   if (config.type === 'select') {
     const options = resolveSelectFieldConfigOptions(config, dynamicValues)
@@ -119,8 +121,20 @@ export function resolveFieldRenderConfig(
   }
 
   if (config.type === 'combobox') {
+    const resolved = resolveComboboxFieldConfig(config, dynamicValues)
+    const resolvedOptions = optionAvailability
+      ? applyOptionAvailabilityToFieldOptions(
+          resolved.options ?? [],
+          optionAvailability,
+          optionValues,
+        )
+      : resolved.options
+
     return {
-      config: resolveComboboxFieldConfig(config, dynamicValues) as FieldConfig,
+      config: {
+        ...resolved,
+        ...(resolvedOptions !== undefined ? { options: resolvedOptions } : {}),
+      } as FieldConfig,
       ...basePresentation,
     }
   }

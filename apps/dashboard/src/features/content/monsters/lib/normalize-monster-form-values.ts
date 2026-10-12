@@ -8,6 +8,9 @@ import { monsterActionActiveKeys } from './monster-action-kind'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
+import { normalizeWeaponProficiencyGrantSet } from '../../classes/lib/class-weapon-proficiency-helpers'
+
+import { coerceCreatureWeaponProficienciesForForm } from './monster-weapon-proficiencies-form.lib'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
@@ -102,6 +105,36 @@ function normalizeHitPoints(hitPoints: MonsterFormValues['hitPoints']): Record<s
   return next
 }
 
+function dedupeSkillProficiencies(
+  skills: MonsterFormValues['proficiencies']['skills'],
+): MonsterFormValues['proficiencies']['skills'] {
+  const seen = new Set<string>()
+  const next: MonsterFormValues['proficiencies']['skills'] = []
+  for (const row of skills) {
+    if (seen.has(row.skill)) continue
+    seen.add(row.skill)
+    next.push(row)
+  }
+  return next
+}
+
+function normalizeProficiencies(
+  proficiencies: MonsterFormValues['proficiencies'],
+  weaponProficiencyMode: MonsterFormValues['weaponProficiencyMode'],
+): Record<string, unknown> {
+  const coercedWeapons = coerceCreatureWeaponProficienciesForForm(proficiencies.weapons)
+  const weapons = normalizeWeaponProficiencyGrantSet({
+    categories: coercedWeapons.categories,
+    items: coercedWeapons.items,
+    hasSpecificWeapons: weaponProficiencyMode === 'individual',
+  })
+  return {
+    ...proficiencies,
+    skills: dedupeSkillProficiencies(proficiencies.skills ?? []),
+    weapons,
+  }
+}
+
 function normalizeLanguages(languages: MonsterFormValues['languages']): Record<string, unknown> {
   const cleaned = omitEmptyStrings(languages)
   if (!isRecord(cleaned)) return { entries: [] }
@@ -114,7 +147,6 @@ function normalizeLanguages(languages: MonsterFormValues['languages']): Record<s
   })
   const next: Record<string, unknown> = { entries: nextEntries }
   if (typeof cleaned.telepathy === 'number') next.telepathy = cleaned.telepathy
-  if (typeof cleaned.note === 'string') next.note = cleaned.note
   return next
 }
 
@@ -142,7 +174,10 @@ export function normalizeMonsterFormValues(
     movement: movementRecord,
     senses: values.senses ?? [],
     languages: normalizeLanguages(values.languages),
-    proficiencies: values.proficiencies,
+    proficiencies: normalizeProficiencies(
+      values.proficiencies,
+      values.weaponProficiencyMode ?? 'categories',
+    ),
     defenses: values.defenses,
     equipment: values.equipment,
     traits: omitEmptyStrings(values.traits),

@@ -1,11 +1,14 @@
 import type { ReactNode, Ref } from 'react'
 
 import type { FieldSize } from './field.client'
+import type { ResolveComboboxOptionLabel } from './combobox-field.lib'
 
 export interface ComboboxFieldOption {
   label: string
   value: string
   disabled?: boolean
+  /** Shown in the panel when the option is disabled (e.g. cross-list defense exclusion). */
+  disabledReason?: string
   /** Secondary line text (e.g. source badge copy). Included in combobox search matching. */
   metadata?: string
   /** Optional classification shown inline after the label (`Name · Classification`). */
@@ -67,6 +70,8 @@ export interface ComboboxFieldControlProps {
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
   resolveFilteredOptions?: ResolveComboboxFilteredOptions
+  /** Labels for selected values missing from `options` (e.g. stale catalog slugs). */
+  resolveOptionLabel?: ResolveComboboxOptionLabel
   /** Optional filter row below search — hosts own filter UI and state. */
   filter?: React.ReactNode
   clearable?: boolean

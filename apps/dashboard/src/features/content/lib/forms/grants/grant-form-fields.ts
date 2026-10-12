@@ -13,7 +13,6 @@ import {
   MOVEMENT_OPERATION_ENTRIES,
   MOVEMENT_OPERATIONS,
   MOVEMENT_SPEED_FEET,
-  SENSE_RANGES,
   USAGE_FREQUENCIES,
   USAGE_FREQUENCY_ENTRIES,
   type FeatCategory,
@@ -31,7 +30,6 @@ import {
   type FieldVisibility,
   type FormItem,
   type InlineSentenceFieldConfig,
-  type JoinedPairFieldConfig,
   type SelectFieldOptionListItem,
   flattenSelectFieldOptions,
 } from '@rpg/ui/form'
@@ -54,6 +52,7 @@ import {
 } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../registry/content-form-registry'
+import { senseRangeJoinedPairField } from '../fields/content-sense-range-form-fields'
 import { getLevelFieldOptions, withLevelOptionLabels } from '../../form-options/level-field-options'
 import {
   referenceEquipmentFieldOptions,
@@ -261,35 +260,6 @@ export function formatFeatChoiceRowSummary(
 
 export function formatSpellRowSummary(values: GrantRowValues, ctx: GrantRowHeaderContext): string {
   return resolveGrantRowPresentation(values, ctx)?.description ?? ''
-}
-
-const senseRangeOptions = SENSE_RANGES.map((range) => ({
-  value: range,
-  label: String(range),
-}))
-
-function senseRangeJoinedPairField(
-  overrides?: Partial<JoinedPairFieldConfig>,
-): JoinedPairFieldConfig {
-  return {
-    type: 'joinedPair',
-    label: 'Range',
-    width: '1/3',
-    start: {
-      kind: 'select',
-      name: 'senseRange',
-      options: senseRangeOptions,
-      digits: 3,
-      defaultValue: 60,
-      ariaLabel: 'Range',
-    },
-    end: {
-      kind: 'label',
-      text: 'ft.',
-      ariaLabel: 'Range unit',
-    },
-    ...overrides,
-  }
 }
 
 const usageFrequencyOptions = toOptions(

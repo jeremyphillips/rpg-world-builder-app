@@ -1,5 +1,4 @@
 import {
-  EMPTY_CREATURE_WEAPON_PROFICIENCIES,
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
@@ -7,6 +6,7 @@ import {
 } from '@rpg/contracts'
 
 import { equipmentArmorRole, equipmentEntryBaseName } from './monster-equipment-labels'
+import { coerceCreatureWeaponProficienciesForForm } from './monster-weapon-proficiencies-form.lib'
 import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from './monster-equipment-references'
 import { monsterBodyArmorIgnoredMessage } from './monster-form-labels'
 import type { MonsterActionDraftRow } from './monster-action-presets'
@@ -64,7 +64,7 @@ export function collectMonsterFormAdvisories(
       if (item && isWeaponEquipment(item)) {
         const proficient = isWeaponProficientFromGrantSet(
           item,
-          values.proficiencies?.weapons ?? EMPTY_CREATURE_WEAPON_PROFICIENCIES,
+          coerceCreatureWeaponProficienciesForForm(values.proficiencies?.weapons),
         )
         if (!proficient) {
           advisories.push({

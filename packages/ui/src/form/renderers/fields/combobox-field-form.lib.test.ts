@@ -22,6 +22,28 @@ const toolOptions = [
   },
 ]
 
+describe('toComboboxFieldOptions', () => {
+  it('maps disabledReason onto combobox panel options', () => {
+    expect(
+      toComboboxFieldOptions([
+        {
+          value: 'fire',
+          label: 'Fire',
+          disabled: true,
+          disabledReason: 'Already in Vulnerabilities',
+        },
+      ]),
+    ).toEqual([
+      {
+        value: 'fire',
+        label: 'Fire',
+        disabled: true,
+        disabledReason: 'Already in Vulnerabilities',
+      },
+    ])
+  })
+})
+
 describe('filterComboboxOptionsByCategory', () => {
   it('returns all options when the filter is "all"', () => {
     expect(

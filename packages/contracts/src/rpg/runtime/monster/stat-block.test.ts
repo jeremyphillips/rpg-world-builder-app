@@ -149,7 +149,7 @@ const skeleton = monsterSchema.parse({
   hitPoints: { kind: 'hit-dice', count: 2 },
   movement: { walk: 30 },
   senses: [{ type: 'darkvision', range: 60 }],
-  languages: { entries: [{ language: 'common', speaks: false }], note: 'plus one other language' },
+  languages: { entries: [{ language: 'common', speaks: false }] },
   challengeRating: '1/4',
   proficiencies: {
     savingThrows: [],

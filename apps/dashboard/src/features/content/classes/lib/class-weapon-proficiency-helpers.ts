@@ -4,7 +4,7 @@ import type { WeaponCategory } from '@rpg/contracts'
  * Resolves weapon proficiencies for API input: categories and named weapons are
  * mutually exclusive — the proficiency mode radio selects one or the other.
  */
-export function normalizeClassWeaponProficiencies(input: {
+export function normalizeWeaponProficiencyGrantSet(input: {
   categories: readonly WeaponCategory[]
   items?: readonly string[]
   hasSpecificWeapons: boolean

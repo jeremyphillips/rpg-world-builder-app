@@ -4,12 +4,15 @@ import { characterSchema } from '../runtime/character/sheet'
 import {
   creatureAbilityScoresSchema,
   creatureRuntimeHitPointsSchema,
+  creatureSensesDraftSchema,
   creatureSensesSchema,
+  refineCreatureSenseRanges,
   creatureMovementSchema,
   creatureStatBlockHitPointsSchema,
   creatureSkillProficiencyEntrySchema,
   creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetSchema,
+  resolveDamageDefenseOptionState,
 } from './creature'
 
 describe('creatureAbilityScoresSchema', () => {
@@ -89,6 +92,33 @@ describe('creature movement and senses', () => {
 
   it('defaults omitted senses to an empty list', () => {
     expect(creatureSensesSchema.parse(undefined)).toEqual([])
+  })
+
+  it('allows draft senses without range until publish refinement', () => {
+    expect(creatureSensesDraftSchema.parse([{ type: 'darkvision' }])).toEqual([
+      { type: 'darkvision' },
+    ])
+  })
+})
+
+describe('refineCreatureSenseRanges', () => {
+  it('requires range on publish refinement', () => {
+    const issues: { message: string; path: (string | number)[] }[] = []
+    refineCreatureSenseRanges(
+      [{ type: 'darkvision' }],
+      {
+        addIssue: (issue) => {
+          issues.push({ message: issue.message, path: issue.path as (string | number)[] })
+        },
+      } as never,
+      ['senses'],
+    )
+    expect(issues).toEqual([
+      {
+        message: 'Enter a range in feet for each sense.',
+        path: ['senses', 0, 'range'],
+      },
+    ])
   })
 })
 
@@ -175,5 +205,30 @@ describe('character schema creature reuse', () => {
       cha: 8,
     })
     expect(parsed.hitPoints).toEqual({ base: 12, current: 12, temporary: 0 })
+  })
+})
+
+describe('resolveDamageDefenseOptionState', () => {
+  it('disables damage types already assigned to another defense list', () => {
+    expect(
+      resolveDamageDefenseOptionState('fire', 'resistances', {
+        vulnerabilities: ['fire'],
+        resistances: [],
+        immunities: [],
+      }),
+    ).toEqual({
+      disabled: true,
+      disabledReason: 'Already in Vulnerabilities',
+    })
+  })
+
+  it('leaves options enabled when the type is only on the active list', () => {
+    expect(
+      resolveDamageDefenseOptionState('fire', 'vulnerabilities', {
+        vulnerabilities: ['fire'],
+        resistances: [],
+        immunities: [],
+      }),
+    ).toEqual({ disabled: false })
   })
 })

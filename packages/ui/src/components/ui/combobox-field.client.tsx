@@ -59,6 +59,8 @@ export interface ComboboxFieldProps
   enableSearch?: boolean
   /** Custom selected-value renderer in multi-select mode; defaults to `Chip mode="removable"`. */
   renderSelectedItem?: ComboboxRenderSelectedItem
+  /** Labels for selected values missing from `options`. */
+  resolveOptionLabel?: ComboboxFieldControlProps['resolveOptionLabel']
   /** Custom interior for dropdown options; primitive retains label-only fallback and a11y name. */
   renderOption?: ComboboxRenderOption
   /** Custom filter/rank for panel options; selected values must remain visible when set. */
@@ -202,6 +204,7 @@ export function ComboboxField({
   renderSelectedItem,
   renderOption,
   resolveFilteredOptions,
+  resolveOptionLabel,
   filter,
   hintPosition,
   chrome,
@@ -261,6 +264,7 @@ export function ComboboxField({
             renderSelectedItem={renderSelectedItem}
             renderOption={renderOption}
             resolveFilteredOptions={resolveFilteredOptions}
+            resolveOptionLabel={resolveOptionLabel}
             filter={filter}
             clearable={clearable}
             clearAccessibleName={clearAccessibleName}

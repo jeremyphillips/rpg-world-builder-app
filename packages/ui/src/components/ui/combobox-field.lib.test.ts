@@ -40,6 +40,12 @@ describe('combobox-field.lib', () => {
     ])
   })
 
+  it('resolves labels for stale selected values when a resolver is provided', () => {
+    expect(filterOptions(options, 'xyz', ['missing-weapon'], () => 'Resolved Dagger')).toEqual([
+      { value: 'missing-weapon', label: 'Resolved Dagger' },
+    ])
+  })
+
   it('builds trigger labels', () => {
     expect(resolveTriggerLabel(true, [], 'Choose…', options)).toBe('Choose…')
     expect(resolveTriggerLabel(true, ['a', 'b'], 'Choose…', options)).toBe('2 selected')

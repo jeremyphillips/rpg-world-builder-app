@@ -7,7 +7,7 @@ import { damageTypeIdSchema, getDamageTypeLabel } from '../vocab/damage'
 import { effectConditionSchema } from '../vocab/effect-condition'
 import { creatureSizeSchema } from '../vocab/creature-size'
 import { creatureTypeSchema } from '../vocab/creature-type'
-import { senseSchema } from '../vocab/sense'
+import { senseDraftSchema, senseSchema } from '../vocab/sense'
 import { movementSpeedsSchema } from '../vocab/movement-mode'
 import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
@@ -34,6 +34,25 @@ export const creatureSizeRefSchema = creatureSizeSchema
 export const creatureTypeRefSchema = creatureTypeSchema
 export const creatureMovementSchema = movementSpeedsSchema
 export const creatureSensesSchema = z.array(senseSchema).default([])
+
+export const creatureSensesDraftSchema = z.array(senseDraftSchema).default([])
+
+/** Publish validation — every sense row needs a range in feet. */
+export function refineCreatureSenseRanges(
+  senses: readonly { type: string; range?: number }[],
+  ctx: z.RefinementCtx,
+  path: (string | number)[],
+): void {
+  senses.forEach((sense, index) => {
+    if (sense.range === undefined) {
+      addCustomRefinementIssue(ctx, 'Enter a range in feet for each sense.', [
+        ...path,
+        index,
+        'range',
+      ])
+    }
+  })
+}
 
 // ---------------------------------------------------------------------------
 // Ability scores
@@ -138,11 +157,41 @@ export type CreatureDefenses = z.infer<typeof creatureDefensesSchema>
 
 const DAMAGE_DEFENSE_LISTS = ['vulnerabilities', 'resistances', 'immunities'] as const
 
+export type CreatureDamageDefenseList = (typeof DAMAGE_DEFENSE_LISTS)[number]
+
+export const CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES = {
+  vulnerabilities: { label: 'Vulnerabilities', noun: 'vulnerability' },
+  resistances: { label: 'Resistances', noun: 'resistance' },
+  immunities: { label: 'Immunities', noun: 'immunity' },
+} as const satisfies Record<CreatureDamageDefenseList, { label: string; noun: string }>
+
 const DAMAGE_DEFENSE_NOUN = {
-  vulnerabilities: 'vulnerability',
-  resistances: 'resistance',
-  immunities: 'immunity',
+  vulnerabilities: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.vulnerabilities.noun,
+  resistances: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.resistances.noun,
+  immunities: CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES.immunities.noun,
 } as const
+
+/** Per-option disabled state for damage-defense comboboxes (cross-list exclusion). */
+export function resolveDamageDefenseOptionState(
+  damageTypeId: string,
+  activeList: CreatureDamageDefenseList,
+  defenses: {
+    vulnerabilities?: readonly string[]
+    resistances?: readonly string[]
+    immunities?: readonly string[]
+  },
+): { disabled: boolean; disabledReason?: string } {
+  for (const list of DAMAGE_DEFENSE_LISTS) {
+    if (list === activeList) continue
+    if ((defenses[list] ?? []).includes(damageTypeId)) {
+      return {
+        disabled: true,
+        disabledReason: `Already in ${CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES[list].label}`,
+      }
+    }
+  }
+  return { disabled: false }
+}
 
 /** Publish guard: a damage type belongs to at most one damage-defense list. */
 export function refineCreatureDamageDefenses(

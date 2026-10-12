@@ -841,6 +841,14 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   filterSelect?: ComboboxFilterSelectConfig
   /** Dynamic category filter resolved from watched values; replaces `filterSelect` when set. */
   filterSelectResolve?: FieldDynamicComboboxFilterSelect
+  /** When false, omits the panel search row (keyboard nav targets the listbox). */
+  enableSearch?: boolean
+  optionAvailability?: FieldOptionAvailability
+  /**
+   * Resolves display labels for selected values that are not in the current `options`
+   * list (stale slugs, catalog rows filtered from reference options, etc.).
+   */
+  resolveOptionLabel?: (value: string) => string | undefined
 }
 
 export type { ComboboxRenderSelectedItem } from '../components/ui/combobox-field.types'

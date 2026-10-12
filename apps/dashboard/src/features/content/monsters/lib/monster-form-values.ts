@@ -18,6 +18,7 @@ import {
 } from './monster-hit-points-form.lib'
 import type { MonsterHitPointStash } from './monster-variant-transitions'
 
+import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import {
   movementRecordToRows,
@@ -38,6 +39,11 @@ import {
   updateMonsterDraftInputSchema,
   updateMonsterInputSchema,
 } from '@rpg/contracts'
+
+import {
+  coerceCreatureWeaponProficienciesForForm,
+  weaponProficiencyModeFromFormWeapons,
+} from './monster-weapon-proficiencies-form.lib'
 
 export type MonsterEquipmentFormEntry = {
   entryId: string
@@ -63,7 +69,7 @@ export type MonsterFormValues = FieldValues & {
   hitPoints: Monster['hitPoints'] | { kind: 'fixed'; average?: number; formula?: string }
   movement: MovementRowDraftFormValues[]
   hover?: boolean
-  senses: Monster['senses']
+  senses: Array<{ type: Monster['senses'][number]['type']; range?: number }>
   languages: Monster['languages']
   challengeRating?: Monster['challengeRating']
   experiencePointsOverride?: number
@@ -78,6 +84,7 @@ export type MonsterFormValues = FieldValues & {
   [MONSTER_HIT_POINTS_DICE_FIELD]?: DiceFormulaValue
   [MONSTER_HIT_POINTS_STASH_FIELD]?: MonsterHitPointStash
   [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]?: number
+  weaponProficiencyMode?: WeaponProficiencyMode
 }
 
 const NEUTRAL_ABILITIES: Monster['abilityScores'] = {
@@ -119,6 +126,7 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     actions: [],
     bonusActions: [],
     reactions: [],
+    weaponProficiencyMode: 'categories',
   }
 }
 
@@ -147,6 +155,8 @@ function hitPointsAuthoringFromEntity(
 }
 
 export function monsterToFormValues(entity: Monster): MonsterFormValues {
+  const weapons = coerceCreatureWeaponProficienciesForForm(entity.proficiencies.weapons)
+
   return {
     name: entity.name,
     description: entity.description,
@@ -163,13 +173,17 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     languages: entity.languages ?? { entries: [] },
     challengeRating: entity.challengeRating,
     experiencePointsOverride: entity.experiencePointsOverride,
-    proficiencies: entity.proficiencies,
+    proficiencies: {
+      ...entity.proficiencies,
+      weapons,
+    },
     defenses: entity.defenses,
     equipment: entity.equipment,
     traits: entity.traits,
     actions: entity.actions,
     bonusActions: entity.bonusActions,
     reactions: entity.reactions,
+    weaponProficiencyMode: weaponProficiencyModeFromFormWeapons(weapons),
   }
 }
 

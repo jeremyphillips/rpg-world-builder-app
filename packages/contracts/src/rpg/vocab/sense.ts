@@ -42,6 +42,14 @@ export const senseSchema = z.object({
 
 export type Sense = z.infer<typeof senseSchema>
 
+/** Authoring draft — range may be unset until the author picks a distance. */
+export const senseDraftSchema = z.object({
+  type: senseIdSchema,
+  range: z.number().int().min(0).optional(),
+})
+
+export type SenseDraft = z.infer<typeof senseDraftSchema>
+
 /** Returns a display label — title-cased slug fallback when seed label is unknown. */
 export function getSenseLabel(type: string): string {
   return formatVocabularySlugLabel(type)

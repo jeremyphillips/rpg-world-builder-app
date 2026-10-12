@@ -101,7 +101,9 @@ export function ComboboxFieldRenderer({
       onBlur={field.onBlur}
       renderSelectedItem={config.renderSelectedItem}
       resolveFilteredOptions={resolveFilteredOptions}
+      resolveOptionLabel={config.resolveOptionLabel}
       filter={filter}
+      enableSearch={config.enableSearch}
     />
   )
 }

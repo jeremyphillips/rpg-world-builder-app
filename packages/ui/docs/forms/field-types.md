@@ -373,6 +373,11 @@ Searchable dropdown for large lists (catalog refs).
 - `resolveFilteredOptions(options, query, selected)` — optional custom filter/rank for large
   vocabularies (e.g. building archetype Model E precedence). Selected values must remain
   visible when set, matching the default `filterOptions` contract.
+- `enableSearch: false` — omits the panel search row; keyboard navigation targets the listbox
+  (short closed vocabularies such as damage defenses).
+- `optionAvailability` — same `enabledWhen` contract as `select` / `chips`; merges with static
+  `option.disabled`. Pair with `FieldOption.disabledReason` (or `optionsResolve`) when disabled
+  options should explain why in the panel end slot.
 
 ## Level range (`levelRange`)
 

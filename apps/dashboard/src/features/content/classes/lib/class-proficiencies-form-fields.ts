@@ -22,6 +22,7 @@ import { COMBOBOX_FILTER_ALL_VALUE, toOptions, type FormItem } from '@rpg/ui/for
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { resolveContentWeaponGrantOptionLabel } from '../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import {
   referenceSkillFieldOptions,
   referenceToolFieldOptions,
@@ -163,6 +164,8 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
         categoryOptions: weaponCategoryOptions,
         itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
+        resolveOptionLabel: (value) =>
+          resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
         categoriesLabel: 'Weapon proficiencies',
         itemsLabel: 'Weapon choices',
         categoriesHint: WEAPON_PROFICIENCIES_HINT,
