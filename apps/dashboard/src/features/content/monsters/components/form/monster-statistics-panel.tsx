@@ -1,14 +1,12 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext } from 'react'
 import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import {
   ABILITY_IDS,
   CREATURE_ARMOR_CLASS_KINDS,
-  CREATURE_SIZE_HIT_DIE,
   abilityModifier,
   formatSignedModifier,
   getAbilityCompactLabel,
   getCreatureArmorClassKindLabel,
-  type CreatureSize,
 } from '@rpg/contracts'
 import { Button, SegmentedControl, SemanticText } from '@rpg/ui'
 import { flattenFormIssues, useFormValidationPresentation, useTabbedFormChrome } from '@rpg/ui/form'
@@ -21,13 +19,6 @@ import {
   MONSTER_ARMOR_CLASS_HEADING,
   MONSTER_FIXED_AC_HINT,
   MONSTER_FIXED_AC_LABEL,
-  MONSTER_FIXED_AVERAGE_LABEL,
-  MONSTER_FIXED_FORMULA_HINT,
-  MONSTER_FIXED_FORMULA_LABEL,
-  MONSTER_HIT_DICE_LABEL,
-  MONSTER_HIT_DICE_MINIMUM_ERROR,
-  MONSTER_HIT_POINTS_HEADING,
-  MONSTER_HP_MINIMUM_NOTE,
   MONSTER_NATURAL_BONUS_LABEL,
   MONSTER_SAVE_LABEL,
   monsterBodyArmorConflictMessage,
@@ -80,16 +71,14 @@ function StatisticsIssueList() {
 
 export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const { switchArmorClass, switchHitPoints } = useMonsterVariantStash(ctx.entityId)
+  const { switchArmorClass } = useMonsterVariantStash(ctx.entityId)
   const chrome = useTabbedFormChrome()
   const derived = values ? deriveMonsterFormDraft(values as MonsterFormValues, ctx) : null
   const catalog = monsterEquipmentCatalog(ctx)
   const armorClass = values?.armorClass
-  const hitPoints = values?.hitPoints
-  const [hitDiceDisplay, setHitDiceDisplay] = useState<string | null>(null)
   const statisticsIssues = useStatisticsIssues()
 
-  if (!values || !armorClass || !hitPoints) return null
+  if (!values || !armorClass) return null
 
   const equippedBodyArmor = (values.equipment ?? [])
     .filter((entry) => entry.equipped)
@@ -122,14 +111,6 @@ export function MonsterStatisticsPanel({ ctx }: { ctx: ContentFormCtx }) {
           )}
           onSwitch={switchArmorClass}
           onGoToEquipment={goToEquipment}
-        />
-        <HitPointsSection
-          values={values as MonsterFormValues}
-          hitPoints={hitPoints}
-          derived={derived}
-          hitDiceDisplay={hitDiceDisplay}
-          setHitDiceDisplay={setHitDiceDisplay}
-          onSwitch={switchHitPoints}
         />
       </div>
     </StatisticsIssuesContext.Provider>
@@ -300,150 +281,6 @@ function FixedArmorValue({ armorClass }: { armorClass: MonsterFormValues['armorC
   )
 }
 
-function HitPointsSection({
-  values,
-  hitPoints,
-  derived,
-  hitDiceDisplay,
-  setHitDiceDisplay,
-  onSwitch,
-}: {
-  values: MonsterFormValues
-  hitPoints: MonsterFormValues['hitPoints']
-  derived: ReturnType<typeof deriveMonsterFormDraft>
-  hitDiceDisplay: string | null
-  setHitDiceDisplay: (value: string | null) => void
-  onSwitch: (
-    kind: 'hit-dice' | 'fixed',
-    prefill: { average: number; formula: string } | undefined,
-  ) => void
-}) {
-  return (
-    <section>
-      <h3>{MONSTER_HIT_POINTS_HEADING}</h3>
-      <SegmentedControl
-        aria-label={MONSTER_HIT_POINTS_HEADING}
-        value={hitPoints.kind}
-        options={[
-          { value: 'hit-dice', label: MONSTER_HIT_DICE_LABEL },
-          { value: 'fixed', label: 'Fixed' },
-        ]}
-        onValueChange={(kind) => {
-          if (kind !== 'hit-dice' && kind !== 'fixed') return
-          const prefill =
-            derived?.hp.status === 'resolved'
-              ? { average: derived.hp.value.hp, formula: derived.hp.value.formula }
-              : undefined
-          onSwitch(kind, prefill)
-          setHitDiceDisplay(null)
-        }}
-      />
-      {hitPoints.kind === 'hit-dice' ? (
-        <HitDiceCountField
-          values={values}
-          hitPoints={hitPoints}
-          hitDiceDisplay={hitDiceDisplay}
-          setHitDiceDisplay={setHitDiceDisplay}
-        />
-      ) : (
-        <FixedHitPointsFields hitPoints={hitPoints} />
-      )}
-      <HitPointStatus derived={derived} />
-    </section>
-  )
-}
-
-function HitDiceCountField({
-  values,
-  hitPoints,
-  hitDiceDisplay,
-  setHitDiceDisplay,
-}: {
-  values: MonsterFormValues
-  hitPoints: Extract<MonsterFormValues['hitPoints'], { kind: 'hit-dice' }>
-  hitDiceDisplay: string | null
-  setHitDiceDisplay: (value: string | null) => void
-}) {
-  const form = useFormContext<MonsterFormValues>()
-  const issues = useContext(StatisticsIssuesContext)
-  const invalid = hitDiceDisplay !== null && !/^[1-9]\d*$/.test(hitDiceDisplay)
-  return (
-    <label>
-      {MONSTER_HIT_DICE_LABEL}
-      <input
-        aria-label={MONSTER_HIT_DICE_LABEL}
-        aria-invalid={invalid || statisticsInvalid('hitPoints', issues) || undefined}
-        type="number"
-        value={hitDiceDisplay ?? String(hitPoints.count)}
-        onChange={(event) => {
-          const raw = event.target.value
-          setHitDiceDisplay(raw)
-          const count = Number(raw)
-          if (Number.isInteger(count) && count >= 1) {
-            form.setValue('hitPoints', { kind: 'hit-dice', count }, { shouldDirty: true })
-            setHitDiceDisplay(null)
-          }
-        }}
-        onBlur={() => {
-          if (invalid) setHitDiceDisplay(hitDiceDisplay)
-        }}
-      />
-      <span>d{CREATURE_SIZE_HIT_DIE[(values.size ?? 'medium') as CreatureSize] ?? ''}</span>
-      {invalid ? (
-        <SemanticText tone="destructive">{MONSTER_HIT_DICE_MINIMUM_ERROR}</SemanticText>
-      ) : null}
-    </label>
-  )
-}
-
-function FixedHitPointsFields({ hitPoints }: { hitPoints: MonsterFormValues['hitPoints'] }) {
-  const form = useFormContext<MonsterFormValues>()
-  if (hitPoints.kind !== 'fixed') return null
-  return (
-    <>
-      <label>
-        {MONSTER_FIXED_AVERAGE_LABEL}
-        <input
-          aria-label={MONSTER_FIXED_AVERAGE_LABEL}
-          type="number"
-          value={hitPoints.average ?? ''}
-          onChange={(event) => {
-            const raw = event.target.value
-            form.setValue(
-              'hitPoints',
-              {
-                kind: 'fixed',
-                ...(raw === '' ? {} : { average: Number(raw) }),
-                ...(hitPoints.formula ? { formula: hitPoints.formula } : {}),
-              },
-              { shouldDirty: true },
-            )
-          }}
-        />
-      </label>
-      <label>
-        {MONSTER_FIXED_FORMULA_LABEL}
-        <input
-          aria-label={MONSTER_FIXED_FORMULA_LABEL}
-          value={hitPoints.formula ?? ''}
-          onChange={(event) =>
-            form.setValue(
-              'hitPoints',
-              {
-                kind: 'fixed',
-                ...(hitPoints.average !== undefined ? { average: hitPoints.average } : {}),
-                ...(event.target.value ? { formula: event.target.value } : {}),
-              },
-              { shouldDirty: true },
-            )
-          }
-        />
-        <span>{MONSTER_FIXED_FORMULA_HINT}</span>
-      </label>
-    </>
-  )
-}
-
 function ArmorClassStatus({
   values,
   derived,
@@ -489,18 +326,4 @@ function ArmorClassStatus({
     return <p>AC — {monsterUnavailableReasonCopy(derived.ac.reason, 'armor')}</p>
   }
   return null
-}
-
-function HitPointStatus({ derived }: { derived: ReturnType<typeof deriveMonsterFormDraft> }) {
-  if (!derived) return null
-  if (derived.hp.status === 'unavailable') {
-    return <p>HP — {monsterUnavailableReasonCopy(derived.hp.reason, 'generic')}</p>
-  }
-  const note = derived.hp.value.clampedToMinimum ? ` ${MONSTER_HP_MINIMUM_NOTE}` : ''
-  return (
-    <p>
-      HP {derived.hp.value.hp} = {derived.hp.value.formula}
-      {note}
-    </p>
-  )
 }

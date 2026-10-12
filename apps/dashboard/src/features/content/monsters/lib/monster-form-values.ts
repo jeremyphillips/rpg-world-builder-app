@@ -5,7 +5,18 @@ import type {
   MonsterAction,
   MonsterReaction,
 } from '@rpg/contracts'
+import type { DiceFormulaValue } from '@rpg/ui'
 import type { FieldValues } from 'react-hook-form'
+
+import {
+  defaultHitPointsDiceForSize,
+  MONSTER_HIT_POINTS_DICE_FIELD,
+  MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD,
+  MONSTER_HIT_POINTS_STASH_FIELD,
+  MONSTER_HIT_POINTS_USE_FIXED_FIELD,
+  hitPointsDiceFromFormValues,
+} from './monster-hit-points-form.lib'
+import type { MonsterHitPointStash } from './monster-variant-transitions'
 
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
 import {
@@ -63,6 +74,10 @@ export type MonsterFormValues = FieldValues & {
   actions: Array<MonsterAction | Record<string, unknown>>
   bonusActions: Array<MonsterAction | Record<string, unknown>>
   reactions: Array<MonsterReaction | Record<string, unknown>>
+  [MONSTER_HIT_POINTS_USE_FIXED_FIELD]?: boolean
+  [MONSTER_HIT_POINTS_DICE_FIELD]?: DiceFormulaValue
+  [MONSTER_HIT_POINTS_STASH_FIELD]?: MonsterHitPointStash
+  [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]?: number
 }
 
 const NEUTRAL_ABILITIES: Monster['abilityScores'] = {
@@ -82,6 +97,9 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     abilityScores: { ...NEUTRAL_ABILITIES },
     armorClass: { kind: 'unarmored' },
     hitPoints: { kind: 'hit-dice', count: 1 },
+    [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: false,
+    [MONSTER_HIT_POINTS_DICE_FIELD]: defaultHitPointsDiceForSize('medium'),
+    [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
     languages: { entries: [] },
@@ -104,6 +122,30 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
   }
 }
 
+function hitPointsAuthoringFromEntity(
+  entity: Monster,
+): Pick<
+  MonsterFormValues,
+  | typeof MONSTER_HIT_POINTS_USE_FIXED_FIELD
+  | typeof MONSTER_HIT_POINTS_DICE_FIELD
+  | typeof MONSTER_HIT_POINTS_STASH_FIELD
+  | typeof MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD
+> {
+  const useFixed = entity.hitPoints.kind === 'fixed'
+  const dice = hitPointsDiceFromFormValues({
+    hitPoints: entity.hitPoints,
+    size: entity.size,
+  })
+  return {
+    [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: useFixed,
+    [MONSTER_HIT_POINTS_DICE_FIELD]: dice,
+    [MONSTER_HIT_POINTS_STASH_FIELD]: {},
+    ...(useFixed && entity.hitPoints.kind === 'fixed' && entity.hitPoints.average !== undefined
+      ? { [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]: entity.hitPoints.average }
+      : {}),
+  }
+}
+
 export function monsterToFormValues(entity: Monster): MonsterFormValues {
   return {
     name: entity.name,
@@ -114,6 +156,7 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     abilityScores: entity.abilityScores,
     armorClass: entity.armorClass,
     hitPoints: entity.hitPoints,
+    ...hitPointsAuthoringFromEntity(entity),
     movement: movementRecordToRows(entity.movement),
     hover: entity.hover,
     senses: entity.senses ?? [],

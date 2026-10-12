@@ -74,10 +74,7 @@ export function useMonsterVariantStash(recordId?: string) {
   )
 
   const switchHitPoints = useCallback(
-    (
-      nextKind: MonsterFormValues['hitPoints']['kind'],
-      prefill?: { average?: number; formula?: string },
-    ) => {
+    (nextKind: MonsterFormValues['hitPoints']['kind'], prefill?: { average?: number }) => {
       const current = form.getValues('hitPoints')
       const result = transitionHitPoints(current, nextKind, stashRef.current.hitPoints, prefill)
       stashRef.current = { ...stashRef.current, hitPoints: result.stash }

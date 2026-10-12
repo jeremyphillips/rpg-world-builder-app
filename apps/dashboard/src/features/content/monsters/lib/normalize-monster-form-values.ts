@@ -99,9 +99,6 @@ function normalizeHitPoints(hitPoints: MonsterFormValues['hitPoints']): Record<s
   }
   const next: Record<string, unknown> = { kind: 'fixed' }
   if (hitPoints.average !== undefined) next.average = hitPoints.average
-  if (typeof hitPoints.formula === 'string' && hitPoints.formula.trim()) {
-    next.formula = hitPoints.formula.trim()
-  }
   return next
 }
 

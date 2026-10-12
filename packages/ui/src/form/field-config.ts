@@ -275,7 +275,8 @@ export interface FieldHintConfig {
 
 /** One label/value row in derived field metadata (informational, not authored). */
 export interface FieldDerivedMetaRow {
-  label: string
+  /** Omit or leave empty for a single value line (no label column). */
+  label?: string
   value: string
 }
 

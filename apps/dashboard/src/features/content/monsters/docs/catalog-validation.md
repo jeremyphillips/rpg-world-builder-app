@@ -42,3 +42,7 @@ Monster (and species) forms author movement as row arrays via
 `normalizeMonsterFormValues` and `resolveMonsterFormSchema` convert rows to the API
 `movement` record before save and Zod body validation. Fly hover uses the shared
 `hover` switch (visible only when a fly row is present).
+
+Hit points use `monsterHitPointsFields()` (Fixed switch, inline hit-dice sentence `N dY`,
+number stepper for fixed HP) with session stash via `_hitPointsStash` and `valueSyncs` on
+the monster form def — not the statistics panel slot. Die faces (`Y`) follow creature size.

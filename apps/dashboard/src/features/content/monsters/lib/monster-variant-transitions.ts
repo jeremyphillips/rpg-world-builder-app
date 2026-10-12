@@ -9,7 +9,7 @@ export type MonsterArmorClassStash = {
 
 export type MonsterHitPointStash = {
   hitDice?: number
-  fixed?: { average?: number; formula?: string }
+  fixed?: { average?: number }
 }
 
 export type MonsterVariantStash = {
@@ -74,7 +74,7 @@ function rememberHitPoints(
   }
   return {
     ...stash,
-    fixed: { average: current.average, formula: current.formula },
+    fixed: { average: current.average },
   }
 }
 
@@ -83,7 +83,7 @@ export function transitionHitPoints(
   current: HitPointsValue,
   nextKind: HitPointsValue['kind'],
   stash: MonsterHitPointStash,
-  prefill?: { average?: number; formula?: string },
+  prefill?: { average?: number },
 ): { hitPoints: HitPointsValue; stash: MonsterHitPointStash } {
   const nextStash = rememberHitPoints(current, stash)
   if (nextKind === 'hit-dice') {
@@ -93,12 +93,10 @@ export function transitionHitPoints(
     }
   }
   const average = nextStash.fixed?.average ?? prefill?.average
-  const formula = nextStash.fixed?.formula || prefill?.formula
   return {
     hitPoints: {
       kind: 'fixed',
       ...(average !== undefined ? { average } : {}),
-      ...(formula ? { formula } : {}),
     },
     stash: nextStash,
   }

@@ -27,9 +27,9 @@ describe('monster variant transitions', () => {
       { kind: 'hit-dice', count: 3 },
       'fixed',
       {},
-      { average: 10, formula: '3d8' },
+      { average: 10 },
     )
-    expect(toFixed.hitPoints).toEqual({ kind: 'fixed', average: 10, formula: '3d8' })
+    expect(toFixed.hitPoints).toEqual({ kind: 'fixed', average: 10 })
     expect(toFixed.stash.hitDice).toBe(3)
 
     const back = transitionHitPoints(toFixed.hitPoints, 'hit-dice', toFixed.stash)

@@ -3,6 +3,7 @@ import { cloneElement, isValidElement, type ComponentProps, type ReactNode } fro
 import { cn } from '../../lib/utils'
 import { FieldMessageRegion } from './field-anatomy-regions'
 import { FieldErrorText, FieldHintBelowLabel, FieldHintText, type FieldSize } from './field.client'
+import { FieldsetDerivedMetaRegion } from './fieldset-derived-meta-region.client'
 import type { FieldChrome } from './field-chrome.variants'
 import { FieldChromeShell } from './field-chrome-shell'
 import {
@@ -161,6 +162,7 @@ export function FieldsetChromeFrame({
         >
           {children}
         </fieldset>
+        <FieldsetDerivedMetaRegion id={restFieldsetProps.id ?? 'fieldset'} size={size} />
         <FieldsetBelowControlHint
           hint={hint}
           hintId={hintId}

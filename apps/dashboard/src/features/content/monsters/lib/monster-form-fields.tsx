@@ -21,6 +21,7 @@ import { MonsterEquipmentPanel } from '../components/form/monster-equipment-pane
 import { MonsterActionsEditor } from '../components/form/monster-actions-editor'
 import { MonsterTraitsEditor } from '../components/form/monster-traits-editor'
 import { MonsterStatisticsPanel } from '../components/form/monster-statistics-panel'
+import { monsterHitPointsFields } from './monster-hit-points-form-fields'
 import { MONSTER_CHALLENGE_HEADING } from './monster-form-labels'
 import { MONSTER_FORM_TAB } from './monster-form-view'
 
@@ -80,7 +81,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
   const statistics: FormItem[] = [
     { kind: 'slot', name: 'abilityScores', render: () => <MonsterStatisticsPanel ctx={ctx} /> },
     ownedSlot('armorClass'),
-    ownedSlot('hitPoints'),
+    ...monsterHitPointsFields(),
     movementWithHoverGroup(),
     {
       kind: 'group',

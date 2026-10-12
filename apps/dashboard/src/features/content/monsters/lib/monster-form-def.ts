@@ -15,6 +15,7 @@ import { nameField } from '../../lib/forms/fields/content-identity-form-fields'
 import { monstersQueryKey, useMonsters } from '../hooks/use-monsters'
 import { buildMonsterTabs } from './monster-form-fields'
 import { buildMonsterPreviewIdentity, buildMonsterPreviewSections } from './monster-form-preview'
+import { buildMonsterHitPointsFormValueSyncs } from './monster-hit-points-form.lib'
 import { resolveMonsterFormSchema } from './monster-form-schema'
 import {
   buildMonsterInput,
@@ -51,6 +52,7 @@ function buildMonsterFormValueSyncs(): FormValueSync[] {
         return undefined
       },
     },
+    ...buildMonsterHitPointsFormValueSyncs(),
   ]
 }
 

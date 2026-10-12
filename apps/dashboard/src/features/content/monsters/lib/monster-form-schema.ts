@@ -14,6 +14,7 @@ import {
   refineMovementRows,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
+import { stripMonsterHitPointsAuthoringFields } from './monster-hit-points-form.lib'
 
 function catalogLoadStatus(
   status: ContentFormCtx['equipmentCatalogStatus'],
@@ -36,10 +37,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function adaptMonsterFormMovementForBodySchema(input: unknown): unknown {
   if (!isRecord(input)) return input
-  const movement = input.movement
-  if (!Array.isArray(movement)) return input
+  const stripped = stripMonsterHitPointsAuthoringFields(input)
+  const movement = stripped.movement
+  if (!Array.isArray(movement)) return stripped
   return {
-    ...input,
+    ...stripped,
     movement: movementRowsToRecordForPreview(movement as MovementRowDraftFormValues[]),
   }
 }
