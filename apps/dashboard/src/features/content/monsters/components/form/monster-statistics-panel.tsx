@@ -17,8 +17,10 @@ import { deriveMonsterFormDraft } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ABILITY_SCORES_HEADING,
   MONSTER_ARMOR_CLASS_HEADING,
+  MONSTER_EQUIPMENT_CATALOG_ERROR,
   MONSTER_FIXED_AC_HINT,
   MONSTER_FIXED_AC_LABEL,
+  MONSTER_LOADING_EQUIPMENT,
   MONSTER_NATURAL_BONUS_LABEL,
   MONSTER_SAVE_LABEL,
   monsterBodyArmorConflictMessage,
@@ -202,8 +204,8 @@ function ArmorClassSection({
       {ctx.equipmentCatalogStatus !== 'ready' ? (
         <SemanticText tone="warning">
           {ctx.equipmentCatalogStatus === 'error'
-            ? 'Equipment could not be loaded.'
-            : 'Loading equipment…'}
+            ? MONSTER_EQUIPMENT_CATALOG_ERROR
+            : MONSTER_LOADING_EQUIPMENT}
         </SemanticText>
       ) : (
         <>

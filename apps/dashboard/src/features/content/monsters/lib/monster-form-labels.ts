@@ -1,87 +1,104 @@
-import { getContentTypeSentenceForm, getContentTypeTerm, joinInlineMetadata } from '@rpg/contracts'
+import {
+  ABILITY_SCORE_TERM,
+  CHALLENGE_RATING_TERM,
+  CREATURE_ARMOR_CLASS_KIND_TERM,
+  getActionEconomyLabel,
+  getContentTypeSentenceForm,
+  getProficiencyDomainCollectionLabel,
+  getProficiencyGrantCompactAddLabel,
+  HIT_POINTS_TERM,
+  joinInlineMetadata,
+  LANGUAGE_TERM,
+  SENSE_TERM,
+} from '@rpg/contracts'
 
-import { CREATURE_FLY_HOVER_LABEL } from '../../lib/forms/fields/content-movement-form-fields'
+import {
+  formatContentListLoadErrorMessage,
+  formatContentLoadErrorMessage,
+  getContentTypeItemLabel,
+  getContentTypeMidSentenceLabel,
+} from '@/features/content/lib/content-type-labels'
+import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
+
+const armorClassLabel = CREATURE_ARMOR_CLASS_KIND_TERM.label
+
+function actionEconomySectionHeading(id: 'action' | 'bonus-action' | 'reaction'): string {
+  return `${getActionEconomyLabel(id)}s`
+}
 
 /** Shown beside a clamped hit-point formula. Owned here and reused by the detail display. */
 export const MONSTER_HP_MINIMUM_NOTE = '(minimum 1)'
 
-export const MONSTER_ABILITY_SCORES_HEADING = 'Ability scores'
-export const MONSTER_ARMOR_CLASS_HEADING = 'Armor Class'
-export const MONSTER_HIT_POINTS_HEADING = 'Hit points'
-export const MONSTER_MOVEMENT_HEADING = 'Movement'
-export const MONSTER_CHALLENGE_HEADING = 'Challenge rating'
+export const MONSTER_ABILITY_SCORES_HEADING = vocabularyFieldLabel(ABILITY_SCORE_TERM, {
+  plural: true,
+})
+export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
+export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
+export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
 export const MONSTER_SAVE_LABEL = 'Save'
-export const MONSTER_HOVER_LABEL = CREATURE_FLY_HOVER_LABEL
 export const MONSTER_AWARDS_ZERO_XP_LABEL = 'Awards 0 XP'
 export const MONSTER_AWARDS_ZERO_XP_HINT =
   'Some CR 0 creatures award no XP. When checked, XP shows as 0.'
-export const MONSTER_HIT_DICE_LABEL = 'Hit dice'
 export const MONSTER_FIXED_AVERAGE_LABEL = 'Average HP'
 export const MONSTER_FIXED_FORMULA_LABEL = 'Formula'
 export const MONSTER_FIXED_FORMULA_HINT = 'Optional. Shown as written.'
 export const MONSTER_NATURAL_BONUS_LABEL = 'Natural armor bonus'
-export const MONSTER_FIXED_AC_LABEL = 'Armor Class value'
+export const MONSTER_FIXED_AC_LABEL = `${armorClassLabel} value`
 export const MONSTER_FIXED_AC_HINT = 'Ignores ability scores and equipment.'
-export const MONSTER_HIT_DICE_MINIMUM_ERROR = 'Enter at least 1 hit die'
-export const MONSTER_TELEPATHY_LABEL = 'Telepathy'
 export const MONSTER_TELEPATHY_HINT = 'Leave empty for no telepathy'
-export const MONSTER_LANGUAGE_NOTE_LABEL = 'Language note'
 export const MONSTER_SPEAKS_LABEL = 'Speaks'
 export const MONSTER_UNDERSTANDS_ONLY_LABEL = 'Understands only'
-export const MONSTER_ADD_SKILL_LABEL = 'Add skill'
-export const MONSTER_ADD_WEAPON_LABEL = 'Add weapon'
-export const MONSTER_ADD_LANGUAGE_LABEL = 'Add language'
-export const MONSTER_ADD_SENSE_LABEL = 'Add sense'
-export const MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL = 'Special sense'
+export const MONSTER_ADD_SKILL_LABEL = getProficiencyGrantCompactAddLabel('skill')
+export const MONSTER_ADD_LANGUAGE_LABEL = `Add ${vocabularyFieldLabel(LANGUAGE_TERM)}`
+export const MONSTER_ADD_SENSE_LABEL = `Add ${vocabularyFieldLabel(SENSE_TERM)}`
+export const MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL = `Special ${vocabularyFieldLabel(SENSE_TERM)}`
 export const MONSTER_PASSIVE_PERCEPTION_LABEL = 'Passive Perception'
 export const MONSTER_ADD_ITEM_LABEL = 'Add item'
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'
 export const MONSTER_CUSTOM_DESCRIPTION_LABEL = 'Custom description'
-export const MONSTER_AC_ADJUSTMENT_LABEL = 'Armor Class adjustment'
+export const MONSTER_AC_ADJUSTMENT_LABEL = `${armorClassLabel} adjustment`
 export const MONSTER_REMOVE_LABEL = 'Remove'
 export const MONSTER_CANCEL_LABEL = 'Cancel'
-export const MONSTER_WALK_LABEL = 'Walk'
-export const MONSTER_FEET_SUFFIX = 'ft'
-export const MONSTER_LOADING_EQUIPMENT = 'Loading equipment…'
-export const MONSTER_EQUIPMENT_CATALOG_ERROR = 'Equipment could not be loaded.'
+export const MONSTER_LOADING_EQUIPMENT = `Loading ${getContentTypeMidSentenceLabel('equipment')}…`
+export const MONSTER_EQUIPMENT_CATALOG_ERROR = formatContentLoadErrorMessage('equipment')
 export const MONSTER_RETRY_LABEL = 'Retry'
-export const MONSTER_SKILL_LOADING = 'Loading skills…'
-export const MONSTER_SKILL_ERROR = 'Skills could not be loaded.'
+export const MONSTER_SKILL_LOADING = `Loading ${getContentTypeMidSentenceLabel('skill-proficiencies', { plural: true })}…`
+export const MONSTER_SKILL_ERROR = formatContentListLoadErrorMessage('skill-proficiencies')
 export const MONSTER_BLANK_CHALLENGE_HINT =
   'Required to publish. Values that use proficiency bonus show "—" until set.'
 
 export function monsterGoToEquipmentLabel(): string {
-  return `Go to ${getContentTypeTerm('equipment').label}`
+  return `Go to ${getContentTypeItemLabel('equipment')}`
 }
 
 export function monsterChooseBodyArmorMessage(): string {
-  return `Choose and equip body armor in ${getContentTypeTerm('equipment').label} to calculate Armor Class.`
+  return `Choose and equip body armor in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
 }
 
 export function monsterBodyArmorConflictMessage(names: readonly string[]): string {
-  return `Two body armors are equipped: ${names.join(', ')}. Unequip one in ${getContentTypeTerm('equipment').label} to calculate Armor Class.`
+  return `Two body armors are equipped: ${names.join(', ')}. Unequip one in ${getContentTypeItemLabel('equipment')} to calculate ${armorClassLabel}.`
 }
 
 export function monsterBodyArmorIgnoredMessage(name: string): string {
-  return `Equipped ${name} does not contribute to Armor Class.`
+  return `Equipped ${name} does not contribute to ${armorClassLabel}.`
 }
 
 export function monsterSkillSectionLabel(): string {
-  return getContentTypeTerm('skill-proficiencies').label
+  return getContentTypeItemLabel('skill-proficiencies')
 }
 
-export const MONSTER_WEAPON_PROFICIENCIES_HEADING = 'Weapon proficiencies'
+export const MONSTER_WEAPON_PROFICIENCIES_HEADING = getProficiencyDomainCollectionLabel('weapon')
 
 export function monsterEquipmentSectionLabel(): string {
-  return getContentTypeTerm('equipment').label
+  return getContentTypeItemLabel('equipment')
 }
 
 export const MONSTER_TRAITS_HEADING = 'Traits'
-export const MONSTER_ACTIONS_HEADING = 'Actions'
-export const MONSTER_BONUS_ACTIONS_HEADING = 'Bonus actions'
-export const MONSTER_REACTIONS_HEADING = 'Reactions'
+export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
+export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')
+export const MONSTER_REACTIONS_HEADING = actionEconomySectionHeading('reaction')
 export const MONSTER_ACTIONS_EMPTY = 'No actions yet.'
 export const MONSTER_SECTION_EMPTY = 'None'
 export const MONSTER_ACTION_DETAIL_EMPTY = 'Select or add an action to edit it.'
@@ -97,11 +114,11 @@ export const MONSTER_SPECIAL_PRESET_HINT = 'Prose-based action'
 export const MONSTER_KIND_SWITCH_KEEP = 'The name and description are kept.'
 
 export function monsterAddWeaponShortcut(): string {
-  return `Add a weapon to ${getContentTypeTerm('equipment').label}`
+  return `Add a weapon to ${getContentTypeItemLabel('equipment')}`
 }
 
 export function formatAddedEquipmentNotice(name: string): string {
-  return `${name} was added to ${getContentTypeTerm('equipment').label}.`
+  return `${name} was added to ${getContentTypeItemLabel('equipment')}.`
 }
 
 export function formatWeaponSwapNotice(name: string): string {
@@ -117,7 +134,7 @@ export function formatKindSwitchConfirm(nextKindLabel: string): string {
 }
 
 export function formatDropTriggerBody(): string {
-  return 'Moving this reaction out of Reactions drops its trigger.'
+  return `Moving this reaction out of ${MONSTER_REACTIONS_HEADING} drops its trigger.`
 }
 
 export const MONSTER_DROP_TRIGGER_CONFIRM = 'Move and drop trigger'
@@ -150,7 +167,7 @@ export function formatWeaponRetargetNotice(
 }
 
 export function formatClearAdjustmentConfirmBody(): string {
-  return `This change removes the Armor Class adjustment because the new ${getContentTypeSentenceForm('equipment', 1)} cannot use it.`
+  return `This change removes the ${armorClassLabel} adjustment because the new ${getContentTypeSentenceForm('equipment', 1)} cannot use it.`
 }
 
 export const MONSTER_CLEAR_ADJUSTMENT_CONFIRM = 'Change item'
