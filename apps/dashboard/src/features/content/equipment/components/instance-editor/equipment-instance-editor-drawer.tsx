@@ -455,6 +455,49 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
   )
 }
 
+function CombinedMechanicalModifiers({
+  draft,
+  magic,
+  totals,
+}: {
+  draft: EquipmentInstance
+  magic: ReturnType<typeof resolveEquipmentMagicProperties>
+  totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
+}) {
+  const manualTargets = new Set((draft.mechanicalEffects ?? []).map((effect) => effect.target))
+  const enhancementName =
+    magic.resolved.find((row) => row.definition.category === 'enhancement')?.definition.name ??
+    'Enhancement'
+
+  const overlapping = (['attack_roll', 'damage_roll', 'armor_class'] as const).filter((target) => {
+    const hasEnhancement = magic.resolved.some(
+      (row) =>
+        row.definition.category === 'enhancement' &&
+        row.definition.effects.some((effect) => effect.target === target),
+    )
+    return manualTargets.has(target) && hasEnhancement && totals[target] !== 0
+  })
+
+  if (overlapping.length === 0) return null
+
+  return (
+    <div className="space-y-1 border-t border-border pt-3">
+      <Text variant="emphasis">Combined modifiers</Text>
+      {overlapping.map((target) => (
+        <div key={target} className="flex items-center justify-between gap-2">
+          <Text variant="muted">{effectTargetLabel(target)}</Text>
+          <Text variant="muted">{formatSignedModifier(totals[target])}</Text>
+        </div>
+      ))}
+      <Text variant="muted" className="text-xs">
+        Includes {enhancementName} and the additional modifier
+        {overlapping.length === 1 ? ` on ${effectTargetLabel(overlapping[0]!).toLowerCase()}` : 's'}
+        .
+      </Text>
+    </div>
+  )
+}
+
 function ScopeModeBody({
   entryName,
   quantity,
@@ -487,7 +530,7 @@ function ScopeModeBody({
           {
             value: 'one',
             label: 'One copy',
-            description: `Separate one copy so it can have its own properties. Creates a separate ${entryName} (×1), leaving ${quantity - 1} unchanged.`,
+            description: 'Separate one copy for customization. Other copies remain unchanged.',
           },
           {
             value: 'all',
@@ -687,20 +730,7 @@ function MainModeBody({
         <ActionButton action="add" variant="ghost" onClick={onOpenEffectChoose}>
           Add effect
         </ActionButton>
-        {magic.resolved.some((row) => row.definition.category === 'enhancement') ? (
-          <Text variant="muted">
-            {joinInlineMetadata(
-              (['attack_roll', 'damage_roll', 'armor_class'] as const)
-                .map((target) => {
-                  const total = totals[target]
-                  return total
-                    ? `${formatSignedModifier(total)} ${effectTargetLabel(target).toLowerCase()}`
-                    : null
-                })
-                .filter(Boolean) as string[],
-            )}
-          </Text>
-        ) : null}
+        <CombinedMechanicalModifiers draft={draft} magic={magic} totals={totals} />
       </div>
     </div>
   )

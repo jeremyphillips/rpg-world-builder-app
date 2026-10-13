@@ -20,7 +20,10 @@ export function findCanonicalPlainEntry(
   entries: readonly EquipmentInstance[],
   equipmentId: string,
 ): EquipmentInstance | undefined {
-  return entries.find((entry) => entry.equipmentId === equipmentId && isPlainEquipmentEntry(entry))
+  const plain = entries.filter(
+    (entry) => entry.equipmentId === equipmentId && isPlainEquipmentEntry(entry),
+  )
+  return plain.find((entry) => entry.equipped === true) ?? plain[0]
 }
 
 export type SplitEquipmentEntryInput = {
@@ -78,16 +81,18 @@ export function summarizeEquipmentStacks(
     existing.ownedQuantity += quantity
     if (isPlainEquipmentEntry(entry)) {
       existing.plainQuantity += quantity
-      if (existing.plainEntryId === undefined && 'entryId' in entry && entry.entryId) {
-        existing.plainEntryId = entry.entryId
-      }
     }
     byEquipmentId.set(entry.equipmentId, existing)
   }
 
   for (const [equipmentId, summary] of byEquipmentId) {
+    const canonical = findCanonicalPlainEntry(entries, equipmentId)
     byEquipmentId.set(equipmentId, {
       ...summary,
+      plainEntryId:
+        canonical && 'entryId' in canonical && canonical.entryId
+          ? canonical.entryId
+          : summary.plainEntryId,
       customizedCopyCount: summary.ownedQuantity - summary.plainQuantity,
     })
   }

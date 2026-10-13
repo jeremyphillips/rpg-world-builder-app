@@ -8,6 +8,7 @@ import { toEquippedArmorPiece, resolveEquippedArmorClass } from '../creature/arm
 import { isWeaponProficient } from '../creature/proficiencies'
 import { resolveWeaponAttackAbilityModifier } from '../creature/weapon-attack'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
+import { normalizeEquipmentInstance } from '../../content/equipment/normalize-equipment-instance'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-block'
 
@@ -500,5 +501,148 @@ describe('equipment magic property derivation parity', () => {
 
     expect(characterTotals?.attackBonus).toBe(monsterAttack?.attackBonus)
     expect(characterTotals?.damageAverage).toBe(Number(monsterAttack?.damage))
+  })
+})
+
+describe('equipment effect derivation (ship P0)', () => {
+  const provider: MagicPropertyDefinitionProvider = (id) =>
+    id === `${RULESET}:weapon-enhancement-1`
+      ? {
+          id,
+          name: 'Enhancement +1',
+          description: 'test',
+          category: 'enhancement',
+          appliesTo: ['weapon'],
+          effects: [
+            { target: 'attack_roll', bonus: 1 },
+            { target: 'damage_roll', bonus: 1 },
+          ],
+        }
+      : undefined
+
+  it('does not multiply weapon bonuses by stack quantity', () => {
+    const daggerId = `${RULESET}:dagger`
+    const entryBase = {
+      entryId: 'sword',
+      equipmentId: daggerId,
+      equipped: true,
+      magical: true,
+      magicProperties: [{ kind: 'preset' as const, propertyId: `${RULESET}:weapon-enhancement-1` }],
+    }
+    const qtyOne = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        actions: [{ id: 'slash', kind: 'weapon' as const, equipmentEntryId: 'sword' }],
+        equipment: [{ ...entryBase, quantity: 1 }],
+      },
+      equipmentCatalog,
+      skillCatalog,
+      magicPropertyProvider: provider,
+    }).attacks[0]?.attackBonus
+
+    const qtyTwo = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        actions: [{ id: 'slash', kind: 'weapon' as const, equipmentEntryId: 'sword' }],
+        equipment: [{ ...entryBase, quantity: 2 }],
+      },
+      equipmentCatalog,
+      skillCatalog,
+      magicPropertyProvider: provider,
+    }).attacks[0]?.attackBonus
+
+    expect(qtyTwo).toBe(qtyOne)
+  })
+
+  it('applies enhancement only to the action that references the equipment entry', () => {
+    const daggerId = `${RULESET}:dagger`
+    const enhanced = {
+      entryId: 'plus-one',
+      equipmentId: daggerId,
+      quantity: 1,
+      equipped: true,
+      magical: true,
+      magicProperties: [{ kind: 'preset' as const, propertyId: `${RULESET}:weapon-enhancement-1` }],
+    }
+    const plain = {
+      entryId: 'plain',
+      equipmentId: daggerId,
+      quantity: 1,
+      equipped: true,
+    }
+    const block = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        actions: [
+          {
+            id: 'enhanced',
+            name: 'Enhanced',
+            kind: 'weapon' as const,
+            equipmentEntryId: 'plus-one',
+          },
+          { id: 'plain', name: 'Plain', kind: 'weapon' as const, equipmentEntryId: 'plain' },
+        ],
+        equipment: [enhanced, plain],
+      },
+      equipmentCatalog,
+      skillCatalog,
+      magicPropertyProvider: provider,
+    })
+    const enhancedAttack = block.attacks.find((row) => row.name === 'Enhanced')
+    const plainAttack = block.attacks.find((row) => row.name === 'Plain')
+    expect(enhancedAttack!.attackBonus! > plainAttack!.attackBonus!).toBe(true)
+  })
+
+  it('keeps derived AC unchanged when normalizing legacy armor_class modifiers', () => {
+    const fixture = {
+      entryId: 'armor',
+      equipmentId: `${RULESET}:chain-shirt`,
+      quantity: 1,
+      equipped: true,
+      modifiers: [{ kind: 'armor_class' as const, bonus: -1 }],
+    }
+    const normalized = normalizeEquipmentInstance(fixture)
+    const legacyBlock = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        armorClass: { kind: 'equipment' },
+        equipment: [fixture],
+        actions: [],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    const normalizedBlock = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        armorClass: { kind: 'equipment' },
+        equipment: [normalized],
+        actions: [],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(normalizedBlock.ac).toBe(legacyBlock.ac)
+  })
+
+  it('ignores equipment AC effects under fixed monster armor class', () => {
+    const fixture = {
+      entryId: 'armor',
+      equipmentId: `${RULESET}:chain-shirt`,
+      quantity: 1,
+      equipped: true,
+      mechanicalEffects: [{ effectId: 'ac', target: 'armor_class' as const, bonus: 5 }],
+    }
+    const block = deriveMonsterStatBlock({
+      monster: {
+        ...kobold,
+        armorClass: { kind: 'fixed', value: 17 },
+        equipment: [fixture],
+        actions: [],
+      },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    expect(block.ac).toBe(17)
   })
 })

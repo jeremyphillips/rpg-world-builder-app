@@ -13,6 +13,26 @@ describe('monster-equipment-loadout.lib', () => {
     expect(next[0]?.equipped).toBe(true)
   })
 
+  it('targets the equipped plain stack when another plain stack is unequipped', () => {
+    const entries = [
+      {
+        entryId: 'plain-unequipped',
+        equipmentId: 'srd:dagger',
+        quantity: 1,
+        equipped: false,
+      },
+      {
+        entryId: 'plain-equipped',
+        equipmentId: 'srd:dagger',
+        quantity: 1,
+        equipped: true,
+      },
+    ]
+    const next = incrementMonsterPlainStack(entries, 'srd:dagger')
+    expect(next.find((row) => row.entryId === 'plain-equipped')?.quantity).toBe(2)
+    expect(next.find((row) => row.entryId === 'plain-unequipped')?.quantity).toBe(1)
+  })
+
   it('removes the plain stack when quantity hits zero', () => {
     const entries = [
       {

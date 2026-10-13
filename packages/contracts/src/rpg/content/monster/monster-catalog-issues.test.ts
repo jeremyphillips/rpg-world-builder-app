@@ -181,6 +181,34 @@ describe('collectMonsterCatalogIssues', () => {
     ])
   })
 
+  it('allows unresolved magic presets on draft and rejects them on publish', () => {
+    const body = {
+      equipment: [
+        {
+          entryId: 'sword',
+          equipmentId: dagger.id,
+          magical: true,
+          magicProperties: [{ kind: 'preset' as const, propertyId: 'missing-preset' }],
+        },
+      ],
+    }
+    const provider = () => undefined
+    expect(
+      collectMonsterCatalogIssues(
+        body,
+        readyCatalogs({ magicPropertyProvider: provider }),
+        'draft',
+      ),
+    ).toEqual([])
+    expect(
+      collectMonsterCatalogIssues(
+        body,
+        readyCatalogs({ magicPropertyProvider: provider }),
+        'publish',
+      ).map((row) => row.code),
+    ).toContain('unknown_magic_property_preset')
+  })
+
   it('skips equipment row checks on draft when the equipment catalog is unavailable', () => {
     expect(
       collectMonsterCatalogIssues(

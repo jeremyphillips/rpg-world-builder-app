@@ -214,7 +214,7 @@ export function MonsterEquipmentPanel({
                     <button
                       type="button"
                       className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                      aria-label={`Edit ${label}`}
+                      aria-label={`Customize ${label}`}
                       onClick={() => {
                         setPickerOpen(false)
                         setEditorEntryId(entry.entryId)
@@ -272,7 +272,7 @@ export function MonsterEquipmentPanel({
           subjectNoun="creature"
           referencedByLabel={
             findActionsReferencingEntry(values as MonsterFormValues, editorEntry.entryId).length > 0
-              ? 'Attacks using this item keep using the unchanged copy. Update them in Actions.'
+              ? `This creature's attacks will continue using the original ${equipmentEntryBaseName(editorEntry, catalog)}. To use the customized copy, update the equipment selection in Actions.`
               : undefined
           }
           onCommit={(nextEntries) => {

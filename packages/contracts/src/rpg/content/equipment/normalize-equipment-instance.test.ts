@@ -15,6 +15,16 @@ describe('normalizeEquipmentInstance', () => {
     ])
   })
 
+  it('is idempotent after converting legacy armor_class modifiers', () => {
+    const once = normalizeEquipmentInstance({
+      equipmentId: 'srd-cc-5.2.1:chain-shirt',
+      quantity: 1,
+      modifiers: [{ kind: 'armor_class', bonus: 2 }],
+    })
+    const twice = normalizeEquipmentInstance(once)
+    expect(twice).toEqual(once)
+  })
+
   it('does not add a mechanical effect when armor_class bonus nets to zero', () => {
     const next = normalizeEquipmentInstance({
       equipmentId: 'item',

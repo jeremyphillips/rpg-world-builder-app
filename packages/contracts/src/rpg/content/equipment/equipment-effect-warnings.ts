@@ -1,6 +1,8 @@
 import { isArmorEquipment, isWeaponEquipment, type Equipment } from '../equipment'
 import type { EquipmentInstance } from './instance'
 import type { MagicPropertyDefinitionProvider } from './magic-property'
+import { normalizeEquipmentInstance } from './normalize-equipment-instance'
+import { resolveEquipmentMagicProperties } from './resolve-equipment-magic-properties'
 import {
   resolveEquipmentEntryEffectTotals,
   type EquipmentEffectTotals,
@@ -29,9 +31,33 @@ export type ResolveEquipmentEffectWarningsInput = {
   unarmoredAcBase?: number
 }
 
-function aboveStandardEnhancementWarnings(totals: EquipmentEffectTotals): EquipmentEffectWarning[] {
+function enhancementContributingTargets(
+  entry: EquipmentInstance,
+  item: Equipment,
+  provider: MagicPropertyDefinitionProvider,
+): Set<keyof EquipmentEffectTotals> {
+  const magic = resolveEquipmentMagicProperties(entry, item, provider)
+  const targets = new Set<keyof EquipmentEffectTotals>()
+  for (const row of magic.resolved) {
+    if (row.definition.category !== 'enhancement') continue
+    for (const effect of row.definition.effects) {
+      targets.add(effect.target)
+    }
+  }
+  return targets
+}
+
+function aboveStandardEnhancementWarnings(
+  entry: EquipmentInstance,
+  item: Equipment,
+  provider: MagicPropertyDefinitionProvider,
+  totals: EquipmentEffectTotals,
+): EquipmentEffectWarning[] {
+  const enhancementTargets = enhancementContributingTargets(entry, item, provider)
   return (['attack_roll', 'damage_roll', 'armor_class'] as const).flatMap((target) =>
-    totals[target] > 3 ? [{ code: EQUIPMENT_EFFECT_WARNING.aboveStandardEnhancement, target }] : [],
+    totals[target] > 3 && enhancementTargets.has(target)
+      ? [{ code: EQUIPMENT_EFFECT_WARNING.aboveStandardEnhancement, target }]
+      : [],
   )
 }
 
@@ -68,11 +94,12 @@ function armorAcWarnings(
 export function resolveEquipmentEffectWarnings(
   input: ResolveEquipmentEffectWarningsInput,
 ): EquipmentEffectWarning[] {
+  const entry = normalizeEquipmentInstance(input.entry)
   const totals =
-    input.totals ?? resolveEquipmentEntryEffectTotals(input.entry, input.item, input.provider)
+    input.totals ?? resolveEquipmentEntryEffectTotals(entry, input.item, input.provider)
   const unarmoredAcBase = input.unarmoredAcBase ?? 10
   return [
-    ...aboveStandardEnhancementWarnings(totals),
+    ...aboveStandardEnhancementWarnings(entry, input.item, input.provider, totals),
     ...weaponDamageMinimumWarning(input.item, totals),
     ...armorAcWarnings(input.item, totals, unarmoredAcBase),
   ]

@@ -81,6 +81,7 @@ function collectEquipmentRowIssues(
   catalogs: MonsterCatalogs,
   issues: ApiValidationIssue[],
   equippedBodyArmor: { index: number; label: string }[],
+  intent: ContentValidationIntent,
 ): void {
   if (!entry.equipmentId) return
   const item = catalogs.equipmentById.get(entry.equipmentId)
@@ -107,15 +108,17 @@ function collectEquipmentRowIssues(
       ),
     )
   }
-  const provider = catalogs.magicPropertyProvider ?? (() => undefined)
-  issues.push(
-    ...validateEquipmentMagicProperties({
-      entry: normalized,
-      item,
-      provider,
-      pathPrefix: `equipment.${index}`,
-    }),
-  )
+  if (intent === 'publish') {
+    const provider = catalogs.magicPropertyProvider ?? (() => undefined)
+    issues.push(
+      ...validateEquipmentMagicProperties({
+        entry: normalized,
+        item,
+        provider,
+        pathPrefix: `equipment.${index}`,
+      }),
+    )
+  }
   if (entry.equipped && isBodyArmor(item)) {
     equippedBodyArmor.push({ index, label: itemLabel(entry, item) })
   }
@@ -256,7 +259,7 @@ export function collectMonsterCatalogIssues(
 
   if (equipmentReady) {
     equipment.forEach((entry, index) => {
-      collectEquipmentRowIssues(entry, index, catalogs, issues, equippedBodyArmor)
+      collectEquipmentRowIssues(entry, index, catalogs, issues, equippedBodyArmor, intent)
     })
     collectBodyArmorConflicts(equippedBodyArmor, issues)
     collectWeaponActionIssues(body, equipment, catalogs, issues)

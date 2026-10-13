@@ -8,6 +8,7 @@ import {
   isEquipmentEditorSessionDirty,
   restoreHiddenMagicProperties,
 } from './equipment-editor-reducer'
+import { DEFAULT_BROWSE_DRAFT } from './equipment-editor-reducer.handlers'
 
 const baseEntry = {
   entryId: 'e1',
@@ -99,6 +100,36 @@ describe('equipment editor session', () => {
     const edited = equipmentEditorReducer(state, { type: 'patchDraft', patch: { equipped: false } })
     expect(isEquipmentEditorSessionDirty(edited)).toBe(true)
     expect(isEquipmentEditorSessionDirty(cloneEquipmentEditorState(edited))).toBe(true)
+  })
+
+  it('returns from effect form back to effect choose', () => {
+    const state = createEquipmentEditorState({
+      sourceEntry: { ...baseEntry, quantity: 1 },
+    })
+    const inForm = equipmentEditorReducer(state, {
+      type: 'openEffectForm',
+      draft: { effectId: 'new', target: 'attack_roll', bonus: 1 },
+      origin: 'new',
+    })
+    const back = equipmentEditorReducer(inForm, { type: 'back' })
+    expect(back.mode.kind).toBe('effectChoose')
+  })
+
+  it('returns from property create back to property browse when opened from browse', () => {
+    const state = createEquipmentEditorState({
+      sourceEntry: { ...baseEntry, quantity: 1, magical: true },
+    })
+    const browse = equipmentEditorReducer(state, {
+      type: 'openPropertyBrowse',
+      draft: DEFAULT_BROWSE_DRAFT,
+    })
+    const inCreate = equipmentEditorReducer(browse, {
+      type: 'openPropertyCreate',
+      draft: { name: 'Glow', description: 'Shines' },
+      origin: 'browse',
+    })
+    const back = equipmentEditorReducer(inCreate, { type: 'back' })
+    expect(back.mode).toEqual({ kind: 'propertyBrowse', draft: expect.any(Object) })
   })
 
   it('replaces an enhancement preset from browse', () => {

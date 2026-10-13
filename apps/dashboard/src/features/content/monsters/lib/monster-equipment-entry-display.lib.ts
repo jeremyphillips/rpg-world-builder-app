@@ -30,7 +30,12 @@ export function formatMonsterEquipmentRowMetadata(args: {
     magic.unresolved.length
 
   if (enhancement) {
-    segments.push(enhancement.definition.name)
+    const bonus =
+      enhancement.definition.effects.find((effect) => effect.target === 'attack_roll')?.bonus ??
+      enhancement.definition.effects.find((effect) => effect.target === 'armor_class')?.bonus ??
+      enhancement.definition.effects[0]?.bonus ??
+      1
+    segments.push(`${formatSignedModifier(bonus)} enhancement`)
   } else if (entry.magical) {
     segments.push('Magical')
   }

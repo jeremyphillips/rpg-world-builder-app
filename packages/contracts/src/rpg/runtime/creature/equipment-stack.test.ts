@@ -17,6 +17,15 @@ describe('equipment stack helpers', () => {
     expect(findCanonicalPlainEntry(entries, 'dagger')?.entryId).toBe('b')
   })
 
+  it('prefers a plain equipped stack over an unequipped plain stack', () => {
+    const entries = [
+      { entryId: 'unequipped', equipmentId: 'dagger', quantity: 1, equipped: false },
+      { entryId: 'equipped', equipmentId: 'dagger', quantity: 2, equipped: true },
+    ]
+    expect(findCanonicalPlainEntry(entries, 'dagger')?.entryId).toBe('equipped')
+    expect(summarizeEquipmentStacks(entries).get('dagger')?.plainEntryId).toBe('equipped')
+  })
+
   it('splits one copy while preserving total quantity and list order', () => {
     const entries = [
       { entryId: 'src', equipmentId: 'dagger', quantity: 3, equipped: true },

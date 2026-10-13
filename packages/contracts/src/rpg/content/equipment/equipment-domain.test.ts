@@ -124,7 +124,21 @@ describe('effect totals and warnings', () => {
     expect(totals).toEqual({ attack_roll: 2, damage_roll: 1, armor_class: 0 })
   })
 
-  it('warns when total bonus exceeds standard enhancement', () => {
+  it('warns when enhancement plus manual total exceeds standard +3 on attack', () => {
+    const warnings = resolveEquipmentEffectWarnings({
+      entry: {
+        equipmentId: weapon.id,
+        magical: true,
+        magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
+        mechanicalEffects: [{ effectId: 'e1', target: 'attack_roll', bonus: 3 }],
+      },
+      item: weapon,
+      provider,
+    })
+    expect(warnings.some((row) => row.code === 'above_standard_enhancement')).toBe(true)
+  })
+
+  it('does not warn on a high manual modifier alone without an enhancement', () => {
     const warnings = resolveEquipmentEffectWarnings({
       entry: {
         equipmentId: weapon.id,
@@ -133,6 +147,6 @@ describe('effect totals and warnings', () => {
       item: weapon,
       provider: () => undefined,
     })
-    expect(warnings.some((row) => row.code === 'above_standard_enhancement')).toBe(true)
+    expect(warnings.some((row) => row.code === 'above_standard_enhancement')).toBe(false)
   })
 })

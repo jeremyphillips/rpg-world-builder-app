@@ -127,6 +127,95 @@ describe('monster write validation', () => {
     }
   })
 
+  it('preserves equipment magic fields on draft write and catalog read', async () => {
+    const campaign = await makeTestCampaign()
+    const longswordId = 'srd-cc-5.2.1:longsword'
+    const equipment = [
+      {
+        entryId: 'e1',
+        equipmentId: longswordId,
+        quantity: 2,
+        equipped: true,
+        magical: true,
+        magicProperties: [
+          { kind: 'preset' as const, propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' },
+        ],
+        mechanicalEffects: [{ effectId: 'fx1', target: 'attack_roll' as const, bonus: 1 }],
+      },
+      {
+        entryId: 'custom-stack',
+        equipmentId: longswordId,
+        quantity: 1,
+        equipped: true,
+        magical: true,
+        magicProperties: [
+          {
+            kind: 'custom' as const,
+            customId: 'c1',
+            name: 'Glow',
+            description: 'Shines',
+          },
+        ],
+      },
+    ]
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'equipment-magic-roundtrip',
+        equipment,
+        actions: [{ id: 'slash', kind: 'weapon', equipmentEntryId: 'e1' }],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    expect(created.equipment).toEqual(equipment)
+
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    const stored = catalog.find((row) => row.id === created.id)
+    expect(stored?.equipment).toEqual(equipment)
+  })
+
+  it('allows draft save with an unresolved magic preset id', async () => {
+    const campaign = await makeTestCampaign()
+    const longswordId = 'srd-cc-5.2.1:longsword'
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'unresolved-preset-draft',
+        equipment: [
+          {
+            entryId: 'sword',
+            equipmentId: longswordId,
+            quantity: 1,
+            magical: true,
+            magicProperties: [{ kind: 'preset', propertyId: 'removed-preset-id' }],
+          },
+        ],
+        actions: [],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    expect(created.equipment[0]?.magicProperties?.[0]).toEqual({
+      kind: 'preset',
+      propertyId: 'removed-preset-id',
+    })
+  })
+
   it('rejects unknown or duplicate magic property presets on publish', async () => {
     const campaign = await makeTestCampaign()
     const longswordId = 'srd-cc-5.2.1:longsword'
