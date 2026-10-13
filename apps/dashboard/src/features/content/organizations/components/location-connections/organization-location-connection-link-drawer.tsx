@@ -7,7 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import { Button, Heading, SelectionSummaryCards, Text } from '@rpg/ui'
+import { Button, Heading, Text } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
@@ -35,6 +35,7 @@ import {
 } from '../../../locations/lib/location-display'
 import { EntityReplacementSection } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-section'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
+import { DrawerDecisionSummary } from '../../../lib/relationship/drawer/drawer-decision-summary'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
 import type { EntityReplacementCurrentSnapshot } from '../../../lib/entity/surfaces/drawer/replacement/entity-replacement-current.types'
 import { ENTITY_UNAVAILABLE_LOCATION_HEADING } from '../../../lib/entity/summary/entity-unavailable-headings.lib'
@@ -62,7 +63,6 @@ import {
   ORGANIZATION_DRAWER_KIND_FIELD_LABELS,
   ORGANIZATION_DRAWER_SUBMIT_ADD_LABELS,
   RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
-  RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
   type OrganizationConnectionDrawerIntent,
   filterLocationsForOrganizationKind,
   locationEligibleForOrganizationKind,
@@ -675,22 +675,16 @@ function OrganizationLocationConnectionLinkDrawerContent({
               />
             ) : null}
             {showKindSummary && selectedKindOption ? (
-              <SelectionSummaryCards
-                cards={[
+              <DrawerDecisionSummary
+                rows={[
                   {
-                    id: 'kind-summary',
-                    eyebrow: RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
-                    rows: [
-                      {
-                        id: 'kind',
-                        label: kindFieldLabel,
-                        value: selectedKindOption.label,
-                        decisionId: 'kind',
-                        onNavigate: startEditingKind,
-                        changeLabel: RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
-                        valueActionAriaLabel: kindChangeAriaLabel,
-                      },
-                    ],
+                    id: 'kind',
+                    label: kindFieldLabel,
+                    value: selectedKindOption.label,
+                    decisionId: 'kind',
+                    onNavigate: startEditingKind,
+                    changeLabel: RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
+                    valueActionAriaLabel: kindChangeAriaLabel,
                   },
                 ]}
                 activeDecisionId={showKindField ? 'kind' : null}

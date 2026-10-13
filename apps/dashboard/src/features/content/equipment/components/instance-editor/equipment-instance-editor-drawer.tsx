@@ -25,6 +25,7 @@ import {
   ActionButton,
   ActionIcon,
   Button,
+  DecisionSummaryPanel,
   Heading,
   NumberStepper,
   RadioCard,
@@ -37,7 +38,6 @@ import {
 } from '@rpg/ui'
 
 import { DrawerShell } from '@/components/drawer'
-import { CreateCompositionSummary } from '@/lib/create-flow'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 import { commitEquipmentEditorSession } from '../../lib/instance-editor/commit-equipment-editor-session'
@@ -781,13 +781,14 @@ function EffectFormBody({
 }) {
   return (
     <div className="space-y-4">
-      <CreateCompositionSummary
+      <DecisionSummaryPanel
         rows={[
           {
             id: 'effect-target',
             label: 'Effect target',
             value: draft.target ? effectTargetLabel(draft.target) : '—',
-            onChange: onChangeTarget,
+            decisionId: 'effect-target',
+            onNavigate: onChangeTarget,
           },
         ]}
       />

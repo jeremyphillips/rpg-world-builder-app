@@ -62,7 +62,7 @@ The registry records gaps ("No owner yet") explicitly. It grows only when a fami
 | Transient feedback             | `Toast`                                                           |
 | Catalog picking                | `CatalogPickerSheet` (composes `Sheet`)                           |
 | Key/value metadata             | `MetadataList`                                                    |
-| Completed decision summaries   | `SelectionSummaryCard` + `mapSummaryDecisionRowsToSelectionProps` |
+| Completed decision summaries   | `DecisionSummaryPanel` + `mapSummaryDecisionRowsToSelectionProps` |
 | Inline metadata separators     | `InlineMetadata`                                                  |
 | Tabs                           | `Tabs`                                                            |
 | Multi-step flow                | `Wizard`                                                          |

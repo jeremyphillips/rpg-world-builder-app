@@ -1,11 +1,5 @@
 import type { ReactNode } from 'react'
-import {
-  mapSummaryDecisionRowsToSelectionProps,
-  SelectionSummaryRow,
-  type SummaryDecisionRow,
-} from '@rpg/ui'
-
-import { createCompositionSummaryRowsClasses } from './create-composition.variants'
+import { DecisionSummaryPanel, type SummaryDecisionRow } from '@rpg/ui'
 
 export type CreateCompositionSummaryRow = {
   id: string
@@ -34,22 +28,16 @@ function toSummaryDecisionRows(rows: readonly CreateCompositionSummaryRow[]): Su
   }))
 }
 
+/** Cardless completed-decision rows for nested composition review stacks. */
 export function CreateCompositionSummary({
   rows,
   defaultChangeLabel = 'Change',
 }: CreateCompositionSummaryProps) {
-  if (rows.length === 0) return null
-
-  const selectionRows = mapSummaryDecisionRowsToSelectionProps({
-    rows: toSummaryDecisionRows(rows),
-    defaultChangeLabel,
-  })
-
   return (
-    <dl className={createCompositionSummaryRowsClasses}>
-      {selectionRows.map((row, index) => (
-        <SelectionSummaryRow key={rows[index]!.id} {...row} showDivider={index > 0} />
-      ))}
-    </dl>
+    <DecisionSummaryPanel
+      chrome="embedded"
+      rows={toSummaryDecisionRows(rows)}
+      defaultChangeLabel={defaultChangeLabel}
+    />
   )
 }

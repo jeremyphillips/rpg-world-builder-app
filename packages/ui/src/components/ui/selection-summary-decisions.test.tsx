@@ -6,8 +6,10 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  DecisionSummaryPanel,
   mapSummaryDecisionRowsToSelectionProps,
   SELECTION_SUMMARY_DEFAULT_CHANGE_LABEL,
+  SELECTION_SUMMARY_DEFAULT_EYEBROW,
   SelectionSummaryCards,
   type SummaryDecisionRow,
 } from './selection-summary-decisions'
@@ -136,7 +138,49 @@ describe('mapSummaryDecisionRowsToSelectionProps', () => {
   })
 })
 
+describe('DecisionSummaryPanel', () => {
+  it('renders card chrome with default Selections eyebrow', () => {
+    const { container } = render(
+      <DecisionSummaryPanel
+        rows={[{ id: 'kind', label: 'Kind', value: 'Owner', onNavigate: vi.fn() }]}
+      />,
+    )
+
+    expect(screen.getByText(SELECTION_SUMMARY_DEFAULT_EYEBROW)).toBeInTheDocument()
+    const card = container.querySelector('article')
+    expect(card).toHaveClass('bg-surface-muted')
+  })
+
+  it('renders embedded rows without card shell', () => {
+    const { container } = render(
+      <DecisionSummaryPanel
+        chrome="embedded"
+        rows={[{ id: 'kind', label: 'Kind', value: 'Owner' }]}
+      />,
+    )
+
+    expect(screen.queryByText(SELECTION_SUMMARY_DEFAULT_EYEBROW)).not.toBeInTheDocument()
+    expect(container.querySelector('article')).toBeNull()
+    expect(container.querySelector('dl')).toHaveClass('grid')
+  })
+})
+
 describe('SelectionSummaryCards', () => {
+  it('defaults card eyebrow to Selections when omitted', () => {
+    render(
+      <SelectionSummaryCards
+        cards={[
+          {
+            id: 'selections',
+            rows: [{ id: 'role', label: 'Role', value: 'Scout' }],
+          },
+        ]}
+      />,
+    )
+
+    expect(screen.getByText(SELECTION_SUMMARY_DEFAULT_EYEBROW)).toBeInTheDocument()
+  })
+
   it('renders multiple cards and respects active decision suppression', () => {
     render(
       <SelectionSummaryCards

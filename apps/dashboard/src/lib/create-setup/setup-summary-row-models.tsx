@@ -9,7 +9,7 @@ import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
 import type { SetupSummaryEditTarget, SetupSummaryRowModel } from './create-setup.types'
 import type { SetupSummaryCard, SetupSummaryRow } from './resolve-setup-summary-rows.lib'
 
-function setupSummaryRowsToDecisionRows(
+export function setupSummaryRowsToSummaryDecisionRows(
   rows: readonly SetupSummaryRow[],
   onNavigate?: (targetSetId: string) => void,
 ): SummaryDecisionRow[] {
@@ -30,7 +30,7 @@ export function mapSetupSummaryRowsToSelectionProps(args: {
   onNavigate?: (targetSetId: string) => void
 }): SelectionSummaryRowProps[] {
   return mapSummaryDecisionRowsToSelectionProps({
-    rows: setupSummaryRowsToDecisionRows(args.rows, args.onNavigate),
+    rows: setupSummaryRowsToSummaryDecisionRows(args.rows, args.onNavigate),
     activeDecisionId: args.activeTargetId,
     defaultChangeLabel: args.changeLabel ?? CREATE_SETUP_DEFAULT_CHANGE_LABEL,
   })
@@ -70,6 +70,6 @@ export function setupSummaryCardsToDecisionCards(
   return cards.map((card) => ({
     id: card.id,
     eyebrow: card.eyebrow,
-    rows: setupSummaryRowsToDecisionRows(card.rows, onNavigate),
+    rows: setupSummaryRowsToSummaryDecisionRows(card.rows, onNavigate),
   }))
 }

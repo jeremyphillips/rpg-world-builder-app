@@ -109,16 +109,16 @@ Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for th
 ### Completed decisions vs entity collections
 
 Presentation for **completed decisions** (label, value, optional description, Change navigation) is
-owned by `@rpg/ui`: `SummaryDecisionRow`, `mapSummaryDecisionRowsToSelectionProps`, and
-`SelectionSummaryCard` / `SelectionSummaryCards`. Create-setup adds registry resolution and panel
-wiring only — not a second visual system.
+owned by `@rpg/ui`: `SummaryDecisionRow`, `DecisionSummaryPanel` (`chrome: 'card' | 'embedded'`),
+`SELECTION_SUMMARY_DEFAULT_EYEBROW` (`Selections`), and `SelectionSummaryCards`. Create-setup adds
+registry resolution and panel wiring only — not a second visual system.
 
 | Need                                                  | Use                                                                                |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | Progressive create setup (sets, invalidation, footer) | This library: registry + `CreateSetupPanel` / `useCreateSetupSequence`             |
 | Authoring recap or modal strip after setup            | `resolveSetupSummaryRows` + `SetupSummaryRows`, or `CreateModalShell.setupSummary` |
-| Drawer / reducer wizard (no `CreateSetupSet[]`)       | `SummaryDecisionRow` + `SelectionSummaryCards` from `@rpg/ui`                      |
-| Nested composer completed decisions (cardless stack)  | `CreateCompositionSummary` in `@/lib/create-flow`                                  |
+| Drawer / reducer wizard (no `CreateSetupSet[]`)       | `DrawerDecisionSummary` or `DecisionSummaryPanel` (default card + Selections)      |
+| Nested composer completed decisions (cardless stack)  | `CreateCompositionSummary` → embedded `DecisionSummaryPanel`                       |
 | Committed entities in a list (edit/remove)            | `ContentFormEntitySelectionRow` — not summary cards                                |
 
 ## Consumers

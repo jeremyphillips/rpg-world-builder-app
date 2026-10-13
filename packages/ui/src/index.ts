@@ -534,9 +534,13 @@ export {
   type SelectionSummaryRowProps,
 } from './components/ui/selection-summary-card'
 export {
+  DecisionSummaryPanel,
   mapSummaryDecisionRowsToSelectionProps,
   SELECTION_SUMMARY_DEFAULT_CHANGE_LABEL,
+  SELECTION_SUMMARY_DEFAULT_EYEBROW,
   SelectionSummaryCards,
+  type DecisionSummaryChrome,
+  type DecisionSummaryPanelProps,
   type SelectionSummaryCardsProps,
   type SummaryDecisionCard,
   type SummaryDecisionRow,

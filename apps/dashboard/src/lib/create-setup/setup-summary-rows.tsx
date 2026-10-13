@@ -1,11 +1,11 @@
-import { SelectionSummaryCard } from '@rpg/ui'
+import { DecisionSummaryPanel } from '@rpg/ui'
 
 import { CREATE_SETUP_DEFAULT_CHANGE_LABEL } from './create-setup.constants'
 import type { SetupSummaryRow } from './resolve-setup-summary-rows.lib'
-import { mapSetupSummaryRowsToSelectionProps } from './setup-summary-row-models'
+import { setupSummaryRowsToSummaryDecisionRows } from './setup-summary-row-models'
 
 export type SetupSummaryRowsProps = {
-  eyebrow: string
+  eyebrow?: string
   rows: readonly SetupSummaryRow[]
   activeTargetId?: string | null
   changeLabel?: string
@@ -21,14 +21,12 @@ export function SetupSummaryRows({
   onNavigate,
 }: SetupSummaryRowsProps) {
   return (
-    <SelectionSummaryCard
-      eyebrow={eyebrow}
-      rows={mapSetupSummaryRowsToSelectionProps({
-        rows,
-        activeTargetId,
-        changeLabel,
-        onNavigate,
-      })}
+    <DecisionSummaryPanel
+      chrome="card"
+      rows={setupSummaryRowsToSummaryDecisionRows(rows, onNavigate)}
+      activeDecisionId={activeTargetId}
+      defaultChangeLabel={changeLabel}
+      {...(eyebrow !== undefined ? { eyebrow } : {})}
     />
   )
 }

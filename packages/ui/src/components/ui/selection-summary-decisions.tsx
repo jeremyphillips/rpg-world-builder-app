@@ -5,10 +5,13 @@ import type { ReactNode } from 'react'
 import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
+  SelectionSummaryRow,
   type SelectionSummaryRowProps,
 } from './selection-summary-card'
+import { selectionSummaryCardListClasses } from './selection-summary-card.variants'
 
 export const SELECTION_SUMMARY_DEFAULT_CHANGE_LABEL = 'Change' as const
+export const SELECTION_SUMMARY_DEFAULT_EYEBROW = 'Selections' as const
 
 export type SummaryDecisionRow = {
   id: string
@@ -25,7 +28,7 @@ export type SummaryDecisionRow = {
 
 export type SummaryDecisionCard = {
   id: string
-  eyebrow: string
+  eyebrow?: string
   rows: readonly SummaryDecisionRow[]
 }
 
@@ -71,11 +74,71 @@ export function mapSummaryDecisionRowsToSelectionProps(args: {
   })
 }
 
+export type DecisionSummaryChrome = 'card' | 'embedded'
+
+export type DecisionSummaryPanelProps = {
+  rows: readonly SummaryDecisionRow[]
+  /** Default `card` — bordered summary shell + eyebrow. Use `embedded` inside composition stacks. */
+  chrome?: DecisionSummaryChrome
+  /** Default `Selections` for card chrome. Pass `false` to omit (embedded layouts only). */
+  eyebrow?: string | false
+  activeDecisionId?: string | null
+  defaultChangeLabel?: string
+  className?: string
+}
+
+/** Completed decisions with explicit card vs embedded chrome. */
+export function DecisionSummaryPanel({
+  rows,
+  chrome = 'card',
+  eyebrow,
+  activeDecisionId = null,
+  defaultChangeLabel,
+  className,
+}: DecisionSummaryPanelProps) {
+  if (rows.length === 0) return null
+
+  const selectionRows = mapSummaryDecisionRowsToSelectionProps({
+    rows,
+    activeDecisionId,
+    defaultChangeLabel,
+  })
+  if (selectionRows.length === 0) return null
+
+  if (chrome === 'embedded') {
+    return (
+      <dl className={selectionSummaryCardListClasses}>
+        {selectionRows.map((row, index) => (
+          <SelectionSummaryRow key={rows[index]!.id} {...row} showDivider={index > 0} />
+        ))}
+      </dl>
+    )
+  }
+
+  const resolvedEyebrow = typeof eyebrow === 'string' ? eyebrow : SELECTION_SUMMARY_DEFAULT_EYEBROW
+
+  return (
+    <SelectionSummaryCard
+      eyebrow={resolvedEyebrow}
+      rows={selectionRows}
+      {...(className ? { className } : {})}
+    />
+  )
+}
+
 export type SelectionSummaryCardsProps = {
   cards: readonly SummaryDecisionCard[]
   activeDecisionId?: string | null
   defaultChangeLabel?: string
+  defaultEyebrow?: string
   className?: string
+}
+
+function resolveSummaryDecisionCardEyebrow(
+  card: SummaryDecisionCard,
+  defaultEyebrow: string,
+): string {
+  return card.eyebrow ?? defaultEyebrow
 }
 
 /** Renders one or more completed-decision summary cards from neutral row models. */
@@ -83,6 +146,7 @@ export function SelectionSummaryCards({
   cards,
   activeDecisionId = null,
   defaultChangeLabel,
+  defaultEyebrow = SELECTION_SUMMARY_DEFAULT_EYEBROW,
   className,
 }: SelectionSummaryCardsProps) {
   const rendered = cards.flatMap((card) => {
@@ -96,7 +160,7 @@ export function SelectionSummaryCards({
     return [
       <SelectionSummaryCard
         key={card.id}
-        eyebrow={card.eyebrow}
+        eyebrow={resolveSummaryDecisionCardEyebrow(card, defaultEyebrow)}
         rows={rows}
         {...(className ? { className } : {})}
       />,
