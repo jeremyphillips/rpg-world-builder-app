@@ -6,7 +6,7 @@ import {
   type MonsterActionKind,
 } from '@rpg/contracts'
 
-import type { MonsterActionSection } from './monster-equipment-references'
+import type { MonsterActionSection } from './monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
 
 type DraftUnion = typeof monsterActionDraftSchema

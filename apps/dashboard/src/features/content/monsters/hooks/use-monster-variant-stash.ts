@@ -9,7 +9,7 @@ import {
   transitionHitPoints,
   type MonsterArmorClassKind,
   type MonsterVariantStash,
-} from '../lib/monster-variant-transitions'
+} from '../lib/statistics/monster-variant-transitions'
 
 function valuesMatch(left: unknown, right: unknown): boolean {
   return JSON.stringify(left) === JSON.stringify(right)

@@ -22,13 +22,13 @@ import {
   monsterActionSectionHeading,
   type MonsterActionDraftRow,
   type MonsterActionPresetId,
-} from '../../lib/monster-action-presets'
+} from '../../lib/actions/monster-action-presets'
 import { collectMonsterFormAdvisories } from '../../lib/monster-form-advisories'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from '../../lib/monster-equipment-references'
-import { equipmentEntryReferenceLabel } from '../../lib/monster-equipment-labels'
+} from '../../lib/actions/monster-action-equipment-references'
+import { equipmentEntryReferenceLabel } from '../../lib/equipment/monster-equipment-labels'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ACTION_DETAIL_EMPTY,

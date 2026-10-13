@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveMonsterCreateDefaultValues } from './monster-form-values'
+import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 import {
   applyHitPointsFixedToggle,
   formatMonsterHitPointsPreviewLine,

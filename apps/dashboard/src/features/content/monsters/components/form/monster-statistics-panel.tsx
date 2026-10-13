@@ -28,7 +28,10 @@ import {
   monsterChooseBodyArmorMessage,
   monsterGoToEquipmentLabel,
 } from '../../lib/monster-form-labels'
-import { equipmentArmorRole, equipmentEntryBaseName } from '../../lib/monster-equipment-labels'
+import {
+  equipmentArmorRole,
+  equipmentEntryBaseName,
+} from '../../lib/equipment/monster-equipment-labels'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import { resolveMonsterFormViewForPath } from '../../lib/monster-form-view'
@@ -37,7 +40,7 @@ import {
   statisticsIssueLabel,
   statisticsIssuesForDisplay,
   type StatisticsFieldIssue,
-} from '../../lib/monster-statistics-errors'
+} from '../../lib/statistics/monster-statistics-errors'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 

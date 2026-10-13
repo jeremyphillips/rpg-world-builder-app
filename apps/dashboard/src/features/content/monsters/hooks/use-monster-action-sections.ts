@@ -7,21 +7,21 @@ import {
   actionMoveDropsTrigger,
   describeActionKindSwitchLoss,
   reconcileMonsterActionKind,
-} from '../lib/monster-action-kind'
+} from '../lib/actions/monster-action-kind'
 import {
   createActionFromPreset,
   type MonsterActionDraftRow,
   type MonsterActionPresetId,
-} from '../lib/monster-action-presets'
+} from '../lib/actions/monster-action-presets'
 import {
   firstMonsterActionId,
   resolveFirstInvalidActionPath,
   resolveMonsterActionSelectionAfterRemoval,
-} from '../lib/monster-action-selection'
+} from '../lib/actions/monster-action-selection'
 import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
-} from '../lib/monster-equipment-references'
+} from '../lib/actions/monster-action-equipment-references'
 import type { MonsterFormValues } from '../lib/monster-form-values'
 import type { MonsterActionKind } from '@rpg/contracts'
 

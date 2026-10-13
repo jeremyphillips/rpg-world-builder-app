@@ -1,6 +1,6 @@
 import type { MonsterActionKind } from '@rpg/contracts'
 
-import type { MonsterActionSection } from './monster-equipment-references'
+import type { MonsterActionSection } from './monster-action-equipment-references'
 
 export const MONSTER_NATURAL_WEAPON_PRESETS = [
   { id: 'claw', name: 'Claw', damageType: 'slashing' },

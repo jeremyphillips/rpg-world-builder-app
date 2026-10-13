@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { findActionsReferencingEntry } from './monster-equipment-references'
-import type { MonsterFormValues } from './monster-form-values'
+import { findActionsReferencingEntry } from './monster-action-equipment-references'
+import type { MonsterFormValues } from '../monster-form-values'
 
 function formWithEquipment(equipment: MonsterFormValues['equipment']): MonsterFormValues {
   return {

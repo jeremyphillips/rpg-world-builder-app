@@ -4,7 +4,7 @@ import {
   MONSTER_ABILITY_SCORES_HEADING,
   MONSTER_ARMOR_CLASS_HEADING,
   MONSTER_HIT_POINTS_HEADING,
-} from './monster-form-labels'
+} from '../monster-form-labels'
 
 const SECTION_LABELS: Record<string, string> = {
   armorClass: MONSTER_ARMOR_CLASS_HEADING,

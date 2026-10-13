@@ -1,4 +1,4 @@
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 export type MonsterArmorClassKind = MonsterFormValues['armorClass']['kind']
 

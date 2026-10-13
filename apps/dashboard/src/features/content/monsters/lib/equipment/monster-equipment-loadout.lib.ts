@@ -1,6 +1,6 @@
 import { findCanonicalPlainEntry, normalizeEquipmentInstance, type Equipment } from '@rpg/contracts'
 
-import type { MonsterEquipmentFormEntry } from './monster-form-values'
+import type { MonsterEquipmentFormEntry } from '../monster-form-values'
 
 export function createPlainMonsterEquipmentEntry(equipmentId: string): MonsterEquipmentFormEntry {
   return normalizeEquipmentInstance({

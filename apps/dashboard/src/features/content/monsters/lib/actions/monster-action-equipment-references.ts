@@ -1,4 +1,4 @@
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 export const MONSTER_ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
 

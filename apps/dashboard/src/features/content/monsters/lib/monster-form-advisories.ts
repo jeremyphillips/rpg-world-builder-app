@@ -5,11 +5,14 @@ import {
   type Equipment,
 } from '@rpg/contracts'
 
-import { equipmentArmorRole, equipmentEntryBaseName } from './monster-equipment-labels'
-import { coerceCreatureWeaponProficienciesForForm } from './monster-weapon-proficiencies-form.lib'
-import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from './monster-equipment-references'
+import { equipmentArmorRole, equipmentEntryBaseName } from './equipment/monster-equipment-labels'
+import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
+import {
+  MONSTER_ACTION_SECTIONS,
+  type MonsterActionSection,
+} from './actions/monster-action-equipment-references'
 import { monsterBodyArmorIgnoredMessage } from './monster-form-labels'
-import type { MonsterActionDraftRow } from './monster-action-presets'
+import type { MonsterActionDraftRow } from './actions/monster-action-presets'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterFormAdvisory = {

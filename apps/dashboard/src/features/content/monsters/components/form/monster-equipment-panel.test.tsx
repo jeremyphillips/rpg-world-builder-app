@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { formatMonsterEquipmentRowMetadata } from '../../lib/monster-equipment-entry-display.lib'
+import { formatMonsterEquipmentRowMetadata } from '../../lib/equipment/monster-equipment-entry-display.lib'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,

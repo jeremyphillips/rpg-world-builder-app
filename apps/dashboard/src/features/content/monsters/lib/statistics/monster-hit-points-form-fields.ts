@@ -1,7 +1,7 @@
 import { CREATURE_SIZE_HIT_DIE, type CreatureSize } from '@rpg/contracts'
 import type { FieldVisibility, FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
 
-import { MONSTER_HIT_POINTS_HEADING } from './monster-form-labels'
+import { MONSTER_HIT_POINTS_HEADING } from '../monster-form-labels'
 import {
   formatMonsterHitPointsPreviewLine,
   MONSTER_HIT_POINTS_DICE_COUNT_FIELD,
@@ -9,7 +9,7 @@ import {
   MONSTER_HIT_POINTS_DICE_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
 } from './monster-hit-points-form.lib'
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 const HIT_DIE_FACE_OPTIONS: SelectFieldOptionListItem[] = [
   ...new Set(Object.values(CREATURE_SIZE_HIT_DIE)),

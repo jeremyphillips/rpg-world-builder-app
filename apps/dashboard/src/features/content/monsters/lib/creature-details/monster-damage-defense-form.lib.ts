@@ -1,7 +1,7 @@
 import { resolveDamageDefenseOptionState, type CreatureDamageDefenseList } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 export function damageDefenseComboboxOptions(
   activeList: CreatureDamageDefenseList,

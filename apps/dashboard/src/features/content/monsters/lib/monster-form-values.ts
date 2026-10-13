@@ -16,8 +16,8 @@ import {
   MONSTER_HIT_POINTS_STASH_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
   hitPointsDiceFromFormValues,
-} from './monster-hit-points-form.lib'
-import type { MonsterHitPointStash } from './monster-variant-transitions'
+} from './statistics/monster-hit-points-form.lib'
+import type { MonsterHitPointStash } from './statistics/monster-variant-transitions'
 
 import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'
 import type { ContentFormInputCtx } from '../../lib/forms/registry/content-form-registry'
@@ -44,7 +44,7 @@ import {
 import {
   coerceCreatureWeaponProficienciesForForm,
   weaponProficiencyModeFromFormWeapons,
-} from './monster-weapon-proficiencies-form.lib'
+} from './creature-details/monster-weapon-proficiencies-form.lib'
 
 /** Form state uses a weapon grant set; save normalizes to persisted target rows. */
 export type MonsterFormProficiencies = Omit<Monster['proficiencies'], 'weapons'> & {

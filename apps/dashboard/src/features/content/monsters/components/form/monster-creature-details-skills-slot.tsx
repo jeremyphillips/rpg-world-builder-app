@@ -23,7 +23,7 @@ import {
   MONSTER_SKILL_LOADING,
 } from '../../lib/monster-form-labels'
 import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
-import { monsterSkillDerivedMetadataLine } from '../../lib/monster-skill-derived-metadata.lib'
+import { monsterSkillDerivedMetadataLine } from '../../lib/creature-details/monster-skill-derived-metadata.lib'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
 

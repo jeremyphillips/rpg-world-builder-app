@@ -6,7 +6,7 @@ import {
 } from '@rpg/contracts'
 import type { DiceFormulaValue, FormValueSync } from '@rpg/ui/form'
 
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 import { transitionHitPoints, type MonsterHitPointStash } from './monster-variant-transitions'
 
 export const MONSTER_HIT_POINTS_USE_FIXED_FIELD = 'hitPointsUseFixed'

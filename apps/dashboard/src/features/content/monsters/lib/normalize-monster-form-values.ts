@@ -5,13 +5,13 @@ import {
   type ContentValidationIntent,
 } from '@rpg/contracts'
 
-import { monsterActionActiveKeys } from './monster-action-kind'
+import { monsterActionActiveKeys } from './actions/monster-action-kind'
 
 import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-movement-form-fields'
 
 import { normalizeWeaponProficiencyGrantSet } from '../../classes/lib/class-weapon-proficiency-helpers'
 
-import { coerceCreatureWeaponProficienciesForForm } from './monster-weapon-proficiencies-form.lib'
+import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {

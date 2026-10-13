@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 import { commitEquipmentEditorSession } from '@/features/content/equipment/lib/instance-editor/commit-equipment-editor-session'
 import { createEquipmentEditorState } from '@/features/content/equipment/lib/instance-editor/equipment-editor-reducer'
 
-import { findActionsReferencingEntry } from './monster-equipment-references'
-import type { MonsterFormValues } from './monster-form-values'
+import { findActionsReferencingEntry } from './monster-action-equipment-references'
+import type { MonsterFormValues } from '../monster-form-values'
 
 describe('equipment split and action references', () => {
   it('keeps action equipmentEntryId on the source stack after a one-scope split', () => {

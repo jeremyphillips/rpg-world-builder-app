@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { FormEmbeddedMasterDetailEditor } from '../../../components/master-detail/form-embedded-master-detail-editor'
-import { createMonsterRowId } from '../../lib/monster-action-presets'
+import { createMonsterRowId } from '../../lib/actions/monster-action-presets'
 import { MONSTER_TRAITS_HEADING } from '../../lib/monster-form-labels'
 import {
   MONSTER_TRAIT_ITEM_NOUN,

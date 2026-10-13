@@ -6,7 +6,7 @@ import {
   type CreatureWeaponProficiencies,
 } from '@rpg/contracts'
 
-import type { WeaponProficiencyMode } from '../../classes/lib/class-form-constants'
+import type { WeaponProficiencyMode } from '../../../classes/lib/class-form-constants'
 
 /** Normalizes API/draft weapon proficiencies to the grant-set shape the form expects. */
 export function coerceCreatureWeaponProficienciesForForm(

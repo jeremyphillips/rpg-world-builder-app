@@ -14,7 +14,7 @@ import {
   refineMovementRows,
   type MovementRowDraftFormValues,
 } from '../../lib/forms/fields/content-movement-form-fields'
-import { stripMonsterHitPointsAuthoringFields } from './monster-hit-points-form.lib'
+import { stripMonsterHitPointsAuthoringFields } from './statistics/monster-hit-points-form.lib'
 
 function catalogLoadStatus(
   status: ContentFormCtx['equipmentCatalogStatus'],

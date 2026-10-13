@@ -37,20 +37,20 @@ import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/cont
 import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
 import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
-import { formatMonsterEquipmentRowMetadata } from '../../lib/monster-equipment-entry-display.lib'
+import { formatMonsterEquipmentRowMetadata } from '../../lib/equipment/monster-equipment-entry-display.lib'
 import {
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
   setMonsterPlainStackQuantity,
-} from '../../lib/monster-equipment-loadout.lib'
+} from '../../lib/equipment/monster-equipment-loadout.lib'
 import {
   equipmentEntryBaseName,
   equipmentEntryReferenceLabel,
-} from '../../lib/monster-equipment-labels'
+} from '../../lib/equipment/monster-equipment-labels'
 import {
   findActionsReferencingEntry,
   removeEquipmentEntryWithDependents,
-} from '../../lib/monster-equipment-references'
+} from '../../lib/actions/monster-action-equipment-references'
 import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
   MONSTER_LOADING_EQUIPMENT,

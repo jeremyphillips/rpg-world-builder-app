@@ -5,9 +5,9 @@ import { planEquipmentCatalogChange } from './monster-equipment-catalog-change'
 import {
   findActionsReferencingEntry,
   removeEquipmentEntryWithDependents,
-} from './monster-equipment-references'
+} from '../actions/monster-action-equipment-references'
 import { equipmentEntryReferenceLabel } from './monster-equipment-labels'
-import { resolveMonsterCreateDefaultValues } from './monster-form-values'
+import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 
 const dagger = { id: 'dagger', kind: 'weapon', name: 'Dagger' } as Equipment
 const bow = { id: 'bow', kind: 'weapon', name: 'Shortbow' } as Equipment

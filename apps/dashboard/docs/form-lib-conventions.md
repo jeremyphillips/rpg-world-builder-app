@@ -396,6 +396,7 @@ this table when completing a form-lib alignment phase.
 | Feats                    | `feats/lib/feat-form-def.ts`, `feat-form-fields.ts`, `feat-form-values.ts`                                                                                                         | aligned |
 | Skill proficiencies      | `skill-proficiencies/lib/skill-proficiency-form-def.ts`, `*-form-fields.ts`, `*-form-values.ts`                                                                                    | aligned |
 | Campaign access          | `content/lib/campaign-access/` — see [campaign-access README](../src/features/content/lib/campaign-access/README.md) for unified save session, disclosure, and participant context | aligned |
+| Monsters (hub)           | `monsters/lib/monster-form-def.ts`, `monster-form-fields.tsx`, `monster-form-values.ts`; tab slices under `lib/{equipment,actions,statistics,creature-details}/`                   | aligned |
 
 ### Form config first (no parallel layout paths)
 

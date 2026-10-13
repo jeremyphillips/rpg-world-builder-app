@@ -3,8 +3,8 @@ import { isArmorEquipment, isWeaponEquipment, type Equipment } from '@rpg/contra
 import {
   findActionsReferencingEntry,
   type MonsterEquipmentActionReference,
-} from './monster-equipment-references'
-import type { MonsterEquipmentFormEntry, MonsterFormValues } from './monster-form-values'
+} from '../actions/monster-action-equipment-references'
+import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../monster-form-values'
 
 export type EquipmentCatalogChangePlan =
   | {

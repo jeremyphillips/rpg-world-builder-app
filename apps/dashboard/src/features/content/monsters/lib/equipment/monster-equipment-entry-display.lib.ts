@@ -7,7 +7,7 @@ import {
   type Monster,
 } from '@rpg/contracts'
 
-import type { MonsterEquipmentFormEntry } from './monster-form-values'
+import type { MonsterEquipmentFormEntry } from '../monster-form-values'
 
 // fallow-ignore-next-line complexity
 export function formatMonsterEquipmentRowMetadata(args: {

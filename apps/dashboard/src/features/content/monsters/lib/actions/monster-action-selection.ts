@@ -4,10 +4,13 @@ import {
   findFirstInvalidRowIndex,
   resolveAdjacentIndex,
   resolveSelectionAfterRemoval,
-} from '../../lib/master-detail/master-detail-selection'
-import { MONSTER_ACTION_SECTIONS, type MonsterActionSection } from './monster-equipment-references'
+} from '../../../lib/master-detail/master-detail-selection'
+import {
+  MONSTER_ACTION_SECTIONS,
+  type MonsterActionSection,
+} from './monster-action-equipment-references'
 import type { MonsterActionDraftRow } from './monster-action-presets'
-import type { MonsterFormValues } from './monster-form-values'
+import type { MonsterFormValues } from '../monster-form-values'
 
 function sectionRows(
   values: Pick<MonsterFormValues, MonsterActionSection>,

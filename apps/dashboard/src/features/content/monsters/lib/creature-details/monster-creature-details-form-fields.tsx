@@ -11,27 +11,27 @@ import { toOptions, type FormItem } from '@rpg/ui/form'
 
 import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
 
-import { referenceWeaponFieldOptions } from '../../lib/form-options/content-field-option.lib'
-import { resolveContentWeaponGrantOptionLabel } from '../../lib/forms/grants/content-weapon-grant-option-label.lib'
-import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
+import { referenceWeaponFieldOptions } from '../../../lib/form-options/content-field-option.lib'
+import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
+import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
   WEAPON_PROFICIENCY_MODES,
   type WeaponProficiencyMode,
-} from '../../classes/lib/class-form-constants'
+} from '../../../classes/lib/class-form-constants'
 import {
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   WEAPON_PROFICIENCIES_HINT,
   WEAPON_PROFICIENCY_MODE_LABELS,
-} from '../../classes/lib/class-form-labels'
+} from '../../../classes/lib/class-form-labels'
 import {
   MonsterCreatureDetailsLanguagesSlot,
   MonsterCreatureDetailsSensesSlot,
   MonsterCreatureDetailsSkillsSlot,
   MonsterTelepathyRangeField,
-} from '../components/form/monster-creature-details-slots'
+} from '../../components/form/monster-creature-details-slots'
 import { damageDefenseComboboxOptions } from './monster-damage-defense-form.lib'
-import { MONSTER_WEAPON_PROFICIENCIES_HEADING } from './monster-form-labels'
-import type { MonsterFormValues } from './monster-form-values'
+import { MONSTER_WEAPON_PROFICIENCIES_HEADING } from '../monster-form-labels'
+import type { MonsterFormValues } from '../monster-form-values'
 
 const weaponCategoryOptions = toOptions(
   WEAPON_CATEGORIES,

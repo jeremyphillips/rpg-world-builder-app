@@ -13,9 +13,9 @@ import {
   resolveFirstInvalidActionPath,
   resolveMonsterActionSelectionAfterRemoval,
 } from './monster-action-selection'
-import { collectMonsterFormAdvisories } from './monster-form-advisories'
-import { resolveMonsterCreateDefaultValues } from './monster-form-values'
-import { buildMonsterInput, monsterToFormValues } from './monster-form-values'
+import { collectMonsterFormAdvisories } from '../monster-form-advisories'
+import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import { buildMonsterInput, monsterToFormValues } from '../monster-form-values'
 import type { FieldErrors } from 'react-hook-form'
 
 describe('monster action presets', () => {
