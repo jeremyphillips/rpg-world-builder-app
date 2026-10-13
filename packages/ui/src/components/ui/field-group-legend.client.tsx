@@ -4,9 +4,9 @@ import { ChevronDown } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import {
-  formSectionHeaderActionLayoutClasses,
   formSectionHeaderActionSlotClasses,
   formSectionHeaderLabelRowClasses,
+  resolveFormSectionHeaderActionLayoutClasses,
 } from '../../form/presentation/form-section-header.variants'
 import {
   fieldGroupDescriptionCompactTypographyClasses,
@@ -52,9 +52,11 @@ function LegendActionEndSlot({ action }: { action: React.ReactNode }) {
 
 function LegendHeaderActionLayout({
   action,
+  hasStackedHint,
   children,
 }: {
   action?: React.ReactNode
+  hasStackedHint: boolean
   children: React.ReactNode
 }) {
   if (!action) {
@@ -62,7 +64,7 @@ function LegendHeaderActionLayout({
   }
 
   return (
-    <div className={formSectionHeaderActionLayoutClasses}>
+    <div className={resolveFormSectionHeaderActionLayoutClasses({ hasStackedHint })}>
       <div className="min-w-0">{children}</div>
       <LegendActionEndSlot action={action} />
     </div>
@@ -110,15 +112,19 @@ function StaticFieldGroupLegend({
   legendChromeClassName,
   legendContent,
   legendAction,
+  hasStackedHint,
 }: {
   legendTypography: string
   legendChromeClassName: string
   legendContent: React.ReactNode
   legendAction?: React.ReactNode
+  hasStackedHint: boolean
 }) {
   return (
     <legend className={cn(legendTypography, 'w-full min-w-0', legendChromeClassName)}>
-      <LegendHeaderActionLayout action={legendAction}>{legendContent}</LegendHeaderActionLayout>
+      <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
+        {legendContent}
+      </LegendHeaderActionLayout>
     </legend>
   )
 }
@@ -129,6 +135,7 @@ function CollapsibleFieldGroupLegend({
   legendContent,
   legendAccessory,
   legendAction,
+  hasStackedHint,
   rhythm,
   open,
   onToggle,
@@ -138,6 +145,7 @@ function CollapsibleFieldGroupLegend({
   legendContent: React.ReactNode
   legendAccessory?: React.ReactNode
   legendAction?: React.ReactNode
+  hasStackedHint: boolean
   rhythm: FieldRhythm
   open?: boolean
   onToggle?: () => void
@@ -162,7 +170,9 @@ function CollapsibleFieldGroupLegend({
 
   return (
     <legend className={cn(legendTypography, 'w-full min-w-0', legendChromeClassName)}>
-      <LegendHeaderActionLayout action={legendAction}>{toggleRow}</LegendHeaderActionLayout>
+      <LegendHeaderActionLayout action={legendAction} hasStackedHint={hasStackedHint}>
+        {toggleRow}
+      </LegendHeaderActionLayout>
     </legend>
   )
 }
@@ -193,6 +203,7 @@ export function FieldGroupLegend({
     descriptionTypography,
   }
   const legendContent = resolveLegendContent(contentOptions)
+  const hasStackedHint = Boolean(description)
 
   if (!collapsible) {
     return (
@@ -201,6 +212,7 @@ export function FieldGroupLegend({
         legendChromeClassName={legendChromeClassName}
         legendContent={legendContent}
         legendAction={legendAction}
+        hasStackedHint={hasStackedHint}
       />
     )
   }
@@ -212,6 +224,7 @@ export function FieldGroupLegend({
       legendContent={legendContent}
       legendAccessory={legendAccessory}
       legendAction={legendAction}
+      hasStackedHint={hasStackedHint}
       rhythm={rhythm}
       open={open}
       onToggle={onToggle}

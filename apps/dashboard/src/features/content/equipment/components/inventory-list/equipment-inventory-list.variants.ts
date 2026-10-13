@@ -1,6 +1,4 @@
 /** Shared inventory list chrome for character builder and content loadout surfaces. */
-export const equipmentInventorySectionHeaderClasses = 'flex flex-wrap items-center gap-2'
-
 export const EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT = 'subsection' as const
 
 export const equipmentPurchasedInventoryCategoryListClasses =

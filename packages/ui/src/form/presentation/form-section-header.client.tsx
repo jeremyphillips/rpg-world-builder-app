@@ -18,10 +18,10 @@ import type { FieldHintConfig } from '../field-config'
 import { normalizeFieldHint } from '../field-config'
 import type { FormHeadingTier } from '../form-heading.lib'
 import {
-  formSectionHeaderActionLayoutClasses,
   formSectionHeaderActionSlotClasses,
   formSectionHeaderHeadingStackClasses,
   formSectionHeaderLabelRowClasses,
+  resolveFormSectionHeaderActionLayoutClasses,
 } from './form-section-header.variants'
 
 export type FormSectionHeaderLabelPresentation = 'heading' | 'field-label'
@@ -186,6 +186,12 @@ function renderHeadingBlock({
   )
 }
 
+function hasFormSectionHeaderStackedHint(hint: string | FieldHintConfig | undefined): boolean {
+  if (!hint) return false
+  const normalized = normalizeFieldHint(hint)
+  return Boolean(normalized.text)
+}
+
 /** Form section heading — label + optional hint with an optional trailing action. */
 export function FormSectionHeader({
   label,
@@ -214,8 +220,10 @@ export function FormSectionHeader({
     return <div className={className}>{headingBlock}</div>
   }
 
+  const hasStackedHint = hasFormSectionHeaderStackedHint(hint)
+
   return (
-    <div className={cn(formSectionHeaderActionLayoutClasses, className)}>
+    <div className={cn(resolveFormSectionHeaderActionLayoutClasses({ hasStackedHint }), className)}>
       {headingBlock}
       <div className={formSectionHeaderActionSlotClasses}>{action}</div>
     </div>

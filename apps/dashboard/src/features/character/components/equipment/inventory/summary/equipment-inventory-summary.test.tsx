@@ -383,7 +383,7 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    expect(screen.getByRole('heading', { name: 'Added Equipment' })).toBeInTheDocument()
+    expect(screen.getByText('Added Equipment')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^Starting Package/ })).toHaveAttribute(
       'aria-expanded',
       'false',
@@ -462,8 +462,9 @@ describe('EquipmentInventorySummary', () => {
       />,
     )
 
-    const header = screen.getByRole('heading', { name: 'Added Equipment' }).parentElement
-    expect(header).toHaveTextContent('2')
+    const addedSection = screen.getByText('Added Equipment').closest('section')
+    expect(addedSection).not.toBeNull()
+    expect(within(addedSection!).getByText('2')).toBeInTheDocument()
     expect(screen.queryByText('7')).not.toBeInTheDocument()
   })
 

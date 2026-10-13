@@ -6,7 +6,6 @@ export const equipmentInventorySectionClasses = 'space-y-3 px-4 py-4'
 export {
   EQUIPMENT_INVENTORY_SECTION_TITLE_VARIANT,
   equipmentInventoryRowListClasses,
-  equipmentInventorySectionHeaderClasses,
   equipmentPurchasedInventoryCategoryClasses,
   equipmentPurchasedInventoryCategoryListClasses,
 } from '@/features/content/equipment/components/inventory-list/equipment-inventory-list.variants'
