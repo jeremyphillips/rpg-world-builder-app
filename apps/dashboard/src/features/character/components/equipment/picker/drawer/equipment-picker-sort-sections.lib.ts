@@ -1,5 +1,7 @@
 import { collectCatalogSortValues, resolveCatalogSortSections } from '@/lib/catalog-sort'
 
+import type { EquipmentPickerWorkflowMode } from '../../../../lib/equipment/equipment-step.lib'
+
 import {
   EQUIPMENT_PICKER_SORT_AXES,
   EQUIPMENT_PICKER_SORT_BEST_MATCH,
@@ -12,9 +14,10 @@ import {
 
 /** Sort modes enabled for the current equipment workflow, in menu order. */
 export function resolveEquipmentPickerAvailableSortModes(
-  isMagicItemsWorkflow: boolean,
+  workflowMode: EquipmentPickerWorkflowMode,
 ): EquipmentPickerSortMode[] {
-  const availableValues = isMagicItemsWorkflow
+  const hidePriceSort = workflowMode === 'magic_items' || workflowMode === 'loadout'
+  const availableValues = hidePriceSort
     ? EQUIPMENT_PICKER_SORT_MODES.filter(
         (mode) =>
           mode !== EQUIPMENT_PICKER_SORT_PRICE_ASC && mode !== EQUIPMENT_PICKER_SORT_PRICE_DESC,

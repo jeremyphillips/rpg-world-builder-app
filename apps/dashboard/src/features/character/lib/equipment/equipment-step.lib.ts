@@ -212,7 +212,7 @@ export function formatEquipmentInventoryManageHeadline(equipmentName: string): s
   return `Manage ${equipmentName}`
 }
 
-export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items'
+export type EquipmentPickerWorkflowMode = 'purchase' | 'magic_items' | 'loadout'
 
 export const EQUIPMENT_PACKAGE_CUSTOMIZE_LABEL = 'Customize'
 

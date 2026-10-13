@@ -6,7 +6,9 @@ import type {
   CharacterBuilderDraft,
   EquipmentBudgetSummary,
 } from '@rpg/contracts'
-import { Eyebrow, InsetPanel } from '@rpg/ui'
+import { InsetPanel } from '@rpg/ui'
+
+import { EquipmentCategoryGroupedList } from '@/features/content'
 
 import {
   EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE,
@@ -16,11 +18,6 @@ import {
 import { EquipmentAddedInventoryRowItem } from '../added/equipment-added-inventory-row'
 import type { AddedEquipmentCategoryGroup } from '../../../../lib/equipment/equipment-inventory-summary.lib'
 import { resolveSelectionRowStatusItems } from '../../../../lib/selection-row-status'
-import {
-  equipmentInventoryRowListClasses,
-  equipmentPurchasedInventoryCategoryClasses,
-  equipmentPurchasedInventoryCategoryListClasses,
-} from '../equipment-inventory.variants'
 
 export type EquipmentAddedInventorySectionProps = {
   addedEquipment: AddedEquipmentCategoryGroup[]
@@ -67,53 +64,32 @@ export function EquipmentAddedInventorySection({
     )
   }
 
-  const showCategoryHeadings = addedEquipment.filter((group) => group.entries.length > 0).length > 1
-
-  const renderEntryList = (entries: AddedEquipmentCategoryGroup['entries']) => (
-    <ul className={equipmentInventoryRowListClasses}>
-      {entries.map((entry) => (
-        <li key={entry.equipmentId}>
-          <EquipmentAddedInventoryRowItem
-            entry={entry}
-            status={resolveSelectionRowStatusItems(entry.selectionPresentation, {
-              context: 'owned',
-            })}
-            draft={draft}
-            context={context}
-            catalogIndex={catalogIndex}
-            budget={budget}
-            onRemoveItem={onRemoveItem}
-            onSetPurchaseQuantity={onSetPurchaseQuantity}
-            onReleaseGrant={onReleaseGrant}
-            onRemovePurchase={onRemovePurchase}
-            onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
-            open={resolvedOpenEquipmentId === entry.equipmentId}
-            onOpenChange={(open) => setOpenEquipmentId(open ? entry.equipmentId : null)}
-          />
-        </li>
-      ))}
-    </ul>
-  )
-
-  if (!showCategoryHeadings) {
-    const flatEntries = addedEquipment.flatMap((group) => group.entries)
-    return (
-      <div className={equipmentPurchasedInventoryCategoryListClasses}>
-        {renderEntryList(flatEntries)}
-      </div>
-    )
-  }
-
   return (
-    <div className={equipmentPurchasedInventoryCategoryListClasses}>
-      {addedEquipment.map((group) =>
-        group.entries.length === 0 ? null : (
-          <section key={group.groupLabel} className={equipmentPurchasedInventoryCategoryClasses}>
-            <Eyebrow size="sm">{group.groupLabel}</Eyebrow>
-            {renderEntryList(group.entries)}
-          </section>
-        ),
+    <EquipmentCategoryGroupedList
+      groups={addedEquipment.map((group) => ({
+        groupLabel: group.groupLabel,
+        items: group.entries,
+      }))}
+      getItemKey={(entry) => entry.equipmentId}
+      renderRow={(entry) => (
+        <EquipmentAddedInventoryRowItem
+          entry={entry}
+          status={resolveSelectionRowStatusItems(entry.selectionPresentation, {
+            context: 'owned',
+          })}
+          draft={draft}
+          context={context}
+          catalogIndex={catalogIndex}
+          budget={budget}
+          onRemoveItem={onRemoveItem}
+          onSetPurchaseQuantity={onSetPurchaseQuantity}
+          onReleaseGrant={onReleaseGrant}
+          onRemovePurchase={onRemovePurchase}
+          onApplyMagicItemAcquisition={onApplyMagicItemAcquisition}
+          open={resolvedOpenEquipmentId === entry.equipmentId}
+          onOpenChange={(open) => setOpenEquipmentId(open ? entry.equipmentId : null)}
+        />
       )}
-    </div>
+    />
   )
 }

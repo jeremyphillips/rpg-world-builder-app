@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
+
+import { campaignAccessPatchRegistrationKey } from './campaign-access-state'
 import type {
   ContentCampaignAccessPatch,
   ContentUsageBlocker,
@@ -64,6 +66,8 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
     bindingsRef.current = bindings
   })
 
+  const pendingAccessKey = campaignAccessPatchRegistrationKey(bindings.pendingAccess)
+
   useEffect(() => {
     register({
       isDirty: bindings.isDirty,
@@ -74,8 +78,11 @@ export function useCampaignAccessParticipantUpdater(bindings: CampaignAccessForm
       readPendingAvailable: () => bindingsRef.current.readPendingAvailable?.(),
       readAccessAvailabilityChanged: () => bindingsRef.current.readAccessAvailabilityChanged?.(),
     })
+  }, [bindings.isDirty, bindings.isPending, pendingAccessKey, register])
+
+  useEffect(() => {
     return () => register(DEFAULT_CAMPAIGN_ACCESS_PARTICIPANT)
-  }, [bindings.isDirty, bindings.isPending, bindings.pendingAccess, register])
+  }, [register])
 }
 
 /** Read-only participant state for shells, guards, and disclosure. */

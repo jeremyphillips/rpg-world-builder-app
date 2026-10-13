@@ -172,6 +172,13 @@ export {
   formatContentReferenceLabel,
 } from './lib/display/format-content-reference-label'
 export {
+  EquipmentPickerDrawer,
+  type EquipmentPickerDrawerProps,
+} from './components/equipment/picker/drawer/equipment-picker-drawer'
+export { buildEquipmentLoadoutRowViewModel } from './components/equipment/picker/equipment-picker-action.lib'
+export { enrichEquipmentPickerItemsWithSearchDocument } from './lib/equipment/equipment-picker-search.lib'
+export { EquipmentQuantityStepper } from './components/equipment/equipment-quantity-stepper'
+export {
   hasCatalogPickerNarrowingCriteria,
   hasCatalogPickerResetViewCriteria,
   resolveCatalogPickerResultSummary,

@@ -1,6 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatChoiceSetDrawerHeading } from './format-choice-set-drawer-copy'
+import {
+  formatChoiceSetDrawerHeading,
+  formatEquipmentLoadoutPickerHeading,
+} from './format-choice-set-drawer-copy'
+
+describe('formatEquipmentLoadoutPickerHeading', () => {
+  it('uses add semantics for creature loadout pickers', () => {
+    expect(formatEquipmentLoadoutPickerHeading()).toBe('Add equipment')
+  })
+})
 
 describe('formatChoiceSetDrawerHeading', () => {
   it('returns stable Choose headings from choice type vocabulary', () => {

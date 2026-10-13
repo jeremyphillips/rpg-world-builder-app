@@ -61,10 +61,11 @@ export function useEquipmentPickerController({
   onCommitAdd,
 }: UseEquipmentPickerControllerArgs) {
   const isMagicItemsWorkflow = workflowMode === EQUIPMENT_PICKER_MODE_MAGIC_ITEMS
-  const effectiveBudget = isMagicItemsWorkflow ? undefined : budget
+  const isLoadoutWorkflow = workflowMode === 'loadout'
+  const effectiveBudget = isMagicItemsWorkflow || isLoadoutWorkflow ? undefined : budget
   const effectiveSortModes = React.useMemo(
-    () => resolveEquipmentPickerAvailableSortModes(isMagicItemsWorkflow),
-    [isMagicItemsWorkflow],
+    () => resolveEquipmentPickerAvailableSortModes(workflowMode),
+    [workflowMode],
   )
 
   const supportedItems = React.useMemo(() => filterEligibleEquipmentPickerItems(items), [items])
@@ -201,7 +202,7 @@ export function useEquipmentPickerController({
           preferMartialWeaponBrowseOrder:
             browseSortContext?.preferMartialWeaponBrowseOrder ?? false,
           ...browseSortContext,
-          rankPurchaseAvailability: workflowMode === 'purchase',
+          rankPurchaseAvailability: workflowMode === 'purchase' && !isLoadoutWorkflow,
           rankCompatibility: browseSortContext?.rankCompatibility ?? true,
         },
       }),

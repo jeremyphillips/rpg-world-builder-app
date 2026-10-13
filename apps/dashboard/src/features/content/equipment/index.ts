@@ -16,6 +16,20 @@ export {
 } from './lib/equipment-display'
 export { useEquipment, equipmentQueryKey } from './hooks/use-equipment'
 export {
+  EquipmentCategoryGroupedList,
+  type EquipmentCategoryGroup,
+} from './components/inventory-list/equipment-category-grouped-list'
+export { EquipmentInventorySectionHeader } from './components/inventory-list/equipment-inventory-section-header'
+export { buildLoadoutEquipmentPickerItems } from './lib/loadout/equipment-loadout-picker.lib'
+export { commitEquipmentEditorSession } from './lib/instance-editor/commit-equipment-editor-session'
+export {
+  createEquipmentEditorState,
+  equipmentEditorReducer,
+  isEquipmentEditorSessionDirty,
+  type EquipmentEditorState,
+} from './lib/instance-editor/equipment-editor-reducer'
+export { EquipmentInstanceEditorDrawer } from './components/instance-editor/equipment-instance-editor-drawer'
+export {
   EQUIPMENT_FAMILY_PATHS,
   equipmentKindToFamilyPath,
   familyPathToEquipmentKind,

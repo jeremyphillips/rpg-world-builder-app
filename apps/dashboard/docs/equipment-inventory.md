@@ -4,6 +4,15 @@ Dashboard layout and editing rules for the Equipment step inventory. Contracts
 resolvers and conversion commit logic live in `@rpg/contracts`; this doc covers
 dashboard IA and how the UI composes existing row controls.
 
+## Shared list chrome
+
+`EquipmentInventorySectionHeader` and `EquipmentCategoryGroupedList` live under
+`features/content/equipment/components/inventory-list/`. The character builder
+**Added Equipment** section and the monster **Equipment** tab both use them for
+section title, count badge, and kind-grouped rows (eyebrows only when more than
+one non-empty group). Row metadata uses `statusComposition: 'metadata'` on
+`ContentEntityCard` (Equipped, enhancement, properties, effects).
+
 ## Pending cart after class change
 
 A class change keeps only the player's own purchases (picker and manual rows; see

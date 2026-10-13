@@ -1,11 +1,13 @@
 import type { ComponentProps } from 'react'
 import {
+  ActionIcon,
   Button,
   Input,
   Text,
   cn,
   dialogPanelActionRowClasses,
   dialogPanelSectionInsetXClasses,
+  iconGhostControlVariants,
 } from '@rpg/ui'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { useState } from 'react'
@@ -67,6 +69,26 @@ export const NoFooter: Story = {
   render: () => (
     <DrawerShellDemo title="Read-only panel">
       <Text variant="muted">Body without a footer region.</Text>
+    </DrawerShellDemo>
+  ),
+}
+
+export const WithHeaderLeadingAndContent: Story = {
+  render: () => (
+    <DrawerShellDemo
+      title="Add magic property"
+      headerLeading={
+        <button
+          type="button"
+          className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
+          aria-label="Back to edit item"
+        >
+          <ActionIcon action="back" />
+        </button>
+      }
+      headerContent={<Text variant="muted">Longsword · Qty 1</Text>}
+    >
+      <Text variant="muted">Editor body scrolls independently when header content is set.</Text>
     </DrawerShellDemo>
   ),
 }

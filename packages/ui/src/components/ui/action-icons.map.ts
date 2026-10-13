@@ -1,4 +1,5 @@
 import {
+  ArrowLeft,
   Ellipsis,
   Eye,
   GripVertical,
@@ -19,6 +20,7 @@ import {
 import type { AppIcon } from './app-icon.types'
 
 export const ACTION_ICON_VERBS = [
+  'back',
   'add',
   'edit',
   'remove',
@@ -41,6 +43,7 @@ export type ActionIconVerb = (typeof ACTION_ICON_VERBS)[number]
 
 /** Closed action-verb → glyph map (Lucide today; mixed custom later). */
 export const ACTION_ICONS = {
+  back: ArrowLeft,
   add: Plus,
   edit: Pencil,
   remove: Trash2,

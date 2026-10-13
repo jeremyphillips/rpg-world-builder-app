@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { Button } from '@rpg/ui'
+import { ActionIcon, Button } from '@rpg/ui'
 
 import { DrawerShell } from './drawer-shell'
 
@@ -76,6 +76,27 @@ describe('DrawerShell', () => {
     )
 
     expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-background')
+  })
+
+  it('forwards headerLeading and headerContent to Sheet.Header', () => {
+    render(
+      <DrawerShell
+        open
+        onOpenChange={() => undefined}
+        title="Edit item"
+        headerLeading={
+          <span data-testid="back-icon">
+            <ActionIcon action="back" />
+          </span>
+        }
+        headerContent={<p>Sticky header row</p>}
+      >
+        <p>Drawer body</p>
+      </DrawerShell>,
+    )
+
+    expect(screen.getByTestId('back-icon')).toBeInTheDocument()
+    expect(screen.getByText('Sticky header row')).toBeInTheDocument()
   })
 
   it('allows surface override', () => {

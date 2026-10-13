@@ -35,6 +35,8 @@ Implementation: [`src/components/drawer/`](../src/components/drawer/).
 | -------------------- | -------------------------------------------------------------------------- |
 | `title`              | Required header headline                                                   |
 | `description?`       | Optional header helper line (e.g. vocabulary create)                       |
+| `headerLeading?`     | Optional slot forwarded to `Sheet.Header` `leadIcon` (e.g. back control)   |
+| `headerContent?`     | Optional sticky row under the title stack (name, stepper, scope copy)      |
 | `bodyMode?`          | `scrolling` (default), `managed`, or `composed` — see Body modes           |
 | `footer?`            | Optional shell-owned `Sheet.Footer` actions (`scrolling` / `managed` only) |
 | `DrawerShell.Close`  | Re-export of `Sheet.Close` for cancel buttons                              |

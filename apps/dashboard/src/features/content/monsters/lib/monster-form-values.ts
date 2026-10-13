@@ -51,15 +51,7 @@ export type MonsterFormProficiencies = Omit<Monster['proficiencies'], 'weapons'>
   weapons: CreatureWeaponProficiencies
 }
 
-export type MonsterEquipmentFormEntry = {
-  entryId: string
-  equipmentId: string
-  quantity: number
-  equipped?: boolean
-  customName?: string
-  customDescription?: string
-  modifiers?: Monster['equipment'][number]['modifiers']
-}
+export type MonsterEquipmentFormEntry = Monster['equipment'][number]
 
 export type MonsterFormValues = FieldValues & {
   name: string

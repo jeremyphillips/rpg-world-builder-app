@@ -41,7 +41,11 @@ import {
   type SelectionBlockerReason,
   type SelectionStatusEntry,
 } from '../../../../lib/selection-row-status'
-import type { EquipmentPickerRowActionViewModel } from '../equipment-picker-action.lib'
+import type {
+  EquipmentPickerLoadoutRowViewModel,
+  EquipmentPickerRowActionViewModel,
+} from '../equipment-picker-action.lib'
+import { PICKER_SELECTION_OWNED_LABEL } from '../../../../lib/picker/picker-selection-state'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL,
@@ -302,6 +306,45 @@ function resolvePurchaseControl(args: {
   return { kind: 'add', disabled: rowActionVm.disabled }
 }
 
+function resolveLoadoutPresentation(args: {
+  rowActionVm: EquipmentPickerLoadoutRowViewModel
+  equipmentName: string
+}): EquipmentPickerItemPresentation {
+  const { rowActionVm } = args
+  const control: EquipmentPickerHeaderControl =
+    rowActionVm.plainQuantity > 0
+      ? { kind: 'stepper', value: rowActionVm.plainQuantity, max: rowActionVm.plainQuantity + 999 }
+      : { kind: 'add', disabled: false }
+
+  const provenanceLabels: string[] = []
+  if (rowActionVm.customizedQuantity > 0) {
+    provenanceLabels.push(`${rowActionVm.customizedQuantity} customized`)
+  }
+
+  const ownedLabel =
+    rowActionVm.ownedQuantity <= 1
+      ? PICKER_SELECTION_OWNED_LABEL
+      : `${PICKER_SELECTION_OWNED_LABEL} ×${rowActionVm.ownedQuantity}`
+
+  return {
+    control,
+    provenance: [],
+    selectionState:
+      rowActionVm.ownedQuantity > 0
+        ? {
+            kind: 'owned',
+            provenance: [
+              {
+                kind: 'other',
+                quantity: rowActionVm.ownedQuantity,
+                label: joinInlineMetadata([ownedLabel, ...provenanceLabels]),
+              },
+            ],
+          }
+        : null,
+  }
+}
+
 function resolvePurchasePresentation(args: {
   rowActionVm: Extract<EquipmentPickerRowActionViewModel, { kind: 'purchase' }>
   row: EquipmentPickerRowViewModel
@@ -502,6 +545,13 @@ export function resolveEquipmentPickerItemPresentation(args: {
   if (isAtAcquiredCopyCap(copyCap)) {
     const control = cappedControl(ownership)
     return { control, ...resolveOwnershipLines({ ownership, control, workflowMode }) }
+  }
+
+  if (workflowMode === 'loadout' && rowActionVm.kind === 'loadout') {
+    return resolveLoadoutPresentation({
+      rowActionVm,
+      equipmentName: equipment.name,
+    })
   }
 
   if (workflowMode === 'purchase' && rowActionVm.kind === 'purchase') {

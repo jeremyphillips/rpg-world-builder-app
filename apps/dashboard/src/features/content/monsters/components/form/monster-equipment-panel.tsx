@@ -1,15 +1,49 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { joinInlineMetadata, type Equipment } from '@rpg/contracts'
-import { Button, ConfirmDialog, SemanticText } from '@rpg/ui'
+import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
+import {
+  findCanonicalPlainEntry,
+  getContentTypeTerm,
+  getEquipmentKindCollectionLabel,
+  normalizeEquipmentInstance,
+  type EquipmentPickerItem,
+  type SystemRulesetId,
+} from '@rpg/contracts'
+import {
+  ActionButton,
+  ActionIcon,
+  Button,
+  ConfirmDialog,
+  InsetPanel,
+  SemanticText,
+  iconGhostControlVariants,
+} from '@rpg/ui'
+
+import {
+  buildLoadoutEquipmentPickerItems,
+  EquipmentCategoryGroupedList,
+  EquipmentInventorySectionHeader,
+  EquipmentInstanceEditorDrawer,
+} from '@/features/content'
+import {
+  EquipmentPickerDrawer,
+  EquipmentQuantityStepper,
+  buildEquipmentLoadoutRowViewModel,
+  enrichEquipmentPickerItemsWithSearchDocument,
+} from '@/features/character'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
+import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
 import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
-import { deriveMonsterFormDraft, monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
-import { planEquipmentCatalogChange } from '../../lib/monster-equipment-catalog-change'
+import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
+import { formatMonsterEquipmentRowMetadata } from '../../lib/monster-equipment-entry-display.lib'
 import {
-  equipmentArmorRole,
+  groupMonsterEquipmentByKind,
+  incrementMonsterPlainStack,
+  setMonsterPlainStackQuantity,
+} from '../../lib/monster-equipment-loadout.lib'
+import {
   equipmentEntryBaseName,
   equipmentEntryReferenceLabel,
 } from '../../lib/monster-equipment-labels'
@@ -18,33 +52,21 @@ import {
   removeEquipmentEntryWithDependents,
 } from '../../lib/monster-equipment-references'
 import {
-  MONSTER_AC_ADJUSTMENT_LABEL,
-  MONSTER_ADD_ITEM_LABEL,
-  MONSTER_CUSTOM_DESCRIPTION_LABEL,
-  MONSTER_CUSTOM_NAME_LABEL,
-  MONSTER_CUSTOMIZATION_LABEL,
   MONSTER_EQUIPMENT_CATALOG_ERROR,
-  MONSTER_EQUIPPED_LABEL,
   MONSTER_LOADING_EQUIPMENT,
-  MONSTER_REMOVE_LABEL,
   MONSTER_RETRY_LABEL,
-  formatClearAdjustmentConfirmBody,
-  formatEquipmentQuantityLabel,
   formatRemoveEquipmentConfirmBody,
   formatRemoveEquipmentConfirmLabel,
   formatRemoveEquipmentConfirmTitle,
-  formatWeaponRetargetNotice,
-  MONSTER_CLEAR_ADJUSTMENT_CONFIRM,
 } from '../../lib/monster-form-labels'
-import { describeEquipmentArmorContribution } from '../../lib/monster-display'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 
-type PendingChange = {
+type PendingRemove = {
   entryId: string
-  plan: ReturnType<typeof planEquipmentCatalogChange>
-  previousEquipmentId: string
+  references: ReturnType<typeof findActionsReferencingEntry>
 }
 
+// fallow-ignore-next-line complexity
 export function MonsterEquipmentPanel({
   ctx,
   onRetry,
@@ -54,8 +76,10 @@ export function MonsterEquipmentPanel({
 }) {
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const [pending, setPending] = useState<PendingChange | null>(null)
-  const [notices, setNotices] = useState<Record<string, string>>({})
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [editorEntryId, setEditorEntryId] = useState<string | null>(null)
+  const [pendingRemove, setPendingRemove] = useState<PendingRemove | null>(null)
+
   const catalog = monsterEquipmentCatalog(ctx)
   const status = ctx.equipmentCatalogStatus ?? 'ready'
   const gateReason = resolveStrictCatalogWriteGateReason(status, {
@@ -64,17 +88,42 @@ export function MonsterEquipmentPanel({
   })
   useReportContentFormWriteGate('strict', gateReason)
 
-  if (!values) return null
-  const derived = deriveMonsterFormDraft(values as MonsterFormValues, ctx)
-  const breakdown = derived?.ac.status === 'resolved' ? derived.ac.value.breakdown : undefined
-  const referenceOptions = ctx.options?.equipment?.forReference() ?? []
+  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const magicProvider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
 
-  const updateEntry = (entryId: string, next: MonsterEquipmentFormEntry) => {
-    form.setValue(
-      'equipment',
-      values.equipment.map((entry) => (entry.entryId === entryId ? next : entry)),
-      { shouldDirty: true },
-    )
+  const referenceOptions = ctx.options?.equipment?.forReference() ?? []
+  const pickerItems = useMemo(
+    () =>
+      enrichEquipmentPickerItemsWithSearchDocument(
+        buildLoadoutEquipmentPickerItems(referenceOptions),
+      ),
+    [referenceOptions],
+  )
+
+  if (!values) return null
+
+  const equipment = values.equipment ?? []
+  const totalQuantity = equipment.reduce((sum, entry) => sum + (entry.quantity ?? 1), 0)
+  const groups = groupMonsterEquipmentByKind(equipment, catalog, (item) =>
+    getEquipmentKindCollectionLabel(item.kind),
+  )
+
+  const editorEntry = editorEntryId
+    ? equipment.find((entry) => entry.entryId === editorEntryId)
+    : undefined
+  const editorItem = editorEntry ? catalog.get(editorEntry.equipmentId) : undefined
+
+  const updateEquipment = (next: MonsterEquipmentFormEntry[]) => {
+    form.setValue('equipment', next, { shouldDirty: true })
+  }
+
+  const removeEntry = (entryId: string) => {
+    const references = findActionsReferencingEntry(values as MonsterFormValues, entryId)
+    if (references.length > 0) {
+      setPendingRemove({ entryId, references })
+      return
+    }
+    updateEquipment(equipment.filter((entry) => entry.entryId !== entryId))
   }
 
   return (
@@ -89,384 +138,188 @@ export function MonsterEquipmentPanel({
           ) : null}
         </SemanticText>
       ) : null}
-      {values.equipment.map((entry) => (
-        <EquipmentEntryCard
-          key={entry.entryId}
-          entry={entry}
-          values={values as MonsterFormValues}
-          catalog={catalog}
-          status={status}
-          breakdown={breakdown}
-          referenceOptions={referenceOptions}
-          notice={notices[entry.entryId]}
-          onUpdate={updateEntry}
-          onPending={setPending}
-          onNotice={(entryId, message) =>
-            setNotices((current) => ({ ...current, [entryId]: message }))
-          }
-        />
-      ))}
-      <AddEquipmentSelect
-        values={values as MonsterFormValues}
-        referenceOptions={referenceOptions}
+
+      <EquipmentInventorySectionHeader
+        title={getContentTypeTerm('equipment').label}
+        count={totalQuantity}
+        action={
+          <ActionButton
+            action="add"
+            variant="outline"
+            size="sm"
+            disabled={Boolean(gateReason)}
+            onClick={() => setPickerOpen(true)}
+          >
+            Add equipment
+          </ActionButton>
+        }
       />
-      <EquipmentConfirm
-        pending={pending}
-        values={values as MonsterFormValues}
-        catalog={catalog}
-        onUpdate={updateEntry}
-        onClose={() => setPending(null)}
+
+      <EquipmentCategoryGroupedList<MonsterEquipmentFormEntry>
+        groups={groups.map((group) => ({ groupLabel: group.groupLabel, items: group.entries }))}
+        getItemKey={(entry) => entry.entryId}
+        emptyState={
+          <InsetPanel size="sm" align="center" className="rounded-lg">
+            <InsetPanel.PassiveMessage>No equipment yet.</InsetPanel.PassiveMessage>
+            <InsetPanel.PassiveMessage>
+              Add weapons, armor, or gear to include them on the stat block.
+            </InsetPanel.PassiveMessage>
+          </InsetPanel>
+        }
+        renderRow={(entry) => {
+          const item = catalog.get(entry.equipmentId)
+          const label = equipmentEntryReferenceLabel(entry, equipment, catalog)
+          const metadata = formatMonsterEquipmentRowMetadata({
+            entry,
+            item,
+            provider: magicProvider,
+          })
+          return (
+            <ContentFormEntitySelectionRow
+              entity={{
+                heading: label,
+                description: equipmentEntryBaseName(entry, catalog),
+                ...(metadata
+                  ? {
+                      statusComposition: 'metadata' as const,
+                      status: [
+                        { kind: 'text' as const, label: metadata, variant: 'muted' as const },
+                      ],
+                    }
+                  : {}),
+              }}
+              trailing={{
+                kind: 'utility',
+                content: (
+                  <div className="flex items-center gap-1">
+                    <EquipmentQuantityStepper
+                      size="sm"
+                      digits={2}
+                      value={entry.quantity ?? 1}
+                      min={1}
+                      max={999}
+                      ariaLabel={`Quantity of ${label}`}
+                      remove={{
+                        ariaLabel: `Remove ${label}`,
+                        onRemove: () => removeEntry(entry.entryId),
+                      }}
+                      onChange={(quantity) =>
+                        updateEquipment(
+                          equipment.map((row) =>
+                            row.entryId === entry.entryId ? { ...row, quantity } : row,
+                          ),
+                        )
+                      }
+                    />
+                    <button
+                      type="button"
+                      className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
+                      aria-label={`Edit ${label}`}
+                      onClick={() => {
+                        setPickerOpen(false)
+                        setEditorEntryId(entry.entryId)
+                      }}
+                    >
+                      <ActionIcon action="edit" />
+                    </button>
+                  </div>
+                ),
+              }}
+            />
+          )
+        }}
+      />
+
+      <EquipmentPickerDrawer
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        items={pickerItems}
+        workflowMode="loadout"
+        workflowModes={['loadout']}
+        showCharacterPreview={false}
+        resolveRowActionViewModel={({ equipment: row }) =>
+          buildEquipmentLoadoutRowViewModel(row.id, equipment)
+        }
+        onCommitAdd={(item: EquipmentPickerItem) => {
+          updateEquipment(incrementMonsterPlainStack(equipment, item.equipment.id))
+          return true
+        }}
+        onSetRowQuantity={(item, total) => {
+          const plain = findCanonicalPlainEntry(equipment, item.equipment.id) as
+            | MonsterEquipmentFormEntry
+            | undefined
+          if (total === 0 && plain?.entryId) {
+            removeEntry(plain.entryId)
+            return
+          }
+          updateEquipment(setMonsterPlainStackQuantity(equipment, item.equipment.id, total))
+        }}
+      />
+
+      {editorEntry && editorItem ? (
+        <EquipmentInstanceEditorDrawer
+          open={editorEntryId !== null}
+          onOpenChange={(open) => {
+            if (!open) setEditorEntryId(null)
+          }}
+          sourceEntry={normalizeEquipmentInstance(editorEntry) as MonsterEquipmentFormEntry}
+          entries={equipment.map(
+            (row) => normalizeEquipmentInstance(row) as MonsterEquipmentFormEntry,
+          )}
+          catalogItem={editorItem}
+          rulesetId={rulesetId}
+          definitions={magicProvider}
+          subjectNoun="creature"
+          referencedByLabel={
+            findActionsReferencingEntry(values as MonsterFormValues, editorEntry.entryId).length > 0
+              ? 'Attacks using this item keep using the unchanged copy. Update them in Actions.'
+              : undefined
+          }
+          onCommit={(nextEntries) => {
+            updateEquipment(nextEntries)
+            setEditorEntryId(null)
+          }}
+        />
+      ) : null}
+
+      <ConfirmDialog
+        open={pendingRemove !== null}
+        onOpenChange={(open) => {
+          if (!open) setPendingRemove(null)
+        }}
+        headline={
+          pendingRemove
+            ? formatRemoveEquipmentConfirmTitle(
+                equipmentEntryReferenceLabel(
+                  equipment.find((entry) => entry.entryId === pendingRemove.entryId) ??
+                    equipment[0]!,
+                  equipment,
+                  catalog,
+                ),
+              )
+            : ''
+        }
+        description={
+          pendingRemove
+            ? formatRemoveEquipmentConfirmBody(
+                pendingRemove.references
+                  .map((reference) => reference.name ?? reference.id)
+                  .join(', '),
+              )
+            : ''
+        }
+        confirmLabel={
+          pendingRemove ? formatRemoveEquipmentConfirmLabel(pendingRemove.references.length) : ''
+        }
+        onConfirm={() => {
+          if (!pendingRemove) return
+          form.reset(removeEquipmentEntryWithDependents(form.getValues(), pendingRemove.entryId), {
+            keepDefaultValues: true,
+          })
+          setPendingRemove(null)
+        }}
+        onCancel={() => setPendingRemove(null)}
       />
     </div>
   )
-}
-
-function EquipmentEntryCard({
-  entry,
-  values,
-  catalog,
-  status,
-  breakdown,
-  referenceOptions,
-  notice,
-  onUpdate,
-  onPending,
-  onNotice,
-}: {
-  entry: MonsterEquipmentFormEntry
-  values: MonsterFormValues
-  catalog: ReturnType<typeof monsterEquipmentCatalog>
-  status: NonNullable<ContentFormCtx['equipmentCatalogStatus']>
-  breakdown: Parameters<typeof describeEquipmentArmorContribution>[1]['breakdown']
-  referenceOptions: readonly Equipment[]
-  notice: string | undefined
-  onUpdate: (entryId: string, next: MonsterEquipmentFormEntry) => void
-  onPending: (pending: PendingChange) => void
-  onNotice: (entryId: string, message: string) => void
-}) {
-  const form = useFormContext<MonsterFormValues>()
-  const item = catalog.get(entry.equipmentId)
-  const role = equipmentArmorRole(item)
-  const contribution =
-    status === 'ready'
-      ? describeEquipmentArmorContribution(entry.entryId, {
-          acKind: values.armorClass.kind,
-          breakdown,
-          role,
-        })
-      : undefined
-  const label = equipmentEntryReferenceLabel(entry, values.equipment, catalog)
-  const acModifier = entry.modifiers?.find((modifier) => modifier.kind === 'armor_class')
-  const acBonus = acModifier?.kind === 'armor_class' ? acModifier.bonus : 0
-  return (
-    <article>
-      <h3>{label}</h3>
-      <p>
-        {joinInlineMetadata([
-          equipmentEntryBaseName(entry, catalog),
-          formatEquipmentQuantityLabel(entry.quantity, Boolean(entry.equipped)),
-        ])}
-      </p>
-      <EquipmentContributionLines contribution={contribution} notice={notice} />
-      <label>
-        <input
-          type="checkbox"
-          aria-label={`${label} ${MONSTER_EQUIPPED_LABEL}`}
-          checked={Boolean(entry.equipped)}
-          onChange={(event) =>
-            onUpdate(entry.entryId, { ...entry, equipped: event.target.checked })
-          }
-        />
-        {MONSTER_EQUIPPED_LABEL}
-      </label>
-      <label>
-        Catalog item
-        <select
-          aria-label={`${label} catalog item`}
-          value={entry.equipmentId}
-          onChange={(event) =>
-            changeCatalogItem({
-              values,
-              entry,
-              nextId: event.target.value,
-              referenceOptions,
-              catalog,
-              onUpdate,
-              onPending,
-              onNotice,
-            })
-          }
-        >
-          {catalogOptions(entry, referenceOptions, catalog).map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.name}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        Quantity
-        <input
-          aria-label={`${label} quantity`}
-          type="number"
-          min={1}
-          value={entry.quantity}
-          onChange={(event) =>
-            onUpdate(entry.entryId, {
-              ...entry,
-              quantity: Math.max(1, Number(event.target.value) || 1),
-            })
-          }
-        />
-      </label>
-      <EquipmentCustomization entry={entry} role={role} acBonus={acBonus} onUpdate={onUpdate} />
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => removeEquipmentEntry(form, values, entry, onPending)}
-      >
-        {MONSTER_REMOVE_LABEL}
-      </Button>
-    </article>
-  )
-}
-
-function AddEquipmentSelect({
-  values,
-  referenceOptions,
-}: {
-  values: MonsterFormValues
-  referenceOptions: readonly Equipment[]
-}) {
-  const form = useFormContext<MonsterFormValues>()
-  return (
-    <select
-      aria-label={MONSTER_ADD_ITEM_LABEL}
-      value=""
-      onChange={(event) => {
-        const equipmentId = event.target.value
-        if (!equipmentId) return
-        form.setValue(
-          'equipment',
-          [
-            ...values.equipment,
-            { entryId: crypto.randomUUID(), equipmentId, quantity: 1, equipped: true },
-          ],
-          { shouldDirty: true },
-        )
-      }}
-    >
-      <option value="">{MONSTER_ADD_ITEM_LABEL}</option>
-      {referenceOptions.map((item) => (
-        <option key={item.id} value={item.id}>
-          {item.name}
-        </option>
-      ))}
-    </select>
-  )
-}
-
-function EquipmentConfirm({
-  pending,
-  values,
-  catalog,
-  onUpdate,
-  onClose,
-}: {
-  pending: PendingChange | null
-  values: MonsterFormValues
-  catalog: ReturnType<typeof monsterEquipmentCatalog>
-  onUpdate: (entryId: string, next: MonsterEquipmentFormEntry) => void
-  onClose: () => void
-}) {
-  const form = useFormContext<MonsterFormValues>()
-  const removePlan =
-    pending?.plan.outcome === 'confirm' && pending.plan.reason === 'remove-actions'
-      ? pending.plan
-      : undefined
-  const headline = removePlan
-    ? formatRemoveEquipmentConfirmTitle(
-        equipmentEntryReferenceLabel(
-          values.equipment.find((entry) => entry.entryId === pending?.entryId) ?? removePlan.entry,
-          values.equipment,
-          catalog,
-        ),
-      )
-    : MONSTER_CLEAR_ADJUSTMENT_CONFIRM
-  const description = removePlan
-    ? formatRemoveEquipmentConfirmBody(
-        removePlan.references.map((reference) => reference.name ?? reference.id).join(', '),
-      )
-    : formatClearAdjustmentConfirmBody()
-  const confirmLabel = removePlan
-    ? formatRemoveEquipmentConfirmLabel(removePlan.references.length)
-    : MONSTER_CLEAR_ADJUSTMENT_CONFIRM
-  return (
-    <ConfirmDialog
-      open={pending !== null}
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-      headline={headline}
-      description={description}
-      confirmLabel={confirmLabel}
-      onConfirm={() => {
-        if (!pending || pending.plan.outcome !== 'confirm') return
-        if (
-          pending.plan.reason === 'remove-actions' &&
-          pending.plan.entry.equipmentId === pending.previousEquipmentId
-        ) {
-          form.reset(removeEquipmentEntryWithDependents(form.getValues(), pending.entryId), {
-            keepDefaultValues: true,
-          })
-        } else {
-          onUpdate(pending.entryId, pending.plan.entry)
-        }
-        onClose()
-      }}
-      onCancel={onClose}
-    />
-  )
-}
-
-function EquipmentContributionLines({
-  contribution,
-  notice,
-}: {
-  contribution: ReturnType<typeof describeEquipmentArmorContribution> | undefined
-  notice: string | undefined
-}) {
-  return (
-    <>
-      {contribution?.contributionLabel ? <p>{contribution.contributionLabel}</p> : null}
-      {contribution?.participation === 'not-used' && contribution.notUsedReason ? (
-        <SemanticText>{contribution.notUsedReason}</SemanticText>
-      ) : null}
-      {notice ? <SemanticText>{notice}</SemanticText> : null}
-    </>
-  )
-}
-
-function EquipmentCustomization({
-  entry,
-  role,
-  acBonus,
-  onUpdate,
-}: {
-  entry: MonsterEquipmentFormEntry
-  role: ReturnType<typeof equipmentArmorRole>
-  acBonus: number
-  onUpdate: (entryId: string, next: MonsterEquipmentFormEntry) => void
-}) {
-  return (
-    <details>
-      <summary>{MONSTER_CUSTOMIZATION_LABEL}</summary>
-      <label>
-        {MONSTER_CUSTOM_NAME_LABEL}
-        <input
-          aria-label={MONSTER_CUSTOM_NAME_LABEL}
-          value={entry.customName ?? ''}
-          onChange={(event) =>
-            onUpdate(entry.entryId, {
-              ...entry,
-              ...(event.target.value
-                ? { customName: event.target.value }
-                : { customName: undefined }),
-            })
-          }
-        />
-      </label>
-      <label>
-        {MONSTER_CUSTOM_DESCRIPTION_LABEL}
-        <input
-          aria-label={MONSTER_CUSTOM_DESCRIPTION_LABEL}
-          value={entry.customDescription ?? ''}
-          onChange={(event) =>
-            onUpdate(entry.entryId, {
-              ...entry,
-              customDescription: event.target.value || undefined,
-            })
-          }
-        />
-      </label>
-      {role !== 'other' ? (
-        <label>
-          {MONSTER_AC_ADJUSTMENT_LABEL}
-          <input
-            aria-label={MONSTER_AC_ADJUSTMENT_LABEL}
-            type="number"
-            value={acBonus}
-            onChange={(event) => {
-              const bonus = Number(event.target.value)
-              const rest =
-                entry.modifiers?.filter((modifier) => modifier.kind !== 'armor_class') ?? []
-              onUpdate(entry.entryId, {
-                ...entry,
-                modifiers: bonus === 0 ? rest : [...rest, { kind: 'armor_class', bonus }],
-              })
-            }}
-          />
-        </label>
-      ) : null}
-    </details>
-  )
-}
-
-function changeCatalogItem(input: {
-  values: MonsterFormValues
-  entry: MonsterEquipmentFormEntry
-  nextId: string
-  referenceOptions: readonly Equipment[]
-  catalog: ReturnType<typeof monsterEquipmentCatalog>
-  onUpdate: (entryId: string, next: MonsterEquipmentFormEntry) => void
-  onPending: (pending: PendingChange) => void
-  onNotice: (entryId: string, message: string) => void
-}): void {
-  const { values, entry, nextId, referenceOptions, catalog, onUpdate, onPending, onNotice } = input
-  const nextItem = referenceOptions.find((option) => option.id === nextId) ?? catalog.get(nextId)
-  const plan = planEquipmentCatalogChange(values, entry, nextItem, nextItem?.name ?? nextId)
-  if (plan.outcome === 'confirm') {
-    onPending({ entryId: entry.entryId, plan, previousEquipmentId: entry.equipmentId })
-    return
-  }
-  onUpdate(entry.entryId, plan.entry)
-  if (plan.retarget) {
-    onNotice(
-      entry.entryId,
-      formatWeaponRetargetNotice(plan.retarget.nextName, plan.retarget.actionNames),
-    )
-  }
-}
-
-function removeEquipmentEntry(
-  form: ReturnType<typeof useFormContext<MonsterFormValues>>,
-  values: MonsterFormValues,
-  entry: MonsterEquipmentFormEntry,
-  onPending: (pending: PendingChange) => void,
-): void {
-  const references = findActionsReferencingEntry(values, entry.entryId)
-  if (references.length === 0) {
-    form.setValue(
-      'equipment',
-      values.equipment.filter((row) => row.entryId !== entry.entryId),
-      { shouldDirty: true },
-    )
-    return
-  }
-  onPending({
-    entryId: entry.entryId,
-    previousEquipmentId: entry.equipmentId,
-    plan: { outcome: 'confirm', reason: 'remove-actions', entry, references },
-  })
-}
-
-function catalogOptions(
-  entry: MonsterEquipmentFormEntry,
-  referenceOptions: readonly Equipment[],
-  catalog: ReadonlyMap<string, Equipment>,
-): Equipment[] {
-  const options = [...referenceOptions]
-  const current = catalog.get(entry.equipmentId)
-  if (current && !options.some((option) => option.id === current.id)) options.unshift(current)
-  return options
 }

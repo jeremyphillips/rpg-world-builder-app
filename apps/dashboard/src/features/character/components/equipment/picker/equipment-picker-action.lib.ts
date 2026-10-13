@@ -1,3 +1,5 @@
+import { summarizeEquipmentStacks, type EquipmentInstance } from '@rpg/contracts'
+
 import {
   type EquipmentAcquisitionActionState,
   type EquipmentAcquisitionBlocker,
@@ -14,7 +16,15 @@ import {
 import { formatEquipmentUnaffordableReason } from './drawer/equipment-picker-drawer.lib'
 import type { EquipmentPickerItem } from './drawer/equipment-picker-drawer.types'
 
+export type EquipmentPickerLoadoutRowViewModel = {
+  kind: 'loadout'
+  ownedQuantity: number
+  plainQuantity: number
+  customizedQuantity: number
+}
+
 export type EquipmentPickerRowActionViewModel =
+  | EquipmentPickerLoadoutRowViewModel
   | {
       kind: 'purchase'
       disabled: boolean
@@ -115,6 +125,23 @@ function buildMagicItemGrantRowActionViewModel(
     partialActionLabel: plan.partialAction
       ? formatPartialActionLabel(plan.partialAction)
       : undefined,
+  }
+}
+
+export function buildEquipmentLoadoutRowViewModel(
+  equipmentId: string,
+  entries: readonly (EquipmentInstance & { entryId: string })[],
+): EquipmentPickerLoadoutRowViewModel {
+  const summary = summarizeEquipmentStacks(entries).get(equipmentId) ?? {
+    ownedQuantity: 0,
+    plainQuantity: 0,
+    customizedCopyCount: 0,
+  }
+  return {
+    kind: 'loadout',
+    ownedQuantity: summary.ownedQuantity,
+    plainQuantity: summary.plainQuantity,
+    customizedQuantity: summary.customizedCopyCount,
   }
 }
 

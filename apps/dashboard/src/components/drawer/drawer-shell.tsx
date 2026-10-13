@@ -14,6 +14,10 @@ export type DrawerShellProps = {
   title: React.ReactNode
   children: React.ReactNode
   description?: React.ReactNode
+  /** Rendered in the header lead slot (for example a back control). */
+  headerLeading?: React.ReactNode
+  /** Rendered below the title stack inside the header (sticky with the headline). */
+  headerContent?: React.ReactNode
   footer?: React.ReactNode
   /**
    * scrolling — shell body owns overflow-y scroll (informational / custom content).
@@ -32,6 +36,8 @@ export function DrawerShell({
   title,
   children,
   description,
+  headerLeading,
+  headerContent,
   footer,
   bodyMode = 'scrolling',
   surface = DRAWER_SHELL_DEFAULT_SURFACE,
@@ -43,7 +49,9 @@ export function DrawerShell({
         size="lg"
         {...(!description ? { 'aria-describedby': undefined } : {})}
       >
-        <Sheet.Header headline={title} description={description} />
+        <Sheet.Header headline={title} description={description} leadIcon={headerLeading}>
+          {headerContent}
+        </Sheet.Header>
         {bodyMode === 'composed' ? (
           children
         ) : (

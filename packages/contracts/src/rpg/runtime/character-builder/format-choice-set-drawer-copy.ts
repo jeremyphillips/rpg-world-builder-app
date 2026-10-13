@@ -5,6 +5,11 @@ import { getProficiencyDomainSentenceForm } from '../../vocab/proficiency'
 import type { ChoiceCounterVerb } from './format-spell-acquisition-copy'
 import type { ChoiceSet } from './choice-set'
 
+/** Loadout picker title — add semantics, not generic "choose". */
+export function formatEquipmentLoadoutPickerHeading(): string {
+  return `Add ${getContentTypeSentenceForm('equipment', 1)}`
+}
+
 /** Stable drawer heading for builder ChoiceSet pickers — does not change with selection state. */
 export function formatChoiceSetDrawerHeading(choiceType: ChoiceSet['choiceType']): string {
   switch (choiceType) {
