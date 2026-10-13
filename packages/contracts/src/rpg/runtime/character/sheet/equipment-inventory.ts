@@ -3,18 +3,11 @@ import { z } from 'zod'
 import { coinWealthSchema, type CoinWealth } from '../../../primitives/wealth'
 import type { Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
-import {
-  equipmentInstanceSchema,
-  equipmentInstanceSchemaBase,
-} from '../../../content/equipment/instance'
+import { equipmentInstanceSchemaBase } from '../../../content/equipment/instance'
 import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
 import type { EquipmentKind } from '../../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../../creature/equipment'
-import {
-  toEquippedArmorPiece,
-  toEquippedArmorPieceForEntry,
-  type EquippedArmorPiece,
-} from '../../creature/armor-class'
+import { toEquippedArmorPieceForEntry, type EquippedArmorPiece } from '../../creature/armor-class'
 import type { MagicPropertyDefinitionProvider } from '../../../content/equipment/magic-property'
 import { characterSelectionSourcesSchema } from './selection-sources'
 

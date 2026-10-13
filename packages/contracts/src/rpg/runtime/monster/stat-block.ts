@@ -10,6 +10,7 @@ import {
   dexModifierForArmor,
   resolveEquippedArmorClass,
   toEquippedArmorPieceForEntry,
+  type EquippedArmorPiece,
 } from '../creature/armor-class'
 import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
@@ -112,7 +113,7 @@ type ArmorContributionRow = {
   entryId: string
   label: string
   item: Extract<Equipment, { kind: 'armor' }>
-  piece: ReturnType<typeof toEquippedArmorPiece>
+  piece: EquippedArmorPiece
 }
 
 function equippedArmorRows(

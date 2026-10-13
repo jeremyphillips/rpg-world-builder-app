@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { EquipmentInstance } from './instance'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'
 
 describe('normalizeEquipmentInstance', () => {
@@ -8,7 +9,7 @@ describe('normalizeEquipmentInstance', () => {
       equipmentId: 'srd-cc-5.2.1:chain-shirt',
       quantity: 1,
       modifiers: [{ kind: 'armor_class', bonus: 2 }],
-    })
+    } as EquipmentInstance)
     expect(next.modifiers).toBeUndefined()
     expect(next.mechanicalEffects).toEqual([
       { effectId: 'legacy-armor-class-modifier', target: 'armor_class', bonus: 2 },
@@ -33,7 +34,7 @@ describe('normalizeEquipmentInstance', () => {
         { kind: 'armor_class', bonus: 1 },
         { kind: 'armor_class', bonus: -1 },
       ],
-    })
+    } as EquipmentInstance)
     expect(next.mechanicalEffects).toBeUndefined()
   })
 })

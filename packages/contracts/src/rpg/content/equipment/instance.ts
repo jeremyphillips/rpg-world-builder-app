@@ -25,7 +25,8 @@ export const equipmentInstanceSchemaBase = z.object({
   modifiers: z.array(equipmentModifierSchema).optional(),
 })
 
-export type EquipmentInstance = z.infer<typeof equipmentInstanceSchemaBase>
+/** Parsed rows always include `quantity`; callers may omit it before schema parse. */
+export type EquipmentInstance = z.input<typeof equipmentInstanceSchemaBase>
 
 const equipmentInstanceSchemaParsed = equipmentInstanceSchemaBase.superRefine((entry, ctx) =>
   refineEquipmentInstanceInvariants(entry, ctx),

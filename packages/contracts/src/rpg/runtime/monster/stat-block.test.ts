@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema, isArmorEquipment, monsterSchema, type Monster } from '../../content'
+import {
+  equipmentSchema,
+  isArmorEquipment,
+  isWeaponEquipment,
+  monsterSchema,
+  type Equipment,
+  type Monster,
+} from '../../content'
 import { skillProficiencySchema } from '../../content/skill-proficiency'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import { resolveEquippedArmorFromInventory } from '../character/sheet/equipment-inventory'
@@ -14,8 +21,11 @@ import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-bloc
 
 const RULESET = 'srd-cc-5.2.1'
 
-function weaponFromSeed(slug: string, extra: Record<string, unknown> = {}) {
-  return equipmentSchema.parse({
+function weaponFromSeed(
+  slug: string,
+  extra: Record<string, unknown> = {},
+): Extract<Equipment, { kind: 'weapon' }> {
+  const row = equipmentSchema.parse({
     id: `${RULESET}:${slug}`,
     slug,
     rulesetId: RULESET,
@@ -36,6 +46,8 @@ function weaponFromSeed(slug: string, extra: Record<string, unknown> = {}) {
     damageType: 'piercing',
     ...extra,
   })
+  if (!isWeaponEquipment(row)) throw new Error('expected weapon seed')
+  return row
 }
 
 const equipmentCatalog = new Map(
@@ -504,17 +516,13 @@ describe('equipment magic property derivation parity', () => {
         }
       : undefined
   const longswordId = `${RULESET}:longsword`
-  const longsword = equipmentSchema.parse({
-    ...weaponFromSeed('longsword', {
-      name: 'Longsword',
-      category: 'martial',
-      properties: ['finesse'],
-      mastery: 'nick',
-      damage: { dice: { count: 1, faces: 8 } },
-      damageType: 'slashing',
-    }),
-    id: longswordId,
-    slug: 'longsword',
+  const longsword = weaponFromSeed('longsword', {
+    name: 'Longsword',
+    category: 'martial',
+    properties: ['finesse'],
+    mastery: 'nick',
+    damage: { dice: { count: 1, faces: 8 } },
+    damageType: 'slashing',
   })
   const catalog = new Map(equipmentCatalog)
   catalog.set(longswordId, longsword)

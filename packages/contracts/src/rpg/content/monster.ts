@@ -20,7 +20,6 @@ import {
   creatureDefensesSchema,
   creatureTypeRefSchema,
   creatureWeaponProficiencyTargetSchema,
-  equipmentInstanceSchema,
   equipmentInstanceSchemaBase,
   refineCreatureDamageDefenses,
 } from './creature'
