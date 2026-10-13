@@ -16,9 +16,11 @@ import type {
 import { EntitySummaryStatusItemView } from './entity-summary-status'
 import { EntitySummaryProvenanceItemView } from './entity-summary-provenance'
 import type { EntitySummaryProvenanceItem } from './entity-summary-provenance.types'
+import { groupEntitySummaryStatusForMetadata } from './entity-summary-metadata-groups.lib'
 import {
   entitySummaryHeadingEndValueVariants,
   entitySummaryHeadingRowVariants,
+  entitySummaryStatusBadgeGroupVariants,
   entitySummaryStatusMetadataVariants,
   entitySummaryStatusRowVariants,
 } from './entity-summary.variants'
@@ -103,10 +105,30 @@ export function EntitySummaryStatus({
             </span>
           </InlineMetadata.Item>
         ))}
-        {items.map((status, index) => (
+        {(composition === 'metadata'
+          ? groupEntitySummaryStatusForMetadata(items)
+          : items.map((item) => ({ kind: 'status' as const, item }))
+        ).map((segment, index) => (
           <InlineMetadata.Item key={`status-${index}`}>
             <span data-entity-summary-status>
-              <EntitySummaryStatusItemView item={status} density={density} layout="inline" />
+              {segment.kind === 'badge-group' ? (
+                <span className={entitySummaryStatusBadgeGroupVariants()}>
+                  {segment.badges.map((badge, badgeIndex) => (
+                    <EntitySummaryStatusItemView
+                      key={`${badge.label}-${badgeIndex}`}
+                      item={badge}
+                      density={density}
+                      layout="inline"
+                    />
+                  ))}
+                </span>
+              ) : (
+                <EntitySummaryStatusItemView
+                  item={segment.item}
+                  density={density}
+                  layout="inline"
+                />
+              )}
             </span>
           </InlineMetadata.Item>
         ))}

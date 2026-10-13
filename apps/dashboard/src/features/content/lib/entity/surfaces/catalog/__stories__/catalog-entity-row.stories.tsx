@@ -170,6 +170,15 @@ const METADATA_STATUS_ROWS = [
     ],
   },
   {
+    id: 'equipment-inventory-metadata',
+    heading: 'Shortsword +1',
+    status: [
+      { kind: 'badge', label: 'Equipped', tone: 'success' },
+      { kind: 'badge', label: 'Magical', tone: 'neutral', appearance: 'soft' },
+      { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+    ],
+  },
+  {
     id: 'text-only',
     heading: 'Dagger',
     status: [
