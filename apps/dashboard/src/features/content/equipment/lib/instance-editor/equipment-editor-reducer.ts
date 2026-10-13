@@ -7,7 +7,7 @@ import type {
   EquipmentEditorState,
 } from './equipment-editor-types'
 
-export type { EquipmentEditorAction } from './equipment-editor-types'
+export type { EquipmentEditorAction, EquipmentEditorState } from './equipment-editor-types'
 export {
   DEFAULT_BROWSE_DRAFT,
   DEFAULT_CUSTOM_DRAFT,

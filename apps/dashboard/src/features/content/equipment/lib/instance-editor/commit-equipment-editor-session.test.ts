@@ -66,6 +66,6 @@ describe('commitEquipmentEditorSession', () => {
     expect(committed[0]?.entryId).toBe('source')
     expect(committed[1]?.entryId).toBe('split-copy')
     expect(committed[0]?.quantity).toBe(1)
-    expect(committed[1]?.customName).toBe('Custom dagger')
+    expect(committed[1]).toMatchObject({ customName: 'Custom dagger' })
   })
 })

@@ -9,7 +9,7 @@ function formWithEquipment(equipment: MonsterFormValues['equipment']): MonsterFo
     actions: [{ id: 'strike', kind: 'weapon', equipmentEntryId: 'stack' }],
     bonusActions: [],
     reactions: [],
-  } as MonsterFormValues
+  } as unknown as MonsterFormValues
 }
 
 describe('monster equipment action references', () => {

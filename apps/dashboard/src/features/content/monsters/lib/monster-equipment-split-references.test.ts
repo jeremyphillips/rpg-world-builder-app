@@ -30,12 +30,14 @@ describe('equipment split and action references', () => {
       actions: [{ id: 'strike', kind: 'weapon', equipmentEntryId: 'stack' }],
       bonusActions: [],
       reactions: [],
-    } as MonsterFormValues
+    } as unknown as MonsterFormValues
 
     expect(committed).toHaveLength(2)
     expect(findActionsReferencingEntry(values, 'stack')).toHaveLength(1)
     expect(
-      committed.some((row) => row.entryId !== 'stack' && row.magical && row.quantity === 1),
+      committed.some(
+        (row) => row.entryId !== 'stack' && 'magical' in row && row.magical && row.quantity === 1,
+      ),
     ).toBe(true)
   })
 })

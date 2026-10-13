@@ -1,4 +1,5 @@
 import {
+  type FieldSizeToken,
   FieldReadOnlyValue,
   Select,
   SelectContent,
@@ -62,7 +63,7 @@ function ReadOnlyAmountValue({
   label: string
   titleId: string
   describedBy?: string
-  size: 'sm' | 'md' | 'lg'
+  size: FieldSizeToken
 }) {
   return (
     <FieldReadOnlyValue

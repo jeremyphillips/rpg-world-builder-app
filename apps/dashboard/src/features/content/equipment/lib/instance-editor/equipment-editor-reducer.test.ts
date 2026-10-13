@@ -68,7 +68,7 @@ describe('equipment editor session', () => {
       { type: 'setMagical', magical: false },
     )
     const committed = commitEquipmentEditorSession([baseEntry], off.session)
-    expect(committed[0]?.magicProperties).toBeUndefined()
+    expect(committed[0]).not.toHaveProperty('magicProperties')
   })
 
   it('commits one-scope edits as a split stack', () => {
