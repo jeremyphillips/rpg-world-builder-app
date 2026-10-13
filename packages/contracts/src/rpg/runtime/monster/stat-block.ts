@@ -9,8 +9,10 @@ import { abilityModifier } from '../creature/ability-modifier'
 import {
   dexModifierForArmor,
   resolveEquippedArmorClass,
-  toEquippedArmorPiece,
+  toEquippedArmorPieceForEntry,
 } from '../creature/armor-class'
+import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { resolveCreatureInitiativeModifier } from '../creature/initiative'
@@ -97,7 +99,10 @@ export type DeriveMonsterStatBlockInput = {
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
   acBase?: ArmorClassBase
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }
+
+const EMPTY_MAGIC_PROPERTY_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
 
 function formatInitiativeLabel(modifier: number, dexScore: number): string {
   return `${formatSignedModifier(modifier)} (${dexScore})`
@@ -113,6 +118,7 @@ type ArmorContributionRow = {
 function equippedArmorRows(
   monster: Pick<MonsterBody, 'equipment'>,
   equipmentCatalog: CreatureEquipmentCatalog,
+  magicPropertyProvider: MagicPropertyDefinitionProvider,
 ): ArmorContributionRow[] {
   return (monster.equipment ?? [])
     .filter((entry) => entry.equipped)
@@ -124,7 +130,7 @@ function equippedArmorRows(
           entryId: entry.entryId,
           label: entry.customName ?? item.name,
           item,
-          piece: toEquippedArmorPiece(item, entry.modifiers),
+          piece: toEquippedArmorPieceForEntry(item, entry, item, magicPropertyProvider),
         },
       ]
     })
@@ -143,13 +149,15 @@ export function resolveMonsterArmorClass(args: {
   monster: Pick<MonsterBody, 'armorClass' | 'equipment' | 'abilityScores'>
   equipmentCatalog: CreatureEquipmentCatalog
   acBase?: ArmorClassBase
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }): DerivedField<{ ac: number; breakdown: MonsterArmorClassBreakdown }> {
   const { monster, equipmentCatalog } = args
   const acBase = args.acBase ?? DEFAULT_ARMOR_CLASS_BASE
+  const magicPropertyProvider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
   const armorClass = monster.armorClass
   if (!armorClass) return unavailableField('missing-input')
 
-  const rows = equippedArmorRows(monster, equipmentCatalog)
+  const rows = equippedArmorRows(monster, equipmentCatalog, magicPropertyProvider)
   const { shields, bodyArmor } = partitionEquippedArmor(rows)
   const dexScore = monster.abilityScores?.dex
   const blocked = armorClassBlocker(armorClass, bodyArmor, dexScore)
@@ -357,20 +365,30 @@ function resolveCatalogWeaponAttackLine(args: {
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number
   section: DerivedMonsterAttackLine['section']
+  magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedMonsterAttackLine | undefined {
-  const { action, monster, equipmentCatalog, proficiencyBonus, section } = args
+  const { action, monster, equipmentCatalog, proficiencyBonus, section, magicPropertyProvider } =
+    args
   const entry = monster.equipment.find((row) => row.entryId === action.equipmentEntryId)
   const catalogItem = entry ? equipmentCatalog.get(entry.equipmentId) : undefined
-  if (!catalogItem || !isWeaponEquipment(catalogItem)) return undefined
+  if (!catalogItem || !isWeaponEquipment(catalogItem) || !entry) return undefined
 
   const abilityMod = resolveWeaponAttackAbilityModifier(catalogItem, monster.abilityScores)
   if (abilityMod === undefined) return undefined
 
-  const attackBonusValue = weaponAttackBonus(
-    abilityMod,
-    isWeaponProficient(catalogItem, monster.proficiencies.weapons),
-    proficiencyBonus,
-  )
+  const effectTotals = resolveEquipmentEntryEffectTotals(entry, catalogItem, magicPropertyProvider)
+  const attackBonusValue =
+    weaponAttackBonus(
+      abilityMod,
+      isWeaponProficient(catalogItem, monster.proficiencies.weapons),
+      proficiencyBonus,
+    ) + effectTotals.attack_roll
+
+  const damageAverage =
+    averageStatBlockDamage(
+      catalogItem.damage ?? { dice: { count: 1, faces: 4 as const } },
+      abilityMod,
+    ) + effectTotals.damage_roll
 
   return {
     id: action.id,
@@ -378,12 +396,7 @@ function resolveCatalogWeaponAttackLine(args: {
     name: action.name ?? entry?.customName ?? catalogItem.name,
     attackBonus: attackBonusValue,
     attackBonusLabel: formatSignedModifier(attackBonusValue),
-    damage: String(
-      averageStatBlockDamage(
-        catalogItem.damage ?? { dice: { count: 1, faces: 4 as const } },
-        abilityMod,
-      ),
-    ),
+    damage: String(damageAverage),
     damageTypeLabel: catalogItem.damageType ?? '',
     ...weaponActionReachRange(catalogItem),
   }
@@ -423,8 +436,10 @@ function resolveWeaponAttackLine(args: {
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number
   section: DerivedMonsterAttackLine['section']
+  magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedMonsterAttackLine | undefined {
-  const { action, monster, equipmentCatalog, proficiencyBonus, section } = args
+  const { action, monster, equipmentCatalog, proficiencyBonus, section, magicPropertyProvider } =
+    args
   if (action.kind === 'weapon') {
     return resolveCatalogWeaponAttackLine({
       action,
@@ -432,6 +447,7 @@ function resolveWeaponAttackLine(args: {
       equipmentCatalog,
       proficiencyBonus,
       section,
+      magicPropertyProvider,
     })
   }
   if (action.kind === 'natural-weapon') {
@@ -465,13 +481,14 @@ export function deriveMonsterStatBlock({
   equipmentCatalog,
   skillCatalog,
   acBase = DEFAULT_ARMOR_CLASS_BASE,
+  magicPropertyProvider = EMPTY_MAGIC_PROPERTY_PROVIDER,
 }: DeriveMonsterStatBlockInput): DerivedMonsterStatBlock {
   const dexScore = monster.abilityScores.dex
   const proficiencyBonus = CHALLENGE_RATING_MECHANICS[monster.challengeRating].proficiencyBonus
 
   const armor = requireDerivedField(
     'armorClass',
-    resolveMonsterArmorClass({ monster, equipmentCatalog, acBase }),
+    resolveMonsterArmorClass({ monster, equipmentCatalog, acBase, magicPropertyProvider }),
   )
   const hitPoints = requireDerivedField('hitPoints', resolveMonsterHitPoints(monster))
   const initiativeModifier = resolveCreatureInitiativeModifier(dexScore)
@@ -504,7 +521,7 @@ export function deriveMonsterStatBlock({
   })
 
   const attacks: DerivedMonsterAttackLine[] = []
-  const attackLineArgs = { monster, equipmentCatalog, proficiencyBonus }
+  const attackLineArgs = { monster, equipmentCatalog, proficiencyBonus, magicPropertyProvider }
   appendAttackLines(attacks, monster.actions, attackLineArgs, 'actions')
   appendAttackLines(attacks, monster.bonusActions, attackLineArgs, 'bonusActions')
   appendAttackLines(attacks, monster.reactions, attackLineArgs, 'reactions')
@@ -563,6 +580,7 @@ function draftAttackResult(args: {
   equipmentCatalog: CreatureEquipmentCatalog
   proficiencyBonus: number | undefined
   section: DerivedMonsterAttackLine['section']
+  magicPropertyProvider: MagicPropertyDefinitionProvider
 }): DerivedField<DerivedMonsterAttackLine> {
   if (args.proficiencyBonus === undefined) return unavailableField('missing-input')
   if (args.action.kind === 'natural-weapon' && !args.action.damage)
@@ -576,6 +594,7 @@ function draftAttackResult(args: {
     equipmentCatalog: args.equipmentCatalog,
     proficiencyBonus: args.proficiencyBonus,
     section: args.section,
+    magicPropertyProvider: args.magicPropertyProvider,
   })
   if (!line) {
     return unavailableField(args.action.kind === 'weapon' ? 'missing-reference' : 'missing-input')
@@ -588,6 +607,7 @@ function draftAttacks(
   asBody: MonsterBody,
   equipmentCatalog: CreatureEquipmentCatalog,
   proficiencyBonus: number | undefined,
+  magicPropertyProvider: MagicPropertyDefinitionProvider,
 ): DerivedDraftAttack[] {
   const sections = [
     ['actions', monster.actions ?? []],
@@ -607,6 +627,7 @@ function draftAttacks(
           equipmentCatalog,
           proficiencyBonus,
           section,
+          magicPropertyProvider,
         }),
       })
     }
@@ -680,8 +701,10 @@ export function deriveMonsterDraftStatBlock(args: {
   equipmentCatalog: CreatureEquipmentCatalog
   skillCatalog: CreatureSkillCatalog
   acBase?: ArmorClassBase
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }): DerivedMonsterDraftStatBlock {
   const { monster, equipmentCatalog, skillCatalog, acBase } = args
+  const magicPropertyProvider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
   const dexScore = monster.abilityScores?.dex
   const initiative =
     dexScore === undefined
@@ -701,13 +724,24 @@ export function deriveMonsterDraftStatBlock(args: {
     : unavailableField<{ experiencePoints: number; proficiencyBonus: number }>('missing-input')
 
   const asBody = monster as MonsterBody
-  const attacks = draftAttacks(monster, asBody, equipmentCatalog, mechanics?.proficiencyBonus)
+  const attacks = draftAttacks(
+    monster,
+    asBody,
+    equipmentCatalog,
+    mechanics?.proficiencyBonus,
+    magicPropertyProvider,
+  )
   const savingThrows = draftSavingThrows(monster, mechanics)
   const skills = draftSkills(monster, skillCatalog, mechanics)
   const passivePerception = draftPassivePerception(monster, skillCatalog, mechanics)
 
   return {
-    ac: resolveMonsterArmorClass({ monster: asBody, equipmentCatalog, acBase }),
+    ac: resolveMonsterArmorClass({
+      monster: asBody,
+      equipmentCatalog,
+      acBase,
+      magicPropertyProvider,
+    }),
     hp: resolveMonsterHitPoints(asBody),
     initiative,
     challenge,

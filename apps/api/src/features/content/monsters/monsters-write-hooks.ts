@@ -1,5 +1,6 @@
-import type { Equipment, SkillProficiency } from '@rpg/contracts'
+import type { Equipment, SkillProficiency, SystemRulesetId } from '@rpg/contracts'
 import { collectMonsterCatalogIssues } from '@rpg/contracts'
+import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 
 import { HttpError } from '../../../lib/http-error'
 import { resolveCatalogForCampaign } from '../content.service'
@@ -15,6 +16,9 @@ export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Pro
   ])
   const equipmentById = new Map<string, Equipment>(equipmentCatalog.map((row) => [row.id, row]))
   const skillBySlug = new Map<string, SkillProficiency>(skillCatalog.map((row) => [row.slug, row]))
+  const magicPropertyProvider = createMagicPropertyDefinitionProvider(
+    ctx.rulesetId as SystemRulesetId,
+  )
   const issues = collectMonsterCatalogIssues(
     body,
     {
@@ -22,6 +26,7 @@ export async function monstersValidateBeforeWrite(ctx: ContentWriteContext): Pro
       skillBySlug,
       equipmentCatalog: 'ready',
       skillCatalog: 'ready',
+      magicPropertyProvider,
     },
     ctx.validationIntent,
   )

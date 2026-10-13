@@ -32,6 +32,12 @@
     },
     {
       "fileMatch": [
+        "packages/catalog/src/magic-properties/data/**/magic-properties.json"
+      ],
+      "url": "./packages/contracts/generated/catalog-magic-property-list.schema.json"
+    },
+    {
+      "fileMatch": [
         "packages/catalog/src/feats/data/**/feats.json"
       ],
       "url": "./packages/contracts/generated/catalog-feat-list.schema.json"

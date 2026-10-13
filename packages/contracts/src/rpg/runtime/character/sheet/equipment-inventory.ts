@@ -3,18 +3,26 @@ import { z } from 'zod'
 import { coinWealthSchema, type CoinWealth } from '../../../primitives/wealth'
 import type { Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
-import { equipmentInstanceSchema } from '../../../content/equipment/instance'
+import {
+  equipmentInstanceSchema,
+  equipmentInstanceSchemaBase,
+} from '../../../content/equipment/instance'
 import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
 import type { EquipmentKind } from '../../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../../creature/equipment'
-import { toEquippedArmorPiece, type EquippedArmorPiece } from '../../creature/armor-class'
+import {
+  toEquippedArmorPiece,
+  toEquippedArmorPieceForEntry,
+  type EquippedArmorPiece,
+} from '../../creature/armor-class'
+import type { MagicPropertyDefinitionProvider } from '../../../content/equipment/magic-property'
 import { characterSelectionSourcesSchema } from './selection-sources'
 
 // ---------------------------------------------------------------------------
 // Equipment, wealth, and feats
 // ---------------------------------------------------------------------------
 
-export const characterEquipmentEntrySchema = equipmentInstanceSchema.extend({
+export const characterEquipmentEntrySchema = equipmentInstanceSchemaBase.extend({
   attuned: z.boolean().optional(),
   sources: characterSelectionSourcesSchema,
   notes: z.string().optional(),
@@ -115,14 +123,19 @@ export function characterWealthFromGrant(grant: CharacterWealthGrant | undefined
 }
 
 /** Returns equipped armor catalog rows referenced by the character inventory. */
+const EMPTY_MAGIC_PROPERTY_PROVIDER: MagicPropertyDefinitionProvider = () => undefined
+
 export function resolveEquippedArmorFromInventory(args: {
   equipment: CharacterEquipment
   catalog: CreatureEquipmentCatalog
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }): EquippedArmorPiece[] {
+  const provider = args.magicPropertyProvider ?? EMPTY_MAGIC_PROPERTY_PROVIDER
   return args.equipment.armor.flatMap((entry) => {
     if (!entry.equipped) return []
     const item = args.catalog.get(entry.equipmentId)
-    return item && isArmorEquipment(item) ? [toEquippedArmorPiece(item, entry.modifiers)] : []
+    if (!item || !isArmorEquipment(item)) return []
+    return [toEquippedArmorPieceForEntry(item, entry, item, provider)]
   })
 }
 

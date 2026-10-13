@@ -102,7 +102,7 @@ describe('collectMonsterCatalogIssues', () => {
     ])
     expect(issues.map((issue) => issue.path)).toEqual([
       'equipment.0.equipmentId',
-      'equipment.2.modifiers',
+      'equipment.2.mechanicalEffects',
       'reactions.0.equipmentEntryId',
     ])
   })

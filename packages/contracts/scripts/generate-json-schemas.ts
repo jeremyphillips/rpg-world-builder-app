@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url'
 
 import { classStoredSchema, subclassSchema } from '../src/rpg/content/classes/class.ts'
 import { equipmentSchema } from '../src/rpg/content/equipment.ts'
+import { magicPropertyDefinitionSchema } from '../src/rpg/content/equipment/magic-property.ts'
 import { featSchema } from '../src/rpg/content/feat.ts'
 import { grantGroupSchema } from '../src/rpg/content/lib/grants/grants.ts'
 import { skillProficiencySchema } from '../src/rpg/content/skill-proficiency.ts'
@@ -42,6 +43,8 @@ const xpProgressionSeedFileSchema = z
   .length(1, 'Each SRD ruleset must ship exactly one XP progression')
 
 const slotProgressionSeedFileSchema = z.array(slotProgressionSchema).min(1)
+
+const magicPropertySeedFileSchema = z.array(magicPropertyDefinitionSchema).min(1)
 
 const ROOT = dirname(fileURLToPath(import.meta.url))
 const REPO_ROOT = join(ROOT, '../../..')
@@ -77,6 +80,10 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-equipment-list.schema.json',
     schema: z.array(equipmentSchema),
+  },
+  {
+    file: 'catalog-magic-property-list.schema.json',
+    schema: magicPropertySeedFileSchema,
   },
   {
     file: 'catalog-feat-list.schema.json',

@@ -7,6 +7,7 @@ import {
   choiceOptionTitle,
   defineMessage,
   formatStartingEquipmentOptionCompactSummary,
+  getSpellcastingGearKindLabel,
   spellcastingFocusGearKindSchema,
 } from '@rpg/contracts'
 import { toOptions, type FieldOption, type FieldVisibility, type FormItem } from '@rpg/ui/form'
@@ -245,6 +246,10 @@ export function startingEquipmentModifierFields(): FormItem[] {
       legend: 'Modifiers',
       visibility: visibleForEquipmentGrantTarget(),
       addAction: { label: 'Add modifier' },
+      appendDefaults: () => ({
+        kind: 'spellcasting_focus',
+        spellcastingGearKind: SPELLCASTING_FOCUS_GEAR_KINDS[0],
+      }),
       item: {
         collapsible: true,
         header: {
@@ -252,9 +257,11 @@ export function startingEquipmentModifierFields(): FormItem[] {
           primary: (values) => {
             const row = values as StartingEquipmentModifierForm | undefined
             if (row?.kind === 'spellcasting_focus') {
-              return SPELLCASTING_GEAR_KIND_ENTRIES[row.spellcastingGearKind].label
+              return row.spellcastingGearKind
+                ? getSpellcastingGearKindLabel(row.spellcastingGearKind)
+                : undefined
             }
-            if (row?.kind === 'armor_class') {
+            if (row?.kind === 'armor_class' && row.bonus != null && !Number.isNaN(row.bonus)) {
               return `AC ${row.bonus >= 0 ? '+' : ''}${row.bonus}`
             }
             return undefined
@@ -276,6 +283,7 @@ export function startingEquipmentModifierFields(): FormItem[] {
           label: 'Focus kind',
           options: focusKindOptions,
           required: true,
+          defaultValue: SPELLCASTING_FOCUS_GEAR_KINDS[0],
         },
       ],
     },

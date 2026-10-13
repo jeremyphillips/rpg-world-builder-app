@@ -21,6 +21,7 @@ import {
   creatureTypeRefSchema,
   creatureWeaponProficiencyTargetSchema,
   equipmentInstanceSchema,
+  equipmentInstanceSchemaBase,
   refineCreatureDamageDefenses,
 } from './creature'
 import { customContentTraitSchema } from './lib/grants/grants'
@@ -51,18 +52,9 @@ export {
   monsterReactionDraftSchema,
 } from './monster/action'
 export type { MonsterAction, MonsterReaction } from './monster/action'
-import type { EquipmentModifier } from './equipment/modifier'
-
-const atMostOneArmorClassModifier = (
-  modifiers: readonly EquipmentModifier[] | undefined,
-  ctx: z.RefinementCtx,
-  path: (string | number)[],
-) => {
-  const armorMods = modifiers?.filter((m) => m.kind === 'armor_class') ?? []
-  if (armorMods.length > 1) {
-    addCustomRefinementIssue(ctx, 'At most one armor_class modifier per equipment instance.', path)
-  }
-}
+import type { EquipmentInstance } from './equipment/instance'
+import { normalizeEquipmentInstance } from './equipment/normalize-equipment-instance'
+import { refineEquipmentInstanceInvariants } from './equipment/instance-invariants'
 
 export const monsterArmorClassSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('unarmored') }),
@@ -86,9 +78,14 @@ export const monsterTraitDraftSchema = z.object({
   description: z.string().min(1).optional(),
 })
 
-export const monsterEquipmentEntrySchema = equipmentInstanceSchema
+const monsterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
   .extend({ entryId: z.string().min(1) })
-  .superRefine((entry, ctx) => atMostOneArmorClassModifier(entry.modifiers, ctx, ['modifiers']))
+  .superRefine((entry, ctx) => refineEquipmentInstanceInvariants(entry, ctx))
+
+export const monsterEquipmentEntrySchema = z.preprocess((value) => {
+  if (!value || typeof value !== 'object') return value
+  return normalizeEquipmentInstance(value as EquipmentInstance)
+}, monsterEquipmentEntrySchemaParsed)
 
 export const monsterBodyFields = {
   size: creatureSizeRefSchema,

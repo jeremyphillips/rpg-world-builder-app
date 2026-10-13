@@ -92,7 +92,7 @@ describe('monster write validation', () => {
           },
         ],
         actions: [],
-        path: 'equipment.0.modifiers',
+        path: 'equipment.0.mechanicalEffects',
       },
       {
         armorClass: { kind: 'natural', bonus: 1 },
@@ -125,6 +125,70 @@ describe('monster write validation', () => {
         ),
       ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
     }
+  })
+
+  it('rejects unknown or duplicate magic property presets on publish', async () => {
+    const campaign = await makeTestCampaign()
+    const longswordId = 'srd-cc-5.2.1:longsword'
+
+    await expect(
+      createHomebrewContent(
+        monstersWriteConfig,
+        campaign.id,
+        {
+          ...minimalHomebrewMonsterInput,
+          slug: 'bad-magic-preset',
+          equipment: [
+            {
+              entryId: 'sword',
+              equipmentId: longswordId,
+              quantity: 1,
+              magical: true,
+              magicProperties: [{ kind: 'preset', propertyId: 'missing-preset' }],
+            },
+          ],
+          actions: [],
+          proficiencies: {
+            savingThrows: [],
+            skills: [],
+            languages: [],
+            weapons: [],
+          },
+        },
+        { status: 'published' },
+      ),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
+
+    await expect(
+      createHomebrewContent(
+        monstersWriteConfig,
+        campaign.id,
+        {
+          ...minimalHomebrewMonsterInput,
+          slug: 'double-enhancement',
+          equipment: [
+            {
+              entryId: 'sword',
+              equipmentId: longswordId,
+              quantity: 1,
+              magical: true,
+              magicProperties: [
+                { kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' },
+                { kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-2' },
+              ],
+            },
+          ],
+          actions: [],
+          proficiencies: {
+            savingThrows: [],
+            skills: [],
+            languages: [],
+            weapons: [],
+          },
+        },
+        { status: 'published' },
+      ),
+    ).rejects.toMatchObject({ status: 400, code: 'validation_error' })
   })
 
   it('allows draft saves with an unresolved skill and rejects publish', async () => {

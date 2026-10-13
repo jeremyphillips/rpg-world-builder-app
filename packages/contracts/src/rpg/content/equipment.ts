@@ -115,6 +115,52 @@ export {
 } from './equipment/modifier'
 
 export {
+  EQUIPMENT_EFFECT_BONUS_MIN,
+  EQUIPMENT_EFFECT_BONUS_MAX,
+  equipmentBonusEffectSchema,
+  equipmentMechanicalEffectSchema,
+  nextNonZeroBonus,
+  type EquipmentBonusEffect,
+  type EquipmentMechanicalEffect,
+} from './equipment/effect'
+
+export {
+  MAGIC_PROPERTY_APPLIES_TO,
+  magicPropertyAppliesToSchema,
+  magicPropertyDefinitionSchema,
+  equipmentMagicPropertyEntrySchema,
+  equipmentMagicPropertyPresetEntrySchema,
+  equipmentMagicPropertyCustomEntrySchema,
+  type MagicPropertyAppliesTo,
+  type MagicPropertyDefinition,
+  type MagicPropertyDefinitionProvider,
+  type EquipmentMagicPropertyEntry,
+} from './equipment/magic-property'
+
+export { normalizeEquipmentInstance } from './equipment/normalize-equipment-instance'
+export { refineEquipmentInstanceInvariants } from './equipment/instance-invariants'
+export {
+  resolveEquipmentMagicProperties,
+  type ResolvedEquipmentMagicProperties,
+  type ResolvedEquipmentMagicPropertyPreset,
+} from './equipment/resolve-equipment-magic-properties'
+export {
+  validateEquipmentMagicProperties,
+  EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE,
+} from './equipment/validate-equipment-magic-properties'
+export {
+  resolveEquipmentEntryEffectTotals,
+  type EquipmentEffectTotals,
+} from './equipment/equipment-effect-totals'
+export {
+  resolveEquipmentEffectWarnings,
+  EQUIPMENT_EFFECT_WARNING,
+  type EquipmentEffectWarning,
+  type EquipmentEffectWarningCode,
+} from './equipment/equipment-effect-warnings'
+export { equipmentInstanceSchema, type EquipmentInstance } from './equipment/instance'
+
+export {
   getEquipmentSpellcastingGearKind,
   type AdventuringGearEquipmentKindFields,
 } from './equipment/adventuring-gear-variant'

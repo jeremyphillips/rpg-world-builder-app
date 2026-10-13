@@ -55,6 +55,10 @@ export const CATALOG_SCHEMA_MANIFEST = [
     fileMatch: ['packages/catalog/src/equipment/data/**/*.json'],
   },
   {
+    file: 'catalog-magic-property-list.schema.json',
+    fileMatch: ['packages/catalog/src/magic-properties/data/**/magic-properties.json'],
+  },
+  {
     file: 'catalog-feat-list.schema.json',
     fileMatch: ['packages/catalog/src/feats/data/**/feats.json'],
   },

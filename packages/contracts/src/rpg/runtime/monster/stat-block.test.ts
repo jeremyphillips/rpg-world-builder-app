@@ -5,6 +5,10 @@ import { skillProficiencySchema } from '../../content/skill-proficiency'
 import { deriveCharacterProfile } from '../character/derive/profile'
 import { resolveEquippedArmorFromInventory } from '../character/sheet/equipment-inventory'
 import { toEquippedArmorPiece, resolveEquippedArmorClass } from '../creature/armor-class'
+import { isWeaponProficient } from '../creature/proficiencies'
+import { resolveWeaponAttackAbilityModifier } from '../creature/weapon-attack'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
+import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-block'
 
 const RULESET = 'srd-cc-5.2.1'
@@ -427,5 +431,74 @@ describe('deriveMonsterDraftStatBlock', () => {
         skillCatalog,
       }),
     ).toThrow(/armorClass is unavailable/)
+  })
+})
+
+describe('equipment magic property derivation parity', () => {
+  const provider: MagicPropertyDefinitionProvider = (id) =>
+    id === 'srd-cc-5.2.1:weapon-enhancement-1'
+      ? {
+          id,
+          name: 'Enhancement +1',
+          description: 'test',
+          category: 'enhancement',
+          appliesTo: ['weapon'],
+          effects: [
+            { target: 'attack_roll', bonus: 1 },
+            { target: 'damage_roll', bonus: 1 },
+          ],
+        }
+      : undefined
+  const longswordId = `${RULESET}:longsword`
+  const longsword = equipmentSchema.parse({
+    ...weaponFromSeed('longsword', {
+      name: 'Longsword',
+      category: 'martial',
+      properties: ['finesse'],
+      mastery: 'nick',
+      damage: { dice: { count: 1, faces: 8 } },
+      damageType: 'slashing',
+    }),
+    id: longswordId,
+    slug: 'longsword',
+  })
+  const catalog = new Map(equipmentCatalog)
+  catalog.set(longswordId, longsword)
+
+  const entry = {
+    entryId: 'sword',
+    equipmentId: longswordId,
+    quantity: 1,
+    equipped: true,
+    magical: true,
+    magicProperties: [{ kind: 'preset' as const, propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
+    mechanicalEffects: [{ effectId: 'manual', target: 'attack_roll' as const, bonus: 1 }],
+  }
+
+  it('matches monster and character weapon totals for enhancement plus manual attack', () => {
+    const monster = {
+      ...kobold,
+      actions: [{ id: 'slash', kind: 'weapon' as const, equipmentEntryId: 'sword' }],
+      equipment: [entry],
+    }
+    const monsterAttack = deriveMonsterStatBlock({
+      monster,
+      equipmentCatalog: catalog,
+      skillCatalog,
+      magicPropertyProvider: provider,
+    }).attacks[0]
+
+    const abilityMod = resolveWeaponAttackAbilityModifier(longsword, monster.abilityScores)!
+    const characterTotals = resolveInventoryWeaponAttackTotals({
+      entry,
+      item: longsword,
+      abilityModifier: abilityMod,
+      proficient: isWeaponProficient(longsword, monster.proficiencies.weapons),
+      proficiencyBonus: 2,
+      provider,
+    })
+
+    expect(characterTotals?.attackBonus).toBe(monsterAttack?.attackBonus)
+    expect(characterTotals?.damageAverage).toBe(Number(monsterAttack?.damage))
   })
 })

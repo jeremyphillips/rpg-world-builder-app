@@ -9,6 +9,7 @@ import {
   startingEquipmentFormSchema,
   startingEquipmentItemFields,
   startingEquipmentItemTitle,
+  startingEquipmentModifierFields,
   startingEquipmentOptionCompactSummary,
   startingEquipmentOptionFormSchema,
 } from './class-starting-equipment-form-fields'
@@ -200,6 +201,23 @@ describe('startingEquipmentItemTitle', () => {
         equipmentOptions,
       ),
     ).toBe('Linked to Tool Proficiencies')
+  })
+})
+
+describe('startingEquipmentModifierFields', () => {
+  it('uses fallback header label when focus kind is not set yet', () => {
+    const fields = startingEquipmentModifierFields()
+    const modifiersField = fields.find(
+      (field): field is Extract<typeof field, { kind: 'array' }> =>
+        field.kind === 'array' && field.name === 'modifiers',
+    )
+    const primary = modifiersField?.item?.header?.primary
+
+    expect(primary?.({ kind: 'spellcasting_focus' }, 0)).toBeUndefined()
+    expect(modifiersField?.appendDefaults?.()).toMatchObject({
+      kind: 'spellcasting_focus',
+      spellcastingGearKind: 'arcane_focus',
+    })
   })
 })
 

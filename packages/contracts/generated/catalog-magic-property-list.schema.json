@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "minItems": 1,
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/__schema0"
+  },
+  "definitions": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "enhancement",
+            "special"
+          ],
+          "description": "enhancement | special"
+        },
+        "appliesTo": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "weapon",
+              "armor",
+              "shield"
+            ],
+            "description": "weapon | armor | shield"
+          }
+        },
+        "effects": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "target": {
+                "type": "string",
+                "enum": [
+                  "attack_roll",
+                  "damage_roll",
+                  "armor_class"
+                ],
+                "description": "attack_roll | damage_roll | armor_class"
+              },
+              "bonus": {
+                "type": "integer",
+                "minimum": -10,
+                "maximum": 10
+              }
+            },
+            "required": [
+              "target",
+              "bonus"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "category",
+        "appliesTo",
+        "effects"
+      ],
+      "additionalProperties": false
+    },
+    "__schema1": {
+      "type": "string",
+      "enum": [
+        "weapon",
+        "armor",
+        "shield"
+      ],
+      "description": "weapon | armor | shield"
+    }
+  }
+}

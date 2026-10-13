@@ -1,6 +1,11 @@
 import type { ArmorEquipmentKindFields } from '../../content/equipment/armor-variant'
+import type { Equipment } from '../../content/equipment'
+import type { EquipmentInstance } from '../../content/equipment/instance'
 import type { EquipmentModifier } from '../../content/equipment/modifier'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
 import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
+
+import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
 
 export type ArmorAcFields = Pick<
   ArmorEquipmentKindFields,
@@ -19,7 +24,7 @@ function sumArmorClassModifierBonus(modifiers: readonly EquipmentModifier[] | un
   )
 }
 
-/** Maps catalog armor plus optional instance modifiers to a resolver piece. */
+/** Maps catalog armor plus optional legacy instance modifiers to a resolver piece. */
 export function toEquippedArmorPiece(
   armor: ArmorAcFields,
   modifiers?: readonly EquipmentModifier[],
@@ -27,6 +32,19 @@ export function toEquippedArmorPiece(
   return {
     ...armor,
     acAdjustment: sumArmorClassModifierBonus(modifiers),
+  }
+}
+
+/** Maps catalog armor plus instance magic/mechanical AC effects to a resolver piece. */
+export function toEquippedArmorPieceForEntry(
+  armor: ArmorAcFields,
+  entry: EquipmentInstance,
+  item: Equipment,
+  provider: MagicPropertyDefinitionProvider,
+): EquippedArmorPiece {
+  return {
+    ...armor,
+    acAdjustment: resolveEquipmentEntryEffectTotals(entry, item, provider).armor_class,
   }
 }
 

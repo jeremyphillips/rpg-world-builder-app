@@ -1,7 +1,10 @@
 import type { ApiValidationIssue } from '../../../shared/api-validation'
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
-import type { Equipment, EquipmentModifier } from '../equipment'
+import type { Equipment, EquipmentInstance } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
+import type { MagicPropertyDefinitionProvider } from '../equipment/magic-property'
+import { normalizeEquipmentInstance } from '../equipment/normalize-equipment-instance'
+import { validateEquipmentMagicProperties } from '../equipment/validate-equipment-magic-properties'
 import type { SkillProficiency } from '../skill-proficiency'
 import {
   isContentCampaignEligible,
@@ -26,12 +29,8 @@ export type MonsterCatalogIssueCode =
 
 export type MonsterCatalogLoadStatus = 'ready' | 'unavailable'
 
-type CatalogEquipmentEntry = {
+type CatalogEquipmentEntry = EquipmentInstance & {
   entryId?: string
-  equipmentId?: string
-  equipped?: boolean
-  customName?: string
-  modifiers?: readonly EquipmentModifier[]
 }
 
 type CatalogAction = {
@@ -59,6 +58,7 @@ export type MonsterCatalogs = {
   skillBySlug: ReadonlyMap<string, SkillProficiency>
   equipmentCatalog?: MonsterCatalogLoadStatus
   skillCatalog?: MonsterCatalogLoadStatus
+  magicPropertyProvider?: MagicPropertyDefinitionProvider
 }
 
 const ACTION_SECTIONS = ['actions', 'bonusActions', 'reactions'] as const
@@ -94,18 +94,28 @@ function collectEquipmentRowIssues(
     )
     return
   }
-  if (
-    entry.modifiers?.some((modifier) => modifier.kind === 'armor_class') &&
-    !isArmorEquipment(item)
-  ) {
+  const normalized = normalizeEquipmentInstance(entry as EquipmentInstance)
+  const hasAcEffect = (normalized.mechanicalEffects ?? []).some(
+    (effect) => effect.target === 'armor_class',
+  )
+  if (hasAcEffect && !isArmorEquipment(item)) {
     issues.push(
       issue(
-        `equipment.${index}.modifiers`,
+        `equipment.${index}.mechanicalEffects`,
         'Armor Class adjustments are only allowed on armor or shields.',
         MONSTER_CATALOG_ISSUE_CODE.armorClassModifierNotArmor,
       ),
     )
   }
+  const provider = catalogs.magicPropertyProvider ?? (() => undefined)
+  issues.push(
+    ...validateEquipmentMagicProperties({
+      entry: normalized,
+      item,
+      provider,
+      pathPrefix: `equipment.${index}`,
+    }),
+  )
   if (entry.equipped && isBodyArmor(item)) {
     equippedBodyArmor.push({ index, label: itemLabel(entry, item) })
   }
