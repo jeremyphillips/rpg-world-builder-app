@@ -45,23 +45,21 @@ import {
   setMonsterPlainStackQuantity,
 } from '../../lib/equipment/monster-equipment-loadout.lib'
 import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
-import {
-  findActionsReferencingEntry,
-  removeEquipmentEntryWithDependents,
-} from '../../lib/actions/monster-action-equipment-references'
+import { findActionsReferencingEntry } from '../../lib/actions/monster-action-equipment-references'
+import { commitEquipmentEntryRemoval } from '../../lib/equipment/commit-equipment-entry-removal.lib'
+import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
+  MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME,
   MONSTER_LOADING_EQUIPMENT,
   MONSTER_RETRY_LABEL,
-  formatRemoveEquipmentConfirmBody,
-  formatRemoveEquipmentConfirmLabel,
-  formatRemoveEquipmentConfirmTitle,
+  formatEquipmentCustomizationRemovalSummary,
+  formatEquipmentRemovalConfirmCopy,
 } from '../../lib/monster-form-labels'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 
 type PendingRemove = {
   entryId: string
-  references: ReturnType<typeof findActionsReferencingEntry>
 }
 
 // fallow-ignore-next-line complexity
@@ -98,9 +96,39 @@ export function MonsterEquipmentPanel({
     [referenceOptions],
   )
 
+  const equipment = values?.equipment ?? []
+
+  const pendingRemoveCopy = useMemo(() => {
+    if (!pendingRemove || !values) return null
+    const removing = equipment.find((entry) => entry.entryId === pendingRemove.entryId)
+    const formValues = values as MonsterFormValues
+    const decision = resolveEquipmentRemovalDecision(
+      formValues,
+      removing ?? {
+        entryId: pendingRemove.entryId,
+        equipmentId: '',
+        quantity: 1,
+      },
+    )
+    const displayName = removing
+      ? resolveEquipmentInstanceSummary(removing, catalog.get(removing.equipmentId), magicProvider)
+          .displayName
+      : MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME
+    return formatEquipmentRemovalConfirmCopy({
+      displayName,
+      reasons: decision.reasons,
+      referencedActionCount: decision.references.length,
+      referencedActionSummary: decision.references
+        .map((reference) => reference.name ?? reference.id)
+        .join(', '),
+      customizationSummary: removing
+        ? formatEquipmentCustomizationRemovalSummary(removing)
+        : undefined,
+    })
+  }, [catalog, equipment, magicProvider, pendingRemove, values])
+
   if (!values) return null
 
-  const equipment = values.equipment ?? []
   const totalQuantity = equipment.reduce((sum, entry) => sum + (entry.quantity ?? 1), 0)
   const groups = groupMonsterEquipmentByKind(equipment, catalog, (item) =>
     getEquipmentKindCollectionLabel(item.kind),
@@ -116,12 +144,14 @@ export function MonsterEquipmentPanel({
   }
 
   const removeEntry = (entryId: string) => {
-    const references = findActionsReferencingEntry(values as MonsterFormValues, entryId)
-    if (references.length > 0) {
-      setPendingRemove({ entryId, references })
+    const entry = equipment.find((row) => row.entryId === entryId)
+    if (!entry) return
+    const decision = resolveEquipmentRemovalDecision(values as MonsterFormValues, entry)
+    if (decision.requiresConfirmation) {
+      setPendingRemove({ entryId })
       return
     }
-    updateEquipment(equipment.filter((entry) => entry.entryId !== entryId))
+    commitEquipmentEntryRemoval(form, entryId)
   }
 
   return (
@@ -274,39 +304,12 @@ export function MonsterEquipmentPanel({
         onOpenChange={(open) => {
           if (!open) setPendingRemove(null)
         }}
-        headline={
-          pendingRemove
-            ? (() => {
-                const removing =
-                  equipment.find((entry) => entry.entryId === pendingRemove.entryId) ??
-                  equipment[0]!
-                return formatRemoveEquipmentConfirmTitle(
-                  resolveEquipmentInstanceSummary(
-                    removing,
-                    catalog.get(removing.equipmentId),
-                    magicProvider,
-                  ).displayName,
-                )
-              })()
-            : ''
-        }
-        description={
-          pendingRemove
-            ? formatRemoveEquipmentConfirmBody(
-                pendingRemove.references
-                  .map((reference) => reference.name ?? reference.id)
-                  .join(', '),
-              )
-            : ''
-        }
-        confirmLabel={
-          pendingRemove ? formatRemoveEquipmentConfirmLabel(pendingRemove.references.length) : ''
-        }
+        headline={pendingRemoveCopy?.headline ?? ''}
+        description={pendingRemoveCopy?.description ?? ''}
+        confirmLabel={pendingRemoveCopy?.confirmLabel ?? ''}
         onConfirm={() => {
           if (!pendingRemove) return
-          form.reset(removeEquipmentEntryWithDependents(form.getValues(), pendingRemove.entryId), {
-            keepDefaultValues: true,
-          })
+          commitEquipmentEntryRemoval(form, pendingRemove.entryId)
           setPendingRemove(null)
         }}
         onCancel={() => setPendingRemove(null)}

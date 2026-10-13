@@ -13,12 +13,13 @@ import {
   getProficiencyDomainCollectionLabel,
   getProficiencyGrantCompactAddLabel,
   HIT_POINTS_TERM,
-  joinInlineMetadata,
   LANGUAGE_TERM,
   PASSIVE_PERCEPTION_TERM,
   SAVING_THROW_SHORT_LABEL,
   SENSE_TERM,
 } from '@rpg/contracts'
+
+export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
 import {
   formatContentListLoadErrorMessage,
@@ -165,6 +166,72 @@ export function formatRemoveEquipmentConfirmBody(actionSummary: string): string 
 export function formatRemoveEquipmentConfirmLabel(actionCount: number): string {
   if (actionCount === 1) return 'Remove weapon and action'
   return `Remove weapon and ${actionCount} actions`
+}
+
+export const MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME = getContentTypeMidSentenceLabel('equipment')
+
+export const MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL = `Remove ${getContentTypeMidSentenceLabel('equipment')}`
+
+const EQUIPMENT_REMOVAL_CUSTOMIZED_BODY = `This ${getContentTypeSentenceForm('equipment', 1)} has customizations that will be discarded.`
+
+function formatEquipmentRemovalInlineCount(
+  count: number,
+  singular: string,
+  plural: string,
+): string {
+  return count === 1 ? `1 ${singular}` : `${count} ${plural}`
+}
+
+export type EquipmentRemovalConfirmCopyInput = {
+  displayName: string
+  reasons: readonly ('customized' | 'referenced')[]
+  referencedActionCount: number
+  referencedActionSummary?: string
+  customizationSummary?: string
+}
+
+export function formatEquipmentRemovalConfirmCopy({
+  displayName,
+  reasons,
+  referencedActionCount,
+  referencedActionSummary,
+  customizationSummary,
+}: EquipmentRemovalConfirmCopyInput): {
+  headline: string
+  description: string
+  confirmLabel: string
+} {
+  const referencedOnly = reasons.includes('referenced') && !reasons.includes('customized')
+  if (referencedOnly) {
+    return {
+      headline: formatRemoveEquipmentConfirmTitle(displayName),
+      description: formatRemoveEquipmentConfirmBody(referencedActionSummary ?? ''),
+      confirmLabel: formatRemoveEquipmentConfirmLabel(referencedActionCount),
+    }
+  }
+
+  const customizedOnly = reasons.includes('customized') && !reasons.includes('referenced')
+  const summarySuffix = customizationSummary ? ` ${customizationSummary}.` : ''
+
+  if (customizedOnly) {
+    return {
+      headline: formatRemoveEquipmentConfirmTitle(displayName),
+      description: `${EQUIPMENT_REMOVAL_CUSTOMIZED_BODY}${summarySuffix}`,
+      confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
+    }
+  }
+
+  const actionPhrase = formatEquipmentRemovalInlineCount(
+    referencedActionCount,
+    'linked action',
+    'linked actions',
+  )
+  const equipmentPhrase = getContentTypeSentenceForm('equipment', 1)
+  return {
+    headline: formatRemoveEquipmentConfirmTitle(displayName),
+    description: `This ${equipmentPhrase} has customizations and is used by ${actionPhrase}. Removing it will discard those customizations and remove the linked actions.${summarySuffix}`,
+    confirmLabel: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
+  }
 }
 
 export function formatWeaponRetargetNotice(

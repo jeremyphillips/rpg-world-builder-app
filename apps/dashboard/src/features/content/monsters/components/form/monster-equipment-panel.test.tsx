@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
@@ -8,6 +8,7 @@ import { pickEquipment } from '@/test/fixtures/pick'
 
 import { mapEquipmentInstanceInventoryStatus } from '@/features/content'
 import { resolveEquipmentInstanceSummary } from '@rpg/contracts'
+import { MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL } from '../../lib/monster-form-labels'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
@@ -128,5 +129,192 @@ describe('MonsterEquipmentPanel', () => {
         magical: true,
       },
     ])
+  })
+
+  describe('equipment removal confirmation', () => {
+    it('removes plain unreferenced equipment without a dialog', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [{ entryId: 'plain', equipmentId: dagger.id, quantity: 1 }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove Dagger'))
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(formRef.current?.getValues('equipment')).toEqual([])
+    })
+
+    it('decrements quantity without a dialog', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [{ entryId: 'plain', equipmentId: dagger.id, quantity: 2 }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Decrease Quantity of Dagger'))
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      expect(formRef.current?.getValues('equipment')).toEqual([
+        { entryId: 'plain', equipmentId: dagger.id, quantity: 1 },
+      ])
+    })
+
+    it('does not confirm magical-only rows without properties', async () => {
+      const dagger = pickEquipment('dagger')
+      const user = userEvent.setup()
+      render(
+        <Host
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [{ entryId: 'mag', equipmentId: dagger.id, quantity: 1, magical: true }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove Dagger'))
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+    })
+
+    it('confirms customized removal and preserves unrelated dirty fields', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            name: 'Original',
+            equipment: [
+              {
+                entryId: 'stack',
+                equipmentId: dagger.id,
+                quantity: 1,
+                customName: 'Shard',
+              },
+            ],
+          }}
+        />,
+      )
+
+      act(() => {
+        formRef.current?.setValue('name', 'Edited', { shouldDirty: true })
+      })
+
+      await user.click(screen.getByLabelText('Remove Shard'))
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument()
+      expect(screen.getByText(/customizations that will be discarded/i)).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Cancel' }))
+      expect(formRef.current?.getValues('equipment')).toHaveLength(1)
+
+      await user.click(screen.getByLabelText('Remove Shard'))
+      await user.click(screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }))
+      expect(formRef.current?.getValues('equipment')).toEqual([])
+      expect(formRef.current?.getValues('name')).toBe('Edited')
+      expect(formRef.current?.getFieldState('name').isDirty).toBe(true)
+    })
+
+    it('uses reference-only copy for linked weapon actions', async () => {
+      const dagger = pickEquipment('dagger')
+      const user = userEvent.setup()
+      render(
+        <Host
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [{ entryId: 'stack', equipmentId: dagger.id, quantity: 1 }],
+            actions: [{ id: 'stab', kind: 'weapon', equipmentEntryId: 'stack', name: 'Stab' }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove Dagger'))
+      expect(screen.getByText(/is used by Stab/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Remove weapon and action' })).toBeInTheDocument()
+    })
+
+    it('shows one combined dialog when customized and referenced', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [
+              { entryId: 'stack', equipmentId: dagger.id, quantity: 1, customName: 'Shard' },
+            ],
+            actions: [{ id: 'stab', kind: 'weapon', equipmentEntryId: 'stack', name: 'Stab' }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove Shard'))
+      expect(screen.getByText(/remove the linked actions/i)).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }))
+      expect(formRef.current?.getValues('equipment')).toEqual([])
+      expect(formRef.current?.getValues('actions')).toEqual([])
+    })
+
+    it('only removes the targeted entryId when two stacks share an equipment id', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [
+              { entryId: 'stack-a', equipmentId: dagger.id, quantity: 1, customName: 'A' },
+              { entryId: 'stack-b', equipmentId: dagger.id, quantity: 1 },
+            ],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove A'))
+      await user.click(screen.getByRole('button', { name: MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL }))
+      expect(formRef.current?.getValues('equipment')).toEqual([
+        { entryId: 'stack-b', equipmentId: dagger.id, quantity: 1 },
+      ])
+    })
+
+    it('confirms cleanup from fresh values when the row is gone but the dialog stays open', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            equipment: [{ entryId: 'stack', equipmentId: dagger.id, quantity: 1 }],
+            actions: [{ id: 'stab', kind: 'weapon', equipmentEntryId: 'stack', name: 'Stab' }],
+          }}
+        />,
+      )
+
+      await user.click(screen.getByLabelText('Remove Dagger'))
+      act(() => {
+        formRef.current?.setValue('equipment', [], { shouldDirty: true })
+      })
+      await user.click(screen.getByRole('button', { name: 'Remove weapon and action' }))
+      expect(formRef.current?.getValues('actions')).toEqual([])
+    })
   })
 })
