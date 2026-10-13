@@ -7,6 +7,10 @@ function entriesEqual(a: EquipmentInstance, b: EquipmentInstance): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }
 
+/**
+ * Applies an editor session to the current equipment list. When the source entry
+ * was removed while the drawer was open, returns the list unchanged (no stale writes).
+ */
 export function commitEquipmentEditorSession<T extends EquipmentInstance & { entryId: string }>(
   entries: readonly T[],
   session: EquipmentEditorSession,

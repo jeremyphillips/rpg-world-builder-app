@@ -182,6 +182,70 @@ describe('monster write validation', () => {
     expect(stored?.equipment).toEqual(equipment)
   })
 
+  it('preserves post-split stack shapes on draft write and catalog read', async () => {
+    const campaign = await makeTestCampaign()
+    const longswordId = 'srd-cc-5.2.1:longsword'
+    const equipment = [
+      {
+        entryId: 'plain-stack',
+        equipmentId: longswordId,
+        quantity: 1,
+        equipped: true,
+      },
+      {
+        entryId: 'split-copy',
+        equipmentId: longswordId,
+        quantity: 1,
+        equipped: true,
+        magical: true,
+        magicProperties: [
+          { kind: 'preset' as const, propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' },
+        ],
+      },
+    ]
+    const created = await createHomebrewContent(
+      monstersWriteConfig,
+      campaign.id,
+      {
+        ...minimalHomebrewMonsterInput,
+        slug: 'equipment-split-stacks',
+        equipment,
+        actions: [{ id: 'slash', kind: 'weapon', equipmentEntryId: 'plain-stack' }],
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
+          weapons: [],
+        },
+      },
+      { status: 'draft' },
+    )
+    expect(created.equipment).toEqual(equipment)
+
+    const updated = await updateContentEntity(monstersWriteConfig, campaign.id, created.id, {
+      equipment,
+    })
+    expect(updated.equipment).toEqual(equipment)
+
+    const catalog = await resolveCatalogForCampaign(monstersWriteConfig.readConfig, campaign.id)
+    const storedEquipment = catalog.find((row) => row.id === created.id)?.equipment
+    expect(storedEquipment).toHaveLength(2)
+    expect(storedEquipment?.[0]).toMatchObject({
+      entryId: 'plain-stack',
+      equipmentId: longswordId,
+      quantity: 1,
+      equipped: true,
+    })
+    expect(storedEquipment?.[1]).toMatchObject({
+      entryId: 'split-copy',
+      equipmentId: longswordId,
+      quantity: 1,
+      equipped: true,
+      magical: true,
+      magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
+    })
+  })
+
   it('allows draft save with an unresolved magic preset id', async () => {
     const campaign = await makeTestCampaign()
     const longswordId = 'srd-cc-5.2.1:longsword'

@@ -89,4 +89,47 @@ describe('validateEquipmentMagicProperties', () => {
       EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE.duplicateEffectTarget,
     ])
   })
+
+  it('rejects more than one enhancement preset on the same entry', () => {
+    const providerWithTwoEnhancements: MagicPropertyDefinitionProvider = (id) => {
+      if (id === `${RULESET}:weapon-enhancement-1`) {
+        return {
+          id,
+          name: 'Enhancement +1',
+          description: 'test',
+          category: 'enhancement',
+          appliesTo: ['weapon'],
+          effects: [{ target: 'attack_roll', bonus: 1 }],
+        }
+      }
+      if (id === `${RULESET}:weapon-enhancement-2`) {
+        return {
+          id,
+          name: 'Enhancement +2',
+          description: 'test',
+          category: 'enhancement',
+          appliesTo: ['weapon'],
+          effects: [{ target: 'attack_roll', bonus: 2 }],
+        }
+      }
+      return undefined
+    }
+
+    const issues = validateEquipmentMagicProperties({
+      entry: {
+        equipmentId: longsword.id,
+        magical: true,
+        magicProperties: [
+          { kind: 'preset', propertyId: `${RULESET}:weapon-enhancement-1` },
+          { kind: 'preset', propertyId: `${RULESET}:weapon-enhancement-2` },
+        ],
+      },
+      item: longsword,
+      provider: providerWithTwoEnhancements,
+      pathPrefix: 'equipment.0',
+    })
+    expect(issues.map((row) => row.code)).toEqual([
+      EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE.multipleEnhancements,
+    ])
+  })
 })

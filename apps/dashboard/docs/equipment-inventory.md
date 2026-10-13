@@ -13,6 +13,11 @@ section title, count badge, and kind-grouped rows (eyebrows only when more than
 one non-empty group). Row metadata uses `statusComposition: 'metadata'` on
 `ContentEntityCard` (Equipped, enhancement, properties, effects).
 
+Monster loadout editing uses the same stack model as the character inventory: plain-stack
+picker priority, scope splits, and stable `entryId`s. See
+[`equipment-stack.ts`](../../../packages/contracts/src/rpg/runtime/creature/equipment-stack.ts)
+and [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md).
+
 ## Pending cart after class change
 
 A class change keeps only the player's own purchases (picker and manual rows; see

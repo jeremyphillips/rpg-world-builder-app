@@ -19,4 +19,19 @@ See `summarizeEquipmentStacks` in `packages/contracts/src/rpg/runtime/creature/e
 
 ## Warnings
 
-Non-blocking warnings come from `resolveEquipmentEffectWarnings` (totals above +3, damage floor, armor/shield AC sanity).
+Non-blocking warnings come from `resolveEquipmentEffectWarnings`. They appear only when the
+relevant rules calculation supports the message:
+
+- **Above standard enhancement (+3):** only when an applicable enhancement preset contributes to
+  that target's total (not for a standalone high manual modifier alone).
+- **Damage floor:** when derived minimum weapon damage can fall below 1.
+- **Body armor / shield AC:** when full AC resolution confirms the piece would net-worsen AC.
+
+## Editor UI (dashboard)
+
+In `EquipmentInstanceEditorDrawer`, enhancement bonuses are derived from presets and are not
+editable mechanical-effect cards. When a preset and a manual effect share a target, a
+**Combined modifiers** block lists per-target totals and names both sources.
+
+Magic properties removed by turning **Magic item** off are dropped on **Done** (the editor
+session), not on page Save.

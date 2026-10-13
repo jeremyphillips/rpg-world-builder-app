@@ -33,6 +33,24 @@ describe('monster-equipment-loadout.lib', () => {
     expect(next.find((row) => row.entryId === 'plain-unequipped')?.quantity).toBe(1)
   })
 
+  it('creates a new plain stack when only customized copies exist for an id', () => {
+    const entries = [
+      {
+        entryId: 'custom',
+        equipmentId: 'srd:dagger',
+        quantity: 1,
+        equipped: true,
+        magical: true,
+      },
+    ]
+    const next = incrementMonsterPlainStack(entries, 'srd:dagger')
+    expect(next).toHaveLength(2)
+    const plain = next.find((row) => row.entryId !== 'custom')
+    expect(plain?.quantity).toBe(1)
+    expect(plain?.magical).toBeFalsy()
+    expect(next.find((row) => row.entryId === 'custom')?.quantity).toBe(1)
+  })
+
   it('removes the plain stack when quantity hits zero', () => {
     const entries = [
       {

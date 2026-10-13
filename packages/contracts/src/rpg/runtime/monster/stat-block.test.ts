@@ -257,6 +257,44 @@ describe('modifiedArmorFixture parity', () => {
 
   it('matches character and monster equipment AC paths', () => {
     const dexScore = 16
+    const normalizedArmor = normalizeEquipmentInstance(modifiedArmorFixture)
+
+    for (const armorEntry of [modifiedArmorFixture, normalizedArmor]) {
+      const monsterBlock = deriveMonsterStatBlock({
+        monster: {
+          ...kobold,
+          armorClass: { kind: 'equipment' },
+          equipment: [armorEntry],
+          actions: [],
+        },
+        equipmentCatalog,
+        skillCatalog,
+      })
+
+      const characterPieces = resolveEquippedArmorFromInventory({
+        equipment: {
+          weapons: [],
+          armor: [armorEntry],
+          tools: [],
+          gear: [],
+          magicItems: [],
+          vehicles: [],
+          mounts: [],
+        },
+        catalog: equipmentCatalog,
+      })
+      const characterAc = deriveCharacterProfile({
+        level: 1,
+        proficiencies: { weapons: [], armor: [], tools: [], skills: [], languages: [] },
+        skillProficiencies: [],
+        abilityScores: { dex: dexScore },
+        equippedArmor: characterPieces,
+      }).ac
+
+      expect(monsterBlock.ac).toBe(14)
+      expect(characterAc).toBe(14)
+    }
+
     const monsterBlock = deriveMonsterStatBlock({
       monster: {
         ...kobold,
@@ -267,35 +305,12 @@ describe('modifiedArmorFixture parity', () => {
       equipmentCatalog,
       skillCatalog,
     })
-
-    const characterPieces = resolveEquippedArmorFromInventory({
-      equipment: {
-        weapons: [],
-        armor: [modifiedArmorFixture],
-        tools: [],
-        gear: [],
-        magicItems: [],
-        vehicles: [],
-        mounts: [],
-      },
-      catalog: equipmentCatalog,
-    })
-    const characterAc = deriveCharacterProfile({
-      level: 1,
-      proficiencies: { weapons: [], armor: [], tools: [], skills: [], languages: [] },
-      skillProficiencies: [],
-      abilityScores: { dex: dexScore },
-      equippedArmor: characterPieces,
-    }).ac
-
-    expect(monsterBlock.ac).toBe(14)
     expect(monsterBlock.acBreakdown.bodyArmor).toMatchObject({
       base: 13,
       dex: 2,
       adjustment: -1,
     })
     expect(monsterBlock.acBreakdown.shields).toEqual([])
-    expect(characterAc).toBe(14)
     expect(
       resolveEquippedArmorClass({
         acBase: 10,
@@ -312,6 +327,44 @@ describe('modifiedArmorFixture parity', () => {
         ],
       }),
     ).toBe(14)
+  })
+
+  it('ignores equipped body armor AC under natural armor class', () => {
+    const armorEnhancementProvider: MagicPropertyDefinitionProvider = (id) =>
+      id === `${RULESET}:armor-enhancement-1`
+        ? {
+            id,
+            name: 'Armor +1',
+            description: 'test',
+            category: 'enhancement',
+            appliesTo: ['armor'],
+            effects: [{ target: 'armor_class', bonus: 1 }],
+          }
+        : undefined
+
+    const bodyArmorEntry = {
+      entryId: 'chain',
+      equipmentId: `${RULESET}:chain-shirt`,
+      quantity: 1,
+      equipped: true,
+      magical: true,
+      magicProperties: [{ kind: 'preset' as const, propertyId: `${RULESET}:armor-enhancement-1` }],
+    }
+
+    const withoutBody = deriveMonsterStatBlock({
+      monster: { ...kobold, equipment: [], actions: [] },
+      equipmentCatalog,
+      skillCatalog,
+    })
+    const withBody = deriveMonsterStatBlock({
+      monster: { ...kobold, equipment: [bodyArmorEntry], actions: [] },
+      equipmentCatalog,
+      skillCatalog,
+      magicPropertyProvider: armorEnhancementProvider,
+    })
+
+    expect(withBody.ac).toBe(withoutBody.ac)
+    expect(withBody.acBreakdown.bodyArmor).toBeUndefined()
   })
 
   it('counts a shield under natural armor as its own contribution', () => {
