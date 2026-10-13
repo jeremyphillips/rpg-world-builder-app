@@ -6,7 +6,7 @@ export type EquipmentStackEntry = EquipmentInstance & { entryId: string }
 function equipmentEntryHasConfiguration(entry: EquipmentInstance): boolean {
   const normalized = normalizeEquipmentInstance(entry)
   if (normalized.customName || normalized.customDescription || normalized.magical) return true
-  return [normalized.magicProperties, normalized.mechanicalEffects, normalized.modifiers].some(
+  return [normalized.magicProperties, normalized.adjustments, normalized.modifiers].some(
     (rows) => (rows?.length ?? 0) > 0,
   )
 }

@@ -10,7 +10,7 @@ export function refineEquipmentInstanceInvariants(
   pathPrefix: (string | number)[] = [],
 ): void {
   const magicProperties = entry.magicProperties ?? []
-  const mechanicalEffects = entry.mechanicalEffects ?? []
+  const adjustments = entry.adjustments ?? []
 
   if (magicProperties.length > 0 && !entry.magical) {
     addCustomRefinementIssue(ctx, 'Magic properties require the magical flag.', [
@@ -39,26 +39,23 @@ export function refineEquipmentInstanceInvariants(
     ])
   }
 
-  const effectIds = mechanicalEffects.map((row) => row.effectId)
+  const effectIds = adjustments.map((row) => row.effectId)
   if (new Set(effectIds).size !== effectIds.length) {
-    addCustomRefinementIssue(ctx, 'Duplicate mechanical effect ids.', [
-      ...pathPrefix,
-      'mechanicalEffects',
-    ])
+    addCustomRefinementIssue(ctx, 'Duplicate adjustment ids.', [...pathPrefix, 'adjustments'])
   }
 
-  const targets = mechanicalEffects.map((row) => row.target)
+  const targets = adjustments.map((row) => row.target)
   if (new Set(targets).size !== targets.length) {
-    addCustomRefinementIssue(ctx, 'At most one mechanical effect per target.', [
+    addCustomRefinementIssue(ctx, 'At most one adjustment per target.', [
       ...pathPrefix,
-      'mechanicalEffects',
+      'adjustments',
     ])
   }
 
   if (entry.modifiers?.some((modifier) => modifier.kind === 'armor_class')) {
     addCustomRefinementIssue(
       ctx,
-      'Use mechanicalEffects for Armor Class bonuses instead of armor_class modifiers.',
+      'Use adjustments for Armor Class bonuses instead of armor_class modifiers.',
       [...pathPrefix, 'modifiers'],
     )
   }

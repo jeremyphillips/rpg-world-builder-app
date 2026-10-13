@@ -1,8 +1,13 @@
-import type { EquipmentMechanicalEffect } from './effect'
+import type { EquipmentAdjustment } from './effect'
 import type { EquipmentInstance } from './instance'
 import type { EquipmentModifier } from './modifier'
 
 const LEGACY_AC_EFFECT_ID = 'legacy-armor-class-modifier'
+
+type LegacyEquipmentInstanceInput = EquipmentInstance & {
+  mechanicalEffects?: readonly EquipmentAdjustment[]
+  adjustments?: readonly EquipmentAdjustment[]
+}
 
 function stripLegacyArmorClassModifiers(modifiers: readonly EquipmentModifier[] | undefined): {
   modifiers: EquipmentModifier[] | undefined
@@ -24,18 +29,24 @@ function stripLegacyArmorClassModifiers(modifiers: readonly EquipmentModifier[] 
   }
 }
 
-function mergeLegacyAcIntoMechanicalEffects(
-  entry: EquipmentInstance,
-  legacyAcBonus: number | undefined,
-): EquipmentMechanicalEffect[] | undefined {
-  const existing = entry.mechanicalEffects ?? []
-  if (legacyAcBonus === undefined) {
-    return existing.length > 0 ? existing : undefined
+function resolveBaseAdjustments(raw: LegacyEquipmentInstanceInput): EquipmentAdjustment[] {
+  if (Object.prototype.hasOwnProperty.call(raw, 'adjustments')) {
+    return [...(raw.adjustments ?? [])]
   }
-  const hasAcTarget = existing.some((effect) => effect.target === 'armor_class')
-  if (hasAcTarget) return existing.length > 0 ? existing : undefined
+  return [...(raw.mechanicalEffects ?? [])]
+}
+
+function mergeLegacyAcIntoAdjustments(
+  baseAdjustments: EquipmentAdjustment[],
+  legacyAcBonus: number | undefined,
+): EquipmentAdjustment[] | undefined {
+  if (legacyAcBonus === undefined) {
+    return baseAdjustments.length > 0 ? baseAdjustments : undefined
+  }
+  const hasAcTarget = baseAdjustments.some((effect) => effect.target === 'armor_class')
+  if (hasAcTarget) return baseAdjustments.length > 0 ? baseAdjustments : undefined
   return [
-    ...existing,
+    ...baseAdjustments,
     {
       effectId: LEGACY_AC_EFFECT_ID,
       target: 'armor_class',
@@ -44,16 +55,19 @@ function mergeLegacyAcIntoMechanicalEffects(
   ]
 }
 
-/** Converts legacy armor_class modifiers into mechanicalEffects and strips them from modifiers. */
+/** Converts legacy armor_class modifiers and mechanicalEffects into adjustments. */
 export function normalizeEquipmentInstance<T extends EquipmentInstance>(entry: T): T {
-  const { modifiers, legacyAcBonus } = stripLegacyArmorClassModifiers(entry.modifiers)
-  const mechanicalEffects = mergeLegacyAcIntoMechanicalEffects(
-    { ...entry, modifiers },
-    legacyAcBonus,
-  )
+  const raw = entry as LegacyEquipmentInstanceInput
+  const { modifiers, legacyAcBonus } = stripLegacyArmorClassModifiers(raw.modifiers)
+  const merged = mergeLegacyAcIntoAdjustments(resolveBaseAdjustments(raw), legacyAcBonus)
+  const {
+    mechanicalEffects: _legacyMechanicalEffects,
+    adjustments: _legacyAdjustments,
+    ...rest
+  } = raw
   return {
-    ...entry,
+    ...rest,
     modifiers,
-    mechanicalEffects,
-  }
+    adjustments: merged,
+  } as T
 }

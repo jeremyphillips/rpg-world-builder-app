@@ -132,6 +132,20 @@ describe('equipment editor session', () => {
     expect(back.mode).toEqual({ kind: 'propertyBrowse', draft: expect.any(Object) })
   })
 
+  it('stores manual bonuses on the adjustments field', () => {
+    const state = createEquipmentEditorState({
+      sourceEntry: { ...baseEntry, quantity: 1 },
+    })
+    const next = equipmentEditorReducer(state, {
+      type: 'commitEffectDraft',
+      draft: { effectId: 'fx1', target: 'attack_roll', bonus: 2 },
+      replace: false,
+    })
+    expect(next.session.draft.adjustments).toEqual([
+      { effectId: 'fx1', target: 'attack_roll', bonus: 2 },
+    ])
+  })
+
   it('replaces an enhancement preset from browse', () => {
     const state = createEquipmentEditorState({
       sourceEntry: {

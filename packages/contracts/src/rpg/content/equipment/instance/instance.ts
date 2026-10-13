@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { equipmentMechanicalEffectSchema } from './effect'
+import { equipmentAdjustmentSchema } from './effect'
 import { equipmentMagicPropertyEntrySchema } from './magic-property'
 import { equipmentModifierSchema } from './modifier'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'
@@ -21,7 +21,7 @@ export const equipmentInstanceSchemaBase = z.object({
   customDescription: z.string().optional(),
   magical: z.boolean().optional(),
   magicProperties: z.array(equipmentMagicPropertyEntrySchema).optional(),
-  mechanicalEffects: z.array(equipmentMechanicalEffectSchema).optional(),
+  adjustments: z.array(equipmentAdjustmentSchema).optional(),
   modifiers: z.array(equipmentModifierSchema).optional(),
 })
 

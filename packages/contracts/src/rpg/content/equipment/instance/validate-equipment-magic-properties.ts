@@ -10,7 +10,7 @@ export const EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE = {
   inapplicablePreset: 'inapplicable_magic_property_preset',
   duplicatePreset: 'duplicate_magic_property_preset',
   multipleEnhancements: 'multiple_magic_property_enhancements',
-  duplicateEffectTarget: 'duplicate_mechanical_effect_target',
+  duplicateEffectTarget: 'duplicate_equipment_adjustment_target',
 } as const
 
 function issue(path: string, message: string, code: string): ApiValidationIssue {
@@ -72,12 +72,12 @@ export function validateEquipmentMagicProperties(args: {
     )
   }
 
-  const targets = (normalized.mechanicalEffects ?? []).map((effect) => effect.target)
+  const targets = (normalized.adjustments ?? []).map((effect) => effect.target)
   if (new Set(targets).size !== targets.length) {
     issues.push(
       issue(
-        `${pathPrefix}.mechanicalEffects`,
-        'At most one mechanical effect per target.',
+        `${pathPrefix}.adjustments`,
+        'At most one adjustment per target.',
         EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE.duplicateEffectTarget,
       ),
     )

@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '@/test/fixtures/pick'
 
-import { formatMonsterEquipmentRowMetadata } from '../../lib/equipment/monster-equipment-entry-display.lib'
+import { mapEquipmentInstanceInventoryStatus } from '@/features/content'
+import { resolveEquipmentInstanceSummary } from '@rpg/contracts'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
@@ -48,9 +49,11 @@ describe('MonsterEquipmentPanel', () => {
       magical: true,
       magicProperties: [{ kind: 'preset' as const, propertyId: 'missing-preset' }],
     }
-    expect(formatMonsterEquipmentRowMetadata({ entry, item: dagger, provider })).toContain(
-      'unknown property',
-    )
+    const summary = resolveEquipmentInstanceSummary(entry, dagger, provider)
+    const status = mapEquipmentInstanceInventoryStatus(summary)
+    expect(
+      status.status.some((row) => row.kind === 'text' && row.label.includes('Unknown property')),
+    ).toBe(true)
 
     render(
       <Host

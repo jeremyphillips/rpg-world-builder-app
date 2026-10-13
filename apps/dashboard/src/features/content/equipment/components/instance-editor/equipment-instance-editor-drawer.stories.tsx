@@ -22,7 +22,7 @@ function EditorHost({
       | { kind: 'preset'; propertyId: string }
       | { kind: 'custom'; customId: string; name: string; description: string }
     >
-    mechanicalEffects?: Array<{
+    adjustments?: Array<{
       effectId: string
       target: 'attack_roll' | 'damage_roll' | 'armor_class'
       bonus: number
@@ -79,7 +79,7 @@ export const EnhancementAndManualAttack: Story = {
       equipped: true,
       magical: true,
       magicProperties: [{ kind: 'preset', propertyId: `${rulesetId}:weapon-enhancement-1` }],
-      mechanicalEffects: [{ effectId: 'manual', target: 'attack_roll', bonus: 1 }],
+      adjustments: [{ effectId: 'manual', target: 'attack_roll', bonus: 1 }],
     },
   },
 }

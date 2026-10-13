@@ -76,7 +76,7 @@ describe('validateEquipmentMagicProperties', () => {
     const duplicateTarget = validateEquipmentMagicProperties({
       entry: {
         equipmentId: longsword.id,
-        mechanicalEffects: [
+        adjustments: [
           { effectId: 'a', target: 'attack_roll', bonus: 1 },
           { effectId: 'b', target: 'attack_roll', bonus: 2 },
         ],

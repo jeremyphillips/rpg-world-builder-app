@@ -61,8 +61,9 @@ describe('equipment contract verification (§10)', () => {
     expect(normalized).toMatchObject({
       magical: true,
       magicProperties: raw.magicProperties,
-      mechanicalEffects: raw.mechanicalEffects,
+      adjustments: [{ effectId: 'fx-1', target: 'attack_roll', bonus: 1 }],
     })
+    expect(normalized).not.toHaveProperty('mechanicalEffects')
     expect(normalizeEquipmentInstance(normalized)).toEqual(normalized)
   })
 

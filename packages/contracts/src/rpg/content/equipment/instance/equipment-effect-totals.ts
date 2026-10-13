@@ -27,7 +27,7 @@ function addEffectTotals(
   )
 }
 
-/** Preset enhancement effects plus manual mechanicalEffects, per target. */
+/** Preset enhancement effects plus manual adjustments, per target. */
 export function resolveEquipmentEntryEffectTotals(
   entry: EquipmentInstance,
   item: Equipment,
@@ -41,7 +41,7 @@ export function resolveEquipmentEntryEffectTotals(
     totals = addEffectTotals(totals, preset.definition.effects)
   }
 
-  for (const effect of normalized.mechanicalEffects ?? []) {
+  for (const effect of normalized.adjustments ?? []) {
     totals = addEffectTotals(totals, [effect])
   }
 

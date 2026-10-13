@@ -6,6 +6,7 @@ import {
   getContentTypeTerm,
   getEquipmentKindCollectionLabel,
   normalizeEquipmentInstance,
+  resolveEquipmentInstanceSummary,
   type EquipmentPickerItem,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -24,6 +25,7 @@ import {
   EquipmentCategoryGroupedList,
   EquipmentInventorySectionHeader,
   EquipmentInstanceEditorDrawer,
+  mapEquipmentInstanceInventoryStatus,
 } from '@/features/content'
 import {
   EquipmentPickerDrawer,
@@ -37,16 +39,12 @@ import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/cont
 import { resolveStrictCatalogWriteGateReason } from '../../../lib/forms/shells/layout/content-form-catalog-write-gate.lib'
 import { useReportContentFormWriteGate } from '../../../lib/forms/shells/layout/content-form-write-gate'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
-import { formatMonsterEquipmentRowMetadata } from '../../lib/equipment/monster-equipment-entry-display.lib'
 import {
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
   setMonsterPlainStackQuantity,
 } from '../../lib/equipment/monster-equipment-loadout.lib'
-import {
-  equipmentEntryBaseName,
-  equipmentEntryReferenceLabel,
-} from '../../lib/equipment/monster-equipment-labels'
+import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
 import {
   findActionsReferencingEntry,
   removeEquipmentEntryWithDependents,
@@ -168,25 +166,14 @@ export function MonsterEquipmentPanel({
         }
         renderRow={(entry) => {
           const item = catalog.get(entry.equipmentId)
-          const label = equipmentEntryReferenceLabel(entry, equipment, catalog)
-          const metadata = formatMonsterEquipmentRowMetadata({
-            entry,
-            item,
-            provider: magicProvider,
-          })
+          const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
+          const inventoryStatus = mapEquipmentInstanceInventoryStatus(summary)
+          const label = summary.displayName
           return (
             <ContentFormEntitySelectionRow
               entity={{
                 heading: label,
-                description: equipmentEntryBaseName(entry, catalog),
-                ...(metadata
-                  ? {
-                      statusComposition: 'metadata' as const,
-                      status: [
-                        { kind: 'text' as const, label: metadata, variant: 'muted' as const },
-                      ],
-                    }
-                  : {}),
+                ...(inventoryStatus.status.length > 0 ? inventoryStatus : {}),
               }}
               trailing={{
                 kind: 'utility',
@@ -289,14 +276,18 @@ export function MonsterEquipmentPanel({
         }}
         headline={
           pendingRemove
-            ? formatRemoveEquipmentConfirmTitle(
-                equipmentEntryReferenceLabel(
+            ? (() => {
+                const removing =
                   equipment.find((entry) => entry.entryId === pendingRemove.entryId) ??
-                    equipment[0]!,
-                  equipment,
-                  catalog,
-                ),
-              )
+                  equipment[0]!
+                return formatRemoveEquipmentConfirmTitle(
+                  resolveEquipmentInstanceSummary(
+                    removing,
+                    catalog.get(removing.equipmentId),
+                    magicProvider,
+                  ).displayName,
+                )
+              })()
             : ''
         }
         description={

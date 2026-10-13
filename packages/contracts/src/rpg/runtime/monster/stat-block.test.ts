@@ -534,7 +534,7 @@ describe('equipment magic property derivation parity', () => {
     equipped: true,
     magical: true,
     magicProperties: [{ kind: 'preset' as const, propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
-    mechanicalEffects: [{ effectId: 'manual', target: 'attack_roll' as const, bonus: 1 }],
+    adjustments: [{ effectId: 'manual', target: 'attack_roll' as const, bonus: 1 }],
   }
 
   it('matches monster and character weapon totals for enhancement plus manual attack', () => {
@@ -692,7 +692,7 @@ describe('equipment effect derivation (ship P0)', () => {
       equipmentId: `${RULESET}:chain-shirt`,
       quantity: 1,
       equipped: true,
-      mechanicalEffects: [{ effectId: 'ac', target: 'armor_class' as const, bonus: 5 }],
+      adjustments: [{ effectId: 'ac', target: 'armor_class' as const, bonus: 5 }],
     }
     const block = deriveMonsterStatBlock({
       monster: {

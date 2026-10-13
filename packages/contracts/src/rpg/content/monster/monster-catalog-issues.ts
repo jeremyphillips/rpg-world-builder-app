@@ -96,13 +96,13 @@ function collectEquipmentRowIssues(
     return
   }
   const normalized = normalizeEquipmentInstance(entry as EquipmentInstance)
-  const hasAcEffect = (normalized.mechanicalEffects ?? []).some(
+  const hasAcEffect = (normalized.adjustments ?? []).some(
     (effect) => effect.target === 'armor_class',
   )
   if (hasAcEffect && !isArmorEquipment(item)) {
     issues.push(
       issue(
-        `equipment.${index}.mechanicalEffects`,
+        `equipment.${index}.adjustments`,
         'Armor Class adjustments are only allowed on armor or shields.',
         MONSTER_CATALOG_ISSUE_CODE.armorClassModifierNotArmor,
       ),

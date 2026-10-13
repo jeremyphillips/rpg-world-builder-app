@@ -92,7 +92,7 @@ describe('monster write validation', () => {
           },
         ],
         actions: [],
-        path: 'equipment.0.mechanicalEffects',
+        path: 'equipment.0.adjustments',
       },
       {
         armorClass: { kind: 'natural', bonus: 1 },
@@ -140,7 +140,7 @@ describe('monster write validation', () => {
         magicProperties: [
           { kind: 'preset' as const, propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' },
         ],
-        mechanicalEffects: [{ effectId: 'fx1', target: 'attack_roll' as const, bonus: 1 }],
+        adjustments: [{ effectId: 'fx1', target: 'attack_roll' as const, bonus: 1 }],
       },
       {
         entryId: 'custom-stack',

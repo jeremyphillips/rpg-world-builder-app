@@ -29,6 +29,7 @@ export {
   type EquipmentEditorState,
 } from './lib/instance-editor/equipment-editor-reducer'
 export { EquipmentInstanceEditorDrawer } from './components/instance-editor/equipment-instance-editor-drawer'
+export { mapEquipmentInstanceInventoryStatus } from './lib/instance-summary/map-equipment-instance-inventory-status'
 export {
   EQUIPMENT_FAMILY_PATHS,
   equipmentKindToFamilyPath,

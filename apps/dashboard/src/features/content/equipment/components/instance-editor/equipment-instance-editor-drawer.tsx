@@ -79,9 +79,9 @@ function editorModeTitle(state: EquipmentEditorState): string {
     case 'main':
       return 'Edit item'
     case 'effectChoose':
-      return 'Add mechanical effect'
+      return 'Add adjustment'
     case 'effectForm':
-      return state.mode.origin === 'existing' ? 'Edit mechanical effect' : 'Add mechanical effect'
+      return state.mode.origin === 'existing' ? 'Edit adjustment' : 'Add adjustment'
     case 'propertyBrowse':
       return 'Add magic property'
     case 'propertyCreate':
@@ -92,8 +92,8 @@ function editorModeTitle(state: EquipmentEditorState): string {
 }
 
 function backTargetLabel(state: EquipmentEditorState): string | null {
-  if (state.mode.kind === 'effectChoose') return 'Add mechanical effect'
-  if (state.mode.kind === 'effectForm') return 'Add mechanical effect'
+  if (state.mode.kind === 'effectChoose') return 'Add adjustment'
+  if (state.mode.kind === 'effectForm') return 'Add adjustment'
   if (state.mode.kind === 'propertyBrowse') return 'Add magic property'
   if (state.mode.kind === 'propertyCreate' && state.mode.origin === 'browse') {
     return 'Add magic property'
@@ -233,7 +233,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
                   dispatch({ type: 'removeEffect', effectId: editorMode.draft.effectId! })
                 }
               >
-                Remove effect
+                Remove adjustment
               </Button>
             ) : null}
             <Button
@@ -253,7 +253,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
                 })
               }
             >
-              {editorMode.origin === 'existing' ? 'Save effect' : 'Add effect'}
+              {editorMode.origin === 'existing' ? 'Save adjustment' : 'Add adjustment'}
             </Button>
           </>
         )
@@ -360,7 +360,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
             onMagical={(magical) => dispatch({ type: 'setMagical', magical })}
             onOpenEffectChoose={() => dispatch({ type: 'openEffectChoose' })}
             onOpenEffectForm={(effectId) => {
-              const row = state.session.draft.mechanicalEffects?.find(
+              const row = state.session.draft.adjustments?.find(
                 (effect) => effect.effectId === effectId,
               )
               if (!row) return
@@ -405,7 +405,7 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
             item={catalogItem}
             draft={editorMode.draft}
             existingTargets={
-              new Set(state.session.draft.mechanicalEffects?.map((row) => row.target) ?? [])
+              new Set(state.session.draft.adjustments?.map((row) => row.target) ?? [])
             }
             onSelect={(target) =>
               dispatch({
@@ -465,7 +465,7 @@ function CombinedMechanicalModifiers({
   magic: ReturnType<typeof resolveEquipmentMagicProperties>
   totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
 }) {
-  const manualTargets = new Set((draft.mechanicalEffects ?? []).map((effect) => effect.target))
+  const manualTargets = new Set((draft.adjustments ?? []).map((effect) => effect.target))
   const enhancementName =
     magic.resolved.find((row) => row.definition.category === 'enhancement')?.definition.name ??
     'Enhancement'
@@ -693,12 +693,13 @@ function MainModeBody({
 
       <div className="space-y-2">
         <Heading variant="subsection" as="h3">
-          Mechanical effects
+          Adjustments
         </Heading>
         <Text variant="muted">
-          Add bonuses that change the creature&apos;s attack rolls, damage, or Armor Class.
+          Fine-tune this equipment&apos;s attack, damage, or Armor Class values independently of
+          magical properties.
         </Text>
-        {(draft.mechanicalEffects ?? []).map((row) => (
+        {(draft.adjustments ?? []).map((row) => (
           <ContentFormEntitySelectionRow
             key={row.effectId}
             entity={{
@@ -729,7 +730,7 @@ function MainModeBody({
           />
         ))}
         <ActionButton action="add" variant="ghost" onClick={onOpenEffectChoose}>
-          Add effect
+          Add adjustment
         </ActionButton>
         <CombinedMechanicalModifiers draft={draft} magic={magic} totals={totals} />
       </div>

@@ -25,7 +25,7 @@ function stripMagicPropertiesWhenOff(draft: EquipmentInstance): EquipmentInstanc
   return { ...draft, magicProperties: undefined }
 }
 
-function upsertMechanicalEffect(
+function upsertAdjustment(
   draft: EquipmentInstance,
   effectDraft: EffectDraft,
   replace: boolean,
@@ -37,10 +37,10 @@ function upsertMechanicalEffect(
     bonus: effectDraft.bonus,
     ...(effectDraft.notes ? { notes: effectDraft.notes } : {}),
   }
-  const rest = (draft.mechanicalEffects ?? []).filter(
+  const rest = (draft.adjustments ?? []).filter(
     (row) => row.target !== nextEffect.target && (replace ? row.effectId !== effectId : true),
   )
-  return { ...draft, mechanicalEffects: [...rest, nextEffect] }
+  return { ...draft, adjustments: [...rest, nextEffect] }
 }
 
 function upsertMagicProperty(
@@ -128,17 +128,13 @@ function applyEffectAction(
     case 'openEffectForm':
       return { ...state, mode: { kind: 'effectForm', draft: action.draft, origin: action.origin } }
     case 'commitEffectDraft': {
-      const draft = upsertMechanicalEffect(
-        state.session.draft,
-        action.draft,
-        action.replace ?? false,
-      )
+      const draft = upsertAdjustment(state.session.draft, action.draft, action.replace ?? false)
       return withSession({ ...state, mode: { kind: 'main' } }, { ...state.session, draft })
     }
     case 'removeEffect': {
       const draft = {
         ...state.session.draft,
-        mechanicalEffects: (state.session.draft.mechanicalEffects ?? []).filter(
+        adjustments: (state.session.draft.adjustments ?? []).filter(
           (row) => row.effectId !== action.effectId,
         ),
       }

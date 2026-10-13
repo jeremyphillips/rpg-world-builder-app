@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef, useState, type RefObject } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type RefObject } from 'react'
+import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import { useFormContext, type UseFormReturn } from 'react-hook-form'
 import {
   getContentTypeTerm,
@@ -7,8 +8,11 @@ import {
   getWeaponModeLabel,
   isWeaponEquipment,
   MONSTER_ACTION_KINDS,
+  resolveEquipmentInstanceReferenceLabel,
   type Equipment,
+  type MagicPropertyDefinitionProvider,
   type MonsterActionKind,
+  type SystemRulesetId,
 } from '@rpg/contracts'
 import { Button, ConfirmDialog, SemanticText, Text } from '@rpg/ui'
 
@@ -28,7 +32,6 @@ import {
   MONSTER_ACTION_SECTIONS,
   type MonsterActionSection,
 } from '../../lib/actions/monster-action-equipment-references'
-import { equipmentEntryReferenceLabel } from '../../lib/equipment/monster-equipment-labels'
 import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import {
   MONSTER_ACTION_DETAIL_EMPTY,
@@ -83,10 +86,17 @@ function linkedEquipmentName(
   action: MonsterActionDraftRow,
   equipment: EquipmentRows,
   catalog: EquipmentCatalog,
+  provider: MagicPropertyDefinitionProvider,
+  siblingEntries: readonly MonsterFormValues['equipment'][number][] = equipment ?? [],
 ): string | undefined {
   const entry = (equipment ?? []).find((row) => row.entryId === action.equipmentEntryId)
   if (!entry) return action.equipmentEntryId
-  return equipmentEntryReferenceLabel(entry, equipment ?? [], catalog)
+  return resolveEquipmentInstanceReferenceLabel(
+    entry,
+    catalog.get(entry.equipmentId),
+    provider,
+    siblingEntries,
+  )
 }
 
 function withWeaponMode(
@@ -273,6 +283,7 @@ function WeaponEquipmentControls({
   action,
   equipment,
   catalog,
+  provider,
   equipmentSelectRef,
   addingWeapon,
   weaponChoices,
@@ -283,6 +294,7 @@ function WeaponEquipmentControls({
   action: MonsterActionDraftRow
   equipment: EquipmentRows
   catalog: EquipmentCatalog
+  provider: MagicPropertyDefinitionProvider
   equipmentSelectRef: RefObject<HTMLSelectElement | null>
   addingWeapon: boolean
   weaponChoices: { value: string; label: string }[]
@@ -307,15 +319,25 @@ function WeaponEquipmentControls({
             const entryId = event.target.value
             onWeaponSwap(
               entryId,
-              linkedEquipmentName({ ...action, equipmentEntryId: entryId }, equipment, catalog) ??
-                entryId,
+              linkedEquipmentName(
+                { ...action, equipmentEntryId: entryId },
+                equipment,
+                catalog,
+                provider,
+                ownedWeapons,
+              ) ?? entryId,
             )
           }}
         >
           <option value="">Select</option>
           {ownedWeapons.map((entry) => (
             <option key={entry.entryId} value={entry.entryId}>
-              {equipmentEntryReferenceLabel(entry, equipment ?? [], catalog)}
+              {resolveEquipmentInstanceReferenceLabel(
+                entry,
+                catalog.get(entry.equipmentId),
+                provider,
+                ownedWeapons,
+              )}
             </option>
           ))}
         </select>
@@ -471,6 +493,8 @@ function MonsterActionDetail({
   onToggleAddWeapon: () => void
 }) {
   const catalog = monsterEquipmentCatalog(ctx)
+  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const provider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
   const { getValues } = useFormContext<MonsterFormValues>()
   const equipment = getValues().equipment
   return (
@@ -494,6 +518,7 @@ function MonsterActionDetail({
           action={action}
           equipment={equipment}
           catalog={catalog}
+          provider={provider}
           equipmentSelectRef={equipmentSelectRef}
           addingWeapon={addingWeapon}
           weaponChoices={weaponChoices}
@@ -626,6 +651,8 @@ function ActionDetailPane({
   if (!located) return <p>{MONSTER_ACTION_DETAIL_EMPTY}</p>
   const values = form.getValues()
   const catalog = monsterEquipmentCatalog(ctx)
+  const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
+  const provider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
   const advisories = collectMonsterFormAdvisories(values, catalog)
     .filter((advisory) => advisory.path.startsWith(`${located.section}.${located.index}`))
     .map((advisory) => advisory.message)
@@ -643,8 +670,8 @@ function ActionDetailPane({
       onKind={(kind) =>
         sections.requestKind(
           kind,
-          linkedEquipmentName(located.action, values.equipment, catalog),
-          linkedEquipmentName(located.action, values.equipment, catalog),
+          linkedEquipmentName(located.action, values.equipment, catalog, provider) ?? '',
+          linkedEquipmentName(located.action, values.equipment, catalog, provider) ?? '',
         )
       }
       onRemove={() => sections.removeAction(located.action.id)}

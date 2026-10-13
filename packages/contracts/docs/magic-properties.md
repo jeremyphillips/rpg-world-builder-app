@@ -8,8 +8,8 @@ Magic property **presets** live in `@rpg/catalog` (`loadSeedMagicProperties`, `c
 
 - `magical: true` is required when `magicProperties` is non-empty; magical with zero properties is valid.
 - At most one **enhancement** preset per instance (validated on write via `validateEquipmentMagicProperties`).
-- At most one manual `mechanicalEffects` row per `target` (`attack_roll`, `damage_roll`, `armor_class`).
-- Enhancement contributions are derived from presets and must not be duplicated into `mechanicalEffects`.
+- At most one manual `adjustments` row per `target` (`attack_roll`, `damage_roll`, `armor_class`).
+- Enhancement contributions are derived from presets and must not be duplicated into `adjustments`.
 
 ## Stacks
 
@@ -30,7 +30,7 @@ relevant rules calculation supports the message:
 ## Editor UI (dashboard)
 
 In `EquipmentInstanceEditorDrawer`, enhancement bonuses are derived from presets and are not
-editable mechanical-effect cards. When a preset and a manual effect share a target, a
+editable adjustment cards. When a preset and a manual adjustment share a target, a
 **Combined modifiers** block lists per-target totals and names both sources.
 
 Magic properties removed by turning **Magic item** off are dropped on **Done** (the editor

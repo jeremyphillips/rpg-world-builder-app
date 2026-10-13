@@ -1042,7 +1042,7 @@
           "magicProperties": {
             "$ref": "#/definitions/__schema43"
           },
-          "mechanicalEffects": {
+          "adjustments": {
             "$ref": "#/definitions/__schema44"
           },
           "modifiers": {

@@ -116,7 +116,7 @@ describe('effect totals and warnings', () => {
         equipmentId: weapon.id,
         magical: true,
         magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
-        mechanicalEffects: [{ effectId: 'e1', target: 'attack_roll', bonus: 1 }],
+        adjustments: [{ effectId: 'e1', target: 'attack_roll', bonus: 1 }],
       },
       weapon,
       provider,
@@ -130,7 +130,7 @@ describe('effect totals and warnings', () => {
         equipmentId: weapon.id,
         magical: true,
         magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
-        mechanicalEffects: [{ effectId: 'e1', target: 'attack_roll', bonus: 3 }],
+        adjustments: [{ effectId: 'e1', target: 'attack_roll', bonus: 3 }],
       },
       item: weapon,
       provider,
@@ -142,7 +142,7 @@ describe('effect totals and warnings', () => {
     const warnings = resolveEquipmentEffectWarnings({
       entry: {
         equipmentId: weapon.id,
-        mechanicalEffects: [{ effectId: 'e1', target: 'attack_roll', bonus: 4 }],
+        adjustments: [{ effectId: 'e1', target: 'attack_roll', bonus: 4 }],
       },
       item: weapon,
       provider: () => undefined,

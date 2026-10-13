@@ -3,7 +3,12 @@ import { z } from 'zod'
 import { coinWealthSchema, type CoinWealth } from '../../../primitives/wealth'
 import type { Equipment } from '../../../content/equipment'
 import { isArmorEquipment } from '../../../content/equipment'
-import { equipmentInstanceSchemaBase } from '../../../content/equipment/instance/instance'
+import {
+  equipmentInstanceSchemaBase,
+  type EquipmentInstance,
+} from '../../../content/equipment/instance/instance'
+import { normalizeEquipmentInstance } from '../../../content/equipment/instance/normalize-equipment-instance'
+import { refineEquipmentInstanceInvariants } from '../../../content/equipment/instance/instance-invariants'
 import type { CharacterWealthGrant } from '../../../content/lib/grants/wealth-grant'
 import type { EquipmentKind } from '../../../vocab/equipment/kind'
 import type { CreatureEquipmentCatalog } from '../../creature/equipment'
@@ -15,11 +20,18 @@ import { characterSelectionSourcesSchema } from './selection-sources'
 // Equipment, wealth, and feats
 // ---------------------------------------------------------------------------
 
-export const characterEquipmentEntrySchema = equipmentInstanceSchemaBase.extend({
-  attuned: z.boolean().optional(),
-  sources: characterSelectionSourcesSchema,
-  notes: z.string().optional(),
-})
+const characterEquipmentEntrySchemaParsed = equipmentInstanceSchemaBase
+  .extend({
+    attuned: z.boolean().optional(),
+    sources: characterSelectionSourcesSchema,
+    notes: z.string().optional(),
+  })
+  .superRefine((entry, ctx) => refineEquipmentInstanceInvariants(entry, ctx))
+
+export const characterEquipmentEntrySchema = z.preprocess((value) => {
+  if (!value || typeof value !== 'object') return value
+  return normalizeEquipmentInstance(value as EquipmentInstance)
+}, characterEquipmentEntrySchemaParsed)
 
 export type CharacterEquipmentEntry = z.infer<typeof characterEquipmentEntrySchema>
 

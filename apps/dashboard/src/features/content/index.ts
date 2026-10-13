@@ -195,6 +195,7 @@ export {
   type EquipmentCategoryGroup,
   type EquipmentEditorState,
   EquipmentInstanceEditorDrawer,
+  mapEquipmentInstanceInventoryStatus,
   EQUIPMENT_DETAILS_SECTION_TITLES,
   EQUIPMENT_STAT_LABELS,
   type EquipmentDetailViewModel,

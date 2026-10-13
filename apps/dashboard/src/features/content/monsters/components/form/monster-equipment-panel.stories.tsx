@@ -73,7 +73,7 @@ export const EnhancementOverlap: Story = {
           equipped: true,
           magical: true,
           magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
-          mechanicalEffects: [{ effectId: 'manual', target: 'attack_roll', bonus: 1 }],
+          adjustments: [{ effectId: 'manual', target: 'attack_roll', bonus: 1 }],
         },
       ]}
     />

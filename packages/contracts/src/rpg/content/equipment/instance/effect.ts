@@ -19,14 +19,14 @@ export const equipmentBonusEffectSchema = z
 
 export type EquipmentBonusEffect = z.infer<typeof equipmentBonusEffectSchema>
 
-export const equipmentMechanicalEffectSchema = equipmentBonusEffectSchema
+export const equipmentAdjustmentSchema = equipmentBonusEffectSchema
   .extend({
     effectId: z.string().min(1),
     notes: z.string().optional(),
   })
   .strict()
 
-export type EquipmentMechanicalEffect = z.infer<typeof equipmentMechanicalEffectSchema>
+export type EquipmentAdjustment = z.infer<typeof equipmentAdjustmentSchema>
 
 /** Stepper helper — skips 0 when moving between signed values. */
 export function nextNonZeroBonus(prev: number, next: number): number {

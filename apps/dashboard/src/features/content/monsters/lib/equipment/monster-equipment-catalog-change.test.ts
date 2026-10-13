@@ -6,7 +6,7 @@ import {
   findActionsReferencingEntry,
   removeEquipmentEntryWithDependents,
 } from '../actions/monster-action-equipment-references'
-import { equipmentEntryReferenceLabel } from './monster-equipment-labels'
+import { resolveEquipmentInstanceReferenceLabel } from '@rpg/contracts'
 import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 
 const dagger = { id: 'dagger', kind: 'weapon', name: 'Dagger' } as Equipment
@@ -72,14 +72,28 @@ describe('monster equipment catalog changes', () => {
     expect(cleared).toMatchObject({ outcome: 'confirm', reason: 'clear-adjustment' })
   })
 
-  it('disambiguates duplicate catalog names', () => {
+  it('disambiguates duplicate catalog names with entry tokens', () => {
     const catalog = new Map<string, Equipment>([['dagger', dagger]])
+    const provider = () => undefined
     const entries = [
       { entryId: 'a', equipmentId: 'dagger', quantity: 1 },
       { entryId: 'b', equipmentId: 'dagger', quantity: 1 },
     ]
-    expect(equipmentEntryReferenceLabel(entries[0]!, entries, catalog)).toBe('Dagger (1)')
-    expect(equipmentEntryReferenceLabel(entries[1]!, entries, catalog)).toBe('Dagger (2)')
+    const first = resolveEquipmentInstanceReferenceLabel(
+      entries[0]!,
+      catalog.get('dagger'),
+      provider,
+      entries,
+    )
+    const second = resolveEquipmentInstanceReferenceLabel(
+      entries[1]!,
+      catalog.get('dagger'),
+      provider,
+      entries,
+    )
+    expect(first).not.toBe(second)
+    expect(first).toContain('Dagger')
+    expect(second).toContain('Dagger')
   })
 
   it('uses the real dagger and armor fixtures only as types', () => {

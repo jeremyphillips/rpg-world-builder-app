@@ -118,10 +118,10 @@ export {
   EQUIPMENT_EFFECT_BONUS_MIN,
   EQUIPMENT_EFFECT_BONUS_MAX,
   equipmentBonusEffectSchema,
-  equipmentMechanicalEffectSchema,
+  equipmentAdjustmentSchema,
   nextNonZeroBonus,
+  type EquipmentAdjustment,
   type EquipmentBonusEffect,
-  type EquipmentMechanicalEffect,
 } from './equipment/instance/effect'
 
 export {
@@ -159,6 +159,15 @@ export {
   type EquipmentEffectWarningCode,
 } from './equipment/instance/equipment-effect-warnings'
 export { equipmentInstanceSchema, type EquipmentInstance } from './equipment/instance/instance'
+export {
+  resolveEquipmentInstanceSummary,
+  EQUIPMENT_INSTANCE_VISIBLE_PROPERTY_NAME_LIMIT,
+  type EquipmentInstanceIntegrityWarning,
+  type EquipmentInstanceSummary,
+  type ResolveEquipmentInstanceSummaryOptions,
+} from './equipment/instance/resolve-equipment-instance-summary'
+export { resolveEquipmentInstanceReferenceLabel } from './equipment/instance/resolve-equipment-instance-reference-label'
+export { formatEquipmentEntryDisplayToken } from './equipment/instance/equipment-entry-display-token'
 
 export {
   getEquipmentSpellcastingGearKind,
