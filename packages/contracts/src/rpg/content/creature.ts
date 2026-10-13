@@ -241,4 +241,3 @@ export function refineCreatureDamageDefenses(
 
 export { equipmentInstanceSchema, equipmentInstanceSchemaBase }
 export type { EquipmentInstance } from './equipment/instance'
-export type { EquipmentInstance } from './equipment/instance'
