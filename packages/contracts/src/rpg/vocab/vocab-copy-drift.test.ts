@@ -45,8 +45,6 @@ const COPY_DERIVATION_BASELINE = [
   '4 apps/dashboard/src/features/game-terms/routes/vocabulary-overview-content.tsx label-identifier',
   '2 apps/dashboard/src/features/game-terms/routes/vocabulary-term-detail-content.tsx label-identifier',
   '2 apps/dashboard/src/features/media/lib/media-role-confirm.lib.ts label-identifier',
-  '1 apps/dashboard/src/lib/create-flow/create-composition-summary.tsx label-member',
-  '2 apps/dashboard/src/lib/create-setup/setup-summary-row-models.tsx label-member',
   '1 packages/contracts/src/rpg/content/lib/equipment-compact-display.ts label-getter',
   '1 packages/contracts/src/rpg/content/lib/grants/equipment-grant.ts label-identifier',
   '1 packages/contracts/src/rpg/content/lib/relationship/organization-location-connection-location-occupancy.ts label-getter',
@@ -62,6 +60,7 @@ const COPY_DERIVATION_BASELINE = [
   '1 packages/contracts/src/rpg/vocab/types.ts label-identifier',
   '1 packages/contracts/src/rpg/vocab/weapon/compatibility.ts label-getter',
   '1 packages/ui/src/components/ui/combobox-field-parts.client.tsx label-identifier',
+  '1 packages/ui/src/components/ui/selection-summary-decisions.tsx label-member',
   '1 packages/ui/src/filters/active-filter-chips.client.tsx label-member',
 ] as const
 

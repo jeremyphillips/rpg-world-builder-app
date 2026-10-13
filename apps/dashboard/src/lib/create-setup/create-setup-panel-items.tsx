@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Button, RadioCardField, SelectionSummaryCard } from '@rpg/ui'
+import { Button, RadioCardField, SelectionSummaryCards } from '@rpg/ui'
 
 import {
   resolveCreateSetupSetExpanded,
@@ -10,7 +10,7 @@ import {
   resolveSetupSummaryCards,
   type SetupSummaryCard,
 } from './resolve-setup-summary-rows.lib'
-import { mapSetupSummaryRowsToSelectionProps } from './setup-summary-row-models'
+import { setupSummaryCardsToDecisionCards } from './setup-summary-row-models'
 import type {
   CreateSetupChoiceSet,
   CreateSetupSequenceModel,
@@ -110,11 +110,12 @@ function resolvePanelSummaryCards(
   )
 }
 
-function renderSummaryCard(
+function renderSummaryCards(
   input: BuildCreateSetupPanelItemsInput,
-  card: SetupSummaryCard,
+  cards: readonly SetupSummaryCard[],
 ): ReactNode {
-  if (card.rows.length === 0) return null
+  const nonEmpty = cards.filter((card) => card.rows.length > 0)
+  if (nonEmpty.length === 0) return null
 
   const activeTargetId =
     input.activeSummaryTargetId !== undefined
@@ -124,15 +125,10 @@ function renderSummaryCard(
     input.onSummaryNavigate ?? ((targetSetId: string) => input.model.reopen(targetSetId))
 
   return (
-    <SelectionSummaryCard
-      key={card.id}
-      eyebrow={card.eyebrow}
-      rows={mapSetupSummaryRowsToSelectionProps({
-        rows: card.rows,
-        activeTargetId,
-        changeLabel: input.changeLabel,
-        onNavigate,
-      })}
+    <SelectionSummaryCards
+      cards={setupSummaryCardsToDecisionCards(nonEmpty, onNavigate)}
+      activeDecisionId={activeTargetId}
+      defaultChangeLabel={input.changeLabel}
     />
   )
 }
@@ -142,10 +138,8 @@ export function buildCreateSetupPanelItems(input: BuildCreateSetupPanelItemsInpu
   const setById = buildCreateSetupSetMap(sets)
   const panelItems: ReactNode[] = []
 
-  for (const card of resolvePanelSummaryCards(input)) {
-    const summaryCard = renderSummaryCard(input, card)
-    if (summaryCard) panelItems.push(summaryCard)
-  }
+  const summaryCards = renderSummaryCards(input, resolvePanelSummaryCards(input))
+  if (summaryCards) panelItems.push(summaryCards)
 
   for (const setId of model.visibleSetIds) {
     const set = setById.get(setId)

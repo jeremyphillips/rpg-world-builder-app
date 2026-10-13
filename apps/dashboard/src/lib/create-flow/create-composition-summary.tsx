@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import {
-  SelectionSummaryChangeAction,
+  mapSummaryDecisionRowsToSelectionProps,
   SelectionSummaryRow,
-  type SelectionSummaryRowProps,
+  type SummaryDecisionRow,
 } from '@rpg/ui'
 
 import { createCompositionSummaryRowsClasses } from './create-composition.variants'
@@ -22,35 +22,16 @@ export type CreateCompositionSummaryProps = {
   defaultChangeLabel?: string
 }
 
-function toSelectionSummaryRowProps(
-  row: CreateCompositionSummaryRow,
-  defaultChangeLabel: string,
-): SelectionSummaryRowProps {
-  if (row.onChange == null) {
-    return {
-      label: row.label,
-      value: row.value,
-      helper: row.helper,
-    }
-  }
-
-  const changeLabel = row.changeLabel ?? defaultChangeLabel
-  const valueActionAriaLabel = row.valueActionAriaLabel ?? `Change ${row.label.toLowerCase()}`
-
-  return {
+function toSummaryDecisionRows(rows: readonly CreateCompositionSummaryRow[]): SummaryDecisionRow[] {
+  return rows.map((row) => ({
+    id: row.id,
     label: row.label,
     value: row.value,
-    helper: row.helper,
-    onValueClick: row.onChange,
-    valueActionAriaLabel,
-    action: (
-      <SelectionSummaryChangeAction
-        changeLabel={changeLabel}
-        ariaLabel={valueActionAriaLabel}
-        onChange={row.onChange}
-      />
-    ),
-  }
+    ...(row.helper ? { description: row.helper } : {}),
+    ...(row.onChange ? { onNavigate: row.onChange } : {}),
+    ...(row.changeLabel ? { changeLabel: row.changeLabel } : {}),
+    ...(row.valueActionAriaLabel ? { valueActionAriaLabel: row.valueActionAriaLabel } : {}),
+  }))
 }
 
 export function CreateCompositionSummary({
@@ -59,14 +40,15 @@ export function CreateCompositionSummary({
 }: CreateCompositionSummaryProps) {
   if (rows.length === 0) return null
 
+  const selectionRows = mapSummaryDecisionRowsToSelectionProps({
+    rows: toSummaryDecisionRows(rows),
+    defaultChangeLabel,
+  })
+
   return (
     <dl className={createCompositionSummaryRowsClasses}>
-      {rows.map((row, index) => (
-        <SelectionSummaryRow
-          key={row.id}
-          {...toSelectionSummaryRowProps(row, defaultChangeLabel)}
-          showDivider={index > 0}
-        />
+      {selectionRows.map((row, index) => (
+        <SelectionSummaryRow key={rows[index]!.id} {...row} showDivider={index > 0} />
       ))}
     </dl>
   )

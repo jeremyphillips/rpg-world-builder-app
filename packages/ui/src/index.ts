@@ -534,6 +534,14 @@ export {
   type SelectionSummaryRowProps,
 } from './components/ui/selection-summary-card'
 export {
+  mapSummaryDecisionRowsToSelectionProps,
+  SELECTION_SUMMARY_DEFAULT_CHANGE_LABEL,
+  SelectionSummaryCards,
+  type SelectionSummaryCardsProps,
+  type SummaryDecisionCard,
+  type SummaryDecisionRow,
+} from './components/ui/selection-summary-decisions'
+export {
   selectionSummaryCardListClasses,
   selectionSummaryCardRowHelperVariants,
 } from './components/ui/selection-summary-card.variants'

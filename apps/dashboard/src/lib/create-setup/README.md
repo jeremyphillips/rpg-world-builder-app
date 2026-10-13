@@ -106,6 +106,21 @@ the resulting state.
 
 Feature domain models stay in feature `lib/` and build `CreateSetupSet[]` for the panel.
 
+### Completed decisions vs entity collections
+
+Presentation for **completed decisions** (label, value, optional description, Change navigation) is
+owned by `@rpg/ui`: `SummaryDecisionRow`, `mapSummaryDecisionRowsToSelectionProps`, and
+`SelectionSummaryCard` / `SelectionSummaryCards`. Create-setup adds registry resolution and panel
+wiring only — not a second visual system.
+
+| Need                                                  | Use                                                                                |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Progressive create setup (sets, invalidation, footer) | This library: registry + `CreateSetupPanel` / `useCreateSetupSequence`             |
+| Authoring recap or modal strip after setup            | `resolveSetupSummaryRows` + `SetupSummaryRows`, or `CreateModalShell.setupSummary` |
+| Drawer / reducer wizard (no `CreateSetupSet[]`)       | `SummaryDecisionRow` + `SelectionSummaryCards` from `@rpg/ui`                      |
+| Nested composer completed decisions (cardless stack)  | `CreateCompositionSummary` in `@/lib/create-flow`                                  |
+| Committed entities in a list (edit/remove)            | `ContentFormEntitySelectionRow` — not summary cards                                |
+
 ## Consumers
 
 - **Location create modal** — Site/Settlement/Region auto-advance on final selection; Building Form → Facility
@@ -127,8 +142,8 @@ placeholder organization row. Shared structural presentation lives in
 [create-flow.md](../../docs/create-flow.md#nested-composition-presentation).
 
 Sequenced create-modal setup must use create-setup orchestration unless listed as a documented
-exception. Relationship sequenced Add drawers import `SelectionSummaryCard` from `@rpg/ui` directly —
-they are **not** create-setup consumers. `create-setup-parallel-path-drift.test.ts` and
+exception. Relationship sequenced Add drawers use `SelectionSummaryCards` / `SummaryDecisionRow` from
+`@rpg/ui` directly — they are **not** create-setup consumers. `create-setup-parallel-path-drift.test.ts` and
 `sequenced-relationship-drawer-drift.test.ts` guard against collapse chrome and deleted kind-step
 wrappers. `RadioCardField` is allowed for active decisions.
 

@@ -37,6 +37,7 @@ import {
 } from '@rpg/ui'
 
 import { DrawerShell } from '@/components/drawer'
+import { CreateCompositionSummary } from '@/lib/create-flow'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
 import { commitEquipmentEditorSession } from '../../lib/instance-editor/commit-equipment-editor-session'
@@ -780,12 +781,16 @@ function EffectFormBody({
 }) {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <Text>Effect: {draft.target ? effectTargetLabel(draft.target) : '—'}</Text>
-        <Button type="button" variant="ghost" size="sm" onClick={onChangeTarget}>
-          Change
-        </Button>
-      </div>
+      <CreateCompositionSummary
+        rows={[
+          {
+            id: 'effect-target',
+            label: 'Effect target',
+            value: draft.target ? effectTargetLabel(draft.target) : '—',
+            onChange: onChangeTarget,
+          },
+        ]}
+      />
       <NumberStepper
         value={draft.bonus}
         min={EQUIPMENT_EFFECT_BONUS_MIN}

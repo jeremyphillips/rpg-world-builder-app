@@ -7,7 +7,7 @@ import type {
   OrganizationLocationConnectionKind,
 } from '@rpg/contracts'
 import { getOrganizationLocationConnectionDisplayLabel } from '@rpg/contracts'
-import { Button, Heading, SelectionSummaryCard, SelectionSummaryChangeAction, Text } from '@rpg/ui'
+import { Button, Heading, SelectionSummaryCards, Text } from '@rpg/ui'
 import { LocationConnectionKindField } from '../../../lib/relationship/location-connection/location-connection-kind-field'
 import { comparePickerName } from '@/lib/catalog-picker/compare-picker-name'
 import type { ContentCreateContext } from '@/lib/create-flow'
@@ -675,23 +675,26 @@ function OrganizationLocationConnectionLinkDrawerContent({
               />
             ) : null}
             {showKindSummary && selectedKindOption ? (
-              <SelectionSummaryCard
-                eyebrow={RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW}
-                rows={[
+              <SelectionSummaryCards
+                cards={[
                   {
-                    label: kindFieldLabel,
-                    value: selectedKindOption.label,
-                    onValueClick: startEditingKind,
-                    valueActionAriaLabel: kindChangeAriaLabel,
-                    action: (
-                      <SelectionSummaryChangeAction
-                        changeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
-                        ariaLabel={kindChangeAriaLabel}
-                        onChange={startEditingKind}
-                      />
-                    ),
+                    id: 'kind-summary',
+                    eyebrow: RELATIONSHIP_DRAWER_SELECTIONS_EYEBROW,
+                    rows: [
+                      {
+                        id: 'kind',
+                        label: kindFieldLabel,
+                        value: selectedKindOption.label,
+                        decisionId: 'kind',
+                        onNavigate: startEditingKind,
+                        changeLabel: RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL,
+                        valueActionAriaLabel: kindChangeAriaLabel,
+                      },
+                    ],
                   },
                 ]}
+                activeDecisionId={showKindField ? 'kind' : null}
+                defaultChangeLabel={RELATIONSHIP_DRAWER_KIND_SUMMARY_CHANGE_LABEL}
               />
             ) : null}
             {mode === 'changeTarget' &&
