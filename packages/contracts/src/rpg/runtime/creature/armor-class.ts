@@ -1,11 +1,11 @@
 import type { ArmorEquipmentKindFields } from '../../content/equipment/armor-variant'
 import type { Equipment } from '../../content/equipment'
-import type { EquipmentInstance } from '../../content/equipment/instance'
-import type { EquipmentModifier } from '../../content/equipment/modifier'
-import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
+import type { EquipmentInstance } from '../../content/equipment/instance/instance'
+import type { EquipmentModifier } from '../../content/equipment/instance/modifier'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
 
-import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
+import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/instance/equipment-effect-totals'
 
 export type ArmorAcFields = Pick<
   ArmorEquipmentKindFields,

@@ -1,7 +1,7 @@
 import type { CharacterClass } from '../../../../content/classes/class'
 import { isSpellcastingActiveAtLevel } from '../../../../content/classes/spellcasting/class-spellcasting-ownership'
 import { getEquipmentSpellcastingGearKind } from '../../../../content/equipment/adventuring-gear-variant'
-import type { SpellcastingFocusGearKind } from '../../../../content/equipment/modifier'
+import type { SpellcastingFocusGearKind } from '../../../../content/equipment/instance/modifier'
 import {
   isWealthOnlyStartingEquipmentOption,
   startingEquipmentGrantEquipmentSlug,

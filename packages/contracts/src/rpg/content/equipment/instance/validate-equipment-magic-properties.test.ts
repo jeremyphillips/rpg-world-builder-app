@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema } from '../equipment'
+import { equipmentSchema } from '../../equipment'
 import {
   EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE,
   validateEquipmentMagicProperties,

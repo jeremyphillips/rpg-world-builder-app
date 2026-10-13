@@ -1,5 +1,5 @@
-import type { EquipmentInstance } from '../../content/equipment/instance'
-import { normalizeEquipmentInstance } from '../../content/equipment/normalize-equipment-instance'
+import type { EquipmentInstance } from '../../content/equipment/instance/instance'
+import { normalizeEquipmentInstance } from '../../content/equipment/instance/normalize-equipment-instance'
 
 export type EquipmentStackEntry = EquipmentInstance & { entryId: string }
 

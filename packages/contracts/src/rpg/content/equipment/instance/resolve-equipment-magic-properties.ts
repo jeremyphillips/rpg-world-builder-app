@@ -1,4 +1,4 @@
-import type { Equipment } from '../equipment'
+import type { Equipment } from '../../equipment'
 import type { EquipmentInstance } from './instance'
 import type {
   EquipmentMagicPropertyEntry,

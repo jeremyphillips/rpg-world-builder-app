@@ -1,5 +1,5 @@
-import type { ApiValidationIssue } from '../../../shared/api-validation'
-import type { Equipment } from '../equipment'
+import type { ApiValidationIssue } from '../../../../shared/api-validation'
+import type { Equipment } from '../../equipment'
 import type { EquipmentInstance } from './instance'
 import type { MagicPropertyDefinitionProvider } from './magic-property'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'

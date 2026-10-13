@@ -13,7 +13,7 @@ import { skillSchema } from './skill-proficiency'
 import { proficiencyRankSchema } from '../vocab/proficiency'
 import { weaponProficiencyGrantSetSchema } from '../primitives/proficiency/typed-proficiency-grant-set'
 import { weaponCategorySchema } from '../vocab/weapon/category'
-import { equipmentInstanceSchema, equipmentInstanceSchemaBase } from './equipment/instance'
+import { equipmentInstanceSchema, equipmentInstanceSchemaBase } from './equipment/instance/instance'
 
 /**
  * Shared creature value objects for contracts that describe creatures.
@@ -240,4 +240,4 @@ export function refineCreatureDamageDefenses(
 }
 
 export { equipmentInstanceSchema, equipmentInstanceSchemaBase }
-export type { EquipmentInstance } from './equipment/instance'
+export type { EquipmentInstance } from './equipment/instance/instance'

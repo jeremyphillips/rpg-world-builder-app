@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { spellcastingFocusGearKindSchema } from '../../vocab/equipment/spellcasting-gear-kind'
+import { spellcastingFocusGearKindSchema } from '../../../vocab/equipment/spellcasting-gear-kind'
 
 // ---------------------------------------------------------------------------
 // Equipment modifiers — per-copy overlays on catalog items (spellcasting focus,
@@ -18,7 +18,7 @@ export {
   SPELLCASTING_FOCUS_GEAR_KINDS,
   spellcastingFocusGearKindSchema,
   type SpellcastingFocusGearKind,
-} from '../../vocab/equipment/spellcasting-gear-kind'
+} from '../../../vocab/equipment/spellcasting-gear-kind'
 
 export const spellcastingFocusModifierSchema = z
   .object({

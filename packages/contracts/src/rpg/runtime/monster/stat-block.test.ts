@@ -14,8 +14,8 @@ import { resolveEquippedArmorFromInventory } from '../character/sheet/equipment-
 import { toEquippedArmorPiece, resolveEquippedArmorClass } from '../creature/armor-class'
 import { isWeaponProficient } from '../creature/proficiencies'
 import { resolveWeaponAttackAbilityModifier } from '../creature/weapon-attack'
-import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
-import { normalizeEquipmentInstance } from '../../content/equipment/normalize-equipment-instance'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import { normalizeEquipmentInstance } from '../../content/equipment/instance/normalize-equipment-instance'
 import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { deriveMonsterDraftStatBlock, deriveMonsterStatBlock } from './stat-block'
 

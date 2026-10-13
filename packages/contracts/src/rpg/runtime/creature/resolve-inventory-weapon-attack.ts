@@ -1,8 +1,8 @@
 import type { Equipment } from '../../content/equipment'
 import { isWeaponEquipment } from '../../content/equipment'
-import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
-import type { EquipmentInstance } from '../../content/equipment/instance'
-import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
+import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/instance/equipment-effect-totals'
+import type { EquipmentInstance } from '../../content/equipment/instance/instance'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 
 import { averageStatBlockDamage } from './stat-block-average'
 import { weaponAttackBonus } from './weapon-attack'

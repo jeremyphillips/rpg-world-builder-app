@@ -112,7 +112,7 @@ export {
   type EquipmentModifierKind,
   type SpellcastingFocusGearKind,
   type SpellcastingFocusModifier,
-} from './equipment/modifier'
+} from './equipment/instance/modifier'
 
 export {
   EQUIPMENT_EFFECT_BONUS_MIN,
@@ -122,7 +122,7 @@ export {
   nextNonZeroBonus,
   type EquipmentBonusEffect,
   type EquipmentMechanicalEffect,
-} from './equipment/effect'
+} from './equipment/instance/effect'
 
 export {
   MAGIC_PROPERTY_APPLIES_TO,
@@ -135,30 +135,30 @@ export {
   type MagicPropertyDefinition,
   type MagicPropertyDefinitionProvider,
   type EquipmentMagicPropertyEntry,
-} from './equipment/magic-property'
+} from './equipment/instance/magic-property'
 
-export { normalizeEquipmentInstance } from './equipment/normalize-equipment-instance'
-export { refineEquipmentInstanceInvariants } from './equipment/instance-invariants'
+export { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
+export { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
 export {
   resolveEquipmentMagicProperties,
   type ResolvedEquipmentMagicProperties,
   type ResolvedEquipmentMagicPropertyPreset,
-} from './equipment/resolve-equipment-magic-properties'
+} from './equipment/instance/resolve-equipment-magic-properties'
 export {
   validateEquipmentMagicProperties,
   EQUIPMENT_MAGIC_PROPERTY_ISSUE_CODE,
-} from './equipment/validate-equipment-magic-properties'
+} from './equipment/instance/validate-equipment-magic-properties'
 export {
   resolveEquipmentEntryEffectTotals,
   type EquipmentEffectTotals,
-} from './equipment/equipment-effect-totals'
+} from './equipment/instance/equipment-effect-totals'
 export {
   resolveEquipmentEffectWarnings,
   EQUIPMENT_EFFECT_WARNING,
   type EquipmentEffectWarning,
   type EquipmentEffectWarningCode,
-} from './equipment/equipment-effect-warnings'
-export { equipmentInstanceSchema, type EquipmentInstance } from './equipment/instance'
+} from './equipment/instance/equipment-effect-warnings'
+export { equipmentInstanceSchema, type EquipmentInstance } from './equipment/instance/instance'
 
 export {
   getEquipmentSpellcastingGearKind,

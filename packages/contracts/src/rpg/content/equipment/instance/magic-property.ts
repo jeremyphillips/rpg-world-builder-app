@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { equipmentBonusEffectSchema } from './effect'
-import { magicPropertyCategorySchema } from '../../vocab/magic-property/category'
+import { magicPropertyCategorySchema } from '../../../vocab/magic-property/category'
 
 export const MAGIC_PROPERTY_APPLIES_TO = ['weapon', 'armor', 'shield'] as const
 

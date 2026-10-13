@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { equipmentEffectTargetSchema } from '../../vocab/equipment/effect-target'
+import { equipmentEffectTargetSchema } from '../../../vocab/equipment/effect-target'
 
 export const EQUIPMENT_EFFECT_BONUS_MIN = -10
 export const EQUIPMENT_EFFECT_BONUS_MAX = 10

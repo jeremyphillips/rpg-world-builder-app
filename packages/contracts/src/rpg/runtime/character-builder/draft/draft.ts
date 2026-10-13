@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { equipmentModifierSchema } from '../../../content/equipment/modifier'
+import { equipmentModifierSchema } from '../../../content/equipment/instance/modifier'
 import { builderLevelSchema } from '../../../primitives/level'
 import { abilitySchema } from '../../../vocab/ability'
 import { optionalAlignmentSchema } from '../../../vocab/alignment'

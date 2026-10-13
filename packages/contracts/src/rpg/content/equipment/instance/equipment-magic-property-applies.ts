@@ -1,4 +1,4 @@
-import { isArmorEquipment, isWeaponEquipment, type Equipment } from '../equipment'
+import { isArmorEquipment, isWeaponEquipment, type Equipment } from '../../equipment'
 import type { MagicPropertyAppliesTo } from './magic-property'
 
 export function equipmentMagicPropertyAppliesTo(

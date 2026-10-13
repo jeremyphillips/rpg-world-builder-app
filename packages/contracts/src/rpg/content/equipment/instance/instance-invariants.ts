@@ -1,6 +1,6 @@
 import type { z } from 'zod'
 
-import { addCustomRefinementIssue } from '../../../lib/add-custom-refinement-issue'
+import { addCustomRefinementIssue } from '../../../../lib/add-custom-refinement-issue'
 
 import type { EquipmentInstance } from './instance'
 

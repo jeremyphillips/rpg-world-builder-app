@@ -6,7 +6,7 @@ import {
   equipmentChoiceGrantObjectSchema,
   normalizeEquipmentChoiceGrant,
 } from './lib/grants/equipment-grant'
-import { equipmentModifierSchema } from './equipment/modifier'
+import { equipmentModifierSchema } from './equipment/instance/modifier'
 import { equipmentRecommendationsSchema } from './equipment-recommendation'
 import { characterWealthGrantSchema } from './lib/grants/wealth-grant'
 import {

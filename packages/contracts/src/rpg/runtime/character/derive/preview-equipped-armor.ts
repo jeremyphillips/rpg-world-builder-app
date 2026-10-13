@@ -1,4 +1,4 @@
-import type { EquipmentModifier } from '../../../content/equipment/modifier'
+import type { EquipmentModifier } from '../../../content/equipment/instance/modifier'
 import type { ArmorClassBase } from '../../../vocab/mechanics/edition-preset-mechanics'
 import {
   resolveEquippedArmorClass,

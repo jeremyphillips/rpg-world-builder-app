@@ -55,7 +55,7 @@ import {
   getEquipmentKindLabel,
   type EquipmentKind,
 } from '../../equipment'
-import { equipmentModifierSchema } from '../../equipment/modifier'
+import { equipmentModifierSchema } from '../../equipment/instance/modifier'
 import { contentPoolChoiceSchema } from './choice'
 import { grantValidationMessages } from './grant-messages'
 

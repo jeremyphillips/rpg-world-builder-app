@@ -12,8 +12,8 @@ import {
   toEquippedArmorPieceForEntry,
   type EquippedArmorPiece,
 } from '../creature/armor-class'
-import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/equipment-effect-totals'
-import type { MagicPropertyDefinitionProvider } from '../../content/equipment/magic-property'
+import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/instance/equipment-effect-totals'
+import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { resolveCreatureInitiativeModifier } from '../creature/initiative'

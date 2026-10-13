@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url'
 
 import { classStoredSchema, subclassSchema } from '../src/rpg/content/classes/class.ts'
 import { equipmentSchema } from '../src/rpg/content/equipment.ts'
-import { magicPropertyDefinitionSchema } from '../src/rpg/content/equipment/magic-property.ts'
+import { magicPropertyDefinitionSchema } from '../src/rpg/content/equipment/instance/magic-property.ts'
 import { featSchema } from '../src/rpg/content/feat.ts'
 import { grantGroupSchema } from '../src/rpg/content/lib/grants/grants.ts'
 import { skillProficiencySchema } from '../src/rpg/content/skill-proficiency.ts'

@@ -51,9 +51,9 @@ export {
   monsterReactionDraftSchema,
 } from './monster/action'
 export type { MonsterAction, MonsterReaction } from './monster/action'
-import type { EquipmentInstance } from './equipment/instance'
-import { normalizeEquipmentInstance } from './equipment/normalize-equipment-instance'
-import { refineEquipmentInstanceInvariants } from './equipment/instance-invariants'
+import type { EquipmentInstance } from './equipment/instance/instance'
+import { normalizeEquipmentInstance } from './equipment/instance/normalize-equipment-instance'
+import { refineEquipmentInstanceInvariants } from './equipment/instance/instance-invariants'
 
 export const monsterArmorClassSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('unarmored') }),

@@ -1,8 +1,8 @@
 import type { EquipmentBonusEffect } from './effect'
-import type { Equipment } from '../equipment'
+import type { Equipment } from '../../equipment'
 import type { EquipmentInstance } from './instance'
 import type { MagicPropertyDefinitionProvider } from './magic-property'
-import type { EquipmentEffectTarget } from '../../vocab/equipment/effect-target'
+import type { EquipmentEffectTarget } from '../../../vocab/equipment/effect-target'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'
 import { resolveEquipmentMagicProperties } from './resolve-equipment-magic-properties'
 

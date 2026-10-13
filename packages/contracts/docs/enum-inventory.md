@@ -100,21 +100,21 @@ Spell resolution closed sets (`content/spell/resolution/vocab.ts`) also define
 
 ## Keep local (structural / union discriminators)
 
-| Schema                                           | Home                                    | Catalog JSON | User-facing local | Hover tier   |
-| ------------------------------------------------ | --------------------------------------- | ------------ | ----------------- | ------------ |
-| `proficiencyGrantKindSchema` (`fixed`, `choice`) | `content/lib/proficiency-grant.ts`      | yes          | no                | local-exempt |
-| `proficiencyPoolSourceSchema`                    | `content/lib/proficiency-grant.ts`      | yes          | no                | local-exempt |
-| `contentTraitKindSchema` (`custom`, `grant`)     | `content/lib/grants/grants.ts`          | yes          | no                | local-exempt |
-| `contentGrantSchema` `kind` literals             | `content/lib/grants/grants.ts`          | yes          | no                | local-exempt |
-| `contentSourceSchema` (`system`, `homebrew`)     | `content/lib/envelope.ts`               | yes          | no                | local-exempt |
-| `contentStatusSchema` (`draft`, `published`)     | `content/lib/envelope.ts`               | yes          | no                | local-exempt |
-| `equipmentModifierKindSchema`                    | `content/equipment/modifier.ts`         | yes          | no                | local-exempt |
-| `speciesMulticlassPolicySchema`                  | `content/species-character-creation.ts` | yes          | no                | local-exempt |
-| `speciesClassPolicyModeSchema`                   | `content/species-character-creation.ts` | yes          | no                | local-exempt |
-| `weaponDamageTypeSchema` (equipment variant)     | `content/equipment/weapon-variant.ts`   | yes          | no                | local-exempt |
-| `homebrewSummaryContentTypeSchema`               | `content/lib/homebrew-summary.ts`       | no           | no                | local-exempt |
-| `xpProgressionScopeKindSchema`                   | `content/xp-progression.ts`             | seed only    | no                | local-exempt |
-| `startingWealthScopeKindSchema`                  | `campaign/rules/starting-wealth.ts`     | seed only    | no                | local-exempt |
+| Schema                                           | Home                                     | Catalog JSON | User-facing local | Hover tier   |
+| ------------------------------------------------ | ---------------------------------------- | ------------ | ----------------- | ------------ |
+| `proficiencyGrantKindSchema` (`fixed`, `choice`) | `content/lib/proficiency-grant.ts`       | yes          | no                | local-exempt |
+| `proficiencyPoolSourceSchema`                    | `content/lib/proficiency-grant.ts`       | yes          | no                | local-exempt |
+| `contentTraitKindSchema` (`custom`, `grant`)     | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
+| `contentGrantSchema` `kind` literals             | `content/lib/grants/grants.ts`           | yes          | no                | local-exempt |
+| `contentSourceSchema` (`system`, `homebrew`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
+| `contentStatusSchema` (`draft`, `published`)     | `content/lib/envelope.ts`                | yes          | no                | local-exempt |
+| `equipmentModifierKindSchema`                    | `content/equipment/instance/modifier.ts` | yes          | no                | local-exempt |
+| `speciesMulticlassPolicySchema`                  | `content/species-character-creation.ts`  | yes          | no                | local-exempt |
+| `speciesClassPolicyModeSchema`                   | `content/species-character-creation.ts`  | yes          | no                | local-exempt |
+| `weaponDamageTypeSchema` (equipment variant)     | `content/equipment/weapon-variant.ts`    | yes          | no                | local-exempt |
+| `homebrewSummaryContentTypeSchema`               | `content/lib/homebrew-summary.ts`        | no           | no                | local-exempt |
+| `xpProgressionScopeKindSchema`                   | `content/xp-progression.ts`              | seed only    | no                | local-exempt |
+| `startingWealthScopeKindSchema`                  | `campaign/rules/starting-wealth.ts`      | seed only    | no                | local-exempt |
 
 ---
 

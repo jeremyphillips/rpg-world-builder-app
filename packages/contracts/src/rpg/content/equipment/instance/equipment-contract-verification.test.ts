@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { equipmentSchema } from '../equipment'
+import { equipmentSchema } from '../../equipment'
 import { equipmentInstanceSchema } from './instance'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'
 import { resolveEquipmentEntryEffectTotals } from './equipment-effect-totals'

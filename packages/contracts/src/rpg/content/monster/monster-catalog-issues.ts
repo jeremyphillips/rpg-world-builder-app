@@ -2,9 +2,9 @@ import type { ApiValidationIssue } from '../../../shared/api-validation'
 import type { ContentValidationIntent } from '../lib/content-validation-intent'
 import type { Equipment, EquipmentInstance } from '../equipment'
 import { isArmorEquipment, isWeaponEquipment } from '../equipment'
-import type { MagicPropertyDefinitionProvider } from '../equipment/magic-property'
-import { normalizeEquipmentInstance } from '../equipment/normalize-equipment-instance'
-import { validateEquipmentMagicProperties } from '../equipment/validate-equipment-magic-properties'
+import type { MagicPropertyDefinitionProvider } from '../equipment/instance/magic-property'
+import { normalizeEquipmentInstance } from '../equipment/instance/normalize-equipment-instance'
+import { validateEquipmentMagicProperties } from '../equipment/instance/validate-equipment-magic-properties'
 import type { SkillProficiency } from '../skill-proficiency'
 import {
   isContentCampaignEligible,
