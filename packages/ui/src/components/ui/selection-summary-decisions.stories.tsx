@@ -46,49 +46,51 @@ export const DrawerSubStep: Story = {
 }
 
 export const MultiCard: Story = {
-  render: (args) => <SelectionSummaryCards {...args} />,
-  args: {
-    cards: [
-      {
-        id: 'selections',
-        rows: [
-          {
-            id: 'role',
-            label: 'Role',
-            value: 'Commoner',
-            decisionId: 'role',
-            onNavigate: () => undefined,
-          },
-        ],
-      },
-    ],
-  },
+  render: () => (
+    <SelectionSummaryCards
+      cards={[
+        {
+          id: 'selections',
+          rows: [
+            {
+              id: 'role',
+              label: 'Role',
+              value: 'Commoner',
+              decisionId: 'role',
+              onNavigate: () => undefined,
+            },
+          ],
+        },
+      ]}
+    />
+  ),
 }
 
 export const ActiveBuildDecision: Story = {
-  render: (args) => <SelectionSummaryCards {...args} />,
-  args: {
-    cards: [
-      {
-        id: 'selections',
-        rows: [
-          {
-            id: 'role',
-            label: 'Role',
-            value: 'Commoner',
-            decisionId: 'role',
-            onNavigate: () => undefined,
-          },
-          {
-            id: 'build',
-            label: 'Build',
-            value: 'Commoner · Level 0',
-            decisionId: 'build',
-            onNavigate: () => undefined,
-          },
-        ],
-      },
-    ],
-    activeDecisionId: 'build',
-  },
+  render: () => (
+    <SelectionSummaryCards
+      activeDecisionId="build"
+      cards={[
+        {
+          id: 'selections',
+          rows: [
+            {
+              id: 'role',
+              label: 'Role',
+              value: 'Commoner',
+              decisionId: 'role',
+              onNavigate: () => undefined,
+            },
+            {
+              id: 'build',
+              label: 'Build',
+              value: 'Commoner · Level 0',
+              decisionId: 'build',
+              onNavigate: () => undefined,
+            },
+          ],
+        },
+      ]}
+    />
+  ),
 }

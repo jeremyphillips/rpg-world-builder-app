@@ -194,6 +194,11 @@ utility bands via `useEntityCardUtilityFieldSize()`).
 Width formulas in `numberStepperWidthVariants` use **3rem** side columns for `xs` and **4rem**
 for `sm` / `md` / `lg`. See [`number-stepper.variants.ts`](../../src/components/ui/number-stepper.variants.ts).
 
+**Sign display:** use `signDisplay="positive-prefix"` only when `min >= 0` (additive quantity
+stacks). For signed modifiers (`min < 0`), use `signDisplay="signed-prefix"`: the decorative
+prefix shows `+` or `−`, the center field edits magnitude, and `aria-valuetext` exposes the full
+signed value to assistive tech. Optional `label` + `id` wrap the stepper in `FormField`.
+
 ## Dense settings rows
 
 `labelPosition: 'settings'` on `number`, `select`, and `switch` — label + hint left,

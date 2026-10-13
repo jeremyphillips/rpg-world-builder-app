@@ -793,10 +793,12 @@ function EffectFormBody({
         ]}
       />
       <NumberStepper
+        id="equipment-effect-modifier"
+        label="Modifier"
+        signDisplay="signed-prefix"
         value={draft.bonus}
         min={EQUIPMENT_EFFECT_BONUS_MIN}
         max={EQUIPMENT_EFFECT_BONUS_MAX}
-        valuePrefix="+"
         onChange={(bonus) => onChange({ ...draft, bonus: nextNonZeroBonus(draft.bonus, bonus) })}
         aria-label="Modifier"
       />

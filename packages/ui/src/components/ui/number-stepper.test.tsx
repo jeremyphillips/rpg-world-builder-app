@@ -36,12 +36,12 @@ describe('NumberStepper', () => {
     expect(screen.getByLabelText('Decrease Quantity')).not.toBeDisabled()
   })
 
-  it('renders a visual plus prefix while the input keeps the plain number', () => {
+  it('renders a visual plus prefix while the input keeps the plain magnitude', () => {
     const { container } = render(
       <NumberStepper
         aria-label="Quantity"
         value={2}
-        valuePrefix="+"
+        signDisplay="positive-prefix"
         min={1}
         max={20}
         onChange={() => undefined}
@@ -49,11 +49,60 @@ describe('NumberStepper', () => {
     )
 
     const input = screen.getByLabelText('Quantity')
-    expect(input).toHaveAttribute('type', 'number')
-    expect(input).toHaveValue(2)
+    expect(input).toHaveAttribute('type', 'text')
+    expect(input).toHaveValue('2')
+    expect(input).toHaveAttribute('aria-valuetext', '+2')
     expect(screen.getByText('+')).toBeInTheDocument()
     expect(input).not.toHaveClass('w-[36px]')
     expect(container.firstElementChild).toHaveClass('w-[calc(48px+4rem)]')
+  })
+
+  it('renders signed-prefix with dynamic sign and magnitude without duplicating plus', () => {
+    render(
+      <NumberStepper
+        aria-label="Modifier"
+        signDisplay="signed-prefix"
+        value={-1}
+        min={-10}
+        max={10}
+        onChange={() => undefined}
+      />,
+    )
+
+    const input = screen.getByLabelText('Modifier')
+    expect(input).toHaveAttribute('type', 'text')
+    expect(input).toHaveValue('1')
+    expect(input).toHaveAttribute('aria-valuetext', '-1')
+    expect(screen.getByText('−')).toBeInTheDocument()
+    expect(screen.queryByText('+')).not.toBeInTheDocument()
+  })
+
+  it('steps signed values through zero and updates prefix sign', async () => {
+    const user = userEvent.setup()
+    function SignedHarness() {
+      const [value, setValue] = React.useState(0)
+      return (
+        <NumberStepper
+          aria-label="Modifier"
+          signDisplay="signed-prefix"
+          value={value}
+          min={-10}
+          max={10}
+          onChange={setValue}
+        />
+      )
+    }
+
+    render(<SignedHarness />)
+    const input = screen.getByLabelText('Modifier')
+
+    await user.click(screen.getByLabelText('Decrease Modifier'))
+    expect(input).toHaveAttribute('aria-valuetext', '-1')
+    expect(screen.getByText('−')).toBeInTheDocument()
+
+    await user.click(screen.getByLabelText('Increase Modifier'))
+    expect(input).toHaveAttribute('aria-valuetext', '+0')
+    expect(screen.getByText('+')).toBeInTheDocument()
   })
 
   it('renders the current value with foreground text in the digit slot', () => {

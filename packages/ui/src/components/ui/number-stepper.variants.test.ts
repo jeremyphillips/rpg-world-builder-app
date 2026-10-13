@@ -77,10 +77,10 @@ describe('xs inline-row tier', () => {
     expect(numberStepperRootWidthClass('xs', 1)).toBe(
       `w-[calc(${numberStepperValueSlotWidthPx.xs[1]}px+3rem)]`,
     )
-    expect(numberStepperRootWidthClass('xs', 1, '+')).toBe(
+    expect(numberStepperRootWidthClass('xs', 1, true)).toBe(
       `w-[calc(${numberStepperPrefixedValueSlotWidthPx.xs[1]}px+3rem)]`,
     )
-    expect(numberStepperRootWidthClass('sm', 1, '+')).toBe(
+    expect(numberStepperRootWidthClass('sm', 1, true)).toBe(
       `w-[calc(${numberStepperPrefixedValueSlotWidthPx.sm[1]}px+4rem)]`,
     )
   })

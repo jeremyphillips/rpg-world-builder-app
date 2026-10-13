@@ -215,9 +215,9 @@ export const numberStepperPrefixedWidthVariants = {
 export function numberStepperRootWidthClass(
   size: NumberStepperSize,
   digits: NumberStepperDigits,
-  valuePrefix?: '+',
+  prefixedValueSlot = false,
 ): string {
-  const table = valuePrefix ? numberStepperPrefixedWidthVariants : numberStepperWidthVariants
+  const table = prefixedValueSlot ? numberStepperPrefixedWidthVariants : numberStepperWidthVariants
   return table[size][digits]
 }
 

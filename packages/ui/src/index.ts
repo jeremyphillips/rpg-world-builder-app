@@ -290,6 +290,7 @@ export {
   type NumberStepperDigits,
   type NumberStepperMinAction,
   type NumberStepperProps,
+  type NumberStepperSignDisplay,
 } from './components/ui/number-stepper.client'
 export { Textarea, type TextareaProps } from './components/ui/textarea.client'
 export {
