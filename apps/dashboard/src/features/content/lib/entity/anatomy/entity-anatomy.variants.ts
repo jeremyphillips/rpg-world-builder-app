@@ -28,6 +28,8 @@ export const entityAnatomyColumnsVariants = cva(
   },
 )
 
+export const entityAnatomyMediaContentSpanClasses = 'flex h-full items-start'
+
 export function entityAnatomyVariants({
   density = 'comfortable',
   band = 'control',

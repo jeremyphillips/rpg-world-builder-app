@@ -71,17 +71,26 @@ export const NoFooter: Story = {
   ),
 }
 
-export const WithHeaderLeadingAndContent: Story = {
+export const WithEntityContext: Story = {
   render: () => (
     <DrawerShellDemo
-      title="Add magic property"
+      title="Edit weapon"
+      description="Adjustments apply to this copy only."
       headerBack={{
         ariaLabel: 'Back to edit item',
         onClick: () => undefined,
       }}
-      headerContent={<Text variant="muted">Longsword · Qty 1</Text>}
+      entityContext={
+        <div className="flex min-w-0 items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-sm font-medium">Shortsword</p>
+            <p className="text-xs text-muted-foreground">Simple · Melee</p>
+          </div>
+          <Text variant="muted">Qty 1</Text>
+        </div>
+      }
     >
-      <Text variant="muted">Editor body scrolls independently when header content is set.</Text>
+      <Text variant="muted">Editor body scrolls below the subject band.</Text>
     </DrawerShellDemo>
   ),
 }

@@ -8,6 +8,17 @@ describe('resolveEntityAnatomyBand', () => {
     expect(resolveEntityAnatomyBand(undefined)).toBe('control')
   })
 
+  it('uses control when media spans the content stack', () => {
+    expect(
+      resolveEntityAnatomyBand(
+        <DetailRowLeadingMedia size="sm">
+          <span aria-hidden>HD</span>
+        </DetailRowLeadingMedia>,
+        'content',
+      ),
+    ).toBe('control')
+  })
+
   it('maps xs media to media-xs band', () => {
     expect(
       resolveEntityAnatomyBand(

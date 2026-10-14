@@ -13,7 +13,6 @@ import {
   ActionButton,
   ActionIcon,
   Heading,
-  NumberStepper,
   SemanticText,
   SwitchField,
   Text,
@@ -36,13 +35,11 @@ import {
   EQUIPMENT_INSTANCE_EDITOR_MAGICAL_HINT,
   EQUIPMENT_INSTANCE_EDITOR_MAGICAL_LABEL,
   EQUIPMENT_INSTANCE_EDITOR_MODIFIERS_HEADING,
-  EQUIPMENT_INSTANCE_EDITOR_SEPARATED_QUANTITY_LABEL,
   effectTargetSentenceLabel,
   equipmentAdjustmentsSectionDescription,
   formatEditRowAriaLabel,
   formatEquipmentAdjustmentBonusLabel,
   formatMagicalPropertiesRemovalWarning,
-  formatQuantityStepperAriaLabel,
   formatRemoveMagicPropertyAriaLabel,
   magicPropertyCategoryLabel,
 } from '../../lib/instance-editor/equipment-instance-editor-form-labels'
@@ -55,7 +52,6 @@ type EditorDispatch = Dispatch<EquipmentEditorAction>
 
 type EquipmentInstanceEditorMainBodyProps = {
   state: EquipmentEditorState
-  catalogItem: Equipment
   magic: ResolvedEquipmentMagicProperties
   totals: EquipmentEffectTotals
   hasPresetProperties: boolean
@@ -307,33 +303,15 @@ function AdjustmentsSection({
 
 export function EquipmentInstanceEditorMainBody({
   state,
-  catalogItem,
   magic,
   totals,
   hasPresetProperties,
   dispatch,
 }: EquipmentInstanceEditorMainBodyProps) {
   const draft = state.session.draft
-  const quantity = draft.quantity ?? 1
-  const showQuantityStepper = state.session.scope === 'all' || quantity <= 1
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Text>{catalogItem.name}</Text>
-        {showQuantityStepper ? (
-          <NumberStepper
-            size="sm"
-            value={quantity}
-            min={1}
-            onChange={(value) => dispatch({ type: 'patchDraft', patch: { quantity: value } })}
-            aria-label={formatQuantityStepperAriaLabel(catalogItem.name)}
-          />
-        ) : (
-          <Text variant="muted">{EQUIPMENT_INSTANCE_EDITOR_SEPARATED_QUANTITY_LABEL}</Text>
-        )}
-      </div>
-
       <FieldSeparatorWrapper separator="subtle">
         <SwitchField
           id="equipment-editor-equipped"

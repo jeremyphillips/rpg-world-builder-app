@@ -257,10 +257,14 @@ export {
 } from './organizations'
 export { listLocations, useLocations, locationsQueryKey } from './locations'
 export {
+  buildLocationContextPresentationFromLocation,
   buildLocationEntityCardModel,
   buildLocationEntityCardModelFromClassification,
   buildLocationPickerSearchText,
 } from './locations/lib/location-display'
+export { DrawerEntityContext } from './lib/entity/surfaces/drawer/drawer-entity-context'
+export { toDrawerEntityBlockModel } from './lib/entity/surfaces/drawer/drawer-entity.lib'
+export { DrawerContext } from './lib/relationship/drawer/drawer-context'
 export { assembleLocationPickerSearchDocument } from './locations/lib/location-picker-search.lib'
 export { RelationshipDrawerSubjectField } from './lib/relationship/drawer/relationship-drawer-subject-field'
 export {

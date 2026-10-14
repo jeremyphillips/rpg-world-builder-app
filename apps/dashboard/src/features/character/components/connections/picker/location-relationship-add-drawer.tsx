@@ -1,10 +1,6 @@
 import * as React from 'react'
 
-import {
-  getContentTypeTerm,
-  resolveLocationClassificationDisplay,
-  type Location,
-} from '@rpg/contracts'
+import { resolveLocationClassificationDisplay, type Location } from '@rpg/contracts'
 import { isEmptySearchQuery, normalizeSearchQuery, scoreSearchDocument } from '@rpg/search'
 import { Button, CATALOG_PICKER_ADD_LABEL, resolvePickerActionFailureStatus, Text } from '@rpg/ui'
 
@@ -15,8 +11,11 @@ import {
   RelationshipDrawerSubjectField,
   assembleLocationPickerSearchDocument,
   buildLocationContentDisplayImageInput,
+  buildLocationContextPresentationFromLocation,
   buildLocationEntityCardModelFromClassification,
   createLocationRelationshipFilterSchema,
+  DrawerContext,
+  toDrawerEntityBlockModel,
   getContentDisplayImage,
   relationshipCatalogFilterHasBand,
   resolveLocationRelationshipFilterLayout,
@@ -333,9 +332,15 @@ export function LocationRelationshipAddDrawer({
         showFollowUp ? (
           <div className="flex flex-col gap-6">
             {selectedLocation ? (
-              <RelationshipDrawerSubjectField
-                label={getContentTypeTerm('locations').label}
-                value={selectedLocation.name}
+              <DrawerContext
+                entities={[
+                  toDrawerEntityBlockModel(
+                    buildLocationContextPresentationFromLocation(
+                      selectedLocation,
+                      locationSearchContext,
+                    ),
+                  ),
+                ]}
               />
             ) : null}
             {presetRole ? (

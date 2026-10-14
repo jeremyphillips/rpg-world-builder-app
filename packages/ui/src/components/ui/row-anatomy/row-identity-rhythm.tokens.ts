@@ -2,7 +2,7 @@
  * Shared vertical rhythm between heading, supporting, and status lines.
  * RowAnatomy meta/status cells and IdentityRow stacks must stay in sync.
  */
-export const ROW_IDENTITY_META_OFFSET_CLASS = 'mt-0.5'
+export const ROW_IDENTITY_META_OFFSET_CLASS = ''
 
 export const ROW_IDENTITY_STATUS_OFFSET_CLASS = 'mt-1'
 

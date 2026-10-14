@@ -3,10 +3,18 @@ import * as React from 'react'
 import type { CharacterBuildCatalogIndex } from '@rpg/contracts'
 import { Button, CATALOG_PICKER_ADD_LABEL, resolvePickerActionFailureStatus, Text } from '@rpg/ui'
 
-import { RelationshipDrawerSubjectField } from '@/features/content'
+import {
+  DrawerContext,
+  RelationshipDrawerSubjectField,
+  toDrawerEntityBlockModel,
+} from '@/features/content'
 
 import { createCharacterClassFilterLabelResolver } from '../../../lib/display/format-content-reference-label'
-import type { CharacterPickerOption } from '../../../lib/picker/character-picker-option.lib'
+import { buildCharacterEntityContextPresentation } from '../../../lib/display/character-entity-summary.lib'
+import {
+  buildCharacterPickerOptionEntitySummary,
+  type CharacterPickerOption,
+} from '../../../lib/picker/character-picker-option.lib'
 import {
   PERSON_CONNECTION_ROLE_OPTIONS,
   type PersonConnectionRoleOption,
@@ -115,7 +123,15 @@ export function PersonRelationshipAddDrawer({
         showFollowUp ? (
           <div className="flex flex-col gap-6">
             {selectedCharacter ? (
-              <RelationshipDrawerSubjectField label="Person" value={selectedCharacter.name} />
+              <DrawerContext
+                entities={[
+                  toDrawerEntityBlockModel(
+                    buildCharacterEntityContextPresentation(
+                      buildCharacterPickerOptionEntitySummary(selectedCharacter),
+                    ),
+                  ),
+                ]}
+              />
             ) : null}
             {presetRole ? (
               <RelationshipDrawerSubjectField label="Relationship" value={presetRole.label} />

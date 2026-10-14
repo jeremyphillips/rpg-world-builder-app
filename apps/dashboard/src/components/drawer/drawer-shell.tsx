@@ -6,7 +6,11 @@ import {
   type SheetSurface,
 } from '@rpg/ui'
 
-import { drawerShellBodyVariants } from './drawer-shell.variants'
+import {
+  drawerShellBodyVariants,
+  drawerShellEntityContextBandClasses,
+  drawerShellTitleRowWithEntityContextClasses,
+} from './drawer-shell.variants'
 
 /** Default application drawer plane — page canvas background. */
 export const DRAWER_SHELL_DEFAULT_SURFACE: SheetSurface = 'background'
@@ -26,8 +30,11 @@ export type DrawerShellProps = {
   }
   /** Escape hatch for decorative lead icons (for example {@link IconContainer}). */
   headerLeading?: React.ReactNode
-  /** Rendered below the title stack inside the header (sticky with the headline). */
-  headerContent?: React.ReactNode
+  /**
+   * Subject identity below the title row — typically {@link DrawerEntityContext} from the
+   * content feature. Task guidance stays in `description`; do not repeat the subject there.
+   */
+  entityContext?: React.ReactNode
   footer?: React.ReactNode
   /**
    * scrolling — shell body owns overflow-y scroll (informational / custom content).
@@ -48,7 +55,7 @@ export function DrawerShell({
   description,
   headerBack,
   headerLeading,
-  headerContent,
+  entityContext,
   footer,
   bodyMode = 'scrolling',
   surface = DRAWER_SHELL_DEFAULT_SURFACE,
@@ -59,6 +66,8 @@ export function DrawerShell({
     headerLeading
   )
 
+  const hasEntityContext = entityContext != null
+
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
@@ -66,9 +75,15 @@ export function DrawerShell({
         size="lg"
         {...(!description ? { 'aria-describedby': undefined } : {})}
       >
-        <Sheet.Header headline={title} description={description} leadIcon={leadIcon}>
-          {headerContent}
-        </Sheet.Header>
+        <Sheet.Header
+          headline={title}
+          description={description}
+          leadIcon={leadIcon}
+          className={hasEntityContext ? drawerShellTitleRowWithEntityContextClasses : undefined}
+        />
+        {hasEntityContext ? (
+          <div className={drawerShellEntityContextBandClasses}>{entityContext}</div>
+        ) : null}
         {bodyMode === 'composed' ? (
           children
         ) : (

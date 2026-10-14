@@ -78,25 +78,29 @@ describe('DrawerShell', () => {
     expect(screen.getByRole('dialog', { name: 'Add item' })).toHaveClass('bg-background')
   })
 
-  it('forwards headerLeading and headerContent to Sheet.Header', () => {
+  it('renders entityContext in a band below the title row and keeps description', () => {
     render(
       <DrawerShell
         open
         onOpenChange={() => undefined}
         title="Edit item"
+        description="Task guidance"
         headerLeading={
           <span data-testid="back-icon">
             <ActionIcon action="back" />
           </span>
         }
-        headerContent={<p>Sticky header row</p>}
+        entityContext={<p data-testid="entity-band">Shortsword</p>}
       >
         <p>Drawer body</p>
       </DrawerShell>,
     )
 
     expect(screen.getByTestId('back-icon')).toBeInTheDocument()
-    expect(screen.getByText('Sticky header row')).toBeInTheDocument()
+    expect(screen.getByText('Task guidance')).toBeInTheDocument()
+    const entityBand = screen.getByTestId('entity-band')
+    expect(entityBand).toBeInTheDocument()
+    expect(entityBand.closest('[class*="bg-surface-subtle"]')).toBeTruthy()
   })
 
   it('allows surface override', () => {

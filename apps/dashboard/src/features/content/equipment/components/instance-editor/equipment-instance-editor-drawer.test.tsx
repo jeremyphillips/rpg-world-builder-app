@@ -42,6 +42,34 @@ describe('EquipmentInstanceEditorDrawer', () => {
     expect(screen.getByRole('heading', { name: 'Discard changes?' })).toBeInTheDocument()
   })
 
+  it('shows the catalog item in the header subject band', () => {
+    const provider = createMagicPropertyDefinitionProvider(rulesetId)
+    const sourceEntry = {
+      entryId: 'e1',
+      equipmentId: dagger.id,
+      quantity: 1,
+      equipped: false,
+      customName: 'Bright blade',
+    }
+
+    render(
+      <EquipmentInstanceEditorDrawer
+        open
+        onOpenChange={() => undefined}
+        sourceEntry={sourceEntry}
+        entries={[sourceEntry]}
+        catalogItem={dagger}
+        rulesetId={rulesetId}
+        definitions={provider}
+        subjectNoun="creature"
+        onCommit={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText('Bright blade')).toBeInTheDocument()
+    expect(screen.queryByText(dagger.name)).not.toBeInTheDocument()
+  })
+
   itAxe('has no axe accessibility violations in main mode', async () => {
     const provider = createMagicPropertyDefinitionProvider(rulesetId)
     const sourceEntry = {

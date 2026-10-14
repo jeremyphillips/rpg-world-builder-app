@@ -75,6 +75,7 @@ import {
   listPresetMagicPropertiesForItem,
   presetPropertyBrowseChoice,
 } from '../../lib/instance-editor/equipment-instance-editor.lib'
+import { EquipmentInstanceEditorEntityContext } from './equipment-instance-editor-entity-context'
 import { EquipmentInstanceEditorFooter } from './equipment-instance-editor-footer'
 import { EquipmentInstanceEditorMainBody } from './equipment-instance-editor-main-body'
 
@@ -177,6 +178,14 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
               }
             : undefined
         }
+        entityContext={
+          <EquipmentInstanceEditorEntityContext
+            state={state}
+            catalogItem={catalogItem}
+            definitions={definitions}
+            dispatch={dispatch}
+          />
+        }
         footer={
           <EquipmentInstanceEditorFooter
             mode={state.mode}
@@ -241,7 +250,6 @@ function EquipmentInstanceEditorBody({
       return (
         <EquipmentInstanceEditorMainBody
           state={state}
-          catalogItem={catalogItem}
           magic={magic}
           totals={totals}
           hasPresetProperties={presets.length > 0}

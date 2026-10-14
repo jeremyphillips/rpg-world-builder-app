@@ -110,6 +110,22 @@ describe('EntityAnatomy row tracks', () => {
     ).toHaveLength(2)
   })
 
+  it('spans media beside the content stack when mediaPlacement is content', () => {
+    const { slot } = renderAnatomy({
+      mediaPlacement: 'content',
+      entity: {
+        heading: 'Shortsword',
+        media: <span data-testid="media">M</span>,
+        status: [{ kind: 'text', label: 'Simple · Melee', variant: 'muted' }],
+        statusComposition: 'metadata',
+      },
+    })
+
+    expect(cellOf(slot('media'))).toEqual({ slot: 'stretch', column: 'media' })
+    expect(cellOf(slot('content'))).toEqual({ slot: 'band', column: 'content' })
+    expect(cellOf(slot('status'))).toEqual({ slot: 'status', column: 'content' })
+  })
+
   it('applies leading content gap on the rail and trailing separation from the host columns', () => {
     const { anatomy, slot } = renderAnatomy({
       leadingUtilities: [<span key="grip">Grip</span>],
@@ -173,8 +189,8 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(trailing).toHaveTextContent('30 GP')
     expect(slot('trailing-secondary')?.textContent).toBe('30 GP')
     expect(slot('trailing-secondary')).toHaveClass(
-      'text-xs',
-      'font-body-emphasis',
+      'text-style-label',
+      'tabular-nums',
       'text-foreground',
     )
     expect(slot('trailing-secondary')).not.toHaveClass('text-muted-foreground')

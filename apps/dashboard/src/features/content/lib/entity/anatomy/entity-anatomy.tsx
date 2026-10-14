@@ -19,8 +19,15 @@ import {
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
 import { PickerSelectionStateLine } from '../summary/picker-selection-state-line'
-import { resolveEntityAnatomyBand } from './entity-anatomy-band.lib'
-import { entityAnatomyHostRootVariants, entityAnatomyVariants } from './entity-anatomy.variants'
+import {
+  resolveEntityAnatomyBand,
+  type EntityAnatomyMediaPlacement,
+} from './entity-anatomy-band.lib'
+import {
+  entityAnatomyHostRootVariants,
+  entityAnatomyMediaContentSpanClasses,
+  entityAnatomyVariants,
+} from './entity-anatomy.variants'
 
 export type { EntityAnatomyTrailing } from './entity-anatomy-trailing.types'
 
@@ -32,6 +39,11 @@ export type EntityAnatomyProps = {
   leadingUtilities?: readonly ReactNode[]
   trailing?: EntityAnatomyTrailing
   density?: ContentCardDensity
+  /**
+   * `band` — media shares the heading band row (catalog rows).
+   * `content` — media spans the content stack beside heading + metadata (drawer subject band).
+   */
+  mediaPlacement?: EntityAnatomyMediaPlacement
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
 }
@@ -66,6 +78,7 @@ export function EntityAnatomy({
   leadingUtilities,
   trailing,
   density = 'comfortable',
+  mediaPlacement = 'band',
   headingEndValue,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
@@ -73,7 +86,8 @@ export function EntityAnatomy({
   const hasProvenance = (entity.provenance?.length ?? 0) > 0
   const hasSelectionState = entity.selectionState != null
   const hasStatusCell = hasStatusItems || hasProvenance || hasSelectionState
-  const band = resolveEntityAnatomyBand(entity.media)
+  const band = resolveEntityAnatomyBand(entity.media, mediaPlacement)
+  const mediaSpansContent = entity.media != null && mediaPlacement === 'content'
 
   return (
     <div className={entityAnatomyVariants({ density, band })} {...rowAnatomyRootProps}>
@@ -87,10 +101,18 @@ export function EntityAnatomy({
       ) : null}
       {entity.media ? (
         <RowAnatomyCell<EntityAnatomyColumn>
-          cell={{ slot: 'band', column: 'media' }}
+          cell={
+            mediaSpansContent
+              ? { slot: 'stretch', column: 'media' }
+              : { slot: 'band', column: 'media' }
+          }
           data-entity-item-slot="media"
         >
-          {entity.media}
+          {mediaSpansContent ? (
+            <div className={entityAnatomyMediaContentSpanClasses}>{entity.media}</div>
+          ) : (
+            entity.media
+          )}
         </RowAnatomyCell>
       ) : null}
       <RowAnatomyCell<EntityAnatomyColumn>
