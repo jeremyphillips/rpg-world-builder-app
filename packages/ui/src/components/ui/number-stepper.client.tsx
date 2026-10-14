@@ -8,6 +8,7 @@ import { FormField } from './form-field'
 import {
   NumberStepperDecreaseButton,
   NumberStepperIncreaseButton,
+  NumberStepperStepButton,
 } from './number-stepper-controls.client'
 import type { NumberStepperMinAction } from './number-stepper-min-action.lib'
 import {
@@ -297,3 +298,5 @@ export function NumberStepper({
 }
 
 export type { NumberStepperDigits }
+
+export { NumberStepperStepButton }

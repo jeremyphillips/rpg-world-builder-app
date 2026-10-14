@@ -46,6 +46,41 @@ export function NumberStepperDecreaseButton({
   )
 }
 
+export function NumberStepperStepButton({
+  direction,
+  disabled,
+  size,
+  'aria-label': ariaLabel,
+  onClick,
+}: {
+  direction: 'increase' | 'decrease'
+  disabled: boolean
+  size: NumberStepperSize
+  'aria-label': string
+  onClick: () => void
+}) {
+  if (direction === 'decrease') {
+    return (
+      <NumberStepperDecreaseButton
+        resolvedSize={size}
+        showRemoveAtMin={false}
+        leftDisabled={disabled}
+        leftAriaLabel={ariaLabel}
+        onClick={onClick}
+      />
+    )
+  }
+
+  return (
+    <NumberStepperIncreaseButton
+      resolvedSize={size}
+      disabled={disabled}
+      ariaLabel={ariaLabel}
+      onClick={onClick}
+    />
+  )
+}
+
 export function NumberStepperIncreaseButton({
   resolvedSize,
   disabled,

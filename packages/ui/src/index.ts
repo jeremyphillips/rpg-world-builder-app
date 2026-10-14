@@ -287,6 +287,7 @@ export {
 } from './components/ui/number-input.client'
 export {
   NumberStepper,
+  NumberStepperStepButton,
   type NumberStepperDigits,
   type NumberStepperMinAction,
   type NumberStepperProps,
@@ -849,6 +850,7 @@ export {
   type NotificationPopoverProps,
   type NotificationPopoverHeaderProps,
 } from './components/ui/notification-popover.client'
+export { Popover, PopoverTrigger, PopoverContent } from './components/ui/popover.client'
 export {
   NotificationPreviewList,
   type NotificationPreviewListProps,
