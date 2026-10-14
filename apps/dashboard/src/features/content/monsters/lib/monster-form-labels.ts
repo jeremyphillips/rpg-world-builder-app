@@ -1,5 +1,7 @@
 import {
+  ABILITY_ENTRIES,
   ABILITY_SCORE_TERM,
+  type Ability,
   CHALLENGE_RATING_TERM,
   CREATURE_ARMOR_CLASS_KIND_TERM,
   getActionEconomyLabel,
@@ -15,7 +17,9 @@ import {
   HIT_POINTS_TERM,
   LANGUAGE_TERM,
   PASSIVE_PERCEPTION_TERM,
+  PROFICIENCY_TERM,
   SAVING_THROW_SHORT_LABEL,
+  SAVING_THROW_TERM,
   SENSE_TERM,
 } from '@rpg/contracts'
 
@@ -47,6 +51,12 @@ export const MONSTER_ARMOR_CLASS_HEADING = armorClassLabel
 export const MONSTER_HIT_POINTS_HEADING = vocabularyFieldLabel(HIT_POINTS_TERM, { plural: true })
 export const MONSTER_CHALLENGE_HEADING = vocabularyFieldLabel(CHALLENGE_RATING_TERM)
 export const MONSTER_SAVE_LABEL = SAVING_THROW_SHORT_LABEL
+export const MONSTER_SAVE_PROF_LABEL = 'Save prof.'
+
+export function monsterSavingThrowProficiencyAriaLabel(ability: Ability): string {
+  const abilityLabel = ABILITY_ENTRIES[ability].label
+  return `${abilityLabel} ${SAVING_THROW_TERM.sentence.singular} ${PROFICIENCY_TERM.sentence.singular}`
+}
 export const MONSTER_AWARDS_ZERO_XP_LABEL = 'Awards 0 XP'
 export const MONSTER_AWARDS_ZERO_XP_HINT =
   'Some CR 0 creatures award no XP. When checked, XP shows as 0.'
