@@ -1,48 +1,31 @@
 import {
+  ABILITY_ENTRIES,
   ABILITY_IDS,
-  findAbilityAssignedToScore,
+  getAbilityCompactLabel,
   getAvailableStandardArrayScores,
   type Ability,
 } from '@rpg/contracts'
 
-import { abilitiesFormCopy, FIXED_SCORES_EMPTY_SCORE_VALUE } from './abilities-form-labels'
+import type { AbilityScoreSelectUsedBy } from '@/components/ability-score/ability-score-select-score-grid'
 
-export type FixedScoreOption = {
-  value: string
-  label: string
-  disabled: boolean
-  assignedTo?: Ability
-}
-
-export function formatFixedScoreOptionLabel(score: number, assignedTo?: Ability): string {
-  if (!assignedTo) return String(score)
-  return abilitiesFormCopy.assignedTo(score, assignedTo.toUpperCase())
-}
-
-export function getScoreOptionsForAbility(
+export function buildAbilityScoreSelectUsedBy(
   ability: Ability,
   scores: Partial<Record<Ability, number>>,
-  scorePool: readonly number[],
-): FixedScoreOption[] {
-  const emptyOption: FixedScoreOption = {
-    value: FIXED_SCORES_EMPTY_SCORE_VALUE,
-    label: abilitiesFormCopy.emptyScore,
-    disabled: false,
+): Partial<Record<number, AbilityScoreSelectUsedBy>> {
+  const usedBy: Partial<Record<number, AbilityScoreSelectUsedBy>> = {}
+
+  for (const otherAbility of ABILITY_IDS) {
+    if (otherAbility === ability) continue
+    const score = scores[otherAbility]
+    if (typeof score !== 'number') continue
+
+    usedBy[score] = {
+      fullName: ABILITY_ENTRIES[otherAbility].label,
+      compactLabel: getAbilityCompactLabel(otherAbility),
+    }
   }
 
-  const scoreOptions = [...scorePool]
-    .sort((left, right) => right - left)
-    .map((score) => {
-      const assignedTo = findAbilityAssignedToScore(scores, score, ability)
-      return {
-        value: String(score),
-        label: formatFixedScoreOptionLabel(score, assignedTo),
-        disabled: assignedTo !== undefined,
-        assignedTo,
-      }
-    })
-
-  return [emptyOption, ...scoreOptions]
+  return usedBy
 }
 
 export function getFixedScoresRemainingCount(

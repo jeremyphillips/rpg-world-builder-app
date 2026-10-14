@@ -2,55 +2,29 @@ import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
 
-import { FIXED_SCORES_EMPTY_SCORE_VALUE } from './abilities-form-labels'
 import {
   assignScoreFromPool,
+  buildAbilityScoreSelectUsedBy,
   clearAbilityScore,
-  formatFixedScoreOptionLabel,
   getFixedScoresRemainingCount,
-  getScoreOptionsForAbility,
   moveAssignedScore,
   replaceScoreFromPool,
   swapAssignedScores,
 } from './fixed-scores-assignment.lib'
 
-describe('formatFixedScoreOptionLabel', () => {
-  it('returns the score when unassigned', () => {
-    expect(formatFixedScoreOptionLabel(15)).toBe('15')
+describe('buildAbilityScoreSelectUsedBy', () => {
+  it('maps scores owned by other abilities', () => {
+    const usedBy = buildAbilityScoreSelectUsedBy('dex', { str: 15, con: 13 })
+
+    expect(usedBy[15]).toEqual({ fullName: 'Strength', compactLabel: 'STR' })
+    expect(usedBy[13]).toEqual({ fullName: 'Constitution', compactLabel: 'CON' })
+    expect(usedBy[14]).toBeUndefined()
   })
 
-  it('includes the ability abbreviation when assigned elsewhere', () => {
-    expect(formatFixedScoreOptionLabel(15, 'str')).toBe('15 — assigned to STR')
-  })
-})
-
-describe('getScoreOptionsForAbility', () => {
-  it('disables scores assigned to other abilities', () => {
-    const options = getScoreOptionsForAbility('dex', { str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)
-
-    const fifteen = options.find((option) => option.value === '15')
-    const thirteen = options.find((option) => option.value === '13')
-    const fourteen = options.find((option) => option.value === '14')
-
-    expect(fifteen).toMatchObject({ disabled: true, assignedTo: 'str' })
-    expect(thirteen).toMatchObject({ disabled: true, assignedTo: 'con' })
-    expect(fourteen).toMatchObject({ disabled: false })
-  })
-
-  it('keeps the current row score enabled', () => {
-    const options = getScoreOptionsForAbility('str', { str: 15, con: 13 }, DEFAULT_STANDARD_ARRAY)
-
-    const fifteen = options.find((option) => option.value === '15')
-    expect(fifteen).toMatchObject({ disabled: false })
-  })
-
-  it('includes an empty option', () => {
-    const options = getScoreOptionsForAbility('str', {}, DEFAULT_STANDARD_ARRAY)
-    expect(options[0]).toEqual({
-      value: FIXED_SCORES_EMPTY_SCORE_VALUE,
-      label: '—',
-      disabled: false,
-    })
+  it('omits the current ability score', () => {
+    const usedBy = buildAbilityScoreSelectUsedBy('str', { str: 15, dex: 14 })
+    expect(usedBy[15]).toBeUndefined()
+    expect(usedBy[14]?.compactLabel).toBe('DEX')
   })
 })
 

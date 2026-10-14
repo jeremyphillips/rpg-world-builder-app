@@ -27,14 +27,15 @@ export type AbilityScoreRecommendationClassInput = {
   abilityScoreOrder?: readonly Ability[]
 }
 
-export type AbilityRecommendation = {
-  /** primaryAbilities[0] per class entry (MVP: one class) */
-  primary: readonly Ability[]
-  /** primaryAbilities[1+] per class entry */
-  secondary: readonly Ability[]
+export type AbilityPreference = {
+  ability: Ability
+  source: 'class'
+  emphasis: 'primary' | 'secondary'
+  className: string
 }
 
-export type AbilityScoreRecommendation = AbilityRecommendation & {
+export type AbilityScoreRecommendation = {
+  preferences: readonly AbilityPreference[]
   /** Present when a score source array is provided */
   suggestedAssignment?: Partial<Record<Ability, number>>
 }
@@ -48,19 +49,32 @@ export type AbilityScoreRandomizer = () => number
 
 export type ScoreShuffleFn = (scores: readonly number[]) => number[]
 
-function deriveAbilityRecommendation(
+function deriveAbilityPreferences(
   classes: readonly AbilityScoreRecommendationClassInput[],
-): AbilityRecommendation {
-  const primary: Ability[] = []
-  const secondary: Ability[] = []
+): AbilityPreference[] {
+  const preferences: AbilityPreference[] = []
 
   for (const entry of classes) {
     const [first, ...rest] = entry.primaryAbilities
-    if (first) primary.push(first)
-    secondary.push(...rest)
+    if (first) {
+      preferences.push({
+        ability: first,
+        source: 'class',
+        emphasis: 'primary',
+        className: entry.className,
+      })
+    }
+    for (const ability of rest) {
+      preferences.push({
+        ability,
+        source: 'class',
+        emphasis: 'secondary',
+        className: entry.className,
+      })
+    }
   }
 
-  return { primary, secondary }
+  return preferences
 }
 
 /** Ordered ability list: primaryAbilities first (deduped), then remaining ABILITY_IDS. */
@@ -197,7 +211,8 @@ export function deriveAbilityScoreRecommendations(
 ): AbilityScoreRecommendation | null {
   if (classes.length === 0) return null
 
-  const recommendation = deriveAbilityRecommendation(classes)
+  const preferences = deriveAbilityPreferences(classes)
+  const recommendation: AbilityScoreRecommendation = { preferences }
 
   if (!scoreSource || scoreSource.length === 0) {
     return recommendation

@@ -1,9 +1,3 @@
-export const abilityRecommendationBadgeSlotClasses =
-  'flex min-h-5 items-center justify-center empty:min-h-5'
-
-/** Column wrapper — badge sits above the ability card surface, not inside it. */
-export const abilityScoreCardColumnClasses = 'flex min-w-0 flex-col gap-1'
-
 /** Gentle advisory callout — muted fill without alert semantics. */
 export const abilityRecommendationCalloutClasses =
   'rounded-md border border-border bg-surface-subtle px-3 py-2.5 text-sm'

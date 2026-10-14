@@ -40,13 +40,13 @@ export const characterBuilderAbilityRecommendationMessages = {
     'validation.characterBuilder.abilityRecommendation.applied',
     () => 'Applied',
   ),
-  badgePrimary: defineMessage(
-    'validation.characterBuilder.abilityRecommendation.badgePrimary',
-    () => 'Recommended',
+  preferenceTooltipPrimary: defineMessage<{ className: string }>(
+    'validation.characterBuilder.abilityRecommendation.preferenceTooltipPrimary',
+    ({ className }) => `Recommended primary ability for ${className}.`,
   ),
-  badgeSecondary: defineMessage(
-    'validation.characterBuilder.abilityRecommendation.badgeSecondary',
-    () => 'Also useful',
+  preferenceTooltipSecondary: defineMessage<{ className: string }>(
+    'validation.characterBuilder.abilityRecommendation.preferenceTooltipSecondary',
+    ({ className }) => `Also useful for ${className}.`,
   ),
   autoFillRemaining: defineMessage(
     'validation.characterBuilder.abilityRecommendation.autoFillRemaining',

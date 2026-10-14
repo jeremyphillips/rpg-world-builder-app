@@ -1,9 +1,18 @@
-import { useCallback, useId, useMemo, useState } from 'react'
+import {
+  useCallback,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent,
+  type MutableRefObject,
+} from 'react'
 import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  useDraggable,
   useDroppable,
   useSensor,
   useSensors,
@@ -15,7 +24,6 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import {
   ABILITY_ENTRIES,
   ABILITY_IDS,
-  abilityModifier,
   characterBuilderAbilityRecommendationMessages,
   fillEmptyAbilitiesWithClassRecommendations,
   formatFieldMessage,
@@ -29,27 +37,21 @@ import {
   type AbilityScoreRecommendation,
   type AbilityScoreRecommendationClassInput,
 } from '@rpg/contracts'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  InsetPanel,
-  Text,
-  cn,
-} from '@rpg/ui'
+import { InsetPanel, Text, cn } from '@rpg/ui'
 
 import {
-  abilitiesFormCopy,
-  FIXED_SCORES_EMPTY_SCORE_VALUE,
-} from '../../../../../lib/steps/abilities-form-labels'
+  AbilityScoreRecommendationIndicator,
+  AbilityScoreSelect,
+  type AbilityScoreCardState,
+} from '@/components/ability-score'
+
+import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-labels'
 import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
+import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
 import {
   assignScoreFromPool,
-  clearAbilityScore,
+  buildAbilityScoreSelectUsedBy,
   getFixedScoresRemainingCount,
-  getScoreOptionsForAbility,
   replaceScoreFromPool,
   scoresFromFormValues,
 } from '../../../../../lib/steps/fixed-scores-assignment.lib'
@@ -64,23 +66,10 @@ import {
   type FixedScoresAssignedDragData,
   type FixedScoresPoolDragData,
 } from '../../../../../lib/steps/fixed-scores-dnd.lib'
-import { formatPreviewSignedNumber } from '../../../../../lib/builder-preview/character-builder-preview-panel.lib'
 import { AbilityRecommendationPanel } from '../recommendation/ability-recommendation-panel'
-import { AbilityScoreCardBadge } from '../recommendation/ability-score-card-badge'
 import { AutoFillRemainingAction } from './auto-fill-remaining-action'
-import { abilityScoreCardColumnClasses } from '../recommendation/ability-recommendation.variants'
 import { ScoreToken } from './score-token'
 import {
-  abilityScoreCardAbbrClasses,
-  abilityScoreCardChooseScoreClasses,
-  abilityScoreCardChooseScoreSectionClasses,
-  abilityScoreCardHeaderClasses,
-  abilityScoreCardModifierClasses,
-  abilityScoreCardNameClasses,
-  abilityScoreCardScoreAreaClasses,
-  abilityScoreCardScorePlaceholderOverlayClasses,
-  abilityScoreCardScoreSlotClasses,
-  abilityScoreCardClasses,
   fixedScoresAbilityGridClasses,
   fixedScoresAssignmentIntroClasses,
   fixedScoresAssignmentRootClasses,
@@ -98,13 +87,6 @@ export type FixedScoresAssignmentProps = {
   recommendation?: AbilityScoreRecommendation | null
 }
 
-type AbilityCardState =
-  | 'empty'
-  | 'dragOverValid'
-  | 'filled'
-  | 'draggingFrom'
-  | 'invalidAfterAttempt'
-
 type ActiveDragState =
   | { kind: typeof FIXED_SCORES_DND_KINDS.pool; score: number }
   | { kind: typeof FIXED_SCORES_DND_KINDS.assigned; ability: Ability; score: number }
@@ -115,83 +97,42 @@ function resolveAbilityCardState({
   showInvalidStates,
   isDragOver,
   isDraggingFrom,
+  activeDrag,
 }: {
   assignedScore: number | undefined
   showInvalidStates: boolean
   isDragOver: boolean
   isDraggingFrom: boolean
-}): AbilityCardState {
+  activeDrag: ActiveDragState
+}): AbilityScoreCardState {
   if (isDraggingFrom) return 'draggingFrom'
-  if (isDragOver) return 'dragOverValid'
-  if (showInvalidStates && typeof assignedScore !== 'number') return 'invalidAfterAttempt'
-  if (typeof assignedScore === 'number') return 'filled'
-  return 'empty'
+  if (isDragOver && activeDrag !== null) return 'dragOver'
+  if (showInvalidStates && typeof assignedScore !== 'number') return 'invalid'
+  return 'resting'
 }
 
-function ChooseScoreMenu({
-  ability,
-  scores,
-  scorePool,
-  onSelectScore,
-}: {
-  ability: Ability
-  scores: Partial<Record<Ability, number>>
-  scorePool: readonly number[]
-  onSelectScore: (ability: Ability, value: string) => void
-}) {
-  const entry = ABILITY_ENTRIES[ability]
-  const options = getScoreOptionsForAbility(ability, scores, scorePool)
-  const assignedScore = scores[ability]
-  const actionLabel =
-    typeof assignedScore === 'number'
-      ? abilitiesFormCopy.changeScore
-      : abilitiesFormCopy.chooseScore
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          type="button"
-          variant="text"
-          tone={typeof assignedScore === 'number' ? undefined : 'accent'}
-          size="sm"
-          className={abilityScoreCardChooseScoreClasses}
-          aria-label={`${actionLabel} for ${entry.label}`}
-        >
-          {actionLabel}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="center">
-        {options.map((option) => (
-          <DropdownMenuItem
-            key={option.value || 'empty'}
-            disabled={option.disabled}
-            onSelect={() => onSelectScore(ability, option.value)}
-          >
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
-
-function AbilityScoreCard({
+function FixedScoresAbilityCard({
   ability,
   scores,
   scorePool,
   showInvalidStates,
   activeDrag,
-  recommendation,
+  preferenceLabel,
+  open,
+  onOpenChange,
   onSelectScore,
+  suppressScoreClickRef,
 }: {
   ability: Ability
   scores: Partial<Record<Ability, number>>
   scorePool: readonly number[]
   showInvalidStates: boolean
   activeDrag: ActiveDragState
-  recommendation: AbilityScoreRecommendation | null
-  onSelectScore: (ability: Ability, value: string) => void
+  preferenceLabel?: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSelectScore: (ability: Ability, score: number) => void
+  suppressScoreClickRef: MutableRefObject<boolean>
 }) {
   const entry = ABILITY_ENTRIES[ability]
   const assignedScore = scores[ability]
@@ -203,80 +144,66 @@ function AbilityScoreCard({
     data: { kind: FIXED_SCORES_DND_KINDS.abilityDrop, ability },
   })
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDragHandleRef,
+  } = useDraggable({
+    id: fixedScoresAssignedDndId(ability),
+    data: {
+      kind: FIXED_SCORES_DND_KINDS.assigned,
+      ability,
+      score: assignedScore ?? 0,
+    } satisfies FixedScoresAssignedDragData,
+    disabled: typeof assignedScore !== 'number',
+  })
+
   const cardState = resolveAbilityCardState({
     assignedScore,
     showInvalidStates,
-    isDragOver: isOver && activeDrag !== null,
+    isDragOver: isOver,
     isDraggingFrom,
+    activeDrag,
   })
 
-  const modifierLabel =
+  const usedBy = useMemo(() => buildAbilityScoreSelectUsedBy(ability, scores), [ability, scores])
+
+  const headerAdornment = preferenceLabel ? (
+    <AbilityScoreRecommendationIndicator label={preferenceLabel} />
+  ) : undefined
+
+  const scoreDragHandleProps =
     typeof assignedScore === 'number'
-      ? formatPreviewSignedNumber(abilityModifier(assignedScore))
-      : abilitiesFormCopy.emptyModifier
+      ? {
+          ref: setDragHandleRef,
+          ...listeners,
+          ...attributes,
+          'aria-label': `${entry.label} score ${assignedScore}`,
+          className: 'cursor-grab active:cursor-grabbing',
+          onClick: (event: MouseEvent<HTMLElement>) => {
+            if (suppressScoreClickRef.current) {
+              suppressScoreClickRef.current = false
+              event.preventDefault()
+            }
+          },
+        }
+      : undefined
 
   return (
-    <div className={abilityScoreCardColumnClasses}>
-      <AbilityScoreCardBadge ability={ability} recommendation={recommendation} />
-
-      <article
-        ref={setNodeRef}
-        className={abilityScoreCardClasses(cardState)}
-        aria-label={entry.label}
-      >
-        <header className={abilityScoreCardHeaderClasses}>
-          <div className={abilityScoreCardAbbrClasses}>{ability.toUpperCase()}</div>
-          <div className={abilityScoreCardNameClasses}>{entry.label}</div>
-        </header>
-
-        <div className={abilityScoreCardScoreAreaClasses}>
-          <div className={abilityScoreCardScoreSlotClasses}>
-            {typeof assignedScore === 'number' ? (
-              <ScoreToken
-                value={assignedScore}
-                size="assigned"
-                surface="plain"
-                interactive
-                sourceHidden={isDraggingFrom}
-                ariaLabel={`${entry.label} score ${assignedScore}`}
-                dndId={fixedScoresAssignedDndId(ability)}
-                dndData={
-                  {
-                    kind: FIXED_SCORES_DND_KINDS.assigned,
-                    ability,
-                    score: assignedScore,
-                  } satisfies FixedScoresAssignedDragData
-                }
-              />
-            ) : null}
-            {typeof assignedScore !== 'number' || isDraggingFrom ? (
-              <ScoreToken
-                label={abilitiesFormCopy.dropScoreHere}
-                size="assigned"
-                surface="placeholder"
-                interactive={false}
-                className={
-                  isDraggingFrom ? abilityScoreCardScorePlaceholderOverlayClasses : undefined
-                }
-              />
-            ) : null}
-          </div>
-          <span className={abilityScoreCardModifierClasses} aria-live="polite">
-            <span className="sr-only">Modifier </span>
-            {modifierLabel}
-          </span>
-        </div>
-
-        <div className={abilityScoreCardChooseScoreSectionClasses}>
-          <ChooseScoreMenu
-            ability={ability}
-            scores={scores}
-            scorePool={scorePool}
-            onSelectScore={onSelectScore}
-          />
-        </div>
-      </article>
-    </div>
+    <AbilityScoreSelect
+      ref={setNodeRef}
+      ability={ability}
+      value={typeof assignedScore === 'number' ? assignedScore : null}
+      scores={scorePool}
+      usedBy={usedBy}
+      open={open}
+      onOpenChange={onOpenChange}
+      state={cardState}
+      size="md"
+      headerAdornment={headerAdornment}
+      scoreDragHandleProps={scoreDragHandleProps}
+      onSelect={(score) => onSelectScore(ability, score)}
+    />
   )
 }
 
@@ -363,8 +290,14 @@ export function FixedScoresAssignment({
   const form = useFormContext<AbilitiesFormValues>()
   const watchedValues = useWatch<AbilitiesFormValues>()
   const [activeDrag, setActiveDrag] = useState<ActiveDragState>(null)
+  const [openAbility, setOpenAbility] = useState<Ability | null>(null)
+  const suppressScoreClickRef = useRef(false)
 
   const scores = useMemo(() => scoresFromFormValues(watchedValues ?? {}), [watchedValues])
+  const preferenceLabels = useMemo(
+    () => buildAbilityPreferenceLabelsByAbility(recommendation?.preferences ?? []),
+    [recommendation?.preferences],
+  )
   const availableScores = useMemo(
     () => getAvailableStandardArrayScores(scores, scorePool),
     [scores, scorePool],
@@ -400,6 +333,8 @@ export function FixedScoresAssignment({
   )
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
+    suppressScoreClickRef.current = true
+    setOpenAbility(null)
     const data = event.active.data.current as
       | FixedScoresPoolDragData
       | FixedScoresAssignedDragData
@@ -435,21 +370,11 @@ export function FixedScoresAssignment({
   }, [])
 
   const handleSelectScore = useCallback(
-    (ability: Ability, value: string) => {
-      let nextScores: typeof scores
-
-      if (value === FIXED_SCORES_EMPTY_SCORE_VALUE || value.trim() === '') {
-        nextScores = clearAbilityScore(scores, ability)
-      } else {
-        const parsed = Number(value)
-        if (!Number.isFinite(parsed)) return
-
-        nextScores =
-          typeof scores[ability] === 'number'
-            ? replaceScoreFromPool(scores, ability, parsed)
-            : assignScoreFromPool(scores, ability, parsed)
-      }
-
+    (ability: Ability, score: number) => {
+      const nextScores =
+        typeof scores[ability] === 'number'
+          ? replaceScoreFromPool(scores, ability, score)
+          : assignScoreFromPool(scores, ability, score)
       syncScoresToForm(nextScores)
     },
     [scores, syncScoresToForm],
@@ -526,15 +451,20 @@ export function FixedScoresAssignment({
 
           <div className={fixedScoresAbilityGridClasses} role="group" aria-labelledby={introId}>
             {ABILITY_IDS.map((ability) => (
-              <AbilityScoreCard
+              <FixedScoresAbilityCard
                 key={ability}
                 ability={ability}
                 scores={scores}
                 scorePool={scorePool}
                 showInvalidStates={showInvalidStates}
                 activeDrag={activeDrag}
-                recommendation={recommendation}
+                preferenceLabel={preferenceLabels[ability]}
+                open={openAbility === ability}
+                onOpenChange={(nextOpen) => {
+                  setOpenAbility(nextOpen ? ability : null)
+                }}
                 onSelectScore={handleSelectScore}
+                suppressScoreClickRef={suppressScoreClickRef}
               />
             ))}
           </div>

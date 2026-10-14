@@ -31,8 +31,10 @@ const fighterClassInput = {
 }
 
 const fighterRecommendation = {
-  primary: ['str'] as const,
-  secondary: ['dex'] as const,
+  preferences: [
+    { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
+    { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
+  ],
   suggestedAssignment: { str: 15, dex: 14 },
 }
 
