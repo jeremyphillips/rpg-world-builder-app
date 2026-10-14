@@ -70,7 +70,7 @@ export function AbilityScoreSelectScoreGrid({
                 tileBaseClasses,
                 'min-h-12 tabular-nums text-style-label',
                 isCurrent
-                  ? 'border-primary bg-accent'
+                  ? 'border-primary bg-surface-strong'
                   : unavailable
                     ? 'border-border bg-muted text-muted-foreground'
                     : 'border-border bg-background hover:bg-muted',

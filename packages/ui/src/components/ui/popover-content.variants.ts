@@ -9,6 +9,18 @@ export const tooltipContentMotionClasses =
 
 export type PopoverContentTone = 'menu' | 'popover' | 'tooltip' | 'filter'
 
+/** Pointer box for `PopoverContent` when `arrow` is true. Radix adds this height to `sideOffset`. */
+export const overlayArrowWidth = 20
+
+export const overlayArrowHeight = 10
+
+/**
+ * Open path in the arrow viewport. Fill closes the base; stroke paints only the two sides.
+ * Endpoints sit on the same slopes as a full triangle, but stop at the panel border
+ * (local y=2 under a 2px seam shift) so the 1px stroke does not cross that border.
+ */
+export const overlayArrowPath = 'M2.61 2.5 L10 9.5 L17.39 2.5'
+
 /** Styling primitive for overlay content chrome. Hosts add motion utilities. */
 export function popoverContentVariants({
   tone = 'popover',

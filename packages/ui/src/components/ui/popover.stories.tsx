@@ -40,3 +40,23 @@ export const WithArrowLeft: Story = {
     </div>
   ),
 }
+
+const arrowSides = ['top', 'right', 'bottom', 'left'] as const
+
+/** Open all four placements. Collision flips are checked by shrinking the canvas. */
+export const ArrowPlacements: Story = {
+  render: () => (
+    <div className="grid min-h-[28rem] min-w-[36rem] grid-cols-2 place-items-center gap-24 p-16">
+      {arrowSides.map((side) => (
+        <Popover key={side} defaultOpen>
+          <PopoverTrigger asChild>
+            <Button type="button">{side}</Button>
+          </PopoverTrigger>
+          <PopoverContent side={side} arrow className="p-3">
+            {side}
+          </PopoverContent>
+        </Popover>
+      ))}
+    </div>
+  ),
+}

@@ -80,11 +80,23 @@
     padding-inline-start: calc(var(--spacing) * 8);
   }
 
+  /*
+   * Arrow SVG overflows the box. `shadow-md` on `.ui-popover-content` stays rectangular
+   * and does not follow the pointer silhouette.
+   */
   .ui-popover-content--with-arrow {
     overflow: visible;
   }
 
+  /*
+   * Local overlap only. Radix rotates the arrow wrapper per side, so one -Y shift
+   * moves the pointer into the panel on every placement. The unstroked rect sits
+   * on the path base (inside the viewport — SVG overflow clips anything outside)
+   * and this shift covers the 1px panel border at the seam.
+   */
   .ui-overlay-arrow {
-    fill: var(--popover);
+    display: block;
+    transform: translateY(-2px);
+    pointer-events: none;
   }
 }
