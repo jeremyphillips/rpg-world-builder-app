@@ -7,7 +7,7 @@ describe('groupEntitySummaryStatusForMetadata', () => {
     const segments = groupEntitySummaryStatusForMetadata([
       { kind: 'badge', label: 'Equipped', tone: 'success' },
       { kind: 'badge', label: 'Magical', tone: 'neutral' },
-      { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+      { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
     ])
     expect(segments).toEqual([
       {
@@ -19,7 +19,7 @@ describe('groupEntitySummaryStatusForMetadata', () => {
       },
       {
         kind: 'status',
-        item: { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+        item: { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
       },
     ])
   })

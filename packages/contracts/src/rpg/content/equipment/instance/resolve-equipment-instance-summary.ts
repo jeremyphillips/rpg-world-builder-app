@@ -5,6 +5,7 @@ import { resolveEquipmentEffectWarnings } from './equipment-effect-warnings'
 import type { EquipmentInstance } from './instance'
 import type { MagicPropertyDefinitionProvider } from './magic-property'
 import { normalizeEquipmentInstance } from './normalize-equipment-instance'
+import { adjustmentMetadataSegments } from './equipment-mechanical-metadata'
 import {
   resolveEquipmentMagicProperties,
   type ResolvedEquipmentMagicProperties,
@@ -94,12 +95,6 @@ function resolveDisplayName(args: {
   return `${item.name} ${formatSignedModifier(enhancementBonus)}`
 }
 
-function adjustmentCountSegment(count: number): string | undefined {
-  if (count === 0) return undefined
-  if (count === 1) return '1 adjustment'
-  return `${count} adjustments`
-}
-
 export function resolveEquipmentInstanceSummary(
   entry: EquipmentInstance,
   item: Equipment | undefined,
@@ -128,9 +123,8 @@ export function resolveEquipmentInstanceSummary(
     metadataSegments.push(`${formatSignedModifier(enhancementBonus)} enhancement`)
   }
 
+  metadataSegments.push(...adjustmentMetadataSegments(normalized.adjustments))
   const adjustmentCount = (normalized.adjustments ?? []).length
-  const adjustmentSegment = adjustmentCountSegment(adjustmentCount)
-  if (adjustmentSegment) metadataSegments.push(adjustmentSegment)
 
   const advisories =
     item !== undefined ? resolveEquipmentEffectWarnings({ entry: normalized, item, provider }) : []

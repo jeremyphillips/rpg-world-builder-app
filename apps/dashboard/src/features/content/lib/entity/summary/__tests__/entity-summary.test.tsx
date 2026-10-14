@@ -191,7 +191,7 @@ describe('EntitySummaryStatus', () => {
           items={[
             { kind: 'badge', label: 'Equipped', tone: 'success' },
             { kind: 'badge', label: 'Magical', tone: 'neutral', appearance: 'soft' },
-            { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+            { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
           ]}
         />,
       )
@@ -199,7 +199,7 @@ describe('EntitySummaryStatus', () => {
       expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(1)
       expect(container).toHaveTextContent('Equipped')
       expect(container).toHaveTextContent('Magical')
-      expect(container).toHaveTextContent('Returning · 1 adjustment')
+      expect(container).toHaveTextContent('Returning · +1 adjustment')
     })
 
     it('separates consecutive text items', () => {
@@ -209,7 +209,7 @@ describe('EntitySummaryStatus', () => {
           composition="metadata"
           items={[
             { kind: 'text', variant: 'muted', label: 'Returning' },
-            { kind: 'text', variant: 'muted', label: '1 adjustment' },
+            { kind: 'text', variant: 'muted', label: '+1 adjustment' },
           ]}
         />,
       )
@@ -285,7 +285,7 @@ describe('EntitySummaryStatus', () => {
             items={[
               { kind: 'badge', label: 'Equipped', tone: 'success' },
               { kind: 'badge', label: 'Magical', tone: 'neutral' },
-              { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+              { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
             ]}
           />
         </div>,

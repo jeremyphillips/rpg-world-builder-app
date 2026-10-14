@@ -5,6 +5,7 @@ import {
   EQUIPMENT_EFFECT_BONUS_MAX,
   EQUIPMENT_EFFECT_BONUS_MIN,
   formatSignedModifier,
+  formatEquipmentMechanicalComponentsForTarget,
   joinInlineMetadata,
   nextNonZeroBonus,
   resolveEquipmentEntryEffectTotals,
@@ -466,9 +467,6 @@ function CombinedMechanicalModifiers({
   totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
 }) {
   const manualTargets = new Set((draft.adjustments ?? []).map((effect) => effect.target))
-  const enhancementName =
-    magic.resolved.find((row) => row.definition.category === 'enhancement')?.definition.name ??
-    'Enhancement'
 
   const overlapping = (['attack_roll', 'damage_roll', 'armor_class'] as const).filter((target) => {
     const hasEnhancement = magic.resolved.some(
@@ -482,19 +480,20 @@ function CombinedMechanicalModifiers({
   if (overlapping.length === 0) return null
 
   return (
-    <div className="space-y-1 border-t border-border pt-3">
-      <Text variant="emphasis">Combined modifiers</Text>
-      {overlapping.map((target) => (
-        <div key={target} className="flex items-center justify-between gap-2">
-          <Text variant="muted">{effectTargetLabel(target)}</Text>
-          <Text variant="muted">{formatSignedModifier(totals[target])}</Text>
-        </div>
-      ))}
-      <Text variant="muted" className="text-xs">
-        Includes {enhancementName} and the additional modifier
-        {overlapping.length === 1 ? ` on ${effectTargetLabel(overlapping[0]!).toLowerCase()}` : 's'}
-        .
-      </Text>
+    <div className="space-y-2 border-t border-border pt-3">
+      <Text variant="emphasis">Equipment modifiers</Text>
+      {overlapping.map((target) => {
+        const summary = formatEquipmentMechanicalComponentsForTarget(draft, magic, target)
+        return (
+          <div
+            key={target}
+            className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1"
+          >
+            <Text variant="muted">{effectTargetLabel(target)}</Text>
+            <Text variant="muted">{summary ?? formatSignedModifier(totals[target])}</Text>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -597,8 +596,8 @@ function MainModeBody({
 
       <SwitchField
         id="equipment-editor-equipped"
-        label="Equipped by default"
-        hint="This equipment is included on the stat block as equipped."
+        label="Equipped"
+        hint="Show this item as equipped on the stat block."
         labelPosition="settings"
         checked={Boolean(draft.equipped)}
         onCheckedChange={(equipped) => onPatch({ equipped })}
@@ -606,12 +605,8 @@ function MainModeBody({
 
       <SwitchField
         id="equipment-editor-magical"
-        label="Magic item"
-        hint={
-          catalogItem.kind === 'weapon' || catalogItem.kind === 'armor'
-            ? 'Mark this item as magical and add an enhancement or custom property.'
-            : 'Mark this item as magical and add a custom property.'
-        }
+        label="Magical"
+        hint="Treat this item as magical. Properties are optional."
         labelPosition="settings"
         checked={Boolean(draft.magical)}
         onCheckedChange={onMagical}
@@ -619,42 +614,46 @@ function MainModeBody({
 
       {draft.magical ? (
         <div className="space-y-2">
-          {magic.resolved.map((row) => (
-            <ContentFormEntitySelectionRow
-              key={row.entry.propertyId}
-              entity={{
-                heading: row.definition.name,
-                description: row.definition.description,
-                statusComposition: 'metadata',
-                status: [
-                  {
-                    kind: 'text',
-                    label: joinInlineMetadata([
-                      row.definition.category === 'enhancement' ? 'Enhancement' : 'Special',
-                      ...row.definition.effects.map(
-                        (effect) =>
-                          `${formatSignedModifier(effect.bonus)} ${effectTargetLabel(effect.target).toLowerCase()}`,
-                      ),
-                    ]),
-                    variant: 'muted',
-                  },
-                ],
-              }}
-              trailing={{
-                kind: 'utility',
-                content: (
-                  <button
-                    type="button"
-                    className={iconGhostControlVariants({ hover: 'destructive', layout: 'flex' })}
-                    aria-label={`Remove ${row.definition.name}`}
-                    onClick={() => onRemovePreset(row.entry.propertyId)}
-                  >
-                    <ActionIcon action="remove" />
-                  </button>
-                ),
-              }}
-            />
-          ))}
+          {magic.resolved.map((row) => {
+            const propertyMetadata = joinInlineMetadata([
+              row.definition.category === 'enhancement' ? 'Enhancement' : 'Special',
+              ...row.definition.effects.map(
+                (effect) =>
+                  `${formatSignedModifier(effect.bonus)} ${effectTargetLabel(effect.target).toLowerCase()}`,
+              ),
+            ])
+            const showPresetDescription = row.definition.effects.length === 0
+            return (
+              <ContentFormEntitySelectionRow
+                key={row.entry.propertyId}
+                entity={{
+                  heading: row.definition.name,
+                  ...(showPresetDescription ? { description: row.definition.description } : {}),
+                  statusComposition: 'metadata',
+                  status: [
+                    {
+                      kind: 'text',
+                      label: propertyMetadata,
+                      variant: 'muted',
+                    },
+                  ],
+                }}
+                trailing={{
+                  kind: 'utility',
+                  content: (
+                    <button
+                      type="button"
+                      className={iconGhostControlVariants({ hover: 'destructive', layout: 'flex' })}
+                      aria-label={`Remove ${row.definition.name}`}
+                      onClick={() => onRemovePreset(row.entry.propertyId)}
+                    >
+                      <ActionIcon action="remove" />
+                    </button>
+                  ),
+                }}
+              />
+            )
+          })}
           {magic.custom.map((row) => (
             <ContentFormEntitySelectionRow
               key={row.customId}
@@ -696,8 +695,7 @@ function MainModeBody({
           Adjustments
         </Heading>
         <Text variant="muted">
-          Fine-tune this equipment&apos;s attack, damage, or Armor Class values independently of
-          magical properties.
+          Apply manual modifiers to attack rolls, damage rolls, or Armor Class.
         </Text>
         {(draft.adjustments ?? []).map((row) => (
           <ContentFormEntitySelectionRow
@@ -709,7 +707,7 @@ function MainModeBody({
               status: [
                 {
                   kind: 'text',
-                  label: `${formatSignedModifier(row.bonus)} modifier`,
+                  label: `${formatSignedModifier(row.bonus)} adjustment`,
                   variant: 'muted',
                 },
               ],

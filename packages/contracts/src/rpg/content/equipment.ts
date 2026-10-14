@@ -166,6 +166,13 @@ export {
   type EquipmentInstanceSummary,
   type ResolveEquipmentInstanceSummaryOptions,
 } from './equipment/instance/resolve-equipment-instance-summary'
+export {
+  adjustmentBonusOnTarget,
+  adjustmentMetadataSegments,
+  enhancementBonusOnTarget,
+  formatEquipmentMechanicalComponentSegments,
+  formatEquipmentMechanicalComponentsForTarget,
+} from './equipment/instance/equipment-mechanical-metadata'
 export { resolveEquipmentInstanceReferenceLabel } from './equipment/instance/resolve-equipment-instance-reference-label'
 export { formatEquipmentEntryDisplayToken } from './equipment/instance/equipment-entry-display-token'
 

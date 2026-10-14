@@ -403,7 +403,7 @@ export function grantedEquipmentItemFields(
     {
       type: 'switch',
       name: 'equipped',
-      label: 'Equipped by default',
+      label: 'Equipped',
       visibility: visibleForItemKind('grant', guard),
     },
   ]

@@ -36,7 +36,7 @@ describe('EquipmentInstanceEditorDrawer', () => {
       />,
     )
 
-    await user.click(screen.getByRole('switch', { name: /magic item/i }))
+    await user.click(screen.getByRole('switch', { name: /magical/i }))
     await user.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(screen.getByRole('heading', { name: 'Discard changes?' })).toBeInTheDocument()

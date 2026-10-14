@@ -154,7 +154,7 @@ const rows: Row[] = [
     displayName: 'Shortsword +1',
     equipped: true,
     magical: true,
-    metadata: 'Returning · 1 adjustment',
+    metadata: 'Returning · +1 adjustment',
   },
   {
     name: 'enhancement +1 with adjustment',
@@ -167,7 +167,7 @@ const rows: Row[] = [
     displayName: 'Shortsword +1',
     equipped: true,
     magical: true,
-    metadata: '1 adjustment',
+    metadata: '+1 adjustment',
   },
   {
     name: 'two named properties',
@@ -209,7 +209,7 @@ const rows: Row[] = [
     displayName: 'Shortsword',
     equipped: true,
     magical: false,
-    metadata: '1 adjustment',
+    metadata: '+1 adjustment',
   },
   {
     name: 'custom name with enhancement',
@@ -251,6 +251,6 @@ describe('resolveEquipmentInstanceSummary', () => {
       provider,
     )
     expect(summary.advisories.some((row) => row.code === 'above_standard_enhancement')).toBe(true)
-    expect(summary.metadataSegments).toEqual(['1 adjustment'])
+    expect(summary.metadataSegments).toEqual(['+3 adjustment'])
   })
 })

@@ -175,7 +175,7 @@ const METADATA_STATUS_ROWS = [
     status: [
       { kind: 'badge', label: 'Equipped', tone: 'success' },
       { kind: 'badge', label: 'Magical', tone: 'neutral', appearance: 'soft' },
-      { kind: 'text', variant: 'muted', label: 'Returning · 1 adjustment' },
+      { kind: 'text', variant: 'muted', label: 'Returning · +1 adjustment' },
     ],
   },
   {
