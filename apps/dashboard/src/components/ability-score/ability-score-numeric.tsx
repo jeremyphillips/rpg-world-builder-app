@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type Reac
 
 import { AbilityScoreCard } from './ability-score-card'
 import {
-  abilityScoreCardScoreCenterClasses,
+  abilityScoreCardScoreStepperSlotClasses,
   abilityScoreCardScoreValueClassesFor,
   abilityScoreCardStepperButtonAppearance,
   abilityScoreCardStepperButtonSize,
@@ -146,6 +146,11 @@ export function AbilityScoreNumeric({
     return true
   }
 
+  const scoreSlotClasses = cn(
+    abilityScoreCardScoreStepperSlotClasses,
+    abilityScoreCardScoreValueClassesFor(size),
+  )
+
   const scoreCell = editing ? (
     <input
       ref={inputRef}
@@ -154,8 +159,7 @@ export function AbilityScoreNumeric({
       aria-label={`${fullName} score`}
       aria-invalid={ariaInvalid || undefined}
       className={cn(
-        abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClassesFor(size),
+        scoreSlotClasses,
         'border-0 bg-transparent p-0 outline-none focus-visible:ring-0',
       )}
       value={draft}
@@ -170,8 +174,7 @@ export function AbilityScoreNumeric({
       aria-label={`${fullName} score`}
       aria-invalid={ariaInvalid || undefined}
       className={cn(
-        abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClassesFor(size),
+        scoreSlotClasses,
         disabled && 'text-muted-foreground',
         state === 'draggingFrom' && 'opacity-50',
       )}
@@ -190,9 +193,9 @@ export function AbilityScoreNumeric({
       state={state}
       footer={footer}
       headerAdornment={headerAdornment}
+      scoreLayout="stepper"
       interaction={disabled ? 'none' : 'numeric'}
     >
-      <span aria-hidden />
       {scoreCell}
       <div className={abilityScoreCardStepperStackClasses}>
         <NumberStepperStepButton

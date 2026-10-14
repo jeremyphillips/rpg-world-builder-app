@@ -5,7 +5,6 @@ import {
   getAbilityCompactLabel,
   type Ability,
 } from '@rpg/contracts'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 import { cn } from '@rpg/ui'
 import { forwardRef, type ReactNode } from 'react'
 
@@ -14,11 +13,14 @@ import {
   abilityScoreCardFooterClasses,
   abilityScoreCardHeaderAdornmentClasses,
   abilityScoreCardHeaderClasses,
+  abilityScoreCardHeaderLabelClasses,
   abilityScoreCardModifierClasses,
-  abilityScoreCardScoreCenterClasses,
-  abilityScoreCardScoreRowClasses,
+  abilityScoreCardScoreCenteredSlotClasses,
+  abilityScoreCardScoreRowVariants,
+  abilityScoreCardScoreSlotMinHeightClassesFor,
   abilityScoreCardScoreValueClassesFor,
   abilityScoreCardVariants,
+  type AbilityScoreCardScoreLayout,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
 
@@ -32,6 +34,9 @@ export type AbilityScoreCardProps = {
   children?: ReactNode
   hideModifier?: boolean
   interaction?: 'none' | 'select' | 'numeric'
+  scoreLayout?: AbilityScoreCardScoreLayout
+  /** Overrides the article `aria-label` (e.g. choose trigger copy). */
+  ariaLabel?: string
 }
 
 export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
@@ -46,6 +51,8 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
       children,
       hideModifier = false,
       interaction = 'none',
+      scoreLayout = 'centered',
+      ariaLabel,
     },
     ref,
   ) {
@@ -55,42 +62,41 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
       typeof value === 'number' ? formatSignedModifier(abilityModifier(value)) : '—'
     const suppressModifier = hideModifier || state === 'dragOver'
     const scoreRow = children ?? (
-      <>
-        <span aria-hidden />
-        <span
-          className={cn(
-            abilityScoreCardScoreCenterClasses,
-            abilityScoreCardScoreValueClassesFor(size),
-          )}
-        >
-          {value === null ? '—' : value}
-        </span>
-        <span aria-hidden />
-      </>
+      <span
+        className={cn(
+          abilityScoreCardScoreCenteredSlotClasses,
+          abilityScoreCardScoreValueClassesFor(size),
+        )}
+      >
+        {value === null ? '—' : value}
+      </span>
     )
 
     return (
       <article
         ref={ref}
-        aria-label={fullName}
-        className={abilityScoreCardVariants({ state, size, interaction })}
+        aria-label={ariaLabel ?? fullName}
+        className={abilityScoreCardVariants({ state, size, interaction, scoreLayout })}
       >
         <div className={abilityScoreCardBodyPaddingClasses[size]}>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className={abilityScoreCardHeaderClasses}>
-                  {compactLabel}
-                  {headerAdornment ? (
-                    <div className={abilityScoreCardHeaderAdornmentClasses}>{headerAdornment}</div>
-                  ) : null}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>{fullName}</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className={abilityScoreCardHeaderClasses}>
+            <span aria-hidden className="col-start-1" />
+            <span className={abilityScoreCardHeaderLabelClasses}>{compactLabel}</span>
+            {headerAdornment ? (
+              <div className={abilityScoreCardHeaderAdornmentClasses}>{headerAdornment}</div>
+            ) : (
+              <span aria-hidden className="col-start-3" />
+            )}
+          </div>
 
-          <div className={abilityScoreCardScoreRowClasses}>{scoreRow}</div>
+          <div
+            className={cn(
+              abilityScoreCardScoreRowVariants({ layout: scoreLayout }),
+              abilityScoreCardScoreSlotMinHeightClassesFor(size),
+            )}
+          >
+            {scoreRow}
+          </div>
 
           {suppressModifier ? null : (
             <p className={abilityScoreCardModifierClasses} aria-live="polite">

@@ -2,15 +2,19 @@
 
 import { ABILITY_ENTRIES, type Ability } from '@rpg/contracts'
 import { ActionIcon, cn, Popover, PopoverContent, PopoverTrigger } from '@rpg/ui'
-import { ArrowDown } from 'lucide-react'
 import { forwardRef, useCallback, type HTMLAttributes, type ReactNode } from 'react'
 
 import { AbilityScoreCard } from './ability-score-card'
 import {
-  abilityScoreCardScoreCenterClasses,
+  abilityScoreCardChooseOverlayClasses,
   abilityScoreCardScoreValueClassesFor,
+  abilityScoreCardSelectFilledBalanceSlotClasses,
+  abilityScoreCardSelectFilledClusterClasses,
+  abilityScoreCardSelectInlineNumeralClasses,
+  abilityScoreCardSelectPencilButtonClasses,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
+import { AbilityScoreSelectPrompt } from './ability-score-select-prompt'
 import {
   AbilityScoreSelectScoreGrid,
   type AbilityScoreSelectUsedBy,
@@ -67,88 +71,83 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
       [onOpenChange, onSelect, value],
     )
 
-    const centerContent =
+    const inlineNumeralClasses = cn(
+      abilityScoreCardSelectInlineNumeralClasses,
+      abilityScoreCardScoreValueClassesFor(size),
+    )
+
+    const chooseLabel = `Choose ${fullName} score`
+    const isChooseCard = !filled && state !== 'dragOver'
+
+    const scoreRow =
       state === 'dragOver' ? (
-        <div
-          className={cn(
-            abilityScoreCardScoreCenterClasses,
-            'flex items-center justify-center gap-1 text-style-label',
-          )}
-        >
-          <ArrowDown aria-hidden className="size-4" />
-          Drop
-        </div>
+        <AbilityScoreSelectPrompt label="Drop" />
       ) : filled ? (
-        <button
-          type="button"
-          className={cn(
-            abilityScoreCardScoreCenterClasses,
-            abilityScoreCardScoreValueClassesFor(size),
-            state === 'draggingFrom' && 'opacity-50',
-            scoreDragHandleClassName,
-          )}
-          tabIndex={scoreDragHandleProps ? 0 : undefined}
-          onClick={(event) => {
-            scoreDragHandleOnClick?.(event)
-            if (!event.defaultPrevented) {
-              onOpenChange?.(true)
-            }
-          }}
-          {...scoreDragHandleRest}
-        >
-          {value}
-        </button>
-      ) : (
-        <PopoverTrigger asChild>
+        <div className={abilityScoreCardSelectFilledClusterClasses}>
+          <span aria-hidden className={abilityScoreCardSelectFilledBalanceSlotClasses} />
           <button
             type="button"
             className={cn(
-              abilityScoreCardScoreCenterClasses,
-              'inline-flex items-center justify-center gap-1 text-style-label',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              inlineNumeralClasses,
+              state === 'draggingFrom' && 'opacity-50',
+              scoreDragHandleClassName,
             )}
-            aria-label={`Choose ${fullName} score`}
+            tabIndex={scoreDragHandleProps ? 0 : undefined}
+            onClick={(event) => {
+              scoreDragHandleOnClick?.(event)
+              if (!event.defaultPrevented) {
+                onOpenChange?.(true)
+              }
+            }}
+            {...scoreDragHandleRest}
           >
-            <ArrowDown aria-hidden className="size-4" />
-            Choose
+            {value}
           </button>
-        </PopoverTrigger>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                abilityScoreCardSelectPencilButtonClasses,
+                'size-control-action-compact justify-self-start rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              )}
+              aria-label={`Change ${fullName} score`}
+            >
+              <ActionIcon action="edit" step="sm" />
+            </button>
+          </PopoverTrigger>
+        </div>
+      ) : (
+        <AbilityScoreSelectPrompt className="pointer-events-none" label="Choose" />
       )
 
-    const rightContent =
-      filled && state !== 'dragOver' ? (
-        <PopoverTrigger asChild>
-          <button
-            type="button"
-            className={cn(
-              'inline-flex size-control-action-compact items-center justify-center rounded-md',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            )}
-            aria-label={`Change ${fullName} score`}
-          >
-            <ActionIcon action="edit" step="sm" />
-          </button>
-        </PopoverTrigger>
-      ) : (
-        <span aria-hidden />
-      )
+    const card = (
+      <AbilityScoreCard
+        ref={ref}
+        ability={ability}
+        value={value}
+        size={size}
+        state={state}
+        headerAdornment={headerAdornment}
+        hideModifier={state === 'dragOver'}
+        interaction={state === 'resting' ? 'select' : 'none'}
+        scoreLayout={state === 'dragOver' ? 'centered' : filled ? 'select-filled' : 'choose'}
+      >
+        {isChooseCard ? (
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={abilityScoreCardChooseOverlayClasses}
+              aria-label={chooseLabel}
+            />
+          </PopoverTrigger>
+        ) : null}
+        {scoreRow}
+      </AbilityScoreCard>
+    )
 
     return (
       <Popover open={open} onOpenChange={onOpenChange}>
-        <AbilityScoreCard
-          ref={ref}
-          ability={ability}
-          value={value}
-          size={size}
-          state={state}
-          headerAdornment={headerAdornment}
-          hideModifier={state === 'dragOver'}
-          interaction={state === 'resting' ? 'select' : 'none'}
-        >
-          <span aria-hidden />
-          {centerContent}
-          {rightContent}
-        </AbilityScoreCard>
+        {card}
         <PopoverContent side="right" align="center" arrow collisionPadding={8}>
           <AbilityScoreSelectScoreGrid
             scores={scores}
