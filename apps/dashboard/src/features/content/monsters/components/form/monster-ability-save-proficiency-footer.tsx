@@ -1,7 +1,10 @@
 import type { Ability } from '@rpg/contracts'
-import { cn, StatusIcon } from '@rpg/ui'
+import { Checkbox, cn } from '@rpg/ui'
 
-import { abilityScoreCardFooterActionLabelClasses } from '@/components/ability-score'
+import {
+  abilityScoreCardFooterActionClasses,
+  abilityScoreCardFooterActionLabelClasses,
+} from '@/components/ability-score'
 
 import {
   MONSTER_SAVE_PROF_LABEL,
@@ -23,26 +26,23 @@ export function MonsterAbilitySaveProficiencyFooter({
   'aria-invalid': ariaInvalid,
   onToggle,
 }: MonsterAbilitySaveProficiencyFooterProps) {
-  const iconVariant = disabled ? 'off' : proficient ? 'ready' : 'none'
-
   return (
-    <button
-      type="button"
+    <label
       className={cn(
-        'inline-flex w-full items-center justify-center gap-1.5',
-        'whitespace-nowrap',
-        abilityScoreCardFooterActionLabelClasses,
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-        disabled && 'text-muted-foreground',
+        abilityScoreCardFooterActionClasses,
+        disabled && 'cursor-not-allowed opacity-50',
       )}
-      aria-pressed={proficient}
-      aria-invalid={ariaInvalid || undefined}
-      aria-label={monsterSavingThrowProficiencyAriaLabel(ability)}
-      disabled={disabled}
-      onClick={onToggle}
     >
-      <StatusIcon variant={iconVariant} size="sm" />
-      {MONSTER_SAVE_PROF_LABEL}
-    </button>
+      <Checkbox
+        checked={proficient}
+        disabled={disabled}
+        aria-invalid={ariaInvalid || undefined}
+        aria-label={monsterSavingThrowProficiencyAriaLabel(ability)}
+        onCheckedChange={() => onToggle()}
+      />
+      <span className={abilityScoreCardFooterActionLabelClasses} aria-hidden>
+        {MONSTER_SAVE_PROF_LABEL}
+      </span>
+    </label>
   )
 }

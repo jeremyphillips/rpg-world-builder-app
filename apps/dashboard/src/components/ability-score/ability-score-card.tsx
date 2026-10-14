@@ -14,6 +14,7 @@ import {
   abilityScoreCardHeaderAdornmentClasses,
   abilityScoreCardHeaderClasses,
   abilityScoreCardHeaderLabelClasses,
+  abilityScoreCardScoreSectionClasses,
   abilityScoreCardModifierClasses,
   abilityScoreCardScoreCenteredSlotClasses,
   abilityScoreCardScoreRowVariants,
@@ -89,21 +90,23 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
             )}
           </div>
 
-          <div
-            className={cn(
-              abilityScoreCardScoreRowVariants({ layout: scoreLayout }),
-              abilityScoreCardScoreSlotMinHeightClassesFor(size),
-            )}
-          >
-            {scoreRow}
-          </div>
+          <div className={abilityScoreCardScoreSectionClasses}>
+            <div
+              className={cn(
+                abilityScoreCardScoreRowVariants({ layout: scoreLayout }),
+                abilityScoreCardScoreSlotMinHeightClassesFor(size),
+              )}
+            >
+              {scoreRow}
+            </div>
 
-          {suppressModifier ? null : (
-            <p className={abilityScoreCardModifierClasses} aria-live="polite">
-              <span className="sr-only">Modifier </span>
-              {modifierText}
-            </p>
-          )}
+            {suppressModifier ? null : (
+              <p className={abilityScoreCardModifierClasses} aria-live="polite">
+                <span className="sr-only">Modifier </span>
+                {modifierText}
+              </p>
+            )}
+          </div>
         </div>
         {footer ? <div className={abilityScoreCardFooterClasses}>{footer}</div> : null}
       </article>

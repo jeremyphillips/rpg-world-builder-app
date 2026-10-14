@@ -41,7 +41,7 @@ export function AbilityScoreSelectScoreGrid({
   }
 
   return (
-    <div className="flex w-64 flex-col gap-2 p-3">
+    <div className="flex w-72 flex-col gap-2 p-3">
       <p id={titleId} className="text-style-label">
         Choose a score
       </p>

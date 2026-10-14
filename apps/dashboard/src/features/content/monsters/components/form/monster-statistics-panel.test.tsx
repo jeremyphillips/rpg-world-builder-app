@@ -73,7 +73,7 @@ describe('MonsterStatisticsPanel', () => {
         name: /^(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)$/,
       }),
     ).toHaveLength(6)
-    expect(screen.getAllByRole('button', { name: /saving throw proficiency$/i })).toHaveLength(6)
+    expect(screen.getAllByRole('checkbox', { name: /saving throw proficiency$/i })).toHaveLength(6)
   })
 
   it('commits a typed score on blur without writing untouched default tens', async () => {
@@ -136,7 +136,7 @@ describe('MonsterStatisticsPanel', () => {
     }
 
     render(<TrackingHost />)
-    await user.click(screen.getByRole('button', { name: 'Strength saving throw proficiency' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Strength saving throw proficiency' }))
 
     await waitFor(() => {
       expect(latest?.proficiencies?.savingThrows).toContain('str')

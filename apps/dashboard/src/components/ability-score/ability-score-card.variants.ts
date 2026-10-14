@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn } from '@rpg/ui'
+import { buttonVariants, cn } from '@rpg/ui'
 
 /** Fills grid columns; width constraints belong on the parent layout only. */
 export const abilityScoreCardShellClasses = 'w-full min-w-0'
@@ -51,6 +51,9 @@ export const abilityScoreCardBodyPaddingClasses = {
   sm: 'p-2',
   md: 'p-3',
 } as const
+
+/** 6px above the score row; 8px (`gap-2`) before the modifier when shown. */
+export const abilityScoreCardScoreSectionClasses = 'flex flex-col gap-2 pt-[6px]'
 
 export type AbilityScoreCardScoreLayout = 'centered' | 'stepper' | 'select-filled' | 'choose'
 
@@ -143,8 +146,15 @@ export const abilityScoreCardStepperButtonAppearance = 'isolated' as const
 
 export const abilityScoreCardModifierClasses = 'text-style-label tabular-nums text-muted-foreground'
 
-export const abilityScoreCardFooterClasses = 'border-t border-border px-2 py-[2px]'
+/** Footer shell — border only; padding lives on footer actions (e.g. monster save prof). */
+export const abilityScoreCardFooterClasses = 'border-t border-border'
 
 export const abilityScoreCardFooterActionLabelClasses = 'text-xs'
+
+export const abilityScoreCardFooterActionClasses = cn(
+  buttonVariants({ variant: 'outline', size: 'xs', density: 'compact' }),
+  'border-0 shadow-none',
+  'inline-flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap px-2 py-[2px]',
+)
 
 export type AbilityScoreCardState = 'resting' | 'dragOver' | 'draggingFrom' | 'invalid'

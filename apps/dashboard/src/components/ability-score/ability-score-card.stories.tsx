@@ -1,10 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { useMemo, useState } from 'react'
 
+import { Checkbox } from '@rpg/ui'
+
 import { buildFixedScoreSelectOptions } from '@/features/character/lib/steps/fixed-scores-assignment.lib'
 
 import { AbilityScoreCard } from './ability-score-card'
-import { abilityScoreCardFooterActionLabelClasses } from './ability-score-card.variants'
+
+import {
+  abilityScoreCardFooterActionClasses,
+  abilityScoreCardFooterActionLabelClasses,
+} from './ability-score-card.variants'
 import { AbilityScoreNumeric } from './ability-score-numeric'
 import { AbilityScoreRecommendationIndicator } from './ability-score-recommendation-indicator'
 import { AbilityScoreSelect } from './ability-score-select'
@@ -93,7 +99,14 @@ export const NumericWithFooter: Story = {
       min={1}
       max={30}
       onCommit={() => undefined}
-      footer={<span className={abilityScoreCardFooterActionLabelClasses}>Save prof.</span>}
+      footer={
+        <label className={abilityScoreCardFooterActionClasses}>
+          <Checkbox checked={false} aria-label="Strength saving throw proficiency" />
+          <span className={abilityScoreCardFooterActionLabelClasses} aria-hidden>
+            Save prof.
+          </span>
+        </label>
+      }
     />
   ),
 }
