@@ -1,4 +1,5 @@
 import type {
+  Ability,
   CharacterMediaPatchInput,
   CharacterVitalPatch,
   CharacterVitalState,
@@ -17,6 +18,7 @@ import {
   findCharacterVital,
   findPcForUser,
   listPcsForUser,
+  updateCharacterAbilityScoreRecord,
   updateCharacterVitalRecord,
 } from './character.repository'
 
@@ -58,6 +60,14 @@ export async function deleteCharacterForUser(
 
 type UpdateCharacterVitalOptions = {
   timestamp: string
+}
+
+export async function updateCharacterAbilityScore(
+  characterId: string,
+  ability: Ability,
+  score: number,
+): Promise<boolean> {
+  return updateCharacterAbilityScoreRecord(characterId, ability, score)
 }
 
 export async function updateCharacterVital(

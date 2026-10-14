@@ -71,6 +71,7 @@ export {
 } from './components/recovery/campaign-destination.variants'
 export { useUpdateCampaignCharacterMedia } from './hooks/use-update-campaign-character-media'
 export { useCampaignCharacter, campaignCharacterQueryKey } from './hooks/use-campaign-character'
+export { useCampaignCharacterAbilityScoreEditor } from './hooks/use-campaign-character-ability-score-editor'
 export {
   useCampaignCharacters,
   campaignCharactersListQueryKey,

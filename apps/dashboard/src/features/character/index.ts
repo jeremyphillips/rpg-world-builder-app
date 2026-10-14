@@ -55,6 +55,7 @@ export {
   toCampaignParticipatingCharacterStatusEditorValues,
 } from './lib/campaign-participating-character-status.lib'
 export { CharacterDetailContent } from './components/detail/character-detail-content'
+export type { CharacterDetailAbilityScoreEditor } from './components/detail/sheet/character-detail-abilities-row'
 export { CharacterDetailRouteMedia } from './components/detail/sheet/character-detail-route-media'
 export { CharacterIdentityConnectionsSupplement } from './components/detail/memberships/character-identity-connections-supplement'
 export { CharacterSheetDetailShell } from './components/detail/character-sheet-detail-shell'

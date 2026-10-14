@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import {
+  campaignCharacterAbilityScorePatchSchema,
   campaignParticipatingCharacterStatusPatchSchema,
   characterMediaPatchInputSchema,
   createCampaignInputSchema,
@@ -97,6 +98,13 @@ campaignRouter.patch(
   requireCampaignRole('owner', 'co-owner'),
   validate(campaignParticipatingCharacterStatusPatchSchema),
   campaignCharacterController.patchCampaignCharacterStatusHandler,
+)
+campaignRouter.patch(
+  '/:campaignId/characters/:characterId/ability-scores',
+  requireAuth,
+  requireCampaignRole('owner', 'co-owner'),
+  validate(campaignCharacterAbilityScorePatchSchema),
+  campaignCharacterController.patchCampaignCharacterAbilityScoreHandler,
 )
 campaignRouter.get(
   '/:campaignId/characters/:characterId/relationships',

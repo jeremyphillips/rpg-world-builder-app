@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 
 import type {
+  CampaignCharacterAbilityScorePatch,
   CampaignParticipatingCharacterStatusPatch,
   CharacterMediaPatchInput,
 } from '@rpg/contracts'
@@ -8,6 +9,7 @@ import type {
 import { HttpError } from '../../lib/http-error'
 import { authorizeCampaignCharacterAccess } from './campaign-character-access.service'
 import { patchCampaignCharacterMedia } from './campaign-character-media.service'
+import { patchCampaignCharacterAbilityScore } from './campaign-character-ability-score.service'
 import { patchCampaignCharacterStatus } from './campaign-character-status.service'
 import { listCampaignCharactersForViewer } from './list-campaign-characters.service'
 
@@ -129,6 +131,38 @@ export async function patchCampaignCharacterStatusHandler(
   }
   if (result === 'forbidden') {
     throw HttpError.forbidden('Insufficient permissions to update character status.')
+  }
+
+  res.status(200).json(result)
+}
+
+export async function patchCampaignCharacterAbilityScoreHandler(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  const { campaignId, characterId } = req.params as {
+    campaignId: string
+    characterId: string
+  }
+  const membership = req.campaignMembership
+  if (!membership) {
+    throw HttpError.forbidden('Not a member of this campaign')
+  }
+
+  const result = await patchCampaignCharacterAbilityScore({
+    campaignId,
+    characterId,
+    viewerUserId: req.user!.id,
+    viewerRole: membership.campaignRole,
+    viewerControlledCharacterIds: membership.pcCharacterIds,
+    patch: req.body as CampaignCharacterAbilityScorePatch,
+  })
+
+  if (result === null) {
+    throw new HttpError(404, 'not_found', 'Character not found.')
+  }
+  if (result === 'forbidden') {
+    throw HttpError.forbidden('Insufficient permissions to update ability scores.')
   }
 
   res.status(200).json(result)

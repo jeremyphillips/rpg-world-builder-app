@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
 
 import type { CharacterDetailViewModel } from '../../lib/display/character-display'
-import { CharacterDetailAbilitiesRow } from './sheet/character-detail-abilities-row'
+import {
+  CharacterDetailAbilitiesRow,
+  type CharacterDetailAbilityScoreEditor,
+} from './sheet/character-detail-abilities-row'
 import { CharacterDetailCombatRow } from './sheet/character-detail-combat-row'
 import { CharacterDetailHeader } from './sheet/character-detail-header'
 import {
@@ -20,6 +23,7 @@ export type CharacterDetailSheetProps = {
   /** Preview surfaces pass false; route controllers default to showing delete when wired. */
   showDelete?: boolean
   onDeleteClick?: () => void
+  abilityScoreEditor?: CharacterDetailAbilityScoreEditor
 }
 
 /** Read-only character sheet layout — no routing, breadcrumbs, or mutations. */
@@ -31,6 +35,7 @@ export function CharacterDetailSheet({
   identitySupplement,
   showDelete = false,
   onDeleteClick = () => undefined,
+  abilityScoreEditor,
 }: CharacterDetailSheetProps) {
   return (
     <div className="space-y-6">
@@ -48,7 +53,10 @@ export function CharacterDetailSheet({
       />
 
       <div className={characterDetailAbilitiesStatsSectionClasses}>
-        <CharacterDetailAbilitiesRow abilities={viewModel.abilities} />
+        <CharacterDetailAbilitiesRow
+          abilities={viewModel.abilities}
+          abilityScoreEditor={abilityScoreEditor}
+        />
         <CharacterDetailStatsRow stats={viewModel.stats} hitPoints={viewModel.hitPoints} />
       </div>
       <div className={characterDetailBodyGridClasses}>

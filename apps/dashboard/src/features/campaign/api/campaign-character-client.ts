@@ -1,4 +1,5 @@
 import type {
+  CampaignCharacterAbilityScorePatch,
   CampaignCharacterGetResponse,
   CampaignParticipatingCharacterStatusPatch,
   CharacterMediaPatchInput,
@@ -8,8 +9,21 @@ import { patchJson, request } from '@/lib/api-client'
 
 const PATCH_CAMPAIGN_CHARACTER_MEDIA_ERROR = 'Could not update character images.'
 const PATCH_CAMPAIGN_CHARACTER_STATUS_ERROR = 'Could not update character status.'
+const PATCH_CAMPAIGN_CHARACTER_ABILITY_SCORE_ERROR = 'Could not update ability score.'
 
 const GET_CAMPAIGN_CHARACTER_ERROR = 'Could not load character.'
+
+export async function patchCampaignCharacterAbilityScore(
+  campaignId: string,
+  characterId: string,
+  patch: CampaignCharacterAbilityScorePatch,
+): Promise<CampaignCharacterGetResponse> {
+  return patchJson<CampaignCharacterGetResponse>(
+    `/api/campaigns/${encodeURIComponent(campaignId)}/characters/${encodeURIComponent(characterId)}/ability-scores`,
+    patch,
+    PATCH_CAMPAIGN_CHARACTER_ABILITY_SCORE_ERROR,
+  )
+}
 
 export async function patchCampaignCharacterStatus(
   campaignId: string,

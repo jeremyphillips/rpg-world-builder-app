@@ -17,6 +17,7 @@ export {
   deleteCharacterForUser,
   findCharacterForUser,
   listCharactersForUser,
+  updateCharacterAbilityScore,
   updateCharacterVital,
 } from './character.service'
 export { enrichPcsWithOpenCampaign } from './enrich-pcs-with-open-campaign.lib'
