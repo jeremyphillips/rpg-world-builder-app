@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { DragEndEvent } from '@dnd-kit/core'
 
+import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
+
+import { resolveStandardArrayScoreToAbility } from './fixed-scores-assignment.lib'
 import {
   fixedScoresAbilityDropDndId,
   fixedScoresAssignedDndId,
@@ -13,13 +16,21 @@ import {
   resolveFixedScoresDragEnd,
 } from './fixed-scores-dnd.lib'
 
-function dragEnd(activeId: string, activeData: object, overId: string | null) {
+const POOL = DEFAULT_STANDARD_ARRAY
+
+function dragEnd(
+  activeId: string,
+  activeData: object,
+  overId: string | null,
+  scores: Partial<Record<string, number>> = { str: 15, dex: 14 },
+) {
   return resolveFixedScoresDragEnd(
     {
       active: { id: activeId, data: { current: activeData } },
       over: overId ? { id: overId, data: { current: {} } } : null,
     } as unknown as DragEndEvent,
-    { str: 15, dex: 14 },
+    scores,
+    POOL,
   )
 }
 
@@ -37,48 +48,49 @@ describe('fixed-scores-dnd.lib', () => {
   })
 
   it('assigns from pool to empty ability', () => {
-    expect(
-      resolveFixedScoresDragEnd(
-        {
-          active: {
-            id: fixedScoresPoolDndId(13),
-            data: { current: { kind: 'pool', score: 13 } },
-          },
-          over: { id: fixedScoresAbilityDropDndId('con'), data: { current: {} } },
-        } as unknown as DragEndEvent,
-        { str: 15 },
-      ),
-    ).toEqual({ str: 15, con: 13 })
+    const initial = { str: 15 }
+    const next = dragEnd(
+      fixedScoresPoolDndId(13),
+      { kind: 'pool', score: 13 },
+      fixedScoresAbilityDropDndId('con'),
+      initial,
+    )
+    expect(next).toEqual({ str: 15, con: 13 })
+    expect(resolveStandardArrayScoreToAbility(initial, POOL, 'con', 13)).toMatchObject({ next })
   })
 
   it('replaces from pool on filled ability', () => {
-    expect(
-      dragEnd(
-        fixedScoresPoolDndId(12),
-        { kind: 'pool', score: 12 },
-        fixedScoresAbilityDropDndId('str'),
-      ),
-    ).toEqual({ str: 12, dex: 14 })
+    const initial = { str: 15, dex: 14 }
+    const next = dragEnd(
+      fixedScoresPoolDndId(12),
+      { kind: 'pool', score: 12 },
+      fixedScoresAbilityDropDndId('str'),
+      initial,
+    )
+    expect(next).toEqual({ str: 12, dex: 14 })
+    expect(resolveStandardArrayScoreToAbility(initial, POOL, 'str', 12)).toMatchObject({ next })
   })
 
   it('moves assigned score to empty ability', () => {
-    expect(
-      dragEnd(
-        fixedScoresAssignedDndId('str'),
-        { kind: 'assigned', ability: 'str', score: 15 },
-        fixedScoresAbilityDropDndId('con'),
-      ),
-    ).toEqual({ dex: 14, con: 15 })
+    const initial = { str: 15, dex: 14 }
+    const next = dragEnd(
+      fixedScoresAssignedDndId('str'),
+      { kind: 'assigned', ability: 'str', score: 15 },
+      fixedScoresAbilityDropDndId('con'),
+      initial,
+    )
+    expect(next).toEqual({ dex: 14, con: 15 })
   })
 
   it('swaps assigned scores between filled abilities', () => {
-    expect(
-      dragEnd(
-        fixedScoresAssignedDndId('str'),
-        { kind: 'assigned', ability: 'str', score: 15 },
-        fixedScoresAbilityDropDndId('dex'),
-      ),
-    ).toEqual({ str: 14, dex: 15 })
+    const initial = { str: 15, dex: 14 }
+    const next = dragEnd(
+      fixedScoresAssignedDndId('str'),
+      { kind: 'assigned', ability: 'str', score: 15 },
+      fixedScoresAbilityDropDndId('dex'),
+      initial,
+    )
+    expect(next).toEqual({ str: 14, dex: 15 })
   })
 
   it('swaps assigned score onto another ability token', () => {
@@ -112,6 +124,7 @@ describe('fixed-scores-dnd.lib', () => {
           over: { id: fixedScoresPoolContainerDndId(), data: { current: {} } },
         } as unknown as DragEndEvent,
         { str: 15 },
+        POOL,
       ),
     ).toBeNull()
   })
@@ -135,6 +148,7 @@ describe('fixed-scores-dnd.lib', () => {
           over: null,
         } as unknown as DragEndEvent,
         {},
+        POOL,
       ),
     ).toBeNull()
   })

@@ -2,7 +2,7 @@
 
 import { ABILITY_ENTRIES, type Ability } from '@rpg/contracts'
 import { ActionIcon, cn, Popover, PopoverContent, PopoverTrigger } from '@rpg/ui'
-import { forwardRef, useCallback, type HTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 
 import { AbilityScoreCard } from './ability-score-card'
 import {
@@ -14,17 +14,14 @@ import {
   abilityScoreCardSelectPencilButtonClasses,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
+import type { FixedScoreSelectOption } from './fixed-score-select-option.types'
 import { AbilityScoreSelectPrompt } from './ability-score-select-prompt'
-import {
-  AbilityScoreSelectScoreGrid,
-  type AbilityScoreSelectUsedBy,
-} from './ability-score-select-score-grid'
+import { AbilityScoreSelectScoreGrid } from './ability-score-select-score-grid'
 
 export type AbilityScoreSelectProps = {
   ability: Ability
   value: number | null
-  scores: readonly number[]
-  usedBy?: Readonly<Partial<Record<number, AbilityScoreSelectUsedBy>>>
+  scoreOptions: readonly FixedScoreSelectOption[]
   onSelect: (score: number) => void
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -39,8 +36,7 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
     {
       ability,
       value,
-      scores,
-      usedBy,
+      scoreOptions,
       onSelect,
       open,
       onOpenChange,
@@ -58,18 +54,6 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
       className: scoreDragHandleClassName,
       ...scoreDragHandleRest
     } = scoreDragHandleProps ?? {}
-
-    const handleSelect = useCallback(
-      (score: number) => {
-        if (score === value) {
-          onOpenChange?.(false)
-          return
-        }
-        onSelect(score)
-        onOpenChange?.(false)
-      },
-      [onOpenChange, onSelect, value],
-    )
 
     const inlineNumeralClasses = cn(
       abilityScoreCardSelectInlineNumeralClasses,
@@ -150,10 +134,9 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
         {card}
         <PopoverContent side="right" align="center" arrow collisionPadding={8}>
           <AbilityScoreSelectScoreGrid
-            scores={scores}
+            scoreOptions={scoreOptions}
             currentValue={value}
-            usedBy={usedBy}
-            onSelect={handleSelect}
+            onSelect={onSelect}
           />
         </PopoverContent>
       </Popover>

@@ -49,10 +49,9 @@ import { abilitiesFormCopy } from '../../../../../lib/steps/abilities-form-label
 import type { AbilitiesFormValues } from '../../../../../lib/steps/abilities-form-fields'
 import { buildAbilityPreferenceLabelsByAbility } from '../../../../../lib/steps/ability-preference-indicator.lib'
 import {
-  assignScoreFromPool,
-  buildAbilityScoreSelectUsedBy,
+  buildFixedScoreSelectOptions,
   getFixedScoresRemainingCount,
-  replaceScoreFromPool,
+  resolveStandardArrayScoreToAbility,
   scoresFromFormValues,
 } from '../../../../../lib/steps/fixed-scores-assignment.lib'
 import {
@@ -166,7 +165,10 @@ function FixedScoresAbilityCard({
     activeDrag,
   })
 
-  const usedBy = useMemo(() => buildAbilityScoreSelectUsedBy(ability, scores), [ability, scores])
+  const scoreOptions = useMemo(
+    () => buildFixedScoreSelectOptions(ability, scores, scorePool),
+    [ability, scores, scorePool],
+  )
 
   const headerAdornment = preferenceLabel ? (
     <AbilityScoreRecommendationIndicator label={preferenceLabel} />
@@ -194,8 +196,7 @@ function FixedScoresAbilityCard({
       ref={setNodeRef}
       ability={ability}
       value={typeof assignedScore === 'number' ? assignedScore : null}
-      scores={scorePool}
-      usedBy={usedBy}
+      scoreOptions={scoreOptions}
       open={open}
       onOpenChange={onOpenChange}
       state={cardState}
@@ -358,11 +359,11 @@ export function FixedScoresAssignment({
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       setActiveDrag(null)
-      const nextScores = resolveFixedScoresDragEnd(event, scores)
+      const nextScores = resolveFixedScoresDragEnd(event, scores, scorePool)
       if (!nextScores) return
       syncScoresToForm(nextScores)
     },
-    [scores, syncScoresToForm],
+    [scorePool, scores, syncScoresToForm],
   )
 
   const handleDragCancel = useCallback(() => {
@@ -371,13 +372,18 @@ export function FixedScoresAssignment({
 
   const handleSelectScore = useCallback(
     (ability: Ability, score: number) => {
-      const nextScores =
-        typeof scores[ability] === 'number'
-          ? replaceScoreFromPool(scores, ability, score)
-          : assignScoreFromPool(scores, ability, score)
-      syncScoresToForm(nextScores)
+      const resolved = resolveStandardArrayScoreToAbility(scores, scorePool, ability, score)
+      if (
+        resolved.operation !== 'assign' &&
+        resolved.operation !== 'move' &&
+        resolved.operation !== 'swap'
+      ) {
+        return
+      }
+      syncScoresToForm(resolved.next)
+      setOpenAbility(null)
     },
-    [scores, syncScoresToForm],
+    [scorePool, scores, syncScoresToForm],
   )
 
   const handleApplySuggestions = useCallback(

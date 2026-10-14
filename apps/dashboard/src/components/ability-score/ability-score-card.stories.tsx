@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+
+import { buildFixedScoreSelectOptions } from '@/features/character/lib/steps/fixed-scores-assignment.lib'
 
 import { AbilityScoreCard } from './ability-score-card'
 import { abilityScoreCardFooterActionLabelClasses } from './ability-score-card.variants'
@@ -35,27 +37,46 @@ export const DisplaySm: Story = {
 }
 
 export const SelectFilled: Story = {
-  render: () => (
-    <AbilityScoreSelect ability="str" value={14} scores={POOL} onSelect={() => undefined} />
-  ),
+  render: () => {
+    const scoreOptions = buildFixedScoreSelectOptions('str', { str: 14 }, POOL)
+    return (
+      <AbilityScoreSelect
+        ability="str"
+        value={14}
+        scoreOptions={scoreOptions}
+        onSelect={() => undefined}
+      />
+    )
+  },
 }
 
 export const SelectEmpty: Story = {
-  render: () => (
-    <AbilityScoreSelect ability="str" value={null} scores={POOL} onSelect={() => undefined} />
-  ),
+  render: () => {
+    const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)
+    return (
+      <AbilityScoreSelect
+        ability="str"
+        value={null}
+        scoreOptions={scoreOptions}
+        onSelect={() => undefined}
+      />
+    )
+  },
 }
 
 export const SelectDragOver: Story = {
-  render: () => (
-    <AbilityScoreSelect
-      ability="str"
-      value={null}
-      scores={POOL}
-      state="dragOver"
-      onSelect={() => undefined}
-    />
-  ),
+  render: () => {
+    const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)
+    return (
+      <AbilityScoreSelect
+        ability="str"
+        value={null}
+        scoreOptions={scoreOptions}
+        state="dragOver"
+        onSelect={() => undefined}
+      />
+    )
+  },
 }
 
 export const NumericResting: Story = {
@@ -107,20 +128,14 @@ export const WithRecommendationStar: Story = {
 export const SelectPopoverOpen: Story = {
   render: function Render() {
     const [open, setOpen] = useState(true)
+    const scoreOptions = useMemo(() => buildFixedScoreSelectOptions('dex', { str: 15 }, POOL), [])
     return (
       <AbilityScoreSelect
         ability="dex"
         value={null}
-        scores={POOL}
+        scoreOptions={scoreOptions}
         open={open}
         onOpenChange={setOpen}
-        usedBy={{
-          8: { abilityLabel: 'Strength', compactLabel: 'STR' },
-          10: { abilityLabel: 'Strength', compactLabel: 'STR' },
-          12: { abilityLabel: 'Strength', compactLabel: 'STR' },
-          13: { abilityLabel: 'Strength', compactLabel: 'STR' },
-          14: { abilityLabel: 'Strength', compactLabel: 'STR' },
-        }}
         onSelect={() => undefined}
       />
     )

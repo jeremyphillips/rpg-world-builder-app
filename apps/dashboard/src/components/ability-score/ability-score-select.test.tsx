@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { buildFixedScoreSelectOptions } from '@/features/character/lib/steps/fixed-scores-assignment.lib'
+
 import { AbilityScoreSelect } from './ability-score-select'
 
 const POOL = [15, 14, 13, 12, 10, 8] as const
@@ -10,8 +12,14 @@ const POOL = [15, 14, 13, 12, 10, 8] as const
 describe('AbilityScoreSelect', () => {
   it('opens the popover from Choose on an empty card', async () => {
     const user = userEvent.setup()
+    const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)
     render(
-      <AbilityScoreSelect ability="str" value={null} scores={POOL} onSelect={() => undefined} />,
+      <AbilityScoreSelect
+        ability="str"
+        value={null}
+        scoreOptions={scoreOptions}
+        onSelect={() => undefined}
+      />,
     )
 
     await user.click(screen.getByRole('button', { name: 'Choose Strength score' }))
@@ -24,12 +32,16 @@ describe('AbilityScoreSelect', () => {
 
     function Harness() {
       const [open, setOpen] = useState(true)
+      const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)
       return (
         <AbilityScoreSelect
           ability="str"
           value={null}
-          scores={POOL}
-          onSelect={onSelect}
+          scoreOptions={scoreOptions}
+          onSelect={(score) => {
+            onSelect(score)
+            setOpen(false)
+          }}
           open={open}
           onOpenChange={setOpen}
         />
@@ -45,33 +57,70 @@ describe('AbilityScoreSelect', () => {
     })
   })
 
-  it('does not commit a score used by another ability', async () => {
+  it('commits a move option and closes the popover', async () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
+    const scoreOptions = buildFixedScoreSelectOptions('dex', { str: 15 }, POOL)
+
+    function Harness() {
+      const [open, setOpen] = useState(true)
+      return (
+        <AbilityScoreSelect
+          ability="dex"
+          value={null}
+          scoreOptions={scoreOptions}
+          onSelect={(score) => {
+            onSelect(score)
+            setOpen(false)
+          }}
+          open={open}
+          onOpenChange={setOpen}
+        />
+      )
+    }
+
+    render(<Harness />)
+
+    await user.click(screen.getByRole('radio', { name: 'Move from Strength, 15' }))
+    expect(onSelect).toHaveBeenCalledWith(15)
+  })
+
+  it('does not call onSelect for the current score', async () => {
+    const user = userEvent.setup()
+    const onSelect = vi.fn()
+    const scoreOptions = buildFixedScoreSelectOptions('str', { str: 14 }, POOL)
+
     render(
       <AbilityScoreSelect
-        ability="dex"
-        value={null}
-        scores={POOL}
-        usedBy={{ 14: { abilityLabel: 'Strength', compactLabel: 'STR' } }}
+        ability="str"
+        value={14}
+        scoreOptions={scoreOptions}
         onSelect={onSelect}
         open
       />,
     )
 
-    await user.click(screen.getByRole('radio', { name: 'Used by STR' }))
+    await user.click(screen.getByRole('radio', { name: '14' }))
     expect(onSelect).not.toHaveBeenCalled()
   })
 
   it('marks this card score as the selected radio', () => {
+    const scoreOptions = buildFixedScoreSelectOptions('str', { str: 14 }, POOL)
     render(
-      <AbilityScoreSelect ability="str" value={14} scores={POOL} onSelect={() => undefined} open />,
+      <AbilityScoreSelect
+        ability="str"
+        value={14}
+        scoreOptions={scoreOptions}
+        onSelect={() => undefined}
+        open
+      />,
     )
     expect(screen.getByRole('radio', { name: '14' })).toBeChecked()
   })
 
   it('closes on Escape and returns focus to the edit trigger', async () => {
     const user = userEvent.setup()
+    const scoreOptions = buildFixedScoreSelectOptions('str', { str: 14 }, POOL)
 
     function Harness() {
       const [open, setOpen] = useState(true)
@@ -79,7 +128,7 @@ describe('AbilityScoreSelect', () => {
         <AbilityScoreSelect
           ability="str"
           value={14}
-          scores={POOL}
+          scoreOptions={scoreOptions}
           onSelect={() => undefined}
           open={open}
           onOpenChange={setOpen}

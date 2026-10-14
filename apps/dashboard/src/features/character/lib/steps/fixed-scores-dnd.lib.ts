@@ -4,10 +4,8 @@ import { pointerWithin } from '@dnd-kit/core'
 import type { Ability } from '@rpg/contracts'
 
 import {
-  assignScoreFromPool,
-  clearAbilityScore,
-  replaceScoreFromPool,
-  swapAssignedScores,
+  resolveStandardArrayClearAbility,
+  resolveStandardArrayScoreToAbility,
 } from './fixed-scores-assignment.lib'
 
 export const FIXED_SCORES_DND_KINDS = {
@@ -113,6 +111,7 @@ export const fixedScoresCollisionDetection: CollisionDetection = (args) => {
 export function resolveFixedScoresDragEnd(
   event: DragEndEvent,
   scores: Partial<Record<Ability, number>>,
+  scorePool: readonly number[],
 ): Partial<Record<Ability, number>> | null {
   const { active, over } = event
   if (!over) return null
@@ -125,7 +124,8 @@ export function resolveFixedScoresDragEnd(
 
   if (isFixedScoresPoolContainerDrop(over.id)) {
     if (activeData.kind === FIXED_SCORES_DND_KINDS.assigned) {
-      return clearAbilityScore(scores, activeData.ability)
+      const cleared = resolveStandardArrayClearAbility(scores, scorePool, activeData.ability)
+      return cleared.operation === 'clear' ? cleared.next : null
     }
     return null
   }
@@ -134,17 +134,28 @@ export function resolveFixedScoresDragEnd(
   if (!targetAbility) return null
 
   if (activeData.kind === FIXED_SCORES_DND_KINDS.pool) {
-    const targetScore = scores[targetAbility]
-    return typeof targetScore === 'number'
-      ? replaceScoreFromPool(scores, targetAbility, activeData.score)
-      : assignScoreFromPool(scores, targetAbility, activeData.score)
+    const resolved = resolveStandardArrayScoreToAbility(
+      scores,
+      scorePool,
+      targetAbility,
+      activeData.score,
+    )
+    return resolved.operation === 'assign' ||
+      resolved.operation === 'move' ||
+      resolved.operation === 'swap'
+      ? resolved.next
+      : null
   }
 
   if (activeData.kind === FIXED_SCORES_DND_KINDS.assigned) {
-    const fromAbility = activeData.ability
-    if (fromAbility === targetAbility) return null
-
-    return swapAssignedScores(scores, fromAbility, targetAbility)
+    const resolved = resolveStandardArrayScoreToAbility(
+      scores,
+      scorePool,
+      targetAbility,
+      activeData.score,
+      { fromAbility: activeData.ability },
+    )
+    return resolved.operation === 'move' || resolved.operation === 'swap' ? resolved.next : null
   }
 
   return null

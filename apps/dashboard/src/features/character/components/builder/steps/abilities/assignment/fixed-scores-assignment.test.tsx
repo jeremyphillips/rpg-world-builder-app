@@ -1,6 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useFormContext } from 'react-hook-form'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import {
@@ -137,14 +138,63 @@ describe('FixedScoresAssignment', () => {
     expect(screen.getByText('+2')).toBeInTheDocument()
   })
 
-  it('disables scores already assigned to another ability in choose score', async () => {
+  it('moves a score from another ability via the popover', async () => {
     renderAssignment({ str: 15 })
 
     await userEvent.click(getChooseScoreTrigger('Dexterity'))
-    expect(screen.getByRole('radio', { name: /Used by STR/ })).toHaveAttribute(
-      'aria-disabled',
-      'true',
+    await userEvent.click(screen.getByRole('radio', { name: 'Move from Strength, 15' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Dexterity score 15' })).toBeInTheDocument()
+      expect(getChooseScoreTrigger('Strength')).toBeInTheDocument()
+    })
+    expect(getScorePoolSection().textContent).not.toContain('15')
+  })
+
+  it('swaps scores between abilities via the popover', async () => {
+    renderAssignment({ str: 15, dex: 14 })
+
+    await userEvent.click(getChangeScoreTrigger('Dexterity'))
+    await userEvent.click(screen.getByRole('radio', { name: 'Swap with Strength, 15' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Dexterity score 15' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Strength score 14' })).toBeInTheDocument()
+    })
+  })
+
+  it('marks the form dirty after the first popover assignment', async () => {
+    function DirtyProbe() {
+      const form = useFormContext()
+      return <span data-testid="form-dirty">{String(form.formState.isDirty)}</span>
+    }
+
+    render(
+      <Form
+        schema={abilitiesFormSchema}
+        fields={[
+          {
+            kind: 'slot',
+            name: 'fixedScoresAssignment',
+            render: () => (
+              <>
+                <DirtyProbe />
+                <FixedScoresAssignment scorePool={DEFAULT_ABILITY_GENERATION_RULES.standardArray} />
+              </>
+            ),
+          },
+        ]}
+        defaultValues={{}}
+        onSubmit={vi.fn()}
+      />,
     )
+
+    await userEvent.click(getChooseScoreTrigger('Strength'))
+    await userEvent.click(screen.getByRole('radio', { name: '15' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-dirty')).toHaveTextContent('true')
+    })
   })
 
   it('keeps the dashed pool container visible when all values are assigned', () => {
