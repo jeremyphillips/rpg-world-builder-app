@@ -5,10 +5,10 @@ import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
+import { dialogPanelHeaderGlyphSizeClasses } from './dialog-panel-header-icon-control.lib'
 import {
   DialogPanelHeaderNavButton,
   UI_DIALOG_PANEL_HEADER_NAV_BUTTON_BLOCK_CLASS,
-  dialogPanelHeaderNavGlyphSizeClasses,
 } from './dialog-panel-header-nav-button.client'
 
 const navButtonCss = readFileSync(
@@ -19,7 +19,7 @@ const navButtonCss = readFileSync(
 describe('DialogPanelHeaderNavButton', () => {
   it('defines responsive glyph sizing on the dialog title scale (19px base, 24px from md)', () => {
     expect(navButtonCss).toMatch(
-      /@utility size-dialog-panel-header-nav-glyph \{[\s\S]*?width: var\(--text-heading-dialog-title\)/,
+      /@utility size-dialog-panel-header-glyph \{[\s\S]*?width: var\(--text-heading-dialog-title\)/,
     )
     expect(navButtonCss).toMatch(
       /@media \(width >= 48rem\) \{[\s\S]*?width: var\(--text-heading-dialog-title-md\)/,
@@ -37,7 +37,7 @@ describe('DialogPanelHeaderNavButton', () => {
     expect(button).toHaveClass('ui-compact-control--icon-default')
 
     const glyph = button.querySelector('svg')
-    expect(glyph).toHaveClass(dialogPanelHeaderNavGlyphSizeClasses)
+    expect(glyph).toHaveClass(dialogPanelHeaderGlyphSizeClasses)
     expect(glyph).not.toHaveClass('size-icon-glyph-lg')
 
     await user.click(button)

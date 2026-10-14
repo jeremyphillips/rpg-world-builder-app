@@ -10,12 +10,19 @@ import {
   dialogPanelHeaderHeadlineStackClasses,
   dialogPanelHeaderLeadRowClasses,
 } from './dialog-panel.variants'
+import {
+  dialogPanelHeaderGlyphSizeClasses,
+  dialogPanelHeaderIconControlClasses,
+} from './dialog-panel-header-icon-control.lib'
 import { headingVariants } from './heading.variants'
 import { textVariants } from './text.variants'
 import { cn } from '../../lib/utils'
 
-const dialogCloseButtonClassName =
-  'absolute right-4 top-4 z-30 rounded-sm text-muted-foreground opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none group-data-[has-media=true]/sheet:rounded-md group-data-[has-media=true]/sheet:bg-[var(--surface-current)] group-data-[has-media=true]/sheet:p-1'
+export const dialogCloseButtonClasses = cn(
+  'absolute right-4 top-2 z-30 disabled:pointer-events-none',
+  dialogPanelHeaderIconControlClasses,
+  'group-data-[has-media=true]/sheet:rounded-md group-data-[has-media=true]/sheet:bg-[var(--surface-current)]',
+)
 
 export function dialogDismissHandlers(
   closeOnOutsideClick: boolean,
@@ -37,8 +44,8 @@ export function dialogDismissHandlers(
 
 export function DialogCloseButton({ closeLabel }: { closeLabel: string }) {
   return (
-    <DialogPrimitive.Close aria-label={closeLabel} className={dialogCloseButtonClassName}>
-      <X className="size-4" />
+    <DialogPrimitive.Close aria-label={closeLabel} className={dialogCloseButtonClasses}>
+      <X aria-hidden className={dialogPanelHeaderGlyphSizeClasses} />
     </DialogPrimitive.Close>
   )
 }
