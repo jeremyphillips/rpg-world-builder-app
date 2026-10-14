@@ -18,6 +18,24 @@ picker priority, scope splits, and stable `entryId`s. See
 [`equipment-stack.ts`](../../../packages/contracts/src/rpg/runtime/creature/equipment-stack.ts)
 and [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md).
 
+Inventory bucket labels and ordering use `EQUIPMENT_INVENTORY_GROUP_LABELS` in
+`features/content/equipment/lib/inventory/equipment-inventory-group-labels.lib.ts`
+with `CHARACTER_EQUIPMENT_INVENTORY_BUCKETS` from `@rpg/contracts`. Monster rows
+group through `inventoryBucketForEquipment`; an unresolved `equipmentId` is shown
+under the **Gear** eyebrow as a **display fallback only** (the entry is not stored
+as gear).
+
+When a saved `equipmentId` is missing from the campaign catalog, builder and monster
+surfaces show `EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE` from
+`equipment-catalog-reference-status.lib.ts` (same sentence as the character sheet).
+Rows stay editable for removal; customize requires a resolved catalog item.
+
+Catalog load errors on content create/edit forms are retried from `ContentFormOptionsGate`
+(`ContentFormShellResolver`); only failed TanStack queries are refetched.
+
+Catalog-item swap (change underlying item on an existing row) is **not** implemented yet.
+See [`.cursor/plans/monster-equipment-catalog-swap.plan.md`](../../.cursor/plans/monster-equipment-catalog-swap.plan.md).
+
 ## Pending cart after class change
 
 A class change keeps only the player's own purchases (picker and manual rows; see

@@ -13,6 +13,8 @@ import {
   type EquipmentStepActionIssue,
 } from '@rpg/contracts'
 
+import { mergeEquipmentInventoryCatalogReferenceStatus } from '@/features/content'
+
 import {
   EMPTY_SELECTION_ROW_PRESENTATION,
   resolveSelectionRowStatusItems,
@@ -298,9 +300,12 @@ export function buildPackageSwitchDraftPurchasedGroups(args: {
       groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS.gear,
       items: rows.map((row) => ({
         display: { kind: 'single' as const, row },
-        status: resolveSelectionRowStatusItems(
-          row.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
-          { context: 'reconciliation' },
+        status: mergeEquipmentInventoryCatalogReferenceStatus(
+          resolveSelectionRowStatusItems(
+            row.selectionPresentation ?? EMPTY_SELECTION_ROW_PRESENTATION,
+            { context: 'reconciliation' },
+          ),
+          !row.equipment,
         ),
       })),
     },

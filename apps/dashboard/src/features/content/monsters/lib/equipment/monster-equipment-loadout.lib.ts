@@ -1,4 +1,12 @@
-import { findCanonicalPlainEntry, normalizeEquipmentInstance, type Equipment } from '@rpg/contracts'
+import {
+  CHARACTER_EQUIPMENT_INVENTORY_BUCKETS,
+  findCanonicalPlainEntry,
+  inventoryBucketForEquipment,
+  normalizeEquipmentInstance,
+  type Equipment,
+} from '@rpg/contracts'
+
+import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../equipment/lib/inventory/equipment-inventory-group-labels.lib'
 
 import type { MonsterEquipmentFormEntry } from '../monster-form-values'
 
@@ -49,30 +57,30 @@ export function incrementMonsterPlainStack(
   return setMonsterPlainStackQuantity(entries, equipmentId, current + 1)
 }
 
+/**
+ * Groups monster equipment rows by inventory bucket order.
+ * Unresolved catalog ids use the gear bucket label for display only (not persisted kind).
+ */
 export function groupMonsterEquipmentByKind(
   entries: readonly MonsterEquipmentFormEntry[],
   catalog: ReadonlyMap<string, Equipment>,
-  kindLabel: (equipment: Equipment) => string,
 ): { groupLabel: string; entries: MonsterEquipmentFormEntry[] }[] {
-  const order = ['Weapons', 'Armor', 'Gear'] as const
-  const buckets = new Map<string, MonsterEquipmentFormEntry[]>()
+  const buckets = new Map<
+    keyof typeof EQUIPMENT_INVENTORY_GROUP_LABELS,
+    MonsterEquipmentFormEntry[]
+  >()
 
   for (const entry of entries) {
     const item = catalog.get(entry.equipmentId)
-    const label = item ? kindLabel(item) : 'Gear'
-    const group = buckets.get(label) ?? []
+    const bucket = item ? inventoryBucketForEquipment(item) : 'gear'
+    const group = buckets.get(bucket) ?? []
     group.push(entry)
-    buckets.set(label, group)
+    buckets.set(bucket, group)
   }
 
-  const labelsInData = [...buckets.keys()]
-  const sortedLabels = [
-    ...order.filter((label) => buckets.has(label)),
-    ...labelsInData.filter((label) => !order.includes(label as (typeof order)[number])),
-  ]
-
-  return sortedLabels.map((groupLabel) => ({
-    groupLabel,
-    entries: buckets.get(groupLabel) ?? [],
-  }))
+  return CHARACTER_EQUIPMENT_INVENTORY_BUCKETS.flatMap((bucket) => {
+    const bucketEntries = buckets.get(bucket)
+    if (!bucketEntries?.length) return []
+    return [{ groupLabel: EQUIPMENT_INVENTORY_GROUP_LABELS[bucket], entries: bucketEntries }]
+  })
 }

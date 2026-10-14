@@ -34,7 +34,7 @@ function hasEquipmentAuthoringText(entry: NormalizedEquipmentEntry): boolean {
   return Boolean(entry.customName?.trim() || entry.customDescription?.trim())
 }
 
-function formatEquipmentRemovalInlineCount(
+export function formatEquipmentRemovalInlineCount(
   count: number,
   singular: string,
   plural: string,

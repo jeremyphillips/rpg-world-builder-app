@@ -4,7 +4,6 @@ import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-proper
 import {
   findCanonicalPlainEntry,
   getContentTypeTerm,
-  getEquipmentKindCollectionLabel,
   normalizeEquipmentInstance,
   resolveEquipmentInstanceSummary,
   type EquipmentPickerItem,
@@ -13,19 +12,20 @@ import {
 import {
   ActionButton,
   ActionIcon,
-  Button,
   ConfirmDialog,
   InsetPanel,
   SemanticText,
   iconGhostControlVariants,
 } from '@rpg/ui'
 
+import { formatAddContentTypeLabel } from '../../../lib/content-type-labels'
 import {
   buildLoadoutEquipmentPickerItems,
   EquipmentCategoryGroupedList,
   EquipmentInventorySectionHeader,
   EquipmentInstanceEditorDrawer,
   mapEquipmentInstanceInventoryStatus,
+  mergeEquipmentInventoryCatalogReferenceStatus,
 } from '@/features/content'
 import {
   EquipmentPickerDrawer,
@@ -52,7 +52,6 @@ import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
   MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME,
   MONSTER_LOADING_EQUIPMENT,
-  MONSTER_RETRY_LABEL,
   formatEquipmentCustomizationRemovalSummary,
   formatEquipmentRemovalConfirmCopy,
 } from '../../lib/monster-form-labels'
@@ -63,13 +62,7 @@ type PendingRemove = {
 }
 
 // fallow-ignore-next-line complexity
-export function MonsterEquipmentPanel({
-  ctx,
-  onRetry,
-}: {
-  ctx: ContentFormCtx
-  onRetry?: () => void
-}) {
+export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -130,9 +123,7 @@ export function MonsterEquipmentPanel({
   if (!values) return null
 
   const totalQuantity = equipment.reduce((sum, entry) => sum + (entry.quantity ?? 1), 0)
-  const groups = groupMonsterEquipmentByKind(equipment, catalog, (item) =>
-    getEquipmentKindCollectionLabel(item.kind),
-  )
+  const groups = groupMonsterEquipmentByKind(equipment, catalog)
 
   const editorEntry = editorEntryId
     ? equipment.find((entry) => entry.entryId === editorEntryId)
@@ -159,11 +150,6 @@ export function MonsterEquipmentPanel({
       {gateReason ? (
         <SemanticText tone={status === 'error' ? 'destructive' : 'warning'}>
           {gateReason}
-          {status === 'error' && onRetry ? (
-            <Button type="button" variant="outline" onClick={onRetry}>
-              {MONSTER_RETRY_LABEL}
-            </Button>
-          ) : null}
         </SemanticText>
       ) : null}
 
@@ -178,7 +164,7 @@ export function MonsterEquipmentPanel({
             disabled={Boolean(gateReason)}
             onClick={() => setPickerOpen(true)}
           >
-            Add equipment
+            {formatAddContentTypeLabel('equipment')}
           </ActionButton>
         }
       />
@@ -196,14 +182,21 @@ export function MonsterEquipmentPanel({
         }
         renderRow={(entry) => {
           const item = catalog.get(entry.equipmentId)
+          const catalogMissing = !item
           const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
           const inventoryStatus = mapEquipmentInstanceInventoryStatus(summary)
           const label = summary.displayName
+          const rowStatus = mergeEquipmentInventoryCatalogReferenceStatus(
+            inventoryStatus.status,
+            catalogMissing,
+          )
           return (
             <ContentFormEntitySelectionRow
               entity={{
                 heading: label,
-                ...(inventoryStatus.status.length > 0 ? inventoryStatus : {}),
+                ...(rowStatus.length > 0
+                  ? { status: rowStatus, statusComposition: 'metadata' }
+                  : {}),
               }}
               trailing={{
                 kind: 'utility',
@@ -228,17 +221,19 @@ export function MonsterEquipmentPanel({
                         )
                       }
                     />
-                    <button
-                      type="button"
-                      className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                      aria-label={`Customize ${label}`}
-                      onClick={() => {
-                        setPickerOpen(false)
-                        setEditorEntryId(entry.entryId)
-                      }}
-                    >
-                      <ActionIcon action="edit" />
-                    </button>
+                    {catalogMissing ? null : (
+                      <button
+                        type="button"
+                        className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
+                        aria-label={`Customize ${label}`}
+                        onClick={() => {
+                          setPickerOpen(false)
+                          setEditorEntryId(entry.entryId)
+                        }}
+                      >
+                        <ActionIcon action="edit" />
+                      </button>
+                    )}
                   </div>
                 ),
               }}

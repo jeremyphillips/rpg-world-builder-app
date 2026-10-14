@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { pickEquipment } from '@/test/fixtures/pick'
+
+import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../equipment/lib/inventory/equipment-inventory-group-labels.lib'
+
 import {
+  groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
   setMonsterPlainStackQuantity,
 } from './monster-equipment-loadout.lib'
@@ -49,6 +54,28 @@ describe('monster-equipment-loadout.lib', () => {
     expect(plain?.quantity).toBe(1)
     expect(plain?.magical).toBeFalsy()
     expect(next.find((row) => row.entryId === 'custom')?.quantity).toBe(1)
+  })
+
+  it('orders groups by inventory bucket labels and uses gear for unresolved ids', () => {
+    const dagger = pickEquipment('dagger')
+    const rope = pickEquipment('rope')
+    const catalog = new Map([
+      [dagger.id, dagger],
+      [rope.id, rope],
+    ])
+    const groups = groupMonsterEquipmentByKind(
+      [
+        { entryId: 'r1', equipmentId: rope.id, quantity: 1 },
+        { entryId: 'w1', equipmentId: dagger.id, quantity: 1 },
+        { entryId: 'bad', equipmentId: 'missing-id', quantity: 1 },
+      ],
+      catalog,
+    )
+    expect(groups.map((group) => group.groupLabel)).toEqual([
+      EQUIPMENT_INVENTORY_GROUP_LABELS.weapons,
+      EQUIPMENT_INVENTORY_GROUP_LABELS.gear,
+    ])
+    expect(groups[1]?.entries.map((entry) => entry.entryId)).toEqual(['r1', 'bad'])
   })
 
   it('removes the plain stack when quantity hits zero', () => {

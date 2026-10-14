@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
   buildContentPurposeSelectors,
   isContentReferenceable,
@@ -35,6 +35,13 @@ import { useLocations } from '../../locations/hooks/use-locations'
 import { useSkillProficiencies } from '../../skill-proficiencies/hooks/use-skill-proficiencies'
 import { useSpecies } from '../../species/hooks/use-species'
 import { useSpells } from '../../spells/hooks/use-spells'
+import {
+  failedContentFormCatalogQueries,
+  refetchFailedContentFormCatalogQueries,
+  type ContentFormCatalogQuery,
+} from './content-form-options-retry.lib'
+
+export type { ContentFormCatalogQuery } from './content-form-options-retry.lib'
 import type { ContentFormCtx } from '../forms/registry/content-form-registry'
 import {
   buildRichTextInternalLinkOptions,
@@ -120,6 +127,7 @@ function useContentCatalogLists(campaignId: string | undefined) {
     isError: isAnyError(...queries),
     equipmentQuery,
     skillsQuery,
+    queries,
   }
 }
 
@@ -154,6 +162,7 @@ function useContentFormVocabulary(campaignId: string | undefined) {
     weaponPropertyVocabulary: weaponPropertyQuery.vocabulary,
     isPending: isAnyPending(...queries),
     isError: isAnyError(...queries),
+    queries,
   }
 }
 
@@ -235,6 +244,8 @@ export function useContentFormOptions(campaignId: string | undefined): {
   ctx: ContentFormCtx
   isPending: boolean
   isError: boolean
+  isRetrying: boolean
+  retryFailedQueries: () => Promise<void>
 } {
   const catalog = useContentCatalogLists(campaignId)
   const vocabulary = useContentFormVocabulary(campaignId)
@@ -321,9 +332,29 @@ export function useContentFormOptions(campaignId: string | undefined): {
     ],
   )
 
+  const formQueries = useMemo(
+    () => [...catalog.queries, ...vocabulary.queries],
+    [catalog.queries, vocabulary.queries],
+  )
+
+  const [isRetrying, setIsRetrying] = useState(false)
+
+  const retryFailedQueries = useCallback(async () => {
+    if (isRetrying) return
+    if (failedContentFormCatalogQueries(formQueries).length === 0) return
+    setIsRetrying(true)
+    try {
+      await refetchFailedContentFormCatalogQueries(formQueries)
+    } finally {
+      setIsRetrying(false)
+    }
+  }, [formQueries, isRetrying])
+
   return {
     ctx,
     isPending: catalog.isPending || vocabulary.isPending,
     isError: catalog.isError || vocabulary.isError,
+    isRetrying,
+    retryFailedQueries,
   }
 }

@@ -120,6 +120,21 @@ export const UnresolvedPreset: Story = {
   ),
 }
 
+export const MissingCatalog: Story = {
+  render: () => (
+    <Host
+      equipment={[
+        {
+          entryId: 'gone',
+          equipmentId: 'removed-from-catalog',
+          quantity: 1,
+          equipped: true,
+        },
+      ]}
+    />
+  ),
+}
+
 export const Narrow: Story = {
   render: () => <Host />,
   decorators: [

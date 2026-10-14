@@ -38,7 +38,7 @@ describe('resolveEquipmentRemovalDecision', () => {
     })
   })
 
-  it('requires confirmation for magical-only rows without properties', () => {
+  it('does not require confirmation for magical-only rows without properties', () => {
     const entry = { entryId: 'mag', equipmentId: 'dagger', quantity: 1, magical: true }
     values.equipment = [entry]
     const decision = resolveEquipmentRemovalDecision(values, entry)

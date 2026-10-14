@@ -8,7 +8,10 @@ import type {
 } from '@rpg/contracts'
 import { InsetPanel } from '@rpg/ui'
 
-import { EquipmentCategoryGroupedList } from '@/features/content'
+import {
+  EquipmentCategoryGroupedList,
+  mergeEquipmentInventoryCatalogReferenceStatus,
+} from '@/features/content'
 
 import {
   EQUIPMENT_ADDED_INVENTORY_EMPTY_MESSAGE,
@@ -74,9 +77,12 @@ export function EquipmentAddedInventorySection({
       renderRow={(entry) => (
         <EquipmentAddedInventoryRowItem
           entry={entry}
-          status={resolveSelectionRowStatusItems(entry.selectionPresentation, {
-            context: 'owned',
-          })}
+          status={mergeEquipmentInventoryCatalogReferenceStatus(
+            resolveSelectionRowStatusItems(entry.selectionPresentation, {
+              context: 'owned',
+            }),
+            entry.rows.some((row) => !row.equipment),
+          )}
           draft={draft}
           context={context}
           catalogIndex={catalogIndex}

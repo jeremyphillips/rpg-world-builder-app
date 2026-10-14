@@ -58,6 +58,21 @@ describe('normalizeMonsterFormValues', () => {
     expect(normalized.communication).toEqual({})
   })
 
+  it('preserves equipment rows when catalog ids are unresolved', () => {
+    const values = resolveMonsterCreateDefaultValues()
+    values.equipment = [
+      {
+        entryId: 'missing',
+        equipmentId: 'removed-from-catalog',
+        quantity: 2,
+        customName: 'Relic',
+      },
+    ]
+
+    const normalized = normalizeMonsterFormValues(values, { intent: 'draft', mode: 'create' })
+    expect(normalized.equipment).toEqual(values.equipment)
+  })
+
   it('matches the preview serializer', () => {
     const values = resolveMonsterCreateDefaultValues()
     values.name = 'Scout'

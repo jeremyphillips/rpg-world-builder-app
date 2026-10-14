@@ -3,6 +3,8 @@ import { useState } from 'react'
 
 import { Text } from '@rpg/ui'
 
+import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/features/content'
+
 import { EquipmentInventoryRowItem } from '../row/equipment-inventory-row'
 import {
   resolveSelectionRowStatusItems,
@@ -136,6 +138,34 @@ export const CombinedSourceBreakdown: Story = {
         },
       ],
     },
+  },
+}
+
+export const MissingCatalogReference: Story = {
+  tags: ['storybook-test-runner-skip'],
+  args: {
+    display: {
+      kind: 'single',
+      row: {
+        ...editableStartingGoldRow,
+        equipment: undefined,
+        equipmentName: 'removed-from-catalog',
+        entry: {
+          equipmentId: 'removed-from-catalog',
+          quantity: 1,
+          sources: [{ kind: 'manual' }],
+        },
+        sourceLabel: 'Manual',
+        removeLabel: 'Remove removed-from-catalog',
+      },
+    },
+    status: [
+      {
+        kind: 'text',
+        variant: 'warning',
+        label: EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
+      },
+    ],
   },
 }
 

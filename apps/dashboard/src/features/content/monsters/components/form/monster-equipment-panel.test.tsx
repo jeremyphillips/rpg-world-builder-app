@@ -8,6 +8,7 @@ import { pickEquipment } from '@/test/fixtures/pick'
 
 import { mapEquipmentInstanceInventoryStatus } from '@/features/content'
 import { resolveEquipmentInstanceSummary } from '@rpg/contracts'
+import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/features/content'
 import { MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL } from '../../lib/monster-form-labels'
 import {
   resolveMonsterCreateDefaultValues,
@@ -39,6 +40,27 @@ function Host({
 }
 
 describe('MonsterEquipmentPanel', () => {
+  it('shows unavailable status and hides customize when the catalog row is missing', async () => {
+    render(
+      <Host
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          equipment: [
+            {
+              entryId: 'gone',
+              equipmentId: 'removed-from-catalog',
+              quantity: 1,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByText(EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE)).toBeInTheDocument()
+    expect(screen.queryByLabelText(/Customize/i)).not.toBeInTheDocument()
+    expect(screen.getByLabelText('Remove removed-from-catalog')).toBeInTheDocument()
+  })
+
   it('shows unresolved preset metadata and opens the customize editor', async () => {
     const dagger = pickEquipment('dagger')
     const provider = createMagicPropertyDefinitionProvider('srd-cc-5.2.1')
@@ -117,7 +139,7 @@ describe('MonsterEquipmentPanel', () => {
     )
 
     await user.click(screen.getByLabelText('Customize Dagger'))
-    await user.click(screen.getByRole('switch', { name: /magic item/i }))
+    await user.click(screen.getByRole('switch', { name: /magical/i }))
     await user.click(screen.getByRole('button', { name: 'Done' }))
 
     expect(formRef.current?.getValues('equipment')).toEqual([

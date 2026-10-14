@@ -172,15 +172,23 @@ interface ContentFormOptionsGateProps {
   children: (ctx: ContentFormCtx) => React.ReactNode
 }
 
-/** Waits for campaign catalog options before rendering form content. */
+/**
+ * Waits for campaign catalog options before rendering form content.
+ * Catalog load errors show retry here; refetches only queries that failed.
+ */
 export function ContentFormOptionsGate({ campaignId, children }: ContentFormOptionsGateProps) {
-  const { ctx, isPending, isError } = useContentFormOptions(campaignId)
+  const { ctx, isPending, isError, isRetrying, retryFailedQueries } =
+    useContentFormOptions(campaignId)
 
   return (
     <ContentFormShellResolver
       isPending={isPending}
       isError={isError}
       errorLabel={CONTENT_CATALOG_OPTIONS_ERROR}
+      isRetrying={isRetrying}
+      onRetry={() => {
+        void retryFailedQueries()
+      }}
     >
       {children(ctx)}
     </ContentFormShellResolver>

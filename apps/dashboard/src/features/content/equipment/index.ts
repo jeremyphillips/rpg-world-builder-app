@@ -30,6 +30,12 @@ export {
 } from './lib/instance-editor/equipment-editor-reducer'
 export { EquipmentInstanceEditorDrawer } from './components/instance-editor/equipment-instance-editor-drawer'
 export { mapEquipmentInstanceInventoryStatus } from './lib/instance-summary/map-equipment-instance-inventory-status'
+export { EQUIPMENT_INVENTORY_GROUP_LABELS } from './lib/inventory/equipment-inventory-group-labels.lib'
+export {
+  EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE,
+  equipmentCatalogReferenceUnavailableStatusItem,
+  mergeEquipmentInventoryCatalogReferenceStatus,
+} from './lib/inventory/equipment-catalog-reference-status.lib'
 export {
   EQUIPMENT_FAMILY_PATHS,
   equipmentKindToFamilyPath,

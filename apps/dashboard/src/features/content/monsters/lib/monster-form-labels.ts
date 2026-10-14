@@ -21,6 +21,8 @@ import {
 
 export { formatEquipmentCustomizationRemovalSummary } from './equipment/equipment-entry-customization.lib'
 
+import { formatEquipmentRemovalInlineCount } from './equipment/equipment-entry-customization.lib'
+
 import {
   formatContentListLoadErrorMessage,
   formatContentLoadErrorMessage,
@@ -173,14 +175,6 @@ export const MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME = getContentTypeMidSentence
 export const MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL = `Remove ${getContentTypeMidSentenceLabel('equipment')}`
 
 const EQUIPMENT_REMOVAL_CUSTOMIZED_BODY = `This ${getContentTypeSentenceForm('equipment', 1)} has customizations that will be discarded.`
-
-function formatEquipmentRemovalInlineCount(
-  count: number,
-  singular: string,
-  plural: string,
-): string {
-  return count === 1 ? `1 ${singular}` : `${count} ${plural}`
-}
 
 export type EquipmentRemovalConfirmCopyInput = {
   displayName: string
