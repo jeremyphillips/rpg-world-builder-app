@@ -30,6 +30,7 @@ import {
   Heading,
   NumberStepper,
   RadioCard,
+  SearchBar,
   SemanticText,
   SwitchField,
   Text,
@@ -37,6 +38,7 @@ import {
   TextField,
   iconGhostControlVariants,
 } from '@rpg/ui'
+import { FieldSeparatorWrapper } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
@@ -327,17 +329,13 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
         open={open}
         onOpenChange={handleOpenChange}
         title={headline}
-        headerLeading={
-          showBack ? (
-            <button
-              type="button"
-              className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-              aria-label={`Back to ${backTargetLabel(state)}`}
-              onClick={() => dispatch({ type: 'back' })}
-            >
-              <ActionIcon action="back" />
-            </button>
-          ) : undefined
+        headerBack={
+          showBack
+            ? {
+                ariaLabel: `Back to ${backTargetLabel(state)}`,
+                onClick: () => dispatch({ type: 'back' }),
+              }
+            : undefined
         }
         footer={footer}
       >
@@ -594,101 +592,110 @@ function MainModeBody({
         )}
       </div>
 
-      <SwitchField
-        id="equipment-editor-equipped"
-        label="Equipped"
-        hint="Show this item as equipped on the stat block."
-        labelPosition="settings"
-        checked={Boolean(draft.equipped)}
-        onCheckedChange={(equipped) => onPatch({ equipped })}
-      />
+      <FieldSeparatorWrapper separator="subtle">
+        <SwitchField
+          id="equipment-editor-equipped"
+          label="Equipped"
+          hint="Show this item as equipped on the stat block."
+          labelPosition="settings"
+          checked={Boolean(draft.equipped)}
+          onCheckedChange={(equipped) => onPatch({ equipped })}
+        />
+      </FieldSeparatorWrapper>
 
-      <SwitchField
-        id="equipment-editor-magical"
-        label="Magical"
-        hint="Treat this item as magical. Properties are optional."
-        labelPosition="settings"
-        checked={Boolean(draft.magical)}
-        onCheckedChange={onMagical}
-      />
-
-      {draft.magical ? (
+      <FieldSeparatorWrapper separator="subtle">
         <div className="space-y-2">
-          {magic.resolved.map((row) => {
-            const propertyMetadata = joinInlineMetadata([
-              row.definition.category === 'enhancement' ? 'Enhancement' : 'Special',
-              ...row.definition.effects.map(
-                (effect) =>
-                  `${formatSignedModifier(effect.bonus)} ${effectTargetLabel(effect.target).toLowerCase()}`,
-              ),
-            ])
-            const showPresetDescription = row.definition.effects.length === 0
-            return (
-              <ContentFormEntitySelectionRow
-                key={row.entry.propertyId}
-                entity={{
-                  heading: row.definition.name,
-                  ...(showPresetDescription ? { description: row.definition.description } : {}),
-                  statusComposition: 'metadata',
-                  status: [
-                    {
-                      kind: 'text',
-                      label: propertyMetadata,
-                      variant: 'muted',
-                    },
-                  ],
-                }}
-                trailing={{
-                  kind: 'utility',
-                  content: (
-                    <button
-                      type="button"
-                      className={iconGhostControlVariants({ hover: 'destructive', layout: 'flex' })}
-                      aria-label={`Remove ${row.definition.name}`}
-                      onClick={() => onRemovePreset(row.entry.propertyId)}
-                    >
-                      <ActionIcon action="remove" />
-                    </button>
+          <SwitchField
+            id="equipment-editor-magical"
+            label="Magical"
+            hint="Treat this item as magical. Properties are optional."
+            labelPosition="settings"
+            checked={Boolean(draft.magical)}
+            onCheckedChange={onMagical}
+          />
+
+          {draft.magical ? (
+            <div className="space-y-2">
+              {magic.resolved.map((row) => {
+                const propertyMetadata = joinInlineMetadata([
+                  row.definition.category === 'enhancement' ? 'Enhancement' : 'Special',
+                  ...row.definition.effects.map(
+                    (effect) =>
+                      `${formatSignedModifier(effect.bonus)} ${effectTargetLabel(effect.target).toLowerCase()}`,
                   ),
-                }}
-              />
-            )
-          })}
-          {magic.custom.map((row) => (
-            <ContentFormEntitySelectionRow
-              key={row.customId}
-              entity={{
-                heading: row.name,
-                description: row.description,
-                statusComposition: 'metadata',
-                status: [{ kind: 'text', label: 'Custom property', variant: 'muted' }],
-              }}
-              trailing={{
-                kind: 'utility',
-                content: (
-                  <button
-                    type="button"
-                    className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                    aria-label={`Edit ${row.name}`}
-                    onClick={() => onOpenPropertyCreate(row.customId)}
-                  >
-                    <ActionIcon action="edit" />
-                  </button>
-                ),
-              }}
-            />
-          ))}
-          <ActionButton action="add" variant="ghost" onClick={onOpenPropertyBrowse}>
-            Add magic property
-          </ActionButton>
+                ])
+                const showPresetDescription = row.definition.effects.length === 0
+                return (
+                  <ContentFormEntitySelectionRow
+                    key={row.entry.propertyId}
+                    entity={{
+                      heading: row.definition.name,
+                      ...(showPresetDescription ? { description: row.definition.description } : {}),
+                      statusComposition: 'metadata',
+                      status: [
+                        {
+                          kind: 'text',
+                          label: propertyMetadata,
+                          variant: 'muted',
+                        },
+                      ],
+                    }}
+                    trailing={{
+                      kind: 'utility',
+                      content: (
+                        <button
+                          type="button"
+                          className={iconGhostControlVariants({
+                            hover: 'destructive',
+                            layout: 'flex',
+                          })}
+                          aria-label={`Remove ${row.definition.name}`}
+                          onClick={() => onRemovePreset(row.entry.propertyId)}
+                        >
+                          <ActionIcon action="remove" />
+                        </button>
+                      ),
+                    }}
+                  />
+                )
+              })}
+              {magic.custom.map((row) => (
+                <ContentFormEntitySelectionRow
+                  key={row.customId}
+                  entity={{
+                    heading: row.name,
+                    description: row.description,
+                    statusComposition: 'metadata',
+                    status: [{ kind: 'text', label: 'Custom property', variant: 'muted' }],
+                  }}
+                  trailing={{
+                    kind: 'utility',
+                    content: (
+                      <button
+                        type="button"
+                        className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
+                        aria-label={`Edit ${row.name}`}
+                        onClick={() => onOpenPropertyCreate(row.customId)}
+                      >
+                        <ActionIcon action="edit" />
+                      </button>
+                    ),
+                  }}
+                />
+              ))}
+              <ActionButton action="add" variant="outline" onClick={onOpenPropertyBrowse}>
+                Add magic property
+              </ActionButton>
+            </div>
+          ) : (draft.magicProperties?.length ?? 0) > 0 ? (
+            <SemanticText tone="warning">
+              {(draft.magicProperties?.length ?? 0) === 1
+                ? '1 magic property will be removed when you click Done.'
+                : `${draft.magicProperties?.length} magic properties will be removed when you click Done.`}
+            </SemanticText>
+          ) : null}
         </div>
-      ) : (draft.magicProperties?.length ?? 0) > 0 ? (
-        <SemanticText tone="warning">
-          {(draft.magicProperties?.length ?? 0) === 1
-            ? '1 magic property will be removed when you click Done.'
-            : `${draft.magicProperties?.length} magic properties will be removed when you click Done.`}
-        </SemanticText>
-      ) : null}
+      </FieldSeparatorWrapper>
 
       <div className="space-y-2">
         <Heading variant="subsection" as="h3">
@@ -727,7 +734,7 @@ function MainModeBody({
             }}
           />
         ))}
-        <ActionButton action="add" variant="ghost" onClick={onOpenEffectChoose}>
+        <ActionButton action="add" variant="outline" onClick={onOpenEffectChoose}>
           Add adjustment
         </ActionButton>
         <CombinedMechanicalModifiers draft={draft} magic={magic} totals={totals} />
@@ -834,12 +841,12 @@ function PropertyBrowseBody({
 
   return (
     <div className="space-y-4">
-      <TextField
+      <SearchBar
         id="equipment-property-search"
-        label="Search"
-        placeholder="Search properties"
         value={draft.query}
-        onChange={(event) => onDraftChange({ ...draft, query: event.target.value })}
+        onValueChange={(query) => onDraftChange({ ...draft, query })}
+        placeholder="Search properties"
+        ariaLabel="Search properties"
       />
       <ul className="space-y-2">
         {filtered.map((preset) => {

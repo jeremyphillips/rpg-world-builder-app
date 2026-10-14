@@ -140,7 +140,7 @@ export const dialogPanelHeaderClasses = cn(
 )
 
 /** Leading icon + title stack row when {@link DialogPanelHeader} receives `leadIcon`. */
-export const dialogPanelHeaderLeadRowClasses = 'flex items-start gap-4'
+export const dialogPanelHeaderLeadRowClasses = 'flex items-center gap-4'
 
 /** Title, description, and optional kicker stack beside a header lead icon. */
 export const dialogPanelHeaderCopyStackClasses = 'min-w-0 flex-1 space-y-1.5'

@@ -1,5 +1,10 @@
 import * as React from 'react'
-import { Sheet, dialogPanelActionRowClasses, type SheetSurface } from '@rpg/ui'
+import {
+  DialogPanelHeaderNavButton,
+  Sheet,
+  dialogPanelActionRowClasses,
+  type SheetSurface,
+} from '@rpg/ui'
 
 import { drawerShellBodyVariants } from './drawer-shell.variants'
 
@@ -14,7 +19,12 @@ export type DrawerShellProps = {
   title: React.ReactNode
   children: React.ReactNode
   description?: React.ReactNode
-  /** Rendered in the header lead slot (for example a back control). */
+  /** Canonical back control in the header lead slot (preferred over `headerLeading`). */
+  headerBack?: {
+    ariaLabel: string
+    onClick: () => void
+  }
+  /** Escape hatch for decorative lead icons (for example {@link IconContainer}). */
   headerLeading?: React.ReactNode
   /** Rendered below the title stack inside the header (sticky with the headline). */
   headerContent?: React.ReactNode
@@ -36,12 +46,19 @@ export function DrawerShell({
   title,
   children,
   description,
+  headerBack,
   headerLeading,
   headerContent,
   footer,
   bodyMode = 'scrolling',
   surface = DRAWER_SHELL_DEFAULT_SURFACE,
 }: DrawerShellProps) {
+  const leadIcon = headerBack ? (
+    <DialogPanelHeaderNavButton aria-label={headerBack.ariaLabel} onClick={headerBack.onClick} />
+  ) : (
+    headerLeading
+  )
+
   return (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Content
@@ -49,7 +66,7 @@ export function DrawerShell({
         size="lg"
         {...(!description ? { 'aria-describedby': undefined } : {})}
       >
-        <Sheet.Header headline={title} description={description} leadIcon={headerLeading}>
+        <Sheet.Header headline={title} description={description} leadIcon={leadIcon}>
           {headerContent}
         </Sheet.Header>
         {bodyMode === 'composed' ? (

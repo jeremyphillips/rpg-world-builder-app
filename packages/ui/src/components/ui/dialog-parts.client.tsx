@@ -48,7 +48,10 @@ export interface DialogPanelHeaderProps extends React.HTMLAttributes<HTMLDivElem
   kicker?: React.ReactNode
   headline: React.ReactNode
   description?: React.ReactNode
-  /** Decorative leading icon slot — caller supplies {@link IconContainer} or similar. */
+  /**
+   * Decorative leading icon slot — caller supplies {@link IconContainer} or similar.
+   * Interactive back navigation uses {@link DialogPanelHeaderNavButton}.
+   */
   leadIcon?: React.ReactNode
   /** Merged onto the dialog title element (overrides the shared dialogTitle default). */
   headlineClassName?: string

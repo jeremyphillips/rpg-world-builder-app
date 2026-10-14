@@ -9,6 +9,7 @@ scrim (`modalOverlayVariants` / `bg-overlay`).
 ```text
 dialog-parts.client.tsx     Header, Close, dismiss handlers (header padding SSOT;
                             shared dialogTitle headline default for Modal + Sheet)
+dialog-panel-header-nav-button.client.tsx  Header back affordance (Modal/Sheet leadIcon)
 dialog-panel.variants.ts    Section inset, body, footer chrome, action row helper
 modal.variants.ts           ModalSize + centered panel shell (background only)
 sheet.variants.ts           SheetSize, SheetSurface, dock placement only
@@ -62,7 +63,8 @@ media keep the pinned header + scrolling body anatomy unchanged.
 | `dialogPanelScrollRegionClasses`               | Deprecated alias for inner scroll region layout + inner preset                                                            |
 | `dialogPanelSectionSeparatorBorderClasses`     | Shared faint separator color for header/footer section borders (`border-border-faint`)                                    |
 | `dialogPanelHeaderClasses`                     | Overlay header section chrome (`border-b` + separator token + `px-6 pt-6 pb-4`; title typography on `DialogPanelHeader`)  |
-| `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`gap-4` / 16px)                                         |
+| `dialogPanelHeaderLeadRowClasses`              | Leading icon + copy row when `DialogPanelHeader.leadIcon` is set (`items-center`, `gap-4`)                                |
+| `DialogPanelHeaderNavButton`                   | Interactive header back control (`icon-default` hit target); decorative leads use `IconContainer`                         |
 | `dialogPanelHeaderCopyStackClasses`            | Title/description stack beside a header lead icon                                                                         |
 | `dialogPanelHeaderHeadlineStackClasses`        | Headline row → supporting description (`gap-0.5` / 2px)                                                                   |
 | `dialogPanelFooterClasses`                     | Overlay footer section chrome (`border-t` + separator token + `px-6` + `py-4`; no fill)                                   |

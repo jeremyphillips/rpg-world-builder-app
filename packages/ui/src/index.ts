@@ -1046,6 +1046,9 @@ export {
   dialogPanelFooterClasses,
   dialogPanelHeaderClasses,
   dialogPanelHeaderPaddingClasses,
+  dialogPanelHeaderLeadRowClasses,
+  dialogPanelHeaderCopyStackClasses,
+  dialogPanelHeaderHeadlineStackClasses,
   dialogPanelSectionSeparatorBorderClasses,
   dialogPanelSectionInsetXClasses,
   dialogPanelSectionPaddingClasses,
@@ -1063,6 +1066,11 @@ export {
   DialogPanelActionRow,
   type DialogPanelActionRowProps,
 } from './components/ui/dialog-panel-action-row.client'
+export {
+  DialogPanelHeaderNavButton,
+  dialogPanelHeaderNavButtonClasses,
+  type DialogPanelHeaderNavButtonProps,
+} from './components/ui/dialog-panel-header-nav-button.client'
 export { DIALOG_INITIAL_FOCUS_SELECTOR } from './components/ui/dialog-focus.lib'
 export { ConfirmDialog, type ConfirmDialogProps } from './components/ui/confirm-dialog.client'
 export {
