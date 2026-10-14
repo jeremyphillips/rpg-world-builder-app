@@ -1,30 +1,19 @@
-import { useMemo, useReducer } from 'react'
+import { useMemo, useReducer, type Dispatch } from 'react'
 
-import { loadSeedMagicProperties } from '@rpg/catalog/magic-properties'
 import {
   EQUIPMENT_EFFECT_BONUS_MAX,
   EQUIPMENT_EFFECT_BONUS_MIN,
-  formatSignedModifier,
-  formatEquipmentMechanicalComponentsForTarget,
-  joinInlineMetadata,
   nextNonZeroBonus,
   resolveEquipmentEntryEffectTotals,
   resolveEquipmentMagicProperties,
   type Equipment,
+  type EquipmentEffectTarget,
   type EquipmentInstance,
+  type MagicPropertyDefinition,
   type MagicPropertyDefinitionProvider,
   type SystemRulesetId,
 } from '@rpg/contracts'
-type EquipmentEffectTarget = 'attack_roll' | 'damage_roll' | 'armor_class'
-
-const EFFECT_TARGET_DESCRIPTIONS: Record<EquipmentEffectTarget, string> = {
-  attack_roll: 'Modify attack rolls made with this equipment.',
-  damage_roll: 'Modify damage rolls made with this equipment.',
-  armor_class: 'Increase or decrease AC.',
-}
 import {
-  ActionButton,
-  ActionIcon,
   Button,
   DecisionSummaryPanel,
   Heading,
@@ -32,30 +21,70 @@ import {
   RadioCard,
   SearchBar,
   SemanticText,
-  SwitchField,
   Text,
   TextareaField,
   TextField,
-  iconGhostControlVariants,
 } from '@rpg/ui'
-import { FieldSeparatorWrapper } from '@rpg/ui/form'
 
 import { DrawerShell } from '@/components/drawer'
-import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import { useUnsavedChangesConfirm } from '@/lib/use-unsaved-changes-confirm'
+import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import { commitEquipmentEditorSession } from '../../lib/instance-editor/commit-equipment-editor-session'
 import {
   createEquipmentEditorState,
   equipmentEditorReducer,
   isEquipmentEditorSessionDirty,
 } from '../../lib/instance-editor/equipment-editor-reducer'
-import type { EquipmentEditorState } from '../../lib/instance-editor/equipment-editor-types'
+import type {
+  EquipmentEditorAction,
+  EquipmentEditorMode,
+  EquipmentEditorState,
+} from '../../lib/instance-editor/equipment-editor-types'
+import {
+  EQUIPMENT_INSTANCE_EDITOR_CUSTOM_PROPERTY_DESCRIPTION_HINT,
+  EQUIPMENT_INSTANCE_EDITOR_EFFECT_ALREADY_ADDED_DESCRIPTION,
+  EQUIPMENT_INSTANCE_EDITOR_EFFECT_TARGET_FIELD_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_MODIFIER_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_NOTES_HINT,
+  EQUIPMENT_INSTANCE_EDITOR_NOTES_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_ADD_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_ADDED_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_DESCRIPTION_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_NAME_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_REPLACE_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_SEARCH_ARIA_LABEL,
+  EQUIPMENT_INSTANCE_EDITOR_PROPERTY_SEARCH_PLACEHOLDER,
+  EQUIPMENT_INSTANCE_EDITOR_SCOPE_ALL_COPIES_DESCRIPTION,
+  EQUIPMENT_INSTANCE_EDITOR_SCOPE_ONE_COPY_DESCRIPTION,
+  EQUIPMENT_INSTANCE_EDITOR_SCOPE_ONE_COPY_LABEL,
+  equipmentInstanceEditorBackTargetLabel,
+  equipmentInstanceEditorModeTitle,
+  formatEquipmentInstanceEditorBackAriaLabel,
+  formatScopeAllCopiesLabel,
+  formatScopeChooseCustomizationCopy,
+  formatScopeCustomizeHeading,
+  formatScopeSubjectIntro,
+} from '../../lib/instance-editor/equipment-instance-editor-form-labels'
 import {
   allowedEffectTargetsForEquipment,
+  createDefaultMagicPropertyProvider,
+  effectTargetDescription,
   effectTargetLabel,
   equipmentInstanceEditorKindHeadline,
+  filterPresetMagicPropertiesForBrowse,
   listPresetMagicPropertiesForItem,
+  presetPropertyBrowseChoice,
 } from '../../lib/instance-editor/equipment-instance-editor.lib'
+import { EquipmentInstanceEditorFooter } from './equipment-instance-editor-footer'
+import { EquipmentInstanceEditorMainBody } from './equipment-instance-editor-main-body'
+
+const PRESET_BROWSE_ACTION_LABEL = {
+  add: EQUIPMENT_INSTANCE_EDITOR_PROPERTY_ADD_LABEL,
+  replace: EQUIPMENT_INSTANCE_EDITOR_PROPERTY_REPLACE_LABEL,
+  added: EQUIPMENT_INSTANCE_EDITOR_PROPERTY_ADDED_LABEL,
+} as const
+
+type EditorDispatch = Dispatch<EquipmentEditorAction>
 
 export type EquipmentInstanceEditorDrawerProps<T extends EquipmentInstance & { entryId: string }> =
   {
@@ -71,40 +100,6 @@ export type EquipmentInstanceEditorDrawerProps<T extends EquipmentInstance & { e
     onCommit: (nextEntries: T[]) => void
   }
 
-const EQUIPMENT_EDITOR_DONE_LABEL = 'Done'
-const EQUIPMENT_EDITOR_CANCEL_LABEL = 'Cancel'
-const EQUIPMENT_EDITOR_CONTINUE_LABEL = 'Continue'
-
-function editorModeTitle(state: EquipmentEditorState): string {
-  switch (state.mode.kind) {
-    case 'scope':
-      return 'Customize item'
-    case 'main':
-      return 'Edit item'
-    case 'effectChoose':
-      return 'Add adjustment'
-    case 'effectForm':
-      return state.mode.origin === 'existing' ? 'Edit adjustment' : 'Add adjustment'
-    case 'propertyBrowse':
-      return 'Add magic property'
-    case 'propertyCreate':
-      return state.mode.draft.customId ? 'Edit custom property' : 'Create custom property'
-    default:
-      return 'Edit item'
-  }
-}
-
-function backTargetLabel(state: EquipmentEditorState): string | null {
-  if (state.mode.kind === 'effectChoose') return 'Add adjustment'
-  if (state.mode.kind === 'effectForm') return 'Add adjustment'
-  if (state.mode.kind === 'propertyBrowse') return 'Add magic property'
-  if (state.mode.kind === 'propertyCreate' && state.mode.origin === 'browse') {
-    return 'Add magic property'
-  }
-  if (state.mode.kind === 'main' || state.mode.kind === 'scope') return null
-  return 'Edit item'
-}
-
 export function EquipmentInstanceEditorDrawer<T extends EquipmentInstance & { entryId: string }>(
   props: EquipmentInstanceEditorDrawerProps<T>,
 ) {
@@ -112,7 +107,6 @@ export function EquipmentInstanceEditorDrawer<T extends EquipmentInstance & { en
   return <EquipmentInstanceEditorDrawerInner key={props.sourceEntry.entryId} {...props} />
 }
 
-// fallow-ignore-next-line complexity
 function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entryId: string }>({
   open,
   onOpenChange,
@@ -125,11 +119,10 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
   referencedByLabel,
   onCommit,
 }: EquipmentInstanceEditorDrawerProps<T>) {
-  const definitions = useMemo(() => {
-    if (definitionsProp) return definitionsProp
-    const byId = new Map(loadSeedMagicProperties(rulesetId).map((row) => [row.id, row]))
-    return (id: string) => byId.get(id)
-  }, [definitionsProp, rulesetId])
+  const definitions = useMemo(
+    () => definitionsProp ?? createDefaultMagicPropertyProvider(rulesetId),
+    [definitionsProp, rulesetId],
+  )
 
   const [state, dispatch] = useReducer(equipmentEditorReducer, sourceEntry, (entry) =>
     createEquipmentEditorState({ sourceEntry: entry }),
@@ -165,163 +158,10 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
   const headline =
     state.mode.kind === 'main'
       ? equipmentInstanceEditorKindHeadline(catalogItem)
-      : editorModeTitle(state)
+      : equipmentInstanceEditorModeTitle(state)
 
-  const showBack =
-    state.mode.kind !== 'main' && state.mode.kind !== 'scope' && backTargetLabel(state) !== null
-
-  const editorMode = state.mode
-  // fallow-ignore-next-line complexity
-  const footer = (() => {
-    switch (editorMode.kind) {
-      case 'scope':
-        return (
-          <>
-            <DrawerShell.Close asChild>
-              <Button variant="outline" onClick={requestClose}>
-                {EQUIPMENT_EDITOR_CANCEL_LABEL}
-              </Button>
-            </DrawerShell.Close>
-            <Button type="button" onClick={() => dispatch({ type: 'continueFromScope' })}>
-              {EQUIPMENT_EDITOR_CONTINUE_LABEL}
-            </Button>
-          </>
-        )
-      case 'main':
-        return (
-          <>
-            <DrawerShell.Close asChild>
-              <Button variant="outline" onClick={requestClose}>
-                {EQUIPMENT_EDITOR_CANCEL_LABEL}
-              </Button>
-            </DrawerShell.Close>
-            <Button type="button" onClick={handleDone}>
-              {EQUIPMENT_EDITOR_DONE_LABEL}
-            </Button>
-          </>
-        )
-      case 'effectChoose':
-        return (
-          <>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => dispatch({ type: 'cancelSubMode' })}
-            >
-              {EQUIPMENT_EDITOR_CANCEL_LABEL}
-            </Button>
-            <Button
-              type="button"
-              disabled={!editorMode.draft.target}
-              onClick={() =>
-                dispatch({
-                  type: 'openEffectForm',
-                  draft: editorMode.draft,
-                  origin: 'new',
-                })
-              }
-            >
-              {EQUIPMENT_EDITOR_CONTINUE_LABEL}
-            </Button>
-          </>
-        )
-      case 'effectForm':
-        return (
-          <>
-            {editorMode.origin === 'existing' && editorMode.draft.effectId ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  dispatch({ type: 'removeEffect', effectId: editorMode.draft.effectId! })
-                }
-              >
-                Remove adjustment
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => dispatch({ type: 'cancelSubMode' })}
-            >
-              {EQUIPMENT_EDITOR_CANCEL_LABEL}
-            </Button>
-            <Button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'commitEffectDraft',
-                  draft: editorMode.draft,
-                  replace: editorMode.origin === 'existing',
-                })
-              }
-            >
-              {editorMode.origin === 'existing' ? 'Save adjustment' : 'Add adjustment'}
-            </Button>
-          </>
-        )
-      case 'propertyBrowse':
-        return (
-          <>
-            <ActionButton
-              action="add"
-              variant="ghost"
-              onClick={() => dispatch({ type: 'openPropertyCreate', origin: 'browse' })}
-            >
-              Create custom property
-            </ActionButton>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => dispatch({ type: 'cancelSubMode' })}
-            >
-              {EQUIPMENT_EDITOR_CANCEL_LABEL}
-            </Button>
-          </>
-        )
-      case 'propertyCreate':
-        return (
-          <>
-            {editorMode.draft.customId ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  dispatch({
-                    type: 'removeMagicProperty',
-                    kind: 'custom',
-                    id: editorMode.draft.customId!,
-                  })
-                }
-              >
-                Remove property
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => dispatch({ type: 'cancelSubMode' })}
-            >
-              {EQUIPMENT_EDITOR_CANCEL_LABEL}
-            </Button>
-            <Button
-              type="button"
-              onClick={() =>
-                dispatch({
-                  type: 'commitCustomProperty',
-                  draft: editorMode.draft,
-                  replaceCustomId: editorMode.draft.customId,
-                })
-              }
-            >
-              {editorMode.draft.customId ? 'Save property' : 'Create property'}
-            </Button>
-          </>
-        )
-      default:
-        return null
-    }
-  })()
+  const backTarget = equipmentInstanceEditorBackTargetLabel(state)
+  const showBack = state.mode.kind !== 'main' && state.mode.kind !== 'scope' && backTarget !== null
 
   return (
     <>
@@ -330,170 +170,107 @@ function EquipmentInstanceEditorDrawerInner<T extends EquipmentInstance & { entr
         onOpenChange={handleOpenChange}
         title={headline}
         headerBack={
-          showBack
+          showBack && backTarget
             ? {
-                ariaLabel: `Back to ${backTargetLabel(state)}`,
+                ariaLabel: formatEquipmentInstanceEditorBackAriaLabel(backTarget),
                 onClick: () => dispatch({ type: 'back' }),
               }
             : undefined
         }
-        footer={footer}
+        footer={
+          <EquipmentInstanceEditorFooter
+            mode={state.mode}
+            dispatch={dispatch}
+            onRequestClose={requestClose}
+            onDone={handleDone}
+          />
+        }
       >
-        {state.mode.kind === 'scope' ? (
-          <ScopeModeBody
-            entryName={catalogItem.name}
-            quantity={sourceEntry.quantity ?? 1}
-            subjectNoun={subjectNoun}
-            scope={state.session.scope}
-            referencedByLabel={referencedByLabel}
-            onScopeChange={(scope) => dispatch({ type: 'setScope', scope })}
-          />
-        ) : null}
-        {state.mode.kind === 'main' ? (
-          <MainModeBody
-            state={state}
-            catalogItem={catalogItem}
-            magic={magic}
-            totals={totals}
-            onPatch={(patch) => dispatch({ type: 'patchDraft', patch })}
-            onMagical={(magical) => dispatch({ type: 'setMagical', magical })}
-            onOpenEffectChoose={() => dispatch({ type: 'openEffectChoose' })}
-            onOpenEffectForm={(effectId) => {
-              const row = state.session.draft.adjustments?.find(
-                (effect) => effect.effectId === effectId,
-              )
-              if (!row) return
-              dispatch({
-                type: 'openEffectForm',
-                draft: {
-                  effectId: row.effectId,
-                  target: row.target,
-                  bonus: row.bonus,
-                  notes: row.notes,
-                },
-                origin: 'existing',
-              })
-            }}
-            onOpenPropertyBrowse={() =>
-              presets.length > 0
-                ? dispatch({ type: 'openPropertyBrowse' })
-                : dispatch({ type: 'openPropertyCreate', origin: 'direct' })
-            }
-            onOpenPropertyCreate={(customId) => {
-              const row = state.session.draft.magicProperties?.find(
-                (property) => property.kind === 'custom' && property.customId === customId,
-              )
-              if (row?.kind !== 'custom') return
-              dispatch({
-                type: 'openPropertyCreate',
-                origin: 'existing',
-                draft: {
-                  customId: row.customId,
-                  name: row.name,
-                  description: row.description,
-                },
-              })
-            }}
-            onRemovePreset={(propertyId) =>
-              dispatch({ type: 'removeMagicProperty', kind: 'preset', id: propertyId })
-            }
-          />
-        ) : null}
-        {editorMode.kind === 'effectChoose' ? (
-          <EffectChooseBody
-            item={catalogItem}
-            draft={editorMode.draft}
-            existingTargets={
-              new Set(state.session.draft.adjustments?.map((row) => row.target) ?? [])
-            }
-            onSelect={(target) =>
-              dispatch({
-                type: 'openEffectChoose',
-                draft: { ...editorMode.draft, target },
-                returnTo: editorMode.returnTo,
-              })
-            }
-          />
-        ) : null}
-        {editorMode.kind === 'effectForm' ? (
-          <EffectFormBody
-            draft={editorMode.draft}
-            onChange={(draft) =>
-              dispatch({ type: 'openEffectForm', draft, origin: editorMode.origin })
-            }
-            onChangeTarget={() =>
-              dispatch({
-                type: 'openEffectChoose',
-                draft: editorMode.draft,
-                returnTo: 'effectForm',
-              })
-            }
-          />
-        ) : null}
-        {editorMode.kind === 'propertyBrowse' ? (
-          <PropertyBrowseBody
-            presets={presets}
-            draft={editorMode.draft}
-            sessionDraft={state.session.draft}
-            onDraftChange={(draft) => dispatch({ type: 'openPropertyBrowse', draft })}
-            onAdd={(propertyId, replacePropertyId) =>
-              dispatch({ type: 'commitPresetProperty', propertyId, replacePropertyId })
-            }
-          />
-        ) : null}
-        {editorMode.kind === 'propertyCreate' ? (
-          <PropertyCreateBody
-            draft={editorMode.draft}
-            onChange={(draft) =>
-              dispatch({ type: 'openPropertyCreate', draft, origin: editorMode.origin })
-            }
-          />
-        ) : null}
+        <EquipmentInstanceEditorBody
+          state={state}
+          dispatch={dispatch}
+          catalogItem={catalogItem}
+          subjectNoun={subjectNoun}
+          referencedByLabel={referencedByLabel}
+          sourceQuantity={sourceEntry.quantity ?? 1}
+          magic={magic}
+          totals={totals}
+          presets={presets}
+        />
       </DrawerShell>
       {discardGuard.dialog}
     </>
   )
 }
 
-function CombinedMechanicalModifiers({
-  draft,
+function EquipmentInstanceEditorBody({
+  state,
+  dispatch,
+  catalogItem,
+  subjectNoun,
+  referencedByLabel,
+  sourceQuantity,
   magic,
   totals,
+  presets,
 }: {
-  draft: EquipmentInstance
+  state: EquipmentEditorState
+  dispatch: EditorDispatch
+  catalogItem: Equipment
+  subjectNoun: 'creature' | 'character'
+  referencedByLabel?: string
+  sourceQuantity: number
   magic: ReturnType<typeof resolveEquipmentMagicProperties>
   totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
+  presets: MagicPropertyDefinition[]
 }) {
-  const manualTargets = new Set((draft.adjustments ?? []).map((effect) => effect.target))
-
-  const overlapping = (['attack_roll', 'damage_roll', 'armor_class'] as const).filter((target) => {
-    const hasEnhancement = magic.resolved.some(
-      (row) =>
-        row.definition.category === 'enhancement' &&
-        row.definition.effects.some((effect) => effect.target === target),
-    )
-    return manualTargets.has(target) && hasEnhancement && totals[target] !== 0
-  })
-
-  if (overlapping.length === 0) return null
-
-  return (
-    <div className="space-y-2 border-t border-border pt-3">
-      <Text variant="emphasis">Equipment modifiers</Text>
-      {overlapping.map((target) => {
-        const summary = formatEquipmentMechanicalComponentsForTarget(draft, magic, target)
-        return (
-          <div
-            key={target}
-            className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1"
-          >
-            <Text variant="muted">{effectTargetLabel(target)}</Text>
-            <Text variant="muted">{summary ?? formatSignedModifier(totals[target])}</Text>
-          </div>
-        )
-      })}
-    </div>
-  )
+  const mode = state.mode
+  switch (mode.kind) {
+    case 'scope':
+      return (
+        <ScopeModeBody
+          entryName={catalogItem.name}
+          quantity={sourceQuantity}
+          subjectNoun={subjectNoun}
+          scope={state.session.scope}
+          referencedByLabel={referencedByLabel}
+          onScopeChange={(scope) => dispatch({ type: 'setScope', scope })}
+        />
+      )
+    case 'main':
+      return (
+        <EquipmentInstanceEditorMainBody
+          state={state}
+          catalogItem={catalogItem}
+          magic={magic}
+          totals={totals}
+          hasPresetProperties={presets.length > 0}
+          dispatch={dispatch}
+        />
+      )
+    case 'effectChoose':
+      return (
+        <EffectChooseBody
+          item={catalogItem}
+          mode={mode}
+          existingTargets={new Set(state.session.draft.adjustments?.map((row) => row.target) ?? [])}
+          dispatch={dispatch}
+        />
+      )
+    case 'effectForm':
+      return <EffectFormBody mode={mode} dispatch={dispatch} />
+    case 'propertyBrowse':
+      return (
+        <PropertyBrowseBody
+          presets={presets}
+          mode={mode}
+          sessionDraft={state.session.draft}
+          dispatch={dispatch}
+        />
+      )
+    case 'propertyCreate':
+      return <PropertyCreateBody mode={mode} dispatch={dispatch} />
+  }
 }
 
 function ScopeModeBody({
@@ -511,29 +288,26 @@ function ScopeModeBody({
   referencedByLabel?: string
   onScopeChange: (scope: 'one' | 'all') => void
 }) {
-  const subject =
-    subjectNoun === 'creature'
-      ? `This creature has ${quantity} ${entryName}.`
-      : `You have ${quantity} ${entryName}.`
+  const subjectIntro = formatScopeSubjectIntro(subjectNoun, quantity, entryName)
   return (
     <div className="space-y-4">
       <Heading variant="subsection" as="h3">
-        Customize {entryName}
+        {formatScopeCustomizeHeading(entryName)}
       </Heading>
-      <Text variant="muted">{subject} Choose which to customize.</Text>
+      <Text variant="muted">{formatScopeChooseCustomizationCopy(subjectIntro)}</Text>
       <RadioCard
         value={scope}
         onValueChange={(value) => onScopeChange(value as 'one' | 'all')}
         options={[
           {
             value: 'one',
-            label: 'One copy',
-            description: 'Separate one copy for customization. Other copies remain unchanged.',
+            label: EQUIPMENT_INSTANCE_EDITOR_SCOPE_ONE_COPY_LABEL,
+            description: EQUIPMENT_INSTANCE_EDITOR_SCOPE_ONE_COPY_DESCRIPTION,
           },
           {
             value: 'all',
-            label: `All ${quantity} copies`,
-            description: 'Apply the same customization to every copy in this stack.',
+            label: formatScopeAllCopiesLabel(quantity),
+            description: EQUIPMENT_INSTANCE_EDITOR_SCOPE_ALL_COPIES_DESCRIPTION,
           },
         ]}
         variant="card"
@@ -545,227 +319,35 @@ function ScopeModeBody({
   )
 }
 
-// fallow-ignore-next-line complexity
-function MainModeBody({
-  state,
-  catalogItem,
-  magic,
-  totals,
-  onPatch,
-  onMagical,
-  onOpenEffectChoose,
-  onOpenEffectForm,
-  onOpenPropertyBrowse,
-  onOpenPropertyCreate,
-  onRemovePreset,
-}: {
-  state: EquipmentEditorState
-  catalogItem: Equipment
-  magic: ReturnType<typeof resolveEquipmentMagicProperties>
-  totals: ReturnType<typeof resolveEquipmentEntryEffectTotals>
-  onPatch: (patch: Partial<EquipmentInstance>) => void
-  onMagical: (magical: boolean) => void
-  onOpenEffectChoose: () => void
-  onOpenEffectForm: (effectId: string) => void
-  onOpenPropertyBrowse: () => void
-  onOpenPropertyCreate: (customId: string) => void
-  onRemovePreset: (propertyId: string) => void
-}) {
-  const draft = state.session.draft
-  const quantity = draft.quantity ?? 1
-  const showQuantityStepper = state.session.scope === 'all' || quantity <= 1
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <Text>{catalogItem.name}</Text>
-        {showQuantityStepper ? (
-          <NumberStepper
-            size="sm"
-            value={quantity}
-            min={1}
-            onChange={(value) => onPatch({ quantity: value })}
-            aria-label={`Quantity of ${catalogItem.name}`}
-          />
-        ) : (
-          <Text variant="muted">×1 (separated on save)</Text>
-        )}
-      </div>
-
-      <FieldSeparatorWrapper separator="subtle">
-        <SwitchField
-          id="equipment-editor-equipped"
-          label="Equipped"
-          hint="Show this item as equipped on the stat block."
-          labelPosition="settings"
-          checked={Boolean(draft.equipped)}
-          onCheckedChange={(equipped) => onPatch({ equipped })}
-        />
-      </FieldSeparatorWrapper>
-
-      <FieldSeparatorWrapper separator="subtle">
-        <div className="space-y-2">
-          <SwitchField
-            id="equipment-editor-magical"
-            label="Magical"
-            hint="Treat this item as magical. Properties are optional."
-            labelPosition="settings"
-            checked={Boolean(draft.magical)}
-            onCheckedChange={onMagical}
-          />
-
-          {draft.magical ? (
-            <div className="space-y-2">
-              {magic.resolved.map((row) => {
-                const propertyMetadata = joinInlineMetadata([
-                  row.definition.category === 'enhancement' ? 'Enhancement' : 'Special',
-                  ...row.definition.effects.map(
-                    (effect) =>
-                      `${formatSignedModifier(effect.bonus)} ${effectTargetLabel(effect.target).toLowerCase()}`,
-                  ),
-                ])
-                const showPresetDescription = row.definition.effects.length === 0
-                return (
-                  <ContentFormEntitySelectionRow
-                    key={row.entry.propertyId}
-                    entity={{
-                      heading: row.definition.name,
-                      ...(showPresetDescription ? { description: row.definition.description } : {}),
-                      statusComposition: 'metadata',
-                      status: [
-                        {
-                          kind: 'text',
-                          label: propertyMetadata,
-                          variant: 'muted',
-                        },
-                      ],
-                    }}
-                    trailing={{
-                      kind: 'utility',
-                      content: (
-                        <button
-                          type="button"
-                          className={iconGhostControlVariants({
-                            hover: 'destructive',
-                            layout: 'flex',
-                          })}
-                          aria-label={`Remove ${row.definition.name}`}
-                          onClick={() => onRemovePreset(row.entry.propertyId)}
-                        >
-                          <ActionIcon action="remove" />
-                        </button>
-                      ),
-                    }}
-                  />
-                )
-              })}
-              {magic.custom.map((row) => (
-                <ContentFormEntitySelectionRow
-                  key={row.customId}
-                  entity={{
-                    heading: row.name,
-                    description: row.description,
-                    statusComposition: 'metadata',
-                    status: [{ kind: 'text', label: 'Custom property', variant: 'muted' }],
-                  }}
-                  trailing={{
-                    kind: 'utility',
-                    content: (
-                      <button
-                        type="button"
-                        className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                        aria-label={`Edit ${row.name}`}
-                        onClick={() => onOpenPropertyCreate(row.customId)}
-                      >
-                        <ActionIcon action="edit" />
-                      </button>
-                    ),
-                  }}
-                />
-              ))}
-              <ActionButton action="add" variant="outline" onClick={onOpenPropertyBrowse}>
-                Add magic property
-              </ActionButton>
-            </div>
-          ) : (draft.magicProperties?.length ?? 0) > 0 ? (
-            <SemanticText tone="warning">
-              {(draft.magicProperties?.length ?? 0) === 1
-                ? '1 magic property will be removed when you click Done.'
-                : `${draft.magicProperties?.length} magic properties will be removed when you click Done.`}
-            </SemanticText>
-          ) : null}
-        </div>
-      </FieldSeparatorWrapper>
-
-      <div className="space-y-2">
-        <Heading variant="subsection" as="h3">
-          Adjustments
-        </Heading>
-        <Text variant="muted">
-          Apply manual modifiers to attack rolls, damage rolls, or Armor Class.
-        </Text>
-        {(draft.adjustments ?? []).map((row) => (
-          <ContentFormEntitySelectionRow
-            key={row.effectId}
-            entity={{
-              heading: effectTargetLabel(row.target),
-              description: row.notes,
-              statusComposition: 'metadata',
-              status: [
-                {
-                  kind: 'text',
-                  label: `${formatSignedModifier(row.bonus)} adjustment`,
-                  variant: 'muted',
-                },
-              ],
-            }}
-            trailing={{
-              kind: 'utility',
-              content: (
-                <button
-                  type="button"
-                  className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                  aria-label={`Edit ${effectTargetLabel(row.target)}`}
-                  onClick={() => onOpenEffectForm(row.effectId)}
-                >
-                  <ActionIcon action="edit" />
-                </button>
-              ),
-            }}
-          />
-        ))}
-        <ActionButton action="add" variant="outline" onClick={onOpenEffectChoose}>
-          Add adjustment
-        </ActionButton>
-        <CombinedMechanicalModifiers draft={draft} magic={magic} totals={totals} />
-      </div>
-    </div>
-  )
-}
-
 function EffectChooseBody({
   item,
-  draft,
+  mode,
   existingTargets,
-  onSelect,
+  dispatch,
 }: {
   item: Equipment
-  draft: { target?: EquipmentEffectTarget }
+  mode: Extract<EquipmentEditorMode, { kind: 'effectChoose' }>
   existingTargets: Set<EquipmentEffectTarget>
-  onSelect: (target: EquipmentEffectTarget) => void
+  dispatch: EditorDispatch
 }) {
   const targets = allowedEffectTargetsForEquipment(item)
   return (
     <RadioCard
-      value={draft.target ?? ''}
-      onValueChange={(value) => onSelect(value as EquipmentEffectTarget)}
+      value={mode.draft.target ?? ''}
+      onValueChange={(value) =>
+        dispatch({
+          type: 'openEffectChoose',
+          draft: { ...mode.draft, target: value as EquipmentEffectTarget },
+          returnTo: mode.returnTo,
+        })
+      }
       variant="card"
       options={targets.map((target) => ({
         value: target,
         label: effectTargetLabel(target),
         description: existingTargets.has(target)
-          ? 'Already added. Edit it from the item.'
-          : EFFECT_TARGET_DESCRIPTIONS[target],
+          ? EQUIPMENT_INSTANCE_EDITOR_EFFECT_ALREADY_ADDED_DESCRIPTION
+          : effectTargetDescription(target),
         disabled: existingTargets.has(target),
       }))}
     />
@@ -773,47 +355,59 @@ function EffectChooseBody({
 }
 
 function EffectFormBody({
-  draft,
-  onChange,
-  onChangeTarget,
+  mode,
+  dispatch,
 }: {
-  draft: {
-    target?: EquipmentEffectTarget
-    bonus: number
-    notes?: string
-  }
-  onChange: (draft: { target?: EquipmentEffectTarget; bonus: number; notes?: string }) => void
-  onChangeTarget: () => void
+  mode: Extract<EquipmentEditorMode, { kind: 'effectForm' }>
+  dispatch: EditorDispatch
 }) {
+  const { draft } = mode
   return (
     <div className="space-y-4">
       <DecisionSummaryPanel
         rows={[
           {
             id: 'effect-target',
-            label: 'Effect target',
+            label: EQUIPMENT_INSTANCE_EDITOR_EFFECT_TARGET_FIELD_LABEL,
             value: draft.target ? effectTargetLabel(draft.target) : '—',
             decisionId: 'effect-target',
-            onNavigate: onChangeTarget,
+            onNavigate: () =>
+              dispatch({
+                type: 'openEffectChoose',
+                draft,
+                returnTo: 'effectForm',
+              }),
           },
         ]}
       />
       <NumberStepper
         id="equipment-effect-modifier"
-        label="Modifier"
+        label={EQUIPMENT_INSTANCE_EDITOR_MODIFIER_LABEL}
         signDisplay="signed-prefix"
         value={draft.bonus}
         min={EQUIPMENT_EFFECT_BONUS_MIN}
         max={EQUIPMENT_EFFECT_BONUS_MAX}
-        onChange={(bonus) => onChange({ ...draft, bonus: nextNonZeroBonus(draft.bonus, bonus) })}
-        aria-label="Modifier"
+        onChange={(bonus) =>
+          dispatch({
+            type: 'openEffectForm',
+            draft: { ...draft, bonus: nextNonZeroBonus(draft.bonus, bonus) },
+            origin: mode.origin,
+          })
+        }
+        aria-label={EQUIPMENT_INSTANCE_EDITOR_MODIFIER_LABEL}
       />
       <TextareaField
         id="equipment-effect-notes"
-        label="Notes"
-        hint="Optional. Shown with this effect."
+        label={EQUIPMENT_INSTANCE_EDITOR_NOTES_LABEL}
+        hint={EQUIPMENT_INSTANCE_EDITOR_NOTES_HINT}
         value={draft.notes ?? ''}
-        onChange={(event) => onChange({ ...draft, notes: event.target.value || undefined })}
+        onChange={(event) =>
+          dispatch({
+            type: 'openEffectForm',
+            draft: { ...draft, notes: event.target.value || undefined },
+            origin: mode.origin,
+          })
+        }
       />
     </div>
   )
@@ -821,39 +415,31 @@ function EffectFormBody({
 
 function PropertyBrowseBody({
   presets,
-  draft,
+  mode,
   sessionDraft,
-  onDraftChange,
-  onAdd,
+  dispatch,
 }: {
-  presets: ReturnType<typeof listPresetMagicPropertiesForItem>
-  draft: { query: string; category: 'all' | 'enhancement' }
+  presets: readonly MagicPropertyDefinition[]
+  mode: Extract<EquipmentEditorMode, { kind: 'propertyBrowse' }>
   sessionDraft: EquipmentInstance
-  onDraftChange: (draft: { query: string; category: 'all' | 'enhancement' }) => void
-  onAdd: (propertyId: string, replacePropertyId?: string) => void
+  dispatch: EditorDispatch
 }) {
-  const currentEnhancement = sessionDraft.magicProperties?.find((row) => row.kind === 'preset')
-  const filtered = presets.filter((row) => {
-    if (draft.category === 'enhancement' && row.category !== 'enhancement') return false
-    if (!draft.query.trim()) return true
-    return row.name.toLowerCase().includes(draft.query.trim().toLowerCase())
-  })
+  const filtered = filterPresetMagicPropertiesForBrowse(presets, mode.draft)
 
   return (
     <div className="space-y-4">
       <SearchBar
         id="equipment-property-search"
-        value={draft.query}
-        onValueChange={(query) => onDraftChange({ ...draft, query })}
-        placeholder="Search properties"
-        ariaLabel="Search properties"
+        value={mode.draft.query}
+        onValueChange={(query) =>
+          dispatch({ type: 'openPropertyBrowse', draft: { ...mode.draft, query } })
+        }
+        placeholder={EQUIPMENT_INSTANCE_EDITOR_PROPERTY_SEARCH_PLACEHOLDER}
+        ariaLabel={EQUIPMENT_INSTANCE_EDITOR_PROPERTY_SEARCH_ARIA_LABEL}
       />
       <ul className="space-y-2">
         {filtered.map((preset) => {
-          const added =
-            sessionDraft.magicProperties?.some(
-              (row) => row.kind === 'preset' && row.propertyId === preset.id,
-            ) ?? false
+          const choice = presetPropertyBrowseChoice(sessionDraft, preset.id)
           return (
             <li key={preset.id}>
               <ContentFormEntitySelectionRow
@@ -868,17 +454,16 @@ function PropertyBrowseBody({
                       type="button"
                       size="sm"
                       variant="outline"
-                      disabled={added}
+                      disabled={choice.action === 'added'}
                       onClick={() =>
-                        onAdd(
-                          preset.id,
-                          currentEnhancement?.kind === 'preset'
-                            ? currentEnhancement.propertyId
-                            : undefined,
-                        )
+                        dispatch({
+                          type: 'commitPresetProperty',
+                          propertyId: preset.id,
+                          replacePropertyId: choice.replacePropertyId,
+                        })
                       }
                     >
-                      {added ? 'Added' : currentEnhancement ? 'Replace' : 'Add'}
+                      {PRESET_BROWSE_ACTION_LABEL[choice.action]}
                     </Button>
                   ),
                 }}
@@ -892,28 +477,41 @@ function PropertyBrowseBody({
 }
 
 function PropertyCreateBody({
-  draft,
-  onChange,
+  mode,
+  dispatch,
 }: {
-  draft: { name: string; description: string }
-  onChange: (draft: { name: string; description: string; customId?: string }) => void
+  mode: Extract<EquipmentEditorMode, { kind: 'propertyCreate' }>
+  dispatch: EditorDispatch
 }) {
+  const { draft } = mode
   return (
     <div className="space-y-4">
       <TextField
         id="equipment-custom-property-name"
-        label="Property name"
+        label={EQUIPMENT_INSTANCE_EDITOR_PROPERTY_NAME_LABEL}
         required
         value={draft.name}
-        onChange={(event) => onChange({ ...draft, name: event.target.value })}
+        onChange={(event) =>
+          dispatch({
+            type: 'openPropertyCreate',
+            draft: { ...draft, name: event.target.value },
+            origin: mode.origin,
+          })
+        }
       />
       <TextareaField
         id="equipment-custom-property-description"
-        label="Description"
+        label={EQUIPMENT_INSTANCE_EDITOR_PROPERTY_DESCRIPTION_LABEL}
         required
-        hint="Custom properties describe rules or behavior but don't automatically apply mechanical effects."
+        hint={EQUIPMENT_INSTANCE_EDITOR_CUSTOM_PROPERTY_DESCRIPTION_HINT}
         value={draft.description}
-        onChange={(event) => onChange({ ...draft, description: event.target.value })}
+        onChange={(event) =>
+          dispatch({
+            type: 'openPropertyCreate',
+            draft: { ...draft, description: event.target.value },
+            origin: mode.origin,
+          })
+        }
       />
     </div>
   )
