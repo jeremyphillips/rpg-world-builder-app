@@ -56,9 +56,17 @@ export const abilityScoreCardScoreRowClasses =
 export const abilityScoreCardScoreCenterClasses =
   'w-full min-w-0 max-w-[4.5ch] overflow-hidden tabular-nums text-center'
 
-/** ~24px score numerals — shared across sm/md card sizes. */
-export const abilityScoreCardScoreValueClasses =
-  'text-2xl font-semibold tabular-nums text-foreground'
+const abilityScoreCardScoreValueBaseClasses = 'font-semibold tabular-nums text-foreground'
+
+/** Score numerals — sm ~28px (heading-3), md ~32px. */
+export function abilityScoreCardScoreValueClassesFor(size: 'sm' | 'md'): string {
+  return cn(
+    abilityScoreCardScoreValueBaseClasses,
+    size === 'sm'
+      ? 'text-[length:var(--text-heading-3)] leading-[length:var(--text-heading-3--line-height)]'
+      : 'text-[length:var(--text-ability-score-md)] leading-[length:var(--text-ability-score-md--line-height)]',
+  )
+}
 
 /** 24px compact lane — matches `--control-height-compact` / `size-control-action-compact`. */
 export const abilityScoreCardStepperButtonSize = 'xs' as const

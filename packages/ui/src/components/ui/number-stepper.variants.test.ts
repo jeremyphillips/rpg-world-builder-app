@@ -63,6 +63,14 @@ describe('numberStepperWidthVariants', () => {
     expect(classes).toContain('disabled:[&_svg]:text-input-disabled')
     expect(classes).not.toContain('disabled:opacity-40')
   })
+
+  it('uses faint isolated chrome for ability score card steppers', () => {
+    const classes = numberStepperButtonVariants({ appearance: 'isolated', size: 'xs' })
+    expect(classes).toContain('bg-surface-faint')
+    expect(classes).toContain('border-border-subtle')
+    expect(classes).toContain('hover:bg-surface-subtle')
+    expect(classes).toContain('active:bg-background')
+  })
 })
 
 describe('xs inline-row tier', () => {

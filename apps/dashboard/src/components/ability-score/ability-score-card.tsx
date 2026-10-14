@@ -6,6 +6,7 @@ import {
   type Ability,
 } from '@rpg/contracts'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
+import { cn } from '@rpg/ui'
 import { forwardRef, type ReactNode } from 'react'
 
 import {
@@ -14,7 +15,9 @@ import {
   abilityScoreCardHeaderAdornmentClasses,
   abilityScoreCardHeaderClasses,
   abilityScoreCardModifierClasses,
+  abilityScoreCardScoreCenterClasses,
   abilityScoreCardScoreRowClasses,
+  abilityScoreCardScoreValueClassesFor,
   abilityScoreCardVariants,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
@@ -51,6 +54,20 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
     const modifierText =
       typeof value === 'number' ? formatSignedModifier(abilityModifier(value)) : '—'
     const suppressModifier = hideModifier || state === 'dragOver'
+    const scoreRow = children ?? (
+      <>
+        <span aria-hidden />
+        <span
+          className={cn(
+            abilityScoreCardScoreCenterClasses,
+            abilityScoreCardScoreValueClassesFor(size),
+          )}
+        >
+          {value === null ? '—' : value}
+        </span>
+        <span aria-hidden />
+      </>
+    )
 
     return (
       <article
@@ -73,7 +90,7 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
             </Tooltip>
           </TooltipProvider>
 
-          <div className={abilityScoreCardScoreRowClasses}>{children}</div>
+          <div className={abilityScoreCardScoreRowClasses}>{scoreRow}</div>
 
           {suppressModifier ? null : (
             <p className={abilityScoreCardModifierClasses} aria-live="polite">

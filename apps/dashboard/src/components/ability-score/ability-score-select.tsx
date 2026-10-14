@@ -8,7 +8,7 @@ import { forwardRef, useCallback, type HTMLAttributes, type ReactNode } from 're
 import { AbilityScoreCard } from './ability-score-card'
 import {
   abilityScoreCardScoreCenterClasses,
-  abilityScoreCardScoreValueClasses,
+  abilityScoreCardScoreValueClassesFor,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
 import {
@@ -83,7 +83,7 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
           type="button"
           className={cn(
             abilityScoreCardScoreCenterClasses,
-            abilityScoreCardScoreValueClasses,
+            abilityScoreCardScoreValueClassesFor(size),
             state === 'draggingFrom' && 'opacity-50',
             scoreDragHandleClassName,
           )}

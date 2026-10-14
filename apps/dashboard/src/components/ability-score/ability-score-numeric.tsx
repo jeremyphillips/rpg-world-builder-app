@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type Reac
 import { AbilityScoreCard } from './ability-score-card'
 import {
   abilityScoreCardScoreCenterClasses,
-  abilityScoreCardScoreValueClasses,
+  abilityScoreCardScoreValueClassesFor,
   abilityScoreCardStepperButtonAppearance,
   abilityScoreCardStepperButtonSize,
   abilityScoreCardStepperStackClasses,
@@ -155,7 +155,7 @@ export function AbilityScoreNumeric({
       aria-invalid={ariaInvalid || undefined}
       className={cn(
         abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClasses,
+        abilityScoreCardScoreValueClassesFor(size),
         'border-0 bg-transparent p-0 outline-none focus-visible:ring-0',
       )}
       value={draft}
@@ -171,7 +171,7 @@ export function AbilityScoreNumeric({
       aria-invalid={ariaInvalid || undefined}
       className={cn(
         abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClasses,
+        abilityScoreCardScoreValueClassesFor(size),
         disabled && 'text-muted-foreground',
         state === 'draggingFrom' && 'opacity-50',
       )}

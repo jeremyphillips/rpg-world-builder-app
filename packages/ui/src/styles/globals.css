@@ -254,6 +254,8 @@
   --text-heading-2--line-height: 2.4375rem; /* 39px */
   --text-heading-3: 1.75rem; /* 28px */
   --text-heading-3--line-height: 2.125rem; /* 34px */
+  --text-ability-score-md: 2rem; /* 32px — ability score card numerals (md) */
+  --text-ability-score-md--line-height: 2.25rem; /* 36px */
   --text-heading-3-md: var(--text-2xl); /* 24px — between heading-3 and heading-4 */
   --text-heading-3-md--line-height: var(--text-2xl--line-height);
   --text-heading-4: 1.1875rem; /* 19px */
