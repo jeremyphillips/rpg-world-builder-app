@@ -31,15 +31,11 @@ export function DrawerEntityContext({
       </InlineMetadata>
     ) : undefined
 
-  const media = buildEntitySurfaceLeadingMediaNode(
-    { heading, displayImage, fallback },
-    'comfortable',
-  )
+  const media = buildEntitySurfaceLeadingMediaNode({ heading, displayImage, fallback })
 
   return (
     <EntityAnatomy
       density="compact"
-      mediaPlacement="content"
       entity={{
         heading,
         media,

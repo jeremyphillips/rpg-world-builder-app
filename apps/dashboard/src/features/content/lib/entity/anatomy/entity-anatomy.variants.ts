@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { cn, rowAnatomyTracksVariants, type ContentCardDensity, type RowAnatomyBand } from '@rpg/ui'
+import { cn, rowAnatomyTracksVariants, type ContentCardDensity } from '@rpg/ui'
 
 /** Embedded EntityAnatomyHost host — anatomy only; collection inset owned by the host. */
 export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
@@ -32,7 +32,9 @@ export const entityAnatomyMediaContentSpanClasses = 'flex h-full items-start'
 
 export function entityAnatomyVariants({
   density = 'comfortable',
-  band = 'control',
-}: { density?: ContentCardDensity; band?: RowAnatomyBand } = {}) {
-  return cn(rowAnatomyTracksVariants({ band }), entityAnatomyColumnsVariants({ density }))
+}: { density?: ContentCardDensity } = {}) {
+  return cn(
+    rowAnatomyTracksVariants({ band: 'control' }),
+    entityAnatomyColumnsVariants({ density }),
+  )
 }

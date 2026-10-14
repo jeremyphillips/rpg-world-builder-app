@@ -97,22 +97,9 @@ describe('EntityAnatomy row tracks', () => {
     expect(slot('trailing')).toBeNull()
   })
 
-  it('places leading utilities and media in band cells of their own columns', () => {
+  it('places leading utilities in the band column and spans media beside the content stack', () => {
     const { slot } = renderAnatomy({
       leadingUtilities: [<span key="grip">Grip</span>, <span key="caret">Caret</span>],
-      entity: { heading: 'Brock', media: <span data-testid="media">M</span> },
-    })
-
-    expect(cellOf(slot('leading'))).toEqual({ slot: 'band', column: 'leading' })
-    expect(cellOf(slot('media'))).toEqual({ slot: 'band', column: 'media' })
-    expect(
-      slot('leading')!.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]'),
-    ).toHaveLength(2)
-  })
-
-  it('spans media beside the content stack when mediaPlacement is content', () => {
-    const { slot } = renderAnatomy({
-      mediaPlacement: 'content',
       entity: {
         heading: 'Shortsword',
         media: <span data-testid="media">M</span>,
@@ -121,9 +108,13 @@ describe('EntityAnatomy row tracks', () => {
       },
     })
 
+    expect(cellOf(slot('leading'))).toEqual({ slot: 'band', column: 'leading' })
     expect(cellOf(slot('media'))).toEqual({ slot: 'stretch', column: 'media' })
     expect(cellOf(slot('content'))).toEqual({ slot: 'band', column: 'content' })
     expect(cellOf(slot('status'))).toEqual({ slot: 'status', column: 'content' })
+    expect(
+      slot('leading')!.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]'),
+    ).toHaveLength(2)
   })
 
   it('applies leading content gap on the rail and trailing separation from the host columns', () => {

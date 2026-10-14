@@ -78,7 +78,7 @@ only — not a duplicate trailing badge.
 
 Compact catalog and bordered cards share one **data-only** identity contract:
 
-- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection always paints compact media (image or fallback icon).
+- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection paints the standard entity-row thumbnail (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) independent of text density.
 - Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
 - Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
 - **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
@@ -721,11 +721,11 @@ make room for an image.
 
 ### Layout modes
 
-| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                        |
-| ------------- | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); media grows the RowAnatomy band track; heading centers on the band |
-| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                          |
-| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.            |
+| Mode          | Surfaces                                                   | Geometry                                                                                                                                                                                                             |
+| ------------- | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inset row     | Entity cards, preview-rail identity, radio rows with media | Content-column gap (`gap-2` compact / `gap-4` comfortable); comfortable titles use `entity-card-heading-comfortable` (19px); leading media spans the identity stack (`stretch`); heading band stays `control` height |
+| Inline mark   | Single campaign name rows                                  | `gap-2`, `items-center`, `IdentityFrame` size `inline`                                                                                                                                                               |
+| Stacked bleed | Species/class radio cards; character list cards            | Full-bleed `builderCard` (2:1) derives a window inside the saved **primary** role crop when present, otherwise cover at the surface default. Text padding sits under the image band.                                 |
 
 Portrait role copy targets compact circle/square tokens. Saved role presentation (crop,
 then focal) wins over surface defaults for both system and upload sources.
