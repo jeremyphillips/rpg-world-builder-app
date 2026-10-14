@@ -52,8 +52,20 @@ export const abilityScoreCardBodyPaddingClasses = {
   md: 'p-3',
 } as const
 
-/** 6px above the score row; 8px (`gap-2`) before the modifier when shown. */
-export const abilityScoreCardScoreSectionClasses = 'flex flex-col gap-2 pt-[6px]'
+/** 6px above the score row; `gap-2` before the modifier except in stepper layout. */
+export const abilityScoreCardScoreSectionVariants = cva('flex flex-col pt-[6px]', {
+  variants: {
+    layout: {
+      centered: 'gap-2',
+      stepper: 'gap-0',
+      'select-filled': 'gap-2',
+      choose: 'gap-2',
+    },
+  },
+  defaultVariants: {
+    layout: 'centered',
+  },
+})
 
 export type AbilityScoreCardScoreLayout = 'centered' | 'stepper' | 'select-filled' | 'choose'
 
@@ -69,7 +81,7 @@ export const abilityScoreCardScoreRowVariants = cva('flex w-full min-w-0 items-c
   variants: {
     layout: {
       centered: 'justify-center',
-      stepper: 'justify-end gap-2',
+      stepper: 'justify-center gap-2',
       'select-filled': 'justify-center',
       choose: 'justify-center',
     },
@@ -86,9 +98,9 @@ export function abilityScoreCardScoreSlotMinHeightClassesFor(size: 'sm' | 'md'):
     : 'min-h-[length:var(--text-ability-score-md--line-height)]'
 }
 
-/** Stepper mode: score sits in remaining space, flush toward the stepper column. */
+/** Stepper mode: score width follows the numeral; row centers score + stepper as one group. */
 export const abilityScoreCardScoreStepperSlotClasses =
-  'min-w-0 flex-1 overflow-hidden text-end tabular-nums'
+  'min-w-0 shrink-0 overflow-hidden tabular-nums'
 
 /** Centered score (display, select-filled score, choose). */
 export const abilityScoreCardScoreCenteredSlotClasses =
@@ -144,9 +156,9 @@ export const abilityScoreCardStepperButtonSize = 'xs' as const
 
 export const abilityScoreCardStepperButtonAppearance = 'isolated' as const
 
-export const abilityScoreCardModifierClasses = 'text-style-label tabular-nums text-muted-foreground'
+export const abilityScoreCardModifierClasses = 'text-base tabular-nums text-muted-foreground'
 
-export const abilityScoreCardFooterActionLabelClasses = 'text-xs'
+export const abilityScoreCardFooterActionLabelClasses = 'text-xs font-body'
 
 /** Checkbox on footer row — surface stays visible over outline hover/active on the label. */
 export const abilityScoreCardFooterCheckboxClasses =
@@ -154,9 +166,9 @@ export const abilityScoreCardFooterCheckboxClasses =
 
 /** Entire footer row — outline hover/active, padding, and card bottom radius (no inner button chrome). */
 export const abilityScoreCardFooterClasses = cn(
-  'ui-button ui-button--outline ui-button--xs-compact font-body-emphasis',
+  'ui-button ui-button--outline ui-button--xs-compact font-body',
   interactiveFocusVariants({ context: 'standalone' }),
-  'flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-0 border-t border-border px-2 py-[2px] shadow-none',
+  'flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-0 border-t border-border-subtle px-2 py-[2px] shadow-none',
   'rounded-none rounded-b-md',
 )
 

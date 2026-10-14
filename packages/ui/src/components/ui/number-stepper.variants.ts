@@ -44,7 +44,7 @@ export const numberStepperButtonVariants = cva(
       appearance: {
         default: 'bg-input hover:bg-background active:bg-background',
         isolated:
-          'rounded-md border border-border-subtle bg-surface-faint hover:border-border-faint hover:bg-surface-subtle active:border-border-faint active:bg-background',
+          'rounded-md border border-border-faint bg-transparent hover:bg-surface-faint active:bg-surface-subtle',
       },
       size: {
         xs: resolveCompactControlStepperButtonClasses('xs'),

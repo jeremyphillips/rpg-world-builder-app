@@ -13,7 +13,7 @@ import {
   abilityScoreCardHeaderAdornmentClasses,
   abilityScoreCardHeaderClasses,
   abilityScoreCardHeaderLabelClasses,
-  abilityScoreCardScoreSectionClasses,
+  abilityScoreCardScoreSectionVariants,
   abilityScoreCardModifierClasses,
   abilityScoreCardScoreCenteredSlotClasses,
   abilityScoreCardScoreRowVariants,
@@ -89,7 +89,7 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
             )}
           </div>
 
-          <div className={abilityScoreCardScoreSectionClasses}>
+          <div className={abilityScoreCardScoreSectionVariants({ layout: scoreLayout })}>
             <div
               className={cn(
                 abilityScoreCardScoreRowVariants({ layout: scoreLayout }),

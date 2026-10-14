@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   abilityScoreCardScoreRowVariants,
+  abilityScoreCardScoreSectionVariants,
   abilityScoreCardScoreSlotMinHeightClassesFor,
   abilityScoreCardScoreValueClassesFor,
   abilityScoreCardSelectFilledClusterClasses,
@@ -14,9 +15,20 @@ describe('abilityScoreCardScoreValueClassesFor', () => {
   })
 })
 
+describe('abilityScoreCardScoreSectionVariants', () => {
+  it('omits score-to-modifier gap in stepper layout', () => {
+    expect(abilityScoreCardScoreSectionVariants({ layout: 'stepper' })).toContain('gap-0')
+    expect(abilityScoreCardScoreSectionVariants({ layout: 'stepper' })).not.toContain('gap-2')
+  })
+
+  it('keeps gap-2 between score and modifier for centered layout', () => {
+    expect(abilityScoreCardScoreSectionVariants({ layout: 'centered' })).toContain('gap-2')
+  })
+})
+
 describe('abilityScoreCardScoreRowVariants', () => {
-  it('uses flex end alignment and wider gap for stepper layout', () => {
-    expect(abilityScoreCardScoreRowVariants({ layout: 'stepper' })).toContain('justify-end')
+  it('centers the score and stepper cluster with gap-2', () => {
+    expect(abilityScoreCardScoreRowVariants({ layout: 'stepper' })).toContain('justify-center')
     expect(abilityScoreCardScoreRowVariants({ layout: 'stepper' })).toContain('gap-2')
   })
 
