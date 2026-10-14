@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { useState } from 'react'
 
 import { AbilityScoreCard } from './ability-score-card'
+import { abilityScoreCardFooterActionLabelClasses } from './ability-score-card.variants'
 import { AbilityScoreNumeric } from './ability-score-numeric'
 import { AbilityScoreRecommendationIndicator } from './ability-score-recommendation-indicator'
 import { AbilityScoreSelect } from './ability-score-select'
@@ -18,11 +19,19 @@ export default meta
 type Story = StoryObj
 
 export const DisplayMd: Story = {
-  render: () => <AbilityScoreCard ability="str" value={15} className="w-[100px]" />,
+  render: () => (
+    <div className="w-[100px]">
+      <AbilityScoreCard ability="str" value={15} />
+    </div>
+  ),
 }
 
 export const DisplaySm: Story = {
-  render: () => <AbilityScoreCard ability="str" value={15} size="sm" className="w-full" />,
+  render: () => (
+    <div className="w-full max-w-[120px]">
+      <AbilityScoreCard ability="str" value={15} size="sm" />
+    </div>
+  ),
 }
 
 export const SelectFilled: Story = {
@@ -63,7 +72,7 @@ export const NumericWithFooter: Story = {
       min={1}
       max={30}
       onCommit={() => undefined}
-      footer={<span className="text-style-label">Save prof.</span>}
+      footer={<span className={abilityScoreCardFooterActionLabelClasses}>Save prof.</span>}
     />
   ),
 }
@@ -83,14 +92,15 @@ export const NumericDisabled: Story = {
 
 export const WithRecommendationStar: Story = {
   render: () => (
-    <AbilityScoreCard
-      ability="str"
-      value={15}
-      headerAdornment={
-        <AbilityScoreRecommendationIndicator label="Recommended primary ability for Fighter." />
-      }
-      className="w-[100px]"
-    />
+    <div className="w-[100px]">
+      <AbilityScoreCard
+        ability="str"
+        value={15}
+        headerAdornment={
+          <AbilityScoreRecommendationIndicator label="Recommended primary ability for Fighter." />
+        }
+      />
+    </div>
   ),
 }
 

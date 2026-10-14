@@ -1,6 +1,8 @@
 import type { Ability } from '@rpg/contracts'
 import { cn, StatusIcon } from '@rpg/ui'
 
+import { abilityScoreCardFooterActionLabelClasses } from '@/components/ability-score'
+
 import {
   MONSTER_SAVE_PROF_LABEL,
   monsterSavingThrowProficiencyAriaLabel,
@@ -28,7 +30,8 @@ export function MonsterAbilitySaveProficiencyFooter({
       type="button"
       className={cn(
         'inline-flex w-full items-center justify-center gap-1.5',
-        'whitespace-nowrap text-style-label',
+        'whitespace-nowrap',
+        abilityScoreCardFooterActionLabelClasses,
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         disabled && 'text-muted-foreground',
       )}

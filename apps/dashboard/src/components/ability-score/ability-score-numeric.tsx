@@ -8,6 +8,8 @@ import { AbilityScoreCard } from './ability-score-card'
 import {
   abilityScoreCardScoreCenterClasses,
   abilityScoreCardScoreValueClasses,
+  abilityScoreCardStepperButtonAppearance,
+  abilityScoreCardStepperButtonSize,
   abilityScoreCardStepperStackClasses,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
@@ -22,7 +24,6 @@ export type AbilityScoreNumericProps = {
   disabled?: boolean
   size?: 'sm' | 'md'
   state?: AbilityScoreCardState
-  className?: string
   footer?: ReactNode
   headerAdornment?: ReactNode
   invalid?: boolean
@@ -45,7 +46,6 @@ export function AbilityScoreNumeric({
   disabled = false,
   size = 'md',
   state = 'resting',
-  className,
   footer,
   headerAdornment,
   invalid = false,
@@ -155,7 +155,7 @@ export function AbilityScoreNumeric({
       aria-invalid={ariaInvalid || undefined}
       className={cn(
         abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClasses[size],
+        abilityScoreCardScoreValueClasses,
         'border-0 bg-transparent p-0 outline-none focus-visible:ring-0',
       )}
       value={draft}
@@ -171,7 +171,7 @@ export function AbilityScoreNumeric({
       aria-invalid={ariaInvalid || undefined}
       className={cn(
         abilityScoreCardScoreCenterClasses,
-        abilityScoreCardScoreValueClasses[size],
+        abilityScoreCardScoreValueClasses,
         disabled && 'text-muted-foreground',
         state === 'draggingFrom' && 'opacity-50',
       )}
@@ -190,21 +190,23 @@ export function AbilityScoreNumeric({
       state={state}
       footer={footer}
       headerAdornment={headerAdornment}
-      className={className}
+      interaction={disabled ? 'none' : 'numeric'}
     >
       <span aria-hidden />
       {scoreCell}
       <div className={abilityScoreCardStepperStackClasses}>
         <NumberStepperStepButton
           direction="increase"
-          size="sm"
+          size={abilityScoreCardStepperButtonSize}
+          appearance={abilityScoreCardStepperButtonAppearance}
           disabled={resolveStepDisabled('increase')}
           aria-label={`Increase ${fullName} score`}
           onClick={() => step('increase')}
         />
         <NumberStepperStepButton
           direction="decrease"
-          size="sm"
+          size={abilityScoreCardStepperButtonSize}
+          appearance={abilityScoreCardStepperButtonAppearance}
           disabled={resolveStepDisabled('decrease')}
           aria-label={`Decrease ${fullName} score`}
           onClick={() => step('decrease')}

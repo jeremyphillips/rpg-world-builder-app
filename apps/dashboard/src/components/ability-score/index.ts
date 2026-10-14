@@ -5,4 +5,7 @@ export {
   type AbilityScoreRecommendationIndicatorProps,
 } from './ability-score-recommendation-indicator'
 export { AbilityScoreSelect, type AbilityScoreSelectProps } from './ability-score-select'
-export type { AbilityScoreCardState } from './ability-score-card.variants'
+export {
+  abilityScoreCardFooterActionLabelClasses,
+  type AbilityScoreCardState,
+} from './ability-score-card.variants'

@@ -5,7 +5,7 @@ import {
   getAbilityCompactLabel,
   type Ability,
 } from '@rpg/contracts'
-import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
 import { forwardRef, type ReactNode } from 'react'
 
 import {
@@ -26,10 +26,9 @@ export type AbilityScoreCardProps = {
   footer?: ReactNode
   state?: AbilityScoreCardState
   headerAdornment?: ReactNode
-  className?: string
   children?: ReactNode
   hideModifier?: boolean
-  restingHover?: boolean
+  interaction?: 'none' | 'select' | 'numeric'
 }
 
 export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
@@ -41,10 +40,9 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
       footer,
       state = 'resting',
       headerAdornment,
-      className,
       children,
       hideModifier = false,
-      restingHover = false,
+      interaction = 'none',
     },
     ref,
   ) {
@@ -58,7 +56,7 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
       <article
         ref={ref}
         aria-label={fullName}
-        className={cn(abilityScoreCardVariants({ state, size, restingHover }), className)}
+        className={abilityScoreCardVariants({ state, size, interaction })}
       >
         <div className={abilityScoreCardBodyPaddingClasses[size]}>
           <TooltipProvider>

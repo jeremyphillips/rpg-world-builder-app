@@ -26,7 +26,6 @@ export type AbilityScoreSelectProps = {
   onOpenChange?: (open: boolean) => void
   state?: AbilityScoreCardState
   size?: 'sm' | 'md'
-  className?: string
   headerAdornment?: ReactNode
   scoreDragHandleProps?: HTMLAttributes<HTMLElement>
 }
@@ -41,7 +40,6 @@ export function AbilityScoreSelect({
   onOpenChange,
   state = 'resting',
   size = 'md',
-  className,
   headerAdornment,
   scoreDragHandleProps,
 }: AbilityScoreSelectProps) {
@@ -76,7 +74,7 @@ export function AbilityScoreSelect({
         type="button"
         className={cn(
           abilityScoreCardScoreCenterClasses,
-          abilityScoreCardScoreValueClasses[size],
+          abilityScoreCardScoreValueClasses,
           state === 'draggingFrom' && 'opacity-50',
           scoreDragHandleProps?.className,
         )}
@@ -130,8 +128,7 @@ export function AbilityScoreSelect({
         state={state}
         headerAdornment={headerAdornment}
         hideModifier={state === 'dragOver'}
-        restingHover={state === 'resting'}
-        className={className}
+        interaction={state === 'resting' ? 'select' : 'none'}
       >
         <span aria-hidden />
         {centerContent}

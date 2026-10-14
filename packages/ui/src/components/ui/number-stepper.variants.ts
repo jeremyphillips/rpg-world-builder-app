@@ -7,6 +7,8 @@ import { fieldControlSizeClasses } from './field-sizing.variants'
 
 export type NumberStepperSize = 'xs' | 'sm' | 'md' | 'lg'
 
+export type NumberStepperButtonAppearance = 'default' | 'isolated'
+
 export const numberStepperRootVariants = cva('inline-flex items-center', {
   variants: {
     size: {
@@ -33,13 +35,17 @@ export const numberStepperRootVariants = cva('inline-flex items-center', {
 
 export const numberStepperButtonVariants = cva(
   cn(
-    'inline-flex shrink-0 cursor-pointer items-center justify-center bg-input text-muted-foreground transition-colors',
-    'hover:bg-background active:bg-background',
+    'inline-flex shrink-0 cursor-pointer items-center justify-center text-muted-foreground transition-colors',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
     'disabled:pointer-events-none disabled:bg-sunken disabled:text-input-disabled disabled:[&_svg]:text-input-disabled',
   ),
   {
     variants: {
+      appearance: {
+        default: 'bg-input hover:bg-background active:bg-background',
+        isolated:
+          'rounded-md border border-border bg-muted hover:bg-background active:bg-background',
+      },
       size: {
         xs: resolveCompactControlStepperButtonClasses('xs'),
         sm: resolveCompactControlStepperButtonClasses('sm'),
@@ -52,6 +58,7 @@ export const numberStepperButtonVariants = cva(
       },
     },
     defaultVariants: {
+      appearance: 'default',
       size: 'md',
       minBoundary: 'default',
     },

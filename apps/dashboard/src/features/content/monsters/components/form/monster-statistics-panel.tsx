@@ -153,7 +153,6 @@ function AbilityScoreField({
 
   return (
     <AbilityScoreNumeric
-      className="w-full"
       ability={ability}
       size="sm"
       min={ABILITY_SCORE_MIN}

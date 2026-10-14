@@ -2,36 +2,40 @@ import { cva } from 'class-variance-authority'
 
 import { cn } from '@rpg/ui'
 
+/** Fills grid columns; width constraints belong on the parent layout only. */
+export const abilityScoreCardShellClasses = 'w-full min-w-0'
+
 export const abilityScoreCardVariants = cva(
-  cn('rounded-md bg-card text-center transition-colors'),
+  cn('rounded-md bg-surface-lift text-center transition-colors', abilityScoreCardShellClasses),
   {
     variants: {
       state: {
-        resting: 'border border-border bg-card',
-        dragOver: 'border border-dashed border-primary bg-card ring-2 ring-primary/30',
+        resting: 'border border-border bg-surface-lift',
+        dragOver: 'border border-dashed border-primary bg-surface-lift ring-2 ring-primary/30',
         draggingFrom: 'border border-dashed border-muted-foreground/40 bg-surface-muted',
-        invalid: 'border border-destructive bg-card ring-2 ring-destructive/30',
+        invalid: 'border border-destructive bg-surface-lift ring-2 ring-destructive/30',
       },
       size: {
         sm: '',
         md: '',
       },
-      restingHover: {
-        true: '',
-        false: '',
+      interaction: {
+        none: '',
+        select: '',
+        numeric: '',
       },
     },
     compoundVariants: [
       {
         state: 'resting',
-        restingHover: true,
-        className: 'hover:border-foreground',
+        interaction: 'select',
+        className: 'hover:border-foreground hover:bg-surface-subtle',
       },
     ],
     defaultVariants: {
       state: 'resting',
       size: 'md',
-      restingHover: false,
+      interaction: 'none',
     },
   },
 )
@@ -45,19 +49,28 @@ export const abilityScoreCardHeaderClasses = 'relative px-6 text-sm font-semibol
 
 export const abilityScoreCardHeaderAdornmentClasses = 'absolute right-0 top-0'
 
-export const abilityScoreCardScoreRowClasses = 'grid grid-cols-[1fr_4.5ch_1fr] items-center'
+/** Symmetric compact lanes reserve stepper width via `--control-action-compact-height`. */
+export const abilityScoreCardScoreRowClasses =
+  'grid grid-cols-[var(--control-action-compact-height)_minmax(0,4.5ch)_var(--control-action-compact-height)] items-center'
 
-export const abilityScoreCardScoreCenterClasses = 'w-[4.5ch] tabular-nums text-center'
+export const abilityScoreCardScoreCenterClasses =
+  'w-full min-w-0 max-w-[4.5ch] overflow-hidden tabular-nums text-center'
 
-export const abilityScoreCardScoreValueClasses = {
-  sm: 'heading-style-section font-semibold tabular-nums',
-  md: 'heading-style-page font-semibold tabular-nums',
-} as const
+/** ~24px score numerals — shared across sm/md card sizes. */
+export const abilityScoreCardScoreValueClasses =
+  'text-2xl font-semibold tabular-nums text-foreground'
+
+/** 24px compact lane — matches `--control-height-compact` / `size-control-action-compact`. */
+export const abilityScoreCardStepperButtonSize = 'xs' as const
+
+export const abilityScoreCardStepperButtonAppearance = 'isolated' as const
 
 export const abilityScoreCardModifierClasses = 'text-style-label tabular-nums text-muted-foreground'
 
-export const abilityScoreCardFooterClasses = 'border-t border-border px-2 py-1.5'
+export const abilityScoreCardFooterClasses = 'border-t border-border px-2 py-[2px]'
 
-export const abilityScoreCardStepperStackClasses = 'flex flex-col gap-0.5'
+export const abilityScoreCardFooterActionLabelClasses = 'text-xs'
+
+export const abilityScoreCardStepperStackClasses = 'flex w-full flex-col items-center gap-0.5'
 
 export type AbilityScoreCardState = 'resting' | 'dragOver' | 'draggingFrom' | 'invalid'
