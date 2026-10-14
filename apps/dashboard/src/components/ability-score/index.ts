@@ -6,7 +6,8 @@ export {
 } from './ability-score-recommendation-indicator'
 export { AbilityScoreSelect, type AbilityScoreSelectProps } from './ability-score-select'
 export {
-  abilityScoreCardFooterActionClasses,
   abilityScoreCardFooterActionLabelClasses,
+  abilityScoreCardFooterCheckboxClasses,
+  abilityScoreCardFooterClasses,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'

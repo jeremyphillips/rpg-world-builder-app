@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 
-import { buttonVariants, cn } from '@rpg/ui'
+import { cn, interactiveFocusVariants } from '@rpg/ui'
 
 /** Fills grid columns; width constraints belong on the parent layout only. */
 export const abilityScoreCardShellClasses = 'w-full min-w-0'
@@ -146,15 +146,18 @@ export const abilityScoreCardStepperButtonAppearance = 'isolated' as const
 
 export const abilityScoreCardModifierClasses = 'text-style-label tabular-nums text-muted-foreground'
 
-/** Footer shell — border only; padding lives on footer actions (e.g. monster save prof). */
-export const abilityScoreCardFooterClasses = 'border-t border-border'
-
 export const abilityScoreCardFooterActionLabelClasses = 'text-xs'
 
-export const abilityScoreCardFooterActionClasses = cn(
-  buttonVariants({ variant: 'outline', size: 'xs', density: 'compact' }),
-  'border-0 shadow-none',
-  'inline-flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap px-2 py-[2px]',
+/** Checkbox on footer row — surface stays visible over outline hover/active on the label. */
+export const abilityScoreCardFooterCheckboxClasses =
+  'bg-background data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground'
+
+/** Entire footer row — outline hover/active, padding, and card bottom radius (no inner button chrome). */
+export const abilityScoreCardFooterClasses = cn(
+  'ui-button ui-button--outline ui-button--xs-compact font-body-emphasis',
+  interactiveFocusVariants({ context: 'standalone' }),
+  'flex w-full cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap border-0 border-t border-border px-2 py-[2px] shadow-none',
+  'rounded-none rounded-b-md',
 )
 
 export type AbilityScoreCardState = 'resting' | 'dragOver' | 'draggingFrom' | 'invalid'

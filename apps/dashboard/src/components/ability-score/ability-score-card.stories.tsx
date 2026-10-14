@@ -8,8 +8,9 @@ import { buildFixedScoreSelectOptions } from '@/features/character/lib/steps/fix
 import { AbilityScoreCard } from './ability-score-card'
 
 import {
-  abilityScoreCardFooterActionClasses,
   abilityScoreCardFooterActionLabelClasses,
+  abilityScoreCardFooterCheckboxClasses,
+  abilityScoreCardFooterClasses,
 } from './ability-score-card.variants'
 import { AbilityScoreNumeric } from './ability-score-numeric'
 import { AbilityScoreRecommendationIndicator } from './ability-score-recommendation-indicator'
@@ -100,8 +101,12 @@ export const NumericWithFooter: Story = {
       max={30}
       onCommit={() => undefined}
       footer={
-        <label className={abilityScoreCardFooterActionClasses}>
-          <Checkbox checked={false} aria-label="Strength saving throw proficiency" />
+        <label className={abilityScoreCardFooterClasses}>
+          <Checkbox
+            className={abilityScoreCardFooterCheckboxClasses}
+            checked={false}
+            aria-label="Strength saving throw proficiency"
+          />
           <span className={abilityScoreCardFooterActionLabelClasses} aria-hidden>
             Save prof.
           </span>

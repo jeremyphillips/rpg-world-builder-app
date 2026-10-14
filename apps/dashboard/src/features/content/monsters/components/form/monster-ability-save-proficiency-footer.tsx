@@ -2,8 +2,9 @@ import type { Ability } from '@rpg/contracts'
 import { Checkbox, cn } from '@rpg/ui'
 
 import {
-  abilityScoreCardFooterActionClasses,
   abilityScoreCardFooterActionLabelClasses,
+  abilityScoreCardFooterCheckboxClasses,
+  abilityScoreCardFooterClasses,
 } from '@/components/ability-score'
 
 import {
@@ -28,12 +29,10 @@ export function MonsterAbilitySaveProficiencyFooter({
 }: MonsterAbilitySaveProficiencyFooterProps) {
   return (
     <label
-      className={cn(
-        abilityScoreCardFooterActionClasses,
-        disabled && 'cursor-not-allowed opacity-50',
-      )}
+      className={cn(abilityScoreCardFooterClasses, disabled && 'cursor-not-allowed opacity-50')}
     >
       <Checkbox
+        className={abilityScoreCardFooterCheckboxClasses}
         checked={proficient}
         disabled={disabled}
         aria-invalid={ariaInvalid || undefined}

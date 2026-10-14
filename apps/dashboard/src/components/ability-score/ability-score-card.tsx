@@ -10,7 +10,6 @@ import { forwardRef, type ReactNode } from 'react'
 
 import {
   abilityScoreCardBodyPaddingClasses,
-  abilityScoreCardFooterClasses,
   abilityScoreCardHeaderAdornmentClasses,
   abilityScoreCardHeaderClasses,
   abilityScoreCardHeaderLabelClasses,
@@ -108,7 +107,7 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
             )}
           </div>
         </div>
-        {footer ? <div className={abilityScoreCardFooterClasses}>{footer}</div> : null}
+        {footer}
       </article>
     )
   },
