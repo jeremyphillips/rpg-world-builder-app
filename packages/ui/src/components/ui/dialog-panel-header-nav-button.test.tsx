@@ -1,0 +1,46 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
+import {
+  DialogPanelHeaderNavButton,
+  UI_DIALOG_PANEL_HEADER_NAV_BUTTON_BLOCK_CLASS,
+  dialogPanelHeaderNavGlyphSizeClasses,
+} from './dialog-panel-header-nav-button.client'
+
+const navButtonCss = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), './dialog-panel-header-nav-button.css'),
+  'utf8',
+)
+
+describe('DialogPanelHeaderNavButton', () => {
+  it('defines responsive glyph sizing on the dialog title scale (19px base, 24px from md)', () => {
+    expect(navButtonCss).toMatch(
+      /@utility size-dialog-panel-header-nav-glyph \{[\s\S]*?width: var\(--text-heading-dialog-title\)/,
+    )
+    expect(navButtonCss).toMatch(
+      /@media \(width >= 48rem\) \{[\s\S]*?width: var\(--text-heading-dialog-title-md\)/,
+    )
+  })
+
+  it('renders an accessible back control with the semantic block class', async () => {
+    const user = userEvent.setup()
+    const onClick = vi.fn()
+
+    render(<DialogPanelHeaderNavButton aria-label="Go back" onClick={onClick} />)
+
+    const button = screen.getByRole('button', { name: 'Go back' })
+    expect(button).toHaveClass(UI_DIALOG_PANEL_HEADER_NAV_BUTTON_BLOCK_CLASS)
+    expect(button).toHaveClass('ui-compact-control--icon-default')
+
+    const glyph = button.querySelector('svg')
+    expect(glyph).toHaveClass(dialogPanelHeaderNavGlyphSizeClasses)
+    expect(glyph).not.toHaveClass('size-icon-glyph-lg')
+
+    await user.click(button)
+    expect(onClick).toHaveBeenCalledOnce()
+  })
+})

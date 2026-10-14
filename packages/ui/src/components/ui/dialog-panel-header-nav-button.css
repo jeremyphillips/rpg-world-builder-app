@@ -1,0 +1,12 @@
+/*
+ * Dialog panel header back affordance — pairs icon-default hit target with dialog-title-scale glyphs.
+ */
+@utility size-dialog-panel-header-nav-glyph {
+  width: var(--text-heading-dialog-title);
+  height: var(--text-heading-dialog-title);
+
+  @media (width >= 48rem) {
+    width: var(--text-heading-dialog-title-md);
+    height: var(--text-heading-dialog-title-md);
+  }
+}
