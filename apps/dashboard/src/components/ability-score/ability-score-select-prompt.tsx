@@ -1,22 +1,44 @@
-import { cn } from '@rpg/ui'
-import { ArrowDown } from 'lucide-react'
+import { ActionIcon, cn } from '@rpg/ui'
 
 import {
-  abilityScoreCardSelectPromptClasses,
-  abilityScoreCardSelectPromptIconClasses,
-  abilityScoreCardSelectPromptLabelClasses,
+  ABILITY_SCORE_SELECT_CHOOSE_LABEL,
+  ABILITY_SCORE_SELECT_RELEASE_TO_ASSIGN_LABEL,
+  abilityScoreCardChooseTriggerClasses,
+  abilityScoreCardDragOverPreviewClasses,
+  abilityScoreCardDragOverPreviewHintClasses,
+  abilityScoreCardScoreValueClassesFor,
 } from './ability-score-card.variants'
 
-type AbilityScoreSelectPromptProps = {
-  label: 'Choose' | 'Drop'
+type AbilityScoreSelectChoosePromptProps = {
   className?: string
 }
 
-export function AbilityScoreSelectPrompt({ label, className }: AbilityScoreSelectPromptProps) {
+export function AbilityScoreSelectChoosePrompt({ className }: AbilityScoreSelectChoosePromptProps) {
   return (
-    <div className={cn(abilityScoreCardSelectPromptClasses, className)}>
-      <ArrowDown aria-hidden className={abilityScoreCardSelectPromptIconClasses} />
-      <span className={abilityScoreCardSelectPromptLabelClasses}>{label}</span>
+    <span aria-hidden className={cn(abilityScoreCardChooseTriggerClasses, className)}>
+      <ActionIcon action="add" step="sm" />
+      {ABILITY_SCORE_SELECT_CHOOSE_LABEL}
+    </span>
+  )
+}
+
+type AbilityScoreSelectDragOverPreviewProps = {
+  score: number
+  size: 'sm' | 'md'
+  className?: string
+}
+
+export function AbilityScoreSelectDragOverPreview({
+  score,
+  size,
+  className,
+}: AbilityScoreSelectDragOverPreviewProps) {
+  return (
+    <div className={cn(abilityScoreCardDragOverPreviewClasses, className)}>
+      <span className={abilityScoreCardScoreValueClassesFor(size)}>{score}</span>
+      <span className={abilityScoreCardDragOverPreviewHintClasses}>
+        {ABILITY_SCORE_SELECT_RELEASE_TO_ASSIGN_LABEL}
+      </span>
     </div>
   )
 }

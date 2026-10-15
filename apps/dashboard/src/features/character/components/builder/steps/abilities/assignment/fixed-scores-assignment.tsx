@@ -191,6 +191,9 @@ function FixedScoresAbilityCard({
         }
       : undefined
 
+  const pendingScore =
+    cardState === 'dragOver' && activeDrag !== null ? activeDrag.score : undefined
+
   return (
     <AbilityScoreSelect
       ref={setNodeRef}
@@ -203,6 +206,7 @@ function FixedScoresAbilityCard({
       size="md"
       headerAdornment={headerAdornment}
       scoreDragHandleProps={scoreDragHandleProps}
+      pendingScore={pendingScore}
       onSelect={(score) => onSelectScore(ability, score)}
     />
   )

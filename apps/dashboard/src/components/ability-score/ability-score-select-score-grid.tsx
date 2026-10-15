@@ -55,6 +55,7 @@ export function AbilityScoreSelectScoreGrid({
         {scoreOptions.map((option, index) => {
           const isCurrent = option.operation === 'current'
           const isInvalid = option.operation === 'invalid'
+          const isAssignedElsewhere = option.operation === 'move' || option.operation === 'swap'
 
           return (
             <RadioGroupItem
@@ -70,7 +71,9 @@ export function AbilityScoreSelectScoreGrid({
                   ? 'border-primary bg-surface-strong'
                   : isInvalid
                     ? 'border-border bg-muted text-muted-foreground'
-                    : 'border-border bg-background hover:bg-muted',
+                    : isAssignedElsewhere
+                      ? 'border-border bg-surface-subtle hover:bg-muted'
+                      : 'border-border bg-background hover:bg-muted',
               )}
               onClick={(event) => {
                 if (isInvalid) {

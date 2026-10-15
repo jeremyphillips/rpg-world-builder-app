@@ -3,13 +3,37 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { abilityModifier, formatSignedModifier } from '@rpg/contracts'
+
 import { buildFixedScoreSelectOptions } from '@/features/character/lib/steps/fixed-scores-assignment.lib'
 
+import { ABILITY_SCORE_SELECT_RELEASE_TO_ASSIGN_LABEL } from './ability-score-card.variants'
 import { AbilityScoreSelect } from './ability-score-select'
 
 const POOL = [15, 14, 13, 12, 10, 8] as const
 
 describe('AbilityScoreSelect', () => {
+  it('shows drag-over preview score, hint, and modifier', () => {
+    const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)
+    const pendingScore = 13
+    render(
+      <AbilityScoreSelect
+        ability="str"
+        value={null}
+        scoreOptions={scoreOptions}
+        state="dragOver"
+        pendingScore={pendingScore}
+        onSelect={() => undefined}
+      />,
+    )
+
+    expect(screen.getByText(String(pendingScore))).toBeInTheDocument()
+    expect(screen.getByText(ABILITY_SCORE_SELECT_RELEASE_TO_ASSIGN_LABEL)).toBeInTheDocument()
+    expect(
+      screen.getByText(formatSignedModifier(abilityModifier(pendingScore)), { selector: 'p' }),
+    ).toBeInTheDocument()
+  })
+
   it('opens the popover from Choose on an empty card', async () => {
     const user = userEvent.setup()
     const scoreOptions = buildFixedScoreSelectOptions('str', {}, POOL)

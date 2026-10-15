@@ -80,6 +80,7 @@ export const SelectDragOver: Story = {
         value={null}
         scoreOptions={scoreOptions}
         state="dragOver"
+        pendingScore={13}
         onSelect={() => undefined}
       />
     )

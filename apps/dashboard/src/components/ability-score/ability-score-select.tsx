@@ -1,21 +1,20 @@
 'use client'
 
 import { ABILITY_ENTRIES, type Ability } from '@rpg/contracts'
-import { ActionIcon, cn, Popover, PopoverContent, PopoverTrigger } from '@rpg/ui'
+import { Popover, PopoverContent, PopoverTrigger } from '@rpg/ui'
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 
 import { AbilityScoreCard } from './ability-score-card'
 import {
   abilityScoreCardChooseOverlayClasses,
-  abilityScoreCardScoreValueClassesFor,
-  abilityScoreCardSelectFilledBalanceSlotClasses,
-  abilityScoreCardSelectFilledClusterClasses,
-  abilityScoreCardSelectInlineNumeralClasses,
-  abilityScoreCardSelectPencilButtonClasses,
   type AbilityScoreCardState,
 } from './ability-score-card.variants'
 import type { FixedScoreSelectOption } from './fixed-score-select-option.types'
-import { AbilityScoreSelectPrompt } from './ability-score-select-prompt'
+import {
+  resolveAbilityScoreSelectCardProps,
+  resolveAbilityScoreSelectDragPreview,
+} from './ability-score-select.lib'
+import { AbilityScoreSelectScoreRow } from './ability-score-select-score-row'
 import { AbilityScoreSelectScoreGrid } from './ability-score-select-score-grid'
 
 export type AbilityScoreSelectProps = {
@@ -29,6 +28,8 @@ export type AbilityScoreSelectProps = {
   size?: 'sm' | 'md'
   headerAdornment?: ReactNode
   scoreDragHandleProps?: HTMLAttributes<HTMLElement>
+  /** Incoming score while `state` is `dragOver` (modifier + preview numeral). */
+  pendingScore?: number
 }
 
 export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProps>(
@@ -44,79 +45,35 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
       size = 'md',
       headerAdornment,
       scoreDragHandleProps,
+      pendingScore,
     },
     ref,
   ) {
     const fullName = ABILITY_ENTRIES[ability].label
     const filled = value !== null
-    const {
-      onClick: scoreDragHandleOnClick,
-      className: scoreDragHandleClassName,
-      ...scoreDragHandleRest
-    } = scoreDragHandleProps ?? {}
-
-    const inlineNumeralClasses = cn(
-      abilityScoreCardSelectInlineNumeralClasses,
-      abilityScoreCardScoreValueClassesFor(size),
-    )
-
     const chooseLabel = `Choose ${fullName} score`
-    const isChooseCard = !filled && state !== 'dragOver'
 
-    const scoreRow =
-      state === 'dragOver' ? (
-        <AbilityScoreSelectPrompt label="Drop" />
-      ) : filled ? (
-        <div className={abilityScoreCardSelectFilledClusterClasses}>
-          <span aria-hidden className={abilityScoreCardSelectFilledBalanceSlotClasses} />
-          <button
-            type="button"
-            className={cn(
-              inlineNumeralClasses,
-              state === 'draggingFrom' && 'opacity-50',
-              scoreDragHandleClassName,
-            )}
-            tabIndex={scoreDragHandleProps ? 0 : undefined}
-            onClick={(event) => {
-              scoreDragHandleOnClick?.(event)
-              if (!event.defaultPrevented) {
-                onOpenChange?.(true)
-              }
-            }}
-            {...scoreDragHandleRest}
-          >
-            {value}
-          </button>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              className={cn(
-                abilityScoreCardSelectPencilButtonClasses,
-                'size-control-action-compact justify-self-start rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              )}
-              aria-label={`Change ${fullName} score`}
-            >
-              <ActionIcon action="edit" step="sm" />
-            </button>
-          </PopoverTrigger>
-        </div>
-      ) : (
-        <AbilityScoreSelectPrompt className="pointer-events-none" label="Choose" />
-      )
+    const dragOverPreviewScore = resolveAbilityScoreSelectDragPreview(state, pendingScore)
+    const cardProps = resolveAbilityScoreSelectCardProps({
+      filled,
+      state,
+      dragOverPreviewScore,
+      value,
+    })
 
     const card = (
       <AbilityScoreCard
         ref={ref}
         ability={ability}
-        value={value}
+        value={cardProps.modifierValue}
         size={size}
         state={state}
         headerAdornment={headerAdornment}
-        hideModifier={state === 'dragOver'}
-        interaction={state === 'resting' ? 'select' : 'none'}
-        scoreLayout={state === 'dragOver' ? 'centered' : filled ? 'select-filled' : 'choose'}
+        hideModifier={cardProps.hideModifier}
+        interaction={cardProps.interaction}
+        scoreLayout={cardProps.scoreLayout}
       >
-        {isChooseCard ? (
+        {cardProps.isChooseCard ? (
           <PopoverTrigger asChild>
             <button
               type="button"
@@ -125,7 +82,15 @@ export const AbilityScoreSelect = forwardRef<HTMLElement, AbilityScoreSelectProp
             />
           </PopoverTrigger>
         ) : null}
-        {scoreRow}
+        <AbilityScoreSelectScoreRow
+          value={value}
+          fullName={fullName}
+          size={size}
+          state={state}
+          pendingScore={pendingScore}
+          scoreDragHandleProps={scoreDragHandleProps}
+          onOpenChange={onOpenChange}
+        />
       </AbilityScoreCard>
     )
 

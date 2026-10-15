@@ -35,7 +35,11 @@ export const abilityScoreCardVariants = cva(
       {
         state: 'resting',
         interaction: 'select',
-        className: 'hover:border-foreground hover:bg-surface-subtle',
+        className: 'hover:border-foreground',
+      },
+      {
+        scoreLayout: 'choose',
+        className: 'group/choose',
       },
     ],
     defaultVariants: {
@@ -124,14 +128,24 @@ export const abilityScoreCardSelectInlineNumeralClasses =
 export const abilityScoreCardSelectPencilButtonClasses =
   'inline-flex shrink-0 items-center justify-center'
 
-/** Shared vertical prompt for empty Choose and drag-over Drop. */
-export const abilityScoreCardSelectPromptClasses = cn(
-  'flex w-full min-w-0 flex-col items-center justify-center gap-0.5 px-1 text-xs text-muted-foreground',
+export const ABILITY_SCORE_SELECT_CHOOSE_LABEL = 'Choose' as const
+
+export const ABILITY_SCORE_SELECT_RELEASE_TO_ASSIGN_LABEL = 'Release to assign' as const
+
+/** Decorative outline control for empty choose cards (real trigger is the full-card overlay). */
+export const abilityScoreCardChooseTriggerClasses = cn(
+  'ui-button ui-button--outline ui-button--sm font-body',
+  'pointer-events-none inline-flex items-center justify-center gap-1.5 whitespace-nowrap',
+  'group-hover/choose:bg-[var(--interactive-outline-hover-bg)]',
+  'group-active/choose:bg-[var(--interactive-outline-active-bg)]',
 )
 
-export const abilityScoreCardSelectPromptIconClasses = 'size-5 shrink-0'
+/** Drag-over preview numeral + absolutely positioned hint (hint does not expand the score row). */
+export const abilityScoreCardDragOverPreviewClasses = 'relative w-full min-w-0'
 
-export const abilityScoreCardSelectPromptLabelClasses = 'w-full min-w-0 truncate'
+export const abilityScoreCardDragOverPreviewHintClasses = cn(
+  'pointer-events-none absolute inset-x-0 top-full -translate-y-1 truncate text-center text-control-action-xs text-muted-foreground',
+)
 
 /** Covers the card hit target; popover trigger sits above chrome but below header adornment tooltips. */
 export const abilityScoreCardChooseOverlayClasses =

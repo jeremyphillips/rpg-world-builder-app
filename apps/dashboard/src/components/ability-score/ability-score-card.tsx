@@ -60,7 +60,7 @@ export const AbilityScoreCard = forwardRef<HTMLElement, AbilityScoreCardProps>(
     const compactLabel = getAbilityCompactLabel(ability)
     const modifierText =
       typeof value === 'number' ? formatSignedModifier(abilityModifier(value)) : '—'
-    const suppressModifier = hideModifier || state === 'dragOver'
+    const suppressModifier = hideModifier
     const scoreRow = children ?? (
       <span
         className={cn(
