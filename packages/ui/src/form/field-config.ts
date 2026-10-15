@@ -144,8 +144,13 @@ export interface FieldOption {
   searchTerms?: readonly string[]
   /** Optional classification shown inline after the label in combobox panels. */
   classification?: string
-  /** Category slug matched by combobox `filterSelect` (e.g. tool category id). */
+  /**
+   * Dimension slugs for combobox panel filters (keys align with `filterSelects[].filterKey`).
+   * @deprecated Prefer `filterValues`; removed when legacy `filterCategory` is dropped.
+   */
   filterCategory?: string
+  /** Canonical dimension slugs matched by combobox `filterSelects` (AND across active keys). */
+  filterValues?: Readonly<Record<string, string>>
   /** Inline title badge rendered by `radioCard` fields; ignored by other option controls. */
   badge?: string
 }
@@ -264,6 +269,27 @@ export interface FieldDynamicSelectOptions {
 export interface FieldDynamicComboboxFilterSelect {
   dependsOn: readonly string[]
   filterSelectWhen: (values: Record<string, unknown>) => ComboboxFilterSelectConfig
+}
+
+/** Unrestricted dimension — resolver skips undefined or absent keys. */
+export type FilterDimensionValue = string | undefined
+
+export type ActiveDimensionFilters = Readonly<Record<string, FilterDimensionValue>>
+
+export interface ComboboxFilterDimensionConfig {
+  /** Unique within the field; stable across `filterSelectsWhen` resolves. */
+  filterKey: string
+  ariaLabel: string
+  /** Concrete dimension slugs only — the renderer injects the All menu item. */
+  options: FieldOption[]
+  defaultValue?: FilterDimensionValue
+  allOptionLabel?: string
+}
+
+/** Resolves combobox panel dimension filter configs from watched form values. */
+export interface FieldDynamicComboboxFilterSelects {
+  dependsOn: readonly string[]
+  filterSelectsWhen: (values: Record<string, unknown>) => readonly ComboboxFilterDimensionConfig[]
 }
 
 /** Static and dynamic hint configuration on leaf fields. */
@@ -837,9 +863,17 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
     query: string,
     selected: string[],
   ) => FieldOption[]
-  /** Optional category filter row in the combobox panel toolbar. */
+  /** Multi-dimension filter row in the combobox panel toolbar. */
+  filterSelects?: readonly ComboboxFilterDimensionConfig[]
+  /** Dynamic dimension filters resolved from watched values; replaces `filterSelects` when set. */
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+  /**
+   * @deprecated Use `filterSelects` with a single `filterKey` (e.g. `category`).
+   */
   filterSelect?: ComboboxFilterSelectConfig
-  /** Dynamic category filter resolved from watched values; replaces `filterSelect` when set. */
+  /**
+   * @deprecated Use `filterSelectsResolve`.
+   */
   filterSelectResolve?: FieldDynamicComboboxFilterSelect
   /** When false, omits the panel search row (keyboard nav targets the listbox). */
   enableSearch?: boolean
@@ -1895,6 +1929,18 @@ export function normalizeFieldHint(hint: string | FieldHintConfig | undefined): 
   }
 }
 
+function comboboxFilterDependsOn(field: {
+  type?: FieldConfig['type']
+  filterSelectResolve?: FieldDynamicComboboxFilterSelect
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+}): readonly string[] {
+  if (field.type !== 'combobox') return []
+
+  const legacy = field.filterSelectResolve?.dependsOn ?? []
+  const dimensions = field.filterSelectsResolve?.dependsOn ?? []
+  return [...legacy, ...dimensions]
+}
+
 /** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
 export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
@@ -1902,6 +1948,7 @@ export function collectFieldDynamicDependsOn(field: {
   type?: FieldConfig['type']
   optionsResolve?: FieldDynamicSelectOptions
   filterSelectResolve?: FieldDynamicComboboxFilterSelect
+  filterSelectsResolve?: FieldDynamicComboboxFilterSelects
 }): readonly string[] {
   const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
   const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
@@ -1910,16 +1957,13 @@ export function collectFieldDynamicDependsOn(field: {
     field.optionsResolve
       ? field.optionsResolve.dependsOn
       : []
-  const filterSelectResolveDependsOn =
-    field.type === 'combobox' && field.filterSelectResolve
-      ? field.filterSelectResolve.dependsOn
-      : []
+
   return [
     ...new Set([
       ...hintDependsOn,
       ...derivedMetaDependsOn,
       ...optionsResolveDependsOn,
-      ...filterSelectResolveDependsOn,
+      ...comboboxFilterDependsOn(field),
     ]),
   ]
 }
@@ -1932,6 +1976,9 @@ export function resolveComboboxFieldConfig(
   const options = config.optionsResolve
     ? [...config.optionsResolve.optionsWhen(values)]
     : (config.options ?? [])
+  const filterSelects = config.filterSelectsResolve
+    ? config.filterSelectsResolve.filterSelectsWhen(values)
+    : config.filterSelects
   const filterSelect = config.filterSelectResolve
     ? config.filterSelectResolve.filterSelectWhen(values)
     : config.filterSelect
@@ -1939,6 +1986,7 @@ export function resolveComboboxFieldConfig(
   return {
     ...config,
     options,
+    filterSelects,
     filterSelect,
   }
 }

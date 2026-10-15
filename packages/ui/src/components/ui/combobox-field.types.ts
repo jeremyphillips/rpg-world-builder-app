@@ -13,8 +13,10 @@ export interface ComboboxFieldOption {
   metadata?: string
   /** Optional classification shown inline after the label (`Name · Classification`). */
   classification?: string
-  /** Category slug matched by panel category filters (not shown in the row UI). */
+  /** @deprecated Use `filterValues.category`. */
   filterCategory?: string
+  /** Dimension slugs for panel filters (not shown in the row UI). */
+  filterValues?: Readonly<Record<string, string>>
   /** Additional searchable strings (aliases, semantic terms). Matched as keywords in combobox search. */
   searchTerms?: readonly string[]
 }
