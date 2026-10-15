@@ -2,6 +2,7 @@ import {
   isWeaponEquipment,
   isWeaponProficientFromGrantSet,
   joinInlineMetadata,
+  resolveEquipmentNotProficientShortLabel,
   type Equipment,
 } from '@rpg/contracts'
 
@@ -72,7 +73,10 @@ export function collectMonsterFormAdvisories(
         if (!proficient) {
           advisories.push({
             code: 'weapon-not-proficient',
-            message: joinInlineMetadata(['Not proficient', 'PB not included']),
+            message: joinInlineMetadata([
+              resolveEquipmentNotProficientShortLabel(),
+              'PB not included',
+            ]),
             path,
           })
         }

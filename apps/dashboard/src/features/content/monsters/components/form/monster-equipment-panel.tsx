@@ -24,8 +24,6 @@ import {
   EquipmentCategoryGroupedList,
   EquipmentInventorySectionHeader,
   EquipmentInstanceEditorDrawer,
-  mapEquipmentInstanceInventoryStatus,
-  mergeEquipmentInventoryCatalogReferenceStatus,
 } from '@/features/content'
 import {
   EquipmentPickerDrawer,
@@ -47,6 +45,9 @@ import {
 import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
 import { findActionsReferencingEntry } from '../../lib/actions/monster-action-equipment-references'
 import { commitEquipmentEntryRemoval } from '../../lib/equipment/commit-equipment-entry-removal.lib'
+import { coerceCreatureWeaponProficienciesForForm } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
+import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
+import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/resolve-monster-weapon-is-proficient.lib'
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
@@ -80,13 +81,21 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
   const magicProvider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
 
+  const weaponGrants = useMemo(
+    () => coerceCreatureWeaponProficienciesForForm(values?.proficiencies?.weapons),
+    [values?.proficiencies?.weapons],
+  )
+
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []
   const pickerItems = useMemo(
     () =>
       enrichEquipmentPickerItemsWithSearchDocument(
-        buildLoadoutEquipmentPickerItems(referenceOptions),
+        buildLoadoutEquipmentPickerItems(referenceOptions, {
+          resolveIsProficient: (equipment) =>
+            resolveMonsterLoadoutEquipmentIsProficient(equipment, weaponGrants),
+        }),
       ),
-    [referenceOptions],
+    [referenceOptions, weaponGrants],
   )
 
   const equipment = values?.equipment ?? []
@@ -184,12 +193,17 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
           const item = catalog.get(entry.equipmentId)
           const catalogMissing = !item
           const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
-          const inventoryStatus = mapEquipmentInstanceInventoryStatus(summary)
           const label = summary.displayName
-          const rowStatus = mergeEquipmentInventoryCatalogReferenceStatus(
-            inventoryStatus.status,
+          const isProficient = item
+            ? resolveMonsterLoadoutEquipmentIsProficient(item, weaponGrants)
+            : true
+          const inventoryStatus = resolveMonsterEquipmentRowStatus({
+            summary,
+            catalogItem: item,
             catalogMissing,
-          )
+            isProficient,
+          })
+          const rowStatus = inventoryStatus.status
           return (
             <ContentFormEntitySelectionRow
               entity={{

@@ -7,7 +7,10 @@ import { describe, expect, it } from 'vitest'
 import { pickEquipment } from '@/test/fixtures/pick'
 
 import { mapEquipmentInstanceInventoryStatus } from '@/features/content'
-import { resolveEquipmentInstanceSummary } from '@rpg/contracts'
+import {
+  resolveEquipmentInstanceSummary,
+  resolveEquipmentNotProficientShortLabel,
+} from '@rpg/contracts'
 import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/features/content'
 import { MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL } from '../../lib/monster-form-labels'
 import {
@@ -19,20 +22,27 @@ import { MonsterEquipmentPanel } from './monster-equipment-panel'
 function Host({
   defaultValues,
   formRef,
+  catalogEquipment = [pickEquipment('dagger')],
 }: {
   defaultValues: MonsterFormValues
   formRef?: { current: UseFormReturn<MonsterFormValues> | null }
+  catalogEquipment?: ReturnType<typeof pickEquipment>[]
 }) {
-  const dagger = pickEquipment('dagger')
   const form = useForm<MonsterFormValues>({ defaultValues })
   if (formRef) formRef.current = form
+  const equipmentCatalogById = new Map(catalogEquipment.map((item) => [item.id, item]))
   return (
     <FormProvider {...form}>
       <MonsterEquipmentPanel
         ctx={{
           equipmentCatalogStatus: 'ready',
-          equipmentCatalogById: new Map([[dagger.id, dagger]]),
+          equipmentCatalogById,
           rulesetId: 'srd-cc-5.2.1',
+          options: {
+            equipment: {
+              forReference: () => catalogEquipment,
+            },
+          },
         }}
       />
     </FormProvider>
@@ -57,8 +67,94 @@ describe('MonsterEquipmentPanel', () => {
     )
 
     expect(screen.getByText(EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE)).toBeInTheDocument()
+    expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
     expect(screen.queryByLabelText(/Customize/i)).not.toBeInTheDocument()
     expect(screen.getByLabelText('Remove removed-from-catalog')).toBeInTheDocument()
+  })
+
+  it('shows Not proficient before Equipped when the weapon is not granted', () => {
+    const greataxe = pickEquipment('greataxe')
+    render(
+      <Host
+        catalogEquipment={[greataxe]}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          equipment: [
+            {
+              entryId: 'g1',
+              equipmentId: greataxe.id,
+              quantity: 1,
+              equipped: true,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByText(resolveEquipmentNotProficientShortLabel())).toBeInTheDocument()
+    expect(screen.getByText('Equipped')).toBeInTheDocument()
+  })
+
+  it('omits Not proficient when the creature has martial weapon proficiency', () => {
+    const greataxe = pickEquipment('greataxe')
+    render(
+      <Host
+        catalogEquipment={[greataxe]}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          proficiencies: {
+            ...resolveMonsterCreateDefaultValues().proficiencies,
+            weapons: { categories: ['martial'], items: [] },
+          },
+          equipment: [
+            {
+              entryId: 'g1',
+              equipmentId: greataxe.id,
+              quantity: 1,
+              equipped: true,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
+  })
+
+  it('updates inventory and picker badges when weapon proficiencies change', async () => {
+    const greataxe = pickEquipment('greataxe')
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const user = userEvent.setup()
+    render(
+      <Host
+        formRef={formRef}
+        catalogEquipment={[greataxe]}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          equipment: [
+            {
+              entryId: 'g1',
+              equipmentId: greataxe.id,
+              quantity: 1,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByText(resolveEquipmentNotProficientShortLabel())).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /add equipment/i }))
+    expect(screen.getAllByText(resolveEquipmentNotProficientShortLabel()).length).toBeGreaterThan(1)
+
+    act(() => {
+      formRef.current?.setValue(
+        'proficiencies.weapons',
+        { categories: ['martial'], items: [] },
+        { shouldDirty: true },
+      )
+    })
+
+    expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
   })
 
   it('shows unresolved preset metadata and opens the customize editor', async () => {

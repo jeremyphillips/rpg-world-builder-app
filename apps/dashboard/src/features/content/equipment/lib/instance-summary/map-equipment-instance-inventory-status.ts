@@ -6,6 +6,11 @@ import { joinInlineMetadata } from '@rpg/contracts/primitives'
 
 import type { EntitySummaryStatusItem } from '../../../lib/entity/summary/entity-summary-status.types'
 
+import {
+  EQUIPMENT_INSTANCE_EQUIPPED_STATUS_LABEL,
+  EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
+} from './equipment-instance-status-labels.lib'
+
 function integrityWarningLabel(
   warnings: readonly EquipmentInstanceIntegrityWarning[],
 ): string | undefined {
@@ -27,10 +32,19 @@ export function mapEquipmentInstanceInventoryStatus(summary: EquipmentInstanceSu
   const status: EntitySummaryStatusItem[] = []
 
   if (summary.equipped) {
-    status.push({ kind: 'badge', label: 'Equipped', tone: 'success' })
+    status.push({
+      kind: 'badge',
+      label: EQUIPMENT_INSTANCE_EQUIPPED_STATUS_LABEL,
+      tone: 'success',
+    })
   }
   if (summary.magical) {
-    status.push({ kind: 'badge', label: 'Magical', tone: 'neutral', appearance: 'soft' })
+    status.push({
+      kind: 'badge',
+      label: EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
+      tone: 'neutral',
+      appearance: 'soft',
+    })
   }
   if (summary.metadataSegments.length > 0) {
     status.push({

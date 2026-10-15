@@ -9,6 +9,11 @@ import {
   type MagicPropertyCategory,
 } from '@rpg/contracts'
 
+import {
+  EQUIPMENT_INSTANCE_EQUIPPED_STATUS_LABEL,
+  EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL,
+} from '../instance-summary/equipment-instance-status-labels.lib'
+
 import type { EquipmentEditorState } from './equipment-editor-types'
 
 export const EQUIPMENT_INSTANCE_EDITOR_DONE_LABEL = 'Done'
@@ -31,10 +36,10 @@ export const EQUIPMENT_INSTANCE_EDITOR_REMOVE_PROPERTY_LABEL = 'Remove property'
 export const EQUIPMENT_INSTANCE_EDITOR_SAVE_PROPERTY_LABEL = 'Save property'
 export const EQUIPMENT_INSTANCE_EDITOR_CREATE_PROPERTY_LABEL = 'Create property'
 
-export const EQUIPMENT_INSTANCE_EDITOR_EQUIPPED_LABEL = 'Equipped'
+export const EQUIPMENT_INSTANCE_EDITOR_EQUIPPED_LABEL = EQUIPMENT_INSTANCE_EQUIPPED_STATUS_LABEL
 export const EQUIPMENT_INSTANCE_EDITOR_EQUIPPED_HINT =
   'Show this item as equipped on the stat block.'
-export const EQUIPMENT_INSTANCE_EDITOR_MAGICAL_LABEL = 'Magical'
+export const EQUIPMENT_INSTANCE_EDITOR_MAGICAL_LABEL = EQUIPMENT_INSTANCE_MAGICAL_STATUS_LABEL
 export const EQUIPMENT_INSTANCE_EDITOR_MAGICAL_HINT =
   'Treat this item as magical. Properties are optional.'
 
