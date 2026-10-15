@@ -16,6 +16,8 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
+import { resolveEquipmentFilterValues } from '@/lib/equipment/resolve-equipment-filter-values.lib'
+
 import { shouldPresentContentSource } from '../content-type-presentation'
 
 const HOMEBREW_OPTION_DESCRIPTION = 'Homebrew'
@@ -77,18 +79,28 @@ export function referenceEquipmentFieldOptions(
 export function referenceWeaponFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
-  return toSortedContentFieldOptions(
-    selectors?.forReference().filter(isWeaponEquipment),
-    'equipment',
+  return sortFieldOptions(
+    selectors
+      ?.forReference()
+      .filter(isWeaponEquipment)
+      .map((item) => ({
+        ...toContentFieldOption(item, 'equipment'),
+        filterValues: resolveEquipmentFilterValues(item),
+      })) ?? [],
   )
 }
 
 export function referenceArmorFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
-  return toSortedContentFieldOptions(
-    selectors?.forReference().filter(isArmorEquipment),
-    'equipment',
+  return sortFieldOptions(
+    selectors
+      ?.forReference()
+      .filter(isArmorEquipment)
+      .map((item) => ({
+        ...toContentFieldOption(item, 'equipment'),
+        filterValues: resolveEquipmentFilterValues(item),
+      })) ?? [],
   )
 }
 
@@ -101,7 +113,7 @@ export function referenceToolFieldOptions(
       .filter((item): item is ToolEquipment => item.kind === 'tool')
       .map((item) => ({
         ...toContentFieldOption(item, 'equipment'),
-        filterCategory: item.toolCategory,
+        filterValues: resolveEquipmentFilterValues(item),
         classification: TOOL_CATEGORY_ENTRIES[item.toolCategory].label,
       })) ?? [],
   )

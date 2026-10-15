@@ -1243,9 +1243,10 @@ export {
   type ComboboxSelectedItemRenderContext,
 } from './components/ui/combobox-field.client'
 export {
-  ComboboxFilterSelect,
-  type ComboboxFilterSelectProps,
-} from './form/renderers/fields/combobox-filter-select.client'
+  SharedFilterSelect,
+  type SharedFilterSelectOption,
+  type SharedFilterSelectProps,
+} from './filters/shared-filter-select.client'
 export {
   InputSelectField,
   InputUnitField,

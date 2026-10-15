@@ -4,11 +4,7 @@ import {
   type Location,
   type LocationKind,
 } from '@rpg/contracts'
-import {
-  COMBOBOX_FILTER_ALL_VALUE,
-  type ComboboxFilterSelectConfig,
-  type FieldOption,
-} from '@rpg/ui/form'
+import type { ComboboxFilterDimensionConfig, FieldOption } from '@rpg/ui/form'
 
 import {
   canonicalFieldsForAuthoringType,
@@ -43,25 +39,28 @@ export function buildValidParentLocationFieldOptions(
     .map((location) => ({
       value: location.id,
       label: location.name,
-      filterCategory: location.kind,
+      filterValues: { kind: location.kind },
       classification: getLocationKindLabel(location.kind),
     }))
     .sort((left, right) => left.label.localeCompare(right.label))
 }
 
-export function buildParentLocationKindFilterSelect(
+export function buildParentLocationKindFilterSelects(
   childKind: LocationKind,
-): ComboboxFilterSelectConfig {
+): readonly ComboboxFilterDimensionConfig[] {
   const kindOptions: FieldOption[] = getAllowedParentKinds(childKind).map((kind) => ({
     value: kind,
     label: getLocationKindLabel(kind),
   }))
 
-  return {
-    ariaLabel: 'Filter parent locations by kind',
-    options: [{ value: COMBOBOX_FILTER_ALL_VALUE, label: 'All kinds' }, ...kindOptions],
-    defaultValue: COMBOBOX_FILTER_ALL_VALUE,
-  }
+  return [
+    {
+      filterKey: 'kind',
+      ariaLabel: 'Filter parent locations by kind',
+      options: kindOptions,
+      allOptionLabel: 'All kinds',
+    },
+  ]
 }
 
 function enrichParentLocationOption(
@@ -72,7 +71,7 @@ function enrichParentLocationOption(
   if (!location) return option
   return {
     ...option,
-    filterCategory: location.kind,
+    filterValues: { kind: location.kind },
     classification: getLocationKindLabel(location.kind),
   }
 }
@@ -107,19 +106,24 @@ export function buildParentLocationComboboxOptionsResolve(
   }
 }
 
-export function buildParentLocationFilterSelectResolve() {
+export function buildParentLocationFilterSelectsResolve() {
   return {
     dependsOn: ['authoringType'] as const,
-    filterSelectWhen: (values: Record<string, unknown>): ComboboxFilterSelectConfig => {
+    filterSelectsWhen: (
+      values: Record<string, unknown>,
+    ): readonly ComboboxFilterDimensionConfig[] => {
       const childKind = resolveChildKindFromFormValues(values)
       if (!childKind) {
-        return {
-          ariaLabel: 'Filter parent locations by kind',
-          options: [{ value: COMBOBOX_FILTER_ALL_VALUE, label: 'All kinds' }],
-          defaultValue: COMBOBOX_FILTER_ALL_VALUE,
-        }
+        return [
+          {
+            filterKey: 'kind',
+            ariaLabel: 'Filter parent locations by kind',
+            options: [],
+            allOptionLabel: 'All kinds',
+          },
+        ]
       }
-      return buildParentLocationKindFilterSelect(childKind)
+      return buildParentLocationKindFilterSelects(childKind)
     },
   }
 }

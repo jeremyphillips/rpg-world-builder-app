@@ -14,7 +14,7 @@ import {
   Badge,
   Button,
   ComboboxField,
-  ComboboxFilterSelect,
+  SharedFilterSelect,
   ConfirmDialog,
   RowActionsMenu,
   SelectionOptionCardHeaderAction,
@@ -742,14 +742,15 @@ function AdditionalEquipmentPicker({
       emptyMessage="No matching items"
       filter={
         !disabled && activeKind ? (
-          <ComboboxFilterSelect
+          <SharedFilterSelect
             ariaLabel={QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL}
-            value={activeKind}
+            selectValue={activeKind}
+            showAllOption={false}
             options={kindOptions.map((kind) => ({
               value: kind,
               label: getEquipmentKindCollectionLabel(kind),
             }))}
-            onValueChange={(next) => {
+            onSelectValueChange={(next) => {
               onKindChange(next as (typeof kindOptions)[number])
             }}
           />

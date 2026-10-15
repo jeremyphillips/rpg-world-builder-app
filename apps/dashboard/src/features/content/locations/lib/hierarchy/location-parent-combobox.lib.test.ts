@@ -6,7 +6,7 @@ import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../../fixtures
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildParentLocationComboboxOptionsResolve,
-  buildParentLocationKindFilterSelect,
+  buildParentLocationKindFilterSelects,
   buildValidParentLocationFieldOptions,
 } from './location-parent-combobox.lib'
 
@@ -19,15 +19,15 @@ describe('buildValidParentLocationFieldOptions', () => {
     )
 
     expect(options.map((option) => option.value)).toEqual([DOCK_WARD.id, HARBORFORD.id])
-    expect(options[0]?.filterCategory).toBe('district')
+    expect(options[0]?.filterValues?.kind).toBe('district')
     expect(options[0]?.classification).toBe('District')
   })
 })
 
-describe('buildParentLocationKindFilterSelect', () => {
+describe('buildParentLocationKindFilterSelects', () => {
   it('lists only allowed parent kinds for the child', () => {
-    const filter = buildParentLocationKindFilterSelect('region')
-    expect(filter.options.map((option) => option.value)).toEqual(['all', 'world', 'region'])
+    const [filter] = buildParentLocationKindFilterSelects('region')
+    expect(filter?.options.map((option) => option.value)).toEqual(['world', 'region'])
   })
 })
 

@@ -6,7 +6,6 @@ import { z } from 'zod'
 
 import {
   buildDefaultValues,
-  COMBOBOX_FILTER_ALL_VALUE,
   fieldDefaultValue,
   type ComboboxFieldConfig,
   type FormItem,
@@ -182,7 +181,7 @@ describe('Form combobox field', () => {
     expect(screen.getByRole('option', { name: 'Longbow' })).toBeInTheDocument()
   })
 
-  it('filters combobox options by category from filterSelect', async () => {
+  it('filters combobox options by category from filterSelects', async () => {
     const user = userEvent.setup()
     const schema = z.object({ tools: z.array(z.string()) })
     const fields: FormItem[] = [
@@ -195,22 +194,25 @@ describe('Form combobox field', () => {
           {
             value: 'thieves-tools',
             label: "Thieves' tools",
-            filterCategory: 'thieves',
+            filterValues: { category: 'thieves' },
           },
           {
             value: 'lute',
             label: 'Lute',
-            filterCategory: 'musical_instrument',
+            filterValues: { category: 'musical_instrument' },
           },
         ],
-        filterSelect: {
-          ariaLabel: 'Filter by tool category',
-          options: [
-            { value: COMBOBOX_FILTER_ALL_VALUE, label: 'All categories' },
-            { value: 'thieves', label: "Thieves' tools" },
-            { value: 'musical_instrument', label: 'Musical instrument' },
-          ],
-        },
+        filterSelects: [
+          {
+            filterKey: 'category',
+            ariaLabel: 'Filter by tool category',
+            options: [
+              { value: 'thieves', label: "Thieves' tools" },
+              { value: 'musical_instrument', label: 'Musical instrument' },
+            ],
+            allOptionLabel: 'All categories',
+          },
+        ],
       },
     ]
 

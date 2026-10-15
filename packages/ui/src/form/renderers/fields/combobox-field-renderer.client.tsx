@@ -10,14 +10,11 @@ import type { ActiveDimensionFilters, ComboboxFieldConfig } from '../../field-co
 import { fieldDefaultValue } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
-import { ComboboxFilterSelect } from './combobox-filter-select.client'
 import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../components/ui/combobox-field.types'
 import {
-  composeComboboxResolveFilteredOptions,
   composeComboboxResolveFilteredOptionsFromActive,
   reconcileActiveDimensionFilters,
-  resolveComboboxFilterDefaultValue,
   resolveInitialActiveDimensionFilters,
   toComboboxFieldOptions,
   toFieldOptions,
@@ -51,7 +48,7 @@ function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
   return { dimensionConfigs, active, setActive }
 }
 
-/** RHF adapter for `ComboboxField` with optional category filter toolbar support. */
+/** RHF adapter for `ComboboxField` with optional dimension filter toolbar support. */
 export function ComboboxFieldRenderer({
   config,
   controlSize,
@@ -69,45 +66,22 @@ export function ComboboxFieldRenderer({
 
   const { dimensionConfigs, active, setActive } = useComboboxDimensionFilters(config)
 
-  const [categoryFilter, setCategoryFilter] = React.useState(() =>
-    config.filterSelect ? resolveComboboxFilterDefaultValue(config.filterSelect) : undefined,
-  )
-
-  const effectiveCategoryFilter = React.useMemo(() => {
-    if (!config.filterSelect) return undefined
-    const isValid = config.filterSelect.options.some((option) => option.value === categoryFilter)
-    if (isValid) return categoryFilter
-    return resolveComboboxFilterDefaultValue(config.filterSelect)
-  }, [categoryFilter, config.filterSelect])
-
   const resolveFilteredOptions = React.useMemo((): ResolveComboboxFilteredOptions | undefined => {
-    if (dimensionConfigs.length > 0) {
-      const formResolver = composeComboboxResolveFilteredOptionsFromActive(
-        active,
-        config.resolveFilteredOptions,
-      )
+    if (dimensionConfigs.length === 0) {
+      if (!config.resolveFilteredOptions) return undefined
       return (options, query, selected) =>
-        toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
+        toComboboxFieldOptions(
+          config.resolveFilteredOptions!(toFieldOptions(options), query, selected),
+        )
     }
 
-    const formResolver = config.filterSelect
-      ? composeComboboxResolveFilteredOptions(
-          effectiveCategoryFilter!,
-          config.resolveFilteredOptions,
-        )
-      : config.resolveFilteredOptions
-
-    if (!formResolver) return undefined
-
+    const formResolver = composeComboboxResolveFilteredOptionsFromActive(
+      active,
+      config.resolveFilteredOptions,
+    )
     return (options, query, selected) =>
       toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
-  }, [
-    active,
-    dimensionConfigs.length,
-    effectiveCategoryFilter,
-    config.filterSelect,
-    config.resolveFilteredOptions,
-  ])
+  }, [active, dimensionConfigs.length, config.resolveFilteredOptions])
 
   const filter =
     dimensionConfigs.length > 0 ? (
@@ -115,13 +89,6 @@ export function ComboboxFieldRenderer({
         dimensionConfigs={dimensionConfigs}
         active={active}
         onActiveChange={setActive}
-      />
-    ) : config.filterSelect ? (
-      <ComboboxFilterSelect
-        ariaLabel={config.filterSelect.ariaLabel}
-        options={config.filterSelect.options}
-        value={effectiveCategoryFilter!}
-        onValueChange={setCategoryFilter}
       />
     ) : undefined
 

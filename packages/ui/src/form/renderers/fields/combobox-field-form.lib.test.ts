@@ -1,12 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { COMBOBOX_FILTER_ALL_VALUE } from '../../field-config'
 import {
-  composeComboboxResolveFilteredOptions,
   composeComboboxResolveFilteredOptionsFromActive,
   dimensionValueToSelectValue,
   filterComboboxOptionsByActiveFilters,
-  filterComboboxOptionsByCategory,
   reconcileActiveDimensionFilters,
   selectValueToDimensionValue,
   toComboboxFieldOptions,
@@ -56,13 +53,6 @@ describe('toComboboxFieldOptions', () => {
         disabledReason: 'Already in Vulnerabilities',
       },
     ])
-  })
-
-  it('bridges legacy filterCategory to filterValues.category', () => {
-    expect(
-      toComboboxFieldOptions([{ value: 'x', label: 'X', filterCategory: 'thieves' }])[0]
-        ?.filterValues,
-    ).toEqual({ category: 'thieves' })
   })
 })
 
@@ -154,26 +144,6 @@ describe('reconcileActiveDimensionFilters', () => {
   })
 })
 
-describe('filterComboboxOptionsByCategory', () => {
-  it('returns all options when the filter is "all"', () => {
-    expect(
-      filterComboboxOptionsByCategory(
-        toComboboxFieldOptions(toolOptions),
-        COMBOBOX_FILTER_ALL_VALUE,
-        [],
-      ),
-    ).toEqual(toComboboxFieldOptions(toolOptions))
-  })
-
-  it('keeps selected values visible when they fall outside the active category', () => {
-    const panel = toComboboxFieldOptions(toolOptions)
-    expect(filterComboboxOptionsByCategory(panel, 'thieves', ['lute'])).toEqual([
-      panel[0],
-      panel[1],
-    ])
-  })
-})
-
 describe('composeComboboxResolveFilteredOptionsFromActive', () => {
   it('applies dimension filtering before the default query filter', () => {
     const resolver = composeComboboxResolveFilteredOptionsFromActive(
@@ -182,19 +152,5 @@ describe('composeComboboxResolveFilteredOptionsFromActive', () => {
     )!
     expect(resolver(toolOptions, 'lute', [])).toEqual([])
     expect(resolver(toolOptions, 'thieves', [])).toEqual([toolOptions[0]])
-  })
-})
-
-describe('composeComboboxResolveFilteredOptions', () => {
-  it('applies category filtering before the default query filter', () => {
-    const legacyOptions = toolOptions.map(({ filterValues, ...rest }) => ({
-      ...rest,
-      filterCategory: filterValues?.category,
-    }))
-    const resolver = composeComboboxResolveFilteredOptions('thieves', undefined)!
-    expect(resolver(legacyOptions, 'lute', [])).toEqual([])
-    expect(resolver(legacyOptions, 'thieves', [])).toEqual([
-      { ...legacyOptions[0], filterValues: { category: 'thieves' } },
-    ])
   })
 })

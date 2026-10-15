@@ -2,7 +2,6 @@ import { filterOptions } from '../../../components/ui/combobox-field.lib'
 import { FILTER_SELECT_ALL_VALUE as COMBOBOX_DIMENSION_SELECT_ALL_VALUE } from '../../../filters/filter-bar.variants'
 import type { ComboboxFieldOption } from '../../../components/ui/combobox-field.types'
 import {
-  COMBOBOX_FILTER_ALL_VALUE,
   type ActiveDimensionFilters,
   type ComboboxFieldConfig,
   type ComboboxFilterDimensionConfig,
@@ -15,32 +14,25 @@ export { COMBOBOX_DIMENSION_SELECT_ALL_VALUE }
 /** Maps form-layer options to combobox panel options. */
 export function toComboboxFieldOptions(options: FieldOption[]): ComboboxFieldOption[] {
   return options.map(
-    ({ description, classification, filterCategory, filterValues, disabledReason, ...option }) => ({
+    ({ description, classification, filterValues, disabledReason, ...option }) => ({
       ...option,
       ...(disabledReason !== undefined ? { disabledReason } : {}),
       ...(description !== undefined ? { metadata: description } : {}),
       ...(classification !== undefined ? { classification } : {}),
-      ...(filterValues !== undefined
-        ? { filterValues }
-        : filterCategory !== undefined
-          ? { filterCategory, filterValues: { category: filterCategory } }
-          : {}),
+      ...(filterValues !== undefined ? { filterValues } : {}),
     }),
   )
 }
 
 /** Maps combobox panel options back to form-layer options. */
 export function toFieldOptions(options: ComboboxFieldOption[]): FieldOption[] {
-  return options.map(
-    ({ metadata, classification, filterCategory, filterValues, disabledReason, ...option }) => ({
-      ...option,
-      ...(disabledReason !== undefined ? { disabledReason } : {}),
-      ...(metadata !== undefined ? { description: metadata } : {}),
-      ...(classification !== undefined ? { classification } : {}),
-      ...(filterValues !== undefined ? { filterValues } : {}),
-      ...(filterCategory !== undefined ? { filterCategory } : {}),
-    }),
-  )
+  return options.map(({ metadata, classification, filterValues, disabledReason, ...option }) => ({
+    ...option,
+    ...(disabledReason !== undefined ? { disabledReason } : {}),
+    ...(metadata !== undefined ? { description: metadata } : {}),
+    ...(classification !== undefined ? { classification } : {}),
+    ...(filterValues !== undefined ? { filterValues } : {}),
+  }))
 }
 
 export function dimensionValueToSelectValue(value: FilterDimensionValue): string {
@@ -54,9 +46,7 @@ export function selectValueToDimensionValue(value: string): FilterDimensionValue
 function resolveOptionFilterValues(
   option: ComboboxFieldOption,
 ): Readonly<Record<string, string>> | undefined {
-  if (option.filterValues) return option.filterValues
-  if (option.filterCategory !== undefined) return { category: option.filterCategory }
-  return undefined
+  return option.filterValues
 }
 
 function validateDimensionDefault(
@@ -120,22 +110,6 @@ export function filterComboboxOptionsByActiveFilters(
   })
 }
 
-export function resolveComboboxFilterDefaultValue(
-  filterSelect: NonNullable<ComboboxFieldConfig['filterSelect']>,
-): string {
-  return filterSelect.defaultValue ?? filterSelect.options[0]?.value ?? COMBOBOX_FILTER_ALL_VALUE
-}
-
-/** @deprecated Legacy single-dimension category filter. */
-export function filterComboboxOptionsByCategory(
-  options: ComboboxFieldOption[],
-  category: string,
-  selected: string[],
-): ComboboxFieldOption[] {
-  const active: ActiveDimensionFilters = category === COMBOBOX_FILTER_ALL_VALUE ? {} : { category }
-  return filterComboboxOptionsByActiveFilters(options, active, selected)
-}
-
 export function composeComboboxResolveFilteredOptionsFromActive(
   active: ActiveDimensionFilters,
   userResolver: ComboboxFieldConfig['resolveFilteredOptions'],
@@ -154,15 +128,6 @@ export function composeComboboxResolveFilteredOptionsFromActive(
 
     return toFieldOptions(filterOptions(dimensionFiltered, query, selected))
   }
-}
-
-/** @deprecated Legacy single-dimension compose helper. */
-export function composeComboboxResolveFilteredOptions(
-  category: string,
-  userResolver: ComboboxFieldConfig['resolveFilteredOptions'],
-): ComboboxFieldConfig['resolveFilteredOptions'] {
-  const active: ActiveDimensionFilters = category === COMBOBOX_FILTER_ALL_VALUE ? {} : { category }
-  return composeComboboxResolveFilteredOptionsFromActive(active, userResolver)
 }
 
 export function resolveComboboxDimensionAllOptionLabel(

@@ -7,6 +7,8 @@ import {
   joinInlineMetadata,
 } from '@rpg/contracts'
 
+import { resolveEquipmentFilterValues } from '@/lib/equipment/resolve-equipment-filter-values.lib'
+
 export const EQUIPMENT_PICKER_HIDE_NON_PROFICIENT_LABEL = 'Hide non-proficient'
 export const EQUIPMENT_PICKER_WEAPON_FILTER_LABEL = 'Weapon'
 export const EQUIPMENT_PICKER_ARMOR_FILTER_LABEL = 'Armor'
@@ -186,7 +188,10 @@ export function matchesArmorDetailFilters(
   const armor = armorOf(item)
   if (!armor) return true
   if (!selectedIncludes(filters.categories, armor.category)) return false
-  if (filters.stealth.includes('no-stealth-disadvantage') && armor.stealthDisadvantage) return false
+  if (filters.stealth.includes('no-stealth-disadvantage')) {
+    const stealthSlug = resolveEquipmentFilterValues(item.equipment)?.stealth
+    if (stealthSlug !== 'none') return false
+  }
   if (filters.strength.includes('hide-unmet-strength') && equipmentPickerHasUnmetStrength(item)) {
     return false
   }
