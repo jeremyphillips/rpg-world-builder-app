@@ -438,8 +438,9 @@ like `compact`.
 Compact entity titles stay 14px (`text-sm`). Classification, its middle dot, and title-line
 end text are 12px (`text-xs` on the classification and dot, `text-style-caption` on the
 heading end slot). Price and grant-preview text in the trailing group secondary slot are
-12px (`text-xs`). List rows keep a single shared size and do not use the heading recipe.
-Trailing-rail quantity and meta stay 14px.
+12px (`text-xs`). Trailing meta and value labels (`Purchased · 10 GP`) are 12px
+(`text-xs`). List rows keep a single shared size and do not use the heading recipe.
+Trailing-rail quantity marks stay 14px.
 
 ---
 
@@ -511,7 +512,7 @@ trailing
 ```
 
 `resolveEntityAnatomyTrailingCells` maps each kind onto exactly one RowAnatomy cell. Kinds
-never choose their own alignment. `meta` renders as muted `text-sm` before the control
+never choose their own alignment. `meta` renders as muted `text-xs` before the control
 inside that same cell. It does not add a second cell.
 
 | Kind        | Type contract                                                                         | Cell                                     | Use                                                                                          |

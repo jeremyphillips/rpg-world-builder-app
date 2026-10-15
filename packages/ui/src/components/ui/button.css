@@ -198,6 +198,8 @@
     height: var(--control-height-compact);
     padding-inline: calc(var(--spacing) * 2);
     padding-block: 0;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
     gap: var(--control-gap-xs);
   }
 
@@ -311,6 +313,8 @@
 
   .ui-button__text--sm {
     height: var(--control-height-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
     gap: var(--control-gap-sm);
   }
 
@@ -321,6 +325,8 @@
 
   .ui-button__text--sm-compact {
     height: var(--control-height-compact);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
     gap: var(--control-gap-xs);
   }
 
@@ -415,6 +421,8 @@
 
   .ui-button--attached-sm {
     gap: var(--control-gap-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
   }
 
   .ui-button--attached-sm svg {

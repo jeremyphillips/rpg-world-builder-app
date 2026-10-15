@@ -121,7 +121,8 @@ describe('EquipmentInventoryRowItem', () => {
     render(<EquipmentInventoryRowItem display={{ kind: 'single', row }} onRemoveItem={vi.fn()} />)
 
     const priceLine = screen.getByText('2 GP each · Qty 2 · 4 GP total')
-    expect(priceLine).toHaveClass('text-sm')
+    expect(priceLine).toHaveClass('text-xs')
+    expect(priceLine).not.toHaveClass('text-sm')
     expect(screen.queryByText('Qty 2')).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /Remove all/ })).not.toBeInTheDocument()
   })

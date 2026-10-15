@@ -11,8 +11,8 @@ export const entityAnatomyTrailingIndicatorVariants = cva('flex shrink-0 text-mu
 /** Quantity end slot — 14px, independent of the card body size. */
 export const entityAnatomyTrailingQuantityLabelVariants = cva('text-sm tabular-nums')
 
-/** Inline provenance or price sitting before a trailing control. */
-export const entityAnatomyTrailingMetaVariants = cva('shrink-0 text-style-supporting')
+/** Provenance and value copy in the trailing band — 12px. Quantity marks stay 14px. */
+export const entityAnatomyTrailingMetaVariants = cva('shrink-0 text-xs')
 
 /** Price or rarity-choice label in the trailing band — 12px, foreground. */
 export const entityAnatomyTrailingGroupSecondaryVariants = cva(

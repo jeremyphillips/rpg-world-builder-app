@@ -159,6 +159,26 @@ describe('EntityAnatomy trailing kind to cell', () => {
     expect(screen.getByText('×3')).toHaveClass('text-sm')
   })
 
+  it('renders provenance labels and meta at 12px while quantity stays 14px', () => {
+    renderAnatomy({
+      trailing: { kind: 'indicator', variant: 'label', label: 'Purchased · 10 GP' },
+    })
+    expect(screen.getByText('Purchased · 10 GP')).toHaveClass('text-xs')
+    expect(screen.getByText('Purchased · 10 GP')).not.toHaveClass('text-sm')
+
+    renderAnatomy({
+      trailing: {
+        kind: 'indicator',
+        variant: 'quantity',
+        quantity: 2,
+        format: 'additional',
+        meta: 'Purchased · 4 GP',
+      },
+    })
+    expect(screen.getByText('+2')).toHaveClass('text-sm')
+    expect(screen.getByText('Purchased · 4 GP')).toHaveClass('text-xs')
+  })
+
   it('renders an additional quantity including one', () => {
     renderAnatomy({
       trailing: { kind: 'indicator', variant: 'quantity', quantity: 1, format: 'additional' },

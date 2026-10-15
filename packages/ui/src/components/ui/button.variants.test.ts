@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
 import { buttonVariants } from './button.variants'
@@ -73,6 +76,23 @@ describe('buttonVariants matrix', () => {
     const classes = classesFor({ variant: 'outline', size: 'sm', density: 'default' })
     expect(classes).toContain('ui-button--sm')
     expect(classes).toContain('ui-button--outline')
+  })
+
+  it('keeps every sm modifier at text-xs so compact, text, and attached do not inherit 14px', () => {
+    const source = readFileSync(join(__dirname, 'button.css'), 'utf8')
+    const modifiers = [
+      '.ui-button--sm {',
+      '.ui-button--sm-compact {',
+      '.ui-button__text--sm {',
+      '.ui-button__text--sm-compact {',
+      '.ui-button--attached-sm {',
+    ]
+
+    for (const modifier of modifiers) {
+      const start = source.indexOf(modifier)
+      const block = source.slice(start, source.indexOf('}', start))
+      expect(block, modifier).toContain('font-size: var(--text-xs)')
+    }
   })
 
   it('maps text xs compact to semantic text geometry', () => {
