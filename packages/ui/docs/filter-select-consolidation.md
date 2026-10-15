@@ -10,10 +10,10 @@
 
 ## Phase split
 
-| Phase | Work                                                                                                            |
-| ----- | --------------------------------------------------------------------------------------------------------------- |
-| **2** | Combobox panel toolbar uses `SharedFilterSelect` (injects All row; concrete slugs only in config)               |
-| **4** | Refactor `FilterSelectControl` menu/trigger onto the same module; trim `ComboboxFilterSelect` to a thin wrapper |
+| Phase | Work                                                                                                                 |
+| ----- | -------------------------------------------------------------------------------------------------------------------- |
+| **2** | Combobox panel toolbar uses `SharedFilterSelect` (injects All row; concrete slugs only in config)                    |
+| **4** | Refactor `FilterSelectControl` menu onto `SharedFilterSelectMenu`; combobox toolbar uses `SharedFilterSelect` (done) |
 
 ## Outcome (C) criteria (not chosen)
 

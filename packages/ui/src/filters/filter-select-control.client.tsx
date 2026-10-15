@@ -1,16 +1,10 @@
 'use client'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../components/ui/select.client'
+import { Select, SelectContent, SelectTrigger, SelectValue } from '../components/ui/select.client'
+import { SharedFilterSelectMenu } from './shared-filter-select.client'
 import { useFilterChrome } from './filter-chrome.context'
 import { getEffectiveFilterValue } from './filter-engine'
 import { normalizeFilterSelectChange, resolveSelectCurrentValue } from './filter-bar.lib'
-import { FILTER_SELECT_ALL_VALUE } from './filter-bar.variants'
 import {
   FilterSelectFieldChrome,
   resolveFilterSelectFieldLayout,
@@ -82,16 +76,11 @@ export function FilterSelectControl<TData, TState extends Record<string, unknown
 
   const menu = (
     <SelectContent>
-      {view.showAllOption ? (
-        <SelectItem value={FILTER_SELECT_ALL_VALUE}>
-          {selectField.allOptionLabel ?? `All ${selectField.label}`}
-        </SelectItem>
-      ) : null}
-      {view.options.map((option) => (
-        <SelectItem key={option.value} value={option.value}>
-          {option.label}
-        </SelectItem>
-      ))}
+      <SharedFilterSelectMenu
+        options={view.options}
+        showAllOption={view.showAllOption}
+        allOptionLabel={selectField.allOptionLabel ?? `All ${selectField.label}`}
+      />
     </SelectContent>
   )
 

@@ -130,6 +130,8 @@ export {
 
 export {
   SharedFilterSelect,
+  SharedFilterSelectMenu,
+  type SharedFilterSelectMenuProps,
   type SharedFilterSelectOption,
   type SharedFilterSelectProps,
 } from './shared-filter-select.client'

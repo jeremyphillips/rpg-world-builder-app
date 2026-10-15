@@ -16,6 +16,32 @@ export type SharedFilterSelectOption = {
   disabled?: boolean
 }
 
+export interface SharedFilterSelectMenuProps {
+  options: readonly SharedFilterSelectOption[]
+  allOptionLabel?: string
+  showAllOption?: boolean
+}
+
+/** Shared filter select menu items (All row + concrete slugs). */
+export function SharedFilterSelectMenu({
+  options,
+  allOptionLabel = 'All',
+  showAllOption = true,
+}: SharedFilterSelectMenuProps) {
+  return (
+    <>
+      {showAllOption ? (
+        <SelectItem value={FILTER_SELECT_ALL_VALUE}>{allOptionLabel}</SelectItem>
+      ) : null}
+      {options.map((option) => (
+        <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
+          {option.label}
+        </SelectItem>
+      ))}
+    </>
+  )
+}
+
 export interface SharedFilterSelectProps {
   id?: string
   ariaLabel: string
@@ -49,14 +75,11 @@ export function SharedFilterSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {showAllOption ? (
-          <SelectItem value={FILTER_SELECT_ALL_VALUE}>{allOptionLabel}</SelectItem>
-        ) : null}
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
-            {option.label}
-          </SelectItem>
-        ))}
+        <SharedFilterSelectMenu
+          options={options}
+          allOptionLabel={allOptionLabel}
+          showAllOption={showAllOption}
+        />
       </SelectContent>
     </Select>
   )
