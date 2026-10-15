@@ -6,19 +6,26 @@ import type { ControllerRenderProps } from 'react-hook-form'
 import { ComboboxField } from '../../../components/ui/combobox-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
-import type { ActiveDimensionFilters, ComboboxFieldConfig } from '../../field-config'
+import type {
+  ActiveDimensionFilters,
+  ComboboxFieldConfig,
+  ComboboxFilterDimensionConfig,
+} from '../../field-config'
 import { fieldDefaultValue } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../components/ui/combobox-field.types'
 import {
+  activeDimensionFiltersEqual,
   composeComboboxResolveFilteredOptionsFromActive,
   reconcileActiveDimensionFilters,
   resolveInitialActiveDimensionFilters,
   toComboboxFieldOptions,
   toFieldOptions,
 } from './combobox-field-form.lib'
+
+const EMPTY_FILTER_SELECTS: readonly ComboboxFilterDimensionConfig[] = []
 
 export interface ComboboxFieldRendererProps extends FieldValidationProps {
   config: ComboboxFieldConfig
@@ -31,10 +38,13 @@ export interface ComboboxFieldRendererProps extends FieldValidationProps {
 }
 
 function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
-  const dimensionConfigs = config.filterSelects ?? []
   const dimensionConfigsKey = React.useMemo(
-    () => JSON.stringify(dimensionConfigs),
-    [dimensionConfigs],
+    () => JSON.stringify(config.filterSelects ?? EMPTY_FILTER_SELECTS),
+    [config.filterSelects],
+  )
+  const dimensionConfigs = React.useMemo(
+    () => config.filterSelects ?? EMPTY_FILTER_SELECTS,
+    [dimensionConfigsKey],
   )
 
   const [active, setActive] = React.useState<ActiveDimensionFilters>(() =>
@@ -42,7 +52,10 @@ function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
   )
 
   React.useEffect(() => {
-    setActive((prev) => reconcileActiveDimensionFilters(prev, dimensionConfigs))
+    setActive((prev) => {
+      const next = reconcileActiveDimensionFilters(prev, dimensionConfigs)
+      return activeDimensionFiltersEqual(prev, next) ? prev : next
+    })
   }, [dimensionConfigsKey, dimensionConfigs])
 
   return { dimensionConfigs, active, setActive }

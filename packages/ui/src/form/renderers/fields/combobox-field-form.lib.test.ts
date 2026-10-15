@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { ComboboxFilterDimensionConfig, FieldOption } from '../../field-config'
 import {
+  activeDimensionFiltersEqual,
   composeComboboxResolveFilteredOptionsFromActive,
   dimensionValueToSelectValue,
   filterComboboxOptionsByActiveFilters,
@@ -93,6 +94,18 @@ describe('filterComboboxOptionsByActiveFilters', () => {
     expect(
       filterComboboxOptionsByActiveFilters(panelOptions, { category: 'thieves' }, ['lute']),
     ).toEqual([panelOptions[0], panelOptions[1]])
+  })
+})
+
+describe('activeDimensionFiltersEqual', () => {
+  it('returns true for equivalent filter maps', () => {
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, { category: 'simple' })).toBe(true)
+    expect(activeDimensionFiltersEqual({}, {})).toBe(true)
+  })
+
+  it('returns false when values or keys differ', () => {
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, { category: 'martial' })).toBe(false)
+    expect(activeDimensionFiltersEqual({ category: 'simple' }, {})).toBe(false)
   })
 })
 

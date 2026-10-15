@@ -24,13 +24,10 @@ import {
 
 import { languageGrantItemsField } from './language-grant-form-fields'
 import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
-import {
-  XOR_GRANT_SET_MODES,
-  type XorGrantSetMode,
-} from '@/lib/forms/mode-dependent-grant-set-form-fields'
 import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 import { WEAPON_PROFICIENCY_GRANT_MODES } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
-import { xorArmorProficiencyGrantSetField } from '@/lib/forms/grant-sets/xor-armor-proficiency-grant-field'
+import { ARMOR_PROFICIENCY_GRANT_MODES } from '@/lib/forms/grant-sets/armor-proficiency-grant-mode.lib'
+import { levelZeroArmorProficiencyGrantSetField } from '@/lib/forms/grant-sets/level-zero-armor-proficiency-grant-field'
 
 export const LEVEL_ZERO_NPCS_ENABLED = 'levelZeroNpcsEnabled' as const
 
@@ -102,7 +99,7 @@ export const levelZeroNpcsFormSchema = z.object({
   levelZeroBaseHitDie: z.coerce.number().pipe(hitDieSchema),
   levelZeroProficiencyBonus: z.coerce.number().pipe(levelZeroProficiencyBonusSchema),
   levelZeroRetainSpeciesTraits: z.boolean(),
-  levelZeroArmorGrantMode: z.enum(XOR_GRANT_SET_MODES),
+  levelZeroArmorGrantMode: z.enum(ARMOR_PROFICIENCY_GRANT_MODES),
   levelZeroArmorProficiencies: levelZeroArmorProficienciesFormSchema,
   levelZeroWeaponGrantMode: z.enum(WEAPON_PROFICIENCY_GRANT_MODES),
   levelZeroWeaponProficiencies: levelZeroWeaponProficienciesFormSchema,
@@ -130,7 +127,7 @@ export type LevelZeroNpcsFieldOptions = {
   weaponOptions: FieldOption[]
 }
 
-/** Level 0 NPC campaign configuration fields — uses shared language and XOR grant factories. */
+/** Level 0 NPC campaign configuration fields — shared language and grant-set factories. */
 export function levelZeroNpcsFields({
   languageOptions,
   armorOptions,
@@ -195,7 +192,7 @@ export function levelZeroNpcsFields({
                 defaultValue: true,
                 separator: 'subtle',
               },
-              xorArmorProficiencyGrantSetField({
+              levelZeroArmorProficiencyGrantSetField({
                 modeFieldName: LEVEL_ZERO_ARMOR_MODE,
                 categoriesPath: LEVEL_ZERO_ARMOR_CATEGORIES_PATH,
                 itemsPath: LEVEL_ZERO_ARMOR_ITEMS_PATH,
@@ -255,5 +252,3 @@ export function levelZeroNpcsFields({
     },
   ]
 }
-
-export type { XorGrantSetMode }

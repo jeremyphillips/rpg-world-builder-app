@@ -58,6 +58,16 @@ function validateDimensionDefault(
   return allowed ? defaultValue : undefined
 }
 
+export function activeDimensionFiltersEqual(
+  a: ActiveDimensionFilters,
+  b: ActiveDimensionFilters,
+): boolean {
+  const aKeys = Object.keys(a)
+  const bKeys = Object.keys(b)
+  if (aKeys.length !== bKeys.length) return false
+  return aKeys.every((key) => a[key] === b[key])
+}
+
 /** Reconciles persisted toolbar state when dimension configs change (dynamic fields). */
 export function reconcileActiveDimensionFilters(
   prev: ActiveDimensionFilters,

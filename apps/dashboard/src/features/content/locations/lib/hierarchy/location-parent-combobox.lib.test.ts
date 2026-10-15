@@ -6,6 +6,7 @@ import { DOCK_WARD, GREYSHORE, HARBORFORD, YAWNING_PORTAL } from '../../fixtures
 import { makeContentFormCtx } from '../../../lib/fixtures/content-form-ctx'
 import {
   buildParentLocationComboboxOptionsResolve,
+  buildParentLocationFilterSelectsResolve,
   buildParentLocationKindFilterSelects,
   buildValidParentLocationFieldOptions,
 } from './location-parent-combobox.lib'
@@ -28,6 +29,19 @@ describe('buildParentLocationKindFilterSelects', () => {
   it('lists only allowed parent kinds for the child', () => {
     const [filter] = buildParentLocationKindFilterSelects('region')
     expect(filter?.options.map((option) => option.value)).toEqual(['world', 'region'])
+  })
+})
+
+describe('buildParentLocationFilterSelectsResolve', () => {
+  it('reconciles parent kind filters with the child authoring type', () => {
+    const resolve = buildParentLocationFilterSelectsResolve()
+    const regionFilters = resolve.filterSelectsWhen({ authoringType: 'region' })
+    const structureFilters = resolve.filterSelectsWhen({ authoringType: 'structure' })
+
+    expect(regionFilters[0]?.options.map((option) => option.value)).toEqual(['world', 'region'])
+    expect(structureFilters[0]?.options.map((option) => option.value)).toEqual(
+      buildParentLocationKindFilterSelects('structure')[0]?.options.map((option) => option.value),
+    )
   })
 })
 

@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { isContainer, type DependentConfig } from '@rpg/ui/form'
 
-import {
-  modeDependentGrantSetField,
-  xorProficiencyGrantSetField,
-} from './mode-dependent-grant-set-form-fields'
+import { levelZeroArmorProficiencyGrantSetField } from './grant-sets/level-zero-armor-proficiency-grant-field'
+import { modeDependentGrantSetField } from './mode-dependent-grant-set-form-fields'
 
 function expectDependentField(
   item: ReturnType<typeof modeDependentGrantSetField>,
@@ -53,10 +51,10 @@ describe('modeDependentGrantSetField', () => {
   })
 })
 
-describe('xorProficiencyGrantSetField', () => {
+describe('levelZeroArmorProficiencyGrantSetField', () => {
   it('hides dependents when mode is none', () => {
     const item = expectDependentField(
-      xorProficiencyGrantSetField({
+      levelZeroArmorProficiencyGrantSetField({
         modeFieldName: 'levelZeroArmorGrantMode',
         categoriesPath: 'levelZeroArmorProficiencies.categories',
         itemsPath: 'levelZeroArmorProficiencies.items',
@@ -71,7 +69,7 @@ describe('xorProficiencyGrantSetField', () => {
       visibleWhen: expect.any(Function),
     })
     expect(item.dependents.visibility!.visibleWhen({ levelZeroArmorGrantMode: 'none' })).toBe(false)
-    expect(item.dependents.visibility!.visibleWhen({ levelZeroArmorGrantMode: 'category' })).toBe(
+    expect(item.dependents.visibility!.visibleWhen({ levelZeroArmorGrantMode: 'categories' })).toBe(
       true,
     )
   })

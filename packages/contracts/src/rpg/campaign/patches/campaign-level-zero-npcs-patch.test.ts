@@ -128,6 +128,12 @@ describe('campaignLevelZeroNpcsPatchSchema', () => {
     expect(campaignLevelZeroNpcsPatchSchema.safeParse({ proficiencyBonus: 3 }).success).toBe(false)
   })
 
+  it('rejects mixed armor categories and specific items', () => {
+    expect(
+      levelZeroArmorGrantSchema.safeParse({ categories: ['light'], items: ['srd:shield'] }).success,
+    ).toBe(false)
+  })
+
   it('accepts heavy and martial armor categories', () => {
     expect(levelZeroArmorGrantSchema.safeParse({ categories: ['heavy'], items: [] }).success).toBe(
       true,

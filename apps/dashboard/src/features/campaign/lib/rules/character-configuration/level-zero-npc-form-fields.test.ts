@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { isContainer, type DependentConfig } from '@rpg/ui/form'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
+import { isContainer, type ComboboxFieldConfig, type DependentConfig } from '@rpg/ui/form'
+
+import { assertComboboxOptionsMatchFilterDimensions } from '@/lib/forms/grant-sets/combobox-filter-option-metadata.lib'
+import { buildArmorProficiencyGrantComboboxFilters } from '@/lib/forms/grant-sets/armor-proficiency-combobox-filters.lib'
+import { referenceArmorComboboxFieldOptions } from '@/features/content/lib/form-options/content-field-option.lib'
+import { pickArmor } from '@/test/fixtures/pick'
 
 import { LEVEL_ZERO_NPCS_ENABLED, levelZeroNpcsFields } from './level-zero-npc-form-fields'
 
@@ -65,6 +71,37 @@ describe('levelZeroNpcsFields', () => {
       throw new Error('Expected wealth tiers group')
     }
     expect(wealthGroup.fields).toHaveLength(4)
+  })
+
+  it('pairs level-0 armor combobox filters with option metadata', () => {
+    const armorOptions = referenceArmorComboboxFieldOptions(
+      buildContentPurposeSelectors([pickArmor('leather-armor'), pickArmor('ring-mail')]),
+    )
+    const allow = expectAllowDependent(
+      levelZeroNpcsFields({ languageOptions: [], armorOptions, weaponOptions: [] }),
+    )
+
+    const armorGrant = allow.dependents.fields.find((field) => {
+      if (!isContainer(field) || field.kind !== 'dependent') return false
+      return 'name' in field.controller && field.controller.name === 'levelZeroArmorGrantMode'
+    })
+    expect(armorGrant).toBeDefined()
+    if (!armorGrant || !isContainer(armorGrant) || armorGrant.kind !== 'dependent') {
+      throw new Error('Expected armor grant dependent')
+    }
+
+    const combobox = armorGrant.dependents.fields.find(
+      (field): field is ComboboxFieldConfig =>
+        !('kind' in field) && 'type' in field && field.type === 'combobox',
+    )
+    expect(combobox?.filterSelects).toEqual(buildArmorProficiencyGrantComboboxFilters())
+
+    expect(() =>
+      assertComboboxOptionsMatchFilterDimensions(
+        armorOptions,
+        combobox?.filterSelects ?? buildArmorProficiencyGrantComboboxFilters(),
+      ),
+    ).not.toThrow()
   })
 
   it('keeps nested grant-set dependents on the default nest without panel chrome', () => {

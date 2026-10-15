@@ -25,10 +25,15 @@ import {
 } from '@rpg/contracts'
 
 import {
+  armorProficiencyGrantSetFromMode,
+  armorProficiencyModeFromGrantSet,
+} from '@/lib/forms/grant-sets/armor-proficiency-grant-mode.lib'
+import {
   proficiencyGrantSetsEqual,
   weaponProficiencyGrantSetFromMode,
   weaponProficiencyModeFromGrantSet,
 } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
+import { resolveLevelZeroArmorProficienciesSparsePatch } from './level-zero-armor-proficiencies-sparse.lib'
 
 import {
   buildStandardArrayPatchInput,
@@ -40,11 +45,6 @@ import type { WealthGrantMoneyForm } from '@/lib/forms/wealth-grant-form-fields'
 
 import type { LevelZeroNpcsFormValues } from './level-zero-npc-form-fields'
 import { LEVEL_ZERO_WEALTH_TIER_FIELD_PATHS } from './level-zero-npc-form-fields'
-import {
-  xorGrantSetFromForm,
-  xorGrantSetModeFromGrantSet,
-} from './xor-proficiency-grant-set-form-fields'
-
 export function mapLevelZeroNpcsToFormValues(
   levelZeroNpcs: ResolvedCampaignCharacterCreationPatch['levelZeroNpcs'],
 ): LevelZeroNpcsFormValues {
@@ -53,7 +53,15 @@ export function mapLevelZeroNpcsToFormValues(
     levelZeroBaseHitDie: levelZeroNpcs.baseHitDie,
     levelZeroProficiencyBonus: levelZeroNpcs.proficiencyBonus,
     levelZeroRetainSpeciesTraits: levelZeroNpcs.retainSpeciesTraits,
-    levelZeroArmorGrantMode: xorGrantSetModeFromGrantSet(levelZeroNpcs.armorProficiencies),
+    levelZeroArmorGrantMode: (() => {
+      const inferred = armorProficiencyModeFromGrantSet(levelZeroNpcs.armorProficiencies)
+      if (inferred.kind === 'mixed') {
+        throw new Error(
+          'Level 0 armor proficiencies cannot include both categories and specific items',
+        )
+      }
+      return inferred.mode
+    })(),
     levelZeroArmorProficiencies: {
       categories: [...levelZeroNpcs.armorProficiencies.categories],
       items: [...levelZeroNpcs.armorProficiencies.items],
@@ -106,10 +114,9 @@ export function levelZeroNpcsDefaultFormValues(): LevelZeroNpcsFormValues {
 function buildLevelZeroArmorProficienciesPatch(
   values: LevelZeroNpcsFormValues,
 ): ArmorProficiencyGrantSet {
-  return xorGrantSetFromForm(
+  return armorProficiencyGrantSetFromMode(
     values.levelZeroArmorGrantMode,
-    values.levelZeroArmorProficiencies.categories,
-    values.levelZeroArmorProficiencies.items,
+    values.levelZeroArmorProficiencies,
   ) as ArmorProficiencyGrantSet
 }
 
@@ -261,8 +268,14 @@ function buildSparseLevelZeroNpcsPatchInput(
   applyLevelZeroScalarSparsePatches(patch, values)
 
   const armor = buildLevelZeroArmorProficienciesPatch(values)
-  if (hasNonEmptyGrantSet(armor)) {
-    patch.armorProficiencies = armor
+  const armorIncluded = resolveLevelZeroArmorProficienciesSparsePatch({
+    mode: values.levelZeroArmorGrantMode,
+    projected: armor,
+    storedOverride: options.storedSparse?.armorProficiencies,
+    baseline: DEFAULT_LEVEL_ZERO_EMPTY_GRANT,
+  })
+  if (armorIncluded !== undefined) {
+    patch.armorProficiencies = armorIncluded
   }
 
   const weapons = buildLevelZeroWeaponProficienciesPatch(values)
@@ -332,7 +345,7 @@ function withLevelZeroWealthTierDefaults(
 
 export type BuildLevelZeroNpcsPatchInputOptions = {
   includeDefaultLevelZeroNpcs?: boolean
-  /** Stored sparse `levelZeroNpcs` slice — used to emit explicit weapon clears and omit unchanged grants. */
+  /** Stored sparse `levelZeroNpcs` slice — used to omit unchanged grants and emit explicit armor/weapon clears. */
   storedSparse?: CampaignLevelZeroNpcsPatch
 }
 
