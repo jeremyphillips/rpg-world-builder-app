@@ -32,6 +32,17 @@ describe('InlineMetadata', () => {
     expect(container.querySelectorAll('.text-muted-foreground')).toHaveLength(1)
   })
 
+  it('opts the separator into text-xs without changing the default', () => {
+    const { container } = renderTwoItems({
+      role: 'heading',
+      density: 'compact',
+      wrap: false,
+      separatorSize: 'xs',
+    })
+
+    expect(container.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+  })
+
   it('renders heading comfortable nowrap separator spacing', () => {
     const { container } = renderTwoItems({
       role: 'heading',
@@ -177,7 +188,9 @@ describe('InlineMetadata', () => {
   it('rejects bare string children at compile time', () => {
     expect(
       // @ts-expect-error InlineMetadata only accepts Item elements
-      <InlineMetadata role="heading" density="compact">A · B</InlineMetadata>,
+      <InlineMetadata role="heading" density="compact">
+        A · B
+      </InlineMetadata>,
     ).toBeTruthy()
   })
 

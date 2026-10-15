@@ -435,6 +435,12 @@ Entity/content **density** (`compact` | `comfortable`) is unrelated to form-cont
 **size** tokens — do not force unrelated systems into one scale because both use names
 like `compact`.
 
+Compact entity titles stay 14px (`text-sm`). Classification, its middle dot, and title-line
+end text are 12px (`text-xs` on the classification and dot, `text-style-caption` on the
+heading end slot). Price and grant-preview text in the trailing group secondary slot are
+12px (`text-xs`). List rows keep a single shared size and do not use the heading recipe.
+Trailing-rail quantity and meta stay 14px.
+
 ---
 
 ## Edge geometry contract
@@ -673,7 +679,7 @@ prevent regression:
 | `collapsible-list-item.variants.test.ts`   | Entity-card body classes exclude legacy inset                                |
 | `catalog-entity-row.stories.tsx`           | Flat + disclosure rhythm side-by-side; location picker drawer context        |
 | `content-card.variants.test.ts`            | Mixed-heading title must not use `flex-1`, `%` caps, or right-push hacks     |
-| `entity-summary.test.tsx`                  | Classification adjacent; density-sized badges; parts carry no track offsets  |
+| `entity-summary.test.tsx`                  | Compact title 14px; classification, dot, and end text 12px; no track offsets |
 | `entity-summary-status.type.test.ts`       | Status prop is structured data, not ReactNode                                |
 | `entity-anatomy-trailing.type.test.ts`     | Trailing action/group primary require ReactElement; closed secondary         |
 | AGENTS.md component rule                   | No consumer padding overrides on entity surfaces                             |

@@ -44,16 +44,26 @@ export function EntitySummaryHeading({
   density,
   headingEndValue,
 }: EntitySummaryHeadingProps) {
+  const headingEnd =
+    headingEndValue != null ? (
+      <span className={entitySummaryHeadingEndValueVariants({ density })}>{headingEndValue}</span>
+    ) : undefined
+
   return (
     <div className={entitySummaryHeadingRowVariants()}>
       {density === 'compact' ? (
-        <IdentityRowHeadingLine heading={heading} classification={classification} size="md" />
+        <IdentityRowHeadingLine
+          heading={heading}
+          classification={classification}
+          headingEnd={headingEnd}
+          recipe="entity-compact"
+        />
       ) : (
-        <ContentCardHeading heading={heading} classification={classification} density={density} />
+        <>
+          <ContentCardHeading heading={heading} classification={classification} density={density} />
+          {headingEnd}
+        </>
       )}
-      {headingEndValue != null ? (
-        <span className={entitySummaryHeadingEndValueVariants({ density })}>{headingEndValue}</span>
-      ) : null}
     </div>
   )
 }

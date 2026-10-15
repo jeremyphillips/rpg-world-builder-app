@@ -713,6 +713,7 @@ export {
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   type IdentityRowHeadingLineProps,
+  type IdentityRowHeadingRecipe,
   type IdentityRowProps,
   type IdentityRowSize,
   type IdentityRowSupportingProps,

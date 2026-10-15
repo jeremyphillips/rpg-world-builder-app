@@ -51,6 +51,10 @@ export const inlineMetadataSeparatorVariants = cva('font-normal text-muted-foreg
       false: '',
       true: '',
     },
+    /** Opt-in. Default inherits so heading density stays a spacing token. */
+    size: {
+      xs: 'text-xs',
+    },
   },
   compoundVariants: [
     {

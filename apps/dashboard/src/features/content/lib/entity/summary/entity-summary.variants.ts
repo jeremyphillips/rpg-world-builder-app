@@ -8,7 +8,8 @@ export const entitySummaryHeadingEndValueVariants = cva(
   {
     variants: {
       density: {
-        compact: 'text-sm',
+        /** Size comes from the title-line end slot (`text-style-caption`, 12px). */
+        compact: '',
         comfortable: 'text-base',
       },
     },

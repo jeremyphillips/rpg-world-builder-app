@@ -1,9 +1,4 @@
-import {
-  Children,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
 
 import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
 
@@ -37,6 +32,8 @@ export type InlineMetadataProps = {
   density: InlineMetadataDensity
   wrap?: boolean
   className?: string
+  /** Separator type size. Omitted separators inherit from the item that contains them. */
+  separatorSize?: 'xs'
   children: InlineMetadataChild | readonly InlineMetadataChild[]
 }
 
@@ -57,18 +54,19 @@ function assertInlineMetadataChildren(children: ReactNode): void {
 function InlineMetadataSeparator({
   density,
   wrap,
+  size,
 }: {
   density: InlineMetadataDensity
   wrap: boolean
+  size?: 'xs'
 }) {
-  const className = inlineMetadataSeparatorVariants({ density, wrap })
+  const className = inlineMetadataSeparatorVariants({ density, wrap, size })
 
   if (wrap) {
     return (
       <span aria-hidden="true" data-inline-metadata-separator className={className}>
         {'\u00A0'}
-        {INLINE_METADATA_SEPARATOR}
-        {' '}
+        {INLINE_METADATA_SEPARATOR}{' '}
       </span>
     )
   }
@@ -78,8 +76,7 @@ function InlineMetadataSeparator({
       {' '}
       <span aria-hidden="true" data-inline-metadata-separator className={className}>
         {INLINE_METADATA_SEPARATOR}
-      </span>
-      {' '}
+      </span>{' '}
     </>
   )
 }
@@ -95,7 +92,14 @@ function collectInlineMetadataItems(children: ReactNode): ReactElement<InlineMet
   return items
 }
 
-function InlineMetadataRoot({ role, density, wrap: wrapProp, className, children }: InlineMetadataProps) {
+function InlineMetadataRoot({
+  role,
+  density,
+  wrap: wrapProp,
+  className,
+  separatorSize,
+  children,
+}: InlineMetadataProps) {
   const wrap = wrapProp ?? role === 'supporting'
 
   assertInlineMetadataChildren(children)
@@ -113,12 +117,11 @@ function InlineMetadataRoot({ role, density, wrap: wrapProp, className, children
         return (
           <span
             key={item.key ?? index}
-            className={cn(
-              inlineMetadataItemVariants({ role, wrap, truncate }),
-              itemClassName,
-            )}
+            className={cn(inlineMetadataItemVariants({ role, wrap, truncate }), itemClassName)}
           >
-            {index > 0 ? <InlineMetadataSeparator density={density} wrap={wrap} /> : null}
+            {index > 0 ? (
+              <InlineMetadataSeparator density={density} wrap={wrap} size={separatorSize} />
+            ) : null}
             {itemChildren}
           </span>
         )

@@ -24,6 +24,25 @@ describe('EntitySummaryHeading', () => {
     expect(mixedHeadingRow).toHaveTextContent('Fire Bolt · Spell')
   })
 
+  it('sizes compact classification and title-line end text below the title', () => {
+    render(
+      <EntitySummaryHeading
+        density="compact"
+        heading="Fire Bolt"
+        classification="Spell"
+        headingEndValue={3}
+      />,
+    )
+
+    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
+    expect(screen.getByText('Spell')).toHaveClass('text-xs')
+    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    const endValue = screen.getByText('3')
+    expect(endValue).toHaveClass('tabular-nums')
+    expect(endValue).not.toHaveClass('text-sm')
+    expect(endValue.parentElement).toHaveClass('text-style-caption')
+  })
+
   it('fills the content cell so the heading end value sits at the column end', () => {
     const { container } = render(
       <EntitySummaryHeading

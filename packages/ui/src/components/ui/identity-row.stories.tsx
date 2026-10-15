@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { IdentityRow } from './identity-row.client'
+import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
 import { InteractiveListRow } from './interactive-list-row.client'
 
 const meta = {
@@ -55,6 +55,19 @@ export const WrappedSupporting: Story = {
     supportingWrap: true,
     size: 'md',
   },
+}
+
+export const EntityCompactHeadingLine: Story = {
+  render: () => (
+    <div className="w-72 border border-border p-2">
+      <IdentityRowHeadingLine
+        heading="Longsword"
+        classification="Weapon"
+        headingEnd="15 gp"
+        recipe="entity-compact"
+      />
+    </div>
+  ),
 }
 
 export const HeadingOnly: Story = {
