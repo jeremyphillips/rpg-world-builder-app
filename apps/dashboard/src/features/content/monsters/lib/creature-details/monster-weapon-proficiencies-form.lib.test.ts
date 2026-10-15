@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   coerceCreatureWeaponProficienciesForForm,
-  weaponProficiencyModeFromFormWeapons,
+  weaponProficiencyHydrationFromWeapons,
 } from './monster-weapon-proficiencies-form.lib'
 
 describe('coerceCreatureWeaponProficienciesForForm', () => {
@@ -38,20 +38,30 @@ describe('coerceCreatureWeaponProficienciesForForm', () => {
   })
 })
 
-describe('weaponProficiencyModeFromFormWeapons', () => {
-  it('uses individual mode when item grants are present', () => {
-    expect(weaponProficiencyModeFromFormWeapons({ categories: [], items: ['srd:dagger'] })).toBe(
-      'specific',
-    )
+describe('weaponProficiencyHydrationFromWeapons', () => {
+  it('uses specific mode when item grants are present', () => {
+    expect(
+      weaponProficiencyHydrationFromWeapons({ categories: [], items: ['srd:dagger'] }),
+    ).toEqual({ mode: 'specific', reconciliationPending: false })
   })
 
   it('uses categories mode when only categories are present', () => {
-    expect(weaponProficiencyModeFromFormWeapons({ categories: ['simple'], items: [] })).toBe(
-      'categories',
-    )
+    expect(weaponProficiencyHydrationFromWeapons({ categories: ['simple'], items: [] })).toEqual({
+      mode: 'categories',
+      reconciliationPending: false,
+    })
   })
 
   it('uses none mode when grant set is empty', () => {
-    expect(weaponProficiencyModeFromFormWeapons({ categories: [], items: [] })).toBe('none')
+    expect(weaponProficiencyHydrationFromWeapons({ categories: [], items: [] })).toEqual({
+      mode: 'none',
+      reconciliationPending: false,
+    })
+  })
+
+  it('flags reconciliation when both branches are stored', () => {
+    expect(
+      weaponProficiencyHydrationFromWeapons({ categories: ['simple'], items: ['srd:dagger'] }),
+    ).toEqual({ mode: 'categories', reconciliationPending: true })
   })
 })

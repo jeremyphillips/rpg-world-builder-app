@@ -39,10 +39,3 @@ export function weaponProficiencyHydrationFromWeapons(weapons: CreatureWeaponPro
   }
   return { mode: inferred.mode, reconciliationPending: false }
 }
-
-/** @deprecated Use `weaponProficiencyHydrationFromWeapons` for load paths. */
-export function weaponProficiencyModeFromFormWeapons(
-  weapons: CreatureWeaponProficiencies,
-): WeaponProficiencyMode {
-  return weaponProficiencyHydrationFromWeapons(weapons).mode
-}
