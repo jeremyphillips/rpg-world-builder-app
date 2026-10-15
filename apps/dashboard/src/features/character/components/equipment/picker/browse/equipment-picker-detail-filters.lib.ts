@@ -26,25 +26,25 @@ const WEAPON_FILTER_PROPERTIES = [
   'ammunition',
 ] as const
 
-export type EquipmentWeaponDetailFilters = {
+export type EquipmentPickerWeaponDetailFilters = {
   categories: string[]
   modes: string[]
   properties: string[]
 }
 
-export type EquipmentArmorDetailFilters = {
+export type EquipmentPickerArmorDetailFilters = {
   categories: string[]
   stealth: string[]
   strength: string[]
 }
 
-export const EMPTY_WEAPON_DETAIL_FILTERS: EquipmentWeaponDetailFilters = {
+export const EMPTY_EQUIPMENT_PICKER_WEAPON_DETAIL_FILTERS: EquipmentPickerWeaponDetailFilters = {
   categories: [],
   modes: [],
   properties: [],
 }
 
-export const EMPTY_ARMOR_DETAIL_FILTERS: EquipmentArmorDetailFilters = {
+export const EMPTY_EQUIPMENT_PICKER_ARMOR_DETAIL_FILTERS: EquipmentPickerArmorDetailFilters = {
   categories: [],
   stealth: [],
   strength: [],
@@ -164,9 +164,9 @@ function selectedIncludes(selected: readonly string[], value: string | undefined
   return selected.length === 0 || (value !== undefined && selected.includes(value))
 }
 
-export function matchesWeaponDetailFilters(
+export function matchesEquipmentPickerWeaponDetailFilters(
   item: EquipmentPickerItem,
-  filters: EquipmentWeaponDetailFilters,
+  filters: EquipmentPickerWeaponDetailFilters,
 ): boolean {
   const weapon = weaponOf(item)
   if (!weapon) return true
@@ -181,9 +181,9 @@ export function matchesWeaponDetailFilters(
   return true
 }
 
-export function matchesArmorDetailFilters(
+export function matchesEquipmentPickerArmorDetailFilters(
   item: EquipmentPickerItem,
-  filters: EquipmentArmorDetailFilters,
+  filters: EquipmentPickerArmorDetailFilters,
 ): boolean {
   const armor = armorOf(item)
   if (!armor) return true
@@ -198,15 +198,19 @@ export function matchesArmorDetailFilters(
   return true
 }
 
-export function weaponDetailFiltersActive(filters: EquipmentWeaponDetailFilters): boolean {
+export function equipmentPickerWeaponDetailFiltersActive(
+  filters: EquipmentPickerWeaponDetailFilters,
+): boolean {
   return filters.categories.length + filters.modes.length + filters.properties.length > 0
 }
 
-export function armorDetailFiltersActive(filters: EquipmentArmorDetailFilters): boolean {
+export function equipmentPickerArmorDetailFiltersActive(
+  filters: EquipmentPickerArmorDetailFilters,
+): boolean {
   return filters.categories.length + filters.stealth.length + filters.strength.length > 0
 }
 
-export function formatEquipmentDetailFilterTriggerLabel(
+export function formatEquipmentPickerDetailFilterTriggerLabel(
   label: string,
   activeCount: number,
 ): string {
@@ -214,10 +218,14 @@ export function formatEquipmentDetailFilterTriggerLabel(
   return joinInlineMetadata([label, String(activeCount)])
 }
 
-export function countWeaponDetailFilters(filters: EquipmentWeaponDetailFilters): number {
+export function countEquipmentPickerWeaponDetailFilters(
+  filters: EquipmentPickerWeaponDetailFilters,
+): number {
   return filters.categories.length + filters.modes.length + filters.properties.length
 }
 
-export function countArmorDetailFilters(filters: EquipmentArmorDetailFilters): number {
+export function countEquipmentPickerArmorDetailFilters(
+  filters: EquipmentPickerArmorDetailFilters,
+): number {
   return filters.categories.length + filters.stealth.length + filters.strength.length
 }
