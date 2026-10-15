@@ -38,20 +38,20 @@ const SERVICE_MIDDLE_COLUMNS: ColumnDef<ServiceEquipment>[] = [
   costColumn<ServiceEquipment>(),
 ]
 
-export const serviceFilterSchema = buildContentFilterSchema<ServiceRow, ServiceOverviewFilterState>(
-  'equipment',
-  [
-    createEqualsFilter<ServiceRow, ServiceOverviewFilterState, 'serviceCategory', string>({
-      id: 'serviceCategory',
-      label: 'Category',
-      options: SERVICE_CATEGORIES.map((category) => ({
-        label: getServiceCategoryLabel(category),
-        value: category,
-      })),
-      getValue: (row) => row.serviceCategory,
-    }),
-  ],
-)
+export const serviceOverviewFilterSchema = buildContentFilterSchema<
+  ServiceRow,
+  ServiceOverviewFilterState
+>('equipment', [
+  createEqualsFilter<ServiceRow, ServiceOverviewFilterState, 'serviceCategory', string>({
+    id: 'serviceCategory',
+    label: 'Category',
+    options: SERVICE_CATEGORIES.map((category) => ({
+      label: getServiceCategoryLabel(category),
+      value: category,
+    })),
+    getValue: (row) => row.serviceCategory,
+  }),
+])
 
 /** Service column definitions with the name cell linked to the detail page. */
 export function serviceColumns(

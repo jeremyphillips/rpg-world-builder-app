@@ -1,4 +1,4 @@
-import type { ArmorProficiencyMode, WeaponProficiencyMode } from './class-form-constants'
+import type { ArmorProficiencyMode } from './class-form-constants'
 
 export const CLASS_SKILL_OPTIONS_INFO =
   'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
@@ -8,10 +8,7 @@ export const INDIVIDUAL_WEAPONS_TOGGLE_HINT =
 
 export const WEAPON_PROFICIENCIES_HINT = 'Categories include all weapons in that group.'
 
-export const WEAPON_PROFICIENCY_MODE_LABELS = {
-  categories: 'Categories',
-  specific: 'Individual weapons',
-} as const satisfies Record<WeaponProficiencyMode, string>
+export { WEAPON_PROFICIENCY_GRANT_MODE_LABELS as WEAPON_PROFICIENCY_MODE_LABELS } from '@/lib/forms/grant-sets/weapon-proficiency-grant-form-labels'
 
 export const ARMOR_PROFICIENCY_MODE_LABELS = {
   categories: 'Categories',

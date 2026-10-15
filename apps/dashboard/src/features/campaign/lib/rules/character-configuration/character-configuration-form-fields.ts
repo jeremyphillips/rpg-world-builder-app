@@ -71,6 +71,7 @@ import {
 } from './language-proficiency-form-fields'
 import { languageProficiencyRulesDefaultValues } from './language-proficiency-form-values'
 import { levelZeroNpcsFields, levelZeroNpcsFormSchema } from './level-zero-npc-form-fields'
+import { formatLevelZeroWeaponProficienciesReview } from './level-zero-weapon-proficiencies-review.lib'
 import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
 import {
   standardArrayDefaultFormValues,
@@ -729,6 +730,10 @@ const CHARACTER_RULE_FIELD_REGISTRY: CharacterRuleFieldDef[] = [
     configSection: { id: 'level-0-npcs', label: 'Level 0 NPCs' },
     buildFormItems: ({ languageOptions, armorOptions, weaponOptions }) =>
       levelZeroNpcsFields({ languageOptions, armorOptions, weaponOptions }),
+    buildReviewRow: (values) => ({
+      label: 'Level 0 weapon proficiencies',
+      value: formatLevelZeroWeaponProficienciesReview(values),
+    }),
   },
 ]
 

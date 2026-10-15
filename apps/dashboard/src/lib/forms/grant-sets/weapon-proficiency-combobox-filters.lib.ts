@@ -13,7 +13,7 @@ import {
   WEAPON_PROFICIENCY_MODE_FILTER_ARIA,
 } from './weapon-proficiency-grant-form-labels'
 
-export const WEAPON_PROFICIENCY_FILTER_KEYS = {
+export const WEAPON_PROFICIENCY_COMBOBOX_FILTER_KEYS = {
   category: 'category',
   mode: 'mode',
 } as const
@@ -37,13 +37,13 @@ const weaponModeOptions = toOptions(
 export function buildWeaponProficiencyGrantComboboxFilters(): readonly ComboboxFilterDimensionConfig[] {
   return [
     {
-      filterKey: WEAPON_PROFICIENCY_FILTER_KEYS.category,
+      filterKey: WEAPON_PROFICIENCY_COMBOBOX_FILTER_KEYS.category,
       ariaLabel: WEAPON_PROFICIENCY_CATEGORY_FILTER_ARIA,
       options: weaponCategoryOptions,
       allOptionLabel: WEAPON_PROFICIENCY_CATEGORY_FILTER_ALL_LABEL,
     },
     {
-      filterKey: WEAPON_PROFICIENCY_FILTER_KEYS.mode,
+      filterKey: WEAPON_PROFICIENCY_COMBOBOX_FILTER_KEYS.mode,
       ariaLabel: WEAPON_PROFICIENCY_MODE_FILTER_ARIA,
       options: weaponModeOptions,
       allOptionLabel: WEAPON_PROFICIENCY_MODE_FILTER_ALL_LABEL,

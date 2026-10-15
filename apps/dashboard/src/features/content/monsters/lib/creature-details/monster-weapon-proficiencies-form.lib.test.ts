@@ -50,4 +50,8 @@ describe('weaponProficiencyModeFromFormWeapons', () => {
       'categories',
     )
   })
+
+  it('uses none mode when grant set is empty', () => {
+    expect(weaponProficiencyModeFromFormWeapons({ categories: [], items: [] })).toBe('none')
+  })
 })

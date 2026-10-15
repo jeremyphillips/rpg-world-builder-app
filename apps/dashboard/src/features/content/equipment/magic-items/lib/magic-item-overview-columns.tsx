@@ -59,7 +59,7 @@ const MAGIC_ITEM_MIDDLE_COLUMNS: ColumnDef<MagicItemEquipment>[] = [
   costColumn<MagicItemEquipment>(),
 ]
 
-export const magicItemFilterSchema = buildContentFilterSchema<
+export const magicItemOverviewFilterSchema = buildContentFilterSchema<
   MagicItemRow,
   MagicItemOverviewFilterState
 >('equipment', [

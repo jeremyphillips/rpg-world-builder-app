@@ -4,10 +4,10 @@ export const ARMOR_PROFICIENCY_STEALTH_FILTER_ARIA = 'Filter armor by stealth'
 export const ARMOR_PROFICIENCY_CATEGORY_FILTER_ALL_LABEL = 'All categories'
 export const ARMOR_PROFICIENCY_STEALTH_FILTER_ALL_LABEL = 'All stealth'
 
-export const ARMOR_STEALTH_FILTER_SLUGS = ['none', 'disadvantage'] as const
+export const ARMOR_PROFICIENCY_COMBOBOX_STEALTH_SLUGS = ['none', 'disadvantage'] as const
 
-export const ARMOR_STEALTH_FILTER_LABELS: Record<
-  (typeof ARMOR_STEALTH_FILTER_SLUGS)[number],
+export const ARMOR_PROFICIENCY_COMBOBOX_STEALTH_LABELS: Record<
+  (typeof ARMOR_PROFICIENCY_COMBOBOX_STEALTH_SLUGS)[number],
   string
 > = {
   none: 'No stealth disadvantage',

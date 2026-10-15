@@ -45,6 +45,8 @@ import {
 import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
 import { findActionsReferencingEntry } from '../../lib/actions/monster-action-equipment-references'
 import { commitEquipmentEntryRemoval } from '../../lib/equipment/commit-equipment-entry-removal.lib'
+import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
+
 import { coerceCreatureWeaponProficienciesForForm } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
 import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/resolve-monster-weapon-is-proficient.lib'
@@ -81,10 +83,10 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const rulesetId = (ctx.rulesetId ?? 'srd-cc-5.2.1') as SystemRulesetId
   const magicProvider = useMemo(() => createMagicPropertyDefinitionProvider(rulesetId), [rulesetId])
 
-  const weaponGrants = useMemo(
-    () => coerceCreatureWeaponProficienciesForForm(values?.proficiencies?.weapons),
-    [values?.proficiencies?.weapons],
-  )
+  const weaponGrants = useMemo(() => {
+    const raw = coerceCreatureWeaponProficienciesForForm(values?.proficiencies?.weapons)
+    return weaponProficiencyGrantSetFromMode(values?.weaponProficiencyMode ?? 'none', raw)
+  }, [values?.proficiencies?.weapons, values?.weaponProficiencyMode])
 
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []
   const pickerItems = useMemo(

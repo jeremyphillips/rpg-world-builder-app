@@ -8,6 +8,7 @@ import type {
 } from '@rpg/contracts'
 import {
   DEFAULT_LEVEL_ZERO_BASE_HIT_DIE,
+  DEFAULT_LEVEL_ZERO_EMPTY_GRANT,
   DEFAULT_LEVEL_ZERO_LANGUAGE_PROFICIENCIES,
   DEFAULT_LEVEL_ZERO_NPC_WEALTH_TIERS,
   DEFAULT_LEVEL_ZERO_NPCS_ENABLED,
@@ -22,6 +23,12 @@ import {
   type Currency,
   type NpcWealthTierId,
 } from '@rpg/contracts'
+
+import {
+  proficiencyGrantSetsEqual,
+  weaponProficiencyGrantSetFromMode,
+  weaponProficiencyModeFromGrantSet,
+} from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
 import {
   buildStandardArrayPatchInput,
@@ -51,7 +58,10 @@ export function mapLevelZeroNpcsToFormValues(
       categories: [...levelZeroNpcs.armorProficiencies.categories],
       items: [...levelZeroNpcs.armorProficiencies.items],
     },
-    levelZeroWeaponGrantMode: xorGrantSetModeFromGrantSet(levelZeroNpcs.weaponProficiencies),
+    levelZeroWeaponGrantMode: (() => {
+      const inferred = weaponProficiencyModeFromGrantSet(levelZeroNpcs.weaponProficiencies)
+      return inferred.kind === 'mixed' ? 'categories' : inferred.mode
+    })(),
     levelZeroWeaponProficiencies: {
       categories: [...levelZeroNpcs.weaponProficiencies.categories],
       items: [...levelZeroNpcs.weaponProficiencies.items],
@@ -106,11 +116,32 @@ function buildLevelZeroArmorProficienciesPatch(
 function buildLevelZeroWeaponProficienciesPatch(
   values: LevelZeroNpcsFormValues,
 ): WeaponProficiencyGrantSet {
-  return xorGrantSetFromForm(
+  return weaponProficiencyGrantSetFromMode(
     values.levelZeroWeaponGrantMode,
-    values.levelZeroWeaponProficiencies.categories,
-    values.levelZeroWeaponProficiencies.items,
+    values.levelZeroWeaponProficiencies,
   ) as WeaponProficiencyGrantSet
+}
+
+/**
+ * Sparse PATCH weapon proficiencies:
+ * - Omit when projected grant matches stored sparse override (unchanged save).
+ * - Include non-empty projected grants.
+ * - When author chose None, include explicit empty grant to clear a stored override
+ *   (`resolveLevelZeroWeaponProficiencies` treats absent vs explicit empty differently).
+ */
+function shouldIncludeWeaponProficienciesInSparsePatch(
+  values: LevelZeroNpcsFormValues,
+  projected: WeaponProficiencyGrantSet,
+  storedSparse?: CampaignLevelZeroNpcsPatch['weaponProficiencies'],
+): boolean {
+  const stored = storedSparse ?? DEFAULT_LEVEL_ZERO_EMPTY_GRANT
+  if (proficiencyGrantSetsEqual(projected, stored)) {
+    return false
+  }
+  if (hasNonEmptyGrantSet(projected)) {
+    return true
+  }
+  return values.levelZeroWeaponGrantMode === 'none' && hasNonEmptyGrantSet(stored)
 }
 
 export function wealthTierGrantMoneyToForm(
@@ -223,6 +254,7 @@ function applyLevelZeroScalarSparsePatches(
 
 function buildSparseLevelZeroNpcsPatchInput(
   values: LevelZeroNpcsFormValues,
+  options: { storedSparse?: CampaignLevelZeroNpcsPatch } = {},
 ): CampaignLevelZeroNpcsPatch | undefined {
   const patch: CampaignLevelZeroNpcsPatch = {}
 
@@ -234,7 +266,13 @@ function buildSparseLevelZeroNpcsPatchInput(
   }
 
   const weapons = buildLevelZeroWeaponProficienciesPatch(values)
-  if (hasNonEmptyGrantSet(weapons)) {
+  if (
+    shouldIncludeWeaponProficienciesInSparsePatch(
+      values,
+      weapons,
+      options.storedSparse?.weaponProficiencies,
+    )
+  ) {
     patch.weaponProficiencies = weapons
   }
 
@@ -292,14 +330,20 @@ function withLevelZeroWealthTierDefaults(
   }
 }
 
+export type BuildLevelZeroNpcsPatchInputOptions = {
+  includeDefaultLevelZeroNpcs?: boolean
+  /** Stored sparse `levelZeroNpcs` slice — used to emit explicit weapon clears and omit unchanged grants. */
+  storedSparse?: CampaignLevelZeroNpcsPatch
+}
+
 export function buildLevelZeroNpcsPatchInput(
   values: LevelZeroNpcsPatchFormValues,
-  options: { includeDefaultLevelZeroNpcs?: boolean } = {},
+  options: BuildLevelZeroNpcsPatchInputOptions = {},
 ): CampaignLevelZeroNpcsPatch | undefined {
   const normalized = withLevelZeroWealthTierDefaults(values)
   if (options.includeDefaultLevelZeroNpcs) {
     return buildFullLevelZeroNpcsPatchInput(normalized)
   }
 
-  return buildSparseLevelZeroNpcsPatchInput(normalized)
+  return buildSparseLevelZeroNpcsPatchInput(normalized, options)
 }

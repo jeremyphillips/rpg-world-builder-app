@@ -7,6 +7,7 @@ import {
 } from '@rpg/contracts'
 
 import type { WeaponProficiencyMode } from '../../../classes/lib/class-form-constants'
+import { weaponProficiencyModeFromGrantSet } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
 /** Normalizes API/draft weapon proficiencies to the grant-set shape the form expects. */
 export function coerceCreatureWeaponProficienciesForForm(
@@ -28,8 +29,20 @@ export function coerceCreatureWeaponProficienciesForForm(
   return { ...EMPTY_CREATURE_WEAPON_PROFICIENCIES }
 }
 
+export function weaponProficiencyHydrationFromWeapons(weapons: CreatureWeaponProficiencies): {
+  mode: WeaponProficiencyMode
+  reconciliationPending: boolean
+} {
+  const inferred = weaponProficiencyModeFromGrantSet(weapons)
+  if (inferred.kind === 'mixed') {
+    return { mode: 'categories', reconciliationPending: true }
+  }
+  return { mode: inferred.mode, reconciliationPending: false }
+}
+
+/** @deprecated Use `weaponProficiencyHydrationFromWeapons` for load paths. */
 export function weaponProficiencyModeFromFormWeapons(
   weapons: CreatureWeaponProficiencies,
 ): WeaponProficiencyMode {
-  return weapons.items.length > 0 ? 'specific' : 'categories'
+  return weaponProficiencyHydrationFromWeapons(weapons).mode
 }

@@ -18,10 +18,10 @@ import {
 } from '@/features/vocabulary'
 import {
   buildContentFormOptionSets,
-  toSortedContentFieldOptions,
+  referenceArmorComboboxFieldOptions,
+  referenceWeaponComboboxFieldOptions,
   useEquipment,
 } from '@/features/content'
-import { isArmorEquipment, isWeaponEquipment } from '@rpg/contracts'
 import { disableFormItems } from '@/lib/disable-form-items'
 
 import { createRulesConfigSaveFooter } from '../components/rules-config-save-footer'
@@ -65,15 +65,8 @@ export function useCharacterConfigurationRulesForm(campaignId: string) {
       campaignId,
       equipment,
     })
-    const referenceEquipment = options.equipment.forReference()
-    const armorOptions = toSortedContentFieldOptions(
-      referenceEquipment.filter(isArmorEquipment),
-      'equipment',
-    )
-    const weaponOptions = toSortedContentFieldOptions(
-      referenceEquipment.filter(isWeaponEquipment),
-      'equipment',
-    )
+    const armorOptions = referenceArmorComboboxFieldOptions(options.equipment)
+    const weaponOptions = referenceWeaponComboboxFieldOptions(options.equipment)
     return disableFormItems(
       buildRulesConfigFields(
         creatureTypeOptions,

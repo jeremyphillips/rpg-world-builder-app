@@ -58,29 +58,29 @@ const WEAPON_MIDDLE_COLUMNS: ColumnDef<WeaponEquipment>[] = [
   costColumn<WeaponEquipment>(),
 ]
 
-export const weaponFilterSchema = buildContentFilterSchema<WeaponRow, WeaponOverviewFilterState>(
-  'equipment',
-  [
-    createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'category', string>({
-      id: 'category',
-      label: 'Category',
-      options: WEAPON_CATEGORIES.map((category) => ({
-        label: capitalize(category),
-        value: category,
-      })),
-      getValue: (row) => row.category,
-    }),
-    createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'mastery', string>({
-      id: 'mastery',
-      label: 'Mastery',
-      options: WEAPON_MASTERIES.map((mastery) => ({
-        label: getWeaponMasteryLabel(mastery),
-        value: mastery,
-      })),
-      getValue: (row) => row.mastery,
-    }),
-  ],
-)
+export const weaponOverviewFilterSchema = buildContentFilterSchema<
+  WeaponRow,
+  WeaponOverviewFilterState
+>('equipment', [
+  createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'category', string>({
+    id: 'category',
+    label: 'Category',
+    options: WEAPON_CATEGORIES.map((category) => ({
+      label: capitalize(category),
+      value: category,
+    })),
+    getValue: (row) => row.category,
+  }),
+  createEqualsFilter<WeaponRow, WeaponOverviewFilterState, 'mastery', string>({
+    id: 'mastery',
+    label: 'Mastery',
+    options: WEAPON_MASTERIES.map((mastery) => ({
+      label: getWeaponMasteryLabel(mastery),
+      value: mastery,
+    })),
+    getValue: (row) => row.mastery,
+  }),
+])
 
 /** Weapon column definitions with the name cell linked to the detail page. */
 export function weaponColumns(

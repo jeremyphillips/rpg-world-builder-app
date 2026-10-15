@@ -52,15 +52,15 @@ import type { FieldOption } from '@rpg/ui/form'
 
 export type { ContentPurposeSelectors } from '@rpg/contracts'
 export {
-  referenceArmorFieldOptions,
+  referenceArmorComboboxFieldOptions,
   referenceClassFieldOptions,
   referenceEquipmentFieldOptions,
   referenceMagicItemBaseEquipmentFieldOptions,
   referenceSkillFieldOptions,
   referenceSpellcastingClassFieldOptions,
   referenceSpellFieldOptions,
-  referenceToolFieldOptions,
-  referenceWeaponFieldOptions,
+  referenceToolComboboxFieldOptions,
+  referenceWeaponComboboxFieldOptions,
   toContentFieldOption,
   toSortedContentFieldOptions,
 } from './content-field-option.lib'

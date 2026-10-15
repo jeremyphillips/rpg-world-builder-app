@@ -337,9 +337,12 @@ export {
 } from './lib/forms/registry/content-form-registry'
 export {
   buildContentFormOptionSets,
+  referenceArmorComboboxFieldOptions,
   referenceClassFieldOptions,
   referenceEquipmentFieldOptions,
   referenceSpellcastingClassFieldOptions,
+  referenceToolComboboxFieldOptions,
+  referenceWeaponComboboxFieldOptions,
   toContentFieldOption,
   toSortedContentFieldOptions,
   useContentFormOptions,

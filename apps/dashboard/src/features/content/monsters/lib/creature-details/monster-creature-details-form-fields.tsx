@@ -9,19 +9,17 @@ import {
 import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
+import { createElement } from 'react'
+
 import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 
-import { referenceWeaponFieldOptions } from '../../../lib/form-options/content-field-option.lib'
+import { MonsterWeaponProficiencyReconciliationField } from '../../components/monster-weapon-proficiency-reconciliation-field'
+import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/equipment-proficiency-grant-combobox-config.lib'
 import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
-  WEAPON_PROFICIENCY_MODES,
-  type WeaponProficiencyMode,
-} from '../../../classes/lib/class-form-constants'
-import {
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   WEAPON_PROFICIENCIES_HINT,
-  WEAPON_PROFICIENCY_MODE_LABELS,
 } from '../../../classes/lib/class-form-labels'
 import {
   MonsterCreatureDetailsLanguagesSlot,
@@ -80,22 +78,25 @@ function damageDefenseField(
 }
 
 function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
+  const weaponCombobox = equipmentProficiencyGrantComboboxConfig(ctx.options?.equipment, 'weapon')
   return [
+    {
+      kind: 'slot',
+      name: 'weaponProficiencyReconciliation',
+      render: () => createElement(MonsterWeaponProficiencyReconciliationField),
+    },
     weaponProficiencyGrantSetField({
       modeFieldName: 'weaponProficiencyMode',
-      modes: WEAPON_PROFICIENCY_MODES,
-      modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
       categoriesPath: 'proficiencies.weapons.categories',
       itemsPath: 'proficiencies.weapons.items',
       label: MONSTER_WEAPON_PROFICIENCIES_HEADING,
       hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
       categoryOptions: weaponCategoryOptions,
-      itemOptions: referenceWeaponFieldOptions(ctx.options?.equipment),
+      itemOptions: weaponCombobox.itemOptions,
+      itemsCombobox: weaponCombobox.itemsCombobox,
       categoriesLabel: 'Categories',
       itemsLabel: 'Weapon choices',
       categoriesHint: WEAPON_PROFICIENCIES_HINT,
-      categoryMode: 'categories' satisfies WeaponProficiencyMode,
-      specificMode: 'specific' satisfies WeaponProficiencyMode,
       resolveOptionLabel: (value) =>
         resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
     }),

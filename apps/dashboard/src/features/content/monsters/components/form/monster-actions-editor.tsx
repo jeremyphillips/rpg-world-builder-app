@@ -16,7 +16,7 @@ import {
 } from '@rpg/contracts'
 import { Button, ConfirmDialog, SemanticText, Text } from '@rpg/ui'
 
-import { referenceWeaponFieldOptions } from '../../../lib/form-options/content-field-option.lib'
+import { referenceWeaponComboboxFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { MasterDetailGrid } from '../../../components/master-detail/master-detail-grid'
 import { useMonsterActionSections } from '../../hooks/use-monster-action-sections'
@@ -665,7 +665,7 @@ function ActionDetailPane({
       advisories={advisories}
       equipmentSelectRef={equipmentSelectRef}
       addingWeapon={addingWeapon}
-      weaponChoices={referenceWeaponFieldOptions(ctx.options?.equipment)}
+      weaponChoices={referenceWeaponComboboxFieldOptions(ctx.options?.equipment)}
       descriptionId={descriptionId}
       onKind={(kind) =>
         sections.requestKind(

@@ -28,8 +28,9 @@ import {
   XOR_GRANT_SET_MODES,
   type XorGrantSetMode,
 } from '@/lib/forms/mode-dependent-grant-set-form-fields'
+import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
+import { WEAPON_PROFICIENCY_GRANT_MODES } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 import { xorArmorProficiencyGrantSetField } from '@/lib/forms/grant-sets/xor-armor-proficiency-grant-field'
-import { xorWeaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/xor-weapon-proficiency-grant-field'
 
 export const LEVEL_ZERO_NPCS_ENABLED = 'levelZeroNpcsEnabled' as const
 
@@ -103,7 +104,7 @@ export const levelZeroNpcsFormSchema = z.object({
   levelZeroRetainSpeciesTraits: z.boolean(),
   levelZeroArmorGrantMode: z.enum(XOR_GRANT_SET_MODES),
   levelZeroArmorProficiencies: levelZeroArmorProficienciesFormSchema,
-  levelZeroWeaponGrantMode: z.enum(XOR_GRANT_SET_MODES),
+  levelZeroWeaponGrantMode: z.enum(WEAPON_PROFICIENCY_GRANT_MODES),
   levelZeroWeaponProficiencies: levelZeroWeaponProficienciesFormSchema,
   levelZeroLanguageProficiencies: levelZeroLanguageProficienciesFormSchema,
   levelZeroRetainSpeciesLanguages: z.boolean(),
@@ -206,7 +207,7 @@ export function levelZeroNpcsFields({
                 itemsLabel: 'Specific armor',
                 separator: 'subtle',
               }),
-              xorWeaponProficiencyGrantSetField({
+              weaponProficiencyGrantSetField({
                 modeFieldName: LEVEL_ZERO_WEAPON_MODE,
                 categoriesPath: LEVEL_ZERO_WEAPON_CATEGORIES_PATH,
                 itemsPath: LEVEL_ZERO_WEAPON_ITEMS_PATH,

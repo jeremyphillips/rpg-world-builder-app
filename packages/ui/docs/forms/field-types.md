@@ -382,7 +382,9 @@ Searchable dropdown for large lists (catalog refs).
 ### Panel filters (`filterSelects`)
 
 Toolbar dimensions use `filterSelects` (static) or `filterSelectsResolve` (dynamic). Option rows
-carry matching slugs in `filterValues` (keyed by each dimension’s `filterKey`).
+carry matching slugs in `filterValues` (keyed by each dimension’s `filterKey`). Dashboard
+equipment options: see [equipment-filter-surfaces.md](../../../../apps/dashboard/docs/equipment-filter-surfaces.md)
+(`resolveEquipmentComboboxFilterValues` — not overview or picker filter state).
 
 - **All / reset:** filtering uses `FilterDimensionValue = string | undefined`. `undefined` means
   unrestricted for that dimension. The renderer injects the All menu row; config `options` list

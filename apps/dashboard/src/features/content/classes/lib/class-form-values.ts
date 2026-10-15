@@ -72,14 +72,14 @@ function normalizeClassToolProficiencies(
 
 export function proficienciesFromFormValues(
   proficiencies: ClassFormValues['proficiencies'],
-  hasSpecificWeapons: boolean,
+  weaponProficiencyMode: ClassFormValues['weaponProficiencyMode'],
   hasSpecificArmor: boolean,
 ): ClassProficiencies {
   const tools = normalizeClassToolProficiencies(proficiencies.tools)
   const weapons = normalizeWeaponProficiencyGrantSet({
     categories: proficiencies.weapons.categories,
     items: proficiencies.weapons.items,
-    hasSpecificWeapons,
+    mode: weaponProficiencyMode,
   })
   const armor = normalizeArmorProficiencyGrantSet({
     categories: proficiencies.armor.categories,
@@ -98,11 +98,11 @@ export function proficienciesFromFormValues(
 
 function proficienciesForInput(
   proficiencies: ClassFormValues['proficiencies'],
-  hasSpecificWeapons: boolean,
+  weaponProficiencyMode: ClassFormValues['weaponProficiencyMode'],
   hasSpecificArmor: boolean,
   validationIntent: ContentValidationIntent,
 ): ClassProficiencies | undefined {
-  const parsed = proficienciesFromFormValues(proficiencies, hasSpecificWeapons, hasSpecificArmor)
+  const parsed = proficienciesFromFormValues(proficiencies, weaponProficiencyMode, hasSpecificArmor)
   if (validationIntent === 'draft' && parsed.savingThrows.length === 0) {
     return undefined
   }
@@ -201,7 +201,7 @@ function classWirePayloadParts(
     characterCreation: classCharacterCreationInputFromForm(values, ctx?.entity),
     proficiencies: proficienciesForInput(
       values.proficiencies,
-      values.weaponProficiencyMode === 'specific',
+      values.weaponProficiencyMode,
       values.armorProficiencyMode === 'specific',
       validationIntent,
     ),
@@ -386,6 +386,7 @@ export const classCreateDefaultValues: Partial<ClassFormValues> = {
   grantsCantrips: false,
   spellbookAcquisitionIrregular: false,
   weaponProficiencyMode: 'categories',
+  weaponProficiencyReconciliationPending: false,
   armorProficiencyMode: 'categories',
   proficiencies: {
     savingThrows: [],

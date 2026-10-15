@@ -43,7 +43,7 @@ import {
 
 import {
   coerceCreatureWeaponProficienciesForForm,
-  weaponProficiencyModeFromFormWeapons,
+  weaponProficiencyHydrationFromWeapons,
 } from './creature-details/monster-weapon-proficiencies-form.lib'
 
 /** Form state uses a weapon grant set; save normalizes to persisted target rows. */
@@ -83,6 +83,7 @@ export type MonsterFormValues = FieldValues & {
   [MONSTER_HIT_POINTS_STASH_FIELD]?: MonsterHitPointStash
   [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]?: number
   weaponProficiencyMode?: WeaponProficiencyMode
+  weaponProficiencyReconciliationPending?: boolean
 }
 
 const NEUTRAL_ABILITIES: Monster['abilityScores'] = {
@@ -125,7 +126,8 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     actions: [],
     bonusActions: [],
     reactions: [],
-    weaponProficiencyMode: 'categories',
+    weaponProficiencyMode: 'none',
+    weaponProficiencyReconciliationPending: false,
   }
 }
 
@@ -182,7 +184,13 @@ export function monsterToFormValues(entity: Monster): MonsterFormValues {
     actions: entity.actions,
     bonusActions: entity.bonusActions,
     reactions: entity.reactions,
-    weaponProficiencyMode: weaponProficiencyModeFromFormWeapons(weapons),
+    ...(() => {
+      const hydration = weaponProficiencyHydrationFromWeapons(weapons)
+      return {
+        weaponProficiencyMode: hydration.mode,
+        weaponProficiencyReconciliationPending: hydration.reconciliationPending,
+      }
+    })(),
   }
 }
 

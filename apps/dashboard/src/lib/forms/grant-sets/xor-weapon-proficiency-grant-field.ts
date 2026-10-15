@@ -5,7 +5,9 @@ import {
 
 import { buildWeaponProficiencyGrantComboboxFilters } from './weapon-proficiency-combobox-filters.lib'
 
-/** Level-0 NPC weapon grant set with dual combobox filters. */
+/**
+ * @deprecated Use `weaponProficiencyGrantSetField` — level-0 weapons share the 3-mode grant enum.
+ */
 export function xorWeaponProficiencyGrantSetField(options: XorProficiencyGrantSetFieldOptions) {
   return xorProficiencyGrantSetField({
     ...options,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { fieldValidationMessages, getProficiencyDomainSentenceForm } from '@rpg/contracts'
-import { isContainer, type FormItem } from '@rpg/ui/form'
+import { isContainer, type DependentConfig, type FormItem } from '@rpg/ui/form'
 
 import { createClassFormSchema } from './class-form-fields'
 import { proficienciesFields } from './class-proficiencies-form-fields'
@@ -49,8 +49,10 @@ describe('proficienciesFields', () => {
       throw new Error('Expected Weapons group')
     }
 
-    const [weaponGrantSet] = weaponsGroup.fields
-    if (!weaponGrantSet || !isContainer(weaponGrantSet) || weaponGrantSet.kind !== 'dependent') {
+    const weaponGrantSet = weaponsGroup.fields.find(
+      (field): field is DependentConfig => isContainer(field) && field.kind === 'dependent',
+    )
+    if (!weaponGrantSet) {
       throw new Error('Expected weapon proficiency dependent')
     }
 
@@ -64,8 +66,10 @@ describe('proficienciesFields', () => {
       throw new Error('Expected Weapons group')
     }
 
-    const [weaponGrantSet] = weaponsGroup.fields
-    if (!weaponGrantSet || !isContainer(weaponGrantSet) || weaponGrantSet.kind !== 'dependent') {
+    const weaponGrantSet = weaponsGroup.fields.find(
+      (field): field is DependentConfig => isContainer(field) && field.kind === 'dependent',
+    )
+    if (!weaponGrantSet) {
       throw new Error('Expected weapon proficiency dependent')
     }
 

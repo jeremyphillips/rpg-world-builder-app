@@ -1,4 +1,4 @@
-export { vehicleColumns, vehicleFilterSchema } from './lib/vehicle-overview-columns'
+export { vehicleColumns, vehicleOverviewFilterSchema } from './lib/vehicle-overview-columns'
 export { GALLEY, ROWBOAT, VEHICLE_LIST } from './fixtures'
 export { vehicleFormFieldGroup } from './lib/vehicle-form-fields'
 export { buildVehicleInput, vehicleFormValuesFromEntity } from './lib/vehicle-form-values'

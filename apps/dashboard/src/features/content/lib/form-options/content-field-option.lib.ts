@@ -16,7 +16,7 @@ import {
 } from '@rpg/contracts'
 import type { FieldOption } from '@rpg/ui/form'
 
-import { resolveEquipmentFilterValues } from '@/lib/equipment/resolve-equipment-filter-values.lib'
+import { resolveEquipmentComboboxFilterValues } from '@/lib/equipment/resolve-equipment-grant-filter-dimensions.lib'
 
 import { shouldPresentContentSource } from '../content-type-presentation'
 
@@ -76,7 +76,7 @@ export function referenceEquipmentFieldOptions(
   return toSortedContentFieldOptions(selectors?.forReference(), 'equipment')
 }
 
-export function referenceWeaponFieldOptions(
+export function referenceWeaponComboboxFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
   return sortFieldOptions(
@@ -85,12 +85,12 @@ export function referenceWeaponFieldOptions(
       .filter(isWeaponEquipment)
       .map((item) => ({
         ...toContentFieldOption(item, 'equipment'),
-        filterValues: resolveEquipmentFilterValues(item),
+        filterValues: resolveEquipmentComboboxFilterValues(item),
       })) ?? [],
   )
 }
 
-export function referenceArmorFieldOptions(
+export function referenceArmorComboboxFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
   return sortFieldOptions(
@@ -99,12 +99,12 @@ export function referenceArmorFieldOptions(
       .filter(isArmorEquipment)
       .map((item) => ({
         ...toContentFieldOption(item, 'equipment'),
-        filterValues: resolveEquipmentFilterValues(item),
+        filterValues: resolveEquipmentComboboxFilterValues(item),
       })) ?? [],
   )
 }
 
-export function referenceToolFieldOptions(
+export function referenceToolComboboxFieldOptions(
   selectors: ContentPurposeSelectors<Equipment> | undefined,
 ): FieldOption[] {
   return sortFieldOptions(
@@ -113,7 +113,7 @@ export function referenceToolFieldOptions(
       .filter((item): item is ToolEquipment => item.kind === 'tool')
       .map((item) => ({
         ...toContentFieldOption(item, 'equipment'),
-        filterValues: resolveEquipmentFilterValues(item),
+        filterValues: resolveEquipmentComboboxFilterValues(item),
         classification: TOOL_CATEGORY_ENTRIES[item.toolCategory].label,
       })) ?? [],
   )

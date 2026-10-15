@@ -11,6 +11,9 @@ export type ArmorProficiencyGrantSetFieldOptions = ModeDependentGrantSetFieldOpt
 export function armorProficiencyGrantSetField(options: ArmorProficiencyGrantSetFieldOptions) {
   return modeDependentGrantSetField({
     ...options,
-    itemsCombobox: { filterSelects: buildArmorProficiencyGrantComboboxFilters() },
+    itemsCombobox: {
+      filterSelects: buildArmorProficiencyGrantComboboxFilters(),
+      ...options.itemsCombobox,
+    },
   })
 }

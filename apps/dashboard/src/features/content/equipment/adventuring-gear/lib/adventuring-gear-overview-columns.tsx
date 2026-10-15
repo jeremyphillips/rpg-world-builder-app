@@ -48,7 +48,7 @@ const ADVENTURING_GEAR_MIDDLE_COLUMNS: ColumnDef<AdventuringGearEquipment>[] = [
   costColumn<AdventuringGearEquipment>(),
 ]
 
-export const adventuringGearFilterSchema = buildContentFilterSchema<
+export const adventuringGearOverviewFilterSchema = buildContentFilterSchema<
   AdventuringGearRow,
   AdventuringGearOverviewFilterState
 >('equipment', [

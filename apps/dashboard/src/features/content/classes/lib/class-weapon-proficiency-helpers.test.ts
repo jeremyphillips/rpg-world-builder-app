@@ -3,33 +3,33 @@ import { describe, expect, it } from 'vitest'
 import { normalizeWeaponProficiencyGrantSet } from './class-weapon-proficiency-helpers'
 
 describe('normalizeWeaponProficiencyGrantSet', () => {
-  it('returns categories only when the toggle is off', () => {
+  it('returns empty grant when mode is none', () => {
     expect(
       normalizeWeaponProficiencyGrantSet({
         categories: ['simple', 'martial'],
         items: ['dagger'],
-        hasSpecificWeapons: false,
+        mode: 'none',
+      }),
+    ).toEqual({ categories: [], items: [] })
+  })
+
+  it('returns categories only when mode is categories', () => {
+    expect(
+      normalizeWeaponProficiencyGrantSet({
+        categories: ['simple', 'martial'],
+        items: ['dagger'],
+        mode: 'categories',
       }),
     ).toEqual({ categories: ['simple', 'martial'], items: [] })
   })
 
-  it('returns named weapons only when the toggle is on', () => {
+  it('returns named weapons only when mode is specific', () => {
     expect(
       normalizeWeaponProficiencyGrantSet({
         categories: ['simple'],
         items: ['dagger', 'longsword'],
-        hasSpecificWeapons: true,
+        mode: 'specific',
       }),
     ).toEqual({ categories: [], items: ['dagger', 'longsword'] })
-  })
-
-  it('returns empty categories when individual mode is on with no items selected', () => {
-    expect(
-      normalizeWeaponProficiencyGrantSet({
-        categories: ['simple'],
-        items: [],
-        hasSpecificWeapons: true,
-      }),
-    ).toEqual({ categories: [], items: [] })
   })
 })

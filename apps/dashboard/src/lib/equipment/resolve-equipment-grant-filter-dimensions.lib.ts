@@ -5,10 +5,12 @@ import {
   type ToolEquipment,
 } from '@rpg/contracts'
 
-/** Canonical dimension slugs for combobox filterValues and row metadata comparisons. */
-export function resolveEquipmentFilterValues(
+/** Normalized weapon / armor / tool dimension slugs shared by combobox and picker match boundaries. */
+export type EquipmentGrantFilterDimensions = Readonly<Record<string, string>>
+
+export function resolveEquipmentGrantFilterDimensions(
   equipment: Equipment,
-): Readonly<Record<string, string>> | undefined {
+): EquipmentGrantFilterDimensions | undefined {
   if (isWeaponEquipment(equipment)) {
     return {
       category: equipment.category,
@@ -29,4 +31,11 @@ export function resolveEquipmentFilterValues(
   }
 
   return undefined
+}
+
+/** Adapter for form combobox `FieldOption.filterValues` (same slugs as grant dimensions). */
+export function resolveEquipmentComboboxFilterValues(
+  equipment: Equipment,
+): EquipmentGrantFilterDimensions | undefined {
+  return resolveEquipmentGrantFilterDimensions(equipment)
 }

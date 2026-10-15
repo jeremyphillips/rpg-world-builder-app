@@ -1,5 +1,6 @@
 import {
   addApiValidationIssueToRefinement,
+  addCustomRefinementIssue,
   collectMonsterCatalogIssues,
   type MonsterCatalogs,
   monsterBodyDraftSchema,
@@ -57,6 +58,13 @@ export function resolveMonsterFormSchema(
     .superRefine((input, refinementCtx) => {
       if (!isRecord(input) || !Array.isArray(input.movement)) return
       refineMovementRows(input.movement as MovementRowDraftFormValues[], refinementCtx)
+      if (intent === 'publish' && input.weaponProficiencyReconciliationPending === true) {
+        addCustomRefinementIssue(
+          refinementCtx,
+          'Resolve stored weapon proficiencies by choosing a weapon proficiency mode.',
+          ['weaponProficiencyMode'],
+        )
+      }
     })
     .pipe(z.preprocess(adaptMonsterFormMovementForBodySchema, base))
     .superRefine((body, refinement) => {
