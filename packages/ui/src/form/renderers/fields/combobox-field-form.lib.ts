@@ -113,7 +113,7 @@ export function filterComboboxOptionsByActiveFilters(
 export function composeComboboxResolveFilteredOptionsFromActive(
   active: ActiveDimensionFilters,
   userResolver: ComboboxFieldConfig['resolveFilteredOptions'],
-): ComboboxFieldConfig['resolveFilteredOptions'] {
+): NonNullable<ComboboxFieldConfig['resolveFilteredOptions']> {
   return (options, query, selected) => {
     const comboboxOptions = toComboboxFieldOptions(options)
     const dimensionFiltered = filterComboboxOptionsByActiveFilters(

@@ -18,7 +18,7 @@ describe('resolveMonsterEquipmentRowStatus', () => {
       quantity: 1,
       equipped: true,
       magical: true,
-      adjustments: [{ kind: 'enhancement' as const, value: 1 }],
+      adjustments: [{ effectId: 'enhancement', target: 'attack_roll' as const, bonus: 1 }],
     }
     const summary = resolveEquipmentInstanceSummary(entry, greataxe, provider)
     const { status } = resolveMonsterEquipmentRowStatus({

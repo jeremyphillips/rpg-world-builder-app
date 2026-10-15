@@ -111,7 +111,15 @@ export function EditOrganizationMembershipDrawer({
     }
   }, [onOpenChange, onRemove, pending])
 
-  const organizationVm = buildOrganizationEntitySummaryVm(organization)
+  const organizationVm = buildOrganizationEntitySummaryVm({
+    id: organization.id,
+    name: organization.name,
+    organizationDomain: organization.organizationDomain,
+    slug: organization.id,
+    source: 'homebrew',
+    rulesetId: 'srd-cc-5.2.1',
+    media: undefined,
+  })
   const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
 
   return (

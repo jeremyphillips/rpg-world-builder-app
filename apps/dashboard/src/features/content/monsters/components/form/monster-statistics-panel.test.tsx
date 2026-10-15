@@ -78,8 +78,9 @@ describe('MonsterStatisticsPanel', () => {
 
   it('commits a typed score on blur without writing untouched default tens', async () => {
     const user = userEvent.setup()
-    const values = resolveMonsterCreateDefaultValues()
-    delete values.abilityScores.str
+    const defaults = resolveMonsterCreateDefaultValues()
+    const { str: _str, ...abilityScoresWithoutStr } = defaults.abilityScores
+    const values = { ...defaults, abilityScores: abilityScoresWithoutStr }
 
     let latest: MonsterFormValues | undefined
     function TrackingHost() {
@@ -115,8 +116,9 @@ describe('MonsterStatisticsPanel', () => {
 
   it('toggles save proficiency without writing ability scores', async () => {
     const user = userEvent.setup()
-    const values = resolveMonsterCreateDefaultValues()
-    delete values.abilityScores.str
+    const defaults = resolveMonsterCreateDefaultValues()
+    const { str: _str, ...abilityScoresWithoutStr } = defaults.abilityScores
+    const values = { ...defaults, abilityScores: abilityScoresWithoutStr }
 
     let latest: MonsterFormValues | undefined
     function TrackingHost() {

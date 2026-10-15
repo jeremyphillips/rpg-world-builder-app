@@ -86,7 +86,7 @@ function clearAbilityScore(
 }
 
 function finalizeMutation(
-  scores: Partial<Record<Ability, number>>,
+  _scores: Partial<Record<Ability, number>>,
   scorePool: readonly number[],
   operation: 'assign' | 'move' | 'swap',
   next: Partial<Record<Ability, number>>,

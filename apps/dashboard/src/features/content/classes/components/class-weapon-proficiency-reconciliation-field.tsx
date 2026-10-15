@@ -27,7 +27,7 @@ export function ClassWeaponProficiencyReconciliationField() {
   if (!pending) return null
 
   return (
-    <SemanticText tone="warning" size="sm">
+    <SemanticText tone="warning">
       {WEAPON_PROFICIENCY_PERSISTED_MIXED_RECONCILIATION_MESSAGE}
     </SemanticText>
   )

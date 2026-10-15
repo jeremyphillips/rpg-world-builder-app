@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
-import { DEFAULT_STANDARD_ARRAY } from '@rpg/contracts'
+import { DEFAULT_STANDARD_ARRAY, type AbilityScoreRecommendation } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
 import { abilitiesFormSchema } from '../../../../../lib/steps/abilities-form-fields'
@@ -30,7 +30,7 @@ const fighterClassInput = {
   primaryAbilities: ['str', 'dex'] as const,
 }
 
-const fighterRecommendation = {
+const fighterRecommendation: AbilityScoreRecommendation = {
   preferences: [
     { ability: 'str', source: 'class', emphasis: 'primary', className: 'Fighter' },
     { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },

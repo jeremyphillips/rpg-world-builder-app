@@ -46,6 +46,7 @@ describe('resolveStandardArrayScoreToAbility', () => {
   it('assigns a pool score to an occupied ability and frees the old score', () => {
     const result = resolveStandardArrayScoreToAbility({ str: 15 }, POOL, 'str', 14)
     expect(result).toEqual({ operation: 'assign', next: { str: 14 } })
+    if (result.operation !== 'assign') throw new Error('expected assign')
     expect(getFixedScoresRemainingCount(result.next, POOL)).toBe(5)
   })
 

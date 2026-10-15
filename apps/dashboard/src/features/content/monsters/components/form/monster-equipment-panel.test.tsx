@@ -2,6 +2,7 @@ import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm, type UseFormReturn } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
+import { buildContentPurposeSelectors } from '@rpg/contracts'
 import { describe, expect, it } from 'vitest'
 
 import { pickEquipment } from '@/test/fixtures/pick'
@@ -39,9 +40,7 @@ function Host({
           equipmentCatalogById,
           rulesetId: 'srd-cc-5.2.1',
           options: {
-            equipment: {
-              forReference: () => catalogEquipment,
-            },
+            equipment: buildContentPurposeSelectors(catalogEquipment),
           },
         }}
       />

@@ -3,6 +3,7 @@ import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
   findCanonicalPlainEntry,
+  creatureWeaponProficienciesSchema,
   getContentTypeTerm,
   normalizeEquipmentInstance,
   resolveEquipmentInstanceSummary,
@@ -85,7 +86,9 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
 
   const weaponGrants = useMemo(() => {
     const raw = coerceCreatureWeaponProficienciesForForm(values?.proficiencies?.weapons)
-    return weaponProficiencyGrantSetFromMode(values?.weaponProficiencyMode ?? 'none', raw)
+    return creatureWeaponProficienciesSchema.parse(
+      weaponProficiencyGrantSetFromMode(values?.weaponProficiencyMode ?? 'none', raw),
+    )
   }, [values?.proficiencies?.weapons, values?.weaponProficiencyMode])
 
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []

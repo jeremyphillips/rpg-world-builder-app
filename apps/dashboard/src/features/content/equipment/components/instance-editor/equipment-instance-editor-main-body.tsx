@@ -4,7 +4,6 @@ import {
   formatEquipmentMechanicalComponentsForTarget,
   formatSignedModifier,
   joinInlineMetadata,
-  type Equipment,
   type EquipmentEffectTotals,
   type EquipmentInstance,
   type ResolvedEquipmentMagicProperties,

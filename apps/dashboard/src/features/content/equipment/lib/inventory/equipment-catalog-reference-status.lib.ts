@@ -18,7 +18,12 @@ export function mergeEquipmentInventoryCatalogReferenceStatus(
 ): readonly EntitySummaryStatusItem[] {
   if (!catalogMissing) return status
   const unavailable = equipmentCatalogReferenceUnavailableStatusItem()
-  if (status.some((item) => item.kind === 'text' && item.label === unavailable.label)) {
+  if (
+    status.some((item) => {
+      if (item.kind !== 'text') return false
+      return item.label === EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE
+    })
+  ) {
     return status
   }
   return [unavailable, ...status]

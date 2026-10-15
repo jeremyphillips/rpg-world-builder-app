@@ -7,9 +7,17 @@ import {
   resolveMonsterWeaponIsProficient,
 } from './resolve-monster-weapon-is-proficient.lib'
 
+function expectWeapon(slug: Parameters<typeof pickEquipment>[0]) {
+  const equipment = pickEquipment(slug)
+  if (equipment.kind !== 'weapon') {
+    throw new Error(`Expected weapon fixture: ${slug}`)
+  }
+  return equipment
+}
+
 describe('resolveMonsterWeaponIsProficient', () => {
   it('covers individual weapon grants', () => {
-    const dagger = pickEquipment('dagger')
+    const dagger = expectWeapon('dagger')
     expect(resolveMonsterWeaponIsProficient(dagger, { categories: [], items: [dagger.id] })).toBe(
       true,
     )
@@ -17,7 +25,7 @@ describe('resolveMonsterWeaponIsProficient', () => {
   })
 
   it('covers category grants for martial weapons', () => {
-    const greataxe = pickEquipment('greataxe')
+    const greataxe = expectWeapon('greataxe')
     expect(resolveMonsterWeaponIsProficient(greataxe, { categories: ['martial'], items: [] })).toBe(
       true,
     )
@@ -33,7 +41,7 @@ describe('resolveMonsterLoadoutEquipmentIsProficient', () => {
   })
 
   it('evaluates weapons against the grant set', () => {
-    const greataxe = pickEquipment('greataxe')
+    const greataxe = expectWeapon('greataxe')
     expect(
       resolveMonsterLoadoutEquipmentIsProficient(greataxe, { categories: [], items: [] }),
     ).toBe(false)

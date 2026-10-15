@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
+import {
+  resolveMonsterCreateDefaultValues,
+  type MonsterEquipmentFormEntry,
+} from '../monster-form-values'
 import {
   equipmentEntryHasMeaningfulCustomization,
   resolveEquipmentRemovalDecision,
@@ -19,8 +22,10 @@ describe('equipmentEntryHasMeaningfulCustomization', () => {
     [{ ...base, magicProperties: [{ kind: 'preset', propertyId: 'p1' }] }, true],
     [{ ...base, adjustments: [{ effectId: 'a1', target: 'attack_roll', bonus: 1 }] }, true],
     [{ ...base, modifiers: [{ kind: 'spellcasting_focus' }] }, true],
-  ] as const)('classifies %#', (entry, expected) => {
-    expect(equipmentEntryHasMeaningfulCustomization(entry)).toBe(expected)
+  ])('classifies %#', (entry, expected) => {
+    expect(equipmentEntryHasMeaningfulCustomization(entry as MonsterEquipmentFormEntry)).toBe(
+      expected,
+    )
   })
 })
 

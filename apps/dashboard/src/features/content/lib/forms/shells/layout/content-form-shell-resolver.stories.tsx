@@ -31,6 +31,11 @@ export const Error: Story = {
 }
 
 export const ErrorWithRetry: Story = {
+  args: {
+    isPending: false,
+    isError: true,
+    children: null,
+  },
   render: function ErrorWithRetryStory() {
     const [isError, setIsError] = useState(true)
     const [isRetrying, setIsRetrying] = useState(false)

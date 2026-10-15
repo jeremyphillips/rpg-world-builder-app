@@ -1,4 +1,5 @@
 import {
+  creatureWeaponProficienciesSchema,
   creatureWeaponProficiencyTargetsFromGrantSet,
   monsterActionDraftSchema,
   monsterReactionDraftSchema,
@@ -145,7 +146,9 @@ function normalizeProficiencies(
     weaponProficiencyMode ?? 'none',
     coercedWeapons,
   )
-  const weapons = creatureWeaponProficiencyTargetsFromGrantSet(grantSet)
+  const weapons = creatureWeaponProficiencyTargetsFromGrantSet(
+    creatureWeaponProficienciesSchema.parse(grantSet),
+  )
   return {
     ...proficiencies,
     skills: dedupeSkillProficiencies(proficiencies.skills ?? []),

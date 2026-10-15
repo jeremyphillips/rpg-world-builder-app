@@ -38,7 +38,6 @@ import { useSpells } from '../../spells/hooks/use-spells'
 import {
   failedContentFormCatalogQueries,
   refetchFailedContentFormCatalogQueries,
-  type ContentFormCatalogQuery,
 } from './content-form-options-retry.lib'
 
 export type { ContentFormCatalogQuery } from './content-form-options-retry.lib'

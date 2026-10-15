@@ -1018,6 +1018,7 @@
     "buildingFunctionFamilySchema",
     "campaignAccessParticipantEntrySchema",
     "campaignAccessParticipantRosterSchema",
+    "campaignCharacterAbilityScorePatchSchema",
     "campaignCharacterAssignmentBuildInvalidDetailsSchema",
     "campaignCharacterAssignmentCampaignIneligibleDetailsSchema",
     "campaignCharacterAssignmentErrorDetailsSchema",

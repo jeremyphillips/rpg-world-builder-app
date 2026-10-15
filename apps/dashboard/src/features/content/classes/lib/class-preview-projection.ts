@@ -188,11 +188,10 @@ function buildProficienciesSection(
     CLASS_PREVIEW_FACT_LABELS.savingThrows,
     (proficiencies?.savingThrows ?? []).map(getAbilityCompactLabel),
   )
-  appendFact(
-    facts,
-    CLASS_PREVIEW_FACT_LABELS.armorTraining,
-    (proficiencies?.armor ?? []).map(getArmorCategoryPreviewLabel),
-  )
+  appendFact(facts, CLASS_PREVIEW_FACT_LABELS.armorTraining, [
+    ...(proficiencies?.armor?.categories ?? []).map(getArmorCategoryPreviewLabel),
+    ...(proficiencies?.armor?.items ?? []).map(formatSlugLabel),
+  ])
 
   const weapons = [
     ...(proficiencies?.weapons.categories ?? []).map(getWeaponCategoryPreviewLabel),

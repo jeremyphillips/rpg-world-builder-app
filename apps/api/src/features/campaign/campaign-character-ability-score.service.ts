@@ -4,7 +4,7 @@ import type {
 } from '@rpg/contracts'
 import { isCampaignManager } from '@rpg/contracts'
 
-import { findNpcById, findPcById, updateCharacterAbilityScore } from '../character'
+import { findPcById, updateCharacterAbilityScore } from '../character'
 import { findOpenParticipation } from './participation/campaign-character-participation.repository'
 import { authorizeCampaignCharacterAccess } from './campaign-character-access.service'
 
@@ -42,7 +42,7 @@ export async function patchCampaignCharacterAbilityScore(input: {
     return null
   }
 
-  const refreshed = (await findPcById(input.characterId)) ?? (await findNpcById(input.characterId))
+  const refreshed = await findPcById(input.characterId)
   if (!refreshed) {
     return null
   }

@@ -125,7 +125,11 @@ export function EntitySummaryStatus({
                 <span className={entitySummaryStatusBadgeGroupVariants()}>
                   {segment.badges.map((badge, badgeIndex) => (
                     <EntitySummaryStatusItemView
-                      key={`${badge.label}-${badgeIndex}`}
+                      key={
+                        badge.kind === 'validationError'
+                          ? `validation-error-${badgeIndex}`
+                          : `${badge.label}-${badgeIndex}`
+                      }
                       item={badge}
                       density={density}
                       layout="inline"

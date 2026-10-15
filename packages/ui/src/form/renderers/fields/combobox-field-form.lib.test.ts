@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ComboboxFilterDimensionConfig, FieldOption } from '../../field-config'
 import {
   composeComboboxResolveFilteredOptionsFromActive,
   dimensionValueToSelectValue,
@@ -9,7 +10,7 @@ import {
   toComboboxFieldOptions,
 } from './combobox-field-form.lib'
 
-const toolOptions = [
+const toolOptions: FieldOption[] = [
   {
     value: 'thieves-tools',
     label: "Thieves' tools",
@@ -96,7 +97,7 @@ describe('filterComboboxOptionsByActiveFilters', () => {
 })
 
 describe('reconcileActiveDimensionFilters', () => {
-  const categoryDimension = {
+  const categoryDimension: ComboboxFilterDimensionConfig = {
     filterKey: 'category',
     ariaLabel: 'Filter by category',
     options: [
@@ -104,7 +105,7 @@ describe('reconcileActiveDimensionFilters', () => {
       { value: 'martial', label: 'Martial' },
     ],
     defaultValue: undefined,
-  } as const
+  }
 
   it('drops keys absent from resolved dimension configs', () => {
     expect(
@@ -125,7 +126,7 @@ describe('reconcileActiveDimensionFilters', () => {
   })
 
   it('preserves valid keys when configs add a second dimension', () => {
-    const dual = [
+    const dual: ComboboxFilterDimensionConfig[] = [
       categoryDimension,
       {
         filterKey: 'mode',
@@ -135,7 +136,7 @@ describe('reconcileActiveDimensionFilters', () => {
           { value: 'ranged', label: 'Ranged' },
         ],
       },
-    ] as const
+    ]
 
     expect(reconcileActiveDimensionFilters({ category: 'simple', mode: 'ranged' }, dual)).toEqual({
       category: 'simple',
@@ -149,7 +150,7 @@ describe('composeComboboxResolveFilteredOptionsFromActive', () => {
     const resolver = composeComboboxResolveFilteredOptionsFromActive(
       { category: 'thieves' },
       undefined,
-    )!
+    )
     expect(resolver(toolOptions, 'lute', [])).toEqual([])
     expect(resolver(toolOptions, 'thieves', [])).toEqual([toolOptions[0]])
   })

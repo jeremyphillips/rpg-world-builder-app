@@ -89,7 +89,7 @@ export function EntityAnatomy({
       ) : null}
       {entity.media ? (
         <RowAnatomyCell<EntityAnatomyColumn>
-          cell={{ slot: 'stretch', column: 'media' }}
+          cell={{ slot: 'band', column: 'media' }}
           data-entity-item-slot="media"
         >
           <div className={entityAnatomyMediaContentSpanClasses}>{entity.media}</div>

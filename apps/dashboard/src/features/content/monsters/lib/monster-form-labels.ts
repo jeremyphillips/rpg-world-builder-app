@@ -13,6 +13,7 @@ import {
   getMonsterTraitSectionLabel,
   getNaturalArmorBonusFieldLabel,
   getProficiencyDomainCollectionLabel,
+  joinInlineMetadata,
   getProficiencyGrantCompactAddLabel,
   HIT_POINTS_TERM,
   LANGUAGE_TERM,

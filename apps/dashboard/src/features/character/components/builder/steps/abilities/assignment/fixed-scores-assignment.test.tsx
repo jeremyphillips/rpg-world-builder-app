@@ -9,6 +9,7 @@ import {
   DEFAULT_STANDARD_ARRAY,
   characterBuilderAbilityRecommendationMessages,
   formatFieldMessage,
+  type AbilityScoreRecommendation,
 } from '@rpg/contracts'
 import { Form } from '@rpg/ui/form'
 
@@ -37,7 +38,7 @@ const fighterRecommendation = {
       { ability: 'dex', source: 'class', emphasis: 'secondary', className: 'Fighter' },
     ],
     suggestedAssignment: { str: 15, dex: 14 },
-  },
+  } satisfies AbilityScoreRecommendation,
 }
 
 function renderAssignment(
