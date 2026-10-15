@@ -379,6 +379,21 @@ Searchable dropdown for large lists (catalog refs).
   `option.disabled`. Pair with `FieldOption.disabledReason` (or `optionsResolve`) when disabled
   options should explain why in the panel end slot.
 
+### Panel filters (`filterSelects`)
+
+Toolbar dimensions use `filterSelects` (static) or `filterSelectsResolve` (dynamic). Option rows
+carry matching slugs in `filterValues` (keyed by each dimension’s `filterKey`).
+
+- **All / reset:** filtering uses `FilterDimensionValue = string | undefined`. `undefined` means
+  unrestricted for that dimension. The renderer injects the All menu row; config `options` list
+  **concrete slugs only**.
+- **Resolve order:** `optionsResolve` → `filterSelectsResolve` → reconcile active dimension state →
+  render toolbar → `composeComboboxResolveFilteredOptions`.
+- **Dynamic dimensions:** stable `filterKey` per dimension; invalid slugs reset to `defaultValue`
+  or `undefined`; removed dimensions drop from reconciled state.
+- **Array `filterSelect`:** unrelated cross-row select disabling on parent `array` configs — same
+  name, different feature (see [array-field-authoring.md](./array-field-authoring.md)).
+
 ## Level range (`levelRange`)
 
 Inline min/max level selects joined by a connector (`1 through 20`). Uses sibling paths
