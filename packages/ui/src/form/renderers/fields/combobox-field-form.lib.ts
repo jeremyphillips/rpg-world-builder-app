@@ -1,4 +1,5 @@
 import { filterOptions } from '../../../components/ui/combobox-field.lib'
+import { FILTER_SELECT_ALL_VALUE as COMBOBOX_DIMENSION_SELECT_ALL_VALUE } from '../../../filters/filter-bar.variants'
 import type { ComboboxFieldOption } from '../../../components/ui/combobox-field.types'
 import {
   COMBOBOX_FILTER_ALL_VALUE,
@@ -9,8 +10,7 @@ import {
   type FilterDimensionValue,
 } from '../../field-config'
 
-/** Radix select wire value for unrestricted (All) — not part of the filtering contract. */
-export const COMBOBOX_DIMENSION_SELECT_ALL_VALUE = '__all__'
+export { COMBOBOX_DIMENSION_SELECT_ALL_VALUE }
 
 /** Maps form-layer options to combobox panel options. */
 export function toComboboxFieldOptions(options: FieldOption[]): ComboboxFieldOption[] {

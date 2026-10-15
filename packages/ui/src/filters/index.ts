@@ -127,3 +127,9 @@ export {
   prepareDatatableFilterSchemaForRender,
   validateDatatableFilterSchema,
 } from './validate-datatable-filter-schema'
+
+export {
+  SharedFilterSelect,
+  type SharedFilterSelectOption,
+  type SharedFilterSelectProps,
+} from './shared-filter-select.client'
