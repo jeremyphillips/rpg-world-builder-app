@@ -1,0 +1,15 @@
+/** Grant-set editor copy for armor proficiency combobox filters (not choice-grant pool UI). */
+export const ARMOR_PROFICIENCY_CATEGORY_FILTER_ARIA = 'Filter armor by category'
+export const ARMOR_PROFICIENCY_STEALTH_FILTER_ARIA = 'Filter armor by stealth'
+export const ARMOR_PROFICIENCY_CATEGORY_FILTER_ALL_LABEL = 'All categories'
+export const ARMOR_PROFICIENCY_STEALTH_FILTER_ALL_LABEL = 'All stealth'
+
+export const ARMOR_STEALTH_FILTER_SLUGS = ['none', 'disadvantage'] as const
+
+export const ARMOR_STEALTH_FILTER_LABELS: Record<
+  (typeof ARMOR_STEALTH_FILTER_SLUGS)[number],
+  string
+> = {
+  none: 'No stealth disadvantage',
+  disadvantage: 'Stealth disadvantage',
+}

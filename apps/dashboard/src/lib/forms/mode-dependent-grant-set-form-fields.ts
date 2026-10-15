@@ -24,6 +24,11 @@ export type DependentPresentationOptions = {
   chrome?: DependentChrome
 }
 
+export type GrantSetItemsComboboxConfig = Pick<
+  ComboboxFieldConfig,
+  'filterSelects' | 'resolveFilteredOptions'
+>
+
 export type ModeDependentGrantSetFieldOptions = {
   modeFieldName: string
   modes: readonly string[]
@@ -51,6 +56,7 @@ export type ModeDependentGrantSetFieldOptions = {
   itemsRequired?: boolean
   renderSelectedItem?: ComboboxFieldConfig['renderSelectedItem']
   resolveOptionLabel?: ComboboxFieldConfig['resolveOptionLabel']
+  itemsCombobox?: GrantSetItemsComboboxConfig
 }
 
 function visibleWhenGrantMode(modeFieldName: string, mode: string): FieldVisibility {
@@ -89,6 +95,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
     itemsRequired,
     renderSelectedItem,
     resolveOptionLabel,
+    itemsCombobox,
   } = options
 
   return [
@@ -109,6 +116,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       multiple: true,
       options: itemOptions,
       width: 'full',
+      ...(itemsCombobox ?? {}),
       ...(renderSelectedItem ? { renderSelectedItem } : {}),
       ...(resolveOptionLabel ? { resolveOptionLabel } : {}),
       ...(itemsRequired ? { required: true } : {}),
