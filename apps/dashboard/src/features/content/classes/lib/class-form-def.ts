@@ -110,7 +110,11 @@ const classFormDef: ContentFormDef<
     })(),
     weaponProficiencyMode:
       entity.proficiencies && (entity.proficiencies.weapons.items?.length ?? 0) > 0
-        ? 'individual'
+        ? 'specific'
+        : 'categories',
+    armorProficiencyMode:
+      entity.proficiencies && (entity.proficiencies.armor.items?.length ?? 0) > 0
+        ? 'specific'
         : 'categories',
     spellcasting: spellcastingToFormValues(entity.spellcasting),
     proficiencies: entity.proficiencies

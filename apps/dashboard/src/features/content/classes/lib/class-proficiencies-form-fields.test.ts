@@ -30,19 +30,17 @@ describe('proficienciesFields', () => {
     ])
   })
 
-  it('keeps armor chips as a sibling field inside Defenses', () => {
+  it('keeps armor grant-set inside Defenses after saving throws', () => {
     const defenses = proficienciesColumns().columns[0]?.fields[0]
     if (!defenses || !isContainer(defenses) || defenses.kind !== 'group') {
       throw new Error('Expected Defenses group')
     }
 
-    const armorChips = defenses.fields[1]
-    expect(armorChips).toMatchObject({
-      type: 'chips',
-      name: 'proficiencies.armor',
-      label: 'Armor training',
+    const armorGrantSet = defenses.fields[1]
+    expect(armorGrantSet).toMatchObject({
+      kind: 'dependent',
+      controller: { name: 'armorProficiencyMode' },
     })
-    expect(armorChips).not.toHaveProperty('chrome')
   })
 
   it('relies on default nest chrome for weapon proficiency grant-set dependents', () => {
@@ -101,9 +99,10 @@ describe('publish weapon proficiency validation', () => {
     hasSpellcasting: false,
     grantsCantrips: false,
     weaponProficiencyMode: 'categories' as const,
+    armorProficiencyMode: 'categories' as const,
     proficiencies: {
       savingThrows: ['str'],
-      armor: [],
+      armor: { categories: ['light'], items: [] },
       weapons: { categories: [], items: [] },
       tools: { categories: [], items: [] },
       skills: { items: [] },
@@ -128,7 +127,7 @@ describe('publish weapon proficiency validation', () => {
   it('requires at least one weapon item in individual mode', () => {
     const result = createClassFormSchema().safeParse({
       ...basePublishValues,
-      weaponProficiencyMode: 'individual',
+      weaponProficiencyMode: 'specific',
     })
 
     expect(result.success).toBe(false)

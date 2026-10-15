@@ -26,9 +26,10 @@ import { languageGrantItemsField } from './language-grant-form-fields'
 import { standardArrayFormFields } from '@/lib/forms/standard-array-form-fields'
 import {
   XOR_GRANT_SET_MODES,
-  xorProficiencyGrantSetField,
   type XorGrantSetMode,
 } from '@/lib/forms/mode-dependent-grant-set-form-fields'
+import { xorArmorProficiencyGrantSetField } from '@/lib/forms/grant-sets/xor-armor-proficiency-grant-field'
+import { xorWeaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/xor-weapon-proficiency-grant-field'
 
 export const LEVEL_ZERO_NPCS_ENABLED = 'levelZeroNpcsEnabled' as const
 
@@ -193,7 +194,7 @@ export function levelZeroNpcsFields({
                 defaultValue: true,
                 separator: 'subtle',
               },
-              xorProficiencyGrantSetField({
+              xorArmorProficiencyGrantSetField({
                 modeFieldName: LEVEL_ZERO_ARMOR_MODE,
                 categoriesPath: LEVEL_ZERO_ARMOR_CATEGORIES_PATH,
                 itemsPath: LEVEL_ZERO_ARMOR_ITEMS_PATH,
@@ -205,7 +206,7 @@ export function levelZeroNpcsFields({
                 itemsLabel: 'Specific armor',
                 separator: 'subtle',
               }),
-              xorProficiencyGrantSetField({
+              xorWeaponProficiencyGrantSetField({
                 modeFieldName: LEVEL_ZERO_WEAPON_MODE,
                 categoriesPath: LEVEL_ZERO_WEAPON_CATEGORIES_PATH,
                 itemsPath: LEVEL_ZERO_WEAPON_ITEMS_PATH,

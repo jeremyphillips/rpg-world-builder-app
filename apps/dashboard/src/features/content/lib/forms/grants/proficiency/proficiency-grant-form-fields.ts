@@ -20,6 +20,8 @@ import {
   type FormItem,
 } from '@rpg/ui/form'
 
+import { buildWeaponProficiencyGrantComboboxFilters } from '@/lib/forms/grant-sets/weapon-proficiency-combobox-filters.lib'
+
 import type { ContentFormCtx } from '../../registry/content-form-registry'
 import { grantFieldLabel } from '../grant-field-terms'
 import {
@@ -243,6 +245,7 @@ function weaponProficiencyPoolFields(ctx: ContentFormCtx, guard?: FieldVisibilit
       label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
+      filterSelects: buildWeaponProficiencyGrantComboboxFilters(),
       required: true,
       visibility: visibleForPoolSource('explicit', guard),
     },
@@ -273,6 +276,7 @@ export function weaponProficiencyGrantItemFields(
       label: grantFieldLabel('weaponProficiencySlugs', { plural: true }),
       multiple: true,
       options: weaponOptions,
+      filterSelects: buildWeaponProficiencyGrantComboboxFilters(),
       required: true,
       visibility: visibleForProficiencySource('specific', guard),
       width: 'full',

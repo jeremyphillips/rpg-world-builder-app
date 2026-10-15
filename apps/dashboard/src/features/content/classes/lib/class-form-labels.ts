@@ -1,4 +1,4 @@
-import type { WeaponProficiencyMode } from './class-form-constants'
+import type { ArmorProficiencyMode, WeaponProficiencyMode } from './class-form-constants'
 
 export const CLASS_SKILL_OPTIONS_INFO =
   'Skill options are shared with each skill’s suggested classes. Changes here update those skill records.'
@@ -10,5 +10,10 @@ export const WEAPON_PROFICIENCIES_HINT = 'Categories include all weapons in that
 
 export const WEAPON_PROFICIENCY_MODE_LABELS = {
   categories: 'Categories',
-  individual: 'Individual weapons',
+  specific: 'Individual weapons',
 } as const satisfies Record<WeaponProficiencyMode, string>
+
+export const ARMOR_PROFICIENCY_MODE_LABELS = {
+  categories: 'Categories',
+  specific: 'Specific armor',
+} as const satisfies Record<ArmorProficiencyMode, string>

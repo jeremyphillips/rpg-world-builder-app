@@ -16,7 +16,7 @@ function baseFormValues(overrides: Partial<ClassFormValues> = {}): ClassFormValu
     primaryAbilities: ['int'],
     proficiencies: {
       savingThrows: ['int'],
-      armor: [],
+      armor: { categories: [], items: [] },
       weapons: { categories: ['simple'], items: [] },
       tools: { categories: [], items: [] },
       skills: { items: [] },

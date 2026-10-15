@@ -148,7 +148,11 @@ function joinDisplayList(values: string[]): string {
 function formatGrantedArmorValue(
   armor: ClassDetailViewModelSource['proficiencies']['armor'],
 ): string {
-  return joinDisplayList(armor.categories.map(formatArmorCategoryDisplay))
+  const parts = [
+    ...armor.categories.map(formatArmorCategoryDisplay),
+    ...armor.items.map(formatSlugLabel),
+  ]
+  return joinDisplayList(parts)
 }
 
 function formatGrantedWeaponsValue(

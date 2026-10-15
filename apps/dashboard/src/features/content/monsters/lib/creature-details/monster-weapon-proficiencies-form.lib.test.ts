@@ -41,7 +41,7 @@ describe('coerceCreatureWeaponProficienciesForForm', () => {
 describe('weaponProficiencyModeFromFormWeapons', () => {
   it('uses individual mode when item grants are present', () => {
     expect(weaponProficiencyModeFromFormWeapons({ categories: [], items: ['srd:dagger'] })).toBe(
-      'individual',
+      'specific',
     )
   })
 

@@ -9,7 +9,7 @@ import {
 import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
+import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 
 import { referenceWeaponFieldOptions } from '../../../lib/form-options/content-field-option.lib'
 import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
@@ -81,7 +81,7 @@ function damageDefenseField(
 
 function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
   return [
-    modeDependentGrantSetField({
+    weaponProficiencyGrantSetField({
       modeFieldName: 'weaponProficiencyMode',
       modes: WEAPON_PROFICIENCY_MODES,
       modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
@@ -95,7 +95,7 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
       itemsLabel: 'Weapon choices',
       categoriesHint: WEAPON_PROFICIENCIES_HINT,
       categoryMode: 'categories' satisfies WeaponProficiencyMode,
-      specificMode: 'individual' satisfies WeaponProficiencyMode,
+      specificMode: 'specific' satisfies WeaponProficiencyMode,
       resolveOptionLabel: (value) =>
         resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
     }),

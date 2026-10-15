@@ -20,15 +20,15 @@ describe('modeDependentGrantSetField', () => {
     const item = expectDependentField(
       modeDependentGrantSetField({
         modeFieldName: 'weaponProficiencyMode',
-        modes: ['categories', 'individual'],
-        modeLabels: { categories: 'Categories', individual: 'Individual' },
+        modes: ['categories', 'specific'],
+        modeLabels: { categories: 'Categories', specific: 'Specific' },
         categoriesPath: 'proficiencies.weapons.categories',
         itemsPath: 'proficiencies.weapons.items',
         label: 'Weapon proficiency mode',
         categoryOptions: [],
         itemOptions: [],
         categoryMode: 'categories',
-        specificMode: 'individual',
+        specificMode: 'specific',
       }),
     )
 

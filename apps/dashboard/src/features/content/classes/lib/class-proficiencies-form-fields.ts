@@ -19,17 +19,24 @@ import {
 } from '@rpg/contracts'
 import { toOptions, type FormItem } from '@rpg/ui/form'
 
-import { modeDependentGrantSetField } from '@/lib/forms/mode-dependent-grant-set-form-fields'
-
+import { armorProficiencyGrantSetField } from '@/lib/forms/grant-sets/armor-proficiency-grant-field'
+import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
 import { resolveContentWeaponGrantOptionLabel } from '../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import {
+  referenceArmorFieldOptions,
   referenceSkillFieldOptions,
   referenceToolFieldOptions,
   referenceWeaponFieldOptions,
 } from '../../lib/form-options/content-field-option.lib'
-import { WEAPON_PROFICIENCY_MODES, type WeaponProficiencyMode } from './class-form-constants'
 import {
+  ARMOR_PROFICIENCY_MODES,
+  WEAPON_PROFICIENCY_MODES,
+  type ArmorProficiencyMode,
+  type WeaponProficiencyMode,
+} from './class-form-constants'
+import {
+  ARMOR_PROFICIENCY_MODE_LABELS,
   INDIVIDUAL_WEAPONS_TOGGLE_HINT,
   WEAPON_PROFICIENCIES_HINT,
   WEAPON_PROFICIENCY_MODE_LABELS,
@@ -69,7 +76,10 @@ const toolCategoryOptions = toOptions(
 
 export const proficienciesFormSchema = z.object({
   savingThrows: z.array(abilitySchema).min(1).max(2),
-  armor: z.array(armorCategorySchema),
+  armor: z.object({
+    categories: z.array(armorCategorySchema),
+    items: z.array(z.string()).optional(),
+  }),
   weapons: z.object({
     categories: z.array(weaponCategorySchema),
     items: z.array(z.string()).optional(),
@@ -87,6 +97,35 @@ export const proficienciesFormSchema = z.object({
 export const proficienciesDraftFormSchema = proficienciesFormSchema.extend({
   savingThrows: z.array(abilitySchema).max(2).default([]),
 })
+
+export function refineClassArmorProficiencies(
+  values: {
+    armorProficiencyMode: ArmorProficiencyMode
+    proficiencies: z.infer<typeof proficienciesFormSchema>
+  },
+  ctx: RefinementCtx,
+): void {
+  const { armorProficiencyMode, proficiencies } = values
+
+  if (armorProficiencyMode === 'categories') {
+    if (proficiencies.armor.categories.length === 0) {
+      addCustomRefinementIssue(
+        ctx,
+        fieldValidationMessages.minSelections({ itemLabel: 'armor training category' }),
+        ['proficiencies', 'armor', 'categories'],
+      )
+    }
+    return
+  }
+
+  if ((proficiencies.armor.items ?? []).length === 0) {
+    addCustomRefinementIssue(
+      ctx,
+      fieldValidationMessages.minSelections({ itemLabel: 'armor choice' }),
+      ['proficiencies', 'armor', 'items'],
+    )
+  }
+}
 
 export function refineClassWeaponProficiencies(
   values: {
@@ -141,12 +180,23 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         },
         separator: 'subtle',
       },
-      {
-        type: 'chips',
-        name: 'proficiencies.armor',
-        label: 'Armor training',
-        options: armorCategoryOptions,
-      },
+      armorProficiencyGrantSetField({
+        modeFieldName: 'armorProficiencyMode',
+        modes: ARMOR_PROFICIENCY_MODES,
+        modeLabels: ARMOR_PROFICIENCY_MODE_LABELS,
+        categoriesPath: 'proficiencies.armor.categories',
+        itemsPath: 'proficiencies.armor.items',
+        label: 'Armor proficiency mode',
+        categoryOptions: armorCategoryOptions,
+        itemOptions: referenceArmorFieldOptions(ctx.options?.equipment),
+        categoriesLabel: 'Armor training',
+        itemsLabel: 'Specific armor',
+        categoryMode: 'categories',
+        specificMode: 'specific',
+        labelVisibility: 'srOnly',
+        categoriesRequired: true,
+        itemsRequired: true,
+      }),
     ],
   }
 
@@ -154,7 +204,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
     kind: 'group',
     legend: 'Weapons',
     fields: [
-      modeDependentGrantSetField({
+      weaponProficiencyGrantSetField({
         modeFieldName: 'weaponProficiencyMode',
         modes: WEAPON_PROFICIENCY_MODES,
         modeLabels: WEAPON_PROFICIENCY_MODE_LABELS,
@@ -170,7 +220,7 @@ export function proficienciesFields(ctx: ContentFormCtx): FormItem[] {
         itemsLabel: 'Weapon choices',
         categoriesHint: WEAPON_PROFICIENCIES_HINT,
         categoryMode: 'categories',
-        specificMode: 'individual',
+        specificMode: 'specific',
         labelVisibility: 'srOnly',
         categoriesRequired: true,
         itemsRequired: true,

@@ -33,11 +33,12 @@ import {
   createFeatureRowDraftFormSchema,
   createFeatureRowFormSchema,
 } from './class-feature-form-fields'
-import { WEAPON_PROFICIENCY_MODES } from './class-form-constants'
+import { ARMOR_PROFICIENCY_MODES, WEAPON_PROFICIENCY_MODES } from './class-form-constants'
 import {
   proficienciesDraftFormSchema,
   proficienciesFields,
   proficienciesFormSchema,
+  refineClassArmorProficiencies,
   refineClassWeaponProficiencies,
 } from './class-proficiencies-form-fields'
 import {
@@ -91,6 +92,7 @@ export function createClassFormSchema(
       spellbookAcquisitionIrregular: z.boolean().optional(),
       spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
       weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
+      armorProficiencyMode: z.enum(ARMOR_PROFICIENCY_MODES),
       spellcasting: createSpellcastingFormSchema(maxLevel).optional(),
       proficiencies: proficienciesFormSchema,
       features: z.array(createFeatureRowFormSchema(maxLevel)),
@@ -106,6 +108,7 @@ export function createClassFormSchema(
         }),
     })
     .superRefine((values, ctx) => {
+      refineClassArmorProficiencies(values, ctx)
       refineClassWeaponProficiencies(values, ctx)
       if (!values.hasSpellcasting) return
 
@@ -167,6 +170,7 @@ export function createClassDraftFormSchema(
       spellbookAcquisitionIrregular: z.boolean().optional(),
       spellbookAcquisitionCurve: classGainProgressionSchema.optional(),
       weaponProficiencyMode: z.enum(WEAPON_PROFICIENCY_MODES),
+      armorProficiencyMode: z.enum(ARMOR_PROFICIENCY_MODES),
       spellcasting: createSpellcastingDraftFormSchema(maxLevel).optional(),
       proficiencies: proficienciesDraftFormSchema,
       features: z.array(createFeatureRowDraftFormSchema(maxLevel)).default([]),
@@ -198,7 +202,7 @@ export function buildClassTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       id: 'proficiencies',
       label: 'Proficiencies',
       fields: proficienciesFields(ctx),
-      errorPaths: ['proficiencies', 'weaponProficiencyMode'],
+      errorPaths: ['proficiencies', 'weaponProficiencyMode', 'armorProficiencyMode'],
     },
     {
       id: 'spellcasting',

@@ -401,7 +401,8 @@ export function classDetailSourceFromFormValues(
     description: values.description,
     proficiencies: proficienciesFromFormValues(
       values.proficiencies ?? classCreateDefaultValues.proficiencies!,
-      values.weaponProficiencyMode === 'individual',
+      values.weaponProficiencyMode === 'specific',
+      values.armorProficiencyMode === 'specific',
     ),
     features: featuresFromFormValues(values.features ?? []),
     characterCreation: {

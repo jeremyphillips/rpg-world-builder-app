@@ -305,7 +305,7 @@ export const RadioGrantSet: Story = {
             orientation: 'horizontal',
             options: [
               { label: 'Categories', value: 'categories' },
-              { label: 'Individual weapons', value: 'individual' },
+              { label: 'Individual weapons', value: 'specific' },
             ],
             defaultValue: 'categories',
             hint: {
@@ -340,7 +340,7 @@ export const RadioGrantSet: Story = {
                 placeholder: 'Choose weapons…',
                 visibility: {
                   dependsOn: ['weaponProficiencyMode'],
-                  visibleWhen: (values) => values.weaponProficiencyMode === 'individual',
+                  visibleWhen: (values) => values.weaponProficiencyMode === 'specific',
                 },
               },
             ],

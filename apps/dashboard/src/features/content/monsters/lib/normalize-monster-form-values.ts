@@ -144,7 +144,7 @@ function normalizeProficiencies(
   const grantSet = normalizeWeaponProficiencyGrantSet({
     categories: coercedWeapons.categories,
     items: coercedWeapons.items,
-    hasSpecificWeapons: weaponProficiencyMode === 'individual',
+    hasSpecificWeapons: weaponProficiencyMode === 'specific',
   })
   const weapons = creatureWeaponProficiencyTargetsFromGrantSet(grantSet)
   return {

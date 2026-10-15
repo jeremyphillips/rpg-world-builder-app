@@ -31,5 +31,5 @@ export function coerceCreatureWeaponProficienciesForForm(
 export function weaponProficiencyModeFromFormWeapons(
   weapons: CreatureWeaponProficiencies,
 ): WeaponProficiencyMode {
-  return weapons.items.length > 0 ? 'individual' : 'categories'
+  return weapons.items.length > 0 ? 'specific' : 'categories'
 }

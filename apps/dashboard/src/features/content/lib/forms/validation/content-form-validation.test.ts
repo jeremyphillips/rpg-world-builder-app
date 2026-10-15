@@ -315,7 +315,7 @@ function invalidValueFor(routeKey: string): unknown {
         weaponProficiencyMode: 'categories',
         proficiencies: {
           savingThrows: [],
-          armor: [],
+          armor: { categories: [], items: [] },
           weapons: { categories: [] },
           tools: { categories: [] },
           skills: { choose: 0, from: [] },
