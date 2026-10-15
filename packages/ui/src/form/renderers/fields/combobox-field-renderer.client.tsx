@@ -6,15 +6,19 @@ import type { ControllerRenderProps } from 'react-hook-form'
 import { ComboboxField } from '../../../components/ui/combobox-field.client'
 import type { FieldHintPosition } from '../../../components/ui/field.variants'
 import type { FieldSize } from '../../../components/ui/field.client'
-import type { ComboboxFieldConfig } from '../../field-config'
+import type { ActiveDimensionFilters, ComboboxFieldConfig } from '../../field-config'
 import { fieldDefaultValue } from '../../field-config'
 import type { FieldValidationProps } from '../../../components/ui/field-validation-props'
 import { pickFieldChromeProps } from '../../../components/ui/field-chrome.variants'
 import { ComboboxFilterSelect } from './combobox-filter-select.client'
+import { ComboboxFilterToolbar } from './combobox-filter-toolbar.client'
 import type { ResolveComboboxFilteredOptions } from '../../../components/ui/combobox-field.types'
 import {
   composeComboboxResolveFilteredOptions,
+  composeComboboxResolveFilteredOptionsFromActive,
+  reconcileActiveDimensionFilters,
   resolveComboboxFilterDefaultValue,
+  resolveInitialActiveDimensionFilters,
   toComboboxFieldOptions,
   toFieldOptions,
 } from './combobox-field-form.lib'
@@ -27,6 +31,24 @@ export interface ComboboxFieldRendererProps extends FieldValidationProps {
   hint?: string
   hintPosition?: FieldHintPosition
   labelVisibility?: ComboboxFieldConfig['labelVisibility']
+}
+
+function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
+  const dimensionConfigs = config.filterSelects ?? []
+  const dimensionConfigsKey = React.useMemo(
+    () => JSON.stringify(dimensionConfigs),
+    [dimensionConfigs],
+  )
+
+  const [active, setActive] = React.useState<ActiveDimensionFilters>(() =>
+    resolveInitialActiveDimensionFilters(dimensionConfigs),
+  )
+
+  React.useEffect(() => {
+    setActive((prev) => reconcileActiveDimensionFilters(prev, dimensionConfigs))
+  }, [dimensionConfigsKey, dimensionConfigs])
+
+  return { dimensionConfigs, active, setActive }
 }
 
 /** RHF adapter for `ComboboxField` with optional category filter toolbar support. */
@@ -44,6 +66,9 @@ export function ComboboxFieldRenderer({
     () => toComboboxFieldOptions(config.options ?? []),
     [config.options],
   )
+
+  const { dimensionConfigs, active, setActive } = useComboboxDimensionFilters(config)
+
   const [categoryFilter, setCategoryFilter] = React.useState(() =>
     config.filterSelect ? resolveComboboxFilterDefaultValue(config.filterSelect) : undefined,
   )
@@ -56,6 +81,15 @@ export function ComboboxFieldRenderer({
   }, [categoryFilter, config.filterSelect])
 
   const resolveFilteredOptions = React.useMemo((): ResolveComboboxFilteredOptions | undefined => {
+    if (dimensionConfigs.length > 0) {
+      const formResolver = composeComboboxResolveFilteredOptionsFromActive(
+        active,
+        config.resolveFilteredOptions,
+      )
+      return (options, query, selected) =>
+        toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
+    }
+
     const formResolver = config.filterSelect
       ? composeComboboxResolveFilteredOptions(
           effectiveCategoryFilter!,
@@ -67,16 +101,29 @@ export function ComboboxFieldRenderer({
 
     return (options, query, selected) =>
       toComboboxFieldOptions(formResolver(toFieldOptions(options), query, selected))
-  }, [effectiveCategoryFilter, config.filterSelect, config.resolveFilteredOptions])
+  }, [
+    active,
+    dimensionConfigs.length,
+    effectiveCategoryFilter,
+    config.filterSelect,
+    config.resolveFilteredOptions,
+  ])
 
-  const filter = config.filterSelect ? (
-    <ComboboxFilterSelect
-      ariaLabel={config.filterSelect.ariaLabel}
-      options={config.filterSelect.options}
-      value={effectiveCategoryFilter!}
-      onValueChange={setCategoryFilter}
-    />
-  ) : undefined
+  const filter =
+    dimensionConfigs.length > 0 ? (
+      <ComboboxFilterToolbar
+        dimensionConfigs={dimensionConfigs}
+        active={active}
+        onActiveChange={setActive}
+      />
+    ) : config.filterSelect ? (
+      <ComboboxFilterSelect
+        ariaLabel={config.filterSelect.ariaLabel}
+        options={config.filterSelect.options}
+        value={effectiveCategoryFilter!}
+        onValueChange={setCategoryFilter}
+      />
+    ) : undefined
 
   return (
     <ComboboxField

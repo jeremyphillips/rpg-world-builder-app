@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../../components/ui/select.client'
+import { SharedFilterSelect } from '../../../filters/shared-filter-select.client'
 import type { FieldOption } from '../../field-config'
 
 export interface ComboboxFilterSelectProps {
@@ -16,7 +10,10 @@ export interface ComboboxFilterSelectProps {
   onValueChange: (value: string) => void
 }
 
-/** Category filter select rendered in a combobox panel toolbar filter row. */
+/**
+ * Legacy single-dimension combobox filter — options include the All row.
+ * @deprecated Prefer `ComboboxFilterToolbar` + `filterSelects`.
+ */
 export function ComboboxFilterSelect({
   ariaLabel,
   options,
@@ -24,17 +21,12 @@ export function ComboboxFilterSelect({
   onValueChange,
 }: ComboboxFilterSelectProps) {
   return (
-    <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger size="sm" aria-label={ariaLabel}>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value} disabled={option.disabled}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <SharedFilterSelect
+      ariaLabel={ariaLabel}
+      options={options}
+      selectValue={value}
+      onSelectValueChange={onValueChange}
+      showAllOption={false}
+    />
   )
 }

@@ -125,6 +125,63 @@ describe('Form combobox field', () => {
     expect(archetypeRoot).toHaveClass('min-w-0', 'w-full', 'grid-rows-subgrid')
   })
 
+  it('filters combobox options by filterSelects dimensions', async () => {
+    const user = userEvent.setup()
+    const schema = z.object({ weapons: z.array(z.string()) })
+    const fields: FormItem[] = [
+      {
+        type: 'combobox',
+        name: 'weapons',
+        label: 'Weapons',
+        multiple: true,
+        options: [
+          {
+            value: 'dagger',
+            label: 'Dagger',
+            filterValues: { category: 'simple', mode: 'melee' },
+          },
+          {
+            value: 'longbow',
+            label: 'Longbow',
+            filterValues: { category: 'martial', mode: 'ranged' },
+          },
+        ],
+        filterSelects: [
+          {
+            filterKey: 'category',
+            ariaLabel: 'Filter by category',
+            options: [
+              { value: 'simple', label: 'Simple' },
+              { value: 'martial', label: 'Martial' },
+            ],
+          },
+          {
+            filterKey: 'mode',
+            ariaLabel: 'Filter by mode',
+            options: [
+              { value: 'melee', label: 'Melee' },
+              { value: 'ranged', label: 'Ranged' },
+            ],
+          },
+        ],
+      },
+    ]
+
+    render(
+      <Form schema={schema} fields={fields} defaultValues={{ weapons: [] }} onSubmit={vi.fn()} />,
+    )
+
+    await user.click(screen.getByRole('combobox', { name: 'Weapons' }))
+    expect(screen.getByRole('option', { name: 'Dagger' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Longbow' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('combobox', { name: 'Filter by category' }))
+    await user.click(screen.getByRole('option', { name: 'Martial' }))
+
+    expect(screen.queryByRole('option', { name: 'Dagger' })).not.toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Longbow' })).toBeInTheDocument()
+  })
+
   it('filters combobox options by category from filterSelect', async () => {
     const user = userEvent.setup()
     const schema = z.object({ tools: z.array(z.string()) })
