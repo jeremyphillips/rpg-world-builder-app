@@ -1,7 +1,10 @@
 'use client'
 
-import { catalogFilterControlsVariants } from '../../../filters/catalog-filter-controls.variants'
 import { SharedFilterSelect } from '../../../filters/shared-filter-select.client'
+import {
+  comboboxFilterToolbarItemVariants,
+  comboboxFilterToolbarRowVariants,
+} from './combobox-filter-toolbar.variants'
 import type { ComboboxFilterDimensionConfig } from '../../field-config'
 import {
   dimensionValueToSelectValue,
@@ -25,23 +28,24 @@ export function ComboboxFilterToolbar({
   if (dimensionConfigs.length === 0) return null
 
   return (
-    <div className={catalogFilterControlsVariants()}>
+    <div className={comboboxFilterToolbarRowVariants()}>
       {dimensionConfigs.map((config) => {
         const dimensionValue = active[config.filterKey]
         return (
-          <SharedFilterSelect
-            key={config.filterKey}
-            ariaLabel={config.ariaLabel}
-            options={config.options}
-            selectValue={dimensionValueToSelectValue(dimensionValue)}
-            allOptionLabel={resolveComboboxDimensionAllOptionLabel(config)}
-            onSelectValueChange={(wireValue) => {
-              onActiveChange({
-                ...active,
-                [config.filterKey]: selectValueToDimensionValue(wireValue),
-              })
-            }}
-          />
+          <div key={config.filterKey} className={comboboxFilterToolbarItemVariants()}>
+            <SharedFilterSelect
+              ariaLabel={config.ariaLabel}
+              options={config.options}
+              selectValue={dimensionValueToSelectValue(dimensionValue)}
+              allOptionLabel={resolveComboboxDimensionAllOptionLabel(config)}
+              onSelectValueChange={(wireValue) => {
+                onActiveChange({
+                  ...active,
+                  [config.filterKey]: selectValueToDimensionValue(wireValue),
+                })
+              }}
+            />
+          </div>
         )
       })}
     </div>
