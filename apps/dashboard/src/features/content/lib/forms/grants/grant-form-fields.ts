@@ -43,6 +43,7 @@ import {
   getLanguageLabelFromVocabulary,
   getSenseLabelFromVocabulary,
 } from '@/features/vocabulary'
+import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
 import { GrantTypePersistField } from './grant-type-persist-field'
 import {
@@ -502,11 +503,12 @@ export function grantItemFields<T extends string>(
       visibility: visibleFor('movement'),
     }),
     {
-      type: 'select',
-      name: 'language',
-      label: grantFieldLabel('language'),
-      required: true,
-      options: languageOptions,
+      ...languageSingleComboboxField({
+        name: 'language',
+        label: grantFieldLabel('language'),
+        required: true,
+        options: languageOptions,
+      }),
       visibility: visibleFor('languages'),
     },
     ...proficiencyGrantFieldsForTypes(grantTypes, ctx),

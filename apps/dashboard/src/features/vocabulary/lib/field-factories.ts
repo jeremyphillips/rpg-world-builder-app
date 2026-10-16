@@ -3,7 +3,7 @@ import type { ComboboxFieldConfig, FieldOption, SelectFieldConfig } from '@rpg/u
 
 type VocabularyMemberFieldBase = Pick<
   SelectFieldConfig,
-  'name' | 'label' | 'required' | 'hint' | 'width' | 'disabled'
+  'name' | 'label' | 'required' | 'hint' | 'width' | 'disabled' | 'labelVisibility' | 'separator'
 > & {
   options: FieldOption[]
 }
@@ -28,6 +28,7 @@ export function vocabularyComboboxField(
     max?: number
     placeholder?: string
     defaultValue?: string | string[]
+    enableSearch?: boolean
   },
 ): ComboboxFieldConfig {
   return {
@@ -60,6 +61,7 @@ type VocabularyComboboxFieldForTermConfig = Omit<VocabularyMemberFieldBase, 'lab
   max?: number
   placeholder?: string
   defaultValue?: string | string[]
+  enableSearch?: boolean
   label?: string
 }
 

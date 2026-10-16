@@ -16,6 +16,7 @@ import {
   requireVocabularyEntryFormDefinition,
   vocabularyAvailableFromStatus,
 } from '@/features/vocabulary'
+import { languageMultiComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 
 export function buildVocabularyEntrySheetFieldItems(input: {
   setId: VocabularyOptionSetId
@@ -39,13 +40,12 @@ export function buildVocabularyEntrySheetFieldItems(input: {
   const creatureTypeFields =
     input.setId === CREATURE_TYPE_SET_ID
       ? [
-          {
-            type: 'chips' as const,
+          languageMultiComboboxField({
             name: 'languageAffinities',
             label: 'Language affinities',
             hint: 'Choose languages broadly associated with this creature type. Leave blank when languages vary by species, as with Humanoids. These are recommendations in monster creation, not automatic grants.',
             options: input.languageOptions ?? [],
-          },
+          }),
         ]
       : []
 

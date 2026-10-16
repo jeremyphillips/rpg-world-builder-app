@@ -5,6 +5,7 @@ import { personalNameComponentSchema } from '@rpg/contracts/vocab'
 import { type FormItem } from '@rpg/ui/form'
 
 import { buildActiveLanguageFieldOptions } from '@/features/vocabulary'
+import { languageMultiComboboxField } from '@/lib/forms/language-combobox-form-fields.lib'
 import { getContentTypeMidSentenceLabel } from '@/features/content/lib/content-type-labels'
 
 import type { ContentFormCtx } from '../../lib/forms/registry/content-form-registry'
@@ -118,13 +119,12 @@ export function cultureFields(ctx: ContentFormCtx): FormItem {
         disabled: systemSpecies,
         visibility: visibleWhenCultureOverrideActive(),
       },
-      {
-        type: 'chips',
+      languageMultiComboboxField({
         name: 'languageAffinities',
         label: 'Language affinities',
         hint: 'Recommended languages for origin picks. Does not grant languages or expand selectable pools.',
         options: buildActiveLanguageFieldOptions(ctx.languageVocabulary),
-      },
+      }),
       {
         type: 'switch',
         name: CULTURE_NAMING_SUPPORTED_FIELD,
