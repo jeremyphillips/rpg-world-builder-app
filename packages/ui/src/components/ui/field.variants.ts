@@ -164,8 +164,11 @@ export const fieldRecommendationActionVariants = cva('no-underline hover:no-unde
 /** Collection recommendation stack — caller owns outer spacing (no field `mt-1`). */
 export const fieldRecommendationGroupClasses = 'flex w-fit max-w-full flex-col items-start gap-1'
 
-/** Wrapping row of label/action pairs for collection recommendations. */
-export const fieldRecommendationGroupItemsClasses = 'flex flex-wrap items-baseline gap-y-0.5'
+/** InlineMetadata host for collection recommendation items — caption metrics for separators. */
+export const fieldRecommendationGroupItemsClasses = cn(
+  fieldRecommendationSupportingTextClasses,
+  'max-w-full',
+)
 
 /** One non-stretching label + action unit within a collection recommendation row. */
 export const fieldRecommendationGroupPairClasses = 'inline-flex max-w-full items-baseline gap-x-1'

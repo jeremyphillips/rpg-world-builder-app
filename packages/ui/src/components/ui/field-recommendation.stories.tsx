@@ -83,6 +83,30 @@ export const CollectionGroupAboveEmptyState: Story = {
   ),
 }
 
+export const CollectionGroupCompact: Story = {
+  render: () => (
+    <FormSectionProvider density="compact">
+      <FieldRecommendationGroupView
+        group={{
+          sourceLabel: 'Weapons from selected proficiencies',
+          items: [
+            {
+              id: 'dart',
+              label: 'Dart',
+              action: { label: '+ Add', ariaLabel: 'Add Dart', onClick: () => undefined },
+            },
+            {
+              id: 'flail',
+              label: 'Flail',
+              action: { label: '+ Add', ariaLabel: 'Add Flail', onClick: () => undefined },
+            },
+          ],
+        }}
+      />
+    </FormSectionProvider>
+  ),
+}
+
 export const CollectionGroupNarrowWrap: Story = {
   render: () => (
     <FormSectionProvider density="compact">

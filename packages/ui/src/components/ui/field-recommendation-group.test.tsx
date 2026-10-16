@@ -45,11 +45,25 @@ describe('FieldRecommendationGroupView', () => {
     expect(pair?.querySelector('button')).toHaveTextContent('+ Add')
   })
 
-  it('uses aria-hidden separators between pairs', () => {
+  it('uses InlineMetadata aria-hidden separators prefixed on later items', () => {
     const { container } = renderGroup()
-    const separators = container.querySelectorAll('[data-field-recommendation-separator]')
+    const separators = container.querySelectorAll('[data-inline-metadata-separator]')
     expect(separators).toHaveLength(1)
     expect(separators[0]).toHaveAttribute('aria-hidden', 'true')
+    const shortswordItem = screen
+      .getByText('Shortsword')
+      .closest('[data-field-recommendation-item]')
+    expect(shortswordItem?.parentElement?.querySelector('[data-inline-metadata-separator]')).toBe(
+      separators[0],
+    )
+  })
+
+  it('applies caption typography on the items host for separator metrics', () => {
+    const { container } = renderGroup()
+    const metadataRoot = container.querySelector(
+      '[data-field-recommendation-group] > span:last-child',
+    )
+    expect(metadataRoot).toHaveClass('text-style-caption')
   })
 
   it('uses the same accent text button scale as field recommendations', () => {

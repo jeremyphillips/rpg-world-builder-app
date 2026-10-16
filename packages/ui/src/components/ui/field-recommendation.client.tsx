@@ -1,8 +1,5 @@
 'use client'
 
-import { Fragment } from 'react'
-import { INLINE_METADATA_SEPARATOR } from '@rpg/contracts/primitives'
-
 import { Button } from './button.client'
 import {
   fieldRecommendationActionVariants,
@@ -19,7 +16,7 @@ import type {
   FieldRecommendationGroup,
 } from './field-recommendation.types'
 import { resolveFieldRecommendationButtonScale } from './field-recommendation.lib'
-import { inlineMetadataSeparatorVariants } from './inline-metadata.variants'
+import { InlineMetadata } from './inline-metadata'
 import { useFormSectionContext } from '../../form/context/form-section.context'
 import { cn } from '../../lib/utils'
 
@@ -73,23 +70,10 @@ export interface FieldRecommendationGroupProps {
   className?: string
 }
 
-function FieldRecommendationGroupSeparator() {
-  const { density } = useFormSectionContext()
-  const className = inlineMetadataSeparatorVariants({
-    density,
-    wrap: true,
-  })
-
-  return (
-    <span aria-hidden="true" data-field-recommendation-separator="" className={className}>
-      {'\u00A0'}
-      {INLINE_METADATA_SEPARATOR}{' '}
-    </span>
-  )
-}
-
 /** Compact inline recommendations above a collection list or empty state. */
 export function FieldRecommendationGroupView({ group, className }: FieldRecommendationGroupProps) {
+  const { density } = useFormSectionContext()
+
   if (group.items.length === 0) return null
 
   return (
@@ -100,17 +84,21 @@ export function FieldRecommendationGroupView({ group, className }: FieldRecommen
       {group.sourceLabel ? (
         <span className={fieldRecommendationSupportingTextClasses}>{group.sourceLabel}</span>
       ) : null}
-      <div className={fieldRecommendationGroupItemsClasses}>
-        {group.items.map((item, index) => (
-          <Fragment key={item.id}>
-            {index > 0 ? <FieldRecommendationGroupSeparator /> : null}
+      <InlineMetadata
+        role="heading"
+        density={density}
+        wrap
+        className={fieldRecommendationGroupItemsClasses}
+      >
+        {group.items.map((item) => (
+          <InlineMetadata.Item key={item.id}>
             <span className={fieldRecommendationGroupPairClasses} data-field-recommendation-item="">
               <span className={fieldRecommendationGroupItemLabelClasses}>{item.label}</span>
               <FieldRecommendationActionButton action={item.action} />
             </span>
-          </Fragment>
+          </InlineMetadata.Item>
         ))}
-      </div>
+      </InlineMetadata>
     </div>
   )
 }
