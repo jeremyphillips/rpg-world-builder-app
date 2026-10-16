@@ -10,12 +10,20 @@ import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../equipment/lib/invento
 
 import type { MonsterEquipmentFormEntry } from '../monster-form-values'
 
-export function createPlainMonsterEquipmentEntry(equipmentId: string): MonsterEquipmentFormEntry {
+export type MonsterPlainStackCreateOptions = {
+  /** Applied only when a new plain stack is created. Defaults to equipped. */
+  equipped?: boolean
+}
+
+export function createPlainMonsterEquipmentEntry(
+  equipmentId: string,
+  options?: MonsterPlainStackCreateOptions,
+): MonsterEquipmentFormEntry {
   return normalizeEquipmentInstance({
     entryId: crypto.randomUUID(),
     equipmentId,
     quantity: 1,
-    equipped: true,
+    equipped: options?.equipped ?? true,
   }) as MonsterEquipmentFormEntry
 }
 
@@ -24,6 +32,7 @@ export function setMonsterPlainStackQuantity(
   entries: readonly MonsterEquipmentFormEntry[],
   equipmentId: string,
   targetQuantity: number,
+  createOptions?: MonsterPlainStackCreateOptions,
 ): MonsterEquipmentFormEntry[] {
   if (targetQuantity <= 0) {
     const plain = findCanonicalPlainEntry(entries, equipmentId) as
@@ -42,19 +51,25 @@ export function setMonsterPlainStackQuantity(
     )
   }
 
-  const created = createPlainMonsterEquipmentEntry(equipmentId)
+  const created = createPlainMonsterEquipmentEntry(equipmentId, createOptions)
   return [...entries, { ...created, quantity: targetQuantity }]
 }
 
 export function incrementMonsterPlainStack(
   entries: readonly MonsterEquipmentFormEntry[],
   equipmentId: string,
+  createOptions?: MonsterPlainStackCreateOptions,
 ): MonsterEquipmentFormEntry[] {
   const plain = findCanonicalPlainEntry(entries, equipmentId) as
     | MonsterEquipmentFormEntry
     | undefined
   const current = plain?.quantity ?? 0
-  return setMonsterPlainStackQuantity(entries, equipmentId, current + 1)
+  return setMonsterPlainStackQuantity(
+    entries,
+    equipmentId,
+    current + 1,
+    plain ? undefined : createOptions,
+  )
 }
 
 /**

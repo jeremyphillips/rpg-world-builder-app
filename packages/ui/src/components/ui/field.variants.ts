@@ -161,6 +161,21 @@ export const fieldRecommendationSupportingTextClasses = 'text-style-caption text
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
 export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
 
+/** Collection recommendation stack — caller owns outer spacing (no field `mt-1`). */
+export const fieldRecommendationGroupClasses = 'flex w-fit max-w-full flex-col items-start gap-1'
+
+/** Wrapping row of label/action pairs for collection recommendations. */
+export const fieldRecommendationGroupItemsClasses = 'flex flex-wrap items-baseline gap-y-0.5'
+
+/** One non-stretching label + action unit within a collection recommendation row. */
+export const fieldRecommendationGroupPairClasses = 'inline-flex max-w-full items-baseline gap-x-1'
+
+/** Item label — caption scale, medium weight, may wrap inside the pair. */
+export const fieldRecommendationGroupItemLabelClasses = cn(
+  fieldRecommendationSupportingTextClasses,
+  'min-w-0 break-words font-body-emphasis',
+)
+
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
 export const fieldGroupBottomMarginClasses = 'mb-8'
 /** Omits standalone group bottom margin when a parent rhythm stack owns sibling gap. */

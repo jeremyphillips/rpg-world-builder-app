@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-properties'
 import {
@@ -14,6 +14,7 @@ import {
   ActionButton,
   ActionIcon,
   ConfirmDialog,
+  FieldRecommendationGroupView,
   InsetPanel,
   SemanticText,
   iconGhostControlVariants,
@@ -57,11 +58,13 @@ import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
+  MONSTER_EQUIPMENT_EMPTY_MESSAGE,
   MONSTER_EQUIPMENT_REMOVAL_FALLBACK_NAME,
   MONSTER_LOADING_EQUIPMENT,
   formatEquipmentCustomizationRemovalSummary,
   formatEquipmentRemovalConfirmCopy,
 } from '../../lib/monster-form-labels'
+import { buildMonsterEquipmentRecommendationGroup } from '../../lib/equipment/monster-equipment-field-recommendation.lib'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 
 type PendingRemove = {
@@ -111,6 +114,34 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
 
   const equipment = values?.equipment ?? []
 
+  const updateEquipment = useCallback(
+    (next: MonsterEquipmentFormEntry[]) => {
+      form.setValue('equipment', next, { shouldDirty: true })
+    },
+    [form],
+  )
+
+  const equipmentRecommendations = useMemo(() => {
+    if (!values || gateReason) return null
+    return buildMonsterEquipmentRecommendationGroup({
+      weaponProficiencyItemIds: weaponGrants.items,
+      referenceEquipment: referenceOptions,
+      equipmentEntries: equipment,
+      rulesetId,
+      onAddEquipment: (equipmentId) => {
+        updateEquipment(incrementMonsterPlainStack(equipment, equipmentId, { equipped: false }))
+      },
+    })
+  }, [
+    equipment,
+    gateReason,
+    referenceOptions,
+    rulesetId,
+    updateEquipment,
+    values,
+    weaponGrants.items,
+  ])
+
   const pendingRemoveCopy = useMemo(() => {
     if (!pendingRemove || !values) return null
     const removing = equipment.find((entry) => entry.entryId === pendingRemove.entryId)
@@ -150,10 +181,6 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
     : undefined
   const editorItem = editorEntry ? catalog.get(editorEntry.equipmentId) : undefined
 
-  const updateEquipment = (next: MonsterEquipmentFormEntry[]) => {
-    form.setValue('equipment', next, { shouldDirty: true })
-  }
-
   const removeEntry = (entryId: string) => {
     const entry = equipment.find((row) => row.entryId === entryId)
     if (!entry) return
@@ -189,83 +216,88 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
         }
       />
 
-      <EquipmentCategoryGroupedList<MonsterEquipmentFormEntry>
-        groups={groups.map((group) => ({ groupLabel: group.groupLabel, items: group.entries }))}
-        getItemKey={(entry) => entry.entryId}
-        emptyState={
-          <InsetPanel size="sm" align="center" className="rounded-lg">
-            <InsetPanel.PassiveMessage>No equipment yet.</InsetPanel.PassiveMessage>
-            <InsetPanel.PassiveMessage>
-              Add weapons, armor, or gear to include them on the stat block.
-            </InsetPanel.PassiveMessage>
-          </InsetPanel>
-        }
-        renderRow={(entry) => {
-          const item = catalog.get(entry.equipmentId)
-          const catalogMissing = !item
-          const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
-          const label = summary.displayName
-          const isProficient = item
-            ? resolveMonsterLoadoutEquipmentIsProficient(item, weaponGrants)
-            : true
-          const inventoryStatus = resolveMonsterEquipmentRowStatus({
-            summary,
-            catalogItem: item,
-            catalogMissing,
-            isProficient,
-          })
-          const rowStatus = inventoryStatus.status
-          return (
-            <ContentFormEntitySelectionRow
-              entity={{
-                heading: label,
-                ...(rowStatus.length > 0
-                  ? { status: rowStatus, statusComposition: 'metadata' }
-                  : {}),
-              }}
-              trailing={{
-                kind: 'utility',
-                content: (
-                  <div className="flex items-center gap-1">
-                    <EquipmentQuantityStepper
-                      size="sm"
-                      digits={2}
-                      value={entry.quantity ?? 1}
-                      min={1}
-                      max={999}
-                      ariaLabel={`Quantity of ${label}`}
-                      remove={{
-                        ariaLabel: `Remove ${label}`,
-                        onRemove: () => removeEntry(entry.entryId),
-                      }}
-                      onChange={(quantity) =>
-                        updateEquipment(
-                          equipment.map((row) =>
-                            row.entryId === entry.entryId ? { ...row, quantity } : row,
-                          ),
-                        )
-                      }
-                    />
-                    {catalogMissing ? null : (
-                      <button
-                        type="button"
-                        className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
-                        aria-label={`Customize ${label}`}
-                        onClick={() => {
-                          setPickerOpen(false)
-                          setEditorEntryId(entry.entryId)
+      <div className="flex flex-col gap-2">
+        {equipmentRecommendations ? (
+          <FieldRecommendationGroupView group={equipmentRecommendations} />
+        ) : null}
+
+        <EquipmentCategoryGroupedList<MonsterEquipmentFormEntry>
+          groups={groups.map((group) => ({ groupLabel: group.groupLabel, items: group.entries }))}
+          getItemKey={(entry) => entry.entryId}
+          emptyState={
+            <InsetPanel size="sm" align="center" className="rounded-lg">
+              <InsetPanel.PassiveMessage>
+                {MONSTER_EQUIPMENT_EMPTY_MESSAGE}
+              </InsetPanel.PassiveMessage>
+            </InsetPanel>
+          }
+          renderRow={(entry) => {
+            const item = catalog.get(entry.equipmentId)
+            const catalogMissing = !item
+            const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
+            const label = summary.displayName
+            const isProficient = item
+              ? resolveMonsterLoadoutEquipmentIsProficient(item, weaponGrants)
+              : true
+            const inventoryStatus = resolveMonsterEquipmentRowStatus({
+              summary,
+              catalogItem: item,
+              catalogMissing,
+              isProficient,
+            })
+            const rowStatus = inventoryStatus.status
+            return (
+              <ContentFormEntitySelectionRow
+                entity={{
+                  heading: label,
+                  ...(rowStatus.length > 0
+                    ? { status: rowStatus, statusComposition: 'metadata' }
+                    : {}),
+                }}
+                trailing={{
+                  kind: 'utility',
+                  content: (
+                    <div className="flex items-center gap-1">
+                      <EquipmentQuantityStepper
+                        size="sm"
+                        digits={2}
+                        value={entry.quantity ?? 1}
+                        min={1}
+                        max={999}
+                        ariaLabel={`Quantity of ${label}`}
+                        remove={{
+                          ariaLabel: `Remove ${label}`,
+                          onRemove: () => removeEntry(entry.entryId),
                         }}
-                      >
-                        <ActionIcon action="edit" />
-                      </button>
-                    )}
-                  </div>
-                ),
-              }}
-            />
-          )
-        }}
-      />
+                        onChange={(quantity) =>
+                          updateEquipment(
+                            equipment.map((row) =>
+                              row.entryId === entry.entryId ? { ...row, quantity } : row,
+                            ),
+                          )
+                        }
+                      />
+                      {catalogMissing ? null : (
+                        <button
+                          type="button"
+                          className={iconGhostControlVariants({ hover: 'text', layout: 'flex' })}
+                          aria-label={`Customize ${label}`}
+                          onClick={() => {
+                            setPickerOpen(false)
+                            setEditorEntryId(entry.entryId)
+                          }}
+                        >
+                          <ActionIcon action="edit" />
+                        </button>
+                      )}
+                    </div>
+                  ),
+                }}
+              />
+            )
+          }}
+        />
+      </div>
 
       <EquipmentPickerDrawer
         open={pickerOpen}

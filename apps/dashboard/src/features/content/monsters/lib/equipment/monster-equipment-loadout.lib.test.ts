@@ -18,6 +18,13 @@ describe('monster-equipment-loadout.lib', () => {
     expect(next[0]?.equipped).toBe(true)
   })
 
+  it('creates an unequipped plain stack when requested', () => {
+    const next = incrementMonsterPlainStack([], 'srd:dagger', { equipped: false })
+    expect(next).toHaveLength(1)
+    expect(next[0]?.quantity).toBe(1)
+    expect(next[0]?.equipped).toBe(false)
+  })
+
   it('targets the equipped plain stack when another plain stack is unequipped', () => {
     const entries = [
       {

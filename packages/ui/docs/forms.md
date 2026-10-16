@@ -209,6 +209,13 @@ type FieldRecommendation = {
   hand-built fields) and pass the resolved `FieldRecommendation` object — no separate schema
   `dependsOn` resolver in `@rpg/ui/form`.
 
+**Collection recommendations.** For inventory-style slots (e.g. monster equipment), render
+[`FieldRecommendationGroupView`](../../packages/ui/src/components/ui/field-recommendation.client.tsx)
+above the collection list or empty state. Pass a `FieldRecommendationGroup` (`sourceLabel?`,
+`items[]` with adjacent label + action pairs). The host owns spacing and heading/actions; do not
+wrap the collection in `FieldLayout` or extend `SlotConfig`. Eligibility and mutations stay in
+the feature layer. Bulk **Add all** is intentionally deferred.
+
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 
 ## Form density

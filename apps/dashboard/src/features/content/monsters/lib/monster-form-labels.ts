@@ -133,6 +133,13 @@ export function monsterEquipmentSectionLabel(): string {
   return getContentTypeItemLabel('equipment')
 }
 
+export const MONSTER_EQUIPMENT_EMPTY_MESSAGE = 'No equipment added yet.'
+
+export const MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE =
+  'Weapons from selected proficiencies'
+
+export const MONSTER_EQUIPMENT_RECOMMENDATION_ADD_LABEL = '+ Add'
+
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')

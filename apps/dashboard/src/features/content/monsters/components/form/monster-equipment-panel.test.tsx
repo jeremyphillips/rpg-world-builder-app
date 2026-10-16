@@ -13,7 +13,11 @@ import {
   resolveEquipmentNotProficientShortLabel,
 } from '@rpg/contracts'
 import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '@/features/content'
-import { MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL } from '../../lib/monster-form-labels'
+import {
+  MONSTER_EQUIPMENT_EMPTY_MESSAGE,
+  MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE,
+  MONSTER_REMOVE_EQUIPMENT_CONFIRM_LABEL,
+} from '../../lib/monster-form-labels'
 import {
   resolveMonsterCreateDefaultValues,
   type MonsterFormValues,
@@ -101,6 +105,7 @@ describe('MonsterEquipmentPanel', () => {
         catalogEquipment={[greataxe]}
         defaultValues={{
           ...resolveMonsterCreateDefaultValues(),
+          weaponProficiencyMode: 'categories',
           proficiencies: {
             ...resolveMonsterCreateDefaultValues().proficiencies,
             weapons: { categories: ['martial'], items: [] },
@@ -146,6 +151,7 @@ describe('MonsterEquipmentPanel', () => {
     expect(screen.getAllByText(resolveEquipmentNotProficientShortLabel()).length).toBeGreaterThan(1)
 
     act(() => {
+      formRef.current?.setValue('weaponProficiencyMode', 'categories', { shouldDirty: true })
       formRef.current?.setValue(
         'proficiencies.weapons',
         { categories: ['martial'], items: [] },
@@ -182,7 +188,7 @@ describe('MonsterEquipmentPanel', () => {
       />,
     )
 
-    expect(screen.queryByText('No equipment yet.')).not.toBeInTheDocument()
+    expect(screen.queryByText(MONSTER_EQUIPMENT_EMPTY_MESSAGE)).not.toBeInTheDocument()
     const user = userEvent.setup()
     await user.click(screen.getByLabelText('Customize Dagger'))
     expect(screen.getByText(/customize dagger/i)).toBeInTheDocument()
@@ -432,6 +438,154 @@ describe('MonsterEquipmentPanel', () => {
       })
       await user.click(screen.getByRole('button', { name: 'Remove weapon and action' }))
       expect(formRef.current?.getValues('actions')).toEqual([])
+    })
+  })
+
+  describe('equipment proficiency recommendations', () => {
+    it('shows empty-state copy without instructional text', () => {
+      render(
+        <Host
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+          }}
+        />,
+      )
+      expect(screen.getByText(MONSTER_EQUIPMENT_EMPTY_MESSAGE)).toBeInTheDocument()
+      expect(screen.queryByText(/Add weapons, armor, or gear/i)).not.toBeInTheDocument()
+    })
+
+    it('shows recommendations for missing specific weapon proficiencies', () => {
+      const dagger = pickEquipment('dagger')
+      const shortsword = pickEquipment('shortsword')
+      render(
+        <Host
+          catalogEquipment={[dagger, shortsword]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id, shortsword.id] },
+            },
+          }}
+        />,
+      )
+
+      expect(
+        screen.getByText(MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE),
+      ).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Add Dagger' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Add Shortsword' })).toBeInTheDocument()
+    })
+
+    it('does not recommend weapons when category proficiency mode is active', () => {
+      const greataxe = pickEquipment('greataxe')
+      render(
+        <Host
+          catalogEquipment={[greataxe]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            weaponProficiencyMode: 'categories',
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: ['martial'], items: [greataxe.id] },
+            },
+          }}
+        />,
+      )
+
+      expect(
+        screen.queryByText(MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE),
+      ).not.toBeInTheDocument()
+    })
+
+    it('adds one unequipped item and leaves other recommendations visible', async () => {
+      const dagger = pickEquipment('dagger')
+      const shortsword = pickEquipment('shortsword')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          catalogEquipment={[dagger, shortsword]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id, shortsword.id] },
+            },
+          }}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add Dagger' }))
+      expect(formRef.current?.getValues('equipment')).toEqual([
+        expect.objectContaining({
+          equipmentId: dagger.id,
+          quantity: 1,
+          equipped: false,
+        }),
+      ])
+      expect(screen.queryByRole('button', { name: 'Add Dagger' })).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Add Shortsword' })).toBeInTheDocument()
+    })
+
+    it('restores a recommendation after the added weapon is removed', async () => {
+      const dagger = pickEquipment('dagger')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          catalogEquipment={[dagger]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id] },
+            },
+          }}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add Dagger' }))
+      const entryId = formRef.current?.getValues('equipment')[0]?.entryId
+      expect(entryId).toBeDefined()
+
+      await user.click(screen.getByLabelText('Remove Dagger'))
+      act(() => {
+        formRef.current?.setValue('equipment', [], { shouldDirty: true })
+      })
+
+      expect(screen.getByRole('button', { name: 'Add Dagger' })).toBeInTheDocument()
+    })
+
+    it('suppresses recommendations when a magical copy is already owned', () => {
+      const dagger = pickEquipment('dagger')
+      render(
+        <Host
+          catalogEquipment={[dagger]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id] },
+            },
+            equipment: [
+              {
+                entryId: 'magical',
+                equipmentId: dagger.id,
+                quantity: 1,
+                equipped: false,
+                magical: true,
+              },
+            ],
+          }}
+        />,
+      )
+
+      expect(
+        screen.queryByText(MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE),
+      ).not.toBeInTheDocument()
     })
   })
 })
