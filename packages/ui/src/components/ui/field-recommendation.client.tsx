@@ -1,8 +1,11 @@
 'use client'
 
 import { Button } from './button.client'
-import { Text } from './text'
-import { fieldRecommendationActionVariants, fieldRecommendationRowClasses } from './field.variants'
+import {
+  fieldRecommendationActionVariants,
+  fieldRecommendationRowClasses,
+  fieldRecommendationSupportingTextClasses,
+} from './field.variants'
 import type { FieldRecommendation } from './field-recommendation.types'
 import { resolveFieldRecommendationButtonScale } from './field-recommendation.lib'
 import { useFormSectionContext } from '../../form/context/form-section.context'
@@ -25,9 +28,7 @@ export function FieldRecommendationInline({
 
   return (
     <div className={cn(fieldRecommendationRowClasses, className)} data-field-recommendation="">
-      <Text variant="caption" as="span">
-        {recommendation.content}
-      </Text>
+      <span className={fieldRecommendationSupportingTextClasses}>{recommendation.content}</span>
       <Button
         type="button"
         variant="text"

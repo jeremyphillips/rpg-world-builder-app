@@ -62,8 +62,8 @@ describe('MonsterCreatureDetailsLanguagesSlot recommendation', () => {
 
     expect(screen.getByText(MONSTER_LANGUAGES_FIELD_LABEL)).toBeInTheDocument()
     expect(screen.getByText(MONSTER_LANGUAGES_FIELD_HINT)).toBeInTheDocument()
-    expect(screen.getByText('Draconic')).toBeInTheDocument()
-    expect(screen.getByText(/creature type\./)).toBeInTheDocument()
+    expect(screen.getByText(/Recommended for this creature type:/)).toBeInTheDocument()
+    expect(screen.getByText('Dragon')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add Draconic' })).toBeInTheDocument()
     expect(
       screen.getByRole('combobox', { name: MONSTER_LANGUAGES_FIELD_LABEL }),

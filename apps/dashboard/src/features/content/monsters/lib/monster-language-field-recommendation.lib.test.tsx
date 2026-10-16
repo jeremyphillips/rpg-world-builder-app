@@ -20,8 +20,8 @@ describe('buildMonsterLanguageFieldRecommendation', () => {
 
     expect(recommendation).not.toBeNull()
     render(<>{recommendation?.content}</>)
-    expect(screen.getByText('Draconic')).toBeInTheDocument()
-    expect(screen.getByText(/Dragon creature type/)).toBeInTheDocument()
+    expect(screen.getByText(/Recommended for this creature type:/)).toBeInTheDocument()
+    expect(screen.getByText('Dragon')).toBeInTheDocument()
     expect(recommendation?.action.label).toBe(MONSTER_LANGUAGE_RECOMMENDATION_ADD_LABEL)
     recommendation?.action.onClick()
     expect(onAddLanguage).toHaveBeenCalledWith('draconic')

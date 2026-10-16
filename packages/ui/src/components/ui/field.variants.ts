@@ -155,7 +155,9 @@ export const fieldLabelContentClusterClasses = 'inline-flex items-center gap-1.5
 /** Label + below-label hint — 2px; cluster → control gap is the anatomy token. */
 export const fieldLabelHintStackClasses = 'flex flex-col gap-0.5'
 /** Inline recommendation row below the label/hint stack — supporting text + text action. */
-export const fieldRecommendationRowClasses = 'flex flex-wrap items-center gap-x-1 gap-y-0.5'
+export const fieldRecommendationRowClasses = 'mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5'
+/** Caption scale with foreground ink — same size as field hints, not muted. */
+export const fieldRecommendationSupportingTextClasses = 'text-style-caption text-foreground'
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
 export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
 

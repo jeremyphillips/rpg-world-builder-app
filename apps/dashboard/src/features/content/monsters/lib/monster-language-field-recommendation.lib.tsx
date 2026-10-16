@@ -24,8 +24,8 @@ export function buildMonsterLanguageFieldRecommendation(input: {
   return {
     content: (
       <>
-        <span className="font-body-emphasis">{languageLabel}</span> is recommended for the{' '}
-        {input.creatureTypeLabel} creature type.
+        Recommended for this creature type:{' '}
+        <span className="font-body-emphasis">{input.creatureTypeLabel}</span>
       </>
     ),
     action: {

@@ -8,7 +8,7 @@ import { Input } from './input.client'
 
 describe('FieldLayout recommendation', () => {
   const recommendation = {
-    content: 'Draconic is recommended for the Dragon creature type.',
+    content: 'Recommended for this creature type: Dragon',
     action: { label: '+ Add', ariaLabel: 'Add Draconic', onClick: vi.fn() },
   }
 
@@ -25,7 +25,7 @@ describe('FieldLayout recommendation', () => {
 
     const label = screen.getByText('Languages')
     const hint = screen.getByText('Choose languages.')
-    const recommendationText = screen.getByText(/Draconic is recommended/)
+    const recommendationText = screen.getByText(/Recommended for this creature type/)
     const control = screen.getByRole('textbox', { name: 'Languages control' })
 
     expect(label.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
@@ -49,11 +49,11 @@ describe('FieldLayout recommendation', () => {
       </Field.Root>,
     )
 
-    expect(screen.queryByText(/Draconic is recommended/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Recommended for this creature type/)).not.toBeInTheDocument()
     expect(screen.getByText('Supporting text.')).toBeInTheDocument()
   })
 
-  it('uses accent compact md text button for comfortable density', () => {
+  it('uses caption-scale foreground copy and compact sm accent text button', () => {
     render(
       <Field.Root id="languages" size="md" anatomy>
         <FieldLayout
@@ -65,12 +65,18 @@ describe('FieldLayout recommendation', () => {
       </Field.Root>,
     )
 
+    const row = screen
+      .getByText(/Recommended for this creature type/)
+      .closest('[data-field-recommendation]')
+    expect(row).toHaveClass('mt-1')
+    expect(row?.querySelector('span.text-style-caption.text-foreground')).toBeTruthy()
+
     const addButton = screen.getByRole('button', { name: 'Add Draconic' })
     expect(addButton).toHaveClass(
       'text-action-standalone',
       'text-primary',
       'no-underline',
-      'ui-button__text--default-compact',
+      'ui-button__text--sm-compact',
     )
     expect(addButton).toHaveTextContent('+ Add')
     expect(addButton.querySelector('span')).toBeNull()

@@ -78,8 +78,7 @@ export const WithRecommendation: Story = {
         recommendation={{
           content: (
             <>
-              <span className="font-body-emphasis">Draconic</span> is recommended for the Dragon
-              creature type.
+              Recommended for this creature type: <span className="font-body-emphasis">Dragon</span>
             </>
           ),
           action: {
