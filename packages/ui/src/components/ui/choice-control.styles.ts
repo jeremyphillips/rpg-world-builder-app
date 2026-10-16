@@ -5,6 +5,13 @@ export const UI_CHOICE_CONTROL_THUMB_CLASS = 'ui-choice-control__thumb' as const
 /** Opt-in checkbox appearance — circular indicator on a 24px hit target. */
 export const UI_CHOICE_CONTROL_CIRCLE_CLASS = 'ui-choice-control--circle' as const
 
+/** Circle checkbox that reveals a label on hover and focus without growing layout. */
+export const UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS = 'ui-choice-control--circle-expand' as const
+
+export const UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS = 'ui-choice-control-expand-anchor' as const
+
+export const UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS = 'ui-choice-control__expand-label' as const
+
 export type ChoiceControlKind = 'checkbox' | 'radio' | 'switch'
 
 export type ChoiceControlKindSpec = {

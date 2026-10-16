@@ -119,6 +119,76 @@
     display: none;
   }
 
+  /*
+   * Circle expand — fixed 24px anchor; the checkbox grows right over later siblings.
+   * Label clip lives on the label, not the root, so the focus ring is not cut off.
+   */
+  .ui-choice-control-expand-anchor {
+    position: relative;
+    isolation: isolate;
+    z-index: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    width: var(--control-height-compact);
+    max-width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    display: inline-grid;
+    /* First track matches the 24px border box minus the 1px border on each side. */
+    grid-template-columns: calc(var(--control-height-compact) - 2px) minmax(0, 0fr);
+    align-items: center;
+    justify-items: center;
+    transition-property:
+      max-width, grid-template-columns, background-color, border-color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:hover:not(
+      :disabled
+    ),
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:focus-visible {
+    width: max-content;
+    max-width: 8rem;
+    grid-template-columns: calc(var(--control-height-compact) - 2px) minmax(0, max-content);
+    background-color: var(--surface-lift);
+    border-color: var(--choice-control-border);
+  }
+
+  .ui-choice-control__expand-label {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    justify-self: stretch;
+    padding-inline-end: 0;
+    font-size: var(--text-xs);
+    line-height: 1;
+    color: var(--foreground);
+    transition: opacity 150ms cubic-bezier(0, 0, 0.2, 1);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:hover:not(
+      :disabled
+    )
+    .ui-choice-control__expand-label,
+  .ui-choice-control--checkbox.ui-choice-control--circle.ui-choice-control--circle-expand:focus-visible
+    .ui-choice-control__expand-label {
+    opacity: 1;
+    padding-inline-end: calc(var(--spacing) * 2);
+  }
+
   /* --- Kind: radio --- */
 
   .ui-choice-control--radio {

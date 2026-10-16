@@ -41,6 +41,26 @@ describe('choice-control circle appearance CSS', () => {
     expect(css).not.toContain('var(--control-hover-bg)')
   })
 
+  it('expands the circle label on hover and focus without clipping the root', () => {
+    expect(css).toContain('.ui-choice-control-expand-anchor')
+    expect(css).toContain('isolation: isolate')
+    expect(css).toContain(
+      'grid-template-columns: calc(var(--control-height-compact) - 2px) minmax(0, 0fr)',
+    )
+    expect(css).toContain(
+      'grid-template-columns: calc(var(--control-height-compact) - 2px) minmax(0, max-content)',
+    )
+    expect(css).toContain('max-width: var(--control-height-compact)')
+    expect(css).toContain('.ui-choice-control__expand-label')
+    const labelBlock = css.match(/\.ui-choice-control__expand-label\s*\{[^}]+\}/s)?.[0]
+    expect(labelBlock).toContain('overflow: hidden')
+    const expandRoot = css.match(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle\.ui-choice-control--circle-expand\s*\{[^}]+\}/s,
+    )?.[0]
+    expect(expandRoot).toBeDefined()
+    expect(expandRoot).not.toContain('overflow')
+  })
+
   it('keeps the circular indicator flat at rest with a solid unchecked fill', () => {
     const circleBeforeBlock = css.match(
       /\.ui-choice-control--checkbox\.ui-choice-control--circle::before\s*\{[^}]+\}/s,

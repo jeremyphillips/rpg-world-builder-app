@@ -1,4 +1,4 @@
-import { Checkbox, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@rpg/ui'
+import { Checkbox } from '@rpg/ui'
 
 import {
   MONSTER_EQUIP_TOGGLE_EQUIP_LABEL,
@@ -19,33 +19,19 @@ export function MonsterEquipmentEquippedToggle({
   disabled,
   onCheckedChange,
 }: MonsterEquipmentEquippedToggleProps) {
-  const tooltipLabel = checked
+  const expandLabel = checked
     ? MONSTER_EQUIP_TOGGLE_UNEQUIP_LABEL
     : MONSTER_EQUIP_TOGGLE_EQUIP_LABEL
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        {/*
-         * TooltipTrigger must not merge onto Checkbox — both use `data-state`
-         * (open/closed vs checked/unchecked), which breaks circle checked styling.
-         */}
-        <TooltipTrigger interactive asChild>
-          <span className="inline-flex shrink-0 self-center">
-            <Checkbox
-              appearance="circle"
-              focusContext="embedded"
-              checked={checked}
-              disabled={disabled}
-              aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}
-              onCheckedChange={(next) => onCheckedChange(next === true)}
-            />
-          </span>
-        </TooltipTrigger>
-        <TooltipContent arrow side="top">
-          {tooltipLabel}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Checkbox
+      appearance="circle"
+      focusContext="embedded"
+      expandLabel={expandLabel}
+      checked={checked}
+      disabled={disabled}
+      aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}
+      onCheckedChange={(next) => onCheckedChange(next === true)}
+    />
   )
 }

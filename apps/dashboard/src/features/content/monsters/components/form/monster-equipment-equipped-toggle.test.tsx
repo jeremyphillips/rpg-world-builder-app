@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { MonsterEquipmentEquippedToggle } from './monster-equipment-equipped-toggle'
 
 describe('MonsterEquipmentEquippedToggle', () => {
-  it('keeps checked data-state on the checkbox when wrapped by the tooltip trigger', () => {
+  it('keeps checked state and embedded focus on the expanding checkbox', () => {
     render(
       <MonsterEquipmentEquippedToggle
         displayName="Battleaxe"
@@ -16,11 +16,13 @@ describe('MonsterEquipmentEquippedToggle', () => {
 
     const checkbox = screen.getByRole('checkbox', { name: 'Equipped: Battleaxe' })
     expect(checkbox).toHaveAttribute('data-state', 'checked')
-    expect(checkbox).toHaveClass('ui-focus-ring--embedded')
+    expect(checkbox).toHaveAttribute('aria-checked', 'true')
+    expect(checkbox).toHaveClass('ui-focus-ring--embedded', 'ui-choice-control--circle-expand')
+    expect(checkbox.querySelector('.ui-choice-control__expand-label')).toHaveTextContent('Unequip')
+    expect(screen.queryByRole('tooltip')).toBeNull()
   })
 
-  it('shows the equip tooltip with an arrow when unchecked', async () => {
-    const user = userEvent.setup()
+  it('reveals Equip when unchecked and does not render a tooltip', () => {
     render(
       <MonsterEquipmentEquippedToggle
         displayName="Dagger"
@@ -29,11 +31,9 @@ describe('MonsterEquipmentEquippedToggle', () => {
       />,
     )
 
-    await user.hover(screen.getByRole('checkbox', { name: 'Equipped: Dagger' }))
-    const tooltip = await screen.findByRole('tooltip')
-    expect(tooltip).toHaveTextContent('Equip')
-    expect(document.body.querySelector('.ui-popover-content--with-arrow')).not.toBeNull()
-    expect(document.body.querySelector('.ui-overlay-arrow')).not.toBeNull()
+    const checkbox = screen.getByRole('checkbox', { name: 'Equipped: Dagger' })
+    expect(checkbox.querySelector('.ui-choice-control__expand-label')).toHaveTextContent('Equip')
+    expect(screen.queryByRole('tooltip')).toBeNull()
   })
 
   it('calls onCheckedChange when toggled', async () => {
@@ -49,5 +49,23 @@ describe('MonsterEquipmentEquippedToggle', () => {
 
     await user.click(screen.getByRole('checkbox', { name: 'Equipped: Dagger' }))
     expect(onCheckedChange).toHaveBeenCalledWith(true)
+  })
+
+  it('does not expand a disabled control into an actionable label', () => {
+    render(
+      <MonsterEquipmentEquippedToggle
+        displayName="Dagger"
+        checked
+        disabled
+        onCheckedChange={() => undefined}
+      />,
+    )
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Equipped: Dagger' })
+    expect(checkbox).toBeDisabled()
+    expect(checkbox.querySelector('.ui-choice-control__expand-label')).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    )
   })
 })

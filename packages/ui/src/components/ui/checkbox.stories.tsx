@@ -5,7 +5,6 @@ import { ClassReferenceTable } from '../../stories/semantic-classes/class-refere
 import { Checkbox } from './checkbox.client'
 import { CHOICE_CONTROL_KIND_SPECS, UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { checkboxControlClasses } from './choice-control.variants'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 
 const meta = {
   title: 'Forms/Controls/Checkbox',
@@ -115,27 +114,64 @@ export const CircleOnCardSurface: Story = {
   ),
 }
 
-/** Tooltip trigger wraps a span (not the checkbox) so checked styling and focus ring stay intact. */
-export const CircleOnCardWithTooltip: Story = {
+/** Hover and keyboard focus expand the same checkbox into Equip / Unequip. */
+export const CircleExpandOnCard: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Resting footprint stays 24px. Hover or Tab reveals the action word to the right. The embedded focus ring follows the pill. Disabled stays collapsed.',
+      },
+    },
+  },
   render: () => (
-    <div className={cardChromeClasses}>
-      <TooltipProvider>
-        <Tooltip defaultOpen>
-          <TooltipTrigger interactive asChild>
-            <span className="inline-flex shrink-0">
-              <Checkbox
-                appearance="circle"
-                focusContext="embedded"
-                aria-label="Unequip longsword"
-                defaultChecked
-              />
-            </span>
-          </TooltipTrigger>
-          <TooltipContent arrow side="top">
-            Unequip
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+    <div className="flex max-w-sm flex-col gap-3 rounded-lg border border-border bg-card p-4">
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">Battleaxe</span>
+        <Checkbox
+          appearance="circle"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          aria-label="Equipped: Battleaxe"
+          defaultChecked
+        />
+        <span className="ms-auto text-xs text-muted-foreground">Rest / hover</span>
+      </div>
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <Checkbox
+          appearance="circle"
+          focusContext="embedded"
+          expandLabel="Equip"
+          aria-label="Equipped: +1 Flaming Battleaxe of Very Long Names"
+        />
+        <button type="button" className="text-xs text-muted-foreground">
+          Edit
+        </button>
+      </div>
+      <div className="flex min-w-0 items-center justify-end gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">Edge</span>
+        <Checkbox
+          appearance="circle"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          aria-label="Equipped: Edge"
+          defaultChecked
+        />
+      </div>
+      <div className="flex min-w-0 items-center gap-1">
+        <span className="text-sm font-medium">Disabled</span>
+        <Checkbox
+          appearance="circle"
+          focusContext="embedded"
+          expandLabel="Unequip"
+          aria-label="Equipped: Disabled"
+          defaultChecked
+          disabled
+        />
+      </div>
     </div>
   ),
 }

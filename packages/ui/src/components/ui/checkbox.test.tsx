@@ -6,6 +6,9 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import {
   UI_CHOICE_CONTROL_BLOCK_CLASS,
   UI_CHOICE_CONTROL_CIRCLE_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS,
 } from './choice-control.styles'
 import { Checkbox } from './checkbox.client'
 
@@ -43,6 +46,28 @@ describe('Checkbox', () => {
     const control = screen.getByLabelText('Equipped item')
     expect(control).toBeDisabled()
     expect(control).toHaveAttribute('data-state', 'checked')
+  })
+
+  it('forwards ref to the checkbox root when the label expands', () => {
+    const ref = { current: null as HTMLButtonElement | null }
+    render(
+      <Checkbox ref={ref} appearance="circle" expandLabel="Unequip" aria-label="Equipped: Axe" />,
+    )
+    const control = screen.getByRole('checkbox', { name: 'Equipped: Axe' })
+    expect(ref.current).toBe(control)
+    expect(control).toHaveClass(UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS)
+    expect(control.parentElement).toHaveClass(UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS)
+    expect(control.querySelector(`.${UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS}`)).toHaveTextContent(
+      'Unequip',
+    )
+  })
+
+  it('ignores expandLabel unless appearance is circle', () => {
+    render(<Checkbox expandLabel="Equip" aria-label="Accept terms" />)
+    const control = screen.getByRole('checkbox', { name: 'Accept terms' })
+    expect(control).not.toHaveClass(UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS)
+    expect(control.querySelector(`.${UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS}`)).toBeNull()
+    expect(document.querySelector(`.${UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS}`)).toBeNull()
   })
 
   it('uses standalone focus by default and embedded when requested', () => {

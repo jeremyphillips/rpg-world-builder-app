@@ -7,6 +7,7 @@ import {
   CHOICE_CONTROL_INDICATOR_SIZE_SPECS,
   UI_CHOICE_CONTROL_BLOCK_CLASS,
   UI_CHOICE_CONTROL_CIRCLE_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
   UI_CHOICE_CONTROL_THUMB_CLASS,
   resolveChoiceControlIndicatorSizeClass,
   resolveChoiceControlKindClass,
@@ -16,7 +17,12 @@ import {
 
 export const UI_CHOICE_CONTROL_MARK_CLASS = 'ui-choice-control__mark' as const
 
-export { UI_CHOICE_CONTROL_CIRCLE_CLASS } from './choice-control.styles'
+export {
+  UI_CHOICE_CONTROL_CIRCLE_CLASS,
+  UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS,
+} from './choice-control.styles'
 
 export type CheckboxAppearance = 'default' | 'circle'
 
@@ -40,14 +46,18 @@ export function checkboxControlClasses(options?: {
   className?: string
   appearance?: CheckboxAppearance
   focusContext?: ChoiceControlFocusContext
+  /** Horizontal label reveal. Only valid with `appearance: 'circle'`. */
+  expand?: boolean
 }): string {
   const appearance = options?.appearance ?? 'default'
   const focusContext = options?.focusContext ?? 'standalone'
+  const expand = appearance === 'circle' && options?.expand === true
   return choiceControlClasses('checkbox', {
     focusContext,
     className: cn(
       'peer',
       appearance === 'circle' && UI_CHOICE_CONTROL_CIRCLE_CLASS,
+      expand && UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
       options?.className,
     ),
   })

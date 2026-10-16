@@ -26,6 +26,16 @@ describe('choiceControlClasses', () => {
   it('maps circle appearance to circle modifier', () => {
     const classes = checkboxControlClasses({ appearance: 'circle' })
     expect(classes).toContain('ui-choice-control--circle')
+    expect(classes).not.toContain('ui-choice-control--circle-expand')
+  })
+
+  it('adds the expand modifier only for circle checkboxes', () => {
+    expect(checkboxControlClasses({ appearance: 'circle', expand: true })).toContain(
+      'ui-choice-control--circle-expand',
+    )
+    expect(checkboxControlClasses({ expand: true })).not.toContain(
+      'ui-choice-control--circle-expand',
+    )
   })
 
   it('defaults checkbox focus to standalone and allows embedded for dense inline chrome', () => {
