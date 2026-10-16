@@ -59,6 +59,8 @@ export interface ComboboxFieldProps
   width?: FieldWidth
   size?: FieldSize
   placeholder?: string
+  /** Closed-state copy when `placeholder` is omitted — see `ComboboxFieldConfig`. */
+  closedPlaceholderIntent?: 'choice' | 'add'
   /** Noun metadata for generated closed-state and search placeholders. */
   noun?: FieldNoun
   /** Overrides generated `Search {plural}…` panel copy. */
@@ -211,6 +213,7 @@ export function ComboboxField({
   width,
   size: sizeProp,
   placeholder,
+  closedPlaceholderIntent,
   noun,
   searchPlaceholder: searchPlaceholderProp,
   emptyMessage = 'No options found.',
@@ -232,7 +235,12 @@ export function ComboboxField({
   const size = sizeProp ?? resolveFormDensity(density).size
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
   const resolvedPlaceholder = resolveFieldPlaceholder(
-    { label, noun, category: multiple ? 'multi' : 'choice' },
+    {
+      label,
+      noun,
+      intent: closedPlaceholderIntent,
+      category: multiple ? 'multi' : 'choice',
+    },
     placeholder,
   )
   const resolvedSearchPlaceholder = resolveFieldSearchPlaceholder(

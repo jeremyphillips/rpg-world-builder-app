@@ -4,6 +4,7 @@ import {
   choiceCountPhrase,
   midSentenceLabel,
   nounFromLabel,
+  resolveAddPlaceholder,
   resolveChoicePlaceholder,
   resolveSearchPlaceholder,
   singularizeLabel,
@@ -42,6 +43,13 @@ describe('form copy helpers', () => {
   it('formats choice placeholders for single and multi fields', () => {
     expect(resolveChoicePlaceholder({ singular: 'rarity' }, false)).toBe('Choose a rarity…')
     expect(resolveChoicePlaceholder(primaryAbilities, true)).toBe('Choose primary abilities…')
+  })
+
+  it('formats add-to-collection closed triggers from singular noun phrase', () => {
+    expect(resolveAddPlaceholder({ singular: 'language', plural: 'languages' })).toBe(
+      'Add language',
+    )
+    expect(resolveAddPlaceholder({ singular: 'skill', plural: 'skills' })).toBe('Add skill')
   })
 
   it('formats search placeholders from the plural noun phrase with ellipsis only', () => {

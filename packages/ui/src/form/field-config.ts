@@ -825,6 +825,11 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   /** Maximum selections when `multiple` is true. Omits the ceiling when unset. */
   max?: number
   placeholder?: string
+  /**
+   * Closed-state copy when `placeholder` is omitted — `add` uses `Add {singular}` and
+   * requires explicit `noun`; default `choice` uses Choose vocabulary.
+   */
+  closedPlaceholderIntent?: 'choice' | 'add'
   defaultValue?: string | string[]
   /**
    * Custom selected-value renderer in multi-select mode.

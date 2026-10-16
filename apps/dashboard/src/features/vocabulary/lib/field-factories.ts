@@ -52,7 +52,8 @@ export function vocabularySelectFieldForTerm(
   return vocabularySelectField({
     ...config,
     label: config.label ?? copy.label,
-    placeholder: config.placeholder ?? copy.placeholder,
+    placeholder: config.placeholder,
+    noun: nounFromTerm(term),
   })
 }
 
@@ -74,7 +75,7 @@ export function vocabularyComboboxFieldForTerm(
   return vocabularyComboboxField({
     ...config,
     label: config.label ?? copy.label,
-    placeholder: config.placeholder ?? copy.placeholder,
+    placeholder: config.placeholder,
     noun: nounFromTerm(term),
   })
 }

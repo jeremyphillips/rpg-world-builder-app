@@ -59,6 +59,33 @@ describe('resolveFieldPlaceholder', () => {
   it('returns undefined for text-like categories', () => {
     expect(resolveFieldPlaceholder({ label: 'Name', category: 'text' })).toBeUndefined()
   })
+
+  it('resolves add-to-collection closed triggers from explicit noun metadata', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Add language',
+        category: 'choice',
+        intent: 'add',
+        noun: { singular: 'language', plural: 'languages' },
+      }),
+    ).toBe('Add language')
+  })
+
+  it('requires noun metadata for add intent', () => {
+    expect(() =>
+      resolveFieldPlaceholder({ label: 'Add language', category: 'choice', intent: 'add' }),
+    ).toThrow(/requires explicit noun/)
+  })
+
+  it('defaults choice copy from vocabulary nouns', () => {
+    expect(
+      resolveFieldPlaceholder({
+        label: 'Languages',
+        category: 'choice',
+        noun: { singular: 'language', plural: 'languages' },
+      }),
+    ).toBe('Choose a language…')
+  })
 })
 
 describe('resolveFieldSearchPlaceholder', () => {

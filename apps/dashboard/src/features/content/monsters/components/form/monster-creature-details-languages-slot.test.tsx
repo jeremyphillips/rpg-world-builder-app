@@ -65,9 +65,11 @@ describe('MonsterCreatureDetailsLanguagesSlot recommendation', () => {
     expect(screen.getByText(/Recommended for this creature type:/)).toBeInTheDocument()
     expect(screen.getByText('Dragon')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add Draconic' })).toBeInTheDocument()
-    expect(
-      screen.getByRole('combobox', { name: MONSTER_LANGUAGES_FIELD_LABEL }),
-    ).toBeInTheDocument()
+    const addLanguageControl = screen.getByRole('combobox', {
+      name: MONSTER_LANGUAGES_FIELD_LABEL,
+    })
+    expect(addLanguageControl).toBeInTheDocument()
+    expect(addLanguageControl).toHaveTextContent('Add language')
   })
 
   it('hides recommendation after a language is selected', async () => {

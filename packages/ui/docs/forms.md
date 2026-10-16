@@ -358,21 +358,21 @@ covering each edge case. Tiers, naming, and copy style →
 Linguistic templates (`Choose …`, choice-count hints) live in
 `@rpg/contracts/form-copy`. Presentation orchestration lives in `@rpg/ui/form`:
 
-| Layer                               | Owns                                                         |
-| ----------------------------------- | ------------------------------------------------------------ |
-| `@rpg/contracts/form-copy`          | `FieldNoun`, `resolveChoicePlaceholder`, `choiceCountPhrase` |
-| `@rpg/ui` `resolveFieldPlaceholder` | Compact unset (`—`), presentation/digits inference           |
+| Layer                                     | Owns                                                                                                              |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `@rpg/contracts/form-copy`                | `FieldNoun`, `resolveChoicePlaceholder`, `resolveAddPlaceholder`, `resolveSearchPlaceholder`, `choiceCountPhrase` |
+| `@rpg/ui` `resolveFieldPlaceholder`       | Choice vs add intent, compact unset (`—`), presentation/digits inference                                          |
+| `@rpg/ui` `resolveFieldSearchPlaceholder` | Combobox panel search — always `Search {plural}…` from `noun`                                                     |
 
-**Placeholder precedence** (when config omits an explicit `placeholder`):
+**Closed-state copy** (when config omits an explicit `placeholder`):
 
-```text
-presentation ?? (digits != null ? 'compact' : 'default')
-```
+| Intent                | Config                                             | Result                                                  |
+| --------------------- | -------------------------------------------------- | ------------------------------------------------------- |
+| Choice (default)      | `closedPlaceholderIntent` omitted or `'choice'`    | Single → `Choose a {noun}…`; multi → `Choose {plural}…` |
+| Add-to-collection     | `closedPlaceholderIntent: 'add'` + required `noun` | `Add {singular}` (no ellipsis)                          |
+| Compact single-select | `digits` or `presentation: 'compact'`              | `—` (choice intent only)                                |
 
-- **Default** single-select → `Choose a {noun}…` from contracts.
-- **Compact** single-select → `—` (visual unset only; labels / `ariaLabel` name the control).
-- **`presentation: 'default'` + `digits`** → full Choose copy (escape hatch for digit-sized controls that need it).
-- **Text / number** → no auto placeholder (digit-sized number inputs stay empty when labeled).
+**Search** (combobox panel): omit `searchPlaceholder`; set **`noun`** (never infer from `Add …` action labels). Dashboard conventions → [form-lib-conventions.md](../../../apps/dashboard/docs/form-lib-conventions.md).
 
 Explicit `placeholder` on field config always wins. Do not hand-author `—` in
 dashboard form modules — set `digits` on narrow selects or `presentation: 'compact'`.

@@ -87,6 +87,11 @@ export function resolveChoicePlaceholder(noun: FieldNoun, multiple: boolean): st
   return `Choose ${withArticle(singularNounPhrase(noun))}…`
 }
 
+/** Closed-state trigger for add-to-collection comboboxes (no trailing ellipsis). */
+export function resolveAddPlaceholder(noun: FieldNoun): string {
+  return `Add ${singularNounPhrase(noun)}`
+}
+
 /** Open-panel search placeholder — plural noun phrase plus ellipsis only. */
 export function resolveSearchPlaceholder(noun: FieldNoun): string {
   return `Search ${pluralNounPhrase(noun)}…`

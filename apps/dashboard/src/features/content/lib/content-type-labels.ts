@@ -1,6 +1,8 @@
 import {
   capitalizeFirst,
   getContentTypeTerm,
+  nounFromTerm,
+  resolveAddPlaceholder,
   resolveChoicePlaceholder,
   vocabularyTermLabel,
   type ContentTypeKey,
@@ -115,21 +117,23 @@ export function formatContentOverviewLinkTitle(key: ContentTypeKey): string {
   return `${getContentTypeItemLabel(key)} Overview`
 }
 
-/** Combobox placeholder — e.g. "Choose classes…". */
+/** Singular/plural noun phrases for content-type choice and search copy. */
+export function nounFromContentType(key: ContentTypeKey): FieldNoun {
+  return nounFromTerm(getContentTypeTerm(key))
+}
+
+/** Combobox placeholder — e.g. "Choose classes…". Prefer omitting placeholder on field config. */
 export function formatChooseContentTypePlaceholder(
   key: ContentTypeKey,
   options?: { plural?: boolean },
 ): string {
-  const singular = getContentTypeMidSentenceLabel(key)
-  const noun: FieldNoun = options?.plural
-    ? { singular, plural: getContentTypeMidSentenceLabel(key, { plural: true }) }
-    : { singular }
+  const noun = nounFromContentType(key)
   return resolveChoicePlaceholder(noun, options?.plural === true)
 }
 
 /** Action label — e.g. "Add equipment". */
 export function formatAddContentTypeLabel(key: ContentTypeKey): string {
-  return `Add ${getContentTypeMidSentenceLabel(key)}`
+  return resolveAddPlaceholder(nounFromContentType(key))
 }
 
 /** Destructive delete confirm headline — e.g. "Delete Custom Folk?". */

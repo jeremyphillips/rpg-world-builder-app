@@ -47,7 +47,7 @@ import { languageSingleComboboxField } from '@/lib/forms/language-combobox-form-
 
 import { GrantTypePersistField } from './grant-type-persist-field'
 import {
-  formatChooseContentTypePlaceholder,
+  nounFromContentType,
   getContentTypeCollectionLabel,
   getContentTypeMidSentenceLabel,
 } from '@/features/content/lib/content-type-labels'
@@ -575,7 +575,7 @@ export function grantItemFields<T extends string>(
       label: getContentTypeCollectionLabel('spells'),
       multiple: true,
       options: spellOptions,
-      placeholder: formatChooseContentTypePlaceholder('spells', { plural: true }),
+      noun: nounFromContentType('spells'),
       required: true,
       visibility: visibleFor('spells'),
     },
@@ -600,7 +600,7 @@ export function grantItemFields<T extends string>(
       label: `Recommended ${getContentTypeMidSentenceLabel('feats', { plural: true })}`,
       multiple: true,
       options: featOptions,
-      placeholder: formatChooseContentTypePlaceholder('feats', { plural: true }),
+      noun: nounFromContentType('feats'),
       visibility: visibleFor('featChoice'),
     },
     {

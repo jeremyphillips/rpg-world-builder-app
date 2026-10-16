@@ -2,6 +2,7 @@ export {
   choiceCountPhrase,
   midSentenceLabel,
   nounFromLabel,
+  resolveAddPlaceholder,
   resolveChoicePlaceholder,
   resolveSearchPlaceholder,
   singularizeLabel,

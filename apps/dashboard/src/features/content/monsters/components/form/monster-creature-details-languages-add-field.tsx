@@ -4,7 +4,6 @@ import { ComboboxField } from '@rpg/ui'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import { useMonsterLanguageAddField } from '../../lib/monster-language-add-field.lib'
 import {
-  MONSTER_ADD_LANGUAGE_LABEL,
   MONSTER_LANGUAGES_FIELD_HINT,
   MONSTER_LANGUAGES_FIELD_LABEL,
 } from '../../lib/monster-form-labels'
@@ -32,7 +31,7 @@ export function MonsterCreatureDetailsLanguagesAddField({ ctx }: { ctx: ContentF
       multiple={false}
       enableSearch
       noun={nounFromTerm(LANGUAGE_TERM)}
-      placeholder={MONSTER_ADD_LANGUAGE_LABEL}
+      closedPlaceholderIntent="add"
       value=""
       onChange={(next) => {
         if (typeof next !== 'string' || !next) return

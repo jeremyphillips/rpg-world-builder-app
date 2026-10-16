@@ -1,4 +1,4 @@
-import type { FieldNoun } from '../../form-copy/messages'
+import { resolveAddPlaceholder, type FieldNoun } from '../../form-copy/messages'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { SKILL_PROFICIENCY_SENTENCE } from './proficiency-sentence'
 import {
@@ -194,7 +194,7 @@ export function getProficiencyGrantManageLabel(_domain: ProficiencyDomain): stri
 
 /** Compact inline add action label (e.g. "Add skill"). */
 export function getProficiencyGrantCompactAddLabel(domain: ProficiencyDomain): string {
-  return `Add ${getProficiencyDomainCompactActionNoun(domain, 1)}`
+  return resolveAddPlaceholder(proficiencyDomainFieldNoun(domain))
 }
 
 /** Compact inline edit action label when a grant choice set is full. */

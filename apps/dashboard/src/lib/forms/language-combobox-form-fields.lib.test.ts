@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { vocabularyTermFieldCopy, LANGUAGE_TERM } from '@rpg/contracts'
+import { LANGUAGE_TERM, nounFromTerm } from '@rpg/contracts'
 
 import {
   languageMultiComboboxField,
@@ -23,11 +23,11 @@ describe('language combobox form fields', () => {
       enableSearch: true,
       hint: 'Characters receive these languages: Does not grant languages.',
       label: 'Language affinities',
+      noun: nounFromTerm(LANGUAGE_TERM),
     })
   })
 
   it('builds searchable single-select combobox fields with vocabulary defaults', () => {
-    const copy = vocabularyTermFieldCopy(LANGUAGE_TERM)
     expect(
       languageSingleComboboxField({
         name: 'language',
@@ -40,8 +40,8 @@ describe('language combobox form fields', () => {
       multiple: false,
       enableSearch: true,
       required: true,
-      label: copy.label,
-      placeholder: copy.placeholder,
+      label: 'Language',
+      noun: nounFromTerm(LANGUAGE_TERM),
     })
   })
 })

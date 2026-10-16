@@ -185,7 +185,7 @@ function MonsterCreatureDetailsSkillsSlotView({
           multiple={false}
           enableSearch
           noun={proficiencyDomainFieldNoun('skill')}
-          placeholder={MONSTER_ADD_SKILL_LABEL}
+          closedPlaceholderIntent="add"
           value=""
           onChange={(next) => {
             if (typeof next === 'string' && next) addSkill(next)
