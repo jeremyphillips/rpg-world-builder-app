@@ -28,7 +28,7 @@ export type DependentPresentationOptions = {
 
 export type GrantSetItemsComboboxConfig = Pick<
   ComboboxFieldConfig,
-  'filterSelects' | 'resolveFilteredOptions'
+  'filterSelects' | 'optionsResolve' | 'resolveFilteredOptions'
 >
 
 export type ModeDependentGrantSetFieldOptions = {

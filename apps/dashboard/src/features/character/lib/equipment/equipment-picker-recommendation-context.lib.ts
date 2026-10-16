@@ -1,6 +1,7 @@
 import {
   assembleCharacterProficiencies,
   characterPrefersMartialWeaponBrowseOrder,
+  proficientWeaponCategories,
   createEmptyCharacterBuilderDraft,
   deriveEquipmentRecommendations,
   resolveEquipmentPickerItems,
@@ -104,6 +105,7 @@ export function buildEquipmentPickerRecommendationContext(
     items,
     browseSortContext: {
       preferMartialWeaponBrowseOrder: characterPrefersMartialWeaponBrowseOrder(proficiencies),
+      proficientWeaponCategories: proficientWeaponCategories(proficiencies.weapons),
     },
   }
 }

@@ -1,17 +1,21 @@
 import {
   CREATURE_DAMAGE_DEFENSE_LIST_ENTRIES,
   EFFECT_CONDITION_IDS,
+  creatureWeaponProficienciesSchema,
+  creatureWeaponProficiencyTargetsFromGrantSet,
   getEffectConditionLabel,
   TELEPATHY_TERM,
   WEAPON_CATEGORIES,
   WEAPON_CATEGORY_ENTRIES,
 } from '@rpg/contracts'
 import { vocabularyFieldLabel } from '@/features/vocabulary/lib/term-labels'
-import { toOptions, type FormItem } from '@rpg/ui/form'
+import { toOptions, type FieldOption, type FormItem } from '@rpg/ui/form'
 
 import { createElement } from 'react'
 
+import { prepareWeaponProficiencyComboboxOptions } from '@/lib/forms/grant-sets/prepare-weapon-proficiency-combobox-options.lib'
 import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-proficiency-grant-field'
+import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
 import { MonsterWeaponProficiencyReconciliationField } from '../../components/monster-weapon-proficiency-reconciliation-field'
 import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/equipment-proficiency-grant-combobox-config.lib'
@@ -24,6 +28,7 @@ import {
   MonsterTelepathyRangeField,
 } from '../../components/form/monster-creature-details-slots'
 import { damageDefenseComboboxOptions } from './monster-damage-defense-form.lib'
+import { MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE } from './monster-weapon-proficiencies-form.lib'
 import {
   MONSTER_CONDITION_IMMUNITIES_HINT,
   MONSTER_DAMAGE_DEFENSES_HINT,
@@ -80,6 +85,32 @@ function damageDefenseField(
   }
 }
 
+function monsterWeaponProficiencyOptions(
+  values: MonsterFormValues,
+  ctx: ContentFormCtx,
+  options: readonly FieldOption[],
+): FieldOption[] {
+  const buckets = values.proficiencies?.weapons ?? { categories: [], items: [] }
+  const grant = creatureWeaponProficienciesSchema.parse(
+    weaponProficiencyGrantSetFromMode(
+      values.weaponProficiencyMode ?? MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+      buckets,
+    ),
+  )
+  const catalog = ctx.equipmentCatalogById ? [...ctx.equipmentCatalogById.values()] : []
+  return prepareWeaponProficiencyComboboxOptions({
+    options,
+    equipmentCatalog: catalog,
+    targets: creatureWeaponProficiencyTargetsFromGrantSet(grant),
+    inventory: (values.equipment ?? []).map((entry) => ({
+      equipmentId: entry.equipmentId,
+      quantity: entry.quantity ?? 1,
+      equipped: entry.equipped === true,
+    })),
+    selectedIds: new Set(grant.items),
+  })
+}
+
 function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
   const weaponCombobox = equipmentProficiencyGrantComboboxConfig(ctx.options?.equipment, 'weapon')
   return [
@@ -96,7 +127,18 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
       hint: { text: MONSTER_WEAPON_PROFICIENCY_MODE_HINT, position: 'below-control' },
       categoryOptions: weaponCategoryOptions,
       itemOptions: weaponCombobox.itemOptions,
-      itemsCombobox: weaponCombobox.itemsCombobox,
+      itemsCombobox: {
+        ...weaponCombobox.itemsCombobox,
+        optionsResolve: {
+          dependsOn: ['equipment', 'proficiencies.weapons', 'weaponProficiencyMode'],
+          optionsWhen: (values) =>
+            monsterWeaponProficiencyOptions(
+              values as MonsterFormValues,
+              ctx,
+              weaponCombobox.itemOptions,
+            ),
+        },
+      },
       categoriesLabel: 'Categories',
       itemsLabel: 'Weapon choices',
       categoriesHint: MONSTER_WEAPON_PROFICIENCY_CATEGORIES_HINT,

@@ -11,7 +11,10 @@ import {
 import type { EquipmentPickerBrowseSortContext } from '../picker/equipment-picker-browse-sort-context'
 import type { EquipmentPickerItem } from '../picker/equipment-picker-item'
 import { getEquipmentRecommendationKindRank } from '../picker/equipment-picker-item-kind-rank'
-import { getEquipmentWeaponCategoryBrowseRank } from '../picker/equipment-picker-item-weapon-category-rank'
+import {
+  getEquipmentWeaponCategoryBrowseRank,
+  getProficientWeaponCategoryBrowseRank,
+} from '../picker/equipment-picker-item-weapon-category-rank'
 import type { ResolvedEquipmentOption } from './project-equipment-option-facts'
 import { bestSignalSpecificity } from './project-equipment-option-facts'
 
@@ -151,6 +154,19 @@ function resolvedFacts(item: EquipmentPickerItem): ResolvedEquipmentOption {
   }
 }
 
+function weaponCategoryBrowseRank(
+  equipment: Equipment,
+  context: EquipmentPickerBrowseSortContext | undefined,
+): number {
+  if (context?.proficientWeaponCategories) {
+    return getProficientWeaponCategoryBrowseRank(equipment, context.proficientWeaponCategories)
+  }
+  return getEquipmentWeaponCategoryBrowseRank(
+    equipment,
+    context?.preferMartialWeaponBrowseOrder ?? false,
+  )
+}
+
 function firstNonZero(values: readonly number[]): number | undefined {
   for (const value of values) {
     if (value !== 0) return value
@@ -180,9 +196,8 @@ export function compareEquipmentCanonical(
   const rightKindRank = getEquipmentRecommendationKindRank(right)
   if (leftKindRank !== rightKindRank) return leftKindRank - rightKindRank
 
-  const preferMartial = context?.preferMartialWeaponBrowseOrder ?? false
-  const leftWeaponCategoryRank = getEquipmentWeaponCategoryBrowseRank(left, preferMartial)
-  const rightWeaponCategoryRank = getEquipmentWeaponCategoryBrowseRank(right, preferMartial)
+  const leftWeaponCategoryRank = weaponCategoryBrowseRank(left, context)
+  const rightWeaponCategoryRank = weaponCategoryBrowseRank(right, context)
   if (leftWeaponCategoryRank !== rightWeaponCategoryRank) {
     return leftWeaponCategoryRank - rightWeaponCategoryRank
   }

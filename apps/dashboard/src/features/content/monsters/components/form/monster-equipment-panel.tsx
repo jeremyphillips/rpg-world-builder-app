@@ -4,6 +4,7 @@ import { createMagicPropertyDefinitionProvider } from '@rpg/catalog/magic-proper
 import {
   findCanonicalPlainEntry,
   creatureWeaponProficienciesSchema,
+  creatureWeaponProficiencyTargetsFromGrantSet,
   getContentTypeTerm,
   normalizeEquipmentInstance,
   resolveEquipmentInstanceSummary,
@@ -22,6 +23,7 @@ import {
 
 import { formatAddContentTypeLabel } from '../../../lib/content-type-labels'
 import {
+  applyLoadoutWeaponMatchSignals,
   buildLoadoutEquipmentPickerItems,
   EquipmentCategoryGroupedList,
   EquipmentInventorySectionHeader,
@@ -103,18 +105,25 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   }, [values?.proficiencies?.weapons, values?.weaponProficiencyMode])
 
   const referenceOptions = ctx.options?.equipment?.forReference() ?? []
+  const equipment = values?.equipment ?? []
   const pickerItems = useMemo(
     () =>
       enrichEquipmentPickerItemsWithSearchDocument(
-        buildLoadoutEquipmentPickerItems(referenceOptions, {
-          resolveIsProficient: (equipment) =>
-            resolveMonsterLoadoutEquipmentIsProficient(equipment, weaponGrants),
+        applyLoadoutWeaponMatchSignals({
+          items: buildLoadoutEquipmentPickerItems(referenceOptions, {
+            resolveIsProficient: (equipmentRow) =>
+              resolveMonsterLoadoutEquipmentIsProficient(equipmentRow, weaponGrants),
+          }),
+          targets: creatureWeaponProficiencyTargetsFromGrantSet(weaponGrants),
+          inventory: equipment.map((entry) => ({
+            equipmentId: entry.equipmentId,
+            quantity: entry.quantity ?? 1,
+            equipped: entry.equipped === true,
+          })),
         }),
       ),
-    [referenceOptions, weaponGrants],
+    [equipment, referenceOptions, weaponGrants],
   )
-
-  const equipment = values?.equipment ?? []
 
   const updateEquipment = useCallback(
     (next: MonsterEquipmentFormEntry[]) => {
@@ -333,6 +342,7 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
         open={pickerOpen}
         onOpenChange={setPickerOpen}
         items={pickerItems}
+        browseSortContext={{ proficientWeaponCategories: weaponGrants.categories }}
         workflowMode="loadout"
         workflowModes={['loadout']}
         showCharacterPreview={false}

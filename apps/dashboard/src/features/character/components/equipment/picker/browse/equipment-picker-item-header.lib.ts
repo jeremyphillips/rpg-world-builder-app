@@ -45,7 +45,6 @@ import type {
   EquipmentPickerLoadoutRowViewModel,
   EquipmentPickerRowActionViewModel,
 } from '../equipment-picker-action.lib'
-import { PICKER_SELECTION_OWNED_LABEL } from '../../../../lib/picker/picker-selection-state'
 import {
   EQUIPMENT_PICKER_CANNOT_AFFORD_LABEL,
   EQUIPMENT_PICKER_EXCEEDS_STARTING_BUDGET_LABEL,
@@ -316,15 +315,16 @@ function resolveLoadoutPresentation(args: {
       ? { kind: 'stepper', value: rowActionVm.plainQuantity, max: rowActionVm.plainQuantity + 999 }
       : { kind: 'add', disabled: false }
 
-  const provenanceLabels: string[] = []
-  if (rowActionVm.customizedQuantity > 0) {
-    provenanceLabels.push(`${rowActionVm.customizedQuantity} customized`)
-  }
-
-  const ownedLabel =
-    rowActionVm.ownedQuantity <= 1
-      ? PICKER_SELECTION_OWNED_LABEL
-      : `${PICKER_SELECTION_OWNED_LABEL} ×${rowActionVm.ownedQuantity}`
+  const supplemental =
+    rowActionVm.customizedQuantity > 0
+      ? [
+          {
+            kind: 'other' as const,
+            quantity: rowActionVm.customizedQuantity,
+            label: `${rowActionVm.customizedQuantity} customized`,
+          },
+        ]
+      : []
 
   return {
     control,
@@ -333,13 +333,7 @@ function resolveLoadoutPresentation(args: {
       rowActionVm.ownedQuantity > 0
         ? {
             kind: 'owned',
-            provenance: [
-              {
-                kind: 'other',
-                quantity: rowActionVm.ownedQuantity,
-                label: joinInlineMetadata([ownedLabel, ...provenanceLabels]),
-              },
-            ],
+            ...(supplemental.length > 0 ? { provenance: supplemental } : {}),
           }
         : null,
   }

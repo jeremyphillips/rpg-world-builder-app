@@ -53,7 +53,7 @@ const CHOICE_REASONS = new Set([
   'unresolvedToolProficiencyChoice',
 ])
 
-const SIGNAL_REASONS = new Set(['classSuggested', 'classToolCategory'])
+const SIGNAL_REASONS = new Set(['classSuggested', 'classToolCategory', 'selectedWeaponProficiency'])
 
 export function listOwnedEquipmentIds(args: {
   characterClass: CharacterClass

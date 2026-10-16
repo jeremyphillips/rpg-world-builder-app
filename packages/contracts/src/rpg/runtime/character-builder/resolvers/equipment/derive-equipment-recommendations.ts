@@ -30,6 +30,7 @@ import {
 import {
   applyRecommendationContributions,
   deriveProficiencyRecommendationContributions,
+  deriveSelectedWeaponProficiencyContributions,
   deriveStartingEquipmentRecommendationContributions,
   listSelectedStartingEquipmentGrantIds,
 } from './derive-equipment-recommendation-contributions'
@@ -385,6 +386,14 @@ export function deriveEquipmentRecommendations(
 
   const startingEquipmentIds = resolveFocusInferenceIds(characterClass, catalogIndex, draft)
   const ownedIds = listOwnedEquipmentIds({ characterClass, catalogIndex, draft })
+
+  applyRecommendationContributions({
+    accumulators,
+    contributions: deriveSelectedWeaponProficiencyContributions({ proficiencies, ownedIds }),
+    catalogIndex,
+    rulesetId: characterClass.rulesetId,
+    selectedClassId: characterClass.id,
+  })
 
   applyRequiredGearContributions({
     accumulators,

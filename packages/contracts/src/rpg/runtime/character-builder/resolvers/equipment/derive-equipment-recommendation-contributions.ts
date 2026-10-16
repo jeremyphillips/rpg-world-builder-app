@@ -6,6 +6,7 @@ export type {
 export {
   categoryOnlyToolProficiencyPool,
   deriveProficiencyRecommendationContributions,
+  deriveSelectedWeaponProficiencyContributions,
   hasUnfulfilledCategoryEquipmentNeed,
   isGoldShoppingPath,
   poolHasSemanticCategories,

@@ -1,8 +1,15 @@
+import type { WeaponCategory } from '../../../../vocab/weapon/category'
 import type { ActiveChoiceContext } from '../../recommendation'
 
 /** Context for character-builder equipment picker browse ordering. */
 export type EquipmentPickerBrowseSortContext = {
   preferMartialWeaponBrowseOrder: boolean
+  /**
+   * Weapon categories the creature is proficient with.
+   * When set, those weapons sort ahead of other weapons after strength and kind tie.
+   * A specific weapon grant does not belong in this set.
+   */
+  proficientWeaponCategories?: readonly WeaponCategory[]
   /**
    * What the user is resolving. A `requirement` choice limits which requirement
    * ids lift rows. Pool, package, and allowance choices do not reorder rows.

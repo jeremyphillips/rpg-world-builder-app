@@ -43,6 +43,9 @@ describe('equipment-picker-recommendation-context.lib', () => {
     expect(result.items.map((item) => item.equipment.id)).toEqual(
       expect.arrayContaining([equipmentStepBattleaxeFixture.id, equipmentStepDaggerFixture.id]),
     )
-    expect(result.browseSortContext).toEqual({ preferMartialWeaponBrowseOrder: false })
+    expect(result.browseSortContext).toEqual({
+      preferMartialWeaponBrowseOrder: false,
+      proficientWeaponCategories: ['simple'],
+    })
   })
 })

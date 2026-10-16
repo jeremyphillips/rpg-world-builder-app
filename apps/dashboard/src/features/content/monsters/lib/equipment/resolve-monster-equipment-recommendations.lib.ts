@@ -1,5 +1,6 @@
 import {
   isWeaponEquipment,
+  resolveWeaponCrossRecommendation,
   toEquipmentContentId,
   type Equipment,
   type SystemRulesetId,
@@ -37,14 +38,6 @@ function resolveWeaponForReference(
   return undefined
 }
 
-function entryOwnsWeapon(
-  entry: MonsterEquipmentFormEntry,
-  weapon: Equipment,
-  rulesetId: SystemRulesetId,
-): boolean {
-  return referenceMatchesEquipment(entry.equipmentId, weapon, rulesetId)
-}
-
 /** Missing specific-weapon proficiency rows eligible for equipment quick-add. */
 export function resolveMonsterEquipmentWeaponRecommendations(input: {
   /** Active-mode individual weapon grant ids, in selection order. */
@@ -56,14 +49,24 @@ export function resolveMonsterEquipmentWeaponRecommendations(input: {
   const { weaponProficiencyItemIds, referenceEquipment, equipmentEntries, rulesetId } = input
 
   const referenceIds = new Set(referenceEquipment.map((row) => row.id))
+  const targets = weaponProficiencyItemIds.map((weaponId) => ({ weaponId }))
+  const inventory = equipmentEntries.map((entry) => ({
+    equipmentId: entry.equipmentId,
+    quantity: entry.quantity ?? 1,
+    equipped: entry.equipped === true,
+  }))
   const recommendations: MonsterEquipmentRecommendationCandidate[] = []
 
   for (const itemRef of weaponProficiencyItemIds) {
     const weapon = resolveWeaponForReference(itemRef, referenceEquipment, rulesetId)
     if (!weapon || !referenceIds.has(weapon.id)) continue
 
-    const owned = equipmentEntries.some((entry) => entryOwnsWeapon(entry, weapon, rulesetId))
-    if (owned) continue
+    const signal = resolveWeaponCrossRecommendation({
+      equipment: weapon,
+      targets,
+      inventory,
+    })
+    if (signal?.kind !== 'equipment_match') continue
 
     recommendations.push({ equipmentId: weapon.id, label: weapon.name })
   }

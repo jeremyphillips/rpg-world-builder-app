@@ -185,6 +185,7 @@ export {
   getEquipmentFamilyLabel,
   buildEquipmentDetailViewModel,
   buildEquipmentPickerRowViewModel,
+  applyLoadoutWeaponMatchSignals,
   buildLoadoutEquipmentPickerItems,
   EquipmentCategoryGroupedList,
   EquipmentInventorySectionHeader,
