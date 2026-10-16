@@ -28,6 +28,14 @@ describe('choiceControlClasses', () => {
     expect(classes).toContain('ui-choice-control--circle')
   })
 
+  it('defaults checkbox focus to standalone and allows embedded for dense inline chrome', () => {
+    expect(checkboxControlClasses()).not.toContain('ui-focus-ring--embedded')
+
+    const embedded = checkboxControlClasses({ focusContext: 'embedded' })
+    expect(embedded).toContain('ui-focus-ring')
+    expect(embedded).toContain('ui-focus-ring--embedded')
+  })
+
   it('maps radio group item to block and radio modifier', () => {
     const classes = radioGroupItemControlClasses()
     expect(classes).toContain(UI_CHOICE_CONTROL_BLOCK_CLASS)

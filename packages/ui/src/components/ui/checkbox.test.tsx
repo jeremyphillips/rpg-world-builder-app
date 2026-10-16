@@ -45,6 +45,15 @@ describe('Checkbox', () => {
     expect(control).toHaveAttribute('data-state', 'checked')
   })
 
+  it('uses standalone focus by default and embedded when requested', () => {
+    const { rerender } = render(<Checkbox aria-label="Terms" />)
+    expect(screen.getByLabelText('Terms')).toHaveClass('ui-focus-ring')
+    expect(screen.getByLabelText('Terms')).not.toHaveClass('ui-focus-ring--embedded')
+
+    rerender(<Checkbox aria-label="Terms" focusContext="embedded" />)
+    expect(screen.getByLabelText('Terms')).toHaveClass('ui-focus-ring--embedded')
+  })
+
   itAxe('has no axe accessibility violations', async () => {
     const { container } = render(<Checkbox aria-label="Accept terms" />)
     await expectNoAxeViolations(container)

@@ -1,5 +1,8 @@
 import { cn } from '../../lib/utils'
-import { interactiveFocusVariants } from './interactive-focus.variants'
+import {
+  interactiveFocusVariants,
+  type InteractiveFocusVariantProps,
+} from './interactive-focus.variants'
 import {
   CHOICE_CONTROL_INDICATOR_SIZE_SPECS,
   UI_CHOICE_CONTROL_BLOCK_CLASS,
@@ -17,14 +20,18 @@ export { UI_CHOICE_CONTROL_CIRCLE_CLASS } from './choice-control.styles'
 
 export type CheckboxAppearance = 'default' | 'circle'
 
+/** Where the control sits in the layout — not appearance or domain. */
+export type ChoiceControlFocusContext = NonNullable<InteractiveFocusVariantProps['context']>
+
 export function choiceControlClasses(
   kind: ChoiceControlKind,
-  options: { className?: string } = {},
+  options: { className?: string; focusContext?: ChoiceControlFocusContext } = {},
 ): string {
+  const focusContext = options.focusContext ?? 'standalone'
   return cn(
     UI_CHOICE_CONTROL_BLOCK_CLASS,
     resolveChoiceControlKindClass(kind),
-    interactiveFocusVariants({ context: 'standalone' }),
+    interactiveFocusVariants({ context: focusContext }),
     options.className,
   )
 }
@@ -32,9 +39,12 @@ export function choiceControlClasses(
 export function checkboxControlClasses(options?: {
   className?: string
   appearance?: CheckboxAppearance
+  focusContext?: ChoiceControlFocusContext
 }): string {
   const appearance = options?.appearance ?? 'default'
+  const focusContext = options?.focusContext ?? 'standalone'
   return choiceControlClasses('checkbox', {
+    focusContext,
     className: cn(
       'peer',
       appearance === 'circle' && UI_CHOICE_CONTROL_CIRCLE_CLASS,

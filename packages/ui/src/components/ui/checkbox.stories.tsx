@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react'
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Checkbox } from './checkbox.client'
 import { CHOICE_CONTROL_KIND_SPECS, UI_CHOICE_CONTROL_BLOCK_CLASS } from './choice-control.styles'
 import { checkboxControlClasses } from './choice-control.variants'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 
 const meta = {
   title: 'Forms/Controls/Checkbox',
@@ -71,4 +73,112 @@ export const CircleCheckedDisabled: Story = {
 
 export const CircleInvalid: Story = {
   args: { appearance: 'circle', 'aria-label': 'Equip item', 'aria-invalid': true },
+}
+
+const cardChromeClasses =
+  'flex flex-wrap items-center gap-6 rounded-lg border border-border bg-card p-6'
+
+function CircleOnCardRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <span className="text-xs text-muted-foreground">{label}</span>
+      {children}
+    </div>
+  )
+}
+
+/** Rest / hover / focus on the same surface as entity equipment rows (`bg-card`). */
+export const CircleOnCardSurface: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Hover and Tab through each control: rest shows only the 16px indicator; hover adds a 24px lift fill and border; focus uses the default standalone ring (`--ui-focus-ring-standalone`).',
+      },
+    },
+  },
+  render: () => (
+    <div className={cardChromeClasses}>
+      <CircleOnCardRow label="Unchecked">
+        <Checkbox appearance="circle" aria-label="Equip item" />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Checked">
+        <Checkbox appearance="circle" aria-label="Unequip item" defaultChecked />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Checked disabled">
+        <Checkbox appearance="circle" aria-label="Equipped item" defaultChecked disabled />
+      </CircleOnCardRow>
+      <CircleOnCardRow label="Focus (Tab here)">
+        <Checkbox appearance="circle" aria-label="Focus demo checked" defaultChecked autoFocus />
+      </CircleOnCardRow>
+    </div>
+  ),
+}
+
+/** Tooltip trigger wraps a span (not the checkbox) so checked styling and focus ring stay intact. */
+export const CircleOnCardWithTooltip: Story = {
+  render: () => (
+    <div className={cardChromeClasses}>
+      <TooltipProvider>
+        <Tooltip defaultOpen>
+          <TooltipTrigger interactive asChild>
+            <span className="inline-flex shrink-0">
+              <Checkbox
+                appearance="circle"
+                focusContext="embedded"
+                aria-label="Unequip longsword"
+                defaultChecked
+              />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent arrow side="top">
+            Unequip
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  ),
+}
+
+/** Dense heading inline slot — embedded focus avoids standalone ring bleed into truncated titles. */
+export const CircleEmbeddedInHeading: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Mirrors entity `headingInline` (`gap-1`, truncated title). Use `focusContext="embedded"` for dense inline chrome; spacious layouts keep the default standalone ring.',
+      },
+    },
+  },
+  render: () => (
+    <div className={cardChromeClasses}>
+      <div className="flex min-w-0 max-w-xs items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <span className="inline-flex shrink-0 self-center">
+          <Checkbox
+            appearance="circle"
+            focusContext="embedded"
+            aria-label="Unequip +1 Flaming Battleaxe of Very Long Names"
+            defaultChecked
+          />
+        </span>
+      </div>
+      <div className="flex min-w-0 max-w-xs items-center gap-1">
+        <span className="min-w-0 truncate text-sm font-medium">
+          +1 Flaming Battleaxe of Very Long Names
+        </span>
+        <span className="inline-flex shrink-0 self-center">
+          <Checkbox
+            appearance="circle"
+            focusContext="standalone"
+            aria-label="Standalone focus comparison"
+            defaultChecked
+            autoFocus
+          />
+        </span>
+      </div>
+    </div>
+  ),
 }

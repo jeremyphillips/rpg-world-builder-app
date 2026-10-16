@@ -14,10 +14,9 @@ describe('MonsterEquipmentEquippedToggle', () => {
       />,
     )
 
-    expect(screen.getByRole('checkbox', { name: 'Equipped: Battleaxe' })).toHaveAttribute(
-      'data-state',
-      'checked',
-    )
+    const checkbox = screen.getByRole('checkbox', { name: 'Equipped: Battleaxe' })
+    expect(checkbox).toHaveAttribute('data-state', 'checked')
+    expect(checkbox).toHaveClass('ui-focus-ring--embedded')
   })
 
   it('shows the equip tooltip with an arrow when unchecked', async () => {

@@ -9,17 +9,20 @@ import {
   UI_CHOICE_CONTROL_MARK_CLASS,
   checkboxControlClasses,
   type CheckboxAppearance,
+  type ChoiceControlFocusContext,
 } from './choice-control.variants'
 
 export type CheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
   appearance?: CheckboxAppearance
+  /** Dense inline headings and row chrome use `embedded`; default forms use `standalone`. */
+  focusContext?: ChoiceControlFocusContext
 }
 
 const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Root>, CheckboxProps>(
-  ({ className, appearance = 'default', ...props }, ref) => (
+  ({ className, appearance = 'default', focusContext = 'standalone', ...props }, ref) => (
     <CheckboxPrimitive.Root
       ref={ref}
-      className={cn(checkboxControlClasses({ appearance }), className)}
+      className={cn(checkboxControlClasses({ appearance, focusContext }), className)}
       {...props}
     >
       <CheckboxPrimitive.Indicator className={cn(UI_CHOICE_CONTROL_MARK_CLASS)}>

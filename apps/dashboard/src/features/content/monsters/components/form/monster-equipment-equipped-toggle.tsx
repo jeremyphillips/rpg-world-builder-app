@@ -34,6 +34,7 @@ export function MonsterEquipmentEquippedToggle({
           <span className="inline-flex shrink-0 self-center">
             <Checkbox
               appearance="circle"
+              focusContext="embedded"
               checked={checked}
               disabled={disabled}
               aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}

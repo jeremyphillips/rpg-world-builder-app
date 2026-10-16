@@ -18,4 +18,35 @@ describe('choice-control circle appearance CSS', () => {
     )
     expect(css).toContain('display: none')
   })
+
+  it('suppresses default control shadow only when not focus-visible so the shared focus ring can paint', () => {
+    expect(css).toContain(
+      '.ui-choice-control--checkbox.ui-choice-control--circle:not(:focus-visible)',
+    )
+    expect(css).toMatch(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle:not\(:focus-visible\)\s*\{[^}]*box-shadow:\s*none/s,
+    )
+    expect(css).not.toMatch(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle\s*\{[^}]*box-shadow:\s*none/s,
+    )
+  })
+
+  it('uses lift surface and choice border on hover without shadow', () => {
+    expect(css).toMatch(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle:hover:not\(:disabled\)\s*\{[^}]*background-color:\s*var\(--surface-lift\)/s,
+    )
+    expect(css).toMatch(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle:hover:not\(:disabled\)\s*\{[^}]*border-color:\s*var\(--choice-control-border\)/s,
+    )
+    expect(css).not.toContain('var(--control-hover-bg)')
+  })
+
+  it('keeps the circular indicator flat at rest with a solid unchecked fill', () => {
+    const circleBeforeBlock = css.match(
+      /\.ui-choice-control--checkbox\.ui-choice-control--circle::before\s*\{[^}]+\}/s,
+    )?.[0]
+    expect(circleBeforeBlock).toBeDefined()
+    expect(circleBeforeBlock).toContain('background-color: var(--background)')
+    expect(circleBeforeBlock).not.toContain('box-shadow')
+  })
 })
