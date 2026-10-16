@@ -11,11 +11,11 @@ import type { FieldValues } from 'react-hook-form'
 
 import {
   defaultHitPointsDiceForSize,
-  MONSTER_HIT_POINTS_DICE_FIELD,
+  hitPointsDiceAuthoringFields,
+  hitPointsDiceFromFormValues,
   MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD,
   MONSTER_HIT_POINTS_STASH_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
-  hitPointsDiceFromFormValues,
 } from './statistics/monster-hit-points-form.lib'
 import type { MonsterHitPointStash } from './statistics/monster-variant-transitions'
 
@@ -96,15 +96,14 @@ const NEUTRAL_ABILITIES: Monster['abilityScores'] = {
 }
 
 export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
+  const authoringHitDice = defaultHitPointsDiceForSize(undefined)
   return {
     name: '',
-    size: 'medium',
-    alignment: 'unaligned',
     abilityScores: { ...NEUTRAL_ABILITIES },
     armorClass: { kind: 'unarmored' },
-    hitPoints: { kind: 'hit-dice', count: 1 },
+    hitPoints: { kind: 'hit-dice', count: authoringHitDice.count },
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: false,
-    [MONSTER_HIT_POINTS_DICE_FIELD]: defaultHitPointsDiceForSize('medium'),
+    ...hitPointsDiceAuthoringFields(authoringHitDice),
     [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     movement: [{ mode: 'walk', feet: 30 }],
     senses: [],
@@ -147,7 +146,7 @@ function hitPointsAuthoringFromEntity(
   })
   return {
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: useFixed,
-    [MONSTER_HIT_POINTS_DICE_FIELD]: dice,
+    ...hitPointsDiceAuthoringFields(dice),
     [MONSTER_HIT_POINTS_STASH_FIELD]: {},
     ...(useFixed && entity.hitPoints.kind === 'fixed' && entity.hitPoints.average !== undefined
       ? { [MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD]: entity.hitPoints.average }

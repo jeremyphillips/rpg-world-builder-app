@@ -72,7 +72,7 @@ function renderSectionHint(
     )
   }
   return (
-    <Text as="span" variant="small" className={fieldGroupDescriptionTypographyClasses}>
+    <Text as="span" className={fieldGroupDescriptionTypographyClasses}>
       {normalized.text}
     </Text>
   )

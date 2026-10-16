@@ -74,6 +74,8 @@ const TEXT_STYLE_UTILITIES = [
   'text-style-field-legend-compact',
   'text-style-field-hint',
   'text-style-field-hint-compact',
+  'text-style-field-group-description',
+  'text-style-field-group-description-compact',
   'text-style-field-error',
 ] as const
 

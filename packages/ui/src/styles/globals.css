@@ -949,6 +949,20 @@
   color: var(--muted-foreground);
 }
 
+@utility text-style-field-group-description {
+  font-size: var(--text-sm);
+  line-height: var(--text-sm--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
+@utility text-style-field-group-description-compact {
+  font-size: var(--text-xs);
+  line-height: var(--text-xs--line-height);
+  font-weight: var(--font-weight-normal);
+  color: var(--muted-foreground);
+}
+
 @utility text-style-field-error {
   font-size: var(--text-xs);
   line-height: var(--text-xs--line-height);

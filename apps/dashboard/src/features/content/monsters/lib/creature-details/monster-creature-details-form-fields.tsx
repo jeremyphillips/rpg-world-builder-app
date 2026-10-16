@@ -28,7 +28,12 @@ import {
   MonsterTelepathyRangeField,
 } from '../../components/form/monster-creature-details-slots'
 import { damageDefenseComboboxOptions } from './monster-damage-defense-form.lib'
-import { MONSTER_WEAPON_PROFICIENCIES_HEADING } from '../monster-form-labels'
+import {
+  MONSTER_CONDITION_IMMUNITIES_HINT,
+  MONSTER_DAMAGE_DEFENSES_HINT,
+  MONSTER_SENSES_HINT,
+  MONSTER_WEAPON_PROFICIENCIES_HEADING,
+} from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 
 const weaponCategoryOptions = toOptions(
@@ -131,6 +136,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
     {
       kind: 'group',
       legend: 'Senses',
+      description: MONSTER_SENSES_HINT,
       fields: [
         {
           kind: 'slot',
@@ -158,6 +164,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'group',
           legend: 'Damage defenses',
+          description: MONSTER_DAMAGE_DEFENSES_HINT,
           fields: [
             damageDefenseField(ctx, 'vulnerabilities'),
             damageDefenseField(ctx, 'resistances'),
@@ -167,6 +174,7 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'group',
           legend: 'Condition immunities',
+          description: MONSTER_CONDITION_IMMUNITIES_HINT,
           fields: [
             {
               type: 'combobox',

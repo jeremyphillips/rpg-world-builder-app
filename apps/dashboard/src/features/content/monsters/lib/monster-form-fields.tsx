@@ -68,12 +68,19 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
       density: 'comfortable',
       fields: [
         descriptionField(ctx),
-        { type: 'select', name: 'size', label: 'Size', options: sizeOptions },
+        { type: 'select', name: 'size', label: 'Size', options: sizeOptions, required: true },
         vocabularySelectFieldForTerm(CREATURE_TYPE_TERM, {
           name: 'creatureType',
           options: creatureTypeOptions(ctx),
+          required: true,
         }),
-        { type: 'select', name: 'alignment', label: 'Alignment', options: alignmentOptions },
+        {
+          type: 'select',
+          name: 'alignment',
+          label: 'Alignment',
+          options: alignmentOptions,
+          required: true,
+        },
       ],
     },
   ]
@@ -92,7 +99,7 @@ export function buildMonsterTabs(ctx: ContentFormCtx): TabbedFormTab[] {
           name: 'challengeRating',
           label: MONSTER_CHALLENGE_HEADING,
           options: challengeRatingOptions,
-          clearable: true,
+          required: true,
         },
         {
           kind: 'slot',

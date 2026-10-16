@@ -170,9 +170,11 @@ export const formSectionStackClasses = 'flex flex-col gap-7'
 export const fieldRowGapClasses = 'gap-6'
 /** Horizontal + wrap gap between chip pills — vertical label→chips spacing is the anatomy token. */
 export const fieldChipWrapGapClasses = 'gap-2'
-export const fieldGroupDescriptionTypographyClasses = 'text-style-field-hint'
+/** Comfortable group/subgroup legend description — explicit scale (not leaf field hints). */
+export const fieldGroupDescriptionTypographyClasses = 'text-style-field-group-description'
 /** Compact group legend description — 12px caption scale. */
-export const fieldGroupDescriptionCompactTypographyClasses = 'text-style-field-hint-compact'
+export const fieldGroupDescriptionCompactTypographyClasses =
+  'text-style-field-group-description-compact'
 /** Group/subgroup hint copy — legend→body spacing lives on FieldGroup body wrapper. */
 export const fieldGroupDescriptionClasses = fieldGroupDescriptionTypographyClasses
 /** Vertical gap between a group legend and its optional hint. */
@@ -308,6 +310,15 @@ export const fieldSettingsRowClasses =
 
 /** Vertical gap between siblings in a stack or dependents region. */
 export type FieldRhythm = 'compact' | 'comfortable'
+
+/** Group legend description typography — follows form density (`rhythm`), not legend title scale. */
+export function resolveFieldGroupDescriptionTypography(
+  rhythm: FieldRhythm = 'comfortable',
+): string {
+  return rhythm === 'compact'
+    ? fieldGroupDescriptionCompactTypographyClasses
+    : fieldGroupDescriptionTypographyClasses
+}
 
 export const fieldStackRhythmVariants = cva('flex flex-col', {
   variants: {
@@ -540,7 +551,7 @@ export function resolveArrayLegendScale(size: FieldSizeToken): FieldGroupLegendS
 
 /**
  * Legend-row disclosure trigger inside `<FieldGroupLegend>`.
- * Typography inherits from the parent `<legend>` (`fieldGroupLegendVariants` + density rhythm).
+ * Title scale is on the label span inside the trigger, not on `<legend>`.
  */
 export const fieldGroupLegendDisclosureTriggerVariants = cva(
   cn(

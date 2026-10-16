@@ -1,4 +1,4 @@
-import { CREATURE_SIZE_HIT_DIE, type CreatureSize } from '@rpg/contracts'
+import { CREATURE_SIZE_HIT_DIE } from '@rpg/contracts'
 import type { FieldVisibility, FormItem, SelectFieldOptionListItem } from '@rpg/ui/form'
 
 import { MONSTER_HIT_POINTS_HEADING } from '../monster-form-labels'
@@ -8,6 +8,7 @@ import {
   MONSTER_HIT_POINTS_DICE_FACES_FIELD,
   MONSTER_HIT_POINTS_DICE_FIELD,
   MONSTER_HIT_POINTS_USE_FIXED_FIELD,
+  resolveAuthoringCreatureSize,
 } from './monster-hit-points-form.lib'
 import type { MonsterFormValues } from '../monster-form-values'
 
@@ -74,8 +75,7 @@ export function monsterHitPointsFields(): FormItem[] {
           optionsResolve: {
             dependsOn: ['size'],
             optionsWhen: (values) => {
-              const size = (values.size ?? 'medium') as CreatureSize
-              const faces = CREATURE_SIZE_HIT_DIE[size]
+              const faces = CREATURE_SIZE_HIT_DIE[resolveAuthoringCreatureSize(values.size)]
               return [{ value: String(faces), label: String(faces) }]
             },
           },

@@ -67,7 +67,13 @@ export const MONSTER_FIXED_FORMULA_HINT = 'Optional. Shown as written.'
 export const MONSTER_NATURAL_BONUS_LABEL = getNaturalArmorBonusFieldLabel()
 export const MONSTER_FIXED_AC_LABEL = `${armorClassLabel} value`
 export const MONSTER_FIXED_AC_HINT = 'Ignores ability scores and equipment.'
-export const MONSTER_TELEPATHY_HINT = 'Leave empty for no telepathy'
+export const MONSTER_SENSES_HINT = 'Add special senses and their ranges.'
+export const MONSTER_TELEPATHY_HINT =
+  "Specify the range of this creature's telepathic communication."
+export const MONSTER_DAMAGE_DEFENSES_HINT =
+  'Choose damage types this creature is vulnerable, resistant, or immune to.'
+export const MONSTER_CONDITION_IMMUNITIES_HINT =
+  'Choose conditions that cannot affect this creature, such as Charmed or Poisoned.'
 export const MONSTER_SPEAKS_LABEL = getCreatureLanguageFluencyLabel('speaks')
 export const MONSTER_UNDERSTANDS_ONLY_LABEL = getCreatureLanguageFluencyLabel('understands-only')
 export const MONSTER_ADD_SKILL_LABEL = getProficiencyGrantCompactAddLabel('skill')

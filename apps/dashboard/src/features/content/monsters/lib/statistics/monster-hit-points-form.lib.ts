@@ -16,9 +16,34 @@ export const MONSTER_HIT_POINTS_DICE_FACES_FIELD = 'hitPointsDice.faces'
 export const MONSTER_HIT_POINTS_STASH_FIELD = '_hitPointsStash'
 export const MONSTER_HIT_POINTS_FIXED_AVERAGE_FIELD = 'hitPointsFixedAverage'
 
-export function defaultHitPointsDiceForSize(size: CreatureSize | undefined): DiceFormulaValue {
-  const faces = CREATURE_SIZE_HIT_DIE[size ?? 'medium']
+/** Creature size for HP authoring when the identity select is unset or invalid. */
+export function resolveAuthoringCreatureSize(size: unknown): CreatureSize {
+  if (typeof size === 'string' && Object.hasOwn(CREATURE_SIZE_HIT_DIE, size)) {
+    return size as CreatureSize
+  }
+  return 'medium'
+}
+
+export function defaultHitPointsDiceForSize(size: unknown): DiceFormulaValue {
+  const faces = CREATURE_SIZE_HIT_DIE[resolveAuthoringCreatureSize(size)]
   return { count: 1, faces }
+}
+
+/** Leaf + object paths for inline-sentence hit-dice controls (select reads `hitPointsDice.faces`). */
+export function hitPointsDiceAuthoringFields(dice: DiceFormulaValue): {
+  [MONSTER_HIT_POINTS_DICE_FIELD]: DiceFormulaValue
+  [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]: number
+  [MONSTER_HIT_POINTS_DICE_FACES_FIELD]: string
+} {
+  return {
+    [MONSTER_HIT_POINTS_DICE_FIELD]: dice,
+    [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]: dice.count,
+    [MONSTER_HIT_POINTS_DICE_FACES_FIELD]: String(dice.faces),
+  }
+}
+
+function resolveHitDieFacesForSize(size: unknown): number {
+  return CREATURE_SIZE_HIT_DIE[resolveAuthoringCreatureSize(size)]
 }
 
 export function hitPointsDiceFromFormValues(
@@ -27,7 +52,7 @@ export function hitPointsDiceFromFormValues(
     [MONSTER_HIT_POINTS_DICE_COUNT_FIELD]?: number
   },
 ): DiceFormulaValue {
-  const faces = CREATURE_SIZE_HIT_DIE[(values.size ?? 'medium') as CreatureSize]
+  const faces = resolveHitDieFacesForSize(values.size)
   if (values.hitPoints?.kind === 'hit-dice') {
     return { count: values.hitPoints.count, faces }
   }
@@ -136,7 +161,7 @@ function hitPointsDiceCountForSize(formValues: MonsterFormValues): {
   count: number
   faces: (typeof CREATURE_SIZE_HIT_DIE)[CreatureSize]
 } {
-  const faces = CREATURE_SIZE_HIT_DIE[(formValues.size ?? 'medium') as CreatureSize]
+  const faces = resolveHitDieFacesForSize(formValues.size)
   const dice = hitPointsDiceFromFormValues(formValues)
   const count =
     typeof dice.count === 'number' && Number.isInteger(dice.count) && dice.count >= 1
@@ -152,7 +177,7 @@ function patchHitPointsDiceForSize(
   const dice = hitPointsDiceFromFormValues(formValues)
   const patch: Partial<MonsterFormValues> = {}
   if (dice.faces !== faces || dice.count !== count) {
-    patch.hitPointsDice = { count, faces }
+    Object.assign(patch, hitPointsDiceAuthoringFields({ count, faces }))
   }
   if (formValues.hitPoints.kind !== 'hit-dice' || formValues.hitPoints.count !== count) {
     patch.hitPoints = { kind: 'hit-dice', count }

@@ -396,17 +396,16 @@ export function InlineSentenceFieldRenderer({
   useEffect(() => {
     if (!config.optionsResolve) return
 
-    if (isMountRef.current) {
-      isMountRef.current = false
-      return
-    }
-
     syncResolvedInlineSentenceSelectValues(
       visibleSegments,
       config.name,
       controllerByName,
       resolvedSelectOptionsBySegment,
     )
+
+    if (isMountRef.current) {
+      isMountRef.current = false
+    }
   }, [
     config.name,
     config.optionsResolve,
