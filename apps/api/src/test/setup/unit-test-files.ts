@@ -40,6 +40,7 @@ export const unitTestFiles = [
   'src/features/vocabulary/lib/reference-sources/referrer-identity.test.ts',
   'src/features/vocabulary/lib/reference-sources/species.test.ts',
   'src/features/vocabulary/lib/resolve-vocabulary-options-for-viewer.test.ts',
+  'src/features/vocabulary/lib/creature-type-language-affinities.lib.test.ts',
   'src/features/vocabulary/lib/resolve-vocabulary.test.ts',
   'src/features/vocabulary/lib/vocabulary-usage-registrations.test.ts',
   'src/features/vocabulary/lib/vocabulary-usage-resolvers.test.ts',

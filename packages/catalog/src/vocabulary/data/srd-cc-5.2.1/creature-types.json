@@ -2,7 +2,8 @@
   {
     "id": "aberration",
     "label": "Aberration",
-    "description": "Aberrations are utterly alien beings whose anatomy and senses defy the natural order (e.g. aboleths, mind flayers, beholders)."
+    "description": "Aberrations are utterly alien beings whose anatomy and senses defy the natural order (e.g. aboleths, mind flayers, beholders).",
+    "languageAffinities": ["deep-speech"]
   },
   {
     "id": "beast",
@@ -12,7 +13,8 @@
   {
     "id": "celestial",
     "label": "Celestial",
-    "description": "Celestials are creatures native to the Upper Planes, many of them the servants of deities (e.g. angels, couatls, pegasi)."
+    "description": "Celestials are creatures native to the Upper Planes, many of them the servants of deities (e.g. angels, couatls, pegasi).",
+    "languageAffinities": ["celestial"]
   },
   {
     "id": "construct",
@@ -22,27 +24,32 @@
   {
     "id": "dragon",
     "label": "Dragon",
-    "description": "Dragons are large reptilian creatures of ancient origin and tremendous power, including true dragons, wyverns, and dragon-kin."
+    "description": "Dragons are large reptilian creatures of ancient origin and tremendous power, including true dragons, wyverns, and dragon-kin.",
+    "languageAffinities": ["draconic"]
   },
   {
     "id": "elemental",
     "label": "Elemental",
-    "description": "Elementals are creatures native to the elemental planes, embodying earth, air, fire, and water (e.g. elementals, genies, mephits)."
+    "description": "Elementals are creatures native to the elemental planes, embodying earth, air, fire, and water (e.g. elementals, genies, mephits).",
+    "languageAffinities": ["primordial"]
   },
   {
     "id": "fey",
     "label": "Fey",
-    "description": "Fey are magical creatures closely tied to the forces of nature and the Feywild (e.g. dryads, pixies, hags)."
+    "description": "Fey are magical creatures closely tied to the forces of nature and the Feywild (e.g. dryads, pixies, hags).",
+    "languageAffinities": ["sylvan"]
   },
   {
     "id": "fiend",
     "label": "Fiend",
-    "description": "Fiends are creatures of wickedness native to the Lower Planes (e.g. demons, devils, yugoloths)."
+    "description": "Fiends are creatures of wickedness native to the Lower Planes (e.g. demons, devils, yugoloths).",
+    "languageAffinities": ["abyssal", "infernal"]
   },
   {
     "id": "giant",
     "label": "Giant",
-    "description": "Giants tower over humans and their kind, ranging from ogres and trolls to true giants with their own societies."
+    "description": "Giants tower over humans and their kind, ranging from ogres and trolls to true giants with their own societies.",
+    "languageAffinities": ["giant"]
   },
   {
     "id": "humanoid",

@@ -28,6 +28,9 @@ import {
   MONSTER_TELEPATHY_HINT,
   MONSTER_UNDERSTANDS_ONLY_LABEL,
 } from '../../lib/monster-form-labels'
+import { getCreatureTypeLabel } from '@/features/vocabulary'
+
+import { prepareMonsterLanguageComboboxOptions } from '../../lib/monster-language-combobox-options.lib'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
 
@@ -355,20 +358,34 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
   const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
   const languageEntries = values?.proficiencies?.languages ?? []
+  const creatureType = values?.creatureType
   const selected = useMemo(
     () => new Set(languageEntries.map((entry) => entry.language)),
     [languageEntries],
   )
-  const languageOptions = useMemo(
-    () =>
-      [...(ctx.languageVocabulary?.activeIds ?? [])]
-        .filter((id) => !selected.has(id))
-        .map((id) => ({
-          value: id,
-          label: ctx.languageVocabulary?.labelById[id] ?? id,
-        })),
-    [ctx.languageVocabulary, selected],
-  )
+  const languageOptions = useMemo(() => {
+    const baseOptions = [...(ctx.languageVocabulary?.activeIds ?? [])]
+      .filter((id) => !selected.has(id))
+      .map((id) => ({
+        value: id,
+        label: ctx.languageVocabulary?.labelById[id] ?? id,
+      }))
+
+    const affinityIds =
+      creatureType && ctx.creatureTypeVocabulary
+        ? (ctx.creatureTypeVocabulary.languageAffinitiesById[creatureType] ?? [])
+        : []
+
+    return prepareMonsterLanguageComboboxOptions({
+      activeLanguageOptions: baseOptions,
+      selectedLanguageIds: selected,
+      affinityLanguageIds: affinityIds,
+      creatureTypeLabel:
+        creatureType && ctx.creatureTypeVocabulary
+          ? getCreatureTypeLabel(ctx.creatureTypeVocabulary, creatureType)
+          : undefined,
+    })
+  }, [creatureType, ctx.creatureTypeVocabulary, ctx.languageVocabulary, selected])
   const [addLanguageKey, setAddLanguageKey] = useState(0)
 
   if (!values?.proficiencies) return null

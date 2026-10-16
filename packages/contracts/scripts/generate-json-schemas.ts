@@ -26,6 +26,7 @@ import {
   campaignTemplateSchema,
   worldSeedPackSchema,
 } from '../src/rpg/campaign/campaign-template.ts'
+import { creatureTypeSeedOptionSchema } from '../src/rpg/vocab/creature-type.ts'
 import { languageSeedOptionSchema } from '../src/rpg/vocab/language.ts'
 import { vocabularySeedOptionSchema } from '../src/rpg/vocab/vocabulary.ts'
 import { CATALOG_SCHEMA_MANIFEST, catalogSchemaVsCodeEntries } from './catalog-schema-manifest.ts'
@@ -104,6 +105,10 @@ const SCHEMAS: GeneratedSchema[] = [
   {
     file: 'catalog-language-list.schema.json',
     schema: z.array(languageSeedOptionSchema),
+  },
+  {
+    file: 'catalog-creature-type-list.schema.json',
+    schema: z.array(creatureTypeSeedOptionSchema),
   },
   {
     file: 'catalog-starting-wealth-seed.schema.json',

@@ -2,12 +2,17 @@ import type { ContentUsageBlocker } from '@rpg/contracts'
 
 export type VocabularyReferrerIdentity =
   | { kind: 'content'; contentTypeKey: string; id: string }
+  | { kind: 'game-term'; setId: string; id: string }
   | { kind: 'character'; id: string }
 
 /** Stable dedupe key for vocabulary usage referrers — resolvers must not invent ad-hoc keys. */
 export function vocabularyReferrerIdentityKey(referrer: VocabularyReferrerIdentity): string {
   if (referrer.kind === 'content') {
     return `content:${referrer.contentTypeKey}:${referrer.id}`
+  }
+
+  if (referrer.kind === 'game-term') {
+    return `game-term:${referrer.setId}:${referrer.id}`
   }
 
   return `character:${referrer.id}`
@@ -28,6 +33,14 @@ export function vocabularyReferrerIdentityFromBlocker(
     return {
       kind: 'character',
       id: blocker.usage.id,
+    }
+  }
+
+  if (blocker.kind === 'game-term') {
+    return {
+      kind: 'game-term',
+      setId: blocker.setId,
+      id: blocker.id,
     }
   }
 

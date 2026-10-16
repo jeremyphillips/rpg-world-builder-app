@@ -18,7 +18,6 @@ const CLASS_SLUG_GLOB =
 const VOCABULARY_SEED_FILE_GLOBS = [
   'attack-resolution-modes',
   'conditions',
-  'creature-types',
   'damage-types',
   'edition-presets',
   'equipment-categories',
@@ -73,6 +72,10 @@ export const CATALOG_SCHEMA_MANIFEST = [
   {
     file: 'catalog-language-list.schema.json',
     fileMatch: ['packages/catalog/src/vocabulary/data/**/languages.json'],
+  },
+  {
+    file: 'catalog-creature-type-list.schema.json',
+    fileMatch: ['packages/catalog/src/vocabulary/data/**/creature-types.json'],
   },
   {
     file: 'catalog-vocabulary-list.schema.json',

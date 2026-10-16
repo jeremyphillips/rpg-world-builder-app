@@ -182,6 +182,59 @@ describe('vocabulary write rules', () => {
     expect(deleted.options.some((option) => option.id === 'robot')).toBe(false)
   })
 
+  it('rejects languageAffinities on non-creature-type vocabulary sets', async () => {
+    const campaign = await makeTestCampaign()
+
+    await expect(
+      updateVocabularyEntry(
+        vocabularyUsageContextForCampaign(campaign.id),
+        'conditions',
+        'blinded',
+        { languageAffinities: ['common'] },
+      ),
+    ).rejects.toMatchObject({ status: 400 })
+  })
+
+  it('omits system patch languageAffinities when chips match seed defaults', async () => {
+    const campaign = await makeTestCampaign()
+
+    await updateVocabularyEntry(
+      vocabularyUsageContextForCampaign(campaign.id),
+      CREATURE_TYPE_SET_ID,
+      'dragon',
+      { languageAffinities: ['draconic'] },
+    )
+
+    const doc = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const patch = doc?.vocabulary?.find((entry) => entry.setId === CREATURE_TYPE_SET_ID)
+    expect(
+      patch?.systemEntryPatches?.find((entry) => entry.id === 'dragon')?.languageAffinities,
+    ).toBeUndefined()
+  })
+
+  it('clears and restores dragon seed language affinities through patches', async () => {
+    const campaign = await makeTestCampaign()
+    const ctx = vocabularyUsageContextForCampaign(campaign.id)
+
+    const cleared = await updateVocabularyEntry(ctx, CREATURE_TYPE_SET_ID, 'dragon', {
+      languageAffinities: [],
+    })
+    expect(cleared.options.find((option) => option.id === 'dragon')?.languageAffinities).toEqual([])
+
+    const restored = await updateVocabularyEntry(ctx, CREATURE_TYPE_SET_ID, 'dragon', {
+      languageAffinities: ['draconic'],
+    })
+    expect(restored.options.find((option) => option.id === 'dragon')?.languageAffinities).toEqual([
+      'draconic',
+    ])
+
+    const doc = await CampaignRulesetPatchModel.findOne({ campaignId: campaign.id }).lean()
+    const patch = doc?.vocabulary?.find((entry) => entry.setId === CREATURE_TYPE_SET_ID)
+    expect(
+      patch?.systemEntryPatches?.find((entry) => entry.id === 'dragon')?.languageAffinities,
+    ).toBeUndefined()
+  })
+
   it('attaches usage counts from registered resolvers', async () => {
     const campaign = await makeTestCampaign()
     const set = await resolveVocabularySetForCampaign(

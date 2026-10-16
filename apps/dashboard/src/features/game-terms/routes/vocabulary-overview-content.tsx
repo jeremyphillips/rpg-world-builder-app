@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import {
+  CREATURE_TYPE_SET_ID,
   deriveVocabularyEntryId,
   getVocabularyOptionSetTerm,
   vocabularyOptionSetIdSchema,
@@ -83,6 +84,9 @@ function VocabularyOverviewPage({
         label: values.label,
         description: values.description || undefined,
         status: values.status,
+        ...(setId === CREATURE_TYPE_SET_ID
+          ? { languageAffinities: values.languageAffinities }
+          : {}),
       })
       notifyVocabularyEntryCreated(values.label)
     } else if (sheet.mode === 'edit') {
@@ -92,6 +96,9 @@ function VocabularyOverviewPage({
           label: values.label,
           description: values.description || undefined,
           status: values.status,
+          ...(setId === CREATURE_TYPE_SET_ID
+            ? { languageAffinities: values.languageAffinities }
+            : {}),
         },
       })
       notifyVocabularyEntrySaved(values.label)

@@ -1,7 +1,8 @@
-import type {
-  ContentUsageBlocker,
-  VocabularyOptionSetId,
-  VocabularyOptionWithUsage,
+import {
+  CREATURE_TYPE_SET_ID,
+  type ContentUsageBlocker,
+  type VocabularyOptionSetId,
+  type VocabularyOptionWithUsage,
 } from '@rpg/contracts'
 import { getVocabularySetCapability } from '@rpg/contracts'
 
@@ -25,6 +26,46 @@ export function requireVocabularyEntryFormDefinition(setId: VocabularyOptionSetI
   }
 }
 
+function vocabularyEntryFormValuesFromSheet(
+  setId: VocabularyOptionSetId,
+  values: VocabularyEntrySheetFormValues,
+  status: VocabularyEntryFormValues['status'],
+): VocabularyEntryFormValues {
+  return {
+    label: values.label,
+    description: values.description ?? '',
+    status,
+    ...(setId === CREATURE_TYPE_SET_ID
+      ? { languageAffinities: values.languageAffinities ?? [] }
+      : {}),
+  }
+}
+
+async function assertVocabularyDisableAllowedForSheetEdit(input: {
+  campaignId: string
+  setId: VocabularyOptionSetId
+  entry: VocabularyOptionWithUsage
+  nextStatus: VocabularyEntryFormValues['status']
+  onBlocked: (blockers: ContentUsageBlocker[]) => void
+}): Promise<boolean> {
+  const wasActive = input.entry.status === 'active'
+  if (!wasActive || input.nextStatus !== 'disabled') {
+    return true
+  }
+
+  const availability = await fetchVocabularyDisableAvailability(
+    input.campaignId,
+    input.setId,
+    input.entry.id,
+  )
+  if (availability.status === 'blocked') {
+    input.onBlocked(availability.blockers)
+    return false
+  }
+
+  return true
+}
+
 export function buildVocabularyEntrySheetDefaultValues(
   isEdit: boolean,
   entry?: VocabularyOptionWithUsage,
@@ -34,6 +75,7 @@ export function buildVocabularyEntrySheetDefaultValues(
       label: entry.label,
       description: entry.description ?? '',
       available: vocabularyAvailableFromStatus(entry.status),
+      languageAffinities: entry.languageAffinities ?? [],
     }
   }
 
@@ -41,6 +83,7 @@ export function buildVocabularyEntrySheetDefaultValues(
     label: '',
     description: '',
     available: true,
+    languageAffinities: [],
   }
 }
 
@@ -54,35 +97,25 @@ export async function submitVocabularyEntrySheet(input: {
   onBlocked: (blockers: ContentUsageBlocker[]) => void
 }): Promise<void> {
   const nextStatus = vocabularyStatusFromAvailable(input.values.available)
+  const formValues = vocabularyEntryFormValuesFromSheet(input.setId, input.values, nextStatus)
 
   if (input.isEdit && input.entry) {
-    const wasActive = input.entry.status === 'active'
-
-    if (wasActive && nextStatus === 'disabled') {
-      const availability = await fetchVocabularyDisableAvailability(
-        input.campaignId,
-        input.setId,
-        input.entry.id,
-      )
-      if (availability.status === 'blocked') {
-        input.onBlocked(availability.blockers)
-        return
-      }
+    const allowed = await assertVocabularyDisableAllowedForSheetEdit({
+      campaignId: input.campaignId,
+      setId: input.setId,
+      entry: input.entry,
+      nextStatus,
+      onBlocked: input.onBlocked,
+    })
+    if (!allowed) {
+      return
     }
 
-    await input.onSubmit({
-      label: input.values.label,
-      description: input.values.description ?? '',
-      status: nextStatus,
-    })
+    await input.onSubmit(formValues)
     return
   }
 
-  await input.onSubmit({
-    label: input.values.label,
-    description: input.values.description ?? '',
-    status: nextStatus,
-  })
+  await input.onSubmit(formValues)
 }
 
 export function resolveVocabularyEntrySheetHeadline(

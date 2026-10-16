@@ -47,4 +47,24 @@ describe('map-vocabulary-usage-references', () => {
 
     expect(sorted.map((reference) => reference.label)).toEqual(['Aarakocra', 'Zebrafolk', 'Bob'])
   })
+
+  it('maps game-term blockers to vocabulary usage references', () => {
+    const usage = buildVocabularyEntryUsageFromBlockers([
+      {
+        kind: 'game-term',
+        setId: 'creature-types',
+        id: 'dragon',
+        label: 'Dragon',
+      },
+    ])
+
+    expect(usage.references).toEqual([
+      {
+        kind: 'game-term',
+        setId: 'creature-types',
+        id: 'dragon',
+        label: 'Dragon',
+      },
+    ])
+  })
 })

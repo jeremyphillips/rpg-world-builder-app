@@ -11,10 +11,12 @@ import {
   SENSE_SET_ID,
   SPELL_SCHOOL_SET_ID,
   WEAPON_PROPERTY_SET_ID,
+  creatureTypeSeedOptionSchema,
   languageSeedOptionSchema,
   vocabularySeedOptionSchema,
 } from '@rpg/contracts'
 import type {
+  CreatureTypeSeedOption,
   LanguageCategory,
   LanguageSeedOption,
   SystemRulesetId,
@@ -56,9 +58,15 @@ function parseLanguageSeedOptions(raw: unknown, label: string): LanguageSeedOpti
   return options
 }
 
+function parseCreatureTypeSeedOptions(raw: unknown, label: string): CreatureTypeSeedOption[] {
+  const options = z.array(creatureTypeSeedOptionSchema).parse(raw)
+  assertUniqueOptionIds(options, label)
+  return options
+}
+
 // Validate the shipped catalog against the contract at module load so malformed
 // seed data fails fast (and in CI) rather than at request time.
-const SRD_521_CREATURE_TYPES = parseSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
+const SRD_521_CREATURE_TYPES = parseCreatureTypeSeedOptions(creatureTypesRaw, CREATURE_TYPE_SET_ID)
 const SRD_521_DAMAGE_TYPES = parseSeedOptions(damageTypesRaw, DAMAGE_TYPE_SET_ID)
 const SRD_521_CONDITIONS = parseSeedOptions(conditionsRaw, CONDITION_SET_ID)
 const SRD_521_SIZES = parseSeedOptions(sizesRaw, CREATURE_SIZE_SET_ID)
@@ -111,6 +119,20 @@ function toResolvedSet(
   }
 }
 
+function toResolvedCreatureTypeSet(seeds: readonly CreatureTypeSeedOption[]): VocabularyOptionSet {
+  return {
+    id: CREATURE_TYPE_SET_ID,
+    options: seeds.map((seed) => ({
+      id: seed.id,
+      label: seed.label,
+      description: seed.description,
+      source: 'system',
+      status: 'active',
+      ...(seed.languageAffinities ? { languageAffinities: seed.languageAffinities } : {}),
+    })),
+  }
+}
+
 function loadSeedOptions(
   rulesetId: SystemRulesetId,
   setId: VocabularyOptionSetId,
@@ -130,6 +152,12 @@ export function loadSeedVocabularyOptionSet(
   rulesetId: SystemRulesetId,
   setId: VocabularyOptionSetId,
 ): VocabularyOptionSet {
+  if (setId === CREATURE_TYPE_SET_ID) {
+    return toResolvedCreatureTypeSet(
+      loadSeedOptions(rulesetId, setId) as readonly CreatureTypeSeedOption[],
+    )
+  }
+
   return toResolvedSet(setId, loadSeedOptions(rulesetId, setId))
 }
 
@@ -175,7 +203,9 @@ export const CREATURE_TYPES = SRD_521_CREATURE_TYPES.map((option) => option.id) 
 export type SeedCreatureType = (typeof CREATURE_TYPES)[number]
 
 export function loadSeedCreatureTypes(rulesetId: SystemRulesetId): VocabularyOptionSet {
-  return loadSeedVocabularyOptionSet(rulesetId, CREATURE_TYPE_SET_ID)
+  return toResolvedCreatureTypeSet(
+    loadSeedOptions(rulesetId, CREATURE_TYPE_SET_ID) as readonly CreatureTypeSeedOption[],
+  )
 }
 
 export function seedCreatureTypeIds(rulesetId: SystemRulesetId): ReadonlySet<string> {
@@ -189,10 +219,10 @@ export function getSeedCreatureTypeLabel(rulesetId: SystemRulesetId, id: string)
 export function getSeedCreatureTypeEntry(
   rulesetId: SystemRulesetId,
   id: string,
-): VocabularySeedOption | undefined {
+): CreatureTypeSeedOption | undefined {
   try {
     return getById(
-      loadSeedOptions(rulesetId, CREATURE_TYPE_SET_ID),
+      loadSeedOptions(rulesetId, CREATURE_TYPE_SET_ID) as readonly CreatureTypeSeedOption[],
       rulesetId,
       CREATURE_TYPE_SET_ID,
       id,
@@ -201,6 +231,13 @@ export function getSeedCreatureTypeEntry(
   } catch {
     return undefined
   }
+}
+
+export function getSeedCreatureTypeLanguageAffinities(
+  rulesetId: SystemRulesetId,
+  id: string,
+): readonly string[] {
+  return getSeedCreatureTypeEntry(rulesetId, id)?.languageAffinities ?? []
 }
 
 // ---------------------------------------------------------------------------

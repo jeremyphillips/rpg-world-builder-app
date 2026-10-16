@@ -38,4 +38,30 @@ describe('creature-types vocabulary', () => {
     expect(getCreatureTypeLabel(vocabulary, 'robot')).toBe('Robot')
     expect(getCreatureTypeLabel(vocabulary, 'missing')).toBe('missing')
   })
+
+  it('maps resolved language affinities by creature type id', () => {
+    const vocabulary = buildCreatureTypeVocabulary({
+      options: [
+        {
+          id: 'dragon',
+          label: 'Dragon',
+          source: 'system',
+          status: 'active',
+          languageAffinities: ['draconic'],
+          usedBy: 0,
+        },
+        {
+          id: 'humanoid',
+          label: 'Humanoid',
+          source: 'system',
+          status: 'active',
+          languageAffinities: [],
+          usedBy: 0,
+        },
+      ],
+    })
+
+    expect(vocabulary.languageAffinitiesById.dragon).toEqual(['draconic'])
+    expect(vocabulary.languageAffinitiesById.humanoid).toEqual([])
+  })
 })

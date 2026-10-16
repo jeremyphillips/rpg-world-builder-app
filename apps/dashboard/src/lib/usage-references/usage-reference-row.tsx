@@ -2,6 +2,7 @@ import type { VocabularyUsageReference } from '@rpg/contracts'
 import { ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { GAME_TERMS_ROUTES } from '@/app/game-terms-routes'
 import { resolveContentUsageReferenceHref } from '@/features/content/lib/delete/resolve-content-usage-href'
 
 import { resolveContentBlockerHref } from '@/lib/usage-blocked/resolve-content-blocker-href'
@@ -23,6 +24,10 @@ function resolveUsageReferenceHref(
       characterType: reference.characterType,
       campaignId: reference.campaignId,
     })
+  }
+
+  if (reference.kind === 'game-term') {
+    return GAME_TERMS_ROUTES.detail(campaignId, reference.setId, reference.id)
   }
 
   return resolveContentBlockerHref(campaignId, {

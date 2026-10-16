@@ -15,6 +15,14 @@ const SEED: VocabularyOptionSet = {
       status: 'active',
     },
     {
+      id: 'dragon',
+      label: 'Dragon',
+      description: 'Dragons.',
+      source: 'system',
+      status: 'active',
+      languageAffinities: ['draconic'],
+    },
+    {
       id: 'fey',
       label: 'Fey',
       description: 'Feywild folk.',
@@ -45,6 +53,14 @@ describe('resolveVocabularySet', () => {
         description: 'People.',
         source: 'system',
         status: 'disabled',
+      },
+      {
+        id: 'dragon',
+        label: 'Dragon',
+        description: 'Dragons.',
+        source: 'system',
+        status: 'active',
+        languageAffinities: ['draconic'],
       },
       {
         id: 'fey',
@@ -85,6 +101,46 @@ describe('resolveVocabularySet', () => {
     expect(resolved.find((option) => option.id === 'humanoid')?.source).toBe('system')
   })
 
+  it('inherits seed language affinities when patch omits them', () => {
+    expect(resolveVocabularySet(SEED, undefined).find((option) => option.id === 'dragon')).toEqual({
+      id: 'dragon',
+      label: 'Dragon',
+      description: 'Dragons.',
+      source: 'system',
+      status: 'active',
+      languageAffinities: ['draconic'],
+    })
+  })
+
+  it('replaces seed language affinities from a system patch', () => {
+    const patch: VocabularyOptionSetPatch = {
+      setId: 'creature-types',
+      systemEntryPatches: [{ id: 'dragon', languageAffinities: ['infernal'] }],
+    }
+
+    expect(
+      resolveVocabularySet(SEED, patch).find((option) => option.id === 'dragon'),
+    ).toMatchObject({
+      languageAffinities: ['infernal'],
+    })
+  })
+
+  it('clears seed language affinities when patch stores an empty array', () => {
+    const patch: VocabularyOptionSetPatch = {
+      setId: 'creature-types',
+      systemEntryPatches: [{ id: 'dragon', languageAffinities: [] }],
+    }
+
+    expect(resolveVocabularySet(SEED, patch).find((option) => option.id === 'dragon')).toEqual({
+      id: 'dragon',
+      label: 'Dragon',
+      description: 'Dragons.',
+      source: 'system',
+      status: 'active',
+      languageAffinities: [],
+    })
+  })
+
   it('merges deterministically for combined patches', () => {
     const patch: VocabularyOptionSetPatch = {
       setId: 'creature-types',
@@ -99,6 +155,14 @@ describe('resolveVocabularySet', () => {
         description: 'People.',
         source: 'system',
         status: 'active',
+      },
+      {
+        id: 'dragon',
+        label: 'Dragon',
+        description: 'Dragons.',
+        source: 'system',
+        status: 'active',
+        languageAffinities: ['draconic'],
       },
       {
         id: 'fey',
