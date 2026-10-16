@@ -12,33 +12,49 @@ import {
 } from './interactive-list.variants'
 import {
   selectableRowHighlightFillClasses,
+  selectableRowListPointerHoverClasses,
   selectableRowMenuHighlightFillClasses,
   selectableRowPointerHoverClasses,
 } from './interactive-row.variants'
 
 const FORBIDDEN_HOVER_TOKENS = ['control-hover', 'hover:bg-accent', 'focus:bg-accent'] as const
 
-function assertSelectableRowRecipe(className: string) {
-  expect(className).toMatch(/ui-interactive-row--(hover-selectable|highlight|menu-highlight)/)
+function assertNoForbiddenHoverTokens(className: string) {
   for (const token of FORBIDDEN_HOVER_TOKENS) {
     expect(className).not.toContain(token)
   }
 }
 
+function assertListRowRecipe(className: string) {
+  expect(className).toMatch(
+    /ui-interactive-row--(hover-list|highlight-list|highlight-list-selected|menu-highlight)/,
+  )
+  assertNoForbiddenHoverTokens(className)
+}
+
+function assertEditorRowRecipe(className: string) {
+  expect(className).toMatch(/ui-interactive-row--(hover-selectable|highlight|menu-highlight)/)
+  assertNoForbiddenHoverTokens(className)
+}
+
 describe('selectable row interaction recipe (SSOT)', () => {
   it('exports row-hover fills without control-hover', () => {
-    assertSelectableRowRecipe(selectableRowPointerHoverClasses)
-    assertSelectableRowRecipe(selectableRowHighlightFillClasses)
-    assertSelectableRowRecipe(selectableRowMenuHighlightFillClasses)
+    assertEditorRowRecipe(selectableRowPointerHoverClasses)
+    assertEditorRowRecipe(selectableRowHighlightFillClasses)
+    assertListRowRecipe(selectableRowListPointerHoverClasses)
+    assertListRowRecipe(selectableRowMenuHighlightFillClasses)
   })
 
-  it('encodes list row chrome with row-hover highlight and menu highlight', () => {
-    assertSelectableRowRecipe(
-      interactiveListRowChromeVariants({ host: 'row', highlighted: true, interactive: true }),
+  it('encodes list row chrome with list highlight and menu highlight', () => {
+    assertListRowRecipe(
+      interactiveListRowChromeVariants({
+        host: 'row',
+        highlighted: true,
+        selected: false,
+        interactive: true,
+      }),
     )
-    assertSelectableRowRecipe(
-      interactiveListRowChromeVariants({ host: 'menuitem', interactive: false }),
-    )
+    assertListRowRecipe(interactiveListRowChromeVariants({ host: 'menuitem', interactive: false }))
   })
 
   it('resets menu item control styling before selectable-row chrome', () => {
@@ -50,18 +66,31 @@ describe('selectable row interaction recipe (SSOT)', () => {
 })
 
 describe('selectable row interaction recipe (hosts)', () => {
-  it('InteractiveListRow uses row-hover for pointer hover', () => {
+  it('InteractiveListRow uses list row hover for pointer hover', () => {
     const { container } = render(<InteractiveListRow name="Fireball" />)
-    assertSelectableRowRecipe(container.firstElementChild?.className ?? '')
+    assertListRowRecipe(container.firstElementChild?.className ?? '')
   })
 
-  it('InteractiveListRow uses row-hover when highlighted (combobox/search listbox path)', () => {
+  it('InteractiveListRow uses list highlight when highlighted (combobox/search listbox path)', () => {
     const { container } = render(<InteractiveListRow name="Fireball" highlighted />)
-    assertSelectableRowRecipe(container.firstElementChild?.className ?? '')
-    expect(container.firstElementChild).toHaveClass('ui-interactive-row--highlight')
+    assertListRowRecipe(container.firstElementChild?.className ?? '')
+    expect(container.firstElementChild).toHaveClass('ui-interactive-row--highlight-list')
   })
 
-  it('ComboboxOptionRow shell uses row-hover when highlighted', () => {
+  it('InteractiveListRow uses strong list highlight when selected and highlighted', () => {
+    const { container } = render(<InteractiveListRow name="Fireball" highlighted selected />)
+    expect(container.firstElementChild).toHaveClass('ui-interactive-row--highlight-list-selected')
+    expect(container.firstElementChild).toHaveClass('ui-interactive-row--fill-surface')
+  })
+
+  it('InteractiveListRow uses selected hover (strong) when selected, not list pointer hover', () => {
+    const { container } = render(<InteractiveListRow name="Fireball" selected />)
+    const shell = container.firstElementChild
+    expect(shell).toHaveClass('ui-interactive-row--hover-selected')
+    expect(shell).not.toHaveClass('ui-interactive-row--hover-list')
+  })
+
+  it('ComboboxOptionRow shell uses list highlight when highlighted', () => {
     render(
       <ComboboxOptionRow
         optionId="opt"
@@ -73,7 +102,7 @@ describe('selectable row interaction recipe (hosts)', () => {
     )
     const option = screen.getByRole('option', { name: 'Option' })
     const shell = option.parentElement
-    assertSelectableRowRecipe(shell?.className ?? '')
+    assertListRowRecipe(shell?.className ?? '')
   })
 
   it('MenuChoiceRow uses row-hover menu highlight recipe', () => {
@@ -89,7 +118,7 @@ describe('selectable row interaction recipe (hosts)', () => {
     )
 
     const item = screen.getByRole('menuitem', { name: /Choice/i })
-    assertSelectableRowRecipe(item.className)
+    assertListRowRecipe(item.className)
     expect(item.className).toContain('ui-interactive-row--menu-highlight')
     expect(item.className).toContain('ui-interactive-list__main--md')
     expect(item.className).not.toContain('px-2')
@@ -102,6 +131,6 @@ describe('selectable row interaction recipe (hosts)', () => {
         <a href="/example">Navigate</a>
       </InteractiveListRow>,
     )
-    assertSelectableRowRecipe(container.firstElementChild?.className ?? '')
+    assertListRowRecipe(container.firstElementChild?.className ?? '')
   })
 })

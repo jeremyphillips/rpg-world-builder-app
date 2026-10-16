@@ -17,7 +17,8 @@
   .ui-interactive-row--hover-selectable:hover,
   .ui-interactive-row--hover-navigation:hover,
   .ui-interactive-row--hover-selected:hover,
-  .ui-interactive-row--hover-surface:hover {
+  .ui-interactive-row--hover-surface:hover,
+  .ui-interactive-row--hover-list:hover {
     background-color: var(--ui-row-bg-hover);
   }
 
@@ -41,6 +42,10 @@
 
   .ui-interactive-row--hover-surface {
     --ui-row-bg-hover: var(--surface-subtle);
+  }
+
+  .ui-interactive-row--hover-list {
+    --ui-row-bg-hover: var(--background);
   }
 
   /* --- Selected fill (mutually exclusive) --- */
@@ -127,6 +132,14 @@
 
   .ui-interactive-row--highlight {
     background-color: var(--row-hover-bg);
+  }
+
+  .ui-interactive-row--highlight-list {
+    background-color: var(--background);
+  }
+
+  .ui-interactive-row--highlight-list-selected {
+    background-color: var(--row-selected-bg);
   }
 
   .ui-interactive-row--rail,

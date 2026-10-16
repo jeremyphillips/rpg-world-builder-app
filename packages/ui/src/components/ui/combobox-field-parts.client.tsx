@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import { ChevronDown, Check, Lock } from 'lucide-react'
+import { ChevronDown, Check, Lock, X } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Chip } from './chip.client'
@@ -128,9 +128,10 @@ interface ComboboxOptionItemProps {
   onSelect: () => void
 }
 
-function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean) {
+function comboboxSelectionEndSlot(multiple: boolean, isSelected: boolean, isHighlighted: boolean) {
   if (!multiple || !isSelected) return undefined
-  return <Check className="size-4 shrink-0" aria-hidden />
+  const Icon = isHighlighted ? X : Check
+  return <Icon className="size-4 shrink-0" aria-hidden />
 }
 
 function comboboxDisabledReasonEndSlot(reason: string) {
@@ -147,11 +148,12 @@ function comboboxOptionEndSlot(
   multiple: boolean,
   isSelected: boolean,
   isDisabled: boolean,
+  isHighlighted: boolean,
 ) {
   if (isDisabled && option.disabledReason) {
     return comboboxDisabledReasonEndSlot(option.disabledReason)
   }
-  return comboboxSelectionEndSlot(multiple, isSelected)
+  return comboboxSelectionEndSlot(multiple, isSelected, isHighlighted)
 }
 
 function ComboboxOptionItem({
@@ -167,7 +169,13 @@ function ComboboxOptionItem({
   onSelect,
 }: ComboboxOptionItemProps) {
   const rowSize = resolveInteractiveListSizeForFieldSize(size)
-  const selectionEndSlot = comboboxOptionEndSlot(option, multiple, isSelected, isDisabled)
+  const selectionEndSlot = comboboxOptionEndSlot(
+    option,
+    multiple,
+    isSelected,
+    isDisabled,
+    isHighlighted,
+  )
 
   if (renderOption) {
     const optionContent = renderOption(option, {
@@ -209,7 +217,7 @@ function ComboboxOptionItem({
       heading={option.label}
       classification={option.classification}
       supporting={option.metadata}
-      endSlot={comboboxOptionEndSlot(option, multiple, isSelected, isDisabled)}
+      endSlot={comboboxOptionEndSlot(option, multiple, isSelected, isDisabled, isHighlighted)}
       onHighlight={onHighlight}
       onSelect={onSelect}
     />

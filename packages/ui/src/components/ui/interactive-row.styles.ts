@@ -6,6 +6,8 @@ export const UI_INTERACTIVE_ROW_HOVER_CLASS = {
   navigation: 'ui-interactive-row--hover-navigation',
   selected: 'ui-interactive-row--hover-selected',
   surface: 'ui-interactive-row--hover-surface',
+  /** Listbox / picker rows (`InteractiveListRow`) — unselected pointer hover. */
+  list: 'ui-interactive-row--hover-list',
 } as const
 
 export const UI_INTERACTIVE_ROW_SELECTED_CLASS = {
@@ -32,6 +34,14 @@ export const UI_INTERACTIVE_ROW_HIT_CLASS = {
 } as const
 
 export const UI_INTERACTIVE_ROW_HIGHLIGHT_CLASS = 'ui-interactive-row--highlight' as const
+
+/** Keyboard / pointer active option — unselected list row. */
+export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_UNSELECTED_CLASS =
+  'ui-interactive-row--highlight-list' as const
+
+/** Keyboard / pointer active option — selected list row (strong wash). */
+export const UI_INTERACTIVE_ROW_LIST_HIGHLIGHT_SELECTED_CLASS =
+  'ui-interactive-row--highlight-list-selected' as const
 export const UI_INTERACTIVE_ROW_RAIL_CLASS = 'ui-interactive-row--rail' as const
 export const UI_INTERACTIVE_ROW_MENU_HIGHLIGHT_CLASS = 'ui-interactive-row--menu-highlight' as const
 export const UI_INTERACTIVE_ROW_MENU_RAIL_CLASS = 'ui-interactive-row--menu-rail' as const

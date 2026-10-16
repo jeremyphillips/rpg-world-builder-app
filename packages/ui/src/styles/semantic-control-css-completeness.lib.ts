@@ -287,6 +287,7 @@ const INTERACTIVE_ROW_HOVER_MODIFIERS = [
   'hover-navigation',
   'hover-selected',
   'hover-surface',
+  'hover-list',
 ] as const
 
 const INTERACTIVE_ROW_SELECTED_MODIFIERS = [
