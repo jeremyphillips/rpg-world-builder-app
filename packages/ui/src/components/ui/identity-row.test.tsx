@@ -108,6 +108,21 @@ describe('IdentityRow', () => {
   })
 })
 
+describe('IdentityRowHeadingLine headingInline', () => {
+  it('places headingInline beside a truncating title without a separator', () => {
+    render(
+      <IdentityRowHeadingLine
+        heading="An extraordinarily long equipment name that should truncate in narrow layouts"
+        headingInline={<span data-testid="inline-slot">toggle</span>}
+        recipe="entity-compact"
+      />,
+    )
+    expect(screen.getByTestId('inline-slot')).toBeInTheDocument()
+    expect(screen.getByTestId('inline-slot').closest('.gap-1')).not.toBeNull()
+    expect(screen.queryByText('·')).not.toBeInTheDocument()
+  })
+})
+
 describe('IdentityRowHeadingLine entity-compact', () => {
   it('keeps the title at 14px and classification, dot, and end text at 12px', () => {
     render(

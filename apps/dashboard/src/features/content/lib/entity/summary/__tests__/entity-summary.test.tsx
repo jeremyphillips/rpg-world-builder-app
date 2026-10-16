@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
@@ -80,6 +81,23 @@ describe('EntitySummaryHeading', () => {
 
     expect(container.querySelector('[class*="min-h-control-action-compact"]')).toBeNull()
     expect(container.querySelector('[data-entity-summary-band]')).toBeNull()
+  })
+
+  it('wraps headingHref around the title only when headingInline is set', () => {
+    render(
+      <MemoryRouter>
+        <EntitySummaryHeading
+          density="compact"
+          heading="Longsword"
+          headingHref="/items/longsword"
+          headingInline={<button type="button">toggle</button>}
+        />
+      </MemoryRouter>,
+    )
+
+    const link = screen.getByRole('link', { name: 'Longsword' })
+    expect(link).toHaveAttribute('href', '/items/longsword')
+    expect(screen.getByRole('button', { name: 'toggle' })).not.toContainElement(link)
   })
 })
 

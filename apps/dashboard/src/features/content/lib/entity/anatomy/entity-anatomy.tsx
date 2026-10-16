@@ -1,11 +1,5 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import {
-  RowAnatomyCell,
-  contentCardHeadingLinkVariants,
-  rowAnatomyRootProps,
-  type ContentCardDensity,
-} from '@rpg/ui'
+import { RowAnatomyCell, rowAnatomyRootProps, type ContentCardDensity } from '@rpg/ui'
 
 import { EntityLeadingRail } from './entity-leading-rail'
 import { EntityAnatomyTrailingCells } from './entity-anatomy-trailing'
@@ -37,6 +31,8 @@ export type EntityAnatomyProps = {
   density?: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
+  /** Intrinsic-width slot immediately after the title (private transport from ContentEntityCard). */
+  headingInline?: ReactNode
 }
 
 export type EntityAnatomyHostProps = {
@@ -49,18 +45,6 @@ export type EntityAnatomyHostProps = {
   density?: ContentCardDensity
 }
 
-function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefined): ReactNode {
-  if (!headingHref) {
-    return heading
-  }
-
-  return (
-    <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
-      {heading}
-    </Link>
-  )
-}
-
 /** Row-track entity anatomy — every part is a RowAnatomy cell; trailing kind selects its cell. */
 // fallow-ignore-next-line complexity
 export function EntityAnatomy({
@@ -70,6 +54,7 @@ export function EntityAnatomy({
   trailing,
   density = 'comfortable',
   headingEndValue,
+  headingInline,
 }: EntityAnatomyProps) {
   const resolvedLeadingUtilities = leadingUtilities?.filter((utility) => utility != null) ?? []
   const hasStatusItems = (entity.status?.length ?? 0) > 0
@@ -100,10 +85,12 @@ export function EntityAnatomy({
         data-entity-item-slot="content"
       >
         <EntitySummaryHeading
-          heading={resolveLinkedHeading(entity.heading, headingHref)}
+          heading={entity.heading}
           classification={entity.classification}
           density={density}
           headingEndValue={headingEndValue}
+          headingInline={headingInline}
+          headingHref={headingHref}
         />
       </RowAnatomyCell>
       {entity.description ? (

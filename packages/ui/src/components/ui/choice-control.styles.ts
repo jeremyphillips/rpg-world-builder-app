@@ -2,6 +2,9 @@ export const UI_CHOICE_CONTROL_BLOCK_CLASS = 'ui-choice-control' as const
 
 export const UI_CHOICE_CONTROL_THUMB_CLASS = 'ui-choice-control__thumb' as const
 
+/** Opt-in checkbox appearance — circular indicator on a 24px hit target. */
+export const UI_CHOICE_CONTROL_CIRCLE_CLASS = 'ui-choice-control--circle' as const
+
 export type ChoiceControlKind = 'checkbox' | 'radio' | 'switch'
 
 export type ChoiceControlKindSpec = {

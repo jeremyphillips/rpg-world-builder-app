@@ -5,6 +5,7 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { Info } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import { OverlayArrowSvg, overlayArrowHeight, overlayArrowWidth } from './overlay-arrow.client'
 import { popoverContentVariants, tooltipContentMotionClasses } from './popover-content.variants'
 import { tooltipTriggerCursorVariants } from './tooltip-trigger.variants'
 
@@ -31,10 +32,14 @@ const TooltipTrigger = React.forwardRef<
 ))
 TooltipTrigger.displayName = TooltipPrimitive.Trigger.displayName
 
+type TooltipContentProps = React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content> & {
+  arrow?: boolean
+}
+
 const TooltipContent = React.forwardRef<
   React.ComponentRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
+  TooltipContentProps
+>(({ className, sideOffset = 4, arrow = false, children, ...props }, ref) => (
   <TooltipPrimitive.Portal>
     <TooltipPrimitive.Content
       ref={ref}
@@ -42,10 +47,18 @@ const TooltipContent = React.forwardRef<
       className={cn(
         popoverContentVariants({ tone: 'tooltip' }),
         tooltipContentMotionClasses,
+        arrow && 'ui-popover-content--with-arrow',
         className,
       )}
       {...props}
-    />
+    >
+      {children}
+      {arrow ? (
+        <TooltipPrimitive.Arrow asChild width={overlayArrowWidth} height={overlayArrowHeight}>
+          <OverlayArrowSvg fill="var(--surface-lift)" />
+        </TooltipPrimitive.Arrow>
+      ) : null}
+    </TooltipPrimitive.Content>
   </TooltipPrimitive.Portal>
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName

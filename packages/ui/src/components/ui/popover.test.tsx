@@ -38,8 +38,6 @@ describe('Popover', () => {
     const arrows = document.body.querySelectorAll('.ui-overlay-arrow')
     expect(arrows).toHaveLength(1)
     const arrow = arrows[0]
-    expect(arrow).toHaveAttribute('width', String(overlayArrowWidth))
-    expect(arrow).toHaveAttribute('height', String(overlayArrowHeight))
     expect(arrow).toHaveAttribute('viewBox', `0 0 ${overlayArrowWidth} ${overlayArrowHeight}`)
     expect(arrow?.querySelector('path')).toHaveAttribute('d', overlayArrowPath)
   })

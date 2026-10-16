@@ -65,15 +65,18 @@ function classificationParts(classification?: ReactNode | readonly ReactNode[]):
 function IdentityRowHeadingContent({
   heading,
   classification,
+  headingInline,
   size,
   recipe,
 }: {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
+  headingInline?: ReactNode
   size: IdentityRowSize
   recipe?: IdentityRowHeadingRecipe
 }) {
   const showHeading = isPresent(heading)
+  const showHeadingInline = isPresent(headingInline)
   const parts = classificationParts(classification)
   const scale = resolveIdentityRowHeadingScale(size, recipe)
 
@@ -98,9 +101,23 @@ function IdentityRowHeadingContent({
       className={recipe === 'entity-compact' ? identityRowEntityCompactMetaVariants() : 'min-w-0'}
     >
       {showHeading ? (
-        <InlineMetadata.Item truncate className={identityRowHeadingVariants({ size: scale.title })}>
-          {heading}
-        </InlineMetadata.Item>
+        showHeadingInline ? (
+          <InlineMetadata.Item className="flex min-w-0 items-center gap-1">
+            <span
+              className={cn(identityRowHeadingVariants({ size: scale.title }), 'min-w-0 truncate')}
+            >
+              {heading}
+            </span>
+            <span className="shrink-0 self-center">{headingInline}</span>
+          </InlineMetadata.Item>
+        ) : (
+          <InlineMetadata.Item
+            truncate
+            className={identityRowHeadingVariants({ size: scale.title })}
+          >
+            {heading}
+          </InlineMetadata.Item>
+        )
       ) : null}
       {parts.map((part, index) => (
         <InlineMetadata.Item
@@ -118,6 +135,8 @@ export type IdentityRowHeadingLineProps = {
   heading?: ReactNode
   classification?: ReactNode | readonly ReactNode[]
   headingEnd?: ReactNode
+  /** Intrinsic-width slot immediately after the title (not `headingEnd`). */
+  headingInline?: ReactNode
   size?: IdentityRowSize
   /**
    * Closed compact-card scale. Title stays 14px; classification, its dot, and
@@ -131,6 +150,7 @@ export function IdentityRowHeadingLine({
   heading,
   classification,
   headingEnd,
+  headingInline,
   size = 'md',
   recipe,
 }: IdentityRowHeadingLineProps) {
@@ -138,6 +158,7 @@ export function IdentityRowHeadingLine({
     <IdentityRowHeadingContent
       heading={heading}
       classification={classification}
+      headingInline={headingInline}
       size={size}
       recipe={recipe}
     />

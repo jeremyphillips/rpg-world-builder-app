@@ -5,13 +5,8 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { PopoverLayerPortal } from './layer-portal-container.client'
-import {
-  overlayArrowHeight,
-  overlayArrowPath,
-  overlayArrowWidth,
-  popoverContentMotionClasses,
-  popoverContentVariants,
-} from './popover-content.variants'
+import { OverlayArrowSvg, overlayArrowHeight, overlayArrowWidth } from './overlay-arrow.client'
+import { popoverContentMotionClasses, popoverContentVariants } from './popover-content.variants'
 
 const Popover = PopoverPrimitive.Root
 
@@ -53,21 +48,7 @@ const PopoverContent = React.forwardRef<
         {children}
         {arrow ? (
           <PopoverPrimitive.Arrow asChild width={overlayArrowWidth} height={overlayArrowHeight}>
-            <svg
-              className="ui-overlay-arrow"
-              viewBox={`0 0 ${overlayArrowWidth} ${overlayArrowHeight}`}
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <rect x="3.5" y="0" width="13" height="3" fill="var(--popover)" stroke="none" />
-              <path
-                d={overlayArrowPath}
-                fill="var(--popover)"
-                stroke="var(--border)"
-                strokeWidth={1}
-                strokeLinejoin="round"
-              />
-            </svg>
+            <OverlayArrowSvg fill="var(--popover)" />
           </PopoverPrimitive.Arrow>
         ) : null}
       </PopoverPrimitive.Content>

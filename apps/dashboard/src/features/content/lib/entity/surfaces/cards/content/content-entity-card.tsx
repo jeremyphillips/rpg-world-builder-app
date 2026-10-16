@@ -24,6 +24,8 @@ export type ContentEntityCardProps = {
   disabled?: boolean
   /** Numeric-only passive scalar aligned with the entity heading row. */
   headingEndValue?: number
+  /** Intrinsic-width slot immediately after the entity title. */
+  headingInline?: ReactNode
 }
 
 export function ContentEntityCard({
@@ -34,6 +36,7 @@ export function ContentEntityCard({
   density,
   disabled = false,
   headingEndValue,
+  headingInline,
 }: ContentEntityCardProps) {
   const resolvedDensity = density ?? 'comfortable'
   const utilityFieldSize = resolveEntityCardUtilityFieldSize(resolvedDensity)
@@ -54,6 +57,7 @@ export function ContentEntityCard({
             trailing={trailing}
             density={resolvedDensity}
             headingEndValue={headingEndValue}
+            headingInline={headingInline}
           />
         </EntityCardContent>
       </EntityCardUtilityFieldSizeProvider>

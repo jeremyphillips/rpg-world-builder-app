@@ -51,3 +51,24 @@ export const ClassReference: Story = {
     )
   },
 }
+
+export const CircleUnchecked: Story = {
+  args: { appearance: 'circle', 'aria-label': 'Equip longsword' },
+}
+
+export const CircleChecked: Story = {
+  args: { appearance: 'circle', 'aria-label': 'Unequip longsword', defaultChecked: true },
+}
+
+export const CircleCheckedDisabled: Story = {
+  args: {
+    appearance: 'circle',
+    'aria-label': 'Equipped longsword',
+    defaultChecked: true,
+    disabled: true,
+  },
+}
+
+export const CircleInvalid: Story = {
+  args: { appearance: 'circle', 'aria-label': 'Equip item', 'aria-invalid': true },
+}

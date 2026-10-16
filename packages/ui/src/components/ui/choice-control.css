@@ -48,6 +48,71 @@
     height: var(--icon-glyph-md);
   }
 
+  /* --- Checkbox appearance: circle (24px target, 16px indicator) --- */
+
+  .ui-choice-control--checkbox.ui-choice-control--circle {
+    display: grid;
+    place-items: center;
+    width: var(--control-height-compact);
+    height: var(--control-height-compact);
+    border-color: transparent;
+    background-color: transparent;
+    border-radius: 9999px;
+    box-shadow: none;
+    color: var(--success-foreground);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked'] {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--success-foreground);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle::before {
+    content: '';
+    grid-area: 1 / 1;
+    width: var(--control-choice-indicator-size-sm);
+    height: var(--control-choice-indicator-size-sm);
+    border-radius: 9999px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--choice-control-border);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    box-sizing: border-box;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked']::before {
+    background-color: var(--success);
+    border-color: var(--success);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-invalid='true'] {
+    border-color: transparent;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-invalid='true']::before {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle:hover:not(:disabled) {
+    background-color: var(--control-hover-bg);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark {
+    grid-area: 1 / 1;
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark svg {
+    width: var(--icon-glyph-xs);
+    height: var(--icon-glyph-xs);
+    color: var(--success-foreground);
+  }
+
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='indeterminate']
+    .ui-choice-control__mark {
+    display: none;
+  }
+
   /* --- Kind: radio --- */
 
   .ui-choice-control--radio {

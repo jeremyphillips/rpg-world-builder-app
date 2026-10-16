@@ -84,6 +84,13 @@ export const MONSTER_ADD_SENSE_LABEL = `Add ${vocabularyFieldLabel(SENSE_TERM)}`
 export const MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL = `Special ${vocabularyFieldLabel(SENSE_TERM)}`
 export const MONSTER_PASSIVE_PERCEPTION_LABEL = vocabularyFieldLabel(PASSIVE_PERCEPTION_TERM)
 export const MONSTER_ADD_ITEM_LABEL = 'Add item'
+export const MONSTER_EQUIP_TOGGLE_EQUIP_LABEL = 'Equip'
+export const MONSTER_EQUIP_TOGGLE_UNEQUIP_LABEL = 'Unequip'
+
+export function formatMonsterEquipmentEquippedAriaLabel(displayName: string): string {
+  return `Equipped: ${displayName}`
+}
+
 export const MONSTER_EQUIPPED_LABEL = 'Equipped'
 export const MONSTER_CUSTOMIZATION_LABEL = 'Customization'
 export const MONSTER_CUSTOM_NAME_LABEL = 'Custom name'

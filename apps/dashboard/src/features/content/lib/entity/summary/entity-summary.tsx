@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import {
   ContentCardHeading,
   IdentityRowHeadingLine,
   IdentityRowSupporting,
   InlineMetadata,
+  contentCardHeadingLinkVariants,
   type ContentCardDensity,
   type IdentityRowSize,
 } from '@rpg/ui'
@@ -35,32 +37,57 @@ export type EntitySummaryHeadingProps = Pick<EntitySummaryModel, 'heading' | 'cl
   density: ContentCardDensity
   /** Passive numeric scalar aligned with the heading row (private transport from ContentEntityCard). */
   headingEndValue?: number
+  /** Intrinsic-width slot immediately after the title (private transport from ContentEntityCard). */
+  headingInline?: ReactNode
+  /** Links the entity heading only — not whole-row/card navigation. */
+  headingHref?: string
 }
 
 /** Heading line — placed in the host band cell. Density selects typography only. */
+function resolveLinkedHeading(heading: ReactNode, headingHref: string | undefined): ReactNode {
+  if (!headingHref) {
+    return heading
+  }
+
+  return (
+    <Link to={headingHref} className={contentCardHeadingLinkVariants()}>
+      {heading}
+    </Link>
+  )
+}
+
 export function EntitySummaryHeading({
   heading,
   classification,
   density,
   headingEndValue,
+  headingInline,
+  headingHref,
 }: EntitySummaryHeadingProps) {
   const headingEnd =
     headingEndValue != null ? (
       <span className={entitySummaryHeadingEndValueVariants({ density })}>{headingEndValue}</span>
     ) : undefined
+  const resolvedHeading = resolveLinkedHeading(heading, headingHref)
 
   return (
     <div className={entitySummaryHeadingRowVariants()}>
       {density === 'compact' ? (
         <IdentityRowHeadingLine
-          heading={heading}
+          heading={resolvedHeading}
           classification={classification}
           headingEnd={headingEnd}
+          headingInline={headingInline}
           recipe="entity-compact"
         />
       ) : (
         <>
-          <ContentCardHeading heading={heading} classification={classification} density={density} />
+          <ContentCardHeading
+            heading={resolvedHeading}
+            classification={classification}
+            density={density}
+            headingInline={headingInline}
+          />
           {headingEnd}
         </>
       )}

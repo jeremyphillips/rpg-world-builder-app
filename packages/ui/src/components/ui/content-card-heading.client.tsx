@@ -20,7 +20,7 @@ function classificationItems(classification: ReactNode | readonly ReactNode[]): 
   if (Array.isArray(classification)) {
     return classification.filter(isPresent)
   }
-  return isPresent(classification) ? [classification] : []
+  return [classification]
 }
 
 export type ContentCardHeadingProps = {
@@ -28,6 +28,8 @@ export type ContentCardHeadingProps = {
   classification?: ReactNode | readonly ReactNode[]
   density?: ContentCardDensity
   className?: string
+  /** Intrinsic-width slot immediately after the title. */
+  headingInline?: ReactNode
 }
 
 export function ContentCardHeading({
@@ -35,21 +37,45 @@ export function ContentCardHeading({
   classification,
   density = 'comfortable',
   className,
+  headingInline,
 }: ContentCardHeadingProps) {
   const items = classification ? classificationItems(classification) : []
+  const showHeadingInline = isPresent(headingInline)
 
-  if (items.length === 0) {
+  if (items.length === 0 && !showHeadingInline) {
     return <div className={cn(contentCardHeadingVariants({ density }), className)}>{heading}</div>
   }
 
   const metaDensity = density === 'compact' ? 'compact' : 'comfortable'
 
+  if (items.length === 0 && showHeadingInline) {
+    return (
+      <div className={cn(contentCardMixedHeadingRowVariants({ density }), className)}>
+        <span
+          className={cn(contentCardMixedHeadingNameVariants(), 'flex min-w-0 items-center gap-1')}
+        >
+          <span className="min-w-0 truncate">{heading}</span>
+          <span className="shrink-0 self-center">{headingInline}</span>
+        </span>
+      </div>
+    )
+  }
+
   return (
     <div className={cn(contentCardMixedHeadingRowVariants({ density }), className)}>
       <InlineMetadata role="heading" density={metaDensity} wrap={false} className="min-w-0 flex-1">
-        <InlineMetadata.Item truncate className={contentCardMixedHeadingNameVariants()}>
-          {heading}
-        </InlineMetadata.Item>
+        {showHeadingInline ? (
+          <InlineMetadata.Item className="flex min-w-0 items-center gap-1">
+            <span className={cn(contentCardMixedHeadingNameVariants(), 'min-w-0 truncate')}>
+              {heading}
+            </span>
+            <span className="shrink-0 self-center">{headingInline}</span>
+          </InlineMetadata.Item>
+        ) : (
+          <InlineMetadata.Item truncate className={contentCardMixedHeadingNameVariants()}>
+            {heading}
+          </InlineMetadata.Item>
+        )}
         {items.map((item, index) => (
           <InlineMetadata.Item key={index} className={contentCardMixedHeadingSuffixVariants()}>
             {item}

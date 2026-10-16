@@ -20,6 +20,12 @@ describe('choiceControlClasses', () => {
     expect(classes).toContain(UI_CHOICE_CONTROL_BLOCK_CLASS)
     expect(classes).toContain(resolveChoiceControlKindClass('checkbox'))
     expect(classes).toContain('ui-focus-ring')
+    expect(classes).not.toContain('ui-choice-control--circle')
+  })
+
+  it('maps circle appearance to circle modifier', () => {
+    const classes = checkboxControlClasses({ appearance: 'circle' })
+    expect(classes).toContain('ui-choice-control--circle')
   })
 
   it('maps radio group item to block and radio modifier', () => {

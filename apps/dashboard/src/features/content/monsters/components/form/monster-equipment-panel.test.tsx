@@ -75,7 +75,7 @@ describe('MonsterEquipmentPanel', () => {
     expect(screen.getByLabelText('Remove removed-from-catalog')).toBeInTheDocument()
   })
 
-  it('shows Not proficient before Equipped when the weapon is not granted', () => {
+  it('shows Not proficient and an equipped toggle when the weapon is not granted', () => {
     const greataxe = pickEquipment('greataxe')
     render(
       <Host
@@ -95,7 +95,8 @@ describe('MonsterEquipmentPanel', () => {
     )
 
     expect(screen.getByText(resolveEquipmentNotProficientShortLabel())).toBeInTheDocument()
-    expect(screen.getByText('Equipped')).toBeInTheDocument()
+    expect(screen.queryByText('Equipped')).not.toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Equipped: Greataxe' })).toBeChecked()
   })
 
   it('omits Not proficient when the creature has martial weapon proficiency', () => {
@@ -252,6 +253,117 @@ describe('MonsterEquipmentPanel', () => {
         magical: true,
       },
     ])
+  })
+
+  it('toggles equipped through updateEquipment and marks equipment dirty', async () => {
+    const dagger = pickEquipment('dagger')
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const user = userEvent.setup()
+    render(
+      <Host
+        formRef={formRef}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          name: 'Original',
+          equipment: [
+            {
+              entryId: 'd1',
+              equipmentId: dagger.id,
+              quantity: 2,
+              equipped: true,
+              customName: 'Shard',
+            },
+          ],
+        }}
+      />,
+    )
+
+    act(() => {
+      formRef.current?.setValue('name', 'Edited', { shouldDirty: true })
+    })
+
+    const toggle = screen.getByRole('checkbox', { name: 'Equipped: Shard' })
+    await user.click(toggle)
+
+    expect(formRef.current?.getValues('equipment')).toEqual([
+      {
+        entryId: 'd1',
+        equipmentId: dagger.id,
+        quantity: 2,
+        equipped: false,
+        customName: 'Shard',
+      },
+    ])
+    expect(formRef.current?.getFieldState('equipment').isDirty).toBe(true)
+    expect(formRef.current?.getFieldState('name').isDirty).toBe(true)
+  })
+
+  it('keeps inline toggle state after customize cancel', async () => {
+    const dagger = pickEquipment('dagger')
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const user = userEvent.setup()
+    render(
+      <Host
+        formRef={formRef}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          equipment: [
+            {
+              entryId: 'stack',
+              equipmentId: dagger.id,
+              quantity: 1,
+              equipped: false,
+            },
+          ],
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: 'Equipped: Dagger' }))
+    expect(formRef.current?.getValues('equipment.0.equipped')).toBe(true)
+
+    await user.click(screen.getByLabelText('Customize Dagger'))
+    await user.click(screen.getByRole('switch', { name: /magical/i }))
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(screen.getByRole('heading', { name: 'Discard changes?' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Discard' }))
+
+    expect(formRef.current?.getValues('equipment')).toEqual([
+      {
+        entryId: 'stack',
+        equipmentId: dagger.id,
+        quantity: 1,
+        equipped: true,
+      },
+    ])
+    expect(formRef.current?.getFieldState('equipment').isDirty).toBe(true)
+  })
+
+  it('activates equipped toggle with Space', async () => {
+    const dagger = pickEquipment('dagger')
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const user = userEvent.setup()
+    render(
+      <Host
+        formRef={formRef}
+        defaultValues={{
+          ...resolveMonsterCreateDefaultValues(),
+          equipment: [
+            {
+              entryId: 'd1',
+              equipmentId: dagger.id,
+              quantity: 1,
+              equipped: false,
+            },
+          ],
+        }}
+      />,
+    )
+
+    const toggle = screen.getByRole('checkbox', { name: 'Equipped: Dagger' })
+    toggle.focus()
+    await user.keyboard(' ')
+    expect(formRef.current?.getValues('equipment.0.equipped')).toBe(true)
   })
 
   describe('equipment removal confirmation', () => {

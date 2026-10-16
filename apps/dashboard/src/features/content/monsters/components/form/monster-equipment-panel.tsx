@@ -65,6 +65,7 @@ import {
   formatEquipmentRemovalConfirmCopy,
 } from '../../lib/monster-form-labels'
 import { buildMonsterEquipmentRecommendationGroup } from '../../lib/equipment/monster-equipment-field-recommendation.lib'
+import { MonsterEquipmentEquippedToggle } from './monster-equipment-equipped-toggle'
 import type { MonsterEquipmentFormEntry, MonsterFormValues } from '../../lib/monster-form-values'
 
 type PendingRemove = {
@@ -246,8 +247,22 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
               isProficient,
             })
             const rowStatus = inventoryStatus.status
+            const equipped = Boolean(summary.equipped)
             return (
               <ContentFormEntitySelectionRow
+                headingInline={
+                  <MonsterEquipmentEquippedToggle
+                    displayName={label}
+                    checked={equipped}
+                    onCheckedChange={(nextEquipped) =>
+                      updateEquipment(
+                        equipment.map((row) =>
+                          row.entryId === entry.entryId ? { ...row, equipped: nextEquipped } : row,
+                        ),
+                      )
+                    }
+                  />
+                }
                 entity={{
                   heading: label,
                   ...(rowStatus.length > 0

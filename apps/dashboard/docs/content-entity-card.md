@@ -548,7 +548,7 @@ but must not grow solely to push classification away from the name. `EntitySumma
 
 ```text
 EntitySummary parts            RowAnatomy cell
-├── EntitySummaryHeading      → band   (heading · classification · headingEndValue)
+├── EntitySummaryHeading      → band   (heading · classification · headingEndValue · optional headingInline after title)
 ├── EntitySummaryDescription  → meta
 └── status cell                → status (track offset owned by the cell, not the row)
     ├── PickerSelectionStateLine        (resolved copy, stacked above status)
@@ -621,6 +621,8 @@ AddPendingWorkflow
 ├── resting / pending → ContentEntityCard rows + overflow; optional empty state
 └── composing slot    → CreateComposition* + domain-owned discovery / forms / child footer
 ```
+
+**`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only.
 
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**

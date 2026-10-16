@@ -9,7 +9,7 @@ import { EQUIPMENT_CATALOG_REFERENCE_UNAVAILABLE_MESSAGE } from '../../../equipm
 import { resolveMonsterEquipmentRowStatus } from './resolve-monster-equipment-row-status.lib'
 
 describe('resolveMonsterEquipmentRowStatus', () => {
-  it('prepends Not proficient before Equipped and Magical', () => {
+  it('prepends Not proficient before Magical and omits Equipped badge', () => {
     const greataxe = pickEquipment('greataxe')
     const provider = createMagicPropertyDefinitionProvider('srd-cc-5.2.1')
     const entry = {
@@ -29,9 +29,8 @@ describe('resolveMonsterEquipmentRowStatus', () => {
     })
     const labels = status.map((row) => ('label' in row ? row.label : row.kind))
     expect(labels[0]).toBe('Not proficient')
-    expect(labels).toContain('Equipped')
     expect(labels).toContain('Magical')
-    expect(labels.indexOf('Not proficient')).toBeLessThan(labels.indexOf('Equipped'))
+    expect(labels.indexOf('Not proficient')).toBeLessThan(labels.indexOf('Magical'))
   })
 
   it('skips compatibility when the catalog row is missing', () => {

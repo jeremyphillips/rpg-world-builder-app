@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { overlayArrowPath } from './popover-content.variants'
 import { Button } from './button.client'
 import {
   InfoTooltip,
@@ -40,6 +41,26 @@ describe('InfoTooltip', () => {
     )
 
     expect(screen.getByRole('button', { name: 'Action' })).toHaveClass('cursor-pointer')
+  })
+})
+
+describe('TooltipContent arrow', () => {
+  it('renders overlay arrow on focus when arrow is enabled', async () => {
+    const user = userEvent.setup()
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger interactive asChild>
+            <Button variant="outline">Equip</Button>
+          </TooltipTrigger>
+          <TooltipContent arrow>Unequip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    )
+    await user.tab()
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Unequip')
+    const arrow = document.body.querySelector('.ui-overlay-arrow path')
+    expect(arrow).toHaveAttribute('d', overlayArrowPath)
   })
 })
 
