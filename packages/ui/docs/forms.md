@@ -212,9 +212,11 @@ type FieldRecommendation = {
 **Collection recommendations.** For inventory-style slots (e.g. monster equipment), render
 [`FieldRecommendationGroupView`](../../packages/ui/src/components/ui/field-recommendation.client.tsx)
 above the collection list or empty state. Pass a `FieldRecommendationGroup` (`sourceLabel?`,
-`items[]` with adjacent label + action pairs). The host owns spacing and heading/actions; do not
+`items[]` rendered as inline outline `+ {label}` actions, optional `bulkAction` for feature-owned
+bulk add). Shared UI shows **Add all** (sm ghost) inline after `sourceLabel` when there are
+**3+** actionable (non-`disabled`) items. The host owns spacing and heading/actions; do not
 wrap the collection in `FieldLayout` or extend `SlotConfig`. Eligibility and mutations stay in
-the feature layer. Bulk **Add all** is intentionally deferred.
+the feature layer.
 
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 

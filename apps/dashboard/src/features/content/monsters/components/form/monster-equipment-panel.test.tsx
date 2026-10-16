@@ -610,6 +610,62 @@ describe('MonsterEquipmentPanel', () => {
       ).not.toBeInTheDocument()
     })
 
+    it('shows bulk add when three or more recommendations are available', () => {
+      const dagger = pickEquipment('dagger')
+      const shortsword = pickEquipment('shortsword')
+      const shortbow = pickEquipment('shortbow')
+      render(
+        <Host
+          catalogEquipment={[dagger, shortsword, shortbow]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id, shortsword.id, shortbow.id] },
+            },
+          }}
+        />,
+      )
+
+      expect(
+        screen.getByRole('button', { name: 'Add all 3 recommended weapons' }),
+      ).toBeInTheDocument()
+    })
+
+    it('adds all recommended weapons in one update', async () => {
+      const dagger = pickEquipment('dagger')
+      const shortsword = pickEquipment('shortsword')
+      const shortbow = pickEquipment('shortbow')
+      const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+      const user = userEvent.setup()
+      render(
+        <Host
+          formRef={formRef}
+          catalogEquipment={[dagger, shortsword, shortbow]}
+          defaultValues={{
+            ...resolveMonsterCreateDefaultValues(),
+            proficiencies: {
+              ...resolveMonsterCreateDefaultValues().proficiencies,
+              weapons: { categories: [], items: [dagger.id, shortsword.id, shortbow.id] },
+            },
+          }}
+        />,
+      )
+
+      await user.click(screen.getByRole('button', { name: 'Add all 3 recommended weapons' }))
+      expect(formRef.current?.getValues('equipment')).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ equipmentId: dagger.id, quantity: 1, equipped: false }),
+          expect.objectContaining({ equipmentId: shortsword.id, quantity: 1, equipped: false }),
+          expect.objectContaining({ equipmentId: shortbow.id, quantity: 1, equipped: false }),
+        ]),
+      )
+      expect(formRef.current?.getValues('equipment')).toHaveLength(3)
+      expect(
+        screen.queryByText(MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE),
+      ).not.toBeInTheDocument()
+    })
+
     it('adds one unequipped item and leaves other recommendations visible', async () => {
       const dagger = pickEquipment('dagger')
       const shortsword = pickEquipment('shortsword')

@@ -147,6 +147,10 @@ export const MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE =
 
 export const MONSTER_EQUIPMENT_RECOMMENDATION_ADD_LABEL = '+ Add'
 
+export function formatMonsterEquipmentBulkAddAriaLabel(count: number): string {
+  return `Add all ${count} recommended weapons`
+}
+
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')

@@ -13,15 +13,19 @@ export type FieldRecommendation = {
   action: FieldRecommendationAction
 }
 
-/** One actionable collection recommendation (label adjacent to its action). */
+/** One actionable collection recommendation (rendered as an outline `+ {label}` control). */
 export type FieldRecommendationItem = {
   id: string
   label: string
   action: FieldRecommendationAction
+  /** Excluded from bulk visibility/count; item control renders disabled when true. */
+  disabled?: boolean
 }
 
 /** Multiple recommendations above a collection list or empty state. */
 export type FieldRecommendationGroup = {
   sourceLabel?: string
   items: readonly FieldRecommendationItem[]
+  /** Invoked for eligible items only; visibility gated in {@link resolveFieldRecommendationGroupBulkAction}. */
+  bulkAction?: FieldRecommendationAction
 }

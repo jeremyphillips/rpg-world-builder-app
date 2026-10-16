@@ -7,6 +7,7 @@ import { EQUIPMENT_INVENTORY_GROUP_LABELS } from '../../../equipment/lib/invento
 import {
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
+  incrementMonsterPlainStacks,
   setMonsterPlainStackQuantity,
 } from './monster-equipment-loadout.lib'
 
@@ -23,6 +24,28 @@ describe('monster-equipment-loadout.lib', () => {
     expect(next).toHaveLength(1)
     expect(next[0]?.quantity).toBe(1)
     expect(next[0]?.equipped).toBe(false)
+  })
+
+  it('incrementMonsterPlainStacks matches sequential single adds', () => {
+    const dagger = pickEquipment('dagger')
+    const shortsword = pickEquipment('shortsword')
+    const ids = [dagger.id, shortsword.id, dagger.id]
+    const sequential = ids.reduce(
+      (acc, id) => incrementMonsterPlainStack(acc, id, { equipped: false }),
+      [] as ReturnType<typeof incrementMonsterPlainStack>,
+    )
+    const batched = incrementMonsterPlainStacks([], ids, { equipped: false })
+
+    const summarize = (entries: ReturnType<typeof incrementMonsterPlainStack>) =>
+      entries
+        .map((entry) => ({
+          equipmentId: entry.equipmentId,
+          quantity: entry.quantity,
+          equipped: entry.equipped,
+        }))
+        .sort((a, b) => a.equipmentId.localeCompare(b.equipmentId))
+
+    expect(summarize(batched)).toEqual(summarize(sequential))
   })
 
   it('targets the equipped plain stack when another plain stack is unequipped', () => {

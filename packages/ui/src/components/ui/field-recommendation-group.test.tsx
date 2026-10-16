@@ -36,44 +36,157 @@ function renderGroup(density: 'comfortable' | 'compact' = 'comfortable') {
 }
 
 describe('FieldRecommendationGroupView', () => {
-  it('renders source label and adjacent label/action pairs', () => {
+  it('renders source label and inline outline actions with + label copy', () => {
     renderGroup()
     expect(screen.getByText('Weapons from selected proficiencies')).toBeInTheDocument()
-    const daggerLabel = screen.getByText('Dagger')
-    const pair = daggerLabel.closest('[data-field-recommendation-item]')
-    expect(pair).toHaveClass('inline-flex', 'max-w-full')
-    expect(pair?.querySelector('button')).toHaveTextContent('+ Add')
+    const daggerButton = screen.getByRole('button', { name: 'Add Dagger' })
+    expect(daggerButton).toHaveAttribute('data-field-recommendation-item', '')
+    expect(daggerButton).toHaveTextContent('+ Dagger')
+    expect(screen.getByRole('button', { name: 'Add Shortsword' })).toHaveTextContent('+ Shortsword')
   })
 
-  it('uses InlineMetadata aria-hidden separators prefixed on later items', () => {
+  it('does not render metadata separators between actions', () => {
     const { container } = renderGroup()
-    const separators = container.querySelectorAll('[data-inline-metadata-separator]')
-    expect(separators).toHaveLength(1)
-    expect(separators[0]).toHaveAttribute('aria-hidden', 'true')
-    const shortswordItem = screen
-      .getByText('Shortsword')
-      .closest('[data-field-recommendation-item]')
-    expect(shortswordItem?.parentElement?.querySelector('[data-inline-metadata-separator]')).toBe(
-      separators[0],
-    )
+    expect(container.querySelectorAll('[data-inline-metadata-separator]')).toHaveLength(0)
   })
 
-  it('applies caption typography on the items host for separator metrics', () => {
-    const { container } = renderGroup()
-    const metadataRoot = container.querySelector(
-      '[data-field-recommendation-group] > span:last-child',
-    )
-    expect(metadataRoot).toHaveClass('text-style-caption')
-  })
-
-  it('uses the same accent text button scale as field recommendations', () => {
+  it('uses sm compact outline buttons for collection actions', () => {
     renderGroup('compact')
     const addButton = screen.getByRole('button', { name: 'Add Dagger' })
-    expect(addButton).toHaveClass(
-      'text-action-standalone',
-      'text-primary',
-      'ui-button__text--sm-compact',
+    expect(addButton).toHaveClass('ui-button--outline', 'ui-button--sm-compact')
+  })
+
+  it('does not show bulk add for two or fewer actionable items', () => {
+    render(
+      <FormSectionProvider density="comfortable">
+        <FieldRecommendationGroupView
+          group={{
+            ...sampleGroup,
+            bulkAction: {
+              label: 'Add all',
+              ariaLabel: 'Add all 2 recommended weapons',
+              onClick: vi.fn(),
+            },
+          }}
+        />
+      </FormSectionProvider>,
     )
+    expect(screen.queryByRole('button', { name: 'Add all 2 recommended weapons' })).toBeNull()
+  })
+
+  it('shows sm ghost bulk add inline after the source label for three or more items', () => {
+    const onBulk = vi.fn()
+    render(
+      <FormSectionProvider density="comfortable">
+        <FieldRecommendationGroupView
+          group={{
+            sourceLabel: 'Weapons from selected proficiencies',
+            bulkAction: {
+              label: 'Add all',
+              ariaLabel: 'Add all 3 recommended weapons',
+              onClick: onBulk,
+            },
+            items: [
+              ...sampleGroup.items,
+              {
+                id: 'shortbow',
+                label: 'Shortbow',
+                action: { label: '+ Add', ariaLabel: 'Add Shortbow', onClick: vi.fn() },
+              },
+            ],
+          }}
+        />
+      </FormSectionProvider>,
+    )
+
+    const bulkButton = screen.getByRole('button', { name: 'Add all 3 recommended weapons' })
+    expect(bulkButton).toHaveTextContent('Add all')
+    expect(bulkButton).toHaveClass('ui-button--ghost', 'ui-button--sm-compact')
+    expect(bulkButton).toHaveAttribute('data-field-recommendation-bulk', '')
+    const header = bulkButton.parentElement
+    expect(header).toHaveClass('flex', 'flex-wrap', 'items-center')
+    expect(header).toContainElement(screen.getByText('Weapons from selected proficiencies'))
+  })
+
+  it('counts only non-disabled items toward the bulk threshold', () => {
+    render(
+      <FormSectionProvider density="comfortable">
+        <FieldRecommendationGroupView
+          group={{
+            sourceLabel: 'Recommendations',
+            bulkAction: {
+              label: 'Add all',
+              ariaLabel: 'Add all 3 recommended weapons',
+              onClick: vi.fn(),
+            },
+            items: [
+              {
+                id: 'a',
+                label: 'Alpha',
+                action: { label: '+ Add', ariaLabel: 'Add Alpha', onClick: vi.fn() },
+              },
+              {
+                id: 'b',
+                label: 'Bravo',
+                disabled: true,
+                action: { label: '+ Add', ariaLabel: 'Add Bravo', onClick: vi.fn() },
+              },
+              {
+                id: 'c',
+                label: 'Charlie',
+                action: { label: '+ Add', ariaLabel: 'Add Charlie', onClick: vi.fn() },
+              },
+              {
+                id: 'd',
+                label: 'Delta',
+                action: { label: '+ Add', ariaLabel: 'Add Delta', onClick: vi.fn() },
+              },
+            ],
+          }}
+        />
+      </FormSectionProvider>,
+    )
+    expect(
+      screen.getByRole('button', { name: 'Add all 3 recommended weapons' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add Bravo' })).toBeDisabled()
+  })
+
+  it('invokes bulk action once on click', async () => {
+    const onBulk = vi.fn()
+    const user = userEvent.setup()
+    render(
+      <FormSectionProvider density="comfortable">
+        <FieldRecommendationGroupView
+          group={{
+            bulkAction: {
+              label: 'Add all',
+              ariaLabel: 'Add all 3 recommended weapons',
+              onClick: onBulk,
+            },
+            items: [
+              {
+                id: 'a',
+                label: 'Alpha',
+                action: { label: '+ Add', ariaLabel: 'Add Alpha', onClick: vi.fn() },
+              },
+              {
+                id: 'b',
+                label: 'Bravo',
+                action: { label: '+ Add', ariaLabel: 'Add Bravo', onClick: vi.fn() },
+              },
+              {
+                id: 'c',
+                label: 'Charlie',
+                action: { label: '+ Add', ariaLabel: 'Add Charlie', onClick: vi.fn() },
+              },
+            ],
+          }}
+        />
+      </FormSectionProvider>,
+    )
+    await user.click(screen.getByRole('button', { name: 'Add all 3 recommended weapons' }))
+    expect(onBulk).toHaveBeenCalledOnce()
   })
 
   it('invokes the item action on click', async () => {
@@ -110,7 +223,9 @@ describe('FieldRecommendationGroupView', () => {
       </FormSectionProvider>,
     )
 
-    const group = screen.getByText('Dagger').closest('[data-field-recommendation-group]')
+    const group = screen
+      .getByRole('button', { name: 'Add Dagger' })
+      .closest('[data-field-recommendation-group]')
     const list = screen.getByRole('list', { name: 'Equipment list' })
     expect(group!.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })

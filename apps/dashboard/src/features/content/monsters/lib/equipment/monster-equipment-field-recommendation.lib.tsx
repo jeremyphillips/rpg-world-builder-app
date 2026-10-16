@@ -1,6 +1,7 @@
 import type { FieldRecommendationGroup } from '@rpg/ui'
 
 import {
+  formatMonsterEquipmentBulkAddAriaLabel,
   MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE,
   MONSTER_EQUIPMENT_RECOMMENDATION_ADD_LABEL,
 } from '../monster-form-labels'
@@ -18,6 +19,7 @@ export function buildMonsterEquipmentRecommendationGroup(input: {
   equipmentEntries: readonly MonsterEquipmentFormEntry[]
   rulesetId: SystemRulesetId
   onAddEquipment: (equipmentId: string) => void
+  onAddAllEquipment: (equipmentIds: readonly string[]) => void
 }): FieldRecommendationGroup | null {
   const candidates = resolveMonsterEquipmentWeaponRecommendations({
     weaponProficiencyItemIds: input.weaponProficiencyItemIds,
@@ -28,9 +30,16 @@ export function buildMonsterEquipmentRecommendationGroup(input: {
 
   if (candidates.length === 0) return null
 
+  const equipmentIds = candidates.map((candidate) => candidate.equipmentId)
+
   return {
     sourceLabel: MONSTER_EQUIPMENT_PROFICIENCY_RECOMMENDATIONS_SOURCE,
     items: candidates.map((candidate) => toRecommendationItem(candidate, input.onAddEquipment)),
+    bulkAction: {
+      label: 'Add all',
+      ariaLabel: formatMonsterEquipmentBulkAddAriaLabel(candidates.length),
+      onClick: () => input.onAddAllEquipment(equipmentIds),
+    },
   }
 }
 

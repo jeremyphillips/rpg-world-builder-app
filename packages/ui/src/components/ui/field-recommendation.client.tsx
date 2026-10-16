@@ -4,9 +4,8 @@ import { Button } from './button.client'
 import {
   fieldRecommendationActionVariants,
   fieldRecommendationGroupClasses,
-  fieldRecommendationGroupItemLabelClasses,
+  fieldRecommendationGroupHeaderClasses,
   fieldRecommendationGroupItemsClasses,
-  fieldRecommendationGroupPairClasses,
   fieldRecommendationRowClasses,
   fieldRecommendationSupportingTextClasses,
 } from './field.variants'
@@ -14,9 +13,13 @@ import type {
   FieldRecommendation,
   FieldRecommendationAction,
   FieldRecommendationGroup,
+  FieldRecommendationItem,
 } from './field-recommendation.types'
-import { resolveFieldRecommendationButtonScale } from './field-recommendation.lib'
-import { InlineMetadata } from './inline-metadata'
+import {
+  FIELD_RECOMMENDATION_GROUP_BULK_ADD_LABEL,
+  resolveFieldRecommendationButtonScale,
+  resolveFieldRecommendationGroupBulkAction,
+} from './field-recommendation.lib'
 import { useFormSectionContext } from '../../form/context/form-section.context'
 import { cn } from '../../lib/utils'
 
@@ -26,6 +29,47 @@ export type {
   FieldRecommendationGroup,
   FieldRecommendationItem,
 } from './field-recommendation.types'
+
+function FieldRecommendationGroupItemButton({ item }: { item: FieldRecommendationItem }) {
+  const { density } = useFormSectionContext()
+  const buttonScale = resolveFieldRecommendationButtonScale(density)
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size={buttonScale.size}
+      density={buttonScale.density}
+      aria-label={item.action.ariaLabel}
+      className="max-w-full shrink-0"
+      data-field-recommendation-item=""
+      disabled={item.disabled}
+      onClick={item.action.onClick}
+    >
+      + {item.label}
+    </Button>
+  )
+}
+
+function FieldRecommendationGroupBulkButton({ action }: { action: FieldRecommendationAction }) {
+  const { density } = useFormSectionContext()
+  const buttonScale = resolveFieldRecommendationButtonScale(density)
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size={buttonScale.size}
+      density={buttonScale.density}
+      aria-label={action.ariaLabel}
+      className="shrink-0"
+      data-field-recommendation-bulk=""
+      onClick={action.onClick}
+    >
+      {FIELD_RECOMMENDATION_GROUP_BULK_ADD_LABEL}
+    </Button>
+  )
+}
 
 function FieldRecommendationActionButton({ action }: { action: FieldRecommendationAction }) {
   const { density } = useFormSectionContext()
@@ -72,33 +116,29 @@ export interface FieldRecommendationGroupProps {
 
 /** Compact inline recommendations above a collection list or empty state. */
 export function FieldRecommendationGroupView({ group, className }: FieldRecommendationGroupProps) {
-  const { density } = useFormSectionContext()
-
   if (group.items.length === 0) return null
+
+  const bulkAction = resolveFieldRecommendationGroupBulkAction(group)
+  const showHeader = Boolean(group.sourceLabel) || Boolean(bulkAction)
 
   return (
     <div
       className={cn(fieldRecommendationGroupClasses, className)}
       data-field-recommendation-group=""
     >
-      {group.sourceLabel ? (
-        <span className={fieldRecommendationSupportingTextClasses}>{group.sourceLabel}</span>
+      {showHeader ? (
+        <div className={fieldRecommendationGroupHeaderClasses}>
+          {group.sourceLabel ? (
+            <span className={fieldRecommendationSupportingTextClasses}>{group.sourceLabel}</span>
+          ) : null}
+          {bulkAction ? <FieldRecommendationGroupBulkButton action={bulkAction} /> : null}
+        </div>
       ) : null}
-      <InlineMetadata
-        role="heading"
-        density={density}
-        wrap
-        className={fieldRecommendationGroupItemsClasses}
-      >
+      <div className={fieldRecommendationGroupItemsClasses}>
         {group.items.map((item) => (
-          <InlineMetadata.Item key={item.id}>
-            <span className={fieldRecommendationGroupPairClasses} data-field-recommendation-item="">
-              <span className={fieldRecommendationGroupItemLabelClasses}>{item.label}</span>
-              <FieldRecommendationActionButton action={item.action} />
-            </span>
-          </InlineMetadata.Item>
+          <FieldRecommendationGroupItemButton key={item.id} item={item} />
         ))}
-      </InlineMetadata>
+      </div>
     </div>
   )
 }

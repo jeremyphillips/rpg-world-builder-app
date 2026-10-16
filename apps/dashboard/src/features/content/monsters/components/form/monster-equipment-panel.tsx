@@ -42,6 +42,7 @@ import { monsterEquipmentCatalog } from '../../lib/monster-form-derivation'
 import {
   groupMonsterEquipmentByKind,
   incrementMonsterPlainStack,
+  incrementMonsterPlainStacks,
   setMonsterPlainStackQuantity,
 } from '../../lib/equipment/monster-equipment-loadout.lib'
 import { equipmentEntryBaseName } from '../../lib/equipment/monster-equipment-labels'
@@ -122,6 +123,20 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
     [form],
   )
 
+  const addEquipmentRecommendation = useCallback(
+    (equipmentId: string) => {
+      updateEquipment(incrementMonsterPlainStack(equipment, equipmentId, { equipped: false }))
+    },
+    [equipment, updateEquipment],
+  )
+
+  const addAllEquipmentRecommendations = useCallback(
+    (equipmentIds: readonly string[]) => {
+      updateEquipment(incrementMonsterPlainStacks(equipment, equipmentIds, { equipped: false }))
+    },
+    [equipment, updateEquipment],
+  )
+
   const equipmentRecommendations = useMemo(() => {
     if (!values || gateReason) return null
     return buildMonsterEquipmentRecommendationGroup({
@@ -129,16 +144,16 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
       referenceEquipment: referenceOptions,
       equipmentEntries: equipment,
       rulesetId,
-      onAddEquipment: (equipmentId) => {
-        updateEquipment(incrementMonsterPlainStack(equipment, equipmentId, { equipped: false }))
-      },
+      onAddEquipment: addEquipmentRecommendation,
+      onAddAllEquipment: addAllEquipmentRecommendations,
     })
   }, [
+    addAllEquipmentRecommendations,
+    addEquipmentRecommendation,
     equipment,
     gateReason,
     referenceOptions,
     rulesetId,
-    updateEquipment,
     values,
     weaponGrants.items,
   ])

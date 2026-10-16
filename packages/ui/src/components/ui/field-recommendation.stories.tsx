@@ -38,6 +38,11 @@ export const CollectionGroup: Story = {
       <FieldRecommendationGroupView
         group={{
           sourceLabel: 'Weapons from selected proficiencies',
+          bulkAction: {
+            label: 'Add all',
+            ariaLabel: 'Add all 3 recommended weapons',
+            onClick: () => undefined,
+          },
           items: [
             {
               id: 'dagger',

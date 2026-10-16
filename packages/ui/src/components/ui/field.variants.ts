@@ -161,23 +161,16 @@ export const fieldRecommendationSupportingTextClasses = 'text-style-caption text
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
 export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
 
-/** Collection recommendation stack — caller owns outer spacing (no field `mt-1`). */
-export const fieldRecommendationGroupClasses = 'flex w-fit max-w-full flex-col items-start gap-1'
+/** Collection recommendation stack — 8px below the group; no field `mt-1`. */
+export const fieldRecommendationGroupClasses =
+  'mb-2 flex w-fit max-w-full flex-col items-start gap-1'
 
-/** InlineMetadata host for collection recommendation items — caption metrics for separators. */
-export const fieldRecommendationGroupItemsClasses = cn(
-  fieldRecommendationSupportingTextClasses,
-  'max-w-full',
-)
+/** Source label + optional bulk action — wraps together with token gap. */
+export const fieldRecommendationGroupHeaderClasses =
+  'flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5'
 
-/** One non-stretching label + action unit within a collection recommendation row. */
-export const fieldRecommendationGroupPairClasses = 'inline-flex max-w-full items-baseline gap-x-1'
-
-/** Item label — caption scale, medium weight, may wrap inside the pair. */
-export const fieldRecommendationGroupItemLabelClasses = cn(
-  fieldRecommendationSupportingTextClasses,
-  'min-w-0 break-words font-body-emphasis',
-)
+/** Wrapping row of outline recommendation actions (no metadata separators). */
+export const fieldRecommendationGroupItemsClasses = 'flex max-w-full flex-wrap gap-2'
 
 export const fieldGroupStackClasses = 'flex flex-col gap-6'
 export const fieldGroupBottomMarginClasses = 'mb-8'

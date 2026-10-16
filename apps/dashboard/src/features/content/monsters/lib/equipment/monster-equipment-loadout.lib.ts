@@ -72,6 +72,18 @@ export function incrementMonsterPlainStack(
   )
 }
 
+/** Applies {@link incrementMonsterPlainStack} for each id in order — one coordinated loadout update. */
+export function incrementMonsterPlainStacks(
+  entries: readonly MonsterEquipmentFormEntry[],
+  equipmentIds: readonly string[],
+  createOptions?: MonsterPlainStackCreateOptions,
+): MonsterEquipmentFormEntry[] {
+  return equipmentIds.reduce(
+    (acc, equipmentId) => incrementMonsterPlainStack(acc, equipmentId, createOptions),
+    entries,
+  )
+}
+
 /**
  * Groups monster equipment rows by inventory bucket order.
  * Unresolved catalog ids use the gear bucket label for display only (not persisted kind).
