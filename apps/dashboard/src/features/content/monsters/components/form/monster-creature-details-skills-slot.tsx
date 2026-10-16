@@ -1,5 +1,6 @@
 import {
   formatSignedModifier,
+  NEUTRAL_ABILITY_SCORE,
   PROFICIENCY_RANK_ENTRIES,
   type DerivedMonsterDraftStatBlock,
   type ProficiencyRank,
@@ -169,15 +170,14 @@ function MonsterSkillProficiencyRow({
       ? derived.skills.value.find((entry) => entry.skillId === row.skill)
       : undefined
   const modifierDisplay = resolveMonsterSkillModifierDisplay(derivedRow, derived)
-  const metadataLine =
-    skill && proficiencyBonus !== undefined
-      ? monsterSkillDerivedMetadataLine({
-          ability: skill.ability,
-          abilityScore: values.abilityScores?.[skill.ability] ?? 10,
-          rank: row.rank,
-          proficiencyBonus,
-        })
-      : undefined
+  const metadataLine = skill
+    ? monsterSkillDerivedMetadataLine({
+        ability: skill.ability,
+        abilityScore: values.abilityScores?.[skill.ability] ?? NEUTRAL_ABILITY_SCORE,
+        rank: row.rank,
+        proficiencyBonus,
+      })
+    : undefined
 
   return (
     <ContentFormEntitySelectionRow

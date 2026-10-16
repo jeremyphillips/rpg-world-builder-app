@@ -1,10 +1,11 @@
-import type {
-  ContentValidationIntent,
-  CreateMonsterInput,
-  CreatureWeaponProficiencies,
-  Monster,
-  MonsterAction,
-  MonsterReaction,
+import {
+  neutralAbilityScores,
+  type ContentValidationIntent,
+  type CreateMonsterInput,
+  type CreatureWeaponProficiencies,
+  type Monster,
+  type MonsterAction,
+  type MonsterReaction,
 } from '@rpg/contracts'
 import type { DiceFormulaValue } from '@rpg/ui'
 import type { FieldValues } from 'react-hook-form'
@@ -87,20 +88,11 @@ export type MonsterFormValues = FieldValues & {
   weaponProficiencyReconciliationPending?: boolean
 }
 
-const NEUTRAL_ABILITIES: Monster['abilityScores'] = {
-  str: 10,
-  dex: 10,
-  con: 10,
-  int: 10,
-  wis: 10,
-  cha: 10,
-}
-
 export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
   const authoringHitDice = defaultHitPointsDiceForSize(undefined)
   return {
     name: '',
-    abilityScores: { ...NEUTRAL_ABILITIES },
+    abilityScores: neutralAbilityScores(),
     armorClass: { kind: 'unarmored' },
     hitPoints: { kind: 'hit-dice', count: authoringHitDice.count },
     [MONSTER_HIT_POINTS_USE_FIXED_FIELD]: false,

@@ -160,6 +160,21 @@ export const ABILITY_SCORE_MIN = 1
 export const CHARACTER_ABILITY_SCORE_MAX = 20
 export const ABILITY_SCORE_MAX = 30
 
+/** Score whose ability modifier is 0. Shared baseline for missing creature scores. */
+export const NEUTRAL_ABILITY_SCORE = 10
+
+/** All six ability scores at {@link NEUTRAL_ABILITY_SCORE}. */
+export function neutralAbilityScores(): Record<Ability, number> {
+  return {
+    str: NEUTRAL_ABILITY_SCORE,
+    dex: NEUTRAL_ABILITY_SCORE,
+    con: NEUTRAL_ABILITY_SCORE,
+    int: NEUTRAL_ABILITY_SCORE,
+    wis: NEUTRAL_ABILITY_SCORE,
+    cha: NEUTRAL_ABILITY_SCORE,
+  }
+}
+
 export const abilityScoreSchema = z.number().int().min(ABILITY_SCORE_MIN).max(ABILITY_SCORE_MAX)
 
 export const characterAbilityScoreSchema = abilityScoreSchema.refine(

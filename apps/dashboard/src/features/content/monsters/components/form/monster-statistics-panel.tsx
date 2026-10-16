@@ -4,6 +4,7 @@ import {
   ABILITY_IDS,
   ABILITY_SCORE_MAX,
   ABILITY_SCORE_MIN,
+  NEUTRAL_ABILITY_SCORE,
   CREATURE_ARMOR_CLASS_KINDS,
   getCreatureArmorClassKindLabel,
 } from '@rpg/contracts'
@@ -146,7 +147,7 @@ function AbilityScoreField({
   const form = useFormContext<MonsterFormValues>()
   const issues = useContext(StatisticsIssuesContext)
   const stored = values.abilityScores?.[ability]
-  const displayScore = stored ?? 10
+  const displayScore = stored ?? NEUTRAL_ABILITY_SCORE
   const proficient = values.proficiencies?.savingThrows?.includes(ability) ?? false
   const scorePath = `abilityScores.${ability}`
   const saveInvalid = statisticsInvalid('proficiencies.savingThrows', issues)

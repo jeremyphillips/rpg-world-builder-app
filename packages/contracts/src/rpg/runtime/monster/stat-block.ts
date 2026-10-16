@@ -2,6 +2,7 @@ import { DEFAULT_ARMOR_CLASS_BASE } from '../../campaign/patches/campaign-mechan
 import { isArmorEquipment, isWeaponEquipment, type Equipment } from '../../content/equipment'
 import type { MonsterAction, MonsterBody } from '../../content/monster'
 import { getSkillName } from '../../content/skill-proficiency'
+import { NEUTRAL_ABILITY_SCORE } from '../../vocab/ability'
 import { CHALLENGE_RATING_MECHANICS } from '../../vocab/challenge-rating'
 import { CREATURE_SIZE_HIT_DIE } from '../../vocab/creature-size'
 import type { ArmorClassBase } from '../../vocab/mechanics/edition-preset-mechanics'
@@ -647,7 +648,11 @@ function draftSavingThrows(
     Object.fromEntries(
       (monster.proficiencies?.savingThrows ?? []).map((ability) => [
         ability,
-        savingThrowBonus(monster.abilityScores?.[ability] ?? 10, true, mechanics.proficiencyBonus),
+        savingThrowBonus(
+          monster.abilityScores?.[ability] ?? NEUTRAL_ABILITY_SCORE,
+          true,
+          mechanics.proficiencyBonus,
+        ),
       ]),
     ),
   )
@@ -665,8 +670,8 @@ function draftSkills(
     (monster.proficiencies?.skills ?? []).map((entry) => {
       const skillRow = skillCatalog.get(entry.skill)
       const abilityScore = skillRow
-        ? (monster.abilityScores?.[skillRow.ability] ?? 10)
-        : (monster.abilityScores?.wis ?? 10)
+        ? (monster.abilityScores?.[skillRow.ability] ?? NEUTRAL_ABILITY_SCORE)
+        : (monster.abilityScores?.wis ?? NEUTRAL_ABILITY_SCORE)
       return {
         skillId: entry.skill,
         label: skillRow?.name ?? getSkillName(entry.skill),

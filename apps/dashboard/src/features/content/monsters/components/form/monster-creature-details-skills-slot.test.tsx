@@ -95,5 +95,6 @@ describe('MonsterCreatureDetailsSkillsSlot', () => {
     const placeholder = screen.getByLabelText(MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP)
     expect(placeholder).toHaveTextContent('—')
     expect(placeholder).toHaveClass('cursor-pointer')
+    expect(screen.getByText('DEX +3 · PB —')).toBeInTheDocument()
   })
 })
