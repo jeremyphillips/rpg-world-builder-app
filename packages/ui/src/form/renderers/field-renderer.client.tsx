@@ -508,6 +508,7 @@ const fieldRenderers: {
     hint,
     hintPosition,
     labelVisibility,
+    namePrefix,
     ...validation
   }) => (
     <ComboboxFieldRenderer
@@ -518,6 +519,7 @@ const fieldRenderers: {
       hint={hint}
       hintPosition={hintPosition}
       labelVisibility={labelVisibility}
+      namePrefix={namePrefix}
       {...fieldValidationProps(validation)}
     />
   ),

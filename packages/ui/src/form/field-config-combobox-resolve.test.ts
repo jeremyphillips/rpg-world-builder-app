@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveComboboxFieldConfig, type ComboboxFieldConfig } from './field-config'
+import {
+  collectFieldDynamicDependsOn,
+  resolveComboboxFieldConfig,
+  type ComboboxFieldConfig,
+} from './field-config'
 
 describe('resolveComboboxFieldConfig', () => {
   it('resolves dynamic filterSelects from watched form values', () => {
@@ -71,5 +75,20 @@ describe('resolveComboboxFieldConfig', () => {
     expect(resolved.options).toHaveLength(1)
     expect(resolved.filterSelects?.[0]?.filterKey).toBe('kind')
     expect(resolved.options[0]?.filterValues?.kind).toBe('district')
+  })
+
+  it('collects recommendationResolve dependsOn for combobox fields', () => {
+    const config: ComboboxFieldConfig = {
+      type: 'combobox',
+      name: 'items',
+      label: 'Items',
+      options: [],
+      recommendationResolve: {
+        dependsOn: ['equipment', 'mode'],
+        recommendationWhen: () => null,
+      },
+    }
+
+    expect(collectFieldDynamicDependsOn(config)).toEqual(['equipment', 'mode'])
   })
 })

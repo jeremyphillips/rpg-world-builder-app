@@ -226,6 +226,8 @@ export {
   type ComboboxFieldConfig,
   type ComboboxFilterDimensionConfig,
   type FieldDynamicComboboxFilterSelects,
+  type FieldDynamicRecommendation,
+  type FieldRecommendationResolveContext,
   type FilterDimensionValue,
   type ComboboxRenderSelectedItem,
   type EditableGridColumnConfig,

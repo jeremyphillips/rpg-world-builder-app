@@ -375,7 +375,9 @@ export type {
   FieldRecommendationAction,
   FieldRecommendationGroup,
   FieldRecommendationItem,
+  FieldLayoutRecommendation,
 } from './components/ui/field-recommendation.types'
+export { isFieldRecommendationGroup } from './components/ui/field-recommendation.types'
 export {
   FieldRecommendationInline,
   FieldRecommendationGroupView,

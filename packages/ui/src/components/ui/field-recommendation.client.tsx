@@ -3,7 +3,8 @@
 import { Button } from './button.client'
 import {
   fieldRecommendationActionVariants,
-  fieldRecommendationGroupClasses,
+  fieldRecommendationCollectionGroupClasses,
+  fieldRecommendationFieldGroupClasses,
   fieldRecommendationGroupHeaderClasses,
   fieldRecommendationGroupItemsClasses,
   fieldRecommendationRowClasses,
@@ -24,11 +25,13 @@ import { useFormSectionContext } from '../../form/context/form-section.context'
 import { cn } from '../../lib/utils'
 
 export type {
+  FieldLayoutRecommendation,
   FieldRecommendation,
   FieldRecommendationAction,
   FieldRecommendationGroup,
   FieldRecommendationItem,
 } from './field-recommendation.types'
+export { isFieldRecommendationGroup } from './field-recommendation.types'
 
 function FieldRecommendationGroupItemButton({ item }: { item: FieldRecommendationItem }) {
   const { density } = useFormSectionContext()
@@ -111,20 +114,31 @@ export function FieldRecommendationInline({
 
 export interface FieldRecommendationGroupProps {
   group: FieldRecommendationGroup
+  /** `field` — inside `FieldLayout` above the control. `collection` — above a list host. */
+  placement?: 'field' | 'collection'
   className?: string
 }
 
 /** Compact inline recommendations above a collection list or empty state. */
-export function FieldRecommendationGroupView({ group, className }: FieldRecommendationGroupProps) {
+export function FieldRecommendationGroupView({
+  group,
+  placement = 'collection',
+  className,
+}: FieldRecommendationGroupProps) {
   if (group.items.length === 0) return null
 
   const bulkAction = resolveFieldRecommendationGroupBulkAction(group)
   const showHeader = Boolean(group.sourceLabel) || Boolean(bulkAction)
+  const shellClassName =
+    placement === 'field'
+      ? fieldRecommendationFieldGroupClasses
+      : fieldRecommendationCollectionGroupClasses
 
   return (
     <div
-      className={cn(fieldRecommendationGroupClasses, className)}
+      className={cn(shellClassName, className)}
       data-field-recommendation-group=""
+      data-field-recommendation-placement={placement}
     >
       {showHeader ? (
         <div className={fieldRecommendationGroupHeaderClasses}>

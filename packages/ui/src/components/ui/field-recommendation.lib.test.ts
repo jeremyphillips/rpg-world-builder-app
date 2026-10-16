@@ -93,10 +93,7 @@ describe('resolveFieldLayoutRecommendation', () => {
     expect(resolveFieldLayoutRecommendation('below-label', sample)).toBe(sample)
   })
 
-  it('omits the recommendation when hint is below-control', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    expect(resolveFieldLayoutRecommendation('below-control', sample)).toBeNull()
-    expect(warn).toHaveBeenCalled()
-    warn.mockRestore()
+  it('returns the recommendation when hint is below-control', () => {
+    expect(resolveFieldLayoutRecommendation('below-control', sample)).toBe(sample)
   })
 })

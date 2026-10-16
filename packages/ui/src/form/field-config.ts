@@ -61,6 +61,7 @@ import type {
   FieldLabelPosition,
   FieldSeparator,
 } from '../components/ui/field.variants'
+import type { FieldLayoutRecommendation } from '../components/ui/field-recommendation.types'
 import type { FormDensity } from './form-density'
 import type { FieldLabelVisibility, FormHeading, FormHeadingContent } from './form-heading.lib'
 
@@ -279,6 +280,25 @@ export interface ComboboxFilterDimensionConfig {
 export interface FieldDynamicComboboxFilterSelects {
   dependsOn: readonly string[]
   filterSelectsWhen: (values: Record<string, unknown>) => readonly ComboboxFilterDimensionConfig[]
+}
+
+/** RHF helpers for schema-driven recommendation actions (append grants, etc.). */
+export interface FieldRecommendationResolveContext {
+  setValue: (
+    name: string,
+    value: unknown,
+    options?: { shouldDirty?: boolean; shouldValidate?: boolean },
+  ) => void
+  getValues: (fieldName?: string) => unknown
+}
+
+/** Resolves field recommendations from watched form values. */
+export interface FieldDynamicRecommendation {
+  dependsOn: readonly string[]
+  recommendationWhen: (
+    values: Record<string, unknown>,
+    ctx: FieldRecommendationResolveContext,
+  ) => FieldLayoutRecommendation | null
 }
 
 /** Static and dynamic hint configuration on leaf fields. */
@@ -849,6 +869,10 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   filterSelects?: readonly ComboboxFilterDimensionConfig[]
   /** Dynamic dimension filters resolved from watched values; replaces `filterSelects` when set. */
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+  /** Static inline or grouped recommendation in the field label band (above the control). */
+  recommendation?: FieldLayoutRecommendation
+  /** Dynamic recommendation; `dependsOn` triggers re-resolution. */
+  recommendationResolve?: FieldDynamicRecommendation
   /** When false, omits the panel search row (keyboard nav targets the listbox). */
   enableSearch?: boolean
   /** Overrides generated `Search {plural}…` panel copy. */
@@ -1913,6 +1937,14 @@ function comboboxFilterDependsOn(field: {
   return field.filterSelectsResolve?.dependsOn ?? []
 }
 
+function comboboxRecommendationDependsOn(field: {
+  type?: FieldConfig['type']
+  recommendationResolve?: FieldDynamicRecommendation
+}): readonly string[] {
+  if (field.type !== 'combobox') return []
+  return field.recommendationResolve?.dependsOn ?? []
+}
+
 /** Collects watched field names for dynamic hint, derived metadata, and select options resolution. */
 export function collectFieldDynamicDependsOn(field: {
   hint?: BaseFieldConfig['hint']
@@ -1920,6 +1952,7 @@ export function collectFieldDynamicDependsOn(field: {
   type?: FieldConfig['type']
   optionsResolve?: FieldDynamicSelectOptions
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
+  recommendationResolve?: FieldDynamicRecommendation
 }): readonly string[] {
   const hintDependsOn = normalizeFieldHint(field.hint).resolve?.dependsOn ?? []
   const derivedMetaDependsOn = field.derivedMeta?.dependsOn ?? []
@@ -1935,6 +1968,7 @@ export function collectFieldDynamicDependsOn(field: {
       ...derivedMetaDependsOn,
       ...optionsResolveDependsOn,
       ...comboboxFilterDependsOn(field),
+      ...comboboxRecommendationDependsOn(field),
     ]),
   ]
 }

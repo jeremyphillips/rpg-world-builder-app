@@ -1,7 +1,7 @@
 import type { ButtonVariantProps } from './button.variants'
 import type { FieldHintPosition } from './field.variants'
 import type {
-  FieldRecommendation,
+  FieldLayoutRecommendation,
   FieldRecommendationAction,
   FieldRecommendationGroup,
   FieldRecommendationItem,
@@ -37,19 +37,10 @@ export function resolveFieldRecommendationButtonScale(_formDensity: FormDensity 
   return { size: 'sm', density: 'compact' }
 }
 
-/** Recommendation renders only with pre-control hints (`below-label`). */
+/** Field recommendations render above the control regardless of hint placement. */
 export function resolveFieldLayoutRecommendation(
-  hintPosition: FieldHintPosition | undefined,
-  recommendation: FieldRecommendation | null | undefined,
-): FieldRecommendation | null {
-  if (!recommendation) return null
-  if (hintPosition === 'below-control') {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        'FieldLayout: recommendation is omitted when hintPosition is "below-control" until that layout is designed.',
-      )
-    }
-    return null
-  }
-  return recommendation
+  _hintPosition: FieldHintPosition | undefined,
+  recommendation: FieldLayoutRecommendation | null | undefined,
+): FieldLayoutRecommendation | null {
+  return recommendation ?? null
 }

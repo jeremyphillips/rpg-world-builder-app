@@ -151,6 +151,15 @@ export function formatMonsterEquipmentBulkAddAriaLabel(count: number): string {
   return `Add all ${count} recommended weapons`
 }
 
+export const MONSTER_WEAPON_OWNED_PROFICIENCY_RECOMMENDATIONS_SOURCE =
+  'Owned weapons without proficiency'
+
+export const MONSTER_WEAPON_PROFICIENCY_RECOMMENDATION_ADD_LABEL = '+ Add'
+
+export function formatMonsterWeaponProficiencyBulkAddAriaLabel(count: number): string {
+  return `Add all ${count} weapon proficiencies`
+}
+
 export const MONSTER_TRAITS_HEADING = getMonsterTraitSectionLabel()
 export const MONSTER_ACTIONS_HEADING = actionEconomySectionHeading('action')
 export const MONSTER_BONUS_ACTIONS_HEADING = actionEconomySectionHeading('bonus-action')

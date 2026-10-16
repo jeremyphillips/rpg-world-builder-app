@@ -24,8 +24,8 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 import { cn } from '../../lib/utils'
-import type { FieldRecommendation } from './field-recommendation.types'
-import { FieldRecommendationInline } from './field-recommendation.client'
+import type { FieldLayoutRecommendation } from './field-recommendation.types'
+import { FieldRecommendationFieldContent } from './field-recommendation-field-content.client'
 import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
 
 export interface FormFieldProps {
@@ -36,7 +36,7 @@ export interface FormFieldProps {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
-  recommendation?: FieldRecommendation | null
+  recommendation?: FieldLayoutRecommendation | null
   /** Optional info-icon content rendered as an `[i]` tooltip beside the label. */
   info?: ReactNode
   required?: boolean
@@ -110,7 +110,7 @@ export function FormField({
             {labelNode(label, info, labelVisibility, required)}
             <Field.Hint />
             {resolvedRecommendation ? (
-              <FieldRecommendationInline recommendation={resolvedRecommendation} />
+              <FieldRecommendationFieldContent recommendation={resolvedRecommendation} />
             ) : null}
           </div>
           <div className={presentation.controlBandClassName}>

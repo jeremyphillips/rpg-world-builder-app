@@ -12,12 +12,12 @@ import type { FieldHintPosition } from './field.variants'
 import { cn } from '../../lib/utils'
 import { FieldLayoutLabelRegionContent } from './field-layout-label-region.client'
 import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
-import type { FieldRecommendation } from './field-recommendation.types'
+import type { FieldLayoutRecommendation } from './field-recommendation.types'
 
 export interface FieldLayoutProps {
   hintPosition?: FieldHintPosition
   label: ReactNode
-  recommendation?: FieldRecommendation | null
+  recommendation?: FieldLayoutRecommendation | null
   control: ReactElement | ReactNode
   /**
    * When false, `control` is rendered as-is (e.g. Select with an internal

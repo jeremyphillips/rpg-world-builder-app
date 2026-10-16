@@ -18,6 +18,7 @@ import { weaponProficiencyGrantSetField } from '@/lib/forms/grant-sets/weapon-pr
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
 import { MonsterWeaponProficiencyReconciliationField } from '../../components/monster-weapon-proficiency-reconciliation-field'
+import { resolveMonsterWeaponProficiencyRecommendationGroup } from './monster-weapon-proficiency-recommendations.lib'
 import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/equipment-proficiency-grant-combobox-config.lib'
 import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -136,6 +137,16 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
               values as MonsterFormValues,
               ctx,
               weaponCombobox.itemOptions,
+            ),
+        },
+        recommendationResolve: {
+          dependsOn: ['equipment', 'proficiencies.weapons', 'weaponProficiencyMode'],
+          recommendationWhen: (values, form) =>
+            resolveMonsterWeaponProficiencyRecommendationGroup(
+              values as MonsterFormValues,
+              ctx,
+              weaponCombobox.itemOptions,
+              form,
             ),
         },
       },

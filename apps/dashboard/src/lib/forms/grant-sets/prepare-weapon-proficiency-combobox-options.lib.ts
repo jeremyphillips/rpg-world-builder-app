@@ -64,3 +64,27 @@ export function prepareWeaponProficiencyComboboxOptions(args: {
     )
     .map((entry) => entry.option)
 }
+
+export type WeaponProficiencyMissingRecommendation = {
+  grantId: string
+  label: string
+}
+
+/** Owned or equipped weapons that lack specific proficiency — same eligibility as combobox match labels. */
+export function resolveWeaponProficiencyMissingRecommendations(args: {
+  options: readonly FieldOption[]
+  equipmentCatalog: readonly Equipment[]
+  targets: readonly CreatureWeaponProficiencyTarget[]
+  inventory: readonly WeaponInventoryEntry[]
+  selectedIds: ReadonlySet<string>
+}): WeaponProficiencyMissingRecommendation[] {
+  return prepareWeaponProficiencyComboboxOptions(args)
+    .filter(
+      (option): option is FieldOption & { description: string } =>
+        option.description !== undefined && MATCH_LABELS.has(option.description),
+    )
+    .map((option) => ({
+      grantId: option.value,
+      label: option.label,
+    }))
+}

@@ -161,9 +161,16 @@ export const fieldRecommendationSupportingTextClasses = 'text-style-caption text
 /** Decoration overrides for recommendation text actions — geometry stays on `Button` text tokens. */
 export const fieldRecommendationActionVariants = cva('no-underline hover:no-underline')
 
-/** Collection recommendation stack — 8px below the group; no field `mt-1`. */
-export const fieldRecommendationGroupClasses =
+/** Field recommendation group — internal layout only; field band spacing is `fieldRecommendationRowClasses`. */
+export const fieldRecommendationFieldGroupClasses =
+  'flex w-fit max-w-full flex-col items-start gap-1'
+
+/** Collection recommendation stack — host adds spacing before the collection body. */
+export const fieldRecommendationCollectionGroupClasses =
   'mb-2 flex w-fit max-w-full flex-col items-start gap-1'
+
+/** @deprecated Use {@link fieldRecommendationFieldGroupClasses} or {@link fieldRecommendationCollectionGroupClasses}. */
+export const fieldRecommendationGroupClasses = fieldRecommendationCollectionGroupClasses
 
 /** Source label + optional bulk action — wraps together with token gap. */
 export const fieldRecommendationGroupHeaderClasses =

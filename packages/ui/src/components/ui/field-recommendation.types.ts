@@ -29,3 +29,12 @@ export type FieldRecommendationGroup = {
   /** Invoked for eligible items only; visibility gated in {@link resolveFieldRecommendationGroupBulkAction}. */
   bulkAction?: FieldRecommendationAction
 }
+
+/** Field-owned recommendation — inline quick-add or grouped outline actions (same placement band). */
+export type FieldLayoutRecommendation = FieldRecommendation | FieldRecommendationGroup
+
+export function isFieldRecommendationGroup(
+  recommendation: FieldLayoutRecommendation,
+): recommendation is FieldRecommendationGroup {
+  return 'items' in recommendation
+}

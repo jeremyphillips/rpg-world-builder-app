@@ -24,6 +24,7 @@ import {
   toComboboxFieldOptions,
   toFieldOptions,
 } from './combobox-field-form.lib'
+import { useComboboxFieldRecommendation } from './use-combobox-field-recommendation.client'
 
 const EMPTY_FILTER_SELECTS: readonly ComboboxFilterDimensionConfig[] = []
 
@@ -35,6 +36,7 @@ export interface ComboboxFieldRendererProps extends FieldValidationProps {
   hint?: string
   hintPosition?: FieldHintPosition
   labelVisibility?: ComboboxFieldConfig['labelVisibility']
+  namePrefix?: string
 }
 
 function useComboboxDimensionFilters(config: ComboboxFieldConfig) {
@@ -70,8 +72,11 @@ export function ComboboxFieldRenderer({
   hint,
   hintPosition,
   labelVisibility,
+  namePrefix,
   ...validation
 }: ComboboxFieldRendererProps) {
+  const recommendation = useComboboxFieldRecommendation(config, namePrefix)
+
   const comboboxOptions = React.useMemo(
     () => toComboboxFieldOptions(config.options ?? []),
     [config.options],
@@ -121,6 +126,7 @@ export function ComboboxFieldRenderer({
       {...validation}
       hint={hint}
       hintPosition={hintPosition}
+      recommendation={recommendation}
       info={config.info}
       required={config.required}
       width={config.width}

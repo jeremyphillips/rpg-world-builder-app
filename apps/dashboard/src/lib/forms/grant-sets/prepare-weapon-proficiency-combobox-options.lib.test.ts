@@ -6,7 +6,10 @@ import {
   type Equipment,
 } from '@rpg/contracts'
 
-import { prepareWeaponProficiencyComboboxOptions } from './prepare-weapon-proficiency-combobox-options.lib'
+import {
+  prepareWeaponProficiencyComboboxOptions,
+  resolveWeaponProficiencyMissingRecommendations,
+} from './prepare-weapon-proficiency-combobox-options.lib'
 
 const dagger = {
   id: 'srd:dagger',
@@ -62,5 +65,38 @@ describe('prepareWeaponProficiencyComboboxOptions', () => {
     })
     expect(prepared.find((option) => option.value === dagger.id)?.description).toBeUndefined()
     expect(prepared.find((option) => option.value === longsword.id)?.description).toBeUndefined()
+  })
+})
+
+describe('resolveWeaponProficiencyMissingRecommendations', () => {
+  it('returns grant ids for owned weapons without proficiency in equipped-first order', () => {
+    const recommendations = resolveWeaponProficiencyMissingRecommendations({
+      options,
+      equipmentCatalog: [dagger, longsword],
+      targets: [],
+      inventory: [
+        { equipmentId: longsword.id, quantity: 1, equipped: false },
+        { equipmentId: dagger.id, quantity: 1, equipped: true },
+      ],
+      selectedIds: new Set(),
+    })
+    expect(recommendations).toEqual([
+      { grantId: dagger.id, label: 'Dagger' },
+      { grantId: longsword.id, label: 'Longsword' },
+    ])
+  })
+
+  it('excludes grants already selected or covered by category proficiency', () => {
+    const recommendations = resolveWeaponProficiencyMissingRecommendations({
+      options,
+      equipmentCatalog: [dagger, longsword],
+      targets: [{ weaponCategory: 'martial' }],
+      inventory: [
+        { equipmentId: dagger.id, quantity: 1, equipped: true },
+        { equipmentId: longsword.id, quantity: 1, equipped: true },
+      ],
+      selectedIds: new Set([dagger.id]),
+    })
+    expect(recommendations).toEqual([])
   })
 })

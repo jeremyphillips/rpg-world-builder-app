@@ -28,7 +28,11 @@ export type DependentPresentationOptions = {
 
 export type GrantSetItemsComboboxConfig = Pick<
   ComboboxFieldConfig,
-  'filterSelects' | 'optionsResolve' | 'resolveFilteredOptions'
+  | 'filterSelects'
+  | 'optionsResolve'
+  | 'resolveFilteredOptions'
+  | 'recommendation'
+  | 'recommendationResolve'
 >
 
 export type ModeDependentGrantSetFieldOptions = {
@@ -103,7 +107,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
     itemsCombobox,
   } = options
 
-  return [
+  const fields: FormItem[] = [
     {
       type: 'chips',
       name: categoriesPath,
@@ -113,22 +117,25 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       ...(categoriesRequired ? { required: true } : {}),
       visibility: visibleWhenGrantMode(modeFieldName, categoryMode),
     },
-    {
-      type: 'combobox',
-      name: itemsPath,
-      label: itemsLabel,
-      ...(itemsNoun ? { noun: itemsNoun } : {}),
-      ...(itemsHint ? { hint: itemsHint } : {}),
-      multiple: true,
-      options: itemOptions,
-      width: 'full',
-      ...(itemsCombobox ?? {}),
-      ...(renderSelectedItem ? { renderSelectedItem } : {}),
-      ...(resolveOptionLabel ? { resolveOptionLabel } : {}),
-      ...(itemsRequired ? { required: true } : {}),
-      visibility: visibleWhenGrantMode(modeFieldName, specificMode),
-    },
   ]
+
+  fields.push({
+    type: 'combobox',
+    name: itemsPath,
+    label: itemsLabel,
+    ...(itemsNoun ? { noun: itemsNoun } : {}),
+    ...(itemsHint ? { hint: itemsHint } : {}),
+    multiple: true,
+    options: itemOptions,
+    width: 'full',
+    ...(itemsCombobox ?? {}),
+    ...(renderSelectedItem ? { renderSelectedItem } : {}),
+    ...(resolveOptionLabel ? { resolveOptionLabel } : {}),
+    ...(itemsRequired ? { required: true } : {}),
+    visibility: visibleWhenGrantMode(modeFieldName, specificMode),
+  })
+
+  return fields
 }
 
 /** Shared mode radio + dependent grant-set editors. */

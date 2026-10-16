@@ -37,20 +37,26 @@ describe('FieldLayout recommendation', () => {
     ).toBeTruthy()
   })
 
-  it('omits recommendation when hint is below-control', () => {
+  it('keeps recommendation above the control when hint is below-control', () => {
     render(
       <Field.Root id="languages" hint="Supporting text." anatomy hintPosition="below-control">
         <FieldLayout
           hintPosition="below-control"
           label={<Field.Label>Languages</Field.Label>}
           recommendation={recommendation}
-          control={<Input />}
+          control={<Input aria-label="Languages control" />}
         />
       </Field.Root>,
     )
 
-    expect(screen.queryByText(/Recommended for this creature type/)).not.toBeInTheDocument()
-    expect(screen.getByText('Supporting text.')).toBeInTheDocument()
+    const recommendationText = screen.getByText(/Recommended for this creature type/)
+    const control = screen.getByRole('textbox', { name: 'Languages control' })
+    const hint = screen.getByText('Supporting text.')
+
+    expect(
+      recommendationText.compareDocumentPosition(control) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    expect(control.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('uses caption-scale foreground copy and compact sm accent text button', () => {

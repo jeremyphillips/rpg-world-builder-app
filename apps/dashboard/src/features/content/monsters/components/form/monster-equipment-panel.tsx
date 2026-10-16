@@ -243,7 +243,7 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
 
       <div className="flex flex-col gap-2">
         {equipmentRecommendations ? (
-          <FieldRecommendationGroupView group={equipmentRecommendations} />
+          <FieldRecommendationGroupView group={equipmentRecommendations} placement="collection" />
         ) : null}
 
         <EquipmentCategoryGroupedList<MonsterEquipmentFormEntry>

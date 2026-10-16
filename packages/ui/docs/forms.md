@@ -188,35 +188,37 @@ Centralized in `Field.Root` context:
 
 ### Field recommendations
 
-Optional inline guidance with a quick-add text action — rendered **below the hint and above the
-control** when `hintPosition` is `below-label` (default). Pass `recommendation` on
-[`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
-[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), or leaf wrappers such as
-[`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx).
+Field-owned recommendations (single inline quick-add **or** a grouped outline list) share one
+placement band: **below label/hint, above the control**. Cardinality does not change placement —
+[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx) owns the band via
+`FieldLayoutRecommendation` (`FieldRecommendation | FieldRecommendationGroup`).
+
+Pass `recommendation` on [`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
+[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), leaf wrappers such as
+[`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx), or schema-driven
+combobox fields via `recommendation` / `recommendationResolve` on [`ComboboxFieldConfig`](../../packages/ui/src/form/field-config.ts).
 
 ```ts
-type FieldRecommendation = {
-  content: ReactNode
-  action: { label: string; ariaLabel: string; onClick: () => void }
-}
+type FieldLayoutRecommendation = FieldRecommendation | FieldRecommendationGroup
 ```
 
 - **Not** a hint, description, placeholder, or validation message — do not repurpose `hint`.
 - **Not** combobox option `metadata` (dropdown row supporting text).
-- With `hintPosition: 'below-control'` or floating-label fields, recommendation is **omitted**
-  until that layout is designed (dev-only `console.warn`).
-- Dynamic copy/actions: compute in dashboard `kind: 'slot'` `render()` (or static props on
-  hand-built fields) and pass the resolved `FieldRecommendation` object — no separate schema
-  `dependsOn` resolver in `@rpg/ui/form`.
+- Recommendations stay in the label region even when `hintPosition` is `below-control` (hint
+  remains in the message region under the control).
+- Dynamic field recommendations: `recommendationResolve: { dependsOn, recommendationWhen(values, ctx) }`
+  where `ctx` exposes `setValue` / `getValues` for quick-add mutations. Keep eligibility logic in
+  the feature layer; the renderer only wires placement.
 
-**Collection recommendations.** For inventory-style slots (e.g. monster equipment), render
+**Collection recommendations.** For inventory-style hosts (e.g. monster equipment), render
 [`FieldRecommendationGroupView`](../../packages/ui/src/components/ui/field-recommendation.client.tsx)
-above the collection list or empty state. Pass a `FieldRecommendationGroup` (`sourceLabel?`,
-`items[]` rendered as inline outline `+ {label}` actions, optional `bulkAction` for feature-owned
-bulk add). Shared UI shows **Add all** (sm ghost) inline after `sourceLabel` when there are
-**3+** actionable (non-`disabled`) items. The host owns spacing and heading/actions; do not
-wrap the collection in `FieldLayout` or extend `SlotConfig`. Eligibility and mutations stay in
-the feature layer.
+with `placement="collection"` above the list or empty state. Same `FieldRecommendationGroup` shape;
+the collection host owns recommendation → list spacing (`FieldRecommendationGroupView` internal
+heading/action spacing only). Do not add sibling `FormItem` slots or monster-specific layout
+wrappers for field-owned groups.
+
+**Spacing ownership.** `FieldLayout` owns label → hint → recommendation → control gaps.
+`FieldRecommendationGroupView` with `placement="field"` omits collection-only outer margin.
 
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 
