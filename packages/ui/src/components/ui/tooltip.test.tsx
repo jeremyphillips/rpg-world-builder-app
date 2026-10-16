@@ -5,6 +5,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
 import { overlayArrowPath } from './popover-content.variants'
 import { Button } from './button.client'
+import { Checkbox } from './checkbox.client'
 import {
   InfoTooltip,
   Tooltip,
@@ -58,9 +59,28 @@ describe('TooltipContent arrow', () => {
       </TooltipProvider>,
     )
     await user.tab()
-    expect(await screen.findByRole('tooltip')).toHaveTextContent('Unequip')
+    const tooltip = await screen.findByRole('tooltip')
+    expect(tooltip).toHaveTextContent('Unequip')
+    expect(document.body.querySelector('.ui-popover-content--with-arrow')).not.toBeNull()
     const arrow = document.body.querySelector('.ui-overlay-arrow path')
     expect(arrow).toHaveAttribute('d', overlayArrowPath)
+  })
+
+  it('keeps checkbox data-state when the trigger wraps a span', () => {
+    render(
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span data-testid="tooltip-wrap">
+              <Checkbox appearance="circle" aria-label="Equipped item" defaultChecked />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent arrow>Unequip</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>,
+    )
+
+    expect(screen.getByLabelText('Equipped item')).toHaveAttribute('data-state', 'checked')
   })
 })
 

@@ -26,14 +26,20 @@ export function MonsterEquipmentEquippedToggle({
   return (
     <TooltipProvider>
       <Tooltip>
+        {/*
+         * TooltipTrigger must not merge onto Checkbox — both use `data-state`
+         * (open/closed vs checked/unchecked), which breaks circle checked styling.
+         */}
         <TooltipTrigger interactive asChild>
-          <Checkbox
-            appearance="circle"
-            checked={checked}
-            disabled={disabled}
-            aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}
-            onCheckedChange={(next) => onCheckedChange(next === true)}
-          />
+          <span className="inline-flex shrink-0 self-center">
+            <Checkbox
+              appearance="circle"
+              checked={checked}
+              disabled={disabled}
+              aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}
+              onCheckedChange={(next) => onCheckedChange(next === true)}
+            />
+          </span>
         </TooltipTrigger>
         <TooltipContent arrow side="top">
           {tooltipLabel}

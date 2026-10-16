@@ -35,6 +35,10 @@
     --surface-current: var(--surface-lift);
   }
 
+  .ui-popover-content--tooltip.ui-popover-content--with-arrow {
+    overflow: visible;
+  }
+
   .ui-popover-content--filter {
     width: min(100vw - 2rem, 28rem);
     background-color: var(--popover);

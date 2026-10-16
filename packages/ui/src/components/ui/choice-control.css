@@ -62,7 +62,8 @@
     color: var(--success-foreground);
   }
 
-  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked'] {
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked'],
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true'] {
     background-color: transparent;
     border-color: transparent;
     color: var(--success-foreground);
@@ -81,7 +82,8 @@
     box-sizing: border-box;
   }
 
-  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked']::before {
+  .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked']::before,
+  .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true']::before {
     background-color: var(--success);
     border-color: var(--success);
   }

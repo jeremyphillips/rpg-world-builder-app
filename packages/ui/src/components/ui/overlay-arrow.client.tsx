@@ -12,6 +12,8 @@ export function OverlayArrowSvg({ fill }: OverlayArrowSvgProps) {
   return (
     <svg
       className="ui-overlay-arrow"
+      width={overlayArrowWidth}
+      height={overlayArrowHeight}
       viewBox={`0 0 ${overlayArrowWidth} ${overlayArrowHeight}`}
       preserveAspectRatio="none"
       aria-hidden="true"
