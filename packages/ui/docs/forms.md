@@ -186,6 +186,29 @@ Centralized in `Field.Root` context:
 
 **Hint placement.** `hintPosition`: `below-label` (default) or `below-control`.
 
+### Field recommendations
+
+Optional inline guidance with a quick-add text action — rendered **below the hint and above the
+control** when `hintPosition` is `below-label` (default). Pass `recommendation` on
+[`FormField`](../../packages/ui/src/components/ui/form-field.tsx),
+[`FieldLayout`](../../packages/ui/src/components/ui/field-layout.tsx), or leaf wrappers such as
+[`ComboboxField`](../../packages/ui/src/components/ui/combobox-field.client.tsx).
+
+```ts
+type FieldRecommendation = {
+  content: ReactNode
+  action: { label: string; ariaLabel: string; onClick: () => void }
+}
+```
+
+- **Not** a hint, description, placeholder, or validation message — do not repurpose `hint`.
+- **Not** combobox option `metadata` (dropdown row supporting text).
+- With `hintPosition: 'below-control'` or floating-label fields, recommendation is **omitted**
+  until that layout is designed (dev-only `console.warn`).
+- Dynamic copy/actions: compute in dashboard `kind: 'slot'` `render()` (or static props on
+  hand-built fields) and pass the resolved `FieldRecommendation` object — no separate schema
+  `dependsOn` resolver in `@rpg/ui/form`.
+
 **Requirement:** every field must pass axe. See [AGENTS.md](../../../AGENTS.md) (WCAG 2.2 AA).
 
 ## Form density

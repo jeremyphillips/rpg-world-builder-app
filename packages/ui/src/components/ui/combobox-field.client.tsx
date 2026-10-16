@@ -36,6 +36,7 @@ import { useComposedRef } from './use-composed-ref.client'
 import { resolveFormDensity } from '../../form/form-density'
 import { useComboboxControl } from './use-combobox-control.client'
 import type { FieldLabelPresentationProps } from './field-label-props'
+import type { FieldRecommendation } from './field-recommendation.types'
 
 export type {
   ComboboxFieldOption,
@@ -76,6 +77,7 @@ export interface ComboboxFieldProps
   /** Optional filter row below search — hosts own filter UI and state. */
   filter?: React.ReactNode
   hintPosition?: FieldHintPosition
+  recommendation?: FieldRecommendation | null
   /** Single-select only — inline clear paired with the trigger (see SelectField clearable). */
   clearable?: boolean
   clearAccessibleName?: string
@@ -219,6 +221,7 @@ export function ComboboxField({
   resolveOptionLabel,
   filter,
   hintPosition,
+  recommendation,
   chrome,
   clearable,
   clearAccessibleName,
@@ -252,6 +255,7 @@ export function ComboboxField({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        recommendation={recommendation}
         wrapControl={false}
         labelVisibility={labelVisibility}
         label={

@@ -70,6 +70,30 @@ export const WithError: Story = {
   ),
 }
 
+export const WithRecommendation: Story = {
+  render: () => (
+    <Field.Root id="languages" hint="Choose languages this creature understands." anatomy>
+      <FieldLayout
+        label={<Field.Label>Languages</Field.Label>}
+        recommendation={{
+          content: (
+            <>
+              <span className="font-body-emphasis">Draconic</span> is recommended for the Dragon
+              creature type.
+            </>
+          ),
+          action: {
+            label: '+ Add',
+            ariaLabel: 'Add Draconic',
+            onClick: () => undefined,
+          },
+        }}
+        control={<Input placeholder="Add language" />}
+      />
+    </Field.Root>
+  ),
+}
+
 export const WithInfo: Story = {
   render: () => (
     <Field.Root id="alignment" anatomy>

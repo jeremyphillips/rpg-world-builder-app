@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import {
-  getSenseLabel,
-  LANGUAGE_TERM,
-  nounFromTerm,
-  SENSE_SET_ID,
-  TELEPATHY_MILE_FEET,
-  type SenseId,
-} from '@rpg/contracts'
+import { getSenseLabel, SENSE_SET_ID, TELEPATHY_MILE_FEET, type SenseId } from '@rpg/contracts'
 import { Chip, ChipGroup, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
@@ -28,17 +21,14 @@ import {
 } from '../../../lib/forms/fields/content-sense-range-form-fields'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
-  MONSTER_ADD_LANGUAGE_LABEL,
   MONSTER_ADD_SENSE_LABEL,
   MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL,
   MONSTER_SPEAKS_LABEL,
   MONSTER_TELEPATHY_HINT,
   MONSTER_UNDERSTANDS_ONLY_LABEL,
 } from '../../lib/monster-form-labels'
-import { getCreatureTypeLabel } from '@/features/vocabulary'
-
-import { prepareMonsterLanguageComboboxOptions } from '../../lib/monster-language-combobox-options.lib'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
+import { MonsterCreatureDetailsLanguagesAddField } from './monster-creature-details-languages-add-field'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
 
 export { MonsterCreatureDetailsSkillsSlot } from './monster-creature-details-skills-slot'
@@ -362,68 +352,13 @@ export function MonsterTelepathyRangeField() {
 }
 
 export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormCtx }) {
-  const form = useFormContext<MonsterFormValues>()
   const values = useWatch<MonsterFormValues>() as MonsterFormValues | undefined
-  const languageEntries = values?.proficiencies?.languages ?? []
-  const creatureType = values?.creatureType
-  const selected = useMemo(
-    () => new Set(languageEntries.map((entry) => entry.language)),
-    [languageEntries],
-  )
-  const languageOptions = useMemo(() => {
-    const baseOptions = [...(ctx.languageVocabulary?.activeIds ?? [])]
-      .filter((id) => !selected.has(id))
-      .map((id) => ({
-        value: id,
-        label: ctx.languageVocabulary?.labelById[id] ?? id,
-      }))
-
-    const affinityIds =
-      creatureType && ctx.creatureTypeVocabulary
-        ? (ctx.creatureTypeVocabulary.languageAffinitiesById[creatureType] ?? [])
-        : []
-
-    return prepareMonsterLanguageComboboxOptions({
-      activeLanguageOptions: baseOptions,
-      selectedLanguageIds: selected,
-      affinityLanguageIds: affinityIds,
-      creatureTypeLabel:
-        creatureType && ctx.creatureTypeVocabulary
-          ? getCreatureTypeLabel(ctx.creatureTypeVocabulary, creatureType)
-          : undefined,
-    })
-  }, [creatureType, ctx.creatureTypeVocabulary, ctx.languageVocabulary, selected])
-  const [addLanguageKey, setAddLanguageKey] = useState(0)
 
   if (!values?.proficiencies) return null
 
   return (
     <div className="flex flex-col gap-2">
-      {languageOptions.length > 0 ? (
-        <ComboboxField
-          key={addLanguageKey}
-          id="monster-add-language"
-          label={MONSTER_ADD_LANGUAGE_LABEL}
-          labelVisibility="srOnly"
-          options={languageOptions}
-          multiple={false}
-          enableSearch
-          noun={nounFromTerm(LANGUAGE_TERM)}
-          placeholder={MONSTER_ADD_LANGUAGE_LABEL}
-          value=""
-          onChange={(next) => {
-            if (typeof next !== 'string' || !next) return
-            form.setValue(
-              'proficiencies.languages',
-              [{ language: next }, ...(values.proficiencies.languages ?? [])],
-              {
-                shouldDirty: true,
-              },
-            )
-            setAddLanguageKey((key) => key + 1)
-          }}
-        />
-      ) : null}
+      <MonsterCreatureDetailsLanguagesAddField ctx={ctx} />
       {(values.proficiencies.languages ?? []).map((entry, index) => {
         const label = ctx.languageVocabulary?.labelById[entry.language] ?? entry.language
         const speaks = entry.speaks !== false

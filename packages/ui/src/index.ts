@@ -370,6 +370,12 @@ export {
 } from './components/ui/field-label-content'
 export { FormField } from './components/ui/form-field'
 export { FieldLayout, type FieldLayoutProps } from './components/ui/field-layout'
+export type { FieldRecommendation } from './components/ui/field-recommendation.types'
+export {
+  FieldRecommendationInline,
+  type FieldRecommendationInlineProps,
+} from './components/ui/field-recommendation.client'
+export { resolveFieldLayoutRecommendation } from './components/ui/field-recommendation.lib'
 export {
   FieldControlRegion,
   FieldLabelRegion,

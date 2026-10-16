@@ -19,9 +19,14 @@ const mockCtx: ContentFormCtx = {
     labelById: { darkvision: 'Darkvision', blindsight: 'Blindsight' },
   },
   languageVocabulary: {
-    activeIds: new Set(['common']),
-    labelById: { common: 'Common' },
+    activeIds: new Set(['common', 'draconic']),
+    labelById: { common: 'Common', draconic: 'Draconic' },
     categoryById: {},
+  },
+  creatureTypeVocabulary: {
+    activeIds: new Set(['dragon']),
+    labelById: { dragon: 'Dragon' },
+    languageAffinitiesById: { dragon: ['draconic'] },
   },
   options: {
     skills: {
@@ -103,6 +108,24 @@ export const LanguageRows: Story = {
           savingThrows: [],
           skills: [],
           languages: [{ language: 'common' }],
+          weapons: { categories: [], items: [] },
+        },
+      }}
+    >
+      <MonsterCreatureDetailsLanguagesSlot ctx={mockCtx} />
+    </FormHarness>
+  ),
+}
+
+export const LanguageRecommendation: Story = {
+  render: () => (
+    <FormHarness
+      defaultValues={{
+        creatureType: 'dragon',
+        proficiencies: {
+          savingThrows: [],
+          skills: [],
+          languages: [],
           weapons: { categories: [], items: [] },
         },
       }}

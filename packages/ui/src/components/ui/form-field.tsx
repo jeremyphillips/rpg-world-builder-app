@@ -24,6 +24,9 @@ import {
 } from './field.variants'
 import type { FieldWidth } from './field-control.variants'
 import { cn } from '../../lib/utils'
+import type { FieldRecommendation } from './field-recommendation.types'
+import { FieldRecommendationInline } from './field-recommendation.client'
+import { resolveFieldLayoutRecommendation } from './field-recommendation.lib'
 
 export interface FormFieldProps {
   id: string
@@ -33,6 +36,7 @@ export interface FormFieldProps {
   describedBy?: string
   hint?: string
   hintPosition?: FieldHintPosition
+  recommendation?: FieldRecommendation | null
   /** Optional info-icon content rendered as an `[i]` tooltip beside the label. */
   info?: ReactNode
   required?: boolean
@@ -79,6 +83,7 @@ export function FormField({
   describedBy,
   hint,
   hintPosition,
+  recommendation,
   info,
   required,
   size = 'md',
@@ -90,6 +95,7 @@ export function FormField({
   children,
 }: FormFieldProps) {
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
+  const resolvedRecommendation = resolveFieldLayoutRecommendation(hintPosition, recommendation)
 
   if (labelPosition === 'settings') {
     const presentation = resolveFieldPresentation({
@@ -103,6 +109,9 @@ export function FormField({
           <div className={fieldLabelHintStackClasses}>
             {labelNode(label, info, labelVisibility, required)}
             <Field.Hint />
+            {resolvedRecommendation ? (
+              <FieldRecommendationInline recommendation={resolvedRecommendation} />
+            ) : null}
           </div>
           <div className={presentation.controlBandClassName}>
             <Field.Control>{children}</Field.Control>
@@ -154,6 +163,7 @@ export function FormField({
     >
       <FieldLayout
         hintPosition={hintPosition}
+        recommendation={recommendation}
         labelVisibility={labelVisibility}
         label={labelNode(label, info, labelVisibility, required)}
         control={children}

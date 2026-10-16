@@ -124,7 +124,6 @@ export function creatureDetailsFields(ctx: ContentFormCtx): FormItem[] {
         {
           kind: 'slot',
           name: 'proficiencies.languages',
-          heading: { label: 'Languages' },
           render: () => <MonsterCreatureDetailsLanguagesSlot ctx={ctx} />,
         },
       ],
