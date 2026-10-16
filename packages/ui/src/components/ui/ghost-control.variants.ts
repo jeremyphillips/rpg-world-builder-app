@@ -1,6 +1,6 @@
 /**
  * Shared ghost **visual-state** classes — rest/hover/active/open fills only.
- * Geometry, focus rings, and hit targets stay on each control (Button, FilterInlineControl, …).
+ * Geometry, focus rings, and hit targets stay on each control (Button, SortMenu, …).
  * Not used for Badge `appearance` or Select field-input chrome.
  */
 export const ghostControlVisualStateClasses =

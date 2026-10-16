@@ -189,7 +189,11 @@ item cards keep their own shell model.
 
 **Choice indicators** (radio, checkbox, RadioCard decorative control) use
 `border-choice-control` (`--choice-control-border`), composed toward `--surface-current` — not
-`border-input`.
+`border-input`. Checkbox `tone` (`default`, `success`, `warning`, `destructive`) sets
+`--choice-indicator-*` and `--choice-surface-*` from one `[data-choice-tone]` map in
+`choice-control.css`. `BooleanField` inherits that map for its checked surface. Labels stay
+`--foreground`. Unchecked chrome stays neutral. Focus on a BooleanField paints
+`--ui-focus-ring-standalone` on the container.
 
 ## Visual acceptance checklist
 

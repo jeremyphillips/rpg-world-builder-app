@@ -1,0 +1,116 @@
+/*
+ * Outlined boolean field. Indicator color comes from [data-choice-tone] in choice-control.css.
+ * Size cascade: heading inline, explicit data-size, card data-content-density, then data-field-scale.
+ */
+@layer components {
+  .ui-boolean-field {
+    display: inline-flex;
+    width: auto;
+    max-width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--interactive-outline-border);
+    border-radius: calc(var(--radius) - 2px);
+    background-color: transparent;
+    color: var(--foreground);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .ui-boolean-field[data-field-scale='sm']:not([data-size]) {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-boolean-field[data-size='sm'] {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-boolean-field[data-size='md'] {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  [data-content-density='compact'] .ui-boolean-field:not([data-size]) {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  [data-content-density='comfortable'] .ui-boolean-field:not([data-size]) {
+    height: var(--control-height-md);
+    padding-inline: var(--field-padding-md);
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+
+  [data-heading-inline] .ui-boolean-field,
+  [data-heading-inline] .ui-boolean-field[data-size] {
+    height: var(--control-height-sm);
+    padding-inline: var(--field-padding-sm);
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+
+  .ui-boolean-field__label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ui-boolean-field[data-checked='true'] {
+    background-color: var(--choice-surface-bg);
+    border-color: var(--choice-surface-border);
+  }
+
+  .ui-boolean-field[data-checked='false']:hover:not([data-disabled='true']) {
+    background-color: var(--control-hover-bg);
+  }
+
+  .ui-boolean-field[data-checked='true']:hover:not([data-disabled='true']) {
+    background-color: var(--choice-surface-bg-hover);
+  }
+
+  .ui-boolean-field[data-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
+  }
+
+  .ui-boolean-field[data-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .ui-boolean-field .ui-choice-control:disabled {
+    opacity: 1;
+  }
+
+  .ui-boolean-field .ui-focus-ring:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .ui-boolean-field:has(:focus-visible) {
+    outline: none;
+    box-shadow: var(--ui-focus-ring-standalone);
+  }
+}

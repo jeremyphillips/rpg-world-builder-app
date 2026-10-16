@@ -108,7 +108,9 @@ function IdentityRowHeadingContent({
             >
               {heading}
             </span>
-            <span className="shrink-0 self-center">{headingInline}</span>
+            <span className="shrink-0 self-center" data-heading-inline="">
+              {headingInline}
+            </span>
           </InlineMetadata.Item>
         ) : (
           <InlineMetadata.Item

@@ -36,6 +36,7 @@ export function EntityCardFrame({
     <article
       className={cn(entityCardFrameVariants({ density, surface, disabled, edges }))}
       style={{ ...leadingChromeStyle, ...style }}
+      data-content-density={density}
       data-disabled={disabled ? true : undefined}
       data-entity-surface-start={edges.start}
       data-entity-surface-end={edges.end}

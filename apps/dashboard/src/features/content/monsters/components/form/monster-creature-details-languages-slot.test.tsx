@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
@@ -42,8 +42,14 @@ function Harness({
   return (
     <FormProvider {...form}>
       <MonsterCreatureDetailsLanguagesSlot ctx={ctx} />
+      <SpeaksProbe />
     </FormProvider>
   )
+}
+
+function SpeaksProbe() {
+  const speaks = useFormContext<MonsterFormValues>().watch('proficiencies.languages.0.speaks')
+  return <output data-testid="speaks">{speaks === false ? 'false' : 'unset'}</output>
 }
 
 describe('MonsterCreatureDetailsLanguagesSlot fluency chips', () => {
@@ -66,6 +72,27 @@ describe('MonsterCreatureDetailsLanguagesSlot fluency chips', () => {
       'aria-checked',
       'false',
     )
+  })
+
+  it('writes speaks false when understands only is checked and clears it when unchecked', async () => {
+    const user = userEvent.setup()
+    render(
+      <Harness
+        defaultValues={{
+          proficiencies: {
+            savingThrows: [],
+            skills: [],
+            languages: [{ language: 'common' }],
+            weapons: { categories: [], items: [] },
+          },
+        }}
+      />,
+    )
+
+    await user.click(screen.getByRole('checkbox', { name: MONSTER_UNDERSTANDS_ONLY_LABEL }))
+    expect(screen.getByTestId('speaks')).toHaveTextContent('false')
+    await user.click(screen.getByRole('checkbox', { name: MONSTER_UNDERSTANDS_ONLY_LABEL }))
+    expect(screen.getByTestId('speaks')).toHaveTextContent('unset')
   })
 })
 

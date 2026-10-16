@@ -17,6 +17,7 @@ describe('MonsterEquipmentEquippedToggle', () => {
     const checkbox = screen.getByRole('checkbox', { name: 'Equipped: Battleaxe' })
     expect(checkbox).toHaveAttribute('data-state', 'checked')
     expect(checkbox).toHaveAttribute('aria-checked', 'true')
+    expect(checkbox).toHaveAttribute('data-choice-tone', 'success')
     expect(checkbox).toHaveClass('ui-focus-ring--embedded', 'ui-choice-control--circle-expand')
     expect(checkbox.querySelector('.ui-choice-control__expand-label')).toHaveTextContent('Unequip')
     expect(checkbox.querySelector('.ui-choice-control__expand-reserve')).toHaveTextContent('Equip')

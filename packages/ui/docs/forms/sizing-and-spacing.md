@@ -243,7 +243,7 @@ remains a direct fieldset child). Row `items-end` still targets label + control 
 first-line control columns (`h-4` / `h-5`) inside a `content-sized` band. In anatomy rows
 (schema `kind: 'row'` and compact array inline rows), inline toggles normalize to a
 `single-line` control band; hints and errors render in the message region. Filter booleans
-(no hint stack) use a full single-line band with checkbox + label inside.
+(no hint stack) render `BooleanField`, which takes its scale from filter chrome.
 
 Product convention: **filters use checkboxes; switches are for persistent
 settings/mutations** (no new filter field type).

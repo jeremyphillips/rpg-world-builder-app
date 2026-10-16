@@ -7,7 +7,7 @@ import {
 } from '@rpg/contracts'
 import { proficiencyDomainFieldNoun } from '@rpg/contracts'
 import {
-  Chip,
+  BooleanField,
   cn,
   ComboboxField,
   SemanticText,
@@ -19,7 +19,6 @@ import {
 import { useFormContext } from 'react-hook-form'
 
 import { entityAnatomyTrailingGroupSecondaryVariants } from '../../../lib/entity/anatomy/entity-anatomy-trailing.variants'
-import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
@@ -125,27 +124,23 @@ function MonsterSkillProficiencyRowTrailing({
   values: MonsterFormValues
 }) {
   const form = useFormContext<MonsterFormValues>()
-  const { chipSize } = useEntityCardUtilityControlSizes()
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       <MonsterSkillProficiencyModifier display={modifierDisplay} />
-      <Chip
+      <BooleanField
         id={`monster-skill-${row.skill}-expertise`}
-        mode="selectable"
-        size={chipSize}
-        selectionRole="checkbox"
-        selected={row.rank === 'expertise'}
-        onSelectedChange={(selected) => {
+        label={PROFICIENCY_RANK_ENTRIES.expertise.label}
+        tone="success"
+        checked={row.rank === 'expertise'}
+        onCheckedChange={(selected) => {
           form.setValue(
             `proficiencies.skills.${index}.rank`,
             (selected ? 'expertise' : 'proficient') satisfies ProficiencyRank,
             { shouldDirty: true },
           )
         }}
-      >
-        {PROFICIENCY_RANK_ENTRIES.expertise.label}
-      </Chip>
+      />
       <MonsterCreatureDetailsRemoveRowButton
         label={skillLabel}
         onRemove={() =>

@@ -5,6 +5,7 @@ import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
 import { Check } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
+import type { ChoiceTone } from './choice-control.styles'
 import {
   UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
   UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS,
@@ -18,6 +19,8 @@ import {
 
 export type CheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> & {
   appearance?: CheckboxAppearance
+  /** Checked indicator color. Unchecked chrome stays neutral. */
+  tone?: ChoiceTone
   /** Dense inline headings and row chrome use `embedded`; default forms use `standalone`. */
   focusContext?: ChoiceControlFocusContext
   /**
@@ -37,6 +40,7 @@ const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Ro
     {
       className,
       appearance = 'default',
+      tone = 'default',
       focusContext = 'standalone',
       expandLabel,
       expandLabelReserve,
@@ -57,6 +61,7 @@ const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Ro
           className,
         )}
         {...props}
+        data-choice-tone={tone}
       >
         <CheckboxPrimitive.Indicator className={cn(UI_CHOICE_CONTROL_MARK_CLASS)}>
           <Check aria-hidden />

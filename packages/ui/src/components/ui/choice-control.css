@@ -3,6 +3,50 @@
  * Source order: block → shared states → kind modifiers → indicator sizes → thumb → marks.
  */
 @layer components {
+  /*
+   * One tone map for checkbox indicators and BooleanField surfaces.
+   * Unchecked chrome does not read these variables.
+   */
+  [data-choice-tone='default'] {
+    --choice-indicator-fill: var(--primary);
+    --choice-indicator-border: var(--primary);
+    --choice-indicator-foreground: var(--primary-foreground);
+    --choice-surface-bg: var(--interactive-outline-active-bg);
+    --choice-surface-border: var(--border);
+    --choice-surface-bg-hover: color-mix(in oklch, var(--primary) 12%, var(--choice-surface-bg));
+  }
+
+  [data-choice-tone='success'] {
+    --choice-indicator-fill: var(--success);
+    --choice-indicator-border: var(--success);
+    --choice-indicator-foreground: var(--success-foreground);
+    --choice-surface-bg: var(--success-subtle);
+    --choice-surface-border: var(--success-muted);
+    --choice-surface-bg-hover: color-mix(in oklch, var(--success) 12%, var(--choice-surface-bg));
+  }
+
+  [data-choice-tone='warning'] {
+    --choice-indicator-fill: var(--warning);
+    --choice-indicator-border: var(--warning);
+    --choice-indicator-foreground: var(--warning-foreground);
+    --choice-surface-bg: var(--warning-subtle);
+    --choice-surface-border: var(--warning-muted);
+    --choice-surface-bg-hover: color-mix(in oklch, var(--warning) 12%, var(--choice-surface-bg));
+  }
+
+  [data-choice-tone='destructive'] {
+    --choice-indicator-fill: var(--destructive);
+    --choice-indicator-border: var(--destructive);
+    --choice-indicator-foreground: var(--destructive-foreground);
+    --choice-surface-bg: var(--destructive-subtle);
+    --choice-surface-border: var(--destructive-muted);
+    --choice-surface-bg-hover: color-mix(
+      in oklch,
+      var(--destructive) 12%,
+      var(--choice-surface-bg)
+    );
+  }
+
   .ui-choice-control {
     flex-shrink: 0;
     cursor: pointer;
@@ -39,8 +83,13 @@
   }
 
   .ui-choice-control--checkbox[data-state='checked'] {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
+    background-color: var(--choice-indicator-fill, var(--primary));
+    border-color: var(--choice-indicator-border, var(--primary));
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
+  }
+
+  .ui-choice-control--checkbox[data-state='checked'][aria-invalid='true'] {
+    border-color: var(--field-control-border-invalid);
   }
 
   .ui-choice-control--checkbox .ui-choice-control__mark svg {
@@ -58,7 +107,7 @@
     border-color: transparent;
     background-color: transparent;
     border-radius: 9999px;
-    color: var(--success-foreground);
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
   }
 
   .ui-choice-control--checkbox.ui-choice-control--circle:not(:focus-visible) {
@@ -69,7 +118,7 @@
   .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true'] {
     background-color: transparent;
     border-color: transparent;
-    color: var(--success-foreground);
+    color: var(--choice-indicator-foreground, var(--primary-foreground));
   }
 
   .ui-choice-control--checkbox.ui-choice-control--circle::before {
@@ -87,8 +136,8 @@
 
   .ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked']::before,
   .ui-choice-control--checkbox.ui-choice-control--circle[aria-checked='true']::before {
-    background-color: var(--success);
-    border-color: var(--success);
+    background-color: var(--choice-indicator-fill, var(--primary));
+    border-color: var(--choice-indicator-border, var(--primary));
   }
 
   .ui-choice-control--checkbox.ui-choice-control--circle[aria-invalid='true'] {
@@ -111,7 +160,7 @@
   .ui-choice-control--checkbox.ui-choice-control--circle .ui-choice-control__mark svg {
     width: var(--icon-glyph-xs);
     height: var(--icon-glyph-xs);
-    color: var(--success-foreground);
+    color: currentColor;
   }
 
   .ui-choice-control--checkbox.ui-choice-control--circle[data-state='indeterminate']

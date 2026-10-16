@@ -31,13 +31,11 @@ import {
 } from '../components/ui/compact-label.lib'
 import {
   UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
-  UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES,
   UI_FIELD_CONTROL_MULTILINE_SIZE_CLASSES,
   UI_FIELD_CONTROL_SIZE_CLASSES,
   FIELD_CONTROL_DIGITS_SIZE_SPECS,
   FIELD_CONTROL_MULTILINE_SIZE_SPECS,
   FIELD_CONTROL_SIZE_SPECS,
-  FILTER_INLINE_APPEARANCE_SPECS,
 } from '../components/ui/field-control.styles'
 import {
   UI_FIELD_GROUP_SIZE_CLASSES,
@@ -122,11 +120,6 @@ describe('semantic-control-class-groups sync', () => {
       UI_FIELD_CONTROL_DIGITS_SIZE_CLASSES,
       FIELD_CONTROL_DIGITS_SIZE_SPECS.map((spec) => spec.className),
       'field digit sizes',
-    )
-    expectSameSet(
-      UI_FIELD_CONTROL_FILTER_APPEARANCE_CLASSES,
-      FILTER_INLINE_APPEARANCE_SPECS.map((spec) => spec.className),
-      'filter appearances',
     )
     expectSameSet(
       UI_CHOICE_CONTROL_KIND_CLASSES,

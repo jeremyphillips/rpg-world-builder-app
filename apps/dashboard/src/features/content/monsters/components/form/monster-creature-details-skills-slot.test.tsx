@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { FormProvider, useForm } from 'react-hook-form'
 
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -32,9 +33,11 @@ const mockCtx: ContentFormCtx = {
 
 function Harness({ defaultValues }: { defaultValues: Partial<MonsterFormValues> }) {
   const form = useForm<MonsterFormValues>({ defaultValues: defaultValues as MonsterFormValues })
+  const rank = form.watch('proficiencies.skills.0.rank')
   return (
     <FormProvider {...form}>
       <MonsterCreatureDetailsSkillsSlot ctx={mockCtx} />
+      <output data-testid="rank">{rank}</output>
     </FormProvider>
   )
 }
@@ -67,6 +70,16 @@ describe('MonsterCreatureDetailsSkillsSlot', () => {
       'aria-checked',
       'false',
     )
+  })
+
+  it('toggles expertise without a challenge rating', async () => {
+    const user = userEvent.setup()
+    render(<Harness defaultValues={skillRowDefaults} />)
+
+    await user.click(screen.getByRole('checkbox', { name: 'Expertise' }))
+    expect(screen.getByTestId('rank')).toHaveTextContent('expertise')
+    await user.click(screen.getByRole('checkbox', { name: 'Expertise' }))
+    expect(screen.getByTestId('rank')).toHaveTextContent('proficient')
   })
 
   it('shows an em dash with tooltip hint when challenge rating is missing', () => {

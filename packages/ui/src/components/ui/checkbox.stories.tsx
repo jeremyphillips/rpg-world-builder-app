@@ -53,17 +53,29 @@ export const ClassReference: Story = {
   },
 }
 
+export const ToneSuccess: Story = { args: { defaultChecked: true, tone: 'success' } }
+
+export const ToneWarning: Story = { args: { defaultChecked: true, tone: 'warning' } }
+
+export const ToneDestructive: Story = { args: { defaultChecked: true, tone: 'destructive' } }
+
 export const CircleUnchecked: Story = {
-  args: { appearance: 'circle', 'aria-label': 'Equip longsword' },
+  args: { appearance: 'circle', tone: 'success', 'aria-label': 'Equip longsword' },
 }
 
 export const CircleChecked: Story = {
-  args: { appearance: 'circle', 'aria-label': 'Unequip longsword', defaultChecked: true },
+  args: {
+    appearance: 'circle',
+    tone: 'success',
+    'aria-label': 'Unequip longsword',
+    defaultChecked: true,
+  },
 }
 
 export const CircleCheckedDisabled: Story = {
   args: {
     appearance: 'circle',
+    tone: 'success',
     'aria-label': 'Equipped longsword',
     defaultChecked: true,
     disabled: true,
@@ -71,7 +83,7 @@ export const CircleCheckedDisabled: Story = {
 }
 
 export const CircleInvalid: Story = {
-  args: { appearance: 'circle', 'aria-label': 'Equip item', 'aria-invalid': true },
+  args: { appearance: 'circle', tone: 'success', 'aria-label': 'Equip item', 'aria-invalid': true },
 }
 
 const cardChromeClasses =
@@ -99,16 +111,28 @@ export const CircleOnCardSurface: Story = {
   render: () => (
     <div className={cardChromeClasses}>
       <CircleOnCardRow label="Unchecked">
-        <Checkbox appearance="circle" aria-label="Equip item" />
+        <Checkbox appearance="circle" tone="success" aria-label="Equip item" />
       </CircleOnCardRow>
       <CircleOnCardRow label="Checked">
-        <Checkbox appearance="circle" aria-label="Unequip item" defaultChecked />
+        <Checkbox appearance="circle" tone="success" aria-label="Unequip item" defaultChecked />
       </CircleOnCardRow>
       <CircleOnCardRow label="Checked disabled">
-        <Checkbox appearance="circle" aria-label="Equipped item" defaultChecked disabled />
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          aria-label="Equipped item"
+          defaultChecked
+          disabled
+        />
       </CircleOnCardRow>
       <CircleOnCardRow label="Focus (Tab here)">
-        <Checkbox appearance="circle" aria-label="Focus demo checked" defaultChecked autoFocus />
+        <Checkbox
+          appearance="circle"
+          tone="success"
+          aria-label="Focus demo checked"
+          defaultChecked
+          autoFocus
+        />
       </CircleOnCardRow>
     </div>
   ),
@@ -130,6 +154,7 @@ export const CircleExpandOnCard: Story = {
         <span className="min-w-0 truncate text-sm font-medium">Battleaxe</span>
         <Checkbox
           appearance="circle"
+          tone="success"
           focusContext="embedded"
           expandLabel="Unequip"
           expandLabelReserve="Equip"
@@ -144,6 +169,7 @@ export const CircleExpandOnCard: Story = {
         </span>
         <Checkbox
           appearance="circle"
+          tone="success"
           focusContext="embedded"
           expandLabel="Equip"
           expandLabelReserve="Unequip"
@@ -157,6 +183,7 @@ export const CircleExpandOnCard: Story = {
         <span className="min-w-0 truncate text-sm font-medium">Edge</span>
         <Checkbox
           appearance="circle"
+          tone="success"
           focusContext="embedded"
           expandLabel="Unequip"
           expandLabelReserve="Equip"
@@ -168,6 +195,7 @@ export const CircleExpandOnCard: Story = {
         <span className="text-sm font-medium">Disabled</span>
         <Checkbox
           appearance="circle"
+          tone="success"
           focusContext="embedded"
           expandLabel="Unequip"
           expandLabelReserve="Equip"
@@ -199,6 +227,7 @@ export const CircleEmbeddedInHeading: Story = {
         <span className="inline-flex shrink-0 self-center">
           <Checkbox
             appearance="circle"
+            tone="success"
             focusContext="embedded"
             aria-label="Unequip +1 Flaming Battleaxe of Very Long Names"
             defaultChecked
@@ -212,6 +241,7 @@ export const CircleEmbeddedInHeading: Story = {
         <span className="inline-flex shrink-0 self-center">
           <Checkbox
             appearance="circle"
+            tone="success"
             focusContext="standalone"
             aria-label="Standalone focus comparison"
             defaultChecked

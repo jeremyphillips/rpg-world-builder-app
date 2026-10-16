@@ -14,6 +14,14 @@ import {
 import { Checkbox } from './checkbox.client'
 
 describe('Checkbox', () => {
+  it('sets the default choice tone and a requested semantic tone', () => {
+    const { rerender } = render(<Checkbox aria-label="Accept terms" defaultChecked />)
+    expect(screen.getByLabelText('Accept terms')).toHaveAttribute('data-choice-tone', 'default')
+
+    rerender(<Checkbox aria-label="Accept terms" tone="success" defaultChecked />)
+    expect(screen.getByLabelText('Accept terms')).toHaveAttribute('data-choice-tone', 'success')
+  })
+
   it('emits semantic choice-control classes', () => {
     render(<Checkbox aria-label="Accept terms" />)
     expect(screen.getByLabelText('Accept terms')).toHaveClass(

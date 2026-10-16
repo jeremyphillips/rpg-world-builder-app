@@ -1,6 +1,5 @@
 export type {
   BooleanFilterFieldDef,
-  BooleanFilterShellVariant,
   ChipsFilterFieldDef,
   ChipsSelectionMode,
   FilterCatalogLayoutConfig,
@@ -104,7 +103,6 @@ export { FilterFieldRenderer, type FilterRenderContext } from './filter-field-re
 export { FilterFieldCaption, type FilterFieldCaptionProps } from './filter-field-caption.client'
 export { FilterFloatingField } from './filter-floating-field.client'
 export { FilterFieldList } from './filter-fields.client'
-export { FilterInlineControl, type FilterInlineControlProps } from './filter-inline-control.client'
 export {
   CatalogFilterControls,
   type CatalogFilterControlsProps,

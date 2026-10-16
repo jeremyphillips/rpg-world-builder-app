@@ -29,6 +29,7 @@ export function MonsterEquipmentEquippedToggle({
   return (
     <Checkbox
       appearance="circle"
+      tone="success"
       focusContext="embedded"
       expandLabel={expandLabel}
       expandLabelReserve={expandLabelReserve}

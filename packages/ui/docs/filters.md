@@ -476,7 +476,7 @@ Import from `@rpg/ui/filters` unless noted:
 - `FilterBar` — `placement: 'primary'` fields and optional **Clear filters** (advanced toggle owned by `DataTableFilterChrome` / `DataTableFilterRegion`); `orientation: 'vertical'` stacks compact field rows without full-width controls by default. **Clear filters** button size follows `resolveFilterChromePresentation` (compact → `sm`, comfortable → `md`).
 - `ActiveFilterChips` — data-only chip summaries with central `onClear(fieldId)` / optional `onClearAll` (shown when 2+ chips)
 - `resolveActiveFilterChips(schema, state)` — derives chips from modified fields; boolean chips use natural copy (`Unread only`, not `Unread only: Yes`)
-- `FilterInlineControl` — shared inline boolean shell (native checkbox + label). Default `variant="outline"`; opt in with field `shellVariant: 'ghost'` (or `FilterInlineControl` `variant="ghost"`) for toolbar surfaces. Appearance is orthogonal to filter density/size.
+- Boolean filters render `BooleanField`. Checked writes `true`; clearing writes `undefined`. Density follows filter chrome.
 - `DataTableFilterChrome` (`@rpg/ui`) — canonical datatable composition; see table above.
 - `DataTableFilterRegion` (`@rpg/ui`) — low-level layout primitive; see table above.
 
@@ -558,7 +558,7 @@ Filter bars share control-band + control-edge alignment with forms. Ownership li
 | Common primary labels | Hidden for search. Select captions follow layout resolution                                                                                       |
 | Stacked labels        | Explicit `layout: 'stacked'`, or omitted layout outside a floating catalog region                                                                 |
 | Floating labels       | Catalog regions (`selectPresentation: 'floating'`) and explicit `layout: 'floating'`. See [floating-label-fields.md](./floating-label-fields.md). |
-| Booleans              | Checkbox + label inside a single-line control band — **not** switches                                                                             |
+| Booleans              | `BooleanField` (outlined checkbox + label). Checked is `true`; clearing the box writes `undefined`.                                               |
 
 `resolveFilterFieldPresentation` delegates band/size to `resolveFieldPresentation` and
 maps the resolved select layout (`stacked` → stacked, `inline` → inline, `floating` →

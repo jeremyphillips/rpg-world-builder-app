@@ -937,6 +937,8 @@ export {
   resolveSelectSizingGhostLabels,
 } from './components/ui/select-trigger.lib'
 export { Checkbox } from './components/ui/checkbox.client'
+export { BooleanField, type BooleanFieldProps } from './components/ui/boolean-field.client'
+export type { ChoiceTone } from './components/ui/choice-control.styles'
 export { RadioGroup, RadioGroupItem } from './components/ui/radio-group.client'
 export { Switch } from './components/ui/switch.client'
 

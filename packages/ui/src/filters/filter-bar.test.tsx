@@ -145,7 +145,7 @@ describe('FilterBar', () => {
     expect(screen.queryByLabelText('Hidden only')).not.toBeInTheDocument()
 
     await user.click(screen.getByRole('button', { name: /Additional filters/i }))
-    expect(screen.getByText('Status')).toHaveClass('text-xs')
+    expect(screen.getByText('Status')).toHaveClass('text-style-caption')
     expect(screen.getByLabelText('Hidden only')).toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: /reset additional filters/i }),
@@ -273,10 +273,9 @@ describe('FilterBar', () => {
     const checkbox = screen.getByLabelText('Has Spellcasting')
     const checkboxShell = checkbox.closest('[data-field-align]')
 
-    expect(combobox).toHaveClass('bg-input')
-    expect(checkboxShell).toBeTruthy()
-    expect(checkboxShell).toHaveClass('bg-transparent', 'border-interactive-outline', 'rounded-md')
-    expect(checkboxShell).not.toHaveClass('bg-input')
+    expect(combobox).toHaveClass('ui-field-control')
+    expect(checkboxShell).toHaveClass('ui-boolean-field')
+    expect(checkboxShell).not.toHaveClass('ui-field-control')
   })
 
   it('stacks primary fields vertically without forcing full-width controls', () => {

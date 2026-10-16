@@ -111,7 +111,7 @@ describe('filter-presentation.lib', () => {
     expect(presentation.type).toBe('select')
     if (presentation.type === 'select') {
       expect(presentation.groupClassName).toContain('flex-col')
-      expect(presentation.labelClassName).toContain('text-xs')
+      expect(presentation.labelClassName).toContain('text-style-caption')
     }
   })
 

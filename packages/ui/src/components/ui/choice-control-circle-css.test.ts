@@ -7,6 +7,13 @@ const cssPath = join(dirname(fileURLToPath(import.meta.url)), 'choice-control.cs
 const css = readFileSync(cssPath, 'utf8')
 
 describe('choice-control circle appearance CSS', () => {
+  it('reads checked circle fill from the shared choice tone variables', () => {
+    expect(css).toContain("[data-choice-tone='success']")
+    expect(css).toContain('var(--choice-indicator-fill, var(--primary))')
+    expect(css).not.toContain('background-color: var(--success)')
+    expect(css).not.toContain('color: var(--success-foreground)')
+  })
+
   it('keeps the checked root transparent and hides indeterminate marks', () => {
     expect(css).toContain(
       ".ui-choice-control--checkbox.ui-choice-control--circle[data-state='checked'],",

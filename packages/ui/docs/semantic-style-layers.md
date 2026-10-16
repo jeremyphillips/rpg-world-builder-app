@@ -49,7 +49,7 @@ Tailwind v4 preflight sets `button { cursor: default }`. `@rpg/ui/styles.css` re
 ### Ghost visual state (`ghostControlVisualStateClasses`)
 
 Shared **fill/hover/active/open** classes for toolbar ghost chrome (`Button variant="ghost"`,
-`FilterInlineControl variant="ghost"`, `SortMenu` trigger). Geometry and focus rings stay on
+`SortMenu` trigger). Geometry and focus rings stay on
 each control. Do not confuse with Select **sizing ghosts** (invisible width-reserve spans) or
 Badge `appearance`.
 
@@ -57,7 +57,7 @@ Badge `appearance`.
 
 Migrated controls emit BEM-style `ui-*` modifiers from `*.variants.ts` / `*.styles.ts`; height,
 padding, gap, and indicator geometry live in co-located `*.css` (`button.css`, `field-control.css`,
-`field-group.css`, `choice-control.css`, `floating-label-field.css`, `compact-control.css`).
+`field-group.css`, `choice-control.css`, `boolean-field.css`, `floating-label-field.css`, `compact-control.css`).
 `semantic-control-variants-geometry-ban.test.ts` blocks raw `h-*`, `px-*`, `text-xs|sm|md|base`,
 and `[&_svg]:size-*` from returning to those CVA modules.
 

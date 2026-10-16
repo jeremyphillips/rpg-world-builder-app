@@ -251,7 +251,7 @@
   );
 
   /*
-   * Interactive outline chrome — shared by outline Button, FilterInlineControl, and similar shells.
+   * Interactive outline chrome — shared by outline Button, BooleanField, and similar shells.
    * Border uses foreground mix; hover/active washes use primary for warmth on inherited plane.
    * Tailwind bg utilities are @utility defs in surface-relative-chrome.utilities.css.
    */

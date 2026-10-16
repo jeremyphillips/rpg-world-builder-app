@@ -16,6 +16,10 @@ export const UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS = 'ui-choice-control__expand-cl
 
 export const UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS = 'ui-choice-control__expand-reserve' as const
 
+export const CHOICE_TONES = ['default', 'success', 'warning', 'destructive'] as const
+
+export type ChoiceTone = (typeof CHOICE_TONES)[number]
+
 export type ChoiceControlKind = 'checkbox' | 'radio' | 'switch'
 
 export type ChoiceControlKindSpec = {

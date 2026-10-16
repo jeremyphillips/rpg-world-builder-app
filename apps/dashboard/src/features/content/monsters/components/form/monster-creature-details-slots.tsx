@@ -8,7 +8,7 @@ import {
   TELEPATHY_MILE_FEET,
   type SenseId,
 } from '@rpg/contracts'
-import { Chip, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
+import { BooleanField, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
 import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
@@ -141,26 +141,21 @@ function MonsterLanguageFluencyRowTrailing({
   values: MonsterFormValues
 }) {
   const form = useFormContext<MonsterFormValues>()
-  const { chipSize } = useEntityCardUtilityControlSizes()
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <Chip
+      <BooleanField
         id={`monster-language-${entry.language}-understands-only`}
-        mode="selectable"
-        size={chipSize}
-        selectionRole="checkbox"
-        selected={!speaks}
-        onSelectedChange={(understandsOnly) => {
+        label={MONSTER_UNDERSTANDS_ONLY_LABEL}
+        checked={!speaks}
+        onCheckedChange={(understandsOnly) => {
           form.setValue(
             `proficiencies.languages.${index}.speaks`,
             understandsOnly ? false : undefined,
             { shouldDirty: true },
           )
         }}
-      >
-        {MONSTER_UNDERSTANDS_ONLY_LABEL}
-      </Chip>
+      />
       <MonsterCreatureDetailsRemoveRowButton
         label={label}
         onRemove={() =>

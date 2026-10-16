@@ -55,7 +55,9 @@ export function ContentCardHeading({
           className={cn(contentCardMixedHeadingNameVariants(), 'flex min-w-0 items-center gap-1')}
         >
           <span className="min-w-0 truncate">{heading}</span>
-          <span className="shrink-0 self-center">{headingInline}</span>
+          <span className="shrink-0 self-center" data-heading-inline="">
+            {headingInline}
+          </span>
         </span>
       </div>
     )
@@ -69,7 +71,9 @@ export function ContentCardHeading({
             <span className={cn(contentCardMixedHeadingNameVariants(), 'min-w-0 truncate')}>
               {heading}
             </span>
-            <span className="shrink-0 self-center">{headingInline}</span>
+            <span className="shrink-0 self-center" data-heading-inline="">
+              {headingInline}
+            </span>
           </InlineMetadata.Item>
         ) : (
           <InlineMetadata.Item truncate className={contentCardMixedHeadingNameVariants()}>

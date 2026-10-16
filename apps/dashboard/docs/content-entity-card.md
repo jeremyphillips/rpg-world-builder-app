@@ -622,7 +622,7 @@ AddPendingWorkflow
 └── composing slot    → CreateComposition* + domain-owned discovery / forms / child footer
 ```
 
-**`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only.
+**`headingInline`** — optional intrinsic-width slot immediately after the title (not `headingEndValue`). Heading links wrap title text only. The slot is marked `data-heading-inline`, which forces a nested `BooleanField` to `sm`. Card frames publish `data-content-density` so a compact card resolves that field to `sm` and a comfortable card to `md`, ahead of the surrounding form density. Trailing utility controls keep their own `xs` scale.
 
 **`ContentEntityCard` must not expand.** Do not add collapse, composer, or
 relationship-kind props to CEC. Discovery uses CEC + trailing **Select**
