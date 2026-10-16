@@ -846,6 +846,8 @@ export interface ComboboxFieldConfig extends BaseFieldConfig {
   filterSelectsResolve?: FieldDynamicComboboxFilterSelects
   /** When false, omits the panel search row (keyboard nav targets the listbox). */
   enableSearch?: boolean
+  /** Overrides generated `Search {plural}…` panel copy. */
+  searchPlaceholder?: string
   optionAvailability?: FieldOptionAvailability
   /**
    * Resolves display labels for selected values that are not in the current `options`

@@ -1,3 +1,4 @@
+import { resolveSearchPlaceholder } from '../../../form-copy/messages'
 import type { ContentTypeKey } from '../../primitives/content/content-type-keys'
 import { getContentTypeTerm } from '../../content/lib/content-type-terms'
 import { getTermSentenceForm, type VocabularyTerm } from '../../vocab/types'
@@ -44,7 +45,7 @@ export function formatCatalogPickerCopy(
 ): CatalogPickerCopy {
   const { singular, plural } = noun
   const copy: CatalogPickerCopy = {
-    searchPlaceholder: `Search ${plural}`,
+    searchPlaceholder: resolveSearchPlaceholder({ singular, plural }),
     chooseTitle: `Choose ${singular}`,
     addLabel: `Add ${singular}`,
     noResultsMessage: `No ${plural} match your search.`,

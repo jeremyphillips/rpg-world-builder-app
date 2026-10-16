@@ -26,7 +26,11 @@ import type {
 import type { SelectFieldValueProps } from './select-field-value-props'
 import type { FieldChromeProps } from './field-chrome.variants'
 import { resolveFieldAnatomyWidth } from './field-chrome.variants'
-import { resolveFieldPlaceholder } from '../../form/config/field-placeholder.lib'
+import {
+  resolveFieldPlaceholder,
+  resolveFieldSearchPlaceholder,
+} from '../../form/config/field-placeholder.lib'
+import type { FieldNoun } from '@rpg/contracts'
 import { useFormSectionContext } from '../../form/context/form-section.context'
 import { useComposedRef } from './use-composed-ref.client'
 import { resolveFormDensity } from '../../form/form-density'
@@ -54,6 +58,10 @@ export interface ComboboxFieldProps
   width?: FieldWidth
   size?: FieldSize
   placeholder?: string
+  /** Noun metadata for generated closed-state and search placeholders. */
+  noun?: FieldNoun
+  /** Overrides generated `Search {plural}…` panel copy. */
+  searchPlaceholder?: string
   emptyMessage?: string
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean
@@ -78,6 +86,7 @@ export interface ComboboxFieldProps
 function ComboboxFieldControl(props: ComboboxFieldControlProps) {
   const {
     label,
+    searchPlaceholder = '',
     selected,
     loading,
     size,
@@ -116,6 +125,7 @@ function ComboboxFieldControl(props: ComboboxFieldControlProps) {
       />
       <ComboboxPanel
         label={label}
+        searchPlaceholder={searchPlaceholder}
         listboxId={control.listboxId}
         searchId={control.searchId}
         size={size}
@@ -199,6 +209,8 @@ export function ComboboxField({
   width,
   size: sizeProp,
   placeholder,
+  noun,
+  searchPlaceholder: searchPlaceholderProp,
   emptyMessage = 'No options found.',
   enableSearch = true,
   renderSelectedItem,
@@ -217,8 +229,12 @@ export function ComboboxField({
   const size = sizeProp ?? resolveFormDensity(density).size
   const selected = React.useMemo(() => normalizeSelected(multiple, value), [multiple, value])
   const resolvedPlaceholder = resolveFieldPlaceholder(
-    { label, category: multiple ? 'multi' : 'choice' },
+    { label, noun, category: multiple ? 'multi' : 'choice' },
     placeholder,
+  )
+  const resolvedSearchPlaceholder = resolveFieldSearchPlaceholder(
+    { label, noun },
+    searchPlaceholderProp,
   )
   const rootWidth = resolveFieldAnatomyWidth(width, chrome)
 
@@ -259,6 +275,7 @@ export function ComboboxField({
             loading={loading}
             size={size}
             placeholder={resolvedPlaceholder ?? ''}
+            searchPlaceholder={resolvedSearchPlaceholder}
             emptyMessage={emptyMessage}
             enableSearch={enableSearch}
             renderSelectedItem={renderSelectedItem}

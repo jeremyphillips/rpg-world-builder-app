@@ -217,7 +217,7 @@ function ComboboxOptionItem({
 }
 
 interface ComboboxSearchFieldProps {
-  label: string
+  searchPlaceholder: string
   listboxId: string
   searchId: string
   size: FieldSize
@@ -231,7 +231,7 @@ interface ComboboxSearchFieldProps {
 
 /** Search row shared by combobox panel and searchable input-select unit segments. */
 export function ComboboxSearchField({
-  label,
+  searchPlaceholder,
   listboxId,
   searchId,
   size,
@@ -252,8 +252,8 @@ export function ComboboxSearchField({
             value={query}
             onValueChange={onQueryChange}
             onKeyDown={onSearchKeyDown}
-            placeholder={`Search ${label.toLowerCase()}…`}
-            ariaLabel={`Search ${label}`}
+            placeholder={searchPlaceholder}
+            ariaLabel={searchPlaceholder}
             size={size}
             inputRef={searchInputRef}
             aria-controls={listboxId}
@@ -268,6 +268,7 @@ export function ComboboxSearchField({
 
 interface ComboboxPanelProps {
   label: string
+  searchPlaceholder: string
   listboxId: string
   searchId: string
   size: FieldSize
@@ -294,6 +295,7 @@ interface ComboboxPanelProps {
 
 export function ComboboxPanel({
   label,
+  searchPlaceholder,
   listboxId,
   searchId,
   size,
@@ -332,7 +334,7 @@ export function ComboboxPanel({
       >
         {enableSearch ? (
           <ComboboxSearchField
-            label={label}
+            searchPlaceholder={searchPlaceholder}
             listboxId={listboxId}
             searchId={searchId}
             size={size}

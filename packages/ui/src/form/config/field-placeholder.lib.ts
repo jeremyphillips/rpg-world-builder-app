@@ -1,4 +1,9 @@
-import { nounFromLabel, resolveChoicePlaceholder, type FieldNoun } from '@rpg/contracts'
+import {
+  nounFromLabel,
+  resolveChoicePlaceholder,
+  resolveSearchPlaceholder,
+  type FieldNoun,
+} from '@rpg/contracts'
 
 import type { FieldDigits } from '../../components/ui/field-digit-metrics'
 import type { FieldMessageCategory } from './field-error-map-category.lib'
@@ -39,4 +44,14 @@ export function resolveFieldPlaceholder(
   }
 
   return resolveChoicePlaceholder(noun, input.category === 'multi')
+}
+
+/** Default open-panel search placeholder when combobox config omits one. */
+export function resolveFieldSearchPlaceholder(
+  input: { label: string; noun?: FieldNoun },
+  searchPlaceholder?: string,
+): string {
+  if (searchPlaceholder !== undefined) return searchPlaceholder
+  const noun = input.noun ?? nounFromLabel(input.label)
+  return resolveSearchPlaceholder(noun)
 }

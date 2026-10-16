@@ -6,6 +6,7 @@ import {
   type ProficiencyRank,
   type SkillProficiency,
 } from '@rpg/contracts'
+import { proficiencyDomainFieldNoun } from '@rpg/contracts'
 import { Badge, Chip, ChipGroup, ComboboxField, SemanticText } from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
@@ -183,6 +184,7 @@ function MonsterCreatureDetailsSkillsSlotView({
           options={addOptions}
           multiple={false}
           enableSearch
+          noun={proficiencyDomainFieldNoun('skill')}
           placeholder={MONSTER_ADD_SKILL_LABEL}
           value=""
           onChange={(next) => {

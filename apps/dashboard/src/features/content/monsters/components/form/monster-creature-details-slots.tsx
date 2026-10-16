@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
-import { getSenseLabel, SENSE_SET_ID, TELEPATHY_MILE_FEET, type SenseId } from '@rpg/contracts'
+import {
+  getSenseLabel,
+  LANGUAGE_TERM,
+  nounFromTerm,
+  SENSE_SET_ID,
+  TELEPATHY_MILE_FEET,
+  type SenseId,
+} from '@rpg/contracts'
 import { Chip, ChipGroup, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
@@ -228,7 +235,7 @@ export function MonsterCreatureDetailsSensesSlot({ ctx }: { ctx: ContentFormCtx 
           labelVisibility="srOnly"
           options={senseOptions}
           multiple={false}
-          enableSearch
+          enableSearch={false}
           placeholder={MONSTER_ADD_SENSE_LABEL}
           value=""
           onChange={(next) => {
@@ -401,6 +408,7 @@ export function MonsterCreatureDetailsLanguagesSlot({ ctx }: { ctx: ContentFormC
           options={languageOptions}
           multiple={false}
           enableSearch
+          noun={nounFromTerm(LANGUAGE_TERM)}
           placeholder={MONSTER_ADD_LANGUAGE_LABEL}
           value=""
           onChange={(next) => {

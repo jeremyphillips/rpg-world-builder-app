@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import {
+  catalogNounFromContentType,
   getEquipmentKindCollectionLabel,
   getNpcTemplateLabel,
   indexCharacterBuildCatalog,
@@ -122,6 +123,11 @@ const QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION =
   'Add specific items this NPC should start with in addition to its package.'
 const QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION = 'Add the items this NPC should start with.'
 const QUICK_NPC_ADD_ITEM_PLACEHOLDER = '+ Add item'
+
+const QUICK_NPC_EQUIPMENT_SEARCH_NOUN = (() => {
+  const equipment = catalogNounFromContentType('equipment')
+  return { singular: equipment.singular, plural: equipment.plural }
+})()
 const QUICK_NPC_EQUIPMENT_CATEGORY_FILTER_LABEL = 'Equipment kind'
 
 export type QuickNpcStartingEquipmentPanelProps = {
@@ -725,6 +731,7 @@ function AdditionalEquipmentPicker({
       id="quick-npc-additional-equipment"
       label="Add equipment"
       labelVisibility="srOnly"
+      noun={QUICK_NPC_EQUIPMENT_SEARCH_NOUN}
       multiple={false}
       options={options}
       value=""

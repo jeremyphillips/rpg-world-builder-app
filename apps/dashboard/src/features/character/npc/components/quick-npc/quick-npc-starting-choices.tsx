@@ -33,6 +33,7 @@ import {
   resolveStartingChoiceSuggestionLabels,
   startingChoiceAddAccessibleName,
   startingChoiceAddPlaceholder,
+  startingChoiceComboboxSearchNoun,
   startingChoiceAlsoGrantedHint,
   startingChoiceAllowancePresentation,
   resolveStartingChoiceCategoryAllowanceStatus,
@@ -610,6 +611,7 @@ function StartingChoiceEditor({
                     id={`starting-choice-${entry.choiceSetId}`}
                     label={addAccessibleName}
                     labelVisibility="srOnly"
+                    noun={startingChoiceComboboxSearchNoun(categoryKind)}
                     options={options}
                     value=""
                     disabled={addDisabled}

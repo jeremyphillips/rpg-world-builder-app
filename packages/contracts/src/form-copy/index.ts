@@ -3,6 +3,7 @@ export {
   midSentenceLabel,
   nounFromLabel,
   resolveChoicePlaceholder,
+  resolveSearchPlaceholder,
   singularizeLabel,
   withArticle,
   type ChoiceCountConstraints,

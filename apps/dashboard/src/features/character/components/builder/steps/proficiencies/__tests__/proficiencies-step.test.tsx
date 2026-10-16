@@ -221,7 +221,7 @@ describe('ProficienciesStep', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add language' }))
     expect(screen.getByRole('heading', { name: 'Choose language' })).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Search languages' })).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Search languages…' })).toBeInTheDocument()
 
     const dialog = screen.getByRole('dialog', { name: 'Choose language' })
     const elvishRow = within(dialog)

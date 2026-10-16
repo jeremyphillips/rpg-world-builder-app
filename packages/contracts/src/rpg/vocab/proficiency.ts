@@ -1,3 +1,4 @@
+import type { FieldNoun } from '../../form-copy/messages'
 import { vocabEnumFromEntries, keysFromEntries } from './enum-schema'
 import { SKILL_PROFICIENCY_SENTENCE } from './proficiency-sentence'
 import {
@@ -156,6 +157,14 @@ export function getProficiencyPoolAnyScopePhrase(
 /** Scope phrase for explicit pool choices (e.g. "selected weapons"). */
 export function getProficiencyPoolSelectedPhrase(domain: ProficiencyDomain): string {
   return PROFICIENCY_POOL_SELECTED_PHRASES[domain]
+}
+
+/** Singular/plural head nouns for compact proficiency actions and search copy. */
+export function proficiencyDomainFieldNoun(domain: ProficiencyDomain): FieldNoun {
+  return {
+    singular: getProficiencyDomainCompactActionNoun(domain, 1),
+    plural: getProficiencyDomainCompactActionNoun(domain, 2),
+  }
 }
 
 /** Head noun for compact builder actions (e.g. "skill", "skills", "armor"). */

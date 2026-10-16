@@ -1,4 +1,4 @@
-import { vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
+import { nounFromTerm, vocabularyTermFieldCopy, type VocabularyTerm } from '@rpg/contracts'
 import type { ComboboxFieldConfig, FieldOption, SelectFieldConfig } from '@rpg/ui/form'
 
 type VocabularyMemberFieldBase = Pick<
@@ -75,5 +75,6 @@ export function vocabularyComboboxFieldForTerm(
     ...config,
     label: config.label ?? copy.label,
     placeholder: config.placeholder ?? copy.placeholder,
+    noun: nounFromTerm(term),
   })
 }

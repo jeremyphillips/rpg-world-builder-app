@@ -115,6 +115,8 @@ export function ComboboxFieldRenderer({
       multiple={config.multiple}
       max={config.max}
       placeholder={config.placeholder}
+      noun={config.noun}
+      searchPlaceholder={config.searchPlaceholder}
       {...validation}
       hint={hint}
       hintPosition={hintPosition}

@@ -5,6 +5,7 @@ import {
   indexCharacterBuildCatalog,
   buildSelectionSourceLabelCatalogIndex,
   resolveProficiencyChoiceSetPresentation,
+  resolveSearchPlaceholder,
   type ChoiceSet,
   type NpcStartingChoices,
   type StartingChoiceContribution,
@@ -28,7 +29,19 @@ import {
   startingChoiceShowSuggestedReset,
   startingChoiceItemSuggestionCopy,
   startingChoiceItemSuggestionHint,
+  startingChoiceComboboxSearchNoun,
 } from './quick-npc-starting-choices.lib'
+
+describe('startingChoiceComboboxSearchNoun', () => {
+  it('maps add-row categories to domain vocabulary for search placeholders', () => {
+    expect(resolveSearchPlaceholder(startingChoiceComboboxSearchNoun('skill'))).toBe(
+      'Search skills…',
+    )
+    expect(resolveSearchPlaceholder(startingChoiceComboboxSearchNoun('language'))).toBe(
+      'Search languages…',
+    )
+  })
+})
 
 function allowance(
   overrides: Partial<Extract<StartingChoiceContribution, { mechanic: 'choice-allowance' }>> = {},

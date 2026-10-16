@@ -1,6 +1,11 @@
 import {
   assembleCharacterProficiencies,
+  catalogNounFromContentType,
   buildSelectionSourceLabelCatalogIndex,
+  type FieldNoun,
+  LANGUAGE_TERM,
+  nounFromTerm,
+  proficiencyDomainFieldNoun,
   formatGrantCardProficiencySourceLabel,
   formatRecommendationSourceLabel,
   formatStandardSelectionSourceLabel,
@@ -353,6 +358,26 @@ export function startingChoiceAddAccessibleName(kind: StartingChoiceCategory): s
       return 'Add spell'
     default:
       return 'Add item'
+  }
+}
+
+/** Domain noun for searchable add-row comboboxes — not derived from action labels. */
+export function startingChoiceComboboxSearchNoun(kind: StartingChoiceCategory): FieldNoun {
+  switch (kind) {
+    case 'skill':
+      return proficiencyDomainFieldNoun('skill')
+    case 'tool':
+      return proficiencyDomainFieldNoun('tool')
+    case 'language':
+      return nounFromTerm(LANGUAGE_TERM)
+    case 'spell': {
+      const spells = catalogNounFromContentType('spells')
+      return { singular: spells.singular, plural: spells.plural }
+    }
+    default: {
+      const equipment = catalogNounFromContentType('equipment')
+      return { singular: equipment.singular, plural: equipment.plural }
+    }
   }
 }
 

@@ -62,6 +62,8 @@ export interface ComboboxFieldControlProps {
   loading?: boolean
   size: FieldSize
   placeholder: string
+  /** Open-panel search input placeholder; derived from `noun` when omitted at the field shell. */
+  searchPlaceholder?: string
   emptyMessage: string
   /** When false, the panel omits the search row and keyboard nav targets the listbox. */
   enableSearch?: boolean

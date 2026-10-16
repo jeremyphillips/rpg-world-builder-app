@@ -21,7 +21,7 @@ describe('formatCatalogPickerCopy', () => {
     })
     expect(copy.chooseTitle).toBe('Choose organization')
     expect(copy.addLabel).toBe('Add organization')
-    expect(copy.searchPlaceholder).toBe('Search organizations')
+    expect(copy.searchPlaceholder).toBe('Search organizations…')
     expect(copy.noResultsMessage).toBe('No organizations match this view.')
     expect(copy.noItemsMessage).toBe('No organizations are available.')
     expect(copy.noOptionsMessage).toBe('No organizations are available for this choice.')
@@ -35,7 +35,7 @@ describe('formatCatalogPickerCopy', () => {
     const copy = formatCatalogPickerCopy(noun, { noResultsMessage: undefined })
 
     expect(noun.plural).toBe('equipment')
-    expect(copy.searchPlaceholder).toBe('Search equipment')
+    expect(copy.searchPlaceholder).toBe('Search equipment…')
     expect(copy.noResultsMessage).toBe('No equipment match your search.')
   })
 

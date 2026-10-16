@@ -36,6 +36,7 @@ import { type NumberInputDigits } from './number-input.client'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select.client'
 import { FieldLabelContent } from './field-label-content'
 import { shouldShowVisibleRequiredMarker } from './field-required.lib'
+import { resolveFieldSearchPlaceholder } from '../../form/config/field-placeholder.lib'
 
 const EMPTY_UNIT_MESSAGE = 'No units match your search.'
 
@@ -157,6 +158,7 @@ function SearchableUnitSelect({
   const filteredOptions = filterInputSelectOptions(options, query)
   const triggerText = unit ? selectedOption.label : (unitPlaceholder ?? 'Choose unit')
   const sizingLabels = options.map((option) => option.label)
+  const searchPlaceholder = resolveFieldSearchPlaceholder({ label })
 
   function handleSelect(nextUnit: string) {
     onUnitChange(nextUnit)
@@ -215,7 +217,7 @@ function SearchableUnitSelect({
           }}
         >
           <ComboboxSearchField
-            label={label}
+            searchPlaceholder={searchPlaceholder}
             listboxId={listboxId}
             searchId={searchId}
             size={size}

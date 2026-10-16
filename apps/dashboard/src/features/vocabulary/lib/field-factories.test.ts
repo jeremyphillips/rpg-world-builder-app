@@ -95,6 +95,7 @@ describe('vocabulary field factories', () => {
       name: 'allowedCharacterCreatureTypes',
       label: 'Creature types',
       placeholder: 'Choose creature types…',
+      noun: { singular: 'creature type', plural: 'creature types' },
       options,
       multiple: true,
       required: true,

@@ -2,13 +2,12 @@ import {
   compareProficiencyPickerItemsByRecommendation,
   formatChoiceSetDrawerHeading,
   getLanguageProficiencySentenceForm,
-  getProficiencyDomainCompactActionNoun,
-  getProficiencyDomainSentenceForm,
   getTermSentenceForm,
   PROFICIENCY_TERM,
+  proficiencyDomainFieldNoun,
+  resolveSearchPlaceholder,
   type ChoiceSet,
   type ProficiencyPickerItem,
-  type ProficiencyDomain,
 } from '@rpg/contracts'
 
 import { normalizeSearchQuery } from '@rpg/ui'
@@ -61,27 +60,26 @@ export function formatProficiencyPickerDrawerDescription(
   return `Selected ${selectedIds.length} of ${choiceSet.max}. Choose ${remaining} more.`
 }
 
-function proficiencyDomainSearchScope(domain: ProficiencyDomain): string {
-  if (domain === 'skill') {
-    return getProficiencyDomainCompactActionNoun(domain, 2)
-  }
-  return getProficiencyDomainSentenceForm(domain, 2)
-}
-
 export function formatProficiencyPickerSearchPlaceholder(choiceSet: ChoiceSet): string {
   switch (choiceSet.choiceType) {
     case 'skillProficiency':
-      return `Search ${proficiencyDomainSearchScope('skill')}`
+      return resolveSearchPlaceholder(proficiencyDomainFieldNoun('skill'))
     case 'language':
-      return `Search ${getLanguageProficiencySentenceForm(2)}`
+      return resolveSearchPlaceholder({
+        singular: getLanguageProficiencySentenceForm(1),
+        plural: getLanguageProficiencySentenceForm(2),
+      })
     case 'toolProficiency':
-      return `Search ${proficiencyDomainSearchScope('tool')}`
+      return resolveSearchPlaceholder(proficiencyDomainFieldNoun('tool'))
     case 'weaponProficiency':
-      return `Search ${proficiencyDomainSearchScope('weapon')}`
+      return resolveSearchPlaceholder(proficiencyDomainFieldNoun('weapon'))
     case 'armorTraining':
-      return `Search ${proficiencyDomainSearchScope('armor')}`
+      return resolveSearchPlaceholder(proficiencyDomainFieldNoun('armor'))
     default:
-      return `Search ${getTermSentenceForm(PROFICIENCY_TERM, 2)}`
+      return resolveSearchPlaceholder({
+        singular: getTermSentenceForm(PROFICIENCY_TERM, 1),
+        plural: getTermSentenceForm(PROFICIENCY_TERM, 2),
+      })
   }
 }
 

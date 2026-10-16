@@ -86,3 +86,8 @@ export function resolveChoicePlaceholder(noun: FieldNoun, multiple: boolean): st
   }
   return `Choose ${withArticle(singularNounPhrase(noun))}…`
 }
+
+/** Open-panel search placeholder — plural noun phrase plus ellipsis only. */
+export function resolveSearchPlaceholder(noun: FieldNoun): string {
+  return `Search ${pluralNounPhrase(noun)}…`
+}
