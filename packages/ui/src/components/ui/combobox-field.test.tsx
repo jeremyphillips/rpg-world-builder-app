@@ -69,6 +69,41 @@ describe('ComboboxField', () => {
     )
   })
 
+  it('resolves add intent closed and search copy from domain nouns', () => {
+    render(
+      <ComboboxField
+        id="monster-add-skill"
+        label="Add skill"
+        labelVisibility="srOnly"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        closedPlaceholderIntent="add"
+        noun={{ singular: 'skill', plural: 'skills' }}
+      />,
+    )
+    const trigger = screen.getByRole('combobox', { name: 'Add skill' })
+    expect(trigger).toHaveTextContent('Add skill')
+  })
+
+  it('prefers explicit placeholder overrides over add intent', () => {
+    render(
+      <ComboboxField
+        id="custom-add"
+        label="Add skill"
+        options={weaponOptions}
+        multiple={false}
+        value=""
+        closedPlaceholderIntent="add"
+        noun={{ singular: 'skill', plural: 'skills' }}
+        placeholder="Custom closed copy"
+      />,
+    )
+    expect(screen.getByRole('combobox', { name: 'Add skill' })).toHaveTextContent(
+      'Custom closed copy',
+    )
+  })
+
   it('shows the placeholder and spinner while loading', () => {
     render(
       <ComboboxField

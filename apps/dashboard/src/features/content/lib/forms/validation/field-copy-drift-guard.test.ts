@@ -47,6 +47,10 @@ const FORBIDDEN_PATTERNS: { label: string; pattern: RegExp }[] = [
     label: 'Action label wired as closed placeholder without intent',
     pattern: /placeholder=\{MONSTER_ADD_/,
   },
+  {
+    label: 'Plus-prefix add placeholder bypass on ComboboxField',
+    pattern: /<ComboboxField[\s\S]*?placeholder=\{['"]\+ Add/i,
+  },
 ]
 
 function collectFormConfigFiles(directory: string, acc: string[] = []): string[] {
@@ -57,6 +61,23 @@ function collectFormConfigFiles(directory: string, acc: string[] = []): string[]
       continue
     }
     if (FORM_CONFIG_GLOBS.some((suffix) => entry.name.endsWith(suffix))) {
+      acc.push(absolutePath)
+    }
+  }
+  return acc
+}
+
+function collectQuickNpcComboboxTsxFiles(directory: string, acc: string[] = []): string[] {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const absolutePath = join(directory, entry.name)
+    if (entry.isDirectory()) {
+      collectQuickNpcComboboxTsxFiles(absolutePath, acc)
+      continue
+    }
+    if (
+      entry.name.endsWith('.tsx') &&
+      readFileSync(absolutePath, 'utf8').includes('ComboboxField')
+    ) {
       acc.push(absolutePath)
     }
   }
@@ -101,6 +122,17 @@ describe('field copy drift guard', () => {
   it('form component modules avoid redundant placeholder literals', () => {
     const violations: string[] = []
     scanFiles(collectFeatureFormTsxFiles(join(DASHBOARD_SRC, 'features')), violations)
+    expect(violations).toEqual([])
+  })
+
+  it('quick npc combobox modules avoid add-placeholder bypasses', () => {
+    const violations: string[] = []
+    scanFiles(
+      collectQuickNpcComboboxTsxFiles(
+        join(DASHBOARD_SRC, 'features', 'character', 'npc', 'components', 'quick-npc'),
+      ),
+      violations,
+    )
     expect(violations).toEqual([])
   })
 })

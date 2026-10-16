@@ -342,10 +342,6 @@ export function resolveStartingChoiceCategoryAllowanceStatus(args: {
   return 'complete'
 }
 
-export function startingChoiceAddPlaceholder(kind: StartingChoiceCategory): string {
-  return `+ ${startingChoiceAddAccessibleName(kind)}`
-}
-
 export function startingChoiceAddAccessibleName(kind: StartingChoiceCategory): string {
   switch (kind) {
     case 'skill':

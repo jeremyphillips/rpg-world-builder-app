@@ -1,3 +1,5 @@
+import type { FieldNoun } from '@rpg/contracts'
+
 import {
   type ComboboxFieldConfig,
   type DependentChrome,
@@ -41,6 +43,8 @@ export type ModeDependentGrantSetFieldOptions = {
   itemOptions: FieldOption[]
   categoriesLabel?: string
   itemsLabel?: string
+  /** Domain noun for generated closed/search copy on the items combobox (independent of `itemsLabel`). */
+  itemsNoun?: FieldNoun
   categoriesHint?: FieldConfig['hint']
   itemsHint?: FieldConfig['hint']
   categoryMode: string
@@ -87,6 +91,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
     itemOptions,
     categoriesLabel = 'Categories',
     itemsLabel = 'Specific items',
+    itemsNoun,
     categoriesHint,
     itemsHint,
     categoryMode,
@@ -112,6 +117,7 @@ function grantSetDependentFields(options: ModeDependentGrantSetFieldOptions): Fo
       type: 'combobox',
       name: itemsPath,
       label: itemsLabel,
+      ...(itemsNoun ? { noun: itemsNoun } : {}),
       ...(itemsHint ? { hint: itemsHint } : {}),
       multiple: true,
       options: itemOptions,

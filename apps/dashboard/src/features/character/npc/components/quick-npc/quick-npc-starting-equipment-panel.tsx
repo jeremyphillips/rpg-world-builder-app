@@ -122,8 +122,6 @@ const QUICK_NPC_ADDITIONAL_EQUIPMENT_SECTION_LABEL = 'Additional Equipment'
 const QUICK_NPC_ADDITIONAL_EQUIPMENT_DESCRIPTION =
   'Add specific items this NPC should start with in addition to its package.'
 const QUICK_NPC_STARTING_EQUIPMENT_ONLY_DESCRIPTION = 'Add the items this NPC should start with.'
-const QUICK_NPC_ADD_ITEM_PLACEHOLDER = '+ Add item'
-
 const QUICK_NPC_EQUIPMENT_SEARCH_NOUN = (() => {
   const equipment = catalogNounFromContentType('equipment')
   return { singular: equipment.singular, plural: equipment.plural }
@@ -732,6 +730,7 @@ function AdditionalEquipmentPicker({
       label="Add equipment"
       labelVisibility="srOnly"
       noun={QUICK_NPC_EQUIPMENT_SEARCH_NOUN}
+      closedPlaceholderIntent="add"
       multiple={false}
       options={options}
       value=""
@@ -745,7 +744,6 @@ function AdditionalEquipmentPicker({
         if (!value) return
         onSelect(value)
       }}
-      placeholder={QUICK_NPC_ADD_ITEM_PLACEHOLDER}
       emptyMessage="No matching items"
       filter={
         !disabled && activeKind ? (

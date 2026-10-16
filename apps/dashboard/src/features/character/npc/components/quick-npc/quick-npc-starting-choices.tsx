@@ -32,7 +32,6 @@ import {
   resolveQuickNpcStartingChoices,
   resolveStartingChoiceSuggestionLabels,
   startingChoiceAddAccessibleName,
-  startingChoiceAddPlaceholder,
   startingChoiceComboboxSearchNoun,
   startingChoiceAlsoGrantedHint,
   startingChoiceAllowancePresentation,
@@ -537,7 +536,6 @@ function StartingChoiceEditor({
         const hasEligibleOptions = options.length > 0
         const showAddControl = !isComplete
         const addDisabled = !hasEligibleOptions
-        const addPlaceholder = startingChoiceAddPlaceholder(categoryKind)
         const addAccessibleName = startingChoiceAddAccessibleName(categoryKind)
 
         function updateSelectedIds(nextIds: string[]) {
@@ -612,6 +610,7 @@ function StartingChoiceEditor({
                     label={addAccessibleName}
                     labelVisibility="srOnly"
                     noun={startingChoiceComboboxSearchNoun(categoryKind)}
+                    closedPlaceholderIntent="add"
                     options={options}
                     value=""
                     disabled={addDisabled}
@@ -620,7 +619,6 @@ function StartingChoiceEditor({
                       if (!value || selectedIds.includes(value)) return
                       updateSelectedIds([...selectedIds, value])
                     }}
-                    placeholder={addPlaceholder}
                     emptyMessage="No matching options"
                   />
                 </div>

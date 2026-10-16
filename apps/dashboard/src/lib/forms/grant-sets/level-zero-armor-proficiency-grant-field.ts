@@ -1,3 +1,5 @@
+import { proficiencyDomainFieldNoun } from '@rpg/contracts'
+
 import {
   modeDependentGrantSetField,
   type ModeDependentGrantSetFieldOptions,
@@ -18,6 +20,7 @@ export function levelZeroArmorProficiencyGrantSetField(
 ) {
   return modeDependentGrantSetField({
     ...options,
+    itemsNoun: options.itemsNoun ?? proficiencyDomainFieldNoun('armor'),
     modes: ARMOR_PROFICIENCY_GRANT_MODES,
     modeLabels: ARMOR_PROFICIENCY_GRANT_MODE_LABELS,
     categoryMode: 'categories',

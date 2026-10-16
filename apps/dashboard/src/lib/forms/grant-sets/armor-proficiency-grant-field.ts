@@ -1,3 +1,5 @@
+import { proficiencyDomainFieldNoun } from '@rpg/contracts'
+
 import {
   modeDependentGrantSetField,
   type ModeDependentGrantSetFieldOptions,
@@ -11,6 +13,7 @@ export type ArmorProficiencyGrantSetFieldOptions = ModeDependentGrantSetFieldOpt
 export function armorProficiencyGrantSetField(options: ArmorProficiencyGrantSetFieldOptions) {
   return modeDependentGrantSetField({
     ...options,
+    itemsNoun: options.itemsNoun ?? proficiencyDomainFieldNoun('armor'),
     itemsCombobox: {
       filterSelects: buildArmorProficiencyGrantComboboxFilters(),
       ...options.itemsCombobox,
