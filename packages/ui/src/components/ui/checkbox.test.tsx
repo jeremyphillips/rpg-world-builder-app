@@ -9,6 +9,7 @@ import {
   UI_CHOICE_CONTROL_CIRCLE_EXPAND_CLASS,
   UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
   UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS,
 } from './choice-control.styles'
 import { Checkbox } from './checkbox.client'
 
@@ -60,6 +61,21 @@ describe('Checkbox', () => {
     expect(control.querySelector(`.${UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS}`)).toHaveTextContent(
       'Unequip',
     )
+  })
+
+  it('reserves width with the other action word without announcing it', () => {
+    render(
+      <Checkbox
+        appearance="circle"
+        expandLabel="Equip"
+        expandLabelReserve="Unequip"
+        aria-label="Equipped: Axe"
+      />,
+    )
+    const control = screen.getByRole('checkbox', { name: 'Equipped: Axe' })
+    const reserve = control.querySelector(`.${UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS}`)
+    expect(reserve).toHaveTextContent('Unequip')
+    expect(reserve).toHaveAttribute('aria-hidden', 'true')
   })
 
   it('ignores expandLabel unless appearance is circle', () => {

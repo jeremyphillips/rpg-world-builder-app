@@ -19,6 +19,7 @@ describe('MonsterEquipmentEquippedToggle', () => {
     expect(checkbox).toHaveAttribute('aria-checked', 'true')
     expect(checkbox).toHaveClass('ui-focus-ring--embedded', 'ui-choice-control--circle-expand')
     expect(checkbox.querySelector('.ui-choice-control__expand-label')).toHaveTextContent('Unequip')
+    expect(checkbox.querySelector('.ui-choice-control__expand-reserve')).toHaveTextContent('Equip')
     expect(screen.queryByRole('tooltip')).toBeNull()
   })
 

@@ -132,6 +132,7 @@ export const CircleExpandOnCard: Story = {
           appearance="circle"
           focusContext="embedded"
           expandLabel="Unequip"
+          expandLabelReserve="Equip"
           aria-label="Equipped: Battleaxe"
           defaultChecked
         />
@@ -145,6 +146,7 @@ export const CircleExpandOnCard: Story = {
           appearance="circle"
           focusContext="embedded"
           expandLabel="Equip"
+          expandLabelReserve="Unequip"
           aria-label="Equipped: +1 Flaming Battleaxe of Very Long Names"
         />
         <button type="button" className="text-xs text-muted-foreground">
@@ -157,6 +159,7 @@ export const CircleExpandOnCard: Story = {
           appearance="circle"
           focusContext="embedded"
           expandLabel="Unequip"
+          expandLabelReserve="Equip"
           aria-label="Equipped: Edge"
           defaultChecked
         />
@@ -167,6 +170,7 @@ export const CircleExpandOnCard: Story = {
           appearance="circle"
           focusContext="embedded"
           expandLabel="Unequip"
+          expandLabelReserve="Equip"
           aria-label="Equipped: Disabled"
           defaultChecked
           disabled

@@ -22,12 +22,16 @@ export function MonsterEquipmentEquippedToggle({
   const expandLabel = checked
     ? MONSTER_EQUIP_TOGGLE_UNEQUIP_LABEL
     : MONSTER_EQUIP_TOGGLE_EQUIP_LABEL
+  const expandLabelReserve = checked
+    ? MONSTER_EQUIP_TOGGLE_EQUIP_LABEL
+    : MONSTER_EQUIP_TOGGLE_UNEQUIP_LABEL
 
   return (
     <Checkbox
       appearance="circle"
       focusContext="embedded"
       expandLabel={expandLabel}
+      expandLabelReserve={expandLabelReserve}
       checked={checked}
       disabled={disabled}
       aria-label={formatMonsterEquipmentEquippedAriaLabel(displayName)}

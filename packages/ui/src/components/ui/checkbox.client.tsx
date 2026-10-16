@@ -7,7 +7,9 @@ import { Check } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import {
   UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS,
   UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS,
+  UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS,
   UI_CHOICE_CONTROL_MARK_CLASS,
   checkboxControlClasses,
   type CheckboxAppearance,
@@ -23,14 +25,30 @@ export type CheckboxProps = React.ComponentPropsWithoutRef<typeof CheckboxPrimit
    * Applies only with `appearance="circle"`; other appearances ignore it.
    */
   expandLabel?: string
+  /**
+   * Other action word included only for intrinsic width, so Equip and Unequip
+   * share one open pill size. Not shown and not announced.
+   */
+  expandLabelReserve?: string
 }
 
 const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Root>, CheckboxProps>(
   (
-    { className, appearance = 'default', focusContext = 'standalone', expandLabel, ...props },
+    {
+      className,
+      appearance = 'default',
+      focusContext = 'standalone',
+      expandLabel,
+      expandLabelReserve,
+      ...props
+    },
     ref,
   ) => {
     const expands = appearance === 'circle' && Boolean(expandLabel)
+    const reserve =
+      expands && expandLabelReserve && expandLabelReserve !== expandLabel
+        ? expandLabelReserve
+        : null
     const control = (
       <CheckboxPrimitive.Root
         ref={ref}
@@ -44,8 +62,17 @@ const Checkbox = React.forwardRef<React.ComponentRef<typeof CheckboxPrimitive.Ro
           <Check aria-hidden />
         </CheckboxPrimitive.Indicator>
         {expands ? (
-          <span className={UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS} aria-hidden>
-            {expandLabel}
+          <span className={UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS}>
+            <span className={`${UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS}-inner`}>
+              {reserve ? (
+                <span className={UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS} aria-hidden>
+                  {reserve}
+                </span>
+              ) : null}
+              <span className={UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS} aria-hidden>
+                {expandLabel}
+              </span>
+            </span>
           </span>
         ) : null}
       </CheckboxPrimitive.Root>

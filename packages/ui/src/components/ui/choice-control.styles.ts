@@ -12,6 +12,10 @@ export const UI_CHOICE_CONTROL_EXPAND_ANCHOR_CLASS = 'ui-choice-control-expand-a
 
 export const UI_CHOICE_CONTROL_EXPAND_LABEL_CLASS = 'ui-choice-control__expand-label' as const
 
+export const UI_CHOICE_CONTROL_EXPAND_CLIP_CLASS = 'ui-choice-control__expand-clip' as const
+
+export const UI_CHOICE_CONTROL_EXPAND_RESERVE_CLASS = 'ui-choice-control__expand-reserve' as const
+
 export type ChoiceControlKind = 'checkbox' | 'radio' | 'switch'
 
 export type ChoiceControlKindSpec = {
