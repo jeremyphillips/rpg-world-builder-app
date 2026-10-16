@@ -12,7 +12,10 @@ import { movementRowsToRecordForPreview } from '../../lib/forms/fields/content-m
 
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
-import { coerceCreatureWeaponProficienciesForForm } from './creature-details/monster-weapon-proficiencies-form.lib'
+import {
+  coerceCreatureWeaponProficienciesForForm,
+  MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+} from './creature-details/monster-weapon-proficiencies-form.lib'
 import type { MonsterFormValues } from './monster-form-values'
 
 export type MonsterNormalizeBaseline = {
@@ -143,7 +146,7 @@ function normalizeProficiencies(
 ): Record<string, unknown> {
   const coercedWeapons = coerceCreatureWeaponProficienciesForForm(proficiencies.weapons)
   const grantSet = weaponProficiencyGrantSetFromMode(
-    weaponProficiencyMode ?? 'none',
+    weaponProficiencyMode ?? MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     coercedWeapons,
   )
   const weapons = creatureWeaponProficiencyTargetsFromGrantSet(
@@ -192,7 +195,7 @@ export function normalizeMonsterFormValues(
     communication: normalizeCommunication(values.communication),
     proficiencies: normalizeProficiencies(
       values.proficiencies,
-      values.weaponProficiencyMode ?? 'none',
+      values.weaponProficiencyMode ?? MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     ),
     defenses: values.defenses,
     equipment: values.equipment,

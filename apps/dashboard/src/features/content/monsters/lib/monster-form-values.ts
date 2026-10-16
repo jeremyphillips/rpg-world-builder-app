@@ -43,6 +43,7 @@ import {
 
 import {
   coerceCreatureWeaponProficienciesForForm,
+  MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
   weaponProficiencyHydrationFromWeapons,
 } from './creature-details/monster-weapon-proficiencies-form.lib'
 
@@ -125,7 +126,7 @@ export function resolveMonsterCreateDefaultValues(): MonsterFormValues {
     actions: [],
     bonusActions: [],
     reactions: [],
-    weaponProficiencyMode: 'none',
+    weaponProficiencyMode: MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
     weaponProficiencyReconciliationPending: false,
   }
 }

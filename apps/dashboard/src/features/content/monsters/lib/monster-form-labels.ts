@@ -98,6 +98,8 @@ export const MONSTER_SKILL_LOADING = `Loading ${getContentTypeMidSentenceLabel('
 export const MONSTER_SKILL_ERROR = formatContentListLoadErrorMessage('skill-proficiencies')
 export const MONSTER_BLANK_CHALLENGE_HINT =
   'Required to publish. Values that use proficiency bonus show "—" until set.'
+export const MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP =
+  'Set a Challenge Rating to determine the proficiency bonus.'
 
 export function monsterGoToEquipmentLabel(): string {
   return `Go to ${getContentTypeItemLabel('equipment')}`
@@ -120,6 +122,12 @@ export function monsterSkillSectionLabel(): string {
 }
 
 export const MONSTER_WEAPON_PROFICIENCIES_HEADING = getProficiencyDomainCollectionLabel('weapon')
+
+export const MONSTER_WEAPON_PROFICIENCY_MODE_HINT =
+  'Most monsters are proficient with specific weapons. Use categories for broader weapon proficiencies.'
+
+export const MONSTER_WEAPON_PROFICIENCY_CATEGORIES_HINT =
+  'Categories include all weapons in that group.'
 
 export function monsterEquipmentSectionLabel(): string {
   return getContentTypeItemLabel('equipment')

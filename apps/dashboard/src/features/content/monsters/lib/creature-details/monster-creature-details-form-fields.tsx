@@ -18,10 +18,6 @@ import { equipmentProficiencyGrantComboboxConfig } from '@/lib/forms/grant-sets/
 import { resolveContentWeaponGrantOptionLabel } from '../../../lib/forms/grants/content-weapon-grant-option-label.lib'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
 import {
-  INDIVIDUAL_WEAPONS_TOGGLE_HINT,
-  WEAPON_PROFICIENCIES_HINT,
-} from '../../../classes/lib/class-form-labels'
-import {
   MonsterCreatureDetailsLanguagesSlot,
   MonsterCreatureDetailsSensesSlot,
   MonsterCreatureDetailsSkillsSlot,
@@ -33,6 +29,8 @@ import {
   MONSTER_DAMAGE_DEFENSES_HINT,
   MONSTER_SENSES_HINT,
   MONSTER_WEAPON_PROFICIENCIES_HEADING,
+  MONSTER_WEAPON_PROFICIENCY_CATEGORIES_HINT,
+  MONSTER_WEAPON_PROFICIENCY_MODE_HINT,
 } from '../monster-form-labels'
 import type { MonsterFormValues } from '../monster-form-values'
 
@@ -95,13 +93,13 @@ function weaponProficiencyFields(ctx: ContentFormCtx): FormItem[] {
       categoriesPath: 'proficiencies.weapons.categories',
       itemsPath: 'proficiencies.weapons.items',
       label: MONSTER_WEAPON_PROFICIENCIES_HEADING,
-      hint: { text: INDIVIDUAL_WEAPONS_TOGGLE_HINT, position: 'below-control' },
+      hint: { text: MONSTER_WEAPON_PROFICIENCY_MODE_HINT, position: 'below-control' },
       categoryOptions: weaponCategoryOptions,
       itemOptions: weaponCombobox.itemOptions,
       itemsCombobox: weaponCombobox.itemsCombobox,
       categoriesLabel: 'Categories',
       itemsLabel: 'Weapon choices',
-      categoriesHint: WEAPON_PROFICIENCIES_HINT,
+      categoriesHint: MONSTER_WEAPON_PROFICIENCY_CATEGORIES_HINT,
       resolveOptionLabel: (value) =>
         resolveContentWeaponGrantOptionLabel(value, ctx.options, ctx.equipmentCatalogById),
     }),

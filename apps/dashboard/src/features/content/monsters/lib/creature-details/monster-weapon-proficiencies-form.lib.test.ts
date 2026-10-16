@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   coerceCreatureWeaponProficienciesForForm,
+  MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
   weaponProficiencyHydrationFromWeapons,
 } from './monster-weapon-proficiencies-form.lib'
+import { resolveMonsterCreateDefaultValues } from '../monster-form-values'
 
 describe('coerceCreatureWeaponProficienciesForForm', () => {
   it('folds legacy target rows into a grant set', () => {
@@ -38,6 +40,14 @@ describe('coerceCreatureWeaponProficienciesForForm', () => {
   })
 })
 
+describe('monster weapon proficiency defaults', () => {
+  it('defaults new monsters to specific mode', () => {
+    expect(resolveMonsterCreateDefaultValues().weaponProficiencyMode).toBe(
+      MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+    )
+  })
+})
+
 describe('weaponProficiencyHydrationFromWeapons', () => {
   it('uses specific mode when item grants are present', () => {
     expect(
@@ -52,9 +62,9 @@ describe('weaponProficiencyHydrationFromWeapons', () => {
     })
   })
 
-  it('uses none mode when grant set is empty', () => {
+  it('uses specific mode when grant set is empty', () => {
     expect(weaponProficiencyHydrationFromWeapons({ categories: [], items: [] })).toEqual({
-      mode: 'none',
+      mode: 'specific',
       reconciliationPending: false,
     })
   })

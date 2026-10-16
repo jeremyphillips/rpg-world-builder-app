@@ -9,6 +9,8 @@ import { MonsterCreatureDetailsLanguagesSlot } from './monster-creature-details-
 import {
   MONSTER_LANGUAGES_FIELD_HINT,
   MONSTER_LANGUAGES_FIELD_LABEL,
+  MONSTER_SPEAKS_LABEL,
+  MONSTER_UNDERSTANDS_ONLY_LABEL,
 } from '../../lib/monster-form-labels'
 
 const languageCtx: ContentFormCtx = {
@@ -43,6 +45,29 @@ function Harness({
     </FormProvider>
   )
 }
+
+describe('MonsterCreatureDetailsLanguagesSlot fluency chips', () => {
+  it('shows understands-only as a lone toggle; speaking is implied', () => {
+    render(
+      <Harness
+        defaultValues={{
+          proficiencies: {
+            savingThrows: [],
+            skills: [],
+            languages: [{ language: 'common' }],
+            weapons: { categories: [], items: [] },
+          },
+        }}
+      />,
+    )
+
+    expect(screen.queryByRole('checkbox', { name: MONSTER_SPEAKS_LABEL })).not.toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: MONSTER_UNDERSTANDS_ONLY_LABEL })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    )
+  })
+})
 
 describe('MonsterCreatureDetailsLanguagesSlot recommendation', () => {
   it('shows recommendation for dragon with no selected languages', () => {

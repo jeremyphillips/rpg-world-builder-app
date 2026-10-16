@@ -84,6 +84,24 @@ export const SkillRows: Story = {
   ),
 }
 
+export const SkillRowsWithoutChallengeRating: Story = {
+  render: () => (
+    <FormHarness
+      defaultValues={{
+        abilityScores: { str: 10, dex: 16, con: 10, int: 10, wis: 10, cha: 10 },
+        proficiencies: {
+          skills: [{ skill: 'stealth', rank: 'proficient' }],
+          savingThrows: [],
+          languages: [],
+          weapons: { categories: [], items: [] },
+        },
+      }}
+    >
+      <MonsterCreatureDetailsSkillsSlot ctx={mockCtx} />
+    </FormHarness>
+  ),
+}
+
 export const SenseRows: Story = {
   render: () => (
     <FormHarness defaultValues={{ senses: [{ type: 'darkvision', range: 60 }] }}>

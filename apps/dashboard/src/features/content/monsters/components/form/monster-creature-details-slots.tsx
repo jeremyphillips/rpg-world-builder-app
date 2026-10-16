@@ -8,7 +8,7 @@ import {
   TELEPATHY_MILE_FEET,
   type SenseId,
 } from '@rpg/contracts'
-import { Chip, ChipGroup, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
+import { Chip, ComboboxField, JoinedPairFieldForm } from '@rpg/ui'
 
 import { buildLabelDescriptionActiveVocabulary } from '@/features/vocabulary/lib/build-vocabulary-maps'
 import { useVocabularySet } from '@/features/vocabulary/hooks/use-vocabulary-set'
@@ -30,7 +30,6 @@ import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-re
 import {
   MONSTER_ADD_SENSE_LABEL,
   MONSTER_SPECIAL_SENSE_SUPPORTING_LABEL,
-  MONSTER_SPEAKS_LABEL,
   MONSTER_TELEPATHY_HINT,
   MONSTER_UNDERSTANDS_ONLY_LABEL,
 } from '../../lib/monster-form-labels'
@@ -146,41 +145,22 @@ function MonsterLanguageFluencyRowTrailing({
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      <ChipGroup
-        semanticRole="radiogroup"
-        aria-label={`${label}, ${speaks ? MONSTER_SPEAKS_LABEL : MONSTER_UNDERSTANDS_ONLY_LABEL}`}
+      <Chip
+        id={`monster-language-${entry.language}-understands-only`}
+        mode="selectable"
+        size={chipSize}
+        selectionRole="checkbox"
+        selected={!speaks}
+        onSelectedChange={(understandsOnly) => {
+          form.setValue(
+            `proficiencies.languages.${index}.speaks`,
+            understandsOnly ? false : undefined,
+            { shouldDirty: true },
+          )
+        }}
       >
-        <Chip
-          id={`monster-language-${entry.language}-speaks`}
-          mode="selectable"
-          size={chipSize}
-          selectionRole="radio"
-          selected={speaks}
-          onSelectedChange={(nextSpeaks) => {
-            if (!nextSpeaks) return
-            form.setValue(`proficiencies.languages.${index}.speaks`, undefined, {
-              shouldDirty: true,
-            })
-          }}
-        >
-          {MONSTER_SPEAKS_LABEL}
-        </Chip>
-        <Chip
-          id={`monster-language-${entry.language}-understands`}
-          mode="selectable"
-          size={chipSize}
-          selectionRole="radio"
-          selected={!speaks}
-          onSelectedChange={(nextUnderstands) => {
-            if (!nextUnderstands) return
-            form.setValue(`proficiencies.languages.${index}.speaks`, false, {
-              shouldDirty: true,
-            })
-          }}
-        >
-          {MONSTER_UNDERSTANDS_ONLY_LABEL}
-        </Chip>
-      </ChipGroup>
+        {MONSTER_UNDERSTANDS_ONLY_LABEL}
+      </Chip>
       <MonsterCreatureDetailsRemoveRowButton
         label={label}
         onRemove={() =>

@@ -1,15 +1,24 @@
 import {
   formatSignedModifier,
   PROFICIENCY_RANK_ENTRIES,
-  PROFICIENCY_RANK_IDS,
   type DerivedMonsterDraftStatBlock,
   type ProficiencyRank,
   type SkillProficiency,
 } from '@rpg/contracts'
 import { proficiencyDomainFieldNoun } from '@rpg/contracts'
-import { Badge, Chip, ChipGroup, ComboboxField, SemanticText } from '@rpg/ui'
+import {
+  Chip,
+  cn,
+  ComboboxField,
+  SemanticText,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@rpg/ui'
 import { useFormContext } from 'react-hook-form'
 
+import { entityAnatomyTrailingGroupSecondaryVariants } from '../../../lib/entity/anatomy/entity-anatomy-trailing.variants'
 import { useEntityCardUtilityControlSizes } from '../../../lib/entity/surfaces/cards/content/entity-card-utility-field-size.lib'
 import { ContentFormEntitySelectionRow } from '../../../lib/forms/selection/content-form-entity-selection-row'
 import type { ContentFormCtx } from '../../../lib/forms/registry/content-form-registry'
@@ -22,8 +31,8 @@ import {
   MONSTER_PASSIVE_PERCEPTION_LABEL,
   MONSTER_SKILL_ERROR,
   MONSTER_SKILL_LOADING,
+  MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP,
 } from '../../lib/monster-form-labels'
-import { monsterUnavailableReasonCopy } from '../../lib/monster-display'
 import { monsterSkillDerivedMetadataLine } from '../../lib/creature-details/monster-skill-derived-metadata.lib'
 import type { MonsterFormValues } from '../../lib/monster-form-values'
 import { MonsterCreatureDetailsRemoveRowButton } from './monster-creature-details-slot-parts'
@@ -53,49 +62,90 @@ type SkillRowProps = {
   values: MonsterFormValues
 }
 
+type MonsterSkillModifierDisplay =
+  | { kind: 'resolved'; label: string }
+  | { kind: 'unavailable' }
+  | { kind: 'hidden' }
+
+function resolveMonsterSkillModifierDisplay(
+  derivedRow: { modifier: number } | undefined,
+  derived: DerivedMonsterDraftStatBlock | null,
+): MonsterSkillModifierDisplay {
+  if (derivedRow) {
+    return { kind: 'resolved', label: formatSignedModifier(derivedRow.modifier) }
+  }
+  if (derived?.skills.status === 'unavailable') {
+    return { kind: 'unavailable' }
+  }
+  return { kind: 'hidden' }
+}
+
+function monsterSkillModifierClassName(): string {
+  return cn(entityAnatomyTrailingGroupSecondaryVariants(), 'mr-1 text-sm')
+}
+
+function MonsterSkillProficiencyModifier({ display }: { display: MonsterSkillModifierDisplay }) {
+  if (display.kind === 'hidden') return null
+
+  const valueClassName = monsterSkillModifierClassName()
+
+  if (display.kind === 'resolved') {
+    return <span className={valueClassName}>{display.label}</span>
+  }
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild className="cursor-pointer">
+          <span
+            className={cn(valueClassName, 'cursor-pointer')}
+            tabIndex={0}
+            aria-label={MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP}
+          >
+            —
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{MONSTER_SKILL_MODIFIER_UNAVAILABLE_TOOLTIP}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  )
+}
+
 function MonsterSkillProficiencyRowTrailing({
   row,
   index,
   skillLabel,
-  modifierBadge,
+  modifierDisplay,
   values,
 }: {
   row: SkillRowProps['row']
   index: number
   skillLabel: string
-  modifierBadge: string | undefined
+  modifierDisplay: MonsterSkillModifierDisplay
   values: MonsterFormValues
 }) {
   const form = useFormContext<MonsterFormValues>()
-  const { chipSize, badgeSize } = useEntityCardUtilityControlSizes()
+  const { chipSize } = useEntityCardUtilityControlSizes()
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
-      {modifierBadge ? (
-        <Badge tone="neutral" appearance="soft" size={badgeSize}>
-          {modifierBadge}
-        </Badge>
-      ) : null}
-      <ChipGroup semanticRole="radiogroup" aria-label={`${skillLabel} rank`}>
-        {PROFICIENCY_RANK_IDS.map((rank) => (
-          <Chip
-            key={rank}
-            id={`monster-skill-${row.skill}-${rank}`}
-            mode="selectable"
-            size={chipSize}
-            selectionRole="radio"
-            selected={row.rank === rank}
-            onSelectedChange={(selectedRank) => {
-              if (!selectedRank) return
-              form.setValue(`proficiencies.skills.${index}.rank`, rank as ProficiencyRank, {
-                shouldDirty: true,
-              })
-            }}
-          >
-            {PROFICIENCY_RANK_ENTRIES[rank].label}
-          </Chip>
-        ))}
-      </ChipGroup>
+      <MonsterSkillProficiencyModifier display={modifierDisplay} />
+      <Chip
+        id={`monster-skill-${row.skill}-expertise`}
+        mode="selectable"
+        size={chipSize}
+        selectionRole="checkbox"
+        selected={row.rank === 'expertise'}
+        onSelectedChange={(selected) => {
+          form.setValue(
+            `proficiencies.skills.${index}.rank`,
+            (selected ? 'expertise' : 'proficient') satisfies ProficiencyRank,
+            { shouldDirty: true },
+          )
+        }}
+      >
+        {PROFICIENCY_RANK_ENTRIES.expertise.label}
+      </Chip>
       <MonsterCreatureDetailsRemoveRowButton
         label={skillLabel}
         onRemove={() =>
@@ -123,11 +173,7 @@ function MonsterSkillProficiencyRow({
     derived?.skills.status === 'resolved'
       ? derived.skills.value.find((entry) => entry.skillId === row.skill)
       : undefined
-  const modifierBadge = derivedRow
-    ? formatSignedModifier(derivedRow.modifier)
-    : derived?.skills.status === 'unavailable'
-      ? monsterUnavailableReasonCopy(derived.skills.reason, 'challenge')
-      : undefined
+  const modifierDisplay = resolveMonsterSkillModifierDisplay(derivedRow, derived)
   const metadataLine =
     skill && proficiencyBonus !== undefined
       ? monsterSkillDerivedMetadataLine({
@@ -151,7 +197,7 @@ function MonsterSkillProficiencyRow({
             row={row}
             index={index}
             skillLabel={skillLabel}
-            modifierBadge={modifierBadge}
+            modifierDisplay={modifierDisplay}
             values={values}
           />
         ),

@@ -48,7 +48,10 @@ import { findActionsReferencingEntry } from '../../lib/actions/monster-action-eq
 import { commitEquipmentEntryRemoval } from '../../lib/equipment/commit-equipment-entry-removal.lib'
 import { weaponProficiencyGrantSetFromMode } from '@/lib/forms/grant-sets/weapon-proficiency-grant-mode.lib'
 
-import { coerceCreatureWeaponProficienciesForForm } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
+import {
+  coerceCreatureWeaponProficienciesForForm,
+  MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+} from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
 import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/resolve-monster-weapon-is-proficient.lib'
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
@@ -87,7 +90,10 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
   const weaponGrants = useMemo(() => {
     const raw = coerceCreatureWeaponProficienciesForForm(values?.proficiencies?.weapons)
     return creatureWeaponProficienciesSchema.parse(
-      weaponProficiencyGrantSetFromMode(values?.weaponProficiencyMode ?? 'none', raw),
+      weaponProficiencyGrantSetFromMode(
+        values?.weaponProficiencyMode ?? MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
+        raw,
+      ),
     )
   }, [values?.proficiencies?.weapons, values?.weaponProficiencyMode])
 
