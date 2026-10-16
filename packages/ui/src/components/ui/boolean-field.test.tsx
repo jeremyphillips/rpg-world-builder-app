@@ -144,6 +144,17 @@ describe('BooleanField density CSS', () => {
     expect(css).toContain('height: var(--control-height-sm)')
   })
 
+  it('shares one background state path and keeps neutral checked fill on the active outline wash', () => {
+    expect(css).toContain('--boolean-bg: var(--color-background)')
+    expect(css).toContain('--boolean-hover-bg: var(--surface-subtle)')
+    expect(css).toContain('--boolean-checked-bg: var(--interactive-outline-active-bg)')
+    expect(css).toContain('--boolean-checked-hover-bg:')
+    expect(css).toContain('background-color: var(--boolean-hover-bg)')
+    expect(css).toContain('background-color: var(--boolean-checked-bg)')
+    expect(css).toContain('background-color: var(--boolean-checked-hover-bg)')
+    expect(css).not.toContain("[data-choice-tone='default']")
+  })
+
   it('suppresses the inner focus ring from the field scope', () => {
     expect(css).toContain('.ui-boolean-field .ui-focus-ring:focus-visible')
     expect(css).toContain('.ui-boolean-field:has(:focus-visible)')

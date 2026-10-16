@@ -11,40 +11,24 @@
     --choice-indicator-fill: var(--primary);
     --choice-indicator-border: var(--primary);
     --choice-indicator-foreground: var(--primary-foreground);
-    --choice-surface-bg: var(--interactive-outline-active-bg);
-    --choice-surface-border: var(--border);
-    --choice-surface-bg-hover: color-mix(in oklch, var(--primary) 12%, var(--choice-surface-bg));
   }
 
   [data-choice-tone='success'] {
     --choice-indicator-fill: var(--success);
     --choice-indicator-border: var(--success);
     --choice-indicator-foreground: var(--success-foreground);
-    --choice-surface-bg: var(--success-subtle);
-    --choice-surface-border: var(--success-muted);
-    --choice-surface-bg-hover: color-mix(in oklch, var(--success) 12%, var(--choice-surface-bg));
   }
 
   [data-choice-tone='warning'] {
     --choice-indicator-fill: var(--warning);
     --choice-indicator-border: var(--warning);
     --choice-indicator-foreground: var(--warning-foreground);
-    --choice-surface-bg: var(--warning-subtle);
-    --choice-surface-border: var(--warning-muted);
-    --choice-surface-bg-hover: color-mix(in oklch, var(--warning) 12%, var(--choice-surface-bg));
   }
 
   [data-choice-tone='destructive'] {
     --choice-indicator-fill: var(--destructive);
     --choice-indicator-border: var(--destructive);
     --choice-indicator-foreground: var(--destructive-foreground);
-    --choice-surface-bg: var(--destructive-subtle);
-    --choice-surface-border: var(--destructive-muted);
-    --choice-surface-bg-hover: color-mix(
-      in oklch,
-      var(--destructive) 12%,
-      var(--choice-surface-bg)
-    );
   }
 
   .ui-choice-control {

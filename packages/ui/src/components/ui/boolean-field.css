@@ -1,5 +1,6 @@
 /*
  * Outlined boolean field. Indicator color comes from [data-choice-tone] in choice-control.css.
+ * Surface state reads --boolean-bg / --boolean-hover-bg / --boolean-checked-bg for every tone.
  * Size cascade: heading inline, explicit data-size, card data-content-density, then data-field-scale.
  */
 @layer components {
@@ -15,9 +16,21 @@
     padding-inline: var(--field-padding-md);
     border-width: 1px;
     border-style: solid;
-    border-color: var(--interactive-outline-border);
+    border-color: var(--boolean-border);
     border-radius: calc(var(--radius) - 2px);
-    background-color: transparent;
+    background-color: var(--boolean-bg);
+    --boolean-bg: var(--color-background);
+    --boolean-border: var(--interactive-outline-border);
+    --boolean-hover-bg: var(--surface-subtle);
+    --boolean-hover-border: var(--border-strong);
+    --boolean-checked-bg: var(--interactive-outline-active-bg);
+    --boolean-checked-border: var(--interactive-outline-border);
+    --boolean-checked-hover-bg: color-mix(
+      in oklch,
+      var(--primary) 8%,
+      var(--interactive-outline-active-bg)
+    );
+    --boolean-checked-hover-border: var(--border-strong);
     color: var(--foreground);
     font-size: var(--text-sm);
     line-height: var(--text-sm--line-height);
@@ -78,17 +91,44 @@
     white-space: nowrap;
   }
 
-  .ui-boolean-field[data-checked='true'] {
-    background-color: var(--choice-surface-bg);
-    border-color: var(--choice-surface-border);
+  .ui-boolean-field[data-choice-tone='success'] {
+    --boolean-checked-bg: var(--success-subtle);
+    --boolean-checked-border: var(--success-muted);
+    --boolean-checked-hover-bg: color-mix(in oklch, var(--success) 8%, var(--success-subtle));
+    --boolean-checked-hover-border: var(--success-muted);
+  }
+
+  .ui-boolean-field[data-choice-tone='warning'] {
+    --boolean-checked-bg: var(--warning-subtle);
+    --boolean-checked-border: var(--warning-muted);
+    --boolean-checked-hover-bg: color-mix(in oklch, var(--warning) 8%, var(--warning-subtle));
+    --boolean-checked-hover-border: var(--warning-muted);
+  }
+
+  .ui-boolean-field[data-choice-tone='destructive'] {
+    --boolean-checked-bg: var(--destructive-subtle);
+    --boolean-checked-border: var(--destructive-muted);
+    --boolean-checked-hover-bg: color-mix(
+      in oklch,
+      var(--destructive) 8%,
+      var(--destructive-subtle)
+    );
+    --boolean-checked-hover-border: var(--destructive-muted);
   }
 
   .ui-boolean-field[data-checked='false']:hover:not([data-disabled='true']) {
-    background-color: var(--control-hover-bg);
+    background-color: var(--boolean-hover-bg);
+    border-color: var(--boolean-hover-border);
+  }
+
+  .ui-boolean-field[data-checked='true'] {
+    background-color: var(--boolean-checked-bg);
+    border-color: var(--boolean-checked-border);
   }
 
   .ui-boolean-field[data-checked='true']:hover:not([data-disabled='true']) {
-    background-color: var(--choice-surface-bg-hover);
+    background-color: var(--boolean-checked-hover-bg);
+    border-color: var(--boolean-checked-hover-border);
   }
 
   .ui-boolean-field[data-invalid='true'] {
