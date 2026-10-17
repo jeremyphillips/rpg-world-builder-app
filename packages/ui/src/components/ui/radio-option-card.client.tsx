@@ -32,6 +32,8 @@ import {
   SelectionTargetRaised,
 } from './selection-target.client'
 import {
+  optionCardDensityBodyLayoutVariants,
+  optionCardDensityContentGapVariants,
   optionCardEmbeddedSlotVariants,
   optionCardFooterSlotVariants,
 } from './selection-option-card.variants'
@@ -329,7 +331,14 @@ function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
       {showCardMedia ? (
         <div className={cn('ui-radio-card__media', radioCardMediaSlotClasses)}>{media}</div>
       ) : null}
-      <div className={cn('ui-radio-card__body', showCardMedia && 'flex min-h-0 flex-1 flex-col')}>
+      <div
+        className={cn(
+          'ui-radio-card__body',
+          optionCardDensityBodyLayoutVariants({ density }),
+          optionCardDensityContentGapVariants({ density }),
+          showCardMedia && 'flex min-h-0 flex-1 flex-col',
+        )}
+      >
         <RadioOptionCardPrimaryRow {...props} />
         <RadioOptionCardBodyExtras
           density={density}

@@ -1,6 +1,6 @@
 /*
- * Card shell. Part padding lives here. Tone and state modifiers resolve surface chrome.
- * Source order: block → tone → interactive/static → selected → disabled → parts.
+ * Card shell. Part padding lives here. Tone modifiers set tokens; toned chrome resolves once.
+ * Source order: block → tone tokens → toned chrome → interactive/static → selected → disabled → parts.
  */
 @layer components {
   .ui-card {
@@ -12,12 +12,8 @@
     --surface-current: var(--card);
   }
 
+  /* Tone dimensions — custom properties only (completeness guard). */
   .ui-card--quiet {
-    border-radius: var(--ui-card-radius);
-    border: 1px solid var(--ui-card-border);
-    background-color: var(--ui-card-bg);
-    box-shadow: var(--ui-card-shadow);
-    --surface-current: var(--ui-card-bg);
     --ui-card-bg: var(--card);
     --ui-card-border: var(--border);
     --ui-card-shadow: none;
@@ -30,11 +26,6 @@
   }
 
   .ui-card--strong {
-    border-radius: var(--ui-card-radius);
-    border: 1px solid var(--ui-card-border);
-    background-color: var(--ui-card-bg);
-    box-shadow: var(--ui-card-shadow);
-    --surface-current: var(--ui-card-bg);
     --ui-card-bg: var(--surface-muted);
     --ui-card-border: var(--card-border);
     --ui-card-shadow: var(--shadow-surface-raised);
@@ -44,6 +35,15 @@
     --ui-card-bg-selected: var(--surface-strong);
     --ui-card-border-selected: var(--primary);
     --ui-card-ring-selected: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
+  .ui-card.ui-card--quiet,
+  .ui-card.ui-card--strong {
+    border-radius: var(--ui-card-radius);
+    border: 1px solid var(--ui-card-border);
+    background-color: var(--ui-card-bg);
+    box-shadow: var(--ui-card-shadow);
+    --surface-current: var(--ui-card-bg);
   }
 
   .ui-card--static,

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { ChartNoAxesColumn, Grid3x3 } from 'lucide-react'
 import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 
+import { CardSurfaceToneProvider } from './card-surface-tone.client'
 import { RadioCard } from './radio-card.client'
 
 const options = [
@@ -22,6 +23,38 @@ const options = [
 ]
 
 describe('RadioCard', () => {
+  it('uses quiet tone chrome when a quiet host provider is present', () => {
+    render(
+      <CardSurfaceToneProvider tone="quiet">
+        <RadioCard
+          aria-label="Connection kind"
+          density="compact"
+          options={[{ label: 'Owner', value: 'owns', description: 'Controls the location' }]}
+        />
+      </CardSurfaceToneProvider>,
+    )
+
+    const shell = screen.getByRole('radio', { name: /Owner/i }).closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--quiet')
+    expect(shell).not.toHaveClass('ui-card--strong')
+  })
+
+  it('applies density body padding inside the radio card shell', () => {
+    render(
+      <RadioCard
+        aria-label="Connection kind"
+        density="compact"
+        options={[{ label: 'Owner', value: 'owns' }]}
+      />,
+    )
+
+    const body = screen
+      .getByRole('radio', { name: /Owner/i })
+      .closest('.ui-card')
+      ?.querySelector('.ui-radio-card__body')
+    expect(body).toHaveClass('pl-3', 'pr-4', 'py-2')
+  })
+
   it('selects an option on click', async () => {
     const user = userEvent.setup()
     const onValueChange = vi.fn()
