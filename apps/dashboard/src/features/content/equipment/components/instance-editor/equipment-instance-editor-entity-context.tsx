@@ -42,9 +42,9 @@ export function EquipmentInstanceEditorEntityContext({
   )
 
   const quantity = draft.quantity ?? 1
-  const isScopeMode = state.mode.kind === 'scope'
-  const showQuantityStepper = !isScopeMode && (state.session.scope === 'all' || quantity <= 1)
-  const showSeparatedLabel = !isScopeMode && state.session.scope === 'one' && quantity > 1
+  const isMainMode = state.mode.kind === 'main'
+  const showQuantityStepper = isMainMode && (state.session.scope === 'all' || quantity <= 1)
+  const showSeparatedLabel = isMainMode && state.session.scope === 'one' && quantity > 1
 
   const trailing = showQuantityStepper ? (
     <NumberStepper
