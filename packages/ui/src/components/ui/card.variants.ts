@@ -64,7 +64,7 @@ const CARD_TONE_STATE_MATRIX: readonly {
     key: 'quiet-rest',
     tone: 'quiet',
     useCase: 'Drawer / entity row rest',
-    keyValues: 'bg --card, border --border',
+    keyValues: 'bg host plane when `.ui-card-tone-host--inherit`, else --card; border --border',
   },
   {
     key: 'quiet-hover',

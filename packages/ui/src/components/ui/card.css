@@ -4,17 +4,29 @@
  */
 @layer components {
   .ui-card {
+    color: var(--card-foreground);
+  }
+
+  /* Untoned cards only — quiet/strong chrome resolves on the compound selector below. */
+  .ui-card:not(.ui-card--quiet):not(.ui-card--strong) {
     border-radius: var(--radius-card);
     border: 1px solid var(--card-border);
     background-color: var(--card);
-    color: var(--card-foreground);
     box-shadow: var(--shadow-surface-raised);
     --surface-current: var(--card);
   }
 
+  /*
+   * Drawer / canvas hosts set `--ui-card-quiet-bg` via `.ui-card-tone-host--inherit`
+   * so quiet rows sit on the host plane instead of the panel fill.
+   */
+  .ui-card-tone-host--inherit {
+    --ui-card-quiet-bg: var(--surface-current);
+  }
+
   /* Tone dimensions — custom properties only (completeness guard). */
   .ui-card--quiet {
-    --ui-card-bg: var(--card);
+    --ui-card-bg: var(--ui-card-quiet-bg, var(--card));
     --ui-card-border: var(--border);
     --ui-card-shadow: none;
     --ui-card-radius: var(--radius-md);

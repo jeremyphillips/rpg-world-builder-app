@@ -68,11 +68,8 @@ export const collapsibleListItemEntityCardHeaderRowClasses =
 
 export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
 
-/** Catalog row chrome — quiet card tone for raw picker rows. */
-export const collapsibleListItemCatalogChromeClasses = cn(
-  cardSurfaceVariants({ tone: 'quiet' }),
-  'border-border',
-)
+/** Catalog row chrome — quiet card tone for raw picker rows (no Tailwind border/radius utilities). */
+export const collapsibleListItemCatalogChromeClasses = cardSurfaceVariants({ tone: 'quiet' })
 
 /** Shared body divider and vertical rhythm — no surface tone. */
 export const collapsibleListItemBodyFrameClasses = 'border-t border-border-subtle py-3'
@@ -113,36 +110,33 @@ export function collapsibleListItemHeaderRowClassesForRowLayout(
 }
 
 /** Item shell — border and shell padding; actions rail sits inside padded box on row 1. */
-export const collapsibleListItemShellVariants = cva(
-  cn('relative overflow-hidden rounded-md border'),
-  {
-    variants: {
-      layout: {
-        default: cn(
-          'grid grid-cols-[minmax(0,1fr)_auto] items-start',
-          collapsibleListItemShellPaddingClasses,
-        ),
-        headerActions: 'flex flex-col',
-        compactRow: collapsibleListItemFlatShellPaddingClasses,
-        entityCardHeaderActions: cn(
-          'flex flex-col',
-          collapsibleListItemEntityCardShellPaddingClasses,
-        ),
-      },
-      preset: {
-        default: 'border-border',
-        catalog: cn(
-          collapsibleListItemCatalogChromeClasses,
-          collapsibleListItemCatalogShellExtraClasses,
-        ),
-      },
+export const collapsibleListItemShellVariants = cva(cn('relative overflow-hidden'), {
+  variants: {
+    layout: {
+      default: cn(
+        'grid grid-cols-[minmax(0,1fr)_auto] items-start',
+        collapsibleListItemShellPaddingClasses,
+      ),
+      headerActions: 'flex flex-col',
+      compactRow: collapsibleListItemFlatShellPaddingClasses,
+      entityCardHeaderActions: cn(
+        'flex flex-col',
+        collapsibleListItemEntityCardShellPaddingClasses,
+      ),
     },
-    defaultVariants: {
-      layout: 'default',
-      preset: 'default',
+    preset: {
+      default: cn('rounded-md border border-border'),
+      catalog: cn(
+        collapsibleListItemCatalogChromeClasses,
+        collapsibleListItemCatalogShellExtraClasses,
+      ),
     },
   },
-)
+  defaultVariants: {
+    layout: 'default',
+    preset: 'default',
+  },
+})
 
 /** Preset-aware shell classes — use when composing rows outside the shell component. */
 export function collapsibleListItemShellPresetClasses(

@@ -248,7 +248,8 @@ describe('CollapsibleListItem', () => {
     )
 
     const shell = container.firstChild
-    expect(shell).toHaveClass('border-border', 'ui-card--quiet', 'pb-0')
+    expect(shell).toHaveClass('ui-card', 'ui-card--quiet', 'ui-card--static', 'pb-0')
+    expect(shell).not.toHaveClass('rounded-md')
   })
 
   it('applies catalog body wash classes when preset is catalog', () => {

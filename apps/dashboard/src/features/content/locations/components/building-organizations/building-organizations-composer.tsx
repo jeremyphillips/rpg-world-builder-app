@@ -346,7 +346,7 @@ export function BuildingOrganizationComposer({
   }
 
   return (
-    <CardSurfaceToneProvider tone="quiet">
+    <CardSurfaceToneProvider tone="quiet" inheritHostPlane>
       <CreateCompositionComposer heading={BUILDING_ORGANIZATIONS_COMPOSER_HEADING}>
         <BuildingOrganizationRelationshipReview controller={controller} />
       </CreateCompositionComposer>
