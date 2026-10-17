@@ -43,6 +43,7 @@ export function ContentEntityCard({
       density={resolvedDensity}
       disabled={disabled}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount: leading ? 1 : 0, trailing })}
+      leadingUtilityCount={leading ? 1 : 0}
     >
       <EntityCardUtilityFieldSizeProvider size={utilityFieldSize}>
         <EntityCardContent>

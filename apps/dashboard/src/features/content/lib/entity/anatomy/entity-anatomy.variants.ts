@@ -5,29 +5,6 @@ import { cn, rowAnatomyTracksVariants, type ContentCardDensity } from '@rpg/ui'
 /** Embedded EntityAnatomyHost host — anatomy only; collection inset owned by the host. */
 export const entityAnatomyHostRootVariants = cva('w-full min-w-0')
 
-/**
- * Column template — EntityAnatomy owns columns and horizontal spacing; RowAnatomy owns rows.
- * Empty `auto` columns collapse to 0, so absent rails add no phantom spacing.
- * Compact media → content is 16px. Leading caret/grip gap stays on EntityLeadingRail
- * padding-inline-end. Trailing separation is the `ms-*` rule on the trailing column.
- */
-export const entityAnatomyColumnsVariants = cva(
-  'min-w-0 w-full grid-cols-[[leading]_auto_[media]_auto_[content]_minmax(0,1fr)_[trailing]_auto] [&>[data-row-anatomy-column=trailing]]:justify-self-end',
-  {
-    variants: {
-      density: {
-        compact:
-          '[&>[data-row-anatomy-column=media]]:me-4 [&>[data-row-anatomy-column=trailing]]:ms-2',
-        comfortable:
-          '[&>[data-row-anatomy-column=media]]:me-4 [&>[data-row-anatomy-column=trailing]]:ms-3',
-      },
-    },
-    defaultVariants: {
-      density: 'comfortable',
-    },
-  },
-)
-
 export const entityAnatomyMediaContentSpanClasses = 'flex h-full items-start'
 
 export function entityAnatomyVariants({
@@ -35,6 +12,7 @@ export function entityAnatomyVariants({
 }: { density?: ContentCardDensity } = {}) {
   return cn(
     rowAnatomyTracksVariants({ band: 'control' }),
-    entityAnatomyColumnsVariants({ density }),
+    'dash-entity-anatomy min-w-0 w-full',
+    density === 'compact' ? 'dash-entity-anatomy--compact' : 'dash-entity-anatomy--comfortable',
   )
 }

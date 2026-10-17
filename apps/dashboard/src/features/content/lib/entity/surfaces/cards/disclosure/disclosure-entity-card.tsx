@@ -5,10 +5,7 @@ import {
   type ContentCardDensity,
 } from '@rpg/ui'
 
-import {
-  buildEntityContentOffsetStyle,
-  resolveEntityLeadingUtilityCount,
-} from '../../../anatomy/entity-leading-rail.lib'
+import { resolveEntityLeadingUtilityCount } from '../../../anatomy/entity-leading-rail.lib'
 import type { EntityAnatomyTrailing } from '../../../anatomy/entity-anatomy-trailing.types'
 import { resolveEntitySurfaceEdges } from '../../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../../summary/entity-summary.types'
@@ -56,17 +53,13 @@ export function DisclosureEntityCard({
     dragHandle: showDragHandle,
     disclosure: true,
   })
-  const leadingOffsetStyle = buildEntityContentOffsetStyle({
-    count: leadingUtilityCount,
-    density,
-  })
 
   return (
     <EntityCardFrame
       density={density}
       disabled={disabled}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
-      style={leadingOffsetStyle}
+      leadingUtilityCount={leadingUtilityCount}
     >
       <CollapsibleListItem
         itemId={itemId}

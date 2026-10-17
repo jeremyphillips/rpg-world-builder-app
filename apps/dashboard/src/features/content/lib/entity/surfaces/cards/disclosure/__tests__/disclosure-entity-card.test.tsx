@@ -6,14 +6,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { ActionIcon, iconGhostControlVariants } from '@rpg/ui'
 
 import { DisclosureEntityCard } from '../disclosure-entity-card'
-import {
-  entityBodyInlineEndClasses as disclosureEntityCardBodyInlineEndClasses,
-  entityBodyInlineStartClasses as disclosureEntityCardBodyInlineStartClasses,
-} from '../../../entity-surface-inset.variants'
-import {
-  ENTITY_BODY_INLINE_START_VAR,
-  ENTITY_CONTENT_OFFSET_VAR,
-} from '../../../../anatomy/entity-leading-rail.lib'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
 import { HARBOR_DISTRICT_ENTITY } from '../../../../__tests__/entity.fixture'
 
 const mockDragHandleProps = {
@@ -82,21 +75,13 @@ describe('DisclosureEntityCard', () => {
     const body = screen.getByText('Expanded inventory details').parentElement
     expect(body).not.toHaveAttribute('hidden')
     expect(body).toHaveClass('border-t', 'bg-background')
-    expect(body).toHaveClass(disclosureEntityCardBodyInlineStartClasses)
-    expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
+    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(var(--spacing)*6)',
-    )
-    expect(article.style.getPropertyValue(ENTITY_BODY_INLINE_START_VAR)).toBe(
-      'calc(var(--entity-surface-inline-start) + var(--entity-content-offset))',
-    )
-    expect(article).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*2)]')
-    expect(article).toHaveClass(
-      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
-    )
-    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-inset)]')
+    expect(article).toHaveClass('dash-entity-surface--leading-1')
+    expect(article).toHaveClass('dash-entity-surface--start-utility')
+    expect(article).toHaveClass('dash-entity-surface--end-default')
+    expect(article).not.toHaveAttribute('style')
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
     expect(shell.className).not.toContain('--entity-surface-inline-start')
@@ -145,8 +130,7 @@ describe('DisclosureEntityCard', () => {
 
     const classNames = cases.map((entry) => bodyFor(entry.label).className)
     for (const className of classNames) {
-      expect(className).toContain(disclosureEntityCardBodyInlineEndClasses)
-      expect(className).toContain(disclosureEntityCardBodyInlineStartClasses)
+      expect(className).toContain(DASH_ENTITY_CARD_BODY_CLASS)
     }
     expect(new Set(classNames).size).toBe(1)
   })
@@ -167,13 +151,11 @@ describe('DisclosureEntityCard', () => {
 
     const shell = container.querySelector('[role="group"]') as HTMLElement
     const article = container.querySelector('article') as HTMLElement
-    expect(article).toHaveClass('[--entity-surface-inset:calc(var(--spacing)*4)]')
-    expect(article).toHaveClass(
-      '[--entity-surface-inline-start:var(--entity-surface-utility-inset)]',
-    )
-    expect(article).toHaveClass('[--entity-surface-inline-end:var(--entity-surface-utility-inset)]')
+    expect(article).toHaveClass('dash-entity-surface--compact')
+    expect(article).toHaveClass('dash-entity-surface--start-utility')
+    expect(article).toHaveClass('dash-entity-surface--end-utility')
     expect(shell.className).not.toContain('--entity-surface-inline-start')
-    expect(bodyFor('Compact body')).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
+    expect(bodyFor('Compact body')).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
   })
 
   it('toggles collapse from the caret control', async () => {
@@ -211,8 +193,8 @@ describe('DisclosureEntityCard', () => {
     const expandButton = screen.getByRole('button', { name: 'Expand Harbor District' })
     const dragButton = screen.getByRole('button', { name: 'Drag to reorder Harbor District' })
 
-    expect(expandButton.parentElement).toHaveClass('w-[var(--leading-chrome-size)]')
-    expect(dragButton.parentElement).toHaveClass('w-[var(--leading-chrome-size)]')
+    expect(expandButton.parentElement).toHaveClass('dash-entity-leading__column')
+    expect(dragButton.parentElement).toHaveClass('dash-entity-leading__column')
   })
 
   it('renders caret-only leading chrome when drag is omitted', () => {
@@ -227,9 +209,7 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(var(--spacing)*6)',
-    )
+    expect(article).toHaveClass('dash-entity-surface--leading-1')
     expect(screen.getByRole('button', { name: 'Expand Harbor District' })).toBeInTheDocument()
     expect(screen.queryByLabelText(/drag to reorder/i)).not.toBeInTheDocument()
   })
@@ -305,7 +285,7 @@ describe('DisclosureEntityCard', () => {
     const headerWrap = screen
       .getByText('Light', { selector: '.font-body-emphasis' })
       .closest('.dash-entity-card__content') as HTMLElement
-    const anatomy = headerWrap.querySelector('.grid') as HTMLElement
+    const anatomy = headerWrap.querySelector('[data-row-anatomy]') as HTMLElement
     const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
     const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
 
@@ -346,7 +326,7 @@ describe('DisclosureEntityCard', () => {
 
     expect(anatomy).toHaveClass('w-full')
     expect(trailing).toHaveAttribute('data-row-anatomy-slot', 'full')
-    expect(content).toHaveClass('min-w-0')
+    expect(content).toHaveClass('ui-row-anatomy__cell')
     expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
     expect(trailing).toHaveAttribute('data-row-anatomy-column', 'trailing')
     expect(container.querySelector('[data-entity-item-slot="description"]')).toHaveAttribute(
@@ -373,8 +353,7 @@ describe('DisclosureEntityCard', () => {
     )
 
     const body = bodyFor('Isolated body')
-    expect(body).toHaveClass(disclosureEntityCardBodyInlineStartClasses)
-    expect(body).toHaveClass(disclosureEntityCardBodyInlineEndClasses)
+    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
     expect(body.className).not.toContain('content-column-indent')
     expect(body.className).not.toContain('content-inline-start')
     expect(
@@ -405,9 +384,7 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(2 * calc(var(--spacing)*6)',
-    )
+    expect(article).toHaveClass('dash-entity-surface--leading-2')
   })
 
   it('matches leading offset to caret-only count on the article root', () => {
@@ -423,9 +400,7 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article') as HTMLElement
-    expect(article.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(calc(var(--spacing)*6)',
-    )
+    expect(article).toHaveClass('dash-entity-surface--leading-1')
   })
 
   it('composes entity-card CLI behavior-only with a single leading rail and two columns', () => {
@@ -442,13 +417,11 @@ describe('DisclosureEntityCard', () => {
     )
 
     const leadingSlot = container.querySelector('[data-entity-item-slot="leading"]') as HTMLElement
-    const rail = leadingSlot.querySelector('.flex.shrink-0.items-center.gap-0') as HTMLElement
+    const rail = leadingSlot.querySelector('.dash-entity-leading') as HTMLElement
     expect(rail).toBeTruthy()
-    expect(rail).toHaveClass('pe-[calc(var(--spacing)*3)]')
+    expect(rail).toHaveClass('dash-entity-leading--comfortable')
     expect(leadingSlot.className).not.toMatch(/\bmr-/)
-    expect(leadingSlot.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]')).toHaveLength(
-      2,
-    )
+    expect(leadingSlot.querySelectorAll('.dash-entity-leading__column')).toHaveLength(2)
 
     const body = bodyFor('Combined invariant body')
     expect(body.className).not.toContain('content-column-indent')

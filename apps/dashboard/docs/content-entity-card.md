@@ -34,7 +34,7 @@ surfaces/  — CEC, DEC, catalog rows; imports anatomy/ + summary/ only via depe
 Dependency direction: `surfaces → anatomy → summary`. `summary/` must not import `anatomy/`;
 `anatomy/` must not import `surfaces/`. Shared CSS var **names** live in
 `anatomy/entity-geometry.tokens.ts`; surface CVA **values** live in
-`surfaces/entity-surface-inset.variants.ts`.
+`surfaces/dash-entity-surface.variants.ts` + `dash-entity-surface.css`.
 
 ## Choose a surface
 
@@ -222,11 +222,10 @@ EntityCardFrame (article)
     └── header inset: horizontal + vertical (density-resolved)
 ```
 
-| `surface` prop | Used by                | Background                      |
-| -------------- | ---------------------- | ------------------------------- |
-| `card`         | `ContentEntityCard`    | `bg-card`                       |
-| `subtle`       | `DisclosureEntityCard` | `bg-surface-subtle`             |
-| `catalogRow`   | `CatalogEntityRow`     | `bg-catalog-picker-row-surface` |
+| Host tone     | Used by                         | Resolver                                        |
+| ------------- | ------------------------------- | ----------------------------------------------- |
+| `quiet`       | CEC, DEC, `CatalogEntityRow`    | `cardSurfaceVariants({ tone: 'quiet' })`        |
+| (interactive) | Selectable catalog / radio rows | `ui-card--interactive` + `selected` when chosen |
 
 Rhythm must **never** depend on `collapsible`, `details`, or collapsed state.
 

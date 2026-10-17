@@ -5,11 +5,10 @@ import { cn } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../entity/anatomy/entity-anatomy'
 import type { EntityAnatomyTrailing } from '../../../entity/anatomy/entity-anatomy-trailing.types'
-import { buildEntityContentOffsetStyle } from '../../../entity/anatomy/entity-leading-rail.lib'
 import { resolveEntitySurfaceEdges } from '../../../entity/anatomy/entity-surface-edges.lib'
 import { projectEntitySummaryModel } from '../../../entity/summary/entity-summary-projection.lib'
 import type { EntitySummaryStatusItem } from '../../../entity/summary/entity-summary-status.types'
-import { entitySurfaceInsetVariants } from '../../../entity/surfaces/entity-surface-inset.variants'
+import { entitySurfaceVariants } from '../../../entity/surfaces/dash-entity-surface.variants'
 import {
   detailEntityRowDisclosureButtonVariants,
   detailEntityRowDisclosureContentVariants,
@@ -40,11 +39,6 @@ export type DetailEntityRowProps = {
 }
 
 const DETAIL_ENTITY_ROW_DENSITY = 'compact' as const
-
-const DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE = buildEntityContentOffsetStyle({
-  count: 1,
-  density: DETAIL_ENTITY_ROW_DENSITY,
-})
 
 function DetailEntityRowDisclosureUtility({
   disclosure,
@@ -150,7 +144,11 @@ export function DetailEntityRow({
         className={cn(
           detailEntityRowVariants({ inset }),
           flatEdges &&
-            entitySurfaceInsetVariants({ density: DETAIL_ENTITY_ROW_DENSITY, ...flatEdges }),
+            entitySurfaceVariants({
+              density: DETAIL_ENTITY_ROW_DENSITY,
+              edges: flatEdges,
+              leadingUtilityCount: 0,
+            }),
           className,
         )}
         data-entity-surface-start={flatEdges?.start}
@@ -169,18 +167,20 @@ export function DetailEntityRow({
     )
   }
 
+  const disclosureEdges = resolveEntitySurfaceEdges({ leadingUtilityCount: 1, trailing })
+
   return (
     <div
       className={cn(
         detailEntityRowDisclosureItemVariants(),
         inset === 'self' &&
-          entitySurfaceInsetVariants({
+          entitySurfaceVariants({
             density: DETAIL_ENTITY_ROW_DENSITY,
-            ...resolveEntitySurfaceEdges({ leadingUtilityCount: 1, trailing }),
+            edges: disclosureEdges,
+            leadingUtilityCount: 1,
           }),
         className,
       )}
-      style={DETAIL_ENTITY_ROW_DISCLOSURE_OFFSET_STYLE}
     >
       <div className={detailEntityRowDisclosureRowVariants({ inset })}>
         <DetailEntityRowIdentity

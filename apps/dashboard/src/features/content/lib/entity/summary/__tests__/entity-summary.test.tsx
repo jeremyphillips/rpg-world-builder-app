@@ -36,9 +36,8 @@ describe('EntitySummaryHeading', () => {
       />,
     )
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
-    expect(screen.getByText('Spell')).toHaveClass('text-xs')
-    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title--md')
+    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification--sm')
     const endValue = screen.getByText('3')
     expect(endValue).toHaveClass('tabular-nums')
     expect(endValue).not.toHaveClass('text-sm')
@@ -113,8 +112,8 @@ describe('EntitySummarySupportingMetadata', () => {
 
     expect(screen.getByText(/\+5 to hit/)).toBeInTheDocument()
     const line = screen.getByText(/1d8\+3 slashing/).closest('div')
-    expect(line).toHaveClass('leading-snug')
-    expect(line).not.toHaveClass('truncate')
+    expect(line).toHaveClass('ui-identity-row__supporting--wrap')
+    expect(line).not.toHaveClass('ui-identity-row__supporting--truncate')
   })
 })
 
@@ -128,11 +127,14 @@ describe('EntitySummaryDescription', () => {
     )
 
     expect(screen.getByText('Compact copy')).toHaveClass(
-      'text-xs',
+      'ui-identity-row__supporting--md',
       'text-muted-foreground',
-      'truncate',
+      'ui-identity-row__supporting--truncate',
     )
-    expect(screen.getByText('Comfortable copy')).toHaveClass('text-sm', 'truncate')
+    expect(screen.getByText('Comfortable copy')).toHaveClass(
+      'ui-identity-row__supporting--lg',
+      'ui-identity-row__supporting--truncate',
+    )
   })
 })
 

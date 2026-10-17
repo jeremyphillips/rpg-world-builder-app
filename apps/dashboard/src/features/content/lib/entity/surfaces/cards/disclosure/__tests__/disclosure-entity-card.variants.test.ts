@@ -2,26 +2,12 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-import {
-  ENTITY_BODY_INLINE_END_VAR,
-  ENTITY_BODY_INLINE_START_VAR,
-} from '../../../../anatomy/entity-geometry.tokens'
-import {
-  entityBodyInlineEndClasses,
-  entityBodyInlineStartClasses,
-} from '../../../entity-surface-inset.variants'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
+import { disclosureEntityCardBodyWashVariants } from '../disclosure-entity-card.variants'
 
-const INSET_VARIANTS_PATH = join(__dirname, '../../../entity-surface-inset.variants.ts')
-
-describe('entity body inline classes', () => {
-  it('use fully static Tailwind utility tokens that match the token var names', () => {
-    expect(entityBodyInlineStartClasses).toBe(`pl-[var(${ENTITY_BODY_INLINE_START_VAR})]`)
-    expect(entityBodyInlineEndClasses).toBe(`pr-[var(${ENTITY_BODY_INLINE_END_VAR})]`)
-
-    const source = readFileSync(INSET_VARIANTS_PATH, 'utf8')
-    expect(source).toContain("'pl-[var(--entity-body-inline-start)]'")
-    expect(source).toContain("'pr-[var(--entity-body-inline-end)]'")
-    expect(source).not.toMatch(/`\$\{/)
+describe('disclosure entity card body wash', () => {
+  it('uses dash-entity-card__body for expanded inline inset', () => {
+    expect(disclosureEntityCardBodyWashVariants()).toContain(DASH_ENTITY_CARD_BODY_CLASS)
   })
 })
 
@@ -32,5 +18,6 @@ describe('dash-entity-card content', () => {
     expect(css).toContain('.dash-entity-card__content')
     expect(css).toContain('width: 100%')
     expect(css).toContain('padding-block: var(--entity-surface-block-inset)')
+    expect(css).toContain('.dash-entity-card__body')
   })
 })

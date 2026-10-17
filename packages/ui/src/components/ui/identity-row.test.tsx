@@ -57,15 +57,15 @@ describe('IdentityRow', () => {
     const supporting = screen.getByText(
       'A contained structure such as a tavern, temple, or guild hall.',
     )
-    expect(supporting.className).toMatch(/\bleading-snug\b/)
-    expect(supporting.className).not.toMatch(/\btruncate\b/)
+    expect(supporting).toHaveClass('ui-identity-row__supporting--wrap')
+    expect(supporting).not.toHaveClass('ui-identity-row__supporting--truncate')
   })
 
   it('truncates supporting copy by default', () => {
     render(<IdentityRow heading="Building" supporting="Secondary metadata line" size="md" />)
 
     const supporting = screen.getByText('Secondary metadata line')
-    expect(supporting).toHaveClass('truncate')
+    expect(supporting).toHaveClass('ui-identity-row__supporting--truncate')
   })
 
   it('omits supporting line when absent', () => {
@@ -100,11 +100,13 @@ describe('IdentityRow', () => {
   it('uses text-xs heading at sm size', () => {
     render(<IdentityRow heading="Compact row" classification="Tag" size="sm" />)
 
-    expect(screen.getByText('Compact row').className).toMatch(/\btext-xs\b/)
+    expect(screen.getByText('Compact row').className).toContain('ui-identity-row__title--sm')
   })
 
   it('keeps md classification on the title scale', () => {
-    expect(identityRowClassificationVariants({ size: 'md' })).toContain('text-sm')
+    expect(identityRowClassificationVariants({ size: 'md' })).toContain(
+      'ui-identity-row__classification--md',
+    )
   })
 })
 
@@ -134,11 +136,10 @@ describe('IdentityRowHeadingLine entity-compact', () => {
       />,
     )
 
-    expect(screen.getByText('Fire Bolt')).toHaveClass('text-sm')
-    expect(screen.getByText('Fire Bolt')).not.toHaveClass('text-xs')
-    expect(screen.getByText('Spell')).toHaveClass('text-xs')
-    expect(screen.getByText('Spell')).not.toHaveClass('text-sm')
-    expect(document.querySelector('[data-inline-metadata-separator]')).toHaveClass('text-xs')
+    expect(screen.getByText('Fire Bolt')).toHaveClass('ui-identity-row__title--md')
+    expect(screen.getByText('Fire Bolt')).not.toHaveClass('ui-identity-row__title--sm')
+    expect(screen.getByText('Spell')).toHaveClass('ui-identity-row__classification--sm')
+    expect(screen.getByText('Spell')).not.toHaveClass('ui-identity-row__classification--md')
     expect(screen.getByText('3')).toHaveClass('text-style-caption')
   })
 })

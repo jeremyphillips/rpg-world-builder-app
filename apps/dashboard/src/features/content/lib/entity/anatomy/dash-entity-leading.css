@@ -1,0 +1,24 @@
+@layer components {
+  .dash-entity-leading {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0;
+  }
+
+  .dash-entity-leading__column {
+    display: flex;
+    width: var(--leading-chrome-size);
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dash-entity-leading--compact {
+    padding-inline-end: var(--entity-leading-content-gap);
+  }
+
+  .dash-entity-leading--comfortable {
+    padding-inline-end: var(--entity-leading-content-gap);
+  }
+}

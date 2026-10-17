@@ -44,10 +44,8 @@ describe('EntityAnatomy row tracks', () => {
     const { anatomy } = renderAnatomy()
 
     expect(anatomy).toHaveAttribute('data-row-anatomy')
-    expect(anatomy.className).toContain('grid-rows-[[slack-start]')
-    expect(anatomy.className).toContain(
-      'grid-cols-[[leading]_auto_[media]_auto_[content]_minmax(0,1fr)_[trailing]_auto]',
-    )
+    expect(anatomy.className).toContain('ui-row-anatomy')
+    expect(anatomy.className).toContain('dash-entity-anatomy')
     expect(anatomy.className).not.toMatch(/(^|\s)gap-x-|(^|\s)items-(start|center)\b/)
   })
 
@@ -112,9 +110,7 @@ describe('EntityAnatomy row tracks', () => {
     expect(cellOf(slot('media'))).toEqual({ slot: 'stretch', column: 'media' })
     expect(cellOf(slot('content'))).toEqual({ slot: 'band', column: 'content' })
     expect(cellOf(slot('status'))).toEqual({ slot: 'status', column: 'content' })
-    expect(
-      slot('leading')!.querySelectorAll('[class*="w-[var(--leading-chrome-size)]"]'),
-    ).toHaveLength(2)
+    expect(slot('leading')!.querySelectorAll('.dash-entity-leading__column')).toHaveLength(2)
   })
 
   it('applies leading content gap on the rail and trailing separation from the host columns', () => {
@@ -123,12 +119,9 @@ describe('EntityAnatomy row tracks', () => {
       trailing: SELECT_ACTION,
     })
 
-    const rail = slot('leading')?.querySelector('.flex.shrink-0.items-center.gap-0')
-    expect(rail).toHaveClass('pe-[calc(var(--spacing)*2)]')
-    expect(anatomy.className).toContain('[&>[data-row-anatomy-column=media]]:me-4')
-    expect(anatomy.className).not.toContain('[&>[data-row-anatomy-column=media]]:me-2')
-    expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:ms-2')
-    expect(anatomy.className).toContain('[&>[data-row-anatomy-column=trailing]]:justify-self-end')
+    const rail = slot('leading')?.querySelector('.dash-entity-leading')
+    expect(rail).toHaveClass('dash-entity-leading--compact')
+    expect(anatomy.className).toContain('dash-entity-anatomy--compact')
   })
 })
 
@@ -163,7 +156,7 @@ describe('EntityAnatomy trailing kind to cell', () => {
     renderAnatomy({
       trailing: { kind: 'indicator', variant: 'label', label: 'Purchased · 10 GP' },
     })
-    expect(screen.getByText('Purchased · 10 GP')).toHaveClass('text-xs')
+    expect(screen.getByText('Purchased · 10 GP')).toHaveClass('text-style-caption')
     expect(screen.getByText('Purchased · 10 GP')).not.toHaveClass('text-sm')
 
     renderAnatomy({
@@ -176,7 +169,7 @@ describe('EntityAnatomy trailing kind to cell', () => {
       },
     })
     expect(screen.getByText('+2')).toHaveClass('text-sm')
-    expect(screen.getByText('Purchased · 4 GP')).toHaveClass('text-xs')
+    expect(screen.getByText('Purchased · 4 GP')).toHaveClass('text-style-caption')
   })
 
   it('renders an additional quantity including one', () => {

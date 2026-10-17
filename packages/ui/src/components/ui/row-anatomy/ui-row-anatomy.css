@@ -1,0 +1,67 @@
+@layer components {
+  .ui-row-anatomy {
+    display: grid;
+    min-width: 0;
+    grid-template-rows:
+      [slack-start] 1fr [band] minmax(var(--row-band-height), auto) [meta] auto [status] auto
+      [slack-end] 1fr [row-end];
+  }
+
+  .ui-row-anatomy--band-control {
+    --row-band-height: var(--control-action-compact-height);
+  }
+
+  .ui-row-anatomy--band-media-xs {
+    --row-band-height: calc(var(--spacing) * 8);
+  }
+
+  .ui-row-anatomy--band-media-sm {
+    --row-band-height: calc(var(--spacing) * 10);
+  }
+
+  .ui-row-anatomy__cell {
+    min-width: 0;
+  }
+
+  .ui-row-anatomy__cell--band {
+    grid-row: band;
+    align-self: center;
+  }
+
+  .ui-row-anatomy__cell--meta {
+    grid-row: meta;
+    align-self: start;
+  }
+
+  .ui-row-anatomy__cell--status {
+    grid-row: status;
+    align-self: start;
+    margin-block-start: calc(var(--spacing) * 1);
+  }
+
+  .ui-row-anatomy__cell--full {
+    grid-row: slack-start / row-end;
+    align-self: center;
+  }
+
+  .ui-row-anatomy__cell--stretch {
+    grid-row: slack-start / row-end;
+    align-self: stretch;
+  }
+
+  .ui-row-anatomy__cell--leading {
+    grid-column: leading;
+  }
+
+  .ui-row-anatomy__cell--media {
+    grid-column: media;
+  }
+
+  .ui-row-anatomy__cell--content {
+    grid-column: content;
+  }
+
+  .ui-row-anatomy__cell--trailing {
+    grid-column: trailing;
+  }
+}

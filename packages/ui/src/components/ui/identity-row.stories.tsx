@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 
+import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { IdentityRow, IdentityRowHeadingLine } from './identity-row.client'
 import { InteractiveListRow } from './interactive-list-row.client'
+import { IDENTITY_ROW_CLASS_SPECS } from './identity-row.styles'
 
 const meta = {
   title: 'UI/IdentityRow',
   component: IdentityRow,
   tags: ['autodocs'],
+  parameters: { semanticClasses: true },
 } satisfies Meta<typeof IdentityRow>
 
 export default meta
@@ -98,5 +101,26 @@ export const InInteractiveListRowWithSlots: Story = {
         endSlot={<span aria-hidden>✓</span>}
       />
     </div>
+  ),
+}
+
+export const ClassReference: Story = {
+  tags: ['control-parity'],
+  parameters: { semanticClasses: true },
+  render: () => (
+    <ClassReferenceTable
+      rows={IDENTITY_ROW_CLASS_SPECS.map((spec) => ({
+        key: spec.key,
+        sample: (
+          <span data-semantic-class-target className={spec.className}>
+            Sample
+          </span>
+        ),
+        propsLabel: spec.key,
+        className: spec.className,
+        keyValues: spec.keyValues,
+        useCase: spec.useCase,
+      }))}
+    />
   ),
 }

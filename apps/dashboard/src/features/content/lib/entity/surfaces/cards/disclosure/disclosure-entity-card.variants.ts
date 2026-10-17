@@ -2,13 +2,10 @@ import { cva } from 'class-variance-authority'
 
 import { cn, collapsibleListItemBodyFrameClasses, establishSurfaceCurrent } from '@rpg/ui'
 
-import {
-  entityBodyInlineEndClasses,
-  entityBodyInlineStartClasses,
-} from '../../entity-surface-inset.variants'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../dash-entity-surface.variants'
 
-/** Strip CollapsibleListItem outer chrome — perimeter lives on EntityCardFrame. */
-export const disclosureEntityCardListItemVariants = cva('border-0 rounded-none shadow-none')
+/** Entity-card CLI host — chrome reset lives in `ui-collapsible-list-item--entity-card`. */
+export const disclosureEntityCardListItemVariants = cva('')
 
 /**
  * Full-bleed expanded body wash — divider/wash span shell edge.
@@ -20,7 +17,6 @@ export const disclosureEntityCardBodyWashVariants = cva(
     collapsibleListItemBodyFrameClasses,
     'bg-background',
     establishSurfaceCurrent('background'),
-    entityBodyInlineStartClasses,
-    entityBodyInlineEndClasses,
+    DASH_ENTITY_CARD_BODY_CLASS,
   ),
 )

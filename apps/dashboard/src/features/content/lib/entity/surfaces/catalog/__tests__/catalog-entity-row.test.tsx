@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogEntityRow } from '../catalog-entity-row'
 import { catalogEntityRowBodyWashVariants } from '../catalog-entity-row.variants'
-import { ENTITY_CONTENT_OFFSET_VAR } from '../../../anatomy/entity-leading-rail.lib'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../dash-entity-surface.variants'
 
 const domIds = {
   itemId: 'picker-item-rope',
@@ -35,18 +35,18 @@ describe('CatalogEntityRow', () => {
 
     const frame = container.querySelector('article') as HTMLElement
     expect(frame).toHaveClass('ui-card--quiet')
-    expect(frame).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
-    expect(frame).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*1)]')
-    expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
-      'calc(var(--spacing)*6)',
-    )
+    expect(frame).toHaveClass('dash-entity-surface--start-utility')
+    expect(frame).toHaveClass('dash-entity-surface--leading-1')
+    expect(frame).not.toHaveAttribute('style')
 
     const shell = screen.getByRole('group')
-    expect(shell).toHaveClass('p-0')
+    expect(shell).toHaveClass('ui-collapsible-list-item--entity-card')
     expect(shell).not.toHaveClass('pl-2')
     expect(shell).not.toHaveClass('ui-card--quiet')
+    expect(shell.style.length).toBe(0)
 
     const headerRow = shell.firstElementChild as HTMLElement
+    expect(headerRow).toHaveClass('ui-collapsible-list-item__header')
     expect(headerRow).not.toHaveClass(
       collapsibleListItemHeaderVerticalPaddingVariants({ density: 'compact' }),
     )
@@ -71,9 +71,10 @@ describe('CatalogEntityRow', () => {
     )
 
     const frame = container.querySelector('article') as HTMLElement
-    expect(frame).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-inset)]')
-    expect(frame).toHaveClass('[--entity-surface-inset:calc(var(--spacing)*4)]')
-    expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
+    expect(frame).toHaveClass('dash-entity-surface--start-default')
+    expect(frame).toHaveClass('dash-entity-surface--compact')
+    expect(frame).toHaveClass('dash-entity-surface--leading-0')
+    expect(frame).not.toHaveAttribute('style')
 
     const contentInset = entityCardContentFromShell(container)
     expect(contentInset).toHaveClass('dash-entity-card__content')
@@ -104,6 +105,7 @@ describe('CatalogEntityRow', () => {
 
     const frame = document.querySelector('article') as HTMLElement
     expect(frame).toHaveClass('ui-card--interactive')
+    expect(frame).toHaveClass('dash-entity-surface--leading-1')
     expect(screen.getByRole('radio', { name: 'The Foos' })).toBeInTheDocument()
     await user.click(screen.getByText('The Foos'))
     expect(onValueChange).toHaveBeenCalledWith('org-1')
@@ -138,7 +140,7 @@ describe('CatalogEntityRow', () => {
 
     const body = screen.getByText('Expanded details').parentElement
     expect(body).toHaveClass(catalogEntityRowBodyWashVariants())
-    expect(body).toHaveClass('pl-[var(--entity-body-inline-start)]')
+    expect(body).toHaveClass(DASH_ENTITY_CARD_BODY_CLASS)
     expect(body).not.toHaveClass('-ml-2')
   })
 })

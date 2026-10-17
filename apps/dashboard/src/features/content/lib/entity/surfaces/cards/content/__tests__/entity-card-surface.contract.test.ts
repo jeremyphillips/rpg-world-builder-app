@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url'
 
 import { resolveEntitySurfaceEdges } from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
+import { DASH_ENTITY_CARD_BODY_CLASS } from '../../../dash-entity-surface.variants'
 import { catalogEntityRowBodyWashVariants } from '../../../catalog/catalog-entity-row.variants'
 import { disclosureEntityCardBodyWashVariants } from '../../disclosure/disclosure-entity-card.variants'
 import { entityCardFrameVariants } from '../entity-card-frame.variants'
@@ -20,12 +21,14 @@ const groupTrailing: EntityAnatomyTrailing = {
   secondary: { kind: 'price', label: '15 GP' },
 }
 
-const END_UTILITY = '[--entity-surface-inline-end:var(--entity-surface-utility-inset)]'
-const END_DEFAULT = '[--entity-surface-inline-end:var(--entity-surface-inset)]'
-
 const dashEntityCardCssPath = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   '../dash-entity-card.css',
+)
+
+const dashEntitySurfaceCssPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../../dash-entity-surface.css',
 )
 
 describe('entity card surface contract', () => {
@@ -34,11 +37,11 @@ describe('entity card surface contract', () => {
 
     expect(frame).not.toMatch(/\bpy-\d/)
     expect(frame).not.toMatch(/\bp[xytblr]-\d/)
-    expect(frame).toContain('dash-entity-card__content'.replace('__content', ''))
+    expect(frame).toContain('dash-entity-card')
     expect(frame).toContain('dash-entity-card--compact')
+    expect(frame).toContain('dash-entity-surface--compact')
     expect(frame).not.toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
-
-    expect(frame).toContain('[--entity-surface-inset:calc(var(--spacing)*4)]')
+    expect(frame).not.toMatch(/\[--entity-surface-inset:/)
   })
 
   it('publishes block inset on the frame density modifier', () => {
@@ -75,6 +78,44 @@ describe('entity card surface contract', () => {
     })
     expect(failures).toEqual([])
   })
+
+  it('registers dash-entity-surface semantic CSS completely', () => {
+    const failures = validateSemanticControlCssCompleteness({
+      filePath: dashEntitySurfaceCssPath,
+      classPrefix: 'dash',
+      dimensions: [
+        {
+          modifierPrefix: 'dash-entity-surface--compact',
+          requiredProperties: [
+            '--entity-surface-inset',
+            '--entity-surface-utility-inset',
+            '--entity-leading-content-gap',
+          ],
+        },
+        {
+          modifierPrefix: 'dash-entity-surface--comfortable',
+          requiredProperties: [
+            '--entity-surface-inset',
+            '--entity-surface-utility-inset',
+            '--entity-leading-content-gap',
+          ],
+        },
+        {
+          modifierPrefix: 'dash-entity-surface--leading-0',
+          requiredProperties: ['--entity-content-offset'],
+        },
+        {
+          modifierPrefix: 'dash-entity-surface--leading-1',
+          requiredProperties: ['--entity-content-offset'],
+        },
+        {
+          modifierPrefix: 'dash-entity-surface--leading-2',
+          requiredProperties: ['--entity-content-offset'],
+        },
+      ],
+    })
+    expect(failures).toEqual([])
+  })
 })
 
 describe('edge-aware surface inset', () => {
@@ -90,7 +131,9 @@ describe('edge-aware surface inset', () => {
     ).toEqual({ start: 'utility', end: 'utility' })
 
     const edges = resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing: utilityTrailing })
-    expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(END_UTILITY)
+    expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(
+      'dash-entity-surface--end-utility',
+    )
   })
 
   it('keeps the default end inset for action, group, and quantity trailing', () => {
@@ -102,17 +145,19 @@ describe('edge-aware surface inset', () => {
     ]) {
       const edges = resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing })
       expect(edges.end).toBe('default')
-      expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(END_DEFAULT)
+      expect(entityCardFrameVariants({ density: 'compact', edges })).toContain(
+        'dash-entity-surface--end-default',
+      )
     }
   })
 
-  it('keeps body end padding on the base inset whatever the trailing kind', () => {
+  it('keeps body wash on dash-entity-card__body', () => {
     for (const wash of [
       disclosureEntityCardBodyWashVariants(),
       catalogEntityRowBodyWashVariants(),
     ]) {
-      expect(wash).toContain('pr-[var(--entity-body-inline-end)]')
-      expect(wash).not.toContain('pr-[var(--entity-surface-inline-end)]')
+      expect(wash).toContain(DASH_ENTITY_CARD_BODY_CLASS)
+      expect(wash).not.toContain('pr-[var(--entity-body-inline-end)]')
     }
   })
 })

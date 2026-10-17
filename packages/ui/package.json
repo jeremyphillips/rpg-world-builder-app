@@ -47,6 +47,10 @@
       "types": "./src/storybook/row-anatomy-geometry.ts",
       "default": "./src/storybook/row-anatomy-geometry.ts"
     },
+    "./storybook/class-reference-table": {
+      "types": "./src/stories/semantic-classes/class-reference-table.tsx",
+      "default": "./src/stories/semantic-classes/class-reference-table.tsx"
+    },
     "./vitest/setup": {
       "types": "./src/vitest/setup.ts",
       "default": "./src/vitest/setup.ts"

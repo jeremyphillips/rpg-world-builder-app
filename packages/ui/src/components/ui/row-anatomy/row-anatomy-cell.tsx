@@ -27,7 +27,6 @@ export function RowAnatomyCell<C extends string = RowColumn>({
     <div
       {...dataAttributes}
       className={rowAnatomyCellClasses(cell)}
-      style={{ gridColumn: cell.column }}
       {...{
         [ROW_ANATOMY_SLOT_ATTRIBUTE]: cell.slot,
         [ROW_ANATOMY_COLUMN_ATTRIBUTE]: cell.column,

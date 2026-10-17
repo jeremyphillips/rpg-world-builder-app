@@ -1,6 +1,6 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cardSurfaceVariants, cn, useCardSurfaceTone } from '@rpg/ui'
 import type { ContentCardDensity } from '@rpg/ui'
 
@@ -16,7 +16,7 @@ type EntityCardFrameProps = {
   selected?: boolean
   disabled?: boolean
   edges?: EntitySurfaceEdges
-  style?: CSSProperties
+  leadingUtilityCount?: number
   children: ReactNode
 }
 
@@ -27,7 +27,7 @@ export function EntityCardFrame({
   selected = false,
   disabled = false,
   edges = ENTITY_SURFACE_DEFAULT_EDGES,
-  style,
+  leadingUtilityCount = 0,
   children,
 }: EntityCardFrameProps) {
   const tone = useCardSurfaceTone('quiet')
@@ -36,9 +36,8 @@ export function EntityCardFrame({
     <article
       className={cn(
         cardSurfaceVariants({ tone, interactive, selected, disabled }),
-        entityCardFrameVariants({ density, edges }),
+        entityCardFrameVariants({ density, edges, leadingUtilityCount }),
       )}
-      style={style}
       data-content-density={density}
       data-disabled={disabled ? true : undefined}
       data-entity-surface-start={edges.start}

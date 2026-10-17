@@ -59,12 +59,20 @@ export const collapsibleListItemChromeButtonClasses = iconGhostControlVariants({
 /** Catalog row shell — drop default bottom pad; expanded body owns vertical rhythm. */
 export const collapsibleListItemCatalogShellExtraClasses = 'pb-0'
 
-/** Entity-card host — catalog shell keeps border/bg but drops content-area inset. */
+/** Entity-card host — structural reset; perimeter lives on EntityCardFrame. */
+export const collapsibleListItemEntityCardShellClasses =
+  'ui-collapsible-list-item ui-collapsible-list-item--entity-card'
+
+/** @deprecated Padding reset is owned by `ui-collapsible-list-item--entity-card`. */
 export const collapsibleListItemEntityCardShellPaddingClasses = 'p-0'
 
 /** Entity-card host header row — no duplicate vertical padding; entity card owns rhythm. */
-export const collapsibleListItemEntityCardHeaderRowClasses =
-  'flex w-full min-w-0 items-center gap-2'
+export const collapsibleListItemEntityCardHeaderRowClasses = 'ui-collapsible-list-item__header'
+
+export const collapsibleListItemEntityCardHeaderStackClasses = 'ui-collapsible-list-item__stack'
+
+export const collapsibleListItemEntityCardHeaderStackSummaryGapClasses =
+  'ui-collapsible-list-item__stack--with-summary'
 
 export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
 
@@ -119,10 +127,7 @@ export const collapsibleListItemShellVariants = cva(cn('relative overflow-hidden
       ),
       headerActions: 'flex flex-col',
       compactRow: collapsibleListItemFlatShellPaddingClasses,
-      entityCardHeaderActions: cn(
-        'flex flex-col',
-        collapsibleListItemEntityCardShellPaddingClasses,
-      ),
+      entityCardHeaderActions: collapsibleListItemEntityCardShellClasses,
     },
     preset: {
       default: cn('rounded-md border border-border'),

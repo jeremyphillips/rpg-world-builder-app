@@ -62,7 +62,9 @@ For each migrated primitive, verify in Storybook DevTools:
 
 `ui-selection-target` exposes `__control` (stretched hit area) and `__raised` (trailing controls above the hit area).
 
-`dash-entity-card` (dashboard `index.css`) publishes density (`--compact`, `--comfortable`), utility edge modifiers (`--start-utility`, `--end-utility`), and elements `__content` and `__details`. Entity frames compose `cardSurfaceVariants({ tone: quiet, … })` with these modifiers; tone comes from `CardSurfaceToneProvider` on sheet and create-composition hosts.
+`dash-entity-card` (dashboard `index.css`) publishes block inset on `--compact` / `--comfortable` and elements `__content`, `__details`, and `__body`. `dash-entity-surface` on the same article publishes density, edge (`--start-*`, `--end-*`), and leading-count (`--leading-0|1|2`) custom properties — no inline `style`. Entity frames compose `cardSurfaceVariants({ tone: quiet, … })` with these modifiers; tone comes from `CardSurfaceToneProvider` on sheet and create-composition hosts.
+
+`ui-row-anatomy` owns row tracks and `__cell--{slot}` / `__cell--{column}` placement. `dash-entity-anatomy` and `dash-entity-leading` (dashboard) own entity column gaps and leading-rail columns. `ui-collapsible-list-item--entity-card` resets CLI chrome for DEC / catalog rows. `ui-identity-row__*` size modifiers own identity type scale (`__title`, `__classification`, `__supporting`).
 
 `ui-inset-panel--{sm,md,lg}` owns radius and padding. Border style and alignment are separate modifiers. Surface wash still comes from the visual-vocabulary resolver.
 

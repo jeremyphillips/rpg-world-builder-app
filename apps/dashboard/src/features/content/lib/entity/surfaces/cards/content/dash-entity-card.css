@@ -13,10 +13,6 @@
     --entity-surface-block-inset: calc(var(--spacing) * 3);
   }
 
-  .dash-entity-card--start-utility {
-    --leading-chrome-size: calc(var(--spacing) * 6);
-  }
-
   .dash-entity-card__content {
     width: 100%;
     min-width: 0;
@@ -27,5 +23,10 @@
 
   .dash-entity-card__details {
     padding-inline: var(--entity-surface-inset);
+  }
+
+  .dash-entity-card__body {
+    padding-inline-start: calc(var(--entity-surface-inline-start) + var(--entity-content-offset));
+    padding-inline-end: var(--entity-surface-inset);
   }
 }

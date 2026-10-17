@@ -7,7 +7,6 @@ import {
 } from '@rpg/ui'
 
 import { EntityAnatomyHost } from '../../anatomy/entity-anatomy'
-import { buildEntityContentOffsetStyle } from '../../anatomy/entity-leading-rail.lib'
 import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
 import { resolveEntitySurfaceEdges } from '../../anatomy/entity-surface-edges.lib'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
@@ -60,6 +59,7 @@ function CatalogEntityRowSelectionBody({
       selected={selected}
       disabled={disabled}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount: 1 })}
+      leadingUtilityCount={1}
     >
       <SelectionTarget htmlFor={radioId}>
         <EntityCardContent>
@@ -110,18 +110,13 @@ export function CatalogEntityRow(props: CatalogEntityRowProps) {
 
   const trailing = 'trailing' in props ? props.trailing : undefined
   const isDisclosure = collapsible
-  const contentOffsetStyle = isDisclosure
-    ? buildEntityContentOffsetStyle({
-        count: 1,
-        density: CATALOG_ENTITY_ROW_DENSITY,
-      })
-    : undefined
+  const leadingUtilityCount = isDisclosure ? 1 : 0
 
   return (
     <EntityCardFrame
       density={CATALOG_ENTITY_ROW_DENSITY}
-      edges={resolveEntitySurfaceEdges({ leadingUtilityCount: isDisclosure ? 1 : 0, trailing })}
-      style={contentOffsetStyle}
+      edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
+      leadingUtilityCount={leadingUtilityCount}
     >
       <CollapsibleListItem
         itemId={domIds.itemId}

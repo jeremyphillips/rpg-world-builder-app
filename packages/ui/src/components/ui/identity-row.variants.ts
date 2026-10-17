@@ -12,25 +12,21 @@ export const identityRowRootVariants = cva('min-w-0 flex-1')
 
 export const identityRowHeadingLineVariants = cva('flex w-full min-w-0 items-baseline')
 
-/**
- * Compact entity-card secondary copy on the title line.
- * The title item overrides this with `text-sm`. The separator sets its own `text-xs`
- * because it renders inside the classification item, not as a sibling of the root.
- */
-export const identityRowEntityCompactMetaVariants = cva('min-w-0 text-xs')
+/** Compact entity-card secondary copy on the title line. */
+export const identityRowEntityCompactMetaVariants = cva('ui-identity-row__meta--entity-compact')
 
 export const identityRowHeadingClusterVariants = cva('flex min-w-0 flex-1 items-baseline')
 
 export const identityRowHeadingEndVariants = cva('shrink-0 text-style-caption')
 
 export const identityRowHeadingVariants = cva(
-  'min-w-0 shrink truncate font-body-emphasis text-foreground [&_a]:truncate',
+  'ui-identity-row__title font-body-emphasis text-foreground',
   {
     variants: {
       size: {
-        sm: 'text-xs',
-        md: 'text-sm',
-        lg: 'text-base',
+        sm: 'ui-identity-row__title--sm',
+        md: 'ui-identity-row__title--md',
+        lg: 'ui-identity-row__title--lg',
       },
     },
     defaultVariants: {
@@ -42,9 +38,9 @@ export const identityRowHeadingVariants = cva(
 export const identityRowSeparatorVariants = cva('shrink-0 font-normal text-muted-foreground', {
   variants: {
     size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
+      sm: 'ui-identity-row__classification--sm',
+      md: 'ui-identity-row__classification--md',
+      lg: 'ui-identity-row__classification--lg',
     },
   },
   defaultVariants: {
@@ -52,43 +48,60 @@ export const identityRowSeparatorVariants = cva('shrink-0 font-normal text-muted
   },
 })
 
-export const identityRowClassificationVariants = cva('shrink-0 font-normal text-muted-foreground', {
-  variants: {
-    size: {
-      sm: 'text-xs',
-      md: 'text-sm',
-      lg: 'text-base',
+export const identityRowClassificationVariants = cva(
+  'ui-identity-row__classification shrink-0 font-normal text-muted-foreground',
+  {
+    variants: {
+      size: {
+        sm: 'ui-identity-row__classification--sm',
+        md: 'ui-identity-row__classification--md',
+        lg: 'ui-identity-row__classification--lg',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
     },
   },
-  defaultVariants: {
-    size: 'md',
-  },
-})
+)
 
-export const identityRowSupportingVariants = cva('text-muted-foreground', {
+export const identityRowSupportingVariants = cva(
+  'ui-identity-row__supporting text-muted-foreground',
+  {
+    variants: {
+      size: {
+        sm: 'ui-identity-row__supporting--sm',
+        md: 'ui-identity-row__supporting--md',
+        lg: 'ui-identity-row__supporting--lg',
+      },
+      wrap: {
+        true: 'ui-identity-row__supporting--wrap',
+        false: 'ui-identity-row__supporting--truncate',
+      },
+    },
+    defaultVariants: {
+      size: 'md',
+      wrap: false,
+    },
+  },
+)
+
+export const identityRowStackVariants = cva('flex flex-col', {
   variants: {
     size: {
-      sm: 'text-xs',
-      md: 'text-xs',
-      lg: 'text-sm',
-    },
-    wrap: {
-      true: 'leading-snug',
-      false: 'truncate',
+      sm: ROW_IDENTITY_STACK_GAP_CLASS,
+      md: ROW_IDENTITY_STACK_GAP_CLASS,
+      lg: ROW_IDENTITY_STACK_GAP_CLASS,
     },
   },
   defaultVariants: {
     size: 'md',
-    wrap: false,
   },
 })
 
 export const identityRowStatusVariants = cva('', {
   variants: {
     spacing: {
-      /** Badges sit slightly below the metadata line. */
       offset: ROW_IDENTITY_STATUS_OFFSET_CLASS,
-      /** Text advisories share the stack gap with the supporting metadata line. */
       flush: '',
     },
   },
@@ -96,18 +109,3 @@ export const identityRowStatusVariants = cva('', {
     spacing: 'offset',
   },
 })
-
-export const identityRowStackVariants = cva('flex min-w-0 flex-col', {
-  variants: {
-    size: {
-      sm: ROW_IDENTITY_STACK_GAP_CLASS,
-      md: ROW_IDENTITY_STACK_GAP_CLASS,
-      lg: 'gap-1',
-    },
-  },
-  defaultVariants: {
-    size: 'md',
-  },
-})
-
-export type IdentityRowVariantProps = VariantProps<typeof identityRowHeadingVariants>
