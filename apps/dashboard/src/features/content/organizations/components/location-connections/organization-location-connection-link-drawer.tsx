@@ -826,7 +826,7 @@ function OrganizationLocationConnectionLinkDrawerContent({
                 excludeConnectionId,
               })
             const isSelected = selectedLocationId === location.id
-            const metadata = !kindAvailable ? fullyLinkedReason : undefined
+            const metadata = !kindAvailable ? [fullyLinkedReason] : undefined
 
             return {
               identity: summary

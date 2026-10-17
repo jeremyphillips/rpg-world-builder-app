@@ -10,6 +10,7 @@ import { NumberStepper, Text } from '@rpg/ui'
 import { DrawerEntityContext } from '../../../lib/entity/surfaces/drawer/drawer-entity-context'
 import { getContentDisplayImage } from '../../../lib/detail/page/content-display-image'
 import { buildEquipmentContentDisplayImageInput } from '../../../lib/detail/page/content-display-image-input'
+import { buildEquipmentEntitySurfaceIdentity } from '../../lib/equipment-entity-surface-identity.lib'
 import type {
   EquipmentEditorAction,
   EquipmentEditorState,
@@ -35,7 +36,7 @@ export function EquipmentInstanceEditorEntityContext({
 }: EquipmentInstanceEditorEntityContextProps) {
   const draft = state.session.draft
   const summary = resolveEquipmentInstanceSummary(draft, catalogItem, definitions)
-  const metadata = buildEquipmentInstanceEditorContextMetadata(catalogItem)
+  const metadataSegments = buildEquipmentInstanceEditorContextMetadata(catalogItem)
   const displayImage = getContentDisplayImage(
     buildEquipmentContentDisplayImageInput(catalogItem, 'compact'),
   )
@@ -59,11 +60,21 @@ export function EquipmentInstanceEditorEntityContext({
 
   return (
     <DrawerEntityContext
-      heading={summary.displayName}
-      metadata={metadata}
-      displayImage={displayImage}
-      fallback="equipment"
-      trailing={trailing}
+      surface={{
+        identity: buildEquipmentEntitySurfaceIdentity({
+          heading: summary.displayName,
+          metadataSegments,
+          displayImage,
+        }),
+      }}
+      trailing={
+        trailing
+          ? {
+              kind: 'utility',
+              content: <div className="shrink-0">{trailing}</div>,
+            }
+          : undefined
+      }
     />
   )
 }

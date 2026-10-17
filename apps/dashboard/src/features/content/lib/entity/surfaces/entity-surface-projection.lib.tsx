@@ -57,7 +57,7 @@ export function projectEntitySurfaceIdentityToSummaryModel(
     heading,
     media: buildEntitySurfaceMedia(identity),
     ...(classification ? { classification } : {}),
-    ...(metadata ? { description: metadata } : {}),
+    ...(metadata && metadata.length > 0 ? { supportingMetadata: metadata } : {}),
     ...(status && status.length > 0 ? { status } : {}),
     ...(selectionState ? { selectionState } : {}),
   }

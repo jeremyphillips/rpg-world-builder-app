@@ -110,6 +110,29 @@ export function EntitySummaryDescription({
   )
 }
 
+/** Structured supporting segments — placed in the host meta cell. */
+export function EntitySummarySupportingMetadata({
+  segments,
+  density,
+}: {
+  segments: readonly string[]
+  density: ContentCardDensity
+}) {
+  if (segments.length === 0) {
+    return null
+  }
+
+  return (
+    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>
+      <InlineMetadata role="supporting" density={density}>
+        {segments.map((label) => (
+          <InlineMetadata.Item key={label}>{label}</InlineMetadata.Item>
+        ))}
+      </InlineMetadata>
+    </IdentityRowSupporting>
+  )
+}
+
 /**
  * Status lane — placed in the host status cell; the cell owns the top offset.
  * `provenance` is a separate group rendered ahead of status on the same line.

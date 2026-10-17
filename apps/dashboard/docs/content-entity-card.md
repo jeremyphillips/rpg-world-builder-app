@@ -74,12 +74,26 @@ primitives — not ad-hoc menu item class stacks. Menu rows derive highlight/was
 Campaign-unavailable search hits use entity `inactive` status in the identity status slot
 only — not a duplicate trailing badge.
 
-### EntitySurfaceConfig (character / organization / location pickers)
+### Entity surface projection (cards, catalogs, drawer subject bands)
 
-Compact catalog and bordered cards share one **data-only** identity contract:
+Compact catalog rows, bordered cards, and `DrawerEntityContext` share one **data-only**
+identity contract and one projector (`projectEntitySurfaceConfig` /
+`projectEntitySurfaceIdentityToSummaryModel`):
 
-- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional `metadata`, `classification`, `status`, optional `displayImage`, required semantic `fallback`) via `buildCharacterEntityCardModel`, `buildLocationEntityCardModel`, and `buildOrganizationEntityCardModel`. No JSX, no media nodes, no row chrome. Projection paints the standard entity-row thumbnail (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) independent of text density.
-- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- Feature display modules return `EntitySurfaceIdentity` (`heading`, optional
+  `metadata` segment line, `classification`, `status`, optional `displayImage`, required
+  semantic `fallback`) via domain builders such as `buildCharacterEntityCardModel`,
+  `buildLocationEntityCardModel`, `buildOrganizationEntityCardModel`, and
+  `buildEquipmentEntitySurfaceIdentity`. No JSX, no media nodes, no row chrome.
+  **Entity surface projection** paints the standard entity-row thumbnail
+  (`ENTITY_SURFACE_LEADING_THUMB_FRAME`, 40px / `sm`) and maps `metadata` segments onto
+  `EntitySummaryModel.supportingMetadata` for anatomy to render.
+- Callers pass `EntitySurfaceConfig` (`identity`, optional `details`, optional
+  `inlineAction`) into `CatalogEntitySurfaceRow`, `EntitySurfaceContentCard`,
+  `DrawerEntityContext`, or `createCatalogEntityRowRenderer({ buildSurface })`.
+- `DrawerEntityContext` uses the same projection as cards; only drawer band chrome differs.
+  Drawer-only utilities pass `trailing` (`EntityAnatomyTrailing`) — not extra fields on
+  `EntitySurfaceConfig`.
 - Heading label buttons use **`inlineAction` only** (`label`, `onClick`, `disabled?`, `loading?`). Surfaces render locked compact picker buttons.
 - **Allowed exceptions:** disclosure-body commit `Button`s inside `details` / DEC children; `trailing.kind: 'utility'` for inventory steppers and icon-remove controls; `trailing.kind: 'group'` for commerce stacks.
 

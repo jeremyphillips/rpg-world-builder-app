@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 
 import type { EntitySurfaceIdentity } from '../summary/entity-surface-identity.types'
 import { EntitySummaryStatusItemView } from '../summary/entity-summary-status'
+import { EntitySummarySupportingMetadata } from '../summary/entity-summary'
 import {
   buildEntitySurfaceLeadingMediaNode,
   projectEntitySurfaceIdentityToSummaryModel,
@@ -31,11 +32,18 @@ export function projectSearchHitToInteractiveListPresentation(
       </>
     ) : undefined
 
+  const supporting =
+    entity.supportingMetadata && entity.supportingMetadata.length > 0 ? (
+      <EntitySummarySupportingMetadata segments={entity.supportingMetadata} density="compact" />
+    ) : (
+      entity.description
+    )
+
   return {
     startSlot,
     heading: entity.heading,
     classification: entity.classification,
-    supporting: entity.description,
+    supporting,
     status,
   }
 }

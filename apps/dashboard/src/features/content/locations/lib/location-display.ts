@@ -19,6 +19,10 @@ import type { ContentDisplayImage } from '@rpg/contracts'
 
 import { getContentDisplayImage } from '../../lib/detail/page/content-display-image'
 import { buildLocationContentDisplayImageInput } from '../../lib/detail/page/content-display-image-input'
+import {
+  entitySurfaceMetadataFromText,
+  entitySurfaceMetadataLine,
+} from '../../lib/entity/summary/entity-surface-metadata.lib'
 import type { EntitySurfaceIdentity } from '../../lib/entity/summary/entity-surface-identity.types'
 import type { PickerSelectionStateLineModel } from '../../lib/entity/summary/picker-selection-state-line.types'
 import type { EntitySummaryStatusItem } from '../../lib/entity/summary/entity-summary-status.types'
@@ -287,16 +291,18 @@ export function buildLocationEntitySummaryVm(
 export function buildLocationEntityCardModelFromClassification(
   input: Pick<LocationEntitySummaryVm, 'name' | 'displayImage'> & {
     classificationText: string
-    metadata?: string
+    metadata?: readonly string[]
     status?: readonly EntitySummaryStatusItem[]
     selectionState?: PickerSelectionStateLineModel
   },
 ): EntitySurfaceIdentity {
+  const metadata = input.metadata ? entitySurfaceMetadataLine(input.metadata) : undefined
+
   return {
     heading: input.name,
     fallback: 'location',
     classification: input.classificationText,
-    ...(input.metadata ? { metadata: input.metadata } : {}),
+    ...(metadata ? { metadata } : {}),
     ...(input.status && input.status.length > 0 ? { status: input.status } : {}),
     ...(input.selectionState ? { selectionState: input.selectionState } : {}),
     ...(input.displayImage ? { displayImage: input.displayImage } : {}),
@@ -305,10 +311,13 @@ export function buildLocationEntityCardModelFromClassification(
 
 export function buildLocationEntityCardModel(
   vm: LocationEntitySummaryVm,
-  options: { metadata?: string } = {},
+  options: { metadata?: readonly string[] } = {},
 ): EntitySurfaceIdentity {
   const presentation = buildLocationEntityContextPresentation(vm)
-  const metadata = options.metadata !== undefined ? options.metadata : presentation.supportingText
+  const metadata =
+    options.metadata !== undefined
+      ? entitySurfaceMetadataLine(options.metadata)
+      : entitySurfaceMetadataFromText(presentation.supportingText)
 
   return {
     heading: vm.name,

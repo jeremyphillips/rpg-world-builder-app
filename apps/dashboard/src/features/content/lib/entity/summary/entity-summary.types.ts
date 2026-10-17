@@ -11,6 +11,9 @@ import type {
 export type EntitySummaryModel = {
   heading: ReactNode
   classification?: ReactNode
+  /** Structured supporting segments — anatomy renders via InlineMetadata. */
+  supportingMetadata?: readonly string[]
+  /** Free-form supporting copy when hosts need JSX beyond segment lines. */
   description?: ReactNode
   status?: readonly EntitySummaryStatusItem[]
   /** Resolved selection-state copy, stacked above status. Not a semantic kind. */

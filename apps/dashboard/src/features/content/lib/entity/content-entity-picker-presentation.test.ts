@@ -25,7 +25,7 @@ describe('content-entity-picker-presentation', () => {
     expect(model).toMatchObject({
       heading: 'Yawning Portal',
       classification: 'Building · Brewery',
-      description: 'Located in Dock Ward',
+      supportingMetadata: ['Located in Dock Ward'],
     })
     expect(model.media).toBeTruthy()
   })
@@ -37,7 +37,7 @@ describe('content-entity-picker-presentation', () => {
       heading: 'City Council',
       classification: 'Government',
     })
-    expect(model.description).toBeUndefined()
+    expect(model.supportingMetadata).toBeUndefined()
     expect(model.media).toBeTruthy()
   })
 
@@ -52,7 +52,7 @@ describe('content-entity-picker-presentation', () => {
 
     expect(model).toMatchObject({
       heading: 'Frug Daergel',
-      description: 'PC · Human · Level 1 Fighter',
+      supportingMetadata: ['PC', 'Human', 'Level 1 Fighter'],
     })
     expect(model.classification).toBeUndefined()
     expect(model.media).toBeTruthy()

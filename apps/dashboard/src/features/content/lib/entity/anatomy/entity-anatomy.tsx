@@ -9,6 +9,7 @@ import {
   EntitySummaryDescription,
   EntitySummaryHeading,
   EntitySummaryStatus,
+  EntitySummarySupportingMetadata,
 } from '../summary/entity-summary'
 import type { EntitySummaryModel } from '../summary/entity-summary.types'
 import { entitySummaryStatusLaneVariants } from '../summary/entity-summary.variants'
@@ -61,6 +62,8 @@ export function EntityAnatomy({
   const hasProvenance = (entity.provenance?.length ?? 0) > 0
   const hasSelectionState = entity.selectionState != null
   const hasStatusCell = hasStatusItems || hasProvenance || hasSelectionState
+  const hasSupportingMetadata = (entity.supportingMetadata?.length ?? 0) > 0
+  const hasMetaCell = entity.description != null || hasSupportingMetadata
 
   return (
     <div className={entityAnatomyVariants({ density })} {...rowAnatomyRootProps}>
@@ -74,7 +77,7 @@ export function EntityAnatomy({
       ) : null}
       {entity.media ? (
         <RowAnatomyCell<EntityAnatomyColumn>
-          cell={{ slot: 'band', column: 'media' }}
+          cell={{ slot: 'stretch', column: 'media' }}
           data-entity-item-slot="media"
         >
           <div className={entityAnatomyMediaContentSpanClasses}>{entity.media}</div>
@@ -93,14 +96,21 @@ export function EntityAnatomy({
           headingHref={headingHref}
         />
       </RowAnatomyCell>
-      {entity.description ? (
+      {hasMetaCell ? (
         <RowAnatomyCell<EntityAnatomyColumn>
           cell={{ slot: 'meta', column: 'content' }}
           data-entity-item-slot="description"
         >
-          <EntitySummaryDescription density={density}>
-            {entity.description}
-          </EntitySummaryDescription>
+          {entity.description != null ? (
+            <EntitySummaryDescription density={density}>
+              {entity.description}
+            </EntitySummaryDescription>
+          ) : (
+            <EntitySummarySupportingMetadata
+              segments={entity.supportingMetadata ?? []}
+              density={density}
+            />
+          )}
         </RowAnatomyCell>
       ) : null}
       {hasStatusCell ? (

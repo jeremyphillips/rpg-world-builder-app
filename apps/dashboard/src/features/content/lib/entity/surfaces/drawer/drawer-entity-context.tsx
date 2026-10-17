@@ -1,54 +1,18 @@
-import type { ReactNode } from 'react'
-
-import { type ContentDisplayFallback, type ContentDisplayImage } from '@rpg/contracts'
-import { InlineMetadata } from '@rpg/ui'
-
 import { EntityAnatomy } from '../../anatomy/entity-anatomy'
-import { buildEntitySurfaceLeadingMediaNode } from '../entity-surface-projection.lib'
+import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailing.types'
+import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
+import type { EntitySurfaceConfig } from '../entity-surface.types'
 
 export type DrawerEntityContextProps = {
-  heading: string
-  metadata?: readonly string[]
-  displayImage?: ContentDisplayImage
-  fallback: ContentDisplayFallback
-  trailing?: ReactNode
+  surface: EntitySurfaceConfig
+  /** Domain utilities (steppers, muted labels) — not card inline actions. */
+  trailing?: EntityAnatomyTrailing
 }
 
-/** Subject identity for drawer header bands — compact anatomy, one metadata line, optional trailing control. */
-export function DrawerEntityContext({
-  heading,
-  metadata,
-  displayImage,
-  fallback,
-  trailing,
-}: DrawerEntityContextProps) {
-  const description =
-    metadata && metadata.length > 0 ? (
-      <InlineMetadata role="supporting" density="compact">
-        {metadata.map((label) => (
-          <InlineMetadata.Item key={label}>{label}</InlineMetadata.Item>
-        ))}
-      </InlineMetadata>
-    ) : undefined
+/** Subject identity for drawer header bands — same projection as bordered entity cards. */
+export function DrawerEntityContext({ surface, trailing }: DrawerEntityContextProps) {
+  const projected = projectEntitySurfaceConfig(surface, 'compact')
+  const resolvedTrailing = trailing ?? projected.trailing
 
-  const media = buildEntitySurfaceLeadingMediaNode({ heading, displayImage, fallback })
-
-  return (
-    <EntityAnatomy
-      density="compact"
-      entity={{
-        heading,
-        media,
-        ...(description ? { description } : {}),
-      }}
-      trailing={
-        trailing
-          ? {
-              kind: 'utility',
-              content: <div className="shrink-0">{trailing}</div>,
-            }
-          : undefined
-      }
-    />
-  )
+  return <EntityAnatomy density="compact" entity={projected.entity} trailing={resolvedTrailing} />
 }

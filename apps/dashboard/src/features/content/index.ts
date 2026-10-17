@@ -137,7 +137,6 @@ export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/en
 export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export {
   buildCatalogToggleSelectInlineAction,
-  buildEntitySurfaceLeadingMediaNode,
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'
@@ -154,6 +153,12 @@ export type {
   EntitySurfaceIdentity,
   EntitySurfaceInlineAction,
 } from './lib/entity/summary/entity-surface-identity.types'
+export {
+  entitySurfaceMetadataFromJoinedCopy,
+  entitySurfaceMetadataFromText,
+  entitySurfaceMetadataLine,
+  type EntitySurfaceMetadataLine,
+} from './lib/entity/summary/entity-surface-metadata.lib'
 export type { PickerSelectionStateLineModel } from './lib/entity/summary/picker-selection-state-line.types'
 export {
   CAMPAIGN_ACCESS_TABLE_FILTER_ALL,
@@ -269,7 +274,10 @@ export {
   buildLocationEntityCardModelFromClassification,
   buildLocationPickerSearchText,
 } from './locations/lib/location-display'
-export { DrawerEntityContext } from './lib/entity/surfaces/drawer/drawer-entity-context'
+export {
+  DrawerEntityContext,
+  type DrawerEntityContextProps,
+} from './lib/entity/surfaces/drawer/drawer-entity-context'
 export { toDrawerEntityBlockModel } from './lib/entity/surfaces/drawer/drawer-entity.lib'
 export { DrawerContext } from './lib/relationship/drawer/drawer-context'
 export { assembleLocationPickerSearchDocument } from './locations/lib/location-picker-search.lib'

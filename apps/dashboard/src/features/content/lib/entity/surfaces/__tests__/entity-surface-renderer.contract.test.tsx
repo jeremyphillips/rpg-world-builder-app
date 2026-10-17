@@ -43,7 +43,9 @@ describe('entity surface renderer contract', () => {
       />,
     )
 
-    expect(screen.getByText('NPC · Dwarf · Level 1 Rogue')).toBeInTheDocument()
+    expect(screen.getByText('NPC')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
+    expect(screen.getByText('Level 1 Rogue')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument()
     expect(screen.getByText('Recommended')).toBeInTheDocument()
 
@@ -63,7 +65,8 @@ describe('entity surface renderer contract', () => {
       />,
     )
 
-    expect(screen.getByText('NPC · Dwarf · Level 1 Rogue')).toBeInTheDocument()
+    expect(screen.getByText('NPC')).toBeInTheDocument()
+    expect(screen.getByText('Dwarf')).toBeInTheDocument()
     expect(screen.queryByText('Recommended')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
   })

@@ -711,7 +711,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                   {
                     metadata:
                       organizationDomain != null && !hasAvailableKind
-                        ? organizationFullyLinkedReason
+                        ? [organizationFullyLinkedReason]
                         : undefined,
                   },
                 ),
@@ -819,7 +819,7 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                 {
                   metadata:
                     characterKind != null && !hasAvailableKind
-                      ? CHARACTER_DRAWER_FULLY_LINKED_REASON
+                      ? [CHARACTER_DRAWER_FULLY_LINKED_REASON]
                       : undefined,
                 },
               ),

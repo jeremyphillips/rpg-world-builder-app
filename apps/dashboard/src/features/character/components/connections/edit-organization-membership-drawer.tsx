@@ -1,6 +1,5 @@
 import * as React from 'react'
 
-import { getOrganizationDomainLabel } from '@rpg/contracts'
 import {
   Button,
   ConfirmDialog,
@@ -11,7 +10,11 @@ import {
 
 import { DrawerShell } from '@/components/drawer'
 import { drawerShellBodyVariants } from '@/components/drawer/drawer-shell.variants'
-import { DrawerEntityContext, buildOrganizationEntitySummaryVm } from '@/features/content'
+import {
+  DrawerEntityContext,
+  buildOrganizationEntityCardModel,
+  buildOrganizationEntitySummaryVm,
+} from '@/features/content'
 
 import { OrganizationMembershipTitleField } from './organization-membership-title-field'
 import {
@@ -120,8 +123,6 @@ export function EditOrganizationMembershipDrawer({
     rulesetId: 'srd-cc-5.2.1',
     media: undefined,
   })
-  const domainLabel = getOrganizationDomainLabel(organization.organizationDomain)
-
   return (
     <>
       <DrawerShell
@@ -130,10 +131,9 @@ export function EditOrganizationMembershipDrawer({
         title={copy.drawerTitle}
         entityContext={
           <DrawerEntityContext
-            heading={organizationVm.name}
-            metadata={[domainLabel]}
-            displayImage={organizationVm.displayImage}
-            fallback="organization"
+            surface={{
+              identity: buildOrganizationEntityCardModel(organizationVm),
+            }}
           />
         }
         bodyMode="composed"
