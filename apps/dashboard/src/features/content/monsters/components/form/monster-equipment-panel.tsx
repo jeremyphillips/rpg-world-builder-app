@@ -58,7 +58,7 @@ import {
 } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
 import { resolveMonsterEquipmentRowProjection } from '../../lib/equipment/resolve-monster-equipment-row-projection.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
-import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/resolve-monster-weapon-is-proficient.lib'
+import { resolveLoadoutEquipmentIsProficient } from '../../../equipment/lib/loadout/equipment-loadout-picker.lib'
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
 import {
   MONSTER_EQUIPMENT_CATALOG_ERROR,
@@ -113,7 +113,7 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
         applyLoadoutWeaponMatchSignals({
           items: buildLoadoutEquipmentPickerItems(referenceOptions, {
             resolveIsProficient: (equipmentRow) =>
-              resolveMonsterLoadoutEquipmentIsProficient(equipmentRow, weaponGrants),
+              resolveLoadoutEquipmentIsProficient(equipmentRow, weaponGrants),
           }),
           targets: creatureWeaponProficiencyTargetsFromGrantSet(weaponGrants),
           inventory: equipment.map((entry) => ({
@@ -263,7 +263,7 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
             const summary = resolveEquipmentInstanceSummary(entry, item, magicProvider)
             const label = summary.displayName
             const isProficient = item
-              ? resolveMonsterLoadoutEquipmentIsProficient(item, weaponGrants)
+              ? resolveLoadoutEquipmentIsProficient(item, weaponGrants)
               : true
             const rowSummary = resolveMonsterEquipmentRowProjection({
               entry,

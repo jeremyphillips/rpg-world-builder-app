@@ -1,6 +1,5 @@
 import {
   CHALLENGE_RATING_MECHANICS,
-  resolveEquipmentRowSummary,
   type Ability,
   type ChallengeRating,
   type CreatureWeaponProficiencies,
@@ -9,6 +8,8 @@ import {
   type EquipmentRowWeaponSummary,
   type MagicPropertyDefinitionProvider,
 } from '@rpg/contracts'
+
+import { resolveCreatureEquipmentRowProjection } from '../../../equipment/lib/inventory/resolve-creature-equipment-row-projection.lib'
 
 function proficiencyBonusForChallengeRating(
   challengeRating: string | undefined,
@@ -26,15 +27,13 @@ export function resolveMonsterEquipmentRowProjection(args: {
   omitSharedEnhancement: boolean
   provider: MagicPropertyDefinitionProvider
 }): EquipmentRowWeaponSummary | undefined {
-  return resolveEquipmentRowSummary(
-    args.entry,
-    args.item,
-    {
-      abilityScores: args.abilityScores,
-      proficiencyBonus: proficiencyBonusForChallengeRating(args.challengeRating),
-      weaponProficiencies: args.weaponProficiencies,
-      omitSharedEnhancement: args.omitSharedEnhancement,
-    },
-    args.provider,
-  )
+  return resolveCreatureEquipmentRowProjection({
+    entry: args.entry,
+    item: args.item,
+    abilityScores: args.abilityScores,
+    proficiencyBonus: proficiencyBonusForChallengeRating(args.challengeRating),
+    weaponProficiencies: args.weaponProficiencies,
+    omitSharedEnhancement: args.omitSharedEnhancement,
+    provider: args.provider,
+  })
 }

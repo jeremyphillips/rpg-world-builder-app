@@ -1,7 +1,7 @@
 import {
+  equipmentIdMatchesReference,
   isWeaponEquipment,
   resolveWeaponCrossRecommendation,
-  toEquipmentContentId,
   type Equipment,
   type SystemRulesetId,
 } from '@rpg/contracts'
@@ -13,25 +13,16 @@ export type MonsterEquipmentRecommendationCandidate = {
   label: string
 }
 
-function referenceMatchesEquipment(
-  reference: string,
-  equipment: Equipment,
-  rulesetId: SystemRulesetId,
-): boolean {
-  return (
-    reference === equipment.id ||
-    reference === equipment.slug ||
-    toEquipmentContentId(rulesetId, reference) === equipment.id
-  )
-}
-
 function resolveWeaponForReference(
   reference: string,
   catalog: readonly Equipment[],
   rulesetId: SystemRulesetId,
 ): Extract<Equipment, { kind: 'weapon' }> | undefined {
   for (const row of catalog) {
-    if (referenceMatchesEquipment(reference, row, rulesetId) && isWeaponEquipment(row)) {
+    if (
+      equipmentIdMatchesReference({ reference, equipment: row, rulesetId }) &&
+      isWeaponEquipment(row)
+    ) {
       return row
     }
   }

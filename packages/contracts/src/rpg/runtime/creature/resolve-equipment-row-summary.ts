@@ -16,8 +16,8 @@ import { formatSignedModifier, resolveWeaponAttackAbilityModifier } from './weap
  *
  * Armor and shields return no summary. Versatile and thrown attacks stay on the
  * catalog mode and one-handed die that the attack resolver uses.
- * Character detail still calls the attack resolver without a magic-property provider,
- * so preset enhancements are omitted there until a provider is passed.
+ * Dashboard surfaces should call this via `resolveCreatureEquipmentRowProjection`
+ * (content/equipment) and surface-specific adapters (monster CR, character level).
  */
 export type EquipmentRowCreatureContext = {
   abilityScores: Partial<Record<Ability, number>>

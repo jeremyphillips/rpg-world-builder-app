@@ -65,7 +65,11 @@ from a layer below it in this diagram, it is in the wrong module.
 
 **Suggested modules:** one noun per file — `languages.ts`, `senses.ts`, `damage-resistances.ts`.
 
-**Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/spellcasting.ts`
+**Exists today:** `creature/languages.ts`, `creature/equipment.ts`, `creature/equipment-id-match.ts`,
+`creature/equipment-stack.ts`, `creature/proficiencies.ts`, `creature/weapon-cross-recommendation.ts`,
+`creature/resolve-inventory-weapon-attack.ts`, `creature/resolve-equipment-row-summary.ts`
+(card/read-model weapon summaries for any creature-like inventory row),
+`creature/spellcasting.ts`
 
 ---
 

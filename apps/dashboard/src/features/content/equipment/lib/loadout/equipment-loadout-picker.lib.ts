@@ -2,8 +2,10 @@ import {
   NEUTRAL_EQUIPMENT_RECOMMENDATION,
   isEquipmentPickerSupportedKind,
   isWeaponEquipment,
+  isWeaponProficientFromGrantSet,
   resolveEquipmentPresentationFacts,
   resolveWeaponCrossRecommendation,
+  type CreatureWeaponProficiencies,
   type CreatureWeaponProficiencyTarget,
   type Equipment,
   type EquipmentPickerItem,
@@ -12,6 +14,15 @@ import {
 
 export type BuildLoadoutEquipmentPickerItemsOptions = {
   resolveIsProficient?: (equipment: Equipment) => boolean
+}
+
+/** Weapon rows use grant-set proficiency; non-weapons are always proficient in loadout UI. */
+export function resolveLoadoutEquipmentIsProficient(
+  equipment: Equipment,
+  weaponGrants: CreatureWeaponProficiencies,
+): boolean {
+  if (!isWeaponEquipment(equipment)) return true
+  return isWeaponProficientFromGrantSet(equipment, weaponGrants)
 }
 
 /** Minimal picker rows for loadout workflow (no purchase or proficiency gates). */
@@ -36,7 +47,15 @@ export function buildLoadoutEquipmentPickerItems(
     }))
 }
 
-/** Stamps exact unowned weapon-proficiency matches onto loadout rows. Category grants stay browse context. */
+/**
+ * Stamps exact unowned weapon-proficiency matches onto loadout picker rows.
+ *
+ * **Single dashboard implementation** for loadout `selectedWeaponProficiency` recommendation
+ * stamping (compatible tier + presentation facts). Do not fork this envelope in feature
+ * code — import this helper. Signal eligibility stays in
+ * `@rpg/contracts` `resolveWeaponCrossRecommendation`; character-builder browse ranking
+ * uses a separate contracts path. Category grants stay browse sort context only.
+ */
 export function applyLoadoutWeaponMatchSignals(args: {
   items: readonly EquipmentPickerItem[]
   targets: readonly CreatureWeaponProficiencyTarget[]

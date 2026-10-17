@@ -18,6 +18,25 @@ picker priority, scope splits, and stable `entryId`s. See
 [`equipment-stack.ts`](../../../packages/contracts/src/rpg/runtime/creature/equipment-stack.ts)
 and [`magic-properties.md`](../../../packages/contracts/docs/magic-properties.md).
 
+### Creature-adjusted weapon metadata (inventory cards)
+
+Weapon rows on creature loadouts (monster equipment today; character inventory cards next)
+split presentation across two lanes:
+
+| Lane                              | Owner                                                                                                            | Contents                                                                                                |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Supporting metadata** (band)    | `@rpg/contracts` `resolveEquipmentRowSummary` via `resolveCreatureEquipmentRowProjection` in `content/equipment` | Damage expression, damage type, to-hit — same math as `resolveInventoryWeaponAttackTotals`              |
+| **Status** (metadata composition) | `resolveCreatureEquipmentInventoryRowStatus` in `content/equipment`                                              | Not proficient, Magical, property names, calculated adjustment source segments; optional Equipped badge |
+
+Surface adapters only supply creature context:
+
+- **Monster** — `resolveMonsterEquipmentRowProjection` (CR → proficiency bonus); status omits Equipped (inline toggle).
+- **Character** — `resolveCharacterEquipmentRowProjection` (level → proficiency bonus); character detail action rows use the same summary path.
+
+Loadout picker rows stamp unowned weapon-proficiency matches only through
+`applyLoadoutWeaponMatchSignals` in `equipment-loadout-picker.lib.ts` (do not fork).
+Signal rules live in `resolveWeaponCrossRecommendation` (`@rpg/contracts`).
+
 Inventory bucket labels and ordering use `EQUIPMENT_INVENTORY_GROUP_LABELS` in
 `features/content/equipment/lib/inventory/equipment-inventory-group-labels.lib.ts`
 with `CHARACTER_EQUIPMENT_INVENTORY_BUCKETS` from `@rpg/contracts`. Monster rows

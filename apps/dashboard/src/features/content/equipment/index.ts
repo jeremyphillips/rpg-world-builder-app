@@ -23,7 +23,10 @@ export { EquipmentInventorySectionHeader } from './components/inventory-list/equ
 export {
   applyLoadoutWeaponMatchSignals,
   buildLoadoutEquipmentPickerItems,
+  resolveLoadoutEquipmentIsProficient,
 } from './lib/loadout/equipment-loadout-picker.lib'
+export { resolveCreatureEquipmentRowProjection } from './lib/inventory/resolve-creature-equipment-row-projection.lib'
+export { resolveCreatureEquipmentInventoryRowStatus } from './lib/inventory/resolve-creature-equipment-inventory-row-status.lib'
 export { commitEquipmentEditorSession } from './lib/instance-editor/commit-equipment-editor-session'
 export {
   createEquipmentEditorState,

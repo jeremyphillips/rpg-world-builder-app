@@ -2,12 +2,36 @@ import { describe, expect, it } from 'vitest'
 
 import { MATCHES_WEAPON_PROFICIENCY_LABEL } from '@rpg/contracts'
 
-import { pickEquipment } from '@/test/fixtures/pick'
+import { pickArmor, pickEquipment } from '@/test/fixtures/pick'
 
 import {
   applyLoadoutWeaponMatchSignals,
   buildLoadoutEquipmentPickerItems,
+  resolveLoadoutEquipmentIsProficient,
 } from './equipment-loadout-picker.lib'
+
+function expectWeapon(slug: Parameters<typeof pickEquipment>[0]) {
+  const equipment = pickEquipment(slug)
+  if (equipment.kind !== 'weapon') {
+    throw new Error(`Expected weapon fixture: ${slug}`)
+  }
+  return equipment
+}
+
+describe('resolveLoadoutEquipmentIsProficient', () => {
+  it('treats non-weapons as proficient regardless of grants', () => {
+    const plate = pickArmor('plate-armor')
+    expect(resolveLoadoutEquipmentIsProficient(plate, { categories: [], items: [] })).toBe(true)
+  })
+
+  it('evaluates weapons against the grant set', () => {
+    const greataxe = expectWeapon('greataxe')
+    expect(resolveLoadoutEquipmentIsProficient(greataxe, { categories: [], items: [] })).toBe(false)
+    expect(
+      resolveLoadoutEquipmentIsProficient(greataxe, { categories: ['martial'], items: [] }),
+    ).toBe(true)
+  })
+})
 
 describe('buildLoadoutEquipmentPickerItems', () => {
   it('defaults isProficient to true when resolveIsProficient is omitted', () => {
