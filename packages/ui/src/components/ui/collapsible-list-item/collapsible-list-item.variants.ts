@@ -130,6 +130,8 @@ export const collapsibleListItemShellVariants = cva(cn('relative overflow-hidden
       entityCardHeaderActions: collapsibleListItemEntityCardShellClasses,
     },
     preset: {
+      /** Entity-card hosts — perimeter lives on EntityCardFrame; CLI is structural only. */
+      none: '',
       default: cn('rounded-md border border-border'),
       catalog: cn(
         collapsibleListItemCatalogChromeClasses,

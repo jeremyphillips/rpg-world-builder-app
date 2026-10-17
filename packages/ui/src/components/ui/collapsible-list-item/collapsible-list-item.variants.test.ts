@@ -20,6 +20,17 @@ describe('collapsibleListItemShellVariants', () => {
     expect(collapsibleListItemShellVariants({ layout: 'headerActions' })).toContain('flex-col')
     expect(collapsibleListItemDisclosureShellPaddingClasses).toContain('pb-0')
   })
+
+  it('omits preset border chrome when preset is none for entity-card hosts', () => {
+    const classes = collapsibleListItemShellVariants({
+      layout: 'entityCardHeaderActions',
+      preset: 'none',
+    })
+
+    expect(classes).toContain('ui-collapsible-list-item--entity-card')
+    expect(classes).not.toMatch(/\bborder\s+border-border\b/)
+    expect(classes).not.toContain('ui-card')
+  })
 })
 
 describe('collapsibleListItemHeaderVerticalPaddingVariants', () => {

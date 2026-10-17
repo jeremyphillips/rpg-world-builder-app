@@ -108,7 +108,8 @@ export function CollapsibleListItemShell({
   })
   const resolvedToolbar = toolbar ?? main
   const resolvedBody = toolbar !== undefined ? body : undefined
-  const chromeClasses = resolveShellChromeClasses({ preset, surface, tone })
+  const chromeClasses =
+    rowLayout === 'entity-card' ? '' : resolveShellChromeClasses({ preset, surface, tone })
   const headerActionsPaddingClasses = resolveCollapsibleListItemHeaderActionsPaddingClasses(
     shellLayout,
     collapsible,
@@ -121,7 +122,10 @@ export function CollapsibleListItemShell({
       aria-labelledby={titleId}
       data-array-item-prefix={itemPrefix}
       className={cn(
-        collapsibleListItemShellVariants({ layout: shellLayout, preset }),
+        collapsibleListItemShellVariants({
+          layout: shellLayout,
+          preset: rowLayout === 'entity-card' ? 'none' : preset,
+        }),
         headerActionsPaddingClasses,
         chromeClasses,
         dragging && collapsibleListItemDraggingClasses,
