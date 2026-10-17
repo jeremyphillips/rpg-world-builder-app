@@ -177,6 +177,136 @@ export const RecommendationsEmptyList: Story = {
   },
 }
 
+const calculatedCreature = {
+  challengeRating: '0' as const,
+  abilityScores: {
+    ...resolveMonsterCreateDefaultValues().abilityScores,
+    str: 16,
+    dex: 14,
+  },
+  weaponProficiencyMode: 'categories' as const,
+  proficiencies: {
+    ...resolveMonsterCreateDefaultValues().proficiencies,
+    weapons: { categories: ['martial' as const, 'simple' as const], items: [] },
+  },
+}
+
+export const CalculatedOrdinary: Story = {
+  render: () => (
+    <Host
+      defaultValues={calculatedCreature}
+      equipment={[
+        {
+          entryId: 'axe',
+          equipmentId: pickEquipment('greataxe').id,
+          quantity: 1,
+          equipped: true,
+        },
+      ]}
+    />
+  ),
+}
+
+export const CalculatedMagical: Story = {
+  render: () => (
+    <Host
+      defaultValues={calculatedCreature}
+      equipment={[
+        {
+          entryId: 'enhanced',
+          equipmentId: pickEquipment('longsword').id,
+          quantity: 1,
+          equipped: true,
+          magical: true,
+          magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
+        },
+      ]}
+    />
+  ),
+}
+
+export const CalculatedAdjusted: Story = {
+  render: () => (
+    <Host
+      defaultValues={calculatedCreature}
+      equipment={[
+        {
+          entryId: 'adjusted',
+          equipmentId: pickEquipment('longsword').id,
+          quantity: 1,
+          equipped: true,
+          customName: 'Notched Longsword',
+          magical: true,
+          magicProperties: [{ kind: 'preset', propertyId: 'srd-cc-5.2.1:weapon-enhancement-1' }],
+          adjustments: [{ effectId: 'manual', target: 'damage_roll', bonus: -1 }],
+        },
+      ]}
+    />
+  ),
+}
+
+export const CalculatedNonproficient: Story = {
+  render: () => (
+    <Host
+      defaultValues={{
+        ...calculatedCreature,
+        weaponProficiencyMode: 'categories',
+        proficiencies: {
+          ...calculatedCreature.proficiencies,
+          weapons: { categories: [], items: [] },
+        },
+      }}
+      equipment={[
+        {
+          entryId: 'axe',
+          equipmentId: pickEquipment('greataxe').id,
+          quantity: 1,
+          equipped: true,
+        },
+      ]}
+    />
+  ),
+}
+
+export const CalculatedIncomplete: Story = {
+  render: () => (
+    <Host
+      equipment={[
+        {
+          entryId: 'axe',
+          equipmentId: pickEquipment('greataxe').id,
+          quantity: 1,
+          equipped: true,
+        },
+      ]}
+    />
+  ),
+}
+
+export const CalculatedLongTitle: Story = {
+  render: () => (
+    <Host
+      defaultValues={calculatedCreature}
+      equipment={[
+        {
+          entryId: 'named',
+          equipmentId: pickEquipment('greataxe').id,
+          quantity: 1,
+          equipped: true,
+          customName: 'Greataxe of the Unnecessarily Long Ceremonial Procession',
+        },
+      ]}
+    />
+  ),
+  decorators: [
+    (Story) => (
+      <div className="max-w-sm">
+        <Story />
+      </div>
+    ),
+  ],
+}
+
 export const RecommendationsWithOwnedWeapon: Story = {
   render: () => {
     const dagger = pickEquipment('dagger')

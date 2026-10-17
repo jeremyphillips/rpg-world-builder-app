@@ -123,7 +123,7 @@ export function EntitySummarySupportingMetadata({
   }
 
   return (
-    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]}>
+    <IdentityRowSupporting size={ENTITY_SUMMARY_SUPPORTING_SIZE[density]} wrap>
       <InlineMetadata role="supporting" density={density}>
         {segments.map((label) => (
           <InlineMetadata.Item key={label}>{label}</InlineMetadata.Item>

@@ -56,6 +56,7 @@ import {
   coerceCreatureWeaponProficienciesForForm,
   MONSTER_DEFAULT_WEAPON_PROFICIENCY_MODE,
 } from '../../lib/creature-details/monster-weapon-proficiencies-form.lib'
+import { resolveMonsterEquipmentRowProjection } from '../../lib/equipment/resolve-monster-equipment-row-projection.lib'
 import { resolveMonsterEquipmentRowStatus } from '../../lib/equipment/resolve-monster-equipment-row-status.lib'
 import { resolveMonsterLoadoutEquipmentIsProficient } from '../../lib/equipment/resolve-monster-weapon-is-proficient.lib'
 import { resolveEquipmentRemovalDecision } from '../../lib/equipment/resolve-equipment-removal-decision.lib'
@@ -264,11 +265,21 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
             const isProficient = item
               ? resolveMonsterLoadoutEquipmentIsProficient(item, weaponGrants)
               : true
+            const rowSummary = resolveMonsterEquipmentRowProjection({
+              entry,
+              item,
+              abilityScores: values.abilityScores,
+              challengeRating: values.challengeRating,
+              weaponProficiencies: weaponGrants,
+              omitSharedEnhancement: summary.enhancementInDisplayName,
+              provider: magicProvider,
+            })
             const inventoryStatus = resolveMonsterEquipmentRowStatus({
               summary,
               catalogItem: item,
               catalogMissing,
               isProficient,
+              adjustmentSegments: rowSummary?.adjustmentSegments,
             })
             const rowStatus = inventoryStatus.status
             const equipped = Boolean(summary.equipped)
@@ -289,6 +300,9 @@ export function MonsterEquipmentPanel({ ctx }: { ctx: ContentFormCtx }) {
                 }
                 entity={{
                   heading: label,
+                  ...(rowSummary && rowSummary.supportingMetadata.length > 0
+                    ? { supportingMetadata: [...rowSummary.supportingMetadata] }
+                    : {}),
                   ...(rowStatus.length > 0
                     ? { status: rowStatus, statusComposition: 'metadata' }
                     : {}),

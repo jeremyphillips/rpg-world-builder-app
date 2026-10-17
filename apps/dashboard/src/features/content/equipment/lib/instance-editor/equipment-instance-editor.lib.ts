@@ -1,5 +1,7 @@
 import { loadSeedMagicProperties } from '@rpg/catalog/magic-properties'
 import {
+  adjustmentBonusOnTarget,
+  enhancementBonusOnTarget,
   EQUIPMENT_EFFECT_TARGET_ENTRIES,
   type Equipment,
   type EquipmentEffectTarget,
@@ -14,8 +16,8 @@ import {
 import type { PropertyBrowseDraft } from './equipment-editor-types'
 
 const MECHANICAL_MODIFIER_TARGETS = [
-  'attack_roll',
   'damage_roll',
+  'attack_roll',
   'armor_class',
 ] as const satisfies readonly EquipmentEffectTarget[]
 
@@ -93,15 +95,11 @@ export function overlappingMechanicalModifierTargets(args: {
   magic: ResolvedEquipmentMagicProperties
   totals: EquipmentEffectTotals
 }): EquipmentEffectTarget[] {
-  const manualTargets = new Set((args.draft.adjustments ?? []).map((effect) => effect.target))
-  return MECHANICAL_MODIFIER_TARGETS.filter((target) => {
-    const hasEnhancement = args.magic.resolved.some(
-      (row) =>
-        row.definition.category === 'enhancement' &&
-        row.definition.effects.some((effect) => effect.target === target),
-    )
-    return manualTargets.has(target) && hasEnhancement && args.totals[target] !== 0
-  })
+  return MECHANICAL_MODIFIER_TARGETS.filter(
+    (target) =>
+      enhancementBonusOnTarget(args.magic, target) !== 0 ||
+      adjustmentBonusOnTarget(args.draft, target) !== 0,
+  )
 }
 
 export function filterPresetMagicPropertiesForBrowse(

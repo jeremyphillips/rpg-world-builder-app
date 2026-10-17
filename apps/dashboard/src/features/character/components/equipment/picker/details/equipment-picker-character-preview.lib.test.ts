@@ -32,7 +32,7 @@ describe('resolveEquipmentPickerCharacterPreviewLines', () => {
     )
 
     expect(lines).toContain(`${EQUIPMENT_PICKER_PREVIEW_ATTACK_LABEL}: +5`)
-    expect(lines).toContain(`${EQUIPMENT_PICKER_PREVIEW_DAMAGE_LABEL}: 1d8 +3`)
+    expect(lines).toContain(`${EQUIPMENT_PICKER_PREVIEW_DAMAGE_LABEL}: 1d8+3`)
     expect(lines).toContain(`${EQUIPMENT_PICKER_PREVIEW_REMAINING_AFTER_PURCHASE_LABEL}: 25 GP`)
   })
 

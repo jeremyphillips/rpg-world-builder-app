@@ -170,6 +170,7 @@ export {
   adjustmentBonusOnTarget,
   adjustmentMetadataSegments,
   enhancementBonusOnTarget,
+  formatEquipmentEffectSourceSegments,
   formatEquipmentMechanicalComponentSegments,
   formatEquipmentMechanicalComponentsForTarget,
 } from './equipment/instance/equipment-mechanical-metadata'

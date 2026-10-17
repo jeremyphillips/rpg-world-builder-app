@@ -7,6 +7,7 @@ import {
   getDamageTypeSentenceForm,
 } from './damage/vocabulary'
 import {
+  getPhysicalDamageTypeCompactLabel,
   getPhysicalDamageTypeEntry,
   PHYSICAL_DAMAGE_TYPE_IDS,
   physicalDamageTypeSchema,
@@ -44,6 +45,12 @@ describe('damage type vocabulary', () => {
       expect(entry?.label).toBeTruthy()
       expect(entry?.description).toBeTruthy()
     }
+  })
+
+  it('uses authored compact labels for inline weapon facts', () => {
+    expect(getPhysicalDamageTypeCompactLabel('slashing')).toBe('slashing')
+    expect(getPhysicalDamageTypeCompactLabel('piercing')).toBe('piercing')
+    expect(getPhysicalDamageTypeCompactLabel('bludgeoning')).toBe('bludgeoning')
   })
 
   it('returns labels and falls back for unknown ids', () => {

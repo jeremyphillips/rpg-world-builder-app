@@ -126,6 +126,47 @@ describe('MonsterEquipmentPanel', () => {
     expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
   })
 
+  it('recalculates damage and to-hit from unsaved strength', () => {
+    const greataxe = pickEquipment('greataxe')
+    const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }
+    const defaults = resolveMonsterCreateDefaultValues()
+    render(
+      <Host
+        formRef={formRef}
+        catalogEquipment={[greataxe]}
+        defaultValues={{
+          ...defaults,
+          challengeRating: '0',
+          abilityScores: { ...defaults.abilityScores, str: 16 },
+          weaponProficiencyMode: 'categories',
+          proficiencies: {
+            ...defaults.proficiencies,
+            weapons: { categories: ['martial'], items: [] },
+          },
+          equipment: [
+            {
+              entryId: 'g1',
+              equipmentId: greataxe.id,
+              quantity: 1,
+              equipped: true,
+            },
+          ],
+        }}
+      />,
+    )
+
+    expect(screen.getByText('1d12+3 slashing')).toBeInTheDocument()
+    expect(screen.getByText('+5 to hit')).toBeInTheDocument()
+
+    act(() => {
+      formRef.current?.setValue('abilityScores.str', 10, { shouldDirty: true })
+    })
+
+    expect(screen.getByText('1d12 slashing')).toBeInTheDocument()
+    expect(screen.getByText('+2 to hit')).toBeInTheDocument()
+    expect(screen.queryByText(resolveEquipmentNotProficientShortLabel())).not.toBeInTheDocument()
+  })
+
   it('updates inventory and picker badges when weapon proficiencies change', async () => {
     const greataxe = pickEquipment('greataxe')
     const formRef: { current: UseFormReturn<MonsterFormValues> | null } = { current: null }

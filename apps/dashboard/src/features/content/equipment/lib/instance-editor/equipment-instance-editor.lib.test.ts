@@ -43,6 +43,42 @@ function magicWithEnhancement(): ResolvedEquipmentMagicProperties {
 }
 
 describe('overlappingMechanicalModifierTargets', () => {
+  it('lists an enhancement target even when that target has no manual adjustment', () => {
+    const draft: EquipmentInstance = {
+      equipmentId: 'longsword',
+      adjustments: [{ effectId: 'manual', target: 'damage_roll', bonus: 9 }],
+    }
+    const magic: ResolvedEquipmentMagicProperties = {
+      resolved: [
+        {
+          entry: { kind: 'preset', propertyId: 'plus-three' },
+          definition: {
+            id: 'plus-three',
+            name: 'Weapon +3',
+            description: '',
+            category: 'enhancement',
+            appliesTo: ['weapon'],
+            effects: [
+              { target: 'attack_roll', bonus: 3 },
+              { target: 'damage_roll', bonus: 3 },
+            ],
+          },
+        },
+      ],
+      custom: [],
+      unresolved: [],
+      inapplicable: [],
+    }
+
+    expect(
+      overlappingMechanicalModifierTargets({
+        draft,
+        magic,
+        totals: { attack_roll: 3, damage_roll: 12, armor_class: 0 },
+      }),
+    ).toEqual(['damage_roll', 'attack_roll'])
+  })
+
   it('lists targets that combine an enhancement and a manual adjustment', () => {
     const draft: EquipmentInstance = {
       equipmentId: 'longsword',
@@ -58,7 +94,7 @@ describe('overlappingMechanicalModifierTargets', () => {
     ).toEqual(['attack_roll'])
   })
 
-  it('skips a target whose combined total is zero', () => {
+  it('keeps a target when enhancement and adjustment cancel', () => {
     const draft: EquipmentInstance = {
       equipmentId: 'longsword',
       adjustments: [{ effectId: 'manual', target: 'attack_roll', bonus: -1 }],
@@ -70,7 +106,7 @@ describe('overlappingMechanicalModifierTargets', () => {
         magic: magicWithEnhancement(),
         totals: emptyTotals,
       }),
-    ).toEqual([])
+    ).toEqual(['attack_roll'])
   })
 })
 

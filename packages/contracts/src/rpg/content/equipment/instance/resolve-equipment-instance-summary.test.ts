@@ -252,5 +252,6 @@ describe('resolveEquipmentInstanceSummary', () => {
     )
     expect(summary.advisories.some((row) => row.code === 'above_standard_enhancement')).toBe(true)
     expect(summary.metadataSegments).toEqual(['+3 adjustment'])
+    expect(summary.enhancementInDisplayName).toBe(true)
   })
 })

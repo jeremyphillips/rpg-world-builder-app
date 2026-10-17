@@ -1,5 +1,5 @@
 import { vocabEnumFromEntries, keysFromEntries } from '../enum-schema'
-import type { GameTermEntry, VocabularyTerm } from '../types'
+import { getTermCompactLabel, type GameTermEntry, type VocabularyTerm } from '../types'
 
 // ---------------------------------------------------------------------------
 // Physical damage — closed forever (3 SRD types). Weapons use this subset only;
@@ -18,6 +18,7 @@ export const PHYSICAL_DAMAGE_TYPE_TERM = {
 export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
   bludgeoning: {
     label: 'Bludgeoning',
+    compactLabel: 'bludgeoning',
     description:
       'Bludgeoning damage is delivered by a blunt instrument or a blow, fall, or constriction that does not use a cutting or piercing point.',
     sentence: {
@@ -27,6 +28,7 @@ export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
   },
   piercing: {
     label: 'Piercing',
+    compactLabel: 'piercing',
     description:
       'Piercing damage is delivered by a strike that uses a point, such as a fang, arrow, or rapier.',
     sentence: {
@@ -36,6 +38,7 @@ export const PHYSICAL_DAMAGE_TYPE_ENTRIES = {
   },
   slashing: {
     label: 'Slashing',
+    compactLabel: 'slashing',
     description:
       'Slashing damage is delivered by a cut from a sharp edge, such as an axe, claw, or greatsword.',
     sentence: {
@@ -59,4 +62,10 @@ export function getPhysicalDamageTypeEntry(id: string): GameTermEntry | undefine
 /** Returns the display label for a physical damage type. Falls back to the raw value. */
 export function getPhysicalDamageTypeLabel(id: string): string {
   return getPhysicalDamageTypeEntry(id)?.label ?? id
+}
+
+/** Compact inline form (`slashing`). Falls back to the display label. */
+export function getPhysicalDamageTypeCompactLabel(id: string): string {
+  const entry = getPhysicalDamageTypeEntry(id)
+  return entry ? getTermCompactLabel(entry) : id
 }

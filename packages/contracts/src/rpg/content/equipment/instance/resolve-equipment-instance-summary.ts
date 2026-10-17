@@ -26,6 +26,8 @@ export type EquipmentInstanceSummary = {
   integrityWarnings: EquipmentInstanceIntegrityWarning[]
   advisories: EquipmentEffectWarning[]
   adjustmentCount: number
+  /** True when `displayName` already suffixes the enhancement bonus. */
+  enhancementInDisplayName: boolean
 }
 
 export type ResolveEquipmentInstanceSummaryOptions = {
@@ -137,5 +139,6 @@ export function resolveEquipmentInstanceSummary(
     integrityWarnings,
     advisories,
     adjustmentCount,
+    enhancementInDisplayName: !normalized.customName && enhancementBonus !== undefined,
   }
 }

@@ -3,15 +3,14 @@ import {
   assembleStartingEquipment,
   canPurchaseEquipment,
   formatSignedModifier,
-  formatWeaponDamageWithModifier,
   isArmorEquipment,
   proficiencyBonus,
   resolveArmorClassIfEquipped,
   resolveEquippedArmorFromInventory,
+  resolveInventoryWeaponAttackTotals,
   resolveWeaponAttackAbilityModifier,
   formatInlineWealth,
   subtractFromWealth,
-  weaponAttackBonus,
   type Ability,
   type ArmorEquipment,
   type ArmorClassBase,
@@ -76,17 +75,19 @@ function resolveWeaponPreviewLines(
   if (!equipment.damage) return []
 
   const abilityMod = resolveWeaponAttackAbilityModifier(equipment, context.abilityScores ?? {})
-  if (abilityMod === undefined) return []
-
-  const profBonus = proficiencyBonus(context.level)
-  const attack = weaponAttackBonus(abilityMod, isProficient, profBonus)
+  const totals = resolveInventoryWeaponAttackTotals({
+    entry: { equipmentId: equipment.id, quantity: 1 },
+    item: equipment,
+    abilityModifier: abilityMod,
+    proficient: isProficient,
+    proficiencyBonus: proficiencyBonus(context.level),
+    provider: () => undefined,
+  })
+  if (totals?.attackBonus === undefined || totals.damageExpression === undefined) return []
 
   return [
-    `${EQUIPMENT_PICKER_PREVIEW_ATTACK_LABEL}: ${formatSignedModifier(attack)}`,
-    `${EQUIPMENT_PICKER_PREVIEW_DAMAGE_LABEL}: ${formatWeaponDamageWithModifier(
-      equipment.damage,
-      abilityMod,
-    )}`,
+    `${EQUIPMENT_PICKER_PREVIEW_ATTACK_LABEL}: ${formatSignedModifier(totals.attackBonus)}`,
+    `${EQUIPMENT_PICKER_PREVIEW_DAMAGE_LABEL}: ${totals.damageExpression}`,
   ]
 }
 

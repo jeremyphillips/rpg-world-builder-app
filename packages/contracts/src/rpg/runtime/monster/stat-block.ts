@@ -13,8 +13,8 @@ import {
   toEquippedArmorPieceForEntry,
   type EquippedArmorPiece,
 } from '../creature/armor-class'
-import { resolveEquipmentEntryEffectTotals } from '../../content/equipment/instance/equipment-effect-totals'
 import type { MagicPropertyDefinitionProvider } from '../../content/equipment/instance/magic-property'
+import { resolveInventoryWeaponAttackTotals } from '../creature/resolve-inventory-weapon-attack'
 import { resolvePassivePerception, savingThrowBonus, skillModifier } from '../creature/checks'
 import type { CreatureEquipmentCatalog } from '../creature/equipment'
 import { resolveCreatureInitiativeModifier } from '../creature/initiative'
@@ -361,6 +361,18 @@ function weaponActionReachRange(
   }
 }
 
+function catalogWeaponForAction(
+  monster: MonsterBody,
+  equipmentCatalog: CreatureEquipmentCatalog,
+  equipmentEntryId: string,
+) {
+  const entry = monster.equipment.find((row) => row.entryId === equipmentEntryId)
+  if (!entry) return undefined
+  const catalogItem = equipmentCatalog.get(entry.equipmentId)
+  if (!catalogItem || !isWeaponEquipment(catalogItem)) return undefined
+  return { entry, catalogItem }
+}
+
 function resolveCatalogWeaponAttackLine(args: {
   action: Extract<MonsterAction, { kind: 'weapon' }>
   monster: MonsterBody
@@ -371,34 +383,30 @@ function resolveCatalogWeaponAttackLine(args: {
 }): DerivedMonsterAttackLine | undefined {
   const { action, monster, equipmentCatalog, proficiencyBonus, section, magicPropertyProvider } =
     args
-  const entry = monster.equipment.find((row) => row.entryId === action.equipmentEntryId)
-  const catalogItem = entry ? equipmentCatalog.get(entry.equipmentId) : undefined
-  if (!catalogItem || !isWeaponEquipment(catalogItem) || !entry) return undefined
+  const resolved = catalogWeaponForAction(monster, equipmentCatalog, action.equipmentEntryId)
+  if (!resolved) return undefined
+  const { entry, catalogItem } = resolved
 
   const abilityMod = resolveWeaponAttackAbilityModifier(catalogItem, monster.abilityScores)
   if (abilityMod === undefined) return undefined
 
-  const effectTotals = resolveEquipmentEntryEffectTotals(entry, catalogItem, magicPropertyProvider)
-  const attackBonusValue =
-    weaponAttackBonus(
-      abilityMod,
-      isWeaponProficient(catalogItem, monster.proficiencies.weapons),
-      proficiencyBonus,
-    ) + effectTotals.attack_roll
-
-  const damageAverage =
-    averageStatBlockDamage(
-      catalogItem.damage ?? { dice: { count: 1, faces: 4 as const } },
-      abilityMod,
-    ) + effectTotals.damage_roll
+  const totals = resolveInventoryWeaponAttackTotals({
+    entry,
+    item: catalogItem,
+    abilityModifier: abilityMod,
+    proficient: isWeaponProficient(catalogItem, monster.proficiencies.weapons),
+    proficiencyBonus,
+    provider: magicPropertyProvider,
+  })
+  if (totals?.attackBonus === undefined || totals.damageAverage === undefined) return undefined
 
   return {
     id: action.id,
     section,
     name: action.name ?? entry?.customName ?? catalogItem.name,
-    attackBonus: attackBonusValue,
-    attackBonusLabel: formatSignedModifier(attackBonusValue),
-    damage: String(damageAverage),
+    attackBonus: totals.attackBonus,
+    attackBonusLabel: formatSignedModifier(totals.attackBonus),
+    damage: String(totals.damageAverage),
     damageTypeLabel: catalogItem.damageType ?? '',
     ...weaponActionReachRange(catalogItem),
   }

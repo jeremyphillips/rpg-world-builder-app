@@ -7,6 +7,7 @@ import {
   EntitySummaryDescription,
   EntitySummaryHeading,
   EntitySummaryStatus,
+  EntitySummarySupportingMetadata,
 } from '../entity-summary'
 
 describe('EntitySummaryHeading', () => {
@@ -98,6 +99,22 @@ describe('EntitySummaryHeading', () => {
     const link = screen.getByRole('link', { name: 'Longsword' })
     expect(link).toHaveAttribute('href', '/items/longsword')
     expect(screen.getByRole('button', { name: 'toggle' })).not.toContainElement(link)
+  })
+})
+
+describe('EntitySummarySupportingMetadata', () => {
+  it('wraps every segment so a later to-hit fact stays visible', () => {
+    render(
+      <EntitySummarySupportingMetadata
+        density="compact"
+        segments={['1d8+3 slashing', '+5 to hit']}
+      />,
+    )
+
+    expect(screen.getByText(/\+5 to hit/)).toBeInTheDocument()
+    const line = screen.getByText(/1d8\+3 slashing/).closest('div')
+    expect(line).toHaveClass('leading-snug')
+    expect(line).not.toHaveClass('truncate')
   })
 })
 

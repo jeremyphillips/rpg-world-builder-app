@@ -2,8 +2,6 @@ import type {
   CharacterBuildCatalogIndex,
   CharacterDerivationInput,
   CharacterLocationReferenceResolution,
-  CharacterProficiencies,
-  Equipment,
   MovementMode,
   OrganizationReferenceResolution,
   ResolvedCharacterCreationRules,
@@ -15,7 +13,6 @@ import {
   ABILITY_IDS,
   deriveCharacterProfile,
   formatSignedModifier,
-  formatWeaponDamageWithModifier,
   getGenderLabel,
   getCharacterLocationConnectionDisplayLabel,
   getMovementModeLabel,
@@ -28,8 +25,9 @@ import {
   createDefaultCharacterVitalState,
   resolveEquippedArmorFromInventory,
   resolveTraitDisplay,
+  isWeaponProficient,
+  resolveInventoryWeaponAttackTotals,
   resolveWeaponAttackAbilityModifier,
-  weaponAttackBonus,
   getWeaponCategoryLabel,
   getArmorCategoryLabel,
   getToolCategoryLabel,
@@ -121,17 +119,6 @@ function resolveIdentitySummary(
   return formatCharacterSummaryFromCatalog(summaryInput, catalogIndex)
 }
 
-function isCharacterProficientWithWeapon(
-  proficiencies: CharacterProficiencies,
-  weapon: Extract<Equipment, { kind: 'weapon' }>,
-): boolean {
-  return proficiencies.weapons.some((entry) => {
-    if (entry.weaponId) return entry.weaponId === weapon.id
-    if (entry.weaponCategory) return entry.weaponCategory === weapon.category
-    return false
-  })
-}
-
 function buildActionRows(
   source: CharacterDetailSource,
   catalogIndex: CharacterBuildCatalogIndex,
@@ -145,17 +132,21 @@ function buildActionRows(
     const equipment = catalogIndex.equipment.get(entry.equipmentId)
     if (!equipment || equipment.kind !== 'weapon' || !equipment.damage) continue
 
-    const abilityMod = resolveWeaponAttackAbilityModifier(equipment, abilityScores)
-    if (abilityMod === undefined) continue
-
-    const isProficient = isCharacterProficientWithWeapon(source.proficiencies, equipment)
-    const attack = weaponAttackBonus(abilityMod, isProficient, profBonus)
+    const totals = resolveInventoryWeaponAttackTotals({
+      entry,
+      item: equipment,
+      abilityModifier: resolveWeaponAttackAbilityModifier(equipment, abilityScores),
+      proficient: isWeaponProficient(equipment, source.proficiencies.weapons),
+      proficiencyBonus: profBonus,
+      provider: () => undefined,
+    })
+    if (totals?.attackBonus === undefined || totals.damageExpression === undefined) continue
 
     rows.push({
       id: entry.entryId ?? entry.equipmentId,
       name: entry.customName ?? equipment.name,
-      attackBonus: formatSignedModifier(attack),
-      damage: formatWeaponDamageWithModifier(equipment.damage, abilityMod),
+      attackBonus: formatSignedModifier(totals.attackBonus),
+      damage: totals.damageExpression,
     })
   }
 
