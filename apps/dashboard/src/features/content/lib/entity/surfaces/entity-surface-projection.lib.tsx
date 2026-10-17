@@ -84,21 +84,6 @@ export function buildEntitySurfaceInlineActionTrailing(
   }
 }
 
-export function buildCatalogToggleSelectInlineAction(input: {
-  isSelected: boolean
-  onSelect: () => void
-  onDeselect: () => void
-  canSelect?: boolean
-  selectLabel?: string
-}): EntitySurfaceInlineAction {
-  return {
-    label: input.isSelected ? 'Remove' : (input.selectLabel ?? 'Select'),
-    intent: input.isSelected ? 'remove' : 'add',
-    onClick: input.isSelected ? input.onDeselect : input.onSelect,
-    disabled: !input.isSelected && input.canSelect === false,
-  }
-}
-
 export function projectEntitySurfaceConfig(
   config: EntitySurfaceConfig,
   density: ContentCardDensity = 'compact',

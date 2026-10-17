@@ -8,6 +8,7 @@ import { expectNoAxeViolations, itAxe } from '@rpg/ui/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogPickerSheet } from './catalog-picker-sheet.client'
+import { RadioGroupItem } from './radio-group.client'
 
 type DemoItem = {
   id: string
@@ -421,6 +422,38 @@ describe('CatalogPickerSheet', () => {
     expect(screen.getByRole('searchbox', { name: 'Search catalog' })).toHaveValue('rope')
     expect(screen.getByText('Beta Item')).toBeInTheDocument()
     expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
+  })
+
+  it('renders selection mode as a radio group and forwards row selection args', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+
+    render(
+      <CatalogPickerSheet
+        open
+        onOpenChange={vi.fn()}
+        title="Pick one"
+        items={items}
+        getItemKey={(item) => item.id}
+        getSearchText={(item) => item.searchText}
+        getItemToolbarLabel={(item) => item.name}
+        selection={{ value: null, onValueChange }}
+        renderCollapsibleRow={(args) => (
+          <div>
+            <RadioGroupItem value={args.itemKey} aria-label={args.toolbarLabel} />
+            <span>{args.item.name}</span>
+            <span data-testid="row-selection-disabled">{String(args.selection?.disabled)}</span>
+          </div>
+        )}
+      />,
+    )
+
+    const group = screen.getByRole('radiogroup', { name: 'Pick one' })
+    expect(group).toBeInTheDocument()
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('radio', { name: 'Beta Item' }))
+    expect(onValueChange).toHaveBeenCalledWith('beta')
   })
 
   it('delegates row rendering to renderCollapsibleRow when provided', () => {

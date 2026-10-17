@@ -2,7 +2,10 @@ import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
 import type { EntitySurfaceConfig } from '../entity-surface.types'
 import { CatalogEntityRow, type CatalogEntityRowProps } from './catalog-entity-row'
 
-export type CatalogEntitySurfaceRowProps = Omit<CatalogEntityRowProps, 'entity' | 'trailing'> & {
+export type CatalogEntitySurfaceRowProps = Omit<
+  Extract<CatalogEntityRowProps, { selection?: undefined }>,
+  'entity' | 'trailing'
+> & {
   surface: EntitySurfaceConfig
 }
 

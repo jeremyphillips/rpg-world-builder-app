@@ -53,9 +53,9 @@ describe('LocationParentReplacementDrawer', () => {
     expect(screen.getByText('Choose a new parent for this location.')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('Search locations…')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeDisabled()
-    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeDisabled()
+    expect(screen.getByRole('radio', { name: /Harborford/i })).toBeEnabled()
 
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: /Harborford/i }))
 
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
     expect(screen.getAllByText('Dock Ward')).toHaveLength(1)
@@ -86,8 +86,47 @@ describe('LocationParentReplacementDrawer', () => {
     expect(screen.getByText('Choose a parent for this location.')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Set parent location' })).toBeDisabled()
 
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: /Material Plane/i }))
     expect(screen.getByRole('button', { name: 'Set parent location' })).toBeEnabled()
+  })
+
+  it('resets selection when the drawer remounts on reopen', async () => {
+    const user = userEvent.setup()
+    const onOpenChange = vi.fn()
+
+    const { rerender } = render(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={onOpenChange}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    await user.click(screen.getByRole('radio', { name: /Harborford/i }))
+    expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
+
+    rerender(
+      <LocationParentReplacementDrawer
+        open={false}
+        onOpenChange={onOpenChange}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        onSubmit={vi.fn()}
+      />,
+    )
+    rerender(
+      <LocationParentReplacementDrawer
+        open
+        onOpenChange={onOpenChange}
+        subject={YAWNING_PORTAL}
+        campaignLocations={LOCATIONS_LIST}
+        onSubmit={vi.fn()}
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Change parent location' })).toBeDisabled()
   })
 
   it('lists Harborford as a valid replacement parent for Yawning Portal', async () => {
@@ -104,7 +143,7 @@ describe('LocationParentReplacementDrawer', () => {
     )
 
     expect(screen.getByText('Harborford')).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Select' }))
+    await user.click(screen.getByRole('radio', { name: /Harborford/i }))
     expect(screen.getByRole('button', { name: 'Change parent location' })).toBeEnabled()
   })
 
@@ -196,6 +235,6 @@ describe('LocationParentReplacementDrawer', () => {
       ),
     ).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Move location' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Select' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /Harborford/i })).not.toBeInTheDocument()
   })
 })

@@ -6,6 +6,7 @@ import {
   ActionIcon,
   iconGhostControlVariants,
   NumberStepper,
+  RadioGroup,
   type ContentCardDensity,
 } from '@rpg/ui'
 import {
@@ -13,7 +14,12 @@ import {
   waitForRowAnatomyLayout,
 } from '@rpg/ui/storybook/row-anatomy-geometry'
 
-import { ContentEntityCard, DetailRowLeadingMedia, DisclosureEntityCard } from '@/features/content'
+import {
+  CatalogEntityRow,
+  ContentEntityCard,
+  DetailRowLeadingMedia,
+  DisclosureEntityCard,
+} from '@/features/content'
 import { DetailEntityRow } from '../../../detail/row/entity/detail-entity-row'
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import type { EntityAnatomyTrailing } from '../entity-anatomy-trailing.types'
@@ -288,6 +294,58 @@ function EdgeGeometryPair({ density }: { density: ContentCardDensity }) {
  * Edge contract: a trailing ghost utility sits as far from the end edge as a leading caret
  * sits from the start edge — the surface tightens whichever edge carries utility chrome.
  */
+/** Representative catalog-picker rows: leading radio × trailing none, status metadata, and caret disclosure. */
+export const CatalogRowRadioLeading: Story = {
+  render: () => (
+    <div className="flex max-w-md flex-col gap-2">
+      <RadioGroup aria-label="Organizations" defaultValue="org-eligible">
+        <div data-edge-case="radio-leading-none">
+          <CatalogEntityRow
+            toolbarLabel="City Council"
+            domIds={{
+              itemId: 'matrix-radio-none',
+              titleId: 'matrix-radio-none-title',
+              bodyId: 'matrix-radio-none-body',
+            }}
+            entity={{ heading: 'City Council', classification: 'Government' }}
+            selection={{ value: 'org-eligible' }}
+          />
+        </div>
+        <div data-edge-case="radio-leading-status">
+          <CatalogEntityRow
+            toolbarLabel="Harbor Guild"
+            domIds={{
+              itemId: 'matrix-radio-status',
+              titleId: 'matrix-radio-status-title',
+              bodyId: 'matrix-radio-status-body',
+            }}
+            entity={{
+              heading: 'Harbor Guild',
+              classification: 'Trade',
+              status: [{ kind: 'text', label: 'Already linked' }],
+            }}
+            selection={{ value: 'org-blocked', disabled: true }}
+          />
+        </div>
+      </RadioGroup>
+      <div data-edge-case="radio-leading-disclosure">
+        <DisclosureEntityCard
+          itemId="matrix-radio-disclosure"
+          toolbarAriaLabel="Spell details"
+          entity={{ heading: 'Fireball', classification: 'Evocation' }}
+          density="compact"
+        >
+          <p className="text-style-supporting">Disclosed picker body.</p>
+        </DisclosureEntityCard>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitForRowAnatomyLayout()
+    await expectRowAnatomyAligned(canvasElement, { minGrids: 3 })
+  },
+}
+
 export const UtilityEdgeParity: Story = {
   render: () => (
     <div className="flex max-w-md flex-col gap-6">

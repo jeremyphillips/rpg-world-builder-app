@@ -5,7 +5,7 @@ import type { EntityAnatomyTrailing } from '../../anatomy/entity-anatomy-trailin
 import type { EntitySummaryModel } from '../../summary/entity-summary.types'
 import { projectEntitySurfaceConfig } from '../entity-surface-projection.lib'
 import type { EntitySurfaceConfig } from '../entity-surface.types'
-import { CatalogEntityRow } from './catalog-entity-row'
+import { CatalogEntityRow, type CatalogEntityRowProps } from './catalog-entity-row'
 
 type CatalogEntityRowRendererConfig<TItem> = {
   buildSurface?: (item: TItem) => EntitySurfaceConfig
@@ -52,19 +52,30 @@ function renderCatalogEntityRow<TItem>(
   const surfaceConfig = config.buildSurface?.(args.item)
   const projected = surfaceConfig ? projectEntitySurfaceConfig(surfaceConfig) : undefined
 
-  return (
-    <CatalogEntityRow
-      toolbarLabel={args.toolbarLabel}
-      domIds={args.domIds}
-      collapsible={args.collapsible}
-      collapsed={args.collapsed}
-      onToggleCollapse={args.onToggleCollapse}
-      summary={args.summary}
-      details={resolveCatalogEntityRowDetails(args.item, args, projected, config.buildDetails)}
-      entity={resolveCatalogEntityRowModel(args.item, projected, config.buildEntity)}
-      trailing={resolveCatalogEntityRowTrailing(args.item, projected, config.buildTrailing)}
-    />
-  )
+  const trailing = args.selection
+    ? undefined
+    : resolveCatalogEntityRowTrailing(args.item, projected, config.buildTrailing)
+
+  const rowProps = {
+    toolbarLabel: args.toolbarLabel,
+    domIds: args.domIds,
+    collapsible: args.collapsible,
+    collapsed: args.collapsed,
+    onToggleCollapse: args.onToggleCollapse,
+    summary: args.summary,
+    details: resolveCatalogEntityRowDetails(args.item, args, projected, config.buildDetails),
+    entity: resolveCatalogEntityRowModel(args.item, projected, config.buildEntity),
+    ...(args.selection
+      ? {
+          selection: {
+            value: args.selection.value,
+            disabled: args.selection.disabled,
+          },
+        }
+      : { trailing }),
+  } as CatalogEntityRowProps
+
+  return <CatalogEntityRow {...rowProps} />
 }
 
 export function createCatalogEntityRowRenderer<TItem>(

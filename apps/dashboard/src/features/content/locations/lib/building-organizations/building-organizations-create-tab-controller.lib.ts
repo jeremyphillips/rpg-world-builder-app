@@ -388,9 +388,16 @@ function applyBuildingOrganizationResolvedSummary(
   view: BuildingOrganizationComposerView,
   input: BuildingOrganizationSetupSummaryState & { relationshipKindCount: number },
 ): BuildingOrganizationComposerView {
-  const summaryRows = resolveSetupSummaryRows(input, BUILDING_ORGANIZATION_SETUP_SUMMARY).map(
-    toBuildingOrganizationComposerSummaryRow,
-  )
+  const summaryRows = resolveSetupSummaryRows(input, BUILDING_ORGANIZATION_SETUP_SUMMARY)
+    .map(toBuildingOrganizationComposerSummaryRow)
+    .filter(
+      (row) =>
+        !(
+          view.showDiscovery &&
+          view.activeDecision === 'organization' &&
+          row.id === 'organization'
+        ),
+    )
 
   return {
     ...view,
@@ -466,8 +473,13 @@ export function canConfirmBuildingOrganizationRelationship(input: {
   organizationOptions: readonly BuildingOrganizationRelationshipKindOption[]
 }): boolean {
   if (!input.kind || !input.selectedOrganization) return false
-  if (input.composerStage !== 'review' && input.composerStage !== 'branch') return false
-  return !input.organizationOptions.find((option) => option.value === input.kind)?.disabled
+  if (input.organizationOptions.find((option) => option.value === input.kind)?.disabled) {
+    return false
+  }
+  if (input.selectedOrganization.kind === 'new') {
+    return input.composerStage === 'branch'
+  }
+  return input.composerStage === 'discovery' || input.composerStage === 'review'
 }
 
 export function resolveBuildingOrganizationChildWorkflowView(input: {

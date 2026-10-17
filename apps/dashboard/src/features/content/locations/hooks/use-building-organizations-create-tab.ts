@@ -281,7 +281,7 @@ export function useBuildingOrganizationsCreateTab({
         kindOptionsFor,
         relationshipDraftId: editingDraftId ?? undefined,
       })
-      setComposerStage(stillEligible ? 'review' : 'discovery')
+      setComposerStage('discovery')
       if (!stillEligible) setSelectedOrganization(null)
     },
     [editingDraftId, kind, kindOptionsFor, selectedOrganization],
@@ -309,7 +309,7 @@ export function useBuildingOrganizationsCreateTab({
       setValidationAttempted(false)
       setEditingDecision(null)
       setSelectedOrganization({ kind: 'existing', organizationId })
-      setComposerStage('review')
+      setComposerStage('discovery')
     },
     [editingDecision, selectedOrganization],
   )
@@ -405,7 +405,7 @@ export function useBuildingOrganizationsCreateTab({
       setEditingDraftId(relationship.draftId)
       setSelectedOrganization(relationship.organization)
       setKind(relationship.kind)
-      setComposerStage('review')
+      setComposerStage('discovery')
       setNewOrganizationDraftId(null)
       setEditingDecision(null)
       setComposerMode('composing')

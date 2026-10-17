@@ -32,7 +32,6 @@ import {
   resolveOrganizationRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
-import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import {
   buildOrganizationEntityCardModel,
   buildOrganizationEntitySummaryVm,
@@ -693,9 +692,20 @@ function LocationInversePeopleConnectionLinkDrawerContent({
               ' ',
             )
           }
+          selection={{
+            value: selectedOrganizationId,
+            onValueChange: setSelectedOrganizationId,
+            isItemDisabled: (organization) =>
+              organizationDomain == null ||
+              !organizationInverseSubjectHasAvailableKind(
+                organization.id,
+                location.id,
+                organizationAvailabilityKinds,
+                orgRows,
+              ),
+          }}
           renderEntityRow={createCatalogEntityRowRenderer({
             buildSurface: (organization) => {
-              const isSelected = selectedOrganizationId === organization.id
               const hasAvailableKind =
                 organizationDomain != null &&
                 organizationInverseSubjectHasAvailableKind(
@@ -715,12 +725,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                         : undefined,
                   },
                 ),
-                inlineAction: buildCatalogToggleSelectInlineAction({
-                  isSelected,
-                  canSelect: hasAvailableKind,
-                  onSelect: () => setSelectedOrganizationId(organization.id),
-                  onDeselect: () => setSelectedOrganizationId(null),
-                }),
               }
             },
           })}
@@ -802,9 +806,19 @@ function LocationInversePeopleConnectionLinkDrawerContent({
         getItemKey={(character) => character.id}
         getItemToolbarLabel={(character) => character.name}
         getSearchText={buildConnectedPartyCharacterPickerSearchText}
+        selection={{
+          value: selectedCharacterId,
+          onValueChange: setSelectedCharacterId,
+          isItemDisabled: (character) =>
+            characterKind == null ||
+            !characterInverseSubjectHasAvailableKind(
+              character.id,
+              characterAvailabilityKinds,
+              characterExistingKeys,
+            ),
+        }}
         renderEntityRow={createCatalogEntityRowRenderer({
           buildSurface: (character) => {
-            const isSelected = selectedCharacterId === character.id
             const hasAvailableKind =
               characterKind != null &&
               characterInverseSubjectHasAvailableKind(
@@ -823,12 +837,6 @@ function LocationInversePeopleConnectionLinkDrawerContent({
                       : undefined,
                 },
               ),
-              inlineAction: buildCatalogToggleSelectInlineAction({
-                isSelected,
-                canSelect: hasAvailableKind,
-                onSelect: () => setSelectedCharacterId(character.id),
-                onDeselect: () => setSelectedCharacterId(null),
-              }),
             }
           },
         })}

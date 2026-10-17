@@ -24,6 +24,9 @@ import {
   SelectionSummaryCard,
   SelectionSummaryChangeAction,
   Text,
+  RadioCard,
+  RadioGroup,
+  Sheet,
   iconGhostControlVariants,
 } from '@rpg/ui'
 import { ArrayItemAnatomyGrid } from '@rpg/ui/form'
@@ -712,6 +715,98 @@ export const CARD_RECIPES: readonly CardRecipe[] = [
     trailing: 'action column',
     anatomy: 'different',
     render: () => <QuickNpcStartingChoicesDemo />,
+  },
+  {
+    name: 'radio-card-strong',
+    section: 'ui-cards-form-rows',
+    component: 'RadioOptionCard',
+    chain: ['RadioCard', 'RadioOptionCard', 'SelectionTarget', 'SelectionTargetRadio'],
+    useWhen: 'Standalone builder or onboarding choices outside sheet hosts (strong tone default).',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <RadioCard
+        aria-label="Scope"
+        value="item"
+        density="compact"
+        options={[
+          { value: 'item', label: 'This item', description: 'Applies once' },
+          { value: 'all', label: 'All items', description: 'Applies to every copy' },
+        ]}
+      />
+    ),
+  },
+  {
+    name: 'radio-card-quiet-in-sheet',
+    section: 'ui-cards-form-rows',
+    component: 'RadioOptionCard',
+    chain: ['Sheet.Content', 'CardSurfaceToneProvider', 'RadioCard', 'RadioOptionCard'],
+    useWhen: 'Footer-committed drawer kind fields inherit quiet tone from Sheet.Content.',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'different',
+    render: () => (
+      <Sheet.Root open>
+        <Sheet.Content surface="background" size="lg">
+          <RadioCard
+            aria-label="Connection kind"
+            value="owns"
+            density="compact"
+            options={[
+              { value: 'owns', label: 'Owner', description: 'Controls the location' },
+              { value: 'tenant', label: 'Tenant', description: 'Occupies the location' },
+            ]}
+          />
+        </Sheet.Content>
+      </Sheet.Root>
+    ),
+  },
+  {
+    name: 'catalog-entity-row-radio',
+    section: 'picker-rows',
+    component: 'CatalogEntityRow',
+    chain: [
+      'RadioGroup',
+      'CatalogEntityRow',
+      'SelectionTarget',
+      'SelectionTargetRadio',
+      ...ENTITY_CHAIN,
+    ],
+    useWhen: 'Footer-committed catalog pickers with single-choice radio rows.',
+    density: 'compact',
+    leading: 'radio',
+    trailing: 'none',
+    anatomy: 'row-track',
+    render: () => (
+      <RadioGroup aria-label="Organizations" defaultValue="org-1">
+        <CatalogEntityRow
+          toolbarLabel="City Council"
+          domIds={{
+            itemId: 'recipe-catalog-radio',
+            titleId: 'recipe-catalog-radio-title',
+            bodyId: 'recipe-catalog-radio-body',
+          }}
+          entity={{ heading: 'City Council', classification: 'Government' }}
+          selection={{ value: 'org-1' }}
+        />
+      </RadioGroup>
+    ),
+  },
+  {
+    name: 'catalog-entity-row-radio-disclosure',
+    section: 'picker-rows',
+    component: 'CatalogEntityRow',
+    chain: ['CatalogEntityRow', 'CollapsibleListItem', ...ENTITY_CHAIN],
+    useWhen:
+      'Spell/proficiency pickers keep leading caret disclosure; selection mode is flat rows.',
+    density: 'compact',
+    leading: 'caret',
+    trailing: 'action (band)',
+    anatomy: 'row-track',
+    render: () => <CatalogEntityRowRecipe />,
   },
   {
     name: 'Choice block row',

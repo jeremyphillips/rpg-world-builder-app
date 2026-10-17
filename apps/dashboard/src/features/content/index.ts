@@ -136,7 +136,6 @@ export { createCatalogEntityRowRenderer } from './lib/entity/surfaces/catalog/ca
 export { EntitySurfaceContentCard } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export type { EntitySurfaceContentCardProps } from './lib/entity/surfaces/cards/content/entity-surface-content-card'
 export {
-  buildCatalogToggleSelectInlineAction,
   projectEntitySurfaceConfig,
   projectEntitySurfaceIdentityToSummaryModel,
 } from './lib/entity/surfaces/entity-surface-projection.lib'

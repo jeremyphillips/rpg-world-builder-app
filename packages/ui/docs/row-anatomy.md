@@ -69,18 +69,18 @@ track offsets live in the resolver, not in consumers. Hosts mark their grid root
 
 ## Entity kind → cell
 
-| Entity slot / trailing kind | Cell                                                                  |
-| --------------------------- | --------------------------------------------------------------------- |
-| leading utilities           | `band` / `leading`                                                    |
-| media                       | `stretch` / `media` (spans identity stack; band stays control height) |
-| heading                     | `band` / `content`                                                    |
-| description                 | `meta` / `content`                                                    |
-| status                      | `status` / `content`                                                  |
-| `action`                    | `band` / `trailing`                                                   |
-| `utility`                   | `full` / `trailing`                                                   |
-| `indicator` chevron         | `full` / `trailing`                                                   |
-| `indicator` quantity        | `band` / `trailing`                                                   |
-| `group`                     | primary `band`, secondary `meta` (both `trailing`)                    |
+| Entity slot / trailing kind | Cell                                                                                  |
+| --------------------------- | ------------------------------------------------------------------------------------- |
+| leading utilities           | `band` / `leading` (caret, drag grip, **selection radio** via `SelectionTargetRadio`) |
+| media                       | `stretch` / `media` (spans identity stack; band stays control height)                 |
+| heading                     | `band` / `content`                                                                    |
+| description                 | `meta` / `content`                                                                    |
+| status                      | `status` / `content`                                                                  |
+| `action`                    | `band` / `trailing`                                                                   |
+| `utility`                   | `full` / `trailing`                                                                   |
+| `indicator` chevron         | `full` / `trailing`                                                                   |
+| `indicator` quantity        | `band` / `trailing`                                                                   |
+| `group`                     | primary `band`, secondary `meta` (both `trailing`)                                    |
 
 ## No compensation rule
 

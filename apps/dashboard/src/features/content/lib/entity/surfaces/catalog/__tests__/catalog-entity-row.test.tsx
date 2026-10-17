@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import { collapsibleListItemHeaderVerticalPaddingVariants } from '@rpg/ui'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { collapsibleListItemHeaderVerticalPaddingVariants, RadioGroup } from '@rpg/ui'
+import { describe, expect, it, vi } from 'vitest'
 
 import { CatalogEntityRow } from '../catalog-entity-row'
 import { catalogEntityRowBodyWashVariants } from '../catalog-entity-row.variants'
@@ -84,6 +85,28 @@ describe('CatalogEntityRow', () => {
 
     expect(screen.queryByRole('button', { name: 'The Foos' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Select' })).toBeInTheDocument()
+  })
+
+  it('renders selection mode with a leading radio inside the card frame', async () => {
+    const user = userEvent.setup()
+    const onValueChange = vi.fn()
+
+    render(
+      <RadioGroup aria-label="Organizations" value="" onValueChange={onValueChange}>
+        <CatalogEntityRow
+          toolbarLabel="The Foos"
+          domIds={domIds}
+          entity={{ heading: 'The Foos', classification: 'Government' }}
+          selection={{ value: 'org-1' }}
+        />
+      </RadioGroup>,
+    )
+
+    const frame = document.querySelector('article') as HTMLElement
+    expect(frame).toHaveClass('ui-card--interactive')
+    expect(screen.getByRole('radio', { name: 'The Foos' })).toBeInTheDocument()
+    await user.click(screen.getByText('The Foos'))
+    expect(onValueChange).toHaveBeenCalledWith('org-1')
   })
 
   it('keeps the disclosure trigger before details are mounted', () => {

@@ -28,6 +28,7 @@ export type {
   CatalogPickerRowLayout,
   CatalogPickerAuxiliaryAction,
   CatalogPickerCollapsibleRowRenderArgs,
+  CatalogPickerSheetSelection,
 } from './catalog-picker-sheet.types'
 export type {
   CatalogToolbarProps,
@@ -191,6 +192,7 @@ export function CatalogPickerSheet<TItem>({
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
   expandedItemId,
   onExpandedItemChange,
+  selection,
 }: CatalogPickerSheetProps<TItem>) {
   const resultsReady = useCatalogPickerResultsReady(open)
   const {
@@ -232,6 +234,7 @@ export function CatalogPickerSheet<TItem>({
     getItemToolbarLabel,
     expandedItemId,
     onExpandedItemChange,
+    selection,
   } as CatalogPickerSheetProps<TItem>
 
   const bodyContent = resolveCatalogPickerSheetBodyContent({
@@ -248,7 +251,12 @@ export function CatalogPickerSheet<TItem>({
     emptyState,
     emptyMessage,
     results: (
-      <CatalogPickerSheetResults items={visibleItems} getItemKey={getItemKey} rowProps={rowProps} />
+      <CatalogPickerSheetResults
+        items={visibleItems}
+        getItemKey={getItemKey}
+        rowProps={rowProps}
+        resultsLabel={title}
+      />
     ),
   })
 

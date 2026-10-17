@@ -56,7 +56,13 @@ For each migrated primitive, verify in Storybook DevTools:
 
 ## Card, inset panel, and empty panel
 
-`ui-card` owns radius, border, fill, raised shadow, and `--surface-current`. `--static` and `--interactive` set hover through one `:hover` rule. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive. `shadow-md` is not used; the card reads `--shadow-surface-raised`.
+`ui-card` owns radius, border, fill, shadow, and `--surface-current`. Tone modifiers `--quiet` and `--strong` set the same `--ui-card-*` custom-property list; state modifiers `--interactive`, `--static`, `--selected`, and `--disabled` read those variables. Parts are `__header`, `__content`, and `__footer`. `cardSurfaceVariants()` is the styling primitive.
+
+`ui-radio-card` splits density (`--default`, `--compact`), layout (`--media`, `--row`), and elements `__details`, `__embedded`, and `__footer` from the shared card resolver.
+
+`ui-selection-target` exposes `__control` (stretched hit area) and `__raised` (trailing controls above the hit area).
+
+`dash-entity-card` (dashboard `index.css`) publishes density (`--compact`, `--comfortable`), utility edge modifiers (`--start-utility`, `--end-utility`), and elements `__content` and `__details`. Entity frames compose `cardSurfaceVariants({ tone: quiet, … })` with these modifiers; tone comes from `CardSurfaceToneProvider` on sheet and create-composition hosts.
 
 `ui-inset-panel--{sm,md,lg}` owns radius and padding. Border style and alignment are separate modifiers. Surface wash still comes from the visual-vocabulary resolver.
 

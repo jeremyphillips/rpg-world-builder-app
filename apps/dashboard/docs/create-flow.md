@@ -133,6 +133,13 @@ Feature-owned discovery body (when applicable)
   Picker cards (8px — createTabDiscoveryListClasses)
 ```
 
+Building Organizations discovery uses a `RadioGroup` of `CatalogEntityRow`
+**selection mode** rows (leading radio, no trailing Select). Choosing an existing
+organization stays on the `discovery` stage; footer commit uses the child-workflow
+projection while the list remains visible. `BuildingOrganizationComposer` wraps
+`CreateCompositionComposer` in `CardSurfaceToneProvider tone="quiet"` so intent
+`RadioCardField` rows match entity picker rows.
+
 Import spacing tokens from `@/lib/create-flow`. Do not fork composition
 stage or composer review values in feature variants.
 

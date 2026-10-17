@@ -30,6 +30,13 @@ export type CatalogPickerCollapsibleRowRenderArgs<TItem> = {
   onToggleCollapse?: () => void
   summary?: ReactNode
   details?: ReactNode
+  selection?: { value: string; disabled: boolean }
+}
+
+export type CatalogPickerSheetSelection<TItem> = {
+  value: string | null
+  onValueChange: (itemKey: string) => void
+  isItemDisabled?: (item: TItem) => boolean
 }
 
 type CatalogPickerSheetRowRenderProps<TItem> =
@@ -165,5 +172,7 @@ export type CatalogPickerSheetProps<TItem> = {
   noResultsMessage?: string
   noScopedItemsMessage?: string
   noItemsMessage?: string
+  /** Single-choice picker rows — results render as a radio group labelled by the sheet title. */
+  selection?: CatalogPickerSheetSelection<TItem>
 } & CatalogPickerSheetRowRenderProps<TItem> &
   CatalogPickerSearchStrategy<TItem>

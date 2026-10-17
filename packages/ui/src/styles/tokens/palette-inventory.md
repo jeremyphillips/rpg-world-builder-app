@@ -142,8 +142,9 @@ for inline/status text — never reference palette steps from UI code.
 Layer 2 roles may reference `--palette-*` theme roles, another established Layer 2
 semantic role, or `color-mix` of those roles toward a **concrete surface** (never
 `transparent` as the default wash pattern). Layer 2 must not contain independent
-authored `oklch`/`hex` constants or reference component-only recipes
-(`--catalog-picker-row-surface`, `--surface-raised-shadow`).
+authored `oklch`/`hex` constants or reference removed component-only recipes
+(`--surface-raised-shadow`). Entity picker rows use `ui-card--quiet` (`--card`) instead of
+`--catalog-picker-row-surface`.
 
 ## Layer 2 (semantic)
 

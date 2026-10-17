@@ -32,7 +32,6 @@ import {
   resolveCharacterRelationshipFilterLayout,
   useRelationshipCatalogFilters,
 } from '@/features/content'
-import { buildCatalogToggleSelectInlineAction } from '../../../lib/entity/surfaces/entity-surface-projection.lib'
 import { LOCATION_CONNECTION_KIND_OPTIONS_COPY } from '../../lib/connected-parties/location-connection-kind-options-copy.lib'
 import { DrawerContext } from '../../../lib/relationship/drawer/drawer-context'
 import { toDrawerEntityBlockModel } from '../../../lib/entity/surfaces/drawer/drawer-entity.lib'
@@ -370,9 +369,19 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
       getItemKey={(character) => character.id}
       getItemToolbarLabel={(character) => character.name}
       getSearchText={buildConnectedPartyCharacterPickerSearchText}
+      selection={{
+        value: selectedCharacterId,
+        onValueChange: (characterId) => {
+          setSelectedCharacterId(characterId)
+          if (!resolvedAddKind) {
+            setSelectedKind(null)
+          }
+        },
+        isItemDisabled: (character) =>
+          !characterInverseSubjectHasAvailableKind(character.id, availabilityKinds, existingKeys),
+      }}
       renderEntityRow={createCatalogEntityRowRenderer({
         buildSurface: (character) => {
-          const isSelected = selectedCharacterId === character.id
           const hasAvailableKind = characterInverseSubjectHasAvailableKind(
             character.id,
             availabilityKinds,
@@ -386,22 +395,6 @@ function LocationInverseCharacterConnectionLinkDrawerContent({
                 metadata: !hasAvailableKind ? [CHARACTER_DRAWER_FULLY_LINKED_REASON] : undefined,
               },
             ),
-            inlineAction: buildCatalogToggleSelectInlineAction({
-              isSelected,
-              canSelect: hasAvailableKind,
-              onSelect: () => {
-                setSelectedCharacterId(character.id)
-                if (!resolvedAddKind) {
-                  setSelectedKind(null)
-                }
-              },
-              onDeselect: () => {
-                setSelectedCharacterId(null)
-                if (!resolvedAddKind) {
-                  setSelectedKind(null)
-                }
-              },
-            }),
           }
         },
       })}
