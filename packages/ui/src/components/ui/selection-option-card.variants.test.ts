@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { cardSurfaceVariants } from './card.variants'
 import {
   optionCardBodyVariants,
   optionCardCompactBodyInsetClasses,
@@ -9,52 +10,19 @@ import {
   optionCardSummaryBadgeRowVariants,
   optionCardDescriptionVariants,
   optionCardEmbeddedSlotVariants,
-  optionCardSelectedChromeClasses,
   optionCardSummaryTitleVariants,
   optionCardTitleVariants,
-  selectionOptionCardShellVariants,
 } from './selection-option-card.variants'
-import {
-  radioCardShellSelectedChromeClasses,
-  radioCardShellVariants,
-  radioCardVariants,
-} from './radio-card.variants'
+import { radioCardVariants } from './radio-card.variants'
 
 describe('optionCard selected chrome parity', () => {
-  it('uses the same selected classes on static and radio shells', () => {
-    expect(selectionOptionCardShellVariants({ selected: true })).toContain(
-      optionCardSelectedChromeClasses,
-    )
-    expect(radioCardShellVariants({ selected: true })).toContain(
-      radioCardShellSelectedChromeClasses,
-    )
-  })
-
-  it('applies selected chrome to checked radio card variant', () => {
-    expect(radioCardVariants({ variant: 'card' })).toContain('data-[state=checked]:border-primary')
-    expect(radioCardVariants({ variant: 'card' })).toContain(
-      'data-[state=checked]:bg-surface-strong',
-    )
-    expect(radioCardVariants({ variant: 'card' })).toContain('data-[state=checked]:ring-1')
-    expect(radioCardVariants({ variant: 'card' })).toContain('data-[state=checked]:ring-primary/20')
+  it('uses ui-card strong selected surface on static selection cards', () => {
+    expect(cardSurfaceVariants({ tone: 'strong', selected: true })).toContain('ui-card--selected')
+    expect(cardSurfaceVariants({ tone: 'strong', selected: true })).toContain('ui-card--strong')
   })
 })
 
 describe('optionCard surface establishment', () => {
-  it('establishes the muted plane on radio cards and keeps hover on surface-subtle', () => {
-    expect(radioCardVariants({ variant: 'card' })).toContain('bg-surface-muted')
-    expect(radioCardVariants({ variant: 'card' })).toContain(
-      '[--surface-current:var(--surface-muted)]',
-    )
-    expect(radioCardVariants({ variant: 'card' })).toContain(
-      '[--surface-current:var(--surface-subtle)]',
-    )
-    expect(radioCardShellVariants()).toContain('bg-surface-muted')
-    expect(radioCardShellVariants()).toContain('[--surface-current:var(--surface-muted)]')
-    expect(radioCardShellVariants()).toContain('[--surface-current:var(--surface-subtle)]')
-    expect(radioCardShellVariants({ selected: true })).toContain('bg-surface-strong')
-  })
-
   it('does not paint a separate fill on embedded slots', () => {
     for (const tone of ['panel', 'divider', 'plain'] as const) {
       const classes = optionCardEmbeddedSlotVariants({ tone })

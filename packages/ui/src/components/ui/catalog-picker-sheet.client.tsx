@@ -155,7 +155,6 @@ export function CatalogPickerSheet<TItem>({
   onOpenChange,
   title,
   description,
-  headlineClassName,
   items,
   getItemKey,
   getSearchText,
@@ -190,12 +189,6 @@ export function CatalogPickerSheet<TItem>({
   noResultsMessage = DEFAULT_NO_RESULTS_MESSAGE,
   noScopedItemsMessage = DEFAULT_NO_SCOPED_ITEMS_MESSAGE,
   noItemsMessage = DEFAULT_NO_ITEMS_MESSAGE,
-  rowPreset,
-  rowLayout,
-  rowSurface,
-  toolbarCompact,
-  rowBodyClassName,
-  rowShellClassName,
   expandedItemId,
   onExpandedItemChange,
 }: CatalogPickerSheetProps<TItem>) {
@@ -237,12 +230,6 @@ export function CatalogPickerSheet<TItem>({
     renderItemActions,
     renderItemDetails,
     getItemToolbarLabel,
-    rowPreset,
-    rowLayout,
-    rowSurface,
-    toolbarCompact,
-    rowBodyClassName,
-    rowShellClassName,
     expandedItemId,
     onExpandedItemChange,
   } as CatalogPickerSheetProps<TItem>
@@ -296,7 +283,6 @@ export function CatalogPickerSheet<TItem>({
         <Sheet.Header
           headline={title}
           description={description}
-          headlineClassName={headlineClassName}
           className={pinChromeInHeader ? 'pb-2' : undefined}
         >
           <CatalogPickerSheetHeaderChrome

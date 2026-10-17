@@ -1,0 +1,53 @@
+@layer components {
+  .ui-radio-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    text-align: left;
+    color: var(--card-foreground);
+  }
+
+  .ui-radio-card--default {
+    gap: calc(var(--spacing) * 2);
+  }
+
+  .ui-radio-card--compact {
+    gap: calc(var(--spacing) * 1);
+  }
+
+  .ui-radio-card--media {
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .ui-radio-card--row {
+    width: 100%;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .ui-radio-card__media {
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .ui-radio-card__body {
+    display: flex;
+    min-height: 0;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+  }
+
+  .ui-radio-card__details {
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block-end: calc(var(--spacing) * 3);
+  }
+
+  .ui-radio-card__embedded,
+  .ui-radio-card__footer {
+    min-width: 0;
+  }
+}

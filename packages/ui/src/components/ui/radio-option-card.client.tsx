@@ -1,12 +1,15 @@
 'use client'
 
 import * as React from 'react'
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
 import { Info } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { Badge } from './badge'
 import { Button } from './button.client'
+import { cardSurfaceVariants, type CardSurfaceTone } from './card.variants'
+import { useCardSurfaceTone } from './card-surface-tone.client'
+import { Collapsible, CollapsibleContent } from './collapsible.client'
+import { DisclosureChevronTrigger } from './disclosure-chevron-trigger.client'
 import {
   SelectionOptionCardAnatomy,
   SelectionOptionCardTitleMeta,
@@ -16,15 +19,22 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip.client'
 import { RadioOptionCardLeadingControl } from './radio-option-card-controls.client'
 import {
-  RadioOptionCardMediaSlot,
-  RadioOptionCardShellLayout,
-} from './radio-option-card-shell.client'
-import {
   radioCardDetailsActionVariants,
-  radioCardVariants,
+  radioCardGroupItemRowClasses,
+  radioCardMediaSlotClasses,
   type RadioCardVariant,
   type RadioCardVisualControl,
 } from './radio-card.variants'
+import { useRadioGroupItemSelected } from './radio-group.client'
+import {
+  SelectionTarget,
+  SelectionTargetRadio,
+  SelectionTargetRaised,
+} from './selection-target.client'
+import {
+  optionCardEmbeddedSlotVariants,
+  optionCardFooterSlotVariants,
+} from './selection-option-card.variants'
 
 export type RadioOptionCardEmbeddedSlotTone = 'divider' | 'panel' | 'plain'
 
@@ -33,9 +43,10 @@ export type RadioOptionCardSummaryBadge = {
   tooltip?: string
 }
 
-export type RadioOptionCardProps = React.ComponentPropsWithoutRef<
-  typeof RadioGroupPrimitive.Item
-> & {
+export type RadioOptionCardProps = {
+  id?: string
+  value: string
+  disabled?: boolean
   label: string
   description?: string
   summaryItems?: string[]
@@ -43,35 +54,24 @@ export type RadioOptionCardProps = React.ComponentPropsWithoutRef<
   summaryContent?: React.ReactNode
   density?: SelectionOptionCardDensity
   variant?: RadioCardVariant
-  /** Merged onto the option title label. */
-  titleClassName?: string
-  controlPosition?: 'left' | 'right'
   visualControl?: RadioCardVisualControl
   icon?: React.ReactNode
-  titleEndSlot?: React.ReactNode
   titleAdornment?: React.ReactNode
   embedded?: React.ReactNode
   footer?: React.ReactNode
   embeddedTone?: RadioOptionCardEmbeddedSlotTone
-  /** Full-bleed image region above the card body. */
   media?: React.ReactNode
   summaryBadge?: RadioOptionCardSummaryBadge
   reserveSummaryBadgeRow?: boolean
-  clampDescription?: boolean
   copyWidth?: SelectionOptionCardCopyWidth
-  /** Outer shell selected chrome when using shell layout. */
-  shellSelected?: boolean
-  /** When shell layout is used, whether embedded content is visible. */
-  showEmbedded?: boolean
+  details?: React.ReactNode
+  onDetails?: () => void
+  onClick?: React.MouseEventHandler<HTMLButtonElement>
+  className?: string
 }
 
-function radioOptionCardUsesShell({
-  titleEndSlot,
-  embedded,
-  footer,
-  media,
-}: Pick<RadioOptionCardProps, 'titleEndSlot' | 'embedded' | 'footer' | 'media'>): boolean {
-  return !!(titleEndSlot || embedded || footer || media)
+function resolveRadioCardDetailsAriaLabel(label: string): string {
+  return `View ${label} details`
 }
 
 function RadioOptionCardSummaryBadgeSlot({ badge }: { badge: RadioOptionCardSummaryBadge }) {
@@ -97,144 +97,7 @@ function RadioOptionCardSummaryBadgeSlot({ badge }: { badge: RadioOptionCardSumm
   )
 }
 
-function renderSummaryBadge(
-  summaryBadge: RadioOptionCardSummaryBadge | undefined,
-): React.ReactNode {
-  if (!summaryBadge) return null
-  return <RadioOptionCardSummaryBadgeSlot badge={summaryBadge} />
-}
-
-export const RadioOptionCard = React.forwardRef<
-  React.ComponentRef<typeof RadioGroupPrimitive.Item>,
-  RadioOptionCardProps
->(
-  (
-    {
-      className,
-      label,
-      description,
-      summaryItems,
-      summaryLines,
-      summaryContent,
-      density = 'default',
-      variant = 'card',
-      titleClassName,
-      controlPosition = 'left',
-      visualControl = 'radio',
-      icon,
-      titleEndSlot,
-      titleAdornment,
-      embedded,
-      footer,
-      embeddedTone = 'divider',
-      media,
-      summaryBadge,
-      reserveSummaryBadgeRow = false,
-      clampDescription = false,
-      copyWidth = 'fill',
-      shellSelected = false,
-      showEmbedded = false,
-      disabled,
-      onClick,
-      value,
-      id,
-      ...props
-    },
-    ref,
-  ) => {
-    const effectiveControlPosition = visualControl === 'icon' ? 'left' : controlPosition
-    const leadingControl = (
-      <RadioOptionCardLeadingControl
-        visualControl={visualControl}
-        icon={icon}
-        variant={variant}
-        density={density}
-      />
-    )
-    const summaryBadgeNode = renderSummaryBadge(summaryBadge)
-    const anatomyProps = {
-      density,
-      label,
-      titleAdornment,
-      description,
-      summaryItems,
-      summaryLines,
-      summaryContent,
-      titleClassName,
-      summaryBadgeNode,
-      reserveSummaryBadgeRow,
-      clampDescription,
-      copyWidth,
-    }
-    const itemProps = {
-      ref,
-      disabled,
-      value,
-      id,
-      onClick,
-      className,
-      ...props,
-    }
-
-    if (variant === 'row' || !radioOptionCardUsesShell({ titleEndSlot, embedded, footer, media })) {
-      return (
-        <RadioGroupPrimitive.Item
-          {...itemProps}
-          aria-label={label}
-          className={cn(radioCardVariants({ density, variant }), className)}
-        >
-          <SelectionOptionCardAnatomy
-            density={density}
-            leadingControl={leadingControl}
-            leadingMedia={variant === 'row' ? media : undefined}
-            label={label}
-            titleAdornment={titleAdornment}
-            titleEndSlot={titleEndSlot}
-            description={description}
-            summaryItems={summaryItems}
-            summaryLines={summaryLines}
-            summaryContent={summaryContent}
-            titleClassName={titleClassName}
-            controlPosition={effectiveControlPosition}
-            summaryBadge={summaryBadgeNode}
-            reserveSummaryBadgeRow={reserveSummaryBadgeRow}
-            clampDescription={clampDescription}
-            copyWidth={copyWidth}
-          />
-        </RadioGroupPrimitive.Item>
-      )
-    }
-
-    return (
-      <RadioOptionCardShellLayout
-        itemProps={itemProps}
-        visualControl={visualControl}
-        icon={icon}
-        variant={variant}
-        leadingControl={leadingControl}
-        effectiveControlPosition={effectiveControlPosition}
-        titleEndSlot={titleEndSlot}
-        embedded={embedded}
-        footer={footer}
-        embeddedTone={embeddedTone}
-        showEmbedded={showEmbedded}
-        media={media}
-        mediaSlot={
-          media != null ? (
-            <RadioOptionCardMediaSlot media={media} id={id} disabled={disabled} />
-          ) : null
-        }
-        shellSelected={shellSelected}
-        {...anatomyProps}
-      />
-    )
-  },
-)
-RadioOptionCard.displayName = 'RadioOptionCard'
-
-export const RADIO_CARD_DETAILS_TOOLTIP = 'View details'
-
-export function RadioOptionCardDetailsAction({
+function RadioOptionCardDetailsAction({
   ariaLabel,
   onDetails,
 }: {
@@ -242,36 +105,291 @@ export function RadioOptionCardDetailsAction({
   onDetails: () => void
 }) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger interactive asChild>
-          <Button
-            type="button"
-            variant="text"
-            tone="neutral"
-            size="sm"
-            density="compact"
-            className={radioCardDetailsActionVariants()}
-            aria-label={ariaLabel}
-            onPointerDown={(event) => event.stopPropagation()}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.stopPropagation()
-              }
-            }}
-            onClick={(event) => {
-              event.stopPropagation()
-              onDetails()
-            }}
-          >
-            <Info aria-hidden="true" />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>{RADIO_CARD_DETAILS_TOOLTIP}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <SelectionTargetRaised>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger interactive asChild>
+            <Button
+              type="button"
+              variant="text"
+              tone="neutral"
+              size="sm"
+              density="compact"
+              className={radioCardDetailsActionVariants()}
+              aria-label={ariaLabel}
+              onClick={onDetails}
+            >
+              <Info aria-hidden="true" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>View details</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </SelectionTargetRaised>
   )
 }
+
+function resolveRadioOptionCardTitleEndSlot(
+  label: string,
+  details: React.ReactNode | undefined,
+  onDetails: (() => void) | undefined,
+): React.ReactNode {
+  if (details) {
+    return <DisclosureChevronTrigger label={`${label} details`} />
+  }
+  if (onDetails) {
+    return (
+      <RadioOptionCardDetailsAction
+        ariaLabel={resolveRadioCardDetailsAriaLabel(label)}
+        onDetails={onDetails}
+      />
+    )
+  }
+  return undefined
+}
+
+function resolveRadioOptionCardShellClassName({
+  variant,
+  density,
+  tone,
+  selected,
+  disabled,
+  media,
+  className,
+}: {
+  variant: RadioCardVariant
+  density: SelectionOptionCardDensity
+  tone: CardSurfaceTone
+  selected: boolean
+  disabled?: boolean
+  media?: React.ReactNode
+  className?: string
+}): string {
+  if (variant === 'row') {
+    return cn(
+      radioCardGroupItemRowClasses({ density }),
+      'group ui-radio-card ui-radio-card--row',
+      selected && 'ui-interactive-row--selected-bordered',
+      disabled && 'opacity-50',
+      className,
+    )
+  }
+
+  return cn(
+    cardSurfaceVariants({
+      tone,
+      interactive: !disabled,
+      selected,
+      disabled,
+    }),
+    'group ui-radio-card',
+    density === 'compact' ? 'ui-radio-card--compact' : 'ui-radio-card--default',
+    media && 'ui-radio-card--media',
+    className,
+  )
+}
+
+type RadioOptionCardInteriorProps = Pick<
+  RadioOptionCardProps,
+  | 'id'
+  | 'value'
+  | 'label'
+  | 'description'
+  | 'summaryItems'
+  | 'summaryLines'
+  | 'summaryContent'
+  | 'density'
+  | 'variant'
+  | 'visualControl'
+  | 'icon'
+  | 'titleAdornment'
+  | 'embedded'
+  | 'footer'
+  | 'embeddedTone'
+  | 'media'
+  | 'summaryBadge'
+  | 'reserveSummaryBadgeRow'
+  | 'copyWidth'
+  | 'details'
+  | 'onDetails'
+  | 'disabled'
+  | 'onClick'
+> & {
+  selected: boolean
+}
+
+function RadioOptionCardBodyExtras({
+  density,
+  embeddedTone,
+  selected,
+  embedded,
+  footer,
+}: Pick<
+  RadioOptionCardInteriorProps,
+  'density' | 'embeddedTone' | 'selected' | 'embedded' | 'footer'
+>) {
+  return (
+    <>
+      {selected && embedded ? (
+        <div
+          className={cn(
+            'ui-radio-card__embedded',
+            optionCardEmbeddedSlotVariants({ density, tone: embeddedTone }),
+          )}
+        >
+          {embedded}
+        </div>
+      ) : null}
+      {footer ? (
+        <div className={cn('ui-radio-card__footer', optionCardFooterSlotVariants({ density }))}>
+          {footer}
+        </div>
+      ) : null}
+    </>
+  )
+}
+
+function RadioOptionCardPrimaryRow(props: RadioOptionCardInteriorProps) {
+  const {
+    id,
+    value,
+    label,
+    description,
+    summaryItems,
+    summaryLines,
+    summaryContent,
+    density = 'default',
+    variant = 'card',
+    visualControl = 'radio',
+    icon,
+    titleAdornment,
+    media,
+    summaryBadge,
+    reserveSummaryBadgeRow = false,
+    copyWidth = 'fill',
+    details,
+    onDetails,
+    disabled,
+    onClick,
+  } = props
+
+  const summaryBadgeNode = summaryBadge ? (
+    <RadioOptionCardSummaryBadgeSlot badge={summaryBadge} />
+  ) : null
+
+  const leadingIndicator =
+    visualControl === 'icon' && icon ? (
+      <RadioOptionCardLeadingControl visualControl="icon" icon={icon} density={density} />
+    ) : undefined
+
+  return (
+    <SelectionOptionCardAnatomy
+      density={density}
+      leadingControl={
+        <SelectionTargetRadio
+          id={id}
+          value={value}
+          disabled={disabled}
+          indicator={leadingIndicator}
+          aria-label={label}
+          aria-describedby={description ? `${id}-description` : undefined}
+          onClick={onClick}
+        />
+      }
+      leadingMedia={variant === 'row' ? media : undefined}
+      label={label}
+      titleAdornment={titleAdornment}
+      titleEndSlot={resolveRadioOptionCardTitleEndSlot(label, details, onDetails)}
+      description={description}
+      summaryItems={summaryItems}
+      summaryLines={summaryLines}
+      summaryContent={summaryContent}
+      summaryBadge={summaryBadgeNode}
+      reserveSummaryBadgeRow={reserveSummaryBadgeRow || summaryBadge != null}
+      copyWidth={copyWidth}
+    />
+  )
+}
+
+function RadioOptionCardInterior(props: RadioOptionCardInteriorProps) {
+  const {
+    id,
+    density = 'default',
+    variant = 'card',
+    media,
+    embedded,
+    footer,
+    embeddedTone,
+    selected,
+  } = props
+  const showCardMedia = Boolean(media && variant === 'card')
+
+  return (
+    <SelectionTarget htmlFor={id}>
+      {showCardMedia ? (
+        <div className={cn('ui-radio-card__media', radioCardMediaSlotClasses)}>{media}</div>
+      ) : null}
+      <div className={cn('ui-radio-card__body', showCardMedia && 'flex min-h-0 flex-1 flex-col')}>
+        <RadioOptionCardPrimaryRow {...props} />
+        <RadioOptionCardBodyExtras
+          density={density}
+          embeddedTone={embeddedTone}
+          selected={selected}
+          embedded={embedded}
+          footer={footer}
+        />
+      </div>
+    </SelectionTarget>
+  )
+}
+
+export const RadioOptionCard = React.forwardRef<HTMLDivElement, RadioOptionCardProps>(
+  (props, ref) => {
+    const {
+      className,
+      density = 'default',
+      variant = 'card',
+      details,
+      disabled,
+      value,
+      id,
+      media,
+    } = props
+    const tone = useCardSurfaceTone('strong')
+    const selected = useRadioGroupItemSelected(value)
+    const detailsBodyId = details && id ? `${id}-details` : undefined
+    const shellClassName = resolveRadioOptionCardShellClassName({
+      variant,
+      density,
+      tone,
+      selected,
+      disabled,
+      media,
+      className,
+    })
+    const cardInterior = <RadioOptionCardInterior {...props} selected={selected} />
+
+    if (details) {
+      return (
+        <Collapsible>
+          <div ref={ref} className={shellClassName} data-disabled={disabled ? true : undefined}>
+            {cardInterior}
+            <CollapsibleContent id={detailsBodyId} className="ui-radio-card__details">
+              {details}
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+      )
+    }
+
+    return (
+      <div ref={ref} className={shellClassName} data-disabled={disabled ? true : undefined}>
+        {cardInterior}
+      </div>
+    )
+  },
+)
+RadioOptionCard.displayName = 'RadioOptionCard'
 
 export function RadioOptionCardTitleAdornment({
   badge,

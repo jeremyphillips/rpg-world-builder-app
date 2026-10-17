@@ -44,17 +44,14 @@ describe('LocationDetailIdentity', () => {
 })
 
 describe('ContentEntityCard (location rows)', () => {
-  it('renders linked title and summary line', () => {
+  it('renders title and summary line', () => {
     render(
       <MemoryRouter>
-        <ContentEntityCard
-          entity={{ heading: 'Dock Ward', description: 'District' }}
-          headingHref="/campaigns/camp_1/locations/location-dock-ward"
-        />
+        <ContentEntityCard entity={{ heading: 'Dock Ward', description: 'District' }} />
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('link', { name: 'Dock Ward' })).toBeInTheDocument()
+    expect(screen.getByText('Dock Ward')).toBeInTheDocument()
     expect(screen.getByText('District')).toBeInTheDocument()
   })
 

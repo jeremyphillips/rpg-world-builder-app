@@ -11,7 +11,6 @@ type CatalogEntityRowRendererConfig<TItem> = {
   buildSurface?: (item: TItem) => EntitySurfaceConfig
   buildEntity?: (item: TItem) => EntitySummaryModel
   buildTrailing?: (item: TItem) => EntityAnatomyTrailing | undefined
-  buildHeadingHref?: (item: TItem) => string | undefined
   buildDetails?: (item: TItem) => ReactNode
 }
 
@@ -64,7 +63,6 @@ function renderCatalogEntityRow<TItem>(
       details={resolveCatalogEntityRowDetails(args.item, args, projected, config.buildDetails)}
       entity={resolveCatalogEntityRowModel(args.item, projected, config.buildEntity)}
       trailing={resolveCatalogEntityRowTrailing(args.item, projected, config.buildTrailing)}
-      headingHref={config.buildHeadingHref?.(args.item)}
     />
   )
 }

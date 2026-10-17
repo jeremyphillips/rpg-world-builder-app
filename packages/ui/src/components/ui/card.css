@@ -1,6 +1,6 @@
 /*
- * Card shell. Part padding lives here. Interactive hover is one modifier.
- * Source order: block → interactive → parts.
+ * Card shell. Part padding lives here. Tone and state modifiers resolve surface chrome.
+ * Source order: block → tone → interactive/static → selected → disabled → parts.
  */
 @layer components {
   .ui-card {
@@ -12,19 +12,78 @@
     --surface-current: var(--card);
   }
 
+  .ui-card--quiet {
+    border-radius: var(--ui-card-radius);
+    border: 1px solid var(--ui-card-border);
+    background-color: var(--ui-card-bg);
+    box-shadow: var(--ui-card-shadow);
+    --surface-current: var(--ui-card-bg);
+    --ui-card-bg: var(--card);
+    --ui-card-border: var(--border);
+    --ui-card-shadow: none;
+    --ui-card-radius: var(--radius-md);
+    --ui-card-bg-hover: var(--row-hover-bg);
+    --ui-card-border-hover: var(--border);
+    --ui-card-bg-selected: var(--row-selected-bg);
+    --ui-card-border-selected: var(--row-selected-border);
+    --ui-card-ring-selected: none;
+  }
+
+  .ui-card--strong {
+    border-radius: var(--ui-card-radius);
+    border: 1px solid var(--ui-card-border);
+    background-color: var(--ui-card-bg);
+    box-shadow: var(--ui-card-shadow);
+    --surface-current: var(--ui-card-bg);
+    --ui-card-bg: var(--surface-muted);
+    --ui-card-border: var(--card-border);
+    --ui-card-shadow: var(--shadow-surface-raised);
+    --ui-card-radius: var(--radius-card);
+    --ui-card-bg-hover: var(--surface-subtle);
+    --ui-card-border-hover: var(--primary);
+    --ui-card-bg-selected: var(--surface-strong);
+    --ui-card-border-selected: var(--primary);
+    --ui-card-ring-selected: 0 0 0 1px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+
   .ui-card--static,
   .ui-card--interactive {
-    transition-property: background-color, border-color, color;
+    transition-property: background-color, border-color, color, box-shadow;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms;
   }
 
   .ui-card--static:hover {
-    background-color: var(--card);
+    background-color: var(--ui-card-bg, var(--card));
   }
 
   .ui-card--interactive:hover {
-    background-color: var(--row-hover-bg);
+    background-color: var(--ui-card-bg-hover, var(--row-hover-bg));
+    border-color: var(--ui-card-border-hover, var(--card-border));
+  }
+
+  .ui-card--selected {
+    background-color: var(--ui-card-bg-selected);
+    border-color: var(--ui-card-border-selected);
+    box-shadow: var(--ui-card-ring-selected);
+    --surface-current: var(--ui-card-bg-selected);
+  }
+
+  .ui-card--selected.ui-card--interactive:hover {
+    background-color: var(--ui-card-bg-selected);
+    border-color: var(--ui-card-border-selected);
+    box-shadow: var(--ui-card-ring-selected);
+  }
+
+  .ui-card--disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .ui-card--interactive:has(.ui-selection-target__control:focus-visible),
+  .ui-card--interactive:has(.ui-choice-control:focus-visible) {
+    outline: none;
+    box-shadow: var(--ui-card-ring-selected, none), var(--ui-focus-ring-standalone);
   }
 
   .ui-card__header {

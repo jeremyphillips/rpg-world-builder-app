@@ -1,14 +1,6 @@
 import type { ReactNode } from 'react'
-import type { ContentCardDensity } from '@rpg/ui'
 
-import { entityCardContentInsetVariants } from './entity-card-content.variants'
-
-type EntityCardContentProps = {
-  density?: ContentCardDensity
-  children: ReactNode
-}
-
-/** Shared header/content inset region — sole owner of entity card padding. */
-export function EntityCardContent({ density = 'comfortable', children }: EntityCardContentProps) {
-  return <div className={entityCardContentInsetVariants({ density })}>{children}</div>
+/** Shared header/content inset region — padding from `dash-entity-card__content`. */
+export function EntityCardContent({ children }: { children: ReactNode }) {
+  return <div className="dash-entity-card__content">{children}</div>
 }

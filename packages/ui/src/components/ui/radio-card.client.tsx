@@ -4,20 +4,12 @@ import * as React from 'react'
 
 import { cn } from '../../lib/utils'
 import { RadioGroup } from './radio-group.client'
-import {
-  RadioOptionCard,
-  RadioOptionCardDetailsAction,
-  RadioOptionCardTitleAdornment,
-} from './radio-option-card.client'
+import { RadioOptionCard, RadioOptionCardTitleAdornment } from './radio-option-card.client'
 import type {
   SelectionOptionCardCopyWidth,
   SelectionOptionCardDensity,
 } from './selection-option-card-anatomy.client'
 import { radioCardGroupGapVariants } from './radio-card.variants'
-
-export function resolveRadioCardDetailsAriaLabel(label: string): string {
-  return `View ${label} details`
-}
 
 /** Radix RadioGroup skips onValueChange when the current option is clicked again. */
 export function createRadioCardReselectClickHandler(
@@ -50,82 +42,56 @@ export type RadioCardSummaryBadge = {
   tooltip?: string
 }
 
-export interface RadioCardOption {
+type RadioCardOptionBase = {
   label: string
   value: string
   disabled?: boolean
-  /** Leading visual when the group uses visualControl="icon". */
   icon?: React.ReactNode
   description?: string
-  /** Optional badge rendered inline with the title (e.g. "Recommended"). */
   badge?: string
-  /** Inline muted text immediately after the title (e.g. "Heritage required"). */
   titleMeta?: string
-  /** Compact density: trait names or other summary chips rendered inline. */
   summaryItems?: string[]
-  /** Stacked muted lines below the title row (e.g. level-grouped grant summaries). */
   summaryLines?: string[]
-  /** Rich summary under the description, before string summary lines. */
   summaryContent?: React.ReactNode
-  /** Full-bleed image region above the card body. */
   media?: React.ReactNode
-  /** Third-row neutral badge (e.g. spellcasting progression). */
   summaryBadge?: RadioCardSummaryBadge
-  /** Rendered inside the card shell when this option is selected (e.g. dependent-choice flow). */
   embeddedContent?: React.ReactNode
-  /** Visual treatment for the embedded region below the primary card row. */
   embeddedSlotTone?: RadioCardEmbeddedSlotTone
-  /** Always-visible region below the primary row inside the shell (e.g. validation reasons). */
   footerContent?: React.ReactNode
-  onDetails?: () => void
-  /** Overrides the default `View {label} details` accessible name for the info action. */
-  detailsAriaLabel?: string
 }
+
+type RadioCardOptionTrailing =
+  | { details?: undefined; onDetails?: undefined }
+  | { details: React.ReactNode; onDetails?: never }
+  | { onDetails: () => void; details?: never }
+
+export type RadioCardOption = RadioCardOptionBase & RadioCardOptionTrailing
 
 export interface RadioCardProps extends React.ComponentPropsWithoutRef<typeof RadioGroup> {
   options: RadioCardOption[]
-  /** Prefix for generated option ids (used with `htmlFor` when embedding items separately). */
   idPrefix?: string
   variant?: RadioCardVariant
   density?: SelectionOptionCardDensity
-  /**
-   * Horizontal placement of the decorative radio control within each card.
-   * Ignored when visualControl="icon".
-   */
-  controlPosition?: 'left' | 'right'
-  /** Leading control presentation. Default 'radio' preserves existing consumers. */
   visualControl?: RadioCardVisualControl
-  /** Responsive column count for card-variant groups. Default 'one'. */
   columns?: RadioCardColumns
-  /** Reserve third-row badge height on every card for equal-height grids. */
-  reserveSummaryBadgeRow?: boolean
-  /** Clamp title and description for equal-height card grids. */
-  clampDescription?: boolean
-  /** When `content`, metadata under the title shrink-wraps instead of filling the content column. */
   copyWidth?: SelectionOptionCardCopyWidth
 }
 
-/**
- * Card-style single-select built on Radix `RadioGroup`. Each option renders a
- * label, optional description, and optional summary content.
- */
 function RadioCard({
   className,
   options,
   idPrefix = 'radio-card',
   variant = 'card',
   density = 'default',
-  controlPosition = 'left',
   visualControl = 'radio',
   columns = 'one',
-  reserveSummaryBadgeRow = false,
-  clampDescription = false,
   copyWidth = 'fill',
   value,
   onValueChange,
   ...props
 }: RadioCardProps) {
   const selectedValue = value ?? undefined
+  const reserveSummaryBadgeRow = options.some((option) => option.summaryBadge != null)
 
   return (
     <RadioGroup
@@ -135,16 +101,9 @@ function RadioCard({
       {...props}
     >
       {options.map((option) => {
-        const selected = selectedValue === option.value
         const titleAdornment = (
           <RadioOptionCardTitleAdornment badge={option.badge} titleMeta={option.titleMeta} />
         )
-        const titleEndSlot = option.onDetails ? (
-          <RadioOptionCardDetailsAction
-            ariaLabel={option.detailsAriaLabel ?? resolveRadioCardDetailsAriaLabel(option.label)}
-            onDetails={option.onDetails}
-          />
-        ) : undefined
 
         return (
           <RadioOptionCard
@@ -152,6 +111,7 @@ function RadioCard({
             id={`${idPrefix}-${option.value}`}
             value={option.value}
             disabled={option.disabled}
+            reserveSummaryBadgeRow={reserveSummaryBadgeRow}
             label={option.label}
             description={option.description}
             summaryItems={option.summaryItems}
@@ -159,21 +119,17 @@ function RadioCard({
             summaryContent={option.summaryContent}
             density={density}
             variant={variant}
-            controlPosition={controlPosition}
             visualControl={visualControl}
             icon={option.icon}
             titleAdornment={titleAdornment}
-            titleEndSlot={titleEndSlot}
             media={option.media}
             summaryBadge={option.summaryBadge}
-            reserveSummaryBadgeRow={reserveSummaryBadgeRow}
-            clampDescription={clampDescription}
             copyWidth={copyWidth}
             embedded={option.embeddedContent}
             footer={option.footerContent}
             embeddedTone={option.embeddedSlotTone}
-            shellSelected={selected}
-            showEmbedded={selected}
+            details={'details' in option ? option.details : undefined}
+            onDetails={'onDetails' in option ? option.onDetails : undefined}
             onClick={createRadioCardReselectClickHandler(
               option.value,
               selectedValue,

@@ -423,26 +423,6 @@ describe('CatalogPickerSheet', () => {
     expect(screen.queryByText('Alpha Item')).not.toBeInTheDocument()
   })
 
-  it('drops catalog content inset when rowLayout is entity-card', () => {
-    render(
-      <CatalogPickerSheet
-        open
-        onOpenChange={vi.fn()}
-        title="Catalog"
-        rowPreset="catalog"
-        rowLayout="entity-card"
-        items={items}
-        getItemKey={(item) => item.id}
-        getSearchText={(item) => item.searchText}
-        renderItemHeader={(item) => <span>{item.name}</span>}
-      />,
-    )
-
-    const rowShell = screen.getAllByRole('group')[0]
-    expect(rowShell).toHaveClass('p-0')
-    expect(rowShell).not.toHaveClass('pl-2')
-  })
-
   it('delegates row rendering to renderCollapsibleRow when provided', () => {
     render(
       <CatalogPickerSheet

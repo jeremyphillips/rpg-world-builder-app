@@ -100,7 +100,6 @@ const gridOptions = [
 
 export const RadioOnRightTwoColumnGrid: Story = {
   args: {
-    controlPosition: 'right',
     columns: 'two',
     options: gridOptions,
     defaultValue: '5e',

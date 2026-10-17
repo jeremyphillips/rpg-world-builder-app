@@ -248,10 +248,10 @@ describe('DisclosureEntityCard', () => {
 
     const article = container.querySelector('article')
     expect(article).toHaveAttribute('data-disabled', 'true')
-    expect(article).toHaveClass('opacity-60')
+    expect(article).toHaveClass('ui-card--disabled')
   })
 
-  it('owns subtle header fill independent of parent host surfaces', () => {
+  it('owns quiet card fill independent of parent host surfaces', () => {
     const { container } = render(
       <div className="bg-surface-muted">
         <DisclosureEntityCard
@@ -266,8 +266,8 @@ describe('DisclosureEntityCard', () => {
     )
 
     const article = container.querySelector('article')
-    expect(article).toHaveClass('bg-surface-subtle')
-    expect(article?.className).toContain('[--surface-current:var(--surface-subtle)]')
+    expect(article).toHaveClass('ui-card--quiet')
+    expect(article?.className).not.toContain('bg-surface-muted')
   })
 
   it('forwards trailing seam to EntityAnatomyHost anatomy', () => {
@@ -304,12 +304,12 @@ describe('DisclosureEntityCard', () => {
 
     const headerWrap = screen
       .getByText('Light', { selector: '.font-body-emphasis' })
-      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
+      .closest('.dash-entity-card__content') as HTMLElement
     const anatomy = headerWrap.querySelector('.grid') as HTMLElement
     const trailing = container.querySelector('[data-entity-item-slot="trailing"]') as HTMLElement
     const content = container.querySelector('[data-entity-item-slot="content"]') as HTMLElement
 
-    expect(headerWrap).toHaveClass('w-full', 'min-w-0')
+    expect(headerWrap).toHaveClass('dash-entity-card__content')
     expect(anatomy).toHaveClass('w-full')
     expect(anatomy).toHaveAttribute('data-row-anatomy')
     expect(content).toHaveAttribute('data-row-anatomy-column', 'content')
@@ -387,9 +387,8 @@ describe('DisclosureEntityCard', () => {
 
     const headerWrap = screen
       .getByText('Harbor District', { selector: '.font-body-emphasis' })
-      .closest('[class*="pl-[var(--entity-surface-inline-start)]"]') as HTMLElement
-    expect(headerWrap.className).toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
-    expect(headerWrap.className).toMatch(/pr-\[var\(--entity-surface-inline-end\)\]/)
+      .closest('.dash-entity-card__content') as HTMLElement
+    expect(headerWrap).toHaveClass('dash-entity-card__content')
   })
 
   it('matches leading offset to grip+caret count on the article root', () => {

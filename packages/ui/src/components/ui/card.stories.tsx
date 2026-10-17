@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { ClassReferenceTable } from '../../stories/semantic-classes/class-reference-table'
 import { Button } from './button.client'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
-import { CARD_CLASS_SPECS, cardSurfaceVariants } from './card.variants'
+import { CARD_CLASS_SPECS } from './card.variants'
 import { Input } from './input.client'
 
 const meta = {
@@ -60,7 +60,7 @@ export const ClassReference: Story = {
           </div>
         ),
         propsLabel: spec.key,
-        className: cardSurfaceVariants({ interactive: spec.key === 'interactive' }),
+        className: spec.className,
         keyValues: spec.keyValues,
         useCase: spec.useCase,
       }))}

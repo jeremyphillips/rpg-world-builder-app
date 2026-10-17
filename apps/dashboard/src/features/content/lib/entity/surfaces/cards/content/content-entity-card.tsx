@@ -18,8 +18,6 @@ export type ContentEntityCardProps = {
   /** Exactly one leading utility when set — never a multi-control fragment. */
   leading?: ReactNode
   trailing?: EntityAnatomyTrailing
-  /** Links the entity heading only — not whole-row/card navigation. */
-  headingHref?: string
   density?: ContentCardDensity
   disabled?: boolean
   /** Numeric-only passive scalar aligned with the entity heading row. */
@@ -32,7 +30,6 @@ export function ContentEntityCard({
   entity,
   leading,
   trailing,
-  headingHref,
   density,
   disabled = false,
   headingEndValue,
@@ -46,13 +43,11 @@ export function ContentEntityCard({
       density={resolvedDensity}
       disabled={disabled}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount: leading ? 1 : 0, trailing })}
-      surface="card"
     >
       <EntityCardUtilityFieldSizeProvider size={utilityFieldSize}>
-        <EntityCardContent density={resolvedDensity}>
+        <EntityCardContent>
           <EntityAnatomy
             entity={entity}
-            headingHref={headingHref}
             leadingUtilities={leading != null ? [leading] : undefined}
             trailing={trailing}
             density={resolvedDensity}

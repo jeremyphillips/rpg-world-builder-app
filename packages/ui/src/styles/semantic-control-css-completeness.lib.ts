@@ -468,6 +468,34 @@ export const SEMANTIC_CONTROL_CSS_REGISTRY: SemanticControlCssRegistryEntry[] = 
     filePath: cardCssPath,
     dimensions: [
       {
+        modifierPrefix: 'ui-card--quiet',
+        requiredProperties: [
+          '--ui-card-bg',
+          '--ui-card-border',
+          '--ui-card-shadow',
+          '--ui-card-radius',
+          '--ui-card-bg-hover',
+          '--ui-card-border-hover',
+          '--ui-card-bg-selected',
+          '--ui-card-border-selected',
+          '--ui-card-ring-selected',
+        ],
+      },
+      {
+        modifierPrefix: 'ui-card--strong',
+        requiredProperties: [
+          '--ui-card-bg',
+          '--ui-card-border',
+          '--ui-card-shadow',
+          '--ui-card-radius',
+          '--ui-card-bg-hover',
+          '--ui-card-border-hover',
+          '--ui-card-bg-selected',
+          '--ui-card-border-selected',
+          '--ui-card-ring-selected',
+        ],
+      },
+      {
         modifierPrefix: 'ui-card--static',
         requiredProperties: ['transition-property'],
       },

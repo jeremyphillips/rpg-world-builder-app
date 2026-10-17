@@ -302,7 +302,27 @@ export {
   CardDescription,
   CardContent,
 } from './components/ui/card'
-export { cardSurfaceClasses, cardSurfaceVariants } from './components/ui/card.variants'
+export {
+  CARD_CLASS_SPECS,
+  CARD_SURFACE_TONES,
+  cardSurfaceClasses,
+  cardSurfaceVariants,
+  type CardClassSpec,
+  type CardSurfaceTone,
+  type CardSurfaceVariantProps,
+} from './components/ui/card.variants'
+export {
+  CardSurfaceToneProvider,
+  useCardSurfaceTone,
+} from './components/ui/card-surface-tone.client'
+export {
+  SelectionTarget,
+  SelectionTargetRadio,
+  SelectionTargetRaised,
+  type SelectionTargetRadioProps,
+} from './components/ui/selection-target.client'
+export { DisclosureChevronTrigger } from './components/ui/disclosure-chevron-trigger.client'
+export { useRadioGroupItemSelected } from './components/ui/radio-group.client'
 
 export {
   fieldControlTriggerCursorClasses,
@@ -486,7 +506,6 @@ export {
 } from './components/ui/selection-option-card-anatomy.client'
 export {
   RadioOptionCard,
-  RadioOptionCardDetailsAction,
   RadioOptionCardTitleAdornment,
   type RadioOptionCardProps,
   type RadioOptionCardEmbeddedSlotTone,
@@ -494,7 +513,6 @@ export {
 export {
   RadioCard,
   radioCardVariants,
-  resolveRadioCardDetailsAriaLabel,
   type RadioCardVisualControl,
   type RadioCardVariant,
   type RadioCardEmbeddedSlotTone,

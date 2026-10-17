@@ -1,11 +1,14 @@
 import { createElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
+import { validateSemanticControlCssCompleteness } from '@rpg/ui/test-utils'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { resolveEntitySurfaceEdges } from '../../../../anatomy/entity-surface-edges.lib'
 import type { EntityAnatomyTrailing } from '../../../../anatomy/entity-anatomy-trailing.types'
 import { catalogEntityRowBodyWashVariants } from '../../../catalog/catalog-entity-row.variants'
 import { disclosureEntityCardBodyWashVariants } from '../../disclosure/disclosure-entity-card.variants'
-import { entityCardContentInsetVariants } from '../entity-card-content.variants'
 import { entityCardFrameVariants } from '../entity-card-frame.variants'
 
 const button = () => createElement('button', { type: 'button' })
@@ -20,43 +23,65 @@ const groupTrailing: EntityAnatomyTrailing = {
 const END_UTILITY = '[--entity-surface-inline-end:var(--entity-surface-utility-inset)]'
 const END_DEFAULT = '[--entity-surface-inline-end:var(--entity-surface-inset)]'
 
+const dashEntityCardCssPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../dash-entity-card.css',
+)
+
 describe('entity card surface contract', () => {
   it('keeps perimeter and content inset as separate owners', () => {
-    const frame = entityCardFrameVariants({ density: 'compact', surface: 'card' })
-    const content = entityCardContentInsetVariants({ density: 'compact' })
+    const frame = entityCardFrameVariants({ density: 'compact' })
 
     expect(frame).not.toMatch(/\bpy-\d/)
     expect(frame).not.toMatch(/\bp[xytblr]-\d/)
+    expect(frame).toContain('dash-entity-card__content'.replace('__content', ''))
+    expect(frame).toContain('dash-entity-card--compact')
     expect(frame).not.toMatch(/pl-\[var\(--entity-surface-inline-start\)\]/)
 
-    expect(content).toContain('py-2')
-    expect(content).toContain('pl-[var(--entity-surface-inline-start)]')
-    expect(content).toContain('pr-[var(--entity-surface-inline-end)]')
+    expect(frame).toContain('[--entity-surface-inset:calc(var(--spacing)*4)]')
   })
 
-  it('resolves identical content inset across surfaces at the same density', () => {
-    expect(entityCardContentInsetVariants({ density: 'compact' })).toBe(
-      entityCardContentInsetVariants({ density: 'compact' }),
+  it('publishes block inset on the frame density modifier', () => {
+    expect(entityCardFrameVariants({ density: 'compact' })).toContain('dash-entity-card--compact')
+    expect(entityCardFrameVariants({ density: 'comfortable' })).toContain(
+      'dash-entity-card--comfortable',
     )
-    expect(entityCardContentInsetVariants({ density: 'comfortable' })).toContain('py-3')
   })
 
-  it('maps surface identities on the frame only', () => {
-    expect(entityCardFrameVariants({ density: 'compact', surface: 'card' })).toContain('bg-card')
-    expect(entityCardFrameVariants({ density: 'compact', surface: 'subtle' })).toContain(
-      'bg-surface-subtle',
-    )
-    expect(entityCardFrameVariants({ density: 'compact', surface: 'catalogRow' })).toContain(
-      'bg-catalog-picker-row-surface',
-    )
+  it('does not reference removed catalog row surface tokens', () => {
+    const frame = entityCardFrameVariants({ density: 'compact' })
+    expect(frame).not.toContain('bg-catalog-picker-row-surface')
+    expect(frame).not.toContain('surface=')
+  })
+
+  it('registers dash-entity-card semantic CSS completely', () => {
+    const failures = validateSemanticControlCssCompleteness({
+      filePath: dashEntityCardCssPath,
+      classPrefix: 'dash',
+      dimensions: [
+        {
+          modifierPrefix: 'dash-entity-card--compact',
+          requiredProperties: ['--entity-surface-block-inset'],
+        },
+        {
+          modifierPrefix: 'dash-entity-card--comfortable',
+          requiredProperties: ['--entity-surface-block-inset'],
+        },
+        {
+          modifierPrefix: 'dash-entity-card__content',
+          requiredProperties: ['padding-inline-start', 'padding-inline-end', 'padding-block'],
+        },
+      ],
+    })
+    expect(failures).toEqual([])
   })
 })
 
 describe('edge-aware surface inset', () => {
   it('tightens the header end inset for utility and chevron trailing', () => {
-    expect(resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing: utilityTrailing })).toEqual(
-      { start: 'default', end: 'utility' },
-    )
+    expect(
+      resolveEntitySurfaceEdges({ leadingUtilityCount: 0, trailing: utilityTrailing }),
+    ).toEqual({ start: 'default', end: 'utility' })
     expect(
       resolveEntitySurfaceEdges({
         leadingUtilityCount: 1,
@@ -82,7 +107,10 @@ describe('edge-aware surface inset', () => {
   })
 
   it('keeps body end padding on the base inset whatever the trailing kind', () => {
-    for (const wash of [disclosureEntityCardBodyWashVariants(), catalogEntityRowBodyWashVariants()]) {
+    for (const wash of [
+      disclosureEntityCardBodyWashVariants(),
+      catalogEntityRowBodyWashVariants(),
+    ]) {
       expect(wash).toContain('pr-[var(--entity-body-inline-end)]')
       expect(wash).not.toContain('pr-[var(--entity-surface-inline-end)]')
     }

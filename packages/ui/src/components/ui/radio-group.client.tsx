@@ -10,13 +10,27 @@ import {
   radioGroupItemControlClasses,
 } from './choice-control.variants'
 
+const RadioGroupValueContext = React.createContext<string | null | undefined>(undefined)
+
 const RadioGroup = React.forwardRef<
   React.ComponentRef<typeof RadioGroupPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <RadioGroupPrimitive.Root ref={ref} className={cn('grid gap-2', className)} {...props} />
+>(({ className, value, ...props }, ref) => (
+  <RadioGroupValueContext.Provider value={value}>
+    <RadioGroupPrimitive.Root
+      ref={ref}
+      className={cn('grid gap-2', className)}
+      value={value}
+      {...props}
+    />
+  </RadioGroupValueContext.Provider>
 ))
 RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
+
+export function useRadioGroupItemSelected(optionValue: string): boolean {
+  const groupValue = React.useContext(RadioGroupValueContext)
+  return groupValue === optionValue
+}
 
 type RadioGroupItemProps = React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item> & {
   variant?: 'default' | 'tile'

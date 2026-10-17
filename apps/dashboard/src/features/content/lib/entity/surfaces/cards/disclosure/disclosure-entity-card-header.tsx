@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import type { CollapsibleListItemDragHandleConfig, ContentCardDensity } from '@rpg/ui'
 
 import { EntityAnatomy } from '../../../anatomy/entity-anatomy'
@@ -11,8 +10,6 @@ export type DisclosureEntityCardHeaderProps = {
   trailing?: EntityAnatomyTrailing
   headingHref?: string
   density?: ContentCardDensity
-  /** Optional consumer drag grip — rendered in the entity leading rail. */
-  dragHandle?: ReactNode
   /** Enables sortable drag grip — requires CollapsibleListItem drag context. */
   dragHandleProps?: CollapsibleListItemDragHandleConfig
 }
@@ -23,10 +20,9 @@ export function DisclosureEntityCardHeader({
   trailing,
   headingHref,
   density = 'comfortable',
-  dragHandle,
   dragHandleProps,
 }: DisclosureEntityCardHeaderProps) {
-  const leadingUtilities = resolveEntityDisclosureLeadingUtilities({ dragHandle, dragHandleProps })
+  const leadingUtilities = resolveEntityDisclosureLeadingUtilities({ dragHandleProps })
 
   return (
     <EntityAnatomy

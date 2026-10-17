@@ -89,9 +89,9 @@ describe('RadioCard', () => {
       />,
     )
 
-    const radio = screen.getByRole('radio', { name: /Elf/i })
-    expect(radio).toHaveTextContent('Elf')
-    expect(radio).toHaveTextContent('Heritage required')
+    expect(screen.getByRole('radio', { name: /Elf/i })).toBeInTheDocument()
+    expect(screen.getByText('Elf')).toBeInTheDocument()
+    expect(screen.getByText('Heritage required')).toBeInTheDocument()
   })
 
   it('renders stacked summary lines for dependent-choice cards', () => {
@@ -160,8 +160,8 @@ describe('RadioCard', () => {
       />,
     )
 
-    const shell = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-surface-strong')
+    const shell = screen.getByRole('radio', { name: /Elf/i }).closest('.ui-card--selected')
+    expect(shell).toHaveClass('ui-card--strong')
     expect(shell).toHaveTextContent('Lineage picker')
   })
 
@@ -181,8 +181,8 @@ describe('RadioCard', () => {
     )
 
     expect(screen.getByText('Requires strength 13')).toBeInTheDocument()
-    const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('[class*="rounded-card"]')
-    expect(shell).toHaveClass('bg-surface-muted')
+    const shell = screen.getByRole('radio', { name: /Dwarf/i }).closest('.ui-card')
+    expect(shell).toHaveClass('ui-card--strong')
   })
 
   it('renders embedded content inside the selected card shell', () => {
@@ -204,7 +204,7 @@ describe('RadioCard', () => {
       />,
     )
 
-    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('[class*="rounded-card"]')
+    const elfCard = screen.getByRole('radio', { name: /Elf/i }).closest('.ui-radio-card')
     expect(elfCard).toHaveTextContent('Gnomish Lineage picker')
   })
 
@@ -251,12 +251,10 @@ describe('RadioCard', () => {
       />,
     )
 
-    const drow = screen.getByRole('radio', { name: /Drow/i })
-    expect(drow).toHaveClass('rounded-md')
-    expect(drow).not.toHaveClass('shadow-sm')
-    expect(drow).toHaveClass('border-0')
-    expect(drow).toHaveClass('ui-interactive-row--data-checked')
-    expect(drow).not.toHaveClass('data-[state=checked]:ring-1')
+    const drowRow = screen.getByRole('radio', { name: /Drow/i }).closest('.ui-radio-card--row')
+    expect(drowRow).toBeTruthy()
+    expect(drowRow).toHaveClass('ui-interactive-row--selected-bordered')
+    expect(drowRow).not.toHaveClass('ui-card--selected')
   })
 
   it('renders embedded panel slot edge-to-edge inside the card shell', () => {
@@ -374,23 +372,8 @@ describe('RadioCard', () => {
     )
 
     const selected = screen.getByRole('radio', { name: /General table/i })
-    expect(selected).toHaveClass('data-[state=checked]:border-primary')
-    expect(selected).toHaveClass('data-[state=checked]:bg-surface-strong')
-  })
-
-  it('selects an option when controlPosition is right', async () => {
-    const user = userEvent.setup()
-    const onValueChange = vi.fn()
-    render(
-      <RadioCard
-        aria-label="Edition preset"
-        options={options}
-        controlPosition="right"
-        onValueChange={onValueChange}
-      />,
-    )
-    await user.click(screen.getByRole('radio', { name: /Modern 3e/i }))
-    expect(onValueChange).toHaveBeenCalledWith('3e')
+    expect(selected).toBeChecked()
+    expect(selected.closest('.ui-card--selected')).toBeTruthy()
   })
 
   it('opens details without selecting the card', async () => {
@@ -417,24 +400,6 @@ describe('RadioCard', () => {
     await user.click(screen.getByRole('button', { name: 'View Dwarf details' }))
     expect(onDetails).toHaveBeenCalledTimes(1)
     expect(onValueChange).not.toHaveBeenCalled()
-  })
-
-  it('exposes a focusable details control in compact mode', () => {
-    render(
-      <RadioCard
-        aria-label="Species"
-        density="compact"
-        options={[
-          {
-            label: 'Dwarf',
-            value: 'dwarf',
-            onDetails: vi.fn(),
-            detailsAriaLabel: 'View Dwarf details',
-          },
-        ]}
-      />,
-    )
-    expect(screen.getByRole('button', { name: 'View Dwarf details' })).toBeInTheDocument()
   })
 
   it('renders the details action inline with the title row', () => {

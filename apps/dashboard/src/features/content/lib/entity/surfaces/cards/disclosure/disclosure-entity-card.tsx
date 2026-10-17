@@ -24,8 +24,6 @@ export type DisclosureEntityCardProps = {
   entity: EntitySummaryModel
   itemId: string
   toolbarAriaLabel: string
-  /** Optional consumer drag grip — rendered in the entity leading rail. */
-  dragHandle?: ReactNode
   trailing?: EntityAnatomyTrailing
   /** Links the entity heading only — not whole-row/card navigation. */
   headingHref?: string
@@ -43,7 +41,6 @@ export function DisclosureEntityCard({
   entity,
   itemId,
   toolbarAriaLabel,
-  dragHandle,
   trailing,
   headingHref,
   children,
@@ -67,7 +64,6 @@ export function DisclosureEntityCard({
   return (
     <EntityCardFrame
       density={density}
-      surface="subtle"
       disabled={disabled}
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount, trailing })}
       style={leadingOffsetStyle}
@@ -88,13 +84,12 @@ export function DisclosureEntityCard({
         className={disclosureEntityCardListItemVariants()}
         bodyClassName={disclosureEntityCardBodyWashVariants()}
         header={
-          <EntityCardContent density={density}>
+          <EntityCardContent>
             <DisclosureEntityCardHeader
               entity={entity}
               headingHref={headingHref}
               trailing={trailing}
               density={density}
-              dragHandle={dragHandle}
               dragHandleProps={dragHandleProps}
             />
           </EntityCardContent>

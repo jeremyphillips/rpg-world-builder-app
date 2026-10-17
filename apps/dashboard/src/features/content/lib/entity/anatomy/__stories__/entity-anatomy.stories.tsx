@@ -46,10 +46,7 @@ export const EmbeddedWithAction: Story = {
 export const ContentEntityCardComfortable: Story = {
   render: () => (
     <div className="max-w-md">
-      <ContentEntityCard
-        entity={HARBOR_DISTRICT_ENTITY}
-        headingHref="/campaigns/demo/locations/harbor"
-      />
+      <ContentEntityCard entity={HARBOR_DISTRICT_ENTITY} />
     </div>
   ),
 }

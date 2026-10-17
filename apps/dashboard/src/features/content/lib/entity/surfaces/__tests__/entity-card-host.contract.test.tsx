@@ -5,12 +5,10 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { HARBOR_DISTRICT_ENTITY } from '../../__tests__/entity.fixture'
 import { CatalogEntityRow } from '../catalog/catalog-entity-row'
-import { entityCardContentInsetVariants } from '../cards/content/entity-card-content.variants'
 import { ContentEntityCard } from '../cards/content/content-entity-card'
 import { DisclosureEntityCard } from '../cards/disclosure/disclosure-entity-card'
 
-const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
-const comfortableContentInset = entityCardContentInsetVariants({ density: 'comfortable' })
+const ENTITY_CARD_CONTENT_CLASS = 'dash-entity-card__content'
 
 const MEANINGFUL_PADDING_PATTERN = /\b(p[xytblr]-(?!0\b)\d+|p-(?!0\b)\d+)\b/
 
@@ -24,16 +22,13 @@ function countEntityCardContentRegions(container: HTMLElement): number {
   const article = container.querySelector('article') as HTMLElement
   return Array.from(article.querySelectorAll('*')).filter((element) => {
     const className = element.getAttribute('class') ?? ''
-    return (
-      className.includes('pl-[var(--entity-surface-inline-start)]') &&
-      (className.includes('py-2') || className.includes('py-3'))
-    )
+    return className.includes(ENTITY_CARD_CONTENT_CLASS)
   }).length
 }
 
 function entityCardContentElement(container: HTMLElement): HTMLElement {
   const article = container.querySelector('article') as HTMLElement
-  const contentInset = article.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  const contentInset = article.querySelector(`.${ENTITY_CARD_CONTENT_CLASS}`)
   expect(contentInset).toBeTruthy()
   return contentInset as HTMLElement
 }
@@ -136,7 +131,7 @@ describe('Entity card host contract (single inset owner)', () => {
     const flatInset = entityCardContentElement(flatContainer).className
     const disclosureInset = entityCardContentElement(disclosureContainer).className
     expect(flatInset).toBe(disclosureInset)
-    expect(flatInset).toContain(compactContentInset)
+    expect(flatInset).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('resolves identical content inset classes across all three hosts at compact density', () => {
@@ -175,7 +170,7 @@ describe('Entity card host contract (single inset owner)', () => {
     ]
 
     expect(new Set(insetClassNames).size).toBe(1)
-    expect(insetClassNames[0]).toContain(compactContentInset)
+    expect(insetClassNames[0]).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('maps comfortable density inset on EntityCardContent only', () => {
@@ -188,7 +183,7 @@ describe('Entity card host contract (single inset owner)', () => {
     const article = container.querySelector('article') as HTMLElement
     const content = entityCardContentElement(container)
     assertNoMeaningfulPadding(article.className)
-    expect(content.className).toContain(comfortableContentInset)
+    expect(content.className).toContain(ENTITY_CARD_CONTENT_CLASS)
   })
 
   it('does not apply entity-card header padding on default CLI rows with collapsible=false', () => {

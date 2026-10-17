@@ -22,7 +22,6 @@ export type CatalogEntityRowProps = {
   details?: ReactNode
   entity: EntitySummaryModel
   trailing?: EntityAnatomyTrailing
-  headingHref?: string
 }
 
 const CATALOG_ENTITY_ROW_DENSITY = 'compact' as const
@@ -38,7 +37,6 @@ export function CatalogEntityRow({
   details,
   entity,
   trailing,
-  headingHref,
 }: CatalogEntityRowProps) {
   const isDisclosure = collapsible
   const contentOffsetStyle = isDisclosure
@@ -51,7 +49,6 @@ export function CatalogEntityRow({
   return (
     <EntityCardFrame
       density={CATALOG_ENTITY_ROW_DENSITY}
-      surface="catalogRow"
       edges={resolveEntitySurfaceEdges({ leadingUtilityCount: isDisclosure ? 1 : 0, trailing })}
       style={contentOffsetStyle}
     >
@@ -71,19 +68,17 @@ export function CatalogEntityRow({
         className={disclosureEntityCardListItemVariants()}
         bodyClassName={isDisclosure ? catalogEntityRowBodyWashVariants() : undefined}
         header={
-          <EntityCardContent density={CATALOG_ENTITY_ROW_DENSITY}>
+          <EntityCardContent>
             {isDisclosure ? (
               <DisclosureEntityCardHeader
                 entity={entity}
                 trailing={trailing}
-                headingHref={headingHref}
                 density={CATALOG_ENTITY_ROW_DENSITY}
               />
             ) : (
               <EntityAnatomyHost
                 entity={entity}
                 trailing={trailing}
-                headingHref={headingHref}
                 density={CATALOG_ENTITY_ROW_DENSITY}
               />
             )}

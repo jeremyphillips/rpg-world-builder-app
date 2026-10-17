@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../../lib/utils'
+import { cardSurfaceVariants } from '../card.variants'
 import { dragHandleVariants } from '../drag-handle.variants'
 import { dragSurfaceVariants } from '../drag-surface.variants'
 import { iconGhostControlVariants } from '../icon-ghost-control.variants'
@@ -67,8 +68,11 @@ export const collapsibleListItemEntityCardHeaderRowClasses =
 
 export type CollapsibleListItemRowLayout = 'default' | 'entity-card'
 
-/** Catalog row chrome — picker/sheet row surface tone. */
-export const collapsibleListItemCatalogChromeClasses = 'border-border bg-catalog-picker-row-surface'
+/** Catalog row chrome — quiet card tone for raw picker rows. */
+export const collapsibleListItemCatalogChromeClasses = cn(
+  cardSurfaceVariants({ tone: 'quiet' }),
+  'border-border',
+)
 
 /** Shared body divider and vertical rhythm — no surface tone. */
 export const collapsibleListItemBodyFrameClasses = 'border-t border-border-subtle py-3'

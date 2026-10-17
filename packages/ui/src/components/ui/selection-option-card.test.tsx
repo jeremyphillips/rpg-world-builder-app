@@ -9,7 +9,6 @@ import {
 import { selectionOptionCardHeaderActionClasses } from './selection-option-card.variants'
 import {
   optionCardDescriptionVariants,
-  optionCardSelectedChromeClasses,
   optionCardSummaryTitleVariants,
 } from './selection-option-card.variants'
 
@@ -68,7 +67,7 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain(selectionOptionCardHeaderActionClasses)
-    expect(action.className).toContain('h-6')
+    expect(action.className).toContain('ui-button__text--sm-compact')
     expect(action.className).toContain('text-action-standalone')
     expect(action.className).not.toContain('text-control-action-xs')
     expect(action.className).not.toContain('h-auto')
@@ -92,7 +91,7 @@ describe('SelectionOptionCard', () => {
 
     const action = screen.getByRole('button', { name: 'Change package' })
     expect(action.className).toContain('text-control-action-xs')
-    expect(action.className).toContain('h-control-action-compact')
+    expect(action.className).toContain('ui-button__text--xs-compact')
     expect(action.className).not.toMatch(/\btext-sm\b/)
     expect(action.className).not.toMatch(/\btext-xs\b/)
   })
@@ -123,15 +122,13 @@ describe('SelectionOptionCard', () => {
     expect(eyebrow.className).toContain('eyebrow-style-xs')
   })
 
-  it('applies shared selected chrome classes when selected', () => {
+  it('applies strong selected card surface when selected', () => {
     const { container } = render(
       <SelectionOptionCard selected label="Selected package" summaryLines={['Line one']} />,
     )
 
     const shell = container.firstElementChild
-    for (const token of optionCardSelectedChromeClasses.split(' ')) {
-      expect(shell).toHaveClass(token)
-    }
+    expect(shell).toHaveClass('ui-card--strong', 'ui-card--selected')
   })
 
   itAxe('has no axe accessibility violations', async () => {

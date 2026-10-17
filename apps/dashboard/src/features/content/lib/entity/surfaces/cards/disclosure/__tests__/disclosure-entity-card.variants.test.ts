@@ -6,7 +6,6 @@ import {
   ENTITY_BODY_INLINE_END_VAR,
   ENTITY_BODY_INLINE_START_VAR,
 } from '../../../../anatomy/entity-geometry.tokens'
-import { entityCardContentInsetVariants } from '../../content/entity-card-content.variants'
 import {
   entityBodyInlineEndClasses,
   entityBodyInlineStartClasses,
@@ -26,10 +25,12 @@ describe('entity body inline classes', () => {
   })
 })
 
-describe('entityCardContentInsetVariants', () => {
+describe('dash-entity-card content', () => {
   it('fills the available header region for full-width entity anatomy', () => {
-    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('w-full')
-    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('min-w-0')
-    expect(entityCardContentInsetVariants({ density: 'compact' })).toContain('py-2')
+    const cssPath = join(__dirname, '../../content/dash-entity-card.css')
+    const css = readFileSync(cssPath, 'utf8')
+    expect(css).toContain('.dash-entity-card__content')
+    expect(css).toContain('width: 100%')
+    expect(css).toContain('padding-block: var(--entity-surface-block-inset)')
   })
 })

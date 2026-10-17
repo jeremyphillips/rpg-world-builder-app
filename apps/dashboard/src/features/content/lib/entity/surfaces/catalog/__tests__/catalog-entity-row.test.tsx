@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 
 import { CatalogEntityRow } from '../catalog-entity-row'
 import { catalogEntityRowBodyWashVariants } from '../catalog-entity-row.variants'
-import { entityCardContentInsetVariants } from '../../cards/content/entity-card-content.variants'
 import { ENTITY_CONTENT_OFFSET_VAR } from '../../../anatomy/entity-leading-rail.lib'
 
 const domIds = {
@@ -13,11 +12,9 @@ const domIds = {
   bodyId: 'picker-item-rope-body',
 }
 
-const compactContentInset = entityCardContentInsetVariants({ density: 'compact' })
-
 function entityCardContentFromShell(container: HTMLElement): HTMLElement {
   const shell = container.querySelector('[role="group"]') as HTMLElement
-  const contentInset = shell.querySelector('.pl-\\[var\\(--entity-surface-inline-start\\)\\]')
+  const contentInset = shell.querySelector('.dash-entity-card__content')
   expect(contentInset).toBeTruthy()
   return contentInset as HTMLElement
 }
@@ -36,7 +33,7 @@ describe('CatalogEntityRow', () => {
     )
 
     const frame = container.querySelector('article') as HTMLElement
-    expect(frame).toHaveClass('bg-catalog-picker-row-surface')
+    expect(frame).toHaveClass('ui-card--quiet')
     expect(frame).toHaveClass('[--entity-surface-inline-start:var(--entity-surface-utility-inset)]')
     expect(frame).toHaveClass('[--entity-surface-utility-inset:calc(var(--spacing)*1)]')
     expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toContain(
@@ -46,7 +43,7 @@ describe('CatalogEntityRow', () => {
     const shell = screen.getByRole('group')
     expect(shell).toHaveClass('p-0')
     expect(shell).not.toHaveClass('pl-2')
-    expect(shell).not.toHaveClass('bg-catalog-picker-row-surface')
+    expect(shell).not.toHaveClass('ui-card--quiet')
 
     const headerRow = shell.firstElementChild as HTMLElement
     expect(headerRow).not.toHaveClass(
@@ -54,7 +51,7 @@ describe('CatalogEntityRow', () => {
     )
 
     const contentInset = entityCardContentFromShell(container)
-    expect(contentInset).toHaveClass(compactContentInset)
+    expect(contentInset).toHaveClass('dash-entity-card__content')
 
     const leading = document.querySelector('[data-entity-item-slot="leading"]')
     expect(leading?.querySelector('button[aria-expanded]')).toBeTruthy()
@@ -78,7 +75,7 @@ describe('CatalogEntityRow', () => {
     expect(frame.style.getPropertyValue(ENTITY_CONTENT_OFFSET_VAR)).toBe('')
 
     const contentInset = entityCardContentFromShell(container)
-    expect(contentInset).toHaveClass(compactContentInset)
+    expect(contentInset).toHaveClass('dash-entity-card__content')
 
     const headerRow = screen.getByRole('group').firstElementChild as HTMLElement
     expect(headerRow).not.toHaveClass(

@@ -5,11 +5,8 @@ import * as React from 'react'
 import { CollapsibleListItem } from './collapsible-list-item'
 import type {
   CatalogPickerCollapsibleRowRenderArgs,
-  CatalogPickerRowLayout,
   CatalogPickerSheetProps,
 } from './catalog-picker-sheet.types'
-import type { CollapsibleListItemShellPreset } from './collapsible-list-item/collapsible-list-item-shell.client'
-import type { SurfaceConfig } from './visual-vocabulary.types'
 import { catalogPickerSheetListVariants } from './catalog-picker-sheet.variants'
 import { resolveCollapsibleListItemDomIds } from './collapsible-list-item/collapsible-list-item.variants'
 
@@ -42,10 +39,6 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary,
   renderItemActions,
   renderItemDetails,
-  rowPreset,
-  rowLayout,
-  rowSurface = { elevation: 'flat' },
-  toolbarCompact = false,
   expandedItemId,
   onExpandedItemChange,
 }: {
@@ -57,10 +50,6 @@ function CatalogPickerCollapsibleItemRow<TItem>({
   renderItemSummary?: (item: TItem) => React.ReactNode
   renderItemActions?: (item: TItem) => React.ReactNode
   renderItemDetails?: (item: TItem) => React.ReactNode
-  rowPreset?: CollapsibleListItemShellPreset
-  rowLayout?: CatalogPickerRowLayout
-  rowSurface?: SurfaceConfig
-  toolbarCompact?: boolean
   expandedItemId?: string | null
   onExpandedItemChange?: (itemId: string | null) => void
 }) {
@@ -98,10 +87,10 @@ function CatalogPickerCollapsibleItemRow<TItem>({
         titleId={domIds.titleId}
         bodyId={domIds.bodyId}
         toolbarAriaLabel={toolbarLabel}
-        preset={rowPreset}
-        rowLayout={rowLayout}
-        surface={rowSurface}
-        toolbarCompact={toolbarCompact}
+        preset="catalog"
+        rowLayout="default"
+        surface={{ elevation: 'flat' }}
+        toolbarCompact={false}
         collapsible={hasDetails}
         showDragHandle={false}
         collapsed={!isExpanded}
@@ -140,10 +129,6 @@ export function CatalogPickerSheetResults<TItem>({
               renderItemSummary={rowProps.renderItemSummary}
               renderItemActions={rowProps.renderItemActions}
               renderItemDetails={rowProps.renderItemDetails}
-              rowPreset={rowProps.rowPreset}
-              rowLayout={rowProps.rowLayout}
-              rowSurface={rowProps.rowSurface}
-              toolbarCompact={rowProps.toolbarCompact}
               expandedItemId={rowProps.expandedItemId}
               onExpandedItemChange={rowProps.onExpandedItemChange}
             />
